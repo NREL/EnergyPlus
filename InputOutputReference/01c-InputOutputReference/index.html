@@ -297,7 +297,7 @@
         
         <li><a href="#field-outlet-node-name">Field: Outlet Node Name</a></li>
         
-        <li><a href="#field-maximum-flow-rate">Field: Maximum Flow Rate</a></li>
+        <li><a href="#field-design-flow-rate">Field: Design Flow Rate</a></li>
         
         <li><a href="#field-number-of-bore-holes">Field: Number of Bore Holes</a></li>
         
@@ -310,8 +310,6 @@
         <li><a href="#fieldset-ground-thermal-heat-capacity">FieldSet: Ground Thermal Heat Capacity</a></li>
         
         <li><a href="#field-ground-temperature">Field: Ground Temperature</a></li>
-        
-        <li><a href="#field-design-flow-rate">Field: Design Flow Rate</a></li>
         
         <li><a href="#field-grout-thermal-conductivity">Field: Grout Thermal Conductivity</a></li>
         
@@ -709,6 +707,8 @@
         
         <li><a href="#airflownetworkmultizonewindpressurecoefficientvalues">AirflowNetwork:MultiZone:WindPressureCoefficientValues</a></li>
         
+        <li><a href="#airflownetworkoccupantventilationcontrol">AirflowNetwork:OccupantVentilationControl</a></li>
+        
         <li><a href="#airflownetworkdistributionnode">AirflowNetwork:Distribution:Node</a></li>
         
         <li><a href="#airflownetworkdistributioncomponentleak">AirflowNetwork:Distribution:Component:Leak</a></li>
@@ -734,7 +734,7 @@
       </ul>
     </li>
   
-    <li class="main"><a href="#group-zone-equipment">Group – Zone Equipment</a>
+    <li class="main"><a href="#group-zone-equipment">Group - Zone Equipment</a>
       <ul class="nav">
         
         <li><a href="#zonehvacairdistributionunit">ZoneHVAC:AirDistributionUnit</a></li>
@@ -1099,8 +1099,8 @@
 <p>This alpha field contains the ground heat exchanger inlet node name.</p>
 <h4 id="field-outlet-node-name">Field: Outlet Node Name</h4>
 <p>This alpha field contains the ground heat exchanger outlet node name.</p>
-<h4 id="field-maximum-flow-rate">Field: Maximum Flow Rate</h4>
-<p>This numeric field contains the GHE maximum design flow rate in cubic meters per second {m<sup>3</sup>/s}.</p>
+<h4 id="field-design-flow-rate">Field: Design Flow Rate</h4>
+<p>This numeric field contains the GHE design flow rate in cubic meters per second {m<sup>3</sup>/s}.</p>
 <h4 id="field-number-of-bore-holes">Field: Number of Bore Holes</h4>
 <p>This numeric field contains the number of bore holes in the GHE installation.</p>
 <h4 id="field-bore-hole-length">Field: Bore Hole Length</h4>
@@ -1113,8 +1113,6 @@
 <p>This numeric field contains the thermal heat capacity of the ground in J/m<sup>3</sup>-K.</p>
 <h4 id="field-ground-temperature">Field: Ground Temperature</h4>
 <p>This numeric field contains the far field temperature of the ground in °C.</p>
-<h4 id="field-design-flow-rate">Field: Design Flow Rate</h4>
-<p>This numeric field contains the design volume flow rate of the GHE in m<sup>3</sup>/s.</p>
 <h4 id="field-grout-thermal-conductivity">Field: Grout Thermal Conductivity</h4>
 <p>This numeric field contains the thermal conductivity of the filler material in W/m-K.</p>
 <h4 id="field-pipe-thermal-conductivity">Field: Pipe Thermal Conductivity</h4>
@@ -1146,60 +1144,60 @@
 <p>This numeric field contains the G-function value of the corresponding LNTTS.</p>
 <p>The following is an example input:</p>
 <pre><code class="idf">GroundHeatExchanger:Vertical,
-    Vertical Ground Heat Exchanger,  !- Name
-    GHE Inlet Node,          !- Inlet Node Name
-    GHE Outlet Node,         !- Outlet Node Name
-    0.00330000,              !- Design Flow Rate {m3/s}
-    120,                     !- Number of Bore Holes
-    76.2,                    !- Bore Hole Length {m}
-    .635080E-01,             !- Bore Hole Radius {m}
-    .692626E+00,             !- Ground Thermal Conductivity {W/m-K}
-    .234700E+07,             !- Ground Thermal Heat Capacity {J/m3-K}
-    13.375,                  !- Ground Temperature {C}
-    .692626E+00,             !- Grout Thermal Conductivity {W/m-K}
-    .391312E+00,             !- Pipe Thermal Conductivity {W/m-K}
-    2.66667E-02,             !- Pipe Out Diameter {m}
-    2.53977E-02,             !- U-Tube Distance {m}
-    2.41285E-03,             !- Pipe Thickness {m}
-    2,                       !- Maximum Length of Simulation
-    0.0005,                  !- G-Function Reference Ratio
-    35,                      !- Number of Data Pairs of the G Function
-    ! The G-function is defined by the following data pairs
-    -15.2996, -0.348322,  ! G-Function Ln(T/Ts) Value 1, G-Function G Value 1
-    -14.201,   0.022208,  ! G-Function Ln(T/Ts) Value 2, G-Function G Value 2
-    -13.2202,  0.412345,  ! G-Function Ln(T/Ts) Value 3, G-Function G Value 3
-    -12.2086,  0.867498,  ! G-Function Ln(T/Ts) Value 4, G-Function G Value 4
-    -11.1888,  1.357839,  ! G-Function Ln(T/Ts) Value 5, G-Function G Value 5
-    -10.1816,  1.852024,  ! G-Function Ln(T/Ts) Value 6, G-Function G Value 6
-    -9.1815,   2.345656,  ! G-Function Ln(T/Ts) Value 7, G-Function G Value 7
-    -8.6809,   2.593958,  ! G-Function Ln(T/Ts) Value 8, G-Function G Value 8
-    -8.5,      2.679,     ! etc, etc.
-    -7.8,      3.023,
-    -7.2,      3.32,
-    -6.5,      3.681,
-    -5.9,      4.071,
-    -5.2,      4.828,
-    -4.5,      6.253,
-    -3.963,    7.894,
-    -3.27,     11.82,
-    -2.864,    15.117,
-    -2.577,    18.006,
-    -2.171,    22.887,
-    -1.884,    26.924,
-    -1.191,    38.004,
-    -0.497,    49.919,
-    -0.274,    53.407,
-    -0.051,    56.632,
-    0.196,     59.825,
-    0.419,     62.349,
-    0.642,     64.524,
-    0.873,     66.412,
-    1.112,     67.993,
-    1.335,     69.162,
-    1.679,     70.476,
-    2.028,     71.361,
-    2.275,     71.79,
-    3.003,     72.511;  !- 35 PAIRS
+Vertical Ground Heat Exchanger, !- Name
+GHE Inlet Node,                 !- Inlet Node Name
+GHE Outlet Node,                !- Outlet Node Name
+0.00330000,                     !- Design Flow Rate {m3/s}
+120,                            !- Number of Bore Holes
+76.2,                           !- Bore Hole Length {m}
+.635080E-01,                    !- Bore Hole Radius {m}
+.692626E+00,                    !- Ground Thermal Conductivity {W/m-K}
+.234700E+07,                    !- Ground Thermal Heat Capacity {J/m3-K}
+13.375,                         !- Ground Temperature {C}
+.692626E+00,                    !- Grout Thermal Conductivity {W/m-K}
+.391312E+00,                    !- Pipe Thermal Conductivity {W/m-K}
+2.66667E-02,                    !- Pipe Out Diameter {m}
+2.53977E-02,                    !- U-Tube Distance {m}
+2.41285E-03,                    !- Pipe Thickness {m}
+2,                              !- Maximum Length of Simulation
+0.0005,                         !- G-Function Reference Ratio
+35,                             !- Number of Data Pairs of the G Function
+! The G-function is defined by the following data pairs
+-15.2996, -0.348322,            ! G-Function Ln(T/Ts) Value 1, G-Function G Value 1
+-14.201,  0.022208,             ! G-Function Ln(T/Ts) Value 2, G-Function G Value 2
+-13.2202, 0.412345,             ! G-Function Ln(T/Ts) Value 3, G-Function G Value 3
+-12.2086, 0.867498,             ! G-Function Ln(T/Ts) Value 4, G-Function G Value 4
+-11.1888, 1.357839,             ! G-Function Ln(T/Ts) Value 5, G-Function G Value 5
+-10.1816, 1.852024,             ! G-Function Ln(T/Ts) Value 6, G-Function G Value 6
+-9.1815,  2.345656,             ! G-Function Ln(T/Ts) Value 7, G-Function G Value 7
+-8.6809,  2.593958,             ! G-Function Ln(T/Ts) Value 8, G-Function G Value 8
+-8.5,     2.679,                ! etc, etc.
+-7.8,     3.023,
+-7.2,     3.32,
+-6.5,     3.681,
+-5.9,     4.071,
+-5.2,     4.828,
+-4.5,     6.253,
+-3.963,   7.894,
+-3.27,    11.82,
+-2.864,   15.117,
+-2.577,   18.006,
+-2.171,   22.887,
+-1.884,   26.924,
+-1.191,   38.004,
+-0.497,   49.919,
+-0.274,   53.407,
+-0.051,   56.632,
+0.196,    59.825,
+0.419,    62.349,
+0.642,    64.524,
+0.873,    66.412,
+1.112,    67.993,
+1.335,    69.162,
+1.679,    70.476,
+2.028,    71.361,
+2.275,    71.79,
+3.003,    72.511;               !- 35 PAIRS
 </code></pre>
 
 <h3 id="vertical-ground-heat-exchanger-outputs">Vertical Ground Heat Exchanger Outputs</h3>
@@ -2524,27 +2522,46 @@
 <p>Using Venting Availability Schedule allows you to turn off venting at certain times of the day (at night, for example), of the week (on weekends, for example), or of the year (during the winter, for example).</p>
 <p>If used with Ventilation Control Mode = Constant, the ventilation rate is constant only when this schedule allows venting; otherwise the ventilation rate is set to zero.</p>
 <p>If Ventilation Control Mode = NoVent, this schedule has no effect.</p>
+<h4 id="field-occupant-ventilation-control-name">Field: Occupant Ventilation Control Name</h4>
+<p>The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the ventilation control defined in the Ventilation Control Mode field will be overridden.</p>
+<p><strong>Note:</strong> The Occupant Ventilation Control object can be assigned to a zone (AirflowNetwork:MultiZone:Zone) or a surface (AirflowNetwork:MultiZone:Surface). When the object is assigned to a zone, the Occupant Ventilation Control is assigned to the surfaces belonging to the zone automatically. The surface objects must have an associated AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening, or  AirflowNetwork:MultiZone:Component:SimpleOpening component specified in the field of Leakage Component Name. All output variables will be shown under surface names only, and not under zone names.</p>
 <p><img alt="" src="../../InputOutputReference/media/image222.svg" /></p>
 <p>Figure 96. Modulation of venting area according to inside-outside temperature difference.</p>
 <p><img alt="" src="../../InputOutputReference/media/image223.svg" /></p>
 <p>Figure 97. Modulation of venting area according to inside-outside enthalpy difference.</p>
 <p><strong>Note:</strong> In order to establish an airflow network, each AirflowNetwork:Multizone:Zone object must have at least two surfaces defined with AirflowNetwork:Multizone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:Multizone:Surface objects facing the same Zone (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).</p>
 <p>An IDF example is shown below:</p>
-<p>AirflowNetwork:MultiZone:Zone,</p>
-<p>RESISTIVE ZONE,          !- Name of Associated Thermal Zone</p>
-<p>Temperature,             !- Ventilation Control Mode</p>
-<p>WindowVentSched,         !- Vent Temperature Schedule Name</p>
-<p>0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor</p>
-<p>!- {dimensionless}</p>
-<p>5.0,                     !- Lower Value on Inside/Outside Temperature Difference for</p>
-<p>!- Modulating the Venting Open Factor {deltaC}</p>
-<p>10.0,                    !- Upper Value on Inside/Outside Temperature Difference for</p>
-<p>!- Modulating the Venting Open Factor {deltaC}</p>
-<p>0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating</p>
-<p>!- the Venting Open Factor {J/kg}</p>
-<p>300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating</p>
-<p>!- the Venting Open Factor {J/kg}</p>
-<p>VentingSched;            !- Venting Availability Schedule Name</p>
+<pre><code class="idf">AirflowNetwork:MultiZone:Zone,
+
+    RESISTIVE ZONE,          !- Name of Associated Thermal Zone
+
+    Temperature,             !- Ventilation Control Mode
+
+    WindowVentSched,         !- Vent Temperature Schedule Name
+
+    0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
+
+                             !- {dimensionless}
+
+    5.0,                     !- Lower Value on Inside/Outside Temperature Difference for
+
+                             !- Modulating the Venting Open Factor {deltaC}
+
+    10.0,                    !- Upper Value on Inside/Outside Temperature Difference for
+
+                             !- Modulating the Venting Open Factor {deltaC}
+
+    0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating
+
+                             !- the Venting Open Factor {J/kg}
+
+    300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
+
+                             !- the Venting Open Factor {J/kg}
+
+    VentingSched;            !- Venting Availability Schedule Name
+</code></pre>
+
 <h3 id="airflownetworkmultizonesurface">AirflowNetwork:Multizone:Surface</h3>
 <p>The AirflowNetwork:Multizone:Surface object specifies the properties of a surface “linkage” through which air flows. This linkage is always associated with a heat transfer surface (wall, roof, floor, or a ceiling) or subsurface (door, glass door, or window) with both faces exposed to air. The linkage specifies two connected nodes: two zone nodes defined in AirflowNetwork:Multizone:Zone objects based on inside and outside face environment for an interior surface, or a zone node defined in an AirflowNetwork:Multizone:Zone object based on inside face environment and an external node defined in an AirflowNetwork:MultiZone:ExternalNode object for an exterior surface. The associated leakage component for this surface can be a crack (or surface effective leakage area) in an exterior or interior heat transfer surface or subsurface, or an exterior or interior window, door or glass door (heat transfer subsurface) that can be opened to allow air flow. The allowed surface air leakage components are:</p>
 <ul>
@@ -2644,40 +2661,82 @@
 <p>If used with Ventilation Control Mode = Constant, the ventilation rate is constant only when this schedule allows venting; otherwise the ventilation rate is set to zero.</p>
 <p>If Ventilation Control Mode = NoVent, this schedule has no effect.</p>
 <p><strong>Note:</strong> In order to establish an airflow network, each AirflowNetwork:Multizone:Zone object must have at least two surfaces defined with AirflowNetwork:Multizone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:Multizone:Surface objects facing the same Zone Name (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).</p>
+<h4 id="field-occupant-ventilation-control-name_1">Field: Occupant Ventilation Control Name</h4>
+<p>The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the Ventilation Control defined in the Ventilation Control Mode field will be overridden. </p>
 <p>IDF examples are provided below:</p>
-<p>AirflowNetwork:MultiZone:Surface,</p>
-<p>Zn001:Wall001,           !- Name of Associated Heat Transfer Surface</p>
-<p>CR-1,                    !- Leakage Component Name</p>
-<p>SFacade,                 !- External Node Name</p>
-<p>1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}</p>
-<p>AirflowNetwork:MultiZone:Surface,</p>
-<p>Zn001:Wall001:Win001,    !- Name of Associated Heat Transfer Surface</p>
-<p>WiOpen1,                 !- Leakage Component Name</p>
-<p>SFacade,                 !- External Node Name</p>
-<p>0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}</p>
-<p>AirflowNetwork:MultiZone:Surface,</p>
-<p>Zn003:Wall003,           !- Name of Associated Heat Transfer Surface</p>
-<p>Zone3 Exhaust Fan,       !- Leakage Component Name</p>
-<p>EFacade,                 !- External Node Name</p>
-<p>1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}</p>
-<p>AirflowNetwork:MultiZone:Surface,</p>
-<p>Zn001:Wall001:Win002,    !- Name of Associated Heat Transfer Surface</p>
-<p>WiOpen2,                 !- Leakage Component Name</p>
-<p>WFacade,                 !- External Node Name</p>
-<p>0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}</p>
-<p>Temperature,             !- Ventilation Control Mode</p>
-<p>WindowVentSched,         !- Vent Temperature Schedule Name</p>
-<p>0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor</p>
-<p>!- {dimensionless}</p>
-<p>5.0,                     !- Lower Value on Inside/Outside Temperature Difference for</p>
-<p>!- Modulating the Venting Open Factor {deltaC}</p>
-<p>10.0,                    !- Upper Value on Inside/Outside Temperature Difference for</p>
-<p>!- Modulating the Venting Open Factor {deltaC}</p>
-<p>0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating</p>
-<p>!- the Venting Open Factor {J/kg}</p>
-<p>300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating</p>
-<p>!- the Venting Open Factor {J/kg}</p>
-<p>VentingSched;            !- Venting Availability Schedule Name</p>
+<pre><code class="idf">AirflowNetwork:MultiZone:Surface,
+
+    Zn001:Wall001,           !- Name of Associated Heat Transfer Surface
+
+    CR-1,                    !- Leakage Component Name
+
+    SFacade,                 !- External Node Name
+
+    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+
+
+AirflowNetwork:MultiZone:Surface,
+
+    Zn001:Wall001:Win001,    !- Name of Associated Heat Transfer Surface
+
+    WiOpen1,                 !- Leakage Component Name
+
+    SFacade,                 !- External Node Name
+
+    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+
+
+
+
+AirflowNetwork:MultiZone:Surface,
+
+    Zn003:Wall003,           !- Name of Associated Heat Transfer Surface
+
+    Zone3 Exhaust Fan,       !- Leakage Component Name
+
+    EFacade,                 !- External Node Name
+
+    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+AirflowNetwork:MultiZone:Surface,
+
+    Zn001:Wall001:Win002,    !- Name of Associated Heat Transfer Surface
+
+    WiOpen2,                 !- Leakage Component Name
+
+    WFacade,                 !- External Node Name
+
+0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+    Temperature,             !- Ventilation Control Mode
+
+    WindowVentSched,         !- Vent Temperature Schedule Name
+
+    0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
+
+                             !- {dimensionless}
+
+    5.0,                     !- Lower Value on Inside/Outside Temperature Difference for
+
+                             !- Modulating the Venting Open Factor {deltaC}
+
+    10.0,                    !- Upper Value on Inside/Outside Temperature Difference for
+
+                             !- Modulating the Venting Open Factor {deltaC}
+
+    0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating
+
+                             !- the Venting Open Factor {J/kg}
+
+    300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
+
+                             !- the Venting Open Factor {J/kg}
+
+    VentingSched;            !- Venting Availability Schedule Name
+</code></pre>
+
 <h3 id="airflownetworkmultizonereferencecrackconditions">AirflowNetwork:MultiZone:ReferenceCrackConditions</h3>
 <p>This object specifies the reference conditions for temperature, humidity, and pressure which correspond to the AirflowNetwork:MultiZone:Surface:Crack object.</p>
 <h4 id="field-name_16">Field: Name</h4>
@@ -2967,28 +3026,87 @@
 <p>AirflowNetwork Model:Wind Pressure Coefficients, SFACADE, -0.37,-0.42,-0.56,-0.56,4.00E-002,0.48,0.60,0.48,4.00E-002,-0.56,-0.56,-0.42</p>
 <p>AirflowNetwork Model:Wind Pressure Coefficients, WFACADE, -0.56,-0.56,-0.42,-0.37,-0.42,-0.56,-0.56,4.00E-002,0.48,0.60,0.48,4.00E-002</p>
 <p>An IDF example is provided below:</p>
-<p><strong>AirflowNetwork:MultiZone:WindPressureCoefficientValues,</strong></p>
-<p>NFacade_WPCValue,        !- Name</p>
-<p>Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name</p>
-<p>0.60,                    !- Wind Pressure Coefficient Value 1 {dimensionless}</p>
-<p>0.48,                    !- Wind Pressure Coefficient Value 2 {dimensionless}</p>
-<p>0.04,                    !- Wind Pressure Coefficient Value 3 {dimensionless}</p>
-<p>-0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}</p>
-<p>-0.56,                   !- Wind Pressure Coefficient Value 5 {dimensionless}</p>
-<p>-0.42,                   !- Wind Pressure Coefficient Value 6 {dimensionless}</p>
-<p>-0.37,                   !- Wind Pressure Coefficient Value 7 {dimensionless}</p>
-<p>-0.42,                   !- Wind Pressure Coefficient Value 8 {dimensionless}</p>
-<p>-0.56,                   !- Wind Pressure Coefficient Value 9 {dimensionless}</p>
-<p>-0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}</p>
-<p>0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}</p>
-<p>0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}</p>
+<pre><code class="idf">AirflowNetwork:MultiZone:WindPressureCoefficientValues,
+
+    NFacade\_WPCValue,        !- Name
+
+    Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name
+
+    0.60,                    !- Wind Pressure Coefficient Value 1 {dimensionless}
+
+    0.48,                    !- Wind Pressure Coefficient Value 2 {dimensionless}
+
+    0.04,                    !- Wind Pressure Coefficient Value 3 {dimensionless}
+
+    -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}
+
+    -0.56,                   !- Wind Pressure Coefficient Value 5 {dimensionless}
+
+    -0.42,                   !- Wind Pressure Coefficient Value 6 {dimensionless}
+
+    -0.37,                   !- Wind Pressure Coefficient Value 7 {dimensionless}
+
+    -0.42,                   !- Wind Pressure Coefficient Value 8 {dimensionless}
+
+    -0.56,                   !- Wind Pressure Coefficient Value 9 {dimensionless}
+
+    -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}
+
+    0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}
+
+    0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}
+</code></pre>
+
+<h3 id="airflownetworkoccupantventilationcontrol">AirflowNetwork:OccupantVentilationControl</h3>
+<p>The AirflowNetwork:OccupantVentilationControl object provides control options with minimum opening and closing time checks and opening and closing probability values. In general, the probability values could be a constant or a specific function. Due to lack of real data, two schedules are selected to represent probability values. If real data are available, this object may be modified to adopt new data. </p>
+<h4 id="field-name_26">Field: Name</h4>
+<p>This is the name of the object.</p>
+<h4 id="field-minimum-opening-time">Field: Minimum Opening Time</h4>
+<p>The field represents the minimum time that windows will remain open. If a window has been open for a time less than this value, the window will remain open. </p>
+<h4 id="field-minimum-closing-time">Field: Minimum Closing Time</h4>
+<p>The field represents the minimum time that windows will remain closed. If a window has been closed for a time less than this value, the window will remain closed. </p>
+<h4 id="field-thermal-comfort-low-temperature-curve-name">Field: Thermal Comfort Low Temperature Curve Name</h4>
+<p>This alpha field defines the name of a curve to be used for thermal comfort temperature calculation at low outdoor dry-bulb temperature. This curve is a linear or quadratic equation using outdoor dry-bulb temperatures as an independent variable. This performance curve can be used to describe the thermal comfort temperature at low outdoor dry-bulb temperature. It allows maximum two curves to describe the thermal comfort temperature in two different outdoor dry-bulb temperature regions. If a single curve is used, blanks are entered in the following two fields.</p>
+<h4 id="field-thermal-comfort-temperature-boundary-point">Field: Thermal Comfort Temperature Boundary Point</h4>
+<p>When there are two piecewise curves to represent thermal comfort temperature calculation, this field represents a boundary point of outdoor dry-bulb temperature. The low temperature curve and the high temperature curve should have the same values at the boundary point. If a single curve is used, this field may be left blank.</p>
+<h4 id="field-thermal-comfort-high-temperature-curve-name">Field: Thermal Comfort High Temperature Curve Name</h4>
+<p>This alpha field defines the name of a curve to be used for thermal comfort temperature calculation at high outdoor dry-bulb temperature. This curve is a linear or quadratic equation using outdoor dry-bulb temperatures as an independent variable. This performance curve can be used to describe the thermal comfort temperature at high outdoor dry-bulb temperature. It allows maximum two curves to describe the thermal comfort temperature in two different outdoor dry-bulb temperature regions. If a single curve is used, blanks are entered in this field.</p>
+<h4 id="field-maximum-threshold-for-persons-dissatisfied-ppd">Field: Maximum Threshold for Persons Dissatisfied PPD</h4>
+<p>This field is used to calculate the comfort band as a function of predicted percentage of dissatisfied (PPD). The default value is 10%. The equation is based on curve fit and is valid between 0% and 35%.  </p>
+<div>\[\Theta = -0.0028 (100-PPD)^2 + 0.3419 (100-PPD) - 6.6275\]</div>
+
+<p>where</p>
+<ul>
+<li><span>$\Theta$</span> is the comfort band (degC)</li>
+<li>PPD is predicted percentage person of dissatisfied (%)</li>
+</ul>
+<h4 id="field-occupancy-check">Field: Occupancy Check</h4>
+<p>Input is Yes or No. The default is No. If Yes, an occupancy check is performed used in the opening probability check. If No, the occupancy check is bypassed.</p>
+<h4 id="field-opening-probability-schedule-name">Field: Opening Probability Schedule Name</h4>
+<p>The name of a schedule of opening probability that controls the opening of windows and doors in the thermal zone to provide natural ventilation. If the probability value is greater a random number, windows are allowed to open. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied. </p>
+<h4 id="field-closing-probability-schedule-name">Field: Closing Probability Schedule Name</h4>
+<p>The name of a schedule of closing probability that controls the closing of windows and doors in the thermal zone to reduce natural ventilation. If the probability value is greater a random number, windows are allowed to be closed. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied.</p>
+<p>An IDF example is provided below:</p>
+<pre><code class="idf">AirlowNetwork:OccupantVentilationControl,
+VentilationControl,      !- Name
+5.0,                     !- Minimum Opening Time
+5.0,                     !- Minimum Opening Time
+ComfortLowTempCurve,     !- Thermal Comfort Low Temperature Curve Name
+10.0,                    !- Thermal Comfort Temperature Boundary Point
+ComfortHighTempCurve,    !- Thermal Comfort High Temperature Curve Name
+10.0,                    !- Maximum Threshold for Persons Dissatisfied PPD
+Yes,                     !- Occupancy Check
+OpeningProbabilitySch,   !- Opening Probability Schedule Name
+ClosingProbabilitySch;   !- Closing Probability Schedule Name
+</code></pre>
+
 <p>The previous sections of this AirflowNetwork model discussion describe input objects used for multizone airflow calculations. The following sections describe input objects used for air distribution system simulations. These objects work when control option “MultiZone with Distribution” or “MultiZone with Distribution Only During Fan Operation” is defined in the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.</p>
 <p>The first section presents the input object for distribution system nodes. Although thermal zones are required to perform air distribution system simulations, the thermal zones are already defined in the multizone input section (described previously), so that there is no need to repeat the inputs for thermal zones when modeling an air distribution system. The same is also true for surface air leakage. This section has only one object: AirflowNetwork:Distribution:Node.</p>
 <h3 id="airflownetworkdistributionnode">AirflowNetwork:Distribution:Node</h3>
 <p>The AirflowNetwork:Distribution:Node object is used to represent air distribution system nodes for the AirflowNetwork model. The EnergyPlus nodes defined in an AirLoopHVAC are a subset of the nodes used to simulate the distribution system using the AirflowNetwork model. For example, the inlet node of a fan and the outlet node of a coil defined in an AirLoopHVAC must be defined as nodes using the AirflowNetwork:Distribution:Node object. A set of EnergyPlus Zone Equipment nodes is also a subset of the AirflowNetwork:Distribution:Nodes. For example, zone inlet and outlet nodes must be defined as nodes using the AirflowNetwork:Distribution: Node object. In addition, although mixers and splitters are defined as objects with inlet and outlet nodes within EnergyPlus, the AirflowNetwork:Distribution:Node object treats mixers and splitters as single nodes. The node objects are referenced by AirflowNetwork:Distribution:Linkage objects.</p>
 <p>In summary, all nodes used to define an AirLoopHVAC (except splitters, mixers, and outdoor air systems which are treated as single nodes) and its connections to a thermal zone must be specified as AirflowNetwork:Distribution:Nodes. If distribution system air leaks are to be modeled, additional AirflowNetwork:Distribution:Nodes may be defined along with AirflowNetwork:Distribution:Components (e.g., leak or leak ratio) to define the air leakage characteristics.</p>
 <p>Note: Supply and return leaks are not allowed in an AirLoopHVAC. They can only be modeled in the Zone Equipment Loop (i.e., return leaks may be modeled between the zone return node and the zone mixer inlet or the zone mixer outlet and the zone equipment loop outlet; and supply leaks may be modeled between the zone equipment loop inlet and the AirLoopHVAC:ZoneSplitter inlet node or the AirLoopHVAC:ZoneSplitter outlet node and the zone supply node).</p>
-<h4 id="field-name_26">Field: Name</h4>
+<h4 id="field-name_27">Field: Name</h4>
 <p>The name of an air distribution system node. This node name is referenced by an AirflowNetwork:Distribution:Linkage and in the output listing. Each node should have a unique name within the AirflowNetwork:Distribution:Node objects (however, the node name may be used elsewhere as regular EnergyPlus node names such as the fan inlet node or coil outlet node).</p>
 <h4 id="fieldcomponent-name-or-node-name">Field:Component Name or Node Name</h4>
 <p>Designates node names defined in another EnergyPlus object, so that the AirflowNetwork:Distribution:Node object is able to get input parameters and node conditions from the associated EnergyPlus node or object. The actual node name is entered here and represents a node already defined in an AirLoopHVAC or zone equipment loop. This field is left blank if the EnergyPlus Node Type field below is entered as Mixer, Splitter, Outdoor air System, or Other.</p>
@@ -3086,7 +3204,7 @@
 <p>ρ<sub>o</sub> = Air density at air conditions of 20°C, 0 kg/kg and 101325 Pa [kg/m<sup>3</sup>]</p>
 <p>ν<sub>o</sub> = Air kinetic viscosity at an air temperature of 20°C [m<sup>2</sup>/s]</p>
 <p>Note: The correction factor shown above is use for this particular component as specified.</p>
-<h4 id="field-name_27">Field: Name</h4>
+<h4 id="field-name_28">Field: Name</h4>
 <p>A unique name identifying a supply or return air leak in an air distribution system. This unique name will be referenced by an AirflowNetwork:Distribution:Linkage object to represent a component leak.</p>
 <h4 id="field-air-mass-flow-coefficient">Field: Air Mass Flow Coefficient</h4>
 <p>This numeric field is defined as the air mass flow coefficient at 1 Pa pressure difference across this component. Valid entries must be greater than zero.</p>
@@ -3118,11 +3236,11 @@
 <p><span>$\Delta {P_r}$</span> = Reference pressure difference [Pa]</p>
 <p>n = Air mass flow exponent [dimensionless]</p>
 <p>The above calculation is valid only for a HVAC system using a constant volume supply fan: Fan:ConstantVolume or Fan:OnOff.</p>
-<h4 id="field-name_28">Field: Name</h4>
+<h4 id="field-name_29">Field: Name</h4>
 <p>A unique name identifying a supply or return air leak (ratio with respect to the constant volume fan flow rate) in an air distribution system. This unique name will be referenced in an AirflowNetwork:Distribution:Linkage object to represent a component.</p>
 <h4 id="field-effective-leakage-ratio">Field: Effective Leakage Ratio</h4>
 <p>This numeric field is used to input the effective leakage ratio. This value must be greater than zero and less than or equal to 1. The effective leakage ratio is used to characterize supply and return leaks with respect to the constant fan flow (supply or return air leak flow rate divided by the maximum air flow rate for the fan). When a VAV system is used with Supply Fan Object Type = Fan:VariableVolume in the AirflowNetwork:Distribution:Component:Fan object, the ratio for a supply leak is defined as the value of supply air leak flow rate divided by the supply fan air flow rate at the current time step. The inputs of the rest of 3 fields are not used.</p>
-<h4 id="field-maximum-flow-rate_1">Field: Maximum Flow Rate</h4>
+<h4 id="field-maximum-flow-rate">Field: Maximum Flow Rate</h4>
 <p>This numeric field is used to input the maximum flow rate for a constant volume fan [m<sup>3</sup>/s]. This value must be greater than 0 m<sup>3</sup>/s. When a VAV system is used with Supply Fan Object Type = Fan:VariableVolume in the AirflowNetwork:Distribution:Component:Fan object, this input is not used, because the real supply fan flow rate at the current time step is used to calculate the amount of a supply leak.</p>
 <h4 id="field-reference-pressure-difference_1">Field: Reference Pressure Difference</h4>
 <p>This numeric field is used to input the reference pressure difference [Pa]. This value must be greater than 0 Pa. When a VAV system is used with Supply Fan Object Type = Fan:VariableVolume in the AirflowNetwork:Distribution:Component:Fan object, this input is not used, because the real supply fan flow rate at the current time step is used to calculate the amount of a supply leak.</p>
@@ -3156,7 +3274,7 @@
 <p>where</p>
 <p>e= Surface roughness [m]</p>
 <p>Re = Reynolds number = <span>${\raise0.7ex\hbox{${\rho VD}$} !\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.\kern-\nulldelimiterspace}!\lower0.7ex\hbox{$\mu $}}$</span></p>
-<h4 id="field-name_29">Field: Name</h4>
+<h4 id="field-name_30">Field: Name</h4>
 <p>A unique name for an AirflowNetwork duct component in an air distribution system. This unique name will be referenced by an AirflowNetwork:Distribution:Linkage object to represent a component.</p>
 <h4 id="field-duct-length">Field: Duct Length</h4>
 <p>This numeric field is used to input duct length [m]. This value must be greater than zero.</p>
@@ -3335,7 +3453,7 @@
 <p>This component represents a constant pressure drop component. It is generally used to simulate a constant pressure drop filter. The mathematical equation may be written as:</p>
 <div>\[\Delta P = const\]</div>
 
-<h4 id="field-name_30">Field: Name</h4>
+<h4 id="field-name_31">Field: Name</h4>
 <p>A unique name identifying an AirflowNetwork constant pressure drop component in an air distribution system. This unique name will be referenced by an AirflowNetwork: Distribution:Linkage object to represent a component.</p>
 <h4 id="field-pressure-difference-across-the-component">Field: Pressure Difference across the Component</h4>
 <p>This numeric field is used to input the pressure difference across the element [Pa].</p>
@@ -3346,7 +3464,7 @@
 <p>1.0;           ! Pressure Difference Across the Component [Pa]</p>
 <h3 id="airflownetworkdistributionlinkage">AirflowNetwork:Distribution:Linkage</h3>
 <p>The AirflowNetwork:Distribution:Linkage represents a connection between two AirflowNetwork:Distribution:Node objects and an AirflowNetwork component defined above. In addition, the relative height from node height to linkage height for each node is required.</p>
-<h4 id="field-name_31">Field: Name</h4>
+<h4 id="field-name_32">Field: Name</h4>
 <p>The name identifies the linkage for later reference and in the output listing. Each linkage should have a unique name.</p>
 <h4 id="field-node-1-name">Field: Node 1 Name</h4>
 <p>Designates a node name where airflow starts. The node name should be defined in an AirflowNetwork:Distribution:Node object.</p>
@@ -3426,7 +3544,7 @@
 <p>HVAC,Average,AFN Zone Infiltration Air Change Rate [ach]</p>
 <p>HVAC,Sum,AFN Zone Mixing Volume [m3]</p>
 <p>HVAC,Sum,AFN Zone Mixing Mass [kg]</p>
-<p><strong>The following are reported only when a Fan:OnOff object is used:</strong></p>
+<p><strong>The following output variables are reported only when a Fan:OnOff object is used:</strong></p>
 <p>HVAC,Average,AFN Zone Average Pressure [Pa]</p>
 <p>HVAC,Average,AFN Zone On Cycle Pressure [Pa]</p>
 <p>HVAC,Average,AFN Zone Off Cycle Pressure [Pa]</p>
@@ -3437,6 +3555,14 @@
 <p>HVAC,Average,AFN Surface Average Pressure Difference [Pa]</p>
 <p>HVAC,Average,AFN Surface On Cycle Pressure Difference [Pa]</p>
 <p>HVAC,Average,AFN Surface Off Cycle Pressure Difference [Pa]</p>
+<p><strong>The following output variables are reported only when an AirflowNetwork:OccupantVentilationControl object is used:</strong></p>
+<p>HVAC,Average,AFN Surface Venting Window or Door Opening Factor at Previous Time Step []</p>
+<p>HVAC,Average,AFN Surface Opening Elapsed Time [min]</p>
+<p>HVAC,Average,AFN Surface Closing Elapsed Time [min]</p>
+<p>HVAC,Average,AFN Surface Opening Status at Previous Time Step []</p>
+<p>HVAC,Average,AFN Surface Opening Status []</p>
+<p>HVAC,Average,AFN Surface Opening Probability Status []</p>
+<p>HVAC,Average,AFN Surface Closing Probability Status []</p>
 <h4 id="afn-node-temperature-c">AFN Node Temperature [C]</h4>
 <p>This is the AirflowNetwork node temperature output in degrees C. When a Fan:OnOff object is used and is scheduled to operate in the cycling fan operation mode, this value for AirflowNetwork:Distribution:Node objects reflects the temperature when the fan is operating (ON).</p>
 <h4 id="afn-node-humidity-ratio-kgwaterkgdryair">AFN Node Humidity Ratio [kgWater/kgDryAir]</h4>
@@ -3684,7 +3810,22 @@
 <p>This is a sum of mass flow rates from adjacent zones or outdoors multiplied by the carbon dioxide concentration differences between the corresponding zone and the receiving zone.</p>
 <h4 id="afn-zone-total-generic-air-contaminant-mass-flow-rate-kgs">AFN Zone Total Generic Air Contaminant Mass Flow Rate [kg/s]</h4>
 <p>This is a sum of mass flow rates from adjacent zones or outdoors multiplied by the generic contaminant concentration differences between the corresponding zone and the receiving zone.</p>
-<h2 id="group-zone-equipment">Group – Zone Equipment</h2>
+<p>The following output variables are reported only when an AirflowNetwork:OccupantVentilationControl object is used:</p>
+<h4 id="afn-surface-venting-window-or-door-opening-factor-at-previous-time-step">AFN Surface Venting Window or Door Opening Factor at Previous Time Step []</h4>
+<p>The value of the venting opening factor for a particular window or door at the previous time step. When the window or door is venting, this is the input value of the opening factor (see AirflowNetwork:Multizone:Surface, Window/Door Opening Factor) times the multiplier for venting modulation (see description of next output variable, "Opening Factor Multiplier for AirflowNetwork Venting Modulation"). For example, if  the input Window/Door opening factor is 0.5 and the modulation multiplier is 0.7, then the value of this output variable will be 0.5*0.7 = 0.35.</p>
+<h4 id="afn-surface-opening-elapsed-time-min">AFN Surface Opening Elapsed Time [min]</h4>
+<p>This output is the opening elapsed time in the units of minutes since the window opened. </p>
+<h4 id="afn-surface-closing-elapsed-time-min">AFN Surface Closing Elapsed Time [min]</h4>
+<p>This output is the opening elapsed time in the units of minutes since the windows closed. </p>
+<h4 id="afn-surface-opening-status-at-previous-time-step">AFN Surface Opening Status at Previous Time Step []</h4>
+<p>This is the window or door opening factor control status at the previous time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no occupant ventilation control. The opening factor is determined by the Ventilation Control Mode field. A value of 1 indicates that a window or door is allowed to open. The value of 1 is determined when the opening elapsed time is less than the minimum opening time. A value of 2 denotes that a window or door is forced to close. The value of 2 is determined when the closing elapsed time is less than the minimum closing time.</p>
+<h4 id="afn-surface-opening-status">AFN Surface Opening Status []</h4>
+<p>This is the window or door opening factor control status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no occupant ventilation control. The opening factor is determined by the Ventilation Control Mode field. A value of 1 indicates that a window or door is allowed to open. The value of 1 is determined when the opening elapsed time is less than the minimum opening time. A value of 2 denotes that a window or door is forced to close. The value of 2 is determined when the closing elapsed time is less than the minimum closing time.</p>
+<h4 id="afn-surface-opening-probability-status">AFN Surface Opening Probability Status []</h4>
+<p>This is the opening probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no opening probability control action. A value of 1 indicates that a window or door is forced to open when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. </p>
+<h4 id="afn-surface-closing-probability-status">AFN Surface Closing Probability Status []</h4>
+<p>This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. </p>
+<h2 id="group-zone-equipment">Group - Zone Equipment</h2>
 <p>There are five main zone equipment statements that must be used to describe a block of zone equipment as shown in the below figure “Zone Equipment Input Syntax Map”.</p>
 <p>Types of Zone equipment are listed below and shown below in figure “Zone Equipment”.</p>
 <p>Table 26. Available Zone Equipment Types</p>
@@ -3746,7 +3887,7 @@ High Temp Radiant System</td>
 <p>AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat</p>
 <p>Connections between the air distribution unit, the supply air duct, and the zone are specified in the input syntax for the air distribution unit and the AirLoopHVAC:ZoneSplitter. The input syntax also explicitly defines an outlet identifier. This implies a connection to a zone through a NodeList for zone inlets (see the ZoneHVAC:EquipmentConnections statement). The air distribution unit is limited to one combined component-controller unit; because controls are normally based on the zone thermostat and can work in parallel or series in complex fashion. Since the control and the flow resolution can be complex, each air distribution unit is unique in addressing these combinations and therefore only one is allowed per zone.</p>
 <p>The Air Distribution unit also allows the user to specify leaks in the supply air duct system. These inputs are used in the EnergyPlus Simplified Duct Leakage Model (SDLM). This model simulates a specific configuration: supply leaks to a return plenum in a commercial VAV or CV system. The system must have a constant static pressure setpoint. Within these limitations SDLM allows the user to easily evaluate the energy penalty due to duct leakage.</p>
-<h4 id="field-name_32">Field: Name</h4>
+<h4 id="field-name_33">Field: Name</h4>
 <p>Unique identifying name of the air distribution unit.</p>
 <h4 id="field-air-distribution-unit-outlet-node-name">Field: Air Distribution Unit Outlet Node Name</h4>
 <p>Outlet node name for the air distribution unit to the attached zone.</p>
@@ -3797,7 +3938,7 @@ High Temp Radiant System</td>
 <h3 id="zonehvacequipmentlist">ZoneHVAC:EquipmentList</h3>
 <p>The first list encountered in the ZoneHVAC:EquipmentConnections statement is the ZoneHVAC:EquipmentList. This object lists all HVAC equipment serving the zone. Each item in the list has four fields associated with it: Object Type, Name, Cooling Sequence and Heating or No-Load Sequence The Object Type and Name identify the specific equipment object. Cooling Sequence and Heating or No-Load Sequence specify the order of simulation for zones with more than one type of HVAC equipment.</p>
 <p>Note that a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled must be listed in this statement if there is a forced air system serving the zone from an air loop.</p>
-<h4 id="field-name_33">Field: Name</h4>
+<h4 id="field-name_34">Field: Name</h4>
 <p>Unique identifying name.</p>
 <h4 id="field-set-zone-equipment-object-type-name-cooling-sequence-heating-or-no-load-sequence">Field Set (Zone Equipment: Object Type, Name, Cooling Sequence, Heating or No-Load Sequence)</h4>
 <p>This set is used together in order to sequence the equipment for heating and cooling. The #1 sequence equipment will try to meet the entire demand with its capacity and then pass the results on to the #2 and so on for both heating and cooling. This field set is extensible by duplicating the last four fields.</p>
@@ -3918,7 +4059,7 @@ High Temp Radiant System</td>
 <p>Central system air is usually supplied to a zone through a terminal unit such as a single duct VAV reheat box. Sometimes, however, it is desirable to supply central system air directly to a zone without any zone level control or tempering. An example would be a single zone reheat system.</p>
 <p>The control zone receives supply air directly from the central system since the supply air temperature has been adjusted to control the temperature in the control zone. The slave zones then have baseboards or reheat coils to allow some temperature adjustment. The AirTerminal:SingleDuct:Uncontrolled object creates the capability of supplying central system air directly to a zone. Its input consists of the object name, an availability (on/off) schedule, and a node name. This node is both a zone inlet node and an outlet node of the AirLoopHVAC:ZoneSplitter.</p>
 <p>For the objects to work correctly, it is important in any systems including Direct Air objects for the sum of the maximum zone air flow rates to be equal to the maximum central system flow rate. The zone maximum flow rates are specified in the zone terminal unit or direct air inputs. The central air system flow rate is specified in the AirLoopHVAC input and also in the air loop branch and central fan inputs.</p>
-<h4 id="field-name_34">Field: Name</h4>
+<h4 id="field-name_35">Field: Name</h4>
 <p>A unique user assigned name for each AirTerminal:SingleDuct:Uncontrolled component. Any other component that needs to use this direct air component will refer to it by this name.</p>
 <h4 id="field-availability-schedule-name_1">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the component can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -3955,7 +4096,7 @@ High Temp Radiant System</td>
 <p>These outputs are the sensible cooling power and energy provided to the zone by the uncontrolled air terminal unit.</p>
 <h3 id="airterminalsingleductconstantvolumereheat">AirTerminal:SingleDuct:ConstantVolume:Reheat</h3>
 <p>The AirTerminal:SingleDuct:ConstantVolume:Reheat or terminal reheat system is a constant volume reheat system. The systems cooling capabilities are provided by way of cooling coil that supplies cooling to the entire supply air volume. The cooling coil is controlled by a controller setpoint specified for the cooling coil. Zone control is accomplished by heating (reheating) the airflow into each zone as determined by the zone thermostat. Currently the reheat can be supplied by a electric, gas, or hot water coil that tries to meet the zone demand.</p>
-<h4 id="field-name_35">Field: Name</h4>
+<h4 id="field-name_36">Field: Name</h4>
 <p>Unique name for the terminal reheat Air Distribution Unit (ADU).</p>
 <h4 id="field-availability-schedule-name_2">Field: Availability Schedule Name</h4>
 <p>Schedule that this component will operate or is available to operate. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4003,7 +4144,7 @@ High Temp Radiant System</td>
 <h3 id="airterminalsingleductvavreheat">AirTerminal:SingleDuct:VAV:Reheat</h3>
 <p>AirTerminal:SingleDuct:VAV:Reheat - Variable air volume (VAV) systems control the dry-bulb temperature inside a zone by varying the supply air volume instead of the air temperature. At full cooling the VAV damper is fully open supplying the specified maximum air flow rate. As the cooling load decreases, the damper closes until it reaches the minimum stop specified by the zone minimum air flow fraction.</p>
 <p>VAV systems can be used for interior or perimeter zones with a common fan system, air temperature control, and reheating devices. The VAV concept may vary according to the VAV box locations, air temperature controls and types of heating elements. Heating can usually be provided by use of reheat coils or thermostatic baseboard.</p>
-<h4 id="field-name_36">Field: Name</h4>
+<h4 id="field-name_37">Field: Name</h4>
 <p>Unique name for the AirTerminal:SingleDuct:VAV:Reheat Air Distribution Unit (ADU).</p>
 <h4 id="field-availability-schedule-name_3">Field: Availability Schedule Name</h4>
 <p>Schedule that this component will operate or is available to operate. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4117,7 +4258,7 @@ High Temp Radiant System</td>
 <p>The VAV terminal unit with variable-speed fan and reheat coil is an air system terminal unit consisting of a variable speed fan in series with a heating coil. These units are usually employed in underfloor air distribution (UFAD) systems where the air is supplied at low static pressure through an underfloor plenum. The fan is used to control the flow of conditioned air that enters the space. When the fan is off the plenum pressure drives the minimum air flow through the terminal unit. At maximum cooling the fan runs at its maximum speed. At full heating the fan runs at its heating maximum – usually less than the cooling maximum flow rate. Thus this unit has two separate maximum flow rates – one for heating and one for cooling.</p>
 <p>For cooling, control is maintained simply by varying the fan speed. For heating, the unit first tries to meet the heating load by varying the heating coil output while keeping the air flow at minimum (fan off). If this is not adequate the fan turns on and operates in variable flow mode up to the heating maximum flow rate.</p>
 <p>This unit is modeled in EnergyPlus as a compound component – a variable speed fan and a heating coil in series in the air stream. The unit is blow through – the fan is upstream of the heating coil.</p>
-<h4 id="field-name_37">Field: Name</h4>
+<h4 id="field-name_38">Field: Name</h4>
 <p>A unique user assigned name for a particular VS fan VAV reheat terminal unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_4">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4208,7 +4349,7 @@ High Temp Radiant System</td>
 <p>This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system.</p>
 <p><img alt="Damper" src="../../InputOutputReference/media/image267.png" /></p>
 <p>Figure 104. Single Duct VAV Heat and Cool Reheat Schematic</p>
-<h4 id="field-name_38">Field: Name</h4>
+<h4 id="field-name_39">Field: Name</h4>
 <p>Unique user-defined name for this Air Distribution Unit (ADU).</p>
 <h4 id="field-availability-schedule-name_5">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of the schedule (ref: Schedule) that denotes whether or not this component is available to operate during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4272,7 +4413,7 @@ High Temp Radiant System</td>
 <h3 id="airterminalsingleductvavnoreheat">AirTerminal:SingleDuct:VAV:NoReheat</h3>
 <p>Variable air volume (VAV) systems control the dry-bulb temperature inside a zone by varying the supply air volume instead of the air temperature. At full cooling the VAV damper is fully open supplying the specified maximum air flow rate. As the cooling load decreases, the damper closes until it reaches the minimum stop specified by the zone minimum air flow fraction.</p>
 <p>VAV systems can be used for interior or perimeter zones with a common fan system and air temperature control. The VAV concept may vary according to the VAV box locations and air temperature controls. Heating can be provided if necessary by use of baseboard.</p>
-<h4 id="field-name_39">Field: Name</h4>
+<h4 id="field-name_40">Field: Name</h4>
 <p>Unique name for the VAV Air Distribution Unit (ADU).</p>
 <h4 id="field-availability-schedule-name_6">Field: Availability Schedule Name</h4>
 <p>Schedule that this component will operate or is available to operate. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4333,7 +4474,7 @@ High Temp Radiant System</td>
 <p>This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system..This object may be used when the central heating coil is sufficient to maintain the heating set point temperature. Additional heating may be provided, if necessary, by use of AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat or ZoneHVAC:Baseboard:* objects.</p>
 <p><img alt="Damper_NoHeat" src="../../InputOutputReference/media/image268.png" /></p>
 <p>Figure 105. Single Duct VAV Heat and Cool NoReheat Schematic</p>
-<h4 id="field-name_40">Field: Name</h4>
+<h4 id="field-name_41">Field: Name</h4>
 <p>Unique user-defined name for this Air Distribution Unit (ADU).</p>
 <h4 id="field-availability-schedule-name_7">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of the schedule (ref: Schedule) that denotes whether or not this component is available to operate during a given time period. If a schedule value is greater than zero then the system is available to operate; otherwise, the system is unavailable for that time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4362,7 +4503,7 @@ High Temp Radiant System</td>
 <p>The EnergyPlus model of the series PIU terminal unit is composed of three components: a zone mixer, a constant volume fan, and a heating coil (hot water, electric, or gas).</p>
 <p><img alt="SeriesPIUPicture.png" src="../../InputOutputReference/media/image269.png" /></p>
 <p>Figure 106. Series PIU Terminal Unit</p>
-<h4 id="field-name_41">Field: Name</h4>
+<h4 id="field-name_42">Field: Name</h4>
 <p>A unique user assigned name for a particular series powered induction terminal unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_8">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4442,7 +4583,7 @@ High Temp Radiant System</td>
 <p>The EnergyPlus model of the parallel PIU terminal unit is composed of three components: a constant volume fan, a zone mixer, and a heating coil (hot water, electric, or gas).</p>
 <p><img alt="ParallelPIUPicture.png" src="../../InputOutputReference/media/image271.png" /></p>
 <p>Figure 107. Parallel PIU Terminal Unit</p>
-<h4 id="field-name_42">Field: Name</h4>
+<h4 id="field-name_43">Field: Name</h4>
 <p>A unique user assigned name for a particular  parallel powered induction terminal unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_9">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4522,7 +4663,7 @@ High Temp Radiant System</td>
 <h3 id="airterminalsingleductconstantvolumefourpipeinduction">AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction</h3>
 <p>The four pipe induction terminal unit provides local hot water heating or chilled water cooling of induced zone air which then mixes with centrally conditioned supply air. An air conditioning system consisting of these terminal units is effectively a mixed cental air / local hydronic system. The centrally conditioned air supplied to the induction terminal units is constant volume at quite high pressure. The central air is discharged through a nozzle in the terminal unit, inducing a flow of room air over a hydronic heating/cooling coil. The coil is connected either to a single inlet and outlet pipe (2 pipe unit) or to 2 inlets and 2 outlets (4 pipe unit). The heated or cooled induced air mixes with the centrally conditioned air before being discharged into the zone. The terminal units are usually expected to do only sensible cooling – any dehumidification is done by the central air conditioning system.</p>
 <p>The EnergyPlus model of the four pipe induction terminal unit is a compound component consisting of a hot water heating coil, a chilled water cooling coil, and an air mixer. The unit has two inlet air streams: the centrally conditioned supply air and the induced air from the zone. The induced air passes first through the heating coil, then through the cooling coil and finally through the mixer. The central supply air goes directly into the mixer. The water flow through the hot or cold water coil is varied to meet the zone air conditioning requirement. Note that EnergyPlus models the four pipe induction terminal unit as having separate heating and cooling coils whereas real units have only a single coil used for both heating and cooling. Note also that the four pipe induction unit model can be used to model a two pipe unit by simply adjusting the heating and cooling coil schedules so that the heating coil is off when the cooling coil is on and vice versa.</p>
-<h4 id="field-name_43">Field: Name</h4>
+<h4 id="field-name_44">Field: Name</h4>
 <p>A unique user assigned name for a particular  four pipe induction terminal unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_10">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4625,7 +4766,7 @@ High Temp Radiant System</td>
 <p>The Cooled Beam system is a mixed air-hydronic system. A central, single-duct forced-air system supplies conditioned ventilation air to the zones. Sensible cooling is done by chilled water circulating through ceiling mounted cooled beam units. Chilled water flow rate through the cooled beam units is varied to meet the zone sensible cooling load. Any dehumidification is done by the central ventilation air system. Heating is usually accomplished with hot water radiators. Thermodynamically, the cooled beam system resembles the four-pipe induction unit.</p>
 <p>To model a typical cooled beam system the user will need to define a conventional central constant volume forced air system. This system will normally be 100% outside air delivered at a fixed supply temperature (which could be reset by schedule or by outside air temperature). On the supply side of this air loop there will be the usual central AC equipment: outside air mixer, fan, heating and cooling coil. On the zone equipment (demand) side of the loop, the chilled beams will be represented as terminal units. Additional zone equipment (such as baseboard heaters) will be needed to handle heating loads.</p>
 <p>Although the cooled beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will have multiple beams in each zone. The program (in its sizing calculation for the system) figures out how many beams of what length are needed to meet the zone design load.</p>
-<h4 id="field-name_44">Field: Name</h4>
+<h4 id="field-name_45">Field: Name</h4>
 <p>A unique user assigned name for a particular chilled beam unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_11">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4732,7 +4873,7 @@ High Temp Radiant System</td>
 <p>The AirTerminal:SingleDuct:InletSideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is recirculated air from the zone. The outlet air stream of the inlet side mixer is then the inlet to the zone AC unit.</p>
 <p><img alt="" src="../../InputOutputReference/media/image275.svg" /></p>
 <p>Figure 108. Inlet Side Mixer Air Terminal Unit with Fan Coil</p>
-<h4 id="field-name_45">Field: Name</h4>
+<h4 id="field-name_46">Field: Name</h4>
 <p>A unique user assigned name for a particular inlet side mixer terminal unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-zonehvac-terminal-unit-object-type">Field: ZoneHVAC Terminal Unit Object Type</h4>
 <p>The type of zone AC unit to which this terminal unit will be connected. Currently only ZoneHVAC:FourPipeFanCoil can be used.</p>
@@ -4757,7 +4898,7 @@ High Temp Radiant System</td>
 <p>The AirTerminal:SingleDuct:SupplySideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is outlet air from the zone AC unit. The outlet air stream from the supply side mixer is then the inlet to the conditioned zone.</p>
 <p><img alt="" src="../../InputOutputReference/media/image276.svg" /></p>
 <p>Figure 109. Supply Side Mixer Air Terminal Unit with Fan Coil</p>
-<h4 id="field-name_46">Field: Name</h4>
+<h4 id="field-name_47">Field: Name</h4>
 <p>A unique user assigned name for a particular supply side mixer terminal unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-zonehvac-terminal-unit-object-type_1">Field: ZoneHVAC Terminal Unit Object Type</h4>
 <p>The type of zone AC unit to which this terminal unit will be connected. Currently only ZoneHVAC:FourPipeFanCoil can be used.</p>
@@ -4779,7 +4920,7 @@ High Temp Radiant System</td>
 <p>SPACE1-1 Fan Coil Outlet;!- Terminal Unit Secondary Air Inlet Node Name</p>
 <h3 id="airterminaldualductconstantvolume">AirTerminal:DualDuct:ConstantVolume</h3>
 <p>The AirTerminal:DualDuct:ConstantVolume simulation or the typical Multizone is described by this Air Distribution Unit (ADU). Multizone systems condition all the air in a central apparatus and distribute it to the conditioned zones through two parallel ducts. One duct carries cold air and the other warm air, providing air sources for both heating and cooling at all times. In each conditioned zone, a mixing valve responsive to a room thermostat mixes the warm and cold air in proper proportions to satisfy the prevailing heating or cooling load of the space. The Multizone ADU is the specific component that leads to the zone containing the mixer and the mixing damper and then connecting to the zone. The total airflow to each room is kept constant while the proportion of hot air to cold air is adjusted to maintain the temperature in each zone at the desired level.</p>
-<h4 id="field-name_47">Field: Name</h4>
+<h4 id="field-name_48">Field: Name</h4>
 <p>Unique name for the Multizone ADU.</p>
 <h4 id="field-availability-schedule-name_12">Field: Availability Schedule Name</h4>
 <p>Schedule that this component will operate or is available to operate for a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4808,7 +4949,7 @@ High Temp Radiant System</td>
 <p>This output is the damper position of the hot air stream in a dual duct air terminal. This is the average value over the frequency being reported. The damper position is defined as the terminal unit hot air mass flow rate divided by the terminal unit’s maximum hot air mass flow rate. This output is dimensionless and ranges from 0.0 to 1.0.</p>
 <h3 id="airterminaldualductvav">AirTerminal:DualDuct:VAV</h3>
 <p>AirTerminal:DualDuct:VAV (i.e., Dual duct variable air volume (DDVAV)) systems are used to obtain zone temperature control by mixing the cold and warm air in various volume combinations. The fan is sized for the anticipated maximum coincident hot or cold volume, not the sum of the instantaneous peaks. This system has an advantage of a true single path VAV system, except for warm port leakage. When cold air is modulated for control before mixing, it operates similar to the VAV induction when mixing occurs without hot deck reheat. It is similar to a reheat system when mixing occurs while the hot deck is using the reheat coil. It uses more energy than a true VAV system, but less than a constant volume dual duct system.</p>
-<h4 id="field-name_48">Field: Name</h4>
+<h4 id="field-name_49">Field: Name</h4>
 <p>Unique name for the AirTerminal:DualDuct:VAV Air Distribution Unit (ADU).</p>
 <h4 id="field-availability-schedule-name_13">Field: Availability Schedule Name</h4>
 <p>Schedule that this component will operate or is available to operate for a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4865,7 +5006,7 @@ High Temp Radiant System</td>
 <p>AirTerminal:DualDuct:VAV:OutdoorAir provides a model for a type of dual duct air system in which one duct provides outdoor air ventilation and the other provides VAV cooling.  The Outdoor Air stream and the Recirculated Air stream are conditioned and supplied through separate air streams as part of a centralized dedicated outdoor air  (DOAS) distribution system. The dual duct arrangement allows the ventilation air to be controlled separately using schedules or occupancy demand while the recirculated air is controlled to meet the dry-bulb zone temperature setpoint. The two airstreams remain decoupled until the terminal box where they are mixed. The terminal unit is meant for systems regulating outdoor air based only on demand control or code minimum settings and not on economizer operation.</p>
 <p>This air terminal does not have heating coils and is not configured for conditions zones that need heat. Additional ZoneHVAC equipment, such as baseboards or fan coil units, are needed to provide heating to the zone when using this air terminal.</p>
 <p>Although this air terminal is primarily for dual duct system, it is allowed to use just the outdoor air side in a single duct system. This can be useful for modeling single duct DOAS when the required volume of outdoor air varies over time.</p>
-<h4 id="field-name_49">Field: Name</h4>
+<h4 id="field-name_50">Field: Name</h4>
 <p>Unique name for the AirTerminal:DualDuct:VAV:OutdoorAir Air Distribution Unit (ADU).</p>
 <h4 id="field-availability-schedule-name_14">Field: Availability Schedule Name</h4>
 <p>Schedule that this component will operate or is available to operate for a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -4917,7 +5058,7 @@ High Temp Radiant System</td>
 <p><strong>Notes:</strong> The ideal loads system uses the zone return node or an optional zone exhaust node to extract air from the zone. Every zone served by an HVAC component must have a return air node, even though this node may not be connected to anything.</p>
 <p>The ideal loads system was significantly expanded in version 7.0 (October 2011). As part of this upgrade, any change in the moisture content of the supply air stream results in a latent cooling (dehumidification) or latent heating (humidification) load which is metered as DistrictCooling and DistrictHeating energy consumption. Prior to version 7.0, when the ideal loads system was in heating mode, only the energy for sensible heating was metered. This results in significant changes in reported energy use compared to earlier versions, especially when using the <strong><em>ConstantSupplyHumidityRatio</em></strong> option for Humidification Control Type.</p>
 <p>Older idf files which are transitioned to version 7.0 will automatically be set to use the <strong><em>ConstantSupplyHumidityRatio</em></strong> option for both dehumidification and humidification controls, because this is equivalent to the controls used in the older version of this system. However, the user should review all of the humidity control options and select the one which best reflects the goal of the simulation.</p>
-<h4 id="field-name_50">Field: Name</h4>
+<h4 id="field-name_51">Field: Name</h4>
 <p>A unique user assigned name for each ideal loads air system component.  This name is referenced in a ZoneHVAC:EquipmentList object.</p>
 <h4 id="field-availability-schedule-name_15">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of the schedule (ref: Schedule) that denotes whether or not this component is available to operate during a given time period. If the schedule value is greater than zero then the system is available to operate; otherwise, the system is unavailable for that time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -5161,7 +5302,7 @@ High Temp Radiant System</td>
 <p>In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop (demand side) through its hot water coil and to a chilled water loop (demand side) through its cooling coil.</p>
 <p>Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For <em>ConstantFanVariableFlow </em> a <em>Fan:OnOff</em> or <em>Fan:ConstantVolume</em> should be used. For <em>CyclingFan</em>, a <em>Fan:OnOff</em> should be used. And for <em>VariableFanVariableFlow</em> or <em>VariableFanConstantFlow</em> a <em>Fan:VariableVolume</em>  should be chosen.</p>
 <p>Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. We model 4-pipe units, but the 4-pipe model can be used to model 2-pipe  units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available.</p>
-<h4 id="field-name_51">Field: Name</h4>
+<h4 id="field-name_52">Field: Name</h4>
 <p>A unique user assigned name for an instance of a Fan Coil unit. Any reference to this Fan Coil unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_16">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the fan coil unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -5382,7 +5523,7 @@ High Temp Radiant System</td>
 <p><strong>Cooling/With Coil/FixedTemperature:</strong> The unit is on, there is a cooling load, a cooling coil is present and is scheduled on, and fixed temperature has been specified. The unit ventilator tries to use outdoor air as best as possible to meet the temperature goal. If it cannot meet this goal because the temperature goal is not between the zone return temperature and the outdoor air temperature, then the unit ventilator will either use the maximum or minimum outdoor air flow rate in the same fashion as the fixed temperature outdoor air control for the “no coil” conditions. The cooling coil then attempts to meet any remaining zone load.</p>
 <p><strong>Cooling/With Coil/FixedAmount:</strong> The unit is on, there is a cooling load, a cooling coil is present and is scheduled on, and fixed amount control has been specified. The unit ventilator fixes the outdoor air flow rate as defined by the user and sets the maximum and minimum outdoor air flow rate to be equal in order to avoid the variation of outdoor air flow rate between the maximum and minimum values. The cooling coil then attempts to meet any remaining zone cooling load.</p>
 <p>Note: the unit ventilator controls are strictly temperature based and do not factor humidity into the equation (not an enthalpy economy cycle but rather a simple return air economy cycle). In addition, temperature predictions are not strict energy balances here in the control routine though in the mixing routine an energy balance is preserved.</p>
-<h4 id="field-name_52">Field: Name</h4>
+<h4 id="field-name_53">Field: Name</h4>
 <p>This field is simply the identifying name that distinguishes one particular unit ventilator from another in the input data file. Like all other names in EnergyPlus, it is assumed that this is a unique character string and that no other unit ventilators use this same name.</p>
 <h4 id="field-availability-schedule-name_17">Field: Availability Schedule Name</h4>
 <p>This field is a schedule name (ref: Schedule) that determines whether the unit ventilator is available to operate. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -5553,7 +5694,7 @@ High Temp Radiant System</td>
 <p><strong>NoLoad OR Cooling/”No”</strong> is specified in input field “Supply Air Fan Operation During No Heating”<strong>:</strong> Unit is available, but there is no heating load. With “No” specified for “Supply Air Fan Operation During No Heating” and the supply fan operating mode set to 0, the fan will be off since there is no heating load. All flow rates are set to zero and the temperatures are set to zone conditions.</p>
 <p><strong>NoLoad OR Cooling/”Yes”</strong> is specified in input field “Supply Air Fan Operation During No Heating”<strong>:</strong> Unit is available, the supply fan operating mode schedule value is greater than 0 (for OnOff Fan) and the fan is running (if it is scheduled to be available also). No heating is provided, only air circulation via the fan running. However, any heat added by the fan is introduced into the space with the circulation of the air.</p>
 <p><strong>Heating:</strong> The unit is on/available and there is a heating load. The heating coil is modulated (constant fan speed) to meet the heating load. When the fan type is not an OnOff fan then the  control of the heating coil and its flow rate is identical to the fan coil unit. In the case of OnOff fan, the fan cycles with heating coil if the current timestep supply fan operating mode is schedule value is 0, or else if the current timestep supply fan operating mode schedule value is greater than 0, then the supply fan runs continuously for the entire timestep.</p>
-<h4 id="field-name_53">Field: Name</h4>
+<h4 id="field-name_54">Field: Name</h4>
 <p>This field is simply the identifying name that distinguishes one particular unit heater from another in the input data file. Like all other names in EnergyPlus, it is assumed that this is a unique character string and that no other unit heaters use this same name.</p>
 <h4 id="field-availability-schedule-name_18">Field: Availability Schedule Name</h4>
 <p>This field is a schedule name (ref: Schedule) that determines whether the unit heater is available to operate. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -5657,7 +5798,7 @@ High Temp Radiant System</td>
 <h3 id="zonehvacevaporativecoolerunit">ZoneHVAC:EvaporativeCoolerUnit</h3>
 <p>The zone evaporative cooler unit is a compound object made up of a fan and one or two evaporative cooler components.  This unit serves a single thermal zone as a forced-convection, cooling-only unit with supply fan.  It always draws 100% of its supply air from the outside, passes the air through a supply fan and evaporative cooler(s) and then into the zone.  The fan can be positioned upstream of the cooler(s) for a blow through placement.  Or it can be positioned downstream of the cooler(s) for a draw through placement.  If there is more than one evaporative cooler, then should be in series with the first cooler immediately upstream of the second cooler. There is an option to include a relief zone exhaust node to balance the air in the zone.</p>
 <p>The unit can have either constant or variable speed fans.  This zone unit differs from other constant speed forced-air zone units in that its controls are not based on a part-load formulation with averaged air flow rates. Instead the unit is completely on or off during the entire timestep.  This means that it is beneficial to use relatively short timesteps. However for variable speed fans, the unit can modulate fan speed to just meet cooling loads and therefore operates similar to other zone HVAC units.</p>
-<h4 id="field-name_54">Field: Name</h4>
+<h4 id="field-name_55">Field: Name</h4>
 <p>This alpha field defines a unique user-assigned name for an instance of a zone evaporative cooler unit.  References to this unit by other objects will use this name.</p>
 <h4 id="field-availability-schedule-name_19">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of a schedule that denotes whether the unit operates during a given time period. A schedule value equal to 0.0 denotes that the cooler unit must be off for that time period. A schedule value greater than 0.0 denotes that the cooler is available to operate during that time period. If this field is left blank, then the program assumes that the unit is always available as if the schedule was always set to 1.0.</p>
@@ -5760,7 +5901,7 @@ High Temp Radiant System</td>
 <p>Figure 110. Zone Outdoor Air Unit Schematic</p>
 <p>Zones may contain one or more zone outdoor air units.  The user can choose to have each unit have its own exhaust fan or may choose to have only one unit have a exhaust fan that will handle the flow of all of the zone outdoor air units.  Note that the user will need to account for any flow balance among the zone outdoor air units on the supply and exhaust sides.</p>
 <p>The full input for zone outdoor air units is described below using a variety of fields.</p>
-<h4 id="field-name_55">Field: Name</h4>
+<h4 id="field-name_56">Field: Name</h4>
 <p>This field is simply the identifying name that distinguishes one particular outdoor air unit from another in the input data file. Like all other names in EnergyPlus, it is assumed that this is a unique character string and that no other zone outdoor air units use this same name.</p>
 <h4 id="field-availability-schedule-name_20">Field: Availability Schedule Name</h4>
 <p>This field is a schedule name (ref: Schedule) that determines whether the zone outdoor air unit is available to operate. A schedule value greater than 0 (usually 1 is used) indicates that the outdoor air unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the outdoor air unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. For any schedule value greater than zero, the outdoor air unit is considered available and will operate at the supply and exhaust flow rates defined by input field described below.</p>
@@ -5866,7 +6007,7 @@ High Temp Radiant System</td>
 <p>This is the availability status of the outdoor air unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the outdoor air unit  object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.</p>
 <h3 id="zonehvacoutdoorairunitequipmentlist">ZoneHVAC:OutdoorAirUnit:EquipmentList</h3>
 <p>This input syntax is used to specify the components in a zone outdoor air unit. The components will be simulated in the order in which they occur in this list.</p>
-<h4 id="field-name_56">Field: Name</h4>
+<h4 id="field-name_57">Field: Name</h4>
 <p>The user designated unique name of an instance of a zone outdoor air unit equipment list.</p>
 <h4 id="field-set-component-object-type-component-name-control-node-name-up-to-8">Field Set (Component Object Type, Component Name, Control Node Name) up to 8</h4>
 <p>After the identifying name, the list consists of up to 8 pairs of data items.</p>
@@ -5889,7 +6030,7 @@ High Temp Radiant System</td>
 <h3 id="zonehvacwindowairconditioner">ZoneHVAC:WindowAirConditioner</h3>
 <p>The Window Air Conditioner is a unit of zone equipment made up of other components. Each window air conditioner consists of an outdoor air mixer, a fan, and a direct expansion (DX) cooling coil. These components are described elsewhere in this document. The input for a window air conditioner requires the names of these three pieces of equipment, which are then specified individually elsewhere in the input. The input for a window air conditioner also requires the name of an availability schedule, the maximum unit airflow rate, and the maximum outdoor airflow rate for the unit. The unit is connected to a zone by specifying an air inlet node, which must be the same as a zone exhaust node; and an air outlet node, which must be the same as a zone inlet node (ref. ZoneHVAC:EquipmentConnections).</p>
 <p>A supply air fan operating mode schedule must also be specified. The supply air fan operating mode schedule value determines if the supply air fan can run continuously with the DX coil cycling on/off to match the zone cooling demand or the fan and DX coil can cycle on/off together to meet the cooling demand. The placement of the supply air fan, in relation to the DX coil, must also be specified (blow through or draw through). The cooling convergence tolerance is required, which is the tolerance denoting how closely the window air conditioner will meet the cooling load. The tolerance is always relative to the zone load (i.e., the unit will operate to meet the zone load to within the tolerance value times the zone load for each simulation timestep). Finally, the DX cooling coil type must be specified.</p>
-<h4 id="field-name_57">Field: Name</h4>
+<h4 id="field-name_58">Field: Name</h4>
 <p>A unique user assigned name for an instance of a window air conditioner unit. Any reference to this window air conditioner by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_21">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the window air conditioner unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -6025,7 +6166,7 @@ High Temp Radiant System</td>
 <p><img alt="PTAC_Drawthrough" src="../../InputOutputReference/media/image284.png" /></p>
 <p>Figure 111.  Schematic of a packaged terminal air conditioner with draw through fan placement</p>
 <p>Links to the PTAC’s supply air fan, DX cooling coil, heating coil, and outdoor air mixer specifications are provided in the air conditioner’s input syntax. Additional inputs include supply and outdoor air flow rates during cooling operation, heating operation, and when neither cooling or heating is required. A description of each input field for the packaged terminal air conditioner compound object is provided below.</p>
-<h4 id="field-name_58">Field: Name</h4>
+<h4 id="field-name_59">Field: Name</h4>
 <p>This alpha field defines a unique user-assigned name for an instance of a packaged terminal air conditioner. Any reference to this air conditioner by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_22">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the air conditioner operates during a given time period. A schedule value equal to 0 denotes that the air conditioner must be off for that time period. A value greater than 0 denotes that the air conditioner is available to operate during that time period. This schedule may be used to completely disable the air conditioner (all of its coils and the supply air fan) as required. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -6209,7 +6350,7 @@ High Temp Radiant System</td>
 <p><img alt="PTPFigure" src="../../InputOutputReference/media/image285.png" /></p>
 <p>Figure 112. Schematic of a packaged terminal heat pump (draw through fan placement)</p>
 <p>Links to the PTHP’s supply air fan, DX coils, supplemental heating coil, and outdoor air mixer specifications are provided in the heat pump’s input syntax. Additional inputs include supply and outdoor air flow rates during cooling operation, heating operation, and when neither cooling or heating is required. A description of each input field for the packaged terminal heat pump compound object is provided below.</p>
-<h4 id="field-name_59">Field: Name</h4>
+<h4 id="field-name_60">Field: Name</h4>
 <p>This alpha field defines a unique user-assigned name for an instance of a packaged terminal heat pump. Any reference to this heat pump by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_23">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the heat pump operates during a given time period. A schedule value equal to 0 denotes that the heat pump must be off for that time period. A value greater than 0 denotes that the heat pump is available to operate during that time period. This schedule may be used to completely disable the heat pump (all of its coils and the supply air fan) as required. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -6439,7 +6580,7 @@ High Temp Radiant System</td>
 <h3 id="zonehvacrefrigerationchillerset">ZoneHVAC:RefrigerationChillerSet</h3>
 <p>The ZoneHVAC:RefrigerationChillerSet object works in conjunction with one or multiple air chillers, compressor racks, refrigeration systems, or refrigeration secondary system objects (Ref. Refrigeration:AirChiller Refrigeration:CompressorRack, Refrigeration:System, or Refrigeration:SecondarySystem) to simulate the performance of a group of air chillers cooling a single zone. The chiller set model passes information about the zone conditions to determine the performance of individual chiller coils within the set, thus providing the sensible and latent heat exchange with the zone environment.</p>
 <p>The refrigeration chiller set object inputs include a name, an availability schedule name, the name of the zone cooled by the chiller set, the air inlet node name, the air outlet node name, and an extensible list of air chiller names (Ref. Refrigeration:AirChiller).</p>
-<h4 id="field-name_60">Field: Name</h4>
+<h4 id="field-name_61">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a refrigeration chiller. Any reference to this refrigeration chiller by another object (may be listed in a Refrigeration:CaseAndWalkInList, Refrigeration:System, Refrigeration:SecondarySystem, or Refrigeration:CompressorRack) will use this name.</p>
 <h4 id="field-availability-schedule-name_24">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the refrigeration chiller can operate during a given time period. A schedule value greater than 0 (maximum schedule value of 1.0 is typically used) indicates that the refrigeration chiller will operate during a given time period. A value equal to 0 denotes that the case does not operate (everything is OFF: refrigeration, fans, lights, anti-sweat, etc.). Typically the refrigeration chiller will operate throughout the day (i.e., the schedule will contain 1 for all time periods); however, refrigeration chillers require maintenance and/or cleaning and this can be modeled accordingly using this schedule if desired. If this field is left blank, the default schedule has a value of 1 for all time periods.</p>
@@ -6477,7 +6618,7 @@ High Temp Radiant System</td>
 <p>Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit</p>
 <p><img alt="Schematic_ZoneWSHP" src="../../InputOutputReference/media/image288.png" /></p>
 <p>Figure 113. Zone Water to Air Heat Pump Schematic for a DrawThrough Configuration with Ground Heat Exchanger</p>
-<h4 id="field-name_61">Field: Name</h4>
+<h4 id="field-name_62">Field: Name</h4>
 <p>This alpha field contains the identifying name for the zone system heat pump.</p>
 <h4 id="field-availability-schedule-name_25">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the heat pump operates during a given time period. A schedule value equal to 0 denotes that the heat pump must be off for that time period. A value greater than 0 denotes that the heat pump is available to operate during that time period. This schedule may be used to completely disable the heat pump (all of its coils and the supply air fan) as required. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -6741,7 +6882,7 @@ High Temp Radiant System</td>
 <p>Figure 114. Schematic of a mechanical dehumidifier</p>
 <p>The model has inputs for water removal, energy factor and air flow rate at rated conditions (26.7°C, 60% RH). Curve objects must be specified to describe performance at off-rated conditions. A part-load cycling curve input must also be specified to account for inefficiencies due to cycling. Other inputs including minimum and maximum operating temperatures for dehumidifier operation, off-cycle parasitic load, and an input to direct the removed water to a storage tank.</p>
 <p>The model assumes that this equipment dehumidifies and heats the air. If used in tandem with another system that cools and dehumidifies the zone air, then the zone dehumidifier should be specified as the lowest cooling priority in the ZoneHVAC:EquipmentList object for best control of zone temperature and humidity levels (e.g., if there are 3 pieces of equipment in ZoneHVAC:EquipmentList, then the zone dehumidifier should have Cooling Priority = 3). With this zone equipment prioritization, the other cooling and dehumidification system would operate first to meet the temperature setpoint (and possibly meet the high humidity setpoint as well). If additional dehumidification is needed, then the zone dehumidifier would operate. The sensible heat generated by the dehumidifier is carried over to the zone air heat balance for the next HVAC time step.</p>
-<h4 id="field-name_62">Field: Name</h4>
+<h4 id="field-name_63">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a zone DX dehumidifier unit. Any reference to this dehumidifier by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_26">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the dehumidifier operates during a given time period. A schedule value equal to 0 denotes that the dehumidifier will not operate for that time period. A value greater than 0 denotes that the dehumidifier is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -6873,7 +7014,7 @@ High Temp Radiant System</td>
 </li>
 </ul>
 <p>A description of each input field for this compound object is provided below.</p>
-<h4 id="field-name_63">Field: Name</h4>
+<h4 id="field-name_64">Field: Name</h4>
 <p>A unique user-assigned name for the stand alone ERV unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_27">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the unit can operate during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can operate during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit will not operate. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -7205,7 +7346,7 @@ High Temp Radiant System</td>
 <p><strong>FractionOfAutosizedCoolingCapacity</strong>: entered when it is intended that the simulation engine sizes the cooling capacity from the user specified <em>capacity fraction</em> and <em>autosized cooling design capacity</em> value.</p>
 <p><strong>FractionOfAutosizedHeatingCapacity</strong>: entered when it is intended that the simulation engine sizes the heating capacity from the user specified <em>capacity fraction</em> and <em>autosized heating design capacity</em> value.</p>
 <p>Description of the input fields of the design specification zone HVAC sizing object “DesignSpecification:ZoneHVAC:Sizing”:</p>
-<h4 id="field-name_64">Field: Name</h4>
+<h4 id="field-name_65">Field: Name</h4>
 <p>Unique identifier name of the DesignSpecification:ZoneHVAC:Sizing object. This sizing specification object referenced by a zone HVAC equipment whose design calculation will be made using the input data of this object.</p>
 <h4 id="field-cooling-design-air-flow-method">Field: Cooling Design Air Flow Method</h4>
 <p>The input of this field must be the method used to determine the cooling supply air volume flow rate. Input allowed is either <em>None</em>, <em>SupplyAirFlowRate</em>, <em>FlowPerFloorArea</em>, <em>FractionOfAutosizedCoolingAirflow</em>, or <em>FlowPerCoolingCapacity</em>.  None means cooling coil is not included in the zone HVAC equipment or this field may be left blank. <em>SupplyAirFlowRate</em> means the user specifies the magnitude of supply air flow rate or the program calculates the design cooling supply air volume flow rate if autosize is specified. <em>FlowPerFloorArea</em> means the program calculates the cooling supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified <em>Flow Per Floor Area</em> value. <em>FractionOfAutosizedCoolingAirflow</em> means the program calculates the cooling supply air volume flow rate from user specified fraction and the autosized design cooling supply air volume flow rate value determined by the simulation. FlowPerCoolingCapacity means the supply air volume is calculated from user specified flow per cooling capacity and design cooling capacity determined by the simulation. The default method is <em>SupplyAirFlowRate</em>.</p>
@@ -7369,7 +7510,7 @@ High Temp Radiant System</td>
 <p><img alt="" src="../../InputOutputReference/media/image294.png" /></p>
 <p>Figure 1. Schematic of the EnergyPlus Unitary System</p>
 <p>Links to the fan, cooling coil, heating coil and reheat coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the system design operating conditions are specified by the unitary system inputs.</p>
-<h4 id="field-name_65">Field: Name</h4>
+<h4 id="field-name_66">Field: Name</h4>
 <p>This alpha field contains the identifying name for the unitary system.</p>
 <h4 id="field-control-type_1">Field: Control Type</h4>
 <p>This alpha field contains control type i.e. load based or setpoint based for the unitary system. Valid choices are Load and SetPoint. Load control requires a Controlling Zone name and SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended.</p>
@@ -7663,7 +7804,7 @@ High Temp Radiant System</td>
 <h4 id="unitary-system-requested-heating-rate-w">Unitary System Requested Heating Rate [W]</h4>
 <p>This output variable is the sensible heating requested from the zone thermostat in watts. This value is calculated using the unitary system outlet air and zone conditions, the specific heat of the zone air, and the supply air mass flow rate entering/leaving the system. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.</p>
 <h3 id="unitarysystemperformanceheatpumpmultispeed">UnitarySystemPerformance:HeatPump:Multispeed</h3>
-<h4 id="field-name_66">Field: Name</h4>
+<h4 id="field-name_67">Field: Name</h4>
 <p>This alpha field contains the identifying name for the multispeed performance specification.</p>
 <h4 id="field-number-of-speeds-for-heating">Field: Number of Speeds for Heating</h4>
 <p>This field defines the number of heating speeds for the heat pump, and must match the number of heating speeds defined in the associated heating coil. The value for this input field defines the number of airflow rate ratios that must be defined for heating in the fields below. The minimum value for this field is one and the maximum value is the number specified in the coil object. If the heating coil type used in the unitary system object is not a multispeed coil type, then this field should be 1.</p>
@@ -7691,7 +7832,7 @@ High Temp Radiant System</td>
 <p>Figure 116. Schematic of EnergyPlus Heat/Cool Furnace</p>
 <p>Note: the coil order shown here has been revised from previous versions (prior to V4.0) of Energyplus to configure the cooling coil upstream of the heating coil. This configuration provides uniformity with all unitary equipment. However, for unitary HeatCool systems that do not use a reheat coil, the heating coil can also be placed upstream of the cooling coil. This optional coil placement is retained to allow compatibility with previous versions of Energyplus. For input files developed using previous versions of Energyplus, it is recommended that the coil order be revised according to the figure above.</p>
 <p>Links to the fan, heating coil, DX cooling coil and optional reheat coil specifications are provided in the furnace input data syntax. In addition, the control zone name and the furnace design operating conditions are specified by the furnace inputs.</p>
-<h4 id="field-name_67">Field: Name</h4>
+<h4 id="field-name_68">Field: Name</h4>
 <p>This alpha field contains the identifying name for the unit.</p>
 <h4 id="field-availability-schedule-name_30">Field: Availability Schedule Name</h4>
 <p>This alpha field contains the schedule name which contains information on the availability of the furnace to operate. A schedule value equal to 0 denotes that the furnace must be off for that time period. A value greater than 0 denotes that the furnace is available to operate during that time period. This schedule may be used to completely disable the furnace as required. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -7833,7 +7974,7 @@ High Temp Radiant System</td>
 <p>Figure 117. Schematic of Blow Through Heat/Cool Unitary System</p>
 <p>Note: the coil order shown here has been revised from previous versions (prior to V4.0) of Energyplus to configure the cooling coil upstream of the heating coil. This configuration provides uniformity with all unitary equipment. However, for unitary HeatCool systems that do not use a reheat coil, the heating coil can also be placed upstream of the cooling coil. This optional coil placement is retained to allow compatibility with previous versions of Energyplus. For input files developed using previous versions of Energyplus, it is recommended that the coil order be revised according to the figure above.</p>
 <p>Links to the fan, DX cooling coil, heating coil and optional reheat coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the system design operating conditions are specified by the unitary system inputs.</p>
-<h4 id="field-name_68">Field: Name</h4>
+<h4 id="field-name_69">Field: Name</h4>
 <p>This alpha field contains the identifying name for the unitary system.</p>
 <h4 id="field-availability-schedule-name_31">Field: Availability Schedule Name</h4>
 <p>This alpha field contains the schedule name which contains information on the availability of the unitary system to operate. A schedule value equal to 0 denotes that the unitary system must be off for that time period. A value greater than 0 denotes that the unitary system is available to operate during that time period. This schedule may be used to completely disable the unitary system as required. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -7975,7 +8116,7 @@ High Temp Radiant System</td>
 <p><img alt="FurnaceSchematic_HeatPump" src="../../InputOutputReference/media/image300.png" /></p>
 <p>Figure 118. Schematic of EnergyPlus Unitary Air-to-Air Heat Pump (Blow Through Configuration)</p>
 <p>Links to the fan, DX cooling coil, DX heating coil, and supplementary heating coil specifications are provided in the heat pump’s input data syntax. In addition the control zone name and the system design operating conditions are specified by the heat pump inputs.</p>
-<h4 id="field-name_69">Field: Name</h4>
+<h4 id="field-name_70">Field: Name</h4>
 <p>This alpha field contains the identifying name for the unitary system heat pump.</p>
 <h4 id="field-availability-schedule-name_32">Field: Availability Schedule Name</h4>
 <p>This alpha field contains the schedule name (ref. Schedule objects) that contains information on the availability of the heat pump to operate. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the hour. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the hour. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -8145,7 +8286,7 @@ High Temp Radiant System</td>
 <p>If the ZoneControl:Thermostat:StagedDualSetpoint object and other zone control thermostat and humidistat are assigned to the same controlled zone in the Controlling Zone or Thermostat Location field, the ZoneControl:Thermostat:StagedDualSetpoint object takes precedence and the stage number provided by the the ZoneControl:Thermostat:StagedDualSetpoint object is used to set the speed number.</p>
 <p><img alt="FurnaceSchematic_BlowThru_Multispeed" src="../../InputOutputReference/media/image301.png" /></p>
 <p>Figure 119. Schematic of EnergyPlus Unitary Air-to-Air Multi Speed Heat Pump</p>
-<h4 id="field-name_70">Field: Name</h4>
+<h4 id="field-name_71">Field: Name</h4>
 <p>This alpha field contains the identifying name for the multispeed heat pump.</p>
 <h4 id="field-availability-schedule-name_33">Field: Availability Schedule Name</h4>
 <p>This alpha field contains the schedule name (ref. Schedule objects) that contains information on the availability of the heat pump to operate. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -8507,7 +8648,7 @@ High Temp Radiant System</td>
 <p><img alt="" src="../../InputOutputReference/media/image302.svg" /></p>
 <p>Figure 120. Schematic of Blow Through Furnace Model</p>
 <p>Links to the fan and heating coil specifications are provided in the furnace input data syntax. In addition the control zone name and the furnace design operating conditions are specified by the furnace inputs.</p>
-<h4 id="field-name_71">Field: Name</h4>
+<h4 id="field-name_72">Field: Name</h4>
 <p>This alpha field contains the identifying name for the furnace.</p>
 <h4 id="field-availability-schedule-name_34">Field: Availability Schedule Name</h4>
 <p>This alpha field contains the schedule name which contains information on the availability of the furnace to operate. A schedule value equal to 0 denotes that the furnace must be off for that time period. A value greater than 0 denotes that the furnace is available to operate during that time period. This schedule may be used to completely disable the unitary system as required. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -8610,7 +8751,7 @@ High Temp Radiant System</td>
 <p><img alt="" src="../../InputOutputReference/media/image303.svg" /></p>
 <p>Figure 121. Schematic of Blow Through Heat-Only Unitary System</p>
 <p>Links to the fan and heating coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the unitary system design operating conditions are specified by the unitary system syntax.</p>
-<h4 id="field-name_72">Field: Name</h4>
+<h4 id="field-name_73">Field: Name</h4>
 <p>This alpha field contains the identifying name for the unitary system.</p>
 <h4 id="field-availability-schedule-name_35">Field: Availability Schedule Name</h4>
 <p>This alpha field contains the schedule name which contains information on the availability of the unitary system to operate. A schedule value equal to 0 denotes that the unitary system must be off for that time period. A value greater than 0 denotes that the unitary system is available to operate during that time period. This schedule may be used to completely disable the unitary system as required. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -8720,7 +8861,7 @@ High Temp Radiant System</td>
 <p><img alt="FurnaceSchematic_WSHP" src="../../InputOutputReference/media/image304.png" /></p>
 <p>Figure 122. Water to Air Heat Pump Schematic for a BlowThrough Configuration with Ground Heat Exchanger</p>
 <p>In addition, the control zone name and the system design operating conditions are specified by the heat pump inputs.</p>
-<h4 id="field-name_73">Field: Name</h4>
+<h4 id="field-name_74">Field: Name</h4>
 <p>This alpha field contains the identifying name for the unitary system heat pump.</p>
 <h4 id="field-availability-schedule-name_36">Field: Availability Schedule Name</h4>
 <p>This alpha field contains the schedule name (ref. Schedule objects) that contains information on the availability of the heat pump to operate. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -8986,7 +9127,7 @@ High Temp Radiant System</td>
 <p><img alt="BlowthruCBVAV" src="../../InputOutputReference/media/image309.png" /></p>
 <p>Figure 124. Schematic of a CBVAV unitary system (blow through fan placement)</p>
 <p>Links to the CBVAV system’s supply air fan, coils, and outdoor air mixer specifications are provided in the object’s input syntax. Additional inputs include system and outdoor air flow rates during heating and cooling operation, the priority control mode, and dehumidification control type. A description of each input field for the CBVAV unitary system compound object is provided below.</p>
-<h4 id="field-name_74">Field: Name</h4>
+<h4 id="field-name_75">Field: Name</h4>
 <p>This alpha field defines a unique user-assigned name for an instance of a changeover-bypass VAV system. Any reference to this system by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_37">Field: Availability Schedule Name</h4>
 <p>This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the system operates during a given time period. A schedule value equal to 0 denotes that the system must be off for that time period, and a schedule value greater than 0 denotes that the system is available to operate during that time period. This schedule may be used to completely disable the system (all of its coils and the supply air fan) as required. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -9663,7 +9804,7 @@ High Temp Radiant System</td>
 </ul>
 <h3 id="zonehvacbaseboardradiantconvectivewater">ZoneHVAC:Baseboard:RadiantConvective:Water</h3>
 <p>The objective of this model is to calculate the convective and radiant heat transfer from water baseboard heaters to the people and the surfaces within a zone so that surface heat balances can take into account the radiant heat transfer to the surfaces and thus enhance the accuracy of thermal comfort predictions within the space. The radiant heat gains are distributed to the surfaces by fractions defined by user input.</p>
-<h4 id="field-name_75">Field: Name</h4>
+<h4 id="field-name_76">Field: Name</h4>
 <p>A unique user assigned name for an instance of a hot water baseboard heater unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_39">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the hot water baseboard heater unit can run during a given time period. A schedule value equal to 0 denotes that the unit must be off for that time period. A value greater than 0 denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -9769,7 +9910,7 @@ High Temp Radiant System</td>
 <p>This field reports the air temperatures at the outlet node of a baseboard unit.</p>
 <h3 id="zonehvacbaseboardradiantconvectivesteam">ZoneHVAC:Baseboard:RadiantConvective:Steam</h3>
 <p>The objective of this model is to calculate the convective and radiant heat transfer from steam baseboard heaters to the people and the surfaces within a zone so that surface heat balances can take into account the radiant heat transfer to the surfaces and thus enhance the accuracy of thermal comfort predictions within the space. The radiant heat gains are distributed to the surfaces by fractions defined by the user. Users are requested to provide degree of sub cooling to estimate the outlet conditions of the condensate.</p>
-<h4 id="field-name_76">Field: Name</h4>
+<h4 id="field-name_77">Field: Name</h4>
 <p>A unique user assigned name for an instance of a steam baseboard heater unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_40">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the steam baseboard heater unit can run during a given time period. A schedule value equal to 0 denotes that the unit must be off for that time period. A value greater than 0 denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -9867,7 +10008,7 @@ High Temp Radiant System</td>
 <p>This field reports the steam temperatures at the outlet node of a baseboard unit.</p>
 <h3 id="zonehvacbaseboardradiantconvectiveelectric">ZoneHVAC:Baseboard:RadiantConvective:Electric</h3>
 <p>The electric baseboard heater is a component in the zone equipment simulation. Heat from this device is radiated to people and surfaces and also convected to the surrounding air. The electric baseboard model includes the impact of the radiant heat addition to people and surfaces so that the thermal comfort and surface heat balances are impacted. The component is controlled to meet any remaining zone load not met by other equipment baseboard operates to meet the remaining zone load and the total electric consumption is calculated by dividing by the efficiency of the baseboard.</p>
-<h4 id="field-name_77">Field: Name</h4>
+<h4 id="field-name_78">Field: Name</h4>
 <p>A unique user assigned name for an instance of an electric baseboard heater unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_41">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the electric baseboard heater unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit will be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -9947,7 +10088,7 @@ High Temp Radiant System</td>
 <p>This field reports the amount of convective energy transferred from the baseboard directly to the zone air in Joules.</p>
 <h3 id="zonehvacbaseboardconvectivewater">ZoneHVAC:Baseboard:Convective:Water</h3>
 <p>The hot water baseboard heater is a component of zone equipment. The component is controlled to meet any remaining zone load not met by other equipment in the zone that have higher heating priority. The control is accomplished by throttling the hot water flow. Input resembles that for the simple heating coil: there is an availability schedule, an overall UA, and a maximum hot water mass flow rate. The unit is connected to a hot water loop (demand side) with an inlet and outlet node. Finally, there is the convergence tolerance, which is the tolerance on how closely the baseboard outlet will meet the zone load. Of course, this tolerance is relative to the zone load.</p>
-<h4 id="field-name_78">Field: Name</h4>
+<h4 id="field-name_79">Field: Name</h4>
 <p>A unique user assigned name for an instance of a hot water baseboard heater unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_42">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the hot water baseboard heater unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -10020,7 +10161,7 @@ High Temp Radiant System</td>
 <p>This field reports the air temperatures at the outlet node of a baseboard unit.</p>
 <h3 id="zonehvacbaseboardconvectiveelectric">ZoneHVAC:Baseboard:Convective:Electric</h3>
 <p>The electric baseboard heater is a component in the zone equipment simulation. The component is controlled to meet any remaining zone load not met by other equipment in the zone that have higher heating priority. The control is accomplished by taking the remaining zone load and dividing by the efficiency of the baseboard.</p>
-<h4 id="field-name_79">Field: Name</h4>
+<h4 id="field-name_80">Field: Name</h4>
 <p>A unique user assigned name for an instance of a electric baseboard heater unit. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_43">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the electric baseboard heater unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.</p>
@@ -10063,7 +10204,7 @@ High Temp Radiant System</td>
 <h3 id="zonehvaclowtemperatureradiantvariableflow">ZoneHVAC:LowTemperatureRadiant:VariableFlow</h3>
 <p>This low temperature radiant system (hydronic) is a component of zone equipment that is intended to model any “radiant system” where water is used to supply/remove energy to/from a building surface (wall, ceiling, or floor). The component is controlled to meet any remaining zone load not met by other equipment in the zone that have higher priority. The control is accomplished by throttling the hot or chilled water flow to the unit. Note that this system will only control based on the radiant system controls defined by this input syntax and not via a zone thermostat such as is used for forced air systems. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.  If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.</p>
 <p>This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:Electric).</p>
-<h4 id="field-name_80">Field: Name</h4>
+<h4 id="field-name_81">Field: Name</h4>
 <p>This field is an unique user assigned name for an instance of a hydronic low temperature radiant system. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_44">Field: Availability Schedule Name</h4>
 <p>This field is the name of the schedule (ref: Schedule) that denotes whether the hydronic low temperature radiant system can run during a given time period. A schedule value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for that time period. A value greater than 0 (usually 1 is used) denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -10195,7 +10336,7 @@ High Temp Radiant System</td>
 <p>This low temperature radiant system (hydronic) is a component of zone equipment that is intended to model any “radiant system” where water is used to supply/remove energy to/from a building surface (wall, ceiling, or floor). The component is controlled via control schedules as described in the syntax below and does not require a zone thermostat. Note that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.  If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.</p>
 <p>The constant flow system differs from the hydronic system describe above in what it controls. The hydronic system varies the flow rate through the radiant system based on some control temperature. The constant flow system keeps flow rate constant via a local circulation pump and varies the water temperature that is sent to the radiant system. This is accomplished with a mixing valve that is controlled by a sensor. This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:Electric). Low temperature radiant systems that vary the flow rate through the radiant system should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:VariableFlow)</p>
 <p>One of the other differences between this model and the variable flow hydronic radiant system is that the constant flow radiant system has a built-in local secondary loop. It will recirculate flow coming out of the system and mix this with flow from the loop to arrive at the desired inlet temperature to the radiant system (note that this model has the temperature sensor AFTER the pump to insure proper inlet temperature to the radiant system). The local loop also contains a pump which is assumed to be upstream of the radiant system and after the mixing valve. So, the local loop can have some recirculation. The flow from the main loop may also bypass the radiant system if more than enough flow is available and the main loop is also a constant flow system.</p>
-<h4 id="field-name_81">Field: Name</h4>
+<h4 id="field-name_82">Field: Name</h4>
 <p>This field is an unique user assigned name for an instance of a constant flow low temperature radiant system. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_45">Field: Availability Schedule Name</h4>
 <p>This field is the name of the schedule (ref: Schedule) that denotes whether the constant flow low temperature radiant system can run during a given time period. A schedule value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for that time period. A value greater than 0 (usually 1 is used) denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -10350,7 +10491,7 @@ High Temp Radiant System</td>
 <h3 id="zonehvaclowtemperatureradiantelectric">ZoneHVAC:LowTemperatureRadiant:Electric</h3>
 <p>This low temperature radiant system (electric) is a component of zone equipment that is intended to model any “radiant system” where electric resistance heating is used to supply energy (heat) to a building surface (wall, ceiling, or floor). The component is controlled by the radiant system controls that are defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.  If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.</p>
 <p>The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: Low Temp Radiant System:Hydronic).</p>
-<h4 id="field-name_82">Field: Name</h4>
+<h4 id="field-name_83">Field: Name</h4>
 <p>This field is an unique user assigned name for an instance of an electric low temperature radiant system. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_46">Field: Availability Schedule Name</h4>
 <p>This field is the name of the schedule (ref: Schedule) that denotes whether the electric low temperature radiant system can operate during a given time period. A schedule value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for that time period. A value greater than 0 (usually 1 is used) denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -10406,7 +10547,7 @@ High Temp Radiant System</td>
 <p>These outputs are the heating provided by the low temperature radiant system to the zone, in Watts or Joules.</p>
 <h3 id="zonehvaclowtemperatureradiantsurfacegroup">ZoneHVAC:LowTemperatureRadiant:SurfaceGroup</h3>
 <p>A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that are serving to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallet, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how flow rate is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list must be a part of the same zone and that the zone of these surfaces must also match the zone the radiant system is attempting to condition.</p>
-<h4 id="field-name_83">Field: Name</h4>
+<h4 id="field-name_84">Field: Name</h4>
 <p>This field is an unique user assigned name for the list of surfaces that are acting in coordination with one another. Any reference to this list by a radiant system will use this name.</p>
 <h4 id="field-set-surface-name-flow-fraction-to-surface">Field Set: Surface Name, Flow Fraction to Surface</h4>
 <p>The pairs of Surface Name, Flow Fraction to Surface are used in several objects. There can be up to 10 specified. The object is extensible so more can be added.</p>
@@ -10426,7 +10567,7 @@ High Temp Radiant System</td>
 <h3 id="zonehvachightemperatureradiant">ZoneHVAC:HighTemperatureRadiant</h3>
 <p>The high temperature radiant system (gas-fired or electric) is a component of zone equipment that is intended to model any “high temperature” or “high intensity” radiant system where electric resistance or gas-fired combustion heating is used to supply energy (heat) to a building occupants directly as well as the building surfaces (wall, ceiling, or floor). The component is controlled by the radiant system controls defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.  If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.</p>
 <p>The control is accomplished by varying the electrical power supplied to or gas consumed by the unit. It is not intended to simulate low temperature electric or hydronic radiant systems. Those devices will be handled by a separate model and different input syntax (ref: the low temperature systems described elsewhere).</p>
-<h4 id="field-name_84">Field: Name</h4>
+<h4 id="field-name_85">Field: Name</h4>
 <p>This field is an unique user assigned name for an instance of the high temperature radiant system. Any reference to this unit by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_47">Field: Availability Schedule Name</h4>
 <p>This field is the name of the schedule (ref: Schedule) that denotes whether the high temperature radiant system can operate during a given time period. A schedule value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for that time period. A value greater than 0 (usually 1 is used) denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -10517,7 +10658,7 @@ High Temp Radiant System</td>
 <p>Ventilated slab systems in general use outdoor air to “precool” slabs with colder nighttime air.  This method of precooling the thermal mass of a space can be very effective when nighttime temperatures are low and the mass of the system is high enough to provide a significant amount of cooling potential during the day to counteract internal heat gains within a zone.  Nearly all ventilated slabs are simple systems such as that shown in the right side of Figure 128.  The fan is shown in a blow through position, but the model will allow either a blow or draw through configuration.</p>
 <p><img alt="f102_jpeg" src="../../InputOutputReference/media/image321.png" /></p>
 <p>Figure 128. Ventilated Slab model - basic system</p>
-<h4 id="field-name_85">Field: Name</h4>
+<h4 id="field-name_86">Field: Name</h4>
 <p>This field is a unique user assigned name for an instance of a ventilated slab system. Any reference to this unit by another object will use this name. Other objects that use this ventilated slab system will reference it by this name.</p>
 <h4 id="field-availability-schedule-name_48">Field: Availability Schedule Name</h4>
 <p>This field is the name of the schedule (ref: Schedule) that denotes whether the ventilated slab system can run during a given time period. A schedule value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for that time period. A value greater than 0 (usually 1 is used) denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.</p>
@@ -10839,7 +10980,7 @@ High Temp Radiant System</td>
 <p>The refrigeration compressor rack object works in conjunction with the refrigeration case and walkin objects (Ref. Refrigeration:Case and Refrigeration:WalkIn) to simulate the performance of a refrigerated case system. This object models the electric consumption of the rack compressors and the condenser fans. Heat removed from the refrigerated cases, walkins, and compressor/condenser fan heat can be rejected either outdoors or to a zone. Compressor rack waste heat can also be reclaimed for use by an optional air- or water-heating coil (Ref. Coil:Heating:Desuperheater and Coil:WaterHeating:Desuperheater).</p>
 <p>If heat is rejected outdoors, condenser cooling can either be accomplished by direct air flow, evaporative water cooling, or a by water-cooled condenser with appropriate plant loop piping. With evaporative cooling, water is sprayed through the air stream to effectively lower the air temperature experienced by the condenser coil as a result of water evaporation. The use of a water-cooled condenser requires the definition of a plant loop to supply cooling to the condenser.  Waste heat can be reclaimed and stored using a water storage device.</p>
 <p>The inputs for the compressor rack object include a name, the heat rejection location, the compressor rack coefficient of performance (COP) at design conditions, the design condenser fan power, and the type of condenser cooling. The model requires two curve objects to describe performance at off-design conditions. If the condenser is water-cooled, the inlet and outlet node names as well as the water outlet temperature schedule name are required.  If the condenser has evaporative cooling, additional inputs for evaporative condenser effectiveness, condenser air flow rate, basin heater parameters, water pump power, water source, and an evaporative cooling availability schedule are available. The names of refrigerated cases and walkins connected to the compressor rack are the final inputs to the model.</p>
-<h4 id="field-name_86">Field: Name</h4>
+<h4 id="field-name_87">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a refrigeration compressor rack. Any reference to this compressor rack by another object will use this name.</p>
 <h4 id="field-heat-rejection-location">Field: Heat Rejection Location</h4>
 <p>The location of the compressor rack’s condenser. The compressor rack condenser heat can be directed “Outdoors” to model an outdoor air or water-cooled condenser or “Zone” to model a condenser located in a zone (e.g., a stand-alone packaged refrigerated case with integral condenser located in a conditioned zone). The default for this field is “Outdoors”. If the heat rejection location is “Zone” and no walk-in coolers are served by this compressor rack, then all refrigerated cases connected to this compressor rack must be located in the same zone. If however, walk-in coolers are also served by this compressor rack, then the heat rejection zone name must be specified (see Heat Rejection Zone Name field below) and cases and walk-ins can be located in multiple zones.</p>
@@ -11061,7 +11202,7 @@ High Temp Radiant System</td>
 <p>The user can select from eight case defrost types, with additional inputs being required depending on the type selected. The user must enter a defrost schedule (unless Case Defrost Type = None), and an optional defrost drip-down schedule can be specified to allow additional time for melted frost to drain from the cooling coil following the regular defrost period.</p>
 <p>Inputs are required for case fans, lights, and anti-sweat heaters. Case lighting can be controlled by the user through entering a schedule. The case fans operate whenever the cooling coil is operating and during defrost periods for certain case defrost types. Anti-sweat heater power can be controlled by several methods which are user selectable. The model assumes that the fans are contained within the thermal envelope of the case and provide a direct heat load on the case cooling coil. For lighting and anti-sweat heaters, the user can specify the fraction of their respective heat loads that directly impact the case cooling coil (with the remainder of their heat load impacting the surrounding zone air).</p>
 <p>The user has the option of specifying a case restocking schedule and a schedule for modifying the case credits if needed. Finally, the user can specify the under case HVAC return air fraction which determines the portion of the case credits that directly impact the HVAC return air conditions (with the remainder of the case credits impacting the zone sensible and latent loads).</p>
-<h4 id="field-name_87">Field: Name</h4>
+<h4 id="field-name_88">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a refrigerated case. Any reference to this case by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_49">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the refrigerated case can operate during a given time period. A schedule value greater than 0 (maximum schedule value of 1.0 is typically used) indicates that the case will operate during a given time period. A value equal to 0 denotes that the case does not operate (everything is OFF: refrigeration, fans, lights, anti-sweat, etc.). Typically the refrigerated case will operate throughout the day (i.e., the schedule will contain 1 for all time periods); however, cases require maintenance and/or cleaning and this can be modeled accordingly using this schedule if desired. If this field is left blank, the case is assumed to be available at all time periods.</p>
@@ -11288,7 +11429,7 @@ High Temp Radiant System</td>
 <p>This field is the total electricity consumption of the refrigerated case electric defrost heater(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects). This output is available if case defrost type is Electric or Electric with Temperature Termination.</p>
 <h3 id="refrigerationcaseandwalkinlist">Refrigeration:CaseAndWalkInList</h3>
 <p>This object provides a list of all the refrigerated cases and/or walk in coolers cooled by a single refrigeration system (ref: Refrigeraion:CompressorRack and Refrigeration:System). This list is extensible. Note that the names of all cases, walk-ins,air chillers, and caseandwalkinlists must be unique.  That is, you cannot give a list the same name as one of the cases.  Similarly, a walkin cannot have the same name as a case.This list may contain a combination of case and walk-in names OR a list of air chiller names.  Air chillers may not be included in any list that also includes cases or walk-ins.</p>
-<h4 id="field-name_88">Field: Name</h4>
+<h4 id="field-name_89">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a CaseAndWalkInList. Any reference to this list by another object will use this name.</p>
 <h4 id="field-case-or-walkin-or-air-chiller-x-name">Field: Case or WalkIn or Air Chiller &lt;x&gt; Name</h4>
 <p>Identifies a particular refrigerated case or walk-in. The name will be validated against the  Refrigeration Case, Refrigeration WalkIn, and Air Chiller names (ref: Refrigeration:Case,  Refrigeration:WalkIn, and Refrigeration:AirChiller) in the input file. Up to 20 are provided in the IDD; this object is extensible.</p>
@@ -11304,7 +11445,7 @@ High Temp Radiant System</td>
 <p>The walk-in cooler object inputs include a name, an availability schedule name, the rated cooling capacity, the rated operating temperature, the rated cooling source temperature, the rated total heating power and heating power schedule, the rated fan and lighting power and schedules, defrost type, defrost control type, defrost schedule name, drip-down schedule name, defrost power, the portion of the defrost energy used to melt ice (only for temperature termination control type), restocking schedule, refrigerant inventory, and the floor area and U-value.</p>
 <p>For each zone adjacent to the walk-in, the user must input the zone name and the insulated surface area and U-value facing that zone. The user must also specify, for two types of doors, the door area, height, U-value, door opening schedule name, and any door opening protection.</p>
 <p>Under case HVAC return air fraction, available for refrigerated cases, is not available for walk-in coolers.</p>
-<h4 id="field-name_89">Field: Name</h4>
+<h4 id="field-name_90">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a refrigerated walk-in. Any reference to this walk-in by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_50">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the walk in can operate during a given time period. A schedule value greater than 0 (maximum schedule value of 1.0 is typically used) indicates that the walkin will operate during a given time period. A value equal to 0 denotes that the case does not operate (everything is OFF: refrigeration, fans, lights, anti-sweat, etc.). Typically the walkin will operate throughout the day (i.e., the schedule will contain 1 for all time periods); however, walkins require maintenance and/or cleaning and this can be modeled accordingly using this schedule if desired. If this field is left blank, the default schedule has a value of 1 for all time periods.</p>
@@ -11485,7 +11626,7 @@ High Temp Radiant System</td>
 <p>The refrigeration system may also include a liquid suction and/or mechanical subcooler (Ref. Refrigeration:Subcooler).</p>
 <p>The system object coordinates the energy flows between the other refrigeration objects and is used to set system parameters. Compressor waste heat can also be reclaimed for use by an optional air- or water-heating coil (Ref. Coil:Heating:Desuperheater and Coil:WaterHeating:Desuperheater).</p>
 <p>The inputs for the refrigeration system object, in addition to the names of the other refrigeration objects described above, include a name for this system, the minimum condensing temperature, the refrigeration system working fluid, and the type of saturated suction temperature control. Optional input fields are also provided for users seeking to keep track of refrigerant inventory and suction pipe heat gains.</p>
-<h4 id="field-name_90">Field: Name</h4>
+<h4 id="field-name_91">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a refrigeration system. Any reference to this refrigeration system by another object will use this name.</p>
 <h4 id="field-refrigerated-case-or-walkin-or-caseandwalkinlist-name">Field: Refrigerated Case or WalkIn or CaseAndWalkInList Name</h4>
 <p>Identifies a single case, a single walkin, single air chiller, or a particular list of refrigerated cases and walkins or air chillers, that is cooled by this refrigeration system. The name will be validated against the case, walkin, air chiller and CaseAndWalkInList names  (ref: Refrigeration:Case, Refrigeration:WalkIn, Refrigeration:AirChiller, and Refrigeration:CaseAndWalkInList) in the input file. Only cases and walkins or air chillers served directly by the system should be included in this list.  Any cases, walkins, or air chillers served indirectly via a secondary loop should NOT be included in this list. Note that any system that serves an air chiller cannot also serve a case or walkin.</p>
@@ -11795,7 +11936,7 @@ High Temp Radiant System</td>
 <p>The Refrigeration:TranscriticalSystem object coordinates the energy flows between the other refrigeration objects and is used to set system parameters.</p>
 <p>The inputs for the refrigeration system object, in addition to the names of the other refrigeration objects described above, include a name for this system, the receiver pressure, the subcooler effectiveness, and the refrigeration system working fluid.  Optional input fields are also provided for users seeking to keep track of suction pipe heat gains.</p>
 <p>A detailed description of the transcritical CO<sub>2</sub> booster refrigeration system may be found in the Refrigeration section of the Engineering Reference.</p>
-<h4 id="field-name_91">Field: Name</h4>
+<h4 id="field-name_92">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a transcritical CO<sub>2</sub> refrigeration system.  Any reference to this refrigeration system by another object will use this name.</p>
 <h4 id="field-system-type">Field: System Type</h4>
 <p>Identifies the transcritical CO<sub>2</sub> refrigeration system as either a single-stage system with only medium-temperature loads, or a two-stage system with both medium- and low-temperature loads.  Valid choices are:  SingleStage for single stage systems or TwoStage for two stage systems.</p>
@@ -11927,7 +12068,7 @@ High Temp Radiant System</td>
 <h3 id="refrigerationcompressor">Refrigeration:Compressor</h3>
 <p>The compressors are described here using manufacturer’s data for curves that provide the efficiency, cooling capacity, and power consumption.  The corresponding rated values for cycle superheat and subcooling are also required.</p>
 <p><strong>A dataset has been provided containing the compressor rating data, including the performance curve inputs, for a large number of compressors.  See RefrigerationCompressorCurves.idf.</strong></p>
-<h4 id="field-name_92">Field: Name</h4>
+<h4 id="field-name_93">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a compressor. Any reference to this compressor by another object will use this name.</p>
 <h4 id="field-refrigeration-compressor-power-curve-name">Field: Refrigeration Compressor Power Curve Name</h4>
 <p>This required field provides the name of the curve object that describes the compressor power as a function of the evaporating and condensing temperatures, as specified in ARI 540. The curve is of the bicubic form(ref: Curve:Bicubic).  However, the input order for the Energy Plus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:</p>
@@ -12004,7 +12145,7 @@ High Temp Radiant System</td>
 <p>This is the fraction of the time step when the compressor ran to meet the load.  It is a value between 0.0 and 1.0.</p>
 <h3 id="refrigerationcompressorlist">Refrigeration:CompressorList</h3>
 <p>This object provides a list of all the compressors included within a single refrigeration system (Ref: Refrigeration:System). Each list must contain at least one compressor. The order in which the individual compressors are listed here will be the order in which the compressors are dispatched to meet the system load.  That is, at very low loads, only compressor #1 will be operating.  As the load increases, the first two compressors will be operating, and so on. This list is extensible.</p>
-<h4 id="field-name_93">Field: Name</h4>
+<h4 id="field-name_94">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a compressor list. Any reference to this compressor list by another object will use this name. The compressor list cannot have the same name as any individual compressor.</p>
 <h4 id="field-refrigeration-compressor-x-name">Field: Refrigeration Compressor &lt;x&gt; Name</h4>
 <p>Identifies a particular compressor that works in conjunction with the other compressors on this list to provides cooling to a single refrigeration system. The name will be validated against the compressor names (ref: Refrigeration:Compressor) in the input file. Up to 20 are available in the IDD; this object is extensible.</p>
@@ -12016,7 +12157,7 @@ High Temp Radiant System</td>
 <p>CompressorC;             !- Refrigeration Compressor Name #3</p>
 <h3 id="refrigerationsubcooler">Refrigeration:Subcooler</h3>
 <p>Two types of subcoolers are modeled by the detailed refrigeration system.  As described in the Engineering Reference, the liquid suction heat exchanger uses cool suction gas to subcool the hot condensate after it leaves the condenser and before it reaches the thermal expansion valve.  For the liquid suction heat exchanger, both the source and sink of energy are located within the same refrigeration system.  In contrast, a mechanical subcooler is used to transfer cooling capacity from one refrigeration system to another. The mechanical subcooler is listed as a part of the system for which the condensate is cooled.  However, the input data for the mechanical subcooler includes a field that identifies the system that provides the cooling capacity.</p>
-<h4 id="field-name_94">Field: Name</h4>
+<h4 id="field-name_95">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a subcooler. Any reference to this subcooler by another object will use this name.</p>
 <h4 id="field-subcooler-type">Field: Subcooler Type</h4>
 <p>The type of subcooler. Valid choices are Mechanical and LiquidSuction.  If the field is blank, the default will be LiquidSuction.</p>
@@ -12067,7 +12208,7 @@ High Temp Radiant System</td>
 <p>This output is the cooling energy transferred from one system’s compressor group to the refrigerant leaving the condenser for another refrigeration system in Joules.</p>
 <h3 id="refrigerationcondenseraircooled">Refrigeration:Condenser:AirCooled</h3>
 <p>The refrigeration system requires a single condenser to reject the system heat.  The air cooled condenser object is one of four options for this condenser. In an air-cooled condenser, the total heat of rejection is characterized by a linear relationship between the difference between the inlet air (usually the outside drybulb) and condensing temperatures. This curve is commonly found in the condenser manufacturers’ literature. This rating curve, which corresponds to ARI 460 standards, also has an associated rated value for subcooling that should be entered. The rated condenser fan power and fan speed control type must be specified. If the condenser is not at ground level, the user may specify an air inlet node name (ref: OutdoorAir:Node name). If the condenser is located inside a conditioned zone, the zone name may be specified(ref: bbbZoneNamebbb). Optional input is provided to help the user compare refrigerant inventories for different systems.  These inputs represent the design values for the refrigerant inventory within the condenser, within a receiver beneath the condenser, and in the liquid pipes between the condenser and the refrigerated cases.</p>
-<h4 id="field-name_95">Field: Name</h4>
+<h4 id="field-name_96">Field: Name</h4>
 <p>Identifies a particular condenser that rejects heat for a one or more refrigeration system(s). The name must be unique and will be validated against all the condenser names (ref: Refrigeration:Condenser:*) in the input file, including names used for evaporative-cooled, water-cooled, and cascade-cooled condensers.</p>
 <h4 id="field-rated-effective-total-heat-rejection-rate-curve-name">Field: Rated Effective Total Heat Rejection Rate Curve Name</h4>
 <p>This field is the name of a curve object defining the condenser heat rejection as a function of the difference between the condensing and entering air temperatures. The curve should be linear (Curve:Linear). See the Engineering Reference for more discussion on the curve coefficients.</p>
@@ -12165,7 +12306,7 @@ High Temp Radiant System</td>
 <h3 id="refrigerationcondenserevaporativecooled">Refrigeration:Condenser:EvaporativeCooled</h3>
 <p>Each refrigeration system requires a single condenser.  The evaporative cooled condenser object is one of four options for this condenser. In an evaporative-cooled condenser, the total heat of rejection is characterized by a four-factor relationship between the condensing temperature and the difference between the outside wetbulb and condensing temperatures. This curve must be developed by regression from the condenser manufacturers’ literature. This rating curve, which is based upon rated data taken according to ARI 460 standards, also has an associated rated value for subcooling that should be entered. The rated condenser fan power and fan speed control type must be specified. If the condenser is not at ground level, the user may specify an air inlet node name (ref: OutdoorAir:Node name). Optional input is provided to help the user compare refrigerant inventories for different systems.  These input represent the design values for the refrigerant inventory within the condenser, within a receiver beneath the condenser, and in the liquid pipes between the condenser and the refrigerated cases.</p>
 <p>Additional inputs are needed for basin heater parameters, water pump power, and water source. An evaporative cooling availability schedule is available.</p>
-<h4 id="field-name_96">Field: Name</h4>
+<h4 id="field-name_97">Field: Name</h4>
 <p>Identifies a particular condenser that rejects heat for a one or more refrigeration system(s). The name must be unique and will be validated against all the condenser names (ref: Refrigeration:Condenser:*) in the input file, including names used for air-cooled, water-cooled and cascade-cooled condensers.</p>
 <h4 id="field-rated-effective-total-heat-rejection-rate">Field: Rated Effective Total Heat Rejection Rate</h4>
 <p>This numeric field should be the rated heat rejection effect (W) at standard rating conditions per ARI 490.  Be sure the rating corresponds to the correct refrigerant.</p>
@@ -12345,7 +12486,7 @@ High Temp Radiant System</td>
 <p>This is the water consumed by evaporation in m<sup>3</sup> while providing evaporative cooling of the condenser for the timestep being reported. This output is also added to a meter with Resource Type = Water, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).</p>
 <h3 id="refrigerationcondenserwatercooled">Refrigeration:Condenser:WaterCooled</h3>
 <p>The refrigeration system requires a single condenser.  The water cooled condenser object is one of four options for this condenser. Manufacturer’s data is required for the rated total heat rejection, the rated condensing temperature, and the rated leaving liquid refrigerant temperature, all per ARI 450.  These values are used to calculate the subcooling included in the rated capacity. The inlet and outlet node names as well as the water outlet temperature schedule name are required.  Optional input is provided to help the user compare refrigerant inventories for different systems.  These input represent the design values for the refrigerant inventory within the condenser, within a receiver beneath the condenser, and in the liquid pipes between the condenser and the refrigerated cases.</p>
-<h4 id="field-name_97">Field: Name</h4>
+<h4 id="field-name_98">Field: Name</h4>
 <p>Identifies a particular condenser that rejects heat for one or more refrigeration system(s). The name must be unique and will be validated against all the condenser names (ref: Refrigeration:Condenser) in the input file, including names used for air-cooled, evaporative-cooled, and cascade-cooled condensers.</p>
 <h4 id="field-rated-effective-total-heat-rejection-rate_1">Field: Rated Effective Total Heat Rejection Rate</h4>
 <p>This numeric field should be the rated heat rejection effect (W) at standard rating conditions per ARI 450.  Be sure the rating corresponds to the correct refrigerant.</p>
@@ -12459,7 +12600,7 @@ High Temp Radiant System</td>
 <p>The refrigeration system requires a single condenser.  The cascade condenser object is one of four options for this condenser. The cascade condenser is unlike the other condenser options because it rejects heat to another, higher-temperature, refrigeration system. That is, the cascade condenser acts as a heat rejection object for one system, but acts as a refrigeration load for another system.  Therefore, this object will be referenced twice: first for the system rejecting heat (see the field Refrigeration Condenser Name for the object Refrigeration:System), and second for the system absorbing the heat (see the input for the field Refrigeration Transfer Load or TransferLoad List Name for the object Refrigeration:System or the field Cascade Condenser Name or Secondary System Name for the object Refrigeration:TransferLoadList).</p>
 <p>Manufacturer’s data is required for the rated condensing temperature and the rated approach temperature difference. The user must also specify the condensing temperature control type.  There are two choices. The user can specify “Fixed” and the condensing temperature will be held constant at the input value.  The user can specify “Float” if they want the condensing temperature to be set by other refrigeration loads served by the higher-temperature system.</p>
 <p>The rated heat rejection capacity is not used except as a rough input value check on the overall system sizing. Optional input is provided to help the user compare refrigerant inventories for different systems.  These inputs represent the design values for the refrigerant inventory within the condenser, within a receiver beneath the condenser, and in the liquid pipes between the condenser and the refrigerated cases.</p>
-<h4 id="field-name_98">Field: Name</h4>
+<h4 id="field-name_99">Field: Name</h4>
 <p>Identifies a particular condenser that rejects heat for a single refrigeration system. The name must be unique and will be validated against all the condenser names (ref: Refrigeration:Condenser:*) in the input file, including names used for air-cooled, evaporative-cooled, and water-cooled condensers.</p>
 <h4 id="field-rated-condensing-temperature_1">Field: Rated Condensing Temperature</h4>
 <p>This numeric field provides the rated condensing temperature (C).</p>
@@ -12501,7 +12642,7 @@ High Temp Radiant System</td>
 <p>This is the total heat energy flowing across the condenser for the timestep being reported.</p>
 <h3 id="refrigerationgascooleraircooled">Refrigeration:GasCooler:AirCooled</h3>
 <p>The transcritical refrigeration system requires a single gas cooler to reject the system heat.  The total heat of rejection is characterized by a linear relationship between the difference between the outside dry-bulb and gas cooler outlet temperatures.  The rated gas cooler fan power and fan speed control type must be specified.  If the gas cooler is not at ground level, the user may specify an air inlet node name (Ref. OutdoorAir:Node name).  Optional input is provided to help the user track refrigerant inventories.  These inputs represent the design values for the refrigerant inventory within the gas cooler, within a receiver, and in the liquid pipes between the gas cooler and the refrigerated cases.</p>
-<h4 id="field-name_99">Field: Name</h4>
+<h4 id="field-name_100">Field: Name</h4>
 <p>Identifies a particular gas cooler that rejects heat for a single refrigeration system.  The name must be unique and will be validated against all the gas cooler names (Ref. Refrigeration:GasCooler:AirCooled) in the input file.</p>
 <h4 id="field-rated-total-heat-rejection-rate-curve-name">Field: Rated Total Heat Rejection Rate Curve Name</h4>
 <p>This field is the name of a curve object defining the gas cooler heat rejection as a function of the difference between the gas cooler outlet and entering air temperatures. The curve should be linear (Curve:Linear). See the Engineering Reference for more discussion on the curve coefficients.</p>
@@ -12572,7 +12713,7 @@ High Temp Radiant System</td>
 <p>This is the total heat recovered from the gas cooler inlet flow for defrost purposes within the refrigeration system for the timestep being reported.</p>
 <h3 id="refrigerationtransferloadlist">Refrigeration:TransferLoadList</h3>
 <p>A refrigeration system may provide cooling to other, secondary, systems through either a secondary loop or a cascade condenser (Ref. Refrigeration:SecondarySystem and Refrigeration:Condenser:Cascade). If multiple transfer loads are served by a single primary system, use this list to group them together for reference by the primary system (see the field “Refrigeration Transfer Load or TransferLoad List Name” in the Refrigeration:System object).</p>
-<h4 id="field-name_100">Field: Name</h4>
+<h4 id="field-name_101">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a refrigeration transfer load list. Any reference to this list by another object will use this name. In particular, the primary refrigeration system absorbing the heat from all the loads listed here will use this name to reference those loads.</p>
 <h4 id="field-cascade-condenser-name-or-secondary-system-name">Field: Cascade Condenser Name or Secondary System Name</h4>
 <p>Identifies a cascade condenser or secondary loop that is cooled, along with the other transfer loads listed here, by a single system. The name will be validated against the Refrigeration:SecondarySystem and Refrigeration:Condenser:Cascade names in the input file (the name will also be compared against all the other condenser names, but an error will be issued if it refers to any type of condenser other than a cascade condenser).</p>
@@ -12588,7 +12729,7 @@ High Temp Radiant System</td>
 <p>If the secondary fluid remains a liquid, the heat exchanger between the primary and secondary systems functions as an evaporator on the primary side and chills the circulating fluid on the secondary side. Inputs that describe the evaporator performance at rated conditions are used to calculate the heat exchanger effectiveness. These values include the rated evaporator capacity (which can be specified in terms of energy or fluid flow rate), the rated evaporating temperature, the rated approach temperature difference, and the rated range temperature difference.</p>
 <p>If the secondary fluid undergoes a partial phase change, the heat exchanger between the primary and secondary systems functions as an evaporator on the primary side and as a condenser on the secondary side. The evaporator capacity, evaporating temperature, and approach temperature difference, all at full-load design conditions, are input.</p>
 <p>The balance of the secondary system object describes the pumping system. The pumping options include a single constant speed pump, multiple constant speed pumps, or a variable frequency-drive pump.  The user can also keep track of distribution piping and receiver shell heat gains.</p>
-<h4 id="field-name_101">Field: Name</h4>
+<h4 id="field-name_102">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a refrigeration secondary system. Any reference to this refrigeration secondary system by another object will use this name. In particular, the primary refrigeration system absorbing the heat from this system will use this name to define that load.</p>
 <h4 id="field-refrigerated-case-or-walkin-or-caseandwalkinlist-name_1">Field: Refrigerated Case or WalkIn or CaseAndWalkInList Name</h4>
 <p>Identifies a single case, or walkin, or a particular list of refrigerated cases and walkins, that are cooled by this refrigeration secondary system. The name will be validated against the case, walkin, and CaseAndWalkInList names (ref. Refrigeration:Case, Refrigeration:WalkIn and Refrigeration:CaseAndWalkInList) in the input file.</p>
@@ -12853,7 +12994,7 @@ High Temp Radiant System</td>
 <p>The Refrigeration:AirChiller object works in conjunction with a refrigeration chiller set, compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. ZoneHvac:RefrigerationChillerSet, and a Refrigeration:CompressorRack, Refrigeration:System, or Refrigeration:SecondarySystem) to simulate the performance of an air chiller, similar to one found in a refrigerated warehouse. The air chiller model uses information at rated conditions along with the zone conditions to determine performance. Energy use for fans and heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigeration chiller model accounts for the sensible and latent heat exchange with the surrounding environment.</p>
 <p>The refrigeration chiller cooler object inputs include a name, an availability schedule name, the rated cooling capacity, the rated operating temperature, the rated cooling source temperature, the rated total heating power and heating power schedule, the rated fan power and schedules, defrost type, defrost control type, defrost schedule name, drip-down schedule name, defrost power, the portion of the defrost energy used to melt ice (only for temperature termination control type), and refrigerant inventory.</p>
 <p>Chiller coils are rated under multiple conventions. Each rating is typically based upon a selected fin material and refrigerant cycle, with correction factors for other materials or refrigerants. Fields are provided here for those correction factors. The performance of all chiller coils depends upon the inlet air temperature, relative humidity, and flow rate. Multiple methods of expressing this relationship are provided here to accommodate the way information is provided by different manufacturers.</p>
-<h4 id="field-name_102">Field: Name</h4>
+<h4 id="field-name_103">Field: Name</h4>
 <p>A unique user-assigned name for an instance of a refrigeration chiller. Any reference to this refrigeration chiller by another object will use this name.</p>
 <h4 id="field-availability-schedule-name_51">Field: Availability Schedule Name</h4>
 <p>The name of the schedule (ref: Schedule) that denotes whether the refrigeration chiller can operate during a given time period. A schedule value greater than 0 (maximum schedule value of 1.0 is typically used) indicates that the refrigeration chiller will operate during a given time period. A value equal to 0 denotes that the case does not operate (everything is OFF: refrigeration, fans, lights, anti-sweat, etc.). Typically the refrigeration chiller will operate throughout the day (i.e., the schedule will contain 1 for all time periods); however, refrigeration chillers require maintenance and/or cleaning and this can be modeled accordingly using this schedule if desired. If this field is left blank, the default schedule has a value of 1 for all time periods.</p>
