@@ -8240,33 +8240,28 @@ This optional field defaults to Yes if not specified. The field is used to show 
 
 And, an IDF example:
 
+```idf
   Zone,
-
     DORM ROOMS AND COMMON AREAS,  !- Name
-
     0.0000000E+00,           !- Direction of Relative North {deg}
-
     0.0000000E+00,           !- X Origin {m}
-
     6.096000,                !- Y Origin {m}
-
     0.0000000E+00,           !- Z Origin {m}
-
     1,                       !- Type
-
     1,                       !- Multiplier
-
     autocalculate,           !-Ceiling Height {m}
-
     autocalculate;           !- Volume {m3}
+```
+
 
 ### Zone Outputs
 
-Zone,Average,Zone Outdoor Air Drybulb Temperature [C]
+* Zone,Average,Zone Outdoor Air Drybulb Temperature [C]
 
-Zone,Average,Zone Outdoor Air Wetbulb Temperature [C]
+* Zone,Average,Zone Outdoor Air Wetbulb Temperature [C]
 
-Zone,Average,Zone Outdoor Air Wind Speed [m/s]
+* Zone,Average,Zone Outdoor Air Wind Speed [m/s]
+
 
 #### Zone Outdoor Air Drybulb Temperature [C]
 
@@ -8284,63 +8279,64 @@ The outdoor wind speed calculated at the height above ground of the zone centroi
 
 In addition to the canned Surface reports (view the Reports section later in this document) and surface variables (above), the following variables are available for all zones:
 
-Zone,Sum,Zone Total Internal Radiant Heating Energy [J]
+* Zone,Sum,Zone Total Internal Radiant Heating Energy [J]
 
-Zone,Average,Zone Total Internal Radiant Heating Rate [W]
+* Zone,Average,Zone Total Internal Radiant Heating Rate [W]
 
-Zone,Sum,Zone Total Internal Visible Radiation Heating Energy [J]
+* Zone,Sum,Zone Total Internal Visible Radiation Heating Energy [J]
 
-Zone,Average,Zone Total Internal Visible Radiation Heating Rate [W]
+* Zone,Average,Zone Total Internal Visible Radiation Heating Rate [W]
 
-Zone,Sum,Zone Total Internal Convective Heating Energy [J]
+* Zone,Sum,Zone Total Internal Convective Heating Energy [J]
 
-Zone,Average,Zone Total Internal Convective Heating Rate [W]
+* Zone,Average,Zone Total Internal Convective Heating Rate [W]
 
-Zone,Sum,Zone Total Internal Latent Gain Energy [J]
+* Zone,Sum,Zone Total Internal Latent Gain Energy [J]
 
-Zone,Average,Zone Total Internal Latent Gain Rate [W]
+* Zone,Average,Zone Total Internal Latent Gain Rate [W]
 
-Zone,Sum,Zone Total Internal Total Heating Energy [J]
+* Zone,Sum,Zone Total Internal Total Heating Energy [J]
 
-Zone,Average,Zone Total Internal Total Heating Rate [W]
+* Zone,Average,Zone Total Internal Total Heating Rate [W]
 
-Zone,Average,Zone Mean Air Temperature [C]
+* Zone,Average,Zone Mean Air Temperature [C]
 
-HVAC,Average,Zone Air Temperature [C]
+* HVAC,Average,Zone Air Temperature [C]
 
-Zone,Average,Zone Mean Air Dewpoint Temperature [C]
+* Zone,Average,Zone Mean Air Dewpoint Temperature [C]
 
-Zone,Average,Zone Mean Radiant Temperature [C]
+* Zone,Average,Zone Mean Radiant Temperature [C]
 
-Zone,Average,Zone Operative Temperature [C]
+* Zone,Average,Zone Operative Temperature [C]
 
-HVAC,Average,Zone Air Heat Balance Internal Convective Heat Gain Rate [W]
+* HVAC,Average,Zone Air Heat Balance Internal Convective Heat Gain Rate [W]
 
-HVAC,Average,Zone Air Heat Balance Surface Convection Rate [W]
+* HVAC,Average,Zone Air Heat Balance Surface Convection Rate [W]
 
-HVAC,Average,Zone Air Heat Balance Interzone Air Transfer Rate [W]
+* HVAC,Average,Zone Air Heat Balance Interzone Air Transfer Rate [W]
 
-HVAC,Average,Zone Air Heat Balance Outdoor Air Transfer Rate [W]
+* HVAC,Average,Zone Air Heat Balance Outdoor Air Transfer Rate [W]
 
-HVAC,Average,Zone Air Heat Balance System Air Transfer Rate [W]
+* HVAC,Average,Zone Air Heat Balance System Air Transfer Rate [W]
 
-HVAC,Average,Zone Air Heat Balance System Convective Heat Gain Rate [W]
+* HVAC,Average,Zone Air Heat Balance System Convective Heat Gain Rate [W]
 
-HVAC,Average,Zone Air Heat Balance Air Energy Storage Rate [W]
+* HVAC,Average,Zone Air Heat Balance Air Energy Storage Rate [W]
 
-HVAC,Average,Zone Air Heat Balance Deviation Rate [W]
+* HVAC,Average,Zone Air Heat Balance Deviation Rate [W]
 
-HVAC,Sum,Zone Air System Sensible Heating Energy [J]
+* HVAC,Sum,Zone Air System Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Air System Sensible Heating Rate [W]
+* HVAC,Average,Zone Air System Sensible Heating Rate [W]
 
-HVAC,Average,Zone Air System Sensible Cooling Rate [W]
+* HVAC,Average,Zone Air System Sensible Cooling Rate [W]
 
-HVAC,Average,Zone Air Humidity Ratio[kgWater/kgDryAir]
+* HVAC,Average,Zone Air Humidity Ratio[kgWater/kgDryAir]
 
-HVAC,Average,Zone Air Relative Humidity[%]
+* HVAC,Average,Zone Air Relative Humidity[%]
+
 
 Two of these are of particular interest:
 
@@ -8478,27 +8474,27 @@ The name of the ZoneList object. Must be unique across ZoneLists.
 
 Reference to a Zone object. This field is extensible; for greater than 20 zones, edit the IDD to add more *Zone Name* fields.
 
-ZoneList,
-
+Z```idf
+oneList,
   Mid Floor List,  !- Name
-
   Mid West Zone,  !- Zone 1 Name
-
   Mid Center Zone,  !- Zone 2 Name
-
   Mid East Zone;  !- Zone 3 Name
+```
+
 
 ### ZoneList Outputs
 
 The following output variables are reported by the ZoneList object:
 
-HVAC,Average,Zone List Sensible Heating Rate [W]
+* HVAC,Average,Zone List Sensible Heating Rate [W]
 
-HVAC,Average,Zone List Sensible Cooling Rate [W]
+* HVAC,Average,Zone List Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone List Sensible Heating Energy [J]
+* HVAC,Sum,Zone List Sensible Heating Energy [J]
 
-HVAC,Sum,Zone List Sensible Cooling Energy [J]
+* HVAC,Sum,Zone List Sensible Cooling Energy [J]
+
 
 All ZoneList variables are the sum of the corresponding Zone variables. *Zone Multiplier* fields in the Zone objects are also taken into account.
 
@@ -8530,25 +8526,26 @@ Reference to a ZoneList object. The zones in the list constitute the zones in th
 
 An integer multiplier. Zone List Multiplier is designed as a “multiplier” for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied. The default is 1.
 
+```idf
 ZONE GROUP,
-
   Mid Floor,  !- Zone Group Name
-
   Mid Floor List,  !- Zone List Name
-
   8;  !- Zone List Multiplier
+```
+
 
 ### ZoneGroup Outputs
 
 The following output variables are reported by the ZoneGroup object:
 
-HVAC,Average,Zone Group Sensible Heating Rate [W]
+* HVAC,Average,Zone Group Sensible Heating Rate [W]
 
-HVAC,Average,Zone Group Sensible Cooling Rate [W]
+* HVAC,Average,Zone Group Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Group Sensible Heating Energy [J]
+* HVAC,Sum,Zone Group Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Group Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Group Sensible Cooling Energy [J]
+
 
 All ZoneGroup variables report the associated ZoneList value multiplied by the *Zone List Multiplier*.
 
@@ -9530,193 +9527,110 @@ This field is the height of the door in meters.
 
 Examples of the rectangular surfaces are found in the example files 4ZoneWithShading\_Simple\_1.idf and 4ZoneWithShading\_Simple\_2. Some examples:
 
+```idf
   Wall:Exterior,
-
     Zn001:Wall001,           !- Name
-
     EXTERIOR,                !- Construction Name
-
     ZONE 1,                  !- Zone Name
-
     180,                     !- Azimuth Angle {deg}
-
     90,                      !- Tilt Angle {deg}
-
     0,                       !- Starting X Coordinate {m}
-
     0,                       !- Starting Y Coordinate {m}
-
     0,                       !- Starting Z Coordinate {m}
-
     20,                      !- Length {m}
-
     10;                      !- Height {m}
 
-
-
   Window,
-
     Zn001:Wall001:Win001,    !- Name
-
     SINGLE PANE HW WINDOW,   !- Construction Name
-
     Zn001:Wall001,           !- Building Surface Name
-
     ,                        !- Shading Control Name
-
     ,                        !- Frame and Divider Name
-
     1,                       !- Multiplier
-
     4,                       !- Starting X Coordinate {m}
-
     3,                       !- Starting Z Coordinate {m}
-
     3,                       !- Length {m}
-
     5;                       !- Height {m}
 
-
-
   Door,
-
     Zn001:Wall001:Door001,   !- Name
-
     HOLLOW WOOD DOOR,        !- Construction Name
-
     Zn001:Wall001,           !- Building Surface Name
-
     1,                       !- Multiplier
-
     14,                      !- Starting X Coordinate {m}
-
     0,                       !- Starting Z Coordinate {m}
-
     3,                       !- Length {m}
-
     5;                       !- Height {m}
 
   Wall:Adiabatic,
-
     Zn001:Wall004,           !- Name
-
     INTERIOR,                !- Construction Name
-
     ZONE 1,                  !- Zone Name
-
     90,                      !- Azimuth Angle {deg}
-
     90,                      !- Tilt Angle {deg}
-
     20,                      !- Starting X Coordinate {m}
-
     0,                       !- Starting Y Coordinate {m}
-
     0,                       !- Starting Z Coordinate {m}
-
     20,                      !- Length {m}
-
     10;                      !- Height {m}
 
-
-
   Floor:Adiabatic,
-
     Zn001:Flr001,            !- Name
-
     FLOOR,                   !- Construction Name
-
     ZONE 1,                  !- Zone Name
-
     90,                      !- Azimuth Angle {deg}
-
     180,                     !- Tilt Angle {deg}
-
     0,                       !- Starting X Coordinate {m}
-
     0,                       !- Starting Y Coordinate {m}
-
     0,                       !- Starting Z Coordinate {m}
-
     20,                      !- Length {m}
-
     20;                      !- Width {m}
-
-
 
   Ceiling:Interzone,
-
     Zn001:Roof001,           !- Name
-
     CEILING34,               !- Construction Name
-
     ZONE 1,                  !- Zone Name
-
     Zn003:Flr001,            !- Outside Boundary Condition Object
-
     180,                     !- Azimuth Angle {deg}
-
     0,                       !- Tilt Angle {deg}
-
     0,                       !- Starting X Coordinate {m}
-
     0,                       !- Starting Y Coordinate {m}
-
     10,                      !- Starting Z Coordinate {m}
-
     20,                      !- Length {m}
-
     20;                      !- Width {m}
 
-
-
-
-
-
-
   Window,
-
     Zn002:Wall001:Win001,    !- Name
-
     SINGLE PANE HW WINDOW,   !- Construction Name
-
     Zn002:Wall001,           !- Building Surface Name
-
     ,                        !- Shading Control Name
-
     ,                        !- Frame and Divider Name
-
     1,                       !- Multiplier
-
     4,                       !- Starting X Coordinate {m}
-
     3,                       !- Starting Z Coordinate {m}
-
     3,                       !- Length {m}
-
     5;                       !- Height {m}
-
-
+```
 
 ### Surface Vertices
 
 Each of the following surfaces:
 
-BuildingSurface:Detailed
+* BuildingSurface:Detailed
 
-Wall:Detailed
+* Wall:Detailed
 
-RoofCeiling:Detailed
+* RoofCeiling:Detailed
 
-Floor:Detailed
+* Floor:Detailed
 
-FenstrationSurface:Detailed
+* FenstrationSurface:Detailed
 
-Shading:Site:Detailed
+* Shading:Site:Detailed
 
-Shading:Building:Detailed
+* Shading:Building:Detailed
 
-Shading:Zone:Detailed
+* Shading:Zone:Detailed
 
 use the same vertex input. The numeric parameters indicated below are taken from the BuildingSurface:Detailed definition;  the others may not be exactly the same but are identical in configuration. They are also “extensible” – so, if you want more vertices for these surfaces, you may add to the IDD definition as indicated in the “extensible” comment or, as EnergyPlus is “auto-extensible” just add the number of vertices into your input file.. Note that FenestrationSurface:Detailed is not extensible and is limited to 4 (max) vertices. If you leave the Number of Surface Vertex groups blank or enter **autocalculate**, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.
 
@@ -10054,95 +9968,52 @@ This field specifies the number of sides in the surface (number of X,Y,Z vertex 
 
 Some examples of using these objects:
 
+```idf
 Floor:Detailed,
-
-    Floor\_NorthZone\_1stFloor,!- Name
-
+    Floor_NorthZone_1stFloor,!- Name
     FLOOR-SLAB-ASSEMBLY,     !- Construction Name
-
-    NorthZone\_1stFloor,      !- Zone Name
-
+    NorthZone_1stFloor,      !- Zone Name
     Ground,                  !- Outside Boundary Condition
-
     ,                        !- Outside Boundary Condition Object
-
     NoSun,                   !- Sun Exposure
-
     NoWind,                  !- Wind Exposure
-
     0.0,                     !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     0, 11, 0,                           !- X,Y,Z  1 {m}
-
     25, 11, 0,                          !- X,Y,Z  2 {m}
-
     25, 5.5, 0,                         !- X,Y,Z  3 {m}
-
    0, 5.5, 0;                          !- X,Y,Z  4 {m}
 
-
-
 RoofCeiling:Detailed,
-
-    Ceiling\_SouthZone\_1stFloor,  !- Name
-
+    Ceiling_SouthZone_1stFloor,  !- Name
     CEILING-FLOOR-ASSEMBLY,  !- Construction Name
-
-    SouthZone\_1stFloor,      !- Zone Name
-
+    SouthZone_1stFloor,      !- Zone Name
     Surface,                 !- Outside Boundary Condition
-
-    Floor\_SouthZone\_2ndFloor,!- Outside Boundary Condition Object
-
+    Floor_SouthZone_2ndFloor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
-
     NoWind,                  !- Wind Exposure
-
     0.0,                     !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     0, 0, 3.4,                          !- X,Y,Z  1 {m}
-
     25, 0, 3.4,                         !- X,Y,Z  2 {m}
-
     25, 5.5, 3.4,                       !- X,Y,Z  3 {m}
-
    0, 5.5, 3.4;                        !- X,Y,Z  4 {m}
 
-
-
 Wall:Detailed,
-
-    InteriorWall\_SouthZone\_1stFloor,  !- Name
-
+    InteriorWall_SouthZone_1stFloor,  !- Name
     INTERIOR-WALL-ASSEMBLY,  !- Construction Name
-
-    SouthZone\_1stFloor,      !- Zone Name
-
+    SouthZone_1stFloor,      !- Zone Name
     Surface,                 !- Outside Boundary Condition
-
-    InteriorWall\_NorthZone\_1stFloor,  !- Outside Boundary Condition Object
-
+    InteriorWall_NorthZone_1stFloor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
-
     NoWind,                  !- Wind Exposure
-
     0,                       !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     25, 5.5, 3.7,                       !- X,Y,Z  1 {m}
-
     25, 5.5, 0,                         !- X,Y,Z  2 {m}
-
     0, 5.5, 0,                          !- X,Y,Z  3 {m}
-
    0, 5.5, 3.7;                        !- X,Y,Z  4 {m}
-
-
+```
 
 ### BuildingSurface:Detailed
 
@@ -10254,81 +10125,46 @@ This field specifies the number of sides in the surface (number of X,Y,Z vertex 
 
 IDF example of three walls (first is an exterior wall, second and third are interzone partitions):
 
+```idf
 BuildingSurface:Detailed,Zn001:Wall001,  !- Base Surface Name
-
   Wall,EXTERIOR,  !- Class and Construction Name
-
   ZONE 1 @ 200 601 0 T,  !- Zone
-
   Outdoors,,  !- Outside Boundary Condition  and Target (if applicable)
-
    SunExposed,  !- Solar Exposure
-
    WindExposed,  !- Wind Exposure
-
   0.5000000    ,  !- VF to Ground
-
            4, !-Rectangle
-
   0.0000000E+00,  0.0000000E+00,   3.048000    ,
-
   0.0000000E+00,  0.0000000E+00,  0.0000000E+00,
-
    6.096000    ,  0.0000000E+00,  0.0000000E+00,
-
    6.096000    ,  0.0000000E+00,   3.048000    ;
 
-
-
 BuildingSurface:Detailed,Zn001:Wall006,  !-Base Surface Name
-
   Wall,INTERIOR,  !- Class and Construction Name
-
   HEARTLAND AREA,  !- Zone
-
   Surface,Zn004:Wall005,  !- Outside Boundary Conditions and Target (if applicable)
-
    NoSun,  !- Solar Exposure
-
    NoWind,  !- Wind Exposure
-
   0.5000000    ,  !- VF to Ground
-
            4, !-Rectangle
-
    38.01000    ,   28.25000    ,   10.00000    ,
-
    38.01000    ,   28.25000    ,  0.0000000E+00,
-
    38.01000    ,   18.25000    ,  0.0000000E+00,
-
    38.01000    ,   18.25000    ,   10.00000    ;
 
-
-
 BuildingSurface:Detailed,Zn001:Wall007,  !- Base Surface Name
-
   Wall,INTERIOR,  !- Class and Construction Name
-
   HEARTLAND AREA,  !- Zone
-
   Surface,Zn003:Wall006,  !- Outside Boundary Conditions and Target (if applicable)
-
    NoSun,  !- Solar Exposure
-
    NoWind,  !- Wind Exposure
-
   0.5000000    ,  !- VF to Ground
-
            4, !-Rectangle
-
    58.01000    ,   18.25000    ,   10.00000    ,
-
    58.01000    ,   18.25000    ,  0.0000000E+00,
-
    58.01000    ,   28.25000    ,  0.0000000E+00,
-
    58.01000    ,   28.25000    ,   10.00000    ;
+```
 
 ### FenestrationSurface:Detailed
 
@@ -10422,30 +10258,22 @@ For triangular windows the first vertex listed can be any of the three vertices,
 
 An IDF example of a rectangular subsurface (Window):
 
+```idf
 FenestrationSurface:Detailed,
-
  Zn001:Wall001:Win001,  !- SubSurface Name
-
   Window,SINGLE PANE HW WINDOW,  !- Class and Construction Name
-
   Zn001:Wall001,,         !- Base Surface Name and Target (if applicable)
-
   0.5000000    ,          !- VF to Ground
-
   WINDOW-CONTROL-DRAPES,  !- Window Shading Control
-
   TestFrameAndDivider,    !- Frame/Divider name
-   5,                      !- Multiplier
-
+  5,                      !- Multiplier
   4,                      !- Rectangle (number of sides)
-
    1.524000    ,  0.1520000    ,   2.743000    ,
-
    1.524000    ,  0.1520000    ,  0.3050000    ,
-
    4.572000    ,  0.1520000    ,  0.3050000    ,
-
    4.572000    ,  0.1520000    ,   2.743000    ;
+```
+
 
 ### Window Modeling Options
 
@@ -10457,9 +10285,9 @@ Table 8. Window Modeling Options
 
 <table class="table table-striped">
 <tr>
-<td>Option</td>
-<td>Object/Field or Output Variable</td>
-<td>Input File (distributed with install)</td>
+<th>Option</th>
+<th>Object/Fielh or Output Variable</th>
+<th>Input File (histributeh with install)</th>
 </tr>
 <tr>
 <td>Build up a window from layers</td>
@@ -10614,21 +10442,18 @@ This field is the surface area of the internal mass. The area that is specified 
 
 IDF examples of Internal Mass surfaces:
 
+```idf
 InternalMass,Zn002:IntM001,  !- Surface Name
-
   INTERIOR,  !- Construction Name
-
   DORM ROOMS AND COMMON AREAS,  !- Zone
-
    408.7734    ;  !- Total area exposed to Zone {m2}
 
 InternalMass,Zn002:IntM002,  !- Surface Name
-
   PARTITION02,  !- Construction Name
-
   DORM ROOMS AND COMMON AREAS,  !- Zone
-
    371.6122    ;  !- Total area exposed to Zone {m2}
+```
+
 
 ### Surface Output Variables/Reports
 
@@ -10642,407 +10467,393 @@ Note that Surface Outputs from specialized algorithms (such as Effective Moistur
 
 Additionally, the output variables applicable to all heat transfer surfaces:
 
-Zone,Sum,Surface Inside Face Heat Balance Calculation Iteration Count []
+* Zone,Sum,Surface Inside Face Heat Balance Calculation Iteration Count []
 
-Zone,Average,Surface Inside Face Temperature [C]
+* Zone,Average,Surface Inside Face Temperature [C]
 
-Zone,Average,Surface Outside Face Temperature [C]
+* Zone,Average,Surface Outside Face Temperature [C]
 
-Zone,Average,Surface Inside Face Adjacent Air Temperature [C]
+* Zone,Average,Surface Inside Face Adjacent Air Temperature [C]
 
-Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]
+* Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]
 
-Zone,Average,Surface Inside Face Convection Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face Convection Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face Convection Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face Convection Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face Convection Heat Gain Energy [J]
+* Zone,Sum,Surface Inside Face Convection Heat Gain Energy [J]
 
-Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy [J]
 
-Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]
 
-Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]
 
-Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face Internal Gains Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Inside Face Internal Gains Radiation Heat Gain Energy [J]
 
-Zone,Average,Surface Inside Face System Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face System Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face System Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face System Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face System Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Inside Face System Radiation Heat Gain Energy [J]
 
-Zone,Average,Surface Outside Face Convection Heat Transfer Coefficient [W/m2-K]
+* Zone,Average,Surface Outside Face Convection Heat Transfer Coefficient [W/m2-K]
 
-Zone,Average,Surface Outside Face Convection Heat Gain Rate [W]
+* Zone,Average,Surface Outside Face Convection Heat Gain Rate [W]
 
-Zone,Average,Surface Outside Face Convection Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Outside Face Convection Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Outside Face Convection Heat Gain Energy [J]
+* Zone,Sum,Surface Outside Face Convection Heat Gain Energy [J]
 
-Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]
 
-Zone,Average,Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]
+* Zone,Average,Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]
 
-Zone,Average,Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]
+* Zone,Average,Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]
 
-Zone,Average,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]
+* Zone,Average,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]
 
-Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate [W]
+* Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate [W]
 
-Zone,Sum,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy [J]
+* Zone,Sum,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy [J]
 
-Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
 
-Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate [W]
+* Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate [W]
 
-Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
 
-Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]
+* Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]
 
-Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]
+* Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]
 
-Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate [W]
+* Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate [W]
 
-Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate [W]
-
-
+* Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate [W]
 
 Output variables applicable to all exterior heat transfer surfaces:
 
-Zone,Average,Surface Outside Face Outdoor Air Drybulb Temperature [C]
+* Zone,Average,Surface Outside Face Outdoor Air Drybulb Temperature [C]
 
-Zone,Average,Surface Outside Face Outdoor Air Wetbulb Temperature [C]
+* Zone,Average,Surface Outside Face Outdoor Air Wetbulb Temperature [C]
 
-Zone,Average,Surface Outside Face Outdoor Air Wind Speed [m/s]
+* Zone,Average,Surface Outside Face Outdoor Air Wind Speed [m/s]
 
-Zone,Average,Surface Outside Face Sunlit Area [m2]
+* Zone,Average,Surface Outside Face Sunlit Area [m2]
 
-Zone,Average,Surface Outside Face Sunlit Fraction []
+* Zone,Average,Surface Outside Face Sunlit Fraction []
 
-Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area[W/m2]
 
-Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Outside Face Solar Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Outside Face Solar Radiation Heat Gain Energy [J]
 
+* Zone,Average,Surface Outside Face Incident Beam Solar Radiation Rate per Area[W/m2]
 
+* Zone,Average,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area[W/m2]
 
-Zone,Average,Surface Outside Face Incident Beam Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area[W/m2]
 
-Zone,Average,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Ext Diff Sol From Bm-To-Diff Refl From Ground[W/m2]
 
-Zone,Average,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area[W/m2]
 
-Zone,Average,Surface Ext Diff Sol From Bm-To-Diff Refl From Ground[W/m2]
+* Zone,Average,Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]
 
-Zone,Average,Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area[W/m2]
 
-Zone,Average,Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]
 
-Zone,Average,Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value[]
 
-Zone,Average,Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]
+* Zone,Average,Surface Anisotropic Sky Multiplier []
 
-Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value[]
+* Zone,Average,Surface Window BSDF Beam Direction Number []
 
-Zone,Average,Surface Anisotropic Sky Multiplier []
+* Zone,Average,Surface Window BSDF Beam Theta Angle [rad]
 
-Zone,Average,Surface Window BSDF Beam Direction Number []
-
-Zone,Average,Surface Window BSDF Beam Theta Angle [rad]
-
-Zone,Average,Surface Window BSDF Beam Phi Angle [rad]
-
-
+* Zone,Average,Surface Window BSDF Beam Phi Angle [rad]
 
 Output variables applicable to opaque heat transfer surfaces (FLOOR, WALL, ROOF, DOOR). **Note – these are advanced variables – you must read the descriptions and understand before use – then you must use the Diagnostics object to allow reporting.**
 
-Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]
 
-Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]
+* Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]
 
-Zone,Average,Surface Inside Face Conduction Heat Transfer Rate [W]
+* Zone,Average,Surface Inside Face Conduction Heat Transfer Rate [W]
 
-Zone,Average,Surface Inside Face Conduction Heat Gain Rate [W]
+* Zone,Average,Surface Inside Face Conduction Heat Gain Rate [W]
 
-Zone,Average,Surface Inside Face Conduction Heat Loss Rate [W]
+* Zone,Average,Surface Inside Face Conduction Heat Loss Rate [W]
 
-Zone,Average,Surface Inside Face Conduction Heat Transfer Rate per Area [W/m2]
+* Zone,Average,Surface Inside Face Conduction Heat Transfer Rate per Area [W/m2]
 
-Zone,Sum,Surface Inside Face Conduction Heat Transfer Energy [J]
+* Zone,Sum,Surface Inside Face Conduction Heat Transfer Energy [J]
 
-Zone,Average,Surface Outside Face Conduction Heat Transfer Rate [W]
+* Zone,Average,Surface Outside Face Conduction Heat Transfer Rate [W]
 
-Zone,Average,Surface Outside Face Conduction Heat Gain Rate [W]
+* Zone,Average,Surface Outside Face Conduction Heat Gain Rate [W]
 
-Zone,Average,Surface Outside Face Conduction Heat Loss Rate [W]
+* Zone,Average,Surface Outside Face Conduction Heat Loss Rate [W]
 
-Zone,Average,Surface Outside Face Conduction Heat Transfer Rate per Area [W/m2]
+* Zone,Average,Surface Outside Face Conduction Heat Transfer Rate per Area [W/m2]
 
-Zone,Sum,Surface Outside Face Conduction Heat Transfer Energy [J]
+* Zone,Sum,Surface Outside Face Conduction Heat Transfer Energy [J]
 
-Zone,Average,Surface Average Face Conduction Heat Transfer Rate [W]
+* Zone,Average,Surface Average Face Conduction Heat Transfer Rate [W]
 
-Zone,Average,Surface Average Face Conduction Heat Gain Rate [W]
+* Zone,Average,Surface Average Face Conduction Heat Gain Rate [W]
 
-Zone,Average,Surface Average Face Conduction Heat Loss Rate [W]
+* Zone,Average,Surface Average Face Conduction Heat Loss Rate [W]
 
-Zone,Average,Surface Average Face Conduction Heat Transfer Rate per Area [W/m2]
+* Zone,Average,Surface Average Face Conduction Heat Transfer Rate per Area [W/m2]
 
-Zone,Sum,Surface Average Face Conduction Heat Transfer Energy [J]
+* Zone,Sum,Surface Average Face Conduction Heat Transfer Energy [J]
 
-Zone,Average,Surface Heat Storage Rate [W]
+* Zone,Average,Surface Heat Storage Rate [W]
 
-Zone,Average,Surface Heat Storage Gain Rate [W]
+* Zone,Average,Surface Heat Storage Gain Rate [W]
 
-Zone,Average,Surface Heat Storage Loss Rate [W]
+* Zone,Average,Surface Heat Storage Loss Rate [W]
 
-Zone,Average,Surface Heat Storage Rate per Area [W/m2]
+* Zone,Average,Surface Heat Storage Rate per Area [W/m2]
 
-Zone,Sum,Surface Heat Storage Energy [J]
+* Zone,Sum,Surface Heat Storage Energy [J]
 
-Zone,Average,Surface Internal Source Location Temperature [C]
+* Zone,Average,Surface Internal Source Location Temperature [C]
 
-Zone,Average,Zone Opaque Surface Inside Face Conduction [W]
+* Zone,Average,Zone Opaque Surface Inside Face Conduction [W]
 
-Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate [W]
+* Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate [W]
 
-Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate [W]
+* Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate [W]
 
-Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Energy [J]
+* Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Energy [J]
 
-Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Energy [J]
+* Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Energy [J]
 
-Zone,Average,Zone Opaque Surface Outside Face Conduction [W]
+* Zone,Average,Zone Opaque Surface Outside Face Conduction [W]
 
-Zone,Average,Zone Opaque Surface Outside Face Conduction Gain[W]
+* Zone,Average,Zone Opaque Surface Outside Face Conduction Gain[W]
 
-Zone,Average,Zone Opaque Surface Outside Face Conduction Loss[W]
+* Zone,Average,Zone Opaque Surface Outside Face Conduction Loss[W]
 
-Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]
+* Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]
 
 ### Window Output Variables
 
 Output variables applicable only to exterior windows and glass doors:
 
-Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate [W]
+* Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate [W]
 
-Zone,Sum,Zone Transmitted Solar Energy [J]
+* Zone,Sum,Zone Transmitted Solar Energy [J]
 
-Zone,Average,Zone Windows Total Heat Gain Rate [W]
+* Zone,Average,Zone Windows Total Heat Gain Rate [W]
 
-Zone,Sum,Zone Windows Total Heat Gain Energy [J]
+* Zone,Sum,Zone Windows Total Heat Gain Energy [J]
 
-Zone,Average,Zone Windows Total Heat Loss Rate [W]
+* Zone,Average,Zone Windows Total Heat Loss Rate [W]
 
-Zone,Sum,Zone Windows Total Heat Loss Energy [J]
+* Zone,Sum,Zone Windows Total Heat Loss Energy [J]
 
-Zone,Average,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate [W]
+* Zone,Average,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate [W]
 
-Zone,Sum,Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy [J]
+* Zone,Sum,Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy [J]
 
-Zone,Average,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate [W]
+* Zone,Average,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate [W]
 
-Zone,Sum,Zone Interior Windows Total Transmitted Beam Solar Radiation Energy [J]
+* Zone,Sum,Zone Interior Windows Total Transmitted Beam Solar Radiation Energy [J]
 
-Zone,Average,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+* Zone,Average,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
 
-Zone,Sum,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
+* Zone,Sum,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
 
-Zone,Average,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+* Zone,Average,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
 
-Zone,Average,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]
+* Zone,Average,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]
 
-Zone,Average,Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate [W]
+* Zone,Average,Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate [W]
 
-Zone,Sum,Surface Window Total Glazing Layers Absorbed Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Total Glazing Layers Absorbed Solar Radiation Energy [J]
 
-Zone,Average,Surface Window Shading Device Absorbed Solar Radiation Rate [W]
+* Zone,Average,Surface Window Shading Device Absorbed Solar Radiation Rate [W]
 
-Zone,Sum,Surface Window Shading Device Absorbed Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Shading Device Absorbed Solar Radiation Energy [J]
 
-Zone,Average, Surface Window Transmitted Solar Radiation Rate [W]
+* Zone,Average, Surface Window Transmitted Solar Radiation Rate [W]
 
-Zone,Sum,Surface Window Transmitted Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Transmitted Solar Radiation Energy [J]
 
-Zone,Average,Surface Window Transmitted Beam Solar Radiation Rate [W]
+* Zone,Average,Surface Window Transmitted Beam Solar Radiation Rate [W]
 
-Zone,Average,Surface Window Transmitted Beam To Beam Solar Radiation Rate [W]
+* Zone,Average,Surface Window Transmitted Beam To Beam Solar Radiation Rate [W]
 
-Zone,Average,Surface Window Transmitted Beam To Diffuse Solar Radiation Rate [W]
+* Zone,Average,Surface Window Transmitted Beam To Diffuse Solar Radiation Rate [W]
 
-Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]
 
-Zone,Sum,Surface Window Transmitted Beam To Beam Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Transmitted Beam To Beam Solar Radiation Energy [J]
 
-Zone,Sum,Surface Window Transmitted Beam To Diffuse Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Transmitted Beam To Diffuse Solar Radiation Energy [J]
 
-Zone,Average,Surface Window Transmitted Diffuse Solar Radiation Rate [W]
+* Zone,Average,Surface Window Transmitted Diffuse Solar Radiation Rate [W]
 
-Zone,Sum,Surface Window Transmitted Diffuse Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Transmitted Diffuse Solar Radiation Energy [J]
 
-Zone,Average,Surface Window System Solar Transmittance []
+* Zone,Average,Surface Window System Solar Transmittance []
 
-Zone,Average,Surface Window System Solar Absorptance []
+* Zone,Average,Surface Window System Solar Absorptance []
 
-Zone,Average,Surface Window System Solar Reflectance []
+* Zone,Average,Surface Window System Solar Reflectance []
 
-Zone,Average,Surface Window Gap Convective Heat Transfer Rate [W]
+* Zone,Average,Surface Window Gap Convective Heat Transfer Rate [W]
 
-Zone,Sum,Surface Window Gap Convective Heat Transfer Energy [J]
+* Zone,Sum,Surface Window Gap Convective Heat Transfer Energy [J]
 
-Zone,Average,Surface Window Heat Gain Rate [W]
+* Zone,Average,Surface Window Heat Gain Rate [W]
 
-Zone,Sum,Surface Window Heat Gain Energy [J]
+* Zone,Sum,Surface Window Heat Gain Energy [J]
 
-Zone,Average,Surface Window Heat Loss Rate [W]
+* Zone,Average,Surface Window Heat Loss Rate [W]
 
-Zone,Sum,Surface Window Heat Loss Energy [J]
+* Zone,Sum,Surface Window Heat Loss Energy [J]
 
-Zone,Average,Surface Window Glazing Beam to Beam Solar Transmittance[]
+* Zone,Average,Surface Window Glazing Beam to Beam Solar Transmittance[]
 
-Zone,Average,Surface Window Glazing Beam to Diffuse Solar Transmittance []
+* Zone,Average,Surface Window Glazing Beam to Diffuse Solar Transmittance []
 
-Zone,Average,Surface Window Glazing Diffuse to Diffuse Solar Transmittance[]
+* Zone,Average,Surface Window Glazing Diffuse to Diffuse Solar Transmittance[]
 
-Zone,Average,Surface Window Model Solver Iteration Count []
+* Zone,Average,Surface Window Model Solver Iteration Count []
 
-Zone,Average,Surface Window Solar Horizontal Profile Angle[deg]
+* Zone,Average,Surface Window Solar Horizontal Profile Angle[deg]
 
-Zone,Average,Surface Window Solar Vertical Profile Angle[deg]
+* Zone,Average,Surface Window Solar Vertical Profile Angle[deg]
 
-Zone,Average,Surface Window Outside Reveal Reflected Beam Solar Radiation Rate [W]
+* Zone,Average,Surface Window Outside Reveal Reflected Beam Solar Radiation Rate [W]
 
-Zone,Sum,Surface Window Outside Reveal Reflected Beam Solar Radiation Energy
+* Zone,Sum,Surface Window Outside Reveal Reflected Beam Solar Radiation Energy
 
-Zone,Average,Surface Window Inside Reveal Reflected Beam Solar Radiation Rate [W]
+* Zone,Average,Surface Window Inside Reveal Reflected Beam Solar Radiation Rate [W]
 
-Zone,Sum,Surface Window Inside Reveal Reflected Beam Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Inside Reveal Reflected Beam Solar Radiation Energy [J]
 
-Zone,Average,Surface Window Inside Reveal Absorbed Beam Solar Radiation Rate [W]
+* Zone,Average,Surface Window Inside Reveal Absorbed Beam Solar Radiation Rate [W]
 
+* Zone,Average,Surface Window Inside Face Glazing Condensation Status []
 
+* Zone,Average,Surface Window Inside Face Frame Condensation Status []
 
+* Zone,Average,Surface Window Inside Face Divider Condensation Status []
 
+* Zone,Average,Surface Shading Device Is On Time Fraction[]
 
+* Zone,Average,Surface Window Blind Slat Angle [deg]
 
+* Zone,Average,Surface Window Blind Beam to Beam Solar Transmittance[]
 
-Zone,Average,Surface Window Inside Face Glazing Condensation Status []
+* Zone,Average,Surface Window Blind Beam to Diffuse Solar Transmittance[]
 
-Zone,Average,Surface Window Inside Face Frame Condensation Status []
+* Zone,Average,Surface Window Blind Diffuse to Diffuse Solar Transmittance[]
 
-Zone,Average,Surface Window Inside Face Divider Condensation Status []
+* Zone,Average,Surface Window Blind and Glazing System Beam Solar Transmittance[]
 
-Zone,Average,Surface Shading Device Is On Time Fraction[]
+* Zone,Average,Surface Window Blind and Glazing System Diffuse Solar Transmittance[]
 
-Zone,Average,Surface Window Blind Slat Angle [deg]
+* Zone,Average,Surface Window Screen Beam to Beam Solar Transmittance []
 
-Zone,Average,Surface Window Blind Beam to Beam Solar Transmittance[]
+* Zone,Average,Surface Window Screen Beam to Diffuse Solar Transmittance []
 
-Zone,Average,Surface Window Blind Beam to Diffuse Solar Transmittance[]
+* Zone,Average,Surface Window Screen Diffuse to Diffuse Solar Transmittance []
 
-Zone,Average,Surface Window Blind Diffuse to Diffuse Solar Transmittance[]
+* Zone,Average,Surface Window Screen and Glazing System Beam Solar Transmittance []
 
-Zone,Average,Surface Window Blind and Glazing System Beam Solar Transmittance[]
+* Zone,Average,Surface Window Screen and Glazing System Diffuse Solar Transmittance []
 
-Zone,Average,Surface Window Blind and Glazing System Diffuse Solar Transmittance[]
+* Zone,State,Surface Storm Window On Off Status []
 
-Zone,Average,Surface Window Screen Beam to Beam Solar Transmittance []
+* Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate [W]
 
-Zone,Average,Surface Window Screen Beam to Diffuse Solar Transmittance []
+* Zone,Average,Surface Window Frame Heat Gain Rate [W]
 
-Zone,Average,Surface Window Screen Diffuse to Diffuse Solar Transmittance []
+* Zone,Average,Surface Window Frame Heat Loss Rate [W]
 
-Zone,Average,Surface Window Screen and Glazing System Beam Solar Transmittance []
+* Zone,Average,Surface Window Divider Heat Gain Rate [W]
 
-Zone,Average,Surface Window Screen and Glazing System Diffuse Solar Transmittance []
+* Zone,Average,Surface Window Divider Heat Loss Rate [W]
 
-Zone,State,Surface Storm Window On Off Status []
+* Zone,Average,Surface Window Frame Inside Temperature [C]
 
-Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate [W]
+* Zone,Average,Surface Window Frame Outside Temperature [C]
 
-Zone,Average,Surface Window Frame Heat Gain Rate [W]
+* Zone,Average,Surface Window Divider Inside Temperature [C]
 
-Zone,Average,Surface Window Frame Heat Loss Rate [W]
-
-Zone,Average,Surface Window Divider Heat Gain Rate [W]
-
-Zone,Average,Surface Window Divider Heat Loss Rate [W]
-
-Zone,Average,Surface Window Frame Inside Temperature [C]
-
-Zone,Average,Surface Window Frame Outside Temperature [C]
-
-Zone,Average,Surface Window Divider Inside Temperature [C]
-
-Zone,Average,Surface Window Divider Outside Temperature [C]
-
-
+* Zone,Average,Surface Window Divider Outside Temperature [C]
 
 If the user requests to display advanced report/output variables (e.g. see Output:Diagnostics keyword DisplayAdvancedReportVariables) the the following additional output variables are available for exterior windows and glass doors
 
-Zone,Average,Surface Window Inside Face Glazing Zone Convection Heat Gain Rate [W]
+* Zone,Average,Surface Window Inside Face Glazing Zone Convection Heat Gain Rate [W]
 
-Zone,Average,Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate [W]
+* Zone,Average,Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate [W]
 
-Zone,Average,Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate [W]
+* Zone,Average,Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate [W]
 
-Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate [W]
+* Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate [W]
 
-Zone,Average,Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate [W]
+* Zone,Average,Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate [W]
 
-Zone,Average,Surface Window Inside Face Shade Zone Convection Heat Gain Rate [W]
+* Zone,Average,Surface Window Inside Face Shade Zone Convection Heat Gain Rate [W]
 
-Zone,Average,Surface Window Inside Face Shade Net Infrared Heat Transfer Rate [W]
+* Zone,Average,Surface Window Inside Face Shade Net Infrared Heat Transfer Rate [W]
 
 Output variables applicable only to interior windows and glass doors:
 
-Zone,Average, Surface Window Transmitted Beam Solar Radiation Rate [W]
+* Zone,Average, Surface Window Transmitted Beam Solar Radiation Rate [W]
 
-Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]
+* Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]
 
 If the user requests to display advanced report/output variables (e.g. see Output:Diagnostics keyword DisplayAdvancedReportVariables) the the following additional output variable is available for Equivalent Layer Window;
 
-Zone,Average, Surface Window Inside Face Other Convection Heat Gain Rate [W]
+* Zone,Average, Surface Window Inside Face Other Convection Heat Gain Rate [W]
 
-Output variables applicable to interior and exterior windows and doors are:
+* Output variables applicable to interior and exterior windows and doors are:
 
-Zone,Average,Surface Window Total Absorbed Shortwave Radiation Rate Layer &lt;x&gt; [W]
+* Zone,Average,Surface Window Total Absorbed Shortwave Radiation Rate Layer &lt;x&gt; [W]
 
-Zone,Average,Surface Window Front Face Temperature Layer &lt;x&gt; [C]
+* Zone,Average,Surface Window Front Face Temperature Layer &lt;x&gt; [C]
 
-Zone,Average,Surface Window Back Face Temperature Layer &lt;x&gt; [C]
+* Zone,Average,Surface Window Back Face Temperature Layer &lt;x&gt; [C]
 
 #### Surface Window Total Absorbed Shortwave Radiation Rate Layer &lt;x&gt; [W]
 
@@ -11172,15 +10983,9 @@ Beam solar radiation from the exterior windows in a zone incident on the inside 
 
 Beam solar radiation from the interior (i.e., interzone) windows in a zone incident on the inside face of a surface in the zone. This value is calculated only if Solar Distribution in the BUILDING object is equal to FullInteriorExterior. However, the program does not track where this radiation falls. Instead, it is treated by the program as though it were diffuse radiation uniformly distributed over all of the zone surfaces. See **Figure 31**. Different versions of the report are available including the basic incident rate (W), a per unit area flux (W/m2), and an energy version (J).
 
-
-
-
-
 ![](InputOutputReference/media/image057.svg)
 
 Figure 31. Beam solar radiation entering a zone through an interior window is distributed inside the zone as though it were diffuse radiation.
-
-#### 
 
 #### Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]
 
@@ -11236,17 +11041,17 @@ These “outside face solar radiation” output variables describe the heat tran
 
 The total solar radiation incident on the outside of an exterior surface. It is the sum of:
 
-Surface Outside Face Incident Beam Solar Radiation Rate per Area
+* Surface Outside Face Incident Beam Solar Radiation Rate per Area
 
-Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area
+* Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area
 
-Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area
+* Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area
 
-Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area
+* Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area
 
-Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area
+* Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area
 
-Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area
+* Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area
 
 #### Surface Outside Face Incident Beam Solar Radiation Rate per Area [W/m2]
 
@@ -11598,8 +11403,6 @@ If the sun is behind the window, the vertical profile angle is not defined and i
 
 Note that in most texts what we call “vertical profile angle” is called “horizontal profile angle.”
 
-
-
 ![](InputOutputReference/media/image058.svg)
 
 Figure 32. Vertical exterior window showing solar horizontal profile angle, solar vertical profile angle and solar incidence angle.
@@ -11816,9 +11619,9 @@ This report produces a special file (**eplusout.dxf**) in the industry standard 
 
 EnergyPlus produces this file from the Report command:
 
+```idf
 Output:Reports, Surfaces, DXF;
-
-
+```
 
 #### Details, Vertices, DetailsWithVertices
 
@@ -11834,27 +11637,27 @@ There are two kinds of shading surfaces in EnergyPlus: **detached** and **attach
 
 Objects for detached shading surfaces:
 
-Shading:Site
+* Shading:Site
 
-Shading:Building
+* Shading:Building
 
-Shading:Site:Detailed
+* Shading:Site:Detailed
 
-Shading:Building:Detailed
+* Shading:Building:Detailed
 
 Similarly to the surfaces, the detailed objects use vertex entry whereas the other objects are limited to rectangular representation.
 
 Objects for attached shading surfaces:
 
-Shading:Overhang
+* Shading:Overhang
 
-Shading:Overhang:Projection
+* Shading:Overhang:Projection
 
-Shading:Fin
+* Shading:Fin
 
-Shading:Fin:Projection
+* Shading:Fin:Projection
 
-Shading:Zone:Detailed
+* Shading:Zone:Detailed
 
 EnergyPlus creates “bi-directional” shades from each shading surface entered. This means that the shade you input will cast a shadow no matter which side of the shade the sun is on. For example, a vertical fin will cast a shadow whether the sun is on the left side or right side of the fin.[[1]](#_ftn1)
 
@@ -11912,45 +11715,27 @@ This field is the width of the shade in meters.
 
 Examples of these (can be found in example files 4ZoneWithShading\_Simple\_1.idf and 4ZoneWithShading\_Simple\_2.idf)
 
+```idf
   Shading:Building,
-
     Bushes-East,             !- Name
-
     90,                      !- Azimuth Angle {deg}
-
     90,                      !- Tilt Angle {deg}
-
     45,                      !- Starting X Coordinate {m}
-
     0,                       !- Starting Y Coordinate {m}
-
     0,                       !- Starting Z Coordinate {m}
-
     50,                      !- Length {m}
-
     1;                       !- Height {m}
-
-
 
   Shading:Site,
-
     Bushes-North,            !- Name
-
     0,                       !- Azimuth Angle {deg}
-
     90,                      !- Tilt Angle {deg}
-
     45,                      !- Starting X Coordinate {m}
-
     50,                      !- Starting Y Coordinate {m}
-
     0,                       !- Starting Z Coordinate {m}
-
     50,                      !- Length {m}
-
     1;                       !- Height {m}
-
-
+```
 
 ### Shading:Site:Detailed, Shading:Building:Detailed
 
@@ -11992,33 +11777,24 @@ The number of sides in the surface (number of X,Y,Z vertex groups). For further 
 
 IDF example of Detached Shading Surfaces:
 
+```idf
 Shading:Building:Detailed,
-
    EAST SIDE TREE,  !- Detached Shading
-
    ShadingTransmittance:0002,  !- Shadowing Transmittance & Schedule
-
    3, !-Triangle
-
    33.52800    ,   10.66800    ,   10.05800    ,
-
    33.52800    ,   13.71600    ,  0.9140000    ,
-
    33.52800    ,   4.572000    ,  0.9140000    ;
 
 Shading:Building:Detailed,
-
    WEST SIDE TREE,  !- Detached Shading
-
    ShadingTransmittance:0002,  !- Shadowing Transmittance & Schedule
-
    3, !-Triangle
-
   -3.048000    ,   7.620000    ,   10.05800    ,
-
   -3.048000    ,   4.572000    ,  0.9140000    ,
-
   -3.048000    ,   13.71600    ,  0.9140000    ;
+```
+
 
 ### Attached Shading Surfaces
 
@@ -12196,67 +11972,39 @@ zone.
 
 Examples of these (can be found in example files 4ZoneWithShading\_Simple\_1.idf and 4ZoneWithShading\_Simple\_2.idf)
 
+```idf
   Shading:Overhang:Projection,
-
     Zn001:Wall001:Win001:Shade001,  !- Name
-
     Zn001:Wall001:Win001,    !- Window or Door Name
-
     .7,                      !- Height above Window or Door {m}
-
     90,                      !- Tilt Angle from Window/Door {deg}
-
     .2,                      !- Left extension from Window/Door Width {m}
-
     .2,                      !- Right extension from Window/Door Width {m}
-
     .6;                      !- Depth as Fraction of Window/Door Height {m}
 
-
-
   Shading:Overhang,
-
     Zn001:Wall001:Door001:Shade001,  !- Name
-
     Zn001:Wall001:Door001,   !- Window or Door Name
-
     .6,                      !- Height above Window or Door {m}
-
     90,                      !- Tilt Angle from Window/Door {deg}
-
     0,                       !- Left extension from Window/Door Width {m}
-
     0,                       !- Right extension from Window/Door Width {m}
-
     3;                       !- Depth {m}
 
-
-
   Shading:Fin:Projection,
-
     Zn001:Wall001:Shade003,  !- Name
-
     Zn001:Wall001:Win001,    !- Window or Door Name
-
     .1,                      !- Left Extension from Window/Door {m}
-
     .1,                   !- Left Distance Above Top of Window {m}
-
     .1,                   !- Left Distance Below Bottom of Window {m}
-
     90,                   !- Left Tilt Angle from Window/Door {deg}
-
     .6,                   !- Left Depth as Fraction of Window/Door Width {m}
-
     .1,                   !- Right Extension from Window/Door {m}
-
     .1,                   !- Right Distance Above Top of Window {m}
-
     .1,                   !- Right Distance Below Bottom of Window {m}
-
     90,                   !- Right Tilt Angle from Window/Door {deg}
-
     .6;                   !- Right Depth as Fraction of Window/Door Width {m}
+```
 
 ### Shading:Zone:Detailed
 
@@ -12300,8 +12048,6 @@ Note that shading devices only shade solar radiation when the sun is up, which i
 
 The number of sides in the surface (number of X,Y,Z vertex groups). For further information, see the discussion on “Surface Vertices” above. The example below shows the correct input for an overhang (to shade the appropriate portion of the base wall and window).
 
-
-
 ![](InputOutputReference/media/image059.svg)
 
 Figure 33. Illustration for Attached Shading Surface
@@ -12318,57 +12064,34 @@ Thus, another shading surface will be created (facing down):
 
 IDF example of attached shading surfaces (overhang, fin):
 
+```idf
 Shading:Zone:Detailed,
-
   Zn001:Wall001:Shade001,  !- Surface Name
-
   Zn001:Wall001,  !- Base Surface Name
-
   ShadingTransmittance:0001,  !- Shadowing Transmittance Schedule
-
    4, !-RectangularOverhang
-
    1.524000    , -0.3050000    ,   2.865000    ,
-
    1.524000    ,  0.0000000E+00,   2.865000    ,
-
    4.572000    ,  0.0000000E+00,   2.865000    ,
-
    4.572000    , -0.3050000    ,   2.865000    ;
-
 Shading:Zone:Detailed,
-
   Zn003:Wall001:Shade001,  !- Surface Name
-
   Zn003:Wall001,  !- Base Surface Name
-
   ShadingTransmittance:0001,  !- Shadowing Transmittance Schedule
-
    4, !-RectangularLeftFin
-
    57.97000    ,   8.450000    ,   10.00000    ,
-
    57.97000    ,   8.450000    ,  0.0000000E+00,
-
    57.97000    ,   6.450000    ,  0.0000000E+00,
-
    57.97000    ,   6.450000    ,   10.00000    ;
-
  Shading:Zone:Detailed,Zn003:Wall001:Shade002,  !- Surface Name
-
   Zn003:Wall001,  !- Base Surface Name
-
   ShadingTransmittance:0003,  !- Shadowing Transmittance Schedule
-
    4, !-RectangularRightFin
-
    77.97000    ,   6.450000    ,   10.00000    ,
-
    77.97000    ,   6.450000    ,  0.0000000E+00,
-
    77.97000    ,   8.450000    ,  0.0000000E+00,
-
    77.97000    ,   8.450000    ,   10.00000    ;
+```
 
 ### ShadingProperty:Reflectance
 
@@ -12404,74 +12127,50 @@ The fraction of the area of the shading surface that consists of windows (defaul
 
 The name of the construction of the windows on the shading surface. Required if Fraction of Shading Surface That Is Glazed is greater than 0.0.
 
-
-
 IDF example of Shading Surface Reflectance for shading surface with specular reflection
 
+```idf
 Shading:Site:Detailed,
-
 Adjacent Glazed Facade,  !- User Supplied Surface Name
-
 ,   !- Shadowing Transmittance Schedule
-
 4,  !- Number of Surface Vertex Groups -- Number of (X,Y,Z) groups
-
 0,-24,30, !- Vertex 1 X,Y,Z coordinates
-
 0,-24,0,  !- Vertex 2 X,Y,Z coordinates
-
 0,0,0,    !- Vertex 3 X,Y,Z coordinates
-
 0,0,30;   !-Vertex 3 X,Y,Z coordinates
 
 
-
 ShadingProperty:Reflectance,
-
 Adjacent Glazed Facade, !- Name of Surface:Shading Object
-
 0.3,  !- Diffuse Solar Reflectance of Unglazed Part of Shading Surface
-
 0.3,  !- Diffuse Visible Reflectance of Unglazed Part of Shading Surface
-
 0.7,  !- Fraction of Shading Surface That Is Glazed
-
 GlassCon-1; !- Name of Glazing Construction
+```
+
 
 
 
 IDF example of Shading Surface Reflectance for shading surface without specular reflection
 
+```idf
 Shading:Site:Detailed,
-
 Adjacent Blank Facade,  !- User Supplied Surface Name
-
 ,   !- Shadowing Transmittance Schedule
-
 4,  !- Number of Surface Vertex Groups -- Number of (X,Y,Z) groups
-
 0,-24,30,
-
 0,-24,0,
-
 0,0,0,
-
 0,0,30;
 
 
-
 ShadingProperty:Reflectance,
-
 Adjacent Blank Facade, !- Name of Surface:Shading Object
-
 0.4,  !- Diffuse Solar Reflectance of Unglazed Part of Shading Surface
-
 0.4,  !- Diffuse Visible Reflectance of Unglazed Part of Shading Surface
-
 0.0,  !- Fraction of Shading Surface That Is Glazed
- ;     !- Name of glazing construction
-
-
+;     !- Name of glazing construction
+```
 
 ### WindowProperty:ShadingControl
 
@@ -12675,255 +12374,134 @@ An IDF example: window with interior roll shade that is deployed when solar inci
 
  ! in WindowProperty:ShadingControl
 
-
-
+```idf
  WindowMaterial:Glazing, GLASS - CLEAR SHEET 1 / 8 IN,  !- Material Name
-
      SpectralAverage,! Optical data type {SpectralAverage or Spectral}
-
      ,               ! Name of spectral data set when Optical Data Type = Spectral
-
      0.003        ,  !- Thickness {m}
-
      0.837        ,  !- Solar Transmittance at Normal Incidence
-
      0.075        ,  !- Solar Reflectance at Normal Incidence: Front Side
-
      0.075        ,  !- Solar Reflectance at Normal Incidence: Back Side
-
      0.898        ,  !- Visible Transmittance at Normal Incidence
-
      0.081        ,  !- Visible Reflectance at Normal Incidence: Front Side
-
      0.081        ,  !- Visible Reflectance at Normal Incidence: Back Side
-
      0.0          ,  !- IR Transmittance
-
      0.8400000    ,  !- IR Emissivity: Front Side
-
      0.8400000    ,  !- IR Emissivity: Back Side
-
      0.9000000    ;  !- Conductivity {W/m-K}
 
-
-
  WindowMaterial:Shade, ROLL SHADE,  !- Material Name
-
      0.3          ,   !- Solar Transmittance at normal incidence
-
      0.5000000    ,   !- Solar Reflectance (same for front and back side)
-
      0.3          ,   !- Visible Transmittance at normal incidence
-
      0.5000000    ,   !- Visible reflectance (same for front and back side)
-
      0.9000000    ,   !- IR Emissivity (same for front and back side)
-
      0.05         ,   !- IR Transmittance
-
      0.003        ,   !- Thickness
-
      0.1          ,   !- Conductivity {W/m-K}
-
      0.0          ,   !- Top Opening Multiplier
-      0.0          ,   !- Bottom Opening Multiplier
-      0.5          ,   !- Left-Side Opening Multiplier
-      0.5          ,   !- Right-Side Opening Multiplier
-      0.0          ;   !- Air-Flow Permeability
+     0.0          ,   !- Bottom Opening Multiplier
+     0.5          ,   !- Left-Side Opening Multiplier
+     0.5          ,   !- Right-Side Opening Multiplier
+     0.0          ;   !- Air-Flow Permeability
 
  Construction, SINGLE PANE WITH NO SHADE,  ! Name of construction without shade
-
      GLASS - CLEAR SHEET 1 / 8 IN;  !- First material layer
 
-
-
  Construction, SINGLE PANE WITH INT SHADE, ! Name of construction with shade
-
      GLASS - CLEAR SHEET 1 / 8 IN,  !- First material layer
-
      ROLL SHADE                  ;  !- Second material layer
 
-
-
-
-
  WindowProperty:ShadingControl, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Control
-
      InteriorShade,                !- Shading Type
-
      SINGLE PANE WITH INT SHADE,   !- Name of construction with shading device
-
      OnIfHighSolarOnWindow,        !- Shading Control Type
-
      ,                             !- Schedule name
-
      50.0,                         !- Setpoint {W/m2}
-
      NO,                           !- Shading Control Is Scheduled
-
      NO,                           !- Glare Control Is Active
-
      ,                             !- Material Name of Shading Device
-
      ,                             !- Type of Slat Angle Control for Blinds
-
      ;                             !- Slat Angle Schedule Name
 
-
-
-
-
  FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name
-
      Window                   ,    !- Class
-
      SINGLE PANE WITH NO SHADE,    !- Name of construction without shading device
-
      Zn001:Wall001            ,    !- Base Surface Name
-
      ,                             !- Target
-
      0.5000000                ,    !- VF to Ground
-
      CONTROL ON INCIDENT SOLAR,    !- Window Shading Control name
-
      ,                             !- Frame/Divider name
-
      1.0                      ,    !- Multiplier
-
      4                        ,    !- Number of vertices (assumed rectangular)
-
      0.548 ,  0.0 ,   2.5     ,    !- x,y,z of vertices {m}
-
      0.548 ,  0.0 ,   0.5     ,
-
      5.548 ,  0.0 ,   0.5     ,
-
      5.548 ,  0.0 ,   2.5     ;
-
-
-
-
 
  ! Example 2: Interior movable shade specified by giving name of shading device in WindowProperty:ShadingControl
 
-
-
  WindowMaterial:Glazing, GLASS - CLEAR SHEET 1 / 8 IN,  !- Material Name
-
      SpectralAverage,! Optical data type {SpectralAverage or Spectral}
-
      ,               ! Name of spectral data set when Optical Data Type = Spectral
-
      0.003        ,  !- Thickness {m}
-
      0.837        ,  !- Solar Transmittance at Normal Incidence
-
      0.075        ,  !- Solar Reflectance at Normal Incidence: Front Side
-
      0.075        ,  !- Solar Reflectance at Normal Incidence: Back Side
-
      0.898        ,  !- Visible Transmittance at Normal Incidence
-
      0.081        ,  !- Visible Reflectance at Normal Incidence: Front Side
-
      0.081        ,  !- Visible Reflectance at Normal Incidence: Back Side
-
      0.0          ,  !- IR Transmittance
-
      0.8400000    ,  !- IR Emissivity: Front Side
-
      0.8400000    ,  !- IR Emissivity: Back Side
-
      0.9000000    ;  !- Conductivity {W/m-K}
 
-
-
  WindowMaterial:Shade, ROLL SHADE,  !- Material Name
-
      0.3          ,   !- Solar Transmittance at normal incidence
-
      0.5000000    ,   !- Solar Reflectance (same for front and back side)
-
      0.3          ,   !- Visible Transmittance at normal incidence
-
      0.5000000    ,   !- Visible reflectance (same for front and back side)
-
      0.9000000    ,   !- IR Emissivity (same for front and back side)
-
      0.05         ,   !- IR Transmittance
-
      0.003        ,   !- Thickness
-
      0.1          ,   !- Conductivity {W/m-K}
-
      0.0          ,   !- Top Opening Multiplier
-      0.0          ,   !- Bottom Opening Multiplier
-      0.5          ,   !- Left-Side Opening Multiplier
-      0.5          ,   !- Right-Side Opening Multiplier
-      0.0          ;   !- Air-Flow Permeability
-
-
+     0.0          ,   !- Bottom Opening Multiplier
+     0.5          ,   !- Left-Side Opening Multiplier
+     0.5          ,   !- Right-Side Opening Multiplier
+     0.0          ;   !- Air-Flow Permeability
 
  Construction, SINGLE PANE WITH NO SHADE,  ! Name of construction without shade
-
      GLASS - CLEAR SHEET 1 / 8 IN;  !- First material layer
 
-
-
-
-
-
-
  WINDOWPROPERTY:SHADINGCONTROL, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Control
-
      InteriorShade,                !- Shading Type
-
      ,                             !- Name of shaded construction
-
      OnIfHighSolarOnWindow,        !- Shading Control Type
-
      ,                             !- Schedule name
-
      50.0,                         !- Setpoint {W/m2}
-
      NO,                           !- Shading Control Is Scheduled
-
      NO,                           !- Glare Control Is Active
-
      ROLL SHADE,                   !- Material Name of Shading Device
-
      ,                             !- Type of Slat Angle Control for Blinds
-
      ;                             !- Slat Angle Schedule Name
 
  FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name
-
      Window                   ,    !- Class
-
      SINGLE PANE WITH NO SHADE,    !- Name of construction without shade
-
      Zn001:Wall001            ,    !- Base Surface Name
-
      ,                             !- Target
-
      0.5000000                ,    !- VF to Ground
-
      CONTROL ON INCIDENT SOLAR,    !- Window Shading Control name
-
      ,                             !- Frame/Divider name
-
      1.0                      ,    !- Multiplier
-
      4                        ,    !- Number of vertices (assumed rectangular)
-
      0.548 ,  0.0 ,   2.5     ,    !- x,y,z of vertices {m}
-
      0.548 ,  0.0 ,   0.5     ,
-
      5.548 ,  0.0 ,   0.5     ,
-
      5.548 ,  0.0 ,   2.5     ;
+```
+
 
 ### WindowProperty:FrameAndDivider
 
