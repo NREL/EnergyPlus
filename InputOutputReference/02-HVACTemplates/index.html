@@ -1296,19 +1296,19 @@
 <p>This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.</p>
 <h4 id="field-rated-total-heating-capacity-sizing-ratio">Field: Rated Total Heating Capacity Sizing Ratio</h4>
 <p>This numeric field defines the ratio of the heating coil to cooling coil size when autosizing is used. The model assumes that when used, this value will be greater than 1. This field supersedes the Rated Total Heating Capacity Sizing Ratio entered in the AirConditioner:VariableRefrigerantFlow object. If this field is left blank, the value entered in the parent object is used for sizing. If neither field is used, the sizing ratio is assumed to be 1.</p>
-<h4 id="field-supply-air-flow-rate-during-cooling-operation">Field: Supply Air Flow Rate During Cooling Operation</h4>
+<h4 id="field-cooling-supply-air-flow-rate_3">Field: Cooling Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when the terminal unit is operating in cooling mode. By entering Autosize, the supply air flow rate is automatically determined based on the loads experienced by the zone during the specified cooling SizingPeriod:DesignDay. If a value is entered, it will be multiplied by the Supply Air Sizing Factor and by zone multipliers. The units are in m3/s. The default is autosize.</p>
-<h4 id="field-supply-air-flow-rate-when-no-cooling-is-needed">Field: Supply Air Flow Rate When No Cooling is Needed</h4>
+<h4 id="field-no-cooling-supply-air-flow-rate">Field: No Cooling Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when the terminal unit’s cooling coil is not operating and the previous mode was cooling.. This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will <em>not</em> be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.</p>
-<h4 id="field-supply-air-flow-rate-during-heating-operation">Field: Supply Air Flow Rate During Heating Operation</h4>
+<h4 id="field-heating-supply-air-flow-rate_3">Field: Heating Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when the heating coil is operating. By entering Autosize, the supply air flow rate is automatically determined based on the loads experienced by the zone during the specified heating SizingPeriod:DesignDay. If a value is entered, it will be multiplied by the Supply Air Sizing Factor and by zone multipliers. The units are in m3/s. The default is autosize.</p>
-<h4 id="field-supply-air-flow-rate-when-no-heating-is-needed">Field: Supply Air Flow Rate When No Heating is Needed</h4>
+<h4 id="field-no-heating-supply-air-flow-rate">Field: No Heating Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will <em>not</em> be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.</p>
-<h4 id="field-outdoor-air-flow-rate-during-cooling-operation">Field: Outdoor Air Flow Rate During Cooling Operation</h4>
+<h4 id="field-cooling-outdoor-air-flow-rate">Field: Cooling Outdoor Air Flow Rate</h4>
 <p>This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in cooling mode.        If this field is set to autosize it will be sized based on the outdoor air inputs below, unless a dedicated outdoor air system is specified for this zone and then it will be set to zero.</p>
-<h4 id="field-outdoor-air-flow-rate-during-heating-operation">Field: Outdoor Air Flow Rate During Heating Operation</h4>
+<h4 id="field-heating-outdoor-air-flow-rate">Field: Heating Outdoor Air Flow Rate</h4>
 <p>This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in heating mode. If this field is set to autosize it will be sized based on the outdoor air inputs below, unless a dedicated outdoor air system is specified for this zone and then it will be set to zero.</p>
-<h4 id="field-outdoor-air-flow-rate-when-no-cooling-or-heating-is-needed">Field: Outdoor Air Flow Rate When No Cooling or Heating is Needed</h4>
+<h4 id="field-no-load-outdoor-air-flow-rate">Field: No Load Outdoor Air Flow Rate</h4>
 <p>This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is not operating in cooling or heating mode. If this field is set to autosize it will be sized based on the outdoor air inputs below, unless a dedicated outdoor air system is specified for this zone and then it will be set to zero.</p>
 <h4 id="field-outdoor-air-method_6">Field: Outdoor Air Method</h4>
 <p>The input must be either <em>Flow/Zone</em>, or <em>Flow/Person</em>, <em>Flow/Area</em>, <em>Sum</em>, <em>Maximum or DetailedSpecification</em>. <em>Flow/Zone</em> means that the program will use the input of the field <em>Outdoor Air Flow</em> as the zone design outdoor air flow rate. <em>Flow/Person</em> means the program will use the input from the field <em>Outdoor Air Flow per Person</em> and the maximum occupancy to calculate a zone design outdoor air flow rate. <em>Flow/Area</em> means the program will use the input from the field <em>Outdoor Air Flow per Zone Floor Area</em> to calculated a zone design outdoor air flow rate. <em>Sum</em> means that the flows calculated from the fields <em>Outdoor Air Flow per Person,</em> <em>Outdoor Air Flow per Area</em> and <em>Outdoor Air Flow per Zone</em> will be added to obtain the zone design outdoor air flow rate. <em>Maximum</em> means that the maximum flow derived from <em>Outdoor Air Flow per Person,</em> <em>Outdoor Air Flow per Area</em> and <em>Outdoor Air Flow per Zone</em> will be used for the zone design outdoor air flow rate. The default is <em>Flow/Person</em>.</p>
@@ -1386,51 +1386,52 @@
 <h4 id="field-baseboard-heating-capacity_5">Field: Baseboard Heating Capacity</h4>
 <p>Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTHP system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTHP system.</p>
 <p>As shown in an IDF:</p>
-<p>,                        !-</p>
-<p>HVACTemplate:Zone:VRF,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>,                        !- Rated Total Heating Capacity Sizing Ratio</p>
-<p>autosize,                !- Supply Air Flow Rate During Cooling Operation{m3/s}</p>
-<p>autosize,                !- Supply Air Flow Rate When No Cooling is Needed{m3/s}</p>
-<p>autosize,                !- Supply Air Flow Rate During Heating Operation{m3/s}</p>
-<p>autosize,                !- Supply Air Flow Rate When No Heating is Needed{m3/s}</p>
-<p>autosize,                !- Outdoor Air Flow Rate During Cooling Operation{m3/s}</p>
-<p>autosize,                !- Outdoor Air Flow Rate During Heating Operation{m3/s}</p>
-<p>autosize,    !- Outdoor Air Flow Rate When No Cooling or Heating is Needed{m3/s}</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>,            !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>,                        !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>,            !- Design Specification Outdoor Air Object Name</p>
-<p>,            !- Design Specification Zone Air Distribution Object Name</p>
-<p>,                        !- System Availability Schedule Name</p>
-<p>,                        !- Supply Fan Operating Mode Schedule Name</p>
-<p>DrawThrough,             !- Supply Fan Placement</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>75,                      !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>VariableRefrigerantFlowDX,  !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>autosize,                !- Cooling Coil Gross Rated Total Capacity {W}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>VariableRefrigerantFlowDX,  !- Heat Pump Heating Coil Type</p>
-<p>,                        !- Heat Pump Heating Coil Availability Schedule Name</p>
-<p>autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}</p>
-<p>0,           !- Zone Terminal Unit On Parasitic Electric Energy Use {W}</p>
-<p>0,           !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}</p>
-<p>,                        !- Dedicated Outdoor Air System Name</p>
-<p>SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method</p>
-<p>14.0,        !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>50.0,        !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
-<p>None,        !- Baseboard Heating Type</p>
-<p>,            !- Baseboard Heating Availability Schedule Name</p>
-<p>Autosize;    !- Baseboard Heating Capacity {W}</p>
+<pre><code class="idf">HVACTemplate:Zone:VRF,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    ,                        !- Rated Total Heating Capacity Sizing Ratio
+    autosize,                !- Cooling Supply Air Flow Rate{m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate{m3/s}
+    autosize,                !- Heating Supply Air Flow Rate{m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate{m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate{m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate{m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate{m3/s}
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    ,            !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,            !- Design Specification Outdoor Air Object Name
+    ,            !- Design Specification Zone Air Distribution Object Name
+    ,                        !- System Availability Schedule Name
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    VariableRefrigerantFlowDX,  !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    VariableRefrigerantFlowDX,  !- Heat Pump Heating Coil Type
+    ,                        !- Heat Pump Heating Coil Availability Schedule Name
+    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
+    0,           !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
+    0,           !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Dedicated Outdoor Air System Name
+ SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,        !- Zone Cooling Design Supply Air Temperature {C}
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C}
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    None,        !- Baseboard Heating Type
+    ,            !- Baseboard Heating Availability Schedule Name
+    Autosize;    !- Baseboard Heating Capacity {W}
+</code></pre>
+
 <h3 id="hvactemplatezoneunitary">HVACTemplate:Zone:Unitary</h3>
 <p>This object simulates the zone portion of a constant volume direct-expansion based HVAC configuration with several different heating options. Often a single HVACTemplate:Zone:Unitary object will be used with a single HVACTemplate:System:Unitary (or HVACTemplate:System:UnitaryHeatPump:AirToAir , or HVACTemplate:System:UnitarySystem) object to simulate single zone direct-expansion based air conditioning systems. In addition, multiple HVACTemplate:Zone:Unitary objects may appear that all reference the same HVACTemplate:System object in a multiple zone version. For a multizone system, only one zone is specified as the control zone (see HVACTemplate:System:Unitary, HVACTemplate:System:UnitaryHeatPump:AirToAir , or HVACTemplate:System:UnitarySystem for more information). Direct expansion includes single packaged rooftop systems commonly seen in commercial applications and split systems commonly seen in residential applications.</p>
 <h4 id="field-zone-name_7">Field: Zone Name</h4>
@@ -2544,9 +2545,9 @@
 <p>Leave this field blank if you want the system to be available for the entire year to perform heating or cooling if called for by the thermostat. If a schedule name is specified, those times that the system is available should be specified as 1.0. Those times that the system is not available should have a zero value in the schedule specified. During times when the system is available,  the supply fan operating mode controls fan operation. (See "Supply Fan Operating Mode Schedule Name" below)</p>
 <h4 id="field-control-zone-or-thermostat-location-name_1">Field: Control Zone or Thermostat Location Name</h4>
 <p>Enter the name of the HVACTemplate:Zone:Unitary object that contains the thermostat. While multiple HVACTemplate:Zone:Unitary objects can be part of a HVACTemplate:System:UnitaryHeatPump:AirToAir system, only one of the zones contains a thermostat that controls heating and cooling operation. For a single zone system, this field should contain the name of that zone.</p>
-<h4 id="field-cooling-supply-air-flow-rate_3">Field: Cooling Supply Air Flow Rate</h4>
+<h4 id="field-cooling-supply-air-flow-rate_4">Field: Cooling Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when the DX cooling coil is operating. By entering Autosize, the supply air flow rate is automatically determined based on the loads experienced by the zone during the specified cooling SizingPeriod:DesignDay. This flow rate will <em>not</em> be multiplied by a sizing factor or by zone multipliers. If using zone multipliers a value entered here must be large enough to serve the multiplied zones. The units are in m3/s. The default is Autosize.</p>
-<h4 id="field-heating-supply-air-flow-rate_3">Field: Heating Supply Air Flow Rate</h4>
+<h4 id="field-heating-supply-air-flow-rate_4">Field: Heating Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when the heating coil is operating. By entering Autosize, the supply air flow rate is automatically determined based on the loads experienced by the zone during the specified heating SizingPeriod:DesignDay. This flow rate will <em>not</em> be multiplied by a sizing factor or by zone multipliers. If using zone multipliers a value entered here must be large enough to serve the multiplied zones. The units are in m3/s. The default is Autosize.</p>
 <h4 id="field-no-load-supply-air-flow-rate_3">Field: No Load Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will <em>not</em> be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is Autosize.</p>
@@ -2811,9 +2812,9 @@
 <p>This alpha field contains control type i.e. load based or setpoint based for the unitary system. Valid choices are <em>Load</em> and <em>SetPoint</em>. <em>Load</em> control requires a Controlling Zone name and <em>SetPoint</em> control is an advanced option which requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. The user must add the desired setpoint managers to the idf file. The default is <em>Load</em>.</p>
 <h4 id="field-control-zone-or-thermostat-location-name_2">Field: Control Zone or Thermostat Location Name</h4>
 <p>Enter the name of the HVACTemplate:Zone:Unitary object that contains the thermostat. While multiple HVACTemplate:Zone:Unitary objects can be part of a HVACTemplate:System:UnitarySystem system, only one of the zones contains a thermostat that controls heating and cooling operation. For a single zone system, this field should contain the name of that zone.</p>
-<h4 id="field-cooling-supply-air-flow-rate_4">Field: Cooling Supply Air Flow Rate</h4>
+<h4 id="field-cooling-supply-air-flow-rate_5">Field: Cooling Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when the cooling coil is operating. By entering Autosize, the supply air flow rate is automatically determined based on the loads experienced by the zone during the specified cooling SizingPeriod:DesignDay. This flow rate will <em>not</em> be multiplied by a sizing factor or by zone multipliers. If using zone multipliers a value entered here must be large enough to serve the multiplied zones. The units are in m3/s. The default is Autosize.</p>
-<h4 id="field-heating-supply-air-flow-rate_4">Field: Heating Supply Air Flow Rate</h4>
+<h4 id="field-heating-supply-air-flow-rate_5">Field: Heating Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when the heating coil is operating. By entering Autosize, the supply air flow rate is automatically determined based on the loads experienced by the zone during the specified heating SizingPeriod:DesignDay. This flow rate will <em>not</em> be multiplied by a sizing factor or by zone multipliers. If using zone multipliers a value entered here must be large enough to serve the multiplied zones. The units are in m3/s. The default is Autosize.</p>
 <h4 id="field-no-load-supply-air-flow-rate_4">Field: No Load Supply Air Flow Rate</h4>
 <p>This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will <em>not</em> be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is Autosize.</p>

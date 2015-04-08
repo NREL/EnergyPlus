@@ -6143,20 +6143,30 @@ NoDeflection,                                 �
 <h4 id="field-part-of-total-floor-area">Field: Part of Total Floor Area</h4>
 <p>This optional field defaults to Yes if not specified. The field is used to show when a zone is not part of the Total Floor Area as shown in the Annual Building Utility Performance Summary tables. Specifically, when No is specified, the area is excluded from both the conditioned floor area and the total floor area in the Building Area sub table and the Normalized Metrics sub tables.</p>
 <p>And, an IDF example:</p>
-<p>Zone,</p>
-<p>DORM ROOMS AND COMMON AREAS,  !- Name</p>
-<p>0.0000000E+00,           !- Direction of Relative North {deg}</p>
-<p>0.0000000E+00,           !- X Origin {m}</p>
-<p>6.096000,                !- Y Origin {m}</p>
-<p>0.0000000E+00,           !- Z Origin {m}</p>
-<p>1,                       !- Type</p>
-<p>1,                       !- Multiplier</p>
-<p>autocalculate,           !-Ceiling Height {m}</p>
-<p>autocalculate;           !- Volume {m3}</p>
+<pre><code class="idf">  Zone,
+    DORM ROOMS AND COMMON AREAS,  !- Name
+    0.0000000E+00,           !- Direction of Relative North {deg}
+    0.0000000E+00,           !- X Origin {m}
+    6.096000,                !- Y Origin {m}
+    0.0000000E+00,           !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    autocalculate,           !-Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+</code></pre>
+
 <h3 id="zone-outputs">Zone Outputs</h3>
+<ul>
+<li>
 <p>Zone,Average,Zone Outdoor Air Drybulb Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Outdoor Air Wetbulb Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Outdoor Air Wind Speed [m/s]</p>
+</li>
+</ul>
 <h4 id="zone-outdoor-air-drybulb-temperature-c_1">Zone Outdoor Air Drybulb Temperature [C]</h4>
 <p>The outdoor air dry-bulb temperature calculated at the height above ground of the zone centroid.</p>
 <h4 id="zone-outdoor-air-wetbulb-temperature-c_1">Zone Outdoor Air Wetbulb Temperature [C]</h4>
@@ -6165,35 +6175,95 @@ NoDeflection,                                 �
 <p>The outdoor wind speed calculated at the height above ground of the zone centroid.</p>
 <h3 id="zone-thermal-outputs">Zone Thermal Output(s)</h3>
 <p>In addition to the canned Surface reports (view the Reports section later in this document) and surface variables (above), the following variables are available for all zones:</p>
+<ul>
+<li>
 <p>Zone,Sum,Zone Total Internal Radiant Heating Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Total Internal Radiant Heating Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Total Internal Visible Radiation Heating Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Total Internal Visible Radiation Heating Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Total Internal Convective Heating Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Total Internal Convective Heating Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Total Internal Latent Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Total Internal Latent Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Total Internal Total Heating Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Total Internal Total Heating Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Mean Air Temperature [C]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Mean Air Dewpoint Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Mean Radiant Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Operative Temperature [C]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Heat Balance Internal Convective Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Heat Balance Surface Convection Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Heat Balance Interzone Air Transfer Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Heat Balance Outdoor Air Transfer Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Heat Balance System Air Transfer Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Heat Balance System Convective Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Heat Balance Air Energy Storage Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Heat Balance Deviation Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Sum,Zone Air System Sensible Heating Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Zone Air System Sensible Cooling Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air System Sensible Heating Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air System Sensible Cooling Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Humidity Ratio[kgWater/kgDryAir]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Air Relative Humidity[%]</p>
+</li>
+</ul>
 <p>Two of these are of particular interest:</p>
 <p>Zone,Average,Zone Mean Air Temperature [C]</p>
 <p>HVAC,Average,Zone Air Temperature [C]</p>
@@ -6262,50 +6332,80 @@ NoDeflection,                                 �
 <p>The name of the ZoneList object. Must be unique across ZoneLists.</p>
 <h4 id="field-zone-1-20-name">Field: Zone 1 – 20 Name</h4>
 <p>Reference to a Zone object. This field is extensible; for greater than 20 zones, edit the IDD to add more <em>Zone Name</em> fields.</p>
-<p>ZoneList,</p>
-<p>Mid Floor List,  !- Name</p>
-<p>Mid West Zone,  !- Zone 1 Name</p>
-<p>Mid Center Zone,  !- Zone 2 Name</p>
-<p>Mid East Zone;  !- Zone 3 Name</p>
-<h3 id="zonelist-outputs">ZoneList Outputs</h3>
-<p>The following output variables are reported by the ZoneList object:</p>
-<p>HVAC,Average,Zone List Sensible Heating Rate [W]</p>
-<p>HVAC,Average,Zone List Sensible Cooling Rate [W]</p>
-<p>HVAC,Sum,Zone List Sensible Heating Energy [J]</p>
-<p>HVAC,Sum,Zone List Sensible Cooling Energy [J]</p>
-<p>All ZoneList variables are the sum of the corresponding Zone variables. <em>Zone Multiplier</em> fields in the Zone objects are also taken into account.</p>
-<h3 id="zonegroup">ZoneGroup</h3>
-<p>The ZoneGroup object adds a multiplier to a ZoneList. This can be used to reduce the amount of input necessary for simulating repetitive structures, such as the identical floors of a multi-story building. To create a "Floor Multiplier", use the ZoneList object to organize several zones into a typical floor. Then use the <em>Zone List Multiplier</em> field in the ZoneGroup object to multiply the system load for the zones in the list will also be multiplied. Zones with a <em>Multiplier</em> field greater than one in the Zone object are effectively double-multiplied.</p>
-<p>NOTE:  Although ZoneLists are not exclusive by themselves, ZoneLists used to form a ZoneGroup are exclusive; the ZoneLists used with a ZoneGroup must not have any zones in common.</p>
-<h4 id="tips-for-multi-story-simulations">Tips for Multi-Story Simulations:</h4>
-<ul>
-<li>
-<p>For floors that are multiplied, connect exterior boundary conditions of the floor to the ceiling and vice versa.</p>
-</li>
-<li>
-<p>Since exterior convection coefficients vary with elevation, locate the typical middle floor zones midheight between the lowest and highest middle floors to be modeled.</p>
-</li>
-<li>
-<p>Shading must be identical for all multiplied floors or less accurate results may be obtained by using the zone list multiplier.</p>
-</li>
-</ul>
-<p>ZoneGroup and ZoneList can also be used to simulate other repetitive cases, such as clusters of zones on the ground.</p>
-<h4 id="field-zone-group-name">Field: Zone Group Name</h4>
-<p>The name of the ZoneGroup object. This must be unique across ZoneGroups.</p>
-<h4 id="field-zone-list-name_1">Field: Zone List Name</h4>
-<p>Reference to a ZoneList object. The zones in the list constitute the zones in the group.</p>
-<h4 id="field-zone-list-multiplier">Field: Zone List Multiplier</h4>
-<p>An integer multiplier. Zone List Multiplier is designed as a “multiplier” for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied. The default is 1.</p>
-<p>ZONE GROUP,</p>
-<p>Mid Floor,  !- Zone Group Name</p>
-<p>Mid Floor List,  !- Zone List Name</p>
-<p>8;  !- Zone List Multiplier</p>
+<p>Z```idf
+oneList,
+  Mid Floor List,  !- Name
+  Mid West Zone,  !- Zone 1 Name
+  Mid Center Zone,  !- Zone 2 Name
+  Mid East Zone;  !- Zone 3 Name</p>
+<pre><code>
+
+### ZoneList Outputs
+
+The following output variables are reported by the ZoneList object:
+
+* HVAC,Average,Zone List Sensible Heating Rate [W]
+
+* HVAC,Average,Zone List Sensible Cooling Rate [W]
+
+* HVAC,Sum,Zone List Sensible Heating Energy [J]
+
+* HVAC,Sum,Zone List Sensible Cooling Energy [J]
+
+
+All ZoneList variables are the sum of the corresponding Zone variables. *Zone Multiplier* fields in the Zone objects are also taken into account.
+
+### ZoneGroup
+
+The ZoneGroup object adds a multiplier to a ZoneList. This can be used to reduce the amount of input necessary for simulating repetitive structures, such as the identical floors of a multi-story building. To create a &quot;Floor Multiplier&quot;, use the ZoneList object to organize several zones into a typical floor. Then use the *Zone List Multiplier* field in the ZoneGroup object to multiply the system load for the zones in the list will also be multiplied. Zones with a *Multiplier* field greater than one in the Zone object are effectively double-multiplied.
+
+NOTE:  Although ZoneLists are not exclusive by themselves, ZoneLists used to form a ZoneGroup are exclusive; the ZoneLists used with a ZoneGroup must not have any zones in common.
+
+#### Tips for Multi-Story Simulations:
+
+- For floors that are multiplied, connect exterior boundary conditions of the floor to the ceiling and vice versa.
+
+- Since exterior convection coefficients vary with elevation, locate the typical middle floor zones midheight between the lowest and highest middle floors to be modeled.
+
+- Shading must be identical for all multiplied floors or less accurate results may be obtained by using the zone list multiplier.
+
+ZoneGroup and ZoneList can also be used to simulate other repetitive cases, such as clusters of zones on the ground.
+
+#### Field: Zone Group Name
+
+The name of the ZoneGroup object. This must be unique across ZoneGroups.
+
+#### Field: Zone List Name
+
+Reference to a ZoneList object. The zones in the list constitute the zones in the group.
+
+#### Field: Zone List Multiplier
+
+An integer multiplier. Zone List Multiplier is designed as a “multiplier” for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied. The default is 1.
+
+```idf
+ZONE GROUP,
+  Mid Floor,  !- Zone Group Name
+  Mid Floor List,  !- Zone List Name
+  8;  !- Zone List Multiplier
+</code></pre>
+
 <h3 id="zonegroup-outputs">ZoneGroup Outputs</h3>
 <p>The following output variables are reported by the ZoneGroup object:</p>
+<ul>
+<li>
 <p>HVAC,Average,Zone Group Sensible Heating Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Average,Zone Group Sensible Cooling Rate [W]</p>
+</li>
+<li>
 <p>HVAC,Sum,Zone Group Sensible Heating Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Zone Group Sensible Cooling Energy [J]</p>
+</li>
+</ul>
 <p>All ZoneGroup variables report the associated ZoneList value multiplied by the <em>Zone List Multiplier</em>.</p>
 <h3 id="surfaces">Surface(s)</h3>
 <p>What’s a building without surfaces?</p>
@@ -6848,92 +6948,118 @@ NoDeflection,                                 �
 <h4 id="field-height_10">Field: Height</h4>
 <p>This field is the height of the door in meters.</p>
 <p>Examples of the rectangular surfaces are found in the example files 4ZoneWithShading_Simple_1.idf and 4ZoneWithShading_Simple_2. Some examples:</p>
-<p>Wall:Exterior,</p>
-<p>Zn001:Wall001,           !- Name</p>
-<p>EXTERIOR,                !- Construction Name</p>
-<p>ZONE 1,                  !- Zone Name</p>
-<p>180,                     !- Azimuth Angle {deg}</p>
-<p>90,                      !- Tilt Angle {deg}</p>
-<p>0,                       !- Starting X Coordinate {m}</p>
-<p>0,                       !- Starting Y Coordinate {m}</p>
-<p>0,                       !- Starting Z Coordinate {m}</p>
-<p>20,                      !- Length {m}</p>
-<p>10;                      !- Height {m}</p>
-<p>Window,</p>
-<p>Zn001:Wall001:Win001,    !- Name</p>
-<p>SINGLE PANE HW WINDOW,   !- Construction Name</p>
-<p>Zn001:Wall001,           !- Building Surface Name</p>
-<p>,                        !- Shading Control Name</p>
-<p>,                        !- Frame and Divider Name</p>
-<p>1,                       !- Multiplier</p>
-<p>4,                       !- Starting X Coordinate {m}</p>
-<p>3,                       !- Starting Z Coordinate {m}</p>
-<p>3,                       !- Length {m}</p>
-<p>5;                       !- Height {m}</p>
-<p>Door,</p>
-<p>Zn001:Wall001:Door001,   !- Name</p>
-<p>HOLLOW WOOD DOOR,        !- Construction Name</p>
-<p>Zn001:Wall001,           !- Building Surface Name</p>
-<p>1,                       !- Multiplier</p>
-<p>14,                      !- Starting X Coordinate {m}</p>
-<p>0,                       !- Starting Z Coordinate {m}</p>
-<p>3,                       !- Length {m}</p>
-<p>5;                       !- Height {m}</p>
-<p>Wall:Adiabatic,</p>
-<p>Zn001:Wall004,           !- Name</p>
-<p>INTERIOR,                !- Construction Name</p>
-<p>ZONE 1,                  !- Zone Name</p>
-<p>90,                      !- Azimuth Angle {deg}</p>
-<p>90,                      !- Tilt Angle {deg}</p>
-<p>20,                      !- Starting X Coordinate {m}</p>
-<p>0,                       !- Starting Y Coordinate {m}</p>
-<p>0,                       !- Starting Z Coordinate {m}</p>
-<p>20,                      !- Length {m}</p>
-<p>10;                      !- Height {m}</p>
-<p>Floor:Adiabatic,</p>
-<p>Zn001:Flr001,            !- Name</p>
-<p>FLOOR,                   !- Construction Name</p>
-<p>ZONE 1,                  !- Zone Name</p>
-<p>90,                      !- Azimuth Angle {deg}</p>
-<p>180,                     !- Tilt Angle {deg}</p>
-<p>0,                       !- Starting X Coordinate {m}</p>
-<p>0,                       !- Starting Y Coordinate {m}</p>
-<p>0,                       !- Starting Z Coordinate {m}</p>
-<p>20,                      !- Length {m}</p>
-<p>20;                      !- Width {m}</p>
-<p>Ceiling:Interzone,</p>
-<p>Zn001:Roof001,           !- Name</p>
-<p>CEILING34,               !- Construction Name</p>
-<p>ZONE 1,                  !- Zone Name</p>
-<p>Zn003:Flr001,            !- Outside Boundary Condition Object</p>
-<p>180,                     !- Azimuth Angle {deg}</p>
-<p>0,                       !- Tilt Angle {deg}</p>
-<p>0,                       !- Starting X Coordinate {m}</p>
-<p>0,                       !- Starting Y Coordinate {m}</p>
-<p>10,                      !- Starting Z Coordinate {m}</p>
-<p>20,                      !- Length {m}</p>
-<p>20;                      !- Width {m}</p>
-<p>Window,</p>
-<p>Zn002:Wall001:Win001,    !- Name</p>
-<p>SINGLE PANE HW WINDOW,   !- Construction Name</p>
-<p>Zn002:Wall001,           !- Building Surface Name</p>
-<p>,                        !- Shading Control Name</p>
-<p>,                        !- Frame and Divider Name</p>
-<p>1,                       !- Multiplier</p>
-<p>4,                       !- Starting X Coordinate {m}</p>
-<p>3,                       !- Starting Z Coordinate {m}</p>
-<p>3,                       !- Length {m}</p>
-<p>5;                       !- Height {m}</p>
+<pre><code class="idf">  Wall:Exterior,
+    Zn001:Wall001,           !- Name
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    180,                     !- Azimuth Angle {deg}
+    90,                      !- Tilt Angle {deg}
+    0,                       !- Starting X Coordinate {m}
+    0,                       !- Starting Y Coordinate {m}
+    0,                       !- Starting Z Coordinate {m}
+    20,                      !- Length {m}
+    10;                      !- Height {m}
+
+  Window,
+    Zn001:Wall001:Win001,    !- Name
+    SINGLE PANE HW WINDOW,   !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    4,                       !- Starting X Coordinate {m}
+    3,                       !- Starting Z Coordinate {m}
+    3,                       !- Length {m}
+    5;                       !- Height {m}
+
+  Door,
+    Zn001:Wall001:Door001,   !- Name
+    HOLLOW WOOD DOOR,        !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    1,                       !- Multiplier
+    14,                      !- Starting X Coordinate {m}
+    0,                       !- Starting Z Coordinate {m}
+    3,                       !- Length {m}
+    5;                       !- Height {m}
+
+  Wall:Adiabatic,
+    Zn001:Wall004,           !- Name
+    INTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    90,                      !- Azimuth Angle {deg}
+    90,                      !- Tilt Angle {deg}
+    20,                      !- Starting X Coordinate {m}
+    0,                       !- Starting Y Coordinate {m}
+    0,                       !- Starting Z Coordinate {m}
+    20,                      !- Length {m}
+    10;                      !- Height {m}
+
+  Floor:Adiabatic,
+    Zn001:Flr001,            !- Name
+    FLOOR,                   !- Construction Name
+    ZONE 1,                  !- Zone Name
+    90,                      !- Azimuth Angle {deg}
+    180,                     !- Tilt Angle {deg}
+    0,                       !- Starting X Coordinate {m}
+    0,                       !- Starting Y Coordinate {m}
+    0,                       !- Starting Z Coordinate {m}
+    20,                      !- Length {m}
+    20;                      !- Width {m}
+
+  Ceiling:Interzone,
+    Zn001:Roof001,           !- Name
+    CEILING34,               !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Zn003:Flr001,            !- Outside Boundary Condition Object
+    180,                     !- Azimuth Angle {deg}
+    0,                       !- Tilt Angle {deg}
+    0,                       !- Starting X Coordinate {m}
+    0,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
+    20,                      !- Length {m}
+    20;                      !- Width {m}
+
+  Window,
+    Zn002:Wall001:Win001,    !- Name
+    SINGLE PANE HW WINDOW,   !- Construction Name
+    Zn002:Wall001,           !- Building Surface Name
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    4,                       !- Starting X Coordinate {m}
+    3,                       !- Starting Z Coordinate {m}
+    3,                       !- Length {m}
+    5;                       !- Height {m}
+</code></pre>
+
 <h3 id="surface-vertices">Surface Vertices</h3>
 <p>Each of the following surfaces:</p>
+<ul>
+<li>
 <p>BuildingSurface:Detailed</p>
+</li>
+<li>
 <p>Wall:Detailed</p>
+</li>
+<li>
 <p>RoofCeiling:Detailed</p>
+</li>
+<li>
 <p>Floor:Detailed</p>
+</li>
+<li>
 <p>FenstrationSurface:Detailed</p>
+</li>
+<li>
 <p>Shading:Site:Detailed</p>
+</li>
+<li>
 <p>Shading:Building:Detailed</p>
+</li>
+<li>
 <p>Shading:Zone:Detailed</p>
+</li>
+</ul>
 <p>use the same vertex input. The numeric parameters indicated below are taken from the BuildingSurface:Detailed definition;  the others may not be exactly the same but are identical in configuration. They are also “extensible” – so, if you want more vertices for these surfaces, you may add to the IDD definition as indicated in the “extensible” comment or, as EnergyPlus is “auto-extensible” just add the number of vertices into your input file.. Note that FenestrationSurface:Detailed is not extensible and is limited to 4 (max) vertices. If you leave the Number of Surface Vertex groups blank or enter <strong>autocalculate</strong>, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.</p>
 <p><strong>Note that the resolution on the surface vertex input is 1 millimeter (.001 meter). Therefore, using vertices that are very close together (&lt;1 mm) may result in invalid dot product and fatal errors during shading calculations.</strong></p>
 <p><img alt="" src="../../InputOutputReference/media/image055.svg" /></p>
@@ -7102,48 +7228,52 @@ NoDeflection,                                 �
 <h4 id="field-number-of-vertices_2">Field: Number of Vertices</h4>
 <p>This field specifies the number of sides in the surface (number of X,Y,Z vertex groups). For further information, see the discussion on “Surface Vertices” above.</p>
 <p>Some examples of using these objects:</p>
-<p>Floor:Detailed,</p>
-<p>Floor_NorthZone_1stFloor,!- Name</p>
-<p>FLOOR-SLAB-ASSEMBLY,     !- Construction Name</p>
-<p>NorthZone_1stFloor,      !- Zone Name</p>
-<p>Ground,                  !- Outside Boundary Condition</p>
-<p>,                        !- Outside Boundary Condition Object</p>
-<p>NoSun,                   !- Sun Exposure</p>
-<p>NoWind,                  !- Wind Exposure</p>
-<p>0.0,                     !- View Factor to Ground</p>
-<p>4,                       !- Number of Vertices</p>
-<p>0, 11, 0,                           !- X,Y,Z  1 {m}</p>
-<p>25, 11, 0,                          !- X,Y,Z  2 {m}</p>
-<p>25, 5.5, 0,                         !- X,Y,Z  3 {m}</p>
-<p>0, 5.5, 0;                          !- X,Y,Z  4 {m}</p>
-<p>RoofCeiling:Detailed,</p>
-<p>Ceiling_SouthZone_1stFloor,  !- Name</p>
-<p>CEILING-FLOOR-ASSEMBLY,  !- Construction Name</p>
-<p>SouthZone_1stFloor,      !- Zone Name</p>
-<p>Surface,                 !- Outside Boundary Condition</p>
-<p>Floor_SouthZone_2ndFloor,!- Outside Boundary Condition Object</p>
-<p>NoSun,                   !- Sun Exposure</p>
-<p>NoWind,                  !- Wind Exposure</p>
-<p>0.0,                     !- View Factor to Ground</p>
-<p>4,                       !- Number of Vertices</p>
-<p>0, 0, 3.4,                          !- X,Y,Z  1 {m}</p>
-<p>25, 0, 3.4,                         !- X,Y,Z  2 {m}</p>
-<p>25, 5.5, 3.4,                       !- X,Y,Z  3 {m}</p>
-<p>0, 5.5, 3.4;                        !- X,Y,Z  4 {m}</p>
-<p>Wall:Detailed,</p>
-<p>InteriorWall_SouthZone_1stFloor,  !- Name</p>
-<p>INTERIOR-WALL-ASSEMBLY,  !- Construction Name</p>
-<p>SouthZone_1stFloor,      !- Zone Name</p>
-<p>Surface,                 !- Outside Boundary Condition</p>
-<p>InteriorWall_NorthZone_1stFloor,  !- Outside Boundary Condition Object</p>
-<p>NoSun,                   !- Sun Exposure</p>
-<p>NoWind,                  !- Wind Exposure</p>
-<p>0,                       !- View Factor to Ground</p>
-<p>4,                       !- Number of Vertices</p>
-<p>25, 5.5, 3.7,                       !- X,Y,Z  1 {m}</p>
-<p>25, 5.5, 0,                         !- X,Y,Z  2 {m}</p>
-<p>0, 5.5, 0,                          !- X,Y,Z  3 {m}</p>
-<p>0, 5.5, 3.7;                        !- X,Y,Z  4 {m}</p>
+<pre><code class="idf">Floor:Detailed,
+    Floor_NorthZone_1stFloor,!- Name
+    FLOOR-SLAB-ASSEMBLY,     !- Construction Name
+    NorthZone_1stFloor,      !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0, 11, 0,                           !- X,Y,Z  1 {m}
+    25, 11, 0,                          !- X,Y,Z  2 {m}
+    25, 5.5, 0,                         !- X,Y,Z  3 {m}
+   0, 5.5, 0;                          !- X,Y,Z  4 {m}
+
+RoofCeiling:Detailed,
+    Ceiling_SouthZone_1stFloor,  !- Name
+    CEILING-FLOOR-ASSEMBLY,  !- Construction Name
+    SouthZone_1stFloor,      !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Floor_SouthZone_2ndFloor,!- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0, 0, 3.4,                          !- X,Y,Z  1 {m}
+    25, 0, 3.4,                         !- X,Y,Z  2 {m}
+    25, 5.5, 3.4,                       !- X,Y,Z  3 {m}
+   0, 5.5, 3.4;                        !- X,Y,Z  4 {m}
+
+Wall:Detailed,
+    InteriorWall_SouthZone_1stFloor,  !- Name
+    INTERIOR-WALL-ASSEMBLY,  !- Construction Name
+    SouthZone_1stFloor,      !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    InteriorWall_NorthZone_1stFloor,  !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    25, 5.5, 3.7,                       !- X,Y,Z  1 {m}
+    25, 5.5, 0,                         !- X,Y,Z  2 {m}
+    0, 5.5, 0,                          !- X,Y,Z  3 {m}
+   0, 5.5, 3.7;                        !- X,Y,Z  4 {m}
+</code></pre>
+
 <h3 id="buildingsurfacedetailed">BuildingSurface:Detailed</h3>
 <p>The BuildingSurface:Detailed object can more generally describe each of the surfaces.</p>
 <h4 id="field-name_79">Field: Name</h4>
@@ -7199,42 +7329,46 @@ NoDeflection,                                 �
 <h4 id="field-number-of-vertices_3">Field: Number of Vertices</h4>
 <p>This field specifies the number of sides in the surface (number of X,Y,Z vertex groups). For further information, see the discussion on “Surface Vertices” above.</p>
 <p>IDF example of three walls (first is an exterior wall, second and third are interzone partitions):</p>
-<p>BuildingSurface:Detailed,Zn001:Wall001,  !- Base Surface Name</p>
-<p>Wall,EXTERIOR,  !- Class and Construction Name</p>
-<p>ZONE 1 @ 200 601 0 T,  !- Zone</p>
-<p>Outdoors,,  !- Outside Boundary Condition  and Target (if applicable)</p>
-<p>SunExposed,  !- Solar Exposure</p>
-<p>WindExposed,  !- Wind Exposure</p>
-<p>0.5000000    ,  !- VF to Ground</p>
-<p>4, !-Rectangle</p>
-<p>0.0000000E+00,  0.0000000E+00,   3.048000    ,</p>
-<p>0.0000000E+00,  0.0000000E+00,  0.0000000E+00,</p>
-<p>6.096000    ,  0.0000000E+00,  0.0000000E+00,</p>
-<p>6.096000    ,  0.0000000E+00,   3.048000    ;</p>
-<p>BuildingSurface:Detailed,Zn001:Wall006,  !-Base Surface Name</p>
-<p>Wall,INTERIOR,  !- Class and Construction Name</p>
-<p>HEARTLAND AREA,  !- Zone</p>
-<p>Surface,Zn004:Wall005,  !- Outside Boundary Conditions and Target (if applicable)</p>
-<p>NoSun,  !- Solar Exposure</p>
-<p>NoWind,  !- Wind Exposure</p>
-<p>0.5000000    ,  !- VF to Ground</p>
-<p>4, !-Rectangle</p>
-<p>38.01000    ,   28.25000    ,   10.00000    ,</p>
-<p>38.01000    ,   28.25000    ,  0.0000000E+00,</p>
-<p>38.01000    ,   18.25000    ,  0.0000000E+00,</p>
-<p>38.01000    ,   18.25000    ,   10.00000    ;</p>
-<p>BuildingSurface:Detailed,Zn001:Wall007,  !- Base Surface Name</p>
-<p>Wall,INTERIOR,  !- Class and Construction Name</p>
-<p>HEARTLAND AREA,  !- Zone</p>
-<p>Surface,Zn003:Wall006,  !- Outside Boundary Conditions and Target (if applicable)</p>
-<p>NoSun,  !- Solar Exposure</p>
-<p>NoWind,  !- Wind Exposure</p>
-<p>0.5000000    ,  !- VF to Ground</p>
-<p>4, !-Rectangle</p>
-<p>58.01000    ,   18.25000    ,   10.00000    ,</p>
-<p>58.01000    ,   18.25000    ,  0.0000000E+00,</p>
-<p>58.01000    ,   28.25000    ,  0.0000000E+00,</p>
-<p>58.01000    ,   28.25000    ,   10.00000    ;</p>
+<pre><code class="idf">BuildingSurface:Detailed,Zn001:Wall001,  !- Base Surface Name
+  Wall,EXTERIOR,  !- Class and Construction Name
+  ZONE 1 @ 200 601 0 T,  !- Zone
+  Outdoors,,  !- Outside Boundary Condition  and Target (if applicable)
+   SunExposed,  !- Solar Exposure
+   WindExposed,  !- Wind Exposure
+  0.5000000    ,  !- VF to Ground
+           4, !-Rectangle
+  0.0000000E+00,  0.0000000E+00,   3.048000    ,
+  0.0000000E+00,  0.0000000E+00,  0.0000000E+00,
+   6.096000    ,  0.0000000E+00,  0.0000000E+00,
+   6.096000    ,  0.0000000E+00,   3.048000    ;
+
+BuildingSurface:Detailed,Zn001:Wall006,  !-Base Surface Name
+  Wall,INTERIOR,  !- Class and Construction Name
+  HEARTLAND AREA,  !- Zone
+  Surface,Zn004:Wall005,  !- Outside Boundary Conditions and Target (if applicable)
+   NoSun,  !- Solar Exposure
+   NoWind,  !- Wind Exposure
+  0.5000000    ,  !- VF to Ground
+           4, !-Rectangle
+   38.01000    ,   28.25000    ,   10.00000    ,
+   38.01000    ,   28.25000    ,  0.0000000E+00,
+   38.01000    ,   18.25000    ,  0.0000000E+00,
+   38.01000    ,   18.25000    ,   10.00000    ;
+
+BuildingSurface:Detailed,Zn001:Wall007,  !- Base Surface Name
+  Wall,INTERIOR,  !- Class and Construction Name
+  HEARTLAND AREA,  !- Zone
+  Surface,Zn003:Wall006,  !- Outside Boundary Conditions and Target (if applicable)
+   NoSun,  !- Solar Exposure
+   NoWind,  !- Wind Exposure
+  0.5000000    ,  !- VF to Ground
+           4, !-Rectangle
+   58.01000    ,   18.25000    ,   10.00000    ,
+   58.01000    ,   18.25000    ,  0.0000000E+00,
+   58.01000    ,   28.25000    ,  0.0000000E+00,
+   58.01000    ,   28.25000    ,   10.00000    ;
+</code></pre>
+
 <h3 id="fenestrationsurfacedetailed">FenestrationSurface:Detailed</h3>
 <p>This surface class is used for subsurfaces, which can be of five different types: Windows, Doors, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers. A subsurface (such as a window) of a base surface (such as a wall) inherits several of the properties (such as Outside Boundary Condition, Sun Exposure, etc.) of the base surface. Windows, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers are considered to have one or more glass layers and so transmit solar radiation. Doors are considered to be opaque.</p>
 <h4 id="field-name_80">Field: Name</h4>
@@ -7281,27 +7415,29 @@ NoDeflection,                                 �
 <p>This is a total of twelve fields giving the x,y,z coordinate values of the four vertices  of   rectangular subsurfaces [m], or a total of nine fields giving the x,y,z coordinate values of the three vertices of triangular windows.</p>
 <p>For triangular windows the first vertex listed can be any of the three vertices, but the order of the vertices should be counter-clockwise if VertexEntry is CounterClockWise and clockwise if VertexEntry is ClockWise (ref: GlobalGeometryRules).</p>
 <p>An IDF example of a rectangular subsurface (Window):</p>
-<p>FenestrationSurface:Detailed,</p>
-<p>Zn001:Wall001:Win001,  !- SubSurface Name</p>
-<p>Window,SINGLE PANE HW WINDOW,  !- Class and Construction Name</p>
-<p>Zn001:Wall001,,         !- Base Surface Name and Target (if applicable)</p>
-<p>0.5000000    ,          !- VF to Ground</p>
-<p>WINDOW-CONTROL-DRAPES,  !- Window Shading Control</p>
-<p>TestFrameAndDivider,    !- Frame/Divider name
-   5,                      !- Multiplier</p>
-<p>4,                      !- Rectangle (number of sides)</p>
-<p>1.524000    ,  0.1520000    ,   2.743000    ,</p>
-<p>1.524000    ,  0.1520000    ,  0.3050000    ,</p>
-<p>4.572000    ,  0.1520000    ,  0.3050000    ,</p>
-<p>4.572000    ,  0.1520000    ,   2.743000    ;</p>
+<pre><code class="idf">FenestrationSurface:Detailed,
+ Zn001:Wall001:Win001,  !- SubSurface Name
+  Window,SINGLE PANE HW WINDOW,  !- Class and Construction Name
+  Zn001:Wall001,,         !- Base Surface Name and Target (if applicable)
+  0.5000000    ,          !- VF to Ground
+  WINDOW-CONTROL-DRAPES,  !- Window Shading Control
+  TestFrameAndDivider,    !- Frame/Divider name
+  5,                      !- Multiplier
+  4,                      !- Rectangle (number of sides)
+   1.524000    ,  0.1520000    ,   2.743000    ,
+   1.524000    ,  0.1520000    ,  0.3050000    ,
+   4.572000    ,  0.1520000    ,  0.3050000    ,
+   4.572000    ,  0.1520000    ,   2.743000    ;
+</code></pre>
+
 <h3 id="window-modeling-options">Window Modeling Options</h3>
 <p>The following table shows what input objects/fields to use to model different window options. It also gives the name of an example input, if available, that demonstrates the option.</p>
 <p>Table 8. Window Modeling Options</p>
 <table class="table table-striped">
 <tr>
-<td>Option</td>
-<td>Object/Field or Output Variable</td>
-<td>Input File (distributed with install)</td>
+<th>Option</th>
+<th>Object/Fielh or Output Variable</th>
+<th>Input File (histributeh with install)</th>
 </tr>
 <tr>
 <td>Build up a window from layers</td>
@@ -7437,14 +7573,17 @@ NoDeflection,                                 �
 <h4 id="field-surface-area">Field: Surface Area</h4>
 <p>This field is the surface area of the internal mass. The area that is specified must be the entire surface area that is exposed to the zone. If both sides of a wall are completely within the same zone, then the area of both sides must be included when describing that internal wall.</p>
 <p>IDF examples of Internal Mass surfaces:</p>
-<p>InternalMass,Zn002:IntM001,  !- Surface Name</p>
-<p>INTERIOR,  !- Construction Name</p>
-<p>DORM ROOMS AND COMMON AREAS,  !- Zone</p>
-<p>408.7734    ;  !- Total area exposed to Zone {m2}</p>
-<p>InternalMass,Zn002:IntM002,  !- Surface Name</p>
-<p>PARTITION02,  !- Construction Name</p>
-<p>DORM ROOMS AND COMMON AREAS,  !- Zone</p>
-<p>371.6122    ;  !- Total area exposed to Zone {m2}</p>
+<pre><code class="idf">InternalMass,Zn002:IntM001,  !- Surface Name
+  INTERIOR,  !- Construction Name
+  DORM ROOMS AND COMMON AREAS,  !- Zone
+   408.7734    ;  !- Total area exposed to Zone {m2}
+
+InternalMass,Zn002:IntM002,  !- Surface Name
+  PARTITION02,  !- Construction Name
+  DORM ROOMS AND COMMON AREAS,  !- Zone
+   371.6122    ;  !- Total area exposed to Zone {m2}
+</code></pre>
+
 <h3 id="surface-output-variablesreports">Surface Output Variables/Reports</h3>
 <p>Note that Surface Outputs from specialized algorithms (such as Effective Moisture Penetration Depth (EMPD), Combined Heat and Moisture Transport (HAMT) and Conduction Finite Difference (CondFD) are discussed under the objects that describe the specialized inputs for these algorithms). You can access them via these links:</p>
 <ul>
@@ -7459,200 +7598,588 @@ NoDeflection,                                 �
 </li>
 </ul>
 <p>Additionally, the output variables applicable to all heat transfer surfaces:</p>
+<ul>
+<li>
 <p>Zone,Sum,Surface Inside Face Heat Balance Calculation Iteration Count []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Adjacent Air Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Convection Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Convection Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Convection Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Internal Gains Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face System Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face System Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face System Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Convection Heat Transfer Coefficient [W/m2-K]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Convection Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Convection Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Outside Face Convection Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate [W]</p>
+</li>
+</ul>
 <p>Output variables applicable to all exterior heat transfer surfaces:</p>
+<ul>
+<li>
 <p>Zone,Average,Surface Outside Face Outdoor Air Drybulb Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Outdoor Air Wetbulb Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Outdoor Air Wind Speed [m/s]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Sunlit Area [m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Sunlit Fraction []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Solar Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Outside Face Solar Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Incident Beam Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Ext Diff Sol From Bm-To-Diff Refl From Ground[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area[W/m2]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Anisotropic Sky Multiplier []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window BSDF Beam Direction Number []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window BSDF Beam Theta Angle [rad]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window BSDF Beam Phi Angle [rad]</p>
+</li>
+</ul>
 <p>Output variables applicable to opaque heat transfer surfaces (FLOOR, WALL, ROOF, DOOR). <strong>Note – these are advanced variables – you must read the descriptions and understand before use – then you must use the Diagnostics object to allow reporting.</strong></p>
+<ul>
+<li>
 <p>Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Conduction Heat Transfer Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Conduction Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Conduction Heat Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Inside Face Conduction Heat Transfer Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Inside Face Conduction Heat Transfer Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Conduction Heat Transfer Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Conduction Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Conduction Heat Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Outside Face Conduction Heat Transfer Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Outside Face Conduction Heat Transfer Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Average Face Conduction Heat Transfer Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Average Face Conduction Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Average Face Conduction Heat Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Average Face Conduction Heat Transfer Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Average Face Conduction Heat Transfer Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Heat Storage Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Heat Storage Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Heat Storage Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Heat Storage Rate per Area [W/m2]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Heat Storage Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Internal Source Location Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Opaque Surface Inside Face Conduction [W]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Opaque Surface Outside Face Conduction [W]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Opaque Surface Outside Face Conduction Gain[W]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Opaque Surface Outside Face Conduction Loss[W]</p>
+</li>
+<li>
 <p>Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]</p>
+</li>
+</ul>
 <h3 id="window-output-variables">Window Output Variables</h3>
 <p>Output variables applicable only to exterior windows and glass doors:</p>
+<ul>
+<li>
 <p>Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Transmitted Solar Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Windows Total Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Windows Total Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Windows Total Heat Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Windows Total Heat Loss Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Interior Windows Total Transmitted Beam Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Total Glazing Layers Absorbed Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Shading Device Absorbed Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Shading Device Absorbed Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average, Surface Window Transmitted Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Transmitted Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Transmitted Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Transmitted Beam To Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Transmitted Beam To Diffuse Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Transmitted Beam To Beam Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Transmitted Beam To Diffuse Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Transmitted Diffuse Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Transmitted Diffuse Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window System Solar Transmittance []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window System Solar Absorptance []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window System Solar Reflectance []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Gap Convective Heat Transfer Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Gap Convective Heat Transfer Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Heat Gain Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Heat Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Heat Loss Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Glazing Beam to Beam Solar Transmittance[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Glazing Beam to Diffuse Solar Transmittance []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Glazing Diffuse to Diffuse Solar Transmittance[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Model Solver Iteration Count []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Solar Horizontal Profile Angle[deg]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Solar Vertical Profile Angle[deg]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Outside Reveal Reflected Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Outside Reveal Reflected Beam Solar Radiation Energy</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Reveal Reflected Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Inside Reveal Reflected Beam Solar Radiation Energy [J]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Reveal Absorbed Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Glazing Condensation Status []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Frame Condensation Status []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Divider Condensation Status []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Shading Device Is On Time Fraction[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Blind Slat Angle [deg]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Blind Beam to Beam Solar Transmittance[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Blind Beam to Diffuse Solar Transmittance[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Blind Diffuse to Diffuse Solar Transmittance[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Blind and Glazing System Beam Solar Transmittance[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Blind and Glazing System Diffuse Solar Transmittance[]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Screen Beam to Beam Solar Transmittance []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Screen Beam to Diffuse Solar Transmittance []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Screen Diffuse to Diffuse Solar Transmittance []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Screen and Glazing System Beam Solar Transmittance []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Screen and Glazing System Diffuse Solar Transmittance []</p>
+</li>
+<li>
 <p>Zone,State,Surface Storm Window On Off Status []</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Frame Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Frame Heat Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Divider Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Divider Heat Loss Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Frame Inside Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Frame Outside Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Divider Inside Temperature [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Divider Outside Temperature [C]</p>
+</li>
+</ul>
 <p>If the user requests to display advanced report/output variables (e.g. see Output:Diagnostics keyword DisplayAdvancedReportVariables) the the following additional output variables are available for exterior windows and glass doors</p>
+<ul>
+<li>
 <p>Zone,Average,Surface Window Inside Face Glazing Zone Convection Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Frame and Divider Zone Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Shade Zone Convection Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Inside Face Shade Net Infrared Heat Transfer Rate [W]</p>
+</li>
+</ul>
 <p>Output variables applicable only to interior windows and glass doors:</p>
+<ul>
+<li>
 <p>Zone,Average, Surface Window Transmitted Beam Solar Radiation Rate [W]</p>
+</li>
+<li>
 <p>Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]</p>
+</li>
+</ul>
 <p>If the user requests to display advanced report/output variables (e.g. see Output:Diagnostics keyword DisplayAdvancedReportVariables) the the following additional output variable is available for Equivalent Layer Window;</p>
+<ul>
+<li>
 <p>Zone,Average, Surface Window Inside Face Other Convection Heat Gain Rate [W]</p>
+</li>
+<li>
 <p>Output variables applicable to interior and exterior windows and doors are:</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Total Absorbed Shortwave Radiation Rate Layer &lt;x&gt; [W]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Front Face Temperature Layer &lt;x&gt; [C]</p>
+</li>
+<li>
 <p>Zone,Average,Surface Window Back Face Temperature Layer &lt;x&gt; [C]</p>
+</li>
+</ul>
 <h4 id="surface-window-total-absorbed-shortwave-radiation-rate-layer-x-w">Surface Window Total Absorbed Shortwave Radiation Rate Layer &lt;x&gt; [W]</h4>
 <p>This will output shortwave radiation absorbed in a window layer. The key values for this output variable are the surface name. Layers are numbered from the outside to the inside of the surface. The full listing will appear in the RDD file.</p>
 <h4 id="surface-window-front-face-temperature-layer-x-c">Surface Window Front Face Temperature Layer &lt;x&gt; [C]</h4>
@@ -7719,7 +8246,6 @@ NoDeflection,                                 �
 <p>Beam solar radiation from the interior (i.e., interzone) windows in a zone incident on the inside face of a surface in the zone. This value is calculated only if Solar Distribution in the BUILDING object is equal to FullInteriorExterior. However, the program does not track where this radiation falls. Instead, it is treated by the program as though it were diffuse radiation uniformly distributed over all of the zone surfaces. See <strong>Figure 31</strong>. Different versions of the report are available including the basic incident rate (W), a per unit area flux (W/m2), and an energy version (J).</p>
 <p><img alt="" src="../../InputOutputReference/media/image057.svg" /></p>
 <p>Figure 31. Beam solar radiation entering a zone through an interior window is distributed inside the zone as though it were diffuse radiation.</p>
-<h4></h4>
 <h4 id="surface-inside-face-initial-transmitted-diffuse-absorbed-solar-radiation-rate-w">Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]</h4>
 <p>As of Version 2.1, diffuse solar transmitted through exterior and interior windows is no longer uniformly distributed.  Instead, it is distributed according to the approximate view factors between the transmitting window and all other heat transfer surfaces in the zone.  This variable is the amount of transmitted diffuse solar that is initially absorbed on the inside of each heat transfer surface.  The portion of this diffuse solar that is reflected by all surfaces in the zone is subsequently redistributed uniformly to all heat transfer surfaces in the zone, along with interior reflected beam solar and shortwave radiation from lights.  The total absorbed shortwave radiation is given by the next variable.</p>
 <h4 id="surface-inside-face-absorbed-shortwave-radiation-rate-w">Surface Inside Face Absorbed Shortwave Radiation Rate [W]</h4>
@@ -7747,12 +8273,26 @@ NoDeflection,                                 �
 <p>These “outside face solar radiation” output variables describe the heat transferred by the absorption of solar radiation at the outside face.  This is the result of incident solar radiation being absorbed at the surface face.  The values are always positive.</p>
 <h4 id="surface-outside-face-incident-solar-radiation-rate-per-area-wm2">Surface Outside Face Incident Solar Radiation Rate per Area [W/m2]</h4>
 <p>The total solar radiation incident on the outside of an exterior surface. It is the sum of:</p>
+<ul>
+<li>
 <p>Surface Outside Face Incident Beam Solar Radiation Rate per Area</p>
+</li>
+<li>
 <p>Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area</p>
+</li>
+<li>
 <p>Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area</p>
+</li>
+<li>
 <p>Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area</p>
+</li>
+<li>
 <p>Surface Outside Face Incident Beam To Beam Surface Reflected Solar Radiation Rate per Area</p>
+</li>
+<li>
 <p>Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area</p>
+</li>
+</ul>
 <h4 id="surface-outside-face-incident-beam-solar-radiation-rate-per-area-wm2">Surface Outside Face Incident Beam Solar Radiation Rate per Area [W/m2]</h4>
 <p>The solar beam radiation incident on the outside of an exterior surface, including the effects of shadowing, if present. The beam here is that directly from the sun; it excludes beam specularly reflected from obstructions.</p>
 <h4 id="surface-outside-face-incident-sky-diffuse-solar-radiation-rate-per-area-wm2">Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area [W/m2]</h4>
@@ -8063,7 +8603,9 @@ NoDeflection,                                 �
 <h4 id="dxf">DXF</h4>
 <p>This report produces a special file (<strong>eplusout.dxf</strong>) in the industry standard DXF (Drawing Interchange Format) for drawings. It is produced and accepted by many popular, commercial CAD programs. Detailed reference can be found on the AutoCAD™ website at: http://www.autodesk.com/techpubs/autocad/acadr14/dxf/index.htm</p>
 <p>EnergyPlus produces this file from the Report command:</p>
-<p>Output:Reports, Surfaces, DXF;</p>
+<pre><code class="idf">Output:Reports, Surfaces, DXF;
+</code></pre>
+
 <h4 id="details-vertices-detailswithvertices">Details, Vertices, DetailsWithVertices</h4>
 <p>This version of the report creates lines in the eplusout.eio file for each surface (except internal mass surfaces). Details of this reporting is shown in the Output Details and Examples document.</p>
 <h3 id="shading-surfaces">Shading Surfaces</h3>
@@ -8071,17 +8613,39 @@ NoDeflection,                                 �
 <p>The most important effect of shading surfaces is to reduce solar gain in windows that are shadowed. (However, in some cases, shading surfaces can reflect solar onto a wall or window and increase solar gain.)</p>
 <p>There are two kinds of shading surfaces in EnergyPlus: <strong>detached</strong> and <strong>attached</strong>. A <strong>detached</strong> shading surface, such as a tree or neighboring building, is not connected to the building. An <strong>attached</strong> shading surface is typically an overhang or fin that is attached to a particular base surface of the building, usually a wall; attached shading surfaces are usually designed to shade specific windows.</p>
 <p>Objects for detached shading surfaces:</p>
+<ul>
+<li>
 <p>Shading:Site</p>
+</li>
+<li>
 <p>Shading:Building</p>
+</li>
+<li>
 <p>Shading:Site:Detailed</p>
+</li>
+<li>
 <p>Shading:Building:Detailed</p>
+</li>
+</ul>
 <p>Similarly to the surfaces, the detailed objects use vertex entry whereas the other objects are limited to rectangular representation.</p>
 <p>Objects for attached shading surfaces:</p>
+<ul>
+<li>
 <p>Shading:Overhang</p>
+</li>
+<li>
 <p>Shading:Overhang:Projection</p>
+</li>
+<li>
 <p>Shading:Fin</p>
+</li>
+<li>
 <p>Shading:Fin:Projection</p>
+</li>
+<li>
 <p>Shading:Zone:Detailed</p>
+</li>
+</ul>
 <p>EnergyPlus creates “bi-directional” shades from each shading surface entered. This means that the shade you input will cast a shadow no matter which side of the shade the sun is on. For example, a vertical fin will cast a shadow whether the sun is on the left side or right side of the fin.<a href="#_ftn1">[1]</a></p>
 <p>It is important to note that EnergyPlus will automatically account for “self-shading” effects—such as in L-shaped buildings—in which some of the building’s wall and roof surfaces shade other parts of the building, especially windows. This means that you only need to describe shading elements that aren’t building heat-transfer surfaces.</p>
 <p>Shading surfaces can also <strong>reflect</strong> solar radiation onto the building. This feature is simulated if you choose FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building object (ref: Building - Field: Solar Distribution). In this case, you may specify the reflectance properties of a shading surface with the ShadingProperty:Reflectance object. Note: If no ShadingProperty:Reflectance object is defined, then the shading surface reflectance values are assumed to be 0.2 and the fraction of shading surface that is glazed is assumed to be 0.0.</p>
@@ -8110,24 +8674,27 @@ NoDeflection,                                 �
 <h4 id="field-height_11">Field: Height</h4>
 <p>This field is the width of the shade in meters.</p>
 <p>Examples of these (can be found in example files 4ZoneWithShading_Simple_1.idf and 4ZoneWithShading_Simple_2.idf)</p>
-<p>Shading:Building,</p>
-<p>Bushes-East,             !- Name</p>
-<p>90,                      !- Azimuth Angle {deg}</p>
-<p>90,                      !- Tilt Angle {deg}</p>
-<p>45,                      !- Starting X Coordinate {m}</p>
-<p>0,                       !- Starting Y Coordinate {m}</p>
-<p>0,                       !- Starting Z Coordinate {m}</p>
-<p>50,                      !- Length {m}</p>
-<p>1;                       !- Height {m}</p>
-<p>Shading:Site,</p>
-<p>Bushes-North,            !- Name</p>
-<p>0,                       !- Azimuth Angle {deg}</p>
-<p>90,                      !- Tilt Angle {deg}</p>
-<p>45,                      !- Starting X Coordinate {m}</p>
-<p>50,                      !- Starting Y Coordinate {m}</p>
-<p>0,                       !- Starting Z Coordinate {m}</p>
-<p>50,                      !- Length {m}</p>
-<p>1;                       !- Height {m}</p>
+<pre><code class="idf">  Shading:Building,
+    Bushes-East,             !- Name
+    90,                      !- Azimuth Angle {deg}
+    90,                      !- Tilt Angle {deg}
+    45,                      !- Starting X Coordinate {m}
+    0,                       !- Starting Y Coordinate {m}
+    0,                       !- Starting Z Coordinate {m}
+    50,                      !- Length {m}
+    1;                       !- Height {m}
+
+  Shading:Site,
+    Bushes-North,            !- Name
+    0,                       !- Azimuth Angle {deg}
+    90,                      !- Tilt Angle {deg}
+    45,                      !- Starting X Coordinate {m}
+    50,                      !- Starting Y Coordinate {m}
+    0,                       !- Starting Z Coordinate {m}
+    50,                      !- Length {m}
+    1;                       !- Height {m}
+</code></pre>
+
 <h3 id="shadingsitedetailed-shadingbuildingdetailed">Shading:Site:Detailed, Shading:Building:Detailed</h3>
 <p>These objects are used to describe shading elements that are external to the building. Examples are trees, high fences, near-by hills, and neighboring buildings.</p>
 <p>If relative coordinates are used (ref: Field: Coordinate System in GlobalGeometryRules), shading surfaces entered with Shading:Site:Detailed remain stationary if the building is rotated, whereas those entered with Shading:Building:Detailed rotate with the building. If world coordinates are used Shading:Site:Detailed and Shading:Building:Detailed are equivalent.</p>
@@ -8164,20 +8731,23 @@ NoDeflection,                                 �
 <h4 id="field-number-vertices">Field: Number Vertices</h4>
 <p>The number of sides in the surface (number of X,Y,Z vertex groups). For further information, see the discussion on “Surface Vertices” above.</p>
 <p>IDF example of Detached Shading Surfaces:</p>
-<p>Shading:Building:Detailed,</p>
-<p>EAST SIDE TREE,  !- Detached Shading</p>
-<p>ShadingTransmittance:0002,  !- Shadowing Transmittance &amp; Schedule</p>
-<p>3, !-Triangle</p>
-<p>33.52800    ,   10.66800    ,   10.05800    ,</p>
-<p>33.52800    ,   13.71600    ,  0.9140000    ,</p>
-<p>33.52800    ,   4.572000    ,  0.9140000    ;</p>
-<p>Shading:Building:Detailed,</p>
-<p>WEST SIDE TREE,  !- Detached Shading</p>
-<p>ShadingTransmittance:0002,  !- Shadowing Transmittance &amp; Schedule</p>
-<p>3, !-Triangle</p>
-<p>-3.048000    ,   7.620000    ,   10.05800    ,</p>
-<p>-3.048000    ,   4.572000    ,  0.9140000    ,</p>
-<p>-3.048000    ,   13.71600    ,  0.9140000    ;</p>
+<pre><code class="idf">Shading:Building:Detailed,
+   EAST SIDE TREE,  !- Detached Shading
+   ShadingTransmittance:0002,  !- Shadowing Transmittance &amp; Schedule
+   3, !-Triangle
+   33.52800    ,   10.66800    ,   10.05800    ,
+   33.52800    ,   13.71600    ,  0.9140000    ,
+   33.52800    ,   4.572000    ,  0.9140000    ;
+
+Shading:Building:Detailed,
+   WEST SIDE TREE,  !- Detached Shading
+   ShadingTransmittance:0002,  !- Shadowing Transmittance &amp; Schedule
+   3, !-Triangle
+  -3.048000    ,   7.620000    ,   10.05800    ,
+  -3.048000    ,   4.572000    ,  0.9140000    ,
+  -3.048000    ,   13.71600    ,  0.9140000    ;
+</code></pre>
+
 <h3 id="attached-shading-surfaces">Attached Shading Surfaces</h3>
 <p>Overhangs are usually horizontal devices that are used to shade windows. Fins are usually vertical devices that similarly shade windows.</p>
 <h3 id="shadingoverhang">Shading:Overhang</h3>
@@ -8266,35 +8836,39 @@ NoDeflection,                                 �
 <p>This field is the fraction of the window/door width to specify as the depth of the right fin (meters) projecting out from the wall.</p>
 <p>zone.</p>
 <p>Examples of these (can be found in example files 4ZoneWithShading_Simple_1.idf and 4ZoneWithShading_Simple_2.idf)</p>
-<p>Shading:Overhang:Projection,</p>
-<p>Zn001:Wall001:Win001:Shade001,  !- Name</p>
-<p>Zn001:Wall001:Win001,    !- Window or Door Name</p>
-<p>.7,                      !- Height above Window or Door {m}</p>
-<p>90,                      !- Tilt Angle from Window/Door {deg}</p>
-<p>.2,                      !- Left extension from Window/Door Width {m}</p>
-<p>.2,                      !- Right extension from Window/Door Width {m}</p>
-<p>.6;                      !- Depth as Fraction of Window/Door Height {m}</p>
-<p>Shading:Overhang,</p>
-<p>Zn001:Wall001:Door001:Shade001,  !- Name</p>
-<p>Zn001:Wall001:Door001,   !- Window or Door Name</p>
-<p>.6,                      !- Height above Window or Door {m}</p>
-<p>90,                      !- Tilt Angle from Window/Door {deg}</p>
-<p>0,                       !- Left extension from Window/Door Width {m}</p>
-<p>0,                       !- Right extension from Window/Door Width {m}</p>
-<p>3;                       !- Depth {m}</p>
-<p>Shading:Fin:Projection,</p>
-<p>Zn001:Wall001:Shade003,  !- Name</p>
-<p>Zn001:Wall001:Win001,    !- Window or Door Name</p>
-<p>.1,                      !- Left Extension from Window/Door {m}</p>
-<p>.1,                   !- Left Distance Above Top of Window {m}</p>
-<p>.1,                   !- Left Distance Below Bottom of Window {m}</p>
-<p>90,                   !- Left Tilt Angle from Window/Door {deg}</p>
-<p>.6,                   !- Left Depth as Fraction of Window/Door Width {m}</p>
-<p>.1,                   !- Right Extension from Window/Door {m}</p>
-<p>.1,                   !- Right Distance Above Top of Window {m}</p>
-<p>.1,                   !- Right Distance Below Bottom of Window {m}</p>
-<p>90,                   !- Right Tilt Angle from Window/Door {deg}</p>
-<p>.6;                   !- Right Depth as Fraction of Window/Door Width {m}</p>
+<pre><code class="idf">  Shading:Overhang:Projection,
+    Zn001:Wall001:Win001:Shade001,  !- Name
+    Zn001:Wall001:Win001,    !- Window or Door Name
+    .7,                      !- Height above Window or Door {m}
+    90,                      !- Tilt Angle from Window/Door {deg}
+    .2,                      !- Left extension from Window/Door Width {m}
+    .2,                      !- Right extension from Window/Door Width {m}
+    .6;                      !- Depth as Fraction of Window/Door Height {m}
+
+  Shading:Overhang,
+    Zn001:Wall001:Door001:Shade001,  !- Name
+    Zn001:Wall001:Door001,   !- Window or Door Name
+    .6,                      !- Height above Window or Door {m}
+    90,                      !- Tilt Angle from Window/Door {deg}
+    0,                       !- Left extension from Window/Door Width {m}
+    0,                       !- Right extension from Window/Door Width {m}
+    3;                       !- Depth {m}
+
+  Shading:Fin:Projection,
+    Zn001:Wall001:Shade003,  !- Name
+    Zn001:Wall001:Win001,    !- Window or Door Name
+    .1,                      !- Left Extension from Window/Door {m}
+    .1,                   !- Left Distance Above Top of Window {m}
+    .1,                   !- Left Distance Below Bottom of Window {m}
+    90,                   !- Left Tilt Angle from Window/Door {deg}
+    .6,                   !- Left Depth as Fraction of Window/Door Width {m}
+    .1,                   !- Right Extension from Window/Door {m}
+    .1,                   !- Right Distance Above Top of Window {m}
+    .1,                   !- Right Distance Below Bottom of Window {m}
+    90,                   !- Right Tilt Angle from Window/Door {deg}
+    .6;                   !- Right Depth as Fraction of Window/Door Width {m}
+</code></pre>
+
 <h3 id="shadingzonedetailed">Shading:Zone:Detailed</h3>
 <p>This object is used to describe attached “subsurfaces” such as overhangs, wings or fins that project outward from a base surface. This classification is used for convenience; actually, a device of this type can cast shadows on the surface to which it is attached as well as on adjacent surfaces. For example, a fin may shade its parent wall as well as adjacent walls.</p>
 <p>Note that a zone surface can cast shadows on other zone surfaces. However, you don’t have to worry about such effects—for example, one wall of an L-shaped building shading another wall--because EnergyPlus will automatically check for this kind of “self shadowing” and do the proper calculations.</p>
@@ -8340,32 +8914,34 @@ NoDeflection,                                 �
 <p>Thus, another shading surface will be created (facing down):</p>
 <p>4,(C+A,-B,D),(C+A,0,D),(C,0,D),(C,-B,D);</p>
 <p>IDF example of attached shading surfaces (overhang, fin):</p>
-<p>Shading:Zone:Detailed,</p>
-<p>Zn001:Wall001:Shade001,  !- Surface Name</p>
-<p>Zn001:Wall001,  !- Base Surface Name</p>
-<p>ShadingTransmittance:0001,  !- Shadowing Transmittance Schedule</p>
-<p>4, !-RectangularOverhang</p>
-<p>1.524000    , -0.3050000    ,   2.865000    ,</p>
-<p>1.524000    ,  0.0000000E+00,   2.865000    ,</p>
-<p>4.572000    ,  0.0000000E+00,   2.865000    ,</p>
-<p>4.572000    , -0.3050000    ,   2.865000    ;</p>
-<p>Shading:Zone:Detailed,</p>
-<p>Zn003:Wall001:Shade001,  !- Surface Name</p>
-<p>Zn003:Wall001,  !- Base Surface Name</p>
-<p>ShadingTransmittance:0001,  !- Shadowing Transmittance Schedule</p>
-<p>4, !-RectangularLeftFin</p>
-<p>57.97000    ,   8.450000    ,   10.00000    ,</p>
-<p>57.97000    ,   8.450000    ,  0.0000000E+00,</p>
-<p>57.97000    ,   6.450000    ,  0.0000000E+00,</p>
-<p>57.97000    ,   6.450000    ,   10.00000    ;</p>
-<p>Shading:Zone:Detailed,Zn003:Wall001:Shade002,  !- Surface Name</p>
-<p>Zn003:Wall001,  !- Base Surface Name</p>
-<p>ShadingTransmittance:0003,  !- Shadowing Transmittance Schedule</p>
-<p>4, !-RectangularRightFin</p>
-<p>77.97000    ,   6.450000    ,   10.00000    ,</p>
-<p>77.97000    ,   6.450000    ,  0.0000000E+00,</p>
-<p>77.97000    ,   8.450000    ,  0.0000000E+00,</p>
-<p>77.97000    ,   8.450000    ,   10.00000    ;</p>
+<pre><code class="idf">Shading:Zone:Detailed,
+  Zn001:Wall001:Shade001,  !- Surface Name
+  Zn001:Wall001,  !- Base Surface Name
+  ShadingTransmittance:0001,  !- Shadowing Transmittance Schedule
+   4, !-RectangularOverhang
+   1.524000    , -0.3050000    ,   2.865000    ,
+   1.524000    ,  0.0000000E+00,   2.865000    ,
+   4.572000    ,  0.0000000E+00,   2.865000    ,
+   4.572000    , -0.3050000    ,   2.865000    ;
+Shading:Zone:Detailed,
+  Zn003:Wall001:Shade001,  !- Surface Name
+  Zn003:Wall001,  !- Base Surface Name
+  ShadingTransmittance:0001,  !- Shadowing Transmittance Schedule
+   4, !-RectangularLeftFin
+   57.97000    ,   8.450000    ,   10.00000    ,
+   57.97000    ,   8.450000    ,  0.0000000E+00,
+   57.97000    ,   6.450000    ,  0.0000000E+00,
+   57.97000    ,   6.450000    ,   10.00000    ;
+ Shading:Zone:Detailed,Zn003:Wall001:Shade002,  !- Surface Name
+  Zn003:Wall001,  !- Base Surface Name
+  ShadingTransmittance:0003,  !- Shadowing Transmittance Schedule
+   4, !-RectangularRightFin
+   77.97000    ,   6.450000    ,   10.00000    ,
+   77.97000    ,   6.450000    ,  0.0000000E+00,
+   77.97000    ,   8.450000    ,  0.0000000E+00,
+   77.97000    ,   8.450000    ,   10.00000    ;
+</code></pre>
+
 <h3 id="shadingpropertyreflectance">ShadingProperty:Reflectance</h3>
 <p>Specifies the reflectance properties of a shading surface when the solar reflection calculation has requested, i.e., when if “WithReflections” option is chosen in the Building object (ref: Building - Field: Solar Distribution). It is assumed that shading surfaces are divided into an unglazed, diffusely reflecting portion and a glazed, specularly-reflecting portion, either of which may be zero. The reflectance properties are assumed to be the same on both sides of the shading surface.</p>
 <p>Note that a shadowing transmittance schedule (ref: Shading Surfaces, Field: Transmittance Schedule Name) can be used with a reflective shading surface. However, EnergyPlus assumes that the reflectance properties of the shading surface are constant even if the transmittance varies.</p>
@@ -8384,35 +8960,43 @@ NoDeflection,                                 �
 <h4 id="field-glazing-construction-name">Field: Glazing Construction Name</h4>
 <p>The name of the construction of the windows on the shading surface. Required if Fraction of Shading Surface That Is Glazed is greater than 0.0.</p>
 <p>IDF example of Shading Surface Reflectance for shading surface with specular reflection</p>
-<p>Shading:Site:Detailed,</p>
-<p>Adjacent Glazed Facade,  !- User Supplied Surface Name</p>
-<p>,   !- Shadowing Transmittance Schedule</p>
-<p>4,  !- Number of Surface Vertex Groups -- Number of (X,Y,Z) groups</p>
-<p>0,-24,30, !- Vertex 1 X,Y,Z coordinates</p>
-<p>0,-24,0,  !- Vertex 2 X,Y,Z coordinates</p>
-<p>0,0,0,    !- Vertex 3 X,Y,Z coordinates</p>
-<p>0,0,30;   !-Vertex 3 X,Y,Z coordinates</p>
-<p>ShadingProperty:Reflectance,</p>
-<p>Adjacent Glazed Facade, !- Name of Surface:Shading Object</p>
-<p>0.3,  !- Diffuse Solar Reflectance of Unglazed Part of Shading Surface</p>
-<p>0.3,  !- Diffuse Visible Reflectance of Unglazed Part of Shading Surface</p>
-<p>0.7,  !- Fraction of Shading Surface That Is Glazed</p>
-<p>GlassCon-1; !- Name of Glazing Construction</p>
+<pre><code class="idf">Shading:Site:Detailed,
+Adjacent Glazed Facade,  !- User Supplied Surface Name
+,   !- Shadowing Transmittance Schedule
+4,  !- Number of Surface Vertex Groups -- Number of (X,Y,Z) groups
+0,-24,30, !- Vertex 1 X,Y,Z coordinates
+0,-24,0,  !- Vertex 2 X,Y,Z coordinates
+0,0,0,    !- Vertex 3 X,Y,Z coordinates
+0,0,30;   !-Vertex 3 X,Y,Z coordinates
+
+
+ShadingProperty:Reflectance,
+Adjacent Glazed Facade, !- Name of Surface:Shading Object
+0.3,  !- Diffuse Solar Reflectance of Unglazed Part of Shading Surface
+0.3,  !- Diffuse Visible Reflectance of Unglazed Part of Shading Surface
+0.7,  !- Fraction of Shading Surface That Is Glazed
+GlassCon-1; !- Name of Glazing Construction
+</code></pre>
+
 <p>IDF example of Shading Surface Reflectance for shading surface without specular reflection</p>
-<p>Shading:Site:Detailed,</p>
-<p>Adjacent Blank Facade,  !- User Supplied Surface Name</p>
-<p>,   !- Shadowing Transmittance Schedule</p>
-<p>4,  !- Number of Surface Vertex Groups -- Number of (X,Y,Z) groups</p>
-<p>0,-24,30,</p>
-<p>0,-24,0,</p>
-<p>0,0,0,</p>
-<p>0,0,30;</p>
-<p>ShadingProperty:Reflectance,</p>
-<p>Adjacent Blank Facade, !- Name of Surface:Shading Object</p>
-<p>0.4,  !- Diffuse Solar Reflectance of Unglazed Part of Shading Surface</p>
-<p>0.4,  !- Diffuse Visible Reflectance of Unglazed Part of Shading Surface</p>
-<p>0.0,  !- Fraction of Shading Surface That Is Glazed
- ;     !- Name of glazing construction</p>
+<pre><code class="idf">Shading:Site:Detailed,
+Adjacent Blank Facade,  !- User Supplied Surface Name
+,   !- Shadowing Transmittance Schedule
+4,  !- Number of Surface Vertex Groups -- Number of (X,Y,Z) groups
+0,-24,30,
+0,-24,0,
+0,0,0,
+0,0,30;
+
+
+ShadingProperty:Reflectance,
+Adjacent Blank Facade, !- Name of Surface:Shading Object
+0.4,  !- Diffuse Solar Reflectance of Unglazed Part of Shading Surface
+0.4,  !- Diffuse Visible Reflectance of Unglazed Part of Shading Surface
+0.0,  !- Fraction of Shading Surface That Is Glazed
+;     !- Name of glazing construction
+</code></pre>
+
 <h3 id="windowpropertyshadingcontrol">WindowProperty:ShadingControl</h3>
 <p>Window shading with coverings like drapes, blinds, screens or pull-down shades can be used to reduce the amount of solar radiation entering the window or reduce daylighting glare. It can also be used to reduce heat loss through the window (movable insulation). Leaving the window covering open in the winter can maximize solar heat gain and thereby reduce heating loads.</p>
 <p>With WindowProperty:ShadingControl—which is referenced by windows and glass doors (ref: FenestrationSurface:Detailed with Type = Window or GlassDoor)--you specify the type and location of the shading device, what variable or combination of variables controls deployment of the shading device, and what the control setpoint is. If the shading device is a blind, you also specify how the slat angle is controlled.</p>
@@ -8522,120 +9106,133 @@ NoDeflection,                                 �
 <p>An IDF example: window with interior roll shade that is deployed when solar incident on the window exceeds 50 W/m<sup>2</sup>.</p>
 <p>! Example 1: Interior movable shade specified by giving name of shaded construction</p>
 <p>! in WindowProperty:ShadingControl</p>
-<p>WindowMaterial:Glazing, GLASS - CLEAR SHEET 1 / 8 IN,  !- Material Name</p>
-<p>SpectralAverage,! Optical data type {SpectralAverage or Spectral}</p>
-<p>,               ! Name of spectral data set when Optical Data Type = Spectral</p>
-<p>0.003        ,  !- Thickness {m}</p>
-<p>0.837        ,  !- Solar Transmittance at Normal Incidence</p>
-<p>0.075        ,  !- Solar Reflectance at Normal Incidence: Front Side</p>
-<p>0.075        ,  !- Solar Reflectance at Normal Incidence: Back Side</p>
-<p>0.898        ,  !- Visible Transmittance at Normal Incidence</p>
-<p>0.081        ,  !- Visible Reflectance at Normal Incidence: Front Side</p>
-<p>0.081        ,  !- Visible Reflectance at Normal Incidence: Back Side</p>
-<p>0.0          ,  !- IR Transmittance</p>
-<p>0.8400000    ,  !- IR Emissivity: Front Side</p>
-<p>0.8400000    ,  !- IR Emissivity: Back Side</p>
-<p>0.9000000    ;  !- Conductivity {W/m-K}</p>
-<p>WindowMaterial:Shade, ROLL SHADE,  !- Material Name</p>
-<p>0.3          ,   !- Solar Transmittance at normal incidence</p>
-<p>0.5000000    ,   !- Solar Reflectance (same for front and back side)</p>
-<p>0.3          ,   !- Visible Transmittance at normal incidence</p>
-<p>0.5000000    ,   !- Visible reflectance (same for front and back side)</p>
-<p>0.9000000    ,   !- IR Emissivity (same for front and back side)</p>
-<p>0.05         ,   !- IR Transmittance</p>
-<p>0.003        ,   !- Thickness</p>
-<p>0.1          ,   !- Conductivity {W/m-K}</p>
-<p>0.0          ,   !- Top Opening Multiplier
-      0.0          ,   !- Bottom Opening Multiplier
-      0.5          ,   !- Left-Side Opening Multiplier
-      0.5          ,   !- Right-Side Opening Multiplier
-      0.0          ;   !- Air-Flow Permeability</p>
-<p>Construction, SINGLE PANE WITH NO SHADE,  ! Name of construction without shade</p>
-<p>GLASS - CLEAR SHEET 1 / 8 IN;  !- First material layer</p>
-<p>Construction, SINGLE PANE WITH INT SHADE, ! Name of construction with shade</p>
-<p>GLASS - CLEAR SHEET 1 / 8 IN,  !- First material layer</p>
-<p>ROLL SHADE                  ;  !- Second material layer</p>
-<p>WindowProperty:ShadingControl, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Control</p>
-<p>InteriorShade,                !- Shading Type</p>
-<p>SINGLE PANE WITH INT SHADE,   !- Name of construction with shading device</p>
-<p>OnIfHighSolarOnWindow,        !- Shading Control Type</p>
-<p>,                             !- Schedule name</p>
-<p>50.0,                         !- Setpoint {W/m2}</p>
-<p>NO,                           !- Shading Control Is Scheduled</p>
-<p>NO,                           !- Glare Control Is Active</p>
-<p>,                             !- Material Name of Shading Device</p>
-<p>,                             !- Type of Slat Angle Control for Blinds</p>
-<p>;                             !- Slat Angle Schedule Name</p>
-<p>FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name</p>
-<p>Window                   ,    !- Class</p>
-<p>SINGLE PANE WITH NO SHADE,    !- Name of construction without shading device</p>
-<p>Zn001:Wall001            ,    !- Base Surface Name</p>
-<p>,                             !- Target</p>
-<p>0.5000000                ,    !- VF to Ground</p>
-<p>CONTROL ON INCIDENT SOLAR,    !- Window Shading Control name</p>
-<p>,                             !- Frame/Divider name</p>
-<p>1.0                      ,    !- Multiplier</p>
-<p>4                        ,    !- Number of vertices (assumed rectangular)</p>
-<p>0.548 ,  0.0 ,   2.5     ,    !- x,y,z of vertices {m}</p>
-<p>0.548 ,  0.0 ,   0.5     ,</p>
-<p>5.548 ,  0.0 ,   0.5     ,</p>
-<p>5.548 ,  0.0 ,   2.5     ;</p>
-<p>! Example 2: Interior movable shade specified by giving name of shading device in WindowProperty:ShadingControl</p>
-<p>WindowMaterial:Glazing, GLASS - CLEAR SHEET 1 / 8 IN,  !- Material Name</p>
-<p>SpectralAverage,! Optical data type {SpectralAverage or Spectral}</p>
-<p>,               ! Name of spectral data set when Optical Data Type = Spectral</p>
-<p>0.003        ,  !- Thickness {m}</p>
-<p>0.837        ,  !- Solar Transmittance at Normal Incidence</p>
-<p>0.075        ,  !- Solar Reflectance at Normal Incidence: Front Side</p>
-<p>0.075        ,  !- Solar Reflectance at Normal Incidence: Back Side</p>
-<p>0.898        ,  !- Visible Transmittance at Normal Incidence</p>
-<p>0.081        ,  !- Visible Reflectance at Normal Incidence: Front Side</p>
-<p>0.081        ,  !- Visible Reflectance at Normal Incidence: Back Side</p>
-<p>0.0          ,  !- IR Transmittance</p>
-<p>0.8400000    ,  !- IR Emissivity: Front Side</p>
-<p>0.8400000    ,  !- IR Emissivity: Back Side</p>
-<p>0.9000000    ;  !- Conductivity {W/m-K}</p>
-<p>WindowMaterial:Shade, ROLL SHADE,  !- Material Name</p>
-<p>0.3          ,   !- Solar Transmittance at normal incidence</p>
-<p>0.5000000    ,   !- Solar Reflectance (same for front and back side)</p>
-<p>0.3          ,   !- Visible Transmittance at normal incidence</p>
-<p>0.5000000    ,   !- Visible reflectance (same for front and back side)</p>
-<p>0.9000000    ,   !- IR Emissivity (same for front and back side)</p>
-<p>0.05         ,   !- IR Transmittance</p>
-<p>0.003        ,   !- Thickness</p>
-<p>0.1          ,   !- Conductivity {W/m-K}</p>
-<p>0.0          ,   !- Top Opening Multiplier
-      0.0          ,   !- Bottom Opening Multiplier
-      0.5          ,   !- Left-Side Opening Multiplier
-      0.5          ,   !- Right-Side Opening Multiplier
-      0.0          ;   !- Air-Flow Permeability</p>
-<p>Construction, SINGLE PANE WITH NO SHADE,  ! Name of construction without shade</p>
-<p>GLASS - CLEAR SHEET 1 / 8 IN;  !- First material layer</p>
-<p>WINDOWPROPERTY:SHADINGCONTROL, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Control</p>
-<p>InteriorShade,                !- Shading Type</p>
-<p>,                             !- Name of shaded construction</p>
-<p>OnIfHighSolarOnWindow,        !- Shading Control Type</p>
-<p>,                             !- Schedule name</p>
-<p>50.0,                         !- Setpoint {W/m2}</p>
-<p>NO,                           !- Shading Control Is Scheduled</p>
-<p>NO,                           !- Glare Control Is Active</p>
-<p>ROLL SHADE,                   !- Material Name of Shading Device</p>
-<p>,                             !- Type of Slat Angle Control for Blinds</p>
-<p>;                             !- Slat Angle Schedule Name</p>
-<p>FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name</p>
-<p>Window                   ,    !- Class</p>
-<p>SINGLE PANE WITH NO SHADE,    !- Name of construction without shade</p>
-<p>Zn001:Wall001            ,    !- Base Surface Name</p>
-<p>,                             !- Target</p>
-<p>0.5000000                ,    !- VF to Ground</p>
-<p>CONTROL ON INCIDENT SOLAR,    !- Window Shading Control name</p>
-<p>,                             !- Frame/Divider name</p>
-<p>1.0                      ,    !- Multiplier</p>
-<p>4                        ,    !- Number of vertices (assumed rectangular)</p>
-<p>0.548 ,  0.0 ,   2.5     ,    !- x,y,z of vertices {m}</p>
-<p>0.548 ,  0.0 ,   0.5     ,</p>
-<p>5.548 ,  0.0 ,   0.5     ,</p>
-<p>5.548 ,  0.0 ,   2.5     ;</p>
+<pre><code class="idf"> WindowMaterial:Glazing, GLASS - CLEAR SHEET 1 / 8 IN,  !- Material Name
+     SpectralAverage,! Optical data type {SpectralAverage or Spectral}
+     ,               ! Name of spectral data set when Optical Data Type = Spectral
+     0.003        ,  !- Thickness {m}
+     0.837        ,  !- Solar Transmittance at Normal Incidence
+     0.075        ,  !- Solar Reflectance at Normal Incidence: Front Side
+     0.075        ,  !- Solar Reflectance at Normal Incidence: Back Side
+     0.898        ,  !- Visible Transmittance at Normal Incidence
+     0.081        ,  !- Visible Reflectance at Normal Incidence: Front Side
+     0.081        ,  !- Visible Reflectance at Normal Incidence: Back Side
+     0.0          ,  !- IR Transmittance
+     0.8400000    ,  !- IR Emissivity: Front Side
+     0.8400000    ,  !- IR Emissivity: Back Side
+     0.9000000    ;  !- Conductivity {W/m-K}
+
+ WindowMaterial:Shade, ROLL SHADE,  !- Material Name
+     0.3          ,   !- Solar Transmittance at normal incidence
+     0.5000000    ,   !- Solar Reflectance (same for front and back side)
+     0.3          ,   !- Visible Transmittance at normal incidence
+     0.5000000    ,   !- Visible reflectance (same for front and back side)
+     0.9000000    ,   !- IR Emissivity (same for front and back side)
+     0.05         ,   !- IR Transmittance
+     0.003        ,   !- Thickness
+     0.1          ,   !- Conductivity {W/m-K}
+     0.0          ,   !- Top Opening Multiplier
+     0.0          ,   !- Bottom Opening Multiplier
+     0.5          ,   !- Left-Side Opening Multiplier
+     0.5          ,   !- Right-Side Opening Multiplier
+     0.0          ;   !- Air-Flow Permeability
+
+ Construction, SINGLE PANE WITH NO SHADE,  ! Name of construction without shade
+     GLASS - CLEAR SHEET 1 / 8 IN;  !- First material layer
+
+ Construction, SINGLE PANE WITH INT SHADE, ! Name of construction with shade
+     GLASS - CLEAR SHEET 1 / 8 IN,  !- First material layer
+     ROLL SHADE                  ;  !- Second material layer
+
+ WindowProperty:ShadingControl, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Control
+     InteriorShade,                !- Shading Type
+     SINGLE PANE WITH INT SHADE,   !- Name of construction with shading device
+     OnIfHighSolarOnWindow,        !- Shading Control Type
+     ,                             !- Schedule name
+     50.0,                         !- Setpoint {W/m2}
+     NO,                           !- Shading Control Is Scheduled
+     NO,                           !- Glare Control Is Active
+     ,                             !- Material Name of Shading Device
+     ,                             !- Type of Slat Angle Control for Blinds
+     ;                             !- Slat Angle Schedule Name
+
+ FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name
+     Window                   ,    !- Class
+     SINGLE PANE WITH NO SHADE,    !- Name of construction without shading device
+     Zn001:Wall001            ,    !- Base Surface Name
+     ,                             !- Target
+     0.5000000                ,    !- VF to Ground
+     CONTROL ON INCIDENT SOLAR,    !- Window Shading Control name
+     ,                             !- Frame/Divider name
+     1.0                      ,    !- Multiplier
+     4                        ,    !- Number of vertices (assumed rectangular)
+     0.548 ,  0.0 ,   2.5     ,    !- x,y,z of vertices {m}
+     0.548 ,  0.0 ,   0.5     ,
+     5.548 ,  0.0 ,   0.5     ,
+     5.548 ,  0.0 ,   2.5     ;
+
+ ! Example 2: Interior movable shade specified by giving name of shading device in WindowProperty:ShadingControl
+
+ WindowMaterial:Glazing, GLASS - CLEAR SHEET 1 / 8 IN,  !- Material Name
+     SpectralAverage,! Optical data type {SpectralAverage or Spectral}
+     ,               ! Name of spectral data set when Optical Data Type = Spectral
+     0.003        ,  !- Thickness {m}
+     0.837        ,  !- Solar Transmittance at Normal Incidence
+     0.075        ,  !- Solar Reflectance at Normal Incidence: Front Side
+     0.075        ,  !- Solar Reflectance at Normal Incidence: Back Side
+     0.898        ,  !- Visible Transmittance at Normal Incidence
+     0.081        ,  !- Visible Reflectance at Normal Incidence: Front Side
+     0.081        ,  !- Visible Reflectance at Normal Incidence: Back Side
+     0.0          ,  !- IR Transmittance
+     0.8400000    ,  !- IR Emissivity: Front Side
+     0.8400000    ,  !- IR Emissivity: Back Side
+     0.9000000    ;  !- Conductivity {W/m-K}
+
+ WindowMaterial:Shade, ROLL SHADE,  !- Material Name
+     0.3          ,   !- Solar Transmittance at normal incidence
+     0.5000000    ,   !- Solar Reflectance (same for front and back side)
+     0.3          ,   !- Visible Transmittance at normal incidence
+     0.5000000    ,   !- Visible reflectance (same for front and back side)
+     0.9000000    ,   !- IR Emissivity (same for front and back side)
+     0.05         ,   !- IR Transmittance
+     0.003        ,   !- Thickness
+     0.1          ,   !- Conductivity {W/m-K}
+     0.0          ,   !- Top Opening Multiplier
+     0.0          ,   !- Bottom Opening Multiplier
+     0.5          ,   !- Left-Side Opening Multiplier
+     0.5          ,   !- Right-Side Opening Multiplier
+     0.0          ;   !- Air-Flow Permeability
+
+ Construction, SINGLE PANE WITH NO SHADE,  ! Name of construction without shade
+     GLASS - CLEAR SHEET 1 / 8 IN;  !- First material layer
+
+ WINDOWPROPERTY:SHADINGCONTROL, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Control
+     InteriorShade,                !- Shading Type
+     ,                             !- Name of shaded construction
+     OnIfHighSolarOnWindow,        !- Shading Control Type
+     ,                             !- Schedule name
+     50.0,                         !- Setpoint {W/m2}
+     NO,                           !- Shading Control Is Scheduled
+     NO,                           !- Glare Control Is Active
+     ROLL SHADE,                   !- Material Name of Shading Device
+     ,                             !- Type of Slat Angle Control for Blinds
+     ;                             !- Slat Angle Schedule Name
+
+ FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name
+     Window                   ,    !- Class
+     SINGLE PANE WITH NO SHADE,    !- Name of construction without shade
+     Zn001:Wall001            ,    !- Base Surface Name
+     ,                             !- Target
+     0.5000000                ,    !- VF to Ground
+     CONTROL ON INCIDENT SOLAR,    !- Window Shading Control name
+     ,                             !- Frame/Divider name
+     1.0                      ,    !- Multiplier
+     4                        ,    !- Number of vertices (assumed rectangular)
+     0.548 ,  0.0 ,   2.5     ,    !- x,y,z of vertices {m}
+     0.548 ,  0.0 ,   0.5     ,
+     5.548 ,  0.0 ,   0.5     ,
+     5.548 ,  0.0 ,   2.5     ;
+</code></pre>
+
 <h3 id="windowpropertyframeanddivider">WindowProperty:FrameAndDivider</h3>
 <p>The WindowProperty:FrameAndDivider object is referenced by exterior windows that have</p>
 <ul>
