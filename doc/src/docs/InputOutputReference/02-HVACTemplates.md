@@ -1771,31 +1771,31 @@ This input is the zone level cooling sizing ratio. The zone design cooling air f
 
 This numeric field defines the ratio of the heating coil to cooling coil size when autosizing is used. The model assumes that when used, this value will be greater than 1. This field supersedes the Rated Total Heating Capacity Sizing Ratio entered in the AirConditioner:VariableRefrigerantFlow object. If this field is left blank, the value entered in the parent object is used for sizing. If neither field is used, the sizing ratio is assumed to be 1.
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This field specifies the supply air flow rate when the terminal unit is operating in cooling mode. By entering Autosize, the supply air flow rate is automatically determined based on the loads experienced by the zone during the specified cooling SizingPeriod:DesignDay. If a value is entered, it will be multiplied by the Supply Air Sizing Factor and by zone multipliers. The units are in m3/s. The default is autosize.
 
-#### Field: Supply Air Flow Rate When No Cooling is Needed
+#### Field: No Cooling Supply Air Flow Rate
 
 This field specifies the supply air flow rate when the terminal unit’s cooling coil is not operating and the previous mode was cooling.. This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This field specifies the supply air flow rate when the heating coil is operating. By entering Autosize, the supply air flow rate is automatically determined based on the loads experienced by the zone during the specified heating SizingPeriod:DesignDay. If a value is entered, it will be multiplied by the Supply Air Sizing Factor and by zone multipliers. The units are in m3/s. The default is autosize.
 
-#### Field: Supply Air Flow Rate When No Heating is Needed
+#### Field: No Heating Supply Air Flow Rate
 
 This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
 
-#### Field: Outdoor Air Flow Rate During Cooling Operation
+#### Field: Cooling Outdoor Air Flow Rate
 
 This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in cooling mode.        If this field is set to autosize it will be sized based on the outdoor air inputs below, unless a dedicated outdoor air system is specified for this zone and then it will be set to zero.
 
-#### Field: Outdoor Air Flow Rate During Heating Operation
+#### Field: Heating Outdoor Air Flow Rate
 
 This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in heating mode. If this field is set to autosize it will be sized based on the outdoor air inputs below, unless a dedicated outdoor air system is specified for this zone and then it will be set to zero.
 
-#### Field: Outdoor Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Outdoor Air Flow Rate
 
 This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is not operating in cooling or heating mode. If this field is set to autosize it will be sized based on the outdoor air inputs below, unless a dedicated outdoor air system is specified for this zone and then it will be set to zero.
 
@@ -1937,95 +1937,52 @@ Enter autosize to allow the sizing algorithm to determine the proper capacity re
 
 As shown in an IDF:
 
-    ,                        !-
-
-  HVACTemplate:Zone:VRF,
-
-    SPACE1-1,                !- Zone Name
-
-    All Zones,               !- Template Thermostat Name
-
-    ,                        !- Zone Heating Sizing Factor
-
-    ,                        !- Zone Cooling Sizing Factor
-
-    ,                        !- Rated Total Heating Capacity Sizing Ratio
-
-    autosize,                !- Supply Air Flow Rate During Cooling Operation{m3/s}
-
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed{m3/s}
-
-    autosize,                !- Supply Air Flow Rate During Heating Operation{m3/s}
-
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed{m3/s}
-
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation{m3/s}
-
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation{m3/s}
-
-    autosize,    !- Outdoor Air Flow Rate When No Cooling or Heating is Needed{m3/s}
-
-    flow/person,             !- Outdoor Air Method
-
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-
-    ,            !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-
-    ,            !- Design Specification Outdoor Air Object Name
-
-    ,            !- Design Specification Zone Air Distribution Object Name
-
-    ,                        !- System Availability Schedule Name
-
-    ,                        !- Supply Fan Operating Mode Schedule Name
-
-    DrawThrough,             !- Supply Fan Placement
-
-    0.7,                     !- Supply Fan Total Efficiency
-
-    75,                      !- Supply Fan Delta Pressure {Pa}
-
-    0.9,                     !- Supply Fan Motor Efficiency
-
-    VariableRefrigerantFlowDX,  !- Cooling Coil Type
-
-    ,                        !- Cooling Coil Availability Schedule Name
-
-    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
-
-    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
-
-    VariableRefrigerantFlowDX,  !- Heat Pump Heating Coil Type
-
-    ,                        !- Heat Pump Heating Coil Availability Schedule Name
-
-    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
-
-    0,           !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-
-    0,           !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
-
-    ,                        !- Dedicated Outdoor Air System Name
-
- SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
-
-    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
-
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
-
- SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-
-    50.0,        !- Zone Heating Design Supply Air Temperature {C]
-
-    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
-
-    None,        !- Baseboard Heating Type
-
-    ,            !- Baseboard Heating Availability Schedule Name
-
-    Autosize;    !- Baseboard Heating Capacity {W}
+```idf
+HVACTemplate:Zone:VRF,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    ,                        !- Rated Total Heating Capacity Sizing Ratio
+    autosize,                !- Cooling Supply Air Flow Rate{m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate{m3/s}
+    autosize,                !- Heating Supply Air Flow Rate{m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate{m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate{m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate{m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate{m3/s}
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    ,            !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,            !- Design Specification Outdoor Air Object Name
+    ,            !- Design Specification Zone Air Distribution Object Name
+    ,                        !- System Availability Schedule Name
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    VariableRefrigerantFlowDX,  !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    VariableRefrigerantFlowDX,  !- Heat Pump Heating Coil Type
+    ,                        !- Heat Pump Heating Coil Availability Schedule Name
+    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
+    0,           !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
+    0,           !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Dedicated Outdoor Air System Name
+ SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,        !- Zone Cooling Design Supply Air Temperature {C}
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C}
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    None,        !- Baseboard Heating Type
+    ,            !- Baseboard Heating Availability Schedule Name
+    Autosize;    !- Baseboard Heating Capacity {W}
+```
 
 ### HVACTemplate:Zone:Unitary
 

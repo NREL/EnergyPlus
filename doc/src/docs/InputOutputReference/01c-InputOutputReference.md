@@ -9536,29 +9536,29 @@ OutdoorAir:Mixer
 
 This alpha field defines the name of an outdoor air mixer component which composes part of the PTAC. The return air node of the outdoor air mixer should also be the same node as the air inlet node of the PTAC. Furthermore, the outdoor air mixer’s mixed air node should be the same as the PTAC’s fan inlet air node (for blow through fan placement) or the PTAC’s DX cooling coil inlet node (for draw through fan placement).
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the air conditioner in cubic meters per second when the DX cooling coil is operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the air conditioner in cubic meters per second when the heating coil is operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the air conditioner in cubic meters per second when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).
 
-#### Field: Outdoor Air Flow Rate During Cooling Operation
+#### Field: Cooling Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate during cooling operation is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate during cooling operation cannot be greater than the air conditioner’s supply air volumetric flow rate during cooling operation.
+This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Cooling Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Cooling Outdoor Air Flow Rate cannot be greater than the air conditioner’s supply air volumetric flow rate during cooling operation.
 
-#### Field: Outdoor Air Flow Rate During Heating Operation
+#### Field: Heating Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the heating coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate during heating operation is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate during heating operation cannot be greater than the air conditioner’s supply air volumetric flow rate during heating operation.
+This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the heating coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Heating Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Heating Outdoor Air Flow Rate cannot be greater than the air conditioner’s supply air volumetric flow rate during heating operation.
 
-#### Field: Outdoor Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when neither cooling nor heating is required (i.e., cooling and heating coils are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate when no cooling/heating is needed cannot be greater than the air conditioner’s supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and the field ‘Supply air volumetric flow rate when no cooling or heating is needed’ is set to zero or is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation [i.e., Outdoor air Flow rate during cooling operation] or heating operation [i.e., Outdoor air flow rate during heating operation]) and this field is not used.
+This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when neither cooling nor heating is required (i.e., cooling and heating coils are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate when no cooling/heating is needed cannot be greater than the air conditioner’s supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and the field ‘Supply air volumetric flow rate when no cooling or heating is needed’ is set to zero or is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation [i.e., Cooling Outdoor Air Flow Rate] or heating operation [i.e., Heating Outdoor Air Flow Rate]) and this field is not used.
 
 #### Field: Supply Air Fan Object Type
 
@@ -9614,62 +9614,41 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Supply Air Flow Rate During Cooling Operation in this Packaged Terminal Air Conditioner  zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner  zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 As shown in the example below, correct specification of the packaged terminal air conditioner requires the following objects in addition to the compound object itself:
 
-1)   Fan (Fan:OnOff or Fan:ConstantVolume)
+1)�Fan (Fan:OnOff or Fan:ConstantVolume)
 
-2)   DX cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
+2)�DX cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
 
-3)   Heating coil (Coil:Heating:Gas, Coil:Heating:Electric, Coil:Heating:Water, or Coil:Heating:Steam)
+3)�Heating coil (Coil:Heating:Gas, Coil:Heating:Electric, Coil:Heating:Water, or Coil:Heating:Steam)
 
-4)   OutdoorAir:Mixer
+4)�OutdoorAir:Mixer
 
 
-
-  ZoneHVAC:PackagedTerminalAirConditioner,
-
-    Zone2PTAC,               !- Name
-
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-
-    Zone2PTACAirInletNode,   !- Air Inlet Node Name
-
-    Zone2PTACAirOutletNode,  !- Air Outlet Node Name
-
-    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
-
-    Zone2PTACOAMixer,        !- Outdoor Air Mixer Name
-
-    autosize,              !- Supply Air Flow Rate During Cooling Operation {m3/s}
-
-    autosize,              !- Supply Air Flow Rate During Heating Operation operation {m3/s}
-
-    autosize,              !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-
-    autosize,              !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-
-    autosize,              !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-
-    autosize,              !- Outdoor Air Flow Rate When No Cooling or Heating is Needed  {m3/s}
-
-    Fan:OnOff,                      !- Supply Air Fan Object Type
-
-    Zone2PTACFan,                          !- Supply Air Fan Name
-
-    Coil:Heating:Electric,                 !- Heating Coil Object Type
-
-    Zone2PTACHeatCoil,                     !- Heating Coil Name
-
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
-
-    Zone2PTACDXCoolCoil,                   !- Cooling Coil Name
-
-    BlowThrough,                           !- Fan Placement
-
-    SupplyFanSch;                          !- Supply Air Fan Operating Mode Schedule Name
-
+```idf
+ZoneHVAC:PackagedTerminalAirConditioner,
+    Zone2PTAC,               !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone2PTACAirInletNode,   !- Air Inlet Node Name
+    Zone2PTACAirOutletNode,  !- Air Outlet Node Name
+    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
+    Zone2PTACOAMixer,        !- Outdoor Air Mixer Name
+    autosize,              !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,              !- Heating Supply Air Flow Rate operation {m3/s}
+    autosize,              !- No Load Supply Air Flow Rate {m3/s}
+    autosize,              !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,              !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,              !- No Load Outdoor Air Flow Rate  {m3/s}
+    Fan:OnOff,                      !- Supply Air Fan Object Type
+    Zone2PTACFan,                          !- Supply Air Fan Name
+    Coil:Heating:Electric,                 !- Heating Coil Object Type
+    Zone2PTACHeatCoil,                     !- Heating Coil Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Zone2PTACDXCoolCoil,                   !- Cooling Coil Name
+    BlowThrough,                           !- Fan Placement
+    SupplyFanSch;                          !- Supply Air Fan Operating Mode Schedule Name
 
 
 Schedule:Compact,
@@ -9775,6 +9754,7 @@ Coil:Heating:Electric,
     Zone2PTACCoolCoilOutletNode, !- Air Inlet Node Name
 
     Zone2PTACAirOutletNode;      !- Air Outlet Node Name
+```
 
 ### Packaged Terminal Air Conditioner (PTAC) Outputs
 
@@ -9918,29 +9898,29 @@ OutdoorAir:Mixer
 
 This alpha field defines the name of an outdoor air mixer component which composes part of the PTHP. Note that the return air node of the outdoor air mixer should also be the same node as the air inlet node of the PTHP. Furthermore, the outdoor air mixer’s mixed air node should be the same as the PTHP’s fan inlet air node (for blow through fan placement) or the PTHP’s DX cooling coil inlet node (for draw through fan placement).
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). This field is only used when the heat pump’s supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the heat pump’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).
 
-####  Field: Outdoor Air Flow Rate During Cooling Operation
+####�Field: Cooling Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate during cooling operation is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate during cooling operation cannot be greater than the heat pump’s supply air volumetric flow rate during cooling operation.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Cooling Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Cooling Outdoor Air Flow Rate cannot be greater than the heat pump’s supply air volumetric flow rate during cooling operation.
 
-#### Field: Outdoor Air Flow Rate During Heating Operation
+#### Field: Heating Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate during heating operation is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate during heating operation cannot be greater than the heat pump’s supply air volumetric flow rate during heating operation.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Heating Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Heating Outdoor Air Flow Rate cannot be greater than the heat pump’s supply air volumetric flow rate during heating operation.
 
-#### Field: Outdoor Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate when no cooling/heating is needed cannot be greater than the heat pump’s supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the heat pump’s supply air fan operating mode schedule specifies continuous fan operation. If the heat pump’s supply air fan operating mode schedule specifies continuous fan operation and the field ‘Supply air volumetric flow rate when no cooling or heating is needed’ is set to zero or is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation [i.e., Outdoor air flow rate during cooling operation] or heating operation [i.e., Outdoor air flow rate during heating operation]) and this field is not used.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate when no cooling/heating is needed cannot be greater than the heat pump’s supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the heat pump’s supply air fan operating mode schedule specifies continuous fan operation. If the heat pump’s supply air fan operating mode schedule specifies continuous fan operation and the field ‘Supply air volumetric flow rate when no cooling or heating is needed’ is set to zero or is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation [i.e., Cooling Outdoor Air Flow Rate] or heating operation [i.e., Heating Outdoor Air Flow Rate]) and this field is not used.
 
 #### Field: Supply Air Fan Object Type
 
@@ -10036,78 +10016,51 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Supply Air Flow Rate During Cooling Operation in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
 As shown in the example below, correct specification of the packaged terminal heat pump requires the following objects in addition to the compound object itself:
 
-1)   Fan (Fan:OnOff or Fan:ConstantVolume)
+1)�Fan (Fan:OnOff or Fan:ConstantVolume)
 
-2)   DX cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
+2)�DX cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
 
-3)   DX heating coil (Coil:Heating:DX:SingleSpeed)
+3)�DX heating coil (Coil:Heating:DX:SingleSpeed)
 
-4)   Supplemental heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
+4)�Supplemental heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
 
-5)   OutdoorAir:Mixer
+5)�OutdoorAir:Mixer
 
+```idf
 ZoneHVAC:PackagedTerminalHeatPump,
-
-    Zone2PTHP,               !- Name
-
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-
-    Zone2PTHPAirInletNode,   !- Air Inlet Node Name
-
-    Zone2PTHPAirOutletNode,  !- Air Outlet Node Name
-
-    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
-
-    Zone2PTHPOAMixer,        !- Outdoor Air Mixer Name
-
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-
-    Fan:OnOff,               !- Supply Air Fan Object Type
-
-    Zone2PTHPFan,            !- Supply Air Fan Name
-
-    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
-
-    Zone2PTHPDXHeatCoil,     !- Heating Coil Name
-
-    0.001,                   !- Heating Convergence Tolerance {dimensionless}
-
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
-
-    Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
-
-    0.001,                   !- Cooling Convergence Tolerance {dimensionless}
-
-    Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
-
-    Zone2PTHPSupHeater,      !- Supplemental Heating Coil Name
-
-    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater {C}
-
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-
-    BlowThrough,             !- Fan Placement
-
-    CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
-
+    Zone2PTHP,               !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone2PTHPAirInletNode,   !- Air Inlet Node Name
+    Zone2PTHPAirOutletNode,  !- Air Outlet Node Name
+    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
+    Zone2PTHPOAMixer,        !- Outdoor Air Mixer Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
+    Fan:OnOff,               !- Supply Air Fan Object Type
+    Zone2PTHPFan,            !- Supply Air Fan Name
+    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
+    Zone2PTHPDXHeatCoil,     !- Heating Coil Name
+    0.001,                   !- Heating Convergence Tolerance {dimensionless}
+    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
+    0.001,                   !- Cooling Convergence Tolerance {dimensionless}
+    Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
+    Zone2PTHPSupHeater,      !- Supplemental Heating Coil Name
+    autosize,                !- Maximum Supply Air Temperature from Supplemental Heater {C}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+    BlowThrough,             !- Fan Placement
+    CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
 
 
 Schedule:Compact,
@@ -10251,6 +10204,8 @@ Coil:Heating:Electric,
     Zone2PTHPDXHeatCoilOutletNode, !- Air Inlet Node Name
 
     Zone2PTHPAirOutletNode;      !- Air Outlet Node Name
+```
+
 
 ### Packaged Terminal Heat Pump (PTHP) Outputs
 
@@ -10472,29 +10427,29 @@ OutdoorAir:Mixer
 
 This alpha field defines the name of an outdoor air mixer component which composes part of the zone WaterToAirHeatPump. The return air stream node of the outdoor air mixer should also be the same node as the air inlet node of the WaterToAirHeatPump. Furthermore, the outdoor air mixer’s mixed air node should be the same as the WaterToAirHeatPump’s fan inlet air node (for blow through fan placement) or the WaterToAirHeatPump’s cooling coil inlet node (for draw through fan placement).
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). This field is only used when the heat pump’s supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the heat pump’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).
 
-#### Field: Outdoor Air Flow Rate During Cooling Operation
+#### Field: Cooling Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during cooling operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during cooling operation cannot be greater than the heat pump’s supply air volumetric flow rate during cooling operation.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during cooling operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during cooling operation cannot be greater than the heat pump’s supply air flow rate during cooling operation.
 
-#### Field: Outdoor Air Flow Rate During Heating Operation
+#### Field: Heating Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during heating operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during heating operation cannot be greater than the heat pump’s supply air volumetric flow rate during heating operation.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during heating operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during heating operation cannot be greater than the heat pump’s supply air flow rate during heating operation.
 
-#### Field: Outdoor Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Outdoor Air Flow Rate When No Cooling or Heating is Needed
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outside air flow rate when no cooling/heating is needed cannot be greater than the heat pump’s supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the heat pump’s supply air fan operating mode schedule specifies continuous fan operation. If the heat pump’s supply air fan operating mode schedule specifies continuous fan operation and the field ‘Supply air volumetric flow rate when no cooling or heating is needed’ is set to zero or is left blank, then the model assumes that the outside air flow rate when no cooling/heating is needed is equal to the outside air flow rate when the cooling or heating coil was last operating (for cooling operation [i.e., Outside air volumetric flow rate during cooling operation] or heating operation [i.e., Outside air volumetric flow rate during heating operation]) and this field is not used.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the no load outdoor air flow rate cannot change during the simulation. In addition, the no load outdoor air flow rate cannot be greater than the heat pump�s no load supply air flow rate. This field is only used when the heat pump�s supply air fan operating mode schedule specifies continuous fan operation. If the heat pump�s supply air fan operating mode schedule specifies continuous fan operation and the field �No Load Supply Air Flow Rate� is set to zero or is left blank, then the model assumes that the no load outdoor air flow rate is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation [i.e., Cooling outdoor air flow rate] or heating operation [i.e., Heating outdoor air flow rate]) and this field is not used.
 
 #### Field: Supply Air Fan Object Type
 
@@ -10528,7 +10483,7 @@ This numeric field contains the maximum on-off cycling rate for the compressor, 
 
 #### Field: Heat Pump Time Constant
 
-This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
+This numeric field contains the time constant for the cooling coil�s capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
 ![](InputOutputReference/media/image290.svg)
 
@@ -10606,81 +10561,51 @@ This field specifies the way in which water flow through the heat pump coils wil
 
 - CyclingOnDemand
 
-**Cycling** varies water flow through the coil based on the heat pump Part Load Ratio.  This control method is appropriate for modeling heat pumps that are outfitted with a soleniod valve which allows water to flow through the coil only when the compressor is active. This is the default for EnergyPlus V8 and later.
+**Cycling** varies water flow through the coil based on the heat pump Part Load Ratio.� This control method is appropriate for modeling heat pumps that are outfitted with a soleniod valve which allows water to flow through the coil only when the compressor is active. This is the default for EnergyPlus V8 and later.
 
-**Constant** provides a constant water flow regardless of heat pump operation.  Remember that EnergyPlus has two coils (a heating coil and a cooling coil) to approximate the operation of one coil that can operate in either heating mode or cooling mode.  Therefore, when the water flow mode is constant, there will be full flow through either the heating coil or the cooling coil, but not both at the same time.
+**Constant** provides a constant water flow regardless of heat pump operation.� Remember that EnergyPlus has two coils (a heating coil and a cooling coil) to approximate the operation of one coil that can operate in either heating mode or cooling mode.� Therefore, when the water flow mode is constant, there will be full flow through either the heating coil or the cooling coil, but not both at the same time.
 
-**ConstantOnDemand** provides full flow through the coil whenever there is a load.  When there is no load, there is zero flow through the coil.  This control strategy represents the way EnergyPlus modeled heat pump water flow prior to Version 8.
+**ConstantOnDemand** provides full flow through the coil whenever there is a load.� When there is no load, there is zero flow through the coil.  This control strategy represents the way EnergyPlus modeled heat pump water flow prior to Version 8.
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Supply Air Flow Rate During Cooling Operation in this Water To Air Heat Pump zone HVAC object.  The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Water To Air Heat Pump zone HVAC object.� The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
 Examples of IDF use:
 
-**ZoneHVAC:WaterToAirHeatPump**,
-
-    Zone1WTAHP,               !- Name
-
-    FanAndCoilAvailSched,     !- Availability Schedule Name
-
-    Zone 1 Outlet Node,       !- Air Inlet Node Name
-
-    Zone 1 Inlet Node,        !-Air Outlet Node Name
-
-    OutdoorAir:Mixer,         !- Outdoor air mixer object type
-
-    Zone 1 Mixer,             !- Outdoor Air Mixer Name
-
-    Autosize,                 !- Supply Air Flow Rate During Cooling Operation {m3/s}
-
-    Autosize,                 !- Supply Air Flow Rate During Heating Operation {m3/s}
-
-    ,                         !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-
-    0.0,                      !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-
-    0.0,                      !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-
-    ,                         !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-
-    Fan:OnOff,                !- Supply Air Fan Object Type
-
-    Zone 1 Fan,               !- Supply Air Fan Name
-
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
-
-    Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
-
-    Coil:Cooling:WaterToAirHeatPump:EquationFit, !- Cooling Coil Object Type
-
-    Sys 1 Heat Pump Cooling Mode, !- Cooling Coil Name
-
-    2.5,                      !- Maximum Cycling Rate
-
-    60.0,                     !- Heat Pump Time Constant
-
-    0.01,                     !- Fraction of On-Cycle Power Use
-
-    60,                       !- Heat Pump Fan Delay Time
-
-    Coil:Heating:Gas,         !- Supplemental Heating Coil Object Type
-
-    Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name
-
-    60.0,                  !- Maximum Supply Air Temperature from Supplemental Heater {C}
-
-    20.0,                  !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-
-    Sys 1 Outside Air Inlet Node, !- Outdoor Dry-Bulb Temperature Sensor Node Name
-
-    BlowThrough,              !- Fan Placement
-
-    CyclingFanSch;            !- Supply Air Fan Operating Mode Schedule Name
-
-
+```idf
+ZoneHVAC:WaterToAirHeatPump,
+    Zone1WTAHP,               !- Name
+    FanAndCoilAvailSched,     !- Availability Schedule Name
+    Zone 1 Outlet Node,       !- Air Inlet Node Name
+    Zone 1 Inlet Node,        !- Air Outlet Node Name
+    OutdoorAir:Mixer,         !- Outdoor air mixer object type
+    Zone 1 Mixer,             !- Outdoor Air Mixer Name
+    Autosize,                 !- Cooling Supply Air Flow Rate {m3/s}
+    Autosize,                 !- Heating Supply Air Flow Rate {m3/s}
+    ,                         !- No Load Supply Air Flow Rate {m3/s}
+    0.0,                      !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.0,                      !- Heating Outdoor Air Flow Rate {m3/s}
+    ,                         !- No Load Outdoor Air Flow Rate {m3/s}
+    Fan:OnOff,                !- Supply Air Fan Object Type
+    Zone 1 Fan,               !- Supply Air Fan Name
+    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
+    Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
+    Coil:Cooling:WaterToAirHeatPump:EquationFit, !- Cooling Coil Object Type
+    Sys 1 Heat Pump Cooling Mode, !- Cooling Coil Name
+    2.5,                      !- Maximum Cycling Rate
+    60.0,                     !- Heat Pump Time Constant
+    0.01,                     !- Fraction of On-Cycle Power Use
+    60,                       !- Heat Pump Fan Delay Time
+    Coil:Heating:Gas,         !- Supplemental Heating Coil Object Type
+    Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name
+    60.0,                  !- Maximum Supply Air Temperature from Supplemental Heater {C}
+    20.0,                  !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+    Sys 1 Outside Air Inlet Node, !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    BlowThrough,              !- Fan Placement
+    CyclingFanSch;            !- Supply Air Fan Operating Mode Schedule Name
 
 Schedule:Compact,
 
@@ -10829,7 +10754,7 @@ Schedule:Compact,
     Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
 
     ACTIVE;  !- Component 1 Branch Control Type
-
+```
 
 
 ### Water to Air Heat Pump (ZoneHVAC) Outputs
@@ -11574,31 +11499,31 @@ This alpha field defines the name of the terminal unit air inlet node. This node
 
 This alpha field defines the name of the terminal unit air outlet node. This node name should be the same as a zone inlet node (ref: ZoneHVAC:EquipmentConnections).
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This numeric field defines the terminal unit’s operating volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in cooling mode.
 
-#### Field: Supply Air Flow Rate When No Cooling is Needed
+#### Field: No Cooling Supply Air Flow Rate
 
 This numeric field defines the terminal unit’s operating volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit’s cooling coil is not operating and the previous mode was cooling.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field defines the terminal unit’s operating volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in heating mode.
 
-#### Field: Supply Air Flow Rate When No Heating is Needed
+#### Field: No Heating Supply Air Flow Rate
 
 This numeric field defines the terminal unit’s operating volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit’s heating coil is not operating and the previous mode was heating.
 
-#### Field: Outdoor Air Flow Rate During Cooling Operation
+#### Field: Cooling Outdoor Air Flow Rate
 
 This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in cooling mode.
 
-#### Field: Outdoor Air Flow Rate During Heating Operation
+#### Field: Heating Outdoor Air Flow Rate
 
 This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in heating mode.
 
-#### Field: Outdoor Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Outdoor Air Flow Rate
 
 This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is not operating in cooling or heating mode.
 
@@ -11664,65 +11589,40 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Supply Air Flow Rate During Cooling Operation in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
 Following is an example input for a ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object.
 
+```idf
 ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
-
-    Zone 1 TU,               !-Zone Terminal Unit Name
-
-    TU Availability Schedule,!- Terminal Unit Availability schedule
-
-    TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name
-
-   TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-
-    0.005,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}
-
-    0,                       !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-
-    0.005,                   !- Supply Air Flow Rate During Heating Operation {m3/s}
-
-    0,                       !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-
-    0.001,                   !- Outdoor Air Flow Rate During Cooling Operation
-
-    0.001,                   !- Outdoor Air Flow Rate During Heating Operation
-
-    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed
-
-    TU1 Fan Op Schedule,     !- Supply Air Fan Operating Mode Schedule Name
-
-   drawthrough,             !- Supply Air Fan placement
-
-    Fan:ConstantVolume,      !- Supply Air Fan Object Type
-
-    TU1 SA Fan,              !- Supply Air Fan Object Name
-
-    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
-
-    TU1 OA Mixer,            !- Outside Air Mixer Object Name
-
-    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type
-
-    TU1 VRF DX Cooling Coil, !- Cooling Coil Object Name
-
-    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
-
-    TU1 VRF DX Heating Coil, !- Heating Coil Object Name
-
-    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-
-    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
-
-    ,                        !- Rated Total Heating Capacity Sizing Ratio {W/W}
-
-    ;                        !- Availability Manager List Name
-
-
+    Zone 1 TU,               !- Zone Terminal Unit Name
+    TU Availability Schedule,!- Terminal Unit Availability schedule
+    TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name
+    TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name
+    0.005,                   !- Cooling Supply Air Flow Rate {m3/s}
+    0,                       !- No Cooling Supply Air Flow Rate {m3/s}
+    0.005,                   !- Heating Supply Air Flow Rate {m3/s}
+    0,                       !- No Heating Supply Air Flow Rate {m3/s}
+    0.001,                   !- Cooling Outdoor Air Flow Rate
+    0.001,                   !- Heating Outdoor Air Flow Rate
+    0,                       !- No Load Outdoor Air Flow Rate
+    TU1 Fan Op Schedule,     !- Supply Air Fan Operating Mode Schedule Name
+    drawthrough,             !- Supply Air Fan placement
+    Fan:ConstantVolume,      !- Supply Air Fan Object Type
+    TU1 SA Fan,              !- Supply Air Fan Object Name
+    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
+    TU1 OA Mixer,            !- Outside Air Mixer Object Name
+    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type
+    TU1 VRF DX Cooling Coil, !- Cooling Coil Object Name
+    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
+    TU1 VRF DX Heating Coil, !- Heating Coil Object Name
+    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Total Heating Capacity Sizing Ratio {W/W}
+    ;                        !- Availability Manager List Name
+```
 
 ### Variable Refrigerant Flow (VRF) Terminal Unit (ZoneHVAC) Outputs
 
@@ -11759,9 +11659,6 @@ HVAC,Average,Zone VRF Air Terminal Heating Electric Power [W]
 HVAC,Sum,Zone VRF Air Terminal Heating Electric Energy [J]
 
 HVAC,Average, Zone VRF Air Terminal Fan Availability Status []
-
-
-
 
 
 #### Zone VRF Air Terminal Total Cooling Rate [W]
@@ -12421,73 +12318,73 @@ Coil:Heating:Steam
 
 This alpha field contains the identifying name given to the unitary system reheat coil.
 
-#### Field: Supply Air Flow Rate Method During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate Method
 
-This alpha field defines the supply air flow method during cooling operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FlowPerCoolingCapacity. For each of the choices, corresponding air flow rate for cooling must be specified.
+This alpha field defines the supply air flow method during cooling operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FlowPerCoolingCapacity. For each of the choices, a corresponding air flow rate for cooling must be specified.
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
-This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Cooling Operation is **SupplyAirFlowRate**.
+This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is **SupplyAirFlowRate**.
 
-#### Field: Supply Air Flow Rate Per Floor Area During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate Per Floor Area
 
-This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Cooling Operation is **FlowPerFloorArea**.
+This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is **FlowPerFloorArea**.
 
-#### Field: Fraction of Autosized Design Cooling Supply Air Flow Rate
+#### Field: Cooling Fraction of Autosized Design Cooling Supply Air Flow Rate
 
-This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Cooling Operation is **FractionOfAutosizedCoolingValue**.
+This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is **FractionOfAutosizedCoolingValue**.
 
-#### Field: Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate Per Unit of Capacity
 
-This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Cooling Operation is **FlowPerCoolingCapacity**.
+This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is **FlowPerCoolingCapacity**.
 
-#### Field: Supply Air Flow Rate Method During Heating Operation
+#### Field: Heating Supply Air Flow Rate Method
 
-This alpha field defines the supply air flow method during heating operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedHeatingValue, FlowPerHeatingCapacity. For each of the choices, corresponding air flow rate for heating must be specified.
+This alpha field defines the supply air flow method during heating operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedHeatingValue, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate for heating must be specified.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
-This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Heating Operation is **SupplyAirFlowRate**.
+This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is **SupplyAirFlowRate**.
 
-#### Field: Supply Air Flow Rate Per Floor Area During Heating Operation
+#### Field: Heating Supply Air Flow Rate Per Floor Area
 
-This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Heating Operation is **FlowPerFloorArea**.
+This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is **FlowPerFloorArea**.
 
-#### Field: Fraction of Autosized Design Heating Supply Air Flow Rate
+#### Field: Heating Fraction of Autosized Design Heating Supply Air Flow Rate
 
-This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Heating Operation is **FractionOfAutosizedHeatingValue**.
+This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is **FractionOfAutosizedHeatingValue**.
 
-#### Field: Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation
+#### Field: Heating Supply Air Flow Rate Per Unit of Capacity
 
-This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Heating Operation is **FlowPerHeatingCapacity**.
+This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is **FlowPerHeatingCapacity**.
 
-#### Field: Supply Air Flow Rate Method When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate Method
 
-This alpha field defines the supply air flow method when neither cooling or heating is required. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity. For each of the choices, corresponding air flow rate must be specified.
+This alpha field defines the supply air flow method when neither cooling or heating is required. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate must be specified.
 
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
 
-#### Field: Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate Per Floor Area
 
-This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Heating Operation is **FlowPerFloorArea**.
+This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method During is **FlowPerFloorArea**.
 
-#### Field: Fraction of Autosized Design Cooling Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Fraction of Autosized Cooling Supply Air Flow Rate
 
-This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Cooling Operation is **FractionOfAutosizedCoolingValue**.
+This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is **FractionOfAutosizedCoolingValue**.
 
-#### Field: Fraction of Autosized Design Heating Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Fraction of Autosized Heating Supply Air Flow Rate
 
-This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Heating Operation is **FractionOfAutosizedHeatingValue**.
+This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is **FractionOfAutosizedHeatingValue**.
 
-#### Field: Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
 
-This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when neither cooling or heating is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Cooling Operation is **FlowPerCoolingCapacity**.
+This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when neither cooling or heating is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is **FlowPerCoolingCapacity**.
 
-#### Field: Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation
 
-This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when neither cooling or heating is operating. Values must be greater than 0 or this field is autosizable. Required field when Supply Air Flow Rate Method During Heating Operation is **FlowPerHeatingCapacity**.
+This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when neither cooling or heating is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is **FlowPerHeatingCapacity**.
 
 #### Field: Maximum Supply Air Temperature
 
@@ -12561,150 +12458,85 @@ This alpha field contains the identifying name for the design specification mult
 
 As shown in the example below, correct specification of the heat/cool unitary system requires specification of the following objects in addition to the unitary system object:
 
-1)   Fan (Fan:OnOff or Fan:ConstantVolume)
+1)�Fan (Fan:OnOff or Fan:ConstantVolume)
 
-2)   Cooling coil
+2)�Cooling coil
 
-3)   Heating coil
+3)�Heating coil
 
-4)   Reheat coil
+4)�Reheat coil
 
-5)   Direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the unitary system
+5)�Direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the unitary system
 
- AirLoopHVAC:UnitarySystem,
-
-   DXAC Heat Pump 1,        !- Name
-
-   Load,                    !- Control Type
-
-   East Zone,               !- Controlling Zone or Thermostat Location
-
-   ,                        !- Dehumidification Control Type
-
-   FanAndCoilAvailSched,    !- Availability Schedule Name
-
-   Mixed Air Node,          !- Air Inlet Node Name
-
-   Air Loop Outlet Node,    !- Air Outlet Node Name
-
-   Fan:OnOff,               !- Supply Air Fan Object Type
-
-   Supply Fan 1,            !- Supply Air Fan Name
-
-   BlowThrough,             !- Fan Placement
-
-   FanModeSchedule,         !- Supply Air Fan Operating Mode Schedule Name
-
-   Coil:Heating:DX:MultiSpeed,  !- Heating Coil Object Type
-
-   Heat Pump DX Heating Coil 1, !- Heating Coil Name
-
-   ,                            !- DX Heating Coil Sizing Ratio
-
-   Coil:Cooling:DX:MultiSpeed,  !- Cooling Coil Object Type
-
-   Heat Pump ACDXCoil 1,    !- Cooling Coil Name
-
-   ,                        !- Use DOAS DX Cooling Coil
-
-   ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature
-
-   ,                        !- Latent Load Control
-
-   Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
-
-   Supp Gas Heating Coil 1, !- Supplemental Heating Coil Name
-
-   SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
-
-   1.7,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-
-   ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Opertation
-
-   ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-
-   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
-
-   SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Heating Operation
-
-   1.7,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
-
-   ,                        !- Supply Air Flow Rate Per Floor Area During Heating Opertation
-
-   ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-
-   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation
-
-   SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-
-   0.2,                     !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
-
-   ,                        !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required
-
-   ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-
-   ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-
-   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
-
-   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation
-
-   50,                      !- Maximum Supply Air Temperature {C}
-
-   21,  !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
-
-   ,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
-
-   ,  !- Maximum Cycling Rate
-
-   ,  !- Heat Pump Time Constant
-
-   ,  !- Fraction of On-Cycle Power Use
-
-   ,  !- Heat Pump Fan Delay Time
-
-   ,  !- Ancilliary On-Cycle Electric Power
-
-   ,  !- Ancilliary Off-Cycle Electric Power
-
-   ,  !- Design Heat Recovery Water Flow Rate
-
-   ,  !- Maximum Temperature for Heat Recovery (Maximum Heat Recovery Outlet Temperature?)
-
-   ,  !- Heat Recovery Water Inlet Node Name
-
-   ,  !- Heat Recovery Water Outlet Node Name
-
-   UnitarySystemPerformance:HeatPump:Multispeed,  !- Design Specification Multispeed Heat Pump Object Type
-
-   MyMultispeedHPSpec;  !- Design Specification Multispeed Heat Pump Object Name
-
-
+```idf
+AirLoopHVAC:UnitarySystem,
+   DXAC Heat Pump 1,        !- Name
+   Load,                    !- Control Type
+   East Zone,               !- Controlling Zone or Thermostat Location
+   ,                        !- Dehumidification Control Type
+   FanAndCoilAvailSched,    !- Availability Schedule Name
+   Mixed Air Node,          !- Air Inlet Node Name
+   Air Loop Outlet Node,    !- Air Outlet Node Name
+   Fan:OnOff,               !- Supply Air Fan Object Type
+   Supply Fan 1,            !- Supply Air Fan Name
+   BlowThrough,             !- Fan Placement
+   FanModeSchedule,         !- Supply Air Fan Operating Mode Schedule Name
+   Coil:Heating:DX:MultiSpeed,  !- Heating Coil Object Type
+   Heat Pump DX Heating Coil 1, !- Heating Coil Name
+   ,                            !- DX Heating Coil Sizing Ratio
+   Coil:Cooling:DX:MultiSpeed,  !- Cooling Coil Object Type
+   Heat Pump ACDXCoil 1,    !- Cooling Coil Name
+   ,                        !- Use DOAS DX Cooling Coil
+   ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature
+   ,                        !- Latent Load Control
+   Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+   Supp Gas Heating Coil 1, !- Supplemental Heating Coil Name
+   SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
+   1.7,                     !- Cooling Supply Air Flow Rate {m3/s}
+   ,                        !- Cooling Supply Air Flow Rate Per Floor Area
+   ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+   ,                        !- Cooling Supply Air Flow Rate Per Unit of Cooling Capacity
+   SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
+   1.7,                     !- Heating Supply Air Flow Rate {m3/s}
+   ,                        !- Heating Supply Air Flow Rate Per Floor Area
+   ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+   ,                        !- Heating Supply Air Flow Rate Per Unit of Heating Capacity
+   SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
+   0.2,                     !- No Load Supply Air Flow Rate {m3/s}
+   ,                        !- No Load Supply Air Flow Rate Per Floor Area
+   ,                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
+   ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
+   ,                        !- No Load Supply Air Flow Rate Per Unit of Cooling Capacity
+   ,                        !- No Load Supply Air Flow Rate Per Unit of Heating Capacity
+   50,                      !- Maximum Supply Air Temperature {C}
+   21,  !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+   ,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
+   ,  !- Maximum Cycling Rate
+   ,  !- Heat Pump Time Constant
+   ,  !- Fraction of On-Cycle Power Use
+   ,  !- Heat Pump Fan Delay Time
+   ,  !- Ancilliary On-Cycle Electric Power
+   ,  !- Ancilliary Off-Cycle Electric Power
+   ,  !- Design Heat Recovery Water Flow Rate
+   ,  !- Maximum Temperature for Heat Recovery (Maximum Heat Recovery Outlet Temperature?)
+   ,  !- Heat Recovery Water Inlet Node Name
+   ,  !- Heat Recovery Water Outlet Node Name
+   UnitarySystemPerformance:HeatPump:Multispeed,  !- Design Specification Multispeed Heat Pump Object Type
+   MyMultispeedHPSpec;  !- Design Specification Multispeed Heat Pump Object Name
 
 UnitarySystemPerformance:HeatPump:Multispeed,
-
-   MyMultispeedHPSpec,      !- Name
-
-   4,                       !- Number of Speeds for Heating
-
-   4,                       !- Number of Speeds for Cooling
-
-   0.235294118,             !- Speed 1 Supply Air Flow Rate During Heating Operation {m3/s}
-
-   0.235294118,             !- Speed 1 Supply Air Flow Rate During Cooling Operation {m3/s}
-
-   0.470588235,             !- Speed 2 Supply Air Flow Rate During Heating Operation {m3/s}
-
-   0.470588235,             !- Speed 2 Supply Air Flow Rate During Cooling Operation {m3/s}
-
-   0.705882353,             !- Speed 3 Supply Air Flow Rate During Heating Operation {m3/s}
-
-   0.705882353,             !- Speed 3 Supply Air Flow Rate During Cooling Operation {m3/s}
-
-   1.0,                     !- Speed 4 Supply Air Flow Rate During Heating Operation {m3/s}
-
-   1.0;                     !- Speed 4 Supply Air Flow Rate During Cooling Operation {m3/s}
-
+   MyMultispeedHPSpec,      !- Name
+   4,                       !- Number of Speeds for Heating
+   4,                       !- Number of Speeds for Cooling
+   0.235294118,             !- Heating Speed 1 Supply Air Flow Rate {m3/s}
+   0.235294118,             !- Cooling Speed 1 Supply Air Flow Rate {m3/s}
+   0.470588235,             !- Heating Speed 2 Supply Air Flow Rate {m3/s}
+   0.470588235,             !- Cooling Speed 2 Supply Air Flow Rate {m3/s}
+   0.705882353,             !- Heating Speed 3 Supply Air Flow Rate {m3/s}
+   0.705882353,             !- Cooling Speed 3 Supply Air Flow Rate {m3/s}
+   1.0,                     !- Heating Speed 4 Supply Air Flow Rate {m3/s}
+   1.0;                     !- Cooling Speed 4 Supply Air Flow Rate {m3/s}
+```
 
 
 ### Unitary System (AirLoopHVAC) Outputs
@@ -12873,35 +12705,35 @@ This field defines the number of heating speeds for the heat pump, and must matc
 
 This field defines the number of cooling speeds for the heat pump, and must match the number of cooling speeds defined in the associated DX cooling coil. The value for this input field defines the number of airflow rate ratios that must be defined for cooling in the fields below. The minimum value for this field is one and the maximum value is the number specified in the coil object. If the cooling coil type used in the unitary system object is not a multispeed coil type, then this field should be 1.
 
-#### Field: Speed 1 Supply Air Flow Ratio During Heating Operation
+#### Field: Heating Speed 1 Supply Air Flow Ratio
 
 This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 1 (lowest speed). Values must be greater than 0.
 
-#### Field: Speed 1 Supply Air Flow Ratio During Cooling Operation
+#### Field: Cooling Speed 1 Supply Air Flow Ratio
 
 This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 1 (lowest speed). Values must be greater than 0.
 
-#### Field: Speed 2 Supply Air Flow Ratio During Heating Operation
+#### Field: Heating Speed 2 Supply Air Flow Ratio
 
 This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 2. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating speed 1.
 
-#### Field: Speed 2 Supply Air Flow Ratio During Cooling Operation
+#### Field: Cooling Speed 2 Supply Air Flow Ratio
 
 This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 2. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling speed 1.
 
-#### Field: Speed 3 Supply Air Flow Ratio During Heating Operation
+#### Field: Heating Speed 3 Supply Air Flow Ratio
 
 This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating speed 2.If the ‘Number of Speeds for Heating’ is less than 3, then this field can be left blank.
 
-#### Field: Speed 3 Supply Air Flow Ratio During Cooling Operation
+#### Field: Cooling Speed 3 Supply Air Flow Ratio
 
 This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling speed 2.If the ‘Number of Speeds for Cooling’ is less than 3, then this field can be left blank.
 
-#### Field: Speed 4 Supply Air Flow Ratio During Heating Operation
+#### Field: Heating Speed 4 Supply Air Flow Ratio
 
 This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 3.If the ‘Number of Speeds for Heating’ is less than 4, then this field can be left blank.
 
-#### Field: Speed 4 Supply Air Flow Ratio During Cooling Operation
+#### Field: Cooling Speed 4 Supply Air Flow Ratio
 
 This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 4. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 3.If the ‘Number of Speeds for Cooling’ is less than 4, then this field can be left blank.
 
@@ -12933,7 +12765,7 @@ This alpha field contains the furnace inlet node name.
 
 This alpha field contains the furnace outlet node name.
 
-***Field: Supply Air Fan Operating Mode Schedule Name***
+#### Field: Supply Air Fan Operating Mode Schedule Name
 
 This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the furnace supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.
 
@@ -12941,15 +12773,15 @@ This alpha field specifies the name of the supply air fan operating mode schedul
 
 This numeric field contains the design operating furnace air outlet temperature in degrees C when the furnace is heating. If this input field is left blank, the default value is 80 C.
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the furnace in cubic meters per second when the DX cooling coil is operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the furnace in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the furnace in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). This field is only used when the furnace operating mode is specified as continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the furnace operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
 
@@ -13031,56 +12863,38 @@ This alpha field contains the identifying name given to the furnace reheat coil.
 
 As shown in the example below, correct specification of the heat/cool furnace requires specification of the following objects in addition to the furnace object:
 
-1)   fan (Fan:OnOff or Fan:ConstantVolume)
+1)�fan (Fan:OnOff or Fan:ConstantVolume)
 
-2)   cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
+2)�cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
 
-3)   heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
+3)�heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
 
-4)   reheat coil (optional, Coil:Heating:Gas, Coil:Heating:Electric, or Coil:Heating:Desuperheater)
+4) reheat coil (optional, Coil:Heating:Gas, Coil:Heating:Electric, or Coil:Heating:Desuperheater)
 
-5)   terminal unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
+5) terminal unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
 
 Note: the furnace’s fan, cooling coil, heating coil and optional reheat coil must be connected in the air loop according to the configuration shown above (Figure 116) when CoolReheat is selected as the dehujmidificaiton control type. In addition, the volumetric air flow rate specified in the terminal air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the furnace object.
 
+```idf
 AirLoopHVAC:Unitary:Furnace:HeatCool,
-
-    GasHeat DXAC Furnace 1, !- Name of furnace
-
-    FanAndCoilAvailSched,   !- Availability schedule
-
-    Air Loop Inlet Node,    !- Furnace inlet node name
-
-    Air Loop Outlet Node,   !- Furnace outlet node name
-
-    CycFanSchedule,         !- Supply Air Fan Operating Mode Schedule Name
-
-    80,        !- Maximum supply air temperature from furnace heater {C}
-
-    1.3,       !- Supply air volumetric flow rate during cooling operation {m3/s}
-
-    1.3,       !- Supply air volumetric flow rate during heating operation {m3/s}
-
-    0.0,       !- Design air volumetric flow rate when no heating or cooling is needed {m3/s}
-
-    East Zone, !- Controlling zone or thermostat location
-
-    Fan:OnOff,       !- Supply fan type
-
-    Supply Fan 1,           !- Supply fan name
-
-    BlowThrough,            !- Fan Placement
-
-    Coil:Heating:Gas,       !- Heating coil type
-
-    Furnace Heating Coil 1, !- Heating coil name
-
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
-
-    Furnace ACDXCoil 1,     !- Cooling coil name
-
-    None;                   !- Dehumidificatioin Control Type
-
+    GasHeat DXAC Furnace 1, !- Name of furnace
+    FanAndCoilAvailSched,   !- Availability schedule
+    Air Loop Inlet Node,    !- Furnace inlet node name
+    Air Loop Outlet Node,   !- Furnace outlet node name
+    CycFanSchedule,         !- Supply Air Fan Operating Mode Schedule Name
+    80,                     !- Maximum supply air temperature from furnace heater {C}
+    1.3,                    !- Cooling Supply Air Flow Rate {m3/s}
+    1.3,                    !- Heating Supply Air Flow Rate {m3/s}
+    0.0,                    !- No Load Supply Air Flow Rate {m3/s}
+    East Zone,              !- Controlling zone or thermostat location
+    Fan:OnOff,              !- Supply fan type
+    Supply Fan 1,           !- Supply fan name
+    BlowThrough,            !- Fan Placement
+    Coil:Heating:Gas,       !- Heating coil type
+    Furnace Heating Coil 1, !- Heating coil name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
+    Furnace ACDXCoil 1,     !- Cooling coil name
+    None;                   !- Dehumidificatioin Control Type
 
 
 Coil:Heating:Gas,
@@ -13186,6 +13000,7 @@ Coil:Heating:Gas,
     Zone 3 Inlet Node,     !- Zone Supply Air Node Name
 
    0.47;  !- Maximum air flow rate {m3/s}
+```
 
  Example of Heat/Cool Furnace Specification
 
@@ -13237,15 +13052,15 @@ This alpha field specifies the name of the supply air fan operating mode schedul
 
 This numeric field contains the design operating air outlet temperature in degrees C when the unitary system is heating. If this input field is left blank, the default value is 80 C.
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the DX cooling coil is operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
 
@@ -13339,47 +13154,27 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 
 Note: the unitary system’s fan, cooling coil, heating coil and optional reheat coil must be connected in the air loop according to the configuration shown above (Figure 117). In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the unitary system object.
 
+
+```idf
 AirLoopHVAC:Unitary:Furnace:HeatCool,
-
-    GasHeat DXAC Unitary System 1, !- Name of unitary system
-
-    FanAndCoilAvailSched,   !- Availability schedule
-
-    Air Loop Inlet Node,    !- Unitary system inlet node name
-
-    Air Loop Outlet Node,   !- Unitary system outlet node name
-
-    CycFanSchedule,         !- Supply Air Fan Operating Mode Schedule Name
-
-    80,        !- Maximum supply air temperature from unitary system heater {C}
-
-    1.3,       !- Supply air volumetric flow rate during cooling operation {m3/s}
-
-    1.3,       !- Supply air volumetric flow rate during heating operation {m3/s}
-
-    0.0,       !- Design air volumetric flow rate when no heating or cooling is needed {m3/s}
-
-    East Zone, !- Controlling zone or thermostat location
-
-    Fan:OnOff,       !- Supply fan type
-
-    Supply Fan 1,           !- Supply fan name
-
-    BlowThrough,            !- Fan Placement
-
-    Coil:Heating:Gas,       !- Heating coil type
-
-    Unitary System Heating Coil 1,   !- Heating coil name
-
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
-
-    Unitary System ACDXCoil 1,       !- Cooling coil name
-
-    None;        !- High humidity control
-
-
-
-
+    GasHeat DXAC Unitary System 1, !- Name of unitary system
+    FanAndCoilAvailSched,   !- Availability schedule
+    Air Loop Inlet Node,    !- Unitary system inlet node name
+    Air Loop Outlet Node,   !- Unitary system outlet node name
+    CycFanSchedule,         !- Supply Air Fan Operating Mode Schedule Name
+    80,                     !- Maximum supply air temperature from unitary system heater {C}
+    1.3,                    !- Cooling Supply Air Flow Rate {m3/s}
+    1.3,                    !- Heating Supply Air Flow Rate {m3/s}
+    0.0,                    !- No Load Supply Air Flow Rate {m3/s}
+    East Zone,              !- Controlling zone or thermostat location
+    Fan:OnOff,              !- Supply fan type
+    Supply Fan 1,           !- Supply fan name
+    BlowThrough,            !- Fan Placement
+    Coil:Heating:Gas,       !- Heating coil type
+    Unitary System Heating Coil 1,   !- Heating coil name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
+    Unitary System ACDXCoil 1,       !- Cooling coil name
+    None;        !- High humidity control
 
   Coil:Heating:Gas,
 
@@ -13488,7 +13283,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
     Zone 3 Inlet Node,     !- Zone Supply Air Node Name
 
    0.47;  !- Maximum air flow rate {m3/s}
-
+```
 
 
 Example of Heat/Cool Unitary System Specification
@@ -13533,15 +13328,15 @@ This alpha field contains the  name of the HVAC system node from which the heat
 
 This alpha field contains the  name of the HVAC system node to which the heat pump sends its outlet air.
 
-#### Field: Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than 0 or this field is autosizable.
 
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). This field is only used when the heat pump operating mode is specified as continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the heat pump operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
 
@@ -13649,11 +13444,11 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
 
       Air Loop Outlet Node,        ! Heat Pump air outlet  node
 
-      1.3,                  !- Supply air volumetric flow rate during cooling operation {m3/s}
+      1.3,                  !- Cooling Supply Air Flow Rate {m3/s}
 
-      1.3,                  !- Supply air volumetric flow rate during heating operation {m3/s}
+      1.3,                  !- Heating Supply Air Flow Rate {m3/s}
 
-      0.0,                  !- Design air volumetric flow rate when no heating or cooling is needed {m3/s}
+      0.0,                  !- No Load Suuply Air Flow Rate {m3/s}
 
       East Zone,                   ! Controlling zone or thermostat location
 
@@ -13985,7 +13780,7 @@ This alpha field contains the identifying name for the heat recovery side inlet 
 
 This alpha field contains the identifying name for the heat recovery side outlet node.
 
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when neither cooling nor heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). This field is only used when the heat pump supply air fan is scheduled to operate continuously regardless of DX coil operation (ref. field “Supply Air Fan Operating Mode Schedule). Values must be greater than or equal to zero, or this field is autosizable. If the heat pump supply air fan is scheduled to operate continuously and the input value for this field is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
 
@@ -13997,108 +13792,75 @@ This field defines the number of heating speeds for the heat pump, and must matc
 
 This field defines the number of cooling speeds for the heat pump, and must match the number of cooling speeds defined in the associated DX cooling coil. The value for this input field defines the number of airflow rates that must be defined for cooling in the field below. The minimum value for this field is two and the maximum value is four.
 
-#### Field: Speed 1 Supply Air Flow Rate During Heating Operation
+#### Field: Heating Speed 1 Supply Air Flow Rate
 
 This required numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating at Speed 1 (lowest speed). Values must be greater than 0 or this field is autosizable.
 
-#### Field: Speed 2 Supply Air Flow Rate During Heating Operation
+#### Field: Heating Speed 2 Supply Air Flow Rate
 
 This required numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating at Speed 2. Values must be greater than 0 or this field is autosizable. If not autosized, the entered value must be greater or equal to the flow rate specified for heating Speed 1.
 
-#### Field: Speed 3 Supply Air Flow Rate During Heating Operation
+#### Field: Heating Speed 3 Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating at Speed 3. Values must be greater than 0 or this field is autosizable. If not autosized, the entered value must be greater or equal to the flow rate specified for heating Speed 2. If the ‘Number of Speeds for Heating’ is less than 3, then this field can be left blank.
 
-#### Field: Speed 4 Supply Air Flow Rate During Heating Operation
+#### Field: Heating Speed 4 Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating at Speed 4 (high speed). Values must be greater than 0 or this field is autosizable. If not autosized, the entered value must be greater or equal to the flow rate specified for heating Speed 3. If the ‘Number of Speeds for Heating’ is less than 4, then this field can be left blank.
 
 **Note**: When autosizable is selected for any of the supply air volumetric flow rate fields, all supply air flow fields at the different speeds must be specified as autosizable. Otherwise, a fatal error will be issued and the simulation will terminate.
 
-#### Field: Speed 1 Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Speed 1 Supply Air Flow Rate
 
 This required numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX cooling coil is operating at Speed 1 (lowest speed). Values must be greater than 0 or this field is autosizable.
 
-#### Field: Speed 2 Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Speed 2 Supply Air Flow Rate
 
 This required numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX cooling coil is operating at Speed 2. Values must be greater than 0 or this field is autosizable. If not autosized, the entered value must be greater or equal to the flow rate specified for cooling Speed 1.
 
-#### Field: Speed 3 Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Speed 3 Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX cooling coil is operating at Speed 3. Values must be greater than 0 or this field is autosizable. If not autosized, the entered value must be greater or equal to the flow rate specified for cooling Speed 2. If the ‘Number of Speeds for Cooling’ is less than 3, then this field can be left blank.
 
-#### Field: Speed 4 Supply Air Flow Rate During Cooling Operation
+#### Field: Cooling Speed 4 Supply Air Flow Rate
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when the DX cooling coil is operating at Speed 4 (highest speed). Values must be greater than 0 or this field is autosizable. If not autosized, the entered value must be greater or equal to the flow rate specified for cooling Speed 3. If the ‘Number of Speeds for Cooling’ is less than 4, then this field can be left blank.
 
 Following is an example input for the object and its associated components.
 
+```idf
 AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
-
-    DXAC Heat Pump 1,        !- Name of multispeed heat pump
-
-    FanAndCoilAvailSched,    !- Availability schedule
-
-    Mixed Air Node,          !- Heat pump air inlet node name
-
-    Air Loop Outlet Node,    !- Heat pump air outlet node name
-
-    East Zone,               !- Controlling zone or thermostat location
-
-    Fan:OnOff,               !- Supply air fan type
-
-    Supply Fan 1,            !- Supply air fan name
-
-    BlowThrough,             !- Supply air fan placement
-
-    FanModeSchedule,         !- Supply air fan operating mode schedule name
-
-    Coil:Heating:DX:MultiSpeed, Heat Pump DX Heating Coil 1,  !- Heating coil type & name
-
-    -8.0,                    !- Minimum outdoor dry-bulb temperature for compressor operation
-
-    Coil:Cooling:DX:MultiSpeed, Heat Pump ACDXCoil 1,    !- Cooling coil type & name
-
-    Coil:Heating:Gas,        !- Supplemental heating coil type
-
-    Supp Gas Heating Coil 1, !- Supplemental heating coil name
-
-    50.0,                    !- Maximum supply air temperature from supplemental heater
-
-    21,                      !- Maximum outdoor dry-bulb temperature for supplemental heater operation
-
-    0,                       !- Auxiliary On-Cycle Electric Power {W}
-
-    0,                       !- Auxiliary Off-Cycle Electric Power {W}
-
-    0.00,                    !- Design Heat Recovery Water Flow Rate {m3/s}
-
-    80.0,,,                    !- Maximum Temp for Heat Recovery {C} & Node names (none)
-
-    0.2,                     !- Supply air volumetric flow rate when no cooling or heating is needed
-
-    4,                       !- Number of speeds for heating
-
-    4,                       !- Number of speeds for cooling
-
-    0.4,                     !- Supply air flow rate during heating operation, Speed 1
-
-    0.8,                     !- Supply air flow rate during heating operation, Speed 2
-
-    1.2,                     !- Supply air flow rate during heating operation, Speed 3
-
-    1.7,                     !- Supply air flow rate during heating operation, Speed 4
-
-    0.4,                     !- Supply air flow rate during cooling operation, Speed 1
-
-    0.8,                     !- Supply air flow rate during cooling operation, Speed 2
-
-    1.2,                     !- Supply air flow rate during cooling operation, Speed 3
-
-    1.7;                     !- Supply air flow rate during cooling operation, Speed 4
-
-
-
+    DXAC Heat Pump 1,        !- Name of multispeed heat pump
+    FanAndCoilAvailSched,    !- Availability schedule
+    Mixed Air Node,          !- Heat pump air inlet node name
+    Air Loop Outlet Node,    !- Heat pump air outlet node name
+    East Zone,               !- Controlling zone or thermostat location
+    Fan:OnOff,               !- Supply air fan type
+    Supply Fan 1,            !- Supply air fan name
+    BlowThrough,             !- Supply air fan placement
+    FanModeSchedule,         !- Supply air fan operating mode schedule name
+    Coil:Heating:DX:MultiSpeed, Heat Pump DX Heating Coil 1,  !- Heating coil type & name
+    -8.0,                    !- Minimum outdoor dry-bulb temperature for compressor operation
+    Coil:Cooling:DX:MultiSpeed, Heat Pump ACDXCoil 1,    !- Cooling coil type & name
+    Coil:Heating:Gas,        !- Supplemental heating coil type
+    Supp Gas Heating Coil 1, !- Supplemental heating coil name
+    50.0,                    !- Maximum supply air temperature from supplemental heater
+    21,                      !- Maximum outdoor dry-bulb temperature for supplemental heater operation
+    0,                       !- Auxiliary On-Cycle Electric Power {W}
+    0,                       !- Auxiliary Off-Cycle Electric Power {W}
+    0.00,                    !- Design Heat Recovery Water Flow Rate {m3/s}
+    80.0,,,                    !- Maximum Temp for Heat Recovery {C} & Node names (none)
+    0.2,                     !- Supply air volumetric flow rate when no cooling or heating is needed
+    4,                       !- Number of speeds for heating
+    4,                       !- Number of speeds for cooling
+    0.4,                     !- Heating Speed 1 Supply Air Flow Rate 
+    0.8,                     !- Heating Speed 2 Supply Air Flow Rate 
+    1.2,                     !- Heating Speed 3 Supply Air Flow Rate 
+    1.7,                     !- Heating Speed 4 Supply Air Flow Rate 
+    0.4,                     !- Cooling Speed 1 Supply Air Flow Rate 
+    0.8,                     !- Cooling Speed 2 Supply Air Flow Rate 
+    1.2,                     !- Cooling Speed 3 Supply Air Flow Rate 
+    1.7;                     !- Cooling Speed 4 Supply Air Flow Rate 
 
 
 Coil:Heating:DX:MultiSpeed,
@@ -14482,6 +14244,7 @@ AirTerminal:SingleDuct:Uncontrolled,
       Zone 3 Inlet Node,               ! zone supply air node name
 
      0.612;                           ! maximum air flow rate, m3/s
+```
 
 ### Unitary Air to Air MultiSpeed Heat Pump (AirLoopHVAC) Outputs
 
@@ -14643,7 +14406,7 @@ This alpha field specifies the name of the supply air fan operating mode schedul
 
 This numeric field contains the design operating furnace air outlet temperature in degrees C when the furnace is heating. If this input field is left blank, the default value is 80 C.
 
-#### Field: Supply Air Flow Rate
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field contains the design volumetric flow rate of the furnace in cubic meters per second. This volumetric flow rate should match the flow rate specified for the furnace fan.
 
@@ -14705,7 +14468,7 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
 
     80,                   !- Maximum Supply Air Temperature {C}
 
-    1.3,                  !- Supply Air Flow Rate {m3/s}
+    1.3,                  !- Heating Supply Air Flow Rate {m3/s}
 
     East Zone,            !- Controlling Zone or Thermostat Location
 
@@ -14865,7 +14628,7 @@ This alpha field specifies the name of the supply air fan operating mode schedul
 
 This numeric field contains the design  air outlet temperature in degrees C when the unitary system is heating. If this input field is left blank, the default value is 80 C.
 
-#### Field: Supply Air Flow Rate
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field contains the design volumetric flow rate of the unitary system in cubic meters per second. This volumetric flow rate should match the flow rate specified for the unitary system fan.
 
@@ -14913,6 +14676,7 @@ As shown in the example below, correct specification of the heat-only unitary sy
 
 Note: the unitary system’s fan and heating coil must be connected in the air loop according to the configuration shown above (Figure 121) when a blow through fan configuration is specified. If a draw through fan is used, the fan is located down stream of the heating coil. In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the unitary system object.
 
+```idf
 AirLoopHVAC:UnitaryHeatOnly,
 
     Gas Unitary System 1, !- Name
@@ -14927,7 +14691,7 @@ AirLoopHVAC:UnitaryHeatOnly,
 
     80,                   !- Maximum Supply Air Temperature {C}
 
-    1.3,                  !- Supply Air Flow Rate {m3/s}
+    1.3,                  !- Heating Supply Air Flow Rate {m3/s}
 
     East Zone,            !- Controlling Zone or Thermostat Location
 
@@ -15040,6 +14804,7 @@ Fan:OnOff,
     Zone 3 Inlet Node,    !- Zone Supply Air Node Name
 
    0.47;   !- Maximum air flow rate {m3/s}
+```
 
 Example of Heat-Only Unitary System Specification
 
@@ -15619,29 +15384,29 @@ This alpha field defines a unique user-assigned name for an instance of a change
 
 This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the system operates during a given time period. A schedule value equal to 0 denotes that the system must be off for that time period, and a schedule value greater than 0 denotes that the system is available to operate during that time period. This schedule may be used to completely disable the system (all of its coils and the supply air fan) as required. If this field is left blank, the schedule has a value of 1 for all time periods.
 
-#### Field: System Air Flow Rate During Cooling Operation
+#### Field: Cooling Supply Air Flow Rate
 
 This numeric field defines the air flow rate through the system (i.e., through the fan and heating/cooling coils) in cubic meters per second when the DX cooling coil is operating. Values must be greater than 0, or this field is autosizable.
 
-#### Field: System Air Flow Rate During Heating Operation
+#### Field: Heating Supply Air Flow Rate
 
 This numeric field defines the air flow rate through the system (i.e., through the fan and heating/cooling coils) in cubic meters per second when the heating coil is operating. Values must be greater than 0, or this field is autosizable.
 
-#### Field: System Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Supply Air Flow Rate
 
 This numeric field defines the air flow rate through the system (i.e., through the fan and heating/cooling coils) in cubic meters per second when neither cooling nor heating is required (i.e., the DX cooling coil and heating coil are off but the supply air fan operates). Values must be greater than or equal to zero, or this field is autosizable. This field is only used when the unitary system’s supply air fan operating mode is specified as continuous fan operation (Ref. Field: Supply air fan operating mode schedule name). If the system’s supply air fan operating mode is specified as continuous fan operation and this value is set to zero or the field is left blank, then the model assumes that the system air flow rate when no heating/cooling is needed is equal to the system air flow rate when the coils were last operating (for cooling operation or heating operation).
 
-#### Field: Outdoor Air Flow Rate During Cooling Operation
+#### Field: Cooling Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the system (i.e., through the Outdoor air Mixer’s Outside\_Air\_Stream\_Node) in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate during cooling operating can be changed during the simulation using a multiplier schedule (Ref. Field: Outdoor air volumetric flow rate multiplier schedule name). For any simulation timestep, the outdoor air flow rate during cooling operation cannot exceed the system air volumetric flow rate during cooling operation.
+This numeric field defines the outdoor air flow rate through the system (i.e., through the Outdoor air Mixer’s Outside\_Air\_Stream\_Node) in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Cooling Outdoor Air Flow Rate can be changed during the simulation using a multiplier schedule (Ref. Field: Outdoor air volumetric flow rate multiplier schedule name). For any simulation timestep, the Cooling Outdoor Air Flow Rate cannot exceed the system air volumetric flow rate during cooling operation.
 
-#### Field: Outdoor Air Flow Rate During Heating Operation
+#### Field: Heating Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air flow rate through the system (i.e., through the Outdoor air Mixer’s Outside\_Air\_Stream\_Node) in cubic meters per second when the heating coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate during heating operating can be changed during the simulation using a multiplier schedule (Ref. Field: Outdoor air volumetric flow rate multiplier schedule name). For any simulation timestep, the outdoor air flow rate during heating operation cannot exceed the system air volumetric flow rate during heating operation.
+This numeric field defines the outdoor air flow rate through the system (i.e., through the Outdoor air Mixer’s Outside\_Air\_Stream\_Node) in cubic meters per second when the heating coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Heating Outdoor Air Flow Rate can be changed during the simulation using a multiplier schedule (Ref. Field: Outdoor air volumetric flow rate multiplier schedule name). For any simulation timestep, the Heating Outdoor Air Flow Rate cannot exceed the system air volumetric flow rate during heating operation.
 
-#### Field: Outdoor Air Flow Rate When No Cooling or Heating is Needed
+#### Field: No Load Outdoor Air Flow Rate When No Cooling or Heating is Needed
 
-This numeric field defines the outdoor air flow rate through the system (i.e., through the Outdoor air Mixer’s Outside\_Air\_Stream\_Node) in cubic meters per second when neither cooling nor heating is required (i.e., the DX cooling coil and heating coil are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed can be changed during the simulation using a multiplier schedule (Ref. Field: Outdoor air volumetric flow rate multiplier schedule name). For any simulation timestep, the outdoor air flow rate when no cooling/heating is needed cannot exceed the system air volumetric flow rate when no cooling/heating is needed. This field is only used when the unitary system’s supply air fan operating mode is specified as continuous fan operation (Ref. Field: Supply air fan operating mode schedule name). If the system’s supply air fan operating mode is specified as continuous fan operation and this value is set to zero or the field is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the coils were last operating (for cooling operation [i.e. Outdoor air volumetric flow rate during cooling operation] or heating operation [i.e. Outdoor air volumetric flow rate during heating operation]) and this field is not used.
+This numeric field defines the outdoor air flow rate through the system (i.e., through the Outdoor air Mixer�s Outside_Air_Stream_Node) in cubic meters per second when neither cooling nor heating is required (i.e., the DX cooling coil and heating coil are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the no load outdoor air flow rate can be changed during the simulation using a multiplier schedule (Ref. Field: Outdoor air volumetric flow rate multiplier schedule name). For any simulation timestep, the no load outdoor air flow rate cannot exceed the no load supply air flow rate. This field is only used when the unitary system�s supply air fan operating mode is specified as continuous fan operation (Ref. Field: Supply air fan operating mode schedule name). If the system�s supply air fan operating mode is specified as continuous fan operation and this value is set to zero or the field is left blank, then the model assumes that the no load outdoor air flow rate is equal to the outdoor air flow rate when the coils were last operating (for cooling operation [i.e. Cooling outdoor air flow rate] or heating operation [i.e. Heating outdoor air flow rate]) and this field is not used.
 
 #### Field: Outdoor Air Flow Rate Multiplier Schedule Name
 
@@ -15779,63 +15544,35 @@ As shown in the example below, correct specification of the CBVAV unitary system
 
 Note: The fan, heating coil, cooling coil, and outdoor air mixer must be connected in the air loop according to the configurations shown above (Figure 123 and Figure 124).
 
+```idf
 AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
-
-    GasHeat CBVAV System,  !- Name of unitary system
-
-    FanAndCoilAvailSched,  !- Availability schedule name
-
-    1.8,                   !- System air volumetric flow rate during cooling operation {m3/s}
-
-    1.7,                   !- System air volumetric flow rate during heating operation {m3/s}
-
-    1.6,                   !- System air volumetric flow rate when no cooling or heating is needed {m3/s}
-
-    0.32,                  !- Outdoor air volumetric flow rate during cooling operation {m3/s}
-
-    0.3,                   !- Outdoor air volumetric flow rate during heating operation {m3/s}
-
-    0.27,                  !- Outdoor air volumetric flow rate when no cooling or heating is needed {m3/s}
-
-    Outdoor Air Multiplier Schedule, !- Outdoor air volumetric flow rate multiplier schedule name
-
-    Air Loop Inlet Node,     !- Air inlet node name
-
-    Mixer Inlet Node,        !- Bypass duct mixer node name
-
-    Heating Coil Air Outlet Node,    !- Bypass duct splitter node name
-
-    Air Loop Outlet Node,    !- Air outlet node name
-
-    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
-
-    Outdoor air Mixer,       !- Outdoor air mixer name
-
-    Fan:OnOff,        !- Supply air fan type
-
-    Supply Fan 1,            !- Supply air fan name
-
-    BlowThrough,            !- Supply air fan placement
-
-    Fan OpMode Schedule,     !- Supply air fan operating mode schedule name
-
-    Coil:Cooling:DX:TwoStageWithHumidityControlMode,  !- Cooling coil type
-
-    ACDXCoil 2,              !- Cooling coil name
-
-    Coil:Heating:Gas,        !- Heating coil type
-
-    Furnace Heating Coil 1,  !- Heating coil name
-
-    CoolingPriority,        !- Priority control mode
-
-    10.0,                    !- Minimum outlet air temperature during cooling operation {C}
-
-    50.0,                    !- Maximum outlet air temperature during heating operation {C}
-
-    None;                    !- Dehumidification control type
-
-
+    GasHeat CBVAV System,  !- Name of unitary system
+    FanAndCoilAvailSched,  !- Availability schedule name
+    1.8,                   !- Cooling Supply Air Flow Rate {m3/s}
+    1.7,                   !- Heating Supply Air Flow Rate {m3/s}
+    1.6,                   !- No Load Supply Air Flow Rate {m3/s}
+    0.32,                  !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.3,                   !- Heating Outdoor Air Flow Rate {m3/s}
+    0.27,                  !- No Load Outdoor Air Flow Rate {m3/s}
+    Outdoor Air Multiplier Schedule, !- Outdoor air volumetric flow rate multiplier schedule name
+    Air Loop Inlet Node,     !- Air inlet node name
+    Mixer Inlet Node,        !- Bypass duct mixer node name
+    Heating Coil Air Outlet Node,    !- Bypass duct splitter node name
+    Air Loop Outlet Node,    !- Air outlet node name
+    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
+    Outdoor air Mixer,       !- Outdoor air mixer name
+    Fan:OnOff,        !- Supply air fan type
+    Supply Fan 1,            !- Supply air fan name
+    BlowThrough,            !- Supply air fan placement
+    Fan OpMode Schedule,     !- Supply air fan operating mode schedule name
+    Coil:Cooling:DX:TwoStageWithHumidityControlMode,  !- Cooling coil type
+    ACDXCoil 2,              !- Cooling coil name
+    Coil:Heating:Gas,        !- Heating coil type
+    Furnace Heating Coil 1,  !- Heating coil name
+    CoolingPriority,        !- Priority control mode
+    10.0,                    !- Minimum outlet air temperature during cooling operation {C}
+    50.0,                    !- Maximum outlet air temperature during heating operation {C}
+    None;                    !- Dehumidification control type
 
 OutdoorAir:Mixer,
 
@@ -15990,6 +15727,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
     0.584,                   !- Maximum air flow rate {m3/s}
 
     0.25;                    !- Zone Minimum Air Flow Fraction
+```
 
 ### Unitary VAV Changeover Bypass Heat and Cool (AirLoopHVAC) Outputs
 
