@@ -2405,7 +2405,7 @@ Designates which method is used for AirflowNetwork initialization. The choices f
 
 #### Field: Relative Airflow Convergence Tolerance
 
-The solution is assumed to have converged when <span>${{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}} \right. \kern-\nulldelimiterspace} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}$</span>is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|$</span>) to the sum of network airflow magnitudes (<span>$\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} $</span>). The default value is 1.0x10<sup>-4</sup>.
+The solution is assumed to have converged when <span>${{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}} \right. } {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}$</span>is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|$</span>) to the sum of network airflow magnitudes (<span>$\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} $</span>). The default value is 1.0x10<sup>-4</sup>.
 
 #### Field: Absolute Airflow Convergence Tolerance
 
@@ -3841,7 +3841,7 @@ where
 
 e= Surface roughness [m]
 
-Re = Reynolds number = <span>${\raise0.7ex\hbox{${\rho VD}$} \!\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.\kern-\nulldelimiterspace}\!\lower0.7ex\hbox{$\mu $}}$</span>
+Re = Reynolds number = <span>${\raise0.7ex\hbox{${\rho VD}$} \!\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.}\!\lower0.7ex\hbox{$\mu $}}$</span>
 
 #### Field: Name
 
