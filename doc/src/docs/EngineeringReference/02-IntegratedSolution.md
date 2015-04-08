@@ -621,7 +621,7 @@ Figure 8 illustrates the zone mass flow components for an air loop system provid
 
 
 
-Figure 8. Illustration of zone air mass flow balance componentshe
+Figure 8. Illustration of zone air mass flow balance components
 
 
 
