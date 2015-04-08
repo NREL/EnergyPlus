@@ -50,3 +50,7 @@ $('ul.nav a').click(function () {
         location.hash = '';
     }
 });
+
+//$("img").each(function() {
+    //$(this)['align']="middle";
+//});

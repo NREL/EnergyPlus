@@ -2408,7 +2408,7 @@ GHE Outlet Node,                !- Outlet Node Name
 <h4 id="field-initialization-type">Field: Initialization Type</h4>
 <p>Designates which method is used for AirflowNetwork initialization. The choices for Initialization Type are LinearInitializationMethod and ZeroNodePressures, with the default being ZeroNodePressures.</p>
 <h4 id="field-relative-airflow-convergence-tolerance">Field: Relative Airflow Convergence Tolerance</h4>
-<p>The solution is assumed to have converged when <span>${{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }<em>{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits</em>{} {{{\mathop m\limits^ \bullet  }<em>{_i}}} } \right|} {\sum\limits</em>{} {\left| {{{\mathop m\limits^ \bullet  }<em>{_i}}} \right|} }}} \right. \kern-\nulldelimiterspace} {\sum\limits</em>{} {\left| {{{\mathop m\limits^ \bullet  }<em>{_i}}} \right|} }}$</span>is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }</em>{<em>i}}} } \right|$</span>) to the sum of network airflow magnitudes (<span>$\sum\limits</em>{}^{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} $</span>). The default value is 1.0x10<sup>-4</sup>.</p>
+<p>The solution is assumed to have converged when <span>${{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }<em>{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits</em>{} {{{\mathop m\limits^ \bullet  }<em>{_i}}} } \right|} {\sum\limits</em>{} {\left| {{{\mathop m\limits^ \bullet  }<em>{_i}}} \right|} }}} \right. } {\sum\limits</em>{} {\left| {{{\mathop m\limits^ \bullet  }<em>{_i}}} \right|} }}$</span>is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }</em>{<em>i}}} } \right|$</span>) to the sum of network airflow magnitudes (<span>$\sum\limits</em>{}^{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} $</span>). The default value is 1.0x10<sup>-4</sup>.</p>
 <h4 id="field-absolute-airflow-convergence-tolerance">Field: Absolute Airflow Convergence Tolerance</h4>
 <p>The solution is assumed to have converged when the summation of the absolute value of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|$</span>) is less than the value specified for this input field. The default value is 1.0x10<sup>-6</sup>.</p>
 <h4 id="field-convergence-acceleration-limit">Field: Convergence Acceleration Limit</h4>
@@ -3273,7 +3273,7 @@ ClosingProbabilitySch;   !- Closing Probability Schedule Name
 
 <p>where</p>
 <p>e= Surface roughness [m]</p>
-<p>Re = Reynolds number = <span>${\raise0.7ex\hbox{${\rho VD}$} !\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.\kern-\nulldelimiterspace}!\lower0.7ex\hbox{$\mu $}}$</span></p>
+<p>Re = Reynolds number = <span>${\raise0.7ex\hbox{${\rho VD}$} !\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.}!\lower0.7ex\hbox{$\mu $}}$</span></p>
 <h4 id="field-name_30">Field: Name</h4>
 <p>A unique name for an AirflowNetwork duct component in an air distribution system. This unique name will be referenced by an AirflowNetwork:Distribution:Linkage object to represent a component.</p>
 <h4 id="field-duct-length">Field: Duct Length</h4>

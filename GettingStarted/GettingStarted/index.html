@@ -809,10 +809,13 @@
 <p>When run normally, EP-Launch and EnergyPlus automatically creates post-processed standard output (eso) and meter output (mtr) files into columnar csv (comma separated variable) files.  These files are ready to be read by spreadsheet programs (such as Excel™).</p>
 <h4 id="htmhtml">htm/html</h4>
 <p>Several of the report options produce html files that can be read in standard Web browsers.  These are very powerful, information packed files.  Though wary of information overload, the easiest way to see “everything” is to enter the following in your input file:</p>
-<p>OutputControl:Table,</p>
-<p>HTML;                    !- ColumnSeparator</p>
-<p>Output:Table:SummaryReports,</p>
-<p>All Summary;</p>
+<pre><code class="idf">OutputControl:Table,
+   HTML;                    !- ColumnSeparator
+
+Output:Table:SummaryReports,
+    All Summary;
+</code></pre>
+
 <p>Note that you can also get this file in other formats (the OutputControl:Table option).</p>
 <h3 id="other-output-files">Other Output Files</h3>
 <h4 id="audit">audit</h4>
@@ -828,12 +831,18 @@
 <h4 id="rdd">rdd</h4>
 <h4 id="mdd">mdd</h4>
 <p>The <em>Report (variable) Data Dictionary</em> (RDD) is a text file listing those variables available for reporting (on the ESO) for this particular simulation. Which variables are available for output depends on the actual simulation problem described in the IDF. The <em>Report (meter) Data Dictionary</em> (MDD) is a text file listing those variables available for reporting (on the MTR) for this particular simulation. Which meters are available for output depends on the actual simulation problem described in the IDF. A simulation with no chiller does not permit the output of any chiller report variables. The user may need to examine the RDD or MDD to find out which report variables are available in a particular simulation. The RDD and MDD are written only if the following is included in the IDF file.</p>
-<p>Output:Reports, VariableDictionary;</p>
+<pre><code class="idf">Output:Reports, VariableDictionary;
+</code></pre>
+
 <p>A variant produces the same files in a IDF “ready” format.</p>
-<p>Output:Reports, VariableDictionary, IDF;</p>
+<pre><code class="idf">Output:Reports, VariableDictionary, IDF;
+</code></pre>
+
 <h4 id="dxf">dxf</h4>
 <p>This is a file in AutoCad™ DXF format showing all the surfaces defined in the IDF file. It provides a means of viewing the building geometry. The DXF file from EnergyPlus highlights different building elements (shading, walls, subsurfaces) in differing colors. A number of programs can read and display DXF files. Output of this file is triggered by</p>
-<p>Output:Reports, Surfaces, DXF;</p>
+<pre><code class="idf">Output:Reports, Surfaces, DXF;
+</code></pre>
+
 <p>in the IDF.</p>
 <h1 id="tutorial-example-for-running-energyplus">Tutorial Example for running EnergyPlus</h1>
 <p>The following example is taken directly from the training course “Introduction to EnergyPlus”, Exercise 1.  Of course, it is presented here without the benefit of classroom presentation and discussion but when followed step by step, should provide an introduction of actually using EnergyPlus.</p>
@@ -1488,96 +1497,106 @@ SimulationControl,
 </table>
 
 <p>The pieces of the definition that designate BuildingSurface:Detailed surfaces as either <em>heat transfer</em> or <em>heat storage</em> surfaces are:</p>
-<p><strong>  A5 , \field Outside Boundary Condition</strong></p>
-<p>\required-field</p>
-<p>\type choice</p>
-<p>\key Surface</p>
-<p>\key Zone</p>
-<p>\key Outdoors</p>
-<p>\key Ground</p>
-<p>\key OtherSideCoefficients</p>
-<p>\key OtherSideConditionsModel</p>
-<p><strong>  A6,  \field Outside Boundary Condition Object</strong></p>
-<p>\type object-list</p>
-<p>\object-list OutFaceEnvNames</p>
-<p>\note Non-blank only if the field Outside Boundary Condition is Surface, Zone, OtherSideCoefficients,</p>
-<p>\note or OtherSideConditionsModel</p>
-<p>\note If Surface, specify name of corresponding surface in adjacent zone or</p>
-<p>\note specify current surface name for internal partition separating like zones</p>
-<p>\note If Zone, specify the name of the corresponding zone and</p>
-<p>\note the program will generate the corresponding interzone surface</p>
-<p>\note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients</p>
-<p>\note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel</p>
-<p><strong>  A7 , \field Sun Exposure</strong></p>
-<p>\required-field</p>
-<p>\type choice</p>
-<p>\key SunExposed</p>
-<p>\key NoSun</p>
-<p>\default SunExposed</p>
-<p><strong>  A8,  \field Wind Exposure</strong></p>
-<p>\required-field</p>
-<p>\type choice</p>
-<p>\key WindExposed</p>
-<p>\key NoWind</p>
-<p>\default WindExposed</p>
+<pre><code class="idf">  A5 , \field Outside Boundary Condition
+       \required-field
+       \type choice
+       \key Surface
+       \key Zone
+       \key Outdoors
+       \key Ground
+       \key OtherSideCoefficients
+       \key OtherSideConditionsModel
+  A6,  \field Outside Boundary Condition Object
+       \type object-list
+       \object-list OutFaceEnvNames
+       \note Non-blank only if the field Outside Boundary Condition is Surface, Zone, OtherSideCoefficients,
+       \note or OtherSideConditionsModel
+       \note If Surface, specify name of corresponding surface in adjacent zone or
+       \note specify current surface name for internal partition separating like zones
+       \note If Zone, specify the name of the corresponding zone and
+       \note the program will generate the corresponding interzone surface
+       \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
+       \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
+  A7 , \field Sun Exposure
+       \required-field
+       \type choice
+       \key SunExposed
+       \key NoSun
+       \default SunExposed
+  A8,  \field Wind Exposure
+       \required-field
+       \type choice
+       \key WindExposed
+       \key NoWind
+       \default WindExposed
+</code></pre>
+
 <p>Note that subsurfaces (windows, doors) on these base surfaces will inherit the base surface properties listed above. The following examples will use a bit more of the Surface definition to give context.</p>
 <p>Surfaces that specify “themselves” as the outside boundary condition are ceilings, floors and partitions that divide temperature-controlled spaces. The program assumes that the surface temperatures on both sides of the surface are the same. This means that even though heat may be stored in a partition, ceiling, or floor, no heat flows <em>through</em> it.</p>
 <p>Heat Storage Surfaces (Use current Surface name for ExteriorEnvironment), e.g.:</p>
-<p><strong>BuildingSurface:Detailed</strong>,Zn005:Wall006,  !- Base Surface Name</p>
-<p>Wall,INTERIOR,  !- Class and Construction Name</p>
-<p>MAINE WING,  !- Zone</p>
-<p><strong>  Surface, Zn005:Wall006,  !- Exterior Conditions and Target</strong></p>
-<p>NoSun,  !- Solar Exposure</p>
-<p>NoWind,  !- Wind Exposure</p>
-<p>0.5000000    ,  !- VF to Ground</p>
-<p>4, !-Rectangle</p>
-<p>57.90000    ,   57.79000    ,   10.00000    ,</p>
-<p>57.90000    ,   57.79000    ,  0.0000000E+00,</p>
-<p>57.90000    ,   47.79000    ,  0.0000000E+00,</p>
-<p>57.90000    ,   47.79000    ,   10.00000    ;</p>
+<pre><code class="idf">BuildingSurface:Detailed,Zn005:Wall006,  !- Base Surface Name
+  Wall,INTERIOR,  !- Class and Construction Name
+  MAINE WING,  !- Zone
+  Surface, Zn005:Wall006,  !- Exterior Conditions and Target
+   NoSun,  !- Solar Exposure
+   NoWind,  !- Wind Exposure
+  0.5000000    ,  !- VF to Ground
+           4, !-Rectangle
+   57.90000    ,   57.79000    ,   10.00000    ,
+   57.90000    ,   57.79000    ,  0.0000000E+00,
+   57.90000    ,   47.79000    ,  0.0000000E+00,
+   57.90000    ,   47.79000    ,   10.00000    ;
+</code></pre>
+
 <p>Some surfaces divide the temperature controlled space from the outside environment. Surfaces that are both sun and wind exposed (e.g. exterior walls, exposed floors, roofs) feel the full effect of both solar radiation and outside temperature, and the outside air film resistance for these surfaces changes with wind speed and wind direction. Surfaces that are not sun or wind exposed (a wall to an “uncontrolled” space) are not affected by solar radiation, wind speed or direction and have a constant outside convective air film resistance.</p>
 <p>Heat Transfer Surfaces Exposed to the Outside Environment, such as Exterior Walls, Roofs, Exposed Floors:</p>
-<p><strong>BuildingSurface:Detailed</strong>,Zn005:Wall002,  !- Base Surface Name</p>
-<p>Wall,EXTERIOR,  !- Class and Construction Name</p>
-<p>MAINE WING,  !- Zone</p>
-<p><strong>  Outdoors,,  !- Exterior Conditions and Target (if applicable)</strong></p>
-<p>SunExposed,  !- Solar Exposure</p>
-<p>WindExposed,  !- Wind Exposure</p>
-<p>0.5000000    ,  !- VF to Ground</p>
-<p>4, !-Rectangle</p>
-<p>77.90000    ,   47.79000    ,   10.00000    ,</p>
-<p>77.90000    ,   47.79000    ,  0.0000000E+00,</p>
-<p>77.90000    ,   67.79000    ,  0.0000000E+00,</p>
-<p>77.90000    ,   67.79000    ,   10.00000    ;</p>
+<pre><code class="idf">BuildingSurface:Detailed,Zn005:Wall002,  !- Base Surface Name
+  Wall,EXTERIOR,  !- Class and Construction Name
+  MAINE WING,  !- Zone
+  Outdoors,,  !- Exterior Conditions and Target (if applicable)
+   SunExposed,  !- Solar Exposure
+   WindExposed,  !- Wind Exposure
+  0.5000000    ,  !- VF to Ground
+           4, !-Rectangle
+   77.90000    ,   47.79000    ,   10.00000    ,
+   77.90000    ,   47.79000    ,  0.0000000E+00,
+   77.90000    ,   67.79000    ,  0.0000000E+00,
+   77.90000    ,   67.79000    ,   10.00000    ;
+</code></pre>
+
 <p>Surfaces such as basement walls and slab floors separate the space from the earth surrounding the surfaces. Therefore, the outside surface temperatures become the ground temperatures.</p>
 <p>Heat Transfer Surfaces in Contact with the Ground, such as Basement Walls or Slab Floors:</p>
-<p><strong>BuildingSurface:Detailed</strong>,Zn004:Flr001,  !- Base Surface Name</p>
-<p>Floor,SLAB FLOOR,  !- Class and Construction Name</p>
-<p>ARIZONA WING,  !- Zone</p>
-<p><strong>  Ground,,  !- Exterior Conditions and Target (if applicable)</strong></p>
-<p>NoSun,  !- Solar Exposure</p>
-<p>NoWind,  !- Wind Exposure</p>
-<p>1.000000    ,  !- VF to Ground</p>
-<p>4, !-Rectangle</p>
-<p>38.01000    ,   8.510000    ,  0.0000000E+00,</p>
-<p>18.01000    ,   8.510000    ,  0.0000000E+00,</p>
-<p>18.01000    ,   28.51000    ,  0.0000000E+00,</p>
-<p>38.01000    ,   28.51000    ,  0.0000000E+00;</p>
+<pre><code class="idf">BuildingSurface:Detailed,Zn004:Flr001,  !- Base Surface Name
+  Floor,SLAB FLOOR,  !- Class and Construction Name
+  ARIZONA WING,  !- Zone
+  Ground,,  !- Exterior Conditions and Target (if applicable)
+   NoSun,  !- Solar Exposure
+   NoWind,  !- Wind Exposure
+   1.000000    ,  !- VF to Ground
+           4, !-Rectangle
+   38.01000    ,   8.510000    ,  0.0000000E+00,
+   18.01000    ,   8.510000    ,  0.0000000E+00,
+   18.01000    ,   28.51000    ,  0.0000000E+00,
+   38.01000    ,   28.51000    ,  0.0000000E+00;
+</code></pre>
+
 <p>Other surfaces separate zones that may be at different temperatures. These surface types allow heat transfer (by conduction through the walls) from a zone at a higher temperature to a zone at a lower temperature. The location of the heat storage surface in the zone is not important except in specialized solar studies. The surface above (wall to uncontrolled space) would be more correctly modeled as an interzone surface.</p>
 <p>Heat Transfer Surfaces Exposed to Another Zone, such as Interzone walls, ceilings or floors:</p>
-<p><strong>BuildingSurface:Detailed</strong>,Zn005:Wall005,  !- Base Surface Name</p>
-<p>Wall,INTERIOR,  !- Class and Construction Name</p>
-<p>MAINE WING,  !- Zone</p>
-<p><strong>  Surface,Zn001:Wall009,  !- Exterior Conditions and Target</strong></p>
-<p>NoSun,  !- Solar Exposure</p>
-<p>NoWind,  !- Wind Exposure</p>
-<p>0.5000000    ,  !- VF to Ground</p>
-<p>4, !-Rectangle</p>
-<p>57.90000    ,   47.79000    ,   10.00000    ,</p>
-<p>57.90000    ,   47.79000    ,  0.0000000E+00,</p>
-<p>67.90000    ,   47.79000    ,  0.0000000E+00,</p>
-<p>67.90000    ,   47.79000    ,   10.00000    ;</p>
-<p><strong> </strong></p>
+<pre><code class="idf">BuildingSurface:Detailed,Zn005:Wall005,  !- Base Surface Name
+  Wall,INTERIOR,  !- Class and Construction Name
+  MAINE WING,  !- Zone
+  Surface,Zn001:Wall009,  !- Exterior Conditions and Target
+   NoSun,  !- Solar Exposure
+   NoWind,  !- Wind Exposure
+  0.5000000    ,  !- VF to Ground
+           4, !-Rectangle
+   57.90000    ,   47.79000    ,   10.00000    ,
+   57.90000    ,   47.79000    ,  0.0000000E+00,
+   67.90000    ,   47.79000    ,  0.0000000E+00,
+   67.90000    ,   47.79000    ,   10.00000    ;
+ 
+</code></pre>
+
 <h4 id="step-32-define-equivalent-surfaces-as-desired">Step 3.2.     Define equivalent surfaces as desired.</h4>
 <p>When the building was zoned, our objective was to define as <em>few</em> zones as possible. Now we would like to extend this objective to include defining as <em>few</em> surfaces as possible without significantly compromising the integrity of the simulation. We reduce the number and complexity of surfaces in our input file by defining <em>equivalent</em> surfaces.</p>
 <p>Before dealing with equivalent surfaces, it is appropriate to take the concept of a thermal zone one step further. EnergyPlus performs heat balances on individual zone surfaces and on the zone air. For purposes of the heat transfer calculations, a <em>geometrically</em> correct rendering of the zone surfaces is not required. The surfaces do not even have to be connected. As long as the program knows to which thermal zone (mass of air) each surface transfers heat, it will calculate all heat balances correctly. For example, all heat storage surfaces of the same construction within a zone may be defined as a single rectangular surface. The size of this <em>equivalent</em> surface will equal the sum of all the areas of all the heat storage surfaces in the zone. A few simple rules will further explain what we mean by <em>equivalent</em> surfaces and how these surfaces may be used. Remember that these are guidelines for optional simplification of input. Each simplification must be evaluated to determine if it would significantly impact certain shading, interior solar gains, or daylighting features. The goal is to seek an adequate level of detail to capture the key features of the building envelope without spending excess time describing and computing results for details that are insignificant.</p>
@@ -2102,15 +2121,32 @@ SimulationControl,
 </li>
 </ul>
 <h4 id="space-conditioning">Space Conditioning</h4>
+<ul>
+<li>
 <p>Heating setpoints:   21.1C (70F) occupied, 12.8C (55F) unoccupied</p>
+</li>
+<li>
 <p>Cooling setpoints:   23.9C (75F) occupied, 40.0C (104F, system off) unoccupied</p>
+</li>
+<li>
 <p>Plenum zone not controlled</p>
+</li>
+</ul>
 <h4 id="environment">Environment</h4>
+<ul>
+<li>
 <p>Location:                   Chicago, Illinois, USA</p>
-<p>Design Days:             Summer</p>
-<p>Winter</p>
+</li>
+<li>
+<p>Design Days:             Summer, Winter</p>
+</li>
+<li>
 <p>Annual Simulation Period:    Jan 1 – Dec 31</p>
+</li>
+<li>
 <p>Ground Temperatures:         from Slab preprocessor (20.4 to 23.0 C)</p>
+</li>
+</ul>
 <h2 id="instructions_1">Instructions</h2>
 <h3 id="exercise-2a-add-unitary-system-with-dx-cooling-and-gas-heating-furnace-serving-a-single-zone">Exercise 2A. Add Unitary System with DX Cooling and Gas Heating (Furnace) Serving a Single Zone</h3>
 <p>Objective:  Learn how to describe a thermostat and unitary equipment using HVACTemplate objects.</p>
@@ -2281,292 +2317,328 @@ SimulationControl,
 <p>This is a listing of new objects added in this Exercise.</p>
 <p><strong><em>Try not to look at this section until you have completed the Exercise.</em></strong></p>
 <h4 id="solution-exercise-2a">Solution: Exercise 2A</h4>
-<p><strong>HVACTemplate:Thermostat</strong>,</p>
-<p>Office Thermostat,       !- Thermostat Name</p>
-<p>Office Heating Setpoints,!- Thermostat Heating Setpoint Schedule</p>
-<p>,                        !- Thermostat Constant Heating Setpoint {C}</p>
-<p>Office Cooling Setpoints,!- Thermostat Cooling Setpoint Schedule</p>
-<p>;                        !- Thermostat Constant Cooling Setpoint {C}</p>
-<p><strong>HVACTemplate:Zone:Unitary</strong>,</p>
-<p>NORTH PERIMETER,         !- Zone Name</p>
-<p>North Zone Unitary,      !- Air Handling System Name</p>
-<p>Office Thermostat,       !- Thermostat Name</p>
-<p>autosize,                !- Zone Supply Air Max Flow Rate {m3/s}</p>
-<p>,                        !- Zone Supply Air Sizing Factor</p>
-<p>Flow/Person,             !- Zone Outside Air Method</p>
-<p>0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone {m3/s}</p>
-<p>,                        !- Zone Supply Plenum Name</p>
-<p>,                        !- Zone Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p><strong>HVACTemplate:System:Unitary</strong>,</p>
-<p>North Zone Unitary,      !- Air Handling System Name</p>
-<p>Office HVAC,             !- System Availability Schedule</p>
-<p>NORTH PERIMETER,         !- Control Zone Name or Thermostat Location</p>
-<p>autosize,                !- Supply Fan Max Flow Rate {m3/s}</p>
-<p>Continuous,              !- Supply Fan Operating Mode Schedule Name</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>600,                     !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>Single-speed DX,         !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule</p>
-<p>autosize,                !- Cooling Coil Capacity {W}</p>
-<p>autosize,                !- Cooling Coil Rated SHR</p>
-<p>3,                       !- Cooling Coil Rated COP</p>
-<p>Gas,                     !- Heating Coil Type</p>
-<p>,                        !- Heating Coil Availability Schedule</p>
-<p>autosize,                !- Heating Coil Capacity {W}</p>
-<p>0.8,                     !- Gas Heating Coil Efficiency</p>
-<p>,                        !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>autosize,                !- Maximum Outside Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Minimum Outside Air Flow Rate {m3/s}</p>
-<p>Office Minimum OA,       !- Minimum Outside Air Schedule Name</p>
-<p>NoEconomizer,            !- Economizer Type</p>
-<p>NoLockout,               !- Economizer Lockout</p>
-<p>,                        !- Economizer Upper Temperature Limit {C}</p>
-<p>,                        !- Economizer Lower Temperature Limit {C}</p>
-<p>,                        !- Economizer Upper Enthalpy Limit {J/kg}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>BlowThrough,             !- Supply Fan Placement</p>
-<p>StayOff,                 !- Night Cycle Control</p>
-<p>,                        !- Night Cycle Control Zone Name</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>0.7,                     !- Sensible Heat Recovery Effectiveness</p>
-<p>0.65,                    !- Latent Heat Recovery Effectiveness</p>
-<p>,                        !- Dehumidification Control Type</p>
-<p>,                        !- Dehumidification Control Zone Name</p>
-<p>,                        !- Dehumidification Setpoint {percent}</p>
-<p>,                        !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule</p>
-<p>,                        !- Humidifier Rated Capacity {m3/s}</p>
-<p>,                        !- Humidifier Rated Electric Power {W}</p>
-<p>,                        !- Humidifier Control Zone Name</p>
-<p>;                        !- Humidifier Setpoint {percent}</p>
-<p><strong>Sizing:Parameters</strong>,</p>
-<p>1.2;                     !- sizing factor</p>
-<p><strong>Output:Variable</strong>,*,Furnace Fan Part-Load Ratio,hourly;</p>
-<p><strong>Output:Variable</strong>,*,DX Cooling Coil Runtime Fraction,hourly;</p>
-<p><strong>Output:Variable</strong>,*,Heating Coil Runtime Fraction,hourly;</p>
+<pre><code class="idf">HVACTemplate:Thermostat,
+    Office Thermostat,       !- Thermostat Name
+    Office Heating Setpoints,!- Thermostat Heating Setpoint Schedule
+    ,                        !- Thermostat Constant Heating Setpoint {C}
+    Office Cooling Setpoints,!- Thermostat Cooling Setpoint Schedule
+    ;                        !- Thermostat Constant Cooling Setpoint {C}
+
+
+HVACTemplate:Zone:Unitary,
+    NORTH PERIMETER,         !- Zone Name
+    North Zone Unitary,      !- Air Handling System Name
+    Office Thermostat,       !- Thermostat Name
+    autosize,                !- Zone Supply Air Max Flow Rate {m3/s}
+    ,                        !- Zone Supply Air Sizing Factor
+    Flow/Person,             !- Zone Outside Air Method
+    0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}
+    0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}
+    0.0,                     !- Zone Outside Air Flow per Zone {m3/s}
+    ,                        !- Zone Supply Plenum Name
+    ,                        !- Zone Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule
+    autosize;                !- Baseboard Heating Capacity {W}
+
+
+HVACTemplate:System:Unitary,
+    North Zone Unitary,      !- Air Handling System Name
+    Office HVAC,             !- System Availability Schedule
+    NORTH PERIMETER,         !- Control Zone Name or Thermostat Location
+    autosize,                !- Supply Fan Max Flow Rate {m3/s}
+    Continuous,              !- Supply Fan Operating Mode Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    Single-speed DX,         !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule
+    autosize,                !- Cooling Coil Capacity {W}
+    autosize,                !- Cooling Coil Rated SHR
+    3,                       !- Cooling Coil Rated COP
+    Gas,                     !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule
+    autosize,                !- Heating Coil Capacity {W}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outside Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outside Air Flow Rate {m3/s}
+    Office Minimum OA,       !- Minimum Outside Air Schedule Name
+    NoEconomizer,            !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    ,                        !- Economizer Upper Temperature Limit {C}
+    ,                        !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    BlowThrough,             !- Supply Fan Placement
+    StayOff,                 !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    ,                        !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    ,                        !- Dehumidification Setpoint {percent}
+    ,                        !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule
+    ,                        !- Humidifier Rated Capacity {m3/s}
+    ,                        !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    ;                        !- Humidifier Setpoint {percent}
+
+
+Sizing:Parameters,
+    1.2;                     !- sizing factor
+
+
+Output:Variable,*,Furnace Fan Part-Load Ratio,hourly;
+Output:Variable,*,DX Cooling Coil Runtime Fraction,hourly;
+Output:Variable,*,Heating Coil Runtime Fraction,hourly;
+</code></pre>
+
 <h4 id="solution-exercise-2b">Solution: Exercise 2B</h4>
-<p><strong>HVACTemplate:System:VAV</strong>,</p>
-<p>VAV with Reheat,         !- Air Handling System Name</p>
-<p>Office HVAC,             !- System Availability Schedule</p>
-<p>autosize,                !- Supply Fan Max Flow Rate {m3/s}</p>
-<p>autosize,                !- Supply Fan Min Flow Rate {m3/s}</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>1000,                    !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>ChilledWater,            !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule</p>
-<p>,                        !- Cooling Coil Setpoint Schedule</p>
-<p>13,                      !- Cooling Coil Design Setpoint {C}</p>
-<p>None,                    !- Heating Coil Type</p>
-<p>,                        !- Heating Coil Availability Schedule</p>
-<p>,                        !- Heating Coil Setpoint Schedule</p>
-<p>10.0,                    !- Heating Coil Design Setpoint {C}</p>
-<p>0.8,                     !- Gas Heating Coil Efficiency</p>
-<p>,                        !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>None,                    !- Preheat Coil Type</p>
-<p>,                        !- Preheat Coil Availability Schedule</p>
-<p>,                        !- Preheat Coil Setpoint Schedule</p>
-<p>7.2,                     !- Preheat Coil Design Setpoint {C}</p>
-<p>0.8,                     !- Gas Preheat Coil Efficiency</p>
-<p>,                        !- Gas Preheat Coil Parasitic Electric Load {W}</p>
-<p>autosize,                !- Maximum Outside Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Minimum Outside Air Flow Rate {m3/s}</p>
-<p>ProportionalMinimum,     !- Minimum Outside Air Control Type</p>
-<p>Office Minimum OA,       !- Minimum Outside Air Schedule Name</p>
-<p>FixedDryBulb,            !- Economizer Type</p>
-<p>NoLockout,               !- Economizer Lockout</p>
-<p>,                        !- Economizer Upper Temperature Limit {C}</p>
-<p>,                        !- Economizer Lower Temperature Limit {C}</p>
-<p>,                        !- Economizer Upper Enthalpy Limit {J/kg}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>PLENUM,                  !- Return Plenum Name</p>
-<p>DrawThrough,             !- Supply Fan Placement</p>
-<p>InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients</p>
-<p>StayOff,                 !- Night Cycle Control</p>
-<p>,                        !- Night Cycle Control Zone Name</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>0.7,                     !- Sensible Heat Recovery Effectiveness</p>
-<p>0.65,                    !- Latent Heat Recovery Effectiveness</p>
-<p>None,                    !- Cooling Coil Setpoint Reset Type</p>
-<p>None,                    !- Heating Coil Setpoint Reset Type</p>
-<p>,                        !- Dehumidification Control Type</p>
-<p>,                        !- Dehumidification Control Zone Name</p>
-<p>,                        !- Dehumidification Setpoint {percent}</p>
-<p>,                        !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule</p>
-<p>,                        !- Humidifier Rated Capacity {m3/s}</p>
-<p>,                        !- Humidifier Rated Electric Power {W}</p>
-<p>,                        !- Humidifier Control Zone Name</p>
-<p>;                        !- Humidifier Setpoint {percent}</p>
-<p><strong>HVACTemplate:Zone:VAV</strong>,</p>
-<p>SOUTH PERIMETER,         !- Zone Name</p>
-<p>VAV with Reheat,         !- Air Handling System Name</p>
-<p>Office Thermostat,       !- Thermostat Name</p>
-<p>autosize,                !- Zone Supply Air Max Flow Rate {m3/s}</p>
-<p>,                        !- Zone Supply Air Sizing Factor</p>
-<p>0.2,                     !- Zone Supply Air Min Flow Fraction</p>
-<p>Flow/Person,             !- Zone Outside Air Method</p>
-<p>0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone {m3/s}</p>
-<p>HotWater,                !- Reheat Coil Type</p>
-<p>,                        !- Reheat Coil Availability Schedule</p>
-<p>Reverse,                 !- Zone Damper Heating Action</p>
-<p>,                        !- Zone Supply Plenum Name</p>
-<p>,                        !- Zone Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p><strong>HVACTemplate:Zone:VAV</strong>,</p>
-<p>EAST PERIMETER,          !- Zone Name</p>
-<p>VAV with Reheat,         !- Air Handling System Name</p>
-<p>Office Thermostat,       !- Thermostat Name</p>
-<p>autosize,                !- Zone Supply Air Max Flow Rate {m3/s}</p>
-<p>,                        !- Zone Supply Air Sizing Factor</p>
-<p>0.2,                     !- Zone Supply Air Min Flow Fraction</p>
-<p>Flow/Person,             !- Zone Outside Air Method</p>
-<p>0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone {m3/s}</p>
-<p>HotWater,                !- Reheat Coil Type</p>
-<p>,                        !- Reheat Coil Availability Schedule</p>
-<p>Reverse,                 !- Zone Damper Heating Action</p>
-<p>,                        !- Zone Supply Plenum Name</p>
-<p>,                        !- Zone Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p><strong>HVACTemplate:Zone:VAV</strong>,</p>
-<p>WEST PERIMETER,          !- Zone Name</p>
-<p>VAV with Reheat,         !- Air Handling System Name</p>
-<p>Office Thermostat,       !- Thermostat Name</p>
-<p>autosize,                !- Zone Supply Air Max Flow Rate {m3/s}</p>
-<p>,                        !- Zone Supply Air Sizing Factor</p>
-<p>0.2,                     !- Zone Supply Air Min Flow Fraction</p>
-<p>Flow/Person,             !- Zone Outside Air Method</p>
-<p>0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone {m3/s}</p>
-<p>HotWater,                !- Reheat Coil Type</p>
-<p>,                        !- Reheat Coil Availability Schedule</p>
-<p>Reverse,                 !- Zone Damper Heating Action</p>
-<p>,                        !- Zone Supply Plenum Name</p>
-<p>,                        !- Zone Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p><strong>HVACTemplate:Zone:VAV</strong>,</p>
-<p>CORE,                    !- Zone Name</p>
-<p>VAV with Reheat,         !- Air Handling System Name</p>
-<p>Office Thermostat,       !- Thermostat Name</p>
-<p>autosize,                !- Zone Supply Air Max Flow Rate {m3/s}</p>
-<p>,                        !- Zone Supply Air Sizing Factor</p>
-<p>0.2,                     !- Zone Supply Air Min Flow Fraction</p>
-<p>Flow/Person,             !- Zone Outside Air Method</p>
-<p>0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}</p>
-<p>0.0,                     !- Zone Outside Air Flow per Zone {m3/s}</p>
-<p>HotWater,                !- Reheat Coil Type</p>
-<p>,                        !- Reheat Coil Availability Schedule</p>
-<p>Reverse,                 !- Zone Damper Heating Action</p>
-<p>,                        !- Zone Supply Plenum Name</p>
-<p>,                        !- Zone Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p><strong>HVACTemplate:Plant:ChilledWaterLoop</strong>,</p>
-<p>Chilled Water Plant,     !- Plant Loop Name</p>
-<p>,                        !- Pump Schedule</p>
-<p>Intermittent,            !- Pump Control Type</p>
-<p>Default,                 !- Chiller Plant Operation Scheme Type</p>
-<p>,                        !- Chiller Plant Operation Scheme Name</p>
-<p>,                        !- Chilled Water Setpoint Schedule</p>
-<p>7.22,                    !- Chilled Water Design Setpoint {C}</p>
-<p>ConstantPrimaryNoSecondary,  !- Chilled Water Pump Configuration</p>
-<p>179352,                  !- Primary Chilled Water Pump Rated Head {Pa}</p>
-<p>179352,                  !- Secondary Chilled Water Pump Rated Head {Pa}</p>
-<p>Default,                 !- Condenser Plant Operation Scheme Type</p>
-<p>,                        !- Condenser Plant Operation Scheme List Name</p>
-<p>SpecifiedSetpoint,       !- Condenser Water Temperature Control Type</p>
-<p>,                        !- Condenser Water Setpoint Schedule</p>
-<p>29.4,                    !- Condenser Water Design Setpoint {C}</p>
-<p>179352,                  !- Condenser Water Pump Rated Head {Pa}</p>
-<p>None,                    !- Chilled Water Setpoint Reset Type</p>
-<p>12.2,                    !- Chilled Water Setpoint at Outdoor Dry Bulb Low {C}</p>
-<p>15.6,                    !- Chilled Water Reset Outdoor Dry Bulb Low {C}</p>
-<p>6.7,                     !- Chilled Water Setpoint at Outdoor Dry Bulb High {C}</p>
-<p>26.7;                    !- Chilled Water Reset Outdoor Dry Bulb High {C}</p>
-<p><strong>HVACTemplate:Plant:Chiller</strong>,</p>
-<p>Chiller 1,               !- Chiller Name</p>
-<p>ElectricReciprocatingChiller,  !- Chiller Type</p>
-<p>autosize,                !- Capacity {W}</p>
-<p>3.6,                     !- COP {W/W}</p>
-<p>WaterCooled,             !- Condenser Type</p>
-<p>;                        !- Priority</p>
-<p><strong>HVACTemplate:Plant:Tower</strong>,</p>
-<p>Tower 1,                 !- Tower Name</p>
-<p>TwoSpeed,                !- Tower Type</p>
-<p>autosize,                !- High-Speed Nominal Capacity {W}</p>
-<p>autosize,                !- High-Speed Fan Power {W}</p>
-<p>autosize,                !- Low-Speed Nominal Capacity {W}</p>
-<p>autosize,                !- Low-Speed Fan Power {W}</p>
-<p>autosize,                !- Free Convection Capacity {W}</p>
-<p>;                        !- Priority</p>
-<p><strong>HVACTemplate:Plant:HotWaterLoop</strong>,</p>
-<p>Hot Water Plant,         !- Plant Loop Name</p>
-<p>,                        !- Pump Schedule</p>
-<p>Intermittent,            !- Pump Control Type</p>
-<p>Default,                 !- Hot Water Plant Operation Scheme Type</p>
-<p>,                        !- Hot Water Plant Operation Scheme List Name</p>
-<p>,                        !- Hot Water Setpoint Schedule</p>
-<p>82,                      !- Hot Water Design Setpoint {C}</p>
-<p>ConstantFlow,            !- Hot Water Pump Configuration</p>
-<p>179352,                  !- Hot Water Pump Rated Head {Pa}</p>
-<p>None,                    !- Hot Water Setpoint Reset Type</p>
-<p>82.2,                    !- Hot Water Setpoint at Outdoor Dry Bulb Low {C}</p>
-<p>-6.7,                    !- Hot Water Reset Outdoor Dry Bulb Low {C}</p>
-<p>65.6,                    !- Hot Water Setpoint at Outdoor Dry Bulb High {C}</p>
-<p>10;                      !- Hot Water Reset Outdoor Dry Bulb High {C}</p>
-<p><strong>HVACTemplate:Plant:Boiler</strong>,</p>
-<p>Boiler 1,                !- Boiler Name</p>
-<p>HotWaterBoiler,          !- Boiler Type</p>
-<p>autosize,                !- Capacity {W}</p>
-<p>0.8,                     !- Efficiency</p>
-<p>NaturalGas,              !- Fuel Type</p>
-<p>;                        !- Priority</p>
-<p><strong>Output:Variable</strong>,*,Damper Position,hourly;</p>
-<p><strong>Output:Variable</strong>,*,Chiller Evap Heat Trans Rate,hourly;</p>
-<p><strong>Output:Variable</strong>,*,Chiller COP,hourly;</p>
-<p><strong>Output:Variable</strong>,*,Boiler Heating Output Rate,hourly;</p>
-<p><strong>Output:Variable</strong>,*,Tower Heat Transfer,hourly;</p>
+<pre><code class="idf">HVACTemplate:System:VAV,
+   VAV with Reheat,         !- Air Handling System Name
+    Office HVAC,             !- System Availability Schedule
+    autosize,                !- Supply Fan Max Flow Rate {m3/s}
+    autosize,                !- Supply Fan Min Flow Rate {m3/s}
+    0.7,                     !- Supply Fan Total Efficiency
+    1000,                    !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule
+    ,                        !- Cooling Coil Setpoint Schedule
+    13,                      !- Cooling Coil Design Setpoint {C}
+    None,                    !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule
+    ,                        !- Heating Coil Setpoint Schedule
+    10.0,                    !- Heating Coil Design Setpoint {C}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    None,                    !- Preheat Coil Type
+    ,                        !- Preheat Coil Availability Schedule
+    ,                        !- Preheat Coil Setpoint Schedule
+    7.2,                     !- Preheat Coil Design Setpoint {C}
+    0.8,                     !- Gas Preheat Coil Efficiency
+    ,                        !- Gas Preheat Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outside Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outside Air Flow Rate {m3/s}
+    ProportionalMinimum,     !- Minimum Outside Air Control Type
+    Office Minimum OA,       !- Minimum Outside Air Schedule Name
+    FixedDryBulb,            !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    ,                        !- Economizer Upper Temperature Limit {C}
+    ,                        !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                        !- Supply Plenum Name
+    PLENUM,                  !- Return Plenum Name
+    DrawThrough,             !- Supply Fan Placement
+    InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients
+    StayOff,                 !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    None,                    !- Cooling Coil Setpoint Reset Type
+    None,                    !- Heating Coil Setpoint Reset Type
+    ,                        !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    ,                        !- Dehumidification Setpoint {percent}
+    ,                        !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule
+    ,                        !- Humidifier Rated Capacity {m3/s}
+    ,                        !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    ;                        !- Humidifier Setpoint {percent}
+
+
+HVACTemplate:Zone:VAV,
+    SOUTH PERIMETER,         !- Zone Name
+    VAV with Reheat,         !- Air Handling System Name
+    Office Thermostat,       !- Thermostat Name
+    autosize,                !- Zone Supply Air Max Flow Rate {m3/s}
+    ,                        !- Zone Supply Air Sizing Factor
+    0.2,                     !- Zone Supply Air Min Flow Fraction
+    Flow/Person,             !- Zone Outside Air Method
+    0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}
+    0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}
+    0.0,                     !- Zone Outside Air Flow per Zone {m3/s}
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule
+    Reverse,                 !- Zone Damper Heating Action
+    ,                        !- Zone Supply Plenum Name
+    ,                        !- Zone Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule
+    autosize;                !- Baseboard Heating Capacity {W}
+
+
+HVACTemplate:Zone:VAV,
+    EAST PERIMETER,          !- Zone Name
+    VAV with Reheat,         !- Air Handling System Name
+    Office Thermostat,       !- Thermostat Name
+    autosize,                !- Zone Supply Air Max Flow Rate {m3/s}
+    ,                        !- Zone Supply Air Sizing Factor
+    0.2,                     !- Zone Supply Air Min Flow Fraction
+    Flow/Person,             !- Zone Outside Air Method
+    0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}
+    0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}
+    0.0,                     !- Zone Outside Air Flow per Zone {m3/s}
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule
+    Reverse,                 !- Zone Damper Heating Action
+    ,                        !- Zone Supply Plenum Name
+    ,                        !- Zone Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule
+    autosize;                !- Baseboard Heating Capacity {W}
+
+
+HVACTemplate:Zone:VAV,
+    WEST PERIMETER,          !- Zone Name
+    VAV with Reheat,         !- Air Handling System Name
+    Office Thermostat,       !- Thermostat Name
+    autosize,                !- Zone Supply Air Max Flow Rate {m3/s}
+    ,                        !- Zone Supply Air Sizing Factor
+    0.2,                     !- Zone Supply Air Min Flow Fraction
+    Flow/Person,             !- Zone Outside Air Method
+    0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}
+    0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}
+    0.0,                     !- Zone Outside Air Flow per Zone {m3/s}
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule
+    Reverse,                 !- Zone Damper Heating Action
+    ,                        !- Zone Supply Plenum Name
+    ,                        !- Zone Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule
+    autosize;                !- Baseboard Heating Capacity {W}
+
+
+HVACTemplate:Zone:VAV,
+    CORE,                    !- Zone Name
+    VAV with Reheat,         !- Air Handling System Name
+    Office Thermostat,       !- Thermostat Name
+    autosize,                !- Zone Supply Air Max Flow Rate {m3/s}
+    ,                        !- Zone Supply Air Sizing Factor
+    0.2,                     !- Zone Supply Air Min Flow Fraction
+    Flow/Person,             !- Zone Outside Air Method
+    0.00944,                 !- Zone Outside Air Flow Rate per Person {m3/s}
+    0.0,                     !- Zone Outside Air Flow per Zone Area {m3/s-m2}
+    0.0,                     !- Zone Outside Air Flow per Zone {m3/s}
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule
+    Reverse,                 !- Zone Damper Heating Action
+    ,                        !- Zone Supply Plenum Name
+    ,                        !- Zone Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule
+    autosize;                !- Baseboard Heating Capacity {W}
+
+
+HVACTemplate:Plant:ChilledWaterLoop,
+  Chilled Water Plant,     !- Plant Loop Name
+  ,                        !- Pump Schedule
+  Intermittent,            !- Pump Control Type
+  Default,                 !- Chiller Plant Operation Scheme Type
+  ,                        !- Chiller Plant Operation Scheme Name
+  ,                        !- Chilled Water Setpoint Schedule
+  7.22,                    !- Chilled Water Design Setpoint {C}
+  ConstantPrimaryNoSecondary,  !- Chilled Water Pump Configuration
+  179352,                  !- Primary Chilled Water Pump Rated Head {Pa}
+  179352,                  !- Secondary Chilled Water Pump Rated Head {Pa}
+  Default,                 !- Condenser Plant Operation Scheme Type
+  ,                        !- Condenser Plant Operation Scheme List Name
+  SpecifiedSetpoint,       !- Condenser Water Temperature Control Type
+  ,                        !- Condenser Water Setpoint Schedule
+  29.4,                    !- Condenser Water Design Setpoint {C}
+  179352,                  !- Condenser Water Pump Rated Head {Pa}
+  None,                    !- Chilled Water Setpoint Reset Type
+  12.2,                    !- Chilled Water Setpoint at Outdoor Dry Bulb Low {C}
+  15.6,                    !- Chilled Water Reset Outdoor Dry Bulb Low {C}
+  6.7,                     !- Chilled Water Setpoint at Outdoor Dry Bulb High {C}
+  26.7;                    !- Chilled Water Reset Outdoor Dry Bulb High {C}
+
+
+HVACTemplate:Plant:Chiller,
+    Chiller 1,               !- Chiller Name
+    ElectricReciprocatingChiller,  !- Chiller Type
+    autosize,                !- Capacity {W}
+    3.6,                     !- COP {W/W}
+    WaterCooled,             !- Condenser Type
+    ;                        !- Priority
+
+
+HVACTemplate:Plant:Tower,
+    Tower 1,                 !- Tower Name
+    TwoSpeed,                !- Tower Type
+    autosize,                !- High-Speed Nominal Capacity {W}
+    autosize,                !- High-Speed Fan Power {W}
+    autosize,                !- Low-Speed Nominal Capacity {W}
+    autosize,                !- Low-Speed Fan Power {W}
+    autosize,                !- Free Convection Capacity {W}
+    ;                        !- Priority
+
+
+HVACTemplate:Plant:HotWaterLoop,
+  Hot Water Plant,         !- Plant Loop Name
+  ,                        !- Pump Schedule
+  Intermittent,            !- Pump Control Type
+  Default,                 !- Hot Water Plant Operation Scheme Type
+  ,                        !- Hot Water Plant Operation Scheme List Name
+  ,                        !- Hot Water Setpoint Schedule
+  82,                      !- Hot Water Design Setpoint {C}
+  ConstantFlow,            !- Hot Water Pump Configuration
+  179352,                  !- Hot Water Pump Rated Head {Pa}
+  None,                    !- Hot Water Setpoint Reset Type
+  82.2,                    !- Hot Water Setpoint at Outdoor Dry Bulb Low {C}
+  -6.7,                    !- Hot Water Reset Outdoor Dry Bulb Low {C}
+  65.6,                    !- Hot Water Setpoint at Outdoor Dry Bulb High {C}
+  10;                      !- Hot Water Reset Outdoor Dry Bulb High {C}
+
+
+HVACTemplate:Plant:Boiler,
+  Boiler 1,                !- Boiler Name
+  HotWaterBoiler,          !- Boiler Type
+  autosize,                !- Capacity {W}
+  0.8,                     !- Efficiency
+  NaturalGas,              !- Fuel Type
+  ;                        !- Priority
+
+
+Output:Variable,*,Damper Position,hourly;
+Output:Variable,*,Chiller Evap Heat Trans Rate,hourly;
+Output:Variable,*,Chiller COP,hourly;
+Output:Variable,*,Boiler Heating Output Rate,hourly;
+Output:Variable,*,Tower Heat Transfer,hourly;
+</code></pre>
+
 <h4 id="exercise-2c">Exercise 2C</h4>
-<p><strong>Output:Variable</strong>,*,Zone/Sys Air Temperature,monthly,Office Occupancy 2;</p>
-<p><strong>Output:Table:Monthly</strong>,</p>
-<p>Zone Temperature Report, !- Name</p>
-<p>2,                       !- DigitsAfterDecimal</p>
-<p>Zone Mean Air Temperature,  !- VariableOrMeterName01</p>
-<p>SumOrAverage,            !- AggregationType01</p>
-<p>Zone Mean Air Temperature,  !- VariableOrMeterName02</p>
-<p>Maximum,                 !- AggregationType02</p>
-<p>Zone Mean Air Temperature,  !- VariableOrMeterName03</p>
-<p>Minimum,                 !- AggregationType03</p>
-<p>Zone People Number of Occupants,  !- VariableOrMeterName04</p>
-<p>HoursPositive,           !- AggregationType04</p>
-<p>Zone Mean Air Temperature,  !- VariableOrMeterName05</p>
-<p>SumOrAverageDuringHoursShown,  !- AggregationType05</p>
-<p>Zone Mean Air Temperature,  !- VariableOrMeterName06</p>
-<p>MaximumDuringHoursShown, !- AggregationType06</p>
-<p>Zone Mean Air Temperature,  !- VariableOrMeterName07</p>
-<p>MinimumDuringHoursShown; !- AggregationType07</p>
+<pre><code class="idf">Output:Variable,*,Zone/Sys Air Temperature,monthly,Office Occupancy 2;
+
+
+Output:Table:Monthly,
+    Zone Temperature Report, !- Name
+    2,                       !- DigitsAfterDecimal
+    Zone Mean Air Temperature,  !- VariableOrMeterName01
+    SumOrAverage,            !- AggregationType01
+    Zone Mean Air Temperature,  !- VariableOrMeterName02
+    Maximum,                 !- AggregationType02
+    Zone Mean Air Temperature,  !- VariableOrMeterName03
+    Minimum,                 !- AggregationType03
+    Zone People Number of Occupants,  !- VariableOrMeterName04
+    HoursPositive,           !- AggregationType04
+    Zone Mean Air Temperature,  !- VariableOrMeterName05
+    SumOrAverageDuringHoursShown,  !- AggregationType05
+    Zone Mean Air Temperature,  !- VariableOrMeterName06
+    MaximumDuringHoursShown, !- AggregationType06
+    Zone Mean Air Temperature,  !- VariableOrMeterName07
+    MinimumDuringHoursShown; !- AggregationType07
+</code></pre>
+
 <h1 id="idf-editor-brief-introduction">IDF Editor – Brief Introduction</h1>
 <p>EnergyPlus has several options for the user to create input files. For the purposes of this document, we will describe briefly the workings of the IDF Editor that is supplied with the EnergyPlus Installation.  The IDF Editor is a simple, “intelligent” editor that reads the EnergyPlus Data Dictionary (IDD) and allows creation/revision of EnergyPlus Input Files (IDF). It can be run from a shortcut in the main EnergyPlus directory (created as part of the install) or directly from EP-Launch.</p>
 <p>Full details of the IDF Editor can be found in the Auxiliary Programs document.  IDD Conventions (to be able to read the IDD) are found in the Input Output Reference document. EnergyPlus standard units are described in several places, including later in this document.</p>
@@ -2636,13 +2708,13 @@ SimulationControl,
 <p><strong>End Uses</strong></p>
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity (GJ)</td>
-<td>Natural Gas (GJ)</td>
-<td>Other Fuel (GJ)</td>
-<td>Purchased Cooling (GJ)</td>
-<td>Purchased Heating (GJ)</td>
-<td>Water (m3)</td>
+<th> </th>
+<th>Electricity (GJ)</th>
+<th>Natural Gas (GJ)</th>
+<th>Other Fuel (GJ)</th>
+<th>Purchaseh Cooling (GJ)</th>
+<th>Purchaseh Heating (GJ)</th>
+<th>Water (m3)</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -2811,7 +2883,7 @@ SimulationControl,
 <p>Table 7. Overall Meter Types</p>
 <table class="table table-striped">
 <tr>
-<td>Meters</td>
+<th>Meters</th>
 </tr>
 <tr>
 <td>Facility</td>
@@ -2832,22 +2904,51 @@ SimulationControl,
 
 <p>Both the fuel types and enduse types are set within the program by the developers. Current Fuel types are shown in the table below. There is also a special category called “EnergyTranser”.</p>
 <p>Table 8. Table of Metered Fuel Types</p>
-<p>Utility/Fuel Types</p>
-<p>Electricity</p>
-<p>Gas</p>
-<p>Gasoline</p>
-<p>Diesel</p>
-<p>Coal</p>
-<p>FuelOil#1</p>
-<p>FuelOil#2</p>
-<p>Propane</p>
-<p>Water</p>
-<p>Steam</p>
-<p>DistrictCooling</p>
-<p>DistrictHeating</p>
+<table class="table table-striped">
+  <tr>
+    <th>Utility/Fuel Types</th>
+  </tr>
+  <tr>
+    <td>Electricity</td>
+  </tr>
+  <tr>
+    <td>Gas</td>
+  </tr>
+  <tr>
+    <td>Gasoline</td>
+  </tr>
+  <tr>
+    <td>Diesel</td>
+  </tr>
+  <tr>
+    <td>Coal</td>
+  </tr>
+  <tr>
+    <td>FuelOil\#1</td>
+  </tr>
+  <tr>
+    <td>FuelOil\#2</td>
+  </tr>
+  <tr>
+    <td>Propane</td>
+  </tr>
+  <tr>
+    <td>Water</td>
+  </tr>
+  <tr>
+    <td>Steam</td>
+  </tr>
+  <tr>
+    <td>DistrictCooling</td>
+  </tr>
+  <tr>
+    <td>DistrictHeating</td>
+  </tr>
+</table>
+
 <table class="table table-striped">
 <tr>
-<td>Other Resource Types</td>
+<th>Other Resource Types</th>
 </tr>
 <tr>
 <td>EnergyTransfer</td>
@@ -2856,30 +2957,85 @@ SimulationControl,
 
 <p>The end use types are shown in the following table:</p>
 <p>Table 9. End Use Category Types</p>
-<p><strong>End Use Types</strong></p>
-<p>InteriorLights</p>
-<p>ExteriorLights</p>
-<p>InteriorEquipment</p>
-<p>ExteriorEquipment</p>
-<p>Fans</p>
-<p>Pumps</p>
-<p>Heating</p>
-<p>Cooling</p>
-<p>HeatRejection</p>
-<p>Humidifier</p>
-<p>HeatRecovery</p>
-<p>DHW</p>
-<p>Cogeneration</p>
-<p>Refrigeration</p>
-<p>Miscellaneous</p>
-<p>Additional End Use Types Only Used for EnergyTransfer</p>
-<p>HeatingCoils</p>
-<p>CoolingCoils</p>
-<p>Chillers</p>
-<p>Boilers</p>
-<p>Baseboard</p>
-<p>HeatRecoveryForCooling</p>
-<p>HeatReoveryFor Heating</p>
+<table class="table table-striped">
+  <tr>
+    <th>End Use Types</th>
+  </tr>
+  <tr>
+    <td>InteriorLights</td>
+  </tr>
+  <tr>
+    <td>ExteriorLights</td>
+  </tr>
+  <tr>
+    <td>InteriorEquipment</td>
+  </tr>
+  <tr>
+    <td>ExteriorEquipment</td>
+  </tr>
+  <tr>
+    <td>Fans</td>
+  </tr>
+  <tr>
+    <td>Pumps</td>
+  </tr>
+  <tr>
+    <td>Heating</td>
+  </tr>
+  <tr>
+    <td>Cooling</td>
+  </tr>
+  <tr>
+    <td>HeatRejection</td>
+  </tr>
+  <tr>
+    <td>Humidifier</td>
+  </tr>
+  <tr>
+    <td>HeatRecovery</td>
+  </tr>
+  <tr>
+    <td>DHW</td>
+  </tr>
+  <tr>
+    <td>Cogeneration</td>
+  </tr>
+  <tr>
+    <td>Refrigeration</td>
+  </tr>
+  <tr>
+    <td>Miscellaneous</td>
+  </tr>
+</table>
+
+<p>Additional End Use Types Only Used for EnergyTransfer:</p>
+<table class="table table-striped">
+  <tr>
+    <th>AdditionalTypes</th>
+  </tr>
+  <tr>
+    <td>HeatingCoils</td>
+  </tr>
+  <tr>
+    <td>CoolingCoils</td>
+  </tr>
+  <tr>
+    <td>Chillers</td>
+  </tr>
+  <tr>
+    <td>Boilers</td>
+  </tr>
+  <tr>
+    <td>Baseboard</td>
+  </tr>
+  <tr>
+    <td>HeatRecoveryForCooling</td>
+  </tr>
+  <tr>
+    <td>HeatRecoveryForHeating</td>
+  </tr>
+</table>
+
 <h2 id="custom-meters">Custom Meters</h2>
 <p>You can also define your own “custom meters” from variable names that are summed during the simulation.  You assign the proper fuel type during the definition (review Input Output Reference, objects: <strong>Meter:Custom</strong> and <strong>Meter:CustomDecrement</strong>) for further requirements.</p>
 <h1 id="standard-energyplus-units">Standard EnergyPlus Units</h1>
@@ -2889,9 +3045,9 @@ SimulationControl,
 <p>Table 10. Standard EnergyPlus Units</p>
 <table class="table table-striped">
 <tr>
-<td>Quantity</td>
-<td>unit</td>
-<td>abbreviation</td>
+<th>Quantity</th>
+<th>unit</th>
+<th>abbreviation</th>
 </tr>
 <tr>
 <td>angular degrees</td>

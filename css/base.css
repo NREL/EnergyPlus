@@ -155,3 +155,16 @@ h5:hover .header-link,
 h6:hover .header-link {
   opacity: 1;
 }
+
+.box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto }

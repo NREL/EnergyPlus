@@ -713,7 +713,7 @@
 <p><span>${\dot m_S}$</span>   =    zone supply air mass flow rate, (kg/s)</p>
 <p>Figure 8 illustrates the zone mass flow components for an air loop system providing conditioned air to the two zones connected with a zone mixing object. Since Zone 1 is a source zone only, infiltration object is defined for zone 1 only.  The zone mixing object air flow rate depends on the user specified values and the zone air mass flow balance requirements.  When required the zone mixing object flow rate is adjusted from the user specified value for balancing purpose.</p>
 <p><img alt="" src="../../EngineeringReference/media/image134.svg" /></p>
-<p>Figure 8. Illustration of zone air mass flow balance componentshe</p>
+<p>Figure 8. Illustration of zone air mass flow balance components</p>
 <p>Individual zone may be a source zone for multiple receiving zones, and at the same time the same source zone may receive mixing flows from multiple adjacent zones in an air loop.  The source and receiving mass flow rates of ZoneMixing objects are calculated from user defined mixing flow rates at the first HVAC iteration for each time step and adjusted in subsequent iterations to balance the zone air mass flow. The source zone mixing mass flow rate is calculated by tracking the mass flow rates of ZoneMixing objects connected to a zone and is given by:</p>
 <div>\[{\dot m_{XS}} = \sum\nolimits_j {{{\dot m}_{XS,j}}} \]</div>
 
