@@ -11659,13 +11659,13 @@ Objects for attached shading surfaces:
 
 * Shading:Zone:Detailed
 
-EnergyPlus creates “bi-directional” shades from each shading surface entered. This means that the shade you input will cast a shadow no matter which side of the shade the sun is on. For example, a vertical fin will cast a shadow whether the sun is on the left side or right side of the fin.[[1]](#_ftn1)
+EnergyPlus creates “bi-directional” shades from each shading surface entered. This means that the shade you input will cast a shadow no matter which side of the shade the sun is on. For example, a vertical fin will cast a shadow whether the sun is on the left side or right side of the fin.  Prior to V1.0.2, a shading surface cast a shadow only in the hemisphere toward which the surface faced. This hemisphere is the one pointed to by the shading surface’s outward normal vector, which is the cross product V23 x V21, where V23 is the vector from vertex 2 to vertex 3 of the shading surface and V21 is the vector from vertex 2 to vertex 1. Beginning with V1.0.2, the shades in EnergyPlus are “bi-directional” so that they can cast shadows in both hemispheres depending on the time-varying position of the sun relative to the shading surface.
 
 It is important to note that EnergyPlus will automatically account for “self-shading” effects—such as in L-shaped buildings—in which some of the building’s wall and roof surfaces shade other parts of the building, especially windows. This means that you only need to describe shading elements that aren’t building heat-transfer surfaces.
 
 Shading surfaces can also **reflect** solar radiation onto the building. This feature is simulated if you choose FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building object (ref: Building - Field: Solar Distribution). In this case, you may specify the reflectance properties of a shading surface with the ShadingProperty:Reflectance object. Note: If no ShadingProperty:Reflectance object is defined, then the shading surface reflectance values are assumed to be 0.2 and the fraction of shading surface that is glazed is assumed to be 0.0.
 
-Shading surfaces also automatically shade diffuse solar radiation (and long-wave radiation) from the sky. And they will automically shade diffuse solar radiation from the ground if Solar Distribution Field = FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building  object.[[2]](#_ftn2) Otherwise, shading surfaces will not shade diffuse radiation from the ground unless you enter a reduced value for View Factor to Ground for those building surfaces that are shaded (ref: BuildingSurface:Detailed - Field: View Factor to Ground and FenestrationSurface:Detailed - Field: View Factor to Ground).
+Shading surfaces also automatically shade diffuse solar radiation (and long-wave radiation) from the sky. And they will automically shade diffuse solar radiation from the ground if Solar Distribution Field = FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building  object. (If the reflections option for Solar Distribution is used, the program also takes into account the reduction of solar radiation reflected from the ground due to shading of the ground by shading surfaces and by the building itself.)  Otherwise, shading surfaces will not shade diffuse radiation from the ground unless you enter a reduced value for View Factor to Ground for those building surfaces that are shaded (ref: BuildingSurface:Detailed - Field: View Factor to Ground and FenestrationSurface:Detailed - Field: View Factor to Ground).
 
 ### Detached Shading Surfaces
 
@@ -12687,60 +12687,37 @@ The solar absorptance of the inside reveal surfaces other than the sill.
 
 Figure 38. (a) Vertical section through a window (with frame) showing outside and inside reveal surfaces and inside sill. (b) Perspective view looking from the outside of a window (without frame) showing reveal surfaces. Note that “Outside Reveal Depth” is not a user input; it is calculated by the program from the window and wall vertices.
 
-
-
 An IDF example:
 
+```idf
   WindowProperty:FrameAndDivider,
-
       TestFrameAndDivider, ! Frame/Divider Name
-
       0.05, ! Frame Width
-
       0.04, ! Frame Outside Projection
-
       0.03, ! Frame Inside Projection
-
       5.0,  ! Frame Conductance
-
       1.3,  ! Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance
-
       0.8,  ! Frame Solar Absorptance
-
       0.8,  ! Frame Visible Absorptance
-
       0.9,  ! Frame Thermal Emissivity
-
       DividedLite, ! Divider Type
-
       0.03, ! Divider Width
-
       2,    ! Number of Horizontal Dividers
-
       2,    ! Number of Vertical Dividers
-
       0.03, ! Divider Outside Projection
-       0.03, ! Divider Inside Projection
-
+      0.03, ! Divider Inside Projection
       5.0,  ! Divider Conductance
-
       1.3,  ! Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
-
       0.8,  ! Divider Solar Absorptance
-
       0.8,  ! Divider Visible Absorptance
-
-     0.9,  ! Divider Thermal Emissivity
-
+      0.9,  ! Divider Thermal Emissivity
       0.7,  ! Outside Reveal Solar Absorptance
-
       0.25, ! Inside Sill Depth (m)
-
       0.6,  ! Inside Sill Solar Absorptance
-
       0.2,  ! Inside Reveal Depth (m)
-
       0.5;  ! Inside Reveal Solar Absorptance
+```
+
 
 ### WindowProperty:AirflowControl
 
@@ -12828,21 +12805,17 @@ Figure 39. Gap airflow configurations for airflow windows. (a) **Air exhaust win
 
 An IDF example: window with a constant airflow from inside to outside at 0.008 m<sup>3</sup>/s-m.
 
+```idf
  WindowProperty:AirflowControl,   !- Used to control forced airflow through a gap between glass layers
-
     Zn001:Wall001:Win002,   !- Name of Associated Window
-
     InsideAir,              !- Airflow Source
-
     OutsideAir,             !- Airflow Destination
-
     0.008,                  !- Maximum Airflow (m3/s per m of glazing width)
-
     AlwaysOnAtMaxFlow,      !- Airflow Control Type
-
     No,                     !- Airflow Has Multiplier Schedule?
-
     ;                       !- Name of Airflow Multiplier Schedule
+```
+
 
 ### WindowProperty:StormWindow
 
@@ -12908,21 +12881,17 @@ In the northern hemisphere, the month the storm window is put on is generally gr
 
 An IDF example of WindowProperty:StormWindow. The storm window is put in place on October 15 and removed on May 1.
 
+```idf
 WindowProperty:StormWindow,
-
  Window1, !- Name of Window to Which Storm Window Glass Layer is Applied
-
  GlassA,  !- Name of Material:WindowGlass or MATERIAL:WindowGlass:AltInput that is the storm window layer
-
  0.060,   !- Distance from storm window to adjacent glass (m)
-
  10,      !- Month that Storm Window Is Put On
-
  15,      !- Day of Month that Storm Window Is Put On
-
  5,       !- Month that Storm Window Is Taken Off
-
  1;       !- Day of Month that Storm Window Is Taken Off
+```
+
 
 ### Importing Windows from WINDOW program
 
@@ -12954,11 +12923,12 @@ Although WINDOW writes only one window entry on the WINDOW data file, EnergyPlus
 
 In EnergyPlus, the Window data file is searched for each “Construction:WindowDataFile” object in the EnergyPlus input. This object has a very simple form:
 
+```idf
 Construction:WindowDataFile,
-
 ConstructionName,
-
 FileName; ! Default is Window5DataFile.dat in the “run” folder.
+```
+
 
 If there is a window called ConstructionName on the Window data file, the data for that window is read from the file and the following EnergyPlus objects and their names are created. The “W5” prefixed to these names indicates that the object originated in the Window data file.
 
@@ -12968,41 +12938,42 @@ If there is a window called ConstructionName on the Window data file, the data f
 
 In addition to the canned Surface reports (view the Reports section later in this document) and surface variables (above), the following variables are available for all zones:
 
-Zone,Sum,Zone Total Internal Radiant Heating Energy [J]
+* Zone,Sum,Zone Total Internal Radiant Heating Energy [J]
 
-Zone,Sum,Zone Total Internal Visible Radiation Heating Energy [J]
+* Zone,Sum,Zone Total Internal Visible Radiation Heating Energy [J]
 
-Zone,Sum,Zone Total Internal Convective Heating Energy [J]
+* Zone,Sum,Zone Total Internal Convective Heating Energy [J]
 
-Zone,Sum,Zone Total Internal Latent Gain Energy [J]
+* Zone,Sum,Zone Total Internal Latent Gain Energy [J]
 
-Zone,Sum,Zone Total Internal Total Heating Energy [J]
+* Zone,Sum,Zone Total Internal Total Heating Energy [J]
 
-Zone,Average,Zone Mean Air Temperature [C]
+* Zone,Average,Zone Mean Air Temperature [C]
 
-HVAC,Average,Zone Air Temperature [C]
+* HVAC,Average,Zone Air Temperature [C]
 
-Zone,Average,Zone Mean Radiant Temperature [C]
+* Zone,Average,Zone Mean Radiant Temperature [C]
 
-Zone,Average,Zone Operative Temperature [C]
+* Zone,Average,Zone Operative Temperature [C]
 
-HVAC,Sum,Zone Air System Sensible Heating Energy [J]
+* HVAC,Sum,Zone Air System Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Air System Sensible Heating Rate [W]
+* HVAC,Average,Zone Air System Sensible Heating Rate [W]
 
-HVAC,Average,Zone Air System Sensible Cooling Rate [W]
+* HVAC,Average,Zone Air System Sensible Cooling Rate [W]
 
-HVAC,Average,Zone Air Humidity Ratio[kgWater/kgDryAir]
+* HVAC,Average,Zone Air Humidity Ratio[kgWater/kgDryAir]
 
-HVAC,Average,Zone Air Relative Humidity[%]
+* HVAC,Average,Zone Air Relative Humidity[%]
 
-Two of these are of particular interest:
+* Two of these are of particular interest:
 
-Zone,Average,Zone Mean Air Temperature [C]
+* Zone,Average,Zone Mean Air Temperature [C]
 
-HVAC,Average,Zone Air Temperature [C]
+* HVAC,Average,Zone Air Temperature [C]
+
 
 These two variable outputs are/should be identical. However, note that they can be reported at different time intervals. “Zone Mean Air Temperature” is only available on the Zone/HB timestep (Number of Timesteps per Hour) whereas “Zone Air Temperature” can be reported at the HVAC timestep (which can vary).
 
@@ -13153,13 +13124,13 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 - CombinedHeatAndMoistureFiniteElement
 
+```idf
 SurfaceProperty:HeatTransferAlgorithm:MultipleSurface,
-
     my exterior wall override,
-
     AllExteriorWalls,
-
     ConductionFiniteDifference;
+```
+
 
 ### SurfaceProperty:HeatTransferAlgorithm:SurfaceList
 
@@ -13195,19 +13166,15 @@ This is the name of the “Nth” surface that will be assigned to use the heat 
 
 An example IDF object follows.
 
+```idf
 SurfaceProperty:HeatTransferAlgorithm:SurfaceList,
-
     my wall construct override,   !- Name
-
     ConductionFiniteDifference,   !- Algorithm
-
     Zn001:Wall001,                !- Surface Name 1
-
     Zn001:Wall002,                !- Surface Name 2
-
     Zn001:Wall003,                !- Surface Name 3
-
     Zn001:Wall004;                !- Surface Name 4
+```
 
 ### SurfaceProperty:HeatTransferAlgorithm:Construction
 
@@ -13243,13 +13210,13 @@ This field is the name of a Construction object defined elsewhere.  All the sur
 
 An example IDF object follows.
 
+```idf
 SurfaceProperty:HeatTransferAlgorithm:Construction,
-
     my wall construct override,  !- Name
-
     ConductionFiniteDifference,  !- Algorithm
-
     R13WALL;                     !- Construction Name
+```
+
 
 ### SurfaceControl:MoveableInsulation
 
@@ -13279,15 +13246,14 @@ This field is a schedule that theoretically can be any positive real number but 
 
 An example of this syntax implemented in an input file is:
 
+```idf
 SurfaceControl:MoveableInsulation,
-
   Exterior,                      ! Insulation Type
-
   Zone001:Wall001,               ! Surface Name
-
   TransparentInsulationMaterial, ! Material Name
-
   PresentInWinterSchedule;       ! Schedule Name
+```
+
 
 ### SurfaceProperty:OtherSideCoefficients
 
@@ -13383,61 +13349,38 @@ Tpast  = Other side temperature from previous zone timestep (°C)
 
 Figure 41. Illustration for Other Side Coefficients
 
+```idf
 !  Example input using temperature schedule
-
 SurfaceProperty:OtherSideCoefficients,
-
     OSCCoef:Zn005:Wall003,   !- Name
-
     0,                       !- Combined Convective/Radiative Film Coefficient {W/m2-K}
-
     0.000000,                !- Constant Temperature {C}
-
     1.000000,                !- Constant Temperature Coefficient
-
     0.000000,                !- External Dry-Bulb Temperature Coefficient
-
     0.000000,                !- Ground Temperature Coefficient
-
     0.000000,                !- Wind Speed Coefficient
-
     0.000000,                !- Zone Air Temperature Coefficient
-
     Zn005Wall003OtherSideTempSched;  !- Constant Temperature Schedule Name
 
 
-
 !  Example input for outside heat transfer coefficient of 1.23, using Tosdb
-
 SurfaceProperty:OtherSideCoefficients,
-
     OSCCoef:Zn005:Wall004,   !- Name
-
     1.230000,                !- Combined Convective/Radiative Film Coefficient {W/m2-K}
-
     0.000000,                !- Constant Temperature {C}
-
     0.000000,                !- Constant Temperature Coefficient
-
     1.000000,                !- External Dry-Bulb Temperature Coefficient
-
     0.000000,                !- Ground Temperature Coefficient
-
     0.000000,                !- Wind Speed Coefficient
-
     0.000000,                !- Zone Air Temperature Coefficient
-
     ,                        !- Constant Temperature Schedule Name
-
     No,                      !- Sinusoidal Variation of Constant Temperature Coefficient
-
     24,                      !- Period of Sinusoidal Variation {hr}
-
     0.,                      !- Previous Other Side Temperature Coefficient
-
     ,                        !- Minimum Other Side Temperature Limit {C}
-
     ;                        !- Maximum Other Side Temperature Limit {C}
+```
+
 
 ### SurfaceProperty:OtherSideCoefficients Outputs
 
@@ -13446,18 +13389,6 @@ Zone,Average,Surface Other Side Coefficients Exterior Air Drybulb Temperature
 #### Surface Other Side Coefficients Exterior Air Drybulb Temperature [C]
 
 This is the air temperature applied to the other side of the surface.
-
-
-
-
-
-------------------------------------------------------------------------
-
-[[1]](#_ftnref1) Prior to V1.0.2, a shading surface cast a shadow only in the hemisphere toward which the surface faced. This hemisphere is the one pointed to by the shading surface’s outward normal vector, which is the cross product V23 x V21, where V23 is the vector from vertex 2 to vertex 3 of the shading surface and V21 is the vector from vertex 2 to vertex 1. Beginning with V1.0.2, the shades in EnergyPlus are “bi-directional” so that they can cast shadows in both hemispheres depending on the time-varying position of the sun relative to the shading surface.
-
-[[2]](#_ftnref2) If the reflections option for Solar Distribution is used, the program also takes into account the reduction of solar radiation reflected from the ground due to shading of the ground by shading surfaces and by the building itself.
-
-
 
 ### SurfaceProperty:OtherSideConditionsModel
 
@@ -13477,31 +13408,27 @@ This is the string referenced in the Surface statement that is using OtherSideMo
 
 This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ”GapConvectionRadiation” or “UndergroundPipingSystemSurface.”
 
-
-
 ![OtherSideConditionsFig](InputOutputReference/media/image070.png)
 
 Figure 42. Illustration for Other Side Conditions Model
 
 An example specification is:
 
+```idf
 SurfaceProperty:OtherSideConditionsModel,
-
     UTSC OSCM ZN11,          ! OtherSideConditionsModel Name
-
     GapConvectionRadiation; ! Type of Modeling used to determine Boundary Conditions
-
-
+```
 
 ### SurfaceProperty:OtherSideConditionsModel Outputs
 
-Zone,Average,Surface Other Side Conditions Modeled Convection Air Temperature [C]
+* Zone,Average,Surface Other Side Conditions Modeled Convection Air Temperature [C]
 
-Zone,Average,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient [W/m2-K]
+* Zone,Average,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient [W/m2-K]
 
-Zone,Average,Surface Other Side Conditions Modeled Radiation Temperature [C]
+* Zone,Average,Surface Other Side Conditions Modeled Radiation Temperature [C]
 
-Zone,Average,Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient [W/m2-K]
+* Zone,Average,Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient [W/m2-K]
 
 #### Surface Other Side Conditions Modeled Convection Air Temperature [C]
 
@@ -14025,8 +13952,8 @@ The entries can be of several types: Value (simple numeric value), Schedule (nam
 
 <table class="table table-striped">
 <tr>
-<td>Key choice</td>
-<td>Applies to Inside or Outside</td>
+<th>Key choice</th>
+<th>Applies to Insihe or Outsihe</th>
 </tr>
 <tr>
 <td>Value</td>
@@ -14230,65 +14157,39 @@ If the Convection type was “UserCurve”, then this field contains the name of
 
 In IDF usage:
 
+```idf
 SurfaceProperty:ConvectionCoefficients,
-
 Zn001:Wall001,  ! Surface Name
-
 Outside,        ! Convection Coefficient 1 Location
-
 Value,          ! Convection Coefficient 1 Type
-
 9.8,            ! Convection Coefficient 1
-
 ,               ! Convection Coefficient 1 Schedule Name
-
 ,               ! Convection Coefficient 1 User Curve Name
-
 Inside,         ! Convection Coefficient 2 Location
-
 Schedule,       ! Convection Coefficient 2 Type
-
 ,               ! Convection Coefficient 2 {blank because using schedule}
-
 MyInteriorCC,   ! Convection Coefficient 2 Schedule Name
-
 ;               ! Convection Coefficient 2 User Curve Name
 
-
-
 SurfaceProperty:ConvectionCoefficients,
-
 Zn001:Wall002,  ! Surface Name
-
 Inside,         ! Convection Coefficient 1 Location
-
 Value,          ! Convection Coefficient 1 Type
-
 .8,             ! Convection Coefficient 1
-
 ,               ! Convection Coefficient 1 Schedule Name
-
 ,               ! Convection Coefficient 1 User Curve Name
-
 Outside,        ! Convection Coefficient 2 Location
-
 Value,          ! Convection Coefficient 2 Type
-
 5.5,            ! Convection Coefficient 2
-
 ;               ! Convection Coefficient 2 User Curve Name
 
-
-
 SurfaceProperty:ConvectionCoefficients,
-
 Zn001:Wall003,  ! Surface Name
-
 Outside,        ! Convection Coefficient 1 Location
-
 Value,          ! Convection Coefficient 1 Type
-
 9.8;            ! Convection Coefficient 1
+```
+
 
 ### SurfaceProperty:ConvectionCoefficients:MultipleSurface
 
@@ -14338,8 +14239,8 @@ The entries can be of several types: Value (simple numeric value), Schedule (nam
 
 <table class="table table-striped">
 <tr>
-<td>Key choice</td>
-<td>Applies to Inside or Outside</td>
+<th>Key choice</th>
+<th>Applies to Insihe or Outsihe</th>
 </tr>
 <tr>
 <td>Value</td>
@@ -14539,13 +14440,13 @@ If the Convection type was “UserCurve”, then this field contains the name of
 
 In IDF usage:
 
+```idf
 SurfaceProperty:ConvectionCoefficients:MultipleSurface,
-
 AllExteriorWindows,  ! Surface Types
-
 Outside,             ! Convection Coefficient 1 Location
-
 MoWitt;              ! Convection Coefficient 1 Type
+```
+
 
 ### Convection Coefficient Application Hierarchy
 
@@ -14569,8 +14470,8 @@ Table 9. Convection Coefficient Assignment Hierarchy
 
 <table class="table table-striped">
 <tr>
-<td>Objects/Description</td>
-<td>Action</td>
+<th>Objects/Description</th>
+<th>Action</th>
 </tr>
 <tr>
 <td>SurfaceConvectionAlgorithm:*</td>
@@ -14616,10 +14517,10 @@ This variable reports how the surface was classified as part of the adaptive con
 
 <table class="table table-striped">
 <tr>
-<td>Code</td>
-<td>Zone Airflow Regime</td>
-<td>Type of surface</td>
-<td>Heat Flow</td>
+<th>Cohe</th>
+<th>Zone Airflow Regime</th>
+<th>Type of surface</th>
+<th>Heat Flow</th>
 </tr>
 <tr>
 <td>1</td>
@@ -14899,8 +14800,8 @@ This variable reports the specific model equation used to calculate the inside f
 
 <table class="table table-striped">
 <tr>
-<td>Report Code</td>
-<td>Related key and model</td>
+<th>Report Cohe</th>
+<th>Relateh key anh mohel</th>
 </tr>
 <tr>
 <td>200</td>
@@ -15034,8 +14935,8 @@ The inside face convection heat transfer calculations can be based on different 
 
 <table class="table table-striped">
 <tr>
-<td>Report Code</td>
-<td>Reference Air Temperature Method</td>
+<th>Report Cohe</th>
+<th>Reference Air Temperature Methoh</th>
 </tr>
 <tr>
 <td>1</td>
@@ -15057,8 +14958,8 @@ This variable reports how the surface was classified as part of the adaptive con
 
 <table class="table table-striped">
 <tr>
-<td>Report Code</td>
-<td>Surface Classification</td>
+<th>Report Cohe</th>
+<th>Surface Classification</th>
 </tr>
 <tr>
 <td>101</td>
@@ -15086,8 +14987,8 @@ These variables report the specific model equation used to calculate the outside
 
 <table class="table table-striped">
 <tr>
-<td>Report Code</td>
-<td>Related key and model</td>
+<th>Report Cohe</th>
+<th>Relateh key anh mohel</th>
 </tr>
 <tr>
 <td>300</td>
@@ -15221,17 +15122,15 @@ The CombinedHeatAndMoistureFiniteElement algorithm will use this value to calcul
 
 Below is an example input of vapor transfer coefficients for a surface.
 
+```idf
 SurfaceProperties:VaporCoefficients,
-
       South wall,     !- Surface Name
-
       Yes,     !- Constant External Vapor Transfer Coefficient
-
       0.0000000625,     !- External Vapor Coefficient Value
-
       Yes,     !- Constant Internal vapor Transfer Coefficient
-
       0.00000002;     !- Internal Vapor Coefficient Value
+```
+
 
 ### SurfaceProperty:ExteriorNaturalVentedCavity
 
@@ -15299,47 +15198,37 @@ The remaining fields are used to name the **BuildingSurface:Detailed** objects t
 
 An example IDF entry is
 
+```idf
 SurfaceProperty:ExteriorNaturalVentedCavity,
-
     PVRoofPaverExtVentCav1 ,   ! Name
-
     PVRoofPaverSystem1,        ! OtherSideConditionsModel Object Name
-
     0.02,    ! Area Fraction of Openings
-
     0.9,     ! Thermal Emissivity of Exterior Baffle Material
-
     0.92,    ! Solar Absorbtivity of Exterior Baffle
-
     0.05,    ! Height scale for bouyancy-driven ventilation
-
     0.05,    ! Effective Thickness of Cavity Behind Exterior Baffle
-
     0.97,    ! Ratio of Actual surface area to projected surface area
-
     Smooth , ! Roughness of collector
-
     0.1 ,    ! Cv, Effectiveness for perforations with respect to Wind
-
     0.5 ,    ! Cd, Discharge Coefficient for Openings with respect to bouyancy-driven flow
-
     Zn001:Roof001 ;    ! Surface Name
+```
 
 ### SurfaceProperty:ExteriorNaturalVentedCavity Outputs
 
 In addition to related output that can be obtained for all surfaces, these outputs are available for exterior naturally vented cavity configurations:
 
-HVAC,Average, Surface Exterior Cavity Air Drybulb Temperature [C]
+* HVAC,Average, Surface Exterior Cavity Air Drybulb Temperature [C]
 
-HVAC,Average, Surface Exterior Cavity Baffle Surface Temperature [C]
+* HVAC,Average, Surface Exterior Cavity Baffle Surface Temperature [C]
 
-HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Air Change Rate [ACH]
+* HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Air Change Rate [ACH]
 
-HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate [kg/s]
+* HVAC,Average, Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate [kg/s]
 
-HVAC,Average, Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate [kg/s]
+* HVAC,Average, Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate [kg/s]
 
-HVAC,Average, Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate [kg/s]
+* HVAC,Average, Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate [kg/s]
 
 #### Surface Exterior Cavity Air Drybulb Temperature [C]
 
@@ -15387,33 +15276,23 @@ This field specifies the name of a schedule that contains the values for inciden
 
 Example for SurfaceProperty:SolarIncidentInside using a compact schedule:
 
+```idf
   Schedule:Compact,
-
     North Wall SSG,          !- Name
-
     Positive Number,         !- Schedule Type Limits Name
-
     Through: 12/31,          !- Field 1
-
     For: AllDays,            !- Field 2
-
     Until: 07:00,10,         !- Field 3
-
     Until: 17:00,20,         !- Field 5
-
     Until: 24:00,15;         !- Field 7
 
 
-
   SurfaceProperty:SolarIncidentInside,
-
     North Wall Solar Incident,  !- Name
-
     Room102 North Wall,         !- Surface Name
-
     Room Wall - North,          !- Construction Name
-
     North Wall SSG;             !- Schedule Name
+```
 
 ### ComplexFenestrationProperty:SolarAbsorbedLayers
 
@@ -15453,73 +15332,45 @@ Specifies the name of a schedule that contains absorbed solar radiation values i
 
 Example for ComplexFenestrationProperty:SolarAbsorbedLayers with compact schedules:
 
+```idf
   Schedule:Compact,
-
     Layer 1,                 !- Name
-
     Positive Number,         !- Schedule Type Limits Name
-
     Through: 12/31,          !- Field 1
-
     For: AllDays,            !- Field 2
-
     Until: 07:00,1,         !- Field 3
-
     Until: 17:00,2,         !- Field 5
-
     Until: 24:00,1.5;         !- Field 7
 
 
-
   Schedule:Compact,
-
     Layer 2,                 !- Name
-
     Positive Number,         !- Schedule Type Limits Name
-
     Through: 12/31,          !- Field 1
-
     For: AllDays,            !- Field 2
-
     Until: 07:00,0.8,        !- Field 3
-
     Until: 17:00,1.2,        !- Field 5
-
     Until: 24:00,1.0;        !- Field 7
 
 
-
   Schedule:Compact,
-
     Layer 3,                 !- Name
-
     Positive Number,         !- Schedule Type Limits Name
-
     Through: 12/31,          !- Field 1
-
     For: AllDays,            !- Field 2
-
     Until: 07:00,1,          !- Field 3
-
     Until: 17:00,2.1,        !- Field 5
-
     Until: 24:00,1.7;        !- Field 7
 
 
-
   ComplexFenestrationProperty:SolarAbsorbedLayers,
-
     South Window Solar Absorbed Layers, !- Name
-
     Room 102 South Window,              !- Fenestration surface name
-
-    CFS\_Glz\_2,                          !- Construction Surface name
-
+    CFS_Glz_2,                          !- Construction Surface name
     Layer 1,                            !- Absorbed solar energy in layer 1
-
     Layer 2,                            !- Absorbed solar energy in layer 2
-
     Layer 3;                            !- Absorbed solar energy in layer 3
+```
 
 ### GeometryTransform
 
@@ -15607,13 +15458,12 @@ This value is the view factor for “from Surface” to “to Surface”.
 
 An IDF Example:
 
+```idf
 ZoneProperty:UserViewFactors:bySurfaceName,Lshaped Zone,
-
   Lshaped Zone:South Wall,Lshaped Zone:South Wall,0.000000,
-
   Lshaped Zone:South Wall,Lshaped Zone:East Wall,0.101310,
-
-&lt;snip&gt;
+  <snip>
+```
 
 Group – Detailed Ground Heat Transfer
 -------------------------------------
@@ -15707,10 +15557,10 @@ Table 10. Summary of Room Air Models
 
 <table class="table table-striped">
 <tr>
-<td>Air Model Key</td>
-<td>Air model Algorithm</td>
-<td>Applicability</td>
-<td>Input Objects Required</td>
+<th>Air Mohel Key</th>
+<th>Air mohel Algorithm</th>
+<th>Applicability</th>
+<th>Input Objects Requireh</th>
 </tr>
 <tr>
 <td>Mixing</td>
@@ -15784,15 +15634,14 @@ Input either *Direct* or *Indirect*
 
 An example idf entry follows
 
+```idf
 RoomAirModelType,
-
     MOD1,      !- Room-Air Model Name
-
     ZONE ONE,  !- Zone Name
-
     ThreeNodeDisplacementVentilation,  !- Room-Air Modeling Type
-
     Direct;    !- Air Temperature Coupling Strategy
+```
+
 
 ### RoomAir:TemperaturePattern:UserDefined
 
@@ -15820,15 +15669,14 @@ This field provides the name of schedule that will be used to control which user
 
 An example of this object is
 
+```idf
 RoomAir:TemperaturePattern:UserDefined,
-
   Ground Floor South Air Temp Contrls , ! Name
-
-  ZN2\_S\_1 ,          ! Zone Name
-
-  Always\_on ,        ! Availability Schedule Name
-
+  ZN2_S_1 ,          ! Zone Name
+  Always_on ,        ! Availability Schedule Name
   Roomair Pattern 1; ! Pattern Control Schedule Name
+```
+
 
 ### RoomAir:TemperaturePattern:ConstantGradient
 
@@ -15864,19 +15712,15 @@ This field specifies the gradient, or slope, of temperature changes in the verti
 
 An example of this object is:
 
+```idf
 RoomAir:TemperaturePattern:ConstantGradient,
-
   half C per Meter,       ! Name
-
   10005,   ! Control Integer for Pattern Control Schedule Name
-
   0.0,     ! Thermostat Offset (Temp at thermostat- Mean Air Temp) [C]
-
   1.0,     ! Return Air Offset (Tleaving - Mean Air Temp )  [C]
-
   1.0,     ! Exhaust Air Offset (Texhaust - Mean Air Temp)  [C]
-
   0.5;     ! Temperature Gradient [K/m]
+```
 
 ### RoomAir:TemperaturePattern:TwoGradient
 
@@ -15942,31 +15786,21 @@ This field is used to enter the lower bound on heat rate values. It is required 
 
 An example of this object follows. This pattern will apply no gradient (effectively the mixing model) if zone air temperatures are 22.5 C or lower. It will apply a gradient of 1 K/m if zone temperatures are 26.0 C or higher. For zone air temperatures between 22.5 and 26.0 it will determine the gradient by linear interpolation and use a gradient between 0.0 and 1.0 K/m depending on where the zone air temperature is in the range.
 
+```idf
 RoomAir:TemperaturePattern:TwoGradient,
-
   Mixed to one C per M by Zone DB, ! Name
-
   2002,                 ! Control Integer for Pattern Control Schedule
-
   1.1,                  ! Thermostat Height meters
-
   4.5,                  ! Return Air Height
-
   3.5,                  ! Exhaust Air Height
-
   0.0, ! Temperature Gradient Lower Bound K/m
-
   1.0, ! Temperature Gradient Upper  Bound K/m
-
   ZoneDrybulbTemperature, ! Gradient Interpolation Mode
-
   26.0,               ! Upper Temperature [C]
-
   22.5,               ! Lower Temperature [C]
-
   , ! Upper Heat Rate [W]
-
   ; ! Lower Heat Rate [W]
+```
 
 ### RoomAir:TemperaturePattern:NondimensionalHeight
 
@@ -16016,41 +15850,27 @@ An example of this object corresponding to the figure above is:
 
 
 
+```idf
 RoomAir:TemperaturePattern:NondimensionalHeight,
-
   Rough UFAD Approx  , ! Name
-
   3001 , ! Control Integer for Pattern Control Schedule
-
         ! note reference this entry in Schedule
-
   -1.0 ,   ! Thermostat Offset
-
   1.5 , ! Return Air Offset (Tleaving - Mean Air Temp ) deg C
-
   1.75,   ! Exhaust Air Offset (Texhaust - Mean Air Temp) deg C
-
   0.05,  -1.8,   ! pair 1 (Zeta , DeltaTai)
-
   0.1,   -1.7 ,  ! pair 2 (Zeta , DeltaTai)
-
   0.2,   -0.8 ,  ! pair 3 (Zeta , DeltaTai)
-
   0.3,   -0.2,   ! pair 4 (Zeta , DeltaTai)
-
   0.4,    0.5,   ! pair 5 (Zeta , DeltaTai)
-
   0.5,    0.8,   ! pair 6 (Zeta , DeltaTai)
-
   0.6,    1.2,   ! pair 7 (Zeta , DeltaTai)
-
   0.7,    1.4,   ! pair 8 (Zeta , DeltaTai)
-
   0.8,    1.4,   ! pair 9 (Zeta , DeltaTai)
-
   0.9,   1.42,   ! pair 10 (Zeta , DeltaTai)
-
  0.95,  1.44;   ! pair 11 (Zeta , DeltaTai)
+```
+
 
 ### RoomAir:TemperaturePattern:SurfaceMapping
 
@@ -16094,35 +15914,24 @@ DeltaT<sub>ai</sub> is the temperature difference between the air temperature ad
 
 An example of this object, which might be used to elevate temperatures near west windows in the afternoon, is:
 
+```idf
 RoomAir:TemperaturePattern:SurfaceMapping,
-
   GroundFloor SW Corner Hot Near West Wall, ! Name
-
   4001, ! Control Integer for Pattern Control Schedule Name
-
   0.0, ! Thermostat Offset(Temp at thermostat- Mean Air Temp)
-
   0.0, ! Return Air Offset  deg C
-
   0.0, ! Exhaust Air Offset
+  ZN1_SW_1:W_ExtWall:1 ,  0.8,  ! pair 1 (Surface Name , DeltaTai)
+  ZN1_SW_1:W_ExtWall:2 ,  0.9,  ! pair 2 (Surface Name , DeltaTai)
+  ZN1_SW_1:W_ExtWall:3 ,  1.0,  ! pair 3 (Surface Name , DeltaTai)
+  ZN1_SW_1:W_ExtWall:4,   1.1,  ! pair 4 (Surface Name , DeltaTai)
+  ZN1_SW_1:W_ExtWall:5,   1.3,  ! pair 5 (Surface Name , DeltaTai)
+  ZN1_SW_1:W_ExtWall:6,   1.5,  ! pair 6 (Surface Name , DeltaTai)
+  ZN1_SW_1:W_ExtWall:7,   1.7,  ! pair 7 (Surface Name , DeltaTai)
+  ZN1_SW_1:W_ExtWall:8,   2.1,  ! pair 8 (Surface Name , DeltaTai)
+  ZN1_SW_1:W_ExtWall:9,   2.4 ; ! pair 8 (Surface Name , DeltaTai)
+```
 
-  ZN1\_SW\_1:W\_ExtWall:1 ,  0.8,  ! pair 1 (Surface Name , DeltaTai)
-
-  ZN1\_SW\_1:W\_ExtWall:2 ,  0.9,  ! pair 2 (Surface Name , DeltaTai)
-
-  ZN1\_SW\_1:W\_ExtWall:3 ,  1.0,  ! pair 3 (Surface Name , DeltaTai)
-
-  ZN1\_SW\_1:W\_ExtWall:4,   1.1,  ! pair 4 (Surface Name , DeltaTai)
-
-  ZN1\_SW\_1:W\_ExtWall:5,   1.3,  ! pair 5 (Surface Name , DeltaTai)
-
-  ZN1\_SW\_1:W\_ExtWall:6,   1.5,  ! pair 6 (Surface Name , DeltaTai)
-
-  ZN1\_SW\_1:W\_ExtWall:7,   1.7,  ! pair 7 (Surface Name , DeltaTai)
-
-  ZN1\_SW\_1:W\_ExtWall:8,   2.1,  ! pair 8 (Surface Name , DeltaTai)
-
-  ZN1\_SW\_1:W\_ExtWall:9,   2.4 ; ! pair 8 (Surface Name , DeltaTai)
 
 ### RoomAir:Node
 
@@ -16162,19 +15971,16 @@ These remaining alpha fields indicate the names of the surfaces (Ref: Surface) t
 
 An IDF example:
 
+```idf
 RoomAir:Node,
-
     WESTZN:FLOORAIR,    !- Node Name
-
     Floor,      !- Node Type
-
     WEST ZONE,  !- Name of Zone to Which the Air Node Belongs
-
     0.1,        !- Height of Nodal Control Volume Center {m}
-
     WESTZN:FLOOR:LEFF,  !- surface name
-
     WESTZN:FLOOR:RIGHT; !- surface name
+```
+
 
 ### RoomAirSettings:OneNodeDisplacementVentilation
 
@@ -16194,13 +16000,12 @@ This numeric field indicates what fraction of the infiltration air enters near t
 
 An IDF example:
 
+```idf
 RoomAirSettings:OneNodeDisplacementVentilation,
-
     WEST ZONE,  !- Zone Name
-
     0.1,  !- Fraction of internal loads from the convective Floor Air
-
     0.1;  !- Fraction of internal loads from the Infiltration Air
+```
 
 ### RoomAirSettings:ThreeNodeDisplacementVentilation
 
@@ -16274,19 +16079,16 @@ The value should be greater than or equal to zero and is in units of degrees Cen
 
 An example input:
 
+```idf
 RoomAirSettings:ThreeNodeDisplacementVentilation,
-
     ZONE ONE,  !- Zone Name
-
     Constant - .2,  !- Gain Distribution Schedule Name
-
      1,  !- Number of Plumes per Occupant
-
       ,  !- Thermostat Height
-
       ,  !- Comfort Height
-
     .3;  !- Temp. Difference Threshold for Displacement Ventilation
+```
+
 
 ### RoomAirSettings:CrossVentilation
 
@@ -16332,23 +16134,24 @@ Possible choices: Jet or Recirculation.
 
 ### CrossVentilation Model Outputs
 
-Zone,Average,Room Air Zone Jet Region Temperature [C]
+* Zone,Average,Room Air Zone Jet Region Temperature [C]
 
-Zone,Average,Room Air Zone Recirculation Region Temperature [C]
+* Zone,Average,Room Air Zone Recirculation Region Temperature [C]
 
-Zone,Average,Room Air Zone Jet Region Average Air Velocity [m/s]
+* Zone,Average,Room Air Zone Jet Region Average Air Velocity [m/s]
 
-Zone,Average,Room Air Zone Recirculation Region Average Air Velocity [m/s]
+* Zone,Average,Room Air Zone Recirculation Region Average Air Velocity [m/s]
 
-Zone,Average,Room Air Window Jet Region Average Air Velocity [m/s] Zone,Average,Room Air Zone Recirculation and Inflow Rate Ratio []
+* Zone,Average,Room Air Window Jet Region Average Air Velocity [m/s] Zone,Average,Room Air Zone Recirculation and Inflow Rate Ratio []
 
-Zone,Average,Room Air Zone Inflow Opening Area [m2]
+* Zone,Average,Room Air Zone Inflow Opening Area [m2]
 
-Zone,Average,Room Air Zone Room Length [m]
+* Zone,Average,Room Air Zone Room Length [m]
 
-Zone,Average,Room Air Zone Is Mixing Status []
+* Zone,Average,Room Air Zone Is Mixing Status []
 
-Zone,Average,Room Air Zone Is Recirculating Status []
+* Zone,Average,Room Air Zone Is Recirculating Status []
+
 
 #### Room Air Zone Jet Region Temperature [C]
 
@@ -16466,48 +16269,31 @@ An example input is:
 
 
 
+```idf
   RoomAirModelType,
-
     SPACE5-1 RoomAir Model,  !- Name
-
     SPACE5-1,                !- Zone Name
-
     UnderFloorAirDistributionInterior,  !- Room-Air Modeling Type
-
     DIRECT;                  !- Air Temperature Coupling Strategy
 
-
 RoomAirSettings:UnderFloorAirDistributionInterior,
-
     SPACE5-1,                !- Zone Name
-
     Autocalculate,           !- Number of Diffusers
-
     Autocalculate,           !- Power per Plume
-
     Autocalculate,           !- Design Effective Area of Diffuser {m2}
-
     Autocalculate,           !- Diffuser Slot Angle from Vertical {deg}
-
     ,                        !- Thermostat Height {m}
-
     ,                        !- Comfort Height {m}
-
     0.001,         !- Temperature Difference Threshold for Reporting {deltaC}
-
     Swirl,                   !- Diffuser Type
-
     1.7,                     !- Transition Height {m}
-
     Autocalculate,           !- Coefficient A
-
     Autocalculate,           !- Coefficient B
-
     Autocalculate,           !- Coefficient C
-
     Autocalculate,           !- Coefficient D
-
    Autocalculate;           !- Coefficient E
+```
+
 
 ### RoomAirSettings:UnderFloorAirDistributionExterior
 
@@ -16585,37 +16371,25 @@ The coefficient E in the formula: Kc = A\*Gamma\*\*B + C + D\*Gamma + E\*Gamma\*
 
 An example input is:
 
+```idf
   RoomAirSettings:UnderFloorAirDistributionExterior,
-
     SPACE1-1,                !- Zone Name
-
     Autocalculate,           !- Number of Diffusers per Zone
-
     Autocalculate,           !- Power per Plume
-
     Autocalculate,           !- Design Effective Area of Diffuser {m2}
-
     Autocalculate,           !- Diffuser Slot Angle from Vertical {deg}
-
     ,                        !- Thermostat Height {m}
-
     ,                        !- Comfort Height {m}
-
     0.001,                   !- Temperature Difference Threshold for Reporting {deltaC}
-
     LinearBarGrille,         !- Diffuser Type
-
     1.7,                     !- Transition Height {m}
-
     Autocalculate,           !- Coefficient A
-
     Autocalculate,           !- Coefficient B
-
     Autocalculate,           !- Coefficient C
-
     Autocalculate,           !- Coefficient D
-
    Autocalculate;           !- Coefficient E
+```
+
 
 ### Room Air Model Outputs
 
@@ -16647,25 +16421,26 @@ This output variable provides the drybulb air temperature used in, or calculated
 
 ### ThreeNodeDisplacementVentilation Outputs
 
-HVAC,Average,Room Air Zone Mixed Subzone Temperature [C]
+* HVAC,Average,Room Air Zone Mixed Subzone Temperature [C]
 
-HVAC,Average,Room Air Zone Occupied Subzone Temperature [C]
+* HVAC,Average,Room Air Zone Occupied Subzone Temperature [C]
 
-HVAC,Average,Room Air Zone Floor Subzone Temperature [C]
+* HVAC,Average,Room Air Zone Floor Subzone Temperature [C]
 
-HVAC,Average,Room Air Zone Transition Height [m]
+* HVAC,Average,Room Air Zone Transition Height [m]
 
-HVAC,Average,Room Air Zone Recommended Minimum Flow Fraction
+* HVAC,Average,Room Air Zone Recommended Minimum Flow Fraction
 
-HVAC,Average,Room Air Zone Is Mixed Status []
+* HVAC,Average,Room Air Zone Is Mixed Status []
 
-HVAC,Average,Room Air Zone Average Temperature Gradient [K/m]
+* HVAC,Average,Room Air Zone Average Temperature Gradient [K/m]
 
-HVAC,Average,Room Air Zone Maximum Temperature Gradient [K/m]
+* HVAC,Average,Room Air Zone Maximum Temperature Gradient [K/m]
 
-HVAC,Average,Room Air Zone Thermal Comfort Effective Air Temperature [C]
+* HVAC,Average,Room Air Zone Thermal Comfort Effective Air Temperature [C]
 
-HVAC,Average,Room Air Zone Thermostat Temperature [C]
+* HVAC,Average,Room Air Zone Thermostat Temperature [C]
+
 
 #### Room Air Zone Mixed Subzone Temperature [C]
 
@@ -16709,23 +16484,24 @@ The temperature at the height of the thermostat (specified by user input) in deg
 
 ### CrossVentilation Model Outputs
 
-Zone,Average,Room Air Zone Jet Region Temperature [C]
+* Zone,Average,Room Air Zone Jet Region Temperature [C]
 
-Zone,Average,Room Air Zone Recirculation Region Temperature [C]
+* Zone,Average,Room Air Zone Recirculation Region Temperature [C]
 
-Zone,Average,Room Air Zone Jet Region Average Air Velocity [m/s]
+* Zone,Average,Room Air Zone Jet Region Average Air Velocity [m/s]
 
-Zone,Average,Room Air Zone Recirculation Region Average Air Velocity [m/s]
+* Zone,Average,Room Air Zone Recirculation Region Average Air Velocity [m/s]
 
-Zone,Average,Room Air Zone Inflow Opening Area[m2]
+* Zone,Average,Room Air Zone Inflow Opening Area[m2]
 
-Zone,Average,Room Air Zone Room Length [m]
+* Zone,Average,Room Air Zone Room Length [m]
 
-Zone,Average,Room Air Zone Recirculation and Inflow Rate Ratio []
+* Zone,Average,Room Air Zone Recirculation and Inflow Rate Ratio []
 
-Zone,Average,Room Air Zone Is Mixing Status []
+* Zone,Average,Room Air Zone Is Mixing Status []
 
-Zone,Average,Room Air Zone Is Recirculating Status []
+* Zone,Average,Room Air Zone Is Recirculating Status []
+
 
 #### Room Air Zone Jet Region Temperature [C]
 
@@ -16767,27 +16543,28 @@ An integer flag that indicates whether recirculations are present in the flow. A
 
 ### UnderFloorAirDistributionInterior/Exterior Model Outputs
 
-HVAC,Average,Room Air Zone Mixed Subzone Temperature [C]
+* HVAC,Average,Room Air Zone Mixed Subzone Temperature [C]
 
-HVAC,Average,Room Air Zone Occupied Subzone Temperature [C]
+* HVAC,Average,Room Air Zone Occupied Subzone Temperature [C]
 
-HVAC,Average,Room Air Zone Transition Height [m]
+* HVAC,Average,Room Air Zone Transition Height [m]
 
-HVAC,Average,Room Air Zone Is Mixed Status []
+* HVAC,Average,Room Air Zone Is Mixed Status []
 
-HVAC,Average,Room Air Zone Average Temperature Gradient [K/m]
+* HVAC,Average,Room Air Zone Average Temperature Gradient [K/m]
 
-HVAC,Average,Room Air Zone Effective Comfort Air Temperature [C]
+* HVAC,Average,Room Air Zone Effective Comfort Air Temperature [C]
 
-HVAC,Average,Room Air Zone Thermostat Temperature [C]
+* HVAC,Average,Room Air Zone Thermostat Temperature [C]
 
-HVAC,Average,Room Air Zone Transition Height Gamma Value [ ]
+* HVAC,Average,Room Air Zone Transition Height Gamma Value [ ]
 
-HVAC,Average,Room Air Zone Plume Heat Transfer Rate [W]
+* HVAC,Average,Room Air Zone Plume Heat Transfer Rate [W]
 
-HVAC,Average,Room Air Zone Temperature Stratification Fraction []
+* HVAC,Average,Room Air Zone Temperature Stratification Fraction []
 
-HVAC,Average,Room Air Zone Window Plume Heat Transfer Rate [W]
+* HVAC,Average,Room Air Zone Window Plume Heat Transfer Rate [W]
+
 
 #### Room Air Zone Mixed Subzone Temperature [C]
 
@@ -16912,247 +16689,191 @@ This field accepts either “Yes” or “No” as values. When “Yes” is spe
 
 Table 11. Metabolic Rates for Various Activities
 
-Activity
-
-Activity Level W/Person EnergyPlus Schedule Value
-
-Activity Level W/m<sup>2</sup>
-
-met\*
-
-*Resting*
-
-Sleeping
-
-72
-
-40
-
-0.7
-
-Reclining
-
-81
-
-45
-
-0.8
-
-Seated, quiet
-
-108
-
-60
-
-1
-
-Standing, relaxed
-
-126
-
-70
-
-1.2
-
-*Walking (on level surface)*
-
-3.2 km/h (0.9 m/s)
-
-207
-
-115
-
-2
-
-4.3 km/h (1.2 m/s)
-
-270
-
-150
-
-2.6
-
-6.4 km/h (1.8 m/s)
-
-396
-
-220
-
-3.8
-
-*Office Activities*
-
-Reading, seated
-
-99
-
-55
-
-1
-
-Writing
-
-108
-
-60
-
-1
-
-Typing
-
-117
-
-65
-
-1.1
-
-Filing, seated
-
-126
-
-70
-
-1.2
-
-Filing, standing
-
-144
-
-80
-
-1.4
-
-Walking about
-
-180
-
-100
-
-1.7
-
-Lifting/packing
-
-216
-
-120
-
-2.1
-
-*Miscellaneous Occupational Activities*
-
-Cooking
-
-171 to 207
-
-95 to 115
-
-1.6 to 2.0
-
-Housecleaning
-
-207 to 360
-
-115 to 200
-
-2.0 to 3.4
-
-Seated, heavy limb movement
-
-234
-
-130
-
-2.2
-
-Machine work
-
-
-
-
-
-
-
-sawing (table saw)
-
-189
-
-105
-
-1.8
-
-light (electrical industry)
-
-207 to 252
-
-115 to 140
-
-2.0 to 2.4
-
-heavy
-
-423
-
-235
-
-4
-
-Handling 50 kg bags
-
-423
-
-235
-
-4
-
-Pick and shovel work
-
-423 to 504
-
-235 to 280
-
-4.0 to 4.8
-
-*Miscellaneous Leisure Activities*
-
-Dancing, social
-
-252 to 459
-
-140 to 255
-
-2.4 to 4.4
-
-Calisthenics/exercise
-
-315 to 423
-
-175 to 235
-
-3.0 to 4.0
-
-Tennis, singles
-
-378 to 486
-
-210 to 270
-
-3.6 to 4.0
-
-Basketball
-
-522 to 792
-
-290 to 440
-
-5.0 to 7.6
-
-Wrestling, competitive
-
-738 to 909
-
-410 to 505
-
-7.0 to 8.7
+<table class="table table-striped">
+  <tr>
+    <th>Activity</th>
+    <th>Activity Level w/Person EnergyPlus Schedule Value</th>
+    <th>Activity Level W/m2</th>
+    <th>met*</th>
+  </tr>
+  <tr>
+    <td colspan="4">Resting</td>
+  </tr>
+  <tr>
+    <td>Sleeping</td>
+    <td>72</td>
+    <td>40</td>
+    <td>0.7</td>
+  </tr>
+  <tr>
+    <td>Reclining</td>
+    <td>81</td>
+    <td>45</td>
+    <td>0.8</td>
+  </tr>
+  <tr>
+    <td>Seated, quiet</td>
+    <td>108</td>
+    <td>60</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>Standing, relaxed</td>
+    <td>126</td>
+    <td>70</td>
+    <td>1.2</td>
+  </tr>
+  <tr>
+    <td colspan="4">Walking (on level surface)</td>
+  </tr>
+  <tr>
+    <td>3.2 km/h (0.9 m/s)</td>
+    <td>207</td>
+    <td>115</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>4.3 km/h (1.2 m/s)</td>
+    <td>270</td>
+    <td>150</td>
+    <td>2.6</td>
+  </tr>
+  <tr>
+    <td>6.4 km/h (1.8 m/s)</td>
+    <td>396</td>
+    <td>220</td>
+    <td>3.8</td>
+  </tr>
+  <tr>
+    <td colspan="4">Office Activities</td>
+  </tr>
+  <tr>
+    <td>Reading, seated</td>
+    <td>99</td>
+    <td>55</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>Writing</td>
+    <td>108</td>
+    <td>60</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>Typing</td>
+    <td>117</td>
+    <td>65</td>
+    <td>1.1</td>
+  </tr>
+  <tr>
+    <td>Filing, seated</td>
+    <td>126</td>
+    <td>70</td>
+    <td>1.2</td>
+  </tr>
+  <tr>
+    <td>Filing, standing</td>
+    <td>144</td>
+    <td>80</td>
+    <td>1.4</td>
+  </tr>
+  <tr>
+    <td>Walking about</td>
+    <td>180</td>
+    <td>100</td>
+    <td>1.7</td>
+  </tr>
+  <tr>
+    <td>Lifting/packing</td>
+    <td>216</td>
+    <td>120</td>
+    <td>2.1</td>
+  </tr>
+  <tr>
+    <td colspan="4">Miscellaneous Occupational Activities</td>
+  </tr>
+  <tr>
+    <td>Cooking</td>
+    <td>171 to 207</td>
+    <td>95 to 115</td>
+    <td>1.6 to 2.0</td>
+  </tr>
+  <tr>
+    <td>Housecleaning</td>
+    <td>207 to 360</td>
+    <td>115 to 200</td>
+    <td>2.0 to 3.4</td>
+  </tr>
+  <tr>
+    <td>Seated, heavy limb movement</td>
+    <td>234</td>
+    <td>130</td>
+    <td>2.2</td>
+  </tr>
+  <tr>
+    <td>Machine work</td>
+    <td>189</td>
+    <td>105</td>
+    <td>1.8</td>
+  </tr>
+  <tr>
+    <td>sawing (table saw)</td>
+    <td>207 to 252</td>
+    <td>115 to 140</td>
+    <td>2.0 to 2.4</td>
+  </tr>
+  <tr>
+    <td>light (electrical industry)</td>
+    <td>423</td>
+    <td>235</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>Handling 50 kg bags</td>
+    <td>423</td>
+    <td>235</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>Pick and shovel work</td>
+    <td>423 to 504</td>
+    <td>235 to 280</td>
+    <td>4.0 to 4.8</td>
+  </tr>
+  <tr>
+    <td colspan="4">Miscellaneous Leisure Activities</td>
+  </tr>
+  <tr>
+    <td>Dancing, social</td>
+    <td>252 to 459</td>
+    <td>140 to 255</td>
+    <td>2.4 to 4.4</td>
+  </tr>
+  <tr>
+    <td>Calisthenics/exercise</td>
+    <td>315 to 423</td>
+    <td>175 to 235</td>
+    <td>3.0 to 4.0</td>
+  </tr>
+  <tr>
+    <td>Tennis, singles</td>
+    <td>378 to 486</td>
+    <td>210 to 270</td>
+    <td>3.6 to 4.0</td>
+  </tr>
+  <tr>
+    <td>Basketball, competitive</td>
+    <td>522 to 792</td>
+    <td>290 to 440</td>
+    <td>5.0 to 7.6</td>
+  </tr>
+  <tr>
+    <td>Wrestling, competitive</td>
+    <td>738 to 909</td>
+    <td>410 to 505</td>
+    <td>7.0 to 8.7</td>
+  </tr>
+</table>
 
 **\*Note that one met = 58.1 W/m<sup>2</sup>**
 
@@ -17208,115 +16929,80 @@ The final one to five fields are optional and are intended to trigger various th
 
 The following IDF example allows for a maximum of 31 people with scheduled occupancy of “Office Occupancy”, 60% radiant using an Activity Schedule of “Activity Sch”. The example allows for thermal comfort reporting.
 
+```idf
 People,
-
-  Kitchen\_ZN\_1\_FLR\_1,  !- Name
-
-  Kitchen\_ZN\_1\_FLR\_1,  !- Zone or ZoneList Name
-
- BLDG\_OCC\_SCH,  !- Number of People Schedule Name
-
+  Kitchen_ZN_1_FLR_1,  !- Name
+  Kitchen_ZN_1_FLR_1,  !- Zone or ZoneList Name
+  BLDG_OCC_SCH,  !- Number of People Schedule Name
   People,  !- Number of People Calculation Method
-
   25.2000,,,  !- Number of People, People per Zone Floor Area, Zone Floor Area per Person
-
   0.3000,  !- Fraction Radiant
-
   AUTOCALCULATE,  !- Sensible Heat Fraction
-
-  ACTIVITY\_SCH,  !- Activity Level Schedule Name
-
+  ACTIVITY_SCH,  !- Activity Level Schedule Name
   3.82E-8        !- Carbon Dioxide Generation Rate {m3/s-W}
-
   No,  !- Enable ASHRAE 55 Comfort Warnings
-
   ZoneAveraged,  !- Mean Radiant Temperature Calculation Type
-
   ,  !- Surface Name/Angle Factor List Name
-
-  WORK\_EFF\_SCH,  !- Work Efficiency Schedule Name
-
-  CLOTHING\_SCH,  !- Clothing Insulation Schedule Name
-
-  AIR\_VELO\_SCH,  !- Air Velocity Schedule Name
-
+  WORK_EFF_SCH,  !- Work Efficiency Schedule Name
+  CLOTHING_SCH,  !- Clothing Insulation Schedule Name
+  AIR_VELO_SCH,  !- Air Velocity Schedule Name
   Fanger;  !- Thermal Comfort Model 1 Type
+```
+
 
 A simpler example, without using the thermal comfort reporting option:
 
+```idf
 People,
-
     RIGHT FORK,              !- Name
-
     RIGHT FORK,              !- Zone or ZoneListName
-
     Dorm Occupancy,          !- Number of People Schedule Name
-
     people,                  !- Number of People Calculation Method
-
     8.00000,                 !- Number of People,
-
    ,                         !- People per Zone Floor Area
-
    ,                         !- Zone Floor Area per Person
-
     0.6000000,               !- Fraction Radiant
-
     Autocalculate,           !- Sensible Heat Fraction
-
     Activity Sch,            !- Activity level Schedule Name
+```
+
 
 And with the sensible fraction specified:
 
+```idf
 People,
-
     SPACE1-1 People 1,       !- Name
-
     SPACE1-1,                !- Zone or ZoneListName
-
     OCCUPY-1,                !- Number of People Schedule Name
-
     people,                  !- Number of People Calculation Method
-
     11,                      !- Number of People
-
     ,                        !- People per Zone Floor Area
-
     ,                        !- Zone Floor Area per Person
-
     0.3,                     !- Fraction Radiant
-
     0.55,                    !- Sensible Heat Fraction
-
     ActSchd;                 !- Activity level Schedule Name
+```
+
 
 Global People Object:
 
+```idf
   ZoneList,AllOccupiedZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
 
-
   People,
-
     AllZones with People,       !- Name
-
     AllOccupiedZones,        !- Zone or ZoneList Name
-
     OCCUPY-1,                !- Number of People Schedule Name
-
     People/Area,             !- Number of People Calculation Method
-
     ,                        !- Number of People
-
     .11,                     !- People per Zone Floor Area {person/m2}
-
     ,                        !- Zone Floor Area per Person {m2/person}
-
     0.3,                     !- Fraction Radiant
-
     ,                        !- Sensible Heat Fraction
-
     ActSchd;                 !- Activity Level Schedule Name
+```
+
 
 ### People Outputs
 
@@ -17324,91 +17010,92 @@ People objects have output variables for individual objects and for zone totals.
 
 People specific outputs include:
 
-Zone,Average,People Occupant Count []
+* Zone,Average,People Occupant Count []
 
-Zone,Sum,People Radiant Heating Energy [J]
+* Zone,Sum,People Radiant Heating Energy [J]
 
-Zone,Average,People Radiant Heating Rate [W]
+* Zone,Average,People Radiant Heating Rate [W]
 
-Zone,Sum,People Convective Heating Energy [J]
+* Zone,Sum,People Convective Heating Energy [J]
 
-Zone,Average,People Convective Heating Rate [W]
+* Zone,Average,People Convective Heating Rate [W]
 
-Zone,Sum,People Sensible Heating Energy [J]
+* Zone,Sum,People Sensible Heating Energy [J]
 
-Zone,Average,People Sensible Heating Rate [W]
+* Zone,Average,People Sensible Heating Rate [W]
 
-Zone,Sum,People Latent Gain Energy [J]
+* Zone,Sum,People Latent Gain Energy [J]
 
-Zone,Average,People Latent Gain Rate [W]
+* Zone,Average,People Latent Gain Rate [W]
 
-Zone,Sum,People Total Heating Energy [J]
+* Zone,Sum,People Total Heating Energy [J]
 
-Zone,Average,People Total Heating Rate [W]
+* Zone,Average,People Total Heating Rate [W]
 
-Zone,Average,Zone People Occupant Count []
+* Zone,Average,Zone People Occupant Count []
 
-Zone,Sum,Zone People Radiant Heating Energy [J]
+* Zone,Sum,Zone People Radiant Heating Energy [J]
 
-Zone,Average,Zone People Radiant Heating Rate [W]
+* Zone,Average,Zone People Radiant Heating Rate [W]
 
-Zone,Sum,Zone People Convective Heating Energy [J]
+* Zone,Sum,Zone People Convective Heating Energy [J]
 
-Zone,Average,Zone People Convective Heating Rate [W]
+* Zone,Average,Zone People Convective Heating Rate [W]
 
-Zone,Sum,Zone People Sensible Heating Energy [J]
+* Zone,Sum,Zone People Sensible Heating Energy [J]
 
-Zone,Average,Zone People Sensible Heating Rate [W]
+* Zone,Average,Zone People Sensible Heating Rate [W]
 
-Zone,Sum,Zone People Latent Gain Energy [J]
+* Zone,Sum,Zone People Latent Gain Energy [J]
 
-Zone,Average,Zone People Latent Gain Rate [W]
+* Zone,Average,Zone People Latent Gain Rate [W]
 
-Zone,Sum,Zone People Total Heating Energy [J]
+* Zone,Sum,Zone People Total Heating Energy [J]
 
-Zone,Average,People Air Temperature [C]
+* Zone,Average,People Air Temperature [C]
 
-Zone,Average,People Air Relative Humidity [%]
+* Zone,Average,People Air Relative Humidity [%]
 
-Zone,Average,Zone People Total Heating Rate [W]
+* Zone,Average,Zone People Total Heating Rate [W]
 
-Zone,Average,Zone Thermal Comfort Mean Radiant Temperature [C]
+* Zone,Average,Zone Thermal Comfort Mean Radiant Temperature [C]
 
-Zone,Average,Zone Thermal Comfort Operative Temperature [C]
+* Zone,Average,Zone Thermal Comfort Operative Temperature [C]
 
-Zone,Average,Zone Thermal Comfort Fanger Model PMV []
+* Zone,Average,Zone Thermal Comfort Fanger Model PMV []
 
-Zone,Average,Zone Thermal Comfort Fanger Model PPD [%]
+* Zone,Average,Zone Thermal Comfort Fanger Model PPD [%]
 
-Zone,Average,Zone Thermal Comfort Clothing Surface Temperature [C]
+* Zone,Average,Zone Thermal Comfort Clothing Surface Temperature [C]
 
-Zone,Average,Zone Thermal Comfort Pierce Model Effective Temperature PMV []
+* Zone,Average,Zone Thermal Comfort Pierce Model Effective Temperature PMV []
 
-Zone,Average,Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV []
+* Zone,Average,Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV []
 
-Zone,Average,Zone Thermal Comfort Pierce Model Discomfort Index []
+* Zone,Average,Zone Thermal Comfort Pierce Model Discomfort Index []
 
-Zone,Average,Zone Thermal Comfort Pierce Model Thermal Sensation Index []
+* Zone,Average,Zone Thermal Comfort Pierce Model Thermal Sensation Index []
 
-Zone,Average,Zone Thermal Comfort KSU Model Thermal Sensation Index []
+* Zone,Average,Zone Thermal Comfort KSU Model Thermal Sensation Index []
 
-Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status []
+* Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status []
 
-Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status []
+* Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status []
 
-Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature [C]
+* Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature [C]
 
-Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature [C]
+* Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature [C]
 
-Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status []
+* Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status []
 
-Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status []
+* Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status []
 
-Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status
+* Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status
 
-Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature [C]
+* Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature [C]
 
-Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Temperature [C]
+* Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Temperature [C]
+
 
 #### People Occupant Count []
 
@@ -17574,8 +17261,8 @@ Table 12. Winter Clothes (1.0 Clo)
 
 <table class="table table-striped">
 <tr>
-<td>Operative Temperature (C)</td>
-<td>Humidity Ratio (kgWater/kgDryAir)</td>
+<th>Operative Temperature (C)</th>
+<th>Humihity Ratio (kgWater/kgDryAir)</th>
 </tr>
 <tr>
 <td>19.6</td>
@@ -17607,8 +17294,8 @@ Table 13. Summer Clothes (0.5 Clo)
 
 <table class="table table-striped">
 <tr>
-<td>Operative Temperature (C)</td>
-<td>Humidity Ratio (kgWater/kgDryAir)</td>
+<th>Operative Temperature (C)</th>
+<th>Humihity Ratio (kgWater/kgDryAir)</th>
 </tr>
 <tr>
 <td>23.6</td>
@@ -17628,7 +17315,6 @@ Table 13. Summer Clothes (0.5 Clo)
 </tr>
 </table>
 
-** **
 
 ![](InputOutputReference/media/image085.svg)
 
@@ -17664,31 +17350,20 @@ The simplified ASHRAE 55 calculations may be computed for occupied zones and, po
 
 If you enable the warnings, the simplified ASHRAE 55 calculations are done for occupied zones and, possibly, warnings are shown on the .err file at the end of each simulated environment.
 
-   \*\* Warning \*\* More than 4% of time (350.4 hours) uncomfortable in zone ZSF1
-
-   \*\*   ~~~   \*\* 553.0 hours were uncomfortable based on ASHRAE 55-2004 graph (Section 5.2.1.1)
-
-   \*\*   ~~~   \*\* During Environment [10/01 - 09/30]: CHICAGO IL USA TMY2-94846 WMO\#=725300
-
-   \*\* Warning \*\* More than 4% of time (350.4 hours) uncomfortable in zone ZNF1
-
-   \*\*   ~~~   \*\* 827.8 hours were uncomfortable based on ASHRAE 55-2004 graph (Section 5.2.1.1)
-
-   \*\*   ~~~   \*\* During Environment [10/01 - 09/30]: CHICAGO IL USA TMY2-94846 WMO\#=725300
-
-   \*\* Warning \*\* More than 4% of time (350.4 hours) uncomfortable in zone ZSF2
-
-   \*\*   ~~~   \*\* 593.5 hours were uncomfortable based on ASHRAE 55-2004 graph (Section 5.2.1.1)
-
-   \*\*   ~~~   \*\* During Environment [10/01 - 09/30]: CHICAGO IL USA TMY2-94846 WMO\#=725300
-
-   \*\* Warning \*\* More than 4% of time (350.4 hours) uncomfortable in zone ZNF2
-
-   \*\*   ~~~   \*\* 875.8 hours were uncomfortable based on ASHRAE 55-2004 graph (Section 5.2.1.1)
-
-   \*\*   ~~~   \*\* During Environment [10/01 - 09/30]: CHICAGO IL USA TMY2-94846 WMO\#=725300
-
-
+```
+   ** Warning ** More than 4% of time (350.4 hours) uncomfortable in zone ZSF1
+   **   ~~~   ** 553.0 hours were uncomfortable based on ASHRAE 55-2004 graph (Section 5.2.1.1)
+   **   ~~~   ** During Environment [10/01 - 09/30]: CHICAGO IL USA TMY2-94846 WMO\#=725300
+   ** Warning ** More than 4% of time (350.4 hours) uncomfortable in zone ZNF1
+   **   ~~~   ** 827.8 hours were uncomfortable based on ASHRAE 55-2004 graph (Section 5.2.1.1)
+   **   ~~~   ** During Environment [10/01 - 09/30]: CHICAGO IL USA TMY2-94846 WMO\#=725300
+   ** Warning ** More than 4% of time (350.4 hours) uncomfortable in zone ZSF2
+   **   ~~~   ** 593.5 hours were uncomfortable based on ASHRAE 55-2004 graph (Section 5.2.1.1)
+   **   ~~~   ** During Environment [10/01 - 09/30]: CHICAGO IL USA TMY2-94846 WMO\#=725300
+   ** Warning ** More than 4% of time (350.4 hours) uncomfortable in zone ZNF2
+   **   ~~~   ** 875.8 hours were uncomfortable based on ASHRAE 55-2004 graph (Section 5.2.1.1)
+   **   ~~~   ** During Environment [10/01 - 09/30]: CHICAGO IL USA TMY2-94846 WMO\#=725300
+```
 
 You may decide if you need to change parameters to reduce these “uncomfortable” hours. The individual output variables shown previously may help you get more details on when these are occurring.
 
@@ -17728,23 +17403,18 @@ This field is the fraction that this surface contributes to the total mean radia
 
 An example IDF with an electric low temperature radiant system is shown below.
 
+```idf
 ComfortViewFactorAngles,
-
     South Zone Angle Factors, !- name of angle factor list
-
     Sourth Zone,              !- Zone Name
-
     Zn001:Flr001,             !- Surface name 1
-
     0.75,                     !- Angle factor for surface 1
-
     Zn001:Wall001,            !- Surface name 2
-
     0.15,                     !- Angle factor for surface 2
-
     Zn001:Roof001,            !- Surface name 3
-
     0.10;                     !- Angle factor for surface 3
+```
+
 
 ### Lights
 
@@ -17820,75 +17490,51 @@ Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible
 
 Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. These values assume that no light heat goes into an adjacent zone. Source: *Lighting Handbook: Reference & Application*, 8<sup>th</sup> Edition, Illuminating Engineering Society of North America, New York, 1993, p. 355.
 
-**Field Name**
-
-**Luminaire Configuration, Fluorescent Lighting**
-
-Suspended
-
-Surface
- mount
-
-
-
-Recessed
-
-
-
-Luminous
- and louvered
- ceiling
-
-Return-air
- ducted
-
-Return Air Fraction
-
-0.0
-
-0.0
-
-0.0
-
-0.0
-
-0.54
-
-Fraction Radiant
-
-0.42
-
-0.72
-
-0.37
-
-0.37
-
-0.18
-
-Fraction Visible
-
-0.18
-
-0.18
-
-0.18
-
-0.18
-
-0.18
-
-*f<sub>convected</sub>*
-
-*0.40*
-
-*0.10*
-
-*0.45*
-
-*0.45*
-
-*0.10*
+<table class="table table-striped">
+  <tr>
+    <th rowspan="2">Field Name</th>
+    <th colspan="5">Luminaire Configuration, Flourescent Lighting</th>
+  </tr>
+  <tr>
+    <td>Suspended</td>
+    <td>Surface Mount</td>
+    <td>Recessed</td>
+    <td>Luminous and louvered ceiling</td>
+    <td>Return-air ducted</td>
+  </tr>
+  <tr>
+    <td>Return Air Fraction</td>
+    <td>0.0</td>
+    <td>0.0</td>
+    <td>0.0</td>
+    <td>0.0</td>
+    <td>0.54</td>
+  </tr>
+  <tr>
+    <td>Fraction Radiant</td>
+    <td>0.42</td>
+    <td>0.72</td>
+    <td>0.37</td>
+    <td>0.37</td>
+    <td>0.18</td>
+  </tr>
+  <tr>
+    <td>Fraction Visible</td>
+    <td>0.18</td>
+    <td>0.18</td>
+    <td>0.18</td>
+    <td>0.18</td>
+    <td>0.18</td>
+  </tr>
+  <tr>
+    <td>f<sub>convected</sub></td>
+    <td>0.40</td>
+    <td>0.10</td>
+    <td>0.45</td>
+    <td>0.45</td>
+    <td>0.10</td>
+  </tr>
+</table>
 
 ![](InputOutputReference/media/image086.svg)
 
@@ -17940,63 +17586,39 @@ Figure 52. Vertical section through a zone and its return air plenum showing rec
 
 An IDF example:
 
+```idf
 Lights,
-
     RIGHT FORK Lights 1,     !- Name
-
     RIGHT FORK,              !- Zone Name
-
     Office Lighting,         !- SCHEDULE Name
-
     LightingLevel,          !- Design Level calculation method
-
     1039.706,,,                !- Lighting Level {W}
-
     0.0000000E+00,           !- Return Air Fraction
-
     0.4000000,               !- Fraction Radiant
-
     0.2000000,               !- Fraction Visible
-
     1.0,                     !- Fraction Replaceable
-
     GeneralLights;           !- End-Use Subcategory
-
-
+```
 
 Global Lights Object:
 
+```idf
   ZoneList,AllOccupiedZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
-
-
   Lights,
-
     AllZones with Lights,       !- Name
-
     AllOccupiedZones,        !- Zone or ZoneList Name
-
     LIGHTS-1,                !- Schedule Name
-
     Watts/Area,              !- Design Level Calculation Method
-
     ,                        !- Lighting Level {W}
-
     16,                      !- Watts per Zone Floor Area {W/m2}
-
     ,                        !- Watts per Person {W/person}
-
     0.2,                     !- Return Air Fraction
-
     0.59,                    !- Fraction Radiant
-
     0.2,                     !- Fraction Visible
-
     0,                       !- Fraction Replaceable
-
     GeneralLights;           !- End-Use Subcategory
-
-
+```
 
 ### Lights Report Outputs
 
@@ -18004,53 +17626,53 @@ If daylighting controls are operating in the zone, all of the Lights objects wit
 
 Lights objects have output variables for individual objects and for zone totals.
 
-Zone,Average,Lights Electric Power [W]
+* Zone,Average,Lights Electric Power [W]
 
-Zone,Sum,Lights Radiant Heat Gain [J]
+* Zone,Sum,Lights Radiant Heat Gain [J]
 
-Zone,Average,Lights Radiant Heating Rate [W]
+* Zone,Average,Lights Radiant Heating Rate [W]
 
-Zone,Sum,Lights Visible Radiation Heating Energy [J]
+* Zone,Sum,Lights Visible Radiation Heating Energy [J]
 
-Zone,Average,Lights Visible Radiation Heating Rate [W]
+* Zone,Average,Lights Visible Radiation Heating Rate [W]
 
-Zone,Sum,Lights Convective Heating Energy [J]
+* Zone,Sum,Lights Convective Heating Energy [J]
 
-Zone,Average,Lights Convective Heating Rate [W]
+* Zone,Average,Lights Convective Heating Rate [W]
 
-Zone,Sum,Lights Return Air Heating Energy [J]
+* Zone,Sum,Lights Return Air Heating Energy [J]
 
-Zone,Average,Lights Return Air Heating Rate [W]
+* Zone,Average,Lights Return Air Heating Rate [W]
 
-Zone,Sum,Lights Total Heating Energy [J]
+* Zone,Sum,Lights Total Heating Energy [J]
 
-Zone,Average,Lights Total Heating Rate [W]
+* Zone,Average,Lights Total Heating Rate [W]
 
-Zone,Sum,Lights Electric Energy [J]
+* Zone,Sum,Lights Electric Energy [J]
 
-Zone,Average,Zone Lights Electric Power [W]
+* Zone,Average,Zone Lights Electric Power [W]
 
-Zone,Sum,Zone Lights Radiant Heating Energy [J]
+* Zone,Sum,Zone Lights Radiant Heating Energy [J]
 
-Zone,Average,Zone Lights Radiant Heating Rate [W]
+* Zone,Average,Zone Lights Radiant Heating Rate [W]
 
-Zone,Sum,Zone Lights Visible Radiation Heating Energy [J]
+* Zone,Sum,Zone Lights Visible Radiation Heating Energy [J]
 
-Zone,Average,Zone Lights Visible Radiation Heating Rate [W]
+* Zone,Average,Zone Lights Visible Radiation Heating Rate [W]
 
-Zone,Sum,Zone Lights Convective Heating Energy [J]
+* Zone,Sum,Zone Lights Convective Heating Energy [J]
 
-Zone,Average,Zone Lights Convective Heating Rate [W]
+* Zone,Average,Zone Lights Convective Heating Rate [W]
 
-Zone,Sum,Zone Lights Return Air Heating Energy [J]
+* Zone,Sum,Zone Lights Return Air Heating Energy [J]
 
-Zone,Average,Zone Lights Return Air Heating Rate [W]
+* Zone,Average,Zone Lights Return Air Heating Rate [W]
 
-Zone,Sum,Zone Lights Total Heating Energy [J]
+* Zone,Sum,Zone Lights Total Heating Energy [J]
 
-Zone,Average,Zone Lights Total Heating Rate [W]
+* Zone,Average,Zone Lights Total Heating Rate [W]
 
-Zone,Sum,Zone Lights Electric Energy [J]
+* Zone,Sum,Zone Lights Electric Energy [J]
 
 #### Lights Electric Power [W]
 
@@ -18146,11 +17768,11 @@ As described in the Lights Outputs, values for lights will show up on the follow
 
 Table 15. Distribution of Lights to Meters
 
-<table class="table table-striped">
+<table class="table table-stripeh">
 <tr>
-<td>Meter Name</td>
-<td>Scope</td>
-<td>Lights Specfics</td>
+<th>Meter Name</th>
+<th>Scope</th>
+<th>Lights Specfics</th>
 </tr>
 <tr>
 <td>Electricity:Facility</td>
@@ -18256,57 +17878,38 @@ Allows you to specify a user-defined end-use subcategory, e.g., "Computers", "Co
 
 An IDF example:
 
+```idf
 ElectricEquipment,
-
     DORM ROOMS AND COMMON AREAS ElecEq 1,  !- Name
-
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
-
     Residence Equipment,     !- SCHEDULE Name
-
     EquipmentLevel,         !- Design Level calculation method
-
     9210.921,                !- Design Level {W}
-
     ,                        !- Watts per Zone Floor Area {watts/m2}
-
     ,                        !- Watts per Person {watts/person}
-
     0.0000000E+00,           !- Fraction Latent
-
     0.3000000,               !- Fraction Radiant
-
     0.0000000E+00,           !- Fraction Lost
-
     Computers;               !- End-use Subcategory
+```
 
 Global ElectricEquipment example:
 
+```idf
   ZoneList,AllOccupiedZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
-
-
   ElectricEquipment,
-
     AllZones with Electric Equipment,       !- Name
-
     AllOccupiedZones,        !- Zone or ZoneList Name
-
     EQUIP-1,                 !- Schedule Name
-
     Watts/Person,            !- Design Level Calculation Method
-
     ,                        !- Design Level {W}
-
     ,                        !- Watts per Zone Floor Area {W/m2}
-
     96,                      !- Watts per Person {W/person}
-
     0,                       !- Fraction Latent
-
     0.3,                     !- Fraction Radiant
-
     0;                       !- Fraction Lost
+```
 
 ### GasEquipment
 
@@ -18384,59 +17987,39 @@ Allows you to specify a user-defined end-use subcategory, e.g., "Cooking", "Clot
 
 An IDF example:
 
+```idf
 GasEquipment,
-
     DORM ROOMS AND COMMON AREAS GasEq 1,  !- Name
-
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
-
     Gas Eq Sch,              !-Schedule Name
-
     EquipmentLevel,          !- Design Level Calculation Method
-
     29287.51,                !- Design Level {W}
-
     ,                        !- Power per Zone Floor Area {W/m2}
-
     ,                        !- Power per Person {W/Person}
-
     0,                       !- Fraction Latent
-
     0.3,                     !- Fraction Radiant
-
     0,                       !- Fraction Lost
-
     0,                       !- Carbon Dioxide Generation Rate {m3/s-W}
-
     Cooking;                 !- End-Use Subcategory
+```
 
 Global Gas Equipment example:
 
+```idf
   ZoneList,OfficeZones,Left Fork, Middle Fork, Right Fork;
 
-
-
   GasEquipment,
-
     Office Zones with Gas Equipment,       !- Name
-
     OfficeZones,               !- Zone Name
-
     Gas Eq Sch,              !- Schedule Name
-
     Watts/Area,              !- Design Level Calculation Method
-
     ,                        !- Design Level {W}
-
     197,                     !- Power per Zone Floor Area {W/m2}
-
     ,                        !- Power per Person {W/Person}
-
     0.0000000E+00,           !- Fraction Latent
-
     0.3000000,               !- Fraction Radiant
-
     0.0000000E+00;           !- Fraction Lost
+```
 
 ### HotWaterEquipment
 
@@ -18510,57 +18093,38 @@ Allows you to specify a user-defined end-use subcategory, e.g., "Cooking", "Clot
 
 IDF Examples:
 
+```idf
 HotWaterEquipment,
-
     SPACE2-1 HWEq 1,         !- Name
-
     SPACE2-1,                !- Zone Name
-
     EQUIP-1,                 !- SCHEDULE Name
-
     EquipmentLevel,         !- Design Level calculation method
-
     300,                     !- Design Level {W}
-
     ,                        !- Power per Zone Floor Area {watts/m2}
-
     ,                        !- Power per Person {watts/person}
-
     0.2,                     !- Fraction Latent
-
     0.1,                     !- Fraction Radiant
-
     0.5,                     !- Fraction Lost
-
     Dishwashing;             !- End-Use Subcategory
+```
 
 Global Hot Water Equipment example:
 
+```idf
   ZoneList,OfficeZones,Left Fork, Middle Fork, Right Fork;
 
-
-
   HotWaterEquipment,
-
     Office Zones with Hot Water Equipment,       !- Name
-
     OfficeZones,             !- Zone Name
-
     HotWater Eq Sch,         !- Schedule Name
-
     Watts/Area,              !- Design Level Calculation Method
-
     ,                        !- Design Level {W}
-
     50,                      !- Power per Zone Floor Area {W/m2}
-
     ,                        !- Power per Person {W/Person}
-
     0.0000000E+00,           !- Fraction Latent
-
     0.3000000,               !- Fraction Radiant
-
     0.0000000E+00;           !- Fraction Lost
+```
 
 ### SteamEquipment
 
@@ -18916,253 +18480,258 @@ Each type of equipment object has output variables for individual objects and fo
 
 Electric Equipment
 
-Zone,Average,Electric Equipment Electric Power [W]
+* Zone,Average,Electric Equipment Electric Power [W]
 
-Zone,Sum,Electric Equipment Electric Energy [J]
+* Zone,Sum,Electric Equipment Electric Energy [J]
 
-Zone,Sum,Electric Equipment Radiant Heating Energy [J]
+* Zone,Sum,Electric Equipment Radiant Heating Energy [J]
 
-Zone,Average,Electric Equipment Radiant Heating Rate [W]
+* Zone,Average,Electric Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Electric Equipment Convective Heating Energy [J]
+* Zone,Sum,Electric Equipment Convective Heating Energy [J]
 
-Zone,Average,Electric Equipment Convective Heating Rate [W]
+* Zone,Average,Electric Equipment Convective Heating Rate [W]
 
-Zone,Sum,Electric Equipment Latent Gain Energy [J]
+* Zone,Sum,Electric Equipment Latent Gain Energy [J]
 
-Zone,Average,Electric Equipment Latent Gain Rate [W]
+* Zone,Average,Electric Equipment Latent Gain Rate [W]
 
-Zone,Sum,Electric Equipment Lost Heat Energy [J]
+* Zone,Sum,Electric Equipment Lost Heat Energy [J]
 
-Zone,Average,Electric Equipment Lost Heat Rate [W]
+* Zone,Average,Electric Equipment Lost Heat Rate [W]
 
-Zone,Sum,Electric Equipment Total Heating Energy [J]
+* Zone,Sum,Electric Equipment Total Heating Energy [J]
 
-Zone,Average,Electric Equipment Total Heating Rate [W]
+* Zone,Average,Electric Equipment Total Heating Rate [W]
 
-Zone,Average,Zone Electric Equipment Electric Power [W]
+* Zone,Average,Zone Electric Equipment Electric Power [W]
 
-Zone,Sum,Zone Electric Equipment Electric Energy [J]
+* Zone,Sum,Zone Electric Equipment Electric Energy [J]
 
-Zone,Sum,Zone Electric Equipment Radiant Heating Energy [J]
+* Zone,Sum,Zone Electric Equipment Radiant Heating Energy [J]
 
-Zone,Average,Zone Electric Equipment Radiant Heating Rate [W]
+* Zone,Average,Zone Electric Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Zone Electric Equipment Convective Heating Energy [J]
+* Zone,Sum,Zone Electric Equipment Convective Heating Energy [J]
 
-Zone,Average,Zone Electric Equipment Convective Heating Rate [W]
+* Zone,Average,Zone Electric Equipment Convective Heating Rate [W]
 
-Zone,Sum,Zone Electric Equipment Latent Gain Energy [J]
+* Zone,Sum,Zone Electric Equipment Latent Gain Energy [J]
 
-Zone,Average,Zone Electric Equipment Latent Gain Rate [W]
+* Zone,Average,Zone Electric Equipment Latent Gain Rate [W]
 
-Zone,Sum,Zone Electric Equipment Lost Heat Energy [J]
+* Zone,Sum,Zone Electric Equipment Lost Heat Energy [J]
 
-Zone,Average,Zone Electric Equipment Lost Heat Rate [W]
+* Zone,Average,Zone Electric Equipment Lost Heat Rate [W]
 
-Zone,Sum,Zone Electric Equipment Total Heating Energy [J]
+* Zone,Sum,Zone Electric Equipment Total Heating Energy [J]
 
-Zone,Average,Zone Electric Equipment Total Heating Rate [W]
+* Zone,Average,Zone Electric Equipment Total Heating Rate [W]
+
 
 
 
 **Gas Equipment**
 
-Zone,Average,Gas Equipment Gas Rate [W]
+* Zone,Average,Gas Equipment Gas Rate [W]
 
-Zone,Sum,Gas Equipment Gas Energy [J]
+* Zone,Sum,Gas Equipment Gas Energy [J]
 
-Zone,Sum,Gas Equipment Radiant Heating Energy [J]
+* Zone,Sum,Gas Equipment Radiant Heating Energy [J]
 
-Zone,Sum,Gas Equipment Convective Heating Energy [J]
+* Zone,Sum,Gas Equipment Convective Heating Energy [J]
 
-Zone,Sum,Gas Equipment Latent Gain Energy [J]
+* Zone,Sum,Gas Equipment Latent Gain Energy [J]
 
-Zone,Sum,Gas Equipment Lost Heat Energy [J]
+* Zone,Sum,Gas Equipment Lost Heat Energy [J]
 
-Zone,Sum,Gas Equipment Total Heating Energy [J]
+* Zone,Sum,Gas Equipment Total Heating Energy [J]
 
-Zone,Average,Gas Equipment Radiant Heating Rate [W]
+* Zone,Average,Gas Equipment Radiant Heating Rate [W]
 
-Zone,Average,Gas Equipment Convective Heating Rate [W]
+* Zone,Average,Gas Equipment Convective Heating Rate [W]
 
-Zone,Average,Gas Equipment Latent Gain Rate [W]
+* Zone,Average,Gas Equipment Latent Gain Rate [W]
 
-Zone,Average,Gas Equipment Lost Heat Rate [W]
+* Zone,Average,Gas Equipment Lost Heat Rate [W]
 
-Zone,Average,Gas Equipment Total Heating Rate [W]
+* Zone,Average,Gas Equipment Total Heating Rate [W]
 
-Zone,Average,Zone Gas Equipment Gas Rate [W]
+* Zone,Average,Zone Gas Equipment Gas Rate [W]
 
-Zone,Sum,Zone Gas Equipment Gas Energy [J]
+* Zone,Sum,Zone Gas Equipment Gas Energy [J]
 
-Zone,Sum,Zone Gas Equipment Radiant Heating Energy [J]
+* Zone,Sum,Zone Gas Equipment Radiant Heating Energy [J]
 
-Zone,Average,Zone Gas Equipment Radiant Heating Rate [W]
+* Zone,Average,Zone Gas Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Zone Gas Equipment Convective Heating Energy [J]
+* Zone,Sum,Zone Gas Equipment Convective Heating Energy [J]
 
-Zone,Average,Zone Gas Equipment Convective Heating Rate [W]
+* Zone,Average,Zone Gas Equipment Convective Heating Rate [W]
 
-Zone,Sum,Zone Gas Equipment Latent Gain Energy [J]
+* Zone,Sum,Zone Gas Equipment Latent Gain Energy [J]
 
-Zone,Average,Zone Gas Equipment Latent Gain Rate [W]
+* Zone,Average,Zone Gas Equipment Latent Gain Rate [W]
 
-Zone,Sum,Zone Gas Equipment Lost Heat Energy [J]
+* Zone,Sum,Zone Gas Equipment Lost Heat Energy [J]
 
-Zone,Average,Zone Gas Equipment Lost Heat Rate [W]
+* Zone,Average,Zone Gas Equipment Lost Heat Rate [W]
 
-Zone,Sum,Zone Gas Equipment Total Heating Energy [J]
+* Zone,Sum,Zone Gas Equipment Total Heating Energy [J]
 
-Zone,Average,Zone Gas Equipment Total Heating Rate [W]
+* Zone,Average,Zone Gas Equipment Total Heating Rate [W]
+
 
 
 
 **HotWater Equipment**
 
-Zone,Average,Hot Water Equipment District Heating Rate [W]
+* Zone,Average,Hot Water Equipment District Heating Rate [W]
 
-Zone,Sum,Hot Water Equipment District Heating Energy [J]
+* Zone,Sum,Hot Water Equipment District Heating Energy [J]
 
-Zone,Sum,Hot Water Equipment Radiant Heating Energy [J]
+* Zone,Sum,Hot Water Equipment Radiant Heating Energy [J]
 
-Zone,Average,Hot Water Equipment Radiant Heating Rate [W]
+* Zone,Average,Hot Water Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Hot Water Equipment Convective Heating Energy [J]
+* Zone,Sum,Hot Water Equipment Convective Heating Energy [J]
 
-Zone,Average,Hot Water Equipment Convective Heating Rate [W]
+* Zone,Average,Hot Water Equipment Convective Heating Rate [W]
 
-Zone,Sum,Hot Water Equipment Latent Gain Energy [J]
+* Zone,Sum,Hot Water Equipment Latent Gain Energy [J]
 
-Zone,Average,Hot Water Equipment Latent Gain Rate [W]
+* Zone,Average,Hot Water Equipment Latent Gain Rate [W]
 
-Zone,Sum,Hot Water Equipment Lost Heat Energy [J]
+* Zone,Sum,Hot Water Equipment Lost Heat Energy [J]
 
-Zone,Average,Hot Water Equipment Lost Heat Rate [W]
+* Zone,Average,Hot Water Equipment Lost Heat Rate [W]
 
-Zone,Sum,Hot Water Equipment Total Heating Energy [J]
+* Zone,Sum,Hot Water Equipment Total Heating Energy [J]
 
-Zone,Average,Hot Water Equipment Total Heating Rate [W]
+* Zone,Average,Hot Water Equipment Total Heating Rate [W]
 
-Zone,Average,Zone Hot Water Equipment District Heating Rate [W]
+* Zone,Average,Zone Hot Water Equipment District Heating Rate [W]
 
-Zone,Sum,Zone Hot Water Equipment District Heating Energy [J]
+* Zone,Sum,Zone Hot Water Equipment District Heating Energy [J]
 
-Zone,Sum,Zone Hot Water Equipment Radiant Heating Energy [J]
+* Zone,Sum,Zone Hot Water Equipment Radiant Heating Energy [J]
 
-Zone,Average,Zone Hot Water Equipment Radiant Heating Rate [W]
+* Zone,Average,Zone Hot Water Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Zone Hot Water Equipment Convective Heating Energy [J]
+* Zone,Sum,Zone Hot Water Equipment Convective Heating Energy [J]
 
-Zone,Average,Zone Hot Water Equipment Convective Heating Rate [W]
+* Zone,Average,Zone Hot Water Equipment Convective Heating Rate [W]
 
-Zone,Sum,Zone Hot Water Equipment Latent Gain Energy [J]
+* Zone,Sum,Zone Hot Water Equipment Latent Gain Energy [J]
 
-Zone,Average,Zone Hot Water Equipment Latent Gain Rate [W]
+* Zone,Average,Zone Hot Water Equipment Latent Gain Rate [W]
 
-Zone,Sum,Zone Hot Water Equipment Lost Heat Energy [J]
+* Zone,Sum,Zone Hot Water Equipment Lost Heat Energy [J]
 
-Zone,Average,Zone Hot Water Equipment Lost Heat Rate [W]
+* Zone,Average,Zone Hot Water Equipment Lost Heat Rate [W]
 
-Zone,Sum,Zone Hot Water Equipment Total Heating Energy [J]
+* Zone,Sum,Zone Hot Water Equipment Total Heating Energy [J]
 
-Zone,Average,Zone Hot Water Equipment Total Heating Rate [W]
+* Zone,Average,Zone Hot Water Equipment Total Heating Rate [W]
+
 
 
 
 **Steam Equipment**
 
-Zone,Average,Steam Equipment District Heating Rate [W]
+* Zone,Average,Steam Equipment District Heating Rate [W]
 
-Zone,Sum,Steam Equipment District Heating Energy [J]
+* Zone,Sum,Steam Equipment District Heating Energy [J]
 
-Zone,Sum,Steam Equipment Radiant Heating Energy [J]
+* Zone,Sum,Steam Equipment Radiant Heating Energy [J]
 
-Zone,Average,Steam Equipment Radiant Heating Rate [W]
+* Zone,Average,Steam Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Steam Equipment Convective Heating Energy [J]
+* Zone,Sum,Steam Equipment Convective Heating Energy [J]
 
-Zone,Average,Steam Equipment Convective Heating Rate [W]
+* Zone,Average,Steam Equipment Convective Heating Rate [W]
 
-Zone,Sum,Steam Equipment Latent Gain Energy [J]
+* Zone,Sum,Steam Equipment Latent Gain Energy [J]
 
-Zone,Average,Steam Equipment Latent Gain Rate [W]
+* Zone,Average,Steam Equipment Latent Gain Rate [W]
 
-Zone,Sum,Steam Equipment Lost Heat Energy [J]
+* Zone,Sum,Steam Equipment Lost Heat Energy [J]
 
-Zone,Average,Steam Equipment Lost Heat Rate [W]
+* Zone,Average,Steam Equipment Lost Heat Rate [W]
 
-Zone,Sum,Steam Equipment Total Heating Energy [J]
+* Zone,Sum,Steam Equipment Total Heating Energy [J]
 
-Zone,Average,Steam Equipment Total Heating Rate [W]
+* Zone,Average,Steam Equipment Total Heating Rate [W]
 
-Zone,Average,Zone Steam Equipment District Heating Rate [W]
+* Zone,Average,Zone Steam Equipment District Heating Rate [W]
 
-Zone,Sum,Zone Steam Equipment District Heating Energy [J]
+* Zone,Sum,Zone Steam Equipment District Heating Energy [J]
 
-Zone,Sum,Zone Steam Equipment Radiant Heating Energy [J]
+* Zone,Sum,Zone Steam Equipment Radiant Heating Energy [J]
 
-Zone,Average,Zone Steam Equipment Radiant Heating Rate [W]
+* Zone,Average,Zone Steam Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Zone Steam Equipment Convective Heating Energy [J]
+* Zone,Sum,Zone Steam Equipment Convective Heating Energy [J]
 
-Zone,Average,Zone Steam Equipment Convective Heating Rate [W]
+* Zone,Average,Zone Steam Equipment Convective Heating Rate [W]
 
-Zone,Sum,Zone Steam Equipment Latent Gain Energy [J]
+* Zone,Sum,Zone Steam Equipment Latent Gain Energy [J]
 
-Zone,Average,Zone Steam Equipment Latent Gain Rate [W]
+* Zone,Average,Zone Steam Equipment Latent Gain Rate [W]
 
-Zone,Sum,Zone Steam Equipment Lost Heat Energy [J]
+* Zone,Sum,Zone Steam Equipment Lost Heat Energy [J]
 
-Zone,Average,Zone Steam Equipment Lost Heat Rate [W]
+* Zone,Average,Zone Steam Equipment Lost Heat Rate [W]
 
-Zone,Sum,Zone Steam Equipment Total Heating Energy [J]
+* Zone,Sum,Zone Steam Equipment Total Heating Energy [J]
 
-Zone,Average,Zone Steam Equipment Total Heating Rate [W]
+* Zone,Average,Zone Steam Equipment Total Heating Rate [W]
+
 
 
 
 **Other Equipment**
 
-Zone,Sum,Other Equipment Radiant Heating Energy [J]
+* Zone,Sum,Other Equipment Radiant Heating Energy [J]
 
-Zone,Average,Other Equipment Radiant Heating Rate [W]
+* Zone,Average,Other Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Other Equipment Convective Heating Energy [J]
+* Zone,Sum,Other Equipment Convective Heating Energy [J]
 
-Zone,Average,Other Equipment Convective Heating Rate [W]
+* Zone,Average,Other Equipment Convective Heating Rate [W]
 
-Zone,Sum,Other Equipment Latent Gain Energy [J]
+* Zone,Sum,Other Equipment Latent Gain Energy [J]
 
-Zone,Average,Other Equipment Latent Gain Rate [W]
+* Zone,Average,Other Equipment Latent Gain Rate [W]
 
-Zone,Sum,Other Equipment Lost Heat Energy [J]
+* Zone,Sum,Other Equipment Lost Heat Energy [J]
 
-Zone,Average,Other Equipment Lost Heat Rate [W]
+* Zone,Average,Other Equipment Lost Heat Rate [W]
 
-Zone,Sum,Other Equipment Total Heating Energy [J]
+* Zone,Sum,Other Equipment Total Heating Energy [J]
 
-Zone,Average,Other Equipment Total Heating Rate [W]
+* Zone,Average,Other Equipment Total Heating Rate [W]
 
-Zone,Sum,Zone Other Equipment Radiant Heating Energy [J]
+* Zone,Sum,Zone Other Equipment Radiant Heating Energy [J]
 
-Zone,Average,Zone Other Equipment Radiant Heating Rate [W]
+* Zone,Average,Zone Other Equipment Radiant Heating Rate [W]
 
-Zone,Sum,Zone Other Equipment Convective Heating Energy [J]
+* Zone,Sum,Zone Other Equipment Convective Heating Energy [J]
 
-Zone,Average,Zone Other Equipment Convective Heating Rate [W]
+* Zone,Average,Zone Other Equipment Convective Heating Rate [W]
 
-Zone,Sum,Zone Other Equipment Latent Gain Energy [J]
+* Zone,Sum,Zone Other Equipment Latent Gain Energy [J]
 
-Zone,Average,Zone Other Equipment Latent Gain Rate [W]
+* Zone,Average,Zone Other Equipment Latent Gain Rate [W]
 
-Zone,Sum,Zone Other Equipment Lost Heat Energy [J]
+* Zone,Sum,Zone Other Equipment Lost Heat Energy [J]
 
-Zone,Average,Zone Other Equipment Lost Heat Rate [W]
+* Zone,Average,Zone Other Equipment Lost Heat Rate [W]
 
-Zone,Sum,Zone Other Equipment Total Heating Energy [J]
+* Zone,Sum,Zone Other Equipment Total Heating Energy [J]
 
-Zone,Average,Zone Other Equipment Total Heating Rate [W]
+* Zone,Average,Zone Other Equipment Total Heating Rate [W]
+
 
 #### Electric Equipment Electric Power [W]
 
@@ -19611,15 +19180,14 @@ This field is the name of the schedule (ref: Schedules) that modifies the design
 
 An IDF example is provided below:
 
+```idf
 ZoneContaminantSourceAndSink:CarbonDioxide,
-
-    NORTH\_ZONE CO2,        !- Name
-
-    NORTH\_ZONE,            !- Zone Name
-
+    NORTH_ZONE CO2,        !- Name
+    NORTH_ZONE,            !- Zone Name
     1.e-6,                 !- Design Generation Rate {m3/s}
+    CO2 Source Schedule;   !- Schedule Name
+```
 
-CO2 Source Schedule;   !- Schedule Name
 
 ### ZoneContaminantSourceAndSink:CarbonDioxide Outputs
 
@@ -19683,19 +19251,15 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 
 An IDF example is provided below:
 
+```idf
   ZoneContaminantSourceAndSink:GenericContaminant:Constant,
-
     NORTH ZONE GC,          !- Name
-
     NORTH ZONE,             !- Zone Name
-
     1.0E-6,                 !- Design Generation Rate {m3/s}
-
     GC Source Schedule,     !- Schedule Name
-
     1.0E-7,                 !- Design Removal Coefficient {m3/s}
-
     GC Removal Schedule;    !- Removal Schedule Name
+```
 
 ### ZoneContaminantSourceAndSink:GenericContaminant:Constant Outputs
 
@@ -19745,17 +19309,15 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 
 An IDF example is provided below:
 
+```idf
   SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven,
-
     WEST ZONE GC BLD,       !- Name
-
     Zn001:Wall001,          !- Surface Name
-
     1.0E-6,                 !- Design Generation Rate Coefficient {m3/s}
-
     GC Source Schedule,     !- Generation Schedule Name
-
     0.5;                    !- Generation Exponent
+```
+
 
 ### SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven Outputs
 
@@ -19809,17 +19371,15 @@ This field is the generic contaminant cutoff concentration level where the sourc
 
 An IDF example is provided below:
 
+```idf
 ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel,
-
     NORTH ZONE GC CutoffModel,          !- Name
-
     NORTH ZONE,             !- Zone Name
-
     1.0E-5,                 !- Design Generation Rate {m3/s}
-
     GC Source Schedule,     !- Schedule Name
-
     100000;                 !- Cutoff Concentration {ppm}
+```
+
 
 ### ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel Outputs
 
@@ -19873,17 +19433,15 @@ Note: The variable t, time since the start of emission, will be reset to zero, w
 
 An IDF example is provided below:
 
+```idf
 ZoneContaminantSourceAndSink:GenericContaminant:DecaySource,
-
     WEST ZONE GC DecaySource,           !- Name
-
     WEST ZONE,              !- Zone Name
-
     1.0E-5,                 !- Initial Emission Rate {m3/s}
-
     GC Source Schedule,     !- Schedule Name
-
     100000;                  !- Delay Time Constant {s}
+```
+
 
 ### ZoneContaminantSourceAndSink:GenericContaminant:DecaySource Outputs
 
@@ -19943,17 +19501,15 @@ This field denotes the generic contaminant Henry partition coefficient in the un
 
 An IDF example is provided below:
 
+```idf
 SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion,
-
     WEST ZONE GC BLD,       !- Name
-
     Zn001:Wall001,          !- Surface Name
-
     1.0E-2,                 !- Mass Transfer Coefficient {m/s}
-
     GC Source Schedule,     !- Schedule Name
-
     2.0;                    !- Henry adsorption constant or partition coefficient
+```
+
 
 ### SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion Outputs
 
@@ -20011,15 +19567,14 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 
 An IDF example is provided below:
 
+```idf
 SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink,
-
     EAST ZONE GC DVS,       !- Name
-
     Zn002:Wall001,          !- Surface Name
-
     1.0E-3,                 !- Deposition Velocity {m/s}
-
     GC Source Schedule;     !- Schedule Name
+```
+
 
 ### SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink Outputs
 
@@ -20075,15 +19630,14 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 
 An IDF example is provided below:
 
+```idf
 ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink,
-
     NORTH ZONE GC DRS,      !- Name
-
     NORTH ZONE,             !- Zone Name
-
     1.0E-5,                 !- Deposition Rate {m3/s}
-
     GC Source Schedule;     !- Schedule Name
+```
+
 
 ### ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink Outputs
 
