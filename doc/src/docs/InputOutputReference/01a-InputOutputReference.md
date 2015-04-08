@@ -77,8 +77,8 @@ IDD Conventions
 The following is a basic description of the structure of the IDD (it’s actually taken directly from the IDD file). As noted within, **!** signifies a comment character as does the **\\**. **\\** has also been adopted as a convention for including more specific comments about each field in an object. These have been used with success in the IDFEditor and it is hoped the flexibility will provide other interface developers with useful information.
 
 ```idd
-!IDD\_Version **VERSION NUMBER**
-! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
+!IDD_Version **VERSION NUMBER**
+! **************************************************************************
 ! This file is the Input Data Dictionary (IDD) for EnergyPlus.
 ! The IDD defines the syntax and data model for each type of input "Object."
 ! Lines in EnergyPlus input files (and IDD) are limited to 500 characters.
@@ -107,81 +107,81 @@ The following is a basic description of the structure of the IDD (it’s actuall
 !
 ! Field-level comments:
 !
-!  \\field           Name of field
+!  \field           Name of field
 !                     (should be succinct and readable, blanks are encouraged)
 !
-!  \\note            Note describing the field and its valid values. If multiple lines,
-!                   start each line with \\note. Limit line length to 100 characters.
+!  \note            Note describing the field and its valid values. If multiple lines,
+!                   start each line with \note. Limit line length to 100 characters.
 !
-!  \\required-field  To flag fields which may not be left blank
+!  \required-field  To flag fields which may not be left blank
 !                     (this comment has no "value")
 !
-!  \\begin-extensible  Marks the first field at which the object accepts an extensible
+!  \begin-extensible  Marks the first field at which the object accepts an extensible
 !                   field set.  A fixed number of fields from this marker define the
-!                   extensible field set, see the object code \\extensible for
+!                   extensible field set, see the object code \extensible for
 !                   more information.
 !
-!  \\units           Units (must be from EnergyPlus standard units list)
+!  \units           Units (must be from EnergyPlus standard units list)
 !                   EnergyPlus units are standard SI units
 !
-!  \\ip-units        IP-Units (for use by input processors with IP units)
+!  \ip-units        IP-Units (for use by input processors with IP units)
 !                   This is only used if the default conversion is not
 !                   appropriate.
 !
-!  \\unitsBasedOnField  For fields that may have multiple possible units, indicates
+!  \unitsBasedOnField  For fields that may have multiple possible units, indicates
 !                   the field in the object that can be used to determine
 !                   the units. The field reference is in the A2 form.
 !
-!  \\minimum         Minimum that includes the following value
+!  \minimum         Minimum that includes the following value
 !
-!  \\minimum&gt;        Minimum that must be &gt; than the following value
+!  \minimum&gt;        Minimum that must be &gt; than the following value
 !
-!  \\maximum         Maximum that includes the following value
+!  \maximum         Maximum that includes the following value
 !
-!  \\maximum&lt;        Maximum that must be &lt; than the following value
+!  \maximum&lt;        Maximum that must be &lt; than the following value
 !
-!  \\default         Default for the field (if N/A then omit entire line)
+!  \default         Default for the field (if N/A then omit entire line)
 !
-!  \\deprecated      This field is not really used and will be deleted from the object.
+!  \deprecated      This field is not really used and will be deleted from the object.
 !                   The required information is gotten internally or
 !                   not needed by the program.
 !
-!  \\autosizable     Flag to indicate that this field can be used with the Auto
+!  \autosizable     Flag to indicate that this field can be used with the Auto
 !                   Sizing routines to produce calculated results for the
 !                   field.  If a value follows this, then that will be used
 !                   when the "Autosize" feature is flagged.  To trigger
 !                   autosizing for a field, enter Autosize as the field's
 !                   value.  Only applicable to numeric fields.
 !
-! \\autocalculatable Flag to indicate that this field can be automatically
+! \autocalculatable Flag to indicate that this field can be automatically
 !                   calculated. To trigger auto calculation for a field, enter
 !                   Autocalculate as the field's value.  Only applicable to
 !                   numeric fields.
 !
-!  \\type            Type of data for the field -
+!  \type            Type of data for the field -
 !                     integer
 !                     real
 !                     alpha       (arbitrary string),
 !                     choice      (alpha with specific list of choices, see
-!                                 \\key)
+!                                 \key)
 !                     object-list (link to a list of objects defined elsewhere,
-!                                  see \\object-list and \\reference)
+!                                  see \object-list and \reference)
 !                     external-list (uses a special list from an external source,
-!                                    see \\external-list)
+!                                    see \external-list)
 !                     node        (name used in connecting HVAC components)
 !
-!  \\retaincase      Retains the alphabetic case for alpha type fields
+!  \retaincase      Retains the alphabetic case for alpha type fields
 !
-!  \\key             Possible value for "\\type choice" (blanks are significant)
-!                     use multiple \\key lines to indicate all valid choices
+!  \key             Possible value for "\type choice" (blanks are significant)
+!                     use multiple \key lines to indicate all valid choices
 !
-!  \\object-list     Name of a list of user-provided object names that are valid
-!                     entries for this field (used with "\\reference")
+!  \object-list     Name of a list of user-provided object names that are valid
+!                     entries for this field (used with "\reference")
 !                     see Zone and BuildingSurface:Detailed objects below for
 !                     examples.
-!                  \*\* Note that a field may have multiple \\object-list commands.
+!                  ** Note that a field may have multiple \object-list commands.
 !
-!  \\external-list   The values for this field should be selected from a special
+!  \external-list   The values for this field should be selected from a special
 !                   list generated outside of the IDD file. The choices for the
 !                   special lists are:
 !                        autoRDDvariable
@@ -190,71 +190,71 @@ The following is a basic description of the structure of the IDD (it’s actuall
 !                   When one of these are selected the options for the field
 !                   are taken from the RDD or MDD file or both.
 !
-!  \\reference       Name of a list of names to which this object belongs
-!                     used with "\\type object-list" and with "\\object-list"
+!  \reference       Name of a list of names to which this object belongs
+!                     used with "\type object-list" and with "\object-list"
 !                     see Zone and BuildingSurface:Detailed objects below for
 !                     examples:
 !
 !                        Zone,
-!                          A1 , \\field Name
-!                               \\type alpha
-!                               \\reference ZoneNames
+!                          A1 , \field Name
+!                               \type alpha
+!                               \reference ZoneNames
 !
 !                        BuildingSurface:Detailed,
-!                          A4 , \\field Zone Name
-!                               \\note Zone the surface is a part of
-!                               \\type object-list
-!                               \\object-list ZoneNames
+!                          A4 , \field Zone Name
+!                               \note Zone the surface is a part of
+!                               \type object-list
+!                               \object-list ZoneNames
 !
 !             For each zone, the field "Name" may be referenced
 !             by other objects, such as BuildingSurface:Detailed, so it is
-!             commented with "\\reference ZoneNames"
+!             commented with "\reference ZoneNames"
 !             Fields that reference a zone name, such as BuildingSurface:Detailed's
 !             "Zone Name", are commented as
-!             "\\type object-list" and "\\object-list ZoneNames"
-!             \*\* Note that a field may have multiple \\reference commands.
-!             \*\* This is useful if the object belongs to a small specific
+!             "\type object-list" and "\object-list ZoneNames"
+!             ** Note that a field may have multiple \reference commands.
+!             ** This is useful if the object belongs to a small specific
 !             object-list as well as a larger more general object-list.
 !
 ! Object-level comments:
 !
-!  \\memo            Memo describing the object. If multiple lines, start each line
-!                   with \\memo.
+!  \memo            Memo describing the object. If multiple lines, start each line
+!                   with \memo.
 !                   Limit line length to 100 characters.
 !
-!  \\unique-object   To flag objects which should appear only once in an idf
+!  \unique-object   To flag objects which should appear only once in an idf
 !                     (this comment has no "value")
 !
-!  \\required-object To flag objects which are required in every idf
+!  \required-object To flag objects which are required in every idf
 !                     (this comment has no "value")
 !
-!  \\min-fields      Minimum number of fields that should be included in the
+!  \min-fields      Minimum number of fields that should be included in the
 !                   object.  If appropriate, the Input Processor will fill
 !                   any missing fields with defaults (for numeric fields).
 !                   It will also supply that number of fields to the "get"
 !                   routines using blanks for alpha fields (note -- blanks
 !                   may not be allowable for some alpha fields).
 !
-!  \\obsolete        This object has been replaced though is kept (and is read)
+!  \obsolete        This object has been replaced though is kept (and is read)
 !                   in the current version.  Please refer to documentation as
 !                   to the dispersal of the object.  If this object is
 !                   encountered in an IDF, the InputProcessor will post an
 !                   appropriate message to the error file.
-!                   usage:  \\obsolete New=&gt;[New object name]
+!                   usage:  \obsolete New=&gt;[New object name]
 !
-!  \\extensible:&lt;\#&gt;  This object is dynamically extensible -- meaning, if you
+!  \extensible:&lt;\#&gt;  This object is dynamically extensible -- meaning, if you
 !           change the IDD appropriately (if the object has a simple list
 !           structure -- just add items to the list arguments (i.e. BRANCH
 !           LIST). These will be automatically redimensioned and used during
 !           the simulation. &lt;\#&gt; should be entered by the developer to signify
 !           how many of the last fields are needed to be extended (and EnergyPlus
 !           will attempt to auto-extend the object).  The first field of the first
-!           instance of the extensible field set is marked with \\begin-extensible.
+!           instance of the extensible field set is marked with \begin-extensible.
 !
-!  \\begin-extensible See previous item, marks beginning of extensible fields in
+!  \begin-extensible See previous item, marks beginning of extensible fields in
 !                   an object.
 !
-!  \\format          The object should have a special format when saved in
+!  \format          The object should have a special format when saved in
 !                   the IDF Editor with the special format option enabled.
 !                   The options include SingleLine, Vertices, CompactSchedule,
 !                   FluidProperties, ViewFactors, and Spectral.
@@ -270,12 +270,12 @@ The following is a basic description of the structure of the IDD (it’s actuall
 !                   The Spectral option formats the four fields related to
 !                   window glass spectral data per line.
 !
-!   \\reference-class-name Adds the name of the class to the reference list
-!                   similar to \\reference.
+!   \reference-class-name Adds the name of the class to the reference list
+!                   similar to \reference.
 !
 ! Group-level comments:
 !
-!  \\group          Name for a group of related objects
+!  \group          Name for a group of related objects
 !
 !
 ! Notes on comments
@@ -293,117 +293,117 @@ The following is a basic description of the structure of the IDD (it’s actuall
 In addition, the IDD contains indications of IP (inch-pound) units for the EnergyPlus standard SI (Systems International) units. These may be used by input and output interfaces to display values in the IP system. As noted, if the IP units are “standard” (first block below), then no \\ip-units is expected in the field. Note that for some fields – due to their multiple use (for example, schedule values) – there cannot be a ip-unit designation.
 
 ```idd
-! Default IP conversions (no \\ip-units necessary)
-!      $/(m3/s)               =&gt;   $/(ft3/min)         0.000472000059660808
-!      $/(W/K)                =&gt;   $/(Btu/h-F)         0.52667614683731
-!      $/kW                   =&gt;   $/(kBtuh/h)         0.293083235638921
-!      $/m2                   =&gt;   $/ft2               0.0928939733269818
-!      $/m3                   =&gt;   $/ft3               0.0283127014102352
-!      (kg/s)/W               =&gt;   (lbm/sec)/(Btu/hr)  0.646078115385742
-!      1/K                    =&gt;   1/F                 0.555555555555556
-!      1/m                    =&gt;   1/ft                0.3048
-!      A/K                    =&gt;   A/F                 0.555555555555556
-!      C                      =&gt;   F                   1.8 (plus 32)
-!      cm                     =&gt;   in                  0.3937
-!      cm2                    =&gt;   inch2               0.15500031000062
-!      deltaC                 =&gt;   deltaF              1.8
-!      deltaJ/kg              =&gt;   deltaBtu/lb         0.0004299
-!      g/GJ                   =&gt;   lb/MWh              0.00793664091373665
-!      g/kg                   =&gt;   grains/lb           7
-!      g/MJ                   =&gt;   lb/MWh              7.93664091373665
-!      g/mol                  =&gt;   lb/mol              0.0022046
-!      g/m-s                  =&gt;   lb/ft-s             0.000671968949659
-!      g/m-s-K                =&gt;   lb/ft-s-F           0.000373574867724868
-!      GJ                     =&gt;   ton-hrs             78.9889415481832
-!      J                      =&gt;   Wh                  0.000277777777777778
-!      J/K                    =&gt;   Btu/F               526.565
-!      J/kg                   =&gt;   Btu/lb              0.00042986
-!      J/kg-K                 =&gt;   Btu/lb-F            0.000239005736137667
-!      J/kg-K2                =&gt;   Btu/lb-F2           0.000132889924714692
-!      J/kg-K3                =&gt;   Btu/lb-F3           7.38277359526066E-05
-!      J/m2-K                 =&gt;   Btu/ft2-F           4.89224766847393E-05
-!      J/m3                   =&gt;   Btu/ft3             2.68096514745308E-05
-!      J/m3-K                 =&gt;   Btu/ft3-F           1.49237004739337E-05
-!      K                      =&gt;   R                   1.8
-!      K/m                    =&gt;   F/ft                0.54861322767449
-!      kg                     =&gt;   lb                  2.2046
-!      kg/J                   =&gt;   lb/Btu              2325.83774250441
-!      kg/kg-K                =&gt;   lb/lb-F             0.555555555555556
-!      kg/m                   =&gt;   lb/ft               0.67196893069637
-!      kg/m2                  =&gt;   lb/ft2              0.204794053596664
-!      kg/m3                  =&gt;   lb/ft3              0.062428
-!      kg/m-s                 =&gt;   lb/ft-s             0.67196893069637
-!      kg/m-s-K               =&gt;   lb/ft-s-F           0.373316072609094
-!      kg/m-s-K2              =&gt;   lb/ft-s-F2          0.207397818116164
-!      kg/Pa-s-m2             =&gt;   lb/psi-s-ft2        1412.00523459398
-!      kg/s                   =&gt;   lb/s                2.20462247603796
-!      kg/s2                  =&gt;   lb/s2               2.2046
-!      kg/s-m                 =&gt;   lb/s-ft             0.67196893069637
-!      kJ/kg                  =&gt;   Btu/lb              0.429925
-!      kPa                    =&gt;   psi                 0.145038
-!      L/day                  =&gt;   pint/day            2.11337629827348
-!      L/GJ                   =&gt;   gal/kWh             0.000951022349025202
-!      L/kWh                  =&gt;   pint/kWh            2.11337629827348
-!      L/MJ                   =&gt;   gal/kWh             0.951022349025202
-!      lux                    =&gt;   foot-candles        0.092902267
-!      m                      =&gt;   ft                  3.28083989501312
-!      m/hr                   =&gt;   ft/hr               3.28083989501312
-!      m/s                    =&gt;   ft/min              196.850393700787
-!      m/s                    =&gt;   miles/hr            2.2369362920544
-!      m/yr                   =&gt;   inch/yr             39.3700787401575
-!      m2                     =&gt;   ft2                 10.7639104167097
-!      m2/m                   =&gt;   ft2/ft              3.28083989501312
-!      m2/person              =&gt;   ft2/person          10.764961
-!      m2/s                   =&gt;   ft2/s               10.7639104167097
-!      m2-K/W                 =&gt;   ft2-F-hr/Btu        5.678263
-!      m3                     =&gt;   ft3                 35.3146667214886
-!      m3                     =&gt;   gal                 264.172037284185
-!      m3/GJ                  =&gt;   ft3/MWh             127.13292
-!      m3/hr                  =&gt;   ft3/hr              35.3146667214886
-!      m3/hr-m2               =&gt;   ft3/hr-ft2          3.28083989501312
-!      m3/hr-person           =&gt;   ft3/hr-person       35.3146667214886
-!      m3/kg                  =&gt;   ft3/lb              16.018
-!      m3/m2                  =&gt;   ft3/ft2             3.28083989501312
-!      m3/MJ                  =&gt;   ft3/kWh             127.13292
-!      m3/person              =&gt;   ft3/person          35.3146667214886
-!      m3/s                   =&gt;   ft3/min             2118.88000328931
-!      m3/s-m                 =&gt;   ft3/min-ft          645.89
-!      m3/s-m2                =&gt;   ft3/min-ft2         196.85
-!      m3/s-person            =&gt;   ft3/min-person      2118.6438
-!      m3/s-W                 =&gt;   (ft3/min)/(Btu/h)   621.099127332943
-!      N-m                    =&gt;   lbf-in              8.85074900525547
-!      N-s/m2                 =&gt;   lbf-s/ft2           0.0208857913669065
-!      Pa                     =&gt;   psi                 0.000145037743897283
-!      percent/K              =&gt;   percent/F           0.555555555555556
-!      person/m2              =&gt;   person/ft2          0.0928939733269818
-!      s/m                    =&gt;   s/ft                0.3048
-!      V/K                    =&gt;   V/F                 0.555555555555556
-!      W                      =&gt;   Btu/h               3.4121412858518
-!      W/(m3/s)               =&gt;   W/(ft3/min)         0.0004719475
-!      W/K                    =&gt;   Btu/h-F             1.89563404769544
-!      W/m                    =&gt;   Btu/h-ft            1.04072
-!      W/m2                   =&gt;   Btu/h-ft2           0.316957210776545
-!      W/m2                   =&gt;   W/ft2               0.09290304
-!      W/m2-K                 =&gt;   Btu/h-ft2-F         0.176110194261872
-!      W/m2-K2                =&gt;   Btu/h-ft2-F2        0.097826
-!      W/m-K                  =&gt;   Btu-in/h-ft2-F      6.93481276005548
-!      W/m-K2                 =&gt;   Btu/h-F2-ft         0.321418310071648
-!      W/m-K3                 =&gt;   Btu/h-F3-ft         0.178565727817582
-!      W/person               =&gt;   Btu/h-person        3.4121412858518
+! Default IP conversions (no \ip-units necessary)
+!      $/(m3/s)               =>   $/(ft3/min)         0.000472000059660808
+!      $/(W/K)                =>   $/(Btu/h-F)         0.52667614683731
+!      $/kW                   =>   $/(kBtuh/h)         0.293083235638921
+!      $/m2                   =>   $/ft2               0.0928939733269818
+!      $/m3                   =>   $/ft3               0.0283127014102352
+!      (kg/s)/W               =>   (lbm/sec)/(Btu/hr)  0.646078115385742
+!      1/K                    =>   1/F                 0.555555555555556
+!      1/m                    =>   1/ft                0.3048
+!      A/K                    =>   A/F                 0.555555555555556
+!      C                      =>   F                   1.8 (plus 32)
+!      cm                     =>   in                  0.3937
+!      cm2                    =>   inch2               0.15500031000062
+!      deltaC                 =>   deltaF              1.8
+!      deltaJ/kg              =>   deltaBtu/lb         0.0004299
+!      g/GJ                   =>   lb/MWh              0.00793664091373665
+!      g/kg                   =>   grains/lb           7
+!      g/MJ                   =>   lb/MWh              7.93664091373665
+!      g/mol                  =>   lb/mol              0.0022046
+!      g/m-s                  =>   lb/ft-s             0.000671968949659
+!      g/m-s-K                =>   lb/ft-s-F           0.000373574867724868
+!      GJ                     =>   ton-hrs             78.9889415481832
+!      J                      =>   Wh                  0.000277777777777778
+!      J/K                    =>   Btu/F               526.565
+!      J/kg                   =>   Btu/lb              0.00042986
+!      J/kg-K                 =>   Btu/lb-F            0.000239005736137667
+!      J/kg-K2                =>   Btu/lb-F2           0.000132889924714692
+!      J/kg-K3                =>   Btu/lb-F3           7.38277359526066E-05
+!      J/m2-K                 =>   Btu/ft2-F           4.89224766847393E-05
+!      J/m3                   =>   Btu/ft3             2.68096514745308E-05
+!      J/m3-K                 =>   Btu/ft3-F           1.49237004739337E-05
+!      K                      =>   R                   1.8
+!      K/m                    =>   F/ft                0.54861322767449
+!      kg                     =>   lb                  2.2046
+!      kg/J                   =>   lb/Btu              2325.83774250441
+!      kg/kg-K                =>   lb/lb-F             0.555555555555556
+!      kg/m                   =>   lb/ft               0.67196893069637
+!      kg/m2                  =>   lb/ft2              0.204794053596664
+!      kg/m3                  =>   lb/ft3              0.062428
+!      kg/m-s                 =>   lb/ft-s             0.67196893069637
+!      kg/m-s-K               =>   lb/ft-s-F           0.373316072609094
+!      kg/m-s-K2              =>   lb/ft-s-F2          0.207397818116164
+!      kg/Pa-s-m2             =>   lb/psi-s-ft2        1412.00523459398
+!      kg/s                   =>   lb/s                2.20462247603796
+!      kg/s2                  =>   lb/s2               2.2046
+!      kg/s-m                 =>   lb/s-ft             0.67196893069637
+!      kJ/kg                  =>   Btu/lb              0.429925
+!      kPa                    =>   psi                 0.145038
+!      L/day                  =>   pint/day            2.11337629827348
+!      L/GJ                   =>   gal/kWh             0.000951022349025202
+!      L/kWh                  =>   pint/kWh            2.11337629827348
+!      L/MJ                   =>   gal/kWh             0.951022349025202
+!      lux                    =>   foot-candles        0.092902267
+!      m                      =>   ft                  3.28083989501312
+!      m/hr                   =>   ft/hr               3.28083989501312
+!      m/s                    =>   ft/min              196.850393700787
+!      m/s                    =>   miles/hr            2.2369362920544
+!      m/yr                   =>   inch/yr             39.3700787401575
+!      m2                     =>   ft2                 10.7639104167097
+!      m2/m                   =>   ft2/ft              3.28083989501312
+!      m2/person              =>   ft2/person          10.764961
+!      m2/s                   =>   ft2/s               10.7639104167097
+!      m2-K/W                 =>   ft2-F-hr/Btu        5.678263
+!      m3                     =>   ft3                 35.3146667214886
+!      m3                     =>   gal                 264.172037284185
+!      m3/GJ                  =>   ft3/MWh             127.13292
+!      m3/hr                  =>   ft3/hr              35.3146667214886
+!      m3/hr-m2               =>   ft3/hr-ft2          3.28083989501312
+!      m3/hr-person           =>   ft3/hr-person       35.3146667214886
+!      m3/kg                  =>   ft3/lb              16.018
+!      m3/m2                  =>   ft3/ft2             3.28083989501312
+!      m3/MJ                  =>   ft3/kWh             127.13292
+!      m3/person              =>   ft3/person          35.3146667214886
+!      m3/s                   =>   ft3/min             2118.88000328931
+!      m3/s-m                 =>   ft3/min-ft          645.89
+!      m3/s-m2                =>   ft3/min-ft2         196.85
+!      m3/s-person            =>   ft3/min-person      2118.6438
+!      m3/s-W                 =>   (ft3/min)/(Btu/h)   621.099127332943
+!      N-m                    =>   lbf-in              8.85074900525547
+!      N-s/m2                 =>   lbf-s/ft2           0.0208857913669065
+!      Pa                     =>   psi                 0.000145037743897283
+!      percent/K              =>   percent/F           0.555555555555556
+!      person/m2              =>   person/ft2          0.0928939733269818
+!      s/m                    =>   s/ft                0.3048
+!      V/K                    =>   V/F                 0.555555555555556
+!      W                      =>   Btu/h               3.4121412858518
+!      W/(m3/s)               =>   W/(ft3/min)         0.0004719475
+!      W/K                    =>   Btu/h-F             1.89563404769544
+!      W/m                    =>   Btu/h-ft            1.04072
+!      W/m2                   =>   Btu/h-ft2           0.316957210776545
+!      W/m2                   =>   W/ft2               0.09290304
+!      W/m2-K                 =>   Btu/h-ft2-F         0.176110194261872
+!      W/m2-K2                =>   Btu/h-ft2-F2        0.097826
+!      W/m-K                  =>   Btu-in/h-ft2-F      6.93481276005548
+!      W/m-K2                 =>   Btu/h-F2-ft         0.321418310071648
+!      W/m-K3                 =>   Btu/h-F3-ft         0.178565727817582
+!      W/person               =>   Btu/h-person        3.4121412858518
 !
-! Other conversions supported (needs the \\ip-units code)
+! Other conversions supported (needs the \ip-units code)
 !
-!      kPa                    =&gt;   inHg                0.29523
-!      m                      =&gt;   in                  39.3700787401575
-!      m3/s                   =&gt;   gal/min             15850.3222370511
-!      Pa                     =&gt;   ftH2O               0.00033455
-!      Pa                     =&gt;   inH2O               0.00401463
-!      Pa                     =&gt;   inHg                0.00029613
-!      Pa                     =&gt;   Pa                  1
-!      W                      =&gt;   W                   1
-!      W/m2                   =&gt;   W/m2                1
-!      W/m-K                  =&gt;   Btu/h-ft-F          0.577796066000163
-!      W/person               =&gt;   W/person            1
+!      kPa                    =>   inHg                0.29523
+!      m                      =>   in                  39.3700787401575
+!      m3/s                   =>   gal/min             15850.3222370511
+!      Pa                     =>   ftH2O               0.00033455
+!      Pa                     =>   inH2O               0.00401463
+!      Pa                     =>   inHg                0.00029613
+!      Pa                     =>   Pa                  1
+!      W                      =>   W                   1
+!      W/m2                   =>   W/m2                1
+!      W/m-K                  =>   Btu/h-ft-F          0.577796066000163
+!      W/person               =>   W/person            1
 !
 ! Units fields that are not translated
 !      $
@@ -440,7 +440,7 @@ In addition, the IDD contains indications of IP (inch-pound) units for the Energ
 !      W/s
 !      W/W
 !      years
-! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
+! **************************************************************************
 ```
 
 Input – Output Descriptions (Document)
@@ -519,77 +519,77 @@ The Simple (or regular) display looks like the following figure and is interpret
 
 Example from the **eplusout.rdd** file:
 
-Zone,Average,Site Outdoor Air Drybulb Temperature [C]
+* Zone,Average,Site Outdoor Air Drybulb Temperature [C]
 
-Zone,Average,Site Outdoor Air Dewpoint Temperature [C]
+* Zone,Average,Site Outdoor Air Dewpoint Temperature [C]
 
-Zone,Average,Site Outdoor Air Wetbulb Temperature [C]
+* Zone,Average,Site Outdoor Air Wetbulb Temperature [C]
 
-Zone,Average,Site Outdoor Air Humidity Ratio [kgWater/kgAir]
+* Zone,Average,Site Outdoor Air Humidity Ratio [kgWater/kgAir]
 
-Zone,Average,Site Outdoor Air Relative Humidity [%]
+* Zone,Average,Site Outdoor Air Relative Humidity [%]
 
-Zone,Average,Site Outdoor Air Barometric Pressure [Pa]
+* Zone,Average,Site Outdoor Air Barometric Pressure [Pa]
 
-Zone,Average,Wind Speed [m/s]
+* Zone,Average,Wind Speed [m/s]
 
-Zone,Average,Site Wind Direction [deg]
+* Zone,Average,Site Wind Direction [deg]
 
-Zone,Average,Site Sky Temperature [C]
+* Zone,Average,Site Sky Temperature [C]
 
-HVAC,Sum,Zone Air System Sensible Heating Energy [J]
+* HVAC,Sum,Zone Air System Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Air System Sensible Heating Rate [W]
+* HVAC,Average,Zone Air System Sensible Heating Rate [W]
 
-HVAC,Average,Zone Air System Sensible Cooling Rate [W]
+* HVAC,Average,Zone Air System Sensible Cooling Rate [W]
 
-HVAC,Average,Zone Air Temperature [C]
+* HVAC,Average,Zone Air Temperature [C]
 
-HVAC,Average,Zone Thermostat Air Temperature [C]
+* HVAC,Average,Zone Thermostat Air Temperature [C]
 
 Note that the **eplusout.mdd** file is similar, but meters are only available at the Zone timestep.
 
-Zone,Meter,Electricity:Facility [J]
+* Zone,Meter,Electricity:Facility [J]
 
-Zone,Meter,ExteriorLights:Electricity [J]
+* Zone,Meter,ExteriorLights:Electricity [J]
 
-Zone,Meter,Grounds Lights:ExteriorLights:Electricity [J]
+* Zone,Meter,Grounds Lights:ExteriorLights:Electricity [J]
 
-Zone,Meter,EnergyTransfer:Facility [J]
+* Zone,Meter,EnergyTransfer:Facility [J]
 
-Zone,Meter,EnergyTransfer:Building [J]
+* Zone,Meter,EnergyTransfer:Building [J]
 
-Zone,Meter,EnergyTransfer:Zone:R13WALL WALLS [J]
+* Zone,Meter,EnergyTransfer:Zone:R13WALL WALLS [J]
 
 The IDF display has all the same information in an IDF-ready form (i.e., you could copy and paste it into your input file using a text editor).
 
 Example from the **eplusout.rdd** file:
 
-Output:Variable,\*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
+* Output:Variable,\*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
 
-Output:Variable,\*,Site Outdoor Air Dewpoint Temperature,hourly; !- Zone Average [C]
+* Output:Variable,\*,Site Outdoor Air Dewpoint Temperature,hourly; !- Zone Average [C]
 
-Output:Variable,\*,Site Outdoor Air Wetbulb Temperature,hourly; !- Zone Average [C]
+* Output:Variable,\*,Site Outdoor Air Wetbulb Temperature,hourly; !- Zone Average [C]
 
-Output:Variable,\*,Site Outdoor Air Humidity Ratio,hourly; !- Zone Average [kgWater/kgAir]
+* Output:Variable,\*,Site Outdoor Air Humidity Ratio,hourly; !- Zone Average [kgWater/kgAir]
 
-Output:Variable,\*,Site Outdoor Air Relative Humidity,hourly; !- Zone Average [%]
+* Output:Variable,\*,Site Outdoor Air Relative Humidity,hourly; !- Zone Average [%]
 
-Output:Variable,\*,Site Outdoor Air Barometric Pressure,hourly; !- Zone Average [Pa]
+* Output:Variable,\*,Site Outdoor Air Barometric Pressure,hourly; !- Zone Average [Pa]
 
-Output:Variable,\*,Zone Air System Sensible Heating Energy,hourly; !- HVAC Sum [J]
+* Output:Variable,\*,Zone Air System Sensible Heating Energy,hourly; !- HVAC Sum [J]
 
-Output:Variable,\*,Zone Air System Sensible Cooling Energy,hourly; !- HVAC Sum [J]
+* Output:Variable,\*,Zone Air System Sensible Cooling Energy,hourly; !- HVAC Sum [J]
 
-Output:Variable,\*,Zone Air System Sensible Heating Rate,hourly; !- HVAC Average [W]
+* Output:Variable,\*,Zone Air System Sensible Heating Rate,hourly; !- HVAC Average [W]
 
-Output:Variable,\*,Zone Air System Sensible Cooling Rate,hourly; !- HVAC Average [W]
+* Output:Variable,\*,Zone Air System Sensible Cooling Rate,hourly; !- HVAC Average [W]
 
-Output:Variable,\*,Zone Air Temperature,hourly; !- HVAC Average [C]
+* Output:Variable,\*,Zone Air Temperature,hourly; !- HVAC Average [C]
 
-Output:Variable,\*,Zone Thermostat Air Temperature,hourly; !- HVAC Average [C]
+* Output:Variable,\*,Zone Thermostat Air Temperature,hourly; !- HVAC Average [C]
 
 All of the same information appears in a slightly different form and defaults to “hourly” reporting frequency (which, of course, can be changed when you put it into your input file). The “\*” is preselected so that you would be reporting for all those items.
 
@@ -618,16 +618,16 @@ The choice made for this field has important implications for modeling accuracy 
 
 - The weather data files usually have 60-minute (or hourly) data.  However, it does not follow that this should be used as the basis for choosing the zone timestep because:
 
-o   EnergyPlus carefully interpolates the weather data between data points for use at shorter timesteps.  This is discussed in a later section: Weather Data Hourly Interpolation
+  - EnergyPlus carefully interpolates the weather data between data points for use at shorter timesteps.  This is discussed in a later section: Weather Data Hourly Interpolation
 
-o   Many aspects of a model have time scales that differ from the that of the weather data.  A goal of the modeling is to predict how the building will respond to the weather.  However, the building’s response is not *governed* by the time scale that the weather data are available at, but rather the time scales of the dynamic performance of the thermal envelope as well as things like schedules for internal gains, thermostats, and equipment availability.
+  - Many aspects of a model have time scales that differ from the that of the weather data.  A goal of the modeling is to predict how the building will respond to the weather.  However, the building’s response is not *governed* by the time scale that the weather data are available at, but rather the time scales of the dynamic performance of the thermal envelope as well as things like schedules for internal gains, thermostats, and equipment availability.
 
 - If the model will include calculating the cost of electricity, then the user should be aware that many electric utility tariffs base charges on demand windows of a specified length of time.  If the choice of Number of Timesteps per Hour is not consistent with the demand window, then unexpected results may be obtained.  For reasonable prediction of the maximum rates for electricity use for in calculating demand charges, the length of the zone timestep needs to be consistent with the tariff’s demand window.  The following table lists what values are consistent with various demand windows.
 
 <table class="table table-striped">
 <tr>
-<td>Demand Window</td>
-<td>Applicable Number of Timesteps per Hour</td>
+<th>Demanh Winhow</th>
+<th>Applicable Number of Timesteps per Hour</th>
 </tr>
 <tr>
 <td>QuarterHour</td>
@@ -649,7 +649,9 @@ Users can see the system timestep used if they select the "detailed" frequency o
 
 And, the IDF example:
 
+```idf
 Timestep, 6;  !Suggested default for most system simulations
+```
 
 Suggested defaults are 4 for non-HVAC simulations, 6 for simulations with HVAC, 20 is the minimum for ConductionFiniteDifference and HeatAndMoistureFiniteElement simulations. Green roof (ref: Material:RoofVegetation) also may require more timesteps.
 
@@ -713,29 +715,32 @@ The site’s terrain affects how the wind hits the building – as does the buil
 
 Table 1. Values for "Terrain"
 
-Terrain Type Value
-
-Terrain Description
-
-Country
-
-Flat, Open Country
-
-Suburbs
-
-Rough, Wooded Country, Suburbs
-
-City
-
-Towns, city outskirts, center of large cities
-
-Ocean
-
-Ocean, Bayou flat country
-
-Urban
-
-Urban, Industrial, Forest
+<table class="table table-striped">
+  <tr>
+    <th>Terrain Type Value</th>
+    <th>Terrain Description</th>
+  </tr>
+  <tr>
+    <td>Country</td>
+    <td>Flat, Open Country</td>
+  </tr>
+  <tr>
+    <td>Suburbs</td>
+    <td>Rough, Wooded Country, Suburbs</td>
+  </tr>
+  <tr>
+    <td>City</td>
+    <td>Towns, city outskirts, center of large cities</td>
+  </tr>
+  <tr>
+    <td>Ocean</td>
+    <td>Ocean, Bayou flat country</td>
+  </tr>
+  <tr>
+    <td>Urban</td>
+    <td>Urban, Industrial, Forest</td>
+  </tr>
+</table>
 
 #### Warmup Convergence
 
@@ -823,17 +828,14 @@ Figure 5. Shadowing from building affects beam solar reflection from the ground.
 
 This field specifies the number of “warmup” days that might be used in the simulation before “convergence” is achieved. The default number, 25, is usually more than sufficient for this task; however, some complex buildings (with complex constructions) may require more days. If you enter less than 25 as a maximum, that is the number of maximum warmup days that will be used. An error message will occur when the simulation “runs” out of days and has not converged:
 
+```
 CheckWarmupConvergence: Loads Initialization, Zone="MAIN ZONE" did not converge after 30 warmup days.
-
 See Warmup Convergence Information in .eio file for details
-
 ..Environment(SizingPeriod)="DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB"
-
 ..Max Temp Comparison = 2.06E-002 vs Temperature Convergence Tolerance=0.50 – Pass Convergence
-
 ..Min Temp Comparison = 5.95E-003 vs Temperature Convergence Tolerance=0.50 – Pass Convergence
-
 ..Max Cool Load Comparison = 9.5082E-002 vs Loads Convergence Tolerance=5.00E-002 – Fail Convergence
+```
 
 As noted in the message, there will be more information in the .eio file. (Refer to Output Details document as well for examples.)
 
@@ -845,23 +847,18 @@ This field specifies the minimum number of “warmup” days before EnergyPlus w
 
 An example from an IDF:
 
+```idf
 Building,
-
   PSI HOUSE DORM AND OFFICES,  !- Name
-
   36.87000,               !- North Axis {deg}
-
   Suburbs,                !- Terrain
-
   0.04,                   !- Loads Convergence Tolerance Value
-
   0.4000000,              !- Temperature Convergence Tolerance Value {deltaC}
-
   FullInteriorAndExterior, !- Solar Distribution
-
   40,                     !- Maximum Number of Warmup Days
-
   6;                      !- Minimum Number of Warmup Days
+```
+
 
 ### SurfaceConvectionAlgorithm:Inside
 
@@ -883,7 +880,11 @@ The default is **TARP**.
 
 IDF Example:
 
+
+```idf
 SurfaceConvectionAlgorithm:Inside,TARP;
+```
+
 
 ### SurfaceConvectionAlgorithm:Outside
 
@@ -909,7 +910,11 @@ Note that when the surface is wet (i.e. it is raining and the surface is exposed
 
 IDF Example:
 
+
+```idf
 SurfaceConvectionAlgorithm:Outside, AdaptiveConvectionAlgorithm;
+```
+
 
 ### HeatBalanceAlgorithm
 
@@ -949,21 +954,16 @@ Four values are allowed to select which solution will be used.
 
 This field is a bit “advanced”.  It should only be used when the simulation fails AND you cannot determine a cause for the failure.  That is, you receive an error similar to:
 
-   \*\* Severe  \*\* Temperature out of bounds (202.91) for surface=Wall1
-
-   \*\*   ~~~   \*\* in Zone=Zone01
-
-   \*\*   ~~~   \*\*  Occurrence info=NEW YORK CITY NY SUMMER, 07/21 16:00 - 16:01
-
-   \*\*   ~~~   \*\* A temperature out of bounds problem can be caused by several things.  The user
-
-   \*\*   ~~~   \*\* should check the weather environment, the level of internal gains with respect
-
-   \*\*   ~~~   \*\* to the zone, and the thermal properties of their materials among other things.
-
-   \*\*   ~~~   \*\* A common cause is a building with no thermal mass -- all materials with
-
-   \*\*   ~~~   \*\* Regular-R definitions.
+```
+   ** Severe  ** Temperature out of bounds (202.91) for surface=Wall1
+   **   ~~~   ** in Zone=Zone01
+   **   ~~~   **  Occurrence info=NEW YORK CITY NY SUMMER, 07/21 16:00 - 16:01
+   **   ~~~   ** A temperature out of bounds problem can be caused by several things.  The user
+   **   ~~~   ** should check the weather environment, the level of internal gains with respect
+   **   ~~~   ** to the zone, and the thermal properties of their materials among other things.
+   **   ~~~   ** A common cause is a building with no thermal mass -- all materials with
+   **   ~~~   ** Regular-R definitions.
+```
 
 And, after careful perusal, you cannot find a solution as suggested in the error description. You may then want to enter a higher number than the default for this field.
 
@@ -1015,15 +1015,14 @@ An example IDF object follows.
 
 
 
+```idf
   HeatBalanceSettings:ConductionFiniteDifference,
-
     FullyImplicitFirstOrder , !- Difference Scheme
-
     3.0 ,  !- Space Discretization Constant
-
     1.0,   !- Relaxation Factor
-
     0.002 ;!- Inside Face Surface Temperature Convergence Criteria
+```
+
 
 ### ZoneAirHeatBalanceAlgorithm
 
@@ -1061,15 +1060,14 @@ This field specifies the name of a schedule that contains outdoor air generic co
 
 An IDF example:
 
+```idf
 ZoneAirContaminantBalance,
-
   Yes,                       !- Carbon Dioxide Concentration
-
   Outdoor CO2 Schedule,      !- Outdoor Carbon Dioxide Schedule Name
-
   Yes,                       !- Generic Contaminant Concentration
-
   Generic Contaminant Schedule; !- Outdoor Generic Contaminant Schedule Name
+```
+
 
 
 
@@ -1135,11 +1133,12 @@ This field applies to the method called “AverageOverDaysInFrequency.”  When
 
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
+```idf
 ShadowCalculation,AverageOverDaysInFrequency,1;
 
 
-
 ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
+```
 
 Note that the use of “1” in the examples is NOT the same as using DetailedTimestepIntegration – “1” causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
 
@@ -1177,9 +1176,11 @@ Allowable choices are:
 
 In IDF use:
 
+```idf
 Output:Diagnostics,
-
   DisplayExtraWarnings;
+```
+
 
 ### Output:DebuggingData
 
@@ -1197,9 +1198,11 @@ This field allows the debug data to be reported during the warmup period. When a
 
 In IDF use:
 
+```idf
 Output:DebuggingData,
-
 1,1;
+```
+
 
 ### Output:PreprocessorMessage
 
@@ -1221,23 +1224,22 @@ Each line is limited to 100 characters and an appropriate message can be compose
 
 An IDF Example:
 
+```idf
 Output:PreprocessorMessage,
-
    No Preprocessor Used,     !- preprocessor name
-
    Information,              !- error severity
-
    Illustrative Message,     !- message line 1
-
    No problems for processing;  !- message line 2
+```
+
 
 And would appear in output:
 
+```
 Preprocessor="No Preprocessor Used" has the following Information messages:
-
 Illustrative Message
-
 No problems for processing
+```
 
 ### ZoneCapacitanceMultiplier:ResearchSpecial
 
@@ -1316,9 +1318,11 @@ This field is used to specify a limit on the number of threads EnergyPlus will u
 
 An example IDF object that sets the program to use only one thread follows.
 
+```idf
   ProgramControl,
-
     1 ; !- Number of Threads Allowed
+```
+
 
 ### Meter:Custom
 
@@ -1430,85 +1434,59 @@ In the following examples, the custom meters are set up to illustrate the capabi
 
 
 
+```idf
 Meter:Custom,
-
-    **MyGeneralLights**,         !- Name
-
+    MyGeneralLights,         !- Name
     Electricity,             !- Fuel Type
-
     SPACE1-1,                !- Key Name 1
-
     Lights Electric Energy,  !- Output Variable or Meter Name 1
-
     SPACE2-1,                !- Key Name 2
-
     Lights Electric Energy,  !- Output Variable or Meter Name 2
-
     SPACE3-1,                !- Key Name 3
-
     Lights Electric Energy,  !- Output Variable or Meter Name 3
-
     SPACE4-1,                !- Key Name 4
-
     Lights Electric Energy,  !- Output Variable or Meter Name 4
-
     SPACE5-1,                !- Key Name 5
-
     Lights Electric Energy;  !- Output Variable or Meter Name 5
 
 
-
 Meter:Custom,
-
-    **MyBuildingElectric**,      !- Name
-
+    MyBuildingElectric,      !- Name
     Electricity,             !- Fuel Type
-
     ,                        !- Key Name \#1
-
     Electricity:Building;    !- Output Variable or Meter Name \#1
 
 
 
 
-
 Meter:CustomDecrement,
-
-    **MyBuildingOther**,         !- Name
-
+    MyBuildingOther,         !- Name
     Electricity,             !- Fuel Type
-
     Electricity:Building,    !- Source Meter Name
-
     ,                        !- Key Name \#1
-
     MyGeneralLights;         !- Output Variable or Meter Name \#1
+```
+
 
 
 
 For an example of “generic” fuel type, one might put the Building Infiltration Heat Loss & Heat Gain on a set of custom meters:
 
+```idf
   Meter:Custom,
-
     Building Infiltration Heat Loss,  !- Name
-
     Generic,             !- Fuel Type
-
-    \*,                       !- Key Name 1
-
+    *,                       !- Key Name 1
     Zone Infiltration Total Heat Loss Energy;  !- Output Variable Name 1
 
 
-
   Meter:Custom,
-
     Building Infiltration Heat Gain,  !- Name
-
     Generic,             !- Fuel Type
-
-    \*,                       !- Key Name 1
-
+    *,                       !- Key Name 1
     Zone Infiltration Total Heat Gain Energy;  !- Output Variable Name 1
+```
+
 
 One can then report these values the same way one reports other standard meters.
 
@@ -1531,9 +1509,11 @@ Building Rotation for Appendix G allows for the building model to be rotated for
 
 An example from an IDF:
 
+```idf
 Compliance:Building,
-
     90;                 Building Rotation for Appendix G
+```
+
 
 Group -- Location – Climate – Weather File Access
 -------------------------------------------------
@@ -1566,19 +1546,21 @@ This field represents the elevation of the facility in meters (relative to sea l
 
 Units with their abbreviations are shown in Appendix A.  And, as shown in an IDF:
 
+```idf
 Site:Location, DENVER COLORADO,     ! Name
-
    39.75000    ,     ! Latitude {N+ S-}
-
   -104.8700    ,     ! Longitude {W- E+}
-
   -7.000000    ,     ! TimeZoneNumber {GMT+/-}
-
   1610.26;           ! Elevation {m}
+```
+
 
 Most examples in this document include the comment lines that illustrate each data field’s value. However, this is not necessary (though it makes the IDF more readable). The previous example could also be:
 
+```idf
 Site:Location, DENVER COLORADO,39.75,-104.87,-7,1610.26;
+```
+
 
 ### SizingPeriod:DesignDay
 
@@ -1660,9 +1642,9 @@ Table 2. Humidity Indicating Field Interactions - Design Day
 
 <table class="table table-striped">
 <tr>
-<td>Humidity Condition Type</td>
-<td>Primary Humidity Indicating Field</td>
-<td>Humidity Indicating Day Schedule</td>
+<th>Humihity Conhition Type</th>
+<th>Primary Humihity Inhicating Fielh</th>
+<th>Humihity Inhicating Day Schehule</th>
 </tr>
 <tr>
 <td>WetBulb</td>
@@ -1800,131 +1782,75 @@ If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang
 
 IDF Examples:
 
-! Phoenix Sky Harbor Intl Ap\_AZ\_USA Annual Cooling (WB=&gt;MDB)
-
+```idf
+! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (WB=&gt;MDB)
 !   .4%, MDB=35.8°C WB=24.5°C
-
  SizingPeriod:DesignDay,
-
   Phoenix Sky Harbor Intl Ap Ann Clg .4% Condns WB=&gt;MDB,     !- Name
-
           7,      !- Month
-
          21,      !- Day of Month
-
   SummerDesignDay,!- Day Type
-
        35.8,      !- Maximum Dry-Bulb Temperature {C}
-
          12,      !- Daily Dry-Bulb Temperature Range {C}
-
  DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-
            ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-
     Wetbulb,      !- Humidity Condition Type
-
        24.5,      !- Wetbulb at Maximum Dry-Bulb {C}
-
            ,      !- Humidity Indicating Day Schedule Name
-
            ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-
            ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-
            ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-
      97342.,      !- Barometric Pressure {Pa}
-
         4.1,      ! Wind Speed {m/s}
-
         260,      !- Wind Direction {Degrees; N=0, S=180}
-
          No,      !- Rain {Yes/No}
-
          No,      !- Snow on ground {Yes/No}
-
          No,      !- Daylight Savings Time Indicator
-
        ASHRAETau, !- Solar Model Indicator
-
            ,      !- Beam Solar Day Schedule Name
-
            ,      !- Diffuse Solar Day Schedule Name
-
       0.588,     !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-
       1.653;  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
 
 
-
   SizingPeriod:DesignDay,
-
     Denver Centennial Golden Ann Htg 99% Condns DB - sched solar,  !- Name
-
     1,                       !- Month
-
     13,                      !- Day of Month
-
     WinterDesignDay,         !- Day Type
-
     -16,                     !- Maximum Dry-Bulb Temperature {C}
-
     0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
-
     ,                        !- Dry-Bulb Temperature Range Modifier Type
-
     ,                    !- Dry-Bulb Temperature Range Modifier Schedule Name
-
     Wetbulb,                 !- Humidity Condition Type
-
     -16,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-
     ,                        !- Humidity Indicating Day Schedule Name
-
     ,               !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
-
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-
     83411.,                  !- Barometric Pressure {Pa}
-
     2.3,                     !- Wind Speed {m/s}
-
     180,                     !- Wind Direction {deg}
-
     No,                      !- Rain Indicator
-
     No,                      !- Snow Indicator
-
     No,                      !- Daylight Saving Time Indicator
-
     Schedule,                !- Solar Model Indicator
-
     Winter (1/13) Beam Solar,!- Beam Solar Day Schedule Name
-
     Winter (1/13) Diffuse Solar;  !- Diffuse Solar Day Schedule Name
 
 
-
   Schedule:Day:Hourly,
-
     Winter (1/13) Beam Solar,
-
     Any Number,
-
     0,0,0,0,0,0,0,190,698,852,892,919,957,953,856,700,213,0,0,0,0,0,0,0;
 
 
-
   Schedule:Day:Hourly,
-
     Winter (1/13) Diffuse Solar,
-
     Any Number,
-
     0,0,0,0,0,0,0,35,118,116,92,65,40,14,0,0,5,0,0,0,0,0,0,0;
+```
+
 
 
 
@@ -1934,23 +1860,24 @@ Look at the example files 1ZoneUncontrolled\_DDChanges.idf and 1ZoneUncontrolled
 
 For the schedule fields in the object, several output variables can be used:
 
-Zone,Average,Sizing Period Site Beam Solar Schedule Value [W/m2]
+* Zone,Average,Sizing Period Site Beam Solar Schedule Value [W/m2]
 
-Zone,Average,Sizing Period Site Diffuse Solar Schedule Value [W/m2]
+* Zone,Average,Sizing Period Site Diffuse Solar Schedule Value [W/m2]
 
-Zone,Average,Sizing Period Site Humidity Condition Schedule Value [%]
+* Zone,Average,Sizing Period Site Humidity Condition Schedule Value [%]
 
-Zone,Average,Sizing Period Site Humidity Condition Schedule Value []
+* Zone,Average,Sizing Period Site Humidity Condition Schedule Value []
 
-Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value []
+* Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value []
 
-Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value [deltaC]
+* Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value [deltaC]
 
-Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value [C]
+* Zone,Average,Sizing Period Site Drybulb Temperature Range Modifier Schedule Value [C]
 
-Zone,Average,Sizing Period Site Sky Temperature Schedule Value [deltaC]
+* Zone,Average,Sizing Period Site Sky Temperature Schedule Value [deltaC]
 
-Zone,Average,Sizing Period Site Sky Temperature Schedule Value [C]
+* Zone,Average,Sizing Period Site Sky Temperature Schedule Value [C]
+
 
 #### Sizing Period Site Beam Solar Schedule Value [W/m2]
 
@@ -2022,31 +1949,23 @@ Weather files can contain “rain” and “snow” indicators. (EPW field “Pr
 
 IDF Example:
 
-  SizingPeriod:WeatherFileDays,
-
+```idf
+SizingPeriod:WeatherFileDays,
     Summer including Extreme Summer days,  !- Name
-
     7,18,7,25,                             !- Begin/end Day/Month
-
     SummerDesignDay,                       !- Day type
-
     No,                          !- Use Weather File Daylight Saving Period
-
     No;                          !- Use Weather File Rain and Snow Indicators
-
 
 
   SizingPeriod:WeatherFileDays,
-
     Winter including Extreme Winter days,  !- Name
-
     1,25,2,1,                              !- Begin/end Day/Month
-
     WinterDesignDay,                       !- Day type
-
     No,                          !- Use Weather File Daylight Saving Period
-
     No;                          !- Use Weather File Rain and Snow Indicators
+```
+
 
 ### SizingPeriod:WeatherFileConditionType
 
@@ -2100,31 +2019,23 @@ Weather files can contain “rain” and “snow” indicators. (EPW field “Pr
 
 IDF Example:
 
+```idf
   SizingPeriod:WeatherFileConditionType,
-
     Extreme Summer Weather Period for Design,  !- Name
-
     SummerExtreme,                             !- Period Selection
-
     SummerDesignDay,                           !- Day Type
-
     No,                          !- Use Weather File Daylight Saving Period
-
     No;                          !- Use Weather File Rain and Snow Indicators
-
 
 
   SizingPeriod:WeatherFileConditionType,
-
     Extreme Winter Weather Period for Design,  !- Name
-
     WinterExtreme,                             !- Period Selection
-
     WinterDesignDay,                           !- Day Type
-
     No,                          !- Use Weather File Daylight Saving Period
-
     No;                          !- Use Weather File Rain and Snow Indicators
+```
+
 
 ### RunPeriod
 
@@ -2196,61 +2107,38 @@ When repeating a period, you might (for whatever reason), choose to have a speci
 
 And, as shown in an IDF:
 
+```idf
  RunPeriod,  ! Winter Simulation
-
     Winter Simulation,  !- Name
-
     12,  !- Begin Month
-
     1,  !- Begin Day of Month
-
     3,  !- End Month
-
     31,  !- End Day of Month
-
     UseWeatherFile,  !- Day of Week for Start Day
-
     Yes,  !- Use Weather File Holidays and Special Days
-
     Yes,  !- Use Weather File Daylight Saving Period
-
     No,  !- Apply Weekend Holiday Rule
-
     Yes,  !- Use Weather File Rain Indicators
-
     Yes;  !- Use Weather File Snow Indicators
 
 
 
 
-
  ! Multiple year simulation example
-
  RunPeriod,
-
     Multiple Years,  !- Name
-
     1,    !- Begin Month
-
     1,    !- Begin Day of Month
-
     12,   !- End Month
-
     31,   !- End Day of Month
-
     UseWeatherFile,  !- Day of Week for Start Day
-
     Yes,  !- Use Weather File Holidays and Special Days
-
     Yes,  !- Use Weather File Daylight Saving Period
-
     No,   !- Apply Weekend Holiday Rule
-
     Yes,  !- Use Weather File Rain Indicators
-
     Yes,  !- Use Weather File Snow Indicators
-
      3;   !- Number of Times Runperiod to be Repeated
+```
 
 ### RunPeriod:CustomRange
 
@@ -2334,8 +2222,8 @@ Table 3. Date Field Interpretation
 
 <table class="table table-striped">
 <tr>
-<td>Field Contents</td>
-<td>Interpretation</td>
+<th>Fielh Contents</th>
+<th>Interpretation</th>
 </tr>
 <tr>
 <td>&lt;number&gt; / &lt;number&gt;</td>
@@ -2373,13 +2261,12 @@ This alpha field designates the “day type” for schedule use during the speci
 
 An example in the IDF would be:
 
+```idf
 RunPeriodControl:SpecialDays, President’s Day, 3rd Monday in February,1,Holiday;
-
 RunPeriodControl:SpecialDays, Thanksgiving, 4th Thursday in November, 1,Holiday;
-
 RunPeriodControl:SpecialDays, Halloween, 10/31, 1, Holiday;
-
 RunPeriodControl:SpecialDays, Vacation, 5/1, 14, CustomDay1;
+```
 
 ### RunPeriodControl:DaylightSavingTime
 
@@ -2401,21 +2288,17 @@ This is the ending date of the daylight saving period. Note that it can be enter
 
 And in the IDF:
 
+```idf
 ! U.S. Standard for Daylight Saving
-
 RunPeriodControl:DaylightSavingTime,2nd Sunday in March, 1st Sunday in November; !2007
-
 ! Brazil standard
-
 RunPeriodControl:DaylightSavingTime,1st Sunday in October, Last Sunday in February;
-
 ! European Standard
-
 RunPeriodControl:DaylightSavingTime, Last Sunday in March, Last Sunday in October;
-
 ! Syria Standard
-
 RunPeriodControl:DaylightSavingTime, 4/1, 10/1;
+```
+
 
 Of course, these could not all appear in the same IDF as only one DaylightSavingPeriod object per input file is allowed. More information on Daylight Saving Periods can be seen on the web at: http://www.webexhibits.org/daylightsaving/  The ASHRAE Handbook of Fundamentals [ASHRAE 2005] also contains information about daylight saving periods and their climatic information now includes start and end dates for many locations.
 
@@ -2437,67 +2320,42 @@ This field specifies a schedule name to accomplish the sky temperature calculati
 
 An example of IDF usage (with DesignDay):
 
+```idf
   SizingPeriod:DesignDay,
-
-    DENVER\_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
-
+    DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
     32.6,               !- Maximum Dry-Bulb Temperature {C}
-
     15.2,               !- Daily Temperature Range {deltaC}
-
     15.5,               !- Humidity Indicating Conditions at Maximum Dry-Bulb
-
     83411.,                  !- Barometric Pressure {Pa}
-
     4,                       !- Wind Speed {m/s}
-
     120,                     !- Wind Direction {deg}
-
     1.00,                    !- Sky Clearness
-
     0,                       !- Rain Indicator
-
     0,                       !- Snow Indicator
-
     25,                      !- Day of Month
-
     7,                       !- Month
-
     SummerDesignDay,         !- Day Type
-
     0,                       !- Daylight Saving Time Indicator
-
     WetBulb,                 !- Humidity Indicating Type
-
     ,                        !- Relative Humidity Day Schedule Name
-
     deltaschedule,           !- Dry-Bulb Temperature Range Modifier Type
-
     temp range deltas; !-   Dry-Bulb Temperature Range Modifier Schedule Name
 
 
-
   WeatherProperty:SkyTemperature,
-
-    DENVER\_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
-
+    DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
     ScheduleValue,           !- Calculation Type
-
     DaySchedule5;            !- Schedule Name
 
 
-
   Schedule:Day:Interval,
-
     DaySchedule5,            !- Name
-
     Temperature,             !- Schedule Type Limits Name
-
     Yes,                     !- Interpolate to Timestep
-
     until: 24:00,            !- Time 1
-
     5;                       !- Value Until Time 1
+```
+
 
 ### Site:WeatherStation
 
@@ -2521,9 +2379,9 @@ Table 4. Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005).
 
 <table class="table table-striped">
 <tr>
-<td>Terrain Description</td>
-<td>Exponent</td>
-<td>Boundary Layer Thickness (m)</td>
+<th>Terrain Description</th>
+<th>Exponent</th>
+<th>Bounhary Layer Thickness (m)</th>
 </tr>
 <tr>
 <td>Flat, open country</td>
@@ -2574,15 +2432,14 @@ For example, if you are using weather data measured on the top of your building,
 
 Or, in IDF terms, with a building in a town or city:
 
-  Site:WeatherStation,
-
+```idf
+Site:WeatherStation,
     30,  !- Wind Sensor Height Above Ground {m}
-
     0.33,  !- Wind Speed Profile Exponent {}
-
     460,  !- Wind Speed Profile Boundary Layer Thickness {m}
-
     30;  !- Air Temperature Sensor Height Above Ground {m}
+```
+
 
 This would change if you had a different wind speed profile exponent or wind speed profile boundary layer thickness at your site.
 
@@ -2592,13 +2449,13 @@ The Site:HeightVariation object is used to specify the local variation in atmosp
 
 Table 5. Atmospheric Variables at Two Different Heights Above Ground Level.
 
-<table class="table table-striped">
+<table class="table table-stripeh">
 <tr>
-<td>Variable</td>
-<td>1.5 m</td>
-<td>284 m</td>
-<td>Absolute Diff</td>
-<td>Percent Diff</td>
+<th>Variable</th>
+<th>1.5 m</th>
+<th>284 m</th>
+<th>Absolute Diff</th>
+<th>Percent Diff</th>
 </tr>
 <tr>
 <td>Air Temperature</td>
@@ -2639,13 +2496,13 @@ The wind speed profile boundary layer thickness [m] for the terrain surrounding 
 
 The air temperature gradient coefficient [K/m] is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height. Note that the *Air Temperature Sensor Height* in the **Site:WeatherStation** object should also be set to zero in order to force the local outdoor air temperatures to match the weather file outdoor air temperature. This change is required because the **Site:WeatherStation** object assumes an air temperature gradient of 0.0065 K/m.
 
+```idf
   Site:HeightVariation,
-
     0.22,  !- Wind Speed Profile Exponent
-
     370,  !- Wind Speed Profile Boundary Layer Thickness {m}
-
     0.0065;  !- Air Temperature Gradient Coefficient {deltaC/m}
+```
+
 
 ### Site:GroundTemperature:BuildingSurface
 
@@ -2661,7 +2518,10 @@ Each numeric field is the monthly ground temperature (degrees Celsius) used for 
 
 An IDF example:
 
+```idf
 Site:GroundTemperature:BuildingSurface,19,20,20,20,20,20,20,20,20,20,20,20;
+```
+
 
 ### Site:GroundTemperature:Shallow
 
@@ -2675,7 +2535,10 @@ Each numeric field is the monthly surface ground temperature (degrees Celsius) u
 
 An IDF example:
 
+```idf
 Site:GroundTemperature:Shallow,  4,4,6,6,10,10,15,15,14,14,8,8;
+```
+
 
 ### Site:GroundTemperature:Deep
 
@@ -2689,7 +2552,9 @@ Each numeric field is the monthly deep ground temperature (degrees Celsius) used
 
 An IDF example:
 
+```idf
 Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
+```
 
 ### Site:GroundDomain:Slab
 
@@ -3057,7 +2922,10 @@ Each numeric field is the monthly ground temperature (degrees Celsius) used for 
 
 And, the IDF example:
 
+```idf
 Site:GroundTemperature:FCfactorMethod,  9.5, 3.5, -0.7, -1.7, -0.6, 3.6, 9.3, 14, 18.2, 22.7, 21.2, 16.8;
+```
+
 
 ### Site:GroundReflectance
 
@@ -3189,15 +3057,14 @@ Magnitude of annual precipitation associated with the rate schedule. This value 
 
 IDF example:
 
+```idf
 Site:Precipitation,
-
   ScheduledAndDesignLevel, !- Precipitation Model Type
-
   0.75,                    !- Design Level Total Annual Precipitation {m/yr}
-
   PrecipitationSchd,       !- Schedule Name for Precipitation Rates
-
   0.80771;                 !- Average Total Annual Precipitation {m/yr}
+```
+
 
 ### RoofIrrigation
 
@@ -3217,11 +3084,12 @@ Used with the SmartSchedule option in the Irrigation Model Type field to overrid
 
 IDF example:
 
+```idf
 RoofIrrigation,
-
   Schedule, !- Irrigation Model Type
-
   IrrigationSchd; !- Schedule Name for Irrigation Rates
+```
+
 
 ### Solar and Visible Spectrum Objects
 
@@ -3249,15 +3117,14 @@ This field is required if the Spectrum Data Method is set to UserDefined. This f
 
 IDF example:
 
+```idf
 Site:SolarAndVisibleSpectrum,
-
   LocalSpectrum,             !- Name
-
   UserDefined,               !- Spectrum Data Method: Default, UserDefined
-
   SolarSpectrum,             !- Solar Spectrum Data Object Name
-
   VisibleSpectrum;           !- Visible Spectrum Data Object
+```
+
 
 ### Site:SpectrumData
 
@@ -3281,41 +3148,27 @@ This field specifies the nth spectrum corresponding to the nth wavelength.
 
 IDF example:
 
+```idf
 Site:SpectrumData,
-
   SolarSpectrum,             !- Name
-
   Solar,                     !- Spectrum Data Type
-
   0.3,0,                     !- up to 107 pair of (wavelength, spectrum)
-
   0.305,3.4,
-
   0.31,15.6,
-
   0.315,41.1,
-
   0.32,71.2,
-
   0.325,100.2,
-
   0.33,152.4,
-
   0.335,155.6,
-
   0.34,179.4,
-
   0.345,186.7,
-
   0.35,212,
-
   0.36,240.5,
-
   0.37,324,
-
   0.38,362.4,
+  ...;
+```
 
-  …;
 
 ### Climate Group Outputs
 
@@ -3325,83 +3178,83 @@ Climate related variables appear in two places for EnergyPlus outputs. Certain o
 
 Variables related to ambient environment data are available at timestep and higher resolutions. Below is a variable dictionary of these variables and subsequent definitions:
 
-Zone,Average,Site Outdoor Air Drybulb Temperature [C]
+* Zone,Average,Site Outdoor Air Drybulb Temperature [C]
 
-Zone,Average,Site Outdoor Air Dewpoint Temperature [C]
+* Zone,Average,Site Outdoor Air Dewpoint Temperature [C]
 
-Zone,Average,Site Outdoor Air Wetbulb Temperature [C]
+* Zone,Average,Site Outdoor Air Wetbulb Temperature [C]
 
-Zone,Average,Site Outdoor Air Humidity Ratio [kgWater/kgAir]
+* Zone,Average,Site Outdoor Air Humidity Ratio [kgWater/kgAir]
 
-Zone,Average,Site Outdoor Air Relative Humidity [%]
+* Zone,Average,Site Outdoor Air Relative Humidity [%]
 
-Zone,Average,Site Outdoor Air Barometric Pressure [Pa]
+* Zone,Average,Site Outdoor Air Barometric Pressure [Pa]
 
-Zone,Average,Site Wind Speed [m/s]
+* Zone,Average,Site Wind Speed [m/s]
 
-Zone,Average,Site Wind Direction [deg]
+* Zone,Average,Site Wind Direction [deg]
 
-Zone,Average,Site Sky Temperature [C]
+* Zone,Average,Site Sky Temperature [C]
 
-Zone,Average,Site Horizontal Infrared Radiation Rate per Area [W/m2]
+* Zone,Average,Site Horizontal Infrared Radiation Rate per Area [W/m2]
 
-Zone,Average,Site Diffuse Solar Radiation Rate per Area [W/m2]
+* Zone,Average,Site Diffuse Solar Radiation Rate per Area [W/m2]
 
-Zone,Average,Site Direct Solar Radiation Rate per Area [W/m2]
+* Zone,Average,Site Direct Solar Radiation Rate per Area [W/m2]
 
-Zone,Sum,Site Precipitation Depth [m]
+* Zone,Sum,Site Precipitation Depth [m]
 
-Zone,Average,Site Ground Reflected Solar Radiation Rate per Area [W/m2]
+* Zone,Average,Site Ground Reflected Solar Radiation Rate per Area [W/m2]
 
-Zone,Average,Site Ground Temperature [C]
+* Zone,Average,Site Ground Temperature [C]
 
-Zone,Average,Site Surface Ground Temperature [C]
+* Zone,Average,Site Surface Ground Temperature [C]
 
-Zone,Average,Site Deep Ground Temperature [C]
+* Zone,Average,Site Deep Ground Temperature [C]
 
-Zone,Average,Site Simple Factor Model Ground Temperature [C]
+* Zone,Average,Site Simple Factor Model Ground Temperature [C]
 
-Zone,Average,Site Outdoor Air Enthalpy [J/kg]
+* Zone,Average,Site Outdoor Air Enthalpy [J/kg]
 
-Zone,Average,Site Outdoor Air Density [kg/m3]
+* Zone,Average,Site Outdoor Air Density [kg/m3]
 
-Zone,Average,Site Solar Azimuth Angle [deg]
+* Zone,Average,Site Solar Azimuth Angle [deg]
 
-Zone,Average,Site Solar Altitude Angle [deg]
+* Zone,Average,Site Solar Altitude Angle [deg]
 
-Zone,Average,Site Solar Hour Angle [deg]
+* Zone,Average,Site Solar Hour Angle [deg]
 
-Zone,Average,Site Rain Status []
+* Zone,Average,Site Rain Status []
 
-Zone,Average,Site Snow on Ground Status []
+* Zone,Average,Site Snow on Ground Status []
 
-Zone,Average,Site Exterior Horizontal Sky Illuminance [lux]
+* Zone,Average,Site Exterior Horizontal Sky Illuminance [lux]
 
-Zone,Average,Site Exterior Horizontal Beam Illuminance [lux]
+* Zone,Average,Site Exterior Horizontal Beam Illuminance [lux]
 
-Zone,Average,Site Exterior Beam Normal Illuminance [lux]
+* Zone,Average,Site Exterior Beam Normal Illuminance [lux]
 
-Zone,Average,Site Sky Diffuse Solar Radiation Luminous Efficacy [lum/W]
+* Zone,Average,Site Sky Diffuse Solar Radiation Luminous Efficacy [lum/W]
 
-Zone,Average,Site Beam Solar Radiation Luminous Efficacy [lum/W]
+* Zone,Average,Site Beam Solar Radiation Luminous Efficacy [lum/W]
 
-Zone,Average,Site Daylighting Model Sky Clearness []
+* Zone,Average,Site Daylighting Model Sky Clearness []
 
-Zone,Average,Sky Brightness for Daylighting Calculation []
+* Zone,Average,Sky Brightness for Daylighting Calculation []
 
-Zone,Average,Site Daylight Saving Time Status []
+* Zone,Average,Site Daylight Saving Time Status []
 
-Zone,Average,Site Day Type Index []
+* Zone,Average,Site Day Type Index []
 
-Zone,Average,Site Mains Water Temperature [C]
+* Zone,Average,Site Mains Water Temperature [C]
 
-HVAC,Average,Site Precipitation Rate [m/s]
+* HVAC,Average,Site Precipitation Rate [m/s]
 
-HVAC,Sum,Site Precipitation Depth [m]
+* HVAC,Sum,Site Precipitation Depth [m]
 
-HVAC,Sum,Water System Roof Irrigation Scheduled Depth[m]
+* HVAC,Sum,Water System Roof Irrigation Scheduled Depth[m]
 
-HVAC,Sum,Water System Roof Irrigation Actual Depth[m]
+* HVAC,Sum,Water System Roof Irrigation Actual Depth[m]
 
 Note that these data values may be interpolated from “hour” points (ref: Weather Data Hourly Interpolation). Most of the data values represent the “average” over the reporting resolution period.
 
@@ -3515,8 +3368,8 @@ Table 6. Relationship of Angles (degrees) to Time
 
 <table class="table table-striped">
 <tr>
-<td>Unit of Angle</td>
-<td>Equivalent time</td>
+<th>Unit of Angle</th>
+<th>Equivalent time</th>
 </tr>
 <tr>
 <td>1 radian</td>
@@ -3574,19 +3427,20 @@ This is the actual amount of irrigation for the green roof (ecoroof) based on th
 
 Local atmospheric properties for outdoor air temperature and wind speed are separately calculated and reported for all zones, surfaces, and outdoor air nodes. The output variables are associated with their respective objects:
 
-Zone,Average,Zone Outdoor Air Drybulb Temperature [C]
+* Zone,Average,Zone Outdoor Air Drybulb Temperature [C]
 
-Zone,Average,Zone Outdoor Air Wetbulb Temperature [C]
+* Zone,Average,Zone Outdoor Air Wetbulb Temperature [C]
 
-Zone,Average,Zone Outdoor Air Wind Speed [m/s]
+* Zone,Average,Zone Outdoor Air Wind Speed [m/s]
 
-Zone,Average,Surface Ext Outdoor Dry Bulb [C]
+* Zone,Average,Surface Ext Outdoor Dry Bulb [C]
 
-Zone,Average,Surface Ext Outdoor Wet Bulb [C]
+* Zone,Average,Surface Ext Outdoor Wet Bulb [C]
 
-Zone,Average,Surface Ext Wind Speed [m/s]
+* Zone,Average,Surface Ext Wind Speed [m/s]
 
-HVAC,Average,System Node Temperature [C]        (for OUTDOOR AIR NODE object)
+* HVAC,Average,System Node Temperature [C]        (for OUTDOOR AIR NODE object)
+
 
 
 
@@ -3691,15 +3545,14 @@ This field is used to indicate the kind of units that may be associated with the
 
 Several IDF Examples will illustrate the use:
 
+```idf
 ScheduleTypeLimits,Any Number;  ! Not limited
-
 ScheduleTypeLimits,Fraction, 0.0 , 1.0 ,CONTINUOUS;
-
 ScheduleTypeLimits,Temperature,-60,200,CONTINUOUS;
-
 ScheduleTypeLimits,Control Type,0,4,DISCRETE;
-
 ScheduleTypeLimits,On/Off,0,1,DISCRETE;
+```
+
 
 ### Day Schedules
 
@@ -3723,9 +3576,11 @@ These fields contain the hourly values for each of the 24 hours in a day. (Hour 
 
 An IDF example:
 
+```idf
 Schedule:Day:Hourly, Day On Peak, Fraction,
-
   0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.;
+```
+
 
 ### Schedule:Day:Interval
 
@@ -3759,17 +3614,15 @@ This represents the actual value to be passed to the simulation at the appropria
 
 And an example of use:
 
+```idf
 Schedule:Day:Interval,
-
     dd winter rel humidity,  !- Name
-
     Percent,                 !- Schedule Type Limits Name
-
     No,                      !- Interpolate to Timestep
-
     until: 24:00,             !- Time 1
-
     74;                      !- Value Until Time 1
+```
+
 
 ### Schedule:Day:List
 
@@ -3799,21 +3652,17 @@ This is the value to be used for the specified number of minutes.
 
 For example:
 
+```idf
 Schedule:Day:List,
-
   Myschedule,  ! name
-
   Fraction,   ! Schedule type
-
   No,   ! Interpolate value
-
   30,   ! Minutes per item
-
   0.0,  ! from 00:01 to 00:30
-
   0.5,  ! from 00:31 to 01:00
+  <snipped>
+```
 
-  &lt;snipped&gt;
 
 
 
@@ -3833,15 +3682,14 @@ These fields contain day schedule names for the appropriate day types. Days of t
 
 An IDF example:
 
+```idf
 Schedule:Week:Daily, Week on Peak,
-
         Day On Peak,Day On Peak,Day On Peak,
-
         Day On Peak,Day On Peak,Day On Peak,
-
         Day On Peak,Day On Peak,Day On Peak,
-
         Day On Peak,Day On Peak,Day On Peak;
+```
+
 
 ### Schedule:Week:Compact
 
@@ -3865,21 +3713,17 @@ This field contains the name of the day schedule (any of the Schedule:Day object
 
 Some IDF examples:
 
+```idf
 Schedule:Week:Compact, Week on Peak,
-
         For: AllDays,
-
         Day On Peak;
-
 Schedule:Week:Compact, WeekDays on Peak,
-
         WeekDays,
-
         Day On Peak,
-
         AllOtherDays
-
         Day Off Peak;
+```
+
 
 ### Schedule:Year
 
@@ -3921,19 +3765,21 @@ This numeric field is the ending day for the schedule time period.
 
 Note that there are many possible periods to be described. An IDF example with a single period:
 
+```idf
 Schedule:Year, On Peak, Fraction,
-
         Week On Peak, 1,1, 12,31;
+```
+
 
 And a multiple period illustration:
 
+```idf
 Schedule:Year,CoolingCoilAvailSched,Fraction,
-
         FanAndCoilAllOffWeekSched, 1,1, 3,31,
-
         FanAndCoilSummerWeekSched, 4,1, 9,30,
-
         FanAndCoilAllOffWeekSched, 10,1, 12,31;
+```
+
 
 The following definition will generate an error (if any scheduled items are used in the simulation):
 
@@ -3983,83 +3829,50 @@ Finally, the value field is the schedule value for the specified time interval.
 
 And, some IDF examples:
 
+```idf
 Schedule:Compact,
-
   POFF,    !- Name
-
   Fraction,  !- Schedule Type Limits Name
-
   Through: 4/30,
-
   For: AllDays,
-
   Until: 24:00, 1.0,
-
   Through: 12/31,
-
   For: Weekdays,
-
    Until: 7:00,   .1,
-
    Until: 17:00, 1.0,
-
    Until: 24:00,  .1,
-
   For: Weekends Holidays,
-
    Until: 24:00,  .1,
-
   For: AllOtherDays,
-
    Until: 24:00,  .1;
 
 
-
 ! Schedule Continuous
-
 Schedule:Compact,
-
   Continuous,
-
   on/off,
-
   Through: 12/31,
-
   For: AllDays,
-
   Until: 24:00, 1.0;
 
 
-
 ! Schedule Daytime Ventilation
-
 Schedule:Compact,
-
   Daytime Ventilation,
-
   Fraction,
-
   Through: 12/31,
-
   For: Weekdays SummerDesignDay,
-
   Until: 08:00, 0.0,
-
   Until: 18:00, 1.0,
-
   Until: 24:00, 0.0,
-
   For: Weekends WinterDesignDay,
-
   Until: 10:00, 0.0,
-
   Until: 16:00, 1.0,
-
   Until: 24:00, 0.0,
-
   For: Holidays AllOtherDays,
-
   Until: 24:00, 0.0;
+```
+
 
 ### Schedule:Constant
 
@@ -4079,27 +3892,21 @@ This field contains a constant real value. A fixed value is assigned as an hourl
 
 An IDF example:
 
+```idf
 Schedule:Constant,
-
   AlwaysOn,                  !- Name
-
   On/Off,                    !- Schedule Type Limits Name
-
   1.0;                       !- Hourly Value
 
 
-
 ScheduleTypeLimits,
-
     On/Off,                  !- Name
-
     0,                       !- Lower Limit Value
-
     1,                       !- Upper Limit Value
-
     DISCRETE,                !- Numeric Type
-
     Availability;            !- Unit Type
+```
+
 
 
 
@@ -4153,57 +3960,45 @@ This field represents the number of minutes for each item – in this case each 
 
 Here is an IDF example:
 
+```idf
 Schedule:File,
-
    elecTDVfromCZ01res,   !- Name
-
    Any Number,           !- ScheduleType
-
-   TDV\_kBtu\_CTZ01.csv,   !- Name of File
-
+   TDV_kBtu_CTZ01.csv,   !- Name of File
    2,                    !- Column Number
-
    4,                    !- Rows to Skip at Top
-
    8760,                 !- Number of Hours of Data
-
    Comma;                !- Column Separator
+```
+
 
 or with a relational path:
 
+```idf
 Schedule:File,
-
    elecTDVfromCZ01res,   !- Name
-
    Any Number,           !- ScheduleType
-
-   DataSets\\TDV\\TDV\_kBtu\_CTZ01.csv,   !- Name of File
-
+   DataSets\TDV\TDV_kBtu_CTZ01.csv,   !- Name of File
    2,                    !- Column Number
-
    4;                    !- Rows to Skip at Top
+```
+
 
 A sub-hourly indication. Note that this is identical to an hourly file because there are 60 minutes per item – the number of hours defaults to 8760 and the column separator defaults to a comma. If the number of minutes per item had been, say, 15, then the file would need to contain 8760\*4 or 35,040 rows for this item.
 
+```idf
   Schedule:File,
-
     elecTDVfromCZ06com,      !- Name
-
     Any Number,              !- Schedule Type Limits Name
-
-    DataSets\\TDV\\TDV\_2008\_kBtu\_CTZ06.csv,  !- File Name
-
+    DataSets\TDV\TDV_2008_kBtu_CTZ06.csv,  !- File Name
     1,                       !- Column Number
-
     4,                       !- Rows to Skip at Top
-
     ,                        !- Number of Hours of Data
-
     ,                        !- Column Separator
-
     ,                        !- Interpolate to Timestep
-
     60;                      !- Minutes per Item
+```
+
 
 ### Schedule Outputs
 
@@ -4211,11 +4006,17 @@ An optional report can be used to gain the values described in the previous Sche
 
 ! will give them on hourly increments (day schedule resolution)
 
+```idf
 Output:Reports, Schedules, Hourly;
+```
+
 
 ! will give them at the timestep of the simulation
 
+```idf
 Output:Reports, Schedules, Timestep;
+```
+
 
 This report is placed on the eplusout.eio file. Details of this reporting are shown in the Output Details and Examples document.
 
@@ -4227,9 +4028,11 @@ Zone,Average,Schedule Value []
 
 This is the schedule value (as given to whatever entity that uses it). It has no units in this context because values may be many different units (i.e. temperatures, fractions, watts). For best results, you may want to apply the schedule name when you use this output variable to avoid output proliferation. For example, the following reporting should yield the values shown above, depending on day of week and day type:
 
-Output:Variable,People\_Shopping\_Sch,Schedule Value,hourly;
+```idf
+Output:Variable,People_Shopping_Sch,Schedule Value,hourly;
+Output:Variable,Activity_Shopping_Sch,Schedule Value,hourly;
+```
 
-Output:Variable,Activity\_Shopping\_Sch,Schedule Value,hourly;
 
 Group – Surface Construction Elements
 -------------------------------------
@@ -4322,23 +4125,18 @@ The visible absorptance field in the Material input syntax represents the fracti
 
 An IDF example:
 
+```idf
 Material,A2 - 4 IN DENSE FACE BRICK,  ! Material Name
-
  Rough,  ! Roughness
-
   0.1014984    ,  ! Thickness {m}
-
-   1.245296    ,   ! Conductivity {W/M\*K}
-
-   2082.400    ,   ! Density {Kg/M\*\*3}
-
-  920.4800    ,   ! Specific Heat {J/Kg\*K}
-
+   1.245296    ,   ! Conductivity {W/M*K}
+   2082.400    ,   ! Density {Kg/M**3}
+  920.4800    ,   ! Specific Heat {J/Kg*K}
   0.9000000    ,   ! Thermal Absorptance
-
   0.9300000    ,   ! Solar Absorptance
-
   0.9300000    ;   ! Visible Absorptance
+```
+
 
 ### Material:NoMass
 
@@ -4370,17 +4168,15 @@ The visible absorptance field in the Material input syntax represents the fracti
 
 An IDF example:
 
+```idf
 Material:NoMass,R13LAYER,  ! Material Name
-
  Rough,  ! Roughness
-
-   2.290965    ,  ! Resistance {M\*\*2K/W}
-
+   2.290965    ,  ! Resistance {M**2K/W}
   0.9000000    ,   ! Thermal Absorptance
-
   0.7500000    ,   ! Solar Absorptance
-
   0.7500000    ;   ! Visible Absorptance
+```
+
 
 ### Material:InfraredTransparent
 
@@ -4394,97 +4190,60 @@ A Infrared Transparent surface should not participate in a convective/conductive
 
 An example idf object specification for use with the IRT surface is shown below. Note that surfaces are not described in this example
 
+```idf
 Material:InfraredTransparent,
-
     IRTMaterial1;            !- Name
 
 
-
 Construction,
-
     IRTSurface,              !- Name
-
     IRTMaterial1;            !- Outside Layer
 
 
-
 SurfaceProperty:ConvectionCoefficients,
-
     Bottom:Top,              !- SurfaceName
-
     Outside,                 !- Convection Type 1
-
     value,                   !- Convection Value Type 1
-
     0.1,                     !- Convection value 1 {W/m2-K}
-
     ,                        !- Convection Schedule 1
-
     Inside,                  !- Convection Type 2
-
     value,                   !- Convection Value Type 2
-
     0.1;                     !- Convection value 2 {W/m2-K}
 
 
-
 SurfaceProperty:ConvectionCoefficients,
-
     SecondLevel:Bottom,      !- SurfaceName
-
     Outside,                 !- Convection Type 1
-
     value,                   !- Convection Value Type 1
-
     0.1,                     !- Convection value 1 {W/m2-K}
-
     ,                        !- Convection Schedule 1
-
     Inside,                  !- Convection Type 2
-
     value,                   !- Convection Value Type 2
-
     0.1;                     !- Convection value 2 {W/m2-K}
 
 
-
 SurfaceProperty:ConvectionCoefficients,
-
     SecondLevel:Top,         !- SurfaceName
-
     Outside,                 !- Convection Type 1
-
     value,                   !- Convection Value Type 1
-
     0.1,                     !- Convection value 1 {W/m2-K}
-
     ,                        !- Convection Schedule 1
-
     Inside,                  !- Convection Type 2
-
     value,                   !- Convection Value Type 2
-
     0.1;                     !- Convection value 2 {W/m2-K}
-
 
 
 SurfaceProperty:ConvectionCoefficients,
-
     ThirdLevel:Bottom,       !- SurfaceName
-
     Outside,                 !- Convection Type 1
-
     value,                   !- Convection Value Type 1
-
     0.1,                     !- Convection value 1 {W/m2-K}
-
     ,                        !- Convection Schedule 1
-
     Inside,                  !- Convection Type 2
-
     value,                   !- Convection Value Type 2
-
     0.1;                     !- Convection value 2 {W/m2-K}
+```
+
 
 ### Material:AirGap
 
@@ -4500,9 +4259,10 @@ This field is used to enter the thermal resistance (R-value) of the material lay
 
 An IDF example:
 
+```idf
 Material:AirGap,B1 - AIRSPACE RESISTANCE,  ! Material Name
-
-  0.1603675    ;  ! Resistance {M\*\*2K/W}
+  0.1603675    ;  ! Resistance {M**2K/W}
+```
 
 
 
@@ -4528,7 +4288,7 @@ The next four fields, coefficients “a”, “b”, “c”, and “d”, help 
 
 where
 
-      a,b,c,d              = Coefficients to define the relationship between the material’s moisture content and the surface air relative humidity
+a,b,c,d               = Coefficients to define the relationship between the material’s moisture content and the surface air relative humidity
 
 U                      = Moisture content defined as the mass fraction of water contained in a material [kg/kg]
 
@@ -4548,91 +4308,61 @@ Ann IDF example showing how it is used in conjunction with Material in synchrono
 
 
 
+```idf
   Material,
-
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
-
     Smooth,                  !- Roughness
-
     1.9050000E-02,           !- Thickness {m}
-
     0.7264224,               !- Conductivity {W/m-K}
-
     1601.846,                !- Density {kg/m3}
-
     836.8000,                !- Specific Heat {J/kg-K}
-
     0.9000000,               !- Thermal Absorptance
-
     0.9200000,               !- Solar Absorptance
-
     0.9200000;               !- Visible Absorptance
 
 
 
 
-
  MaterialProperty:MoisturePenetrationDepth:Settings,
-
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
-
     0.004,                   !- Effective Moisture Penetration Depth {m}
-
     0.072549,           !- Moisture Equation Coefficient a {dimensionless}
-
     0.397173,           !- Moisture Equation Coefficient b {dimensionless}
-
     0.007774,           !- Moisture Equation Coefficient c {dimensionless}
-
     11.7057;            !- Moisture Equation Coefficient d {dimensionless}
 
 
-
   Material,
-
     C10 - 8 IN HW CONCRETE,  !- Name
-
     MediumRough,             !- Roughness
-
     0.2033016,               !- Thickness {m}
-
     1.729577,                !- Conductivity {W/m-K}
-
     2242.585,                !- Density {kg/m3}
-
     836.8000,                !- Specific Heat {J/kg-K}
-
     0.9000000,               !- Thermal Absorptance
-
     0.6500000,               !- Solar Absorptance
-
     0.6500000;               !- Visible Absorptance
 
 
-
  MaterialProperty:MoisturePenetrationDepth:Settings,
-
     C10 - 8 IN HW CONCRETE,  !- Name
-
     0.004,                   !- Effective Moisture Penetration Depth {m}
-
     0.018062,             !- Moisture Equation Coefficient a {dimensionless}
-
     0.451879,             !- Moisture Equation Coefficient b {dimensionless}
-
     0.026178,             !- Moisture Equation Coefficient c {dimensionless}
-
     10.8356;              !- Moisture Equation Coefficient d {dimensionless}
+```
+
 
 ### Moisture Penetration Depth (EMPD) Outputs
 
 Output variables applicable to heat transfer surfaces using EMPD model:
 
-Zone,Average,EMPD Surface Inside Face Water Vapor Density [kg/m3]
+* Zone,Average,EMPD Surface Inside Face Water Vapor Density [kg/m3]
 
-Zone,Average,EMPD Surface Inside Face Humidity Ratio [kgWater/kgDryAir]
+* Zone,Average,EMPD Surface Inside Face Humidity Ratio [kgWater/kgDryAir]
 
-Zone,Average,EMPD Surface Inside Face Relative Humidity [%]
+* Zone,Average,EMPD Surface Inside Face Relative Humidity [%]
 
 The following variables apply only to surfaces, where the material assigned to the inside layers is MaterialProperty:MoisturePenetrationDepth:Settings. The EMPD (Effective Moisture Penetration Depth) moisture balance solution algorithm is used to calculate the inside surface moisture levels.
 
@@ -4688,61 +4418,40 @@ And, an IDF example showing how it is used in conjunction with the Material:
 
 Note, the following Heat Balance Algorithm is necessary (only specified once). Also, when using ConductionFiniteDifference, it is more efficient to set the zone timestep shorter than those used for the ConductionTransferFunction solution algorithm. It should be set to 12 timesteps per hour or greater, and can range up to 60.
 
+```idf
 HeatBalanceAlgorithm,
-
 ConductionFiniteDifference;
 
 
-
 Timestep,
-
 12;
 
 
-
 Material,
-
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
-
     Smooth,                  !- Roughness
-
     1.9050000E-02,           !- Thickness {m}
-
     0.7264224,               !- Conductivity {W/m-K}
-
     1601.846,                !- Density {kg/m3}
-
     836.8000,                !- Specific Heat {J/kg-K}
-
     0.9000000,               !- Thermal Absorptance
-
     0.9200000,               !- Solar Absorptance
-
     0.9200000;               !- Visible Absorptance
 
 
-
 MaterialProperty:PhaseChange,
-
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
-
     0.0,             !- Temperature coefficient,thermal conductivity(W/m K2)
-
     -20.,            !- Temperature 1, C
-
     0.01,            !- Enthalpy 1 at –20C, (J/kg)
-
     20.,             !- Temperature 2, C
-
     33400,           !- Enthalpy 2, (J/kg)
-
     20.5,            !- temperature 3, C
-
     70000,           !- Ethalpy 3, (J/kg)
-
     100.,            !- Temperature 4, C
-
     137000;          !- Enthalpy 4, (J/kg)
+```
+
 
 ### MaterialProperty:VariableThermalConductivity
 
@@ -4768,59 +4477,39 @@ And, an IDF example showing how it is used in conjunction with the Materials:
 
 Note, the following Heat Balance Algorithm is necessary (only specified once). Also, when using Conduction Finite Difference, it is more efficient to set the zone time step shorter than those used for the Conduction Transfer Function solution algorithm. It should be set to 12 time steps per hour or greater, and can range up to 60.
 
+```idf
 HeatBalanceAlgorithm,
-
 ConductionFiniteDifference;
 
 
-
 Timestep,
-
 12;
 
 
-
 Material,
-
     PCMPlasterBoard ,      !- Name
-
     Smooth,                  !- Roughness
-
     1.9050000E-02,           !- Thickness {m}
-
     4.2,                     !- Conductivity {W/m-K}
-
     1601.846,                !- Density {kg/m3}
-
     836.8000,                !- Specific Heat {J/kg-K}
-
     0.9000000,               !- Thermal Absorptance
-
     0.9200000,               !- Solar Absorptance
-
     0.9200000;               !- Visible Absorptance
 
 
-
 MaterialProperty:VariableThermalConductivity,
-
     PCMPlasterBoard,         !- Name
-
     0,                       !- Temperature 1 {C}
-
     4.2,                     !- Thermal Conductivity 1 {W/m-K}
-
     22,                      !- Temperature 2 {C}
-
     4.2,                     !- Thermal Conductivity 2 {W/m-K}
-
     22.1,                    !- Temperature 3 {C}
-
     2.5,                     !- Thermal Conductivity 3 {W/m-K}
-
     100,                     !- Temperature 4 {C}
-
     2.5;                     !- Thermal Conductivity 4 {W/m-K}
+```
+
 
 ### Conduction Finite Difference (CondFD) Outputs
 
@@ -4828,9 +4517,10 @@ The Conduction Finite Difference solution algorithm uses a finite difference sol
 
 The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference:
 
-Zone,Sum,CondFD Inner Solver Loop Iteration Count []
+* Zone,Sum,CondFD Inner Solver Loop Iteration Count []
 
-Zone,Average,CondFD Surface Temperature Node &lt;1 – N&gt; [C]
+* Zone,Average,CondFD Surface Temperature Node <1> [C]
+
 
 #### CondFD Inner Solver Loop Iteration Count []
 
@@ -4874,21 +4564,23 @@ For this solution algorithm, the initial water content is assumed to be distribu
 
 Below is an example input for the porosity and initial water content of a material.
 
+```idf
 MaterialProperty:HeatAndMoistureTransfer:Settings,
-
       Concrete,     !- Name
-
       0.76,     !- Porosity
-
       0.2;     !- Initial (or typical) Water content
+```
+
 
 ### MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
 
-**Advanced/Research Usage:**This material property is used in conjunction with the CombinedHeatAndMoistureFiniteElement heat balance solution algorithm.
+**Advanced/Research Usage:** This material property is used in conjunction with the CombinedHeatAndMoistureFiniteElement heat balance solution algorithm.
 
 The Isotherm data relates the moisture, or water content [kg/m3] of a material with the relative humidity (RH). The water content is expected to increase as relative humidity increases, starting at zero content at 0.0relative humidity fraction and reaching a maximum, defined by the porosity, at 1.0 relative humidity fraction, which corresponds to 100% relatve humidity. Relative humidities are entered as fraction for this object ranging from 0.0 to 1.0. These two extremes (0.0 and 1.0) are automatically set by the HAMT solution. However, if they are entered they will be used as extra data points. Data should be provided with increasing RH and moisture content up to as high an RH as possible to provide a stable solution. One possible reason for the following error message may be that a material has a very rapid increase in water content for a small change in RH, which can happen if the last entered water content point is at a low RH and the material has a very high porosity.
 
-  \*\* Warning \*\* HeatAndMoistureTransfer: Large Latent Heat for Surface ROOF
+```
+  ** Warning ** HeatAndMoistureTransfer: Large Latent Heat for Surface ROOF
+```
 
 Another potential reason for this error being generated is the use of inappropriate values for Vapor Transfer Coefficients. See the SurfaceProperties:VaporCoefficients object in the Advanced Surface Concepts group.
 
@@ -4912,51 +4604,32 @@ The Moisture Content of the x<sup>th</sup> coordinate. The units are [kg/m3]
 
 Below is an example input for a material isotherm
 
+```idf
 MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
-
       Concrete,     !- Name
-
       10,     !- Number of data Coordinates
+      0.2205,    !- Relative Humidity fraction #1
+      22.31,     !- Moisture content #1
+      0.202,     !- Relative Humidity fraction #2
+      19.665,    !- Moisture content #2
+      0.449,     !- Relative Humidity fraction #3
+      40.02,     !- Moisture content #3
+      0.454,     !- Relative Humidity fraction #4
+      36.915,    !- Moisture content #4
+      0.6506,    !- Relative Humidity fraction #5
+      56.005,    !- Moisture content #5
+      0.655,     !- Relative Humidity fraction #6
+      52.325,    !- Moisture content #6
+      0.824,     !- Relative Humidity fraction #7
+      72.565,    !- Moisture content #7
+      0.8725,    !- Relative Humidity fraction #8
+      85.1,      !- Moisture content #8
+      0.924,     !- Relative Humidity fraction #9
+      91.08,     !- Moisture content #9
+      0.964,     !- Relative Humidity fraction #10
+      100.28;    !- Moisture content #10
+```
 
-      0.2205,    !- Relative Humidity fraction \#1
-
-      22.31,     !- Moisture content \#1
-
-      0.202,     !- Relative Humidity fraction \#2
-
-      19.665,    !- Moisture content \#2
-
-      0.449,     !- Relative Humidity fraction \#3
-
-      40.02,     !- Moisture content \#3
-
-      0.454,     !- Relative Humidity fraction \#4
-
-      36.915,    !- Moisture content \#4
-
-      0.6506,    !- Relative Humidity fraction \#5
-
-      56.005,    !- Moisture content \#5
-
-      0.655,     !- Relative Humidity fraction \#6
-
-      52.325,    !- Moisture content \#6
-
-      0.824,     !- Relative Humidity fraction \#7
-
-      72.565,    !- Moisture content \#7
-
-      0.8725,    !- Relative Humidity fraction \#8
-
-      85.1,      !- Moisture content \#8
-
-      0.924,     !- Relative Humidity fraction \#9
-
-      91.08,     !- Moisture content \#9
-
-      0.964,     !- Relative Humidity fraction \#10
-
-      100.28;    !- Moisture content \#10
 
 ### MaterialProperty:HeatAndMoistureTransfer:Suction
 
@@ -4984,31 +4657,22 @@ The Liquid Transport Coefficient of the x<sup>th</sup> point. The units are [m2/
 
 Below is an example input for a material liquid transport coefficient under suction.
 
+```idf
 MaterialProperty:HeatAndMoistureTransfer:Suction,
-
       Concrete,     !- Name
-
       5,     !- Number of Suction points
-
       0,     !- Moisture content 1
-
       0,     !- Liquid Transport Coefficient 1
-
       72,     !- Moisture content 2
-
       0.0000000000741,     !- Liquid Transport Coefficient 2
-
       85,     !- Moisture content 3
-
       0.000000000253,     !- Liquid Transport Coefficient 3
-
       100,     !- Moisture content 4
-
       0.00000000101,     !- Liquid Transport Coefficient 4
-
       118,     !- Moisture content 5
-
       0.00000000128;     !- Liquid Transport Coefficient 5
+```
+
 
 ### MaterialProperty:HeatAndMoistureTransfer:Redistribution
 
@@ -5036,31 +4700,22 @@ The Liquid Transport Coefficient of the x<sup>th</sup> point. The units are [m2/
 
 Below is an example input for the object.
 
+```idf
 MaterialProperty:HeatAndMoistureTransfer:Redistribution,
-
       Concrete,     !- Name
-
       5,     !- Number of Redistribution points
-
       0,     !- Moisture content 1
-
       0,     !- Liquid Transport Coefficient 1
-
       72,     !- Moisture content 2
-
       0.00000000000741,     !- Liquid Transport Coefficient 2
-
       85,     !- Moisture content 3
-
       0.0000000000253,     !- Liquid Transport Coefficient 3
-
       100,     !- Moisture content 4
-
       0.000000000101,     !- Liquid Transport Coefficient 4
-
       118,     !- Moisture content 5
-
       0.000000000128;     !- Liquid Transport Coefficient 5
+```
+
 
 ### MaterialProperty:HeatAndMoistureTransfer:Diffusion
 
@@ -5088,33 +4743,24 @@ The Liquid Transport Coefficient of the x<sup>th</sup> pair.
 
 Below are some examples of the values for materials.
 
+```idf
 MaterialProperty:HeatAndMoistureTransfer:Diffusion,
-
       Plywood,     !- Name
-
       3,     !- Number of data Points
-
       0,     !- Relative Humidity Fraction 1
-
       700,     !- Water Vapor Diffusion Resistance Factor 1
-
       0.5,     !- Relative Humidity Fraction 2
-
       200,     !- Water Vapor Diffusion Resistance Factor 2
-
       1,     !- Relative Humidity Fraction 3
-
       20;     !- Water Vapor Diffusion Resistance Factor 3
 
 MaterialProperty:HeatAndMoistureTransfer:Diffusion,
-
       Concrete,     !- Name
-
       1,     !- Number of Mu Points
-
       0,     !- Relative Humidity Fraction 1
-
       180;     !- Water Vapor Diffusion Resistance Factor 1
+```
+
 
 ### MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
 
@@ -5142,35 +4788,33 @@ The Thermal Conductivity of the x<sup>th</sup> coordinate. The units are [W/m-K]
 
 Below is an example of values for a material.
 
+```idf
 MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
-
       Concrete,     !- Name
-
       2,     !- Number of Thermal Coordinates
-
       0,     !- Moisture content \#1
-
       1.6,     !- Thermal Conductivity \#1
-
       180,     !- Moisture content \#2
-
       2.602;     !- Thermal Conductivity \#2
+```
+
 
 ### Heat and Moisture (HAMT) Outputs
 
-Zone,Average,HAMT Surface Average Water Content Ratio [kg/kg]
+* Zone,Average,HAMT Surface Average Water Content Ratio [kg/kg]
 
-Zone,Average,HAMT Surface Inside Face Temperature [C]
+* Zone,Average,HAMT Surface Inside Face Temperature [C]
 
-Zone,Average,HAMT Surface Inside Face Relative Humidity [%]
+* Zone,Average,HAMT Surface Inside Face Relative Humidity [%]
 
-Zone,Average,HAMT Surface Inside Face Vapor Pressure [Pa]
+* Zone,Average,HAMT Surface Inside Face Vapor Pressure [Pa]
 
-Zone,Average,HAMT Surface Outside Face Temperature [C]
+* Zone,Average,HAMT Surface Outside Face Temperature [C]
 
-Zone,Average,HAMT Surface Outside Face Relative Humidity [%]
+* Zone,Average,HAMT Surface Outside Face Relative Humidity [%]
 
-Zone,Average,HAMT Surface Inside Face Relative Humidity [%]
+* Zone,Average,HAMT Surface Inside Face Relative Humidity [%]
+
 
 #### HAMT Surface Average Water Content Ratio [kg/kg]
 
@@ -5220,9 +4864,10 @@ This is the relative water content of the cell in the surface.
 
 Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format.
 
-! &lt;HAMT cells&gt;, Surface Name, Construction Name, Cell Numbers
-
-! &lt;HAMT origins&gt;, Surface Name, Construction Name, Cell origins (m)
+```
+! <HAMT cells>, Surface Name, Construction Name, Cell Numbers
+! <HAMT origins>, Surface Name, Construction Name, Cell origins (m)
+```
 
 The output also contains the HAMT cell origins and cell number for each construction – surface combination. The coordinate system origin is defined as the exterior surface of the construction. Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
 
@@ -5232,13 +4877,13 @@ It is better to specify the “key” or Surface Name in this output.
 
 So for example to output the temperature of the 10<sup>th</sup> cell in a surface, eg “East Wall” would require the following output variable.
 
+```idf
 Output:Variable,
-
     East Wall,               !- Key Value
-
     HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-
     Hourly;                  !- Reporting Frequency
+```
+
 
 By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
 
@@ -5328,39 +4973,35 @@ Representative values of the dirt correction factor are shown in Table 7.
 
      Table 7. Dirt Correction Factors
 
-Type of Location
-
-Angle of Glazing
-
-Vertical
-
-45<sup>O</sup>
-
-Horizontal
-
-Non-industrial
-
-0.9
-
-0.8
-
-0.7
-
-Industrial
-
-0.7
-
-0.6
-
-0.5
-
-Very Dirty
-
-0.6
-
-0.5
-
-0.4
+<table class="table table-striped">
+  <tr>
+    <th rowspan="2">Type of Location</th>
+    <th colspan="3">Angle of Glazing</th>
+  </tr>
+  <tr>
+    <td>Vertical</td>
+    <td>45</td>
+    <td>Horizontal</td>
+  </tr>
+  <tr>
+    <td>Non-industrial</td>
+    <td>0.9</td>
+    <td>0.8</td>
+    <td>0.7</td>
+  </tr>
+  <tr>
+    <td>Industrial</td>
+    <td>0.7</td>
+    <td>0.6</td>
+    <td>0.5</td>
+  </tr>
+  <tr>
+    <td>Very Dirty</td>
+    <td>0.6</td>
+    <td>0.5</td>
+    <td>0.4</td>
+  </tr>
+</table>
 
 From Appendix A, “Daylighting in Sports Halls, Report 2,” SportScotland, Nov. 2002
  (www.sportscotland.org.uk)
@@ -5395,101 +5036,63 @@ The ratio, when a sample object is stretched, of the contraction or transverse s
 
 IDF examples of Spectral average and using a Spectral data set:
 
+```idf
 MATERIAL:WINDOWGLASS, GLASS - CLEAR SHEET 1 / 8 IN,
-
   SpectralAverage, ! Optical data type
-
   0.003, ! Thickness {m} 1/8"
-
   0.850, ! Solar transmittance at normal incidence
-
   0.075, ! Solar reflectance at normal incidence: front side
-
   0.075, ! Solar reflectance at normal incidence: back side
-
   0.901, ! Visible transmittance at normal incidence
-
   0.081, ! Visible reflectance at normal incidence: front side
-
   0.081, ! Visible reflectance at normal incidence: back side
-
   0.0,   ! IR transmittance at normal incidence
-
   0.84,  ! IR hemispherical emissivity: front side
-
   0.84,  ! IR hemispherical emissivity: back side
-
   0.9;   ! Conductivity {W/m-K}
 
 
-
 WindowMaterial:Glazing ,SPECTRAL GLASS INNER PANE, ! Material name
-
     Spectral, ! Optical data type {SpectralAverage or Spectral}
-
     TestSpectralDataSet, ! Name of spectral data set
-
     0.0099, ! Thickness {m}
-
     ,  ! Solar transmittance at normal incidence
-
     ,  ! Solar reflectance at normal incidence: front side
-
     ,  ! Solar reflectance at normal incidence: back side
-
     ,  ! Visible transmittance at normal incidence
-
     ,  ! Visible reflectance at normal incidence: front side
-
     ,  ! Visible reflectance at normal incidence: back side
-
     0.0,   ! IR transmittance at normal incidence
-
     0.84,  ! IR emissivity: front side
-
     0.84,  ! IR emissivity: back side
-
     0.798; ! Conductivity {W/m-K}
+```
+
 
 IDF example of Spectral Data Type = BSDF
 
+```idf
 WindowMaterial:Glazing,
-
-  Glass\_5012\_Layer,        !- Layer name : CLEAR\_6.PPG
-
+  Glass_5012_Layer,        !- Layer name : CLEAR_6.PPG
   BSDF,                    !- Optical Data Type
-
   ,                        !- Spectral Data name
-
   0.005664,                !- Thickness
-
   ,                        !- Solar Transmittance
-
   ,                        !- Solar Front Reflectance
-
   ,                        !- Solar Back Reflectance
-
   ,                        !- Visible Transmittance
-
   ,                        !- Visible Front Reflectance
-
   ,                        !- Visible Back reflectance
-
   0.000000,                !- IR Transmittance
-
   0.840000,                !-Front Emissivity
-
   0.840000,                !-Back Emissivity
-
   1.000000,                !-Conductivity
-
   ,                        !-Dirt Correction Factor for Sol/Vis Transmittance
-
   ,                        !-Solar Diffusing
-
   7.2e10,                  !-Young’s modulus
-
   0.22;                    !-Poisson’s ratio
+```
+
 
 ### WindowMaterial:Glazing:RefractionExtinctionMethod
 
@@ -5541,7 +5144,7 @@ The default value of the dirt correction factor is 1.0, which means the glass is
 
 #### Field: Solar Diffusing
 
-Takes values No (the default) and Yes. If No, the glass is transparent. If Yes, the glass is translucent and beam solar radiation incident on the glass is transmitted as hemispherically diffuse radiation with no beam component. Solar Diffusing = Yes should only be used on the innermost pane of glass in an exterior window; it does not apply to interior windows.
+Takes values No (the default) and Yes. If No, the glass is transparent. If Yes, the glass is translucent and beam solar radiation incident on the glass is transmitted as hemispherically diffuse radiation with no beam component. (EnergyPlus does not model the “partially translucent” case in which beam solar radiation incident on the glass is transmitted as a combination of beam and diffuse.) Solar Diffusing = Yes should only be used on the innermost pane of glass in an exterior window; it does not apply to interior windows.
 
 If, in the Building object, Solar Distribution = FullInteriorAndExterior, use of Solar Diffusing = Yes for glass in an exterior window will change the distribution of interior solar radiation from the window. The result is that beam solar radiation that would be transmitted by a transparent window and get absorbed by particular interior surfaces will be diffused by a translucent window and be spread over more interior surfaces. This can change the time dependence of heating and cooling loads in the zone.
 
@@ -5549,32 +5152,25 @@ In a zone with Daylighting:Detailed, translucent glazing, which is often used in
 
 An IDF example:
 
+```idf
 WindowMaterial:Glazing:RefractionExtinctionMethod,
-
 4MM CLEAR GLASS, !- Material name
-
     0.004, !- Thickness {m}
-
     1.526, !- Solar index of refraction
-
     30.0 , !- Solar extinction coefficient (1/m)
-
     1.526, !- Visible index of refraction
-
     30.0 , !- Visible extinction coefficient (1/m)
-
     0.0,   !- IR transmittance at normal incidence
-
     0.84,  !- IR emissivity
-
     0.9;   !- Conductivity {W/m-K}
+```
+
 
 ### Glass Optical Properties Conversion
 
 #### Conversion from Glass Optical Properties Specified as Index of Refraction and Transmittance at Normal Incidence
 
-The optical properties of uncoated glass are sometimes specified by index of refraction, *n*,*
-* and transmittance at normal incidence, *T*.
+The optical properties of uncoated glass are sometimes specified by index of refraction, n, and transmittance at normal incidence, T.
 
 The following equations show how to convert from this set of values to the transmittance and reflectance values required by WindowMaterial:Glazing. These equations apply only to uncoated glass, and can be used to convert either spectral-average solar properties or spectral-average visible properties (in general, *n* and *T* are different for the solar and visible). Note that since the glass is uncoated, the front and back reflectances are the same and equal to the *R* that is solved for in the following equations.
 
@@ -5614,548 +5210,271 @@ The window glazing (defined with WindowMaterial:Glazing) name that provides the 
 
 IDF Examples
 
+```idf
   Construction,
-
-    window\_const,             !- Name
-
+    window_const,             !- Name
     Usual Glass,              !- Layer 1
-
     AIR 6MM,                  !- Layer 2
-
     TCGlazings,               !- Layer 3
-
     AIR 6MM,                  !- Layer 4
-
     Usual Glass;              !- Layer 5
 
-
-
-
-
   WindowMaterial:Gas,
-
     AIR 6MM,                 !- Name
-
     Air,                     !- Gas Type
-
     0.0063;                  !- Thickness {m}
 
-
-
-
-
 ! Added for thermochromic glazings
-
   WindowMaterial:GlazingGroup:Thermochromic,
-
     TCGlazings,
-
     0 ,  TCGlazing0,
-
     20,  TCGlazing20,
-
     25,  TCGlazing25,
-
     30,  TCGlazing30,
-
     35,  TCGlazing35,
-
     40,  TCGlazing40,
-
     45,  TCGlazing45,
-
     50,  TCGlazing50,
-
     55,  TCGlazing55,
-
     60,  TCGlazing60,
-
     65,  TCGlazing65,
-
     75,  TCGlazing75,
-
     85,  TCGlazing85;
 
-
-
-
-
 WindowMaterial:Glazing,
-
   TCGlazing0,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
-
-
 WindowMaterial:Glazing,
-
   TCGlazing20,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
-
-
 WindowMaterial:Glazing,
-
   TCGlazing25,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
 WindowMaterial:Glazing,
-
   TCGlazing30,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
 WindowMaterial:Glazing,
-
   TCGlazing35,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
-
-
 WindowMaterial:Glazing,
-
   TCGlazing40,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
 WindowMaterial:Glazing,
-
   TCGlazing45,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
 WindowMaterial:Glazing,
-
   TCGlazing50,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
-
-
 WindowMaterial:Glazing,
-
   TCGlazing55,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
 WindowMaterial:Glazing,
-
   TCGlazing60,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
 WindowMaterial:Glazing,
-
   TCGlazing65,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
 
-
-
-
-
 WindowMaterial:Glazing,
-
   TCGlazing75,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
-
-
 
 WindowMaterial:Glazing,
-
   TCGlazing85,  !- Name
-
   SpectralAverage,  !- Optical Data Type
-
   ,        !- Window Glass Spectral Data Set Name
-
   0.0030,  !- Thickness
-
   0.2442,  !- Solar Transmittance at Normal Incidence
-
   0.7058,  !- Front Side Solar Reflectance at Normal Incidence
-
   0.7058,  !- Back Side Solar Reflectance at Normal Incidence
-
   0.3192,  !- Visible Transmittance at Normal Incidence
-
   0.6308,  !- Front Side Visible Reflectance at Normal Incidence
-
   0.6308,  !- Back Side Visible Reflectance at Normal Incidence
-
   0.0000,  !- Infrared Transmittance at Normal Incidence
-
   0.9000,  !- Front Side Infrared Hemispherical Emissivity
-
   0.9000,  !- Back Side Infrared Hemispherical Emissivity
-
   0.0199,  !- Conductivity
-
   1.0000,  !- Dirt Correction Factor for Solar and Visible Transmittance
-
   No;      !- Solar Diffusing
-
+```
 
 
 ### WindowMaterial:GlazingGroup:Thermochromic Outputs
@@ -6242,55 +5561,45 @@ The specific heat ratio for gas.  The specific heat ratio of a gas is the ratio
 
 An IDF example:
 
+```idf
 WindowMaterial:Gas,AIRGAP,
-
   AIR,      ! Gas type (Air - Argon - Krypton - Xenon - Custom)]
-
   0.0125;   ! Thickness {m} 1/2 inch
+```
+
 
 An IDF example to be used with a WindowMaterial:Gap definition (see below)
 
+```idf
 WindowMaterial:Gas,
-
-Gas\_1\_W\_0\_0100,                                     !- gap name - Air
-
+Gas_1_W_0_0100,                                     !- gap name - Air
 Air,                                                !- type
-
 0.0100;                                             !- thickness
+```
+
 
 
 
 An IDF example for a Custom Gas
 
+```idf
 WindowMaterial:Gas,
-
-Gas\_16\_W\_0\_0003,                   !- gap name
-
+Gas_16_W_0_0003,                   !- gap name
 Custom,                            !- type
-
 0.0003,                            !- thickness
-
 2.873000e-003,                     !- Conductivity Coefficient A
-
 7.760000e-005,                     !- Conductivity Coefficient B
-
 0.000000e+000,                     !- Conductivity Coefficient C
-
 3.723000e-006,                     !- Conductivity Viscosity A
-
 4.940000e-008,                     !- Conductivity Viscosity B
-
 0.000000e+000,                     !- Conductivity Viscosity C
-
 1002.737000,                       !- Specific Heat Coefficient A
-
 0.012324,                          !- Specific Heat Coefficient B
-
 0.000000,                          !- Specific Heat Coefficient C
-
 28.969999,                         !- Molecular Weight
-
 1.400000;                          !- Specific Heat Ratio
+```
+
 
 
 
@@ -6322,19 +5631,15 @@ The fraction of the first gas in the mixture.
 
 An IDF example:
 
+```idf
 WindowMaterial:GasMixture,ArgonKryptonMix,
-
 0.0125,   ! Thickness {m} 1/2 inch
-
 2,        ! Number of Gases in Mixture
-
 Argon,    ! Gas 1 Type
-
 0.6,      ! Gas 1 Fraction
-
 Krypton,  ! Gas 2 Type
-
 0.4;      ! Gas 2 Fraction
+```
 
 ### WindowMaterial:Gap
 
@@ -6368,51 +5673,39 @@ References gas (WindowMaterial:Gas) or gas mixture (WindowMaterial:GasMixture) o
 
 An IDF example for simple glazing:
 
+```idf
 WindowMaterial:Gas,
-
-Gas\_1\_W\_0\_0120,                                !- gap name - Air
-
+Gas_1_W_0_0120,                                !- gap name - Air
 Air,                                           !- type
-
 0.0120;                                        !- thickness
 
 
-
 WindowMaterial:Gap,
-
-Gap\_1\_Layer,                                   !- gap name: Air
-
+Gap_1_Layer,                                   !- gap name: Air
 0.0120,                                        !- thickness
-
-Gas\_1\_W\_0\_0120,                                !- Gas (or Gas Mixture) name
-
+Gas_1_W_0_0120,                                !- Gas (or Gas Mixture) name
 101325.0000;                                   !- pressure
+```
+
 
 
 
 An IDF example for vacuum glazing:
 
+```idf
 WindowMaterial:Gap,
-
-Gap\_16\_Layer,                     !- gap name: Vacuum\_0.001\_pr-0.5\_ps-50.8
-
-0.0003,                                             !- thicknessGas\_16\_W\_0\_0003,                                    !- Gas (or Gas Mixture) name
-
+Gap_16_Layer,                     !- gap name: Vacuum_0.001_pr-0.5_ps-50.8
+0.0003,                                             !- thicknessGas_16_W_0_0003,                                    !- Gas (or Gas Mixture) name
 0.1333,                                             !- pressure
-
 ,                                                   !- deflection state
-
-SupportPillar\_16\_Gap\_1;                             !- SupportPillar
-
+SupportPillar_16_Gap_1;                             !- SupportPillar
 
 
 WindowGap:SupportPillar,
-
-SupportPillar\_16\_Gap\_1,                             !- Name
-
+SupportPillar_16_Gap_1,                             !- Name
 0.0508,                                             !- spacing
-
 0.0005;                                             !- radius
+```
 
 
 
@@ -6432,25 +5725,20 @@ The thickness (m) of the gap in deflected state.  It represents value of deflec
 
 An IDF example where WindowThermalModel:Params Deflection Model = MeasuredDeflection:
 
+```idf
 WindowMaterial:Gap,
-
-Gap\_1\_Layer,                                  !- gap name: Air
-
+Gap_1_Layer,                                  !- gap name: Air
 0.0120,                                       !- thickness
-
-Gas\_1\_W\_0\_0120,                               !- Gas (or Gas Mixture) name
-
+Gas_1_W_0_0120,                               !- Gas (or Gas Mixture) name
 101325.0000,                                  !- pressure
-
-Gap\_1\_Deflection;                              !- deflection state
-
+Gap_1_Deflection;                              !- deflection state
 
 
 WindowGap:DeflectionState,       !- deflection state of gap
-
-  Gap\_1\_Deflection,              !- name
-
+  Gap_1_Deflection,              !- name
   0.011;                         !- gap thickness in deflected state
+```
+
 
 ### WindowGap:SupportPillar
 
@@ -6476,13 +5764,13 @@ The radius (m) of the support pillar (see Engineering reference document for mor
 
 An IDF example for vacuum glazing (see Vacuum Glazing example in WindowMaterial:Gap above)
 
+```idf
 WindowGap:SupportPillar,       !- gap support pillar
-
-  SupportPillar\_16\_Gap\_1,      !- basis matrix name
-
+  SupportPillar_16_Gap_1,      !- basis matrix name
   0.05,                        !- pillar spacing
-
   0.005;                       !- pillar radius
+```
+
 
 ### WindowMaterial:SimpleGlazingSystem
 
@@ -6512,15 +5800,14 @@ This field is optional. If it is omitted, then the visible transmittance propert
 
 An example of this object.
 
-  WindowMaterial:SimpleGlazingSystem,
-
+```idf
+WindowMaterial:SimpleGlazingSystem,
     SimpleWindow:DOUBLE PANE WINDOW , !- Name
-
     2.716 , !-  U-Factor
-
     0.763 , !-  Solar Heat Gain Coefficient
-
     0.812 ; !-  Visible Transmittance
+```
+
 
 ### WindowMaterial:Shade
 
@@ -6642,37 +5929,25 @@ Figure 13. Examples of air-flow openings for an interior shade covering glass of
 
 An IDF example:
 
+```idf
 WindowMaterial:Shade,
-
     DRAPES - CLOSE WEAVE MEDIUM,  !- Name
-
     0.05,                    !- Solar transmittance
-
     0.3000000,               !- Solar Reflectance
-
     .05,                     !- Visible transmittance
-
     0.3000000,               !- Visible reflectance
-
     0.9000000,               !- Thermal Hemispherical Emissivity
-
     0.0,                     !- Thermal Transmittance
-
     0.003,                   !- Thickness {m}
-
     0.1,                     !- Conductivity {W/m-K}
-
     0.050,                   !- Shade to glass distance {m}
-
     1.0,                     !- Top opening multiplier
-
     1.0,                     !- Bottom opening multiplier
-
     0.0,                     !- Left-side opening multiplier
-
     0.0,                     !- Right-side opening multiplier
-
     0.0;                     !- Air flow permeability
+```
+
 
 ### WindowMaterial:Blind
 
@@ -6838,65 +6113,39 @@ The maximum allowed slat angle (degrees). Used only if WindowProperty:ShadingCon
 
 An IDF example:
 
+```idf
 WindowMaterial:Blind,
-
  White Painted Metal Blind,   !- Name
-
  HORIZONTAL, !- Slat orientation
-
  0.025   , !- Slat width (m)
-
  0.01875 , !- Slat separation (m)
-
  0.001   , !- Slat thickness (m)
-
  45.0    , !- Slat angle (deg)
-
  44.9    , !- Slat conductivity (W/m-K)
-
  0.0     , !- Slat beam solar transmittance
-
  0.8     , !- Front Side Slat beam solar reflectance
-
  0.8     , !- Back Side Slat beam solar reflectance
-
  0.0     , !- Slat diffuse solar transmittance
-
  0.8     , !- Front Side Slat diffuse solar reflectance
-
  0.8     , !- Back Side Slat diffuse solar reflectance
-
  0.0     , !- Slat beam visible transmittance
-
  0.7     , !- Front Side Slat beam visible reflectance
-
  0.7     , !- Back Side Slat beam visible reflectance
-
  0.0     , !- Slat diffuse visible transmittance
-
  0.7     , !- Front Side Slat diffuse visible reflectance
-
  0.7     , !- Back Side Slat diffuse visible reflectance
-
  0.0     , !- Slat Infrared hemispherical transmittance
-
  0.9     , !- Front Side Slat Infrared hemispherical emissivity
-
  0.9     , !- Back Side Slat Infrared hemispherical emissivity
-
  0.050   , !- Blind-to-glass distance
-
  0.0     , !- Blind top opening multiplier
-
  0.0     , !- Blind bottom opening multiplier
-
  0.5     , !- Blind left-side opening multiplier
-
  0.5     , !- Blind right-side opening multiplier
-
  ,         !- Minimum slat angle (deg)
-
  ;         !- Maximum slat angle (deg)
+```
+
 
 
 
@@ -7038,73 +6287,49 @@ Figure 18. Side view of horizontal venetian blind slats or top view of blinds wi
 
 An IDF example for ShadingLayerType = Venetian
 
+```idf
 WindowMaterial:ComplexShade,       !- venetian blind layer
-
-  Shade\_30001\_Layer,               !- name
-
+  Shade_30001_Layer,               !- name
   Venetian,                        !- shading layer type
-
   0.005,                           !- thickness
-
   160,                             !- layer conductivity
-
   0.0,                             !- IR transmittance
-
   0.9,                             !- front emissivity
-
   0.9,                             !- back emissivity
-
   0.0,                             !- top opening multiplier
-
   0.0,                             !- bottom opening multiplier
-
   0.0,                             !- left side opening multiplier
-
   0.0,                             !- right side opening multiplier
-
   0.05,                            !- front opening multiplier
-
   0.016,                           !- venetian slat width
-
   0.012,                           !- venetian slat spacing
-
   0.0006,                          !- venetian slat thickness
-
   -45.00,                          !- venetian slat angle
-
   160.00,                          !- venetian slat conductivity
-
   0.0000;                          !- venetian slat curve
+```
+
 
 An IDF example for ShadingLayerType = Woven
 
 (Note that it is not necessary to include “blank” lines for the venetian blind input for a Woven shade definition).
 
+```idf
 WindowMaterial:ComplexShade,       !- woven shade layer
-
-  Shade\_30002\_Layer,               !- name
-
+  Shade_30002_Layer,               !- name
   Woven,                           !- shading layer type
-
   0.011,                           !- thickness
-
   1,                               !- layer conductivity
-
   0.0,                             !- IR transmittance
-
   0.9,                             !- front emissivity
-
   0.9,                             !- back emissivity
-
   0.0,                             !- top opening multiplier
-
   0.0,                             !- bottom opening multiplier
-
   0.0,                             !- left side opening multiplier
-
   0.0,                             !- right side opening multiplier
-
   0.17;                            !- front opening multiplier
+```
+
 
 ### WindowMaterial:Screen
 
@@ -7168,11 +6393,11 @@ This input specifies the visible reflectance (beam-to-diffuse) of the screen mat
 
 If diffuse visible reflectance for the screen material is not available, then the following guidelines can be used to estimate this value:
 
-Dark-colored screen (e.g., charcoal):                  0.08 – 0.10
+* Dark-colored screen (e.g., charcoal):                  0.08 – 0.10
 
-Medium-colored screen (e.g., gray):                   0.20 – 0.25
+* Medium-colored screen (e.g., gray):                   0.20 – 0.25
 
-Light-colored screen (e.g., bright aluminum):       0.60 – 0.65
+* Light-colored screen (e.g., bright aluminum):       0.60 – 0.65
 
 Commercially-available gray scale or grayscale reflecting chart references can be purchased for improved accuracy in estimating visible reflectance (by visual comparison of screen reflected brightness with that of various known-reflectance portions of the grayscale).
 
@@ -7224,75 +6449,43 @@ Angle of resolution, in degrees, for the overall screen beam transmittance (dire
 
 An IDF example for this object, along with Construction and WindowProperty:ShadingControl objects, is shown below:
 
+```idf
 WindowMaterial:Screen,
-
     EXTERIOR SCREEN,         !- Name
-
     ModelAsDiffuse,        !- Reflected Beam Transmittance Accounting Method
-
     0.6,                     !- Diffuse Solar Reflectance
-
     0.6,                     !- Diffuse Visible Reflectance
-
     0.9,                     !- Thermal Hemispherical Emissivity
-
     221.0,                   !- Conductivity {W/m-K}
-
     0.00154,                 !- Screen Material Spacing (m)
-
     0.000254,                !- Screen Material Diameter (m)
-
     0.025,                   !- Screen-to-Glass Distance {m}
-
     0.0,                     !- Top Opening Multiplier
-
     0.0,                     !- Bottom Opening Multiplier
-
     0.0,                     !- Left-Side Opening Multiplier
-
     0.0,                     !- Right-Side Opening Multiplier
-
     0;                   !- Angle of Resolution for Output Map {deg}
 
-
-
 Construction,
-
     DOUBLE PANE WITHOUT SCREEN,     !- Name
-
     GLASS - CLEAR SHEET 1 / 8 IN,   !- Outside Layer
-
     WinAirB1 - AIRSPACE RESISTANCE, !- Layer \#2
-
     GLASS - CLEAR SHEET 1 / 8 IN;   !- Layer \#3
 
-
-
-
-
 WindowProperty:ShadingControl,
-
     DOUBLE PANE WITH SCREEN, !- User Supplied Shading Control Name
-
     ExteriorScreen,          !- Shading Type
-
     ,                        !- Name of construction with shading
-
     AlwaysOn,                !- Shading Control Type
-
     ScreenSchedule,          !- Schedule Name
-
     20.0,                    !- SetPoint {W/m2, W or deg C}
-
     YES,                     !- Shading Control Is Scheduled
-
     NO,                      !- Glare Control Is Active
-
     EXTERIOR SCREEN,         !- Material Name of Shading Device
-
     ,                        !- Type of Slat Angle Control for Blinds
-
     ;                        !- Slat Angle Schedule Name
+```
+
 
 ### WindowMaterial:Shade:EquivalentLayer
 
@@ -7348,31 +6541,22 @@ This value is the back side long-wave hemispherical emissivity of shade material
 
 An IDF example for this object is shown below:
 
+```idf
 WindowMaterial:Shade:EquivalentLayer,
-
   Shade1,        !- Name
-
   0.190,         !- Shade Beam-Beam Solar Transmittance
-
   0.206,         !- Front Side Shade Beam-Diffuse Solar Transmittance
-
   0.206,         !- Back Side Shade Beam-Diffuse Solar Transmittance
-
   0.499,         !- Front Side Shade Beam-Diffuse Solar Reflectance
-
   0.499,         !- Back Side Shade Beam-Diffuse Solar Reflectance
-
   0.0,           !- Shade Beam-Beam Visible Transmittance
-
   0.0,           !- Shade Beam-Diffuse Vissible Transmittance
-
   0.0,           !- Shade Vissible Reflectance
-
   0.0,           !- Shade Material Infrared Transmittance
-
   0.84,          !- Front Side Shade Material Infrared Emissivity
-
   0.84;          !- Back Side Shade Material Infrared Emissivity
+```
+
 
 ### WindowMaterial:Drape:EquivalentLayer
 
@@ -7442,35 +6626,24 @@ This value is the length of the pleated section of the draped fabric, s(m). If t
 
 An IDF example for this object is shown below:
 
+```idf
 WindowMaterial:Drape:EquivalentLayer,
-
   Drape02,            !- Name
-
   0.14,               !- Shade Beam-Beam Solar Transmittance
-
   0.10,               !- Front Side Shade Beam-Diffuse Solar Transmittance
-
   0.10,               !- Back Side Shade Beam-Diffuse Solar Transmittance
-
   0.40,               !- Front Side Shade Beam-Diffuse Solar Reflectance
-
   0.50,               !- Back Side Shade Beam-Diffuse Solar Reflectance
-
   0.0,                !- Shade Beam-Beam Visible Transmittance
-
   0.0,                !- Shade Beam-Diffuse Visible Transmittance
-
   0.0,                !- Shade Beam-Diffuse Visible Reflectance
-
   0.10,               !- Shade Material Infrared Transmittance
-
   0.90,               !- Front Side Shade Material Infrared Emissivity
-
   0.80,               !- Back Side Shade Material Infrared Emissivity
-
   0.01,               !- Width of Pleated Fabric
-
   0.025;              !- Length of Pleated Fabric
+```
+
 
 ### WindowMaterial:Blind:EquivalentLayer
 
@@ -7584,55 +6757,34 @@ This input field is used only if slat angle control is desired.  The three key 
 
 An IDF example for this object, is shown below:
 
+```idf
 WindowMaterial:Blind:EquivalentLayer,
-
   VBU8D6+45SW1,      ! - Name
-
   Horizontal,        ! - Slat Orientation
-
   0.025,             ! - Slat Width
-
   0.025,             ! - Slat Separation
-
   0.0,               ! - Slat Crown
-
   45.0,              ! - Slat Angle
-
   0.0,               ! - Front Side Slat Beam-Diffuse Solar Transmittance
-
   0.0,               ! - Back Side Slat Beam-Diffuse Solar Transmittance
-
   0.0,               ! - Front Side Slat Beam-Diffuse Solar Reflectance
-
   0.0,               ! - Back Side Slat Beam-Diffuse Solar Reflectance
-
   0.0,               ! - Front Side Slat Beam-Diffuse Visible Transmittance
-
   0.0,               ! - Back Side Slat Beam-Diffuse Visible Transmittance
-
   0.0,               ! - Front Side Slat Beam-Diffuse Visible Reflectance
-
   0.0,               ! - Back Side Slat Beam-Diffuse Visible  Reflectance
-
   0.0,               ! - Slat Diffuse-Diffuse Solar Transmittance
-
   0.80,              ! - Front Side Slat Diffuse-Diffuse Solar Reflectance
-
   0.60,              ! - Back Side Slat Diffuse-Diffuse Solar Reflectance
-
   0.0,               ! - Slat Diffuse-Diffuse Visible Transmittance
-
   0.0,               ! - Front Side Slat Diffuse-Diffuse Visible Reflectance
-
   0.0,               ! - Back Side Slat Diffuse-Diffuse Visible Reflectance
-
   0.0,               ! - Slat Infrared Transmittance
-
   0.90,              ! - Front Side Slat Infrared Emissivity
-
   0.90,              ! - Back Side Slat Infrared Emissivity
-
   FixedSlatAngle;    ! - Slat Angle Control
+```
+
 
 ### WindowMaterial:Screen:EquivalentLayer
 
@@ -7690,29 +6842,21 @@ The diameter, D (m), of individual strands or wires of the screen material. The 
 
 An IDF example for this object, is shown below:
 
+```idf
 WindowMaterial:Screen:EquivalentLayer,
-
   INSCRN,                !- Name
-
   0.763,                 !- Screen Beam-Beam Solar Transmittance
-
   0.052,                 !- Screen Beam-Diffuse Solar Transmittance
-
   0.076,                 !- Screen Beam-Diffuse Solar Reflectance
-
   0.0,                   !- Screen Beam-Beam Visible Transmittance
-
   0.0,                   !- Screen Beam-Diffuse Visible Transmittance
-
   0.0,                   !- Screen Beam-Diffuse Visible Reflectance
-
   0.0,                   !- Screen Infrared Transmittance
-
   0.84,                  !- Screen Infrared Emissivity
-
   0.025,                 !- Screen Wire Spacing
-
   0.005;                 !- Screen Wire Diameter
+```
+
 
 ### WindowMaterial:Glazing:EquivalentLayer
 
@@ -7832,63 +6976,38 @@ This value is the back side long-wave hemispherical emissivity of the glazing. T
 
 An IDF example for this object, is shown below:
 
+```idf
 WindowMaterial:Glazing:EquivalentLayer,
-
   GLZCLR,                  !- Name
-
   SpectralAverage,         !- Optical Data Type
-
   ,                        !- Window Glass Spectral Data Set Name
-
   0.83,                    !- Front Side Beam-Beam Solar Transmittance
-
   0.83,                    !- Back Side Beam-Beam Solar Transmittance
-
   0.08,                    !- Front Side Beam-Beam Solar Reflectance
-
   0.08,                    !- Back Side Beam-Beam Solar Reflectance
-
   0.0,                     !- Front Side Beam-Beam Visible Transmittance
-
   0.0,                     !- Back Side Beam-Beam Visible Transmittance
-
   0.0,                     !- Front Side Beam-Beam Visible Reflectance
-
   0.0,                     !- Back Side Beam-Beam Visible Reflectance
-
   0.0,                     !- Front Side Beam-Diffuse Solar Transmittance
-
   0.0,                     !- Back Side Beam-Diffuse Solar Transmittance
-
   0.0,                     !- Front Side Beam-Diffuse Solar Reflectance
-
   0.0,                     !- Back Side Beam-Diffuse Solar Reflectance
-
   0.0,                     !- Front Side Beam-Diffuse Visible Transmittance
-
   0.0,                     !- Back Side Beam-Diffuse Visible Transmittance
-
   0.0,                     !- Front Side Beam-Diffuse Visible Reflectance
-
   0.0,                     !- Back Side Beam-Diffuse Visible Reflectance
-
   0.76,                    !- Diffuse-Diffuse Solar Transmittance
-
   0.14,                    !- Front Side Diffuse-Diffuse Solar Reflectance
-
   0.14,                    !- Back Side Diffuse-Diffuse Solar Reflectance
-
   0.0,                     !- Diffuse-Diffuse Visible Transmittance
-
   0.0,                     !- Front Side Diffuse-Diffuse Visible Reflectance
-
   0.0,                     !- Back Side Diffuse-Diffuse Visible Reflectance
-
   0.0,                     !- Infrared Transmittance
-
   0.84,                    !- Front Side Infrared Emissivity
-
   0.84;                    !- Back Side Infrared Emissivity
+```
+
 
 ### WindowMaterial:Gap:EquivalentLayer
 
@@ -7966,35 +7085,24 @@ The specific heat ratio for gas.  The specific heat ratio of a gas is the ratio
 
 An IDF example for this object, is shown below:
 
+```idf
 WindowMaterial:Gap:EquivalentLayer,
-
   Custom CO2 Sealed 12mm,    !- Name
-
   CUSTOM,                    !- Gas Type
-
   0.0120,                    !- Thickness {m}
-
   Sealed,                    !- Gap Vent Type
-
  -5.8181E-3,                 !- Conductivity Coefficient A {W/m-K}
-
   7.4714E-5,                 !- Conductivity Coefficient B {W/m-K2}
-
   0.0,                       !- Conductivity Coefficient C {W/m-K3}
-
   8.5571E-7,                 !- Viscosity Coefficient A {kg/m-s}
-
   4.7143E-8,                 !- Viscosity Coefficient B {kg/m-s-K}
-
   0.0,                       !- Viscosity Coefficient C {kg/m-s-K2}
-
   5.76903E2,                 !- Specific Heat Coefficient A {J/kg-K}
-
   9.18088E-2,                !- Specific Heat Coefficient B {J/kg-K2}
-
   0.0,                       !- Specific Heat Coefficient C {J/kg-K3}
-
   44.01;                     !- Molecular Weight {g/mol}
+```
+
 
 ### Material:RoofVegetation
 
@@ -8084,139 +7192,103 @@ Marcel G Schaap and Martinus Th. van Genuchten, 2006, 'A modified Maulem-van Gen
 
 An IDF example:
 
-  Material:RoofVegetation,
-
+```idf
+Material:RoofVegetation,
     BaseEco,                 !- Name
-
     0.5,                     !- Height of Plants {m}
-
     5,                       !- Leaf Area Index {dimensionless}
-
     0.2,                     !- Leaf Reflectivity {dimensionless}
-
     0.95,                    !- Leaf Emissivity
-
     180,                     !- Minimum Stomatal Resistance {s/m}
-
     EcoRoofSoil,             !- Soil Layer Name
-
     MediumSmooth,            !- Roughness
-
     0.18,                    !- Thickness {m}
-
     0.4,                     !- Conductivity of Dry Soil {W/m-K}
-
     641,                     !- Density of Dry Soil {kg/m3}
-
     1100,                    !- Specific Heat of Dry Soil {J/kg-K}
-
     0.95,                    !- Thermal Absorptance
-
     0.8,                     !- Solar Absorptance
-
     0.7,                     !- Visible Absorptance
-
    0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
-
     0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer
-
     0.2,                     !- Initial Volumetric Moisture Content of the Soil Layer
-
     Advanced;                !- Moisture Diffusion Calculation Method
-
 
 
   Material:RoofVegetation,
-
     LowLAI,                  !- Name
-
     0.5,                     !- Height of Plants {m}
-
     0.5,                     !- Leaf Area Index {dimensionless}
-
     0.2,                     !- Leaf Reflectivity {dimensionless}
-
     0.95,                    !- Leaf Emissivity
-
     180,                     !- Minimum Stomatal Resistance {s/m}
-
     EcoRoofSoil,             !- Soil Layer Name
-
     MediumSmooth,            !- Roughness
-
     0.18,                    !- Thickness {m}
-
     0.4,                     !- Conductivity of Dry Soil {W/m-K}
-
     641,                     !- Density of Dry Soil {kg/m3}
-
     1100,                    !- Specific Heat of Dry Soil {J/kg-K}
-
     0.95,                    !- Thermal Absorptance
-
     0.8,                     !- Solar Absorptance
-
     0.7,                     !- Visible Absorptance
-
    0.4,          !- Saturation Volumetric Moisture Content of the Soil Layer
-
     0.01,         !- Residual Volumetric Moisture Content of the Soil Layer
-
     0.2,          !- Initial Volumetric Moisture Content of the Soil Layer
-
     Advanced;                !- Moisture Diffusion Calculation Method
+```
+
 
 And construction using the ecoroof material:
 
+```idf
 Construction,
-
-    ASHRAE 90.1-2004\_Sec 5.5-2\_Roof,  !- Name
-
+    ASHRAE 90.1-2004_Sec 5.5-2_Roof,  !- Name
     BaseEco,                 !- Outside Layer
+    ASHRAE 90.1-2004_Sec 5.5-2_Roof Insulation_1,  !- Layer \#2
+    ASHRAE 90.1-2004_Sec 5.5-2_MAT-METAL;  !- Layer \#3
+```
 
-    ASHRAE 90.1-2004\_Sec 5.5-2\_Roof Insulation\_1,  !- Layer \#2
-
-    ASHRAE 90.1-2004\_Sec 5.5-2\_MAT-METAL;  !- Layer \#3
 
 ### Ecoroof / RoofVegetation outputs
 
 The following outputs are available for the Roof Vegetation surface.
 
-Zone,Average,Green Roof Soil Temperature [C]
+* Zone,Average,Green Roof Soil Temperature [C]
 
-Zone,Average,Green Roof Vegetation Temperature [C]
+* Zone,Average,Green Roof Vegetation Temperature [C]
 
-Zone,Average,Green Roof Soil Root Moisture Ratio []
+* Zone,Average,Green Roof Soil Root Moisture Ratio []
 
-Zone,Average,Green Roof Soil Near Surface Moisture Ratio []
+* Zone,Average,Green Roof Soil Near Surface Moisture Ratio []
 
-Zone,Average,Green Roof Soil Sensible Heat Transfer Rate per Area [W/m2]
+* Zone,Average,Green Roof Soil Sensible Heat Transfer Rate per Area [W/m2]
 
-Zone,Average,Green Roof Vegetation Sensible Heat Transfer Rate per Area [W/m2]
+* Zone,Average,Green Roof Vegetation Sensible Heat Transfer Rate per Area [W/m2]
 
-Zone,Average,Green Roof Vegetation Moisture Transfer Rate [m/s]
+* Zone,Average,Green Roof Vegetation Moisture Transfer Rate [m/s]
 
-Zone,Average,Green Roof Soil Moisture Transfer Rate [m/s]
+* Zone,Average,Green Roof Soil Moisture Transfer Rate [m/s]
 
-Zone,Average,Green Roof Vegetation Latent Heat Transfer Rate per Area [W/m2]
+* Zone,Average,Green Roof Vegetation Latent Heat Transfer Rate per Area [W/m2]
 
-Zone,Average,Green Roof Soil Latent Heat Transfer Rate per Area [W/m2]
+* Zone,Average,Green Roof Soil Latent Heat Transfer Rate per Area [W/m2]
 
-Zone,Sum,Green Roof Cumulative Precipitation Depth [m]
+* Zone,Sum,Green Roof Cumulative Precipitation Depth [m]
 
-Zone,Sum,Green Roof Cumulative Irrigation Depth [m]
+* Zone,Sum,Green Roof Cumulative Irrigation Depth [m]
 
-Zone,Sum,Green Roof Cumulative Runoff Depth [m]
+* Zone,Sum,Green Roof Cumulative Runoff Depth [m]
 
-Zone,Sum,Green Roof Cumulative Evapotranspiration Depth [m]
+* Zone,Sum,Green Roof Cumulative Evapotranspiration Depth [m]
 
-Zone,Sum,Green Roof Current Precipitation Depth [m]
+* Zone,Sum,Green Roof Current Precipitation Depth [m]
 
-Zone,Sum,Green Roof Current Irrigation Depth [m]
+* Zone,Sum,Green Roof Current Irrigation Depth [m]
 
-Zone,Sum,Green Roof Current Runoff Depth [m]
+* Zone,Sum,Green Roof Current Runoff Depth [m]
 
-Zone,Sum,Green Roof Current Evapotranspiration Depth [m]
+* Zone,Sum,Green Roof Current Evapotranspiration Depth [m]
+
 
 #### Green Roof Soil Temperature [C]
 
@@ -8308,55 +7380,27 @@ The wavelength values must be in ascending order. The transmittance and reflecta
 
 An IDF example:
 
+```idf
 MaterialProperty:GlazingSpectralData,
-
       TestSpectralDataSet,
-
        ! { from WINDOW 4 library }
-
-       ! { actual 9.91mm clear laminate: 15\_mil PVB, ID:37966/50032-39-9 } 10.38
-
+       ! { actual 9.91mm clear laminate: 15_mil PVB, ID:37966/50032-39-9 } 10.38
        ! { conductivity PVB adjusted, W/M/K  } 0.798
-
        ! { thermal IR transmittance, assumed } tir=0.00
-
        ! { thermal IR hemispherical emittance, assumed } emis= 0.84 0.84
 
 
-
        ! WL   T     Rfront Rback
-
        .300, 0.000, 0.045, 0.045,
-
        .310, 0.000, 0.044, 0.044,
-
        .320, 0.000, 0.044, 0.044,
-
        .330, 0.000, 0.042, 0.042,
-
        .340, 0.000, 0.041, 0.041,
-
        .350, 0.000, 0.040, 0.040,
-
-&lt;snip&gt;
-
+      <snip>
       2.450, 0.200, 0.040, 0.040,
-
       2.500, 0.214, 0.039, 0.039;
-
-
-
-
-
-
-
-------------------------------------------------------------------------
-
-[[1]](#_ftnref1) If Optical Data Type = Spectral, the program multiplies the solar and visible transmittance *at each wavelength* by the dirt correction factor.
-
-[[2]](#_ftnref2) EnergyPlus does not model the “partially translucent” case in which beam solar radiation incident on the glass is transmitted as a combination of beam and diffuse.
-
-
+```
 
 ### Construction
 
@@ -8372,13 +7416,9 @@ Window constructions are similarly built up from items in the Window Materials s
 
 Figure 25. Illustration for material ordering in windows.
 
-
-
 However, for a between-glass shading device the gaps on either side of the shading layer must be entered and they must have the same gas type. In addition, the gap widths with and without the between-glass shading layer must be consistent (see Figure 26).
 
 A maximum of four glass layers and one shading layer is allowed. A gas layer must always separate adjacent glass layers in a multi-pane glazing without a between-glass shading layer.
-
-
 
 ![](InputOutputReference/media/image052.svg)
 
@@ -8466,13 +7506,12 @@ It is better to specify the “key” or Surface Name in this output.
 
 So for example to output the temperature of the 10<sup>th</sup> cell in a surface, eg “East Wall” would require the following output variable.
 
+```idf
 Output:Variable,
-
     East Wall,               !- Key Value
-
     HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-
     Hourly;                  !- Reporting Frequency
+```
 
 By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
 
@@ -8484,35 +7523,33 @@ The next fields are optional and the number of them showing up in a particular C
 
 IDF Example (floor construction):
 
+```idf
 Construction, FLOOR38,  ! Material layer names follow:
-
       E5 - ACOUSTIC TILE,
-
       E4 - CEILING AIRSPACE,
-
       C12 - 2 IN HW CONCRETE;
+```
 
 IDF Example (window construction, no shade):
 
+```idf
 Construction, DOUBLE PANE WINDOW,  !- Material layer names follow:
-
       GLASS - CLEAR SHEET 1 / 8 IN,
-
       WinAirB1 - AIRSPACE RESISTANCE,
-
       GLASS - CLEAR SHEET 1 / 8 IN;
+```
+
 
 IDF Example (window construction, with interior shade):
 
+```idf
 Construction, DOUBLE PANE WITH ROLL SHADE,  !- Material layer names follow:
-
       GLASS - CLEAR SHEET 1 / 8 IN,
-
       WinAirB1 - AIRSPACE RESISTANCE,
-
       GLASS - CLEAR SHEET 1 / 8 IN,
-
       ROLL SHADE - LIGHT
+```
+
 
 ### Site:GroundTemperature:FCfactorMethod
 
@@ -8524,7 +7561,9 @@ Each numeric field is the monthly ground temperature (degrees Celsius) used for 
 
 And, the IDF example:
 
+```idf
 Site:GroundTemperature:FCfactorMethod,  9.5,3.5,-0.7,-1.7,-0.6,3.6,9.3,14,18.2,22.7,21.2,16.8;
+```
 
 ### Constructions - Modeling Underground Walls and Ground Floors Defined with C and F Factors for Building Energy Code Compliance
 
@@ -8556,45 +7595,30 @@ This field describes the height of the underground wall, i.e. the depth to the g
 
 IDF Example:
 
+```idf
 Construction:CfactorUndergroundWall,
-
     CfactorUGWall,
-
     0.436,           ! C-factor (W/m2K), does not include soil or air films
-
     4.57;            ! Height (m)
 
 
-
   BuildingSurface:Detailed,
-
     Zn001:Wall001,           !- Name
-
     Wall,                    !- Surface Type
-
     CfactorUGWall,           !- Construction Name
-
     ZONE ONE,                !- Zone Name
-
     GroundFCfactorMethod,    !- Outside Boundary Condition
-
     ,                        !- Outside Boundary Condition Object
-
     NoSun,                   !- Sun Exposure
-
     NoWind,                  !- Wind Exposure
-
     0.0,                     !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     0.0,0.0,4.572,           !- X,Y,Z ==&gt; Vertex 1
-
     0.0,0.0,0.0,             !- X,Y,Z ==&gt; Vertex 2
-
     15.24,0.0,0.0,           !- X,Y,Z ==&gt; Vertex 3
-
     15.24,0.0,4.572;         !- X,Y,Z ==&gt; Vertex 4
+```
+
 
 ### Construction:FfactorGroundFloor
 
@@ -8620,47 +7644,31 @@ This field describes the exposed (direct contact with ambient air) perimeter (in
 
 IDF Example:
 
+```idf
 Construction:FfactorGroundFloor,
-
     slabconst,
-
     0.12,     !F-factor in W/m-K
-
     232.26,   !Area in m2
-
     61.0;     !Exposed perimeter in m
 
 
-
   BuildingSurface:Detailed,
-
     Zn001:Flr001,            !- Name
-
     Floor,                   !- Surface Type
-
     slabconst,               !- Construction Name, FLOOR
-
     ZONE ONE,                !- Zone Name
-
     GroundFCfactorMethod,    !- Outside Boundary Condition, Surface
-
     ,                        !- Outside Boundary Condition Object, Zn001:Flr001
-
     NoSun,                   !- Sun Exposure
-
     NoWind,                  !- Wind Exposure
-
     0,                       !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     15.24,0.0,0.0,           !- X,Y,Z ==&gt; Vertex 1
-
     0.0,0.0,0.0,             !- X,Y,Z ==&gt; Vertex 2
-
     0.0,15.240,0.0,          !- X,Y,Z ==&gt; Vertex 3
-
     15.24,15.24,0.0;         !- X,Y,Z ==&gt; Vertex 4
+```
+
 
 ### Construction:InternalSource
 
@@ -8764,13 +7772,13 @@ It is better to specify the “key” or Surface Name in this output.
 
 So for example to output the temperature of the 10<sup>th</sup> cell in a surface, eg “East Wall” would require the following output variable.
 
+```idf
 Output:Variable,
-
     East Wall,               !- Key Value
-
     HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-
     Hourly;                  !- Reporting Frequency
+```
+
 
 By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
 
@@ -8860,73 +7868,49 @@ These layers include gaps, which do not need to have matrix data specified.
 
 An IDF example of complex fenestration with single layer:
 
+```idf
 Construction:ComplexFenestrationState,       !- single layer example
-
-  CFS\_Glz\_1,                 !- name
-
+  CFS_Glz_1,                 !- name
   LBNLWindow,                !- basis type
-
   None,                      !- basis symmetry type
+  ThermParam_1,              !- window thermal model
+  CFS_Glz_1_Basis,           !- basis matrix name
+  CFS_Glz_1_TfSol,           !- Tfsol
+  CFS_Glz_1_RbSol,           !- Rbsol
+  CFS_Glz_1_Tfvis,           !- Tfvis
+  CFS_Glz_1_Tbvis,           !- Tbvis
+  Glass_102_Layer,           !- layer 1 name
+  CFS_Glz_1_Layer_1_fAbs,    !- fAbs
+  CFS_Glz_1_Layer_1_bAbs;    !- bAbs
+```
 
-  ThermParam\_1,              !- window thermal model
-
-  CFS\_Glz\_1\_Basis,           !- basis matrix name
-
-  CFS\_Glz\_1\_TfSol,           !- Tfsol
-
-  CFS\_Glz\_1\_RbSol,           !- Rbsol
-
-  CFS\_Glz\_1\_Tfvis,           !- Tfvis
-
-  CFS\_Glz\_1\_Tbvis,           !- Tbvis
-
-  Glass\_102\_Layer,           !- layer 1 name
-
-  CFS\_Glz\_1\_Layer\_1\_fAbs,    !- fAbs
-
-  CFS\_Glz\_1\_Layer\_1\_bAbs;    !- bAbs
 
 
 
 An complex fenestration IDF example with double layer (first layer is shading device):
 
+```idf
 Construction:ComplexFenestrationState,       !- double layer example
-
-  CFS\_Glz\_59,                    !- name
-
+  CFS_Glz_59,                    !- name
   LBNLWindow,                    !- basis type
-
   None,                          !- basis symmetry type
-
-  ThermParam\_59,                 !- window thermal model
-
-  CFS\_Glz\_59\_Basis,              !- basis matrix name
-
-  CFS\_Glz\_59\_TfSol,              !- Tfsol
-
-  CFS\_Glz\_59\_RbSol,              !- Rbsol
-
-  CFS\_Glz\_59\_Tfvis,              !- Tfvis
-
-  CFS\_Glz\_59\_Tbvis,              !- Tbvis
-
-  Shade\_30001\_Layer,             !- layer 1 name (shading device)
-
-  CFS\_Glz\_59\_Layer\_1\_fAbs,       !- fAbs
-
-  CFS\_Glz\_59\_Layer\_1\_bAbs,       !- bAbs
-
-  Gap\_1\_Layer,                   !- layer 1 name
-
+  ThermParam_59,                 !- window thermal model
+  CFS_Glz_59_Basis,              !- basis matrix name
+  CFS_Glz_59_TfSol,              !- Tfsol
+  CFS_Glz_59_RbSol,              !- Rbsol
+  CFS_Glz_59_Tfvis,              !- Tfvis
+  CFS_Glz_59_Tbvis,              !- Tbvis
+  Shade_30001_Layer,             !- layer 1 name (shading device)
+  CFS_Glz_59_Layer_1_fAbs,       !- fAbs
+  CFS_Glz_59_Layer_1_bAbs,       !- bAbs
+  Gap_1_Layer,                   !- layer 1 name
   ,                 !- absorptance matrices for gaps should be empty for now
-
   ,                              !- it is for future use
+  Glass_3110_Layer,              !- layer 2 name
+  CFS_Glz_59_Layer_3110_fAbs,    !- fAbs
+  CFS_Glz_59_Layer_3110_bAbs;    !- bAbs
+```
 
-  Glass\_3110\_Layer,              !- layer 2 name
-
-  CFS\_Glz\_59\_Layer\_3110\_fAbs,    !- fAbs
-
-  CFS\_Glz\_59\_Layer\_3110\_bAbs;    !- bAbs
 
 ### WindowThermalModel:Params
 
@@ -8994,57 +7978,47 @@ The pressure (Pa) of the gap at the time of fabrication of the sealed glazing sy
 
 An IDF example for WindowThermalModel:Params (without deflection):
 
+```idf
 WindowThermalModel:Params,
-
-  ThermParam\_59,                   !- name
-
+  ThermParam_59,                   !- name
   ISO15099,                        !- standard
-
   ISO15099,                        !- thermal model standard
-
   1.00,                            !- SD scalar
-
   NoDeflection;                    !- deflection model
+```
+
 
 
 
 An IDF example for thermal paramters (with deflection):
 
+```idf
 WindowThermalModel:Params,
-
-  ThermParam\_59,                   !- name
-
+  ThermParam_59,                   !- name
   ISO15099,                        !- standard
-
   ISO15099,                        !- thermal model standard
-
   1.00,                            !- SD scalar
-
   TemperatureAndPressureInput,     !- deflection model
-
   ,                                !- vacuum pressure limit
-
   21.00,                           !- temperature at time of fabrication
-
   10000.00;                        !- pressure at time of fabrication
+```
+
 
 
 
 An IDF example for WindowThermalModel:Params for modeling vacuum glazing
 
+```idf
 WindowThermalModel:Params,
-
-ThermParam\_1006,                                    !- name
-
+ThermParam_1006,                                    !- name
 ISO15099,                                           !- standard
-
 ISO15099,                                           !- thermal model
-
 1.0000,                                             !- SDScalar
-
 NoDeflection,                                       !- deflection model
-
 13.238;                                             !- vacuum pressure limit
+```
+
 
 ### Matix:TwoDimension
 
@@ -9082,31 +8056,22 @@ This is the value of the matrix at the first row and the second column.
 
 An IDF example of matrix for defining BSDF basis:
 
+```idf
 Matrix:TwoDimension,       !- matrix for basis definition
-
-  CFS\_Glz\_1\_Basis,         !- basis matrix name
-
+  CFS_Glz_1_Basis,         !- basis matrix name
   9,                       !- number of rows
-
   2,                       !- number of colums
-
   0.00000, 1.00000,
-
   10.00000, 8.00000,
-
   20.00000, 16.00000,
-
   30.00000, 20.00000,
-
   40.00000, 24.00000,
-
   50.00000, 24.00000,
-
   60.00000, 24.00000,
-
   70.00000, 16.00000,
-
   82.50000, 12.00000;
+```
+
 
 ### Construction:WindowEquivalentLayer
 
@@ -9138,31 +8103,22 @@ The next fields are optional and the number of them showing up in a particular e
 
 An IDF example for this object, is shown below:
 
+```idf
 Construction:WindowEquivalentLayer,
-
   Six Solid Layers Window,   !- Name
-
   INSCRN,                    !- Outside Layer
-
   Air GAP Outdoor 12.7mm,    !- Layer 2
-
   GLZGRY,                    !- Layer 3
-
   Argon GAP Sealed 12.7mm,   !- Layer 4
-
   FEP,                       !- Layer 5
-
   Xenon GAP Sealed 12.7mm,   !- Layer 6
-
   LOF1436,                   !- Layer 7
-
   Krypton GAP Sealed 12.7mm, !- Layer 8
-
   GLZCLR,                    !- Layer 9
-
   Air GAP Indoor 12.7mm,     !- Layer 10
-
   ShadeTrns;                 !- Layer 11
+```
+
 
 ### Construction:WindowDataFile
 
@@ -9178,54 +8134,41 @@ This is the file name of the Window data file that contains the Window reference
 
 If this field is left blank, the file name is defaulted to Window5DataFile.dat.
 
-The IDD of the object:
-
 Input Example
 
+```idf
 Construction:WindowDataFile,
-
-  **DoubleClear**;          !- Name of a Window on the Window Data File
+  DoubleClear;          !- Name of a Window on the Window Data File
+```
 
 **  ! Note – Window5DataFile.dat is presumed to be in the “run” folder where EnergyPlus.exe is**
 
-
-
+```idf
 FenestrationSurface:Detailed,
-
   Zn001:Wall001:Win001, !- Name
-
   Window,               !- Class
-
-  **DoubleClear**,          !- Construction Name
-
+  DoubleClear,          !- Construction Name
   Zn001:Wall001,,       !- Base Surface Name, and Target (if applicable)
-
   0.5,                  !- View Factor to Ground
-
   ,                     !- Window Shading Control name
-
   ,                     !- Frame/Divider name
-
   1.0,                  !- Multiplier
-
   4,                    !- Number of vertices
-
   0.548, 0.0, 2.5000,   !- X,Y,Z of Vertices
-
   0.548, 0.0, 0.5000,
-
   5.548, 0.0, 0.5000,
-
   5.548, 0.0, 2.5000;
+```
+
 
 
 
 An example showing use of specific data file name and complete path location follows:
 
+```idf
 Construction:WindowDataFile,
-
-  **DoubleClear,**            !- Name of a Window on the Window Data File
-
+  DoubleClear,            !- Name of a Window on the Window Data File
+```
 **  C:\\EnergyPlusData\\DataSets\\MyWindow.dat;**
 
 ### Construction Element Outputs
