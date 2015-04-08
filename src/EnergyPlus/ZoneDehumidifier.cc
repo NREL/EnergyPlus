@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -92,7 +92,7 @@ namespace ZoneDehumidifier {
 	int NumDehumidifiers( 0 ); // Number of zone dehumidifier objects in the input file
 
 	bool GetInputFlag( true ); // Set to FALSE after first time input is "gotten"
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 	// Driver/Manager Routines
@@ -110,7 +110,7 @@ namespace ZoneDehumidifier {
 	// Get either inlet or outlet node number
 
 	// Object Data
-	FArray1D< ZoneDehumidifierData > ZoneDehumid;
+	Array1D< ZoneDehumidifierData > ZoneDehumid;
 
 	// Functions
 
@@ -256,12 +256,12 @@ namespace ZoneDehumidifier {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max)
 		Real64 CurveVal; // Output from curve object (water removal or energy factor curves)
 
@@ -531,7 +531,7 @@ namespace ZoneDehumidifier {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
 		//  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: MySizeFlag  ! Used for sizing zone dehumidifier inputs one time
 		static bool MyOneTimeFlag( true ); // initialization flag
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items

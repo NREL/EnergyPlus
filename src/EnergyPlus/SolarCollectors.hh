@@ -2,7 +2,7 @@
 #define SolarCollectors_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -34,16 +34,16 @@ namespace SolarCollectors {
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumOfParameters;
 	extern int NumOfCollectors;
 
-	extern FArray1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
-	extern FArray1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
-	extern FArray1D< Real64 > RefSysSkyDiff; // reflectance of cover system for sky diffuse solar rad.
-	extern FArray1D< Real64 > RefSysGrnDiff; // reflectance of cover system for ground diffuse solar rad.
+	extern Array1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
+	extern Array1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
+	extern Array1D< Real64 > RefSysSkyDiff; // reflectance of cover system for sky diffuse solar rad.
+	extern Array1D< Real64 > RefSysGrnDiff; // reflectance of cover system for ground diffuse solar rad.
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -71,9 +71,9 @@ namespace SolarCollectors {
 		Real64 AspectRatio; // collector aspect ratio (dimensionless)
 		int NumOfCovers; // number of transparent collector covers
 		Real64 CoverSpacing; // collector cover spacings (m)
-		FArray1D< Real64 > RefractiveIndex; // refractive idex of inner and outer covers (dimensionless)
-		FArray1D< Real64 > ExtCoefTimesThickness; // extinction coefficient times thickness of covers (dimensionless)
-		FArray1D< Real64 > EmissOfCover; // emissivity of inner and outer covers (dimensionless)
+		Array1D< Real64 > RefractiveIndex; // refractive idex of inner and outer covers (dimensionless)
+		Array1D< Real64 > ExtCoefTimesThickness; // extinction coefficient times thickness of covers (dimensionless)
+		Array1D< Real64 > EmissOfCover; // emissivity of inner and outer covers (dimensionless)
 		Real64 EmissOfAbsPlate; // emissivity Of absorber plate (dimensionless)
 		Real64 AbsorOfAbsPlate; // absorptance of the absorber plate (dimensionless)
 
@@ -120,9 +120,9 @@ namespace SolarCollectors {
 			Real64 const AspectRatio, // collector aspect ratio (dimensionless)
 			int const NumOfCovers, // number of transparent collector covers
 			Real64 const CoverSpacing, // collector cover spacings (m)
-			FArray1< Real64 > const & RefractiveIndex, // refractive idex of inner and outer covers (dimensionless)
-			FArray1< Real64 > const & ExtCoefTimesThickness, // extinction coefficient times thickness of covers (dimensionless)
-			FArray1< Real64 > const & EmissOfCover, // emissivity of inner and outer covers (dimensionless)
+			Array1< Real64 > const & RefractiveIndex, // refractive idex of inner and outer covers (dimensionless)
+			Array1< Real64 > const & ExtCoefTimesThickness, // extinction coefficient times thickness of covers (dimensionless)
+			Array1< Real64 > const & EmissOfCover, // emissivity of inner and outer covers (dimensionless)
 			Real64 const EmissOfAbsPlate, // emissivity Of absorber plate (dimensionless)
 			Real64 const AbsorOfAbsPlate // absorptance of the absorber plate (dimensionless)
 		) :
@@ -210,9 +210,9 @@ namespace SolarCollectors {
 		Real64 TauAlphaSkyDiffuse; // Transmittance-absorptance product sky diffuse radiation
 		Real64 TauAlphaGndDiffuse; // Transmittance-absorptance product grn diffuse radiation
 		Real64 TauAlphaBeam; // Transmittance-absorptance product beam radiation
-		FArray1D< Real64 > CoversAbsSkyDiffuse; // sky diffuse solar absorptance of cover
-		FArray1D< Real64 > CoversAbsGndDiffuse; // ground diffuse solar absorptance of cover
-		FArray1D< Real64 > CoverAbs; // solar rad weighted covers absorptance
+		Array1D< Real64 > CoversAbsSkyDiffuse; // sky diffuse solar absorptance of cover
+		Array1D< Real64 > CoversAbsGndDiffuse; // ground diffuse solar absorptance of cover
+		Array1D< Real64 > CoverAbs; // solar rad weighted covers absorptance
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		// Saved in order to identify the beginning of a new system time
 		Real64 UbLoss; // Over all bottom loss coefficient [W/m2C]
@@ -363,9 +363,9 @@ namespace SolarCollectors {
 			Real64 const TauAlphaSkyDiffuse, // Transmittance-absorptance product sky diffuse radiation
 			Real64 const TauAlphaGndDiffuse, // Transmittance-absorptance product grn diffuse radiation
 			Real64 const TauAlphaBeam, // Transmittance-absorptance product beam radiation
-			FArray1< Real64 > const & CoversAbsSkyDiffuse, // sky diffuse solar absorptance of cover
-			FArray1< Real64 > const & CoversAbsGndDiffuse, // ground diffuse solar absorptance of cover
-			FArray1< Real64 > const & CoverAbs, // solar rad weighted covers absorptance
+			Array1< Real64 > const & CoversAbsSkyDiffuse, // sky diffuse solar absorptance of cover
+			Array1< Real64 > const & CoversAbsGndDiffuse, // ground diffuse solar absorptance of cover
+			Array1< Real64 > const & CoverAbs, // solar rad weighted covers absorptance
 			Real64 const TimeElapsed, // Fraction of the current hour that has elapsed (h)
 			Real64 const UbLoss, // Over all bottom loss coefficient [W/m2C]
 			Real64 const UsLoss, // Over all side loss coefficient [W/m2C]
@@ -469,8 +469,8 @@ namespace SolarCollectors {
 	};
 
 	// Object Data
-	extern FArray1D< ParametersData > Parameters;
-	extern FArray1D< CollectorData > Collector;
+	extern Array1D< ParametersData > Parameters;
+	extern Array1D< CollectorData > Collector;
 
 	// Functions
 

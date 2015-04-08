@@ -6,13 +6,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 namespace ObjexxFCL {
 
@@ -70,18 +69,6 @@ selected_real_kind( int const p, int const r ) // Fortran 2008 variant with radi
 
 int
 selected_char_kind( std::string const & s )
-{
-	if ( s == "DEFAULT" ) {
-		return 1;
-	} else if ( s == "ASCII" ) {
-		return 1;
-	} else {
-		return -1;
-	}
-}
-
-int
-selected_char_kind( Fstring const & s )
 {
 	if ( s == "DEFAULT" ) {
 		return 1;

@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,6 @@ namespace ObjexxFCL {
 template< typename > class Sticky;
 class byte;
 class ubyte;
-class Fstring;
 
 // Types
 typedef  byte  sbyte;
@@ -54,7 +53,6 @@ typedef  Sticky< char >                Sticky_char;
 typedef  Sticky< unsigned char >       Sticky_uchar;
 typedef  Sticky< signed char >         Sticky_schar;
 typedef  Sticky< std::string >         Sticky_string;
-typedef  Sticky< Fstring >             Sticky_Fstring;
 
 // Const Types
 typedef  Sticky< bool const >                Sticky_bool_const;
@@ -83,7 +81,6 @@ typedef  Sticky< char const >                Sticky_char_const;
 typedef  Sticky< unsigned char const >       Sticky_uchar_const;
 typedef  Sticky< signed char const >         Sticky_schar_const;
 typedef  Sticky< std::string const >         Sticky_string_const;
-typedef  Sticky< Fstring const >             Sticky_Fstring_const;
 
 } // ObjexxFCL
 

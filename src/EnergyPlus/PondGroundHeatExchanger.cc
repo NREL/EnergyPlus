@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -112,13 +112,13 @@ namespace PondGroundHeatExchanger {
 	int WaterIndex( 0 ); // Fluid index for pond water
 	bool NoDeepGroundTempObjWarning( true ); // This will cause a warning to be issued if no "deep" ground
 	// temperature object was input.
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PlantPondGroundHeatExchangers
 
 	// Object Data
-	FArray1D< PondGroundHeatExchangerData > PondGHE;
-	FArray1D< PondGroundHeatExchangerReport > PondGHEReport;
+	Array1D< PondGroundHeatExchangerData > PondGHE;
+	Array1D< PondGroundHeatExchangerReport > PondGHEReport;
 
 	//==============================================================================
 
@@ -495,7 +495,7 @@ namespace PondGroundHeatExchanger {
 		Real64 DesignFlow; // Hypothetical design flow rate
 		static bool OneTimeFlag( true ); // flag for one time intializations
 		int PondNum; // loop counter
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyFlag;
 		static bool MyOneTimeFlag( true );
 		int LoopNum;
 		int LoopSideNum;

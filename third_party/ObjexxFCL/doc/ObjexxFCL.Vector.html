@@ -2,10 +2,10 @@
 <html lang="en-US">
 <head>
 	<meta charset="UTF-8">
-	<title>ObjexxFCL Users Guide: FArray</title>
+	<title>ObjexxFCL Users Guide: Array</title>
 	<meta name="description" content="Objexx Fortran Compatibility Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright 2000-2014 Objexx Engineering, Inc. All rights reserved.">
+	<meta name="copyright" content="Copyright 2000-2015 Objexx Engineering, Inc. All rights reserved.">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
@@ -56,9 +56,9 @@
 			<ul class="body">
 				<li>Fast, loop-free operations.</li>
 				<li>Minimal space overhead.</li>
-				<li>Interoperation with <span class="source">std::array</span>, <span class="source">std::vector</span>, <span class="source">std::initializer_list</span>, and <span class="source">FArray1</span>.</li>
+				<li>Interoperation with <span class="source">std::array</span>, <span class="source">std::vector</span>, <span class="source">std::initializer_list</span>, and <span class="source">Array1</span>.</li>
 				<li>Useful functions such as distance, normalization, dot and cross products.</li>
-            </ul>
+			</ul>
 			<p class="body">Vector2 and Vector3 are class templates. Shorthand (typedef) names are provided for the common value types in their forward declaration headers so, for example, we use <span class="source">Vector2_double</span> instead of <span class="source">Vector2&lt; double &gt;</span> on this page.</p>
 
 			<h2 class="h3">Named Elements</h2>
@@ -118,7 +118,7 @@ Vector3_double u( { 4.0, 5.0, 6.0 } );
 v += u;</pre></td>
 			</tr>
 			</table>
-			<p class="body">Assignment of <span class="source">std::array</span>, <span class="source">std::vector</span>, <span class="source">std::initializer_list</span>, brace-enclosed composite initializers, and FArrays are also supported.</p>
+			<p class="body">Assignment of <span class="source">std::array</span>, <span class="source">std::vector</span>, <span class="source">std::initializer_list</span>, brace-enclosed composite initializers, and Arrays are also supported.</p>
 			<p class="body">Uniform whole-array assignment of any scalar value that is assignment-compatible with the Vector's value type with the operators {=, +=, -=, *=, /=}:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 			<tr>
@@ -198,7 +198,7 @@ std::cin &gt;&gt; v // Input vector from cin</pre></td>
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2014 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2015 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>

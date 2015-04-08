@@ -22,7 +22,7 @@ using namespace ObjexxFCL;
 TEST( HeatBalanceManagerTest, ProcessZoneData )
 {
 	ShowMessage( "Begin Test: HeatBalanceManagerTest, ProcessZoneData" );
-	
+
 // Test input processing of Zone object
 //	Zone,
 //		ZONE ONE, !- Name
@@ -106,7 +106,7 @@ TEST( HeatBalanceManagerTest, ProcessZoneData )
 	rNumericArgs.deallocate();
 
 }
-TEST( HeatBalanceManagerTest, GetWindowConstructData ) 
+TEST( HeatBalanceManagerTest, GetWindowConstructData )
 {
 	ShowMessage( "Begin Test: HeatBalanceManagerTest, GetWindowConstructData" );
 
@@ -160,7 +160,7 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData )
 	ObjectDef( 1 ).AlphFieldChks.allocate( NumAlphas );
 	ObjectDef( 1 ).AlphFieldChks = " ";
 	ObjectDef( 1 ).NumRangeChks.allocate( NumNumbers );
-	
+
 	NumIDFRecords = 1;
 	IDFRecords.allocate( NumIDFRecords );
 	IDFRecords( 1 ).Name = ListOfObjects( 1 );
@@ -212,7 +212,7 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData )
 	EXPECT_FALSE( ErrorsFound );
 
 	// Clear shared arrays that were allocated in GetConstructData
-	Construct.deallocate( );
+	Construct.deallocate();
 
 	// call to get invalid window material type
 	Material( 2 ).Group = 16; // BlindEquivalentLayer, this layer is invalid in plain windows
@@ -221,8 +221,8 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData )
 	EXPECT_TRUE( ErrorsFound );
 
 	// dealocate variables
-	Construct.deallocate( );
-	Material.deallocate( );
+	Construct.deallocate();
+	Material.deallocate();
 	iListOfObjects.deallocate();
 	ObjectStartRecord.deallocate();
 	ObjectGotCount.deallocate();

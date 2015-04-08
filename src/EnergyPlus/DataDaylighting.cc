@@ -50,7 +50,7 @@ namespace DataDaylighting {
 	int const NoDaylighting( 0 );
 	int const DetailedDaylighting( 1 );
 	int const DElightDaylighting( 2 );
-	FArray1D_string const DaylightTypes( 2, { "Daylighting:Controls", "Daylighting:DELight:Controls" } );
+	Array1D_string const DaylightTypes( 2, { "Daylighting:Controls", "Daylighting:DELight:Controls" } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -62,15 +62,15 @@ namespace DataDaylighting {
 	int TotIllumMaps( 0 );
 	bool mapResultsToReport( false ); // used when only partial hour has "sun up"
 	bool mapResultsReported( false ); // when no map results are ever reported this will still be false
-	std::string MapColSep; // Character for separating map columns (tab, space, comma)
+	char MapColSep; // Character for separating map columns (tab, space, comma)
 
 	bool DFSReportSizingDays( false );
 	bool DFSReportAllShadowCalculationDays( false );
 
 	// Object Data
-	FArray1D< ZoneDaylightCalc > ZoneDaylight;
-	FArray1D< IllumMapData > IllumMap;
-	FArray1D< MapCalcData > IllumMapCalc;
+	Array1D< ZoneDaylightCalc > ZoneDaylight;
+	Array1D< IllumMapData > IllumMap;
+	Array1D< MapCalcData > IllumMapCalc;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

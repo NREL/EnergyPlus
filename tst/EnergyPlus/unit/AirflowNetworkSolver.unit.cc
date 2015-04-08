@@ -9,7 +9,7 @@
 //#include <string>
 
 // ObjexxFCL Headers
-//#include <ObjexxFCL/FArray.functions.hh>
+//#include <ObjexxFCL/Array.functions.hh>
 //#include <ObjexxFCL/Fmath.hh>
 //#include <ObjexxFCL/gio.hh>
 
@@ -35,8 +35,8 @@ TEST( AirflowNetworkSolverTest, HorizontalOpening )
 	int n;
 	int m;
 	int NF;
-	FArray1D< Real64 > F;
-	FArray1D< Real64 > DF;
+	Array1D< Real64 > F;
+	Array1D< Real64 > DF;
 
 	n = 1;
 	m = 2;

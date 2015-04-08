@@ -2,7 +2,7 @@
 #define HeatPumpWaterToWaterHEATING_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -40,7 +40,7 @@ namespace HeatPumpWaterToWaterHEATING {
 	extern Real64 SourceSideWaterInletTemp; // Source Side outlet temperature °C
 	extern Real64 LoadSideWaterOutletTemp; // Source Side outlet temperature °C
 	extern Real64 LoadSideWaterInletTemp; // Source Side outlet temperature °C
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -282,8 +282,8 @@ namespace HeatPumpWaterToWaterHEATING {
 	};
 
 	// Object Data
-	extern FArray1D< GshpSpecs > GSHP; // dimension to number of machines
-	extern FArray1D< ReportVars > GSHPReport;
+	extern Array1D< GshpSpecs > GSHP; // dimension to number of machines
+	extern Array1D< ReportVars > GSHPReport;
 
 	// Functions
 

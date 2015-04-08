@@ -2,7 +2,7 @@
 #define HeatPumpWaterToWaterSimple_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -350,8 +350,8 @@ namespace HeatPumpWaterToWaterSimple {
 	};
 
 	// Object Data
-	extern FArray1D< GshpSpecs > GSHP;
-	extern FArray1D< ReportVars > GSHPReport;
+	extern Array1D< GshpSpecs > GSHP;
+	extern Array1D< ReportVars > GSHPReport;
 
 	// Functions
 

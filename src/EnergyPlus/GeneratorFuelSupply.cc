@@ -3,8 +3,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -130,8 +130,8 @@ namespace GeneratorFuelSupply {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 25 ); // character string data
-		FArray1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
+		Array1D_string AlphArray( 25 ); // character string data
+		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name

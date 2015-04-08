@@ -3,6 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -49,38 +50,38 @@ namespace TarcogShading {
 
 	void
 	shading(
-		FArray1A< Real64 > const theta,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > hgas,
-		FArray1A< Real64 > hcgas,
-		FArray1A< Real64 > hrgas,
-		FArray2A< Real64 > const frct,
-		FArray2A_int const iprop,
-		FArray1A< Real64 > const pressure,
-		FArray1A_int const nmix,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const theta,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > hgas,
+		Array1A< Real64 > hcgas,
+		Array1A< Real64 > hrgas,
+		Array2A< Real64 > const frct,
+		Array2A_int const iprop,
+		Array1A< Real64 > const pressure,
+		Array1A_int const nmix,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		int const nlayer,
 		Real64 const width,
 		Real64 const height,
 		Real64 const angle,
 		Real64 const Tout,
 		Real64 const Tin,
-		FArray1A< Real64 > const Atop,
-		FArray1A< Real64 > const Abot,
-		FArray1A< Real64 > const Al,
-		FArray1A< Real64 > const Ar,
-		FArray1A< Real64 > const Ah,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const tvent,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > Tgaps,
-		FArray1A< Real64 > qv,
+		Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const tvent,
+		Array1A_int const LayerType,
+		Array1A< Real64 > Tgaps,
+		Array1A< Real64 > qv,
 		int & nperr,
 		std::string & ErrorMessage,
-		FArray1A< Real64 > vfreevent
+		Array1A< Real64 > vfreevent
 	)
 	{
 		//**************************************************************************************************************
@@ -125,14 +126,14 @@ namespace TarcogShading {
 		hgas.dim( maxlay1 );
 		hcgas.dim( maxlay1 );
 		hrgas.dim( maxlay1 );
-		frct.dim( maxlay1, maxgas );
-		iprop.dim( maxlay1, maxgas );
+		frct.dim( maxgas, maxlay1 );
+		iprop.dim( maxgas, maxlay1 );
 		pressure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		Atop.dim( maxlay );
 		Abot.dim( maxlay );
 		Al.dim( maxlay );
@@ -163,8 +164,8 @@ namespace TarcogShading {
 		Real64 hc;
 		Real64 hc1;
 		Real64 hc2;
-		FArray1D< Real64 > frct1( maxgas );
-		FArray1D< Real64 > frct2( maxgas );
+		Array1D< Real64 > frct1( maxgas );
+		Array1D< Real64 > frct2( maxgas );
 		Real64 speed;
 		Real64 Tav;
 		Real64 Tgap;
@@ -185,8 +186,8 @@ namespace TarcogShading {
 		int k;
 		int nmix1;
 		int nmix2;
-		FArray1D_int iprop1( maxgas );
-		FArray1D_int iprop2( maxgas );
+		Array1D_int iprop1( maxgas );
+		Array1D_int iprop2( maxgas );
 
 		// init vectors:
 		qv = 0.0;
@@ -212,10 +213,10 @@ namespace TarcogShading {
 				press1 = pressure( i );
 				press2 = pressure( i + 1 );
 				for ( j = 1; j <= maxgas; ++j ) {
-					iprop1( j ) = iprop( i, j );
-					iprop2( j ) = iprop( i + 1, j );
-					frct1( j ) = frct( i, j );
-					frct2( j ) = frct( i + 1, j );
+					iprop1( j ) = iprop( j, i );
+					iprop2( j ) = iprop( j, i + 1 );
+					frct1( j ) = frct( j, i );
+					frct2( j ) = frct( j, i + 1 );
 				} // j
 
 				//dr.......shading on outdoor side
@@ -323,14 +324,14 @@ namespace TarcogShading {
 
 	void
 	forcedventilation(
-		FArray1A_int const iprop,
-		FArray1A< Real64 > const frct,
+		Array1A_int const iprop,
+		Array1A< Real64 > const frct,
 		Real64 const press,
 		int const nmix,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 const s,
 		Real64 const H,
 		Real64 const hc,
@@ -367,9 +368,9 @@ namespace TarcogShading {
 		iprop.dim( maxgas );
 		frct.dim( maxgas );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 
 		// Locals
 		Real64 H0;
@@ -395,18 +396,18 @@ namespace TarcogShading {
 
 	void
 	shadingin(
-		FArray1A_int const iprop1,
-		FArray1A< Real64 > const frct1,
+		Array1A_int const iprop1,
+		Array1A< Real64 > const frct1,
 		Real64 const press1,
 		int const nmix1,
-		FArray1A_int const iprop2,
-		FArray1A< Real64 > const frct2,
+		Array1A_int const iprop2,
+		Array1A< Real64 > const frct2,
 		Real64 const press2,
 		int const nmix2,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 & Atop,
 		Real64 & Abot,
 		Real64 const Al,
@@ -473,9 +474,9 @@ namespace TarcogShading {
 		iprop2.dim( maxgas );
 		frct2.dim( maxgas );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 
 		// Locals
 		Real64 A;
@@ -699,18 +700,18 @@ namespace TarcogShading {
 
 	void
 	shadingedge(
-		FArray1A_int const iprop1,
-		FArray1A< Real64 > const frct1,
+		Array1A_int const iprop1,
+		Array1A< Real64 > const frct1,
 		Real64 const press1,
 		int const nmix1,
-		FArray1A_int const iprop2,
-		FArray1A< Real64 > const frct2,
+		Array1A_int const iprop2,
+		Array1A< Real64 > const frct2,
 		Real64 const press2,
 		int const nmix2,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 & Atop,
 		Real64 & Abot,
 		Real64 const Al,
@@ -774,9 +775,9 @@ namespace TarcogShading {
 		iprop2.dim( maxgas );
 		frct2.dim( maxgas );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 
 		// Locals
 		Real64 A;

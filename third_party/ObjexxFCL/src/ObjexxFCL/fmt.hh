@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -39,7 +39,6 @@ namespace ObjexxFCL {
 // Forward
 class byte;
 class ubyte;
-class Fstring;
 
 namespace fmt {
 
@@ -135,10 +134,6 @@ A( char const c, Size const w = 1ul )
 // string
 std::string
 A( std::string const & s, Size const w = 0ul );
-
-// Fstring
-std::string
-A( Fstring const & s, Size const w = 0ul );
 
 // cstring
 inline
@@ -418,14 +413,6 @@ G( std::string const & s, Size const w = TraitsG< std::string >::w, Size const =
 	return A( s, w );
 }
 
-// General: Fstring Specialization
-inline
-std::string
-G( Fstring const & s, Size const w = TraitsG< Fstring >::w, Size const = 0ul, Size const = 0ul, int const = 0 )
-{
-	return A( s, w );
-}
-
 // General: cstring Specialization
 inline
 std::string
@@ -597,10 +584,6 @@ LD( std::string const & s )
 {
 	return s;
 }
-
-// List-Directed: Fstring Specialization
-std::string
-LD( Fstring const & s );
 
 // Extras /////
 

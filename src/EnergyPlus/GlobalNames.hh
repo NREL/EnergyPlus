@@ -2,7 +2,7 @@
 #define GlobalNames_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -56,10 +56,10 @@ namespace GlobalNames {
 	};
 
 	// Object Data
-	extern FArray1D< ComponentNameData > ChillerNames;
-	extern FArray1D< ComponentNameData > BoilerNames;
-	extern FArray1D< ComponentNameData > BaseboardNames;
-	extern FArray1D< ComponentNameData > CoilNames;
+	extern Array1D< ComponentNameData > ChillerNames;
+	extern Array1D< ComponentNameData > BoilerNames;
+	extern Array1D< ComponentNameData > BaseboardNames;
+	extern Array1D< ComponentNameData > CoilNames;
 
 	// Functions
 

@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -15,7 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/DimensionSlice.hh>
-#include <ObjexxFCL/StaticIndexRange.hh>
+#include <ObjexxFCL/IndexRange.hh>
 #include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
@@ -53,7 +53,7 @@ TEST( DimensionSliceTest, ConstructionIndexSliceMultiplier )
 
 TEST( DimensionSliceTest, ConstructionIndexRangeSliceMultiplier )
 {
-	StaticIndexRange r( -5, 5 );
+	IndexRange r( -5, 5 );
 	IndexSlice s( -3, 3, 2 );
 	DimensionSlice d( r, s, 3 );
 	EXPECT_EQ( s.s() * 3, d.m() );
@@ -66,7 +66,7 @@ TEST( DimensionSliceTest, ConstructionIndexRangeSliceMultiplier )
 
 TEST( DimensionSliceTest, ConstructionIndexRangeSliceOmitMultiplier )
 {
-	StaticIndexRange r( -5, 3 );
+	IndexRange r( -5, 3 );
 	IndexSlice s( -3, _, 2 );
 	DimensionSlice d( r, s, 3 );
 	EXPECT_EQ( s.s() * 3, d.m() );

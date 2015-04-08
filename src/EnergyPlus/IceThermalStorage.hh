@@ -2,7 +2,7 @@
 #define IceThermalStorage_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -96,7 +96,7 @@ namespace IceThermalStorage {
 	extern Real64 ITSCoolingRate; // ITS Discharge(-)/Charge(+) rate [W]
 	extern Real64 ITSCoolingEnergy;
 	extern Real64 ChillerOutletTemp; // Chiller outlet brine temperature [C]
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 	// General routine
@@ -459,10 +459,10 @@ namespace IceThermalStorage {
 	};
 
 	// Object Data
-	extern FArray1D< IceStorageSpecs > IceStorage; // dimension to number of machines
-	extern FArray1D< ReportVars > IceStorageReport; // dimension to number of machines
-	extern FArray1D< DetailedIceStorageData > DetIceStor; // Derived type for detailed ice storage model
-	extern FArray1D< IceStorageMapping > IceStorageTypeMap;
+	extern Array1D< IceStorageSpecs > IceStorage; // dimension to number of machines
+	extern Array1D< ReportVars > IceStorageReport; // dimension to number of machines
+	extern Array1D< DetailedIceStorageData > DetIceStor; // Derived type for detailed ice storage model
+	extern Array1D< IceStorageMapping > IceStorageTypeMap;
 
 	// Functions
 

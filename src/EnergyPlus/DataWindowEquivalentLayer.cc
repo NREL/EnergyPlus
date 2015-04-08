@@ -55,9 +55,9 @@ namespace DataWindowEquivalentLayer {
 
 	// Object Data
 	CFSSWP SWP_ROOMBLK; // Solar reflectance, BEAM-BEAM, front | Solar reflectance, BEAM-BEAM, back | Solar transmittance, BEAM-BEAM, front | Solar transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE, back | Solar transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance, DIFFUSE-DIFFUSE, front | Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE
-	FArray1D< CFSLAYER > CFSLayers;
-	FArray1D< CFSTY > CFS;
-	FArray1D< CFSGAP > CFSGaps;
+	Array1D< CFSLAYER > CFSLayers;
+	Array1D< CFSTY > CFS;
+	Array1D< CFSGAP > CFSGaps;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

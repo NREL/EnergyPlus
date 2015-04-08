@@ -33,18 +33,18 @@ namespace DElightManagerF {
 	std::string
 	ReplaceBlanksWithUnderscores(
 		std::string const & InputString
-	); 
+	);
 
-	void 
+	void
 	DElightElecLtgCtrl(
 		int iNameLength,
-		std::string cZoneName, 
-		Real64 dBldgLat, 
-		Real64 dHISKF, 
-		Real64 dHISUNF, 
-		Real64 dCloudFraction, 
-		Real64 dSOLCOSX, 
-		Real64 dSOLCOSY, 
+		std::string cZoneName,
+		Real64 dBldgLat,
+		Real64 dHISKF,
+		Real64 dHISUNF,
+		Real64 dCloudFraction,
+		Real64 dSOLCOSX,
+		Real64 dSOLCOSY,
 		Real64 dSOLCOSZ,
 		Real64 & pdPowerReducFac,
 		int piErrorFlag

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -95,7 +95,7 @@ namespace Pumps {
 	int const PumpBank_VarSpeed( 104 );
 	std::string const cPumpBank_ConSpeed( "HeaderedPumps:ConstantSpeed" );
 	int const PumpBank_ConSpeed( 105 );
-	FArray1D_string const cPumpTypes( {101,105}, { cPump_VarSpeed, cPump_ConSpeed, cPump_Cond, cPumpBank_VarSpeed, cPumpBank_ConSpeed } );
+	Array1D_string const cPumpTypes( {101,105}, { cPump_VarSpeed, cPump_ConSpeed, cPump_Cond, cPumpBank_VarSpeed, cPumpBank_ConSpeed } );
 
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
@@ -120,8 +120,8 @@ namespace Pumps {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
 	// Object Data
-	FArray1D< PumpSpecs > PumpEquip;
-	FArray1D< ReportVars > PumpEquipReport;
+	Array1D< PumpSpecs > PumpEquip;
+	Array1D< ReportVars > PumpEquipReport;
 
 	//*************************************************************************!
 
@@ -376,7 +376,7 @@ namespace Pumps {
 			}
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 3 );
-			if (PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+			if ( PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
 				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
 			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 4 );
@@ -501,7 +501,7 @@ namespace Pumps {
 			}
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 3 );
-			if (PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+			if ( PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
 				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
 			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 4 );
@@ -714,7 +714,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).NumPumpsInBank = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 3 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 4 );
-			if (PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+			if ( PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
 				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
 			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 5 );
@@ -802,7 +802,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).NumPumpsInBank = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 3 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 4 );
-			if (PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+			if ( PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
 				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
 			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 5 );
@@ -1176,7 +1176,7 @@ namespace Pumps {
 		PumpOverridableMaxLimit = PumpEquip( PumpNum ).MassFlowRateMax;
 
 		// override the user specified min to allow pump to turn off when no flow is required.
-		if ( PumpEquip( PumpNum ).LoopSolverOverwriteFlag == true ) {
+		if ( PumpEquip( PumpNum ).LoopSolverOverwriteFlag ) {
 			PumpMassFlowRateMinLimit = 0.0;
 		} else {
 			PumpMassFlowRateMinLimit = PumpEquip( PumpNum ).MassFlowRateMin;
@@ -1617,12 +1617,12 @@ namespace Pumps {
 			PlantSizNum = PlantLoop( PumpEquip( PumpNum ).LoopNum ).PlantSizNum;
 		}
 		// use pump sizing factor stored in plant sizing data structure
-		if ( PlantSizNum > 0 ) { 
+		if ( PlantSizNum > 0 ) {
 			PumpSizFac = PlantSizData( PlantSizNum ).PlantSizFac;
 		} else {
 			// might be able to remove this next block
 			if ( PumpEquip( PumpNum ).LoopNum > 0 ) {
-				SideLoop: for ( Side = 1; Side <= 2; ++Side ) {
+				for ( Side = 1; Side <= 2; ++Side ) {
 					for ( BranchNum = 1; BranchNum <= PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).TotalBranches; ++BranchNum ) {
 						for ( CompNum = 1; CompNum <= PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 							if ( PumpEquip( PumpNum ).InletNodeNum == PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn && PumpEquip( PumpNum ).OutletNodeNum == PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut ) {
@@ -1635,7 +1635,6 @@ namespace Pumps {
 							}
 						}
 					}
-					SideLoop_loop: ;
 				}
 				SideLoop_exit: ;
 			}
@@ -1676,11 +1675,11 @@ namespace Pumps {
 					}
 				}
 				if (PlantFinalSizesOkayToReport) {
-					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, 
+					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
 						"Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
 				}
 				if (PlantFirstSizesOkayToReport) {
-					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, 
+					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
 						"Initial Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
 				}
 			} else {
@@ -1702,11 +1701,11 @@ namespace Pumps {
 				PumpEquip( PumpNum ).NomPowerUse = 0.0;
 			}
 			if ( PlantFinalSizesOkayToReport ) {
-				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, 
+				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
 					"Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
 			}
 			if ( PlantFirstSizesOkayToReport ) {
-				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, 
+				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
 					"Initial Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
 			}
 		}

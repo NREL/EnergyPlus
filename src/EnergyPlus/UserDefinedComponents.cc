@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -77,19 +77,19 @@ namespace UserDefinedComponents {
 	int NumUserZoneAir( 0 );
 	int NumUserAirTerminals( 0 );
 
-	FArray1D_bool CheckUserPlantCompName;
-	FArray1D_bool CheckUserCoilName;
-	FArray1D_bool CheckUserZoneAirName;
-	FArray1D_bool CheckUserAirTerminal;
+	Array1D_bool CheckUserPlantCompName;
+	Array1D_bool CheckUserCoilName;
+	Array1D_bool CheckUserZoneAirName;
+	Array1D_bool CheckUserAirTerminal;
 	bool GetInput( true );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Object Data
-	FArray1D< UserPlantComponentStruct > UserPlantComp;
-	FArray1D< UserCoilComponentStruct > UserCoil;
-	FArray1D< UserZoneHVACForcedAirComponentStruct > UserZoneAirHVAC;
-	FArray1D< UserAirTerminalComponentStruct > UserAirTerminal;
+	Array1D< UserPlantComponentStruct > UserPlantComp;
+	Array1D< UserCoilComponentStruct > UserCoil;
+	Array1D< UserZoneHVACForcedAirComponentStruct > UserZoneAirHVAC;
+	Array1D< UserAirTerminalComponentStruct > UserAirTerminal;
 
 	// Functions
 
@@ -624,12 +624,12 @@ namespace UserDefinedComponents {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int CompLoop;
 		int ConnectionLoop;
@@ -1371,8 +1371,8 @@ namespace UserDefinedComponents {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyEnvrnFlag; // environment flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag; // environment flag
+		static Array1D_bool MyFlag;
 		int ConnectionNum;
 		bool errFlag;
 		//  REAL(r64) :: rho
@@ -1464,7 +1464,7 @@ namespace UserDefinedComponents {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyFlag;
 		bool errFlag;
 		int Loop;
 
@@ -1554,7 +1554,7 @@ namespace UserDefinedComponents {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyFlag;
 		bool errFlag;
 		int Loop;
 
@@ -1654,7 +1654,7 @@ namespace UserDefinedComponents {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyFlag;
 		bool errFlag;
 		int Loop;
 

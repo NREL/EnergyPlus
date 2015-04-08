@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <HighTempRadiantSystem.hh>
@@ -99,21 +99,21 @@ namespace HighTempRadiantSystem {
 	// MODULE VARIABLE DECLARATIONS:
 	// Standard, run-of-the-mill variables...
 	int NumOfHighTempRadSys( 0 ); // Number of hydronic low tempererature radiant systems
-	FArray1D< Real64 > QHTRadSource; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > QHTRadSrcAvg; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+	Array1D< Real64 > QHTRadSource; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > QHTRadSrcAvg; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QHTRadSrcAvg locally
-	FArray1D< Real64 > LastQHTRadSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D< Real64 > LastQHTRadSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
 
 	// Object Data
-	FArray1D< HighTempRadiantSystemData > HighTempRadSys;
-	FArray1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
+	Array1D< HighTempRadiantSystemData > HighTempRadSys;
+	Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
 

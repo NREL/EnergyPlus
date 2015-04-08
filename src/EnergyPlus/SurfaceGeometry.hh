@@ -2,8 +2,8 @@
 #define SurfaceGeometry_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -20,11 +20,11 @@ namespace SurfaceGeometry {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern FArray1D_string const BaseSurfCls;
-	extern FArray1D_string const SubSurfCls;
-	extern FArray1D_int const BaseSurfIDs;
+	extern Array1D_string const BaseSurfCls;
+	extern Array1D_string const SubSurfCls;
+	extern Array1D_int const BaseSurfIDs;
 
-	extern FArray1D_int const SubSurfIDs;
+	extern Array1D_int const SubSurfIDs;
 
 	extern int const UnenteredAdjacentZoneSurface; // allows users to enter one zone surface ("Zone")
 	// referencing another in adjacent zone
@@ -39,8 +39,8 @@ namespace SurfaceGeometry {
 	extern Real64 SinBldgRelNorth; // Sine of the building rotation (relative north)   (includes appendix G rotation)
 	extern Real64 CosBldgRotAppGonly; // Cosine of the building rotation for appendix G only(relative north)
 	extern Real64 SinBldgRotAppGonly; // Sine of the building rotation for appendix G only (relative north)
-	extern FArray1D< Real64 > CosZoneRelNorth; // Cosine of the zone rotation (relative north)
-	extern FArray1D< Real64 > SinZoneRelNorth; // Sine of the zone rotation (relative north)
+	extern Array1D< Real64 > CosZoneRelNorth; // Cosine of the zone rotation (relative north)
+	extern Array1D< Real64 > SinZoneRelNorth; // Sine of the zone rotation (relative north)
 
 	extern bool NoGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "Ground"
 	// outside environment are used but no ground temperature object was input.
@@ -54,7 +54,7 @@ namespace SurfaceGeometry {
 	//SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
 	// Object Data
-	extern FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	extern Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
 
 	// Functions
 
@@ -94,8 +94,8 @@ namespace SurfaceGeometry {
 		int const TotDetailedWalls, // Number of Wall:Detailed items to obtain
 		int const TotDetailedRoofs, // Number of RoofCeiling:Detailed items to obtain
 		int const TotDetailedFloors, // Number of Floor:Detailed items to obtain
-		FArray1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
-		FArray1S_int const BaseSurfIDs,
+		Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
+		Array1S_int const BaseSurfIDs,
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
 
@@ -113,7 +113,7 @@ namespace SurfaceGeometry {
 		int const TotRectGCFloors, // Number of Floors with Ground Contact to obtain
 		int const TotRectIntFloors, // Number of Adiabatic Walls to obtain
 		int const TotRectIZFloors, // Number of Interzone Floors to obtain
-		FArray1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
+		Array1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
 
@@ -133,8 +133,8 @@ namespace SurfaceGeometry {
 		bool & ErrorsFound, // Error flag indicator (true if errors found)
 		int & SurfNum, // Count of Current SurfaceNumber
 		int const TotHTSubs, // Number of Heat Transfer SubSurfaces to obtain
-		FArray1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
-		FArray1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+		Array1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
+		Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
 		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
@@ -149,7 +149,7 @@ namespace SurfaceGeometry {
 		int const TotIZWindows, // Number of Interzone Window SubSurfaces to obtain
 		int const TotIZDoors, // Number of Interzone Door SubSurfaces to obtain
 		int const TotIZGlazedDoors, // Number of Interzone Glass Door SubSurfaces to obtain
-		FArray1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+		Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
 		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
 		int & NeedToAddSubSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	);
@@ -219,7 +219,7 @@ namespace SurfaceGeometry {
 	GetVertices(
 		int const SurfNum, // Current surface number
 		int const NSides, // Number of sides to figure
-		FArray1S< Real64 > const Vertices // Vertices, in specified order
+		Array1S< Real64 > const Vertices // Vertices, in specified order
 	);
 
 	void
@@ -254,7 +254,7 @@ namespace SurfaceGeometry {
 	void
 	CalculateZoneVolume(
 		bool & ErrorsFound, // If errors found in input
-		FArray1S_bool const CeilingHeightEntered
+		Array1S_bool const CeilingHeightEntered
 	);
 
 	void

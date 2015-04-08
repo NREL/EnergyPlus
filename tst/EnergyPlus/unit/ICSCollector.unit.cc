@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
@@ -29,10 +29,10 @@ using DataGlobals::BeginEnvrnFlag;
 TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 	ShowMessage( "Begin Test: ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest" );
 
-	// ICS collector un-allocated collector data bug fix test.  This unit test 
-	// does not test ICS collector performance but it does test a bug fix for 
-	// issue #4723 (crash) occured due to unallocated ICS collector data. 
-	// ! Collector.allocated() 
+	// ICS collector un-allocated collector data bug fix test.  This unit test
+	// does not test ICS collector performance but it does test a bug fix for
+	// issue #4723 (crash) occured due to unallocated ICS collector data.
+	// ! Collector.allocated()
 
 	int const NumOfSurf( 1 );
 	int SurfNum;
@@ -40,7 +40,7 @@ TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 	int ConstrNum;
 	int MatNum;
 
-	InitializePsychRoutines( );
+	InitializePsychRoutines();
 
 	BeginEnvrnFlag = true;
 	OutBaroPress = 101325.0;
@@ -100,7 +100,7 @@ TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 	Real64 TaGap( 22.0 ); // Temperature of air gap (assumed mixed) use lagged value on input [C]
 	Real64 HcGapRpt; // gap convection coefficient [W/m2C]
 	Real64 HrGapRpt; // gap radiation coefficient [W/m2C]
-	Real64 IscRpt; //  
+	Real64 IscRpt; //
 	Real64 MdotVentRpt; // gap air mass flow rate [kg/s]
 	Real64 VdotWindRpt; // gap wind driven air volume flow rate [m3/s]
 	Real64 VdotBouyRpt; // gap bouyancy driven volume flow rate [m3/s]

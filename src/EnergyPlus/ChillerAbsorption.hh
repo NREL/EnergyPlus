@@ -2,7 +2,7 @@
 #define ChillerAbsorption_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -43,7 +43,7 @@ namespace ChillerAbsorption {
 	extern Real64 QCondenser; // W - rate of heat transfer to the condenser coil
 	extern Real64 CondenserEnergy; // J - heat transfer to the condenser coil
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -81,8 +81,8 @@ namespace ChillerAbsorption {
 		Real64 OptPartLoadRat; // (BLAST BEST) optimal operating frac full load
 		Real64 TempDesCondIn; // C - (BLAST ADJTC(1)The design secondary loop fluid
 		// temperature at the Absorber condenser side inlet
-		FArray1D< Real64 > SteamLoadCoef; // (BLAST RPWRC() ) coeff of full load poly. fit
-		FArray1D< Real64 > PumpPowerCoef; // coeff of pumping power poly. fit
+		Array1D< Real64 > SteamLoadCoef; // (BLAST RPWRC() ) coeff of full load poly. fit
+		Array1D< Real64 > PumpPowerCoef; // coeff of pumping power poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		int ErrCount2; // error counter
 		int GenHeatSourceType; // Generator heat source type, NodeType_Steam=3 or NodeType_Water=2
@@ -207,8 +207,8 @@ namespace ChillerAbsorption {
 	};
 
 	// Object Data
-	extern FArray1D< BLASTAbsorberSpecs > BLASTAbsorber; // dimension to number of machines
-	extern FArray1D< ReportVars > BLASTAbsorberReport;
+	extern Array1D< BLASTAbsorberSpecs > BLASTAbsorber; // dimension to number of machines
+	extern Array1D< ReportVars > BLASTAbsorberReport;
 
 	// Functions
 
