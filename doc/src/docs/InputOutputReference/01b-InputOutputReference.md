@@ -4434,7 +4434,7 @@ For autosizing to occur at the component level the user must enter the special v
 Table 22. Details of Autosizable Objects/Fields
 
 
-<table>
+<table class="table table-striped">
   <tr>
     <th>Component / Object Name</th>
     <th>Autosizable Fields</th>
@@ -5170,7 +5170,7 @@ Table 22. Details of Autosizable Objects/Fields
     <td>Evaporative Condenser Pump Rated Power Consumption</td>
   </tr>
   <tr>
-    <th colspan="2">Coil:Cooling:DX:TwoSpeed</th>
+    <td colspan="2">Coil:Cooling:DX:TwoSpeed</td>
   </tr>
   <tr>
     <td></td>
@@ -5915,7 +5915,7 @@ Table 22. Details of Autosizable Objects/Fields
     <td>Humidifier Rated Electric Power</td>
   </tr>
   <tr>
-    <th colspan="2">HVACTemplate:System:DualDuct</th>
+    <td colspan="2">HVACTemplate:System:DualDuct</td>
   </tr>
   <tr>
     <td></td>
@@ -6675,7 +6675,7 @@ Table 22. Details of Autosizable Objects/Fields
     <td>Design Supply Air Flow Rate</td>
   </tr>
   <tr>
-    <th colspan="2">ZoneHVAC:FourPipeFanCoil</th>
+    <td colspan="2">ZoneHVAC:FourPipeFanCoil</td>
   </tr>
   <tr>
     <td></td>
