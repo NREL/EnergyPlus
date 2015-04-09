@@ -32,71 +32,58 @@ Statement Keywords
 
 Every programming language has instructions or commands that tell the processor what to do. Erl supports a few types of program statements. Each line of an Erl program begins with a statement keyword. The syntax for each line depends on the keyword that starts that line. Only those listed in Table 1 are allowed.
 
-
-
-Table 1. Statement Keywords for Erl
-
-Keyword
-
-Syntax
-
-Statement Description
-
-RUN
-
-RUN &lt;program name&gt;,
-
-Calls another Erl program or subroutine. Returns to the calling point when completed. Recursive calling is allowed.
-
-RETURN
-
-RETURN,
-
-Prematurely exits a subroutine or program and returns control to the caller.
-
-SET
-
-SET &lt;variable&gt; = &lt;expression&gt;,
-
-Assigns the right-hand side to the left-hand side. If &lt;variable&gt; has not been used before, it is dynamically declared (with local scope). **Note: &lt;variables&gt; should NOT start with numerics.**
-
-IF
-
-IF &lt;expression&gt;,
-
-Begins an “IF block.” Conditional decision. If &lt;expression&gt; evaluates to anything other than zero, the block of statements after the IF is executed.
-
-ELSEIF
-
-ELSEIF &lt;expression&gt;,
-
-Conditional decision that follows a regular IF block of instructions. If &lt;expression&gt;  evaluates to anything other than zero, the block of instructions after the ELSEIF is executed.
-
-ELSE
-
-ELSE,
-
-Conditional decision. Associated with an IF statement, the block of statements after the ELSE is executed if &lt;expression&gt; evaluates to zero for preceding IF and ELSEIF statements.
-
-ENDIF
-
-ENDIF,
-
-Terminates IF block (required).
-
-WHILE
-
-WHILE &lt;expression&gt;,
-
-Begins a “WHILE block.”  Conditional decision.  If &lt;expression&gt; evaluates to anything other than zero, the block of statements after the WHILE is repeatedly executed.
-
-ENDWHILE
-
-ENDWHILE,
-
-Terminates WHILE block (required).
-
-
+<table class="table table-striped">
+<tr>
+ <th>Keyword</th>
+ <th>Syntax</th>
+ <th>Statement Description</th>
+</tr>
+<tr>
+ <td>RUN</td>
+ <td>RUN &lt;program name&gt;</td>
+ <td>Calls another Erl program or subroutine. Returns to the calling point when completed. Recursive calling is allowed.</td>
+</tr>
+<tr>
+ <td>RETURN</td>
+ <td>RETURN,</td>
+ <td>Prematurely exits a subroutine or program and returns control to the caller.</td>
+</tr>
+<tr>
+ <td>SET</td>
+ <td>SET &lt;variable&gt; = &lt;expression&gt;,</td>
+ <td>Assigns the right-hand side to the left-hand side. If <variable> has not been used before, it is dynamically declared (with local scope). **Note: &lt;variables&gt; should NOT start with numerics.**</td>
+</tr>
+<tr>
+ <td>IF</td>
+ <td>IF &lt;expression&gt;,</td>
+ <td>Begins an “IF block.” Conditional decision. If &lt;expression&gt; evaluates to anything other than zero, the block of statements after the IF is executed.</td>
+</tr>
+<tr>
+ <td>ELSEIF</td>
+ <td>ELSEIF &lt;expression&gt;</td>
+ <td>Conditional decision that follows a regular IF block of instructions. If &lt;expression&gt; evaluates to anything other than zero, the block of instructions after the ELSEIF is executed.</td>
+</tr>
+<tr>
+ <td>ELSE</td>
+ <td>ELSE,</td>
+ <td>Conditional decision. Associated with an IF statement, the block of statements after the ELSE is executed if &lt;expression&gt; evaluates to zero for preceding IF and ELSEIF statements.</td>
+</tr>
+<tr>
+ <td>ENDIF</td>
+ <td>ENDIF,</td>
+ <td>Terminates IF block (required).</td>
+</tr>
+<tr>
+ <td>WHILE</td>
+ <td>WHILE &lt;expression&gt;</td>
+ <td>Begins a “WHILE block.”  Conditional decision.  If &lt;expression&gt; evaluates to anything other than zero, the block of statements after the WHILE is repeatedly executed.</td>
+</tr>
+<tr>
+ <td>ENDWHILE</td>
+ <td>ENDWHILE,</td>
+ <td>Terminates WHILE block (required).</td>
+</tr>
+</table>
 
 ### Rules for IF blocks:
 
@@ -195,8 +182,8 @@ Table 2. Built-In Unique Variables for Erl
 
 <table class="table table-striped">
 <tr>
-<td>Variable Name</td>
-<td>Value</td>
+<th>Variable Name</th>
+<th>Value</th>
 </tr>
 <tr>
 <td>Year</td>
@@ -324,10 +311,10 @@ Table 3. Operators for Erl
 
 <table class="table table-striped">
 <tr>
-<td>Operator Symbol</td>
-<td>Description</td>
-<td>Evaluation Order</td>
-<td>Example</td>
+<th>Operator Symbol</th>
+<th>Description</th>
+<th>Evaluation Order</th>
+<th>Example</th>
 </tr>
 <tr>
 <td>( )</td>
@@ -419,19 +406,20 @@ Table 3. Operators for Erl
 
 Because expressions can be evaluated to a single value, they can be used in SET and IF statements. That means both of the following instructions are allowed:
 
-SET a = c &lt; d
-
+```
+SET a = c < d
 IF a - 1
+```
 
 In the case of the SET example, the value of “a” is set to 1 if “c” is less than “d”; otherwise, it is set to 0. For the IF example, the IF block of instructions are executed if a – 1 is greater than zero.
 
 Compound expressions allow multiple operators to be sequenced or nested. For example:
 
+```
 a + b \* 7 / 4.5
-
 (a \* 3 + 4) ^ 2
-
-(a &gt; b) && (c &lt; d)
+(a > b) && (c < d)
+```
 
 For complicated expressions, it helps to make heavy use of parentheses in your equations.  By using parentheses with proper algebraic evaluation in mind to group terms, you can help the Erl parser.  The language processor is simplistic compared to a full-blown programming language and sometimes has problems applying the rules of algebra.  It is safer to err on the side of extra parentheses and to inspect the results of complex expressions in the EDD output.
 
@@ -458,9 +446,9 @@ Table 4. Built-in Math Functions for Erl
 
 <table class="table table-striped">
 <tr>
-<td>Function Name</td>
-<td>Description</td>
-<td>Number of Arguments</td>
+<th>Function Name</th>
+<th>Description</th>
+<th>Number of Arguments</th>
 </tr>
 <tr>
 <td>@Round</td>
@@ -552,9 +540,9 @@ Table 5. Built-in EnergyPlus Simulation Management Functions for Erl
 
 <table class="table table-striped">
 <tr>
-<td>Function Name</td>
-<td>Description</td>
-<td>Number of Arguments</td>
+<th>Function Name</th>
+<th>Description</th>
+<th>Number of Arguments</th>
 </tr>
 <tr>
 <td>@FatalHaltEp</td>
@@ -581,9 +569,9 @@ Table 6. Built-in Functions for Trend Variables in Erl
 
 <table class="table table-striped">
 <tr>
-<td>Function Name</td>
-<td>Description</td>
-<td>Number of Arguments</td>
+<th>Function Name</th>
+<th>Description</th>
+<th>Number of Arguments</th>
 </tr>
 <tr>
 <td>@TrendValue</td>
@@ -625,524 +613,423 @@ Building modeling often involves calculations related to moist air. A comprehens
 
 Table 7. Built-in Psychrometric Functions for Erl
 
-Function Name
-
-Arguments
-
-Description
-
-Units
-
-@RhoAirFnPbTdbW
-
-Result
-
-Density of moist air
-
-kg/m<sup>3</sup>
-
-Input 1
-
-Barometric pressure
-
-Pa
-
-Input 2
-
-Drybulb temperature
-
-ºC
-
-Input 3
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-@CpAirFnWTdb
-
-Result
-
-Heat capacity of moist air
-
-J/kg-°C
-
-Input 1
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 2
-
-Drybulb temperature
-
-ºC
-
-@HfgAirFnWTdb
-
-Result
-
-Heat of vaporization for vapor
-
-J/kg
-
-Input 1
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 2
-
-Drybulb temperature
-
-ºC
-
-@HgAirFnWTdb
-
-Result
-
-Enthalpy of the gas
-
-
-
-Input 1
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 2
-
-Drybulb temperature
-
-ºC
-
-@TdpFnTdbTwbPb
-
-Result
-
-Dew-point temperature
-
-ºC
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Wetbulb temperature
-
-ºC
-
-Input 3
-
-Barometric pressure
-
-Pa
-
-@TdpFnWPb
-
-Result
-
-Dew-point temperature
-
-ºC
-
-Input 1
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 2
-
-Barometric pressure
-
-Pa
-
-@HFnTdbW
-
-Result
-
-Enthalpy of moist air
-
-J/kg
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-@HFnTdbRhPb
-
-Result
-
-Enthalpy of moist air
-
-J/kg
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Relative humidity
-
-Fraction (0.0..1)
-
-Input 3
-
-Barometric pressure
-
-Pa
-
-@TdbFnHW
-
-Result
-
-Drybulb temperature
-
-ºC
-
-Input 1
-
-Enthalpy of moist air
-
-J/kg
-
-Input 2
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-@RhovFnTdbRh
-
-Result
-
-Vapor density in air
-
-kg/m<sup>3</sup>
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-@RhovFnTdbWPb
-
-Result
-
-Vapor density in air
-
-kg/m<sup>3</sup>
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 3
-
-Barometric pressure
-
-Pa
-
-@RhFnTdbRhov
-
-Result
-
-Relative humidity
-
-Fraction (0.0..1)
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Vapor density in air
-
-kg/m<sup>3</sup>
-
-@RhFnTdbWPb
-
-Result
-
-Relative humidity
-
-Fraction [0.0..1.0]
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 3
-
-Barometric pressure
-
-Pa
-
-@TwbFnTdbWPb
-
-Result
-
-Wetbulb temperature
-
-ºC
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 3
-
-Barometric pressure
-
-Pa
-
-@VFnTdbWPb
-
-Result
-
-Specific volume
-
-m<sup>3</sup>/kg
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 3
-
-Barometric pressure
-
-Pa
-
-@WFnTdpPb
-
-Result
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 1
-
-Dew-point temperature
-
-ºC
-
-Input 2
-
-Barometric pressure
-
-Pa
-
-@WFnTdbH
-
-Result
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Enthalpy of moist air
-
-J/kg
-
-@WFnTdbTwbPb
-
-Result
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Wetbulb temperature
-
-ºC
-
-Input 3
-
-Barometric pressure
-
-Pa
-
-@WFnTdbRhPb
-
-Result
-
-Humidity ratio
-
-kgWater/kgDryAir
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-Input 2
-
-Relative humidity
-
-Fraction [0.0..1.0]
-
-Input 3
-
-Barometric pressure
-
-Pa
-
-@PsatFnTemp
-
-Result
-
-Saturation pressure
-
-Pa
-
-Input 1
-
-Drybulb temperature
-
-ºC
-
-@TsatFnHPb
-
-Result
-
-Saturation temperature
-
-ºC
-
-Input 1
-
-Enthalpy of moist air
-
-J/kg
-
-Input 2
-
-Barometric pressure
-
-Pa
-
-@CpCW
-
-Result
-
-Heat capacity of water
-
-J/kg-K
-
-Input 1
-
-Temperature
-
-ºC
-
-@CpHW
-
-Result
-
-Heat capacity of water
-
-J/kg-K
-
-Input 1
-
-Temperature
-
-ºC
-
-@RhoH2O
-
-Result
-
-Density of water
-
-kg/m<sup>3</sup>
-
-Input 1
-
-Temperature
-
-ºC
-
+<table class="table table-striped">
+  <tr>
+    <th>Function Name</th>
+    <th>Arguments</th>
+    <th>Description</th>
+    <th>Units</th>
+  </tr>
+  <tr>
+    <td rowspan="4">@RhoAirFnPbTdbW</td>
+    <td>Result</td>
+    <td>Density of moist air</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@CpAirFnWTdb</td>
+    <td>Result</td>
+    <td>Heat capacity of moist air</td>
+    <td>J/kg-&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@HfgAirFnWTdb`</td>
+    <td>Result</td>
+    <td>Heat of vaporization for vapor</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@HgAirFnWTdb</td>
+    <td>Result</td>
+    <td>Enthalpy of the gas</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@TdpFnTdbTwbPb</td>
+    <td>Result</td>
+    <td>Dew-point temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Wetbulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@TdpFnWPb</td>
+    <td>Result</td>
+    <td>Dew-point temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@HFnTdbW</td>
+    <td>Result</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@HFnTdbRhPb</td>
+    <td>Result</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@TdbFnHW</td>
+    <td>Result</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@RhovFnTdbRh</td>
+    <td>Result</td>
+    <td>Vapor density in air</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@RhovFnTdbWPb</td>
+    <td>Result</td>
+    <td>Vapor density in air</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@RhFnTdbRhov</td>
+    <td>Result</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Vapor density in air</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@RhFnTdbWPb</td>
+    <td>Result</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@TwbFnTdbWPb</td>
+    <td>Result</td>
+    <td>Wetbulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@VFnTdbWPb</td>
+    <td>Result</td>
+    <td>Specific volume</td>
+    <td>m&lt;sup&gt;3&lt;/sup&gt;/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@WFnTdpPb</td>
+    <td>Result</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Dew-point temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@WFnTdbH</td>
+    <td>Result</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@WFnTdbTwbPb</td>
+    <td>Result</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Wetbulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@WFnTdbRhPb</td>
+    <td>Result</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="2">@PsatFnTemp</td>
+    <td>Result</td>
+    <td>Saturation pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@TsatFnHPb</td>
+    <td>Result</td>
+    <td>Saturation temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="2">@CpCW</td>
+    <td>Result</td>
+    <td>Heat capacity of water</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="2">@CpHW</td>
+    <td>Result</td>
+    <td>Heat capacity of water</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="2">@RhoH2O</td>
+    <td>Result</td>
+    <td>Density of water</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+</table>
 
 
 ### Built-in Curve and Table Functions
@@ -1157,59 +1044,50 @@ The first input argument is always an Erl variable that has been declared using 
 
 Table 8. Built-in Function for Accessing Curves and Tables
 
-Function Name
-
-Arguments
-
-Description
-
-Notes
-
-@CurveValue
-
-Result
-
-Result from evaluating the curve or table as a function of the input arguments
-
-
-
-Input 1
-
-Index variable that “points” to a specific curve or table object defined elsewhere in the IDF.
-
-This variable needs to be declared and filled using an EnergyManagementSystem:CurveOrTableIndexVariable object.
-
-Input 2
-
-First independent variable
-
-Typically the “X” input value, always used
-
-Input 3
-
-Second independent variable
-
-Typically the “Y” value, only used if curve/table has two or more independent variables
-
-Input 4
-
-Third independent variable
-
-Typically the “Z” value, only used if curve/table has three or more independent variables.
-
-Input 5
-
-Fourth independent variable
-
-Only used if table has four or more independent variables
-
-Input 6
-
-Fifth independent variable
-
-Only used if table has five independent variables
-
-
+<table class="table table-striped">
+<tr>
+ <th>Function Name</th>
+ <th>Arguments</th>
+ <th>Description</th>
+ <th>Notes</th>
+</tr>
+<tr>
+ <td rowspan="7">@CurveValue</td>
+ <td>Result</td>
+ <td>Result from evaluating the curve or table as a function of the input arguments</td>
+ <td></td>
+</tr>
+<tr>
+ <td>Input 1</td>
+ <td>Index variable that "points" to a specific curve or table object defined elsewhere in the IDF.</td>
+ <td>This variable needs to be declared and filled using an EnergyManagementSystem:CurveOrTableIndexVariable object.</td>
+</tr>
+<tr>
+ <td>Input 2</td>
+ <td>First independent variable</td>
+ <td>Typically the "X" input value, always used</td>
+</tr>
+<tr>
+ <td>Input 3</td>
+ <td>Second independent variable</td>
+ <td>Typically the "Y" value, only used if curve/table has two or more independent variables</td>
+</tr>
+<tr>
+ <td>Input 4</td>
+ <td>Third independent variable</td>
+ <td>Typically the "Z" value, only used if curve/table has three or more independent variables.</td>
+</tr>
+<tr>
+ <td>Input 5</td>
+ <td>Fourth independent variable</td>
+ <td>Only used if table has four or more independent variables</td>
+</tr>
+<tr>
+ <td>Input 6</td>
+ <td>Fifth independent variable</td>
+ <td>Only used if table has five independent variables</td>
+</tr>
+</table>
 
 Internal Variables
 ==================
