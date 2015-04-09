@@ -175,795 +175,414 @@ IDD Conventions
 
 The following is a basic description of the structure of the IDD (it’s actually taken directly from the IDD file). As noted within, **!** signifies a comment character as does the **\\**. **\\** has also been adopted as a convention for including more specific comments about each field in an object. These have been used with success in the IDFEditor and it is hoped the flexibility will provide other interface developers with useful information.
 
-!IDD\_Version **VERSION NUMBER**
-
-! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
-
+```idd
+!IDD_Version VERSION NUMBER
+! **************************************************************************
 ! This file is the Input Data Dictionary (IDD) for EnergyPlus.
-
 ! The IDD defines the syntax and data model for each type of input "Object."
-
 ! Lines in EnergyPlus input files (and IDD) are limited to 500 characters.
-
 !
-
 ! Object Description
-
 ! ------------------
-
 ! To define an object (a record with data), develop a key word that is unique
-
 ! Each data item to the object can be A (Alphanumeric string) or N (numeric)
-
 ! Number each A and N.  This will show how the data items will be put into the
-
 ! arrays that are passed to the Input Processor "Get" (GetObjectItem) routines.
-
 ! All alpha fields are limited to 100 characters.  Numeric fields should be
-
 ! valid numerics (can include such as 1.0E+05) and are placed into double
-
 ! precision variables.
-
 !
-
 ! NOTE: Even though a field may be optional, a comma representing that field
-
 !   must be included (unless it is the last field in the object).  Since the
-
 !   entire input is "field-oriented" and not "keyword-oriented", the EnergyPlus
-
 !   Input Processor must have some representation (even if blank) for each
-
 !   field.
-
 !
-
 ! Object Documentation
-
 ! --------------------
-
 ! In addition, the following special comments appear one per line and
-
 ! most are followed by a value.  Comments may apply to a field or the object
-
 ! or a group of objects.
-
 !
-
 ! Field-level comments:
-
 !
-
-!  \\field           Name of field
-
+!  \field           Name of field
 !                     (should be succinct and readable, blanks are encouraged)
-
 !
-
-!  \\note            Note describing the field and its valid values. If multiple lines,
-
-!                   start each line with \\note. Limit line length to 100 characters.
-
+!  \note            Note describing the field and its valid values. If multiple lines,
+!                   start each line with \note. Limit line length to 100 characters.
 !
-
-!  \\required-field  To flag fields which may not be left blank
-
+!  \required-field  To flag fields which may not be left blank
 !                     (this comment has no "value")
-
 !
-
-!  \\begin-extensible  Marks the first field at which the object accepts an extensible
-
+!  \begin-extensible  Marks the first field at which the object accepts an extensible
 !                   field set.  A fixed number of fields from this marker define the
-
-!                   extensible field set, see the object code \\extensible for
-
+!                   extensible field set, see the object code \extensible for
 !                   more information.
-
 !
-
-!  \\units           Units (must be from EnergyPlus standard units list)
-
+!  \units           Units (must be from EnergyPlus standard units list)
 !                   EnergyPlus units are standard SI units
-
 !
-
-!  \\ip-units        IP-Units (for use by input processors with IP units)
-
+!  \ip-units        IP-Units (for use by input processors with IP units)
 !                   This is only used if the default conversion is not
-
 !                   appropriate.
-
 !
-
-!  \\unitsBasedOnField  For fields that may have multiple possible units, indicates
-
+!  \unitsBasedOnField  For fields that may have multiple possible units, indicates
 !                   the field in the object that can be used to determine
-
 !                   the units. The field reference is in the A2 form.
-
 !
-
-!  \\minimum         Minimum that includes the following value
-
+!  \minimum         Minimum that includes the following value
 !
-
-!  \\minimum&gt;        Minimum that must be &gt; than the following value
-
+!  \minimum>        Minimum that must be > than the following value
 !
-
-!  \\maximum         Maximum that includes the following value
-
+!  \maximum         Maximum that includes the following value
 !
-
-!  \\maximum&lt;        Maximum that must be &lt; than the following value
-
+!  \maximum<        Maximum that must be < than the following value
 !
-
-!  \\default         Default for the field (if N/A then omit entire line)
-
+!  \default         Default for the field (if N/A then omit entire line)
 !
-
-!  \\deprecated      This field is not really used and will be deleted from the object.
-
+!  \deprecated      This field is not really used and will be deleted from the object.
 !                   The required information is gotten internally or
-
 !                   not needed by the program.
-
 !
-
-!  \\autosizable     Flag to indicate that this field can be used with the Auto
-
+!  \autosizable     Flag to indicate that this field can be used with the Auto
 !                   Sizing routines to produce calculated results for the
-
 !                   field.  If a value follows this, then that will be used
-
 !                   when the "Autosize" feature is flagged.  To trigger
-
 !                   autosizing for a field, enter Autosize as the field's
-
 !                   value.  Only applicable to numeric fields.
-
 !
-
-!  \\autocalculatable Flag to indicate that this field can be automatically
-
+!  \autocalculatable Flag to indicate that this field can be automatically
 !                   calculated. To trigger auto calculation for a field, enter
-
 !                   Autocalculate as the field's value.  Only applicable to
-
 !                   numeric fields.
-
 !
-
-!  \\type            Type of data for the field -
-
+!  \type            Type of data for the field -
 !                     integer
-
 !                     real
-
 !                     alpha       (arbitrary string),
-
 !                     choice      (alpha with specific list of choices, see
-
-!                                 \\key)
-
+!                                 \key)
 !                     object-list (link to a list of objects defined elsewhere,
-
-!                                  see \\object-list and \\reference)
-
+!                                  see \object-list and \reference)
 !                     external-list (uses a special list from an external source,
-
-!                                    see \\external-list)
-
+!                                    see \external-list)
 !                     node        (name used in connecting HVAC components)
-
 !
-
-!  \\retaincase      Retains the alphabetic case for alpha type fields
-
+!  \retaincase      Retains the alphabetic case for alpha type fields
 !
-
-!  \\key             Possible value for "\\type choice" (blanks are significant)
-
-!                     use multiple \\key lines to indicate all valid choices
-
+!  \key             Possible value for "\type choice" (blanks are significant)
+!                     use multiple \key lines to indicate all valid choices
 !
-
-!  \\object-list     Name of a list of user-provided object names that are valid
-
-!                     entries for this field (used with "\\reference")
-
+!  \object-list     Name of a list of user-provided object names that are valid
+!                     entries for this field (used with "\reference")
 !                     see Zone and BuildingSurface:Detailed objects below for
-
 !                     examples.
-
-!                  \*\* Note that a field may have multiple \\object-list commands.
-
+!                  ** Note that a field may have multiple \object-list commands.
 !
-
-!  \\external-list   The values for this field should be selected from a special
-
+!  \external-list   The values for this field should be selected from a special
 !                   list generated outside of the IDD file. The choices for the
-
 !                   special lists are:
-
 !                        autoRDDvariable
-
 !                        autoRDDmeter
-
 !                        autoRDDvariableMeter
-
 !                   When one of these are selected the options for the field
-
 !                   are taken from the RDD or MDD file or both.
-
 !
-
-!  \\reference       Name of a list of names to which this object belongs
-
-!                     used with "\\type object-list" and with "\\object-list"
-
+!  \reference       Name of a list of names to which this object belongs
+!                     used with "\type object-list" and with "\object-list"
 !                     see Zone and BuildingSurface:Detailed objects below for
-
 !                     examples:
-
 !
-
 !                        Zone,
-
-!                          A1 , \\field Name
-
-!                               \\type alpha
-
-!                               \\reference ZoneNames
-
+!                          A1 , \field Name
+!                               \type alpha
+!                               \reference ZoneNames
 !
-
 !                        BuildingSurface:Detailed,
-
-!                          A4 , \\field Zone Name
-
-!                               \\note Zone the surface is a part of
-
-!                               \\type object-list
-
-!                               \\object-list ZoneNames
-
+!                          A4 , \field Zone Name
+!                               \note Zone the surface is a part of
+!                               \type object-list
+!                               \object-list ZoneNames
 !
-
 !             For each zone, the field "Name" may be referenced
-
 !             by other objects, such as BuildingSurface:Detailed, so it is
-
-!             commented with "\\reference ZoneNames"
-
+!             commented with "\reference ZoneNames"
 !             Fields that reference a zone name, such as BuildingSurface:Detailed's
-
 !             "Zone Name", are commented as
-
-!             "\\type object-list" and "\\object-list ZoneNames"
-
-!             \*\* Note that a field may have multiple \\reference commands.
-
-!             \*\* This is useful if the object belongs to a small specific
-
+!             "\type object-list" and "\object-list ZoneNames"
+!             ** Note that a field may have multiple \reference commands.
+!             ** This is useful if the object belongs to a small specific
 !             object-list as well as a larger more general object-list.
-
 !
-
 ! Object-level comments:
-
 !
-
-!  \\memo            Memo describing the object. If multiple lines, start each line
-
-!                   with \\memo.
-
+!  \memo            Memo describing the object. If multiple lines, start each line
+!                   with \memo.
 !                   Limit line length to 100 characters.
-
 !
-
-!  \\unique-object   To flag objects which should appear only once in an idf
-
+!  \unique-object   To flag objects which should appear only once in an idf
 !                     (this comment has no "value")
-
 !
-
-!  \\required-object To flag objects which are required in every idf
-
+!  \required-object To flag objects which are required in every idf
 !                     (this comment has no "value")
-
 !
-
-!  \\min-fields      Minimum number of fields that should be included in the
-
+!  \min-fields      Minimum number of fields that should be included in the
 !                   object.  If appropriate, the Input Processor will fill
-
 !                   any missing fields with defaults (for numeric fields).
-
 !                   It will also supply that number of fields to the "get"
-
 !                   routines using blanks for alpha fields (note -- blanks
-
 !                   may not be allowable for some alpha fields).
-
 !
-
-!  \\obsolete        This object has been replaced though is kept (and is read)
-
+!  \obsolete        This object has been replaced though is kept (and is read)
 !                   in the current version.  Please refer to documentation as
-
 !                   to the dispersal of the object.  If this object is
-
 !                   encountered in an IDF, the InputProcessor will post an
-
 !                   appropriate message to the error file.
-
-!                   usage:  \\obsolete New=&gt;[New object name]
-
+!                   usage:  \obsolete New=>[New object name]
 !
-
-!  \\extensible:&lt;\#&gt;  This object is dynamically extensible -- meaning, if you
-
+!  \extensible:<\#>  This object is dynamically extensible -- meaning, if you
 !           change the IDD appropriately (if the object has a simple list
-
 !           structure -- just add items to the list arguments (i.e. BRANCH
-
 !           LIST). These will be automatically redimensioned and used during
-
-!           the simulation. &lt;\#&gt; should be entered by the developer to signify
-
+!           the simulation. <\#> should be entered by the developer to signify
 !           how many of the last fields are needed to be extended (and EnergyPlus
-
 !           will attempt to auto-extend the object).  The first field of the first
-
-!           instance of the extensible field set is marked with \\begin-extensible.
-
+!           instance of the extensible field set is marked with \begin-extensible.
 !
-
-!  \\begin-extensible See previous item, marks beginning of extensible fields in
-
+!  \begin-extensible See previous item, marks beginning of extensible fields in
 !                   an object.
-
 !
-
-!  \\format          The object should have a special format when saved in
-
+!  \format          The object should have a special format when saved in
 !                   the IDF Editor with the special format option enabled.
-
 !                   The options include SingleLine, Vertices, CompactSchedule,
-
 !                   FluidProperties, ViewFactors, and Spectral.
-
 !                   The SingleLine option puts all the fields for the object
-
 !                   on a single line. The Vertices option is used in objects
-
 !                   that use X, Y and Z fields to format those three fields
-
 !                   on a single line.
-
 !                   The CompactSchedule formats that specific object.
-
 !                   The FluidProperty option formats long lists of fluid
-
 !                   properties to ten values per line.
-
 !                   The ViewFactor option formats three fields related to
-
 !                   view factors per line.
-
 !                   The Spectral option formats the four fields related to
-
 !                   window glass spectral data per line.
-
 !
-
-!   \\reference-class-name Adds the name of the class to the reference list
-
-!                   similar to \\reference.
-
+!   \reference-class-name Adds the name of the class to the reference list
+!                   similar to \reference.
 !
-
 ! Group-level comments:
-
 !
-
-!  \\group          Name for a group of related objects
-
+!  \group          Name for a group of related objects
 !
-
 !
-
 ! Notes on comments
-
 ! -----------------
-
 !
-
 ! 1.  If a particular comment is not applicable (such as units, or default)
-
 ! then simply omit the comment rather than indicating N/A.
-
 !
-
 ! 2.  Memos and notes should be brief (recommend 5 lines or less per block).
-
 ! More extensive explanations are expected to be in the user documentation
+```
+
 
 ### IDD – IP Units
 
 In addition, the IDD contains indications of IP (inch-pound) units for the EnergyPlus standard SI (Systems International) units. These may be used by input and output interfaces to display values in the IP system. As noted, if the IP units are “standard” (first block below), then no \\ip-units is expected in the field. Note that for some fields – due to their multiple use (for example, schedule values) – there cannot be a ip-unit designation.
-
-! Default IP conversions (no \\ip-units necessary)
-
-!      $/(m3/s)               =&gt;   $/(ft3/min)         0.000472000059660808
-
-!      $/(W/K)                =&gt;   $/(Btu/h-F)         0.52667614683731
-
-!      $/kW                   =&gt;   $/(kBtuh/h)         0.293083235638921
-
-!      $/m2                   =&gt;   $/ft2               0.0928939733269818
-
-!      $/m3                   =&gt;   $/ft3               0.0283127014102352
-
-!      (kg/s)/W               =&gt;   (lbm/sec)/(Btu/hr)  0.646078115385742
-
-!      1/K                    =&gt;   1/F                 0.555555555555556
-
-!      1/m                    =&gt;   1/ft                0.3048
-
-!      A/K                    =&gt;   A/F                 0.555555555555556
-
-!      C                      =&gt;   F                   1.8 (plus 32)
-
-!      cm                     =&gt;   in                  0.3937
-
-!      cm2                    =&gt;   inch2               0.15500031000062
-
-!      deltaC                 =&gt;   deltaF              1.8
-
-!      deltaJ/kg              =&gt;   deltaBtu/lb         0.0004299
-
-!      g/GJ                   =&gt;   lb/MWh              0.00793664091373665
-
-!      g/kg                   =&gt;   grains/lb           7
-
-!      g/MJ                   =&gt;   lb/MWh              7.93664091373665
-
-!      g/mol                  =&gt;   lb/mol              0.0022046
-
-!      g/m-s                  =&gt;   lb/ft-s             0.000671968949659
-
-!      g/m-s-K                =&gt;   lb/ft-s-F           0.000373574867724868
-
-!      GJ                     =&gt;   ton-hrs             78.9889415481832
-
-!      J                      =&gt;   Wh                  0.000277777777777778
-
-!      J/K                    =&gt;   Btu/F               526.565
-
-!      J/kg                   =&gt;   Btu/lb              0.00042986
-
-!      J/kg-K                 =&gt;   Btu/lb-F            0.000239005736137667
-
-!      J/kg-K2                =&gt;   Btu/lb-F2           0.000132889924714692
-
-!      J/kg-K3                =&gt;   Btu/lb-F3           7.38277359526066E-05
-
-!      J/m2-K                 =&gt;   Btu/ft2-F           4.89224766847393E-05
-
-!      J/m3                   =&gt;   Btu/ft3             2.68096514745308E-05
-
-!      J/m3-K                 =&gt;   Btu/ft3-F           1.49237004739337E-05
-
-!      K                      =&gt;   R                   1.8
-
-!      K/m                    =&gt;   F/ft                0.54861322767449
-
-!      kg                     =&gt;   lb                  2.2046
-
-!      kg/J                   =&gt;   lb/Btu              2325.83774250441
-
-!      kg/kg-K                =&gt;   lb/lb-F             0.555555555555556
-
-!      kg/m                   =&gt;   lb/ft               0.67196893069637
-
-!      kg/m2                  =&gt;   lb/ft2              0.204794053596664
-
-!      kg/m3                  =&gt;   lb/ft3              0.062428
-
-!      kg/m-s                 =&gt;   lb/ft-s             0.67196893069637
-
-!      kg/m-s-K               =&gt;   lb/ft-s-F           0.373316072609094
-
-!      kg/m-s-K2              =&gt;   lb/ft-s-F2          0.207397818116164
-
-!      kg/Pa-s-m2             =&gt;   lb/psi-s-ft2        1412.00523459398
-
-!      kg/s                   =&gt;   lb/s                2.20462247603796
-
-!      kg/s2                  =&gt;   lb/s2               2.2046
-
-!      kg/s-m                 =&gt;   lb/s-ft             0.67196893069637
-
-!      kJ/kg                  =&gt;   Btu/lb              0.429925
-
-!      kPa                    =&gt;   psi                 0.145038
-
-!      L/day                  =&gt;   pint/day            2.11337629827348
-
-!      L/GJ                   =&gt;   gal/kWh             0.000951022349025202
-
-!      L/kWh                  =&gt;   pint/kWh            2.11337629827348
-
-!      L/MJ                   =&gt;   gal/kWh             0.951022349025202
-
-!      lux                    =&gt;   foot-candles        0.092902267
-
-!      m                      =&gt;   ft                  3.28083989501312
-
-!      m/hr                   =&gt;   ft/hr               3.28083989501312
-
-!      m/s                    =&gt;   ft/min              196.850393700787
-
-!      m/s                    =&gt;   miles/hr            2.2369362920544
-
-!      m/yr                   =&gt;   inch/yr             39.3700787401575
-
-!      m2                     =&gt;   ft2                 10.7639104167097
-
-!      m2/m                   =&gt;   ft2/ft              3.28083989501312
-
-!      m2/person              =&gt;   ft2/person          10.764961
-
-!      m2/s                   =&gt;   ft2/s               10.7639104167097
-
-!      m2-K/W                 =&gt;   ft2-F-hr/Btu        5.678263
-
-!      m3                     =&gt;   ft3                 35.3146667214886
-
-!      m3                     =&gt;   gal                 264.172037284185
-
-!      m3/GJ                  =&gt;   ft3/MWh             127.13292
-
-!      m3/hr                  =&gt;   ft3/hr              35.3146667214886
-
-!      m3/hr-m2               =&gt;   ft3/hr-ft2          3.28083989501312
-
-!      m3/hr-person           =&gt;   ft3/hr-person       35.3146667214886
-
-!      m3/kg                  =&gt;   ft3/lb              16.018
-
-!      m3/m2                  =&gt;   ft3/ft2             3.28083989501312
-
-!      m3/MJ                  =&gt;   ft3/kWh             127.13292
-
-!      m3/person              =&gt;   ft3/person          35.3146667214886
-
-!      m3/s                   =&gt;   ft3/min             2118.88000328931
-
-!      m3/s-m                 =&gt;   ft3/min-ft          645.89
-
-!      m3/s-m2                =&gt;   ft3/min-ft2         196.85
-
-!      m3/s-person            =&gt;   ft3/min-person      2118.6438
-
-!      m3/s-W                 =&gt;   (ft3/min)/(Btu/h)   621.099127332943
-
-!      N-m                    =&gt;   lbf-in              8.85074900525547
-
-!      N-s/m2                 =&gt;   lbf-s/ft2           0.0208857913669065
-
-!      Pa                     =&gt;   psi                 0.000145037743897283
-
-!      percent/K              =&gt;   percent/F           0.555555555555556
-
-!      person/m2              =&gt;   person/ft2          0.0928939733269818
-
-!      s/m                    =&gt;   s/ft                0.3048
-
-!      V/K                    =&gt;   V/F                 0.555555555555556
-
-!      W                      =&gt;   Btu/h               3.4121412858518
-
-!      W/(m3/s)               =&gt;   W/(ft3/min)         0.0004719475
-
-!      W/K                    =&gt;   Btu/h-F             1.89563404769544
-
-!      W/m                    =&gt;   Btu/h-ft            1.04072
-
-!      W/m2                   =&gt;   Btu/h-ft2           0.316957210776545
-
-!      W/m2                   =&gt;   W/ft2               0.09290304
-
-!      W/m2-K                 =&gt;   Btu/h-ft2-F         0.176110194261872
-
-!      W/m2-K2                =&gt;   Btu/h-ft2-F2        0.097826
-
-!      W/m-K                  =&gt;   Btu-in/h-ft2-F      6.93481276005548
-
-!      W/m-K2                 =&gt;   Btu/h-F2-ft         0.321418310071648
-
-!      W/m-K3                 =&gt;   Btu/h-F3-ft         0.178565727817582
-
-!      W/person               =&gt;   Btu/h-person        3.4121412858518
-
+```idf
+! Default IP conversions (no \ip-units necessary)
+!      $/(m3/s)               =>   $/(ft3/min)         0.000472000059660808
+!      $/(W/K)                =>   $/(Btu/h-F)         0.52667614683731
+!      $/kW                   =>   $/(kBtuh/h)         0.293083235638921
+!      $/m2                   =>   $/ft2               0.0928939733269818
+!      $/m3                   =>   $/ft3               0.0283127014102352
+!      (kg/s)/W               =>   (lbm/sec)/(Btu/hr)  0.646078115385742
+!      1/K                    =>   1/F                 0.555555555555556
+!      1/m                    =>   1/ft                0.3048
+!      A/K                    =>   A/F                 0.555555555555556
+!      C                      =>   F                   1.8 (plus 32)
+!      cm                     =>   in                  0.3937
+!      cm2                    =>   inch2               0.15500031000062
+!      deltaC                 =>   deltaF              1.8
+!      deltaJ/kg              =>   deltaBtu/lb         0.0004299
+!      g/GJ                   =>   lb/MWh              0.00793664091373665
+!      g/kg                   =>   grains/lb           7
+!      g/MJ                   =>   lb/MWh              7.93664091373665
+!      g/mol                  =>   lb/mol              0.0022046
+!      g/m-s                  =>   lb/ft-s             0.000671968949659
+!      g/m-s-K                =>   lb/ft-s-F           0.000373574867724868
+!      GJ                     =>   ton-hrs             78.9889415481832
+!      J                      =>   Wh                  0.000277777777777778
+!      J/K                    =>   Btu/F               526.565
+!      J/kg                   =>   Btu/lb              0.00042986
+!      J/kg-K                 =>   Btu/lb-F            0.000239005736137667
+!      J/kg-K2                =>   Btu/lb-F2           0.000132889924714692
+!      J/kg-K3                =>   Btu/lb-F3           7.38277359526066E-05
+!      J/m2-K                 =>   Btu/ft2-F           4.89224766847393E-05
+!      J/m3                   =>   Btu/ft3             2.68096514745308E-05
+!      J/m3-K                 =>   Btu/ft3-F           1.49237004739337E-05
+!      K                      =>   R                   1.8
+!      K/m                    =>   F/ft                0.54861322767449
+!      kg                     =>   lb                  2.2046
+!      kg/J                   =>   lb/Btu              2325.83774250441
+!      kg/kg-K                =>   lb/lb-F             0.555555555555556
+!      kg/m                   =>   lb/ft               0.67196893069637
+!      kg/m2                  =>   lb/ft2              0.204794053596664
+!      kg/m3                  =>   lb/ft3              0.062428
+!      kg/m-s                 =>   lb/ft-s             0.67196893069637
+!      kg/m-s-K               =>   lb/ft-s-F           0.373316072609094
+!      kg/m-s-K2              =>   lb/ft-s-F2          0.207397818116164
+!      kg/Pa-s-m2             =>   lb/psi-s-ft2        1412.00523459398
+!      kg/s                   =>   lb/s                2.20462247603796
+!      kg/s2                  =>   lb/s2               2.2046
+!      kg/s-m                 =>   lb/s-ft             0.67196893069637
+!      kJ/kg                  =>   Btu/lb              0.429925
+!      kPa                    =>   psi                 0.145038
+!      L/day                  =>   pint/day            2.11337629827348
+!      L/GJ                   =>   gal/kWh             0.000951022349025202
+!      L/kWh                  =>   pint/kWh            2.11337629827348
+!      L/MJ                   =>   gal/kWh             0.951022349025202
+!      lux                    =>   foot-candles        0.092902267
+!      m                      =>   ft                  3.28083989501312
+!      m/hr                   =>   ft/hr               3.28083989501312
+!      m/s                    =>   ft/min              196.850393700787
+!      m/s                    =>   miles/hr            2.2369362920544
+!      m/yr                   =>   inch/yr             39.3700787401575
+!      m2                     =>   ft2                 10.7639104167097
+!      m2/m                   =>   ft2/ft              3.28083989501312
+!      m2/person              =>   ft2/person          10.764961
+!      m2/s                   =>   ft2/s               10.7639104167097
+!      m2-K/W                 =>   ft2-F-hr/Btu        5.678263
+!      m3                     =>   ft3                 35.3146667214886
+!      m3                     =>   gal                 264.172037284185
+!      m3/GJ                  =>   ft3/MWh             127.13292
+!      m3/hr                  =>   ft3/hr              35.3146667214886
+!      m3/hr-m2               =>   ft3/hr-ft2          3.28083989501312
+!      m3/hr-person           =>   ft3/hr-person       35.3146667214886
+!      m3/kg                  =>   ft3/lb              16.018
+!      m3/m2                  =>   ft3/ft2             3.28083989501312
+!      m3/MJ                  =>   ft3/kWh             127.13292
+!      m3/person              =>   ft3/person          35.3146667214886
+!      m3/s                   =>   ft3/min             2118.88000328931
+!      m3/s-m                 =>   ft3/min-ft          645.89
+!      m3/s-m2                =>   ft3/min-ft2         196.85
+!      m3/s-person            =>   ft3/min-person      2118.6438
+!      m3/s-W                 =>   (ft3/min)/(Btu/h)   621.099127332943
+!      N-m                    =>   lbf-in              8.85074900525547
+!      N-s/m2                 =>   lbf-s/ft2           0.0208857913669065
+!      Pa                     =>   psi                 0.000145037743897283
+!      percent/K              =>   percent/F           0.555555555555556
+!      person/m2              =>   person/ft2          0.0928939733269818
+!      s/m                    =>   s/ft                0.3048
+!      V/K                    =>   V/F                 0.555555555555556
+!      W                      =>   Btu/h               3.4121412858518
+!      W/(m3/s)               =>   W/(ft3/min)         0.0004719475
+!      W/K                    =>   Btu/h-F             1.89563404769544
+!      W/m                    =>   Btu/h-ft            1.04072
+!      W/m2                   =>   Btu/h-ft2           0.316957210776545
+!      W/m2                   =>   W/ft2               0.09290304
+!      W/m2-K                 =>   Btu/h-ft2-F         0.176110194261872
+!      W/m2-K2                =>   Btu/h-ft2-F2        0.097826
+!      W/m-K                  =>   Btu-in/h-ft2-F      6.93481276005548
+!      W/m-K2                 =>   Btu/h-F2-ft         0.321418310071648
+!      W/m-K3                 =>   Btu/h-F3-ft         0.178565727817582
+!      W/person               =>   Btu/h-person        3.4121412858518
 !
-
-! Other conversions supported (needs the \\ip-units code)
-
+! Other conversions supported (needs the \ip-units code)
 !
-
-!      kPa                    =&gt;   inHg                0.29523
-
-!      m                      =&gt;   in                  39.3700787401575
-
-!      m3/s                   =&gt;   gal/min             15850.3222370511
-
-!      Pa                     =&gt;   ftH2O               0.00033455
-
-!      Pa                     =&gt;   inH2O               0.00401463
-
-!      Pa                     =&gt;   inHg                0.00029613
-
-!      Pa                     =&gt;   Pa                  1
-
-!      W                      =&gt;   W                   1
-
-!      W/m2                   =&gt;   W/m2                1
-
-!      W/m-K                  =&gt;   Btu/h-ft-F          0.577796066000163
-
-!      W/person               =&gt;   W/person            1
-
+!      kPa                    =>   inHg                0.29523
+!      m                      =>   in                  39.3700787401575
+!      m3/s                   =>   gal/min             15850.3222370511
+!      Pa                     =>   ftH2O               0.00033455
+!      Pa                     =>   inH2O               0.00401463
+!      Pa                     =>   inHg                0.00029613
+!      Pa                     =>   Pa                  1
+!      W                      =>   W                   1
+!      W/m2                   =>   W/m2                1
+!      W/m-K                  =>   Btu/h-ft-F          0.577796066000163
+!      W/person               =>   W/person            1
 !
-
 ! Units fields that are not translated
-
 !      $
-
 !      1/hr
-
 !      A
-
 !      Ah
-
 !      A/V
-
 !      Availability
-
 !      Control
-
 !      cycles/hr
-
 !      days
-
 !      deg
-
 !      dimensionless
-
 !      eV
-
 !      hr
-
 !      J/J
-
 !      kg/kg
-
 !      kg-H2O/kg-air
-
 !      kmol
-
 !      kmol/s
-
 !      m3/m3
-
 !      minutes
-
 !      Mode
-
 !      ms
-
 !      ohms
-
 !      percent
-
 !      ppm
-
 !      rev/min
-
 !      s
-
 !      V
-
 !      VA
-
 !      W/m2 or deg C
-
 !      W/m2, W or deg C
-
 !      W/s
-
 !      W/W
-
 !      years
-
-! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
+! **************************************************************************
+```
 
 ### Example Object
 
 The Site:Location object will serve as an example.
 
-**Site:Location,**
+```idd
+Site:Location,
+       \unique-object
+       \min-fields 5
+  A1 , \field Name
+       \required-field
+       \type  alpha
+  N1 , \field Latitude
+       \units deg
+       \minimum -90.0
+       \maximum +90.0
+       \default 0.0
+       \note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)
+       \type real
+  N2 , \field Longitude
+       \units deg
+       \minimum -180.0
+       \maximum +180.0
+       \default 0.0
+       \note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)
+       \type real
+  N3 , \field Time Zone
+       \note basic these limits on the WorldTimeZone Map (2003)
+       \units hr
+       \minimum -12.0
+       \maximum +14.0
+       \default 0.0
+       \note  Time relative to GMT. Decimal hours.
+       \type real
+  N4 ; \field Elevation
+       \units m
+       \minimum -300.0
+       \maximum&lt; 6096.0
+       \default 0.0
+       \type real
+```
 
-       \\unique-object
-
-       \\min-fields 5
-
-  A1 , \\field Name
-
-       \\required-field
-
-       \\type  alpha
-
-  N1 , \\field Latitude
-
-       \\units deg
-
-       \\minimum -90.0
-
-       \\maximum +90.0
-
-       \\default 0.0
-
-       \\note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)
-
-       \\type real
-
-  N2 , \\field Longitude
-
-       \\units deg
-
-       \\minimum -180.0
-
-       \\maximum +180.0
-
-       \\default 0.0
-
-       \\note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)
-
-       \\type real
-
-  N3 , \\field Time Zone
-
-       \\note basic these limits on the WorldTimeZone Map (2003)
-
-       \\units hr
-
-       \\minimum -12.0
-
-       \\maximum +14.0
-
-       \\default 0.0
-
-       \\note  Time relative to GMT. Decimal hours.
-
-       \\type real
-
-  N4 ; \\field Elevation
-
-       \\units m
-
-       \\minimum -300.0
-
-       \\maximum&lt; 6096.0
-
-       \\default 0.0
-
-       \\type real
 
 First, the object name is given.  (Site:Location)  This is followed by a comma in both the definition (IDD) and in an input file (IDF).  In fact, all fields except the terminating field of an IDD class object and IDF object are followed by commas.  The final field in an IDD class object or in an IDF object is terminated by a semi-colon.
 
@@ -1046,9 +665,9 @@ Table 1. Standard EnergyPlus Units
 
 <table class="table table-striped">
 <tr>
-<td>Quantity</td>
-<td>unit</td>
-<td>abbreviation</td>
+<th>Quantity</th>
+<th>unit</th>
+<th>abbreviation</th>
 </tr>
 <tr>
 <td>angular degrees</td>
@@ -1254,19 +873,14 @@ Output
 
 EnergyPlus produces several output files as shown in the section on “Running EnergyPlus”.   This section will discuss the data contained in the “standard” output file (**eplusout.eso**).  It, too, has a data dictionary but unlike the input files, the output data dictionary is contained within the output file.  Thus, the basic structure of the standard output file is:
 
+```
 Data Dictionary Information
-
 End of Data Dictionary
-
 Data
-
 …
-
 Data
-
 End of Data
-
-
+```
 
 As with the IDF structure, there are rules associated with the interpretation of the standard output data dictionary.  These rules are summarized as follows:
 
@@ -1276,77 +890,58 @@ As with the IDF structure, there are rules associated with the interpretation of
 
 Six standard items appear at the start of every EnergyPlus Standard Output File Data Dictionary:
 
+```
 Program Version,EnergyPlus, 1.0, Beta 2, Build 017
-
 1,5,Environment Title[],Latitude[degrees],Longitude[degrees],Time Zone[],Elevation[m]
-
 2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no], Hour[], StartMinute[], EndMinute[], DayType
-
 3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType
-
 4,2,Cumulative Days of Simulation[],Month[]
-
 5,1,Cumulative Days of Simulation[]
+```
 
-Item 0 is the program version statement.
+* Item 0 is the program version statement.
 
-Item 1 is produced at the beginning of each new “environment” (design day, run period).
+* Item 1 is produced at the beginning of each new “environment” (design day, run period).
 
-Item 2 is produced prior to any variable reported at the timestep or hourly intervals.  Hourly intervals will be shown with a start minute of 0.0 and an end minute of 60.0.  Timestep intervals will show the appropriate start and end minutes.
+* Item 2 is produced prior to any variable reported at the timestep or hourly intervals.  Hourly intervals will be shown with a start minute of 0.0 and an end minute of 60.0.  Timestep intervals will show the appropriate start and end minutes.
 
-Item 3 is produced prior to any variable reported at the daily interval.
+* Item 3 is produced prior to any variable reported at the daily interval.
 
-Item 4 is produced prior to any variable reported at the monthly interval.
+* Item 4 is produced prior to any variable reported at the monthly interval.
 
-Item 5 is produced prior to any variable reported at the end of the “environment”.
+* Item 5 is produced prior to any variable reported at the end of the “environment”.
 
 Following these five standard lines will be the variables requested for reporting from the input file (ref. Report Variable).  For example:
 
+```
 6,2,Environment,Outdoor Dry Bulb [C] !Hourly
-
 21,2,ZONE ONE,Mean Air Temperature[C] !Hourly
-
 22,2,ZONE ONE,Zone-Total Latent Gain[J] !Hourly
-
 26,2,ZONE ONE,Zone-Total Electric Consumption[J] !Hourly
+```
 
 This example illustrates the non-consecutive nature of the “report codes”.  Internally, EnergyPlus counts each variable that *could* be reported.  This is the assigned “report code”.  However, the user may not request each possible variable for reporting.  Note that, currently, the requested reporting frequency is shown as a comment (!) line in the standard output file.
 
 The data is produced when the actual simulation is performed (after the warmup days).  Data output is simpler in format than the data dictionary lines.  From the dictionary above:
 
-     1,DENVER COLORADO WINTER,  39.75,-104.87,  -7.00,1610.26
-
-     2,  1, 1,21, 0, 1, 0.00,60.00,Monday
-
+```
+1,DENVER COLORADO WINTER,  39.75,-104.87,  -7.00,1610.26
+2,  1, 1,21, 0, 1, 0.00,60.00,Monday
 6,-17.22222
-
 21,-17.22219
-
 22,0.0000000E+00
-
 26,0.0000000E+00
-
-     2,  1, 1,21, 0, 2, 0.00,60.00,Monday
-
+2,  1, 1,21, 0, 2, 0.00,60.00,Monday
 6,-17.22222
-
 21,-17.22219
-
 22,0.0000000E+00
-
 26,0.0000000E+00
-
-     2,  1, 1,21, 0, 3, 0.00,60.00,Monday
-
+2,  1, 1,21, 0, 3, 0.00,60.00,Monday
 6,-17.22222
-
 21,-17.22219
-
 22,0.0000000E+00
-
 26,0.0000000E+00
-
-…
+```
 
 This output file can be easily turned into a form that is read into commonly used spreadsheet programs where it can be further analyzed, graphed, etc.
 
@@ -1366,15 +961,15 @@ Running EnergyPlus
 
 EnergyPlus is written in language conforming to Fortran Standard 90/95.  It runs as a 32 bit console (non-Windows) application on Intel compatible computers (Windows NT, Windows 95/98).  More explicit details on running EnergyPlus are available in a separate document (Running EnergyPlus in Auxiliary Programs document).  The following files are used to run EnergyPlus:
 
-EnergyPlus.exe (the executable file)
+* EnergyPlus.exe (the executable file)
 
-Energy+.ini (described below)
+* Energy+.ini (described below)
 
-Energy+.idd (the input data dictionary file)
+* Energy+.idd (the input data dictionary file)
 
-In.idf (the input file)
+* In.idf (the input file)
 
-In.epw – optional (weather data file)
+* In.epw – optional (weather data file)
 
 The input data dictionary and input data file have been discussed in the previous sections of this document.
 
@@ -1390,8 +985,8 @@ Table 2.  EnergyPlus Output Files
 
 <table class="table table-striped">
 <tr>
-<td>FileName</td>
-<td>Description</td>
+<th>FileName</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>Audit.out</td>
@@ -1433,8 +1028,8 @@ Table 3.  EnergyPlus Errors
 
 <table class="table table-striped">
 <tr>
-<td>Error Level</td>
-<td>Action</td>
+<th>Error Level</th>
+<th>Action</th>
 </tr>
 <tr>
 <td>Warning</td>
@@ -1452,41 +1047,26 @@ Table 3.  EnergyPlus Errors
 
 EnergyPlus produces several messages as it is executing, as a guide to its progress.  For example, the run of the 1ZoneUncontrolled input file from Appendix A produces:
 
+```idf
 EnergyPlus Starting
-
  EnergyPlus 1.3.0.011, 4/5/2006 2:59 PM
-
  Initializing New Environment Parameters
-
  Warming up {1}
-
  Initializing Response Factors
-
  Initializing Window Optical Properties
-
  Initializing Solar Calculations
-
  Initializing HVAC
-
  Warming up {2}
-
  Warming up {3}
-
  Warming up {4}
-
- Starting Simulation at 12/21 for DENVER\_STAPLETON ANN HTG 99% CONDNS DB
-
+ Starting Simulation at 12/21 for DENVER_STAPLETON ANN HTG 99% CONDNS DB
  Initializing New Environment Parameters
-
  Warming up {1}
-
  Warming up {2}
-
  Warming up {3}
-
- Starting Simulation at 07/21 for DENVER\_STAPLETON ANN CLG 1% CONDNS DB=&gt;MWB
-
+ Starting Simulation at 07/21 for DENVER_STAPLETON ANN CLG 1% CONDNS DB=&gt;MWB
  EnergyPlus Run Time=00hr 00min  1.00sec
+```
 
 Extensive timing studies and fine-tuning of EnergyPlus is NOT complete.  To give you an idea of comparable run times, we present the following (does not include HVAC) with an early version of EnergyPlus running on a 450MHZ machine.  Remember, BLAST would be 1 calculation per hour, EnergyPlus (in this case) was 4 calculations per hour.  Obviously, these are quite out of date.  However, a recent change in a developer’s test machine illustrates the importance of maximum memory.  A 5 zone full year run on a 1.8GHZ, 1GB machine was running about 8 minutes – with a new 2.1GHZ, 2GB machine the same file takes about 2 minutes.
 
@@ -1494,9 +1074,9 @@ Table 4.  Timings Comparison (EnergyPlus vs. BLAST)
 
 <table class="table table-striped">
 <tr>
-<td>File</td>
-<td>BLAST Per Zone</td>
-<td>EnergyPlus Per Zone</td>
+<th>File</th>
+<th>BLAST Per Zone</th>
+<th>EnergyPlus Per Zone</th>
 </tr>
 <tr>
 <td>GeometryTest (5 Zones, 2 Design Day, Full Weather Year)</td>
@@ -1510,16 +1090,6 @@ Table 4.  Timings Comparison (EnergyPlus vs. BLAST)
 </tr>
 </table>
 
-
-
-
-
-
-
-
-
-
-
 Licensing
 =========
 
@@ -1530,1037 +1100,580 @@ http://www.eere.energy.gov/buildings/energyplus/energyplus_licensing.html contai
 Appendix A.  Simple IDF file
 ============================
 
+```idf
 !1ZoneUncontrolled.idf
-
 ! Basic file description:  Basic test for EnergyPlus.  Resistive Walls.  Regular (no ground contact) floor.
-
 !                          Regular roof.  No Windows.
-
 !
-
 ! Highlights:              Very basic test to see that EnergyPlus "works".
-
 !
-
 !
-
-! Simulation Location/Run: DENVER\_STAPLETON\_CO\_USA\_WMO\_724690, 2 design days, 1 run period,
-
+! Simulation Location/Run: DENVER_STAPLETON_CO_USA_WMO_724690, 2 design days, 1 run period,
 !                          Run Control executes two design days (see RUN PERIOD object)
-
 !
-
 ! Location:                Denver, CO
-
 !
-
-! Design Days:             DENVER\_STAPLETON\_CO\_USA Annual Heating 99%, MaxDB=-16°C
-
-!                          DENVER\_STAPLETON\_CO\_USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=32.6°C MWB=15.5°C
-
+! Design Days:             DENVER_STAPLETON_CO_USA Annual Heating 99%, MaxDB=-16°C
+!                          DENVER_STAPLETON_CO_USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=32.6°C MWB=15.5°C
 !
-
-! Run Period (Weather File): Full Annual Simulation, DENVER\_STAPLETON\_CO\_USA\_WMO\_724690
-
+! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
 !
-
 ! Run Control:             No zone or system sizing, design day run control (no weather file simulation)
-
 !
-
 ! Building: Fictional 1 zone building with resistive walls.
-
 !
-
 !           The building is oriented due north.
-
 !
-
 ! Floor Area:        232.25 m2
-
 ! Number of Stories: 1
-
 !
-
 ! Zone Description Details:
-
 !
-
 !       (0,15.24,0)                 (15.24,15.24,0)
-
-!              \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
+!              _____________________________
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
 !             |                             |
-
-!             |\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_|
-
+!             |_____________________________|
 !
-
 !          (0,0,0)                      (15.24,0,0)
-
 !
-
 ! Internal gains description:     NA
-
 !
-
 ! Interzone Surfaces:             None
-
 ! Internal Mass:                  None
-
 ! People:                         None
-
 ! Lights:                         None
-
 ! Equipment:                      None
-
 ! Windows:                        0
-
 ! Detached Shading:               None
-
 ! Daylight:                       None
-
 ! Natural Ventilation:            None
-
 ! Compact Schedules:              NA (Example of non-Compact Schedules)
-
 ! Solar Distribution:             MinimalShadowing
-
 !
-
 ! HVAC:                           NA
-
 !
-
 ! Zonal Equipment:                NA
-
 ! Central Air Handling Equipment: No
-
 ! System Equipment Autosize:      No
-
 ! Purchased Cooling:              No
-
 ! Purchased Heating:              No
-
 ! Purchased Chilled Water:        No
-
 ! Purchased Hot Water:            No
-
 ! Coils:                          None
-
 ! Pumps:                          None
-
 ! Boilers:                        None
-
 ! Chillers:                       None
-
 ! Towers:                         None
-
 !
-
 ! Results:
-
 ! Standard Reports:               Variable Dictionary, Surfaces (dxf-wireframe), Meter File
-
 ! Timestep or Hourly Variables:   Hourly and Daily
-
 ! Time bins Report:               None
-
 ! HTML Report:                    None
-
 ! Environmental Emissions:        None
-
 ! Utility Tariffs:                None
 
 
-
   Output:PreprocessorMessage,
-
     No Preprocessor Used,    !- Preprocessor Name
-
     Information,             !- Error Severity
-
     Illustrative Message,    !- Message Line 1
-
     No problems for processing;  !- Message Line 2
 
 
-
   Version,
-
     3.0;                     !- Version Identifier
 
 
-
   Timestep,
-
     4;                       !- Number of Timesteps per Hour
 
 
-
   Building,
-
     Simple One Zone (Wireframe DXF),  !- Name
-
     0.0000000E+00,           !- North Axis {deg}
-
     Suburbs,                 !- Terrain
-
     .04,                     !- Loads Convergence Tolerance Value
-
     .004,                    !- Temperature Convergence Tolerance Value {deltaC}
-
     MinimalShadowing,        !- Solar Distribution
-
     30;                      !- Maximum Number of Warmup Days
 
 
-
   HeatBalanceAlgorithm,
-
     ConductionTransferFunction;  !- Algorithm
 
 
-
   SurfaceConvectionAlgorithm:Inside,
-
     Detailed;                !- Algorithm
-
 
 
   SurfaceConvectionAlgorithm:Outside,
-
     Detailed;                !- Algorithm
 
 
-
   SimulationControl,
-
     No,                      !- Do Zone Sizing Calculation
-
     No,                      !- Do System Sizing Calculation
-
     No,                      !- Do Plant Sizing Calculation
-
     Yes,                     !- Run Simulation for Sizing Periods
-
     Yes;                     !- Run Simulation for Weather File Run Periods
 
 
-
   RunPeriod,
-
     1,                       !- Begin Month
-
     1,                       !- Begin Day of Month
-
     12,                      !- End Month
-
     31,                      !- End Day of Month
-
     Tuesday,                 !- Day of Week for Start Day
-
     Yes,                     !- Use Weather File Holidays and Special Days
-
     Yes,                     !- Use Weather File Daylight Saving Period
-
     No,                      !- Apply Weekend Holiday Rule
-
     Yes,                     !- Use Weather File Rain Indicators
-
     Yes;                     !- Use Weather File Snow Indicators
 
 
-
   Site:Location,
-
-    DENVER\_STAPLETON\_CO\_USA\_WMO\_724690,  !- Name
-
+    DENVER_STAPLETON_CO_USA_WMO_724690,  !- Name
     39.77,                   !- Latitude {deg}
-
     -104.87,                 !- Longitude {deg}
-
     -7.00,                   !- Time Zone {hr}
-
     1611.00;                 !- Elevation {m}
 
 
-
  !  WMO=724690 Time Zone=NAM        (GMT-07:00) Mountain Time (US & Canada)
-
  !  Data Source=ASHRAE 2005 Annual Design Conditions
-
  ! Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
-
- ! DENVER\_STAPLETON\_CO\_USA Extreme Annual Wind Speeds, 1%=10.9m/s, 2.5%=8.8m/s, 5%=7.7m/s
-
- ! DENVER\_STAPLETON\_CO\_USA Extreme Annual Temperatures, Max Drybulb=37.2°C Min Drybulb=-24.6°C
-
- ! DENVER\_STAPLETON\_CO\_USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
-
+ ! DENVER_STAPLETON_CO_USA Extreme Annual Wind Speeds, 1%=10.9m/s, 2.5%=8.8m/s, 5%=7.7m/s
+ ! DENVER_STAPLETON_CO_USA Extreme Annual Temperatures, Max Drybulb=37.2°C Min Drybulb=-24.6°C
+ ! DENVER_STAPLETON_CO_USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
  ! Coldest Month=December
-
- ! DENVER\_STAPLETON\_CO\_USA Annual Heating 99%, MaxDB=-16°C
-
+ ! DENVER_STAPLETON_CO_USA Annual Heating 99%, MaxDB=-16°C
 
 
   SizingPeriod:DesignDay,
-
-    DENVER\_STAPLETON Ann Htg 99% Condns DB,  !- Name
-
+    DENVER_STAPLETON Ann Htg 99% Condns DB,  !- Name
     -16,                     !- Maximum Dry-Bulb Temperature {C}
-
     0.0,                     !- Daily Temperature Range {deltaC}
-
     -16,                     !- Humidity Indicating Conditions at Maximum Dry-Bulb
-
     83411.,                  !- Barometric Pressure {Pa}
-
     2.3,                     !- Wind Speed {m/s}
-
     180,                     !- Wind Direction {deg}
-
     0.00,                    !- Sky Clearness
-
     0,                       !- Rain Indicator
-
     0,                       !- Snow Indicator
-
     21,                      !- Day of Month
-
     12,                      !- Month
-
     WinterDesignDay,         !- Day Type
-
     0,                       !- Daylight Saving Time Indicator
-
     WetBulb;                 !- Humidity Indicating Type
 
 
-
- ! DENVER\_STAPLETON Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
-
+ ! DENVER_STAPLETON Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
  ! Hottest Month=July
-
- ! DENVER\_STAPLETON\_CO\_USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=32.6°C MWB=15.5°C
-
+ ! DENVER_STAPLETON_CO_USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=32.6°C MWB=15.5°C
 
 
   SizingPeriod:DesignDay,
-
-    DENVER\_STAPLETON Ann Clg 1% Condns DB=&gt;MWB,  !- Name
-
+    DENVER_STAPLETON Ann Clg 1% Condns DB=&gt;MWB,  !- Name
     32.6,                    !- Maximum Dry-Bulb Temperature {C}
-
     15.2,                    !- Daily Temperature Range {deltaC}
-
     15.5,                    !- Humidity Indicating Conditions at Maximum Dry-Bulb
-
     83411.,                  !- Barometric Pressure {Pa}
-
     4,                       !- Wind Speed {m/s}
-
     120,                     !- Wind Direction {deg}
-
     1.00,                    !- Sky Clearness
-
     0,                       !- Rain Indicator
-
     0,                       !- Snow Indicator
-
     21,                      !- Day of Month
-
     7,                       !- Month
-
     SummerDesignDay,         !- Day Type
-
     0,                       !- Daylight Saving Time Indicator
-
     WetBulb;                 !- Humidity Indicating Type
 
 
-
   Material:NoMass,
-
     R13LAYER,                !- Name
-
     Rough,                   !- Roughness
-
     2.290965,                !- Thermal Resistance {m2-K/W}
-
     0.9000000,               !- Thermal Absorptance
-
     0.7500000,               !- Solar Absorptance
-
     0.7500000;               !- Visible Absorptance
-
 
 
   Material:NoMass,
-
     R31LAYER,                !- Name
-
     Rough,                   !- Roughness
-
     5.456,                   !- Thermal Resistance {m2-K/W}
-
     0.9000000,               !- Thermal Absorptance
-
     0.7500000,               !- Solar Absorptance
-
     0.7500000;               !- Visible Absorptance
-
 
 
   Material,
-
     C5 - 4 IN HW CONCRETE,   !- Name
-
     MediumRough,             !- Roughness
-
     0.1014984,               !- Thickness {m}
-
     1.729577,                !- Conductivity {W/m-K}
-
     2242.585,                !- Density {kg/m3}
-
     836.8000,                !- Specific Heat {J/kg-K}
-
     0.9000000,               !- Thermal Absorptance
-
     0.6500000,               !- Solar Absorptance
-
     0.6500000;               !- Visible Absorptance
 
 
-
   Construction,
-
     R13WALL,                 !- Name
-
     R13LAYER;                !- Outside Layer
 
 
-
   Construction,
-
     FLOOR,                   !- Name
-
     C5 - 4 IN HW CONCRETE;   !- Outside Layer
 
 
-
   Construction,
-
     ROOF31,                  !- Name
-
     R31LAYER;                !- Outside Layer
 
 
-
   Site:GroundTemperature:BuildingSurface,
-
     18.89,                   !- January Ground Temperature {C}
-
     18.92,                   !- February Ground Temperature {C}
-
     19.02,                   !- March Ground Temperature {C}
-
     19.12,                   !- April Ground Temperature {C}
-
     19.21,                   !- May Ground Temperature {C}
-
     19.23,                   !- June Ground Temperature {C}
-
     19.07,                   !- July Ground Temperature {C}
-
     19.32,                   !- August Ground Temperature {C}
-
     19.09,                   !- September Ground Temperature {C}
-
     19.21,                   !- October Ground Temperature {C}
-
     19.13,                   !- November Ground Temperature {C}
-
     18.96;                   !- December Ground Temperature {C}
 
 
-
   Zone,
-
     ZONE ONE,                !- Name
-
     0.0000000E+00,           !- Direction of Relative North {deg}
-
     0.0000000E+00,           !- X Origin {m}
-
     0.0000000E+00,           !- Y Origin {m}
-
     0.0000000E+00,           !- Z Origin {m}
-
     1,                       !- Type
-
     1,                       !- Multiplier
-
     autocalculate,           !- Ceiling Height {m}
-
     autocalculate;           !- Volume {m3}
 
 
-
   ScheduleTypeLimits,
-
     Fraction,                !- Name
-
     0.0 : 1.0,               !- Range
-
     CONTINUOUS;              !- Numeric Type
 
 
-
   GlobalGeometryRules,
-
     UpperLeftCorner,         !- Starting Vertex Position
-
     CounterClockWise,        !- Vertex Entry Direction
-
     WorldCoordinateSystem;   !- Coordinate System
 
 
-
   BuildingSurface:Detailed,
-
     Zn001:Wall001,           !- Name
-
     Wall,                    !- Surface Type
-
     R13WALL,                 !- Construction Name
-
     ZONE ONE,                !- Zone Name
-
     Outdoors,                !- Outside Boundary Condition
-
     ,                        !- Outside Boundary Condition Object
-
     SunExposed,              !- Sun Exposure
-
     WindExposed,             !- Wind Exposure
-
     0.5000000,               !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==&gt; Vertex 1
-
     0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==&gt; Vertex 2
-
     15.24000,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==&gt; Vertex 3
-
     15.24000,0.0000000E+00,4.572000;  !- X,Y,Z ==&gt; Vertex 4
 
 
-
   BuildingSurface:Detailed,
-
     Zn001:Wall002,           !- Name
-
     Wall,                    !- Surface Type
-
     R13WALL,                 !- Construction Name
-
     ZONE ONE,                !- Zone Name
-
     Outdoors,                !- Outside Boundary Condition
-
     ,                        !- Outside Boundary Condition Object
-
     SunExposed,              !- Sun Exposure
-
     WindExposed,             !- Wind Exposure
-
     0.5000000,               !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     15.24000,0.0000000E+00,4.572000,  !- X,Y,Z ==&gt; Vertex 1
-
     15.24000,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==&gt; Vertex 2
-
     15.24000,15.24000,0.0000000E+00,  !- X,Y,Z ==&gt; Vertex 3
-
     15.24000,15.24000,4.572000;  !- X,Y,Z ==&gt; Vertex 4
 
 
-
   BuildingSurface:Detailed,
-
     Zn001:Wall003,           !- Name
-
     Wall,                    !- Surface Type
-
     R13WALL,                 !- Construction Name
-
     ZONE ONE,                !- Zone Name
-
     Outdoors,                !- Outside Boundary Condition
-
     ,                        !- Outside Boundary Condition Object
-
     SunExposed,              !- Sun Exposure
-
     WindExposed,             !- Wind Exposure
-
     0.5000000,               !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     15.24000,15.24000,4.572000,  !- X,Y,Z ==&gt; Vertex 1
-
     15.24000,15.24000,0.0000000E+00,  !- X,Y,Z ==&gt; Vertex 2
-
     0.0000000E+00,15.24000,0.0000000E+00,  !- X,Y,Z ==&gt; Vertex 3
-
     0.0000000E+00,15.24000,4.572000;  !- X,Y,Z ==&gt; Vertex 4
 
 
-
   BuildingSurface:Detailed,
-
     Zn001:Wall004,           !- Name
-
     Wall,                    !- Surface Type
-
     R13WALL,                 !- Construction Name
-
     ZONE ONE,                !- Zone Name
-
     Outdoors,                !- Outside Boundary Condition
-
     ,                        !- Outside Boundary Condition Object
-
     SunExposed,              !- Sun Exposure
-
     WindExposed,             !- Wind Exposure
-
     0.5000000,               !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     0.0000000E+00,15.24000,4.572000,  !- X,Y,Z ==&gt; Vertex 1
-
     0.0000000E+00,15.24000,0.0000000E+00,  !- X,Y,Z ==&gt; Vertex 2
-
     0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==&gt; Vertex 3
-
     0.0000000E+00,0.0000000E+00,4.572000;  !- X,Y,Z ==&gt; Vertex 4
 
 
-
   BuildingSurface:Detailed,
-
     Zn001:Flr001,            !- Name
-
     Floor,                   !- Surface Type
-
     FLOOR,                   !- Construction Name
-
     ZONE ONE,                !- Zone Name
-
     Surface,                 !- Outside Boundary Condition
-
     Zn001:Flr001,            !- Outside Boundary Condition Object
-
     NoSun,                   !- Sun Exposure
-
     NoWind,                  !- Wind Exposure
-
     1.000000,                !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     15.24000,0.000000,0.0,  !- X,Y,Z ==&gt; Vertex 1
-
     0.000000,0.000000,0.0,  !- X,Y,Z ==&gt; Vertex 2
-
     0.000000,15.24000,0.0,  !- X,Y,Z ==&gt; Vertex 3
-
     15.24000,15.24000,0.0;  !- X,Y,Z ==&gt; Vertex 4
 
 
-
   BuildingSurface:Detailed,
-
     Zn001:Roof001,           !- Name
-
     Roof,                    !- Surface Type
-
     ROOF31,                  !- Construction Name
-
     ZONE ONE,                !- Zone Name
-
     Outdoors,                !- Outside Boundary Condition
-
     ,                        !- Outside Boundary Condition Object
-
     SunExposed,              !- Sun Exposure
-
     WindExposed,             !- Wind Exposure
-
     0.0000000E+00,           !- View Factor to Ground
-
     4,                       !- Number of Vertices
-
     0.000000,15.24000,4.572,  !- X,Y,Z ==&gt; Vertex 1
-
     0.000000,0.000000,4.572,  !- X,Y,Z ==&gt; Vertex 2
-
     15.24000,0.000000,4.572,  !- X,Y,Z ==&gt; Vertex 3
-
     15.24000,15.24000,4.572;  !- X,Y,Z ==&gt; Vertex 4
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     outdoor dry bulb,        !- Variable Name
-
     hourly;                  !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Daylight Saving Time Indicator,  !- Variable Name
-
     daily;                   !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     DayType Index,           !- Variable Name
-
     daily;                   !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Zone Mean Air Temperature,  !- Variable Name
-
     hourly;                  !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Zone Total Internal Latent Gain,  !- Variable Name
-
     hourly;                  !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Zone Mean Radiant Temperature,  !- Variable Name
-
     hourly;                  !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Zone Air Balance Surface Convection Rate,  !- Variable Name
-
     hourly;                  !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Zone Air Balance Air Energy Storage Rate,  !- Variable Name
-
     hourly;                  !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Surface Inside Temperature,  !- Variable Name
-
     daily;                   !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Surface Outside Temperature,  !- Variable Name
-
     daily;                   !- Reporting Frequency
 
 
-
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Surface Int Convection Coeff,  !- Variable Name
-
     daily;                   !- Reporting Frequency
-
 
 
   Output:Variable,
-
-    \*,                       !- Key Value
-
+    *,                       !- Key Value
     Surface Ext Convection Coeff,  !- Variable Name
-
     daily;                   !- Reporting Frequency
-
 
 
   Output:Reports,
-
     VariableDictionary,      !- Type of Report
-
     IDF;                     !- Report Name
 
 
-
   Output:Reports,
-
     surfaces,                !- Type of Report
-
     dxf:wireframe;           !- Report Name
 
 
-
   Output:Reports,
-
     construction;            !- Type of Report
 
 
-
   Output:Meter:MeterFileOnly,
-
     ExteriorLights:Electricity,  !- Name
-
     hourly;                  !- Reporting Frequency
 
 
-
   Output:Meter:MeterFileOnly,
-
     Carbon Equivalent:Facility,  !- Name
-
     hourly;                  !- Reporting Frequency
 
 
-
   Output:Meter:MeterFileOnly,
-
     EnergyTransfer:Building, !- Name
-
     hourly;                  !- Reporting Frequency
-
 
 
   Output:Meter:MeterFileOnly,
-
     EnergyTransfer:Facility, !- Name
-
     hourly;                  !- Reporting Frequency
-
 
 
   OutputControl:Table:Style,
-
     HTML;                    !- Column Separator
 
 
-
   Output:Table:SummaryReports,
-
     AllSummary;              !- Report 1 Name
 
 
-
   Exterior:Lights,
-
     ExtLights,               !- Name
-
     AlwaysOn,                !- Schedule Name
-
     5250,                    !- Design Level {W}
-
     AstronomicalClock,       !- Control Option
-
     Grounds Lights;          !- End-Use Subcategory
 
 
-
   ScheduleTypeLimits,
-
     On/Off,                  !- Name
-
     0:1,                     !- Range
-
     DISCRETE;                !- Numeric Type
 
 
-
   Schedule:Day:Hourly,
-
     On,                      !- Name
-
     On/Off,                  !- Schedule Type Limits Name
-
     1.,                      !- Hour 1
-
     1.,                      !- Hour 2
-
     1.,                      !- Hour 3
-
     1.,                      !- Hour 4
-
     1.,                      !- Hour 5
-
     1.,                      !- Hour 6
-
     1.,                      !- Hour 7
-
     1.,                      !- Hour 8
-
     1.,                      !- Hour 9
-
     1.,                      !- Hour 10
-
     1.,                      !- Hour 11
-
     1.,                      !- Hour 12
-
     1.,                      !- Hour 13
-
     1.,                      !- Hour 14
-
     1.,                      !- Hour 15
-
     1.,                      !- Hour 16
-
     1.,                      !- Hour 17
-
     1.,                      !- Hour 18
-
     1.,                      !- Hour 19
-
     1.,                      !- Hour 20
-
     1.,                      !- Hour 21
-
     1.,                      !- Hour 22
-
     1.,                      !- Hour 23
-
     1.;                      !- Hour 24
 
 
-
   Schedule:Week:Daily,
-
     On Weeks,                !- Name
-
     On,                      !- Sunday Schedule:Day Name
-
     On,                      !- Monday Schedule:Day Name
-
     On,                      !- Tuesday Schedule:Day Name
-
     On,                      !- Wednesday Schedule:Day Name
-
     On,                      !- Thursday Schedule:Day Name
-
     On,                      !- Friday Schedule:Day Name
-
     On,                      !- Saturday Schedule:Day Name
-
     On,                      !- Holiday Schedule:Day Name
-
     On,                      !- SummerDesignDay Schedule:Day Name
-
     On,                      !- WinterDesignDay Schedule:Day Name
-
     On,                      !- CustomDay1 Schedule:Day Name
-
     On;                      !- CustomDay2 Schedule:Day Name
 
 
-
   Schedule:Year,
-
     AlwaysOn,                !- Name
-
     On/Off,                  !- Schedule Type Limits Name
-
     On Weeks,                !- Schedule:Week Name 1
-
     1,                       !- Start Month 1
-
     1,                       !- Start Day 1
-
     12,                      !- End Month 1
-
     31;                      !- End Day 1
 
-
+```
 
 
 
