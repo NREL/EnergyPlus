@@ -2432,6 +2432,42 @@ $$</div>
 <p>The object provides both cooling and heating, and also operates in a single operating mode such as cooling-only or heating-only mode. Thus, the rated flow rate is determined, depending upon the operating mode of the unit. If the unit operates in a single operating mode, either design chilled water or hot water flow rate is chosen. The larger of the two is chosen if the unit provides both cooling and heating. The flow rates are determined in the same fashion to the variable flow system above.</p>
 <h5 id="hydronic-tubing-length_1">Hydronic Tubing Length</h5>
 <p>The length of hydronic tube is determined as described in the variable flow radiant system above.</p>
+<h3 id="unitary-system-sizing_1">Unitary System Sizing</h3>
+<p>The AirloopHVAC:UnitarySystem object incorporates all coils types and fans as a complete packaged system. The fans and coils are optional allowing virtually any system type to be modeled. Sizing of this object depends on the coils selected. For single coil systems, the associated air flow rate is used as the operating flow rate (i.e., cooling or heating). For systems with both a cooling and heating coil, this methodology still applies except for DX systems (Heat Pumps) where the greater of the cooling or heating air flow rate is used. Heat pumps are defined as systems having both a DX cooling and DX heating coil. The inputs that may need to be autosized are the supply air air volumetric air flow rates during cooling operation, heating operation, and when no cooling or heating is needed. The data needed for sizing the units are obtained from the zone design arrays.</p>
+<h4 id="supply-air-volumetric-flow-rate-during-cooling-operation_1">Supply Air volumetric flow rate during cooling operation:</h4>
+<div> \[ \dot V_{SA,cooling} = \text{DesCoolVolFlow}_{zone} / \text{ZoneFraction} \] </div>
+
+<h4 id="supply-air-volumetric-flow-rate-during-heating-operation_1">Supply Air volumetric flow rate during heating operation:</h4>
+<div> \[ \dot V_{SA,heating} = \text{DesHeatVolFlow}_{zone} / \text{ZoneFraction} \] </div>
+
+<h4 id="supply-air-volumetric-flow-rate-when-dx-coils-are-used-as-a-system">Supply Air volumetric flow rate when DX coils are used as a system:</h4>
+<div> \[ \dot V_{SA} = \max \left(\text{DesCoolVolFlow}_{zone}, \text{DesHeatVolFlow}_{zone}\right) / \text{ZoneFraction} \] </div>
+
+<p>where:</p>
+<ul>
+<li>ZoneFraction = Fraction of the total volume flow that goes through the controlling zone</li>
+</ul>
+<p>The unitary system object also allows scalable sizing as follows:</p>
+<p>Flow Per Floor Area:</p>
+<div>\[ \dot V_{SA} = \left(\text{FlowPerFloorArea}\right)\left(\text{TotalFloorArea}\right) \]</div>
+
+<p>Fraction of Autosized Cooling Value:</p>
+<div>\[ \dot V_{SA,cooling} = \dot V_{SA,des,cooling}\left(\text{FractionOfCoolingValue}\right) \]</div>
+
+<p>Fraction of Autosized Heating Value:</p>
+<div>\[ \dot V_{SA,heating} = \dot V_{SA,des,heating}\left(\text{FractionOfHeatingValue}\right) \]</div>
+
+<p>Flow Per Cooling Capacity</p>
+<div>\[ \dot V_{SA,cooling} = \dot Q_{coil,des,cooling}\left(\text{FractionOfCoolingValue}\right) \]</div>
+
+<p>Flow Per Heating Capacity</p>
+<div>\[ \dot V_{SA,heating} = \dot Q_{coil,des,heating}\left(\text{FractionOfHeatingValue}\right) \]</div>
+
+<h4 id="maximum-supply-air-temperature">Maximum Supply Air Temperature</h4>
+<p>The maximum supply air temperature can also be automatically selected. The value is determined from the Sizing:Zone or Sizing:System object depending on where the object is used in the simulation (i.e., as zone or air loop equipment).
+Maximum supply air temperature</p>
+<div>\[T_{SA,max} = \text{HeatDesTemp}_{ZoneOrSystem}\]</div>
+
 <h2 id="zone-outdoor-air-design-data">Zone Outdoor Air Design Data</h2>
 <p>Outdoor air design data may be required for many aspects of a building computer model. Sizing of HVAC equipment, infiltration and ventilation, and specific outdoor air requirements for different zone types are a few examples where required outdoor air quantities may vary. Since there would be a significant chance for data input errors if each individual aspect of the simulation model allowed for independent input of outdoor air design data, this general object is used to define outdoor air design data and this data set may be used throughout the building simulation model.</p>
 <p>The design data is provided as a group of inputs that are recognized by designers as standard practice. This information may be used individually or used as a group to calculate summations or maximums of the entered data. These design data include values for:</p>
