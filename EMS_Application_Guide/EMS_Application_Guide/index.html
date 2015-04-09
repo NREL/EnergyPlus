@@ -490,37 +490,59 @@
 <p>Erl is the simplified programming language used to define the EMS control and modeling programs. This section describes the rules and syntax for using Erl to write programs.</p>
 <h2 id="statement-keywords">Statement Keywords</h2>
 <p>Every programming language has instructions or commands that tell the processor what to do. Erl supports a few types of program statements. Each line of an Erl program begins with a statement keyword. The syntax for each line depends on the keyword that starts that line. Only those listed in Table 1 are allowed.</p>
-<p>Table 1. Statement Keywords for Erl</p>
-<p>Keyword</p>
-<p>Syntax</p>
-<p>Statement Description</p>
-<p>RUN</p>
-<p>RUN &lt;program name&gt;,</p>
-<p>Calls another Erl program or subroutine. Returns to the calling point when completed. Recursive calling is allowed.</p>
-<p>RETURN</p>
-<p>RETURN,</p>
-<p>Prematurely exits a subroutine or program and returns control to the caller.</p>
-<p>SET</p>
-<p>SET &lt;variable&gt; = &lt;expression&gt;,</p>
-<p>Assigns the right-hand side to the left-hand side. If &lt;variable&gt; has not been used before, it is dynamically declared (with local scope). <strong>Note: &lt;variables&gt; should NOT start with numerics.</strong></p>
-<p>IF</p>
-<p>IF &lt;expression&gt;,</p>
-<p>Begins an “IF block.” Conditional decision. If &lt;expression&gt; evaluates to anything other than zero, the block of statements after the IF is executed.</p>
-<p>ELSEIF</p>
-<p>ELSEIF &lt;expression&gt;,</p>
-<p>Conditional decision that follows a regular IF block of instructions. If &lt;expression&gt;  evaluates to anything other than zero, the block of instructions after the ELSEIF is executed.</p>
-<p>ELSE</p>
-<p>ELSE,</p>
-<p>Conditional decision. Associated with an IF statement, the block of statements after the ELSE is executed if &lt;expression&gt; evaluates to zero for preceding IF and ELSEIF statements.</p>
-<p>ENDIF</p>
-<p>ENDIF,</p>
-<p>Terminates IF block (required).</p>
-<p>WHILE</p>
-<p>WHILE &lt;expression&gt;,</p>
-<p>Begins a “WHILE block.”  Conditional decision.  If &lt;expression&gt; evaluates to anything other than zero, the block of statements after the WHILE is repeatedly executed.</p>
-<p>ENDWHILE</p>
-<p>ENDWHILE,</p>
-<p>Terminates WHILE block (required).</p>
+<table class="table table-striped">
+<tr>
+ <th>Keyword</th>
+ <th>Syntax</th>
+ <th>Statement Description</th>
+</tr>
+<tr>
+ <td>RUN</td>
+ <td>RUN &lt;program name&gt;</td>
+ <td>Calls another Erl program or subroutine. Returns to the calling point when completed. Recursive calling is allowed.</td>
+</tr>
+<tr>
+ <td>RETURN</td>
+ <td>RETURN,</td>
+ <td>Prematurely exits a subroutine or program and returns control to the caller.</td>
+</tr>
+<tr>
+ <td>SET</td>
+ <td>SET &lt;variable&gt; = &lt;expression&gt;,</td>
+ <td>Assigns the right-hand side to the left-hand side. If <variable> has not been used before, it is dynamically declared (with local scope). **Note: &lt;variables&gt; should NOT start with numerics.**</td>
+</tr>
+<tr>
+ <td>IF</td>
+ <td>IF &lt;expression&gt;,</td>
+ <td>Begins an “IF block.” Conditional decision. If &lt;expression&gt; evaluates to anything other than zero, the block of statements after the IF is executed.</td>
+</tr>
+<tr>
+ <td>ELSEIF</td>
+ <td>ELSEIF &lt;expression&gt;</td>
+ <td>Conditional decision that follows a regular IF block of instructions. If &lt;expression&gt; evaluates to anything other than zero, the block of instructions after the ELSEIF is executed.</td>
+</tr>
+<tr>
+ <td>ELSE</td>
+ <td>ELSE,</td>
+ <td>Conditional decision. Associated with an IF statement, the block of statements after the ELSE is executed if &lt;expression&gt; evaluates to zero for preceding IF and ELSEIF statements.</td>
+</tr>
+<tr>
+ <td>ENDIF</td>
+ <td>ENDIF,</td>
+ <td>Terminates IF block (required).</td>
+</tr>
+<tr>
+ <td>WHILE</td>
+ <td>WHILE &lt;expression&gt;</td>
+ <td>Begins a “WHILE block.”  Conditional decision.  If &lt;expression&gt; evaluates to anything other than zero, the block of statements after the WHILE is repeatedly executed.</td>
+</tr>
+<tr>
+ <td>ENDWHILE</td>
+ <td>ENDWHILE,</td>
+ <td>Terminates WHILE block (required).</td>
+</tr>
+</table>
+
 <h3 id="rules-for-if-blocks">Rules for IF blocks:</h3>
 <ul>
 <li>
@@ -642,8 +664,8 @@
 <p>Table 2. Built-In Unique Variables for Erl</p>
 <table class="table table-striped">
 <tr>
-<td>Variable Name</td>
-<td>Value</td>
+<th>Variable Name</th>
+<th>Value</th>
 </tr>
 <tr>
 <td>Year</td>
@@ -767,10 +789,10 @@
 <p>Table 3. Operators for Erl</p>
 <table class="table table-striped">
 <tr>
-<td>Operator Symbol</td>
-<td>Description</td>
-<td>Evaluation Order</td>
-<td>Example</td>
+<th>Operator Symbol</th>
+<th>Description</th>
+<th>Evaluation Order</th>
+<th>Example</th>
 </tr>
 <tr>
 <td>( )</td>
@@ -859,13 +881,17 @@
 </table>
 
 <p>Because expressions can be evaluated to a single value, they can be used in SET and IF statements. That means both of the following instructions are allowed:</p>
-<p>SET a = c &lt; d</p>
-<p>IF a - 1</p>
+<pre><code>SET a = c &lt; d
+IF a - 1
+</code></pre>
+
 <p>In the case of the SET example, the value of “a” is set to 1 if “c” is less than “d”; otherwise, it is set to 0. For the IF example, the IF block of instructions are executed if a – 1 is greater than zero.</p>
 <p>Compound expressions allow multiple operators to be sequenced or nested. For example:</p>
-<p>a + b * 7 / 4.5</p>
-<p>(a * 3 + 4) ^ 2</p>
-<p>(a &gt; b) &amp;&amp; (c &lt; d)</p>
+<pre><code>a + b \* 7 / 4.5
+(a \* 3 + 4) ^ 2
+(a &gt; b) &amp;&amp; (c &lt; d)
+</code></pre>
+
 <p>For complicated expressions, it helps to make heavy use of parentheses in your equations.  By using parentheses with proper algebraic evaluation in mind to group terms, you can help the Erl parser.  The language processor is simplistic compared to a full-blown programming language and sometimes has problems applying the rules of algebra.  It is safer to err on the side of extra parentheses and to inspect the results of complex expressions in the EDD output.</p>
 <h2 id="built-in-functions">Built-In Functions</h2>
 <p>Several useful, built-in functions are available for use in Erl programs. You cannot configure these; they are internal to the language processor inside EnergyPlus. They provide access to a subset of general service routines that are useful inside the main EnergyPlus program or are intrinsic functions available in the underlying Fortran language. The “@” character is used to signal to the language processor that the following character string defines a built-in function that is used to assign a result to an Erl variable. The characters appended to the “@” operator must be one of the predefined names listed in Table 4, Table 5, Table 6, or Table 7. The syntax of the function call will vary depending on the arguments required by the function, but the general structure is:</p>
@@ -879,9 +905,9 @@
 <p>Table 4. Built-in Math Functions for Erl</p>
 <table class="table table-striped">
 <tr>
-<td>Function Name</td>
-<td>Description</td>
-<td>Number of Arguments</td>
+<th>Function Name</th>
+<th>Description</th>
+<th>Number of Arguments</th>
 </tr>
 <tr>
 <td>@Round</td>
@@ -969,9 +995,9 @@
 <p>Table 5. Built-in EnergyPlus Simulation Management Functions for Erl</p>
 <table class="table table-striped">
 <tr>
-<td>Function Name</td>
-<td>Description</td>
-<td>Number of Arguments</td>
+<th>Function Name</th>
+<th>Description</th>
+<th>Number of Arguments</th>
 </tr>
 <tr>
 <td>@FatalHaltEp</td>
@@ -995,9 +1021,9 @@
 <p>Table 6. Built-in Functions for Trend Variables in Erl</p>
 <table class="table table-striped">
 <tr>
-<td>Function Name</td>
-<td>Description</td>
-<td>Number of Arguments</td>
+<th>Function Name</th>
+<th>Description</th>
+<th>Number of Arguments</th>
 </tr>
 <tr>
 <td>@TrendValue</td>
@@ -1035,294 +1061,474 @@
 <h3 id="built-in-psychrometric-functions">Built-in Psychrometric Functions</h3>
 <p>Building modeling often involves calculations related to moist air. A comprehensive set of built-in functions is available for psychrometric calculations. Table 7 lists the functions available for use in Erl programs that are related to moist air properties and some physical properties related to water. More discussion of the psychrometric functions is provided in the section “Pyschrometric services” in the Module Developer Guide.</p>
 <p>Table 7. Built-in Psychrometric Functions for Erl</p>
-<p>Function Name</p>
-<p>Arguments</p>
-<p>Description</p>
-<p>Units</p>
-<p>@RhoAirFnPbTdbW</p>
-<p>Result</p>
-<p>Density of moist air</p>
-<p>kg/m<sup>3</sup></p>
-<p>Input 1</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>Input 2</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 3</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>@CpAirFnWTdb</p>
-<p>Result</p>
-<p>Heat capacity of moist air</p>
-<p>J/kg-°C</p>
-<p>Input 1</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 2</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>@HfgAirFnWTdb</p>
-<p>Result</p>
-<p>Heat of vaporization for vapor</p>
-<p>J/kg</p>
-<p>Input 1</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 2</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>@HgAirFnWTdb</p>
-<p>Result</p>
-<p>Enthalpy of the gas</p>
-<p>Input 1</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 2</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>@TdpFnTdbTwbPb</p>
-<p>Result</p>
-<p>Dew-point temperature</p>
-<p>ºC</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Wetbulb temperature</p>
-<p>ºC</p>
-<p>Input 3</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@TdpFnWPb</p>
-<p>Result</p>
-<p>Dew-point temperature</p>
-<p>ºC</p>
-<p>Input 1</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 2</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@HFnTdbW</p>
-<p>Result</p>
-<p>Enthalpy of moist air</p>
-<p>J/kg</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>@HFnTdbRhPb</p>
-<p>Result</p>
-<p>Enthalpy of moist air</p>
-<p>J/kg</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Relative humidity</p>
-<p>Fraction (0.0..1)</p>
-<p>Input 3</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@TdbFnHW</p>
-<p>Result</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 1</p>
-<p>Enthalpy of moist air</p>
-<p>J/kg</p>
-<p>Input 2</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>@RhovFnTdbRh</p>
-<p>Result</p>
-<p>Vapor density in air</p>
-<p>kg/m<sup>3</sup></p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>@RhovFnTdbWPb</p>
-<p>Result</p>
-<p>Vapor density in air</p>
-<p>kg/m<sup>3</sup></p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 3</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@RhFnTdbRhov</p>
-<p>Result</p>
-<p>Relative humidity</p>
-<p>Fraction (0.0..1)</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Vapor density in air</p>
-<p>kg/m<sup>3</sup></p>
-<p>@RhFnTdbWPb</p>
-<p>Result</p>
-<p>Relative humidity</p>
-<p>Fraction [0.0..1.0]</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 3</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@TwbFnTdbWPb</p>
-<p>Result</p>
-<p>Wetbulb temperature</p>
-<p>ºC</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 3</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@VFnTdbWPb</p>
-<p>Result</p>
-<p>Specific volume</p>
-<p>m<sup>3</sup>/kg</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 3</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@WFnTdpPb</p>
-<p>Result</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 1</p>
-<p>Dew-point temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@WFnTdbH</p>
-<p>Result</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Enthalpy of moist air</p>
-<p>J/kg</p>
-<p>@WFnTdbTwbPb</p>
-<p>Result</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Wetbulb temperature</p>
-<p>ºC</p>
-<p>Input 3</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@WFnTdbRhPb</p>
-<p>Result</p>
-<p>Humidity ratio</p>
-<p>kgWater/kgDryAir</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>Input 2</p>
-<p>Relative humidity</p>
-<p>Fraction [0.0..1.0]</p>
-<p>Input 3</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@PsatFnTemp</p>
-<p>Result</p>
-<p>Saturation pressure</p>
-<p>Pa</p>
-<p>Input 1</p>
-<p>Drybulb temperature</p>
-<p>ºC</p>
-<p>@TsatFnHPb</p>
-<p>Result</p>
-<p>Saturation temperature</p>
-<p>ºC</p>
-<p>Input 1</p>
-<p>Enthalpy of moist air</p>
-<p>J/kg</p>
-<p>Input 2</p>
-<p>Barometric pressure</p>
-<p>Pa</p>
-<p>@CpCW</p>
-<p>Result</p>
-<p>Heat capacity of water</p>
-<p>J/kg-K</p>
-<p>Input 1</p>
-<p>Temperature</p>
-<p>ºC</p>
-<p>@CpHW</p>
-<p>Result</p>
-<p>Heat capacity of water</p>
-<p>J/kg-K</p>
-<p>Input 1</p>
-<p>Temperature</p>
-<p>ºC</p>
-<p>@RhoH2O</p>
-<p>Result</p>
-<p>Density of water</p>
-<p>kg/m<sup>3</sup></p>
-<p>Input 1</p>
-<p>Temperature</p>
-<p>ºC</p>
+<table class="table table-striped">
+  <tr>
+    <th>Function Name</th>
+    <th>Arguments</th>
+    <th>Description</th>
+    <th>Units</th>
+  </tr>
+  <tr>
+    <td rowspan="4">@RhoAirFnPbTdbW</td>
+    <td>Result</td>
+    <td>Density of moist air</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@CpAirFnWTdb</td>
+    <td>Result</td>
+    <td>Heat capacity of moist air</td>
+    <td>J/kg-&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@HfgAirFnWTdb`</td>
+    <td>Result</td>
+    <td>Heat of vaporization for vapor</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@HgAirFnWTdb</td>
+    <td>Result</td>
+    <td>Enthalpy of the gas</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@TdpFnTdbTwbPb</td>
+    <td>Result</td>
+    <td>Dew-point temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Wetbulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@TdpFnWPb</td>
+    <td>Result</td>
+    <td>Dew-point temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@HFnTdbW</td>
+    <td>Result</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@HFnTdbRhPb</td>
+    <td>Result</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@TdbFnHW</td>
+    <td>Result</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@RhovFnTdbRh</td>
+    <td>Result</td>
+    <td>Vapor density in air</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@RhovFnTdbWPb</td>
+    <td>Result</td>
+    <td>Vapor density in air</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@RhFnTdbRhov</td>
+    <td>Result</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Vapor density in air</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@RhFnTdbWPb</td>
+    <td>Result</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@TwbFnTdbWPb</td>
+    <td>Result</td>
+    <td>Wetbulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@VFnTdbWPb</td>
+    <td>Result</td>
+    <td>Specific volume</td>
+    <td>m&lt;sup&gt;3&lt;/sup&gt;/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@WFnTdpPb</td>
+    <td>Result</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Dew-point temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@WFnTdbH</td>
+    <td>Result</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@WFnTdbTwbPb</td>
+    <td>Result</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Wetbulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="4">@WFnTdbRhPb</td>
+    <td>Result</td>
+    <td>Humidity ratio</td>
+    <td>kgWater/kgDryAir</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Relative humidity</td>
+    <td>Fraction (0.0 .. 1)</td>
+  </tr>
+  <tr>
+    <td>Input 3</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="2">@PsatFnTemp</td>
+    <td>Result</td>
+    <td>Saturation pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Drybulb temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="3">@TsatFnHPb</td>
+    <td>Result</td>
+    <td>Saturation temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Enthalpy of moist air</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 2</td>
+    <td>Barometric pressure</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td rowspan="2">@CpCW</td>
+    <td>Result</td>
+    <td>Heat capacity of water</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="2">@CpHW</td>
+    <td>Result</td>
+    <td>Heat capacity of water</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+  <tr>
+    <td rowspan="2">@RhoH2O</td>
+    <td>Result</td>
+    <td>Density of water</td>
+    <td>kg/m&lt;sup&gt;3&lt;/sup&gt;</td>
+  </tr>
+  <tr>
+    <td>Input 1</td>
+    <td>Temperature</td>
+    <td>&amp;deg;C</td>
+  </tr>
+</table>
+
 <h3 id="built-in-curve-and-table-functions">Built-in Curve and Table Functions</h3>
 <p>EnergyPlus has a number of different generic curve and table input objects that are used to describe the performance characteristics for various component models.  Table 8 describes a built-in function called @CurveValue that is available for reusing those curve and table input objects in your Erl programs.  Although the Erl language could be used to replicate the functionality, reusing those input objects can have advantages because the input may have already been developed for use in traditional component models or the limiting and interpolation methods are helpful.  The @CurveValue function expects six arguments, although usually only a subset of them will be used depending on the number of independent variables involved with the curve or table.  Because Erl does not support passing optional arguments, dummy variables do need to be included in the function call for all unused independent variables.  For example, the Curve:Biquadratric object has only x and y independent variables, so input arguments 4, 5, and 6 will not be used when @CurveValue is evaluated:</p>
 <p>Set MyCurveResult = @CurveValue myCurveIndex X1 Y1 dummy dummy dummy;</p>
 <p>The first input argument is always an Erl variable that has been declared using an EnergyManagementSystem:CurveOrTableIndexVariable input object.  This variable identifies the location of a specific curve or table in the program’s internal data structures.  It is important that you do not inadvertently reassign the value held in this variable because it is only filled once at the beginning of the simulation.</p>
 <p>Table 8. Built-in Function for Accessing Curves and Tables</p>
-<p>Function Name</p>
-<p>Arguments</p>
-<p>Description</p>
-<p>Notes</p>
-<p>@CurveValue</p>
-<p>Result</p>
-<p>Result from evaluating the curve or table as a function of the input arguments</p>
-<p>Input 1</p>
-<p>Index variable that “points” to a specific curve or table object defined elsewhere in the IDF.</p>
-<p>This variable needs to be declared and filled using an EnergyManagementSystem:CurveOrTableIndexVariable object.</p>
-<p>Input 2</p>
-<p>First independent variable</p>
-<p>Typically the “X” input value, always used</p>
-<p>Input 3</p>
-<p>Second independent variable</p>
-<p>Typically the “Y” value, only used if curve/table has two or more independent variables</p>
-<p>Input 4</p>
-<p>Third independent variable</p>
-<p>Typically the “Z” value, only used if curve/table has three or more independent variables.</p>
-<p>Input 5</p>
-<p>Fourth independent variable</p>
-<p>Only used if table has four or more independent variables</p>
-<p>Input 6</p>
-<p>Fifth independent variable</p>
-<p>Only used if table has five independent variables</p>
+<table class="table table-striped">
+<tr>
+ <th>Function Name</th>
+ <th>Arguments</th>
+ <th>Description</th>
+ <th>Notes</th>
+</tr>
+<tr>
+ <td rowspan="7">@CurveValue</td>
+ <td>Result</td>
+ <td>Result from evaluating the curve or table as a function of the input arguments</td>
+ <td></td>
+</tr>
+<tr>
+ <td>Input 1</td>
+ <td>Index variable that "points" to a specific curve or table object defined elsewhere in the IDF.</td>
+ <td>This variable needs to be declared and filled using an EnergyManagementSystem:CurveOrTableIndexVariable object.</td>
+</tr>
+<tr>
+ <td>Input 2</td>
+ <td>First independent variable</td>
+ <td>Typically the "X" input value, always used</td>
+</tr>
+<tr>
+ <td>Input 3</td>
+ <td>Second independent variable</td>
+ <td>Typically the "Y" value, only used if curve/table has two or more independent variables</td>
+</tr>
+<tr>
+ <td>Input 4</td>
+ <td>Third independent variable</td>
+ <td>Typically the "Z" value, only used if curve/table has three or more independent variables.</td>
+</tr>
+<tr>
+ <td>Input 5</td>
+ <td>Fourth independent variable</td>
+ <td>Only used if table has four or more independent variables</td>
+</tr>
+<tr>
+ <td>Input 6</td>
+ <td>Fifth independent variable</td>
+ <td>Only used if table has five independent variables</td>
+</tr>
+</table>
+
 <h1 id="internal-variables">Internal Variables</h1>
 <p>Internal variables form a category of built-in data accessible for EMS. They are internal in that they access information about the input file from inside EnergyPlus. You should already have access to the information contained in these because they depend on other content in the IDF. However, it would be inconvenient to always have to coordinate changes between Erl programs and the rest of the IDF. Internal variables simplify the process of keeping an Erl program in sync with other changes to the model. These differ from the built-in variables in that they may or may not be created in every simulation and have user-defined names that distinguish among different instances of the same type of data. The internal variables differ from sensors in that they are usually static values that do not change over time. The constants might vary from run to run but never within a single run period. Internal variables are read only.</p>
 <p>Internal variables are automatically made available whenever an input file includes basic EMS input objects and the model they are associated with is included in the input file. To use an internal variable in an Erl program, you must declare it with an EnergyManagementSystem:InternalVariable input object. This object assigns a specified Erl variable name to contain the value in an internal EnergyPlus data structure. The EDD file lists the specific internal variable types, their unique identifying names, and the units. The rest of this section provides information about specific internal variables.</p>
@@ -2450,70 +2656,102 @@
 <p>We therefore choose the EMS calling point with the key of “EndOfZoneTimestepBeforeReporting.”</p>
 <h3 id="ems-input-objects">EMS Input Objects</h3>
 <p>A set of input objects to solve this problem appears below and is included in the example file called “EMSCustomOutputVariable.idf.”</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>T1, !Name</p>
-<p>Perimeter_ZN_1 ,! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>T2, !Name</p>
-<p>Perimeter_ZN_2 , ! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>T3, !Name</p>
-<p>Perimeter_ZN_3 , ! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>T4, !Name</p>
-<p>Perimeter_ZN_4, ! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Mean Air Temperature ;! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>T5, !Name</p>
-<p>Core_ZN , ! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Average Building Temperature , ! Name</p>
-<p>EndOfZoneTimestepBeforeZoneReporting , ! EnergyPlus Model Calling Point</p>
-<p>AverageZoneTemps ; ! Program Name 1</p>
-<p>EnergyManagementSystem:GlobalVariable,</p>
-<p>AverageBuildingTemp;</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>Weighted Average Building Zone Air Temperature [C], ! Name</p>
-<p>AverageBuildingTemp, ! EMS Variable Name</p>
-<p>Averaged, ! Type of Data in Variable</p>
-<p>ZoneTimeStep ; ! Update Frequency</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>Zn1vol,</p>
-<p>Perimeter_ZN_1,</p>
-<p>Zone Air Volume;</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>Zn2vol,</p>
-<p>Perimeter_ZN_2,</p>
-<p>Zone Air Volume;</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>Zn3vol,</p>
-<p>Perimeter_ZN_3,</p>
-<p>Zone Air Volume;</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>Zn4vol,</p>
-<p>Perimeter_ZN_4,</p>
-<p>Zone Air Volume;</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>Zn5vol,</p>
-<p>Core_ZN ,</p>
-<p>Zone Air Volume;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>AverageZoneTemps , ! Name</p>
-<p>SET SumNumerator = T1*Zn1vol + T2*Zn2vol + T3*Zn3vol + T4*Zn4vol + T5*Zn5vol,</p>
-<p>SET SumDenominator = Zn1vol + Zn2vol + Zn3vol + Zn4vol + Zn5vol,</p>
-<p>SET AverageBuildingTemp = SumNumerator / SumDenominator;</p>
-<p>Output:EnergyManagementSystem,</p>
-<p>Verbose,</p>
-<p>Verbose,</p>
-<p>Verbose;</p>
-<p>Output:Variable,</p>
-<p>*,                       !- Key Value</p>
-<p>Weighted Average Building Zone Air Temperature,  !- Variable Name</p>
-<p>timestep;                  !- Reporting Frequency</p>
+<pre><code class="idf">EnergyManagementSystem:Sensor,
+   T1, !Name
+   Perimeter_ZN_1 ,! Output:Variable or Output:Meter Index Key Name
+   Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+ EnergyManagementSystem:Sensor,
+   T2, !Name
+   Perimeter_ZN_2 , ! Output:Variable or Output:Meter Index Key Name
+   Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+ EnergyManagementSystem:Sensor,
+   T3, !Name
+   Perimeter_ZN_3 , ! Output:Variable or Output:Meter Index Key Name
+   Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+ EnergyManagementSystem:Sensor,
+   T4, !Name
+   Perimeter_ZN_4, ! Output:Variable or Output:Meter Index Key Name
+   Zone Mean Air Temperature ;! Output:Variable or Output:Meter Name
+
+
+ EnergyManagementSystem:Sensor,
+   T5, !Name
+   Core_ZN , ! Output:Variable or Output:Meter Index Key Name
+   Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+ EnergyManagementSystem:ProgramCallingManager,
+   Average Building Temperature , ! Name
+   EndOfZoneTimestepBeforeZoneReporting , ! EnergyPlus Model Calling Point
+   AverageZoneTemps ; ! Program Name 1
+
+
+ EnergyManagementSystem:GlobalVariable,
+   AverageBuildingTemp;
+
+
+ EnergyManagementSystem:OutputVariable,
+   Weighted Average Building Zone Air Temperature [C], ! Name
+   AverageBuildingTemp, ! EMS Variable Name
+   Averaged, ! Type of Data in Variable
+   ZoneTimeStep ; ! Update Frequency
+
+
+ EnergyManagementSystem:InternalVariable,
+   Zn1vol,
+   Perimeter_ZN_1,
+   Zone Air Volume;
+
+
+ EnergyManagementSystem:InternalVariable,
+   Zn2vol,
+   Perimeter_ZN_2,
+   Zone Air Volume;
+
+
+ EnergyManagementSystem:InternalVariable,
+   Zn3vol,
+   Perimeter_ZN_3,
+   Zone Air Volume;
+
+
+ EnergyManagementSystem:InternalVariable,
+   Zn4vol,
+   Perimeter_ZN_4,
+   Zone Air Volume;
+
+
+ EnergyManagementSystem:InternalVariable,
+   Zn5vol,
+   Core_ZN ,
+   Zone Air Volume;
+
+
+ EnergyManagementSystem:Program,
+   AverageZoneTemps , ! Name
+   SET SumNumerator = T1*Zn1vol + T2*Zn2vol + T3*Zn3vol + T4*Zn4vol + T5*Zn5vol,
+   SET SumDenominator = Zn1vol + Zn2vol + Zn3vol + Zn4vol + Zn5vol,
+   SET AverageBuildingTemp = SumNumerator / SumDenominator;
+
+
+ Output:EnergyManagementSystem,
+   Verbose,
+   Verbose,
+   Verbose;
+
+
+ Output:Variable,
+   *,                       !- Key Value
+   Weighted Average Building Zone Air Temperature,  !- Variable Name
+   timestep;                  !- Reporting Frequency
+</code></pre>
+
 <h2 id="example-2-traditional-setpoint-and-availability-managers">Example 2. Traditional Setpoint and Availability Managers</h2>
 <h3 id="problem-statement_1">Problem Statement</h3>
 <p>The traditional way of modeling supervisory control of HVAC systems in EnergyPlus is to use SetpointManagers and AvailabilityManagers. To gain experience with EMS, we should ask, Is there a way to take a model such as the Large Office Reference Building (RefBldgLargeOfficeNew2004_Chicago.idf) and replicate the traditional HVAC managers by using only the EMS?</p>
@@ -2540,112 +2778,152 @@
 <h3 id="ems-input-objects_1">EMS Input Objects</h3>
 <p>EMS examples are provided for the three types of traditional HVAC managers. The full set to run with no traditional managers is provided in the example file “EMSReplaceTraditionalManagers_LargeOffice.idf.”</p>
 <p>Example input objects that replicate a scheduled setpoint manager using EMS follow.</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Seasonal_Reset_SAT_Sched, !Name</p>
-<p>Seasonal-Reset-Supply-Air-Temp-Sch , ! Output:Variable Index Key Name</p>
-<p>Schedule Value;   ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>VAV_1_SAT_setpoint,                ! Name</p>
-<p>VAV_1 Supply Equipment Outlet Node,      ! Component Name</p>
-<p>System Node Setpoint,              ! Component Type</p>
-<p>Temperature Setpoint;              ! Control Variable</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>VAV_1_SchedSetpoint , ! Name</p>
-<p>SET VAV_1_SAT_setpoint = Seasonal_Reset_SAT_Sched;</p>
-<p>Example input objects that replicate a mixed air setpoint manager using EMS follow.</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>T_VAV1FanIn, !Name</p>
-<p>VAV_1_HeatC-VAV_1_FanNode , ! Output:Variable Key Name</p>
-<p>System Node Temperature; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>T_VAV1FanOut, !Name</p>
-<p>VAV_1 Supply Equipment Outlet Node, ! Output:Variable Index Key Name</p>
-<p>System Node Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>VAV_1_CoolC_Setpoint,            ! Name</p>
-<p>VAV_1_CoolC-VAV_1_HeatCNode ,    ! Component Name</p>
-<p>System Node Setpoint,            ! Component Type</p>
-<p>Temperature Setpoint;            ! Control Variable</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>VAV_1_HeatC_Setpoint,                            ! Name</p>
-<p>VAV_1_HeatC-VAV_1_FanNode ,                  ! Component Name</p>
-<p>System Node Setpoint,                          ! Component Type</p>
-<p>Temperature Setpoint;            ! Control Variable</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>VAV_1_OA_Setpoint,                            ! Name</p>
-<p>VAV_1_OA-VAV_1_CoolCNode ,                  ! Component Name</p>
-<p>System Node Setpoint,                          ! Component Type</p>
-<p>Temperature Setpoint;            ! Control Variable</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>VAV1MixedAirManagers , ! Name</p>
-<p>SET VAV_1_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),</p>
-<p>SET VAV_1_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),</p>
-<p>SET VAV_1_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn);</p>
-<p>Example input objects for a night cycle availability manager follow.</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>VAV_1_NightCycleStatus,   ! Name</p>
-<p>VAV_1,                    ! Component Name</p>
-<p>AirLoopHVAC,              ! Component Type</p>
-<p>Availability Status;      ! Control Variable</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>heating_setpoint,                  ! Name</p>
-<p>HTGSETP_SCH ,         ! Output:Variable or Output:Meter Index Key Name</p>
-<p>Schedule Value ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>cooling_setpoint,                  ! Name</p>
-<p>CLGSETP_SCH ,         ! Output:Variable or Output:Meter Index Key Name</p>
-<p>Schedule Value ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>TzoneVAV1_1,                  ! Name</p>
-<p>Core_bottom ,         ! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>TzoneVAV1_2,                  ! Name</p>
-<p>Perimeter_bot_ZN_3 ,         ! Output:Variable Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>TzoneVAV1_3,                  ! Name</p>
-<p>Perimeter_bot_ZN_2 ,         ! Output:Variable Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>TzoneVAV1_4,                  ! Name</p>
-<p>Perimeter_bot_ZN_1 ,         ! Output:Variable Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>TzoneVAV1_5,                  ! Name</p>
-<p>Perimeter_bot_ZN_4 ,         ! Output:Variable Key Name</p>
-<p>Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>VAV_1_NightCycleMGR , ! Name</p>
-<p>SET Toffset = 0.8333  ,  ! 1.5F</p>
-<p>SET NoAction = 0.0 ,</p>
-<p>SET ForceOff = 1.0 ,</p>
-<p>SET CycleOn = 2.0 ,</p>
-<p>SET CycleOnZoneFansOnly = 3.0 ,</p>
-<p>SET VAV1_heating_TurnOn  = heating_setpoint - Toffset ,</p>
-<p>SET VAV1_heating_TurnOff = heating_setpoint + Toffset ,</p>
-<p>SET VAV1_cooling_TurnOn  = cooling_setpoint + Toffset ,</p>
-<p>SET VAV1_cooling_TurnOff = cooling_setpoint - Toffset ,</p>
-<p>! find max and min for "cycleOnAny" operation</p>
-<p>SET Tmin = @MIN TzoneVAV1_1 TzoneVAV1_2  ,</p>
-<p>SET Tmin = @MIN Tmin        TzoneVAV1_3  ,</p>
-<p>SET Tmin = @MIN Tmin        TzoneVAV1_4  ,</p>
-<p>SET Tmin = @MIN Tmin        TzoneVAV1_5  ,</p>
-<p>SET Tmax = @MAX TzoneVAV1_1 TzoneVAV1_2  ,</p>
-<p>SET Tmax = @MAX Tmax        TzoneVAV1_3  ,</p>
-<p>SET Tmax = @MAX Tmax        TzoneVAV1_4  ,</p>
-<p>SET Tmax = @MAX Tmax        TzoneVAV1_5  ,</p>
-<p>IF Tmin &lt; VAV1_heating_TurnOn ,</p>
-<p>SET VAV_1_NightCycleStatus = CycleOn,</p>
-<p>RETURN,  ! need to exit early or cooling check could also trigger</p>
-<p>ELSEIF Tmin &gt; VAV1_heating_TurnOff,</p>
-<p>SET VAV_1_NightCycleStatus = NoAction,</p>
-<p>ENDIF,</p>
-<p>IF Tmax &gt; VAV1_cooling_TurnOn,</p>
-<p>SET VAV_1_NightCycleStatus = CycleOn,</p>
-<p>ELSEIF Tmax &lt; VAV1_cooling_TurnOff,</p>
-<p>SET VAV_1_NightCycleStatus = NoAction   ,</p>
-<p>ENDIF;</p>
+<pre><code class="idf">EnergyManagementSystem:Sensor,
+   Seasonal_Reset_SAT_Sched, !Name
+   Seasonal-Reset-Supply-Air-Temp-Sch , ! Output:Variable Index Key Name
+   Schedule Value;   ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Actuator,
+   VAV_1_SAT_setpoint,                ! Name
+   VAV_1 Supply Equipment Outlet Node,      ! Component Name
+   System Node Setpoint,              ! Component Type
+   Temperature Setpoint;              ! Control Variable
+
+
+EnergyManagementSystem:Program,
+   VAV_1_SchedSetpoint , ! Name
+   SET VAV_1_SAT_setpoint = Seasonal_Reset_SAT_Sched;
+
+
+Example input objects that replicate a mixed air setpoint manager using EMS follow.
+EnergyManagementSystem:Sensor,
+   T_VAV1FanIn, !Name
+   VAV_1_HeatC-VAV_1_FanNode , ! Output:Variable Key Name
+   System Node Temperature; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Sensor,
+   T_VAV1FanOut, !Name
+   VAV_1 Supply Equipment Outlet Node, ! Output:Variable Index Key Name
+   System Node Temperature ; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Actuator,
+   VAV_1_CoolC_Setpoint,            ! Name
+   VAV_1_CoolC-VAV_1_HeatCNode ,    ! Component Name
+   System Node Setpoint,            ! Component Type
+   Temperature Setpoint;            ! Control Variable
+
+
+EnergyManagementSystem:Actuator,
+   VAV_1_HeatC_Setpoint,                            ! Name
+   VAV_1_HeatC-VAV_1_FanNode ,                  ! Component Name
+   System Node Setpoint,                          ! Component Type
+   Temperature Setpoint;            ! Control Variable
+
+
+EnergyManagementSystem:Actuator,
+   VAV_1_OA_Setpoint,                            ! Name
+   VAV_1_OA-VAV_1_CoolCNode ,                  ! Component Name
+   System Node Setpoint,                          ! Component Type
+   Temperature Setpoint;            ! Control Variable
+
+
+
+
+EnergyManagementSystem:Program,
+   VAV1MixedAirManagers , ! Name
+   SET VAV_1_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),
+   SET VAV_1_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),
+   SET VAV_1_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn);
+
+
+Example input objects for a night cycle availability manager follow.
+EnergyManagementSystem:Actuator,
+  VAV_1_NightCycleStatus,   ! Name
+  VAV_1,                    ! Component Name
+  AirLoopHVAC,              ! Component Type
+  Availability Status;      ! Control Variable
+
+
+
+
+EnergyManagementSystem:Sensor,
+  heating_setpoint,                  ! Name
+  HTGSETP_SCH ,         ! Output:Variable or Output:Meter Index Key Name
+  Schedule Value ; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Sensor,
+  cooling_setpoint,                  ! Name
+  CLGSETP_SCH ,         ! Output:Variable or Output:Meter Index Key Name
+  Schedule Value ; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Sensor,
+  TzoneVAV1_1,                  ! Name
+  Core_bottom ,         ! Output:Variable or Output:Meter Index Key Name
+  Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Sensor,
+  TzoneVAV1_2,                  ! Name
+  Perimeter_bot_ZN_3 ,         ! Output:Variable Key Name
+  Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Sensor,
+  TzoneVAV1_3,                  ! Name
+  Perimeter_bot_ZN_2 ,         ! Output:Variable Key Name
+  Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Sensor,
+  TzoneVAV1_4,                  ! Name
+  Perimeter_bot_ZN_1 ,         ! Output:Variable Key Name
+  Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Sensor,
+  TzoneVAV1_5,                  ! Name
+  Perimeter_bot_ZN_4 ,         ! Output:Variable Key Name
+  Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Program,
+   VAV_1_NightCycleMGR , ! Name
+   SET Toffset = 0.8333  ,  ! 1.5F
+   SET NoAction = 0.0 ,
+   SET ForceOff = 1.0 ,
+   SET CycleOn = 2.0 ,
+   SET CycleOnZoneFansOnly = 3.0 ,
+   SET VAV1_heating_TurnOn  = heating_setpoint - Toffset ,
+   SET VAV1_heating_TurnOff = heating_setpoint + Toffset ,
+   SET VAV1_cooling_TurnOn  = cooling_setpoint + Toffset ,
+   SET VAV1_cooling_TurnOff = cooling_setpoint - Toffset ,
+   ! find max and min for &quot;cycleOnAny&quot; operation
+   SET Tmin = @MIN TzoneVAV1_1 TzoneVAV1_2  ,
+   SET Tmin = @MIN Tmin        TzoneVAV1_3  ,
+   SET Tmin = @MIN Tmin        TzoneVAV1_4  ,
+   SET Tmin = @MIN Tmin        TzoneVAV1_5  ,
+   SET Tmax = @MAX TzoneVAV1_1 TzoneVAV1_2  ,
+   SET Tmax = @MAX Tmax        TzoneVAV1_3  ,
+   SET Tmax = @MAX Tmax        TzoneVAV1_4  ,
+   SET Tmax = @MAX Tmax        TzoneVAV1_5  ,
+   IF Tmin &amp;lt; VAV1_heating_TurnOn ,
+     SET VAV_1_NightCycleStatus = CycleOn,
+     RETURN,  ! need to exit early or cooling check could also trigger
+   ELSEIF Tmin &amp;gt; VAV1_heating_TurnOff,
+     SET VAV_1_NightCycleStatus = NoAction,
+   ENDIF,
+   IF Tmax &amp;gt; VAV1_cooling_TurnOn,
+     SET VAV_1_NightCycleStatus = CycleOn,
+   ELSEIF Tmax &amp;lt; VAV1_cooling_TurnOff,
+     SET VAV_1_NightCycleStatus = NoAction   ,
+   ENDIF;
+</code></pre>
+
 <h2 id="example-3-hygro-thermal-window-opening-control-for-airflow-network">Example 3. Hygro-thermal Window Opening Control for Airflow Network</h2>
 <h3 id="problem-statement_2">Problem Statement</h3>
 <p>A user of EnergyPlus version 3.1 posted the following question on the Yahoo! list (circa spring 2009):</p>
@@ -2677,32 +2955,42 @@
 
 <h3 id="ems-input-objects_2">EMS Input Objects</h3>
 <p>EMS-related input objects to solve this problem are listed below and are included in the example file called “EMSAirflowNetworkOpeningControlByHumidity.idf.”</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>ZoneRH , ! Name</p>
-<p>Zone 1 Node, ! Output:Variable or Output:Meter Index Key Name</p>
-<p>System Node Relative Humidity; ! Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>MyOpenFactor,                            ! Name</p>
-<p>Zn001:Wall001:Win001,                  ! Component Name</p>
-<p>AirFlow Network Window/Door Opening, ! Component Type</p>
-<p>Venting Opening Factor;    ! Control Type</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>RH Controlled Open Factor ,    ! Name</p>
-<p>BeginTimestepBeforePredictor , ! EnergyPlus Model Calling Point</p>
-<p>RH_OpeningController ;         ! Program Name 1</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>RH_OpeningController ,     ! Name</p>
-<p>IF ZoneRH &lt; 25,</p>
-<p>SET MyOpenFactor = 0.0 ,</p>
-<p>ELSEIF ZoneRH &gt; 60,</p>
-<p>SET MyOpenFactor = 1.0 ,</p>
-<p>ELSE,</p>
-<p>SET MyOpenFactor = (ZoneRH - 25) / (60 - 25),</p>
-<p>ENDIF;</p>
-<p>Output:EnergyManagementSystem,</p>
-<p>Verbose,</p>
-<p>Verbose,</p>
-<p>Verbose;</p>
+<pre><code class="idf">EnergyManagementSystem:Sensor,
+  ZoneRH , ! Name
+  Zone 1 Node, ! Output:Variable or Output:Meter Index Key Name
+  System Node Relative Humidity; ! Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Actuator,
+  MyOpenFactor,                            ! Name
+  Zn001:Wall001:Win001,                  ! Component Name
+  AirFlow Network Window/Door Opening, ! Component Type
+  Venting Opening Factor;    ! Control Type
+
+
+EnergyManagementSystem:ProgramCallingManager,
+  RH Controlled Open Factor ,    ! Name
+  BeginTimestepBeforePredictor , ! EnergyPlus Model Calling Point
+  RH_OpeningController ;         ! Program Name 1
+
+
+EnergyManagementSystem:Program,
+  RH_OpeningController ,     ! Name
+  IF ZoneRH &amp;lt; 25,
+    SET MyOpenFactor = 0.0 ,
+  ELSEIF ZoneRH &amp;gt; 60,
+    SET MyOpenFactor = 1.0 ,
+  ELSE,
+    SET MyOpenFactor = (ZoneRH - 25) / (60 - 25),
+  ENDIF;
+
+
+Output:EnergyManagementSystem,
+  Verbose,
+  Verbose,
+  Verbose;
+</code></pre>
+
 <h2 id="example-4-halt-program-based-on-constraint">Example 4. Halt Program Based on Constraint</h2>
 <h3 id="problem-statement_3">Problem Statement</h3>
 <p>Heavy users of EnergyPlus explore the enormous parameter space associated with building design options. Computational requirements often limit what can be accomplished in a given study. For optimizations and other parametric studies, there is usually a tension between having a very detailed model that is comfortably accurate, and a simpler model that executes faster.</p>
@@ -2712,37 +3000,45 @@
 <p>To monitor PMV, we will use a trend variable, which we create by using the EnergyManagementSystem:TrendVariable input object. A trend variable is a log of historical values for Erl variables. A trend log is an array that goes farther and farther back in time. For this example, we assume the constraint is to monitor the average PMV for the previous 2-hour period. The example file has 6 timesteps per hour, so each trend point is 10 minutes and a 2-hour average needs 12 timesteps. So the field Number of Timesteps to be Logged must be 12 or larger. To access the values stored in a trend variable, the built-in functions provided for accessing trends must be used. The @TrendAverage function called with an index of 12 will return the 2-hour running average. To monitor this result of running average PMV, we set up custom output variable using an EnergyManagementSystem:OutputVariable input object.</p>
 <h3 id="ems-input-objects_3">EMS Input Objects</h3>
 <p>The EMS input objects for this example follow and are contained in the example file called “EMSTestMAthAndKill.idf.”</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Average Building Temperature , ! Name</p>
-<p>EndOfZoneTimestepBeforeZoneReporting , ! EnergyPlus Model Calling Point</p>
-<p>updateMy_averagePMV; ! Program Name 1</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>PMV5, !Name</p>
-<p>Core_ZN , ! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Thermal Comfort Fanger Model PMV ; ! Output:Variable Name</p>
-<p>EnergyManagementSystem:TrendVariable,</p>
-<p>PMVtrendLog1,</p>
-<p>PMV5,</p>
-<p>300;</p>
-<p>EnergyManagementSystem:GlobalVariable,</p>
-<p>PMVrunningAvg;</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>Running Two Hour Average PMV [PMVunits], ! Name</p>
-<p>PMVrunningAvg, ! EMS Variable Name</p>
-<p>Averaged, ! Type of Data in Variable</p>
-<p>ZoneTimeStep ; ! Update Frequency</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>UpdateMy_averagePMV,</p>
-<p>Set PMVrunningAvg = @TrendAverage PMVtrendLog1 12, ! two hour running average.</p>
-<p>RUN Kill_Run_if_Uncomfortable;</p>
-<p>EnergyManagementSystem:Subroutine,</p>
-<p>Kill_Run_if_Uncomfortable,</p>
-<p>IF PMVrunningAvg &gt; 2.5,</p>
-<p>SET tmpError = @FatalHaltEp 1002.50, ! error code "1002.50" for comfort avg over 2.5</p>
-<p>ENDIF,</p>
-<p>IF PMVrunningAvg &lt; 0.0 - 1.3,</p>
-<p>SET tmpError = @FatalHaltEp 9001.30, ! error code "9001.30" for comfort avg under - 1.3</p>
-<p>ENDIF;</p>
+<pre><code class="idf"> EnergyManagementSystem:ProgramCallingManager,
+   Average Building Temperature , ! Name
+   EndOfZoneTimestepBeforeZoneReporting , ! EnergyPlus Model Calling Point
+   updateMy_averagePMV; ! Program Name 1
+
+ EnergyManagementSystem:Sensor,
+   PMV5, !Name
+   Core_ZN , ! Output:Variable or Output:Meter Index Key Name
+   Zone Thermal Comfort Fanger Model PMV ; ! Output:Variable Name
+
+ EnergyManagementSystem:TrendVariable,
+   PMVtrendLog1,
+   PMV5,
+   300;
+
+ EnergyManagementSystem:GlobalVariable,
+   PMVrunningAvg;
+
+ EnergyManagementSystem:OutputVariable,
+   Running Two Hour Average PMV [PMVunits], ! Name
+   PMVrunningAvg, ! EMS Variable Name
+   Averaged, ! Type of Data in Variable
+   ZoneTimeStep ; ! Update Frequency
+
+ EnergyManagementSystem:Program,
+   UpdateMy_averagePMV,
+   Set PMVrunningAvg = @TrendAverage PMVtrendLog1 12, ! two hour running average.
+   RUN Kill_Run_if_Uncomfortable;
+
+ EnergyManagementSystem:Subroutine,
+   Kill_Run_if_Uncomfortable,
+   IF PMVrunningAvg &amp;gt; 2.5,
+     SET tmpError = @FatalHaltEp 1002.50, ! error code &quot;1002.50&quot; for comfort avg over 2.5
+   ENDIF,
+   IF PMVrunningAvg &amp;lt; 0.0 - 1.3,
+     SET tmpError = @FatalHaltEp 9001.30, ! error code &quot;9001.30&quot; for comfort avg under - 1.3
+   ENDIF;
+</code></pre>
+
 <h2 id="example-5-computed-schedule">Example 5. Computed Schedule</h2>
 <h3 id="problem-statement_4">Problem Statement</h3>
 <p>Many models have schedule inputs that could be used to control the object, but creating the schedules it is too cumbersome. We need to ask, Can we use the EMS to dynamically calculate a schedule?</p>
@@ -2751,62 +3047,70 @@
 <p>To devise an Erl program to compute the schedule, we need to use the built-in variables that describe time and day. The built-in variable Hour will provide information about the time of day; DayOfWeek will provide information about whether it is the weekend or a weekday.</p>
 <h3 id="ems-input-objects_4">EMS Input Objects</h3>
 <p>Example EMS input for computing a schedule for heating and cooling setpoints follows and are contained in the example file called “EMSCustomSchedule.idf.”</p>
-<p>Schedule:Constant,</p>
-<p>CLGSETP_SCH,</p>
-<p>Temperature,</p>
-<p>24.0;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>myCLGSETP_SCH_Override,</p>
-<p>CLGSETP_SCH,Schedule:Constant,Schedule Value;</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>My Setpoint Schedule Calculator Example,</p>
-<p>BeginTimestepBeforePredictor,</p>
-<p>MyComputedCoolingSetpointProg,</p>
-<p>MyComputedHeatingSetpointProg;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>MyComputedCoolingSetpointProg,</p>
-<p>IF (DayOfWeek == 1),</p>
-<p>Set myCLGSETP_SCH_Override = 30.0  ,</p>
-<p>ELSEIF (Holiday == 3.0) &amp;&amp; (DayOfMonth == 21) &amp;&amp; (Month == 1),  !winter design day</p>
-<p>Set myCLGSETP_SCH_Override = 30.0 ,</p>
-<p>ELSEIF HOUR &lt; 6       ,</p>
-<p>Set myCLGSETP_SCH_Override = 30.0  ,</p>
-<p>ELSEIF (Hour &gt;= 6) &amp;&amp; (Hour &lt; 22)  &amp;&amp; (DayOfWeek &gt;=2) &amp;&amp; (DayOfWeek &lt;=6) ,</p>
-<p>Set myCLGSETP_SCH_Override = 24.0  ,</p>
-<p>ELSEIF (Hour &gt;= 6) &amp;&amp; (hour &lt; 18) &amp;&amp; (DayOfWeek == 7)</p>
-<p>Set myCLGSETP_SCH_Override = 24.0  ,</p>
-<p>ELSEIF (Hour &gt;= 6) &amp;&amp; (hour &gt;= 18) &amp;&amp; (DayOfWeek == 7)</p>
-<p>Set myCLGSETP_SCH_Override = 30.0  ,</p>
-<p>ELSEIF (Hour &gt;= 22)                   ,</p>
-<p>Set myCLGSETP_SCH_Override = 30.0  ,</p>
-<p>ENDIF;</p>
-<p>Schedule:Constant,</p>
-<p>HTGSETP_SCH,</p>
-<p>Temperature,</p>
-<p>21.0;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>myHTGSETP_SCH,</p>
-<p>HTGSETP_SCH,Schedule:Constant,Schedule Value;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>MyComputedHeatingSetpointProg,</p>
-<p>Set locHour = Hour, ! echo out for debug</p>
-<p>Set locDay = DayOfWeek, ! echo out for debug</p>
-<p>Set locHol = Holiday,  ! echo out for debug</p>
-<p>IF (DayOfWeek == 1),</p>
-<p>Set myHTGSETP_SCH = 15.6  ,</p>
-<p>ELSEIF (Holiday == 3.0) &amp;&amp; (DayOfYear == 21),  !winter design day</p>
-<p>Set myHTGSETP_SCH = 21.0 ,</p>
-<p>ELSEIF HOUR &lt; 5       ,         </p>
-<p>Set myHTGSETP_SCH = 15.6  ,</p>
-<p>ELSEIF (Hour &gt;= 5) &amp;&amp; (Hour &lt; 19)  &amp;&amp; (DayOfWeek &gt;=2) &amp;&amp; (DayOfWeek &lt;=6) ,</p>
-<p>Set myHTGSETP_SCH = 21.0  ,</p>
-<p>ELSEIF (Hour &gt;= 6) &amp;&amp; (hour &lt; 17) &amp;&amp; (DayOfWeek == 7),</p>
-<p>Set myHTGSETP_SCH = 21.0  ,</p>
-<p>ELSEIF (Hour &gt;= 6) &amp;&amp; (hour &gt;= 17) &amp;&amp; (DayOfWeek == 7) ,</p>
-<p>Set myHTGSETP_SCH = 15.6   ,</p>
-<p>ELSEIF (Hour &gt;= 19)          ,</p>
-<p>Set myHTGSETP_SCH = 15.6   ,</p>
-<p>ENDIF;</p>
+<pre><code class="idf">Schedule:Constant,
+    CLGSETP_SCH,
+    Temperature,
+    24.0;
+
+  EnergyManagementSystem:Actuator,
+    myCLGSETP_SCH_Override,
+    CLGSETP_SCH,Schedule:Constant,Schedule Value;
+
+  EnergyManagementSystem:ProgramCallingManager,
+    My Setpoint Schedule Calculator Example,
+    BeginTimestepBeforePredictor,
+    MyComputedCoolingSetpointProg,
+    MyComputedHeatingSetpointProg;
+
+  EnergyManagementSystem:Program,
+    MyComputedCoolingSetpointProg,
+    IF (DayOfWeek == 1),
+      Set myCLGSETP_SCH_Override = 30.0  ,
+    ELSEIF (Holiday == 3.0) &amp;&amp; (DayOfMonth == 21) &amp;&amp; (Month == 1),  !winter design day
+      Set myCLGSETP_SCH_Override = 30.0 ,
+    ELSEIF HOUR &amp;lt; 6       ,
+      Set myCLGSETP_SCH_Override = 30.0  ,
+    ELSEIF (Hour &amp;gt;= 6) &amp;&amp; (Hour &amp;lt; 22)  &amp;&amp; (DayOfWeek &amp;gt;=2) &amp;&amp; (DayOfWeek &amp;lt;=6) ,
+      Set myCLGSETP_SCH_Override = 24.0  ,
+    ELSEIF (Hour &amp;gt;= 6) &amp;&amp; (hour &amp;lt; 18) &amp;&amp; (DayOfWeek == 7)
+      Set myCLGSETP_SCH_Override = 24.0  ,
+    ELSEIF (Hour &amp;gt;= 6) &amp;&amp; (hour &amp;gt;= 18) &amp;&amp; (DayOfWeek == 7)
+      Set myCLGSETP_SCH_Override = 30.0  ,
+    ELSEIF (Hour &amp;gt;= 22)                   ,
+      Set myCLGSETP_SCH_Override = 30.0  ,
+    ENDIF;
+
+  Schedule:Constant,
+    HTGSETP_SCH,
+    Temperature,
+    21.0;
+
+  EnergyManagementSystem:Actuator,
+    myHTGSETP_SCH,
+    HTGSETP_SCH,Schedule:Constant,Schedule Value;
+
+  EnergyManagementSystem:Program,
+   MyComputedHeatingSetpointProg,
+   Set locHour = Hour, ! echo out for debug
+   Set locDay = DayOfWeek, ! echo out for debug
+   Set locHol = Holiday,  ! echo out for debug
+   IF (DayOfWeek == 1),
+     Set myHTGSETP_SCH = 15.6  ,
+   ELSEIF (Holiday == 3.0) &amp;&amp; (DayOfYear == 21),  !winter design day
+     Set myHTGSETP_SCH = 21.0 ,
+   ELSEIF HOUR &amp;lt; 5       ,        
+     Set myHTGSETP_SCH = 15.6  ,
+   ELSEIF (Hour &amp;gt;= 5) &amp;&amp; (Hour &amp;lt; 19)  &amp;&amp; (DayOfWeek &amp;gt;=2) &amp;&amp; (DayOfWeek &amp;lt;=6) ,
+     Set myHTGSETP_SCH = 21.0  ,
+   ELSEIF (Hour &amp;gt;= 6) &amp;&amp; (hour &amp;lt; 17) &amp;&amp; (DayOfWeek == 7),
+     Set myHTGSETP_SCH = 21.0  ,
+   ELSEIF (Hour &amp;gt;= 6) &amp;&amp; (hour &amp;gt;= 17) &amp;&amp; (DayOfWeek == 7) ,
+     Set myHTGSETP_SCH = 15.6   ,
+   ELSEIF (Hour &amp;gt;= 19)          ,
+     Set myHTGSETP_SCH = 15.6   ,
+   ENDIF;
+</code></pre>
+
 <h2 id="example-6-window-shade-control">Example 6. Window Shade Control</h2>
 <h3 id="problem-statement_5">Problem Statement</h3>
 <p>EnergyPlus offers a wide range of control options in the WindowProperty:ShadingControl object, but it is easy to imagine custom schemes for controlling shades or blinds that are not available. We need to ask, Can we use the EMS to override the shading controls?</p>
@@ -2831,122 +3135,164 @@
 <p>Although the user-defined name for the WindowProperty:ShadingControl is “INCIDENT SOLAR ON BLIND,” the component unique name of the actuator that is available is called “ZN001:WALL001:WIN001.”  There could be multiple windows, all with shades, and each is governed by a single WindowProperty:ShadingControl input object. The EMS actuator could override each window separately. The Control Type is called “Control Status,” and requires you to set the status to one of a set of possible control flags. For this case, with only an interior shade, there are two states for the actuator to take. The first shows the shade is “off,” and corresponds to a value of 0.0. The second shows the interior shade is “on,” and corresponds to a value of 6.0.</p>
 <h3 id="ems-input-objects_5">EMS Input Objects</h3>
 <p>The EMS input objects for this example follow and are contained in the example file called “EMSWindowShadeControl.idf.”</p>
-<p>Output:EnergyManagementSystem,</p>
-<p>Verbose,</p>
-<p>Verbose,</p>
-<p>Verbose;</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Solar_Beam_Incident_Cos, !Name</p>
-<p>Zn001:Wall001:Win001,! Output:Variable or Output:Meter Index Key Name</p>
-<p>Surface Outside Face Beam Solar Incident Angle Cosine Value; ! Var Name</p>
-<p>Output:Variable, Zn001:Wall001:Win001,</p>
-<p>Surface Outside Face Beam Solar Incident Angle Cosine Value, Timestep;</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Zone_Sensible_Cool_Rate, !Name</p>
-<p>RESISTIVE ZONE,! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Air System Sensible Cooling Rate; ! Var Name</p>
-<p>Output:Variable, RESISTIVE ZONE,</p>
-<p>Zone Air System Sensible Cooling Rate, Timestep;</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Window Shading Device EMS Controller,    ! Name</p>
-<p>BeginTimestepBeforePredictor , ! EnergyPlus Model Calling Point</p>
-<p>Set_Shade_Control_State ;         ! Program Name 1</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>Zn001_Wall001_Win001_Shading_Deploy_Status,   ! Name</p>
-<p>Zn001:Wall001:Win001,    ! Component Name  Surface name with shade controls</p>
-<p>Window Shade Control, ! Component Type</p>
-<p>Control Status;    ! Control Type</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>Set_Shade_Control_State,     ! Name</p>
-<p>!</p>
-<p>Set IncidentAngleRad = @ArcCos Solar_Beam_Incident_Cos,</p>
-<p>Set IncidentAngle   = @RadToDeg IncidentAngleRad,</p>
-<p>!</p>
-<p>IF IncidentAngle &lt; 45 , ! Block intense direct sun</p>
-<p>Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,</p>
-<p>ELSEIF Zone_Sensible_Cool_Rate &gt; 20, ! block to reduce cooling loads</p>
-<p>Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,</p>
-<p>Else,</p>
-<p>Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Off ,</p>
-<p>ENDIF ;</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>Erl Shading Control Status, ! Name</p>
-<p>Zn001_Wall001_Win001_Shading_Deploy_Status, ! EMS Variable Name</p>
-<p>Averaged, ! Type of Data in Variable</p>
-<p>ZoneTimeStep ; ! Update Frequency</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>Erl Zn001:Wall001:Win001 Incident Angle, ! Name</p>
-<p>IncidentAngle, ! EMS Variable Name</p>
-<p>Averaged, ! Type of Data in Variable</p>
-<p>ZoneTimeStep ; ! Update Frequency</p>
-<p>EnergyManagementSystem:GlobalVariable,  IncidentAngle;</p>
-<p>Output:Variable,</p>
-<p>*,</p>
-<p>Erl Shading Control Status,</p>
-<p>Timestep;</p>
-<p>Output:Variable,</p>
-<p>*,</p>
-<p>Erl Zn001:Wall001:Win001 Incident Angle,</p>
-<p>Timestep;</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Init Window Shading Device Control Constants,    ! Name</p>
-<p>BeginNewEnvironment , ! EnergyPlus Model Calling Point</p>
-<p>InitializeShadeControlFlags ;         ! Program Name 1</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_None;</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_Off ;</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_Interior_Shade_On;</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_Switchable_Dark;</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_Exterior_Shade_On;</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_Interior_Blind_On;</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_Exterior_Blind_On;</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_Between_Glass_Shade_On;</p>
-<p>EnergyManagementSystem:GlobalVariable,    Shade_Status_Between_Glass_Blind_On;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>InitializeShadeControlFlags,</p>
-<p>! these are control flag values used inside EnergyPlus for window shades</p>
-<p>! EMS control of window shading devices involves setting the control values for shading control actuators with</p>
-<p>!  one of these values. The variable names can be used or replaced, it is the whole number values that trigger</p>
-<p>!  changes in the modeling.</p>
-<p>!  Shades and Blinds are either fully on or fully off, partial positions require multiple windows.</p>
-<p>! the window shading control flag values follow</p>
-<p>!  -1: if window has no shading device</p>
-<p>Set Shade_Status_None = 0.0 - 1.0,  ! this is how to write a negative number Erl does not have unary "minus,"  only binary subtraction</p>
-<p>!   0: if shading device is off</p>
-<p>Set Shade_Status_Off = 0.0,</p>
-<p>!   1: if interior shade is on</p>
-<p>Set Shade_Status_Interior_Shade_On = 1.0,</p>
-<p>!   2: if glazing is switched to darker state</p>
-<p>Set Shade_Status_Switchable_Dark = 2.0,</p>
-<p>!   3: if exterior shade is on</p>
-<p>Set Shade_Status_Exterior_Shade_On = 3.0,</p>
-<p>!   6: if interior blind is on</p>
-<p>Set Shade_Status_Interior_Blind_On = 6.0,</p>
-<p>!   7: if exterior blind is on</p>
-<p>Set Shade_Status_Exterior_Blind_On = 6.0,</p>
-<p>!   8: if between-glass shade is on</p>
-<p>Set Shade_Status_Between_Glass_Shade_On = 8.0,</p>
-<p>!   9: if between-glass blind is on</p>
-<p>Set Shade_Status_Between_Glass_Blind_On = 9.0;</p>
-<p>!  10: window has interior shade that is off but may be triggered on later</p>
-<p>!       to control daylight glare</p>
-<p>!  20: window has switchable glazing that is unswitched but may be switched later</p>
-<p>!       to control daylight glare or daylight illuminance</p>
-<p>!  30: window has exterior shade that is off but may be triggered on later</p>
-<p>!       to control daylaight glare or daylight illuminance</p>
-<p>!  60: window has interior blind that is off but may be triggered on later</p>
-<p>!       to control daylaight glare or daylight illuminance</p>
-<p>!  70: window has exterior blind that is off but may be triggered on later</p>
-<p>!       to control daylaight glare or daylight illuminance</p>
-<p>!  80: window has between-glass shade that is off but may be triggered on later</p>
-<p>!       to control daylaight glare or daylight illuminance</p>
-<p>!  90: window has between-glass blind that is off but may be triggered on later</p>
-<p>!       to control daylaight glare or daylight illuminance</p>
-<p>! A "shading device" may be an exterior, interior or between-glass shade or blind,</p>
-<p>! or the lower-transmitting (dark) state of switchable glazing (e.g., electrochromic).</p>
-<p>! In all cases, the unshaded condition is represented</p>
-<p>! by the construction given by window's Surface()%Construction and</p>
-<p>! the shaded condition is represented by the construction given by</p>
-<p>! the window's Surface()%ShadedConstruction</p>
+<pre><code class="idf">Output:EnergyManagementSystem,
+   Verbose,
+   Verbose,
+   Verbose;
+
+
+ EnergyManagementSystem:Sensor,
+   Solar_Beam_Incident_Cos, !Name
+   Zn001:Wall001:Win001,! Output:Variable or Output:Meter Index Key Name
+   Surface Outside Face Beam Solar Incident Angle Cosine Value; ! Var Name
+
+
+ Output:Variable, Zn001:Wall001:Win001,
+    Surface Outside Face Beam Solar Incident Angle Cosine Value, Timestep;
+
+
+ EnergyManagementSystem:Sensor,
+   Zone_Sensible_Cool_Rate, !Name
+   RESISTIVE ZONE,! Output:Variable or Output:Meter Index Key Name
+   Zone Air System Sensible Cooling Rate; ! Var Name
+
+
+ Output:Variable, RESISTIVE ZONE,
+    Zone Air System Sensible Cooling Rate, Timestep;
+
+
+EnergyManagementSystem:ProgramCallingManager,
+  Window Shading Device EMS Controller,    ! Name
+  BeginTimestepBeforePredictor , ! EnergyPlus Model Calling Point
+  Set_Shade_Control_State ;         ! Program Name 1
+
+
+EnergyManagementSystem:Actuator,
+  Zn001_Wall001_Win001_Shading_Deploy_Status,   ! Name
+  Zn001:Wall001:Win001,    ! Component Name  Surface name with shade controls
+  Window Shade Control, ! Component Type
+  Control Status;    ! Control Type
+
+
+
+
+EnergyManagementSystem:Program,
+  Set_Shade_Control_State,     ! Name
+  !
+  Set IncidentAngleRad = @ArcCos Solar_Beam_Incident_Cos,
+  Set IncidentAngle   = @RadToDeg IncidentAngleRad,
+  !
+  IF IncidentAngle &amp;lt; 45 , ! Block intense direct sun
+   Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,
+  ELSEIF Zone_Sensible_Cool_Rate &amp;gt; 20, ! block to reduce cooling loads
+   Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,
+  Else,
+   Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Off ,
+  ENDIF ;
+
+
+
+
+EnergyManagementSystem:OutputVariable,
+   Erl Shading Control Status, ! Name
+   Zn001_Wall001_Win001_Shading_Deploy_Status, ! EMS Variable Name
+   Averaged, ! Type of Data in Variable
+   ZoneTimeStep ; ! Update Frequency
+
+
+EnergyManagementSystem:OutputVariable,
+   Erl Zn001:Wall001:Win001 Incident Angle, ! Name
+   IncidentAngle, ! EMS Variable Name
+   Averaged, ! Type of Data in Variable
+   ZoneTimeStep ; ! Update Frequency
+
+
+ EnergyManagementSystem:GlobalVariable,  IncidentAngle;
+
+
+Output:Variable,
+  *,
+  Erl Shading Control Status,
+  Timestep;
+
+
+Output:Variable,
+  *,
+  Erl Zn001:Wall001:Win001 Incident Angle,
+  Timestep;
+
+
+
+
+
+
+EnergyManagementSystem:ProgramCallingManager,
+  Init Window Shading Device Control Constants,    ! Name
+  BeginNewEnvironment , ! EnergyPlus Model Calling Point
+  InitializeShadeControlFlags ;         ! Program Name 1
+
+
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_None;
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_Off ;
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_Interior_Shade_On;
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_Switchable_Dark;
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_Exterior_Shade_On;
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_Interior_Blind_On;
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_Exterior_Blind_On;
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_Between_Glass_Shade_On;
+ EnergyManagementSystem:GlobalVariable,    Shade_Status_Between_Glass_Blind_On;
+
+
+
+
+ EnergyManagementSystem:Program,
+    InitializeShadeControlFlags,
+          ! these are control flag values used inside EnergyPlus for window shades
+          ! EMS control of window shading devices involves setting the control values for shading control actuators with
+          !  one of these values. The variable names can be used or replaced, it is the whole number values that trigger
+          !  changes in the modeling.
+          !  Shades and Blinds are either fully on or fully off, partial positions require multiple windows.
+          ! the window shading control flag values follow
+          !  -1: if window has no shading device
+    Set Shade_Status_None = 0.0 - 1.0,  ! this is how to write a negative number Erl does not have unary &quot;minus,&quot;  only binary subtraction
+          !   0: if shading device is off
+    Set Shade_Status_Off = 0.0,
+          !   1: if interior shade is on
+    Set Shade_Status_Interior_Shade_On = 1.0,
+          !   2: if glazing is switched to darker state
+    Set Shade_Status_Switchable_Dark = 2.0,
+          !   3: if exterior shade is on
+    Set Shade_Status_Exterior_Shade_On = 3.0,
+          !   6: if interior blind is on
+    Set Shade_Status_Interior_Blind_On = 6.0,
+          !   7: if exterior blind is on
+    Set Shade_Status_Exterior_Blind_On = 6.0,
+          !   8: if between-glass shade is on
+    Set Shade_Status_Between_Glass_Shade_On = 8.0,
+          !   9: if between-glass blind is on
+    Set Shade_Status_Between_Glass_Blind_On = 9.0;
+          !  10: window has interior shade that is off but may be triggered on later
+          !       to control daylight glare
+          !  20: window has switchable glazing that is unswitched but may be switched later
+          !       to control daylight glare or daylight illuminance
+          !  30: window has exterior shade that is off but may be triggered on later
+          !       to control daylaight glare or daylight illuminance
+          !  60: window has interior blind that is off but may be triggered on later
+          !       to control daylaight glare or daylight illuminance
+          !  70: window has exterior blind that is off but may be triggered on later
+          !       to control daylaight glare or daylight illuminance
+          !  80: window has between-glass shade that is off but may be triggered on later
+          !       to control daylaight glare or daylight illuminance
+          !  90: window has between-glass blind that is off but may be triggered on later
+          !       to control daylaight glare or daylight illuminance
+          ! A &quot;shading device&quot; may be an exterior, interior or between-glass shade or blind,
+          ! or the lower-transmitting (dark) state of switchable glazing (e.g., electrochromic).
+          ! In all cases, the unshaded condition is represented
+          ! by the construction given by window's Surface()%Construction and
+          ! the shaded condition is represented by the construction given by
+          ! the window's Surface()%ShadedConstruction
+</code></pre>
+
 <h2 id="example-7-constant-volume-purchased-air-system">Example 7. Constant Volume Purchased Air System</h2>
 <h3 id="problem-statement_6">Problem Statement</h3>
 <p>The simplest way to add HVAC control to an EnergyPlus thermal zone is to use the ZoneHVAC:IdealLoadsAirSystem. This was called <em>purchased air</em> in older versions. The ideal loads air system is intended for load calculations. You provide input for the supply air conditions of drybulb and humidity ratio, but the flow rate cannot be controlled. The model operates by varying the flow rate to exactly meet the desired setpoints. However, you may want to experiment with various designs in a slightly different way in which, given a prescribed supply air situation, then adjust the design to maximize the thermal comfort. It would be interesting to use the simple-to-input purchased air model to examine how a zone responds to a system, rather than how the system responds to a zone. We should ask, Can we use the EMS to prescribe the supply air flow rates for a purchased air model?</p>
@@ -2957,67 +3303,87 @@
 <p>An EMS actuator is available for the ideal loads air system that overrides the air mass flow rate (kg/s) delivered by the system when it is on. The override is not absolute in that the model will still apply the limits defined in the input object and overrides only if the system is “on.”  The internal logic will turn off the air system if the zone is in the thermostat dead band or scheduled “off” by availability managers. This “off” state is modeled inside the ideal loads air system so it does not need to be calculated in Erl. This control leads to a constant volume system that cycles in an attempt to control the zone conditions. In practice, it can achieve relatively good control when loads do not exceed the available capacity.</p>
 <h3 id="ems-input-objects_6">EMS Input Objects</h3>
 <p>A set of EMS input objects for a constant volume purchased air system serving three zones follows are contained in the example file called “EMSConstantVolumePurchAir.idf.”</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Constant Volume Purchased Air Example,    ! Name</p>
-<p>AfterPredictorAfterHVACManagers , ! EnergyPlus Model Calling Point</p>
-<p>Determine_Purch_Air_State,         ! Program Name 1</p>
-<p>Set_Purch_Air;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>Determine_Purch_Air_State,     ! Name</p>
-<p>! State representation:  1.0 is heating, 2.0 is cooling</p>
-<p>IF (Sensible_Load_Zone_1 &lt;= 0.0) ,</p>
-<p>SET Zone_1_State = 2.0,</p>
-<p>ELSEIF (Sensible_Load_Zone_1 &gt; 0.0) ,</p>
-<p>SET Zone_1_State = 1.0,</p>
-<p>ENDIF,</p>
-<p>IF (Sensible_Load_Zone_2 &lt;= 0.0) ,</p>
-<p>SET Zone_2_State = 2.0,</p>
-<p>ELSEIF (Sensible_Load_Zone_2 &gt; 0.0) ,</p>
-<p>SET Zone_2_State = 1.0,</p>
-<p>ENDIF,</p>
-<p>IF (Sensible_Load_Zone_3 &lt;= 0.0) ,</p>
-<p>SET Zone_3_State = 2.0,</p>
-<p>ELSEIF (Sensible_Load_Zone_3 &gt; 0.0) ,</p>
-<p>SET Zone_3_State = 1.0,</p>
-<p>ENDIF;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>Set_Purch_Air,</p>
-<p>IF (    Zone_1_State == 2.0),</p>
-<p>SET ZONE_1_AIR_Mdot = 0.3,</p>
-<p>ELSEIF (Zone_1_State == 1.0),</p>
-<p>SET ZONE_1_AIR_Mdot = 0.1,</p>
-<p>ENDIF,</p>
-<p>IF (    Zone_2_State == 2.0),</p>
-<p>SET ZONE_2_AIR_Mdot = 0.3,</p>
-<p>ELSEIF (Zone_2_State == 1.0),</p>
-<p>SET ZONE_2_AIR_Mdot = 0.1,</p>
-<p>ENDIF,</p>
-<p>IF (    Zone_3_State == 2.0),</p>
-<p>SET ZONE_3_AIR_Mdot = 0.4,</p>
-<p>ELSEIF (Zone_3_State == 1.0),</p>
-<p>SET ZONE_3_AIR_Mdot = 0.15,</p>
-<p>ENDIF;</p>
-<p>EnergyManagementSystem:GlobalVariable,  Zone_1_State;</p>
-<p>EnergyManagementSystem:GlobalVariable,  Zone_2_State;</p>
-<p>EnergyManagementSystem:GlobalVariable,  Zone_3_State;</p>
-<p>EnergyManagementSystem:Actuator,  ZONE_1_AIR_Mdot,</p>
-<p>ZONE1AIR,Ideal Loads Air System,Air Mass Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator, ZONE_2_AIR_Mdot,</p>
-<p>ZONE2AIR,Ideal Loads Air System,Air Mass Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator, ZONE_3_AIR_Mdot,</p>
-<p>ZONE3AIR,Ideal Loads Air System,Air Mass Flow Rate;</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Sensible_Load_Zone_1, !Name</p>
-<p>RESISTIVE ZONE,! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Predicted Sensible Load to Setpoint Heat Transfer Rate; ! Var Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Sensible_Load_Zone_2, !Name</p>
-<p>EAST ZONE,! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Predicted Sensible Load to Setpoint Heat Transfer Rate; ! Var Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Sensible_Load_Zone_3, !Name</p>
-<p>NORTH ZONE,! Output:Variable or Output:Meter Index Key Name</p>
-<p>Zone Predicted Sensible Load to Setpoint Heat Transfer Rate; ! Var Name</p>
+<pre><code class="idf">EnergyManagementSystem:ProgramCallingManager,
+  Constant Volume Purchased Air Example,    ! Name
+  AfterPredictorAfterHVACManagers , ! EnergyPlus Model Calling Point
+  Determine_Purch_Air_State,         ! Program Name 1
+  Set_Purch_Air;
+
+
+EnergyManagementSystem:Program,
+  Determine_Purch_Air_State,     ! Name
+  ! State representation:  1.0 is heating, 2.0 is cooling
+  IF (Sensible_Load_Zone_1 &amp;lt;= 0.0) ,
+    SET Zone_1_State = 2.0,
+  ELSEIF (Sensible_Load_Zone_1 &amp;gt; 0.0) ,
+    SET Zone_1_State = 1.0,
+  ENDIF,
+  IF (Sensible_Load_Zone_2 &amp;lt;= 0.0) ,
+    SET Zone_2_State = 2.0,
+  ELSEIF (Sensible_Load_Zone_2 &amp;gt; 0.0) ,
+    SET Zone_2_State = 1.0,
+  ENDIF,
+  IF (Sensible_Load_Zone_3 &amp;lt;= 0.0) ,
+    SET Zone_3_State = 2.0,
+  ELSEIF (Sensible_Load_Zone_3 &amp;gt; 0.0) ,
+    SET Zone_3_State = 1.0,
+  ENDIF;
+
+
+
+
+ EnergyManagementSystem:Program,
+  Set_Purch_Air,
+  IF (    Zone_1_State == 2.0),
+    SET ZONE_1_AIR_Mdot = 0.3,
+  ELSEIF (Zone_1_State == 1.0),
+    SET ZONE_1_AIR_Mdot = 0.1,
+  ENDIF,
+  IF (    Zone_2_State == 2.0),
+    SET ZONE_2_AIR_Mdot = 0.3,
+  ELSEIF (Zone_2_State == 1.0),
+    SET ZONE_2_AIR_Mdot = 0.1,
+  ENDIF,
+  IF (    Zone_3_State == 2.0),
+    SET ZONE_3_AIR_Mdot = 0.4,
+  ELSEIF (Zone_3_State == 1.0),
+    SET ZONE_3_AIR_Mdot = 0.15,
+  ENDIF;
+
+
+
+
+ EnergyManagementSystem:GlobalVariable,  Zone_1_State;
+ EnergyManagementSystem:GlobalVariable,  Zone_2_State;
+ EnergyManagementSystem:GlobalVariable,  Zone_3_State;
+
+
+ EnergyManagementSystem:Actuator,  ZONE_1_AIR_Mdot,
+  ZONE1AIR,Ideal Loads Air System,Air Mass Flow Rate;
+ EnergyManagementSystem:Actuator, ZONE_2_AIR_Mdot,
+  ZONE2AIR,Ideal Loads Air System,Air Mass Flow Rate;
+ EnergyManagementSystem:Actuator, ZONE_3_AIR_Mdot,
+  ZONE3AIR,Ideal Loads Air System,Air Mass Flow Rate;
+
+
+ EnergyManagementSystem:Sensor,
+  Sensible_Load_Zone_1, !Name
+  RESISTIVE ZONE,! Output:Variable or Output:Meter Index Key Name
+  Zone Predicted Sensible Load to Setpoint Heat Transfer Rate; ! Var Name
+
+
+ EnergyManagementSystem:Sensor,
+  Sensible_Load_Zone_2, !Name
+  EAST ZONE,! Output:Variable or Output:Meter Index Key Name
+  Zone Predicted Sensible Load to Setpoint Heat Transfer Rate; ! Var Name
+
+
+ EnergyManagementSystem:Sensor,
+  Sensible_Load_Zone_3, !Name
+  NORTH ZONE,! Output:Variable or Output:Meter Index Key Name
+  Zone Predicted Sensible Load to Setpoint Heat Transfer Rate; ! Var Name
+</code></pre>
+
 <h2 id="example-8-system-sizing-with-discrete-package-sizes">Example 8. System Sizing with Discrete Package Sizes</h2>
 <h3 id="problem-statement_7">Problem Statement</h3>
 <p>One tension often arises with modeling when options being evaluated have an indirect effect on air system size. In normal autosizing, the changes in sizes are continuous, but in real systems, equipment sizes tend to be discrete. If we start with the Strip Mall Reference Building model (RefBldgStripMallNew2004_Chicago.idf), we should ask, Could we use the EMS custom calculations to intervene and make the final system sizing results follow the discrete sizes available for a particular product line of equipment?</p>
@@ -3025,7 +3391,7 @@
 <p>Examining the vendor’s literature for one line of commercial packaged single-zone HVAC air systems shows that the nominal product sizes include 1200 cfm, 1600 cfm, 2000 cfm, 2400 cfm, 3000 cfm, 3400, cfm, and 4000 cfm. The literature also classifies units by tonnage of cooling capacity; however, in EnergyPlus modeling it is simpler to classify by air flow rate rather than by cooling capacity (because the direct expansion models have a tight range for allowable cooling capacity per air flow rate and size themselves off the flow rate). We construct the following simple model to select the next higher air flow rate product that uses the volume flow determined during the usual autosizing calculations, <span>$\dot{V}_{size}$</span>, and threshold values taken from the nominal product sizes (in m<sup>3</sup>/s):</p>
 <table class="table table-striped">
   <tr>
-    <th>Threshold</th>
+    <th>Thresholh</th>
     <th>Selection</th>
   </tr>
   <tr>
@@ -3064,159 +3430,213 @@
 <p>For this example, we modify the example file called “RefBldgStripMallNew2004_Chicago.idf.”  This file has 10 separate packaged units, so rather than repeat the algorithm several times, we use a subroutine so the same Erl code can be reused for each air system. The subroutine has two arguments that we will declare as global variables:  the input for continuous size and the output for the discrete size.</p>
 <h3 id="ems-input-objects_7">EMS Input Objects</h3>
 <p>A set of input objects for EMS control for discrete resizing of 10 air systems follows and is included in the example file called “EMSDiscreteAirSystemSizes.idf.”</p>
-<p>Output:EnergyManagementSystem,</p>
-<p>Verbose,</p>
-<p>Verbose,</p>
-<p>Verbose;</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Apply Discrete Package Sizes to Air System Sizing , ! Name</p>
-<p>EndOfSystemSizing ,    ! EnergyPlus Model Calling Point</p>
-<p>Resize_PSZ_To_Match_Product_Availability;         ! Program Name 1</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>Resize_PSZ_To_Match_Product_Availability , ! Name</p>
-<p>SET argMainVdot = PSZ_1_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_1_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_2_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_2_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_3_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_3_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_4_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_4_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_5_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_5_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_6_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_6_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_7_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_7_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_8_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_8_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_9_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_9_MainSupVdotSet = argDiscreteMainVdot,</p>
-<p>SET argMainVdot = PSZ_10_CalcMainSupVdot,</p>
-<p>RUN Select_Discrete_Nominal_Air_Flow,</p>
-<p>SET PSZ_10_MainSupVdotSet = argDiscreteMainVdot;</p>
-<p>EnergyManagementSystem:Subroutine,</p>
-<p>Select_Discrete_Nominal_Air_Flow,</p>
-<p>! argMainVdot          Input</p>
-<p>! argDiscreteMainVdot         Output</p>
-<p>IF (argMainVdot &lt;= 0.56628) , ! 1200 cfm</p>
-<p>SET argDiscreteMainVdot = 0.56628 ,</p>
-<p>ELSEIF (argMainVdot &gt; 0.56628) &amp;&amp; (argMainVdot &lt;= 0.75504) , ! 1600 CFM</p>
-<p>SET argDiscreteMainVdot = 0.75504 ,</p>
-<p>ELSEIF (argMainVdot &gt; 0.75504) &amp;&amp; (argMainVdot &lt;= 0.9438 ) , ! 2000 CFM</p>
-<p>SET argDiscreteMainVdot = 0.9438 ,</p>
-<p>ELSEIF (argMainVdot &gt; 0.9438) &amp;&amp; (argMainVdot &lt;= 1.13256 ) , ! 2400 CFM</p>
-<p>SET argDiscreteMainVdot = 1.13256 ,</p>
-<p>ELSEIF (argMainVdot &gt; 1.13256) &amp;&amp; (argMainVdot &lt;= 1.4157 ) , ! 3000 CFM</p>
-<p>SET argDiscreteMainVdot = 1.4157 ,</p>
-<p>ELSEIF (argMainVdot &gt; 1.4157) &amp;&amp; (argMainVdot &lt;= 1.60446 ) , ! 3400 CFM</p>
-<p>SET argDiscreteMainVdot = 1.60446 ,</p>
-<p>ELSEIF (argMainVdot &gt; 1.60446) &amp;&amp; (argMainVdot &lt;= 1.8879 ) , ! 4000 CFM</p>
-<p>SET argDiscreteMainVdot = 1.8879 ,</p>
-<p>ELSEIF (argMainVdot &gt; 1.8879), ! too high</p>
-<p>set dummy = @SevereWarnEP 666.0,</p>
-<p>ENDIF;</p>
-<p>EnergyManagementSystem:GlobalVariable, argDiscreteMainVdot;</p>
-<p>EnergyManagementSystem:GlobalVariable, argMainVdot;</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_1_CalcMainSupVdot,</p>
-<p>PSZ-AC_1:1 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_1_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_1:1  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_2_CalcMainSupVdot,</p>
-<p>PSZ-AC_2:2 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_2_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_2:2  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_3_CalcMainSupVdot,</p>
-<p>PSZ-AC_3:3 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_3_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_3:3  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_4_CalcMainSupVdot,</p>
-<p>PSZ-AC_4:4 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_4_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_4:4  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_5_CalcMainSupVdot,</p>
-<p>PSZ-AC_5:5 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_5_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_5:5  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_6_CalcMainSupVdot,</p>
-<p>PSZ-AC_6:6 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_6_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_6:6  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_7_CalcMainSupVdot,</p>
-<p>PSZ-AC_7:7 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_7_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_7:7  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_8_CalcMainSupVdot,</p>
-<p>PSZ-AC_8:8 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_8_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_8:8  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_9_CalcMainSupVdot,</p>
-<p>PSZ-AC_9:9 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_9_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_9:9  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>PSZ_10_CalcMainSupVdot,</p>
-<p>PSZ-AC_10:10 ,</p>
-<p>Intermediate Air System Main Supply Volume Flow Rate;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PSZ_10_MainSupVdotSet,                            ! Name</p>
-<p>PSZ-AC_10:10  ,                  ! Component Name</p>
-<p>Sizing:System, ! Component Type</p>
-<p>Main Supply Volume Flow Rate;    ! Control Type</p>
+<pre><code class="idf">Output:EnergyManagementSystem,
+  Verbose,
+  Verbose,
+  Verbose;
+
+
+EnergyManagementSystem:ProgramCallingManager,
+  Apply Discrete Package Sizes to Air System Sizing , ! Name
+  EndOfSystemSizing ,    ! EnergyPlus Model Calling Point
+  Resize_PSZ_To_Match_Product_Availability;         ! Program Name 1
+
+
+
+
+EnergyManagementSystem:Program,
+  Resize_PSZ_To_Match_Product_Availability , ! Name
+  SET argMainVdot = PSZ_1_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_1_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_2_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_2_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_3_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_3_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_4_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_4_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_5_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_5_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_6_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_6_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_7_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_7_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_8_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_8_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_9_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_9_MainSupVdotSet = argDiscreteMainVdot,
+  SET argMainVdot = PSZ_10_CalcMainSupVdot,
+  RUN Select_Discrete_Nominal_Air_Flow,
+  SET PSZ_10_MainSupVdotSet = argDiscreteMainVdot;
+
+
+EnergyManagementSystem:Subroutine,
+  Select_Discrete_Nominal_Air_Flow,
+  ! argMainVdot          Input
+  ! argDiscreteMainVdot         Output
+  IF (argMainVdot &amp;lt;= 0.56628) , ! 1200 cfm
+    SET argDiscreteMainVdot = 0.56628 ,
+  ELSEIF (argMainVdot &amp;gt; 0.56628) &amp;&amp; (argMainVdot &amp;lt;= 0.75504) , ! 1600 CFM
+    SET argDiscreteMainVdot = 0.75504 ,
+  ELSEIF (argMainVdot &amp;gt; 0.75504) &amp;&amp; (argMainVdot &amp;lt;= 0.9438 ) , ! 2000 CFM
+    SET argDiscreteMainVdot = 0.9438 ,
+  ELSEIF (argMainVdot &amp;gt; 0.9438) &amp;&amp; (argMainVdot &amp;lt;= 1.13256 ) , ! 2400 CFM
+    SET argDiscreteMainVdot = 1.13256 ,
+  ELSEIF (argMainVdot &amp;gt; 1.13256) &amp;&amp; (argMainVdot &amp;lt;= 1.4157 ) , ! 3000 CFM
+    SET argDiscreteMainVdot = 1.4157 ,
+  ELSEIF (argMainVdot &amp;gt; 1.4157) &amp;&amp; (argMainVdot &amp;lt;= 1.60446 ) , ! 3400 CFM
+    SET argDiscreteMainVdot = 1.60446 ,
+  ELSEIF (argMainVdot &amp;gt; 1.60446) &amp;&amp; (argMainVdot &amp;lt;= 1.8879 ) , ! 4000 CFM
+    SET argDiscreteMainVdot = 1.8879 ,
+  ELSEIF (argMainVdot &amp;gt; 1.8879), ! too high
+    set dummy = @SevereWarnEP 666.0,
+  ENDIF;
+
+
+EnergyManagementSystem:GlobalVariable, argDiscreteMainVdot;
+EnergyManagementSystem:GlobalVariable, argMainVdot;
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_1_CalcMainSupVdot,
+   PSZ-AC_1:1 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_1_MainSupVdotSet,                            ! Name
+   PSZ-AC_1:1  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_2_CalcMainSupVdot,
+   PSZ-AC_2:2 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_2_MainSupVdotSet,                            ! Name
+   PSZ-AC_2:2  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_3_CalcMainSupVdot,
+   PSZ-AC_3:3 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_3_MainSupVdotSet,                            ! Name
+   PSZ-AC_3:3  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_4_CalcMainSupVdot,
+   PSZ-AC_4:4 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_4_MainSupVdotSet,                            ! Name
+   PSZ-AC_4:4  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_5_CalcMainSupVdot,
+   PSZ-AC_5:5 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_5_MainSupVdotSet,                            ! Name
+   PSZ-AC_5:5  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_6_CalcMainSupVdot,
+   PSZ-AC_6:6 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_6_MainSupVdotSet,                            ! Name
+   PSZ-AC_6:6  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_7_CalcMainSupVdot,
+   PSZ-AC_7:7 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_7_MainSupVdotSet,                            ! Name
+   PSZ-AC_7:7  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_8_CalcMainSupVdot,
+   PSZ-AC_8:8 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_8_MainSupVdotSet,                            ! Name
+   PSZ-AC_8:8  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_9_CalcMainSupVdot,
+   PSZ-AC_9:9 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_9_MainSupVdotSet,                            ! Name
+   PSZ-AC_9:9  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+   PSZ_10_CalcMainSupVdot,
+   PSZ-AC_10:10 ,
+   Intermediate Air System Main Supply Volume Flow Rate;
+
+
+EnergyManagementSystem:Actuator,
+   PSZ_10_MainSupVdotSet,                            ! Name
+   PSZ-AC_10:10  ,                  ! Component Name
+   Sizing:System, ! Component Type
+   Main Supply Volume Flow Rate;    ! Control Type
+</code></pre>
+
 <h2 id="example-9-demand-management">Example 9. Demand Management</h2>
 <h3 id="problem-statement_8">Problem Statement</h3>
 <p>Demand management refers to controlling a building to reduce the peak electrical power draws or otherwise improve the load profile from the perspective of the electric utility. Managing electricity demand is an important application for EMS. We should ask, Can we take the model from example 2 and use the EMS to add demand management?</p>
@@ -3248,9 +3668,9 @@
 <p>Table 9. Example 9 Demand Management Adjustments by Control State</p>
 <table class="table table-striped">
 <tr>
-<td>Control State</td>
-<td>Lighting Power Adjustment Factor</td>
-<td>Cooling Thermostat Offset</td>
+<th>Control State</th>
+<th>Lighting Power Ahjustment Factor</th>
+<th>Cooling Thermostat Offset</th>
 </tr>
 <tr>
 <td>0</td>
@@ -3280,248 +3700,316 @@
 <p>There are also two ways to alter the cooling setpoint with EMS. To dynamically alter the cooling setpoints, we modify the schedule rather than directly actuating Zone Temperature Control actuators. Changing the schedule allows one actuator to override all the zones; the more direct approach would require actuators for each zone. (This can be used to advantage if different zones are to be managed differently.)  The algorithm applies an offset depending on the control state. In the input file, the schedule for cooling setpoints is called CLGSETP_SCH, so we set up an actuator for this Schedule Value. Because the algorithm is a simple offset from the original schedule, we need to keep track of the values in the original schedule. We cannot use the same schedule as an input to the algorithm because once an actuator overrides the schedule value it will corrupt the original schedule. This would be an example of a circular reference problem. Therefore, we make a copy of the cooling setpoint schedule, naming it CLGSETP_SCH_Copy, and use the copy in a EnergyManagementSystem:Sensor object to obtain the current scheduled value for the setpoint. When we override the CLGSETP_SCH schedule, it will not corrupt the values from the CLGSTEP_SCH_Copy schedule used as input.</p>
 <h3 id="ems-input-objects_8">EMS Input Objects</h3>
 <p>The main input objects that implement this example of demand management are listed below and are included in the example file called “EMSDemandManager_LargeOffice.idf.”  The results indicate that demand management controls could reduce electricity costs by around $40,000 or 10%.</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Demand Manager Demonstration,</p>
-<p>BeginTimestepBeforePredictor,</p>
-<p>Determine_Current_Demand_Manage_State,</p>
-<p>Dispatch_Demand_Controls_By_State;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>Determine_Current_Demand_Manage_State,</p>
-<p>Set localDemand = CurntFacilityElectDemand / 1000.0 ,</p>
-<p>Set CurrntTrend = @TrendDirection FacilityElectTrend 4,</p>
-<p>IF (Month == 1) ,</p>
-<p>Set argTargetDemand = 0.85 * 1154.01,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 2),</p>
-<p>Set argTargetDemand = 0.85 * 1150.85 ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 3),</p>
-<p>Set argTargetDemand = 0.85 * 1313.56 ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 4),</p>
-<p>Set argTargetDemand = 0.85 * 1364.28,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 5),</p>
-<p>Set argTargetDemand = 0.85 * 1506.29  ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 6),</p>
-<p>Set argTargetDemand = 0.85 * 1516.93  ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 7),</p>
-<p>Set argTargetDemand = 0.85 * 1545.20  ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 8),</p>
-<p>Set argTargetDemand = 0.85 * 1555.20  ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 9),</p>
-<p>Set argTargetDemand = 0.85 * 1491.38  ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 10),</p>
-<p>Set argTargetDemand = 0.85 * 1402.86  ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 11),</p>
-<p>Set argTargetDemand = 0.85 * 1418.69  ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ELSEIF (Month == 12),</p>
-<p>Set argTargetDemand = 0.85 * 1440.48  ,</p>
-<p>Set argCrntDmnd = localDemand,</p>
-<p>Set argTrendDirection = CurrntTrend,</p>
-<p>ENDIF,</p>
-<p>Run Find_Demand_State; </p>
-<p>EnergyManagementSystem:Subroutine,</p>
-<p>Find_Demand_State,</p>
-<p>!  argTargetDemand       Input kW level target</p>
-<p>!  argCrntDmnd           Input  kW level current</p>
-<p>!  argTrendDirection            Input   J/hour</p>
-<p>!  argDmndMngrState     Output  value code, 0.0 = no management,</p>
-<p>!                        1.0 = level 1 demand management</p>
-<p>!                     2.0 = level 2 demand management</p>
-<p>!                     3.0 = level 3 demand management</p>
-<p>Set DmndStateX1 = @TrendValue Demand_Mgr_State_Trend 1,</p>
-<p>Set DmndStateX2 = @TrendValue Demand_Mgr_State_Trend 2,</p>
-<p>Set Level1Demand = 0.9 * argTargetDemand,</p>
-<p>Set argCrntDmnd = argCrntDmnd,</p>
-<p>Set argTargetDemand = argTargetDemand,</p>
-<p>SET argDmndMngrState = DmndStateX1, ! initialize to last state then model changes</p>
-<p>IF (argCrntDmnd &gt; Level1Demand) &amp;&amp; (argCrntDmnd &lt;argTargetDemand) &amp;&amp; (argTrendDirection &gt; 0.0),</p>
-<p>IF DmndStateX1 &lt;= 1.0,</p>
-<p>SET argDmndMngrState = 1.0,</p>
-<p>ELSEIF (DmndStateX1 == 2.0) &amp;&amp; (DmndStateX2 &lt; 2.0),</p>
-<p>SET argDmndMngrState = 2.0,  ! go at least two timesteps at 2.0</p>
-<p>ELSEIF (DmndStateX1 == 3.0) &amp;&amp; (DmndStateX2 == 3.0),</p>
-<p>SET argDmndMngrState = 2.0,</p>
-<p>ELSEIF (DmndStateX1 == 3.0) &amp;&amp; (DmndStateX2 == 2.0),</p>
-<p>SET argDmndMngrState = 3.0,  ! go at least two timesteps at 3.0</p>
-<p>ENDIF,</p>
-<p>ELSEIF (argCrntDmnd &gt; argTargetDemand) &amp;&amp; (argTrendDirection &lt; 0.0),</p>
-<p>IF DmndStateX1 &lt;= 2.0,</p>
-<p>SET argDmndMngrState = 2.0,</p>
-<p>ELSEIF (DmndStateX1 == 3.0) &amp;&amp; (DmndStateX2 == 2.0) , ! go at least two timesteps at 3.0</p>
-<p>SET argDmndMngrState = 3.0,</p>
-<p>ELSEIF (DmndStateX1 == 3.0) &amp;&amp; (DmndStateX2 == 3.0),</p>
-<p>SET argDmndMngrState = 2.0,</p>
-<p>ENDIF,</p>
-<p>ELSEIF (argCrntDmnd &gt; argTargetDemand) &amp;&amp; (argTrendDirection &gt;= 0.0),</p>
-<p>Set argDmndMngrState = 3.0,</p>
-<p>ENDIF;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>Dispatch_Demand_Controls_By_State,</p>
-<p>IF     (argDmndMngrState == 0.0),</p>
-<p>RUN Unset_Demand_Controls,</p>
-<p>ELSEIF (argDmndMngrState == 1.0),</p>
-<p>RUN Set_Demand_Level1_Controls,</p>
-<p>ELSEIF (argDmndMngrState == 2.0),</p>
-<p>Run Set_Demand_Level2_Controls,</p>
-<p>ELSEIF (argDmndMngrState == 3.0),</p>
-<p>Run Set_Demand_Level3_Controls,</p>
-<p>ENDIF;</p>
-<p>EnergyManagementSystem:Subroutine,</p>
-<p>Unset_Demand_Controls,</p>
-<p>SET Set_Cooling_Setpoint_Sched    = Null,</p>
-<p>SET Set_Basement_Lights           = Null,</p>
-<p>SET Set_Core_bottom_Lights        = Null,</p>
-<p>SET Set_Core_mid_Lights           = Null,</p>
-<p>SET Set_Core_top_Lights           = Null,</p>
-<p>SET Set_Perimeter_bot_ZN_3_Lights = Null,</p>
-<p>SET Set_Perimeter_bot_ZN_2_Lights = Null,</p>
-<p>SET Set_Perimeter_bot_ZN_1_Lights = Null,</p>
-<p>SET Set_Perimeter_bot_ZN_4_Lights = Null,</p>
-<p>SET Set_Perimeter_mid_ZN_3_Lights = Null,</p>
-<p>SET Set_Perimeter_mid_ZN_2_Lights = Null,</p>
-<p>SET Set_Perimeter_mid_ZN_1_Lights = Null,</p>
-<p>SET Set_Perimeter_mid_ZN_4_Lights = Null,</p>
-<p>SET Set_Perimeter_top_ZN_3_Lights = Null,</p>
-<p>SET Set_Perimeter_top_ZN_2_Lights = Null,</p>
-<p>SET Set_Perimeter_top_ZN_1_Lights = Null,</p>
-<p>SET Set_Perimeter_top_ZN_4_Lights = Null;</p>
-<p>EnergyManagementSystem:Subroutine,</p>
-<p>Set_Demand_Level1_Controls,</p>
-<p>! set lighting power to 90% of what it would otherwise be</p>
-<p>SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 0.8, ! add 0.8 deg C to cooling setpoint</p>
-<p>SET Set_Basement_Lights           = 0.90 * Basement_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_bottom_Lights        = 0.90 * Core_bottom_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_mid_Lights           = 0.90 * Core_mid_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_top_Lights           = 0.90 * Core_top_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_3_Lights = 0.90 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_2_Lights = 0.90 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_1_Lights = 0.90 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_4_Lights = 0.90 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_3_Lights = 0.90 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_2_Lights = 0.90 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_1_Lights = 0.90 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_4_Lights = 0.90 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_3_Lights = 0.90 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_2_Lights = 0.90 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_1_Lights = 0.90 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_4_Lights = 0.90 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;</p>
-<p>EnergyManagementSystem:Subroutine,</p>
-<p>Set_Demand_Level2_Controls,</p>
-<p>! set lighting power to 80% of what it would otherwise be</p>
-<p>SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 1.5, ! add 1.5 deg C to cooling setpoint</p>
-<p>SET Set_Basement_Lights           = 0.80 * Basement_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_bottom_Lights        = 0.80 * Core_bottom_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_mid_Lights           = 0.80 * Core_mid_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_top_Lights           = 0.80 * Core_top_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_3_Lights = 0.80 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_2_Lights = 0.80 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_1_Lights = 0.80 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_4_Lights = 0.80 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_3_Lights = 0.80 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_2_Lights = 0.80 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_1_Lights = 0.80 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_4_Lights = 0.80 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_3_Lights = 0.80 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_2_Lights = 0.80 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_1_Lights = 0.80 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_4_Lights = 0.80 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;</p>
-<p>EnergyManagementSystem:Subroutine,</p>
-<p>Set_Demand_Level3_Controls,</p>
-<p>! set lighting power to 70% of what it would otherwise be</p>
-<p>SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 2.0, ! add 2.0 deg C to cooling setpoint</p>
-<p>SET Set_Basement_Lights           = 0.70 * Basement_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_bottom_Lights        = 0.70 * Core_bottom_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_mid_Lights           = 0.70 * Core_mid_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Core_top_Lights           = 0.70 * Core_top_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_3_Lights = 0.70 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_2_Lights = 0.70 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_1_Lights = 0.70 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_bot_ZN_4_Lights = 0.70 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_3_Lights = 0.70 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_2_Lights = 0.70 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_1_Lights = 0.70 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_mid_ZN_4_Lights = 0.70 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_3_Lights = 0.70 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_2_Lights = 0.70 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_1_Lights = 0.70 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,</p>
-<p>SET Set_Perimeter_top_ZN_4_Lights = 0.70 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;</p>
-<p>EnergyManagementSystem:GlobalVariable,argTargetDemand;</p>
-<p>EnergyManagementSystem:GlobalVariable,argCrntDmnd;</p>
-<p>EnergyManagementSystem:GlobalVariable,argTrendDirection;</p>
-<p>EnergyManagementSystem:GlobalVariable,argDmndMngrState;</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>BLDG_LIGHT_SCH, !- Name</p>
-<p>BLDG_LIGHT_SCH, !- Output:Variable or Output:Meter Index Key Name</p>
-<p>Schedule Value; !- Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>CurntFacilityElectDemand,  !- Name</p>
-<p>Whole Building,        !- Output:Variable or Output:Meter Index Key Name</p>
-<p>Facility Total Electric Demand Power; !- Output:Variable Name</p>
-<p>EnergyManagementSystem:TrendVariable,</p>
-<p>Demand_Mgr_State_Trend , !- Name</p>
-<p>argDmndMngrState, !- EMS Variable Name</p>
-<p>48 ; !- Number of Timesteps to be Logged</p>
-<p>EnergyManagementSystem:TrendVariable,</p>
-<p>FacilityElectTrend , !- Name</p>
-<p>CurntFacilityElectDemand, !- EMS Variable Name</p>
-<p>144 ; !- Number of Timesteps to be Logged</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Cooling_Setpoint_Sched,  !- Name</p>
-<p>CLGSETP_SCH_Copy,        !- Output:Variable or Output:Meter Index Key Name</p>
-<p>Schedule Value; !- Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>Set_Cooling_Setpoint_Sched,  !- Name</p>
-<p>CLGSETP_SCH ,     !- Actuated Component Unique Name</p>
-<p>Schedule:Compact,   !- Actuated Component Type</p>
-<p>Schedule Value    ; !- Actuated Component Control Type</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>Erl Cooling Setpoint [C],    !- Name</p>
-<p>Set_Cooling_Setpoint_Sched,  !- EMS Variable Name</p>
-<p>Averaged   ,                 !- Type of Data in Variable</p>
-<p>ZoneTimestep;                !- Update Frequency</p>
-<p>Output:Variable,</p>
-<p>*,</p>
-<p>Erl Cooling Setpoint,</p>
-<p>Timestep;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>Set_Basement_Lights,  !- Name</p>
-<p>Basement_Lights ,     !- Actuated Component Unique Name</p>
-<p>Lights,               !- Actuated Component Type</p>
-<p>Electric Power Level; !- Actuated Component Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>Basement_Lights , !- Name</p>
-<p>Basement_Lights , !- Internal Data Index Key Name</p>
-<p>Lighting Power Design Level ; !- Internal Data Type</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>Set_Core_bottom_Lights, !- Name</p>
-<p>Core_bottom_Lights ,  !- Actuated Component Unique Name</p>
-<p>Lights,               !- Actuated Component Type</p>
-<p>Electric Power Level; !- Actuated Component Control Type</p>
-<p>EnergyManagementSystem:InternalVariable,</p>
-<p>Core_bottom_Lights , !- Name</p>
-<p>Core_bottom_Lights , !- Internal Data Index Key Name</p>
-<p>Lighting Power Design Level ; !- Internal Data Type</p>
-<p><strong>&lt;&lt; Snipped remaining Lights Sensors and Actuators &gt;&gt;</strong></p>
+<pre><code class="idf">EnergyManagementSystem:ProgramCallingManager,
+  Demand Manager Demonstration,
+  BeginTimestepBeforePredictor,
+  Determine_Current_Demand_Manage_State,
+  Dispatch_Demand_Controls_By_State;
+
+
+EnergyManagementSystem:Program,
+  Determine_Current_Demand_Manage_State,
+  Set localDemand = CurntFacilityElectDemand / 1000.0 ,
+  Set CurrntTrend = @TrendDirection FacilityElectTrend 4,
+  IF (Month == 1) ,
+    Set argTargetDemand = 0.85 * 1154.01,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 2),
+    Set argTargetDemand = 0.85 * 1150.85 ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 3),
+    Set argTargetDemand = 0.85 * 1313.56 ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 4),
+    Set argTargetDemand = 0.85 * 1364.28,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 5),
+    Set argTargetDemand = 0.85 * 1506.29  ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 6),
+    Set argTargetDemand = 0.85 * 1516.93  ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+
+
+  ELSEIF (Month == 7),
+    Set argTargetDemand = 0.85 * 1545.20  ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 8),
+    Set argTargetDemand = 0.85 * 1555.20  ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 9),
+    Set argTargetDemand = 0.85 * 1491.38  ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 10),
+    Set argTargetDemand = 0.85 * 1402.86  ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 11),
+    Set argTargetDemand = 0.85 * 1418.69  ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ELSEIF (Month == 12),
+    Set argTargetDemand = 0.85 * 1440.48  ,
+    Set argCrntDmnd = localDemand,
+    Set argTrendDirection = CurrntTrend,
+  ENDIF,
+  Run Find_Demand_State;
+
+
+
+
+EnergyManagementSystem:Subroutine,
+  Find_Demand_State,
+  !  argTargetDemand       Input kW level target
+  !  argCrntDmnd           Input  kW level current
+  !  argTrendDirection            Input   J/hour
+  !  argDmndMngrState     Output  value code, 0.0 = no management,
+  !                        1.0 = level 1 demand management
+  !                     2.0 = level 2 demand management
+  !                     3.0 = level 3 demand management
+  Set DmndStateX1 = @TrendValue Demand_Mgr_State_Trend 1,
+  Set DmndStateX2 = @TrendValue Demand_Mgr_State_Trend 2,
+  Set Level1Demand = 0.9 * argTargetDemand,
+  Set argCrntDmnd = argCrntDmnd,
+  Set argTargetDemand = argTargetDemand,
+  SET argDmndMngrState = DmndStateX1, ! initialize to last state then model changes
+  IF (argCrntDmnd &amp;gt; Level1Demand) &amp;&amp; (argCrntDmnd &amp;lt;argTargetDemand) &amp;&amp; (argTrendDirection &amp;gt; 0.0),
+
+
+    IF DmndStateX1 &amp;lt;= 1.0,
+      SET argDmndMngrState = 1.0,
+    ELSEIF (DmndStateX1 == 2.0) &amp;&amp; (DmndStateX2 &amp;lt; 2.0),
+      SET argDmndMngrState = 2.0,  ! go at least two timesteps at 2.0
+    ELSEIF (DmndStateX1 == 3.0) &amp;&amp; (DmndStateX2 == 3.0),
+      SET argDmndMngrState = 2.0,
+    ELSEIF (DmndStateX1 == 3.0) &amp;&amp; (DmndStateX2 == 2.0),
+      SET argDmndMngrState = 3.0,  ! go at least two timesteps at 3.0
+    ENDIF,
+
+
+  ELSEIF (argCrntDmnd &amp;gt; argTargetDemand) &amp;&amp; (argTrendDirection &amp;lt; 0.0),
+    IF DmndStateX1 &amp;lt;= 2.0,
+      SET argDmndMngrState = 2.0,
+    ELSEIF (DmndStateX1 == 3.0) &amp;&amp; (DmndStateX2 == 2.0) , ! go at least two timesteps at 3.0
+      SET argDmndMngrState = 3.0,
+    ELSEIF (DmndStateX1 == 3.0) &amp;&amp; (DmndStateX2 == 3.0),
+      SET argDmndMngrState = 2.0,
+    ENDIF,
+
+
+  ELSEIF (argCrntDmnd &amp;gt; argTargetDemand) &amp;&amp; (argTrendDirection &amp;gt;= 0.0),
+    Set argDmndMngrState = 3.0,
+  ENDIF;
+
+
+
+
+EnergyManagementSystem:Program,
+  Dispatch_Demand_Controls_By_State,
+  IF     (argDmndMngrState == 0.0),
+    RUN Unset_Demand_Controls,
+  ELSEIF (argDmndMngrState == 1.0),
+    RUN Set_Demand_Level1_Controls,
+  ELSEIF (argDmndMngrState == 2.0),
+    Run Set_Demand_Level2_Controls,
+  ELSEIF (argDmndMngrState == 3.0),
+    Run Set_Demand_Level3_Controls,
+  ENDIF;
+
+
+
+
+EnergyManagementSystem:Subroutine,
+  Unset_Demand_Controls,
+  SET Set_Cooling_Setpoint_Sched    = Null,
+  SET Set_Basement_Lights           = Null,
+  SET Set_Core_bottom_Lights        = Null,
+  SET Set_Core_mid_Lights           = Null,
+  SET Set_Core_top_Lights           = Null,
+  SET Set_Perimeter_bot_ZN_3_Lights = Null,
+  SET Set_Perimeter_bot_ZN_2_Lights = Null,
+  SET Set_Perimeter_bot_ZN_1_Lights = Null,
+  SET Set_Perimeter_bot_ZN_4_Lights = Null,
+  SET Set_Perimeter_mid_ZN_3_Lights = Null,
+  SET Set_Perimeter_mid_ZN_2_Lights = Null,
+  SET Set_Perimeter_mid_ZN_1_Lights = Null,
+  SET Set_Perimeter_mid_ZN_4_Lights = Null,
+  SET Set_Perimeter_top_ZN_3_Lights = Null,
+  SET Set_Perimeter_top_ZN_2_Lights = Null,
+  SET Set_Perimeter_top_ZN_1_Lights = Null,
+  SET Set_Perimeter_top_ZN_4_Lights = Null;
+
+
+EnergyManagementSystem:Subroutine,
+  Set_Demand_Level1_Controls,
+  ! set lighting power to 90% of what it would otherwise be
+  SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 0.8, ! add 0.8 deg C to cooling setpoint
+  SET Set_Basement_Lights           = 0.90 * Basement_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_bottom_Lights        = 0.90 * Core_bottom_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_mid_Lights           = 0.90 * Core_mid_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_top_Lights           = 0.90 * Core_top_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_3_Lights = 0.90 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_2_Lights = 0.90 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_1_Lights = 0.90 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_4_Lights = 0.90 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_3_Lights = 0.90 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_2_Lights = 0.90 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_1_Lights = 0.90 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_4_Lights = 0.90 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_3_Lights = 0.90 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_2_Lights = 0.90 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_1_Lights = 0.90 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_4_Lights = 0.90 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
+
+
+EnergyManagementSystem:Subroutine,
+  Set_Demand_Level2_Controls,
+  ! set lighting power to 80% of what it would otherwise be
+  SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 1.5, ! add 1.5 deg C to cooling setpoint
+  SET Set_Basement_Lights           = 0.80 * Basement_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_bottom_Lights        = 0.80 * Core_bottom_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_mid_Lights           = 0.80 * Core_mid_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_top_Lights           = 0.80 * Core_top_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_3_Lights = 0.80 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_2_Lights = 0.80 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_1_Lights = 0.80 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_4_Lights = 0.80 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_3_Lights = 0.80 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_2_Lights = 0.80 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_1_Lights = 0.80 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_4_Lights = 0.80 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_3_Lights = 0.80 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_2_Lights = 0.80 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_1_Lights = 0.80 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_4_Lights = 0.80 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
+
+
+
+
+EnergyManagementSystem:Subroutine,
+  Set_Demand_Level3_Controls,
+  ! set lighting power to 70% of what it would otherwise be
+  SET Set_Cooling_Setpoint_Sched    = Cooling_Setpoint_Sched + 2.0, ! add 2.0 deg C to cooling setpoint
+  SET Set_Basement_Lights           = 0.70 * Basement_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_bottom_Lights        = 0.70 * Core_bottom_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_mid_Lights           = 0.70 * Core_mid_Lights * BLDG_LIGHT_SCH,
+  SET Set_Core_top_Lights           = 0.70 * Core_top_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_3_Lights = 0.70 * Perimeter_bot_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_2_Lights = 0.70 * Perimeter_bot_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_1_Lights = 0.70 * Perimeter_bot_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_bot_ZN_4_Lights = 0.70 * Perimeter_bot_ZN_4_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_3_Lights = 0.70 * Perimeter_mid_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_2_Lights = 0.70 * Perimeter_mid_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_1_Lights = 0.70 * Perimeter_mid_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_mid_ZN_4_Lights = 0.70 * Perimeter_mid_ZN_4_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_3_Lights = 0.70 * Perimeter_top_ZN_3_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_2_Lights = 0.70 * Perimeter_top_ZN_2_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_1_Lights = 0.70 * Perimeter_top_ZN_1_Lights * BLDG_LIGHT_SCH,
+  SET Set_Perimeter_top_ZN_4_Lights = 0.70 * Perimeter_top_ZN_4_Lights * BLDG_LIGHT_SCH;
+
+
+
+
+
+
+EnergyManagementSystem:GlobalVariable,argTargetDemand;
+EnergyManagementSystem:GlobalVariable,argCrntDmnd;
+EnergyManagementSystem:GlobalVariable,argTrendDirection;
+EnergyManagementSystem:GlobalVariable,argDmndMngrState;
+
+
+EnergyManagementSystem:Sensor,
+  BLDG_LIGHT_SCH, !- Name
+  BLDG_LIGHT_SCH, !- Output:Variable or Output:Meter Index Key Name
+  Schedule Value; !- Output:Variable or Output:Meter Name
+
+
+
+
+EnergyManagementSystem:Sensor,
+  CurntFacilityElectDemand,  !- Name
+  Whole Building,        !- Output:Variable or Output:Meter Index Key Name
+  Facility Total Electric Demand Power; !- Output:Variable Name
+
+
+
+
+EnergyManagementSystem:TrendVariable,
+  Demand_Mgr_State_Trend , !- Name
+  argDmndMngrState, !- EMS Variable Name
+  48 ; !- Number of Timesteps to be Logged
+
+
+EnergyManagementSystem:TrendVariable,
+  FacilityElectTrend , !- Name
+  CurntFacilityElectDemand, !- EMS Variable Name
+  144 ; !- Number of Timesteps to be Logged
+
+
+EnergyManagementSystem:Sensor,
+  Cooling_Setpoint_Sched,  !- Name
+  CLGSETP_SCH_Copy,        !- Output:Variable or Output:Meter Index Key Name
+  Schedule Value; !- Output:Variable or Output:Meter Name
+
+
+EnergyManagementSystem:Actuator,
+  Set_Cooling_Setpoint_Sched,  !- Name
+  CLGSETP_SCH ,     !- Actuated Component Unique Name
+  Schedule:Compact,   !- Actuated Component Type
+  Schedule Value    ; !- Actuated Component Control Type
+
+
+EnergyManagementSystem:OutputVariable,
+  Erl Cooling Setpoint [C],    !- Name
+  Set_Cooling_Setpoint_Sched,  !- EMS Variable Name
+  Averaged   ,                 !- Type of Data in Variable
+  ZoneTimestep;                !- Update Frequency
+
+
+
+
+Output:Variable,
+  *,
+  Erl Cooling Setpoint,
+  Timestep;
+
+
+EnergyManagementSystem:Actuator,
+  Set_Basement_Lights,  !- Name
+  Basement_Lights ,     !- Actuated Component Unique Name
+  Lights,               !- Actuated Component Type
+  Electric Power Level; !- Actuated Component Control Type
+
+
+EnergyManagementSystem:InternalVariable,
+  Basement_Lights , !- Name
+  Basement_Lights , !- Internal Data Index Key Name
+  Lighting Power Design Level ; !- Internal Data Type
+
+
+EnergyManagementSystem:Actuator,
+  Set_Core_bottom_Lights, !- Name
+  Core_bottom_Lights ,  !- Actuated Component Unique Name
+  Lights,               !- Actuated Component Type
+  Electric Power Level; !- Actuated Component Control Type
+EnergyManagementSystem:InternalVariable,
+  Core_bottom_Lights , !- Name
+  Core_bottom_Lights , !- Internal Data Index Key Name
+  Lighting Power Design Level ; !- Internal Data Type
+
+
+&lt;&lt; Snipped remaining Lights Sensors and Actuators &gt;&gt;
+</code></pre>
+
 <h2 id="example-10-plant-loop-override-control">Example 10. Plant Loop Override Control</h2>
 <h3 id="problem-statement_9">Problem Statement</h3>
 <p>A common occurrence in EnergyPlus central plant simulations is for a component to be designed well, but during the course of an annual simulation, it is operated outside of its allowable region.  This is due to the governing control strategies (operating schemes).  These operation schemes may not have the intelligence to say, turn off a cooling tower when the outdoor temperature is too low.</p>
@@ -3535,46 +4023,66 @@
 <p>The Erl program is quite simple for this case.  If the outdoor dry bulb temperature goes below a certain value, the loop and pump actuators are set to zero.  If the outdoor temperature is equal to or above this value, the actuators are set to <em>Null</em>, relinquishing control back to the regular operation schemes.  In modifying this specific input file it was found that the outdoor dry bulb temperature which removed these warnings was six degrees Celsius.  We also create a custom output variable called “EMS Condenser Flow Override On” to easily record when the overrides have occurred.</p>
 <h3 id="ems-input-objects_9">EMS Input Objects</h3>
 <p>The main input objects that implement this example of plant loop control are listed below and are included in the example file called “EMSPlantLoopOverrideControl.idf.”  The addition of the EMS objects properly shuts down the loop as the outdoor temperature go below the transition value, and the simulation error file shows no warnings for the tower outlet temperature.</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>OutdoorTemp,         !- Name</p>
-<p>Environment,         !- Output:Variable Index Key Name</p>
-<p>Site Outdoor Air Drybulb Temperature;    !- Output:Variable Name</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>Actuator_Loop,       !- Name</p>
-<p>Chiller Plant Condenser Loop, !- Actuated Component Unique Name</p>
-<p>Plant Loop Overall,  !- Actuated Component Type</p>
-<p>On/Off Supervisory;  !- Actuated Component Control Type</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>PumpFlowOverride,    !- Name</p>
-<p>Chiller Plant Cnd Circ Pump,  !- Actuated Component Unique Name</p>
-<p>Pump,                !- Actuated Component Type</p>
-<p>Pump Mass Flow Rate; !- Actuated Component Control Type</p>
-<p>EnergyManagementSystem:GlobalVariable,</p>
-<p>PumpFlowOverrideReport;</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>EMS Condenser Flow Override On [On/Off], !- Name</p>
-<p>PumpFlowOverrideReport,    !- EMS Variable Name</p>
-<p>Averaged,            !- Type of Data in Variable</p>
-<p>SystemTimeStep;      !- Update Frequency</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Condenser OnOff Management,</p>
-<p>InsideHVACSystemIterationLoop,</p>
-<p>TowerControl;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>TowerControl,</p>
-<p>IF (OutdoorTemp &lt; 6.0),</p>
-<p>SET Actuator_Loop = 0.0,</p>
-<p>SET PumpFlowOverride = 0.0,</p>
-<p>SET PumpFlowOverrideReport = 1.0,</p>
-<p>ELSE,</p>
-<p>SET Actuator_Loop = Null,</p>
-<p>SET PumpFlowOverride = Null,</p>
-<p>SET PumpFlowOverrideReport = 0.0,</p>
-<p>ENDIF;</p>
-<p>Output:Variable,</p>
-<p>*,</p>
-<p>EMS Condenser Flow Override On,</p>
-<p>Hourly;</p>
+<pre><code class="idf">  EnergyManagementSystem:Sensor,
+    OutdoorTemp,         !- Name
+    Environment,         !- Output:Variable Index Key Name
+    Site Outdoor Air Drybulb Temperature;    !- Output:Variable Name
+
+
+  EnergyManagementSystem:Actuator,
+    Actuator_Loop,       !- Name
+    Chiller Plant Condenser Loop, !- Actuated Component Unique Name
+    Plant Loop Overall,  !- Actuated Component Type
+    On/Off Supervisory;  !- Actuated Component Control Type
+
+
+  EnergyManagementSystem:Actuator,
+    PumpFlowOverride,    !- Name
+    Chiller Plant Cnd Circ Pump,  !- Actuated Component Unique Name
+    Pump,                !- Actuated Component Type
+    Pump Mass Flow Rate; !- Actuated Component Control Type
+
+
+  EnergyManagementSystem:GlobalVariable,
+    PumpFlowOverrideReport;
+
+
+  EnergyManagementSystem:OutputVariable,
+    EMS Condenser Flow Override On [On/Off], !- Name
+    PumpFlowOverrideReport,    !- EMS Variable Name
+    Averaged,            !- Type of Data in Variable
+    SystemTimeStep;      !- Update Frequency
+
+
+
+
+
+
+  EnergyManagementSystem:ProgramCallingManager,
+    Condenser OnOff Management,
+    InsideHVACSystemIterationLoop,
+    TowerControl;
+
+
+  EnergyManagementSystem:Program,
+    TowerControl,
+    IF (OutdoorTemp &amp;lt; 6.0),
+      SET Actuator_Loop = 0.0,
+      SET PumpFlowOverride = 0.0,
+      SET PumpFlowOverrideReport = 1.0,
+    ELSE,
+      SET Actuator_Loop = Null,
+      SET PumpFlowOverride = Null,
+      SET PumpFlowOverrideReport = 0.0,
+    ENDIF;
+
+
+  Output:Variable,
+    *,
+    EMS Condenser Flow Override On,
+    Hourly;
+</code></pre>
+
 <h2 id="example-11-performance-curve-result-override">Example 11. Performance Curve Result Override</h2>
 <h3 id="problem-statement_10">Problem Statement</h3>
 <p>The output of EnergyPlus performance curves (or tables) can be modified as necessary to simulate hardware or controls that cannot be accurately realized using a single performance curve. This example describes a method for modifying the capacity of a DX cooling coil via the DX coil objects Total Cooling Capacity Function of Temperature performance curve object.</p>
@@ -3586,121 +4094,157 @@
 \]</div>
 
 <p>The first term (Twb,i) refers to the cooling coil inlet air wet-bulb temperature and the second (Tc,i) refers to the outdoor condenser inlet air dry-bulb temperature. Using the EMS, a new total capacity as a function of temperature value will be calculated and used during the simulation. The Energyplus input objects for the cooling coil capacity curve, the associated outdoor air mixer object, and the original cooling capacity performance curve are shown here.</p>
-<p>Coil:Cooling:DX:SingleSpeed,</p>
-<p>Zone1PTHPDXCoolCoil,     !- Name</p>
-<p>CoolingCoilAvailSched,   !- Availability Schedule Name</p>
-<p>8750.0,                  !- Rated Total Cooling Capacity {W}</p>
-<p>0.75,                    !- Rated Sensible Heat Ratio</p>
-<p>3.0,                     !- Rated COP</p>
-<p>0.5,                     !- Rated Air Flow Rate {m3/s}</p>
-<p>,          !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}</p>
-<p>Zone1PTHPFanOutletNode,  !- Air Inlet Node Name</p>
-<p>Zone1PTHPDXCoolCoilOutletNode,  !- Air Outlet Node Name</p>
-<p>HPACCoolCapFT,    !- Total Cooling Capacity f(Temperature) Curve Name</p>
-<p>HPACCoolCapFFF,   !- Total Cooling Capacity f(Flow Fraction) Curve Name</p>
-<p>HPACEIRFT,        !- Energy Input Ratio f(Temperature) Curve Name</p>
-<p>HPACEIRFFF,       !- Energy Input Ratio f(Flow Fraction) Curve Name</p>
-<p>HPACPLFFPLR;      !- Part Load Fraction Correlation Curve Name</p>
-<p>OutdoorAir:Mixer,</p>
-<p>Zone1PTHPOAMixer,        !- Name</p>
-<p>Zone1PTHPOAMixerOutletNode,  !- Mixed Air Node Name</p>
-<p>Zone1PTHPOAInNode,       !- Outdoor Air Stream Node Name</p>
-<p>Zone1PTHPExhNode,        !- Relief Air Stream Node Name</p>
-<p>Zone1PTHPAirInletNode;   !- Return Air Stream Node Name</p>
-<p>Curve:Biquadratic,</p>
-<p>HPACCoolCapFT,           !- Name</p>
-<p>0.942587793,             !- Coefficient1 Constant</p>
-<p>0.009543347,             !- Coefficient2 x</p>
-<p>0.000683770,             !- Coefficient3 x**2</p>
-<p>-0.011042676,            !- Coefficient4 y</p>
-<p>0.000005249,             !- Coefficient5 y**2</p>
-<p>-0.000009720,            !- Coefficient6 x*y</p>
+<pre><code class="idf">  Coil:Cooling:DX:SingleSpeed,
+    Zone1PTHPDXCoolCoil,     !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    8750.0,                  !- Rated Total Cooling Capacity {W}
+    0.75,                    !- Rated Sensible Heat Ratio
+    3.0,                     !- Rated COP
+    0.5,                     !- Rated Air Flow Rate {m3/s}
+    ,          !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    Zone1PTHPFanOutletNode,  !- Air Inlet Node Name
+    Zone1PTHPDXCoolCoilOutletNode,  !- Air Outlet Node Name
+    HPACCoolCapFT,    !- Total Cooling Capacity f(Temperature) Curve Name
+    HPACCoolCapFFF,   !- Total Cooling Capacity f(Flow Fraction) Curve Name
+    HPACEIRFT,        !- Energy Input Ratio f(Temperature) Curve Name
+    HPACEIRFFF,       !- Energy Input Ratio f(Flow Fraction) Curve Name
+    HPACPLFFPLR;      !- Part Load Fraction Correlation Curve Name
+
+
+  OutdoorAir:Mixer,
+    Zone1PTHPOAMixer,        !- Name
+    Zone1PTHPOAMixerOutletNode,  !- Mixed Air Node Name
+    Zone1PTHPOAInNode,       !- Outdoor Air Stream Node Name
+    Zone1PTHPExhNode,        !- Relief Air Stream Node Name
+    Zone1PTHPAirInletNode;   !- Return Air Stream Node Name
+
+
+  Curve:Biquadratic,
+    HPACCoolCapFT,           !- Name
+    0.942587793,             !- Coefficient1 Constant
+    0.009543347,             !- Coefficient2 x
+    0.000683770,             !- Coefficient3 x**2
+    -0.011042676,            !- Coefficient4 y
+    0.000005249,             !- Coefficient5 y**2
+    -0.000009720,            !- Coefficient6 x*y
+</code></pre>
+
 <p>Note that the Total Cooling Capacity Function of Temperature Curve Name is HPACCoolCapFT and the inlet air node for this cooling coil is Zone1PTHPFanOutletNode. From the mixer object, the outdoor air node name is Zone1PTHPOAInNode. The existing cooling capacity performance curve name is HPACCoolCapFT. These node or object names will be used in the EMS program to point to the node or object as required.</p>
 <h3 id="ems-input-objects_10">EMS Input Objects</h3>
 <p>The main input objects that implement this example for over-riding a performance curve result are listed below. Note that the node wet-bulb temperature at the inlet node of the cooling coil is calculated both using the node wet-bulb temperature and the psychrometric function to calculate a wet-bulb temperature from dry-bulb temperature and humidity ratio. The node wet-bulb temperature EMS sensor is left in this example for the sole purpose of showing how to access this node variable in a direct and indirect manner.</p>
 <p>Referring to the cooling capacity equation above, a new equation must be developed to represent this same performance aspect of the cooling coil. Since, in this example, the cooling capacity changes at 31°C, one of the coefficients is modified and used in the IF block to modify the cooling capacity above and below this outdoor air temperature limit. Note also that the coefficients used in the EMS program are all positive values and the negative sign is accounted for the CurveInput equation. Also, the value of C2 was changed to a negative value to represent the change in performance at 31°C. To calculate the new performance curve results, EMS sensors are placed at the cooling coil air inlet node to capture air dry-bulb temperature and humidity ratio, and at the outdoor air mixer outdoor air node inlet to capture outdoor air dry-bulb temperature and pressure. The curve input equation is identical to the equation shown above except that 1) the equation coefficients are all positive and any negative coefficients are accounted for in the equation itself, and 2) alternate coefficients (actually only C2a in this example) are used for the second equation. The results of this example show a marked difference in the cooling capacity above 31°C.</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>EMSBasedCurveManager,  !- Name</p>
-<p>AfterPredictorBeforeHVACManagers,  !- EnergyPlus Model Calling Point</p>
-<p>CurveOverwriteMGR;     !- Program Name 1</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>CurveOverwriteMGR,</p>
-<p>SET TTmp = CoilInletDBT,</p>
-<p>SET WTmp = CoilInletW,</p>
-<p>SET PTmp = Pressure,</p>
-<p>SET MyWB = @TwbFnTdbWPb TTmp WTmp PTmp,</p>
-<p>SET IVOne = CoilInletWBT,</p>
-<p>SET IVOne = MyWB,</p>
-<p>SET IVTwo = OAT,</p>
-<p>SET IVThree = IVOne*IVTwo,</p>
-<p>SET C1 = 0.942567793,</p>
-<p>SET C2 = 0.009543347,</p>
-<p>SET C2a = 0.009543347, !-  -0.009543347</p>
-<p>SET C3 = 0.00068377,</p>
-<p>SET C4 = 0.011042676, !-  -0.011042676</p>
-<p>SET C5 = 0.000005249,</p>
-<p>SET C6 = 0.000009720, !-  -0.000009720</p>
-<p>IF OAT &lt; 31.0,</p>
-<p>SET CurveInput = C1 + (C2*IVOne) + (C3*IVOne*IVone) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),</p>
-<p>ELSE,</p>
-<p>SET CurveInput = C1 - (C2a*IVOne) + (C3*IVOne*IVone) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),</p>
-<p>ENDIF,</p>
-<p>SET CurveOverwrite = CurveInput;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>CurveOverwrite,    !- Name</p>
-<p>HPACCOOLCAPFT,     !- Actuated Component Unique Name</p>
-<p>Curve,             !- Actuated Component Type</p>
-<p>Curve Result;      !- Actuated Component Control Type</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>ActualCurve,           !- Name</p>
-<p>HPACCOOLCAPFT,     !- Output:Variable or Output:Meter Index Key Name</p>
-<p>Performance Curve Output Value;  !- Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>CoilInletWBT,          !- Name</p>
-<p>Zone1PTHPFanOutletNode, !- Output:Variable or Output:Meter Index Key Name</p>
-<p>System Node Wetbulb Temperature; !- Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Pressure,          !- Name</p>
-<p>Zone1PTHPOAInNode,     !- Output:Variable or Output:Meter Index Key Name</p>
-<p>System Node Pressure ;  !- Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>CoilInletDBT,          !- Name</p>
-<p>Zone1PTHPFanOutletNode, !- Output:Variable or Output:Meter Index Key Name</p>
-<p>System Node Temperature;  !- Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>CoilInletW,          !- Name</p>
-<p>Zone1PTHPFanOutletNode, !- Output:Variable or Output:Meter Index Key Name</p>
-<p>System Node Humidity Ratio;  !- Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>OAT,          !- Name</p>
-<p>Zone1PTHPOAInNode,     !- Output:Variable or Output:Meter Index Key Name</p>
-<p>System Node Temperature;  !- Output:Variable or Output:Meter Name</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>ERLCurveValue, ! Name</p>
-<p>ActualCurve,   ! EMS Variable Name</p>
-<p>Averaged,      ! Type of Data in Variable</p>
-<p>ZoneTimeStep ; ! Update Frequency</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>NewCurveValue, ! Name</p>
-<p>CurveInput,    ! EMS Variable Name</p>
-<p>Averaged,      ! Type of Data in Variable</p>
-<p>ZoneTimeStep ; ! Update Frequency</p>
-<p>Output:EnergyManagementSystem,</p>
-<p>Verbose,       !- Actuator Availability Dictionary Reporting</p>
-<p>Verbose,       !- Internal Variable Availability Dictionary Reporting</p>
-<p>Verbose;       !- EMS Runtime Language Debug Output Level</p>
-<p>Output:Variable,</p>
-<p>*,</p>
-<p>ERLCurveValue,</p>
-<p>Hourly;</p>
-<p>Output:Variable, HPACCOOLCAPFT,</p>
-<p>Performance Curve Output Value,Hourly;</p>
-<p>Output:Variable, HPACCOOLCAPFT,</p>
-<p>Performance Curve Input Variable 1 Value,Hourly;</p>
-<p>Output:Variable, HPACCOOLCAPFT,</p>
-<p>Performance Curve Input Variable 2 Value,Hourly;</p>
-<p>Output:Variable, Zone1PTHPFanOutletNode,</p>
-<p>System Node Wetbulb Temperature, Hourly;</p>
+<pre><code class="idf">  EnergyManagementSystem:ProgramCallingManager,
+    EMSBasedCurveManager,  !- Name
+    AfterPredictorBeforeHVACManagers,  !- EnergyPlus Model Calling Point
+    CurveOverwriteMGR;     !- Program Name 1
+
+
+  EnergyManagementSystem:Program,
+    CurveOverwriteMGR,
+    SET TTmp = CoilInletDBT,
+    SET WTmp = CoilInletW,
+    SET PTmp = Pressure,
+    SET MyWB = @TwbFnTdbWPb TTmp WTmp PTmp,
+    SET IVOne = CoilInletWBT,
+    SET IVOne = MyWB,
+    SET IVTwo = OAT,
+    SET IVThree = IVOne*IVTwo,
+    SET C1 = 0.942567793,
+    SET C2 = 0.009543347,
+    SET C2a = 0.009543347, !-  -0.009543347
+    SET C3 = 0.00068377,
+    SET C4 = 0.011042676, !-  -0.011042676
+    SET C5 = 0.000005249,
+    SET C6 = 0.000009720, !-  -0.000009720
+    IF OAT &amp;lt; 31.0,
+      SET CurveInput = C1 + (C2*IVOne) + (C3*IVOne*IVone) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),
+    ELSE,
+      SET CurveInput = C1 - (C2a*IVOne) + (C3*IVOne*IVone) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),
+    ENDIF,
+    SET CurveOverwrite = CurveInput;
+
+
+
+
+  EnergyManagementSystem:Actuator,
+    CurveOverwrite,    !- Name
+    HPACCOOLCAPFT,     !- Actuated Component Unique Name
+    Curve,             !- Actuated Component Type
+    Curve Result;      !- Actuated Component Control Type
+
+
+  EnergyManagementSystem:Sensor,
+    ActualCurve,           !- Name
+    HPACCOOLCAPFT,     !- Output:Variable or Output:Meter Index Key Name
+    Performance Curve Output Value;  !- Output:Variable or Output:Meter Name
+
+
+  EnergyManagementSystem:Sensor,
+    CoilInletWBT,          !- Name
+    Zone1PTHPFanOutletNode, !- Output:Variable or Output:Meter Index Key Name
+    System Node Wetbulb Temperature; !- Output:Variable or Output:Meter Name
+
+
+  EnergyManagementSystem:Sensor,
+    Pressure,          !- Name
+    Zone1PTHPOAInNode,     !- Output:Variable or Output:Meter Index Key Name
+    System Node Pressure ;  !- Output:Variable or Output:Meter Name
+
+
+  EnergyManagementSystem:Sensor,
+    CoilInletDBT,          !- Name
+    Zone1PTHPFanOutletNode, !- Output:Variable or Output:Meter Index Key Name
+    System Node Temperature;  !- Output:Variable or Output:Meter Name
+
+
+  EnergyManagementSystem:Sensor,
+    CoilInletW,          !- Name
+    Zone1PTHPFanOutletNode, !- Output:Variable or Output:Meter Index Key Name
+    System Node Humidity Ratio;  !- Output:Variable or Output:Meter Name
+
+
+  EnergyManagementSystem:Sensor,
+    OAT,          !- Name
+    Zone1PTHPOAInNode,     !- Output:Variable or Output:Meter Index Key Name
+    System Node Temperature;  !- Output:Variable or Output:Meter Name
+
+
+  EnergyManagementSystem:OutputVariable,
+    ERLCurveValue, ! Name
+    ActualCurve,   ! EMS Variable Name
+    Averaged,      ! Type of Data in Variable
+    ZoneTimeStep ; ! Update Frequency
+
+
+  EnergyManagementSystem:OutputVariable,
+    NewCurveValue, ! Name
+    CurveInput,    ! EMS Variable Name
+    Averaged,      ! Type of Data in Variable
+    ZoneTimeStep ; ! Update Frequency
+
+
+  Output:EnergyManagementSystem,
+    Verbose,       !- Actuator Availability Dictionary Reporting
+    Verbose,       !- Internal Variable Availability Dictionary Reporting
+    Verbose;       !- EMS Runtime Language Debug Output Level
+
+
+  Output:Variable,
+    *,
+    ERLCurveValue,
+    Hourly;
+
+
+ Output:Variable, HPACCOOLCAPFT,
+     Performance Curve Output Value,Hourly;
+ Output:Variable, HPACCOOLCAPFT,
+     Performance Curve Input Variable 1 Value,Hourly;
+ Output:Variable, HPACCOOLCAPFT,
+     Performance Curve Input Variable 2 Value,Hourly;
+ Output:Variable, Zone1PTHPFanOutletNode,
+     System Node Wetbulb Temperature, Hourly;
+</code></pre>
+
 <p><img alt="" src="../../EMS_Application_Guide/media/image011.jpg" /></p>
 <p>Figure 4. Results of Performance Curve Override</p>
 <h2 id="example-12-variable-refrigerant-flow-system-override">Example 12. Variable Refrigerant Flow System Override</h2>
@@ -3711,50 +4255,70 @@
 <p>This simple example shows how to use EMS actuators to SET the operating mode and cause a specific terminal unit to operate at a specified part-load ratio (PLR). When setting the terminal unit PLR, the terminal unit will turn on only if the condenser is allowed to operate according to the minimum and maximum outdoor temperature limits.</p>
 <h3 id="ems-input-objects_11">EMS Input Objects</h3>
 <p>The main input objects that implement this example are the variable refrigerant flow actuators that control the VRF system and specific terminal unit. Note that the terminal unit PLR can be controlled without controlling the mode of the VRF condenser, however, the specific terminal unit will operate in whatever mode the existing operation control scheme chooses. This example program simply “sets” the operating mode and PLR, other more complex control algorithms can be developed by the user as needed.</p>
-<p>Output:EnergyManagementSystem,</p>
-<p>Verbose,                 !- Actuator Availability Dictionary Reporting</p>
-<p>Verbose,                 !- Internal Variable Availability Dictionary Reporting</p>
-<p>Verbose;                 !- EMS Runtime Language Debug Output Level</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>VRF OnOff Management,     !- Name</p>
-<p>InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point</p>
-<p>VRFControl;               !- Program Name 1</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>VRFControl,               !- Name</p>
-<p>SET VRF_Actuator_OnOff = VRF_Status_Heating, !- Program Line 2</p>
-<p>SET VRF_TerminalUnit1_PLR = 0.5;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>VRF_Actuator_OnOff,       !- Name</p>
-<p>VRF Heat Pump,            !- Actuated Component Unique Name</p>
-<p>Variable Refrigerant Flow Heat Pump,      !- Actuated Component Type</p>
-<p>Operating Mode;           !- Actuated Component Control Type</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>VRF_TerminalUnit1_PLR,    !- Name</p>
-<p>TU1,                      !- Actuated Component Unique Name</p>
-<p>Variable Refrigerant Flow Terminal Unit,  !- Actuated Component Type</p>
-<p>Part Load Ratio;          !- Actuated Component Control Type</p>
-<p>EnergyManagementSystem:OutputVariable,</p>
-<p>Erl VRF Control Status,   !- Name</p>
-<p>VRF_Actuator_OnOff,       !- EMS Variable Name</p>
-<p>Averaged,                 !- Type of Data in Variable</p>
-<p>SystemTimeStep;           !- Update Frequency</p>
-<p>Output:Variable,*,Erl VRF Control Status, detailed;</p>
-<p>Output:Variable,*,VRF Heat Pump Operating Mode, detailed;</p>
-<p>Output:Variable,*,Cooling Coil Runtime Fraction, detailed;</p>
-<p>Output:Variable,*,Heating Coil Runtime Fraction, detailed;</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>Init VRF Control Mode Constants,  !- Name</p>
-<p>BeginNewEnvironment,           !- EnergyPlus Model Calling Point</p>
-<p>InitializeVRFControlModes;     !- Program Name 1</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>InitializeVRFControlModes,     !- Name</p>
-<p>Set VRF_Status_Off = 0.0,      !- Program Line 1</p>
-<p>Set VRF_Status_Cooling = 1.0,  !- Program Line 2</p>
-<p>Set VRF_Status_Heating = 2.0;  !- Program Line 3</p>
-<p>EnergyManagementSystem:GlobalVariable,</p>
-<p>VRF_Status_Off,                !- Erl Variable 1 Name</p>
-<p>VRF_Status_Cooling,            !- Erl Variable 2 Name</p>
-<p>VRF_Status_Heating;            !- Erl Variable 3 Name</p>
+<pre><code class="idf">  Output:EnergyManagementSystem,
+    Verbose,                 !- Actuator Availability Dictionary Reporting
+    Verbose,                 !- Internal Variable Availability Dictionary Reporting
+    Verbose;                 !- EMS Runtime Language Debug Output Level
+
+
+  EnergyManagementSystem:ProgramCallingManager,
+    VRF OnOff Management,     !- Name
+    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
+    VRFControl;               !- Program Name 1
+
+
+  EnergyManagementSystem:Program,
+    VRFControl,               !- Name
+    SET VRF_Actuator_OnOff = VRF_Status_Heating, !- Program Line 2
+    SET VRF_TerminalUnit1_PLR = 0.5;
+
+
+  EnergyManagementSystem:Actuator,
+    VRF_Actuator_OnOff,       !- Name
+    VRF Heat Pump,            !- Actuated Component Unique Name
+    Variable Refrigerant Flow Heat Pump,      !- Actuated Component Type
+    Operating Mode;           !- Actuated Component Control Type
+
+
+  EnergyManagementSystem:Actuator,
+    VRF_TerminalUnit1_PLR,    !- Name
+    TU1,                      !- Actuated Component Unique Name
+    Variable Refrigerant Flow Terminal Unit,  !- Actuated Component Type
+    Part Load Ratio;          !- Actuated Component Control Type
+
+
+  EnergyManagementSystem:OutputVariable,
+    Erl VRF Control Status,   !- Name
+    VRF_Actuator_OnOff,       !- EMS Variable Name
+    Averaged,                 !- Type of Data in Variable
+    SystemTimeStep;           !- Update Frequency
+
+
+  Output:Variable,*,Erl VRF Control Status, detailed;
+  Output:Variable,*,VRF Heat Pump Operating Mode, detailed;
+  Output:Variable,*,Cooling Coil Runtime Fraction, detailed;
+  Output:Variable,*,Heating Coil Runtime Fraction, detailed;
+
+
+  EnergyManagementSystem:ProgramCallingManager,
+    Init VRF Control Mode Constants,  !- Name
+    BeginNewEnvironment,           !- EnergyPlus Model Calling Point
+    InitializeVRFControlModes;     !- Program Name 1
+
+
+  EnergyManagementSystem:Program,
+    InitializeVRFControlModes,     !- Name
+    Set VRF_Status_Off = 0.0,      !- Program Line 1
+    Set VRF_Status_Cooling = 1.0,  !- Program Line 2
+    Set VRF_Status_Heating = 2.0;  !- Program Line 3
+
+
+  EnergyManagementSystem:GlobalVariable,
+    VRF_Status_Off,                !- Erl Variable 1 Name
+    VRF_Status_Cooling,            !- Erl Variable 2 Name
+    VRF_Status_Heating;            !- Erl Variable 3 Name
+</code></pre>
+
 <h2 id="example-13-surface-construction-actuator-for-thermochromic-window">Example 13. Surface Construction Actuator for Thermochromic Window</h2>
 <h3 id="problem-statement_12">Problem Statement</h3>
 <p>There are a variety of novel new technologies for dynamic thermal envelopes that are the subject of research and development. Can we use EMS to investigate dynamic envelope technologies?</p>
@@ -3764,102 +4328,130 @@
 <p>The control algorithm is very simple.  The temperature of the glazing is used in a long IF-ELSEIF-ELSE-ENDIF block to select the appropriate construction to assign the surface.  In this case the native thermochromic model has an important advantage in that the dedicated model can access the temperature of the middle pane in a triple glazed window whereas the EMS model can only access the temperature of the outside pane or the inside pane.  Here we use the temperature of the outside face of the surface because it is closer to the temperature of the middle pane (which can be much higher when in direct sun).</p>
 <h3 id="ems-input-objects_12">EMS Input Objects</h3>
 <p>The main input objects that implement this example of EMS-based thermochromic glazing system are listed below.  The surface called “Perimeter_ZN_1_wall_south_Window_1” is the one being actuated by EMS and we can observe the outcomes of the override by reporting the output variable called Surface Construction Index.  See the example file called EMSThermochromicWindow.idf.</p>
-<p>Construction,</p>
-<p>TCwindow_25,                !- Name</p>
-<p>Clear3PPG,               !- Outside Layer</p>
-<p>AIR 3MM,                 !- Layer 2</p>
-<p>WO18RT25,              !- Layer 3</p>
-<p>AIR 8MM,                 !- Layer 4</p>
-<p>SB60Clear3PPG;           !- Layer 5</p>
-<p>EnergyManagementSystem:ConstructionIndexVariable,</p>
-<p>TCwindow_25,</p>
-<p>TCwindow_25;</p>
-<p>Construction,</p>
-<p>TCwindow_27,                !- Name</p>
-<p>Clear3PPG,               !- Outside Layer</p>
-<p>AIR 3MM,                 !- Layer 2</p>
-<p>WO18RT27,              !- Layer 3</p>
-<p>AIR 8MM,                 !- Layer 4</p>
-<p>SB60Clear3PPG;           !- Layer 5</p>
-<p>EnergyManagementSystem:ConstructionIndexVariable,</p>
-<p>TCwindow_27,</p>
-<p>TCwindow_27;</p>
-<p>&lt;&lt;SNIPPED states between 27C and 80C &gt;&gt;</p>
-<p>Construction,</p>
-<p>TCwindow_80,                !- Name</p>
-<p>Clear3PPG,               !- Outside Layer</p>
-<p>AIR 3MM,                 !- Layer 2</p>
-<p>WO18RT80,              !- Layer 3</p>
-<p>AIR 8MM,                 !- Layer 4</p>
-<p>SB60Clear3PPG;           !- Layer 5</p>
-<p>EnergyManagementSystem:ConstructionIndexVariable,</p>
-<p>TCwindow_80,</p>
-<p>TCwindow_80;</p>
-<p>Construction,</p>
-<p>TCwindow_85,                !- Name</p>
-<p>Clear3PPG,               !- Outside Layer</p>
-<p>AIR 3MM,                 !- Layer 2</p>
-<p>WO18RT85,              !- Layer 3</p>
-<p>AIR 8MM,                 !- Layer 4</p>
-<p>SB60Clear3PPG;           !- Layer 5</p>
-<p>EnergyManagementSystem:ConstructionIndexVariable,</p>
-<p>TCwindow_85,</p>
-<p>TCwindow_85;</p>
-<p>EnergyManagementSystem:Sensor,</p>
-<p>Win1_Tout,</p>
-<p>Perimeter_ZN_1_wall_south_Window_1,</p>
-<p>Surface Outside Face Temperature;</p>
-<p>EnergyManagementSystem:Actuator,</p>
-<p>Win1_Construct,</p>
-<p>Perimeter_ZN_1_wall_south_Window_1,</p>
-<p>Surface,</p>
-<p>Construction State;</p>
-<p>EnergyManagementSystem:ProgramCallingManager,</p>
-<p>My thermochromic window emulator,</p>
-<p>BeginTimestepBeforePredictor,</p>
-<p>ZN_1_wall_south_Window_1_Control;</p>
-<p>EnergyManagementSystem:Program,</p>
-<p>ZN_1_wall_south_Window_1_Control,</p>
-<p>IF Win1_Tout &lt;= 26.0 ,</p>
-<p>Set Win1_Construct = TCwindow_25,</p>
-<p>ELSEIF Win1_Tout &lt;= 28.0 ,</p>
-<p>SEt Win1_Construct = TCwindow_27,</p>
-<p>ELSEIF Win1_Tout &lt;= 30.0 ,</p>
-<p>SET Win1_Construct = TCwindow_29,</p>
-<p>ELSEIF Win1_Tout &lt;= 32.0 ,</p>
-<p>SET Win1_Construct = TCwindow_31,</p>
-<p>ELSEIF Win1_Tout &lt;= 34.0 ,</p>
-<p>SET Win1_Construct = TCwindow_33,</p>
-<p>ELSEIF Win1_Tout &lt;= 36.0 ,</p>
-<p>SET Win1_Construct = TCwindow_35,</p>
-<p>ELSEIF Win1_Tout &lt;= 38.0 ,</p>
-<p>SET Win1_Construct = TCwindow_37,</p>
-<p>ELSEIF Win1_Tout &lt;= 40.0 ,</p>
-<p>SET Win1_Construct = TCwindow_39,</p>
-<p>ELSEIF Win1_Tout &lt;= 42.0 ,</p>
-<p>SET Win1_Construct = TCwindow_41,</p>
-<p>ELSEIF Win1_Tout &lt;= 44.0 ,</p>
-<p>SET Win1_Construct = TCwindow_43,</p>
-<p>ELSEIF Win1_Tout &lt;= 47.5 ,</p>
-<p>SET Win1_Construct = TCwindow_45,</p>
-<p>ELSEIF Win1_Tout &lt;= 52.5 ,</p>
-<p>SET Win1_Construct = TCwindow_50,</p>
-<p>ELSEIF Win1_Tout &lt;= 57.5 ,</p>
-<p>SET Win1_Construct = TCwindow_55,</p>
-<p>ELSEIF Win1_Tout &lt;= 62.5 ,</p>
-<p>SET Win1_Construct = TCwindow_60,</p>
-<p>ELSEIF Win1_Tout &lt;= 67.5 ,</p>
-<p>SET Win1_Construct = TCwindow_65,</p>
-<p>ELSEIF Win1_Tout &lt;= 72.5 ,</p>
-<p>SET Win1_Construct = TCwindow_70,</p>
-<p>ELSEIF Win1_Tout &lt;= 77.5 ,</p>
-<p>SET Win1_Construct = TCwindow_75,</p>
-<p>ELSEIF Win1_Tout &lt;= 82.5 ,</p>
-<p>SET Win1_Construct = TCwindow_80,</p>
-<p>ELSE ,</p>
-<p>SET Win1_Construct = TCwindow_85,</p>
-<p>ENDIF;</p>
-<p>Output:Variable, Perimeter_ZN_1_wall_south_Window_1, Surface Construction Index, timestep;</p>
+<pre><code class="idf">  Construction,
+    TCwindow_25,                !- Name
+    Clear3PPG,               !- Outside Layer
+    AIR 3MM,                 !- Layer 2
+    WO18RT25,              !- Layer 3
+    AIR 8MM,                 !- Layer 4
+    SB60Clear3PPG;           !- Layer 5
+
+
+  EnergyManagementSystem:ConstructionIndexVariable,
+    TCwindow_25,
+    TCwindow_25;
+
+
+  Construction,
+    TCwindow_27,                !- Name
+    Clear3PPG,               !- Outside Layer
+    AIR 3MM,                 !- Layer 2
+    WO18RT27,              !- Layer 3
+    AIR 8MM,                 !- Layer 4
+    SB60Clear3PPG;           !- Layer 5
+
+
+  EnergyManagementSystem:ConstructionIndexVariable,
+    TCwindow_27,
+    TCwindow_27;
+
+
+ &lt;&lt;SNIPPED states between 27C and 80C&gt;&gt;
+
+
+  Construction,
+    TCwindow_80,                !- Name
+    Clear3PPG,               !- Outside Layer
+    AIR 3MM,                 !- Layer 2
+    WO18RT80,              !- Layer 3
+    AIR 8MM,                 !- Layer 4
+    SB60Clear3PPG;           !- Layer 5
+
+
+  EnergyManagementSystem:ConstructionIndexVariable,
+    TCwindow_80,
+    TCwindow_80;
+
+
+  Construction,
+    TCwindow_85,                !- Name
+    Clear3PPG,               !- Outside Layer
+    AIR 3MM,                 !- Layer 2
+    WO18RT85,              !- Layer 3
+    AIR 8MM,                 !- Layer 4
+    SB60Clear3PPG;           !- Layer 5
+
+
+  EnergyManagementSystem:ConstructionIndexVariable,
+    TCwindow_85,
+    TCwindow_85;
+
+
+  EnergyManagementSystem:Sensor,
+    Win1_Tout,
+    Perimeter_ZN_1_wall_south_Window_1,
+    Surface Outside Face Temperature;
+
+
+  EnergyManagementSystem:Actuator,
+    Win1_Construct,
+    Perimeter_ZN_1_wall_south_Window_1,
+    Surface,
+    Construction State;
+
+
+  EnergyManagementSystem:ProgramCallingManager,
+    My thermochromic window emulator,
+    BeginTimestepBeforePredictor,
+    ZN_1_wall_south_Window_1_Control;
+
+
+  EnergyManagementSystem:Program,
+    ZN_1_wall_south_Window_1_Control,
+    IF Win1_Tout &amp;lt;= 26.0 ,
+      Set Win1_Construct = TCwindow_25,
+    ELSEIF Win1_Tout &amp;lt;= 28.0 ,
+      SEt Win1_Construct = TCwindow_27,
+    ELSEIF Win1_Tout &amp;lt;= 30.0 ,
+      SET Win1_Construct = TCwindow_29,
+    ELSEIF Win1_Tout &amp;lt;= 32.0 ,
+      SET Win1_Construct = TCwindow_31,
+    ELSEIF Win1_Tout &amp;lt;= 34.0 ,
+      SET Win1_Construct = TCwindow_33,
+    ELSEIF Win1_Tout &amp;lt;= 36.0 ,
+      SET Win1_Construct = TCwindow_35,
+    ELSEIF Win1_Tout &amp;lt;= 38.0 ,
+      SET Win1_Construct = TCwindow_37,
+    ELSEIF Win1_Tout &amp;lt;= 40.0 ,
+      SET Win1_Construct = TCwindow_39,
+    ELSEIF Win1_Tout &amp;lt;= 42.0 ,
+      SET Win1_Construct = TCwindow_41,
+    ELSEIF Win1_Tout &amp;lt;= 44.0 ,
+      SET Win1_Construct = TCwindow_43,
+    ELSEIF Win1_Tout &amp;lt;= 47.5 ,
+      SET Win1_Construct = TCwindow_45,
+    ELSEIF Win1_Tout &amp;lt;= 52.5 ,
+      SET Win1_Construct = TCwindow_50,
+    ELSEIF Win1_Tout &amp;lt;= 57.5 ,
+      SET Win1_Construct = TCwindow_55,
+    ELSEIF Win1_Tout &amp;lt;= 62.5 ,
+      SET Win1_Construct = TCwindow_60,
+    ELSEIF Win1_Tout &amp;lt;= 67.5 ,
+      SET Win1_Construct = TCwindow_65,
+    ELSEIF Win1_Tout &amp;lt;= 72.5 ,
+      SET Win1_Construct = TCwindow_70,
+    ELSEIF Win1_Tout &amp;lt;= 77.5 ,
+      SET Win1_Construct = TCwindow_75,
+    ELSEIF Win1_Tout &amp;lt;= 82.5 ,
+      SET Win1_Construct = TCwindow_80,
+    ELSE ,
+      SET Win1_Construct = TCwindow_85,
+    ENDIF;
+
+
+Output:Variable, Perimeter_ZN_1_wall_south_Window_1, Surface Construction Index, timestep;
+</code></pre>
+
 <h1 id="debugging-ems-programs">Debugging EMS Programs</h1>
 <p>This section discusses approaches to debugging Erl programs. As you develop your own programs, you will need to identify and correct coding problems. The task of debugging an Erl program is challenging. Compared to most programming, with integrated development environments and sophisticated debugging interfaces, the Erl programmer has only rudimentary tools available for debugging. If you have some type of developer license and EnergyPlus source code, you could debug Erl programs inside a full-featured debugging environment (such as IVF integrated into VS9). But this is only for extremely advanced users and developers implementing EMS related code inside EnergyPlus. Most users’ EMS should have little need to deal with compilers and development environments, because enough information is produced by EnergyPlus when it runs their Erl programs. This section examines output related to EMS in an effort to help you debug your Erl programs.</p>
 <h2 id="err-file">ERR File</h2>
@@ -3871,7 +4463,9 @@
 <h2 id="line-trace">Line Trace</h2>
 <p>You can use the EDD file to examine the execution of every line of code. If you request a verbose level of debugging output in the Output:EnergyManagementSystem input object, the EDD file will contain a series of text records that trace the execution of each line of Erl code. Traces contain the name of the program, the program line number, the text of the line, the result returned by executing the line (if any), and a timestamp that indicates when it was executed during the environment period. Note that the EDD file is only produced if you have EMS/Erl programs in your input file.</p>
 <p>An example of a single trace follows. This is one record, or single line of text from one of the traces in an EDD file.</p>
-<p>VAV1MIXEDAIRMANAGERS,Line 1,SET VAV_1_COOLC_SETPOINT = SEASONAL_RESET_SAT_SCHED - ( T_VAV1FANOUT - T_VAV1FANIN),13.0000000000000, During Warmup, Occurrence info=CHICAGO IL USA TMY2-94846 WMO#=725300, 01/01 18:30 - 18:45</p>
+<pre><code>VAV1MIXEDAIRMANAGERS,Line 1,SET VAV_1_COOLC_SETPOINT = SEASONAL_RESET_SAT_SCHED - ( T_VAV1FANOUT - T_VAV1FANIN),13.0000000000000, During Warmup, Occurrence info=CHICAGO IL USA TMY2-94846 WMO\#=725300, 01/01 18:30 - 18:45
+</code></pre>
+
 <p>Each block of text is separated by comma, so the trace information could be read into a spreadsheet and formatted to columns using comma separation.</p>
 <p>“VAV1MIXEDAIRMANAGERS” is the name of a user-defined Erl Program.</p>
 <p>“Line 1” indicates that this trace is from the first line of the Erl program called VAV1MIXEDAIRMANAGERS.</p>
@@ -3884,12 +4478,18 @@
 <p>This section attempts to provide some debugging tips.</p>
 <p>There is no debugging environment, so the main way to obtain information is to use verbose mode and trace each line.</p>
 <p>Say, for example, we are trying to debug the following line:</p>
-<p>ELSEIF (Hour &gt;= 5) &amp;&amp; (Hour &lt; 19)  &amp;&amp; (DayOfWeek &gt;=2) &amp;&amp; (DayOfWeek &lt;=6) ,</p>
+<pre><code> ELSEIF (Hour &gt;= 5) &amp;&amp; (Hour &lt; 19)  &amp;&amp; (DayOfWeek &gt;=2) &amp;&amp; (DayOfWeek &lt;=6) ,
+</code></pre>
+
 <p>The line trace, shown next, shows only the result of the logical condition, i.e., 0.0 (highlighted) if overall it is false or 1.0 if overall it is true.</p>
-<p>MYCOMPUTEDHEATINGSETPOINTPROG,Line 10,ELSEIF (HOUR &gt;= 5) &amp;&amp; (HOUR &lt; 19)  &amp;&amp; (DAYOFWEEK &gt;=2) &amp;&amp; (DAYOFWEEK &lt;=6),0.0, Occurrence info=CHICAGO IL USA TMY2-94846 WMO#=725300, 09/23 10:20 - 10:30</p>
+<pre><code>MYCOMPUTEDHEATINGSETPOINTPROG,Line 10,ELSEIF (HOUR &gt;= 5) &amp;&amp; (HOUR &lt; 19)  &amp;&amp; (DAYOFWEEK &gt;=2) &amp;&amp; (DAYOFWEEK &lt;=6),0.0, Occurrence info=CHICAGO IL USA TMY2-94846 WMO\#=725300, 09/23 10:20 - 10:30
+</code></pre>
+
 <p>To debug what is going on with the individual terms in the logical expression, we can add some otherwise useless statements so line traces contain an echo of the current values of the HOUR and DAYOFWEEK built-in variables. So if we add the following lines before the start of the IF block,</p>
-<p>Set locHour = Hour, ! echo out for debug</p>
-<p>Set locDay = DayOfWeek, ! echo out for debug</p>
+<pre><code>    Set locHour = Hour, ! echo out for debug
+    Set locDay = DayOfWeek, ! echo out for debug
+</code></pre>
+
 <p>We will see the values that Hour and DayOfWeek contain in the debug output. The local variables Erl variables locHour and locDay do not need to be used for anything, but by adding these Erl statements we can glean debugging insights.</p>
 <p>The line of Erl code is switched to all uppercase on input, so the line trace differs from the input file in that all characters are capitalized. If the input file was developed using a CamelCase convention, it may be much more difficult to read in the line trace output. Thus, the underscore character “_” may be a more useful convention for inputting Erl code because it will be more readable in the debugging traces.</p>
 
