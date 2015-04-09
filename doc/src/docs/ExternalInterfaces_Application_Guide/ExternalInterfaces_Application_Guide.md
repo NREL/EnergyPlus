@@ -19,9 +19,9 @@ Coupling EnergyPlus with the Building Controls Virtual Test Bed
 
 The process in which at least two simulators solve initial-value differential equations that are coupled to each other is called co-simulation. Various algorithms are possible for the data exchange. In the BCVTB, data are exchanged between its client programs, including EnergyPlus, using a fixed synchronization time step. There is no iteration between the clients. In the co-simulation literature, this coupling scheme is referred to as *quasi-dynamic coupling*, *loose coupling* or *ping-pong coupling* (Hensen 1999, Zhai and Chen 2005).
 
-The algorithm for exchanging data is as follows: Suppose we have a system with two clients, with client 1 being EnergyPlus and client 2 being, for example, the Simulink program from Mathworks. Suppose each client solves an initial-value ordinary differential equation that is coupled to the differential equation of the other client. Let ![](ExternalInterfaces_Application_Guide/media/image001.png) denote the number of time steps and let ![](ExternalInterfaces_Application_Guide/media/image002.png) denote the time steps. We will use the subscripts *1* and *2* to denote the state variable and the function that computes the next state variable of the simulator *1* and *2*, respectively.
+The algorithm for exchanging data is as follows: Suppose we have a system with two clients, with client 1 being EnergyPlus and client 2 being, for example, the Simulink program from Mathworks. Suppose each client solves an initial-value ordinary differential equation that is coupled to the differential equation of the other client. Let <span>$N\in\mathbf{N}$</span> denote the number of time steps and let <span>$k\in\left\\{1,...,N\right\\}$</span> denote the time steps. We will use the subscripts *1* and *2* to denote the state variable and the function that computes the next state variable of the simulator *1* and *2*, respectively.
 
-The simulator *1* computes, for ![](ExternalInterfaces_Application_Guide/media/image003.png)the sequence
+The simulator *1* computes, for <span>$k\in\left\\{1,...,N-1\right\\}$</span> the sequence
 
 *x<sub>1</sub>(k+1) = f<sub>1</sub>(x<sub>1</sub>(k), x<sub>2</sub>(k))*
 
@@ -44,7 +44,7 @@ on the time interval *t* *∈ [0, 1]*, the following sequence:
 <table class="table table-striped">
 <tr>
 <td>Step 0:</td>
-<td>Initialize counter k=0 and number of steps <img src="ExternalInterfaces_Application_Guide/media/image001.png" />.</td>
+<td>Initialize counter k=0 and number of steps <span>$N\in\mathbf{N}$</span>.</td>
 </tr>
 <tr>
 <td> </td>
@@ -69,7 +69,7 @@ In the situation where the differential equation is solved using co-simulation, 
 <table class="table table-striped">
 <tr>
 <td>Step 0:</td>
-<td>Initialize counter k=0 and number of steps <img src="ExternalInterfaces_Application_Guide/media/image001.png" />.</td>
+<td>Initialize counter k=0 and number of steps <span>$N\in\mathbf{N}$</span>.</td>
 </tr>
 <tr>
 <td> </td>
@@ -124,10 +124,10 @@ Table 1. Overview of the EnergyPlus objects used in Examples
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Example 1</td>
-<td>Example 2</td>
-<td>Example 3</td>
+<th> </th>
+<th>Example 1</th>
+<th>Example 2</th>
+<th>Example 3</th>
 </tr>
 <tr>
 <td>ExternalInterface:Schedule</td>
@@ -267,129 +267,96 @@ The code below shows how to declare these objects.
 
 To activate the external interface, we use:
 
+```idf
 ExternalInterface,           !- Object to activate the external interface
-
  PtolemyServer;              !- Name of external interface
+```
 
 To enter schedules to which the external interface writes, we use:
 
+```idf
 ! Cooling schedule. This schedule is set directly by the external interface.
-
 ! During warm-up and system-sizing, it is fixed at 24 degC.
-
   ExternalInterface:Schedule,
-
     TSetCoo,                 !- Name
-
     Temperature,             !- ScheduleType
-
     24;                      !- Initial value, used during warm-up
 
 
-
 ! Heating schedule. This schedule is set directly by the external interface.
-
 ! During warm-up and system-sizing, it is fixed at 20 degC.
-
   ExternalInterface:Schedule,
-
     TSetHea,                 !- Name
-
     Temperature,             !- ScheduleType
-
     20;                      !- Initial value, used during warm-up
+```
+
 
 These schedules can be used as other EnergyPlus schedules. In this example, they are used to change a thermostat setpoint:
 
+```idf
 ThermostatSetpoint:DualSetpoint,
-
     DualSetPoint,            !- Name
-
     BCVTB-SP-TH,             !- Heating Setpoint Temperature Schedule Name
-
     BCVTB-SP-TC;             !- Cooling Setpoint Temperature Schedule Name
-
+```
 
 
 We also want to read from EnergyPlus output variables, which we declare as
 
+```idf
 Output:Variable,
-
     TSetHea,        !- Key Value
-
     Schedule Value, !- Variable Name
-
     TimeStep;       !- Reporting Frequency
 
 
-
 Output:Variable,
-
     TSetCoo,        !- Key Value
-
     Schedule Value, !- Variable Name
-
     TimeStep;       !- Reporting Frequency
+```
+
 
 To specify that data should be exchanged every 15 minutes of simulation time, enter in the idf file the section
 
+```idf
   Timestep,
-
     4;          !- Number of Timesteps per Hour
+```
+
 
 #### Creating the configuration file
 
 Note that we have not yet specified the order of the elements in the signal vector that is exchanged between EnergyPlus and the BCVTB. This information is specified in the file variables.cfg. The file variables.cfg needs to be in the same directory as the EnergyPlus idf file. For the objects used in the section above, the file looks like
+```idf
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE BCVTB-variables SYSTEM "variables.dtd">
+<BCVTB-variables>
+  <!-- The next two elements send the set points to E+ -->
+  <variable source="Ptolemy">
+    <EnergyPlus schedule="TSetHea"/>
+  </variable>
+  <variable source="Ptolemy">
+    <EnergyPlus schedule="TSetCoo"/>
+  </variable>
+  <!-- The next two elements receive the outdoor and zone air temperature from E+ -->
+  <variable source="EnergyPlus">
+   <EnergyPlus name="ENVIRONMENT" type="SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="ZSF1" type="ZONE AIR TEMPERATURE"/>
+  </variable>
+  <!-- The next two elements receive the schedule value as an output from E+ -->
+  <variable source="EnergyPlus">
+    <EnergyPlus name="TSetHea" type="Schedule Value"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="TSetCoo" type="Schedule Value"/>
+  </variable>
+</BCVTB-variables>
+```
 
-&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
-
-&lt;!DOCTYPE BCVTB-variables SYSTEM "variables.dtd"&gt;
-
-&lt;BCVTB-variables&gt;
-
-  &lt;!-- The next two elements send the set points to E+ --&gt;
-
-  &lt;variable source="Ptolemy"&gt;
-
-    &lt;EnergyPlus schedule="TSetHea"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;variable source="Ptolemy"&gt;
-
-    &lt;EnergyPlus schedule="TSetCoo"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;!-- The next two elements receive the outdoor and zone air temperature from E+ --&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-   &lt;EnergyPlus name="ENVIRONMENT" type="SITE OUTDOOR AIR DRYBULB TEMPERATURE"/&gt; 
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="ZSF1" type="ZONE AIR TEMPERATURE"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;!-- The next two elements receive the schedule value as an output from E+ --&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="TSetHea" type="Schedule Value"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="TSetCoo" type="Schedule Value"/&gt;
-
-  &lt;/variable&gt;
-
-&lt;/BCVTB-variables&gt;
 
 This file specifies that the actor in the BCVTB that calls EnergyPlus has an input vector with two elements that are computed by Ptolemy (Ptolemy is the name of the software on which the BCVTB is based) and sent to EnergyPlus, and that it has an output vector with four elements that are computed by EnergyPlus and sent to Ptolemy. The order of the elements in each vector is determined by the order in the above XML file. Hence, the input vector that contains the signals sent to EnergyPlus has elements
 
@@ -457,123 +424,94 @@ To interface EnergyPlus using the EMS feature, the following three items are nee
 
 The code below shows how to set up an EnergyPlus file that uses EnergyManagmentSystem:Actuator. To activate the external interface, we use:
 
+```idf
 ExternalInterface,           !- Object to activate the external interface
-
  PtolemyServer;              !- Name of external interface
+```
 
 To declare an actuator that changes the control status of the window with name “Zn001:Wall001:Win001”, we use:
 
+```idf
 ExternalInterface:Actuator,
-
-    Zn001\_Wall001\_Win001\_Shading\_Deploy\_Status,  !- Name
-
+    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Name
     Zn001:Wall001:Win001,    !- Actuated Component Unique Name
-
     Window Shading Control,  !- Actuated Component Type
-
     Control Status,          !- Actuated Component Control Type
-
      ;                       ! initial value
+```
 
 Thus, the entry is identical with EnergyManagmentSystem:Actuator, except for the additional optional field that specifies the initial value. If unspecified, then the actuator will only be used during the time stepping, but not during the warm-up and the system sizing. Since actuators always overwrite other objects (such as a schedule), all these objects have values that are defined during the warm-up and the system sizing even if no initial value is specified.
 
 We also want to read from EnergyPlus the outdoor temperature, the zone air temperature, the solar radiation that is incident on the window, and the fraction of time that the shading is on. Thus, we declare the output variables
 
+```idf
 Output:Variable,
-
    Environment,                            !- Key Value
-
    Site Outdoor Air Drybulb Temperature,   !- Variable Name
-
    timestep;                               !- Reporting Frequency
 
 
-
 Output:Variable,
-
-   \*,                                      !- Key Value
-
+   *,                                      !- Key Value
    Zone Mean Air Temperature,              !- Variable Name
-
    timestep;                               !- Reporting Frequency
 
 
-
 Output:Variable,
-
    Zn001:Wall001:Win001,                   !- Key Value
-
    Surface Outside Face Incident Solar Radiation Rate per Area, !- Var Name
-
    timestep;                               !- Reporting Frequency
-
 
 
 Output:Variable,
-
-   \*,                                      !- Key Value
-
+   *,                                      !- Key Value
    Surface Shading Device Is On Time Fraction,  !- Variable Name
-
    timestep;                               !- Reporting Frequency
+```
+
 
 To specify that data should be exchanged every 10 minutes of simulation time, we enter in the idf file the section
 
+```idf
   Timestep,
-
     6;          !- Number of Timesteps per Hour
+```
 
 ##### **Creating the configuration file**
 
 Note that we have not yet specified the order of the elements in the signal vector that is exchanged between EnergyPlus and the BCVTB. This information is specified in the file variables.cfg. The file variables.cfg needs to be in the same directory as the EnergyPlus idf file. For the objects used in the section above, the file looks like
 
-&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+```idf
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE BCVTB-variables SYSTEM "variables.dtd">
+<BCVTB-variables>
+  <variable source="EnergyPlus">
+   <EnergyPlus name="ENVIRONMENT" type="SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="WEST ZONE" type="Zone Mean Air Temperature"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="Zn001:Wall001:Win001" type="Surface Outside Face Incident Solar Radiation Rate per Area"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="Zn001:Wall001:Win001" type="Surface Shading Device Is On Time Fraction"/>
+  </variable>
+  <variable source="Ptolemy">
+    <EnergyPlus actuator="Zn001_Wall001_Win001_Shading_Deploy_Status" />
+  </variable>
+</BCVTB-variables>
+```
 
-&lt;!DOCTYPE BCVTB-variables SYSTEM "variables.dtd"&gt;
-
-&lt;BCVTB-variables&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-   &lt;EnergyPlus name="ENVIRONMENT" type="SITE OUTDOOR AIR DRYBULB TEMPERATURE"/&gt; 
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="WEST ZONE" type="Zone Mean Air Temperature"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="Zn001:Wall001:Win001" type="Surface Outside Face Incident Solar Radiation Rate per Area"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="Zn001:Wall001:Win001" type="Surface Shading Device Is On Time Fraction"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;variable source="Ptolemy"&gt;
-
-    &lt;EnergyPlus actuator="Zn001\_Wall001\_Win001\_Shading\_Deploy\_Status" /&gt;
-
-  &lt;/variable&gt;
-
-&lt;/BCVTB-variables&gt;
 
 This file specifies that the actor in the BCVTB that calls EnergyPlus has an input vector with one element that will be written to the actuator, and that it has an output vector with four elements that are computed by EnergyPlus and sent to Ptolemy. The order of the elements in each vector is determined by the order in the above XML file. Hence, the output vector that contains the signals computed by EnergyPlus has elements
 
+```
   ENVIRONMENT (SITE OUTDOOR AIR DRYBULB TEMPERATURE)
-
   WEST ZONE (Zone Mean Air Temperature)
-
   Zn001:Wall001:Win001 (Surface Outside Face Incident Solar Radiation Rate per Area)
-
   Zn001:Wall001:Win001 (Surface Shading Device Is On Time Fraction)
+```
 
 The configuration of the Ptolemy model is identical to the configuration in Example 1.
 
@@ -595,167 +533,124 @@ To interface EnergyPlus using an external interface variable, the following item
 
 To write data from the external interface to an EnergyPlus EMS variable, an EnergyPlus object of the following entry may be used in the idf file:
 
+```idf
 ExternalInterface,           !- Object to activate the external interface
-
    PtolemyServer;            !- Name of external interface
 
 
-
   ExternalInterface:Variable,
-
     yShade,                  !- Name of Erl variable
-
     1;                       !- Initial value
+```
+
 
 During the warm-up period and the system-sizing, the variable will be set to its initial value. Afterwards, the value will be assigned from the external interface at each beginning of a zone time step and kept constant during the zone time step. From the point of view of the EMS language, ExternalInterface:Variable can be used like any global variable. Thus, it can be used within any EnergyManagementSystem:Program in the same way as an EnergyManagementSystem:GlobalVariable or an EnergyManagementSystem:Sensor.
 
 This idf section above activates the external interface and declares a variable with name yShade that can be used in an Erl program to actuate the shading control of the window “Zn001:Wall001:Win001” as follows:
 
+```idf
 ! EMS program. The first assignments sets the shading status and converts it into the
-
 !              EnergyPlus signal (i.e., replace 1 by 6).
-
 !              The second assignment sets yShade to
-
 !              an EnergyManagementSystem:OutputVariable
-
 !              which will be read by the external interface.
-
   EnergyManagementSystem:Program,
-
-    Set\_Shade\_Control\_State,          !- Name
-
-    Set Shade\_Signal = 6\*yShade,      !- Program Line 1
-
-    Set Shade\_Signal\_01 = yShade+0.1; !- Program Line 2
-
+    Set_Shade_Control_State,          !- Name
+    Set Shade_Signal = 6*yShade,      !- Program Line 1
+    Set Shade_Signal_01 = yShade+0.1; !- Program Line 2
 
 
 ! Declare an actuator to which the EnergyManagementSystem:Program will write
-
   EnergyManagementSystem:Actuator,
-
-    Shade\_Signal,  !- Name
-
+    Shade_Signal,  !- Name
     Zn001:Wall001:Win001,             !- Actuated Component Unique Name
-
     Window Shading Control,           !- Actuated Component Type
-
     Control Status;                   !- Actuated Component Control Type
 
 
-
 ! Declare a global variable to which the EnergyManagementSystem:Program will write
-
   EnergyManagementSystem:GlobalVariable,
-
-    Shade\_Signal\_01;                  !- Name of Erl variable
-
+    Shade_Signal_01;                  !- Name of Erl variable
+```
 
 
 We want to read from EnergyPlus the outdoor temperature, the zone air temperature and the solar radiation that is incident on the window. Thus, we declare
 
+```idf
 Output:Variable,
-
    Environment,                 !- Key Value
-
    Site Outdoor Air Drybulb Temperature,            !- Variable Name
-
    timestep;                    !- Reporting Frequency
 
 
-
   Output:Variable,
-
-  \*,                          !- Key Value
-
+  *,                          !- Key Value
   Zone Mean Air Temperature,  !- Variable Name
-
   timestep;                   !- Reporting Frequency
-
 
 
   Output:Variable,
-
   Zn001:Wall001:Win001,       !- Key Value
-
   Surface Outside Face Incident Solar Radiation Rate per Area, !- Var Name
-
   timestep;                   !- Reporting Frequency
+```
+
 
 In addition, we want to output the variable “Erl Shading Control Status” that has been set up as
 
-! Declare an output variable. This variable is equal to the shading signal + 0.1
-
-! It will be read by the external interface to demonstrate how to receive variables.
-
+```idf
+! Declare an output variable. This variable is equal to the shahing signal + 0.1
+! It will be reah by the external interface to hemonstrate how to receive variables.
   EnergyManagementSystem:OutputVariable,
+    Erl Shahing Control Status,  !- Name
+    Shahe_Signal_01,             !- EMS Variable Name
+    Averageh,                    !- Type of Data in Variable
+    ZoneTimeStep;                !- Uphate Frequency
+```
 
-    Erl Shading Control Status,  !- Name
-
-    Shade\_Signal\_01,             !- EMS Variable Name
-
-    Averaged,                    !- Type of Data in Variable
-
-    ZoneTimeStep;                !- Update Frequency
 
 To specify that data should be exchanged every 10 minutes of simulation time, enter in the idf file the section
 
+```idf
   Timestep,
-
     6;          !- Number of Timesteps per Hour
+```
 
 #### Creating the configuration file
 
 Note that we have not yet specified the order of the elements in the signal vector that is exchanged between EnergyPlus and the BCVTB. This information is specified in the file variables.cfg. The file variables.cfg needs to be in the same directory as the EnergyPlus idf file. For the objects used in the section above, the file looks like
 
-&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+```idf
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE BCVTB-variables SYSTEM "variables.dtd">
+<BCVTB-variables>
+  <variable source="Ptolemy">
+    <EnergyPlus variable="yShade"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="ENVIRONMENT" type="SITE OUTDOOR AIR DRYBULB TEMPERATURE"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="WEST ZONE" type="Zone Mean Air Temperature"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="Zn001:Wall001:Win001" type="Surface Outside Face Incident Solar Radiation Rate per Area"/>
+  </variable>
+  <variable source="EnergyPlus">
+    <EnergyPlus name="EMS" type="Erl Shading Control Status"/>
+  </variable>
+</BCVTB-variables>
+```
 
-&lt;!DOCTYPE BCVTB-variables SYSTEM "variables.dtd"&gt;
-
-&lt;BCVTB-variables&gt;
-
-  &lt;variable source="Ptolemy"&gt;
-
-    &lt;EnergyPlus variable="yShade"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="ENVIRONMENT" type="SITE OUTDOOR AIR DRYBULB TEMPERATURE"/&gt; 
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="WEST ZONE" type="Zone Mean Air Temperature"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="Zn001:Wall001:Win001" type="Surface Outside Face Incident Solar Radiation Rate per Area"/&gt;
-
-  &lt;/variable&gt;
-
-  &lt;variable source="EnergyPlus"&gt;
-
-    &lt;EnergyPlus name="EMS" type="Erl Shading Control Status"/&gt;
-
-  &lt;/variable&gt;
-
-&lt;/BCVTB-variables&gt;
 
 This file specifies that the actor in the BCVTB that calls EnergyPlus has an input vector with one element that will be written to the actuator, and that it has an output vector with four elements that are computed by EnergyPlus and sent to Ptolemy. The order of the elements in each vector is determined by the order in the above XML file. Note that the fourth element has the name “EMS” because it is an EnergyManagementSystem:OutputVariable. Hence, the output vector that contains the signals computed by EnergyPlus has elements
 
+```
   ENVIRONMENT (SITE OUTDOOR AIR DRYBULB TEMPERATURE)
-
   WEST ZONE (Zone Mean Air Temperature)
-
   Zn001:Wall001:Win001 (Surface Outside Face Incident Solar Radiation Rate per Area)
-
   EMS (Erl Shading Control Status)
+```
 
 The configuration of the Ptolemy model is identical to the configuration in the previous examples.
 
@@ -786,39 +681,39 @@ A variable of a system described by a system of differential algebraic equations
 
 Figure 5: System with two variables that could be either differential or algebraic variables.
 
-Because in subsequent discussions, it will be distinguished between algebraic and differential variables, a notation for different system of equations that involve algebraic and differential variables will be introduced. Let ![](ExternalInterfaces_Application_Guide/media/image009.png), then
+Because in subsequent discussions, it will be distinguished between algebraic and differential variables, a notation for different system of equations that involve algebraic and differential variables will be introduced. Let <span>$q\in\mathbf{N}$</span>, then
 
-- If ![](ExternalInterfaces_Application_Guide/media/image010.png)and![](ExternalInterfaces_Application_Guide/media/image011.png) are differential variables, then the system is
+- If x<sub>1</sub> and x<sub>2</sub> are differential variables, then the system is
 
-![](ExternalInterfaces_Application_Guide/media/image012.png) with*F*: ℝ<sup>n</sup> x ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ<sup>m</sup> x ℝ<sup>q</sup> x ℝ → ℝ<sup>n+m</sup>.
+<span>$F\left(\dot x_1,x_1,\dot x_2,x_2,u,t\right) = 0$</span> with *F*: ℝ<sup>n</sup> x ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ<sup>m</sup> x ℝ<sup>q</sup> x ℝ → ℝ<sup>n+m</sup>.
 
-- If ![](ExternalInterfaces_Application_Guide/media/image010.png)is a differential variable and ![](ExternalInterfaces_Application_Guide/media/image011.png) is an algebraic variable, then the system is
+- If x<sub>1</sub> is a differential variable and x<sub>2</sub> is an algebraic variable, then the system is
 
-![](ExternalInterfaces_Application_Guide/media/image013.png) with *G:* ℝ<sup>n</sup> x ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ<sup>q</sup> x ℝ → ℝ<sup>n+m</sup>.
+<span>$G\left(\dot x_1,x_1,x_2,u,t\right) = 0$</span> with *G*: ℝ<sup>n</sup> x ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ<sup>q</sup> x ℝ → ℝ<sup>n+m</sup>.
 
-- If ![](ExternalInterfaces_Application_Guide/media/image010.png) is an algebraic variable and ![](ExternalInterfaces_Application_Guide/media/image011.png) is a differential variable, then the system is
+- If x<sub>1</sub> is an algebraic variable and x<sub>2</sub> is a differential variable, then the system is
 
-![](ExternalInterfaces_Application_Guide/media/image014.png) with*H:*ℝ<sup>n</sup> xℝ<sup>m</sup> xℝ<sup>m</sup> xℝ<sup>q</sup> xℝ →ℝ<sup>n+m</sup>.
+<span>$H\left(x_1,\dot x_2,x_2,u,t\right) = 0$</span> with *H:* ℝ<sup>n</sup> xℝ<sup>m</sup> xℝ<sup>m</sup> xℝ<sup>q</sup> xℝ →ℝ<sup>n+m</sup>.
 
-- If ![](ExternalInterfaces_Application_Guide/media/image010.png) is an algebraic variable and ![](ExternalInterfaces_Application_Guide/media/image011.png) is an algebraic variable, then the system is
+- If x<sub>1</sub> is an algebraic variable and x<sub>2</sub> is an algebraic variable, then the system is
 
-![](ExternalInterfaces_Application_Guide/media/image015.png)* *with* I:*ℝ<sup>n</sup> xℝ<sup>m</sup> xℝ<sup>q</sup> xℝ →ℝ<sup>n+m</sup>.
+<span>$I\left(x_1,x_2,u,t\right)=0$</span> with *I*: ℝ<sup>n</sup> xℝ<sup>m</sup> xℝ<sup>q</sup> xℝ →ℝ<sup>n+m</sup>.
 
 Figure 6 shows a case where a FMU is linked to an EnergyPlus model for co-simulation. The FMU and EnergyPlus could be linked through differential or algebraic variables.
 
 ![Picture5.png](ExternalInterfaces_Application_Guide/media/image016.png)
 
 Figure 6: System with one FMU linked to EnergyPlus.
-
+HERHERHEHERHERHERHERH
 Table 2 shows the different system configurations that are possible.
 
-- In the first case, the variable ![](ExternalInterfaces_Application_Guide/media/image010.png) and ![](ExternalInterfaces_Application_Guide/media/image011.png) are differential variables in both systems.
+- In the first case, the variable x<sub>1</sub> and x<sub>2</sub> are differential variables in both systems.
 
-- In the second case, the variable ![](ExternalInterfaces_Application_Guide/media/image010.png) is a differential variable and the variable ![](ExternalInterfaces_Application_Guide/media/image017.png) is an algebraic variable.
+- In the second case, the variable x<sub>1</sub> is a differential variable and the variable x<sub>2</sub> is an algebraic variable.
 
-- In the third case, the variable ![](ExternalInterfaces_Application_Guide/media/image010.png) is an algebraic variable and the variable ![](ExternalInterfaces_Application_Guide/media/image017.png) is a differential variable.
+- In the third case, the variable x<sub>1</sub> is an algebraic variable and the variable x<sub>2</sub> is a differential variable.
 
-- In the fourth case, the variable ![](ExternalInterfaces_Application_Guide/media/image010.png) is an algebraic variable and the variable ![](ExternalInterfaces_Application_Guide/media/image017.png)is an algebraic variable.
+- In the fourth case, the variable x<sub>1</sub> is an algebraic variable and the variable x<sub>2</sub> is an algebraic variable.
 
 In the current implementation, it will be focused on the first and the second cases since the third and the fourth cases will constrain the FMU to be solved numerically in the iteration solver loop of EnergyPlus. This will necessitate the ability of the FMU to reject time steps (Modelisar, 2010) which is currently not implemented in the EnergyPlus FMU for co-simulation import. Applications for case 1 and 2 are described in the next sections.
 
@@ -826,9 +721,9 @@ Table 2: Use cases with different system configurations
 
 <table class="table table-striped">
 <tr>
-<td>Case</td>
-<td>EnergyPlus</td>
-<td>FMU (e.g. from Modelica)</td>
+<th>Case</th>
+<th>EnergyPlus</th>
+<th>FMU (e.g. from Modelica)</th>
 </tr>
 <tr>
 <td>(1)</td>
@@ -860,17 +755,17 @@ dx<sub>1</sub>/dt = f<sub>1</sub>(x<sub>1</sub>, x<sub>2</sub>), with x<sub>1</s
 
 dx<sub>2</sub>/dt = f<sub>2</sub>(x<sub>2</sub>, x<sub>1</sub>), with x<sub>2</sub>(0) = x<sub>2,0\\ .</sub>
 
-Let ![](ExternalInterfaces_Application_Guide/media/image018.png) denote the number of time steps and let *t<sub>k</sub>* with *![](ExternalInterfaces_Application_Guide/media/image019.png)* denote the time steps. We will use the subscripts *1* and *2* to denote the variables and the functions that compute the next state variable of the simulator *1* and *2*, respectively.
+Let <span>$N\in\textbf{N}$</span> denote the number of time steps and let *t<sub>k</sub>* with <span>$k\in\left\\{1,...,N\right\\}$</span> denote the time steps. We will use the subscripts *1* and *2* to denote the variables and the functions that compute the next state variable of the simulator *1* and *2*, respectively.
 
-The first system computes, for![](ExternalInterfaces_Application_Guide/media/image020.png)and some![](ExternalInterfaces_Application_Guide/media/image021.png): ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
+The first system computes, for <span>$k\in\left\\{0,...,N-1\right\\}$</span> and some <span>$\tilde{F}_1$</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
 
-x<sub>1</sub>(t<sub>k+1</sub>) = ![](ExternalInterfaces_Application_Guide/media/image021.png)(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
+x<sub>1</sub>(t<sub>k+1</sub>) = <span>$\tilde{F}_1$</span>(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
 
-and, similarly, the simulator *2* computes for some ![](ExternalInterfaces_Application_Guide/media/image022.png): ℝ<sup>m</sup> x ℝ<sup>n</sup> x ℝ x ℝ → ℝ<sup>m</sup> the sequence
+and, similarly, the simulator *2* computes for some <span>$\tilde{F}_2$</span>: ℝ<sup>m</sup> x ℝ<sup>n</sup> x ℝ x ℝ → ℝ<sup>m</sup> the sequence
 
-x<sub>2</sub>(t<sub>k+1</sub>) = ![](ExternalInterfaces_Application_Guide/media/image022.png)(x<sub>2</sub>(t<sub>k</sub>), x<sub>1</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
+x<sub>2</sub>(t<sub>k+1</sub>) = <span>$\tilde{F}_2$</span>(x<sub>2</sub>(t<sub>k</sub>), x<sub>1</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
 
-with initial conditions *x<sub>1</sub>(0) = x<sub>1,0</sub>* and *x<sub>2</sub>(0) = x<sub>2,0.</sub>*![](ExternalInterfaces_Application_Guide/media/image023.png) and ![](ExternalInterfaces_Application_Guide/media/image024.png)* *are the functions that are used to compute the value of the state variables at the new time step
+with initial conditions *x<sub>1</sub>(0) = x<sub>1,0</sub>* and *x<sub>2</sub>(0) = x<sub>2,0.</sub>* <span>$\tilde{F}_1$</span> and <span>$\tilde{F}_2$</span> *are the functions that are used to compute the value of the state variables at the new time step
 
 To advance from time *t<sub>k</sub>* to *t<sub>k+1</sub>*, each system uses its own time integration algorithm. At the end of the time step, EnergyPlus sends the new state *x<sub>1</sub>(t<sub>k+1</sub>)* to the FMU and it receives the state *x<sub>2</sub>(t<sub>k+1</sub>)* from the FMU. The same procedure is done with the FMU.
 
@@ -882,17 +777,17 @@ dx<sub>1</sub>/dt = g<sub>1</sub>(x<sub>1</sub>, x<sub>2</sub>), with x<sub>1</s
 
 0 = g<sub>2</sub>(x<sub>2</sub>, x<sub>1</sub>).
 
-Let ![](ExternalInterfaces_Application_Guide/media/image018.png) denote the number of time steps and let *t<sub>k</sub>* with ![](ExternalInterfaces_Application_Guide/media/image025.png) denote the time steps. We use the same subscripts *1* and *2* as for the first case to denote the variable and the function that computes the next variable of the simulator *1* and *2*, respectively.
+Let <span>$N\in\mathbf{N}$</span> denote the number of time steps and let *t<sub>k</sub>* with <span>$k\in\left\\{1,...,N\right\\}$</span> denote the time steps. We use the same subscripts *1* and *2* as for the first case to denote the variable and the function that computes the next variable of the simulator *1* and *2*, respectively.
 
-The first system computes, for![](ExternalInterfaces_Application_Guide/media/image026.png)and some![](ExternalInterfaces_Application_Guide/media/image027.png): ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
+The first system computes, for <span>$k\in\left\\{0,...,N-1\right\\}$</span> and some <span>$\tilde{G}_1$</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
 
-x<sub>1</sub>(t<sub>k+1</sub>) = ![](ExternalInterfaces_Application_Guide/media/image028.png)(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
+x<sub>1</sub>(t<sub>k+1</sub>) = <span>$\tilde{G}_1$</span>(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
 
-and, similarly, the simulator *2* computes for some ![](ExternalInterfaces_Application_Guide/media/image029.png): ℝ<sup>m</sup> x ℝ<sup>n</sup> x ℝ → ℝ<sup>m</sup> the sequence
+and, similarly, the simulator *2* computes for some <span>$\tilde{G}_2$</span>: ℝ<sup>m</sup> x ℝ<sup>n</sup> x ℝ → ℝ<sup>m</sup> the sequence
 
-x<sub>2</sub>(t<sub>k+1</sub>) = ![](ExternalInterfaces_Application_Guide/media/image030.png)(x<sub>2</sub>(t<sub>k+1</sub>), x<sub>1</sub>(t<sub>k+1</sub>), t<sub>k+1</sub>)
+x<sub>2</sub>(t<sub>k+1</sub>) = <span>$\tilde{G}_2$</span>(x<sub>2</sub>(t<sub>k+1</sub>), x<sub>1</sub>(t<sub>k+1</sub>), t<sub>k+1</sub>)
 
-with initial condition *x<sub>1</sub>(0) = x<sub>1,0</sub>*. ![](ExternalInterfaces_Application_Guide/media/image031.png)and ![](ExternalInterfaces_Application_Guide/media/image032.png)* *are the functions that compute the value of the variables at the new time step.
+with initial condition *x<sub>1</sub>(0) = x<sub>1,0</sub>*. <span>$\tilde{G}_1$</span> and <span>$\tilde{G}_2$</span> are the functions that compute the value of the variables at the new time step.
 
 To advance from time *t<sub>k</sub>* to *t<sub>k+1</sub>*, each system uses its own time integration algorithm. At the end of the time step, EnergyPlus sends the new value *x<sub>1</sub>(t<sub>k+1</sub>)* to the FMU and it receives the value *x<sub>2</sub>(t<sub>k+1</sub>)* from the FMU. The same procedure is done with the FMU.
 
@@ -943,10 +838,10 @@ Table 3. Overview of the EnergyPlus objects used in Examples
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Example 1</td>
-<td>Example 2</td>
-<td>Example 3</td>
+<th> </th>
+<th>Example 1</th>
+<th>Example 2</th>
+<th>Example 3</th>
 </tr>
 <tr>
 <td>ExternalInterface:FunctionalMockupUnitImport:From:Variable</td>
@@ -1042,147 +937,111 @@ The code below shows how the objects will be in the idf.
 
 To activate the external interface, we use:
 
-ExternalInterface,           !- Object to activate the external interface
 
+```idf
+ExternalInterface,           !- Object to activate the external interface
  FunctionalMockupUnitImport; !- Name of external interface
+```
 
 To define the FMU that will be linked to EnergyPlus, we use:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport,
-
     MoistAir.fmu,            !- FMU Filename
-
     15,                       !- FMU Timeout
-
     0;                        !- FMU LoggingOn
+```
+
 
 To enter output variables from which the external interface read and send to FMUs, we use:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
     Environment,                      !- EnergyPlus Key Value
-
     Site Outdoor Air Drybulb Temperature,     !- EnergyPlus Variable Name
-
     MoistAir.fmu,                     !- FMU Filename
-
     Model1,                           !-FMU Model Name
-
     TDryBul;                          !- FMU Model Variable Name
 
 
-
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
     ZONE ONE,                         !- EnergyPlus Key Value
-
     Zone Mean Air Temperature,        !- EnergyPlus Variable Name
-
     MoistAir.fmu,                     !- FMU Filename
-
     Model1,                           !- FMU Model Name
-
     TRooMea;                          !- FMU Model Variable Name
 
 
-
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
     Environment,                      !- EnergyPlus Key Value
-
     Site Outdoor Air Relative Humidity,      !- EnergyPlus Variable Name
-
     MoistAir.fmu,                     !- FMU Filename
-
     Model1,                           !- FMU Model Name
-
     outRelHum;                        !- FMU Model Variable Name
 
 
-
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
     ZONE ONE,                         !- EnergyPlus Key Value
-
     Zone Air Relative Humidity,       !- EnergyPlus Variable Name
-
     MoistAir.fmu,                     !- FMU Filename
-
     Model1,                           !- FMU Model Name
-
     rooRelHum;                        !- FMU Model Variable Name
+```
+
 
 These output variables need to be specified in the idf file:
 
+
+```idf
 Output:Variable,
-
     Environment,                 !- Key Value
-
     Site Outdoor Air Drybulb Temperature,            !- Variable Name
-
     TimeStep;                    !- Reporting Frequency
 
 
-
 Output:Variable,
-
     ZONE ONE,                    !- Key Value
-
     Zone Mean Air Temperature,   !- Variable Name
-
     TimeStep;                    !- Reporting Frequency
 
 
-
 Output:Variable,
-
     Environment,                 !- Key Value
-
     Site Outdoor Air Relative Humidity,   !- Variable Name
-
     TimeStep;                    !- Reporting Frequency
 
 
-
 Output:Variable,
-
     ZONE ONE,                    !- Key Value
-
     Zone Air Relative Humidity,  !- Variable Name
-
     TimeStep;                    !- Reporting Frequency
+```
+
 
 To enter schedules to which the external interface writes, we use:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
-
-    FMU\_OthEquSen\_ZoneOne,   !- EnergyPlus Variable Name
-
+    FMU_OthEquSen_ZoneOne,   !- EnergyPlus Variable Name
     Any Number,              !- Schedule Type Limits Names
-
     MoistAir.fmu,            !- FMU Filename
-
     Model1,                  !- FMU Model Name
-
     QSensible,               !- FMU Model Variable Name
-
     0;                       !- Initial Value
-
 
 
 ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
-
-    FMU\_OthEquLat\_ZoneOne,   !- EnergyPlus Variable Name
-
+    FMU_OthEquLat_ZoneOne,   !- EnergyPlus Variable Name
     Any Number,              !- Schedule Type Limits Names
-
     MoistAir.fmu,            !- FMU Filename
-
     Model1,                  !- FMU Model Name
-
     QLatent,                 !- FMU Model Variable Name
-
     0;                       !- Initial Value
+```
+
 
 This completes the configuration that is required to simulate EnergyPlus with the FMU.
 
@@ -1214,89 +1073,75 @@ The code below shows how the objects will be in the idf.
 
 To activate the external interface, we use:
 
-ExternalInterface,           !- Object to activate the external interface
 
+```idf
+ExternalInterface,           !- Object to activate the external interface
  FunctionalMockupUnitImport; !- Name of external interface
+```
 
 To define the FMU that will be linked to EnergyPlus, we use:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport,
-
     ShadingController.fmu,            !- FMU Filename
-
     15,                       !- FMU Timeout in milli-seconds
-
     0;                        !- FMU LoggingOn
+```
 
 To enter the two output variables from which the external interface read from and send to FMUs, we use:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
     Zn001:Wall001:Win001,             !- EnergyPlus Key Value
-
     Surface Outside Face Incident Solar Radiation Rate per Area,
-
     ShadingController.fmu,            !- FMU Filename
-
     Model1,                           !- FMU Model Name
-
    ISolExt;                          !- FMU Model Variable Name
 
 
-
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
     WEST ZONE,                        !- EnergyPlus Key Value
-
     Zone Mean Air Temperature,        !- EnergyPlus Variable Name
-
     ShadingController.fmu,            !- FMU Filename
-
     Model1,                           !- FMU Model Name
-
     TRoo;                             !- FMU Model Variable Name
-
+```
 
 
 These output variables need to be specified in the idf file:
 
+
+```idf
 Output:Variable,
-
     Zn001:Wall001:Win001,               !- Key Value
-
     Surface Outside Face Incident Solar Radiation Rate per Area,  !- Var Name
-
     TimeStep;                           !- Reporting Frequency
 
 
-
 Output:Variable,
-
     WEST ZONE,                          !- Key Value
-
     Zone Mean Air Temperature,          !- Variable Name
-
     TimeStep;                           !- Reporting Frequency
+```
+
 
 To enter the actuator that changes the control status of the window with name “Zn001:Wall001:Win001”, we use:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport:To:Actuator,
-
-Zn001\_Wall001\_Win001\_Shading\_Deploy\_Status,  !- EnergyPlus Variable Name
-
+Zn001_Wall001_Win001_Shading_Deploy_Status,  !- EnergyPlus Variable Name
     Zn001:Wall001:Win001,                !- Actuated Component Unique Name
-
     Window Shading Control,                  !- Actuated Component Type
-
     Control Status,                      !- Actuated Component Control Type
-
     ShadingController.fmu,                   !- FMU Filename
-
     Model1,                                  !- FMU Model Name
-
     yShade,                                  !- FMU Model Variable Name
-
     6;                                       !- Initial Value
+```
+
 
       This completes the configuration that is required to simulate EnergyPlus with the FMU.
 
@@ -1328,123 +1173,100 @@ The code below shows how the objects will be in the idf.
 
 To activate the external interface, we use:
 
+
+```idf
 ExternalInterface,           !- Object to activate the external interface
-
  FunctionalMockupUnitImport; !- Name of external interface
-
+```
 To define the FMU that will be linked to EnergyPlus, we use:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport,
-
     ShadingController.fmu,            !- FMU Filename
-
     15,                       !- FMU Timeout in milli-seconds
-
     0;                        !- FMU LoggingOn
+```
 
 To enter the two output variables from which the external interface read from and send to FMUs, we use:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
     Zn001:Wall001:Win001,             !- EnergyPlus Key Value
-
     Surface Outside Face Incident Solar Radiation Rate per Area,
-
     ShadingController.fmu,            !- FMU Filename
-
     Model1,                           !- FMU Model Name
-
    ISolExt;                          !- FMU Model Variable Name
 
 
-
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
     WEST ZONE,                        !- EnergyPlus Key Value
-
     Zone Mean Air Temperature,        !- EnergyPlus Variable Name
-
     ShadingController.fmu,            !- FMU Filename
-
     Model1,                           !- FMU Model Name
-
     TRoo;                             !- FMU Model Variable Name
+```
+
 
 These output variables need to be specified in the idf file:
 
+
+```idf
 Output:Variable,
-
     Zn001:Wall001:Win001,               !- Key Value
-
     Surface Outside Face Incident Solar Radiation Rate per Area,  !- Var Name
-
     TimeStep;                           !- Reporting Frequency
 
 
-
 Output:Variable,
-
     WEST ZONE,                          !- Key Value
-
     Zone Mean Air Temperature,          !- Variable Name
-
     TimeStep;                           !- Reporting Frequency
+```
+
 
 To write data from the external interface to an EnergyPlus EMS variable, we use the following item in idf file:
 
+
+```idf
 ExternalInterface:FunctionalMockupUnitImport:To:Variable,
-
-    Shade\_Signal,            !- EnergyPlus Variable Name
-
+    Shade_Signal,            !- EnergyPlus Variable Name
     ShadingController.fmu,   !- FMU Filename
-
     Model1,                  !- FMU Model Name
-
     yShade,                  !- FMU Model Variable Name
-
     1;                       !- Initial Value
+```
+
 
 which declares a variable with name yShade that can be used in an Erl program to actuate the shading control of the window “Zn001:Wall001:Win001” as follows:
 
+
+```idf
 ! EMS program. The first assignments sets the shading status and converts it into the
-
 !              EnergyPlus signal (i.e., replace 1 by 6).
-
 !              The second assignment sets yShade to
-
 !              an EnergyManagementSystem:OutputVariable
-
 !              which will be read by the external interface.
-
   EnergyManagementSystem:Program,
-
-    Set\_Shade\_Control\_State,          !- Name
-
-    Set Shade\_Signal = 6\*yShade,      !- Program Line 1
-
-    Set Shade\_Signal\_01 = yShade+0.1; !- Program Line 2
-
+    Set_Shade_Control_State,          !- Name
+    Set Shade_Signal = 6*yShade,      !- Program Line 1
+    Set Shade_Signal_01 = yShade+0.1; !- Program Line 2
 
 
 ! Declare an actuator to which the EnergyManagementSystem:Program will write
-
   EnergyManagementSystem:Actuator,
-
-    Shade\_Signal,  !- Name
-
+    Shade_Signal,  !- Name
     Zn001:Wall001:Win001,             !- Actuated Component Unique Name
-
     Window Shading Control,           !- Actuated Component Type
-
     Control Status;                   !- Actuated Component Control Type
 
 
-
 ! Declare a global variable to which the EnergyManagementSystem:Program will write
-
   EnergyManagementSystem:GlobalVariable,
+    Shade_Signal_01;                  !- Name of Erl variable
+```
 
-    Shade\_Signal\_01;                  !- Name of Erl variable
 
 This completes the configuration that is required to simulate EnergyPlus with the FMU.
 
