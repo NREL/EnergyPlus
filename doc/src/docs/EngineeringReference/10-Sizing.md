@@ -2761,54 +2761,6 @@ Packaged terminal heat pumps are compound components: each unit contains a suppl
 
 <div>\[{T_{SA,\max }} = HeatDesTem{p_{zone}}\]</div>
 
-#### Unitary System Sizing
-
-The AirloopHVAC:UnitarySystem object incorporates all coils types and fans as a complete packaged system. The fans and coils are optional allowing virtually any system type to be modeled. Sizing of this object depends on the coils selected. For single coil systems, the associated air flow rate is used as the operating flow rate (i.e., cooling or heating). For systems with both a cooling and heating coil, this methodology still applies except for DX systems (Heat Pumps) where the greater of the cooling or heating air flow rate is used. Heat pumps are defined as systems having both a DX cooling and DX heating coil. Other AirloopHVAC equipment models use the greater of the cooling and heating flow rates. The inputs that may need to be autosized are the supply air air volumetric air flow rates during cooling operation, heating operation, and when no cooling or heating is needed. The data needed for sizing the units are obtained from the zone design arrays.
-
-Supply Air Flow Rate:
-
-Supply air volumetric flow rate during cooling operation
-
-<div>\[\dot{V}_{SA,cooling} = \rm{DesCoolVolFlow}_{zone}/\rm{ZoneFraction} \]</div>
- 
-Supply air volumetric flow rate during heating operation
-
-<div>\[\dot{V}_{SA,heating} = \rm{DesHeatVolFlow}_{zone}/\rm{ZoneFraction} \]</div>
- 
-Supply air volumetric flow rate when DX coils are used as a system
-
-<div>\[\dot{V}_{SA} = \max{\eft(\rm{DesCoolVolFlow},\rm{DesHeatVolFlow}\right)}/\rm{ZoneFraction} \]</div>
- 
-where ZoneFraction = Fraction of the total volume flow that goes through the controlling zone
-
-The unitary system object also allows scalable sizing as follows:
-
-Flow Per Floor Area:
-
-<div>\[\dot{V}_{SA} = \rm{FlowPerFloorArea}\left(\rm{TotalFloorArea}\right)\]</div>
-
-Fraction of Autosized Cooling Value:
-
-<div>\[\dot{V}_{SA,cooling} = \dot{V}_{SA,des,cooling}\left(\rm{FractionOfCoolingValue}\right)\]</div>
- 
-Fraction of Autosized Heating Value:
-
-<div>\[\dot{V}_{SA,heating} = \dot{V}_{SA,des,heating}\left(\rm{FractionOfHeatingValue}\right)\]</div>
- 
-Flow Per Cooling Capacity
-
-<div>\[\dot{V}_{SA,cooling} = \dot{Q}_{coil,des,cooling}\left(\rm{FractionOfCoolingValue}\right)\]</div>
-
-Flow Per Heating Capacity
-
-<div>\[\dot{V}_{SA,heating} = \dot{Q}_{coil,des,heating}\left(\rm{FractionOfHeatingValue}\right)\]</div>
-
-The maximum supply air temperature can also be automatically selected. The value is determined from the Sizing:Zone or Sizing:System object depending on where the object is used in the simulation (i.e., as zone or air loop equipment).
-
-Maximum supply air temperature
- 
-<div>\[T_{SA,max}=\rm{HeatDesTemp}_{ZoneOrSystem}]</div>
-
 ### MultiSpeed Heat Pump Sizing
 
 MultiSpeed heat pumps are compound components: each unit contains a supply air fan, a multispeed DX cooling coil, a multispeed DX heating coil, and a GAS or ELECTRIC supplemental heating coil. The inputs that may need to be autosized are the supply air volumetric air flow rates during cooling operation, heating operation, and when no cooling or heating is needed. The data needed for sizing the units are obtained from the controlled zone design arrays.
@@ -3087,6 +3039,55 @@ The object provides both cooling and heating, and also operates in a single oper
 ##### Hydronic Tubing Length
 
 The length of hydronic tube is determined as described in the variable flow radiant system above.
+
+### Unitary System Sizing
+
+The AirloopHVAC:UnitarySystem object incorporates all coils types and fans as a complete packaged system. The fans and coils are optional allowing virtually any system type to be modeled. Sizing of this object depends on the coils selected. For single coil systems, the associated air flow rate is used as the operating flow rate (i.e., cooling or heating). For systems with both a cooling and heating coil, this methodology still applies except for DX systems (Heat Pumps) where the greater of the cooling or heating air flow rate is used. Heat pumps are defined as systems having both a DX cooling and DX heating coil. The inputs that may need to be autosized are the supply air air volumetric air flow rates during cooling operation, heating operation, and when no cooling or heating is needed. The data needed for sizing the units are obtained from the zone design arrays.
+
+#### Supply Air volumetric flow rate during cooling operation:
+
+<div> \[ \dot V_{SA,cooling} = \text{DesCoolVolFlow}_{zone} / \text{ZoneFraction} \] </div>
+
+#### Supply Air volumetric flow rate during heating operation:
+
+<div> \[ \dot V_{SA,heating} = \text{DesHeatVolFlow}_{zone} / \text{ZoneFraction} \] </div>
+
+#### Supply Air volumetric flow rate when DX coils are used as a system:
+
+<div> \[ \dot V_{SA} = \max \left(\text{DesCoolVolFlow}_{zone}, \text{DesHeatVolFlow}_{zone}\right) / \text{ZoneFraction} \] </div>
+
+where:
+
+* ZoneFraction = Fraction of the total volume flow that goes through the controlling zone
+
+The unitary system object also allows scalable sizing as follows:
+
+Flow Per Floor Area:
+
+<div>\[ \dot V_{SA} = \left(\text{FlowPerFloorArea}\right)\left(\text{TotalFloorArea}\right) \]</div>
+
+Fraction of Autosized Cooling Value:
+
+<div>\[ \dot V_{SA,cooling} = \dot V_{SA,des,cooling}\left(\text{FractionOfCoolingValue}\right) \]</div>
+
+Fraction of Autosized Heating Value:
+
+<div>\[ \dot V_{SA,heating} = \dot V_{SA,des,heating}\left(\text{FractionOfHeatingValue}\right) \]</div>
+
+Flow Per Cooling Capacity
+
+<div>\[ \dot V_{SA,cooling} = \dot Q_{coil,des,cooling}\left(\text{FractionOfCoolingValue}\right) \]</div>
+
+Flow Per Heating Capacity
+
+<div>\[ \dot V_{SA,heating} = \dot Q_{coil,des,heating}\left(\text{FractionOfHeatingValue}\right) \]</div>
+
+#### Maximum Supply Air Temperature
+
+The maximum supply air temperature can also be automatically selected. The value is determined from the Sizing:Zone or Sizing:System object depending on where the object is used in the simulation (i.e., as zone or air loop equipment).
+Maximum supply air temperature
+
+<div>\[T_{SA,max} = \text{HeatDesTemp}_{ZoneOrSystem}\]</div>
 
 Zone Outdoor Air Design Data
 ----------------------------
