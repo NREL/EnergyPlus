@@ -5,54 +5,54 @@ Extra programs for EnergyPlus
 Auxiliary Programs Introduction
 ===============================
 
-This document will describe several of the “auxiliary programs” of the EnergyPlus system in more detail. Some of these programs are only available or only distributed for certain platforms. Typically, the programs are available on the Windows platform. Within the descriptions, other platforms will be noted as applicable. These programs include:
+This document will describe several of the "auxiliary programs" of the EnergyPlus system in more detail. Some of these programs are only available or only distributed for certain platforms. Typically, the programs are available on the Windows platform. Within the descriptions, other platforms will be noted as applicable. These programs include:
 
-**Weather Converter Program** (aka “Weather”)
+**Weather Converter Program** (aka "Weather")
 
-**Ground Heat Transfer in EnergyPlus** – Procedure for Ground Temperature creation
+**Ground Heat Transfer in EnergyPlus** - Procedure for Ground Temperature creation
 
-**View Factor Calculation Program** – Auxiliary program used to calculate View Factors which can be used with EnergyPlus
+**View Factor Calculation Program** - Auxiliary program used to calculate View Factors which can be used with EnergyPlus
 
-**Using Older Version Input Files - Transition** – to convert input files from one version to another upon release of a new version
+**Using Older Version Input Files - Transition** - to convert input files from one version to another upon release of a new version
 
-**EPDraw** – Create DXF files from your input files
+**EPDraw** - Create DXF files from your input files
 
-**Input Macros** – Use a macro language to increase efficiency in creating EnergyPlus input files.  Unfortunately, IDF files containing macros cannot be read in the IDF Editor.
+**Input Macros** - Use a macro language to increase efficiency in creating EnergyPlus input files.  Unfortunately, IDF files containing macros cannot be read in the IDF Editor.
 
-**HVAC Diagram** – Use a post processing program to diagram your HVAC inputs.
+**HVAC Diagram** - Use a post processing program to diagram your HVAC inputs.
 
-**CoeffConv/CoeffCheck** – Convert DOE-2 temperature dependent curves (Fahrenheit) to EnergyPlus temperature curves (Centigrade/Celsius)
+**CoeffConv/CoeffCheck** - Convert DOE-2 temperature dependent curves (Fahrenheit) to EnergyPlus temperature curves (Centigrade/Celsius)
 
-**ExpandObjects** – Some technical details of the Expand Objects program which preprocessed HVACTemplate:\* and GroundHeatTransfer:\* objects for use inside EnergyPlus.
+**ExpandObjects** - Some technical details of the Expand Objects program which preprocessed HVACTemplate:\* and GroundHeatTransfer:\* objects for use inside EnergyPlus.
 
-**CSVproc** – Get simple statistics from CSV output files.
+**CSVproc** - Get simple statistics from CSV output files.
 
-**convertESOMTR** – convert your outputs to Inch-Pound (default) or other custom unit conversions.
+**convertESOMTR** - convert your outputs to Inch-Pound (default) or other custom unit conversions.
 
-**CalcSoilSurfTemp Program** – calculate soil surface parameters used in the Earth Tube simulation
+**CalcSoilSurfTemp Program** - calculate soil surface parameters used in the Earth Tube simulation
 
-**HVAC Performance Curve Fit Tool**– generates HVAC performance curves in EnergyPlus IDF format
+**HVAC Performance Curve Fit Tool**- generates HVAC performance curves in EnergyPlus IDF format
 
-**Parametric Spreadsheets** – Parametric spreadsheets are available to help illustrate or calculate some parameters/coefficients.
+**Parametric Spreadsheets** - Parametric spreadsheets are available to help illustrate or calculate some parameters/coefficients.
 
-**ParametricPreprocessor** **–** Special objects can be inserted in IDF files and generate a series of IDF files from a single source IDF file that contains parametric objects and expressions. Unlike using the macro language, these input files are capable of being read in the IDF Editor.
+**ParametricPreprocessor** **-** Special objects can be inserted in IDF files and generate a series of IDF files from a single source IDF file that contains parametric objects and expressions. Unlike using the macro language, these input files are capable of being read in the IDF Editor.
 
-**AppGPostProcess – Appendix G PostProcessing program** – The ASHRAE 90.1 Appendix G postprocessing program takes simulation outputs and processes them to help meet Appendix G requirements..
+**AppGPostProcess - Appendix G PostProcessing program** - The ASHRAE 90.1 Appendix G postprocessing program takes simulation outputs and processes them to help meet Appendix G requirements..
 
-**BLASTTranslator** – The BLAST translator can take BLAST (Building Loads Analysis and System Thermodynamics) input files and make them ready for running in EnergyPlus.
+**BLASTTranslator** - The BLAST translator can take BLAST (Building Loads Analysis and System Thermodynamics) input files and make them ready for running in EnergyPlus.
 
-**DOE2Translator** – The DOE-2 translator can take DOE-2 program input files and make them ready for running in EnergyPlus.
+**DOE2Translator** - The DOE-2 translator can take DOE-2 program input files and make them ready for running in EnergyPlus.
 
-**Running Console Applications** – this section describes how to run console applications that are part of EnergyPlus and how you might modify these to your specific needs. Instructions for running individual programs are included in their descriptions.
+**Running Console Applications** - this section describes how to run console applications that are part of EnergyPlus and how you might modify these to your specific needs. Instructions for running individual programs are included in their descriptions.
 
-**Technical Details of Running EnergyPlus** – this section gives full instructions on both EP-Launch and the IDF-Editor as well as some more details on running EnergyPlus manually.
+**Technical Details of Running EnergyPlus** - this section gives full instructions on both EP-Launch and the IDF-Editor as well as some more details on running EnergyPlus manually.
 
 **EP-Compare** - A utility to graphically compare tabular results from multiple simulation files.
 
 Weather Converter Program
 =========================
 
-The Weather Converter program is stored in the EnergyPlus folder area under “PreProcess” and subsequently in the “WeatherConverter” folder.
+The Weather Converter program is stored in the EnergyPlus folder area under "PreProcess" and subsequently in the "WeatherConverter" folder.
 
 To perform annual/run period simulations in EnergyPlus, one needs weather data. Most weather data is still issued in an hour by hour (hourly) format though as you will see, EnergyPlus and its weather converter can accept data that has a finer resolution on the data (such as every 10 or 15 minutes).
 
@@ -61,7 +61,7 @@ The special weather format (EPW) used in EnergyPlus is a simple, ascii format as
 Background
 ----------
 
-All building simulation programs employ some means of representing local climatic conditions relative to the building models. For example, Radiance (Ward 1996) needs a description of sky conditions and illuminance values to calculate solar distribution through a window and within a space. Three of the widely used energy simulation programs in the UK and US, ESP-r (ESRU 1999), BLAST (UI 1998), and DOE-2 (Winkelmann et al. 1993) also use weather conditions to simulate the response of a building. But even after 30 years of significant development advances in simulation capabilities, these programs use the same climate representations as in the past—a simple set of hourly temperature, humidity, wind speed and direction, and atmospheric pressure and solar radiation or cloud cover data. These data are often ‘typical’ data derived from hourly observations at a specific location by the national weather service or meteorological office. Examples of these typical data include TMY2 (NREL 1995) and WYEC2 (ASHRAE 1997) in the United States and Canada and TRY (CEC 1985) in Europe. The TMY2 and WYEC2 typical weather years contain more solar radiation and illumination data than older formats such as TMY (NCDC 1983), WYEC (ASHRAE 1985), and TRY (NCDC 1981) in the U.S. Crawley (1998) demonstrated that the methods used to select data for the US TMY2 and European TRY data sets better fits the long-term climate patterns.
+All building simulation programs employ some means of representing local climatic conditions relative to the building models. For example, Radiance (Ward 1996) needs a description of sky conditions and illuminance values to calculate solar distribution through a window and within a space. Three of the widely used energy simulation programs in the UK and US, ESP-r (ESRU 1999), BLAST (UI 1998), and DOE-2 (Winkelmann et al. 1993) also use weather conditions to simulate the response of a building. But even after 30 years of significant development advances in simulation capabilities, these programs use the same climate representations as in the past-a simple set of hourly temperature, humidity, wind speed and direction, and atmospheric pressure and solar radiation or cloud cover data. These data are often ‘typical’ data derived from hourly observations at a specific location by the national weather service or meteorological office. Examples of these typical data include TMY2 (NREL 1995) and WYEC2 (ASHRAE 1997) in the United States and Canada and TRY (CEC 1985) in Europe. The TMY2 and WYEC2 typical weather years contain more solar radiation and illumination data than older formats such as TMY (NCDC 1983), WYEC (ASHRAE 1985), and TRY (NCDC 1981) in the U.S. Crawley (1998) demonstrated that the methods used to select data for the US TMY2 and European TRY data sets better fits the long-term climate patterns.
 
 Radiation and illumination data are becoming increasingly necessary in simulation programs. Anyone who has ever attempted to measure daylight factors will be familiar with the fluctuations in lighting levels under partly cloudy conditions. The expansion and contraction of lightweight building components also shares sensitivity to rapid fluctuations in solar radiation. Single-sided ventilation is dependant on wind pressure fluctuations and pedestrians in many cities are acquainted with the disarming tendency of the wind to guest and change direction. It is increasingly the case that design questions touch on such issues.
 
@@ -71,26 +71,26 @@ Thus far, projects that mix empirical and simulation-based work have had to stor
 
 The simulation community must also consider practitioner demands and issues of quality assurance. Someone who is not a native of Copenhagen may not know that there are three or four recognizable patterns of winter weather that should be included in detailed assessments. A data set that lacks documentation or is dependent on separately held lists of assumptions can be effectively useless.
 
-In the absence of data within the weather data format, the simulation programs must calculate these data often with older calculation methods. As the simulation programs have become more capable, data at hourly resolution is no longer enough—interpolating between hourly observations does not accurately represent weather conditions that change much more frequently such as illumination.
+In the absence of data within the weather data format, the simulation programs must calculate these data often with older calculation methods. As the simulation programs have become more capable, data at hourly resolution is no longer enough-interpolating between hourly observations does not accurately represent weather conditions that change much more frequently such as illumination.
 
 We have developed a generalized weather data format for use by energy simulation programs has been developed and adopted by both ESP-r (in the UK) and EnergyPlus (in the US). Anticipating the need for data at time steps less than one hour, the format includes a minute field to facilitate the use of sub hourly data. The data include basic location identifiers such as location name, data source, latitude, longitude, time zone, elevation, peak design conditions, holidays, daylight saving period, typical and extreme periods, ground temperatures, period(s) covered by the data and space for descriptive comments. The time step data include dry bulb and dew point temperature, relative humidity, station pressure, solar radiation (global, extraterrestrial, horizontal infrared, direct, and diffuse), illuminance, wind direction and speed, sky cover, and current weather.
 
 Weather Format for Simulation Programs
 --------------------------------------
 
-For these reasons, we developed a generalized weather data format for use with two major simulation programs—ESP-r and EnergyPlus (Crawley et al. 1999). All the data are in SI units. The format is simple, text-based with comma-separated data. It is based on the data available within the TMY2 weather format but has been rearranged to facilitate visual inspection of the data. The TMY2 data are a strict, position-specific format—filling missing data with nines and zero values with zeroes. The new weather data format contains commas to facilitate data reading and analysis with spreadsheet programs. By eliminating redundant ‘fill’ values, the size of each file is only slightly larger than the original TMY2 format. Details about the TMY2 format can be found in the TMY2 User’s manual (see references at the end of this section).
+For these reasons, we developed a generalized weather data format for use with two major simulation programs-ESP-r and EnergyPlus (Crawley et al. 1999). All the data are in SI units. The format is simple, text-based with comma-separated data. It is based on the data available within the TMY2 weather format but has been rearranged to facilitate visual inspection of the data. The TMY2 data are a strict, position-specific format-filling missing data with nines and zero values with zeroes. The new weather data format contains commas to facilitate data reading and analysis with spreadsheet programs. By eliminating redundant ‘fill’ values, the size of each file is only slightly larger than the original TMY2 format. Details about the TMY2 format can be found in the TMY2 User’s manual (see references at the end of this section).
 
 The traditional distribution of data source and uncertainty flags within the raw data fields carries with it not only the need for many field separators, it obfuscates the relationships between non-numerical data. In a set of minute data, which could easily require hundreds of thousands of records, the space penalty is considerable. In the E/E file format, all data source and uncertainty fields have been clumped together as a single field immediately following the day and time stamp. For applications where uncertainty is not an issue such data can be easily ignored. When it is important, a single text field is conceptually and computationally easy to parse.
 
-Another difference between the EnergyPlus/ESP-r (E/E) format and TMY2 is the addition of two new data fields—minute and infrared sky. The minute field facilitates use of data observed at intervals of less than one hour such as measured data from a research study of energy efficiency for a particular building. This will allow easier and more accurate calibration of a simulation model to measured data than possible in the past. The infrared sky field allows the programs to calculate the effective sky temperature for re-radiation during nighttime.
+Another difference between the EnergyPlus/ESP-r (E/E) format and TMY2 is the addition of two new data fields-minute and infrared sky. The minute field facilitates use of data observed at intervals of less than one hour such as measured data from a research study of energy efficiency for a particular building. This will allow easier and more accurate calibration of a simulation model to measured data than possible in the past. The infrared sky field allows the programs to calculate the effective sky temperature for re-radiation during nighttime.
 
-The last difference is that a full year of data (such as 8760 hours) is not required—subsets of years are acceptable. Which periods are covered by the data is described in the files.  Periods of typical weather patterns based on analysis of the data are also included within the format. A side-by-side comparison of data included in the E/E weather format with data previously used by ESP-r, DOE-2, and BLAST is shown in Table 1.  A deficiency noted within ESP-r for example is the lack of correcting air volumes for elevation change—many of the users of ESP-r are in relatively low elevations. For DOE-2 and BLAST, neither program used illumination data in daylighting calculations or infrared sky temperatures—it was always recalculated at time of use.
+The last difference is that a full year of data (such as 8760 hours) is not required-subsets of years are acceptable. Which periods are covered by the data is described in the files.  Periods of typical weather patterns based on analysis of the data are also included within the format. A side-by-side comparison of data included in the E/E weather format with data previously used by ESP-r, DOE-2, and BLAST is shown in Table 1.  A deficiency noted within ESP-r for example is the lack of correcting air volumes for elevation change-many of the users of ESP-r are in relatively low elevations. For DOE-2 and BLAST, neither program used illumination data in daylighting calculations or infrared sky temperatures-it was always recalculated at time of use.
 
 By including the uncertainty and data source information found in TMY2, users now can evaluate the potential impact of weather variability on the performance of the building.
 
 McDonald and Strachan (1998) are introducing uncertainty analysis into ESP-r.
 
-We use the EnergyPlus data dictionary format to describe the E/E weather data set. (See the end of this document). Each line in the format is preceded by a keyword such as LOCATION, DESIGN CONDITIONS, followed by a list of variables beginning either with A or N and a number. A stands for alphanumeric; N for numeric. The number following A/N is the sequence of that number in the keyword list. Commas separate data. (Refer to the IDD Conventions document in “[Input Output Reference](InputOutputReference.pdf)” for further explanation of the format). The header information consists of eight lines (keywords):  LOCATION, DESIGN CONDITIONS, TYPICAL/EXTREME PERIODS, GROUND TEMPERATURES, HOLIDAYS/DAYLIGHT SAVINGS, COMMENTS 1, COMMENTS 2, and DATA PERIODS. This is followed by the time step data.
+We use the EnergyPlus data dictionary format to describe the E/E weather data set. (See the end of this document). Each line in the format is preceded by a keyword such as LOCATION, DESIGN CONDITIONS, followed by a list of variables beginning either with A or N and a number. A stands for alphanumeric; N for numeric. The number following A/N is the sequence of that number in the keyword list. Commas separate data. (Refer to the IDD Conventions document in "[Input Output Reference](InputOutputReference.pdf)" for further explanation of the format). The header information consists of eight lines (keywords):  LOCATION, DESIGN CONDITIONS, TYPICAL/EXTREME PERIODS, GROUND TEMPERATURES, HOLIDAYS/DAYLIGHT SAVINGS, COMMENTS 1, COMMENTS 2, and DATA PERIODS. This is followed by the time step data.
 
 The first eight lines or header within each E/E weather file define basic location information such as longitude, latitude, time zone, elevation, annual design conditions, monthly average ground temperatures, typical and extreme periods, holidays/daylight saving periods, and data periods included. There is also space for users to document any special features or information about the file such as sources of data.
 
@@ -99,7 +99,7 @@ Weather Data Availability
 
 Typically, acquisition of weather data has been a user’s burden. Though this will remain the case in many instances for EnergyPlus users, the EnergyPlus team has been successful in making a wealth of US, Canadian and International data available to our users. To summarize, the weather data for 2092 locations is available at the EnergyPlus web site: [www.energyplus.gov](http://www.energyplus.gov)
 
-The details are shown in Table 18. Summary of Downloadable Weather Data by Type.   This data has been selected with the energy simulation user in mind. All the data (as well as the statistical reports – described later in this document) are downloadable for individual locations.
+The details are shown in Table 18. Summary of Downloadable Weather Data by Type.   This data has been selected with the energy simulation user in mind. All the data (as well as the statistical reports - described later in this document) are downloadable for individual locations.
 
 Table 1. Comparison of E/E with ESP-r/DOE-2/BLAST Weather Data Formats
 
@@ -343,7 +343,7 @@ Table 1. Comparison of E/E with ESP-r/DOE-2/BLAST Weather Data Formats
     <td></td>
   </tr>
   <tr>
-    <td>�Undisturbed� Ground temperatures (monthly)</td>
+    <td>"Undisturbed" Ground temperatures (monthly)</td>
     <td>X</td>
     <td></td>
     <td></td>
@@ -412,11 +412,11 @@ Using the Weather Converter
 
 We developed a utility for the E/E format to read standard weather service file types such as SAMSON and newer ‘typical year’ weather files such as TMY2, WYEC2, and IWEC. The utility also reads ESP-r (CLM format), DOE-2 (fmt format), BLAST (Ascii format) files and other files.
 
-The utility translates and extends typical weather data into the E/E format. The processor makes the calculations necessary for supplying data (when data is missing) and calculates the Horizontal Infrared Radiation Intensity values—not typically currently an observed value reported by the meteorological offices through the world. The utility also prepares an statistical summary of the weather data set as part of the processing. An additional “output format” from the utility is a comma-delimited file that can easily be imported into a spreadsheet program such as Excel™ for further user perusal, charting and/or editing.
+The utility translates and extends typical weather data into the E/E format. The processor makes the calculations necessary for supplying data (when data is missing) and calculates the Horizontal Infrared Radiation Intensity values-not typically currently an observed value reported by the meteorological offices through the world. The utility also prepares an statistical summary of the weather data set as part of the processing. An additional "output format" from the utility is a comma-delimited file that can easily be imported into a spreadsheet program such as Excel™ for further user perusal, charting and/or editing.
 
 The utility consists of two parts: a user interface that executes on standard Wintel systems and a DLL that does the work of the processing. The DLL interface is described in a later section for those developers who might wish to access it directly.
 
-The user front end is a simple to use program with standard graphical user interface menus. It is executed from the Start Menu programs using the specific folder where the EnergyPlus program was installed. (e.g., Start Menu -&gt; EnergyPlus &lt;version&gt; -&gt; WeatherConverter). For convenience, it automatically opens with the “convert” option.
+The user front end is a simple to use program with standard graphical user interface menus. It is executed from the Start Menu programs using the specific folder where the EnergyPlus program was installed. (e.g., Start Menu -&gt; EnergyPlus &lt;version&gt; -&gt; WeatherConverter). For convenience, it automatically opens with the "convert" option.
 
 EP-Launch can also be used to run the weather utility program.  Weather is one of the options on the Utilities tab in EP-Launch. See the section on EP-Launch in this document for more information on how to use EP-Launch with the weather utility program.
 
@@ -432,17 +432,17 @@ The file menu has four options:
 
 #### Fix Out of Range Data
 
-This is a toggle option that once selected is saved in the registry with other options (for example, screen size) for the program. As shown in the IDD type description of the Weather Data, there are minimum and maximum values for several of the fields. The weather converter program can ignore these (and just report them) or it can try to fix them with appropriate values. If the option is “checked”, then the processor will try to fix the data; if it is blank, the processor will not fix the data though it will report any out of range data that it finds.
+This is a toggle option that once selected is saved in the registry with other options (for example, screen size) for the program. As shown in the IDD type description of the Weather Data, there are minimum and maximum values for several of the fields. The weather converter program can ignore these (and just report them) or it can try to fix them with appropriate values. If the option is "checked", then the processor will try to fix the data; if it is blank, the processor will not fix the data though it will report any out of range data that it finds.
 
 #### Select Delta DB Trigger
 
-Depending on the quality control and accuracy of the weather data collection, time period (usually hour to hour) changes in some data values may make the data suspect for that time period. This selection brings up the screen shown below and will allow the user some control over the actual value reporting. Note that this data is not “fixed”, merely reported by the program in the audit output file.
+Depending on the quality control and accuracy of the weather data collection, time period (usually hour to hour) changes in some data values may make the data suspect for that time period. This selection brings up the screen shown below and will allow the user some control over the actual value reporting. Note that this data is not "fixed", merely reported by the program in the audit output file.
 
 ![](AuxiliaryPrograms/media/image002.jpg)
 
 Figure 2. Delta DB Trigger Selection
 
-Though only one “trigger” value is selected from this screen, consecutive values of dry-bulb temperature, dew-point temperature and wind speed are reported using appropriate calculated values. Both dew-point and wind speed use a calculated value based on mean of their values over the entire data period and standard deviation from that mean, heuristically derived.
+Though only one "trigger" value is selected from this screen, consecutive values of dry-bulb temperature, dew-point temperature and wind speed are reported using appropriate calculated values. Both dew-point and wind speed use a calculated value based on mean of their values over the entire data period and standard deviation from that mean, heuristically derived.
 
 An excerpt from the audit file is illustrative:
 
@@ -482,7 +482,7 @@ This choice exits the program.
 
 ### Converting Data
 
-This screen is automatically shown when you start the program - it will allow you to select raw data for processing, change the default type (based on file extension), select the kind of conversion you want, select where and what name to store for the processed data, and process the data. An “almost” completed screen shows:
+This screen is automatically shown when you start the program - it will allow you to select raw data for processing, change the default type (based on file extension), select the kind of conversion you want, select where and what name to store for the processed data, and process the data. An "almost" completed screen shows:
 
 ![](AuxiliaryPrograms/media/image003.jpg)
 
@@ -509,7 +509,7 @@ Table 2. Input File Extensions with implied Data types
   </tr>
   <tr>
     <td>&lt;any&gt; or CST</td>
-    <td>Custom � must have �def� file as specified below</td>
+    <td>Custom - must have "def" file as specified below</td>
   </tr>
   <tr>
     <td>EPW</td>
@@ -561,11 +561,11 @@ Table 2. Input File Extensions with implied Data types
   </tr>
 </table>
 
-Of course, the “all files” (\*.\*) may be used as well. If the file selected is not one of the above types, you will be cautioned to use the “override default type” button to select the correct type before proceeding. Most of the data file types are described in other publications and won’t be described in detail here.
+Of course, the "all files" (\*.\*) may be used as well. If the file selected is not one of the above types, you will be cautioned to use the "override default type" button to select the correct type before proceeding. Most of the data file types are described in other publications and won’t be described in detail here.
 
-Note on the input CSV format:  It is the EPW CSV format. The CSV format must mirror the output CSV format very closely. The processor expects a Location header record and the headers for the data fields as a minimum (as well as the data that supports those header fields). If you have a differently formatted file, possible comma delimited, investigate the “custom” format option.
+Note on the input CSV format:  It is the EPW CSV format. The CSV format must mirror the output CSV format very closely. The processor expects a Location header record and the headers for the data fields as a minimum (as well as the data that supports those header fields). If you have a differently formatted file, possible comma delimited, investigate the "custom" format option.
 
-The LST data type allows you to specify a list of files to be “batch processed”. The format of this file is very simple (however, the default extensions from the preceding table **must** be used **or** you must include a “def” file – see below for details).
+The LST data type allows you to specify a list of files to be "batch processed". The format of this file is very simple (however, the default extensions from the preceding table **must** be used **or** you must include a "def" file - see below for details).
 
 Each line of the LST file can have a columnar structure as shown in the following table or can have the input file separated from the output file with a TAB character.
 
@@ -585,10 +585,10 @@ Table 3. LST File Structure
 <tr>
 <td>46-105 (or follow the first name with a {TAB})</td>
 <td>Output File with:
-EPW – same as output type “EPW”
-CSV – same as output type “CSV”
-Both – same as output type “both”
-Rpt – same as output type “rpt”</td>
+EPW - same as output type "EPW"
+CSV - same as output type "CSV"
+Both - same as output type "both"
+Rpt - same as output type "rpt"</td>
 </tr>
 <tr>
 <td>106-end (or follow the second name with a {TAB})</td>
@@ -598,11 +598,11 @@ Rpt – same as output type “rpt”</td>
 
 #### Definitions File
 
-An auxiliary file, the Definitions File (extension .def) can be used to specify additional or replacement characteristics for the incoming data. This file is fully described in the section “Definitions File & Custom File Processing” later in this document.
+An auxiliary file, the Definitions File (extension .def) can be used to specify additional or replacement characteristics for the incoming data. This file is fully described in the section "Definitions File & Custom File Processing" later in this document.
 
 #### Override Default Type
 
-This button is used as described above to select the correct data type for a file that might have one of the standard “default” extensions but may, in fact, be a data file of an entirely different type. For example, the BLAST ASCII files as they exist on the BLAST CD have extensions of .dat – our default type for the SAMSON data. You must select the proper data type for your data or the processor probably won’t work anywhere near what you expect.
+This button is used as described above to select the correct data type for a file that might have one of the standard "default" extensions but may, in fact, be a data file of an entirely different type. For example, the BLAST ASCII files as they exist on the BLAST CD have extensions of .dat - our default type for the SAMSON data. You must select the proper data type for your data or the processor probably won’t work anywhere near what you expect.
 
 #### Select Output Format
 
@@ -610,44 +610,44 @@ You may select from four options of output format:
 
 - EPW Format  -- both an epw file and a statistical report file are produced
 
-- CSV Format – both a csv file and a statistical report file are produced
+- CSV Format - both a csv file and a statistical report file are produced
 
-- Both EPW and CSV – epw, csv, and statistical report files are produced
+- Both EPW and CSV - epw, csv, and statistical report files are produced
 
-- Rpt only – only a statistical report file is produced (output extension is “stat”)
+- Rpt only - only a statistical report file is produced (output extension is "stat")
 
-Note that the CSV file is very similar to the EPW format file but is ready to be imported into a spreadsheet program such as Excel™ and has some additional “header” records in front of each EPW style header record
+Note that the CSV file is very similar to the EPW format file but is ready to be imported into a spreadsheet program such as Excel™ and has some additional "header" records in front of each EPW style header record
 
 #### Save File As…
 
-This button allows you to select the location to save your file set from the output format selection. The utility automatically places a “data type” extension on the file name to show its original data file type.
+This button allows you to select the location to save your file set from the output format selection. The utility automatically places a "data type" extension on the file name to show its original data file type.
 
-Note on Save As…  Since you select the “save as” file name from a dialog, the processor DOES NOT warn you of overwriting previous files of the same name. In addition, if you have previously saved several types (e.g. EPW and CSV) but this time only save the RPT – it DOES NOT create new of the others nor does it delete the previous ones.
+Note on Save As…  Since you select the "save as" file name from a dialog, the processor DOES NOT warn you of overwriting previous files of the same name. In addition, if you have previously saved several types (e.g. EPW and CSV) but this time only save the RPT - it DOES NOT create new of the others nor does it delete the previous ones.
 
 #### Convert File
 
-Pressing this button causes the processing of the data to proceed. If you choose a “.lst” input format, you will see messages as each once is completed and/or has errors. If you choose a single data file, you will see a similar message box once the processing is done (or has terminated due to errors).
+Pressing this button causes the processing of the data to proceed. If you choose a ".lst" input format, you will see messages as each once is completed and/or has errors. If you choose a single data file, you will see a similar message box once the processing is done (or has terminated due to errors).
 
 ### Help
 
-No online help is available. This brings up an “about” box for the program.
+No online help is available. This brings up an "about" box for the program.
 
 Definitions File & Custom File Processing
 -----------------------------------------
 
-### Description of “Def” input file
+### Description of "Def" input file
 
-Some of the data formats have inherent omissions (e.g. TMY does not have location data, BLAST ASCII does not have elevations). In order to overcome this limitation and to provide further flexibility, a definitions file (extension must be .def) is implemented. By naming this with the same “file name” as your input file (in the same folder), the weather converter will read the format and use that data, as appropriate, in the file conversions. The .def file uses Fortran “Namelist” input fields as shown in the example below. For flexibility, you can also define a “presets.def” file (such as when you have a list of files to process and the format or some portion is all the same between the group of files. The two def files (one named the same as the file name for the raw data and one named presets.def) will both be processed. Conflicts between the two will be shown in the .audit file. The set of namelist groups is:
+Some of the data formats have inherent omissions (e.g. TMY does not have location data, BLAST ASCII does not have elevations). In order to overcome this limitation and to provide further flexibility, a definitions file (extension must be .def) is implemented. By naming this with the same "file name" as your input file (in the same folder), the weather converter will read the format and use that data, as appropriate, in the file conversions. The .def file uses Fortran "Namelist" input fields as shown in the example below. For flexibility, you can also define a "presets.def" file (such as when you have a list of files to process and the format or some portion is all the same between the group of files. The two def files (one named the same as the file name for the raw data and one named presets.def) will both be processed. Conflicts between the two will be shown in the .audit file. The set of namelist groups is:
 
-- &location – Location data
+- &location - Location data
 
-- &miscdata – Comments to be applied to “COMMENT2” in the EPW file and “Source Data”
+- &miscdata - Comments to be applied to "COMMENT2" in the EPW file and "Source Data"
 
-- &wthdata –  weather data specifications including file type, custom formats
+- &wthdata -  weather data specifications including file type, custom formats
 
-- &datacontrol – user specified control over “missing” data (Custom format only)
+- &datacontrol - user specified control over "missing" data (Custom format only)
 
-**Note that the “Def” formats are entirely different from the usual IDF formats of EnergyPlus.  No commas separate fields.  No semicolon terminates the entry.**
+**Note that the "Def" formats are entirely different from the usual IDF formats of EnergyPlus.  No commas separate fields.  No semicolon terminates the entry.**
 
     &location
     City='Hong Kong'
@@ -665,11 +665,11 @@ Some of the data formats have inherent omissions (e.g. TMY does not have locatio
     SourceData=’Original xyz data’
     /
 
-The “slash” (/) character terminating each block is very important – omissions results in incorrect reading of data.
+The "slash" (/) character terminating each block is very important - omissions results in incorrect reading of data.
 
-Definitions File Details are shown in the following table. You may leave out a field if you wish – the program will use whatever default is applicable (or usable) from the data format. All data formats accept this additional file. Only Custom format currently uses the &datacontrol element. And only Custom format input type uses the Data Elements, Format and Conversion factors from the &wthdata element.
+Definitions File Details are shown in the following table. You may leave out a field if you wish - the program will use whatever default is applicable (or usable) from the data format. All data formats accept this additional file. Only Custom format currently uses the &datacontrol element. And only Custom format input type uses the Data Elements, Format and Conversion factors from the &wthdata element.
 
-Note that strings in the “def” should be enclosed in single quotes if there is more than one word in the string – if only one word, quotes do not need to be used.
+Note that strings in the "def" should be enclosed in single quotes if there is more than one word in the string - if only one word, quotes do not need to be used.
 
 Table 4. Definitions File &location description
 
@@ -725,7 +725,7 @@ Table 4. Definitions File &location description
 
 #### Fields: City, StateProv, Country
 
-These fields are string variables. If Country is *not* included, an attempt to use the State/Prov entry may be used to determine country. Otherwise, these fields are not validated and are used to create part of the “location” header record in the EPW file. City can be up to 30 characters in length; StateProv up to 15 characters; Country up to 10 characters (standard 3 character abbreviation preferred).
+These fields are string variables. If Country is *not* included, an attempt to use the State/Prov entry may be used to determine country. Otherwise, these fields are not validated and are used to create part of the "location" header record in the EPW file. City can be up to 30 characters in length; StateProv up to 15 characters; Country up to 10 characters (standard 3 character abbreviation preferred).
 
 #### Fields: InLat, InLong
 
@@ -733,15 +733,15 @@ These fields are decimal equivalent for Latitude and Longitude. The convention i
 
 #### Field: InTime
 
-This field is the decimal equivalent for the Time Zone value. The convention is GMT +/-. That is, if your time zone is “behind” GMT time by 6 hours, your input would be –6.
+This field is the decimal equivalent for the Time Zone value. The convention is GMT +/-. That is, if your time zone is "behind" GMT time by 6 hours, your input would be -6.
 
 #### Field: InElev
 
-This field is the location elevation in meters. Range can be from –300 to 6096. (These are the values from EnergyPlus – there is no validation of these in the weather converter.)
+This field is the location elevation in meters. Range can be from -300 to 6096. (These are the values from EnergyPlus - there is no validation of these in the weather converter.)
 
 #### Field: InWMO
 
-This field is the WMO (World Meterological Organization) number for the location. Though not validated per se, if found in the “design conditions” auxiliary files, the Design Day information can be generated.
+This field is the WMO (World Meterological Organization) number for the location. Though not validated per se, if found in the "design conditions" auxiliary files, the Design Day information can be generated.
 
 Table 5. Definitions File - &miscdata description
 
@@ -781,7 +781,7 @@ These are strings. After concatenation, they become part of the comment header l
 
 #### Field: SourceData
 
-This string is applied to the “Source Data” field in the Location Header. Up to 60 characters is allowed.
+This string is applied to the "Source Data" field in the Location Header. Up to 60 characters is allowed.
 
 #### Field: OutputURL
 
@@ -828,7 +828,7 @@ Table 6. Definitions file - &wthdata description
   <tr>
     <td>Format for input</td>
     <td>InFormat</td>
-    <td>Format String or �delimited�</td>
+    <td>Format String or "delimited"</td>
   </tr>
   <tr>
     <td>Delimiter Character</td>
@@ -851,7 +851,7 @@ Table 6. Definitions file - &wthdata description
 
 #### Field: InputFileType
 
-You can always use this field and def file to “override” the default input format type that depends on the extension of your file (see Table 2. Input File Extensions with implied Data types). A complete set of valid values for Input File types is shown in the following table. Data Files are described more fully in the section Source Weather Data Formats that occurs later in this document.
+You can always use this field and def file to "override" the default input format type that depends on the extension of your file (see Table 2. Input File Extensions with implied Data types). A complete set of valid values for Input File types is shown in the following table. Data Files are described more fully in the section Source Weather Data Formats that occurs later in this document.
 
 Table 7. Input File Type Values
 
@@ -916,13 +916,13 @@ Table 7. Input File Type Values
 
 #### Field: NumInHour
 
-This field can be used to specify multi-interval (per hour) files. Without this field, the only formats that can have multiple intervals per hour are the EPW and CSV file formats – using the header record DataPeriods value for that field.
+This field can be used to specify multi-interval (per hour) files. Without this field, the only formats that can have multiple intervals per hour are the EPW and CSV file formats - using the header record DataPeriods value for that field.
 
-#### Fields below only used in “Custom” format processing
+#### Fields below only used in "Custom" format processing
 
 #### Field: DataElements
 
-For custom files, you will need to indicate which data elements are in which positions of the raw data file. The fields must come from a standardized list of names see following tables that include internal names (short and long – as shown in Table 8) as well as the EnergyPlus CSV format names (short and long – shown in Table 9) plus some further elements that can be specified when the standard data elements are not part of the raw data (as shown in Table 10). “Ignore” is used to skip a raw data field that is not applicable to the weather converter formats. Note that variables listed in the following table (in italics) are allowed for flexibility – i.e. wetbulb temperature can be used to determine relative humidity and/or dewpoint temperature. The following three tables illustrate the names for data elements.
+For custom files, you will need to indicate which data elements are in which positions of the raw data file. The fields must come from a standardized list of names see following tables that include internal names (short and long - as shown in Table 8) as well as the EnergyPlus CSV format names (short and long - shown in Table 9) plus some further elements that can be specified when the standard data elements are not part of the raw data (as shown in Table 10). "Ignore" is used to skip a raw data field that is not applicable to the weather converter formats. Note that variables listed in the following table (in italics) are allowed for flexibility - i.e. wetbulb temperature can be used to determine relative humidity and/or dewpoint temperature. The following three tables illustrate the names for data elements.
 
 Table 8. Internal Data Element Names (directly applicable to EPW)
 
@@ -1431,7 +1431,7 @@ If you have direct horizontal radiation (and at least one other solar element fr
 
 #### Interval
 
-If your “number of records per hour” is &gt;1, then you can designate each interval of that hour with this field.
+If your "number of records per hour" is &gt;1, then you can designate each interval of that hour with this field.
 
 #### Hour\_Of\_Year
 
@@ -1443,7 +1443,7 @@ Time can be entered (rather than hour) and the units must be hh:mm; this is then
 
 #### Date
 
-Dates can be entered as month, day, and year.  The units field must be entered and should designate the format for the date decoding. Date separator characters for this field are entered in the DateSeparator item. Default date separator is “/” and that is what is used in the table that shows the allowable units:
+Dates can be entered as month, day, and year.  The units field must be entered and should designate the format for the date decoding. Date separator characters for this field are entered in the DateSeparator item. Default date separator is "/" and that is what is used in the table that shows the allowable units:
 
 Table 11. Allowable date formats for Custom Data entries.
 
@@ -1474,7 +1474,7 @@ Table 11. Allowable date formats for Custom Data entries.
 
 #### Field: DataUnits
 
-There should be as many DataUnits entries as DataElement entries. These are not generally used but may be used in the future for automatic conversions. The exception to this is “temperature” fields. Use “f” for Fahrenheit, “k” for Kelvin temperatures. Note that the DataConversionFactor for this field will be applied prior to conversion. (Many formats use integer numbers to represent values that are in tenths, for example.)
+There should be as many DataUnits entries as DataElement entries. These are not generally used but may be used in the future for automatic conversions. The exception to this is "temperature" fields. Use "f" for Fahrenheit, "k" for Kelvin temperatures. Note that the DataConversionFactor for this field will be applied prior to conversion. (Many formats use integer numbers to represent values that are in tenths, for example.)
 
 #### Field: DataConversionFactors
 
@@ -1482,23 +1482,23 @@ There should be as many DataConversionFactors entries as DataElement entries. Th
 
 #### Field: DataMissingValues
 
-There should be as many entries (though some can be blank) as DataElement entries. The values entered will override the default “missing” values (from the EPW data dictionary) and, whereas the defaults may be interpreted as a &gt;= missing value (i.e. &gt;= 999), these values will be exact (i.e. = -999.)
+There should be as many entries (though some can be blank) as DataElement entries. The values entered will override the default "missing" values (from the EPW data dictionary) and, whereas the defaults may be interpreted as a &gt;= missing value (i.e. &gt;= 999), these values will be exact (i.e. = -999.)
 
 #### Field: InFormat
 
-The value in this field should be “delimited” if you are using a free format data file or specify a “Fortran style” format statement.
+The value in this field should be "delimited" if you are using a free format data file or specify a "Fortran style" format statement.
 
 #### Field: DelimiterChar
 
-If you use a “delimited” format file, you need to specify a delimiter character. Only a single character may be specified.
+If you use a "delimited" format file, you need to specify a delimiter character. Only a single character may be specified.
 
 #### Field: DecimalSymbolChar
 
-A single character can be used to specify the decimal “point” character. Default is the US Standard “.”. With use of DelimiterChar and this field, one can essentially use the fields to specify European Standard Excel export formats.
+A single character can be used to specify the decimal "point" character. Default is the US Standard ".". With use of DelimiterChar and this field, one can essentially use the fields to specify European Standard Excel export formats.
 
 #### Field: DateSeparator
 
-If you are entering the aforementiond “date” Data Element and your date separator is a character other than slash (“/”), then you need to enter a single character so the program can interpret your date entries.
+If you are entering the aforementiond "date" Data Element and your date separator is a character other than slash ("/"), then you need to enter a single character so the program can interpret your date entries.
 
 Table 12. Definitions file - &datacontrol description
 
@@ -1541,7 +1541,7 @@ Table 12. Definitions file - &datacontrol description
   <tr>
     <td>Missing Opaque Sky Cover Value</td>
     <td>MissingOpaqueSkyCoverValue</td>
-    <td>Real (Value 0.0 to 10.0) � tenths of sky cover</td>
+    <td>Real (Value 0.0 to 10.0) - tenths of sky cover</td>
   </tr>
   <tr>
     <td>Maximum Wind Speed</td>
@@ -1589,17 +1589,17 @@ This is an integer number of records to read (typically 8760 for a full year). Y
 
 #### Fields: MissingDataAction, MissingWindDirAction, MissingOpaqueSkyCoverAction
 
-These fields tell the converter program what to do with “missing” data. Missing data can be found in two forms:  totally not included in the DataElements or a missing value (as defined in the EPW format). Valid values for these fields are:
+These fields tell the converter program what to do with "missing" data. Missing data can be found in two forms:  totally not included in the DataElements or a missing value (as defined in the EPW format). Valid values for these fields are:
 
-- DEFAULT – use the default processing that the weather converter already uses – starts off with a specific value and updates if data is found.
+- DEFAULT - use the default processing that the weather converter already uses - starts off with a specific value and updates if data is found.
 
-- CONSTANT – use a constant value to replace all missing data
+- CONSTANT - use a constant value to replace all missing data
 
-- RANDOM – use a random number to generate the missing data
+- RANDOM - use a random number to generate the missing data
 
 An additional value for MissingOpaqueSkyCoverAction is:
 
-- TOTALSKY – use the value for Total Sky Cover
+- TOTALSKY - use the value for Total Sky Cover
 
 #### Fields: MissingWindDirValue, MissingOpaqueSkyCoverValue
 
@@ -1607,11 +1607,11 @@ The values specified in this field are used with the action fields previously me
 
 #### Field: MaxWindSpeed
 
-The default maximum wind speed (40m/s) may not be enough for some locations – this allows the override capability.
+The default maximum wind speed (40m/s) may not be enough for some locations - this allows the override capability.
 
 #### Field: MaxDirectSolar, MaxDiffuseSolar, MaxIlluminanceValue
 
-Default maximum solar values may not be enough for some locations – this allows the override capability.
+Default maximum solar values may not be enough for some locations - this allows the override capability.
 
 #### Field: GenerateSolarRadiationWarnings, GenerateIlluminanceWarnings
 
@@ -1619,9 +1619,9 @@ If you don’t want to see extra warnings when input values are greater than max
 
 ### Def File Examples
 
-In the following examples, every attempt has been made to make sure that these work with the Weather Converter program. However, we cannot foresee all possible combinations. **Caveat emptor – user beware.**
+In the following examples, every attempt has been made to make sure that these work with the Weather Converter program. However, we cannot foresee all possible combinations. **Caveat emptor - user beware.**
 
-Here’s an example where the delimiter between fields is a semi-colon (;) and the decimal symbol character is a comma (,) – typical of some non-USA regional settings:
+Here’s an example where the delimiter between fields is a semi-colon (;) and the decimal symbol character is a comma (,) - typical of some non-USA regional settings:
 
     &location
     City=&lt;cityname&gt;
@@ -1656,7 +1656,7 @@ Figure 4. DEF file for with non-standard field delimiter and decimal symbol
 
 
 
-Here’s an example of a file used to “enhance” a DOE-2 FMT file:
+Here’s an example of a file used to "enhance" a DOE-2 FMT file:
 
     &location
     City='Kelburn'
@@ -1718,7 +1718,7 @@ Figure 6. DEF file for formatted custom file.
 
 
 
-An example of a free format custom file. Here, there were several lines of text after the numeric data at the end of the file – thus we used the number of records to read parameter rather than hand editing each input file.
+An example of a free format custom file. Here, there were several lines of text after the numeric data at the end of the file - thus we used the number of records to read parameter rather than hand editing each input file.
 
     &location
     City='Beijing'
@@ -1755,7 +1755,7 @@ Figure 7. DEF File for delimited custom file.
 
 
 
-Suppose you have a file that is “almost” TMY2 format. You can easily specify a Def file to treat it as a custom file rather than a TMY2 file (which, by standards, will have the data filled).
+Suppose you have a file that is "almost" TMY2 format. You can easily specify a Def file to treat it as a custom file rather than a TMY2 file (which, by standards, will have the data filled).
 
     &location
     City=&lt;cityname&gt;
@@ -1832,9 +1832,9 @@ Figure 9. DEF File for EPW files.
 
 ### Custom File Processing
 
-In “normal” file processing, conversion from the input data elements to the EPW data elements is automatic. In “custom” file processing, there is limited flexibility in this regard. For example, the user may use “wet bulb” temperature in their inputs – this will allow the weather converter to calculate appropriate values for dew point temperature (if it is missing) and/or relative humidity. Again, limited calculations/derivations are done – should one input wet bulb temperature along with dew point temperature and relative humidity. Likewise, if only values for global horizontal radiation and diffuse horizontal radiation are given, the program will calculate a value for direct normal radiation using commonly recognized relationships between these values.
+In "normal" file processing, conversion from the input data elements to the EPW data elements is automatic. In "custom" file processing, there is limited flexibility in this regard. For example, the user may use "wet bulb" temperature in their inputs - this will allow the weather converter to calculate appropriate values for dew point temperature (if it is missing) and/or relative humidity. Again, limited calculations/derivations are done - should one input wet bulb temperature along with dew point temperature and relative humidity. Likewise, if only values for global horizontal radiation and diffuse horizontal radiation are given, the program will calculate a value for direct normal radiation using commonly recognized relationships between these values.
 
-### Custom File Processing – Solar Radiation Value Calculation
+### Custom File Processing - Solar Radiation Value Calculation
 
 EnergyPlus only uses the solar radiation data for Direct Normal and Diffuse Horizontal radation in its calculations. But many data sources have only Global Horizontal (sometimes called Total) or none of the solar radiation elements.
 
@@ -1867,9 +1867,9 @@ Figure 11. Comparison of IWEC vs Weather program Solar Model (Singapore)
 Reports/Files Produced by the Weather Converter
 -----------------------------------------------
 
-Minimally, two outputs are produced for every weather converter run: an audit / log file and a statistical report file. The audit / log file shows details of the processing (including any errors) as well as the statistical report. The statistical report produced from the weather conversion process is a short, but complete, picture of the weather data on the file. A single file (.stat extension) is produced of the “statistics” about the data file. A feature of the weather converter is to look in several design condition files for possible design conditions for the location from the stored design condition files (source: ASHRAE Handbook of Fundamentals, 2001). If found (WMO (World Meteorological Organization) id is used for matching), these will be shown in the report as well as included in the output data files (EPW and CSV, as applicable). In addition, the Köppen classification scheme is used to characterize the climate based on the data file’s contents. Other statistics are given as well to help you visualize the data.
+Minimally, two outputs are produced for every weather converter run: an audit / log file and a statistical report file. The audit / log file shows details of the processing (including any errors) as well as the statistical report. The statistical report produced from the weather conversion process is a short, but complete, picture of the weather data on the file. A single file (.stat extension) is produced of the "statistics" about the data file. A feature of the weather converter is to look in several design condition files for possible design conditions for the location from the stored design condition files (source: ASHRAE Handbook of Fundamentals, 2001). If found (WMO (World Meteorological Organization) id is used for matching), these will be shown in the report as well as included in the output data files (EPW and CSV, as applicable). In addition, the Köppen classification scheme is used to characterize the climate based on the data file’s contents. Other statistics are given as well to help you visualize the data.
 
-In the “reporting” section of the file, each line contains “tab-delimited” elements. This will allow you to easily place the data into a spreadsheet program for further refinement but the tabs are not as intrusive for “normal viewing” as commas.
+In the "reporting" section of the file, each line contains "tab-delimited" elements. This will allow you to easily place the data into a spreadsheet program for further refinement but the tabs are not as intrusive for "normal viewing" as commas.
 
 ### Audit / Log File
 
@@ -1951,7 +1951,7 @@ As an example, the initial portion of an audit file is shown (illustrating the e
 
 ### Statistical Report File
 
-As will be seen in comparison with a “statistical” report shown following, the audit file may contain some details about the data that the statistical report does not (such as the data years for the weather data). Some basic statistics are shown first:
+As will be seen in comparison with a "statistical" report shown following, the audit file may contain some details about the data that the statistical report does not (such as the data years for the weather data). Some basic statistics are shown first:
 
 **Statistics for USA\_CA\_San.Francisco.Intl.AP.724940\_TMY3**
 
@@ -2837,7 +2837,7 @@ Solar Radiation
 
 
 
-The program calculated “undisturbed” ground temperatures:
+The program calculated "undisturbed" ground temperatures:
 
 **- Monthly Calculated "undisturbed" Ground Temperatures\*\* °C**
 
@@ -2859,7 +2859,7 @@ The program calculated “undisturbed” ground temperatures:
 
 -   Calculations use a standard soil diffusivity of 2.3225760E-03 {m\*\*2/day}
 
-As noted in the above statistics calculation, the “undisturbed” ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the GroundTemperatures:Surface and GroundTemperatures:Deep objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
+As noted in the above statistics calculation, the "undisturbed" ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the GroundTemperatures:Surface and GroundTemperatures:Deep objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
 
 Heating/cooling degree days from the weather file are shown.  Long term heating/cooling degree days are shown earlier if available from ASHRAE HOF for the location/WMO.
 
@@ -2978,11 +2978,11 @@ And these can be easily used to produce graphs:
 
 ### Design Day Calculations Output
 
-Using the WMO field (or determining it from the WBAN field), the Weather Converter performs table look up in the Design Condition files to see if there are recorded design conditions for the subject location. If this location is found, then design day objects are produced on the resultant design day object (ddy extension) file – ready for inclusion into an EnergyPlus input data file. If no design conditions are located, then the design day object file will still include a location object for inclusion with EnergyPlus. However, statistics using the weather file are displayed to the statistics file – these “can” be used to create your own design day definitions but you should read the warning that is issued and take care if your weather file is only a “single instance” weather data representation.
+Using the WMO field (or determining it from the WBAN field), the Weather Converter performs table look up in the Design Condition files to see if there are recorded design conditions for the subject location. If this location is found, then design day objects are produced on the resultant design day object (ddy extension) file - ready for inclusion into an EnergyPlus input data file. If no design conditions are located, then the design day object file will still include a location object for inclusion with EnergyPlus. However, statistics using the weather file are displayed to the statistics file - these "can" be used to create your own design day definitions but you should read the warning that is issued and take care if your weather file is only a "single instance" weather data representation.
 
-The location objects as well as the design condition objects are constrained by the data source. Some data sources do not have elevation information – thus, a location object from such a source will have an elevation of 0.0. Likewise, the time zone of some locations may not be available from the source data nor other data resources that the weather converter uses. A time zone will be estimated from the standard meridian of the location (determined by the longitude) but it may not be accurate. A user needs to be aware of these limitations when taking the design day files from the weather converter.
+The location objects as well as the design condition objects are constrained by the data source. Some data sources do not have elevation information - thus, a location object from such a source will have an elevation of 0.0. Likewise, the time zone of some locations may not be available from the source data nor other data resources that the weather converter uses. A time zone will be estimated from the standard meridian of the location (determined by the longitude) but it may not be accurate. A user needs to be aware of these limitations when taking the design day files from the weather converter.
 
-Note that you can always include a “def” file with this data to assure accuracy regardless of input format limitations.
+Note that you can always include a "def" file with this data to assure accuracy regardless of input format limitations.
 
 An excerpt of a design day output is shown in the following (actual design day objects have been deleted for brevity). Note that with the 2009 ASHRAE HOF climate conditions, a possible DaylightSavingPeriod object may be included.
 
@@ -3118,9 +3118,9 @@ An excerpt of a design day output is shown in the following (actual design day o
 
 
 
-Design day “definitions” originate in the ASHRAE Handbook of Fundamentals. Prior to 1997, these conditions were described for winter and summer (heating and cooling). They were based on seasonal percentages.
+Design day "definitions" originate in the ASHRAE Handbook of Fundamentals. Prior to 1997, these conditions were described for winter and summer (heating and cooling). They were based on seasonal percentages.
 
-EnergyPlus uses the design day object values and creates an entire day of weather data – this is described more fully in the Input Output Reference under the **DesignDay** object. The weather converter program assigns “SummerDesignDay” and “WinterDesignDay” day types by default – these day types influence “scheduling” of various elements. How to use these effectively is described during the **DesignDay** and **Schedule** objects discussions in the Input Output Reference.
+EnergyPlus uses the design day object values and creates an entire day of weather data - this is described more fully in the Input Output Reference under the **DesignDay** object. The weather converter program assigns "SummerDesignDay" and "WinterDesignDay" day types by default - these day types influence "scheduling" of various elements. How to use these effectively is described during the **DesignDay** and **Schedule** objects discussions in the Input Output Reference.
 
 Beginning in 1997, and continuing (the latest version was published in 2009), the design condition data is based on annual percentages. In addition, only locations with long-term hourly observations data (on which to form the basis) are included.
 
@@ -3147,7 +3147,7 @@ Introduced in 1928 as a wall map co-authored with student Rudolph Geiger, the K�
 
 The modified Köppen Climate Classification System is the most widely used system for classifying the world's climates. Its categories are based on the annual and monthly averages of temperature and precipitation. The Köppen system recognizes six major climatic types; each type is designated by a capital letter.
 
-In addition to the major climate types, each category is further sub-divided into sub-categories based on temperature and precipitation. There are only 24 sub-categories possible – making the general schemes quite easy to comprehend.
+In addition to the major climate types, each category is further sub-divided into sub-categories based on temperature and precipitation. There are only 24 sub-categories possible - making the general schemes quite easy to comprehend.
 
 For example, the U.S. states located along the Gulf of Mexico are designated as "Cfa." The "C" represents the "mild mid-latitude" category, the second letter "f" stands for the German word *feucht* or "moist," and the third letter "a" indicates that the average temperature of the warmest month is above 22°C. Thus, "Cfa" gives us a good indication of the climate of this region, a mild mid-latitude climate with no dry season and a hot summer.
 
@@ -3210,7 +3210,7 @@ Polar climates have year-round cold temperatures with warmest month less than 10
 
 ### Highlands Areas (H)
 
-Highland areas can encompass any of the previously mentioned major categories –- the determining factor is one of altitude (temperature decreases roughly 2º C for every increase of 305 m). This is a complex climate zone. Highland regions roughly correspond to the major categories change in temperature with latitude – with one important exception. Seasons only exist in highlands if they also exist in the nearby lowland regions. For example, although **A** climates have cooler temperatures at higher elevations, the seasonal changes of **C**, **D** and **E** climates are not present.
+Highland areas can encompass any of the previously mentioned major categories -- the determining factor is one of altitude (temperature decreases roughly 2º C for every increase of 305 m). This is a complex climate zone. Highland regions roughly correspond to the major categories change in temperature with latitude - with one important exception. Seasons only exist in highlands if they also exist in the nearby lowland regions. For example, although **A** climates have cooler temperatures at higher elevations, the seasonal changes of **C**, **D** and **E** climates are not present.
 
 The following shows an overview of the world and its Köppen classifications.
 
@@ -3235,24 +3235,24 @@ Figure 16. Monthly Dew Point in Köppen Climates (Northern Hemisphere)
 ASHRAE Climate Classification
 ------------------------------------------------------------------------
 
-For the ASHRAE 90.1 and 90.2 standards (2004), a climate zone classification scheme was introduced, similar to the Köppen classification. The methodology is described in two ASHRAE Transactions papers – Briggs – 2002.
+For the ASHRAE 90.1 and 90.2 standards (2004), a climate zone classification scheme was introduced, similar to the Köppen classification. The methodology is described in two ASHRAE Transactions papers - Briggs - 2002.
 
 EnergyPlus Weather File (EPW) Data Dictionary
 ----------------------------------------------------------
 
-The “data dictionary” for EnergyPlus Weather Data is shown below. Note that semi-colons do NOT terminate lines in the EnergyPlus Weather Data. It helps if you have familiarity with the IDD conventions please view them in the Input Output Reference document. Briefly, we have similar “\\” conventions that are important for reading the following tables:
+The "data dictionary" for EnergyPlus Weather Data is shown below. Note that semi-colons do NOT terminate lines in the EnergyPlus Weather Data. It helps if you have familiarity with the IDD conventions please view them in the Input Output Reference document. Briefly, we have similar "\\" conventions that are important for reading the following tables:
 
 \\minimum, \\minimum&gt; - values for this field must be either &gt;= or &gt; than the following number
 
 \\maximum, \\maximum&lt; - values for this field must be either &lt;= or &lt; than the following number
 
-\\missing – if values in this field are &gt;= the following number, it is considered “missing” and missing data rules will apply
+\\missing - if values in this field are &gt;= the following number, it is considered "missing" and missing data rules will apply
 
-\\default – blank fields will receive the following as “default” values
+\\default - blank fields will receive the following as "default" values
 
-\\units – expected units for the field. Standard EnergyPlus units are shown in the Input Output Reference Document.
+\\units - expected units for the field. Standard EnergyPlus units are shown in the Input Output Reference Document.
 
-Note that in the header records where “date” is used, the interpretation is shown in the following table.
+Note that in the header records where "date" is used, the interpretation is shown in the following table.
 
 Table 14. Weather File Date Field Interpretation
 
@@ -3275,7 +3275,7 @@ Table 14. Weather File Date Field Interpretation
 <tr>
 <td>&lt;number&gt; / &lt;number&gt; / &lt;number&gt;</td>
 <td>Month / Day / Year</td>
-<td>DataPeriod only – special multiple year file – ref: RunPeriod:CustomRange object in IDF / Input Output Reference document</td>
+<td>DataPeriod only - special multiple year file - ref: RunPeriod:CustomRange object in IDF / Input Output Reference document</td>
 </tr>
 <tr>
 <td>&lt;number&gt; Month</td>
@@ -3306,11 +3306,11 @@ In the table, Weekday can be one of (Sunday, Monday, Tuesday, Wednesday, Thursda
 ```idd
 !ESP(r)/EnergyPlus Weather Format
 !April 2002
-\memo� Dates in the EPW file can be several formats:
-\memo� <number>/<number>� (month/day)
-\memo� <number> Month
-\memo� Month <number>
-\memo <number>� (taken to be Julian day of year)
+\memo Dates in the EPW file can be several formats:
+\memo <number>/<number>  (month/day)
+\memo <number> Month
+\memo Month <number>
+\memo <number> (taken to be Julian day of year)
 \memo Months are January, February, March, April, May,
 \memo            June, July, August, September, October, November, December
 \memo Months can be the first 3 letters of the month
@@ -3428,9 +3428,9 @@ GROUND TEMPERATURES,
 -- etc to # of depths entered
 ```
 
-The weather converter program can use a full year weather data file to calculate “undisturbed” ground temperatures based on temperatures. Since an important part of soil heat transfer includes soil properties such as conductivity, density and specific heat AND these cannot be calculated from simple weather observations, this header record is provided primarilyfor user information. However, with the FC construction option, these are automatically selected (.5 depth) for use if the user does not include values in the Site:GroundTemperature:FcfactorMethod object.
+The weather converter program can use a full year weather data file to calculate "undisturbed" ground temperatures based on temperatures. Since an important part of soil heat transfer includes soil properties such as conductivity, density and specific heat AND these cannot be calculated from simple weather observations, this header record is provided primarilyfor user information. However, with the FC construction option, these are automatically selected (.5 depth) for use if the user does not include values in the Site:GroundTemperature:FcfactorMethod object.
 
-As noted in the statistics report, the “undisturbed” ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the GroundTemperatures:Surface and GroundTemperatures:Deep objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
+As noted in the statistics report, the "undisturbed" ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the GroundTemperatures:Surface and GroundTemperatures:Deep objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
 
 ```idd
 HOLIDAYS/DAYLIGHT SAVING,
@@ -3449,7 +3449,7 @@ HOLIDAYS/DAYLIGHT SAVING,
 -- etc to # of Holidays entered
 ```
 
-The Holidays / Daylight Saving header record details the start and end dates of Daylight Saving Time and other special days such as might be recorded for the weather file. These can be used by keying “Yes” for appropriate fields in the Run Period Object.
+The Holidays / Daylight Saving header record details the start and end dates of Daylight Saving Time and other special days such as might be recorded for the weather file. These can be used by keying "Yes" for appropriate fields in the Run Period Object.
 
 Note: EnergyPlus processed weather files available on the EnergyPlus web site:  have neither special days specified nor daylight saving period.
 
@@ -3498,13 +3498,13 @@ DATA PERIODS,
 -- etc to # of periods entered
 ```
 
-A weather file may contain several “data periods” though this is not required (and, in fact, may be detrimental). In addition, a weather file may contain multiple records per hour BUT these must match the Number of Time Steps In Hour for the simulation. Multiple interval data files can be valued when you want to be sure of the weather values for each time step (rather than relying on “interpolated” weather data). A weather file may also contain several consecutive years of weather data. EnergyPlus will automatically process the extra years when the Number of Years field is used in the RunPeriod object. Sorry – there is no way to jump into a year in the middle of the EPW file.
+A weather file may contain several "data periods" though this is not required (and, in fact, may be detrimental). In addition, a weather file may contain multiple records per hour BUT these must match the Number of Time Steps In Hour for the simulation. Multiple interval data files can be valued when you want to be sure of the weather values for each time step (rather than relying on "interpolated" weather data). A weather file may also contain several consecutive years of weather data. EnergyPlus will automatically process the extra years when the Number of Years field is used in the RunPeriod object. Sorry - there is no way to jump into a year in the middle of the EPW file.
 
 
 
 Note that a Run Period object may not cross Data Period boundary lines.
 
-For those interested in creating their own weather data in the CSV or EPW formats or reading the .csv and .epw files that are produced by the Weather Converter program, the fields are shown in the following “IDD” description. Items shown in bold are used directly in the EnergyPlus program.
+For those interested in creating their own weather data in the CSV or EPW formats or reading the .csv and .epw files that are produced by the Weather Converter program, the fields are shown in the following "IDD" description. Items shown in bold are used directly in the EnergyPlus program.
 
 ```idd
 ! Actual data does not have a descriptor
@@ -3631,55 +3631,55 @@ For those interested in creating their own weather data in the CSV or EPW format
 
 Descriptions of the fields are taken from the IWEC manual - as descriptive of what should be contained in the data fields.
 
-#### Field:� Year
+#### Field: Year
 
 This is the Year of the data. Not really used in EnergyPlus. Used in the Weather Converter program for display in audit file.
 
-#### Field:� Month
+#### Field: Month
 
 This is the month (1-12) for the data. Cannot be missing.
 
-#### Field:� Day
+#### Field: Day
 
 This is the day (dependent on month) for the data. Cannot be missing.
 
-#### Field:� Hour
+#### Field: Hour
 
 This is the hour of the data. (1 - 24). Hour 1 is 00:01 to 01:00. Cannot be missing.
 
-#### Field:� Minute
+#### Field: Minute
 
 This is the minute field. (1..60)
 
-#### Field:� Data Source and Uncertainty Flags
+#### Field: Data Source and Uncertainty Flags
 
 The data source and uncertainty flags from various formats (usually shown with each field) are consolidated in the E/E+ EPW format. More is shown about Data Source and Uncertainty in Data Sources/Uncertainty section later in this document.
 
-#### Field:� Dry Bulb Temperature
+#### Field: Dry Bulb Temperature
 
-This is the dry bulb temperature in C at the time indicated. Note that this is a full numeric field (i.e. 23.6) and not an integer representation with tenths. Valid values range from -70 �C to 70 �C. Missing value for this field is 99.9.
+This is the dry bulb temperature in C at the time indicated. Note that this is a full numeric field (i.e. 23.6) and not an integer representation with tenths. Valid values range from -70&deg;C to 70&deg;C. Missing value for this field is 99.9.
 
-#### Field:� Dew Point Temperature
+#### Field: Dew Point Temperature
 
-This is the dew point temperature in C at the time indicated. Note that this is a full numeric field (i.e. 23.6) and not an integer representation with tenths. Valid values range from -70 �C to 70 �C. �Missing value for this field is 99.9.
+This is the dew point temperature in C at the time indicated. Note that this is a full numeric field (i.e. 23.6) and not an integer representation with tenths. Valid values range from -70&deg;C to 70&deg;C. Missing value for this field is 99.9.
 
-#### Field:� Relative Humidity
+#### Field: Relative Humidity
 
-This is the Relative Humidity in percent at the time indicated. Valid values range from 0% to 110%.�Missing value for this field is 999.
+This is the Relative Humidity in percent at the time indicated. Valid values range from 0% to 110%. Missing value for this field is 999.
 
-#### Field:� Atmospheric Station Pressure
+#### Field: Atmospheric Station Pressure
 
 This is the station pressure in Pa at the time indicated. Valid values range from 31,000 to 120,000. (These values were chosen from the standard barometric pressure for all elevations of the World). Missing value for this field is 999999.
 
-#### Field:� Extraterrestrial Horizontal Radiation
+#### Field: Extraterrestrial Horizontal Radiation
 
 This is the Extraterrestrial Horizontal Radiation in Wh/m2. It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
 
-#### Field:� Extraterrestrial Direct Normal Radiation
+#### Field: Extraterrestrial Direct Normal Radiation
 
 This is the Extraterrestrial Direct Normal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received on a surface normal to the rays of the sun at the top of the atmosphere during the number of minutes preceding the time indicated). It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
 
-#### Field:� Horizontal Infrared Radiation Intensity
+#### Field: Horizontal Infrared Radiation Intensity
 
 This is the Horizontal Infrared Radiation Intensity in Wh/m2. If it is missing, it is calculated from the Opaque Sky Cover field as shown in the following explanation. It should have a minimum value of 0; missing value for this field is 9999.
 
@@ -3709,61 +3709,61 @@ Example: Clear sky (<span>$N=0$</span>), <span>$T_{drybulb} = 273+20=293 K$</spa
 
 References (Walton, 1983) (Clark, Allen, 1978) for these calculations are contained in the references section at the end of this list of fields.
 
-#### Field:� Global Horizontal Radiation
+#### Field: Global Horizontal Radiation
 
 This is the Global Horizontal Radiation in Wh/m2. (Total amount of direct and diffuse solar radiation in Wh/m2 received on a horizontal surface during the number of minutes preceding the time indicated.) It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
 
-#### Field:� Direct Normal Radiation
+#### Field: Direct Normal Radiation
 
 This is the Direct Normal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  If the field is missing (<span>$\ge 9999$</span>) or invalid (<span>$<0$</span>), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
 
-#### Field:� Diffuse Horizontal Radiation
+#### Field: Diffuse Horizontal Radiation
 
 This is the Diffuse Horizontal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.) If the field is missing (<span>$\ge 9999$</span>) or invalid (<span>$<0$</span>), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
 
-#### Field:� Global Horizontal Illuminance
+#### Field: Global Horizontal Illuminance
 
-This is the Global Horizontal Illuminance in lux. (Average total amount of direct and diffuse illuminance in hundreds of lux received on a horizontal surface during the number of minutes preceding the time indicated.)� It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
+This is the Global Horizontal Illuminance in lux. (Average total amount of direct and diffuse illuminance in hundreds of lux received on a horizontal surface during the number of minutes preceding the time indicated.) It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
 
-#### Field:� Direct Normal Illuminance
+#### Field: Direct Normal Illuminance
 
 This is the Direct Normal Illuminance in lux. (Average amount of illuminance in hundreds of lux received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
 
-#### Field:� Diffuse Horizontal Illuminance
+#### Field: Diffuse Horizontal Illuminance
 
 This is the Diffuse Horizontal Illuminance in lux. (Average amount of illuminance in hundreds of lux received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
 
-#### Field:� Zenith Luminance
+#### Field: Zenith Luminance
 
-This is the Zenith Illuminance in Cd/m2. (Average amount of luminance at the sky's zenith in tens of Cd/m2 during the number of minutes preceding the time indicated.)� It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
+This is the Zenith Illuminance in Cd/m2. (Average amount of luminance at the sky's zenith in tens of Cd/m2 during the number of minutes preceding the time indicated.) It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
 
-#### Field:� Wind Direction
+#### Field: Wind Direction
 
-This is the Wind Direction in degrees where the convention is that North=0.0, East=90.0, South=180.0, West=270.0. (Wind direction in degrees at the time indicated. If calm, direction equals zero.)� Values can range from 0 to 360. Missing value is 999.
+This is the Wind Direction in degrees where the convention is that North=0.0, East=90.0, South=180.0, West=270.0. (Wind direction in degrees at the time indicated. If calm, direction equals zero.) Values can range from 0 to 360. Missing value is 999.
 
-#### Field:� Wind Speed
+#### Field: Wind Speed
 
-This is the wind speed in m/sec. (Wind speed at time indicated.)� Values can range from 0 to 40. Missing value is 999.
+This is the wind speed in m/sec. (Wind speed at time indicated.) Values can range from 0 to 40. Missing value is 999.
 
-#### Field:� Total Sky Cover
+#### Field: Total Sky Cover
 
 This is the value for total sky cover (tenths of coverage). (i.e. 1 is 1/10 covered. 10 is total coverage). (Amount of sky dome in tenths covered by clouds or obscuring phenomena at the hour indicated at the time indicated.) Minimum value is 0; maximum value is 10; missing value is 99.
 
-#### Field:� Opaque Sky Cover
+#### Field: Opaque Sky Cover
 
-This is the value for opaque sky cover (tenths of coverage). (i.e. 1 is 1/10 covered. 10 is total coverage). (Amount of sky dome in tenths covered by clouds or obscuring phenomena that prevent observing the sky or higher cloud layers at the time indicated.)� This is not used unless the field for Horizontal Infrared Radiation Intensity is missing and then it is used to calculate Horizontal Infrared Radiation Intensity. Minimum value is 0; maximum value is 10; missing value is 99.
+This is the value for opaque sky cover (tenths of coverage). (i.e. 1 is 1/10 covered. 10 is total coverage). (Amount of sky dome in tenths covered by clouds or obscuring phenomena that prevent observing the sky or higher cloud layers at the time indicated.)  This is not used unless the field for Horizontal Infrared Radiation Intensity is missing and then it is used to calculate Horizontal Infrared Radiation Intensity. Minimum value is 0; maximum value is 10; missing value is 99.
 
-#### Field:� Visibility
+#### Field: Visibility
 
 This is the value for visibility in km. (Horizontal visibility at the time indicated.)  It is not currently used in EnergyPlus calculations. Missing value is 9999.
 
-#### Field:� Ceiling Height
+#### Field: Ceiling Height
 
-This is the value for ceiling height in m. (77777 is unlimited ceiling height. 88888 is cirroform ceiling.)� �It is not currently used in EnergyPlus calculations. Missing value is 99999.
+This is the value for ceiling height in m. (77777 is unlimited ceiling height. 88888 is cirroform ceiling.) It is not currently used in EnergyPlus calculations. Missing value is 99999.
 
-#### Field:� Present Weather Observation
+#### Field: Present Weather Observation
 
-If the value of the field is 0, then the observed weather codes are taken from the following field. If the value of the field is 9, then “missing” weather is assumed. Since the primary use of these fields (Present Weather Observation and Present Weather Codes) is for rain/wet surfaces, a missing observation field or a missing weather code implies no rain.
+If the value of the field is 0, then the observed weather codes are taken from the following field. If the value of the field is 9, then "missing" weather is assumed. Since the primary use of these fields (Present Weather Observation and Present Weather Codes) is for rain/wet surfaces, a missing observation field or a missing weather code implies no rain.
 
 Table 15. Present Weather Observation Values
 
@@ -3782,9 +3782,9 @@ Table 15. Present Weather Observation Values
 
 
 
-#### Field:� Present Weather Codes
+#### Field: Present Weather Codes
 
-The present weather codes field is assumed to follow the TMY2 conventions for this field. Note that though this field may be represented as numeric (e.g. in the CSV format), it is really a text field of 9 single digits. This convention along with values for each “column” (left to right) is presented in Table 16. Note that some formats (e.g. TMY) does not follow this convention – as much as possible, the present weather codes are converted to this convention during WeatherConverter processing. Also note that the most important fields are those representing liquid precipitation – where the surfaces of the building would be wet. EnergyPlus uses “Snow Depth” to determine if snow is on the ground.
+The present weather codes field is assumed to follow the TMY2 conventions for this field. Note that though this field may be represented as numeric (e.g. in the CSV format), it is really a text field of 9 single digits. This convention along with values for each "column" (left to right) is presented in Table 16. Note that some formats (e.g. TMY) does not follow this convention - as much as possible, the present weather codes are converted to this convention during WeatherConverter processing. Also note that the most important fields are those representing liquid precipitation - where the surfaces of the building would be wet. EnergyPlus uses "Snow Depth" to determine if snow is on the ground.
 
 Table 16. Weather Codes Field Interpretation
 
@@ -3802,10 +3802,10 @@ Occurrence of Thunderstorm, Tornado, or Squall
 
 0 - 2, 4, 6 - 9
 
-0 = Thunderstorm—lightning and thunder. Wind gusts less than 25.7 m/s, and hail, if any, less than 1.9 cm diameter
- 1 = Heavy or severe thunderstorm—frequent intense lightning and thunder. Wind gusts greater than 25.7 m/s and hail, if any, 1.9 cm or greater diameter
+0 = Thunderstorm-lightning and thunder. Wind gusts less than 25.7 m/s, and hail, if any, less than 1.9 cm diameter
+ 1 = Heavy or severe thunderstorm-frequent intense lightning and thunder. Wind gusts greater than 25.7 m/s and hail, if any, 1.9 cm or greater diameter
  2 = Report of tornado or waterspout
- 4 = Moderate squall—sudden increase of wind speed by at least 8.2 m/s, reaching 11.3 m/s or more and lasting for at least 1 minute
+ 4 = Moderate squall-sudden increase of wind speed by at least 8.2 m/s, reaching 11.3 m/s or more and lasting for at least 1 minute
  6 = Water spout (beginning January 1984)
  7 = Funnel cloud (beginning January 1984)
  8 = Tornado (beginning January 1984)
@@ -3939,33 +3939,33 @@ Occurrence of Ice Pellets
 
 
 
-For example, a Present Weather Observation (previous field) of 0 and a Present Weather Codes field of 929999999 notes that there is heavy rain for this data period (usually hourly but depends on the number of intervals per hour field in the “Data Periods” record).
+For example, a Present Weather Observation (previous field) of 0 and a Present Weather Codes field of 929999999 notes that there is heavy rain for this data period (usually hourly but depends on the number of intervals per hour field in the "Data Periods" record).
 
-#### Field:� Precipitable Water
+#### Field: Precipitable Water
 
 This is the value for Precipitable Water in mm. (This is not rain - rain is inferred from the PresWeathObs field but a better result is from the Liquid Precipitation Depth field)). It is not currently used in EnergyPlus calculations (primarily due to the unreliability of the reporting of this value). Missing value is 999.
 
-#### Field:� Aerosol Optical Depth
+#### Field: Aerosol Optical Depth
 
 This is the value for Aerosol Optical Depth in thousandths. It is not currently used in EnergyPlus calculations. Missing value is .999.
 
-#### Field:� Snow Depth
+#### Field: Snow Depth
 
 This is the value for Snow Depth in cm. This field is used to tell when snow is on the ground and, thus, the ground reflectance may change. Missing value is 999.
 
-#### Field:� Days Since Last Snowfall
+#### Field: Days Since Last Snowfall
 
 This is the value for Days Since Last Snowfall. It is not currently used in EnergyPlus calculations. Missing value is 99.
 
-#### Field:� Albedo
+#### Field: Albedo
 
 The ratio (unitless) of reflected solar irradiance to global horizontal irradiance. It is not currently used in EnergyPlus.
 
-#### Field:� Liquid Precipitation Depth
+#### Field: Liquid Precipitation Depth
 
-The amount of liquid precipitation (mm) observed at the indicated time for the period indicated in the liquid precipitation quantity field. If this value is not missing, then it is used and overrides the “precipitation” flag as rainfall.� Conversely, if the precipitation flag shows rain and this field is missing or zero, it is set to 1.5 (mm).
+The amount of liquid precipitation (mm) observed at the indicated time for the period indicated in the liquid precipitation quantity field. If this value is not missing, then it is used and overrides the "precipitation" flag as rainfall.  Conversely, if the precipitation flag shows rain and this field is missing or zero, it is set to 1.5 (mm).
 
-#### Field:� Liquid Precipitation Quantity
+#### Field: Liquid Precipitation Quantity
 
 The period of accumulation (hr) for the liquid precipitation depth field. It is not currently used in EnergyPlus.
 
@@ -3978,7 +3978,7 @@ Clark, G. and C. Allen, "The Estimation of Atmospheric Radiation for Clear and C
 EPW CSV Format (In/Out)
 -----------------------
 
-EPW CSV Format to the Weather Converter is a special CSV format which echoes the format of the EPW file.  For the “header” records in the CSV file, they are basically the same as the header records for the EPW file (see above). However, in the CSV file, each header is shown and then the data. Partial year files will not have all of these headers “filled” in. Also see Figure 17. EnergyPlus EPW CSV file (spreadsheet view) and Figure 18. EnergyPlus EPW CSV Data Records (spreadsheet view) for snapshot pictures of the EnergyPlus EPW CSV file as shown in a spreadsheet.
+EPW CSV Format to the Weather Converter is a special CSV format which echoes the format of the EPW file.  For the "header" records in the CSV file, they are basically the same as the header records for the EPW file (see above). However, in the CSV file, each header is shown and then the data. Partial year files will not have all of these headers "filled" in. Also see Figure 17. EnergyPlus EPW CSV file (spreadsheet view) and Figure 18. EnergyPlus EPW CSV Data Records (spreadsheet view) for snapshot pictures of the EnergyPlus EPW CSV file as shown in a spreadsheet.
 
 ### Location Header/Data (CSV)
 
@@ -3986,7 +3986,7 @@ Location Title,Latitude {N+/S-},Longitude {E+/W-},TimeZone {+/- GMT},Elevation {
 
 LOCATION\_SYDNEY\_\_AUS\_IWEC Data\_947670,-33.95,151.18,10.0,3.0
 
-LOCATION + the city, state/province, country and WMO fields from the EPW file are concatenated to form the “Location Title”. The latitude, longitude, time zone and elevation fields are numeric.
+LOCATION + the city, state/province, country and WMO fields from the EPW file are concatenated to form the "Location Title". The latitude, longitude, time zone and elevation fields are numeric.
 
 ### Design Conditions Header/Data (CSV)
 
@@ -4016,7 +4016,7 @@ Number of Typical/Extreme Periods,Period Name,Period Type,Period Start Day,Perio
 
 ### Ground Temperatures Header/Data (CSV)
 
-The results from the ground temperature heuristic calculation are shown, typically for 3 depths. Users may also fill in the blank fields (soil conductivity, soil density, soil specific heat) with known values and/or perform their own calculations and depths and supply those. These should be considered “undisturbed” ground temperatures – temperatures of soil that have not been disturbed by construction. They are not considered appropriate for calculations of building losses.
+The results from the ground temperature heuristic calculation are shown, typically for 3 depths. Users may also fill in the blank fields (soil conductivity, soil density, soil specific heat) with known values and/or perform their own calculations and depths and supply those. These should be considered "undisturbed" ground temperatures - temperatures of soil that have not been disturbed by construction. They are not considered appropriate for calculations of building losses.
 
 The program uses a heuristic, time lagged calculation based on dry bulb temperature and location. References on the topic are found in Kusuda (see references).
 
@@ -4034,7 +4034,7 @@ No,0,0,0
 
 ### Comment 1 Header/Data (CSV)
 
-Some original data files fill the comment 1 header and some do not. Typically, it will display at least a “station” number and potentially more information.
+Some original data files fill the comment 1 header and some do not. Typically, it will display at least a "station" number and potentially more information.
 
 Comment Line \#1
 
@@ -4054,7 +4054,7 @@ Number of Data Periods [DP],Number of Intervals per Hour,DP Name/Description,DP 
 
 ### Data Records (CSV)
 
-The field “names” for each item are shown. First, the “short” names:
+The field "names" for each item are shown. First, the "short" names:
 
 Date,HH:MM,Datasource,DryBulb {C},DewPoint {C},RelHum {%},Atmos Pressure {Pa},ExtHorzRad {Wh/m2},ExtDirRad {Wh/m2},HorzIRSky {Wh/m2},GloHorzRad {Wh/m2},DirNormRad {Wh/m2},DifHorzRad {Wh/m2},GloHorzIllum {lux},DirNormIllum {lux},DifHorzIllum {lux},ZenLum {Cd/m2},WindDir {deg},WindSpd {m/s},TotSkyCvr {.1},OpaqSkyCvr {.1},Visibility {km},Ceiling Hgt {m},PresWeathObs,PresWeathCodes,Precip Wtr {mm},Aerosol Opt Depth {.001},SnowDepth {cm},Days Last Snow,Albedo {.01},Rain {mm},Rain Quantity {hr}
 
@@ -4068,7 +4068,7 @@ As noted previously, these headers and data are in the identical order to the it
 
 The Date and Time fields need a bit of description. The Date field (e.g. 1983/1/1) uses your standard system date for formatting. In the EPW file, these are three separate fields (year, month, and day in this example). The time field combines the hours and minutes into one field (hh:mm). This makes it easier for graphing with spreadsheet programs but a bit harder if you use the CSV format as input.
 
-Each data item field obeys the same “missing” and other content rules as shown above in the EnergyPlus Weather File (EPW) Data Dictionary.
+Each data item field obeys the same "missing" and other content rules as shown above in the EnergyPlus Weather File (EPW) Data Dictionary.
 
 ![](AuxiliaryPrograms/media/image015.png)
 
@@ -4080,12 +4080,12 @@ The figure above shows how the EnergyPlus EPW CSV file (initial header records) 
 
 Figure 18. EnergyPlus EPW CSV Data Records (spreadsheet view)
 
-The above figure shows how the data periods header record and the individual data records look when opened in a spread sheet. Again, the headers are shown in bold.  Note that there are two header records for the data records – one with short names – one with longer more descriptive names.
+The above figure shows how the data periods header record and the individual data records look when opened in a spread sheet. Again, the headers are shown in bold.  Note that there are two header records for the data records - one with short names - one with longer more descriptive names.
 
 Missing Weather File Data
 -------------------------
 
-The following data contains “missing” descriptors; a new concept not introduced previously in our IDD conventions. In this case, it will be processed as though those values are “missing” in the weather conversions. This may not always be desirable though the weather processor will fill in “missing” value with something “appropriate”. Eventually, these missing values will be available through the weather processor. Until then, the following are used for initial missing conditions. When a valid value is encountered from weather data, however, it will become the new “missing” replacement value:
+The following data contains "missing" descriptors; a new concept not introduced previously in our IDD conventions. In this case, it will be processed as though those values are "missing" in the weather conversions. This may not always be desirable though the weather processor will fill in "missing" value with something "appropriate". Eventually, these missing values will be available through the weather processor. Until then, the following are used for initial missing conditions. When a valid value is encountered from weather data, however, it will become the new "missing" replacement value:
 
 Table 17. Missing weather replacement values
 
@@ -4182,13 +4182,13 @@ Table 17. Missing weather replacement values
 Source Weather Data Formats
 ---------------------------
 
-Source weather data for building energy simulation programs can be broken into two major classes: *historical data* and *typical weather years*. Historical data is just "real" data: usually measured (but sometimes modeled) data from a particular location for a given period of record. Typical years are ersatz years assembled to match the long term data from a particular location using a particular statistical measure. Typical data may also be “real” data but may not be a contiguous year – the data may be comprised of months from multiple years.
+Source weather data for building energy simulation programs can be broken into two major classes: *historical data* and *typical weather years*. Historical data is just "real" data: usually measured (but sometimes modeled) data from a particular location for a given period of record. Typical years are ersatz years assembled to match the long term data from a particular location using a particular statistical measure. Typical data may also be "real" data but may not be a contiguous year - the data may be comprised of months from multiple years.
 
 The primary source for historical weather data is the U.S. National Climatic Data Center (NCDC) in Asheville, NC: http://www.ncdc.noaa.gov/. NCDC can provide hourly historical data for thousands of locations around the world. This data may not always be complete; data items or periods of record may be missing.
 
 ### Data Set vs. Data Format
 
-In this document as well in many others, you will read about a certain “data set” and you will also read about data in a “certain” format – e.g., the TMY2 data set and the TMY2 data format. Simply stated, a data set refers to a set of data files developed around a set of procedures for selection and usually with a specific purpose for use. A data format is merely the identification of data elements in a data file. In the TMY2 example, the TMY2 data set was developed as described below and the format of the data is usually called a TMY2 format.
+In this document as well in many others, you will read about a certain "data set" and you will also read about data in a "certain" format - e.g., the TMY2 data set and the TMY2 data format. Simply stated, a data set refers to a set of data files developed around a set of procedures for selection and usually with a specific purpose for use. A data format is merely the identification of data elements in a data file. In the TMY2 example, the TMY2 data set was developed as described below and the format of the data is usually called a TMY2 format.
 
 Any data *could* be put into a TMY2 format, but it wouldn’t necessarily be selected using the same procedures as the TMY2 data set.
 
@@ -4212,7 +4212,7 @@ The SWERA format is very similar to the TMY2 format except:  WMO stations are u
 
 ### WYEC2 Data Set/Format
 
-Culminating in the early 1980s, ASHRAE published their “Weather Year for Energy Calculations” (WYEC) hourly weather files for 51 US and Canadian locations. These files were intended to support the then growing interest in computer simulation of energy use in buildings. In the late 1980s, a major revision was initiated – this included the addition of 26 Typical Meteorological Year (TMY) hourly weather files to the original WYEC data set and a number of improvements.
+Culminating in the early 1980s, ASHRAE published their "Weather Year for Energy Calculations" (WYEC) hourly weather files for 51 US and Canadian locations. These files were intended to support the then growing interest in computer simulation of energy use in buildings. In the late 1980s, a major revision was initiated - this included the addition of 26 Typical Meteorological Year (TMY) hourly weather files to the original WYEC data set and a number of improvements.
 
 The work of revising and improving the WYEC data base was performed by at the National Renewable Energy Laboratory (NREL) as part of the Solar Radiation Resource Assessment Program (SRRAP), during the period 1989 through 1993. Richard Perez, at the State University of New York at Albany -- Atmospheric Sciences Research Center provided a substantial contribution to this work. The resulting set of 77 revised and corrected hourly weather files are referred to as WYEC Version 2 or "WYEC2" data set.
 
@@ -4230,7 +4230,7 @@ The IWEC are the result of ASHRAE Research Project 1015 conducted by Numerical L
 
 The files are derived from up to 18 years of DATSAV3 hourly weather data originally archived at the U S National Climatic Data Center. The weather data is supplemented by solar radiation estimated on an hourly basis from earth-sun geometry and hourly weather elements, particularly cloud amount information. The IWEC CD-ROM is available from ASHRAE.
 
-The Department of Energy has licensed the IWEC data from ASHRAE. Our license with ASHRAE allows us to: “Distribute versions of the individual IWEC files in converted format suitable for EnergyPlus (EPW). Make the EnergyPlus versions of the IWEC files available to users at no cost via this EnergyPlus web site.”  All 227 locations in the IWEC data set are available for download in EnergyPlus weather format.
+The Department of Energy has licensed the IWEC data from ASHRAE. Our license with ASHRAE allows us to: "Distribute versions of the individual IWEC files in converted format suitable for EnergyPlus (EPW). Make the EnergyPlus versions of the IWEC files available to users at no cost via this EnergyPlus web site."  All 227 locations in the IWEC data set are available for download in EnergyPlus weather format.
 
 The IWEC source data is © 2001 American Society of Heating, Refrigerating and Air-Conditioning Engineers (ASHRAE), Inc., Atlanta, GA, USA. http://www.ashrae.org/ All rights reserved as noted in the License Agreement and Additional Conditions.
 
@@ -4326,7 +4326,7 @@ The CIBSE, in association with the (UK) Met Office has produced 'Test Reference 
 
 ### Real Time Data
 
-Real-Time weather data is available from the EnergyPlus web site. From the web site: “Hourly weather data from stations across the world is continuously collected and stored into a local database. The data is available through this web interface. Most stations have information for dry bulb temperature, wet bulb temperature, wind speed/direction, atmospheric pressure, visibility, cloud conditions, and precipitation type. Data may not be available for all stations and may not be contiguous for time period selected.”  The data is available in two output formats: CSV and IWEC. Note that their CSV is not the same as EnergyPlus CSV format. If you wish to get weather data from the real time sources, it may be easier to use the IWEC format with the EnergyPlus WeatherConverter program; HOWEVER, they do not collect solar data and, currently, the WeatherConverter cannot generate solar data for these data files.
+Real-Time weather data is available from the EnergyPlus web site. From the web site: "Hourly weather data from stations across the world is continuously collected and stored into a local database. The data is available through this web interface. Most stations have information for dry bulb temperature, wet bulb temperature, wind speed/direction, atmospheric pressure, visibility, cloud conditions, and precipitation type. Data may not be available for all stations and may not be contiguous for time period selected."  The data is available in two output formats: CSV and IWEC. Note that their CSV is not the same as EnergyPlus CSV format. If you wish to get weather data from the real time sources, it may be easier to use the IWEC format with the EnergyPlus WeatherConverter program; HOWEVER, they do not collect solar data and, currently, the WeatherConverter cannot generate solar data for these data files.
 
 ### Meteonorm Data
 
@@ -4816,11 +4816,11 @@ Table 18. Summary of Downloadable Weather Data by Type
 
 2699
 
-One other format worth mentioning is TRY. TRY is “test reference year” data that did not include solar radiation data. “Test Reference Year” is a term that usually denotes selection of a specific year of “real” data based on some statistical procedure. The original TRY data (TD-9706) was based on an ASHRAE procedure to select the data from a “period of record”. “The principle of the selection is to eliminate years in the period of record containing months with extremely high or low mean temperatures until only one year remains.”  The weather conversion utility cannot process data in “TRY” format. However, many organizations develop data for reference year data (e.g. European TRY, Moisture Reference Data).
+One other format worth mentioning is TRY. TRY is "test reference year" data that did not include solar radiation data. "Test Reference Year" is a term that usually denotes selection of a specific year of "real" data based on some statistical procedure. The original TRY data (TD-9706) was based on an ASHRAE procedure to select the data from a "period of record". "The principle of the selection is to eliminate years in the period of record containing months with extremely high or low mean temperatures until only one year remains."  The weather conversion utility cannot process data in "TRY" format. However, many organizations develop data for reference year data (e.g. European TRY, Moisture Reference Data).
 
 ### Custom Format
 
-Using a “definitions” file (see Description of “Def” input file), the weather converter can process a wide range of data formats. In the table above, both the GDG and CTYW weather data was processed by a custom format approach.
+Using a "definitions" file (see Description of "Def" input file), the weather converter can process a wide range of data formats. In the table above, both the GDG and CTYW weather data was processed by a custom format approach.
 
 ### Solar Data
 
@@ -5194,7 +5194,7 @@ Table 23. Meteorological Uncertainty Flag Codes
 
 
 
-Advanced use – accessing weather conversion capabilities
+Advanced use - accessing weather conversion capabilities
 --------------------------------------------------------
 
 ### Interface to the EPlusWth.dll
@@ -5203,7 +5203,7 @@ To provide information for outside developers/interfaces that might want to use 
 
 ### Files used by EPlusWth.dll
 
-Each of the files is in a general comma-delimited format. Thus, they can be easily viewed by importing into a spreadsheet program such as Excel™. The files are used to support information lacking in the source data files and/or supply additional information used during the conversion process. In each case (with one exception), there will be a single or set of “header” records describing each column of the file and then the data values of the file will follow on subsequent records. Each of the files is described briefly in the next few sections.
+Each of the files is in a general comma-delimited format. Thus, they can be easily viewed by importing into a spreadsheet program such as Excel™. The files are used to support information lacking in the source data files and/or supply additional information used during the conversion process. In each case (with one exception), there will be a single or set of "header" records describing each column of the file and then the data values of the file will follow on subsequent records. Each of the files is described briefly in the next few sections.
 
 #### Abbreviations.csv
 
@@ -5215,7 +5215,7 @@ In many older data sets, the station identifier for the weather data uses the WB
 
 #### Cal Climate Zone Lat Long data.csv
 
-Note that this file has spaces in the name. The California c limate zone data source files do not have standard station identifiers. Rather they use a climate zone designator from 1-16. This file is used to obtain the latitude, longitude, time zone and elevation data for these climate zones. The WYEC2 “File Source Code” (field 2, column 6 of each data record) is used to determine that the file is a California compliance type file.
+Note that this file has spaces in the name. The California c limate zone data source files do not have standard station identifiers. Rather they use a climate zone designator from 1-16. This file is used to obtain the latitude, longitude, time zone and elevation data for these climate zones. The WYEC2 "File Source Code" (field 2, column 6 of each data record) is used to determine that the file is a California compliance type file.
 
 #### ASHRAE\_2009\_Yearly\_DesignConditions.csv
 
@@ -5223,11 +5223,11 @@ The three files for design conditions have roughly the same format. These are th
 
 ### Public calls to EPlusWth.dll
 
-Several points of the library are made available for use with external programs. In each case the parameters passed will be described along with the Visual Basic™ (VB6) code that is used to declare them as well as Fortran 90 style “Interface” statements to the same calls. The library is placed in the same folder with the weather converter utility – you may need to copy it to your program’s folder if you choose to add external calls from your program to it.
+Several points of the library are made available for use with external programs. In each case the parameters passed will be described along with the Visual Basic™ (VB6) code that is used to declare them as well as Fortran 90 style "Interface" statements to the same calls. The library is placed in the same folder with the weather converter utility - you may need to copy it to your program’s folder if you choose to add external calls from your program to it.
 
 #### SetupPWInternalDataPath
 
-This call designates the “path” to the files listed above. This is the location where the ProcessWeather call will expect to find the files. Having this incorrectly specified is not fatal, but will probably cause confusion.
+This call designates the "path" to the files listed above. This is the location where the ProcessWeather call will expect to find the files. Having this incorrectly specified is not fatal, but will probably cause confusion.
 
 VB declaration statement:
 
@@ -5259,7 +5259,7 @@ CALL SetupPWInternalDataPath(trim(DataPath))
 
 #### SetFixOutOfRangeData
 
-As shown earlier (file menu option in the weather converter utility), there is an option to “fix” out of range data or not. By default, this is turned off (does not fix data). Again a character convention (“yes” for fixing; “no” for not fixing) is used. Case of the actual string is ignored.
+As shown earlier (file menu option in the weather converter utility), there is an option to "fix" out of range data or not. By default, this is turned off (does not fix data). Again a character convention ("yes" for fixing; "no" for not fixing) is used. Case of the actual string is ignored.
 
 VB Declaration statement:
 
@@ -5269,7 +5269,7 @@ And calling it from VB:
 
     Global FixOutOfRangeData As String
 
-    FixOutOfRangeData = “Yes”
+    FixOutOfRangeData = "Yes"
 
     Call SetFixOutOfRangeData(FixOutOfRangeData, Len(FixOutOfRangeData))
 
@@ -5339,7 +5339,7 @@ use 15°C
 
 
 
-You can also choose to ignore the calculated trigger entirely. If you do not “ignore” the calculated trigger, then the trigger is the minimum of the calculated and your trigger limit selection.
+You can also choose to ignore the calculated trigger entirely. If you do not "ignore" the calculated trigger, then the trigger is the minimum of the calculated and your trigger limit selection.
 
 VB Declaration Statement:
 
@@ -5351,7 +5351,7 @@ And a call from VB:
 
 #### ProcessWeather
 
-The “meat” of the processing is done by this routine. It gets passed the input file name (source data), the input file type, output file name, and output file type. As an output it can provide a notice that the processing was successful or not.
+The "meat" of the processing is done by this routine. It gets passed the input file name (source data), the input file type, output file name, and output file type. As an output it can provide a notice that the processing was successful or not.
 
 VB Declaration Statement:
 
@@ -5426,7 +5426,7 @@ Table 25. Valid Input File Types for "ProcessWeather" call
 </tr>
 <tr>
 <td>&lt;any&gt;</td>
-<td>Custom – must have “def” file</td>
+<td>Custom - must have "def" file</td>
 </tr>
 </table>
 
@@ -5459,7 +5459,7 @@ Table 26. Valid Output File Types for the "ProcessWeather" call
 
 For Input and Output file names, the complete paths should be included.
 
-ErrorFlag will be returned as “true” if an error occurs during processing or “false” if the process is successful.
+ErrorFlag will be returned as "true" if an error occurs during processing or "false" if the process is successful.
 
 Fortran 90/95 Declaration:
 
@@ -5510,9 +5510,9 @@ ASHRAE. 2004. *ANSI/ASHRAE/IESNA Standard 90.1-2004*, "Energy-Efficient Design o
 
 ASHRAE, 2009. Handbook of Fundamentals, Atlanta: American Society of Heating, Refrigerating, and Air-conditioning Engineers.
 
-Briggs, Robert S., Robert G. Lucas, and Z. Todd Taylor. 2002. “Climate Classification for Building Energy Codes and Standards: Part 1 – Development Process” in *ASHRAE Transactions 2002*, 109, Pt 1. Atlanta:  ASHRAE.
+Briggs, Robert S., Robert G. Lucas, and Z. Todd Taylor. 2002. "Climate Classification for Building Energy Codes and Standards: Part 1 - Development Process" in *ASHRAE Transactions 2002*, 109, Pt 1. Atlanta:  ASHRAE.
 
-Briggs, Robert S., Robert G. Lucas, and Z. Todd Taylor. 2002. “Climate Classification for Building Energy Codes and Standards: Part 2 – Zone Definitions, Maps and Comparisons” in *ASHRAE Transactions*, 109, Pt 1. Atlanta:  ASHRAE.
+Briggs, Robert S., Robert G. Lucas, and Z. Todd Taylor. 2002. "Climate Classification for Building Energy Codes and Standards: Part 2 - Zone Definitions, Maps and Comparisons" in *ASHRAE Transactions*, 109, Pt 1. Atlanta:  ASHRAE.
 
 Buhl, W.F. 1998. DOE-2 Weather Processor, DOE2.1E Documentation Update, Berkeley: Lawrence Berkeley National Laboratory.
 
@@ -5522,16 +5522,16 @@ China Meteorological Bureau, Climate Information Center, Climate Data Office and
 
 Commission of the European Community. 1985. *Test Reference Years,* Weather data sets for computer simulations of solar energy systems and energy consumption in buildings, CEC, DG XII. Brussels, Belgium: Commission of the European Community.
 
-Crawley, Drury B., Linda K. Lawrie, Curtis O. Pedersen, Richard J. Liesen, Daniel E. Fisher, Richard K. Strand, Russell D. Taylor, Frederick C. Winkelmann, W.F. Buhl, A. Ender Erdem, and Y. Joe Huang. 1999. “EnergyPlus, A New-Generation Building Energy Simulation Program,” in *Proceedings of Building Simulation ’99*, Kyoto, Japan. IBPSA.
+Crawley, Drury B., Linda K. Lawrie, Curtis O. Pedersen, Richard J. Liesen, Daniel E. Fisher, Richard K. Strand, Russell D. Taylor, Frederick C. Winkelmann, W.F. Buhl, A. Ender Erdem, and Y. Joe Huang. 1999. "EnergyPlus, A New-Generation Building Energy Simulation Program," in *Proceedings of Building Simulation ’99*, Kyoto, Japan. IBPSA.
 
-Crawley, Drury B. 1998. “Which Weather Data Should You Use for Energy Simulations of Commercial Buildings?,” *ASHRAE Transactions*, pp. 498-515, Vol. 104, Pt. 2. Atlanta:  ASHRAE.
+Crawley, Drury B. 1998. "Which Weather Data Should You Use for Energy Simulations of Commercial Buildings?," *ASHRAE Transactions*, pp. 498-515, Vol. 104, Pt. 2. Atlanta:  ASHRAE.
 http://energyplus.gov/pdfs/bibliography/whichweatherdatashouldyouuseforenergysimulations.pdf
 
-Crawley, Drury B., Jon Hand, and Linda K. Lawrie, 1999. “Improving the Weather Information Available to Simulation Programs”, in *Proceedings of Building Simulation ’99*, Kyoto, Japan. September 1999. IBPSA.
+Crawley, Drury B., Jon Hand, and Linda K. Lawrie, 1999. "Improving the Weather Information Available to Simulation Programs", in *Proceedings of Building Simulation ’99*, Kyoto, Japan. September 1999. IBPSA.
 
 Energy Simulation Research Unit. 1999.  http://www.strath.ac.uk/Departments/ESRU
 
-Janak, M. 1997. “Coupling Building Energy and Lighting Simulation,” in *Proceedings of Building Simulation 97*, September 1997, Volume II pp 313-319, Prague, Czech Republic, IBPSA.
+Janak, M. 1997. "Coupling Building Energy and Lighting Simulation," in *Proceedings of Building Simulation 97*, September 1997, Volume II pp 313-319, Prague, Czech Republic, IBPSA.
 
 Köppen, W. 1931. Grundriss der Klimakunde. Berlin: Walter de Gruyter & Co.
 
@@ -5541,7 +5541,7 @@ Kusuda, T., Least Squares Technique for the Analysis of Periodic Temperature of 
 
 National Instruments Corporation. 1999. *LabVIEW User Manual*. Austin, Texas:  National Instruments Corporation.
 
-McDonald, Iain, and Paul Strachan. 1998. “Practical Application of Uncertainty Analysis” in *Proceedings of EPIC 98: Second International Conference on Energy Performance and Indoor Climate in Buildings*, Lyon, France, 19-21 November 1998.
+McDonald, Iain, and Paul Strachan. 1998. "Practical Application of Uncertainty Analysis" in *Proceedings of EPIC 98: Second International Conference on Energy Performance and Indoor Climate in Buildings*, Lyon, France, 19-21 November 1998.
 
 National Climatic Data Center (NCDC). 1976. *Test Reference Year (TRY)*, Tape Reference Manual, TD-9706, September 1976. Asheville, North Carolina: National Climatic Data Center, U.S. Department of Commerce.
 
@@ -5569,7 +5569,7 @@ Ward. G. 1996. *Radiance.* Berkeley:  Lawrence Berkeley National Laboratory.
 
 Winkelmann, F.C., W.F. Buhl, B. Birdsall, A. E. Erdem, and K. Ellington. 1994. *DOE-2.1E Supplement*, DE-940-11218. Lawrence Berkeley Laboratory, Berkeley, California. Springfield, Virginia: NTIS.
 
-Zhang, Q. Y., Y. J. Huang. 2002. “Development of Typical Year Weather Files for Chinese Locations”, in ASHRAE Transactions, Volume 108, Part 2.
+Zhang, Q. Y., Y. J. Huang. 2002. "Development of Typical Year Weather Files for Chinese Locations", in ASHRAE Transactions, Volume 108, Part 2.
 
 Web Resources
 -------------
@@ -5603,13 +5603,13 @@ For ground-contact surfaces in EnergyPlus, it is important to specify appropriat
 Introduction
 ------------
 
-There are two difficulties behind linking ground heat transfer calculations to EnergyPlus. One is the fact that the conduction calculations in EnergyPlus (and in DOE–2 and BLAST previously) are one-dimensional and the ground heat transfer calculations are two or three-dimensional. This causes severe modeling problems irrespective of the methods being used for the ground heat transfer calculation. The other difficulty is the markedly different time scales involved in the processes. Basically, the zone model is on an hour scale and the ground heat transfer is on a monthly time scale. The basic heat balance based zone model of EnergyPlus has to be considered as the foundation for building energy simulation at the present time and for some time in the future. Thus, it is necessary to be able to relate ground heat transfer calculations to that model.
+There are two difficulties behind linking ground heat transfer calculations to EnergyPlus. One is the fact that the conduction calculations in EnergyPlus (and in DOE-2 and BLAST previously) are one-dimensional and the ground heat transfer calculations are two or three-dimensional. This causes severe modeling problems irrespective of the methods being used for the ground heat transfer calculation. The other difficulty is the markedly different time scales involved in the processes. Basically, the zone model is on an hour scale and the ground heat transfer is on a monthly time scale. The basic heat balance based zone model of EnergyPlus has to be considered as the foundation for building energy simulation at the present time and for some time in the future. Thus, it is necessary to be able to relate ground heat transfer calculations to that model.
 
 The heat balance zone model considers a single room or thermal zone in a building and performs a heat balance on it. A fundamental modeling assumption is that the faces of the enclosure are isothermal planes. A ground heat transfer calculation usually considers an entire building and the earth that surrounds it, resulting in non-isothermal face planes where there is ground contact. While it is not impossible to imagine multi-zone, whole building models that include the surrounding earth and non-isothermal building surfaces, such models will not be practical for some time in the future, and their usefulness even then is not clear.
 
-The EnergyPlus development team addressed the problem and decided that the most reasonable first step would be to partially decouple the ground heat transfer calculation from the thermal zone calculation. The most important parameter for the zone calculation is the outside face temperature of the building surface that is in contact with the ground. Thus this becomes a reasonable “separation plane” for the two calculations. It was further decided that the current usage of monthly average ground temperature was reasonable for this separation plane temperature as well, since the time scales of the building heat transfer processes are so much shorter than those of the ground heat transfer processes.
+The EnergyPlus development team addressed the problem and decided that the most reasonable first step would be to partially decouple the ground heat transfer calculation from the thermal zone calculation. The most important parameter for the zone calculation is the outside face temperature of the building surface that is in contact with the ground. Thus this becomes a reasonable "separation plane" for the two calculations. It was further decided that the current usage of monthly average ground temperature was reasonable for this separation plane temperature as well, since the time scales of the building heat transfer processes are so much shorter than those of the ground heat transfer processes.
 
-Using the separation plane premise, the 3D ground heat transfer programs for slabs developed by Bahnfleth (1989, 1990) were modified by Clements (2004) to produce outside face temperatures. EnergyPlus permits separate monthly average inside temperatures as input. The program produces outside face temperatures for the core area and the perimeter area of the slab. It is described in the section “Use of the Ground Temperatures with Slabs” below.
+Using the separation plane premise, the 3D ground heat transfer programs for slabs developed by Bahnfleth (1989, 1990) were modified by Clements (2004) to produce outside face temperatures. EnergyPlus permits separate monthly average inside temperatures as input. The program produces outside face temperatures for the core area and the perimeter area of the slab. It is described in the section "Use of the Ground Temperatures with Slabs" below.
 
 A 3D basement program also is included with EnergyPlus. This is described below in Using Ground Temperatures with Basements. It uses the same principle as the slab procedure; it determines the outside face (surface) temperature of the walls and floor of a basement in contact with the ground.
 
@@ -5622,9 +5622,9 @@ Use of the Ground Temperatures with Slabs
 
 The Slab program produces temperature profiles for the outside surface at the core and at the perimeter of the slab. It also produces the average based on the perimeter and core areas used in the calculation. This allows the user to apply the Slab temperatures one of two ways in EnergyPlus:
 
-*Option 1 – Core and Perimeter Temperatures*:  The EnergyPlus OtherSideCoefficients object can be used to provide two sets of twelve monthly average ground temperature values. In this way, both the perimeter and the core values from the Slab program can be used in the succeeding EnergyPlus run. This method assumes that the floor slab will be described using at least two different heat transfer surfaces. The use of OtherSideCoefficients to provide additional ground contact surfaces is described in detail in the "Multiple Ground Temperatures" section below.
+*Option 1 - Core and Perimeter Temperatures*:  The EnergyPlus OtherSideCoefficients object can be used to provide two sets of twelve monthly average ground temperature values. In this way, both the perimeter and the core values from the Slab program can be used in the succeeding EnergyPlus run. This method assumes that the floor slab will be described using at least two different heat transfer surfaces. The use of OtherSideCoefficients to provide additional ground contact surfaces is described in detail in the "Multiple Ground Temperatures" section below.
 
-*Option 2 – Average Temperatures: * Use the monthly average temperatures produced by the Slab program in the EnergyPlus GroundTemperatures object. This will provide an average ground temperature at the outside face of any heat transfer surface whose OutsideFaceEnvironment field is set to “ground”.
+*Option 2 - Average Temperatures: * Use the monthly average temperatures produced by the Slab program in the EnergyPlus GroundTemperatures object. This will provide an average ground temperature at the outside face of any heat transfer surface whose OutsideFaceEnvironment field is set to "ground".
 
 EnergyPlus accepts twelve separate monthly average inside temperatures. In addition, it is possible to add an hourly sinusoidal variation of the inside temperature with a 24 hour period sine function. This was included to show the effect of something such as night setback on the face temperature. Generally, the effect is quite small.
 
@@ -6007,7 +6007,7 @@ The resulting heat fluxes are shown below.  They can be compared with the fluxe
 Slab configuration Drawing
 --------------------------
 
-The slab configuration used in the slab model is a “slab in grade” model. That is, the slab top surface is assumed level with the outside earth surface. If a “slab on grade” configuration, having the bottom surface of the slab level with the outside earth surface is desired, the best approximation is to use the horizontal insulation configuration. The edge of the slab will have a small thermal resistance due to the two dimensional path through the earth, but the effect is small. In any case, uninsulated slab edges are certainly not recommended in cold climates.
+The slab configuration used in the slab model is a "slab in grade" model. That is, the slab top surface is assumed level with the outside earth surface. If a "slab on grade" configuration, having the bottom surface of the slab level with the outside earth surface is desired, the best approximation is to use the horizontal insulation configuration. The edge of the slab will have a small thermal resistance due to the two dimensional path through the earth, but the effect is small. In any case, uninsulated slab edges are certainly not recommended in cold climates.
 
 ![](AuxiliaryPrograms/media/image018.jpg)
 
@@ -6018,7 +6018,7 @@ Running the Slab Program
 
 EP-Launch can be used to run the Slab program using two different methods.
 
-If the Slab objects (see Description of the Objects in the E+SlabGHT.IDD) are located in the standard EnergyPlus IDF input file than the Single Input File and Group of Input File tabs of EP-Launch can be used and the Slab preprocessor will be called automatically during the simulation process. In this case the Slab objects should all appear with the object name starting with “**GroundHeatTransfer:Slab:**” This option also requires a **GroundHeatTransfer:Control** object in the EnergyPlus idf file (see Input Output Reference).
+If the Slab objects (see Description of the Objects in the E+SlabGHT.IDD) are located in the standard EnergyPlus IDF input file than the Single Input File and Group of Input File tabs of EP-Launch can be used and the Slab preprocessor will be called automatically during the simulation process. In this case the Slab objects should all appear with the object name starting with "**GroundHeatTransfer:Slab:**" This option also requires a **GroundHeatTransfer:Control** object in the EnergyPlus idf file (see Input Output Reference).
 
 If the Slab objects are located in a separate file, they should be run using the Slab option on the Utilities tab in EP-Launch. See the EP-Launch section in this document for more information on how to use EP-Launch with the Slab program.
 
@@ -6071,7 +6071,7 @@ and then in command mode issue the run command:
 
 RunSlab myinput Chicago
 
-Where you would have myinput.idf in “input\_path” and Chicago would be the name of the .epw file in the “weather\_path”.
+Where you would have myinput.idf in "input\_path" and Chicago would be the name of the .epw file in the "weather\_path".
 
 You should set up the command mode so that it does not automatically close the window at the end of program termination if you want to see the commands as they run and know for sure that no errors occurred.
 
@@ -6082,17 +6082,17 @@ The following output files are created by the Slab program and saved in the outp
 
 
 
-\*\_slab.ger – Error file. Input errors are reported here.
+\*\_slab.ger - Error file. Input errors are reported here.
 
-\*\_slab.out – Summary of inputs, location data, and grid coordinates
+\*\_slab.out - Summary of inputs, location data, and grid coordinates
 
-\*\_slab.gtp – Monthly ground temperatures and EnergyPlus idf objects
+\*\_slab.gtp - Monthly ground temperatures and EnergyPlus idf objects
 
 
 
 ### EnergyPlus idf Objects from Slab Program
 
-If the objects are placed in the normal EnergyPlus input IDF file using the “GroundHeatTransfer:Slab:” prefix, then the values resulting from the Slab preprocessor will be automatically included in the simulation at run time. The surfaces can reference these values using Outside Boundary Conditions of:
+If the objects are placed in the normal EnergyPlus input IDF file using the "GroundHeatTransfer:Slab:" prefix, then the values resulting from the Slab preprocessor will be automatically included in the simulation at run time. The surfaces can reference these values using Outside Boundary Conditions of:
 
 n GroundSlabPreprocessorAverage
 
@@ -6286,7 +6286,7 @@ Until:24:00,
 
 
 
-&lt;reduced for brevity – compact schedules for MonthlyPerimeterTemp and MonthlyCoreTemp are included.
+&lt;reduced for brevity - compact schedules for MonthlyPerimeterTemp and MonthlyCoreTemp are included.
 
 
 
@@ -6297,7 +6297,7 @@ Until:24:00,
 Description of the Objects in the E+SlabGHT.IDD
 -----------------------------------------------
 
-These objects also appear in the main Energy+.IDD file with the prefix “GroundHeatTransfer:Slab:”
+These objects also appear in the main Energy+.IDD file with the prefix "GroundHeatTransfer:Slab:"
 
 ### Materials or GroundHeatTransfer:Slab:Materials Object
 
@@ -6527,7 +6527,7 @@ Use only the value 0 here. Only a rectangular shape is implemented.
 
 This field supplies the building height. This is used to calculate the building shadowing on the ground. Height is in meters.
 
-#### Field: TIN1 – TIN12 &lt;month&gt; Indoor Average temperature set point
+#### Field: TIN1 - TIN12 &lt;month&gt; Indoor Average temperature set point
 
 The next twelve fields specify the average indoor building set point temperatures for each month of the year. These fields are useful for simulating a building that is not temperature controlled for some of the year. In such a case, the average indoor set point temperatures can be obtained by first running the model in EnergyPlus with an insulated floor boundary condition, and then using the resulting monthly average zone temperatures in these fields.
 
@@ -6913,7 +6913,7 @@ ZFACE,  \\memo This is only needed when usuing manual gridding (not recommended
 
 
 
-### Sample IDF File – Slab Program
+### Sample IDF File - Slab Program
 
 A sample IDF file is shown below.
 
@@ -7093,7 +7093,7 @@ Running the Basement Program
 
 EP-Launch can be used to run the Basement program.
 
-If the Basement Objects (see The Basement idd below) are located in the standard EnergyPlus IDF input file than the Single Input File and Group of Input File tabs of EP-Launch can be used and the Basement preprocessor will be called automatically during the simulation process. In this case the Basement objects should all appear with the object name starting with “**GroundHeatTransfer:Basement:**” This option also requires a **GroundHeatTransfer:Control** object in the EnergyPlus idf file (see Input Output Reference).
+If the Basement Objects (see The Basement idd below) are located in the standard EnergyPlus IDF input file than the Single Input File and Group of Input File tabs of EP-Launch can be used and the Basement preprocessor will be called automatically during the simulation process. In this case the Basement objects should all appear with the object name starting with "**GroundHeatTransfer:Basement:**" This option also requires a **GroundHeatTransfer:Control** object in the EnergyPlus idf file (see Input Output Reference).
 
 If the Basement objects are located in a separate file, they should be run using the Basement option on the Utilities tab in EP-Launch. See the EP-Launch section in this document for more information on how to use EP-Launch with the Basement program.
 
@@ -7146,7 +7146,7 @@ and then in command mode issue the run command:
 
 RunBasement myinput Chicago
 
-Where you would have myinput.idf in “input\_path” and Chicago would be the name of the .epw file in the “weather\_path”.
+Where you would have myinput.idf in "input\_path" and Chicago would be the name of the .epw file in the "weather\_path".
 
 You should set up the command mode so that it does not automatically close the window at the end of program termination if you want to see the commands as they run and know for sure that no errors occurred.
 
@@ -7157,18 +7157,18 @@ The following output files are created by the Basement program and saved in the 
 
 
 
-\*.audit – Audit file. Input errors are reported here as well as other information about the progress of the program..
+\*.audit - Audit file. Input errors are reported here as well as other information about the progress of the program..
 
-\*.out – Summary of inputs, location data, and grid coordinates
+\*.out - Summary of inputs, location data, and grid coordinates
 
-\*.csv – Monthly temperatures and fluxes for each surface.
+\*.csv - Monthly temperatures and fluxes for each surface.
 
-\*.idf – the EPObjects.txt file – ready to be included in an EnergyPlus input file (idf)
+\*.idf - the EPObjects.txt file - ready to be included in an EnergyPlus input file (idf)
 
 The Basement idd
 ----------------
 
-The basement idd objects and fields are shown below. These objects also appear in the main Energy+.IDD file with the prefix “GroundHeatTransfer:Basement:”
+The basement idd objects and fields are shown below. These objects also appear in the main Energy+.IDD file with the prefix "GroundHeatTransfer:Basement:"
 
 ! Basement foundation heat transfer module Input Data Dictionary file
 
@@ -7635,7 +7635,7 @@ ZFACE,  !NOTE: This is only needed when using manual gridding
 Description of the Objects in the BasementGHT.idd
 -------------------------------------------------
 
-These objects also appear in the main Energy+.IDD file with the prefix “GroundHeatTransfer:Basement:”
+These objects also appear in the main Energy+.IDD file with the prefix "GroundHeatTransfer:Basement:"
 
 ### SimParameters or GroundHeatTransfer:Basement:SimParameters Object
 
@@ -7735,7 +7735,7 @@ This field is the R value (m2-K/W) of any exterior insulation.
 
 #### Field: INSFULL: Flag: Is the wall fully insulated?
 
-This field uses “true” for fully insulated walls and “false” for insulation half way down the side wall from the grade line.
+This field uses "true" for fully insulated walls and "false" for insulation half way down the side wall from the grade line.
 
 ### SurfaceProps or GroundHeatTransfer:Basement:SurfaceProps Object
 
@@ -7767,11 +7767,11 @@ This field specifies the surface roughness or vegetation height (cm) that is use
 
 #### Field: PET: Flag, Potential evapotranspiration on?
 
-This field is a flag that invokes the evapotranspiration calculation at the surface. This covers all forms of latent heat transfer from the surface. It normally should be included. The user enters “true” for “yes” and “false” for no.
+This field is a flag that invokes the evapotranspiration calculation at the surface. This covers all forms of latent heat transfer from the surface. It normally should be included. The user enters "true" for "yes" and "false" for no.
 
 ### BldgData or GroundHeatTransfer:Basement:BldgData Object
 
-This object specifies the major configuration parameters for the basement. The 3-D grid used in the simulation has the capability of including a gravel “fill” around the basement. Thus several dimensions must be specified. All units are in meters.
+This object specifies the major configuration parameters for the basement. The 3-D grid used in the simulation has the capability of including a gravel "fill" around the basement. Thus several dimensions must be specified. All units are in meters.
 
 #### Field: DWALL: Wall thickness
 
@@ -7783,7 +7783,7 @@ This field specifies the thickness of the floor slab (m). Typical value is 0.25.
 
 #### Field: DGRAVXY: Width of gravel pit beside basement wall
 
-This field specifies the width of the gravel “fill” bed beside the basement wall (m).
+This field specifies the width of the gravel "fill" bed beside the basement wall (m).
 
 #### Field: DGRAVZN: Gravel depth extending above the floor slab
 
@@ -7803,27 +7803,27 @@ This flag indicates that the basement temperature is controlled. For EnergyPlus 
 
 #### Field: HIN: Downward convection only heat transfer coefficient
 
-This field specifies the convection only heat transfer coefficient for floors (downward heat flux – W/m2-K).
+This field specifies the convection only heat transfer coefficient for floors (downward heat flux - W/m2-K).
 
 #### Field: HIN: Upward convection only heat transfer coefficient
 
-This field specifies the convection only heat transfer coefficient for floors (upward heat flux – W/m2-K).
+This field specifies the convection only heat transfer coefficient for floors (upward heat flux - W/m2-K).
 
 #### Field: HIN: Horizontal convection only heat transfer coefficient
 
-This field specifies the convection only heat transfer coefficient for walls (horizontal heat flux – W/m2-K).
+This field specifies the convection only heat transfer coefficient for walls (horizontal heat flux - W/m2-K).
 
 #### Field: HIN: Downward combined (convection and radiation) heat transfer coefficient
 
-This field specifies the combined thermal radiation and convection heat transfer coefficient for floors (downward heat flux – W/m2-K).
+This field specifies the combined thermal radiation and convection heat transfer coefficient for floors (downward heat flux - W/m2-K).
 
 #### Field: HIN: Upward combined (convection and radiation) heat transfer coefficient
 
-This field specifies the combined thermal radiation and convection heat transfer coefficient for floors (upward heat flux – W/m2-K).
+This field specifies the combined thermal radiation and convection heat transfer coefficient for floors (upward heat flux - W/m2-K).
 
 #### Field: HIN: Horizontal combined (convection and radiation) heat transfer coefficient
 
-This field specifies the combined thermal radiation and convection heat transfer coefficient for walls (horizontal heat flux – W/m2-K).
+This field specifies the combined thermal radiation and convection heat transfer coefficient for walls (horizontal heat flux - W/m2-K).
 
 ### ComBldg or GroundHeatTransfer:Basement:ComBldg Object
 
@@ -8168,7 +8168,7 @@ ZFACE,
 Using the Interface Surface Temperature Results in EnergyPlus
 -------------------------------------------------------------
 
-If the objects are placed in the normal EnergyPlus input IDF file using the “GroundHeatTransfer:Basement:” prefix, then the values resulting from the Basement preprocessor will be automatically included in the simulation at run time. The surfaces can reference these values using Outside Boundary Conditions of:
+If the objects are placed in the normal EnergyPlus input IDF file using the "GroundHeatTransfer:Basement:" prefix, then the values resulting from the Basement preprocessor will be automatically included in the simulation at run time. The surfaces can reference these values using Outside Boundary Conditions of:
 
 n GroundBasementPreprocessorAverageWall
 
@@ -8636,7 +8636,7 @@ emit = 0
 
 out = 0
 
-view factor output file format – 1 = …gence criterion for the numerical integration used to compute view factors between surfaces that have view obstructing surfaces between them.
+view factor output file format - 1 = …gence criterion for the numerical integration used to compute view factors between surfaces that have view obstructing surfaces between them.
 
 list = 0
 
@@ -8707,9 +8707,9 @@ The extra sheets generated by the VBA macros will be deleted if the program is c
 Additional Information
 ----------------------
 
-The interface and this document do not describe all of the features of the View3D program. Additional information can be found in the NIST document View3D32.pdf that accompanies the distribution. For example, if an obstruction wall is desired, it can be placed using the interface, but then the “C” at the left end of the row describing that surface in the input file should be changed to “O”. The program can then be rerun with the new input file. If View3D.exe is double clicked, it will ask for the names of the input file and the output file.
+The interface and this document do not describe all of the features of the View3D program. Additional information can be found in the NIST document View3D32.pdf that accompanies the distribution. For example, if an obstruction wall is desired, it can be placed using the interface, but then the "C" at the left end of the row describing that surface in the input file should be changed to "O". The program can then be rerun with the new input file. If View3D.exe is double clicked, it will ask for the names of the input file and the output file.
 
-An additional point should be emphasized. The program will not calculate view factors for walls containing windows. That is all surfaces must be convex. Therefore,  a wall containing a subsurface must be described as four sections surrounding the subsurface. They can be combined using the “comb” column as described in the View3D document. However, this in not necessary if the user is willing to work with a few additional surfaces.
+An additional point should be emphasized. The program will not calculate view factors for walls containing windows. That is all surfaces must be convex. Therefore,  a wall containing a subsurface must be described as four sections surrounding the subsurface. They can be combined using the "comb" column as described in the View3D document. However, this in not necessary if the user is willing to work with a few additional surfaces.
 
 
 
@@ -8723,7 +8723,7 @@ IDF Version Updater
 
 The transition programs have been written as console applications similar to EnergyPlus. However, that may not be the easiest for users who want to transition several versions or several files at one time. Thus the IDF Version Updater GUI application was created.
 
-The IDF Version Updater lives in the folder with the multiple transition programs -- see **Error! Reference source not found.**. Note that this application is also available from the EP-Launch Utilities tab (utility: IDFVersionUpdater). If you need to convert files from older than V6.0, the transition program set will need to be downloaded before use.  Once “IDF Version Updater” is selected from the Utilities pulldown list, click on the “Run IDF Version Updater” box and the single window shown below appears:
+The IDF Version Updater lives in the folder with the multiple transition programs -- see **Error! Reference source not found.**. Note that this application is also available from the EP-Launch Utilities tab (utility: IDFVersionUpdater). If you need to convert files from older than V6.0, the transition program set will need to be downloaded before use.  Once "IDF Version Updater" is selected from the Utilities pulldown list, click on the "Run IDF Version Updater" box and the single window shown below appears:
 
 
 
@@ -8731,9 +8731,9 @@ The IDF Version Updater lives in the folder with the multiple transition program
 
 Figure 29.  Transition GUI screen
 
-Using the program is quite simple. As the window indicates, you press “Choose File to Update” to select a file or list of files (see IDF Version Converter / Transition File Lists) to convert. If doing multiple transitions using a transition file list you also press the “Choose File to Update, a browse window will appear at the bottom of which is a pulldown list for the “Files of Type”.  Select the “Text File With List of EnergyPlus Files (\*.lst)” (see the section IDF Version Converter / Transition File Lists for format of this .lst file) option.  Once a file is found, its version is checked and appears as the “Current Version”. By default, the latest “New Version” will be selected by the program – you can override this by choosing a different file version as the end version. The “Update File” button will then be able to be selected and the conversion will be done. The audit from the multiple transitions will be able to be viewed once the process is complete. If you are doing multiple transitions (e.g., from V2.2 to V6), you can select the check box “Create Intermediate Files” and after each transition, a file for the resultant version will be created and labeled &lt;filename&gt;)\_Vx.idf (where x is an abbreviated version number).
+Using the program is quite simple. As the window indicates, you press "Choose File to Update" to select a file or list of files (see IDF Version Converter / Transition File Lists) to convert. If doing multiple transitions using a transition file list you also press the "Choose File to Update, a browse window will appear at the bottom of which is a pulldown list for the "Files of Type".  Select the "Text File With List of EnergyPlus Files (\*.lst)" (see the section IDF Version Converter / Transition File Lists for format of this .lst file) option.  Once a file is found, its version is checked and appears as the "Current Version". By default, the latest "New Version" will be selected by the program - you can override this by choosing a different file version as the end version. The "Update File" button will then be able to be selected and the conversion will be done. The audit from the multiple transitions will be able to be viewed once the process is complete. If you are doing multiple transitions (e.g., from V2.2 to V6), you can select the check box "Create Intermediate Files" and after each transition, a file for the resultant version will be created and labeled &lt;filename&gt;)\_Vx.idf (where x is an abbreviated version number).
 
-The converted file becomes the new &lt;file&gt;.idf and the original file is saved in the original folder as &lt;file&gt;\_original.idf. To delete the original file instead of saving it, check the “Delete Original Files” checkbox.
+The converted file becomes the new &lt;file&gt;.idf and the original file is saved in the original folder as &lt;file&gt;\_original.idf. To delete the original file instead of saving it, check the "Delete Original Files" checkbox.
 
 Table 27. IDF Version Updater Output Files and Descriptions.
 
@@ -8752,7 +8752,7 @@ Table 27. IDF Version Updater Output Files and Descriptions.
 </tr>
 <tr>
 <td>&lt;filename&gt;_Vxxx.idf</td>
-<td>If you don’t select “create intermediate versions”, this will only be the original version. Otherwise will have each version.</td>
+<td>If you don’t select "create intermediate versions", this will only be the original version. Otherwise will have each version.</td>
 </tr>
 </table>
 
@@ -8761,7 +8761,7 @@ Transition Console Program Details
 
 For those who are interested, this is the detailed description of the Transition console applications including the current one. There are methods to use the program set from the command line; those details are not included in this document but available from EnergyPlus Support group.
 
-TransitionV6-0-0-to-V7-0-0.exe is the current transition program that is distributed with the V7.0 release. It uses several important files that are included in the main “EnergyPlus” folder.
+TransitionV6-0-0-to-V7-0-0.exe is the current transition program that is distributed with the V7.0 release. It uses several important files that are included in the main "EnergyPlus" folder.
 
 Table 28. Transition files for current release
 
@@ -8788,11 +8788,11 @@ Table 28. Transition files for current release
 </tr>
 </table>
 
- Another file “Rules6-0-0-to-7-0-0.xls” is not used directly by the program but contains the “rules” for translating objects from version 6.0 release to the 7.0 release. The ObjectStatus file can also be viewed – it will show if deleted objects are automatically transitioned to the new input file versions.
+ Another file "Rules6-0-0-to-7-0-0.xls" is not used directly by the program but contains the "rules" for translating objects from version 6.0 release to the 7.0 release. The ObjectStatus file can also be viewed - it will show if deleted objects are automatically transitioned to the new input file versions.
 
-There are several methods to executing the transition program – these methods give you the most flexibility in changing files from one version to the next. The easiest transition is through the EP-Launch program which can detect if the input file about to be run is of the same version as the IDD or not and suggest transitioning. You can also manually transition from the file menu in EP-Launch. (To have this feature, you must also have the files from the preceding table in the same folder as EP-Launch – which is usually the folder that also has the EnergyPlus.exe program).
+There are several methods to executing the transition program - these methods give you the most flexibility in changing files from one version to the next. The easiest transition is through the EP-Launch program which can detect if the input file about to be run is of the same version as the IDD or not and suggest transitioning. You can also manually transition from the file menu in EP-Launch. (To have this feature, you must also have the files from the preceding table in the same folder as EP-Launch - which is usually the folder that also has the EnergyPlus.exe program).
 
-There are two command line methods to execute the transition version (from the Command Prompt). One is to simply use the file name you want transitioned (including .rvi or .mvi file names) or you can use a file name with a .lst extension and simply enter file names to be done in a text file. When you execute the transition program in this fashion, you will get the “typical” program defaults of a “full” transition, field names will be shown at each field with units, and any blank fields will be left blank rather than filled in with the current defaults.
+There are two command line methods to execute the transition version (from the Command Prompt). One is to simply use the file name you want transitioned (including .rvi or .mvi file names) or you can use a file name with a .lst extension and simply enter file names to be done in a text file. When you execute the transition program in this fashion, you will get the "typical" program defaults of a "full" transition, field names will be shown at each field with units, and any blank fields will be left blank rather than filled in with the current defaults.
 
 IDF Version Converter / Transition File Lists
 ---------------------------------------------
@@ -8818,7 +8818,7 @@ Note that the files need not be in the same folder. And, if you use the IDF Vers
 Converting imf files
 --------------------
 
-The transition/conversion programs can “automatically” transition imf (ep-macro) files. One note of caution: if your macro file contains \#if statements in the form:
+The transition/conversion programs can "automatically" transition imf (ep-macro) files. One note of caution: if your macro file contains \#if statements in the form:
 
 PEOPLE,
 
@@ -8888,7 +8888,7 @@ Help is offered on the Main Tab and on the Options Tab when you place the mouse,
 Main Tab
 --------
 
-The Main Tab, shown in Figure 30, contains the “Create DXF from IDF” button which is the button to use to create a DXF file from an IDF file, the main function of the EPDrawGUI program. This is the primary button that you will need to use. When pressed, you select an IDF file that you want to use as the basis for a drawing.  If the “Show DXF File After Created” check box is check, when the “Create DXF from IDF” button is pressed, the drawing will be viewed immediately after the DXF file is created. Normally, the viewer for DXF files is automatically found but if the program cannot find a drawing viewer program, you can select one manually on the Options Tab.
+The Main Tab, shown in Figure 30, contains the "Create DXF from IDF" button which is the button to use to create a DXF file from an IDF file, the main function of the EPDrawGUI program. This is the primary button that you will need to use. When pressed, you select an IDF file that you want to use as the basis for a drawing.  If the "Show DXF File After Created" check box is check, when the "Create DXF from IDF" button is pressed, the drawing will be viewed immediately after the DXF file is created. Normally, the viewer for DXF files is automatically found but if the program cannot find a drawing viewer program, you can select one manually on the Options Tab.
 
 
 
@@ -8901,11 +8901,11 @@ Option Tab
 
 The Option Tab, shown in Figure 31, contains an additional option to control some complex drawings as well as ways to select the DXF file viewer and view DXF files.
 
-The “View DXF File” button is used to select a previously created DXF file and view it with the DXF file viewer. The DXF viewer is usually found automatically but if this function does not work, you may want to select the DXF file viewer manually using the Select DXF Viewer button.
+The "View DXF File" button is used to select a previously created DXF file and view it with the DXF file viewer. The DXF viewer is usually found automatically but if this function does not work, you may want to select the DXF file viewer manually using the Select DXF Viewer button.
 
-The “Select DXF Viewer” button allows you to manually select the program used to display DXF files. Normally, it is not necessary to use this function since the DXF file viewer program is automatically detected but if the wrong file viewer is automatically detected or no file viewer is detected, this button can be used to select the viewer program.
+The "Select DXF Viewer" button allows you to manually select the program used to display DXF files. Normally, it is not necessary to use this function since the DXF file viewer program is automatically detected but if the wrong file viewer is automatically detected or no file viewer is detected, this button can be used to select the viewer program.
 
-For IDF files that contain surfaces with more than four sides, the options under “Polygons with 5+ Sides” can affect the way the drawing is shown. Polygons with &gt;4 sides do not display with the DXF 3DFACE command used for surfaces of 3 and 4 sides which subsequently will display very nicely as a “solid” in many DXF viewers.
+For IDF files that contain surfaces with more than four sides, the options under "Polygons with 5+ Sides" can affect the way the drawing is shown. Polygons with &gt;4 sides do not display with the DXF 3DFACE command used for surfaces of 3 and 4 sides which subsequently will display very nicely as a "solid" in many DXF viewers.
 
 Thus there are four options which the user may choose to display &gt;4 sided polygons.
 
@@ -8950,7 +8950,7 @@ These capabilities are invoked in the EP-MACRO program by using macro commands. 
 Running the EP-Macro program
 ----------------------------
 
-The EP-Macro program is run automatically from the batch files (RunEPlus or EPL-Run from EP-Launch). Skip this small section if you are using either the RunEPlus batch file or EP-Launch. If you wish to run it by hand, it is found in the main folder of the EnergyPlus install (bin folder in the Linux install). Note that in EP-Launch and other script files for use with EP-Macro the convention is to name the file &lt;filename&gt;.imf (input macro file). If you name it &lt;filename&gt;.idf (input data file), the scripts will most likely think it is a “normal” EnergyPlus input file and ignore using EP-Macro on it – giving you a less than desireable result.
+The EP-Macro program is run automatically from the batch files (RunEPlus or EPL-Run from EP-Launch). Skip this small section if you are using either the RunEPlus batch file or EP-Launch. If you wish to run it by hand, it is found in the main folder of the EnergyPlus install (bin folder in the Linux install). Note that in EP-Launch and other script files for use with EP-Macro the convention is to name the file &lt;filename&gt;.imf (input macro file). If you name it &lt;filename&gt;.idf (input data file), the scripts will most likely think it is a "normal" EnergyPlus input file and ignore using EP-Macro on it - giving you a less than desireable result.
 
 Table 29. Files used in EP-Macro program
 
@@ -8973,7 +8973,7 @@ Table 29. Files used in EP-Macro program
 </tr>
 </table>
 
-The EP-Macro program is a Console Application, so to run by hand you would need to open a command prompt in the Main EnergyPlus install folder. Then, you would need to copy your input file containing the macro commands from its folder to this folder with the name “in.imf”. The installed name of the EP-Macro program is “epmacro.exe”. After execution, you can save the out.idf in an appropriate folder or rename it to in.idf in order to execute EnergyPlus. You can view the audit.out file for any errors that might have occurred during EP-Macro processing.
+The EP-Macro program is a Console Application, so to run by hand you would need to open a command prompt in the Main EnergyPlus install folder. Then, you would need to copy your input file containing the macro commands from its folder to this folder with the name "in.imf". The installed name of the EP-Macro program is "epmacro.exe". After execution, you can save the out.idf in an appropriate folder or rename it to in.idf in order to execute EnergyPlus. You can view the audit.out file for any errors that might have occurred during EP-Macro processing.
 
 
 
@@ -9785,7 +9785,7 @@ Comment fields may contain macro expansion directions. Following this command, t
 
 For example, you might have:
 
-\#\#set1 Location = “Colorado Springs, CO”
+\#\#set1 Location = "Colorado Springs, CO"
 
 ! Simulation run for Location[]
 
@@ -9960,7 +9960,7 @@ It creates a series of diagrams for the layout of the HVAC system components. Th
 
 Each diagram should be read from left to right, which is the direction of the flow of the fluid through the components.
 
-The HVAC-Diagram program is automatically called when using EP-Launch but can also be included in other batch files. To view the drawing in EP-Launch, click on the drawing button. You can zoom in on this drawing and with the “copy” command, paste a zoomed in portion as a bitmap in your document.
+The HVAC-Diagram program is automatically called when using EP-Launch but can also be included in other batch files. To view the drawing in EP-Launch, click on the drawing button. You can zoom in on this drawing and with the "copy" command, paste a zoomed in portion as a bitmap in your document.
 
 ![](AuxiliaryPrograms/media/image030.jpg)
 
@@ -10688,7 +10688,7 @@ CD PreProcess\\CoeffConv
 
 4)   Run the program:
 
-After creating your files as shown above, enter either CoeffConv or CoeffCheck as desired. The folder also contains a “readme.txt” file which you can peruse.
+After creating your files as shown above, enter either CoeffConv or CoeffCheck as desired. The folder also contains a "readme.txt" file which you can peruse.
 
 ExpandObjects
 =============
@@ -10696,11 +10696,11 @@ ExpandObjects
 Introduction
 ------------
 
-The ExpandObjects program uses HVACTemplate objects in the IDF file to “expand” them into full fledged objects for EnergyPlus.  Read more details of the systems and the individual fields in the HVACTemplate objects in the Input Output Reference document.
+The ExpandObjects program uses HVACTemplate objects in the IDF file to "expand" them into full fledged objects for EnergyPlus.  Read more details of the systems and the individual fields in the HVACTemplate objects in the Input Output Reference document.
 
 ExpandObjects also processes GroundHeatTransfer objects, sends an input file to the Slab and Basement preprocessors, and replaces ground heat transfer boundary condition fields in building surface objects. Read more details of the ground heat transfer processing in the Input Output Reference.
 
-Technically speaking, the ExpandObjects program is a preprocessor that is currently used with the HVACTemplate objects. The preprocessor reads an **idf** file and generates an expanded.idf file (usually with the extension .**expidf**). The original idf file contains objects that will be read by the preprocessor and those that are ignored by the preprocessor. The objects read can be either commented out or left as is. The objects created by the preprocessor in the expanded.idf file should require no further preprocessing. The preprocessor does not read the EnergyPlus Data Dictionary file (Energy+.IDD) and does limited validation. Most of the object values that are created are “passed” through from input objects. This allows EnergyPlus to provide most of the validation. If errors are found, error messages are passed to the EnergyPlus program using the Output:Preprocessor object. These errors will be shown in the usual EnergyPlus error file. When used with EP-Launch, the expanded.idf file is renamed to the original file name with the extension **expidf**.
+Technically speaking, the ExpandObjects program is a preprocessor that is currently used with the HVACTemplate objects. The preprocessor reads an **idf** file and generates an expanded.idf file (usually with the extension .**expidf**). The original idf file contains objects that will be read by the preprocessor and those that are ignored by the preprocessor. The objects read can be either commented out or left as is. The objects created by the preprocessor in the expanded.idf file should require no further preprocessing. The preprocessor does not read the EnergyPlus Data Dictionary file (Energy+.IDD) and does limited validation. Most of the object values that are created are "passed" through from input objects. This allows EnergyPlus to provide most of the validation. If errors are found, error messages are passed to the EnergyPlus program using the Output:Preprocessor object. These errors will be shown in the usual EnergyPlus error file. When used with EP-Launch, the expanded.idf file is renamed to the original file name with the extension **expidf**.
 
 HVAC Template Objects Processed
 -------------------------------
@@ -10913,9 +10913,9 @@ Source code is available upon request from jglazer@gard.com.
 convertESOMTR
 =============
 
-This simple post processing utility will convert the raw data “ESO” and “MTR” files to IP (Inch-Pound) units before later processing into CSV files. EP-Launch has an option to automatically convert to IP units that invokes convertESOMTR, see VIEW – Options - Miscellaneous dialog box. The ReadVarsESO program will take these converted files and make them into normal CSV files but will have IP units. The RunEPlus batch file does not include this option but could be edited to perform the same functions if desired.
+This simple post processing utility will convert the raw data "ESO" and "MTR" files to IP (Inch-Pound) units before later processing into CSV files. EP-Launch has an option to automatically convert to IP units that invokes convertESOMTR, see VIEW - Options - Miscellaneous dialog box. The ReadVarsESO program will take these converted files and make them into normal CSV files but will have IP units. The RunEPlus batch file does not include this option but could be edited to perform the same functions if desired.
 
-Technically speaking, the convertESOMTR program uses the “convert.txt” file which contains the conversion factors. It creates files “ip.eso” and “ip.mtr” as appropriate. The batch examples then renames the old eplusout.eso to eplusout.esoold, old eplusout.mtr to eplusout.mtrold and the ip files to the default eplusout.eso, eplusout.mtr.
+Technically speaking, the convertESOMTR program uses the "convert.txt" file which contains the conversion factors. It creates files "ip.eso" and "ip.mtr" as appropriate. The batch examples then renames the old eplusout.eso to eplusout.esoold, old eplusout.mtr to eplusout.mtrold and the ip files to the default eplusout.eso, eplusout.mtr.
 
 The convert.txt file contains the conversion factors using three different commands.
 
@@ -11377,14 +11377,14 @@ SI: Temperature in °C, Capacity in kW, Power in kW, and Flow in m<sup>3</sup>/s
 Rated Data
 ----------
 
-The rated data is used to normalize the performance data set. The rated test conditions depend on the equipment type.  For DX cooling coil the rated test temperatures are 67°F (19.4°C) indoor coil entering wet bulb, 80°F (26.7°C) indoor coil entering dry bulb and 95°F (35.0°C) outdoor coil entering dry bulb air temperatures per ANSI/AHRI Std. 210/240 (AHRI 2008).  If the rated test temperatures are different from the values populated by the tool, then the user may enter the applicable values manually.  The rated data can be one of the performance data points depending on the speed or stage. The rated data set is entered in the Cells range “B11:E11” of the INPUT tab as shown in Figure 1.
+The rated data is used to normalize the performance data set. The rated test conditions depend on the equipment type.  For DX cooling coil the rated test temperatures are 67°F (19.4°C) indoor coil entering wet bulb, 80°F (26.7°C) indoor coil entering dry bulb and 95°F (35.0°C) outdoor coil entering dry bulb air temperatures per ANSI/AHRI Std. 210/240 (AHRI 2008).  If the rated test temperatures are different from the values populated by the tool, then the user may enter the applicable values manually.  The rated data can be one of the performance data points depending on the speed or stage. The rated data set is entered in the Cells range "B11:E11" of the INPUT tab as shown in Figure 1.
 
 Performance Data
 ----------------
 
 The performance data set entered depends on the type of independent variables selected.  To generate performance curves (e.g. DX Coils) as a function of temperatures require the capacity and power data at various combinations of indoor and outdoor coil entering air temperatures at a rated supply air flow rate. And performance curves (e.g. DX Coil) as function of flow fraction require  capacity and power data at various supply air flow rates and rated indoor and outdoor coil entering air (or water) temperatures. The performance data set may include the rated data as one of the data points. The performance data set is entered starting from row 15 and down for each of the variables as shown in Figure 33.
 
-The total cooling and heating capacities must be the gross values, i.e., not corrected for the supply fan heating effect.  Also the input power has to exclude the supply air fan power, but includes other miscellaneous power inputs (e.g. control panel power).   If manufacturers provide the total power, then the supply fan power must be deducted from the former.  If the capacity and power data are normalized values, then enter 1.0 for rated gross capacity and power in the ***Rated Data*** input Cells range (B11:E11 in the INPUT tab). Two samples of performance and rated data set are included in the “**INSTRUCTION**” tab.
+The total cooling and heating capacities must be the gross values, i.e., not corrected for the supply fan heating effect.  Also the input power has to exclude the supply air fan power, but includes other miscellaneous power inputs (e.g. control panel power).   If manufacturers provide the total power, then the supply fan power must be deducted from the former.  If the capacity and power data are normalized values, then enter 1.0 for rated gross capacity and power in the ***Rated Data*** input Cells range (B11:E11 in the INPUT tab). Two samples of performance and rated data set are included in the "**INSTRUCTION**" tab.
 
 Outputs
 -------
@@ -11477,7 +11477,7 @@ Reports progress of the curve object generation calculation starting from readin
 Notes
 -----
 
-This tool has been tested on Ubuntu 11 using Libre Office and MS Office Macintosh 2011 machines.  But the button for running the macro may not be imported properly on Ubuntu hence users may have to run the tool manually by selecting "**ManageCurveFit**" and “**SaveCurveObjToTextFile**” subroutine from the macro list.
+This tool has been tested on Ubuntu 11 using Libre Office and MS Office Macintosh 2011 machines.  But the button for running the macro may not be imported properly on Ubuntu hence users may have to run the tool manually by selecting "**ManageCurveFit**" and "**SaveCurveObjToTextFile**" subroutine from the macro list.
 
 References
 ----------
@@ -11516,7 +11516,7 @@ Tang,C.C. 2004. Modeling Packaged Heat Pumps in a Quasi-Steady State Energy Simu
 
 Data points are obtained from the heat pump manufacturer data. Minimum data points for the parameter estimation based model are 32 data points according to Jin (2002). The curve-fit model performance is not affected by the number of data points and a minimum of 5 data points is required since the governing equations require 6 coefficients. The data points must have varying inlet conditions (e.g. water flow rates, inlet water temperatures, etc.) that covers the entire range of the heat pump operating conditions. Correction tables provided by the manufacturer should be used to extend the catalog data range in order to have a good set of parameters/coefficients.
 
-- Using the heat pump performance data, enter the values to Table 1 in worksheet “CATALOG DATA”. The values can be in SI or IP units.
+- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
 
 - Click on Button 1 based on the units used.
 
@@ -11528,23 +11528,23 @@ For SI units:
 
 ![](AuxiliaryPrograms/media/image038.png)
 
-- The program will convert the values to the desired units and display them on Table 2 in worksheet “INPUT”.
+- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT".
 
-- The button shown below is used clearing Table 1 (worksheet “CATALOG DATA”), and Table 2 (worksheet “INPUT”). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
+- The button shown below is used clearing Table 1 (worksheet "CATALOG DATA"), and Table 2 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
 
 ![](AuxiliaryPrograms/media/image039.png)
 
 After Table 2 is created, the parameters/coefficients are then calculated as follows:
 
-- Worksheet “ParamEstimator” is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
+- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
 
-- Worksheet “CoeffCalculator” is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
+- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
 
 ### Parameter Estimation Procedure
 
 #### Step 2a: Generating First Set of Parameters (PE-Based Model)
 
-- Using Table 2, the program can generate parameters. The user must fill all the cells colored light blue in worksheet “ParamEstimator”.
+- Using Table 2, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
 
 - **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
 
@@ -11564,7 +11564,7 @@ It will take some time to generate the parameters depending on the number of dat
 
 - Look at the error analysis of Error 1 which gives the user a summary of the errors for Qload, Qsource and Power. An average error of 5-8% is achievable for all the values.
 
-- The errors for all the individual catalog data points are displayed in worksheet “RESULT”.
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
 #### Step 2b: Improving the Set of Parameters (PE-Based Model)
 
@@ -11592,7 +11592,7 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 ![](AuxiliaryPrograms/media/image042.png)
 
-- The button shown below in worksheet “ParamEstimator” is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet “RESULT”.
+- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image043.png)
 
@@ -11602,7 +11602,7 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 #### Step 2: Generating the coefficients (Curve-Fit Model)
 
-- Using Table 2, the program is ready to generate the coefficients. User is required to fill all the cells colored light blue in worksheet “CoeffCalculator”.
+- Using Table 2, the program is ready to generate the coefficients. User is required to fill all the cells colored light blue in worksheet "CoeffCalculator".
 
 - **RatedLoadVolFlowRate:** Rated load side volumetric flow rate (m<sup>3</sup>/s) which corresponds to the highest load side heat transfer rate listed in the catalog data.
 
@@ -11618,9 +11618,9 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 - The coefficients for the corresponding curves are listed at cell B12:C16. Error analysis of model is listed at cell B19:B27.
 
-- The errors for all the individual catalog data points are displayed in worksheet “RESULT”.
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
-- The button shown below in worksheet “CoeffCalculator” is used for clearing the coefficients, the error analysis and the outputs in worksheet “RESULT”.
+- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image045.png)
 
@@ -11647,7 +11647,7 @@ Tang,C.C. 2004. Modeling Packaged Heat Pumps in a Quasi-Steady State Energy Simu
 
 Data points are obtained from the heat pump manufacturer data. Minimum data points for the parameter estimation based model are 32 data points according to Jin (2002). The curve-fit model performance is not affected by the number of data points and a minimum of 6 data points is required since the sensible cooling capacity requires 6 coefficients. The data points must have varying inlet conditions (e.g. air flow rates, inlet water temperatures, and etc.) that covers the entire range of the heat pump operating conditions. Correction tables provided by the manufacturer should be used to extend the catalog data range in order to have a good set of parameters/coefficients.
 
-- Using the heat pump performance data, enter the values to Table 1 in worksheet “CATALOG DATA”. The values can be in SI or IP units.
+- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
 
 - Click on Button 1 based on the units used.
 
@@ -11659,23 +11659,23 @@ For SI units:
 
 ![](AuxiliaryPrograms/media/image047.png)
 
-- The program will convert the values to the desired units and display them on Table 2 in worksheet “INPUT”.  Then the program will discard bad catalog points by calculating the relative humidity of the exiting air at the load side (relative humidity should be less or equal to 1). Table 3 in worksheet “INPUT” shows the input catalog data that will be used by the parameter/coefficient generator program.
+- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT".  Then the program will discard bad catalog points by calculating the relative humidity of the exiting air at the load side (relative humidity should be less or equal to 1). Table 3 in worksheet "INPUT" shows the input catalog data that will be used by the parameter/coefficient generator program.
 
-- The button shown below is used clearing Table 1 (worksheet “CATALOG DATA”), Table 2, and Table 3 (worksheet “INPUT”). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
+- The button shown below is used clearing Table 1 (worksheet "CATALOG DATA"), Table 2, and Table 3 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
 
 ![](AuxiliaryPrograms/media/image048.png)
 
 After Table 3 is created, the parameters/coefficients are then calculated as follows:
 
-- Worksheet “ParamEstimator” is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
+- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
 
-- Worksheet “CoeffCalculator” is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
+- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
 
 ### Parameter Estimation Procedure
 
 #### Step 2a: Generating First Set of Parameters (PE-Based Model)
 
-- Using contents of Table 3, the program can generate parameters. The user must fill all the cells colored light blue in worksheet “ParamEstimator”.
+- Using contents of Table 3, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
 
 - **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
 
@@ -11695,7 +11695,7 @@ It will take some time to generate the parameters depending on the number of dat
 
 - Look at the error analysis of Error 1, which gives the user a summary of the errors for Qtotal, Qsensible, Qsource and Power. An average error of 5-8% is achievable for all the values.
 
-- The errors for all the individual catalog data points are displayed in worksheet “RESULT”.
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
 #### Step 2b: Improving the Set of Parameters (PE-Based Model)
 
@@ -11723,7 +11723,7 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 ![](AuxiliaryPrograms/media/image050.png)
 
-- The button shown below in worksheet “ParamEstimator” is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet “RESULT”.
+- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image051.png)
 
@@ -11733,7 +11733,7 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 #### Step 2: Generating the coefficients (Curve-Fit Model)
 
-- Using the contents of Table 3, the program can generate the coefficients. The user must fill all the cells colored light blue in worksheet “CoeffCalculator”.
+- Using the contents of Table 3, the program can generate the coefficients. The user must fill all the cells colored light blue in worksheet "CoeffCalculator".
 
 - **RatedAirVolFlowRate:** Rated volumetric air flow rate (m<sup>3</sup>/s) which corresponds to the highest total cooling capacity listed in the catalog data.
 
@@ -11751,9 +11751,9 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 - The coefficients for the corresponding curves are listed at cell B12:D17. Error analysis of model are listed at cell B19:B30.
 
-- The errors for all the individual catalog data points are displayed in worksheet “RESULT”.
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
-- The button shown below in worksheet “CoeffCalculator” is used for clearing the coefficients, the error analysis and the outputs in worksheet “RESULT”.
+- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image053.png)
 
@@ -11780,7 +11780,7 @@ Tang,C.C. 2004. Modeling Packaged Heat Pumps in a Quasi-Steady State Energy Simu
 
 Data points are obtained from the heat pump manufacturer data. Minimum data points for the parameter estimation based model are 32 data points according to Jin (2002). The curve-fit model performance is not affected by the number of data points and a minimum of 5 data points is required since the governing equations require 5 coefficients. The data points must have varying inlet conditions (e.g. air flow rates, inlet water temperatures, and etc.) that covers the entire range of the heat pump operating conditions. Correction tables provided by the manufacturer should be used to extend the catalog data range in order to have a good set of parameters/coefficients.
 
-- Using the heat pump performance data, enter the values to Table 1 in worksheet “CATALOG DATA”. The values can be in SI or IP units.
+- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
 
 - Click on Button 1 based on the units used.
 
@@ -11792,23 +11792,23 @@ For SI units:
 
 ![](AuxiliaryPrograms/media/image055.png)
 
-- The program will convert the values to the desired units and display them on Table 2 in worksheet “INPUT” which will be used by the parameter/coefficient generator program.
+- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT" which will be used by the parameter/coefficient generator program.
 
-- The button shown below is used for clearing Table 1 (worksheet “CATALOG DATA”) and Table 2 (worksheet “INPUT”). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
+- The button shown below is used for clearing Table 1 (worksheet "CATALOG DATA") and Table 2 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
 
 ![](AuxiliaryPrograms/media/image056.png)
 
 After Table 2 is created, the parameters/coefficients are then calculated as follows:
 
-- Worksheet “ParamEstimator” is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
+- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
 
-- Worksheet “CoeffCalculator” is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
+- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
 
 ### Parameter Estimation Procedure
 
 #### Step 2a: Generating First Set of Parameters (PE-Based Model)
 
-- Using Table 2, the program can generate parameters. The user must fill all the cells colored light blue in worksheet “ParamEstimator”.
+- Using Table 2, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
 
 - **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
 
@@ -11830,7 +11830,7 @@ It will take some time to generate the parameters depending on the number of dat
 
 - Look at the error analysis of Error 1, which gives the user a summary of the errors for Heating Capacity, Heating Absorption and Power. An average error of 5-8% is achievable for all the values.
 
-- The errors for all the individual catalog data points are displayed in worksheet “RESULT”.
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
 #### Step 2b: Improving the Set of Parameters (PE-Based Model)
 
@@ -11858,7 +11858,7 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 ![](AuxiliaryPrograms/media/image058.png)
 
-- The button shown below in worksheet “ParamEstimator” is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet “RESULT”.
+- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image059.png)
 
@@ -11868,7 +11868,7 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 #### Step 2: Generating the coefficients (Curve-Fit Model)
 
-- Using Table 2, the program can generate the coefficients. The user must fill all the cells colored light blue in Worksheet “CoeffCalculator”.
+- Using Table 2, the program can generate the coefficients. The user must fill all the cells colored light blue in Worksheet "CoeffCalculator".
 
 - **RatedAirVolFlowRate:** Rated volumetric air flow rate (m<sup>3</sup>/s) which corresponds to the highest heating capacity listed in the catalog data.
 
@@ -11884,9 +11884,9 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 - The coefficients for the corresponding curves are listed at cell B12:C16. Error analysis of model are listed at cell B19:B27.
 
-- The errors for all the individual catalog data points are displayed in worksheet “RESULT”.
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
-- The button shown below in worksheet “CoeffCalculator” is used for clearing the coefficients, the error analysis and the outputs in worksheet “RESULT”.
+- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image059.png)
 
@@ -11899,7 +11899,7 @@ The spreadsheet (g-function\_library.xls) has comparison plots for different con
 
 The reference data set GLHERefData.idf contains sets of parameters for the Ground Heat Exchangers:
 
-“This file contains sample input for the ground loop heat exchanger model. The response of the borehole/ground is found from the 'G-function' that is defined in the input as series of 'n' pairs of values (LNTTSn, GNFCn). It is important to note that the G-functions have to be calculated for specific GHE configurations and borehole resitance, length and borehole/ length ratio. That is, the parameters for the units vary with each design. The data in this file are intended as examples/samples and may not represent actual designs.
+"This file contains sample input for the ground loop heat exchanger model. The response of the borehole/ground is found from the 'G-function' that is defined in the input as series of 'n' pairs of values (LNTTSn, GNFCn). It is important to note that the G-functions have to be calculated for specific GHE configurations and borehole resitance, length and borehole/ length ratio. That is, the parameters for the units vary with each design. The data in this file are intended as examples/samples and may not represent actual designs.
 
 The sample data has been calculated for a number of configurations:
 
@@ -11924,7 +11924,7 @@ The parametric preprocessor used to create a series of resulting IDF files from 
 
 ·        Parametric:FileNameSuffix
 
-The ParametricPreprocessor reads the source IDF file and removes the Parametric objects shown above, processes these objects and any embedded expressions and produces a series of resulting IDF files, one for each “run” described by the objects.
+The ParametricPreprocessor reads the source IDF file and removes the Parametric objects shown above, processes these objects and any embedded expressions and produces a series of resulting IDF files, one for each "run" described by the objects.
 
 An intermediate file called parametric.int is used that contains references to all embedded expressions that will need to be substituted into the file.
 
@@ -11936,7 +11936,7 @@ ParametricPreprocessor can be called at the command line with the name of the so
 
 The ParametricPreprocessor is used in the batch files that come with EnergyPlus and is used by EP-Launch automatically.
 
-AppGPostProcess – Appendix G PostProcessing program
+AppGPostProcess - Appendix G PostProcessing program
 ===================================================
 
 The baseline for Standard 90.1 Appendix G requires simulating the baseline building in four cardinal directions and comparing the average of those simulation results with the proposed building simulation results.  The AppGPostProcess utility helps perform the averaging needed. The utility takes the four HTML files generated by EnergyPlus and creates an average HTML file. In addition, the AppGPostProcess utility takes the four CSV files (based on ESO files) and creates an average CSV file as well as averaging the meter CSV files (based on the MTR files).  The source files must have specific names for this utility to work:
@@ -11965,7 +11965,7 @@ fileNameRoot-G180Table.html
 
 fileNameRoot-G270Table.html
 
-Where “fileNameRoot” can be the characters typically used to name files without extension. A single command line argument is passed to the AppGPostProcess utility which is the name of one of the HTML files. The remaining file names will be used based on any of the HTML files selected.
+Where "fileNameRoot" can be the characters typically used to name files without extension. A single command line argument is passed to the AppGPostProcess utility which is the name of one of the HTML files. The remaining file names will be used based on any of the HTML files selected.
 
 The utility creates the files
 
@@ -11977,7 +11977,7 @@ fileNameRoot-GAVGTable.html
 
 The numeric values in the output files are the average results from the four corresponding source files. In the HTML file, if not all the four files contain a numeric value, then the four values are displayed instead. The source files must have identical structure for AppGPostProcess to work. For CSV files, the same number of rows and the same number of columns are needed each file. This means that monthly or hourly values should be included in the CSV file, and not TimeStep values. For HTML files, the same reports should be included in each and the IDF files should be identical.
 
-The intention is that the four baseline IDF files would be identical except for the use of the Compliance:Building object and only the value of the field “Building Rotation for Appendix G” would change.
+The intention is that the four baseline IDF files would be identical except for the use of the Compliance:Building object and only the value of the field "Building Rotation for Appendix G" would change.
 
 EP-Launch can be used to run both the AppGPostProcess program by using the Utilities tab in EP-Launch.  See the EP-Launch section in this document for more information on how to use EP-Launch.
 
@@ -11986,7 +11986,7 @@ EP-Launch can be used to run both the AppGPostProcess program by using the Utili
 BLASTTranslator
 ===============
 
-The BLAST Translator will produce an IDF file from an existing BLAST Input File (usually called &lt;something&gt;.bin. For anyone that is unfamiliar, BLAST stands for the Building Loads Analysis and Systems Thermodynamics computer program.  Documentation is included here though the BLAST Translator is no longer included with the EnergyPlus Installation – it is available as a special download for those who need it.
+The BLAST Translator will produce an IDF file from an existing BLAST Input File (usually called &lt;something&gt;.bin. For anyone that is unfamiliar, BLAST stands for the Building Loads Analysis and Systems Thermodynamics computer program.  Documentation is included here though the BLAST Translator is no longer included with the EnergyPlus Installation - it is available as a special download for those who need it.
 
 A special batch file (**RunXLate.bat**) can be used to run the translation program. Similar to running EnergyPlus (see above), you run this batch file:
 
@@ -11994,7 +11994,7 @@ RunXLate &lt;blastinputfile&gt;
 
 Where &lt;blastinputfile&gt; is the part of the file name without extension. The program produces a .idf file of the same name.
 
-The BLASTTranslator uses an “Energy+.ini” file for some parameters. For example:
+The BLASTTranslator uses an "Energy+.ini" file for some parameters. For example:
 
 
 
@@ -12012,12 +12012,12 @@ surf=group
 
 dir=
 
-The above BLASTTranslator ini file sets the “version” of EnergyPlus to the current version and has the “surf” parameter set to “group”. This BLASTTranslator run will produce an EnergyPlus input file for the current release version format and will name surfaces by Zone and Class (e.g. ZN001:Wall001). The alternative “Consecutive” will number surfaces in sequence.
+The above BLASTTranslator ini file sets the "version" of EnergyPlus to the current version and has the "surf" parameter set to "group". This BLASTTranslator run will produce an EnergyPlus input file for the current release version format and will name surfaces by Zone and Class (e.g. ZN001:Wall001). The alternative "Consecutive" will number surfaces in sequence.
 
 DOE2Translator
 ==============
 
-The DOE2Translator program creates an EnergyPlus input file from a DOE-2.1E input file. The translation is not intended to be complete but simply an aid to help you move your library of DOE-2.1E input files into EnergyPlus. You should look over the resulting EnergyPlus input file, review the documentation of EnergyPlus, and make any necessary edits to the translated file. Documentation is included here though the BLAST Translator is no longer included with the EnergyPlus Installation – it is available as a special download for those who need it.
+The DOE2Translator program creates an EnergyPlus input file from a DOE-2.1E input file. The translation is not intended to be complete but simply an aid to help you move your library of DOE-2.1E input files into EnergyPlus. You should look over the resulting EnergyPlus input file, review the documentation of EnergyPlus, and make any necessary edits to the translated file. Documentation is included here though the BLAST Translator is no longer included with the EnergyPlus Installation - it is available as a special download for those who need it.
 
 To use the DOE2Translator program, at the DOS prompt (or the command prompt for Windows NT/2000 systems), go to the directory that the DOE2Translator is located. That directory is likely to be:
 
@@ -12043,7 +12043,7 @@ Where you substitute the file you want to translate for &lt;file&gt; without a f
 
   DOE2Translator  samp1b
 
-The &lt;file&gt; can also have a full path, but it should not have an extension. If you have spaces in your path name, enclose the whole thing in “.
+The &lt;file&gt; can also have a full path, but it should not have an extension. If you have spaces in your path name, enclose the whole thing in ".
 
 Several files get created when you run the DOE2Translator program. In the same directory as the DOE-2.1E input file, a new file with the same name and the file extension of ".imf" contains the EnergyPlus translation.
 
@@ -12051,7 +12051,7 @@ This is an EnergyPlus macro file and the macro processor EPMacro needs to be use
 
 The D2EP.log file contains a detailed log of the translation process. The D2E\_TEMP.txt file contains an intermediate version of the log file. Both of these files are created in the same directory as the DOE2Translator program and can usually be deleted.
 
-Since DOE-2.1e and EnergyPlus share a common macro language, many macro features are passed to the EnergyPlus file unchanged, including \#\#set1, \#\#if, \#\#def and other macro commands. References to macro variables (i.e., “var[]”) and expressions (i.e., “ \#[x[] + 1]”) are usually passed through to the resulting EneryPlus IMF unless the DOE2Translator needs to understand that field during the translation process. The DOE2Translator does not evaluate macro expressions and if it needs to understand a field value and a macro is present instead will use a default value for the field instead. Most fields do not need to be understood by the translator and are directly passed through to the IMF file unchanged.
+Since DOE-2.1e and EnergyPlus share a common macro language, many macro features are passed to the EnergyPlus file unchanged, including \#\#set1, \#\#if, \#\#def and other macro commands. References to macro variables (i.e., "var[]") and expressions (i.e., " \#[x[] + 1]") are usually passed through to the resulting EneryPlus IMF unless the DOE2Translator needs to understand that field during the translation process. The DOE2Translator does not evaluate macro expressions and if it needs to understand a field value and a macro is present instead will use a default value for the field instead. Most fields do not need to be understood by the translator and are directly passed through to the IMF file unchanged.
 
 Files that are included with the \#\#include are not translated automatically and would each need to be run through the DOE2Translator. If the included file does not have the INP extension it would need to be changed prior to the translation. In addition, the user would need to edit the \#\#include commands to use the IMF extension instead of the INP extension.
 
@@ -12098,7 +12098,7 @@ In this version of the DOE2Translator program, translation is limited to the fol
 Running Console Applications
 ============================
 
-Several of the auxiliary programs included with EnergyPlus are Console Applications. This designation means that they are executed from the “command window” (Windows OS) or terminal window (Linux OS). We will include generic instructions for the Windows OS use of these applications in this section. Each program will also include specifics for the Windows OS in the individual program documentation.
+Several of the auxiliary programs included with EnergyPlus are Console Applications. This designation means that they are executed from the "command window" (Windows OS) or terminal window (Linux OS). We will include generic instructions for the Windows OS use of these applications in this section. Each program will also include specifics for the Windows OS in the individual program documentation.
 
 As installed, the batch files that accompany console applications will be set so that file extensions are not included for input parameters, paths to installed data (such as weather data) will be set automatically, and these paths can be modified by the user as desired. (Instructions included a bit later in this section).
 
@@ -12171,11 +12171,11 @@ Or, as seen in the batch file text:
 
  set weather\_path=..\\..\\WeatherData\\
 
-As the instructions in the batch file show, the path character must terminate the path specification or errors can occur. The “weather\_path” specification shows an example of using a “relative” path specification. Depending on the program, this specification, of course, might change.
+As the instructions in the batch file show, the path character must terminate the path specification or errors can occur. The "weather\_path" specification shows an example of using a "relative" path specification. Depending on the program, this specification, of course, might change.
 
 set weather\_path=..\\..\\WeatherData\\
 
-What the specification says is that above (..) and above again (..) and then “WeatherData” is where the weather data files are located. This kind of relative path would be true for most “Preprocess” programs in the installed folders. The following illustrates the folder tree:
+What the specification says is that above (..) and above again (..) and then "WeatherData" is where the weather data files are located. This kind of relative path would be true for most "Preprocess" programs in the installed folders. The following illustrates the folder tree:
 
 &lt;Root Folder&gt; (this is usually EnergyPlusV&lt;version&gt;)
 
@@ -12190,7 +12190,7 @@ Thus, the user can simply put the name of the weather data file onto the batch f
 Technical Details of Running EnergyPlus
 =======================================
 
-This section will contain the details of running EnergyPlus – more (and some duplicated) information on EP-Launch (basic discussion included in the Getting Started manual) and “by hand” – describing the batch files that are included with the install. The first parts of this section deal with using EnergyPlus on a Wintel/Windows OS system. Though similar commands can be used on other OS – such as Linux, they will not be exactly the same commands (usually).
+This section will contain the details of running EnergyPlus - more (and some duplicated) information on EP-Launch (basic discussion included in the Getting Started manual) and "by hand" - describing the batch files that are included with the install. The first parts of this section deal with using EnergyPlus on a Wintel/Windows OS system. Though similar commands can be used on other OS - such as Linux, they will not be exactly the same commands (usually).
 
 EP-Launch Program
 -----------------
@@ -12205,7 +12205,7 @@ Figure 35. EP-Launch Screen
 
 ### Start EP-Launch
 
-EP-Launch is located in the main directory/folder for EnergyPlus. In addition, it is available on the shortcut menu for EnergyPlus.  By double clicking on the EP-Launch icon you get the screen shown above (Figure 35) for running a single input file. The EP-Launch program simply starts other programs and allows you to avoid having to use the DOS command line prompt to run EnergyPlus. More help is provided for the program under the “Help” menu.
+EP-Launch is located in the main directory/folder for EnergyPlus. In addition, it is available on the shortcut menu for EnergyPlus.  By double clicking on the EP-Launch icon you get the screen shown above (Figure 35) for running a single input file. The EP-Launch program simply starts other programs and allows you to avoid having to use the DOS command line prompt to run EnergyPlus. More help is provided for the program under the "Help" menu.
 
 ### Selecting Input and Weather Files
 
@@ -12217,7 +12217,7 @@ On the Single Input File tab, after you select the weather and input files simpl
 
 1)   Press the "Control-S" key combination to try to stop the progress and any key to continue.
 
-2)   Under the "View" menu on the EP-Launch program, select “Options” then “Command Window” then check "Pause During Simulation" and this will pause the process immediately after EnergyPlus executes. To continue after the pause, press any key.
+2)   Under the "View" menu on the EP-Launch program, select "Options" then "Command Window" then check "Pause During Simulation" and this will pause the process immediately after EnergyPlus executes. To continue after the pause, press any key.
 
 If the file contains Parametric objects, the single input file may cause multiple simulations to be performed. If multiple simulations are performed, the output files will be listed on the History tab and will be named with either the file suffixes defined in the input file or with a serial number.
 
@@ -12231,93 +12231,93 @@ After you have run a simulation and the black DOS window closes, EnergyPlus has 
 
 Figure 36. EP-Launch Finish Status.
 
-This status gives you a quick overview of whether there were warning (**should look at**), severe (**should probably fix**) or fatal (**must fix**) errors in the run as well as the time it took for the simulation to complete.  After pressing “OK” from this box, selecting “ERR/EIO/BND Output Files Only” from the “View” menu will display the ERR, EIO, and BND files – useful when errors may have occurred. Alternatively, pressing the F2 function key will display the same three files.
+This status gives you a quick overview of whether there were warning (**should look at**), severe (**should probably fix**) or fatal (**must fix**) errors in the run as well as the time it took for the simulation to complete.  After pressing "OK" from this box, selecting "ERR/EIO/BND Output Files Only" from the "View" menu will display the ERR, EIO, and BND files - useful when errors may have occurred. Alternatively, pressing the F2 function key will display the same three files.
 
-Another way to open files easily is by using the View Results buttons as shown in 29. Two different panels of buttons can be used under View Results, one shown by using the “All” tab on the left edge and by using the “Sets” tab on the left edge. The “All” tab shows all the various files by file extension that can be viewed individually. Files available for view  based on the current input file name, are “enabled” (extension names clearly readable).
+Another way to open files easily is by using the View Results buttons as shown in 29. Two different panels of buttons can be used under View Results, one shown by using the "All" tab on the left edge and by using the "Sets" tab on the left edge. The "All" tab shows all the various files by file extension that can be viewed individually. Files available for view  based on the current input file name, are "enabled" (extension names clearly readable).
 
 ![](AuxiliaryPrograms/media/image063.png)
 
 Figure 37. EP-Launch with the Sets tab of View Results
 
-The figure above shows the same main screen of EP-Launch but with the “Sets” tab selected on the left edge of the View Results section. The buttons on this tab can open many files at the same time and are a shortcut to opening the files that may be commonly used. The Text Output Files, Drawing Files, and Spreadsheets buttons cause several different results files to open at once based on the currently selected Input File. The HTML file opens just the tabular results file if that file was produced (see *OutputControl:Table:Style*). The buttons labeled as Set 1 to Set 8 allow you to select which sets of files you want to open. Press the “Define” button in order to define the files to view.
+The figure above shows the same main screen of EP-Launch but with the "Sets" tab selected on the left edge of the View Results section. The buttons on this tab can open many files at the same time and are a shortcut to opening the files that may be commonly used. The Text Output Files, Drawing Files, and Spreadsheets buttons cause several different results files to open at once based on the currently selected Input File. The HTML file opens just the tabular results file if that file was produced (see *OutputControl:Table:Style*). The buttons labeled as Set 1 to Set 8 allow you to select which sets of files you want to open. Press the "Define" button in order to define the files to view.
 
 ![](AuxiliaryPrograms/media/image064.png)
 
 Figure 38. Define Files to View
 
-When the “Define” button is pressed on the Sets tab of the View Results section of the main screen, the dialog box in the figure above is shown. This allows the files extensions to be selected that would be opened for each of the Set 1 to Set 8 buttons. One or many files can be selected for each of the Set buttons. This allows you to define exactly which files you want opened.
+When the "Define" button is pressed on the Sets tab of the View Results section of the main screen, the dialog box in the figure above is shown. This allows the files extensions to be selected that would be opened for each of the Set 1 to Set 8 buttons. One or many files can be selected for each of the Set buttons. This allows you to define exactly which files you want opened.
 
 The content of each file extension is listed below.  The contents (along with examples) are discussed in the [Output Details](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document.
 
-By pressing the "Text Output Files” button, a text editor will open each of the text output files. Up to 29 files will open, if they exist. Selecting “Single File” from the ‘View’  menu displays a menu of all available output files from which any file can be opened individually. Each file may also be opened with an associated function key. The output files and function key shortcuts are listed below:
+By pressing the "Text Output Files" button, a text editor will open each of the text output files. Up to 29 files will open, if they exist. Selecting "Single File" from the ‘View’  menu displays a menu of all available output files from which any file can be opened individually. Each file may also be opened with an associated function key. The output files and function key shortcuts are listed below:
 
-1.    Variable – tabulated results in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (F4)
+1.    Variable - tabulated results in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (F4)
 
-2.    ESO – raw report variable output (F5),
+2.    ESO - raw report variable output (F5),
 
-3.    RDD – list of output variables available from the run (F6).
+3.    RDD - list of output variables available from the run (F6).
 
-4.    MDD – list of output meters available from the run (Shift-Ctrl-F3)
+4.    MDD - list of output meters available from the run (Shift-Ctrl-F3)
 
-5.    EIO – additional EnergyPlus results (F7),
+5.    EIO - additional EnergyPlus results (F7),
 
-6.    ERR – list of errors and warnings (F8),
+6.    ERR - list of errors and warnings (F8),
 
-7.    BND – HVAC system node and component connection details (F9),
+7.    BND - HVAC system node and component connection details (F9),
 
-8.    MTR – raw report meter output (F11),
+8.    MTR - raw report meter output (F11),
 
-9.    MTD – list of meter component variables (F12)
+9.    MTD - list of meter component variables (F12)
 
-10. METER File – tabulated meter report in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (Ctrl-F4)
+10. METER File - tabulated meter report in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (Ctrl-F4)
 
-11. ZSZ – zone sizing details in comma, tab or space delimited format (Ctrl+F5)
+11. ZSZ - zone sizing details in comma, tab or space delimited format (Ctrl+F5)
 
-12. SSZ – system sizing details in comma, tab or space delimited format (Ctrl+F6)
+12. SSZ - system sizing details in comma, tab or space delimited format (Ctrl+F6)
 
-13. AUDIT – input file echo with input processor errors and warnings (Ctrl+F8)
+13. AUDIT - input file echo with input processor errors and warnings (Ctrl+F8)
 
-14. SLN – output from "report, surfaces, lines" (Ctrl+F9)
+14. SLN - output from "report, surfaces, lines" (Ctrl+F9)
 
-15. DBG – output from the debug command (Ctrl+F11)
+15. DBG - output from the debug command (Ctrl+F11)
 
-16. SHD – output related to shading (Ctrl+F12)
+16. SHD - output related to shading (Ctrl+F12)
 
 17. SVG - HVAC Diagram (Shift+ F4)
 
-18. EPMIDF – clean idf file after EP-Macro processing (Shift+F5)
+18. EPMIDF - clean idf file after EP-Macro processing (Shift+F5)
 
-19. EPMDET – EP-Macro detailed output with errors and warnings (Shift+F6)
+19. EPMDET - EP-Macro detailed output with errors and warnings (Shift+F6)
 
-20. MAP – daylighting illuminance map (Shift+F7)
+20. MAP - daylighting illuminance map (Shift+F7)
 
-21. TABLE – tabulated report of bin and monthly data in comma, tab or space delimited or HTML format  (Shift+F8)
+21. TABLE - tabulated report of bin and monthly data in comma, tab or space delimited or HTML format  (Shift+F8)
 
-22. VMRL – drawing file in VRML (Virtual Reality Markup Language) format (Shift F+F11)
+22. VMRL - drawing file in VRML (Virtual Reality Markup Language) format (Shift F+F11)
 
-23. DXF – drawing file in AutoCAD DXF format (Shift+F12)
+23. DXF - drawing file in AutoCAD DXF format (Shift+F12)
 
 24. Delight IN - DElight input generated from EnergyPlus processed input (Shift+Ctrl+F4)
 
-25. Delight OUT – Detailed DElight output (Shift+Ctrl+F5)
+25. Delight OUT - Detailed DElight output (Shift+Ctrl+F5)
 
-26. Delight ELDMP – DElight reference point illuminance per time step (Shift+Ctrl+F6)
+26. Delight ELDMP - DElight reference point illuminance per time step (Shift+Ctrl+F6)
 
-27. Delight DFDMP – DElight warning and error messages (Shift+Ctrl+F7)
+27. Delight DFDMP - DElight warning and error messages (Shift+Ctrl+F7)
 
-28. EXPIDF – Expanded IDF when using HVACTemplate objects (Shift+Ctrl+F8)
+28. EXPIDF - Expanded IDF when using HVACTemplate objects (Shift+Ctrl+F8)
 
-29. Group Error – combined error files for a group run. (Shift+Ctrl+F9)
+29. Group Error - combined error files for a group run. (Shift+Ctrl+F9)
 
-30. VCpErr – Transition program error file (Shift+Ctrl+F11)
+30. VCpErr - Transition program error file (Shift+Ctrl+F11)
 
 31. Screen (Shift+Ctrl+f12)
 
-32. Proc CSV – Simple statistiscs generated from CSVProc (also see Create Statistics File option under View-Options).
+32. Proc CSV - Simple statistiscs generated from CSVProc (also see Create Statistics File option under View-Options).
 
-33. EDD – Energy Management System details.
+33. EDD - Energy Management System details.
 
-Clicking on the "Drawing File" button will open the generated DXF file if an appropriate viewer has been configured (see *Selecting Viewers and Editors* below). The DXF file is a CAD format that displays the physical shape of the building being modeled in three dimensions. The “Drawing File” button also opens the HVAC diagram generated with the HVAC-Diagram utility (see Auxiliary Programs).
+Clicking on the "Drawing File" button will open the generated DXF file if an appropriate viewer has been configured (see *Selecting Viewers and Editors* below). The DXF file is a CAD format that displays the physical shape of the building being modeled in three dimensions. The "Drawing File" button also opens the HVAC diagram generated with the HVAC-Diagram utility (see Auxiliary Programs).
 
 Clicking on the "Spreadsheets" buttons will open any generated CSV files if an appropriate viewer has been configured (see *Selecting Viewers and Editors* below).
 
@@ -12333,15 +12333,15 @@ The input file, called IDF file that is selected from the top pull-down list, ca
 
 The File menu can be used for selecting input and weather files just like the "Browse…" buttons (see the *Selecting Input and Weather Files* section above)
 
-If you are upgrading from the previous version of EnergyPlus you can use the “File”, “Transition” menu option to upgrade your EnergyPlus input files (IDF and IMF) to the most recent version (see the section Using Older Version Input Files - Transition for more information about the Transition program). This EP-Launch option only works for upgrading input files one version.
+If you are upgrading from the previous version of EnergyPlus you can use the "File", "Transition" menu option to upgrade your EnergyPlus input files (IDF and IMF) to the most recent version (see the section Using Older Version Input Files - Transition for more information about the Transition program). This EP-Launch option only works for upgrading input files one version.
 
 ### Edit Menu
 
-No cutting or pasting is used in this program so the edit menu shows options that duplicate the functions of the "Edit – Text Editor" and "Edit – IDF Editor" buttons. In addition, the weather file and the postprocessor command file (rvi) may be opened in the text editor.
+No cutting or pasting is used in this program so the edit menu shows options that duplicate the functions of the "Edit - Text Editor" and "Edit - IDF Editor" buttons. In addition, the weather file and the postprocessor command file (rvi) may be opened in the text editor.
 
 ### View Menu
 
-The View menu (see Figure 39) duplicates the options in the "View Results" area of the main screen (see the *Looking at the Results* section above) and allows opening of selected output files. You can also open the folders that contain the active input and weather files. Opening a single file is under a submenu and is very similar to the Quick Open Panel for Single Simulation described above. Selecting “HTML File” from the “View” menu will open any user created files saved in the format: &lt;filename&gt;table.html (see *OutputControl:Table:Style*).
+The View menu (see Figure 39) duplicates the options in the "View Results" area of the main screen (see the *Looking at the Results* section above) and allows opening of selected output files. You can also open the folders that contain the active input and weather files. Opening a single file is under a submenu and is very similar to the Quick Open Panel for Single Simulation described above. Selecting "HTML File" from the "View" menu will open any user created files saved in the format: &lt;filename&gt;table.html (see *OutputControl:Table:Style*).
 
 ![](AuxiliaryPrograms/media/image065.jpg)
 
@@ -12351,43 +12351,43 @@ Figure 39. EP-Launch View Menu
 
 Figure 40. EP-Launch Options Screen.
 
-The “View” menu also accesses the “Options” menu item shown in Figure 40 that is used to control many of the optional features of EP-Launch. These optional features are described below:
+The "View" menu also accesses the "Options" menu item shown in Figure 40 that is used to control many of the optional features of EP-Launch. These optional features are described below:
 
 #### Command Window Options
 
-**Pause During Simulation (Unless Minimized)** – Stops the progress of the EnergyPlus run at different points. This does not stop the simulation itself but pauses before or after important events as files are copied or utility programs are run. It is usually used only for diagnosing problems with the EPL-RUN batch file. The feature is also described in the *Running a Single Input File* section above.
+**Pause During Simulation (Unless Minimized)** - Stops the progress of the EnergyPlus run at different points. This does not stop the simulation itself but pauses before or after important events as files are copied or utility programs are run. It is usually used only for diagnosing problems with the EPL-RUN batch file. The feature is also described in the *Running a Single Input File* section above.
 
-**Minimize Single Simulation Command Window** – For a single input file, minimizes the Command Window that EP-Launch uses to run EnergyPlus. The command window will appear only in the Windows taskbar and the command window will not be visible. You can restore the command window be clicking on the taskbar item labeled “EnergyPlus Process”. This option should be used with caution since you will not see any indication of the simulation being complete other than the “EnergyPlus Process” taskbar item will disappear.
+**Minimize Single Simulation Command Window** - For a single input file, minimizes the Command Window that EP-Launch uses to run EnergyPlus. The command window will appear only in the Windows taskbar and the command window will not be visible. You can restore the command window be clicking on the taskbar item labeled "EnergyPlus Process". This option should be used with caution since you will not see any indication of the simulation being complete other than the "EnergyPlus Process" taskbar item will disappear.
 
-**Minimum Group Simulation Command Window** – For a group of input files, minimizes the Command Window that EP-Launch uses to run EnergyPlus. This is a good option when working on something else on your computer at the same time as the group of simulations is running since the command window normally becomes the front window each time a new simulation starts. This option prevents the command window coming to the front for each simulation. The command window will appear only in the Windows taskbar and the command window will not be visible. You can restore the command window be clicking on the taskbar item labeled “EnergyPlus Process”. This option should be used with caution since you will not see any indication of the simulation being complete other than the “EnergyPlus Process” taskbar item will not be present.
+**Minimum Group Simulation Command Window** - For a group of input files, minimizes the Command Window that EP-Launch uses to run EnergyPlus. This is a good option when working on something else on your computer at the same time as the group of simulations is running since the command window normally becomes the front window each time a new simulation starts. This option prevents the command window coming to the front for each simulation. The command window will appear only in the Windows taskbar and the command window will not be visible. You can restore the command window be clicking on the taskbar item labeled "EnergyPlus Process". This option should be used with caution since you will not see any indication of the simulation being complete other than the "EnergyPlus Process" taskbar item will not be present.
 
-**Number of Simultaneous Processes** – Select the maximum number of simulations that should be able to be run at the same time. For a computer with multiple processors or multiple cores, this will allow better utilization of the computers power. The value selected should correspond to the number of processors/cores but higher or lower number can be used as well.
+**Number of Simultaneous Processes** - Select the maximum number of simulations that should be able to be run at the same time. For a computer with multiple processors or multiple cores, this will allow better utilization of the computers power. The value selected should correspond to the number of processors/cores but higher or lower number can be used as well.
 
-**Disable Multi-Threading** – Check this box if you wish to disable the built in multi-threading capabilities of EnergyPlus. Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation. This multithreading may not be desirable when running more than one simulation at a time on the same computer (because it can actually run more slowly). When this check box is checked multi-threading is turned off. The check box sets the **EP\_OMP\_NUM\_THREADS** environmental variable to 1. The multi-threading capability of EnergyPlus can also be controlled using the **ProgramControl** object field called Number of Threads Allowed. That field takes precedence over the setting of the checkbox. Also note that when multiple simulations are started from EP-Launch, this automatically disables multithreading by setting the EP\_OMP\_NUM\_THREADS environmental variable to 1 whether this box is checked or not. The ProgramControl object is described in the Input Output Reference document.
+**Disable Multi-Threading** - Check this box if you wish to disable the built in multi-threading capabilities of EnergyPlus. Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation. This multithreading may not be desirable when running more than one simulation at a time on the same computer (because it can actually run more slowly). When this check box is checked multi-threading is turned off. The check box sets the **EP\_OMP\_NUM\_THREADS** environmental variable to 1. The multi-threading capability of EnergyPlus can also be controlled using the **ProgramControl** object field called Number of Threads Allowed. That field takes precedence over the setting of the checkbox. Also note that when multiple simulations are started from EP-Launch, this automatically disables multithreading by setting the EP\_OMP\_NUM\_THREADS environmental variable to 1 whether this box is checked or not. The ProgramControl object is described in the Input Output Reference document.
 
 #### Interface Options
 
-**Extra Wide Window** – Select this option to make the main EP-Launch window wider. This is useful when files are used with very long file path names.
+**Extra Wide Window** - Select this option to make the main EP-Launch window wider. This is useful when files are used with very long file path names.
 
-**Alternative layout** – Changes the layout of the EP-Launch window to an alternative arrangement of buttons.
+**Alternative layout** - Changes the layout of the EP-Launch window to an alternative arrangement of buttons.
 
 #### Miscellaneous Options
 
-**Tab Delimited Open with Spreadsheet** – Selecting ”Single File” and then “Main Results File” from the “View” menu or pressing the F4 function key will open TAB files with the default spreadsheet application rather than the text editor. Comma-separated variable (CSV) is the default setting for viewing tabulated results set in the RVI file. If the user changes the setting for viewing tabulated results to TAB or TXT format, selecting ”Single File” and then “Main Results File” from the “View” menu or pressing the F4 function key will open the files in the default text editor.  TAB files, when selected, will also be opened by the text editor when the “Text Output Files” button is pressed after a successful run.
+**Tab Delimited Open with Spreadsheet** - Selecting "Single File" and then "Main Results File" from the "View" menu or pressing the F4 function key will open TAB files with the default spreadsheet application rather than the text editor. Comma-separated variable (CSV) is the default setting for viewing tabulated results set in the RVI file. If the user changes the setting for viewing tabulated results to TAB or TXT format, selecting "Single File" and then "Main Results File" from the "View" menu or pressing the F4 function key will open the files in the default text editor.  TAB files, when selected, will also be opened by the text editor when the "Text Output Files" button is pressed after a successful run.
 
-**Allow More Than 250 Columns** – Tabulated data that exceeds 250 columns, the MS Excel maximum, will be truncated to that limit unless “Allow &gt;250 Columns” is selected. Excel versions prior to 2007 were limited to 255 columns in a sheet; later versions allow unlimited number of columns. This limitation may not be true for other spreadsheet programs.
+**Allow More Than 250 Columns** - Tabulated data that exceeds 250 columns, the MS Excel maximum, will be truncated to that limit unless "Allow &gt;250 Columns" is selected. Excel versions prior to 2007 were limited to 255 columns in a sheet; later versions allow unlimited number of columns. This limitation may not be true for other spreadsheet programs.
 
-**Check VERSION Prior to Simulation** – Automatically check the VERSION object in the selected EnergyPlus input file prior to simulation and if it is an older version than the current version will run the Transition program to update the file.
+**Check VERSION Prior to Simulation** - Automatically check the VERSION object in the selected EnergyPlus input file prior to simulation and if it is an older version than the current version will run the Transition program to update the file.
 
-**Convert ESO/MTR to IP Units** – Runs the convertESOMTR utility program (see AuxiliaryPrograms documentation for more information). This utility will convert the ESO and MTR files into Inch-Pound units. The CSV file created from these files will also be in Inch-Pound units.
+**Convert ESO/MTR to IP Units** - Runs the convertESOMTR utility program (see AuxiliaryPrograms documentation for more information). This utility will convert the ESO and MTR files into Inch-Pound units. The CSV file created from these files will also be in Inch-Pound units.
 
-**Create Statistics File** – Runs the CSVProc utility program (see the AuxiliaryPrograms documentation for more information) and creates the –Proc.csv file. This file contains some simple statistics on each variable in the normal CSV file.
+**Create Statistics File** - Runs the CSVProc utility program (see the AuxiliaryPrograms documentation for more information) and creates the -Proc.csv file. This file contains some simple statistics on each variable in the normal CSV file.
 
-**Create Batch File to Run EnergyPlus** – Traditionally EP-Launch has created a batch file in order to execute EnergyPlus with the various options chosen. This can cause problems with some operating systems, such as Windows Vista, when set to a higher security setting.  This option can be unchecked and a batch file is not created when running EnergyPlus instead parameters are passed to an existing batch file.
+**Create Batch File to Run EnergyPlus** - Traditionally EP-Launch has created a batch file in order to execute EnergyPlus with the various options chosen. This can cause problems with some operating systems, such as Windows Vista, when set to a higher security setting.  This option can be unchecked and a batch file is not created when running EnergyPlus instead parameters are passed to an existing batch file.
 
-**Run ParametricPreprocessor** – When this option is checked, if Parametric objects are present in the file, the ParametricPreprocessor will be run prior to the first simulation and if multiple simulations are needed they will all be executed. See the Auxiliary Programs documentation for details.
+**Run ParametricPreprocessor** - When this option is checked, if Parametric objects are present in the file, the ParametricPreprocessor will be run prior to the first simulation and if multiple simulations are needed they will all be executed. See the Auxiliary Programs documentation for details.
 
-**Check for Updates to EnergyPlus** – When this option is checked, EP-Launch will check every seven days if an update to EnergyPlus or any of the files distributed with EnergyPlus are available to download. If they are available a message will be shown upon start up.  You can also manually check by going to HELP .. CHECK FOR UPDATES.
+**Check for Updates to EnergyPlus** - When this option is checked, EP-Launch will check every seven days if an update to EnergyPlus or any of the files distributed with EnergyPlus are available to download. If they are available a message will be shown upon start up.  You can also manually check by going to HELP .. CHECK FOR UPDATES.
 
 #### Text Editor Options
 
@@ -12415,7 +12415,7 @@ EP-Launch will start a HTML browser program when viewing the tabular results fil
 
 #### ESO Viewer Options
 
-By default, ESO files are opened with a text editor. ESO files are the raw output file containing results from EnergyPlus for Report Variable objects. They are often processed into CSV files to make it easier to view them. At least one utility program has been developed to view ESO files directly (see the EnergyPlus.gov web site under “Interfaces & Other Tools”, “Third-party EnergyPlus Tools).  The Auto Find and Select buttons work the same way as other viewer selectors. If no special ESO viewer is selected the box will be shown as empty. It can also be emptied by using the Clear button.
+By default, ESO files are opened with a text editor. ESO files are the raw output file containing results from EnergyPlus for Report Variable objects. They are often processed into CSV files to make it easier to view them. At least one utility program has been developed to view ESO files directly (see the EnergyPlus.gov web site under "Interfaces & Other Tools", "Third-party EnergyPlus Tools).  The Auto Find and Select buttons work the same way as other viewer selectors. If no special ESO viewer is selected the box will be shown as empty. It can also be emptied by using the Clear button.
 
 #### PDF Viewer Options
 
@@ -12453,13 +12453,13 @@ Figure 41. EP-Launch Group of Input Files Tab.
 
 This tab lets you manage EPG, EnergyPlus Group files which contain a list of simulations that need to be performed. The EPG file is simply a text file that contains on each line the input file and weather file names to be used for a simulation along with how the output files should be named and a counter.
 
-You do not need to manually create EPG files, instead press the New Group button on the Group of Input Files Tab and a step-by-step “wizard” will help to create a new EPG, EnergyPlus Group file. The first step of the wizard is to selected the EnergyPlus input files that should be simulated as part of the group:
+You do not need to manually create EPG files, instead press the New Group button on the Group of Input Files Tab and a step-by-step "wizard" will help to create a new EPG, EnergyPlus Group file. The first step of the wizard is to selected the EnergyPlus input files that should be simulated as part of the group:
 
 ![](AuxiliaryPrograms/media/image068.jpg)
 
 Figure 42. EP-Launch Step 1 of New Group Wizard.
 
-Use the boxes next to each file to select the files to be simulated. The path to files shown may be changed using the “path” button. Once the files in a certain directory are selected the “next” button should be pressed. If additional files are desired in different directories, you will get a chance to add them to the EnergyPlus group file in a later step.
+Use the boxes next to each file to select the files to be simulated. The path to files shown may be changed using the "path" button. Once the files in a certain directory are selected the "next" button should be pressed. If additional files are desired in different directories, you will get a chance to add them to the EnergyPlus group file in a later step.
 
 Select one or several weather files using the second step of the wizard, shown below:
 
@@ -12467,13 +12467,13 @@ Select one or several weather files using the second step of the wizard, shown b
 
 Figure 43. EP-Launch Step 2 of New Group Wizard.
 
-The next step is to review the simulations selected. Each combination of weather file and input file is initially shown. Each simulation is displayed as a single row. You may select a row and delete the simulation at this point. In addition, if additional simulations are desired, the “Add more simulations button” brings you back to the first step of the wizard to add more file.
+The next step is to review the simulations selected. Each combination of weather file and input file is initially shown. Each simulation is displayed as a single row. You may select a row and delete the simulation at this point. In addition, if additional simulations are desired, the "Add more simulations button" brings you back to the first step of the wizard to add more file.
 
 ![](AuxiliaryPrograms/media/image070.jpg)
 
 Figure 44. EP-Launch Step 3 of New Group Wizard.
 
-The next step of the wizard allows you to decide exactly where you want the output files located and what they should be named. For most people just trying to group their simulations and wanting the output files in the same directory as the input files, just select “Original Input File Locations”.
+The next step of the wizard allows you to decide exactly where you want the output files located and what they should be named. For most people just trying to group their simulations and wanting the output files in the same directory as the input files, just select "Original Input File Locations".
 
 ![](AuxiliaryPrograms/media/image071.jpg)
 
@@ -12501,7 +12501,7 @@ For macro files (they have an extension IMF instead of IDF) used in a parametric
 
 Finally, you can save the EPG, EnergyPlus Group, file wherever you would like.
 
-To run the simulations press the “Simulate Group” button on the Group of Input Files tab. To prevent a specific simulation from being performed, edit the file and use a comment character (an exclamation point) to comment out the line.
+To run the simulations press the "Simulate Group" button on the Group of Input Files tab. To prevent a specific simulation from being performed, edit the file and use a comment character (an exclamation point) to comment out the line.
 
 When the group of input file simulations is running, the title bar of EP-Launch will show the progress.
 
@@ -12529,7 +12529,7 @@ The utilities tab shown in the following figure allows several utility programs 
 
 Figure 47. EP-Launch Utilities Tab.
 
-For each utility, input files can be selected by using the Browse Button. The input file can be opened using a text editor and, for certain utilities, the IDF Editor. If a weather file is needed for a utility it can also be selected. For other utilities, no weather file is needed and that portion of the screen is not shown. The appropriate output files can be opened by the “Open” button near the bottom of the screen. To run the utility, use the “Run” button in the lower left corner of the screen above the “Exit” button.
+For each utility, input files can be selected by using the Browse Button. The input file can be opened using a text editor and, for certain utilities, the IDF Editor. If a weather file is needed for a utility it can also be selected. For other utilities, no weather file is needed and that portion of the screen is not shown. The appropriate output files can be opened by the "Open" button near the bottom of the screen. To run the utility, use the "Run" button in the lower left corner of the screen above the "Exit" button.
 
 In addition, for each utility, a brief description of the function of the utility is shown in the about box but much more information is available in the AuxiliaryPrograms documentation.
 
@@ -12553,7 +12553,7 @@ Figure 48. EnergyPlus crash within EP-Launch.
 
 ### Bugs
 
-The EP-Launch program has been through several “releases” but there is still a chance you will find bugs. Please report them to the energyplus-support@gard.com address so that we can fix them prior to the release.
+The EP-Launch program has been through several "releases" but there is still a chance you will find bugs. Please report them to the energyplus-support@gard.com address so that we can fix them prior to the release.
 
 If the pull-down lists ever are shown as blank the "reset" button may be used. This unlabeled button is very small in the lower left-hand corner of the main screen. It removes the items shown in the recently used file list and causes the program to forget the selected viewers and text editors; and exits the program. When you start EP-Launch again, you will need to make these selections (viewers and text editors) again.
 
@@ -12577,11 +12577,11 @@ The *input data dictionary* (IDD) is an ascii (text) file containing a list of a
 
 #### idf
 
-The *input data file* (IDF) is an ascii file containing the data describing the building and HVAC system to be simulated. Many example files are installed as part of the EnergyPlus installation. Additionally, a spreadsheet file “ExampleFiles.xls”  contains columnar descriptions of each file’s features.
+The *input data file* (IDF) is an ascii file containing the data describing the building and HVAC system to be simulated. Many example files are installed as part of the EnergyPlus installation. Additionally, a spreadsheet file "ExampleFiles.xls"  contains columnar descriptions of each file’s features.
 
 #### imf
 
-The *input macro file* (IMF) is an ascii file containing the data describing the building and HVAC system to be simulated and will have some contents of “macro” commands. The Auxiliary programs document describes use of the macro commands and the program that processes them – EP-Macro.   Many example files are installed as part of the EnergyPlus installation.
+The *input macro file* (IMF) is an ascii file containing the data describing the building and HVAC system to be simulated and will have some contents of "macro" commands. The Auxiliary programs document describes use of the macro commands and the program that processes them - EP-Macro.   Many example files are installed as part of the EnergyPlus installation.
 
 #### ini
 
@@ -12597,9 +12597,9 @@ More information (and more up-to-date) about output files is shown in the [Outpu
 
 #### err
 
-A text file containing the error messages issued by EnergyPlus. **This is the first output that should be examined after a simulation.**Error messages may be issued by EnergyPlus during its input phase or during the simulation. There are three levels of error severity: *fatal*, *severe*, and *warning* as well as simple *“message”* lines. A fatal error causes the program to terminate immediately. The following table illustrates the necessary actions.
+A text file containing the error messages issued by EnergyPlus. **This is the first output that should be examined after a simulation.**Error messages may be issued by EnergyPlus during its input phase or during the simulation. There are three levels of error severity: *fatal*, *severe*, and *warning* as well as simple *"message"* lines. A fatal error causes the program to terminate immediately. The following table illustrates the necessary actions.
 
-Table 33. Error Message Levels – Required Actions
+Table 33. Error Message Levels - Required Actions
 
 <table class="table table-striped">
 <tr>
@@ -12630,7 +12630,7 @@ An example of an error message due to an input syntax error is:
 
 \*\* Severe  \*\* Did not find " DessignDay" in list of Objects
 
-   \*\*  Fatal  \*\* Errors occurred on processing IDF file –
+   \*\*  Fatal  \*\* Errors occurred on processing IDF file -
 
        probable incorrect IDD file. View "audit.out" for details.
 
@@ -12666,13 +12666,13 @@ The *Report (variable) Data Dictionary* (RDD) is a text file listing those varia
 
 Output:Reports, VariableDictionary;
 
-A variant produces the same files in a IDF “ready” format.
+A variant produces the same files in a IDF "ready" format.
 
 Output:Reports, VariableDictionary, IDF;
 
 #### dbg
 
-This is a text file containing *debug* output for use by EnergyPlus developers. Generally developers will add debug print statements wherever in the code that that they wish. There is a “standard” debug output that prints out conditions at all the HVAC nodes. This output is triggered by placing
+This is a text file containing *debug* output for use by EnergyPlus developers. Generally developers will add debug print statements wherever in the code that that they wish. There is a "standard" debug output that prints out conditions at all the HVAC nodes. This output is triggered by placing
 
 Output:DebuggingData,1;
 
@@ -12698,23 +12698,23 @@ in the IDF.
 
 ### Postprocessing Program/Files
 
-A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) under a section heading called “Using ReadVarsESO”.
+A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) under a section heading called "Using ReadVarsESO".
 
 RunEPlus batch file
 -------------------
 
-It is simple to run EnergyPlus: open a DOS or CMD box in the EnergyPlus directory and use the RunEPlus.bat procedure file. The procedure file takes two arguments – the input file name (containing the building description) and the weather file name:
+It is simple to run EnergyPlus: open a DOS or CMD box in the EnergyPlus directory and use the RunEPlus.bat procedure file. The procedure file takes two arguments - the input file name (containing the building description) and the weather file name:
 
 RunEPlus &lt;input\_file\_name&gt; &lt;weather\_file\_name&gt;
 
 Though it’s possible to supply arguments to the batch file with embedded blanks, it’s better practice not to. More extensive information about the intricacies of EnergyPlus execution is given in the next parts of this section.
 
-As installed, the RunEPlus is ready to run the sample files that are included. If you wish to create and run other files, you may wish to modify the batch file to your own preferences. See “RunEPlus details” later in this document for parts of the batch file that you will need to modify.
+As installed, the RunEPlus is ready to run the sample files that are included. If you wish to create and run other files, you may wish to modify the batch file to your own preferences. See "RunEPlus details" later in this document for parts of the batch file that you will need to modify.
 
 Running EnergyPlus by Hand
 --------------------------
 
-EnergyPlus is compiled as a 32 bit console application on Windows™ (Windows 98, Windows NT, Windows 2000, Windows ME) operating systems, commonly run on the Intel™ or compatible processing chips (aka WinTel machines). To run the program bring up the command prompt and “cd” to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing “EnergyPlus” (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
+EnergyPlus is compiled as a 32 bit console application on Windows™ (Windows 98, Windows NT, Windows 2000, Windows ME) operating systems, commonly run on the Intel™ or compatible processing chips (aka WinTel machines). To run the program bring up the command prompt and "cd" to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing "EnergyPlus" (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
 
  EnergyPlus Starting
 
@@ -12787,9 +12787,9 @@ When execution is finished, *eplusout.err* and *eplusout.audit* will always appe
 RunEPlus details
 ----------------
 
-A procedure (batch) file is the normal way to run a console application. The *installed* procedure file **RunEPlus.bat** can be used to execute EnergyPlus and deal with all the file handling and postprocessing. It can accommodate running the EPMacro program if you name your files appropriately. And it can use ExpandObjects to expand the special “HVACTemplate” objects into “normal” IDF objects.
+A procedure (batch) file is the normal way to run a console application. The *installed* procedure file **RunEPlus.bat** can be used to execute EnergyPlus and deal with all the file handling and postprocessing. It can accommodate running the EPMacro program if you name your files appropriately. And it can use ExpandObjects to expand the special "HVACTemplate" objects into "normal" IDF objects.
 
-The “set” statements near the beginning of the procedure file can be customized for each local system. Thus “program\_path” should be set to the directory path where the program executable resides on your local computer, “program\_name” should be set to the name of the EnergyPlus executable file, “input\_path” should be set to the directory path containing the input (IDF) file, and so forth. Each of the path environment variables must have “\\” as the final character or things won’t run correctly. As mentioned before, the batch file is executed by typing:
+The "set" statements near the beginning of the procedure file can be customized for each local system. Thus "program\_path" should be set to the directory path where the program executable resides on your local computer, "program\_name" should be set to the name of the EnergyPlus executable file, "input\_path" should be set to the directory path containing the input (IDF) file, and so forth. Each of the path environment variables must have "\\" as the final character or things won’t run correctly. As mentioned before, the batch file is executed by typing:
 
 
 
@@ -12894,7 +12894,7 @@ RunDirMulti &lt;weather file&gt; (opt) &lt;number processor cores&gt; (opt)
 
 The RunDirMulti batch file loops through the files located in the current directory and puts RunEPlus calls to each file into as many temporary batch files as processor cores and then starts each of the batch files. No load balancing between the cores is achieved using this method. The RunDirMulti.bat file should be located in a directory that contains the IDF files. Editing of the file may be necessary to match the directory that EnergyPlus is installed in.
 
-Since the batch file starts up other batch files in different CMD windows, the only way to know that the simulations are all complete is when all of the other CMD windows are closed. Those windows are named “Batch Simulation&lt;n&gt;” where n is 1 to the number of processor cores you selected to use.
+Since the batch file starts up other batch files in different CMD windows, the only way to know that the simulations are all complete is when all of the other CMD windows are closed. Those windows are named "Batch Simulation&lt;n&gt;" where n is 1 to the number of processor cores you selected to use.
 
 
 
@@ -12947,7 +12947,7 @@ dir= PreProcess\\GrndTempCalc
 
 
 
-Under [program], dir should indicate the folder where EnergyPlus is installed (e.g. C:\\Program Files\\EnergyPlusV2-0-0 or C:\\EnergyPlusV2-0-0).  This is automatically generated during the install and may be the “shortened form” of these folder names. The “weather” portion of the initialization file is unused for normal EnergyPlus. [BasementGHT] and [SlabGHT] are used by the EP-Launch program when the Utilities tab is used to execute the Basement and Slab programs, respectively.
+Under [program], dir should indicate the folder where EnergyPlus is installed (e.g. C:\\Program Files\\EnergyPlusV2-0-0 or C:\\EnergyPlusV2-0-0).  This is automatically generated during the install and may be the "shortened form" of these folder names. The "weather" portion of the initialization file is unused for normal EnergyPlus. [BasementGHT] and [SlabGHT] are used by the EP-Launch program when the Utilities tab is used to execute the Basement and Slab programs, respectively.
 
 #### in.epw
 
@@ -12959,11 +12959,11 @@ More information (and more up-to-date) about output files is shown in the [Outpu
 
 #### eplusout.err
 
-A text file containing the error messages issued by EnergyPlus. This is the first output that should be examined after a simulation. Error messages are issued by EnergyPlus during its input phase or during the simulation. There are three levels of error severity: *fatal*, *severe*, and *warning* as well as simple *“message”* lines. A fatal error causes the program to terminate immediately. The following table illustrates the necessary actions.
+A text file containing the error messages issued by EnergyPlus. This is the first output that should be examined after a simulation. Error messages are issued by EnergyPlus during its input phase or during the simulation. There are three levels of error severity: *fatal*, *severe*, and *warning* as well as simple *"message"* lines. A fatal error causes the program to terminate immediately. The following table illustrates the necessary actions.
 
 
 
-Table 34. Error Message Levels – Required Actions
+Table 34. Error Message Levels - Required Actions
 
 <table class="table table-striped">
 <tr>
@@ -12971,7 +12971,7 @@ Table 34. Error Message Levels – Required Actions
 <td>Action</td>
 </tr>
 <tr>
-<td>“Information”</td>
+<td>"Information"</td>
 <td>Informative, usually a follow-on to one of the others. No action required.</td>
 </tr>
 <tr>
@@ -12994,7 +12994,7 @@ An example of an error message due to an input syntax error is:
 
 \*\* Severe  \*\* Did not find " DessignDay" in list of Objects
 
-   \*\*  Fatal  \*\* Errors occurred on processing IDF file –
+   \*\*  Fatal  \*\* Errors occurred on processing IDF file -
 
        probable incorrect IDD file. View "audit.out" for details.
 
@@ -13028,7 +13028,7 @@ appears in the input (IDF) file.
 
 #### eplusout.dbg
 
-This is a text file containing *debug* output for use by EnergyPlus developers. Generally developers will add debug print statements wherever in the code that that they wish. There is a “standard” debug output that prints out conditions at all the HVAC nodes. This output is triggered by placing
+This is a text file containing *debug* output for use by EnergyPlus developers. Generally developers will add debug print statements wherever in the code that that they wish. There is a "standard" debug output that prints out conditions at all the HVAC nodes. This output is triggered by placing
 
 DEBUG OUTPUT,1;
 
@@ -13067,13 +13067,13 @@ EnergyPlus has several options for the user to create input files. One of the go
 
 Four methods (with the installed program) are available to create input files:
 
-1)    IDFEditor – this is a very simple, “intelligent” editor that reads the IDD and IDFs and allows creation/revision of IDF files. It can be run from a shortcut in the main EnergyPlus directory (created as part of the install) or directly from EP-Launch.
+1)    IDFEditor - this is a very simple, "intelligent" editor that reads the IDD and IDFs and allows creation/revision of IDF files. It can be run from a shortcut in the main EnergyPlus directory (created as part of the install) or directly from EP-Launch.
 
-2)    BLAST Translator – if you already have BLAST and/or BLAST input files, this program will produce the bulk of a translation to EnergyPlus for you. It generates a complete IDF file but does not include specifics for Systems or Plants. (It does include the System and Plant schedules that were in the BLAST deck). Many of the sample files included with the install started out as BLAST input files.
+2)    BLAST Translator - if you already have BLAST and/or BLAST input files, this program will produce the bulk of a translation to EnergyPlus for you. It generates a complete IDF file but does not include specifics for Systems or Plants. (It does include the System and Plant schedules that were in the BLAST deck). Many of the sample files included with the install started out as BLAST input files.
 
-3)    DOE-2 Translator – if you already have  DOE-2.1e input files, this program will produce the bulk of a translation to EnergyPlus for you. It generates a IMF (input macro file) that must be run through the EnergyPlus Macro (EPMacro) program before it can be used by EnergyPlus.
+3)    DOE-2 Translator - if you already have  DOE-2.1e input files, this program will produce the bulk of a translation to EnergyPlus for you. It generates a IMF (input macro file) that must be run through the EnergyPlus Macro (EPMacro) program before it can be used by EnergyPlus.
 
-4)    Hand editing – for simple changes to an existing file (such as one of the sample files), you can hand edit a file using your knowledge of the IDD, comments in the IDF file, and a text editor such as NOTEPAD™ (Wordpad™ for large files). For creating HVAC simulations – the HVACtemplate objects provide a quick way to start at HVAC simulation.
+4)    Hand editing - for simple changes to an existing file (such as one of the sample files), you can hand edit a file using your knowledge of the IDD, comments in the IDF file, and a text editor such as NOTEPAD™ (Wordpad™ for large files). For creating HVAC simulations - the HVACtemplate objects provide a quick way to start at HVAC simulation.
 
 IDD Conventions
 ---------------
@@ -13753,9 +13753,9 @@ Creating a new input data file or selecting an existing input data file can be a
 
 The classes that can be used to make up an IDF file have been organized into groups as shown in the ‘Class List’ portion of the screen. A class is made up of a group of objects. Select a class from the list by clicking on and highlighting the class. The field to the left of the selected class in the ‘Class List’ will either contain [------] to indicate that this class has no objects in the IDF file or it will contain a number like [0003] to indicate the number of times the object currently appears in the IDF file. For example, for the BuildingSurface:Detailed class selected in the screen above under the Thermal Zone Description/Geometry group, there are 40 objects in the IDF file. The details for these 40 objects or any new object that is defined are displayed in columns within the grid. Each object is made up of fields and can be used to further define the object. Any units attached to each field are shown in the second column. You may need to scroll down the ‘field’ list or maximize the application to see all of the fields. Likewise, you may need to scroll to the right of the main grid to see other objects.
 
-Options under the view menu can change how you use the Class List. To display only classes that contain objects select the “show classes with objects only” option on the “View” menu. You can also toggle this feature on and off with CTRL+L. If the file is empty and has no objects, this toggle does not impact the display.
+Options under the view menu can change how you use the Class List. To display only classes that contain objects select the "show classes with objects only" option on the "View" menu. You can also toggle this feature on and off with CTRL+L. If the file is empty and has no objects, this toggle does not impact the display.
 
-The “Show Quick Select Dropdowns” view menu option adds two new input fields to the main screen. The input fields can be used to go quickly to different classes in the main list of classes. By typing in the top input field, the group that starts with those letters are displayed. After selecting one and pressing the tab button, classes in that group are shown and by typing the first few letters, you can easily select a specific class. Pressing tab again displays that class and it objects. This method allows for quick selection of classes if you remember the group name and class name.
+The "Show Quick Select Dropdowns" view menu option adds two new input fields to the main screen. The input fields can be used to go quickly to different classes in the main list of classes. By typing in the top input field, the group that starts with those letters are displayed. After selecting one and pressing the tab button, classes in that group are shown and by typing the first few letters, you can easily select a specific class. Pressing tab again displays that class and it objects. This method allows for quick selection of classes if you remember the group name and class name.
 
 ### Changing Values
 
@@ -13771,7 +13771,7 @@ By clicking and highlighting a value within an object, several things happen:
 
 5)   Some numeric fields have a maximum and/or minimum value specified in the IDD. If the value entered is outside this range, the cell will be highlighted in pale orange.
 
-6)   For values that are names of nodes, a new dialog box titled “Edit or Select Node Name” can be shown when the small button is pressed that is on the right side in each node name cell as described in the next section.
+6)   For values that are names of nodes, a new dialog box titled "Edit or Select Node Name" can be shown when the small button is pressed that is on the right side in each node name cell as described in the next section.
 
 ### Edit or Select Node Names Dialog
 
@@ -13781,21 +13781,21 @@ The following dialog box is displayed when the small button is pressed that is o
 
 Figure 50. Edit or Select Node Name Dialog Box
 
-To enter a new node name, type it in the “Node Name” field near the top of the dialog. To select a name of a node that is already being used in the file, choose a node name from the list shown on the left of the dialog box and labeled “Other Node Names.” When a node name is selected from the list on the left side of the dialog box, the box near the bottom left shown as “Where Selected Other Node Name Appears in File” will display the name of the class, name of the object and name of the field for each other location in the file that node name is currently be used.
+To enter a new node name, type it in the "Node Name" field near the top of the dialog. To select a name of a node that is already being used in the file, choose a node name from the list shown on the left of the dialog box and labeled "Other Node Names." When a node name is selected from the list on the left side of the dialog box, the box near the bottom left shown as "Where Selected Other Node Name Appears in File" will display the name of the class, name of the object and name of the field for each other location in the file that node name is currently be used.
 
-The Other Node Names list on the left side of the dialog box may contain a very long list of node names depending on the complexity of the HVAC system. To help with this, four options are available just above the list titled All, Recent, Containing, and Class or Field. The All option shows all node names used in the file while the other options are used to narrow the list down to only certain node names. The Recent option shows only node names that have recently been edited. The Containing option shows a list on the right side of the dialog box called “Filter by Contents” which shows all of the various words used as part of node names. These words can be selected and the Other Node Names list will only show node names that contain those words. By selecting words from this list, the list of Other Node Names can be shortened very quickly. The last option, Class or Field, shows a hierarchical list on the right side titled Filter by Object or Field containing the list of classes and fields that can have node names. By selecting an object or a field, the Other Node Names list on the right shows only node names that are present in the selected object or field. This is another way of quickly shortening the list of Other Node Names so that the appropriate node name can be selected.
+The Other Node Names list on the left side of the dialog box may contain a very long list of node names depending on the complexity of the HVAC system. To help with this, four options are available just above the list titled All, Recent, Containing, and Class or Field. The All option shows all node names used in the file while the other options are used to narrow the list down to only certain node names. The Recent option shows only node names that have recently been edited. The Containing option shows a list on the right side of the dialog box called "Filter by Contents" which shows all of the various words used as part of node names. These words can be selected and the Other Node Names list will only show node names that contain those words. By selecting words from this list, the list of Other Node Names can be shortened very quickly. The last option, Class or Field, shows a hierarchical list on the right side titled Filter by Object or Field containing the list of classes and fields that can have node names. By selecting an object or a field, the Other Node Names list on the right shows only node names that are present in the selected object or field. This is another way of quickly shortening the list of Other Node Names so that the appropriate node name can be selected.
 
 Finally, the Containing Text field just above the OK button can be typed in. Whatever you type limits the Other Node Names list to just those characters. The more typed, the shorter the list becomes. This is another method of quickly finding the node name used in other parts of the file. The Containing Text field is usually used with the All option but can be used with the other display options as well.
 
 ### Working with Objects
 
-To delete an object, first click on any value for the object and then click on the “Del Obj” button. To add a new object, click on the “New Obj” button and a new object column with fields set to blanks, zeros, or default values will be added to the far right of the grid. The “Dup Obj” button is similar to “New Obj”, but copies the values of the fields of the currently selected object. Copying and pasting an object or groups of objects is also possible using the “Copy Obj” and “Paste Obj” buttons.  These allow objects to be copied between files are also good for copying from files in the DataSets subdirectory. (Also see the Edit menu to perform these functions.)
+To delete an object, first click on any value for the object and then click on the "Del Obj" button. To add a new object, click on the "New Obj" button and a new object column with fields set to blanks, zeros, or default values will be added to the far right of the grid. The "Dup Obj" button is similar to "New Obj", but copies the values of the fields of the currently selected object. Copying and pasting an object or groups of objects is also possible using the "Copy Obj" and "Paste Obj" buttons.  These allow objects to be copied between files are also good for copying from files in the DataSets subdirectory. (Also see the Edit menu to perform these functions.)
 
 ### File Menu
 
 The File menu can be used for creating or selecting input files just like the buttons on the IDF Editor screen (see the *Creating or Selecting an Input File* section above). In addition, the File menu is used to save a file or exit the IDF Editor. More than one file can be opened at a time.
 
-The “File”, “Save Options” screen is shown below.
+The "File", "Save Options" screen is shown below.
 
 
 
@@ -13809,7 +13809,7 @@ In addition, the Save Options also allow certain objects to be written to the fi
 
 The settings for the save options are kept for each file saved from the IDF Editor.
 
-The “Set as Default” option allows you to keep the save options intact for files that have not been saved yet with a version of IDF Editor that has this capability.
+The "Set as Default" option allows you to keep the save options intact for files that have not been saved yet with a version of IDF Editor that has this capability.
 
 The Help that is available from the Save Options screen is reproduced below:
 
@@ -13819,13 +13819,13 @@ n The sorted order of saving objects is the traditional way the IDF Editor sort
 
 n You can also choose to specially format some objects. This affects how individual fields in objects are arranged when saved. Selecting this option will format the following objects on a single line: Report, Report Meter, Report Variable, Version, Timestep in Hour, Inside Convection Algorithm, Outside Convection Algorithm, Solution Algorithm, Shadowing Calculations, Ground Reflectances, and GroundTemperatures:Deep. In addition, Schedule:Compact objects will be formatted to have two field for some lines. With this option, objects with geometric vertices are formatted to have the X, Y, and Z values on the same line. Those objects include: Surface:HeatTransfer, Surface:HeatTransfer:Sub, Surface:Shading:Detached:Fixed, Surface:Shading:Detached:Building and Surface:Shading:Attached.
 
-n These options are saved for each file. If a file has not been saved with IDF Editor yet, the default is used  but if a file does not specify the default values for these can also be set by using the set as default option. The saved file keeps these options by using the !-option line with SortedOrder, OriginalOrderTop, OriginalOrderBottom, and UseSpecialFormat.”
+n These options are saved for each file. If a file has not been saved with IDF Editor yet, the default is used  but if a file does not specify the default values for these can also be set by using the set as default option. The saved file keeps these options by using the !-option line with SortedOrder, OriginalOrderTop, OriginalOrderBottom, and UseSpecialFormat."
 
-n Full line comments which begin with “!” are preserved by IDF Editor and become associated with the object immediately followin the comment line(s).
+n Full line comments which begin with "!" are preserved by IDF Editor and become associated with the object immediately followin the comment line(s).
 
-n Endline comments which begin with “!” are preserved by IDF Editor and are placed immediately before the object they are found in.
+n Endline comments which begin with "!" are preserved by IDF Editor and are placed immediately before the object they are found in.
 
-n Endline comment which being with “!-“ are automatic comments which IDF Editor will overwrite with the field name and units. User-provided text which follows “!-“ will be lost. User comments should be added above the pertinent object using “!” to begin the line.
+n Endline comment which being with "!-" are automatic comments which IDF Editor will overwrite with the field name and units. User-provided text which follows "!-" will be lost. User comments should be added above the pertinent object using "!" to begin the line.
 
 Also on the File menu is the Open DataSet menu and submenu. This allows you to open any input file that appears in the DataSet subdirectory and copy objects from them into another file. This is required because EnergyPlus does not read the DataSet files, it is up to you to include objects from them.
 
@@ -13861,11 +13861,11 @@ The View menu offers options for units and column widths. The Narrow/Medium/Wide
 
 3)   Schedules, fluid properties and curves now support IP unit conversions. For curves, the minimum and maximum values are converted but the coefficients are not.
 
-To display only classes that contain objects select the “show classes with objects only” option on the “View” menu. You can also toggle this feature on and off with CTRL+L. If the file is empty and has no objects, this toggle does not impact the display.
+To display only classes that contain objects select the "show classes with objects only" option on the "View" menu. You can also toggle this feature on and off with CTRL+L. If the file is empty and has no objects, this toggle does not impact the display.
 
-The “Show Quick Select Dropdowns” option, which can also be turned on and off with CTRL-Q, displays two dropdown lists above the class list that can be quickly used to select classes. The first list displays the possible groups. Once those are selected, the second list contains only the classes within that group. This option may be used to quickly access classes while avoiding scrolling through the long class list. In addition these pull down menus may be used with the keyboard to select groups and class names based on the first few letters of the names.
+The "Show Quick Select Dropdowns" option, which can also be turned on and off with CTRL-Q, displays two dropdown lists above the class list that can be quickly used to select classes. The first list displays the possible groups. Once those are selected, the second list contains only the classes within that group. This option may be used to quickly access classes while avoiding scrolling through the long class list. In addition these pull down menus may be used with the keyboard to select groups and class names based on the first few letters of the names.
 
-The figure below shows the “Layout Options” also accessible under the View menu.
+The figure below shows the "Layout Options" also accessible under the View menu.
 
 ![](AuxiliaryPrograms/media/image080.png)
 
@@ -13873,15 +13873,15 @@ Figure 54. IDF Editor Layout Options Screen.
 
 This option allows for different arrangements of the layout for the main screen of the IDF Editor. Select one of the four layouts available.
 
-The “Show Quick Select Dropdowns” view menu option adds two new input fields to the main screen. The input fields can be used to go quickly to different classes in the main list of classes.
+The "Show Quick Select Dropdowns" view menu option adds two new input fields to the main screen. The input fields can be used to go quickly to different classes in the main list of classes.
 
-The “Validity Check” function has replaced and expanded upon the old “Check Out-of-Range” function. It can also be started by using CTRL-R. The “Validity Check” function performs three kinds of validity checks and displays the results as shown in the dialog box below:
+The "Validity Check" function has replaced and expanded upon the old "Check Out-of-Range" function. It can also be started by using CTRL-R. The "Validity Check" function performs three kinds of validity checks and displays the results as shown in the dialog box below:
 
 ![](AuxiliaryPrograms/media/image081.jpg)
 
 Figure 55. Validity Check Dialog Box
 
-The list displays the values and locations for objects with values that are either above the maximum or below the minimum values. This allows you to check your input for out-of-range values prior to running EnergyPlus.  It also displays fields that contain invalid references. An invalid reference is when a name is used that should be the name of object but no object exists that uses that name. For example, if a Construction object references a layer named IN20 but no Material (or Material:NoMass, etc.) object is named IN20. When viewing the class that contains invalid references, those references are shown with a different background color similar to numbers that are out of range. The “Validity Check” dialog also shows when an entry for a field is not one of the possible lists of choices. The Goto button allows you to jump directly to the selected identified problems. The Perform Validity Check When Saving File can be turned on and off and automatically performs the check whenever the file is saved.
+The list displays the values and locations for objects with values that are either above the maximum or below the minimum values. This allows you to check your input for out-of-range values prior to running EnergyPlus.  It also displays fields that contain invalid references. An invalid reference is when a name is used that should be the name of object but no object exists that uses that name. For example, if a Construction object references a layer named IN20 but no Material (or Material:NoMass, etc.) object is named IN20. When viewing the class that contains invalid references, those references are shown with a different background color similar to numbers that are out of range. The "Validity Check" dialog also shows when an entry for a field is not one of the possible lists of choices. The Goto button allows you to jump directly to the selected identified problems. The Perform Validity Check When Saving File can be turned on and off and automatically performs the check whenever the file is saved.
 
 ### Help Menu
 
@@ -13891,7 +13891,7 @@ The Help menu offers options to open the EnergyPlus documentation files.
 
 Remember to save any changes made before you create or edit another input file.
 
-No “Run EnergyPlus” button is available. Save your IDF file and use EP-Launch to execute an EnergyPlus run.
+No "Run EnergyPlus" button is available. Save your IDF file and use EP-Launch to execute an EnergyPlus run.
 
 You cannot edit comments in the ‘Comments from IDF’ section of the screen.
 
@@ -13915,7 +13915,7 @@ Figure 56. EP-Compare Main Screen
 
 The main screen shows both the graph being displayed at the bottom and allows the user to select a graph from a list at the top. The list of graphs is based on each table name and subtable name and then has a list of graphs supported including stacked bars, simple bar, 100% stacked bars, side-by-side bars, and monthly line graphs. The program window can be resized.
 
-The first time the program is started no graphs are shown because no files have been selected. To select files use the “Manage Files” button. This brings up the Manage Files dialog box shown below:
+The first time the program is started no graphs are shown because no files have been selected. To select files use the "Manage Files" button. This brings up the Manage Files dialog box shown below:
 
 ![](AuxiliaryPrograms/media/image083.jpg)
 
