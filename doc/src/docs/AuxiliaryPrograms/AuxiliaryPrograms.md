@@ -101,441 +101,311 @@ Typically, acquisition of weather data has been a user’s burden. Though this w
 
 The details are shown in Table 18. Summary of Downloadable Weather Data by Type.   This data has been selected with the energy simulation user in mind. All the data (as well as the statistical reports – described later in this document) are downloadable for individual locations.
 
-
-
 Table 1. Comparison of E/E with ESP-r/DOE-2/BLAST Weather Data Formats
 
-Data Element
-
-DOE-2
-
-BLAST
-
-ESP-r
-
-E/E
-
-Location (name, latitude, longitude, elevation, time zone)
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Data source
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Commentary
-
-** **
-
-** **
-
-**X**
-
-**X**
-
-Design conditions
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Typical/extreme periods
-
-** **
-
-** **
-
-**X**
-
-**X**
-
-Data periods
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Holiday/Daylight Saving
-
-** **
-
-**X**
-
-** **
-
-**X**
-
-Solar Angles/Equation of Time Hours
-
-** **
-
-**X**
-
-** **
-
-** **
-
-Degree Days
-
-** **
-
-**X**
-
-** **
-
-**X**
-
-Year
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Month
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Day
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Hour
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Minute
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Data source and uncertainty flags
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Dry bulb temperature
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Wet bulb temperature
-
-**X**
-
-**X**
-
-** **
-
-** **
-
-Dew point temperature
-
-**X**
-
-** **
-
-** **
-
-**X**
-
-Atmospheric station pressure
-
-**X**
-
-**X**
-
-** **
-
-**X**
-
-Humidity ratio
-
-**X**
-
-**X**
-
-** **
-
-** **
-
-Relative humidity
-
-** **
-
-** **
-
-**X**
-
-**X**
-
-Enthalpy
-
-**X**
-
-** **
-
-** **
-
-** **
-
-Density
-
-**X**
-
-** **
-
-** **
-
-** **
-
-Wind Speed
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Wind Direction
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Infrared Sky Temperature
-
-** **
-
-**X**
-
-** **
-
-**X**
-
-Solar Radiation (global, normal, diffuse)
-
-**X**
-
-**X**
-
-**X**
-
-**X**
-
-Illuminance (global, normal, diffuse)
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Sky cover (cloud amount)
-
-**X**
-
-** **
-
-** **
-
-**X**
-
-Opaque sky cover
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Visibility
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Ceiling height
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Clearness (monthly)
-
-**X**
-
-** **
-
-** **
-
-** **
-
-“Undisturbed” Ground temperatures (monthly)
-
-**X**
-
-** **
-
-** **
-
-**X**
-
-Present weather observation and codes (rain, snow)
-
-** **
-
-**X**
-
-** **
-
-**X**
-
-Precipitable water
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Aerosol optical depth
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Snow depth
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Days since last snowfall
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Albedo
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Liquid Precipitation Depth
-
-** **
-
-** **
-
-** **
-
-**X**
-
-Liquid Precipitation Quantity
-
-** **
-
-** **
-
-** **
-
-**X**
-
-
+<table class="table table-striped">
+  <tr>
+    <th>Data Element</th>
+    <th>DOE-2</th>
+    <th>BLAST</th>
+    <th>ESP-r</th>
+    <th>E/E</th>
+  </tr>
+  <tr>
+    <td>Location (name, latitude, longitude, elevation, time zone)</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Data source</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Commentary</td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Design conditions</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Typical/extreme periods</td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Data periods</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Holiday/Daylight Saving</td>
+    <td></td>
+    <td>X</td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Solar Angles/Equation of Time Hours</td>
+    <td></td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Degree Days</td>
+    <td></td>
+    <td>X</td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Year</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Month</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Day</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Hour</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Minute</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Data source and uncertainty flags</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Dry bulb temperature</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Wet bulb temperature</td>
+    <td>X</td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Dew point temperature</td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Atmospheric station pressure</td>
+    <td>X</td>
+    <td>X</td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Humidity ratio</td>
+    <td>X</td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Relative humidity</td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Enthalpy</td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Density</td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Wind Speed</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Wind Direction</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Infrared Sky Temperature</td>
+    <td></td>
+    <td>X</td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Solar Radiation (global, normal, diffuse)</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Illuminance (global, normal, diffuse)</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Sky cover (cloud amount)</td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Opaque sky cover</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Visibility</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Ceiling height</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Clearness (monthly)</td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>�Undisturbed� Ground temperatures (monthly)</td>
+    <td>X</td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Present weather observation and codes (rain, snow)</td>
+    <td></td>
+    <td>X</td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Precipitable water</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Aerosol optical depth</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Snow depth</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Days since last snowfall</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Albedo</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Liquid Precipitation Depth</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Liquid Precipitation Quantity</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>X</td>
+  </tr>
+</table>
 
 Using the Weather Converter
 ---------------------------
@@ -612,7 +482,7 @@ This choice exits the program.
 
 ### Converting Data
 
-This screen is automatically shown when you start the program – it will allow you to select raw data for processing, change the default type (based on file extension), select the kind of conversion you want, select where and what name to store for the processed data, and process the data. An “almost” completed screen shows:
+This screen is automatically shown when you start the program - it will allow you to select raw data for processing, change the default type (based on file extension), select the kind of conversion you want, select where and what name to store for the processed data, and process the data. An “almost” completed screen shows:
 
 ![](AuxiliaryPrograms/media/image003.jpg)
 
@@ -628,65 +498,68 @@ Selecting this command button brings up a common dialog interface that allows yo
 
 Table 2. Input File Extensions with implied Data types
 
-**File Extension**
-
-**Implicit Data File Type**
-
-LST
-
-Processing List of Files
-
-&lt;any&gt; or CST
-
-Custom – must have “def” file as specified below
-
-EPW
-
-EnergyPlus E/E
-
-CSV
-
-Comma Delimited File (EPW Format) Note: special EnergyPlus CSV format. For other CSV files use the DEF file and describe the format.
-
-TM2
-
-TMY2
-
-TMY
-
-TMY
-
-IWC
-
-IWEC
-
-WY2
-
-WYEC2
-
-DAT
-
-SAMSON
-
-FMT
-
-DOE-2 Formatted File
-
-CLM
-
-ESP-r Climate Formatted File
-
-ASC
-
-BLAST ASCII
-
-SWE
-
-SWERA
-
-WEA
-
-Ecotect WEA file
+<table class="table table-striped">
+  <tr>
+    <th>File Extension</th>
+    <th>Implicit Data File Type</th>
+  </tr>
+  <tr>
+    <td>LST</td>
+    <td>Processing List of Files</td>
+  </tr>
+  <tr>
+    <td>&lt;any&gt; or CST</td>
+    <td>Custom � must have �def� file as specified below</td>
+  </tr>
+  <tr>
+    <td>EPW</td>
+    <td>EnergyPlus E/E</td>
+  </tr>
+  <tr>
+    <td>CSV</td>
+    <td>Comma Delimited File (EPW Format) Note: special EnergyPlus CSV format. For other CSV files use the DEF file and describe the format.</td>
+  </tr>
+  <tr>
+    <td>TM2</td>
+    <td>TMY2</td>
+  </tr>
+  <tr>
+    <td>TMY</td>
+    <td>TMY</td>
+  </tr>
+  <tr>
+    <td>IWC</td>
+    <td>IWEC</td>
+  </tr>
+  <tr>
+    <td>WY2</td>
+    <td>WYEC2</td>
+  </tr>
+  <tr>
+    <td>DAT</td>
+    <td>SAMSON</td>
+  </tr>
+  <tr>
+    <td>FMT</td>
+    <td>DOE-2 Formatted File</td>
+  </tr>
+  <tr>
+    <td>CLM</td>
+    <td>ESP-r Climate Formatted File</td>
+  </tr>
+  <tr>
+    <td>ASC</td>
+    <td>BLAST ASCII</td>
+  </tr>
+  <tr>
+    <td>SWE</td>
+    <td>SWERA</td>
+  </tr>
+  <tr>
+    <td>WEA</td>
+    <td>Ecotect WEA file</td>
+  </tr>
+</table>
 
 Of course, the “all files” (\*.\*) may be used as well. If the file selected is not one of the above types, you will be cautioned to use the “override default type” button to select the correct type before proceeding. Most of the data file types are described in other publications and won’t be described in detail here.
 
@@ -776,37 +649,21 @@ Some of the data formats have inherent omissions (e.g. TMY does not have locatio
 
 **Note that the “Def” formats are entirely different from the usual IDF formats of EnergyPlus.  No commas separate fields.  No semicolon terminates the entry.**
 
-
-
-&location
-
-City='Hong Kong'
-
-StateProv=' '
-
-Country='CHN'
-
-InLat=22.75
-
-InLong=115
-
-InTime=8
-
-InElev=0
-
-InWMO=450040
-
-/
-
-
-
-&miscdata
-
-Comments1='This file was given to us by....'
-
-SourceData=’Original xyz data’
-
-/
+    &location
+    City='Hong Kong'
+    StateProv=' '
+    Country='CHN'
+    InLat=22.75
+    InLong=115
+    InTime=8
+    InElev=0
+    InWMO=450040
+    /
+    
+    &miscdata
+    Comments1='This file was given to us by....'
+    SourceData=’Original xyz data’
+    /
 
 The “slash” (/) character terminating each block is very important – omissions results in incorrect reading of data.
 
@@ -932,72 +789,63 @@ When a list of files is being processed, one of the outputs that results from th
 
 Table 6. Definitions file - &wthdata description
 
-**&wthdata**
- Field Description
-
-Field Name
-
-Type
-
-Input File Type
-
-InputFileType
-
-String
-
-Number of records per hour
-
-NumInHour
-
-Integer
-
-Data Element Names
-
-DataElements
-
-Strings
-
-Data Units
-
-DataUnits
-
-Strings
-
-Multiplicative Conversion Factors for Data
-
-DataConversionFactors
-
-Numeric
-
-Special Missing Values
-
-DataMissingValues
-
-Numeric
-
-Format for input
-
-InFormat
-
-Format String or “delimited”
-
-Delimiter Character
-
-DelimiterChar
-
-
-
-Decimal Delimiter Character
-
-DecimalSymbolChar
-
-String
-
-Date Separator
-
-DateSeparator
-
-String (single character)
+<table class="table table-striped">
+  <tr>
+    <th>&amp;wthdata Field Description</th>
+    <th>Field Name</th>
+    <th>Type</th>
+  </tr>
+  <tr>
+    <td>Input File Type</td>
+    <td>InputFileType</td>
+    <td>String</td>
+  </tr>
+  <tr>
+    <td>Number of records per hour</td>
+    <td>NumInHour</td>
+    <td>Integer</td>
+  </tr>
+  <tr>
+    <td>Data Element Names</td>
+    <td>DataElements</td>
+    <td>Strings</td>
+  </tr>
+  <tr>
+    <td>Data Units</td>
+    <td>DataUnits</td>
+    <td>Strings</td>
+  </tr>
+  <tr>
+    <td>Multiplicative Conversion Factors for Data</td>
+    <td>DataConversionFactors</td>
+    <td>Numeric</td>
+  </tr>
+  <tr>
+    <td>Special Missing Values</td>
+    <td>DataMissingValues</td>
+    <td>Numeric</td>
+  </tr>
+  <tr>
+    <td>Format for input</td>
+    <td>InFormat</td>
+    <td>Format String or �delimited�</td>
+  </tr>
+  <tr>
+    <td>Delimiter Character</td>
+    <td>DelimiterChar</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Decimal Delimiter Character</td>
+    <td>DecimalSymbolChar</td>
+    <td>String</td>
+  </tr>
+  <tr>
+    <td>Date Separator</td>
+    <td>DateSeparator</td>
+    <td>String (single character)</td>
+  </tr>
+</table>
 
 ### Expected Formats for &wthdata
 
@@ -1078,567 +926,431 @@ For custom files, you will need to indicate which data elements are in which pos
 
 Table 8. Internal Data Element Names (directly applicable to EPW)
 
-**Short Name**
-
-**Long Name**
-
-**Default EPW Units**
-
-**Used by EnergyPlus**
-
-year
-
-Year
-
--
-
-n
-
-month
-
-Month
-
--
-
-y
-
-day
-
-Day
-
--
-
-y
-
-hour
-
-hour
-
--
-
-y
-
-minute
-
-minute
-
--
-
-n
-
-datasource
-
-datasource
-
--
-
-n
-
-drybulb
-
-dry\_bulb\_temperature
-
-C
-
-y
-
-dewpoint
-
-dew\_point\_temperature
-
-C
-
-y
-
-relhum
-
-relative\_humidity
-
-%
-
-y
-
-atmos\_pressure
-
-atmospheric\_pressure
-
-Pa
-
-y
-
-exthorrad
-
-extraterrestrial\_horizontal\_radiation
-
-Wh/m2
-
-n
-
-extdirrad
-
-extraterrestrial\_direct\_normal\_radiation
-
-Wh/m2
-
-n
-
-horirsky
-
-horizontal\_infrared\_radiation\_intensity\_from\_sky
-
-Wh/m2
-
-y
-
-glohorrad
-
-global\_horizontal\_radiation
-
-Wh/m2
-
-n
-
-dirnorrad
-
-direct\_normal\_radiation
-
-Wh/m2
-
-y
-
-difhorrad
-
-diffuse\_horizontal\_radiation
-
-Wh/m2
-
-y
-
-glohorillum
-
-global\_horizontal\_illuminance
-
-lux
-
-n
-
-dirnorillum
-
-direct\_normal\_illuminance
-
-lux
-
-n
-
-difhorillum
-
-diffuse\_horizontal\_illuminance
-
-lux
-
-n
-
-zenlum
-
-zenith\_luminance
-
-lux
-
-n
-
-winddir
-
-wind\_direction
-
-degrees
-
-y
-
-windspd
-
-wind\_speed
-
-m/2
-
-y
-
-totskycvr
-
-total\_sky\_cover
-
-tenths
-
-n
-
-opaqskycvr
-
-opaque\_sky\_cover
-
-tenths
-
-n
-
-visibility
-
-visibility
-
-km
-
-n
-
-ceiling\_hgt
-
-ceiling\_height
-
-m
-
-n
-
-presweathobs
-
-present\_weather\_observation
-
--
-
-y
-
-presweathcodes
-
-present\_weather\_codes
-
--
-
-y
-
-precip\_wtr
-
-precipitable\_water
-
-mm
-
-n
-
-aerosol\_opt\_depth
-
-aerosol\_optical\_depth
-
-thousandths
-
-N
-
-snowdepth
-
-snow\_depth
-
-cm
-
-Y
-
-days\_last\_snow
-
-days\_since\_last\_snow
-
--
-
-N
-
-Albedo
-
-albedo
-
--
-
-N
-
-liq\_precip\_depth
-
-liquid\_precip\_depth
-
-mm
-
-Y
-
-liq\_precip\_rate
-
-liquid\_precip\_rate
-
-Hour
-
-N
-
-
+<table class="table table-striped">
+  <tr>
+    <th>Short Name</th>
+    <th>Long Name</th>
+    <th>Default EPW Units</th>
+    <th>Used by EnergyPlus</th>
+  </tr>
+  <tr>
+    <td>year</td>
+    <td>Year</td>
+    <td>-</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>month</td>
+    <td>Month</td>
+    <td>-</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>day</td>
+    <td>Day</td>
+    <td>-</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>hour</td>
+    <td>hour</td>
+    <td>-</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>minute</td>
+    <td>minute</td>
+    <td>-</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>datasource</td>
+    <td>datasource</td>
+    <td>-</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>drybulb</td>
+    <td>dry_bulb_temperature</td>
+    <td>C</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>dewpoint</td>
+    <td>dew_point_temperature</td>
+    <td>C</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>relhum</td>
+    <td>relative_humidity</td>
+    <td>%</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>atmos_pressure</td>
+    <td>atmospheric_pressure</td>
+    <td>Pa</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>exthorrad</td>
+    <td>extraterrestrial_horizontal_radiation</td>
+    <td>Wh/m2</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>extdirrad</td>
+    <td>extraterrestrial_direct_normal_radiation</td>
+    <td>Wh/m2</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>horirsky</td>
+    <td>horizontal_infrared_radiation_intensity_from_sky</td>
+    <td>Wh/m2</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>glohorrad</td>
+    <td>global_horizontal_radiation</td>
+    <td>Wh/m2</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>dirnorrad</td>
+    <td>direct_normal_radiation</td>
+    <td>Wh/m2</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>difhorrad</td>
+    <td>diffuse_horizontal_radiation</td>
+    <td>Wh/m2</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>glohorillum</td>
+    <td>global_horizontal_illuminance</td>
+    <td>lux</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>dirnorillum</td>
+    <td>direct_normal_illuminance</td>
+    <td>lux</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>difhorillum</td>
+    <td>diffuse_horizontal_illuminance</td>
+    <td>lux</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>zenlum</td>
+    <td>zenith_luminance</td>
+    <td>lux</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>winddir</td>
+    <td>wind_direction</td>
+    <td>degrees</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>windspd</td>
+    <td>wind_speed</td>
+    <td>m/2</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>totskycvr</td>
+    <td>total_sky_cover</td>
+    <td>tenths</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>opaqskycvr</td>
+    <td>opaque_sky_cover</td>
+    <td>tenths</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>visibility</td>
+    <td>visibility</td>
+    <td>km</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>ceiling_hgt</td>
+    <td>ceiling_height</td>
+    <td>m</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>presweathobs</td>
+    <td>present_weather_observation</td>
+    <td>-</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>presweathcodes</td>
+    <td>present_weather_codes</td>
+    <td>-</td>
+    <td>y</td>
+  </tr>
+  <tr>
+    <td>precip_wtr</td>
+    <td>precipitable_water</td>
+    <td>mm</td>
+    <td>n</td>
+  </tr>
+  <tr>
+    <td>aerosol_opt_depth</td>
+    <td>aerosol_optical_depth</td>
+    <td>thousandths</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>snowdepth</td>
+    <td>snow_depth</td>
+    <td>cm</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>days_last_snow</td>
+    <td>days_since_last_snow</td>
+    <td>-</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>Albedo</td>
+    <td>albedo</td>
+    <td>-</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>liq_precip_depth</td>
+    <td>liquid_precip_depth</td>
+    <td>mm</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>liq_precip_rate</td>
+    <td>liquid_precip_rate</td>
+    <td>Hour</td>
+    <td>N</td>
+  </tr>
+</table>
 
 The following table illustrates that the EnergyPlus CSV header names can be used for data elements in DEF files, if desired.
 
 Table 9. Names from the EnergyPlus CSV files
 
-**Short Name**
-
-**Long Name**
-
-**Default EPW Units**
-
-**Used by EnergyPlus**
-
-*Date*
-
-*Date (used to derive Month/Day)*
-
--
-
-N
-
-*hh:mm*
-
-*HH:MM (used to derive hour/minute)*
-
--
-
-N
-
-datasource
-
-datasource
-
--
-
-N
-
-Drybulb
-
-dry bulb temperature
-
-C
-
-Y
-
-dewpoint
-
-dew point temperature
-
-C
-
-Y
-
-Relhum
-
-relative humidity
-
-%
-
-Y
-
-atmos pressure
-
-atmospheric pressure
-
-Pa
-
-Y
-
-exthorzrad
-
-extraterrestrial horizontal radiation
-
-Wh/m2
-
-N
-
-extdirrad
-
-extraterrestrial direct normal radiation
-
-Wh/m2
-
-N
-
-horzirsky
-
-horizontal infrared radiation intensity from sky
-
-Wh/m2
-
-Y
-
-glohorzrad
-
-global horizontal radiation
-
-Wh/m2
-
-N
-
-dirnorzrad
-
-direct normal radiation
-
-Wh/m2
-
-Y
-
-difhorzrad
-
-diffuse horizontal radiation
-
-Wh/m2
-
-Y
-
-glohorzillum
-
-global horizontal illuminance
-
-lux
-
-N
-
-dirnorzillum
-
-direct normal illuminance
-
-lux
-
-N
-
-difhorzillum
-
-diffuse horizontal illuminance
-
-lux
-
-N
-
-Zenlum
-
-zenith luminance
-
-lux
-
-N
-
-winddir
-
-wind direction
-
-degrees
-
-Y
-
-windspd
-
-wind speed
-
-m/2
-
-Y
-
-totskycvr
-
-total sky cover
-
-tenths
-
-N
-
-opaqskycvr
-
-opaque sky cover
-
-tenths
-
-N
-
-visibility
-
-visibility
-
-km
-
-N
-
-ceiling hgt
-
-ceiling height
-
-m
-
-N
-
-presweathobs
-
-present weather observation
-
--
-
-Y
-
-presweathcodes
-
-present weather codes
-
--
-
-Y
-
-precip wtr
-
-precipitable water
-
-mm
-
-N
-
-aerosol opt depth
-
-aerosol optical depth
-
-thousandths
-
-N
-
-snowdepth
-
-snow depth
-
-cm
-
-Y
-
-days last snow
-
-days since last snow
-
--
-
-N
-
-Albedo
-
-albedo
-
--
-
-N
-
-rain
-
-liquid precipitation depth
-
-mm
-
-Y
-
-rain quantity
-
-liquid precipitation rate
-
-Hour
-
-N
-
-
-
-### Custom Files – Auxiliary Data
+<table class="table table-striped">
+  <tr>
+    <th>Short Name</th>
+    <th>Long Name</th>
+    <th>Default EPW Units</th>
+    <th>Used by EnergyPlus</th>
+  </tr>
+  <tr>
+    <td>Date</td>
+    <td>Date (used to derive Month/Day)</td>
+    <td>-</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>hh:mm</td>
+    <td>HH:MM (used to derive hour/minute)</td>
+    <td>-</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>datasource</td>
+    <td>datasource</td>
+    <td>-</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>Drybulb</td>
+    <td>dry bulb temperature</td>
+    <td>C</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>dewpoint</td>
+    <td>dew point temperature</td>
+    <td>C</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>Relhum</td>
+    <td>relative humidity</td>
+    <td>%</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>atmos pressure</td>
+    <td>atmospheric pressure</td>
+    <td>Pa</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>exthorzrad</td>
+    <td>extraterrestrial horizontal radiation</td>
+    <td>Wh/m2</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>extdirrad</td>
+    <td>extraterrestrial direct normal radiation</td>
+    <td>Wh/m2</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>horzirsky</td>
+    <td>horizontal infrared radiation intensity from sky</td>
+    <td>Wh/m2</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>glohorzrad</td>
+    <td>global horizontal radiation</td>
+    <td>Wh/m2</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>dirnorzrad</td>
+    <td>direct normal radiation</td>
+    <td>Wh/m2</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>difhorzrad</td>
+    <td>diffuse horizontal radiation</td>
+    <td>Wh/m2</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>glohorzillum</td>
+    <td>global horizontal illuminance</td>
+    <td>lux</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>dirnorzillum</td>
+    <td>direct normal illuminance</td>
+    <td>lux</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>difhorzillum</td>
+    <td>diffuse horizontal illuminance</td>
+    <td>lux</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>Zenlum</td>
+    <td>zenith luminance</td>
+    <td>lux</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>winddir</td>
+    <td>wind direction</td>
+    <td>degrees</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>windspd</td>
+    <td>wind speed</td>
+    <td>m/2</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>totskycvr</td>
+    <td>total sky cover</td>
+    <td>tenths</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>opaqskycvr</td>
+    <td>opaque sky cover</td>
+    <td>tenths</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>visibility</td>
+    <td>visibility</td>
+    <td>km</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>ceiling hgt</td>
+    <td>ceiling height</td>
+    <td>m</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>presweathobs</td>
+    <td>present weather observation</td>
+    <td>-</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>presweathcodes</td>
+    <td>present weather codes</td>
+    <td>-</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>precip wtr</td>
+    <td>precipitable water</td>
+    <td>mm</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>aerosol opt depth</td>
+    <td>aerosol optical depth</td>
+    <td>thousandths</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>snowdepth</td>
+    <td>snow depth</td>
+    <td>cm</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>days last snow</td>
+    <td>days since last snow</td>
+    <td>-</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>Albedo</td>
+    <td>albedo</td>
+    <td>-</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>rain</td>
+    <td>liquid precipitation depth</td>
+    <td>mm</td>
+    <td>Y</td>
+  </tr>
+  <tr>
+    <td>rain quantity</td>
+    <td>liquid precipitation rate</td>
+    <td>Hour</td>
+    <td>N</td>
+  </tr>
+</table>
+
+### Custom Files - Auxiliary Data
 
 Often raw data files will not have the preceding elements but similar elements that can be used to derive the values used in the EPW files and in EnergyPlus. (For example, dew point temperature and relative humidity are needed and can be derived from dry builb temperature and a humidity indicating element such as wet bulb temperature or humidity ratio). The following table contains the data element names that can be used in the Weather Converter program to derive other data which will then be placed into the EPW data fields.
 
@@ -1790,90 +1502,78 @@ If you are entering the aforementiond “date” Data Element and your date sepa
 
 Table 12. Definitions file - &datacontrol description
 
-**&datacontrol**
- Field Description
-
-Field Name
-
-Type
-
-Records to Skip
-
-NumRecordsToSkip
-
-Integer
-
-Records to Read
-
-MaxNumRecordsToRead
-
-Integer
-
-Missing Data Action
-
-MissingDataAction
-
-
-
-Missing Wind Direction Action
-
-MissingWindDirAction
-
-
-
-Missing Wind Direction Value
-
-MissingWindDirValue
-
-Real
-
-Missing Opaque Sky Cover Action
-
-MissingOpaqueSkyCoverAction
-
-
-
-Missing Opaque Sky Cover Value
-
-MissingOpaqueSkyCoverValue
-
-Real (Value 0.0 to 10.0) – tenths of sky cover
-
-Maximum Wind Speed
-
-MaxWindSpeed
-
-Real
-
-Maximum Direct Solar
-
-MaxDirectSolar
-
-Real
-
-Maximum Diffuse Solar
-
-MaxDiffuseSolar
-
-Real
-
-Maximum Illuminance Value
-
-MaxIlluminanceValue
-
-Real
-
-Generate Solar Radiation Warnings
-
-GenerateSolarRadiationWarnings
-
-
-
-Generate Illuminance Warnings
-
-GenerateIlluminanceWarnings
-
-
+<table class="table table-striped">
+  <tr>
+    <th>&amp;datacontrol Field Description</th>
+    <th>Field Name</th>
+    <th>Type</th>
+  </tr>
+  <tr>
+    <td>Records to Skip</td>
+    <td>NumRecordsToSkip</td>
+    <td>Integer</td>
+  </tr>
+  <tr>
+    <td>Records to Read</td>
+    <td>MaxNumRecordsToRead</td>
+    <td>Integer</td>
+  </tr>
+  <tr>
+    <td>Missing Data Action</td>
+    <td>MissingDataAction</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Missing Wind Direction Action</td>
+    <td>MissingWindDirAction</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Missing Wind Direction Value</td>
+    <td>MissingWindDirValue</td>
+    <td>Real</td>
+  </tr>
+  <tr>
+    <td>Missing Opaque Sky Cover Action</td>
+    <td>MissingOpaqueSkyCoverAction</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Missing Opaque Sky Cover Value</td>
+    <td>MissingOpaqueSkyCoverValue</td>
+    <td>Real (Value 0.0 to 10.0) � tenths of sky cover</td>
+  </tr>
+  <tr>
+    <td>Maximum Wind Speed</td>
+    <td>MaxWindSpeed</td>
+    <td>Real</td>
+  </tr>
+  <tr>
+    <td>Maximum Direct Solar</td>
+    <td>MaxDirectSolar</td>
+    <td>Real</td>
+  </tr>
+  <tr>
+    <td>Maximum Diffuse Solar</td>
+    <td>MaxDiffuseSolar</td>
+    <td>Real</td>
+  </tr>
+  <tr>
+    <td>Maximum Illuminance Value</td>
+    <td>MaxIlluminanceValue</td>
+    <td>Real</td>
+  </tr>
+  <tr>
+    <td>Generate Solar Radiation Warnings</td>
+    <td>GenerateSolarRadiationWarnings</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Generate Illuminance Warnings</td>
+    <td>GenerateIlluminanceWarnings</td>
+    <td></td>
+  </tr>
+</table>
 
 ### Expected Formats for &datacontrol
 
@@ -1923,61 +1623,34 @@ In the following examples, every attempt has been made to make sure that these w
 
 Here’s an example where the delimiter between fields is a semi-colon (;) and the decimal symbol character is a comma (,) – typical of some non-USA regional settings:
 
-&location
+    &location
+    City=&lt;cityname&gt;
+    StateProv=&lt;state/province&gt;
+    Country=&lt;country&gt;
+    InWMO=&lt;wmo&gt;
+    InLat=&lt;latitude&gt;
+    InLong=&lt;longitude&gt;
+    InElev=&lt;elevation&gt;
+    InTime=&lt;timezone&gt;
+    /
+    
+    &wthdata
+    NumInHour=1
+    InputFileType='CUSTOM'
+    InFormat='DELIMITED'
+    DataElements=Date,HH:MM,Datasource,Dry Bulb Temperature,Dew Point Temperature,Relative Humidity,Atmospheric Pressure,Extraterrestrial Horizontal Radiation,Extraterrestrial Direct Normal Radiation,Horizontal Infrared Radiation Intensity from Sky,Global Horizontal Radiation,Direct Normal Radiation,Diffuse Horizontal Radiation,Global Horizontal Illuminance,Direct Normal Illuminance,Diffuse Horizontal Illuminance,Zenith Luminance,Wind Direction,Wind Speed,Total Sky Cover,Opaque Sky Cover,Visibility,Ceiling Height,Present Weather Observation,Present Weather Codes,Precipitable Water,Aerosol Optical Depth,Snow Depth,Days Since Last Snow,Albedo,Liquid Precipitation Depth,Liquid Precipitation Quantity
+    DataUnits='mm.dd.yyyy','hh:mm','x','x','x','x','C','C','%','Pa','Wh/m2','Wh/m2','Wh/m2','Wh/m2','Wh/m2','Wh/m2','lux','lux','lux','Cd/m2','deg','m/s','tenths','tenths','km','m','x','x','mm','{.001}','cm','x','{.01}','mm','hr'
+    DataConversionFactors=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+    DelimiterChar=';'
+    DateSeparator='.'
+    DecimalSymbolChar=','
+    /
 
-City=&lt;cityname&gt;
-
-StateProv=&lt;state/province&gt;
-
-Country=&lt;country&gt;
-
-InWMO=&lt;wmo&gt;
-
-InLat=&lt;latitude&gt;
-
-InLong=&lt;longitude&gt;
-
-InElev=&lt;elevation&gt;
-
-InTime=&lt;timezone&gt;
-
-/
-
-
-
-&wthdata
-
-NumInHour=1
-
-InputFileType='CUSTOM'
-
-InFormat='DELIMITED'
-
-DataElements=Date,HH:MM,Datasource,Dry Bulb Temperature,Dew Point Temperature,Relative Humidity,Atmospheric Pressure,Extraterrestrial Horizontal Radiation,Extraterrestrial Direct Normal Radiation,Horizontal Infrared Radiation Intensity from Sky,Global Horizontal Radiation,Direct Normal Radiation,Diffuse Horizontal Radiation,Global Horizontal Illuminance,Direct Normal Illuminance,Diffuse Horizontal Illuminance,Zenith Luminance,Wind Direction,Wind Speed,Total Sky Cover,Opaque Sky Cover,Visibility,Ceiling Height,Present Weather Observation,Present Weather Codes,Precipitable Water,Aerosol Optical Depth,Snow Depth,Days Since Last Snow,Albedo,Liquid Precipitation Depth,Liquid Precipitation Quantity
-
-DataUnits='mm.dd.yyyy','hh:mm','x','x','x','x','C','C','%','Pa','Wh/m2','Wh/m2','Wh/m2','Wh/m2','Wh/m2','Wh/m2','lux','lux','lux','Cd/m2','deg','m/s','tenths','tenths','km','m','x','x','mm','{.001}','cm','x','{.01}','mm','hr'
-
-DataConversionFactors=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-DelimiterChar=';'
-
-DateSeparator='.'
-
-DecimalSymbolChar=','
-
-/
-
-
-
-&datacontrol
-
-NumRecordsToSkip=19
-
-MaxNumRecordsToRead=8784
-
-MissingWindDirAction=RANDOM
-
-/
+    &datacontrol
+    NumRecordsToSkip=19
+    MaxNumRecordsToRead=8784
+    MissingWindDirAction=RANDOM
+    /
 
 Figure 4. DEF file for with non-standard field delimiter and decimal symbol
 
@@ -1985,107 +1658,61 @@ Figure 4. DEF file for with non-standard field delimiter and decimal symbol
 
 Here’s an example of a file used to “enhance” a DOE-2 FMT file:
 
-&location
-
-City='Kelburn'
-
-StateProv='Wellington'
-
-Country='NZL'
-
-InWMO=934360
-
-InLat=-42.3333
-
-InLong=174.8
-
-InElev=8
-
-InTime=1
-
-/
-
-
-
-&wthdata
-
-NumInHour=1
-
-InputFileType='FMT'
-
-/
-
-
-
-&miscdata
-
-Comments1='Standard Data Files for Computer Thermal Simulation of Solar Low Energy Non-residential Buildings; ven der Werff, Amor, and Donn 1990'
-
-Comments2='Full Actual year of dataSource data is TRY format converted to DOE-2 format;'
-
-/
+    &location
+    City='Kelburn'
+    StateProv='Wellington'
+    Country='NZL'
+    InWMO=934360
+    InLat=-42.3333
+    InLong=174.8
+    InElev=8
+    InTime=1
+    /
+    
+    &wthdata
+    NumInHour=1
+    InputFileType='FMT'
+    /
+    
+    &miscdata
+    Comments1='Standard Data Files for Computer Thermal Simulation of Solar Low Energy Non-residential Buildings; ven der Werff, Amor, and Donn 1990'
+    Comments2='Full Actual year of dataSource data is TRY format converted to DOE-2 format;'
+    /
 
 Figure 5. DEF file for DOE-2 FMT file
 
 Here’s an example of a fixed format used for custom file processing. Note that random sky cover is used, to facilitate calculating Horizontal IR from Sky that is used in EnergyPlus. Also, random wind direction is used because the data set does not contain wind direction.
 
-&location
+    &location
+    City='Torino-Caselle'
+    StateProv=' '
+    Country='ITA'
+    InWMO=160590
+    InLat=45.18333
+    InLong=7.65
+    InElev=282
+    InTime=1
+    /
+    
+    &wthdata
+    NumInHour=1
+    InputFileType='CUSTOM'
+    InFormat='(I2, I2, I2, F7.2, F7.2, F5.1, F5.1, F5.1)'
+    DataElements=Month,Day,Hour,DirNorRad,DifHorRad,DryBulb,Wind\_Speed,Relative\_Humidity
+    DataUnits=,,,'kJ/M2','kJ/M2','C','m/s','%'
+    DataConversionFactors=1,1,1,.2777778,.2777778,1,1,1
+    /
+    
+    &miscdata
+    Comments1='Italian Climate Data Set Gianni de Giorgio'
+    Comments2='Period of record 1951-1970'
+    SourceData=’IGDG Data Set’
+    /
 
-City='Torino-Caselle'
-
-StateProv=' '
-
-Country='ITA'
-
-InWMO=160590
-
-InLat=45.18333
-
-InLong=7.65
-
-InElev=282
-
-InTime=1
-
-/
-
-
-
-&wthdata
-
-NumInHour=1
-
-InputFileType='CUSTOM'
-
-InFormat='(I2, I2, I2, F7.2, F7.2, F5.1, F5.1, F5.1)'
-
-DataElements=Month,Day,Hour,DirNorRad,DifHorRad,DryBulb,Wind\_Speed,Relative\_Humidity
-
-DataUnits=,,,'kJ/M2','kJ/M2','C','m/s','%'
-
-DataConversionFactors=1,1,1,.2777778,.2777778,1,1,1
-
-/
-
-
-
-&miscdata
-
-Comments1='Italian Climate Data Set Gianni de Giorgio'
-
-Comments2='Period of record 1951-1970'
-
-SourceData=’IGDG Data Set’
-
-/
-
-&datacontrol
-
-MissingOpaqueSkyCoverAction=RANDOM
-
-MissingWindDirAction=RANDOM
-
-/
+    &datacontrol
+    MissingOpaqueSkyCoverAction=RANDOM
+    MissingWindDirAction=RANDOM
+    /
 
 Figure 6. DEF file for formatted custom file.
 
@@ -2093,65 +1720,36 @@ Figure 6. DEF file for formatted custom file.
 
 An example of a free format custom file. Here, there were several lines of text after the numeric data at the end of the file – thus we used the number of records to read parameter rather than hand editing each input file.
 
-&location
-
-City='Beijing'
-
-StateProv='Beijing'
-
-Country='CHN'
-
-InWMO='545110'
-
-InLat=39.92
-
-InLong=116.27
-
-InElev=55
-
-InTime=8
-
-/
-
-
-
-&miscdata
-
-Comments1='China Data Set - Zhang/Huang'
-
-/
-
-
-
-&wthdata
-
-NumInHour=1
-
-InputFileType='CUSTOM'
-
-InFormat='DELIMITED'
-
-DataElements=Ignore,Year,Month,Day,Hour,Ignore,DryBulb,DewPoint,Ignore,Relative\_Humidity,Ignore,DirNorRad,DifHorRad,WindDir,Wind\_Speed,OpaqSkyCvr,Atmos\_Pressure
-
-DataUnits=x,x,x,x,x,x,'k','k',x,'%',x,'wh/m2','wh/m2','deg','m/s',x,'Pa'
-
-DataConversionFactors=1,1,1,1,1,1,.1,.1,1,1,1,1,1,1,.1,.1,10
-
-DelimiterChar=' '
-
-/
-
-
-
-
-
-&datacontrol
-
-NumRecordsToSkip=0
-
-MaxNumRecordsToRead=8760
-
-/
+    &location
+    City='Beijing'
+    StateProv='Beijing'
+    Country='CHN'
+    InWMO='545110'
+    InLat=39.92
+    InLong=116.27
+    InElev=55
+    InTime=8
+    /
+    
+    &miscdata
+    Comments1='China Data Set - Zhang/Huang'
+    /
+    
+    &wthdata
+    NumInHour=1
+    InputFileType='CUSTOM'
+    InFormat='DELIMITED'
+    DataElements=Ignore,Year,Month,Day,Hour,Ignore,DryBulb,DewPoint,Ignore,Relative\_Humidity,Ignore,DirNorRad,DifHorRad,WindDir,Wind\_Speed,OpaqSkyCvr,Atmos\_Pressure
+    DataUnits=x,x,x,x,x,x,'k','k',x,'%',x,'wh/m2','wh/m2','deg','m/s',x,'Pa'
+    DataConversionFactors=1,1,1,1,1,1,.1,.1,1,1,1,1,1,1,.1,.1,10
+    DelimiterChar=' '
+    /
+    
+    
+    &datacontrol
+    NumRecordsToSkip=0
+    MaxNumRecordsToRead=8760
+    /
 
 Figure 7. DEF File for delimited custom file.
 
@@ -2159,69 +1757,38 @@ Figure 7. DEF File for delimited custom file.
 
 Suppose you have a file that is “almost” TMY2 format. You can easily specify a Def file to treat it as a custom file rather than a TMY2 file (which, by standards, will have the data filled).
 
-&location
-
-City=&lt;cityname&gt;
-
-StateProv=&lt;state/province&gt;
-
-Country=&lt;country&gt;
-
-InWMO=&lt;wmo&gt;
-
-InLat=&lt;latitude&gt;
-
-InLong=&lt;longitude&gt;
-
-InElev=&lt;elevation&gt;
-
-InTime=&lt;timezone&gt;
-
-/
-
-
-
-&wthdata
-
-NumInHour=1
-
-InputFileType='CUSTOM'
-
-InFormat='(1X,I2,I2,I2,I2,I4,I4,I4,A2,I4,A2,I4,A2,I4,A2,I4,A2,I4,A2,I4,A2,I2,A2,I2,A2,I4,A2,I4,A2,I3,A2,I4,A2,I3,A2,I3,A2,I4,A2,I5,A2,I1,A9,I3,A2,I3,A2,I3,A2,I2,A2)'
-
-DataElements=ignore,year,month,day,hour,ExtHorzRad,ExtDirNormRad,GloHorzRad,ignore,DirNormRad,ignore,DifHorzRad,ignore,GloHorzIllum,ignore,DirNormIllum,ignore,DifHorzIllum,ignore,ZenithLum,ignore,ignore,ignore,ignore,ignore,DryBulb,ignore,DewPoint,ignore,RelHumid,ignore,Pressure,ignore,WindDir,ignore,WindSpd,ignore,Visibility,ignore,CeilHgt,ignore,ObsIndicator,WeatherCodes,PrecWtr,ignore,AerOptDepth,ignore,SnowDepth,ignore,DaysSnow,ignore
-
-DataUnits='x','x','x','x','x','x','Wh/m2','Wh/m2','Wh/m2','x','Wh/m2','x','Wh/m2','x','lux','x','lux','x','lux','x','Cd/m2','x','x','x','x','x','C','x','C','x','%','x','x','x','deg','x','m/s','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'
-
-DataConversionFactors=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.1,1,0.1,1,1,1,100,1,1,1,0.1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-/
-
-
-
-&miscdata
-
-Comments1='Custom DEF format for TMY2 formatted files.'
-
-SourceData='TMY2'
-
-/
-
-
-
-&datacontrol
-
-NumRecordsToSkip=1
-
-MaxNumRecordsToRead=8784
-
-MissingWindDirAction=RANDOM
-
-MissingDataAction=DEFAULT
-
-MissingOpaqueSkyCoverAction=RANDOM
-
-/
+    &location
+    City=&lt;cityname&gt;
+    StateProv=&lt;state/province&gt;
+    Country=&lt;country&gt;
+    InWMO=&lt;wmo&gt;
+    InLat=&lt;latitude&gt;
+    InLong=&lt;longitude&gt;
+    InElev=&lt;elevation&gt;
+    InTime=&lt;timezone&gt;
+    /
+    
+    &wthdata
+    NumInHour=1
+    InputFileType='CUSTOM'
+    InFormat='(1X,I2,I2,I2,I2,I4,I4,I4,A2,I4,A2,I4,A2,I4,A2,I4,A2,I4,A2,I4,A2,I2,A2,I2,A2,I4,A2,I4,A2,I3,A2,I4,A2,I3,A2,I3,A2,I4,A2,I5,A2,I1,A9,I3,A2,I3,A2,I3,A2,I2,A2)'
+    DataElements=ignore,year,month,day,hour,ExtHorzRad,ExtDirNormRad,GloHorzRad,ignore,DirNormRad,ignore,DifHorzRad,ignore,GloHorzIllum,ignore,DirNormIllum,ignore,DifHorzIllum,ignore,ZenithLum,ignore,ignore,ignore,ignore,ignore,DryBulb,ignore,DewPoint,ignore,RelHumid,ignore,Pressure,ignore,WindDir,ignore,WindSpd,ignore,Visibility,ignore,CeilHgt,ignore,ObsIndicator,WeatherCodes,PrecWtr,ignore,AerOptDepth,ignore,SnowDepth,ignore,DaysSnow,ignore
+    DataUnits='x','x','x','x','x','x','Wh/m2','Wh/m2','Wh/m2','x','Wh/m2','x','Wh/m2','x','lux','x','lux','x','lux','x','Cd/m2','x','x','x','x','x','C','x','C','x','%','x','x','x','deg','x','m/s','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'
+    DataConversionFactors=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.1,1,0.1,1,1,1,100,1,1,1,0.1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+    /
+    
+    &miscdata
+    Comments1='Custom DEF format for TMY2 formatted files.'
+    SourceData='TMY2'
+    /
+    
+    &datacontrol
+    NumRecordsToSkip=1
+    MaxNumRecordsToRead=8784
+    MissingWindDirAction=RANDOM
+    MissingDataAction=DEFAULT
+    MissingOpaqueSkyCoverAction=RANDOM
+    /
 
 Figure 8. DEF File for almost TMY2 files.
 
@@ -2229,67 +1796,37 @@ Figure 8. DEF File for almost TMY2 files.
 
 Finally, an example of using an EPW file as a custom file with a DEF format. Note that the specially formatted CSV files from EnergyPlus can be automatically read in and this format is provided as an extra bonus.
 
-&location
-
-City=&lt;cityname&gt;
-
-StateProv=&lt;state/province&gt;
-
-Country=&lt;country&gt;
-
-InWMO=&lt;wmo&gt;
-
-InLat=&lt;latitude&gt;
-
-InLong=&lt;longitude&gt;
-
-InElev=&lt;elevation&gt;
-
-InTime=&lt;timezone&gt;
-
-/
-
-
-
-&wthdata
-
-NumInHour=1
-
-InputFileType='CUSTOM'
-
-InFormat='DELIMITED'
-
-DataElements=year,month,day,hour,minute,datasource,Dry\_Bulb\_Temperature,Dew\_Point\_Temperature,Relative\_Humidity,Atmospheric\_Pressure,Extraterrestrial\_Horizontal\_Radiation,Extraterrestrial\_Direct\_Normal\_Radiation,Horizontal\_Infrared\_Radiation\_Intensity\_from\_Sky,Global\_Horizontal\_Radiation,Direct\_Normal\_Radiation,Diffuse\_Horizontal\_Radiation,Global\_Horizontal\_Illuminance,Direct\_Normal\_Illuminance,Diffuse\_Horizontal\_Illuminance,Zenith\_Luminance,Wind\_Direction,Wind\_Speed,Total\_Sky\_Cover,Opaque\_Sky\_Cover,Visibility,Ceiling\_Height,Present\_Weather\_Observation,Present\_Weather\_Codes,Precipitable\_Water,Aerosol\_Optical\_Depth,Snow\_Depth,Days\_Since\_Last\_Snow,Albedo,Liquid\_Precipitation\_Depth,Liquid\_Precipitation\_Quantity
-
-DataUnits='x','x','x','x','x','x','C','C','%','Pa','Wh/m2','Wh/m2','Wh/m2','Wh/m2','Wh/m2','Wh/m2','lux','lux','lux','Cd/m2','deg','m/s','tenths','tenths','km','m','x','x','mm','{.001}','cm','x','{.01}','mm','hr'
-
-DataConversionFactors=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-DelimiterChar=','
-
-/
-
-
-
-&miscdata
-
-Comments1='Standard EPW Custom def format for reading EPW files in EnergyPlus Weather Converter'
-
-SourceData='EPW'
-
-/
-
-
-
-&datacontrol
-
-NumRecordsToSkip=8
-
-MaxNumRecordsToRead=8784
-
-MissingWindDirAction=RANDOM
-
-/
+    &location
+    City=&lt;cityname&gt;
+    StateProv=&lt;state/province&gt;
+    Country=&lt;country&gt;
+    InWMO=&lt;wmo&gt;
+    InLat=&lt;latitude&gt;
+    InLong=&lt;longitude&gt;
+    InElev=&lt;elevation&gt;
+    InTime=&lt;timezone&gt;
+    /
+    
+    &wthdata
+    NumInHour=1
+    InputFileType='CUSTOM'
+    InFormat='DELIMITED'
+    DataElements=year,month,day,hour,minute,datasource,Dry\_Bulb\_Temperature,Dew\_Point\_Temperature,Relative\_Humidity,Atmospheric\_Pressure,Extraterrestrial\_Horizontal\_Radiation,Extraterrestrial\_Direct\_Normal\_Radiation,Horizontal\_Infrared\_Radiation\_Intensity\_from\_Sky,Global\_Horizontal\_Radiation,Direct\_Normal\_Radiation,Diffuse\_Horizontal\_Radiation,Global\_Horizontal\_Illuminance,Direct\_Normal\_Illuminance,Diffuse\_Horizontal\_Illuminance,Zenith\_Luminance,Wind\_Direction,Wind\_Speed,Total\_Sky\_Cover,Opaque\_Sky\_Cover,Visibility,Ceiling\_Height,Present\_Weather\_Observation,Present\_Weather\_Codes,Precipitable\_Water,Aerosol\_Optical\_Depth,Snow\_Depth,Days\_Since\_Last\_Snow,Albedo,Liquid\_Precipitation\_Depth,Liquid\_Precipitation\_Quantity
+    DataUnits='x','x','x','x','x','x','C','C','%','Pa','Wh/m2','Wh/m2','Wh/m2','Wh/m2','Wh/m2','Wh/m2','lux','lux','lux','Cd/m2','deg','m/s','tenths','tenths','km','m','x','x','mm','{.001}','cm','x','{.01}','mm','hr'
+    DataConversionFactors=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+    DelimiterChar=','
+    /
+    
+    &miscdata
+    Comments1='Standard EPW Custom def format for reading EPW files in EnergyPlus Weather Converter'
+    SourceData='EPW'
+    /
+    
+    &datacontrol
+    NumRecordsToSkip=8
+    MaxNumRecordsToRead=8784
+    MissingWindDirAction=RANDOM
+    /
 
 Figure 9. DEF File for EPW files.
 
@@ -2303,11 +1840,11 @@ EnergyPlus only uses the solar radiation data for Direct Normal and Diffuse Hori
 
 With any two of the solar components, it is reasonable to use the simple relationship of Global, Diffuse and Direct, such as:
 
-![](AuxiliaryPrograms/media/image004.png)
+<div>\[Global_{horizontalradiation} = Direct_{horizontalradiation}+Diffuse_{horizontalradiation}\]</div>
 
 Using known solar position (calculated internally by the Weather converter from latitude, longitude, date and hour), one has:
 
-![](AuxiliaryPrograms/media/image005.png)
+<div>\[Direct_{normalradiation} = \frac{Direct_{horizontalradiation}}{\sin(Solar_{height}}\]</div>
 
 Thus, having two of the solar radiation components makes it relatively simple to derive the third.
 
@@ -3766,255 +3303,151 @@ In the table, Month can be one of (January, February, March, April, May, June, J
 
 In the table, Weekday can be one of (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday). Abbreviations of the first three characters are also valid.
 
+```idd
 !ESP(r)/EnergyPlus Weather Format
-
 !April 2002
+\memo� Dates in the EPW file can be several formats:
+\memo� <number>/<number>� (month/day)
+\memo� <number> Month
+\memo� Month <number>
+\memo <number>� (taken to be Julian day of year)
+\memo Months are January, February, March, April, May,
+\memo            June, July, August, September, October, November, December
+\memo Months can be the first 3 letters of the month
+```
 
-\\memo  Dates in the EPW file can be several formats:
-
-\\memo  &lt;number&gt;/&lt;number&gt;  (month/day)
-
-\\memo  &lt;number&gt; Month
-
-\\memo  Month &lt;number&gt;
-
-\\memo &lt;number&gt;  (taken to be Julian day of year)
-
-\\memo Months are January, February, March, April, May,
-
-\\memo            June, July, August, September, October, November, December
-
-\\memo Months can be the first 3 letters of the month
-
-
-
+```idd
 LOCATION,
-
-   A1, \\field city
-
-   \\type alpha
-
-   A2, \\field State Province Region
-
-   \\type alpha
-
-   A3, \\field Country
-
-   \\type alpha
-
-   A4, \\field Source
-
-   \\type alpha
-
-   N1, \\field WMO
-
-    \\note usually a 6 digit field. Used as alpha in EnergyPlus
-
-    \\type alpha
-
-   N2 , \\field Latitude
-
-       \\units deg
-
-       \\minimum -90.0
-
-       \\maximum +90.0
-
-       \\default 0.0
-
-       \\note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)
-
-       \\type real
-
-   N3 , \\field Longitude
-
-       \\units deg
-
-       \\minimum -180.0
-
-       \\maximum +180.0
-
-       \\default 0.0
-
-       \\note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)
-
-       \\type real
-
-   N4 , \\field TimeZone
-
-       \\units hr - not on standard units list???
-
-       \\minimum -12.0
-
-       \\maximum +12.0
-
-       \\default 0.0
-
-       \\note  Time relative to GMT.
-
-       \\type real
-
-   N5 ; \\field Elevation
-
-       \\units m
-
-       \\minimum -1000.0
-
-       \\maximum&lt; +9999.9
-
-       \\default 0.0
-
-       \\type real
+   A1, \field city
+   \type alpha
+   A2, \field State Province Region
+   \type alpha
+   A3, \field Country
+   \type alpha
+   A4, \field Source
+   \type alpha
+   N1, \field WMO
+    \note usually a 6 digit field. Used as alpha in EnergyPlus
+    \type alpha
+   N2 , \field Latitude
+       \units deg
+       \minimum -90.0
+       \maximum +90.0
+       \default 0.0
+       \note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)
+       \type real
+   N3 , \field Longitude
+       \units deg
+       \minimum -180.0
+       \maximum +180.0
+       \default 0.0
+       \note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)
+       \type real
+   N4 , \field TimeZone
+       \units hr - not on standard units list???
+       \minimum -12.0
+       \maximum +12.0
+       \default 0.0
+       \note  Time relative to GMT.
+       \type real
+   N5 ; \field Elevation
+       \units m
+       \minimum -1000.0
+       \maximum< +9999.9
+       \default 0.0
+       \type real
+```
 
 The Location header record duplicates the information required for the Location Object. When only a Run Period object is used (i.e. a weather file), then the Location Object Is not needed. When a Run Period and Design Day objects are entered, then the Location on the weather file (as described previously) is used and overrides any Location Object entry.
 
+```idd
 DESIGN CONDITIONS,
-
-     N1, \\field Number of Design Conditions
-
-     A1, \\field Design Condition Source
-
-         \\note current sources are ASHRAE HOF 2009 US Design Conditions, Canadian Design Conditions
-
-         \\note and World Design Conditions
-
-     A2, \\field Design Condition Type (HEATING)
-
-       \\note fields here will be dependent on the source, they are shown in a header/data format
-
-       \\note in both the .rpt and .csv files that are produced by the WeatherConverter program
-
-     ...
-
-     An, \\field Design Condition Type (COOLING)
-
-       \\note same as note on Heating Design Conditions
+     N1, \field Number of Design Conditions
+     A1, \field Design Condition Source
+         \note current sources are ASHRAE HOF 2009 US Design Conditions, Canadian Design Conditions
+         \note and World Design Conditions
+     A2, \field Design Condition Type (HEATING)
+       \note fields here will be dependent on the source, they are shown in a header/data format 
+       \note in both the .rpt and .csv files that are produced by the WeatherConverter program
+     ...
+     An, \field Design Condition Type (COOLING)
+       \note same as note on Heating Design Conditions
+```
 
 The Design Conditions header record encapsulates matching (using WMO\# -- World Meteorological Organization Station Number) design conditions for a weather file location. Currently only those design conditions contained in the ASHRAE Handbook of Fundamentals 2009 are contained in the weather files. These conditions can be used as desired. In addition, Design Day definition files have been created of all World, Canada, and United States Design Conditions. These files are available in the DataSet folder of the EnergyPlus installation.
 
-
-
+```idd
 TYPICAL/EXTREME PERIODS,
-
-     N1, \\field Number of Typical/Extreme Periods
-
-     A1, \\field Typical/Extreme Period 1 Name
-
-     A2, \\field Typical/Extreme Period 1 Type
-
-     A3, \\field Period 1 Start Day
-
-     A4, \\field Period 1 End Day
-
-     \\note repeat (A1-A3) until number of typical periods
-
- -- etc to \# of periods entered
+     N1, \field Number of Typical/Extreme Periods
+     A1, \field Typical/Extreme Period 1 Name
+     A2, \field Typical/Extreme Period 1 Type
+     A3, \field Period 1 Start Day
+     A4, \field Period 1 End Day
+     \note repeat (A1-A3) until number of typical periods
+ -- etc to # of periods entered
+```
 
 Using a heuristic method, the weather converter can determine typical and extreme weather periods for full year weather files. These will then be shown on the Typical/Extreme Periods header record. These are also reported in the statistical report output from the Weather Converter.
 
+```idd
 GROUND TEMPERATURES,
-
-       N1, Number of Ground Temperature Depths
-
-       N2, \\field Ground Temperature Depth 1
-
-         \\units m
-
-       N3, \\field Depth 1 Soil Conductivity
-
-         \\units W/m-K,
-
-       N4, \\field Depth 1 Soil Density
-
-         \\units kg/m3
-
-       N5, \\field Depth 1 Soil Specific Heat
-
-         \\units J/kg-K,
-
-       N6, \\field Depth 1 January Average Ground Temperature
-
-        \\units C
-
-       N7, \\field Depth 1 February Average Ground Temperature
-
-        \\units C
-
-       N8, \\field Depth 1 March Average Ground Temperature
-
-        \\units C
-
-       N9, \\field Depth 1 April Average Ground Temperature
-
-        \\units C
-
-       N10, \\field Depth 1 May Average Ground Temperature
-
-        \\units C
-
-       N11, \\field Depth 1 June Average Ground Temperature
-
-        \\units C
-
-       N12, \\field Depth 1 July Average Ground Temperature
-
-        \\units C
-
-       N13, \\field Depth 1 August Average Ground Temperature
-
-        \\units C
-
-       N14, \\field Depth 1 September Average Ground Temperature
-
-        \\units C
-
-       N15, \\field Depth 1 October Average Ground Temperature
-
-        \\units C
-
-       N16, \\field Depth 1 November Average Ground Temperature
-
-        \\units C
-
-       N17, \\field Depth 1 December Average Ground Temperature
-
-        \\units C
-
-      \\note repeat above (N2-N17) to number of ground temp depths indicated
-
--- etc to \# of depths entered
+       N1, Number of Ground Temperature Depths
+       N2, \field Ground Temperature Depth 1
+         \units m
+       N3, \field Depth 1 Soil Conductivity
+         \units W/m-K,
+       N4, \field Depth 1 Soil Density
+         \units kg/m3
+       N5, \field Depth 1 Soil Specific Heat
+         \units J/kg-K,
+       N6, \field Depth 1 January Average Ground Temperature
+        \units C
+       N7, \field Depth 1 February Average Ground Temperature
+        \units C
+       N8, \field Depth 1 March Average Ground Temperature
+        \units C
+       N9, \field Depth 1 April Average Ground Temperature
+        \units C
+       N10, \field Depth 1 May Average Ground Temperature
+        \units C
+       N11, \field Depth 1 June Average Ground Temperature
+        \units C
+       N12, \field Depth 1 July Average Ground Temperature
+        \units C
+       N13, \field Depth 1 August Average Ground Temperature
+        \units C
+       N14, \field Depth 1 September Average Ground Temperature
+        \units C
+       N15, \field Depth 1 October Average Ground Temperature
+        \units C
+       N16, \field Depth 1 November Average Ground Temperature
+        \units C
+       N17, \field Depth 1 December Average Ground Temperature
+        \units C
+      \note repeat above (N2-N17) to number of ground temp depths indicated
+-- etc to # of depths entered
+```
 
 The weather converter program can use a full year weather data file to calculate “undisturbed” ground temperatures based on temperatures. Since an important part of soil heat transfer includes soil properties such as conductivity, density and specific heat AND these cannot be calculated from simple weather observations, this header record is provided primarilyfor user information. However, with the FC construction option, these are automatically selected (.5 depth) for use if the user does not include values in the Site:GroundTemperature:FcfactorMethod object.
 
 As noted in the statistics report, the “undisturbed” ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the GroundTemperatures:Surface and GroundTemperatures:Deep objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
 
+```idd
 HOLIDAYS/DAYLIGHT SAVING,
-
-     A1, \\field LeapYear Observed
-
-      \\type choice
-
-      \\key Yes
-
-      \\key No
-
-      \\note Yes if Leap Year will be observed for this file
-
-      \\note No if Leap Year days (29 Feb) should be ignored in this file
-
-     A2, \\field Daylight Saving Start Day
-
-     A3, \\field Daylight Saving End Day
-
-     N1, \\field Number of Holidays (essentially unlimited)
-
-     A4, \\field Holiday 1 Name
-
-     A5, \\field Holiday 1 Day
-
-     \\note repeat above two fields until Number of Holidays is reached
-
--- etc to \# of Holidays entered
+     A1, \field LeapYear Observed
+      \type choice
+      \key Yes
+      \key No
+      \note Yes if Leap Year will be observed for this file
+      \note No if Leap Year days (29 Feb) should be ignored in this file
+     A2, \field Daylight Saving Start Day
+     A3, \field Daylight Saving End Day
+     N1, \field Number of Holidays (essentially unlimited)
+     A4, \field Holiday 1 Name
+     A5, \field Holiday 1 Day
+     \note repeat above two fields until Number of Holidays is reached
+-- etc to # of Holidays entered
+```
 
 The Holidays / Daylight Saving header record details the start and end dates of Daylight Saving Time and other special days such as might be recorded for the weather file. These can be used by keying “Yes” for appropriate fields in the Run Period Object.
 
@@ -4022,69 +3455,48 @@ Note: EnergyPlus processed weather files available on the EnergyPlus web site:  
 
 For example, using a RunPeriod:
 
+```idf
 RunPeriod,
-
-    1,                       !- Begin Month
-
-    1,                       !- Begin Day Of Month
-
-    12,                      !- End Month
-
-    31,                      !- End Day Of Month
-
-    Wednesday,               !- Day Of Week For Start Day
-
-    Yes,                     !- Use WeatherFile Holidays/Special Days
-
-    No,                      !- Use WeatherFile DaylightSavingPeriod
-
-    Yes,                     !- Apply Weekend Holiday Rule
-
-    Yes,                     !- Use WeatherFile Rain Indicators
-
-    Yes;                     !- Use WeatherFile Snow Indicators
+    1,                       !- Begin Month
+    1,                       !- Begin Day Of Month
+    12,                      !- End Month
+    31,                      !- End Day Of Month
+    Wednesday,               !- Day Of Week For Start Day
+    Yes,                     !- Use WeatherFile Holidays/Special Days
+    No,                      !- Use WeatherFile DaylightSavingPeriod
+    Yes,                     !- Apply Weekend Holiday Rule
+    Yes,                     !- Use WeatherFile Rain Indicators
+    Yes;                     !- Use WeatherFile Snow Indicators
+```
 
 Will use any holidays specified in the Holidays / Daylight Saving header record of the weather file but will not use the Daylight Saving Period that is specified there (if any). In addition, the user can specify Special Day Periods via the Special Day Period object and/or Daylight Saving Period via the Daylight Saving Period object to additionally specify these items.
 
-COMMENTS 1, A1 \\field Comments\_1
-
-COMMENTS 2, A1 \\field Comments\_2
+```idd
+COMMENTS 1, A1 \field Comments_1
+COMMENTS 2, A1 \field Comments_2
+```
 
 The Comment header records may provide additional information about the weather data source or other information which may not fit in other header record formats.
 
+```idd
 DATA PERIODS,
-
-     N1, \\field Number of Data Periods
-
-     N2, \\field Number of Records per hour
-
-     A1, \\field Data Period 1 Name/Description
-
-     A2, \\field Data Period 1 Start Day of Week
-
-       \\type choice
-
-       \\key  Sunday
-
-       \\key  Monday
-
-       \\key  Tuesday
-
-       \\key  Wednesday
-
-       \\key  Thursday
-
-       \\key  Friday
-
-       \\key  Saturday
-
-     A3, \\field Data Period 1 Start Day
-
-     A4, \\field Data Period 1 End Day
-
-     \\note repeat above to number of data periods
-
--- etc to \# of periods entered
+     N1, \field Number of Data Periods
+     N2, \field Number of Records per hour
+     A1, \field Data Period 1 Name/Description
+     A2, \field Data Period 1 Start Day of Week
+       \type choice
+       \key  Sunday
+       \key  Monday
+       \key  Tuesday
+       \key  Wednesday
+       \key  Thursday
+       \key  Friday
+       \key  Saturday
+     A3, \field Data Period 1 Start Day
+     A4, \field Data Period 1 End Day
+     \note repeat above to number of data periods
+-- etc to # of periods entered
+```
 
 A weather file may contain several “data periods” though this is not required (and, in fact, may be detrimental). In addition, a weather file may contain multiple records per hour BUT these must match the Number of Time Steps In Hour for the simulation. Multiple interval data files can be valued when you want to be sure of the weather values for each time step (rather than relying on “interpolated” weather data). A weather file may also contain several consecutive years of weather data. EnergyPlus will automatically process the extra years when the Number of Years field is used in the RunPeriod object. Sorry – there is no way to jump into a year in the middle of the EPW file.
 
@@ -4094,387 +3506,264 @@ Note that a Run Period object may not cross Data Period boundary lines.
 
 For those interested in creating their own weather data in the CSV or EPW formats or reading the .csv and .epw files that are produced by the Weather Converter program, the fields are shown in the following “IDD” description. Items shown in bold are used directly in the EnergyPlus program.
 
+```idd
 ! Actual data does not have a descriptor
-
-     N1, \\field Year
-
-     N2, \\field **Month**
-
-     N3, \\field **Day**
-
-     N4, \\field **Hour**
-
-     N5, \\field **Minute**
-
-     A1, \\field Data Source and Uncertainty Flags
-
-     \\note Initial day of weather file is checked by EnergyPlus for validity (as shown below)
-
-     \\note Each field is checked for "missing" as shown below. Reasonable values, calculated
-
-     \\note values or the last "good" value is substituted.
-
-
-
-     N6, \\field **Dry Bulb Temperature**
-
-        \\units C
-
-        \\minimum&gt; -70
-
-        \\maximum&lt; 70
-
-        \\missing 99.9
-
-     N7, \\field **Dew Point Temperature**
-
-        \\units C
-
-        \\minimum&gt; -70
-
-        \\maximum&lt; 70
-
-        \\missing 99.9
-
-     N8, \\field **Relative Humidity**
-
-         \\missing 999.
-
-         \\minimum 0
-
-         \\maximum 110
-
-     N9, \\field **Atmospheric Station Pressure**
-
-        \\units Pa
-
-        \\missing 999999.
-
-        \\minimum&gt; 31000
-
-        \\maximum&lt; 120000
-
-     N10, \\field Extraterrestrial Horizontal Radiation
-
-        \\units Wh/m2
-
-        \\missing 9999.
-
-        \\minimum 0
-
-     N11, \\field Extraterrestrial Direct Normal Radiation
-
-        \\units Wh/m2
-
-        \\missing 9999.
-
-        \\minimum 0
-
-     N12, \\field **Horizontal Infrared Radiation Intensity**
-
-        \\units Wh/m2
-
-        \\missing 9999.
-
-        \\minimum 0
-
-     N13, \\field Global Horizontal Radiation
-
-        \\units Wh/m2
-
-        \\missing 9999.
-
-        \\minimum 0
-
-     N14, \\field **Direct Normal Radiation**
-
-        \\units Wh/m2
-
-        \\missing 9999.
-
-        \\minimum 0
-
-     N15, \\field **Diffuse Horizontal Radiation**
-
-        \\units Wh/m2
-
-        \\missing 9999.
-
-        \\minimum 0
-
-     N16, \\field Global Horizontal Illuminance
-
-        \\units lux
-
-        \\missing 999999.
-
-        \\note will be missing if &gt;= 999900
-
-        \\minimum 0
-
-     N17, \\field Direct Normal Illuminance
-
-        \\units lux
-
-        \\missing 999999.
-
-        \\note will be missing if &gt;= 999900
-
-        \\minimum 0
-
-     N18, \\field Diffuse Horizontal Illuminance
-
-        \\units lux
-
-        \\missing 999999.
-
-        \\note will be missing if &gt;= 999900
-
-        \\minimum 0
-
-     N19, \\field Zenith Luminance
-
-        \\units Cd/m2
-
-        \\missing 9999.
-
-        \\note will be missing if &gt;= 9999
-
-        \\minimum 0
-
-     N20, \\field **Wind Direction**
-
-        \\units degrees
-
-        \\missing 999.
-
-        \\minimum 0
-
-        \\maximum 360
-
-
-
-     N21, \\field **Wind Speed**
-
-        \\units m/s
-
-        \\missing 999.
-
-        \\minimum 0
-
-        \\maximum 40
-
-     N22, \\field Total Sky Cover
-
-        \\missing 99
-
-        \\minimum 0
-
-        \\maximum 10
-
-     N23, \\field **Opaque Sky Cover** (used if Horizontal IR Intensity missing)
-
-        \\missing 99
-
-        \\minimum 0
-
-        \\maximum 10
-
-     N24, \\field Visibility
-
-        \\units km
-
-        \\missing 9999
-
-     N25, \\field Ceiling Height
-
-        \\units m
-
-        \\missing 99999
-
-     N26, \\field **Present Weather Observation**
-
-     N27, \\field **Present Weather Codes**
-
-     N28, \\field Precipitable Water
-
-        \\units mm
-
-        \\missing 999
-
-     N29, \\field Aerosol Optical Depth
-
-        \\units thousandths
-
-        \\missing .999
-
-     N30, \\field Snow Depth
-
-        \\units cm
-
-        \\missing 999
-
-     N31, \\field Days Since Last Snowfall
-
-        \\missing 99
-
-     N32, \\field Albedo
-
-        \\missing 999
-
-     N33, \\field **Liquid Precipitation Depth**
-
-          \\units mm
-
-        \\missing 999
-
-     N34; \\field Liquid Precipitation Quantity
-
-          \\units hr
-
-        \\missing 99
+     N1, \field Year
+     N2, \field Month
+     N3, \field Day
+     N4, \field Hour
+     N5, \field Minute
+     A1, \field Data Source and Uncertainty Flags
+     \note Initial day of weather file is checked by EnergyPlus for validity (as shown below)
+     \note Each field is checked for "missing" as shown below. Reasonable values, calculated
+     \note values or the last "good" value is substituted.
+     N6, \field Dry Bulb Temperature
+        \units C
+        \minimum> -70
+        \maximum< 70
+        \missing 99.9
+     N7, \field Dew Point Temperature
+        \units C
+        \minimum> -70
+        \maximum< 70
+        \missing 99.9
+     N8, \field Relative Humidity
+         \missing 999.
+         \minimum 0
+         \maximum 110
+     N9, \field Atmospheric Station Pressure
+        \units Pa
+        \missing 999999.
+        \minimum> 31000
+        \maximum< 120000
+     N10, \field Extraterrestrial Horizontal Radiation
+        \units Wh/m2
+        \missing 9999.
+        \minimum 0
+     N11, \field Extraterrestrial Direct Normal Radiation
+        \units Wh/m2
+        \missing 9999.
+        \minimum 0
+     N12, \field Horizontal Infrared Radiation Intensity
+        \units Wh/m2
+        \missing 9999.
+        \minimum 0
+     N13, \field Global Horizontal Radiation
+        \units Wh/m2
+        \missing 9999.
+        \minimum 0
+     N14, \field Direct Normal Radiation
+        \units Wh/m2
+        \missing 9999.
+        \minimum 0
+     N15, \field Diffuse Horizontal Radiation
+        \units Wh/m2
+        \missing 9999.
+        \minimum 0
+     N16, \field Global Horizontal Illuminance
+        \units lux
+        \missing 999999.
+        \note will be missing if >= 999900
+        \minimum 0
+     N17, \field Direct Normal Illuminance
+        \units lux
+        \missing 999999.
+        \note will be missing if >= 999900
+        \minimum 0
+     N18, \field Diffuse Horizontal Illuminance
+        \units lux
+        \missing 999999.
+        \note will be missing if >= 999900
+        \minimum 0
+     N19, \field Zenith Luminance
+        \units Cd/m2
+        \missing 9999.
+        \note will be missing if >= 9999
+        \minimum 0
+     N20, \field Wind Direction
+        \units degrees
+        \missing 999.
+        \minimum 0
+        \maximum 360
+     N21, \field Wind Speed
+        \units m/s
+        \missing 999.
+        \minimum 0
+        \maximum 40
+     N22, \field Total Sky Cover
+        \missing 99
+        \minimum 0
+        \maximum 10
+     N23, \field Opaque Sky Cover (used if Horizontal IR Intensity missing)
+        \missing 99
+        \minimum 0
+        \maximum 10
+     N24, \field Visibility
+        \units km
+        \missing 9999
+     N25, \field Ceiling Height
+        \units m
+        \missing 99999
+     N26, \field Present Weather Observation
+     N27, \field Present Weather Codes
+     N28, \field Precipitable Water
+        \units mm
+        \missing 999
+     N29, \field Aerosol Optical Depth
+        \units thousandths
+        \missing .999
+     N30, \field Snow Depth
+        \units cm
+        \missing 999
+     N31, \field Days Since Last Snowfall
+        \missing 99
+     N32, \field Albedo
+        \missing 999
+     N33, \field Liquid Precipitation Depth
+          \units mm
+        \missing 999
+     N34; \field Liquid Precipitation Quantity
+          \units hr
+        \missing 99
+```
 
 ### Data Field Descriptions
 
-Descriptions of the fields are taken from the IWEC manual – as descriptive of what should be contained in the data fields.
+Descriptions of the fields are taken from the IWEC manual - as descriptive of what should be contained in the data fields.
 
-#### Field:  Year
+#### Field:� Year
 
 This is the Year of the data. Not really used in EnergyPlus. Used in the Weather Converter program for display in audit file.
 
-#### Field:  Month
+#### Field:� Month
 
 This is the month (1-12) for the data. Cannot be missing.
 
-#### Field:  Day
+#### Field:� Day
 
 This is the day (dependent on month) for the data. Cannot be missing.
 
-#### Field:  Hour
+#### Field:� Hour
 
-This is the hour of the data. (1 – 24). Hour 1 is 00:01 to 01:00. Cannot be missing.
+This is the hour of the data. (1 - 24). Hour 1 is 00:01 to 01:00. Cannot be missing.
 
-#### Field:  Minute
+#### Field:� Minute
 
 This is the minute field. (1..60)
 
-#### Field:  Data Source and Uncertainty Flags
+#### Field:� Data Source and Uncertainty Flags
 
 The data source and uncertainty flags from various formats (usually shown with each field) are consolidated in the E/E+ EPW format. More is shown about Data Source and Uncertainty in Data Sources/Uncertainty section later in this document.
 
-#### Field:  Dry Bulb Temperature
+#### Field:� Dry Bulb Temperature
 
-This is the dry bulb temperature in C at the time indicated. Note that this is a full numeric field (i.e. 23.6) and not an integer representation with tenths. Valid values range from –70 °C to 70 °C. Missing value for this field is 99.9.
+This is the dry bulb temperature in C at the time indicated. Note that this is a full numeric field (i.e. 23.6) and not an integer representation with tenths. Valid values range from -70 �C to 70 �C. Missing value for this field is 99.9.
 
-#### Field:  Dew Point Temperature
+#### Field:� Dew Point Temperature
 
-This is the dew point temperature in C at the time indicated. Note that this is a full numeric field (i.e. 23.6) and not an integer representation with tenths. Valid values range from –70 °C to 70 °C.   Missing value for this field is 99.9.
+This is the dew point temperature in C at the time indicated. Note that this is a full numeric field (i.e. 23.6) and not an integer representation with tenths. Valid values range from -70 �C to 70 �C. �Missing value for this field is 99.9.
 
-#### Field:  Relative Humidity
+#### Field:� Relative Humidity
 
-This is the Relative Humidity in percent at the time indicated. Valid values range from 0% to 110%.   Missing value for this field is 999.
+This is the Relative Humidity in percent at the time indicated. Valid values range from 0% to 110%.�Missing value for this field is 999.
 
-#### Field:  Atmospheric Station Pressure
+#### Field:� Atmospheric Station Pressure
 
-This is the station pressure in Pa at the time indicated. Valid values range from 31,000 to 120,000. (These values were chosen from the “standard barometric pressure” for all elevations of the World). Missing value for this field is 999999.
+This is the station pressure in Pa at the time indicated. Valid values range from 31,000 to 120,000. (These values were chosen from the standard barometric pressure for all elevations of the World). Missing value for this field is 999999.
 
-#### Field:  Extraterrestrial Horizontal Radiation
+#### Field:� Extraterrestrial Horizontal Radiation
 
 This is the Extraterrestrial Horizontal Radiation in Wh/m2. It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
 
-#### Field:  Extraterrestrial Direct Normal Radiation
+#### Field:� Extraterrestrial Direct Normal Radiation
 
 This is the Extraterrestrial Direct Normal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received on a surface normal to the rays of the sun at the top of the atmosphere during the number of minutes preceding the time indicated). It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
 
-#### Field:  Horizontal Infrared Radiation Intensity
+#### Field:� Horizontal Infrared Radiation Intensity
 
 This is the Horizontal Infrared Radiation Intensity in Wh/m2. If it is missing, it is calculated from the Opaque Sky Cover field as shown in the following explanation. It should have a minimum value of 0; missing value for this field is 9999.
 
-![](AuxiliaryPrograms/media/image013.png)
+<div>\[Horizontal_{IR} = \epsilon\sigma T^4_{drybulb}\]</div>
 
 where
 
-Horizontal\_IR = horizontal IR intensity {W/m<sup>2</sup>}
-
-Sky<sub>emissivity</sub> = sky emissivity
-
-Sigma = Stefan-Boltzmann constant = 5.6697e-8 {W/m<sup>2</sup>-K<sup>4</sup>}
-
-Temperature<sub>drybulb</sub> = drybulb temperature {K}
+* <span>$Horizontal_{IR}$</span> is the horizontal IR intensity {W/m<sup>2</sup>}
+* <span>$\epsilon$</span> is the sky emissivity
+* <span>$\sigma$</span> is the Stefan-Boltzmann constant = 5.6697e-8 W/m<sup>2</sup>-K<sup>4</sup>
+* <span>$T_{drybulb}$</span> is the drybulb temperature {K}
 
 The sky emissivity is given by
 
-![](AuxiliaryPrograms/media/image014.png)
+<div>\[ \epsilon = \left( 0.782 +0.764 \ln\left(\frac{T_{dewpoint}}{273}\right)\right)\left( 1 + 0.0224N + 0.0035N^2 + 0.00028N^3 \right)\]</div>
 
 where
 
-Temperature<sub>dewpoint</sub> = dewpoint temperature {K}
+* <span>$T_{dewpoint}$</span> is the dewpoint temperature {K}
+* <span>$N$</span> is the opaque sky cover {tenths}
 
-N = opaque sky cover {tenths}
+Example: Clear sky (<span>$N=0$</span>), <span>$T_{drybulb} = 273+20=293 K$</span>, <span>$T_{dewpoint} = 273+10=283 K$</span>:
 
-Example: Clear sky (N=0), Temperature<sub>drybulb</sub> = 273+20=293 K, Temperature<sub>dewpoint</sub> = 273+10=283 K:
+<span>$\epsilon = 0.787 + 0.764*0.036 = 0.815$</span>
 
-Sky<sub>emissivity</sub> = 0.787 + 0.764\*0.036 = 0.815
-
-Horizontal\_IR = 0.815\*5.6697e-8\*(293\*\*4) = 340.6 W/m<sup>2</sup>
+<span>$Horizontal_{IR} = 0.815*5.6697e-8*(293^4) = 340.6 W/m^2$</span>
 
 References (Walton, 1983) (Clark, Allen, 1978) for these calculations are contained in the references section at the end of this list of fields.
 
-#### Field:  Global Horizontal Radiation
+#### Field:� Global Horizontal Radiation
 
 This is the Global Horizontal Radiation in Wh/m2. (Total amount of direct and diffuse solar radiation in Wh/m2 received on a horizontal surface during the number of minutes preceding the time indicated.) It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
 
-#### Field:  Direct Normal Radiation
+#### Field:� Direct Normal Radiation
 
-This is the Direct Normal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  If the field is “missing (³ 9999)” or invalid (&lt;0), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
+This is the Direct Normal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  If the field is missing (<span>$\ge 9999$</span>) or invalid (<span>$<0$</span>), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
 
-#### Field:  Diffuse Horizontal Radiation
+#### Field:� Diffuse Horizontal Radiation
 
-This is the Diffuse Horizontal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.) If the field is “missing (³ 9999)” or invalid (&lt;0), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
+This is the Diffuse Horizontal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.) If the field is missing (<span>$\ge 9999$</span>) or invalid (<span>$<0$</span>), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
 
-#### Field:  Global Horizontal Illuminance
+#### Field:� Global Horizontal Illuminance
 
-This is the Global Horizontal Illuminance in lux. (Average total amount of direct and diffuse illuminance in hundreds of lux received on a horizontal surface during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing of &gt;= 999900.
+This is the Global Horizontal Illuminance in lux. (Average total amount of direct and diffuse illuminance in hundreds of lux received on a horizontal surface during the number of minutes preceding the time indicated.)� It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
 
-#### Field:  Direct Normal Illuminance
+#### Field:� Direct Normal Illuminance
 
-This is the Direct Normal Illuminance in lux. (Average amount of illuminance in hundreds of lux received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing of &gt;= 999900.
+This is the Direct Normal Illuminance in lux. (Average amount of illuminance in hundreds of lux received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
 
-#### Field:  Diffuse Horizontal Illuminance
+#### Field:� Diffuse Horizontal Illuminance
 
-This is the Diffuse Horizontal Illuminance in lux. (Average amount of illuminance in hundreds of lux received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing of &gt;= 999900.
+This is the Diffuse Horizontal Illuminance in lux. (Average amount of illuminance in hundreds of lux received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
 
-#### Field:  Zenith Luminance
+#### Field:� Zenith Luminance
 
-This is the Zenith Illuminance in Cd/m2. (Average amount of luminance at the sky's zenith in tens of Cd/m2 during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
+This is the Zenith Illuminance in Cd/m2. (Average amount of luminance at the sky's zenith in tens of Cd/m2 during the number of minutes preceding the time indicated.)� It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 9999.
 
-#### Field:  Wind Direction
+#### Field:� Wind Direction
 
-This is the Wind Direction in degrees where the convention is that North=0.0, East=90.0, South=180.0, West=270.0. (Wind direction in degrees at the time indicated. If calm, direction equals zero.)  Values can range from 0 to 360. Missing value is 999.
+This is the Wind Direction in degrees where the convention is that North=0.0, East=90.0, South=180.0, West=270.0. (Wind direction in degrees at the time indicated. If calm, direction equals zero.)� Values can range from 0 to 360. Missing value is 999.
 
-#### Field:  Wind Speed
+#### Field:� Wind Speed
 
-This is the wind speed in m/sec. (Wind speed at time indicated.)  Values can range from 0 to 40. Missing value is 999.
+This is the wind speed in m/sec. (Wind speed at time indicated.)� Values can range from 0 to 40. Missing value is 999.
 
-#### Field:  Total Sky Cover
+#### Field:� Total Sky Cover
 
 This is the value for total sky cover (tenths of coverage). (i.e. 1 is 1/10 covered. 10 is total coverage). (Amount of sky dome in tenths covered by clouds or obscuring phenomena at the hour indicated at the time indicated.) Minimum value is 0; maximum value is 10; missing value is 99.
 
-#### Field:  Opaque Sky Cover
+#### Field:� Opaque Sky Cover
 
-This is the value for opaque sky cover (tenths of coverage). (i.e. 1 is 1/10 covered. 10 is total coverage). (Amount of sky dome in tenths covered by clouds or obscuring phenomena that prevent observing the sky or higher cloud layers at the time indicated.)  This is not used unless the field for Horizontal Infrared Radiation Intensity is missing and then it is used to calculate Horizontal Infrared Radiation Intensity. Minimum value is 0; maximum value is 10; missing value is 99.
+This is the value for opaque sky cover (tenths of coverage). (i.e. 1 is 1/10 covered. 10 is total coverage). (Amount of sky dome in tenths covered by clouds or obscuring phenomena that prevent observing the sky or higher cloud layers at the time indicated.)� This is not used unless the field for Horizontal Infrared Radiation Intensity is missing and then it is used to calculate Horizontal Infrared Radiation Intensity. Minimum value is 0; maximum value is 10; missing value is 99.
 
-#### Field:  Visibility
+#### Field:� Visibility
 
 This is the value for visibility in km. (Horizontal visibility at the time indicated.)  It is not currently used in EnergyPlus calculations. Missing value is 9999.
 
-#### Field:  Ceiling Height
+#### Field:� Ceiling Height
 
-This is the value for ceiling height in m. (77777 is unlimited ceiling height. 88888 is cirroform ceiling.)   It is not currently used in EnergyPlus calculations. Missing value is 99999.
+This is the value for ceiling height in m. (77777 is unlimited ceiling height. 88888 is cirroform ceiling.)� �It is not currently used in EnergyPlus calculations. Missing value is 99999.
 
-#### Field:  Present Weather Observation
+#### Field:� Present Weather Observation
 
-If the value of the field is 0, then the observed weather codes are taken from the following field. If the value of the field is 9, then “missing” weather is assumed. Since the primary use of these fields (Present Weather Observation and Present Weather Codes) is for rain/wet surfaces, a missing observation field or a missing weather code implies “no rain”.
+If the value of the field is 0, then the observed weather codes are taken from the following field. If the value of the field is 9, then “missing” weather is assumed. Since the primary use of these fields (Present Weather Observation and Present Weather Codes) is for rain/wet surfaces, a missing observation field or a missing weather code implies no rain.
 
 Table 15. Present Weather Observation Values
 
@@ -4493,7 +3782,7 @@ Table 15. Present Weather Observation Values
 
 
 
-#### Field:  Present Weather Codes
+#### Field:� Present Weather Codes
 
 The present weather codes field is assumed to follow the TMY2 conventions for this field. Note that though this field may be represented as numeric (e.g. in the CSV format), it is really a text field of 9 single digits. This convention along with values for each “column” (left to right) is presented in Table 16. Note that some formats (e.g. TMY) does not follow this convention – as much as possible, the present weather codes are converted to this convention during WeatherConverter processing. Also note that the most important fields are those representing liquid precipitation – where the surfaces of the building would be wet. EnergyPlus uses “Snow Depth” to determine if snow is on the ground.
 
@@ -4652,31 +3941,31 @@ Occurrence of Ice Pellets
 
 For example, a Present Weather Observation (previous field) of 0 and a Present Weather Codes field of 929999999 notes that there is heavy rain for this data period (usually hourly but depends on the number of intervals per hour field in the “Data Periods” record).
 
-#### Field:  Precipitable Water
+#### Field:� Precipitable Water
 
-This is the value for Precipitable Water in mm. (This is not “rain” – rain is inferred from the PresWeathObs field but a better result is from the Liquid Precipitation Depth field)). It is not currently used in EnergyPlus calculations (primarily due to the unreliability of the reporting of this value). Missing value is 999.
+This is the value for Precipitable Water in mm. (This is not rain - rain is inferred from the PresWeathObs field but a better result is from the Liquid Precipitation Depth field)). It is not currently used in EnergyPlus calculations (primarily due to the unreliability of the reporting of this value). Missing value is 999.
 
-#### Field:  Aerosol Optical Depth
+#### Field:� Aerosol Optical Depth
 
 This is the value for Aerosol Optical Depth in thousandths. It is not currently used in EnergyPlus calculations. Missing value is .999.
 
-#### Field:  Snow Depth
+#### Field:� Snow Depth
 
 This is the value for Snow Depth in cm. This field is used to tell when snow is on the ground and, thus, the ground reflectance may change. Missing value is 999.
 
-#### Field:  Days Since Last Snowfall
+#### Field:� Days Since Last Snowfall
 
 This is the value for Days Since Last Snowfall. It is not currently used in EnergyPlus calculations. Missing value is 99.
 
-#### Field:  Albedo
+#### Field:� Albedo
 
 The ratio (unitless) of reflected solar irradiance to global horizontal irradiance. It is not currently used in EnergyPlus.
 
-#### Field:  Liquid Precipitation Depth
+#### Field:� Liquid Precipitation Depth
 
-The amount of liquid precipitation (mm) observed at the indicated time for the period indicated in the liquid precipitation quantity field. If this value is not missing, then it is used and overrides the “precipitation” flag as rainfall.  Conversely, if the precipitation flag shows rain and this field is missing or zero, it is set to 1.5 (mm).
+The amount of liquid precipitation (mm) observed at the indicated time for the period indicated in the liquid precipitation quantity field. If this value is not missing, then it is used and overrides the “precipitation” flag as rainfall.� Conversely, if the precipitation flag shows rain and this field is missing or zero, it is set to 1.5 (mm).
 
-#### Field:  Liquid Precipitation Quantity
+#### Field:� Liquid Precipitation Quantity
 
 The period of accumulation (hr) for the liquid precipitation depth field. It is not currently used in EnergyPlus.
 
