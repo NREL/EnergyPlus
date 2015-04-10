@@ -2,7 +2,7 @@
 #define TranspiredCollector_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -27,7 +27,7 @@ namespace TranspiredCollector {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumUTSC; // number of transpired collectors in model
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	extern bool GetInputFlag; // First time, input is gotten
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE TranspiredCollector:
@@ -42,10 +42,10 @@ namespace TranspiredCollector {
 		std::string OSCMName; // OtherSideConditionsModel
 		int OSCMPtr; // OtherSideConditionsModel index
 		int SchedPtr; // Availablity schedule
-		FArray1D_int InletNode; // Air system node "pointer", should be set to outdoor air
-		FArray1D_int OutletNode; // Air system node "pointer", outlet from UTSC
-		FArray1D_int ControlNode; // Air system node "pointer", should have mixed air setpoint
-		FArray1D_int ZoneNode; // Air system node "pointer", should have zone node
+		Array1D_int InletNode; // Air system node "pointer", should be set to outdoor air
+		Array1D_int OutletNode; // Air system node "pointer", outlet from UTSC
+		Array1D_int ControlNode; // Air system node "pointer", should have mixed air setpoint
+		Array1D_int ZoneNode; // Air system node "pointer", should have zone node
 		int Layout; // 'Square' or 'Triangle'
 		int Correlation; // which heat exchanger effectiveness model
 		Real64 HoleDia; // Diameter of Perforations in Collector [m]
@@ -56,7 +56,7 @@ namespace TranspiredCollector {
 		Real64 PlenGapThick; // Depth of Plenum Behind Collector [m]
 		Real64 PlenCrossArea; // cross section area of plenum behind collector [m2]
 		int NumSurfs; // a single collector can have multiple surfaces underneath it
-		FArray1D_int SurfPtrs; // = 0  ! array of pointers for participating underlying surfaces
+		Array1D_int SurfPtrs; // = 0  ! array of pointers for participating underlying surfaces
 		Real64 Height; // Overall Height of Collector  [m]
 		Real64 AreaRatio; // Ratio of actual surface are to projected surface area [dimensionless]
 		Real64 CollectThick; // Thickness of collector absorber plate material.  [m]
@@ -172,10 +172,10 @@ namespace TranspiredCollector {
 			std::string const & OSCMName, // OtherSideConditionsModel
 			int const OSCMPtr, // OtherSideConditionsModel index
 			int const SchedPtr, // Availablity schedule
-			FArray1_int const & InletNode, // Air system node "pointer", should be set to outdoor air
-			FArray1_int const & OutletNode, // Air system node "pointer", outlet from UTSC
-			FArray1_int const & ControlNode, // Air system node "pointer", should have mixed air setpoint
-			FArray1_int const & ZoneNode, // Air system node "pointer", should have zone node
+			Array1_int const & InletNode, // Air system node "pointer", should be set to outdoor air
+			Array1_int const & OutletNode, // Air system node "pointer", outlet from UTSC
+			Array1_int const & ControlNode, // Air system node "pointer", should have mixed air setpoint
+			Array1_int const & ZoneNode, // Air system node "pointer", should have zone node
 			int const Layout, // 'Square' or 'Triangle'
 			int const Correlation, // which heat exchanger effectiveness model
 			Real64 const HoleDia, // Diameter of Perforations in Collector [m]
@@ -186,7 +186,7 @@ namespace TranspiredCollector {
 			Real64 const PlenGapThick, // Depth of Plenum Behind Collector [m]
 			Real64 const PlenCrossArea, // cross section area of plenum behind collector [m2]
 			int const NumSurfs, // a single collector can have multiple surfaces underneath it
-			FArray1_int const & SurfPtrs, // = 0  ! array of pointers for participating underlying surfaces
+			Array1_int const & SurfPtrs, // = 0  ! array of pointers for participating underlying surfaces
 			Real64 const Height, // Overall Height of Collector  [m]
 			Real64 const AreaRatio, // Ratio of actual surface are to projected surface area [dimensionless]
 			Real64 const CollectThick, // Thickness of collector absorber plate material.  [m]
@@ -302,7 +302,7 @@ namespace TranspiredCollector {
 	};
 
 	// Object Data
-	extern FArray1D< UTSCDataStruct > UTSC;
+	extern Array1D< UTSCDataStruct > UTSC;
 
 	// Functions
 

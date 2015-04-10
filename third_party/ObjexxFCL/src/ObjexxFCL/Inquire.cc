@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -15,13 +15,14 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Inquire.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/Stream.hh>
 
 // C++ Headers
 #include <cassert>
-#include <iostream>
+#include <fstream>
+#include <istream>
+#include <ostream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef _WIN32
@@ -78,13 +79,6 @@ Inquire( std::string const & name, IOFlags & flags )
 	struct stat fs;
 	stat( name.c_str(), &fs );
 	flags.size( fs.st_size );
-}
-
-// Inquire by Name
-void
-Inquire( Fstring const & name, IOFlags & flags )
-{
-	Inquire( std::string( name.trimmed() ), flags );
 }
 
 // Inquire by Name

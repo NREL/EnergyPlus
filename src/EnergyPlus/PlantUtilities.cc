@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -213,7 +213,7 @@ namespace PlantUtilities {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool OneTimeDiagSetup( true );
-		static FArray1D_bool NodeErrorMsgIssued;
+		static Array1D_bool NodeErrorMsgIssued;
 		static bool NullPlantErrorMsgIssued;
 		Real64 MdotOldRequest; // initial value of mass flow
 		int CompInletNodeNum;
@@ -1406,7 +1406,7 @@ namespace PlantUtilities {
 		};
 
 		// Object Data
-		static FArray1D< CriteriaData > CriteriaChecks; // stores criteria information
+		static Array1D< CriteriaData > CriteriaChecks; // stores criteria information
 		CriteriaData CurCriteria; // for convenience
 
 		if ( UniqueCriteriaCheckIndex <= 0 ) { // If we don't yet have an index, we need to initialize
@@ -1921,7 +1921,7 @@ namespace PlantUtilities {
 		}
 
 		// store copy of prior structure
-		FArray1D< PlantCallingOrderInfoStruct > TempPlantCallingOrderInfo( PlantCallingOrderInfo );
+		Array1D< PlantCallingOrderInfoStruct > TempPlantCallingOrderInfo( PlantCallingOrderInfo );
 
 		RecordToMoveInPlantCallingOrderInfo = PlantCallingOrderInfo( OldIndex );
 
@@ -2027,7 +2027,7 @@ namespace PlantUtilities {
 		int thisCallNodeIndex;
 
 		// Object Data
-		FArray1D< CompDesWaterFlowData > CompDesWaterFlow0; // scratch array to store components'
+		Array1D< CompDesWaterFlowData > CompDesWaterFlow0; // scratch array to store components'
 
 		NumPlantComps = SaveNumPlantComps;
 
@@ -2320,15 +2320,13 @@ namespace PlantUtilities {
 
 	// In-Place Right Shift by 1 of Array Elements
 	void
-	rshift1( FArray1< Real64 > & a, Real64 const a_l )
+	rshift1( Array1< Real64 > & a, Real64 const a_l )
 	{
 		assert( a.size_bounded() );
-		if ( a.dimensions_initialized() ) {
-			for ( int i = a.u(), e = a.l(); i > e; --i ) {
-				a( i ) = a( i - 1 );
-			}
-			a( a.l() ) = a_l;
+		for ( int i = a.u(), e = a.l(); i > e; --i ) {
+			a( i ) = a( i - 1 );
 		}
+		a( a.l() ) = a_l;
 	}
 
 	void

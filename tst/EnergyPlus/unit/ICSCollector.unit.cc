@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
@@ -12,6 +12,9 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -19,13 +22,17 @@ using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
+using namespace EnergyPlus::Psychrometrics;
+using namespace EnergyPlus::DataEnvironment;
+using DataGlobals::BeginEnvrnFlag;
 
-TEST( ISCSolarCollectorTest, BugTest ) {
+TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
+	ShowMessage( "Begin Test: ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest" );
 
-	// ICS collector un-allocated collector data bug fix test.  This unit test 
-	// does not test ICS collector performance but it does test a bug fix for 
-	// issue #4723 (crash) occured due to unallocated ICS collector data. 
-	// ! Collector.allocated() 
+	// ICS collector un-allocated collector data bug fix test.  This unit test
+	// does not test ICS collector performance but it does test a bug fix for
+	// issue #4723 (crash) occured due to unallocated ICS collector data.
+	// ! Collector.allocated()
 
 	int const NumOfSurf( 1 );
 	int SurfNum;
@@ -33,6 +40,12 @@ TEST( ISCSolarCollectorTest, BugTest ) {
 	int ConstrNum;
 	int MatNum;
 
+	InitializePsychRoutines();
+
+	BeginEnvrnFlag = true;
+	OutBaroPress = 101325.0;
+	SkyTemp = 24.0;
+	IsRain = false;
 	MatNum = 1;
 	ZoneNum = 1;
 	SurfNum = 1;
@@ -47,6 +60,8 @@ TEST( ISCSolarCollectorTest, BugTest ) {
 	Surface( SurfNum ).BaseSurf = SurfNum;
 	Surface( SurfNum ).Zone = ZoneNum;
 	Surface( SurfNum ).IsICS = true;
+	Surface( SurfNum ).ExtConvCoeff = 0;
+	Surface( SurfNum ).ExtWind = false;
 	// allocate construction variable data
 	Construct.allocate( ConstrNum );
 	Construct( ConstrNum ).LayerPoint.allocate( MatNum );
@@ -62,7 +77,7 @@ TEST( ISCSolarCollectorTest, BugTest ) {
 	Zone( ZoneNum ).OutsideConvectionAlgo = ASHRAESimple;
 	// allocate surface temperature variable data
 	TH.allocate( NumOfSurf, 1, 2 );
-	TH( SurfNum, 1, 1 ) = 22;
+	TH( SurfNum, 1, 1 ) = 22.0;
 	// allocate solar incident radiation variable data
 	QRadSWOutIncident.allocate( 1 );
 	QRadSWOutIncident( 1 ) = 0.0;
@@ -80,12 +95,12 @@ TEST( ISCSolarCollectorTest, BugTest ) {
 	Real64 const AspRat( 0.9 ); // aspect ratio of gap  Height/gap [--]
 	Real64 const GapThick( 0.05 ); // Thickness of air space between baffle and underlying heat transfer surface
 	int Roughness( 1 ); // Roughness index (1-6), see DataHeatBalance parameters
-	Real64 QdotSource( 0 ); // Source/sink term, e.g. electricity exported from solar cell [W]
+	Real64 QdotSource( 0.0 ); // Source/sink term, e.g. electricity exported from solar cell [W]
 	Real64 TsBaffle( 20.0 ); // Temperature of baffle (both sides) use lagged value on input [C]
 	Real64 TaGap( 22.0 ); // Temperature of air gap (assumed mixed) use lagged value on input [C]
 	Real64 HcGapRpt; // gap convection coefficient [W/m2C]
 	Real64 HrGapRpt; // gap radiation coefficient [W/m2C]
-	Real64 IscRpt; //  
+	Real64 IscRpt; //
 	Real64 MdotVentRpt; // gap air mass flow rate [kg/s]
 	Real64 VdotWindRpt; // gap wind driven air volume flow rate [m3/s]
 	Real64 VdotBouyRpt; // gap bouyancy driven volume flow rate [m3/s]
@@ -98,7 +113,7 @@ TEST( ISCSolarCollectorTest, BugTest ) {
 	EXPECT_NEAR( 3.694, HrGapRpt, 0.001 );
 	EXPECT_NEAR( 0.036, MdotVentRpt, 0.001 );
 
-	// delete allocated variables
+	// deallocated variables
 	Surface.deallocate();
 	Construct( ConstrNum ).LayerPoint.deallocate();
 	Construct.deallocate();

@@ -8,11 +8,14 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <ReportSizingManager.hh>
 #include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 
 TEST( ReportSizingManager, GetCoilDesFlowT )
 {
+	ShowMessage( "Begin Test: ReportSizingManager, GetCoilDesFlowT" );
+
 	// setup global allocation
 	DataSizing::SysSizInput.allocate(1);
 	DataSizing::SysSizPeakDDNum.allocate(1);
@@ -109,6 +112,7 @@ TEST( ReportSizingManager, GetCoilDesFlowT )
 	
 	
 	// tear down
+	DataSizing::DataAirFlowUsedForSizing = 0.0;
 	DataSizing::CalcSysSizing(1).SumZoneCoolLoadSeq.deallocate();
 	DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq.deallocate();
 	DataSizing::SysSizPeakDDNum(1).TimeStepAtSensCoolPk.deallocate();

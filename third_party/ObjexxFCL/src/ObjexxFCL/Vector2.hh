@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -1730,7 +1730,7 @@ public: // Data
 
 }; // Vector2
 
-// stream << Vector2 output operator
+// Stream << Vector2 output operator
 template< typename T >
 std::ostream &
 operator <<( std::ostream & stream, Vector2< T > const & v )
@@ -1754,7 +1754,7 @@ operator <<( std::ostream & stream, Vector2< T > const & v )
 	return stream;
 }
 
-// stream >> Vector2 input operator
+// Stream >> Vector2 input operator
 //  Supports whitespace-separated values with optional commas between values as long as whitespace is also present
 //  String or char values containing whitespace or commas or enclosed in quotes are not supported
 //  Vector can optionally be enclosed in parentheses () or square brackets []

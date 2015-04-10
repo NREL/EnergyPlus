@@ -5,7 +5,7 @@
 !                          Chilled Water Coil and VAV with No Reheat Air Terminal Unit.  
 !
 !                          Mass walls.  Regular slab floor. 2 Thermal Zones, and 2 supply plenum 
-!                          Regular roof.  No Windows.
+!                          Regular roof.  No Windows. Air cooled IT equipment (ITE).
 !
 ! Highlights:              Example of single zone Airloop HVAC system for Data Center Application
 !
@@ -59,7 +59,7 @@
 !             |__________________________________|
 !         (32.24,0,0)                      (32.24,15.24,0)
 !
-! Internal gains description:     NA
+! Internal gains description:     Air cooled ITE and lights.
 !
 ! Interzone Surfaces:             None
 ! Internal Mass:                  None
@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,4;
 
@@ -1801,7 +1801,7 @@
     CW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     3,                       !- Minimum Loop Temperature {C}
-    0.001,                   !- Maximum Loop Flow Rate {m3/s}
+    autosize,                   !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     CW Supply Inlet Node,    !- Plant Side Inlet Node Name
@@ -1983,8 +1983,8 @@
     29.44,                   !- Design Condenser Inlet Temperature {C}
     2.682759,                !- Temperature Rise Coefficient
     6.667,                   !- Design Chilled Water Outlet Temperature {C}
-    0.01,                    !- Design Chilled Water Flow Rate {m3/s}
-    0.01,                    !- Design Condenser Fluid Flow Rate {m3/s}
+    autosize,                    !- Design Chilled Water Flow Rate {m3/s}
+    autosize,                    !- Design Condenser Fluid Flow Rate {m3/s}
     0.94483600,              !- Coefficient 1 of Capacity Ratio Curve
     -.05700880,              !- Coefficient 2 of Capacity Ratio Curve
     -.00185486,              !- Coefficient 3 of Capacity Ratio Curve
@@ -2009,9 +2009,9 @@
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
+    autosize,                   !- Rated Flow Rate {m3/s}
     160000,                  !- Rated Pump Head {Pa}
-    1000,                    !- Rated Power Consumption {W}
+    autosize,                    !- Rated Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
@@ -2190,7 +2190,7 @@
     Condenser Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     3,                       !- Minimum Loop Temperature {C}
-    1.0,                     !- Maximum Loop Flow Rate {m3/s}
+    autosize,                     !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     Condenser Supply Inlet Node,  !- Plant Side Inlet Node Name
@@ -2696,46 +2696,6 @@
     For: Sunday Holidays AllOtherDays, !- Field 32
     Until: 24:00,0.30;       !- Field 33
 
-  Schedule:Compact, 
-    DataCenter_Equip_Sch, 
-     Any Number, 
-     Through: 1/31, 
-     For: AllDays, 
-     Until: 24:00, 0.25,
-     Through: 2/29, 
-     For: AllDays,
-     Until: 24:00, 0.50, 
-     Through: 3/31, 
-     For: AllDays,
-     Until: 24:00, 0.75,      
-     Through: 4/30, 
-     For: AllDays,
-     Until: 24:00, 1.0,   
-     Through: 5/31, 
-     For: AllDays,
-     Until: 24:00, 0.25,   
-     Through: 6/30, 
-     For: AllDays,
-     Until: 24:00, 0.50,   
-     Through: 7/31, 
-     For: AllDays,
-     Until: 24:00, 0.75,                    
-     Through: 8/31, 
-     For: AllDays,
-     Until: 24:00, 1.0,   
-     Through: 9/30, 
-     For: AllDays,
-     Until: 24:00, 0.25,   
-     Through: 10/31, 
-     For: AllDays,
-     Until: 24:00, 0.50,          
-     Through: 11/30, 
-     For: AllDays,
-     Until: 24:00, 0.75,    
-     Through: 12/31, 
-     For: AllDays,
-     Until: 24:00, 1.00; 
-
   ScheduleTypeLimits,
     Any Number;              !- Name
 
@@ -2766,20 +2726,120 @@
     0.0000,                  !- Fraction Lost
     MiscPlug;                !- End-Use Subcategory
 
-  ElectricEquipment,
-    WestDataCenter_Equip,    !- Name
-    West Zone,               !- Zone or ZoneList Name
-    DataCenter_Equip_Sch,    !- Schedule Name
-    Watts/Area,              !- Design Level Calculation Method
-    ,                        !- Design Level {W}
-    200.0,                   !- Watts per Zone Floor Area {W/m2}
-    ,                        !- Watts per Person {W/person}
-    0.0000,                  !- Fraction Latent
-    0.2500,                  !- Fraction Radiant
-    0.0000,                  !- Fraction Lost
-    ITEquipMent;             !- End-Use Subcategory
+ ElectricEquipment:ITE:AirCooled,
+    WestDataCenter_Equip,     !- Name
+    West Zone,               !- Zone Name
+    Watts/Area,              !- Design Power Input Calculation Method
+    ,                        !- Watts per Unit {W}
+    ,                        !- Number of Units
+    200,                     !- Watts per Zone Floor Area {W/m2}
+    Data Center Operation Schedule, !- Design Power Input Schedule Name
+    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name
+    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
+    0.4,                     !- Design Fan Power Input Fraction
+    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}
+    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name
+    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name
+    15,                      !- Design Entering Air Temperature {C}
+    A3,                      !- Environmental Class
+    AdjustedSupply,          !- Air Inlet Connection Type
+    ,                        !- Air Inlet Room Air Model Node Name
+    ,                        !- Air Outlet Room Air Model Node Name
+    West Zone Inlet Node,    !- Supply Air Node Name
+    0.1,                     !- Design Recirculation Fraction
+    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name
+    0.9,                     !- Design Electric Power Supply Efficiency
+    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+    1,                       !- Fraction of Electric Power Supply Losses to Zone
+    ITE-CPU,                 !- CPU End-Use Subcategory
+    ITE-Fans,                !- Fan End-Use Subcategory
+    ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
 
-  Lights,
+  Curve:Quadratic,
+    ECM FanPower fFlow,          !- Name
+    0.0,                     !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    99.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    UPS Efficiency fPLR,          !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    99.0;                     !- Maximum Value of x
+
+  Curve:Biquadratic,
+    Data Center Servers Power fLoadTemp,  !- Name
+    -1.0,                    !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.06667,                 !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Data Center Servers Airflow fLoadTemp,  !- Name
+    -1.4,                    !- Coefficient1 Constant
+    0.9,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.1,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Data Center Recirculation fLoadTemp,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Schedule:Constant, Data Center Operation Schedule, Any Number, 1.0;
+
+  Schedule:Compact,
+    Data Center CPU Loading Schedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: SummerDesignDay,    !- Field 2
+    Until: 24:00,1.00,       !- Field 3
+    For: AllOtherDays,       !- Field 4
+    Until: 6:00,0.50,        !- Field 5
+    Until: 8:00,0.75,        !- Field 6
+    Until: 18:00,1.00,       !- Field 7
+    Until: 24:00,0.80;       !- Field 8
+
+ Lights,
     East Zone Lights,         !- Name
     East Zone,                !- Zone or ZoneList Name
     LIGHTS-1,                !- Schedule Name
@@ -2806,18 +2866,34 @@
     0.0000,                  !- Fraction Lost
     MiscPlug;                !- End-Use Subcategory
 
-  ElectricEquipment,
+ ElectricEquipment:ITE:AirCooled,
     EastDataCenter_Equip,    !- Name
-    East Zone,               !- Zone or ZoneList Name
-    DataCenter_Equip_Sch,    !- Schedule Name
-    Watts/Area,              !- Design Level Calculation Method
-    ,                        !- Design Level {W}
-    200.0,                   !- Watts per Zone Floor Area {W/m2}
-    ,                        !- Watts per Person {W/person}
-    0.0000,                  !- Fraction Latent
-    0.5000,                  !- Fraction Radiant
-    0.0000,                  !- Fraction Lost
-    ITEquipMent;             !- End-Use Subcategory
+    East Zone,               !- Zone Name
+    Watts/Area,              !- Design Power Input Calculation Method
+    ,                        !- Watts per Unit {W}
+    ,                        !- Number of Units
+    200,                     !- Watts per Zone Floor Area {W/m2}
+    Data Center Operation Schedule, !- Design Power Input Schedule Name
+    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name
+    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
+    0.4,                     !- Design Fan Power Input Fraction
+    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}
+    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name
+    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name
+    15,                      !- Design Entering Air Temperature {C}
+    A3,                      !- Environmental Class
+    AdjustedSupply,          !- Air Inlet Connection Type
+    ,                        !- Air Inlet Room Air Model Node Name
+    ,                        !- Air Outlet Room Air Model Node Name
+    East Zone Inlet Node,    !- Supply Air Node Name
+    0.1,                     !- Design Recirculation Fraction
+    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name
+    0.9,                     !- Design Electric Power Supply Efficiency
+    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+    1,                       !- Fraction of Electric Power Supply Losses to Zone
+    ITE-CPU,                 !- CPU End-Use Subcategory
+    ITE-Fans,                !- Fan End-Use Subcategory
+    ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
 
   Schedule:Compact,
     LIGHTS-1,                !- Name
@@ -3058,14 +3134,53 @@
   Output:Variable,East Zone Inlet Node,System Node Mass Flow Rate,timestep;
   Output:Variable,East Zone Inlet Node,System Node Temperature,timestep;
 
-
   Output:Variable,*,Evaporative Cooler Stage Effectiveness,timestep;
   Output:Variable,*,Evaporative Cooler Total Stage Effectiveness,timestep;
   Output:Variable, *,Evaporative Cooler Operating Mode Status, timestep;
   Output:Variable,*,Evaporative Cooler Electric Power,timestep; 
   Output:Variable,*,Evaporative Cooler Water Volume,timestep;
-  
-  Output:VariableDictionary,Regular;
+
+  Output:Variable,*,ITE CPU Electric Power,hourly; !- Zone Average [W]
+  Output:Variable,*,ITE Fan Electric Power,hourly; !- Zone Average [W]
+  Output:Variable,*,ITE UPS Electric Power,hourly; !- Zone Average [W]
+  Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,hourly; !- Zone Average [W]
+  Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,hourly; !- Zone Average [W]
+  Output:Variable,*,ITE UPS Heat Gain to Zone Rate,hourly; !- Zone Average [W]
+  Output:Variable,*,ITE Total Heat Gain to Zone Rate,hourly; !- Zone Average [W]
+  Output:Variable,*,ITE Standard Density Air Volume Flow Rate,hourly; !- Zone Average [m3/s]
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature,hourly; !- Zone Average [C]
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature,hourly; !- Zone Average [C]
+  Output:Variable,*,ITE Air Inlet Relative Humidity,hourly; !- Zone Average [%]
+  Output:Variable,*,ITE Air Outlet Dry-Bulb Temperature,hourly; !- Zone Average [C]
+  Output:Variable,*,ITE Supply Heat Index,hourly; !- Zone Average []
+  Output:Variable,*,ITE Air Inlet Operating Range Exceeded Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Above Operating Range Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Below Operating Range Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,ITE Air Inlet Relative Humidity Above Operating Range Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,ITE Air Inlet Relative Humidity Below Operating Range Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range,hourly; !- Zone Average [deltaC]
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range,hourly; !- Zone Average [deltaC]
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Above Operating Range,hourly; !- Zone Average [deltaC]
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Below Operating Range,hourly; !- Zone Average [deltaC]
+  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,hourly; !- Zone Average [%]
+  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,hourly; !- Zone Average [%]
+  Output:Variable,*,Zone ITE CPU Electric Power,hourly; !- Zone Average [W]
+  Output:Variable,*,Zone ITE Fan Electric Power,hourly; !- Zone Average [W]
+  Output:Variable,*,Zone ITE UPS Electric Power,hourly; !- Zone Average [W]
+  Output:Variable,*,Zone ITE CPU Electric Power at Design Inlet Conditions,hourly; !- Zone Average [W]
+  Output:Variable,*,Zone ITE Fan Electric Power at Design Inlet Conditions,hourly; !- Zone Average [W]
+  Output:Variable,*,Zone ITE UPS Heat Gain to Zone Rate,hourly; !- Zone Average [W]
+  Output:Variable,*,Zone ITE Total Heat Gain to Zone Rate,hourly; !- Zone Average [W]
+  Output:Variable,*,Chiller Evaporator Cooling Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Chiller Evaporator Inlet Temperature,hourly; !- HVAC Average [C]
+  Output:Variable,*,Chiller Evaporator Outlet Temperature,hourly; !- HVAC Average [C]
+  Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Chiller Condenser Inlet Temperature,hourly; !- HVAC Average [C]
+  Output:Variable,*,Chiller Condenser Outlet Temperature,hourly; !- HVAC Average [C]
+
+  Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf;
 

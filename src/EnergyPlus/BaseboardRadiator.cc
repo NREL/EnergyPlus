@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -83,15 +83,15 @@ namespace BaseboardRadiator {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumBaseboards( 0 );
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool SetLoopIndexFlag; // get loop number flag
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool SetLoopIndexFlag; // get loop number flag
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< BaseboardParams > Baseboard;
-	FArray1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
+	Array1D< BaseboardParams > Baseboard;
+	Array1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
 
 	// Functions
 
@@ -474,7 +474,7 @@ namespace BaseboardRadiator {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		Real64 RhoAirStdInit;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -608,7 +608,7 @@ namespace BaseboardRadiator {
 		Real64 UA0; // lower bound for UA
 		Real64 UA1; // upper bound for UA
 		Real64 UA;
-		FArray1D< Real64 > Par( 2 );
+		Array1D< Real64 > Par( 2 );
 		bool ErrorsFound; // If errors detected in input
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -1107,7 +1107,7 @@ namespace BaseboardRadiator {
 	Real64
 	HWBaseboardUAResidual(
 		Real64 const UA, // UA of coil
-		FArray1< Real64 > const & Par // par(1) = design coil load [W]
+		Array1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 

@@ -23,12 +23,13 @@ using namespace EnergyPlus::DataSizing;
 
 TEST( SizePurchasedAirTest, Test1 )
 {
+	ShowMessage( "Begin Test: SizePurchasedAirTest, Test1" );
 
 	int PurchAirNum = 1;
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber( );
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
+	OutputFileInits = GetNewUnitNumber();
+	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 //	eso_stream = gio::out_stream( OutputFileStandard );
 
 	//ZoneEquipConfig.allocate( 1 );
@@ -41,15 +42,21 @@ TEST( SizePurchasedAirTest, Test1 )
 	CurZoneEqNum = 1;
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 24 );
 	CurSysNum = 0;
+	ZoneHVACSizing.allocate( 1 );
+	ZoneHVACSizing( 1 ).CoolingSAFMethod = SupplyAirFlowRate;
+	ZoneHVACSizing( 1 ).HeatingSAFMethod = SupplyAirFlowRate;
 
-	FinalZoneSizing.allocate(1);
+	ZoneEqSizing( CurZoneEqNum ).AirVolFlow = 0.0;
+	FinalZoneSizing.allocate( 1 );
 	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.0;
+	ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = 1.0;
 	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp = 30.0;
 	FinalZoneSizing( CurZoneEqNum ).HeatDesTemp = 80.0;
 	FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat = 0.008;
 	FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow = 0.01;
 
 	FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 2.0;
+	ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = 2.0;
 	FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp = 60.0;
 	FinalZoneSizing( CurZoneEqNum ).CoolDesTemp = 50.0;
 	FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = 0.008;
@@ -90,6 +97,7 @@ TEST( SizePurchasedAirTest, Test1 )
 
 	ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
 	ZoneEqSizing.deallocate();
+	ZoneHVACSizing.deallocate();
 	FinalZoneSizing.deallocate();
 	PurchAir.deallocate();
 	PurchAirNumericFields.deallocate();

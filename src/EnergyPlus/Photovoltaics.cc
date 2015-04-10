@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -83,7 +83,7 @@ namespace Photovoltaics {
 	// DERIVED TYPE DEFINITIONS:
 	//   see DataPhotovoltaics.cc
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
 
@@ -329,9 +329,9 @@ namespace Photovoltaics {
 		int dupPtr;
 
 		// Object Data
-		FArray1D< SimplePVParamsStruct > tmpSimpleModuleParams; // temporary, for processing input data
-		FArray1D< TRNSYSPVModuleParamsStruct > tmpTNRSYSModuleParams; // temporary, for processing input data
-		FArray1D< SNLModuleParamsStuct > tmpSNLModuleParams; // temporary, for processing input data
+		Array1D< SimplePVParamsStruct > tmpSimpleModuleParams; // temporary, for processing input data
+		Array1D< TRNSYSPVModuleParamsStruct > tmpTNRSYSModuleParams; // temporary, for processing input data
+		Array1D< SNLModuleParamsStuct > tmpSNLModuleParams; // temporary, for processing input data
 
 		// count how many photovoltaic arrays of different types are in the .idf
 		NumPVs = GetNumObjectsFound( cPVGeneratorObjectName );
@@ -1120,7 +1120,7 @@ namespace Photovoltaics {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
 		// perform the one time initializations

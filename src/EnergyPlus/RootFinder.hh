@@ -2,7 +2,7 @@
 #define RootFinder_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -144,7 +144,7 @@ namespace RootFinder {
 	void
 	SortHistory(
 		int const N, // Number of points to sort in history array
-		FArray1S< PointType > History // Array of PointType variables. At least N of them
+		Array1S< PointType > History // Array of PointType variables. At least N of them
 	);
 
 	void

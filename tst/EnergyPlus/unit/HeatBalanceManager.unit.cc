@@ -21,6 +21,8 @@ using namespace ObjexxFCL;
 
 TEST( HeatBalanceManagerTest, ProcessZoneData )
 {
+	ShowMessage( "Begin Test: HeatBalanceManagerTest, ProcessZoneData" );
+
 // Test input processing of Zone object
 //	Zone,
 //		ZONE ONE, !- Name
@@ -94,8 +96,20 @@ TEST( HeatBalanceManagerTest, ProcessZoneData )
 	EXPECT_EQ( "Zone Two", Zone( 2 ).Name );
 	EXPECT_EQ( ASHRAETARP, Zone( 2 ).InsideConvectionAlgo );
 
+	// Clean up
+	Zone.deallocate();
+	lNumericFieldBlanks.deallocate();
+	lAlphaFieldBlanks.deallocate();
+	cAlphaFieldNames.deallocate();
+	cNumericFieldNames.deallocate();
+	cAlphaArgs.deallocate();
+	rNumericArgs.deallocate();
+
 }
-TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
+TEST( HeatBalanceManagerTest, GetWindowConstructData )
+{
+	ShowMessage( "Begin Test: HeatBalanceManagerTest, GetWindowConstructData" );
+
 	// Test get input for window construction object
 	// Construction,
 	//	 WINDOWWBLIND, !- Name
@@ -108,9 +122,13 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	int NumAlphas( 4 );
 	int NumNumbers( 0 );
 
-	TotConstructs = 1;
-	Construct.allocate( TotConstructs );
-	Construct( 1 ).Name = "WINDOWWBLIND";
+	ZoneNum = 0;
+	NumAlphas = 4;
+	NumNumbers = 0;
+
+	//TotConstructs = 1;
+	//Construct.allocate( TotConstructs );
+	//Construct( 1 ).Name = "WINDOWWBLIND";
 
 	TotMaterials = 3;
 	Material.allocate( TotMaterials );
@@ -142,7 +160,7 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	ObjectDef( 1 ).AlphFieldChks.allocate( NumAlphas );
 	ObjectDef( 1 ).AlphFieldChks = " ";
 	ObjectDef( 1 ).NumRangeChks.allocate( NumNumbers );
-	
+
 	NumIDFRecords = 1;
 	IDFRecords.allocate( NumIDFRecords );
 	IDFRecords( 1 ).Name = ListOfObjects( 1 );
@@ -150,7 +168,7 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	IDFRecords( 1 ).NumAlphas = NumAlphas;
 	IDFRecords( 1 ).ObjectDefPtr = ObjectDef( 1 ).NumFound;
 	IDFRecords( 1 ).Alphas.allocate( NumAlphas );
-	IDFRecords( 1 ).Alphas( 1 ) = Construct( 1 ).Name;
+	IDFRecords( 1 ).Alphas( 1 ) = "WINDOWWBLIND";
 	IDFRecords( 1 ).Alphas( 2 ) = Material( 1 ).Name;
 	IDFRecords( 1 ).Alphas( 3 ) = Material( 2 ).Name;
 	IDFRecords( 1 ).Alphas( 4 ) = Material( 3 ).Name;
@@ -184,21 +202,27 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	NominalRforNominalUCalculation.allocate( 1 );
 	NominalRforNominalUCalculation( 1 ) = 0.0;
 	NominalR.allocate( TotMaterials );
-	NominalR( TotMaterials ) = 0.4;
+	NominalR( 1 ) = 0.4; // Set these explicity for each material layer to avoid random failures of check for NominalRforNominalUCalculation == 0.0 at end of GetConstructData
+	NominalR( 2 ) = 0.4;
+	NominalR( 3 ) = 0.4;
 
 	// call to get valid window material types
+	ErrorsFound = false;
 	GetConstructData( ErrorsFound ); // returns ErrorsFound as false since all layers are valid
 	EXPECT_FALSE( ErrorsFound );
 
+	// Clear shared arrays that were allocated in GetConstructData
+	Construct.deallocate();
+
 	// call to get invalid window material type
 	Material( 2 ).Group = 16; // BlindEquivalentLayer, this layer is invalid in plain windows
+	ErrorsFound = false;
 	GetConstructData( ErrorsFound ); // returns ErrorsFound as true since layer 2 is invalid
 	EXPECT_TRUE( ErrorsFound );
 
 	// dealocate variables
 	Construct.deallocate();
 	Material.deallocate();
-	//ListOfObjects.deallocate();
 	iListOfObjects.deallocate();
 	ObjectStartRecord.deallocate();
 	ObjectGotCount.deallocate();

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
@@ -68,14 +68,14 @@ namespace ZonePlenum {
 	int NumZonePlenums( 0 ); // The Number of ZonePlenums found in the Input
 	int NumZoneReturnPlenums( 0 ); // The Number of ZoneReturnPlenums found in the Input
 	int NumZoneSupplyPlenums( 0 ); // The Number of ZoneSupplyPlenums found in the Input
-	FArray1D_bool CheckRetEquipName;
-	FArray1D_bool CheckSupEquipName;
+	Array1D_bool CheckRetEquipName;
+	Array1D_bool CheckSupEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 
 	// Object Data
-	FArray1D< ZoneReturnPlenumConditions > ZoneRetPlenCond;
-	FArray1D< ZoneSupplyPlenumConditions > ZoneSupPlenCond;
+	Array1D< ZoneReturnPlenumConditions > ZoneRetPlenCond;
+	Array1D< ZoneSupplyPlenumConditions > ZoneSupPlenCond;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -138,14 +138,12 @@ namespace ZonePlenum {
 		// FLOW:
 
 		// Obtains and Allocates ZonePlenum related parameters from input file
-		if ( GetInputFlag ) { //First time subroutine has been entered
+		if ( GetInputFlag ) { // First time subroutine has been entered
 			GetZonePlenumInput();
 			GetInputFlag = false;
 		}
 
-		{ auto const SELECT_CASE_var( iCompType );
-
-		if ( SELECT_CASE_var == ZoneReturnPlenum_Type ) { // 'AirLoopHVAC:ReturnPlenum'
+		if ( iCompType == ZoneReturnPlenum_Type ) { // 'AirLoopHVAC:ReturnPlenum'
 			// Find the correct ZonePlenumNumber
 			if ( CompIndex == 0 ) {
 				ZonePlenumNum = FindItemInList( CompName, ZoneRetPlenCond.ZonePlenumName(), NumZoneReturnPlenums );
@@ -174,7 +172,7 @@ namespace ZonePlenum {
 
 			ReportZoneReturnPlenum( ZonePlenumNum );
 
-		} else if ( SELECT_CASE_var == ZoneSupplyPlenum_Type ) { // 'AirLoopHVAC:SupplyPlenum'
+		} else if ( iCompType == ZoneSupplyPlenum_Type ) { // 'AirLoopHVAC:SupplyPlenum'
 			// Find the correct ZonePlenumNumber
 			if ( CompIndex == 0 ) {
 				ZonePlenumNum = FindItemInList( CompName, ZoneSupPlenCond.ZonePlenumName(), NumZoneSupplyPlenums );
@@ -208,7 +206,7 @@ namespace ZonePlenum {
 			ShowContinueError( "ZonePlenum: Unhandled plenum type found:" + TrimSigDigits( iCompType ) );
 			ShowFatalError( "Preceding conditions cause termination." );
 
-		}}
+		}
 
 	}
 
@@ -273,18 +271,18 @@ namespace ZonePlenum {
 		int NumNums;
 		int NumArgs;
 		int NumNodes;
-		FArray1D_int NodeNums;
+		Array1D_int NodeNums;
 		int MaxNums;
 		int MaxAlphas;
 		int NodeNum;
 		int IOStat;
-		FArray1D< Real64 > NumArray; // Numeric input items for object
+		Array1D< Real64 > NumArray; // Numeric input items for object
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name

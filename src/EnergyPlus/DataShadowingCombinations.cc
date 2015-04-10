@@ -38,7 +38,7 @@ namespace DataShadowingCombinations {
 	// MODULE VARIABLE DECLARATIONS:
 
 	// Object Data
-	FArray1D< ShadowingCombinations > ShadowComb;
+	Array1D< ShadowingCombinations > ShadowComb;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

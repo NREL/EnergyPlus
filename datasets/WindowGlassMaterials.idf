@@ -39,7 +39,7 @@
 !                    Name                                         Th   Ts   Rfs  Rbs  Tv   Rfv  Rbv Tir Ef  Eb Con
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   WindowMaterial:Glazing,
     CLEAR 2.5MM,             !- Name

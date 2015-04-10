@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -164,13 +164,13 @@ namespace HVACMultiSpeedHeatPump {
 	Real64 SupHeaterLoad( 0.0 ); // load to be met by supplemental heater [W]
 	Real64 SaveLoadResidual( 0.0 ); // Saved load residual used to check convergence
 	Real64 SaveCompressorPLR( 0.0 ); // holds compressor PLR from active DX coil
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< MSHeatPumpData > MSHeatPump;
-	FArray1D< MSHeatPumpReportData > MSHeatPumpReport;
+	Array1D< MSHeatPumpData > MSHeatPump;
+	Array1D< MSHeatPumpReportData > MSHeatPumpReport;
 
 	// Functions
 
@@ -560,12 +560,12 @@ namespace HVACMultiSpeedHeatPump {
 		int SuppHeatCoilOutletNode; // Supplemental heating coil outlet node number
 		bool LocalError; // Local error flag
 		int SpeedInput; // Status of number of speed input
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -1555,12 +1555,12 @@ namespace HVACMultiSpeedHeatPump {
 		int HeatRecOutNode; // Outlet node number of heat recovery
 		Real64 RhoAir; // Air density at InNode
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MySizeFlag; // Used for sizing MSHP inputs one time
-		static FArray1D_bool MyCheckFlag; // Used to obtain the zone inlet node number in the controlled zone
-		static FArray1D_bool MyFlowFracFlag; // Used for calculatig flow fraction once
-		static FArray1D_bool MyPlantScantFlag; // used for finding on heat recovery plant loop
-		static FArray1D_bool MyStagedFlag; // used for finding on staged thermostat
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MySizeFlag; // Used for sizing MSHP inputs one time
+		static Array1D_bool MyCheckFlag; // Used to obtain the zone inlet node number in the controlled zone
+		static Array1D_bool MyFlowFracFlag; // Used for calculatig flow fraction once
+		static Array1D_bool MyPlantScantFlag; // used for finding on heat recovery plant loop
+		static Array1D_bool MyStagedFlag; // used for finding on staged thermostat
 
 		Real64 QSensUnitOut; // Output of MSHP system with coils off
 		Real64 PartLoadFrac; // Part-load ratio
@@ -1760,7 +1760,7 @@ namespace HVACMultiSpeedHeatPump {
 		NumAirLoopZones = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled + AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 		if ( allocated( AirToZoneNodeInfo ) && MyFlowFracFlag( MSHeatPumpNum ) ) {
 			FlowFracFlagReady = true;
-			ZonesLoop: for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex ) {
+			for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex ) {
 				// zone inlet nodes for cooling
 				if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled > 0 ) {
 					if ( AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolInletNodes( ZoneInSysIndex ) == -999 ) {
@@ -1775,9 +1775,7 @@ namespace HVACMultiSpeedHeatPump {
 						FlowFracFlagReady = false;
 					}
 				}
-				ZonesLoop_loop: ;
 			}
-			ZonesLoop_exit: ;
 		}
 		if ( allocated( AirToZoneNodeInfo ) && FlowFracFlagReady ) {
 			SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
@@ -2414,7 +2412,7 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 NoCompOutput; // output when no active compressor [W]
 		Real64 ErrorToler; // error tolerance
 		int SolFla; // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 9 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > Par( 9 ); // Parameters passed to RegulaFalsi
 		Real64 CpAir; // air specific heat
 		Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
 		Real64 QCoilActual; // coil load actually delivered returned to calling component
@@ -2916,7 +2914,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2996,7 +2994,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3439,7 +3437,7 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 MinWaterFlow; // coil minimum hot water mass flow rate, kg/s
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		FArray1D< Real64 > Par( 3 );
+		Array1D< Real64 > Par( 3 );
 		int SolFlag;
 
 		static std::string HeatCoilName;
@@ -3573,7 +3571,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	)
 	{
 

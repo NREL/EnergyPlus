@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -129,7 +129,7 @@ namespace SetPointManager {
 	int const iCtrlVarType_MinMassFlow( 9 ); // control Type 'MinimumMassFlowRate'
 
 	int const NumValidCtrlTypes( 9 );
-	FArray1D_string const cValidCtrlTypes( NumValidCtrlTypes, { "Temperature", "MaximumTemperature", "MinimumTemperature", "HumidityRatio", "MaximumHumidityRatio", "MinimumHumidityRatio", "MassFlowRate", "MaximumMassFlowRate", "MinimumMassFlowRate" } );
+	Array1D_string const cValidCtrlTypes( NumValidCtrlTypes, { "Temperature", "MaximumTemperature", "MinimumTemperature", "HumidityRatio", "MaximumHumidityRatio", "MinimumHumidityRatio", "MassFlowRate", "MaximumMassFlowRate", "MinimumMassFlowRate" } );
 
 	// following are used to reduce string comparisons related to CtrlVarType
 	int const iSPMType_Scheduled( 1 );
@@ -161,7 +161,7 @@ namespace SetPointManager {
 	int const iSPMType_SZOneStageHeating( 27 );
 
 	int const NumValidSPMTypes( 27 );
-	FArray1D_string const cValidSPMTypes( NumValidSPMTypes, { "SetpointManager:Scheduled", "SetpointManager:Scheduled:DualSetpoint", "SetpointManager:OutdoorAirReset", "SetpointManager:SingleZone:Reheat", "SetpointManager:SingleZone:Heating", "SetpointManager:SingleZone:Cooling", "SetpointManager:SingleZone:Humidity:Minimum", "SetpointManager:SingleZone:Humidity:Maximum", "SetpointManager:MixedAir", "SetpointManager:OutdoorAirPretreat", "SetpointManager:Warmest", "SetpointManager:Coldest", "SetpointManager:WarmestTemperatureFlow", "SetpointManager:ReturnAirBypassFlow", "SetpointManager:MultiZone:Cooling:Average", "SetpointManager:MultiZone:Heating:Average", "SetpointManager:MultiZone:MinimumHumidity:Average", "SetpointManager:MultiZone:MaximumHumidity:Average", "SetpointManager:MultiZone:Humidity:Minimum", "SetpointManager:MultiZone:Humidity:Maximum", "SetpointManager:FollowOutdoorAirTemperature", "SetpointManager:FollowSystemNodeTemperature", "SetpointManager:FollowGroundTemperature", "SetpointManager:CondenserEnteringReset", "SetpointManager:CondenserEnteringReset:Ideal", "SetpointManager:SingleZone:OneStageCooling", "SetpointManager:SingleZone:OneStageHeating" } );
+	Array1D_string const cValidSPMTypes( NumValidSPMTypes, { "SetpointManager:Scheduled", "SetpointManager:Scheduled:DualSetpoint", "SetpointManager:OutdoorAirReset", "SetpointManager:SingleZone:Reheat", "SetpointManager:SingleZone:Heating", "SetpointManager:SingleZone:Cooling", "SetpointManager:SingleZone:Humidity:Minimum", "SetpointManager:SingleZone:Humidity:Maximum", "SetpointManager:MixedAir", "SetpointManager:OutdoorAirPretreat", "SetpointManager:Warmest", "SetpointManager:Coldest", "SetpointManager:WarmestTemperatureFlow", "SetpointManager:ReturnAirBypassFlow", "SetpointManager:MultiZone:Cooling:Average", "SetpointManager:MultiZone:Heating:Average", "SetpointManager:MultiZone:MinimumHumidity:Average", "SetpointManager:MultiZone:MaximumHumidity:Average", "SetpointManager:MultiZone:Humidity:Minimum", "SetpointManager:MultiZone:Humidity:Maximum", "SetpointManager:FollowOutdoorAirTemperature", "SetpointManager:FollowSystemNodeTemperature", "SetpointManager:FollowGroundTemperature", "SetpointManager:CondenserEnteringReset", "SetpointManager:CondenserEnteringReset:Ideal", "SetpointManager:SingleZone:OneStageCooling", "SetpointManager:SingleZone:OneStageHeating" } );
 
 	//Type declarations in SetPointManager module
 
@@ -213,34 +213,34 @@ namespace SetPointManager {
 	//SUBROUTINE SPECIFICATIONS FOR MODULE SetPointManager
 
 	// Object Data
-	FArray1D< DataSetPointManager > AllSetPtMgr; // Array for all Setpoint Manager data(warnings)
-	FArray1D< DefineScheduledSetPointManager > SchSetPtMgr; // Array for Scheduled Setpoint Manager data
-	FArray1D< DefineSchedDualSetPointManager > DualSchSetPtMgr; // Dual Scheduled Setpoint Manager data
-	FArray1D< DefineOutsideAirSetPointManager > OutAirSetPtMgr; // Array for Outside Air Setpoint Manager data
-	FArray1D< DefineSZReheatSetPointManager > SingZoneRhSetPtMgr; // Array for SZRH Set Pt Mgr
-	FArray1D< DefineSZHeatingSetPointManager > SingZoneHtSetPtMgr; // Array for SZ Heating Set Pt Mgr
-	FArray1D< DefineSZCoolingSetPointManager > SingZoneClSetPtMgr; // Array for SZ Cooling Set Pt Mgr
-	FArray1D< DefineSZMinHumSetPointManager > SZMinHumSetPtMgr; // Array for SZ Min Hum Set Pt Mgr
-	FArray1D< DefineSZMaxHumSetPointManager > SZMaxHumSetPtMgr; // Array for SZ Max Hum Set Pt Mgr
-	FArray1D< DefineMixedAirSetPointManager > MixedAirSetPtMgr; // Array for Mixed Air Set Pt Mgr
-	FArray1D< DefineOAPretreatSetPointManager > OAPretreatSetPtMgr; // Array for OA Pretreat Set Pt Mgr
-	FArray1D< DefineWarmestSetPointManager > WarmestSetPtMgr; // Array for Warmest Set Pt Mgr
-	FArray1D< DefineColdestSetPointManager > ColdestSetPtMgr; // Array for Coldest Set Pt Mgr
-	FArray1D< DefWarmestSetPtManagerTempFlow > WarmestSetPtMgrTempFlow; // Array for Warmest Set Pt Mgr
-	FArray1D< DefRABFlowSetPointManager > RABFlowSetPtMgr; // Array for return air bypass
-	FArray1D< DefMultiZoneAverageCoolingSetPointManager > MZAverageCoolingSetPtMgr; // Array for MultiZone
-	FArray1D< DefMultiZoneAverageHeatingSetPointManager > MZAverageHeatingSetPtMgr; // Array for MultiZone
-	FArray1D< DefMultiZoneAverageMinHumSetPointManager > MZAverageMinHumSetPtMgr; // Array for MultiZone
-	FArray1D< DefMultiZoneAverageMaxHumSetPointManager > MZAverageMaxHumSetPtMgr; // Array for MultiZone
-	FArray1D< DefMultiZoneMinHumSetPointManager > MZMinHumSetPtMgr; // Multizone min humidity rat Set Pt Mgr
-	FArray1D< DefMultiZoneMaxHumSetPointManager > MZMaxHumSetPtMgr; // Multizone max humidity rat Set Pt Mgr
-	FArray1D< DefineFollowOATempSetPointManager > FollowOATempSetPtMgr; // Array for Follow Outdoor Air
-	FArray1D< DefineFollowSysNodeTempSetPointManager > FollowSysNodeTempSetPtMgr; // Array for Follow System
-	FArray1D< DefineGroundTempSetPointManager > GroundTempSetPtMgr; // Array for Ground Temp Setpoint
-	FArray1D< DefineCondEntSetPointManager > CondEntSetPtMgr; // Condenser Entering Water Set Pt Mgr
-	FArray1D< DefineIdealCondEntSetPointManager > IdealCondEntSetPtMgr; // Ideal Condenser Entering Set Pt Mgr
-	FArray1D< DefineSZOneStageCoolinggSetPointManager > SZOneStageCoolingSetPtMgr; // single zone 1 stage cool
-	FArray1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
+	Array1D< DataSetPointManager > AllSetPtMgr; // Array for all Setpoint Manager data(warnings)
+	Array1D< DefineScheduledSetPointManager > SchSetPtMgr; // Array for Scheduled Setpoint Manager data
+	Array1D< DefineSchedDualSetPointManager > DualSchSetPtMgr; // Dual Scheduled Setpoint Manager data
+	Array1D< DefineOutsideAirSetPointManager > OutAirSetPtMgr; // Array for Outside Air Setpoint Manager data
+	Array1D< DefineSZReheatSetPointManager > SingZoneRhSetPtMgr; // Array for SZRH Set Pt Mgr
+	Array1D< DefineSZHeatingSetPointManager > SingZoneHtSetPtMgr; // Array for SZ Heating Set Pt Mgr
+	Array1D< DefineSZCoolingSetPointManager > SingZoneClSetPtMgr; // Array for SZ Cooling Set Pt Mgr
+	Array1D< DefineSZMinHumSetPointManager > SZMinHumSetPtMgr; // Array for SZ Min Hum Set Pt Mgr
+	Array1D< DefineSZMaxHumSetPointManager > SZMaxHumSetPtMgr; // Array for SZ Max Hum Set Pt Mgr
+	Array1D< DefineMixedAirSetPointManager > MixedAirSetPtMgr; // Array for Mixed Air Set Pt Mgr
+	Array1D< DefineOAPretreatSetPointManager > OAPretreatSetPtMgr; // Array for OA Pretreat Set Pt Mgr
+	Array1D< DefineWarmestSetPointManager > WarmestSetPtMgr; // Array for Warmest Set Pt Mgr
+	Array1D< DefineColdestSetPointManager > ColdestSetPtMgr; // Array for Coldest Set Pt Mgr
+	Array1D< DefWarmestSetPtManagerTempFlow > WarmestSetPtMgrTempFlow; // Array for Warmest Set Pt Mgr
+	Array1D< DefRABFlowSetPointManager > RABFlowSetPtMgr; // Array for return air bypass
+	Array1D< DefMultiZoneAverageCoolingSetPointManager > MZAverageCoolingSetPtMgr; // Array for MultiZone
+	Array1D< DefMultiZoneAverageHeatingSetPointManager > MZAverageHeatingSetPtMgr; // Array for MultiZone
+	Array1D< DefMultiZoneAverageMinHumSetPointManager > MZAverageMinHumSetPtMgr; // Array for MultiZone
+	Array1D< DefMultiZoneAverageMaxHumSetPointManager > MZAverageMaxHumSetPtMgr; // Array for MultiZone
+	Array1D< DefMultiZoneMinHumSetPointManager > MZMinHumSetPtMgr; // Multizone min humidity rat Set Pt Mgr
+	Array1D< DefMultiZoneMaxHumSetPointManager > MZMaxHumSetPtMgr; // Multizone max humidity rat Set Pt Mgr
+	Array1D< DefineFollowOATempSetPointManager > FollowOATempSetPtMgr; // Array for Follow Outdoor Air
+	Array1D< DefineFollowSysNodeTempSetPointManager > FollowSysNodeTempSetPtMgr; // Array for Follow System
+	Array1D< DefineGroundTempSetPointManager > GroundTempSetPtMgr; // Array for Ground Temp Setpoint
+	Array1D< DefineCondEntSetPointManager > CondEntSetPtMgr; // Condenser Entering Water Set Pt Mgr
+	Array1D< DefineIdealCondEntSetPointManager > IdealCondEntSetPtMgr; // Ideal Condenser Entering Set Pt Mgr
+	Array1D< DefineSZOneStageCoolinggSetPointManager > SZOneStageCoolingSetPtMgr; // single zone 1 stage cool
+	Array1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
 
 	// Functions
 
@@ -382,12 +382,12 @@ namespace SetPointManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
@@ -403,7 +403,7 @@ namespace SetPointManager {
 		int NumZones; // number of zone nodes in input node list
 		int ZoneNum; // loop index for zone nodes
 		int NumNodes;
-		FArray1D_int NodeNums;
+		Array1D_int NodeNums;
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -6433,7 +6433,7 @@ namespace SetPointManager {
 		static bool RunSubOptCondEntTemp( false );
 		static bool RunFinalOptCondEntTemp( false );
 		static bool firstTime( true );
-		static FArray1D_bool SetupIdealCondEntSetPtVars;
+		static Array1D_bool SetupIdealCondEntSetPtVars;
 
 		//! Current timestep's condenser water entering setpoint
 		if ( firstTime ) {
@@ -6588,14 +6588,14 @@ namespace SetPointManager {
 		std::string TypeOfComp;
 		std::string NameOfComp;
 
-		FArray1D_int VarIndexes; // Variable Numbers
-		FArray1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
-		FArray1D_int IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
-		FArray1D_string UnitsStrings; // UnitsStrings for each variable
-		FArray1D_int ResourceTypes; // ResourceTypes for each variable
-		FArray1D_string EndUses; // EndUses for each variable
-		FArray1D_string Groups; // Groups for each variable
-		FArray1D_string Names; // Variable Names for each variable
+		Array1D_int VarIndexes; // Variable Numbers
+		Array1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
+		Array1D_int IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
+		Array1D_string UnitsStrings; // UnitsStrings for each variable
+		Array1D_int ResourceTypes; // ResourceTypes for each variable
+		Array1D_string EndUses; // EndUses for each variable
+		Array1D_string Groups; // Groups for each variable
+		Array1D_string Names; // Variable Names for each variable
 		int NumVariables;
 		int NumFound;
 
@@ -7384,7 +7384,7 @@ namespace SetPointManager {
 		// Initialize to false that node is not controlled by set point manager
 		NodeHasSPMCtrlVarType = false;
 
-		SPMLoop: for ( SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum ) {
 			for ( NumNode = 1; NumNode <= AllSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++NumNode ) {
 				if ( NodeNum == AllSetPtMgr( SetPtMgrNum ).CtrlNodes( NumNode ) ) {
 					if ( AllSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType ) {
@@ -7394,7 +7394,6 @@ namespace SetPointManager {
 					}
 				}
 			}
-			SPMLoop_loop: ;
 		}
 		SPMLoop_exit: ;
 

@@ -19,17 +19,28 @@ SET(SRC
   SimData.f90
 )
 
-IF(UNIX) # Mac and Linux
-ELSE()  # Windows
-  IF(CMAKE_Fortran_COMPILER MATCHES "ifort")
+if(APPLE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
+  endif()
+elseif(UNIX)
+  set(CMAKE_SKIP_RPATH TRUE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static" )
+  endif()
+else()
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
     # Set release flags to be empty
-    SET(CMAKE_Fortran_FLAGS_RELEASE "")
-    SET(CMAKE_Fortran_FLAGS "/nologo /debug:minimal /O2 /Oy- /assume:buffered_io /noaltparam /fpscomp:nolibs /fpe:0 /fp:fast=2  /traceback /check:uninit /libs:static /threads /c /assume:protect-parens /Qprec-div /Qprec-sqrt /Qvec-")
-  ELSE()
-    SET(CMAKE_Fortran_FLAGS "-static")
-  ENDIF()
-ENDIF()
+    set(CMAKE_Fortran_FLAGS_RELEASE "")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:static")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+  endif()
+endif()
 
+set(SKIP_BUILD_RPATH true)
 ADD_EXECUTABLE( Slab ${SRC} )
 
 SET_TARGET_PROPERTIES(Slab PROPERTIES

@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
@@ -175,10 +175,10 @@ namespace WaterThermalTanks {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
-	FArray1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
-	FArray1D_bool MyHPSizeFlag; // Used to report autosize info in Init
-	FArray1D_bool CheckWTTEquipName;
-	FArray1D_bool CheckHPWHEquipName;
+	Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+	Array1D_bool MyHPSizeFlag; // Used to report autosize info in Init
+	Array1D_bool CheckWTTEquipName;
+	Array1D_bool CheckHPWHEquipName;
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumChilledWaterMixed( 0 ); // number of mixed chilled water tanks
@@ -195,14 +195,14 @@ namespace WaterThermalTanks {
 	Real64 MixerInletAirSchedule( 0.0 ); // output of inlet air mixer node schedule
 	Real64 MdotAir( 0.0 ); // mass flow rate of evaporator air, kg/s
 	int NumWaterHeaterSizing( 0 ); // Number of sizing/design objects for water heaters.
-	FArray1D_bool AlreadyRated; // control so we don't repeat again
+	Array1D_bool AlreadyRated; // control so we don't repeat again
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< WaterThermalTankData > WaterThermalTank;
-	FArray1D< HeatPumpWaterHeaterData > HPWaterHeater;
-	FArray1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
+	Array1D< WaterThermalTankData > WaterThermalTank;
+	Array1D< HeatPumpWaterHeaterData > HPWaterHeater;
+	Array1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
 
 	static gio::Fmt fmtLD( "*" );
 
@@ -255,10 +255,10 @@ namespace WaterThermalTanks {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool OneTimeSetupFlag( true );
-		static FArray1D_bool MyOneTimeFlagWH; // first pass log
-		static FArray1D_bool MyTwoTimeFlagWH; // second pass do input check
-		static FArray1D_bool MyOneTimeFlagHP; // first pass log
-		static FArray1D_bool MyTwoTimeFlagHP; // second pass do input check
+		static Array1D_bool MyOneTimeFlagWH; // first pass log
+		static Array1D_bool MyTwoTimeFlagWH; // second pass do input check
+		static Array1D_bool MyOneTimeFlagHP; // first pass log
+		static Array1D_bool MyTwoTimeFlagHP; // second pass do input check
 		int tmpLoopNum;
 		int tmpLoopSideNum;
 		int CompNum;
@@ -338,15 +338,13 @@ namespace WaterThermalTanks {
 				}
 				MinePlantStructForInfo( CompNum );
 				if ( present( LoopNum ) ) {
-					if ( ( ( WaterThermalTank( CompNum ).SourceSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).SourceSidePlantLoopSide == LoopSideNum ) ) 
+					if ( ( ( WaterThermalTank( CompNum ).SourceSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).SourceSidePlantLoopSide == LoopSideNum ) )
 						|| ( ( WaterThermalTank( CompNum ).UseSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).UseSidePlantLoopSide == LoopSideNum ) ) ) {
 
 						SizeTankForDemandSide( CompNum );
 						SizeDemandSidePlantConnections( CompNum );
 						SizeSupplySidePlantConnections( CompNum, LoopNum, LoopSideNum );
 						SizeTankForSupplySide( CompNum );
-
-
 					} else {
 						return;
 					}
@@ -759,6 +757,7 @@ namespace WaterThermalTanks {
 		//                      B. Griffith, Oct. 2007 extensions for indirect water heaters
 		//                      B. Griffith, Feb. 2008 extensions for autosizing water heaters
 		//                      BG Mar 2009.  Trap for bad heater height input for stratefied water heater CR7718
+		//						B. Shen 12/2014, add air-source variable-speed heat pump water heating
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -808,6 +807,10 @@ namespace WaterThermalTanks {
 		using DXCoils::DXCoil;
 		using DXCoils::GetDXCoilIndex;
 		using DXCoils::NumDXCoils;
+		using VariableSpeedCoils::GetCoilIndexVariableSpeed;
+		using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
+		using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
+		using VariableSpeedCoils::GetVSCoilPLFFPLR;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
@@ -884,6 +887,7 @@ namespace WaterThermalTanks {
 		static bool errFlag( false ); // Used for error checking used with HPWHs
 		static Real64 HEffFTemp( 0.0 ); // Used for error checking desuperheater heating coils
 		bool Okay;
+		bool bIsVScoil( false ); // indicate if the heat pump WH coil is a variable-speed coil
 
 		// Following allow for temporary storage of character strings but not saved in main structure
 		Real64 rho; // local fluid density
@@ -917,9 +921,9 @@ namespace WaterThermalTanks {
 		};
 
 		// Object Data
-		FArray1D< WaterHeaterSaveNodes > HPWHSaveNodeNames; // temporary for HPWH node names used in later checks
-		FArray1D< WaterHeaterSaveNodes > WHSaveNodeNames; // temporary for WH node names used in later checks
-		FArray1D< WaterHeaterSaveNodes > CoilSaveNodeNames; // temporary for coil node names used in later checks
+		Array1D< WaterHeaterSaveNodes > HPWHSaveNodeNames; // temporary for HPWH node names used in later checks
+		Array1D< WaterHeaterSaveNodes > WHSaveNodeNames; // temporary for WH node names used in later checks
+		Array1D< WaterHeaterSaveNodes > CoilSaveNodeNames; // temporary for coil node names used in later checks
 
 		// Formats
 		static gio::Fmt Format_720( "('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, ','Standard Rated Energy Factor')" );
@@ -1402,14 +1406,26 @@ namespace WaterThermalTanks {
 					HPWaterHeater( HPWaterHeaterNum ).DXCoilName = cAlphaArgs( 19 );
 
 					//       check that the DX Coil exists
-					if ( ! SameString( HPWaterHeater( HPWaterHeaterNum ).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump" ) ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-						ShowContinueError( "Heat pump water heater can only be used with Coil:WaterHeating:AirToWaterHeatPump." );
+					//		 allow both single-speed and variable-speed HPWH coils
+					if (!(SameString(HPWaterHeater(HPWaterHeaterNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump") ||
+						SameString(HPWaterHeater(HPWaterHeaterNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed"))) {
+						ShowSevereError(cCurrentModuleObject + "=\"" + HPWaterHeater(HPWaterHeaterNum).Name + "\":");
+						ShowContinueError("Heat pump water heater can only be used with Coil:WaterHeating:AirToWaterHeatPump or Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.");
 						ErrorsFound = true;
 					}
 
 					DXCoilErrFlag = false;
-					GetDXCoilIndex( HPWaterHeater( HPWaterHeaterNum ).DXCoilName, HPWaterHeater( HPWaterHeaterNum ).DXCoilNum, DXCoilErrFlag, cCurrentModuleObject );
+					bIsVScoil = false;
+					if (SameString(HPWaterHeater(HPWaterHeaterNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump"))
+						GetDXCoilIndex(HPWaterHeater(HPWaterHeaterNum).DXCoilName, HPWaterHeater(HPWaterHeaterNum).DXCoilNum, DXCoilErrFlag, cCurrentModuleObject);
+
+					//find variable speed HPWH
+					if (SameString(HPWaterHeater(HPWaterHeaterNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed")) {
+						HPWaterHeater(HPWaterHeaterNum).DXCoilNum = GetCoilIndexVariableSpeed(HPWaterHeater(HPWaterHeaterNum).DXCoilType,
+							HPWaterHeater(HPWaterHeaterNum).DXCoilName, DXCoilErrFlag);
+						if (!DXCoilErrFlag) bIsVScoil = true; //it is a variable-speed coil
+					}
+
 					if ( DXCoilErrFlag ) {
 						ShowContinueError( "...occurs in WaterHeater:HeatPump =" + HPWaterHeater( HPWaterHeaterNum ).Name );
 						ShowContinueError( "...entered DX CoilType=" + HPWaterHeater( HPWaterHeaterNum ).DXCoilType );
@@ -1518,15 +1534,24 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 					}
 
-					if ( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum > 0 ) {
+
+					if ( ( HPWaterHeater(HPWaterHeaterNum).DXCoilNum > 0 ) && ( !bIsVScoil ) ) {
 						//         get HPWH capacity, air inlet node, and PLF curve info from DX coil object
-						HPWaterHeater( HPWaterHeaterNum ).Capacity = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2;
-						HPWaterHeater( HPWaterHeaterNum ).DXCoilAirInletNode = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).AirInNode;
-						HPWaterHeater( HPWaterHeaterNum ).DXCoilPLFFPLR = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).PLFFPLR( 1 );
+						HPWaterHeater(HPWaterHeaterNum).Capacity = DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).RatedTotCap2;
+						HPWaterHeater(HPWaterHeaterNum).DXCoilAirInletNode = DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).AirInNode;
+						HPWaterHeater(HPWaterHeaterNum).DXCoilPLFFPLR = DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).PLFFPLR(1);
 						//         check the range of condenser pump power to be <= 5 gpm/ton
-						if ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 > 0.1422 ) {
-							ShowWarningError( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).DXCoilType + "= " + DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).Name + ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 W/W (41.67 watt/MBH). Condenser pump power per watt = " + TrimSigDigits( ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 ), 4 ) );
+						if (DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).HPWHCondPumpElecNomPower / DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).RatedTotCap2 > 0.1422) {
+							ShowWarningError(DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).DXCoilType + "= " + DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).Name + ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 W/W (41.67 watt/MBH). Condenser pump power per watt = " + TrimSigDigits((DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).HPWHCondPumpElecNomPower / DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).RatedTotCap2), 4));
 						}
+					} else if ( ( HPWaterHeater(HPWaterHeaterNum).DXCoilNum > 0 ) && ( bIsVScoil ) ) {
+						HPWaterHeater(HPWaterHeaterNum).Capacity = GetCoilCapacityVariableSpeed(HPWaterHeater(HPWaterHeaterNum).DXCoilType,
+							HPWaterHeater(HPWaterHeaterNum).DXCoilName, DXCoilErrFlag);
+						HPWaterHeater(HPWaterHeaterNum).DXCoilAirInletNode = GetCoilInletNodeVariableSpeed(HPWaterHeater(HPWaterHeaterNum).DXCoilType,
+							HPWaterHeater(HPWaterHeaterNum).DXCoilName, DXCoilErrFlag);
+						HPWaterHeater(HPWaterHeaterNum).DXCoilPLFFPLR = GetVSCoilPLFFPLR(HPWaterHeater(HPWaterHeaterNum).DXCoilType,
+							HPWaterHeater(HPWaterHeaterNum).DXCoilName, DXCoilErrFlag);
+						//         check the range of condenser pump power to be <= 5 gpm/ton, will be checked in the coil object
 					}
 
 					if ( HPWaterHeater( HPWaterHeaterNum ).OperatingWaterFlowRate == AutoCalculate ) {
@@ -1720,7 +1745,10 @@ namespace WaterThermalTanks {
 						}
 					} else if ( HPWaterHeater( HPWaterHeaterNum ).FanPlacement == BlowThru ) {
 						//           set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
-						HPWaterHeater( HPWaterHeaterNum ).FanOutletNode = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).AirInNode;
+						if ( bIsVScoil ) HPWaterHeater(HPWaterHeaterNum).FanOutletNode = GetCoilInletNodeVariableSpeed(HPWaterHeater(HPWaterHeaterNum).DXCoilType,
+							HPWaterHeater(HPWaterHeaterNum).DXCoilName, DXCoilErrFlag);
+						else HPWaterHeater(HPWaterHeaterNum).FanOutletNode = DXCoil(HPWaterHeater(HPWaterHeaterNum).DXCoilNum).AirInNode;
+
 					}
 
 					//       set the max mass flow rate for outdoor fans
@@ -2945,10 +2973,9 @@ namespace WaterThermalTanks {
 
 					if ( lNumericFieldBlanks( 7 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = 0.0;
-
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = rNumericArgs( 7 );
-						if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate  ) {
+						if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate ) {
 							WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized = true;
 						}
 					}
@@ -3224,7 +3251,6 @@ namespace WaterThermalTanks {
 
 					if ( lNumericFieldBlanks( 12 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = 0.0;
-
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = rNumericArgs( 12 );
 						if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) {
@@ -3597,7 +3623,7 @@ namespace WaterThermalTanks {
 								ErrorsFound = true;
 							}
 							// if both volume and demand side flow connections are autosized, must be a good NominalVolForSizingDemandSideFlow
-							if ( ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide == DemandSide ) 
+							if ( ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide == DemandSide )
 								&& ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) ) {
 								if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NominalVolForSizingDemandSideFlow <= 0.0 ) {
 									ShowWarningError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + " needs a value for Nominal Tank Volume for Autosizing Plant Connections" );
@@ -4248,6 +4274,7 @@ namespace WaterThermalTanks {
 		//       DATE WRITTEN   February 2004
 		//       MODIFIED       FSEC, July 2005
 		//                      Brent Griffith, October 2007 indirect fired water heater
+		//						B. Shen 12/2014, add air-source variable-speed heat pump water heating
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4291,6 +4318,9 @@ namespace WaterThermalTanks {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using FluidProperties::GetDensityGlycol;
+		using VariableSpeedCoils::SimVariableSpeedCoils;
+		using VariableSpeedCoils::VarSpeedCoil;
+		using Fans::GetFanVolFlow;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4314,13 +4344,18 @@ namespace WaterThermalTanks {
 		Real64 HPInletHumRat( 0.0 ); // HPWH's air inlet humidity ratio, kg/kg
 		Real64 HPInletRelHum; // HPWH's air inlet relative humidity
 		Real64 DeadBandTemp; // Minimum tank temperature (SetPointTemp - DeadBandDeltaTemp) (C)
+		Real64 MulSpeedFlowScale; // scaling factor for adjusting flow rates of VS HPWH coil
+		Real64 rhoAir; // air density
+		int Iter; // iteration number
+		Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); //place holder to calling function
+		Real64 FanVolFlow(0.0); // Used for error checking fans used with HPWHs
 		//  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
 		//  Integer             :: Loop
 		static bool InitWaterThermalTanksOnce( true ); // flag for 1 time initialization
-		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
-		static FArray1D_bool MyWarmupFlag; // flag for init after warmup complete
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag
-//		static FArray1D_bool MySizingDoneFlag; // true if sizing is finished
+		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag
+//		static Array1D_bool MySizingDoneFlag; // true if sizing is finished
 
 		static std::string const RoutineName( "InitWaterThermalTank" );
 		static std::string const GetWaterThermalTankInput( "GetWaterThermalTankInput" );
@@ -4871,6 +4906,75 @@ namespace WaterThermalTanks {
 			HPWHInletDBTemp = HPInletDryBulbTemp;
 			HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, HPInletHumRat, OutBaroPress );
 
+			// initialize flow rates at speed levels for varaible-speed HPWH
+			if (SameString(HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") &&
+				(0 == HPWaterHeater(HPNum).NumofSpeed))
+			{
+				EMP1 = 4.0;
+				EMP2 = 0.0;
+				EMP3 = 0.0;
+				SimVariableSpeedCoils(BlankString, HPWaterHeater(HPNum).DXCoilNum,
+					0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0); //conduct the sizing operation in the VS WSHP
+				HPWaterHeater(HPNum).NumofSpeed = VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NumOfSpeeds;
+				// below pass the flow rates from the VS coil to the water heater object
+
+				// scale air flow rates
+				MulSpeedFlowScale = VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).RatedAirVolFlowRate /
+					VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).MSRatedAirVolFlowRate(VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel);
+				for (Iter = 1; Iter <= HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
+					HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) = VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
+				}
+
+				// check fan flow rate, should be larger than the max flow rate of the VS coil
+				GetFanVolFlow(HPWaterHeater(HPNum).FanNum, FanVolFlow);
+				if (FanVolFlow  < HPWaterHeater(HPNum).HPWHAirVolFlowRate(HPWaterHeater(HPNum).NumofSpeed)) {
+					ShowWarningError("InitWaterThermalTank: -air flow rate = " + TrimSigDigits(FanVolFlow, 7) +
+						" in fan object " " is less than the MSHP system air flow rate" " when waterheating is required("
+						+ TrimSigDigits(HPWaterHeater(HPNum).HPWHAirVolFlowRate(HPWaterHeater(HPNum).NumofSpeed), 7) + ").");
+					ShowContinueError(" The MSHP system flow rate when waterheating is required is reset to the" " fan flow rate and the simulation continues.");
+					ShowContinueError(" Occurs in " + HPWaterHeater(HPNum).Name);
+					HPWaterHeater(HPNum).HPWHAirVolFlowRate(HPWaterHeater(HPNum).NumofSpeed) = FanVolFlow;
+					// Check flow rates in other speeds and ensure flow rates are not above the max flow rate
+					for (Iter = HPWaterHeater(HPNum).NumofSpeed - 1; Iter >= 1; --Iter) {
+						if (HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) > HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter + 1)) {
+							ShowContinueError(" The MSHP system flow rate when waterheating is required is reset to the" " flow rate at higher speed and the simulation continues at Speed"
+								+ TrimSigDigits(Iter) + '.');
+							ShowContinueError(" Occurs in " + HPWaterHeater(HPNum).Name);
+							HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) = HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter + 1);
+						}
+					}
+				}
+
+				for (Iter = 1; Iter <= HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
+					HPWaterHeater(HPNum).MSAirSpeedRatio(Iter) = HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) /
+						HPWaterHeater(HPNum).HPWHAirVolFlowRate(HPWaterHeater(HPNum).NumofSpeed);
+				}
+
+				// scale water flow rates
+				MulSpeedFlowScale = VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).RatedWaterVolFlowRate /
+					VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).MSRatedWaterVolFlowRate
+					(VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel);
+				for (Iter = 1; Iter <= HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
+					HPWaterHeater(HPNum).HPWHWaterVolFlowRate(Iter) = VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).MSRatedWaterVolFlowRate(Iter) * MulSpeedFlowScale;
+					HPWaterHeater(HPNum).HPWHWaterMassFlowRate(Iter) = VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).MSRatedWaterMassFlowRate(Iter) * MulSpeedFlowScale;
+					HPWaterHeater(HPNum).MSWaterSpeedRatio(Iter) = VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).MSRatedWaterVolFlowRate(Iter) /
+						VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).MSRatedWaterVolFlowRate(HPWaterHeater(HPNum).NumofSpeed);
+				}
+			}
+
+			if (HPWaterHeater(HPNum).NumofSpeed > 0) {
+				rhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, HPInletDryBulbTemp, HPInletHumRat);
+
+				for (Iter = 1; Iter <= HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
+					HPWaterHeater(HPNum).HPWHAirMassFlowRate(Iter) =
+						HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) * rhoAir;
+				}
+
+				//   set the max mass flow rate for outdoor fans
+				Node(HPWaterHeater(HPNum).FanOutletNode).MassFlowRateMax =
+					HPWaterHeater(HPNum).HPWHAirMassFlowRate(HPWaterHeater(HPNum).NumofSpeed);
+			}
+
 		} //  IF(WaterThermalTank(WaterThermalTankNum)%HeatPumpNum .GT. 0)THEN
 
 	}
@@ -4979,8 +5083,8 @@ namespace WaterThermalTanks {
 		static int DummyWaterIndex( 1 );
 
 		// Reference to objects
-		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Reference to the tank object to save typing
-		
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum ); // Reference to the tank object to save typing
+
 		// FLOW:
 		TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
 
@@ -5065,21 +5169,21 @@ namespace WaterThermalTanks {
 
 		// Calculate the heating rate from the heat pump.
 		if ( Tank.HeatPumpNum > 0 ) {
-			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
-			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
-			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
+			HeatPumpWaterHeaterData const & HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+			DataLoopNode::NodeData const & HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
+			DataLoopNode::NodeData const & HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
 			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
 		} else {
 			HPWHCondenserDeltaT = 0.0;
 		}
 		assert( HPWHCondenserDeltaT >= 0 );
-		
+
 		CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SetPointTemp,
 												SourceMassFlowRate, Qheatpump, Qsource);
-		
+
 		// Calculate steady-state use heat rate.
 		Quse = UseMassFlowRate * Cp * ( UseInletTemp - SetPointTemp );
-		
+
 		while ( TimeRemaining > 0.0 ) {
 
 			TimeNeeded = 0.0;
@@ -5331,7 +5435,7 @@ namespace WaterThermalTanks {
 
 			} else {
 				// No default
-				assert(0);
+				assert( false );
 			}}
 
 			deltaTsum = CalcTempIntegral( TankTemp, NewTankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeNeeded );
@@ -5443,13 +5547,13 @@ namespace WaterThermalTanks {
 		//		Date Written: January 2015
 		//		Modified: na
 		//		Re-engineered: na
-		
+
 		// Purpose of this function:
 		// Determines if the source side heat transfer is coming from a heat pump.
 		// If so it treats the source side heat transfer as a constant heat source
 		// If it is not coming from a heat pump it treats the source side heat transfer
 		// as a constant temperature.
-		
+
 		// Determine if the source side heating is coming from a heat pump.
 		Qheatpump = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
 		if ( Qheatpump > 0.0 ) {
@@ -5458,9 +5562,9 @@ namespace WaterThermalTanks {
 		} else {
 			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - SetPointTemp );
 		}
-		
+
 	}
-	
+
 	Real64
 	CalcTimeNeeded(
 		Real64 const Ti, // Initial tank temperature (C)
@@ -5842,7 +5946,7 @@ namespace WaterThermalTanks {
 		Real64 HPWHCondenserDeltaT; // Temperature difference across the condenser for a heat pump water heater
 
 		// References
-		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Tank object
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum ); // Tank object
 
 		// FLOW:
 		TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
@@ -5874,9 +5978,9 @@ namespace WaterThermalTanks {
 
 		// Calculate the heating rate from the heat pump.
 		if ( Tank.HeatPumpNum > 0 ) {
-			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
-			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
-			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
+			HeatPumpWaterHeaterData const & HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+			DataLoopNode::NodeData const & HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
+			DataLoopNode::NodeData const & HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
 			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
 		} else {
 			HPWHCondenserDeltaT = 0.0;
@@ -6008,7 +6112,7 @@ namespace WaterThermalTanks {
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
 				Qsource = CalcStratifiedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SourceMassFlowRate, NodeTemp);
-				
+
 				InvMixUp = 0.0;
 				if ( NodeNum > 1 ) {
 					TempUp = Tank.Node( NodeNum - 1 ).Temp;
@@ -6169,7 +6273,7 @@ namespace WaterThermalTanks {
 		if ( Tank.AmbientTempZone > 0 ) WaterThermalTank( WaterThermalTankNum ).AmbientZoneGain = -Qlosszone - Qvent;
 
 	}
-	
+
 	Real64
 	CalcStratifiedTankSourceSideHeatTransferRate(
 		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
@@ -6185,7 +6289,7 @@ namespace WaterThermalTanks {
 
 		// Purpose of this function:
 		// Calculates the source side heat transfer rate of a stratified tank.
-		
+
 		// Methodology:
 		// If the source side heat transfer is coming from a heat pump, then
 		Real64 Qsource;
@@ -6240,7 +6344,7 @@ namespace WaterThermalTanks {
 		Real64 MinDeltaTemp; // Smallest temperature difference found so far (delta C)
 
 		// References to objects
-		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum );
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
 
 		// FLOW:
 		NumNodes = Tank.Nodes;
@@ -6428,7 +6532,7 @@ namespace WaterThermalTanks {
 		int DesuperheaterNum; // Index to desuperheater
 		int SolFla; // Flag of RegulaFalsi solver
 		int SourceID; // Waste Heat Source ID number
-		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
 		static Real64 MinTemp( 0.0 ); // used for error messages, C
 		std::string IterNum; // Max number of iterations for warning message
 
@@ -6788,6 +6892,7 @@ namespace WaterThermalTanks {
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   March 2005
 		//       MODIFIED       B. Griffith, Jan 2012 for stratified tank
+		//						B. Shen 12/2014, add air-source variable-speed heat pump water heating
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -6819,6 +6924,7 @@ namespace WaterThermalTanks {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::RhoH2O;
+		using VariableSpeedCoils::SimVariableSpeedCoils;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6846,19 +6952,30 @@ namespace WaterThermalTanks {
 		int OutletAirSplitterNode; // HP outlet air splitter node number
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
 		int SolFla( 0 ); // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > ParVS( 10 ); // Parameters passed to RegulaFalsi, for variable-speed HPWH
 		Real64 HPMinTemp; // used for error messages, C
 		std::string HPMinTempChar; // used for error messages
 		std::string IterNum; // Max number of iterations for warning message
 		int CompOp; // DX compressor operation; 1=on, 0=off
 		Real64 CondenserDeltaT; // HPWH condenser water temperature difference
+		//new varaibles for variable-speed HPWH
+		int MaxSpeedNum( 0 ); // speed number of variable speed HPWH coil
+		int SpeedNum( 1 ); // selected speed number
+		Real64 RhoWater; //water density
+		Real64 SpeedRatio( 0.0 ); //speed ratio for interpolating between two speed levels
+		bool bIterSpeed( false );// interpolation between speed level or not
+		Real64 zeroResidual( 1.0 ); //residual when running VSHPWH at 0.0 part-load ratio, 1.0 needed setting >0
+		int i;// index for iteration
+		Real64 EMP1( 0.0 ), EMP2( 0.0 ), EMP3( 0.0 ); //place holder to calling vs HPWH function
+		Real64 LowSpeedTankTemp( 0.0 ); //tank temperature resulted by a lower compressor speed
 		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
-		Real64 HPWaterInletNodeTempSaved; // Water temp saved from previous timestep
+		//Real64 HPWaterInletNodeTempSaved; // Water temp saved from previous timestep
 		int loopIter; // iteration loop counter
-		
+
 		// References to objects used in this function
-		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum );
-		HeatPumpWaterHeaterData &HeatPump = HPWaterHeater( Tank.HeatPumpNum );
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
+		HeatPumpWaterHeaterData & HeatPump = HPWaterHeater( Tank.HeatPumpNum );
 
 		// FLOW:
 		// initialize local variables
@@ -6879,10 +6996,12 @@ namespace WaterThermalTanks {
 		HeatPump.OffCycParaFuelRate = 0.0;
 		HeatPump.OffCycParaFuelEnergy = 0.0;
 		Node( HPWaterOutletNode ) = Node( HPWaterInletNode );
+		MaxSpeedNum = HeatPump.NumofSpeed;
 
 		// assign set point temperature (cut-out) and dead band temp diff (cut-in = cut-out minus dead band temp diff)
 		SetPointTemp = HeatPump.SetPointTemp;
 		DeadBandTempDiff = HeatPump.DeadBandTempDiff;
+		RhoWater = RhoH2O( SetPointTemp ); // initialize
 
 		// store first iteration tank temperature and HP mode of operation
 		// this code can be called more than once with FirstHVACIteration = .TRUE., use FirstTimeThroughFlag to control save
@@ -6907,15 +7026,30 @@ namespace WaterThermalTanks {
 				Node( InletAirMixerNode ) = Node( HPAirInletNode );
 			}
 			//   pass node info and simulate crankcase heater
-			if ( HeatPump.FanPlacement == BlowThru ) {
-				SimulateFanComponents( HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum );
-				SimDXCoil( HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio );
+			if (MaxSpeedNum > 0) {
+				SpeedRatio = 1.0;
+				SpeedNum = 1;
+				if (HeatPump.FanPlacement == BlowThru) {
+					SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+					SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum, CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+				} else {
+					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+					SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum, CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+					SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+				}
 			} else {
-				SimDXCoil( HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio );
-				SimulateFanComponents( HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum );
+				if (HeatPump.FanPlacement == BlowThru) {
+					SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+					SimDXCoil(HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio);
+				} else {
+					SimDXCoil(HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio);
+					SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+				}
 			}
-			if ( OutletAirSplitterNode > 0 ) {
-				Node( HPAirOutletNode ) = Node( OutletAirSplitterNode );
+
+			if (OutletAirSplitterNode > 0) {
+				Node(HPAirOutletNode) = Node(OutletAirSplitterNode);
 			}
 
 			//   Simulate tank if HP compressor unavailable for water heating
@@ -6960,20 +7094,23 @@ namespace WaterThermalTanks {
 		}}
 		HeatPump.Mode = HeatPump.SaveMode;
 
+		RhoWater = RhoH2O(TankTemp);//udpate water density using tank temp
+
 		// set the heat pump air- and water-side mass flow rate
 		MdotWater = HeatPump.OperatingWaterFlowRate * RhoH2O( TankTemp );
 
 		// Select mode of operation (float mode or heat mode) from last iteration.
 		// Determine if heating will occur this iteration and get an estimate of the PLR
-		{ auto const SELECT_CASE_var( HeatPump.Mode );
-		if ( SELECT_CASE_var == HeatMode ) {
+		switch (HeatPump.Mode) {
+		case HeatMode:
 			// HPWH was heating last iteration and will continue to heat until the set point is reached
-			
+
 			HPPartLoadRatio = 1.0;
-			
-		} else if ( SELECT_CASE_var == FloatMode ) {
+			break;
+
+		case FloatMode:
 			// HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
-			
+
 			// set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
 			{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
 			if ( SELECT_CASE_var1 == MixedWaterHeater ) {
@@ -7018,7 +7155,7 @@ namespace WaterThermalTanks {
 
 				// HPWH is now in heating mode
 				HeatPump.Mode = HeatMode;
-				
+
 				// Reset the water heater's mode (call above may have changed modes)
 				Tank.Mode = HeatPump.SaveWHMode;
 
@@ -7030,51 +7167,66 @@ namespace WaterThermalTanks {
 					HPPartLoadRatio = 1.0;
 				}
 			}
+			break;
 
-		} else {
+		default:
 			// Never gets here, only allowed modes for HPWH are float and heat
-			assert(0);
-		}}
-		
+			assert( false );
+		}
+
 		// If the HPWH was in heating mode during the last timestep or if it was determined that
 		// heating would be needed during this timestep to maintain setpoint, do the heating calculation.
 		if ( HeatPump.Mode == HeatMode ) {
-			
+
 			// set up air flow on DX coil inlet node
 			Node( DXCoilAirInletNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
 
 			// set the condenser inlet node mass flow rate prior to calling the CalcHPWHDXCoil
 			Node( HPWaterInletNode ).MassFlowRate = MdotWater * HPPartLoadRatio;
 			Tank.SourceMassFlowRate = MdotWater * HPPartLoadRatio;
-			
+
 			HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-			HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
+			//HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
 			// This for loop is intended to iterate and converge on a condenser operating temperature so that the evaporator model correctly calculates performance.
+			// CHECK- embedded both the nonVS and the VS sim calls inside the for-loop, previously the VS wasn't in a for loop
 			for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
-				CalcHPWHDXCoil( HeatPump.DXCoilNum, HPPartLoadRatio );
+				if (MaxSpeedNum > 0) { // lowest speed of VS HPWH coil
+					SpeedRatio = 1.0;
+					HPPartLoadRatio = 1.0;
+					bIterSpeed = true; // prepare for iterating between speed levels
+					SpeedNum = 1;
+					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio,
+						RhoWater, MdotWater, FirstHVACIteration);
+					SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
+						CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+				} else {
+					CalcHPWHDXCoil(HeatPump.DXCoilNum, HPPartLoadRatio);
+				}
 				// Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
 				// If HPWH is ever allowed to vary fan speed, this next sub should be called.
 				// CALL CalcDOE2DXCoil(DXCoilNum, HPPartLoadRatio, FirstHVACIteration,PartLoadRatio, FanOpMode)
 				// (possibly with an iteration loop to converge on a solution)
 				CondenserDeltaT = Node( HPWaterOutletNode ).Temp - Node( HPWaterInletNode ).Temp;
-				Tank.SourceInletTemp = HPWaterInletNodeTempSaved + CondenserDeltaT;
-				
+				Tank.SourceInletTemp = Node(HPWaterInletNode).Temp + CondenserDeltaT;
+
 				// this CALL does not update node temps, must use WaterThermalTank variables
 				// select tank type
 				{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
-					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
-						CalcWaterThermalTankMixed( WaterThermalTankNum );
-						NewTankTemp = Tank.TankTemp;
-					} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
-						CalcWaterThermalTankStratified( WaterThermalTankNum );
-						NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HeatPump.ControlSensorLocation );
-					}}
+				if ( SELECT_CASE_var1 == MixedWaterHeater ) {
+					CalcWaterThermalTankMixed( WaterThermalTankNum );
+					NewTankTemp = Tank.TankTemp;
+				} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
+					CalcWaterThermalTankStratified( WaterThermalTankNum );
+					NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HeatPump.ControlSensorLocation );
+				}}
+
+				LowSpeedTankTemp = NewTankTemp;
+
 				Node( HPWaterInletNode ).Temp = Tank.SourceOutletTemp;
 				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
 				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
 			}
-			
-			// if tank temperature is greater than set point, calculate a PLR needed to exactly reach the set point
+
 			if ( NewTankTemp > SetPointTemp ) {
 				HeatPump.Mode = FloatMode;
 				Par( 1 ) = SetPointTemp;
@@ -7086,50 +7238,191 @@ namespace WaterThermalTanks {
 					Par( 4 ) = 0.0;
 				}
 				Par( 5 ) = MdotWater;
-				{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
-					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par );
-					} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par );
+
+				if (MaxSpeedNum > 0) {
+					//square the solving, and avoid warning
+					//due to very small capacity at lowest speed of VSHPWH coil
+					{ auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
+					if (SELECT_CASE_var1 == MixedWaterHeater) {
+						zeroResidual = PLRResidualMixedTank(0.0, Par);
+					} else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
+						zeroResidual = PLRResidualStratifiedTank(0.0, Par);
 					}}
-				if ( SolFla == -1 ) {
-					gio::write( IterNum, fmtLD ) << MaxIte;
-					strip( IterNum );
-					if ( ! WarmupFlag ) {
-						++HeatPump.IterLimitExceededNum2;
-						if ( HeatPump.IterLimitExceededNum2 == 1 ) {
-							ShowWarningError( HeatPump.Type + " \"" + HeatPump.Name + "\"" );
-							ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
-							ShowContinueErrorTimeStamp( "This error occurred in float mode." );
-						} else {
-							ShowRecurringWarningErrorAtEnd( HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HeatPump.IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio );
-						}
-					}
-				} else if ( SolFla == -2 ) {
-					HPPartLoadRatio = max( 0.0, min( 1.0, ( SetPointTemp - TankTemp ) / ( NewTankTemp - TankTemp ) ) );
-					if ( ! WarmupFlag ) {
-						++HeatPump.RegulaFalsiFailedNum2;
-						if ( HeatPump.RegulaFalsiFailedNum2 == 1 ) {
-							ShowWarningError( HeatPump.Type + " \"" + HeatPump.Name + "\"" );
-							ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
-							ShowContinueError( "Please send this information to the EnergyPlus support group." );
-							ShowContinueErrorTimeStamp( "This error occured in float mode." );
-						} else {
-							ShowRecurringWarningErrorAtEnd( HeatPump.Type + " \"" + HeatPump.Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio );
-						}
-					}
 				}
-				
+
+				if (zeroResidual > 0.0) { // then iteration
+					{ auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
+					if (SELECT_CASE_var1 == MixedWaterHeater) {
+						SolveRegulaFalsi(Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par);
+					} else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
+						SolveRegulaFalsi(Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par);
+					}}
+					if (SolFla == -1) {
+						gio::write(IterNum, fmtLD) << MaxIte;
+						strip(IterNum);
+						if (!WarmupFlag) {
+							++HeatPump.IterLimitExceededNum2;
+							if (HeatPump.IterLimitExceededNum2 == 1) {
+								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
+								ShowContinueError("Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits(HPPartLoadRatio, 3));
+								ShowContinueErrorTimeStamp("This error occurred in float mode.");
+							} else {
+								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HeatPump.IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio);
+							}
+						}
+					} else if (SolFla == -2) {
+						HPPartLoadRatio = max(0.0, min(1.0, (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
+						if (!WarmupFlag) {
+							++HeatPump.RegulaFalsiFailedNum2;
+							if (HeatPump.RegulaFalsiFailedNum2 == 1) {
+								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
+								ShowContinueError("Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits(HPPartLoadRatio, 3));
+								ShowContinueError("Please send this information to the EnergyPlus support group.");
+								ShowContinueErrorTimeStamp("This error occured in float mode.");
+							} else {
+								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio);
+							}
+						}
+					}
+				} else {
+					HPPartLoadRatio = 0.0;
+				};
+
 				// Re-calculate the HPWH Coil to get the correct heat transfer rate.
-				Node( HPWaterInletNode ).Temp = Tank.SourceOutletTemp;
-				CalcHPWHDXCoil( HeatPump.DXCoilNum, HPPartLoadRatio );
-				
+				Node(HPWaterInletNode).Temp = Tank.SourceOutletTemp;
+				if (MaxSpeedNum > 0) {
+					SpeedRatio = 1.0;
+					bIterSpeed = false; //prepare for iterating between speed levels
+					SpeedNum = 1;
+
+					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio,
+						RhoWater, MdotWater, FirstHVACIteration);
+					SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
+						CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+				} else{
+					CalcHPWHDXCoil(HeatPump.DXCoilNum, HPPartLoadRatio);
+				}
+			} else if (bIterSpeed) {
+				for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
+					HeatPump.Mode = HeatMode;//HeatMode is important for system convergence
+					HPPartLoadRatio = 1.0;
+					SpeedRatio = 1.0;
+					for (i = 2; i <= MaxSpeedNum; ++i) {
+						SpeedNum = i;
+						SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+						SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum, CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+
+						CondenserDeltaT = Node(HPWaterOutletNode).Temp - Node(HPWaterInletNode).Temp;
+
+						//           move the full load outlet temperature rate to the water heater structure variables
+						//           (water heaters source inlet node temperature/mdot are set in Init, set it here after CalcHPWHDXCoil has been called)
+						WaterThermalTank(WaterThermalTankNum).SourceInletTemp = Node(HPWaterInletNode).Temp + CondenserDeltaT;
+						//				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
+
+						//           this CALL does not update node temps, must use WaterThermalTank variables
+						// select tank type
+						{ auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
+						if (SELECT_CASE_var1 == MixedWaterHeater) {
+							CalcWaterThermalTankMixed(WaterThermalTankNum);
+							NewTankTemp = Tank.TankTemp;
+						} else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
+							CalcWaterThermalTankStratified(WaterThermalTankNum);
+							NewTankTemp = FindStratifiedTankSensedTemp(WaterThermalTankNum, HeatPump.ControlSensorLocation);
+						}}
+
+						if (NewTankTemp > SetPointTemp) {
+							SpeedNum = i;
+							break;
+						} else {
+							LowSpeedTankTemp = NewTankTemp;
+						}
+					}
+
+					if ( NewTankTemp > SetPointTemp ) {
+						ParVS(1) = WaterThermalTankNum;
+						ParVS(2) = Tank.HeatPumpNum;
+						ParVS(3) = SpeedNum;
+						ParVS(4) = HPWaterInletNode;
+						ParVS(5) = HPWaterOutletNode;
+						ParVS(6) = RhoWater;
+						ParVS(7) = SetPointTemp;
+						ParVS(8) = HeatPump.SaveWHMode;
+						if (FirstHVACIteration) {
+							ParVS(9) = 1.0;
+						} else {
+							ParVS(9) = 0.0;
+						}
+
+						SolveRegulaFalsi(Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS);
+
+						if (SolFla == -1) {
+							gio::write(IterNum, fmtLD) << MaxIte;
+							strip(IterNum);
+							if (!WarmupFlag) {
+								++HeatPump.IterLimitExceededNum1;
+								if (HeatPump.IterLimitExceededNum1 == 1) {
+									ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
+									ShowContinueError("Iteration limit exceeded calculating heat pump water heater speed" " speed ratio ratio, maximum iterations = " + IterNum + ". speed ratio returned = " + RoundSigDigits(SpeedRatio, 3));
+									ShowContinueErrorTimeStamp("This error occurred in heating mode.");
+								} else {
+									ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in heating mode warning continues. speed ratio statistics follow.", HeatPump.IterLimitErrIndex1, SpeedRatio, SpeedRatio);
+								}
+							}
+						} else if ( SolFla == -2 ) {
+							SpeedRatio = max(0.0, min(1.0, (SetPointTemp - LowSpeedTankTemp) / (NewTankTemp - LowSpeedTankTemp)));
+							if (!WarmupFlag) {
+								++HeatPump.RegulaFalsiFailedNum1;
+								if (HeatPump.RegulaFalsiFailedNum1 == 1) {
+									ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
+									ShowContinueError("Heat pump water heater speed ratio calculation failed: speed ratio limits " "of 0 to 1 exceeded. speed ratio used = " + RoundSigDigits(SpeedRatio, 3));
+									ShowContinueError("Please send this information to the EnergyPlus support group.");
+									ShowContinueErrorTimeStamp("This error occured in heating mode.");
+								} else {
+									ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Speed ratio calculation failed in heating mode warning continues. Speed ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex1, SpeedRatio, SpeedRatio);
+								}
+							}
+						}
+					} else {
+						SpeedNum = MaxSpeedNum;
+						SpeedRatio = 1.0;
+					}
+
+					HPPartLoadRatio = 1.0;
+					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio,
+						RhoWater, MdotWater, FirstHVACIteration);
+					SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
+						CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+
+
+					CondenserDeltaT = Node(HPWaterOutletNode).Temp - Node(HPWaterInletNode).Temp;
+
+					//           move the full load outlet temperature rate to the water heater structure variables
+					//           (water heaters source inlet node temperature/mdot are set in Init, set it here after CalcHPWHDXCoil has been called)
+					WaterThermalTank(WaterThermalTankNum).SourceInletTemp = Node(HPWaterInletNode).Temp + CondenserDeltaT;
+					//				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
+
+					//           this CALL does not update node temps, must use WaterThermalTank variables
+					// select tank type
+					{ auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
+					if (SELECT_CASE_var1 == MixedWaterHeater) {
+						CalcWaterThermalTankMixed(WaterThermalTankNum);
+						NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+					} else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
+						CalcWaterThermalTankStratified(WaterThermalTankNum);
+						NewTankTemp = FindStratifiedTankSensedTemp(WaterThermalTankNum, HeatPump.ControlSensorLocation);
+					}}
+					//update inlet temp
+					Node(HPWaterInletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
+					if (std::abs(Node(HPWaterInletNode).Temp - HPWHCondInletNodeLast) < SmallTempDiff) break;
+					HPWHCondInletNodeLast = Node(HPWaterInletNode).Temp;
+				}
+
 			} else {
 				// Set the PLR to 1 if we're not going to reach setpoint during this timestep.
 				HPPartLoadRatio = 1.0;
 			}
 		}
-		
+
 		// set air-side mass flow rate for final calculation
 		if ( InletAirMixerNode > 0 ) {
 			Node( InletAirMixerNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
@@ -7147,23 +7440,64 @@ namespace WaterThermalTanks {
 		if ( HPPartLoadRatio == 0 ) Tank.SourceInletTemp = Tank.SourceOutletTemp;
 
 		// set water-side mass flow rate for final calculation
-		Node( HPWaterInletNode ).MassFlowRate = MdotWater * HPPartLoadRatio;
+		Node(HPWaterInletNode).MassFlowRate = MdotWater * HPPartLoadRatio;
 
-		// pass node information using resulting PLR
-		if ( HeatPump.FanPlacement == BlowThru ) {
-			//   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
-			SimulateFanComponents( HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum );
-			SimDXCoil( HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio );
-			SimulateFanComponents( HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum );
-			SimDXCoil( HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio );
-		} else {
-			//   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
-			SimDXCoil( HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio );
-			SimulateFanComponents( HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum );
-			SimDXCoil( HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio );
-			SimulateFanComponents( HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum );
+		if (MaxSpeedNum > 0) {
+
+			// it is important to use MdotAir to reset the notes, otherwise, could fail to converge
+			if (InletAirMixerNode > 0) {
+				Node(InletAirMixerNode).MassFlowRateMax = MdotAir;
+				Node(InletAirMixerNode).MassFlowRateMaxAvail = MdotAir;
+			} else {
+				if (OutdoorAirNode == 0) {
+					Node(HPAirInletNode).MassFlowRateMax = MdotAir;
+					Node(HPAirInletNode).MassFlowRateMaxAvail = MdotAir;
+				} else {
+					Node(OutdoorAirNode).MassFlowRateMax = MdotAir;
+					Node(OutdoorAirNode).MassFlowRateMaxAvail = MdotAir;
+				}
+			}
+
+			//   set the max mass flow rate for outdoor fans
+			Node(HeatPump.FanOutletNode).MassFlowRateMax = MdotAir;
+
+			// pass node information using resulting PLR
+			if (HeatPump.FanPlacement == BlowThru) {
+				//   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
+				SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+				SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
+					CycFanCycCoil, EMP1, EMP2, EMP3, CompOp, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+				SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+				SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
+					CycFanCycCoil, EMP1, EMP2, EMP3, CompOp, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+			} else {
+				//   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
+				SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
+					CycFanCycCoil, EMP1, EMP2, EMP3, CompOp, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+				SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+				SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
+					CycFanCycCoil, EMP1, EMP2, EMP3, CompOp, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+				SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+			}
+
+		} else { // single speed
+
+			// pass node information using resulting PLR
+			if (HeatPump.FanPlacement == BlowThru) {
+				//   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
+				SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+				SimDXCoil(HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio);
+				SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+				SimDXCoil(HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio);
+			} else {
+				//   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
+				SimDXCoil(HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio);
+				SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+				SimDXCoil(HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, CycFanCycCoil, HPPartLoadRatio);
+				SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+			}
+
 		}
-
 		// set HPWH outlet node equal to the outlet air splitter node conditions if outlet air splitter node exists
 		if ( OutletAirSplitterNode > 0 ) {
 			Node( HPAirOutletNode ) = Node( OutletAirSplitterNode );
@@ -7211,10 +7545,159 @@ namespace WaterThermalTanks {
 
 	}
 
+	void
+	SetVSHPWHFlowRates(
+		int const WaterThermalTankNum, // Water Heater tank being simulated
+		int const HPNum,//index of heat pump coil
+		int const SpeedNum,//upper speed number
+		Real64 const SpeedRatio,//interpolation ration between upper and lower speed
+		Real64 const WaterDens,// tank water density
+		Real64 & MdotWater, // water flow rate
+		bool const FirstHVACIteration
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         B.Shen, ORNL, 12/2014
+		//       DATE WRITTEN   May 2005
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		//  set water and air flow rates driven by the variable-speed HPWH coil
+		//  calculate resultant HPWH coil output
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// Using/Aliasing
+		using DataLoopNode::Node;
+		using Fans::SimulateFanComponents;
+
+		int DXCoilAirInletNode; // Inlet air node number of DX coil
+		int HPWaterInletNode; // HP condenser water inlet node number
+		int SpeedLow; //lower speed level
+
+		SpeedLow = SpeedNum - 1;
+		if (SpeedLow < 1) SpeedLow = 1;
+
+		HPWaterInletNode = HPWaterHeater(HPNum).CondWaterInletNode;
+		DXCoilAirInletNode = HPWaterHeater(HPNum).DXCoilAirInletNode;
+
+		HPWaterHeater(HPNum).OperatingWaterFlowRate =
+			HPWaterHeater(HPNum).HPWHWaterVolFlowRate(SpeedNum)* SpeedRatio +
+			HPWaterHeater(HPNum).HPWHWaterVolFlowRate(SpeedLow)* (1.0 - SpeedRatio);
+		HPWaterHeater(HPNum).OperatingAirFlowRate =
+			HPWaterHeater(HPNum).HPWHAirVolFlowRate(SpeedNum) * SpeedRatio +
+			HPWaterHeater(HPNum).HPWHAirVolFlowRate(SpeedLow)* (1.0 - SpeedRatio);
+		MdotAir = HPWaterHeater(HPNum).HPWHAirMassFlowRate(SpeedNum) * SpeedRatio +
+			HPWaterHeater(HPNum).HPWHAirMassFlowRate(SpeedLow)* (1.0 - SpeedRatio);
+		MdotWater = HPWaterHeater(HPNum).OperatingWaterFlowRate * WaterDens;
+
+		Node(DXCoilAirInletNode).MassFlowRate = MdotAir;
+		Node(HPWaterInletNode).MassFlowRate = MdotWater;
+		WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater;
+
+		if (HPWaterHeater(HPNum).InletAirMixerNode > 0) {
+			Node(HPWaterHeater(HPNum).InletAirMixerNode).MassFlowRate = MdotAir;
+			Node(HPWaterHeater(HPNum).InletAirMixerNode).MassFlowRateMaxAvail = MdotAir;
+		} else {
+			if (HPWaterHeater(HPNum).OutsideAirNode == 0) {
+				Node(HPWaterHeater(HPNum).HeatPumpAirInletNode).MassFlowRate = MdotAir;
+				Node(HPWaterHeater(HPNum).HeatPumpAirInletNode).MassFlowRateMaxAvail = MdotAir;
+			} else {
+				Node(HPWaterHeater(HPNum).OutsideAirNode).MassFlowRate = MdotAir;
+				Node(HPWaterHeater(HPNum).OutsideAirNode).MassFlowRateMaxAvail = MdotAir;
+			}
+		}
+
+		// put fan component first, regardless placement, to calculate fan power
+		SimulateFanComponents(HPWaterHeater(HPNum).FanName,
+			FirstHVACIteration, HPWaterHeater(HPNum).FanNum);
+	}
+
+	Real64
+	PLRResidualIterSpeed(
+		Real64 const SpeedRatio, // speed ratio between two speed levels
+		Array1< Real64 > const & Par //
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         B.Shen, ORNL, 12/2014
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		//  Calculates residual function (desired tank temp - actual tank temp), when iterating speed ration between two speed levels
+		//  HP water heater output depends on the speed ratio which is being varied to zero the residual.
+
+		// METHODOLOGY EMPLOYED:
+		//  Calls residuals to get tank temperature at the given speed ratio between a lower and an upper speed levels
+		//  and calculates the residual as defined respectively for MixedWaterHeater or StratifiedWaterHeater
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// Using/Aliasing
+		using DataLoopNode::Node;
+		using VariableSpeedCoils::SimVariableSpeedCoils;
+		using DataHVACGlobals::CycFanCycCoil;
+
+		int WaterThermalTankNum; // index of water heater
+		Real64 NewTankTemp; // resulting tank temperature [C]
+		int SpeedNum;
+		int HPNum;
+		Real64 MdotWater(0);
+		Real64 RhoWater;
+		int HPWaterInletNode;
+		int HPWaterOutletNode;
+		Real64 CondenserDeltaT;
+		Real64 PLRResidualIterSpeed;
+		bool FirstHVACIteration; // FirstHVACIteration flag
+		Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); //place holder to calling variable-speed coil function
+
+		WaterThermalTankNum = int( Par(1) );
+		HPNum = int( Par(2) );
+		SpeedNum = int( Par(3) );
+		HPWaterInletNode = int( Par(4) );
+		HPWaterOutletNode = int( Par(5) );
+		RhoWater = Par(6);
+		WaterThermalTank(WaterThermalTankNum).Mode = int( Par(8) );
+		// FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
+		FirstHVACIteration = ( Par(9) == 1.0 );
+
+		HPPartLoadRatio = 1.0;
+		SetVSHPWHFlowRates(WaterThermalTankNum, HPNum, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+		SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, HPWaterHeater(HPNum).DXCoilNum,
+			CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+
+		CondenserDeltaT = Node(HPWaterOutletNode).Temp - Node(HPWaterInletNode).Temp;
+
+		//           move the full load outlet temperature rate to the water heater structure variables
+		//           (water heaters source inlet node temperature/mdot are set in Init, set it here after CalcHPWHDXCoil has been called)
+		WaterThermalTank(WaterThermalTankNum).SourceInletTemp = Node(HPWaterInletNode).Temp + CondenserDeltaT;
+		//				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
+
+		//           this CALL does not update node temps, must use WaterThermalTank variables
+		// select tank type
+		{ auto const SELECT_CASE_var1(HPWaterHeater(HPNum).TankTypeNum);
+		if (SELECT_CASE_var1 == MixedWaterHeater) {
+			CalcWaterThermalTankMixed(WaterThermalTankNum);
+			NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+		} else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
+			CalcWaterThermalTankStratified(WaterThermalTankNum);
+			NewTankTemp = FindStratifiedTankSensedTemp(WaterThermalTankNum, HPWaterHeater(HPNum).ControlSensorLocation);
+		}}
+
+		PLRResidualIterSpeed = Par(7) - NewTankTemp;
+		return PLRResidualIterSpeed;
+	}
+
 	Real64
 	PLRResidualMixedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
+		Array1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -7278,7 +7761,7 @@ namespace WaterThermalTanks {
 	Real64
 	PLRResidualStratifiedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
+		Array1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -7869,11 +8352,11 @@ namespace WaterThermalTanks {
 							}
 						}
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 								"Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
 						}
 						if ( PlantFirstSizesOkayToReport ) {
-							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 								"Initial Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
 						}
 						if ( PlantFirstSizesOkayToFinalize ) {
@@ -7924,11 +8407,11 @@ namespace WaterThermalTanks {
 							}
 						}
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 								"Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
 						}
 						if ( PlantFirstSizesOkayToReport ) {
-							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 								"Initial Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
 						}
 						if ( PlantFirstSizesOkayToFinalize ) {
@@ -8035,7 +8518,6 @@ namespace WaterThermalTanks {
 		// local inits
 		Tstart = 14.44;
 		Tfinish = 57.22;
-
 
 		tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Volume;
 		tmpMaxCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
@@ -8182,22 +8664,22 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 			}
 			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 			}
@@ -8218,22 +8700,22 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 			}
 			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 			}
@@ -8253,22 +8735,22 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 			}
 			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 			}
@@ -8286,22 +8768,22 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 			}
 			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 			}
@@ -8314,11 +8796,11 @@ namespace WaterThermalTanks {
 			if ( ( WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( ! WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) ) {
 				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * pow_2( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) / Pi, 0.3333333333333333 );
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
 				}
 				// check if autocalculate Use outlet and source inlet are still set to autosize by earlier
@@ -8402,12 +8884,12 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankDrawTime * WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * SecInHour; // hours | m3/s | (3600 s/1 hour)
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
-				if ( PlantFinalSizesOkayToReport ){
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
-				if ( PlantFirstSizesOkayToReport ){
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 			}
@@ -8429,11 +8911,11 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 			}
@@ -8449,37 +8931,37 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
 			}
 			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 			}
 		}}
 
 		if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantFirstSizesOkayToFinalize ) { // might set height
-			if ( ( WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) 
+			if ( ( WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized )
 					&& ( ! WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) ) {
 				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * pow_2( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) / Pi, 0.3333333333333333 );
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 						"Initial Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
 				}
 			}
@@ -8612,11 +9094,11 @@ namespace WaterThermalTanks {
 							ErrorsFound = true;
 						}
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 								"Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
 						}
 						if ( PlantFirstSizesOkayToReport ) {
-							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 								"Initial Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
 						}
 						if ( PlantFirstSizesOkayToFinalize ) {
@@ -8683,11 +9165,11 @@ namespace WaterThermalTanks {
 							ErrorsFound = true;
 						}
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 								"Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
 						}
 						if ( PlantFirstSizesOkayToReport ) {
-							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name,
 								"Initial Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
 						}
 						if ( PlantFirstSizesOkayToFinalize ) {
@@ -9187,6 +9669,11 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::CycFanCycCoil;
 		using namespace OutputReportPredefined;
 		using General::TrimSigDigits;
+		using InputProcessor::SameString;
+		using VariableSpeedCoils::SimVariableSpeedCoils;
+		using VariableSpeedCoils::VarSpeedCoil;
+		using VariableSpeedCoils::VSHPWHHeatingCapacity;
+		using VariableSpeedCoils::VSHPWHHeatingCOP;
 
 		// Locals
 		Real64 MdotAir; // air mass flow rate through HP water heater evaporator (kg/s)
@@ -9213,6 +9700,9 @@ namespace WaterThermalTanks {
 		bool FirstTimeFlag; // used during HPWH rating procedure
 		std::string equipName;
 		static bool MyOneTimeSetupFlag( true ); // one time setup flag
+		Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); //place holder to calling vs HPWH function
+		bool bIsVSCoil(false); // variable-speed HPWH identifier
+		Real64 RhoWater; //water density
 
 		// Formats
 		static gio::Fmt Format_720( "('Water Heater Information',6(',',A))" );
@@ -9316,19 +9806,59 @@ namespace WaterThermalTanks {
 
 					HPWHCrankcaseDBTemp = WaterThermalTank( WaterThermalTankNum ).AmbientTemp;
 
-					//       simulate the HPWH coil/fan to find heating capacity
-					if ( HPWaterHeater( HPNum ).FanPlacement == BlowThru ) {
-						SimulateFanComponents( HPWaterHeater( HPNum ).FanName, true, HPWaterHeater( HPNum ).FanNum );
-						//         CALL SimDXCoil(HPWaterHeater(HPNum)%DXCoilName, CompOp,  .TRUE.,PartLoadRatio, HPWaterHeater(HPNum)%DXCoilNum,FanOpMode)
-						SimDXCoil( HPWaterHeater( HPNum ).DXCoilName, 1, true, HPWaterHeater( HPNum ).DXCoilNum, CycFanCycCoil, 1.0 );
-						SimulateFanComponents( HPWaterHeater( HPNum ).FanName, true, HPWaterHeater( HPNum ).FanNum );
-						SimDXCoil( HPWaterHeater( HPNum ).DXCoilName, 1, true, HPWaterHeater( HPNum ).DXCoilNum, CycFanCycCoil, 1.0 );
+					if (SameString(HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed")) {
+						bIsVSCoil = true;
+						RhoWater = RhoH2O(WaterThermalTank(WaterThermalTankNum).TankTemp);
+						SetVSHPWHFlowRates(WaterThermalTankNum, HPNum,
+							VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0,
+							RhoWater, MdotWater, true);
+						//       simulate the HPWH coil/fan to find heating capacity
+						if (HPWaterHeater(HPNum).FanPlacement == BlowThru) {
+							//   simulate fan and DX coil twice
+							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+							SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, HPWaterHeater(HPNum).DXCoilNum,
+								CycFanCycCoil, EMP1, EMP2, EMP3, 1, 1.0,
+								VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, 0.0, 0.0, 1.0);
+							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+							SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, HPWaterHeater(HPNum).DXCoilNum,
+								CycFanCycCoil, EMP1, EMP2, EMP3, 1, 1.0,
+								VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, 0.0, 0.0, 1.0);
+						} else {
+							//   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
+							SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, HPWaterHeater(HPNum).DXCoilNum,
+								CycFanCycCoil, EMP1, EMP2, EMP3, 1, 1.0,
+								VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, 0.0, 0.0, 1.0);
+							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+							SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName, HPWaterHeater(HPNum).DXCoilNum,
+								CycFanCycCoil, EMP1, EMP2, EMP3, 1, 1.0,
+								VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, 0.0, 0.0, 1.0);
+							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+						}
+
+						WaterThermalTank(WaterThermalTankNum).MaxCapacity = VSHPWHHeatingCapacity;
+						WaterThermalTank(WaterThermalTankNum).MinCapacity = VSHPWHHeatingCapacity;
+						WaterThermalTank(WaterThermalTankNum).Efficiency = VSHPWHHeatingCOP;
 					} else {
-						SimDXCoil( HPWaterHeater( HPNum ).DXCoilName, 1, true, HPWaterHeater( HPNum ).DXCoilNum, CycFanCycCoil, 1.0 );
-						SimulateFanComponents( HPWaterHeater( HPNum ).FanName, true, HPWaterHeater( HPNum ).FanNum );
-						SimDXCoil( HPWaterHeater( HPNum ).DXCoilName, 1, true, HPWaterHeater( HPNum ).DXCoilNum, CycFanCycCoil, 1.0 );
-						SimulateFanComponents( HPWaterHeater( HPNum ).FanName, true, HPWaterHeater( HPNum ).FanNum );
+						bIsVSCoil = false;
+						//       simulate the HPWH coil/fan to find heating capacity
+						if (HPWaterHeater(HPNum).FanPlacement == BlowThru) {
+							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+							//         CALL SimDXCoil(HPWaterHeater(HPNum)%DXCoilName, CompOp,  .TRUE.,PartLoadRatio, HPWaterHeater(HPNum)%DXCoilNum,FanOpMode)
+							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
+							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
+						} else {
+							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
+							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
+							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+						}
+
+						WaterThermalTank(WaterThermalTankNum).MaxCapacity = HPWHHeatingCapacity;
+						WaterThermalTank(WaterThermalTankNum).MinCapacity = HPWHHeatingCapacity;
+						WaterThermalTank(WaterThermalTankNum).Efficiency = HPWHHeatingCOP;
 					}
+
 
 					if ( FirstTimeFlag ) {
 						RatedDXCoilTotalCapacity = DXCoilTotalCapacity;
@@ -9338,9 +9868,9 @@ namespace WaterThermalTanks {
 					//       Switch the HPWH info with the tank info and call CalcWaterThermalTankMixed to get Standard Rating
 					//       (backup element is assumed to be disabled during the rating procedure)
 					WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = 0.0;
-					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = HPWHHeatingCapacity;
-					WaterThermalTank( WaterThermalTankNum ).MinCapacity = HPWHHeatingCapacity;
-					WaterThermalTank( WaterThermalTankNum ).Efficiency = HPWHHeatingCOP; //* WaterHeater(WaterHeaterNum)%Efficiency
+					//WaterThermalTank( WaterThermalTankNum ).MaxCapacity = HPWHHeatingCapacity;
+					//WaterThermalTank( WaterThermalTankNum ).MinCapacity = HPWHHeatingCapacity;
+					//WaterThermalTank( WaterThermalTankNum ).Efficiency = HPWHHeatingCOP; //* WaterHeater(WaterHeaterNum)%Efficiency
 					WaterThermalTank( WaterThermalTankNum ).OnCycParaLoad = HPWaterHeater( HPNum ).OnCycParaLoad;
 					WaterThermalTank( WaterThermalTankNum ).OffCycParaLoad = HPWaterHeater( HPNum ).OffCycParaLoad;
 					WaterThermalTank( WaterThermalTankNum ).OffCycParaFracToTank = 0.0;
@@ -9414,7 +9944,11 @@ namespace WaterThermalTanks {
 			equipName = HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name;
 			PreDefTableEntry( pdchSWHType, equipName, HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Type );
 			PreDefTableEntry( pdchSWHVol, equipName, WaterThermalTank( WaterThermalTankNum ).Volume );
-			PreDefTableEntry( pdchSWHHeatIn, equipName, HPWHHeatingCapacity );
+			if ( bIsVSCoil ) {
+				PreDefTableEntry( pdchSWHHeatIn, equipName, VSHPWHHeatingCapacity );
+			} else {
+				PreDefTableEntry( pdchSWHHeatIn, equipName, HPWHHeatingCapacity );
+			}
 			PreDefTableEntry( pdchSWHThEff, equipName, WaterThermalTank( WaterThermalTankNum ).Efficiency );
 			PreDefTableEntry( pdchSWHRecEff, equipName, RecoveryEfficiency );
 			PreDefTableEntry( pdchSWHEnFac, equipName, EnergyFactor );
@@ -9478,7 +10012,7 @@ namespace WaterThermalTanks {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeSetupFlag( true ); // one time setup flag
-		static FArray1D_bool AlreadyReported; // control so we don't repeat again
+		static Array1D_bool AlreadyReported; // control so we don't repeat again
 
 		// Formats
 		static gio::Fmt Format_728( "('Chilled Water Tank Information',5(',',A))" );
@@ -9565,7 +10099,7 @@ namespace WaterThermalTanks {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -9,12 +9,14 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/CArray.fwd.hh>
+#include <ObjexxFCL/noexcept.hh>
+#include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -22,6 +24,9 @@
 #include <cmath>
 #include <cstddef>
 #include <initializer_list>
+#include <iomanip>
+#include <istream>
+#include <ostream>
 #include <type_traits>
 #include <utility>
 
@@ -37,6 +42,8 @@ private: // Friend
 	template< typename > friend class CArray; // Friendship across value types
 
 public: // Types
+
+	typedef  TypeTraits< T >  Traits;
 
 	// STL Style
 	typedef  T  value_type;
@@ -68,7 +75,7 @@ public: // Creation
 	// Default Constructor
 	inline
 	CArray() :
-	 size_( 0 ),
+	 size_( 0u ),
 	 data_( nullptr )
 	{}
 
@@ -81,6 +88,16 @@ public: // Creation
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = a.data_[ i ];
 		}
+	}
+
+	// Move Constructor
+	inline
+	CArray( CArray && a ) NOEXCEPT :
+	 size_( a.size_ ),
+	 data_( a.data_ )
+	{
+		a.size_ = 0u;
+		a.data_ = nullptr;
 	}
 
 	// Copy Constructor Template
@@ -191,6 +208,20 @@ public: // Conversion
 		return ( data_ != nullptr );
 	}
 
+	// Data
+	inline
+	operator T const *() const
+	{
+		return data_;
+	}
+
+	// Data
+	inline
+	operator T *()
+	{
+		return data_;
+	}
+
 public: // Assignment
 
 	// Copy Assignment
@@ -207,6 +238,19 @@ public: // Assignment
 				data_[ i ] = a.data_[ i ];
 			}
 		}
+		return *this;
+	}
+
+	// Move Assignment
+	inline
+	CArray &
+	operator =( CArray && a ) NOEXCEPT
+	{
+		assert( this != &a );
+		size_ = a.size_;
+		delete[] data_; data_ = a.data_;
+		a.size_ = 0u;
+		a.data_ = nullptr;
 		return *this;
 	}
 
@@ -438,6 +482,22 @@ public: // Inspector
 		return size_;
 	}
 
+	// Lower Index
+	inline
+	size_type
+	l() const
+	{
+		return 0u;
+	}
+
+	// Upper index
+	inline
+	size_type
+	u() const
+	{
+		return size_ - 1u; // npos if size_ == 0
+	}
+
 	// First Element
 	inline
 	T const &
@@ -570,24 +630,6 @@ public: // Modifier
 
 public: // Subscript
 
-	// CArray[ i ] const: 0-Based Indexing
-	inline
-	T const &
-	operator []( size_type const i ) const
-	{
-		assert( i < size_ );
-		return data_[ i ];
-	}
-
-	// CArray[ i ]: 0-Based Indexing
-	inline
-	T &
-	operator []( size_type const i )
-	{
-		assert( i < size_ );
-		return data_[ i ];
-	}
-
 	// CArray( i ) const: 1-Based Indexing
 	inline
 	T const &
@@ -644,7 +686,7 @@ public: // Array Accessor
 
 	// C Array const Accessor
 	inline
-	T const &
+	T const *
 	operator ()() const
 	{
 		return data_;
@@ -652,7 +694,7 @@ public: // Array Accessor
 
 	// C Array Non-const Accessor
 	inline
-	T &
+	T *
 	operator ()()
 	{
 		return data_;
@@ -661,7 +703,6 @@ public: // Array Accessor
 private: // Data
 
 	size_type size_; // Number of array elements
-
 	T * data_; // C array
 
 }; // CArray
@@ -1118,6 +1159,46 @@ operator /( CArray< T > const & a, T const & t )
 	CArray< T > r( a );
 	r /= t;
 	return r;
+}
+
+// Stream >> CArray
+template< typename T >
+inline
+std::istream &
+operator >>( std::istream & stream, CArray< T > & a )
+{
+	typedef  typename CArray< T >::size_type  size_type;
+	if ( stream && ( ! a.emtpy() ) ) {
+		for ( size_type i = 0, e = a.size(); i < e; ++i ) {
+			stream >> a[ i ];
+			if ( ! stream ) break;
+		}
+	}
+	return stream;
+}
+
+// Stream << CArray
+template< typename T >
+inline
+std::ostream &
+operator <<( std::ostream & stream, CArray< T > const & a )
+{
+	using std::setw;
+	typedef  TypeTraits< T >  Traits;
+	typedef  typename CArray< T >::size_type  size_type;
+	if ( stream && ( ! a.emtpy() ) ) {
+		std::ios_base::fmtflags const old_flags( stream.flags() );
+		std::streamsize const old_precision( stream.precision( Traits::precision ) );
+		stream << std::right << std::showpoint << std::uppercase;
+		size_type const e( a.size() - 1 );
+		int const w( Traits::iwidth );
+		for ( size_type i = 0; i < e; ++i ) {
+			stream << setw( w ) << a[ i ] << ' ';
+		} stream << setw( w ) << a[ e ];
+		stream.precision( old_precision );
+		stream.flags( old_flags );
+	}
+	return stream;
 }
 
 } // ObjexxFCL

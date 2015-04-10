@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -110,12 +110,12 @@ namespace PackagedThermalStorageCoil {
 	// MODULE VARIABLE DECLARATIONS:
 
 	int NumTESCoils;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool GetTESInputFlag( true );
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Object Data
-	FArray1D< PackagedTESCoolingCoilStruct > TESCoil;
+	Array1D< PackagedTESCoolingCoilStruct > TESCoil;
 
 	// Functions
 
@@ -1683,10 +1683,10 @@ namespace PackagedThermalStorageCoil {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyFlag; // One time environment flag
-		static FArray1D_bool MySizeFlag; // One time sizing flag
-		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
-		static FArray1D_bool MyWarmupFlag; // flag for init after warmup complete
+		static Array1D_bool MyFlag; // One time environment flag
+		static Array1D_bool MySizeFlag; // One time sizing flag
+		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
 		static bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 		bool errFlag;
 		int plloopnum;

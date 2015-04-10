@@ -2,7 +2,7 @@
 #define HVACControllers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -41,7 +41,7 @@ namespace HVACControllers {
 	extern int const CoilType_Cooling;
 	extern int const CoilType_Heating;
 
-	extern FArray1D_string const ControlVariableTypes;
+	extern Array1D_string const ControlVariableTypes;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -56,7 +56,7 @@ namespace HVACControllers {
 	extern int NumAirLoopStats; // Same size as NumPrimaryAirSys if controllers
 	// are defined, 0 otherwise.
 	// all controllers per air loop
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// Flag set to make sure you get input once
 	extern bool GetControllerInputFlag;
@@ -143,7 +143,7 @@ namespace HVACControllers {
 		// Array of solution trackers. Saved at last call to SimAirLoop() in ManageControllers(iControllerOpEnd)
 		// The first tracker is used to track the solution when FirstHVACIteration is TRUE.
 		// The second tracker is used to track the solution at FirstHVACIteration is FALSE.
-		FArray1D< SolutionTrackerType > SolutionTrackers;
+		Array1D< SolutionTrackerType > SolutionTrackers;
 		// --------------------
 		// Operational limits at min/max avail values for actuated variable and the corresponding sensed values
 		// --------------------
@@ -250,7 +250,7 @@ namespace HVACControllers {
 			bool const DoWarmRestartFlag,
 			bool const ReuseIntermediateSolutionFlag,
 			bool const ReusePreviousSolutionFlag,
-			FArray1< SolutionTrackerType > const & SolutionTrackers,
+			Array1< SolutionTrackerType > const & SolutionTrackers,
 			Real64 const MaxAvailActuated, // kg/s, The maximum actuated variable currently available.
 			Real64 const MaxAvailSensed, // Sensed value at maximum available actuated variable
 			Real64 const MinAvailActuated, // kg/s, The minimum actuated variable currently available.
@@ -328,9 +328,9 @@ namespace HVACControllers {
 	struct ControllerStatsType
 	{
 		// Members
-		FArray1D_int NumCalls; // Number of times this controller operated in each mode
-		FArray1D_int TotIterations; // Total number of iterations required to solve this controller
-		FArray1D_int MaxIterations; // Maximum number of iterations required to solve this controller
+		Array1D_int NumCalls; // Number of times this controller operated in each mode
+		Array1D_int TotIterations; // Total number of iterations required to solve this controller
+		Array1D_int MaxIterations; // Maximum number of iterations required to solve this controller
 
 		// Default Constructor
 		ControllerStatsType() :
@@ -341,9 +341,9 @@ namespace HVACControllers {
 
 		// Member Constructor
 		ControllerStatsType(
-			FArray1_int const & NumCalls, // Number of times this controller operated in each mode
-			FArray1_int const & TotIterations, // Total number of iterations required to solve this controller
-			FArray1_int const & MaxIterations // Maximum number of iterations required to solve this controller
+			Array1_int const & NumCalls, // Number of times this controller operated in each mode
+			Array1_int const & TotIterations, // Total number of iterations required to solve this controller
+			Array1_int const & MaxIterations // Maximum number of iterations required to solve this controller
 		) :
 			NumCalls( {iFirstMode,iLastMode}, NumCalls ),
 			TotIterations( {iFirstMode,iLastMode}, TotIterations ),
@@ -365,7 +365,7 @@ namespace HVACControllers {
 		int MaxSimAirLoopComponents; // Maximum number of times the SimAirLoopComponents() routine has been invoked
 		int TotIterations; // Total number of iterations required to solve the controllers on this air loop
 		int MaxIterations; // Maximum number of iterations required to solve the controllers on this air loop
-		FArray1D< ControllerStatsType > ControllerStats; // Array of statistics for each controller
+		Array1D< ControllerStatsType > ControllerStats; // Array of statistics for each controller
 		// on this air loop
 
 		// Default Constructor
@@ -391,7 +391,7 @@ namespace HVACControllers {
 			int const MaxSimAirLoopComponents, // Maximum number of times the SimAirLoopComponents() routine has been invoked
 			int const TotIterations, // Total number of iterations required to solve the controllers on this air loop
 			int const MaxIterations, // Maximum number of iterations required to solve the controllers on this air loop
-			FArray1< ControllerStatsType > const & ControllerStats // Array of statistics for each controller
+			Array1< ControllerStatsType > const & ControllerStats // Array of statistics for each controller
 		) :
 			TraceFileUnit( TraceFileUnit ),
 			FirstTraceFlag( FirstTraceFlag ),
@@ -408,9 +408,9 @@ namespace HVACControllers {
 	};
 
 	// Object Data
-	extern FArray1D< ControllerPropsType > ControllerProps;
-	extern FArray1D< RootFinderDataType > RootFinders;
-	extern FArray1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
+	extern Array1D< ControllerPropsType > ControllerProps;
+	extern Array1D< RootFinderDataType > RootFinders;
+	extern Array1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
 
 	// Functions
 

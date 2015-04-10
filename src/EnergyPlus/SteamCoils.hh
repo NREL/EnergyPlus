@@ -2,7 +2,7 @@
 #define SteamCoils_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -27,9 +27,9 @@ namespace SteamCoils {
 	// MODULE VARIABLE DECLARATIONS:
 	extern int SteamIndex;
 	extern int NumSteamCoils; // The Number of SteamCoils found in the Input
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CoilWarningOnceFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CoilWarningOnceFlag;
+	extern Array1D_bool CheckEquipName;
 	extern bool GetSteamCoilsInputFlag; // Flag set to make sure you get input once
 
 	// Subroutine Specifications for the Module
@@ -274,7 +274,7 @@ namespace SteamCoils {
 	};
 
 	// Object Data
-	extern FArray1D< SteamCoilEquipConditions > SteamCoil;
+	extern Array1D< SteamCoilEquipConditions > SteamCoil;
 
 	// Functions
 

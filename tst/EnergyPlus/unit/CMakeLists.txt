@@ -21,7 +21,9 @@ set( test_src
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
   ManageElectricPower.unit.cc
+  HVACUnitarySystem.unit.cc
   MixedAir.unit.cc
+  MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
@@ -34,6 +36,7 @@ set( test_src
   SQLite.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc

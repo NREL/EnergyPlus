@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -143,7 +143,7 @@ namespace DXCoils {
 	int const WaterSupplyFromTank( 102 );
 
 	int const NumValidOutputFuelTypes( 9 );
-	FArray1D_string const cValidOutputFuelTypes( NumValidOutputFuelTypes, { "Electricity", "Gas", "Propane", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2" } );
+	Array1D_string const cValidOutputFuelTypes( NumValidOutputFuelTypes, { "Electricity", "Gas", "Propane", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2" } );
 
 	static std::string const BlankString;
 
@@ -161,17 +161,17 @@ namespace DXCoils {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D< Real64 > DXCoilOutletTemp; // DX coil outlet dry bulb temperature [C]
-	FArray1D< Real64 > DXCoilOutletHumRat; // DX coil outlet humidity ratio [kgWater/kgDryAir]
-	FArray1D< Real64 > DXCoilPartLoadRatio; // DX coil part-load ratio
-	FArray1D_int DXCoilFanOpMode; // supply air fan operating mode
-	FArray1D< Real64 > DXCoilFullLoadOutAirTemp; // DX coil full load outlet dry bulb temperature [C]
-	FArray1D< Real64 > DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
-	FArray1D< Real64 > DXCoilTotalCooling; // DX cooling coil total cooling output [W]
-	FArray1D< Real64 > DXCoilTotalHeating; // DX heating coil total heating output [W]
-	FArray1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
-	FArray1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
-	FArray1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
+	Array1D< Real64 > DXCoilOutletTemp; // DX coil outlet dry bulb temperature [C]
+	Array1D< Real64 > DXCoilOutletHumRat; // DX coil outlet humidity ratio [kgWater/kgDryAir]
+	Array1D< Real64 > DXCoilPartLoadRatio; // DX coil part-load ratio
+	Array1D_int DXCoilFanOpMode; // supply air fan operating mode
+	Array1D< Real64 > DXCoilFullLoadOutAirTemp; // DX coil full load outlet dry bulb temperature [C]
+	Array1D< Real64 > DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
+	Array1D< Real64 > DXCoilTotalCooling; // DX cooling coil total cooling output [W]
+	Array1D< Real64 > DXCoilTotalHeating; // DX heating coil total heating output [W]
+	Array1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
+	Array1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
+	Array1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
 	int CurDXCoilNum( 0 );
 
 	int NumDXCoils( 0 ); // Total number of DX coils
@@ -188,7 +188,7 @@ namespace DXCoils {
 
 	int NumDXMulSpeedCoolCoils( 0 ); // number of multispeed DX cooling coils
 	int NumDXMulSpeedHeatCoils( 0 ); // number of multispeed DX heating coils
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -205,8 +205,8 @@ namespace DXCoils {
 	// External function calls
 
 	// Object Data
-	FArray1D< DXCoilData > DXCoil;
-	FArray1D< DXCoilNumericFieldData > DXCoilNumericFields;
+	Array1D< DXCoilData > DXCoil;
+	Array1D< DXCoilNumericFieldData > DXCoilNumericFields;
 
 	// Functions
 
@@ -877,12 +877,12 @@ namespace DXCoils {
 		int DXCoilNum; // current DX coil number
 		int NumAlphas; // Number of alphas in input
 		int NumNumbers; // Number of numeric items in input
-		FArray1D_string Alphas2; // Alpha input items for object
-		FArray1D< Real64 > Numbers2; // Numeric input items for object
-		FArray1D_string cAlphaFields2; // Alpha field names
-		FArray1D_string cNumericFields2; // Numeric field names
-		FArray1D_bool lAlphaBlanks2; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks2; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas2; // Alpha input items for object
+		Array1D< Real64 > Numbers2; // Numeric input items for object
+		Array1D_string cAlphaFields2; // Alpha field names
+		Array1D_string cNumericFields2; // Numeric field names
+		Array1D_bool lAlphaBlanks2; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks2; // Logical array, numeric field input BLANK = .TRUE.
 		int NumAlphas2; // Number of alphas in input for performance object
 		int NumNumbers2; // Number of numeric items in input for performance object
 		int IOStatus; // Input status returned from GetObjectItem
@@ -908,12 +908,12 @@ namespace DXCoils {
 		Real64 HeatCOPFWaterFlow; // Used to verify HPWH DX coil heating COP (function of water flow) performance curve
 		int I; // Index of speeds
 		Real64 CurveVal; // Used to verify modifier curves equal 1 at rated conditions
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNumbers( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -4802,8 +4802,8 @@ namespace DXCoils {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag; // One time environment flag
-		static FArray1D_bool MySizeFlag; // One time sizing flag
+		static Array1D_bool MyEnvrnFlag; // One time environment flag
+		static Array1D_bool MySizeFlag; // One time sizing flag
 		static bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 		static bool CrankcaseHeaterReportVarFlag( true ); // One time flag used to report crankcase heater power for non-HP coils
 		Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
@@ -4840,7 +4840,7 @@ namespace DXCoils {
 
 			RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) / DXCoil( DXCoilNum ).RatedTotCap2;
 			if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - RatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) || ( ( RatedVolFlowPerRatedTotCap - MaxHeatVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
-				ShowSevereError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Rated air volume flow rate per watt of rated total water heating capacity is out of range." );
+				ShowSevereError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Rated air volume flow rate per watt of rated total water heating capacity is out of range" );
 				ShowContinueError( "Min Rated Vol Flow Per Watt=[" + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "], Rated Vol Flow Per Watt=[" + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) + "], Max Rated Vol Flow Per Watt=[" + TrimSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "]. See Input-Output Reference Manual for valid range." );
 			}
 			HPInletAirHumRat = PsyWFnTdbTwbPb( DXCoil( DXCoilNum ).RatedInletDBTemp, DXCoil( DXCoilNum ).RatedInletWBTemp, StdBaroPress, RoutineName );
@@ -9850,6 +9850,19 @@ Label50: ;
 		AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 		AirMassFlowRatioLS = MSHPMassFlowRateLow / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS );
 		AirMassFlowRatioHS = MSHPMassFlowRateHigh / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumHS );
+		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( ( MSHPMassFlowRateLow == 0.0 ) || ( MSHPMassFlowRateHigh == 0.0 ) ) ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
+			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "AirMassFlow = " + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio = " + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow = " + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh = " + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
+			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "CycRatio=" + RoundSigDigits( CycRatio, 1 ) + ", SpeedRatio = " + RoundSigDigits( SpeedRatio, 1 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		}
 
 		DXCoil( DXCoilNum ).PartLoadRatio = 0.0;
 		HeatReclaimDXCoil( DXCoilNum ).AvailCapacity = 0.0;
@@ -9888,11 +9901,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 500 cfm/ton) at high speed
@@ -9904,11 +9917,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Adjust high speed coil bypass factor for actual maximum air flow rate.
@@ -10114,11 +10127,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				if ( DXCoil( DXCoilNum ).CondenserType( SpeedNumLS ) == EvapCooled ) {
@@ -10464,6 +10477,19 @@ Label50: ;
 		AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 		AirMassFlowRatioLS = MSHPMassFlowRateLow / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS );
 		AirMassFlowRatioHS = MSHPMassFlowRateHigh / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumHS );
+		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( ( MSHPMassFlowRateLow == 0.0 ) || ( MSHPMassFlowRateHigh == 0.0 ) ) ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
+			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
+			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "CycRatio=" + RoundSigDigits( CycRatio, 1 ) + ", SpeedRatio = " + RoundSigDigits( SpeedRatio, 1 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		}
 
 		AirFlowRatio = 1.0;
 		if ( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil == 0 ) MSHPWasteHeat = 0.0;
@@ -10528,11 +10554,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton) at high speed
@@ -10544,11 +10570,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Get total capacity modifying factor (function of temperature) for off-rated conditions
@@ -10744,7 +10770,7 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).ErrIndex1 == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed 1." );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
@@ -10832,7 +10858,7 @@ Label50: ;
 				// Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
 				// Model was extended to accept bi-quadratic curves. This allows sensitivity of the EIR
 				// to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
-				// advised to use the bi-quaratic curve if sufficient manufacturer data is available.
+				// advised to use the bi-quadratic curve if sufficient manufacturer data is available.
 				if ( ( DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( 1 ) == Quadratic ) || ( DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( 1 ) == Cubic ) ) {
 					EIRTempModFac = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( 1 ), OutdoorDryBulb );
 				} else if ( DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( 1 ) == BiQuadratic ) {
@@ -11187,8 +11213,8 @@ Label50: ;
 		Real64 const CoolingCoilInletAirWetBulbTempRated( 19.4 ); // 19.44C (67F)
 		Real64 const CoolingCoilInletAirDryBulbTempRated( 26.7 );
 		Real64 const OutdoorUnitInletAirDryBulbTempRated( 35.0 ); // 35.00C (95F)
-		static FArray1D< Real64 > const OutdoorUnitInletAirDryBulbTempPLTestPoint( 3, { 27.5, 20.0, 18.3 } );
-		static FArray1D< Real64 > const NetCapacityFactorPLTestPoint( 3, { 0.75, 0.50, 0.25 } );
+		static Array1D< Real64 > const OutdoorUnitInletAirDryBulbTempPLTestPoint( 3, { 27.5, 20.0, 18.3 } );
+		static Array1D< Real64 > const NetCapacityFactorPLTestPoint( 3, { 0.75, 0.50, 0.25 } );
 		Real64 const ConvFromSIToIP( 3.412141633 ); // Conversion from SI to IP [3.412 Btu/hr-W]
 
 		Real64 const AirMassFlowRatioRated( 1.0 ); // AHRI test is at the design flow rate
@@ -11217,11 +11243,11 @@ Label50: ;
 		static Real64 EIRFlowModFac( 0.0 ); // EIR modifier (function of actual supply air flow vs rated flow) [-]
 		Real64 EIR;
 		Real64 TotalElecPowerRated;
-		FArray1D< Real64 > EER_TestPoint_SI( 4 ); // 1 = A, 2 = B, 3= C, 4= D
-		FArray1D< Real64 > EER_TestPoint_IP( 4 ); // 1 = A, 2 = B, 3= C, 4= D
-		FArray1D< Real64 > NetCapacity_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
-		FArray1D< Real64 > NetPower_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
-		FArray1D< Real64 > SupAirMdot_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > EER_TestPoint_SI( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > EER_TestPoint_IP( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > NetCapacity_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > NetPower_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > SupAirMdot_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
 
 		static Real64 TempDryBulb_Leaving_Apoint( 0.0 );
 
@@ -11233,7 +11259,7 @@ Label50: ;
 		static Real64 AccuracyTolerance( 0.2 ); // tolerance in AHRI 340/360 Table 6 note 1
 		static int MaximumIterations( 500 );
 		int SolverFlag;
-		FArray1D< Real64 > Par( 12 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 12 ); // Parameter array passed to solver
 		Real64 EIR_HighSpeed;
 		Real64 EIR_LowSpeed;
 		int FanInletNode;
@@ -11688,7 +11714,7 @@ Label50: ;
 	Real64
 	CalcTwoSpeedDXCoilIEERResidual(
 		Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:

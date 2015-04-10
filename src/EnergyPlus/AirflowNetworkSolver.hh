@@ -2,8 +2,8 @@
 #define AirflowNetworkSolver_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -22,46 +22,46 @@ namespace AirflowNetworkSolver {
 	extern int const NrInt; // Number of intervals for a large opening
 
 	// Common block AFEDAT
-	extern FArray1D< Real64 > AFECTL;
-	extern FArray1D< Real64 > AFLOW2;
-	extern FArray1D< Real64 > AFLOW;
-	extern FArray1D< Real64 > PS;
-	extern FArray1D< Real64 > PW;
+	extern Array1D< Real64 > AFECTL;
+	extern Array1D< Real64 > AFLOW2;
+	extern Array1D< Real64 > AFLOW;
+	extern Array1D< Real64 > PS;
+	extern Array1D< Real64 > PW;
 
 	// Common block CONTRL
 	extern Real64 PB;
 	extern int LIST;
 
 	// Common block ZONL
-	extern FArray1D< Real64 > RHOZ;
-	extern FArray1D< Real64 > SQRTDZ;
-	extern FArray1D< Real64 > VISCZ;
-	extern FArray1D< Real64 > SUMAF;
-	extern FArray1D< Real64 > TZ; // Temperature [C]
-	extern FArray1D< Real64 > WZ; // Humidity ratio [kg/kg]
-	extern FArray1D< Real64 > PZ; // Pressure [Pa]
+	extern Array1D< Real64 > RHOZ;
+	extern Array1D< Real64 > SQRTDZ;
+	extern Array1D< Real64 > VISCZ;
+	extern Array1D< Real64 > SUMAF;
+	extern Array1D< Real64 > TZ; // Temperature [C]
+	extern Array1D< Real64 > WZ; // Humidity ratio [kg/kg]
+	extern Array1D< Real64 > PZ; // Pressure [Pa]
 
 	// Other array variables
-	extern FArray1D_int ID;
-	extern FArray1D_int IK;
-	extern FArray1D< Real64 > AD;
-	extern FArray1D< Real64 > AU;
+	extern Array1D_int ID;
+	extern Array1D_int IK;
+	extern Array1D< Real64 > AD;
+	extern Array1D< Real64 > AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-	extern FArray1D_int newIK; // noel
-	extern FArray1D< Real64 > newAU; // noel
+	extern Array1D_int newIK; // noel
+	extern Array1D< Real64 > newAU; // noel
 #endif
 
 	//REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-	extern FArray1D< Real64 > SUMF;
+	extern Array1D< Real64 > SUMF;
 	extern int Unit11;
 	extern int Unit21;
 
 	// Large opening variables
-	extern FArray1D< Real64 > DpProf; // Differential pressure profile for Large Openings [Pa]
-	extern FArray1D< Real64 > RhoProfF; // Density profile in FROM zone [kg/m3]
-	extern FArray1D< Real64 > RhoProfT; // Density profile in TO zone [kg/m3]
-	extern FArray2D< Real64 > DpL; // Array of stack pressures in link
+	extern Array1D< Real64 > DpProf; // Differential pressure profile for Large Openings [Pa]
+	extern Array1D< Real64 > RhoProfF; // Density profile in FROM zone [kg/m3]
+	extern Array1D< Real64 > RhoProfT; // Density profile in TO zone [kg/m3]
+	extern Array2D< Real64 > DpL; // Array of stack pressures in link
 
 	// Functions
 
@@ -79,9 +79,9 @@ namespace AirflowNetworkSolver {
 
 	void
 	SOLVZP(
-		FArray1A_int IK, // pointer to the top of column/row "K"
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A_int IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
 		int & ITER // number of iterations
 	);
 
@@ -99,8 +99,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -112,8 +112,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -125,8 +125,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -138,8 +138,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -151,8 +151,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -164,8 +164,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -179,8 +179,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -194,8 +194,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -207,8 +207,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -220,8 +220,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -233,8 +233,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -246,8 +246,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -259,8 +259,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -272,8 +272,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -285,8 +285,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -298,8 +298,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -311,46 +311,46 @@ namespace AirflowNetworkSolver {
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
 	void
 	FACSKY(
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > AL, // the lower triangle of [A] before and after factoring
-		FArray1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > AL, // the lower triangle of [A] before and after factoring
+		Array1A_int const IK, // pointer to the top of column/row "K"
 		int const NEQ, // number of equations
 		int const NSYM // symmetry:  0 = symmetric matrix, 1 = non-symmetric
 	);
 
 	void
 	SLVSKY(
-		FArray1A< Real64 > const AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > const AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > const AL, // the lower triangle of [A] before and after factoring
-		FArray1A< Real64 > B, // "B" vector (input); "X" vector (output).
-		FArray1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > const AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > const AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > const AL, // the lower triangle of [A] before and after factoring
+		Array1A< Real64 > B, // "B" vector (input); "X" vector (output).
+		Array1A_int const IK, // pointer to the top of column/row "K"
 		int const NEQ, // number of equations
 		int const NSYM // symmetry:  0 = symmetric matrix, 1 = non-symmetric
 	);
 
 	void
 	FILSKY(
-		FArray1A< Real64 > const X, // element array (row-wise sequence)
-		FArray1A_int const LM, // location matrix
-		FArray1A_int const IK, // pointer to the top of column/row "K"
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > const X, // element array (row-wise sequence)
+		Array1A_int const LM, // location matrix
+		Array1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
 		int const FLAG // mode of operation
 	);
 
 	void
 	DUMPVD(
 		std::string const & S, // Description
-		FArray1A< Real64 > const V, // Output values
+		Array1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
 	);
@@ -358,7 +358,7 @@ namespace AirflowNetworkSolver {
 	void
 	DUMPVR(
 		std::string const & S, // Description
-		FArray1A< Real64 > const V, // Output values
+		Array1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
 	);
@@ -371,8 +371,8 @@ namespace AirflowNetworkSolver {
 		int const IL, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	);
 
@@ -381,12 +381,12 @@ namespace AirflowNetworkSolver {
 		int const il, // Linkage number
 		int const Pprof, // Opening number
 		Real64 const G, // gravitation field strength [N/kg]
-		FArray1A< Real64 > const DpF, // Stack pressures at start heights of Layers
-		FArray1A< Real64 > const DpT, // Stack pressures at start heights of Layers
-		FArray1A< Real64 > const BetaF, // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-		FArray1A< Real64 > const BetaT, // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-		FArray1A< Real64 > const RhoStF, // Density at the start heights of Layers in the FROM zone
-		FArray1A< Real64 > const RhoStT, // Density at the start heights of Layers in the TO zone
+		Array1A< Real64 > const DpF, // Stack pressures at start heights of Layers
+		Array1A< Real64 > const DpT, // Stack pressures at start heights of Layers
+		Array1A< Real64 > const BetaF, // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+		Array1A< Real64 > const BetaT, // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+		Array1A< Real64 > const RhoStF, // Density at the start heights of Layers in the FROM zone
+		Array1A< Real64 > const RhoStT, // Density at the start heights of Layers in the TO zone
 		int const From, // Number of FROM zone
 		int const To, // Number of To zone
 		Real64 const ActLh, // Actual height of opening [m]

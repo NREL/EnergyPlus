@@ -21664,7 +21664,7 @@ ZoneEarthtube,
       \default 0
  N13, \field Amplitude of Soil Surface Temperature
       \required-field
-      \units C
+      \units deltaC
       \type real
       \minimum 0
       \default 0
@@ -31163,6 +31163,7 @@ ZoneControl:Humidistat,
   \min-fields 3
   A1 , \field Name
        \required-field
+       \reference ZoneControlHumidistatNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -38631,6 +38632,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \minimum> 0.0
        \default 0.001
   A12; \field Zone Mixer Name
+       \required-field
        \type object-list
        \object-list ZoneMixers
 
@@ -47097,6 +47099,964 @@ Coil:WaterHeating:AirToWaterHeatPump,
        \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
        \note due to variations in part load ratio.
 
+Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
+       \memo vairlable-speed Heat pump water heater (VSHPWH) heating coil, air-to-water direct-expansion (DX)
+       \memo system which includes a variable-speed water heating coil, evaporator air coil, evaporator
+       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPump system.
+       \min-fields 33
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Unique name for this instance of a variable-speed heat pump water heater DX coil.
+  N1,  \field Number of Speeds
+       \units dimensionless
+       \type integer
+       \required-field
+       \minimum 1
+       \maximum 10
+       \default 1
+  N2 , \field Nominal Speed Level
+       \units dimensionless
+       \type integer
+       \default 1
+       \required-field
+       \note must be lower than or equal to the highest speed number
+  N3 , \field Rated Water Heating Capacity
+       \required-field
+       \type real
+       \units W
+       \minimum> 0
+       \note Water Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat. 
+  N4 , \field Rated Evaporator Inlet Air Dry-Bulb Temperature
+       \type real
+       \units C
+       \minimum> 5
+       \default 19.7
+       \note Evaporator inlet air dry-bulb temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N5 , \field Rated Evaporator Inlet Air Wet-Bulb Temperature
+       \type real
+       \units C
+       \minimum> 5
+       \default 13.5
+       \note Evaporator inlet air wet-bulb temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N6 , \field Rated Condenser Inlet Water Temperature
+       \type real
+       \units C
+       \minimum> 25
+       \default 57.5
+       \note Condenser inlet water temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N7 , \field Rated Evaporator Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0
+       \autocalculatable
+       \note Evaporator air flow rate corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+       \note Default is 5.035E-5 m3/s/W (31.25 cfm/MBH) of rated heating capacity when autocalculated.
+  N8 , \field Rated Condenser Water Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0
+       \autocalculatable
+       \note Condenser water flow rate corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+       \note Default is 4.487E-8 m3/s/W (0.208 gpm/MBH) of rated heating capacity when autocalculated.
+       \note A warning message will be issued if the ratio of Rated Condenser Water Flow Rate
+       \note to Heating Capacity is less than 1.79405E-8 m3/s/W (0.083 gpm/MBH)
+       \note or greater than 8.97024E-8 m3/s/W (0.417 gpm/MBH), but the simulation will continue.
+  A2 , \field Evaporator Fan Power Included in Rated COP
+       \type choice
+       \key Yes
+       \key No
+       \default Yes
+       \note Select Yes if the evaporator fan power is included in the rated COP. This choice field
+       \note impacts the calculation of compressor electric power.
+  A3 , \field Condenser Pump Power Included in Rated COP
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note Select Yes if the condenser pump power is included in the rated COP. This choice field
+       \note impacts the calculation of compressor electric power.
+  A4 , \field Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note Select Yes if the condenser pump heat is included in the rated heating capacity and
+       \note rated COP. This choice field impacts the calculation of water heating capacity.
+  N9 , \field Fraction of Condenser Pump Heat to Water
+       \type real
+       \minimum 0
+       \maximum 1
+       \default 0.2
+       \note Fraction of pump heat transferred to the condenser water. The pump is assumed
+       \note to be located downstream of the condenser.
+  A5 , \field Evaporator Air Inlet Node Name
+       \required-field
+       \type node
+       \note The node from which the DX coil draws its inlet air.
+  A6 , \field Evaporator Air Outlet Node Name
+       \required-field
+       \type node
+       \note The node to which the DX coil sends its outlet air.
+  A7 , \field Condenser Water Inlet Node Name
+       \required-field
+       \type node
+       \note The node from which the DX coil condenser draws its inlet water.
+       \note This name should match the source side outlet node name in the associated
+       \note water heater tank object.
+  A8 , \field Condenser Water Outlet Node Name
+       \required-field
+       \type node
+       \note The node to which the DX coil condenser sends its outlet water.
+       \note This name should match the source side inlet node name in the associated
+       \note water heater tank object.
+  N10, \field Crankcase Heater Capacity
+       \type real
+       \minimum 0
+       \default 0
+       \units W
+       \note The compressor crankcase heater only operates when the dry-bulb temperature of air
+       \note surrounding the compressor is below the Maximum Ambient Temperature for Crankcase
+       \note Heater Operation and the DX coil is off.  The ambient temperature surrounding the
+       \note compressor is set by the WaterHeater:HeatPump parent object (field Compressor Location).
+  N11, \field Maximum Ambient Temperature for Crankcase Heater Operation
+       \type real
+       \minimum 0
+       \default 10
+       \units C
+       \note The compressor crankcase heater only operates when the dry-bulb temperature of air
+       \note surrounding the compressor is below the Maximum Outdoor Temperature for Crankcase
+       \note Heater Operation and the unit is off. The ambient temperature surrounding the
+       \note compressor is set by the WaterHeater:HeatPump parent object (field Compressor Location).
+  A9 , \field Evaporator Air Temperature Type for Curve Objects
+       \type choice
+       \key DryBulbTemperature
+       \key WetBulbTemperature
+       \default WetBulbTemperature
+       \note Determines temperature type for heating capacity curves and
+       \note heating COP curves. This input determines whether
+       \note the inlet air dry-bulb or wet-bulb temperature is used to evaluate these curves. 
+  A10, \field Part Load Fraction Correlation Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note Part Load Fraction Correlation (function of part load ratio) should be quadratic or cubic.
+       \note Quadratic curve = a + b(PLR) + c(PLR)^2.
+       \note Cubic curve = a + b(PLR) + c(PLR)^2 + d(PLR)^3.
+       \note PLR = part load ratio (heating delivered/steady state heating capacity).
+       \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
+       \note due to variations in part load ratio.
+  N12, \field Rated Water Heating Capacity at speed 1
+       \required-field
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N13, \field Rated Water Heating COP at speed 1
+       \required-field
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N14, \field Rated Sensible Heat Ratio at speed 1
+       \required-field 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N15, \field Speed 1 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+       \required-field
+  N16, \field Speed 1 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+       \required-field
+  N17, \field Speed 1 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+       \required-field
+  A11, \field Speed 1 Total WH Capacity Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A12, \field Speed 1 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \required-field
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A13, \field Speed 1 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \required-field
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A14, \field Speed 1 COP Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A15, \field Speed 1 COP Function of Air Flow Fraction Curve Name
+       \required-field
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A16, \field Speed 1 COP Function of Water Flow Fraction Curve Name
+       \required-field
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N18, \field Rated Water Heating Capacity at speed 2
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N19, \field Rated Water Heating COP at speed 2
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N20, \field Rated Sensible Heat Ratio at speed 2 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N21, \field Speed 2 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N22, \field Speed 2 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N23, \field Speed 2 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A17, \field Speed 2 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A18, \field Speed 2 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A19, \field Speed 2 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A20, \field Speed 2 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A21, \field Speed 2 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A22, \field Speed 2 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N24, \field Rated Water Heating Capacity at speed 3
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N25, \field Rated Water Heating COP at speed 3
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N26, \field Rated Sensible Heat Ratio at speed 3 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N27, \field Speed 3 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N28, \field Speed 3 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N29, \field Speed 3 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A23, \field Speed 3 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A24, \field Speed 3 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A25, \field Speed 3 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A26, \field Speed 3 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A27, \field Speed 3 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A28, \field Speed 3 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N30, \field Rated Water Heating Capacity at speed 4
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N31, \field Rated Water Heating COP at speed 4
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N32, \field Rated Sensible Heat Ratio at speed 4 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N33, \field Speed 4 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N34, \field Speed 4 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N35, \field Speed 4 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A29, \field Speed 4 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A30, \field Speed 4 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A31, \field Speed 4 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A32, \field Speed 4 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A33, \field Speed 4 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A34, \field Speed 4 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N36, \field Rated Water Heating Capacity at speed 5
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N37, \field Rated Water Heating COP at speed 5
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N38, \field Rated Sensible Heat Ratio at speed 5 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N39, \field Speed 5 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N40, \field Speed 5 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N41, \field Speed 5 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A35, \field Speed 5 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A36, \field Speed 5 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A37, \field Speed 5 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A38, \field Speed 5 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A39, \field Speed 5 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A40, \field Speed 5 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N42, \field Rated Water Heating Capacity at speed 6
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N43, \field Rated Water Heating COP at speed 6
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N44, \field Rated Sensible Heat Ratio at speed 6 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N45, \field Speed 6 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N46, \field Speed 6 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N47, \field Speed 6 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A41, \field Speed 6 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A42, \field Speed 6 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A43, \field Speed 6 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A44, \field Speed 6 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A45, \field Speed 6 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A46, \field Speed 6 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N48, \field Rated Water Heating Capacity at speed 7
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N49, \field Rated Water Heating COP at speed 7
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N50, \field Rated Sensible Heat Ratio at speed 7 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N51, \field Speed 7 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N52, \field Speed 7 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N53, \field Speed 7 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A47, \field Speed 7 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A48, \field Speed 7 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A49, \field Speed 7 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A50, \field Speed 7 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A51, \field Speed 7 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A52, \field Speed 7 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N54, \field Rated Water Heating Capacity at speed 8
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N55, \field Rated Water Heating COP at speed 8
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N56, \field Rated Sensible Heat Ratio at speed 8 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N57, \field Speed 8 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N58, \field Speed 8 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N59, \field Speed 8 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A53, \field Speed 8 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A54, \field Speed 8 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A55, \field Speed 8 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A56, \field Speed 8 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A57, \field Speed 8 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A58, \field Speed 8 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N60, \field Rated Water Heating Capacity at speed 9
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N61, \field Rated Water Heating COP at speed 9
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N62, \field Rated Sensible Heat Ratio at speed 9 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N63, \field Speed 9 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N64, \field Speed 9 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N65, \field Speed 9 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A59, \field Speed 9 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A60, \field Speed 9 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A61, \field Speed 9 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A62, \field Speed 9 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A63, \field Speed 9 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A64, \field Speed 9 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  N66, \field Rated Water Heating Capacity at speed 10
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N67, \field Rated Water Heating COP at speed 10
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air and water temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N68, \field Rated Sensible Heat Ratio at speed 10 
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N69, \field Speed 10 Reference Unit Rated Air Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N70, \field Speed 10 Reference Unit Rated Water Flow Rate
+       \units m3/s
+       \type real
+       \minimum 0
+  N71, \field Speed 10 Reference Unit Water Pump Input Power At Rated Conditions
+       \units dimensionless
+       \type real
+       \minimum 0
+  A65, \field Speed 10 Total WH Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A66, \field Speed 10 Total WH Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A67, \field Speed 10 Total WH Capacity Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow
+  A68, \field Speed 10 COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \note Table:TwoIndependentVariables object can also be used
+       \note curve = a + b*wb + c*wb**2 + d*ewt + e*ewt**2 + f*wb*ewt
+       \note wb = entering wet-bulb temperature or dry bulb temperature upon selection (C)
+       \note ewt = water entering temperature seen by the condenser (C)
+  A69, \field Speed 10 COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffa + c*ffa**2
+       \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
+       \note ffa = Fraction of the full load Air Flow
+  A70; \field Speed 10 COP Function of Water Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \note Table:OneIndependentVariable object can also be used
+       \note quadratic curve = a + b*ffw + c*ffw**2
+       \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
+       \note ffw = Fraction of the full load Water Flow	   
+	   
 Coil:WaterHeating:Desuperheater,
        \memo Desuperheater air heating coil. The heating energy provided by this coil is reclaimed
        \memo from the superheated refrigerant gas leaving a compressor and does not impact the
@@ -56064,7 +57024,7 @@ Pipe:Underground,
         \default 0
    N4,  \field Amplitude of Soil Surface Temperature
         \note optional
-        \units C
+        \units deltaC
         \type real
         \minimum 0
         \default 0
@@ -56187,7 +57147,7 @@ PipingSystem:Underground:Domain,
    N16, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
         \required-field
         \type real
-        \units C
+        \units deltaC
    N17, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
         \required-field
         \type real
@@ -62798,7 +63758,7 @@ GroundHeatExchanger:HorizontalTrench,
         \note Site:GroundTemperature:Shallow object must be found in the input
         \note The undisturbed ground temperature will be approximated from this object
         \type real
-        \units C
+        \units deltaC
    N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
         \note This is the parameter for phase shift from minimum surface temperature
         \note This is an optional input in that if it is missing, a
@@ -63757,6 +64717,7 @@ WaterHeater:HeatPump,
        \memo This object models an air-source heat pump for water heating.
        \memo WaterHeater:HeatPump is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump, Fan:OnOff, WaterHeater:Mixed
+	   \memo Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, Fan:OnOff, WaterHeater:Mixed
   A1 , \field Name
        \required-field
        \type alpha
@@ -63882,14 +64843,16 @@ WaterHeater:HeatPump,
        \required-field
        \type choice
        \key Coil:WaterHeating:AirToWaterHeatPump
+	   \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
        \default Coil:WaterHeating:AirToWaterHeatPump
        \note Specify the type of DX coil used by this heat pump water heater. The only
-       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump.
+       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
   A19, \field DX Coil Name
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
-       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump object.
+	   \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
@@ -69416,7 +70379,7 @@ Refrigeration:Condenser:AirCooled,
         \note Will be adjusted for elevation automatically
   N1 ,  \field Rated Subcooling Temperature Difference
         \type real
-        \units DeltaC
+        \units deltaC
         \default 0.0
         \minimum 0.0
         \note must correspond to rating given for total heat rejection effect
@@ -69484,7 +70447,7 @@ Refrigeration:Condenser:EvaporativeCooled,
         \units W
   N2 ,  \field Rated Subcooling Temperature Difference
         \type real
-        \units DeltaC
+        \units deltaC
         \default 0.0
         \minimum 0.0
         \note must correspond to rating given for total heat rejection effect
@@ -69634,7 +70597,7 @@ Refrigeration:Condenser:WaterCooled,
         \default 0.0
         \minimum 0.0
         \type real
-        \units DeltaC
+        \units deltaC
         \note must correspond to rating given for total heat rejection effect
   N4,   \field Rated Water Inlet Temperature
         \required-field
@@ -69717,7 +70680,7 @@ Refrigeration:Condenser:Cascade,
         \default 3.0
         \type real
         \minimum> 0.0
-        \units DeltaC
+        \units deltaC
   N3 ,  \field Rated Effective Total Heat Rejection Rate
         \required-field
         \note used for identification and rough system size error checking
@@ -69789,13 +70752,13 @@ Refrigeration:GasCooler:AirCooled,
         \note Temperature difference between the CO2 exiting the gas cooler and the air entering the
         \note gas cooler during transcritical operation.
         \type real
-        \units DeltaC
+        \units deltaC
         \default 3.0
   N5 ,  \field Subcritical Temperature Difference
         \note Temperature difference between the saturated condensing temperature and the air
         \note temperature during subcritical operation.
         \type real
-        \units DeltaC
+        \units deltaC
         \default 10.0
   N6 ,  \field Minimum Condensing Temperature
         \note Minimum saturated condensing temperature during subcritical operation.
@@ -69906,7 +70869,7 @@ Refrigeration:Subcooler,
         \note plan to add ambient subcoolers at future time
    N1 , \field Liquid Suction Design Subcooling Temperature Difference
         \type real
-        \units DeltaC
+        \units deltaC
         \note Applicable only and required for liquid suction heat exchangers
         \note design liquid suction subcooling
    N2 , \field Design Liquid Inlet Temperature
@@ -70435,7 +71398,7 @@ Refrigeration:SecondarySystem,
   N4 ,  \field Evaporator Approach Temperature Difference
         \type real
         \required-field
-        \units DeltaC
+        \units deltaC
         \note  For "FluidAlwaysLiquid", this is the rated difference between the temperature of the
         \note      circulating fluid leaving the heat exchanger
         \note      and the heat exchanger's rated evaporating temperature.
@@ -70443,7 +71406,7 @@ Refrigeration:SecondarySystem,
         \note      evaporating and condensing temperatures in the heat exchanger.
   N5 ,  \field Evaporator Range Temperature Difference
         \type real
-        \units DeltaC
+        \units deltaC
         \note  For "FluidAlwaysLiquid", this is the rated difference between the temperature of the
         \note      circulating fluid entering the heat exchanger and the temperature of the
         \note      circulating fluid leaving the heat exchanger, and is Required.
@@ -75130,7 +76093,7 @@ FaultModel:HumidistatOffset,
        \note Enter the name of a ZoneControl:Humidistat object.
        \required-field
        \type object-list
-       \object-list ZoneControlHumidistaticNames
+       \object-list ZoneControlHumidistatNames
    A3, \field Humidistat Offset Type 
        \note Two types are available: 
        \note Type ThermostatOffsetIndependent

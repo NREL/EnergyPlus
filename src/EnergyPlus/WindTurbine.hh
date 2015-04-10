@@ -2,7 +2,7 @@
 #define WindTurbine_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -233,7 +233,7 @@ namespace WindTurbine {
 	};
 
 	// Object Data
-	extern FArray1D< WindTurbineParams > WindTurbineSys;
+	extern Array1D< WindTurbineParams > WindTurbineSys;
 
 	// Functions
 

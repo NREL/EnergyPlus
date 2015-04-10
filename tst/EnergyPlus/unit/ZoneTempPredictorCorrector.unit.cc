@@ -16,6 +16,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataAirflowNetwork.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -31,10 +32,14 @@ using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataAirflowNetwork;
+using namespace EnergyPlus::Psychrometrics;
 
 
 TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 {
+	ShowMessage( "Begin Test: ZoneTempPredictorCorrector, CorrectZoneHumRatTest" );
+
+	InitializePsychRoutines();
 
 	TimeStepSys = 15.0 / 60.0; // System timestep in hours
 
@@ -199,28 +204,28 @@ TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 	EXPECT_FALSE( (0.008 == Node( 5 ).HumRat) );
 
 	// Deallocate everything
-	ZoneEquipConfig( 1 ).InletNode.deallocate( );
-	ZoneEquipConfig( 1 ).ExhaustNode.deallocate( );
-	ZoneEquipConfig.deallocate( );
-	Node.deallocate( );
-	Zone.deallocate( );
-	ZoneLatentGain.deallocate( );
-	ZoneEqSizing.deallocate( );
-	SumLatentHTRadSys.deallocate( );
-	SumLatentPool.deallocate( );
-	ZT.deallocate( ); // Zone temperature C
-	ZoneAirHumRat.deallocate( );
-	Surface.deallocate( );
-	OAMFL.deallocate( );
-	VAMFL.deallocate( );
-	EAMFL.deallocate( );
-	CTMFL.deallocate( );
-	SumHmARaW.deallocate( );
-	SumHmARa.deallocate( );
-	MixingMassFlowXHumRat.deallocate( );
-	MixingMassFlowZone.deallocate( );
-	MDotOA.deallocate( );
-	ZoneAirHumRatTemp.deallocate( );
-	ZoneW1.deallocate( );
+	ZoneEquipConfig( 1 ).InletNode.deallocate();
+	ZoneEquipConfig( 1 ).ExhaustNode.deallocate();
+	ZoneEquipConfig.deallocate();
+	Node.deallocate();
+	Zone.deallocate();
+	ZoneLatentGain.deallocate();
+	ZoneEqSizing.deallocate();
+	SumLatentHTRadSys.deallocate();
+	SumLatentPool.deallocate();
+	ZT.deallocate(); // Zone temperature C
+	ZoneAirHumRat.deallocate();
+	Surface.deallocate();
+	OAMFL.deallocate();
+	VAMFL.deallocate();
+	EAMFL.deallocate();
+	CTMFL.deallocate();
+	SumHmARaW.deallocate();
+	SumHmARa.deallocate();
+	MixingMassFlowXHumRat.deallocate();
+	MixingMassFlowZone.deallocate();
+	MDotOA.deallocate();
+	ZoneAirHumRatTemp.deallocate();
+	ZoneW1.deallocate();
 
 }

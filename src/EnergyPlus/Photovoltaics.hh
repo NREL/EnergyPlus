@@ -5,7 +5,7 @@
 #include <functional>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -21,7 +21,7 @@ namespace Photovoltaics {
 	// DERIVED TYPE DEFINITIONS:
 	//   see DataPhotovoltaics.cc
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
 

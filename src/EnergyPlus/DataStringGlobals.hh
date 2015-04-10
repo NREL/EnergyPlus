@@ -66,7 +66,7 @@ namespace DataStringGlobals {
 	extern std::string outputCsvFileName;
 	extern std::string outputMtrCsvFileName;
 	extern std::string outputRvauditFileName;
-	
+
 	extern std::string weatherFileNameOnly;
 	extern std::string idfDirPathName;
 	extern std::string idfFileNameOnly;

@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -106,13 +106,13 @@ namespace Boilers {
 	Real64 BoilerOutletTemp( 0.0 ); // W - Boiler outlet temperature
 	Real64 BoilerPLR( 0.0 ); // Boiler operating part-load ratio
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
 	// Object Data
-	FArray1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
-	FArray1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
+	Array1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
+	Array1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
 
 	// MODULE SUBROUTINES:
 
@@ -262,7 +262,7 @@ namespace Boilers {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool errFlag; // Flag to show errors were found during function call
-		FArray1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
+		Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
 		//GET NUMBER OF ALL EQUIPMENT
 		cCurrentModuleObject = "Boiler:HotWater";
@@ -430,7 +430,7 @@ namespace Boilers {
 
 			Boiler( BoilerNum ).TempDesBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).VolFlowRate = rNumericArgs( 4 );
-			if ( Boiler( BoilerNum ).VolFlowRate  ==  AutoSize ){
+			if ( Boiler( BoilerNum ).VolFlowRate ==  AutoSize ) {
 				Boiler( BoilerNum ).VolFlowRateWasAutoSized = true;
 			}
 			Boiler( BoilerNum ).MinPartLoadRat = rNumericArgs( 5 );
@@ -552,8 +552,8 @@ namespace Boilers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyEnvrnFlag; // environment flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag; // environment flag
+		static Array1D_bool MyFlag;
 		Real64 rho;
 		bool FatalError;
 		bool errFlag;
@@ -585,7 +585,7 @@ namespace Boilers {
 			MyFlag( BoilerNum ) = false;
 		}
 
-		if (  MyEnvrnFlag( BoilerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize )  ) {
+		if ( MyEnvrnFlag( BoilerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 			//if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
 			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 			Boiler( BoilerNum ).DesMassFlowRate = Boiler( BoilerNum ).VolFlowRate * rho;
@@ -720,15 +720,15 @@ namespace Boilers {
 				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
 
 			}
-			if ( PlantFirstSizesOkayToFinalize  ) {
-				if (  Boiler( BoilerNum ).NomCapWasAutoSized ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) {
 					Boiler( BoilerNum ).NomCap = tmpNomCap;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, 
+						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
 							"Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, 
+						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
 							"Initial Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else { // Hard-sized with sizing data
@@ -755,10 +755,10 @@ namespace Boilers {
 				ShowSevereError( "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} 
-			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && PlantFinalSizesOkayToReport 
+			}
+			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && PlantFinalSizesOkayToReport
 					&& ( Boiler( BoilerNum ).NomCap > 0.0 ) ) { // Hard-sized with no sizing data
-					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, 
+					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
 						"User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
 			}
 		}
@@ -775,11 +775,11 @@ namespace Boilers {
 				if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized ) {
 					Boiler( BoilerNum ).VolFlowRate = tmpBoilerVolFlowRate;
 					if ( PlantFinalSizesOkayToReport) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, 
+						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
 							"Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate );
 					}
 					if ( PlantFirstSizesOkayToReport) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, 
+						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
 							"Initial Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate );
 					}
 				} else {
@@ -806,10 +806,10 @@ namespace Boilers {
 				ShowSevereError( "Autosizing of Boiler design flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} 
-			if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+			}
+			if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized && PlantFinalSizesOkayToReport
 					&& ( Boiler( BoilerNum ).VolFlowRate > 0.0 ) ) { // Hard-sized with no sizing data
-					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, 
+					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
 						"User-Specified Design Water Flow Rate [m3/s]", Boiler( BoilerNum ).VolFlowRate );
 			}
 		}

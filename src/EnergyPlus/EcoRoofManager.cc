@@ -280,7 +280,7 @@ namespace EcoRoofManager {
 		HMovInsul = 0.0;
 
 		if ( Surface( SurfNum ).ExtWind ) {
-			InitExteriorConvectionCoeff( SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH( SurfNum, 1, 1 ), HcExtSurf( SurfNum ), HSkyExtSurf( SurfNum ), HGrdExtSurf( SurfNum ), HAirExtSurf( SurfNum ) );
+			InitExteriorConvectionCoeff( SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH( 1, 1, SurfNum ), HcExtSurf( SurfNum ), HSkyExtSurf( SurfNum ), HGrdExtSurf( SurfNum ), HAirExtSurf( SurfNum ) );
 		}
 
 		RS = BeamSolarRad + AnisoSkyMult( SurfNum ) * DifSolarRad;
@@ -388,7 +388,7 @@ namespace EcoRoofManager {
 			if ( Construct( ConstrNum ).CTFCross( 0 ) > 0.01 ) {
 				QuickConductionSurf = true;
 				F1temp = Construct( ConstrNum ).CTFCross( 0 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) );
-				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + F1temp * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) );
+				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + F1temp * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( SurfNum, 1 ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) );
 			} else {
 				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TempSurfIn( SurfNum );
 				F1temp = 0.0;
@@ -595,7 +595,7 @@ namespace EcoRoofManager {
 		} // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
 		// this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.
 
-		TH( SurfNum, 1, 1 ) = Tgold; // SoilTemperature
+		TH( 1, 1, SurfNum ) = Tgold; // SoilTemperature
 		TempExt = Tgold;
 
 	}

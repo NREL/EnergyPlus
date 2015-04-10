@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -90,17 +90,17 @@ namespace PlantCentralGSHP {
 
 	// Type defining the component specifications
 
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool CHCheckEquipName;
-	FArray1D_bool HPCheckEquipName;
+	Array1D_bool CheckEquipName;
+	Array1D_bool CHCheckEquipName;
+	Array1D_bool HPCheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
 
 	// Object Data
-	FArray1D< WrapperSpecs > Wrapper;
-	FArray1D< ChillerHeaterSpecs > ChillerHeater;
-	FArray1D< CHReportVars > ChillerHeaterReport;
-	FArray1D< WrapperReportVars > WrapperReport;
+	Array1D< WrapperSpecs > Wrapper;
+	Array1D< ChillerHeaterSpecs > ChillerHeater;
+	Array1D< CHReportVars > ChillerHeaterReport;
+	Array1D< WrapperReportVars > WrapperReport;
 
 	// MODULE SUBROUTINES:
 
@@ -189,7 +189,7 @@ namespace PlantCentralGSHP {
 			MaxCap = 0.0;
 			OptCap = 0.0;
 			if ( LoopNum == Wrapper( WrapperNum ).CWLoopNum ) { // Chilled water loop
-				SizeWrapper( WrapperNum ); 
+				SizeWrapper( WrapperNum );
 				if ( Wrapper( WrapperNum ).ControlMode == SmartMixing ) { // control mode is SmartMixing
 					for ( NumChillerHeater = 1; NumChillerHeater <= Wrapper( WrapperNum ).ChillerHeaterNums; ++NumChillerHeater ) {
 						MaxCap += Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling * Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).MaxPartLoadRatCooling;
@@ -376,19 +376,19 @@ namespace PlantCentralGSHP {
 						if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRateWasAutoSized ) {
 							Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate = tmpEvapVolFlowRate;
 							if ( PlantFinalSizesOkayToReport ) {
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 									"Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
 							}
 							if ( PlantFirstSizesOkayToReport ) {
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 									"Initial Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
 							}
 						} else {
-							if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 
+							if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0
 									&& PlantFinalSizesOkayToReport) {
 								EvapVolFlowRateUser = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate;
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
-									"Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
+									"Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate,
 									"User-Specified Reference Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 								tmpEvapVolFlowRate = EvapVolFlowRateUser;
 								if ( DisplayExtraWarnings ) {
@@ -412,7 +412,7 @@ namespace PlantCentralGSHP {
 						}
 					} else {
 						if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate > 0.0 && PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 								"User-Specified Reference Chilled Water Flow Rate [m3/s]", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate );
 						}
 					}
@@ -434,22 +434,22 @@ namespace PlantCentralGSHP {
 						if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCoolingWasAutoSized ) {
 							Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling = tmpNomCap;
 
-							Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapClgHtg = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling 
+							Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapClgHtg = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling
 								* Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).ClgHtgToCoolingCapRatio;
 							if ( PlantFinalSizesOkayToReport ) {
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 								"Design Size Reference Capacity [W]", tmpNomCap );
 							}
 							if ( PlantFirstSizesOkayToReport ) {
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 								"Initial Design Size Reference Capacity [W]", tmpNomCap );
 							}
 						} else {
-							if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling > 0.0 && tmpNomCap > 0.0 
+							if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling > 0.0 && tmpNomCap > 0.0
 									&& PlantFinalSizesOkayToReport ) {
 								NomCapUser = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling;
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
-									"Design Size Reference Capacity [W]", tmpNomCap, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
+									"Design Size Reference Capacity [W]", tmpNomCap,
 									"User-Specified Reference Capacity [W]", NomCapUser );
 								tmpNomCap = NomCapUser;
 								if ( DisplayExtraWarnings ) {
@@ -474,7 +474,7 @@ namespace PlantCentralGSHP {
 						}
 					} else {
 						if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling > 0.0 && PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 								"User-Specified Reference Capacity [W]", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling );
 						}
 					}
@@ -499,19 +499,19 @@ namespace PlantCentralGSHP {
 						if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRateWasAutoSized ) {
 							Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate = tmpCondVolFlowRate;
 							if ( PlantFinalSizesOkayToReport ) {
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 									"Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
 							}
 							if ( PlantFirstSizesOkayToReport ) {
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 									"Initial Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
 							}
 						} else {
-							if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 
+							if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0
 									&& PlantFinalSizesOkayToReport ) {
 								CondVolFlowRateUser = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate;
-								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
-									"Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, 
+								ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
+									"Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate,
 									"User-Specified Reference Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 								if ( DisplayExtraWarnings ) {
 									if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -535,13 +535,13 @@ namespace PlantCentralGSHP {
 						}
 					} else {
 						if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate > 0.0 && PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, 
+							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name,
 								"User-Specified Reference Condenser Water Flow Rate [m3/s]", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate );
 						}
 					}
 				}
 
-				if ( PlantFinalSizesOkayToReport) {
+				if ( PlantFinalSizesOkayToReport ) {
 					//create predefined report
 					equipName = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name;
 					PreDefTableEntry( pdchMechType, equipName, "ChillerHeaterPerformance:Electric:EIR" );
@@ -955,7 +955,7 @@ namespace PlantCentralGSHP {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		Real64 CurveVal; // Used to verify EIR-FT and CAP-FT curves
-		FArray1D< Real64 > CurveValArray( 11 ); // Used to evaluate PLFFPLR curve objects
+		Array1D< Real64 > CurveValArray( 11 ); // Used to evaluate PLFFPLR curve objects
 		Real64 CurveValTmp; // Used to evaluate PLFFPLR curve objects
 
 		// Formats
@@ -1072,7 +1072,7 @@ namespace PlantCentralGSHP {
 
 			// Chiller rated performance data
 			ChillerHeater( ChillerHeaterNum ).RefCapCooling = rNumericArgs( 1 );
-			if ( ChillerHeater( ChillerHeaterNum ).RefCapCooling == AutoSize ){
+			if ( ChillerHeater( ChillerHeaterNum ).RefCapCooling == AutoSize ) {
 				ChillerHeater( ChillerHeaterNum ).RefCapCoolingWasAutoSized = true;
 			}
 			if ( rNumericArgs( 1 ) == 0.0 ) {
@@ -1091,7 +1091,7 @@ namespace PlantCentralGSHP {
 			ChillerHeater( ChillerHeaterNum ).TempRefCondInCooling = rNumericArgs( 4 );
 			ChillerHeater( ChillerHeaterNum ).TempRefCondOutCooling = rNumericArgs( 5 );
 			ChillerHeater( ChillerHeaterNum ).ClgHtgToCoolingCapRatio = rNumericArgs( 6 );
-			if ( ! ChillerHeater( ChillerHeaterNum ).RefCapCoolingWasAutoSized ) { 
+			if ( ! ChillerHeater( ChillerHeaterNum ).RefCapCoolingWasAutoSized ) {
 				ChillerHeater( ChillerHeaterNum ).RefCapClgHtg = rNumericArgs( 6 ) * ChillerHeater( ChillerHeaterNum ).RefCapCooling;
 			}
 
@@ -1116,7 +1116,7 @@ namespace PlantCentralGSHP {
 			ChillerHeater( ChillerHeaterNum ).TempRefCondInClgHtg = rNumericArgs( 10 );
 			ChillerHeater( ChillerHeaterNum ).TempLowLimitEvapOut = rNumericArgs( 11 );
 			ChillerHeater( ChillerHeaterNum ).EvapVolFlowRate = rNumericArgs( 12 );
-			if ( ChillerHeater( ChillerHeaterNum ).EvapVolFlowRate == AutoSize ){
+			if ( ChillerHeater( ChillerHeaterNum ).EvapVolFlowRate == AutoSize ) {
 				ChillerHeater( ChillerHeaterNum ).EvapVolFlowRateWasAutoSized = true;
 			}
 			ChillerHeater( ChillerHeaterNum ).CondVolFlowRate = rNumericArgs( 13 );
@@ -1315,8 +1315,8 @@ namespace PlantCentralGSHP {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyWrapperOneTimeFlag( true ); // Flag used to execute code only once
-		static FArray1D_bool MyWrapperFlag; // TRUE in order to set component location
-		static FArray1D_bool MyWrapperEnvrnFlag; // TRUE when new environment is started
+		static Array1D_bool MyWrapperFlag; // TRUE in order to set component location
+		static Array1D_bool MyWrapperEnvrnFlag; // TRUE when new environment is started
 		int WrapperCondInletNode; // Node number for condenser water inlet node
 		int WrapperCondOutletNode; // Node number for condenser water outlet node
 		int HeatRecInNode; // Node number for heat recovery water inlet node

@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -61,12 +61,13 @@ namespace MixerComponent {
 	int NumMixers( 0 ); // The Number of Mixers found in the Input
 	int LoopInletNode( 0 );
 	int LoopOutletNode( 0 );
-	FArray1D_bool CheckEquipName;
+	bool GetInputFlag( true ); // Flag set to make sure you get input once
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
 
 	// Object Data
-	FArray1D< MixerConditions > MixerCond;
+	Array1D< MixerConditions > MixerCond;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -216,12 +217,12 @@ namespace MixerComponent {
 		int InNodeNum1;
 		int InNodeNum2;
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// Flow
 		CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
@@ -621,6 +622,72 @@ namespace MixerComponent {
 	}
 
 	//        End of Reporting subroutines for the Mixer Module
+
+	// Beginning of Utility subroutines for the Mixer Component
+	// *****************************************************************************
+
+	void
+	GetZoneMixerIndex(
+		std::string const & MixerName,
+		int & MixerIndex,
+		bool & ErrorsFound,
+		std::string const & ThisObjectType
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   March 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets an index for a given zone mixer -- issues error message if that mixer
+		// is not legal mixer.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// na
+		if ( GetInputFlag ) { //First time subroutine has been entered
+			GetMixerInput();
+			GetInputFlag = false;
+		}
+
+		MixerIndex = FindItemInList( MixerName, MixerCond.MixerName(), NumMixers );
+		if ( MixerIndex == 0 ) {
+			if ( ! ThisObjectType.empty() ) {
+				ShowSevereError( ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName );
+			} else {
+				ShowSevereError( "GetZoneMixerIndex: Zone Mixer not found=" + MixerName );
+			}
+			ErrorsFound = true;
+		}
+
+	}
+
+	// End of Utility subroutines for the Mixer Component
+	// *****************************************************************************
+
 	// *****************************************************************************
 
 	//     NOTICE

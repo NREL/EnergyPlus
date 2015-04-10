@@ -2,7 +2,7 @@
 #define MicroturbineElectricGenerator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,7 +26,7 @@ namespace MicroturbineElectricGenerator {
 	extern int NumMTGenerators; // number of MT Generators specified in input
 	extern bool GetMTInput; // then TRUE, calls subroutine to read input file.
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE MicroturbineElectricGenerator
 
@@ -498,8 +498,8 @@ namespace MicroturbineElectricGenerator {
 	};
 
 	// Object Data
-	extern FArray1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
-	extern FArray1D< ReportVars > MTGeneratorReport;
+	extern Array1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
+	extern Array1D< ReportVars > MTGeneratorReport;
 
 	// Functions
 

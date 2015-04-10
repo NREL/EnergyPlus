@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <SteamBaseboardRadiator.hh>
@@ -95,24 +95,24 @@ namespace SteamBaseboardRadiator {
 	int NumSteamBaseboards( 0 );
 	int SteamIndex( 0 );
 
-	FArray1D< Real64 > QBBSteamRadSource; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > QBBSteamRadSrcAvg; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
+	Array1D< Real64 > QBBSteamRadSource; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > QBBSteamRadSrcAvg; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
 	// with no source
 
 	// Record keeping variables used to calculate QBBRadSrcAvg locally
-	FArray1D< Real64 > LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool SetLoopIndexFlag; // get loop number flag
+	Array1D< Real64 > LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool SetLoopIndexFlag; // get loop number flag
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< SteamBaseboardParams > SteamBaseboard;
-	FArray1D< SteamBaseboardNumericFieldData > SteamBaseboardNumericFields;
+	Array1D< SteamBaseboardParams > SteamBaseboard;
+	Array1D< SteamBaseboardNumericFieldData > SteamBaseboardNumericFields;
 
 	// Functions
 
@@ -626,7 +626,7 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int Loop;
 		int SteamInletNode;
 		int ZoneNode;

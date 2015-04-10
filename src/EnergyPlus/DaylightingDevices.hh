@@ -2,7 +2,7 @@
 #define DaylightingDevices_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,7 +17,7 @@ namespace DaylightingDevices {
 	// MODULE VARIABLE TYPE DECLARATIONS: na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D< Real64 > COSAngle; // List of cosines of incident angle
+	extern Array1D< Real64 > COSAngle; // List of cosines of incident angle
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -61,7 +61,7 @@ namespace DaylightingDevices {
 	Real64
 	InterpolatePipeTransBeam(
 		Real64 const COSI, // Cosine of the incident angle
-		FArray1A< Real64 > const transBeam // Table of beam transmittance vs. cosine angle
+		Array1A< Real64 > const transBeam // Table of beam transmittance vs. cosine angle
 	);
 
 	int

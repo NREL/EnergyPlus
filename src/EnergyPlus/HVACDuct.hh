@@ -2,7 +2,7 @@
 #define HVACDuct_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -22,7 +22,7 @@ namespace HVACDuct {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumDucts;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 
@@ -57,7 +57,7 @@ namespace HVACDuct {
 	};
 
 	// Object Data
-	extern FArray1D< DuctData > Duct;
+	extern Array1D< DuctData > Duct;
 
 	// Functions
 

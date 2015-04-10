@@ -7,7 +7,7 @@
 ! TRANS          Solar or visible transmittance (assumed independent of angle of incidence)
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   WindowMaterial:Shade,
     HIGH REFLECT - LOW TRANS SHADE,  !- Name

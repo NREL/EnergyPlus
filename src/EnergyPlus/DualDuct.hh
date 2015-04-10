@@ -2,7 +2,7 @@
 #define DualDuct_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -35,7 +35,7 @@ namespace DualDuct {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	extern int NumDampers; // The Number of Dampers found in the Input
 	extern int NumDualDuctConstVolDampers;
@@ -257,13 +257,13 @@ namespace DualDuct {
 	};
 
 	// Object Data
-	extern FArray1D< DamperDesignParams > Damper;
-	extern FArray1D< DamperFlowConditions > DamperInlet;
-	extern FArray1D< DamperFlowConditions > DamperHotAirInlet;
-	extern FArray1D< DamperFlowConditions > DamperColdAirInlet;
-	extern FArray1D< DamperFlowConditions > DamperOutlet;
-	extern FArray1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
-	extern FArray1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
+	extern Array1D< DamperDesignParams > Damper;
+	extern Array1D< DamperFlowConditions > DamperInlet;
+	extern Array1D< DamperFlowConditions > DamperHotAirInlet;
+	extern Array1D< DamperFlowConditions > DamperColdAirInlet;
+	extern Array1D< DamperFlowConditions > DamperOutlet;
+	extern Array1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
+	extern Array1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
 	// Functions
 

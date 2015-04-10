@@ -56,7 +56,7 @@ namespace DataDefineEquip {
 	int NumAirDistUnits( 0 );
 
 	// Object Data
-	FArray1D< ZoneAirEquip > AirDistUnit; // Used to specify zone related
+	Array1D< ZoneAirEquip > AirDistUnit; // Used to specify zone related
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

@@ -2,7 +2,7 @@
 #define PhotovoltaicThermalCollectors_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -34,7 +34,7 @@ namespace PhotovoltaicThermalCollectors {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	extern int NumPVT; // count of all types of PVT in input file
 	extern int NumSimplePVTPerform; // count of simple PVT performance objects in input file
 
@@ -164,7 +164,7 @@ namespace PhotovoltaicThermalCollectors {
 	};
 
 	// Object Data
-	extern FArray1D< PVTCollectorStruct > PVT;
+	extern Array1D< PVTCollectorStruct > PVT;
 
 	// Functions
 

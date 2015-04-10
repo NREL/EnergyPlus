@@ -2,9 +2,9 @@
 #define ConductionTransferFunctionCalc_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -31,26 +31,26 @@ namespace ConductionTransferFunctionCalc {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray2D< Real64 > AExp; // Exponential of AMat
-	extern FArray2D< Real64 > AInv; // Inverse of AMat
-	extern FArray2D< Real64 > AMat; // "A" matrix from Seem's dissertation
+	extern Array2D< Real64 > AExp; // Exponential of AMat
+	extern Array2D< Real64 > AInv; // Inverse of AMat
+	extern Array2D< Real64 > AMat; // "A" matrix from Seem's dissertation
 	// (constant coefficients of linear system)
-	extern FArray1D< Real64 > BMat; // "B" matrix of state space method (non-zero elements)
-	extern FArray1D< Real64 > CMat; // "C" matrix of state space method (non-zero elements)
-	extern FArray1D< Real64 > DMat; // "D" matrix of state space method (non-zero elements)
-	extern FArray1D< Real64 > e; // Coefficients for the surface flux history term
-	extern FArray2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
+	extern Array1D< Real64 > BMat; // "B" matrix of state space method (non-zero elements)
+	extern Array1D< Real64 > CMat; // "C" matrix of state space method (non-zero elements)
+	extern Array1D< Real64 > DMat; // "D" matrix of state space method (non-zero elements)
+	extern Array1D< Real64 > e; // Coefficients for the surface flux history term
+	extern Array2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
-	extern FArray2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
+	extern Array2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
 	extern int NodeSource; // Node at which a source or sink is present
 	extern int NodeUserTemp; // Node where user wishes to calculate a temperature
 	// (for constructions with sources/sinks only)
 	extern int rcmax; // Total number of nodes in the construct (<= MaxTotNodes)
-	extern FArray3D< Real64 > s; // Coefficients for the surface temperature history terms
-	extern FArray2D< Real64 > s0; // Coefficients for the current surface temperature terms
+	extern Array3D< Real64 > s; // Coefficients for the surface temperature history terms
+	extern Array2D< Real64 > s0; // Coefficients for the current surface temperature terms
 	extern Real64 TinyLimit;
-	extern FArray2D< Real64 > IdenMatrix; // Identity Matrix
+	extern Array2D< Real64 > IdenMatrix; // Identity Matrix
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
