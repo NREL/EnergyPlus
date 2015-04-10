@@ -431,11 +431,11 @@ namespace DXCoils {
 		Real64 SecCoilLatentHeatRemovalRate; // secondary zone latent heat removal rate [W]
 		bool IsSecondaryDXCoilInZone; // true means secondary dx coil is zone instead of outside
 		Real64 CompressorPartLoadRatio; // compressor part load ratio of the primary DX coil
-		FArray1D_int MSSecCoilSHRFT; // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
-		FArray1D_int MSSecCoilSHRFF; //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
-		FArray1D< Real64 > MSSecCoilAirFlow; // multispeed secondary coil air flow rate
-		FArray1D< Real64 > MSSecCoilAirFlowScalingFactor; //multispeed secondary coil air flow rate autosize scaling factor 
-		FArray1D< Real64 > MSSecCoilRatedSHR; // multispeed secondary coil nominal or rated sensible heat ratio
+		Array1D_int MSSecCoilSHRFT; // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
+		Array1D_int MSSecCoilSHRFF; //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
+		Array1D< Real64 > MSSecCoilAirFlow; // multispeed secondary coil air flow rate
+		Array1D< Real64 > MSSecCoilAirFlowScalingFactor; //multispeed secondary coil air flow rate autosize scaling factor 
+		Array1D< Real64 > MSSecCoilRatedSHR; // multispeed secondary coil nominal or rated sensible heat ratio
 		int MSSpeedNumLS; // current low speed number of multspeed HP
 		int MSSpeedNumHS; // current high speed number of multspeed HP
 		Real64 MSSpeedRatio; // current speed ratio of multspeed HP
@@ -915,11 +915,11 @@ namespace DXCoils {
 			Real64 const SecCoilLatentHeatRemovalRate, // secondary zone latent heat removal rate [W]
 			bool const IsSecondaryDXCoilInZone, // true means secondary dx coil is zone instead of outside
 			Real64 const CompressorPartLoadRatio, // compressor part load ratio of the primary DX coil
-			FArray1_int const & MSSecCoilSHRFT, // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
-			FArray1_int const & MSSecCoilSHRFF, //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
-			FArray1< Real64 > const & MSSecCoilAirFlow, // multispeed secondary coil air flow rate
-			FArray1< Real64 > const & MSSecCoilAirFlowScalingFactor, //multispeed secondary coil air flow rate autosize scaling factor 
-			FArray1< Real64 > const & MSSecCoilRatedSHR, // multispeed secondary coil nominal or rated sensible heat ratio
+			Array1_int const & MSSecCoilSHRFT, // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
+			Array1_int const & MSSecCoilSHRFF, //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
+			Array1< Real64 > const & MSSecCoilAirFlow, // multispeed secondary coil air flow rate
+			Array1< Real64 > const & MSSecCoilAirFlowScalingFactor, //multispeed secondary coil air flow rate autosize scaling factor 
+			Array1< Real64 > const & MSSecCoilRatedSHR, // multispeed secondary coil nominal or rated sensible heat ratio
 			int const MSSpeedNumLS, // current low speed number of multspeed HP
 			int const MSSpeedNumHS, // current high speed number of multspeed HP
 			Real64 const MSSpeedRatio, // current speed ratio of multspeed HP
