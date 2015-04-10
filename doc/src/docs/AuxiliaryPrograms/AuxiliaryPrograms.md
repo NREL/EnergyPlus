@@ -17,7 +17,7 @@ This document will describe several of the "auxiliary programs" of the EnergyPlu
 
 **EPDraw** - Create DXF files from your input files
 
-**Input Macros** - Use a macro language to increase efficiency in creating EnergyPlus input files.  Unfortunately, IDF files containing macros cannot be read in the IDF Editor.
+**Input Macros** - Use a macro language to increase efficiency in creating EnergyPlus input files.  Unfortunately, IDF files containing macros cannot be read in the IDF Editor.
 
 **HVAC Diagram** - Use a post processing program to diagram your HVAC inputs.
 
@@ -61,7 +61,7 @@ The special weather format (EPW) used in EnergyPlus is a simple, ascii format as
 Background
 ----------
 
-All building simulation programs employ some means of representing local climatic conditions relative to the building models. For example, Radiance (Ward 1996) needs a description of sky conditions and illuminance values to calculate solar distribution through a window and within a space. Three of the widely used energy simulation programs in the UK and US, ESP-r (ESRU 1999), BLAST (UI 1998), and DOE-2 (Winkelmann et al. 1993) also use weather conditions to simulate the response of a building. But even after 30 years of significant development advances in simulation capabilities, these programs use the same climate representations as in the past-a simple set of hourly temperature, humidity, wind speed and direction, and atmospheric pressure and solar radiation or cloud cover data. These data are often ‘typical’ data derived from hourly observations at a specific location by the national weather service or meteorological office. Examples of these typical data include TMY2 (NREL 1995) and WYEC2 (ASHRAE 1997) in the United States and Canada and TRY (CEC 1985) in Europe. The TMY2 and WYEC2 typical weather years contain more solar radiation and illumination data than older formats such as TMY (NCDC 1983), WYEC (ASHRAE 1985), and TRY (NCDC 1981) in the U.S. Crawley (1998) demonstrated that the methods used to select data for the US TMY2 and European TRY data sets better fits the long-term climate patterns.
+All building simulation programs employ some means of representing local climatic conditions relative to the building models. For example, Radiance (Ward 1996) needs a description of sky conditions and illuminance values to calculate solar distribution through a window and within a space. Three of the widely used energy simulation programs in the UK and US, ESP-r (ESRU 1999), BLAST (UI 1998), and DOE-2 (Winkelmann et al. 1993) also use weather conditions to simulate the response of a building. But even after 30 years of significant development advances in simulation capabilities, these programs use the same climate representations as in the past-a simple set of hourly temperature, humidity, wind speed and direction, and atmospheric pressure and solar radiation or cloud cover data. These data are often 'typical' data derived from hourly observations at a specific location by the national weather service or meteorological office. Examples of these typical data include TMY2 (NREL 1995) and WYEC2 (ASHRAE 1997) in the United States and Canada and TRY (CEC 1985) in Europe. The TMY2 and WYEC2 typical weather years contain more solar radiation and illumination data than older formats such as TMY (NCDC 1983), WYEC (ASHRAE 1985), and TRY (NCDC 1981) in the U.S. Crawley (1998) demonstrated that the methods used to select data for the US TMY2 and European TRY data sets better fits the long-term climate patterns.
 
 Radiation and illumination data are becoming increasingly necessary in simulation programs. Anyone who has ever attempted to measure daylight factors will be familiar with the fluctuations in lighting levels under partly cloudy conditions. The expansion and contraction of lightweight building components also shares sensitivity to rapid fluctuations in solar radiation. Single-sided ventilation is dependant on wind pressure fluctuations and pedestrians in many cities are acquainted with the disarming tendency of the wind to guest and change direction. It is increasingly the case that design questions touch on such issues.
 
@@ -78,28 +78,28 @@ We have developed a generalized weather data format for use by energy simulation
 Weather Format for Simulation Programs
 --------------------------------------
 
-For these reasons, we developed a generalized weather data format for use with two major simulation programs-ESP-r and EnergyPlus (Crawley et al. 1999). All the data are in SI units. The format is simple, text-based with comma-separated data. It is based on the data available within the TMY2 weather format but has been rearranged to facilitate visual inspection of the data. The TMY2 data are a strict, position-specific format-filling missing data with nines and zero values with zeroes. The new weather data format contains commas to facilitate data reading and analysis with spreadsheet programs. By eliminating redundant ‘fill’ values, the size of each file is only slightly larger than the original TMY2 format. Details about the TMY2 format can be found in the TMY2 User’s manual (see references at the end of this section).
+For these reasons, we developed a generalized weather data format for use with two major simulation programs-ESP-r and EnergyPlus (Crawley et al. 1999). All the data are in SI units. The format is simple, text-based with comma-separated data. It is based on the data available within the TMY2 weather format but has been rearranged to facilitate visual inspection of the data. The TMY2 data are a strict, position-specific format-filling missing data with nines and zero values with zeroes. The new weather data format contains commas to facilitate data reading and analysis with spreadsheet programs. By eliminating redundant 'fill' values, the size of each file is only slightly larger than the original TMY2 format. Details about the TMY2 format can be found in the TMY2 User's manual (see references at the end of this section).
 
 The traditional distribution of data source and uncertainty flags within the raw data fields carries with it not only the need for many field separators, it obfuscates the relationships between non-numerical data. In a set of minute data, which could easily require hundreds of thousands of records, the space penalty is considerable. In the E/E file format, all data source and uncertainty fields have been clumped together as a single field immediately following the day and time stamp. For applications where uncertainty is not an issue such data can be easily ignored. When it is important, a single text field is conceptually and computationally easy to parse.
 
 Another difference between the EnergyPlus/ESP-r (E/E) format and TMY2 is the addition of two new data fields-minute and infrared sky. The minute field facilitates use of data observed at intervals of less than one hour such as measured data from a research study of energy efficiency for a particular building. This will allow easier and more accurate calibration of a simulation model to measured data than possible in the past. The infrared sky field allows the programs to calculate the effective sky temperature for re-radiation during nighttime.
 
-The last difference is that a full year of data (such as 8760 hours) is not required-subsets of years are acceptable. Which periods are covered by the data is described in the files.  Periods of typical weather patterns based on analysis of the data are also included within the format. A side-by-side comparison of data included in the E/E weather format with data previously used by ESP-r, DOE-2, and BLAST is shown in Table 1.  A deficiency noted within ESP-r for example is the lack of correcting air volumes for elevation change-many of the users of ESP-r are in relatively low elevations. For DOE-2 and BLAST, neither program used illumination data in daylighting calculations or infrared sky temperatures-it was always recalculated at time of use.
+The last difference is that a full year of data (such as 8760 hours) is not required-subsets of years are acceptable. Which periods are covered by the data is described in the files.  Periods of typical weather patterns based on analysis of the data are also included within the format. A side-by-side comparison of data included in the E/E weather format with data previously used by ESP-r, DOE-2, and BLAST is shown in Table 1.  A deficiency noted within ESP-r for example is the lack of correcting air volumes for elevation change-many of the users of ESP-r are in relatively low elevations. For DOE-2 and BLAST, neither program used illumination data in daylighting calculations or infrared sky temperatures-it was always recalculated at time of use.
 
 By including the uncertainty and data source information found in TMY2, users now can evaluate the potential impact of weather variability on the performance of the building.
 
 McDonald and Strachan (1998) are introducing uncertainty analysis into ESP-r.
 
-We use the EnergyPlus data dictionary format to describe the E/E weather data set. (See the end of this document). Each line in the format is preceded by a keyword such as LOCATION, DESIGN CONDITIONS, followed by a list of variables beginning either with A or N and a number. A stands for alphanumeric; N for numeric. The number following A/N is the sequence of that number in the keyword list. Commas separate data. (Refer to the IDD Conventions document in "[Input Output Reference](InputOutputReference.pdf)" for further explanation of the format). The header information consists of eight lines (keywords):  LOCATION, DESIGN CONDITIONS, TYPICAL/EXTREME PERIODS, GROUND TEMPERATURES, HOLIDAYS/DAYLIGHT SAVINGS, COMMENTS 1, COMMENTS 2, and DATA PERIODS. This is followed by the time step data.
+We use the EnergyPlus data dictionary format to describe the E/E weather data set. (See the end of this document). Each line in the format is preceded by a keyword such as LOCATION, DESIGN CONDITIONS, followed by a list of variables beginning either with A or N and a number. A stands for alphanumeric; N for numeric. The number following A/N is the sequence of that number in the keyword list. Commas separate data. (Refer to the IDD Conventions document in "[Input Output Reference](InputOutputReference.pdf)" for further explanation of the format). The header information consists of eight lines (keywords):  LOCATION, DESIGN CONDITIONS, TYPICAL/EXTREME PERIODS, GROUND TEMPERATURES, HOLIDAYS/DAYLIGHT SAVINGS, COMMENTS 1, COMMENTS 2, and DATA PERIODS. This is followed by the time step data.
 
 The first eight lines or header within each E/E weather file define basic location information such as longitude, latitude, time zone, elevation, annual design conditions, monthly average ground temperatures, typical and extreme periods, holidays/daylight saving periods, and data periods included. There is also space for users to document any special features or information about the file such as sources of data.
 
 Weather Data Availability
 -------------------------
 
-Typically, acquisition of weather data has been a user’s burden. Though this will remain the case in many instances for EnergyPlus users, the EnergyPlus team has been successful in making a wealth of US, Canadian and International data available to our users. To summarize, the weather data for 2092 locations is available at the EnergyPlus web site: [www.energyplus.gov](http://www.energyplus.gov)
+Typically, acquisition of weather data has been a user's burden. Though this will remain the case in many instances for EnergyPlus users, the EnergyPlus team has been successful in making a wealth of US, Canadian and International data available to our users. To summarize, the weather data for 2092 locations is available at the EnergyPlus web site: [www.energyplus.gov](http://www.energyplus.gov)
 
-The details are shown in Table 18. Summary of Downloadable Weather Data by Type.   This data has been selected with the energy simulation user in mind. All the data (as well as the statistical reports - described later in this document) are downloadable for individual locations.
+The details are shown in Table 18. Summary of Downloadable Weather Data by Type.   This data has been selected with the energy simulation user in mind. All the data (as well as the statistical reports - described later in this document) are downloadable for individual locations.
 
 Table 1. Comparison of E/E with ESP-r/DOE-2/BLAST Weather Data Formats
 
@@ -410,7 +410,7 @@ Table 1. Comparison of E/E with ESP-r/DOE-2/BLAST Weather Data Formats
 Using the Weather Converter
 ---------------------------
 
-We developed a utility for the E/E format to read standard weather service file types such as SAMSON and newer ‘typical year’ weather files such as TMY2, WYEC2, and IWEC. The utility also reads ESP-r (CLM format), DOE-2 (fmt format), BLAST (Ascii format) files and other files.
+We developed a utility for the E/E format to read standard weather service file types such as SAMSON and newer 'typical year' weather files such as TMY2, WYEC2, and IWEC. The utility also reads ESP-r (CLM format), DOE-2 (fmt format), BLAST (Ascii format) files and other files.
 
 The utility translates and extends typical weather data into the E/E format. The processor makes the calculations necessary for supplying data (when data is missing) and calculates the Horizontal Infrared Radiation Intensity values-not typically currently an observed value reported by the meteorological offices through the world. The utility also prepares an statistical summary of the weather data set as part of the processing. An additional "output format" from the utility is a comma-delimited file that can easily be imported into a spreadsheet program such as Excel™ for further user perusal, charting and/or editing.
 
@@ -418,7 +418,7 @@ The utility consists of two parts: a user interface that executes on standard Wi
 
 The user front end is a simple to use program with standard graphical user interface menus. It is executed from the Start Menu programs using the specific folder where the EnergyPlus program was installed. (e.g., Start Menu -&gt; EnergyPlus &lt;version&gt; -&gt; WeatherConverter). For convenience, it automatically opens with the "convert" option.
 
-EP-Launch can also be used to run the weather utility program.  Weather is one of the options on the Utilities tab in EP-Launch. See the section on EP-Launch in this document for more information on how to use EP-Launch with the weather utility program.
+EP-Launch can also be used to run the weather utility program.  Weather is one of the options on the Utilities tab in EP-Launch. See the section on EP-Launch in this document for more information on how to use EP-Launch with the weather utility program.
 
 ![](AuxiliaryPrograms/media/image001.jpg)
 
@@ -446,25 +446,25 @@ Though only one "trigger" value is selected from this screen, consecutive values
 
 An excerpt from the audit file is illustrative:
 
-Average Delta DB Change=  0.78°C ; Std Dev=  0.83°C
+Average Delta DB Change=  0.78°C ; Std Dev=  0.83°C
 
- Average Delta DP Change=  0.68°C ; Std Dev=  0.78°C
+ Average Delta DP Change=  0.68°C ; Std Dev=  0.78°C
 
- Average Delta Relative Humidity Change=  4.02% ; Std Dev=  4.22%
+ Average Delta Relative Humidity Change=  4.02% ; Std Dev=  4.22%
 
- Average Delta Wind Speed Change=  0.91m/s ; Std Dev=  0.88m/s
+ Average Delta Wind Speed Change=  0.91m/s ; Std Dev=  0.88m/s
 
- Hourly Dry Bulb temperature change trigger = minimum of  12.13°C  and  10.°C
+ Hourly Dry Bulb temperature change trigger = minimum of  12.13°C  and  10.°C
 
-     12.13°C = calculated trigger based on mean change in dry-bulb temperature and standard deviation shown above
+     12.13°C = calculated trigger based on mean change in dry-bulb temperature and standard deviation shown above
 
-     10.°C = trigger set by user
+     10.°C = trigger set by user
 
 Here the calculated DB trigger would be 12.13°C, but the user chosen trigger is 10°C. Changes &gt;= 10°C will be reported.
 
 - Delta DB/DP Range Triggered for Apr 30
 
-- Change in DB= 11.60°C, Hour=14
+- Change in DB= 11.60°C, Hour=14
 
 Such detail allows the user to hand edit the incoming data, if desired.
 
@@ -561,9 +561,9 @@ Table 2. Input File Extensions with implied Data types
   </tr>
 </table>
 
-Of course, the "all files" (\*.\*) may be used as well. If the file selected is not one of the above types, you will be cautioned to use the "override default type" button to select the correct type before proceeding. Most of the data file types are described in other publications and won’t be described in detail here.
+Of course, the "all files" (\*.\*) may be used as well. If the file selected is not one of the above types, you will be cautioned to use the "override default type" button to select the correct type before proceeding. Most of the data file types are described in other publications and won't be described in detail here.
 
-Note on the input CSV format:  It is the EPW CSV format. The CSV format must mirror the output CSV format very closely. The processor expects a Location header record and the headers for the data fields as a minimum (as well as the data that supports those header fields). If you have a differently formatted file, possible comma delimited, investigate the "custom" format option.
+Note on the input CSV format:  It is the EPW CSV format. The CSV format must mirror the output CSV format very closely. The processor expects a Location header record and the headers for the data fields as a minimum (as well as the data that supports those header fields). If you have a differently formatted file, possible comma delimited, investigate the "custom" format option.
 
 The LST data type allows you to specify a list of files to be "batch processed". The format of this file is very simple (however, the default extensions from the preceding table **must** be used **or** you must include a "def" file - see below for details).
 
@@ -575,8 +575,8 @@ Table 3. LST File Structure
 
 <table class="table table-striped">
 <tr>
-<td>Columns</td>
-<td>Contents</td>
+<th>Columns</th>
+<th>Contents</th>
 </tr>
 <tr>
 <td>1-45</td>
@@ -602,19 +602,19 @@ An auxiliary file, the Definitions File (extension .def) can be used to specify 
 
 #### Override Default Type
 
-This button is used as described above to select the correct data type for a file that might have one of the standard "default" extensions but may, in fact, be a data file of an entirely different type. For example, the BLAST ASCII files as they exist on the BLAST CD have extensions of .dat - our default type for the SAMSON data. You must select the proper data type for your data or the processor probably won’t work anywhere near what you expect.
+This button is used as described above to select the correct data type for a file that might have one of the standard "default" extensions but may, in fact, be a data file of an entirely different type. For example, the BLAST ASCII files as they exist on the BLAST CD have extensions of .dat - our default type for the SAMSON data. You must select the proper data type for your data or the processor probably won't work anywhere near what you expect.
 
 #### Select Output Format
 
 You may select from four options of output format:
 
-- EPW Format  -- both an epw file and a statistical report file are produced
+- EPW Format  -- both an epw file and a statistical report file are produced
 
-- CSV Format - both a csv file and a statistical report file are produced
+- CSV Format - both a csv file and a statistical report file are produced
 
-- Both EPW and CSV - epw, csv, and statistical report files are produced
+- Both EPW and CSV - epw, csv, and statistical report files are produced
 
-- Rpt only - only a statistical report file is produced (output extension is "stat")
+- Rpt only - only a statistical report file is produced (output extension is "stat")
 
 Note that the CSV file is very similar to the EPW format file but is ready to be imported into a spreadsheet program such as Excel™ and has some additional "header" records in front of each EPW style header record
 
@@ -622,7 +622,7 @@ Note that the CSV file is very similar to the EPW format file but is ready to be
 
 This button allows you to select the location to save your file set from the output format selection. The utility automatically places a "data type" extension on the file name to show its original data file type.
 
-Note on Save As…  Since you select the "save as" file name from a dialog, the processor DOES NOT warn you of overwriting previous files of the same name. In addition, if you have previously saved several types (e.g. EPW and CSV) but this time only save the RPT - it DOES NOT create new of the others nor does it delete the previous ones.
+Note on Save As…  Since you select the "save as" file name from a dialog, the processor DOES NOT warn you of overwriting previous files of the same name. In addition, if you have previously saved several types (e.g. EPW and CSV) but this time only save the RPT - it DOES NOT create new of the others nor does it delete the previous ones.
 
 #### Convert File
 
@@ -639,15 +639,15 @@ Definitions File & Custom File Processing
 
 Some of the data formats have inherent omissions (e.g. TMY does not have location data, BLAST ASCII does not have elevations). In order to overcome this limitation and to provide further flexibility, a definitions file (extension must be .def) is implemented. By naming this with the same "file name" as your input file (in the same folder), the weather converter will read the format and use that data, as appropriate, in the file conversions. The .def file uses Fortran "Namelist" input fields as shown in the example below. For flexibility, you can also define a "presets.def" file (such as when you have a list of files to process and the format or some portion is all the same between the group of files. The two def files (one named the same as the file name for the raw data and one named presets.def) will both be processed. Conflicts between the two will be shown in the .audit file. The set of namelist groups is:
 
-- &location - Location data
+- &location - Location data
 
-- &miscdata - Comments to be applied to "COMMENT2" in the EPW file and "Source Data"
+- &miscdata - Comments to be applied to "COMMENT2" in the EPW file and "Source Data"
 
-- &wthdata -  weather data specifications including file type, custom formats
+- &wthdata -  weather data specifications including file type, custom formats
 
-- &datacontrol - user specified control over "missing" data (Custom format only)
+- &datacontrol - user specified control over "missing" data (Custom format only)
 
-**Note that the "Def" formats are entirely different from the usual IDF formats of EnergyPlus.  No commas separate fields.  No semicolon terminates the entry.**
+**Note that the "Def" formats are entirely different from the usual IDF formats of EnergyPlus.  No commas separate fields.  No semicolon terminates the entry.**
 
     &location
     City='Hong Kong'
@@ -662,7 +662,7 @@ Some of the data formats have inherent omissions (e.g. TMY does not have locatio
     
     &miscdata
     Comments1='This file was given to us by....'
-    SourceData=’Original xyz data’
+    SourceData='Original xyz data'
     /
 
 The "slash" (/) character terminating each block is very important - omissions results in incorrect reading of data.
@@ -675,9 +675,9 @@ Table 4. Definitions File &location description
 
 <table class="table table-striped">
 <tr>
-<td>&amp;location Field Description</td>
-<td>Field Name</td>
-<td>Type</td>
+<th>&amp;location Fielh Description</th>
+<th>Fielh Name</th>
+<th>Type</th>
 </tr>
 <tr>
 <td>Name of City</td>
@@ -729,7 +729,7 @@ These fields are string variables. If Country is *not* included, an attempt to u
 
 #### Fields: InLat, InLong
 
-These fields are decimal equivalent for Latitude and Longitude. The convention is North Latitude is positive; South is negative. Likewise, East Longitude is positive; West Longitude is negative. That is, if your latitude is N 30° 15’ (North 30 degrees, 15 minutes) then your input is +30.25.
+These fields are decimal equivalent for Latitude and Longitude. The convention is North Latitude is positive; South is negative. Likewise, East Longitude is positive; West Longitude is negative. That is, if your latitude is N 30° 15' (North 30 degrees, 15 minutes) then your input is +30.25.
 
 #### Field: InTime
 
@@ -747,9 +747,9 @@ Table 5. Definitions File - &miscdata description
 
 <table class="table table-striped">
 <tr>
-<td>&amp;miscdata Field Description</td>
-<td>Field Name</td>
-<td>Type</td>
+<th>&amp;mischata Fielh Description</th>
+<th>Fielh Name</th>
+<th>Type</th>
 </tr>
 <tr>
 <td>String for Comments 1 header</td>
@@ -857,8 +857,8 @@ Table 7. Input File Type Values
 
 <table class="table table-striped">
 <tr>
-<td>Value</td>
-<td>File Type Description</td>
+<th>Value</th>
+<th>File Type Description</th>
 </tr>
 <tr>
 <td>Tmy or ,tm2</td>
@@ -1358,10 +1358,10 @@ Table 10. Auxiliary Data for Custom Files
 
 <table class="table table-striped">
 <tr>
-<td>Short Name</td>
-<td>Long Name</td>
-<td>Units</td>
-<td>Used by EnergyPlus</td>
+<th>Short Name</th>
+<th>Long Name</th>
+<th>Units</th>
+<th>Useh by EnergyPlus</th>
 </tr>
 <tr>
 <td>wetbulb</td>
@@ -1435,7 +1435,7 @@ If your "number of records per hour" is &gt;1, then you can designate each inter
 
 #### Hour\_Of\_Year
 
-If you wish, you can just put in the hour of the year for each record.  Note that if no date element is entered, then the default is that the data is in hour of the year (including possible number of records per hour).
+If you wish, you can just put in the hour of the year for each record.  Note that if no date element is entered, then the default is that the data is in hour of the year (including possible number of records per hour).
 
 #### Time (or HH:MM)
 
@@ -1443,15 +1443,15 @@ Time can be entered (rather than hour) and the units must be hh:mm; this is then
 
 #### Date
 
-Dates can be entered as month, day, and year.  The units field must be entered and should designate the format for the date decoding. Date separator characters for this field are entered in the DateSeparator item. Default date separator is "/" and that is what is used in the table that shows the allowable units:
+Dates can be entered as month, day, and year.  The units field must be entered and should designate the format for the date decoding. Date separator characters for this field are entered in the DateSeparator item. Default date separator is "/" and that is what is used in the table that shows the allowable units:
 
-Table 11. Allowable date formats for Custom Data entries.
+Table 11. Allowable hate formats for Custom Data entries.
 
-<table class="table table-striped">
+<table class="table table-stripeh">
 <tr>
-<td>Units Format</td>
-<td>Interpretation</td>
-<td>Example</td>
+<th>Units Format</th>
+<th>Interpretation</th>
+<th>Example</th>
 </tr>
 <tr>
 <td>mm/dd/yyyy mm/dd/yy m/d/y</td>
@@ -1589,17 +1589,17 @@ This is an integer number of records to read (typically 8760 for a full year). Y
 
 #### Fields: MissingDataAction, MissingWindDirAction, MissingOpaqueSkyCoverAction
 
-These fields tell the converter program what to do with "missing" data. Missing data can be found in two forms:  totally not included in the DataElements or a missing value (as defined in the EPW format). Valid values for these fields are:
+These fields tell the converter program what to do with "missing" data. Missing data can be found in two forms:  totally not included in the DataElements or a missing value (as defined in the EPW format). Valid values for these fields are:
 
-- DEFAULT - use the default processing that the weather converter already uses - starts off with a specific value and updates if data is found.
+- DEFAULT - use the default processing that the weather converter already uses - starts off with a specific value and updates if data is found.
 
-- CONSTANT - use a constant value to replace all missing data
+- CONSTANT - use a constant value to replace all missing data
 
-- RANDOM - use a random number to generate the missing data
+- RANDOM - use a random number to generate the missing data
 
 An additional value for MissingOpaqueSkyCoverAction is:
 
-- TOTALSKY - use the value for Total Sky Cover
+- TOTALSKY - use the value for Total Sky Cover
 
 #### Fields: MissingWindDirValue, MissingOpaqueSkyCoverValue
 
@@ -1615,13 +1615,13 @@ Default maximum solar values may not be enough for some locations - this allows 
 
 #### Field: GenerateSolarRadiationWarnings, GenerateIlluminanceWarnings
 
-If you don’t want to see extra warnings when input values are greater than max values (default or as specified in previous fields), use NO as the keyword. Use YES to make sure you see the warnings. Default is YES.
+If you don't want to see extra warnings when input values are greater than max values (default or as specified in previous fields), use NO as the keyword. Use YES to make sure you see the warnings. Default is YES.
 
 ### Def File Examples
 
 In the following examples, every attempt has been made to make sure that these work with the Weather Converter program. However, we cannot foresee all possible combinations. **Caveat emptor - user beware.**
 
-Here’s an example where the delimiter between fields is a semi-colon (;) and the decimal symbol character is a comma (,) - typical of some non-USA regional settings:
+Here's an example where the delimiter between fields is a semi-colon (;) and the decimal symbol character is a comma (,) - typical of some non-USA regional settings:
 
     &location
     City=&lt;cityname&gt;
@@ -1656,7 +1656,7 @@ Figure 4. DEF file for with non-standard field delimiter and decimal symbol
 
 
 
-Here’s an example of a file used to "enhance" a DOE-2 FMT file:
+Here's an example of a file used to "enhance" a DOE-2 FMT file:
 
     &location
     City='Kelburn'
@@ -1681,7 +1681,7 @@ Here’s an example of a file used to "enhance" a DOE-2 FMT file:
 
 Figure 5. DEF file for DOE-2 FMT file
 
-Here’s an example of a fixed format used for custom file processing. Note that random sky cover is used, to facilitate calculating Horizontal IR from Sky that is used in EnergyPlus. Also, random wind direction is used because the data set does not contain wind direction.
+Here's an example of a fixed format used for custom file processing. Note that random sky cover is used, to facilitate calculating Horizontal IR from Sky that is used in EnergyPlus. Also, random wind direction is used because the data set does not contain wind direction.
 
     &location
     City='Torino-Caselle'
@@ -1706,7 +1706,7 @@ Here’s an example of a fixed format used for custom file processing. Note that
     &miscdata
     Comments1='Italian Climate Data Set Gianni de Giorgio'
     Comments2='Period of record 1951-1970'
-    SourceData=’IGDG Data Set’
+    SourceData='IGDG Data Set'
     /
 
     &datacontrol
@@ -1858,7 +1858,7 @@ For example, in Brisbane AUS, comparing the solar creation with the original IWE
 
 Figure 10. Solar radiation comparison - IWEC vs Weather Solar Model (Brisbane AUS)
 
-Of course, there are other locations that don’t compare quite as well:
+Of course, there are other locations that don't compare quite as well:
 
 ![](AuxiliaryPrograms/media/image007.jpg)
 
@@ -1867,7 +1867,7 @@ Figure 11. Comparison of IWEC vs Weather program Solar Model (Singapore)
 Reports/Files Produced by the Weather Converter
 -----------------------------------------------
 
-Minimally, two outputs are produced for every weather converter run: an audit / log file and a statistical report file. The audit / log file shows details of the processing (including any errors) as well as the statistical report. The statistical report produced from the weather conversion process is a short, but complete, picture of the weather data on the file. A single file (.stat extension) is produced of the "statistics" about the data file. A feature of the weather converter is to look in several design condition files for possible design conditions for the location from the stored design condition files (source: ASHRAE Handbook of Fundamentals, 2001). If found (WMO (World Meteorological Organization) id is used for matching), these will be shown in the report as well as included in the output data files (EPW and CSV, as applicable). In addition, the Köppen classification scheme is used to characterize the climate based on the data file’s contents. Other statistics are given as well to help you visualize the data.
+Minimally, two outputs are produced for every weather converter run: an audit / log file and a statistical report file. The audit / log file shows details of the processing (including any errors) as well as the statistical report. The statistical report produced from the weather conversion process is a short, but complete, picture of the weather data on the file. A single file (.stat extension) is produced of the "statistics" about the data file. A feature of the weather converter is to look in several design condition files for possible design conditions for the location from the stored design condition files (source: ASHRAE Handbook of Fundamentals, 2001). If found (WMO (World Meteorological Organization) id is used for matching), these will be shown in the report as well as included in the output data files (EPW and CSV, as applicable). In addition, the K&ouml;ppen classification scheme is used to characterize the climate based on the data file's contents. Other statistics are given as well to help you visualize the data.
 
 In the "reporting" section of the file, each line contains "tab-delimited" elements. This will allow you to easily place the data into a spreadsheet program for further refinement but the tabs are not as intrusive for "normal viewing" as commas.
 
@@ -1875,1094 +1875,615 @@ In the "reporting" section of the file, each line contains "tab-delimited" eleme
 
 As an example, the initial portion of an audit file is shown (illustrating the error reporting):
 
- -Input File Type=WY2, with FileName=D:\\DevTests\\Release\\WeatherData\\04772.wy2
+```
+ -Input File Type=WY2, with FileName=D:\DevTests\Release\WeatherData\04772.wy2
+ -Out of Range Data items will NOT be corrected.
+ Warning ** Dew Point=   5.00&deg;C > Dry Bulb=   4.90&deg;C on date= 5/ 1 at hour= 4
+ Warning ** Dew Point=   4.80&deg;C > Dry Bulb=   4.40&deg;C on date= 5/ 1 at hour= 5
+ Warning ** Dew Point=   4.70&deg;C > Dry Bulb=   3.80&deg;C on date= 5/ 1 at hour= 6
+ Warning ** Suspected missing data line after processing          365  days
+  Month=           0  Day=           0  Hour=           0
+  Processing continues but may be in error
+ Warning ** Suspected Blank line after processing          365  days
+ ** Remaining records, if any, will be ignored
+ Warning ** Missing Data Found on Source Weather Data File
+ ** Missing (and corrected) Aerosol Optical Depth, Number of items= 8760
+ Warning ** Out of Range Data Found on Weather Data File
+ ** Out of Range Dew Point Temperatures > Dry Bulb Temperatures, Number of items=    3
 
- -Out of Range Data items will NOT be corrected.
-
- Warning \*\* Dew Point=   5.00°C &gt; Dry Bulb=   4.90°C on date= 5/ 1 at hour= 4
-
- Warning \*\* Dew Point=   4.80°C &gt; Dry Bulb=   4.40°C on date= 5/ 1 at hour= 5
-
- Warning \*\* Dew Point=   4.70°C &gt; Dry Bulb=   3.80°C on date= 5/ 1 at hour= 6
-
- Warning \*\* Suspected missing data line after processing          365  days
-
-  Month=           0  Day=           0  Hour=           0
-
-  Processing continues but may be in error
-
- Warning \*\* Suspected Blank line after processing          365  days
-
- \*\* Remaining records, if any, will be ignored
-
- Warning \*\* Missing Data Found on Source Weather Data File
-
- \*\* Missing (and corrected) Aerosol Optical Depth, Number of items= 8760
-
- Warning \*\* Out of Range Data Found on Weather Data File
-
- \*\* Out of Range Dew Point Temperatures &gt; Dry Bulb Temperatures, Number of items=    3
+ - Start Date/End Date for Weather Source
+ Start Date=Jan  1; End Date=Dec 31
 
 
+ - Actual Data Years for Monthly Data**
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+              1966  1980  1964  1964  1968  1970  1977  1981  1979  1969  1974  1960
+ - ** Not all weather data sources represent contiguous years.
+ - ** Monthly data values may come from different years.
 
- - Start Date/End Date for Weather Source
+ - Data Sources should be checked for relevancy to these statistics.
 
- Start Date=Jan  1; End Date=Dec 31
+ Average Delta DB Change=  0.76&deg;C ; Std Dev=  0.73&deg;C
+ Average Delta DP Change=  0.62&deg;C ; Std Dev=  0.69&deg;C
+ Average Delta Relative Humidity Change=  3.50% ; Std Dev=  3.63%
+ Average Delta Wind Speed Change=  0.93m/s ; Std Dev=  0.88m/s
+ Hourly Dry Bulb temperature change trigger = minimum of  11.07&deg;C  and  10.&deg;C
+     11.07&deg;C = calculated trigger based on mean change in dry-bulb temperature and standard deviation shown above
+     10.&deg;C = trigger set by user
 
-
-
-
-
- - Actual Data Years for Monthly Data\*\*
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-               1966  1980  1964  1964  1968  1970  1977  1981  1979  1969  1974  1960
-
- - \*\* Not all weather data sources represent contiguous years.
-
- - \*\* Monthly data values may come from different years.
-
-
-
- - Data Sources should be checked for relevancy to these statistics.
-
-
-
- Average Delta DB Change=  0.76°C ; Std Dev=  0.73°C
-
- Average Delta DP Change=  0.62°C ; Std Dev=  0.69°C
-
- Average Delta Relative Humidity Change=  3.50% ; Std Dev=  3.63%
-
- Average Delta Wind Speed Change=  0.93m/s ; Std Dev=  0.88m/s
-
- Hourly Dry Bulb temperature change trigger = minimum of  11.07°C  and  10.°C
-
-     11.07°C = calculated trigger based on mean change in dry-bulb temperature and standard deviation shown above
-
-     10.°C = trigger set by user
-
-
-
- -Output File Type=epw, with FileName=D:\\DevTests\\Release\\WeatherData\\Out\\CAN\_Ottawa-International\_Airport\_CWEC.epw
-
- -Output File Type=csv, with FileName=D:\\DevTests\\Release\\WeatherData\\Out\\CAN\_Ottawa-International\_Airport\_CWEC.csv
+ -Output File Type=epw, with FileName=D:\DevTests\Release\WeatherData\Out\CAN\_Ottawa-International\_Airport\_CWEC.epw
+ -Output File Type=csv, with FileName=D:\DevTests\Release\WeatherData\Out\CAN\_Ottawa-International\_Airport\_CWEC.csv
+```
 
 ### Statistical Report File
 
 As will be seen in comparison with a "statistical" report shown following, the audit file may contain some details about the data that the statistical report does not (such as the data years for the weather data). Some basic statistics are shown first:
 
-**Statistics for USA\_CA\_San.Francisco.Intl.AP.724940\_TMY3**
-
- Location -- San Francisco Intl Ap CA USA
-
-      {N 37° 37'} {W 122° 24'} {GMT -8.0 Hours}
-
- Elevation --     2m above sea level
-
- Standard Pressure at Elevation -- 101301Pa
-
- Data Source -- TMY3
+```
+Statistics for USA_CA_San.Francisco.Intl.AP.724940_TMY3
+ Location -- San Francisco Intl Ap CA USA
+      {N 37&deg; 37'} {W 122&deg; 24'} {GMT -8.0 Hours}
+ Elevation --     2m above sea level
+ Standard Pressure at Elevation -- 101301Pa
+ Data Source -- TMY3
 
 
-
- WMO Station 724940
-
+ WMO Station 724940
 
 
 - Displaying Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
-
- - ASHRAE design conditions are carefully generated from a period of record
-
- - (typically 30 years) to be representative of that location and to be suitable
-
- - for use in heating/cooling load calculations.
+ - ASHRAE design conditions are carefully generated from a period of record
+ - (typically 30 years) to be representative of that location and to be suitable
+ - for use in heating/cooling load calculations.
 
 
-
-       Design Stat   ColdestMonth  DB996  DB990  DP996  HR\_DP996      DB\_DP996      DP990  HR\_DP990       DB\_DP990      WS004c DB\_WS004c     WS010c DB\_WS010c     WS\_DB996      WD\_DB996
-
-       Units  {}     {°C}   {°C}   {°C}   {}     {°C}   {°C}   {}     {°C}   {m/s}  {°C}   {m/s}  {°C}       {m/s}  {deg}
-
-       Heating       1      3.8    4.9    -3.7   2.8    10.7   -1.2   3.4    11.2   12.9   12.1   11.6       12.2   2.2    150
+      Design Stat   ColdestMonth  DB996  DB990  DP996  HR_DP996      DB_DP996      DP990  HR_DP990       DB_DP990      WS004c DB_WS004c     WS010c DB_WS010c     WS_DB996      WD_DB996
+      Units  {}     {&deg;C}   {&deg;C}   {&deg;C}   {}     {&deg;C}   {&deg;C}   {}     {&deg;C}   {m/s}  {&deg;C}   {m/s}  {&deg;C}       {m/s}  {deg}
+      Heating       1      3.8    4.9    -3.7   2.8    10.7   -1.2   3.4    11.2   12.9   12.1   11.6       12.2   2.2    150
 
 
-
-       Design Stat   HottestMonth  DBR    DB004  WB\_DB004      DB010  WB\_DB010      DB020  WB\_DB020       WB004  DB\_WB004      WB010  DB\_WB010      WB020  DB\_WB020      WS\_DB004      WD\_DB004      DP004       HR\_DP004      DB\_DP004      DP010  HR\_DP010      DB\_DP010      DP020  HR\_DP020      DB\_DP020       EN004  DB\_EN004      EN010  DB\_EN010      EN020  DB\_EN020      \#Hrs\_8-4\_&\_DB-12.8/20.6
-
-       Units  {}     {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}       {°C}   {m/s}  {deg}  {°C}   {}     {°C}   {°C}   {}     {°C}   {°C}   {}     {°C}   {kJ/kg}       {°C}   {kJ/kg}       {°C}   {kJ/kg}       {°C}   {}
-
-       Cooling       8      8.5    28.3   17.2   25.7   16.7   23.6   16.2   18.6   25.7   17.8   23.9   17       22.4   5.9    310    16.1   11.5   19.9   15.3   10.9   19.2   14.7   10.4   18.7   52.4   25.8       49.8   23.8   47.6   22.4   2038
+      Design Stat   HottestMonth  DBR    DB004  WB_DB004      DB010  WB_DB010      DB020  WB_DB020       WB004  DB_WB004      WB010  DB_WB010      WB020  DB_WB020      WS_DB004      WD_DB004      DP004       HR_DP004      DB_DP004      DP010  HR_DP010      DB_DP010      DP020  HR_DP020      DB_DP020       EN004  DB_EN004      EN010  DB_EN010      EN020  DB_EN020      \#Hrs_8-4_&_DB-12.8/20.6
+      Units  {}     {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}       {&deg;C}   {m/s}  {deg}  {&deg;C}   {}     {&deg;C}   {&deg;C}   {}     {&deg;C}   {&deg;C}   {}     {&deg;C}   {kJ/kg}       {&deg;C}   {kJ/kg}       {&deg;C}   {kJ/kg}       {&deg;C}   {}
+      Cooling       8      8.5    28.3   17.2   25.7   16.7   23.6   16.2   18.6   25.7   17.8   23.9   17       22.4   5.9    310    16.1   11.5   19.9   15.3   10.9   19.2   14.7   10.4   18.7   52.4   25.8       49.8   23.8   47.6   22.4   2038
 
 
-
-       Design Stat   WS010  WS025  WS050  WBmax  DBmin\_mean    DBmax\_mean    DBmin\_stddev  DBmax\_stddev       DBmin05years  DBmax05years  DBmin10years  DBmax10years  DBmin20years  DBmax20years  DBmin50years       DBmax50years
-
-       Units  {m/s}  {m/s}  {m/s}  {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}   {°C}       {°C}   {°C}   {°C}
-
-       Extremes      12.8   11.5   10.6   22.3   1.8    34.6   1.5    2.3    0.8    36.2   -0.1   37.5   -0.9    38.8   -1.9   40.5
+      Design Stat   WS010  WS025  WS050  WBmax  DBmin_mean    DBmax_mean    DBmin_stddev  DBmax_stddev       DBmin05years  DBmax05years  DBmin10years  DBmax10years  DBmin20years  DBmax20years  DBmin50years       DBmax50years
+      Units  {m/s}  {m/s}  {m/s}  {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}   {&deg;C}       {&deg;C}   {&deg;C}   {&deg;C}
+      Extremes      12.8   11.5   10.6   22.3   1.8    34.6   1.5    2.3    0.8    36.2   -0.1   37.5   -0.9    38.8   -1.9   40.5
 
 
-
- - Displaying Monthly Design Conditions "Climate Design Data 2009 ASHRAE Handbook"
-
- - Monthly Optical Sky Depth Beam (taub) and Diffuse (taud)
-
-                                  Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct       Nov    Dec
-
-                    taub (beam)   0.316  0.326  0.334  0.362  0.368  0.353  0.371  0.365  0.352  0.335       0.320  0.318
-
-                 taud (diffuse)   2.608  2.528  2.525  2.345  2.360  2.496  2.395  2.435  2.518  2.545       2.611  2.538
+ - Displaying Monthly Design Conditions "Climate Design Data 2009 ASHRAE Handbook"
+ - Monthly Optical Sky Depth Beam (taub) and Diffuse (taud)
+                                 Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct       Nov    Dec
+                   taub (beam)   0.316  0.326  0.334  0.362  0.368  0.353  0.371  0.365  0.352  0.335       0.320  0.318
+                taud (diffuse)   2.608  2.528  2.525  2.345  2.360  2.496  2.395  2.435  2.518  2.545       2.611  2.538
 
 
-
-                           taub   = Clear Sky Optical Depth for Beam Irradiance
-
-                           taud   = Clear Sky Optical Depth for Diffuse Irradiance
+                          taub   = Clear Sky Optical Depth for Beam Irradiance
+                          taud   = Clear Sky Optical Depth for Diffuse Irradiance
 
 
-
- - Monthly Solar Irradiance Wh/m² (noon on 21st of month)
-
-                      ib (beam)     879    910    933    918    912    923    903    904    901    887    866      846
-
-                   id (diffuse)      79     93    100    124    123    108    118    112     99     90     78        80
+ - Monthly Solar Irradiance Wh/m<sup>2</sup> (noon on 21st of month)
+                     ib (beam)    879   910   933   918   912   923   903   904   901   887   866     846
+                  id (diffuse)     79    93   100   124   123   108   118   112    99    90    78       80
 
 
-
-                             ib   = Clear Sky Noon Beam Normal Irradiance on 21st Day
-
-                             id   = Clear Sky Noon Diffuse Horizontal Irradiance on 21st Day
+                            ib   = Clear Sky Noon Beam Normal Irradiance on 21st Day
+                            id   = Clear Sky Noon Diffuse Horizontal Irradiance on 21st Day
 
 
 
 
-
- - Monthly Drybulb and Mean Coincident Wetbulb Temperatures °C
-
-                                  Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct       Nov    Dec
-
-                   Drybulb 0.4%   17.8  21.1  23.3  26.9  28.3  31.5  29.4  29.2  31.1  29.5  22.7   17.5
-
-        Coincident Wetbulb 0.4%   12.1  13.9  14.4  16.2  17.3  17.7  18.4  18.2  18.0  16.5  14.0   12.9
-
-                   Drybulb 2.0%   15.8  17.9  19.8  22.5  23.7  25.6  25.3  25.0  27.1  25.5  20.0   16.2
-
-        Coincident Wetbulb 2.0%   12.1  12.7  13.4  14.4  15.8  16.7  17.3  17.5  17.1  15.6  13.5   13.0
-
-                   Drybulb 5.0%   14.6  16.2  17.6  19.5  21.1  22.3  22.7  22.9  23.9  22.6  18.2   15.2
-
-        Coincident Wetbulb 5.0%   11.8  12.6  13.0  13.6  15.1  15.8  16.5  16.8  16.6  15.2  13.4   12.5
-
-                   Drybulb 10.%   13.5  15.0  16.2  17.5  19.1  20.6  21.2  21.5  21.8  20.5  16.8   14.2
-
-        Coincident Wetbulb 10.%   11.2  12.1  12.5  12.9  14.1  15.1  15.9  16.2  16.1  14.9  13.3   11.7
+ - Monthly Drybulb and Mean Coincident Wetbulb Temperatures&deg;C
+                                 Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct       Nov    Dec
+                  Drybulb 0.4%   17.8  21.1  23.3  26.9  28.3  31.5  29.4  29.2  31.1  29.5  22.7   17.5
+        Coincident Wetbulb 0.4%   12.1  13.9  14.4  16.2  17.3  17.7  18.4  18.2  18.0  16.5  14.0   12.9
+                  Drybulb 2.0%   15.8  17.9  19.8  22.5  23.7  25.6  25.3  25.0  27.1  25.5  20.0   16.2
+        Coincident Wetbulb 2.0%   12.1  12.7  13.4  14.4  15.8  16.7  17.3  17.5  17.1  15.6  13.5   13.0
+                  Drybulb 5.0%   14.6  16.2  17.6  19.5  21.1  22.3  22.7  22.9  23.9  22.6  18.2   15.2
+        Coincident Wetbulb 5.0%   11.8  12.6  13.0  13.6  15.1  15.8  16.5  16.8  16.6  15.2  13.4   12.5
+                  Drybulb 10.%   13.5  15.0  16.2  17.5  19.1  20.6  21.2  21.5  21.8  20.5  16.8   14.2
+        Coincident Wetbulb 10.%   11.2  12.1  12.5  12.9  14.1  15.1  15.9  16.2  16.1  14.9  13.3   11.7
 
 
-
-                   Drybulb 0.4%   = 0.4% Monthly Design Drybulb Temperature
-
-        Coincident Wetbulb 0.4%   = 0.4% Monthly Mean Coincident Wetbulb Temperature
-
-                   Drybulb 2.0%   = 2.0% Monthly Design Drybulb Temperature
-
-        Coincident Wetbulb 2.0%   = 2.0% Monthly Mean Coincident Wetbulb Temperature
-
-                   Drybulb 5.0%   = 5.0% Monthly Design Drybulb Temperature
-
-        Coincident Wetbulb 5.0%   = 5.0% Monthly Mean Coincident Wetbulb Temperature
-
-                   Drybulb 10.%   = 10.% Monthly Design Drybulb Temperature
-
-        Coincident Wetbulb 10.%   = 10.% Monthly Mean Coincident Wetbulb Temperature
+                  Drybulb 0.4%   = 0.4% Monthly Design Drybulb Temperature
+        Coincident Wetbulb 0.4%   = 0.4% Monthly Mean Coincident Wetbulb Temperature
+                  Drybulb 2.0%   = 2.0% Monthly Design Drybulb Temperature
+        Coincident Wetbulb 2.0%   = 2.0% Monthly Mean Coincident Wetbulb Temperature
+                  Drybulb 5.0%   = 5.0% Monthly Design Drybulb Temperature
+        Coincident Wetbulb 5.0%   = 5.0% Monthly Mean Coincident Wetbulb Temperature
+                  Drybulb 10.%   = 10.% Monthly Design Drybulb Temperature
+        Coincident Wetbulb 10.%   = 10.% Monthly Mean Coincident Wetbulb Temperature
+```
 
 
 
 Or, if the weather converter must calculate the design stats:
 
-**-EnergyPlus Weather Converter V7.1.0.010**
-
-** Statistics for FaroCST**
-
-** Location -- Faro - PRT **
-
-**      {N 37°  2'} {E   7° 55'} {GMT +0.0 Hours}**
-
-** Elevation --   100m above sea level**
-
-** Standard Pressure at Elevation -- 100129Pa**
-
-** Data Source -- Custom-085790**
-
-** **
-
-** WMO Station 085790**
-
-** **
-
-** - Displaying Design Conditions calculated from this weather file.**
-
-** -  The following design temperature statistics are calculated based on THIS weather file ONLY**
-
-** -  and may not be representative of a long-term  period of record normally used for**
-
-** -  design temperatures. Also, note that dew point temperatures are listed where**
-
-** -  wet-bulb temperatures are normally presented.**
-
-** **
-
-**       Design Stat   Coldest Month HDB 99.6%     HDB 99%**
-
-**          Units          {}           {C}          {C} **
-
-**         Heating      3       5.6    6.0**
-
-** **
-
-**       Design Stat   Hottest Month CDB .4%       CDB 1% CDB 2% CDP .4%       CDP 1% CDP 2%**
-
-**          Units          {}          {C}           {C}   {C}   {C}           {C}   {C}**
-
-**         Cooling      8     33.3  32.5  31.8  22.6  22.0  21.7**
-
-** **
-
-**       Design Stat   Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec**
-
-**          Units      {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}**
-
-**       Max WS   0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0**
-
-** **
-
-** - Heating/Cooling Degree Days/Hours calculated from this weather file are later in this report.**
-
+```
+-EnergyPlus Weather Converter V7.1.0.010
+ Statistics for FaroCST
+ Location -- Faro - PRT 
+      {N 37&deg;  2'} {E   7&deg; 55'} {GMT +0.0 Hours}
+ Elevation --   100m above sea level
+ Standard Pressure at Elevation -- 100129Pa
+ Data Source -- Custom-085790
+ 
+ WMO Station 085790
+ 
+ - Displaying Design Conditions calculated from this weather file.
+ -  The following design temperature statistics are calculated based on THIS weather file ONLY
+ -  and may not be representative of a long-term  period of record normally used for
+ -  design temperatures. Also, note that dew point temperatures are listed where
+ -  wet-bulb temperatures are normally presented.
+ 
+       Design Stat   Coldest Month HDB 99.6%     HDB 99%
+         Units         {}          {C}         {C} 
+        Heating     3      5.6   6.0
+ 
+       Design Stat   Hottest Month CDB .4%       CDB 1% CDB 2% CDP .4%       CDP 1% CDP 2%
+         Units         {}         {C}          {C}   {C}   {C}          {C}   {C}
+        Cooling     8     33.3  32.5  31.8  22.6  22.0  21.7
+ 
+       Design Stat   Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+         Units     {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}  {m/s}
+       Max WS  0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
+ 
+ - Heating/Cooling Degree Days/Hours calculated from this weather file are later in this report.
+```
 
 
 These are followed by groupings of Monthly temperature data.
 
-**- Monthly Statistics for Dry Bulb temperatures °C**
 
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-**Maximum        16.7  22.2  23.9  28.3  29.4  32.8  26.7  29.4  30.0  26.7  20.6  16.1 **
-
-** Day:Hour     19:13  14:13  12:15  2:15  1:12  30:14  12:13  2:13  15:14  20:14  1:14  1:15 **
-
-** **
-
-**Minimum         2.2    5.0    4.4    8.3    8.9    9.4  11.1  11.1  11.1    7.8    3.3    2.8 **
-
-** Day:Hour     24:06  26:07  23:05  19:05  4:02  22:03  1:04  28:05  7:02  31:05  30:05  26:05 **
-
-** **
-
-**Daily Avg     9.6    11.3   12.7   13.7   15.0   15.3   15.9   16.6   16.7   15.1   12.8   10.7  **
-
-** **
-
-**   - Maximum Dry Bulb temperature of  32.8°C on Jun 30**
-
-**   - Minimum Dry Bulb temperature of   2.2°C on Jan 24**
-
-** **
-
-** - Monthly Statistics for Extreme Dry Bulb temperatures °C**
-
-**  \#Days       Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-**Max &gt;= 32                                            1                                           **
-
-**Max &lt;=  0                                                                                        **
-
-**Min &lt;=  0                                                                                        **
-
-**Min &lt;=-18                                                                                        **
-
-** **
-
-** - Monthly Statistics for Dew Point temperatures °C**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-**Maximum       13.3   12.2   13.9   15.0   16.7   16.1   14.0   16.7   16.7   14.4   14.4   13.9  **
-
-** Day:Hour     17:12  21:04  29:15  2:14  14:09  5:12  8:14  3:10  23:12  6:14  11:12  7:03 **
-
-** **
-
-**Minimum       -1.1   0.6    -1.1   -0.6   0.0    5.0    6.1    4.4    7.8    -1.7   -3.3   -5.6  **
-
-** Day:Hour     24:05  24:07  12:15  12:13  2:17  18:17  2:13  30:12  15:17  16:21  21:21  19:12 **
-
-** **
-
-**Daily Avg     6.4    6.6    8.1    8.2    9.4    10.0   10.7   11.5   12.5   9.4    8.3    6.1   **
-
-** **
-
-**   - Maximum Dew Point temperature of  16.7°C on May 14**
-
-**   - Minimum Dew Point temperature of  -5.6°C on Dec 19**
-
+```idf
+- Monthly Statistics for Dry Bulb temperatures&deg;C
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+Maximum       16.7  22.2  23.9  28.3  29.4  32.8  26.7  29.4  30.0  26.7  20.6  16.1 
+ Day:Hour     19:13  14:13  12:15  2:15  1:12  30:14  12:13  2:13  15:14  20:14  1:14  1:15 
+ 
+Minimum        2.2   5.0   4.4   8.3   8.9   9.4  11.1  11.1  11.1   7.8   3.3   2.8 
+ Day:Hour     24:06  26:07  23:05  19:05  4:02  22:03  1:04  28:05  7:02  31:05  30:05  26:05 
+ 
+Daily Avg     9.6   11.3  12.7  13.7  15.0  15.3  15.9  16.6  16.7  15.1  12.8  10.7  
+ 
+   - Maximum Dry Bulb temperature of  32.8&deg;C on Jun 30
+   - Minimum Dry Bulb temperature of   2.2&deg;C on Jan 24
+ 
+ - Monthly Statistics for Extreme Dry Bulb temperatures&deg;C
+  \#Days      Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+Max >= 32                                         1                                        
+Max <=  0                                                                                  
+Min <=  0                                                                                  
+Min <=-18                                                                                  
+ 
+ - Monthly Statistics for Dew Point temperatures&deg;C
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+Maximum      13.3  12.2  13.9  15.0  16.7  16.1  14.0  16.7  16.7  14.4  14.4  13.9  
+ Day:Hour     17:12  21:04  29:15  2:14  14:09  5:12  8:14  3:10  23:12  6:14  11:12  7:03 
+ 
+Minimum      -1.1  0.6   -1.1  -0.6  0.0   5.0   6.1   4.4   7.8   -1.7  -3.3  -5.6  
+ Day:Hour     24:05  24:07  12:15  12:13  2:17  18:17  2:13  30:12  15:17  16:21  21:21  19:12 
+ 
+Daily Avg     6.4   6.6   8.1   8.2   9.4   10.0  10.7  11.5  12.5  9.4   8.3   6.1   
+ 
+   - Maximum Dew Point temperature of  16.7&deg;C on May 14
+   - Minimum Dew Point temperature of  -5.6&deg;C on Dec 19
 For the dry bulb and dew point temperatures, an average hourly report, by month, is also given:
-
-**- Average Hourly Statistics for Dry Bulb temperatures °C**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-** 0:01- 1:00     8.9    9.9  10.6  11.6  12.3  12.1  13.4  14.0  14.4  13.3  11.6    9.7 **
-
-** 1:01- 2:00     8.7    9.5  10.3  11.4  12.1  12.0  13.2  13.7  14.3  12.7  11.2    9.4 **
-
-** 2:01- 3:00     8.3    9.0  10.1  11.3  12.0  11.7  13.1  13.5  14.1  12.4  11.0    9.2 **
-
-** 3:01- 4:00     7.8    8.6  10.0  11.2  12.0  11.6  12.9  13.4  14.0  12.4  11.1    8.9 **
-
-** 4:01- 5:00     7.9    8.5    9.7  11.0  11.8  11.5  13.4  13.3  13.8  12.0  10.6    8.7 **
-
-** 5:01- 6:00     7.8    8.4    9.6  11.3  12.4  12.3  13.8  13.5  13.9  12.2  10.8    8.5 **
-
-** 6:01- 7:00     7.9    8.3    9.8  12.2  14.0  14.1  14.3  14.9  14.6  12.5  10.9    8.5 **
-
-** 7:01- 8:00     7.9    9.2  11.5  13.1  15.5  15.7  15.4  16.3  16.1  14.3  11.5    8.9 **
-
-** 8:01- 9:00     8.8  10.1  12.6  14.1  16.6  16.6  16.5  17.5  17.4  15.3  12.6    9.9 **
-
-** 9:01-10:00     9.5  11.0  13.7  15.0  17.7  17.7  17.5  18.4  18.5  16.1  13.2  10.9 **
-
-**10:01-11:00   10.1  12.1  14.5  16.2  18.8  19.1  18.4  19.6  19.6  17.2  13.8  11.5 **
-
-**11:01-12:00   10.6  13.2  15.6  16.8  19.3  19.9  19.3  20.6  20.5  18.0  14.3  11.9 **
-
-**12:01-13:00   11.4  14.2  16.4  17.1  19.2  20.6  20.2  21.3  21.3  18.9  14.9  12.5 **
-
-**13:01-14:00   11.5  14.5  16.9  17.0  19.0  20.5  19.8  21.5  21.4  19.2  15.4  12.9 **
-
-**14:01-15:00   11.9  14.8  16.8  17.0  18.4  19.7  19.4  21.1  21.0  19.1  15.7  13.0 **
-
-**15:01-16:00   11.6  15.1  16.0  16.7  17.6  18.8  19.0  20.1  19.9  18.2  15.4  13.0 **
-
-**16:01-17:00   11.0  14.1  15.1  15.8  16.7  17.6  18.0  18.8  18.8  17.0  14.3  12.4 **
-
-**17:01-18:00   10.6  13.1  13.8  14.4  15.7  16.6  16.9  17.4  17.0  15.8  13.7  12.0 **
-
-**18:01-19:00   10.3  12.2  12.7  13.3  14.4  15.3  15.8  16.1  15.9  15.3  13.4  11.5 **
-
-**19:01-20:00   10.0  11.8  12.3  12.9  13.4  13.8  15.3  15.4  15.6  14.9  13.0  11.1 **
-
-**20:01-21:00     9.7  11.4  11.7  12.6  13.2  13.3  14.8  15.0  15.1  14.5  12.6  10.6 **
-
-**21:01-22:00     9.6  11.0  11.6  12.3  13.0  12.9  14.2  14.7  14.8  14.2  12.1  10.4 **
-
-**22:01-23:00     9.5  10.6  11.3  12.0  12.7  12.5  14.0  14.3  14.6  13.8  12.1  10.3 **
-
-**23:01-24:00     9.2  10.3  11.1  11.8  12.4  12.5  13.7  14.3  14.5  13.5  11.7  10.0 **
-
-** Max Hour       15     16     14     13     12     13     13     14     14     14     15     15  **
-
-** Min Hour        6      7      6      5      5      5      4      5      5      5      5      6  **
-
-** **
-
-** - Average Hourly Statistics for Dew Point temperatures °C**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-** 0:01- 1:00     6.7    6.6    8.0    8.1    9.5    9.7    9.9  11.4  12.3    9.7    8.0    5.7 **
-
-** 1:01- 2:00     6.6    6.1    7.7    8.1    9.4    9.6  10.1  11.2  12.3    9.3    8.0    5.8 **
-
-** 2:01- 3:00     6.3    5.9    7.4    8.2    9.3    9.4  10.0  11.2  12.2    9.1    7.6    5.9 **
-
-** 3:01- 4:00     5.9    5.9    7.7    8.0    9.3    9.5    9.7  11.0  12.1    8.9    8.0    5.8 **
-
-** 4:01- 5:00     5.9    5.6    7.6    8.0    9.2    9.4    9.9  11.0  12.1    9.1    7.6    5.5 **
-
-** 5:01- 6:00     5.9    5.5    7.5    8.1    9.4    9.8  10.1  11.1  12.1    9.1    7.8    5.7 **
-
-** 6:01- 7:00     6.0    5.7    7.6    8.5    9.7  10.3  10.2  11.6  12.4    9.5    7.8    5.8 **
-
-** 7:01- 8:00     5.9    6.1    8.4    8.8    9.7  10.6  10.8  11.8  12.7  10.4    7.9    6.1 **
-
-** 8:01- 9:00     6.1    6.8    8.8    9.0  10.0  10.8  11.0  12.1  12.9  10.4    8.2    6.3 **
-
-** 9:01-10:00     6.1    7.3    8.8    8.9    9.7  10.9  11.0  12.4  13.2  10.4    8.1   6.3 **
-
-**10:01-11:00     6.4    7.1    8.5    8.7    9.8  10.8  11.4  12.0  13.4    9.9    8.3    6.2 **
-
-**11:01-12:00     6.3    6.8    8.3    8.6    9.5  10.6  11.5  11.8  13.3    9.7    8.1    6.2 **
-
-**12:01-13:00     6.2    6.9    8.3    8.5    9.4  10.5  11.5  11.6  12.8    9.2    8.3    6.5 **
-
-**13:01-14:00     6.3    6.8    8.0    8.7    9.2  10.2  11.6  11.5  12.6    9.3    8.4    6.6 **
-
-**14:01-15:00     6.4    7.1    8.4    8.1    9.2  10.1  11.5  11.4  12.4    8.8    8.7    6.4 **
-
-**15:01-16:00     6.6    7.6    8.0    7.7    9.0    9.9  11.4  11.2  12.4    8.9    8.6   6.3 **
-
-**16:01-17:00     6.6    7.1    7.9    7.8    9.0    9.7  11.2  11.4  12.3    9.0    9.3    6.7 **
-
-**17:01-18:00     6.6    6.8    7.9    7.8    9.1    9.6  11.0  11.4  12.3    8.9    9.4    6.7 **
-
-**18:01-19:00     6.5    6.7    7.9    7.9    9.4    9.6  10.6  11.4  12.3    9.0    9.1    6.7 **
-
-**19:01-20:00     6.5    6.5    7.9    8.0    9.3    9.6  10.7  11.5  12.4    9.2    8.9    6.3 **
-
-**20:01-21:00     6.6    6.6    8.2    7.7    9.5    9.6  10.6  11.5  12.4    9.3    8.5    6.2 **
-
-**21:01-22:00     6.8    6.8    8.0    8.1    9.5    9.7  10.2  11.4  12.5    9.5    8.6    6.0 **
-
-**22:01-23:00     6.7    6.6    8.3    8.0    9.7    9.7  10.4  11.5  12.4    9.6    8.4    6.1 **
-
-**23:01-24:00     6.6    6.5    8.4    8.1    9.6    9.6  10.3  10.7  12.4    9.4    8.5    5.9 **
-
-** Max Hour       22     16      9      9      9     10     14     10     11      9     18     19  **
-
-** Min Hour        6      6      3     16     16      5      4     24      4     15      3      5  **
-
+- Average Hourly Statistics for Dry Bulb temperatures&deg;C
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+ 0:01- 1:00    8.9   9.9  10.6  11.6  12.3  12.1  13.4  14.0  14.4  13.3  11.6   9.7 
+ 1:01- 2:00    8.7   9.5  10.3  11.4  12.1  12.0  13.2  13.7  14.3  12.7  11.2   9.4 
+ 2:01- 3:00    8.3   9.0  10.1  11.3  12.0  11.7  13.1  13.5  14.1  12.4  11.0   9.2 
+ 3:01- 4:00    7.8   8.6  10.0  11.2  12.0  11.6  12.9  13.4  14.0  12.4  11.1   8.9 
+ 4:01- 5:00    7.9   8.5   9.7  11.0  11.8  11.5  13.4  13.3  13.8  12.0  10.6   8.7 
+ 5:01- 6:00    7.8   8.4   9.6  11.3  12.4  12.3  13.8  13.5  13.9  12.2  10.8   8.5 
+ 6:01- 7:00    7.9   8.3   9.8  12.2  14.0  14.1  14.3  14.9  14.6  12.5  10.9   8.5 
+ 7:01- 8:00    7.9   9.2  11.5  13.1  15.5  15.7  15.4  16.3  16.1  14.3  11.5   8.9 
+ 8:01- 9:00    8.8  10.1  12.6  14.1  16.6  16.6  16.5  17.5  17.4  15.3  12.6   9.9 
+ 9:01-10:00    9.5  11.0  13.7  15.0  17.7  17.7  17.5  18.4  18.5  16.1  13.2  10.9 
+10:01-11:00   10.1  12.1  14.5  16.2  18.8  19.1  18.4  19.6  19.6  17.2  13.8  11.5 
+11:01-12:00   10.6  13.2  15.6  16.8  19.3  19.9  19.3  20.6  20.5  18.0  14.3  11.9 
+12:01-13:00   11.4  14.2  16.4  17.1  19.2  20.6  20.2  21.3  21.3  18.9  14.9  12.5 
+13:01-14:00   11.5  14.5  16.9  17.0  19.0  20.5  19.8  21.5  21.4  19.2  15.4  12.9 
+14:01-15:00   11.9  14.8  16.8  17.0  18.4  19.7  19.4  21.1  21.0  19.1  15.7  13.0 
+15:01-16:00   11.6  15.1  16.0  16.7  17.6  18.8  19.0  20.1  19.9  18.2  15.4  13.0 
+16:01-17:00   11.0  14.1  15.1  15.8  16.7  17.6  18.0  18.8  18.8  17.0  14.3  12.4 
+17:01-18:00   10.6  13.1  13.8  14.4  15.7  16.6  16.9  17.4  17.0  15.8  13.7  12.0 
+18:01-19:00   10.3  12.2  12.7  13.3  14.4  15.3  15.8  16.1  15.9  15.3  13.4  11.5 
+19:01-20:00   10.0  11.8  12.3  12.9  13.4  13.8  15.3  15.4  15.6  14.9  13.0  11.1 
+20:01-21:00    9.7  11.4  11.7  12.6  13.2  13.3  14.8  15.0  15.1  14.5  12.6  10.6 
+21:01-22:00    9.6  11.0  11.6  12.3  13.0  12.9  14.2  14.7  14.8  14.2  12.1  10.4 
+22:01-23:00    9.5  10.6  11.3  12.0  12.7  12.5  14.0  14.3  14.6  13.8  12.1  10.3 
+23:01-24:00    9.2  10.3  11.1  11.8  12.4  12.5  13.7  14.3  14.5  13.5  11.7  10.0 
+ Max Hour      15    16    14    13    12    13    13    14    14    14    15    15  
+ Min Hour       6     7     6     5     5     5     4     5     5     5     5     6  
+ 
+ - Average Hourly Statistics for Dew Point temperatures&deg;C
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+ 0:01- 1:00    6.7   6.6   8.0   8.1   9.5   9.7   9.9  11.4  12.3   9.7   8.0   5.7 
+ 1:01- 2:00    6.6   6.1   7.7   8.1   9.4   9.6  10.1  11.2  12.3   9.3   8.0   5.8 
+ 2:01- 3:00    6.3   5.9   7.4   8.2   9.3   9.4  10.0  11.2  12.2   9.1   7.6   5.9 
+ 3:01- 4:00    5.9   5.9   7.7   8.0   9.3   9.5   9.7  11.0  12.1   8.9   8.0   5.8 
+ 4:01- 5:00    5.9   5.6   7.6   8.0   9.2   9.4   9.9  11.0  12.1   9.1   7.6   5.5 
+ 5:01- 6:00    5.9   5.5   7.5   8.1   9.4   9.8  10.1  11.1  12.1   9.1   7.8   5.7 
+ 6:01- 7:00    6.0   5.7   7.6   8.5   9.7  10.3  10.2  11.6  12.4   9.5   7.8   5.8 
+ 7:01- 8:00    5.9   6.1   8.4   8.8   9.7  10.6  10.8  11.8  12.7  10.4   7.9   6.1 
+ 8:01- 9:00    6.1   6.8   8.8   9.0  10.0  10.8  11.0  12.1  12.9  10.4   8.2   6.3 
+ 9:01-10:00    6.1   7.3   8.8   8.9   9.7  10.9  11.0  12.4  13.2  10.4   8.1   6.3 
+10:01-11:00    6.4   7.1   8.5   8.7   9.8  10.8  11.4  12.0  13.4   9.9   8.3   6.2 
+11:01-12:00    6.3   6.8   8.3   8.6   9.5  10.6  11.5  11.8  13.3   9.7   8.1   6.2 
+12:01-13:00    6.2   6.9   8.3   8.5   9.4  10.5  11.5  11.6  12.8   9.2   8.3   6.5 
+13:01-14:00    6.3   6.8   8.0   8.7   9.2  10.2  11.6  11.5  12.6   9.3   8.4   6.6 
+14:01-15:00    6.4   7.1   8.4   8.1   9.2  10.1  11.5  11.4  12.4   8.8   8.7   6.4 
+15:01-16:00    6.6   7.6   8.0   7.7   9.0   9.9  11.4  11.2  12.4   8.9   8.6   6.3 
+16:01-17:00    6.6   7.1   7.9   7.8   9.0   9.7  11.2  11.4  12.3   9.0   9.3   6.7 
+17:01-18:00    6.6   6.8   7.9   7.8   9.1   9.6  11.0  11.4  12.3   8.9   9.4   6.7 
+18:01-19:00    6.5   6.7   7.9   7.9   9.4   9.6  10.6  11.4  12.3   9.0   9.1   6.7 
+19:01-20:00    6.5   6.5   7.9   8.0   9.3   9.6  10.7  11.5  12.4   9.2   8.9   6.3 
+20:01-21:00    6.6   6.6   8.2   7.7   9.5   9.6  10.6  11.5  12.4   9.3   8.5   6.2 
+21:01-22:00    6.8   6.8   8.0   8.1   9.5   9.7  10.2  11.4  12.5   9.5   8.6   6.0 
+22:01-23:00    6.7   6.6   8.3   8.0   9.7   9.7  10.4  11.5  12.4   9.6   8.4   6.1 
+23:01-24:00    6.6   6.5   8.4   8.1   9.6   9.6  10.3  10.7  12.4   9.4   8.5   5.9 
+ Max Hour      22    16     9     9     9    10    14    10    11     9    18    19  
+ Min Hour       6     6     3    16    16     5     4    24     4    15     3     5  
 
 
 Humidity/precipitation: Relative Humidity (both monthly and average hourly by month)
-
-**- Monthly Statistics for Relative Humidity %**
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-Maximum         100     96     96    100    100     96     93     96    100     96     96    100
-
- Day:Hour      7:05  6:04  20:22  9:03  25:02  5:01  18:04  7:02  4:07  7:07  11:07  7:05
+- Monthly Statistics for Relative Humidity %
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+Maximum        100    96    96   100   100    96    93    96   100    96    96   100
+ Day:Hour     7:05  6:04  20:22  9:03  25:02  5:01  18:04  7:02  4:07  7:07  11:07  7:05
 
 
-
-Minimum          23     30     22     24     25     30     25     36     19     20     32     25
-
- Day:Hour     17:15  14:13  4:16  5:10  9:12  17:10  2:13  14:13  28:15  30:13  20:15  24:15
+Minimum         23    30    22    24    25    30    25    36    19    20    32    25
+ Day:Hour    17:15  14:13  4:16  5:10  9:12  17:10  2:13  14:13  28:15  30:13  20:15  24:15
 
 
-
-Daily Avg        77     75     70     72     73     73     71     74     72     73     74     79
-
+Daily Avg       77    75    70    72    73    73    71    74    72    73    74    79
 
 
-** - Average Hourly Relative Humidity %**
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
- 0:01- 1:00      83     81     77     81     85     84     83     86     84     81     81     84
-
- 1:01- 2:00      84     82     75     80     87     84     83     86     85     82     81     85
-
- 2:01- 3:00      86     83     76     83     88     85     83     87     85     82     82     86
-
- 3:01- 4:00      87     84     78     82     87     85     83     87     85     83     83     85
-
- 4:01- 5:00      88     84     79     83     88     83     81     88     85     83     83     86
-
- 5:01- 6:00      89     84     80     83     88     81     80     88     85     83     83     86
-
- 6:01- 7:00      89     84     80     79     81     80     78     84     82     83     83     86
-
- 7:01- 8:00      88     82     75     73     74     75     73     77     78     78     79     86
-
- 8:01- 9:00      83     81     70     70     68     69     68     71     71     74     74     82
-
- 9:01-10:00      77     79     68     65     64     64     62     67     65     70     70     79
-
-10:01-11:00      74     74     65     62     59     62     59     60     59     65     66     76
-
-11:01-12:00      69     69     59     60     55     60     56     57     54     60     63     73
-
-12:01-13:00      65     63     58     59     53     58     53     55     52     55     59     71
-
-13:01-14:00      62     63     58     60     54     59     55     55     54     56     61     68
-
-14:01-15:00      61     63     58     60     56     60     56     57     56     58     62     67
-
-15:01-16:00      61     62     59     62     59     60     58     61     58     59     64     69
-
-16:01-17:00      66     65     62     63     62     65     62     63     63     64     67     74
-
-17:01-18:00      71     68     67     66     67     69     67     69     67     69     70     76
-
-18:01-19:00      74     71     71     69     73     74     72     75     73     73     73     76
-
-19:01-20:00      77     73     72     73     79     76     75     79     76     75     74     77
-
-20:01-21:00      78     74     74     75     81     78     77     82     78     77     76     78
-
-21:01-22:00      79     76     76     76     83     80     80     83     79     78     77     79
-
-22:01-23:00      79     78     76     78     84     81     81     84     81     79     78     82
-
-23:01-24:00      82     79     76     79     84     83     82     84     82     80     80     82
-
- Max Hour        7      7      7      5      5      4      1      6      5      5      7      7
-
- Min Hour       15     16     15     13     13     13     13     13     13     13     13     15
+ - Average Hourly Relative Humidity %
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+ 0:01- 1:00     83    81    77    81    85    84    83    86    84    81    81    84
+ 1:01- 2:00     84    82    75    80    87    84    83    86    85    82    81    85
+ 2:01- 3:00     86    83    76    83    88    85    83    87    85    82    82    86
+ 3:01- 4:00     87    84    78    82    87    85    83    87    85    83    83    85
+ 4:01- 5:00     88    84    79    83    88    83    81    88    85    83    83    86
+ 5:01- 6:00     89    84    80    83    88    81    80    88    85    83    83    86
+ 6:01- 7:00     89    84    80    79    81    80    78    84    82    83    83    86
+ 7:01- 8:00     88    82    75    73    74    75    73    77    78    78    79    86
+ 8:01- 9:00     83    81    70    70    68    69    68    71    71    74    74    82
+ 9:01-10:00     77    79    68    65    64    64    62    67    65    70    70    79
+10:01-11:00     74    74    65    62    59    62    59    60    59    65    66    76
+11:01-12:00     69    69    59    60    55    60    56    57    54    60    63    73
+12:01-13:00     65    63    58    59    53    58    53    55    52    55    59    71
+13:01-14:00     62    63    58    60    54    59    55    55    54    56    61    68
+14:01-15:00     61    63    58    60    56    60    56    57    56    58    62    67
+15:01-16:00     61    62    59    62    59    60    58    61    58    59    64    69
+16:01-17:00     66    65    62    63    62    65    62    63    63    64    67    74
+17:01-18:00     71    68    67    66    67    69    67    69    67    69    70    76
+18:01-19:00     74    71    71    69    73    74    72    75    73    73    73    76
+19:01-20:00     77    73    72    73    79    76    75    79    76    75    74    77
+20:01-21:00     78    74    74    75    81    78    77    82    78    77    76    78
+21:01-22:00     79    76    76    76    83    80    80    83    79    78    77    79
+22:01-23:00     79    78    76    78    84    81    81    84    81    79    78    82
+23:01-24:00     82    79    76    79    84    83    82    84    82    80    80    82
+ Max Hour       7     7     7     5     5     4     1     6     5     5     7     7
+ Min Hour      15    16    15    13    13    13    13    13    13    13    13    15
 
 
-
-** - Monthly Indicators for Precipitation/Moisture (kPa)**
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-                0.8    1.1    0.9    1.0    1.1    1.2    1.3    1.3    1.3    1.2    1.1    0.9
-
+ - Monthly Indicators for Precipitation/Moisture (kPa)
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+               0.8   1.1   0.9   1.0   1.1   1.2   1.3   1.3   1.3   1.2   1.1   0.9
 
 
 Wind and Wind Chill/Heat Index
-
-**- Monthly Statistics for Wind Chill/Heat Index temperatures °C \*\***
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-Minimum WC       -1     -1     -6     -1     -2      4                           9      0     -8
-
- Day:Hour     19:09  2:10  16:06  15:04  5:24  1:23                       27:04  27:04  28:04
+- Monthly Statistics for Wind Chill/Heat Index temperatures&deg;C **
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+Minimum WC      -1    -1    -6    -1    -2     4                         9     0    -8
+ Day:Hour     19:09  2:10  16:06  15:04  5:24  1:23                     27:04  27:04  28:04
 
 
-
-Average WC        6      7      4      5      5      6                           9      7      4
-
-Avg Del WC        1      2      5      3      4      4                           0      2      3
-
- \# Hours WC     293    166    258    159     56     10                           3     86    358
+Average WC       6     7     4     5     5     6                         9     7     4
+Avg Del WC       1     2     5     3     4     4                         0     2     3
+ \# Hours WC    293   166   258   159    56    10                         3    86   358
 
 
-
-Maximum HI                                                 27     28                       
-
- Day:Hour                                                2:10  15:11                       
+Maximum HI                                             27    28                    
+ Day:Hour                                            2:10  15:11                    
 
 
-
-Average HI                                                 27     28                       
-
-Avg Del HI                                                  0      0                       
-
- \# Hours HI                                                 1      1                       
+Average HI                                             27    28                    
+Avg Del HI                                              0     0                    
+ \# Hours HI                                             1     1                    
 
 
-
-**  - \*\*WindChill/HeatIndex Temps -- statistics...only those different from Air Temps**
+  - **WindChill/HeatIndex Temps -- statistics...only those different from Air Temps
 
 
 
 
-
-**- Monthly Wind Direction % {N=0 or 360,E=90,S=180,W=270}**
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-North            20     11      6      5      4      3      7      6      9      8     16     27
-
-NorthEast        10     10      6      3      3      2      3      3      5      6      6     13
-
-East              8      8      6      3      2      1      1      3      3      5      9      8
-
-SouthEast        13      7      6      2      1      0      0      0      1      6     17     17
-
-South            18     10      9      5      3      1      0      1      5     14     14     12
-
-SouthWest         7      6     19      8      5      2      1      6      7      8     11      4
-
-West              9     14     31     35     32     59     21     32     22     16     10      5
-
-NorthWest        15     35     18     39     50     33     66     50     49     36     17     15
+- Monthly Wind Direction % {N=0 or 360,E=90,S=180,W=270}
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+North           20    11     6     5     4     3     7     6     9     8    16    27
+NorthEast       10    10     6     3     3     2     3     3     5     6     6    13
+East             8     8     6     3     2     1     1     3     3     5     9     8
+SouthEast       13     7     6     2     1     0     0     0     1     6    17    17
+South           18    10     9     5     3     1     0     1     5    14    14    12
+SouthWest        7     6    19     8     5     2     1     6     7     8    11     4
+West             9    14    31    35    32    59    21    32    22    16    10     5
+NorthWest       15    35    18    39    50    33    66    50    49    36    17    15
 
 
-
-** - Monthly Statistics for Wind Speed m/s**
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-Maximum        11.8  14.9  17.0  12.9  15.9  11.8  12.4  13.4  14.9  10.8    8.8  13.4
-
- Day:Hour     29:12  10:22  2:15  9:16  10:17  10:16  4:16  29:14  11:15  22:19  3:10  27:13
+ - Monthly Statistics for Wind Speed m/s
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+Maximum       11.8  14.9  17.0  12.9  15.9  11.8  12.4  13.4  14.9  10.8   8.8  13.4
+ Day:Hour    29:12  10:22  2:15  9:16  10:17  10:16  4:16  29:14  11:15  22:19  3:10  27:13
 
 
-
-Minimum         0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0
-
- Day:Hour      1:04  1:10  4:04  4:19  8:05  17:07  1:07  1:07  1:07  3:04  2:01  2:03
+Minimum        0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
+ Day:Hour     1:04  1:10  4:04  4:19  8:05  17:07  1:07  1:07  1:07  3:04  2:01  2:03
 
 
-
-Daily Avg       2.5    3.5    5.1    4.8    6.5    5.6    5.7    5.5    4.8    3.9    2.7    3.6
-
+Daily Avg      2.5   3.5   5.1   4.8   6.5   5.6   5.7   5.5   4.8   3.9   2.7   3.6
 
 
-   - Maximum Wind Speed of  17.0 m/s on Mar  2
-
-   - Minimum Wind Speed of   0.0 m/s on Jan  1
-
+  - Maximum Wind Speed of  17.0 m/s on Mar  2
+  - Minimum Wind Speed of   0.0 m/s on Jan  1
 
 
 Rain/Albedo:
-
-** - Monthly Statistics for Liquid Precipitation mm**
-
-             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-Total         47     0      3      24     22     0      0      0      2      14     21     72   
+ - Monthly Statistics for Liquid Precipitation mm
+            Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+Total        47    0     3     24    22    0     0     0     2     14    21    72  
 
 
-
-** - Monthly Statistics for Albedo**
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-Average       0.160  0.000  0.130  0.130  0.130  0.140  0.000  0.000  0.180  0.180  0.160  0.210
-
+ - Monthly Statistics for Albedo
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+Average      0.160  0.000  0.130  0.130  0.130  0.140  0.000  0.000  0.180  0.180  0.160  0.210
 
 
 
 
 Solar Radiation
-
-**- Monthly Statistics for Solar Radiation  (Direct Normal, Diffuse, Global Horizontal) Wh/m²**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-**Direct Avg    2537   3829   4485   5123   5691   6743   6867   6329   6017   4178   3080   3314  **
-
-** **
-
-**Direct Max    5405   7987   8803   8786   10462  10595  10692  10218  8485   7348   6194   6730  **
-
-**    Day         27     18     20     18     23      2     25      3     10      3      2     25  **
-
-** **
-
-**Diffuse Avg   1127   1300   1763   2344   2335   2247   2148   1998   1643   1610   1252   912   **
-
-** **
-
-**Global Avg    2136   3160   4402   5672   6419   7148   7129   6401   5460   3761   2530   2127  **
-
-**   - Maximum Direct Normal Solar of 10692 Wh/m² on Jul 25**
-
-** **
-
-** - Average Hourly Statistics for Direct Normal Solar Radiation Wh/m²**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-** 0:01- 1:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 1:01- 2:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 2:01- 3:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 3:01- 4:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 4:01- 5:00       0      0     0      0      0      1      0      0      0      0      0      0 **
-
-** 5:01- 6:00       0      0      0     25     47     87     51     22      1      0      0      0 **
-
-** 6:01- 7:00       0      2     38    194    201    283    200    162     85     64      0      0 **
-
-** 7:01- 8:00      50     98    210    340    345    413    310    304    239    279    168     63 **
-
-** 8:01- 9:00     220    246    309    407    439    509    444    466    365    383    297    266 **
-
-** 9:01-10:00     277    338    424    470    526    575    525    554    523    399    372    375 **
-
-**10:01-11:00     288    449    477    456    561    599    617    594    653    438    428    413 **
-
-**11:01-12:00     303    467    531    546    576    641    657    643    744    445    426    473 **
-
-**12:01-13:00     342    498    537    504    572    653    705    666    732    533    360    455 **
-
-**13:01-14:00     398    494   535    536    579    687    732    675    730    537    414    461 **
-
-**14:01-15:00     326    487    481    494    553    659    712    678    688    478    314    403 **
-
-**15:01-16:00     295    413    433    403    499    570    660    621    593    393    229    306 **
-
-**16:01-17:00      37    273    348    363    395    499    584    488    447    186     73    101 **
-
-**17:01-18:00       2     65    153    285    286    368    432    352    208     44      0      0 **
-
-**18:01-19:00       0      0      8    100    107    186    222    103      9      0      0      0 **
-
-**19:01-20:00       0      0      0      0      2     13     14      2      0      0      0      0 **
-
-**20:01-21:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**21:01-22:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**22:01-23:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**23:01-24:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** Max Hour\*      14     13     13     12     14     14     14     15     12     14     11\*    12  **
-
-** Min Hour        1      1      1      1      1      1      1      1      1      1      1      1  **
-
-** **
-
-** - Average Hourly Statistics for Diffuse Horizontal Solar Radiation Wh/m²**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-** 0:01- 1:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 1:01- 2:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 2:01- 3:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 3:01- 4:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 4:01- 5:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 5:01- 6:00       0      0      0      1     26     35     24     12      0      0      0      0 **
-
-** 6:01- 7:00       0      1     14     45     81     79     73     56     36     5      0      0 **
-
-** 7:01- 8:00       2     28     70    107    135    129    140    112     98     61     28     11 **
-
-** 8:01- 9:00      51     82    124    155    190    177    182    159    146    118     84     57 **
-
-** 9:01-10:00     105    123    169    225    215    192    199    196    181    155    127    100 **
-
-**10:01-11:00     146    164    203    268    255    235    224    219    192    208    167    131 **
-
-**11:01-12:00     174    187    227    267    260    232    242    225    189    226    192    141 **
-
-**12:01-13:00     176    173    224    281    249    242    211    231    190   225    205    153 **
-
-**13:01-14:00     170    178    227    258    244    221    205    207    178    191    178    134 **
-
-**14:01-15:00     148    154    194    226    211    201    192    184    156    184    147     98 **
-
-**15:01-16:00     122    118    159    216    188    190    167    154    134    144    114     67 **
-
-**16:01-17:00      34     71    100    162    149    148    137    128     95     91     10     20 **
-
-**17:01-18:00       0     24     49    126     93    109     96     81     46      3      0      0 **
-
-**18:01-19:00       0      0      2      9     39     54     47     31      3      0      0      0 **
-
-**19:01-20:00       0      0      0      0      0      5      9      1      0      0      0      0 **
-
-**20:01-21:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**21:01-22:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**22:01-23:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**23:01-24:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** Max Hour\*      13     12     14     13     12     13     12     13     11\*    12     13     13  **
-
-** Min Hour        1      1      1      1      1      1      1      1      1      1      1      1  **
-
-** **
-
-** - Average Hourly Statistics for Global Horizontal Solar Radiation Wh/m²**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-** 0:01- 1:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 1:01- 2:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 2:01- 3:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 3:01- 4:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 4:01- 5:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** 5:01- 6:00       0      0      0      2     31     45     29     14      0      0      0      0 **
-
-** 6:01- 7:00       0      1    17     83    136    165    127     91     47      8      0      0 **
-
-** 7:01- 8:00       3     39    119    237    295    330    282    234    175    122     47     15 **
-
-** 8:01- 9:00      92    150    254    383    469    511    462    429    330    269    164    108 **
-
-** 9:01-10:00     197    268    414    558    625    650    607    600    520    368    277    222 **
-
-**10:01-11:00     272    409    532    641    749    773    769    717    684    486    382    306 **
-
-**11:01-12:00     326    473    626    746    800    845    863    805    790    531    425    367 **
-
-**12:01-13:00     353    490   638    726    787    872    886    840    786    589    401    373 **
-
-**13:01-14:00     365    476    619    708    763    855    879    797    735    528    381    336 **
-
-**14:01-15:00     280    409    505    595    656    751    786    716    613    433    269    239 **
-
-**15:01-16:00     206    281    381    463    523    594    634    560    445    292    170    135 **
-
-**16:01-17:00      40    135    221    321    349    421    456    366    252    131     15     27 **
-
-**17:01-18:00       0     30     73    196    184    244    254    187     80      4      0      0 **
-
-**18:01-19:00       0      0      2     14     53     87     86     44      3      0      0      0 **
-
-**19:01-20:00       0      0      0      0      0      5     11      1      0      0      0      0 **
-
-**20:01-21:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**21:01-22:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**22:01-23:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-**23:01-24:00       0      0      0      0      0      0      0      0      0      0      0      0 **
-
-** Max Hour       14     13     13     12     12     13     13     13     12     13     12     13  **
-
-** Min Hour        1      1      1      1      1      1      1      1      1      1      1      1  **
-
-** **
-
-** - Average Hourly Statistics for Total Sky Cover %**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-** 0:01- 1:00      59     43     54     47     43     28     37     41     42     31     49     42 **
-
-** 1:01- 2:00      60     46     60     53     41     26     41     40     51     33     45     40 **
-
-** 2:01- 3:00      62     52     59     48     43     27     45     41     55     30     46     43 **
-
-** 3:01- 4:00      60     55     61     52     42     31     50     38     59     30     46     44 **
-
-** 4:01- 5:00      63     57     65     56     50     40     52     45     65     33     49     43 **
-
-** 5:01- 6:00      62     61     60     53     54     37     55     52     64     39     54     38 **
-
-** 6:01- 7:00      60     63     59     59     55     36     58     54     63     41     55     38 **
-
-** 7:01- 8:00      61     67     63     51     51     34     52     54     62     42     52     43 **
-
-** 8:01- 9:00      65     68     64     48     48     32     45     42     59     44     49     50 **
-
-** 9:01-10:00      64     71     59     43     46     29     38     38     43     40     44     50 **
-
-**10:01-11:00      63     66     54     42     45     30     32     35     33     37     46     52 **
-
-**11:01-12:00      58     64     55     42     48     26     26     33     25     36     42     49 **
-
-**12:01-13:00      52     59     53     43     46     27     19     30     25     35     39     50 **
-
-**13:01-14:00      50     61     55     40     46     24     18     27     22     34     41     48 **
-
-**14:01-15:00      49     62     62     39     44     24     17     27     20     31     43     44 **
-
-**15:01-16:00      47     64     59     41     47     25     16     26     20     32     46     43 **
-
-**16:01-17:00      47     62     56     43     48     27     19     31     21     27     46     44 **
-
-**17:01-18:00      49     61     57     40     45     27     24     33     22     29     46     45 **
-
-**18:01-19:00      47     59     51     40     43     29     27     36     18     26     46     42 **
-
-**19:01-20:00      51     54     45     39     42     31     28     37     18     25     47     41 **
-
-**20:01-21:00      53     49     47     41     39     30     27     38     19     27     44     42 **
-
-**21:01-22:00      54     44     45     43     39     26     29     40     27     26     46     45 **
-
-**22:01-23:00      58     43     46     40     38     30     32     38     32     27     44     44 **
-
-**23:01-24:00      55     41     50     40     38     26     36     41     39     26     46     49 **
-
-** Max Hour        9     10      5      7      7      5      7      7      5      9      7     11  **
-
-** Min Hour       16     24     22     15     23     14     16     16     19     20     13      6  **
-
-** **
-
-** - Average Hourly Statistics for Opaque Sky Cover %**
-
-**              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   **
-
-** 0:01- 1:00      57     36     41     41     38     28     36     35     38     26     44     36 **
-
-** 1:01- 2:00      57     38     44     45     34     26     40     36     46     30     43     35 **
-
-** 2:01- 3:00      58     39     43     43     37     27     44     36     51     27     43     37 **
-
-** 3:01- 4:00      57     41     49     50     39     31     48     34     57     28     45     37 **
-
-** 4:01- 5:00      60     43     45     54     45     39     50     36     62     30     47     35 **
-
-** 5:01- 6:00      60     46     46     52     45     36     54     41     57     37     51     33 **
-
-** 6:01- 7:00      58     48     49     58     48     35     56     45     52     39     52     32 **
-
-** 7:01- 8:00      59     49     46     50     44     31     50     46     52     40     49     38 **
-
-** 8:01- 9:00      62     51     50     46     40     29     43     36    47     43     48     43 **
-
-** 9:01-10:00      61     53     43     41     37     26     37     32     34     38     43     44 **
-
-**10:01-11:00      59     50     41     40     35     27     30     31     25     36     45     44 **
-
-**11:01-12:00      55     46     35     40     35     22     25     26     16     34     38     41 **
-
-**12:01-13:00      49     42     33     40     33     21     18     23     15     30     37     43 **
-
-**13:01-14:00      46     41     34     38     34     18     15     20     13     30     36     40 **
-
-**14:01-15:00      45     40     37     37     32     20     15     18    13     27     40     42 **
-
-**15:01-16:00      44     39     37     39     33     22     13     19     14     29     42     39 **
-
-**16:01-17:00      41     40     36     41     36     24     16     24     16     25     44     39 **
-
-**17:01-18:00      46     39     38     38     34     24     21     22     16     27     42     40 **
-
-**18:01-19:00      44     40     30     38     36     24     25     26     14     24     42     36 **
-
-**19:01-20:00      45     37     27     36     36     27     26     29     14     23     42     36 **
-
-**20:01-21:00      49     35     31     37     35     27     25     33     16     25     39     35 **
-
-**21:01-22:00      49     32     32     40     35     25     27     36     22     23     41     38 **
-
-**22:01-23:00      53     33     31     38     33     30     31     35     26     24     41     39 **
-
-**23:01-24:00      52     33     35     38     31     26     35     36     33     23     43     43 **
-
-** Max Hour        9     10      9      7      7      5      7      8      5      9      7     10  **
-
-** Min Hour       17     22     20     20     24     14     16     15     14     20     14      7  **
+- Monthly Statistics for Solar Radiation  (Direct Normal, Diffuse, Global Horizontal) Wh/m<sup>2</sup>
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+Direct Avg   2537  3829  4485  5123  5691  6743  6867  6329  6017  4178  3080  3314  
+ 
+Direct Max   5405  7987  8803  8786  10462  10595  10692  10218  8485  7348  6194  6730  
+    Day        27    18    20    18    23     2    25     3    10     3     2    25  
+ 
+Diffuse Avg   1127  1300  1763  2344  2335  2247  2148  1998  1643  1610  1252  912   
+ 
+Global Avg   2136  3160  4402  5672  6419  7148  7129  6401  5460  3761  2530  2127  
+   - Maximum Direct Normal Solar of 10692 Wh/m<sup>2</sup> on Jul 25
+ 
+ - Average Hourly Statistics for Direct Normal Solar Radiation Wh/m<sup>2</sup>
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+ 0:01- 1:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 1:01- 2:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 2:01- 3:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 3:01- 4:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 4:01- 5:00      0     0     0     0     0     1     0     0     0     0     0     0 
+ 5:01- 6:00      0     0     0    25    47    87    51    22     1     0     0     0 
+ 6:01- 7:00      0     2    38   194   201   283   200   162    85    64     0     0 
+ 7:01- 8:00     50    98   210   340   345   413   310   304   239   279   168    63 
+ 8:01- 9:00    220   246   309   407   439   509   444   466   365   383   297   266 
+ 9:01-10:00    277   338   424   470   526   575   525   554   523   399   372   375 
+10:01-11:00    288   449   477   456   561   599   617   594   653   438   428   413 
+11:01-12:00    303   467   531   546   576   641   657   643   744   445   426   473 
+12:01-13:00    342   498   537   504   572   653   705   666   732   533   360   455 
+13:01-14:00    398   494   535   536   579   687   732   675   730   537   414   461 
+14:01-15:00    326   487   481   494   553   659   712   678   688   478   314   403 
+15:01-16:00    295   413   433   403   499   570   660   621   593   393   229   306 
+16:01-17:00     37   273   348   363   395   499   584   488   447   186    73   101 
+17:01-18:00      2    65   153   285   286   368   432   352   208    44     0     0 
+18:01-19:00      0     0     8   100   107   186   222   103     9     0     0     0 
+19:01-20:00      0     0     0     0     2    13    14     2     0     0     0     0 
+20:01-21:00      0     0     0     0     0     0     0     0     0     0     0     0 
+21:01-22:00      0     0     0     0     0     0     0     0     0     0     0     0 
+22:01-23:00      0     0     0     0     0     0     0     0     0     0     0     0 
+23:01-24:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ Max Hour*     14    13    13    12    14    14    14    15    12    14    11*   12  
+ Min Hour       1     1     1     1     1     1     1     1     1     1     1     1  
+ 
+ - Average Hourly Statistics for Diffuse Horizontal Solar Radiation Wh/m<sup>2</sup>
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+ 0:01- 1:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 1:01- 2:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 2:01- 3:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 3:01- 4:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 4:01- 5:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 5:01- 6:00      0     0     0     1    26    35    24    12     0     0     0     0 
+ 6:01- 7:00      0     1    14    45    81    79    73    56    36     5     0     0 
+ 7:01- 8:00      2    28    70   107   135   129   140   112    98    61    28    11 
+ 8:01- 9:00     51    82   124   155   190   177   182   159   146   118    84    57 
+ 9:01-10:00    105   123   169   225   215   192   199   196   181   155   127   100 
+10:01-11:00    146   164   203   268   255   235   224   219   192   208   167   131 
+11:01-12:00    174   187   227   267   260   232   242   225   189   226   192   141 
+12:01-13:00    176   173   224   281   249   242   211   231   190   225   205   153 
+13:01-14:00    170   178   227   258   244   221   205   207   178   191   178   134 
+14:01-15:00    148   154   194   226   211   201   192   184   156   184   147    98 
+15:01-16:00    122   118   159   216   188   190   167   154   134   144   114    67 
+16:01-17:00     34    71   100   162   149   148   137   128    95    91    10    20 
+17:01-18:00      0    24    49   126    93   109    96    81    46     3     0     0 
+18:01-19:00      0     0     2     9    39    54    47    31     3     0     0     0 
+19:01-20:00      0     0     0     0     0     5     9     1     0     0     0     0 
+20:01-21:00      0     0     0     0     0     0     0     0     0     0     0     0 
+21:01-22:00      0     0     0     0     0     0     0     0     0     0     0     0 
+22:01-23:00      0     0     0     0     0     0     0     0     0     0     0     0 
+23:01-24:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ Max Hour*     13    12    14    13    12    13    12    13    11*   12    13    13  
+ Min Hour       1     1     1     1     1     1     1     1     1     1     1     1  
+ 
+ - Average Hourly Statistics for Global Horizontal Solar Radiation Wh/m<sup>2</sup>
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+ 0:01- 1:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 1:01- 2:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 2:01- 3:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 3:01- 4:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 4:01- 5:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ 5:01- 6:00      0     0     0     2    31    45    29    14     0     0     0     0 
+ 6:01- 7:00      0     1    17    83   136   165   127    91    47     8     0     0 
+ 7:01- 8:00      3    39   119   237   295   330   282   234   175   122    47    15 
+ 8:01- 9:00     92   150   254   383   469   511   462   429   330   269   164   108 
+ 9:01-10:00    197   268   414   558   625   650   607   600   520   368   277   222 
+10:01-11:00    272   409   532   641   749   773   769   717   684   486   382   306 
+11:01-12:00    326   473   626   746   800   845   863   805   790   531   425   367 
+12:01-13:00    353   490   638   726   787   872   886   840   786   589   401   373 
+13:01-14:00    365   476   619   708   763   855   879   797   735   528   381   336 
+14:01-15:00    280   409   505   595   656   751   786   716   613   433   269   239 
+15:01-16:00    206   281   381   463   523   594   634   560   445   292   170   135 
+16:01-17:00     40   135   221   321   349   421   456   366   252   131    15    27 
+17:01-18:00      0    30    73   196   184   244   254   187    80     4     0     0 
+18:01-19:00      0     0     2    14    53    87    86    44     3     0     0     0 
+19:01-20:00      0     0     0     0     0     5    11     1     0     0     0     0 
+20:01-21:00      0     0     0     0     0     0     0     0     0     0     0     0 
+21:01-22:00      0     0     0     0     0     0     0     0     0     0     0     0 
+22:01-23:00      0     0     0     0     0     0     0     0     0     0     0     0 
+23:01-24:00      0     0     0     0     0     0     0     0     0     0     0     0 
+ Max Hour      14    13    13    12    12    13    13    13    12    13    12    13  
+ Min Hour       1     1     1     1     1     1     1     1     1     1     1     1  
+ 
+ - Average Hourly Statistics for Total Sky Cover %
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+ 0:01- 1:00     59    43    54    47    43    28    37    41    42    31    49    42 
+ 1:01- 2:00     60    46    60    53    41    26    41    40    51    33    45    40 
+ 2:01- 3:00     62    52    59    48    43    27    45    41    55    30    46    43 
+ 3:01- 4:00     60    55    61    52    42    31    50    38    59    30    46    44 
+ 4:01- 5:00     63    57    65    56    50    40    52    45    65    33    49    43 
+ 5:01- 6:00     62    61    60    53    54    37    55    52    64    39    54    38 
+ 6:01- 7:00     60    63    59    59    55    36    58    54    63    41    55    38 
+ 7:01- 8:00     61    67    63    51    51    34    52    54    62    42    52    43 
+ 8:01- 9:00     65    68    64    48    48    32    45    42    59    44    49    50 
+ 9:01-10:00     64    71    59    43    46    29    38    38    43    40    44    50 
+10:01-11:00     63    66    54    42    45    30    32    35    33    37    46    52 
+11:01-12:00     58    64    55    42    48    26    26    33    25    36    42    49 
+12:01-13:00     52    59    53    43    46    27    19    30    25    35    39    50 
+13:01-14:00     50    61    55    40    46    24    18    27    22    34    41    48 
+14:01-15:00     49    62    62    39    44    24    17    27    20    31    43    44 
+15:01-16:00     47    64    59    41    47    25    16    26    20    32    46    43 
+16:01-17:00     47    62    56    43    48    27    19    31    21    27    46    44 
+17:01-18:00     49    61    57    40    45    27    24    33    22    29    46    45 
+18:01-19:00     47    59    51    40    43    29    27    36    18    26    46    42 
+19:01-20:00     51    54    45    39    42    31    28    37    18    25    47    41 
+20:01-21:00     53    49    47    41    39    30    27    38    19    27    44    42 
+21:01-22:00     54    44    45    43    39    26    29    40    27    26    46    45 
+22:01-23:00     58    43    46    40    38    30    32    38    32    27    44    44 
+23:01-24:00     55    41    50    40    38    26    36    41    39    26    46    49 
+ Max Hour       9    10     5     7     7     5     7     7     5     9     7    11  
+ Min Hour      16    24    22    15    23    14    16    16    19    20    13     6  
+ 
+ - Average Hourly Statistics for Opaque Sky Cover %
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec   
+ 0:01- 1:00     57    36    41    41    38    28    36    35    38    26    44    36 
+ 1:01- 2:00     57    38    44    45    34    26    40    36    46    30    43    35 
+ 2:01- 3:00     58    39    43    43    37    27    44    36    51    27    43    37 
+ 3:01- 4:00     57    41    49    50    39    31    48    34    57    28    45    37 
+ 4:01- 5:00     60    43    45    54    45    39    50    36    62    30    47    35 
+ 5:01- 6:00     60    46    46    52    45    36    54    41    57    37    51    33 
+ 6:01- 7:00     58    48    49    58    48    35    56    45    52    39    52    32 
+ 7:01- 8:00     59    49    46    50    44    31    50    46    52    40    49    38 
+ 8:01- 9:00     62    51    50    46    40    29    43    36    47    43    48    43 
+ 9:01-10:00     61    53    43    41    37    26    37    32    34    38    43    44 
+10:01-11:00     59    50    41    40    35    27    30    31    25    36    45    44 
+11:01-12:00     55    46    35    40    35    22    25    26    16    34    38    41 
+12:01-13:00     49    42    33    40    33    21    18    23    15    30    37    43 
+13:01-14:00     46    41    34    38    34    18    15    20    13    30    36    40 
+14:01-15:00     45    40    37    37    32    20    15    18    13    27    40    42 
+15:01-16:00     44    39    37    39    33    22    13    19    14    29    42    39 
+16:01-17:00     41    40    36    41    36    24    16    24    16    25    44    39 
+17:01-18:00     46    39    38    38    34    24    21    22    16    27    42    40 
+18:01-19:00     44    40    30    38    36    24    25    26    14    24    42    36 
+19:01-20:00     45    37    27    36    36    27    26    29    14    23    42    36 
+20:01-21:00     49    35    31    37    35    27    25    33    16    25    39    35 
+21:01-22:00     49    32    32    40    35    25    27    36    22    23    41    38 
+22:01-23:00     53    33    31    38    33    30    31    35    26    24    41    39 
+23:01-24:00     52    33    35    38    31    26    35    36    33    23    43    43 
+ Max Hour       9    10     9     7     7     5     7     8     5     9     7    10  
+ Min Hour      17    22    20    20    24    14    16    15    14    20    14     7  
+```
 
 
 
 The program calculated "undisturbed" ground temperatures:
 
-**- Monthly Calculated "undisturbed" Ground Temperatures\*\* °C**
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-   0.5 m        9.8    9.5  10.1  11.5  13.4  15.1  16.3  16.7  16.0  14.6  12.8  11.0
-
-   2.0 m       11.0  10.4  10.6  11.4  12.6  14.0  15.1  15.7  15.6  14.8  13.5  12.1
-
-   4.0 m       12.0  11.4  11.3  11.6  12.4  13.3  14.2  14.8  14.9  14.5  13.8  12.8
+```idf
+- Monthly Calculated "undisturbed" Ground Temperatures**&deg;C
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+  0.5 m       9.8   9.5  10.1  11.5  13.4  15.1  16.3  16.7  16.0  14.6  12.8  11.0
+  2.0 m      11.0  10.4  10.6  11.4  12.6  14.0  15.1  15.7  15.6  14.8  13.5  12.1
+  4.0 m      12.0  11.4  11.3  11.6  12.4  13.3  14.2  14.8  14.9  14.5  13.8  12.8
 
 
-
-- \*\*These ground temperatures should NOT BE USED in the GroundTemperatures object to compute building floor losses.
-
--   The temperatures for 0.5 m depth can be used for GroundTemperatures:Surface.
-
--   The temperatures for 4.0 m depth can be used for GroundTemperatures:Deep.
-
--   Calculations use a standard soil diffusivity of 2.3225760E-03 {m\*\*2/day}
-
+- **These ground temperatures should NOT BE USED in the GroundTemperatures object to compute building floor losses.
+-   The temperatures for 0.5 m depth can be used for GroundTemperatures:Surface.
+-   The temperatures for 4.0 m depth can be used for GroundTemperatures:Deep.
+-   Calculations use a standard soil diffusivity of 2.3225760E-03 {m**2/day}
 As noted in the above statistics calculation, the "undisturbed" ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the GroundTemperatures:Surface and GroundTemperatures:Deep objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
-
-Heating/cooling degree days from the weather file are shown.  Long term heating/cooling degree days are shown earlier if available from ASHRAE HOF for the location/WMO.
-
-**- Monthly Heating/Cooling Degree Days/Hours**
-
-              Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-
-HDD 10C          52      3      7      1      0      0      0      0      0      0      1     36
-
-HDD 18C         290    188    223    173    130    100     73     59     54     92    169    273
+Heating/cooling degree days from the weather file are shown.  Long term heating/cooling degree days are shown earlier if available from ASHRAE HOF for the location/WMO.
+- Monthly Heating/Cooling Degree Days/Hours
+             Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
+HDD 10C         52     3     7     1     0     0     0     0     0     0     1    36
+HDD 18C        290   188   223   173   130   100    73    59    54    92   169   273
 
 
-
-CDD 10C          10     39     32     68    118    142    188    189    200    157     72     10
-
-CDD 18C           0      0      0      0      0      3     14      0     14      1      0      0
+CDD 10C         10    39    32    68   118   142   188   189   200   157    72    10
+CDD 18C          0     0     0     0     0     3    14     0    14     1     0     0
 
 
-
-CDH 20C           0      9      0     45     93    136    330    223    410    129      0      0
-
-CDH 23C           0      0      0      5     13     41    167     50    169     13      0      0
-
-CDH 27C          0      0      0      0      0      0     61      5     59      0      0      0
+CDH 20C          0     9     0    45    93   136   330   223   410   129     0     0
+CDH 23C          0     0     0     5    13    41   167    50   169    13     0     0
+CDH 27C          0     0     0     0     0     0    61     5    59     0     0     0
 
 
-
-    - 1227 annual cooling degree-days (10°C baseline)
-
-    -  100 annual heating degree-days (10°C baseline)
+   - 1227 annual cooling degree-days (10&deg;C baseline)
+   -  100 annual heating degree-days (10&deg;C baseline)
 
 
-
-    -   32 annual cooling degree-days (18°C baseline)
-
-    - 1825 annual heating degree-days (18°C baseline)
-
+   -   32 annual cooling degree-days (18&deg;C baseline)
+   - 1825 annual heating degree-days (18&deg;C baseline)
 In the preceding display for degree-days, users more familiar with degree days to a Fahrenheit temperature base, may wish to multiply the degree day or degree hour values by 9/5.
-
-And then the Köppen, ASHRAE and typical/extreme period calculations:
-
-- Climate type "Cfb" (Köppen classification)\*\*
-
- - Marine west coastal (warm summer, mild winter, rain all year, lat. 35-60°N)
-
-* - \*\*Note that the Köppen classification shown here is derived algorithmically from the source weather data.*
-
-* -   It may not be indicative of the long term climate for this location.*
+And then the K&ouml;ppen, ASHRAE and typical/extreme period calculations:
+- Climate type "Cfb" (K&ouml;ppen classification)**
+ - Marine west coastal (warm summer, mild winter, rain all year, lat. 35-60&deg;N)
+* - **Note that the K&ouml;ppen classification shown here is derived algorithmically from the source weather data.*
+* -   It may not be indicative of the long term climate for this location.*
 
 
-
- - Climate type "3C" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)\*\*
-
- - Warm - Marine, Probable Köppen classification=Cs, Dry Summer Subtropical (Mediterranean)
-
-* - \*\*Note that the ASHRAE classification shown here is derived algorithmically from the source weather data.*
-
-* -   It may not be indicative of the long term climate for this location.*
+ - Climate type "3C" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
+ - Warm - Marine, Probable K&ouml;ppen classification=Cs, Dry Summer Subtropical (Mediterranean)
+* - **Note that the ASHRAE classification shown here is derived algorithmically from the source weather data.*
+* -   It may not be indicative of the long term climate for this location.*
 
 
-
- - Typical/Extreme Period Determination
-
+ - Typical/Extreme Period Determination
 
 
- - Summer is Jul:Sep
-
-     Extreme Summer Week (nearest maximum temperature for summer)
-
-     Extreme Hot Week Period selected: Sep 23:Sep 29, Maximum Temp=  35.10°C, Deviation=|16.393|°C
-
-     Typical Summer Week (nearest average temperature for summer)
-
-     Typical Week Period selected: Aug 19:Aug 25, Average Temp=  16.27°C, Deviation=| 0.032|°C
+ - Summer is Jul:Sep
+    Extreme Summer Week (nearest maximum temperature for summer)
+    Extreme Hot Week Period selected: Sep 23:Sep 29, Maximum Temp=  35.10&deg;C, Deviation=|16.393|&deg;C
+    Typical Summer Week (nearest average temperature for summer)
+    Typical Week Period selected: Aug 19:Aug 25, Average Temp=  16.27&deg;C, Deviation=| 0.032|&deg;C
 
 
-
- - Winter is Jan:Mar
-
-     Extreme Winter Week (nearest minimum temperature for winter)
-
-     Extreme Cold Week Period selected: Jan 22:Jan 28, Minimum Temp=  -0.40°C, Deviation=| 8.532|°C
-
-     Typical Winter Week (nearest average temperature for winter)
-
-     Typical Week Period selected: Mar  5:Mar 11, Average Temp=  10.19°C, Deviation=| 0.417|°C
+ - Winter is Jan:Mar
+    Extreme Winter Week (nearest minimum temperature for winter)
+    Extreme Cold Week Period selected: Jan 22:Jan 28, Minimum Temp=  -0.40&deg;C, Deviation=| 8.532|&deg;C
+    Typical Winter Week (nearest average temperature for winter)
+    Typical Week Period selected: Mar  5:Mar 11, Average Temp=  10.19&deg;C, Deviation=| 0.417|&deg;C
 
 
-
- - Autumn is Oct:Dec
-
-     Typical Autumn Week (nearest average temperature for autumn)
-
-     Typical Week Period selected: Nov 12:Nov 18, Average Temp=  12.19°C, Deviation=| 0.990|°C
+ - Autumn is Oct:Dec
+    Typical Autumn Week (nearest average temperature for autumn)
+    Typical Week Period selected: Nov 12:Nov 18, Average Temp=  12.19&deg;C, Deviation=| 0.990|&deg;C
 
 
-
- - Spring is Apr:Jun
-
-     Typical Spring Week (nearest average temperature for spring)
-
-     Typical Week Period selected: May 13:May 19, Average Temp=  13.59°C, Deviation=| 0.018|°C
-
+ - Spring is Apr:Jun
+    Typical Spring Week (nearest average temperature for spring)
+    Typical Week Period selected: May 13:May 19, Average Temp=  13.59&deg;C, Deviation=| 0.018|&deg;C
+```
 
 
 As this data is all tab-delimited, putting in a spreadsheet and displaying is not difficult:
@@ -2985,137 +2506,96 @@ The location objects as well as the design condition objects are constrained by 
 Note that you can always include a "def" file with this data to assure accuracy regardless of input format limitations.
 
 An excerpt of a design day output is shown in the following (actual design day objects have been deleted for brevity). Note that with the 2009 ASHRAE HOF climate conditions, a possible DaylightSavingPeriod object may be included.
-
+```idf
 ! The following Location and Design Day data are produced as possible from the indicated data source.
-
- ! Wind Speeds follow the indicated design conditions rather than traditional values (6.7 m/s heating, 3.35 m/s cooling)
-
- ! No special attempts at re-creating or determining missing data parts (e.g. Wind speed or direction)
-
- ! are done.  Therefore, you should look at the data and fill in any incorrect values as you desire.
+ ! Wind Speeds follow the indicated design conditions rather than traditional values (6.7 m/s heating, 3.35 m/s cooling)
+ ! No special attempts at re-creating or determining missing data parts (e.g. Wind speed or direction)
+ ! are done.  Therefore, you should look at the data and fill in any incorrect values as you desire.
 
 
-
- Site:Location,
-
-  Chicago Ohare Intl Ap\_IL\_USA Design\_Conditions,     !- Location Name
-
-      41.98,     !- Latitude {N+ S-}
-
-     -87.92,     !- Longitude {W- E+}
-
-      -6.00,     !- Time Zone Relative to GMT {GMT+/-}
-
-     201.00;     !- Elevation {m}
+ Site:Location,
+  Chicago Ohare Intl Ap_IL_USA Design_Conditions,     !- Location Name
+      41.98,     !- Latitude {N+ S-}
+     -87.92,     !- Longitude {W- E+}
+      -6.00,     !- Time Zone Relative to GMT {GMT+/-}
+     201.00;     !- Elevation {m}
 
 
-
- !  WMO=725300 Time Zone=NAC: (GMT-06:00) Central Time (US & Canada)
-
- !  Data Source=ASHRAE 2009 Annual Design Conditions
-
- RunPeriodControl:DaylightSavingTime,
-
-   2nd Sunday in March,    !- StartDate
-
-   2nd Sunday in November;    !- EndDate
-
+ !  WMO=725300 Time Zone=NAC: (GMT-06:00) Central Time (US & Canada)
+ !  Data Source=ASHRAE 2009 Annual Design Conditions
+ RunPeriodControl:DaylightSavingTime,
+   2nd Sunday in March,    !- StartDate
+   2nd Sunday in November;    !- EndDate
 
 
 ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
-
- ! Chicago Ohare Intl Ap\_IL\_USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.4m/s, 5%=8.6m/s
-
- ! Chicago Ohare Intl Ap\_IL\_USA Extreme Annual Temperatures, Max Drybulb=-23.7°C Min Drybulb=35.9°C
+ ! Chicago Ohare Intl Ap_IL_USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.4m/s, 5%=8.6m/s
+ ! Chicago Ohare Intl Ap_IL_USA Extreme Annual Temperatures, Max Drybulb=-23.7&deg;C Min Drybulb=35.9&deg;C
 
 
-
- ! Chicago Ohare Intl Ap\_IL\_USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
-
- ! Chicago Ohare Intl Ap Annual Cooling Design Conditions Wind Speed=5.2m/s Wind Dir=230
-
-** **
-
- ! Coldest Month=January
-
- ! Chicago Ohare Intl Ap IL USA Annual Heating 99.6%, MaxDB=-20°C
+ ! Chicago Ohare Intl Ap_IL_USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
+ ! Chicago Ohare Intl Ap Annual Cooling Design Conditions Wind Speed=5.2m/s Wind Dir=230
+ 
+ ! Coldest Month=January
+ ! Chicago Ohare Intl Ap IL USA Annual Heating 99.6%, MaxDB=-20&deg;C
 
 
-
- ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6°C
-
+ ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6&deg;C
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=31.6°C MWB=23°C
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6&deg;C MWB=23&deg;C
 
 
-
- ! Chicago Ohare Intl Ap IL USA Annual Humidification 99.6% Design Conditions DP=&gt;MCDB, DP=-25.7°C
-
+ ! Chicago Ohare Intl Ap IL USA Annual Humidification 99.6% Design Conditions DP=>MCDB, DP=-25.7&deg;C
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Humidification 99% Design Conditions DP=&gt;MCDB, DP=-22.1°C
+ ! Chicago Ohare Intl Ap IL USA Annual Humidification 99% Design Conditions DP=>MCDB, DP=-22.1&deg;C
 
 
-
- ! Chicago Ohare Intl Ap IL USA Annual Heating Wind 99.6% Design Conditions WS=&gt;MCDB, WS=12.4m/s
-
+ ! Chicago Ohare Intl Ap IL USA Annual Heating Wind 99.6% Design Conditions WS=>MCDB, WS=12.4m/s
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Heating Wind 99% Design Conditions WS=&gt;MCDB, WS=11.4m/s
-
+ ! Chicago Ohare Intl Ap IL USA Annual Heating Wind 99% Design Conditions WS=>MCDB, WS=11.4m/s
 
 
 
 
 ! Hottest Month=July
-
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=&gt;MWB) .4%, MaxDB=33.3°C MWB=23.7°C
-
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.3&deg;C MWB=23.7&deg;C
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
+ ! Chicago Ohare Intl Ap IL USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
 
 
-
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=&gt;MWB) 2%, MaxDB=30.1°C MWB=22.1°C
-
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 2%, MaxDB=30.1&deg;C MWB=22.1&deg;C
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (WB=&gt;MDB) .4%, MDB=31.2°C WB=25.5°C
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (WB=>MDB) .4%, MDB=31.2&deg;C WB=25.5&deg;C
 
 
-
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (WB=&gt;MDB) 1%, MDB=29.6°C WB=24.5°C
-
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (WB=>MDB) 1%, MDB=29.6&deg;C WB=24.5&deg;C
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (WB=&gt;MDB) 2%, MDB=28.1°C WB=23.5°C
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (WB=>MDB) 2%, MDB=28.1&deg;C WB=23.5&deg;C
 
 
-
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DP=&gt;MDB) .4%, MDB=28.9°C DP=23.8°C HR=0.0192
-
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DP=>MDB) .4%, MDB=28.9&deg;C DP=23.8&deg;C HR=0.0192
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DP=&gt;MDB) 1%, MDB=27.7°C DP=22.9°C HR=0.0180
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DP=>MDB) 1%, MDB=27.7&deg;C DP=22.9&deg;C HR=0.0180
 
 
-
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DP=&gt;MDB) 2%, MDB=26.5°C DP=21.9°C HR=0.0170
-
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DP=>MDB) 2%, MDB=26.5&deg;C DP=21.9&deg;C HR=0.0170
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (Enthalpy=&gt;MDB) .4%, MDB=31.4°C Enthalpy=79.2kJ/kg
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (Enthalpy=>MDB) .4%, MDB=31.4&deg;C Enthalpy=79.2kJ/kg
 
 
-
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (Enthalpy=&gt;MDB) 1%, MDB=29.6°C Enthalpy=75.1kJ/kg
-
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (Enthalpy=>MDB) 1%, MDB=29.6&deg;C Enthalpy=75.1kJ/kg
 
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (Enthalpy=&gt;MDB) 2%, MDB=28.2°C Enthalpy=70.9kJ/kg
-
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (Enthalpy=>MDB) 2%, MDB=28.2&deg;C Enthalpy=70.9kJ/kg
+```
 
 
 Design day "definitions" originate in the ASHRAE Handbook of Fundamentals. Prior to 1997, these conditions were described for winter and summer (heating and cooling). They were based on seasonal percentages.
@@ -3126,38 +2606,38 @@ Beginning in 1997, and continuing (the latest version was published in 2009), th
 
 #### [From ASHRAE Handbook of Fundamentals, 2009]:
 
-n Design data based on dry-bulb temperature represent peak occurrences of the sensible component of ambient outdoor conditions. Design values based on wet-bulb temperature are related to the enthalpy of the outdoor air. Conditions based on dew point relate to the peaks of the humidity ratio. The designer, engineer, or other user must decide which set(s) of conditions and probability of occurrence apply to the design situation under consideration.
+Design data based on dry-bulb temperature represent peak occurrences of the sensible component of ambient outdoor conditions. Design values based on wet-bulb temperature are related to the enthalpy of the outdoor air. Conditions based on dew point relate to the peaks of the humidity ratio. The designer, engineer, or other user must decide which set(s) of conditions and probability of occurrence apply to the design situation under consideration.
 
-n The 99.6% and 99% Heating conditions are often used in the sizing of heating equipment.
+The 99.6% and 99% Heating conditions are often used in the sizing of heating equipment.
 
-n The 0.4, 1.0, and 2.0% dry-bulb temperatures and mean coincident wet-bulb temperatures (i.e., DB=&gt;MWB) often represent conditions on hot, mostly sunny days. These are often used in sizing cooling equipment such as chillers or air-conditioning units.
+The 0.4, 1.0, and 2.0% dry-bulb temperatures and mean coincident wet-bulb temperatures (i.e., DB=&gt;MWB) often represent conditions on hot, mostly sunny days. These are often used in sizing cooling equipment such as chillers or air-conditioning units.
 
-n Design conditions based on wet-bulb temperatures (i.e., WB=&gt;MDB) represent extremes of the total sensible plus latent heat of outdoor air. This information is useful for cooling towers, evaporative coolers, and fresh air ventilation system design.
+Design conditions based on wet-bulb temperatures (i.e., WB=&gt;MDB) represent extremes of the total sensible plus latent heat of outdoor air. This information is useful for cooling towers, evaporative coolers, and fresh air ventilation system design.
 
-n Design conditions based on dew-point temperatures (i.e., DP=&gt;MDB)  are directly related to extremes of humidity ratio, which represent peak moisture loads from the weather. Extreme dew-point conditions may occur on days with moderate dry-bulb temperatures, resulting in high relative humidity. These values are especially useful for humidity control applications, such as desiccant cooling and dehumidification, cooling-based dehumidification, and fresh-air ventilation systems. The values are also used as a check point when analyzing the behavior of cooling systems at part-load conditions, particularly when such systems are used for humidity control as a secondary function. Humidity ratio values are calculated from the corresponding dew-point temperature and the standard pressure at the location’s elevation.
+Design conditions based on dew-point temperatures (i.e., DP=&gt;MDB)  are directly related to extremes of humidity ratio, which represent peak moisture loads from the weather. Extreme dew-point conditions may occur on days with moderate dry-bulb temperatures, resulting in high relative humidity. These values are especially useful for humidity control applications, such as desiccant cooling and dehumidification, cooling-based dehumidification, and fresh-air ventilation systems. The values are also used as a check point when analyzing the behavior of cooling systems at part-load conditions, particularly when such systems are used for humidity control as a secondary function. Humidity ratio values are calculated from the corresponding dew-point temperature and the standard pressure at the location's elevation.
 
-n The enthalpy design conditions (i.e. Enthalpy =&gt; MDB) gives the annual enthalpy for the cooling season; this is used for calculating cooling loads caused by infiltration and/or ventilation into buildings. Enthalpy represents the total heat content of air (the sum of its sensible and latent energies). Cooling loads can be easily calculated knowing the conditions of both the outdoor ambient and the building’s interior air.
+The enthalpy design conditions (i.e. Enthalpy =&gt; MDB) gives the annual enthalpy for the cooling season; this is used for calculating cooling loads caused by infiltration and/or ventilation into buildings. Enthalpy represents the total heat content of air (the sum of its sensible and latent energies). Cooling loads can be easily calculated knowing the conditions of both the outdoor ambient and the building's interior air.
 
-Köppen Climate Classification
+K&ouml;ppen Climate Classification
 ------------------------------------------------------------------------
 
-Various attempts have been made to classify the climates of the earth into climatic regions. One notable, yet ancient and misguided example is that of Aristotle's Temperate, Torrid, and Frigid Zones. However, the 20th century classification developed by German climatologist and amateur botanist Wladimir Köppen (1846-1940) continues to be the authoritative map of the world climates in use today.
+Various attempts have been made to classify the climates of the earth into climatic regions. One notable, yet ancient and misguided example is that of Aristotle's Temperate, Torrid, and Frigid Zones. However, the 20th century classification developed by German climatologist and amateur botanist Wladimir K&ouml;ppen (1846-1940) continues to be the authoritative map of the world climates in use today.
 
-Introduced in 1928 as a wall map co-authored with student Rudolph Geiger, the Köppen system of classification (map) was updated and modified by Köppen until his death. Since that time, it has been modified by several geographers.
+Introduced in 1928 as a wall map co-authored with student Rudolph Geiger, the K&ouml;ppen system of classification (map) was updated and modified by K&ouml;ppen until his death. Since that time, it has been modified by several geographers.
 
-The modified Köppen Climate Classification System is the most widely used system for classifying the world's climates. Its categories are based on the annual and monthly averages of temperature and precipitation. The Köppen system recognizes six major climatic types; each type is designated by a capital letter.
+The modified K&ouml;ppen Climate Classification System is the most widely used system for classifying the world's climates. Its categories are based on the annual and monthly averages of temperature and precipitation. The K&ouml;ppen system recognizes six major climatic types; each type is designated by a capital letter.
 
 In addition to the major climate types, each category is further sub-divided into sub-categories based on temperature and precipitation. There are only 24 sub-categories possible - making the general schemes quite easy to comprehend.
 
 For example, the U.S. states located along the Gulf of Mexico are designated as "Cfa." The "C" represents the "mild mid-latitude" category, the second letter "f" stands for the German word *feucht* or "moist," and the third letter "a" indicates that the average temperature of the warmest month is above 22°C. Thus, "Cfa" gives us a good indication of the climate of this region, a mild mid-latitude climate with no dry season and a hot summer.
 
-The Köppen classification code (and some statistics) was adapted (with permission of Peter Schild) from the COMIS weather program code.
+The K&ouml;ppen classification code (and some statistics) was adapted (with permission of Peter Schild) from the COMIS weather program code.
 
-Table 13. Köppen Climate Classification -- Major Groups
+Table 13. K&ouml;ppen Climate Classification -- Major Groups
 
 <table class="table table-striped">
 <tr>
-<td>Köppen Climate Type</td>
+<td>K&ouml;ppen Climate Type</td>
 <td>Description</td>
 </tr>
 <tr>
@@ -3190,7 +2670,7 @@ More details on each of the major categories and sub-categories follow:
 
 ### Tropical Moist Climates (A)
 
-Tropical moist climates extend northward and southward from the equator to about 15 to 25 degrees of latitude. In these climates all months have average temperatures greater than 18 degrees Celsius. Annual precipitation is greater than 1500 mm. Three minor Köppen climate types exist in the A group and their designation is based on seasonal distribution of rainfall. **Af** or tropical wet is a tropical the climate where precipitation occurs all year long. Monthly temperature variations in this climate are less than 3 degrees Celsius. Because of intense surface heating and high humidity cumulus and cumulonimbus clouds form early in the afternoons almost every day. Daily highs are about 32 degrees Celsius while night time temperatures average 22 degrees Celsius. **Am** is a tropical monsoon climate. Annual rainfall is equal to or greater than **Af**, but falls in the 7 to 9 hottest months. During the dry season very little rainfall occurs. The tropical wet and dry or savanna (**Aw**) has an extended dry season during winter. Precipitation during the wet season is usually less than 1000 millimeters and only during the summer season.
+Tropical moist climates extend northward and southward from the equator to about 15 to 25 degrees of latitude. In these climates all months have average temperatures greater than 18 degrees Celsius. Annual precipitation is greater than 1500 mm. Three minor K&ouml;ppen climate types exist in the A group and their designation is based on seasonal distribution of rainfall. **Af** or tropical wet is a tropical the climate where precipitation occurs all year long. Monthly temperature variations in this climate are less than 3 degrees Celsius. Because of intense surface heating and high humidity cumulus and cumulonimbus clouds form early in the afternoons almost every day. Daily highs are about 32 degrees Celsius while night time temperatures average 22 degrees Celsius. **Am** is a tropical monsoon climate. Annual rainfall is equal to or greater than **Af**, but falls in the 7 to 9 hottest months. During the dry season very little rainfall occurs. The tropical wet and dry or savanna (**Aw**) has an extended dry season during winter. Precipitation during the wet season is usually less than 1000 millimeters and only during the summer season.
 
 ### Dry Climates (B)
 
@@ -3212,30 +2692,30 @@ Polar climates have year-round cold temperatures with warmest month less than 10
 
 Highland areas can encompass any of the previously mentioned major categories -- the determining factor is one of altitude (temperature decreases roughly 2º C for every increase of 305 m). This is a complex climate zone. Highland regions roughly correspond to the major categories change in temperature with latitude - with one important exception. Seasons only exist in highlands if they also exist in the nearby lowland regions. For example, although **A** climates have cooler temperatures at higher elevations, the seasonal changes of **C**, **D** and **E** climates are not present.
 
-The following shows an overview of the world and its Köppen classifications.
+The following shows an overview of the world and its K&ouml;ppen classifications.
 
 ![](AuxiliaryPrograms/media/image010.jpg)
 
-Figure 14. World viewed as Köppen Climate Zones
+Figure 14. World viewed as K&ouml;ppen Climate Zones
 
 And a more basic view with monthly dry bulb temperature and dew point temperatures for these zones (Northern Hemisphere).
 
 ![](AuxiliaryPrograms/media/image011.png)
 
-Figure 15. Monthly Dry Bulb Temperatures in Köppen Climates (Northern Hemisphere)
+Figure 15. Monthly Dry Bulb Temperatures in K&ouml;ppen Climates (Northern Hemisphere)
 
 
 
 ![](AuxiliaryPrograms/media/image012.png)
 
-Figure 16. Monthly Dew Point in Köppen Climates (Northern Hemisphere)
+Figure 16. Monthly Dew Point in K&ouml;ppen Climates (Northern Hemisphere)
 
 
 
 ASHRAE Climate Classification
 ------------------------------------------------------------------------
 
-For the ASHRAE 90.1 and 90.2 standards (2004), a climate zone classification scheme was introduced, similar to the Köppen classification. The methodology is described in two ASHRAE Transactions papers - Briggs - 2002.
+For the ASHRAE 90.1 and 90.2 standards (2004), a climate zone classification scheme was introduced, similar to the K&ouml;ppen classification. The methodology is described in two ASHRAE Transactions papers - Briggs - 2002.
 
 EnergyPlus Weather File (EPW) Data Dictionary
 ----------------------------------------------------------
@@ -3727,11 +3207,11 @@ This is the Global Horizontal Illuminance in lux. (Average total amount of direc
 
 #### Field: Direct Normal Illuminance
 
-This is the Direct Normal Illuminance in lux. (Average amount of illuminance in hundreds of lux received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
+This is the Direct Normal Illuminance in lux. (Average amount of illuminance in hundreds of lux received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
 
 #### Field: Diffuse Horizontal Illuminance
 
-This is the Diffuse Horizontal Illuminance in lux. (Average amount of illuminance in hundreds of lux received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
+This is the Diffuse Horizontal Illuminance in lux. (Average amount of illuminance in hundreds of lux received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.)  It is not currently used in EnergyPlus calculations. It should have a minimum value of 0; missing value for this field is 999999 and will be considered missing if greater than or equal to 999900.
 
 #### Field: Zenith Luminance
 
@@ -3755,7 +3235,7 @@ This is the value for opaque sky cover (tenths of coverage). (i.e. 1 is 1/10 cov
 
 #### Field: Visibility
 
-This is the value for visibility in km. (Horizontal visibility at the time indicated.)  It is not currently used in EnergyPlus calculations. Missing value is 9999.
+This is the value for visibility in km. (Horizontal visibility at the time indicated.)  It is not currently used in EnergyPlus calculations. Missing value is 9999.
 
 #### Field: Ceiling Height
 
@@ -3978,7 +3458,7 @@ Clark, G. and C. Allen, "The Estimation of Atmospheric Radiation for Clear and C
 EPW CSV Format (In/Out)
 -----------------------
 
-EPW CSV Format to the Weather Converter is a special CSV format which echoes the format of the EPW file.  For the "header" records in the CSV file, they are basically the same as the header records for the EPW file (see above). However, in the CSV file, each header is shown and then the data. Partial year files will not have all of these headers "filled" in. Also see Figure 17. EnergyPlus EPW CSV file (spreadsheet view) and Figure 18. EnergyPlus EPW CSV Data Records (spreadsheet view) for snapshot pictures of the EnergyPlus EPW CSV file as shown in a spreadsheet.
+EPW CSV Format to the Weather Converter is a special CSV format which echoes the format of the EPW file.  For the "header" records in the CSV file, they are basically the same as the header records for the EPW file (see above). However, in the CSV file, each header is shown and then the data. Partial year files will not have all of these headers "filled" in. Also see Figure 17. EnergyPlus EPW CSV file (spreadsheet view) and Figure 18. EnergyPlus EPW CSV Data Records (spreadsheet view) for snapshot pictures of the EnergyPlus EPW CSV file as shown in a spreadsheet.
 
 ### Location Header/Data (CSV)
 
@@ -4038,13 +3518,13 @@ Some original data files fill the comment 1 header and some do not. Typically, i
 
 Comment Line \#1
 
-"IWEC- WMO\#947670 - South-west Pacific -- Original Source Data (c) 2001 American Society of Heating, Refrigerating and Air-Conditioning Engineers (ASHRAE), Inc., Atlanta, GA, USA. www.ashrae.org  All rights reserved as noted in the License Agreement and Additional Conditions. DISCLAIMER OF WARRANTIES: The data is provided 'as is' without warranty of any kind, either expressed or implied. The entire risk as to the quality and performance of the data is with you. In no event will ASHRAE or its contractors be liable to you for any damages, including without limitation any lost profits, lost savings, or other incidental or consequential damages arising out of the use or inability to use this data."
+"IWEC- WMO\#947670 - South-west Pacific -- Original Source Data (c) 2001 American Society of Heating, Refrigerating and Air-Conditioning Engineers (ASHRAE), Inc., Atlanta, GA, USA. www.ashrae.org  All rights reserved as noted in the License Agreement and Additional Conditions. DISCLAIMER OF WARRANTIES: The data is provided 'as is' without warranty of any kind, either expressed or implied. The entire risk as to the quality and performance of the data is with you. In no event will ASHRAE or its contractors be liable to you for any damages, including without limitation any lost profits, lost savings, or other incidental or consequential damages arising out of the use or inability to use this data."
 
 ### Comment 2 Header/Data (CSV)
 
 Comment Line \#2
 
- -- Ground temps produced with a standard soil diffusivity of 2.3225760E-03 {m\*\*2/day}
+ -- Ground temps produced with a standard soil diffusivity of 2.3225760E-03 {m\*\*2/day}
 
 ### Data Period Header/Data (CSV)
 
@@ -4074,13 +3554,13 @@ Each data item field obeys the same "missing" and other content rules as shown a
 
 Figure 17. EnergyPlus EPW CSV file (spreadsheet view)
 
-The figure above shows how the EnergyPlus EPW CSV file (initial header records) looks when opened in a spreadsheet.  Each header record is shown in bold with data following the headers..
+The figure above shows how the EnergyPlus EPW CSV file (initial header records) looks when opened in a spreadsheet.  Each header record is shown in bold with data following the headers..
 
 ![](AuxiliaryPrograms/media/image016.png)
 
 Figure 18. EnergyPlus EPW CSV Data Records (spreadsheet view)
 
-The above figure shows how the data periods header record and the individual data records look when opened in a spread sheet. Again, the headers are shown in bold.  Note that there are two header records for the data records - one with short names - one with longer more descriptive names.
+The above figure shows how the data periods header record and the individual data records look when opened in a spread sheet. Again, the headers are shown in bold.  Note that there are two header records for the data records - one with short names - one with longer more descriptive names.
 
 Missing Weather File Data
 -------------------------
@@ -4190,7 +3670,7 @@ The primary source for historical weather data is the U.S. National Climatic Dat
 
 In this document as well in many others, you will read about a certain "data set" and you will also read about data in a "certain" format - e.g., the TMY2 data set and the TMY2 data format. Simply stated, a data set refers to a set of data files developed around a set of procedures for selection and usually with a specific purpose for use. A data format is merely the identification of data elements in a data file. In the TMY2 example, the TMY2 data set was developed as described below and the format of the data is usually called a TMY2 format.
 
-Any data *could* be put into a TMY2 format, but it wouldn’t necessarily be selected using the same procedures as the TMY2 data set.
+Any data *could* be put into a TMY2 format, but it wouldn't necessarily be selected using the same procedures as the TMY2 data set.
 
 ### SAMSON Data Set/Format
 
@@ -4200,7 +3680,7 @@ SAMSON also describes a file format. Though no data from the SAMSON data set are
 
 ### TMY2 Data Set/Format
 
-The TMY2 are data sets of hourly values of solar radiation and meteorological elements for a 1-year period. Their intended use is for computer simulations of solar energy conversion systems and building systems to facilitate performance comparisons of different system types, configurations, and locations in the United States and its territories. Because they represent typical rather than extreme conditions, they are not suited for designing systems to meet the worst-case conditions occurring at a location. The data are available from the National Renewable Energy Laboratory for download or on CD.
+The TMY2 are data sets of hourly values of solar radiation and meteorological elements for a 1-year period. Their intended use is for computer simulations of solar energy conversion systems and building systems to facilitate performance comparisons of different system types, configurations, and locations in the United States and its territories. Because they represent typical rather than extreme conditions, they are not suited for designing systems to meet the worst-case conditions occurring at a location. The data are available from the National Renewable Energy Laboratory for download or on CD.
 
 TMY3 files have somewhat replaced TMY2 files but all TMY2 files are available for download from the website.
 
@@ -4208,7 +3688,7 @@ TMY3 files have somewhat replaced TMY2 files but all TMY2 files are available fo
 
 The Solar and Wind Energy Resource Assessment (SWERA) project, funded by the United Nations Environment Program, is developing high quality information on solar and wind energy resources in 14 developing countries. Currently typical year hourly data are available for 156 locations in Belize, Brazil, China, Cuba, El Salvador, Ethiopia, Ghana, Guatemala, Honduras, Kenya, Maldives, Nicaragua, and Sri Lanka. The data are available from the SWERA project web site. http://swera.unep.net/;
 
-The SWERA format is very similar to the TMY2 format except:  WMO stations are used (6 character) in the header and 4 digit years have been adopted in the data lines.
+The SWERA format is very similar to the TMY2 format except:  WMO stations are used (6 character) in the header and 4 digit years have been adopted in the data lines.
 
 ### WYEC2 Data Set/Format
 
@@ -4220,9 +3700,9 @@ The WYEC2 format is used as the format for several other data sets. The WYEC2 da
 
 ### Canadian Weather for Energy Calculations (CWEC)
 
-Produced by Numerical Logics in collaboration with Environment Canada and the National Research Council of Canada, the CWEC were derived using a methodology similar to the TMY2 and TMY. CWEC hourly files represent weather conditions that result in approximately average heating and cooling loads in buildings. The National Energy Code of Canada requires the use of a CWEC file representative of a location when the performance path and customized design calculations are chosen as the means of building energy consumption compliance. The CWEC follow the ASHRAE WYEC2 format and were derived from the Canadian Energy and Engineering Data Sets (CWEEDS) of hourly weather information for Canada from the 1953-1995 period of record.
+Produced by Numerical Logics in collaboration with Environment Canada and the National Research Council of Canada, the CWEC were derived using a methodology similar to the TMY2 and TMY. CWEC hourly files represent weather conditions that result in approximately average heating and cooling loads in buildings. The National Energy Code of Canada requires the use of a CWEC file representative of a location when the performance path and customized design calculations are chosen as the means of building energy consumption compliance. The CWEC follow the ASHRAE WYEC2 format and were derived from the Canadian Energy and Engineering Data Sets (CWEEDS) of hourly weather information for Canada from the 1953-1995 period of record.
 
-The 80 CWEC files contain hourly weather observations representing an artificial one-year period specifically designed for building energy calculations. All 80 locations in the CWEC data set are available for download in EnergyPlus weather format.
+The 80 CWEC files contain hourly weather observations representing an artificial one-year period specifically designed for building energy calculations. All 80 locations in the CWEC data set are available for download in EnergyPlus weather format.
 
 ### International Weather for Energy Calculations (IWEC)
 
@@ -4230,7 +3710,7 @@ The IWEC are the result of ASHRAE Research Project 1015 conducted by Numerical L
 
 The files are derived from up to 18 years of DATSAV3 hourly weather data originally archived at the U S National Climatic Data Center. The weather data is supplemented by solar radiation estimated on an hourly basis from earth-sun geometry and hourly weather elements, particularly cloud amount information. The IWEC CD-ROM is available from ASHRAE.
 
-The Department of Energy has licensed the IWEC data from ASHRAE. Our license with ASHRAE allows us to: "Distribute versions of the individual IWEC files in converted format suitable for EnergyPlus (EPW). Make the EnergyPlus versions of the IWEC files available to users at no cost via this EnergyPlus web site."  All 227 locations in the IWEC data set are available for download in EnergyPlus weather format.
+The Department of Energy has licensed the IWEC data from ASHRAE. Our license with ASHRAE allows us to: "Distribute versions of the individual IWEC files in converted format suitable for EnergyPlus (EPW). Make the EnergyPlus versions of the IWEC files available to users at no cost via this EnergyPlus web site."  All 227 locations in the IWEC data set are available for download in EnergyPlus weather format.
 
 The IWEC source data is © 2001 American Society of Heating, Refrigerating and Air-Conditioning Engineers (ASHRAE), Inc., Atlanta, GA, USA. http://www.ashrae.org/ All rights reserved as noted in the License Agreement and Additional Conditions.
 
@@ -4282,11 +3762,11 @@ Developed for use in simulating building heating and air conditioning loads and 
 
 ### City University of Hong Kong (CUHK) Data Set
 
-CityUHK-45007 -- WMO\#450070   Typical year file Hong Kong originally in IWEC format spreadsheet jointly developed by Dr TT Chow and ALS Chan of the City University of Hong Kong supported by a CERG grant from the Research Grants Council of the Hong Kong Special Administrative Region of China. Solar radiation measured from observatory station at 22.32N  114.17'E  65m above mean sea level.
+CityUHK-45007 -- WMO\#450070   Typical year file Hong Kong originally in IWEC format spreadsheet jointly developed by Dr TT Chow and ALS Chan of the City University of Hong Kong supported by a CERG grant from the Research Grants Council of the Hong Kong Special Administrative Region of China. Solar radiation measured from observatory station at 22.32N  114.17'E  65m above mean sea level.
 
 ### Chinese Standard Weather Data (CSWD)
 
-Developed for use in simulating building heating and air conditioning loads and energy use, and for calculating renewable energy utilization, this set of 270 typical hourly data weather files. These data were developed by Dr. Jiang Yi, Department of Building Science and Technology at Tsinghua University and China Meteorological Bureau. The source data include annual design data, typical year data,  and extreme years for maximum enthalpy, and maximum and minimum temperature and solar radiation.
+Developed for use in simulating building heating and air conditioning loads and energy use, and for calculating renewable energy utilization, this set of 270 typical hourly data weather files. These data were developed by Dr. Jiang Yi, Department of Building Science and Technology at Tsinghua University and China Meteorological Bureau. The source data include annual design data, typical year data,  and extreme years for maximum enthalpy, and maximum and minimum temperature and solar radiation.
 
 China Meteorological Bureau, Climate Information Center, Climate Data Office and Tsinghua University, Department of Building Science and Technology. 2005. China Standard Weather Data for Analyzing Building Thermal Conditions, April 2005. Beijing: China Building Industry Publishing House, ISBN 7-112-07273-3 (13228). http://www.china-building.com.cn.
 
@@ -4326,7 +3806,7 @@ The CIBSE, in association with the (UK) Met Office has produced 'Test Reference 
 
 ### Real Time Data
 
-Real-Time weather data is available from the EnergyPlus web site. From the web site: "Hourly weather data from stations across the world is continuously collected and stored into a local database. The data is available through this web interface. Most stations have information for dry bulb temperature, wet bulb temperature, wind speed/direction, atmospheric pressure, visibility, cloud conditions, and precipitation type. Data may not be available for all stations and may not be contiguous for time period selected."  The data is available in two output formats: CSV and IWEC. Note that their CSV is not the same as EnergyPlus CSV format. If you wish to get weather data from the real time sources, it may be easier to use the IWEC format with the EnergyPlus WeatherConverter program; HOWEVER, they do not collect solar data and, currently, the WeatherConverter cannot generate solar data for these data files.
+Real-Time weather data is available from the EnergyPlus web site. From the web site: "Hourly weather data from stations across the world is continuously collected and stored into a local database. The data is available through this web interface. Most stations have information for dry bulb temperature, wet bulb temperature, wind speed/direction, atmospheric pressure, visibility, cloud conditions, and precipitation type. Data may not be available for all stations and may not be contiguous for time period selected."  The data is available in two output formats: CSV and IWEC. Note that their CSV is not the same as EnergyPlus CSV format. If you wish to get weather data from the real time sources, it may be easier to use the IWEC format with the EnergyPlus WeatherConverter program; HOWEVER, they do not collect solar data and, currently, the WeatherConverter cannot generate solar data for these data files.
 
 ### Meteonorm Data
 
@@ -4338,25 +3818,25 @@ The data sets and formats described above are some of the newest formats availab
 
 Table 18. Summary of Downloadable Weather Data by Type
 
-** **
+** **
 
 **WMO Region**
 
-** **
+** **
 
-** **
+** **
 
 **North and Central America**
 
-** **
+** **
 
-** **
+** **
 
-** **
+** **
 
-** **
+** **
 
-** **
+** **
 
 **USA**
 
@@ -4816,7 +4296,7 @@ Table 18. Summary of Downloadable Weather Data by Type
 
 2699
 
-One other format worth mentioning is TRY. TRY is "test reference year" data that did not include solar radiation data. "Test Reference Year" is a term that usually denotes selection of a specific year of "real" data based on some statistical procedure. The original TRY data (TD-9706) was based on an ASHRAE procedure to select the data from a "period of record". "The principle of the selection is to eliminate years in the period of record containing months with extremely high or low mean temperatures until only one year remains."  The weather conversion utility cannot process data in "TRY" format. However, many organizations develop data for reference year data (e.g. European TRY, Moisture Reference Data).
+One other format worth mentioning is TRY. TRY is "test reference year" data that did not include solar radiation data. "Test Reference Year" is a term that usually denotes selection of a specific year of "real" data based on some statistical procedure. The original TRY data (TD-9706) was based on an ASHRAE procedure to select the data from a "period of record". "The principle of the selection is to eliminate years in the period of record containing months with extremely high or low mean temperatures until only one year remains."  The weather conversion utility cannot process data in "TRY" format. However, many organizations develop data for reference year data (e.g. European TRY, Moisture Reference Data).
 
 ### Custom Format
 
@@ -4826,7 +4306,7 @@ Using a "definitions" file (see Description of "Def" input file), the weather co
 
 Source weather data files may or may not contain solar data. All of the files that can be processed by the EnergyPlus Weather conversion utility contain solar data. The weather processor will transfer this data to the EPW weather file and the EnergyPlus simulation program will use it.
 
-Historical weather data files in CD144 format do not contain solar data nor is such data generally available for a specific location and time period. In this case, ersatz solar data must be generated from cloud cover and other data using sky models and regression formulas. Currently, neither the Weather Conversion utility nor the EnergyPlus program synthesizes this data.  However, the weather conversion utility can use any two of the commonly recorded data (i.e. two of Global Horizontal Radiation, Horizontal Diffuse Radiation and Direct Normal (or Direct Horizontal) Radiation to calculate the EnergyPlus primary solar data of Direct Normal and Horizontal Diffuse Radiation values).
+Historical weather data files in CD144 format do not contain solar data nor is such data generally available for a specific location and time period. In this case, ersatz solar data must be generated from cloud cover and other data using sky models and regression formulas. Currently, neither the Weather Conversion utility nor the EnergyPlus program synthesizes this data.  However, the weather conversion utility can use any two of the commonly recorded data (i.e. two of Global Horizontal Radiation, Horizontal Diffuse Radiation and Direct Normal (or Direct Horizontal) Radiation to calculate the EnergyPlus primary solar data of Direct Normal and Horizontal Diffuse Radiation values).
 
 Data Sources/Uncertainty
 ------------------------
@@ -5223,7 +4703,7 @@ The three files for design conditions have roughly the same format. These are th
 
 ### Public calls to EPlusWth.dll
 
-Several points of the library are made available for use with external programs. In each case the parameters passed will be described along with the Visual Basic™ (VB6) code that is used to declare them as well as Fortran 90 style "Interface" statements to the same calls. The library is placed in the same folder with the weather converter utility - you may need to copy it to your program’s folder if you choose to add external calls from your program to it.
+Several points of the library are made available for use with external programs. In each case the parameters passed will be described along with the Visual Basic™ (VB6) code that is used to declare them as well as Fortran 90 style "Interface" statements to the same calls. The library is placed in the same folder with the weather converter utility - you may need to copy it to your program's folder if you choose to add external calls from your program to it.
 
 #### SetupPWInternalDataPath
 
@@ -5241,15 +4721,15 @@ Call SetupPWInternalDataPath(AppPath, Len(AppPath))
 
 Likewise for Fortran 90/95:
 
-  INTERFACE
+  INTERFACE
 
-    SUBROUTINE SetupPWInternalDataPath (Path)
+    SUBROUTINE SetupPWInternalDataPath (Path)
 
-    CHARACTER(len=\*), INTENT(IN) :: Path    ! Path where data files reside
+    CHARACTER(len=\*), INTENT(IN) :: Path    ! Path where data files reside
 
-    END SUBROUTINE
+    END SUBROUTINE
 
-  END INTERFACE
+  END INTERFACE
 
 And then calling it from Fortran:
 
@@ -5267,29 +4747,29 @@ Private Declare Sub SetFixOutOfRangeData Lib "EPlusWth" (ByVal strValue As Strin
 
 And calling it from VB:
 
-    Global FixOutOfRangeData As String
+    Global FixOutOfRangeData As String
 
-    FixOutOfRangeData = "Yes"
+    FixOutOfRangeData = "Yes"
 
-    Call SetFixOutOfRangeData(FixOutOfRangeData, Len(FixOutOfRangeData))
+    Call SetFixOutOfRangeData(FixOutOfRangeData, Len(FixOutOfRangeData))
 
 For Fortran 90/95:
 
-  INTERFACE
+  INTERFACE
 
-    SUBROUTINE SetFixOutOfRangeData (YesNo)
+    SUBROUTINE SetFixOutOfRangeData (YesNo)
 
-    CHARACTER(len=\*),INTENT(IN) :: YesNo    ! ‘yes’ to set fixing option;
+    CHARACTER(len=\*),INTENT(IN) :: YesNo    ! 'yes' to set fixing option;
 
-                                            ! ‘no’ to not
+                                            ! 'no' to not
 
-    END SUBROUTINE
+    END SUBROUTINE
 
-  END INTERFACE
+  END INTERFACE
 
 And then calling it:
 
-CALL SetFixOutOfRangeData(‘no’)
+CALL SetFixOutOfRangeData('no')
 
 
 
@@ -5347,7 +4827,7 @@ Private Declare Sub SetDefaultChgLimit Lib "EPlusWth" (ByVal strValue As String,
 
 And a call from VB:
 
-    Call SetDefaultChgLimit(TriggerLimit, Len(TriggerLimit), IgnoreCalcTrigger, Len(IgnoreCalcTrigger))
+    Call SetDefaultChgLimit(TriggerLimit, Len(TriggerLimit), IgnoreCalcTrigger, Len(IgnoreCalcTrigger))
 
 #### ProcessWeather
 
@@ -5360,10 +4840,10 @@ Private Declare Sub ProcessWeather Lib "EPlusWth" (ByVal strInType As String, By
 Calling it from VB:
 
 Call ProcessWeather(InputFileDataType, Len(InputFileDataType),
-      OutputFileDataType, Len(OutputFileDataType),
-      InputFileName, Len(InputFileName),
-      OutputFileName, Len(OutputFileName),
-      ErrorFlag)
+      OutputFileDataType, Len(OutputFileDataType),
+      InputFileName, Len(InputFileName),
+      OutputFileName, Len(OutputFileName),
+      ErrorFlag)
 
 
 
@@ -5465,31 +4945,31 @@ Fortran 90/95 Declaration:
 
 INTERFACE
 
-  SUBROUTINE ProcessWeather(InType,OutType,InFileName,OutFileName,ErrFlag)
+  SUBROUTINE ProcessWeather(InType,OutType,InFileName,OutFileName,ErrFlag)
 
-    CHARACTER(len=\*), INTENT(IN) :: InType       ! InputFile Type
+    CHARACTER(len=\*), INTENT(IN) :: InType       ! InputFile Type
 
-    CHARACTER(len=\*), INTENT(IN) :: OutType      ! OutputFile Type
+    CHARACTER(len=\*), INTENT(IN) :: OutType      ! OutputFile Type
 
-    CHARACTER(len=\*), INTENT(IN) :: InFileName   ! InputFile Name (Full path)
+    CHARACTER(len=\*), INTENT(IN) :: InFileName   ! InputFile Name (Full path)
 
-    CHARACTER(len=\*), INTENT(IN) :: OutFileName  ! OutputFileName (Full path)
+    CHARACTER(len=\*), INTENT(IN) :: OutFileName  ! OutputFileName (Full path)
 
-    LOGICAL(Byte2), INTENT(OUT)  :: ErrFlag      ! If errors are found,
+    LOGICAL(Byte2), INTENT(OUT)  :: ErrFlag      ! If errors are found,
 
-                                                 ! set to true and put
+                                                 ! set to true and put
 
-                                                 ! description put in file.
+                                                 ! description put in file.
 
-  END SUBROUTINE
+  END SUBROUTINE
 
 END INTERFACE
 
 And calling it from Fortran:
 
-call processweather(trim(intype),trim(outtype),    &
+call processweather(trim(intype),trim(outtype),    &
 
-                    trim(infilename),trim(outfilename),errflag)
+                    trim(infilename),trim(outfilename),errflag)
 
 
 
@@ -5510,9 +4990,9 @@ ASHRAE. 2004. *ANSI/ASHRAE/IESNA Standard 90.1-2004*, "Energy-Efficient Design o
 
 ASHRAE, 2009. Handbook of Fundamentals, Atlanta: American Society of Heating, Refrigerating, and Air-conditioning Engineers.
 
-Briggs, Robert S., Robert G. Lucas, and Z. Todd Taylor. 2002. "Climate Classification for Building Energy Codes and Standards: Part 1 - Development Process" in *ASHRAE Transactions 2002*, 109, Pt 1. Atlanta:  ASHRAE.
+Briggs, Robert S., Robert G. Lucas, and Z. Todd Taylor. 2002. "Climate Classification for Building Energy Codes and Standards: Part 1 - Development Process" in *ASHRAE Transactions 2002*, 109, Pt 1. Atlanta:  ASHRAE.
 
-Briggs, Robert S., Robert G. Lucas, and Z. Todd Taylor. 2002. "Climate Classification for Building Energy Codes and Standards: Part 2 - Zone Definitions, Maps and Comparisons" in *ASHRAE Transactions*, 109, Pt 1. Atlanta:  ASHRAE.
+Briggs, Robert S., Robert G. Lucas, and Z. Todd Taylor. 2002. "Climate Classification for Building Energy Codes and Standards: Part 2 - Zone Definitions, Maps and Comparisons" in *ASHRAE Transactions*, 109, Pt 1. Atlanta:  ASHRAE.
 
 Buhl, W.F. 1998. DOE-2 Weather Processor, DOE2.1E Documentation Update, Berkeley: Lawrence Berkeley National Laboratory.
 
@@ -5522,24 +5002,24 @@ China Meteorological Bureau, Climate Information Center, Climate Data Office and
 
 Commission of the European Community. 1985. *Test Reference Years,* Weather data sets for computer simulations of solar energy systems and energy consumption in buildings, CEC, DG XII. Brussels, Belgium: Commission of the European Community.
 
-Crawley, Drury B., Linda K. Lawrie, Curtis O. Pedersen, Richard J. Liesen, Daniel E. Fisher, Richard K. Strand, Russell D. Taylor, Frederick C. Winkelmann, W.F. Buhl, A. Ender Erdem, and Y. Joe Huang. 1999. "EnergyPlus, A New-Generation Building Energy Simulation Program," in *Proceedings of Building Simulation ’99*, Kyoto, Japan. IBPSA.
+Crawley, Drury B., Linda K. Lawrie, Curtis O. Pedersen, Richard J. Liesen, Daniel E. Fisher, Richard K. Strand, Russell D. Taylor, Frederick C. Winkelmann, W.F. Buhl, A. Ender Erdem, and Y. Joe Huang. 1999. "EnergyPlus, A New-Generation Building Energy Simulation Program," in *Proceedings of Building Simulation '99*, Kyoto, Japan. IBPSA.
 
-Crawley, Drury B. 1998. "Which Weather Data Should You Use for Energy Simulations of Commercial Buildings?," *ASHRAE Transactions*, pp. 498-515, Vol. 104, Pt. 2. Atlanta:  ASHRAE.
+Crawley, Drury B. 1998. "Which Weather Data Should You Use for Energy Simulations of Commercial Buildings?," *ASHRAE Transactions*, pp. 498-515, Vol. 104, Pt. 2. Atlanta:  ASHRAE.
 http://energyplus.gov/pdfs/bibliography/whichweatherdatashouldyouuseforenergysimulations.pdf
 
-Crawley, Drury B., Jon Hand, and Linda K. Lawrie, 1999. "Improving the Weather Information Available to Simulation Programs", in *Proceedings of Building Simulation ’99*, Kyoto, Japan. September 1999. IBPSA.
+Crawley, Drury B., Jon Hand, and Linda K. Lawrie, 1999. "Improving the Weather Information Available to Simulation Programs", in *Proceedings of Building Simulation '99*, Kyoto, Japan. September 1999. IBPSA.
 
-Energy Simulation Research Unit. 1999.  http://www.strath.ac.uk/Departments/ESRU
+Energy Simulation Research Unit. 1999.  http://www.strath.ac.uk/Departments/ESRU
 
 Janak, M. 1997. "Coupling Building Energy and Lighting Simulation," in *Proceedings of Building Simulation 97*, September 1997, Volume II pp 313-319, Prague, Czech Republic, IBPSA.
 
-Köppen, W. 1931. Grundriss der Klimakunde. Berlin: Walter de Gruyter & Co.
+K&ouml;ppen, W. 1931. Grundriss der Klimakunde. Berlin: Walter de Gruyter & Co.
 
 Kusuda, T., "Earth Temperatures Beneath Five Different Surfaces", Institute for Applied Technology, NBS Report 10-373, 1971, NBS, Washington DC 20234.
 
 Kusuda, T., Least Squares Technique for the Analysis of Periodic Temperature of the Earth's Surface Region, NBS Journal of Research, Vol. 71C, Jan-Mar. 1967, pp 43-50.
 
-National Instruments Corporation. 1999. *LabVIEW User Manual*. Austin, Texas:  National Instruments Corporation.
+National Instruments Corporation. 1999. *LabVIEW User Manual*. Austin, Texas:  National Instruments Corporation.
 
 McDonald, Iain, and Paul Strachan. 1998. "Practical Application of Uncertainty Analysis" in *Proceedings of EPIC 98: Second International Conference on Energy Performance and Indoor Climate in Buildings*, Lyon, France, 19-21 November 1998.
 
@@ -5551,7 +5031,7 @@ NCDC. 1981. *Meteorological Observations*, May 1981. Asheville, North Carolina: 
 
 NCDC. 1993. *Solar and Meteorological Surface Observation Network, 1961-1990, Version 1.0*, September 1993. Asheville, North Carolina: National Climatic Data Center, U.S. Department of Commerce.
 
-National Renewable Energy Laboratory (NREL). 1995. *User’s Manual for TMY2s (Typical Meteorological Years)*, NREL/SP-463-7668, and *TMY2s, Typical Meteorological Years Derived from the 1961-1990 National Solar Radiation Data Base*, June 1995, CD-ROM. Golden, Colorado: National Renewable Energy Laboratory.
+National Renewable Energy Laboratory (NREL). 1995. *User's Manual for TMY2s (Typical Meteorological Years)*, NREL/SP-463-7668, and *TMY2s, Typical Meteorological Years Derived from the 1961-1990 National Solar Radiation Data Base*, June 1995, CD-ROM. Golden, Colorado: National Renewable Energy Laboratory.
 
 http://rredc.nrel.gov/solar/pubs/tmy2/
 
@@ -5563,9 +5043,9 @@ Perez R, Ineichen P, Maxwell E, Seals R and Zelenka. A 1992. Dynamic Global-to-D
 
 Perez R, Ineichen P, Seals R, Michalsky J and Stewart R. 1990. Modeling daylight.availability and irradiance components from direct and global irradiance. *Solar.Energy*44, 271-289.
 
-University of Illinois. 1998. *BLAST User’s Guide.* Building Systems Laboratory, University of Illinois. Urbana, Illinois:  University of Illinois, Department of Industrial and Mechanical Engineering.
+University of Illinois. 1998. *BLAST User's Guide.* Building Systems Laboratory, University of Illinois. Urbana, Illinois:  University of Illinois, Department of Industrial and Mechanical Engineering.
 
-Ward. G. 1996. *Radiance.* Berkeley:  Lawrence Berkeley National Laboratory.
+Ward. G. 1996. *Radiance.* Berkeley:  Lawrence Berkeley National Laboratory.
 
 Winkelmann, F.C., W.F. Buhl, B. Birdsall, A. E. Erdem, and K. Ellington. 1994. *DOE-2.1E Supplement*, DE-940-11218. Lawrence Berkeley Laboratory, Berkeley, California. Springfield, Virginia: NTIS.
 
@@ -5588,7 +5068,7 @@ http://www.energyplus.gov
 
 Description of the SWERA project. http://swera.unep.net/swera/
 
-Weather Analytics ([www.wxaglobal.com](http://www.wxaglobal.com)) - Site specific weather files in EnergyPlus format based on the latest 30 years of hourly data are now available from the private sector company Weather Analytics for any official weather station or over 600,000 35-km grid tiles across the globe. These files are built by integrating hourly weather station observations and the new NOAA reanalysis data sets.  Both Typical Meteorological Year (TMY) files and individual, Actual Meteorological Year (AMY) files are available as well as files constructed from the previous 12 months.
+Weather Analytics ([www.wxaglobal.com](http://www.wxaglobal.com)) - Site specific weather files in EnergyPlus format based on the latest 30 years of hourly data are now available from the private sector company Weather Analytics for any official weather station or over 600,000 35-km grid tiles across the globe. These files are built by integrating hourly weather station observations and the new NOAA reanalysis data sets.  Both Typical Meteorological Year (TMY) files and individual, Actual Meteorological Year (AMY) files are available as well as files constructed from the previous 12 months.
 
 Meteonorm ([www.meteonorm.com](http://www.meteonorm.com)) - Files for specific locations can be purchased in EnergyPlus format from Meteonorm company. Meteonorm extrapolates hourly data from statistical data for a location. Where statistical data aren't available, Meteonorm interpolates from other nearby sites. Generally a statistical approach is a last resort--weather files generated from statistics will not demonstrate the normal hour-to-hour and day-to-day variability seen in measured data.
 
@@ -5622,9 +5102,9 @@ Use of the Ground Temperatures with Slabs
 
 The Slab program produces temperature profiles for the outside surface at the core and at the perimeter of the slab. It also produces the average based on the perimeter and core areas used in the calculation. This allows the user to apply the Slab temperatures one of two ways in EnergyPlus:
 
-*Option 1 - Core and Perimeter Temperatures*:  The EnergyPlus OtherSideCoefficients object can be used to provide two sets of twelve monthly average ground temperature values. In this way, both the perimeter and the core values from the Slab program can be used in the succeeding EnergyPlus run. This method assumes that the floor slab will be described using at least two different heat transfer surfaces. The use of OtherSideCoefficients to provide additional ground contact surfaces is described in detail in the "Multiple Ground Temperatures" section below.
+*Option 1 - Core and Perimeter Temperatures*:  The EnergyPlus OtherSideCoefficients object can be used to provide two sets of twelve monthly average ground temperature values. In this way, both the perimeter and the core values from the Slab program can be used in the succeeding EnergyPlus run. This method assumes that the floor slab will be described using at least two different heat transfer surfaces. The use of OtherSideCoefficients to provide additional ground contact surfaces is described in detail in the "Multiple Ground Temperatures" section below.
 
-*Option 2 - Average Temperatures: * Use the monthly average temperatures produced by the Slab program in the EnergyPlus GroundTemperatures object. This will provide an average ground temperature at the outside face of any heat transfer surface whose OutsideFaceEnvironment field is set to "ground".
+*Option 2 - Average Temperatures: * Use the monthly average temperatures produced by the Slab program in the EnergyPlus GroundTemperatures object. This will provide an average ground temperature at the outside face of any heat transfer surface whose OutsideFaceEnvironment field is set to "ground".
 
 EnergyPlus accepts twelve separate monthly average inside temperatures. In addition, it is possible to add an hourly sinusoidal variation of the inside temperature with a 24 hour period sine function. This was included to show the effect of something such as night setback on the face temperature. Generally, the effect is quite small.
 
@@ -5634,33 +5114,33 @@ First the results for a monthly specified constant average inside temperature. T
 
 Monthly Slab Outside Face Temperatures, C
 
-Perimeter Area: 304.00  Core Area: 1296.00
+Perimeter Area: 304.00  Core Area: 1296.00
 
-Month   Average   Perimeter    Core      Inside
+Month   Average   Perimeter    Core      Inside
 
-1      17.67     16.11      18.03       18.0
+1      17.67     16.11      18.03       18.0
 
-2      17.45     15.92      17.81       18.0
+2      17.45     15.92      17.81       18.0
 
-3      17.43     16.07      17.74       18.0
+3      17.43     16.07      17.74       18.0
 
-4      19.00     17.82      19.27       20.0
+4      19.00     17.82      19.27       20.0
 
-5      19.24     18.23      19.48       20.0
+5      19.24     18.23      19.48       20.0
 
-6      19.31     18.42      19.52       20.0
+6      19.31     18.42      19.52       20.0
 
-7      20.92     20.14      21.11       22.0
+7      20.92     20.14      21.11       22.0
 
-8      21.17     20.44      21.35       22.0
+8      21.17     20.44      21.35       22.0
 
-9      21.22     20.45      21.40       22.0
+9      21.22     20.45      21.40       22.0
 
-10      21.21     20.26      21.44       22.0
+10      21.21     20.26      21.44       22.0
 
-11      19.62     18.54      19.88       20.0
+11      19.62     18.54      19.88       20.0
 
-12      19.35     17.99      19.67       20.0
+12      19.35     17.99      19.67       20.0
 
 The resulting heat flux is shown below. The inside heat transfer coefficient and slab thermal properties are specified in the input file. For this example the total thermal resistance from the inside air to the slab bottom surface was 0.27 (m<sup>2</sup> C)/W. This value is controlled by the user with the inside heat transfer coefficient and slab thermal properties values in the slab program input file.
 
@@ -5790,87 +5270,87 @@ Then for the same conditions, the results with a 2 degree C amplitude 24-hour si
 
 Monthly Slab Outside Face Temperatures, C
 
-Perimeter Area: 304.00  Core Area: 1296.00
+Perimeter Area: 304.00  Core Area: 1296.00
 
-Month   Average   Perimeter    Core      Inside
+Month   Average   Perimeter    Core      Inside
 
-1      17.51     16.03      17.86       18.0
+1      17.51     16.03      17.86       18.0
 
-2      17.29     15.85      17.63       18.0
+2      17.29     15.85      17.63       18.0
 
-3      17.27     16.00      17.57       18.0
+3      17.27     16.00      17.57       18.0
 
-4      18.87     17.77      19.13       20.0
+4      18.87     17.77      19.13       20.0
 
-5      19.11     18.16      19.34       20.0
+5      19.11     18.16      19.34       20.0
 
-6      19.17     18.34      19.37       20.0
+6      19.17     18.34      19.37       20.0
 
-7      20.81     20.07      20.98       22.0
+7      20.81     20.07      20.98       22.0
 
-8      21.05     20.36      21.21       22.0
+8      21.05     20.36      21.21       22.0
 
-9      21.09     20.38      21.26       22.0
+9      21.09     20.38      21.26       22.0
 
-10      21.08     20.19      21.29       22.0
+10      21.08     20.19      21.29       22.0
 
-11      19.47     18.45      19.71       20.0
+11      19.47     18.45      19.71       20.0
 
-12      19.20     17.92      19.51       20.0
+12      19.20     17.92      19.51       20.0
 
 
 
 An example of a 24-hour inside temperature profile for this case is shown below. The sine wave amplitude was 2 C.
 
-Day       Hour   Perim Out Ts    Core Out Ts    Inside Temp
+Day       Hour   Perim Out Ts    Core Out Ts    Inside Temp
 
-1           1   17.30827       19.15832       18.51749
+1           1   17.30827       19.15832       18.51749
 
-1           2   17.29503       19.15274       18.99974
+1           2   17.29503       19.15274       18.99974
 
-1           3   17.30236       19.16732       19.41389
+1           3   17.30236       19.16732       19.41389
 
-1           4   17.32258       19.19376       19.73175
+1           4   17.32258       19.19376       19.73175
 
-1           5   17.34834       19.22526       19.93166
+1           5   17.34834       19.22526       19.93166
 
-1           6   17.37288       19.25529       20.00000
+1           6   17.37288       19.25529       20.00000
 
-1           7   17.39023       19.27798       19.93212
+1           7   17.39023       19.27798       19.93212
 
-1           8   17.39544       19.28838       19.73265
+1           8   17.39544       19.28838       19.73265
 
-1           9   17.38485       19.28117       19.41517
+1           9   17.38485       19.28117       19.41517
 
-1          10   17.35602       19.24733       19.00130
+1          10   17.35602       19.24733       19.00130
 
-1          11   17.30590       19.18686       18.51924
+1          11   17.30590       19.18686       18.51924
 
-1          12   17.23507       19.10210       18.00180
+1          12   17.23507       19.10210       18.00180
 
-1          13   17.14650       18.99703       17.48425
+1          13   17.14650       18.99703       17.48425
 
-1          14   17.04291       18.87713       17.00183
+1          14   17.04291       18.87713       17.00183
 
-1          15   16.92873       18.74895       16.58738
+1          15   16.92873       18.74895       16.58738
 
-1          16   16.81076       18.61963       16.26915
+1          16   16.81076       18.61963       16.26915
 
-1          17   16.69609       18.49656       16.06881
+1          17   16.69609       18.49656       16.06881
 
-1          18   16.59243       18.38671       16.00000
+1          18   16.59243       18.38671       16.00000
 
-1          19   16.50669       18.29626       16.06741
+1          19   16.50669       18.29626       16.06741
 
-1          20   16.44276       18.23010       16.26645
+1          20   16.44276       18.23010       16.26645
 
-1          21   16.40369       18.19161       16.58356
+1          21   16.40369       18.19161       16.58356
 
-1          22   16.38873       18.18218       16.99714
+1          22   16.38873       18.18218       16.99714
 
-1          23   16.39435       18.19834       17.47902
+1          23   16.39435       18.19834       17.47902
 
-1          24   16.41942       18.23298       17.99639
+1          24   16.41942       18.23298       17.99639
 
 A plot of the daily profiles is shown below. Note that the inside temperature change of 4 C produces only a small change in the slab lower face temperature.
 
@@ -5878,7 +5358,7 @@ A plot of the daily profiles is shown below. Note that the inside temperature ch
 
 Figure 19. Daily Temperature Profiles (Slab)
 
-The resulting heat fluxes are shown below.  They can be compared with the fluxes shown above for the constant inside temperature run. The changes resulting from a fairly large 4 C daily temperature variation are probably not significant.
+The resulting heat fluxes are shown below.  They can be compared with the fluxes shown above for the constant inside temperature run. The changes resulting from a fairly large 4 C daily temperature variation are probably not significant.
 
 
 
@@ -6022,25 +5502,25 @@ If the Slab objects (see Description of the Objects in the E+SlabGHT.IDD) are lo
 
 If the Slab objects are located in a separate file, they should be run using the Slab option on the Utilities tab in EP-Launch. See the EP-Launch section in this document for more information on how to use EP-Launch with the Slab program.
 
-You can also run the slab program as a console application.  To execute it, we have provided the batch file:
+You can also run the slab program as a console application.  To execute it, we have provided the batch file:
 
 RunSlab
 
 Steps for running the program
 
-1)   Open a DOS command prompt window (Start à Programs à Accessories à Command Prompt)
+1)   Open a DOS command prompt window (Start à Programs à Accessories à Command Prompt)
 
-2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
+2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
 
 C:
 
 CD \\&lt;rootfolder&gt;\&lt;/span>
 
-3)   Change to the specific folder for the console application:
+3)   Change to the specific folder for the console application:
 
 CD PreProcess\\GrndTempCalc
 
-4)   Run the program (for example use the example included with the install):
+4)   Run the program (for example use the example included with the install):
 
 RunSlab SlabExample USA\_IL\_Chicago-OHare\_TMY2
 
@@ -6053,19 +5533,19 @@ The slab program used to calculate the results is included with the EnergyPlus d
 
 :Instructions:
 
-:  Complete the following path and program names.
+:  Complete the following path and program names.
 
-:  path names must have a following \\ or errors will happen
+:  path names must have a following \\ or errors will happen
 
- set program\_path=
+ set program\_path=
 
- set program\_name=Slab.exe
+ set program\_name=Slab.exe
 
- set input\_path=
+ set input\_path=
 
- set output\_path=
+ set output\_path=
 
- set weather\_path=C:\\EnergyPlus\\WeatherData\\
+ set weather\_path=C:\\EnergyPlus\\WeatherData\\
 
 and then in command mode issue the run command:
 
@@ -6094,89 +5574,89 @@ The following output files are created by the Slab program and saved in the outp
 
 If the objects are placed in the normal EnergyPlus input IDF file using the "GroundHeatTransfer:Slab:" prefix, then the values resulting from the Slab preprocessor will be automatically included in the simulation at run time. The surfaces can reference these values using Outside Boundary Conditions of:
 
-n GroundSlabPreprocessorAverage
+* GroundSlabPreprocessorAverage
 
-n GroundSlabPreprocessorCore
+* GroundSlabPreprocessorCore
 
-n GroundSlabPreprocessorPerimeter
+* GroundSlabPreprocessorPerimeter
 
 The objects that support this include:
 
-n BuildingSurface:Detailed
+* BuildingSurface:Detailed
 
-n Wall:Detailed
+* Wall:Detailed
 
-n RoofCeiling:Detailed
+* RoofCeiling:Detailed
 
-n Floor:Detailed
+* Floor:Detailed
 
 The slab program is capable of supplying the EnergyPlus idf objects needed to use the slab program outputs directly by copying the objects into the EnergyPlus idf file. The file containing these objects has the extension gtp, and an example is shown below. It contains the output temperatures and heat fluxes, and in addition it contains an OtherSideCoefficient object example as mentioned above, and three compact schedule objects that can be used to describe the average, core and perimeter temperatures directly in EnergyPlus. The Name in the compact schedule corresponds to the GroundTemperatureScheduleName in the OtherSideCoefficient object.
 
 ================================================
 
- CHECK CONVERGENCE MESSAGE AT END OF THIS FILE!
+ CHECK CONVERGENCE MESSAGE AT END OF THIS FILE!
 
- ================================================
+ ================================================
 
-   Monthly Slab Outside Face Temperatures, C and Heat Fluxes(loss), W/(m^2)
+   Monthly Slab Outside Face Temperatures, C and Heat Fluxes(loss), W/(m^2)
 
- Perimeter Area: 304.00  Core Area: 1296.00
+ Perimeter Area: 304.00  Core Area: 1296.00
 
-       Month   TAverage   TPerimeter    TCore      TInside AverageFlux PerimeterFlux CoreFlux
+       Month   TAverage   TPerimeter    TCore      TInside AverageFlux PerimeterFlux CoreFlux
 
-          1      17.74     16.41        18.05       18.00       0.88        5.39       -0.17
+          1      17.74     16.41        18.05       18.00       0.88        5.39       -0.17
 
-          2      17.49     16.15        17.81       18.00       1.73        6.29        0.66
+          2      17.49     16.15        17.81       18.00       1.73        6.29        0.66
 
-          3      17.45     16.23        17.74       18.00       1.86        6.02        0.88
+          3      17.45     16.23        17.74       18.00       1.86        6.02        0.88
 
-          4      18.96     17.86        19.22       20.00       3.51        7.24        2.64
+          4      18.96     17.86        19.22       20.00       3.51        7.24        2.64
 
-          5      19.22     18.22        19.45       20.00       2.66        6.04        1.86
+          5      19.22     18.22        19.45       20.00       2.66        6.04        1.86
 
-          6      19.28     18.38        19.49       20.00       2.44        5.48        1.73
+          6      19.28     18.38        19.49       20.00       2.44        5.48        1.73
 
-          7      20.83     19.98        21.03       22.00       3.96        6.87        3.28
+          7      20.83     19.98        21.03       22.00       3.96        6.87        3.28
 
-          8      21.12     20.39        21.29       22.00       2.98        5.47        2.40
+          8      21.12     20.39        21.29       22.00       2.98        5.47        2.40
 
-          9      21.18     20.46        21.35       22.00       2.76        5.22        2.19
+          9      21.18     20.46        21.35       22.00       2.76        5.22        2.19
 
-         10      21.17     20.23        21.39       22.00       2.82        6.02        2.08
+         10      21.17     20.23        21.39       22.00       2.82        6.02        2.08
 
-         11      19.64     18.63        19.88       20.00       1.22        4.63        0.42
+         11      19.64     18.63        19.88       20.00       1.22        4.63        0.42
 
-         12      19.36     18.14        19.65       20.00       2.16        6.30        1.19
+         12      19.36     18.14        19.65       20.00       2.16        6.30        1.19
 
 
 
 ! OTHER SIDE COEFFICIENT OBJECT EXAMPLE FOR IDF FILE
 
- SurfaceProperty:OtherSideCoefficients,
+ SurfaceProperty:OtherSideCoefficients,
 
- ExampleOSC,                !- OtherSideCoeff Name \*\*\*CHANGE THIS!\*\*\*
+ ExampleOSC,                !- OtherSideCoeff Name \*\*\*CHANGE THIS!\*\*\*
 
- 0,                         !- Combined convective/radiative film coefficient
+ 0,                         !- Combined convective/radiative film coefficient
 
- 1,                         !- N2,User selected Constant Temperature {C}
+ 1,                         !- N2,User selected Constant Temperature {C}
 
- 1,                         !- Coefficient modifying the user selected constant temperature
+ 1,                         !- Coefficient modifying the user selected constant temperature
 
- 0,                         !- Coefficient modifying the external dry bulb temperature
+ 0,                         !- Coefficient modifying the external dry bulb temperature
 
- 0,                         !- Coefficient modifying the ground temperature
+ 0,                         !- Coefficient modifying the ground temperature
 
- 0,                         !- Coefficient modifying the wind speed term (s/m)
+ 0,                         !- Coefficient modifying the wind speed term (s/m)
 
- 0,                         !- Coefficient modifying the zone air temperature
+ 0,                         !- Coefficient modifying the zone air temperature
 
-                            !  part of the equation
+                            !  part of the equation
 
- GroundTempCompactSchedName; !- Name of Schedule for values of const
+ GroundTempCompactSchedName; !- Name of Schedule for values of const
 
-                            ! temperature. Schedule values replace N2.
+                            ! temperature. Schedule values replace N2.
 
-                            !  \*\*\*REPLACE WITH CORRECT NAME\*\*\*
+                            !  \*\*\*REPLACE WITH CORRECT NAME\*\*\*
 
 
 
@@ -6186,103 +5666,103 @@ Schedule:Compact,
 
 MonthlyAveSurfaceTemp, !Name
 
-Temperature ,            !- ScheduleType
+Temperature ,            !- ScheduleType
 
-Through:   1/31,
-
-For:AllDays,
-
-Until:24:00,
-
- 17.74    ,
-
-Through:   2/28,
+Through:   1/31,
 
 For:AllDays,
 
 Until:24:00,
 
- 17.49    ,
+ 17.74    ,
 
-Through:   3/31,
-
-For:AllDays,
-
-Until:24:00,
-
- 17.45    ,
-
-Through:   4/30,
+Through:   2/28,
 
 For:AllDays,
 
 Until:24:00,
 
- 18.96    ,
+ 17.49    ,
 
-Through:   5/31,
-
-For:AllDays,
-
-Until:24:00,
-
- 19.22    ,
-
-Through:   6/30,
+Through:   3/31,
 
 For:AllDays,
 
 Until:24:00,
 
- 19.28    ,
+ 17.45    ,
 
-Through:   7/31,
-
-For:AllDays,
-
-Until:24:00,
-
- 20.83    ,
-
-Through:   8/31,
+Through:   4/30,
 
 For:AllDays,
 
 Until:24:00,
 
- 21.12    ,
+ 18.96    ,
 
-Through:   9/30,
-
-For:AllDays,
-
-Until:24:00,
-
- 21.18    ,
-
-Through:  10/31,
+Through:   5/31,
 
 For:AllDays,
 
 Until:24:00,
 
- 21.17    ,
+ 19.22    ,
 
-Through:  11/30,
-
-For:AllDays,
-
-Until:24:00,
-
- 19.64    ,
-
-Through:  12/31,
+Through:   6/30,
 
 For:AllDays,
 
 Until:24:00,
 
- 19.36    ;
+ 19.28    ,
+
+Through:   7/31,
+
+For:AllDays,
+
+Until:24:00,
+
+ 20.83    ,
+
+Through:   8/31,
+
+For:AllDays,
+
+Until:24:00,
+
+ 21.12    ,
+
+Through:   9/30,
+
+For:AllDays,
+
+Until:24:00,
+
+ 21.18    ,
+
+Through:  10/31,
+
+For:AllDays,
+
+Until:24:00,
+
+ 21.17    ,
+
+Through:  11/30,
+
+For:AllDays,
+
+Until:24:00,
+
+ 19.64    ,
+
+Through:  12/31,
+
+For:AllDays,
+
+Until:24:00,
+
+ 19.36    ;
 
 
 
@@ -6292,7 +5772,7 @@ Until:24:00,
 
 
 
-  Convergence has been gained.
+  Convergence has been gained.
 
 Description of the Objects in the E+SlabGHT.IDD
 -----------------------------------------------
@@ -6335,45 +5815,45 @@ The Materials object in the IDD is shown below.
 
 Materials,
 
-        N1, \\field NMAT: Number of materials
+        N1, \\field NMAT: Number of materials
 
-            \\note typical 2
+            \\note typical 2
 
-        N2, \\field ALBEDO: Surface Albedo: No Snow
+        N2, \\field ALBEDO: Surface Albedo: No Snow
 
-            \\note typical value= 0-1
+            \\note typical value= 0-1
 
-        N3, \\field ALBEDO: Surface Albedo: Snow
+        N3, \\field ALBEDO: Surface Albedo: Snow
 
-            \\note typical value= 0-1
+            \\note typical value= 0-1
 
-        N4, \\field EPSLW: Surface Emissivity: No Snow
+        N4, \\field EPSLW: Surface Emissivity: No Snow
 
-            \\note typical value= 0.9
+            \\note typical value= 0.9
 
-        N5, \\field EPSLW: Surface Emissivity: Snow
+        N5, \\field EPSLW: Surface Emissivity: Snow
 
-            \\note typical value= 0.9
+            \\note typical value= 0.9
 
-        N6, \\field Z0: Surface Roughness: No Snow
+        N6, \\field Z0: Surface Roughness: No Snow
 
-            \\note typical value= 0-10 cm
+            \\note typical value= 0-10 cm
 
-        N7, \\field Z0: Surface Roughness: Snow
+        N7, \\field Z0: Surface Roughness: Snow
 
-            \\note typical value= 0-10
+            \\note typical value= 0-10
 
-        N8, \\field HIN: Indoor HConv: Downward Flow
+        N8, \\field HIN: Indoor HConv: Downward Flow
 
-            \\note typical value= 4-10
+            \\note typical value= 4-10
 
-            \\units W/m2-K
+            \\units W/m2-K
 
-        N9; \\field HIN: Indoor HConv: Upward
+        N9; \\field HIN: Indoor HConv: Upward
 
-            \\note typical value= 4-10
+            \\note typical value= 4-10
 
-            \\units W/m2-K
+            \\units W/m2-K
 
 
 
@@ -6403,41 +5883,41 @@ The IDD object is shown below:
 
 MatlProps,
 
-        N1, \\field RHO: Slab Material density
+        N1, \\field RHO: Slab Material density
 
-            \\note typical value= 2300.0
+            \\note typical value= 2300.0
 
-            \\units kg/m3
+            \\units kg/m3
 
-        N2, \\field RHO: Soil Density
+        N2, \\field RHO: Soil Density
 
-            \\note typical value= 1200.0
+            \\note typical value= 1200.0
 
-            \\units kg/m3
+            \\units kg/m3
 
-        N3, \\field CP: Slab CP
+        N3, \\field CP: Slab CP
 
-            \\note typical value=650.0
+            \\note typical value=650.0
 
-            \\units J/kg-K
+            \\units J/kg-K
 
-        N4, \\field CP: Soil CP
+        N4, \\field CP: Soil CP
 
-            \\note typical value= 1200.0
+            \\note typical value= 1200.0
 
-            \\units J/kg-K
+            \\units J/kg-K
 
-        N5, \\field TCON: Slab k
+        N5, \\field TCON: Slab k
 
-            \\note typical value= .9
+            \\note typical value= .9
 
-            \\units W/m2-K
+            \\units W/m2-K
 
-        N6; \\field TCON: Soil k
+        N6; \\field TCON: Soil k
 
-            \\note typical value= 1.0
+            \\note typical value= 1.0
 
-            \\units W/m2-K
+            \\units W/m2-K
 
 ### BoundConds or GroundHeatTransfer:Slab:BoundConds Object
 
@@ -6467,47 +5947,47 @@ The BoundConds object is shown below:
 
 BoundConds,
 
-        A1, \\field EVTR: Is surface evapotranspiration modeled
+        A1, \\field EVTR: Is surface evapotranspiration modeled
 
-            \\type choice
+            \\type choice
 
-            \\key TRUE
+            \\key TRUE
 
-            \\key FALSE
+            \\key FALSE
 
-        A2, \\field FIXBC: is the lower boundary at a fixed temperature
+        A2, \\field FIXBC: is the lower boundary at a fixed temperature
 
-            \\type choice
+            \\type choice
 
-            \\key TRUE
+            \\key TRUE
 
-            \\key FALSE
+            \\key FALSE
 
-            \\note FALSE selects the zero flux lower boundary condition
+            \\note FALSE selects the zero flux lower boundary condition
 
-        N1, \\field TDEEPin,
+        N1, \\field TDEEPin,
 
-            \\note User input lower boundary temperature if FIXBC is TRUE
+            \\note User input lower boundary temperature if FIXBC is TRUE
 
-            \\units C
+            \\units C
 
-            \\note Blank for FIXBC FALSE or
+            \\note Blank for FIXBC FALSE or
 
-            \\note to use the calculated 1-D deep ground temperature.
+            \\note to use the calculated 1-D deep ground temperature.
 
-        A3, \\field USRHflag: Is the ground surface h specified by the user?
+        A3, \\field USRHflag: Is the ground surface h specified by the user?
 
-            \\type choice
+            \\type choice
 
-            \\key TRUE
+            \\key TRUE
 
-            \\key FALSE
+            \\key FALSE
 
-        N2; \\field USERH: User specified ground surface heat transfer coeff
+        N2; \\field USERH: User specified ground surface heat transfer coeff
 
-            \\units W/(m2-K)
+            \\units W/(m2-K)
 
-            \\note Used only if USRHflag is TRUE
+            \\note Used only if USRHflag is TRUE
 
 
 
@@ -6543,103 +6023,103 @@ The entire BldgProps Object is shown below.
 
 BldgProps,
 
-      N1, \\field IYRS: Number of years to iterate
+      N1, \\field IYRS: Number of years to iterate
 
-          \\note typical value= 10
+          \\note typical value= 10
 
-      N2, \\field Shape: Slab shape
+      N2, \\field Shape: Slab shape
 
-          \\note only value= 0
+          \\note only value= 0
 
-      N3, \\field HBLDG: Building height
+      N3, \\field HBLDG: Building height
 
-          \\note typical value= 0-20
+          \\note typical value= 0-20
 
-          \\units m
+          \\units m
 
-      N4, \\field TIN1: January Indoor Average temperature set point
+      N4, \\field TIN1: January Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N5, \\field TIN2: February Indoor Average temperature set point
+      N5, \\field TIN2: February Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N6, \\field TIN3: March Indoor Average temperature set point
+      N6, \\field TIN3: March Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N7, \\field TIN4: April Indoor Average temperature set point
+      N7, \\field TIN4: April Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N8, \\field TIN5: May Indoor Average temperature set point
+      N8, \\field TIN5: May Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N9, \\field TIN6: June Indoor Average temperature set point
+      N9, \\field TIN6: June Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N10, \\field TIN7: July Indoor Average temperature set point
+      N10, \\field TIN7: July Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N11, \\field TIN8: August Indoor Average temperature set point
+      N11, \\field TIN8: August Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N12, \\field TIN9: September Indoor Average temperature set point
+      N12, \\field TIN9: September Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N13, \\field TIN10: October Indoor Average temperature set point
+      N13, \\field TIN10: October Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N14, \\field TIN11: NovemberIndoor Average temperature set point
+      N14, \\field TIN11: NovemberIndoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N15, \\field TIN12: December Indoor Average temperature set point
+      N15, \\field TIN12: December Indoor Average temperature set point
 
-          \\note typical value=22
+          \\note typical value=22
 
-          \\units C
+          \\units C
 
-      N16, \\field TINAmp: Daily Indoor sine wave variation amplitude
+      N16, \\field TINAmp: Daily Indoor sine wave variation amplitude
 
-           \\note typical value: 0
+           \\note typical value: 0
 
-           \\units C
+           \\units C
 
-      N17; \\field ConvTol: Convergence Tolerance
+      N17; \\field ConvTol: Convergence Tolerance
 
-           \\note typical value= 0.1
+           \\note typical value= 0.1
 
-### Insulation or GroundHeatTransfer:Slab:Insulation  Object
+### Insulation or GroundHeatTransfer:Slab:Insulation  Object
 
 This object supplies the information about insulation used around the slab. There are two possible configurations: under the slab or vertical insulation around the slab.
 
@@ -6657,7 +6137,7 @@ This field specifies the thermal resistance of the vertical insulation. It shoul
 
 #### Field ZVINS: Depth of vertical insulation
 
-This field specifies the depth of the vertical insulation into the ground in meters. Note that it starts at the slab upper surface and extends into the ground. Only .2 .4 .6 .8 1.0 1.5 2.0 2.5  or 3.0 m should be used. Units are m.
+This field specifies the depth of the vertical insulation into the ground in meters. Note that it starts at the slab upper surface and extends into the ground. Only .2 .4 .6 .8 1.0 1.5 2.0 2.5  or 3.0 m should be used. Units are m.
 
 #### Field IVINS: Flag: Is there vertical insulation?
 
@@ -6667,33 +6147,33 @@ The Insulation object is shown below.
 
 Insulation,
 
-        N1, \\field RINS: R value of under slab insulation
+        N1, \\field RINS: R value of under slab insulation
 
-            \\note typical value= 0-2.0
+            \\note typical value= 0-2.0
 
-            \\units m2-K/W
+            \\units m2-K/W
 
-        N2, \\field DINS: Width of strip of under slab insulation
+        N2, \\field DINS: Width of strip of under slab insulation
 
-            \\note typical value= 0-2.0
+            \\note typical value= 0-2.0
 
-            \\units m
+            \\units m
 
-        N3, \\field RVINS: R value of vertical insulation
+        N3, \\field RVINS: R value of vertical insulation
 
-            \\note typical value= 0-3.0
+            \\note typical value= 0-3.0
 
-            \\units m2-K/W
+            \\units m2-K/W
 
-        N4, \\field ZVINS: Depth of vertical insulation
+        N4, \\field ZVINS: Depth of vertical insulation
 
-            \\note only use values= .2 .4 .6 .8 1.0 1.5 2.0 2.5 3.0
+            \\note only use values= .2 .4 .6 .8 1.0 1.5 2.0 2.5 3.0
 
-            \\units m
+            \\units m
 
-        N5; \\field IVINS: Flag: Is there vertical insulation
+        N5; \\field IVINS: Flag: Is there vertical insulation
 
-            \\note values: 1=yes 0=no
+            \\note values: 1=yes 0=no
 
 ### EquivalentSlab or GroundHeatTransfer:Slab:EquivalentSlab Object
 
@@ -6723,27 +6203,27 @@ EquivalentSlab,
 
 \\memo Using an equivalent slab allows non-rectangular shapes to be modeled accurately
 
-        N1, \\field APRatio: The area to perimeter ratio for this slab
+        N1, \\field APRatio: The area to perimeter ratio for this slab
 
-            \\units m
+            \\units m
 
-        N2, \\field SLABDEPTH: Thickness of slab on grade
+        N2, \\field SLABDEPTH: Thickness of slab on grade
 
-            \\note typical value= 0.1
+            \\note typical value= 0.1
 
-            \\units m
+            \\units m
 
-        N3, \\field CLEARANCE: Distance from edge of slab to domain edge
+        N3, \\field CLEARANCE: Distance from edge of slab to domain edge
 
-            \\note typical value= 15.0
+            \\note typical value= 15.0
 
-            \\units m
+            \\units m
 
-        N4; \\field ZCLEARANCE: Distance from bottom of slab to domain bottom
+        N4; \\field ZCLEARANCE: Distance from bottom of slab to domain bottom
 
-            \\note typical value= 15.0
+            \\note typical value= 15.0
 
-            \\units m
+            \\units m
 
 
 
@@ -6751,7 +6231,7 @@ EquivalentSlab,
 
 Figure 21. Graph of Slab Outside Temperature vs Slab Thickness
 
-**The EquivSlab object and the EquivAutoGrid Objects that follow have been replaced by the EquivalentSlab object above.  They are included in the idd so that old idf files can still be read.**
+**The EquivSlab object and the EquivAutoGrid Objects that follow have been replaced by the EquivalentSlab object above.  They are included in the idd so that old idf files can still be read.**
 
 ### EquivSlab Object - Obsolete
 
@@ -6773,17 +6253,17 @@ EquivSlab,
 
 \\memo The simulation default should be EquivSizing=True
 
-        N1, \\field APRatio: The area to perimeter ratio for this slab
+        N1, \\field APRatio: The area to perimeter ratio for this slab
 
-            \\units m
+            \\units m
 
-        A1; \\field EquivSizing:
+        A1; \\field EquivSizing:
 
-            \\note Flag: Will the dimensions of an equivalent slab
+            \\note Flag: Will the dimensions of an equivalent slab
 
-            \\note be calculated (TRUE) or will the dimensions be input directly? (FALSE)
+            \\note be calculated (TRUE) or will the dimensions be input directly? (FALSE)
 
-            \\note It is recommended that EnergyPlus users use TRUE.
+            \\note It is recommended that EnergyPlus users use TRUE.
 
 ### EquivAutoGrid Object - Obsolete
 
@@ -6801,21 +6281,21 @@ This field specifies the distance from the slab to the edge of the area that wil
 
 The EquivAutoGrid object is shown below.
 
-EquivAutoGrid, \\memo  EquivAutoGrid only necessary when EquivSizing is true
+EquivAutoGrid, \\memo  EquivAutoGrid only necessary when EquivSizing is true
 
-               \\memo  EnergyPlus users normally use this option.
+               \\memo  EnergyPlus users normally use this option.
 
-        N1, \\field SLABDEPTH: Thickness of slab on grade
+        N1, \\field SLABDEPTH: Thickness of slab on grade
 
-            \\note typical value= 0.1
+            \\note typical value= 0.1
 
-            \\units m
+            \\units m
 
-        N2; \\field CLEARANCE: Distance from edge of slab to domain edge
+        N2; \\field CLEARANCE: Distance from edge of slab to domain edge
 
-            \\note typical value= 15.0
+            \\note typical value= 15.0
 
-            \\units m
+            \\units m
 
 
 
@@ -6823,93 +6303,93 @@ EquivAutoGrid, \\memo  EquivAutoGrid only necessary when EquivSizing is true
 
 There are five additional objects in the IDD that can be used under very special situations by researchers who want to generate special calculation grids. They are normally not useful to EnergyPlus users. They will be shown as IDD sections only. They do not need to be in the IDF.
 
-AutoGrid,   \\memo AutoGrid only necessary when EquivSizing is false
+AutoGrid,   \\memo AutoGrid only necessary when EquivSizing is false
 
-            \\memo  Not normally needed by EnergyPlus users.
+            \\memo  Not normally needed by EnergyPlus users.
 
-        N1, \\field SLABX: X dimension of the building slab
+        N1, \\field SLABX: X dimension of the building slab
 
-            \\note typical values= 0-60.0
+            \\note typical values= 0-60.0
 
-            \\units m
+            \\units m
 
-        N2, \\field SLABY: Y dimension of the building slab
+        N2, \\field SLABY: Y dimension of the building slab
 
-            \\note typical values= 0-60.0
+            \\note typical values= 0-60.0
 
-            \\units m
+            \\units m
 
-        N3, \\field SLABDEPTH: Thickness of slab on grade
+        N3, \\field SLABDEPTH: Thickness of slab on grade
 
-            \\note typical value= .1
+            \\note typical value= .1
 
-            \\units m
+            \\units m
 
-        N4; \\field CLEARANCE: Distance from edge of slab to domain edge
+        N4; \\field CLEARANCE: Distance from edge of slab to domain edge
 
-            \\note typical value= 15.0
+            \\note typical value= 15.0
 
-            \\units m
+            \\units m
 
 !
 
 ManualGrid, \\memo Manual Grid only necessary using manual gridding (not recommended)
 
-            \\memo   Used only in special cases.
+            \\memo   Used only in special cases.
 
-        N1, \\field NX: Number of cells in the X direction
+        N1, \\field NX: Number of cells in the X direction
 
-            \\note typical values= 15
+            \\note typical values= 15
 
-        N2, \\field NY: Number of cells in the Y direction
+        N2, \\field NY: Number of cells in the Y direction
 
-            \\note typical values= 15
+            \\note typical values= 15
 
-        N3, \\field NZ: Number of cells in the Z direction
+        N3, \\field NZ: Number of cells in the Z direction
 
-            \\note typical values= 15
+            \\note typical values= 15
 
-        N4, \\field IBOX: X direction cell indicator of slab edge
+        N4, \\field IBOX: X direction cell indicator of slab edge
 
-            \\note typical values= 1-10
+            \\note typical values= 1-10
 
-        N5; \\field JBOX: Y direction cell indicator of slab edge
+        N5; \\field JBOX: Y direction cell indicator of slab edge
 
-            \\note typical values= 1-10
-
-!
-
-XFACE,  \\memo This is only needed when using manual gridding (not recommended)
-
-        \\memo XFACE: X Direction cell face coordinates: m
-
-  N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
-  N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26, N27, N28, N29,
-
-  N30, N31, N32, N33, N34, N35, N36, N37, N38, N39, N40;
+            \\note typical values= 1-10
 
 !
 
-YFACE,  \\memo This is only needed when using manual gridding (not recommended)
+XFACE,  \\memo This is only needed when using manual gridding (not recommended)
 
-        \\memo YFACE: Y Direction cell face coordinates: m,
+        \\memo XFACE: X Direction cell face coordinates: m
 
-  N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+  N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
 
-  N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26, N27, N28, N29,
+  N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26, N27, N28, N29,
 
-  N30, N31, N32, N33, N34, N35, N36, N37, N38, N39, N40;
+  N30, N31, N32, N33, N34, N35, N36, N37, N38, N39, N40;
 
 !
 
-ZFACE,  \\memo This is only needed when usuing manual gridding (not recommended)
+YFACE,  \\memo This is only needed when using manual gridding (not recommended)
 
-        \\memo ZFACE: Z Direction cell face coordinates: m
+        \\memo YFACE: Y Direction cell face coordinates: m,
 
-        N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+  N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
 
-        N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25;
+  N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26, N27, N28, N29,
+
+  N30, N31, N32, N33, N34, N35, N36, N37, N38, N39, N40;
+
+!
+
+ZFACE,  \\memo This is only needed when usuing manual gridding (not recommended)
+
+        \\memo ZFACE: Z Direction cell face coordinates: m
+
+        N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+
+        N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25;
 
 
 
@@ -6921,149 +6401,149 @@ A sample IDF file is shown below.
 
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 
-!-      Use '!' comments if they need to be retained when using the IDFEditor.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
 
-!-   ===========  ALL OBJECTS IN CLASS: MATERIALS ===========
+!-   ===========  ALL OBJECTS IN CLASS: MATERIALS ===========
 
 Materials,
 
-    2,           !- NMAT: Number of materials
+    2,           !- NMAT: Number of materials
 
-    0.158,       !- ALBEDO: Surface Albedo: No Snow
+    0.158,       !- ALBEDO: Surface Albedo: No Snow
 
-    0.379,       !- ALBEDO: Surface Albedo: Snow
+    0.379,       !- ALBEDO: Surface Albedo: Snow
 
-    0.9,         !- EPSLW: Surface Emissivity: No Snow
+    0.9,         !- EPSLW: Surface Emissivity: No Snow
 
-    0.9,         !- EPSLW: Surface Emissivity: Snow
+    0.9,         !- EPSLW: Surface Emissivity: Snow
 
-    0.75,        !- Z0: Surface Roughness: No Snow
+    0.75,        !- Z0: Surface Roughness: No Snow
 
-    0.03,        !- Z0: Surface Roughness: Snow
+    0.03,        !- Z0: Surface Roughness: Snow
 
-    6.13,        !- HIN: Indoor HConv: Downward Flow {W/m2-K}
+    6.13,        !- HIN: Indoor HConv: Downward Flow {W/m2-K}
 
-    9.26;        !- HIN: Indoor HConv: Upward {W/m2-K}
-
-
+    9.26;        !- HIN: Indoor HConv: Upward {W/m2-K}
 
 
 
-!-   ===========  ALL OBJECTS IN CLASS: MATLPROPS ===========
+
+
+!-   ===========  ALL OBJECTS IN CLASS: MATLPROPS ===========
 
 
 
 MatlProps,
 
-    2300,        !- RHO: Slab Material density {kg/m3}
+    2300,        !- RHO: Slab Material density {kg/m3}
 
-    1200,        !- RHO: Soil Density {kg/m3}
+    1200,        !- RHO: Soil Density {kg/m3}
 
-    653,         !- CP: Slab CP {J/kg-K}
+    653,         !- CP: Slab CP {J/kg-K}
 
-    1200,        !- CP: Soil CP {J/kg-K}
+    1200,        !- CP: Soil CP {J/kg-K}
 
-    0.93,        !- TCON: Slab k {W/m-K}
+    0.93,        !- TCON: Slab k {W/m-K}
 
-    1;           !- TCON: Soil k {W/m-K}
-
-
+    1;           !- TCON: Soil k {W/m-K}
 
 
 
-!-   ===========  ALL OBJECTS IN CLASS: BOUNDCONDS ===========
+
+
+!-   ===========  ALL OBJECTS IN CLASS: BOUNDCONDS ===========
 
 
 
 BoundConds,
 
-    TRUE,        !- EVTR: Is surface evapotranspiration modeled
+    TRUE,        !- EVTR: Is surface evapotranspiration modeled
 
-    TRUE,        !- FIXBC: is the lower boundary at a fixed temperature
+    TRUE,        !- FIXBC: is the lower boundary at a fixed temperature
 
-    FALSE;       !- OLDTG: is there an old ground temperature file
-
-
+    FALSE;       !- OLDTG: is there an old ground temperature file
 
 
 
-!-   ===========  ALL OBJECTS IN CLASS: BLDGPROPS ===========
+
+
+!-   ===========  ALL OBJECTS IN CLASS: BLDGPROPS ===========
 
 
 
 BldgProps,
 
-    10,          !- IYRS: Number of years to iterate
+    10,          !- IYRS: Number of years to iterate
 
-    0,           !- Shape: Slab shape
+    0,           !- Shape: Slab shape
 
-    4,           !- HBLDG: Building height {m}
+    4,           !- HBLDG: Building height {m}
 
-    18,          !- TIN1: January Indoor Average temperature set point {C}
+    18,          !- TIN1: January Indoor Average temperature set point {C}
 
-    18,          !- TIN2: February Indoor Average temperature set point {C}
+    18,          !- TIN2: February Indoor Average temperature set point {C}
 
-    18,          !- TIN3: March Indoor Average temperature set point {C}
+    18,          !- TIN3: March Indoor Average temperature set point {C}
 
-    20,          !- TIN4: April Indoor Average temperature set point {C}
+    20,          !- TIN4: April Indoor Average temperature set point {C}
 
-    20,          !- TIN5: May Indoor Average temperature set point {C}
+    20,          !- TIN5: May Indoor Average temperature set point {C}
 
-    20,          !- TIN6: June Indoor Average temperature set point {C}
+    20,          !- TIN6: June Indoor Average temperature set point {C}
 
-    22,          !- TIN7: July Indoor Average temperature set point {C}
+    22,          !- TIN7: July Indoor Average temperature set point {C}
 
-    22,          !- TIN8: August Indoor Average temperature set point {C}
+    22,          !- TIN8: August Indoor Average temperature set point {C}
 
-    22,          !- TIN9: September Indoor Average temperature set point {C}
+    22,          !- TIN9: September Indoor Average temperature set point {C}
 
-    22,          !- TIN10: October Indoor Average temperature set point {C}
+    22,          !- TIN10: October Indoor Average temperature set point {C}
 
-    20,          !- TIN11: NovemberIndoor Average temperature set point {C}
+    20,          !- TIN11: NovemberIndoor Average temperature set point {C}
 
-    20,          !- TIN12: December Indoor Average temperature set point {C}
+    20,          !- TIN12: December Indoor Average temperature set point {C}
 
-    0,           !- TINAmp: Daily sine wave variation amplitude {C}
+    0,           !- TINAmp: Daily sine wave variation amplitude {C}
 
-    0.10;        !- ConvTol: Convergence Tolerance
-
-
+    0.10;        !- ConvTol: Convergence Tolerance
 
 
 
-!-   ===========  ALL OBJECTS IN CLASS: INSULATION ===========
+
+
+!-   ===========  ALL OBJECTS IN CLASS: INSULATION ===========
 
 
 
 Insulation,
 
-    0.,          !- RINS: R value of under slab insulation {m2-K/W}
+    0.,          !- RINS: R value of under slab insulation {m2-K/W}
 
-    0.,          !- DINS: Width of strip of under slab insulation {m}
+    0.,          !- DINS: Width of strip of under slab insulation {m}
 
-    2.0,         !- RVINS: R value of vertical insulation {m2-K/W}
+    2.0,         !- RVINS: R value of vertical insulation {m2-K/W}
 
-    2.0,         !- ZVINS: Depth of vertical insulation {m}
+    2.0,         !- ZVINS: Depth of vertical insulation {m}
 
-    1;           !- IVINS: Flag: Is there vertical insulation
-
-
+    1;           !- IVINS: Flag: Is there vertical insulation
 
 
 
-!-   ===========  ALL OBJECTS IN CLASS: EQUIVSLAB ===========
+
+
+!-   ===========  ALL OBJECTS IN CLASS: EQUIVSLAB ===========
 
 
 
 EquivalentSlab,
 
-    10,          !- APRatio: The area to perimeter ratio for this slab {m}
+    10,          !- APRatio: The area to perimeter ratio for this slab {m}
 
-   0.1,         !- SLABDEPTH: Thickness of slab on grade {m}
+   0.1,         !- SLABDEPTH: Thickness of slab on grade {m}
 
-    15,          !- CLEARANCE: Distance from edge of slab to domain edge {m}
+    15,          !- CLEARANCE: Distance from edge of slab to domain edge {m}
 
-    10;          !-ZCLEARANCE: Distance from bottom of slab to domain bottom
+    10;          !-ZCLEARANCE: Distance from bottom of slab to domain bottom
 
 Using Ground Temperatures with Basements
 ----------------------------------------
@@ -7103,19 +6583,19 @@ RunBasement
 
 Steps for running the program
 
-1)   Open a DOS command prompt window (Start -&gt; Programs -&gt; Accessories -&gt; Command Prompt)
+1)   Open a DOS command prompt window (Start -&gt; Programs -&gt; Accessories -&gt; Command Prompt)
 
-2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
+2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
 
 C:
 
 CD \\&lt;rootfolder&gt;\&lt;/span>
 
-3)   Change to the specific folder for the console application:
+3)   Change to the specific folder for the console application:
 
 CD PreProcess\\GrndTempCalc
 
-4)   Run the program (for example use the example included with the install):
+4)   Run the program (for example use the example included with the install):
 
 RunBasement BasementExample USA\_IL\_Chicago-OHare\_TMY2
 
@@ -7128,19 +6608,19 @@ The basement program used to calculate the results is included with the EnergyPl
 
 :Instructions:
 
-:  Complete the following path and program names.
+:  Complete the following path and program names.
 
-:  path names must have a following \\ or errors will happen
+:  path names must have a following \\ or errors will happen
 
- set program\_path=
+ set program\_path=
 
- set program\_name=Basement.exe
+ set program\_name=Basement.exe
 
- set input\_path=
+ set input\_path=
 
- set output\_path=
+ set output\_path=
 
- set weather\_path=C:\\EnergyPlus\\WeatherData\\
+ set weather\_path=C:\\EnergyPlus\\WeatherData\\
 
 and then in command mode issue the run command:
 
@@ -7172,7 +6652,7 @@ The basement idd objects and fields are shown below. These objects also appear i
 
 ! Basement foundation heat transfer module Input Data Dictionary file
 
-! Created:    August 18, 2000
+! Created:    August 18, 2000
 
 ! Written by: Edward Clements
 
@@ -7184,131 +6664,131 @@ The basement idd objects and fields are shown below. These objects also appear i
 
 SimParameters,
 
-      N1,\\field F: Multiplier for the ADI solution:
+      N1,\\field F: Multiplier for the ADI solution:
 
-         \\note 0&lt;F&lt;1.0,
+         \\note 0&lt;F&lt;1.0,
 
-         \\note typically 0.1 (0.5 for high k soil]
+         \\note typically 0.1 (0.5 for high k soil]
 
-      N2; \\field IYRS: Maximum number of yearly iterations:
+      N2; \\field IYRS: Maximum number of yearly iterations:
 
-         \\note typically 15-30]
+         \\note typically 15-30]
 
 
 
 MatlProps,
 
-     N1, \\field NMAT: Number of materials in this domain
+     N1, \\field NMAT: Number of materials in this domain
 
-         \\maximum 6
+         \\maximum 6
 
-     N2, \\field Density for Foundation Wall
+     N2, \\field Density for Foundation Wall
 
-         \\note typical value 2243
+         \\note typical value 2243
 
-         \\units kg/m3
+         \\units kg/m3
 
-     N3, \\field density for Floor Slab
+     N3, \\field density for Floor Slab
 
-         \\note typical value 2243
+         \\note typical value 2243
 
-         \\units kg/m3
+         \\units kg/m3
 
-     N4, \\field density for Ceiling
+     N4, \\field density for Ceiling
 
-         \\note typical value 311
+         \\note typical value 311
 
-         \\units kg/m3
+         \\units kg/m3
 
-     N5, \\field density for Soil
+     N5, \\field density for Soil
 
-         \\note typical value 1500
+         \\note typical value 1500
 
-         \\units kg/m3
+         \\units kg/m3
 
-     N6, \\field density for Gravel
+     N6, \\field density for Gravel
 
-         \\note typical value 2000
+         \\note typical value 2000
 
-         \\units kg/m3
+         \\units kg/m3
 
-     N7, \\field density for Wood
+     N7, \\field density for Wood
 
-         \\note typical value 449
+         \\note typical value 449
 
-         \\units kg/m3
+         \\units kg/m3
 
-     N8,  \\field Specific heat for foundation wall
+     N8,  \\field Specific heat for foundation wall
 
-          \\note typical value 880
+          \\note typical value 880
 
-          \\units J/kg-K
+          \\units J/kg-K
 
-     N9,  \\field Specific heat for floor slab
+     N9,  \\field Specific heat for floor slab
 
-          \\note typical value 880
+          \\note typical value 880
 
-          \\units J/kg-K
+          \\units J/kg-K
 
-     N10, \\field Specific heat for ceiling
+     N10, \\field Specific heat for ceiling
 
-          \\note typical value 1530
+          \\note typical value 1530
 
-          \\units J/kg-K
+          \\units J/kg-K
 
-     N11, \\field Specific heat for soil
+     N11, \\field Specific heat for soil
 
-          \\note typical value 840
+          \\note typical value 840
 
-          \\units J/kg-K
+          \\units J/kg-K
 
-     N12, \\field Specific heat for gravel
+     N12, \\field Specific heat for gravel
 
-          \\note typical value 720
+          \\note typical value 720
 
-          \\units J/kg-K
+          \\units J/kg-K
 
-     N13, \\field Specific heat for wood
+     N13, \\field Specific heat for wood
 
-          \\note typical value 1530
+          \\note typical value 1530
 
-          \\units J/kg-K
+          \\units J/kg-K
 
-     N14, \\field Thermal conductivity for foundation wall
+     N14, \\field Thermal conductivity for foundation wall
 
-          \\note typical value 1.4
+          \\note typical value 1.4
 
-          \\units W/m-K
+          \\units W/m-K
 
-     N15, \\field Thermal conductivity for floor slab
+     N15, \\field Thermal conductivity for floor slab
 
-          \\note typical value 1.4
+          \\note typical value 1.4
 
-          \\units W/m-K
+          \\units W/m-K
 
-     N16, \\field Thermal conductivity for ceiling
+     N16, \\field Thermal conductivity for ceiling
 
-          \\note typical value 0.09
+          \\note typical value 0.09
 
-          \\units W/m-K
+          \\units W/m-K
 
-     N17,  \\field thermal conductivity for soil
+     N17,  \\field thermal conductivity for soil
 
-          \\note typical value 1.1
+          \\note typical value 1.1
 
-          \\units W/m-K
+          \\units W/m-K
 
-     N18, \\field thermal conductivity for gravel
+     N18, \\field thermal conductivity for gravel
 
-          \\note typical value 1.9
+          \\note typical value 1.9
 
-          \\units W/m-K
+          \\units W/m-K
 
-     N19; \\field thermal conductivity for wood
+     N19; \\field thermal conductivity for wood
 
-          \\note typical value 0.12
+          \\note typical value 0.12
 
-          \\units W/m-K
+          \\units W/m-K
 
 
 
@@ -7316,115 +6796,115 @@ MatlProps,
 
 Insulation,
 
-     N1, \\field REXT: R Value of any exterior insulation, K/(W/m2)]
+     N1, \\field REXT: R Value of any exterior insulation, K/(W/m2)]
 
-         \\units m2-K/W
+         \\units m2-K/W
 
-     A1; \\field INSFULL: Flag: Is the wall fully insulated?
+     A1; \\field INSFULL: Flag: Is the wall fully insulated?
 
-         \\note  True for full insulation
+         \\note  True for full insulation
 
-         \\note  False for insulation half way down side wall from grade line
+         \\note  False for insulation half way down side wall from grade line
 
 
 
 SurfaceProps,
 
-     N1, \\field ALBEDO: Surface albedo for No snow conditions
+     N1, \\field ALBEDO: Surface albedo for No snow conditions
 
-         \\note typical value 0.16
+         \\note typical value 0.16
 
-     N2, \\field ALBEDO: Surface albedo for snow conditions
+     N2, \\field ALBEDO: Surface albedo for snow conditions
 
-         \\note typical value 0.40
+         \\note typical value 0.40
 
-     N3, \\field EPSLN: Surface emissivity No Snow
+     N3, \\field EPSLN: Surface emissivity No Snow
 
-         \\note typical value 0.94
+         \\note typical value 0.94
 
-     N4, \\field EPSLN: Surface emissivity  with Snow
+     N4, \\field EPSLN: Surface emissivity  with Snow
 
-         \\note typical value 0.86
+         \\note typical value 0.86
 
-     N5, \\field VEGHT: Surface roughness No snow conditions,cm
+     N5, \\field VEGHT: Surface roughness No snow conditions,cm
 
-         \\note typical value 6.0
+         \\note typical value 6.0
 
-         \\units cm
+         \\units cm
 
-     N6, \\field VEGHT: Surface roughness Snow conditions, cm, ]
+     N6, \\field VEGHT: Surface roughness Snow conditions, cm, ]
 
-         \\note typical value 0.25
+         \\note typical value 0.25
 
-         \\units cm
+         \\units cm
 
-     A1; \\field PET: Flag, Potential evapotranspiration on? T/F]
+     A1; \\field PET: Flag, Potential evapotranspiration on? T/F]
 
-         \\note  Typically, PET is True
+         \\note  Typically, PET is True
 
 
 
 BldgData,
 
-     N1, \\field DWALL: Wall thickness,
+     N1, \\field DWALL: Wall thickness,
 
-         \\note typical value .2]
+         \\note typical value .2]
 
-         \\units m
+         \\units m
 
-     N2, \\field DSLAB: Floor slab thickness,
+     N2, \\field DSLAB: Floor slab thickness,
 
-         \\units m
+         \\units m
 
-         \\maximum 0.25
+         \\maximum 0.25
 
-     N3, \\field DGRAVXY: Width of gravel pit beside basement wall
+     N3, \\field DGRAVXY: Width of gravel pit beside basement wall
 
-         \\units  m
+         \\units  m
 
-     N4, \\field DGRAVZN: Gravel depth extending above the floor slab
+     N4, \\field DGRAVZN: Gravel depth extending above the floor slab
 
-         \\units m
+         \\units m
 
-     N5; \\field DGRAVZP: Gravel depth below the floor slab,
+     N5; \\field DGRAVZP: Gravel depth below the floor slab,
 
-         \\units m
+         \\units m
 
-         \\note typical value 0.1
+         \\note typical value 0.1
 
 !
 
 Interior,
 
-   A1, \\field COND: Flag: Is the basement conditioned?
+   A1, \\field COND: Flag: Is the basement conditioned?
 
-       \\note TRUE or FALSE
+       \\note TRUE or FALSE
 
-       \\note for EnergyPlus this should be TRUE
+       \\note for EnergyPlus this should be TRUE
 
-   N1, \\field HIN: Downward convection only heat transfer coefficient
+   N1, \\field HIN: Downward convection only heat transfer coefficient
 
-       \\units W/m2-K
+       \\units W/m2-K
 
-   N2, \\field HIN: Upward convection only heat transfer coefficient
+   N2, \\field HIN: Upward convection only heat transfer coefficient
 
-       \\units W/m2-K
+       \\units W/m2-K
 
-   N3, \\field HIN: Horizontal convection only heat transfer coefficient
+   N3, \\field HIN: Horizontal convection only heat transfer coefficient
 
-       \\units W/m2-K
+       \\units W/m2-K
 
-   N4, \\field HIN: Downward combined (convection and radiation) heat transfer coefficient
+   N4, \\field HIN: Downward combined (convection and radiation) heat transfer coefficient
 
-       \\units W/m2-K
+       \\units W/m2-K
 
-   N5, \\field HIN: Upward combined (convection and radiation) heat transfer coefficient
+   N5, \\field HIN: Upward combined (convection and radiation) heat transfer coefficient
 
-       \\units W/m2-K
+       \\units W/m2-K
 
-   N6; \\field HIN: Horizontal combined (convection and radiation) heat transfer coefficient
+   N6; \\field HIN: Horizontal combined (convection and radiation) heat transfer coefficient
 
-       \\units W/m2-K
+       \\units W/m2-K
 
 !
 
@@ -7434,103 +6914,103 @@ ComBldg,
 
 \\memo ComBldg contains the monthly average temperatures (C) and possibility of daily variation amplitude
 
-   N1,  \\field January average temperature
+   N1,  \\field January average temperature
 
-        \\units C
+        \\units C
 
-   N2,  \\field February average temperature
+   N2,  \\field February average temperature
 
-        \\units C
+        \\units C
 
-   N3,  \\field March average temperature
+   N3,  \\field March average temperature
 
-        \\units C
+        \\units C
 
-   N4,  \\field April average temperature
+   N4,  \\field April average temperature
 
-        \\units C
+        \\units C
 
-   N5,  \\field May average temperature
+   N5,  \\field May average temperature
 
-        \\units C
+        \\units C
 
-   N6,  \\field June average temperature
+   N6,  \\field June average temperature
 
-        \\units C
+        \\units C
 
-   N7,  \\field July average temperature
+   N7,  \\field July average temperature
 
-        \\units C
+        \\units C
 
-   N8,  \\field August average temperature
+   N8,  \\field August average temperature
 
-        \\units C
+        \\units C
 
-   N9,  \\field September average temperature
+   N9,  \\field September average temperature
 
-        \\units C
+        \\units C
 
-   N10, \\field October average temperature
+   N10, \\field October average temperature
 
-        \\units C
+        \\units C
 
-   N11, \\field November average temperature
+   N11, \\field November average temperature
 
-        \\units C
+        \\units C
 
-   N12, \\field December average temperature
+   N12, \\field December average temperature
 
-        \\units C
+        \\units C
 
-   N13; \\field Daily variation sine wave amplitude
+   N13; \\field Daily variation sine wave amplitude
 
-        \\units C
+        \\units C
 
-        \\note (Normally zero, just for checking)
+        \\note (Normally zero, just for checking)
 
 !
 
-EquivSlab,  !  Supplies the EquivSizing Flag
+EquivSlab,  !  Supplies the EquivSizing Flag
 
-    ! Using an equivalent slab allows non-rectangular shapes to be
+    ! Using an equivalent slab allows non-rectangular shapes to be
 
-    !    modeled accurately.
+    !    modeled accurately.
 
-    ! The simulation default should be EquivSizing=True
+    ! The simulation default should be EquivSizing=True
 
-   N1, \\field APRatio: The area to perimeter ratio for this slab
+   N1, \\field APRatio: The area to perimeter ratio for this slab
 
-       \\ units m
+       \\ units m
 
-   A1; \\field EquivSizing: Flag
+   A1; \\field EquivSizing: Flag
 
-         \\note Will the dimensions of an equivalent slab be calculated (TRUE)
+         \\note Will the dimensions of an equivalent slab be calculated (TRUE)
 
-         \\note or will the dimensions be input directly? (FALSE)]
+         \\note or will the dimensions be input directly? (FALSE)]
 
-         \\note Only advanced special simulations should use FALSE.
+         \\note Only advanced special simulations should use FALSE.
 
 !
 
 EquivAutoGrid,
 
-     \\memo EquivAutoGrid necessary when EquivSizing=TRUE, TRUE is is the normal case.
+     \\memo EquivAutoGrid necessary when EquivSizing=TRUE, TRUE is is the normal case.
 
-       N1, \\field CLEARANCE: Distance from outside of wall to edge of 3-D ground domain
+       N1, \\field CLEARANCE: Distance from outside of wall to edge of 3-D ground domain
 
-         \\units m
+         \\units m
 
-         \\note typical value 15m
+         \\note typical value 15m
 
-       N2, \\field SlabDepth: Thickness of the floor slab
+       N2, \\field SlabDepth: Thickness of the floor slab
 
-         \\units m
+         \\units m
 
-         \\note typical value 0.1m
+         \\note typical value 0.1m
 
-       N3; \\field BaseDepth: Depth of the basement wall below grade
+       N3; \\field BaseDepth: Depth of the basement wall below grade
 
-         \\units m
+         \\units m
 
 !
 
@@ -7540,23 +7020,23 @@ EquivAutoGrid,
 
 !
 
-AutoGrid,   ! NOTE: AutoGrid only necessary when EquivSizing is false
+AutoGrid,   ! NOTE: AutoGrid only necessary when EquivSizing is false
 
 ! If the modelled building is not a rectangle or square, Equivalent
 
 ! sizing MUST be used to get accurate results
 
-       N1, \\field CLEARANCE: Distance from outside of wall to edge, 15m]
+       N1, \\field CLEARANCE: Distance from outside of wall to edge, 15m]
 
-       N2, \\field SLABX: X dimension of the building slab, 0-60.0 m]
+       N2, \\field SLABX: X dimension of the building slab, 0-60.0 m]
 
-       N3, \\field SLABY: Y dimension of the building slab, 0-60.0 m]
+       N3, \\field SLABY: Y dimension of the building slab, 0-60.0 m]
 
-       N4, \\field ConcAGHeight: Height of the fndn wall above grade, m]
+       N4, \\field ConcAGHeight: Height of the fndn wall above grade, m]
 
-       N5, \\field SlabDepth: Thickness of the floor slab, m, 0.1]
+       N5, \\field SlabDepth: Thickness of the floor slab, m, 0.1]
 
-       N6; \\field BaseDepth: Depth of the basement wall below grade, m]
+       N6; \\field BaseDepth: Depth of the basement wall below grade, m]
 
 !
 
@@ -7564,73 +7044,73 @@ AutoGrid,   ! NOTE: AutoGrid only necessary when EquivSizing is false
 
 ManualGrid, ! NOTE: Manual Grid only necessary using manual gridding
 
-!  (not recommended)
+!  (not recommended)
 
-       N1, \\field NX: Number of cells in the X direction: 20]
+       N1, \\field NX: Number of cells in the X direction: 20]
 
-       N2, \\field NY: Number of cells in the Y direction: 20]
+       N2, \\field NY: Number of cells in the Y direction: 20]
 
-       N3, \\field NZAG: Number of cells in the Z direction
+       N3, \\field NZAG: Number of cells in the Z direction
 
-!              above grade: 4 Always]
+!              above grade: 4 Always]
 
-       N4, \\field NZBG: Number of cells in Z dir. below grade: 10-35]
+       N4, \\field NZBG: Number of cells in Z dir. below grade: 10-35]
 
-       N5, \\field IBASE: X direction cell indicator of slab edge: 5-20]
+       N5, \\field IBASE: X direction cell indicator of slab edge: 5-20]
 
-       N6, \\field JBASE: Y direction cell indicator of slab edge: 5-20]
+       N6, \\field JBASE: Y direction cell indicator of slab edge: 5-20]
 
-       N7; \\field KBASE: Z direction cell indicator
+       N7; \\field KBASE: Z direction cell indicator
 
-!              of the top of the floor slab: 5-20]
-
-!
-
-XFACE,       ! NOTE: This is only needed when using manual gridding
-
-!  (not recommended)
-
-!       [XFACE: X Direction cell face coordinates: m]
-
-       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
-       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
-
-       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
-
-       N39, N40, N41, N42, N43, N44;
+!              of the top of the floor slab: 5-20]
 
 !
 
-YFACE,  !NOTE: This is only needed when using manual gridding
+XFACE,       ! NOTE: This is only needed when using manual gridding
 
-!  (not recommended)
+!  (not recommended)
 
-!       [YFACE: Y Direction cell face coordinates: m],
+!       [XFACE: X Direction cell face coordinates: m]
 
-       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
 
-       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
 
-       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
 
-       N39, N40, N41, N42, N43, N44;
+       N39, N40, N41, N42, N43, N44;
 
 !
 
-ZFACE,  !NOTE: This is only needed when using manual gridding
+YFACE,  !NOTE: This is only needed when using manual gridding
 
-!  (not recommended)
+!  (not recommended)
 
-!       [ZFACE: Z Direction cell face coordinates: m]
+!       [YFACE: Y Direction cell face coordinates: m],
 
-       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
 
-       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
 
-       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
 
-      N39, N40;
+       N39, N40, N41, N42, N43, N44;
+
+!
+
+ZFACE,  !NOTE: This is only needed when using manual gridding
+
+!  (not recommended)
+
+!       [ZFACE: Z Direction cell face coordinates: m]
+
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
+
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
+
+      N39, N40;
 
 Description of the Objects in the BasementGHT.idd
 -------------------------------------------------
@@ -7639,7 +7119,7 @@ These objects also appear in the main Energy+.IDD file with the prefix "GroundHe
 
 ### SimParameters or GroundHeatTransfer:Basement:SimParameters Object
 
-#### Field:  F: Multiplier for the ADI solution:
+#### Field:  F: Multiplier for the ADI solution:
 
 This field specifies an alternating direction iteration scheme multiplier. It should normally be set to 0.1. It can be increased if the soil conductivity is high.
 
@@ -7913,7 +7393,7 @@ Field N2 specifies the height of the basement wall above the grade level. This s
 
 Field N3 specifies the floor slab thickness.
 
-Field N4 specifies the depth of the basement wall below grade level.  This is the height of the wall above the footing.
+Field N4 specifies the depth of the basement wall below grade level.  This is the height of the wall above the footing.
 
 ### Sample idf File - Basement
 
@@ -7921,11 +7401,11 @@ Field N4 specifies the depth of the basement wall below grade level.  This is t
 
 SimParameters,
 
- 0.1,     ! [F: Multiplier for the ADI solution: 0&lt;F&lt;1.0,
+ 0.1,     ! [F: Multiplier for the ADI solution: 0&lt;F&lt;1.0,
 
-          !         typically 0.1 (0.5 for high k
+          !         typically 0.1 (0.5 for high k
 
- 1;       ! [IYRS: Maximum number of iterations: typically 25-30
+ 1;       ! [IYRS: Maximum number of iterations: typically 25-30
 
 !
 
@@ -7937,15 +7417,15 @@ MatlProps,
 
 !(Fndn wall, Floor Slab, Ceiling,Soil, Gravel, Wood), kg/m3, ]
 
- 880.0, 880.0, 1513.0, 840.0, 720.0, 1630.0,!       [CP(1-6): Specific Heat: J/kg-K,
+ 880.0, 880.0, 1513.0, 840.0, 720.0, 1630.0,!       [CP(1-6): Specific Heat: J/kg-K,
 
- 1.402, 1.402, 0.093, 0.5, 1.9, 0.119;  !       [TCON(1-6): Conductivity: W/m-K
+ 1.402, 1.402, 0.093, 0.5, 1.9, 0.119;  !       [TCON(1-6): Conductivity: W/m-K
 
 !
 
 Insulation,
 
- 5.0, ! [REXT: R Value of any exterior insulation, K/(W/m2)]
+ 5.0, ! [REXT: R Value of any exterior insulation, K/(W/m2)]
 
 TRUE; ! [INSFULL: Flag: Is the wall fully insulated? TRUE/FALSE]
 
@@ -7961,7 +7441,7 @@ SurfaceProps,
 
 TRUE;! [PET: Flag, Potential evapotranspiration on? T/F]
 
-!                Typically, PET is True
+!                Typically, PET is True
 
 !
 
@@ -7975,31 +7455,31 @@ BldgData,
 
 .2, ! [DGRAVZN: Gravel depth above the floor slab, m, 0.2]
 
- .1;! [DGRAVZP: Gravel depth below the floor slab, m, 0.1]
+ .1;! [DGRAVZP: Gravel depth below the floor slab, m, 0.1]
 
 !
 
 Interior,
 
- TRUE, ! [COND: Flag: Is the basement conditioned? TRUE/FALSE]
+ TRUE, ! [COND: Flag: Is the basement conditioned? TRUE/FALSE]
 
 ! [HIN: Indoor convective heat transfer coefficients, W/m2-K
 
-!       Convection Only: 1)Q Downward 2)Q Upward 3)Q Horizontal
+!       Convection Only: 1)Q Downward 2)Q Upward 3)Q Horizontal
 
-!       Conv and Radiation: 4)Q Downward 5)Q Upward 6)Q Horizontal]
+!       Conv and Radiation: 4)Q Downward 5)Q Upward 6)Q Horizontal]
 
 0.92, !Q Downward Convection Only
 
- 4.04,!Q Upward Convection Only
+ 4.04,!Q Upward Convection Only
 
- 3.08,!Q HorizontalConvection Only
+ 3.08,!Q HorizontalConvection Only
 
 6.13, !Q Downward Conv and Radiation
 
 9.26, !Q Upward Conv and Radiation
 
- 8.29;!Q Horizontal Conv and Radiation
+ 8.29;!Q Horizontal Conv and Radiation
 
 !
 
@@ -8011,19 +7491,19 @@ EquivSlab,
 
 TRUE;! [EquivSizing: Flag: Will the dimensions of an equivalent
 
-!             slab be calculated (TRUE) or will the dimensions be
+!             slab be calculated (TRUE) or will the dimensions be
 
-!              input directly? (FALSE)]
+!              input directly? (FALSE)]
 
-!             Only advanced special simulations should use FALSE.
+!             Only advanced special simulations should use FALSE.
 
 !
 
 
 
-EquivAutoGrid,   ! NOTE: EquivAutoGrid necessary when EquivSizing=TRUE
+EquivAutoGrid,   ! NOTE: EquivAutoGrid necessary when EquivSizing=TRUE
 
-!                This is the normal case.
+!                This is the normal case.
 
 ! If the modelled building is not a rectangle or square, Equivalent
 
@@ -8033,7 +7513,7 @@ EquivAutoGrid,   ! NOTE: EquivAutoGrid necessary when EquivSizing=TRUE
 
 15, ! [CLEARANCE: Distance from outside of wall to edge, 15m]
 
-.1,  ! [SlabDepth: Thickness of the floor slab, m, 0.1]
+.1,  ! [SlabDepth: Thickness of the floor slab, m, 0.1]
 
 2.4; ! [BaseDepth: Depth of the basement wall below grade, m]
 
@@ -8041,33 +7521,33 @@ EquivAutoGrid,   ! NOTE: EquivAutoGrid necessary when EquivSizing=TRUE
 
 !
 
-ComBldg, !  Commercial building
+ComBldg, !  Commercial building
 
-20.,  !  Jan Ave basement temp
+20.,  !  Jan Ave basement temp
 
-20.,  !  Feb Ave basement temp
+20.,  !  Feb Ave basement temp
 
-20.,  !  Mar Ave basement temp
+20.,  !  Mar Ave basement temp
 
-20.,  !  Apr Ave basement temp
+20.,  !  Apr Ave basement temp
 
-20.,  !  May Ave basement temp
+20.,  !  May Ave basement temp
 
-20.,  !  Jun Ave basement temp
+20.,  !  Jun Ave basement temp
 
-20.,  !  Jul Ave basement temp
+20.,  !  Jul Ave basement temp
 
-20.,  !  Aug Ave basement temp
+20.,  !  Aug Ave basement temp
 
-20.,  !  Sep Ave basement temp
+20.,  !  Sep Ave basement temp
 
-20.,  !  Oct Ave basement temp
+20.,  !  Oct Ave basement temp
 
-20.,  !  Nov Ave basement temp
+20.,  !  Nov Ave basement temp
 
-20.,  !  Dec Ave basement temp
+20.,  !  Dec Ave basement temp
 
-0.0;  !  Daily variation Sine Wave amplitude
+0.0;  !  Daily variation Sine Wave amplitude
 
 ### Additional Objects
 
@@ -8081,17 +7561,17 @@ AutoGrid,
 
 \\memo sizing MUST be used to get accurate results
 
-       N1, \\field CLEARANCE: Distance from outside of wall to edge, 15m]
+       N1, \\field CLEARANCE: Distance from outside of wall to edge, 15m]
 
-       N2, \\field SLABX: X dimension of the building slab, 0-60.0 m]
+       N2, \\field SLABX: X dimension of the building slab, 0-60.0 m]
 
-       N3, \\field SLABY: Y dimension of the building slab, 0-60.0 m]
+       N3, \\field SLABY: Y dimension of the building slab, 0-60.0 m]
 
-       N4, \\field ConcAGHeight: Height of the fndn wall above grade, m]
+       N4, \\field ConcAGHeight: Height of the fndn wall above grade, m]
 
-       N5, \\field SlabDepth: Thickness of the floor slab, m, 0.1]
+       N5, \\field SlabDepth: Thickness of the floor slab, m, 0.1]
 
-       N6; \\field BaseDepth: Depth of the basement wall below grade, m]
+       N6; \\field BaseDepth: Depth of the basement wall below grade, m]
 
 !
 
@@ -8099,19 +7579,19 @@ ManualGrid,
 
 \\memo Manual Grid only necessary using manual gridding (not recommended)
 
-       N1, \\field NX: Number of cells in the X direction: 20]
+       N1, \\field NX: Number of cells in the X direction: 20]
 
-       N2, \\field NY: Number of cells in the Y direction: 20]
+       N2, \\field NY: Number of cells in the Y direction: 20]
 
-       N3, \\field NZAG: Number of cells in the Z direction. above grade: 4 Always]
+       N3, \\field NZAG: Number of cells in the Z direction. above grade: 4 Always]
 
-       N4, \\field NZBG: Number of cells in Z direction. below grade: 10-35]
+       N4, \\field NZBG: Number of cells in Z direction. below grade: 10-35]
 
-       N5, \\field IBASE: X direction cell indicator of slab edge: 5-20]
+       N5, \\field IBASE: X direction cell indicator of slab edge: 5-20]
 
-       N6, \\field JBASE: Y direction cell indicator of slab edge: 5-20]
+       N6, \\field JBASE: Y direction cell indicator of slab edge: 5-20]
 
-       N7; \\field KBASE: Z direction cell indicator of the top of the floor slab: 5-20]
+       N7; \\field KBASE: Z direction cell indicator of the top of the floor slab: 5-20]
 
 !
 
@@ -8121,13 +7601,13 @@ XFACE,
 
 \\memo XFACE: X Direction cell face coordinates: m
 
-       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
 
-       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
 
-       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
 
-       N39, N40, N41, N42, N43, N44;
+       N39, N40, N41, N42, N43, N44;
 
 !
 
@@ -8139,13 +7619,13 @@ YFACE,
 
 \\memo YFACE: Y Direction cell face coordinates: m
 
-       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
 
-       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
 
-       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
 
-       N39, N40, N41, N42, N43, N44;
+       N39, N40, N41, N42, N43, N44;
 
 !
 
@@ -8155,13 +7635,13 @@ ZFACE,
 
 \\memo ZFACE: Z Direction cell face coordinates: m
 
-       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
+       N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
 
-       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
+       N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
 
-       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
+       N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
 
-       N39, N40;
+       N39, N40;
 
 
 
@@ -8170,131 +7650,86 @@ Using the Interface Surface Temperature Results in EnergyPlus
 
 If the objects are placed in the normal EnergyPlus input IDF file using the "GroundHeatTransfer:Basement:" prefix, then the values resulting from the Basement preprocessor will be automatically included in the simulation at run time. The surfaces can reference these values using Outside Boundary Conditions of:
 
-n GroundBasementPreprocessorAverageWall
+* GroundBasementPreprocessorAverageWall
 
-n GroundBasementPreprocessorAverageFloor
+* GroundBasementPreprocessorAverageFloor
 
-n GroundBasementPreprocessorUpperWall
+* GroundBasementPreprocessorUpperWall
 
-n GroundBasementPreprocessorLowerWall
+* GroundBasementPreprocessorLowerWall
 
 The objects that support this include:
 
-n BuildingSurface:Detailed
+* BuildingSurface:Detailed
 
-n Wall:Detailed
+* Wall:Detailed
 
-n RoofCeiling:Detailed
+* RoofCeiling:Detailed
 
-n Floor:Detailed
+* Floor:Detailed
 
 The monthly results from the basement program are used with the SurfaceProperty:OtherSideCoefficients object in EnergyPlus. The idd corresponding to that object is shown below. The two applicable fields are N2 and A2. N2 should have the value 1.0. It will be modified by a schedule that is named in A2, and that temperature will be used on the outside of the surface specified as having the OtherSideCoeffcients named in A1.
 
-**SurfaceProperty:OtherSideCoefficients,**
+```idf
+SurfaceProperty:OtherSideCoefficients,
+  \memo This object sets the other side conditions for a surface in a variety of ways.
+  \min-fields 8
+ A1, \field Name
+  \required-field
+  \reference OSCNames
+  \reference OutFaceEnvNames
+ N1, \field Combined Convective/Radiative Film Coefficient
+  \required-field
+  \type real
+  \note if>0, this field becomes the exterior convective/radiative film coefficient
+  \note and the other fields are used to calculate the outdoor air temperature
+  \note then exterior surface temperature based on outdoor air and specified coefficient
+  \note if<=0, then remaining fields calculate the outside surface temperature
+  \note following fields are used in the equation:
+  \note SurfTemp=N7*TempZone + N4*OutdoorDry-bulb + N2*N3 + GroundTemp*N5 + WindSpeed*N6*OutdoorDry-bulb
+ N2, \field Constant Temperature
+  \units C
+  \type real
+  \default 0
+  \note This parameter will be overwritten by the values from the Constant Temperature Schedule Name (below) if one is present
+ N3, \field Constant Temperature Coefficient
+  \note This coefficient is used even with a Schedule.  It should normally be 1.0 in that case
+  \default 1
+ N4, \field External Dry-Bulb Temperature Coefficient
+  \type real
+  \default 0
+ N5, \field Ground Temperature Coefficient
+  \type real
+  \default 0
+ N6, \field Wind Speed Coefficient
+  \type real
+  \default 0
+ N7, \field Zone Air Temperature Coefficient
+  \type real
+  \default 0
+ A2; \field Constant Temperature Schedule Name
+  \note Name of schedule for values of constant temperature.
+  \note Schedule values replace any value specified in the field Constant Temperature.
+  \type object-list
+  \object-list ScheduleNames
+```
 
-      \\memo This object sets the other side conditions for a surface in a variety of ways.
-
-      \\min-fields 8
-
-  A1, \\field Name
-
-      \\required-field
-
-      \\reference OSCNames
-
-      \\reference OutFaceEnvNames
-
-  N1, \\field Combined Convective/Radiative Film Coefficient
-
-      \\required-field
-
-      \\type real
-
-      \\note if&gt;0, this field becomes the exterior convective/radiative film coefficient
-
-      \\note and the other fields are used to calculate the outdoor air temperature
-
-      \\note then exterior surface temperature based on outdoor air and specified coefficient
-
-      \\note if&lt;=0, then remaining fields calculate the outside surface temperature
-
-      \\note following fields are used in the equation:
-
-   \\note SurfTemp=N7\*TempZone + N4\*OutdoorDry-bulb + N2\*N3 + GroundTemp\*N5 + WindSpeed\*N6\*OutdoorDry-bulb
-
-
-
-  N2, \\field Constant Temperature
-
-      \\units C
-
-      \\type real
-
-      \\default 0
-
-      \\note This parameter will be overwritten by the values from the Constant Temperature Schedule Name (below) if one is present
-
-  N3, \\field Constant Temperature Coefficient
-
-      \\note This coefficient is used even with a Schedule.  It should normally be 1.0 in that case
-
-      \\default 1
-
-  N4, \\field External Dry-Bulb Temperature Coefficient
-
-      \\type real
-
-      \\default 0
-
-  N5, \\field Ground Temperature Coefficient
-
-      \\type real
-
-      \\default 0
-
-  N6, \\field Wind Speed Coefficient
-
-      \\type real
-
-      \\default 0
-
-  N7, \\field Zone Air Temperature Coefficient
-
-      \\type real
-
-      \\default 0
-
-  A2; \\field Constant Temperature Schedule Name
-
-      \\note Name of schedule for values of constant temperature.
-
-      \\note Schedule values replace any value specified in the field Constant Temperature.
-
-      \\type object-list
-
-      \\object-list ScheduleNames
 
 A sample idf for this object is shown below.
 
+```idf
 SurfaceProperty:OtherSideCoefficients, OSCCoef:Zn005:Wall003, !- OSC Name
+ !  Example input for second ground temperature
+ 0.0000000E+00,    !- OSC SurfFilmCoef
+ 0.000000    ,    !- OSC Temp
+ 1.000000    ,    !- OSC Temp Coef
+ 0.000000    ,    !- OSC dry-bulb
+ 0.000000    ,    !- OSC GrndTemp
+ 0.000000    ,    !- OSC WindSpdCoeff
+ 0.000000    ,    !- OSC ZoneAirTemp
+ GroundTempSched;  !  Name of schedule defining additional ground temperature.
+```
 
- !  Example input for second ground temperature
-
-  0.0000000E+00,    !- OSC SurfFilmCoef
-
-   0.000000    ,    !- OSC Temp
-
-   1.000000    ,    !- OSC Temp Coef
-
-   0.000000    ,    !- OSC dry-bulb
-
-   0.000000    ,    !- OSC GrndTemp
-
-   0.000000    ,    !- OSC WindSpdCoeff
-
-   0.000000    ,    !- OSC ZoneAirTemp
-
-  GroundTempSched;  !  Name of schedule defining additional ground temperature.
 
 The OSC object can be repeated for as many outside temperatures as needed. A more detailed explanation of how to use this object is contained in the next section, and an example object is output by the program in the file EPObjects.txt.
 
@@ -8304,167 +7739,94 @@ These three objects show how the OtherSideCoefficients object can be used to pro
 
 Here is the surface description. Note that the OutsideFaceEnvironment is specified as OtherSideCoeff.
 
+```idf
 BuildingSurface:Detailed,
-
-!========================
-
-    OSCTest:South Wall,      !- User Supplied Surface Name
-
-    Wall,                    !- Surface Type
-
-    Exterior,                !- Construction Name of the Surface
-
-    OSCTest,                 !- Zone
-
-    OtherSideCoefficients,   !- Outside Boundary Condition
-
-    ExampleOSC,              !- Outside Boundary Condition Object
-
-    NoSun  ,                 !- Sun Exposure
-
-    NoWind  ,                !- Wind Exposure
-
-    0.5,                     !- View Factor to Ground
-
-    4,                       !- Number of Vertices
-
-    0,0,0,                   !- Vertex 1 X,Y,Z-coordinates {m}
-
-    6.096,0,0,               !- Vertex 2 X,Y,Z-coordinates {m}
-
-    6.096,0,4.572,           !- Vertex 3 X,Y,Z-coordinates {m}
-
-    0,0,4.572;               !- Vertex 4 X,Y,Z-coordinates {m}
-
-
+    OSCTest:South Wall,      !- User Supplied Surface Name
+    Wall,                    !- Surface Type
+    Exterior,                !- Construction Name of the Surface
+    OSCTest,                 !- Zone
+    OtherSideCoefficients,   !- Outside Boundary Condition
+    ExampleOSC,              !- Outside Boundary Condition Object
+    NoSun  ,                 !- Sun Exposure
+    NoWind  ,                !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,                   !- Vertex 1 X,Y,Z-coordinates {m}
+    6.096,0,0,               !- Vertex 2 X,Y,Z-coordinates {m}
+    6.096,0,4.572,           !- Vertex 3 X,Y,Z-coordinates {m}
+    0,0,4.572;               !- Vertex 4 X,Y,Z-coordinates {m}
+```
 
 The OtherSideCoefficients object has to supply the basic form of the environment. Note that the name corresponds to thee name in the Surface object. This object also supplies the name of a schedule that will provide the monthly ground temperature values.
 
+```idf
 SurfaceProperty:OtherSideCoefficients,
-
-  ExampleOSC,              !- OtherSideCoeff Name
-
-  0,                       !- Combined convective/radiative film coefficient
-
-  1,                       !- User selected Constant Temperature {C}
-
-  1,                       !- Coefficient modifying the user selected constant temperature
-
-  0,                       !- Coefficient modifying the external dry bulb temperature
-
-  0,                       !- Coefficient modifying the ground temperature
-
-  0,                       !- Coefficient modifying the wind speed term (s/m)
-
-  0,                       !- Coefficient modifying the zone air temperature part of the equation
-
-  GroundTempCompactSched;  !- Schedule Name for values of "const" temperature. Schedule values replace N2.
-
-
+  ExampleOSC,              !- OtherSideCoeff Name
+  0,                       !- Combined convective/radiative film coefficient
+  1,                       !- User selected Constant Temperature {C}
+  1,                       !- Coefficient modifying the user selected constant temperature
+  0,                       !- Coefficient modifying the external dry bulb temperature
+  0,                       !- Coefficient modifying the ground temperature
+  0,                       !- Coefficient modifying the wind speed term (s/m)
+  0,                       !- Coefficient modifying the zone air temperature part of the equation
+  GroundTempCompactSched;  !- Schedule Name for values of "const" temperature. Schedule values replace N2.
+```
 
 The schedule named in the last field of the OtherSideCoefficients object must be supplied. In compact schedule format it would appear as shown below. Again, objects for each of the surface temperatures are produced by the program and output in the file EPObjects.txt.
 
+```idf
 Schedule:Compact,
-
-    GroundTempCompactSched,  !- Name
-
-    Temperature ,            !- ScheduleType
-
-    Through: 1/31,           !- Complex Field \#1
-
-    For:AllDays,             !- Complex Field \#2
-
-    Until: 24:00,            !- Complex Field \#3
-
-    16,                      !- Complex Field \#4
-
-    Through: 2/28,           !- Complex Field \#5
-
-    For:AllDays,             !- Complex Field \#6
-
-    Until: 24:00,            !- Complex Field \#7
-
-    17,                      !- Complex Field \#8
-
-    Through: 3/31,           !- Complex Field \#9
-
-    For:AllDays,             !- Complex Field \#10
-
-    Until: 24:00,            !- Complex Field \#11
-
-    18,                      !- Complex Field \#12
-
-    Through: 4/30,           !- Complex Field \#13
-
-    For:AllDays,             !- Complex Field \#14
-
-    Until: 24:00,            !- Complex Field \#15
-
-    19,                      !- Complex Field \#16
-
-    Through: 5/31,           !- Complex Field \#17
-
-    For:AllDays,             !- Complex Field \#18
-
-    Until: 24:00,            !- Complex Field \#19
-
-    20,                      !- Complex Field \#20
-
-    Through: 6/30,           !- Complex Field \#21
-
-    For:AllDays,             !- Complex Field \#22
-
-    Until: 24:00,            !- Complex Field \#23
-
-    20,                      !- Complex Field \#24
-
-    Through: 7/31,           !- Complex Field \#25
-
-    For:AllDays,             !- Complex Field \#26
-
-    Until: 24:00,            !- Complex Field \#27
-
-    20,                      !- Complex Field \#28
-
-    Through: 8/31,           !- Complex Field \#29
-
-    For:AllDays,             !- Complex Field \#30
-
-    Until: 24:00,            !- Complex Field \#31
-
-    19,                      !- Complex Field \#32
-
-    Through: 9/30,           !- Complex Field \#33
-
-    For:AllDays,             !- Complex Field \#34
-
-    Until: 24:00,            !- Complex Field \#35
-
-    18,                      !- Complex Field \#36
-
-    Through: 10/31,          !- Complex Field \#37
-
-    For:AllDays,             !- Complex Field \#38
-
-    Until: 24:00,            !- Complex Field \#39
-
-    17,                      !- Complex Field \#40
-
-    Through: 11/30,          !- Complex Field \#41
-
-    For:AllDays,             !- Complex Field \#42
-
-    Until: 24:00,            !- Complex Field \#43
-
-    16,                      !- Complex Field \#44
-
-    Through: 12/31,          !- Complex Field \#45
-
-    For:AllDays,             !- Complex Field \#46
-
-    Until: 24:00,            !- Complex Field \#47
-
-    16;                      !- Complex Field \#48
+    GroundTempCompactSched,  !- Name
+    Temperature ,            !- ScheduleType
+    Through: 1/31,           !- Complex Field \#1
+    For:AllDays,             !- Complex Field \#2
+    Until: 24:00,            !- Complex Field \#3
+    16,                      !- Complex Field \#4
+    Through: 2/28,           !- Complex Field \#5
+    For:AllDays,             !- Complex Field \#6
+    Until: 24:00,            !- Complex Field \#7
+    17,                      !- Complex Field \#8
+    Through: 3/31,           !- Complex Field \#9
+    For:AllDays,             !- Complex Field \#10
+    Until: 24:00,            !- Complex Field \#11
+    18,                      !- Complex Field \#12
+    Through: 4/30,           !- Complex Field \#13
+    For:AllDays,             !- Complex Field \#14
+    Until: 24:00,            !- Complex Field \#15
+    19,                      !- Complex Field \#16
+    Through: 5/31,           !- Complex Field \#17
+    For:AllDays,             !- Complex Field \#18
+    Until: 24:00,            !- Complex Field \#19
+    20,                      !- Complex Field \#20
+    Through: 6/30,           !- Complex Field \#21
+    For:AllDays,             !- Complex Field \#22
+    Until: 24:00,            !- Complex Field \#23
+    20,                      !- Complex Field \#24
+    Through: 7/31,           !- Complex Field \#25
+    For:AllDays,             !- Complex Field \#26
+    Until: 24:00,            !- Complex Field \#27
+    20,                      !- Complex Field \#28
+    Through: 8/31,           !- Complex Field \#29
+    For:AllDays,             !- Complex Field \#30
+    Until: 24:00,            !- Complex Field \#31
+    19,                      !- Complex Field \#32
+    Through: 9/30,           !- Complex Field \#33
+    For:AllDays,             !- Complex Field \#34
+    Until: 24:00,            !- Complex Field \#35
+    18,                      !- Complex Field \#36
+    Through: 10/31,          !- Complex Field \#37
+    For:AllDays,             !- Complex Field \#38
+    Until: 24:00,            !- Complex Field \#39
+    17,                      !- Complex Field \#40
+    Through: 11/30,          !- Complex Field \#41
+    For:AllDays,             !- Complex Field \#42
+    Until: 24:00,            !- Complex Field \#43
+    16,                      !- Complex Field \#44
+    Through: 12/31,          !- Complex Field \#45
+    For:AllDays,             !- Complex Field \#46
+    Until: 24:00,            !- Complex Field \#47
+    16;                      !- Complex Field \#48
+```
 
 References
 ----------
@@ -8487,11 +7849,11 @@ Associated Files
 
 Three files come with the auxiliary view factor package. They are:
 
-- View3D.exe
+- View3D.exe
 
-- ViewFactorInterface.xls
+- ViewFactorInterface.xls
 
-- View3D32.doc
+- View3D32.doc
 
 The first is the executable program that calculates the view factors. The second is an excel interface that will set up the input files and execute View3D.exe. The third file is the documentation file from NIST that contains some explanation of the program.
 
@@ -8514,93 +7876,53 @@ Figure 25. View Factor Interface VerticesZoneSheet
 
 Either sheet can be used to generate an input file for the View3D program. An example of that file is shown below.
 
+```
 T Test case from Excel interface
-
-C encl=  1  list=  2  eps=  0.0001  maxu=  8  maxo=  8  mino=  0  emit=  0
-
-F  3
-
-V  1  50  0  0
-
-V  2  0  0  0
-
-V  3  0  0  8
-
-V  4  50  0  8
-
-S  1  1  2  3  4   0  0   .999  SouthWall
-
+C encl=  1  list=  2  eps=  0.0001  maxu=  8  maxo=  8  mino=  0  emit=  0
+F  3
+V  1  50  0  0
+V  2  0  0  0
+V  3  0  0  8
+V  4  50  0  8
+S  1  1  2  3  4   0  0   .999  SouthWall
 ! =========================
-
-V  5  50  60  0
-
-V  6  50.00025  0  0
-
-V  7  50.00026  0  8
-
-V  8  50.00001  60  8
-
-S  2  5  6  7  8   0  0   .999  EastWall
-
+V  5  50  60  0
+V  6  50.00025  0  0
+V  7  50.00026  0  8
+V  8  50.00001  60  8
+S  2  5  6  7  8   0  0   .999  EastWall
 ! =========================
-
-V  9  0  60  0
-
-V  10  50  60.00014  0
-
-V  11  50  60.00015  8
-
-V  12  0  60.00001  8
-
-S  3  9  10  11  12   0  0   .999  NorthWall
-
+V  9  0  60  0
+V  10  50  60.00014  0
+V  11  50  60.00015  8
+V  12  0  60.00001  8
+S  3  9  10  11  12   0  0   .999  NorthWall
 ! =========================
-
-
-
-V  13  0  0  0
-
-V  14  0  60  0
-
-V  15  0  60  8
-
-V  16  0  0  8
-
-S  4  13  14  15  16   0  0   .999  WestWall
-
+V  13  0  0  0
+V  14  0  60  0
+V  15  0  60  8
+V  16  0  0  8
+S  4  13  14  15  16   0  0   .999  WestWall
 ! =========================
-
-V  17  0  0  0
-
-V  18  50  1.377901E-04  0
-
-V  19  49.99984  60.00014  0
-
-V  20 -1.653482E-04  60  0
-
-S  5  17  18  19  20   0  0   .999  Floor
-
+V  17  0  0  0
+V  18  50  1.377901E-04  0
+V  19  49.99984  60.00014  0
+V  20 -1.653482E-04  60  0
+S  5  17  18  19  20   0  0   .999  Floor
 ! =========================
-
-V  21  0  60  8
-
-V  22  50  60.00014  8
-
-V  23  50.00016  1.373291E-04  8.000166
-
-V  24  1.653482E-04  0  8.000166
-
-S  6  21  22  23  24   0  0   .999  Roof
-
+V  21  0  60  8
+V  22  50  60.00014  8
+V  23  50.00016  1.373291E-04  8.000166
+V  24  1.653482E-04  0  8.000166
+S  6  21  22  23  24   0  0   .999  Roof
 ! =========================
-
 End Of Data
+```
 
 Notice the title from row 6 on the interface appears at the top of the input file, and the control line information in rows 7 and 8 appear below the title line in a line with the character C at the left end. The explanation of the control parameters from the program document states:
 
 
-
-(C c)  The control line includes the following parameters (in order): name = value
+(C c)  The control line includes the following parameters (in order): name = value
 
 eps = 1.0e-4
 
@@ -8702,36 +8024,36 @@ The results file information is used to generate a UserViewFactor object for Ene
 
 If the results sheet does not appear, or the program terminates, the sheet named View3Dlog or the output file by the same name should be consulted. It contains a complete history of the execution. Any problem with the input file or the calculations should show up there.
 
-The extra sheets generated by the VBA macros will be deleted if the program is called with the run button while they are present. The user will be queried to make sure the sheets should be deleted.   During the succeeding run, new sheets will be created.
+The extra sheets generated by the VBA macros will be deleted if the program is called with the run button while they are present. The user will be queried to make sure the sheets should be deleted.   During the succeeding run, new sheets will be created.
 
 Additional Information
 ----------------------
 
 The interface and this document do not describe all of the features of the View3D program. Additional information can be found in the NIST document View3D32.pdf that accompanies the distribution. For example, if an obstruction wall is desired, it can be placed using the interface, but then the "C" at the left end of the row describing that surface in the input file should be changed to "O". The program can then be rerun with the new input file. If View3D.exe is double clicked, it will ask for the names of the input file and the output file.
 
-An additional point should be emphasized. The program will not calculate view factors for walls containing windows. That is all surfaces must be convex. Therefore,  a wall containing a subsurface must be described as four sections surrounding the subsurface. They can be combined using the "comb" column as described in the View3D document. However, this in not necessary if the user is willing to work with a few additional surfaces.
+An additional point should be emphasized. The program will not calculate view factors for walls containing windows. That is all surfaces must be convex. Therefore,  a wall containing a subsurface must be described as four sections surrounding the subsurface. They can be combined using the "comb" column as described in the View3D document. However, this in not necessary if the user is willing to work with a few additional surfaces.
 
 
 
 Using Older Version Input Files - Transition
 ============================================
 
-The transition program(s) are console programs that assist users in converting input files from prior release versions to the current (or interim). Sometimes many changes are made to the input file syntax; sometimes very few but the Transition program(s) can do the fastest job of making the conversions. An ObjectStatus spreadsheet is also included for those who want the details of each object’s change.
+The transition program(s) are console programs that assist users in converting input files from prior release versions to the current (or interim). Sometimes many changes are made to the input file syntax; sometimes very few but the Transition program(s) can do the fastest job of making the conversions. An ObjectStatus spreadsheet is also included for those who want the details of each object's change.
 
 IDF Version Updater
 -------------------
 
 The transition programs have been written as console applications similar to EnergyPlus. However, that may not be the easiest for users who want to transition several versions or several files at one time. Thus the IDF Version Updater GUI application was created.
 
-The IDF Version Updater lives in the folder with the multiple transition programs -- see **Error! Reference source not found.**. Note that this application is also available from the EP-Launch Utilities tab (utility: IDFVersionUpdater). If you need to convert files from older than V6.0, the transition program set will need to be downloaded before use.  Once "IDF Version Updater" is selected from the Utilities pulldown list, click on the "Run IDF Version Updater" box and the single window shown below appears:
+The IDF Version Updater lives in the folder with the multiple transition programs -- see **Error! Reference source not found.**. Note that this application is also available from the EP-Launch Utilities tab (utility: IDFVersionUpdater). If you need to convert files from older than V6.0, the transition program set will need to be downloaded before use.  Once "IDF Version Updater" is selected from the Utilities pulldown list, click on the "Run IDF Version Updater" box and the single window shown below appears:
 
 
 
 ![](AuxiliaryPrograms/media/image027.jpg)
 
-Figure 29.  Transition GUI screen
+Figure 29.  Transition GUI screen
 
-Using the program is quite simple. As the window indicates, you press "Choose File to Update" to select a file or list of files (see IDF Version Converter / Transition File Lists) to convert. If doing multiple transitions using a transition file list you also press the "Choose File to Update, a browse window will appear at the bottom of which is a pulldown list for the "Files of Type".  Select the "Text File With List of EnergyPlus Files (\*.lst)" (see the section IDF Version Converter / Transition File Lists for format of this .lst file) option.  Once a file is found, its version is checked and appears as the "Current Version". By default, the latest "New Version" will be selected by the program - you can override this by choosing a different file version as the end version. The "Update File" button will then be able to be selected and the conversion will be done. The audit from the multiple transitions will be able to be viewed once the process is complete. If you are doing multiple transitions (e.g., from V2.2 to V6), you can select the check box "Create Intermediate Files" and after each transition, a file for the resultant version will be created and labeled &lt;filename&gt;)\_Vx.idf (where x is an abbreviated version number).
+Using the program is quite simple. As the window indicates, you press "Choose File to Update" to select a file or list of files (see IDF Version Converter / Transition File Lists) to convert. If doing multiple transitions using a transition file list you also press the "Choose File to Update, a browse window will appear at the bottom of which is a pulldown list for the "Files of Type".  Select the "Text File With List of EnergyPlus Files (\*.lst)" (see the section IDF Version Converter / Transition File Lists for format of this .lst file) option.  Once a file is found, its version is checked and appears as the "Current Version". By default, the latest "New Version" will be selected by the program - you can override this by choosing a different file version as the end version. The "Update File" button will then be able to be selected and the conversion will be done. The audit from the multiple transitions will be able to be viewed once the process is complete. If you are doing multiple transitions (e.g., from V2.2 to V6), you can select the check box "Create Intermediate Files" and after each transition, a file for the resultant version will be created and labeled &lt;filename&gt;)\_Vx.idf (where x is an abbreviated version number).
 
 The converted file becomes the new &lt;file&gt;.idf and the original file is saved in the original folder as &lt;file&gt;\_original.idf. To delete the original file instead of saving it, check the "Delete Original Files" checkbox.
 
@@ -8739,8 +8061,8 @@ Table 27. IDF Version Updater Output Files and Descriptions.
 
 <table class="table table-striped">
 <tr>
-<td>Transition Output File Name</td>
-<td>Description</td>
+<th>Transition Output File Name</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>&lt;filename&gt;_Transition.audit</td>
@@ -8752,7 +8074,7 @@ Table 27. IDF Version Updater Output Files and Descriptions.
 </tr>
 <tr>
 <td>&lt;filename&gt;_Vxxx.idf</td>
-<td>If you don’t select "create intermediate versions", this will only be the original version. Otherwise will have each version.</td>
+<td>If you don't select "create intermediate versions", this will only be the original version. Otherwise will have each version.</td>
 </tr>
 </table>
 
@@ -8767,8 +8089,8 @@ Table 28. Transition files for current release
 
 <table class="table table-striped">
 <tr>
-<td>File Name</td>
-<td>Description</td>
+<th>File Name</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>TransitionV6-0-0-to-V7-0-0.exe</td>
@@ -8788,7 +8110,7 @@ Table 28. Transition files for current release
 </tr>
 </table>
 
- Another file "Rules6-0-0-to-7-0-0.xls" is not used directly by the program but contains the "rules" for translating objects from version 6.0 release to the 7.0 release. The ObjectStatus file can also be viewed - it will show if deleted objects are automatically transitioned to the new input file versions.
+ Another file "Rules6-0-0-to-7-0-0.xls" is not used directly by the program but contains the "rules" for translating objects from version 6.0 release to the 7.0 release. The ObjectStatus file can also be viewed - it will show if deleted objects are automatically transitioned to the new input file versions.
 
 There are several methods to executing the transition program - these methods give you the most flexibility in changing files from one version to the next. The easiest transition is through the EP-Launch program which can detect if the input file about to be run is of the same version as the IDD or not and suggest transitioning. You can also manually transition from the file menu in EP-Launch. (To have this feature, you must also have the files from the preceding table in the same folder as EP-Launch - which is usually the folder that also has the EnergyPlus.exe program).
 
@@ -8822,23 +8144,23 @@ The transition/conversion programs can "automatically" transition imf (ep-macro)
 
 PEOPLE,
 
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone Name
 
 **\#\#if \#[DoSizing[] EQSU Y]**
 
-    \#[FAREA[] / OCCDENPEAK[]],        !- Number of People
+    \#[FAREA[] / OCCDENPEAK[]],        !- Number of People
 
-  **\#\#else**
+  **\#\#else**
 
-    \#[FAREA[] / OCCDENAVG[]],         !- Number of People
+    \#[FAREA[] / OCCDENAVG[]],         !- Number of People
 
-**\#\#endif   **
+**\#\#endif   **
 
-    OCCSCHED[],       !- Number of People SCHEDULE Name (real--fraction)
+    OCCSCHED[],       !- Number of People SCHEDULE Name (real--fraction)
 
-    0.5000000,        !- Fraction Radiant
+    0.5000000,        !- Fraction Radiant
 
-    Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
+    Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
 
 They should look like this:
 
@@ -8846,31 +8168,31 @@ They should look like this:
 
 PEOPLE,
 
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone Name
 
-    \#[FAREA[] / OCCDENPEAK[]],       !- Number of People
+    \#[FAREA[] / OCCDENPEAK[]],       !- Number of People
 
-    OCCSCHED[],       !-   Number of People SCHEDULE Name (real--fraction)
+    OCCSCHED[],       !-   Number of People SCHEDULE Name (real--fraction)
 
-    0.5000000,        !- Fraction Radiant
+    0.5000000,        !- Fraction Radiant
 
-    Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
+    Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
 
-  **\#\#else**
+  **\#\#else**
 
 PEOPLE,
 
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone Name
 
-    \#[FAREA[] / OCCDENAVG[]],        !- Number of People
+    \#[FAREA[] / OCCDENAVG[]],        !- Number of People
 
-    OCCSCHED[],       !- Number of People SCHEDULE Name (real--fraction)
+    OCCSCHED[],       !- Number of People SCHEDULE Name (real--fraction)
 
-    0.5000000,        !- Fraction Radiant
+    0.5000000,        !- Fraction Radiant
 
-    Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
+    Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
 
-**\#\#endif   **
+**\#\#endif   **
 
 
 
@@ -8888,7 +8210,7 @@ Help is offered on the Main Tab and on the Options Tab when you place the mouse,
 Main Tab
 --------
 
-The Main Tab, shown in Figure 30, contains the "Create DXF from IDF" button which is the button to use to create a DXF file from an IDF file, the main function of the EPDrawGUI program. This is the primary button that you will need to use. When pressed, you select an IDF file that you want to use as the basis for a drawing.  If the "Show DXF File After Created" check box is check, when the "Create DXF from IDF" button is pressed, the drawing will be viewed immediately after the DXF file is created. Normally, the viewer for DXF files is automatically found but if the program cannot find a drawing viewer program, you can select one manually on the Options Tab.
+The Main Tab, shown in Figure 30, contains the "Create DXF from IDF" button which is the button to use to create a DXF file from an IDF file, the main function of the EPDrawGUI program. This is the primary button that you will need to use. When pressed, you select an IDF file that you want to use as the basis for a drawing.  If the "Show DXF File After Created" check box is check, when the "Create DXF from IDF" button is pressed, the drawing will be viewed immediately after the DXF file is created. Normally, the viewer for DXF files is automatically found but if the program cannot find a drawing viewer program, you can select one manually on the Options Tab.
 
 
 
@@ -8909,21 +8231,21 @@ For IDF files that contain surfaces with more than four sides, the options under
 
 Thus there are four options which the user may choose to display &gt;4 sided polygons.
 
-- Attempt Triangulation
+- Attempt Triangulation
 
-This option attempts simple triangulation for the polygon (&gt;4 sides) surfaces.  This triangulation will show in the wireframe views but will appear as a solid face in 3D views. This triangulation is only for drawing purposes and does not affect the simulations in any way. The triangle algorithm is not perfect and warnings do result when the software cannot triangulate a surface. If unable to triangulate simply, a warning error is generated to the .EPDerr file.
+This option attempts simple triangulation for the polygon (&gt;4 sides) surfaces.  This triangulation will show in the wireframe views but will appear as a solid face in 3D views. This triangulation is only for drawing purposes and does not affect the simulations in any way. The triangle algorithm is not perfect and warnings do result when the software cannot triangulate a surface. If unable to triangulate simply, a warning error is generated to the .EPDerr file.
 
-- Thick Polyline
+- Thick Polyline
 
 With this option, the &gt;4 sided polygon appears as a thicker line in all views of the building model. This option creates a 'thick' line at the border of the polygon (&gt;4 sides) surfaces. It will look like a hole in the drawing with a thicker edge. This thick border shows in wireframe as well as 3D views and can be confusing, due to overlap with other surfaces.
 
-- Regular Polyline
+- Regular Polyline
 
-With this option, the &gt;4 sided polygon appears as a wire frame line in all views of the building model. This option creates a 'regular' polyline for all polygon (&gt;4 sides) surfaces. It will look like a hole in the drawing.  Also, it will look the same in both wireframe and 3D views.
+With this option, the &gt;4 sided polygon appears as a wire frame line in all views of the building model. This option creates a 'regular' polyline for all polygon (&gt;4 sides) surfaces. It will look like a hole in the drawing.  Also, it will look the same in both wireframe and 3D views.
 
-- Wireframe
+- Wireframe
 
-This option creates a wireframe drawing (all lines) for all surfaces.  All surfaces will appear as lines in both wireframe and 3D views.
+This option creates a wireframe drawing (all lines) for all surfaces.  All surfaces will appear as lines in both wireframe and 3D views.
 
 Note that the EPDrawGUI program only processes building and shading surfaces. It does not process daylighting reference points though the similar option in the EnergyPlus program (Report, Surfaces, DXF;) does show the daylighting reference points (but not illuminance map points) in the DXF view.
 
@@ -8935,15 +8257,15 @@ Introduction
 
 The Input Macros feature increases the flexibility of the EnergyPlus input files. This feature is intended for advanced users who are already familiar with EnergyPlus IDF files and need to prepare input manually. The basic capabilities are:
 
-- Incorporating external files containing pieces of IDF into the main EnergyPlus input stream.
+- Incorporating external files containing pieces of IDF into the main EnergyPlus input stream.
 
-- Selectively accepting or skipping portions of the input.
+- Selectively accepting or skipping portions of the input.
 
-- Defining a block of input with parameters and later referencing this block.
+- Defining a block of input with parameters and later referencing this block.
 
-- Performing arithmetic and logical operations on the input.
+- Performing arithmetic and logical operations on the input.
 
-- Input macro debugging and listing control.
+- Input macro debugging and listing control.
 
 These capabilities are invoked in the EP-MACRO program by using macro commands. Macro commands are preceded by \#\# to distinguish them from regular EnergyPlus input commands. After execution by the EP-MACRO processor, macro commands produce regular lines of EnergyPlus input that are shown in the resultant IDF file (**out.idf**) and, subsequently, in the EnergyPlus echo print (**audit.out**). Following are descriptions of the macro commands associated with the above capabilities. A detailed example of input macros is given at the end of this section; you should review it before reading the macro command descriptions.
 
@@ -8956,8 +8278,8 @@ Table 29. Files used in EP-Macro program
 
 <table class="table table-striped">
 <tr>
-<td>File Name</td>
-<td>Description</td>
+<th>File Name</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>in.imf</td>
@@ -8977,43 +8299,41 @@ The EP-Macro program is a Console Application, so to run by hand you would need 
 
 
 
-
-
 Incorporating External Files
 ----------------------------
 
 **\#\#include** {includefilename}
 
-This command puts all of the lines in an external file into the EnergyPlus input stream starting right after the command line. The name of the file that is included is the concatenation of {prefixpathname}, entered using  **\#\#fileprefix** , and {includefilename}. The lines in the external file will be listed in the resultant IDF file. When all the lines in the external file have been read in, input reverts back to the original input file at the line following the  **\#\#include**  command.
+This command puts all of the lines in an external file into the EnergyPlus input stream starting right after the command line. The name of the file that is included is the concatenation of {prefixpathname}, entered using  **\#\#fileprefix** , and {includefilename}. The lines in the external file will be listed in the resultant IDF file. When all the lines in the external file have been read in, input reverts back to the original input file at the line following the  **\#\#include**  command.
 
-**\#\#fileprefix**  {prefixpathname}
+**\#\#fileprefix**  {prefixpathname}
 
-specifies a pathname that will be prefixed to the filename given in an  **\#\#include** command. The **\#\#fileprefix**  command allows commonly-used include files to be kept in a directory other than the directory in which the current input file resides.
+specifies a pathname that will be prefixed to the filename given in an  **\#\#include** command. The **\#\#fileprefix**  command allows commonly-used include files to be kept in a directory other than the directory in which the current input file resides.
 
 Example: on a PC, the combination
 
-**\#\#fileprefix**  C:\\EnergyPlus\\Library
+**\#\#fileprefix**  C:\\EnergyPlus\\Library
 
-**\#\#include**  SCHEDULES.IDF
+**\#\#include**  SCHEDULES.IDF
 
 will include into the EnergyPlus input stream the file whose full name is
 
 C:\\EnergyPlus\\Library\\SCHEDULES.IDF
 
-**\#\#includesilent**  {includefilename}
+**\#\#includesilent**  {includefilename}
 
-This command is identical to  **\#\#include**, except that the lines in the included file will not be listed in the EP-MACRO echo.
+This command is identical to  **\#\#include**, except that the lines in the included file will not be listed in the EP-MACRO echo.
 
 **\#\#nosilent**
 
-Overrides the listing suppression of  **\#\#includesilent**. Used for debugging purposes only. After  **\#\#nosilent** , all following  **\#\#includesilent**  commands are treated as  **\#\#include** commands. 
+Overrides the listing suppression of  **\#\#includesilent**. Used for debugging purposes only. After  **\#\#nosilent** , all following  **\#\#includesilent**  commands are treated as  **\#\#include** commands. 
 
-Example:   Assume the following files contain the indicated lines:
+Example:   Assume the following files contain the indicated lines:
 
 <table class="table table-striped">
 <tr>
-<td>Main input file:</td>
-<td>External file:</td>
+<th>Main input file:</th>
+<th>External file:</th>
 </tr>
 <tr>
 <td>input1.inp</td>
@@ -9024,7 +8344,7 @@ Example:   Assume the following files contain the indicated lines:
 <td>line 2a</td>
 </tr>
 <tr>
-<td>##include  file2.inp</td>
+<td>##include  file2.inp</td>
 <td>line 2b</td>
 </tr>
 <tr>
@@ -9033,31 +8353,31 @@ Example:   Assume the following files contain the indicated lines:
 </tr>
 <tr>
 <td>line 1c</td>
-<td> </td>
+<td> </td>
 </tr>
 </table>
 
 The end result of processing **\#\#include** input1.inp will be:
 
-    line 1a     (from input1.inp)
+    line 1a     (from input1.inp)
 
-    line 2a     (from file2.inp)
+    line 2a     (from file2.inp)
 
-    line 2b    (from file2.inp)
+    line 2b    (from file2.inp)
 
-    line 2c     (from file2.inp)
+    line 2c     (from file2.inp)
 
-    line 1b    (from input1.inp)
+    line 1b    (from input1.inp)
 
-    line 1c     (from input1.inp)
+    line 1c     (from input1.inp)
 
-External files can also contain  **\#\#include** commands, as shown in the following example:
+External files can also contain  **\#\#include** commands, as shown in the following example:
 
 <table class="table table-striped">
 <tr>
-<td>Main input file:</td>
-<td>First external file:</td>
-<td>Second external file:</td>
+<th>Main input file:</th>
+<th>First external file:</th>
+<th>Seconh external file:</th>
 </tr>
 <tr>
 <td>input1.inp</td>
@@ -9070,7 +8390,7 @@ External files can also contain  **\#\#include** commands, as shown in the foll
 <td>line 3a</td>
 </tr>
 <tr>
-<td>##include  file2.inp</td>
+<td>##include  file2.inp</td>
 <td>line 2b</td>
 <td>line 3b</td>
 </tr>
@@ -9088,130 +8408,92 @@ External files can also contain  **\#\#include** commands, as shown in the foll
 
 The end result of processing **\#\#include** input1.tmp will be:
 
-    line 1a     (from input1.inp)
+    line 1a     (from input1.inp)
 
-    line 2a     (from file2.inp)
+    line 2a     (from file2.inp)
 
-    line 2b    (from file2.inp)
+    line 2b    (from file2.inp)
 
-    line 3a     (from file3.inp)
+    line 3a     (from file3.inp)
 
-    line 3b    (from file3.inp)
+    line 3b    (from file3.inp)
 
-    line 3c     (from file3.inp)
+    line 3c     (from file3.inp)
 
-    line 3d    (from file3.inp)
+    line 3d    (from file3.inp)
 
-    line 2c     (from file2.inp)
+    line 2c     (from file2.inp)
 
-    line 1b    (from input1.inp)
+    line 1b    (from input1.inp)
 
-    line 1c     (from input1.inp)
+    line 1c     (from input1.inp)
 
-Note:  Up to nine  **\#\#include** commands can be nested. However, there should be no recursion. This is an example of a recursion:
+Note:  Up to nine  **\#\#include** commands can be nested. However, there should be no recursion. This is an example of a recursion:
 
-file1.inp contains   **\#\#include**   file2.inp
+file1.inp contains   **\#\#include**   file2.inp
 
-file2.inp contains   **\#\#include**   file1.inp
+file2.inp contains   **\#\#include**   file1.inp
 
 Selectively Accepting or Skipping Lines of Input
 ------------------------------------------------
 
-The  **\#\#if**  series of commands is used to selectively accept or skip lines of input according to the following sequence:
+The  **\#\#if**  series of commands is used to selectively accept or skip lines of input according to the following sequence:
 
 
+```idf
+**##if ** {condition1}
+  line1a
+  line1b
+...
 
-**\#\#if ** {condition1}
+**##elseif ** {condition2}
+  line2a
+  line2b
+...
 
-  line1a
+**##elseif ** {condition3**}**
+  line3a
+  line3b
+...
 
-  line1b
+**##else**
+  line N a
+  line N b
+...
 
-….
-
-
-
-**\#\#elseif ** {condition2}
-
-  line2a
-
-  line2b
-
-
-
-
-
-**\#\#elseif ** {condition3**}**
-
-  line3a
-
-  line3b
-
-….
-
-** **
-
-**\#\#else**
-
-  line N a
-
-  line N b
-
-….
-
-
-
-**\#\#endif**
+**##endif**
 
 Then the lines that will be included into the EnergyPlus input stream are:
 
+```idf
 If {condition 1} is TRUE,
-
-  line1a
-
-  line1b
-
-….
+  line1a
+  line1b
+...
 
 otherwise
-
-
 
 If {condition 2} is TRUE,
-
-  line2a
-
-  line2b
-
-….
+  line2a
+  line2b
+...
 
 otherwise
-
-
 
 If {condition 3} is TRUE,
-
-  line3a
-
-  line3b
-
-….
-
-
+  line3a
+  line3b
+...
 
 otherwise
 
-
-
 If {condition 1}, {condition 2}, {condition 3} are all FALSE.
+  line N a
+  line N b
+...
+```
 
-  line N a
-
-  line N b
-
-….
-
-There are six different  **\#\#if...** commands:
+There are six different  **\#\#if...** commands:
 
 Command
 
@@ -9223,39 +8505,39 @@ Result
 
 {macro name}
 
-:  if macro name defined, include following lines
+:  if macro name defined, include following lines
 
 **\#\#ifndef**
 
 {macro name}
 
-:  if macro name NOT defined, include following lines
+:  if macro name NOT defined, include following lines
 
 **\#\#if**
 
 {condition}
 
-:  if condition is TRUE, include following lines
+:  if condition is TRUE, include following lines
 
 **\#\#elseif**
 
 {condition}
 
-:  if condition is TRUE, and previous conditions are FALSE, include
+:  if condition is TRUE, and previous conditions are FALSE, include
 
-   following lines
+   following lines
 
 **\#\#else**
 
 
 
-:  if all previous conditions are FALSE, include following lines
+:  if all previous conditions are FALSE, include following lines
 
 **\#\#endif**
 
 
 
-:  indicates the end of the if block
+:  indicates the end of the if block
 
 Notes:
 
@@ -9263,70 +8545,70 @@ Notes:
 
 {condition} is 0 or BLANK meaning FALSE, and any other character meaning TRUE.
 
-**\#\#ifdef**  and  **\#\#ifndef**  do not have corresponding  **\#\#elseif**  commands, but they do have
+**\#\#ifdef**  and  **\#\#ifndef**  do not have corresponding  **\#\#elseif**  commands, but they do have
 
-       corresponding  **\#\#else**  and  **\#\#endif**  commands.
+       corresponding  **\#\#else**  and  **\#\#endif**  commands.
 
 
 
 Defining Blocks of Input
 ------------------------
 
-The  **\#\#def** command allows a block of input text to be defined and given a name. The block of text can then be inserted anywhere in the EnergyPlus input stream by simply referencing the name of the block. (This process is called macro expansion.)  The block can have parameters (also called arguments) that can be given different values each time the block is referenced.
+The  **\#\#def** command allows a block of input text to be defined and given a name. The block of text can then be inserted anywhere in the EnergyPlus input stream by simply referencing the name of the block. (This process is called macro expansion.)  The block can have parameters (also called arguments) that can be given different values each time the block is referenced.
 
-The syntax of the  **\#\#def** command is as follows:
+The syntax of the  **\#\#def** command is as follows:
 
-        unique name
+        unique name
 
-           |         zero or more arguments    \_\_ macro text
+           |         zero or more arguments    \_\_ macro text
 
-           |            |                     |
+           |            |                     |
 
-           |            |                     |
+           |            |                     |
 
-                                            
+                                            
 
-    \#\#def  macro-name [ arg1 arg2,arg3 ...]   text line 1
+    \#\#def  macro-name [ arg1 arg2,arg3 ...]   text line 1
 
-                                     
+                                     
 
-  |\_     |           | |    |\_   |   \_|     |
+  |\_     |           | |    |\_   |   \_|     |
 
-    |    |           | |      |  |  |       |\_\_ one
+    |    |           | |      |  |  |       |\_\_ one
 
-    |    |           | |      |  |  |           or
+    |    |           | |      |  |  |           or
 
-zero    one       zero\_|     space(s)           more
+zero    one       zero\_|     space(s)           more
 
-or      or        or         or comma           spaces
+or      or        or         or comma           spaces
 
-more    more      more
+more    more      more
 
-spaces  spaces    spaces
+spaces  spaces    spaces
 
-Example:    Define a schedule macro with name "All\_Const":
+Example:    Define a schedule macro with name "All\_Const":
 
 
 
 **\#\#def** All\_Const[x]
 
-**       ** Fraction, WeekON, 1,1, 12,31;
+**       ** Fraction, WeekON, 1,1, 12,31;
 
-    WEEKSCHEDULE, WeekON,
+    WEEKSCHEDULE, WeekON,
 
-        DayON,DayON,DayON,
+        DayON,DayON,DayON,
 
-        DayON,DayON,DayON,
+        DayON,DayON,DayON,
 
-        DayON,DayON,DayON,
+        DayON,DayON,DayON,
 
-        DayON,DayON,DayON;
+        DayON,DayON,DayON;
 
-    DAYSCHEDULE, DayON, Fraction,
+    DAYSCHEDULE, DayON, Fraction,
 
-        x,x,x,x,x,x,x,x,x,x,x,x,
+        x,x,x,x,x,x,x,x,x,x,x,x,
 
-        x,x,x,x,x,x,x,x,x,x,x,x ;
+        x,x,x,x,x,x,x,x,x,x,x,x ;
 
 **\#\#enddef**
 
@@ -9338,73 +8620,73 @@ the result (file out.idf) is equivalent to:
 
 SCHEDULE, Constant At 0.8,
 
-        Fraction, WeekON, 1,1, 12,31;
+        Fraction, WeekON, 1,1, 12,31;
 
-    WEEKSCHEDULE, WeekON,
+    WEEKSCHEDULE, WeekON,
 
-        DayON,DayON,DayON,
+        DayON,DayON,DayON,
 
-        DayON,DayON,DayON,
+        DayON,DayON,DayON,
 
-        DayON,DayON,DayON,
+        DayON,DayON,DayON,
 
-        DayON,DayON,DayON;
+        DayON,DayON,DayON;
 
-    DAYSCHEDULE, DayON, Fraction,
+    DAYSCHEDULE, DayON, Fraction,
 
-        0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,
+        0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,
 
-        0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8 ;
+        0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8 ;
 
 Macro definitions may have one or more arguments; the maximum number of arguments is 32. When a macro with arguments is referenced, its arguments must be given values. When a macro has no arguments, the brackets are still required both for macro definition and reference.
 
-Caution: Square brackets [  ] have been used in some versions of EnergyPlus inputs as comment/units fields. These will be expanded if left in the IDF and sent to EPMacro.
+Caution: Square brackets [  ] have been used in some versions of EnergyPlus inputs as comment/units fields. These will be expanded if left in the IDF and sent to EPMacro.
 
 Macro names must be unique (except see **\#\#set1** below); i.e., when a macro name is defined it cannot be defined again. Macro names are limited to 40 characters.
 
 To summarize, commands you use to define macros are the following:
 
-**\#\#def**   macro-name  [**arg1**,..,**arg*n*** ]  macro-text
+**\#\#def**   macro-name  [**arg1**,..,**arg*n*** ]  macro-text
 
-Defines a macro with the name macro-name  and arguments "arg1" through "arg*n*". "Macro-text" is one or more lines of text. If there are no arguments, the syntax is **\#\#def** macro-name macro-text.
+Defines a macro with the name macro-name  and arguments "arg1" through "arg*n*". "Macro-text" is one or more lines of text. If there are no arguments, the syntax is **\#\#def** macro-name macro-text.
 
 **\#\#enddef**
 
 Indicates the end of the macro definition initiated by **\#\#def.**
 
-**\#\#def1**    macro-name  [**arg1**,..,**arg*n*** ]  macro-text
+**\#\#def1**    macro-name  [**arg1**,..,**arg*n*** ]  macro-text
 
-This is the same as  **\#\#def** but there is only one line of text so that the terminating command  **\#\#enddef** is not required.
+This is the same as  **\#\#def** but there is only one line of text so that the terminating command  **\#\#enddef** is not required.
 
-**\#\#set1**    macro-name   macro-text
+**\#\#set1**    macro-name   macro-text
 
-Like  **\#\#def1**  but has no arguments and macro-text is evaluated before storing. "Macro-text is evaluated" means that if macro-text contains other macros, these macros will be expanded, and the expanded text becomes the macro-text defined by  **\#\#set1**.
+Like  **\#\#def1**  but has no arguments and macro-text is evaluated before storing. "Macro-text is evaluated" means that if macro-text contains other macros, these macros will be expanded, and the expanded text becomes the macro-text defined by  **\#\#set1**.
 
 Example:
 
-                    **\#\#def1**   xx  123
+                    **\#\#def1**   xx  123
 
-                    **\#\#set1**   yy  xx[]
-
-
-
-is equivalent to:   **\#\#set1**   yy  123
+                    **\#\#set1**   yy  xx[]
 
 
 
-**\#\#set1**  can also be used to redefine macro-name.
+is equivalent to:   **\#\#set1**   yy  123
 
 
 
-**\#\#set1**   x   0
+**\#\#set1**  can also be used to redefine macro-name.
 
-  .
 
-  .
 
-  .
+**\#\#set1**   x   0
 
-**\#\#set1**   x    **\#eval**[ x[]+1 ]
+  .
+
+  .
+
+  .
+
+**\#\#set1**   x    **\#eval**[ x[]+1 ]
 
 
 
@@ -9412,345 +8694,276 @@ is equivalent to:   **\#\#set1**   yy  123
 
 ### Arithmetic Operations
 
-The built-in macro called  **\#eval[ ] ** can be used to perform arithmetic, literal, and logical operations. It can be abbreviated to **\# [ ].**
-
-\#eval[ X OP Y  ]  or  \#[ X OP Y ]
-
-gives the result  X OP Y. The allowed values for X, OP, and Y, and the corresponding result, are shown in the following table.
-
-X \*
-
-OP \*\*
-
-Y
-
-Result
-
-number
-
-+ (plus)
-
-number
-
-number
-
-number
-
-- (minus)
-
-number
-
-number
-
-number
-
-\* (times)
-
-number
-
-number
-
-number
-
-/ (divided by)
-
-number
-
-number
-
-number
-
-min
-
-number
-
-number
-
-number
-
-max
-
-number
-
-number
-
-number
-
-mod
-
-number
-
-number
-
-number
-
-\*\* (power)
-
-number
-
-number
-
-SIN
-
-OF
-
-number (degrees)
-
-number
-
-COS
-
-OF
-
-number (degrees)
-
-number
-
-TAN
-
-OF
-
-number (degrees)
-
-number
-
-SQRT
-
-OF
-
-number
-
-number
-
-ABS
-
-OF
-
-number
-
-number
-
-ASIN
-
-OF
-
-number
-
-number (degrees)
-
-ACOS
-
-OF
-
-number
-
-number (degrees)
-
-ATAN
-
-OF
-
-number
-
-number
-
-INT
-
-OF
-
-number
-
-number
-
-LOG10
-
-OF
-
-number
-
-number
-
-LOG
-
-OF
-
-number
-
-number
-
-literal1
-
-// (concatenate)
-
-literal2
-
-literal "literal1literal2"
-
-literal1
-
-/// (concatenate)
-
-literal2
-
-literal "literal1  literal2"
-
-literal
-
-EQS (=)
-
-literal
-
-logical (true or false)
- case sensitive
-
-literal
-
-NES (¹)
-
-literal
-
-logical (true or false)
- case sensitive
-
-literal
-
-EQSU (=)
-
-literal
-
-logical (true or false)
- not case sensitive
-
-literal
-
-NESU (¹)
-
-literal
-
-logical (true or false)
- not case sensitive
-
-logical
-
-AND
-
-logical
-
-logical (true or false)
-
-logical
-
-OR
-
-logical
-
-logical (true or false)
-
-
-
-NOT
-
-logical
-
-logical (true or false)
-
-number
-
-EQ (=)
-
-number
-
-logical (true or false)
-
-number
-
-NE (¹)
-
-number
-
-logical (true or false)
-
-number
-
-GT (&gt;)
-
-number
-
-logical (true or false)
-
-number
-
-GE (³)
-
-number
-
-logical (true or false)
-
-number
-
-LT (&lt;)
-
-number
-
-logical (true or false)
-
-number
-
-LE (£)
-
-number
-
-logical (true or false)
-
-\*    Upper or lower case is allowed for SIN, COS, etc.
-
-\*\*  Upper or lower case is allowed for OF, EQS, etc.
+The built-in macro called  **\#eval[ ] ** can be used to perform arithmetic, literal, and logical operations. It can be abbreviated to **\# [ ].**
+
+\#eval[ X OP Y  ]  or  \#[ X OP Y ]
+
+gives the result  X OP Y. The allowed values for X, OP, and Y, and the corresponding result, are shown in the following table.
+
+<table class="table table-striped">
+  <tr>
+    <th>X*</th>
+    <th>OP **</th>
+    <th>Y</th>
+    <th>Result</th>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>+ (plus)</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>- (minus)</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>* (times)</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>/ (divided by)</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>min</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>max</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>mod</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>** (power)</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>SIN</td>
+    <td>OF</td>
+    <td>number (degrees)</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>COS</td>
+    <td>OF</td>
+    <td>number (degrees)</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>TAN</td>
+    <td>OF</td>
+    <td>number (degrees)</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>SQRT</td>
+    <td>OF</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>ABS</td>
+    <td>OF</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>ASIN</td>
+    <td>OF</td>
+    <td>number</td>
+    <td>number (degrees)</td>
+  </tr>
+  <tr>
+    <td>ACOS</td>
+    <td>OF</td>
+    <td>number</td>
+    <td>number (degrees)</td>
+  </tr>
+  <tr>
+    <td>ATAN</td>
+    <td>OF</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>INT</td>
+    <td>OF</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>LOG10</td>
+    <td>OF</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>LOG</td>
+    <td>OF</td>
+    <td>number</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>literal1</td>
+    <td>// (concatenate)</td>
+    <td>literal2</td>
+    <td>literal "literal1literal2"</td>
+  </tr>
+  <tr>
+    <td>literal1</td>
+    <td>/// (concatenate)</td>
+    <td>literal2</td>
+    <td>literal "literal1 literal2"</td>
+  </tr>
+  <tr>
+    <td>literal</td>
+    <td>EQS (=)</td>
+    <td>literal</td>
+    <td>logical (true or false) case sensitive</td>
+  </tr>
+  <tr>
+    <td>literal</td>
+    <td>NES (&ne;)</td>
+    <td>literal</td>
+    <td>logical (true or false) case sensitive</td>
+  </tr>
+  <tr>
+    <td>literal</td>
+    <td>EQSU (=)</td>
+    <td>literal</td>
+    <td>logical (true or false) not case sensitive</td>
+  </tr>
+  <tr>
+    <td>literal</td>
+    <td>NESU (&ne;)</td>
+    <td>literal</td>
+    <td>logical (true or false) not case sensitive</td>
+  </tr>
+  <tr>
+    <td>logical</td>
+    <td>AND</td>
+    <td>logical</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td>logical</td>
+    <td>OR</td>
+    <td>logical</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>NOT</td>
+    <td>logical</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>EQ (=)</td>
+    <td>number</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>NE (&ne;)</td>
+    <td>number</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>GT (&gt;)</td>
+    <td>number</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>GE (&ge;)</td>
+    <td>number</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>LT (&lt;)</td>
+    <td>number</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td>number</td>
+    <td>LE (&le;)</td>
+    <td>number</td>
+    <td>logical (true or false)</td>
+  </tr>
+  <tr>
+    <td colspan="4">* Upper or lower case is allowed for SIN, COS, etc.</td>
+  </tr>
+  <tr>
+    <td colspan="4">** Upper or lower case is allowed for OF, EQS, etc.</td>
+  </tr>
+</table>
 
 Example
 
-**\#eval[**  1 + 2  **]**     when expanded becomes 3.
+**\#eval[**  1 + 2  **]**     when expanded becomes 3.
 
-**\#eval[** 1 +  **\#eval**[2 \* 3] **]**  when expanded becomes 7.
+**\#eval[** 1 +  **\#eval**[2 \* 3] **]**  when expanded becomes 7.
 
 Example
 
 **\#\#set1** city[] Washington
 
-  DesignDay, \#[ city[ ] /// SUMMER ], ! Design Day Name
+  DesignDay, \#[ city[ ] /// SUMMER ], ! Design Day Name
 
 gives
 
-     DesignDay, "Washington SUMMER", ! Design Day Name
+     DesignDay, "Washington SUMMER", ! Design Day Name
 
-The following example illustrates the use of **\#eval**  inside  **\#if**  commands:
+The following example illustrates the use of **\#eval**  inside  **\#if**  commands:
 
-**\#\#if**  **\#[** city[ ] EQS  Chicago **]**
+**\#\#if**  **\#[** city[ ] EQS  Chicago **]**
 
-**\#\#if**  **\#[\#[** city[ ] EQS  Chicago ] and **\#[** occup[ ] NES low **]** **]**
+**\#\#if**  **\#[\#[** city[ ] EQS  Chicago ] and **\#[** occup[ ] NES low **]** **]**
 
 Notes:
 
-1.   For logical values:
+1.   For logical values:
 
 False = 0 or BLANK,
 
 True = any other character
 
-2.   A literal must be enclosed inside a pair of double quotes if it contains BLANKs or reserved characters like [ ]  ( )  ,
+2.   A literal must be enclosed inside a pair of double quotes if it contains BLANKs or reserved characters like [ ]  ( )  ,
 
 E.g., "abc \*def"
 
 Otherwise, the quotes around the literals are optional.
 
-3.   Literal concatenation operators // and /// produce quoted literals.
+3.   Literal concatenation operators // and /// produce quoted literals.
 
-E.g.,  \#  [ large  ///  office ]   gives  "large office"
+E.g.,  \#  [ large  ///  office ]   gives  "large office"
 
-4.   Literals are case sensitive. For example, "Chicago", "CHICAGO" and "chicago" are distinct.
+4.   Literals are case sensitive. For example, "Chicago", "CHICAGO" and "chicago" are distinct.
 
-5.   EQS and NES are case sensitive string comparisons. EQSU and NESU are case insensitive string comparisons.
+5.   EQS and NES are case sensitive string comparisons. EQSU and NESU are case insensitive string comparisons.
 
-6.   Literals are limited to 40 characters.
+6.   Literals are limited to 40 characters.
 
 Macro Debugging and Listing Control
 -----------------------------------
@@ -9807,7 +9020,7 @@ Don't give full traceback when printing an error message.
 
 **\#\#write**
 
-Start writing expanded text into file 22. This is similar to  **\#\#show** except that the expanded lines are written into file 22. Therefore, file 22 will contain only the text that will be seen by the EnergyPlus processor. This file is used only for debugging purposes. It allows you to see what the macro-processed input file looks like.
+Start writing expanded text into file 22. This is similar to  **\#\#show** except that the expanded lines are written into file 22. Therefore, file 22 will contain only the text that will be seen by the EnergyPlus processor. This file is used only for debugging purposes. It allows you to see what the macro-processed input file looks like.
 
 **\#\#nowrite**
 
@@ -9821,67 +9034,67 @@ Prints table of current macro names. All of the macro names that are defined wil
 
 Clear all macro definitions. All the macro names defined up to this point will be deleted.
 
-**\#\#reserve**   TEXT  *k*    NAMES  *l*    STACK  *m*
+**\#\#reserve**   TEXT  *k*    NAMES  *l*    STACK  *m*
 
 Allocates memory.
 
-Reserves    *k*          words of space in AA array for macro definition storage.
+Reserves    *k*          words of space in AA array for macro definition storage.
 
-Reserves    *l*           positions in macro definition names table.
+Reserves    *l*           positions in macro definition names table.
 
-Reserves    *m*         words of stack space.
+Reserves    *m*         words of stack space.
 
-If used, the  **\#\#reserve**  command must precede  all other macro commands in the EP-MACRO input. This command should be used only if one or more of the following error messages is received:
+If used, the  **\#\#reserve**  command must precede  all other macro commands in the EP-MACRO input. This command should be used only if one or more of the following error messages is received:
 
 "Need more memory for storing macro definitions"
 
-Use  "**\#\#reserve** TEXT nnnnnn" command to get more memory. Current value of  *nnnnnn*  is: \_ \_ \_
+Use  "**\#\#reserve** TEXT nnnnnn" command to get more memory. Current value of  *nnnnnn*  is: \_ \_ \_
 
 "Macro table capacity exceeded"
 
-Use "**\#\#reserve** NAMES nnnnnn" command to get more memory. Current value of  *nnnnnn*  is: \_ \_ \_
+Use "**\#\#reserve** NAMES nnnnnn" command to get more memory. Current value of  *nnnnnn*  is: \_ \_ \_
 
 "Macro stack overflow"
 
-Use "**\#\#reserve** STACK nnnnnn" command to get more memory. Current value of  *nnnnnn*  is: \_ \_ \_
+Use "**\#\#reserve** STACK nnnnnn" command to get more memory. Current value of  *nnnnnn*  is: \_ \_ \_
 
 **\#\#! &lt;comment&gt;**
 
-Allows you to enter comment lines inside a macro. **&lt;comment&gt; ** is printed in the EP-MACRO echo but is not acted on by the macro processor.
+Allows you to enter comment lines inside a macro. **&lt;comment&gt; ** is printed in the EP-MACRO echo but is not acted on by the macro processor.
 
 *Example:*
 
-This example shows the use of the  **\#\#set**, **\#\#include**, **\#\#eval** and **\#\#if** commands. Let an external file called cities.idf contain the following text:
+This example shows the use of the  **\#\#set**, **\#\#include**, **\#\#eval** and **\#\#if** commands. Let an external file called cities.idf contain the following text:
 
 
 
-** \#\#if \#**[ city[ ] **EQS** CHICAGO ]
+** \#\#if \#**[ city[ ] **EQS** CHICAGO ]
 
-  Location,Chicago IL,  !- Location Name
+  Location,Chicago IL,  !- Location Name
 
-   41.880,  !- Latitude
+   41.880,  !- Latitude
 
-   -87.63,  !- Longitude
+   -87.63,  !- Longitude
 
-   -6.0,    !- Time Zone
+   -6.0,    !- Time Zone
 
-   2.;      !- Elevation {m}
+   2.;      !- Elevation {m}
 
 **\#\#elseif \#**[ city[ ] **EQS** WASHINGTON ]
 
-  Location,Washington DC,  !- Location Name
+  Location,Washington DC,  !- Location Name
 
-   38.9,   !- Latitude
+   38.9,   !- Latitude
 
-   -77.0,  !- Longitude
+   -77.0,  !- Longitude
 
-   -5.0,   !- Time Zone
+   -5.0,   !- Time Zone
 
-   15.;    !- Elevation {m}
+   15.;    !- Elevation {m}
 
 **\#\#else**
 
-** ** ERROR --- City Undefined
+** ** ERROR --- City Undefined
 
 **\#\#endif**
 
@@ -9895,15 +9108,15 @@ Then the EnergyPlus input
 
 will be converted, after macro processing, to:
 
-Location,Chicago IL,  !- Location Name
+Location,Chicago IL,  !- Location Name
 
-   41.880,  !- Latitude
+   41.880,  !- Latitude
 
-   -87.63,  !- Longitude
+   -87.63,  !- Longitude
 
-   -6.0,    !- Time Zone
+   -6.0,    !- Time Zone
 
-   2.;      !- Elevation {m}
+   2.;      !- Elevation {m}
 
 Listing Format
 --------------
@@ -9912,41 +9125,41 @@ The format of listing from EP-MACRO gives information about the status of the in
 
 
 
- 1. 1.1  \* 123 \* ...... EnergyPlus input line
+ 1. 1.1  \* 123 \* ...... EnergyPlus input line
 
- -  - -  ------- ----------------------------------
+ -  - -  ------- ----------------------------------
 
-              
+              
 
- |  | |     |     echo of EnergyPlus input line
+ |  | |     |     echo of EnergyPlus input line
 
- |  | |     |
+ |  | |     |
 
- |  | |    line number ( if the current line is being skipped
+ |  | |    line number ( if the current line is being skipped
 
- |  | |                  by " **\#\#if**... " etc, this is indicated
+ |  | |                  by " **\#\#if**... " etc, this is indicated
 
- |  | |                  by printing "- 123 -" instead of
+ |  | |                  by printing "- 123 -" instead of
 
- |  | |                  "**\*** **123** **\***" in the line number field;
+ |  | |                  "**\*** **123** **\***" in the line number field;
 
- |  | |                  if the current line is part of a
+ |  | |                  if the current line is part of a
 
- |  | |                  macro command, it is indicated by
+ |  | |                  macro command, it is indicated by
 
- |  | |                  printing "**\#** **123 \#**" )
+ |  | |                  printing "**\#** **123 \#**" )
 
- |  | |
+ |  | |
 
- |  | macro expansion nesting level
+ |  | macro expansion nesting level
 
- |  |
+ |  |
 
- |"**\#\#if**" nesting level
+ |"**\#\#if**" nesting level
 
- |
+ |
 
- "**\#\#include**" nesting level
+ "**\#\#include**" nesting level
 
 HVAC Diagram
 ============
@@ -10670,23 +9883,23 @@ There is an example input file and an example output file installed with the pro
 Running the CoeffConv or CoeffCheck programs
 --------------------------------------------
 
-EP-Launch can be used to run both the CoeffConv and CoeffCheck programs.  CoeffConv and CoeffCheck are two of the options on the Utilities tab in EP-Launch.  See the EP-Launch section in this document for more information on how to use EP-Launch with the CoeffConv and CoeffCheck programs.
+EP-Launch can be used to run both the CoeffConv and CoeffCheck programs.  CoeffConv and CoeffCheck are two of the options on the Utilities tab in EP-Launch.  See the EP-Launch section in this document for more information on how to use EP-Launch with the CoeffConv and CoeffCheck programs.
 
 You can also run both programs as console applications and, because they are small, they are automatically installed with EnergyPlus. You will need to open a command window using the following steps:
 
-1)   Open a DOS command prompt window (Start -&gt; Programs -&gt; Accessories -&gt; Command Prompt)
+1)   Open a DOS command prompt window (Start -&gt; Programs -&gt; Accessories -&gt; Command Prompt)
 
-2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
+2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
 
 C:
 
 CD \\&lt;rootfolder&gt;\&lt;/span>
 
-3)   Change to the specific folder for the coefficient conversion applications:
+3)   Change to the specific folder for the coefficient conversion applications:
 
 CD PreProcess\\CoeffConv
 
-4)   Run the program:
+4)   Run the program:
 
 After creating your files as shown above, enter either CoeffConv or CoeffCheck as desired. The folder also contains a "readme.txt" file which you can peruse.
 
@@ -10696,7 +9909,7 @@ ExpandObjects
 Introduction
 ------------
 
-The ExpandObjects program uses HVACTemplate objects in the IDF file to "expand" them into full fledged objects for EnergyPlus.  Read more details of the systems and the individual fields in the HVACTemplate objects in the Input Output Reference document.
+The ExpandObjects program uses HVACTemplate objects in the IDF file to "expand" them into full fledged objects for EnergyPlus.  Read more details of the systems and the individual fields in the HVACTemplate objects in the Input Output Reference document.
 
 ExpandObjects also processes GroundHeatTransfer objects, sends an input file to the Slab and Basement preprocessors, and replaces ground heat transfer boundary condition fields in building surface objects. Read more details of the ground heat transfer processing in the Input Output Reference.
 
@@ -10707,140 +9920,140 @@ HVAC Template Objects Processed
 
 The HVACTemplate objects that are currently read by the ExpandObjects preprocessor are:
 
-- HVACTemplate:Thermostat
+- HVACTemplate:Thermostat
 
-- HVACTemplate:Zone:IdealLoadsAirSystem
+- HVACTemplate:Zone:IdealLoadsAirSystem
 
-- HVACTemplate:Zone:FanCoil
+- HVACTemplate:Zone:FanCoil
 
-- HVACTemplate:Zone:PTAC
+- HVACTemplate:Zone:PTAC
 
-- HVACTemplate:Zone:PTHP
+- HVACTemplate:Zone:PTHP
 
-- HVACTemplate:Zone:Unitary
+- HVACTemplate:Zone:Unitary
 
-- HVACTemplate:Zone:VAV
+- HVACTemplate:Zone:VAV
 
-- HVACTemplate:Zone:VAV:FanPowered
+- HVACTemplate:Zone:VAV:FanPowered
 
-- HVACTemplate:Zone:WatertoAirHeatPump
+- HVACTemplate:Zone:WatertoAirHeatPump
 
-- HVACTemplate:System:Unitary
+- HVACTemplate:System:Unitary
 
-- HVACTemplate:System:UnitaryHeatPump:AirToAir
+- HVACTemplate:System:UnitaryHeatPump:AirToAir
 
-- HVACTemplate:System:VAV
+- HVACTemplate:System:VAV
 
-- HVACTemplate:System:PackagedVAV
+- HVACTemplate:System:PackagedVAV
 
-- HVACTemplate:System:DedicatedOutdoorAir
+- HVACTemplate:System:DedicatedOutdoorAir
 
-- HVACTemplate:Plant:ChilledWaterLoop
+- HVACTemplate:Plant:ChilledWaterLoop
 
-- HVACTemplate:Plant:Chiller
+- HVACTemplate:Plant:Chiller
 
-- HVACTemplate:Plant:Chiller:ObjectReference
+- HVACTemplate:Plant:Chiller:ObjectReference
 
-- HVACTemplate:Plant:Tower
+- HVACTemplate:Plant:Tower
 
-- HVACTemplate:Plant:Tower:ObjectReference
+- HVACTemplate:Plant:Tower:ObjectReference
 
-- HVACTemplate:Plant:HotWaterLoop
+- HVACTemplate:Plant:HotWaterLoop
 
-- HVACTemplate:Plant:Boiler
+- HVACTemplate:Plant:Boiler
 
-- HVACTemplate:Plant:Boiler:ObjectReference
+- HVACTemplate:Plant:Boiler:ObjectReference
 
 Ground Heat Transfer Objects Processed
 --------------------------------------
 
 The GroundHeatTransfer objects that are currently read by the ExpandObjects preprocessor are:
 
-- GroundHeatTransfer:Control
+- GroundHeatTransfer:Control
 
-- GroundHeatTransfer:Slab:Materials
+- GroundHeatTransfer:Slab:Materials
 
-- GroundHeatTransfer:Slab:MatlProps
+- GroundHeatTransfer:Slab:MatlProps
 
-- GroundHeatTransfer:Slab:BoundConds
+- GroundHeatTransfer:Slab:BoundConds
 
-- GroundHeatTransfer:Slab:BldgProps
+- GroundHeatTransfer:Slab:BldgProps
 
-- GroundHeatTransfer:Slab:Insulation
+- GroundHeatTransfer:Slab:Insulation
 
-- GroundHeatTransfer:Slab:EquivalentSlab
+- GroundHeatTransfer:Slab:EquivalentSlab
 
-- GroundHeatTransfer:Slab:AutoGrid
+- GroundHeatTransfer:Slab:AutoGrid
 
-- GroundHeatTransfer:Slab:ManualGrid
+- GroundHeatTransfer:Slab:ManualGrid
 
-- GroundHeatTransfer:Slab:XFACE
+- GroundHeatTransfer:Slab:XFACE
 
-- GroundHeatTransfer:Slab:YFACE
+- GroundHeatTransfer:Slab:YFACE
 
-- GroundHeatTransfer:Slab:ZFACE
+- GroundHeatTransfer:Slab:ZFACE
 
-- GroundHeatTransfer:Basement:SimParameters
+- GroundHeatTransfer:Basement:SimParameters
 
-- GroundHeatTransfer:Basement:MatlProps
+- GroundHeatTransfer:Basement:MatlProps
 
-- GroundHeatTransfer:Basement:Insulation
+- GroundHeatTransfer:Basement:Insulation
 
-- GroundHeatTransfer:Basement:SurfaceProps
+- GroundHeatTransfer:Basement:SurfaceProps
 
-- GroundHeatTransfer:Basement:BldgData
+- GroundHeatTransfer:Basement:BldgData
 
-- GroundHeatTransfer:Basement:Interior
+- GroundHeatTransfer:Basement:Interior
 
-- GroundHeatTransfer:Basement:ComBldg
+- GroundHeatTransfer:Basement:ComBldg
 
-- GroundHeatTransfer:Basement:EquivSlab
+- GroundHeatTransfer:Basement:EquivSlab
 
-- GroundHeatTransfer:Basement:EquivAutoGrid
+- GroundHeatTransfer:Basement:EquivAutoGrid
 
-- GroundHeatTransfer:Basement:AutoGrid
+- GroundHeatTransfer:Basement:AutoGrid
 
-- GroundHeatTransfer:Basement:ManualGrid
+- GroundHeatTransfer:Basement:ManualGrid
 
-- GroundHeatTransfer:Basement:XFACE
+- GroundHeatTransfer:Basement:XFACE
 
-- GroundHeatTransfer:Basement:YFACE
+- GroundHeatTransfer:Basement:YFACE
 
-- GroundHeatTransfer:Basement:ZFACEHVACTemplate:Thermostat
+- GroundHeatTransfer:Basement:ZFACEHVACTemplate:Thermostat
 
 Building Surface Objects Processed
 ----------------------------------
 
 The building surface objects that are currently modified by the ExpandObjects preprocessor are:
 
-- BuildingSurface:Detailed
+- BuildingSurface:Detailed
 
-- Wall:Detailed
+- Wall:Detailed
 
-- RoofCeiling:Detailed
+- RoofCeiling:Detailed
 
-- Floor:Detailed
+- Floor:Detailed
 
-- Site:GroundTemperature:BuildingSurface
+- Site:GroundTemperature:BuildingSurface
 
 CSVproc
 =======
 
 This simple post processing utility may be useful when doing parametric analyses. It takes a CSV (comma separated values file) and performs some simple statistics. It is a very small application with no interface. It is typically executed from the command line.
 
-1)   Open a DOS command prompt window (Start à Programs à Accessories à Command Prompt)
+1)   Open a DOS command prompt window (Start à Programs à Accessories à Command Prompt)
 
-2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
+2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
 
 C:
 
 CD \\&lt;root folder&gt;\&lt;/span>
 
-3)   Change to the specific folder for the coefficient conversion applications:
+3)   Change to the specific folder for the coefficient conversion applications:
 
 CD PostProcess
 
-4)   Run the program:
+4)   Run the program:
 
 CSVproc &lt;filename&gt;
 
@@ -10848,63 +10061,63 @@ Where &lt;filename&gt; is the name of a CSV file, including extension. There is 
 
 The statistics performed on each column are:
 
-·        SUM
+·        SUM
 
-·        MAX
+·        MAX
 
-·        MIN
+·        MIN
 
-·        AVERAGE
+·        AVERAGE
 
-·        COUNT
+·        COUNT
 
-·        COUNTIF &gt; 0
+·        COUNTIF &gt; 0
 
-·        COUNTIF &gt; 5
+·        COUNTIF &gt; 5
 
-·        COUNTIF &gt; 10
+·        COUNTIF &gt; 10
 
-·        COUNTIF &gt; 15
+·        COUNTIF &gt; 15
 
-·        COUNTIF &gt; 20
+·        COUNTIF &gt; 20
 
-·        COUNTIF &gt; 25
+·        COUNTIF &gt; 25
 
-·        COUNTIF &gt; 30
+·        COUNTIF &gt; 30
 
-·        COUNTIF &gt; 35
+·        COUNTIF &gt; 35
 
-·        COUNTIF &gt; 40
+·        COUNTIF &gt; 40
 
-·        COUNTIF &gt; 45
+·        COUNTIF &gt; 45
 
-·        COUNTIF &gt; 50
+·        COUNTIF &gt; 50
 
-·        COUNTIF &gt; 55
+·        COUNTIF &gt; 55
 
-·        COUNTIF &gt; 60
+·        COUNTIF &gt; 60
 
-·        COUNTIF &gt; 65
+·        COUNTIF &gt; 65
 
-·        COUNTIF &gt; 70
+·        COUNTIF &gt; 70
 
-·        COUNTIF &gt; 75
+·        COUNTIF &gt; 75
 
-·        COUNTIF &gt; 80
+·        COUNTIF &gt; 80
 
-·        COUNTIF &gt; 85
+·        COUNTIF &gt; 85
 
-·        COUNTIF &gt; 90
+·        COUNTIF &gt; 90
 
-·        COUNTIF &gt; 95
+·        COUNTIF &gt; 95
 
-·        COUNTIF &gt; 100
+·        COUNTIF &gt; 100
 
-·        COUNTIF = 1
+·        COUNTIF = 1
 
-·        COUNTIF &lt; 19.9
+·        COUNTIF &lt; 19.9
 
-·        COUNTIF &gt; 24.0
+·        COUNTIF &gt; 24.0
 
 Obviously, not all statistics are relevant for every output report variable. The average is based on the sum divided by the number of non-blank rows. The average is not based on the length of time for that timestep. Due to this, CSVproc is best suited for an hourly output file.
 
@@ -10925,7 +10138,7 @@ wild,&lt;match-string&gt;,&lt;si-unit&gt;,&lt;ip-unit&gt;
 
 vari,&lt;variable-name-no-units&gt;,&lt;si-unit&gt;,&lt;ip-unit&gt;
 
-If a specific variable needs to be converted, the ‘vari’ line may be used to convert the units on that specific variable only. To convert a class of variables that contains a specific string of characters in the names of the variables, the ‘wild’ line may be used. The ‘conv’ lines are the lines that actually create the conversion factors.  If no ‘vari’ or ‘wild’ match a variable, then it is converted used the first ‘conv’ line that matches. The default convert.txt file contains some conversions for Inch-Pound units but any set of units may be used by editing the convert.txt file. Note that the convert.txt file uses the standard EnergyPlus comment character (!).
+If a specific variable needs to be converted, the 'vari' line may be used to convert the units on that specific variable only. To convert a class of variables that contains a specific string of characters in the names of the variables, the 'wild' line may be used. The 'conv' lines are the lines that actually create the conversion factors.  If no 'vari' or 'wild' match a variable, then it is converted used the first 'conv' line that matches. The default convert.txt file contains some conversions for Inch-Pound units but any set of units may be used by editing the convert.txt file. Note that the convert.txt file uses the standard EnergyPlus comment character (!).
 
 A snippet of the convert.txt file:
 
@@ -10933,11 +10146,11 @@ A snippet of the convert.txt file:
 
 !------------------------------
 
-!    (1 kW / 1000 W)
+!    (1 kW / 1000 W)
 
 conv,W,kW,0.001,0
 
-!    (1 Btuh/ 0.2928751 W) \* (1 kBtuh/1000 Btuh)
+!    (1 Btuh/ 0.2928751 W) \* (1 kBtuh/1000 Btuh)
 
 conv,W,kBtuh,3.41442E-03,0
 
@@ -10946,11 +10159,11 @@ CalcSoilSurfTemp Program
 
 The CalcSoilSurfTemp program calculates three important parameters for the simulation of the earth tube:
 
-- the annual average soil surface temperature
+- the annual average soil surface temperature
 
-- the amplitude of soil surface temperature
+- the amplitude of soil surface temperature
 
-- the phase constant of soil surface temperature
+- the phase constant of soil surface temperature
 
 Since soil temperature is one of the most significant factors affecting the overall performance of earth tube system, soil temperature around the earth tube should be accurately predicted.
 
@@ -10963,19 +10176,19 @@ EP-Launch can be used to run the CalcSoilSurfTemp program. CalcSoilSurfTemp is o
 
 You can also run the CalcSoilSurfTemp program as a console application with a batch file RunCalcSoilSurfTemp. The argument to the batch file is the name of the weather file to be used. Steps to running this program follow:
 
-1)   Open a DOS command prompt window (Start à Programs à Accessories à Command Prompt)
+1)   Open a DOS command prompt window (Start à Programs à Accessories à Command Prompt)
 
-2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
+2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
 
 C:
 
 CD \\&lt;root folder&gt;\&lt;/span>
 
-3)   Change to the calculate surface soil temperature folder:
+3)   Change to the calculate surface soil temperature folder:
 
 CD PreProcess\\CalcSoilSurfTemp
 
-4)   Run the program:
+4)   Run the program:
 
 runcalcsoilsurftemp USA\_IL\_Chicago-OHare\_TMY2
 
@@ -11020,7 +10233,7 @@ After the selection of soil condition, the user should also select the number co
 
 This determines the absorption coefficient and the fraction of evaporation rate of the ground surface.
 
-Note that both soil condition and soil surface condition are the average of the year -  not a particular time period within the year.
+Note that both soil condition and soil surface condition are the average of the year -  not a particular time period within the year.
 
 From this information and an analysis of the weather data, the CalcSoilSurfTemp program calculates the annual average soil surface temperature, the amplitude of soil surface temperature, and the phase constant of soil surface temperature. The user must then add these parameters as input parameter into earth tube model in EnergyPlus.
 
@@ -11045,271 +10258,271 @@ These values are placed in the ZoneEarthTube object numeric fields (12, 13, 14) 
 
 **ZoneEarthtube,**
 
-  \\min-fields 22
+  \\min-fields 22
 
-      \\memo  Earth Tube is specified as a design level which is modified by a Schedule fraction, temperature difference and wind speed:
+      \\memo  Earth Tube is specified as a design level which is modified by a Schedule fraction, temperature difference and wind speed:
 
-      \\memo  Earthtube=Edesign \* Fschedule \* (A + B\*|(Tzone-Todb)| + C\*WindSpd + D \* WindSpd\*\*2)
+      \\memo  Earthtube=Edesign \* Fschedule \* (A + B\*|(Tzone-Todb)| + C\*WindSpd + D \* WindSpd\*\*2)
 
-  A1, \\field Zone Name
+  A1, \\field Zone Name
 
-      \\required-field
+      \\required-field
 
-      \\type object-list
+      \\type object-list
 
-      \\object-list ZoneNames
+      \\object-list ZoneNames
 
-  A2, \\field Schedule Name
+  A2, \\field Schedule Name
 
-      \\required-field
+      \\required-field
 
-      \\type object-list
+      \\type object-list
 
-      \\object-list ScheduleNames
+      \\object-list ScheduleNames
 
-  N1, \\field Design Flow Rate
+  N1, \\field Design Flow Rate
 
-      \\required-field
+      \\required-field
 
-      \\units m3/s
+      \\units m3/s
 
-      \\note  "Edesign" in Equation
+      \\note  "Edesign" in Equation
 
-      \\type real
+      \\type real
 
-      \\minimum 0
+      \\minimum 0
 
-  N2, \\field Minimum Zone Temperature when Cooling
+  N2, \\field Minimum Zone Temperature when Cooling
 
-      \\required-field
+      \\required-field
 
-      \\note this is the indoor temperature below which the earth tube is shut off
+      \\note this is the indoor temperature below which the earth tube is shut off
 
-      \\units C
+      \\units C
 
-      \\type real
+      \\type real
 
-      \\minimum -100
+      \\minimum -100
 
-      \\maximum 100
+      \\maximum 100
 
-  N3, \\field Maximum Zone Temperature when Heating
+  N3, \\field Maximum Zone Temperature when Heating
 
-      \\required-field
+      \\required-field
 
-      \\note this is the indoor temperature above which the earth tube is shut off
+      \\note this is the indoor temperature above which the earth tube is shut off
 
-      \\units C
+      \\units C
 
-      \\type real
+      \\type real
 
-      \\minimum -100
+      \\minimum -100
 
-      \\maximum 100
+      \\maximum 100
 
-  N4, \\field Delta Temperature
+  N4, \\field Delta Temperature
 
-      \\required-field
+      \\required-field
 
-      \\note This is the temperature difference between indoor and outdoor below which the earth tube is shut off
+      \\note This is the temperature difference between indoor and outdoor below which the earth tube is shut off
 
-      \\units deltaC
+      \\units deltaC
 
-      \\type real
+      \\type real
 
-      \\minimum 0
+      \\minimum 0
 
-  A3, \\field Earthtube Type
+  A3, \\field Earthtube Type
 
-      \\required-field
+      \\required-field
 
-      \\type choice
+      \\type choice
 
-      \\key Natural
+      \\key Natural
 
-      \\key Intake
+      \\key Intake
 
-      \\key Exhaust
+      \\key Exhaust
 
-      \\default Natural
+      \\default Natural
 
-  N5, \\field Fan Pressure Rise
+  N5, \\field Fan Pressure Rise
 
-      \\required-field
+      \\required-field
 
-      \\note pressure rise across the fan
+      \\note pressure rise across the fan
 
-      \\type real
+      \\type real
 
-      \\units Pa
+      \\units Pa
 
-      \\minimum 0
+      \\minimum 0
 
-      \\default 0
+      \\default 0
 
-  N6, \\field Fan Total Efficiency
+  N6, \\field Fan Total Efficiency
 
-      \\required-field
+      \\required-field
 
-      \\type real
+      \\type real
 
-      \\minimum&gt; 0
+      \\minimum&gt; 0
 
-      \\default 1
+      \\default 1
 
 
 
-  N7, \\field Pipe Radius
+  N7, \\field Pipe Radius
 
-      \\required-field
+      \\required-field
 
-      \\units m
+      \\units m
 
-      \\type real
+      \\type real
 
-      \\minimum&gt; 0
+      \\minimum&gt; 0
 
-      \\default 1
+      \\default 1
 
-  N8, \\field Pipe Thickness
+  N8, \\field Pipe Thickness
 
-      \\required-field
+      \\required-field
 
-      \\units m
+      \\units m
 
-      \\type real
+      \\type real
 
-      \\minimum&gt; 0
+      \\minimum&gt; 0
 
-      \\default 0.2
+      \\default 0.2
 
-  N9, \\field Pipe Length
+  N9, \\field Pipe Length
 
-      \\required-field
+      \\required-field
 
-      \\units m
+      \\units m
 
-      \\type real
+      \\type real
 
-      \\minimum&gt; 0
+      \\minimum&gt; 0
 
-      \\default 15
+      \\default 15
 
- N10, \\field Pipe Thermal Conductivity
+ N10, \\field Pipe Thermal Conductivity
 
-      \\required-field
+      \\required-field
 
-      \\units W/m-K
+      \\units W/m-K
 
-      \\type real
+      \\type real
 
-      \\minimum&gt; 0
+      \\minimum&gt; 0
 
-      \\default 200
+      \\default 200
 
- N11, \\field Pipe Depth Under Ground Surface
+ N11, \\field Pipe Depth Under Ground Surface
 
-      \\required-field
+      \\required-field
 
-      \\units m
+      \\units m
 
-      \\type real
+      \\type real
 
-      \\minimum&gt; 0
+      \\minimum&gt; 0
 
-      \\default 3
+      \\default 3
 
-  A4, \\field Soil Condition
+  A4, \\field Soil Condition
 
-      \\required-field
+      \\required-field
 
-      \\type choice
+      \\type choice
 
-      \\key HeavyAndSaturated
+      \\key HeavyAndSaturated
 
-      \\key HeavyAndDamp
+      \\key HeavyAndDamp
 
-      \\key HeavyAndDry
+      \\key HeavyAndDry
 
-      \\key LightAndDry
+      \\key LightAndDry
 
-      \\default HeavyAndDamp
+      \\default HeavyAndDamp
 
- N12, \\field Average Soil Surface Temperature
+ N12, \\field Average Soil Surface Temperature
 
-      \\required-field
+      \\required-field
 
-      \\units C
+      \\units C
 
-      \\type real
+      \\type real
 
-      \\default 0
+      \\default 0
 
- N13, \\field Amplitude of Soil Surface Temperature
+ N13, \\field Amplitude of Soil Surface Temperature
 
-      \\required-field
+      \\required-field
 
-      \\units C
+      \\units C
 
-      \\type real
+      \\type real
 
-      \\minimum 0
+      \\minimum 0
 
-      \\default 0
+      \\default 0
 
- N14, \\field Phase Constant of Soil Surface Temperature
+ N14, \\field Phase Constant of Soil Surface Temperature
 
-      \\required-field
+      \\required-field
 
-      \\units days
+      \\units days
 
-      \\type real
+      \\type real
 
-      \\minimum 0
+      \\minimum 0
 
-      \\default 0
+      \\default 0
 
- N15, \\field Constant Term Flow Coefficient
+ N15, \\field Constant Term Flow Coefficient
 
-      \\required-field
+      \\required-field
 
-      \\note  "A" in Equation
+      \\note  "A" in Equation
 
-      \\type real
+      \\type real
 
-      \\default 1
+      \\default 1
 
- N16, \\field Temperature Term Flow Coefficient
+ N16, \\field Temperature Term Flow Coefficient
 
-      \\required-field
+      \\required-field
 
-      \\note  "B" in Equation
+      \\note  "B" in Equation
 
-      \\type real
+      \\type real
 
-      \\default 0
+      \\default 0
 
- N17, \\field Velocity Term Flow Coefficient
+ N17, \\field Velocity Term Flow Coefficient
 
-      \\required-field
+      \\required-field
 
-      \\note  "C" in Equation
+      \\note  "C" in Equation
 
-      \\type real
+      \\type real
 
-      \\default 0
+      \\default 0
 
 
 
- N18; \\field Velocity Squared Term Flow Coefficient
+ N18; \\field Velocity Squared Term Flow Coefficient
 
-      \\required-field
+      \\required-field
 
-      \\note  "D" in Equation
+      \\note  "D" in Equation
 
-      \\type real
+      \\type real
 
-      \\default 0
+      \\default 0
 
 HVAC Performance Curve Fit Tool
 ===============================
@@ -11317,7 +10530,7 @@ HVAC Performance Curve Fit Tool
 Introduction
 ------------
 
-This auxiliary tool generates HVAC performance curves in EnergyPlus curve object format.  For each set of performance data entered, Capacity and EIR performance curves are generated, and these curves are generated either as a function of temperature(s) or flow fraction.  The Capacity and EIR of Cooling DX Coils as a function of temperatures require only Biquadratic curve whereas Capacity and EIR of Heating DX Coils may use Biquadratic, Cubic and Quadratic curves. The selection of either of these curves is dependent on availability of performance data. The Capacity and EIR as a function of flow fraction allows either Cubic or Quadratic curve type. The curve types allowed are:
+This auxiliary tool generates HVAC performance curves in EnergyPlus curve object format.  For each set of performance data entered, Capacity and EIR performance curves are generated, and these curves are generated either as a function of temperature(s) or flow fraction.  The Capacity and EIR of Cooling DX Coils as a function of temperatures require only Biquadratic curve whereas Capacity and EIR of Heating DX Coils may use Biquadratic, Cubic and Quadratic curves. The selection of either of these curves is dependent on availability of performance data. The Capacity and EIR as a function of flow fraction allows either Cubic or Quadratic curve type. The curve types allowed are:
 
 Biquadratic: ![](AuxiliaryPrograms/media/image031.png)
 
@@ -11325,7 +10538,7 @@ Cubic: ![](AuxiliaryPrograms/media/image032.png)
 
 Quadratic: ![](AuxiliaryPrograms/media/image033.png)
 
-These performance curves as a function of temperatures are generated for a given set of input data at a given speed. The curves as a function of flow fraction are generated at the rated temperature conditions.  The rated test condition is the AHRI standard test condition (AHRI 2003;2007; 2008).  The AHRI standard test condition may vary by the equipment type.   For multiple speeds or multiple stage DX Coils, different curve sets can be generated by entering a different set of data for each speed or stage at a time.  The tool automatically populates the labels for each data inputs variable when users select the Coil Type, Independent Variables, Curve Type, and Units. The curve fit tool interface in Figure 1 shows labels selected to generate capacity and EIR biquadratic curves as function of temperatures for DX cooling coil.
+These performance curves as a function of temperatures are generated for a given set of input data at a given speed. The curves as a function of flow fraction are generated at the rated temperature conditions.  The rated test condition is the AHRI standard test condition (AHRI 2003;2007; 2008).  The AHRI standard test condition may vary by the equipment type.   For multiple speeds or multiple stage DX Coils, different curve sets can be generated by entering a different set of data for each speed or stage at a time.  The tool automatically populates the labels for each data inputs variable when users select the Coil Type, Independent Variables, Curve Type, and Units. The curve fit tool interface in Figure 1 shows labels selected to generate capacity and EIR biquadratic curves as function of temperatures for DX cooling coil.
 
 ![](AuxiliaryPrograms/media/image034.jpg)
 
@@ -11336,7 +10549,7 @@ The tool can be used for Coil:Cooing:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed
 Inputs
 ------
 
-First step in curve generation is to select appropriate parameters from the dropdown menu.  These inputs define the DX Coil Type, Curve Type, Independent Variable and the Units type. The choices available for each input parameters are described in table-1. Once these input parameters are selected the tool read in the values and automatically populates labels for each of the independent and dependent variables. The labels guide users to enter the data for each variable in the corresponding worksheet input range.   Two sets of input data are required for curve generation: Rated, and Performance Data.
+First step in curve generation is to select appropriate parameters from the dropdown menu.  These inputs define the DX Coil Type, Curve Type, Independent Variable and the Units type. The choices available for each input parameters are described in table-1. Once these input parameters are selected the tool read in the values and automatically populates labels for each of the independent and dependent variables. The labels guide users to enter the data for each variable in the corresponding worksheet input range.   Two sets of input data are required for curve generation: Rated, and Performance Data.
 
 Table-1 Input parameters description
 
@@ -11369,7 +10582,7 @@ SI: Temperature in °C, Capacity in kW, Power in kW, and Flow in m<sup>3</sup>/s
 </tr>
 <tr>
 <td>Curve Object Name</td>
-<td>This input is optional.  This string is appended to the default curve object name, or if left blank the default curve object name will be displayed. A curve object is named is created by concatenation as follows:
+<td>This input is optional.  This string is appended to the default curve object name, or if left blank the default curve object name will be displayed. A curve object is named is created by concatenation as follows:
 <img src="AuxiliaryPrograms/media/image035.png" /></td>
 </tr>
 </table>
@@ -11377,107 +10590,107 @@ SI: Temperature in °C, Capacity in kW, Power in kW, and Flow in m<sup>3</sup>/s
 Rated Data
 ----------
 
-The rated data is used to normalize the performance data set. The rated test conditions depend on the equipment type.  For DX cooling coil the rated test temperatures are 67°F (19.4°C) indoor coil entering wet bulb, 80°F (26.7°C) indoor coil entering dry bulb and 95°F (35.0°C) outdoor coil entering dry bulb air temperatures per ANSI/AHRI Std. 210/240 (AHRI 2008).  If the rated test temperatures are different from the values populated by the tool, then the user may enter the applicable values manually.  The rated data can be one of the performance data points depending on the speed or stage. The rated data set is entered in the Cells range "B11:E11" of the INPUT tab as shown in Figure 1.
+The rated data is used to normalize the performance data set. The rated test conditions depend on the equipment type.  For DX cooling coil the rated test temperatures are 67°F (19.4°C) indoor coil entering wet bulb, 80°F (26.7°C) indoor coil entering dry bulb and 95°F (35.0°C) outdoor coil entering dry bulb air temperatures per ANSI/AHRI Std. 210/240 (AHRI 2008).  If the rated test temperatures are different from the values populated by the tool, then the user may enter the applicable values manually.  The rated data can be one of the performance data points depending on the speed or stage. The rated data set is entered in the Cells range "B11:E11" of the INPUT tab as shown in Figure 1.
 
 Performance Data
 ----------------
 
-The performance data set entered depends on the type of independent variables selected.  To generate performance curves (e.g. DX Coils) as a function of temperatures require the capacity and power data at various combinations of indoor and outdoor coil entering air temperatures at a rated supply air flow rate. And performance curves (e.g. DX Coil) as function of flow fraction require  capacity and power data at various supply air flow rates and rated indoor and outdoor coil entering air (or water) temperatures. The performance data set may include the rated data as one of the data points. The performance data set is entered starting from row 15 and down for each of the variables as shown in Figure 33.
+The performance data set entered depends on the type of independent variables selected.  To generate performance curves (e.g. DX Coils) as a function of temperatures require the capacity and power data at various combinations of indoor and outdoor coil entering air temperatures at a rated supply air flow rate. And performance curves (e.g. DX Coil) as function of flow fraction require  capacity and power data at various supply air flow rates and rated indoor and outdoor coil entering air (or water) temperatures. The performance data set may include the rated data as one of the data points. The performance data set is entered starting from row 15 and down for each of the variables as shown in Figure 33.
 
-The total cooling and heating capacities must be the gross values, i.e., not corrected for the supply fan heating effect.  Also the input power has to exclude the supply air fan power, but includes other miscellaneous power inputs (e.g. control panel power).   If manufacturers provide the total power, then the supply fan power must be deducted from the former.  If the capacity and power data are normalized values, then enter 1.0 for rated gross capacity and power in the ***Rated Data*** input Cells range (B11:E11 in the INPUT tab). Two samples of performance and rated data set are included in the "**INSTRUCTION**" tab.
+The total cooling and heating capacities must be the gross values, i.e., not corrected for the supply fan heating effect.  Also the input power has to exclude the supply air fan power, but includes other miscellaneous power inputs (e.g. control panel power).   If manufacturers provide the total power, then the supply fan power must be deducted from the former.  If the capacity and power data are normalized values, then enter 1.0 for rated gross capacity and power in the ***Rated Data*** input Cells range (B11:E11 in the INPUT tab). Two samples of performance and rated data set are included in the "**INSTRUCTION**" tab.
 
 Outputs
 -------
 
-The generated curves are post-processed to make sure that the curve value is 1.0 at the rated condition.  The post processing is applied only if the curve value at the rated condition deviates by a value less than or equal to 0.025 and the performance data set contains the rated data set as one the data points. The coefficients of these curves are displayed on the "OUTPUT" tab as shown in Figure 2.
+The generated curves are post-processed to make sure that the curve value is 1.0 at the rated condition.  The post processing is applied only if the curve value at the rated condition deviates by a value less than or equal to 0.025 and the performance data set contains the rated data set as one the data points. The coefficients of these curves are displayed on the "OUTPUT" tab as shown in Figure 2.
 
 ![](AuxiliaryPrograms/media/image036.jpg)
 
 Figure 34. Curve Fit Tool Output Interface
 
-Besides the curve coefficients, the goodness of curve fit indicator statistical parameters *R<sup>2</sup>* is also reported.  The *R<sup>2</sup>* is the ratio of the sum of the squared deviations of the curve fit values from the mean to the sum of the squared deviations of the original data from the mean.  R squared values closer to 1.0 are good.  The tool has an option to save the curve objects to an output file by running another macro (SaveCurveObjToTextFile).  The option output files and the directory path are specified in the OUPUT tab in cells C2 and C3, respectively, as shown in Figure 34. If the output file name and path are left blank, then default names, "EplusCurveObjects.IDF" and the local directory where the tool is located are used.  The local directory where the tool is located must not have write restriction.
+Besides the curve coefficients, the goodness of curve fit indicator statistical parameters *R<sup>2</sup>* is also reported.  The *R<sup>2</sup>* is the ratio of the sum of the squared deviations of the curve fit values from the mean to the sum of the squared deviations of the original data from the mean.  R squared values closer to 1.0 are good.  The tool has an option to save the curve objects to an output file by running another macro (SaveCurveObjToTextFile).  The option output files and the directory path are specified in the OUPUT tab in cells C2 and C3, respectively, as shown in Figure 34. If the output file name and path are left blank, then default names, "EplusCurveObjects.IDF" and the local directory where the tool is located are used.  The local directory where the tool is located must not have write restriction.
 
 Sample EnergyPlus curve objects output file generated using this auxiliary tool.
 
- Curve:Biquadratic,
+ Curve:Biquadratic,
 
-  HeatPumpCoolingCAPFTemp,      !- Name
+  HeatPumpCoolingCAPFTemp,      !- Name
 
-   1.4248528695,                !- Coefficient1 Constant
+   1.4248528695,                !- Coefficient1 Constant
 
-  -0.0554469607,                !- Coefficient2 x
+  -0.0554469607,                !- Coefficient2 x
 
-   0.0027506982,                !- Coefficient3 x\*\*2
+   0.0027506982,                !- Coefficient3 x\*\*2
 
-  -0.0017453896,                !- Coefficient4 y
+  -0.0017453896,                !- Coefficient4 y
 
-  -0.0000081,                   !- Coefficient5 y\*\*2
+  -0.0000081,                   !- Coefficient5 y\*\*2
 
-  -0.0004638975,                !- Coefficient6 x\*y
+  -0.0004638975,                !- Coefficient6 x\*y
 
-  13.8888888889,                !- Minimum Value of x
+  13.8888888889,                !- Minimum Value of x
 
-  22.2222222222,                !- Maximum Value of x
+  22.2222222222,                !- Maximum Value of x
 
-  29.4444444444,                !- Minimum Value of y
+  29.4444444444,                !- Minimum Value of y
 
-  46.1111111111,                !- Maximum Value of y
+  46.1111111111,                !- Maximum Value of y
 
-  0.7875,                       !- Minimum Curve Output
+  0.7875,                       !- Minimum Curve Output
 
-  1.1725,                       !- Maximum Curve Output
+  1.1725,                       !- Maximum Curve Output
 
-  Temperature,                  !- Input Unit Type for X
+  Temperature,                  !- Input Unit Type for X
 
-  Temperature,                  !- Input Unit Type for Y
+  Temperature,                  !- Input Unit Type for Y
 
-  Dimensionless;                !- Output Unit Type
+  Dimensionless;                !- Output Unit Type
 
 
 
- Curve:Biquadratic,
+ Curve:Biquadratic,
 
-  HeatPump1CoolingEIRFTemp,     !- Name
+  HeatPump1CoolingEIRFTemp,     !- Name
 
-  0.1566419771,                 !- Coefficient1 Constant
+  0.1566419771,                 !- Coefficient1 Constant
 
-  0.0522807347,                 !- Coefficient2 x
+  0.0522807347,                 !- Coefficient2 x
 
-  -0.0017986792,                !- Coefficient3 x\*\*2
+  -0.0017986792,                !- Coefficient3 x\*\*2
 
-  0.009523995,                  !- Coefficient4 y
+  0.009523995,                  !- Coefficient4 y
 
-  0.0002405903,                 !- Coefficient5 y\*\*2
+  0.0002405903,                 !- Coefficient5 y\*\*2
 
-  -0.0001781171,                !- Coefficient6 x\*y
+  -0.0001781171,                !- Coefficient6 x\*y
 
-  13.8888888889,                !- Minimum Value of x
+  13.8888888889,                !- Minimum Value of x
 
-  22.2222222222,                !- Maximum Value of x
+  22.2222222222,                !- Maximum Value of x
 
-  29.4444444444,                !- Minimum Value of y
+  29.4444444444,                !- Minimum Value of y
 
-  46.1111111111,                !- Maximum Value of y
+  46.1111111111,                !- Maximum Value of y
 
-  0.8216,                       !- Minimum Curve Output
+  0.8216,                       !- Minimum Curve Output
 
-  1.3703,                       !- Maximum Curve Output
+  1.3703,                       !- Maximum Curve Output
 
-  Temperature,                  !- Input Unit Type for X
+  Temperature,                  !- Input Unit Type for X
 
-  Temperature,                  !- Input Unit Type for Y
+  Temperature,                  !- Input Unit Type for Y
 
-  Dimensionless;                !- Output Unit Type
+  Dimensionless;                !- Output Unit Type
 
 Error Message
 -------------
 
-Reports progress of the curve object generation calculation starting from reading input data to error massage output file "errorCurveObjects.txt".  This error message file provides information whether the tool run successfully or not.  Also points to the step where problem occurred.
+Reports progress of the curve object generation calculation starting from reading input data to error massage output file "errorCurveObjects.txt".  This error message file provides information whether the tool run successfully or not.  Also points to the step where problem occurred.
 
 Notes
 -----
 
-This tool has been tested on Ubuntu 11 using Libre Office and MS Office Macintosh 2011 machines.  But the button for running the macro may not be imported properly on Ubuntu hence users may have to run the tool manually by selecting "**ManageCurveFit**" and "**SaveCurveObjToTextFile**" subroutine from the macro list.
+This tool has been tested on Ubuntu 11 using Libre Office and MS Office Macintosh 2011 machines.  But the button for running the macro may not be imported properly on Ubuntu hence users may have to run the tool manually by selecting "**ManageCurveFit**" and "**SaveCurveObjToTextFile**" subroutine from the macro list.
 
 References
 ----------
@@ -11493,16 +10706,16 @@ AHRI 2003. ANSI/AHRI Standard 550/590: 2003 Standard for Performance Rating Of W
 Parametric Spreadsheets
 =======================
 
-Several spreadsheet applications are included in the Preprocess\\ParametricSpreadsheets folder.  These include spreadsheets (Excel™) for the Water Source heat pumps and Water to Air heat pumps.
+Several spreadsheet applications are included in the Preprocess\\ParametricSpreadsheets folder.  These include spreadsheets (Excel™) for the Water Source heat pumps and Water to Air heat pumps.
 
 Water-to-Water Heat Pump Parameter / Coefficient Generator (Cooling and Heating Mode)
 -------------------------------------------------------------------------------------
 
 This document gives brief instructions on generating the parameters/ coefficients for the water-to-water heat pump models in cooling and heating mode. The Excel™ spreadsheets (WaterWater\_PE\_Cooling.xls and WaterWater\_PE\_Heating.xls) are used. Since the spreadsheet functions are very similar for both cooling and heating modes, only one instruction document is supplied. The spreadsheet generates:
 
-- parameters for the parameter estimation based model.
+- parameters for the parameter estimation based model.
 
-- coefficients for the curve-fit model.
+- coefficients for the curve-fit model.
 
 The following theses have detailed information about the curve-fit model and parameter estimation based model:
 
@@ -11516,9 +10729,9 @@ Tang,C.C. 2004. Modeling Packaged Heat Pumps in a Quasi-Steady State Energy Simu
 
 Data points are obtained from the heat pump manufacturer data. Minimum data points for the parameter estimation based model are 32 data points according to Jin (2002). The curve-fit model performance is not affected by the number of data points and a minimum of 5 data points is required since the governing equations require 6 coefficients. The data points must have varying inlet conditions (e.g. water flow rates, inlet water temperatures, etc.) that covers the entire range of the heat pump operating conditions. Correction tables provided by the manufacturer should be used to extend the catalog data range in order to have a good set of parameters/coefficients.
 
-- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
+- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
 
-- Click on Button 1 based on the units used.
+- Click on Button 1 based on the units used.
 
 For IP units:
 
@@ -11528,71 +10741,71 @@ For SI units:
 
 ![](AuxiliaryPrograms/media/image038.png)
 
-- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT".
+- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT".
 
-- The button shown below is used clearing Table 1 (worksheet "CATALOG DATA"), and Table 2 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
+- The button shown below is used clearing Table 1 (worksheet "CATALOG DATA"), and Table 2 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
 
 ![](AuxiliaryPrograms/media/image039.png)
 
 After Table 2 is created, the parameters/coefficients are then calculated as follows:
 
-- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
+- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
 
-- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
+- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
 
 ### Parameter Estimation Procedure
 
 #### Step 2a: Generating First Set of Parameters (PE-Based Model)
 
-- Using Table 2, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
+- Using Table 2, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
 
-- **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
+- **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
 
-- **Compressor Type:** Only reciprocating compressor is currently available in EnergyPlus. One might be able to generate parameters for heat pump model with different compressor types but this might result in unrealistic parameters.
+- **Compressor Type:** Only reciprocating compressor is currently available in EnergyPlus. One might be able to generate parameters for heat pump model with different compressor types but this might result in unrealistic parameters.
 
-- **Refrigerant:** Contact the manufacturer on the refrigerant used to generate the catalog data and select from the list of refrigerants. Usually the refrigerant used is R22. .
+- **Refrigerant:** Contact the manufacturer on the refrigerant used to generate the catalog data and select from the list of refrigerants. Usually the refrigerant used is R22. .
 
-- **Which Initial Guess?:**  The user may choose a set of initial guesses(1-5) that will be used by the optimization routine in generating the parameters. Start with 1, which is the set of initial guess 1 at column B.
+- **Which Initial Guess?:**  The user may choose a set of initial guesses(1-5) that will be used by the optimization routine in generating the parameters. Start with 1, which is the set of initial guess 1 at column B.
 
-- **Initial Guess:** Initial guess for all the parameters. For Initial Guess 1, enter a value of 1 for all the parameters except for the loss factor (less than 1.0). The loss factor should be less than 1.0 because the efficiency of the compressor should be less than 100%. Adjust the values in Initial Guess 1 if the program happens to crash and try again.
+- **Initial Guess:** Initial guess for all the parameters. For Initial Guess 1, enter a value of 1 for all the parameters except for the loss factor (less than 1.0). The loss factor should be less than 1.0 because the efficiency of the compressor should be less than 100%. Adjust the values in Initial Guess 1 if the program happens to crash and try again.
 
--  Now click on Button 2 shown below to generate the parameters.
+-  Now click on Button 2 shown below to generate the parameters.
 
 ![](AuxiliaryPrograms/media/image040.png)
 
 It will take some time to generate the parameters depending on the number of data points. The parameters generated will be displayed at Parameters 1.
 
-- Look at the error analysis of Error 1 which gives the user a summary of the errors for Qload, Qsource and Power. An average error of 5-8% is achievable for all the values.
+- Look at the error analysis of Error 1 which gives the user a summary of the errors for Qload, Qsource and Power. An average error of 5-8% is achievable for all the values.
 
-- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
 #### Step 2b: Improving the Set of Parameters (PE-Based Model)
 
-- After the initial set of parameters has been generated, the user can increase the accuracy of the parameters by using parameters generated as the initial guess for the second simulation and increasing the accuracy of the program.
+- After the initial set of parameters has been generated, the user can increase the accuracy of the parameters by using parameters generated as the initial guess for the second simulation and increasing the accuracy of the program.
 
-- Copy and Paste Parameters 1 to Initial Guess 2.
+- Copy and Paste Parameters 1 to Initial Guess 2.
 
-- Change the initial guess indicator (**Which Initial Guess?:)** from 1 to 2.
+- Change the initial guess indicator (**Which Initial Guess?:)** from 1 to 2.
 
-- Increase the accuracy by twice. For example, set accuracy to 0.000001.
+- Increase the accuracy by twice. For example, set accuracy to 0.000001.
 
-- Now click on Button 2 shown below to generate the second set of parameters.
+- Now click on Button 2 shown below to generate the second set of parameters.
 
 ![](AuxiliaryPrograms/media/image041.png)
 
 The simulation time would most likely be less but it depends on the accuracy value as well. And the parameters generated will be displayed at Parameter 2.
 
-- Compare Error 2 to Error 1, the error values should be less which means that the parameters are getting better and more accurate.
+- Compare Error 2 to Error 1, the error values should be less which means that the parameters are getting better and more accurate.
 
-- Repeat the steps in 2a and 2b until a desired set of error values is achieved or the errors stop decreasing
+- Repeat the steps in 2a and 2b until a desired set of error values is achieved or the errors stop decreasing
 
 #### Step 3: Generating EnergyPlus Input Parameters
 
-- Click on the Button 3 shown below to convert and arrange the parameters generated to fit EnergyPlus Input File (IDF) which will be listed from cell B52:B59 for cooling mode and B46:B54 for heating mode.
+- Click on the Button 3 shown below to convert and arrange the parameters generated to fit EnergyPlus Input File (IDF) which will be listed from cell B52:B59 for cooling mode and B46:B54 for heating mode.
 
 ![](AuxiliaryPrograms/media/image042.png)
 
-- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
+- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image043.png)
 
@@ -11602,25 +10815,25 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 #### Step 2: Generating the coefficients (Curve-Fit Model)
 
-- Using Table 2, the program is ready to generate the coefficients. User is required to fill all the cells colored light blue in worksheet "CoeffCalculator".
+- Using Table 2, the program is ready to generate the coefficients. User is required to fill all the cells colored light blue in worksheet "CoeffCalculator".
 
-- **RatedLoadVolFlowRate:** Rated load side volumetric flow rate (m<sup>3</sup>/s) which corresponds to the highest load side heat transfer rate listed in the catalog data.
+- **RatedLoadVolFlowRate:** Rated load side volumetric flow rate (m<sup>3</sup>/s) which corresponds to the highest load side heat transfer rate listed in the catalog data.
 
-- **RatedSourceVolFlowRate:** Rated source side volumetric flow rate (m<sup>3</sup>/s) which corresponds to the highest load side heat transfer rate listed in the catalog data.
+- **RatedSourceVolFlowRate:** Rated source side volumetric flow rate (m<sup>3</sup>/s) which corresponds to the highest load side heat transfer rate listed in the catalog data.
 
-- **RatedQload:** Rated load side heat transfer rate (W) which is the highest load side heat transfer rate listed in the catalog data.
+- **RatedQload:** Rated load side heat transfer rate (W) which is the highest load side heat transfer rate listed in the catalog data.
 
-- **RatedPower:** Rated power consumption (W) which corresponds to the highest load side heat transfer rate listed in the catalog data.
+- **RatedPower:** Rated power consumption (W) which corresponds to the highest load side heat transfer rate listed in the catalog data.
 
-- Now click on Button 2 shown below to calculate the coefficients.
+- Now click on Button 2 shown below to calculate the coefficients.
 
 ![](AuxiliaryPrograms/media/image044.png)
 
-- The coefficients for the corresponding curves are listed at cell B12:C16. Error analysis of model is listed at cell B19:B27.
+- The coefficients for the corresponding curves are listed at cell B12:C16. Error analysis of model is listed at cell B19:B27.
 
-- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
-- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
+- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image045.png)
 
@@ -11631,9 +10844,9 @@ Water-to-Air Heat Pump Parameter / Coefficient Generator (Cooling)
 
 This document gives brief instructions on generating the parameters or coefficients for the water-to-air heat pump models in cooling mode. The Excel™ spreadsheets (WaterAir\_PE\_Cooling.xls) are used. The spreadsheet generates:
 
-- parameters for the parameter estimation based model.
+- parameters for the parameter estimation based model.
 
-- coefficients for the curve-fit model.
+- coefficients for the curve-fit model.
 
 The following theses have detailed information about the curve-fit model and parameter estimation based model:
 
@@ -11647,9 +10860,9 @@ Tang,C.C. 2004. Modeling Packaged Heat Pumps in a Quasi-Steady State Energy Simu
 
 Data points are obtained from the heat pump manufacturer data. Minimum data points for the parameter estimation based model are 32 data points according to Jin (2002). The curve-fit model performance is not affected by the number of data points and a minimum of 6 data points is required since the sensible cooling capacity requires 6 coefficients. The data points must have varying inlet conditions (e.g. air flow rates, inlet water temperatures, and etc.) that covers the entire range of the heat pump operating conditions. Correction tables provided by the manufacturer should be used to extend the catalog data range in order to have a good set of parameters/coefficients.
 
-- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
+- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
 
-- Click on Button 1 based on the units used.
+- Click on Button 1 based on the units used.
 
 For IP units:
 
@@ -11659,71 +10872,71 @@ For SI units:
 
 ![](AuxiliaryPrograms/media/image047.png)
 
-- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT".  Then the program will discard bad catalog points by calculating the relative humidity of the exiting air at the load side (relative humidity should be less or equal to 1). Table 3 in worksheet "INPUT" shows the input catalog data that will be used by the parameter/coefficient generator program.
+- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT".  Then the program will discard bad catalog points by calculating the relative humidity of the exiting air at the load side (relative humidity should be less or equal to 1). Table 3 in worksheet "INPUT" shows the input catalog data that will be used by the parameter/coefficient generator program.
 
-- The button shown below is used clearing Table 1 (worksheet "CATALOG DATA"), Table 2, and Table 3 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
+- The button shown below is used clearing Table 1 (worksheet "CATALOG DATA"), Table 2, and Table 3 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
 
 ![](AuxiliaryPrograms/media/image048.png)
 
 After Table 3 is created, the parameters/coefficients are then calculated as follows:
 
-- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
+- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
 
-- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
+- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
 
 ### Parameter Estimation Procedure
 
 #### Step 2a: Generating First Set of Parameters (PE-Based Model)
 
-- Using contents of Table 3, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
+- Using contents of Table 3, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
 
-- **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
+- **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
 
-- **Compressor Type:** User is allowed to select from 3 types of compressors: scroll, rotary or reciprocating. Contact the manufacturer to make sure that the compressor selected is correct. Wrong type of compressor selected would lead to the program crashing or inaccurate parameters.
+- **Compressor Type:** User is allowed to select from 3 types of compressors: scroll, rotary or reciprocating. Contact the manufacturer to make sure that the compressor selected is correct. Wrong type of compressor selected would lead to the program crashing or inaccurate parameters.
 
-- **Refrigerant:** Contact the manufacturer on the refrigerant used to generate the catalog data and select from the list of refrigerants. Usually the refrigerant used is R22. .
+- **Refrigerant:** Contact the manufacturer on the refrigerant used to generate the catalog data and select from the list of refrigerants. Usually the refrigerant used is R22. .
 
-- **Which Initial Guess?:**  The user may choose a set of initial guesses(1-5) that will be used by the optimization routine in generating the parameters. Start with 1, which is the set of initial guesses 1 at column B.
+- **Which Initial Guess?:**  The user may choose a set of initial guesses(1-5) that will be used by the optimization routine in generating the parameters. Start with 1, which is the set of initial guesses 1 at column B.
 
-- **Initial Guess:** Initial guess for all the parameters. For Initial Guess 1, enter a value of 1 for all the parameters except for the loss factor (less than 1.0). The loss factor should be less than 1.0 because the efficiency of the compressor should be less than 100%. Adjust the values in Initial Guess 1 if the program happens to crash and try again.
+- **Initial Guess:** Initial guess for all the parameters. For Initial Guess 1, enter a value of 1 for all the parameters except for the loss factor (less than 1.0). The loss factor should be less than 1.0 because the efficiency of the compressor should be less than 100%. Adjust the values in Initial Guess 1 if the program happens to crash and try again.
 
--  Now click on Button 2 shown below to generate the parameters.
+-  Now click on Button 2 shown below to generate the parameters.
 
 ![](AuxiliaryPrograms/media/image049.png)
 
 It will take some time to generate the parameters depending on the number of data points. The parameters generated will be displayed at Parameters 1.
 
-- Look at the error analysis of Error 1, which gives the user a summary of the errors for Qtotal, Qsensible, Qsource and Power. An average error of 5-8% is achievable for all the values.
+- Look at the error analysis of Error 1, which gives the user a summary of the errors for Qtotal, Qsensible, Qsource and Power. An average error of 5-8% is achievable for all the values.
 
-- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
 #### Step 2b: Improving the Set of Parameters (PE-Based Model)
 
-- After the initial set of parameters has been generated, the user can increase the accuracy of the parameters by using parameters generated as the initial guess for the second simulation and increasing the accuracy of the program.
+- After the initial set of parameters has been generated, the user can increase the accuracy of the parameters by using parameters generated as the initial guess for the second simulation and increasing the accuracy of the program.
 
-- Copy and Paste Parameters 1 to Initial Guess 2.
+- Copy and Paste Parameters 1 to Initial Guess 2.
 
-- Change the initial guess indicator **(Which Initial Guess?)** from 1 to 2.
+- Change the initial guess indicator **(Which Initial Guess?)** from 1 to 2.
 
-- Increase the accuracy by twice. For example, set accuracy to 0.000001.
+- Increase the accuracy by twice. For example, set accuracy to 0.000001.
 
-- Now click on Button 2 shown below to generate the second set of parameters.
+- Now click on Button 2 shown below to generate the second set of parameters.
 
 ![](AuxiliaryPrograms/media/image041.png)
 
 The simulation time would most likely be less but it depends on the accuracy value as well. The parameters generated will be displayed at Parameter 2.
 
-- Compare Error 2 to Error 1, the error values should be less which means that the parameters are getting better and more accurate.
+- Compare Error 2 to Error 1, the error values should be less which means that the parameters are getting better and more accurate.
 
-- Repeat the steps in 2a and 2b until a desired set of error values is achieved or the errors stop decreasing
+- Repeat the steps in 2a and 2b until a desired set of error values is achieved or the errors stop decreasing
 
 #### Step 3: Generating EnergyPlus Input Parameters
 
-- Click on the Button 3 shown below to convert and arrange the parameters generated to fit EnergyPlus Input File (IDF), which will be listed from cell B52:B61.
+- Click on the Button 3 shown below to convert and arrange the parameters generated to fit EnergyPlus Input File (IDF), which will be listed from cell B52:B61.
 
 ![](AuxiliaryPrograms/media/image050.png)
 
-- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
+- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image051.png)
 
@@ -11733,27 +10946,27 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 #### Step 2: Generating the coefficients (Curve-Fit Model)
 
-- Using the contents of Table 3, the program can generate the coefficients. The user must fill all the cells colored light blue in worksheet "CoeffCalculator".
+- Using the contents of Table 3, the program can generate the coefficients. The user must fill all the cells colored light blue in worksheet "CoeffCalculator".
 
-- **RatedAirVolFlowRate:** Rated volumetric air flow rate (m<sup>3</sup>/s) which corresponds to the highest total cooling capacity listed in the catalog data.
+- **RatedAirVolFlowRate:** Rated volumetric air flow rate (m<sup>3</sup>/s) which corresponds to the highest total cooling capacity listed in the catalog data.
 
-- **RatedWaterVolFlowRate:** Rated volumetric water flow rate (m<sup>3</sup>/s) which corresponds to the highest total cooling capacity listed in the catalog data.
+- **RatedWaterVolFlowRate:** Rated volumetric water flow rate (m<sup>3</sup>/s) which corresponds to the highest total cooling capacity listed in the catalog data.
 
-- **RatedTotalCap:** Rated total cooling capacity (W) which is the highest total cooling capacity listed in the catalog data.
+- **RatedTotalCap:** Rated total cooling capacity (W) which is the highest total cooling capacity listed in the catalog data.
 
-- **RatedSensCap:** Rated sensible cooling capacity (W) which corresponds to the highest total cooling capacity listed in the catalog data.
+- **RatedSensCap:** Rated sensible cooling capacity (W) which corresponds to the highest total cooling capacity listed in the catalog data.
 
-- **RatedPower:** Rated power consumption (W) which corresponds to the highest total cooling capacity listed in the catalog data.
+- **RatedPower:** Rated power consumption (W) which corresponds to the highest total cooling capacity listed in the catalog data.
 
-- Now click on Button 2 shown below to calculate the coefficients.
+- Now click on Button 2 shown below to calculate the coefficients.
 
 ![](AuxiliaryPrograms/media/image052.png)
 
-- The coefficients for the corresponding curves are listed at cell B12:D17. Error analysis of model are listed at cell B19:B30.
+- The coefficients for the corresponding curves are listed at cell B12:D17. Error analysis of model are listed at cell B19:B30.
 
-- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
-- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
+- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image053.png)
 
@@ -11764,9 +10977,9 @@ Water-to-Air Heat Pump Parameter / Coefficient Generator (Heating Mode)
 
 This document gives brief instructions on generating the parameters/ coefficients for the water-to-air heat pump models in heating mode. The Excel™ spreadsheets (WaterAir\_PE\_Heating.xls) are used. The spreadsheet generates:
 
-- parameters for the parameter estimation based model.
+- parameters for the parameter estimation based model.
 
-- coefficients for the curve-fit model.
+- coefficients for the curve-fit model.
 
 The following theses have detailed information about the curve-fit model and parameter estimation based model:
 
@@ -11780,9 +10993,9 @@ Tang,C.C. 2004. Modeling Packaged Heat Pumps in a Quasi-Steady State Energy Simu
 
 Data points are obtained from the heat pump manufacturer data. Minimum data points for the parameter estimation based model are 32 data points according to Jin (2002). The curve-fit model performance is not affected by the number of data points and a minimum of 5 data points is required since the governing equations require 5 coefficients. The data points must have varying inlet conditions (e.g. air flow rates, inlet water temperatures, and etc.) that covers the entire range of the heat pump operating conditions. Correction tables provided by the manufacturer should be used to extend the catalog data range in order to have a good set of parameters/coefficients.
 
-- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
+- Using the heat pump performance data, enter the values to Table 1 in worksheet "CATALOG DATA". The values can be in SI or IP units.
 
-- Click on Button 1 based on the units used.
+- Click on Button 1 based on the units used.
 
 For IP units:
 
@@ -11792,73 +11005,73 @@ For SI units:
 
 ![](AuxiliaryPrograms/media/image055.png)
 
-- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT" which will be used by the parameter/coefficient generator program.
+- The program will convert the values to the desired units and display them on Table 2 in worksheet "INPUT" which will be used by the parameter/coefficient generator program.
 
-- The button shown below is used for clearing Table 1 (worksheet "CATALOG DATA") and Table 2 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
+- The button shown below is used for clearing Table 1 (worksheet "CATALOG DATA") and Table 2 (worksheet "INPUT"). It is advisable to clear the tables before generating parameters/coefficients for a new heat pump model.
 
 ![](AuxiliaryPrograms/media/image056.png)
 
 After Table 2 is created, the parameters/coefficients are then calculated as follows:
 
-- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
+- Worksheet "ParamEstimator" is used for generating the parameters for the parameter estimation based model using Nelder Mead Simplex. Refer to the steps in the Parameter Estimation Procedure.
 
-- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
+- Worksheet "CoeffCalculator" is used for calculate the coefficients for the curve-fit model using the generalized least square method. Refer to the steps in the Curve Fit Model procedure.
 
 ### Parameter Estimation Procedure
 
 #### Step 2a: Generating First Set of Parameters (PE-Based Model)
 
-- Using Table 2, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
+- Using Table 2, the program can generate parameters. The user must fill all the cells colored light blue in worksheet "ParamEstimator".
 
-- **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
+- **Accuracy:** Start with a low accuracy for faster convergence, recommended value of 0.001.
 
-- **Compressor Type:** User is allowed to select from 3 types of compressors: scroll, rotary or reciprocating. Contact the manufacturer to make sure that the compressor selected is correct. Wrong type of compressor selected would lead to the program crashing or inaccurate parameters.
+- **Compressor Type:** User is allowed to select from 3 types of compressors: scroll, rotary or reciprocating. Contact the manufacturer to make sure that the compressor selected is correct. Wrong type of compressor selected would lead to the program crashing or inaccurate parameters.
 
-- **Refrigerant:** Contact the manufacturer on the refrigerant used to generate the catalog data and select from the list of refrigerants. Usually the refrigerant used is R22. .
+- **Refrigerant:** Contact the manufacturer on the refrigerant used to generate the catalog data and select from the list of refrigerants. Usually the refrigerant used is R22. .
 
-- **Source Side Fluid:** Select the type of fluid used for the source side. 0: Water, 1: Antifreeze Mixture. Note that the number of parameters will change depending on the type of fluid. Antifreeze mixture requires one additional parameter.
+- **Source Side Fluid:** Select the type of fluid used for the source side. 0: Water, 1: Antifreeze Mixture. Note that the number of parameters will change depending on the type of fluid. Antifreeze mixture requires one additional parameter.
 
-- **Which Initial Guess?:**  The user may choose a set of initial guesses(1-5) that will be used by the optimization routine in generating the parameters. Start with 1, which is the set of initial guesses 1 at column B.
+- **Which Initial Guess?:**  The user may choose a set of initial guesses(1-5) that will be used by the optimization routine in generating the parameters. Start with 1, which is the set of initial guesses 1 at column B.
 
-- **Initial Guess:** Initial guess for all the parameters. For Initial Guess 1, enter a value of 1 for all the parameters except for the loss factor (less than 1.0). The loss factor should be less than 1.0 because the efficiency of the compressor should be less than 100%. Adjust the values in Initial Guess 1 if the program happens to crash and try again.
+- **Initial Guess:** Initial guess for all the parameters. For Initial Guess 1, enter a value of 1 for all the parameters except for the loss factor (less than 1.0). The loss factor should be less than 1.0 because the efficiency of the compressor should be less than 100%. Adjust the values in Initial Guess 1 if the program happens to crash and try again.
 
--  Now click on Button 2 shown below to generate the parameters.
+-  Now click on Button 2 shown below to generate the parameters.
 
 ![](AuxiliaryPrograms/media/image057.png)
 
 It will take some time to generate the parameters depending on the number of data points. The parameters generated will be displayed at Parameters 1.
 
-- Look at the error analysis of Error 1, which gives the user a summary of the errors for Heating Capacity, Heating Absorption and Power. An average error of 5-8% is achievable for all the values.
+- Look at the error analysis of Error 1, which gives the user a summary of the errors for Heating Capacity, Heating Absorption and Power. An average error of 5-8% is achievable for all the values.
 
-- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
 #### Step 2b: Improving the Set of Parameters (PE-Based Model)
 
-- After the initial set of parameters has been generated, the user can increase the accuracy of the parameters by using parameters generated as the initial guess for the second simulation and increasing the accuracy of the program.
+- After the initial set of parameters has been generated, the user can increase the accuracy of the parameters by using parameters generated as the initial guess for the second simulation and increasing the accuracy of the program.
 
-- Copy and Paste Parameters 1 to Initial Guess 2.
+- Copy and Paste Parameters 1 to Initial Guess 2.
 
-- Change the initial guess indicator **(Which Initial Guess?)** from 1 to 2.
+- Change the initial guess indicator **(Which Initial Guess?)** from 1 to 2.
 
-- Increase the accuracy by twice. For example, set accuracy to 0.000001.
+- Increase the accuracy by twice. For example, set accuracy to 0.000001.
 
-- Now click on Button 2 shown below to generate the second set of parameters.
+- Now click on Button 2 shown below to generate the second set of parameters.
 
 ![](AuxiliaryPrograms/media/image041.png)
 
 The simulation time would most likely be less but it depends on the accuracy value as well. And the parameters generated will be displayed at Parameter 2.
 
-- Compare Error 2 to Error 1, the error values should be less, which means that the parameters are getting better and more accurate.
+- Compare Error 2 to Error 1, the error values should be less, which means that the parameters are getting better and more accurate.
 
-- Repeat the steps in 2a and 2b until a desired set of error values is achieved or the errors stop decreasing
+- Repeat the steps in 2a and 2b until a desired set of error values is achieved or the errors stop decreasing
 
 #### Step 3: Generating EnergyPlus Input Parameters
 
-- Click on the Button 3 shown below to convert and arrange the parameters generated to fit EnergyPlus Input File (IDF), which will be listed from cell B46:B54.
+- Click on the Button 3 shown below to convert and arrange the parameters generated to fit EnergyPlus Input File (IDF), which will be listed from cell B46:B54.
 
 ![](AuxiliaryPrograms/media/image058.png)
 
-- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
+- The button shown below in worksheet "ParamEstimator" is used for clearing Initial Guess (2-5), Parameters(1-5), Error(1-5), EnergyPlus Input parameters and Result(1-5) in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image059.png)
 
@@ -11868,25 +11081,25 @@ The simulation time would most likely be less but it depends on the accuracy val
 
 #### Step 2: Generating the coefficients (Curve-Fit Model)
 
-- Using Table 2, the program can generate the coefficients. The user must fill all the cells colored light blue in Worksheet "CoeffCalculator".
+- Using Table 2, the program can generate the coefficients. The user must fill all the cells colored light blue in Worksheet "CoeffCalculator".
 
-- **RatedAirVolFlowRate:** Rated volumetric air flow rate (m<sup>3</sup>/s) which corresponds to the highest heating capacity listed in the catalog data.
+- **RatedAirVolFlowRate:** Rated volumetric air flow rate (m<sup>3</sup>/s) which corresponds to the highest heating capacity listed in the catalog data.
 
-- **RatedWaterVolFlowRate:** Rated volumetric water flow rate (m<sup>3</sup>/s) which corresponds to the highest heating capacity listed in the catalog data.
+- **RatedWaterVolFlowRate:** Rated volumetric water flow rate (m<sup>3</sup>/s) which corresponds to the highest heating capacity listed in the catalog data.
 
-- **RatedTotalCap:** Rated heating capacity (W) which is the highest heating capacity listed in the catalog data.
+- **RatedTotalCap:** Rated heating capacity (W) which is the highest heating capacity listed in the catalog data.
 
-- **RatedPower:** Rated power consumption (W) which corresponds to the highest heating capacity listed in the catalog data.
+- **RatedPower:** Rated power consumption (W) which corresponds to the highest heating capacity listed in the catalog data.
 
-- Now click on Button 2 shown below to calculate the coefficients.
+- Now click on Button 2 shown below to calculate the coefficients.
 
 ![](AuxiliaryPrograms/media/image060.png)
 
-- The coefficients for the corresponding curves are listed at cell B12:C16. Error analysis of model are listed at cell B19:B27.
+- The coefficients for the corresponding curves are listed at cell B12:C16. Error analysis of model are listed at cell B19:B27.
 
-- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
+- The errors for all the individual catalog data points are displayed in worksheet "RESULT".
 
-- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
+- The button shown below in worksheet "CoeffCalculator" is used for clearing the coefficients, the error analysis and the outputs in worksheet "RESULT".
 
 ![](AuxiliaryPrograms/media/image059.png)
 
@@ -11903,11 +11116,11 @@ The reference data set GLHERefData.idf contains sets of parameters for the Groun
 
 The sample data has been calculated for a number of configurations:
 
-- 1 x 2 boreholes
+- 1 x 2 boreholes
 
-- 4 x 4 boreholes
+- 4 x 4 boreholes
 
-- 8 x 8 boreholes
+- 8 x 8 boreholes
 
 Data is given for both 'standard' grout (k=0.744 W/m.K) and 'thermally enhanced' grout (k= 1.471 W/m.K). The flow rate per borehole is .1514 kg/s. The pipe given is 0.75in. Dia. SDR11 HDPE. The fluid is water. The borehole/length ratio is 0.06 (76.2m/4.572m [300ft/15ft])
 
@@ -11916,13 +11129,13 @@ ParametricPreprocessor
 
 The parametric preprocessor used to create a series of resulting IDF files from a single source IDF file that contains parametric objects and expressions. The parametric objects in EnergyPlus are interpreted by the ParametricPreprocessor and are:
 
-·        Parametric:SetValueForRun
+·        Parametric:SetValueForRun
 
-·        Parametric:Logic
+·        Parametric:Logic
 
-·        Parametric:RunControl
+·        Parametric:RunControl
 
-·        Parametric:FileNameSuffix
+·        Parametric:FileNameSuffix
 
 The ParametricPreprocessor reads the source IDF file and removes the Parametric objects shown above, processes these objects and any embedded expressions and produces a series of resulting IDF files, one for each "run" described by the objects.
 
@@ -11939,7 +11152,7 @@ The ParametricPreprocessor is used in the batch files that come with EnergyPlus 
 AppGPostProcess - Appendix G PostProcessing program
 ===================================================
 
-The baseline for Standard 90.1 Appendix G requires simulating the baseline building in four cardinal directions and comparing the average of those simulation results with the proposed building simulation results.  The AppGPostProcess utility helps perform the averaging needed. The utility takes the four HTML files generated by EnergyPlus and creates an average HTML file. In addition, the AppGPostProcess utility takes the four CSV files (based on ESO files) and creates an average CSV file as well as averaging the meter CSV files (based on the MTR files).  The source files must have specific names for this utility to work:
+The baseline for Standard 90.1 Appendix G requires simulating the baseline building in four cardinal directions and comparing the average of those simulation results with the proposed building simulation results.  The AppGPostProcess utility helps perform the averaging needed. The utility takes the four HTML files generated by EnergyPlus and creates an average HTML file. In addition, the AppGPostProcess utility takes the four CSV files (based on ESO files) and creates an average CSV file as well as averaging the meter CSV files (based on the MTR files).  The source files must have specific names for this utility to work:
 
 fileNameRoot-G000.csv
 
@@ -11979,14 +11192,14 @@ The numeric values in the output files are the average results from the four cor
 
 The intention is that the four baseline IDF files would be identical except for the use of the Compliance:Building object and only the value of the field "Building Rotation for Appendix G" would change.
 
-EP-Launch can be used to run both the AppGPostProcess program by using the Utilities tab in EP-Launch.  See the EP-Launch section in this document for more information on how to use EP-Launch.
+EP-Launch can be used to run both the AppGPostProcess program by using the Utilities tab in EP-Launch.  See the EP-Launch section in this document for more information on how to use EP-Launch.
 
 
 
 BLASTTranslator
 ===============
 
-The BLAST Translator will produce an IDF file from an existing BLAST Input File (usually called &lt;something&gt;.bin. For anyone that is unfamiliar, BLAST stands for the Building Loads Analysis and Systems Thermodynamics computer program.  Documentation is included here though the BLAST Translator is no longer included with the EnergyPlus Installation - it is available as a special download for those who need it.
+The BLAST Translator will produce an IDF file from an existing BLAST Input File (usually called &lt;something&gt;.bin. For anyone that is unfamiliar, BLAST stands for the Building Loads Analysis and Systems Thermodynamics computer program.  Documentation is included here though the BLAST Translator is no longer included with the EnergyPlus Installation - it is available as a special download for those who need it.
 
 A special batch file (**RunXLate.bat**) can be used to run the translation program. Similar to running EnergyPlus (see above), you run this batch file:
 
@@ -12021,27 +11234,27 @@ The DOE2Translator program creates an EnergyPlus input file from a DOE-2.1E inpu
 
 To use the DOE2Translator program, at the DOS prompt (or the command prompt for Windows NT/2000 systems), go to the directory that the DOE2Translator is located. That directory is likely to be:
 
-  c:\\EnergyPlus\\PreProcess\\DOE2Translator
+  c:\\EnergyPlus\\PreProcess\\DOE2Translator
 
 In this directory there should be several files:
 
-  DOE2Translator.exe   - the program
+  DOE2Translator.exe   - the program
 
-  D2E\_macr.txt         - a support file that contains the header of the translated file
+  D2E\_macr.txt         - a support file that contains the header of the translated file
 
-  D2comkey.dat         - a support file that contains a list of DOE-2 keywords
+  D2comkey.dat         - a support file that contains a list of DOE-2 keywords
 
-  Samp4n.inp         -  sample DOE-2.1E input file
+  Samp4n.inp         -  sample DOE-2.1E input file
 
-  Samp4n.imf         - the EnergyPlus macro input file resulting from the sample
+  Samp4n.imf         - the EnergyPlus macro input file resulting from the sample
 
 To use the DOE2Translator simply type
 
-  DOE2Translator  &lt;file&gt;
+  DOE2Translator  &lt;file&gt;
 
 Where you substitute the file you want to translate for &lt;file&gt; without a file extension. The ".inp" file extension is assumed. For example, if you want to translate one of the sample DOE-2.1E input files you would type:
 
-  DOE2Translator  samp1b
+  DOE2Translator  samp1b
 
 The &lt;file&gt; can also have a full path, but it should not have an extension. If you have spaces in your path name, enclose the whole thing in ".
 
@@ -12057,39 +11270,39 @@ Files that are included with the \#\#include are not translated automatically an
 
 In this version of the DOE2Translator program, translation is limited to the following DOE-2 commands, which represent the majority of the building envelope and internal gains:
 
-    SPACE (except SHAPE=BOX)
+    SPACE (except SHAPE=BOX)
 
-    SPACE-CONDITIONS
+    SPACE-CONDITIONS
 
-    DAY-SCHEDULE (except use of HOURS and VALUES keywords)
+    DAY-SCHEDULE (except use of HOURS and VALUES keywords)
 
-    WEEK-SCHEDULE (except use of DAYS and DAY-SCHEDULE keywords)
+    WEEK-SCHEDULE (except use of DAYS and DAY-SCHEDULE keywords)
 
-    SCHEDULE (except use of WEEK-SCHEDULE keyword)
+    SCHEDULE (except use of WEEK-SCHEDULE keyword)
 
-    MATERIAL
+    MATERIAL
 
-    LAYERS
+    LAYERS
 
-    CONSTRUCTION
+    CONSTRUCTION
 
-    EXTERIOR-WALL, ROOF (except polygon)
+    EXTERIOR-WALL, ROOF (except polygon)
 
-    INTERIOR-WALL
+    INTERIOR-WALL
 
-    FIXED-SHADE
+    FIXED-SHADE
 
-    WINDOW
+    WINDOW
 
-    DOOR
+    DOOR
 
-    RUN-PERIOD
+    RUN-PERIOD
 
-    DESIGN-DAY
+    DESIGN-DAY
 
-    LIKE
+    LIKE
 
-    SET-DEFAULT
+    SET-DEFAULT
 
 
 
@@ -12104,19 +11317,19 @@ As installed, the batch files that accompany console applications will be set so
 
 Generally, the steps for executing a console application is:
 
-1)   Open a DOS command prompt window (Start à Programs à Accessories à Command Prompt)
+1)   Open a DOS command prompt window (Start à Programs à Accessories à Command Prompt)
 
-2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
+2)   Change to the directory where EnergyPlus is installed (modify the commands below if you did not install EnergyPlus in the default install path):
 
 C:
 
 CD \\&lt;root folder&gt;\&lt;/span>
 
-3)   Change to the specific folder for the console application:
+3)   Change to the specific folder for the console application:
 
 CD &lt;folder&gt;
 
-4)   Run the program:
+4)   Run the program:
 
 &lt;batchfile&gt; &lt;input parameters&gt;
 
@@ -12157,19 +11370,19 @@ Or, as seen in the batch file text:
 
 :Instructions:
 
-:  Complete the following path and program names.
+:  Complete the following path and program names.
 
-:  path names must have a following \\ or errors will happen
+:  path names must have a following \\ or errors will happen
 
- set program\_path=
+ set program\_path=
 
- set program\_name=&lt;specific program name will be here&gt;
+ set program\_name=&lt;specific program name will be here&gt;
 
- set input\_path=
+ set input\_path=
 
- set output\_path=
+ set output\_path=
 
- set weather\_path=..\\..\\WeatherData\\
+ set weather\_path=..\\..\\WeatherData\\
 
 As the instructions in the batch file show, the path character must terminate the path specification or errors can occur. The "weather\_path" specification shows an example of using a "relative" path specification. Depending on the program, this specification, of course, might change.
 
@@ -12179,11 +11392,11 @@ What the specification says is that above (..) and above again (..) and then "We
 
 &lt;Root Folder&gt; (this is usually EnergyPlusV&lt;version&gt;)
 
-      Preprocess
+      Preprocess
 
-                  Specific Program Folders
+                  Specific Program Folders
 
-      WeatherData
+      WeatherData
 
 Thus, the user can simply put the name of the weather data file onto the batch file run and it will look for that file in the installed WeatherData folder.
 
@@ -12205,19 +11418,19 @@ Figure 35. EP-Launch Screen
 
 ### Start EP-Launch
 
-EP-Launch is located in the main directory/folder for EnergyPlus. In addition, it is available on the shortcut menu for EnergyPlus.  By double clicking on the EP-Launch icon you get the screen shown above (Figure 35) for running a single input file. The EP-Launch program simply starts other programs and allows you to avoid having to use the DOS command line prompt to run EnergyPlus. More help is provided for the program under the "Help" menu.
+EP-Launch is located in the main directory/folder for EnergyPlus. In addition, it is available on the shortcut menu for EnergyPlus.  By double clicking on the EP-Launch icon you get the screen shown above (Figure 35) for running a single input file. The EP-Launch program simply starts other programs and allows you to avoid having to use the DOS command line prompt to run EnergyPlus. More help is provided for the program under the "Help" menu.
 
 ### Selecting Input and Weather Files
 
-The input file and weather files can be selected on the Single  Input File tab from the two pull down lists which show recently used files or you can press the "Browse…" buttons to locate an input or weather file that you have created yourself. If this is your first time using EP-Launch, the pull down lists will show some files from the ExampleFiles subdirectory. These are not the only examples, use browse to open other example files from the ExampleFiles subdirectory or other EnergyPlus input files.
+The input file and weather files can be selected on the Single  Input File tab from the two pull down lists which show recently used files or you can press the "Browse…" buttons to locate an input or weather file that you have created yourself. If this is your first time using EP-Launch, the pull down lists will show some files from the ExampleFiles subdirectory. These are not the only examples, use browse to open other example files from the ExampleFiles subdirectory or other EnergyPlus input files.
 
 ### Running a Single Input File
 
 On the Single Input File tab, after you select the weather and input files simply push the "Simulate…" button to start the EnergyPlus building energy simulation engine. At this point a black DOS window should pop up on your screen and show the progress of your simulation. The simulation is complete when the black DOS box closes. The EnergyPlus program black DOS window will show scrolling text as the simulation procedure progresses. If you would like to see these messages more slowly you have two options:
 
-1)   Press the "Control-S" key combination to try to stop the progress and any key to continue.
+1)   Press the "Control-S" key combination to try to stop the progress and any key to continue.
 
-2)   Under the "View" menu on the EP-Launch program, select "Options" then "Command Window" then check "Pause During Simulation" and this will pause the process immediately after EnergyPlus executes. To continue after the pause, press any key.
+2)   Under the "View" menu on the EP-Launch program, select "Options" then "Command Window" then check "Pause During Simulation" and this will pause the process immediately after EnergyPlus executes. To continue after the pause, press any key.
 
 If the file contains Parametric objects, the single input file may cause multiple simulations to be performed. If multiple simulations are performed, the output files will be listed on the History tab and will be named with either the file suffixes defined in the input file or with a serial number.
 
@@ -12231,9 +11444,9 @@ After you have run a simulation and the black DOS window closes, EnergyPlus has 
 
 Figure 36. EP-Launch Finish Status.
 
-This status gives you a quick overview of whether there were warning (**should look at**), severe (**should probably fix**) or fatal (**must fix**) errors in the run as well as the time it took for the simulation to complete.  After pressing "OK" from this box, selecting "ERR/EIO/BND Output Files Only" from the "View" menu will display the ERR, EIO, and BND files - useful when errors may have occurred. Alternatively, pressing the F2 function key will display the same three files.
+This status gives you a quick overview of whether there were warning (**should look at**), severe (**should probably fix**) or fatal (**must fix**) errors in the run as well as the time it took for the simulation to complete.  After pressing "OK" from this box, selecting "ERR/EIO/BND Output Files Only" from the "View" menu will display the ERR, EIO, and BND files - useful when errors may have occurred. Alternatively, pressing the F2 function key will display the same three files.
 
-Another way to open files easily is by using the View Results buttons as shown in 29. Two different panels of buttons can be used under View Results, one shown by using the "All" tab on the left edge and by using the "Sets" tab on the left edge. The "All" tab shows all the various files by file extension that can be viewed individually. Files available for view  based on the current input file name, are "enabled" (extension names clearly readable).
+Another way to open files easily is by using the View Results buttons as shown in 29. Two different panels of buttons can be used under View Results, one shown by using the "All" tab on the left edge and by using the "Sets" tab on the left edge. The "All" tab shows all the various files by file extension that can be viewed individually. Files available for view  based on the current input file name, are "enabled" (extension names clearly readable).
 
 ![](AuxiliaryPrograms/media/image063.png)
 
@@ -12247,75 +11460,75 @@ Figure 38. Define Files to View
 
 When the "Define" button is pressed on the Sets tab of the View Results section of the main screen, the dialog box in the figure above is shown. This allows the files extensions to be selected that would be opened for each of the Set 1 to Set 8 buttons. One or many files can be selected for each of the Set buttons. This allows you to define exactly which files you want opened.
 
-The content of each file extension is listed below.  The contents (along with examples) are discussed in the [Output Details](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document.
+The content of each file extension is listed below.  The contents (along with examples) are discussed in the [Output Details](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document.
 
-By pressing the "Text Output Files" button, a text editor will open each of the text output files. Up to 29 files will open, if they exist. Selecting "Single File" from the ‘View’  menu displays a menu of all available output files from which any file can be opened individually. Each file may also be opened with an associated function key. The output files and function key shortcuts are listed below:
+By pressing the "Text Output Files" button, a text editor will open each of the text output files. Up to 29 files will open, if they exist. Selecting "Single File" from the 'View'  menu displays a menu of all available output files from which any file can be opened individually. Each file may also be opened with an associated function key. The output files and function key shortcuts are listed below:
 
-1.    Variable - tabulated results in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (F4)
+1.    Variable - tabulated results in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (F4)
 
-2.    ESO - raw report variable output (F5),
+2.    ESO - raw report variable output (F5),
 
-3.    RDD - list of output variables available from the run (F6).
+3.    RDD - list of output variables available from the run (F6).
 
-4.    MDD - list of output meters available from the run (Shift-Ctrl-F3)
+4.    MDD - list of output meters available from the run (Shift-Ctrl-F3)
 
-5.    EIO - additional EnergyPlus results (F7),
+5.    EIO - additional EnergyPlus results (F7),
 
-6.    ERR - list of errors and warnings (F8),
+6.    ERR - list of errors and warnings (F8),
 
-7.    BND - HVAC system node and component connection details (F9),
+7.    BND - HVAC system node and component connection details (F9),
 
-8.    MTR - raw report meter output (F11),
+8.    MTR - raw report meter output (F11),
 
-9.    MTD - list of meter component variables (F12)
+9.    MTD - list of meter component variables (F12)
 
-10. METER File - tabulated meter report in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (Ctrl-F4)
+10. METER File - tabulated meter report in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (Ctrl-F4)
 
-11. ZSZ - zone sizing details in comma, tab or space delimited format (Ctrl+F5)
+11. ZSZ - zone sizing details in comma, tab or space delimited format (Ctrl+F5)
 
-12. SSZ - system sizing details in comma, tab or space delimited format (Ctrl+F6)
+12. SSZ - system sizing details in comma, tab or space delimited format (Ctrl+F6)
 
-13. AUDIT - input file echo with input processor errors and warnings (Ctrl+F8)
+13. AUDIT - input file echo with input processor errors and warnings (Ctrl+F8)
 
-14. SLN - output from "report, surfaces, lines" (Ctrl+F9)
+14. SLN - output from "report, surfaces, lines" (Ctrl+F9)
 
-15. DBG - output from the debug command (Ctrl+F11)
+15. DBG - output from the debug command (Ctrl+F11)
 
-16. SHD - output related to shading (Ctrl+F12)
+16. SHD - output related to shading (Ctrl+F12)
 
-17. SVG - HVAC Diagram (Shift+ F4)
+17. SVG - HVAC Diagram (Shift+ F4)
 
-18. EPMIDF - clean idf file after EP-Macro processing (Shift+F5)
+18. EPMIDF - clean idf file after EP-Macro processing (Shift+F5)
 
-19. EPMDET - EP-Macro detailed output with errors and warnings (Shift+F6)
+19. EPMDET - EP-Macro detailed output with errors and warnings (Shift+F6)
 
-20. MAP - daylighting illuminance map (Shift+F7)
+20. MAP - daylighting illuminance map (Shift+F7)
 
-21. TABLE - tabulated report of bin and monthly data in comma, tab or space delimited or HTML format  (Shift+F8)
+21. TABLE - tabulated report of bin and monthly data in comma, tab or space delimited or HTML format  (Shift+F8)
 
-22. VMRL - drawing file in VRML (Virtual Reality Markup Language) format (Shift F+F11)
+22. VMRL - drawing file in VRML (Virtual Reality Markup Language) format (Shift F+F11)
 
-23. DXF - drawing file in AutoCAD DXF format (Shift+F12)
+23. DXF - drawing file in AutoCAD DXF format (Shift+F12)
 
-24. Delight IN - DElight input generated from EnergyPlus processed input (Shift+Ctrl+F4)
+24. Delight IN - DElight input generated from EnergyPlus processed input (Shift+Ctrl+F4)
 
-25. Delight OUT - Detailed DElight output (Shift+Ctrl+F5)
+25. Delight OUT - Detailed DElight output (Shift+Ctrl+F5)
 
-26. Delight ELDMP - DElight reference point illuminance per time step (Shift+Ctrl+F6)
+26. Delight ELDMP - DElight reference point illuminance per time step (Shift+Ctrl+F6)
 
-27. Delight DFDMP - DElight warning and error messages (Shift+Ctrl+F7)
+27. Delight DFDMP - DElight warning and error messages (Shift+Ctrl+F7)
 
-28. EXPIDF - Expanded IDF when using HVACTemplate objects (Shift+Ctrl+F8)
+28. EXPIDF - Expanded IDF when using HVACTemplate objects (Shift+Ctrl+F8)
 
-29. Group Error - combined error files for a group run. (Shift+Ctrl+F9)
+29. Group Error - combined error files for a group run. (Shift+Ctrl+F9)
 
-30. VCpErr - Transition program error file (Shift+Ctrl+F11)
+30. VCpErr - Transition program error file (Shift+Ctrl+F11)
 
-31. Screen (Shift+Ctrl+f12)
+31. Screen (Shift+Ctrl+f12)
 
-32. Proc CSV - Simple statistiscs generated from CSVProc (also see Create Statistics File option under View-Options).
+32. Proc CSV - Simple statistiscs generated from CSVProc (also see Create Statistics File option under View-Options).
 
-33. EDD - Energy Management System details.
+33. EDD - Energy Management System details.
 
 Clicking on the "Drawing File" button will open the generated DXF file if an appropriate viewer has been configured (see *Selecting Viewers and Editors* below). The DXF file is a CAD format that displays the physical shape of the building being modeled in three dimensions. The "Drawing File" button also opens the HVAC diagram generated with the HVAC-Diagram utility (see Auxiliary Programs).
 
@@ -12373,7 +11586,7 @@ The "View" menu also accesses the "Options" menu item shown in Figure 40 that is
 
 #### Miscellaneous Options
 
-**Tab Delimited Open with Spreadsheet** - Selecting "Single File" and then "Main Results File" from the "View" menu or pressing the F4 function key will open TAB files with the default spreadsheet application rather than the text editor. Comma-separated variable (CSV) is the default setting for viewing tabulated results set in the RVI file. If the user changes the setting for viewing tabulated results to TAB or TXT format, selecting "Single File" and then "Main Results File" from the "View" menu or pressing the F4 function key will open the files in the default text editor.  TAB files, when selected, will also be opened by the text editor when the "Text Output Files" button is pressed after a successful run.
+**Tab Delimited Open with Spreadsheet** - Selecting "Single File" and then "Main Results File" from the "View" menu or pressing the F4 function key will open TAB files with the default spreadsheet application rather than the text editor. Comma-separated variable (CSV) is the default setting for viewing tabulated results set in the RVI file. If the user changes the setting for viewing tabulated results to TAB or TXT format, selecting "Single File" and then "Main Results File" from the "View" menu or pressing the F4 function key will open the files in the default text editor.  TAB files, when selected, will also be opened by the text editor when the "Text Output Files" button is pressed after a successful run.
 
 **Allow More Than 250 Columns** - Tabulated data that exceeds 250 columns, the MS Excel maximum, will be truncated to that limit unless "Allow &gt;250 Columns" is selected. Excel versions prior to 2007 were limited to 255 columns in a sheet; later versions allow unlimited number of columns. This limitation may not be true for other spreadsheet programs.
 
@@ -12383,43 +11596,43 @@ The "View" menu also accesses the "Options" menu item shown in Figure 40 that is
 
 **Create Statistics File** - Runs the CSVProc utility program (see the AuxiliaryPrograms documentation for more information) and creates the -Proc.csv file. This file contains some simple statistics on each variable in the normal CSV file.
 
-**Create Batch File to Run EnergyPlus** - Traditionally EP-Launch has created a batch file in order to execute EnergyPlus with the various options chosen. This can cause problems with some operating systems, such as Windows Vista, when set to a higher security setting.  This option can be unchecked and a batch file is not created when running EnergyPlus instead parameters are passed to an existing batch file.
+**Create Batch File to Run EnergyPlus** - Traditionally EP-Launch has created a batch file in order to execute EnergyPlus with the various options chosen. This can cause problems with some operating systems, such as Windows Vista, when set to a higher security setting.  This option can be unchecked and a batch file is not created when running EnergyPlus instead parameters are passed to an existing batch file.
 
 **Run ParametricPreprocessor** - When this option is checked, if Parametric objects are present in the file, the ParametricPreprocessor will be run prior to the first simulation and if multiple simulations are needed they will all be executed. See the Auxiliary Programs documentation for details.
 
-**Check for Updates to EnergyPlus** - When this option is checked, EP-Launch will check every seven days if an update to EnergyPlus or any of the files distributed with EnergyPlus are available to download. If they are available a message will be shown upon start up.  You can also manually check by going to HELP .. CHECK FOR UPDATES.
+**Check for Updates to EnergyPlus** - When this option is checked, EP-Launch will check every seven days if an update to EnergyPlus or any of the files distributed with EnergyPlus are available to download. If they are available a message will be shown upon start up.  You can also manually check by going to HELP .. CHECK FOR UPDATES.
 
 #### Text Editor Options
 
-EP-Launch will start a text editor when editing a IDF file or when viewing many of the results files.  The text editor that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the text editor of your choice. The Auto Find button will automatically find the program that is associated with the TXT file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a text editor is available immediately. The most common text editor is NOTEPAD.EXE and is built into Windows but many other text editors are also available.
+EP-Launch will start a text editor when editing a IDF file or when viewing many of the results files.  The text editor that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the text editor of your choice. The Auto Find button will automatically find the program that is associated with the TXT file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a text editor is available immediately. The most common text editor is NOTEPAD.EXE and is built into Windows but many other text editors are also available.
 
 #### Drawing Viewer Options
 
-The default drawing viewer is the application associated with DXF files. This can be changed to your favorite drawing program by using the Select button then locating the executable file for your favorite drawing software capable of reading a DXF file. The Auto Find button will automatically find the program that is associated with the DXF file extension and use that program. A variety of programs (free of charge) can render DXF files for viewing.  The [Output Details](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document lists some of these programs as well as displaying what a DXF rendered file looks like on the screen.
+The default drawing viewer is the application associated with DXF files. This can be changed to your favorite drawing program by using the Select button then locating the executable file for your favorite drawing software capable of reading a DXF file. The Auto Find button will automatically find the program that is associated with the DXF file extension and use that program. A variety of programs (free of charge) can render DXF files for viewing.  The [Output Details](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document lists some of these programs as well as displaying what a DXF rendered file looks like on the screen.
 
 #### VRML Viewer Options
 
-EP-Launch will start a VRML Viewer when a building drawing is created using the Report, Surfaces, VRML option in your IDF file.  The VRML Viewer that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the VRML Viewer of your choice. The Auto Find button will automatically find the program that is associated with the WRL file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a VRML Viewer is available immediately. Many other VRML Viewers are available.
+EP-Launch will start a VRML Viewer when a building drawing is created using the Report, Surfaces, VRML option in your IDF file.  The VRML Viewer that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the VRML Viewer of your choice. The Auto Find button will automatically find the program that is associated with the WRL file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a VRML Viewer is available immediately. Many other VRML Viewers are available.
 
 #### Spreadsheet Options
 
-EP-Launch will start a spreadsheet program when viewing many of the results files.  The spreadsheet that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the spreadsheet program of your choice. The Auto Find button will automatically find the program that is associated with the CSV file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a spreadsheet program is available immediately.
+EP-Launch will start a spreadsheet program when viewing many of the results files.  The spreadsheet that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the spreadsheet program of your choice. The Auto Find button will automatically find the program that is associated with the CSV file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a spreadsheet program is available immediately.
 
 #### Diagramming Options
 
-EP-Launch will start a diagramming program to view SVG files from HVAC Diagram.  The diagramming program that will be used is shown but can be changed by either pressing the Select button, the Auto Find button, the Use Firefox button or the Use Opera button. The Select button allows you to find the diagramming program of your choice but make sure it is capable of opening SVG files. The Auto Find button will automatically find the program that is associated with the SVG file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a spreadsheet program is available immediately.  Since both Firefox and Opera web browsers can view SVG files, those buttons will select those respective browsers if available.
+EP-Launch will start a diagramming program to view SVG files from HVAC Diagram.  The diagramming program that will be used is shown but can be changed by either pressing the Select button, the Auto Find button, the Use Firefox button or the Use Opera button. The Select button allows you to find the diagramming program of your choice but make sure it is capable of opening SVG files. The Auto Find button will automatically find the program that is associated with the SVG file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a spreadsheet program is available immediately.  Since both Firefox and Opera web browsers can view SVG files, those buttons will select those respective browsers if available.
 
 #### HTML Browser Options
 
-EP-Launch will start a HTML browser program when viewing the tabular results file when HTML is chosen in OutputControl:Table:Style.  The HTML browser that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the HTML browser of your choice. The Auto Find button will automatically find the program that is associated with the HTML file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a HTML browser is available immediately.
+EP-Launch will start a HTML browser program when viewing the tabular results file when HTML is chosen in OutputControl:Table:Style.  The HTML browser that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the HTML browser of your choice. The Auto Find button will automatically find the program that is associated with the HTML file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a HTML browser is available immediately.
 
 #### ESO Viewer Options
 
-By default, ESO files are opened with a text editor. ESO files are the raw output file containing results from EnergyPlus for Report Variable objects. They are often processed into CSV files to make it easier to view them. At least one utility program has been developed to view ESO files directly (see the EnergyPlus.gov web site under "Interfaces & Other Tools", "Third-party EnergyPlus Tools).  The Auto Find and Select buttons work the same way as other viewer selectors. If no special ESO viewer is selected the box will be shown as empty. It can also be emptied by using the Clear button.
+By default, ESO files are opened with a text editor. ESO files are the raw output file containing results from EnergyPlus for Report Variable objects. They are often processed into CSV files to make it easier to view them. At least one utility program has been developed to view ESO files directly (see the EnergyPlus.gov web site under "Interfaces & Other Tools", "Third-party EnergyPlus Tools).  The Auto Find and Select buttons work the same way as other viewer selectors. If no special ESO viewer is selected the box will be shown as empty. It can also be emptied by using the Clear button.
 
 #### PDF Viewer Options
 
-EP-Launch will start a PDF viewer program when opening the EnergyPlus documentation under the Help menu.  The PDF Viewer that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the PDF Viewer of your choice. The Auto Find button will automatically find the program that is associated with the PDF file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a PDF Viewer is available immediately.
+EP-Launch will start a PDF viewer program when opening the EnergyPlus documentation under the Help menu.  The PDF Viewer that will be used is shown but can be changed by either pressing the Select button or by pressing the Auto Find button. The Select button allows you to find the PDF Viewer of your choice. The Auto Find button will automatically find the program that is associated with the PDF file extension and use that program. Auto Find is invoked the first time EP-Launch is started so that a PDF Viewer is available immediately.
 
 #### File Association Options
 
@@ -12431,7 +11644,7 @@ Two reset options are available here.
 
 The **Auto Find All File Viewers** button will autofind all the file viewers in one step. This is equivalent to pressing the Auto Find button for each viewer program.
 
-The **Reset All Options and Exit** button will clear all options and restore the default values used when first invoking EP-Launch for the first time. This also clears the list of recently used IDF and weather files.  This option will exit EP-Launch and you will have to start EP-Launch again.
+The **Reset All Options and Exit** button will clear all options and restore the default values used when first invoking EP-Launch for the first time. This also clears the list of recently used IDF and weather files.  This option will exit EP-Launch and you will have to start EP-Launch again.
 
 ### Help Menu
 
@@ -12485,7 +11698,7 @@ More advanced users may choose to define their locations for the output files us
 
 %G = group file name
 
-%W =  weather file name
+%W =  weather file name
 
 %N = repeat number for IMF files
 
@@ -12577,11 +11790,11 @@ The *input data dictionary* (IDD) is an ascii (text) file containing a list of a
 
 #### idf
 
-The *input data file* (IDF) is an ascii file containing the data describing the building and HVAC system to be simulated. Many example files are installed as part of the EnergyPlus installation. Additionally, a spreadsheet file "ExampleFiles.xls"  contains columnar descriptions of each file’s features.
+The *input data file* (IDF) is an ascii file containing the data describing the building and HVAC system to be simulated. Many example files are installed as part of the EnergyPlus installation. Additionally, a spreadsheet file "ExampleFiles.xls"  contains columnar descriptions of each file's features.
 
 #### imf
 
-The *input macro file* (IMF) is an ascii file containing the data describing the building and HVAC system to be simulated and will have some contents of "macro" commands. The Auxiliary programs document describes use of the macro commands and the program that processes them - EP-Macro.   Many example files are installed as part of the EnergyPlus installation.
+The *input macro file* (IMF) is an ascii file containing the data describing the building and HVAC system to be simulated and will have some contents of "macro" commands. The Auxiliary programs document describes use of the macro commands and the program that processes them - EP-Macro.   Many example files are installed as part of the EnergyPlus installation.
 
 #### ini
 
@@ -12628,13 +11841,13 @@ Table 33. Error Message Levels - Required Actions
 
 An example of an error message due to an input syntax error is:
 
-\*\* Severe  \*\* Did not find " DessignDay" in list of Objects
+\*\* Severe  \*\* Did not find " DessignDay" in list of Objects
 
-   \*\*  Fatal  \*\* Errors occurred on processing IDF file -
+   \*\*  Fatal  \*\* Errors occurred on processing IDF file -
 
-       probable incorrect IDD file. View "audit.out" for details.
+       probable incorrect IDD file. View "audit.out" for details.
 
-   \*\*\*\*\*\*\*\*\*\*\*\*\* EnergyPlus Terminated--Error(s) Detected.
+   \*\*\*\*\*\*\*\*\*\*\*\*\* EnergyPlus Terminated--Error(s) Detected.
 
 
 
@@ -12698,7 +11911,7 @@ in the IDF.
 
 ### Postprocessing Program/Files
 
-A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) under a section heading called "Using ReadVarsESO".
+A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) under a section heading called "Using ReadVarsESO".
 
 RunEPlus batch file
 -------------------
@@ -12707,7 +11920,7 @@ It is simple to run EnergyPlus: open a DOS or CMD box in the EnergyPlus director
 
 RunEPlus &lt;input\_file\_name&gt; &lt;weather\_file\_name&gt;
 
-Though it’s possible to supply arguments to the batch file with embedded blanks, it’s better practice not to. More extensive information about the intricacies of EnergyPlus execution is given in the next parts of this section.
+Though it's possible to supply arguments to the batch file with embedded blanks, it's better practice not to. More extensive information about the intricacies of EnergyPlus execution is given in the next parts of this section.
 
 As installed, the RunEPlus is ready to run the sample files that are included. If you wish to create and run other files, you may wish to modify the batch file to your own preferences. See "RunEPlus details" later in this document for parts of the batch file that you will need to modify.
 
@@ -12716,69 +11929,69 @@ Running EnergyPlus by Hand
 
 EnergyPlus is compiled as a 32 bit console application on Windows™ (Windows 98, Windows NT, Windows 2000, Windows ME) operating systems, commonly run on the Intel™ or compatible processing chips (aka WinTel machines). To run the program bring up the command prompt and "cd" to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing "EnergyPlus" (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
 
- EnergyPlus Starting
+ EnergyPlus Starting
 
- EnergyPlus, Version 1.3
+ EnergyPlus, Version 1.3
 
- Warming up
+ Warming up
 
- Initializing Response Factors
+ Initializing Response Factors
 
- Calculating CTFs for "EXTWALL80", Construction \#1
+ Calculating CTFs for "EXTWALL80", Construction \#1
 
- Calculating CTFs for "PARTITION06", Construction \#2
+ Calculating CTFs for "PARTITION06", Construction \#2
 
- Calculating CTFs for "FLOOR SLAB 8 IN", Construction \#3
+ Calculating CTFs for "FLOOR SLAB 8 IN", Construction \#3
 
- Calculating CTFs for "ROOF34", Construction \#4
+ Calculating CTFs for "ROOF34", Construction \#4
 
- Initializing Window Optical Properties
+ Initializing Window Optical Properties
 
- Initializing Solar Calculations
+ Initializing Solar Calculations
 
- Initializing HVAC
+ Initializing HVAC
 
- Warming up
+ Warming up
 
- Warming up
+ Warming up
 
- Warming up
+ Warming up
 
- Performing Zone Sizing Simulation
+ Performing Zone Sizing Simulation
 
- Warming up
+ Warming up
 
- Warming up
+ Warming up
 
- Warming up
+ Warming up
 
- Performing Zone Sizing Simulation
+ Performing Zone Sizing Simulation
 
- Initializing New Environment Parameters
+ Initializing New Environment Parameters
 
- Warming up {1}
+ Warming up {1}
 
- Warming up {2}
+ Warming up {2}
 
- Warming up {3}
+ Warming up {3}
 
- Warming up {4}
+ Warming up {4}
 
- Starting Simulation at 01/14 for CHICAGO IL UNITED STATES TMY2 94846 WMO\#=725340
+ Starting Simulation at 01/14 for CHICAGO IL UNITED STATES TMY2 94846 WMO\#=725340
 
- Initializing New Environment Parameters
+ Initializing New Environment Parameters
 
- Warming up {1}
+ Warming up {1}
 
- Warming up {2}
+ Warming up {2}
 
- Warming up {3}
+ Warming up {3}
 
- Warming up {4}
+ Warming up {4}
 
- Starting Simulation at 07/07 for CHICAGO IL UNITED STATES TMY2 94846 WMO\#=725340
+ Starting Simulation at 07/07 for CHICAGO IL UNITED STATES TMY2 94846 WMO\#=725340
 
- EnergyPlus Run Time=00hr 00min  7.31sec
+ EnergyPlus Run Time=00hr 00min  7.31sec
 
 
 
@@ -12789,7 +12002,7 @@ RunEPlus details
 
 A procedure (batch) file is the normal way to run a console application. The *installed* procedure file **RunEPlus.bat** can be used to execute EnergyPlus and deal with all the file handling and postprocessing. It can accommodate running the EPMacro program if you name your files appropriately. And it can use ExpandObjects to expand the special "HVACTemplate" objects into "normal" IDF objects.
 
-The "set" statements near the beginning of the procedure file can be customized for each local system. Thus "program\_path" should be set to the directory path where the program executable resides on your local computer, "program\_name" should be set to the name of the EnergyPlus executable file, "input\_path" should be set to the directory path containing the input (IDF) file, and so forth. Each of the path environment variables must have "\\" as the final character or things won’t run correctly. As mentioned before, the batch file is executed by typing:
+The "set" statements near the beginning of the procedure file can be customized for each local system. Thus "program\_path" should be set to the directory path where the program executable resides on your local computer, "program\_name" should be set to the name of the EnergyPlus executable file, "input\_path" should be set to the directory path containing the input (IDF) file, and so forth. Each of the path environment variables must have "\\" as the final character or things won't run correctly. As mentioned before, the batch file is executed by typing:
 
 
 
@@ -12799,96 +12012,96 @@ RunEPlus &lt;input\_filename&gt; &lt;weather\_filename&gt;
 
 where &lt;input\_filename&gt; is the name of the IDF file, without the file extension, and &lt;weather\_filename&gt; is the name of the weather file, without the file extension.The &lt;input\_filename&gt; can also be a complete path to the file (without extension) and it will work.
 
- In addition, RunEPlus can be called from a different directory and the temporary files will be created in the directory it is called from. This enables multiple RunEPlus.bat to be used with multiple processors or a multiple-core processor without the temporary files of one set of simulations interfering with another. Each call to RunEPlus.bat should be from different directories.
+ In addition, RunEPlus can be called from a different directory and the temporary files will be created in the directory it is called from. This enables multiple RunEPlus.bat to be used with multiple processors or a multiple-core processor without the temporary files of one set of simulations interfering with another. Each call to RunEPlus.bat should be from different directories.
 
 Instructions appear at the top of the batch file:
 
 :Instructions:
 
-:  Complete the following path and program names.
+:  Complete the following path and program names.
 
-:  path names must have a following \\ or errors will happen
+:  path names must have a following \\ or errors will happen
 
-:  does not have the capability to run input macro files (yet)
+:  does not have the capability to run input macro files (yet)
 
-:   %program\_path% contains the path to the executable as well as IDD and is
+:   %program\_path% contains the path to the executable as well as IDD and is
 
-:                  the root directory
+:                  the root directory
 
-:   %program\_name% contains the name of the executable (normally EnergyPlus.exe)
+:   %program\_name% contains the name of the executable (normally EnergyPlus.exe)
 
-:   %input\_path%   contains the path to the input file (passed in as first argument)
+:   %input\_path%   contains the path to the input file (passed in as first argument)
 
-:   %output\_path%  contains the path where the result files should be stored
+:   %output\_path%  contains the path where the result files should be stored
 
-:   %post\_proc%    contains the path to the post processing program (ReadVarsESO)
+:   %post\_proc%    contains the path to the post processing program (ReadVarsESO)
 
-:   %weather\_path% contains the path to the weather files (used with optional argument 2)
+:   %weather\_path% contains the path to the weather files (used with optional argument 2)
 
-:   %pausing%      contains Y if pause should occur between major portions of
+:   %pausing%      contains Y if pause should occur between major portions of
 
-:                  batch file (mostly commented out)
+:                  batch file (mostly commented out)
 
-:   %maxcol%       contains "250" if limited to 250 columns otherwise contains
+:   %maxcol%       contains "250" if limited to 250 columns otherwise contains
 
-:                  "nolimit" if unlimited (used when calling readVarsESO)
-
-
-
- echo ===== %0 (Run EnergyPlus) %1 %2 ===== Start =====
-
- set program\_path=
-
- set program\_name=EnergyPlus.exe
-
- set input\_path=ExampleFiles\\
-
- set output\_path=Test\\
-
- set post\_proc=PostProcess\\
-
- set weather\_path=WeatherData\\
-
- set pausing=N
-
- set maxcol=250
+:                  "nolimit" if unlimited (used when calling readVarsESO)
 
 
 
-:  This batch file will perform the following steps:
+ echo ===== %0 (Run EnergyPlus) %1 %2 ===== Start =====
+
+ set program\_path=
+
+ set program\_name=EnergyPlus.exe
+
+ set input\_path=ExampleFiles\\
+
+ set output\_path=Test\\
+
+ set post\_proc=PostProcess\\
+
+ set weather\_path=WeatherData\\
+
+ set pausing=N
+
+ set maxcol=250
+
+
+
+:  This batch file will perform the following steps:
 
 :
 
-:   1. Clean up directory by deleting old working files from prior run
+:   1. Clean up directory by deleting old working files from prior run
 
-:   2. Clean up target directory
+:   2. Clean up target directory
 
-:   3. Copy %1.idf (input) into In.idf
+:   3. Copy %1.idf (input) into In.idf
 
-:   4. Copy %2 (weather) into In.epw
+:   4. Copy %2 (weather) into In.epw
 
-:   5. Execute EnergyPlus
+:   5. Execute EnergyPlus
 
-:   6. If available Copy %1.rvi (post processor commands) into Eplusout.inp
+:   6. If available Copy %1.rvi (post processor commands) into Eplusout.inp
 
-:   7. Execute ReadVarsESO.exe (the Post Processing Program)
+:   7. Execute ReadVarsESO.exe (the Post Processing Program)
 
-:   8. If available Copy %1.mvi (post processor commands) into test.mvi
+:   8. If available Copy %1.mvi (post processor commands) into test.mvi
 
-:       or create appropriate input to get meter output from eplusout.mtr
+:       or create appropriate input to get meter output from eplusout.mtr
 
-:   9. Execute ReadVarsESO.exe (the Post Processing Program) for meter output
+:   9. Execute ReadVarsESO.exe (the Post Processing Program) for meter output
 
-:  10. Copy Eplusout.\* to %1.\*
+:  10. Copy Eplusout.\* to %1.\*
 
-:  11. Clean up working directory.
+:  11. Clean up working directory.
 
 
 
 RunDirMulti Batch File
 ----------------------
 
-The RunDirMulti.bat batch file runs all the IDF files in the directory that it is located in. The batch file is used to run EnergyPlus simulations using the RunEPlus.bat for all the files in the current directory across multiple separate processor cores.  It has  two parameters, the weather file name to use for simulations and the number of processors.
+The RunDirMulti.bat batch file runs all the IDF files in the directory that it is located in. The batch file is used to run EnergyPlus simulations using the RunEPlus.bat for all the files in the current directory across multiple separate processor cores.  It has  two parameters, the weather file name to use for simulations and the number of processors.
 
 RunDirMulti &lt;weather file&gt; (opt) &lt;number processor cores&gt; (opt)
 
@@ -12915,7 +12128,7 @@ The *input data file* (IDF) is an ascii file containing the data describing the 
 
 #### in.imf
 
-The *input macro file* (IMF) is an ascii file that is formatted for the EP-Macro program.  Output from the EP-Macro program will be the standard in.idf format.  IMF files are not directly read by EnergyPlus.
+The *input macro file* (IMF) is an ascii file that is formatted for the EP-Macro program.  Output from the EP-Macro program will be the standard in.idf format.  IMF files are not directly read by EnergyPlus.
 
 #### Energy+.ini
 
@@ -12947,7 +12160,7 @@ dir= PreProcess\\GrndTempCalc
 
 
 
-Under [program], dir should indicate the folder where EnergyPlus is installed (e.g. C:\\Program Files\\EnergyPlusV2-0-0 or C:\\EnergyPlusV2-0-0).  This is automatically generated during the install and may be the "shortened form" of these folder names. The "weather" portion of the initialization file is unused for normal EnergyPlus. [BasementGHT] and [SlabGHT] are used by the EP-Launch program when the Utilities tab is used to execute the Basement and Slab programs, respectively.
+Under [program], dir should indicate the folder where EnergyPlus is installed (e.g. C:\\Program Files\\EnergyPlusV2-0-0 or C:\\EnergyPlusV2-0-0).  This is automatically generated during the install and may be the "shortened form" of these folder names. The "weather" portion of the initialization file is unused for normal EnergyPlus. [BasementGHT] and [SlabGHT] are used by the EP-Launch program when the Utilities tab is used to execute the Basement and Slab programs, respectively.
 
 #### in.epw
 
@@ -12992,13 +12205,13 @@ Table 34. Error Message Levels - Required Actions
 
 An example of an error message due to an input syntax error is:
 
-\*\* Severe  \*\* Did not find " DessignDay" in list of Objects
+\*\* Severe  \*\* Did not find " DessignDay" in list of Objects
 
-   \*\*  Fatal  \*\* Errors occurred on processing IDF file -
+   \*\*  Fatal  \*\* Errors occurred on processing IDF file -
 
-       probable incorrect IDD file. View "audit.out" for details.
+       probable incorrect IDD file. View "audit.out" for details.
 
-   \*\*\*\*\*\*\*\*\*\*\*\*\* EnergyPlus Terminated--Error(s) Detected.
+   \*\*\*\*\*\*\*\*\*\*\*\*\* EnergyPlus Terminated--Error(s) Detected.
 
 
 
@@ -13054,7 +12267,7 @@ in the IDF.
 
 ### Postprocessing Program/Files
 
-A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) as well as the [Output Details and Examples](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) documents.
+A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) as well as the [Output Details and Examples](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) documents.
 
 You can also used the CSVProc and convertESOMTR described earlier in this document as part of your post processing strategy.
 
@@ -13063,22 +12276,22 @@ You can also used the CSVProc and convertESOMTR described earlier in this docume
 Creating Input Files
 ====================
 
-EnergyPlus has several options for the user to create input files. One of the goals of EnergyPlus was to make a simple, readable input file for the program. More of this background and explanation is contained in the Interface Developer’s Guide. Understanding the Input Data Dictionary (IDD) is the key to reading the input file. We have set some conventions for commenting the IDD so that the units, minimum, maximum, and other information. This changes some of the information that is shown in the Interface Developer’s guide. The Energy+.idd (delivered with the install program) contains the most current information. In addition to the four methods for creating inputs described below, several other items are described that may assist you in getting the results you want from EnergyPlus in a timely manner.
+EnergyPlus has several options for the user to create input files. One of the goals of EnergyPlus was to make a simple, readable input file for the program. More of this background and explanation is contained in the Interface Developer's Guide. Understanding the Input Data Dictionary (IDD) is the key to reading the input file. We have set some conventions for commenting the IDD so that the units, minimum, maximum, and other information. This changes some of the information that is shown in the Interface Developer's guide. The Energy+.idd (delivered with the install program) contains the most current information. In addition to the four methods for creating inputs described below, several other items are described that may assist you in getting the results you want from EnergyPlus in a timely manner.
 
 Four methods (with the installed program) are available to create input files:
 
-1)    IDFEditor - this is a very simple, "intelligent" editor that reads the IDD and IDFs and allows creation/revision of IDF files. It can be run from a shortcut in the main EnergyPlus directory (created as part of the install) or directly from EP-Launch.
+1)    IDFEditor - this is a very simple, "intelligent" editor that reads the IDD and IDFs and allows creation/revision of IDF files. It can be run from a shortcut in the main EnergyPlus directory (created as part of the install) or directly from EP-Launch.
 
-2)    BLAST Translator - if you already have BLAST and/or BLAST input files, this program will produce the bulk of a translation to EnergyPlus for you. It generates a complete IDF file but does not include specifics for Systems or Plants. (It does include the System and Plant schedules that were in the BLAST deck). Many of the sample files included with the install started out as BLAST input files.
+2)    BLAST Translator - if you already have BLAST and/or BLAST input files, this program will produce the bulk of a translation to EnergyPlus for you. It generates a complete IDF file but does not include specifics for Systems or Plants. (It does include the System and Plant schedules that were in the BLAST deck). Many of the sample files included with the install started out as BLAST input files.
 
-3)    DOE-2 Translator - if you already have  DOE-2.1e input files, this program will produce the bulk of a translation to EnergyPlus for you. It generates a IMF (input macro file) that must be run through the EnergyPlus Macro (EPMacro) program before it can be used by EnergyPlus.
+3)    DOE-2 Translator - if you already have  DOE-2.1e input files, this program will produce the bulk of a translation to EnergyPlus for you. It generates a IMF (input macro file) that must be run through the EnergyPlus Macro (EPMacro) program before it can be used by EnergyPlus.
 
-4)    Hand editing - for simple changes to an existing file (such as one of the sample files), you can hand edit a file using your knowledge of the IDD, comments in the IDF file, and a text editor such as NOTEPAD™ (Wordpad™ for large files). For creating HVAC simulations - the HVACtemplate objects provide a quick way to start at HVAC simulation.
+4)    Hand editing - for simple changes to an existing file (such as one of the sample files), you can hand edit a file using your knowledge of the IDD, comments in the IDF file, and a text editor such as NOTEPAD™ (Wordpad™ for large files). For creating HVAC simulations - the HVACtemplate objects provide a quick way to start at HVAC simulation.
 
 IDD Conventions
 ---------------
 
-The following is a basic description of the structure of the IDD (it’s actually taken directly from the IDD file). As noted within, ! signifies a comment character as does the \\. \\ has also been adopted as a convention for including more specific comments about each field in an object. These have been used with success in the IDFEditor and it is hoped the flexibility will provide other interface developers with useful information.
+The following is a basic description of the structure of the IDD (it's actually taken directly from the IDD file). As noted within, ! signifies a comment character as does the \\. \\ has also been adopted as a convention for including more specific comments about each field in an object. These have been used with success in the IDFEditor and it is hoped the flexibility will provide other interface developers with useful information.
 
 ! Object Description
 
@@ -13088,11 +12301,11 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 ! Each data item to the object can be A (Alphanumeric string) or N (numeric)
 
-! Number each A and N.  This will show how the data items will be put into the
+! Number each A and N.  This will show how the data items will be put into the
 
 ! arrays that are passed to the Input Processor "Get" (GetObjectItem) routines.
 
-! All alpha fields are limited to 100 characters.  Numeric fields should be
+! All alpha fields are limited to 100 characters.  Numeric fields should be
 
 ! valid numerics (can include such as 1.0E+05) and are placed into double
 
@@ -13102,13 +12315,13 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 ! NOTE: Even though a field may be optional, a comma representing that field
 
-!   must be included (unless it is the last field in the object).  Since the
+!   must be included (unless it is the last field in the object).  Since the
 
-!   entire input is "field-oriented" and not "keyword-oriented", the EnergyPlus
+!   entire input is "field-oriented" and not "keyword-oriented", the EnergyPlus
 
-!   Input Processor must have some representation (even if blank) for each
+!   Input Processor must have some representation (even if blank) for each
 
-!   field.
+!   field.
 
 !
 
@@ -13118,7 +12331,7 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 ! In addition, the following special comments appear one per line and
 
-! most are followed by a value.  Comments may apply to a field or the object
+! most are followed by a value.  Comments may apply to a field or the object
 
 ! or a group of objects.
 
@@ -13128,195 +12341,195 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 !
 
-!  \\field           Name of field
+!  \\field           Name of field
 
-!                     (should be succinct and readable, blanks are encouraged)
-
-!
-
-!  \\note            Note describing the field and its valid values
+!                     (should be succinct and readable, blanks are encouraged)
 
 !
 
-!  \\required-field  To flag fields which may not be left blank
-
-!                     (this comment has no "value")
+!  \\note            Note describing the field and its valid values
 
 !
 
-!  \\begin-extensible  Marks the first field at which the object accepts an extensible
+!  \\required-field  To flag fields which may not be left blank
 
-!                   field set.  A fixed number of fields from this marker define the
-
-!                   extensible field set, see the object code \\extensible for
-
-!                   more information.
+!                     (this comment has no "value")
 
 !
 
-!  \\units           Units (must be from EnergyPlus standard units list)
+!  \\begin-extensible  Marks the first field at which the object accepts an extensible
 
-!                   EnergyPlus units are standard SI units
+!                   field set.  A fixed number of fields from this marker define the
 
-!
+!                   extensible field set, see the object code \\extensible for
 
-!  \\ip-units        IP-Units (for use by input processors with IP units)
-
-!                   This is only used if the default conversion is not
-
-!                   appropriate.
+!                   more information.
 
 !
 
-!  \\unitsBasedOnField  For fields that may have multiple possible units, indicates
+!  \\units           Units (must be from EnergyPlus standard units list)
 
-!                   the field in the object that can be used to determine
-
-!                   the units. The field reference is in the A2 form.
+!                   EnergyPlus units are standard SI units
 
 !
 
-!  \\minimum         Minimum that includes the following value
+!  \\ip-units        IP-Units (for use by input processors with IP units)
+
+!                   This is only used if the default conversion is not
+
+!                   appropriate.
 
 !
 
-!  \\minimum&gt;        Minimum that must be &gt; than the following value
+!  \\unitsBasedOnField  For fields that may have multiple possible units, indicates
+
+!                   the field in the object that can be used to determine
+
+!                   the units. The field reference is in the A2 form.
 
 !
 
-!  \\maximum         Maximum that includes the following value
+!  \\minimum         Minimum that includes the following value
 
 !
 
-!  \\maximum&lt;        Maximum that must be &lt; than the following value
+!  \\minimum&gt;        Minimum that must be &gt; than the following value
 
 !
 
-!  \\default         Default for the field (if N/A then omit entire line)
+!  \\maximum         Maximum that includes the following value
 
 !
 
-!  \\deprecated      This field is not really used and will be deleted from the object.
-
-!                   The information is gotten internally within the program.
+!  \\maximum&lt;        Maximum that must be &lt; than the following value
 
 !
 
-!  \\autosizable     Flag to indicate that this field can be used with the Auto
+!  \\default         Default for the field (if N/A then omit entire line)
 
-!                   Sizing routines to produce calculated results for the
+!
 
-!                   field.  If a value follows this, then that will be used
+!  \\deprecated      This field is not really used and will be deleted from the object.
 
-!                   when the "Autosize" feature is flagged.  To trigger
+!                   The information is gotten internally within the program.
 
-!                   autosizing for a field, enter Autosize as the field's
+!
 
-!                   value.  Only applicable to numeric fields.
+!  \\autosizable     Flag to indicate that this field can be used with the Auto
+
+!                   Sizing routines to produce calculated results for the
+
+!                   field.  If a value follows this, then that will be used
+
+!                   when the "Autosize" feature is flagged.  To trigger
+
+!                   autosizing for a field, enter Autosize as the field's
+
+!                   value.  Only applicable to numeric fields.
 
 !
 
 ! \\autocalculatable Flag to indicate that this field can be automatically
 
-!                   calculated. To trigger auto calculation for a field, enter
+!                   calculated. To trigger auto calculation for a field, enter
 
-!                   Autocalculate as the field's value.  Only applicable to
+!                   Autocalculate as the field's value.  Only applicable to
 
-!                   numeric fields.
-
-!
-
-!  \\type            Type of data for the field -
-
-!                     integer
-
-!                     real
-
-!                     alpha       (arbitrary string),
-
-!                     choice      (alpha with specific list of choices, see
-
-!                                 \\key)
-
-!                     object-list (link to a list of objects defined elsewhere,
-
-!                                  see \\object-list and \\reference)
-
-!                     node        (name used in connecting HVAC components)
+!                   numeric fields.
 
 !
 
-!  \\retaincase      Retains the alphabetic case for alpha type fields
+!  \\type            Type of data for the field -
+
+!                     integer
+
+!                     real
+
+!                     alpha       (arbitrary string),
+
+!                     choice      (alpha with specific list of choices, see
+
+!                                 \\key)
+
+!                     object-list (link to a list of objects defined elsewhere,
+
+!                                  see \\object-list and \\reference)
+
+!                     node        (name used in connecting HVAC components)
 
 !
 
-!  \\key             Possible value for "\\type choice" (blanks are significant)
-
-!                     use multiple \\key lines to indicate all valid choices
+!  \\retaincase      Retains the alphabetic case for alpha type fields
 
 !
 
-!  \\object-list     Name of a list of user-provided object names that are valid
+!  \\key             Possible value for "\\type choice" (blanks are significant)
 
-!                     entries for this field (used with "\\reference")
-
-!                     see Zone and BuildingSurface:Detailed objects below for
-
-!                     examples.
-
-!                  \*\* Note that a field may have multiple \\object-list commands.
+!                     use multiple \\key lines to indicate all valid choices
 
 !
 
-!  \\reference       Name of a list of names to which this object belongs
+!  \\object-list     Name of a list of user-provided object names that are valid
 
-!                     used with "\\type object-list" and with "\\object-list"
+!                     entries for this field (used with "\\reference")
 
-!                     see Zone and BuildingSurface:Detailed objects below for
+!                     see Zone and BuildingSurface:Detailed objects below for
 
-!                     examples:
+!                     examples.
 
-!
-
-!                        Zone,
-
-!                          A1 , \\field Name
-
-!                               \\type alpha
-
-!                               \\reference ZoneNames
+!                  \*\* Note that a field may have multiple \\object-list commands.
 
 !
 
-!                        BuildingSurface:Detailed,
+!  \\reference       Name of a list of names to which this object belongs
 
-!                          A4 , \\field Zone Name
+!                     used with "\\type object-list" and with "\\object-list"
 
-!                               \\note Zone the surface is a part of
+!                     see Zone and BuildingSurface:Detailed objects below for
 
-!                               \\type object-list
-
-!                               \\object-list ZoneNames
+!                     examples:
 
 !
 
-!             For each zone, the field "Name" may be referenced
+!                        Zone,
 
-!             by other objects, such as BuildingSurface:Detailed, so it is
+!                          A1 , \\field Name
 
-!             commented with "\\reference ZoneNames"
+!                               \\type alpha
 
-!             Fields that reference a zone name, such as BuildingSurface:Detailed's
+!                               \\reference ZoneNames
 
-!             "Zone Name", are commented as
+!
 
-!             "\\type object-list" and "\\object-list ZoneNames"
+!                        BuildingSurface:Detailed,
 
-!             \*\* Note that a field may have multiple \\reference commands.
+!                          A4 , \\field Zone Name
 
-!             \*\* This is useful if the object belongs to a small specific
+!                               \\note Zone the surface is a part of
 
-!             object-list as well as a larger more general object-list.
+!                               \\type object-list
+
+!                               \\object-list ZoneNames
+
+!
+
+!             For each zone, the field "Name" may be referenced
+
+!             by other objects, such as BuildingSurface:Detailed, so it is
+
+!             commented with "\\reference ZoneNames"
+
+!             Fields that reference a zone name, such as BuildingSurface:Detailed's
+
+!             "Zone Name", are commented as
+
+!             "\\type object-list" and "\\object-list ZoneNames"
+
+!             \*\* Note that a field may have multiple \\reference commands.
+
+!             \*\* This is useful if the object belongs to a small specific
+
+!             object-list as well as a larger more general object-list.
 
 !
 
@@ -13324,109 +12537,109 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 !
 
-!  \\memo            Memo describing the object
+!  \\memo            Memo describing the object
 
 !
 
-!  \\unique-object   To flag objects which should appear only once in an idf
+!  \\unique-object   To flag objects which should appear only once in an idf
 
-!                     (this comment has no "value")
-
-!
-
-!  \\required-object To flag objects which are required in every idf
-
-!                     (this comment has no "value")
+!                     (this comment has no "value")
 
 !
 
-!  \\min-fields      Minimum number of fields that should be included in the
+!  \\required-object To flag objects which are required in every idf
 
-!                   object.  If appropriate, the Input Processor will fill
-
-!                   any missing fields with defaults (for numeric fields).
-
-!                   It will also supply that number of fields to the "get"
-
-!                   routines using blanks for alpha fields (note -- blanks
-
-!                   may not be allowable for some alpha fields).
+!                     (this comment has no "value")
 
 !
 
-!  \\obsolete        This object has been replaced though is kept (and is read)
+!  \\min-fields      Minimum number of fields that should be included in the
 
-!                   in the current version.  Please refer to documentation as
+!                   object.  If appropriate, the Input Processor will fill
 
-!                   to the dispersal of the object.  If this object is
+!                   any missing fields with defaults (for numeric fields).
 
-!                   encountered in an IDF, the InputProcessor will post an
+!                   It will also supply that number of fields to the "get"
 
-!                   appropriate message to the error file.
+!                   routines using blanks for alpha fields (note -- blanks
 
-!                   usage:  \\obsolete New=&gt;[New object name]
-
-!
-
-!  \\extensible:&lt;\#&gt;  This object is dynamically extensible -- meaning, if you
-
-!           change the IDD appropriately (if the object has a simple list
-
-!           structure -- just add items to the list arguments (i.e. BRANCH
-
-!           LIST). These will be automatically redimensioned and used during
-
-!           the simulation. &lt;\#&gt; should be entered by the developer to signify
-
-!           how many of the last fields are needed to be extended (and EnergyPlus
-
-!           will attempt to auto-extend the object).  The first field of the first
-
-!           instance of the extensible field set is marked with \\begin-extensible.
+!                   may not be allowable for some alpha fields).
 
 !
 
-!  \\begin-extensible See previous item, marks beginning of extensible fields in
+!  \\obsolete        This object has been replaced though is kept (and is read)
 
-!                   an object.
+!                   in the current version.  Please refer to documentation as
 
-!
+!                   to the dispersal of the object.  If this object is
 
-!  \\format          The object should have a special format when saved in
+!                   encountered in an IDF, the InputProcessor will post an
 
-!                   the IDF Editor with the special format option enabled.
+!                   appropriate message to the error file.
 
-!                   The options include SingleLine, Vertices, CompactSchedule,
-
-!                   FluidProperties, ViewFactors, and Spectral.
-
-!                   The SingleLine option puts all the fields for the object
-
-!                   on a single line. The Vertices option is used in objects
-
-!                   that use X, Y and Z fields to format those three fields
-
-!                   on a single line.
-
-!                   The CompactSchedule formats that specific object.
-
-!                   The FluidProperty option formats long lists of fluid
-
-!                   properties to ten values per line.
-
-!                   The ViewFactor option formats three fields related to
-
-!                   view factors per line.
-
-!                   The Spectral option formats the four fields related to
-
-!                   window glass spectral data per line.
+!                   usage:  \\obsolete New=&gt;[New object name]
 
 !
 
-!   \\reference-class-name Adds the name of the class to the reference list
+!  \\extensible:&lt;\#&gt;  This object is dynamically extensible -- meaning, if you
 
-!                   similar to \\reference.
+!           change the IDD appropriately (if the object has a simple list
+
+!           structure -- just add items to the list arguments (i.e. BRANCH
+
+!           LIST). These will be automatically redimensioned and used during
+
+!           the simulation. &lt;\#&gt; should be entered by the developer to signify
+
+!           how many of the last fields are needed to be extended (and EnergyPlus
+
+!           will attempt to auto-extend the object).  The first field of the first
+
+!           instance of the extensible field set is marked with \\begin-extensible.
+
+!
+
+!  \\begin-extensible See previous item, marks beginning of extensible fields in
+
+!                   an object.
+
+!
+
+!  \\format          The object should have a special format when saved in
+
+!                   the IDF Editor with the special format option enabled.
+
+!                   The options include SingleLine, Vertices, CompactSchedule,
+
+!                   FluidProperties, ViewFactors, and Spectral.
+
+!                   The SingleLine option puts all the fields for the object
+
+!                   on a single line. The Vertices option is used in objects
+
+!                   that use X, Y and Z fields to format those three fields
+
+!                   on a single line.
+
+!                   The CompactSchedule formats that specific object.
+
+!                   The FluidProperty option formats long lists of fluid
+
+!                   properties to ten values per line.
+
+!                   The ViewFactor option formats three fields related to
+
+!                   view factors per line.
+
+!                   The Spectral option formats the four fields related to
+
+!                   window glass spectral data per line.
+
+!
+
+!   \\reference-class-name Adds the name of the class to the reference list
+
+!                   similar to \\reference.
 
 !
 
@@ -13434,7 +12647,7 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 !
 
-!  \\group          Name for a group of related objects
+!  \\group          Name for a group of related objects
 
 !
 
@@ -13446,13 +12659,13 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 !
 
-! 1.  If a particular comment is not applicable (such as units, or default)
+! 1.  If a particular comment is not applicable (such as units, or default)
 
 ! then simply omit the comment rather than indicating N/A.
 
 !
 
-! 2.  Memos and notes should be brief (recommend 5 lines or less per block).
+! 2.  Memos and notes should be brief (recommend 5 lines or less per block).
 
 ! More extensive explanations are expected to be in the user documentation
 
@@ -13460,215 +12673,215 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 ! Default IP conversions (no \\ip-units necessary)
 
-!     m                      =&gt;   ft                  3.281
+!     m                      =&gt;   ft                  3.281
 
-!     W                      =&gt;   Btu/h               3.412
+!     W                      =&gt;   Btu/h               3.412
 
-!     m3/s                   =&gt;   ft3/min             2118.6438
+!     m3/s                   =&gt;   ft3/min             2118.6438
 
-!     C                      =&gt;   F                   1.8 (plus 32)
+!     C                      =&gt;   F                   1.8 (plus 32)
 
-!     kg/J                   =&gt;   lb/Btu              2325.83774250441
+!     kg/J                   =&gt;   lb/Btu              2325.83774250441
 
-!     Pa                     =&gt;   psi                 0.0001450377
+!     Pa                     =&gt;   psi                 0.0001450377
 
-!     W/m-K                  =&gt;   Btu-in/h-ft2-F      6.93481276005548
+!     W/m-K                  =&gt;   Btu-in/h-ft2-F      6.93481276005548
 
-!     W/K                    =&gt;   Btu/h-F             1.8987
+!     W/K                    =&gt;   Btu/h-F             1.8987
 
-!     deltaC                 =&gt;   deltaF              1.8
+!     deltaC                 =&gt;   deltaF              1.8
 
-!     m2                     =&gt;   ft2                 10.764961
+!     m2                     =&gt;   ft2                 10.764961
 
-!     K                      =&gt;   R                   1.8
+!     K                      =&gt;   R                   1.8
 
-!     1/K                    =&gt;   1/R                 0.555555556
+!     1/K                    =&gt;   1/R                 0.555555556
 
-!     (kg/s)/W               =&gt;   (lbm/sec)/(Btu/hr)  0.646078115385742
+!     (kg/s)/W               =&gt;   (lbm/sec)/(Btu/hr)  0.646078115385742
 
-!     J/kg                   =&gt;   Btu/lb              0.00042986 (plus 7.686)
+!     J/kg                   =&gt;   Btu/lb              0.00042986 (plus 7.686)
 
-!     kg-H2O/kg-air          =&gt;   lb-H2O/lb-air       1
+!     kg-H2O/kg-air          =&gt;   lb-H2O/lb-air       1
 
-!     kJ/kg                  =&gt;   Btu/lb              0.429925
+!     kJ/kg                  =&gt;   Btu/lb              0.429925
 
-!     lux                    =&gt;   foot-candles        0.092902267
+!     lux                    =&gt;   foot-candles        0.092902267
 
-!     kg/m3                  =&gt;   lb/ft3              0.062428
+!     kg/m3                  =&gt;   lb/ft3              0.062428
 
-!     kg/s                   =&gt;   lb/s                2.2046
+!     kg/s                   =&gt;   lb/s                2.2046
 
-!     kg/s-m                 =&gt;   lb/s-ft             0.67194
+!     kg/s-m                 =&gt;   lb/s-ft             0.67194
 
-!     m3                     =&gt;   ft3                 35.319837041
+!     m3                     =&gt;   ft3                 35.319837041
 
-!     m3                     =&gt;   gal                 264.172
+!     m3                     =&gt;   gal                 264.172
 
-!     W/m2-K                 =&gt;   Btu/h-ft2-F         0.176110194261872
+!     W/m2-K                 =&gt;   Btu/h-ft2-F         0.176110194261872
 
-!     1/m                    =&gt;   1/ft                0.304785126485827
+!     1/m                    =&gt;   1/ft                0.304785126485827
 
-!     J/kg-K                 =&gt;   Btu/lb-F            0.000239005736137667
+!     J/kg-K                 =&gt;   Btu/lb-F            0.000239005736137667
 
-!     J/m3-K                 =&gt;   Btu/ft3-F           1.49237004739337E-05
+!     J/m3-K                 =&gt;   Btu/ft3-F           1.49237004739337E-05
 
-!     m/s                    =&gt;   ft/min              196.86
+!     m/s                    =&gt;   ft/min              196.86
 
-!     m/s                    =&gt;   miles/hr            2.2369
+!     m/s                    =&gt;   miles/hr            2.2369
 
-!     m2-K/W                 =&gt;   ft2-F-hr/Btu        5.678263
+!     m2-K/W                 =&gt;   ft2-F-hr/Btu        5.678263
 
-!     W/m2                   =&gt;   Btu/h-ft2           0.316957210776545
+!     W/m2                   =&gt;   Btu/h-ft2           0.316957210776545
 
-!     A/K                    =&gt;   A/F                 0.555555555555556
+!     A/K                    =&gt;   A/F                 0.555555555555556
 
-!     g/kg                   =&gt;   grains/lb           7.00000
+!     g/kg                   =&gt;   grains/lb           7.00000
 
-!     g/m-s                  =&gt;   lb/ft-s             0.000671968949659
+!     g/m-s                  =&gt;   lb/ft-s             0.000671968949659
 
-!     g/m-s-K                =&gt;   lb/ft-s-F           0.000373574867724868
+!     g/m-s-K                =&gt;   lb/ft-s-F           0.000373574867724868
 
-!     J/K                    =&gt;   Btu/F               0.000526917584820558
+!     J/K                    =&gt;   Btu/F               0.000526917584820558
 
-!     J/kg-K2                =&gt;   Btu/lb-F2           0.000132889924714692
+!     J/kg-K2                =&gt;   Btu/lb-F2           0.000132889924714692
 
-!     J/m3                   =&gt;   Btu/ft3             2.68096514745308E-05
+!     J/m3                   =&gt;   Btu/ft3             2.68096514745308E-05
 
-!     kg/kg-K                =&gt;   lb/lb-F             0.555555555555556
+!     kg/kg-K                =&gt;   lb/lb-F             0.555555555555556
 
-!     kPa                    =&gt;   psi                 0.145038
+!     kPa                    =&gt;   psi                 0.145038
 
-!     kPa                    =&gt;   inHg                0.29523
+!     kPa                    =&gt;   inHg                0.29523
 
-!     m2/s                   =&gt;   ft2/s               10.764961
+!     m2/s                   =&gt;   ft2/s               10.764961
 
-!     m3/kg                  =&gt;   ft3/lb              16.018
+!     m3/kg                  =&gt;   ft3/lb              16.018
 
-!     m3/m3                  =&gt;   ft3/ft3             1
+!     m3/m3                  =&gt;   ft3/ft3             1
 
-!     N-s/m2                 =&gt;   lbf-s/ft2           0.0208857913669065
+!     N-s/m2                 =&gt;   lbf-s/ft2           0.0208857913669065
 
-!     V/K                    =&gt;   V/F                 0.555555555555556
+!     V/K                    =&gt;   V/F                 0.555555555555556
 
-!     W/m-K2                 =&gt;   Btu/h-F2-ft         0.321418310071648
+!     W/m-K2                 =&gt;   Btu/h-F2-ft         0.321418310071648
 
-!     m3/s-m                 =&gt;   ft3/min-ft          645.89
+!     m3/s-m                 =&gt;   ft3/min-ft          645.89
 
-!     J/m2-K                 =&gt;   Btu/ft2-F           4.89224766847393E-05
+!     J/m2-K                 =&gt;   Btu/ft2-F           4.89224766847393E-05
 
-!     cycles/hr              =&gt;   cycles/hr           1
+!     cycles/hr              =&gt;   cycles/hr           1
 
-!     kg/kg                  =&gt;   lb/lb               1
+!     kg/kg                  =&gt;   lb/lb               1
 
-!     J/J                    =&gt;   Btu/Btu             1
+!     J/J                    =&gt;   Btu/Btu             1
 
-!     g/GJ                   =&gt;   lb/MWh              0.00793664091373665
+!     g/GJ                   =&gt;   lb/MWh              0.00793664091373665
 
-!     L/GJ                   =&gt;   gal/kWh             0.000951022349025202
+!     L/GJ                   =&gt;   gal/kWh             0.000951022349025202
 
-!     m3/GJ                  =&gt;   ft3/MWh             127.13292
+!     m3/GJ                  =&gt;   ft3/MWh             127.13292
 
-!     m3/s-m2                =&gt;   ft3/min-ft2         196.85
+!     m3/s-m2                =&gt;   ft3/min-ft2         196.85
 
-!     m3/s-person            =&gt;   ft3/min-person      2118.6438
+!     m3/s-person            =&gt;   ft3/min-person      2118.6438
 
-!     W/m2-K2                =&gt;   Btu/h-ft2-F2        0.097826
+!     W/m2-K2                =&gt;   Btu/h-ft2-F2        0.097826
 
-!     g/MJ                   =&gt;   lb/MWh              7.93664091373665
+!     g/MJ                   =&gt;   lb/MWh              7.93664091373665
 
-!     L/MJ                   =&gt;   gal/kWh             0.951022349025202
+!     L/MJ                   =&gt;   gal/kWh             0.951022349025202
 
-!     m3/MJ                  =&gt;   ft3/kWh             127.13292
+!     m3/MJ                  =&gt;   ft3/kWh             127.13292
 
-!     W/W                    =&gt;   Btuh/Btuh           1
+!     W/W                    =&gt;   Btuh/Btuh           1
 
-!     $/m2                   =&gt;   $/ft2               0.0928939733269818
+!     $/m2                   =&gt;   $/ft2               0.0928939733269818
 
-!     $                      =&gt;   $                   1
+!     $                      =&gt;   $                   1
 
-!     $/kW                   =&gt;   $/(kBtuh/h)         0.293083235638921
+!     $/kW                   =&gt;   $/(kBtuh/h)         0.293083235638921
 
-!     $/m3                   =&gt;   $/ft3               0.0283127014102352
+!     $/m3                   =&gt;   $/ft3               0.0283127014102352
 
-!     years                  =&gt;   years               1
+!     years                  =&gt;   years               1
 
-!     $/(W/K)                =&gt;   $/(Btu/h-F)         0.52667614683731
+!     $/(W/K)                =&gt;   $/(Btu/h-F)         0.52667614683731
 
-!     $/(m3/s)               =&gt;   $/(ft3/min)         0.000472000059660808
+!     $/(m3/s)               =&gt;   $/(ft3/min)         0.000472000059660808
 
-!     W/m                    =&gt;   Btu/h-ft            1.04072
+!     W/m                    =&gt;   Btu/h-ft            1.04072
 
-!     K/m                    =&gt;   F/ft                0.54861322767449
+!     K/m                    =&gt;   F/ft                0.54861322767449
 
-!     W/s                    =&gt;   W/s                 1
+!     W/s                    =&gt;   W/s                 1
 
-!     kmol                   =&gt;   kmol                1
+!     kmol                   =&gt;   kmol                1
 
-!     J                      =&gt;   Wh                  0.000277777777777778
+!     J                      =&gt;   Wh                  0.000277777777777778
 
-!     GJ                     =&gt;   ton-hrs             78.9889415481832
+!     GJ                     =&gt;   ton-hrs             78.9889415481832
 
-!     kg/m2                  =&gt;   lb/ft2              0.204794053596664
+!     kg/m2                  =&gt;   lb/ft2              0.204794053596664
 
-!     kg                     =&gt;   lb                  2.2046
+!     kg                     =&gt;   lb                  2.2046
 
-!     percent/K              =&gt;   percent/F           0.555555555555556
+!     percent/K              =&gt;   percent/F           0.555555555555556
 
-!     kg/s2                  =&gt;   lb/s2               2.2046
+!     kg/s2                  =&gt;   lb/s2               2.2046
 
-!     g/mol                  =&gt;   lb/mol              0.0022046
+!     g/mol                  =&gt;   lb/mol              0.0022046
 
-!     deltaJ/kg              =&gt;   deltaBtu/lb         0.0004299
+!     deltaJ/kg              =&gt;   deltaBtu/lb         0.0004299
 
-!     person/m2              =&gt;   person/ft2          0.0928939733269818
+!     person/m2              =&gt;   person/ft2          0.0928939733269818
 
-!     m2/person              =&gt;   ft2/person          10.764961
+!     m2/person              =&gt;   ft2/person          10.764961
 
-!     W/person               =&gt;   Btu/h-person        3.412
+!     W/person               =&gt;   Btu/h-person        3.412
 
-!     m3/person              =&gt;   ft3/person          35.319837041
+!     m3/person              =&gt;   ft3/person          35.319837041
 
-!     m3/hr-person           =&gt;   ft3/hr-person       35.319837041
+!     m3/hr-person           =&gt;   ft3/hr-person       35.319837041
 
-!     m3/m2                  =&gt;   ft3/ft2             3.281
+!     m3/m2                  =&gt;   ft3/ft2             3.281
 
-!     m3/hr-m2               =&gt;   ft3/hr-ft2          3.281
+!     m3/hr-m2               =&gt;   ft3/hr-ft2          3.281
 
-!     m3/hr                  =&gt;   ft3/hr              35.319837041
+!     m3/hr                  =&gt;   ft3/hr              35.319837041
 
-!     s/m                    =&gt;   s/ft                0.304785126485827
+!     s/m                    =&gt;   s/ft                0.304785126485827
 
-!     m2/m                   =&gt;   ft2/ft              3.281
+!     m2/m                   =&gt;   ft2/ft              3.281
 
-!     L/day                  =&gt;   pint/day            2.11337629827348
+!     L/day                  =&gt;   pint/day            2.11337629827348
 
-!     L/kWh                  =&gt;   pint/kWh            2.11337629827348
+!     L/kWh                  =&gt;   pint/kWh            2.11337629827348
 
-!     kg/Pa-s-m2             =&gt;   lb/psi-s-ft2        1412.00523459398
+!     kg/Pa-s-m2             =&gt;   lb/psi-s-ft2        1412.00523459398
 
-!     m/hr                   =&gt;   ft/hr               3.281
+!     m/hr                   =&gt;   ft/hr               3.281
 
-!     Mode                   =&gt;   Mode                1
+!     Mode                   =&gt;   Mode                1
 
-!     Control                =&gt;   Control             1
+!     Control                =&gt;   Control             1
 
-!     Availability           =&gt;   Availability        1
+!     Availability           =&gt;   Availability        1
 
-!     rev/min                =&gt;   rev/min             1
+!     rev/min                =&gt;   rev/min             1
 
-!     W/(m3/s)               =&gt;   W/(ft3/min)         0.0004719475
+!     W/(m3/s)               =&gt;   W/(ft3/min)         0.0004719475
 
-!     VA                     =&gt;   VA                  1
+!     VA                     =&gt;   VA                  1
 
-!     N-m                    =&gt;   lbf-in              8.85074900525547
+!     N-m                    =&gt;   lbf-in              8.85074900525547
 
-!     m3/s-W                 =&gt;   ft3-h/min-Btu       621.099127332943
+!     m3/s-W                 =&gt;   ft3-h/min-Btu       621.099127332943
 
-!     cm2                    =&gt;   inch2               0.15500031000062
+!     cm2                    =&gt;   inch2               0.15500031000062
 
-!     kg/m                   =&gt;   lb/ft               0.67196893069637
+!     kg/m                   =&gt;   lb/ft               0.67196893069637
 
-!     m/yr                   =&gt;   inch/yr             39.37
+!     m/yr                   =&gt;   inch/yr             39.37
 
 !
 
@@ -13676,66 +12889,66 @@ The following is a basic description of the structure of the IDD (it’s actuall
 
 !
 
-!     m                      =&gt;   in                  39.37
+!     m                      =&gt;   in                  39.37
 
-!     W                      =&gt;   W                   1
+!     W                      =&gt;   W                   1
 
-!     m3/s                   =&gt;   gal/min             15852
+!     m3/s                   =&gt;   gal/min             15852
 
-!     m3/s                   =&gt;   lbH2O/hr            7936289.998
+!     m3/s                   =&gt;   lbH2O/hr            7936289.998
 
-!     Pa                     =&gt;   inHg                0.00029613
+!     Pa                     =&gt;   inHg                0.00029613
 
-!     Pa                     =&gt;   inH2O               0.00401463
+!     Pa                     =&gt;   inH2O               0.00401463
 
-!     Pa                     =&gt;   ftH2O               0.00033455
+!     Pa                     =&gt;   ftH2O               0.00033455
 
-!     W/person               =&gt;   W/person            1
+!     W/person               =&gt;   W/person            1
 
-!     W/m2                   =&gt;   W/m2                1
+!     W/m2                   =&gt;   W/m2                1
 
-!     W/m2                   =&gt;   W/ft2               0.0928939733269818
+!     W/m2                   =&gt;   W/ft2               0.0928939733269818
 
-!     W/m-K                  =&gt;   Btu/h-ft-F          0.577796066000163
+!     W/m-K                  =&gt;   Btu/h-ft-F          0.577796066000163
 
 !
 
 ! Units fields that are not translated
 
-!     deg
+!     deg
 
-!     hr
+!     hr
 
-!     A
+!     A
 
-!     dimensionless
+!     dimensionless
 
-!     V
+!     V
 
-!     ohms
+!     ohms
 
-!     A/V
+!     A/V
 
-!     eV
+!     eV
 
-!     percent
+!     percent
 
-!     s
+!     s
 
-!     W/m2 or deg C
+!     W/m2 or deg C
 
-!     W/m2, W or deg C
+!     W/m2, W or deg C
 
-!     minutes
+!     minutes
 
-!     1/hr
+!     1/hr
 
 ! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
 
 IDFEditor
 ---------
 
-IDF Editor is an optional component of the EnergyPlus installation. For users who want a simple way of creating or editing EnergyPlus input data files (IDF), IDF Editor provides this service.  The IDF Editor does not check inputs for validity, although some numeric fields are highlighted if out of range and some text fields are highlighted if they contain an invalid reference. For instructions and rules that must be followed when creating an IDF file the user should refer to the [*Input/Output Reference*](../../EnergyPlusFromStarTeam/EnergyPlusFromStarTeam/Documentation/sources/InputOutputReference.pdf) document.
+IDF Editor is an optional component of the EnergyPlus installation. For users who want a simple way of creating or editing EnergyPlus input data files (IDF), IDF Editor provides this service.  The IDF Editor does not check inputs for validity, although some numeric fields are highlighted if out of range and some text fields are highlighted if they contain an invalid reference. For instructions and rules that must be followed when creating an IDF file the user should refer to the [*Input/Output Reference*](../../EnergyPlusFromStarTeam/EnergyPlusFromStarTeam/Documentation/sources/InputOutputReference.pdf) document.
 
 ![](AuxiliaryPrograms/media/image075.jpg)
 
@@ -13751,7 +12964,7 @@ Creating a new input data file or selecting an existing input data file can be a
 
 ### Class List and Objects
 
-The classes that can be used to make up an IDF file have been organized into groups as shown in the ‘Class List’ portion of the screen. A class is made up of a group of objects. Select a class from the list by clicking on and highlighting the class. The field to the left of the selected class in the ‘Class List’ will either contain [------] to indicate that this class has no objects in the IDF file or it will contain a number like [0003] to indicate the number of times the object currently appears in the IDF file. For example, for the BuildingSurface:Detailed class selected in the screen above under the Thermal Zone Description/Geometry group, there are 40 objects in the IDF file. The details for these 40 objects or any new object that is defined are displayed in columns within the grid. Each object is made up of fields and can be used to further define the object. Any units attached to each field are shown in the second column. You may need to scroll down the ‘field’ list or maximize the application to see all of the fields. Likewise, you may need to scroll to the right of the main grid to see other objects.
+The classes that can be used to make up an IDF file have been organized into groups as shown in the 'Class List' portion of the screen. A class is made up of a group of objects. Select a class from the list by clicking on and highlighting the class. The field to the left of the selected class in the 'Class List' will either contain [------] to indicate that this class has no objects in the IDF file or it will contain a number like [0003] to indicate the number of times the object currently appears in the IDF file. For example, for the BuildingSurface:Detailed class selected in the screen above under the Thermal Zone Description/Geometry group, there are 40 objects in the IDF file. The details for these 40 objects or any new object that is defined are displayed in columns within the grid. Each object is made up of fields and can be used to further define the object. Any units attached to each field are shown in the second column. You may need to scroll down the 'field' list or maximize the application to see all of the fields. Likewise, you may need to scroll to the right of the main grid to see other objects.
 
 Options under the view menu can change how you use the Class List. To display only classes that contain objects select the "show classes with objects only" option on the "View" menu. You can also toggle this feature on and off with CTRL+L. If the file is empty and has no objects, this toggle does not impact the display.
 
@@ -13761,17 +12974,17 @@ The "Show Quick Select Dropdowns" view menu option adds two new input fields to 
 
 By clicking and highlighting a value within an object, several things happen:
 
-1)   Any user comments from the IDF file will be displayed in the ‘Comments from IDF’ portion of the screen
+1)   Any user comments from the IDF file will be displayed in the 'Comments from IDF' portion of the screen
 
-2)   Any notes contained in the IDD for this input field will be displayed in the ‘Explanation of Keyword’ portion of the screen
+2)   Any notes contained in the IDD for this input field will be displayed in the 'Explanation of Keyword' portion of the screen
 
-3)   The value can be edited. Depending on the field, a drop down list may display the default value, maximum and minimum, or other keywords that can be used with the field.
+3)   The value can be edited. Depending on the field, a drop down list may display the default value, maximum and minimum, or other keywords that can be used with the field.
 
-4)   Numeric fields that can be autosized will include "autosize" as a selection in the drop down list.
+4)   Numeric fields that can be autosized will include "autosize" as a selection in the drop down list.
 
-5)   Some numeric fields have a maximum and/or minimum value specified in the IDD. If the value entered is outside this range, the cell will be highlighted in pale orange.
+5)   Some numeric fields have a maximum and/or minimum value specified in the IDD. If the value entered is outside this range, the cell will be highlighted in pale orange.
 
-6)   For values that are names of nodes, a new dialog box titled "Edit or Select Node Name" can be shown when the small button is pressed that is on the right side in each node name cell as described in the next section.
+6)   For values that are names of nodes, a new dialog box titled "Edit or Select Node Name" can be shown when the small button is pressed that is on the right side in each node name cell as described in the next section.
 
 ### Edit or Select Node Names Dialog
 
@@ -13789,7 +13002,7 @@ Finally, the Containing Text field just above the OK button can be typed in. Wha
 
 ### Working with Objects
 
-To delete an object, first click on any value for the object and then click on the "Del Obj" button. To add a new object, click on the "New Obj" button and a new object column with fields set to blanks, zeros, or default values will be added to the far right of the grid. The "Dup Obj" button is similar to "New Obj", but copies the values of the fields of the currently selected object. Copying and pasting an object or groups of objects is also possible using the "Copy Obj" and "Paste Obj" buttons.  These allow objects to be copied between files are also good for copying from files in the DataSets subdirectory. (Also see the Edit menu to perform these functions.)
+To delete an object, first click on any value for the object and then click on the "Del Obj" button. To add a new object, click on the "New Obj" button and a new object column with fields set to blanks, zeros, or default values will be added to the far right of the grid. The "Dup Obj" button is similar to "New Obj", but copies the values of the fields of the currently selected object. Copying and pasting an object or groups of objects is also possible using the "Copy Obj" and "Paste Obj" buttons.  These allow objects to be copied between files are also good for copying from files in the DataSets subdirectory. (Also see the Edit menu to perform these functions.)
 
 ### File Menu
 
@@ -13799,7 +13012,7 @@ The "File", "Save Options" screen is shown below.
 
 
 
- ![](AuxiliaryPrograms/media/image077.png)
+ ![](AuxiliaryPrograms/media/image077.png)
 
 Figure 51. IDF Editor Save Options Screen.
 
@@ -13813,25 +13026,25 @@ The "Set as Default" option allows you to keep the save options intact for files
 
 The Help that is available from the Save Options screen is reproduced below:
 
-n The save options are related to the layout of the IDF file after it is saved. These options are not important if you never edit the IDF file with a text editor.
+* The save options are related to the layout of the IDF file after it is saved. These options are not important if you never edit the IDF file with a text editor.
 
-n The sorted order of saving objects is the traditional way the IDF Editor sorts objects within files. Each type of object is presented in groups in the order they appear in the Energy+.IDD. The other options preserve the original order of the objects from the file but each object will be still be reformatted. By preserving the order, the objects are not rearranged so you can group them using a text editor and they will stay in that order. New objects are placed either near the top of the file or near the bottom of the file so that they can be easily found when using a text editor.
+* The sorted order of saving objects is the traditional way the IDF Editor sorts objects within files. Each type of object is presented in groups in the order they appear in the Energy+.IDD. The other options preserve the original order of the objects from the file but each object will be still be reformatted. By preserving the order, the objects are not rearranged so you can group them using a text editor and they will stay in that order. New objects are placed either near the top of the file or near the bottom of the file so that they can be easily found when using a text editor.
 
-n You can also choose to specially format some objects. This affects how individual fields in objects are arranged when saved. Selecting this option will format the following objects on a single line: Report, Report Meter, Report Variable, Version, Timestep in Hour, Inside Convection Algorithm, Outside Convection Algorithm, Solution Algorithm, Shadowing Calculations, Ground Reflectances, and GroundTemperatures:Deep. In addition, Schedule:Compact objects will be formatted to have two field for some lines. With this option, objects with geometric vertices are formatted to have the X, Y, and Z values on the same line. Those objects include: Surface:HeatTransfer, Surface:HeatTransfer:Sub, Surface:Shading:Detached:Fixed, Surface:Shading:Detached:Building and Surface:Shading:Attached.
+* You can also choose to specially format some objects. This affects how individual fields in objects are arranged when saved. Selecting this option will format the following objects on a single line: Report, Report Meter, Report Variable, Version, Timestep in Hour, Inside Convection Algorithm, Outside Convection Algorithm, Solution Algorithm, Shadowing Calculations, Ground Reflectances, and GroundTemperatures:Deep. In addition, Schedule:Compact objects will be formatted to have two field for some lines. With this option, objects with geometric vertices are formatted to have the X, Y, and Z values on the same line. Those objects include: Surface:HeatTransfer, Surface:HeatTransfer:Sub, Surface:Shading:Detached:Fixed, Surface:Shading:Detached:Building and Surface:Shading:Attached.
 
-n These options are saved for each file. If a file has not been saved with IDF Editor yet, the default is used  but if a file does not specify the default values for these can also be set by using the set as default option. The saved file keeps these options by using the !-option line with SortedOrder, OriginalOrderTop, OriginalOrderBottom, and UseSpecialFormat."
+* These options are saved for each file. If a file has not been saved with IDF Editor yet, the default is used  but if a file does not specify the default values for these can also be set by using the set as default option. The saved file keeps these options by using the !-option line with SortedOrder, OriginalOrderTop, OriginalOrderBottom, and UseSpecialFormat."
 
-n Full line comments which begin with "!" are preserved by IDF Editor and become associated with the object immediately followin the comment line(s).
+* Full line comments which begin with "!" are preserved by IDF Editor and become associated with the object immediately followin the comment line(s).
 
-n Endline comments which begin with "!" are preserved by IDF Editor and are placed immediately before the object they are found in.
+* Endline comments which begin with "!" are preserved by IDF Editor and are placed immediately before the object they are found in.
 
-n Endline comment which being with "!-" are automatic comments which IDF Editor will overwrite with the field name and units. User-provided text which follows "!-" will be lost. User comments should be added above the pertinent object using "!" to begin the line.
+* Endline comment which being with "!-" are automatic comments which IDF Editor will overwrite with the field name and units. User-provided text which follows "!-" will be lost. User comments should be added above the pertinent object using "!" to begin the line.
 
 Also on the File menu is the Open DataSet menu and submenu. This allows you to open any input file that appears in the DataSet subdirectory and copy objects from them into another file. This is required because EnergyPlus does not read the DataSet files, it is up to you to include objects from them.
 
 ### Edit Menu
 
-The Edit Menu offers options to create a new object, duplicate an object, and delete an object as well as finding and searching. The object options are the same operations as can be accomplished by using the ‘New Obj’, ‘Dup Obj’ and ‘Del Obj’ buttons (see the *Working with Objects* section above). In addition, the "Next Row after Enter" option can be toggled. When this option is on, the selection moves down one row after pressing Enter. The copy and paste object commands allow a single object to be copied within a file or between files. The pasted object appears as the last object in the class. This capability makes it easier to utilize the data in the DataSets directory.
+The Edit Menu offers options to create a new object, duplicate an object, and delete an object as well as finding and searching. The object options are the same operations as can be accomplished by using the 'New Obj', 'Dup Obj' and 'Del Obj' buttons (see the *Working with Objects* section above). In addition, the "Next Row after Enter" option can be toggled. When this option is on, the selection moves down one row after pressing Enter. The copy and paste object commands allow a single object to be copied within a file or between files. The pasted object appears as the last object in the class. This capability makes it easier to utilize the data in the DataSets directory.
 
 The Find Class menu item brings up the following dialog box used to search through the Class List:
 
@@ -13847,7 +13060,7 @@ The Search and Replace menu item or CTRL-H activates the following dialog box:
 
 Figure 53. Search and Replace Diaglog Box
 
-The Search and Replace dialog box can be used to find and change each instance of text being searched with some replacement text. The Search and Replace dialog is used to search and replace values of fields rather than classes like the Find Class dialog. To use the Search and Replace dialog, enter the text being searched in the Find What field and press the Find button.  After the Find button is pressed, the list shows the places in the file that the text appears. For each time the text is found, the entire field value is shown followed by the class name, name of the object, and the name of the field in parentheses.  Each item in the list can be selected using the check box to the left. The All and None buttons will select all or none of the items found. After the locations are selected that need to be replaced, you should enter the text in the Replace With field. When the Replace Selected button is pressed the value in each of locations that were checked will be replaced with the Replace with text.
+The Search and Replace dialog box can be used to find and change each instance of text being searched with some replacement text. The Search and Replace dialog is used to search and replace values of fields rather than classes like the Find Class dialog. To use the Search and Replace dialog, enter the text being searched in the Find What field and press the Find button.  After the Find button is pressed, the list shows the places in the file that the text appears. For each time the text is found, the entire field value is shown followed by the class name, name of the object, and the name of the field in parentheses.  Each item in the list can be selected using the check box to the left. The All and None buttons will select all or none of the items found. After the locations are selected that need to be replaced, you should enter the text in the Replace With field. When the Replace Selected button is pressed the value in each of locations that were checked will be replaced with the Replace with text.
 
 The dialog will usually open with the Find What field filled with the value of the currently selected cell. If the current cell has just been changed, the Find What and the Replace With fields will contain the before and after values of the change in the current cell. This makes it easy to change other instances in the file to be consistent with the changes just made. If renaming objects, the recommended approach is to rename the object and select the cell again and open the Search and Replace dialog. This will show other places in the file that use that object name that also may need to be changed.
 
@@ -13855,11 +13068,11 @@ The dialog will usually open with the Find What field filled with the value of t
 
 The View menu offers options for units and column widths. The Narrow/Medium/Wide Column options set the standard column width for items in the object grid. Individual columns can also be resized by dragging the column separator. The displayed value is rounded and/or expressed in scientific notation to fit within the column width.
 
-1)   EnergyPlus input files are always in SI units. However, selecting "Inch-Pound" (IP) units in the View menu displays and edits values in IP units in the IDF editor. The IP unit will be displayed in the units column of the object grid. Some SI units convert to multiple IP units. For example, W becomes Btu/hr for heating and cooling capacity but remains as W for lighting and electrical equipment.
+1)   EnergyPlus input files are always in SI units. However, selecting "Inch-Pound" (IP) units in the View menu displays and edits values in IP units in the IDF editor. The IP unit will be displayed in the units column of the object grid. Some SI units convert to multiple IP units. For example, W becomes Btu/hr for heating and cooling capacity but remains as W for lighting and electrical equipment.
 
-2)   All conversion factors used in the IDF editor are documented in a block of comments near the top of the Energy+.IDD file.
+2)   All conversion factors used in the IDF editor are documented in a block of comments near the top of the Energy+.IDD file.
 
-3)   Schedules, fluid properties and curves now support IP unit conversions. For curves, the minimum and maximum values are converted but the coefficients are not.
+3)   Schedules, fluid properties and curves now support IP unit conversions. For curves, the minimum and maximum values are converted but the coefficients are not.
 
 To display only classes that contain objects select the "show classes with objects only" option on the "View" menu. You can also toggle this feature on and off with CTRL+L. If the file is empty and has no objects, this toggle does not impact the display.
 
@@ -13881,7 +13094,7 @@ The "Validity Check" function has replaced and expanded upon the old "Check Out-
 
 Figure 55. Validity Check Dialog Box
 
-The list displays the values and locations for objects with values that are either above the maximum or below the minimum values. This allows you to check your input for out-of-range values prior to running EnergyPlus.  It also displays fields that contain invalid references. An invalid reference is when a name is used that should be the name of object but no object exists that uses that name. For example, if a Construction object references a layer named IN20 but no Material (or Material:NoMass, etc.) object is named IN20. When viewing the class that contains invalid references, those references are shown with a different background color similar to numbers that are out of range. The "Validity Check" dialog also shows when an entry for a field is not one of the possible lists of choices. The Goto button allows you to jump directly to the selected identified problems. The Perform Validity Check When Saving File can be turned on and off and automatically performs the check whenever the file is saved.
+The list displays the values and locations for objects with values that are either above the maximum or below the minimum values. This allows you to check your input for out-of-range values prior to running EnergyPlus.  It also displays fields that contain invalid references. An invalid reference is when a name is used that should be the name of object but no object exists that uses that name. For example, if a Construction object references a layer named IN20 but no Material (or Material:NoMass, etc.) object is named IN20. When viewing the class that contains invalid references, those references are shown with a different background color similar to numbers that are out of range. The "Validity Check" dialog also shows when an entry for a field is not one of the possible lists of choices. The Goto button allows you to jump directly to the selected identified problems. The Perform Validity Check When Saving File can be turned on and off and automatically performs the check whenever the file is saved.
 
 ### Help Menu
 
@@ -13893,7 +13106,7 @@ Remember to save any changes made before you create or edit another input file.
 
 No "Run EnergyPlus" button is available. Save your IDF file and use EP-Launch to execute an EnergyPlus run.
 
-You cannot edit comments in the ‘Comments from IDF’ section of the screen.
+You cannot edit comments in the 'Comments from IDF' section of the screen.
 
 The use of point "." or comma "," as the decimal symbol is controlled by the windows system settings. This setting is found in the Control Panel, Regional Options, Number tab, Decimal Symbol field. IDF Editor will use the current decimal symbol to signify the start of the fractional portion of the number and will ignore other symbols. The idf file is always written using point "." as the decimal symbol.
 
