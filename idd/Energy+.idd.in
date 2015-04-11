@@ -1861,12 +1861,24 @@ Site:GroundDomain:Slab,
         \minimum> 0.0
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
-   A10; \field Simulation Timestep
+   A10, \field Simulation Timestep
         \type choice
         \key Hourly
         \key Timestep
         \default Hourly
         \note This field specifies the ground domain simulation timestep.
+   N15, \field X-direction Mesh Density Parameter
+        \type integer
+        \default 4
+        \minimum 2
+   N16, \field Y-direction (vertical) Mesh Density Parameter
+        \type integer
+        \default 4
+        \minimum 2
+   N17; \field Z-direction Mesh Density Parameter
+        \type integer
+        \default 4
+        \minimum 2
 
 Site:GroundDomain:Basement,
         \memo Ground-coupled basement model for simulating basements

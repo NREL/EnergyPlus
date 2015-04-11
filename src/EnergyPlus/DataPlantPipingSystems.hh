@@ -3,6 +3,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
@@ -1359,6 +1360,7 @@ namespace DataPlantPipingSystems {
 		int NumDomainCells;
 		int NumGroundSurfCells;
 		int NumInsulationCells;
+		Array2D< Real64 > WeightedHeatFlux;
 
 		// Main 3D cells array
 		Array3D< CartesianCell > Cells;
@@ -1494,6 +1496,7 @@ namespace DataPlantPipingSystems {
 			int const NumDomainCells,
 			int const NumGroundSurfCells,
 			int const NumInsulationCells,
+			Array2< Real64 > const & WeightedHeatFlux,
 
 			Array3< CartesianCell > const & Cells
 		) :
@@ -1568,7 +1571,8 @@ namespace DataPlantPipingSystems {
 			NumDomainCells( NumDomainCells ),
 			NumGroundSurfCells( NumGroundSurfCells ),
 			NumInsulationCells( NumInsulationCells ),
-			Cells( Cells )
+			Cells( Cells ),
+			WeightedHeatFlux(WeightedHeatFlux)
 		{}
 
 	};

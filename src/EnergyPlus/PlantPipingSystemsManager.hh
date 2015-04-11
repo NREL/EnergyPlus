@@ -888,6 +888,16 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
+		GetSlabArea(
+		int const DomainNum,
+		int const CellType
+		);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
+	Real64
 	EvaluateFarfieldBoundaryTemperature(
 		int const DomainNum,
 		CartesianCell const & cell
