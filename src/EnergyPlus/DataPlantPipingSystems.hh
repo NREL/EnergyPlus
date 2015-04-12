@@ -51,6 +51,7 @@ namespace DataPlantPipingSystems {
 
 	extern int const MeshDistribution_Uniform;
 	extern int const MeshDistribution_SymmetricGeometric;
+	extern int const MeshDistribution_Geometric;
 
 	extern int const SegmentFlow_IncreasingZ;
 	extern int const SegmentFlow_DecreasingZ;

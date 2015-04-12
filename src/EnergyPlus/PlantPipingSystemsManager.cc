@@ -1321,9 +1321,9 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).PerimeterOffset = Domain( ZoneCoupledDomainCtr ).PerimeterOffset;
 
 				// Set simulation interval flag
-				if ( SameString( cAlphaArgs( 10 ), "TIMESTEP" ) ) {
+				if ( SameString( cAlphaArgs( 11 ), "TIMESTEP" ) ) {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
-				} else if ( SameString( cAlphaArgs( 10 ), "HOURLY" ) ) {
+				} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
 				} else {
 					ShowContinueError( "Could not determine slab simulation interval. Check input." );
@@ -1376,15 +1376,32 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Extents.Ymax = Domain( ZoneCoupledDomainCtr ).Depth;
 				PipingSystemDomains( DomainCtr ).Extents.Zmax = Domain( ZoneCoupledDomainCtr ).PerimeterOffset + PipingSystemDomains( DomainCtr ).SlabLength / 2;
 
-				// Set up the mesh with some default parameters
+				// Get mesh parameters
+				
+				// Mesh inputs
+				{ auto const meshDistribution(uppercased(cAlphaArgs(10)));
+				if (meshDistribution == "UNIFORM") {
+					PipingSystemDomains(DomainCtr).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
+					PipingSystemDomains(DomainCtr).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
+					PipingSystemDomains(DomainCtr).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
+				}
+				else if (meshDistribution == "GEOMETRIC") {
+					PipingSystemDomains(DomainCtr).Mesh.X.MeshDistribution = MeshDistribution_Geometric;
+					PipingSystemDomains(DomainCtr).Mesh.Y.MeshDistribution = MeshDistribution_Geometric;
+					PipingSystemDomains(DomainCtr).Mesh.Z.MeshDistribution = MeshDistribution_Geometric;
+					
+					PipingSystemDomains(DomainCtr).Mesh.X.GeometricSeriesCoefficient = rNumericArgs(18);
+					PipingSystemDomains(DomainCtr).Mesh.Y.GeometricSeriesCoefficient = rNumericArgs(18);
+					PipingSystemDomains(DomainCtr).Mesh.Z.GeometricSeriesCoefficient = rNumericArgs(18);
+				}
+				else {
+					IssueSevereInputFieldError(RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs(1), cAlphaFieldNames(10), cAlphaArgs(10), "Use a choice from the available mesh type keys.", ErrorsFound);
+				}}
 
 				PipingSystemDomains(DomainCtr).Mesh.X.RegionMeshCount = rNumericArgs(15);
-				PipingSystemDomains( DomainCtr ).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
 				PipingSystemDomains(DomainCtr).Mesh.Y.RegionMeshCount = rNumericArgs(16);
-				PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
 				PipingSystemDomains(DomainCtr).Mesh.Z.RegionMeshCount = rNumericArgs(17);
-				PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
-
+				
 				// Soil properties
 				PipingSystemDomains( DomainCtr ).GroundProperties.Conductivity = Domain( ZoneCoupledDomainCtr ).SoilConductivity;
 				PipingSystemDomains( DomainCtr ).GroundProperties.Density = Domain( ZoneCoupledDomainCtr ).SoilDensity;
@@ -6424,6 +6441,7 @@ namespace PlantPipingSystemsManager {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 GridWidth;
 		int NumCellsOnEachSide;
+		int NumCells;
 		Real64 SummationTerm;
 		int I;
 		Real64 CellWidth;
@@ -6448,6 +6466,7 @@ namespace PlantPipingSystemsManager {
 		} else {
 			// Error
 		}}
+		ThisMesh.GeometricSeriesCoefficient = 2;
 
 		if ( ThisMesh.RegionMeshCount > 0 ) {
 			RetVal.allocate( {0,ThisMesh.RegionMeshCount - 1} );
@@ -6495,6 +6514,63 @@ namespace PlantPipingSystemsManager {
 				++SubIndex;  // SubIndex should be incremented here - After RetVal (SubIndex) is assigned a value. -SA
 			}
 
+		}
+
+		else if (ThisMesh.MeshDistribution == MeshDistribution_Geometric) {
+
+			NumCells = ThisMesh.RegionMeshCount;
+
+			if (g.RegionType == RegionType_XDirection || g.RegionType == RegionType_ZDirection)
+			{
+				//'calculate geometric series
+				SummationTerm = 0.0;
+				for (I = 1; I <= NumCells; ++I) {
+					SummationTerm += std::pow(ThisMesh.GeometricSeriesCoefficient, I - 1);
+				}
+				CellWidth = GridWidth / SummationTerm;
+				if (g.Min == 0){
+					//Ground region to the left of the slab will have cells expanding to the left
+					RetVal(NumCells - 1) = CellWidth;
+					for (I = NumCells - 2; I >= 0; --I) {
+						CellWidth *= ThisMesh.GeometricSeriesCoefficient;
+						RetVal(I) = CellWidth;
+					}
+				}
+				else{
+					//Slab region will have cells expanding to the right
+					RetVal(0) = CellWidth;
+					for (I = 1; I <= NumCells - 1; ++I) {
+						CellWidth *= ThisMesh.GeometricSeriesCoefficient;
+						RetVal(I) = CellWidth;
+					}
+				}
+			}
+			else if (g.RegionType == RegionType_YDirection){
+				if (g.Max == PipingSystemDomains(DomainNum).Extents.Ymax){
+					//Assign uniform cell widths to the slab cells
+					assert(ThisMesh.RegionMeshCount > 0);
+					CellWidth = GridWidth / ThisMesh.RegionMeshCount;
+
+					for (I = 0; I <= ThisMesh.RegionMeshCount - 1; ++I) {
+						RetVal(I) = CellWidth;
+					}
+				}
+				else{
+					//'calculate geometric series
+					SummationTerm = 0.0;
+					for (I = 1; I <= NumCells; ++I) {
+						SummationTerm += std::pow(ThisMesh.GeometricSeriesCoefficient, I - 1);
+					}
+					CellWidth = GridWidth / SummationTerm;
+
+					//Ground region under the slab will have cells expanding as we go down
+					RetVal(NumCells - 1) = CellWidth;
+					for (I = NumCells - 2; I >= 0; --I) {
+						CellWidth *= ThisMesh.GeometricSeriesCoefficient;
+						RetVal(I) = CellWidth;
+					}
+				}
+			}
 		}
 
 		g.CellWidths( {0,RetMaxIndex} ) = RetVal( {0,RetMaxIndex} );
@@ -6598,11 +6674,16 @@ namespace PlantPipingSystemsManager {
 		// na
 		using DataGlobals::TimeStep;
 		using DataEnvironment::CurMnDyHr;
+		using DataEnvironment::DayOfMonth;
+		using DataGlobals::HourOfDay;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int daytime = DayOfMonth;
+
+		std::ofstream static myfile("temperatures.csv", std::ofstream::out);
 
 		auto & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -6631,6 +6712,9 @@ namespace PlantPipingSystemsManager {
 					} else if ( SELECT_CASE_var == CellType_ZoneGroundInterface ) {
 						cell.MyBase.Temperature = EvaluateZoneInterfaceTemperature( DomainNum, cell );
 					}}
+					if (daytime == 30 && HourOfDay == 23){
+						myfile << "," << CurMnDyHr << "," << PipingSystemDomains(DomainNum).HeatFlux << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Conductivity << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.X << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.Y << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.Z << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).X_min << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).Y_min << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).Z_min << std::endl;
+					}
 				}
 			}
 		}
