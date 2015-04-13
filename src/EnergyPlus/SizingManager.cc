@@ -1728,6 +1728,33 @@ namespace SizingManager {
 						ShowContinueError( "... valid values are DesignDay, Flow/Zone or DesignDayWithLimit." );
 						ErrorsFound = true;
 					}}
+					if ( cAlphaArgs( 8 ) == "YES" ) {
+						ZoneSizingInput( ZoneSizIndex ).AccountForDOAS = true;
+					}
+					else { 
+						ZoneSizingInput( ZoneSizIndex ).AccountForDOAS = false;
+					}
+					{auto const DOASControlMethod( cAlphaArgs( 9 ) );
+					if ( DOASControlMethod == "NEUTRALSUPPLYAIR" ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOANeutralSup;
+					} else if ( DOASControlMethod == "NEUTRALDEHUMIDIFIEDSUPPLYAIR" ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOANeutralDehumSup;
+					} else if ( DOASControlMethod == "COLDSUPPLYAIR" ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOACoolSup;
+					}
+					else {
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... incorrect " + cAlphaFieldNames( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
+						ShowContinueError( "... valid values are NeutralSupplyAir, NeutralDehumidifiedSupplyAir or ColdSupplyAir." );
+						ErrorsFound = true;
+					}}
+					ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = rNumericArgs( 17 );
+					ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = rNumericArgs( 18 );
+					if ( rNumericArgs( 17 ) > 0.0 && rNumericArgs( 18 ) > 0.0 && rNumericArgs( 17 ) >= rNumericArgs( 18 ) ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint" );
+						ErrorsFound = true;
+					}
 				}
 			}
 		}

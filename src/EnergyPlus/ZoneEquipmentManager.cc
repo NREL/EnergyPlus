@@ -678,6 +678,86 @@ namespace ZoneEquipmentManager {
 	}
 
 	void
+	CalcDOASSupCondsForSizing(
+		Real64 OutDB, // outside air temperature [C]
+		Real64 OutHR, // outside humidity ratio [kg Water / kg Dry Air]
+		int DOASControl, // dedicated outside air control strategy
+		Real64 DOASLowTemp, // DOAS low setpoint [C]
+		Real64 DOASHighTemp, // DOAS high setpoint [C]
+		Real64 & DOASSupTemp, // DOAS supply temperature [C]
+		Real64 & DOASSupHR // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
+		)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   March 2015
+		//       MODIFIED
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function calculates supply conditions for the direct outside air system 
+		// (DOAS) sizing calculations
+
+		// METHODOLOGY EMPLOYED:
+		// the supply temperature and humidity ratio are set depending on the design control method 
+		// and the outside air temperature
+
+		// REFERENCES:
+		// Consult the "DOAS Effect On Zone Sizing" new feature proposal and design documents
+
+		// Using/Aliasing
+		using Psychrometrics::PsyWFnTdbRhPb;
+		using DataEnvironment::StdBaroPress;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcDOASSupCondsForSizing" );
+
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 W90H; // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+		Real64 W90L; // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+
+		W90H = PsyWFnTdbRhPb( DOASHighTemp, 0.9, StdBaroPress, RoutineName );
+		W90L = PsyWFnTdbRhPb( DOASLowTemp, 0.9, StdBaroPress, RoutineName );
+		if ( DOASControl == 1 ) {
+			if ( OutDB < DOASLowTemp ) {
+				DOASSupTemp = DOASLowTemp;
+				DOASSupHR = OutHR;
+			} else if (OutDB > DOASHighTemp) {
+				DOASSupTemp = DOASHighTemp;
+				DOASSupHR = min( OutHR, W90H );
+			}
+			else {
+				DOASSupTemp = OutDB;
+				DOASSupHR = OutHR;
+			}
+		}
+		else if ( DOASControl == 2 ) {
+			if ( OutDB < DOASLowTemp ) {
+				DOASSupTemp = DOASHighTemp;
+				DOASSupHR = OutHR;
+			}
+			else {
+				DOASSupTemp = DOASHighTemp;
+				DOASSupHR = min( OutHR, W90L );
+			}
+		}
+		else if ( DOASControl == 3 ) {
+			if ( OutDB < DOASLowTemp ) {
+				DOASSupTemp = DOASHighTemp;
+				DOASSupHR = OutHR;
+			}
+			else {
+				DOASSupTemp = DOASLowTemp;
+				DOASSupHR = min( OutHR, W90L );
+			}
+		}
+		else {
+			ShowFatalError( RoutineName + ":illegal DOAS design control strategy" );
+		}
+	}
+
+	void
 	SetUpZoneSizingArrays()
 	{
 

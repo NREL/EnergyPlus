@@ -68,6 +68,11 @@ namespace DataSizing {
 	extern int const InpDesAirFlow;
 	extern int const DesAirFlowWithLim;
 
+	// parameters for DOAs control method
+	extern int const DOANeutralSup;
+	extern int const DOANeutralDehumSup;
+	extern int const DOACoolSup;
+
 	// parameters for Type of Load to Size On
 	extern int const Sensible;
 	extern int const Latent;
@@ -283,6 +288,11 @@ namespace DataSizing {
 		int ZoneAirDistributionIndex; // index to the zone air distribution object
 		int ZoneDesignSpecOAIndex; // index to the zone design spec OA object
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		bool AccountForDOAS; // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
+		int DOASControlStrategy; // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
+		// 3=supply cold ventilation air
+		Real64 DOASLowSetpoint; // Dedicated Outside Air Low Setpoint for Design [C]
+		Real64 DOASHighSetpoint; // Dedicated Outside Air High Setpoint for Design [C]
 
 		// Default Constructor
 		ZoneSizingInputData() :
@@ -315,7 +325,11 @@ namespace DataSizing {
 			ZoneADEffHeating( 1.0 ),
 			ZoneAirDistributionIndex( 0 ),
 			ZoneDesignSpecOAIndex( 0 ),
-			ZoneSecondaryRecirculation( 0.0 )
+			ZoneSecondaryRecirculation( 0.0 ),
+			AccountForDOAS( false ),
+			DOASControlStrategy( 0 ),
+			DOASLowSetpoint( 0.0 ),
+			DOASHighSetpoint( 0.0)
 		{}
 
 		// Member Constructor
@@ -352,7 +366,12 @@ namespace DataSizing {
 			std::string const & ZoneAirDistEffObjName, // name of the zone air distribution effectiveness object name
 			int const ZoneAirDistributionIndex, // index to the zone air distribution object
 			int const ZoneDesignSpecOAIndex, // index to the zone design spec OA object
-			Real64 const ZoneSecondaryRecirculation // the zone secondary air recirculation fraction
+			Real64 const ZoneSecondaryRecirculation, // the zone secondary air recirculation fraction
+			bool const AccountForDOAS, // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
+			int const DOASControlStrategy, // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
+			// 3=supply cold ventilation air
+			Real64 const DOASLowSetpoint, // Dedicated Outside Air Low Setpoint for Design [C]
+			Real64 const DOASHighSetpoint // Dedicated Outside Air High Setpoint for Design [C]
 		) :
 			ZoneName( ZoneName ),
 			ZoneNum( ZoneNum ),
@@ -386,7 +405,11 @@ namespace DataSizing {
 			ZoneAirDistEffObjName( ZoneAirDistEffObjName ),
 			ZoneAirDistributionIndex( ZoneAirDistributionIndex ),
 			ZoneDesignSpecOAIndex( ZoneDesignSpecOAIndex ),
-			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation )
+			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation ),
+			AccountForDOAS( AccountForDOAS ),
+			DOASControlStrategy( DOASControlStrategy ),
+			DOASLowSetpoint( DOASLowSetpoint ),
+			DOASHighSetpoint( DOASHighSetpoint )
 		{}
 
 	};
