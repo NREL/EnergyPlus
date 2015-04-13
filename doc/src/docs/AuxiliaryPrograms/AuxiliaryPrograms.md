@@ -675,8 +675,8 @@ Table 4. Definitions File &location description
 
 <table class="table table-striped">
 <tr>
-<th>&amp;location Fielh Description</th>
-<th>Fielh Name</th>
+<th>&amp;location Field Description</th>
+<th>Field Name</th>
 <th>Type</th>
 </tr>
 <tr>
@@ -747,8 +747,8 @@ Table 5. Definitions File - &miscdata description
 
 <table class="table table-striped">
 <tr>
-<th>&amp;mischata Fielh Description</th>
-<th>Fielh Name</th>
+<th>&amp;mischata Field Description</th>
+<th>Field Name</th>
 <th>Type</th>
 </tr>
 <tr>
@@ -2637,8 +2637,8 @@ Table 13. K&ouml;ppen Climate Classification -- Major Groups
 
 <table class="table table-striped">
 <tr>
-<td>K&ouml;ppen Climate Type</td>
-<td>Description</td>
+<th>K&ouml;ppen Climate Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>A</td>
@@ -2738,9 +2738,9 @@ Table 14. Weather File Date Field Interpretation
 
 <table class="table table-striped">
 <tr>
-<td>Field Contents</td>
-<td>Interpretation</td>
-<td>Header Applicability</td>
+<th>Field Contents</th>
+<th>Interpretation</th>
+<th>Header Applicability</th>
 </tr>
 <tr>
 <td>&lt;number&gt;</td>
@@ -3249,9 +3249,9 @@ Table 15. Present Weather Observation Values
 
 <table class="table table-striped">
 <tr>
-<td>Element</td>
-<td>Values</td>
-<td>Definition</td>
+<th>Element</th>
+<th>Values</th>
+<th>Definition</th>
 </tr>
 <tr>
 <td>Observation Indicator</td>
@@ -3267,156 +3267,163 @@ Table 15. Present Weather Observation Values
 The present weather codes field is assumed to follow the TMY2 conventions for this field. Note that though this field may be represented as numeric (e.g. in the CSV format), it is really a text field of 9 single digits. This convention along with values for each "column" (left to right) is presented in Table 16. Note that some formats (e.g. TMY) does not follow this convention - as much as possible, the present weather codes are converted to this convention during WeatherConverter processing. Also note that the most important fields are those representing liquid precipitation - where the surfaces of the building would be wet. EnergyPlus uses "Snow Depth" to determine if snow is on the ground.
 
 Table 16. Weather Codes Field Interpretation
-
-Column -- Position in Field
-
-Element Description
-
-Possible Values
-
-Definition
-
-1
-
-Occurrence of Thunderstorm, Tornado, or Squall
-
-0 - 2, 4, 6 - 9
-
-0 = Thunderstorm-lightning and thunder. Wind gusts less than 25.7 m/s, and hail, if any, less than 1.9 cm diameter
- 1 = Heavy or severe thunderstorm-frequent intense lightning and thunder. Wind gusts greater than 25.7 m/s and hail, if any, 1.9 cm or greater diameter
- 2 = Report of tornado or waterspout
- 4 = Moderate squall-sudden increase of wind speed by at least 8.2 m/s, reaching 11.3 m/s or more and lasting for at least 1 minute
- 6 = Water spout (beginning January 1984)
- 7 = Funnel cloud (beginning January 1984)
- 8 = Tornado (beginning January 1984)
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9
-
-2
-
-Occurrence of Rain, Rain Showers, or Freezing Rain
-
-0 - 9
-
-0 = Light rain
- 1 = Moderate rain
- 2 = Heavy rain
- 3 = Light rain showers
- 4 = Moderate rain showers
- 5 = Heavy rain showers
- 6 = Light freezing rain
- 7 = Moderate freezing rain
- 8 = Heavy freezing rain
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9 Notes: Light = up to 0.25 cm per hour Moderate = 0.28 to 0.76 cm per hour Heavy = greater than 0.76 cm per hour
-
-3
-
-Occurrence of Rain Squalls, Drizzle, or Freezing Drizzle
-
-0, 1, 3 - 9
-
-0 = Light rain squalls
- 1 = Moderate rain squalls
- 3 = Light drizzle
- 4 = Moderate drizzle
- 5 = Heavy drizzle
- 6 = Light freezing drizzle
- 7 = Moderate freezing drizzle
- 8 = Heavy freezing drizzle
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9
- Notes: When drizzle or freezing drizzle occurs with other weather phenomena: Light = up to 0.025 cm per hour Moderate = 0.025 to 0.051 cm per hour Heavy = greater than 0.051 cm per hour
- When drizzle or freezing drizzle occurs alone: Light = visibility 1 km or greater Moderate = visibility between 0.5 and 1 km Heavy = visibility 0.5 km or less
-
-4
-
-Occurrence of Snow, Snow Pellets, or Ice Crystals
-
-0 - 9
-
-0 = Light snow
- 1 = Moderate snow
- 2 = Heavy snow
- 3 = Light snow pellets
- 4 = Moderate snow pellets
- 5 = Heavy snow pellets
- 6 = Light ice crystals
- 7 = Moderate ice crystals
- 8 = Heavy ice crystals
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9 Notes: Beginning in April 1963, any occurrence of ice crystals is recorded as a 7.
-
-5
-
-Occurrence of Snow Showers, Snow Squalls, or Snow Grains
-
-0 - 7, 9
-
-0 = Light snow
- 1 = Moderate snow showers
- 2 = Heavy snow showers
- 3 = Light snow squall
- 4 = Moderate snow squall
- 5 = Heavy snow squall
- 6 = Light snow grains
- 7 = Moderate snow grains
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9
-
-6
-
-Occurrence of Sleet, Sleet Showers, or Hail
-
-0 - 2, 4, 9
-
-0 = Light ice pellet showers
- 1 = Moderate ice pellet showers
- 2 = Heavy ice pellet showers
- 4 = Hail
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9
- Notes: Prior to April 1970, ice pellets were coded as sleet. Beginning in April 1970, sleet and small hail were redefined as ice pellets and are coded as 0, 1, or 2.
-
-7
-
-Occurrence of Fog, Blowing Dust, or Blowing Sand
-
-0 - 9
-
-0 = Fog
- 1 = Ice fog
- 2 = Ground fog
- 3 = Blowing dust
- 4 = Blowing sand
- 5 = Heavy fog
- 6 = Glaze (beginning 1984)
- 7 = Heavy ice fog (beginning 1984)
- 8 = Heavy ground fog (beginning 1984)
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9 Notes: These values recorded only when visibility is less than 11 km.
-
-8
-
-Occurrence of Smoke, Haze, Smoke and Haze, Blowing Snow, Blowing Spray, or Dust
-
-0 - 7, 9
-
-0 = Smoke
- 1 = Haze
- 2 = Smoke and haze
- 3 = Dust
- 4 = Blowing snow
- 5 = Blowing spray
- 6 = Dust storm (beginning 1984)
- 7 = Volcanic ash
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9
- Notes: These values recorded only when visibility is less than 11 km.
-
-9
-
-Occurrence of Ice Pellets
-
-0 - 2, 9
-
-0 = Light ice pellets
- 1 = Moderate ice pellets
- 2 = Heavy ice pellets
- 9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9
-
+<table class="table table-striped">
+  <tr>
+    <th>Column - Poisition in Field</th>
+    <th>Element Description</th>
+    <th>Possible Values</th>
+    <th>Definition</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Occurrence ofThunderstorm,Tornado, orSquall</td>
+    <td>0 - 2, 4, 6- 9</td>
+    <td>
+    0 = Thunderstorm-lightning and thunder. Wind gusts less than 25.7 m/s, and hail, if any, less than 1.9 cm diameter <BR>
+    1 = Heavy or severe thunderstorm-frequent intense lightning and thunder. Wind gusts greater than 25.7 m/s and hail, if any, 1.9 cm or greater diameter <BR>
+    2 = Report of tornado or waterspout <BR>
+    4 = Moderate squall-sudden increase of windspeed by at least 8.2 m/s, reaching 11.3 m/s or more and lasting for at least 1 minute <BR>
+    6 = Water spout (beginning January 1984) <BR>
+    7 = Funnel cloud (beginning January 1984) <BR>
+    8 = Tornado (beginning January 1984) <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9
+    </td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>Occurrence ofRain, RainShowers, orFreezing Rain</td>
+    <td>0 - 9</td>
+    <td>
+    0 = Light rain <BR>
+    1 = Moderate rain <BR>
+    2 = Heavy rain <BR>
+    3 = Light rain showers <BR>
+    4 = Moderate rain showers <BR>
+    5 = Heavy rain showers <BR>
+    6 = Light freezing rain <BR>
+    7 = Moderate freezing rain <BR>
+    8 = Heavy freezing rain <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9  <BR>
+    Notes: <BR>
+    Light = up to 0.25 cm per hour  <BR>
+    Moderate = 0.28to 0.76 cm per hour  <BR>
+    Heavy = greater than 0.76cm per hour <BR>
+    </td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Occurrence ofRain Squalls,Drizzle, orFreezing Drizzle</td>
+    <td>0, 1, 3-9</td>
+    <td>
+    0 = Light rain squalls <BR>
+    1 = Moderate rain squalls <BR>
+    3 = Light drizzle <BR>
+    4 = Moderate drizzle <BR>
+    5 = Heavy drizzle <BR>
+    6 = Light freezing drizzle <BR>
+    7 = Moderate freezing drizzle <BR>
+    8 = Heavy freezing drizzle <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9 <BR>
+    Notes: When drizzle or freezing drizzle occurswith other weather phenomena: Light = up to0.025 cm per hour Moderate = 0.025 to 0.051cm per hour Heavy = greater than 0.051 cmper hour When drizzle or freezing drizzle occurs alone:  <BR>
+    Light = visibility 1 km or greater  <BR>
+    Moderate =visibility between 0.5 and 1 km  <BR>
+    Heavy =visibility 0.5 km or less <BR>
+    </td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Occurrence ofSnow, SnowPellets, or IceCrystals</td>
+    <td>0 - 9</td>
+    <td>
+    0 = Light snow <BR>
+    1 = Moderate snow <BR>
+    2 = Heavy snow <BR>
+    3 = Light snow pellets <BR>
+    4 = Moderate snow pellets <BR>
+    5 = Heavy snow pellets <BR>
+    6 = Light ice crystals <BR>
+    7 = Moderate ice crystals <BR>
+    8 = Heavy ice crystals <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9  <BR>
+    Notes:Beginning in April 1963, any occurrence of icecrystals is recorded as a 7. <BR>
+    </td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Occurrence ofSnow Showers,Snow Squalls, orSnow Grains</td>
+    <td>0 - 7, 9</td>
+    <td>
+    0 = Light snow <BR>
+    1 = Moderate snow showers <BR>
+    2 = Heavy snow showers <BR>
+    3 = Light snow squall <BR>
+    4 = Moderate snow squall <BR>
+    5 = Heavy snow squall <BR>
+    6 = Light snow grains <BR>
+    7 = Moderate snow grains <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9 <BR>
+    </td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>Occurrence ofSleet, SleetShowers, or Hail</td>
+    <td>0 - 2, 4, 9</td>
+    <td>
+    0 = Light ice pellet showers <BR>
+    1 = Moderate ice pellet showers <BR>
+    2 = Heavy ice pellet showers <BR>
+    4 = Hail <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9 <BR>
+    Notes: Prior to April 1970, ice pellets werecoded as sleet. Beginning in April 1970, sleetand small hail were redefined as ice pellets andare coded as 0, 1, or 2.
+    </td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>Occurrence ofFog, BlowingDust, or Blowing Sand</td>
+    <td>0 - 9</td>
+    <td>
+    0 = Fog <BR>
+    1 = Ice fog <BR>
+    2 = Ground fog <BR>
+    3 = Blowing dust <BR>
+    4 = Blowing sand <BR>
+    5 = Heavy fog <BR>
+    6 = Glaze (beginning 1984) <BR>
+    7 = Heavy ice fog (beginning 1984) <BR>
+    8 = Heavy ground fog (beginning 1984) <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9 <BR>
+    Notes:These values recorded only when visibility isless than 11 km.
+    </td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>Occurrence ofSmoke, Haze,Smoke andHaze, BlowingSnow, BlowingSpray, or Dust</td>
+    <td>0 - 7, 9</td>
+    <td>
+    0 = Smoke <BR>
+    1 = Haze <BR>
+    2 = Smoke and haze <BR>
+    3 = Dust <BR>
+    4 = Blowing snow <BR>
+    5 = Blowing spray <BR>
+    6 = Dust storm (beginning 1984) <BR>
+    7 = Volcanic ash <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9 <BR>
+    Notes: These values recorded only when visibility is less than 11 km.
+    </td>
+  </tr>
+  <tr>
+    <td>9</td>
+    <td>Occurrence ofIce Pellets</td>
+    <td>0 - 2, 9</td>
+    <td>
+    0 = Light ice pellets <BR>
+    1 = Moderate ice pellets <BR>
+    2 = Heavy ice pellets <BR>
+    9 = None if Observation Indicator element equals 0, or else unknown or missing if Observation Indicator element equals 9
+    </td>
+  </tr>
+</table>
 
 
 For example, a Present Weather Observation (previous field) of 0 and a Present Weather Codes field of 929999999 notes that there is heavy rain for this data period (usually hourly but depends on the number of intervals per hour field in the "Data Periods" record).
@@ -3571,9 +3578,9 @@ Table 17. Missing weather replacement values
 
 <table class="table table-striped">
 <tr>
-<td>Data item</td>
-<td>Supplied Value</td>
-<td>Units</td>
+<th>Data item</th>
+<th>Supplied Value</th>
+<th>Units</th>
 </tr>
 <tr>
 <td>Dry Bulb Temperature</td>
@@ -3804,10 +3811,6 @@ The CIBSE, in association with the (UK) Met Office has produced 'Test Reference 
 
 [www.cibse.org/index.cfm?go=publications.view&PubID=332&S1=y&L1=0&L2=0](file:///E:\Docs4PDFs\www.cibse.org\index.cfm%3fgo=publications.view&PubID=332&S1=y&L1=0&L2=0)
 
-### Real Time Data
-
-Real-Time weather data is available from the EnergyPlus web site. From the web site: "Hourly weather data from stations across the world is continuously collected and stored into a local database. The data is available through this web interface. Most stations have information for dry bulb temperature, wet bulb temperature, wind speed/direction, atmospheric pressure, visibility, cloud conditions, and precipitation type. Data may not be available for all stations and may not be contiguous for time period selected."  The data is available in two output formats: CSV and IWEC. Note that their CSV is not the same as EnergyPlus CSV format. If you wish to get weather data from the real time sources, it may be easier to use the IWEC format with the EnergyPlus WeatherConverter program; HOWEVER, they do not collect solar data and, currently, the WeatherConverter cannot generate solar data for these data files.
-
 ### Meteonorm Data
 
 Meteonorm software can be used when there is no measured data near the location for the simulation. Meteonorm extrapolates hourly data from statistical data for a location. Where statistical data aren't available, Meteonorm interpolates from other nearby sites. Generally a statistical approach is a last resort -- weather files generated from statistics will not demonstrate the normal hour-to-hour and day-to-day variability seen in measured data. Meteonorm version 6 will directly write EPW files.
@@ -3817,484 +3820,249 @@ Meteonorm software can be used when there is no measured data near the location 
 The data sets and formats described above are some of the newest formats available for use with building simulation programs. Source data comes in various formats. Typically the files are ASCII, but the data items, units, item location, and record length vary from format to format. NCDC can provide historical data in a variety of formats: TD-3280, TD-3510, TD-9950 (DATSAV2), TD-9956 (DATSAV3) and TD-1440 (CD144). The EnergyPlus weather processor cannot process any of the types directly.
 
 Table 18. Summary of Downloadable Weather Data by Type
-
-** **
-
-**WMO Region**
-
-** **
-
-** **
-
-**North and Central America**
-
-** **
-
-** **
-
-** **
-
-** **
-
-** **
-
-**USA**
-
-**Canada**
-
-**Central America**
-
-**Africa**
-
-**Asia**
-
-**South America**
-
-**Southwest Pacific**
-
-**Europe**
-
-**Total**
-
-**CityUHK**
-
-
-
-
-
-
-
-
-
-1
-
-
-
-
-
-
-
-1
-
-**CSWD**
-
-
-
-
-
-
-
-
-
-270
-
-
-
-
-
-
-
-270
-
-**CTZ2**
-
-16
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-16
-
-**CWEC**
-
-
-
-80
-
-
-
-
-
-
-
-
-
-
-
-
-
-80
-
-**ETMY**
-
-
-
-
-
-
-
-11
-
-
-
-
-
-
-
-
-
-11
-
-**IGDG**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-66
-
-66
-
-**IMGW**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-61
-
-61
-
-**INETI**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2
-
-2
-
-**ISHRAE**
-
-
-
-
-
-
-
-
-
-58
-
-
-
-
-
-
-
-58
-
-**ITMY**
-
-
-
-
-
-
-
-
-
-1
-
-
-
-
-
-
-
-1
-
-**IWEC**
-
-
-
-
-
-5
-
-12
-
-49
-
-19
-
-20
-
-122
-
-227
-
-**KISR**
-
-
-
-
-
-
-
-
-
-2
-
-
-
-
-
-
-
-2
-
-**Los Alamos** **TMY2**
-
-1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1
-
-**MSI**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4
-
-4
-
-**NIWA**
-
-
-
-
-
-
-
-
-
-
-
-
-
-16
-
-
-
-16
-
-**RMY**
-
-
-
-
-
-
-
-
-
-
-
-
-
-80
-
-
-
-80
-
-**SWEC**
-
-
-
-
-
-
-
-2
-
-
-
-
-
-
-
-50
-
-156
-
-**SWERA**
-
-
-
-
-
-37
-
-33
-
-66
-
-20
-
-
-
-
-
-156
-
-**TMY**
-
-229
-
-
-
-1
-
-
-
-
-
-
-
-4
-
-
-
-234
-
-**TMY2**
-
-235
-
-
-
-1
-
-
-
-
-
-
-
-1
-
-
-
-237
-
-**TMY3**
-
-1011
-
-
-
-7
-
-
-
-
-
-
-
-2
-
-
-
-1020
-
-**Totals**
-
-1492
-
-80
-
-51
-
-58
-
-447
-
-39
-
-123
-
-305
-
-2699
+<table class="table table-striped">
+  <tr>
+    <th rowspan="3">Source</th>
+    <th colspan="8" align="center">WMO Region</th>
+    <th></th>
+  </tr>
+  <tr>
+    <td colspan="3">North and Central America</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>USA</td>
+    <td>Canada</td>
+    <td>Central America</td>
+    <td>Africa</td>
+    <td>Asia</td>
+    <td>South America</td>
+    <td>Southwest Pacific</td>
+    <td>Europe</td>
+    <td>Total</td>
+  </tr>
+  <tr>
+    <td>ETMY</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>11</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>11</td>
+  </tr>
+  <tr>
+    <td>IGDG</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>66</td>
+    <td>66</td>
+  </tr>
+  <tr>
+    <td>IMGW</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>61</td>
+    <td>61</td>
+  </tr>
+  <tr>
+    <td>INETI</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>2</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>ISHRAE</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>58</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>58</td>
+  </tr>
+  <tr>
+    <td>ITMY</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>1</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>IWEC</td>
+    <td></td>
+    <td></td>
+    <td>5</td>
+    <td>12</td>
+    <td>49</td>
+    <td>19</td>
+    <td>20</td>
+    <td>122</td>
+    <td>227</td>
+  </tr>
+  <tr>
+    <td>KISR</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>2</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>Los Alamos TMY2</td>
+    <td>1</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>MSI</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>4</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>NIWA</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>16</td>
+    <td></td>
+    <td>16</td>
+  </tr>
+  <tr>
+    <td>RMY</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>80</td>
+    <td></td>
+    <td>80</td>
+  </tr>
+  <tr>
+    <td>SWEC</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>2</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>50</td>
+    <td>52</td>
+  </tr>
+  <tr>
+    <td>SWERA</td>
+    <td></td>
+    <td></td>
+    <td>37</td>
+    <td>33</td>
+    <td>66</td>
+    <td>20</td>
+    <td></td>
+    <td></td>
+    <td>156</td>
+  </tr>
+  <tr>
+    <td>TMY</td>
+    <td>229</td>
+    <td></td>
+    <td>1</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>4</td>
+    <td></td>
+    <td>234</td>
+  </tr>
+  <tr>
+    <td>TMY2</td>
+    <td>235</td>
+    <td></td>
+    <td>1</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>1</td>
+    <td></td>
+    <td>237</td>
+  </tr>
+  <tr>
+    <td>TMY3</td>
+    <td>1011</td>
+    <td></td>
+    <td>7</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>2</td>
+    <td></td>
+    <td>1020</td>
+  </tr>
+  <tr>
+    <td>Totals</td>
+    <td>1476</td>
+    <td>0</td>
+    <td>51</td>
+    <td>58</td>
+    <td>176</td>
+    <td>39</td>
+    <td>123</td>
+    <td>305</td>
+    <td></td>
+  </tr>
+</table>
 
 One other format worth mentioning is TRY. TRY is "test reference year" data that did not include solar radiation data. "Test Reference Year" is a term that usually denotes selection of a specific year of "real" data based on some statistical procedure. The original TRY data (TD-9706) was based on an ASHRAE procedure to select the data from a "period of record". "The principle of the selection is to eliminate years in the period of record containing months with extremely high or low mean temperatures until only one year remains."  The weather conversion utility cannot process data in "TRY" format. However, many organizations develop data for reference year data (e.g. European TRY, Moisture Reference Data).
 
@@ -4317,8 +4085,8 @@ Table 19. Key to Data Source and Uncertainty Flags
 
 <table class="table table-striped">
 <tr>
-<td>Data Flag</td>
-<td>Flag Values</td>
+<th>Data Flag</th>
+<th>Flag Values</th>
 </tr>
 <tr>
 <td>Dry Bulb Temperature Data Source</td>
@@ -4506,8 +4274,8 @@ Table 20. Solar Radiation and Illuminance Data Source Flag Codes
 
 <table class="table table-striped">
 <tr>
-<td>Flag Code</td>
-<td>Definition</td>
+<th>Flag Code</th>
+<th>Definition</th>
 </tr>
 <tr>
 <td>A</td>
@@ -4557,8 +4325,8 @@ Table 21. Solar Radiation and Illuminance Data Uncertainty Flag Codes
 
 <table class="table table-striped">
 <tr>
-<td>Flag</td>
-<td>Uncertainty Range (%)</td>
+<th>Flag</th>
+<th>Uncertainty Range (%)</th>
 </tr>
 <tr>
 <td>1</td>
@@ -4608,8 +4376,8 @@ Table 22. Meteorological Data Source Flag Codes
 
 <table class="table table-striped">
 <tr>
-<td>Flag</td>
-<td>Definition</td>
+<th>Flag</th>
+<th>Definition</th>
 </tr>
 <tr>
 <td>A</td>
@@ -4647,8 +4415,8 @@ Table 23. Meteorological Uncertainty Flag Codes
 
 <table class="table table-striped">
 <tr>
-<td>Flag</td>
-<td>Definition</td>
+<th>Flag</th>
+<th>Definition</th>
 </tr>
 <tr>
 <td>1- 6</td>
@@ -4715,27 +4483,30 @@ Private Declare Sub SetupPWInternalDataPath Lib "EPlusWth" (ByVal strPath As Str
 
 And a call from a VB program:
 
-Call SetupPWInternalDataPath(AppPath, Len(AppPath))
 
+```basic
+Call SetupPWInternalDataPath(AppPath, Len(AppPath))
+```
 
 
 Likewise for Fortran 90/95:
 
+
+```fortran
   INTERFACE
-
     SUBROUTINE SetupPWInternalDataPath (Path)
-
     CHARACTER(len=\*), INTENT(IN) :: Path    ! Path where data files reside
-
     END SUBROUTINE
-
   END INTERFACE
+```
 
 And then calling it from Fortran:
 
-Character(len=255) DataPath
 
+```fortran
+Character(len=255) DataPath
 CALL SetupPWInternalDataPath(trim(DataPath))
+```
 
 #### SetFixOutOfRangeData
 
@@ -4747,87 +4518,81 @@ Private Declare Sub SetFixOutOfRangeData Lib "EPlusWth" (ByVal strValue As Strin
 
 And calling it from VB:
 
+```basic
     Global FixOutOfRangeData As String
-
     FixOutOfRangeData = "Yes"
-
     Call SetFixOutOfRangeData(FixOutOfRangeData, Len(FixOutOfRangeData))
+```
 
 For Fortran 90/95:
 
+```fortran
   INTERFACE
-
     SUBROUTINE SetFixOutOfRangeData (YesNo)
-
     CHARACTER(len=\*),INTENT(IN) :: YesNo    ! 'yes' to set fixing option;
-
                                             ! 'no' to not
-
     END SUBROUTINE
-
   END INTERFACE
+```
 
 And then calling it:
 
+```fortran
 CALL SetFixOutOfRangeData('no')
-
-
+```
 
 #### SetDefaultChgLimit
 
 This call sets the value for the DB trigger shown earlier. Both values passed in are strings and are specific to the dialog shown earlier:
 
 Table 24. Trigger Limit Call Values
-
-**Trigger Limit**
-
-**Result**
-
-**Ignore Calc Trigger**
-
-**Result**
-
-0
-
-use only calculated trigger
-
-0
-
-Uses Calculated Trigger
-
-1
-
-use 5°C
-
-1
-
-Ignores calculated trigger
-
-2
-
-use 10°C
-
-
-
-
-
-3
-
-use 15°C
-
-
-
+<table class="table table-striped">
+  <tr>
+    <th>Trigger <BR> Limit</th>
+    <th>Result</th>
+    <th>Ignore <BR> Calc <BR> Trigger</th>
+    <th>Result</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>use only calculated trigger</td>
+    <td>0</td>
+    <td>Uses Calculated Trigger</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>use 5&deg;C</td>
+    <td>1</td>
+    <td>Ignores calculated trigger</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>use 10&deg;C</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>use 15&deg;C</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
 
 You can also choose to ignore the calculated trigger entirely. If you do not "ignore" the calculated trigger, then the trigger is the minimum of the calculated and your trigger limit selection.
 
 VB Declaration Statement:
 
+```basic
 Private Declare Sub SetDefaultChgLimit Lib "EPlusWth" (ByVal strValue As String, ByVal strValueLen As Long, ByVal strValue As String, ByVal strValueLen As Long)
+```
 
 And a call from VB:
 
+```basic
     Call SetDefaultChgLimit(TriggerLimit, Len(TriggerLimit), IgnoreCalcTrigger, Len(IgnoreCalcTrigger))
+```
 
 #### ProcessWeather
 
@@ -4835,17 +4600,19 @@ The "meat" of the processing is done by this routine. It gets passed the input f
 
 VB Declaration Statement:
 
+```basic
 Private Declare Sub ProcessWeather Lib "EPlusWth" (ByVal strInType As String, ByVal InTypeLen As Long, ByVal strOutType As String, ByVal OutTypeLen As Long, ByVal strInFileName As String, ByVal InFileNameLen As Long, ByVal strOutFileName As String, ByVal OutFileNameLen As Long, ErrorFlag As Boolean, Optional ByVal strOutFileURL As String, Optional ByVal OutFileURLlen As Long)
+```
 
 Calling it from VB:
 
+```basic
 Call ProcessWeather(InputFileDataType, Len(InputFileDataType),
       OutputFileDataType, Len(OutputFileDataType),
       InputFileName, Len(InputFileName),
       OutputFileName, Len(OutputFileName),
       ErrorFlag)
-
-
+```
 
 Valid values for the Input File Data Type are shown in the following table:
 
@@ -4853,8 +4620,8 @@ Table 25. Valid Input File Types for "ProcessWeather" call
 
 <table class="table table-striped">
 <tr>
-<td>Input File Type</td>
-<td>Source Data file Format Type</td>
+<th>Input File Type</th>
+<th>Source Data file Format Type</th>
 </tr>
 <tr>
 <td>TMY2 or TM2</td>
@@ -4916,8 +4683,8 @@ Table 26. Valid Output File Types for the "ProcessWeather" call
 
 <table class="table table-striped">
 <tr>
-<td>Output File Type</td>
-<td>File(s) produced</td>
+<th>Output File Type</th>
+<th>File(s) produced</th>
 </tr>
 <tr>
 <td>EPW</td>
@@ -4943,34 +4710,26 @@ ErrorFlag will be returned as "true" if an error occurs during processing or "fa
 
 Fortran 90/95 Declaration:
 
+```fortran
 INTERFACE
-
   SUBROUTINE ProcessWeather(InType,OutType,InFileName,OutFileName,ErrFlag)
-
     CHARACTER(len=\*), INTENT(IN) :: InType       ! InputFile Type
-
     CHARACTER(len=\*), INTENT(IN) :: OutType      ! OutputFile Type
-
     CHARACTER(len=\*), INTENT(IN) :: InFileName   ! InputFile Name (Full path)
-
     CHARACTER(len=\*), INTENT(IN) :: OutFileName  ! OutputFileName (Full path)
-
     LOGICAL(Byte2), INTENT(OUT)  :: ErrFlag      ! If errors are found,
-
                                                  ! set to true and put
-
                                                  ! description put in file.
-
   END SUBROUTINE
-
 END INTERFACE
+```
 
 And calling it from Fortran:
 
+```fortran
 call processweather(trim(intype),trim(outtype),    &
-
                     trim(infilename),trim(outfilename),errflag)
-
+```
 
 
 Note that the file where error messages will be placed is the RPT file. If the value of the output file path is incorrect, you may need to search for this file by using the RPT extension.
@@ -5110,51 +4869,36 @@ EnergyPlus accepts twelve separate monthly average inside temperatures. In addit
 
 First the results for a monthly specified constant average inside temperature. The location is Minneapolis, and the slab is insulated.
 
-
-
+```
 Monthly Slab Outside Face Temperatures, C
-
 Perimeter Area: 304.00  Core Area: 1296.00
-
 Month   Average   Perimeter    Core      Inside
-
 1      17.67     16.11      18.03       18.0
-
 2      17.45     15.92      17.81       18.0
-
 3      17.43     16.07      17.74       18.0
-
 4      19.00     17.82      19.27       20.0
-
 5      19.24     18.23      19.48       20.0
-
 6      19.31     18.42      19.52       20.0
-
 7      20.92     20.14      21.11       22.0
-
 8      21.17     20.44      21.35       22.0
-
 9      21.22     20.45      21.40       22.0
-
 10      21.21     20.26      21.44       22.0
-
 11      19.62     18.54      19.88       20.0
-
 12      19.35     17.99      19.67       20.0
+```
 
 The resulting heat flux is shown below. The inside heat transfer coefficient and slab thermal properties are specified in the input file. For this example the total thermal resistance from the inside air to the slab bottom surface was 0.27 (m<sup>2</sup> C)/W. This value is controlled by the user with the inside heat transfer coefficient and slab thermal properties values in the slab program input file.
 
 
-
 <table class="table table-striped">
 <tr>
-<td>Month</td>
-<td>Average</td>
-<td>Perimeter</td>
-<td>Core</td>
-<td>Inside</td>
-<td>Perimeter Heat Flux W/m<sup>2</sup></td>
-<td>Average Heat Flux W/m<sup>2</sup></td>
+<th>Month</th>
+<th>Average</th>
+<th>Perimeter</th>
+<th>Core</th>
+<th>Inside</th>
+<th>Perimeter Heat Flux W/m<sup>2</sup></th>
+<th>Average Heat Flux W/m<sup>2</sup></th>
 </tr>
 <tr>
 <td>1</td>
@@ -5268,89 +5012,54 @@ The resulting heat flux is shown below. The inside heat transfer coefficient and
 
 Then for the same conditions, the results with a 2 degree C amplitude 24-hour sine wave variation. Notice that the inside temperatures are the same since they are monthly averages and the daily variation oscillates about the mean. The core and perimeter slab temperatures are affected slightly.
 
+```
 Monthly Slab Outside Face Temperatures, C
-
 Perimeter Area: 304.00  Core Area: 1296.00
-
 Month   Average   Perimeter    Core      Inside
-
 1      17.51     16.03      17.86       18.0
-
 2      17.29     15.85      17.63       18.0
-
 3      17.27     16.00      17.57       18.0
-
 4      18.87     17.77      19.13       20.0
-
 5      19.11     18.16      19.34       20.0
-
 6      19.17     18.34      19.37       20.0
-
 7      20.81     20.07      20.98       22.0
-
 8      21.05     20.36      21.21       22.0
-
 9      21.09     20.38      21.26       22.0
-
 10      21.08     20.19      21.29       22.0
-
 11      19.47     18.45      19.71       20.0
-
 12      19.20     17.92      19.51       20.0
-
+```
 
 
 An example of a 24-hour inside temperature profile for this case is shown below. The sine wave amplitude was 2 C.
 
+```
 Day       Hour   Perim Out Ts    Core Out Ts    Inside Temp
-
 1           1   17.30827       19.15832       18.51749
-
 1           2   17.29503       19.15274       18.99974
-
 1           3   17.30236       19.16732       19.41389
-
 1           4   17.32258       19.19376       19.73175
-
 1           5   17.34834       19.22526       19.93166
-
 1           6   17.37288       19.25529       20.00000
-
 1           7   17.39023       19.27798       19.93212
-
 1           8   17.39544       19.28838       19.73265
-
 1           9   17.38485       19.28117       19.41517
-
 1          10   17.35602       19.24733       19.00130
-
 1          11   17.30590       19.18686       18.51924
-
 1          12   17.23507       19.10210       18.00180
-
 1          13   17.14650       18.99703       17.48425
-
 1          14   17.04291       18.87713       17.00183
-
 1          15   16.92873       18.74895       16.58738
-
 1          16   16.81076       18.61963       16.26915
-
 1          17   16.69609       18.49656       16.06881
-
 1          18   16.59243       18.38671       16.00000
-
 1          19   16.50669       18.29626       16.06741
-
 1          20   16.44276       18.23010       16.26645
-
 1          21   16.40369       18.19161       16.58356
-
 1          22   16.38873       18.18218       16.99714
-
 1          23   16.39435       18.19834       17.47902
-
 1          24   16.41942       18.23298       17.99639
+```
 
 A plot of the daily profiles is shown below. Note that the inside temperature change of 4 C produces only a small change in the slab lower face temperature.
 
@@ -5364,13 +5073,13 @@ The resulting heat fluxes are shown below.  They can be compared with the fluxes
 
 <table class="table table-striped">
 <tr>
-<td>Month</td>
-<td>Average</td>
-<td>Perimeter</td>
-<td>Core</td>
-<td>Inside</td>
-<td>Perimeter Heat Flux W/m<sup>2</sup></td>
-<td>Average Heat Flux W/m<sup>2</sup></td>
+<th>Month</th>
+<th>Average</th>
+<th>Perimeter</th>
+<th>Core</th>
+<th>Inside</th>
+<th>Perimeter Heat Flux W/m<sup>2</sup></th>
+<th>Average Heat Flux W/m<sup>2</sup></th>
 </tr>
 <tr>
 <td>1</td>
@@ -5531,25 +5240,22 @@ Technical Details on Files for Ground Heat Transfer with Slabs
 
 The slab program used to calculate the results is included with the EnergyPlus distribution. It requires an input file named GHTin.idf in input data file format. The needed corresponding idd file is SlabGHT.idd. An EnergyPlus weather file for the location is also needed. A batch file, RunSlab, is placed in the same folder with the program and sample files. To use it (Command mode or DOS mode), one may modify several important lines:
 
+```
 :Instructions:
-
 :  Complete the following path and program names.
-
 :  path names must have a following \\ or errors will happen
-
  set program\_path=
-
  set program\_name=Slab.exe
-
  set input\_path=
-
  set output\_path=
-
  set weather\_path=C:\\EnergyPlus\\WeatherData\\
+```
 
 and then in command mode issue the run command:
 
+```
 RunSlab myinput Chicago
+```
 
 Where you would have myinput.idf in "input\_path" and Chicago would be the name of the .epw file in the "weather\_path".
 
@@ -5598,181 +5304,95 @@ The slab program is capable of supplying the EnergyPlus idf objects needed to us
 
  ================================================
 
+```
    Monthly Slab Outside Face Temperatures, C and Heat Fluxes(loss), W/(m^2)
-
  Perimeter Area: 304.00  Core Area: 1296.00
-
        Month   TAverage   TPerimeter    TCore      TInside AverageFlux PerimeterFlux CoreFlux
-
           1      17.74     16.41        18.05       18.00       0.88        5.39       -0.17
-
           2      17.49     16.15        17.81       18.00       1.73        6.29        0.66
-
           3      17.45     16.23        17.74       18.00       1.86        6.02        0.88
-
           4      18.96     17.86        19.22       20.00       3.51        7.24        2.64
-
           5      19.22     18.22        19.45       20.00       2.66        6.04        1.86
-
           6      19.28     18.38        19.49       20.00       2.44        5.48        1.73
-
           7      20.83     19.98        21.03       22.00       3.96        6.87        3.28
-
           8      21.12     20.39        21.29       22.00       2.98        5.47        2.40
-
           9      21.18     20.46        21.35       22.00       2.76        5.22        2.19
-
          10      21.17     20.23        21.39       22.00       2.82        6.02        2.08
-
          11      19.64     18.63        19.88       20.00       1.22        4.63        0.42
-
          12      19.36     18.14        19.65       20.00       2.16        6.30        1.19
 
-
-
 ! OTHER SIDE COEFFICIENT OBJECT EXAMPLE FOR IDF FILE
-
  SurfaceProperty:OtherSideCoefficients,
-
  ExampleOSC,                !- OtherSideCoeff Name \*\*\*CHANGE THIS!\*\*\*
-
  0,                         !- Combined convective/radiative film coefficient
-
  1,                         !- N2,User selected Constant Temperature {C}
-
  1,                         !- Coefficient modifying the user selected constant temperature
-
  0,                         !- Coefficient modifying the external dry bulb temperature
-
  0,                         !- Coefficient modifying the ground temperature
-
  0,                         !- Coefficient modifying the wind speed term (s/m)
-
  0,                         !- Coefficient modifying the zone air temperature
-
                             !  part of the equation
-
  GroundTempCompactSchedName; !- Name of Schedule for values of const
-
                             ! temperature. Schedule values replace N2.
-
                             !  \*\*\*REPLACE WITH CORRECT NAME\*\*\*
 
 
-
-
-
 Schedule:Compact,
-
 MonthlyAveSurfaceTemp, !Name
-
 Temperature ,            !- ScheduleType
-
 Through:   1/31,
-
 For:AllDays,
-
 Until:24:00,
-
  17.74    ,
-
 Through:   2/28,
-
 For:AllDays,
-
 Until:24:00,
-
  17.49    ,
-
 Through:   3/31,
-
 For:AllDays,
-
 Until:24:00,
-
  17.45    ,
-
 Through:   4/30,
-
 For:AllDays,
-
 Until:24:00,
-
  18.96    ,
-
 Through:   5/31,
-
 For:AllDays,
-
 Until:24:00,
-
  19.22    ,
-
 Through:   6/30,
-
 For:AllDays,
-
 Until:24:00,
-
  19.28    ,
-
 Through:   7/31,
-
 For:AllDays,
-
 Until:24:00,
-
  20.83    ,
-
 Through:   8/31,
-
 For:AllDays,
-
 Until:24:00,
-
  21.12    ,
-
 Through:   9/30,
-
 For:AllDays,
-
 Until:24:00,
-
  21.18    ,
-
 Through:  10/31,
-
 For:AllDays,
-
 Until:24:00,
-
  21.17    ,
-
 Through:  11/30,
-
 For:AllDays,
-
 Until:24:00,
-
  19.64    ,
-
 Through:  12/31,
-
 For:AllDays,
-
 Until:24:00,
-
  19.36    ;
 
-
-
-&lt;reduced for brevity - compact schedules for MonthlyPerimeterTemp and MonthlyCoreTemp are included.
-
-
-
-
+<reduced for brevity> - compact schedules for MonthlyPerimeterTemp and MonthlyCoreTemp are included.
 
   Convergence has been gained.
+```
 
 Description of the Objects in the E+SlabGHT.IDD
 -----------------------------------------------
@@ -5813,48 +5433,29 @@ These fields specify the combined convective and radiative heat transfer coeffic
 
 The Materials object in the IDD is shown below.
 
+```idf
 Materials,
-
-        N1, \\field NMAT: Number of materials
-
-            \\note typical 2
-
-        N2, \\field ALBEDO: Surface Albedo: No Snow
-
-            \\note typical value= 0-1
-
-        N3, \\field ALBEDO: Surface Albedo: Snow
-
-            \\note typical value= 0-1
-
-        N4, \\field EPSLW: Surface Emissivity: No Snow
-
-            \\note typical value= 0.9
-
-        N5, \\field EPSLW: Surface Emissivity: Snow
-
-            \\note typical value= 0.9
-
-        N6, \\field Z0: Surface Roughness: No Snow
-
-            \\note typical value= 0-10 cm
-
-        N7, \\field Z0: Surface Roughness: Snow
-
-            \\note typical value= 0-10
-
-        N8, \\field HIN: Indoor HConv: Downward Flow
-
-            \\note typical value= 4-10
-
-            \\units W/m2-K
-
-        N9; \\field HIN: Indoor HConv: Upward
-
-            \\note typical value= 4-10
-
-            \\units W/m2-K
-
+ N1, \field NMAT: Number of materials
+  \note typical 2
+ N2, \field ALBEDO: Surface Albedo: No Snow
+  \note typical value= 0-1
+ N3, \field ALBEDO: Surface Albedo: Snow
+  \note typical value= 0-1
+ N4, \field EPSLW: Surface Emissivity: No Snow
+  \note typical value= 0.9
+ N5, \field EPSLW: Surface Emissivity: Snow
+  \note typical value= 0.9
+ N6, \field Z0: Surface Roughness: No Snow
+  \note typical value= 0-10 cm
+ N7, \field Z0: Surface Roughness: Snow
+  \note typical value= 0-10
+ N8, \field HIN: Indoor HConv: Downward Flow
+  \note typical value= 4-10
+  \units W/m2-K
+ N9; \field HIN: Indoor HConv: Upward
+  \note typical value= 4-10
+  \units W/m2-K
+```
 
 
 ### MatlProps or GroundHeatTransfer:Slab:MatlProps Object
@@ -5881,43 +5482,27 @@ These two fields specify the thermal conductivity of the slab and soil in W/(m<s
 
 The IDD object is shown below:
 
+```
 MatlProps,
-
-        N1, \\field RHO: Slab Material density
-
-            \\note typical value= 2300.0
-
-            \\units kg/m3
-
-        N2, \\field RHO: Soil Density
-
-            \\note typical value= 1200.0
-
-            \\units kg/m3
-
-        N3, \\field CP: Slab CP
-
-            \\note typical value=650.0
-
-            \\units J/kg-K
-
-        N4, \\field CP: Soil CP
-
-            \\note typical value= 1200.0
-
-            \\units J/kg-K
-
-        N5, \\field TCON: Slab k
-
-            \\note typical value= .9
-
-            \\units W/m2-K
-
-        N6; \\field TCON: Soil k
-
-            \\note typical value= 1.0
-
-            \\units W/m2-K
+        N1, \field RHO: Slab Material density
+            \note typical value= 2300.0
+            \units kg/m3
+        N2, \field RHO: Soil Density
+            \note typical value= 1200.0
+            \units kg/m3
+        N3, \field CP: Slab CP
+            \note typical value=650.0
+            \units J/kg-K
+        N4, \field CP: Soil CP
+            \note typical value= 1200.0
+            \units J/kg-K
+        N5, \field TCON: Slab k
+            \note typical value= .9
+            \units W/m2-K
+        N6; \field TCON: Soil k
+            \note typical value= 1.0
+            \units W/m2-K
+```
 
 ### BoundConds or GroundHeatTransfer:Slab:BoundConds Object
 
@@ -5945,51 +5530,30 @@ This field supplies the value of the heat transfer coefficient if USPHflag is TR
 
 The BoundConds object is shown below:
 
+```
 BoundConds,
-
-        A1, \\field EVTR: Is surface evapotranspiration modeled
-
-            \\type choice
-
-            \\key TRUE
-
-            \\key FALSE
-
-        A2, \\field FIXBC: is the lower boundary at a fixed temperature
-
-            \\type choice
-
-            \\key TRUE
-
-            \\key FALSE
-
-            \\note FALSE selects the zero flux lower boundary condition
-
-        N1, \\field TDEEPin,
-
-            \\note User input lower boundary temperature if FIXBC is TRUE
-
-            \\units C
-
-            \\note Blank for FIXBC FALSE or
-
-            \\note to use the calculated 1-D deep ground temperature.
-
-        A3, \\field USRHflag: Is the ground surface h specified by the user?
-
-            \\type choice
-
-            \\key TRUE
-
-            \\key FALSE
-
-        N2; \\field USERH: User specified ground surface heat transfer coeff
-
-            \\units W/(m2-K)
-
-            \\note Used only if USRHflag is TRUE
-
-
+        A1, \field EVTR: Is surface evapotranspiration modeled
+            \type choice
+            \key TRUE
+            \key FALSE
+        A2, \field FIXBC: is the lower boundary at a fixed temperature
+            \type choice
+            \key TRUE
+            \key FALSE
+            \note FALSE selects the zero flux lower boundary condition
+        N1, \field TDEEPin,
+            \note User input lower boundary temperature if FIXBC is TRUE
+            \units C
+            \note Blank for FIXBC FALSE or
+            \note to use the calculated 1-D deep ground temperature.
+        A3, \field USRHflag: Is the ground surface h specified by the user?
+            \type choice
+            \key TRUE
+            \key FALSE
+        N2; \field USERH: User specified ground surface heat transfer coeff
+            \units W/(m2-K)
+            \note Used only if USRHflag is TRUE
+```
 
 ### BldgProps or GroundHeatTransfer:Slab:BldgProps Object
 
@@ -6021,103 +5585,57 @@ This final field specifies the convergence tolerance used to control the iterati
 
 The entire BldgProps Object is shown below.
 
+```
 BldgProps,
-
-      N1, \\field IYRS: Number of years to iterate
-
-          \\note typical value= 10
-
-      N2, \\field Shape: Slab shape
-
-          \\note only value= 0
-
-      N3, \\field HBLDG: Building height
-
-          \\note typical value= 0-20
-
-          \\units m
-
-      N4, \\field TIN1: January Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N5, \\field TIN2: February Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N6, \\field TIN3: March Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N7, \\field TIN4: April Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N8, \\field TIN5: May Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N9, \\field TIN6: June Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N10, \\field TIN7: July Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N11, \\field TIN8: August Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N12, \\field TIN9: September Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N13, \\field TIN10: October Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N14, \\field TIN11: NovemberIndoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N15, \\field TIN12: December Indoor Average temperature set point
-
-          \\note typical value=22
-
-          \\units C
-
-      N16, \\field TINAmp: Daily Indoor sine wave variation amplitude
-
-           \\note typical value: 0
-
-           \\units C
-
-      N17; \\field ConvTol: Convergence Tolerance
-
-           \\note typical value= 0.1
+      N1, \field IYRS: Number of years to iterate
+          \note typical value= 10
+      N2, \field Shape: Slab shape
+          \note only value= 0
+      N3, \field HBLDG: Building height
+          \note typical value= 0-20
+          \units m
+      N4, \field TIN1: January Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N5, \field TIN2: February Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N6, \field TIN3: March Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N7, \field TIN4: April Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N8, \field TIN5: May Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N9, \field TIN6: June Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N10, \field TIN7: July Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N11, \field TIN8: August Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N12, \field TIN9: September Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N13, \field TIN10: October Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N14, \field TIN11: NovemberIndoor Average temperature set point
+          \note typical value=22
+          \units C
+      N15, \field TIN12: December Indoor Average temperature set point
+          \note typical value=22
+          \units C
+      N16, \field TINAmp: Daily Indoor sine wave variation amplitude
+           \note typical value: 0
+           \units C
+      N17; \field ConvTol: Convergence Tolerance
+           \note typical value= 0.1
+```
 
 ### Insulation or GroundHeatTransfer:Slab:Insulation  Object
 
@@ -6145,35 +5663,23 @@ This final field specifies that vertical the vertical insulation configuration i
 
 The Insulation object is shown below.
 
+```
 Insulation,
-
-        N1, \\field RINS: R value of under slab insulation
-
-            \\note typical value= 0-2.0
-
-            \\units m2-K/W
-
-        N2, \\field DINS: Width of strip of under slab insulation
-
-            \\note typical value= 0-2.0
-
-            \\units m
-
-        N3, \\field RVINS: R value of vertical insulation
-
-            \\note typical value= 0-3.0
-
-            \\units m2-K/W
-
-        N4, \\field ZVINS: Depth of vertical insulation
-
-            \\note only use values= .2 .4 .6 .8 1.0 1.5 2.0 2.5 3.0
-
-            \\units m
-
-        N5; \\field IVINS: Flag: Is there vertical insulation
-
-            \\note values: 1=yes 0=no
+        N1, \field RINS: R value of under slab insulation
+            \note typical value= 0-2.0
+            \units m2-K/W
+        N2, \field DINS: Width of strip of under slab insulation
+            \note typical value= 0-2.0
+            \units m
+        N3, \field RVINS: R value of vertical insulation
+            \note typical value= 0-3.0
+            \units m2-K/W
+        N4, \field ZVINS: Depth of vertical insulation
+            \note only use values= .2 .4 .6 .8 1.0 1.5 2.0 2.5 3.0
+            \units m
+        N5; \field IVINS: Flag: Is there vertical insulation
+            \note values: 1=yes 0=no
+```
 
 ### EquivalentSlab or GroundHeatTransfer:Slab:EquivalentSlab Object
 
@@ -6199,33 +5705,21 @@ This field specifies the vertical distance from the slab to the bottom edge of t
 
 The object is shown below.
 
+```
 EquivalentSlab,
-
-\\memo Using an equivalent slab allows non-rectangular shapes to be modeled accurately
-
-        N1, \\field APRatio: The area to perimeter ratio for this slab
-
-            \\units m
-
-        N2, \\field SLABDEPTH: Thickness of slab on grade
-
-            \\note typical value= 0.1
-
-            \\units m
-
-        N3, \\field CLEARANCE: Distance from edge of slab to domain edge
-
-            \\note typical value= 15.0
-
-            \\units m
-
-        N4; \\field ZCLEARANCE: Distance from bottom of slab to domain bottom
-
-            \\note typical value= 15.0
-
-            \\units m
-
-
+\memo Using an equivalent slab allows non-rectangular shapes to be modeled accurately
+        N1, \field APRatio: The area to perimeter ratio for this slab
+            \units m
+        N2, \field SLABDEPTH: Thickness of slab on grade
+            \note typical value= 0.1
+            \units m
+        N3, \field CLEARANCE: Distance from edge of slab to domain edge
+            \note typical value= 15.0
+            \units m
+        N4; \field ZCLEARANCE: Distance from bottom of slab to domain bottom
+            \note typical value= 15.0
+            \units m
+```
 
 ![GHTSlabs](AuxiliaryPrograms/media/image019.jpg)
 
@@ -6247,23 +5741,17 @@ This field value should be TRUE. This means that the program will determine the 
 
 The object is shown below.
 
+```
 EquivSlab,
-
-\\memo Using an equivalent slab allows non-rectangular shapes to be modeled accurately
-
-\\memo The simulation default should be EquivSizing=True
-
-        N1, \\field APRatio: The area to perimeter ratio for this slab
-
-            \\units m
-
-        A1; \\field EquivSizing:
-
-            \\note Flag: Will the dimensions of an equivalent slab
-
-            \\note be calculated (TRUE) or will the dimensions be input directly? (FALSE)
-
-            \\note It is recommended that EnergyPlus users use TRUE.
+\memo Using an equivalent slab allows non-rectangular shapes to be modeled accurately
+\memo The simulation default should be EquivSizing=True
+        N1, \field APRatio: The area to perimeter ratio for this slab
+            \units m
+        A1; \field EquivSizing:
+            \note Flag: Will the dimensions of an equivalent slab
+            \note be calculated (TRUE) or will the dimensions be input directly? (FALSE)
+            \note It is recommended that EnergyPlus users use TRUE.
+```
 
 ### EquivAutoGrid Object - Obsolete
 
@@ -6281,269 +5769,147 @@ This field specifies the distance from the slab to the edge of the area that wil
 
 The EquivAutoGrid object is shown below.
 
-EquivAutoGrid, \\memo  EquivAutoGrid only necessary when EquivSizing is true
-
-               \\memo  EnergyPlus users normally use this option.
-
-        N1, \\field SLABDEPTH: Thickness of slab on grade
-
-            \\note typical value= 0.1
-
-            \\units m
-
-        N2; \\field CLEARANCE: Distance from edge of slab to domain edge
-
-            \\note typical value= 15.0
-
-            \\units m
-
-
+```
+EquivAutoGrid, \memo  EquivAutoGrid only necessary when EquivSizing is true
+               \memo  EnergyPlus users normally use this option.
+        N1, \field SLABDEPTH: Thickness of slab on grade
+            \note typical value= 0.1
+            \units m
+        N2; \field CLEARANCE: Distance from edge of slab to domain edge
+            \note typical value= 15.0
+            \units m
+```
 
 ### Additional Objects
 
 There are five additional objects in the IDD that can be used under very special situations by researchers who want to generate special calculation grids. They are normally not useful to EnergyPlus users. They will be shown as IDD sections only. They do not need to be in the IDF.
 
-AutoGrid,   \\memo AutoGrid only necessary when EquivSizing is false
+```
+AutoGrid,   \memo AutoGrid only necessary when EquivSizing is false
+            \memo  Not normally needed by EnergyPlus users.
+        N1, \field SLABX: X dimension of the building slab
+            \note typical values= 0-60.0
+            \units m
+        N2, \field SLABY: Y dimension of the building slab
+            \note typical values= 0-60.0
+            \units m
+        N3, \field SLABDEPTH: Thickness of slab on grade
+            \note typical value= .1
+            \units m
+        N4; \field CLEARANCE: Distance from edge of slab to domain edge
+            \note typical value= 15.0
+            \units m
 
-            \\memo  Not normally needed by EnergyPlus users.
+ManualGrid, \memo Manual Grid only necessary using manual gridding (not recommended)
+            \memo   Used only in special cases.
+        N1, \field NX: Number of cells in the X direction
+            \note typical values= 15
+        N2, \field NY: Number of cells in the Y direction
+            \note typical values= 15
+        N3, \field NZ: Number of cells in the Z direction
+            \note typical values= 15
+        N4, \field IBOX: X direction cell indicator of slab edge
+            \note typical values= 1-10
+        N5; \field JBOX: Y direction cell indicator of slab edge
+            \note typical values= 1-10
 
-        N1, \\field SLABX: X dimension of the building slab
-
-            \\note typical values= 0-60.0
-
-            \\units m
-
-        N2, \\field SLABY: Y dimension of the building slab
-
-            \\note typical values= 0-60.0
-
-            \\units m
-
-        N3, \\field SLABDEPTH: Thickness of slab on grade
-
-            \\note typical value= .1
-
-            \\units m
-
-        N4; \\field CLEARANCE: Distance from edge of slab to domain edge
-
-            \\note typical value= 15.0
-
-            \\units m
-
-!
-
-ManualGrid, \\memo Manual Grid only necessary using manual gridding (not recommended)
-
-            \\memo   Used only in special cases.
-
-        N1, \\field NX: Number of cells in the X direction
-
-            \\note typical values= 15
-
-        N2, \\field NY: Number of cells in the Y direction
-
-            \\note typical values= 15
-
-        N3, \\field NZ: Number of cells in the Z direction
-
-            \\note typical values= 15
-
-        N4, \\field IBOX: X direction cell indicator of slab edge
-
-            \\note typical values= 1-10
-
-        N5; \\field JBOX: Y direction cell indicator of slab edge
-
-            \\note typical values= 1-10
-
-!
-
-XFACE,  \\memo This is only needed when using manual gridding (not recommended)
-
-        \\memo XFACE: X Direction cell face coordinates: m
-
+XFACE,  \memo This is only needed when using manual gridding (not recommended)
+        \memo XFACE: X Direction cell face coordinates: m
   N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
   N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26, N27, N28, N29,
-
   N30, N31, N32, N33, N34, N35, N36, N37, N38, N39, N40;
 
-!
-
-YFACE,  \\memo This is only needed when using manual gridding (not recommended)
-
-        \\memo YFACE: Y Direction cell face coordinates: m,
-
+YFACE,  \memo This is only needed when using manual gridding (not recommended)
+        \memo YFACE: Y Direction cell face coordinates: m,
   N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
   N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26, N27, N28, N29,
-
   N30, N31, N32, N33, N34, N35, N36, N37, N38, N39, N40;
 
-!
-
-ZFACE,  \\memo This is only needed when usuing manual gridding (not recommended)
-
-        \\memo ZFACE: Z Direction cell face coordinates: m
-
+ZFACE,  \memo This is only needed when usuing manual gridding (not recommended)
+        \memo ZFACE: Z Direction cell face coordinates: m
         N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
         N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25;
-
-
+```
 
 ### Sample IDF File - Slab Program
 
 A sample IDF file is shown below.
 
+```idf
+
 !-Generator IDFEditor 1.12
-
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
-
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIALS ===========
 
 Materials,
-
-    2,           !- NMAT: Number of materials
-
-    0.158,       !- ALBEDO: Surface Albedo: No Snow
-
-    0.379,       !- ALBEDO: Surface Albedo: Snow
-
-    0.9,         !- EPSLW: Surface Emissivity: No Snow
-
-    0.9,         !- EPSLW: Surface Emissivity: Snow
-
-    0.75,        !- Z0: Surface Roughness: No Snow
-
-    0.03,        !- Z0: Surface Roughness: Snow
-
-    6.13,        !- HIN: Indoor HConv: Downward Flow {W/m2-K}
-
-    9.26;        !- HIN: Indoor HConv: Upward {W/m2-K}
-
-
-
-
+ 2,           !- NMAT: Number of materials
+ 0.158,       !- ALBEDO: Surface Albedo: No Snow
+ 0.379,       !- ALBEDO: Surface Albedo: Snow
+ 0.9,         !- EPSLW: Surface Emissivity: No Snow
+ 0.9,         !- EPSLW: Surface Emissivity: Snow
+ 0.75,        !- Z0: Surface Roughness: No Snow
+ 0.03,        !- Z0: Surface Roughness: Snow
+ 6.13,        !- HIN: Indoor HConv: Downward Flow {W/m2-K}
+ 9.26;        !- HIN: Indoor HConv: Upward {W/m2-K}
 
 !-   ===========  ALL OBJECTS IN CLASS: MATLPROPS ===========
 
-
-
 MatlProps,
-
-    2300,        !- RHO: Slab Material density {kg/m3}
-
-    1200,        !- RHO: Soil Density {kg/m3}
-
-    653,         !- CP: Slab CP {J/kg-K}
-
-    1200,        !- CP: Soil CP {J/kg-K}
-
-    0.93,        !- TCON: Slab k {W/m-K}
-
-    1;           !- TCON: Soil k {W/m-K}
-
-
-
-
+ 2300,        !- RHO: Slab Material density {kg/m3}
+ 1200,        !- RHO: Soil Density {kg/m3}
+ 653,         !- CP: Slab CP {J/kg-K}
+ 1200,        !- CP: Soil CP {J/kg-K}
+ 0.93,        !- TCON: Slab k {W/m-K}
+ 1;           !- TCON: Soil k {W/m-K}
 
 !-   ===========  ALL OBJECTS IN CLASS: BOUNDCONDS ===========
 
-
-
 BoundConds,
-
-    TRUE,        !- EVTR: Is surface evapotranspiration modeled
-
-    TRUE,        !- FIXBC: is the lower boundary at a fixed temperature
-
-    FALSE;       !- OLDTG: is there an old ground temperature file
-
-
-
-
+ TRUE,        !- EVTR: Is surface evapotranspiration modeled
+ TRUE,        !- FIXBC: is the lower boundary at a fixed temperature
+ FALSE;       !- OLDTG: is there an old ground temperature file
 
 !-   ===========  ALL OBJECTS IN CLASS: BLDGPROPS ===========
 
-
-
 BldgProps,
-
-    10,          !- IYRS: Number of years to iterate
-
-    0,           !- Shape: Slab shape
-
-    4,           !- HBLDG: Building height {m}
-
-    18,          !- TIN1: January Indoor Average temperature set point {C}
-
-    18,          !- TIN2: February Indoor Average temperature set point {C}
-
-    18,          !- TIN3: March Indoor Average temperature set point {C}
-
-    20,          !- TIN4: April Indoor Average temperature set point {C}
-
-    20,          !- TIN5: May Indoor Average temperature set point {C}
-
-    20,          !- TIN6: June Indoor Average temperature set point {C}
-
-    22,          !- TIN7: July Indoor Average temperature set point {C}
-
-    22,          !- TIN8: August Indoor Average temperature set point {C}
-
-    22,          !- TIN9: September Indoor Average temperature set point {C}
-
-    22,          !- TIN10: October Indoor Average temperature set point {C}
-
-    20,          !- TIN11: NovemberIndoor Average temperature set point {C}
-
-    20,          !- TIN12: December Indoor Average temperature set point {C}
-
-    0,           !- TINAmp: Daily sine wave variation amplitude {C}
-
-    0.10;        !- ConvTol: Convergence Tolerance
-
-
-
-
+ 10,          !- IYRS: Number of years to iterate
+ 0,           !- Shape: Slab shape
+ 4,           !- HBLDG: Building height {m}
+ 18,          !- TIN1: January Indoor Average temperature set point {C}
+ 18,          !- TIN2: February Indoor Average temperature set point {C}
+ 18,          !- TIN3: March Indoor Average temperature set point {C}
+ 20,          !- TIN4: April Indoor Average temperature set point {C}
+ 20,          !- TIN5: May Indoor Average temperature set point {C}
+ 20,          !- TIN6: June Indoor Average temperature set point {C}
+ 22,          !- TIN7: July Indoor Average temperature set point {C}
+ 22,          !- TIN8: August Indoor Average temperature set point {C}
+ 22,          !- TIN9: September Indoor Average temperature set point {C}
+ 22,          !- TIN10: October Indoor Average temperature set point {C}
+ 20,          !- TIN11: NovemberIndoor Average temperature set point {C}
+ 20,          !- TIN12: December Indoor Average temperature set point {C}
+ 0,           !- TINAmp: Daily sine wave variation amplitude {C}
+ 0.10;        !- ConvTol: Convergence Tolerance
 
 !-   ===========  ALL OBJECTS IN CLASS: INSULATION ===========
 
-
-
 Insulation,
-
-    0.,          !- RINS: R value of under slab insulation {m2-K/W}
-
-    0.,          !- DINS: Width of strip of under slab insulation {m}
-
-    2.0,         !- RVINS: R value of vertical insulation {m2-K/W}
-
-    2.0,         !- ZVINS: Depth of vertical insulation {m}
-
-    1;           !- IVINS: Flag: Is there vertical insulation
-
-
-
-
+ 0.,          !- RINS: R value of under slab insulation {m2-K/W}
+ 0.,          !- DINS: Width of strip of under slab insulation {m}
+ 2.0,         !- RVINS: R value of vertical insulation {m2-K/W}
+ 2.0,         !- ZVINS: Depth of vertical insulation {m}
+ 1;           !- IVINS: Flag: Is there vertical insulation
 
 !-   ===========  ALL OBJECTS IN CLASS: EQUIVSLAB ===========
 
-
-
 EquivalentSlab,
+ 10,          !- APRatio: The area to perimeter ratio for this slab {m}
+ 0.1,         !- SLABDEPTH: Thickness of slab on grade {m}
+ 15,          !- CLEARANCE: Distance from edge of slab to domain edge {m}
+ 10;          !-ZCLEARANCE: Distance from bottom of slab to domain bottom
+```
 
-    10,          !- APRatio: The area to perimeter ratio for this slab {m}
-
-   0.1,         !- SLABDEPTH: Thickness of slab on grade {m}
-
-    15,          !- CLEARANCE: Distance from edge of slab to domain edge {m}
-
-    10;          !-ZCLEARANCE: Distance from bottom of slab to domain bottom
 
 Using Ground Temperatures with Basements
 ----------------------------------------
@@ -6606,25 +5972,22 @@ Technical Details on Files for Ground Heat Transfer with Basements
 
 The basement program used to calculate the results is included with the EnergyPlus distribution. It requires an input file named BasementGHTin.idf in input data file format. The needed corresponding idd file is BasementGHT.idd. An EnergyPlus weather file for the location is also needed. A batch file, RunBasement, is placed in the same folder with the program and sample files. To use it (Command mode or DOS mode), one may modify several important lines:
 
+```
 :Instructions:
-
 :  Complete the following path and program names.
-
 :  path names must have a following \\ or errors will happen
-
  set program\_path=
-
  set program\_name=Basement.exe
-
  set input\_path=
-
  set output\_path=
-
  set weather\_path=C:\\EnergyPlus\\WeatherData\\
+```
 
 and then in command mode issue the run command:
 
+```
 RunBasement myinput Chicago
+```
 
 Where you would have myinput.idf in "input\_path" and Chicago would be the name of the .epw file in the "weather\_path".
 
@@ -6650,467 +6013,238 @@ The Basement idd
 
 The basement idd objects and fields are shown below. These objects also appear in the main Energy+.IDD file with the prefix "GroundHeatTransfer:Basement:"
 
+```
 ! Basement foundation heat transfer module Input Data Dictionary file
-
 ! Created:    August 18, 2000
-
 ! Written by: Edward Clements
-
 ! Modified for EnergyPlus Auxiliary Application by C. O. Pedersen 10/04
-
 ! Description format: FORTRAN var.: description, units, typ. values
 
-!
-
 SimParameters,
-
-      N1,\\field F: Multiplier for the ADI solution:
-
-         \\note 0&lt;F&lt;1.0,
-
-         \\note typically 0.1 (0.5 for high k soil]
-
-      N2; \\field IYRS: Maximum number of yearly iterations:
-
-         \\note typically 15-30]
-
-
+      N1,\field F: Multiplier for the ADI solution:
+         \note 0<F<1.0,
+         \note typically 0.1 (0.5 for high k soil]
+      N2; \field IYRS: Maximum number of yearly iterations:
+         \note typically 15-30]
 
 MatlProps,
-
-     N1, \\field NMAT: Number of materials in this domain
-
-         \\maximum 6
-
-     N2, \\field Density for Foundation Wall
-
-         \\note typical value 2243
-
-         \\units kg/m3
-
-     N3, \\field density for Floor Slab
-
-         \\note typical value 2243
-
-         \\units kg/m3
-
-     N4, \\field density for Ceiling
-
-         \\note typical value 311
-
-         \\units kg/m3
-
-     N5, \\field density for Soil
-
-         \\note typical value 1500
-
-         \\units kg/m3
-
-     N6, \\field density for Gravel
-
-         \\note typical value 2000
-
-         \\units kg/m3
-
-     N7, \\field density for Wood
-
-         \\note typical value 449
-
-         \\units kg/m3
-
-     N8,  \\field Specific heat for foundation wall
-
-          \\note typical value 880
-
-          \\units J/kg-K
-
-     N9,  \\field Specific heat for floor slab
-
-          \\note typical value 880
-
-          \\units J/kg-K
-
-     N10, \\field Specific heat for ceiling
-
-          \\note typical value 1530
-
-          \\units J/kg-K
-
-     N11, \\field Specific heat for soil
-
-          \\note typical value 840
-
-          \\units J/kg-K
-
-     N12, \\field Specific heat for gravel
-
-          \\note typical value 720
-
-          \\units J/kg-K
-
-     N13, \\field Specific heat for wood
-
-          \\note typical value 1530
-
-          \\units J/kg-K
-
-     N14, \\field Thermal conductivity for foundation wall
-
-          \\note typical value 1.4
-
-          \\units W/m-K
-
-     N15, \\field Thermal conductivity for floor slab
-
-          \\note typical value 1.4
-
-          \\units W/m-K
-
-     N16, \\field Thermal conductivity for ceiling
-
-          \\note typical value 0.09
-
-          \\units W/m-K
-
-     N17,  \\field thermal conductivity for soil
-
-          \\note typical value 1.1
-
-          \\units W/m-K
-
-     N18, \\field thermal conductivity for gravel
-
-          \\note typical value 1.9
-
-          \\units W/m-K
-
-     N19; \\field thermal conductivity for wood
-
-          \\note typical value 0.12
-
-          \\units W/m-K
-
-
-
+     N1, \field NMAT: Number of materials in this domain
+         \maximum 6
+     N2, \field Density for Foundation Wall
+         \note typical value 2243
+         \units kg/m3
+     N3, \field density for Floor Slab
+         \note typical value 2243
+         \units kg/m3
+     N4, \field density for Ceiling
+         \note typical value 311
+         \units kg/m3
+     N5, \field density for Soil
+         \note typical value 1500
+         \units kg/m3
+     N6, \field density for Gravel
+         \note typical value 2000
+         \units kg/m3
+     N7, \field density for Wood
+         \note typical value 449
+         \units kg/m3
+     N8,  \field Specific heat for foundation wall
+          \note typical value 880
+          \units J/kg-K
+     N9,  \field Specific heat for floor slab
+          \note typical value 880
+          \units J/kg-K
+     N10, \field Specific heat for ceiling
+          \note typical value 1530
+          \units J/kg-K
+     N11, \field Specific heat for soil
+          \note typical value 840
+          \units J/kg-K
+     N12, \field Specific heat for gravel
+          \note typical value 720
+          \units J/kg-K
+     N13, \field Specific heat for wood
+          \note typical value 1530
+          \units J/kg-K
+     N14, \field Thermal conductivity for foundation wall
+          \note typical value 1.4
+          \units W/m-K
+     N15, \field Thermal conductivity for floor slab
+          \note typical value 1.4
+          \units W/m-K
+     N16, \field Thermal conductivity for ceiling
+          \note typical value 0.09
+          \units W/m-K
+     N17,  \field thermal conductivity for soil
+          \note typical value 1.1
+          \units W/m-K
+     N18, \field thermal conductivity for gravel
+          \note typical value 1.9
+          \units W/m-K
+     N19; \field thermal conductivity for wood
+          \note typical value 0.12
+          \units W/m-K
 
 
 Insulation,
-
-     N1, \\field REXT: R Value of any exterior insulation, K/(W/m2)]
-
-         \\units m2-K/W
-
-     A1; \\field INSFULL: Flag: Is the wall fully insulated?
-
-         \\note  True for full insulation
-
-         \\note  False for insulation half way down side wall from grade line
-
-
+     N1, \field REXT: R Value of any exterior insulation, K/(W/m2)]
+         \units m2-K/W
+     A1; \field INSFULL: Flag: Is the wall fully insulated?
+         \note  True for full insulation
+         \note  False for insulation half way down side wall from grade line
 
 SurfaceProps,
-
-     N1, \\field ALBEDO: Surface albedo for No snow conditions
-
-         \\note typical value 0.16
-
-     N2, \\field ALBEDO: Surface albedo for snow conditions
-
-         \\note typical value 0.40
-
-     N3, \\field EPSLN: Surface emissivity No Snow
-
-         \\note typical value 0.94
-
-     N4, \\field EPSLN: Surface emissivity  with Snow
-
-         \\note typical value 0.86
-
-     N5, \\field VEGHT: Surface roughness No snow conditions,cm
-
-         \\note typical value 6.0
-
-         \\units cm
-
-     N6, \\field VEGHT: Surface roughness Snow conditions, cm, ]
-
-         \\note typical value 0.25
-
-         \\units cm
-
-     A1; \\field PET: Flag, Potential evapotranspiration on? T/F]
-
-         \\note  Typically, PET is True
-
-
+     N1, \field ALBEDO: Surface albedo for No snow conditions
+         \note typical value 0.16
+     N2, \field ALBEDO: Surface albedo for snow conditions
+         \note typical value 0.40
+     N3, \field EPSLN: Surface emissivity No Snow
+         \note typical value 0.94
+     N4, \field EPSLN: Surface emissivity  with Snow
+         \note typical value 0.86
+     N5, \field VEGHT: Surface roughness No snow conditions,cm
+         \note typical value 6.0
+         \units cm
+     N6, \field VEGHT: Surface roughness Snow conditions, cm, ]
+         \note typical value 0.25
+         \units cm
+     A1; \field PET: Flag, Potential evapotranspiration on? T/F]
+         \note  Typically, PET is True
 
 BldgData,
-
-     N1, \\field DWALL: Wall thickness,
-
-         \\note typical value .2]
-
-         \\units m
-
-     N2, \\field DSLAB: Floor slab thickness,
-
-         \\units m
-
-         \\maximum 0.25
-
-     N3, \\field DGRAVXY: Width of gravel pit beside basement wall
-
-         \\units  m
-
-     N4, \\field DGRAVZN: Gravel depth extending above the floor slab
-
-         \\units m
-
-     N5; \\field DGRAVZP: Gravel depth below the floor slab,
-
-         \\units m
-
-         \\note typical value 0.1
-
-!
+     N1, \field DWALL: Wall thickness,
+         \note typical value .2]
+         \units m
+     N2, \field DSLAB: Floor slab thickness,
+         \units m
+         \maximum 0.25
+     N3, \field DGRAVXY: Width of gravel pit beside basement wall
+         \units  m
+     N4, \field DGRAVZN: Gravel depth extending above the floor slab
+         \units m
+     N5; \field DGRAVZP: Gravel depth below the floor slab,
+         \units m
+         \note typical value 0.1
 
 Interior,
-
-   A1, \\field COND: Flag: Is the basement conditioned?
-
-       \\note TRUE or FALSE
-
-       \\note for EnergyPlus this should be TRUE
-
-   N1, \\field HIN: Downward convection only heat transfer coefficient
-
-       \\units W/m2-K
-
-   N2, \\field HIN: Upward convection only heat transfer coefficient
-
-       \\units W/m2-K
-
-   N3, \\field HIN: Horizontal convection only heat transfer coefficient
-
-       \\units W/m2-K
-
-   N4, \\field HIN: Downward combined (convection and radiation) heat transfer coefficient
-
-       \\units W/m2-K
-
-   N5, \\field HIN: Upward combined (convection and radiation) heat transfer coefficient
-
-       \\units W/m2-K
-
-   N6; \\field HIN: Horizontal combined (convection and radiation) heat transfer coefficient
-
-       \\units W/m2-K
-
-!
-
-
+   A1, \field COND: Flag: Is the basement conditioned?
+       \note TRUE or FALSE
+       \note for EnergyPlus this should be TRUE
+   N1, \field HIN: Downward convection only heat transfer coefficient
+       \units W/m2-K
+   N2, \field HIN: Upward convection only heat transfer coefficient
+       \units W/m2-K
+   N3, \field HIN: Horizontal convection only heat transfer coefficient
+       \units W/m2-K
+   N4, \field HIN: Downward combined (convection and radiation) heat transfer coefficient
+       \units W/m2-K
+   N5, \field HIN: Upward combined (convection and radiation) heat transfer coefficient
+       \units W/m2-K
+   N6; \field HIN: Horizontal combined (convection and radiation) heat transfer coefficient
+       \units W/m2-K
 
 ComBldg,
-
-\\memo ComBldg contains the monthly average temperatures (C) and possibility of daily variation amplitude
-
-   N1,  \\field January average temperature
-
-        \\units C
-
-   N2,  \\field February average temperature
-
-        \\units C
-
-   N3,  \\field March average temperature
-
-        \\units C
-
-   N4,  \\field April average temperature
-
-        \\units C
-
-   N5,  \\field May average temperature
-
-        \\units C
-
-   N6,  \\field June average temperature
-
-        \\units C
-
-   N7,  \\field July average temperature
-
-        \\units C
-
-   N8,  \\field August average temperature
-
-        \\units C
-
-   N9,  \\field September average temperature
-
-        \\units C
-
-   N10, \\field October average temperature
-
-        \\units C
-
-   N11, \\field November average temperature
-
-        \\units C
-
-   N12, \\field December average temperature
-
-        \\units C
-
-   N13; \\field Daily variation sine wave amplitude
-
-        \\units C
-
-        \\note (Normally zero, just for checking)
-
-!
+\memo ComBldg contains the monthly average temperatures (C) and possibility of daily variation amplitude
+   N1,  \field January average temperature
+        \units C
+   N2,  \field February average temperature
+        \units C
+   N3,  \field March average temperature
+        \units C
+   N4,  \field April average temperature
+        \units C
+   N5,  \field May average temperature
+        \units C
+   N6,  \field June average temperature
+        \units C
+   N7,  \field July average temperature
+        \units C
+   N8,  \field August average temperature
+        \units C
+   N9,  \field September average temperature
+        \units C
+   N10, \field October average temperature
+        \units C
+   N11, \field November average temperature
+        \units C
+   N12, \field December average temperature
+        \units C
+   N13; \field Daily variation sine wave amplitude
+        \units C
+        \note (Normally zero, just for checking)
 
 EquivSlab,  !  Supplies the EquivSizing Flag
-
     ! Using an equivalent slab allows non-rectangular shapes to be
-
     !    modeled accurately.
-
     ! The simulation default should be EquivSizing=True
-
-   N1, \\field APRatio: The area to perimeter ratio for this slab
-
-       \\ units m
-
-   A1; \\field EquivSizing: Flag
-
-         \\note Will the dimensions of an equivalent slab be calculated (TRUE)
-
-         \\note or will the dimensions be input directly? (FALSE)]
-
-         \\note Only advanced special simulations should use FALSE.
-
-!
+   N1, \field APRatio: The area to perimeter ratio for this slab
+       \ units m
+   A1; \field EquivSizing: Flag
+         \note Will the dimensions of an equivalent slab be calculated (TRUE)
+         \note or will the dimensions be input directly? (FALSE)]
+         \note Only advanced special simulations should use FALSE.
 
 EquivAutoGrid,
-
-     \\memo EquivAutoGrid necessary when EquivSizing=TRUE, TRUE is is the normal case.
-
-       N1, \\field CLEARANCE: Distance from outside of wall to edge of 3-D ground domain
-
-         \\units m
-
-         \\note typical value 15m
-
-       N2, \\field SlabDepth: Thickness of the floor slab
-
-         \\units m
-
-         \\note typical value 0.1m
-
-       N3; \\field BaseDepth: Depth of the basement wall below grade
-
-         \\units m
+     \memo EquivAutoGrid necessary when EquivSizing=TRUE, TRUE is is the normal case.
+       N1, \field CLEARANCE: Distance from outside of wall to edge of 3-D ground domain
+         \units m
+         \note typical value 15m
+       N2, \field SlabDepth: Thickness of the floor slab
+         \units m
+         \note typical value 0.1m
+       N3; \field BaseDepth: Depth of the basement wall below grade
+         \units m
 
 !
-
-!
-
-! \*\*\*\*\*\*\*\* The following input objects are required only for special cases.
-
+! ******** The following input objects are required only for special cases.
 !
 
 AutoGrid,   ! NOTE: AutoGrid only necessary when EquivSizing is false
-
 ! If the modelled building is not a rectangle or square, Equivalent
-
 ! sizing MUST be used to get accurate results
-
-       N1, \\field CLEARANCE: Distance from outside of wall to edge, 15m]
-
-       N2, \\field SLABX: X dimension of the building slab, 0-60.0 m]
-
-       N3, \\field SLABY: Y dimension of the building slab, 0-60.0 m]
-
-       N4, \\field ConcAGHeight: Height of the fndn wall above grade, m]
-
-       N5, \\field SlabDepth: Thickness of the floor slab, m, 0.1]
-
-       N6; \\field BaseDepth: Depth of the basement wall below grade, m]
-
-!
-
-
+       N1, \field CLEARANCE: Distance from outside of wall to edge, 15m]
+       N2, \field SLABX: X dimension of the building slab, 0-60.0 m]
+       N3, \field SLABY: Y dimension of the building slab, 0-60.0 m]
+       N4, \field ConcAGHeight: Height of the fndn wall above grade, m]
+       N5, \field SlabDepth: Thickness of the floor slab, m, 0.1]
+       N6; \field BaseDepth: Depth of the basement wall below grade, m]
 
 ManualGrid, ! NOTE: Manual Grid only necessary using manual gridding
-
 !  (not recommended)
-
-       N1, \\field NX: Number of cells in the X direction: 20]
-
-       N2, \\field NY: Number of cells in the Y direction: 20]
-
-       N3, \\field NZAG: Number of cells in the Z direction
-
+       N1, \field NX: Number of cells in the X direction: 20]
+       N2, \field NY: Number of cells in the Y direction: 20]
+       N3, \field NZAG: Number of cells in the Z direction
 !              above grade: 4 Always]
-
-       N4, \\field NZBG: Number of cells in Z dir. below grade: 10-35]
-
-       N5, \\field IBASE: X direction cell indicator of slab edge: 5-20]
-
-       N6, \\field JBASE: Y direction cell indicator of slab edge: 5-20]
-
-       N7; \\field KBASE: Z direction cell indicator
-
+       N4, \field NZBG: Number of cells in Z dir. below grade: 10-35]
+       N5, \field IBASE: X direction cell indicator of slab edge: 5-20]
+       N6, \field JBASE: Y direction cell indicator of slab edge: 5-20]
+       N7; \field KBASE: Z direction cell indicator
 !              of the top of the floor slab: 5-20]
 
-!
-
 XFACE,       ! NOTE: This is only needed when using manual gridding
-
 !  (not recommended)
-
 !       [XFACE: X Direction cell face coordinates: m]
-
        N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
        N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
-
        N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
-
        N39, N40, N41, N42, N43, N44;
-
-!
 
 YFACE,  !NOTE: This is only needed when using manual gridding
-
 !  (not recommended)
-
 !       [YFACE: Y Direction cell face coordinates: m],
-
        N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
        N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
-
        N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
-
        N39, N40, N41, N42, N43, N44;
 
-!
-
 ZFACE,  !NOTE: This is only needed when using manual gridding
-
 !  (not recommended)
-
 !       [ZFACE: Z Direction cell face coordinates: m]
-
        N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
        N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
-
        N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
-
       N39, N40;
+```
 
 Description of the Objects in the BasementGHT.idd
 -------------------------------------------------
@@ -7397,253 +6531,131 @@ Field N4 specifies the depth of the basement wall below grade level.  This is th
 
 ### Sample idf File - Basement
 
+```idf
 ! Minneapolis Test Cases
-
 SimParameters,
-
  0.1,     ! [F: Multiplier for the ADI solution: 0&lt;F&lt;1.0,
-
-          !         typically 0.1 (0.5 for high k
-
+ !         typically 0.1 (0.5 for high k
  1;       ! [IYRS: Maximum number of iterations: typically 25-30
 
-!
-
 MatlProps,
-
-6, ! [NMAT: Number of materials in this domain, UP TO 6]
-
-2242.6, 2242.6, 311.66, 1500.0, 2000.0, 448.5,! [RHO(1-6): Matl density
-
-!(Fndn wall, Floor Slab, Ceiling,Soil, Gravel, Wood), kg/m3, ]
-
+ 6, ! [NMAT: Number of materials in this domain, UP TO 6]
+ 2242.6, 2242.6, 311.66, 1500.0, 2000.0, 448.5,! [RHO(1-6): Matl density
+ !(Fndn wall, Floor Slab, Ceiling,Soil, Gravel, Wood), kg/m3, ]
  880.0, 880.0, 1513.0, 840.0, 720.0, 1630.0,!       [CP(1-6): Specific Heat: J/kg-K,
-
  1.402, 1.402, 0.093, 0.5, 1.9, 0.119;  !       [TCON(1-6): Conductivity: W/m-K
 
-!
-
 Insulation,
-
  5.0, ! [REXT: R Value of any exterior insulation, K/(W/m2)]
-
-TRUE; ! [INSFULL: Flag: Is the wall fully insulated? TRUE/FALSE]
-
-!
+ TRUE; ! [INSFULL: Flag: Is the wall fully insulated? TRUE/FALSE]
 
 SurfaceProps,
-
-.16, .40, ! [ALBEDO: Surface albedo array, .16 .40]
-
-.94, .86, ! [EPSLN: Surface emissivity No Snow/ Snow .94 .86]
-
-6.0, 0.25, ! [VEGHT: Surface roughness NS/S, cm, 6.0, 0.25]
-
-TRUE;! [PET: Flag, Potential evapotranspiration on? T/F]
-
-!                Typically, PET is True
-
-!
+ .16, .40, ! [ALBEDO: Surface albedo array, .16 .40]
+ .94, .86, ! [EPSLN: Surface emissivity No Snow/ Snow .94 .86]
+ 6.0, 0.25, ! [VEGHT: Surface roughness NS/S, cm, 6.0, 0.25]
+ TRUE;! [PET: Flag, Potential evapotranspiration on? T/F]
+ !                Typically, PET is True
 
 BldgData,
-
-.2, ! [DWALL: Wall thickness, m, .2]
-
-.1, ! [DSLAB: Floor slab thickness, m, 0.1]
-
-.3, ! [DGRAVXY: Width of gravel pit beside footing, m, 0.3]
-
-.2, ! [DGRAVZN: Gravel depth above the floor slab, m, 0.2]
-
+ .2, ! [DWALL: Wall thickness, m, .2]
+ .1, ! [DSLAB: Floor slab thickness, m, 0.1]
+ .3, ! [DGRAVXY: Width of gravel pit beside footing, m, 0.3]
+ .2, ! [DGRAVZN: Gravel depth above the floor slab, m, 0.2]
  .1;! [DGRAVZP: Gravel depth below the floor slab, m, 0.1]
 
-!
-
 Interior,
-
  TRUE, ! [COND: Flag: Is the basement conditioned? TRUE/FALSE]
-
-! [HIN: Indoor convective heat transfer coefficients, W/m2-K
-
-!       Convection Only: 1)Q Downward 2)Q Upward 3)Q Horizontal
-
-!       Conv and Radiation: 4)Q Downward 5)Q Upward 6)Q Horizontal]
-
-0.92, !Q Downward Convection Only
-
+ ! [HIN: Indoor convective heat transfer coefficients, W/m2-K
+ !       Convection Only: 1)Q Downward 2)Q Upward 3)Q Horizontal
+ !       Conv and Radiation: 4)Q Downward 5)Q Upward 6)Q Horizontal]
+ 0.92, !Q Downward Convection Only
  4.04,!Q Upward Convection Only
-
  3.08,!Q HorizontalConvection Only
-
-6.13, !Q Downward Conv and Radiation
-
-9.26, !Q Upward Conv and Radiation
-
+ 6.13, !Q Downward Conv and Radiation
+ 9.26, !Q Upward Conv and Radiation
  8.29;!Q Horizontal Conv and Radiation
 
-!
-
 EquivSlab,
-
-15.0, ! [APRatio: The area to perimeter ratio for this slab: m]
-
-!
-
-TRUE;! [EquivSizing: Flag: Will the dimensions of an equivalent
-
-!             slab be calculated (TRUE) or will the dimensions be
-
-!              input directly? (FALSE)]
-
-!             Only advanced special simulations should use FALSE.
-
-!
-
-
+ 15.0, ! [APRatio: The area to perimeter ratio for this slab: m]
+ TRUE;! [EquivSizing: Flag: Will the dimensions of an equivalent
+ !             slab be calculated (TRUE) or will the dimensions be
+ !              input directly? (FALSE)]
+ !             Only advanced special simulations should use FALSE.
 
 EquivAutoGrid,   ! NOTE: EquivAutoGrid necessary when EquivSizing=TRUE
-
-!                This is the normal case.
-
-! If the modelled building is not a rectangle or square, Equivalent
-
-! sizing MUST be used to get accurate results
-
-!
-
-15, ! [CLEARANCE: Distance from outside of wall to edge, 15m]
-
-.1,  ! [SlabDepth: Thickness of the floor slab, m, 0.1]
-
-2.4; ! [BaseDepth: Depth of the basement wall below grade, m]
-
-!
-
-!
+ !                This is the normal case.
+ ! If the modelled building is not a rectangle or square, Equivalent
+ ! sizing MUST be used to get accurate results
+ 15, ! [CLEARANCE: Distance from outside of wall to edge, 15m]
+ .1,  ! [SlabDepth: Thickness of the floor slab, m, 0.1]
+ 2.4; ! [BaseDepth: Depth of the basement wall below grade, m]
 
 ComBldg, !  Commercial building
-
-20.,  !  Jan Ave basement temp
-
-20.,  !  Feb Ave basement temp
-
-20.,  !  Mar Ave basement temp
-
-20.,  !  Apr Ave basement temp
-
-20.,  !  May Ave basement temp
-
-20.,  !  Jun Ave basement temp
-
-20.,  !  Jul Ave basement temp
-
-20.,  !  Aug Ave basement temp
-
-20.,  !  Sep Ave basement temp
-
-20.,  !  Oct Ave basement temp
-
-20.,  !  Nov Ave basement temp
-
-20.,  !  Dec Ave basement temp
-
-0.0;  !  Daily variation Sine Wave amplitude
+ 20.,  !  Jan Ave basement temp
+ 20.,  !  Feb Ave basement temp
+ 20.,  !  Mar Ave basement temp
+ 20.,  !  Apr Ave basement temp
+ 20.,  !  May Ave basement temp
+ 20.,  !  Jun Ave basement temp
+ 20.,  !  Jul Ave basement temp
+ 20.,  !  Aug Ave basement temp
+ 20.,  !  Sep Ave basement temp
+ 20.,  !  Oct Ave basement temp
+ 20.,  !  Nov Ave basement temp
+ 20.,  !  Dec Ave basement temp
+ 0.0;  !  Daily variation Sine Wave amplitude
+```
 
 ### Additional Objects
 
 There are five additional objects in the IDD that can be used under very special situations by researchers who want to generate special calculation grids. They are normally not useful to EnergyPlus users. They will be shown as IDD sections only. They do not need to be in the IDF.
 
+```
 AutoGrid,
-
-\\memo AutoGrid only necessary when EquivSizing is false
-
-\\memo If the modelled building is not a rectangle or square, Equivalent
-
-\\memo sizing MUST be used to get accurate results
-
-       N1, \\field CLEARANCE: Distance from outside of wall to edge, 15m]
-
-       N2, \\field SLABX: X dimension of the building slab, 0-60.0 m]
-
-       N3, \\field SLABY: Y dimension of the building slab, 0-60.0 m]
-
-       N4, \\field ConcAGHeight: Height of the fndn wall above grade, m]
-
-       N5, \\field SlabDepth: Thickness of the floor slab, m, 0.1]
-
-       N6; \\field BaseDepth: Depth of the basement wall below grade, m]
-
-!
+\memo AutoGrid only necessary when EquivSizing is false
+\memo If the modelled building is not a rectangle or square, Equivalent
+\memo sizing MUST be used to get accurate results
+       N1, \field CLEARANCE: Distance from outside of wall to edge, 15m]
+       N2, \field SLABX: X dimension of the building slab, 0-60.0 m]
+       N3, \field SLABY: Y dimension of the building slab, 0-60.0 m]
+       N4, \field ConcAGHeight: Height of the fndn wall above grade, m]
+       N5, \field SlabDepth: Thickness of the floor slab, m, 0.1]
+       N6; \field BaseDepth: Depth of the basement wall below grade, m]
 
 ManualGrid,
-
-\\memo Manual Grid only necessary using manual gridding (not recommended)
-
-       N1, \\field NX: Number of cells in the X direction: 20]
-
-       N2, \\field NY: Number of cells in the Y direction: 20]
-
-       N3, \\field NZAG: Number of cells in the Z direction. above grade: 4 Always]
-
-       N4, \\field NZBG: Number of cells in Z direction. below grade: 10-35]
-
-       N5, \\field IBASE: X direction cell indicator of slab edge: 5-20]
-
-       N6, \\field JBASE: Y direction cell indicator of slab edge: 5-20]
-
-       N7; \\field KBASE: Z direction cell indicator of the top of the floor slab: 5-20]
-
-!
+\memo Manual Grid only necessary using manual gridding (not recommended)
+       N1, \field NX: Number of cells in the X direction: 20]
+       N2, \field NY: Number of cells in the Y direction: 20]
+       N3, \field NZAG: Number of cells in the Z direction. above grade: 4 Always]
+       N4, \field NZBG: Number of cells in Z direction. below grade: 10-35]
+       N5, \field IBASE: X direction cell indicator of slab edge: 5-20]
+       N6, \field JBASE: Y direction cell indicator of slab edge: 5-20]
+       N7; \field KBASE: Z direction cell indicator of the top of the floor slab: 5-20]
 
 XFACE,
-
-\\memo This is only needed when using manual gridding (not recommended)
-
-\\memo XFACE: X Direction cell face coordinates: m
-
+\memo This is only needed when using manual gridding (not recommended)
+\memo XFACE: X Direction cell face coordinates: m
        N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
        N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
-
        N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
-
        N39, N40, N41, N42, N43, N44;
-
-!
-
-
 
 YFACE,
-
-\\memo This is only needed when using manual gridding (not recommended)
-
-\\memo YFACE: Y Direction cell face coordinates: m
-
+\memo This is only needed when using manual gridding (not recommended)
+\memo YFACE: Y Direction cell face coordinates: m
        N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
        N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
-
        N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
-
        N39, N40, N41, N42, N43, N44;
 
-!
-
 ZFACE,
-
-\\memo This is only needed when using manual gridding (not recommended)
-
-\\memo ZFACE: Z Direction cell face coordinates: m
-
+\memo This is only needed when using manual gridding (not recommended)
+\memo ZFACE: Z Direction cell face coordinates: m
        N1, N2, N3, N4, N5, N6, N7, N8, N9, N10, N11, N12, N13, N14,
-
        N15, N16, N17, N18, N19, N20, N21, N22, N23, N24, N25, N26,
-
        N27, N28, N29, N30, N31, N32, N33, N34, N35, N36, N37, N38,
-
        N39, N40;
-
-
+```
 
 Using the Interface Surface Temperature Results in EnergyPlus
 -------------------------------------------------------------
@@ -7994,25 +7006,17 @@ Figure 27. Files brought into the Interface Workbook
 
 The results file is named with the name in cell D13 with an extension of out. This file is shown below.
 
-
-
+```
 View3D 3.2 0 1 0 6
-
 400 480 400 480 3000 3000
-
 0.000000 0.078244 0.029324 0.078217 0.407109 0.407106
-
 0.065204 0.000000 0.065204 0.044282 0.412652 0.412659
-
 0.029324 0.078245 0.000000 0.078217 0.407110 0.407105
-
 0.065181 0.044282 0.065181 0.000000 0.412679 0.412677
-
 0.054281 0.066024 0.054281 0.066029 0.000000 0.759385
-
 0.054281 0.066025 0.054281 0.066028 0.759385 0.000000
-
 0.999 0.999 0.999 0.999 0.999 0.999
+```
 
 Excel macro capabilities are used by the interface to convert the text to columns and add the surface names and other headings. The modified results are placed on the Results worksheet as shown in Figure 28.
 
@@ -8121,19 +7125,19 @@ IDF Version Converter / Transition File Lists
 
 Both the console program and the IDF-Version Updater (see) can use a text file of file names to perform the transitions. The file is a very simple list of file names:
 
+```
 FileName1
-
 FileName2
+```
 
 But you must include the path name in the file if it is not in the same folder as the transition set of programs:
 
-C:\\Myfiles\\abc.idf
-
-C:\\My Working Files\\abcdef.idf
-
-D:\\OtherFiles\\xxxxxyyyyy.idf
-
+```
+C:\Myfiles\abc.idf
+C:\My Working Files\abcdef.idf
+D:\OtherFiles\xxxxxyyyyy.idf
 Etc
+```
 
 Note that the files need not be in the same folder. And, if you use the IDF Version Updater app, they need not all be the same version! If you use the straight batch files form the CMD line, all files in this list must be the same starting version and you will need to select that version when you run the batch file. List files have the implicit transition options seen in the following section.
 
@@ -8142,59 +7146,38 @@ Converting imf files
 
 The transition/conversion programs can "automatically" transition imf (ep-macro) files. One note of caution: if your macro file contains \#if statements in the form:
 
+```idf
 PEOPLE,
-
     ZONE ONE,                !- Zone Name
-
 **\#\#if \#[DoSizing[] EQSU Y]**
-
     \#[FAREA[] / OCCDENPEAK[]],        !- Number of People
-
   **\#\#else**
-
     \#[FAREA[] / OCCDENAVG[]],         !- Number of People
-
 **\#\#endif   **
-
     OCCSCHED[],       !- Number of People SCHEDULE Name (real--fraction)
-
     0.5000000,        !- Fraction Radiant
-
     Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
+```
 
 They should look like this:
 
+```idf
 **\#\#if \#[DoSizing[] EQSU Y]**
-
 PEOPLE,
-
     ZONE ONE,                !- Zone Name
-
     \#[FAREA[] / OCCDENPEAK[]],       !- Number of People
-
     OCCSCHED[],       !-   Number of People SCHEDULE Name (real--fraction)
-
     0.5000000,        !- Fraction Radiant
-
     Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
-
   **\#\#else**
-
 PEOPLE,
-
     ZONE ONE,                !- Zone Name
-
     \#[FAREA[] / OCCDENAVG[]],        !- Number of People
-
     OCCSCHED[],       !- Number of People SCHEDULE Name (real--fraction)
-
     0.5000000,        !- Fraction Radiant
-
     Activity Sch;     !- Activity level SCHEDULE Name (units W/person, real)
-
 **\#\#endif   **
-
-
+```
 
 EPDrawGUI
 =========
@@ -8558,85 +7541,57 @@ The  **\#\#def** command allows a block of input text to be defined and given a 
 
 The syntax of the  **\#\#def** command is as follows:
 
+```
         unique name
-
-           |         zero or more arguments    \_\_ macro text
-
+           |         zero or more arguments   macro text
            |            |                     |
-
            |            |                     |
-
-                                            
-
-    \#\#def  macro-name [ arg1 arg2,arg3 ...]   text line 1
-
-                                     
-
-  |\_     |           | |    |\_   |   \_|     |
-
-    |    |           | |      |  |  |       |\_\_ one
-
-    |    |           | |      |  |  |           or
-
-zero    one       zero\_|     space(s)           more
-
-or      or        or         or comma           spaces
-
-more    more      more
-
-spaces  spaces    spaces
+    ##def  macro-name [ arg1 arg2,arg3 ...]   text line 1
+  |_     |           | |    |_   |   _|     |
+    |    |           | |      |  |  |       |
+    |    |           | |      |  |  |       
+zero    one       zero_|     space(s)       one
+or      or        or         or comma       or
+more    more      more                      more
+spaces  spaces    spaces                    spaces
+```
 
 Example:    Define a schedule macro with name "All\_Const":
 
-
-
-**\#\#def** All\_Const[x]
-
+```
+**##def** All_Const[x]
 **       ** Fraction, WeekON, 1,1, 12,31;
-
     WEEKSCHEDULE, WeekON,
-
         DayON,DayON,DayON,
-
         DayON,DayON,DayON,
-
         DayON,DayON,DayON,
-
         DayON,DayON,DayON;
-
     DAYSCHEDULE, DayON, Fraction,
-
         x,x,x,x,x,x,x,x,x,x,x,x,
-
         x,x,x,x,x,x,x,x,x,x,x,x ;
-
-**\#\#enddef**
+**##enddef**
+```
 
 Then, in the EnergyPlus input stream (file in.imf), when we write :
 
-SCHEDULE, Constant At 0.8, All\_Const[0.8]
+```idf
+SCHEDULE, Constant At 0.8, All_Const[0.8]
+```
 
 the result (file out.idf) is equivalent to:
 
+```
 SCHEDULE, Constant At 0.8,
-
         Fraction, WeekON, 1,1, 12,31;
-
     WEEKSCHEDULE, WeekON,
-
         DayON,DayON,DayON,
-
         DayON,DayON,DayON,
-
         DayON,DayON,DayON,
-
         DayON,DayON,DayON;
-
     DAYSCHEDULE, DayON, Fraction,
-
         0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,
-
         0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8 ;
+```
 
 Macro definitions may have one or more arguments; the maximum number of arguments is 32. When a macro with arguments is referenced, its arguments must be given values. When a macro has no arguments, the brackets are still required both for macro definition and reference.
 
@@ -8665,25 +7620,15 @@ Like  **\#\#def1**  but has no arguments and macro-text is evaluated before stor
 Example:
 
                     **\#\#def1**   xx  123
-
                     **\#\#set1**   yy  xx[]
-
-
 
 is equivalent to:   **\#\#set1**   yy  123
 
-
-
 **\#\#set1**  can also be used to redefine macro-name.
 
-
-
 **\#\#set1**   x   0
-
   .
-
   .
-
   .
 
 **\#\#set1**   x    **\#eval**[ x[]+1 ]
@@ -9123,43 +8068,25 @@ Listing Format
 
 The format of listing from EP-MACRO gives information about the status of the input macros, as shown in the following:
 
-
-
- 1. 1.1  \* 123 \* ...... EnergyPlus input line
-
+```
+ 1. 1.1  * 123 * ...... EnergyPlus input line
  -  - -  ------- ----------------------------------
-
-              
-
  |  | |     |     echo of EnergyPlus input line
-
  |  | |     |
-
  |  | |    line number ( if the current line is being skipped
-
- |  | |                  by " **\#\#if**... " etc, this is indicated
-
+ |  | |                  by " ##if... " etc, this is indicated
  |  | |                  by printing "- 123 -" instead of
-
- |  | |                  "**\*** **123** **\***" in the line number field;
-
+ |  | |                  "* 123 *" in the line number field;
  |  | |                  if the current line is part of a
-
  |  | |                  macro command, it is indicated by
-
- |  | |                  printing "**\#** **123 \#**" )
-
+ |  | |                  printing "# 123 #" )
  |  | |
-
  |  | macro expansion nesting level
-
  |  |
-
- |"**\#\#if**" nesting level
-
+ |"##if" nesting level
  |
-
- "**\#\#include**" nesting level
+ "##include" nesting level
+```
 
 HVAC Diagram
 ============
@@ -9189,8 +8116,8 @@ Table 30. HVAC Diagram Object Names (primary sort) Colors
 
 <table class="table table-striped">
 <tr>
-<td>Object Name</td>
-<td>Color</td>
+<th>Object Name</th>
+<th>Color</th>
 </tr>
 <tr>
 <td>AirLoopHVAC:ReturnPlenum</td>
@@ -9492,8 +8419,8 @@ Table 31. HVAC Diagram Object Names and Color (primary sort)
 
 <table class="table table-striped">
 <tr>
-<td>Object Name</td>
-<td>Color</td>
+<th>Object Name</th>
+<th>Color</th>
 </tr>
 <tr>
 <td>EvaporativeCooler:Direct:CelDekPad</td>
@@ -9805,29 +8732,21 @@ You can also run the CoeffConv program as a console application. The input file 
 
 For example:
 
+```
 VarSpeedCoolCapFt
-
 -0.29382,0.0222213,0.00006988,0.0040928,-0.00000226,-0.00013774
-
 55.,75.
-
 75.,115.
-
 67.0,95.0
-
 5.0
+```
 
-The 1st line is the user selected name of the curve.
-
-The 2nd line contains the 6 biquadratic curve coefficients, comma separated. These are the Doe-2 coefficients.
-
-The 3rd line contains the min and max values of the 1st independent variable, comma separated, deg F.
-
-The 4th line contains the min and max values of the 2nd independent variable, comma separated, deg F.
-
-The 5th line contains the rated values of the 1st & 2nd independent variables, comma separated, deg F.
-
-The 6th line contains the delta T for the output performance maps.
+* The 1st line is the user selected name of the curve.
+* The 2nd line contains the 6 biquadratic curve coefficients, comma separated. These are the Doe-2 coefficients.
+* The 3rd line contains the min and max values of the 1st independent variable, comma separated, deg F.
+* The 4th line contains the min and max values of the 2nd independent variable, comma separated, deg F.
+* The 5th line contains the rated values of the 1st & 2nd independent variables, comma separated, deg F.
+* The 6th line contains the delta T for the output performance maps.
 
 All the input lines should start in column 1.
 
@@ -9852,29 +8771,21 @@ You can also run the CoeffCheck program as a console application. The input file
 
 For example:
 
+```
 VarSpeedCoolCapFt
-
 0.476428E+00,0.401147E-01,0.226411E-03,-0.827136E-03,-0.732240E-05,-0.446278E-03
-
 12.777778,23.888889
-
 23.888889,46.111111
-
 19.444444,35.0
-
 2.777778
+```
 
-The 1st line is the user selected name of the curve.
-
-The 2nd line contains the 6 biquadratic curve coefficients, comma separated.
-
-The 3rd line contains the min and max values of the 1st independent variable, comma separated
-
-The 4th line contains the min and max values of the 2nd independent variable, comma separated
-
-The 5th line contains the rated values of the 1st & 2nd independent variables, comma separated
-
-The 6th line contains the delta T for the output performance map
+* The 1st line is the user selected name of the curve.
+* The 2nd line contains the 6 biquadratic curve coefficients, comma separated.
+* The 3rd line contains the min and max values of the 1st independent variable, comma separated
+* The 4th line contains the min and max values of the 2nd independent variable, comma separated
+* The 5th line contains the rated values of the 1st & 2nd independent variables, comma separated
+* The 6th line contains the delta T for the output performance map
 
 The output file is CoeffCheckOutput.txt (status=NEW).
 
@@ -10061,63 +8972,63 @@ Where &lt;filename&gt; is the name of a CSV file, including extension. There is 
 
 The statistics performed on each column are:
 
-·        SUM
+* SUM
 
-·        MAX
+* MAX
 
-·        MIN
+* MIN
 
-·        AVERAGE
+* AVERAGE
 
-·        COUNT
+* COUNT
 
-·        COUNTIF &gt; 0
+* COUNTIF &gt; 0
 
-·        COUNTIF &gt; 5
+* COUNTIF &gt; 5
 
-·        COUNTIF &gt; 10
+* COUNTIF &gt; 10
 
-·        COUNTIF &gt; 15
+* COUNTIF &gt; 15
 
-·        COUNTIF &gt; 20
+* COUNTIF &gt; 20
 
-·        COUNTIF &gt; 25
+* COUNTIF &gt; 25
 
-·        COUNTIF &gt; 30
+* COUNTIF &gt; 30
 
-·        COUNTIF &gt; 35
+* COUNTIF &gt; 35
 
-·        COUNTIF &gt; 40
+* COUNTIF &gt; 40
 
-·        COUNTIF &gt; 45
+* COUNTIF &gt; 45
 
-·        COUNTIF &gt; 50
+* COUNTIF &gt; 50
 
-·        COUNTIF &gt; 55
+* COUNTIF &gt; 55
 
-·        COUNTIF &gt; 60
+* COUNTIF &gt; 60
 
-·        COUNTIF &gt; 65
+* COUNTIF &gt; 65
 
-·        COUNTIF &gt; 70
+* COUNTIF &gt; 70
 
-·        COUNTIF &gt; 75
+* COUNTIF &gt; 75
 
-·        COUNTIF &gt; 80
+* COUNTIF &gt; 80
 
-·        COUNTIF &gt; 85
+* COUNTIF &gt; 85
 
-·        COUNTIF &gt; 90
+* COUNTIF &gt; 90
 
-·        COUNTIF &gt; 95
+* COUNTIF &gt; 95
 
-·        COUNTIF &gt; 100
+* COUNTIF &gt; 100
 
-·        COUNTIF = 1
+* COUNTIF = 1
 
-·        COUNTIF &lt; 19.9
+* COUNTIF &lt; 19.9
 
-·        COUNTIF &gt; 24.0
+* COUNTIF &gt; 24.0
 
 Obviously, not all statistics are relevant for every output report variable. The average is based on the sum divided by the number of non-blank rows. The average is not based on the length of time for that timestep. Due to this, CSVproc is best suited for an hourly output file.
 
@@ -10142,17 +9053,14 @@ If a specific variable needs to be converted, the 'vari' line may be used to con
 
 A snippet of the convert.txt file:
 
+```
 ! Power
-
 !------------------------------
-
 !    (1 kW / 1000 W)
-
 conv,W,kW,0.001,0
-
-!    (1 Btuh/ 0.2928751 W) \* (1 kBtuh/1000 Btuh)
-
+!    (1 Btuh/ 0.2928751 W) * (1 kBtuh/1000 Btuh)
 conv,W,kBtuh,3.41442E-03,0
+```
 
 CalcSoilSurfTemp Program
 ========================
@@ -10256,273 +9164,140 @@ This is the time elapsed from the beginning of the year at which the soil surfac
 
 These values are placed in the ZoneEarthTube object numeric fields (12, 13, 14) of similar names. The ZoneEarthTube IDD definition with these fields highlighted is included:
 
-**ZoneEarthtube,**
-
-  \\min-fields 22
-
-      \\memo  Earth Tube is specified as a design level which is modified by a Schedule fraction, temperature difference and wind speed:
-
-      \\memo  Earthtube=Edesign \* Fschedule \* (A + B\*|(Tzone-Todb)| + C\*WindSpd + D \* WindSpd\*\*2)
-
-  A1, \\field Zone Name
-
-      \\required-field
-
-      \\type object-list
-
-      \\object-list ZoneNames
-
-  A2, \\field Schedule Name
-
-      \\required-field
-
-      \\type object-list
-
-      \\object-list ScheduleNames
-
-  N1, \\field Design Flow Rate
-
-      \\required-field
-
-      \\units m3/s
-
-      \\note  "Edesign" in Equation
-
-      \\type real
-
-      \\minimum 0
-
-  N2, \\field Minimum Zone Temperature when Cooling
-
-      \\required-field
-
-      \\note this is the indoor temperature below which the earth tube is shut off
-
-      \\units C
-
-      \\type real
-
-      \\minimum -100
-
-      \\maximum 100
-
-  N3, \\field Maximum Zone Temperature when Heating
-
-      \\required-field
-
-      \\note this is the indoor temperature above which the earth tube is shut off
-
-      \\units C
-
-      \\type real
-
-      \\minimum -100
-
-      \\maximum 100
-
-  N4, \\field Delta Temperature
-
-      \\required-field
-
-      \\note This is the temperature difference between indoor and outdoor below which the earth tube is shut off
-
-      \\units deltaC
-
-      \\type real
-
-      \\minimum 0
-
-  A3, \\field Earthtube Type
-
-      \\required-field
-
-      \\type choice
-
-      \\key Natural
-
-      \\key Intake
-
-      \\key Exhaust
-
-      \\default Natural
-
-  N5, \\field Fan Pressure Rise
-
-      \\required-field
-
-      \\note pressure rise across the fan
-
-      \\type real
-
-      \\units Pa
-
-      \\minimum 0
-
-      \\default 0
-
-  N6, \\field Fan Total Efficiency
-
-      \\required-field
-
-      \\type real
-
-      \\minimum&gt; 0
-
-      \\default 1
-
-
-
-  N7, \\field Pipe Radius
-
-      \\required-field
-
-      \\units m
-
-      \\type real
-
-      \\minimum&gt; 0
-
-      \\default 1
-
-  N8, \\field Pipe Thickness
-
-      \\required-field
-
-      \\units m
-
-      \\type real
-
-      \\minimum&gt; 0
-
-      \\default 0.2
-
-  N9, \\field Pipe Length
-
-      \\required-field
-
-      \\units m
-
-      \\type real
-
-      \\minimum&gt; 0
-
-      \\default 15
-
- N10, \\field Pipe Thermal Conductivity
-
-      \\required-field
-
-      \\units W/m-K
-
-      \\type real
-
-      \\minimum&gt; 0
-
-      \\default 200
-
- N11, \\field Pipe Depth Under Ground Surface
-
-      \\required-field
-
-      \\units m
-
-      \\type real
-
-      \\minimum&gt; 0
-
-      \\default 3
-
-  A4, \\field Soil Condition
-
-      \\required-field
-
-      \\type choice
-
-      \\key HeavyAndSaturated
-
-      \\key HeavyAndDamp
-
-      \\key HeavyAndDry
-
-      \\key LightAndDry
-
-      \\default HeavyAndDamp
-
- N12, \\field Average Soil Surface Temperature
-
-      \\required-field
-
-      \\units C
-
-      \\type real
-
-      \\default 0
-
- N13, \\field Amplitude of Soil Surface Temperature
-
-      \\required-field
-
-      \\units C
-
-      \\type real
-
-      \\minimum 0
-
-      \\default 0
-
- N14, \\field Phase Constant of Soil Surface Temperature
-
-      \\required-field
-
-      \\units days
-
-      \\type real
-
-      \\minimum 0
-
-      \\default 0
-
- N15, \\field Constant Term Flow Coefficient
-
-      \\required-field
-
-      \\note  "A" in Equation
-
-      \\type real
-
-      \\default 1
-
- N16, \\field Temperature Term Flow Coefficient
-
-      \\required-field
-
-      \\note  "B" in Equation
-
-      \\type real
-
-      \\default 0
-
- N17, \\field Velocity Term Flow Coefficient
-
-      \\required-field
-
-      \\note  "C" in Equation
-
-      \\type real
-
-      \\default 0
-
-
-
- N18; \\field Velocity Squared Term Flow Coefficient
-
-      \\required-field
-
-      \\note  "D" in Equation
-
-      \\type real
-
-      \\default 0
+```idf
+ZoneEarthtube,
+  \min-fields 22
+  \memo  Earth Tube is specified as a design level which is modified by a Schedule fraction, temperature difference and wind speed:
+  \memo  Earthtube=Edesign * Fschedule * (A + B*|(Tzone-Todb)| + C*WindSpd + D * WindSpd**2)
+ A1, \field Zone Name
+  \required-field
+  \type object-list
+  \object-list ZoneNames
+ A2, \field Schedule Name
+  \required-field
+  \type object-list
+  \object-list ScheduleNames
+ N1, \field Design Flow Rate
+  \required-field
+  \units m3/s
+  \note  "Edesign" in Equation
+  \type real
+  \minimum 0
+ N2, \field Minimum Zone Temperature when Cooling
+  \required-field
+  \note this is the indoor temperature below which the earth tube is shut off
+  \units C
+  \type real
+  \minimum -100
+  \maximum 100
+ N3, \field Maximum Zone Temperature when Heating
+  \required-field
+  \note this is the indoor temperature above which the earth tube is shut off
+  \units C
+  \type real
+  \minimum -100
+  \maximum 100
+ N4, \field Delta Temperature
+  \required-field
+  \note This is the temperature difference between indoor and outdoor below which the earth tube is shut off
+  \units deltaC
+  \type real
+  \minimum 0
+ A3, \field Earthtube Type
+  \required-field
+  \type choice
+  \key Natural
+  \key Intake
+  \key Exhaust
+  \default Natural
+ N5, \field Fan Pressure Rise
+  \required-field
+  \note pressure rise across the fan
+  \type real
+  \units Pa
+  \minimum 0
+  \default 0
+ N6, \field Fan Total Efficiency
+  \required-field
+  \type real
+  \minimum> 0
+  \default 1
+ N7, \field Pipe Radius
+  \required-field
+  \units m
+  \type real
+  \minimum> 0
+  \default 1
+ N8, \field Pipe Thickness
+  \required-field
+  \units m
+  \type real
+  \minimum> 0
+  \default 0.2
+ N9, \field Pipe Length
+  \required-field
+  \units m
+  \type real
+  \minimum> 0
+  \default 15
+ N10, \field Pipe Thermal Conductivity
+  \required-field
+  \units W/m-K
+  \type real
+  \minimum> 0
+  \default 200
+ N11, \field Pipe Depth Under Ground Surface
+  \required-field
+  \units m
+  \type real
+  \minimum> 0
+  \default 3
+ A4, \field Soil Condition
+  \required-field
+  \type choice
+  \key HeavyAndSaturated
+  \key HeavyAndDamp
+  \key HeavyAndDry
+  \key LightAndDry
+  \default HeavyAndDamp
+ N12, \field Average Soil Surface Temperature
+  \required-field
+  \units C
+  \type real
+  \default 0
+ N13, \field Amplitude of Soil Surface Temperature
+  \required-field
+  \units C
+  \type real
+  \minimum 0
+  \default 0
+ N14, \field Phase Constant of Soil Surface Temperature
+  \required-field
+  \units days
+  \type real
+  \minimum 0
+  \default 0
+ N15, \field Constant Term Flow Coefficient
+  \required-field
+  \note  "A" in Equation
+  \type real
+  \default 1
+ N16, \field Temperature Term Flow Coefficient
+  \required-field
+  \note  "B" in Equation
+  \type real
+  \default 0
+ N17, \field Velocity Term Flow Coefficient
+  \required-field
+  \note  "C" in Equation
+  \type real
+  \default 0
+ N18; \field Velocity Squared Term Flow Coefficient
+  \required-field
+  \note  "D" in Equation
+  \type real
+  \default 0
+```
 
 HVAC Performance Curve Fit Tool
 ===============================
@@ -10532,11 +9307,11 @@ Introduction
 
 This auxiliary tool generates HVAC performance curves in EnergyPlus curve object format.  For each set of performance data entered, Capacity and EIR performance curves are generated, and these curves are generated either as a function of temperature(s) or flow fraction.  The Capacity and EIR of Cooling DX Coils as a function of temperatures require only Biquadratic curve whereas Capacity and EIR of Heating DX Coils may use Biquadratic, Cubic and Quadratic curves. The selection of either of these curves is dependent on availability of performance data. The Capacity and EIR as a function of flow fraction allows either Cubic or Quadratic curve type. The curve types allowed are:
 
-Biquadratic: ![](AuxiliaryPrograms/media/image031.png)
+Biquadratic: <span>$\text{CurveValue} = a_0 + a_1 X + a_2 X^2 + a_3 Y + a_4 Y^2 + a_5 XY $</span>
 
-Cubic: ![](AuxiliaryPrograms/media/image032.png)
+Cubic: <span>$\text{CurveValue} = a_0 + a_1 X + a_2 X^2 + a_3 X^3 $</span>
 
-Quadratic: ![](AuxiliaryPrograms/media/image033.png)
+Quadratic: <span>$\text{CurveValue} = a_0 + a_1 X + a_2 X^2 $</span>
 
 These performance curves as a function of temperatures are generated for a given set of input data at a given speed. The curves as a function of flow fraction are generated at the rated temperature conditions.  The rated test condition is the AHRI standard test condition (AHRI 2003;2007; 2008).  The AHRI standard test condition may vary by the equipment type.   For multiple speeds or multiple stage DX Coils, different curve sets can be generated by entering a different set of data for each speed or stage at a time.  The tool automatically populates the labels for each data inputs variable when users select the Coil Type, Independent Variables, Curve Type, and Units. The curve fit tool interface in Figure 1 shows labels selected to generate capacity and EIR biquadratic curves as function of temperatures for DX cooling coil.
 
@@ -10555,8 +9330,8 @@ Table-1 Input parameters description
 
 <table class="table table-striped">
 <tr>
-<td>Input Parameter</td>
-<td>Description of Inputs</td>
+<th>Input Parameter</th>
+<th>Description of Inputs</th>
 </tr>
 <tr>
 <td>DX Coil Type</td>
@@ -10583,7 +9358,24 @@ SI: Temperature in °C, Capacity in kW, Power in kW, and Flow in m<sup>3</sup>/s
 <tr>
 <td>Curve Object Name</td>
 <td>This input is optional.  This string is appended to the default curve object name, or if left blank the default curve object name will be displayed. A curve object is named is created by concatenation as follows:
-<img src="AuxiliaryPrograms/media/image035.png" /></td>
+<span>$
+=
+\left\{
+ \begin{array}{c}
+  \text{User Specified} \\
+  \text{Curve Object Name}
+ \end{array}
+\right\} + 
+\text{"DXCoilType"} + 
+\left\{
+ \begin{array}{c}
+  \text{CAPFTemp} \\ 
+  \text{CAPFFF} \\
+  \text{EIRFTemp} \\
+  \text{EIRFFF}
+ \end{array}
+\right\}
+$</span></td>
 </tr>
 </table>
 
@@ -10612,75 +9404,44 @@ Besides the curve coefficients, the goodness of curve fit indicator statistical 
 
 Sample EnergyPlus curve objects output file generated using this auxiliary tool.
 
- Curve:Biquadratic,
+```idf
+Curve:Biquadratic,
+ HeatPumpCoolingCAPFTemp,      !- Name
+ 1.4248528695,                !- Coefficient1 Constant
+ -0.0554469607,                !- Coefficient2 x
+ 0.0027506982,                !- Coefficient3 x**2
+ -0.0017453896,                !- Coefficient4 y
+ -0.0000081,                   !- Coefficient5 y**2
+ -0.0004638975,                !- Coefficient6 x*y
+ 13.8888888889,                !- Minimum Value of x
+ 22.2222222222,                !- Maximum Value of x
+ 29.4444444444,                !- Minimum Value of y
+ 46.1111111111,                !- Maximum Value of y
+ 0.7875,                       !- Minimum Curve Output
+ 1.1725,                       !- Maximum Curve Output
+ Temperature,                  !- Input Unit Type for X
+ Temperature,                  !- Input Unit Type for Y
+ Dimensionless;                !- Output Unit Type
 
-  HeatPumpCoolingCAPFTemp,      !- Name
+Curve:Biquadratic,
+ HeatPump1CoolingEIRFTemp,     !- Name
+ 0.1566419771,                 !- Coefficient1 Constant
+ 0.0522807347,                 !- Coefficient2 x
+ -0.0017986792,                !- Coefficient3 x**2
+ 0.009523995,                  !- Coefficient4 y
+ 0.0002405903,                 !- Coefficient5 y**2
+ -0.0001781171,                !- Coefficient6 x*y
+ 13.8888888889,                !- Minimum Value of x
+ 22.2222222222,                !- Maximum Value of x
+ 29.4444444444,                !- Minimum Value of y
+ 46.1111111111,                !- Maximum Value of y
+ 0.8216,                       !- Minimum Curve Output
+ 1.3703,                       !- Maximum Curve Output
+ Temperature,                  !- Input Unit Type for X
+ Temperature,                  !- Input Unit Type for Y
+ Dimensionless;                !- Output Unit Type
+```
 
-   1.4248528695,                !- Coefficient1 Constant
-
-  -0.0554469607,                !- Coefficient2 x
-
-   0.0027506982,                !- Coefficient3 x\*\*2
-
-  -0.0017453896,                !- Coefficient4 y
-
-  -0.0000081,                   !- Coefficient5 y\*\*2
-
-  -0.0004638975,                !- Coefficient6 x\*y
-
-  13.8888888889,                !- Minimum Value of x
-
-  22.2222222222,                !- Maximum Value of x
-
-  29.4444444444,                !- Minimum Value of y
-
-  46.1111111111,                !- Maximum Value of y
-
-  0.7875,                       !- Minimum Curve Output
-
-  1.1725,                       !- Maximum Curve Output
-
-  Temperature,                  !- Input Unit Type for X
-
-  Temperature,                  !- Input Unit Type for Y
-
-  Dimensionless;                !- Output Unit Type
-
-
-
- Curve:Biquadratic,
-
-  HeatPump1CoolingEIRFTemp,     !- Name
-
-  0.1566419771,                 !- Coefficient1 Constant
-
-  0.0522807347,                 !- Coefficient2 x
-
-  -0.0017986792,                !- Coefficient3 x\*\*2
-
-  0.009523995,                  !- Coefficient4 y
-
-  0.0002405903,                 !- Coefficient5 y\*\*2
-
-  -0.0001781171,                !- Coefficient6 x\*y
-
-  13.8888888889,                !- Minimum Value of x
-
-  22.2222222222,                !- Maximum Value of x
-
-  29.4444444444,                !- Minimum Value of y
-
-  46.1111111111,                !- Maximum Value of y
-
-  0.8216,                       !- Minimum Curve Output
-
-  1.3703,                       !- Maximum Curve Output
-
-  Temperature,                  !- Input Unit Type for X
-
-  Temperature,                  !- Input Unit Type for Y
-
-  Dimensionless;                !- Output Unit Type
 
 Error Message
 -------------
@@ -11129,13 +9890,10 @@ ParametricPreprocessor
 
 The parametric preprocessor used to create a series of resulting IDF files from a single source IDF file that contains parametric objects and expressions. The parametric objects in EnergyPlus are interpreted by the ParametricPreprocessor and are:
 
-·        Parametric:SetValueForRun
-
-·        Parametric:Logic
-
-·        Parametric:RunControl
-
-·        Parametric:FileNameSuffix
+* Parametric:SetValueForRun
+* Parametric:Logic
+* Parametric:RunControl
+* Parametric:FileNameSuffix
 
 The ParametricPreprocessor reads the source IDF file and removes the Parametric objects shown above, processes these objects and any embedded expressions and produces a series of resulting IDF files, one for each "run" described by the objects.
 
@@ -11209,21 +9967,15 @@ Where &lt;blastinputfile&gt; is the part of the file name without extension. The
 
 The BLASTTranslator uses an "Energy+.ini" file for some parameters. For example:
 
-
-
+```
 [program]
-
 dir=
-
 ver=
-
 surf=group
 
-
-
 [weather]
-
 dir=
+```
 
 The above BLASTTranslator ini file sets the "version" of EnergyPlus to the current version and has the "surf" parameter set to "group". This BLASTTranslator run will produce an EnergyPlus input file for the current release version format and will name surfaces by Zone and Class (e.g. ZN001:Wall001). The alternative "Consecutive" will number surfaces in sequence.
 
@@ -11270,43 +10022,25 @@ Files that are included with the \#\#include are not translated automatically an
 
 In this version of the DOE2Translator program, translation is limited to the following DOE-2 commands, which represent the majority of the building envelope and internal gains:
 
+```
     SPACE (except SHAPE=BOX)
-
     SPACE-CONDITIONS
-
     DAY-SCHEDULE (except use of HOURS and VALUES keywords)
-
     WEEK-SCHEDULE (except use of DAYS and DAY-SCHEDULE keywords)
-
     SCHEDULE (except use of WEEK-SCHEDULE keyword)
-
     MATERIAL
-
     LAYERS
-
     CONSTRUCTION
-
     EXTERIOR-WALL, ROOF (except polygon)
-
     INTERIOR-WALL
-
     FIXED-SHADE
-
     WINDOW
-
     DOOR
-
     RUN-PERIOD
-
     DESIGN-DAY
-
     LIKE
-
     SET-DEFAULT
-
-
-
-
+```
 
 Running Console Applications
 ============================
@@ -11339,64 +10073,60 @@ Modifying the batch file
 Generally, the batch files set several environment variables that govern the execution of the specific program.
 
 Table 32. Environment Variables used in Batch Files
-
-**Environment Variables**
-
-*Environment Variable Name*
-
-*Description*
-
-Program Path
-
-Specific or relative program path
-
-Program Name
-
-Name of program
-
-Input\_Path
-
-Input Path Specification
-
-Output\_Path
-
-Output Path Specification
-
-Weather\_Path
-
-Weather Data Path Specification
+<table class="table table-striped">
+  <tr>
+    <th>Environment Variable Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>Program Path</td>
+    <td>Specific or relative program path</td>
+  </tr>
+  <tr>
+    <td>Program Name</td>
+    <td>Name of program</td>
+  </tr>
+  <tr>
+    <td>Input_Path</td>
+    <td>Input Path Specification</td>
+  </tr>
+  <tr>
+    <td>Output_Path</td>
+    <td>Output Path Specification</td>
+  </tr>
+  <tr>
+    <td>Weather_Path</td>
+    <td>Weather Data Path Specification</td>
+  </tr>
+</table>
 
 Or, as seen in the batch file text:
 
+```
 :Instructions:
-
 :  Complete the following path and program names.
-
-:  path names must have a following \\ or errors will happen
-
- set program\_path=
-
- set program\_name=&lt;specific program name will be here&gt;
-
- set input\_path=
-
- set output\_path=
-
- set weather\_path=..\\..\\WeatherData\\
+:  path names must have a following \ or errors will happen
+ set program_path=
+ set program_name=<specific program name will be here>
+ set input_path=
+ set output_path=
+ set weather_path=..\..\WeatherData\
+```
 
 As the instructions in the batch file show, the path character must terminate the path specification or errors can occur. The "weather\_path" specification shows an example of using a "relative" path specification. Depending on the program, this specification, of course, might change.
 
-set weather\_path=..\\..\\WeatherData\\
+```
+set weather_path=..\..\WeatherData\
+```
 
 What the specification says is that above (..) and above again (..) and then "WeatherData" is where the weather data files are located. This kind of relative path would be true for most "Preprocess" programs in the installed folders. The following illustrates the folder tree:
 
-&lt;Root Folder&gt; (this is usually EnergyPlusV&lt;version&gt;)
-
+```
+<Root Folder> (this is usually EnergyPlusV<version>)
       Preprocess
-
                   Specific Program Folders
-
       WeatherData
+```
 
 Thus, the user can simply put the name of the weather data file onto the batch file run and it will look for that file in the installed WeatherData folder.
 
@@ -11410,7 +10140,7 @@ EP-Launch Program
 
 EP-Launch is an optional component of the EnergyPlus Windows installation (it is not available for Linux and Mac platforms). For users that want a simple way of selecting files and running EnergyPlus, EP-Launch provides this and more. In addition, EP-Launch can help open a text editor for the input and output files, open a spreadsheet for the postprocessor results files, a web browser for the tabular results file, and start up a viewer for the selected drawing file.
 
-![](AuxiliaryPrograms/media/image061.jpg)
+![](AuxiliaryPrograms/media/image101.png)
 
 Figure 35. EP-Launch Screen
 
@@ -11440,7 +10170,7 @@ Multiple single input file and group simulations can be started at the same time
 
 After you have run a simulation and the black DOS window closes, EnergyPlus has completed, and a status message is displayed (see figure below):
 
-![](AuxiliaryPrograms/media/image062.jpg)
+![](AuxiliaryPrograms/media/image102.png)
 
 Figure 36. EP-Launch Finish Status.
 
@@ -11448,13 +10178,13 @@ This status gives you a quick overview of whether there were warning (**should l
 
 Another way to open files easily is by using the View Results buttons as shown in 29. Two different panels of buttons can be used under View Results, one shown by using the "All" tab on the left edge and by using the "Sets" tab on the left edge. The "All" tab shows all the various files by file extension that can be viewed individually. Files available for view  based on the current input file name, are "enabled" (extension names clearly readable).
 
-![](AuxiliaryPrograms/media/image063.png)
+![](AuxiliaryPrograms/media/image103.png)
 
 Figure 37. EP-Launch with the Sets tab of View Results
 
 The figure above shows the same main screen of EP-Launch but with the "Sets" tab selected on the left edge of the View Results section. The buttons on this tab can open many files at the same time and are a shortcut to opening the files that may be commonly used. The Text Output Files, Drawing Files, and Spreadsheets buttons cause several different results files to open at once based on the currently selected Input File. The HTML file opens just the tabular results file if that file was produced (see *OutputControl:Table:Style*). The buttons labeled as Set 1 to Set 8 allow you to select which sets of files you want to open. Press the "Define" button in order to define the files to view.
 
-![](AuxiliaryPrograms/media/image064.png)
+![](AuxiliaryPrograms/media/image104.png)
 
 Figure 38. Define Files to View
 
@@ -11556,11 +10286,11 @@ No cutting or pasting is used in this program so the edit menu shows options tha
 
 The View menu (see Figure 39) duplicates the options in the "View Results" area of the main screen (see the *Looking at the Results* section above) and allows opening of selected output files. You can also open the folders that contain the active input and weather files. Opening a single file is under a submenu and is very similar to the Quick Open Panel for Single Simulation described above. Selecting "HTML File" from the "View" menu will open any user created files saved in the format: &lt;filename&gt;table.html (see *OutputControl:Table:Style*).
 
-![](AuxiliaryPrograms/media/image065.jpg)
+![](AuxiliaryPrograms/media/image105.png)
 
 Figure 39. EP-Launch View Menu
 
-![](AuxiliaryPrograms/media/image066.png)
+![](AuxiliaryPrograms/media/image106.png)
 
 Figure 40. EP-Launch Options Screen.
 
@@ -11660,7 +10390,7 @@ If you are running EnergyPlus on one file or even just a few different files, th
 
 
 
-![](AuxiliaryPrograms/media/image067.png)
+![](AuxiliaryPrograms/media/image107.png)
 
 Figure 41. EP-Launch Group of Input Files Tab.
 
@@ -11668,7 +10398,7 @@ This tab lets you manage EPG, EnergyPlus Group files which contain a list of sim
 
 You do not need to manually create EPG files, instead press the New Group button on the Group of Input Files Tab and a step-by-step "wizard" will help to create a new EPG, EnergyPlus Group file. The first step of the wizard is to selected the EnergyPlus input files that should be simulated as part of the group:
 
-![](AuxiliaryPrograms/media/image068.jpg)
+![](AuxiliaryPrograms/media/image108.png)
 
 Figure 42. EP-Launch Step 1 of New Group Wizard.
 
@@ -11676,19 +10406,19 @@ Use the boxes next to each file to select the files to be simulated. The path to
 
 Select one or several weather files using the second step of the wizard, shown below:
 
-![](AuxiliaryPrograms/media/image069.jpg)
+![](AuxiliaryPrograms/media/image109.png)
 
 Figure 43. EP-Launch Step 2 of New Group Wizard.
 
 The next step is to review the simulations selected. Each combination of weather file and input file is initially shown. Each simulation is displayed as a single row. You may select a row and delete the simulation at this point. In addition, if additional simulations are desired, the "Add more simulations button" brings you back to the first step of the wizard to add more file.
 
-![](AuxiliaryPrograms/media/image070.jpg)
+![](AuxiliaryPrograms/media/image110.png)
 
 Figure 44. EP-Launch Step 3 of New Group Wizard.
 
 The next step of the wizard allows you to decide exactly where you want the output files located and what they should be named. For most people just trying to group their simulations and wanting the output files in the same directory as the input files, just select "Original Input File Locations".
 
-![](AuxiliaryPrograms/media/image071.jpg)
+![](AuxiliaryPrograms/media/image111.png)
 
 Figure 45. EP-Launch Step 4 of New Group Wizard.
 
@@ -11722,7 +10452,7 @@ When the group of input file simulations is running, the title bar of EP-Launch 
 
 The History tab allows you to see what files were associated with a particular simulation that was performed. The list shows the date and time of the simulation along with the input and weather file names.
 
-![](AuxiliaryPrograms/media/image072.png)
+![](AuxiliaryPrograms/media/image112.png)
 
 Figure 46. EP-Launch History Tab.
 
@@ -11738,7 +10468,7 @@ The history tab displays the HISTORY.CSV file that is located in the same direct
 
 The utilities tab shown in the following figure allows several utility programs that come with EnergyPlus to be used directly. More information on each utility is also available in the AuxiliaryPrograms documentation.
 
-![](AuxiliaryPrograms/media/image073.png)
+![](AuxiliaryPrograms/media/image113.png)
 
 Figure 47. EP-Launch Utilities Tab.
 
@@ -11760,7 +10490,7 @@ The EPL-RUN.BAT batch file is used to run EnergyPlus from the EP-Launch program.
 
 Though EnergyPlus has had several releases (including beta releases prior to initial release), there still may be problems when input files meet with EnergyPlus. If you are using EP-Launch when this happens, you will see a window appear as in the figure below (Figure 48). Follow the instructions listed on the screen.
 
-![](AuxiliaryPrograms/media/image074.png)
+![](AuxiliaryPrograms/media/image114.png)
 
 Figure 48. EnergyPlus crash within EP-Launch.
 
@@ -11816,8 +10546,8 @@ Table 33. Error Message Levels - Required Actions
 
 <table class="table table-striped">
 <tr>
-<td>Error Level</td>
-<td>Action</td>
+<th>Error Level</th>
+<th>Action</th>
 </tr>
 <tr>
 <td>Information</td>
@@ -11838,18 +10568,14 @@ Table 33. Error Message Levels - Required Actions
 </table>
 
 
-
 An example of an error message due to an input syntax error is:
 
-\*\* Severe  \*\* Did not find " DessignDay" in list of Objects
-
-   \*\*  Fatal  \*\* Errors occurred on processing IDF file -
-
+```
+** Severe  ** Did not find " DessignDay" in list of Objects
+   **  Fatal  ** Errors occurred on processing IDF file -
        probable incorrect IDD file. View "audit.out" for details.
-
-   \*\*\*\*\*\*\*\*\*\*\*\*\* EnergyPlus Terminated--Error(s) Detected.
-
-
+   ************* EnergyPlus Terminated--Error(s) Detected.
+```
 
 #### audit
 
@@ -11877,17 +10603,23 @@ The *EnergyPlus Invariant Output* (EIO) is a text file containing output that do
 
 The *Report (variable) Data Dictionary* (RDD) is a text file listing those variables available for reporting (on the ESO) for this particular simulation. Which variables are available for output depends on the actual simulation problem described in the IDF. The *Report (meter) Data Dictionary* (MDD) is a text file listing those variables available for reporting (on the MTR) for this particular simulation. Which meters are available for output depends on the actual simulation problem described in the IDF. A simulation with no chiller would not permit the output of any chiller report variables. The user may need to examine the RDD or MDD to find out which report variables are available in a particular simulation. The RDD and MDD are written only if the following is included in the IDF file.
 
-Output:Reports, VariableDictionary;
+```
+Output:VariableDictionary, Regular;
+```
 
 A variant produces the same files in a IDF "ready" format.
 
-Output:Reports, VariableDictionary, IDF;
+```
+Output:VariableDictionary, IDF;
+```
 
 #### dbg
 
 This is a text file containing *debug* output for use by EnergyPlus developers. Generally developers will add debug print statements wherever in the code that that they wish. There is a "standard" debug output that prints out conditions at all the HVAC nodes. This output is triggered by placing
 
+```
 Output:DebuggingData,1;
+```
 
 in the IDF file. If Output:DebuggingData, 0 is entered, you will get an empty eplusout.dbg file.
 
@@ -11895,7 +10627,9 @@ in the IDF file. If Output:DebuggingData, 0 is entered, you will get an empty ep
 
 This is a file in AutoCad DXF format showing all the surfaces defined in the IDF file. It provides a means of viewing the building geometry. The DXF file from EnergyPlus highlights different building elements (shading, walls, subsurfaces) in differing colors. A number of programs can read and display DXF files. Output of this file is triggered by
 
+```
 Output:Reports, Surfaces, DXF;
+```
 
 in the IDF.
 
@@ -11929,71 +10663,40 @@ Running EnergyPlus by Hand
 
 EnergyPlus is compiled as a 32 bit console application on Windows™ (Windows 98, Windows NT, Windows 2000, Windows ME) operating systems, commonly run on the Intel™ or compatible processing chips (aka WinTel machines). To run the program bring up the command prompt and "cd" to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing "EnergyPlus" (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
 
+```
  EnergyPlus Starting
-
  EnergyPlus, Version 1.3
-
  Warming up
-
  Initializing Response Factors
-
  Calculating CTFs for "EXTWALL80", Construction \#1
-
  Calculating CTFs for "PARTITION06", Construction \#2
-
  Calculating CTFs for "FLOOR SLAB 8 IN", Construction \#3
-
  Calculating CTFs for "ROOF34", Construction \#4
-
  Initializing Window Optical Properties
-
  Initializing Solar Calculations
-
  Initializing HVAC
-
  Warming up
-
  Warming up
-
  Warming up
-
  Performing Zone Sizing Simulation
-
  Warming up
-
  Warming up
-
  Warming up
-
  Performing Zone Sizing Simulation
-
  Initializing New Environment Parameters
-
  Warming up {1}
-
  Warming up {2}
-
  Warming up {3}
-
  Warming up {4}
-
- Starting Simulation at 01/14 for CHICAGO IL UNITED STATES TMY2 94846 WMO\#=725340
-
+ Starting Simulation at 01/14 for CHICAGO IL UNITED STATES TMY2 94846 WMO#=725340
  Initializing New Environment Parameters
-
  Warming up {1}
-
  Warming up {2}
-
  Warming up {3}
-
  Warming up {4}
-
- Starting Simulation at 07/07 for CHICAGO IL UNITED STATES TMY2 94846 WMO\#=725340
-
+ Starting Simulation at 07/07 for CHICAGO IL UNITED STATES TMY2 94846 WMO#=725340
  EnergyPlus Run Time=00hr 00min  7.31sec
-
-
+```
 
 When execution is finished, *eplusout.err* and *eplusout.audit* will always appear. If the program terminated with an input error, these may be the only output files. If the program runs normally, *eplusout.eio* will appear. Depending on what was requested in the input, the other output files described above will also be written.
 
@@ -12016,87 +10719,48 @@ where &lt;input\_filename&gt; is the name of the IDF file, without the file exte
 
 Instructions appear at the top of the batch file:
 
+```
 :Instructions:
-
 :  Complete the following path and program names.
-
-:  path names must have a following \\ or errors will happen
-
+:  path names must have a following \ or errors will happen
 :  does not have the capability to run input macro files (yet)
-
-:   %program\_path% contains the path to the executable as well as IDD and is
-
+:   %program_path% contains the path to the executable as well as IDD and is
 :                  the root directory
-
-:   %program\_name% contains the name of the executable (normally EnergyPlus.exe)
-
-:   %input\_path%   contains the path to the input file (passed in as first argument)
-
-:   %output\_path%  contains the path where the result files should be stored
-
-:   %post\_proc%    contains the path to the post processing program (ReadVarsESO)
-
-:   %weather\_path% contains the path to the weather files (used with optional argument 2)
-
+:   %program_name% contains the name of the executable (normally EnergyPlus.exe)
+:   %input_path%   contains the path to the input file (passed in as first argument)
+:   %output_path%  contains the path where the result files should be stored
+:   %post_proc%    contains the path to the post processing program (ReadVarsESO)
+:   %weather_path% contains the path to the weather files (used with optional argument 2)
 :   %pausing%      contains Y if pause should occur between major portions of
-
 :                  batch file (mostly commented out)
-
 :   %maxcol%       contains "250" if limited to 250 columns otherwise contains
-
 :                  "nolimit" if unlimited (used when calling readVarsESO)
 
-
-
  echo ===== %0 (Run EnergyPlus) %1 %2 ===== Start =====
-
- set program\_path=
-
- set program\_name=EnergyPlus.exe
-
- set input\_path=ExampleFiles\\
-
- set output\_path=Test\\
-
- set post\_proc=PostProcess\\
-
- set weather\_path=WeatherData\\
-
+ set program_path=
+ set program_name=EnergyPlus.exe
+ set input_path=ExampleFiles\
+ set output_path=Test\
+ set post_proc=PostProcess\
+ set weather_path=WeatherData\
  set pausing=N
-
  set maxcol=250
 
-
-
 :  This batch file will perform the following steps:
-
 :
-
 :   1. Clean up directory by deleting old working files from prior run
-
 :   2. Clean up target directory
-
 :   3. Copy %1.idf (input) into In.idf
-
 :   4. Copy %2 (weather) into In.epw
-
 :   5. Execute EnergyPlus
-
 :   6. If available Copy %1.rvi (post processor commands) into Eplusout.inp
-
 :   7. Execute ReadVarsESO.exe (the Post Processing Program)
-
 :   8. If available Copy %1.mvi (post processor commands) into test.mvi
-
 :       or create appropriate input to get meter output from eplusout.mtr
-
 :   9. Execute ReadVarsESO.exe (the Post Processing Program) for meter output
-
-:  10. Copy Eplusout.\* to %1.\*
-
+:  10. Copy Eplusout.* to %1.*
 :  11. Clean up working directory.
-
-
+```
 
 RunDirMulti Batch File
 ----------------------
@@ -12134,31 +10798,19 @@ The *input macro file* (IMF) is an ascii file that is formatted for the EP-Macro
 
 This is the EnergyPlus initialization file. It is an optional ascii input file that allows the user to specify the path for the directory containing Energy+.idd. This file, using the actual directories of the install, will be created during the install. An example is:
 
+```
 [program]
-
-dir=C:\\EnergyPlus
-
-
+dir=C:\EnergyPlus
 
 [weather]
-
 dir=
 
-
-
 [BasementGHT]
-
-dir=PreProcess\\GrndTempCalc
-
-
+dir=PreProcess\GrndTempCalc
 
 [SlabGHT]
-
-dir= PreProcess\\GrndTempCalc
-
-
-
-
+dir= PreProcess\GrndTempCalc
+```
 
 Under [program], dir should indicate the folder where EnergyPlus is installed (e.g. C:\\Program Files\\EnergyPlusV2-0-0 or C:\\EnergyPlusV2-0-0).  This is automatically generated during the install and may be the "shortened form" of these folder names. The "weather" portion of the initialization file is unused for normal EnergyPlus. [BasementGHT] and [SlabGHT] are used by the EP-Launch program when the Utilities tab is used to execute the Basement and Slab programs, respectively.
 
@@ -12174,14 +10826,12 @@ More information (and more up-to-date) about output files is shown in the [Outpu
 
 A text file containing the error messages issued by EnergyPlus. This is the first output that should be examined after a simulation. Error messages are issued by EnergyPlus during its input phase or during the simulation. There are three levels of error severity: *fatal*, *severe*, and *warning* as well as simple *"message"* lines. A fatal error causes the program to terminate immediately. The following table illustrates the necessary actions.
 
-
-
 Table 34. Error Message Levels - Required Actions
 
 <table class="table table-striped">
 <tr>
-<td>Error Level</td>
-<td>Action</td>
+<th>Error Level</th>
+<th>Action</th>
 </tr>
 <tr>
 <td>"Information"</td>
@@ -12205,15 +10855,12 @@ Table 34. Error Message Levels - Required Actions
 
 An example of an error message due to an input syntax error is:
 
-\*\* Severe  \*\* Did not find " DessignDay" in list of Objects
-
-   \*\*  Fatal  \*\* Errors occurred on processing IDF file -
-
+```
+** Severe  ** Did not find " DessignDay" in list of Objects
+   **  Fatal  ** Errors occurred on processing IDF file -
        probable incorrect IDD file. View "audit.out" for details.
-
-   \*\*\*\*\*\*\*\*\*\*\*\*\* EnergyPlus Terminated--Error(s) Detected.
-
-
+   ************* EnergyPlus Terminated--Error(s) Detected.
+```
 
 #### eplusout.audit
 
@@ -12235,7 +10882,9 @@ The *EnergyPlus Invariant Output* (EIO) is a text file containing output that do
 
 The *Report (variable) Data Dictionary* (RDD) is a text file listing those variables available for reporting (on the ESO or MTR) for this particular simulation. Which variables are available for output on the ESO or MTR depends on the actual simulation problem described in the IDF. A simulation with no chiller would not permit the output of any chiller report variables. The user may need to examine the RDD to find out which report variables are available in a particular simulation. The RDD is written only if
 
-Report, Variable Dictionary;
+```
+Output:VariableDictionary, <either Regular or IDF>;
+```
 
 appears in the input (IDF) file.
 
@@ -12293,664 +10942,341 @@ IDD Conventions
 
 The following is a basic description of the structure of the IDD (it's actually taken directly from the IDD file). As noted within, ! signifies a comment character as does the \\. \\ has also been adopted as a convention for including more specific comments about each field in an object. These have been used with success in the IDFEditor and it is hoped the flexibility will provide other interface developers with useful information.
 
+```
 ! Object Description
-
 ! ------------------
-
 ! To define an object (a record with data), develop a key word that is unique
-
 ! Each data item to the object can be A (Alphanumeric string) or N (numeric)
-
 ! Number each A and N.  This will show how the data items will be put into the
-
 ! arrays that are passed to the Input Processor "Get" (GetObjectItem) routines.
-
 ! All alpha fields are limited to 100 characters.  Numeric fields should be
-
 ! valid numerics (can include such as 1.0E+05) and are placed into double
-
 ! precision variables.
-
 !
-
 ! NOTE: Even though a field may be optional, a comma representing that field
-
 !   must be included (unless it is the last field in the object).  Since the
-
 !   entire input is "field-oriented" and not "keyword-oriented", the EnergyPlus
-
 !   Input Processor must have some representation (even if blank) for each
-
 !   field.
-
 !
-
 ! Object Documentation
-
 ! --------------------
-
 ! In addition, the following special comments appear one per line and
-
 ! most are followed by a value.  Comments may apply to a field or the object
-
 ! or a group of objects.
-
 !
-
 ! Field-level comments:
-
 !
-
-!  \\field           Name of field
-
+!  \field           Name of field
 !                     (should be succinct and readable, blanks are encouraged)
-
 !
-
-!  \\note            Note describing the field and its valid values
-
+!  \note            Note describing the field and its valid values
 !
-
-!  \\required-field  To flag fields which may not be left blank
-
+!  \required-field  To flag fields which may not be left blank
 !                     (this comment has no "value")
-
 !
-
-!  \\begin-extensible  Marks the first field at which the object accepts an extensible
-
+!  \begin-extensible  Marks the first field at which the object accepts an extensible
 !                   field set.  A fixed number of fields from this marker define the
-
-!                   extensible field set, see the object code \\extensible for
-
+!                   extensible field set, see the object code \extensible for
 !                   more information.
-
 !
-
-!  \\units           Units (must be from EnergyPlus standard units list)
-
+!  \units           Units (must be from EnergyPlus standard units list)
 !                   EnergyPlus units are standard SI units
-
 !
-
-!  \\ip-units        IP-Units (for use by input processors with IP units)
-
+!  \ip-units        IP-Units (for use by input processors with IP units)
 !                   This is only used if the default conversion is not
-
 !                   appropriate.
-
 !
-
-!  \\unitsBasedOnField  For fields that may have multiple possible units, indicates
-
+!  \unitsBasedOnField  For fields that may have multiple possible units, indicates
 !                   the field in the object that can be used to determine
-
 !                   the units. The field reference is in the A2 form.
-
 !
-
-!  \\minimum         Minimum that includes the following value
-
+!  \minimum         Minimum that includes the following value
 !
-
-!  \\minimum&gt;        Minimum that must be &gt; than the following value
-
+!  \minimum>        Minimum that must be > than the following value
 !
-
-!  \\maximum         Maximum that includes the following value
-
+!  \maximum         Maximum that includes the following value
 !
-
-!  \\maximum&lt;        Maximum that must be &lt; than the following value
-
+!  \maximum<        Maximum that must be < than the following value
 !
-
-!  \\default         Default for the field (if N/A then omit entire line)
-
+!  \default         Default for the field (if N/A then omit entire line)
 !
-
-!  \\deprecated      This field is not really used and will be deleted from the object.
-
+!  \deprecated      This field is not really used and will be deleted from the object.
 !                   The information is gotten internally within the program.
-
 !
-
-!  \\autosizable     Flag to indicate that this field can be used with the Auto
-
+!  \autosizable     Flag to indicate that this field can be used with the Auto
 !                   Sizing routines to produce calculated results for the
-
 !                   field.  If a value follows this, then that will be used
-
 !                   when the "Autosize" feature is flagged.  To trigger
-
 !                   autosizing for a field, enter Autosize as the field's
-
 !                   value.  Only applicable to numeric fields.
-
 !
-
-! \\autocalculatable Flag to indicate that this field can be automatically
-
+! \autocalculatable Flag to indicate that this field can be automatically
 !                   calculated. To trigger auto calculation for a field, enter
-
 !                   Autocalculate as the field's value.  Only applicable to
-
 !                   numeric fields.
-
 !
-
-!  \\type            Type of data for the field -
-
+!  \type            Type of data for the field -
 !                     integer
-
 !                     real
-
 !                     alpha       (arbitrary string),
-
 !                     choice      (alpha with specific list of choices, see
-
-!                                 \\key)
-
+!                                 \key)
 !                     object-list (link to a list of objects defined elsewhere,
-
-!                                  see \\object-list and \\reference)
-
+!                                  see \object-list and \reference)
 !                     node        (name used in connecting HVAC components)
-
 !
-
-!  \\retaincase      Retains the alphabetic case for alpha type fields
-
+!  \retaincase      Retains the alphabetic case for alpha type fields
 !
-
-!  \\key             Possible value for "\\type choice" (blanks are significant)
-
-!                     use multiple \\key lines to indicate all valid choices
-
+!  \key             Possible value for "\type choice" (blanks are significant)
+!                     use multiple \key lines to indicate all valid choices
 !
-
-!  \\object-list     Name of a list of user-provided object names that are valid
-
-!                     entries for this field (used with "\\reference")
-
+!  \object-list     Name of a list of user-provided object names that are valid
+!                     entries for this field (used with "\reference")
 !                     see Zone and BuildingSurface:Detailed objects below for
-
 !                     examples.
-
-!                  \*\* Note that a field may have multiple \\object-list commands.
-
+!                  ** Note that a field may have multiple \object-list commands.
 !
-
-!  \\reference       Name of a list of names to which this object belongs
-
-!                     used with "\\type object-list" and with "\\object-list"
-
+!  \reference       Name of a list of names to which this object belongs
+!                     used with "\type object-list" and with "\object-list"
 !                     see Zone and BuildingSurface:Detailed objects below for
-
 !                     examples:
-
 !
-
 !                        Zone,
-
-!                          A1 , \\field Name
-
-!                               \\type alpha
-
-!                               \\reference ZoneNames
-
+!                          A1 , \field Name
+!                               \type alpha
+!                               \reference ZoneNames
 !
-
 !                        BuildingSurface:Detailed,
-
-!                          A4 , \\field Zone Name
-
-!                               \\note Zone the surface is a part of
-
-!                               \\type object-list
-
-!                               \\object-list ZoneNames
-
+!                          A4 , \field Zone Name
+!                               \note Zone the surface is a part of
+!                               \type object-list
+!                               \object-list ZoneNames
 !
-
 !             For each zone, the field "Name" may be referenced
-
 !             by other objects, such as BuildingSurface:Detailed, so it is
-
-!             commented with "\\reference ZoneNames"
-
+!             commented with "\reference ZoneNames"
 !             Fields that reference a zone name, such as BuildingSurface:Detailed's
-
 !             "Zone Name", are commented as
-
-!             "\\type object-list" and "\\object-list ZoneNames"
-
-!             \*\* Note that a field may have multiple \\reference commands.
-
-!             \*\* This is useful if the object belongs to a small specific
-
+!             "\type object-list" and "\object-list ZoneNames"
+!             ** Note that a field may have multiple \reference commands.
+!             ** This is useful if the object belongs to a small specific
 !             object-list as well as a larger more general object-list.
-
 !
-
 ! Object-level comments:
-
 !
-
-!  \\memo            Memo describing the object
-
+!  \memo            Memo describing the object
 !
-
-!  \\unique-object   To flag objects which should appear only once in an idf
-
+!  \unique-object   To flag objects which should appear only once in an idf
 !                     (this comment has no "value")
-
 !
-
-!  \\required-object To flag objects which are required in every idf
-
+!  \required-object To flag objects which are required in every idf
 !                     (this comment has no "value")
-
 !
-
-!  \\min-fields      Minimum number of fields that should be included in the
-
+!  \min-fields      Minimum number of fields that should be included in the
 !                   object.  If appropriate, the Input Processor will fill
-
 !                   any missing fields with defaults (for numeric fields).
-
 !                   It will also supply that number of fields to the "get"
-
 !                   routines using blanks for alpha fields (note -- blanks
-
 !                   may not be allowable for some alpha fields).
-
 !
-
-!  \\obsolete        This object has been replaced though is kept (and is read)
-
+!  \obsolete        This object has been replaced though is kept (and is read)
 !                   in the current version.  Please refer to documentation as
-
 !                   to the dispersal of the object.  If this object is
-
 !                   encountered in an IDF, the InputProcessor will post an
-
 !                   appropriate message to the error file.
-
-!                   usage:  \\obsolete New=&gt;[New object name]
-
+!                   usage:  \obsolete New=>[New object name]
 !
-
-!  \\extensible:&lt;\#&gt;  This object is dynamically extensible -- meaning, if you
-
+!  \extensible:<#>  This object is dynamically extensible -- meaning, if you
 !           change the IDD appropriately (if the object has a simple list
-
 !           structure -- just add items to the list arguments (i.e. BRANCH
-
 !           LIST). These will be automatically redimensioned and used during
-
-!           the simulation. &lt;\#&gt; should be entered by the developer to signify
-
+!           the simulation. <#> should be entered by the developer to signify
 !           how many of the last fields are needed to be extended (and EnergyPlus
-
 !           will attempt to auto-extend the object).  The first field of the first
-
-!           instance of the extensible field set is marked with \\begin-extensible.
-
+!           instance of the extensible field set is marked with \begin-extensible.
 !
-
-!  \\begin-extensible See previous item, marks beginning of extensible fields in
-
+!  \begin-extensible See previous item, marks beginning of extensible fields in
 !                   an object.
-
 !
-
-!  \\format          The object should have a special format when saved in
-
+!  \format          The object should have a special format when saved in
 !                   the IDF Editor with the special format option enabled.
-
 !                   The options include SingleLine, Vertices, CompactSchedule,
-
 !                   FluidProperties, ViewFactors, and Spectral.
-
 !                   The SingleLine option puts all the fields for the object
-
 !                   on a single line. The Vertices option is used in objects
-
 !                   that use X, Y and Z fields to format those three fields
-
 !                   on a single line.
-
 !                   The CompactSchedule formats that specific object.
-
 !                   The FluidProperty option formats long lists of fluid
-
 !                   properties to ten values per line.
-
 !                   The ViewFactor option formats three fields related to
-
 !                   view factors per line.
-
 !                   The Spectral option formats the four fields related to
-
 !                   window glass spectral data per line.
-
 !
-
-!   \\reference-class-name Adds the name of the class to the reference list
-
-!                   similar to \\reference.
-
+!   \reference-class-name Adds the name of the class to the reference list
+!                   similar to \reference.
 !
-
 ! Group-level comments:
-
 !
-
-!  \\group          Name for a group of related objects
-
+!  \group          Name for a group of related objects
 !
-
 !
-
 ! Notes on comments
-
 ! -----------------
-
 !
-
 ! 1.  If a particular comment is not applicable (such as units, or default)
-
 ! then simply omit the comment rather than indicating N/A.
-
 !
-
 ! 2.  Memos and notes should be brief (recommend 5 lines or less per block).
-
 ! More extensive explanations are expected to be in the user documentation
-
 !
-
-! Default IP conversions (no \\ip-units necessary)
-
-!     m                      =&gt;   ft                  3.281
-
-!     W                      =&gt;   Btu/h               3.412
-
-!     m3/s                   =&gt;   ft3/min             2118.6438
-
-!     C                      =&gt;   F                   1.8 (plus 32)
-
-!     kg/J                   =&gt;   lb/Btu              2325.83774250441
-
-!     Pa                     =&gt;   psi                 0.0001450377
-
-!     W/m-K                  =&gt;   Btu-in/h-ft2-F      6.93481276005548
-
-!     W/K                    =&gt;   Btu/h-F             1.8987
-
-!     deltaC                 =&gt;   deltaF              1.8
-
-!     m2                     =&gt;   ft2                 10.764961
-
-!     K                      =&gt;   R                   1.8
-
-!     1/K                    =&gt;   1/R                 0.555555556
-
-!     (kg/s)/W               =&gt;   (lbm/sec)/(Btu/hr)  0.646078115385742
-
-!     J/kg                   =&gt;   Btu/lb              0.00042986 (plus 7.686)
-
-!     kg-H2O/kg-air          =&gt;   lb-H2O/lb-air       1
-
-!     kJ/kg                  =&gt;   Btu/lb              0.429925
-
-!     lux                    =&gt;   foot-candles        0.092902267
-
-!     kg/m3                  =&gt;   lb/ft3              0.062428
-
-!     kg/s                   =&gt;   lb/s                2.2046
-
-!     kg/s-m                 =&gt;   lb/s-ft             0.67194
-
-!     m3                     =&gt;   ft3                 35.319837041
-
-!     m3                     =&gt;   gal                 264.172
-
-!     W/m2-K                 =&gt;   Btu/h-ft2-F         0.176110194261872
-
-!     1/m                    =&gt;   1/ft                0.304785126485827
-
-!     J/kg-K                 =&gt;   Btu/lb-F            0.000239005736137667
-
-!     J/m3-K                 =&gt;   Btu/ft3-F           1.49237004739337E-05
-
-!     m/s                    =&gt;   ft/min              196.86
-
-!     m/s                    =&gt;   miles/hr            2.2369
-
-!     m2-K/W                 =&gt;   ft2-F-hr/Btu        5.678263
-
-!     W/m2                   =&gt;   Btu/h-ft2           0.316957210776545
-
-!     A/K                    =&gt;   A/F                 0.555555555555556
-
-!     g/kg                   =&gt;   grains/lb           7.00000
-
-!     g/m-s                  =&gt;   lb/ft-s             0.000671968949659
-
-!     g/m-s-K                =&gt;   lb/ft-s-F           0.000373574867724868
-
-!     J/K                    =&gt;   Btu/F               0.000526917584820558
-
-!     J/kg-K2                =&gt;   Btu/lb-F2           0.000132889924714692
-
-!     J/m3                   =&gt;   Btu/ft3             2.68096514745308E-05
-
-!     kg/kg-K                =&gt;   lb/lb-F             0.555555555555556
-
-!     kPa                    =&gt;   psi                 0.145038
-
-!     kPa                    =&gt;   inHg                0.29523
-
-!     m2/s                   =&gt;   ft2/s               10.764961
-
-!     m3/kg                  =&gt;   ft3/lb              16.018
-
-!     m3/m3                  =&gt;   ft3/ft3             1
-
-!     N-s/m2                 =&gt;   lbf-s/ft2           0.0208857913669065
-
-!     V/K                    =&gt;   V/F                 0.555555555555556
-
-!     W/m-K2                 =&gt;   Btu/h-F2-ft         0.321418310071648
-
-!     m3/s-m                 =&gt;   ft3/min-ft          645.89
-
-!     J/m2-K                 =&gt;   Btu/ft2-F           4.89224766847393E-05
-
-!     cycles/hr              =&gt;   cycles/hr           1
-
-!     kg/kg                  =&gt;   lb/lb               1
-
-!     J/J                    =&gt;   Btu/Btu             1
-
-!     g/GJ                   =&gt;   lb/MWh              0.00793664091373665
-
-!     L/GJ                   =&gt;   gal/kWh             0.000951022349025202
-
-!     m3/GJ                  =&gt;   ft3/MWh             127.13292
-
-!     m3/s-m2                =&gt;   ft3/min-ft2         196.85
-
-!     m3/s-person            =&gt;   ft3/min-person      2118.6438
-
-!     W/m2-K2                =&gt;   Btu/h-ft2-F2        0.097826
-
-!     g/MJ                   =&gt;   lb/MWh              7.93664091373665
-
-!     L/MJ                   =&gt;   gal/kWh             0.951022349025202
-
-!     m3/MJ                  =&gt;   ft3/kWh             127.13292
-
-!     W/W                    =&gt;   Btuh/Btuh           1
-
-!     $/m2                   =&gt;   $/ft2               0.0928939733269818
-
-!     $                      =&gt;   $                   1
-
-!     $/kW                   =&gt;   $/(kBtuh/h)         0.293083235638921
-
-!     $/m3                   =&gt;   $/ft3               0.0283127014102352
-
-!     years                  =&gt;   years               1
-
-!     $/(W/K)                =&gt;   $/(Btu/h-F)         0.52667614683731
-
-!     $/(m3/s)               =&gt;   $/(ft3/min)         0.000472000059660808
-
-!     W/m                    =&gt;   Btu/h-ft            1.04072
-
-!     K/m                    =&gt;   F/ft                0.54861322767449
-
-!     W/s                    =&gt;   W/s                 1
-
-!     kmol                   =&gt;   kmol                1
-
-!     J                      =&gt;   Wh                  0.000277777777777778
-
-!     GJ                     =&gt;   ton-hrs             78.9889415481832
-
-!     kg/m2                  =&gt;   lb/ft2              0.204794053596664
-
-!     kg                     =&gt;   lb                  2.2046
-
-!     percent/K              =&gt;   percent/F           0.555555555555556
-
-!     kg/s2                  =&gt;   lb/s2               2.2046
-
-!     g/mol                  =&gt;   lb/mol              0.0022046
-
-!     deltaJ/kg              =&gt;   deltaBtu/lb         0.0004299
-
-!     person/m2              =&gt;   person/ft2          0.0928939733269818
-
-!     m2/person              =&gt;   ft2/person          10.764961
-
-!     W/person               =&gt;   Btu/h-person        3.412
-
-!     m3/person              =&gt;   ft3/person          35.319837041
-
-!     m3/hr-person           =&gt;   ft3/hr-person       35.319837041
-
-!     m3/m2                  =&gt;   ft3/ft2             3.281
-
-!     m3/hr-m2               =&gt;   ft3/hr-ft2          3.281
-
-!     m3/hr                  =&gt;   ft3/hr              35.319837041
-
-!     s/m                    =&gt;   s/ft                0.304785126485827
-
-!     m2/m                   =&gt;   ft2/ft              3.281
-
-!     L/day                  =&gt;   pint/day            2.11337629827348
-
-!     L/kWh                  =&gt;   pint/kWh            2.11337629827348
-
-!     kg/Pa-s-m2             =&gt;   lb/psi-s-ft2        1412.00523459398
-
-!     m/hr                   =&gt;   ft/hr               3.281
-
-!     Mode                   =&gt;   Mode                1
-
-!     Control                =&gt;   Control             1
-
-!     Availability           =&gt;   Availability        1
-
-!     rev/min                =&gt;   rev/min             1
-
-!     W/(m3/s)               =&gt;   W/(ft3/min)         0.0004719475
-
-!     VA                     =&gt;   VA                  1
-
-!     N-m                    =&gt;   lbf-in              8.85074900525547
-
-!     m3/s-W                 =&gt;   ft3-h/min-Btu       621.099127332943
-
-!     cm2                    =&gt;   inch2               0.15500031000062
-
-!     kg/m                   =&gt;   lb/ft               0.67196893069637
-
-!     m/yr                   =&gt;   inch/yr             39.37
-
+! Default IP conversions (no \ip-units necessary)
+!     m                      =>   ft                  3.281
+!     W                      =>   Btu/h               3.412
+!     m3/s                   =>   ft3/min             2118.6438
+!     C                      =>   F                   1.8 (plus 32)
+!     kg/J                   =>   lb/Btu              2325.83774250441
+!     Pa                     =>   psi                 0.0001450377
+!     W/m-K                  =>   Btu-in/h-ft2-F      6.93481276005548
+!     W/K                    =>   Btu/h-F             1.8987
+!     deltaC                 =>   deltaF              1.8
+!     m2                     =>   ft2                 10.764961
+!     K                      =>   R                   1.8
+!     1/K                    =>   1/R                 0.555555556
+!     (kg/s)/W               =>   (lbm/sec)/(Btu/hr)  0.646078115385742
+!     J/kg                   =>   Btu/lb              0.00042986 (plus 7.686)
+!     kg-H2O/kg-air          =>   lb-H2O/lb-air       1
+!     kJ/kg                  =>   Btu/lb              0.429925
+!     lux                    =>   foot-candles        0.092902267
+!     kg/m3                  =>   lb/ft3              0.062428
+!     kg/s                   =>   lb/s                2.2046
+!     kg/s-m                 =>   lb/s-ft             0.67194
+!     m3                     =>   ft3                 35.319837041
+!     m3                     =>   gal                 264.172
+!     W/m2-K                 =>   Btu/h-ft2-F         0.176110194261872
+!     1/m                    =>   1/ft                0.304785126485827
+!     J/kg-K                 =>   Btu/lb-F            0.000239005736137667
+!     J/m3-K                 =>   Btu/ft3-F           1.49237004739337E-05
+!     m/s                    =>   ft/min              196.86
+!     m/s                    =>   miles/hr            2.2369
+!     m2-K/W                 =>   ft2-F-hr/Btu        5.678263
+!     W/m2                   =>   Btu/h-ft2           0.316957210776545
+!     A/K                    =>   A/F                 0.555555555555556
+!     g/kg                   =>   grains/lb           7.00000
+!     g/m-s                  =>   lb/ft-s             0.000671968949659
+!     g/m-s-K                =>   lb/ft-s-F           0.000373574867724868
+!     J/K                    =>   Btu/F               0.000526917584820558
+!     J/kg-K2                =>   Btu/lb-F2           0.000132889924714692
+!     J/m3                   =>   Btu/ft3             2.68096514745308E-05
+!     kg/kg-K                =>   lb/lb-F             0.555555555555556
+!     kPa                    =>   psi                 0.145038
+!     kPa                    =>   inHg                0.29523
+!     m2/s                   =>   ft2/s               10.764961
+!     m3/kg                  =>   ft3/lb              16.018
+!     m3/m3                  =>   ft3/ft3             1
+!     N-s/m2                 =>   lbf-s/ft2           0.0208857913669065
+!     V/K                    =>   V/F                 0.555555555555556
+!     W/m-K2                 =>   Btu/h-F2-ft         0.321418310071648
+!     m3/s-m                 =>   ft3/min-ft          645.89
+!     J/m2-K                 =>   Btu/ft2-F           4.89224766847393E-05
+!     cycles/hr              =>   cycles/hr           1
+!     kg/kg                  =>   lb/lb               1
+!     J/J                    =>   Btu/Btu             1
+!     g/GJ                   =>   lb/MWh              0.00793664091373665
+!     L/GJ                   =>   gal/kWh             0.000951022349025202
+!     m3/GJ                  =>   ft3/MWh             127.13292
+!     m3/s-m2                =>   ft3/min-ft2         196.85
+!     m3/s-person            =>   ft3/min-person      2118.6438
+!     W/m2-K2                =>   Btu/h-ft2-F2        0.097826
+!     g/MJ                   =>   lb/MWh              7.93664091373665
+!     L/MJ                   =>   gal/kWh             0.951022349025202
+!     m3/MJ                  =>   ft3/kWh             127.13292
+!     W/W                    =>   Btuh/Btuh           1
+!     $/m2                   =>   $/ft2               0.0928939733269818
+!     $                      =>   $                   1
+!     $/kW                   =>   $/(kBtuh/h)         0.293083235638921
+!     $/m3                   =>   $/ft3               0.0283127014102352
+!     years                  =>   years               1
+!     $/(W/K)                =>   $/(Btu/h-F)         0.52667614683731
+!     $/(m3/s)               =>   $/(ft3/min)         0.000472000059660808
+!     W/m                    =>   Btu/h-ft            1.04072
+!     K/m                    =>   F/ft                0.54861322767449
+!     W/s                    =>   W/s                 1
+!     kmol                   =>   kmol                1
+!     J                      =>   Wh                  0.000277777777777778
+!     GJ                     =>   ton-hrs             78.9889415481832
+!     kg/m2                  =>   lb/ft2              0.204794053596664
+!     kg                     =>   lb                  2.2046
+!     percent/K              =>   percent/F           0.555555555555556
+!     kg/s2                  =>   lb/s2               2.2046
+!     g/mol                  =>   lb/mol              0.0022046
+!     deltaJ/kg              =>   deltaBtu/lb         0.0004299
+!     person/m2              =>   person/ft2          0.0928939733269818
+!     m2/person              =>   ft2/person          10.764961
+!     W/person               =>   Btu/h-person        3.412
+!     m3/person              =>   ft3/person          35.319837041
+!     m3/hr-person           =>   ft3/hr-person       35.319837041
+!     m3/m2                  =>   ft3/ft2             3.281
+!     m3/hr-m2               =>   ft3/hr-ft2          3.281
+!     m3/hr                  =>   ft3/hr              35.319837041
+!     s/m                    =>   s/ft                0.304785126485827
+!     m2/m                   =>   ft2/ft              3.281
+!     L/day                  =>   pint/day            2.11337629827348
+!     L/kWh                  =>   pint/kWh            2.11337629827348
+!     kg/Pa-s-m2             =>   lb/psi-s-ft2        1412.00523459398
+!     m/hr                   =>   ft/hr               3.281
+!     Mode                   =>   Mode                1
+!     Control                =>   Control             1
+!     Availability           =>   Availability        1
+!     rev/min                =>   rev/min             1
+!     W/(m3/s)               =>   W/(ft3/min)         0.0004719475
+!     VA                     =>   VA                  1
+!     N-m                    =>   lbf-in              8.85074900525547
+!     m3/s-W                 =>   ft3-h/min-Btu       621.099127332943
+!     cm2                    =>   inch2               0.15500031000062
+!     kg/m                   =>   lb/ft               0.67196893069637
+!     m/yr                   =>   inch/yr             39.37
 !
-
-! Other conversions supported (needs the \\ip-units code)
-
+! Other conversions supported (needs the \ip-units code)
 !
-
-!     m                      =&gt;   in                  39.37
-
-!     W                      =&gt;   W                   1
-
-!     m3/s                   =&gt;   gal/min             15852
-
-!     m3/s                   =&gt;   lbH2O/hr            7936289.998
-
-!     Pa                     =&gt;   inHg                0.00029613
-
-!     Pa                     =&gt;   inH2O               0.00401463
-
-!     Pa                     =&gt;   ftH2O               0.00033455
-
-!     W/person               =&gt;   W/person            1
-
-!     W/m2                   =&gt;   W/m2                1
-
-!     W/m2                   =&gt;   W/ft2               0.0928939733269818
-
-!     W/m-K                  =&gt;   Btu/h-ft-F          0.577796066000163
-
+!     m                      =>   in                  39.37
+!     W                      =>   W                   1
+!     m3/s                   =>   gal/min             15852
+!     m3/s                   =>   lbH2O/hr            7936289.998
+!     Pa                     =>   inHg                0.00029613
+!     Pa                     =>   inH2O               0.00401463
+!     Pa                     =>   ftH2O               0.00033455
+!     W/person               =>   W/person            1
+!     W/m2                   =>   W/m2                1
+!     W/m2                   =>   W/ft2               0.0928939733269818
+!     W/m-K                  =>   Btu/h-ft-F          0.577796066000163
 !
-
 ! Units fields that are not translated
-
 !     deg
-
 !     hr
-
 !     A
-
 !     dimensionless
-
 !     V
-
 !     ohms
-
 !     A/V
-
 !     eV
-
 !     percent
-
 !     s
-
 !     W/m2 or deg C
-
 !     W/m2, W or deg C
-
 !     minutes
-
 !     1/hr
-
-! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
+! **************************************************************************
+```
 
 IDFEditor
 ---------
 
 IDF Editor is an optional component of the EnergyPlus installation. For users who want a simple way of creating or editing EnergyPlus input data files (IDF), IDF Editor provides this service.  The IDF Editor does not check inputs for validity, although some numeric fields are highlighted if out of range and some text fields are highlighted if they contain an invalid reference. For instructions and rules that must be followed when creating an IDF file the user should refer to the [*Input/Output Reference*](../../EnergyPlusFromStarTeam/EnergyPlusFromStarTeam/Documentation/sources/InputOutputReference.pdf) document.
 
-![](AuxiliaryPrograms/media/image075.jpg)
+![](AuxiliaryPrograms/media/image115.png)
 
 Figure 49. IDF Editor Screen.
 
@@ -12990,7 +11316,7 @@ By clicking and highlighting a value within an object, several things happen:
 
 The following dialog box is displayed when the small button is pressed that is on the right side of cells used for node names. Double clicking on cells containing node names can also make the dialog box appear.
 
-![](AuxiliaryPrograms/media/image076.jpg)
+![](AuxiliaryPrograms/media/image116.png)
 
 Figure 50. Edit or Select Node Name Dialog Box
 
@@ -13012,7 +11338,7 @@ The "File", "Save Options" screen is shown below.
 
 
 
- ![](AuxiliaryPrograms/media/image077.png)
+ ![](AuxiliaryPrograms/media/image117.png)
 
 Figure 51. IDF Editor Save Options Screen.
 
@@ -13048,7 +11374,7 @@ The Edit Menu offers options to create a new object, duplicate an object, and de
 
 The Find Class menu item brings up the following dialog box used to search through the Class List:
 
-![](AuxiliaryPrograms/media/image078.png)
+![](AuxiliaryPrograms/media/image118.png)
 
 Figure 52. Find Class Dialog Box
 
@@ -13056,7 +11382,7 @@ The Find Class dialog can be used to find class names quickly and can be activat
 
 The Search and Replace menu item or CTRL-H activates the following dialog box:
 
-![](AuxiliaryPrograms/media/image079.jpg)
+![](AuxiliaryPrograms/media/image119.png)
 
 Figure 53. Search and Replace Diaglog Box
 
@@ -13080,7 +11406,7 @@ The "Show Quick Select Dropdowns" option, which can also be turned on and off wi
 
 The figure below shows the "Layout Options" also accessible under the View menu.
 
-![](AuxiliaryPrograms/media/image080.png)
+![](AuxiliaryPrograms/media/image120.png)
 
 Figure 54. IDF Editor Layout Options Screen.
 
@@ -13090,7 +11416,7 @@ The "Show Quick Select Dropdowns" view menu option adds two new input fields to 
 
 The "Validity Check" function has replaced and expanded upon the old "Check Out-of-Range" function. It can also be started by using CTRL-R. The "Validity Check" function performs three kinds of validity checks and displays the results as shown in the dialog box below:
 
-![](AuxiliaryPrograms/media/image081.jpg)
+![](AuxiliaryPrograms/media/image121.png)
 
 Figure 55. Validity Check Dialog Box
 
@@ -13122,7 +11448,7 @@ EP-Compare
 
 The EP-Compare program is intended to be used to compare the tabular results of several simulations including the ABUPS summary report. To generate tabular reports in EnergyPlus use the Output:Table:SummaryReports object and make sure the OutputControl:Table:Style includes HTML output. EP-Compare displays bar graphs and monthly line graphs for most of the tabular reports. It can be used in Windows, Linux and Macintosh systems. The main screen is shown below:
 
-![](AuxiliaryPrograms/media/image082.jpg)
+![](AuxiliaryPrograms/media/image122.png)
 
 Figure 56. EP-Compare Main Screen
 
@@ -13130,7 +11456,7 @@ The main screen shows both the graph being displayed at the bottom and allows th
 
 The first time the program is started no graphs are shown because no files have been selected. To select files use the "Manage Files" button. This brings up the Manage Files dialog box shown below:
 
-![](AuxiliaryPrograms/media/image083.jpg)
+![](AuxiliaryPrograms/media/image123.png)
 
 Figure 57. EP-Compare Dialog box
 
