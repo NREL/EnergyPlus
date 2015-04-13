@@ -107,6 +107,7 @@ TEST( SecondaryDXHeatingCoilSingleSpeed, Test4 ) {
 	DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
 
 	DXCoil( DXCoilNum ).SecZoneAirNodeNum = 1;
+	Node.allocate( 2 );
 	Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp = 10.0;
 	Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat  = 0.003;
 	DXCoil( DXCoilNum ).SecCoilAirFlow = 1.0;
@@ -160,6 +161,7 @@ TEST( SecondaryDXHeatingCoilSingleSpeed, Test4 ) {
 
 	// cleanup 
 	DXCoil.deallocate();
+	Node.deallocate();
 }
 TEST( SecondaryDXHeatingCoilMultiSpeed, Test5 ) {
 
@@ -186,6 +188,7 @@ TEST( SecondaryDXHeatingCoilMultiSpeed, Test5 ) {
 	DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
 
 	DXCoil( DXCoilNum ).SecZoneAirNodeNum = 1;
+	Node.allocate( 2 );
 	Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp = 10.0;
 	Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat = 0.003;
 	DXCoil( DXCoilNum ).MSSecCoilAirFlow( 1 ) = 1.0;
@@ -217,4 +220,5 @@ TEST( SecondaryDXHeatingCoilMultiSpeed, Test5 ) {
 	DXCoil( DXCoilNum ).MSSecCoilSHRFT.deallocate();
 	DXCoil( DXCoilNum ).MSSecCoilSHRFF.deallocate();
 	DXCoil.deallocate();
+	Node.deallocate();
 }
