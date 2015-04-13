@@ -78,10 +78,10 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Total Energy [GJ]</td>
-<td>Energy Per Total Building Area [MJ/m2]</td>
-<td>Energy Per Conditioned Building Area [MJ/m2]</td>
+<th> </th>
+<th>Total Energy [GJ]</th>
+<th>Energy Per Total Building Area [MJ/m2]</th>
+<th>Energy Per Conditioned Building Area [MJ/m2]</th>
 </tr>
 <tr>
 <td>Total Site Energy</td>
@@ -115,8 +115,8 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Source=&gt;Site Conversion Factor</td>
+<th> </th>
+<th>Source=&gt;Site Conversion Factor</th>
 </tr>
 <tr>
 <td>Electricity</td>
@@ -170,8 +170,8 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Area [m2]</td>
+<th> </th>
+<th>Area [m2]</th>
 </tr>
 <tr>
 <td>Total Building Area</td>
@@ -193,13 +193,13 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity [GJ]</td>
-<td>Natural Gas [GJ]</td>
-<td>Other Fuel [GJ]</td>
-<td>District Cooling [GJ]</td>
-<td>District Heating [GJ]</td>
-<td>Water [m3]</td>
+<th> </th>
+<th>Electricity [GJ]</th>
+<th>Natural Gas [GJ]</th>
+<th>Other Fuel [GJ]</th>
+<th>District Cooling [GJ]</th>
+<th>District Heating [GJ]</th>
+<th>Water [m3]</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -353,14 +353,14 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Subcategory</td>
-<td>Electricity [GJ]</td>
-<td>Natural Gas [GJ]</td>
-<td>Other Fuel [GJ]</td>
-<td>District Cooling [GJ]</td>
-<td>District Heating [GJ]</td>
-<td>Water [m3]</td>
+<th> </th>
+<th>Subcategory</th>
+<th>Electricity [GJ]</th>
+<th>Natural Gas [GJ]</th>
+<th>Other Fuel [GJ]</th>
+<th>District Cooling [GJ]</th>
+<th>District Heating [GJ]</th>
+<th>Water [m3]</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -522,13 +522,13 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity Intensity [MJ/m2]</td>
-<td>Natural Gas Intensity [MJ/m2]</td>
-<td>Other Fuel Intensity [MJ/m2]</td>
-<td>District Cooling Intensity [MJ/m2]</td>
-<td>District Heating Intensity [MJ/m2]</td>
-<td>Water Intensity [m3/m2]</td>
+<th> </th>
+<th>Electricity Intensity [MJ/m2]</th>
+<th>Natural Gas Intensity [MJ/m2]</th>
+<th>Other Fuel Intensity [MJ/m2]</th>
+<th>District Cooling Intensity [MJ/m2]</th>
+<th>District Heating Intensity [MJ/m2]</th>
+<th>Water Intensity [m3/m2]</th>
 </tr>
 <tr>
 <td>Lighting</td>
@@ -574,13 +574,13 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity Intensity [MJ/m2]</td>
-<td>Natural Gas Intensity [MJ/m2]</td>
-<td>Other Fuel Intensity [MJ/m2]</td>
-<td>District Cooling Intensity [MJ/m2]</td>
-<td>District Heating Intensity [MJ/m2]</td>
-<td>Water Intensity [m3/m2]</td>
+<th> </th>
+<th>Electricity Intensity [MJ/m2]</th>
+<th>Natural Gas Intensity [MJ/m2]</th>
+<th>Other Fuel Intensity [MJ/m2]</th>
+<th>District Cooling Intensity [MJ/m2]</th>
+<th>District Heating Intensity [MJ/m2]</th>
+<th>Water Intensity [m3/m2]</th>
 </tr>
 <tr>
 <td>Lighting</td>
@@ -626,9 +626,9 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity [GJ]</td>
-<td>Percent Electricity [%]</td>
+<th> </th>
+<th>Electricity [GJ]</th>
+<th>Percent Electricity [%]</th>
 </tr>
 <tr>
 <td>Fuel-Fired Power Generation</td>
@@ -703,9 +703,9 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Heat [GJ]</td>
-<td>Percent Heat [%]</td>
+<th> </th>
+<th>Heat [GJ]</th>
+<th>Percent Heat [%]</th>
 </tr>
 <tr>
 <td>Water-Side Heat Recovery</td>
@@ -750,9 +750,9 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Water [m3]</td>
-<td>Percent Water [%]</td>
+<th> </th>
+<th>Water [m3]</th>
+<th>Percent Water [%]</th>
 </tr>
 <tr>
 <td>Rainwater Collection</td>
@@ -827,8 +827,8 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Facility [Hours]</td>
+<th> </th>
+<th>Facility [Hours]</th>
 </tr>
 <tr>
 <td>Time Set Point Not Met During Occupied Heating</td>
@@ -864,8 +864,8 @@ General
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Value</td>
+<th> </th>
+<th>Value</th>
 </tr>
 <tr>
 <td>Program Version and Build</td>
@@ -913,12 +913,12 @@ General
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Total</td>
-<td>North (315 to 45 deg)</td>
-<td>East (45 to 135 deg)</td>
-<td>South (135 to 225 deg)</td>
-<td>West (225 to 315 deg)</td>
+<th> </th>
+<th>Total</th>
+<th>North (315 to 45 deg)</th>
+<th>East (45 to 135 deg)</th>
+<th>South (135 to 225 deg)</th>
+<th>West (225 to 315 deg)</th>
 </tr>
 <tr>
 <td>Gross Wall Area [m2]</td>
@@ -952,8 +952,8 @@ General
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Total</td>
+<th> </th>
+<th>Total</th>
 </tr>
 <tr>
 <td>Gross Roof Area [m2]</td>
@@ -977,16 +977,16 @@ General
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Area [m2]</td>
-<td>Conditioned (Y/N)</td>
-<td>Volume [m3]</td>
-<td>Multipliers</td>
-<td>Gross Wall Area [m2]</td>
-<td>Window Glass Area [m2]</td>
-<td>Lighting [W/m2]</td>
-<td>People [m2] per person</td>
-<td>Plug and Process [W/m2]</td>
+<th> </th>
+<th>Area [m2]</th>
+<th>Conditioned (Y/N)</th>
+<th>Volume [m3]</th>
+<th>Multipliers</th>
+<th>Gross Wall Area [m2]</th>
+<th>Window Glass Area [m2]</th>
+<th>Lighting [W/m2]</th>
+<th>People [m2] per person</th>
+<th>Plug and Process [W/m2]</th>
 </tr>
 <tr>
 <td>PLENUM-1</td>
@@ -1118,12 +1118,12 @@ Timestamp: **2011-10-07 20:53:43**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Source Electricity [GJ]</td>
-<td>Source Natural Gas [GJ]</td>
-<td>Source Other Fuel [GJ]</td>
-<td>Source District Cooling [GJ]</td>
-<td>Source District Heating [GJ]</td>
+<th></th>
+<th>Source Electricity [GJ]</th>
+<th>Source Natural Gas [GJ]</th>
+<th>Source Other Fuel [GJ]</th>
+<th>Source District Cooling [GJ]</th>
+<th>Source District Heating [GJ]</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -1262,12 +1262,12 @@ Timestamp: **2011-10-07 20:53:43**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Source Electricity [MJ/m2]</td>
-<td>Source Natural Gas [MJ/m2]</td>
-<td>Source Other Fuel [MJ/m2]</td>
-<td>Source District Cooling [MJ/m2]</td>
-<td>Source District Heating [MJ/m2]</td>
+<th></th>
+<th>Source Electricity [MJ/m2]</th>
+<th>Source Natural Gas [MJ/m2]</th>
+<th>Source Other Fuel [MJ/m2]</th>
+<th>Source District Cooling [MJ/m2]</th>
+<th>Source District Heating [MJ/m2]</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -1404,12 +1404,12 @@ Timestamp: **2011-10-07 20:53:43**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Source Electricity [MJ/m2]</td>
-<td>Source Natural Gas [MJ/m2]</td>
-<td>Source Other Fuel [MJ/m2]</td>
-<td>Source District Cooling [MJ/m2]</td>
-<td>Source District Heating [MJ/m2]</td>
+<th></th>
+<th>Source Electricity [MJ/m2]</th>
+<th>Source Natural Gas [MJ/m2]</th>
+<th>Source Other Fuel [MJ/m2]</th>
+<th>Source District Cooling [MJ/m2]</th>
+<th>Source District Heating [MJ/m2]</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -1557,13 +1557,13 @@ SizingPeriod:DesignDay
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Maximum Dry Bulb [C]</td>
-<td>Daily Temperature Range [C]</td>
-<td>Humidity Value</td>
-<td>Humidity Type</td>
-<td>Wind Speed [m/s]</td>
-<td>Wind Direction</td>
+<th> </th>
+<th>Maximum Dry Bulb [C]</th>
+<th>Daily Temperature Range [C]</th>
+<th>Humidity Value</th>
+<th>Humidity Type</th>
+<th>Wind Speed [m/s]</th>
+<th>Wind Direction</th>
 </tr>
 <tr>
 <td>LOS_ANGELES_CA_USA HEATING 99% CONDITIONS</td>
@@ -1591,8 +1591,8 @@ Weather Statistics File
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Value</td>
+<th> </th>
+<th>Value</th>
 </tr>
 <tr>
 <td>Reference</td>
@@ -1730,15 +1730,15 @@ Opaque Exterior
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Construction</td>
-<td>Reflectance</td>
-<td>U-Factor with Film [W/m2-K]</td>
-<td>U-Factor no Film [W/m2-K]</td>
-<td>Gross Area [m2]</td>
-<td>Azimuth [deg]</td>
-<td>Tilt [deg]</td>
-<td>Cardinal Direction</td>
+<th> </th>
+<th>Construction</th>
+<th>Reflectance</th>
+<th>U-Factor with Film [W/m2-K]</th>
+<th>U-Factor no Film [W/m2-K]</th>
+<th>Gross Area [m2]</th>
+<th>Azimuth [deg]</th>
+<th>Tilt [deg]</th>
+<th>Cardinal Direction</th>
 </tr>
 <tr>
 <td>WALL-1PF</td>
@@ -1902,17 +1902,17 @@ Opaque Exterior
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Construction</td>
-<td>Area of One Opening [m2]</td>
-<td>Area of Openings [m2]</td>
-<td>U-Factor [W/m2-K]</td>
-<td>SHGC</td>
-<td>Visible Transmittance</td>
-<td>Shade Control</td>
-<td>Parent Surface</td>
-<td>Azimuth [deg]</td>
-<td>Cardinal Direction</td>
+<th> </th>
+<th>Construction</th>
+<th>Area of One Opening [m2]</th>
+<th>Area of Openings [m2]</th>
+<th>U-Factor [W/m2-K]</th>
+<th>SHGC</th>
+<th>Visible Transmittance</th>
+<th>Shade Control</th>
+<th>Parent Surface</th>
+<th>Azimuth [deg]</th>
+<th>Cardinal Direction</th>
 </tr>
 <tr>
 <td>WF-1</td>
@@ -2049,16 +2049,16 @@ Sunlit Fraction
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>March 21 9am</td>
-<td>March 21 noon</td>
-<td>March 21 3pm</td>
-<td>June 21 9am</td>
-<td>June 21 noon</td>
-<td>June 21 3pm</td>
-<td>December 21 9am</td>
-<td>December 21 noon</td>
-<td>December 21 3pm</td>
+<th> </th>
+<th>March 21 9am</th>
+<th>March 21 noon</th>
+<th>March 21 3pm</th>
+<th>June 21 9am</th>
+<th>June 21 noon</th>
+<th>June 21 3pm</th>
+<th>December 21 9am</th>
+<th>December 21 noon</th>
+<th>December 21 3pm</th>
 </tr>
 <tr>
 <td>WF-1</td>
@@ -2140,12 +2140,12 @@ Sunlit Fraction
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Name</td>
-<td>Type</td>
-<td>Shaded Construction</td>
-<td>Control</td>
-<td>Glare Control</td>
+<th> </th>
+<th>Name</th>
+<th>Type</th>
+<th>Shaded Construction</th>
+<th>Control</th>
+<th>Glare Control</th>
 </tr>
 <tr>
 <td>None</td>
@@ -2171,16 +2171,16 @@ Interior Lighting
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Zone</td>
-<td>Lighting Power Density [W/m2]</td>
-<td>Zone Area [m2]</td>
-<td>Total Power [W]</td>
-<td>End Use Subcategory</td>
-<td>Schedule Name</td>
-<td>Average Hours/Week [hr]</td>
-<td>Return Air Fraction</td>
-<td>Conditioned (Y/N)</td>
+<th> </th>
+<th>Zone</th>
+<th>Lighting Power Density [W/m2]</th>
+<th>Zone Area [m2]</th>
+<th>Total Power [W]</th>
+<th>End Use Subcategory</th>
+<th>Schedule Name</th>
+<th>Average Hours/Week [hr]</th>
+<th>Return Air Fraction</th>
+<th>Conditioned (Y/N)</th>
 </tr>
 <tr>
 <td>SPACE1-1 LIGHTS 1</td>
@@ -2262,13 +2262,13 @@ Interior Lighting
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Zone</td>
-<td>Daylighting Type</td>
-<td>Control Type</td>
-<td>Fraction Controlled</td>
-<td>Lighting Installed in Zone [W]</td>
-<td>Lighting Controlled [W]</td>
+<th> </th>
+<th>Zone</th>
+<th>Daylighting Type</th>
+<th>Control Type</th>
+<th>Fraction Controlled</th>
+<th>Lighting Installed in Zone [W]</th>
+<th>Lighting Controlled [W]</th>
 </tr>
 <tr>
 <td>None</td>
@@ -2287,11 +2287,11 @@ Interior Lighting
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Total Watts</td>
-<td>Astronomical Clock/Schedule</td>
-<td>Schedule Name</td>
-<td>Average Annual Hours/Week</td>
+<th> </th>
+<th>Total Watts</th>
+<th>Astronomical Clock/Schedule</th>
+<th>Schedule Name</th>
+<th>Average Annual Hours/Week</th>
 </tr>
 <tr>
 <td>Exterior Lighting Total</td>
@@ -2316,10 +2316,10 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Nominal Capacity [W]</td>
-<td>Nominal Efficiency [W/W]</td>
+<th> </th>
+<th>Type</th>
+<th>Nominal Capacity [W]</th>
+<th>Nominal Efficiency [W/W]</th>
 </tr>
 <tr>
 <td>CENTRAL CHILLER</td>
@@ -2341,13 +2341,13 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Nominal Total Capacity [W]</td>
-<td>Nominal Sensible Capacity [W]</td>
-<td>Nominal Latent Capacity [W]</td>
-<td>Nominal Sensible Heat Ratio</td>
-<td>Nominal Efficiency [W/W]</td>
+<th> </th>
+<th>Type</th>
+<th>Nominal Total Capacity [W]</th>
+<th>Nominal Sensible Capacity [W]</th>
+<th>Nominal Latent Capacity [W]</th>
+<th>Nominal Sensible Heat Ratio</th>
+<th>Nominal Efficiency [W/W]</th>
 </tr>
 <tr>
 <td>MAIN COOLING COIL 1</td>
@@ -2366,10 +2366,10 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Nominal Total Capacity [W]</td>
-<td>Nominal Efficiency [W/W]</td>
+<th> </th>
+<th>Type</th>
+<th>Nominal Total Capacity [W]</th>
+<th>Nominal Efficiency [W/W]</th>
 </tr>
 <tr>
 <td>SPACE1-1 ZONE COIL</td>
@@ -2415,14 +2415,14 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Total Efficiency [W/W]</td>
-<td>Delta Pressure [pa]</td>
-<td>Max Flow Rate [m3/s]</td>
-<td>Rated Power [W]</td>
-<td>Motor Heat In Air Fraction</td>
-<td>End Use</td>
+<th> </th>
+<th>Type</th>
+<th>Total Efficiency [W/W]</th>
+<th>Delta Pressure [pa]</th>
+<th>Max Flow Rate [m3/s]</th>
+<th>Rated Power [W]</th>
+<th>Motor Heat In Air Fraction</th>
+<th>End Use</th>
 </tr>
 <tr>
 <td>SUPPLY FAN 1</td>
@@ -2442,12 +2442,12 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Control</td>
-<td>Head [pa]</td>
-<td>Power [W]</td>
-<td>Motor Efficiency [W/W]</td>
+<th> </th>
+<th>Type</th>
+<th>Control</th>
+<th>Head [pa]</th>
+<th>Power [W]</th>
+<th>Motor Efficiency [W/W]</th>
 </tr>
 <tr>
 <td>HW CIRC PUMP</td>
@@ -2473,13 +2473,13 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Storage Volume [m3]</td>
-<td>Input [W]</td>
-<td>Thermal Efficiency [W/W]</td>
-<td>Recovery Efficiency [W/W]</td>
-<td>Energy Factor</td>
+<th> </th>
+<th>Type</th>
+<th>Storage Volume [m3]</th>
+<th>Input [W]</th>
+<th>Thermal Efficiency [W/W]</th>
+<th>Recovery Efficiency [W/W]</th>
+<th>Energy Factor</th>
 </tr>
 <tr>
 <td>None</td>
@@ -2507,69 +2507,47 @@ This provision intends to provide a baseline that is neutral to building orienta
 
 **Step 1.** The first step of performing the building rotations is to include a Compliance:Building object which contains the Building Rotation for Appendix G field. The value of the field should be different for four simulations, 0, 90, 180 and 270 (see Step 2 below). This is further documented in the Input Output Reference.
 
+```idf
 Compliance:Building,
-
     90;                 Building Rotation for Appendix G
+```
 
 Also make sure that the HTML summary reports will be generated by including the following:
 
+```idf
 OutputControl:Table:Style,
-
   HTML;                      !- type
 
-
-
 Output:Table:SummaryReports,
-
   AllSummary;                !- type
+```
 
 **Step 2.** The ParametricPreprocessor automates the creation of the four simulation input files so that only a single simulation file is needs to be created by the user. By setting the file name suffixes (which are appended to the existing file name for each simulation), setting a variable that varies for the four simulations, and setting the Building Rotation for Appendix G to this variable, the user can automatically create the four files when using EnergyPlus. The following example shows what should be included in the EnergyPlus file. The Parametric objects are described further in the Input Output Reference and the ParametricPreprocessor is described in the Auxiliary Programs documentation.
 
+```
 Parametric:FileNameSuffix,
-
   Names,
-
   G000,
-
   G090,
-
   G180,
-
   G270;
 
-
-
 Parametric:SetValueForRun,
-
   $appGAngle,            !- Parameter Name
-
   0.0,                   !- Value 1
-
   90.0,                  !- Value 2
-
   180.0,                 !- Value 3
-
   270.0;                 !- Value 4
 
-
-
-
-
 Compliance:Building,
-
     =$appGAngle;        !- Building Rotation for Appendix G {deg}
 
-
-
 OutputControl:Table:Style,
-
   HTML;                      !- type
 
-
-
 Output:Table:SummaryReports,
-
   AllSummary;                !- type
+```
 
 **Step 3.** Run the simulation using EP-Launch. Using the “Single Input File” tab of EP-Launch select the input that contains the Compliance:Building, Parametric:FileNameSuffix, Parametric:SetValueForRun objects as shown above in Step 2 as well as the weather file. In EP-Launch, make sure under VIEW .. OPTIONS .. MISCELLANEOUS that the RUN PARAMETRICPREPROCESSOR option is checked.
 
@@ -2593,8 +2571,8 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Data</td>
+<th></th>
+<th>Data</th>
 </tr>
 <tr>
 <td>Heating Degree Days</td>
@@ -2632,11 +2610,11 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Space Area [m2]</td>
-<td>Regularly Occupied Area [m2]</td>
-<td>Unconditioned Area [m2]</td>
-<td>Typical Hours/Week in Operation [hr/wk]</td>
+<th></th>
+<th>Space Area [m2]</th>
+<th>Regularly Occupied Area [m2]</th>
+<th>Unconditioned Area [m2]</th>
+<th>Typical Hours/Week in Operation [hr/wk]</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -2695,8 +2673,8 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Data</td>
+<th></th>
+<th>Data</th>
 </tr>
 <tr>
 <td>Number of hours heating loads not met</td>
@@ -2718,11 +2696,11 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Utility Rate</td>
-<td>Virtual Rate [$/unit energy]</td>
-<td>Units of Energy</td>
-<td>Units of Demand</td>
+<th></th>
+<th>Utility Rate</th>
+<th>Virtual Rate [$/unit energy]</th>
+<th>Units of Energy</th>
+<th>Units of Demand</th>
 </tr>
 <tr>
 <td>Electricity</td>
@@ -2753,13 +2731,13 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Electric Energy Use [GJ]</td>
-<td>Electric Demand [W]</td>
-<td>Natural Gas Energy Use [GJ]</td>
-<td>Natural Gas Demand [W]</td>
-<td>Other Energy Use [GJ]</td>
-<td>Other Demand [W]</td>
+<th></th>
+<th>Electric Energy Use [GJ]</th>
+<th>Electric Demand [W]</th>
+<th>Natural Gas Energy Use [GJ]</th>
+<th>Natural Gas Demand [W]</th>
+<th>Other Energy Use [GJ]</th>
+<th>Other Demand [W]</th>
 </tr>
 <tr>
 <td>Interior Lighting</td>
@@ -2913,9 +2891,9 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Process Subtotal [GJ]</td>
-<td>Total Energy Use [GJ]</td>
+<th></th>
+<th>Process Subtotal [GJ]</th>
+<th>Total Energy Use [GJ]</th>
 </tr>
 <tr>
 <td>Electricity</td>
@@ -2945,9 +2923,9 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Process Subtotal [$]</td>
-<td>Total Energy Cost [$]</td>
+<th></th>
+<th>Process Subtotal [$]</th>
+<th>Total Energy Cost [$]</th>
 </tr>
 <tr>
 <td>Electricity</td>
@@ -2977,9 +2955,9 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Rated Capacity [kW]</td>
-<td>Annual Energy Generated [GJ]</td>
+<th></th>
+<th>Rated Capacity [kW]</th>
+<th>Annual Energy Generated [GJ]</th>
 </tr>
 <tr>
 <td>Photovoltaic</td>
@@ -2999,8 +2977,8 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Electricty [MJ/m2]</td>
+<th></th>
+<th>Electricty [MJ/m2]</th>
 </tr>
 <tr>
 <td>Interior Lighting</td>
@@ -3042,8 +3020,8 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Natural Gas [MJ/m2]</td>
+<th></th>
+<th>Natural Gas [MJ/m2]</th>
 </tr>
 <tr>
 <td>Space Heating</td>
@@ -3069,8 +3047,8 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Other [MJ/m2]</td>
+<th></th>
+<th>Other [MJ/m2]</th>
 </tr>
 <tr>
 <td>Miscellaneous</td>
@@ -3088,8 +3066,8 @@ Timestamp: **2013-03-01 15:24:37**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Percent [%]</td>
+<th></th>
+<th>Percent [%]</th>
 </tr>
 <tr>
 <td>Interior Lighting</td>
