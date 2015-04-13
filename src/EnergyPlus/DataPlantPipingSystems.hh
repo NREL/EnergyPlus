@@ -1573,7 +1573,7 @@ namespace DataPlantPipingSystems {
 			NumGroundSurfCells( NumGroundSurfCells ),
 			NumInsulationCells( NumInsulationCells ),
 			Cells( Cells ),
-			WeightedHeatFlux(WeightedHeatFlux)
+			WeightedHeatFlux( WeightedHeatFlux )
 		{}
 
 	};

@@ -405,48 +405,48 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
 				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 						
-						Xmax = ubound(PipingSystemDomains(DomainNum).Cells, 1);
-						Ymax = ubound(PipingSystemDomains(DomainNum).Cells, 2);
-						Zmax = ubound(PipingSystemDomains(DomainNum).Cells, 3);
+						Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
+						Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
+						Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
 						Y = Ymax;
 
 						//Set Tzone = Zone Air temperature. Modify to use average of all zones coupled to the ground ..?
-						Tzone = ZTAV(1);
-						Atotal = GetSlabArea(DomainNum, CellType_ZoneGroundInterface);//PipingSystemDomains(DomainNum).SlabLength*PipingSystemDomains(DomainNum).SlabWidth;
+						Tzone = ZTAV( 1 );
+						Atotal = GetSlabArea( DomainNum, CellType_ZoneGroundInterface );
 
-						WeightedTerm.allocate({ 0, Xmax }, { 0, Zmax });
-						HF.allocate({ 0, Xmax }, { 0, Zmax });
-						PipingSystemDomains(DomainNum).WeightedHeatFlux.allocate({ 0, Xmax }, { 0, Zmax });
+						WeightedTerm.allocate( { 0, Xmax }, { 0, Zmax } );
+						HF.allocate( { 0, Xmax }, { 0, Zmax } );
+						PipingSystemDomains( DomainNum ).WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
 
-						for (Z = lbound(PipingSystemDomains(DomainNum).Cells, 3); Z <= ubound(PipingSystemDomains(DomainNum).Cells, 3); ++Z) {
-							for (X = lbound(PipingSystemDomains(DomainNum).Cells, 1); X <= ubound(PipingSystemDomains(DomainNum).Cells, 1); ++X) {
+						for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+							for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
 								// Zone interface cells
-								if (PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType == CellType_ZoneGroundInterface){
-									WeightedTerm(X, Z) = (Tzone - PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature_PrevTimeStep) / (Tzone - PipingSystemDomains(DomainNum).Cells(Xmax, Ymax, Zmax).MyBase.Temperature_PrevTimeStep);
-									WeightedArea += WeightedTerm(X,Z) * YNormalArea(PipingSystemDomains(DomainNum).Cells(X, Y, Z));
-									if (DayOfMonth == 30 && HourOfDay == 23){
-										myfile << Atotal << "," << Tzone << "," << PipingSystemDomains(DomainNum).HeatFlux << "," << X << "," << Z << "," << WeightedTerm(X, Z) << "," << WeightedArea << "," << HF(Xmax, Zmax) << "," << HF(X, Z) << std::endl;
+								if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
+									WeightedTerm( X, Z ) = ( Tzone - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) / ( Tzone - PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep );
+									WeightedArea += WeightedTerm( X, Z ) * YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
+									if ( DayOfMonth == 30 && HourOfDay == 23 ){
+										myfile << Atotal << "," << Tzone << "," << PipingSystemDomains( DomainNum ).HeatFlux << "," << X << "," << Z << "," << WeightedTerm( X, Z ) << "," << WeightedArea << "," << HF( Xmax, Zmax ) << "," << HF( X, Z ) << std::endl;
 									}
 								}
 							}
 						}
 						//Get heat flux for center cell first
-						HF(Xmax, Zmax) = PipingSystemDomains(DomainNum).HeatFlux * Atotal / WeightedArea;
+						HF( Xmax, Zmax ) = PipingSystemDomains( DomainNum ).HeatFlux * Atotal / WeightedArea;
 
 						//Then get temperature weighted heat flux for each cell 
-						for (Z = lbound(PipingSystemDomains(DomainNum).Cells, 3); Z <= ubound(PipingSystemDomains(DomainNum).Cells, 3); ++Z) {
-							for (X = lbound(PipingSystemDomains(DomainNum).Cells, 1); X <= ubound(PipingSystemDomains(DomainNum).Cells, 1); ++X) {
+						for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+							for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
 								// Zone interface cells
-								if (PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType == CellType_ZoneGroundInterface){
-									HF(X, Z) = WeightedTerm(X, Z) * HF(Xmax, Zmax);
-									if (DayOfMonth == 30 && HourOfDay == 23){
-										myfile << Atotal << "," << Tzone << "," << PipingSystemDomains(DomainNum).HeatFlux << "," << X << "," << Z << "," << WeightedTerm(X, Z) << "," << WeightedArea << "," << HF(Xmax, Zmax) << "," << HF(X, Z) << std::endl;
+								if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
+									HF( X, Z ) = WeightedTerm( X, Z ) * HF( Xmax, Zmax );
+									if ( DayOfMonth == 30 && HourOfDay == 23 ){
+										myfile << Atotal << "," << Tzone << "," << PipingSystemDomains( DomainNum ).HeatFlux << "," << X << "," << Z << "," << WeightedTerm( X, Z ) << "," << WeightedArea << "," << HF( Xmax, Zmax ) << "," << HF( X, Z ) << std::endl;
 									}
 								}
 							}
 						}
 						//Finally, assign heat flux values to PipingSystem arrays for temperture calculations for this time step
-						PipingSystemDomains(DomainNum).WeightedHeatFlux = HF;
+						PipingSystemDomains( DomainNum ).WeightedHeatFlux = HF;
 
 
 				} else { // Coupled basement
@@ -1379,28 +1379,28 @@ namespace PlantPipingSystemsManager {
 				// Get mesh parameters
 				
 				// Mesh inputs
-				{ auto const meshDistribution(uppercased(cAlphaArgs(10)));
-				if (meshDistribution == "UNIFORM") {
-					PipingSystemDomains(DomainCtr).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
-					PipingSystemDomains(DomainCtr).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
-					PipingSystemDomains(DomainCtr).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
+				{ auto const meshDistribution( uppercased( cAlphaArgs( 10 ) ) );
+				if ( meshDistribution == "UNIFORM" ) {
+					PipingSystemDomains( DomainCtr ).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
+					PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
+					PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
 				}
-				else if (meshDistribution == "GEOMETRIC") {
-					PipingSystemDomains(DomainCtr).Mesh.X.MeshDistribution = MeshDistribution_Geometric;
-					PipingSystemDomains(DomainCtr).Mesh.Y.MeshDistribution = MeshDistribution_Geometric;
-					PipingSystemDomains(DomainCtr).Mesh.Z.MeshDistribution = MeshDistribution_Geometric;
+				else if ( meshDistribution == "GEOMETRIC" ) {
+					PipingSystemDomains( DomainCtr ).Mesh.X.MeshDistribution = MeshDistribution_Geometric;
+					PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Geometric;
+					PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Geometric;
 					
-					PipingSystemDomains(DomainCtr).Mesh.X.GeometricSeriesCoefficient = rNumericArgs(18);
-					PipingSystemDomains(DomainCtr).Mesh.Y.GeometricSeriesCoefficient = rNumericArgs(18);
-					PipingSystemDomains(DomainCtr).Mesh.Z.GeometricSeriesCoefficient = rNumericArgs(18);
+					PipingSystemDomains( DomainCtr ).Mesh.X.GeometricSeriesCoefficient = rNumericArgs( 18 );
+					PipingSystemDomains( DomainCtr ).Mesh.Y.GeometricSeriesCoefficient = rNumericArgs( 18 );
+					PipingSystemDomains( DomainCtr ).Mesh.Z.GeometricSeriesCoefficient = rNumericArgs( 18 );
 				}
 				else {
-					IssueSevereInputFieldError(RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs(1), cAlphaFieldNames(10), cAlphaArgs(10), "Use a choice from the available mesh type keys.", ErrorsFound);
+					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 10 ), cAlphaArgs( 10 ), "Use a choice from the available mesh type keys.", ErrorsFound );
 				}}
 
-				PipingSystemDomains(DomainCtr).Mesh.X.RegionMeshCount = rNumericArgs(15);
-				PipingSystemDomains(DomainCtr).Mesh.Y.RegionMeshCount = rNumericArgs(16);
-				PipingSystemDomains(DomainCtr).Mesh.Z.RegionMeshCount = rNumericArgs(17);
+				PipingSystemDomains( DomainCtr ).Mesh.X.RegionMeshCount = rNumericArgs( 15 );
+				PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount = rNumericArgs( 16 );
+				PipingSystemDomains( DomainCtr ).Mesh.Z.RegionMeshCount = rNumericArgs( 17 );
 				
 				// Soil properties
 				PipingSystemDomains( DomainCtr ).GroundProperties.Conductivity = Domain( ZoneCoupledDomainCtr ).SoilConductivity;
@@ -6515,58 +6515,58 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-		else if (ThisMesh.MeshDistribution == MeshDistribution_Geometric) {
+		else if ( ThisMesh.MeshDistribution == MeshDistribution_Geometric ) {
 
 			NumCells = ThisMesh.RegionMeshCount;
 
-			if (g.RegionType == RegionType_XDirection || g.RegionType == RegionType_ZDirection)
+			if ( g.RegionType == RegionType_XDirection || g.RegionType == RegionType_ZDirection )
 			{
 				//'calculate geometric series
 				SummationTerm = 0.0;
-				for (I = 1; I <= NumCells; ++I) {
-					SummationTerm += std::pow(ThisMesh.GeometricSeriesCoefficient, I - 1);
+				for ( I = 1; I <= NumCells; ++I ) {
+					SummationTerm += std::pow( ThisMesh.GeometricSeriesCoefficient, I - 1 );
 				}
 				CellWidth = GridWidth / SummationTerm;
-				if (g.Min == 0){
+				if ( g.Min == 0 ){
 					//Ground region to the left of the slab will have cells expanding to the left
-					RetVal(NumCells - 1) = CellWidth;
-					for (I = NumCells - 2; I >= 0; --I) {
+					RetVal( NumCells - 1 ) = CellWidth;
+					for ( I = NumCells - 2; I >= 0; --I ) {
 						CellWidth *= ThisMesh.GeometricSeriesCoefficient;
-						RetVal(I) = CellWidth;
+						RetVal( I ) = CellWidth;
 					}
 				}
 				else{
 					//Slab region will have cells expanding to the right
-					RetVal(0) = CellWidth;
-					for (I = 1; I <= NumCells - 1; ++I) {
+					RetVal( 0 ) = CellWidth;
+					for ( I = 1; I <= NumCells - 1; ++I ) {
 						CellWidth *= ThisMesh.GeometricSeriesCoefficient;
-						RetVal(I) = CellWidth;
+						RetVal( I ) = CellWidth;
 					}
 				}
 			}
-			else if (g.RegionType == RegionType_YDirection){
-				if (g.Max == PipingSystemDomains(DomainNum).Extents.Ymax){
+			else if ( g.RegionType == RegionType_YDirection ){
+				if ( g.Max == PipingSystemDomains( DomainNum ).Extents.Ymax ){
 					//Assign uniform cell widths to the slab cells
-					assert(ThisMesh.RegionMeshCount > 0);
+					assert( ThisMesh.RegionMeshCount > 0 );
 					CellWidth = GridWidth / ThisMesh.RegionMeshCount;
 
-					for (I = 0; I <= ThisMesh.RegionMeshCount - 1; ++I) {
-						RetVal(I) = CellWidth;
+					for ( I = 0; I <= ThisMesh.RegionMeshCount - 1; ++I ) {
+						RetVal( I ) = CellWidth;
 					}
 				}
 				else{
 					//'calculate geometric series
 					SummationTerm = 0.0;
-					for (I = 1; I <= NumCells; ++I) {
-						SummationTerm += std::pow(ThisMesh.GeometricSeriesCoefficient, I - 1);
+					for ( I = 1; I <= NumCells; ++I ) {
+						SummationTerm += std::pow( ThisMesh.GeometricSeriesCoefficient, I - 1 );
 					}
 					CellWidth = GridWidth / SummationTerm;
 
 					//Ground region under the slab will have cells expanding as we go down
-					RetVal(NumCells - 1) = CellWidth;
-					for (I = NumCells - 2; I >= 0; --I) {
+					RetVal( NumCells - 1 ) = CellWidth;
+					for ( I = NumCells - 2; I >= 0; --I ) {
 						CellWidth *= ThisMesh.GeometricSeriesCoefficient;
-						RetVal(I) = CellWidth;
+						RetVal( I ) = CellWidth;
 					}
 				}
 			}
@@ -7568,7 +7568,7 @@ namespace PlantPipingSystemsManager {
 			++Denominator;
 
 			// catch invalid types
-			assert( std::set< int >( { CellType_BasementWall, CellType_BasementFloor, CellType_ZoneGroundInterface, CellType_BasementCorner } ).count(cell.CellType) != 0 );
+			assert( std::set< int >( { CellType_BasementWall, CellType_BasementFloor, CellType_ZoneGroundInterface, CellType_BasementCorner } ).count( cell.CellType ) != 0 );
 
 			if ( cell.CellType == CellType_BasementWall ) {
 				// Get the average basement wall heat flux and add it to the tally
@@ -7584,8 +7584,8 @@ namespace PlantPipingSystemsManager {
 				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
 			} else if ( cell.CellType ==  CellType_ZoneGroundInterface ) {
 				// Get the average slab heat flux and add it to the tally
-				HeatFlux = PipingSystemDomains(DomainNum).WeightedHeatFlux(cell.X_index, cell.Z_index);
-				Numerator += Beta * HeatFlux * Width(cell) * Depth(cell);
+				HeatFlux = PipingSystemDomains( DomainNum ).WeightedHeatFlux( cell.X_index, cell.Z_index );
+				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
 			}
 
 			//determine the neighbor types based on cell location
@@ -7865,20 +7865,20 @@ namespace PlantPipingSystemsManager {
 		RunningArea = 0.0;
 		CellArea = 0.0;
 
-		for (Z = lbound(PipingSystemDomains(DomainNum).Cells, 3); Z <= ubound(PipingSystemDomains(DomainNum).Cells, 3); ++Z) {
-			for (Y = lbound(PipingSystemDomains(DomainNum).Cells, 2); Y <= ubound(PipingSystemDomains(DomainNum).Cells, 2); ++Y) {
-				for (X = lbound(PipingSystemDomains(DomainNum).Cells, 1); X <= ubound(PipingSystemDomains(DomainNum).Cells, 1); ++X) {
-					if (PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType == CellType) {
-							CellArea = YNormalArea(PipingSystemDomains(DomainNum).Cells(X, Y, Z));
+		for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+			for ( Y = lbound( PipingSystemDomains( DomainNum ).Cells, 2 ); Y <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ); ++Y ) {
+				for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
+					if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType ) {
+							CellArea = YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
 							RunningArea += CellArea;
-							myfile << X << "," << Y << "," << Z << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.X << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.Z << "," << CellArea << "," << RunningArea << std::endl;
+							myfile << X << "," << Y << "," << Z << "," << PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).Centroid.X << "," << PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).Centroid.Z << "," << CellArea << "," << RunningArea << std::endl;
 
 					}
 				}
 			}
 		}
 
-		if (RunningArea > 0) {
+		if ( RunningArea > 0 ) {
 			RetVal = RunningArea;
 		}
 		else {
