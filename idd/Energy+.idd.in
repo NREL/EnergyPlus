@@ -1865,6 +1865,7 @@ Site:GroundDomain:Slab,
         \type choice
         \key Hourly
         \key Timestep
+        \key Daily
         \default Hourly
         \note This field specifies the ground domain simulation timestep.
    N15, \field X-direction Mesh Density Parameter
@@ -2010,6 +2011,7 @@ Site:GroundDomain:Basement,
         \type choice
         \key Timestep
         \key Hourly
+        \key Daily
         \default Hourly
         \note This field specifies the basement domain simulation interval.
    N16; \field Mesh Density Parameter

@@ -1355,6 +1355,7 @@ namespace DataPlantPipingSystems {
 		int InsulationZIndex;
 		bool SimTimestepFlag;
 		bool SimHourlyFlag;
+		bool SimDailyFlag;
 		Real64 ZoneCoupledSurfaceTemp;
 		Real64 BasementWallTemp;
 		Real64 BasementFloorTemp;
@@ -1415,6 +1416,7 @@ namespace DataPlantPipingSystems {
 			InsulationZIndex( 0 ),
 			SimTimestepFlag( false ),
 			SimHourlyFlag( false ),
+			SimDailyFlag( false ),
 			ZoneCoupledSurfaceTemp( 0.0 ),
 			BasementWallTemp( 0.0 ),
 			BasementFloorTemp( 0.0 ),
@@ -1491,6 +1493,7 @@ namespace DataPlantPipingSystems {
 			int const InsulationZIndex,
 			bool const SimTimestepFlag,
 			bool const SimHourlyFlag,
+			bool const SimDailyFlag,
 			Real64 ZoneCoupledSurfaceTemp,
 			Real64 BasementWallTemp,
 			Real64 BasementFloorTemp,
@@ -1566,6 +1569,7 @@ namespace DataPlantPipingSystems {
 			InsulationZIndex( InsulationZIndex ),
 			SimTimestepFlag( SimTimestepFlag ),
 			SimHourlyFlag( SimHourlyFlag ),
+			SimDailyFlag( SimDailyFlag ),
 			ZoneCoupledSurfaceTemp( ZoneCoupledSurfaceTemp ),
 			BasementWallTemp( BasementWallTemp ),
 			BasementFloorTemp( BasementFloorTemp ),

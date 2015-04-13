@@ -467,7 +467,11 @@ namespace PlantPipingSystemsManager {
 			} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
 				// Passes by if not time to run
 				if ( TimeStep != 1 ) continue;
-					PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
+				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
+			} else if ( PipingSystemDomains( DomainNum ).SimDailyFlag ) {
+				//Passes by if not time to run
+				if ( TimeStep != 1 ) continue;
+				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour * 24;
 			}
 
 			// Shift history arrays only if necessary
@@ -1325,6 +1329,8 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
 				} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
+				} else if ( SameString( cAlphaArgs( 11 ), "DAILY" ) ) {
+					PipingSystemDomains( DomainCtr ).SimDailyFlag = true;
 				} else {
 					ShowContinueError( "Could not determine slab simulation interval. Check input." );
 					ShowFatalError( "Preceding error causes program termination." );
@@ -1845,6 +1851,8 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).SimTimestepFlag = true;
 			} else if ( SameString( cAlphaArgs( 9 ), "HOURLY" ) ) {
 				PipingSystemDomains( DomainNum ).SimHourlyFlag = true;
+			} else if ( SameString( cAlphaArgs( 9 ), "DAILY" ) ) {
+				PipingSystemDomains( DomainNum ).SimDailyFlag = true;
 			} else {
 				ShowContinueError( "Could not determine basement simulation interval. Check input." );
 				ShowFatalError( "Preceding error causes program termination." );
