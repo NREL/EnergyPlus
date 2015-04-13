@@ -392,8 +392,8 @@ namespace PlantPipingSystemsManager {
 			// Reset the heat fluxs if domain update has been completed
 			if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ) {
 				PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux = 0;
+				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux = 0;
+				PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux = 0;
 				PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
 				PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = false;
 			}
@@ -470,7 +470,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
 			} else if ( PipingSystemDomains( DomainNum ).SimDailyFlag ) {
 				//Passes by if not time to run
-				if ( TimeStep != 1 ) continue;
+				if ( HourOfDay != 1 || TimeStep != 1 ) continue;
 				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour * 24;
 			}
 

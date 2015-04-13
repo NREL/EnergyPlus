@@ -236,12 +236,12 @@ Material:NoMass,
 
 !- =========== ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
-	Construction,
+    Construction,
     Floor Construction, !- Name
-	Insulation,	!- Outside Layer
-	Slab Material; !- Layer 2
-	
-	Construction,
+    Insulation,    !- Outside Layer
+    Slab Material; !- Layer 2
+    
+    Construction,
     Roof Construction, !- Name
     Roof Layer 1; !- Outside Layer
 
@@ -448,34 +448,34 @@ SurfaceProperty:OtherSideConditionsModel,
 !***********************************************************
   Site:GroundDomain:Slab,
     CoupledSlab, !- Name
-	5, 					!- Ground Domain Depth {m}
-    1, 					!- Aspect Ratio
-    5, 					!- Domain Perimeter Offset {m}
-    1.8, 				!- Soil Thermal Conductivity {W/m-K}
-    3200, 				!- Soil Density {kg/m3}
-    836, 				!- Soil Specific Heat {J/kg-K}
-    30, 				!- Soil Moisture Content Volume Fraction {percent}
-    50, 				!- Soil Moisture Content Volume Fraction at Saturation {percent}
-    15.5,				!- Kusuda-Achenbach Average Surface Temperature {C}
-    12.8, 				!- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    17.3, 				!- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-    1, 					!- Evapotranspiration Ground Cover Parameter
-    GroundCoupledOSCM, 	!- Name of Floor Boundary Condition Model
-    OnGrade, 			!- Slab Location (InGrade/OnGrade)
-    , 					!- Slab Material Name
-    , 					!- Horizontal Insulation (Yes/No)
-    , 					!- Horizontal Insulation Material Name
-    , 					!- Full Horizontal or Perimeter Only (Full/Perimeter)
-    , 					!- Perimeter insulation width (m)
-    Yes, 				!- Vertical Insulation (Yes/No)
-    Insulation, 		!- Vertical Insulation Name
-    1.5, 				!- Vertical perimeter insulation depth from surface (m)
-	4,  				! - x direction mesh parameter
-	4,  				! - y direction mesh parameter
-	4, 					! - z direction mesh parameter
-	geometric,			! - Mesh Type (Uniform/Geometric)
-	1.3,				! - Geometric coefficient
-	Hourly;				!- Domain Simulation Interval. (Timestep/Hourly/Daily)
+    5,                  !- Ground Domain Depth {m}
+    1,                  !- Aspect Ratio
+    5,                  !- Domain Perimeter Offset {m}
+    1.8,                !- Soil Thermal Conductivity {W/m-K}
+    3200,               !- Soil Density {kg/m3}
+    836,                !- Soil Specific Heat {J/kg-K}
+    30,                 !- Soil Moisture Content Volume Fraction {percent}
+    50,                 !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    15.5,               !- Kusuda-Achenbach Average Surface Temperature {C}
+    12.8,               !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+    17.3,               !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    1,                  !- Evapotranspiration Ground Cover Parameter
+    GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
+    OnGrade,            !- Slab Location (InGrade/OnGrade)
+    ,                   !- Slab Material Name
+    ,                   !- Horizontal Insulation (Yes/No)
+    ,                   !- Horizontal Insulation Material Name
+    ,                   !- Full Horizontal or Perimeter Only (Full/Perimeter)
+    ,                   !- Perimeter insulation width (m)
+    Yes,                !- Vertical Insulation (Yes/No)
+    Insulation,         !- Vertical Insulation Name
+    1.5,                !- Vertical perimeter insulation depth from surface (m)
+    4,                  ! - x direction mesh parameter
+    4,                  ! - y direction mesh parameter
+    4,                  ! - z direction mesh parameter
+    geometric,          ! - Mesh Type (Uniform/Geometric)
+    1.3,                ! - Geometric coefficient
+    Hourly;             !- Domain Simulation Interval. (Timestep/Hourly/Daily)
 
 
 !***********************************************************
@@ -556,7 +556,6 @@ ZoneHVAC:IdealLoadsAirSystem,
   0.7, !- Sensible Heat Recovery Effectiveness
   0.65; !- Latent Heat Recovery Effectiveness
 
-	
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
 Output:VariableDictionary,IDF;
