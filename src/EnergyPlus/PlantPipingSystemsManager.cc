@@ -6466,8 +6466,7 @@ namespace PlantPipingSystemsManager {
 		} else {
 			// Error
 		}}
-		ThisMesh.GeometricSeriesCoefficient = 2;
-
+		
 		if ( ThisMesh.RegionMeshCount > 0 ) {
 			RetVal.allocate( {0,ThisMesh.RegionMeshCount - 1} );
 			RetMaxIndex = ThisMesh.RegionMeshCount - 1;
