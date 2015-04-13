@@ -1124,9 +1124,14 @@ namespace WaterThermalTanks {
 		bool ShowSetPointWarning; // Warn when set point is greater than max tank temp limit
 		Real64 HPWaterHeaterSensibleCapacity; // sensible capacity delivered when HPWH is attached to a zone (W)
 		Real64 HPWaterHeaterLatentCapacity; // latent capacity delivered when HPWH is attached to a zone (kg/s)
-		int ControlSensorLocation; // if using stratified tank, indicates control point
 		Real64 WrappedCondenserBottomLocation; // Location of the bottom of the wrapped condenser.
 		Real64 WrappedCondenserTopLocation; // Location of the top of the wrapped condenser.
+		Real64 ControlSensor1Height; // location from bottom of tank of control sensor 1
+		int ControlSensor1Node; // Node number of control sensor 1
+		Real64 ControlSensor1Weight; // weight of control sensor 1
+		Real64 ControlSensor2Height; // location from bottom of tank of control sensor 2
+		int ControlSensor2Node; // Node number of control sensor 2
+		Real64 ControlSensor2Weight; // weight of control sensor 2
 		
 
 		// Default Constructor
@@ -1214,9 +1219,14 @@ namespace WaterThermalTanks {
 			ShowSetPointWarning( true ),
 			HPWaterHeaterSensibleCapacity( 0.0 ),
 			HPWaterHeaterLatentCapacity( 0.0 ),
-			ControlSensorLocation( HPWHControlNotSet ),
 			WrappedCondenserBottomLocation( 0.0 ),
-			WrappedCondenserTopLocation( 0.0 )
+			WrappedCondenserTopLocation( 0.0 ),
+			ControlSensor1Height( -1.0 ),
+			ControlSensor1Node( 1 ),
+			ControlSensor1Weight( 1.0 ),
+			ControlSensor2Height( -1.0 ),
+			ControlSensor2Node( 2 ),
+			ControlSensor2Weight( 0.0 )
 		{}
 
 		// Member Constructor
@@ -1312,9 +1322,14 @@ namespace WaterThermalTanks {
 			bool const ShowSetPointWarning, // Warn when set point is greater than max tank temp limit
 			Real64 const HPWaterHeaterSensibleCapacity, // sensible capacity delivered when HPWH is attached to a zone (W)
 			Real64 const HPWaterHeaterLatentCapacity, // latent capacity delivered when HPWH is attached to a zone (kg/s)
-			int const ControlSensorLocation, // if using stratified tank, indicates control point
 			Real64 WrappedCondenserBottomLocation,
-			Real64 WrappedCondenserTopLocation
+			Real64 WrappedCondenserTopLocation,
+			Real64 ControlSensor1Height, // location from bottom of tank of control sensor 1
+			int ControlSensor1Node,
+			Real64 ControlSensor1Weight, // weight of control sensor 1
+			Real64 ControlSensor2Height, // location from bottom of tank of control sensor 2
+			int ControlSensor2Node,
+			Real64 ControlSensor2Weight // weight of control sensor 2
 		) :
 			Name( Name ),
 			Type( Type ),
@@ -1407,9 +1422,14 @@ namespace WaterThermalTanks {
 			ShowSetPointWarning( ShowSetPointWarning ),
 			HPWaterHeaterSensibleCapacity( HPWaterHeaterSensibleCapacity ),
 			HPWaterHeaterLatentCapacity( HPWaterHeaterLatentCapacity ),
-			ControlSensorLocation( ControlSensorLocation ),
 			WrappedCondenserBottomLocation( WrappedCondenserBottomLocation ),
-			WrappedCondenserTopLocation( WrappedCondenserTopLocation )
+			WrappedCondenserTopLocation( WrappedCondenserTopLocation ),
+			ControlSensor1Height( ControlSensor1Height ),
+			ControlSensor1Node( ControlSensor1Node ),
+			ControlSensor1Weight( ControlSensor1Weight ),
+			ControlSensor2Height( ControlSensor2Height ),
+			ControlSensor2Node( ControlSensor2Node ),
+			ControlSensor2Weight( ControlSensor2Weight )
 		{}
 
 	};
@@ -1863,10 +1883,7 @@ namespace WaterThermalTanks {
 	ReportCWTankInits( int const WaterThermalTankNum );
 
 	Real64
-	FindStratifiedTankSensedTemp(
-		int const WaterThermalTankNum,
-		int const ControlLocationType
-	);
+	FindStratifiedTankSensedTemp( WaterThermalTankData const & Tank );
 
 	//     NOTICE
 

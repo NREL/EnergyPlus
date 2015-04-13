@@ -63819,16 +63819,25 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
        \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
        \note proportional to the schedule value.
-  A26; \field Control Sensor Location In Stratified Tank
+  N7,  \field Control Sensor 1 Height In Stratified Tank
        \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
-       \type choice
-       \key Heater1
-       \key Heater2
-       \key SourceInlet
-       \key SourceOutlet
-       \key UseInlet
-       \key UseOutlet
-       \default Heater1
+       \note If left blank, it will default to the height of Heater1
+       \type real
+       \units m
+       \minimum 0.0
+  N8,  \field Control Sensor 1 Weight
+       \note Weight to give Control Sensor 1 temperature
+       \note The weight of Control Sensor 2 will be 1 - (wt. of control sensor 1)
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N9;  \field Control Sensor 2 Height In Stratified Tank
+       \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
+       \note If left blank, it will default to the height of Heater2
+       \type real
+       \units m
+       \minimum 0.0
 
 WaterHeater:HeatPump:WrappedCondenser,
        \min-fields 31
@@ -64020,16 +64029,25 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
        \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
        \note proportional to the schedule value.
-  A24; \field Control Sensor Location In Stratified Tank
-       \note Used to indicate height of control sensor WaterHeater:Stratified
-       \type choice
-       \key Heater1
-       \key Heater2
-       \key SourceInlet
-       \key SourceOutlet
-       \key UseInlet
-       \key UseOutlet
-       \default Heater1
+  N8,  \field Control Sensor 1 Height In Stratified Tank
+       \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
+       \note If left blank, it will default to the height of Heater1
+       \type real
+       \units m
+       \minimum 0.0
+  N9,  \field Control Sensor 1 Weight
+       \note Weight to give Control Sensor 1 temperature
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N10; \field Control Sensor 2 Height In Stratified Tank
+       \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
+       \note If left blank, it will default to the height of Heater2
+       \note The weight of this control sensor will be 1 - (wt. of control sensor 1)
+       \type real
+       \units m
+       \minimum 0.0
 
 ThermalStorage:Ice:Simple,
       \min-fields 5

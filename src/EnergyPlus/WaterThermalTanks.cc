@@ -1861,29 +1861,27 @@ namespace WaterThermalTanks {
 
 					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, FanInletNode, FanOutletNode );
 
-					// Control Sensor Location In Stratified Tank
-					if ( ! lAlphaFieldBlanks( 26 + nAlphaOffset ) ) {
-						{ auto const SELECT_CASE_var( cAlphaArgs( 26 + nAlphaOffset ) );
-						if ( SELECT_CASE_var == "HEATER1" ) {
-							HPWH.ControlSensorLocation = Heater1HPWHControl;
-						} else if ( SELECT_CASE_var == "HEATER2" ) {
-							HPWH.ControlSensorLocation = Heater2HPWHControl;
-						} else if ( SELECT_CASE_var == "SOURCEINLET" ) {
-							HPWH.ControlSensorLocation = SourceInletHPWHControl;
-						} else if ( SELECT_CASE_var == "SOURCEOUTLET" ) {
-							HPWH.ControlSensorLocation = SourceOutletHPWHControl;
-						} else if ( SELECT_CASE_var == "USEINLET" ) {
-							HPWH.ControlSensorLocation = UseInletHPWHControl;
-						} else if ( SELECT_CASE_var == "USEOUTLET" ) {
-							HPWH.ControlSensorLocation = UseOutletHPWHControl;
-						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid " );
-							ShowContinueError( cAlphaFieldNames( 26 + nAlphaOffset ) + "=\"" + cAlphaArgs( 26 + nAlphaOffset ) + "\"." );
-							ErrorsFound = true;
-						}}
-
+					// Control Sensor 1 Location In Stratified Tank
+					if ( ! lNumericFieldBlanks( 7 + nNumericOffset ) ) {
+						HPWH.ControlSensor1Height = rNumericArgs( 7 + nNumericOffset );
+					} else {
+						// use heater1 location, which we don't know right now
+						HPWH.ControlSensor1Height = -1.0;
 					}
-
+					
+					// Control Sensor 1 Weight
+					HPWH.ControlSensor1Weight = rNumericArgs( 8 + nNumericOffset );
+					
+					// Control Sensor 2 Location In Stratified Tank
+					if ( ! lNumericFieldBlanks( 9 + nNumericOffset ) ) {
+						HPWH.ControlSensor2Height = rNumericArgs( 9 + nNumericOffset );
+					} else {
+						HPWH.ControlSensor2Height = -1.0;
+					}
+					
+					// Control Sensor 2 Weight
+					HPWH.ControlSensor2Weight = 1.0 - HPWH.ControlSensor1Weight;
+					
 				} // DO HPWaterHeaterNum = 1, NumHeatPumpWaterHeater
 
 				if ( ErrorsFound ) {
@@ -3466,6 +3464,9 @@ namespace WaterThermalTanks {
 								Tank.SourceOutletNode = GetOnlySingleNode(HPWHNodeNames.InletNodeName1, ErrorsFound, Tank.Type, Tank.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 								TankNodenames.OutletNodeName2 = HPWHNodeNames.InletNodeName1;
 							}
+							
+							// Mark the tank as not stand alone because it is connected now.
+							Tank.StandAlone = false;
 						}
 						
 						// Set HPWH structure variable StandAlone to TRUE if use nodes are not connected
@@ -3563,8 +3564,9 @@ namespace WaterThermalTanks {
 							} // ALLOCATED
 						} //InletAirConfiguration
 						
-						// Nodal heat distribution fraction for stratified tank wrapped condensers
 						if ( Tank.TypeNum == StratifiedWaterHeater ) {
+							
+							// Nodal heat distribution fraction for stratified tank wrapped condensers
 							if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 								if ( Tank.Shape == TankShapeHorizCylinder ) {
 									ShowWarningError( cCurrentModuleObject + " = " + HPWH.Name + ":" );
@@ -3602,6 +3604,66 @@ namespace WaterThermalTanks {
 										Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac /= SumFrac;
 									}
 								}
+							}
+							
+							// Stratified Tank HPWH control sensor node locations
+							if ( HPWH.ControlSensor1Height < 0.0 ) {
+								// default to heater 1
+								HPWH.ControlSensor1Height = Tank.HeaterHeight1;
+							}
+							if ( HPWH.ControlSensor2Height < 0.0 ) {
+								// default to heater 2
+								HPWH.ControlSensor2Height = Tank.HeaterHeight2;
+							}
+							
+							// Get the vertical tank height depending on the type of tank
+							Real64 TankHeight;
+							if ( Tank.Shape == TankShapeVertCylinder || Tank.Shape == TankShapeOther ) {
+								TankHeight = Tank.Height;
+							} else {
+								assert( Tank.Shape == TankShapeHorizCylinder );
+								// For horizontal cylinders, the tank "height" is actually the length.
+								// We need to calculate the height.
+								Real64 EndArea = Tank.Volume / Tank.Height;
+								Real64 Radius = std::sqrt( EndArea / DataGlobals::Pi );
+								TankHeight = 2.0 * Radius; // actual vertical height
+							}
+							
+							// Make sure the control sensor locations are in the tank
+							if ( HPWH.ControlSensor1Height < 0.0 || HPWH.ControlSensor1Height > TankHeight ) {
+								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+								ShowContinueError( "Control Sensor 1 is located outside the tank." );
+								ErrorsFound = true;
+							}
+							if ( HPWH.ControlSensor2Height < 0.0 || HPWH.ControlSensor2Height > TankHeight ) {
+								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+								ShowContinueError( "Control Sensor 2 is located outside the tank." );
+								ErrorsFound = true;
+							}
+							
+							
+							// Assign the control sensors to the appropriate nodes
+							Real64 H0 = TankHeight;
+							Real64 H;
+							for ( int NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
+								StratifiedNodeData const & TankNode = Tank.Node( NodeNum );
+								if ( NodeNum == Tank.Nodes ) {
+									H = -1.0; // Avoids rounding errors and ensures that anything at height 0.0 goes into the bottom node
+								} else {
+									H = H0 - TankNode.Height;
+								}
+								
+								// Control Sensor 1 Node
+								if ( HPWH.ControlSensor1Height <= H0 && HPWH.ControlSensor1Height > H ) {
+									HPWH.ControlSensor1Node = NodeNum;
+								}
+								
+								// Control Sensor 2 Node
+								if ( HPWH.ControlSensor2Height <= H0 && HPWH.ControlSensor2Height > H ) {
+									HPWH.ControlSensor2Node = NodeNum;
+								}
+								
+								H0 = H;
 							}
 						}
 						
@@ -7127,7 +7189,7 @@ namespace WaterThermalTanks {
 		if ( SELECT_CASE_var == MixedWaterHeater ) {
 			TankTemp = Tank.SavedTankTemp;
 		} else if ( SELECT_CASE_var == StratifiedWaterHeater ) {
-			TankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HeatPump.ControlSensorLocation );
+			TankTemp = FindStratifiedTankSensedTemp( Tank );
 		} else {
 			assert( false );
 		}}
@@ -7177,7 +7239,7 @@ namespace WaterThermalTanks {
 				NewTankTemp = Tank.TankTemp;
 			} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
 				CalcWaterThermalTankStratified( WaterThermalTankNum );
-				NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HeatPump.ControlSensorLocation );
+				NewTankTemp = FindStratifiedTankSensedTemp( Tank );
 			} else {
 				assert( false );
 			}}
@@ -7240,7 +7302,7 @@ namespace WaterThermalTanks {
 						NewTankTemp = Tank.TankTemp;
 					} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
 						CalcWaterThermalTankStratified( WaterThermalTankNum );
-						NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HeatPump.ControlSensorLocation );
+						NewTankTemp = FindStratifiedTankSensedTemp( Tank );
 					}}
 				Node( HPWaterInletNode ).Temp = Tank.SourceOutletTemp;
 				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
@@ -7506,7 +7568,8 @@ namespace WaterThermalTanks {
 		// FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
 		FirstHVACIteration = ( Par( 4 ) == 1.0 );
 		CalcWaterThermalTankStratified( WaterThermalTankNum );
-		NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).ControlSensorLocation );
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
+		NewTankTemp = FindStratifiedTankSensedTemp( Tank );
 		PLRResidualStratifiedTank = Par( 1 ) - NewTankTemp;
 		return PLRResidualStratifiedTank;
 
@@ -9550,17 +9613,14 @@ namespace WaterThermalTanks {
 	}
 
 	Real64
-	FindStratifiedTankSensedTemp(
-		int const WaterThermalTankNum,
-		int const ControlLocationType
-	)
+	FindStratifiedTankSensedTemp( WaterThermalTankData const & Tank )
 	{
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   March 2012
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Noel Merket, April 2015
 
 		// PURPOSE OF THIS FUNCTION:
 		// find tank temperature depending on how sensed
@@ -9591,24 +9651,12 @@ namespace WaterThermalTanks {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static int StratNodeToUse( 0 );
+		HeatPumpWaterHeaterData const & HPWH = HPWaterHeater( Tank.HeatPumpNum );
 
-		{ auto const SELECT_CASE_var( ControlLocationType );
-
-		if ( SELECT_CASE_var == Heater1HPWHControl ) {
-			StratNodeToUse = WaterThermalTank( WaterThermalTankNum ).HeaterNode1;
-		} else if ( SELECT_CASE_var == Heater2HPWHControl ) {
-			StratNodeToUse = WaterThermalTank( WaterThermalTankNum ).HeaterNode2;
-		} else if ( SELECT_CASE_var == SourceInletHPWHControl ) {
-			StratNodeToUse = WaterThermalTank( WaterThermalTankNum ).SourceInletStratNode;
-		} else if ( SELECT_CASE_var == SourceOutletHPWHControl ) {
-			StratNodeToUse = WaterThermalTank( WaterThermalTankNum ).SourceOutletStratNode;
-		} else if ( SELECT_CASE_var == UseInletHPWHControl ) {
-			StratNodeToUse = WaterThermalTank( WaterThermalTankNum ).UseInletStratNode;
-		} else if ( SELECT_CASE_var == UseOutletHPWHControl ) {
-			StratNodeToUse = WaterThermalTank( WaterThermalTankNum ).UseOutletStratNode;
-		}}
-
-		SensedTemp = WaterThermalTank( WaterThermalTankNum ).Node( StratNodeToUse ).Temp;
+		Real64 ControlSensor1Temp = Tank.Node( HPWH.ControlSensor1Node ).Temp;
+		Real64 ControlSensor2Temp = Tank.Node( HPWH.ControlSensor2Node ).Temp;
+		
+		SensedTemp = ControlSensor1Temp * HPWH.ControlSensor1Weight + ControlSensor2Temp * HPWH.ControlSensor2Weight;
 
 		return SensedTemp;
 
