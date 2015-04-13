@@ -3174,7 +3174,7 @@ where
 
 The sky emissivity is given by
 
-<div>\[ \epsilon = \left( 0.782 +0.764 \ln\left(\frac{T_{dewpoint}}{273}\right)\right)\left( 1 + 0.0224N + 0.0035N^2 + 0.00028N^3 \right)\]</div>
+<div>\[ \epsilon = \left( 0.787 +0.764 \ln\left(\frac{T_{dewpoint}}{273}\right)\right)\left( 1 + 0.0224N + 0.0035N^2 + 0.00028N^3 \right)\]</div>
 
 where
 
