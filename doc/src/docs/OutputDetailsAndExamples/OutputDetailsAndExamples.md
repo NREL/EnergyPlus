@@ -20,193 +20,164 @@ Following are the native file names that are output from EnergyPlus; native – 
 
 Table 1. EnergyPlus Basic Output  Files
 
-**Output File Name**
+<table class="table table-striped">
+<tr> 
+ <th>Output File Name</th>
+ <th>Description</th>
+ <th>EP-Launch File Name</th>
+</tr>
+<tr>
+ <td>eplusout.audit</td>
+ <td>Echo of input, includes both IDD echo and IDF echo – may have errors shown in context with IDD or IDF statements</td>
+ <td>&lt;filename&gt;.audit (without echoing IDD unless errors in IDD).</td>
+</tr>
+<tr>
+ <td>eplusout.bnd</td>
+ <td>This file contains details about the nodes and branches. Useful in determining if all your nodes are connected correctly. May be used to diagram the network/ nodes of the HVAC system.</td>
+ <td>&lt;filename&gt;.bnd</td>
+</tr>
+<tr>
+ <td>eplusout.dbg</td>
+ <td>From Debug Output object – may be useful to support to help track down problems</td>
+ <td>&lt;filename&gt;.dbg</td>
+</tr>
+<tr>
+ <td>eplusout.dxf</td>
+ <td>DXF (from Output:Surfaces:Drawing,DXF;)</td>
+ <td>&lt;filename&gt;.dxf</td>
+</tr>
+<tr>
+ <td>eplusout.edd</td>
+ <td>Descriptive output from the EMS portion</td>
+ <td>&lt;filename&gt;.edd</td>
+</tr>
+<tr>
+ <td>eplusout.eio</td>
+ <td>Contains several standard and optional “report” elements. CSV format – may be read directly into spreadsheet program for better formatting.</td>
+ <td>&lt;filename&gt;.eio</td>
+</tr>
+<tr>
+ <td>eplusout.end</td>
+ <td>A one line summary of success or failure (useful for Interface programs)</td>
+ <td>Not saved in the standard EPL-Run script file.</td>
+</tr>
+<tr>
+ <td>eplusout.epmidf</td>
+ <td>Output from EPMacro program – contains the idf created from the input imf file</td>
+ <td>&lt;filename&gt;.epmidf</td>
+</tr>
+<tr>
+ <td>eplusout.epmdet</td>
+ <td>Output from EPMacro program – the audit/details of the EPMacro processing</td>
+ <td>&lt;filename&gt;.epmdet</td>
+</tr>
+<tr>
+ <td>eplusout.err</td>
+ <td>Error file – contains very important information from running the program.</td>
+ <td>&lt;filename&gt;.err</td>
+</tr>
+<tr>
+ <td>eplusout.eso</td>
+ <td>Standard Output File (contains results from both Output:Variable and Output:Meter objects).</td>
+ <td>&lt;filename&gt;.eso</td>
+</tr>
+<tr>
+ <td>eplusout.log</td>
+ <td>Log of items that appear in the command file output from the run.</td>
+ <td>&lt;filename&gt;.log</td>
+</tr>
+<tr>
+ <td>eplusout.mdd</td>
+ <td>Meter names that are applicable for reporting in the current simulation.</td>
+ <td>&lt;filename&gt;.mdd</td>
+</tr>
+<tr>
+ <td>eplusout.mtd</td>
+ <td>Meter details report – what variables are on what meters and vice versa. This shows the meters on which the Zone: Lights Electric Energy appear as well as the contents of the Electricity:Facility meter.</td>
+ <td>&lt;filename&gt;.mtd</td>
+</tr>
+<tr>
+ <td>eplusout.mtr</td>
+ <td>Similar to .eso but only has Output:Meter outputs.</td>
+ <td>&lt;filename&gt;.mtr</td>
+</tr>
+<tr>
+ <td>eplusout.rdd</td>
+ <td>Variable names that are applicable for reporting in the current simulation.</td>
+ <td>&lt;filename&gt;.rdd</td>
+</tr>
+<tr>
+ <td>eplusout.shd</td>
+ <td>Surface shadowing combinations report</td>
+ <td>&lt;filename&gt;.shd</td>
+</tr>
+<tr>
+ <td>eplusout.sln</td>
+ <td>Similar to DXF output but less structured. Results of Output:Reports,Surface, Lines object.</td>
+ <td>&lt;filename&gt;.sln</td>
+</tr>
+<tr>
+ <td>eplusout.sql</td>
+ <td>Mirrors the data in the .eso and .mtr files but is in SQLite format (for viewing with SQLite tools).</td>
+ <td>&lt;filename&gt;.sql</td>
+</tr>
+<tr>
+ <td>eplusssz.&lt;ext&gt;</td>
+ <td>Results from the Sizing:System object. This file is “spreadsheet” ready. Different extensions (csv, tab, and txt) denote different “separators” in the file.</td>
+ <td>&lt;filename&gt;Ssz.&lt;ext&gt;</td>
+</tr>
+<tr>
+ <td>epluszsz.&lt;ext&gt;</td>
+ <td>Results from the Sizing:Zone object. This file is “spreadsheet” ready. Different extensions (csv, tab, and txt) denote different “separators” in the file.</td>
+ <td>&lt;filename&gt;Zsz.&lt;ext&gt;</td>
+</tr>
+<tr>
+ <td>eplusmap.&lt;ext&gt;</td>
+ <td>Daylighting intensity “map” output. Different extensions (csv, tab, and txt) denote different “separators” in the file.</td>
+ <td>&lt;filename&gt;Map.&lt;ext&gt;</td>
+</tr>
+<tr>
+ <td>eplusout.dfs</td>
+ <td>This file contains the hourly pre-calculated daylight factors for exterior windows of a daylight zone.</td>
+ <td>&lt;filename&gt;DFS.csv</td>
+</tr>
+<tr>
+ <td>eplusscreen.csv</td>
+ <td>Window screen transmittance (direct and reflected) “map” output.</td>
+ <td>&lt;filename&gt;Screen.csv</td>
+</tr>
+<tr>
+ <td>eplustbl.&lt;ext&gt;</td>
+ <td>Results of tabular and economics requests. Different extensions (csv, tab, and txt) denote different “separators” in the file.</td>
+ <td>&lt;filename&gt;Table.&lt;ext&gt;</td>
+</tr>
+<tr>
+ <td>eplusout.svg</td>
+ <td>Results from the HVAC-Diagram application. SVG is a Scalable Vector Graphics file for which several viewers can be found.</td>
+ <td>&lt;filename&gt;.svg</td>
+</tr>
+<tr>
+ <td>eplusout.sci</td>
+ <td>File of cost information</td>
+ <td>&lt;filename&gt;.sci</td>
+</tr>
+<tr>
+ <td>eplusout.delightin</td>
+ <td>File produced during DElight simulations – descriptive of EnergyPlus inputs into DElight inputs.</td>
+ <td>&lt;filename&gt;delight.in</td>
+</tr>
+<tr>
+ <td>eplusout.delightout</td>
+ <td>File produced during DElight simulations – basic results from DElight simulation.</td>
+ <td>&lt;filename&gt;delight.out</td>
+</tr>
+<tr>
+ <td>eplusout.wrl</td>
+ <td>VRML output from (Output:Reports, Surfaces, VRML)</td>
+ <td>&lt;filename&gt;.wrl</td>
+</tr>
+</table>
 
-**Description**
-
-**EP-Launch File Name**
-
-eplusout.audit
-
-Echo of input, includes both IDD echo and IDF echo – may have errors shown in context with IDD or IDF statements
-
-&lt;filename&gt;.audit (without echoing IDD unless errors in IDD).
-
-eplusout.bnd
-
-This file contains details about the nodes and branches. Useful in determining if all your nodes are connected correctly. May be used to diagram the network/ nodes of the HVAC system.
-
-&lt;filename&gt;.bnd
-
-eplusout.dbg
-
-From Debug Output object – may be useful to support to help track down problems
-
-&lt;filename&gt;.dbg
-
-eplusout.dxf
-
-DXF (from Output:Surfaces:Drawing,DXF;)
-
-&lt;filename&gt;.dxf
-
-eplusout.edd
-
-Descriptive output from the EMS portion
-
-&lt;filename&gt;.edd
-
-eplusout.eio
-
-Contains several standard and optional “report” elements. CSV format – may be read directly into spreadsheet program for better formatting.
-
-&lt;filename&gt;.eio
-
-eplusout.end
-
-A one line summary of success or failure (useful for Interface programs)
-
-Not saved in the standard EPL-Run script file.
-
-eplusout.epmidf
-
-Output from EPMacro program – contains the idf created from the input imf file
-
-&lt;filename&gt;.epmidf
-
-eplusout.epmdet
-
-Output from EPMacro program – the audit/details of the EPMacro processing
-
-&lt;filename&gt;.epmdet
-
-eplusout.err
-
-Error file – contains very important information from running the program.
-
-&lt;filename&gt;.err
-
-eplusout.eso
-
-Standard Output File (contains results from both Output:Variable and Output:Meter objects).
-
-&lt;filename&gt;.eso
-
-eplusout.log
-
-Log of items that appear in the command file output from the run.
-
-&lt;filename&gt;.log
-
-eplusout.mdd
-
-Meter names that are applicable for reporting in the current simulation.
-
-&lt;filename&gt;.mdd
-
-eplusout.mtd
-
-Meter details report – what variables are on what meters and vice versa.
-
-&lt;filename&gt;.mtd
-
-This shows the meters on which the Zone: Lights Electric Energy appear as well as the contents of the Electricity:Facility meter.
-
-eplusout.mtr
-
-Similar to .eso but only has Output:Meter outputs.
-
-&lt;filename&gt;.mtr
-
-eplusout.rdd
-
-Variable names that are applicable for reporting in the current simulation.
-
-&lt;filename&gt;.rdd
-
-eplusout.shd
-
-Surface shadowing combinations report
-
-&lt;filename&gt;.shd
-
-eplusout.sln
-
-Similar to DXF output but less structured. Results of Output:Reports,Surface, Lines object.
-
-&lt;filename&gt;.sln
-
-eplusout.sql
-
-Mirrors the data in the .eso and .mtr files but is in SQLite format (for viewing with SQLite tools).
-
-&lt;filename&gt;.sql
-
-eplusssz.&lt;ext&gt;
-
-Results from the Sizing:System object. This file is “spreadsheet” ready. Different extensions (csv, tab, and txt) denote different “separators” in the file.
-
-&lt;filename&gt;Ssz.&lt;ext&gt;
-
-epluszsz.&lt;ext&gt;
-
-Results from the Sizing:Zone object. This file is “spreadsheet” ready. Different extensions (csv, tab, and txt) denote different “separators” in the file.
-
-&lt;filename&gt;Zsz.&lt;ext&gt;
-
-eplusmap.&lt;ext&gt;
-
-Daylighting intensity “map” output. Different extensions (csv, tab, and txt) denote different “separators” in the file.
-
-&lt;filename&gt;Map.&lt;ext&gt;
-
-eplusout.dfs
-
-This file contains the hourly pre-calculated daylight factors for exterior windows of a daylight zone.
-
-&lt;filename&gt;DFS.csv
-
-eplusscreen.csv
-
-Window screen transmittance (direct and reflected) “map” output.
-
-&lt;filename&gt;Screen.csv
-
-eplustbl.&lt;ext&gt;
-
-Results of tabular and economics requests. Different extensions (csv, tab, and txt) denote different “separators” in the file.
-
-&lt;filename&gt;Table.&lt;ext&gt;
-
-eplusout.svg
-
-Results from the HVAC-Diagram application. SVG is a Scalable Vector Graphics file for which several viewers can be found.
-
-&lt;filename&gt;.svg
-
-eplusout.sci
-
-File of cost information
-
-&lt;filename&gt;.sci
-
-eplusout.delightin
-
-File produced during DElight simulations – descriptive of EnergyPlus inputs into DElight inputs.
-
-&lt;filename&gt;delight.in
-
-eplusout.delightout
-
-File produced during DElight simulations – basic results from DElight simulation.
-
-&lt;filename&gt;delight.out
-
-eplusout.wrl
-
-VRML output from (Output:Reports, Surfaces, VRML)
-
-&lt;filename&gt;.wrl
 
 
 
@@ -216,9 +187,9 @@ Table 2. "Hybrid" EnergyPlus Output Files
 
 <table class="table table-striped">
 <tr>
-<td>Output File Name</td>
-<td>Description</td>
-<td>EP-Launch File Name</td>
+<th>Output File Name</th>
+<th>Description</th>
+<th>EP-Launch File Name</th>
 </tr>
 <tr>
 <td>eplusout.&lt;ext&gt;
@@ -258,89 +229,50 @@ An excerpt of the file follows. Lines in green are notes produced from EnergyPlu
 
 In all the examples, the actual version of the EnergyPlus exe would appear. In the examples these will be shown as: &lt;version&gt;.
 
+```
   Processing Data Dictionary (Energy+.idd) File -- Start
-
-     1 !IDD\_Version &lt;version&gt;
-
-     2 ! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
-
+     1 !IDD_Version <version>
+     2 ! **************************************************************************
      3 !
-
-&lt;reduced for brevity&gt;
-
- 13000        \\key DETAILS
-
- 13001        \\key Vertices
-
- 13002        \\key DetailsWithVertices
-
+<reduced for brevity>
+ 13000        \key DETAILS
+ 13001        \key Vertices
+ 13002        \key DetailsWithVertices
   Processing Data Dictionary (Energy+.idd) File -- Complete
-
   Maximum number of Alpha Args=        4500
-
   Maximum number of Numeric Args=        1800
-
   Number of Object Definitions=         473
-
   Number of Section Definitions=           2
-
   Processing Input Data File (in.idf) -- Start
-
      1 ! Basic file description: Basic illustration of using Purchased Air as a system
-
      2 ! Run:      2 design days.
-
      3 !           2 annual run periods, 2 summer days and 3 winter days.
-
-&lt;reduced for brevity&gt;
-
+<reduced for brevity>
     63     RunPeriod,          ! 3 day winter simuluation
-
     64               1,                1,  ! Start Month ,Day
-
     65               1,                3;  ! End Month ,Day
-
-   \*\* Warning \*\* Object=RUNPERIOD, entered with less than minimum number of fields.
-
-   \*\*   ~~~   \*\* Attempting fill to minimum.
-
+   ** Warning ** Object=RUNPERIOD, entered with less than minimum number of fields.
+   **   ~~~   ** Attempting fill to minimum.
     66  MATERIAL:Regular,A1 - 1 IN STUCCO,  !- Material Name
-
-&lt;reduced for brevity&gt;
-
+<reduced for brevity>
    784 End Simulation Data;
-
   Processing Input Data File (in.idf) -- Complete
-
   Number of IDF "Lines"=         359
-
   Maximum number of Alpha IDF Args=          29
-
   Maximum number of Numeric IDF Args=          20
-
  Getting object=VERSION
-
  Getting object=TIMESTEP
-
  Getting object=SIMULATIONCONTROL
-
  Getting object=SIZING:PARAMETERS
-
  Getting object=SIZING:ZONE
-
  Getting object=SIZING:SYSTEM
-
  Getting object=SIZING:PLANT
-
-&lt;etc&gt;
-
+<etc>
 MaxRVariable=        5000
-
 MaxIVariable=         100
-
 NumEnergyMeters=         108
-
 NumVarMeterArrays=         106
+```
 
 eplusout.bnd
 ------------
@@ -591,150 +523,81 @@ Figure 2. Voloview 3D Solid view
 
 The DXF file of itself is an ASCII file, with a specific structure as specified in the standard. An excerpt of the file is shown below:
 
+```
 SECTION
-
   2
-
 ENTITIES
-
   0
-
 TEXT
-
   8
-
 1
-
   6
-
 CONTINUOUS
-
  62
-
   3
-
  10
-
       -11.00000
-
  20
-
         3.00000
-
  30
-
         0.10000
-
  40
-
  .25
-
   1
-
 True North
-
  41
-
  0.0
-
   7
-
 MONOTXT
-
 210
-
 0.0
-
 220
-
 0.0
-
 230
-
 1.0
-
   0
-
-&lt;reduced for brevity&gt;
-
-
+<reduced for brevity>
 
 3DFACE
-
   8
-
 1
-
  62
-
   3
-
  10
-
       -10.00000
-
  20
-
         3.00000
-
  30
-
         0.10000
-
  11
-
       -10.00000
-
  21
-
         3.00000
-
  31
-
         0.00000
-
  12
-
       -10.00000
-
  22
-
         0.00000
-
  32
-
         0.00000
-
  13
-
       -10.00000
-
  23
-
         0.00000
-
  33
-
         0.10000
-
   0
-
 ENDSEC
-
   0
-
 EOF
-
 999
-
 DXF created from EnergyPlus
-
 999
-
 Program Version,EnergyPlus, &lt;version&gt;
 
 eplusout.edd
-------------
+-----------
 
 This file is invoked by including an Output:EnergyManagementSystem input object. The EDD file contains three different types of information related to the Energy Management System (EMS) including: (1) listing of available actuators, (2) listing of available internal variables, and (3) a record of the execution of user’s programs for the EnergyPlus Runtime Language (Erl).
 
@@ -1233,21 +1096,20 @@ This field is intended to provide a slight help for the user to determine the ca
 
 The full calculation for Local Wind Speed is:
 
-![](OutputDetailsAndExamples/media/image003.png)
+<div>\[ \text{LocalWindSpeed} = \text{WindSpeed}_{met} \left( \frac{\text{WindBoundaryLayerThickness}_{met}}{\text{AirSensorHeight}_{met}} \right)^{\text{WindExponent}_{met}} \left(\frac{\text{HeightAboveGround}_{site/component}}{\text{WindBoundaryLayerThickness}_{site}}\right)^{\text{SiteWindExponent}}  \]</div>
 
 The Wind Speed Modifier Coefficient [Internal] simplifies the equation to:
 
-![](OutputDetailsAndExamples/media/image004.png)
+<div>\[ \text{LocalWindSpeed} = \text{WindSpeed}_{met} \left( \text{WindSpeedModifier} \right) \left(\frac{\text{HeightAboveGround}_{site/component}}{\text{WindBoundaryLayerThickness}_{site}}\right)^{\text{SiteWindExponent}}  \]</div>
 
 Where the Wind Speed Modifier encapsulates:
 
-![](OutputDetailsAndExamples/media/image005.png)
+<div>\[ \text{WindSpeedModifier} = \left( \frac{\text{WindBoundaryLayerThickness}_{met}}{\text{AirSensorHeight}_{met}} \right)^{\text{WindExponent}_{met}} \]</div>
 
 Where
 
-met = meteorological station
-
-site = location of the building
+* met = meteorological station
+* site = location of the building
 
 #### Field:Temperature Modifier Coefficient [Internal]
 
@@ -1255,19 +1117,19 @@ This field is intended to provide a slight help for the user to determine the ca
 
 The site temperature modifier coefficient (TMC) is defined as:
 
-![](OutputDetailsAndExamples/media/image006.png)
+<div>\[ TMC = frac{ \text{AtmosphericTemperatureGradient} \cdot \text{EarthRadius} \cdot \text{TemperatureSensorHeight}_{met} }
+                  { \text{EarthRadius} + \text{TemperatureSensorHeight}_{met} } \]</div>
 
 Then, the temperature at a height above ground is calculated as:
 
-![](OutputDetailsAndExamples/media/image007.png)
+<div>\[ \text{ActualTemperature} = \text{Temperature}_{met} + TMC - 
+    frac{ \text{TemperatureGradient}_{site} * \text{EarthRadius} * \text{Height}_{site/component} }
+        { \text{EarthRadius} + \text{Height}_{site/component} } \]</div>
 
 Where
 
-met = meteorological station
-
-site = location of the building
-
-
+* met = meteorological station
+* site = location of the building
 
 ### Site Atmospheric Variation
 
@@ -1349,13 +1211,13 @@ This data field will contain the constant “Snow Ground Reflectance Modifiers�
 
 This field is the value between 0.0 and 1.0 which is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values).
 
-![](OutputDetailsAndExamples/media/image008.png)
+<div>\[ \text{GroundReflectance}_{used} = \text{GroundReflectance} \cdot \text{Modifier}_{snow} \]</div>
 
 #### Field: Daylighting
 
 This field is the value between 0.0 and 1.0 which is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values).
 
-![](OutputDetailsAndExamples/media/image009.png)
+<div>\[ \text{DaylightingGroundReflectance}_{used} = \text{GroundReflectance} \cdot \text{Modifier}_{snow} \]</div>
 
 ### Snow Ground Reflectance
 
@@ -2181,7 +2043,7 @@ This field is the air changes per hour for the given infiltration rate.
 
 Actual infiltration amount is an equation based value:
 
-![](OutputDetailsAndExamples/media/image010.png)
+<div>\[ \text{Infiltration} = I_{design} F_{schedule} \left[ A + B \left| T_{zone}-T_{odb} \right| + C\left(\text{WindSpeed}\right) + D\left(\text{WindSpeed}^2\right)  \right] \]</div>
 
 This field value is the A coefficient in the above equation.
 
@@ -2269,7 +2131,7 @@ Operational when Fan Type is INTAKE or EXHAUST, this is the total fan efficiency
 
 Actual ventilation amount is an equation based value:
 
-![](OutputDetailsAndExamples/media/image011.png)
+<div>\[ \text{Ventilation} = V_{design} F_{schedule} \left[ A + B \left| T_{zone}-T_{odb} \right| + C\left(\text{WindSpeed}\right) + D\left(\text{WindSpeed}^2\right)  \right] \]</div>
 
 This field value is the A coefficient in the above equation.
 
@@ -2601,54 +2463,41 @@ A nominal thermal conductance for the surface is calculated for the surface, inc
 
 For opaque surfaces, interior and exterior film coefficients are added to the surface construction based on the prescribed R-values for interior and exterior film coefficients as found in ASHRAE 90.1-2004, Appendix A, and shown below:  The SI values are the exact values used inside EnergyPlus.
 
-
-
-***Surface Class***
-
-***Interior Film Coefficient***
-
-***Exterior Film Coefficient***
-
-
-
-***(ft<sup>2</sup>-F-hr/BTU)***
-
-***(m<sup>2</sup>-K/W)***
-
-***(ft<sup>2</sup>-F-hr/BTU)***
-
-***(m<sup>2</sup>-K/W)***
-
-WALL
-
-0.68
-
-0.1197548
-
-0.17
-
-0.0299387
-
-FLOOR
-
-0.92
-
-0.1620212
-
-0.46
-
-0.0810106
-
-CEILING/ROOF
-
-0.61
-
-0.1074271
-
-0.46
-
-0.0810106
-
+<table class="table table-striped">
+  <tr>
+    <th>Surface Class</th>
+    <th colspan="2">Interior Film Coefficient</th>
+    <th colspan="2">Exterior Film Coefficient</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td>(ft2-F-hr/BTU)</td>
+    <td>(m2-K/W)</td>
+    <td>(ft2-F-hr/BTU)</td>
+    <td>(m2-K/W)</td>
+  </tr>
+  <tr>
+    <td>WALL</td>
+    <td>0.68</td>
+    <td>0.1197548</td>
+    <td>0.17</td>
+    <td>0.0299387</td>
+  </tr>
+  <tr>
+    <td>FLOOR</td>
+    <td>0.92</td>
+    <td>0.1620212</td>
+    <td>0.46</td>
+    <td>0.0810106</td>
+  </tr>
+  <tr>
+    <td>CEILING/ROOF</td>
+    <td>0.61</td>
+    <td>0.1074271</td>
+    <td>0.46</td>
+    <td>0.0810106</td>
+  </tr>
+</table>
 
 
 NOTE:  The resulting "Nominal U with film coefs" is only for comparison purposes with the ASHRAE 90.1 requirements. Actual film coefficients are calculated during the simulation and are dependent on several factors that may change during the simulation time period.
@@ -2771,8 +2620,8 @@ This is an integer code for the type of model assigned to the outside face, if a
 
 <table class="table table-striped">
 <tr>
-<td>Code value</td>
-<td>meaning</td>
+<th>Code value</th>
+<th>meaning</th>
 </tr>
 <tr>
 <td>0</td>
@@ -2868,21 +2717,16 @@ The report describes the actions for the following equation:
 
 The coefficients listed above are used in the following equation:
 
-![](OutputDetailsAndExamples/media/image013.png)
+<div>\[ T = C_2 T_{zone} + C_3 T_{oadb} + C_4 C_5 + C_6 T_{grnd} + C_7 W_{spd} T_{oadb}
 
 where:
 
-T = Outdoor air Temperature when Combined convective/radiative film Coeff &gt; 0
-
-T = Exterior Surface Temperatre when Combined convective/radiative film Coeff &lt;= 0
-
-Tzone  = Temperature of the zone being simulated (°C)
-
-Toadb  = Dry-bulb temperature of the outdoor air (°C)
-
-Tgrnd  = Temperature of the ground (°C)
-
-Wspd  = Outdoor wind speed (m/sec)
+* T = Outdoor air Temperature when Combined convective/radiative film Coeff &gt; 0
+* T = Exterior Surface Temperatre when Combined convective/radiative film Coeff &lt;= 0
+* Tzone  = Temperature of the zone being simulated (°C)
+* Toadb  = Dry-bulb temperature of the outdoor air (°C)
+* Tgrnd  = Temperature of the ground (°C)
+* Wspd  = Outdoor wind speed (m/sec)
 
 #### Field: Name
 
@@ -5148,53 +4992,36 @@ The integrated part load value (*IPLV*) for the Chiller:Electric:EIR and Chiller
 
 Outputs are provided for lookup tables in two forms. The first being the outputs related to the creation of a performance curve. When the Interpolation Method for table objects is set to EvaluateCurveToLimits, a performance curve object is created. The coefficients of the performance curve are calculated and a curve object is written for review. The regression statistics are also included. This performance curve may be used in subsequent simulations or saved in a library file for future use.
 
-! &lt;CREATING NEW CURVE OBJECT&gt;
-
+```
+! <CREATING NEW CURVE OBJECT>
 CREATING NEW CURVE OBJECT
-
 ! Input as Table:OneIndependentVariable "HPACCOOLCAPFFF"
-
 ! RSquared       = 1.0000000000
-
 ! Standard Error = 0.0000000000
-
 ! Sample Size    = 3
-
 Curve:Quadratic,
-
-FromTable\_HPACCOOLCAPFFF,  !- Name
-
+FromTable_HPACCOOLCAPFFF,  !- Name
   0.8000000000,  !- Coefficient1 Constant
-
   0.2000000000,  !- Coefficient2 x
-
-  -3.1086244690E-015,  !- Coefficient3 x\*\*2
-
+  -3.1086244690E-015,  !- Coefficient3 x**2
   0.0000000000,  !- Minimum Value of x
-
   1.5000000000,  !- Maximum Value of x
-
   0.8000000000,  !- Minimum Curve Output
-
   1.5000000000;  !- Maximum Curve Output
-
 END CREATING NEW CURVE OBJECT
+``
 
 A second output form is provided to echo the reading of tabular data. The tabular data is echoed for each multi-variable lookup table object (ref. Table:MultiVariableLookup). The data is echoed using an increasing order sort format regardless of the format specified by the user. In addition, the tabular data is echoed when the data is included in the table object, or when read from an external file. This output form is provided as a verification step when reading tabular data. The normalization point is not included in the raw data varification.
 
-! &lt;READING LOOKUP TABLE DATA&gt;
-
+```
+! <READING LOOKUP TABLE DATA&>
 READING LOOKUP TABLE DATA
-
 ! Reading tabular data for Table:MultiVariableLookup "HPACCOOLCAPFFF2"
-
   1   3
-
   0.000000000000000E+000   1.00000000000000        1.50000000000000
-
   0.800000000000000        1.00000000000000        1.10000000000000
-
 END READING LOOKUP TABLE DATA
+```
 
 ### Warmup Days Line
 
@@ -5362,8 +5189,8 @@ Table 3. EnergyPlus Errors
 
 <table class="table table-striped">
 <tr>
-<td>Error Level</td>
-<td>Action</td>
+<th>Error Level</th>
+<th>Action</th>
 </tr>
 <tr>
 <td>Warning</td>
@@ -5645,103 +5472,56 @@ eplusout.log
 
 When EnergyPlus is running, it is usually running from a “command” window (unless inside another interface program) and some items may appear in the command window. These messages are preserved in the “log” output file. For example:
 
+```
  EnergyPlus Starting
-
- EnergyPlus, Version &lt;version&gt;
-
+ EnergyPlus, Version <version>
  Processing Data Dictionary
-
  Processing Input File
-
  Warming up
-
  Initializing Response Factors
-
- Calculating CTFs for "ROOF-1", Construction \#1
-
- Calculating CTFs for "WALL-1", Construction \#2
-
- Calculating CTFs for "FLOOR-SLAB-1", Construction \#6
-
- Calculating CTFs for "INT-WALL-1", Construction \#7
-
+ Calculating CTFs for "ROOF-1", Construction #1
+ Calculating CTFs for "WALL-1", Construction #2
+ Calculating CTFs for "FLOOR-SLAB-1", Construction #6
+ Calculating CTFs for "INT-WALL-1", Construction #7
  Initializing Window Optical Properties
-
  Initializing Solar Calculations
-
  Initializing HVAC
-
  Warming up
-
  Warming up
-
  Performing Zone Sizing Simulation
-
  Warming up
-
  Warming up
-
  Performing Zone Sizing Simulation
-
  Calculating System sizing
-
  Calculating System sizing
-
-
-
  Initializing New Environment Parameters
-
  Warming up {1}
-
  Warming up {2}
-
  Warming up {3}
-
- Starting Simulation at 01/01 for CHICAGO IL USA TMY2-94846 WMO\#=725300
-
+ Starting Simulation at 01/01 for CHICAGO IL USA TMY2-94846 WMO#=725300
  Updating Shadowing Calculations, Start Date=01/21
-
- Continuing Simulation at 01/21 for CHICAGO IL USA TMY2-94846 WMO\#=725300
-
+ Continuing Simulation at 01/21 for CHICAGO IL USA TMY2-94846 WMO#=725300
  Updating Shadowing Calculations, Start Date=02/10
-
- Continuing Simulation at 02/10 for CHICAGO IL USA TMY2-94846 WMO\#=725300
-
+ Continuing Simulation at 02/10 for CHICAGO IL USA TMY2-94846 WMO#=725300
  Updating Shadowing Calculations, Start Date=03/02
-
- Continuing Simulation at 03/02 for CHICAGO IL USA TMY2-94846 WMO\#=725300
-
+ Continuing Simulation at 03/02 for CHICAGO IL USA TMY2-94846 WMO#=725300
  Updating Shadowing Calculations, Start Date=03/22
-
- Continuing Simulation at 03/22 for CHICAGO IL USA TMY2-94846 WMO\#=725300
-
-&lt;reduced&gt;
-
+ Continuing Simulation at 03/22 for CHICAGO IL USA TMY2-94846 WMO#=725300
+<reduced>
 Updating Shadowing Calculations, Start Date=12/07
-
- Continuing Simulation at 12/07 for CHICAGO IL USA TMY2-94846 WMO\#=725300
-
+ Continuing Simulation at 12/07 for CHICAGO IL USA TMY2-94846 WMO#=725300
  Updating Shadowing Calculations, Start Date=12/27
-
- Continuing Simulation at 12/27 for CHICAGO IL USA TMY2-94846 WMO\#=725300
-
+ Continuing Simulation at 12/27 for CHICAGO IL USA TMY2-94846 WMO#=725300
  EnergyPlus Run Time=00hr 00min 46.00sec
-
 ReadVarsESO program starting.
-
 ReadVars Run Time=00hr 00min  1.11sec
-
 ReadVarsESO program completed successfully.
-
 ReadVarsESO program starting.
-
 ReadVars Run Time=00hr 00min  0.00sec
-
 ReadVarsESO program completed successfully.
-
   Started HVAC Diagram
-
   Complete
+```
 
 eplusout.mtd
 ------------
@@ -6279,44 +6059,34 @@ Current resource types are shown in the table below:
 
 Table 4. Table of Metered Resource  Types
 
-**Utility/Fuel Types**
-
-Electricity
-
-Gas
-
-Gasoline
-
-Diesel
-
-Coal
-
-FuelOil\#1
-
-FuelOil\#2
-
-Propane
-
-Water
-
-Steam
-
-DistrictCooling
-
-DistrictHeating
-
-
+<table class="table table-striped">
+<tr>
+ <th>Utility/Fuel Types</th>
+</tr>
+<tr>
+ <td>Electricity</td>
+ <td>Gas</td>
+ <td>Gasoline</td>
+ <td>Diesel</td>
+ <td>Coal</td>
+ <td>FuelOil\#1</td>
+ <td>FuelOil\#2</td>
+ <td>Propane</td>
+ <td>Water</td>
+ <td>Steam</td>
+ <td>DistrictCooling</td>
+ <td>DistrictHeating</td>
+</tr>
+</table>
 
 <table class="table table-striped">
 <tr>
-<td>Other Resource Types</td>
+<th>Other Resource Types</th>
 </tr>
 <tr>
 <td>EnergyTransfer</td>
 </tr>
 </table>
-
-
 
 The end use types are shown in the following table (note that certain end use types apply only to the EnergyTransfer resource):
 
@@ -6324,59 +6094,43 @@ The end use types are shown in the following table:
 
 Table 5. End Use Category Types
 
-**End Use Types**
+<table class="table table-striped">
+ <tr>
+  <th>End Use Types</th>
+ </tr>
+ <tr>
+  <td>InteriorLights</td>
+  <td>ExteriorLights</td>
+  <td>InteriorEquipment</td>
+  <td>ExteriorEquipment</td>
+  <td>Fans</td>
+  <td>Pumps</td>
+  <td>Heating</td>
+  <td>Cooling</td>
+  <td>HeatRejection</td>
+  <td>Humidifier</td>
+  <td>HeatRecovery</td>
+  <td>DHW</td>
+  <td>Cogeneration</td>
+  <td>Refrigeration</td>
+  <td>Miscellaneous</td>
+ </tr>
+</table>
 
-InteriorLights
-
-ExteriorLights
-
-InteriorEquipment
-
-ExteriorEquipment
-
-Fans
-
-Pumps
-
-Heating
-
-Cooling
-
-HeatRejection
-
-Humidifier
-
-HeatRecovery
-
-DHW
-
-Cogeneration
-
-Refrigeration
-
-Miscellaneous
-
-
-
-
-
-**Additional End Use Types Only Used for EnergyTransfer**
-
-HeatingCoils
-
-CoolingCoils
-
-Chillers
-
-Boilers
-
-Baseboard
-
-HeatRecoveryForCooling
-
-HeatReoveryFor Heating
-
-
+<table class="table table-striped">
+ <tr>
+  <th>Additional End Use Types Only Used for EnergyTransfer</th>
+ </tr>
+ <tr>
+  <td>HeatingCoils</td>
+  <td>CoolingCoils</td>
+  <td>Chillers</td>
+  <td>Boilers</td>
+  <td>Baseboard</td>
+  <td>HeatRecoveryForCooling</td>
+  <td>HeatReoveryFor Heating</td>
+ </tr>
+</table>
 
 Specific meter types are then used for grouping the fuel type meters:
 
@@ -6384,7 +6138,7 @@ Table 6. Overall Meter Types
 
 <table class="table table-striped">
 <tr>
-<td>Meters</td>
+<th>Meters</th>
 </tr>
 <tr>
 <td>Facility</td>
@@ -6407,35 +6161,27 @@ Facility meters contain all the energy of a fuel type. Building meters contain t
 
 Thus, the following relationships should be observed:
 
-![](OutputDetailsAndExamples/media/image015.png)
+<div>\[ \text{Facility} = \sum\left(\text{Building} + \text{System} + \text{Plant} + \text{Exterior}\right) \]</div>
 
-![](OutputDetailsAndExamples/media/image016.png)
+<div>\[ \text{Building} = \sum_{i}^{\#Zones} \text{Zone} \]</div>
 
 Custom Meters, (review Input Output Reference, objects: **Meter:Custom** and **Meter:CustomDecrement**) for further requirements, are reported in the same way as pre-defined meters.
 
 For example, one might put the Building Infiltration Heat Loss & Heat Gain on a set of custom meters:
 
+```
   Meter:Custom,
-
     Building Infiltration Heat Loss,  !- Name
-
     Generic,             !- Fuel Type
-
-    \*,                       !- Key Name 1
-
+    *,                       !- Key Name 1
     Zone Infiltration Total Heat Loss Energy;  !- Output Variable Name 1
 
-
-
   Meter:Custom,
-
     Building Infiltration Heat Gain,  !- Name
-
     Generic,             !- Fuel Type
-
-    \*,                       !- Key Name 1
-
+    *,                       !- Key Name 1
     Zone Infiltration Total Heat Gain Energy;  !- Output Variable Name 1
+```
 
 One can then report these values the same way one reports other standard meters.
 
@@ -8779,7 +8525,7 @@ The sqlite3 program comes standard on MacOS X 10.5. From the command line, type 
 Once it has been confirmed that SQLite3 is installed on your machine, the SQL database can be accessed by typing:
 
 ```
-sqlite3 &lt;database name&gt;
+sqlite3 <database name>
 ```
 
 at the command line, where &lt;database name &gt; is the name of the SQL database (e.g., sqlite3 eplusout.sql).
@@ -8907,7 +8653,7 @@ epluszsz.&lt;ext&gt;
 
 This file is a result of the zone sizing calculation. Zone Sizing (see Sizing:Zone object) performs a special calculation, using a theoretical ideal zonal system, and determines the zone design heating and cooling flow rates and loads, saving the results in the zone sizing arrays. The file has a similar format to the eplusssz.&lt;ext&gt; file.
 
-An excerpt:
+An excerpt (this is a direct copy of the CSV data, so you can copy it to a spreadsheet to view it easier):
 
 Time,SPACE1-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE1-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE1-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE1-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s],SPACE2-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE2-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE2-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE2-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s],SPACE3-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE3-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE3-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE3-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s],SPACE4-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE4-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE4-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE4-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s],SPACE5-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE5-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE5-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE5-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s]
 
@@ -9012,27 +8758,18 @@ eplusmap.&lt;ext&gt;
 
 The eplusmap.csv (or txt or tab extension) is a file that is generated by the Output:IlluminanceMap object. These are calculated for the Daylighting:Controls daylighting option. By default, this is a comma delimited text file (csv) that can be imported into a spreadsheet program. For example, the input for the Output:IlluminanceMap object shown below:
 
-**Output:IlluminanceMap**,
-
+```
+Output:IlluminanceMap,
     Daylit Map,              !- Map Name
-
     Daylit Zone,             !- Zone Name
-
     0.8,                     !- Z height {m}
-
     0.1,                     !- X minimum coordinate {m}
-
     4.9,                     !- X maximum coordinate {m}
-
     10,                      !- Number of X grid points
-
     0.1,                     !- Y minimum coordinate {m}
-
     9.9,                     !- Y maximum coordinate {m}
-
     10;                      !- Number of Y grid points
-
-
+```
 
 generates the following output in csv format when viewed with Microsoft Excel.  **Note that if the point is outside the zone a “\*” will be shown.**
 
@@ -9127,10 +8864,10 @@ The first line describes the data in the eplusout.dfs file. The second line desc
 
 <table class="table table-striped">
 <tr>
-<td>Month and Day</td>
-<td>Zone Name</td>
-<td>Window Name</td>
-<td>Window State</td>
+<th>Month and Day</th>
+<th>Zone Name</th>
+<th>Window Name</th>
+<th>Window State</th>
 </tr>
 <tr>
 <td>01/21</td>
@@ -9148,15 +8885,15 @@ The third line describes the hourly daylight factors. Note that the last 4 colum
 
 <table class="table table-striped">
 <tr>
-<td>Hour</td>
-<td>Daylight factor for clear sky at reference point 1</td>
-<td>Daylight factor for clear turbid sky at reference point 1</td>
-<td>Daylight factor for intermediate sky at reference point 1</td>
-<td>Daylight factor for overcast sky at reference point 1</td>
-<td>Daylight factor for clear sky at reference point 2</td>
-<td>Daylight factor for clear turbid sky at reference point 2</td>
-<td>Daylight factor for intermediate sky at reference point 2</td>
-<td>Daylight factor for overcast sky at reference point 2</td>
+<th>Hour</th>
+<th>Daylight factor for clear sky at reference point 1</th>
+<th>Daylight factor for clear turbid sky at reference point 1</th>
+<th>Daylight factor for intermediate sky at reference point 1</th>
+<th>Daylight factor for overcast sky at reference point 1</th>
+<th>Daylight factor for clear sky at reference point 2</th>
+<th>Daylight factor for clear turbid sky at reference point 2</th>
+<th>Daylight factor for intermediate sky at reference point 2</th>
+<th>Daylight factor for overcast sky at reference point 2</th>
 </tr>
 <tr>
 <td>10</td>
@@ -9412,10 +9149,10 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Total Energy (GJ)</td>
-<td>Energy Per Total Building Area (MJ/m2)</td>
-<td>Energy Per Conditioned Building Area (MJ/m2)</td>
+<th> </th>
+<th>Total Energy (GJ)</th>
+<th>Energy Per Total Building Area (MJ/m2)</th>
+<th>Energy Per Conditioned Building Area (MJ/m2)</th>
 </tr>
 <tr>
 <td>Total Site Energy</td>
@@ -9451,8 +9188,8 @@ Source to Site Energy Converstion Factors
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Source=&gt;Site Conversion Factor</td>
+<th> </th>
+<th>Source=&gt;Site Conversion Factor</th>
 </tr>
 <tr>
 <td>Electricity</td>
@@ -9508,8 +9245,8 @@ Building Area
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Area (m2)</td>
+<th> </th>
+<th>Area (m2)</th>
 </tr>
 <tr>
 <td>Total Building Area</td>
@@ -9533,13 +9270,13 @@ End Uses
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity (GJ)</td>
-<td>Natural Gas (GJ)</td>
-<td>Other Fuel (GJ)</td>
-<td>District Cooling (GJ)</td>
-<td>District Heating (GJ)</td>
-<td>Water (m3)</td>
+<th> </th>
+<th>Electricity (GJ)</th>
+<th>Natural Gas (GJ)</th>
+<th>Other Fuel (GJ)</th>
+<th>District Cooling (GJ)</th>
+<th>District Heating (GJ)</th>
+<th>Water (m3)</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -9695,14 +9432,14 @@ End Uses By Subcategory
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Subcategory</td>
-<td>Electricity (GJ)</td>
-<td>Natural Gas (GJ)</td>
-<td>Other Fuel (GJ)</td>
-<td>District Cooling (GJ)</td>
-<td>District Heating (GJ)</td>
-<td>Water (m3)</td>
+<th> </th>
+<th>Subcategory</th>
+<th>Electricity (GJ)</th>
+<th>Natural Gas (GJ)</th>
+<th>Other Fuel (GJ)</th>
+<th>District Cooling (GJ)</th>
+<th>District Heating (GJ)</th>
+<th>Water (m3)</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -9858,13 +9595,13 @@ Utility Use Per Conditioned Floor Area
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity Intensity (MJ/m2)</td>
-<td>Natural Gas Intensity (MJ/m2)</td>
-<td>Other Fuel Intensity (MJ/m2)</td>
-<td>District Cooling Intensity (MJ/m2)</td>
-<td>District Heating Intensity (MJ/m2)</td>
-<td>Water Intensity (m3/m2)</td>
+<th> </th>
+<th>Electricity Intensity (MJ/m2)</th>
+<th>Natural Gas Intensity (MJ/m2)</th>
+<th>Other Fuel Intensity (MJ/m2)</th>
+<th>District Cooling Intensity (MJ/m2)</th>
+<th>District Heating Intensity (MJ/m2)</th>
+<th>Water Intensity (m3/m2)</th>
 </tr>
 <tr>
 <td>Lighting</td>
@@ -9912,13 +9649,13 @@ Utility Use Per Total Floor Area
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity Intensity (MJ/m2)</td>
-<td>Natural Gas Intensity (MJ/m2)</td>
-<td>Other Fuel Intensity (MJ/m2)</td>
-<td>District Cooling Intensity (MJ/m2)</td>
-<td>District Heating Intensity (MJ/m2)</td>
-<td>Water Intensity (m3/m2)</td>
+<th> </th>
+<th>Electricity Intensity (MJ/m2)</th>
+<th>Natural Gas Intensity (MJ/m2)</th>
+<th>Other Fuel Intensity (MJ/m2)</th>
+<th>District Cooling Intensity (MJ/m2)</th>
+<th>District Heating Intensity (MJ/m2)</th>
+<th>Water Intensity (m3/m2)</th>
 </tr>
 <tr>
 <td>Lighting</td>
@@ -9966,9 +9703,9 @@ Electric Loads Satisfied
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity (GJ)</td>
-<td>Percent Electricity (%)</td>
+<th> </th>
+<th>Electricity (GJ)</th>
+<th>Percent Electricity (%)</th>
 </tr>
 <tr>
 <td>Fuel-Fired Power Generation</td>
@@ -10043,9 +9780,9 @@ Electric Loads Satisfied
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Heat (GJ)</td>
-<td>Percent Heat (%)</td>
+<th> </th>
+<th>Heat (GJ)</th>
+<th>Percent Heat (%)</th>
 </tr>
 <tr>
 <td>Water-Side Heat Recovery</td>
@@ -10092,9 +9829,9 @@ Water Source Summary
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Water (m3)</td>
-<td>Percent Water (%)</td>
+<th> </th>
+<th>Water (m3)</th>
+<th>Percent Water (%)</th>
 </tr>
 <tr>
 <td>Rainwater Collection</td>
@@ -10171,8 +9908,8 @@ Comfort and Setpoint Not Met Summary
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Facility (Hours)</td>
+<th> </th>
+<th>Facility (Hours)</th>
 </tr>
 <tr>
 <td>Time Set Point Not Met During Occupied Heating</td>
@@ -10208,8 +9945,8 @@ General
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Value</td>
+<th> </th>
+<th>Value</th>
 </tr>
 <tr>
 <td>Program Version and Build</td>
@@ -10257,12 +9994,12 @@ Window-Wall Ratio
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Total</td>
-<td>North (315 to 45 deg)</td>
-<td>East (45 to 135 deg)</td>
-<td>South (135 to 225 deg)</td>
-<td>West (225 to 315 deg)</td>
+<th> </th>
+<th>Total</th>
+<th>North (315 to 45 deg)</th>
+<th>East (45 to 135 deg)</th>
+<th>South (135 to 225 deg)</th>
+<th>West (225 to 315 deg)</th>
 </tr>
 <tr>
 <td>Gross Wall Area (m2)</td>
@@ -10298,8 +10035,8 @@ Skylight-Roof Ratio
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Total</td>
+<th> </th>
+<th>Total</th>
 </tr>
 <tr>
 <td>Gross Roof Area (m2)</td>
@@ -10327,16 +10064,16 @@ Zone Summary
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Area (m2)</td>
-<td>Conditioned (Y/N)</td>
-<td>Volume (m3)</td>
-<td>Multipliers</td>
-<td>Gross Wall Area (m2)</td>
-<td>Window Glass Area (m2)</td>
-<td>Lighting (W/m2)</td>
-<td>People (m2/person)</td>
-<td>Plug and Process(W/m2)</td>
+<th> </th>
+<th>Area (m2)</th>
+<th>Conditioned (Y/N)</th>
+<th>Volume (m3)</th>
+<th>Multipliers</th>
+<th>Gross Wall Area (m2)</th>
+<th>Window Glass Area (m2)</th>
+<th>Lighting (W/m2)</th>
+<th>People (m2/person)</th>
+<th>Plug and Process(W/m2)</th>
 </tr>
 <tr>
 <td>PLENUM-1</td>
@@ -10464,13 +10201,13 @@ End Uses
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Electricity (W)</td>
-<td>Natural Gas (W)</td>
-<td>Propane (W)</td>
-<td>District Cooling (W)</td>
-<td>Steam (W)</td>
-<td>Water (m3/s)</td>
+<th> </th>
+<th>Electricity (W)</th>
+<th>Natural Gas (W)</th>
+<th>Propane (W)</th>
+<th>District Cooling (W)</th>
+<th>Steam (W)</th>
+<th>Water (m3/s)</th>
 </tr>
 <tr>
 <td>Time of Peak</td>
@@ -10635,14 +10372,14 @@ End Uses By Subcategory
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Subcategory</td>
-<td>Electricity (W)</td>
-<td>Natural Gas (W)</td>
-<td>Propane (W)</td>
-<td>District Cooling (W)</td>
-<td>Steam (W)</td>
-<td>Water (m3/s)</td>
+<th> </th>
+<th>Subcategory</th>
+<th>Electricity (W)</th>
+<th>Natural Gas (W)</th>
+<th>Propane (W)</th>
+<th>District Cooling (W)</th>
+<th>Steam (W)</th>
+<th>Water (m3/s)</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -10804,12 +10541,12 @@ Timestamp: **2011-10-07 20:53:43**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Source Electricity [GJ]</td>
-<td>Source Natural Gas [GJ]</td>
-<td>Source Other Fuel [GJ]</td>
-<td>Source District Cooling [GJ]</td>
-<td>Source District Heating [GJ]</td>
+<th></th>
+<th>Source Electricity [GJ]</th>
+<th>Source Natural Gas [GJ]</th>
+<th>Source Other Fuel [GJ]</th>
+<th>Source District Cooling [GJ]</th>
+<th>Source District Heating [GJ]</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -10948,12 +10685,12 @@ Timestamp: **2011-10-07 20:53:43**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Source Electricity [MJ/m2]</td>
-<td>Source Natural Gas [MJ/m2]</td>
-<td>Source Other Fuel [MJ/m2]</td>
-<td>Source District Cooling [MJ/m2]</td>
-<td>Source District Heating [MJ/m2]</td>
+<th></th>
+<th>Source Electricity [MJ/m2]</th>
+<th>Source Natural Gas [MJ/m2]</th>
+<th>Source Other Fuel [MJ/m2]</th>
+<th>Source District Cooling [MJ/m2]</th>
+<th>Source District Heating [MJ/m2]</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -11090,12 +10827,12 @@ Timestamp: **2011-10-07 20:53:43**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Source Electricity [MJ/m2]</td>
-<td>Source Natural Gas [MJ/m2]</td>
-<td>Source Other Fuel [MJ/m2]</td>
-<td>Source District Cooling [MJ/m2]</td>
-<td>Source District Heating [MJ/m2]</td>
+<th></th>
+<th>Source Electricity [MJ/m2]</th>
+<th>Source Natural Gas [MJ/m2]</th>
+<th>Source Other Fuel [MJ/m2]</th>
+<th>Source District Cooling [MJ/m2]</th>
+<th>Source District Heating [MJ/m2]</th>
 </tr>
 <tr>
 <td>Heating</td>
@@ -11246,9 +10983,9 @@ Central Plant
 <table class="table table-striped">
 <tr>
 <td> </td>
-<td>Type</td>
-<td>Nominal Capacity (W)</td>
-<td>Nominal Efficiency (W/W)</td>
+<th>Type</th>
+<th>Nominal Capacity (W)</th>
+<th>Nominal Efficiency (W/W)</th>
 </tr>
 <tr>
 <td>None</td>
@@ -11264,13 +11001,13 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Nominal Total Capacity (W)</td>
-<td>Nominal Sensible Capacity (W)</td>
-<td>Nominal Latent Capacity (W)</td>
-<td>Nominal Sensible Heat Ratio</td>
-<td>Nominal Efficiency (W/W)</td>
+<th> </th>
+<th>Type</th>
+<th>Nominal Total Capacity (W)</th>
+<th>Nominal Sensible Capacity (W)</th>
+<th>Nominal Latent Capacity (W)</th>
+<th>Nominal Sensible Heat Ratio</th>
+<th>Nominal Efficiency (W/W)</th>
 </tr>
 <tr>
 <td>MAIN COOLING COIL 1</td>
@@ -11289,10 +11026,10 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Nominal Total Capacity (W)</td>
-<td>Nominal Efficiency (W/W)</td>
+<th> </th>
+<th>Type</th>
+<th>Nominal Total Capacity (W)</th>
+<th>Nominal Efficiency (W/W)</th>
 </tr>
 <tr>
 <td>SPACE1-1 ZONE COIL</td>
@@ -11338,14 +11075,14 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Total Efficiency (W/W)</td>
-<td>Delta Pressure (pa)</td>
-<td>Max Flow Rate (m3/s)</td>
-<td>Rated Power (W)</td>
-<td>Motor Heat In Air Fraction</td>
-<td>End Use</td>
+<th> </th>
+<th>Type</th>
+<th>Total Efficiency (W/W)</th>
+<th>Delta Pressure (pa)</th>
+<th>Max Flow Rate (m3/s)</th>
+<th>Rated Power (W)</th>
+<th>Motor Heat In Air Fraction</th>
+<th>End Use</th>
 </tr>
 <tr>
 <td>SUPPLY FAN 1</td>
@@ -11365,12 +11102,12 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Control</td>
-<td>Head (pa)</td>
-<td>Power (W)</td>
-<td>Motor Efficiency (W/W)</td>
+<th> </th>
+<th>Type</th>
+<th>Control</th>
+<th>Head (pa)</th>
+<th>Power (W)</th>
+<th>Motor Efficiency (W/W)</th>
 </tr>
 <tr>
 <td>None</td>
@@ -11388,13 +11125,13 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Type</td>
-<td>Storage Volume (m3)</td>
-<td>Input(W)</td>
-<td>Thermal Efficiency (W/W)</td>
-<td>Recovery Efficiency (W/W)</td>
-<td>Energy Factor</td>
+<th> </th>
+<th>Type</th>
+<th>Storage Volume (m3)</th>
+<th>Input(W)</th>
+<th>Thermal Efficiency (W/W)</th>
+<th>Recovery Efficiency (W/W)</th>
+<th>Energy Factor</th>
 </tr>
 <tr>
 <td>None</td>
@@ -11423,15 +11160,15 @@ Opaque Exterior
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Construction</td>
-<td>Reflectance</td>
-<td>U-Factor with Film (W/m2-K)</td>
-<td>U-Factor no Film (W/m2-K)</td>
-<td>Gross Area (m2)</td>
-<td>Azimuth (deg)</td>
-<td>Tilt (deg)</td>
-<td>Cardinal Direction</td>
+<th> </th>
+<th>Construction</th>
+<th>Reflectance</th>
+<th>U-Factor with Film (W/m2-K)</th>
+<th>U-Factor no Film (W/m2-K)</th>
+<th>Gross Area (m2)</th>
+<th>Azimuth (deg)</th>
+<th>Tilt (deg)</th>
+<th>Cardinal Direction</th>
 </tr>
 <tr>
 <td>WALL-1PF</td>
@@ -11595,17 +11332,17 @@ Opaque Exterior
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Construction</td>
-<td>Area of One Opening (m2)</td>
-<td>Area of Openings (m2)</td>
-<td>U-Factor</td>
-<td>SHGC</td>
-<td>Visible Transmittance</td>
-<td>Shade Control</td>
-<td>Parent Surface</td>
-<td>Azimuth (deg)</td>
-<td>Cardinal Direction</td>
+<th> </th>
+<th>Construction</th>
+<th>Area of One Opening (m2)</th>
+<th>Area of Openings (m2)</th>
+<th>U-Factor</th>
+<th>SHGC</th>
+<th>Visible Transmittance</th>
+<th>Shade Control</th>
+<th>Parent Surface</th>
+<th>Azimuth (deg)</th>
+<th>Cardinal Direction</th>
 </tr>
 <tr>
 <td>WF-1</td>
@@ -11740,8 +11477,8 @@ Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Possible Shadow Casters</td>
+<th> </th>
+<th>Possible Shadow Casters</th>
 </tr>
 <tr>
 <td>FRONT-1</td>
@@ -11767,8 +11504,8 @@ Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Possible Shadow Casters</td>
+<th> </th>
+<th>Possible Shadow Casters</th>
 </tr>
 <tr>
 <td>WF-1</td>
@@ -11810,16 +11547,16 @@ Sunlit Fraction
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>March 21 9am</td>
-<td>March 21 noon</td>
-<td>March 21 3pm</td>
-<td>June 21 9am</td>
-<td>June 21 noon</td>
-<td>June 21 3pm</td>
-<td>December 21 9am</td>
-<td>December 21 noon</td>
-<td>December 21 3pm</td>
+<th> </th>
+<th>March 21 9am</th>
+<th>March 21 noon</th>
+<th>March 21 3pm</th>
+<th>June 21 9am</th>
+<th>June 21 noon</th>
+<th>June 21 3pm</th>
+<th>December 21 9am</th>
+<th>December 21 noon</th>
+<th>December 21 3pm</th>
 </tr>
 <tr>
 <td>WF-1</td>
@@ -11901,12 +11638,12 @@ Sunlit Fraction
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Name</td>
-<td>Type</td>
-<td>Shaded Construction</td>
-<td>Control</td>
-<td>Glare Control</td>
+<th> </th>
+<th>Name</th>
+<th>Type</th>
+<th>Shaded Construction</th>
+<th>Control</th>
+<th>Glare Control</th>
 </tr>
 <tr>
 <td>none</td>
@@ -11938,19 +11675,19 @@ Interior Lighting
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Zone</td>
-<td>Lighting Power Density [W/m2]</td>
-<td>Zone Area [m2]</td>
-<td>Total Power [W]</td>
-<td>End Use Subcategory</td>
-<td>Schedule Name</td>
-<td>Scheduled Hours/Week [hr]</td>
-<td>Hours/Week &gt; 1% [hr]</td>
-<td>Full Load Hours/Week [hr]</td>
-<td>Return Air Fraction</td>
-<td>Conditioned (Y/N)</td>
-<td>Consumption [GJ]</td>
+<th></th>
+<th>Zone</th>
+<th>Lighting Power Density [W/m2]</th>
+<th>Zone Area [m2]</th>
+<th>Total Power [W]</th>
+<th>End Use Subcategory</th>
+<th>Schedule Name</th>
+<th>Scheduled Hours/Week [hr]</th>
+<th>Hours/Week &gt; 1% [hr]</th>
+<th>Full Load Hours/Week [hr]</th>
+<th>Return Air Fraction</th>
+<th>Conditioned (Y/N)</th>
+<th>Consumption [GJ]</th>
 </tr>
 <tr>
 <td>SPACE1-1 LIGHTS 1</td>
@@ -12050,13 +11787,13 @@ Interior Lighting
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Zone</td>
-<td>Daylighting Type</td>
-<td>Control Type</td>
-<td>Fraction Controlled</td>
-<td>Lighting Installed in Zone [W]</td>
-<td>Lighting Controlled [W]</td>
+<th></th>
+<th>Zone</th>
+<th>Daylighting Type</th>
+<th>Control Type</th>
+<th>Fraction Controlled</th>
+<th>Lighting Installed in Zone [W]</th>
+<th>Lighting Controlled [W]</th>
 </tr>
 <tr>
 <td>None</td>
@@ -12075,14 +11812,14 @@ Interior Lighting
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Total Watts</td>
-<td>Astronomical Clock/Schedule</td>
-<td>Schedule Name</td>
-<td>Scheduled Hours/Week [hr]</td>
-<td>Hours/Week &gt; 1% [hr]</td>
-<td>Full Load Hours/Week [hr]</td>
-<td>Consumption [GJ]</td>
+<th></th>
+<th>Total Watts</th>
+<th>Astronomical Clock/Schedule</th>
+<th>Schedule Name</th>
+<th>Scheduled Hours/Week [hr]</th>
+<th>Hours/Week &gt; 1% [hr]</th>
+<th>Full Load Hours/Week [hr]</th>
+<th>Consumption [GJ]</th>
 </tr>
 <tr>
 <td>Exterior Lighting Total</td>
@@ -12109,15 +11846,15 @@ Report: **HVAC Sizing Summary**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Calculated Design Load [W]</td>
-<td>User Design Load [W]</td>
-<td>Calculated Design Air Flow [m3/s]</td>
-<td>User Design Air Flow [m3/s]</td>
-<td>Design Day Name</td>
-<td>Date/Time Of Peak</td>
-<td>Temperature at Peak [C]</td>
-<td>Humidity Ratio at Peak [kgWater/kgAir]</td>
+<th></th>
+<th>Calculated Design Load [W]</th>
+<th>User Design Load [W]</th>
+<th>Calculated Design Air Flow [m3/s]</th>
+<th>User Design Air Flow [m3/s]</th>
+<th>Design Day Name</th>
+<th>Date/Time Of Peak</th>
+<th>Temperature at Peak [C]</th>
+<th>Humidity Ratio at Peak [kgWater/kgAir]</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -12182,15 +11919,15 @@ Report: **HVAC Sizing Summary**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Calculated Design Load [W]</td>
-<td>User Design Load [W]</td>
-<td>Calculated Design Air Flow [m3/s]</td>
-<td>User Design Air Flow [m3/s]</td>
-<td>Design Day Name</td>
-<td>Date/Time Of Peak</td>
-<td>Temperature at Peak [C]</td>
-<td>Humidity Ratio at Peak [kgWater/kgAir]</td>
+<th></th>
+<th>Calculated Design Load [W]</th>
+<th>User Design Load [W]</th>
+<th>Calculated Design Air Flow [m3/s]</th>
+<th>User Design Air Flow [m3/s]</th>
+<th>Design Day Name</th>
+<th>Date/Time Of Peak</th>
+<th>Temperature at Peak [C]</th>
+<th>Humidity Ratio at Peak [kgWater/kgAir]</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -12255,11 +11992,11 @@ Report: **HVAC Sizing Summary**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Calculated cooling [m3/s]</td>
-<td>User cooling [m3/s]</td>
-<td>Calculated heating [m3/s]</td>
-<td>User heating [m3/s]</td>
+<th></th>
+<th>Calculated cooling [m3/s]</th>
+<th>User cooling [m3/s]</th>
+<th>Calculated heating [m3/s]</th>
+<th>User heating [m3/s]</th>
 </tr>
 <tr>
 <td>VAV SYS 1</td>
@@ -12274,15 +12011,15 @@ Report: **HVAC Sizing Summary**
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Previous Design Volume Flow Rate [m3/s]</td>
-<td>Algorithm Volume Flow Rate [m3/s]</td>
-<td>Coincident Design Volume Flow Rate [m3/s]</td>
-<td>Coincident Size Adjusted</td>
-<td>Peak Sizing Period Name</td>
-<td>Peak Day into Period</td>
-<td>Peak Hour Of Day</td>
-<td>Peak Step Start Minute</td>
+<th></th>
+<th>Previous Design Volume Flow Rate [m3/s]</th>
+<th>Algorithm Volume Flow Rate [m3/s]</th>
+<th>Coincident Design Volume Flow Rate [m3/s]</th>
+<th>Coincident Size Adjusted</th>
+<th>Peak Sizing Period Name</th>
+<th>Peak Day into Period</th>
+<th>Peak Hour Of Day</th>
+<th>Peak Step Start Minute</th>
 </tr>
 <tr>
 <td>COOLSYS1 Sizing Pass 1</td>
@@ -12328,14 +12065,14 @@ Economizer
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>High Limit Shutoff Control</td>
-<td>Minimum Outside Air (m3/s)</td>
-<td>Maximum Outside Air (m3/s)</td>
-<td>Return Air Temp Limit</td>
-<td>Return Air Enthalpy Limit</td>
-<td>Outside Air Temperature Limit (C)</td>
-<td>Outside Air Enthalpy Limit (C)</td>
+<th> </th>
+<th>High Limit Shutoff Control</th>
+<th>Minimum Outside Air (m3/s)</th>
+<th>Maximum Outside Air (m3/s)</th>
+<th>Return Air Temp Limit</th>
+<th>Return Air Enthalpy Limit</th>
+<th>Outside Air Temperature Limit (C)</th>
+<th>Outside Air Enthalpy Limit (C)</th>
 </tr>
 <tr>
 <td>none</td>
@@ -12355,10 +12092,10 @@ Economizer
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Ventilation:Mechanical Name</td>
-<td>Outside Air Per Person(m3/s-person)</td>
-<td>Outside Air Per Area (m3/s-m2)</td>
+<th> </th>
+<th>Ventilation:Mechanical Name</th>
+<th>Outside Air Per Person(m3/s-person)</th>
+<th>Outside Air Per Area (m3/s-m2)</th>
 </tr>
 <tr>
 <td>none</td>
@@ -12374,10 +12111,10 @@ Economizer
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Winter Clothes (hr)</td>
-<td>Summer Clothes (hr)</td>
-<td>Summer or Winter Clothes (hr)</td>
+<th> </th>
+<th>Winter Clothes (hr)</th>
+<th>Summer Clothes (hr)</th>
+<th>Summer or Winter Clothes (hr)</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -12429,11 +12166,11 @@ Economizer
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>During Heating (hr)</td>
-<td>During Cooling (hr)</td>
-<td>During Occupied Heating (hr)</td>
-<td>During Occupied Cooling (hr)</td>
+<th> </th>
+<th>During Heating (hr)</th>
+<th>During Cooling (hr)</th>
+<th>During Occupied Heating (hr)</th>
+<th>During Occupied Cooling (hr)</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -12500,9 +12237,9 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Maximum air flow rate [m3/s]</td>
-<td>Max Reheat Water Flow [m3/s]</td>
+<th> </th>
+<th>Maximum air flow rate [m3/s]</th>
+<th>Max Reheat Water Flow [m3/s]</th>
 </tr>
 <tr>
 <td>SPACE1-1 VAV REHEAT</td>
@@ -12537,10 +12274,10 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Max Water Flow Rate of Coil [m3/s]</td>
-<td>Design Coil Load [W]</td>
-<td>UA of the Coil [W/delK]</td>
+<th> </th>
+<th>Max Water Flow Rate of Coil [m3/s]</th>
+<th>Design Coil Load [W]</th>
+<th>UA of the Coil [W/delK]</th>
 </tr>
 <tr>
 <td>SPACE1-1 ZONE COIL</td>
@@ -12592,8 +12329,8 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Maximum Branch Flow Rate [m3/s]</td>
+<th> </th>
+<th>Maximum Branch Flow Rate [m3/s]</th>
 </tr>
 <tr>
 <td>VAV SYS 1 MAIN BRANCH</td>
@@ -12607,8 +12344,8 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Primary air design volumetric flow rate [m3/s]</td>
+<th> </th>
+<th>Primary air design volumetric flow rate [m3/s]</th>
 </tr>
 <tr>
 <td>VAV SYS 1</td>
@@ -12622,9 +12359,9 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>maximum outside air flow rate [m3/s]</td>
-<td>minimum outside air flow rate [m3/s]</td>
+<th> </th>
+<th>maximum outside air flow rate [m3/s]</th>
+<th>minimum outside air flow rate [m3/s]</th>
 </tr>
 <tr>
 <td>OA CONTROLLER 1</td>
@@ -12639,14 +12376,14 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Max Water Flow Rate of Coil [m3/s]</td>
-<td>Max Air Flow Rate of Coil [m3/s]</td>
-<td>Design Air Inlet Temperature [C]</td>
-<td>Design Air Outlet Temperature [C]</td>
-<td>Design Water Inlet Temperature [C]</td>
-<td>Design Air Inlet Humidity Ratio</td>
-<td>Design Air Outlet Humidity Ratio</td>
+<th> </th>
+<th>Max Water Flow Rate of Coil [m3/s]</th>
+<th>Max Air Flow Rate of Coil [m3/s]</th>
+<th>Design Air Inlet Temperature [C]</th>
+<th>Design Air Outlet Temperature [C]</th>
+<th>Design Water Inlet Temperature [C]</th>
+<th>Design Air Inlet Humidity Ratio</th>
+<th>Design Air Outlet Humidity Ratio</th>
 </tr>
 <tr>
 <td>OA COOLING COIL 1</td>
@@ -12676,9 +12413,9 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Max Flow Rate [m3/s]</td>
-<td>Min Flow Rate [m3/s]</td>
+<th> </th>
+<th>Max Flow Rate [m3/s]</th>
+<th>Min Flow Rate [m3/s]</th>
 </tr>
 <tr>
 <td>SUPPLY FAN 1</td>
@@ -12693,8 +12430,8 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Max Actuated Flow [m3/s]</td>
+<th> </th>
+<th>Max Actuated Flow [m3/s]</th>
 </tr>
 <tr>
 <td>OA CC CONTROLLER 1</td>
@@ -12720,9 +12457,9 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Maximum Loop Volumetric Flow Rate [m3/s]</td>
-<td>Volume of the plant loop [m3]</td>
+<th> </th>
+<th>Maximum Loop Volumetric Flow Rate [m3/s]</th>
+<th>Volume of the plant loop [m3]</th>
 </tr>
 <tr>
 <td>HOT WATER LOOP</td>
@@ -12742,9 +12479,9 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Nominal Capacity [W]</td>
-<td>Design Boiler Water Flow Rate [m3/s]</td>
+<th> </th>
+<th>Nominal Capacity [W]</th>
+<th>Design Boiler Water Flow Rate [m3/s]</th>
 </tr>
 <tr>
 <td>CENTRAL BOILER</td>
@@ -12759,9 +12496,9 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Nominal Capacity [W]</td>
-<td>Design Evaporator Volumetric Water Flow Rate [m3/s]</td>
+<th> </th>
+<th>Nominal Capacity [W]</th>
+<th>Design Evaporator Volumetric Water Flow Rate [m3/s]</th>
 </tr>
 <tr>
 <td>CENTRAL CHILLER</td>
@@ -12776,9 +12513,9 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Rated Volumetric Flow Rate [m3/s]</td>
-<td>Rated Power Consumption [W]</td>
+<th> </th>
+<th>Rated Volumetric Flow Rate [m3/s]</th>
+<th>Rated Power Consumption [W]</th>
 </tr>
 <tr>
 <td>HW CIRC PUMP</td>
@@ -12810,13 +12547,13 @@ Average Outside Air During Occupied Hours
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Average Number of Occupants</td>
-<td>Nominal Number of Occupants</td>
-<td>Zone Volume (m3)</td>
-<td>Mechanical Ventilation (ach)</td>
-<td>Infiltration (ach)</td>
-<td>Simple Ventilation (ach)</td>
+<th> </th>
+<th>Average Number of Occupants</th>
+<th>Nominal Number of Occupants</th>
+<th>Zone Volume (m3)</th>
+<th>Mechanical Ventilation (ach)</th>
+<th>Infiltration (ach)</th>
+<th>Simple Ventilation (ach)</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -12871,13 +12608,13 @@ Average Outside Air During Occupied Hours
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Average Number of Occupants</td>
-<td>Nominal Number of Occupants</td>
-<td>Zone Volume (m3)</td>
-<td>Mechanical Ventilation (ach)</td>
-<td>Infiltration (ach)</td>
-<td>Simple Ventilation (ach)</td>
+<th> </th>
+<th>Average Number of Occupants</th>
+<th>Nominal Number of Occupants</th>
+<th>Zone Volume (m3)</th>
+<th>Mechanical Ventilation (ach)</th>
+<th>Infiltration (ach)</th>
+<th>Simple Ventilation (ach)</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -12942,13 +12679,13 @@ SizingPeriod:DesignDay
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Maximum Dry Bulb (C)</td>
-<td>Daily Temperature Range (C)</td>
-<td>Humidity Value</td>
-<td>Humidity Type</td>
-<td>Wind Speed (m/s)</td>
-<td>Wind Direction</td>
+<th> </th>
+<th>Maximum Dry Bulb (C)</th>
+<th>Daily Temperature Range (C)</th>
+<th>Humidity Value</th>
+<th>Humidity Type</th>
+<th>Wind Speed (m/s)</th>
+<th>Wind Direction</th>
 </tr>
 <tr>
 <td>CHICAGO_IL_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB</td>
@@ -12976,8 +12713,8 @@ SizingPeriod:DesignDay
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Value</td>
+<th> </th>
+<th>Value</th>
 </tr>
 <tr>
 <td>Reference</td>
@@ -13117,9 +12854,9 @@ Surfaces by Class
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Total</td>
-<td>Outdoors</td>
+<th> </th>
+<th>Total</th>
+<th>Outdoors</th>
 </tr>
 <tr>
 <td>Wall</td>
@@ -13209,8 +12946,8 @@ HVAC
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Count</td>
+<th> </th>
+<th>Count</th>
 </tr>
 <tr>
 <td>HVAC Air Loops</td>
@@ -13250,12 +12987,12 @@ Annual and Peak Values - Electricity
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Electricity Annual Value [GJ]</td>
-<td>Electricity Minimum Value [W]</td>
-<td>Timestamp of Minimum</td>
-<td>Electricity Maximum Value [W]</td>
-<td>Timestamp of Maximum</td>
+<th></th>
+<th>Electricity Annual Value [GJ]</th>
+<th>Electricity Minimum Value [W]</th>
+<th>Timestamp of Minimum</th>
+<th>Electricity Maximum Value [W]</th>
+<th>Timestamp of Maximum</th>
 </tr>
 <tr>
 <td>Electricity:Facility</td>
@@ -13593,12 +13330,12 @@ Annual and Peak Values - Electricity
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Gas Annual Value [GJ]</td>
-<td>Gas Minimum Value [W]</td>
-<td>Timestamp of Minimum</td>
-<td>Gas Maximum Value [W]</td>
-<td>Timestamp of Maximum</td>
+<th></th>
+<th>Gas Annual Value [GJ]</th>
+<th>Gas Minimum Value [W]</th>
+<th>Timestamp of Minimum</th>
+<th>Gas Maximum Value [W]</th>
+<th>Timestamp of Maximum</th>
 </tr>
 <tr>
 <td>Gas:Facility</td>
@@ -13640,12 +13377,12 @@ Annual and Peak Values - Electricity
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Cooling Annual Value [GJ]</td>
-<td>Cooling Minimum Value [W]</td>
-<td>Timestamp of Minimum</td>
-<td>Cooling Maximum Value [W]</td>
-<td>Timestamp of Maximum</td>
+<th></th>
+<th>Cooling Annual Value [GJ]</th>
+<th>Cooling Minimum Value [W]</th>
+<th>Timestamp of Minimum</th>
+<th>Cooling Maximum Value [W]</th>
+<th>Timestamp of Maximum</th>
 </tr>
 <tr>
 <td>PlantLoopCoolingDemand:Facility</td>
@@ -13679,12 +13416,12 @@ Annual and Peak Values - Electricity
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Annual Value [m3]</td>
-<td>Minimum Value [m3/s]</td>
-<td>Timestamp of Minimum</td>
-<td>Maximum Value [m3/s]</td>
-<td>Timestamp of Maximum</td>
+<th></th>
+<th>Annual Value [m3]</th>
+<th>Minimum Value [m3/s]</th>
+<th>Timestamp of Minimum</th>
+<th>Maximum Value [m3/s]</th>
+<th>Timestamp of Maximum</th>
 </tr>
 <tr>
 <td>None</td>
@@ -13702,12 +13439,12 @@ Annual and Peak Values - Electricity
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Annual Value [kg]</td>
-<td>Minimum Value [kg/s]</td>
-<td>Timestamp of Minimum</td>
-<td>Maximum Value [kg/s]</td>
-<td>Timestamp of Maximum</td>
+<th></th>
+<th>Annual Value [kg]</th>
+<th>Minimum Value [kg/s]</th>
+<th>Timestamp of Minimum</th>
+<th>Maximum Value [kg/s]</th>
+<th>Timestamp of Maximum</th>
 </tr>
 <tr>
 <td>Carbon Equivalent:Facility</td>
@@ -13733,12 +13470,12 @@ Annual and Peak Values - Electricity
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Annual Value [m3]</td>
-<td>Minimum Value [m3/s]</td>
-<td>Timestamp of Minimum</td>
-<td>Maximum Value [m3/s]</td>
-<td>Timestamp of Maximum</td>
+<th></th>
+<th>Annual Value [m3]</th>
+<th>Minimum Value [m3/s]</th>
+<th>Timestamp of Minimum</th>
+<th>Maximum Value [m3/s]</th>
+<th>Timestamp of Maximum</th>
 </tr>
 <tr>
 <td>None</td>
@@ -13756,12 +13493,12 @@ Annual and Peak Values - Electricity
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Annual Value [L]</td>
-<td>Minimum Value [L]</td>
-<td>Timestamp of Minimum</td>
-<td>Maximum Value [L]</td>
-<td>Timestamp of Maximum</td>
+<th></th>
+<th>Annual Value [L]</th>
+<th>Minimum Value [L]</th>
+<th>Timestamp of Minimum</th>
+<th>Maximum Value [L]</th>
+<th>Timestamp of Maximum</th>
 </tr>
 <tr>
 <td>None</td>
@@ -13779,12 +13516,12 @@ Annual and Peak Values - Electricity
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Annual Value [GJ]</td>
-<td>Minimum Value [W]</td>
-<td>Timestamp of Minimum</td>
-<td>Maximum Value [W]</td>
-<td>Timestamp of Maximum</td>
+<th></th>
+<th>Annual Value [GJ]</th>
+<th>Minimum Value [W]</th>
+<th>Timestamp of Minimum</th>
+<th>Maximum Value [W]</th>
+<th>Timestamp of Maximum</th>
 </tr>
 <tr>
 <td>EnergyTransfer:Facility</td>
@@ -14060,23 +13797,23 @@ Annual Building Sensible Heat Gain Components
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>HVAC Input Sensible Air Heating [GJ]</td>
-<td>HVAC Input Sensible Air Cooling [GJ]</td>
-<td>HVAC Input Heated Surface Heating [GJ]</td>
-<td>HVAC Input Cooled Surface Cooling [GJ]</td>
-<td>People Sensible Heat Addition [GJ]</td>
-<td>Lights Sensible Heat Addition [GJ]</td>
-<td>Equipment Sensible Heat Addition [GJ]</td>
-<td>Window Heat Addition [GJ]</td>
-<td>Interzone Air Transfer Heat Addition [GJ]</td>
-<td>Infiltration Heat Addition [GJ]</td>
-<td>Opaque Surface Conduction and Other Heat Addition [GJ]</td>
-<td>Equipment Sensible Heat Removal [GJ]</td>
-<td>Window Heat Removal [GJ]</td>
-<td>Interzone Air Transfer Heat Removal [GJ]</td>
-<td>Infiltration Heat Removal [GJ]</td>
-<td>Opaque Surface Conduction and Other Heat Removal [GJ]</td>
+<th></th>
+<th>HVAC Input Sensible Air Heating [GJ]</th>
+<th>HVAC Input Sensible Air Cooling [GJ]</th>
+<th>HVAC Input Heated Surface Heating [GJ]</th>
+<th>HVAC Input Cooled Surface Cooling [GJ]</th>
+<th>People Sensible Heat Addition [GJ]</th>
+<th>Lights Sensible Heat Addition [GJ]</th>
+<th>Equipment Sensible Heat Addition [GJ]</th>
+<th>Window Heat Addition [GJ]</th>
+<th>Interzone Air Transfer Heat Addition [GJ]</th>
+<th>Infiltration Heat Addition [GJ]</th>
+<th>Opaque Surface Conduction and Other Heat Addition [GJ]</th>
+<th>Equipment Sensible Heat Removal [GJ]</th>
+<th>Window Heat Removal [GJ]</th>
+<th>Interzone Air Transfer Heat Removal [GJ]</th>
+<th>Infiltration Heat Removal [GJ]</th>
+<th>Opaque Surface Conduction and Other Heat Removal [GJ]</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -14219,24 +13956,24 @@ Annual Building Sensible Heat Gain Components
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Time of Peak</td>
-<td>HVAC Input Sensible Air Heating [W]</td>
-<td>HVAC Input Sensible Air Cooling [W]</td>
-<td>HVAC Input Heated Surface Heating [W]</td>
-<td>HVAC Input Cooled Surface Cooling [W]</td>
-<td>People Sensible Heat Addition [W]</td>
-<td>Lights Sensible Heat Addition [W]</td>
-<td>Equipment Sensible Heat Addition [W]</td>
-<td>Window Heat Addition [W]</td>
-<td>Interzone Air Transfer Heat Addition [W]</td>
-<td>Infiltration Heat Addition [W]</td>
-<td>Opaque Surface Conduction and Other Heat Addition [W]</td>
-<td>Equipment Sensible Heat Removal [W]</td>
-<td>Window Heat Removal [W]</td>
-<td>Interzone Air Transfer Heat Removal [W]</td>
-<td>Infiltration Heat Removal [W]</td>
-<td>Opaque Surface Conduction and Other Heat Removal [W]</td>
+<th></th>
+<th>Time of Peak</th>
+<th>HVAC Input Sensible Air Heating [W]</th>
+<th>HVAC Input Sensible Air Cooling [W]</th>
+<th>HVAC Input Heated Surface Heating [W]</th>
+<th>HVAC Input Cooled Surface Cooling [W]</th>
+<th>People Sensible Heat Addition [W]</th>
+<th>Lights Sensible Heat Addition [W]</th>
+<th>Equipment Sensible Heat Addition [W]</th>
+<th>Window Heat Addition [W]</th>
+<th>Interzone Air Transfer Heat Addition [W]</th>
+<th>Infiltration Heat Addition [W]</th>
+<th>Opaque Surface Conduction and Other Heat Addition [W]</th>
+<th>Equipment Sensible Heat Removal [W]</th>
+<th>Window Heat Removal [W]</th>
+<th>Interzone Air Transfer Heat Removal [W]</th>
+<th>Infiltration Heat Removal [W]</th>
+<th>Opaque Surface Conduction and Other Heat Removal [W]</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -14386,24 +14123,24 @@ Annual Building Sensible Heat Gain Components
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Time of Peak</td>
-<td>HVAC Input Sensible Air Heating [W]</td>
-<td>HVAC Input Sensible Air Cooling [W]</td>
-<td>HVAC Input Heated Surface Heating [W]</td>
-<td>HVAC Input Cooled Surface Cooling [W]</td>
-<td>People Sensible Heat Addition [W]</td>
-<td>Lights Sensible Heat Addition [W]</td>
-<td>Equipment Sensible Heat Addition [W]</td>
-<td>Window Heat Addition [W]</td>
-<td>Interzone Air Transfer Heat Addition [W]</td>
-<td>Infiltration Heat Addition [W]</td>
-<td>Opaque Surface Conduction and Other Heat Addition [W]</td>
-<td>Equipment Sensible Heat Removal [W]</td>
-<td>Window Heat Removal [W]</td>
-<td>Interzone Air Transfer Heat Removal [W]</td>
-<td>Infiltration Heat Removal [W]</td>
-<td>Opaque Surface Conduction and Other Heat Removal [W]</td>
+<th></th>
+<th>Time of Peak</th>
+<th>HVAC Input Sensible Air Heating [W]</th>
+<th>HVAC Input Sensible Air Cooling [W]</th>
+<th>HVAC Input Heated Surface Heating [W]</th>
+<th>HVAC Input Cooled Surface Cooling [W]</th>
+<th>People Sensible Heat Addition [W]</th>
+<th>Lights Sensible Heat Addition [W]</th>
+<th>Equipment Sensible Heat Addition [W]</th>
+<th>Window Heat Addition [W]</th>
+<th>Interzone Air Transfer Heat Addition [W]</th>
+<th>Infiltration Heat Addition [W]</th>
+<th>Opaque Surface Conduction and Other Heat Addition [W]</th>
+<th>Equipment Sensible Heat Removal [W]</th>
+<th>Window Heat Removal [W]</th>
+<th>Interzone Air Transfer Heat Removal [W]</th>
+<th>Infiltration Heat Removal [W]</th>
+<th>Opaque Surface Conduction and Other Heat Removal [W]</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -14565,17 +14302,17 @@ System Ventilation Requirements for Cooling
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Sum of Zone Primary Air Flow - Vpz-sum [m3/s]</td>
-<td>System Population - Ps</td>
-<td>Sum of Zone Population - Pz-sum</td>
-<td>Occupant Diversity - D</td>
-<td>Uncorrected Outdoor Air Intake Airflow - Vou [m3/s]</td>
-<td>System Primary Airflow - Vps [m3/s]</td>
-<td>Average Outdoor Air Fraction - Xs</td>
-<td>System Ventilation Efficiency - Ev</td>
-<td>Outdoor Air Intake Flow - Vot [m3/s]</td>
-<td>Percent Outdoor Air - %OA</td>
+<th></th>
+<th>Sum of Zone Primary Air Flow - Vpz-sum [m3/s]</th>
+<th>System Population - Ps</th>
+<th>Sum of Zone Population - Pz-sum</th>
+<th>Occupant Diversity - D</th>
+<th>Uncorrected Outdoor Air Intake Airflow - Vou [m3/s]</th>
+<th>System Primary Airflow - Vps [m3/s]</th>
+<th>Average Outdoor Air Fraction - Xs</th>
+<th>System Ventilation Efficiency - Ev</th>
+<th>Outdoor Air Intake Flow - Vot [m3/s]</th>
+<th>Percent Outdoor Air - %OA</th>
 </tr>
 <tr>
 <td>VAV SYS 1</td>
@@ -14598,17 +14335,17 @@ System Ventilation Requirements for Cooling
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Sum of Zone Primary Air Flow - Vpz-sum [m3/s]</td>
-<td>System Population - Ps</td>
-<td>Sum of Zone Population - Pz-sum</td>
-<td>Occupant Diversity - D</td>
-<td>Uncorrected Outdoor Air Intake Airflow - Vou [m3/s]</td>
-<td>System Primary Airflow - Vps [m3/s]</td>
-<td>Average Outdoor Air Fraction - Xs</td>
-<td>System Ventilation Efficiency - Ev</td>
-<td>Outdoor Air Intake Flow Vot [m3/s]</td>
-<td>Percent Outdoor Air - %OA</td>
+<th></th>
+<th>Sum of Zone Primary Air Flow - Vpz-sum [m3/s]</th>
+<th>System Population - Ps</th>
+<th>Sum of Zone Population - Pz-sum</th>
+<th>Occupant Diversity - D</th>
+<th>Uncorrected Outdoor Air Intake Airflow - Vou [m3/s]</th>
+<th>System Primary Airflow - Vps [m3/s]</th>
+<th>Average Outdoor Air Fraction - Xs</th>
+<th>System Ventilation Efficiency - Ev</th>
+<th>Outdoor Air Intake Flow Vot [m3/s]</th>
+<th>Percent Outdoor Air - %OA</th>
 </tr>
 <tr>
 <td>VAV SYS 1</td>
@@ -14631,17 +14368,17 @@ System Ventilation Requirements for Cooling
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>AirLoop Name</td>
-<td>People Outdoor Air Rate - Rp [m3/s-person]</td>
-<td>Zone Population - Pz</td>
-<td>Area Outdoor Air Rate - Ra [m3/s-m2]</td>
-<td>Zone Floor Area - Az [m2]</td>
-<td>Breathing Zone Outdoor Airflow - Vbz [m3/s]</td>
-<td>Cooling Zone Air Distribution Effectiveness - Ez-clg</td>
-<td>Cooling Zone Outdoor Airflow - Voz-clg [m3/s]</td>
-<td>Heating Zone Air Distribution Effectiveness - Ez-htg</td>
-<td>Heating Zone Outdoor Airflow - Voz-htg [m3/s]</td>
+<th></th>
+<th>AirLoop Name</th>
+<th>People Outdoor Air Rate - Rp [m3/s-person]</th>
+<th>Zone Population - Pz</th>
+<th>Area Outdoor Air Rate - Ra [m3/s-m2]</th>
+<th>Zone Floor Area - Az [m2]</th>
+<th>Breathing Zone Outdoor Airflow - Vbz [m3/s]</th>
+<th>Cooling Zone Air Distribution Effectiveness - Ez-clg</th>
+<th>Cooling Zone Outdoor Airflow - Voz-clg [m3/s]</th>
+<th>Heating Zone Air Distribution Effectiveness - Ez-htg</th>
+<th>Heating Zone Outdoor Airflow - Voz-htg [m3/s]</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -14716,14 +14453,14 @@ System Ventilation Requirements for Cooling
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>People Outdoor Air Rate - Rp [m3/s-person]</td>
-<td>Sum of Zone Population - Pz-sum</td>
-<td>Area Outdoor Air Rate - Ra [m3/s-m2]</td>
-<td>Sum of Zone Floor Area - Az-sum [m2]</td>
-<td>Breathing Zone Outdoor Airflow - Vbz [m3/s]</td>
-<td>Cooling Zone Outdoor Airflow - Voz-clg [m3/s]</td>
-<td>Heating Zone Outdoor Airflow - Voz-htg [m3/s]</td>
+<th></th>
+<th>People Outdoor Air Rate - Rp [m3/s-person]</th>
+<th>Sum of Zone Population - Pz-sum</th>
+<th>Area Outdoor Air Rate - Ra [m3/s-m2]</th>
+<th>Sum of Zone Floor Area - Az-sum [m2]</th>
+<th>Breathing Zone Outdoor Airflow - Vbz [m3/s]</th>
+<th>Cooling Zone Outdoor Airflow - Voz-clg [m3/s]</th>
+<th>Heating Zone Outdoor Airflow - Voz-htg [m3/s]</th>
 </tr>
 <tr>
 <td>VAV SYS 1</td>
@@ -14743,20 +14480,20 @@ System Ventilation Requirements for Cooling
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>AirLoop Name</td>
-<td>Box Type</td>
-<td>Zone Primary Airflow - Vpz [m3/s]</td>
-<td>Zone Discharge Airflow - Vdz [m3/s]</td>
-<td>Minimum Zone Primary Airflow - Vpz-min [m3/s]</td>
-<td>Zone Outdoor Airflow Cooling - Voz-clg [m3/s]</td>
-<td>Primary Outdoor Air Fraction - Zpz</td>
-<td>Primary Air Fraction - Ep</td>
-<td>Secondary Recirculation Fraction- Er</td>
-<td>Supply Air Fraction- Fa</td>
-<td>Mixed Air Fraction - Fb</td>
-<td>Outdoor Air Fraction - Fc</td>
-<td>Zone Ventilation Efficiency - Evz</td>
+<th></th>
+<th>AirLoop Name</th>
+<th>Box Type</th>
+<th>Zone Primary Airflow - Vpz [m3/s]</th>
+<th>Zone Discharge Airflow - Vdz [m3/s]</th>
+<th>Minimum Zone Primary Airflow - Vpz-min [m3/s]</th>
+<th>Zone Outdoor Airflow Cooling - Voz-clg [m3/s]</th>
+<th>Primary Outdoor Air Fraction - Zpz</th>
+<th>Primary Air Fraction - Ep</th>
+<th>Secondary Recirculation Fraction- Er</th>
+<th>Supply Air Fraction- Fa</th>
+<th>Mixed Air Fraction - Fb</th>
+<th>Outdoor Air Fraction - Fc</th>
+<th>Zone Ventilation Efficiency - Evz</th>
 </tr>
 <tr>
 <td>SPACE1-1</td>
@@ -14846,13 +14583,13 @@ System Ventilation Requirements for Cooling
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Sum of Zone Primary Airflow - Vpz-sum [m3/s]</td>
-<td>System Primary Airflow - Vps [m3/s]</td>
-<td>Sum of Zone Discharge Airflow - Vdz-sum [m3/s]</td>
-<td>Minimum Zone Primary Airflow - Vpz-min [m3/s]</td>
-<td>Zone Outdoor Airflow Cooling - Voz-clg [m3/s]</td>
-<td>Zone Ventilation Efficiency - Evz-min</td>
+<th></th>
+<th>Sum of Zone Primary Airflow - Vpz-sum [m3/s]</th>
+<th>System Primary Airflow - Vps [m3/s]</th>
+<th>Sum of Zone Discharge Airflow - Vdz-sum [m3/s]</th>
+<th>Minimum Zone Primary Airflow - Vpz-min [m3/s]</th>
+<th>Zone Outdoor Airflow Cooling - Voz-clg [m3/s]</th>
+<th>Zone Ventilation Efficiency - Evz-min</th>
 </tr>
 <tr>
 <td>VAV SYS 1</td>
@@ -14871,20 +14608,20 @@ System Ventilation Requirements for Cooling
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>AirLoop Name</td>
-<td>Box Type</td>
-<td>Zone Primary Airflow - Vpz [m3/s]</td>
-<td>Zone Discharge Airflow - Vdz [m3/s]</td>
-<td>Minimum Zone Primary Airflow - Vpz-min [m3/s]</td>
-<td>Zone Outdoor Airflow Heating - Voz-htg [m3/s]</td>
-<td>Primary Outdoor Air Fraction - Zpz</td>
-<td>Primary Air Fraction - Ep</td>
-<td>Secondary Recirculation Fraction- Er</td>
-<td>Supply Air Fraction- Fa</td>
-<td>Mixed Air Fraction - Fb</td>
-<td>Outdoor Air Fraction - Fc</td>
-<td>Zone Ventilation Efficiency - Evz</td>
+<th></th>
+<th>AirLoop Name</th>
+<th>Box Type</th>
+<th>Zone Primary Airflow - Vpz [m3/s]</th>
+<th>Zone Discharge Airflow - Vdz [m3/s]</th>
+<th>Minimum Zone Primary Airflow - Vpz-min [m3/s]</th>
+<th>Zone Outdoor Airflow Heating - Voz-htg [m3/s]</th>
+<th>Primary Outdoor Air Fraction - Zpz</th>
+<th>Primary Air Fraction - Ep</th>
+<th>Secondary Recirculation Fraction- Er</th>
+<th>Supply Air Fraction- Fa</th>
+<th>Mixed Air Fraction - Fb</th>
+<th>Outdoor Air Fraction - Fc</th>
+<th>Zone Ventilation Efficiency - Evz</th>
 </tr>
 <tr>
 <td>None</td>
@@ -14910,13 +14647,13 @@ System Ventilation Requirements for Cooling
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Sum of Zone Primary Airflow - Vpz-sum [m3/s]</td>
-<td>System Primary Airflow - Vps [m3/s]</td>
-<td>Sum of Zone Discharge Airflow - Vdz-sum [m3/s]</td>
-<td>Minimum Zone Primary Airflow - Vpz-min [m3/s]</td>
-<td>Zone Outdoor Airflow Heating - Voz-htg [m3/s]</td>
-<td>Zone Ventilation Efficiency - Evz-min</td>
+<th></th>
+<th>Sum of Zone Primary Airflow - Vpz-sum [m3/s]</th>
+<th>System Primary Airflow - Vps [m3/s]</th>
+<th>Sum of Zone Discharge Airflow - Vdz-sum [m3/s]</th>
+<th>Minimum Zone Primary Airflow - Vpz-min [m3/s]</th>
+<th>Zone Outdoor Airflow Heating - Voz-htg [m3/s]</th>
+<th>Zone Ventilation Efficiency - Evz-min</th>
 </tr>
 <tr>
 <td>VAV SYS 1</td>
@@ -14947,13 +14684,13 @@ Estimated Cooling Peak Load Components
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Sensible - Instant [W]</td>
-<td>Sensible - Delayed [W]</td>
-<td>Sensible - Return Air [W]</td>
-<td>Latent [W]</td>
-<td>Total [W]</td>
-<td>%Grand Total</td>
+<th></th>
+<th>Sensible - Instant [W]</th>
+<th>Sensible - Delayed [W]</th>
+<th>Sensible - Return Air [W]</th>
+<th>Latent [W]</th>
+<th>Total [W]</th>
+<th>%Grand Total</th>
 </tr>
 <tr>
 <td>People</td>
@@ -15188,8 +14925,8 @@ Estimated Cooling Peak Load Components
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Value</td>
+<th></th>
+<th>Value</th>
 </tr>
 <tr>
 <td>Time of Peak Load</td>
@@ -15240,13 +14977,13 @@ Estimated Cooling Peak Load Components
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Sensible - Instant [W]</td>
-<td>Sensible - Delayed [W]</td>
-<td>Sensible - Return Air [W]</td>
-<td>Latent [W]</td>
-<td>Total [W]</td>
-<td>%Grand Total</td>
+<th></th>
+<th>Sensible - Instant [W]</th>
+<th>Sensible - Delayed [W]</th>
+<th>Sensible - Return Air [W]</th>
+<th>Latent [W]</th>
+<th>Total [W]</th>
+<th>%Grand Total</th>
 </tr>
 <tr>
 <td>People</td>
@@ -15481,8 +15218,8 @@ Estimated Cooling Peak Load Components
 
 <table class="table table-striped">
 <tr>
-<td></td>
-<td>Value</td>
+<th></th>
+<th>Value</th>
 </tr>
 <tr>
 <td>Time of Peak Load</td>
@@ -15540,20 +15277,20 @@ Values in table are in hours.
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td> </td>
-<td>1</td>
-<td>2</td>
-<td>3</td>
-<td>4</td>
-<td>5</td>
-<td>6</td>
-<td>7</td>
-<td>8</td>
-<td>9</td>
-<td>10</td>
-<td> </td>
-<td> </td>
+<th> </th>
+<th> </th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+<th> </th>
+<th> </th>
 </tr>
 <tr>
 <td>Interval Start</td>
@@ -16186,8 +15923,8 @@ Values in table are in hours.
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Statistic</td>
+<th> </th>
+<th>Statistic</th>
 </tr>
 <tr>
 <td>Minimum</td>
@@ -16345,17 +16082,17 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>ZONE/SYS SENSIBLE COOLING ENERGY [J]</td>
-<td>ZONE/SYS SENSIBLE COOLING RATE {MAXIMUM}[W]</td>
-<td>ZONE/SYS SENSIBLE COOLING RATE {TIMESTAMP}</td>
-<td>OUTDOOR DRY BULB {AT MAX/MIN} [C]</td>
-<td>OUTDOOR WET BULB {AT MAX/MIN} [C]</td>
-<td>ZONE TOTAL INTERNAL LATENT GAIN [J]</td>
-<td>ZONE TOTAL INTERNAL LATENT GAIN {MAXIMUM}[W]</td>
-<td>ZONE TOTAL INTERNAL LATENT GAIN {TIMESTAMP}</td>
-<td>OUTDOOR DRY BULB {AT MAX/MIN} [C]</td>
-<td>OUTDOOR WET BULB {AT MAX/MIN} [C]</td>
+<th> </th>
+<th>ZONE/SYS SENSIBLE COOLING ENERGY [J]</th>
+<th>ZONE/SYS SENSIBLE COOLING RATE {MAXIMUM}[W]</th>
+<th>ZONE/SYS SENSIBLE COOLING RATE {TIMESTAMP}</th>
+<th>OUTDOOR DRY BULB {AT MAX/MIN} [C]</th>
+<th>OUTDOOR WET BULB {AT MAX/MIN} [C]</th>
+<th>ZONE TOTAL INTERNAL LATENT GAIN [J]</th>
+<th>ZONE TOTAL INTERNAL LATENT GAIN {MAXIMUM}[W]</th>
+<th>ZONE TOTAL INTERNAL LATENT GAIN {TIMESTAMP}</th>
+<th>OUTDOOR DRY BULB {AT MAX/MIN} [C]</th>
+<th>OUTDOOR WET BULB {AT MAX/MIN} [C]</th>
 </tr>
 <tr>
 <td>January</td>
@@ -16583,11 +16320,11 @@ Annual Cost
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Facility:Electric</td>
-<td>Facility:Gas</td>
-<td>Other</td>
-<td>Total</td>
+<th> </th>
+<th>Facility:Electric</th>
+<th>Facility:Gas</th>
+<th>Other</th>
+<th>Total</th>
 </tr>
 <tr>
 <td>Cost ($)</td>
@@ -16617,12 +16354,12 @@ Annual Cost
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Selected</td>
-<td>Qualified</td>
-<td>Meter</td>
-<td>Group</td>
-<td>Annual Cost</td>
+<th> </th>
+<th>Selected</th>
+<th>Qualified</th>
+<th>Meter</th>
+<th>Group</th>
+<th>Annual Cost</th>
 </tr>
 <tr>
 <td>EXAMPLEA</td>
@@ -16726,8 +16463,8 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Parameter</td>
+<th> </th>
+<th>Parameter</th>
 </tr>
 <tr>
 <td>Meter</td>
@@ -16764,21 +16501,21 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Jan</td>
-<td>Feb</td>
-<td>Mar</td>
-<td>Apr</td>
-<td>May</td>
-<td>Jun</td>
-<td>Jul</td>
-<td>Aug</td>
-<td>Sep</td>
-<td>Oct</td>
-<td>Nov</td>
-<td>Dec</td>
-<td>Sum</td>
-<td>Max</td>
+<th> </th>
+<th>Jan</th>
+<th>Feb</th>
+<th>Mar</th>
+<th>Apr</th>
+<th>May</th>
+<th>Jun</th>
+<th>Jul</th>
+<th>Aug</th>
+<th>Sep</th>
+<th>Oct</th>
+<th>Nov</th>
+<th>Dec</th>
+<th>Sum</th>
+<th>Max</th>
 </tr>
 <tr>
 <td>EnergyCharges</td>
@@ -16940,22 +16677,22 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Jan</td>
-<td>Feb</td>
-<td>Mar</td>
-<td>Apr</td>
-<td>May</td>
-<td>Jun</td>
-<td>Jul</td>
-<td>Aug</td>
-<td>Sep</td>
-<td>Oct</td>
-<td>Nov</td>
-<td>Dec</td>
-<td>Sum</td>
-<td>Max</td>
-<td>Category</td>
+<th> </th>
+<th>Jan</th>
+<th>Feb</th>
+<th>Mar</th>
+<th>Apr</th>
+<th>May</th>
+<th>Jun</th>
+<th>Jul</th>
+<th>Aug</th>
+<th>Sep</th>
+<th>Oct</th>
+<th>Nov</th>
+<th>Dec</th>
+<th>Sum</th>
+<th>Max</th>
+<th>Category</th>
 </tr>
 <tr>
 <td>FLATENERGYCHARGE</td>
@@ -16982,21 +16719,21 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Jan</td>
-<td>Feb</td>
-<td>Mar</td>
-<td>Apr</td>
-<td>May</td>
-<td>Jun</td>
-<td>Jul</td>
-<td>Aug</td>
-<td>Sep</td>
-<td>Oct</td>
-<td>Nov</td>
-<td>Dec</td>
-<td>Sum</td>
-<td>Max</td>
+<th> </th>
+<th>Jan</th>
+<th>Feb</th>
+<th>Mar</th>
+<th>Apr</th>
+<th>May</th>
+<th>Jun</th>
+<th>Jul</th>
+<th>Aug</th>
+<th>Sep</th>
+<th>Oct</th>
+<th>Nov</th>
+<th>Dec</th>
+<th>Sum</th>
+<th>Max</th>
 </tr>
 </table>
 
@@ -17005,21 +16742,21 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Jan</td>
-<td>Feb</td>
-<td>Mar</td>
-<td>Apr</td>
-<td>May</td>
-<td>Jun</td>
-<td>Jul</td>
-<td>Aug</td>
-<td>Sep</td>
-<td>Oct</td>
-<td>Nov</td>
-<td>Dec</td>
-<td>Sum</td>
-<td>Max</td>
+<th> </th>
+<th>Jan</th>
+<th>Feb</th>
+<th>Mar</th>
+<th>Apr</th>
+<th>May</th>
+<th>Jun</th>
+<th>Jul</th>
+<th>Aug</th>
+<th>Sep</th>
+<th>Oct</th>
+<th>Nov</th>
+<th>Dec</th>
+<th>Sum</th>
+<th>Max</th>
 </tr>
 </table>
 
@@ -17028,21 +16765,21 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Jan</td>
-<td>Feb</td>
-<td>Mar</td>
-<td>Apr</td>
-<td>May</td>
-<td>Jun</td>
-<td>Jul</td>
-<td>Aug</td>
-<td>Sep</td>
-<td>Oct</td>
-<td>Nov</td>
-<td>Dec</td>
-<td>Sum</td>
-<td>Max</td>
+<th> </th>
+<th>Jan</th>
+<th>Feb</th>
+<th>Mar</th>
+<th>Apr</th>
+<th>May</th>
+<th>Jun</th>
+<th>Jul</th>
+<th>Aug</th>
+<th>Sep</th>
+<th>Oct</th>
+<th>Nov</th>
+<th>Dec</th>
+<th>Sum</th>
+<th>Max</th>
 </tr>
 <tr>
 <td>TotalEnergy</td>
@@ -17595,21 +17332,21 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Jan</td>
-<td>Feb</td>
-<td>Mar</td>
-<td>Apr</td>
-<td>May</td>
-<td>Jun</td>
-<td>Jul</td>
-<td>Aug</td>
-<td>Sep</td>
-<td>Oct</td>
-<td>Nov</td>
-<td>Dec</td>
-<td>Sum</td>
-<td>Max</td>
+<th> </th>
+<th>Jan</th>
+<th>Feb</th>
+<th>Mar</th>
+<th>Apr</th>
+<th>May</th>
+<th>Jun</th>
+<th>Jul</th>
+<th>Aug</th>
+<th>Sep</th>
+<th>Oct</th>
+<th>Nov</th>
+<th>Dec</th>
+<th>Sum</th>
+<th>Max</th>
 </tr>
 <tr>
 <td>NotIncluded</td>
@@ -17646,10 +17383,10 @@ Construction Cost Estimate Summary
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Reference Bldg.</td>
-<td>Current Bldg. Model</td>
-<td>Difference</td>
+<th> </th>
+<th>Reference Bldg.</th>
+<th>Current Bldg. Model</th>
+<th>Difference</th>
 </tr>
 <tr>
 <td>Line Item SubTotal ($)</td>
@@ -17719,13 +17456,13 @@ Construction Cost Estimate Summary
 
 <table class="table table-striped">
 <tr>
-<td> </td>
-<td>Line No.</td>
-<td>Item Name</td>
-<td>Quantity.</td>
-<td>Units</td>
-<td>$ per Qty.</td>
-<td>SubTotal $</td>
+<th> </th>
+<th>Line No.</th>
+<th>Item Name</th>
+<th>Quantity.</th>
+<th>Units</th>
+<th>$ per Qty.</th>
+<th>SubTotal $</th>
 </tr>
 <tr>
 <td>--</td>
@@ -18128,8 +17865,8 @@ The output file contains a list of the unique surfaces and their net and gross a
 
 <table class="table table-striped">
 <tr>
-<td>Column</td>
-<td>Description</td>
+<th>Column</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>1</td>
@@ -18190,125 +17927,71 @@ Figure 11. VRML output - wireframe model
 
 The actual file produced is a text file. EnergyPlus adds some comments, such as the list of zone names and surface names before each coordinate specification. The line/solid colors are set as Floor, Wall, etc. so the file is somewhat readable.
 
-\#VRML V2.0 utf8
-
+```
+#VRML V2.0 utf8
 WorldInfo {
-
    title "Building - Building"
-
-   info ["EnergyPlus Program Version EnergyPlus &lt;version&gt;, 9/14/2006 1:31 PM"]
-
+   info ["EnergyPlus Program Version EnergyPlus <version>, 9/14/2006 1:31 PM"]
 }
-
-\# Zone Names
-
-\# Zone=1:PLENUM-1
-
-\# Zone=2:SPACE1-1
-
-\# Zone=3:SPACE2-1
-
-\# Zone=4:SPACE3-1
-
-\# Zone=5:SPACE4-1
-
-\# Zone=6:SPACE5-1
-
+# Zone Names
+# Zone=1:PLENUM-1
+# Zone=2:SPACE1-1
+# Zone=3:SPACE2-1
+# Zone=4:SPACE3-1
+# Zone=5:SPACE4-1
+# Zone=6:SPACE5-1
 Shape {
-
 appearance DEF FLOOR Appearance {
-
 material Material { diffuseColor 0.502 0.502 0.502 }
-
 }
-
 }
+```
 
-
-
-\# PLENUM-1:WALL-1PF
-
+```
+# PLENUM-1:WALL-1PF
 Shape {
-
 appearance USE WALL
-
 geometry IndexedFaceSet {
-
 solid TRUE
-
 coord DEF Surf5 Coordinate {
-
 point [
-
         0.00000         0.00000         3.00000,
-
         0.00000         0.00000         2.40000,
-
        26.41377       -15.25000         2.40000,
-
        26.41377       -15.25000         3.00000,
-
 ]
-
 }
-
 coordIndex [
-
  0 1 2 3 -1
-
 ]
-
 ccw TRUE
-
 solid TRUE
-
 }
-
 }
+```
 
-
-
-
-
-\# PLENUM-1:WALL-1PR
-
+```
+# PLENUM-1:WALL-1PR
 Shape {
-
 appearance USE WALL
-
 geometry IndexedFaceSet {
-
 solid TRUE
-
 coord DEF Surf6 Coordinate {
-
 point [
-
        26.41377       -15.25000         3.00000,
-
        26.41377       -15.25000         2.40000,
-
        34.01377        -2.08641         2.40000,
-
        34.01377        -2.08641         3.00000,
-
 ]
-
 }
-
 coordIndex [
-
  0 1 2 3 -1
-
 ]
-
 ccw TRUE
-
 solid TRUE
-
 }
-
 }
+```
 
 Delight output files
 --------------------
@@ -18356,201 +18039,108 @@ Following convention, each example file should have at the top a set of comments
 
 For example, the file titled “5ZoneAirCooled.idf” has:
 
+```idf
 ! 5ZoneAirCooled.idf
-
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
-
 !
-
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
-
 !                          outside air stream controlled to preheat and precool setpoints.
-
 !
-
-! Simulation Location/Run: CHICAGO\_IL\_USA TMY2-94846, 2 design days, 2 run periods,
-
+! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
-
 !
-
 ! Location:                Chicago, IL
-
 !
-
-! Design Days:             CHICAGO\_IL\_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-
-!                          CHICAGO\_IL\_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
-
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 !
-
-! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO\_IL\_USA TMY2-94846
-
+! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
-
 ! Run Control:             Zone and System sizing with weather file run control (no design days run)
-
 !
-
 ! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
-
 !           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
-
 !           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
-
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
-
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
-
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-
 !           13mm argon or air gap. The window to wall ratio is approxomately 0.29.
-
 !           The south wall and door have overhangs.
-
 !
-
 !           The building is oriented 30 degrees east of north.
-
 !
-
 
 
 ! Floor Area:        463.6 m2 (5000 ft2)
-
 ! Number of Stories: 1
-
 !
-
 ! Zone Description Details:
-
 !
-
 !      (0,15.2,0)                      (30.5,15.2,0)
-
-!           \_\_\_\_\_   \_\_\_\_\_\_\_\_                \_\_\_\_
-
-!         |\\     \*\*\*        \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*   /|
-
-!         | \\                                 / |
-
-!         |  \\                 (26.8,11.6,0) /  |
-
-!         \*   \\\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_/   \*
-
-!         \*    |(3.7,11.6,0)               |    \*
-
-!         \*    |                           |    \*
-
-!         \*    |                           |    \*
-
-!         \*    |               (26.8,3.7,0)|    \*
-
-!         \*    |\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_|    \*
-
-!         \*   / (3.7,3.7,0)                 \\   \*
-
-!         |  /                               \\  |
-
-!         | /                                 \\ |
-
-!         |/\_\_\_\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\_\_\_\*\*\*\_\_\_\_\_\_\_\_\\|
-
+!           _____   ________                ____
+!         |\     ***        ****************   /|
+!         | \                                 / |
+!         |  \                 (26.8,11.6,0) /  |
+!         *   \_____________________________/   *
+!         *    |(3.7,11.6,0)               |    *
+!         *    |                           |    *
+!         *    |                           |    *
+!         *    |               (26.8,3.7,0)|    *
+!         *    |___________________________|    *
+!         *   / (3.7,3.7,0)                 \   *
+!         |  /                               \  |
+!         | /                                 \ |
+!         |/___******************___***________\|
 !          |       Overhang        |   |
-
-!          |\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_|   |   window/door = \*
-
-!                                  |\_\_\_|
-
+!          |_______________________|   |   window/door = *
+!                                  |___|
 !
-
 !      (0,0,0)                            (30.5,0,0)
-
 !
-
 ! Internal gains description:     lighting is 1.5 watts/ft2, office equip is 1.0 watts/ft2. There is 1 occupant
-
 !                                 per 100 ft2 of floor area. The infiltration is 0.25 air changes per hour.
-
 !
-
 ! Interzone Surfaces:             6 interzone surfaces (see diagram)
-
 ! Internal Mass:                  None
-
 ! People:                         50
-
 ! Lights:                         7500 W
-
 ! Windows:                        4 ea.: 1) Double pane clear, 3mm glass, 13mm air gap
-
 !                                        2) Double pane clear, 3mm glass, 13mm argon gap
-
 !                                        3) Double pane clear, 6mm glass, 6mm air gap
-
 !                                        4) Double pane lowE,  6mm lowE glass outside, 6mm air gap, 6mm clear glass
-
 !
-
 ! Doors:                          2 ea.:    Single pane grey,  3mm glass
-
 !
-
 ! Detached Shading:               None
-
 ! Daylight:                       None
-
 ! Natural Ventilation:            None
-
 ! Compact Schedules:              Yes
-
 !
-
 ! HVAC:                           Standard VAV system with outside air, hot water reheat coils,
-
 !                                 central chilled water cooling coil. Central Plant is single hot water
-
 !                                 boiler, electric compression chiller with air cooled condenser.
-
 !                                 All equipment is autosized. HW and ChW coils are used in the outside air
-
 !                                 stream to precondition the outside air.
-
 !
-
 ! Zonal Equipment:                AirTerminal:SingleDuct:VAV:Reheat
-
 ! Central Air Handling Equipment: Yes
-
 ! System Equipment Autosize:      Yes
-
 ! Purchased Cooling:              None
-
 ! Purchased Heating:              None
-
 ! Coils:                          Coil:Cooling:Water, Coil:Heating:Water
-
 ! Pumps:                          Pump:VariableSpeed
-
 ! Boilers:                        Boiler:HotWater
-
 ! Chillers:                       Chiller:Electric
-
 !
-
 ! Results:
-
 ! Standard Reports:               None
-
 ! Timestep or Hourly Variables:   Hourly
-
 ! Time bins Report:               None
-
 ! HTML Report:                    None
-
 ! Environmental Emissions:        None
-
 ! Utility Tariffs:                None
+```
+
 
 In addition to the idf files, usually an .rvi and perhaps a .mvi of the same file set is included. As discussed previously, the .rvi is used with the ReadVarsESO post-processing program and the .eso file to create a .csv file which can be read easily into Excel™. Like the .rvi, the .mvi file can be used with the .mtr file to create a similar version for “metered” outputs.
 
@@ -18566,45 +18156,28 @@ Simple List Data Sets
 
 This dataset includes performance curves for air cooled electric EIR chiller (object type: Chiller:Electric:EIR). Knowing the type of chiller that you want to simulate, you can find it and the associated performance curves in the dataset file. A brief synopsis of AirCooledChiller.idf is shown below:
 
+```idf
 ! AirCooledChillers.idf
-
 !
-
 ! This dataset includes performance curves for object type Chiller:Electric:EIR
-
 !
-
 ! Summary Table for Electric EIR Chiller reference data sets.
-
 ! Chillers are listed in order of reference capacity. Reference capacity and COP do not necessarily
-
 ! indicate rated capacity and COP at standard rating conditions (e.g. ARI Standard 550/590).
-
 !
-
 ! Performance curves developed from information collected from manufacturer's catalog data
-
 ! The nomenclature used for the chiller is as follows:
-
 ! ElectricEIRChiller - Manufacturer's Name - Model - Reference Capacity in kW - Reference COP
-
 !
-
 !                                                      Compressor   Reference    Reference
-
 ! Chiller Name                                            Type       Capacity      COP
-
 !                                                                    kW (tons)
-
 ! ElectricEIRChiller McQuay AGZ010BS 34.5kW/2.67COP      Scroll     34.5 (9.8)      2.67
-
 ! ElectricEIRChiller McQuay AGZ013BS 47.1kW/2.67COP      Scroll     47.1 (13.4)     2.67
-
 ! ElectricEIRChiller York YCAL0019EE 54.2kW/2.9COP       Scroll     54.2 (15.4)     2.9
-
 ! ElectricEIRChiller McQuay AGZ017BS 54.5kW/2.67COP      Scroll     54.5 (15.5)     2.67
 
-
+```
 
 
 
@@ -18628,35 +18201,24 @@ This dataset includes object types for specific (by manufacturer and type) Chill
 
 Knowing the type of chiller that you want to simulate, you can find it and the associated performance curves in the dataset file. By example, here is part of the comments in the Chiller.idf file:
 
+```idf
 ! Summary Table for Electric EIR Chiller reference data sets (Ref. CoolTools project).
-
 ! Chillers are listed in order of compressor type and reference capacity (model calibration
-
 ! point). Reference capacity and COP do not necessarily indicate rated capacity and COP at
-
 ! standard rating conditions (e.g. ARI Standard 550/590).
-
 !
-
 ! Performance curves developed from information collected over a 10-year period from 1991 to 2001.
-
 !
-
 !                                                      Compressor   Reference  Reference Unloading
-
 ! Chiller Name                                            Type       Capacity    COP     Mechanism
-
 !                                                                    kW (tons)
-
 !-------------------------------------------------------------------------------------------------
-
 ! ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes    Centrifugal   471 (134)   5.89   Inlet Vanes
-
 ! ElectricEIRChiller York YT 563kW/10.61COP/Vanes      Centrifugal   563 (160)   10.61  Inlet Vanes
-
 ! ElectricEIRChiller McQuay PEH 703kW/7.03COP/Vanes    Centrifugal   703 (200)   7.03   Inlet Vanes
-
 ! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
+```
+
 
 ### CompositeWallConstructions.idf
 
@@ -18664,83 +18226,47 @@ The Reference Data Set CompositeWallConstructions.idf contains constructions and
 
 An example entry in this data set--for an insulated 2”x4” steel-stud wall--looks like:
 
-**CONSTRUCTION,Composite 2x4 Steel Stud R11,**
-
+```idf
+CONSTRUCTION,Composite 2x4 Steel Stud R11,
 ! ASHRAE 1145-RP Wall Assembly 10
-
 ! 2"x4" steel studs at 24" on center with between-stud R11 fibreglass insulation.
-
 ! Studs are 3.5", 16 gauge, 15 flange.
-
 ! Layers are 1/2" wood siding, 1/2" plywood, 2x4 steel studs and R11 insulation, 1/2" gypsum board.
-
 ! Area-average R-Value = 8.796 ft2-F-h/Btu (1.548 m2-K/W).
-
 ! Total wall thickness = 5.00in (0.127m)
-
 ! Material layer names follow:
-
-**  Composite 2x4 Steel Stud R11 \#3,**
-
-**  Composite 2x4 Steel Stud R11 \#2,**
-
-**  Composite 2x4 Steel Stud R11 \#1;**
-
-
-
-**MATERIAL,Composite 2x4 Steel Stud R11 \#1,**
-
+  Composite 2x4 Steel Stud R11 \#3,
+  Composite 2x4 Steel Stud R11 \#2,
+  Composite 2x4 Steel Stud R11 \#1;
+MATERIAL,Composite 2x4 Steel Stud R11 \#1,
   Smooth,  !- Roughness
-
   0.013,   !- Thickness (m)
-
   0.720,   !- Conductivity (W/m-K)
-
   640.0,   !- Density (kg/m3)
-
   1048,    !- Specific Heat (J/kg-K)
-
   0.9,     !- Absorptance:Thermal
-
   0.7,     !- Absorptance:Solar
-
   0.7;     !- Absorptance:Visible
-
-**MATERIAL,Composite 2x4 Steel Stud R11 \#2,**
-
+MATERIAL,Composite 2x4 Steel Stud R11 \#2,
   Smooth,  !- Roughness
-
   0.089,   !- Thickness (m)
-
   0.060,   !- Conductivity (W/m-K)
-
   118.223, !- Density (kg/m3)
-
   1048,    !- Specific Heat (J/kg-K)
-
   0.9,     !- Absorptance:Thermal
-
   0.7,     !- Absorptance:Solar
-
   0.7;     !- Absorptance:Visible
-
-**MATERIAL,Composite 2x4 Steel Stud R11 \#3,**
-
+MATERIAL,Composite 2x4 Steel Stud R11 \#3,
   Smooth,  !- Roughness
-
   0.025,   !- Thickness (m)
-
   0.452,   !- Conductivity (W/m-K)
-
   413.782, !- Density (kg/m3)
-
   1048,    !- Specific Heat (J/kg-K)
-
   0.9,     !- Absorptance:Thermal
-
   0.7,     !- Absorptance:Solar
-
   0.7;     !- Absorptance:Visible
+```
+
 
 The materials here are **not** real materials but are “equivalent” materials obtained from finite-difference modeling. The thickness, conductivity, density and specific heat values of the material layers for the different constructions have been taken from the ASHRAE report “Modeling Two- and Three-Dimensional Heat Transfer through Composite Wall and Roof Assemblies in Hourly Energy Simulation Programs (1145-TRP),” by Enermodal Engineering Limited, Oak Ridge National Laboratory, and the Polish Academy of Sciences, January 2001. EnergyPlus will calculate conduction transfer functions using these materials. The heat transfer based on these conduction transfer functions will then be very close to what would be calculated with a two- or three-dimensional heat transfer calculation.
 
@@ -18750,178 +18276,93 @@ If your wall’s exterior or interior roughness or thermal, solar or visible abs
 
 Following is a summary of the constructions in the composite wall data set:
 
-CONSTRUCTION,**Composite 2x4 Wood Stud R11**,
-
+```idf
+CONSTRUCTION,Composite 2x4 Wood Stud R11,
 ! ASHRAE 1145-RP Wall Assembly 1
-
 ! 2"x4" wood studs at 24" on center with between-stud R11 fibreglass insulation.
-
 ! Layers are 1/2" wood siding, 1/2" plywood, 2x4 wood studs and R11 insulation, 1/2" gypsum board.
-
 ! Area-average R-Value = 11.391 ft2-F-h/Btu (2.005 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite 2x6 Wood Stud R19**,
-
+CONSTRUCTION,Composite 2x6 Wood Stud R19,
 ! ASHRAE 1145-RP Wall Assembly 2
-
 ! 2"x6" wood studs at 24" on center with between-stud R19 fibreglass insulation.
-
 ! Layers are 1/2" wood siding, 1/2" plywood, 2x6 wood studs and R19 insulation, 1/2" gypsum board.
-
 ! Area-average R-Value = 17.487 ft2-F-h/Btu (3.078 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite Insulated Concrete Form Wall With Steel Ties**,
-
+CONSTRUCTION,Composite Insulated Concrete Form Wall With Steel Ties,
 ! ASHRAE 1145-RP Wall Assembly 7
-
 ! Wall system is made of two rigid insulation sides held together with wire mesh.
-
 ! The two sides come together to create the formwork for the concrete.
-
 ! Layers are 3/4" concrete stucco, outer polystyrene shell, concrete core, inner polystyrene shell.
-
 ! Area-average R-Value = 11.230 ft2-F-h/Btu (1.977 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite Concrete/Foam/Concrete With Steel Connectors**,
-
+CONSTRUCTION,Composite Concrete/Foam/Concrete With Steel Connectors,
 ! ASHRAE 1145-RP Wall Assembly 8
-
 ! Wall system is made of two 3" concrete slabs separated by 2" rigid insulation.
-
 ! The slab connectors are steel ties with a 0.15"x0.15" cross section.
-
 ! Layers are 3" concrete, 2" polystyrene, 3" concrete.
-
 ! Area-average R-Value = 7.659 ft2-F-h/Btu (1.348 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite Concrete/Foam/Concrete With Plastic Connectors**,
-
+CONSTRUCTION,Composite Concrete/Foam/Concrete With Plastic Connectors,
 ! ASHRAE 1145-RP Wall Assembly 9
-
 ! Wall system is made of two 3" concrete slabs separated by 2" rigid insulation.
-
 ! The slab connectors are plasic ties with a 0.25"x0.25" cross section.
-
 ! Layers are 3" concrete, 2" polystyrene, 3" concrete.
-
 ! Area-average R-Value = 10.582 ft2-F-h/Btu (1.862 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite 2x4 Steel Stud R11**,
-
+CONSTRUCTION,Composite 2x4 Steel Stud R11,
 ! ASHRAE 1145-RP Wall Assembly 10
-
 ! 2"x4" steel studs at 24" on center with between-stud R11 fibreglass insulation.
-
 ! Studs are 3.5", 16 gauge, 15 flange.
-
 ! Layers are 1/2" wood siding, 1/2" plywood, 2x4 steel studs and R11 insulation, 1/2" gypsum board.
-
 ! Area-average R-Value = 8.796 ft2-F-h/Btu (1.548 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite Brick Foam 2x4 Steel Stud R11**,
-
+CONSTRUCTION,Composite Brick Foam 2x4 Steel Stud R11,
 ! ASHRAE 1145-RP Wall Assembly 15
-
 ! Brick veneer, polystyrene, 2"x4" steel studs at 24" on center with
-
 !  between-stud R11 fibreglass insulation.
-
 ! Studs are 3.5", 16 gauge, 15 flange.
-
 ! Layers are 3.25" brick,1" polystyrene insulation, 1/2" plywood, 2x4 steel studs and R11 insulation,
-
 !  1/2" gypsum board.
-
 ! Area-average R-Value = 12.792 ft2-F-h/Btu (2.251 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite 2x6 Steel Stud R19**,
-
+CONSTRUCTION,Composite 2x6 Steel Stud R19,
 ! ASHRAE 1145-RP Wall Assembly 16
-
 ! 2"x6" steel studs at 24" on center with between-stud R19 fibreglass insulation.
-
 ! Studs are 5.5", 16 gauge, 15 flange.
-
 ! Layers are 1/2" wood siding, 1/2" plywood, 2x6 steel studs and R19 insulation, 1/2" gypsum board.
-
 ! Area-average R-Value = 12.792 ft2-F-h/Btu (1.991 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite Foam 2x6 Steel Stud R19**,
-
+CONSTRUCTION,Composite Foam 2x6 Steel Stud R19,
 ! ASHRAE 1145-RP Wall Assembly 17
-
 ! Polystyrene, 2"x6" steel studs at 24" on center with between-stud R19 fibreglass insulation.
-
 ! Studs are 5.5", 16 gauge, 15 flange.
-
 ! Layers are 3/4" concrete stucco,1" polystyrene insulation, 1/2" plywood, 2x6 steel studs and R19 insulation,
-
 !  1/2" gypsum board.
-
 ! Area-average R-Value = 15.157 ft2-F-h/Btu (2.668 m2-K/W).
 
-
-
-
-
-CONSTRUCTION,**Composite Brick Foam 2x6 Steel Stud R19**,
-
+CONSTRUCTION,Composite Brick Foam 2x6 Steel Stud R19,
 ! ASHRAE 1145-RP Wall Assembly 18
-
 ! Brick veneer, polystyrene, 2"x6" steel studs at 24" on center with
-
 !  between-stud R19 fibreglass insulation.
-
 ! Studs are 5.5", 16 gauge, 15 flange.
-
 ! Layers are 3.25" brick,1" polystyrene insulation, 1/2" plywood, 2x6 steel studs and R19 insulation,
-
 !  1/2" gypsum board.
-
 ! Area-average R-Value = 15.465 ft2-F-h/Btu (2.722 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite 2-Core Filled Concrete Block Uninsulated**,
-
+CONSTRUCTION,Composite 2-Core Filled Concrete Block Uninsulated,
 ! ASHRAE 1145-RP Wall Assembly 19
-
 ! Wall system is made of 12" 2-core concrete blocks without insulation.
-
 ! The core area is filled with rebar and poured concrete.
-
 ! Area-average R-Value = 1.326 ft2-F-h/Btu (0.239 m2-K/W).
 
-
-
-CONSTRUCTION,**Composite 2-Core Filled Concrete Block Insulated**,
-
+CONSTRUCTION,Composite 2-Core Filled Concrete Block Insulated,
 ! ASHRAE 1145-RP Wall Assembly 20
-
 ! Wall system is made of 12" 2-core concrete blocks with 1.875"-thick
-
 !  foam inserts in the block cores.
-
 ! The remaining core area is filled with poured concrete.
-
 ! Area-average R-Value = 2.291 ft2-F-h/Btu (0.403 m2-K/W).
-
+```
 
 
 ### DXCoolingCoil.idf
@@ -18930,230 +18371,120 @@ This dataset includes performance curves for the object types Coil:Cooling:DX:Si
 
 Here is a synopsis of the DXCoolingCoil.idf:
 
+```idf
 ! DXCoolingCoil.idf
-
 !
-
 ! This dataset includes performance curves for the object types Coil:Cooling:DX:SingleSpeed and
-
 ! Coil:Cooling:DX:TwoStageWithHumidityControlMode
-
 !
-
 ! Reference capacity at standard rating conditions (ARI 95F OAT, 67F EWBT and air flow rate
-
 ! around 400 cfm/Ton).
-
 !
-
 ! In the objects Coil:Cooling:DX:SingleSpeed and Coil:Cooling:DX:TwoStageWithHumidityControlMode
-
 ! below, input fields 'Availability Schedule Name', 'Air Inlet Node Name' and 'Air Outlet Node
-
 ! Name' need to be defined by the user.
-
 !
-
 !------------------------------------------------------------------------------------------------!                             Compressor  Nominal    Reference      Reference   Refrig  Expansion
-
 !                                                                                         Valve
-
 ! Name                           Type     Capacity   Capacity          COP       Type      Type
-
 !                                         (tons)     kW (tons)
-
 !------------------------------------------------------------------------------------------------! Carrier Centurion 50PG06      Scroll      5        18.28(5.2)        4.15     R-410A    TXV
-
 ! Carrier Centurion 50PG12      Scroll      10       36.79(10.47)      4.05     R-410A    TXV
-
 ! Carrier Centurion 50PG24      Scroll      20       73.81(21)         3.95     R-410A    TXV
 
-
-
   Coil:Cooling:DX:SingleSpeed,
-
     Carrier Centurion 50PG06,     !- Name
-
     CoolingCoilAvailSched,        !- Availability Schedule Name
-
     18276.96,                     !- Rated Total Cooling Capacity {W}
-
     0.74,                         !- Rated Sensible Heat Ratio
-
     4.15,                         !- Rated COP
-
     0.944,                        !- Rated Air Flow Rate {m3/s}
-
     ,                             !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-
     DXCoilAirInletNode,           !- Air Inlet Node Name
-
     DXCoilAirOutletNode,          !- Air Outlet Node Name
-
     CarrierCenturion50PG06CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-
     CarrierCenturion50PG06CapFFF, !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
     CarrierCenturion50PG06EIRFT,       !- Energy Input Ratio Function of Temperature Curve Name
-
     CarrierCenturion50PG06EIRFFF,      !- Energy Input Ratio Function of Flow Fraction Curve Name
-
     Carrier Centurion 50PG06 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
-
-
 
 ! Curve set (5 Curves):
 
-
-
 ! Cooling Capacity Function of Temperature Curve
-
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
 
-
-
   Curve:Biquadratic,
-
     CarrierCenturion50PG06CapFT,  !- Name
-
     0.9953455,               !- Coefficient1 Constant
-
     -0.0118418,              !- Coefficient2 x
-
-    0.0012277,               !- Coefficient3 x\*\*2
-
+    0.0012277,               !- Coefficient3 x**2
     0.0030246,               !- Coefficient4 y
-
-    -0.0000702,              !- Coefficient5 y\*\*2
-
-    -0.0003685,              !- Coefficient6 x\*y
-
+    -0.0000702,              !- Coefficient5 y**2
+    -0.0003685,              !- Coefficient6 x*y
     12.22,                   !- Minimum Value of x
-
     26.67,                   !- Maximum Value of x
-
     15.56,                   !- Minimum Value of y
-
     51.67,                   !- Maximum Value of y
-
     ,                        !- Minimum Curve Output
-
     ,                        !- Maximum Curve Output
-
     Temperature,             !- Input Unit Type for X
-
     Temperature,             !- Input Unit Type for Y
-
     Dimensionless;           !- Output Unit Type
-
-
 
 ! EIR Function of Temperature Curve
-
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
 
-
-
   Curve:Biquadratic,
-
     CarrierCenturion50PG06EIRFT,  !- Name
-
     0.3802131,               !- Coefficient1 Constant
-
     0.0199468,               !- Coefficient2 x
-
-    -0.0006682,              !- Coefficient3 x\*\*2
-
+    -0.0006682,              !- Coefficient3 x**2
     0.0058933,               !- Coefficient4 y
-
-    0.0004646,               !- Coefficient5 y\*\*2
-
-    -0.0004072,              !- Coefficient6 x\*y
-
+    0.0004646,               !- Coefficient5 y**2
+    -0.0004072,              !- Coefficient6 x*y
     12.22,                   !- Minimum Value of x
-
     26.67,                   !- Maximum Value of x
-
     15.56,                   !- Minimum Value of y
-
     51.67,                   !- Maximum Value of y
-
     ,                        !- Minimum Curve Output
-
     ,                        !- Maximum Curve Output
-
     Temperature,             !- Input Unit Type for X
-
     Temperature,             !- Input Unit Type for Y
-
     Dimensionless;           !- Output Unit Type
 
-
-
 ! Cooling Capacity Function of Flow Fraction Curve
-
 ! x = Flow Fraction
 
-
-
   Curve:Quadratic,
-
     CarrierCenturion50PG06CapFFF,  !- Name
-
     0.7705358,               !- Coefficient1 Constant
-
     0.2848007,               !- Coefficient2 x
-
-    -0.0580891,              !- Coefficient3 x\*\*2
-
+    -0.0580891,              !- Coefficient3 x**2
     0.75,                    !- Minimum Value of x
-
     1.25;                    !- Maximum Value of x
-
-
 
 ! EIR Function of Flow Fraction Curve
-
 ! x = Flow Fraction
 
-
-
   Curve:Quadratic,
-
     CarrierCenturion50PG06EIRFFF,   !- Name
-
     1.3439758,               !- Coefficient1 Constant
-
     -0.5111244,              !- Coefficient2 x
-
-    0.1732549,               !- Coefficient3 x\*\*2
-
+    0.1732549,               !- Coefficient3 x**2
     0.75,                    !- Minimum Value of x
-
     1.25;                    !- Maximum Value of x
 
-
-
 ! Part Load Fraction Function of Part Load Ratio Curve
-
 ! x = Part Load Ratio
 
-
-
   Curve:Quadratic,
-
     CarrierCenturion50PG06PLFFPLR,   !- Name
-
     0.85,                    !- Coefficient1 Constant
-
     0.15,                    !- Coefficient2 x
-
-    0.0,                     !- Coefficient3 x\*\*2
-
+    0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
-
     1.0;                     !- Maximum Value of x
-
+```
 
 
 ### ElectricGenerators.idf
@@ -19188,14 +18519,13 @@ For the curves provided, curve A has the highest limit and curve D has the lowes
 
 The electronic enthalpy curve equation represents a unique curve and is a function of both temperature and relative humidity. The equation is set equal to a constant which provides a unique temperature for each relative humidity entered into the equation. Each control curve has a unique constant as shown in the table below. Other constants may be used to develop specialized electronic enthalpy curves.
 
-![](OutputDetailsAndExamples/media/image028.png)
+<div>\[ K = 45.672192 - 1.1559942 \cdot T - 0.144599 \cdot RH \]</div>
 
-where:         K  = Constant value to represent specific curve
+where:
 
-T  = Outdoor Dry-Bulb Temperature (C)
-
-RH = Outdoor Relative Humidity (%)
-
+* K  = Constant value to represent specific curve
+* T  = Outdoor Dry-Bulb Temperature (C)
+* RH = Outdoor Relative Humidity (%)
 
 
 NOTE:  modifying the RH multiplier (-0.144599) tends to "wag" the curvature at the upper relative humidities. Decreasing the multiplier "wags" the upper portion of the curve downward, increasing "wags" it upwards. Modifying the constant (K) moves the intersection of the curve with the Dry-Bulb Temperature  axis. Increasing the constant moves the intersection to the left as shown in the figure, decreasing moves to the right. The minimum and/or maximum x boundaries in the curve objects may have to be adjusted when modifying the equation.
@@ -19204,11 +18534,9 @@ Table 43. Electronic Enthalpy Curve Constants and approximate control point at 5
 
 <table class="table table-striped">
 <tr>
-<td>Control Curve</td>
-<td>Curve Constant
-K</td>
-<td>Approximate Control
-Point at 50% RH (ºC)</td>
+<th>Control Curve</th>
+<th>Curve Constant K</th>
+<th>Approximate Control Point at 50% RH (ºC)</th>
 </tr>
 <tr>
 <td>A</td>
@@ -19240,17 +18568,15 @@ The method described here was used to create each of the four "cubic" curve obje
 
 **Step 1:** Substitute the curve constant K for curve A (12) into the electronic enthalpy curve equation and solve for temperature. Then identify the outdoor air dry-bulb temperatures at known values of relative humidity (e.g., columns 1 and 2 in the table below). Psychrometric routines are helpful for this step.
 
-![](OutputDetailsAndExamples/media/image029.png)
+<div>\[ \text{Temperature} = \frac{12 - 45.672192 + 0.144599 \cdot \text{RelativeHumidity}}{-1.1559942} \]</div>
 
 **Step 2:** Identify humidity ratio at each point (e.g. column 3 in the following table). Psychrometric routines are helpful for this step.
 
-
-
 <table class="table table-striped">
 <tr>
-<td>Relative Humidity (%)</td>
-<td>Temperature (ºC)</td>
-<td>Calculated Humidity Ratio (kg/kg)</td>
+<th>Relative Humidity (%)</th>
+<th>Temperature (ºC)</th>
+<th>Calculated Humidity Ratio (kg/kg)</th>
 </tr>
 <tr>
 <td>0</td>
@@ -19339,7 +18665,7 @@ This data set includes fluid properties reference data. Fluid properties for R40
 
 <table class="table table-striped">
 <tr>
-<td>Refrigerants</td>
+<th>Refrigerants</th>
 </tr>
 <tr>
 <td>R11</td>
@@ -19384,7 +18710,7 @@ This data set includes fluid properties (glycol) reference data. Reference for t
 
 <table class="table table-striped">
 <tr>
-<td>Glycols</td>
+<th>Glycols</th>
 </tr>
 <tr>
 <td>EthyleneGlycol</td>
@@ -19405,11 +18731,9 @@ This file contains sample input for the ground loop heat exchanger model. The re
 
 The sample data has been calculated for a number of configurations:
 
-     1 x 2 boreholes
-
-     4 x 4 boreholes
-
-    8 x 8 boreholes
+* 1 x 2 boreholes
+* 4 x 4 boreholes
+* 8 x 8 boreholes
 
 Data is given for both 'standard' grout (k=0.744 W/m.K) and 'thermally enhanced' grout (k= 1.471 W/m.K). The flow rate per borehole is .1514 kg/s. The pipe given is 0.75in. Dia. SDR11 HDPE. The fluid is water. The borehole/length ratio is 0.06  (76.2m/4.572m [300ft/15ft])
 
@@ -19435,721 +18759,722 @@ This file contains schedules (for an entire year) of precipitation for use with 
 
 All the refrigerated cases included in this database are listed in the following list. Comments before each refrigeration:case object include the manufacturer's model number and assumptions about the fan, lights, defrost etc. The user must ensure that the case names used in the idf file are UNIQUE and must supply the correct zone name.  The user must also supply any required correction curves or schedules. The defrost and drip-down schedule names included here indicate the frequency and duration required. The user must ensure that schedules are provided that meet these needs and that are diversified so that all the cases don't start their defrost cycles at the same time. Please see the example cases for supermarkets to see how these case objects are included with the rest of a supermarket refrigeration system.
 
-Multi-Deck Dairy/Deli Merchandiser with Synergy-E
+* Multi-Deck Dairy/Deli Merchandiser with Synergy-E
 
-Multi-Deck Rear Dairy/Deli Merchandiser with Synergy-E
+* Multi-Deck Rear Dairy/Deli Merchandiser with Synergy-E
 
-Multi-Deck Deli back
+* Multi-Deck Deli back
 
-Single Deck Club Case Merchandiser
+* Single Deck Club Case Merchandiser
 
-Single Deck Club Case Merchandiser
+* Single Deck Club Case Merchandiser
 
-Single Deck Club Merchandiser
+* Single Deck Club Merchandiser
 
-Single Deck Club Case Merchandiser
+* Single Deck Club Case Merchandiser
 
-Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Multi-Deck Dairy/Deli Merchandiser with Synergy-E
+* Multi-Deck Dairy/Deli Merchandiser with Synergy-E
 
-Multi Deck Frozen Food Merchandiser
+* Multi Deck Frozen Food Merchandiser
 
-Multi Deck Frozen Food Merchandiser
+* Multi Deck Frozen Food Merchandiser
 
-Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-International Style Service Deli/Meat/Seafood Merchandiser
+* International Style Service Deli/Meat/Seafood Merchandiser
 
-International Style Flat Glass Service Deli/Meat/Seafood Merchandiser
+* International Style Flat Glass Service Deli/Meat/Seafood Merchandiser
 
-Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Multi-Deck Deli/Meat End Cap Merchandiser
+* Multi-Deck Deli/Meat End Cap Merchandiser
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Multi-Deck Dairy/Deli/Produce/Meat Merchandiser with Synergy-E
+* Multi-Deck Dairy/Deli/Produce/Meat Merchandiser with Synergy-E
 
-Multi-Deck Dairy/Deli/Produce/Meat Merchandiser with Synergy-E
+* Multi-Deck Dairy/Deli/Produce/Meat Merchandiser with Synergy-E
 
-Multi-Deck Produce/Dairy/Deli/Meat Merchandiser
+* Multi-Deck Produce/Dairy/Deli/Meat Merchandiser
 
-Multi-Deck Deli/Meat End Cap Merchandiser
+* Multi-Deck Deli/Meat End Cap Merchandiser
 
-Multi-Deck Bulk Produce End Cap Merchandiser
+* Multi-Deck Bulk Produce End Cap Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Produce Merchandiser
+* Wide Island Multi-Deck Produce Merchandiser
 
-Wide Island Multi-Deck Produce Merchandiser
+* Wide Island Multi-Deck Produce Merchandiser
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Multi-Deck Dairy/Deli/Produce Merchandiser
+* Multi-Deck Dairy/Deli/Produce Merchandiser
 
-Multi-Deck Dairy/Deli/Produce Merchandiser
+* Multi-Deck Dairy/Deli/Produce Merchandiser
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Wide Island Multi-Deck Deli/Meat Merchandiser
+* Wide Island Multi-Deck Deli/Meat Merchandiser
 
-Multi-Deck Dairy/Deli/Produce Merchandiser
+* Multi-Deck Dairy/Deli/Produce Merchandiser
 
-Multi-Deck Dairy/Deli/Produce Merchandiser
+* Multi-Deck Dairy/Deli/Produce Merchandiser
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Multi-Deck Merchandiser with Synergy-E
+* Multi-Deck Merchandiser with Synergy-E
 
-Multi-Deck Merchandiser with Synergy-E
+* Multi-Deck Merchandiser with Synergy-E
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-High Multi-Deck Merchandiser with Synergy-E
+* High Multi-Deck Merchandiser with Synergy-E
 
-High Multi-Deck Merchandiser with Synergy-E
+* High Multi-Deck Merchandiser with Synergy-E
 
-High Multi-Deck Produce/Dairy/Deli Merchandiser
+* High Multi-Deck Produce/Dairy/Deli Merchandiser
 
-High Multi-Deck Produce/Dairy/Deli Merchandiser
+* High Multi-Deck Produce/Dairy/Deli Merchandiser
 
-High Multi-Deck Produce/Dairy/Deli Merchandiser
+* High Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Multi-Deck Read Load Merchandiser with Synergy-E
+* Multi-Deck Read Load Merchandiser with Synergy-E
 
-Multi-Deck Rear Load Dairy Merchandiser
+* Multi-Deck Rear Load Dairy Merchandiser
 
-Multi-Deck Rear Load Dairy Merchandiser
+* Multi-Deck Rear Load Dairy Merchandiser
 
-High Multi-Deck Rear Load Dairy Merchandiser
+* High Multi-Deck Rear Load Dairy Merchandiser
 
-High Multi-Deck Rear Load Dairy Merchandiser
+* High Multi-Deck Rear Load Dairy Merchandiser
 
-Multi Deck Merchandiser with Synergy-E
+* Multi Deck Merchandiser with Synergy-E
 
-Multi-Deck Deli/Meat Merchandiser
+* Multi-Deck Deli/Meat Merchandiser
 
-High Multi-Deck  Merchandiser with Synergy-E
+* High Multi-Deck  Merchandiser with Synergy-E
 
-Multi-Deck Rear Load Deli/Meat Merchandiser
+* Multi-Deck Rear Load Deli/Meat Merchandiser
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Multi-Deck Frozen Food Merchandiser
+* Multi-Deck Frozen Food Merchandiser
 
-Multi-Deck Frozen Food Merchandiser
+* Multi-Deck Frozen Food Merchandiser
 
-Multi-Deck Dairy/Deli/Produce Merchandiser with Synergy E
+* Multi-Deck Dairy/Deli/Produce Merchandiser with Synergy E
 
-Multi-Deck Dairy/Deli/Produce Merchandiser with Synergy E
+* Multi-Deck Dairy/Deli/Produce Merchandiser with Synergy E
 
-Multi-Deck Produce/Dairy/Deli Merchandiser
+* Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Full Service Bakery Merchandiser
+* Full Service Bakery Merchandiser
 
-Full Service Flat Glass Bakery Merchandiser
+* Full Service Flat Glass Bakery Merchandiser
 
-Self Service Bakery/Deli Merchandiser
+* Self Service Bakery/Deli Merchandiser
 
-Self Service Bakery/Deli Merchandiser
+* Self Service Bakery/Deli Merchandiser
 
-Self Service Bakery/Deli Merchandiser
+* Self Service Bakery/Deli Merchandiser
 
-Self Service Deli/Cheese Merchandiser
+* Self Service Deli/Cheese Merchandiser
 
-Self Service Deli/Cheese Merchandiser
+* Self Service Deli/Cheese Merchandiser
 
-Single Deck Deli/Meat End Cap Merchandiser
+* Single Deck Deli/Meat End Cap Merchandiser
 
-Single Deck Buck Produce End Cap Merchandiser
+* Single Deck Buck Produce End Cap Merchandiser
 
-American Style Vertical Glass Service Deli/Meat/Seafood Gravity Coil Merchandiser
+* American Style Vertical Glass Service Deli/Meat/Seafood Gravity Coil Merchandiser
 
-Multi-Deck Deli/Meat Merchandiser
+* Multi-Deck Deli/Meat Merchandiser
 
-Multi-Deck Deli/Meat Merchandiser
+* Multi-Deck Deli/Meat Merchandiser
 
-Multi-Deck Merchandiser with Synergy-E
+* Multi-Deck Merchandiser with Synergy-E
 
-Multi-Deck Merchandiser with Synergy-E
+* Multi-Deck Merchandiser with Synergy-E
 
-High Multi-Deck Deli/Meat Merchandiser
+* High Multi-Deck Deli/Meat Merchandiser
 
-High Multi-Deck Deli/Meat Merchandiser
+* High Multi-Deck Deli/Meat Merchandiser
 
-Multi-Deck Produce Merchandiser
+* Multi-Deck Produce Merchandiser
 
-Multi-Deck Produce Merchandiser
+* Multi-Deck Produce Merchandiser
 
-High Multi-Deck Merchandiser with Synergy-E
+* High Multi-Deck Merchandiser with Synergy-E
 
-High Multi-Deck Merchandiser with Synergy-E
+* High Multi-Deck Merchandiser with Synergy-E
 
-High Multi-Deck Merchandiser with Synergy-E
+* High Multi-Deck Merchandiser with Synergy-E
 
-High Multi-Deck Merchandiser with Synergy-E
+* High Multi-Deck Merchandiser with Synergy-E
 
-Wide Island Deli/Meat Merchandiser
+* Wide Island Deli/Meat Merchandiser
 
-Wide Island Deli/Meat Merchandiser
+* Wide Island Deli/Meat Merchandiser
 
-Wide Island Deli/Meat Merchandiser
+* Wide Island Deli/Meat Merchandiser
 
-Wide Island Deli/Meat Merchandiser
+* Wide Island Deli/Meat Merchandiser
 
-Wide Island Deli/Meat Merchandiser
+* Wide Island Deli/Meat Merchandiser
 
-Wide Island Deli/Meat Merchandiser
+* Wide Island Deli/Meat Merchandiser
 
-Wide Island Bulk Produce Merchandiser
+* Wide Island Bulk Produce Merchandiser
 
-Wide Island Bulk Produce Merchandiser
+* Wide Island Bulk Produce Merchandiser
 
-Wide Island Bulk Produce Merchandiser
+* Wide Island Bulk Produce Merchandiser
 
-Island Frozen Food Merchandiser
+* Island Frozen Food Merchandiser
 
-Island Frozen Food Merchandiser
+* Island Frozen Food Merchandiser
 
-Flat Glass Service Deli Merchandiser
+* Flat Glass Service Deli Merchandiser
 
-Flat Glass Service Deli Gravity Coil Merchandiser
+* Flat Glass Service Deli Gravity Coil Merchandiser
 
-Single-Deck Deli/Meat/Seafood Merchandiser with Synergy -E
+* Single-Deck Deli/Meat/Seafood Merchandiser with Synergy -E
 
-Single-Deck Deli/Meat/Seafood Merchandiser
+* Single-Deck Deli/Meat/Seafood Merchandiser
 
-Single-Deck Deli/Meat/Seafood Merchandiser
+* Single-Deck Deli/Meat/Seafood Merchandiser
 
-Single Deck Frozen Meat Merchandiser
+* Single Deck Frozen Meat Merchandiser
 
-Single Deck Frozen Food/Ice Cream Merchandiser
+* Single Deck Frozen Food/Ice Cream Merchandiser
 
-Single Deck Frozen Food/Ice Cream Merchandiser
+* Single Deck Frozen Food/Ice Cream Merchandiser
 
-Narrow Mulit Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Narrow Mulit Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Narrow Multi Deck Deli Meat End Cap Merchandiser
+* Narrow Multi Deck Deli Meat End Cap Merchandiser
 
-Narrow Multi Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Narrow Multi Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Narrow Multi-Deck Deli/Meat End Cap Merchandiser
+* Narrow Multi-Deck Deli/Meat End Cap Merchandiser
 
-Narrow Multi Deck Bulk Produce End Cap Merchandiser
+* Narrow Multi Deck Bulk Produce End Cap Merchandiser
 
-Narrow Island Multi Deck Deli/Meat Merchandiser
+* Narrow Island Multi Deck Deli/Meat Merchandiser
 
-Narrow Island Multi Deck Deli/Meat Merchandiser
+* Narrow Island Multi Deck Deli/Meat Merchandiser
 
-Narrow Multi Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Narrow Multi Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Multi-Deck Self Service Hot Foods Merchandiser
+* Multi-Deck Self Service Hot Foods Merchandiser
 
-Narrow Multi Deck Produce/Dairy/Deli Merchandiser
+* Narrow Multi Deck Produce/Dairy/Deli Merchandiser
 
-Narrow Multi Deck Produce/Dairy/Deli Merchandiser
+* Narrow Multi Deck Produce/Dairy/Deli Merchandiser
 
-Narrow Multi Deck Produce/Dairy/Deli Merchandiser
+* Narrow Multi Deck Produce/Dairy/Deli Merchandiser
 
-High Narrow Multi-Deck Merchandiser with Synergy-E
+* High Narrow Multi-Deck Merchandiser with Synergy-E
 
-High Narrow Multi-Deck Merchandiser with Synergy-E
+* High Narrow Multi-Deck Merchandiser with Synergy-E
 
-High Narrow Multi-Deck Produce/Dairy Merchandiser
+* High Narrow Multi-Deck Produce/Dairy Merchandiser
 
-High Narrow Multi-Deck Produce/Dairy Merchandiser
+* High Narrow Multi-Deck Produce/Dairy Merchandiser
 
-Narrow Multi-Deck Deli End Cap Merchandiser
+* Narrow Multi-Deck Deli End Cap Merchandiser
 
-Narrow Multi-Deck Produce Merchandiser
+* Narrow Multi-Deck Produce Merchandiser
 
-Narrow Multi-Deck Produce/Dairy/Deli Merchandiser
+* Narrow Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Narrow Single Deck Frozen Meat End Cap Merchandiser
+* Narrow Single Deck Frozen Meat End Cap Merchandiser
 
-Narrow Multi-Deck Deli/Meat Merchandiser
+* Narrow Multi-Deck Deli/Meat Merchandiser
 
-Narrow Multi-Deck Deli/Meat Merchandiser
+* Narrow Multi-Deck Deli/Meat Merchandiser
 
-High Narrow Multi-Deck Deli/Meat Merchandiser
+* High Narrow Multi-Deck Deli/Meat Merchandiser
 
-High Narrow Multi-Deck Deli/Meat Merchandiser
+* High Narrow Multi-Deck Deli/Meat Merchandiser
 
-Narrow Multi-Deck Produce Merchandiser
+* Narrow Multi-Deck Produce Merchandiser
 
-Narrow Multi-Deck Produce Merchandiser
+* Narrow Multi-Deck Produce Merchandiser
 
-High Narrow Multi-Deck Produce Merchandiser
+* High Narrow Multi-Deck Produce Merchandiser
 
-High Narrow Multi-Deck Produce Merchandiser
+* High Narrow Multi-Deck Produce Merchandiser
 
-Narrow Island Deli/Meat Merchandiser double Wraparound end
+* Narrow Island Deli/Meat Merchandiser double Wraparound end
 
-Narrow Island Deli/Meat Merchandiser double Wraparound end
+* Narrow Island Deli/Meat Merchandiser double Wraparound end
 
-Narrow Island Bulk Produce Merchandiser
+* Narrow Island Bulk Produce Merchandiser
 
-Narrow Island Bulk Produce Merchandiser
+* Narrow Island Bulk Produce Merchandiser
 
-Narrow Island Bulk Produce Merchandiser
+* Narrow Island Bulk Produce Merchandiser
 
-Narrow Island Frozen Food/Ice Cream Merchandiser
+* Narrow Island Frozen Food/Ice Cream Merchandiser
 
-Narrow Island Frozen Food/Ice Cream Merchandiser
+* Narrow Island Frozen Food/Ice Cream Merchandiser
 
-Narrow Island Frozen Food/Ice Cream Merchandiser
+* Narrow Island Frozen Food/Ice Cream Merchandiser
 
-Narrow Island Frozen Food Merchandiser
+* Narrow Island Frozen Food Merchandiser
 
-Narrow Single Deck Frozen Meat Merchandiser
+* Narrow Single Deck Frozen Meat Merchandiser
 
-Multi Deck Dairy Merchandiser
+* Multi Deck Dairy Merchandiser
 
-Narrow Multi Deck Deli Merchandiser
+* Narrow Multi Deck Deli Merchandiser
 
-Multi Deck Utility Merchandiser
+* Multi Deck Utility Merchandiser
 
-Narrow Single Deck Produce Merchandiser
+* Narrow Single Deck Produce Merchandiser
 
-Narrow Glass Door Reach In Beverage Merchandiser
+* Narrow Glass Door Reach In Beverage Merchandiser
 
-Narrow Glass Door Reach In Beverage Merchandiser
+* Narrow Glass Door Reach In Beverage Merchandiser
 
-High Narrow Glass Door Reach-in Beverage Merchandiser
+* High Narrow Glass Door Reach-in Beverage Merchandiser
 
-High Narrow Glass Door Reach-in Beverage Merchandiser
+* High Narrow Glass Door Reach-in Beverage Merchandiser
 
-Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
+* Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
 
-Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
+* Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
 
-High Narrow Glass Door Reach-in Back-to-Back Frozen Food/Ice Cream: Frozen food
+* High Narrow Glass Door Reach-in Back-to-Back Frozen Food/Ice Cream: Frozen food
 
-High Narrow Glass Door Reach-in Back-to-Back Frozen Food/Ice Cream: Ice cream
+* High Narrow Glass Door Reach-in Back-to-Back Frozen Food/Ice Cream: Ice cream
 
-Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
+* Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
 
-Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Ice Cream
+* Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Ice Cream
 
-High Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser
+* High Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser
 
-High Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser
+* High Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser
 
-High Narrow Glass Door Reach in Back to back Frozen Food/Ice Cream Merchandiser
+* High Narrow Glass Door Reach in Back to back Frozen Food/Ice Cream Merchandiser
 
-Narrow Multi-Deck Produce/Dairy/Deli/Meat Merchandiser
+* Narrow Multi-Deck Produce/Dairy/Deli/Meat Merchandiser
 
-Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
+* Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
 
-Narrow Multi-Deck Dome Deli Merchandiser
+* Narrow Multi-Deck Dome Deli Merchandiser
 
-Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
+* Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
 
-Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
+* Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
 
-Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
+* Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
 
-Single Deck Produce Merchandiser
+* Single Deck Produce Merchandiser
 
-Single Deck Produce Merchandiser
+* Single Deck Produce Merchandiser
 
-Single Deck Produce Merchandiser
+* Single Deck Produce Merchandiser
 
-Single Deck Produce Merchandiser
+* Single Deck Produce Merchandiser
 
-Glass Door Reach-in Beverage Merchandiser
+* Glass Door Reach-in Beverage Merchandiser
 
-Glass Door Reach-in Beverage Merchandiser
+* Glass Door Reach-in Beverage Merchandiser
 
-High Glass Door Reach-in Beverage Merchandiser
+* High Glass Door Reach-in Beverage Merchandiser
 
-High Glass Door Reach-in Beverage Merchandiser
+* High Glass Door Reach-in Beverage Merchandiser
 
-Glass Door Reach-in Rear Load Beverage Merchandiser
+* Glass Door Reach-in Rear Load Beverage Merchandiser
 
-Roll in Rear Load Merchandiser with Synergy-E
+* Roll in Rear Load Merchandiser with Synergy-E
 
-Roll in Rear Load Dairy Merchandiser
+* Roll in Rear Load Dairy Merchandiser
 
-Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
+* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
 
-Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
+* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
 
-Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
+* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
 
-Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
+* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
 
-Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
+* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
 
-Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
+* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
 
-High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
+* High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
 
-High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
+* High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
 
-American Style Curved Glass Service Deli Merchandiser
+* American Style Curved Glass Service Deli Merchandiser
 
-American Style Curved Glass Service Deli/Meat/Seafood Gravity Merchandiser
+* American Style Curved Glass Service Deli/Meat/Seafood Gravity Merchandiser
 
-American Style Curved Glass Service Deli/Meat/Seafood Gravity Merchandiser
+* American Style Curved Glass Service Deli/Meat/Seafood Gravity Merchandiser
 
-American Style Glass Service Deli Merchandiser
+* American Style Glass Service Deli Merchandiser
 
-American Style Glass Service Deli Merchandiser
+* American Style Glass Service Deli Merchandiser
 
-American Style Flat Glass Service Deli/Meat/Seafood Gravity Coil Merchandiser
+* American Style Flat Glass Service Deli/Meat/Seafood Gravity Coil Merchandiser
 
-International Style Service Deli/Seafood Merchandiser
+* International Style Service Deli/Seafood Merchandiser
 
-International Style Flat Glass Service Deli/Meat/Seafood Merchandiser
+* International Style Flat Glass Service Deli/Meat/Seafood Merchandiser
 
-International Style Single Deck Deli Seafood Merchandiser
+* International Style Single Deck Deli Seafood Merchandiser
 
-American Style Vertical Glass Service Deli Merchandiser
+* American Style Vertical Glass Service Deli Merchandiser
 
-American Style Flat Glass Service Frozen Food Merchandiser
+* American Style Flat Glass Service Frozen Food Merchandiser
 
-Multi-Deck Produce/Dairy/Meat/Seafood Merchandiser
+* Multi-Deck Produce/Dairy/Meat/Seafood Merchandiser
 
-Wide Multi-Deck Produce/Dairy/Deli Merchandiser
+* Wide Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Wide Multi-Deck Produce/Dairy/Deli Merchandiser
+* Wide Multi-Deck Produce/Dairy/Deli Merchandiser
 
-Wide Island End Cap Frozen Food/Ice Cream Merchandiser
+* Wide Island End Cap Frozen Food/Ice Cream Merchandiser
 
-Wide Island End Cap Frozen Food/Ice Cream Merchandiser
+* Wide Island End Cap Frozen Food/Ice Cream Merchandiser
 
-Wide Island End Cap Frozen Food/Ice Cream Merchandiser
+* Wide Island End Cap Frozen Food/Ice Cream Merchandiser
 
-Wide High Multi-Deck Produce Merchandiser
+* Wide High Multi-Deck Produce Merchandiser
 
-Wide High Multi-Deck Produce Merchandiser
+* Wide High Multi-Deck Produce Merchandiser
 
-Wide Island Frozen Food/Ice Cream Merchandiser
+* Wide Island Frozen Food/Ice Cream Merchandiser
 
-Wide Island Frozen Food/Ice Cream Merchandiser
+* Wide Island Frozen Food/Ice Cream Merchandiser
 
-Wide Island Frozen Food/Ice Cream Merchandiser
+* Wide Island Frozen Food/Ice Cream Merchandiser
 
-Wide Single Deck Produce Merchandiser
+* Wide Single Deck Produce Merchandiser
 
-Wide Single Deck Produce Merchandiser
+* Wide Single Deck Produce Merchandiser
 
-Wide Single Deck Produce Merchandiser
+* Wide Single Deck Produce Merchandiser
 
-Wide Single Deck Produce Merchandiser
+* Wide Single Deck Produce Merchandiser
 
-Wide International Style Service Deli/Seafood Merchandiser
+* Wide International Style Service Deli/Seafood Merchandiser
 
-Wide International Style Single Deck Deli/Seafood Merchandiser
+* Wide International Style Single Deck Deli/Seafood Merchandiser
 
-Single Deck Frozen Food Merchandiser
+* Single Deck Frozen Food Merchandiser
 
-Single Deck Frozen Food Merchandiser
+* Single Deck Frozen Food Merchandiser
 
-Wide Single Deck Frozen Food Merchandiser
+* Wide Single Deck Frozen Food Merchandiser
 
-Full Service Flat Glass Deli Merchandiser
+* Full Service Flat Glass Deli Merchandiser
 
-Multi-Deck Curved Glass Dome Deli/Meat/Seafood Merchandiser
+* Multi-Deck Curved Glass Dome Deli/Meat/Seafood Merchandiser
 
-Multi-Deck Curved Glass Dome Deli/Meat/Seafood Merchandiser
+* Multi-Deck Curved Glass Dome Deli/Meat/Seafood Merchandiser
 
-Glass Door Reach-in Beverage Merchandiser
+* Glass Door Reach-in Beverage Merchandiser
 
-Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
+* Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
 
-Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
+* Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
 
-High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
+* High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
 
-High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
+* High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
 
-Single Deck Wood Clad Merchandiser for Medium Temp Application
+* Single Deck Wood Clad Merchandiser for Medium Temp Application
 
-Single Deck Wood Clad Merchandiser for Medium Temp Application
+* Single Deck Wood Clad Merchandiser for Medium Temp Application
 
-55'' Tall Convertible With Extended Canopy. Medium Temperature Merchandiser
+* 55'' Tall Convertible With Extended Canopy. Medium Temperature Merchandiser
 
-C2LGE MultiDeck 3 display levels
+* C2LGE MultiDeck 3 display levels
 
-Convertible Island End. Low Profile Multi-Deck
+* Convertible Island End. Low Profile Multi-Deck
 
-Unitized Convertible Island. Low Profile Multi-Deck
+* Unitized Convertible Island. Low Profile Multi-Deck
 
-Convertible Island. Low Profile Multi-Deck
+* Convertible Island. Low Profile Multi-Deck
 
-Unitized Convertible Island. Low Profile Multi-Deck
+* Unitized Convertible Island. Low Profile Multi-Deck
 
-Unitized Convertible Island. Low Profile Multi-Deck
+* Unitized Convertible Island. Low Profile Multi-Deck
 
-Unitized Convertible Island. Low Profile Multi-Deck
+* Unitized Convertible Island. Low Profile Multi-Deck
 
-Unitized Convertible Island. Low Profile Multi-Deck
+* Unitized Convertible Island. Low Profile Multi-Deck
 
-Convertible Island. Low Profile Multi-Deck
+* Convertible Island. Low Profile Multi-Deck
 
-Self-Serve Three-Level Display With Extended Canopy
+* Self-Serve Three-Level Display With Extended Canopy
 
-Self-Serve Four-Level Display With Extended Canopy
+* Self-Serve Four-Level Display With Extended Canopy
 
-Self-Serve Four-Level Display With Extended Canopy
+* Self-Serve Four-Level Display With Extended Canopy
 
-ED1 Impact Service Merchandiser with curved hinged glass 1 display level
+* ED1 Impact Service Merchandiser with curved hinged glass 1 display level
 
-ED1 Impact Service Merchandiser with curved hinged glass 1 display level
+* ED1 Impact Service Merchandiser with curved hinged glass 1 display level
 
-EDS1 Impact self service glass 1 display level
+* EDS1 Impact self service glass 1 display level
 
-E1 Self Service Single Deck Display for Deli Cheese and Salads
+* E1 Self Service Single Deck Display for Deli Cheese and Salads
 
-E1S Self Service Single Deck Display for Deli Cheese and Salads
+* E1S Self Service Single Deck Display for Deli Cheese and Salads
 
-E2 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
+* E2 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
 
-E2 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
+* E2 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
 
-E2S Self-Serve Three Level Display For Deli Cheese Pizza
+* E2S Self-Serve Three Level Display For Deli Cheese Pizza
 
-E2S Self-Serve Three Level Display For Deli Cheese Pizza
+* E2S Self-Serve Three Level Display For Deli Cheese Pizza
 
-E2S Self-Serve Three Level Display For Deli Cheese Pizza
+* E2S Self-Serve Three Level Display For Deli Cheese Pizza
 
-E2S Self-Serve Three Level Display For Deli Cheese Pizza
+* E2S Self-Serve Three Level Display For Deli Cheese Pizza
 
-E3 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
+* E3 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
 
-Self Serve Multi-Deck Display Merchandiser
+* Self Serve Multi-Deck Display Merchandiser
 
-Self Serve Multi-Deck Display Merchandiser
+* Self Serve Multi-Deck Display Merchandiser
 
-ES1 Single-Deck Curved Glass Service Case with 1 display level
+* ES1 Single-Deck Curved Glass Service Case with 1 display level
 
-ES1S Single-Deck Straight glass Service Case with one display level
+* ES1S Single-Deck Straight glass Service Case with one display level
 
-ESBD Curved glass case for deli with blower coil and one display level with optional shelves
+* ESBD Curved glass case for deli with blower coil and one display level with optional shelves
 
-ESBDHV High Volume Curved Glass Blower Coil Service Case for Deli with 3 display levels
+* ESBDHV High Volume Curved Glass Blower Coil Service Case for Deli with 3 display levels
 
-ESBDS Straight glass service case for deli with blower coil and one display level with optional 2 shelves
+* ESBDS Straight glass service case for deli with blower coil and one display level with optional 2 shelves
 
-ESGM Curved Glass Gravity Coil Service Case for Meat and Seafood
+* ESGM Curved Glass Gravity Coil Service Case for Meat and Seafood
 
-ESGMS Straight Glass Gravity Coil Service Case for Meat and Seafood
+* ESGMS Straight Glass Gravity Coil Service Case for Meat and Seafood
 
-ESGMVS Vertical hinged glass service case for Deli with Gravity Coil\_single display level
+* ESGMVS Vertical hinged glass service case for Deli with Gravity Coil\_single display level
 
-ESGS Curved Glass Gravity Coil Service Case for Meat and Seafood
+* ESGS Curved Glass Gravity Coil Service Case for Meat and Seafood
 
-ESGSS Straight Glass Gravity Coil Service Case for Meat and Seafood
+* ESGSS Straight Glass Gravity Coil Service Case for Meat and Seafood
 
-ESBDVS Straight hinged glass service case for Deli with Blower Coil\_1 display level with optional shelves
+* ESBDVS Straight hinged glass service case for Deli with Blower Coil\_1 display level with optional shelves
 
-B1X BulkSinlge Decked Extended Depth Glass Front
+* B1X BulkSinlge Decked Extended Depth Glass Front
 
-B3XC Bulk Multi-Deck Convertible Merchandiser
+* B3XC Bulk Multi-Deck Convertible Merchandiser
 
-B3XC Bulk Multi-Deck Convertible Merchandiser
+* B3XC Bulk Multi-Deck Convertible Merchandiser
 
-B4-XE Four-Deck High Volume Bulk Convertible Merchandiser
+* B4-XE Four-Deck High Volume Bulk Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2X Low-Profile Multi-Deck Convertible Merchandiser
+* C2X Low-Profile Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
+* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
 
-C3X Multi-Deck Convertible Merchandiser with four display levels
+* C3X Multi-Deck Convertible Merchandiser with four display levels
 
-C3X Multi-Deck Convertible Merchandiser with four display levels
+* C3X Multi-Deck Convertible Merchandiser with four display levels
 
-C4X Multi-Deck Convertible Merchandiser
+* C4X Multi-Deck Convertible Merchandiser
 
-C4X Multi-Deck Convertible Merchandiser
+* C4X Multi-Deck Convertible Merchandiser
 
-C4X Multi-Deck Convertible Merchandiser
+* C4X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C5X Multi-Deck Convertible Merchandiser
+* C5X Multi-Deck Convertible Merchandiser
 
-C6X High Capacity Multi-Deck Convertible Merchandiser
+* C6X High Capacity Multi-Deck Convertible Merchandiser
 
-C6X High Capacity Multi-Deck Convertible Merchandiser
+* C6X High Capacity Multi-Deck Convertible Merchandiser
 
-C6X High Capacity Multi-Deck Convertible Merchandiser
+* C6X High Capacity Multi-Deck Convertible Merchandiser
 
-C6X High Capacity Multi-Deck Convertible Merchandiser
+* C6X High Capacity Multi-Deck Convertible Merchandiser
 
-C6X High Capacity Multi-Deck Convertible Merchandiser
+* C6X High Capacity Multi-Deck Convertible Merchandiser
 
-C6X High Capacity Multi-Deck Convertible Merchandiser
+* C6X High Capacity Multi-Deck Convertible Merchandiser
 
-C6X High Capacity Multi-Deck Convertible Merchandiser
+* C6X High Capacity Multi-Deck Convertible Merchandiser
 
-C6X High Capacity Multi-Deck Convertible Merchandiser
+* C6X High Capacity Multi-Deck Convertible Merchandiser
 
-C6XLRE High Capacity Multi-Deck Convertible Merchandiser with Rear Load-In for Dairy and Deli
+* C6XLRE High Capacity Multi-Deck Convertible Merchandiser with Rear Load-In for Dairy and Deli
 
-D5X-ULEP Ultra Low Front Multi-Deck Dairy/Deli Merchandiser
+* D5X-ULEP Ultra Low Front Multi-Deck Dairy/Deli Merchandiser
 
-D5X-E Multi-Deck Dairy/Deli Merchandiser
+* D5X-E Multi-Deck Dairy/Deli Merchandiser
 
-D5X-EP Multi-Deck Dairy/Deli Merchandiser
+* D5X-EP Multi-Deck Dairy/Deli Merchandiser
 
-D5X-EP Multi-Deck Dairy/Deli Merchandiser
+* D5X-EP Multi-Deck Dairy/Deli Merchandiser
 
-D5X-HE Multi-Deck Dairy/Deli Merchandiser
+* D5X-HE Multi-Deck Dairy/Deli Merchandiser
 
-D5X Multi-Deck Dairy/Deli Merchandiser
+* D5X Multi-Deck Dairy/Deli Merchandiser
 
-D5X-LE Multi-Deck Dairy/Deli Merchandiser
+* D5X-LE Multi-Deck Dairy/Deli Merchandiser
 
-D5X-LEP Multi-Deck Dairy/Deli Merchandiser
+* D5X-LEP Multi-Deck Dairy/Deli Merchandiser
 
-D5X-LEP Multi-Deck Dairy/Deli Merchandiser
+* D5X-LEP Multi-Deck Dairy/Deli Merchandiser
 
-D5XLRE Multi-Deck Dairy/Deli Merchandiser With Rear Sliding Doors and low front
+* D5XLRE Multi-Deck Dairy/Deli Merchandiser With Rear Sliding Doors and low front
 
-D5XRRI Rear Roll-IN Dairy Merchandiser
+* D5XRRI Rear Roll-IN Dairy Merchandiser
 
-D5XRRIS Rear Roll-IN Dairy Merchandiser
+* D5XRRIS Rear Roll-IN Dairy Merchandiser
 
-D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
+* D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
 
-D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
+* D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
 
-D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
+* D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
 
-D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
+* D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
 
-D6X-ULEP Ultra Low Front Dairy Merchandiser
+* D6X-ULEP Ultra Low Front Dairy Merchandiser
 
-F Single Deck Wall Model Merchandiser  with solid front for Frozen Food
+* F Single Deck Wall Model Merchandiser  with solid front for Frozen Food
 
-F Single Deck Wall Model Merchandiser  with solid front for Ice Cream
+* F Single Deck Wall Model Merchandiser  with solid front for Ice Cream
 
-F Single Deck Wall Model Merchandiser  with solid front for Medium Temp Products
+* F Single Deck Wall Model Merchandiser  with solid front for Medium Temp Products
 
-FI Intermediate Island Merchandiser with solid walls for Frozen Food
+* FI Intermediate Island Merchandiser with solid walls for Frozen Food
 
-F2XLG Low Temperature Multi-Deck Merchandiser for Frozen Seafood and Meat
+* F2XLG Low Temperature Multi-Deck Merchandiser for Frozen Seafood and Meat
 
-F6 Low Temperature Multi-Deck Open Merchandiser
+* F6 Low Temperature Multi-Deck Open Merchandiser
 
-F6L Low Temperature Multi-Deck Open Merchandiser
+* F6L Low Temperature Multi-Deck Open Merchandiser
 
-FG Single Deck Wall Model Merchandiser with glass front for Frozen Food
+* FG Single Deck Wall Model Merchandiser with glass front for Frozen Food
 
-FG Single Deck Wall Model Merchandiser r with glass front for Ice Cream
+* FG Single Deck Wall Model Merchandiser r with glass front for Ice Cream
 
-FG Single Deck Wall Model Merchandiser r with glass front for Medium Temp Products
+* FG Single Deck Wall Model Merchandiser r with glass front for Medium Temp Products
 
-FIG Intermediate Island Merchandiser with glass walls for Frozen Food
+* FIG Intermediate Island Merchandiser with glass walls for Frozen Food
 
-FL5NX Excel Multi-Deck Narrow Footprint Floral Merchandiser
+* FL5NX Excel Multi-Deck Narrow Footprint Floral Merchandiser
 
-FN Narrow Island display with solid walls for Frozen Food
+* FN Narrow Island display with solid walls for Frozen Food
 
-FN Narrow Island display with solid walls for Ice Cream
+* FN Narrow Island display with solid walls for Ice Cream
 
-FN Narrow Island display with solid walls for medium temperature
+* FN Narrow Island display with solid walls for medium temperature
 
-FNG Narrow Glass Sided Island Merchandiser for Frozen
+* FNG Narrow Glass Sided Island Merchandiser for Frozen
 
-FNG Narrow Glass Sided Island Merchandiser for Ice Cream
+* FNG Narrow Glass Sided Island Merchandiser for Ice Cream
 
-FNG Narrow Glass Sided Island Merchandiser for Medium Temperature
+* FNG Narrow Glass Sided Island Merchandiser for Medium Temperature
 
-FW Wide Island Display with Solid Walls for Frozen Food
+* FW Wide Island Display with Solid Walls for Frozen Food
 
-FW Wide Island Display with Solid Walls for Ice Cream
+* FW Wide Island Display with Solid Walls for Ice Cream
 
-FW Wide Island Display with Solid Walls for Medium Temperature;
+* FW Wide Island Display with Solid Walls for Medium Temperature;
+
 
 ### RefrigerationCompressorCurves.idf
 
@@ -20159,95 +19484,54 @@ This dataset includes object types for specific (by manufacturer and type) Refri
 
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
+```idf
 Curve:Bicubic,
-
-    06CC016\_R-22\_Low\_qcurv,  !- Name
-
+    06CC016_R-22_Low_qcurv,  !- Name
     2.350e+004,              !- Coefficient1 Constant
-
     816.7,                   !- Coefficient2 x
-
-    10.70,                   !- Coefficient3 x\*\*2
-
+    10.70,                   !- Coefficient3 x**2
     -28.24,                  !- Coefficient4 y
-
-    0.1131,                  !- Coefficient5 y\*\*2
-
-    -0.4553,                 !- Coefficient6 x\*y
-
-    0.05604,                 !- Coefficient7 x\*\*3
-
-    -0.004120,               !- Coefficient8 y\*\*3
-
-    -0.006728,               !- Coefficient9 x\*\*2\*y
-
-    0.006782,                !- Coefficient10 x\*y\*\*2
-
+    0.1131,                  !- Coefficient5 y**2
+    -0.4553,                 !- Coefficient6 x*y
+    0.05604,                 !- Coefficient7 x**3
+    -0.004120,               !- Coefficient8 y**3
+    -0.006728,               !- Coefficient9 x**2*y
+    0.006782,                !- Coefficient10 x*y**2
     -40.0,                   !- Minimum Value of x
-
     -17.8,                   !- Maximum Value of x
-
     10.0,                    !- Minimum Value of y
-
     48.9;                    !- Maximum Value of y
 
-
-
-! Power Curve for Carlyle\_R-22\_Low\_06CC016,   !nominal kW = 3.1
-
+! Power Curve for Carlyle_R-22_Low_06CC016,   !nominal kW = 3.1
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
 Curve:Bicubic,
-
-    06CC016\_R-22\_Low\_pwrcurv,!- Name
-
+    06CC016_R-22_Low_pwrcurv,!- Name
     4018.,                   !- Coefficient1 Constant
-
     95.00,                   !- Coefficient2 x
-
-    1.507,                   !- Coefficient3 x\*\*2
-
+    1.507,                   !- Coefficient3 x**2
     5.705,                   !- Coefficient4 y
-
-    1.247,                   !- Coefficient5 y\*\*2
-
-    -1.381,                  !- Coefficient6 x\*y
-
-    0.01277,                 !- Coefficient7 x\*\*3
-
-    -0.007518,               !- Coefficient8 y\*\*3
-
-    -0.02424,                !- Coefficient9 x\*\*2\*y
-
-    0.02917,                 !- Coefficient10 x\*y\*\*2
-
+    1.247,                   !- Coefficient5 y**2
+    -1.381,                  !- Coefficient6 x*y
+    0.01277,                 !- Coefficient7 x**3
+    -0.007518,               !- Coefficient8 y**3
+    -0.02424,                !- Coefficient9 x**2*y
+    0.02917,                 !- Coefficient10 x*y**2
     -40.0,                   !- Minimum Value of x
-
     -17.8,                   !- Maximum Value of x
-
     10.0,                    !- Minimum Value of y
-
     48.9;                    !- Maximum Value of y
 
-
-
-!Detailed Compressor: Carlyle\_R-22\_Low\_06CC016,   !nominal MBtu/h = 18561.0, !nominal kW = 3.1
-
+!Detailed Compressor: Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0, !nominal kW = 3.1
 Refrigeration:Compressor,
-
-    Carlyle\_R-22\_Low\_06CC016,!- Name
-
-    06CC016\_R-22\_Low\_pwrcurv,!- Refrigeration Compressor Power Curve Name
-
-    06CC016\_R-22\_Low\_qcurv,  !- Refrigeration Compressor Capacity Curve Name
-
+    Carlyle_R-22_Low_06CC016,!- Name
+    06CC016_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
+    06CC016_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
-
     18.3,                    !- Compressor Rated Suction Temperature {C}
-
     4.4,                     !- Rated Liquid Temperature {C}
-
     ;                        !- Compressor Rated Subcooling {C}
+```
+
 
 ### RooftopPackagedHeatPump.idf
 
