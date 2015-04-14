@@ -441,45 +441,35 @@ This numeric field contains length {m} of each hydronic tubing circuit.
 
 An example of the IDF is shown below.
 
+```idf
   GroundHeatExchanger:Pond,
-
     Pond 1,                  !- Name
-
     Condenser Tower 1 Inlet Node,  !- Fluid Inlet Node Name
-
     Condenser Tower 1 Outlet Node,  !- Fluid Outlet Node Name
-
     2.0,                     !- Pond Depth {m}
-
     1000.0,                  !- Pond Area {m2}
-
     0.02,                    !- Hydronic Tubing Inside Diameter {m}
-
     0.025,                   !- Hydronic Tubing Outside Diameter {m}
-
     0.4,                     !- Hydronic Tubing Thermal Conductivity {W/m-K}
-
     1.0,                     !- Ground Thermal Conductivity {W/m2-K}
-
     10,                      !- Number of Tubing Circuits
-
     50.0;                    !- Length of Each Tubing Circuit {m}
-
+```
 
 
 ### Pond Heat Exchanger Outputs
 
-HVAC,Average,Pond Heat Exchanger Heat Transfer Rate [W]
+* HVAC,Average,Pond Heat Exchanger Heat Transfer Rate [W]
 
-HVAC,Sum,Pond Heat Exchanger Heat Transfer Energy [J]
+* HVAC,Sum,Pond Heat Exchanger Heat Transfer Energy [J]
 
-HVAC,Average,Pond Heat Exchanger Mass Flow Rate [kg/s]
+* HVAC,Average,Pond Heat Exchanger Mass Flow Rate [kg/s]
 
-HVAC,Average,Pond Heat Exchanger Inlet Temperature [C]
+* HVAC,Average,Pond Heat Exchanger Inlet Temperature [C]
 
-HVAC,Average,Pond Heat Exchanger Outlet Temperature [C]
+* HVAC,Average,Pond Heat Exchanger Outlet Temperature [C]
 
-HVAC,Average,Pond Heat Exchanger Bulk Temperature [C]
+* HVAC,Average,Pond Heat Exchanger Bulk Temperature [C]
 
 #### Pond Heat Exchanger Heat Transfer Rate [W]
 
@@ -557,55 +547,48 @@ This alpha field expresses the lower surface exposure: Exposed or Ground.
 
 An example of this statement in an IDF is shown below:
 
+```idf
   GroundHeatExchanger:Surface,
-
     SURFACE 1,               !- Name
-
     Outside Surface Construction,  !- Construction Name
-
     Condenser Tower 1 Inlet Node,  !- Fluid Inlet Node Name
-
     Condenser Tower 1 Outlet Node,  !- Fluid Outlet Node Name
-
     0.02,                    !- Hydronic Tubing Inside Diameter {m}
-
     10.0,                    !- Number of Tubing Circuits
-
     0.3,                     !- Hydronic Tube Spacing {m}
-
     100.0,                   !- Surface Length {m}
-
     100.0,                   !- Surface Width {m}
-
     GROUND;                  !- Lower Surface Environment
+```
 
 
 
 ### Surface Ground Heat Exchanger Outputs
 
-HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W]
+* HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W]
 
-HVAC,Average,Ground Heat Exchanger Surface Heat Transfer Rate [W]
+* HVAC,Average,Ground Heat Exchanger Surface Heat Transfer Rate [W]
 
-HVAC,Sum,Ground Heat Exchanger Heat Transfer Energy [J]
+* HVAC,Sum,Ground Heat Exchanger Heat Transfer Energy [J]
 
-HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]
+* HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]
 
-HVAC,Average,Ground Heat Exchanger Inlet Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Inlet Temperature [C]
 
-HVAC,Average,Ground Heat Exchanger Outlet Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Outlet Temperature [C]
 
-HVAC,Average,Ground Heat Exchanger Top Surface Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Top Surface Temperature [C]
 
-HVAC,Average Ground Heat Exchanger Bottom Surface Temperature [C]
+* HVAC,Average Ground Heat Exchanger Bottom Surface Temperature [C]
 
-HVAC,Average,Ground Heat Exchanger Top Surface Heat Transfer Energy per Area [J/m2]
+* HVAC,Average,Ground Heat Exchanger Top Surface Heat Transfer Energy per Area [J/m2]
 
-HVAC,Average,Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area[J/m2]
+* HVAC,Average,Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area[J/m2]
 
-HVAC,Sum,Ground Heat Exchanger Surface Heat Transfer Energy [J]
+* HVAC,Sum,Ground Heat Exchanger Surface Heat Transfer Energy [J]
 
-HVAC,Average,Ground Heat Exchanger Source Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Source Temperature [C]
+
 
 #### Ground Heat Exchanger Heat Transfer Rate [W]
 
@@ -737,61 +720,43 @@ This numeric field specifies the ground cover effects used in the evapotranspira
 
 An example of this statement in an IDF is shown below:
 
+```idf
 GroundHeatExchanger:HorizontalTrench,
-
    My Pipe Circuit, !- Name
-
    Plant Supply Intermediate Node, !- Inlet Node Name
-
    Plant Supply Outlet Node, !- Outlet Node Name
-
    0.004,       !- Design Flow Rate
-
    75,          !- Trench Length in Pipe Axial Direction
-
    2,           !- Number of Trenches
-
    2.0,         !- Horizontal Spacing Between Pipes
-
    0.016,       !- Pipe Inner Diameter
-
    0.02667,     !- Pipe Outer Diameter
-
    1.25,        !- Burial Depth
-
    1.08,        !- Soil Thermal Conductivity
-
    962,         !- Soil Density
-
    2576,        !- Soil Specific Heat
-
    0.3895,      !- Pipe Thermal Conductivity {W/m-K}
-
    641,         !- Pipe Density {kg/m3}
-
    2405,        !- Pipe Specific Heat {J/kg-K}
-
    30,          !- Soil Moisture Content Volume Fraction {percent}
-
    50,       !- Soil Moisture Content Volume Fraction at Saturation {percent}
-
    15.5,        !- Kusuda-Achenbach Average Surface Temperature {C}
-
    12.8,     !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-
    17.3,!- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-
    0.408;       !- Evapotranspiration Ground Cover Parameter
+```
+
 
 ### Horizontal Trench Ground Heat Exchanger Outputs
 
-HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]
+* HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]
 
-HVAC,Average,Ground Heat Exchanger Inlet Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Inlet Temperature [C]
 
-HVAC,Average,Ground Heat Exchanger Outlet Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Outlet Temperature [C]
 
-HVAC,Average,Ground Heat Exchanger Fluid Heat Transfer Rate [W]
+* HVAC,Average,Ground Heat Exchanger Fluid Heat Transfer Rate [W]
+
 
 #### Ground Heat Exchanger Mass Flow Rate [kg/s]
 
@@ -943,70 +908,41 @@ This optional field can be used to provide supervisory control of the heat excha
 
 Some example IDF input objects follow.
 
-
+```idf
 
   HeatExchanger:FluidToFluid,
-
     CondenserLoop HX,!- Name
-
-    ALWAYS\_ON,     !- Availability Schedule Name
-
+    ALWAYS_ON,     !- Availability Schedule Name
     CondenserLoop HX HX Inlet Node, !- Loop Demand Side Inlet Node Name
-
     CondenserLoop HX HX Outlet Node, !- Loop Demand Side Outlet Node Name
-
     autosize,                     !- Loop Demand Side Design Flow Rate
-
     CondenserLoop Pump- HXNode,   !- Loop Supply Side Inlet Node Name
-
     CondenserLoop HX- ChillerNode,!- Loop Supply Side Outlet Node Name
-
     autosize,                !- Loop Supply Side Design Flow Rate
-
     CounterFlow,             !- Heat Exchange Model Type
-
     autosize,                !- Heat Exchanger U-Factor Times Area Value
-
     CoolingDifferentialOnOff,    !- Control Type
-
     ,   !- Heat Exchanger Setpoint Node Name
-
     2.0,         !- Minimum Temperature Difference to Activate Heat Exchanger
-
     FreeCooling;             !- Heat Transfer Metering End Use Type
 
 
-
 HeatExchanger:FluidToFluid,
-
     SOURCE to TRANSFER HX , !- Name
-
     AlwaysOnSchedule, !- Availability Schedule Name
-
     SOURCE Demand HX Inlet Node , !- Loop Demand Side Inlet Node Name
-
     SOURCE Demand HX Outlet Node , !- Loop Demand Side Outlet Node Name
-
     0.003 , !- Loop Demand Side Design Flow Rate
-
     TRANSFER HX Supply Inlet Node, !- Loop Supply Side Inlet Node Name
-
     TRANSFER HX Supply Outlet Node, !- Loop Supply Side Outlet Node Name
-
     0.003 , !- Loop Supply Side Design Flow Rate
-
     CrossFlow, !- Heat Exchange Model Type
-
     15000 , !- Heat Exchanger U-Factor Times Area Value
-
     DualDeadbandSetpointModulated , !- Control Type
-
     TRANSFER Supply Outlet Node, !- Heat Exchanger Setpoint Node Name
-
     0.2 , !- Minimum Temperature Difference to Activate Heat Exchanger
-
     LoopToLoop; !- Heat Transfer Metering End Use Type
-
+```
 
 
 ### Fluid to Fluid Heat Exchanger Outputs
@@ -1088,33 +1024,22 @@ This alpha field contains the identifying names for the Mixer Inlet Branches and
 
 An example of these statements in an IDF is:
 
+```idf
 Connector:Splitter,
-
              CW Loop Splitter,
-
              CW Pump Branch,
-
              Little Chiller Branch,
-
              Big Chiller Branch,
-
              Purchased Cooling Branch,
-
              Supply Bypass Branch;
-
 Connector:Mixer,
-
              CW Loop Mixer,
-
              Cooling Supply Outlet,
-
              Little Chiller Branch,
-
              Big Chiller Branch,
-
              Purchased Cooling Branch,
-
              Supply Bypass Branch;
+```
 
 
 
@@ -1156,19 +1081,16 @@ This field should contain the name of the node that is the outlet for the pump t
 
 This object is demonstrated in the example file called SolarCollectorFlatPlateWater.idf. An example of this object is:
 
+```idf
 TemperingValve,
-
         DHW Anti-Scald Diverter,
-
         DHW Anti-Scald Inlet Node, ! Inlet Node Name
-
         DHW Anti-Scald Outlet Node, ! Outlet Node Name
-
         SHW Storage Tank Use Outlet Node, ! Stream 2 Source Node Name
-
         DHW Instantaneous Boost Outlet Node, ! Temperature Setpoint Node Name
-
         DHW Use Side Pump Outlet;  ! pump outlet node
+```
+
 
 ### Tempering Valve Outputs
 
@@ -1227,45 +1149,35 @@ This field can be the name of a node which is the air outlet node for each suppl
 
 An example of this statement in an IDF is:
 
+```idf
 AirLoopHVAC,
-
   Main Dual Duct Air Loop,           ! Primary Air Loop Name
-
   Dual Duct System 1 Controllers,    ! Controller List
-
   Dual Duct System 1 Schedule List , ! System Availability Manager List
-
   1.3 ,                              ! Primary air design volumetric flow rate
-
   Dual Duct Air Loop Branches ,      ! Air Loop Branch List Name
-
   Dual Duct Connectors ,             ! Air Loop Connector List Name
-
   Supply Fan Inlet Node ,            ! ReturnAir AirLoop Inlet Node
-
   Return Air Mixer Outlet ,          ! ZoneEquipGroup Outlet Node
-
   Zone Equipment Inlet Node List ,   ! SupplyAirPath ZoneEquipGroup Inlet Nodes
-
   Air Loop Outlet Node List ;        ! AirLoop Outlet Nodes
-
-
-
+```
 
 
 ### AirLoopHVAC Outputs
 
-HVAC,Average,Air System Simulation Cycle On Off Status
+* HVAC,Average,Air System Simulation Cycle On Off Status
 
-HVAC,Sum,HVAC System Solver Iteration Count []
+* HVAC,Sum,HVAC System Solver Iteration Count []
 
-HVAC,Sum,Air System Solver Iteration Count []
+* HVAC,Sum,Air System Solver Iteration Count []
 
-HVAC,Sum,Air System Simulation Maximum Iteration Count []
+* HVAC,Sum,Air System Simulation Maximum Iteration Count []
 
-HVAC,Sum,Air System Simulation Iteration Count []
+* HVAC,Sum,Air System Simulation Iteration Count []
 
-HVAC,Sum,Air System Component Model Simulation Calls []
+* HVAC,Sum,Air System Component Model Simulation Calls []
+
 
 #### Air System Simulation Cycle On Off Status
 
@@ -1329,19 +1241,20 @@ Reports the air changes per hour in the zone due to the outside fresh air suppli
 
 The example syntax below shows the basic ventilation flow variables reported on an hourly basis.
 
-Output:Variable,\*,Zone Mechanical Ventilation Mass Flow Rate,Hourly;
+* Output:Variable,\*,Zone Mechanical Ventilation Mass Flow Rate,Hourly;
 
-Output:Variable,\*,Zone Mechanical Ventilation Mass,Hourly;
+* Output:Variable,\*,Zone Mechanical Ventilation Mass,Hourly;
 
-Output:Variable,\*,Zone Mechanical Ventilation Standard Density Volume Flow Rate,Hourly;
+* Output:Variable,\*,Zone Mechanical Ventilation Standard Density Volume Flow Rate,Hourly;
 
-Output:Variable,\*,Zone Mechanical Ventilation Standard Density Volume,Hourly;
+* Output:Variable,\*,Zone Mechanical Ventilation Standard Density Volume,Hourly;
 
-Output:Variable,\*,Zone Mechanical Ventilation Current Density Volume Flow Rate,Hourly;
+* Output:Variable,\*,Zone Mechanical Ventilation Current Density Volume Flow Rate,Hourly;
 
-Output:Variable,\*,Zone Mechanical Ventilation Current Density Volume,Hourly;
+* Output:Variable,\*,Zone Mechanical Ventilation Current Density Volume,Hourly;
 
-Output:Variable,\*, Zone Mechanical Ventilation Air Changes per Hour,Hourly;
+* Output:Variable,\*, Zone Mechanical Ventilation Air Changes per Hour,Hourly;
+
 
 #### Ventilation Load Reports
 
@@ -1413,95 +1326,74 @@ The ventilation zone load output variables are shown in Table 24. The variables 
 
 Table 24. Ventilation Load Output Variables
 
-
-
-No Zone Load
-
-Zone Cooling Load
-
-Zone Heating Load
-
-**Ventilation**
-
-**Cooling**
-
-Zone Mechanical Ventilation No Load Heat Removal Energy
-
-Zone Mechanical Ventilation Cooling Load Decrease Energy
-
-Zone Mechanical Ventilation Heating Load Increase Energy
-
-Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy
-
-**Ventilation Heating**
-
-Zone Mechanical Ventilation No Load Heat Addition Energy
-
-Zone Mechanical Ventilation Cooling Load Increase Energy
-
-Zone Mechanical Ventilation Heating Load Decrease Energy
-
-Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th>No Zone Load</th>
+    <th>Zone Cooling Load</th>
+    <th>Zone Heating Load</th>
+  </tr>
+  <tr>
+    <td rowspan="2">Ventilation Cooling</td>
+    <td rowspan="2">Zone Mechanical Ventilation No Load Heat Removal Energy</td>
+    <td>Zone Mechanical Ventilation Cooling Load Decrease Energy</td>
+    <td rowspan="2">Zone Mechanical Ventilation Heating Load Increase Energy</td>
+  </tr>
+  <tr>
+    <td>Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Ventilation Heating</td>
+    <td rowspan="2">Zone Mechanical Ventilation No Load Heat Addition Energy</td>
+    <td rowspan="2">Zone Mechanical Ventilation Cooling Load Increase Energy</td>
+    <td>Zone Mechanical Ventilation Heating Load Decrease Energy</td>
+  </tr>
+  <tr>
+    <td>Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy</td>
+  </tr>
+</table>
 
 The example syntax below shows the basic ventilation load variables reported on a monthly basis.
 
-  Output:Variable,\*,Zone Mechanical Ventilation Heating Load Increase Energy,monthly;
+*   Output:Variable,\*,Zone Mechanical Ventilation Heating Load Increase Energy,monthly;
 
-  Output:Variable,\*,Zone Mechanical Ventilation Heating Load Decrease Energy,monthly;
+*   Output:Variable,\*,Zone Mechanical Ventilation Heating Load Decrease Energy,monthly;
 
-  Output:Variable,\*,Zone Mechanical Ventilation No Load Heat Addition Energy,monthly;
+*   Output:Variable,\*,Zone Mechanical Ventilation No Load Heat Addition Energy,monthly;
 
-  Output:Variable,\*,Zone Mechanical Ventilation Cooling Load Increase Energy,monthly;
+*   Output:Variable,\*,Zone Mechanical Ventilation Cooling Load Increase Energy,monthly;
 
-  Output:Variable,\*,Zone Mechanical Ventilation Cooling Load Decrease Energy,monthly;
+*   Output:Variable,\*,Zone Mechanical Ventilation Cooling Load Decrease Energy,monthly;
 
-  Output:Variable,\*,Zone Mechanical Ventilation No Load Heat Removal Energy,monthly;
+*   Output:Variable,\*,Zone Mechanical Ventilation No Load Heat Removal Energy,monthly;
 
 Reporting on a timestep or hourly level would produce a detailed report with variables intermingled with the other output variables that might be requested in the input file.
 
 Another method will more easily encapsulate the report:
-
+```idf
 OutputControl:Table:Style, HTML;     !- ColumnSeparator
 
 
-
 Output:Table:Monthly,
-
-  ***Ventilation Loads***,       !- Name
-
+  Ventilation Loads,       !- Name
   ,                        !- DigitsAfterDecimal
-
-**Zone Mechanical Ventilation No Load Heat Removal Energy**,
-
+  Zone Mechanical Ventilation No Load Heat Removal Energy,
          SumOrAverage,
-
-**Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy**,
-
+  Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy,
          SumOrAverage,
-
-**Zone Mechanical Ventilation Cooling Load Decrease Energy**,
-
-** **        SumOrAverage,
-
-**Zone Mechanical Ventilation Cooling Load Increase Energy**,
-
-** **        SumOrAverage,
-
-**Zone Mechanical Ventilation No Load Heat Addition Energy**,
-
-** **        SumOrAverage,
-
-**Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy**,
-
-**        ** SumOrAverage,
-
-**Zone Mechanical Ventilation Heating Load Decrease Energy**,
-
-** **        SumOrAverage,
-
-**Zone Mechanical Ventilation Heating Load Increase Energy**,
-
-** **        SumOrAverage;
+  Zone Mechanical Ventilation Cooling Load Decrease Energy,
+         SumOrAverage,
+  Zone Mechanical Ventilation Cooling Load Increase Energy,
+         SumOrAverage,
+  Zone Mechanical Ventilation No Load Heat Addition Energy,
+         SumOrAverage,
+  Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy,
+         SumOrAverage,
+  Zone Mechanical Ventilation Heating Load Decrease Energy,
+         SumOrAverage,
+  Zone Mechanical Ventilation Heating Load Increase Energy,
+         SumOrAverage;
+```
 
 This combination will report the ventilation loads on a monthly basis in a HTML style report that can be easily read in a web browser. Review the Output:Table:Monthly object for other methods of display or further options on this report item.
 
@@ -1537,19 +1429,16 @@ In ‘Output:Table:Monthly’ format shown below.
 
 
 
+```idf
   OutputControl:Table:Style,HTML;
 
-
-
   Output:Table:Monthly,
-
-    ***System Loads***,       !- Name
-
+    System Loads,       !- Name
     ,                        !- DigitsAfterDecimal
+    Air System Total Heating Energy,  SumOrAverage,
+    Air System Total Cooling Energy,  SumOrAverage;
+```
 
-    **Air System Total Heating Energy**,  SumOrAverage,
-
-    **Air System Total Cooling Energy**,  SumOrAverage;
 
 ### System Energy Use Outputs
 
@@ -1581,29 +1470,19 @@ Water Consumption for the system (humidifiers and evaporative coolers) (m3).
 
 The Standard reports file includes these variables reporting in the Tabular report form as “Air Loop System Energy and Water Use”.
 
-** **
-
+```idf
   OutputControl:Table:Style,HTML;
 
-
-
   Output:Table:Monthly,
-
-    ***Air Loop System Energy and Water Use***,       !- Name
-
+    Air Loop System Energy and Water Use,       !- Name
     ,                        !- DigitsAfterDecimal
-
-    **Air System Hot Water Energy** ,  SumOrAverage,
-
-    **Air System Steam Energy** ,  SumOrAverage,
-
-    **Air System Chilled Water Energy**,  SumOrAverage,
-
-    **Air System Electric Energy**,  SumOrAverage,
-
-    **Air System Gas Energy**,  SumOrAverage,
-
-    **Air System Water Volume**,  SumOrAverage;
+    Air System Hot Water Energy ,  SumOrAverage,
+    Air System Steam Energy ,  SumOrAverage,
+    Air System Chilled Water Energy,  SumOrAverage,
+    Air System Electric Energy,  SumOrAverage,
+    Air System Gas Energy,  SumOrAverage,
+    Air System Water Volume,  SumOrAverage;
+```
 
 ### System Component Loads Outputs
 
@@ -1612,32 +1491,23 @@ Reporting System Component Loads shows the energy transferred to or extracted fr
 The Standard reports file includes these variables reporting in the Tabular report form as “Air Loop System Component Loads”.
 
 
-
+```idf
   OutputControl:Table:Style,HTML;
 
 
-
   Output:Table:Monthly,
-
-    ***Air Loop System Component Loads***,       !- Name
-
+    Air Loop System Component Loads,       !- Name
     ,                        !- DigitsAfterDecimal
+    Air System Fan Air Heating Energy,  SumOrAverage,
+    Air System Cooling Coil Total Cooling Energy,  SumOrAverage,
+    Air System Heating Coil Total Heating Energy,  SumOrAverage,
+    Air System Heat Exchanger Total Heating Energy,  SumOrAverage,
+    Air System Heat Exchanger Total Cooling Energy,  SumOrAverage,
+    Air System Humidifier Total Heating Energy,  SumOrAverage,
+    Air System Evaporative Cooler Total Cooling Energy,  SumOrAverage,
+    Air System Desiccant Dehumidifier Total Cooling Energy,  SumOrAverage;
+```
 
-    **Air System Fan Air Heating Energy**,  SumOrAverage,
-
-    **Air System Cooling Coil Total Cooling Energy**,  SumOrAverage,
-
-    **Air System Heating Coil Total Heating Energy**,  SumOrAverage,
-
-    **Air System Heat Exchanger Total Heating Energy**,  SumOrAverage,
-
-    **Air System Heat Exchanger Total Cooling Energy**,  SumOrAverage,
-
-    **Air System Humidifier Total Heating Energy**,  SumOrAverage,
-
-    **Air System Evaporative Cooler Total Cooling Energy**,  SumOrAverage,
-
-    **Air System Desiccant Dehumidifier Total Cooling Energy**,  SumOrAverage;
 
 #### Air System Fan Air Heating Energy
 
@@ -1737,40 +1607,26 @@ Electricity consumption for the desiccant dehumidifiers. (Joules)
 
 The Standard reports file includes these variables reporting in the Tabular report form as “Air Loop System Component Energy Use”.
 
-** **
 
+```idf
   OutputControl:Table:Style,HTML;
 
 
-
   Output:Table:Monthly,
-
-    ***Air Loop System Component Energy Use***,       !- Name
-
+    Air Loop System Component Energy Use,       !- Name
     ,                        !- DigitsAfterDecimal
-
-    **Air System Fan Electric Energy**,  SumOrAverage,
-
-    **Air System Heating Coil Hot Water Energy**,  SumOrAverage,
-
-    **Air System Cooling Coil Chilled Water Energy**,  SumOrAverage,
-
-    **Air System DX Heating Coil Electric Energy**,  SumOrAverage,
-
-    **Air System DX Cooling Coil Electric Energy**,  SumOrAverage,
-
-    **Air System Heating Coil Electric Energy**,  SumOrAverage,
-
-    **Air System Heating Coil Gas Energy**,  SumOrAverage,
-
-    **Air System Heating Coil Steam Energy**,  SumOrAverage,
-
-    **Air System Humidifier Electric Energy**,  SumOrAverage,
-
-    **Air System Evaporative Cooler Electric Energy**,  SumOrAverage,
-
-    **Air System Desiccant Dehumidifier Electric Energy**,  SumOrAverage;
-
+    Air System Fan Electric Energy,  SumOrAverage,
+    Air System Heating Coil Hot Water Energy,  SumOrAverage,
+    Air System Cooling Coil Chilled Water Energy,  SumOrAverage,
+    Air System DX Heating Coil Electric Energy,  SumOrAverage,
+    Air System DX Cooling Coil Electric Energy,  SumOrAverage,
+    Air System Heating Coil Electric Energy,  SumOrAverage,
+    Air System Heating Coil Gas Energy,  SumOrAverage,
+    Air System Heating Coil Steam Energy,  SumOrAverage,
+    Air System Humidifier Electric Energy,  SumOrAverage,
+    Air System Evaporative Cooler Electric Energy,  SumOrAverage,
+    Air System Desiccant Dehumidifier Electric Energy,  SumOrAverage;
+```
 
 
 ### Overall Air Loop Syntax
@@ -1803,13 +1659,13 @@ The name of a controller object (such as a Controller:WaterCoil) defined elsewhe
 
 An example of this statement in an IDF is:
 
-**AirLoopHVAC:ControllerList**,
-
+```idf
+AirLoopHVAC:ControllerList,
            Dual Duct System 1 Controllers,
-
            Controller:WaterCoil, Main Cooling Coil Controller,
-
            Controller:WaterCoil, Main Heating Coil Controller;
+```
+
 
 ### AvailabilityManagerAssignmentList
 
@@ -1835,21 +1691,17 @@ The name of a AvailabilityManager object defined elsewhere in the input file.
 
 An example of this statement in an IDF is:
 
+```idf
 AvailabilityManagerAssignmentList,
-
   Collector Loop Availability Manager List,  !- Name
-
   AvailabilityManager:HighTemperatureTurnOff,    !- System Availability Manager Type 1
-
   High Temperature Turn Off Availability Manager,  !- System Availability Manager Name 1
-
   AvailabilityManager:LowTemperatureTurnOn ,     !- System Availability Manager Type 2
-
   Low Temperature Turn On Availability Manager,  !- System Availability Manager Name 2
-
   AvailabilityManager:DifferentialThermostat,    !- System Availability Manager Type 3
-
   Differential Thermostat Availability Manager;  !- System Availability Manager Name 3
+```
+
 
 ### AirLoopHVAC:OutdoorAirSystem
 
@@ -1879,93 +1731,53 @@ An IDF example, including the AirLoopHVAC, and the controller and equipment list
 
 
 
+```idf
 AirLoopHVAC,Typical Terminal Reheat 1,
-
            Reheat System 1 Controllers,
-
            Reheat System 1 Avail List,
-
            1.3,
-
            Air Loop Branches,,
-
            Air Loop Inlet Node, Return Air Mixer Outlet,
-
            Zone Equipment Inlet Node, Air Loop Outlet Node;
 
-
-
 AirLoopHVAC:ControllerList,
-
            Reheat System 1 Controllers,
-
            Controller:WaterCoil, Main Cooling Coil Controller;
 
-
-
 BranchList, Air Loop Branches,
-
            Air Loop Main Branch;
 
-
-
 Branch, Air Loop Main Branch,
-
            1.3,
-
-  ,
-
+           ,
            AirLoopHVAC:OutdoorAirSystem, OA Sys 1,
-
            Air Loop Inlet Node, Mixed Air Node,PASSIVE
-
            Fan:ConstantVolume, Supply Fan 1,
-
            Mixed Air Node, Cooling Coil Air Inlet Node, ACTIVE,
-
            Coil:Cooling:Water:DetailedGeometry, Detailed Cooling Coil,
-
            Cooling Coil Air Inlet Node, Air Loop Outlet Node, PASSIVE;
 
-
-
 AvailabilityManagerAssignmentList, Reheat System 1 Avail List,
-
            AvailabilityManager:Scheduled, Reheat System 1 Avail;
 
-
-
 AvailabilityManager:Scheduled, Reheat System 1 Avail,
-
            FanAndCoilAvailSched;
 
-
-
 AirLoopHVAC:OutdoorAirSystem,
-
-       OA Sys 1,
-
-       OA Sys 1 Controllers,
-
-       OA Sys 1 Equipment;
-
-
+           OA Sys 1,
+           OA Sys 1 Controllers,
+           OA Sys 1 Equipment;
 
 AirLoopHVAC:ControllerList,
-
            OA Sys 1 Controllers,
-
            Controller:OutdoorAir, OA Controller 1;
 
-
-
 AirLoopHVAC:OutdoorAirSystem:EquipmentList,
-
            OA Sys 1 Equipment,
-
            HeatExchanger:AirToAir:FlatPlate,OA Heat Recovery 1,
-
            OutdoorAir:Mixer, OA Mixing Box 1;
+```
+
 
 ### Outdoor Air System Outputs
 
@@ -1993,13 +1805,12 @@ This field is the unique name of the component specified in the previous field. 
 
 An example from an IDF:
 
+```idf
 AirLoopHVAC:OutdoorAirSystem:EquipmentList,
-
            OA Sys 1 Equipment,
-
            HeatExchanger:AirToAir:FlatPlate,OA Heat Recovery 1,
-
            OutdoorAir:Mixer, OA Mixing Box 1;
+```
 
 ### OutdoorAir:Node
 
@@ -2021,17 +1832,14 @@ A blank entry or value less than zero indicates that the height will be ignored 
 
 An example IDF:
 
+```idf
 OutdoorAir:Node,
-
   OA Node 1;  !- Name
 
-
-
 OutdoorAir:Node,
-
   Floor 10 Outdoor air Inlet Node,  !- Name
-
   30.0;  !- Height Above Ground {m}
+```
 
 
 
@@ -2039,19 +1847,19 @@ OutdoorAir:Node,
 
 The ambient dry-bulb air temperature and flow rate at the outdoor air node can be monitored using the system node output variables:
 
-HVAC,Average,System Node Temperature [C]
+* HVAC,Average,System Node Temperature [C]
 
-HVAC,Average,System Node Mass Flow Rate [kg/s]
+* HVAC,Average,System Node Mass Flow Rate [kg/s]
 
 e.g.
 
+```idf
 Output:Variable,
+  Floor 10 Outdoor air Inlet Node,
+  System Node Temperature,
+  Hourly;
+```
 
-Floor 10 Outdoor air Inlet Node,
-
-System Node Temperature,
-
-Hourly;
 
 ### OutdoorAir:NodeList
 
@@ -2067,16 +1875,13 @@ The name of an HVAC system node or of a NodeList object. There can be up to 25 n
 
 An example IDF:
 
+```idf
 OutdoorAir:NodeList,
-
     OutsideAirInletNodes;
 
-
-
 NodeList,OutsideAirInletNodes,
-
-       Outdoor air Inlet Node;
-
+    Outdoor air Inlet Node;
+```
 
 
 ### OutdoorAir:Mixer
@@ -2107,17 +1912,15 @@ The name of the HVAC system node which is the inlet for the return air stream.
 
 An IDF example:
 
+```idf
 OutdoorAir:Mixer,
-
     Zone1WindACOAMixer,           ! name
-
     Zone1WindACOAMixerOutletNode, ! mixer outlet node
-
     Zone1WindACOAInNode,          ! mixer OA node
-
     Zone1WindACExhNode,           ! mixer relief node
-
     Zone1WindACAirInletNode;      ! mixer inlet node
+```
+
 
 Group – Airflow Network
 -----------------------
@@ -2249,37 +2052,37 @@ Figure 94 shows a possible air flow pattern in which all of the windows and door
 
 ### Airflow Network Example Files (included in the installation)
 
-AirflowNetwork3zVent.idf
+* AirflowNetwork3zVent.idf
 
-AirflowNetwork3zVentAutoWPC.idf
+* AirflowNetwork3zVentAutoWPC.idf
 
-AirflowNetwork\_Simple\_House.idf
+* AirflowNetwork\_Simple\_House.idf
 
-AirflowNetwork\_Simple\_SmallOffice.idf
+* AirflowNetwork\_Simple\_SmallOffice.idf
 
-AirflowNetwork\_Multizone\_House.idf
+* AirflowNetwork\_Multizone\_House.idf
 
-AirflowNetwork\_MultiZone\_House\_OvercoolDehumid.idf
+* AirflowNetwork\_MultiZone\_House\_OvercoolDehumid.idf
 
-AirflowNetwork\_Multizone\_House\_TwoSpeed.idf
+* AirflowNetwork\_Multizone\_House\_TwoSpeed.idf
 
-AirflowNetwork\_Multizone\_SmallOffice.idf
+* AirflowNetwork\_Multizone\_SmallOffice.idf
 
-AirflowNetwork\_Multizone\_SmallOffice\_CoilHXAssistedDX.idf
+* AirflowNetwork\_Multizone\_SmallOffice\_CoilHXAssistedDX.idf
 
-AirflowNetwork\_MultiZone\_SmallOffice\_GenericContam.idf
+* AirflowNetwork\_MultiZone\_SmallOffice\_GenericContam.idf
 
-AirflowNetwork\_Multizone\_SmallOffice\_HeatRecoveryHXSL.idf
+* AirflowNetwork\_Multizone\_SmallOffice\_HeatRecoveryHXSL.idf
 
-AirflowNetwork\_Multizone\_SmallOffice\_VAV.idf
+* AirflowNetwork\_Multizone\_SmallOffice\_VAV.idf
 
-AirflowNetwor\_Multizone\_HorizontalOpening.idf
+* AirflowNetwor\_Multizone\_HorizontalOpening.idf
 
-CrossVent\_1Zone\_AirflowNetwork.idf
+* CrossVent\_1Zone\_AirflowNetwork.idf
 
-DisplacementVent\_Nat\_AirflowNetwork.idf
+* DisplacementVent\_Nat\_AirflowNetwork.idf
 
-HybridVentilationControl.idf
+* HybridVentilationControl.idf
 
 ### What the Airflow Network Model Can and Cannot Do
 
@@ -2305,19 +2108,19 @@ Here is a list of some of the things that the Airflow Network calculation can an
 
 9)   Dependence of wind pressure on wind speed, wind direction and surface orientation.
 
-10)Supply and return air leaks in an air distribution system.
+10)  Supply and return air leaks in an air distribution system.
 
-11)Account for the effect of supply-air and/or return-air leakage on zone pressure when a forced air distribution system is present and is operating.
+11)  Account for the effect of supply-air and/or return-air leakage on zone pressure when a forced air distribution system is present and is operating.
 
-12)When duct leakage is modeled and the HVAC system is on, interzone airflow or infiltration/exfiltration can occur due to changes in zone pressure.
+12)  When duct leakage is modeled and the HVAC system is on, interzone airflow or infiltration/exfiltration can occur due to changes in zone pressure.
 
-13)Bi-directional flow through large openings. See discussion below under AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:Multizone:Component:HorizontalOpening, and AirflowNetwork:Multizone:Component:SimpleOpening.
+13)  Bi-directional flow through large openings. See discussion below under AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:Multizone:Component:HorizontalOpening, and AirflowNetwork:Multizone:Component:SimpleOpening.
 
-14)Calculate air flows and pressures in ducts or other components of a forced air distribution system.
+14)  Calculate air flows and pressures in ducts or other components of a forced air distribution system.
 
-15)Calculate zone loads when the supply air fan cycles on and off during a system timestep using the CyclingFanAndCompressor fan operation mode (Fan:OnOff).
+15)  Calculate zone loads when the supply air fan cycles on and off during a system timestep using the CyclingFanAndCompressor fan operation mode (Fan:OnOff).
 
-16)Determine the impact of zone exhaust fans on air flows, pressures, air temperatures/humidity levels and energy consumption.
+16)  Determine the impact of zone exhaust fans on air flows, pressures, air temperatures/humidity levels and energy consumption.
 
 #### Cannot Do or Restricted
 
@@ -2437,33 +2240,23 @@ This is an optional field. Input is Yes or No. The default is No. Yes is that ex
 
 An IDF example is shown below:
 
+```idf
 AirflowNetwork:SimulationControl,
-
-    AirflowNetwork\_All,      !- Name
-
+    AirflowNetwork_All,      !- Name
     MultiZoneWithDistribution,  !- AirflowNetwork Control
-
     Input,                   !- Wind Pressure Coefficient Type
-
     Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
-
     OpeningHeight,           !- Height Selection for Local Wind Speed Calculation
-
     LowRise,                 !- Building Type
-
     500,                     !- Maximum Number of Iterations {dimensionless}
-
     ZeroNodePressures,       !- Initialization Type
-
     1.0E-05,                 !- Relative Airflow Convergence Tolerance {dimensionless}
-
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
-
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
-
     0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
-
     1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+```
+
 
 AirflowNetwork:Multizone data objects are used to calculate multizone airflows. This section describes the input requirements for the following objects:
 
@@ -2603,33 +2396,19 @@ An IDF example is shown below:
 
 ```idf
 AirflowNetwork:MultiZone:Zone,
-
     RESISTIVE ZONE,          !- Name of Associated Thermal Zone
-
     Temperature,             !- Ventilation Control Mode
-
     WindowVentSched,         !- Vent Temperature Schedule Name
-
     0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
-
                              !- {dimensionless}
-
     5.0,                     !- Lower Value on Inside/Outside Temperature Difference for
-
                              !- Modulating the Venting Open Factor {deltaC}
-
     10.0,                    !- Upper Value on Inside/Outside Temperature Difference for
-
                              !- Modulating the Venting Open Factor {deltaC}
-
     0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating
-
                              !- the Venting Open Factor {J/kg}
-
     300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
-
                              !- the Venting Open Factor {J/kg}
-
     VentingSched;            !- Venting Availability Schedule Name
 ```
 
@@ -2807,79 +2586,47 @@ The name of an AirlowNetwork:OccupantVentilationControl object. The object is us
 IDF examples are provided below:
 
 
+
 ```idf
 AirflowNetwork:MultiZone:Surface,
-
     Zn001:Wall001,           !- Name of Associated Heat Transfer Surface
-
     CR-1,                    !- Leakage Component Name
-
     SFacade,                 !- External Node Name
-
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
-
-
 AirflowNetwork:MultiZone:Surface,
-
     Zn001:Wall001:Win001,    !- Name of Associated Heat Transfer Surface
-
     WiOpen1,                 !- Leakage Component Name
-
     SFacade,                 !- External Node Name
-
     0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
-
-
-
-
 AirflowNetwork:MultiZone:Surface,
-
     Zn003:Wall003,           !- Name of Associated Heat Transfer Surface
-
     Zone3 Exhaust Fan,       !- Leakage Component Name
-
     EFacade,                 !- External Node Name
-
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
 AirflowNetwork:MultiZone:Surface,
-
     Zn001:Wall001:Win002,    !- Name of Associated Heat Transfer Surface
-
     WiOpen2,                 !- Leakage Component Name
-
     WFacade,                 !- External Node Name
-
 0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
-
     Temperature,             !- Ventilation Control Mode
-
     WindowVentSched,         !- Vent Temperature Schedule Name
-
     0.3,                     !- Limit Value on Multiplier for Modulating Venting Open Factor
-
                              !- {dimensionless}
-
     5.0,                     !- Lower Value on Inside/Outside Temperature Difference for
-
                              !- Modulating the Venting Open Factor {deltaC}
-
     10.0,                    !- Upper Value on Inside/Outside Temperature Difference for
-
                              !- Modulating the Venting Open Factor {deltaC}
-
     0.0,                     !- Lower Value on Inside/Outside Enthalpy Difference for Modulating
-
                              !- the Venting Open Factor {J/kg}
-
     300000.0,                !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
-
                              !- the Venting Open Factor {J/kg}
-
     VentingSched;            !- Venting Availability Schedule Name
 ```
+
+
 
 ### AirflowNetwork:MultiZone:ReferenceCrackConditions
 
@@ -2903,15 +2650,13 @@ The reference humidity ratio in kgWater/kgDryAir under which the Surface Crack D
 
 An IDF example is provided below:
 
+```idf
 AirflowNetwork:MultiZone:ReferenceCrackConditions,
-
     ReferenceCrackConditions,      !- Name of Reference Crack Conditions
-
     20.0,                          !- Reference Temperature for Crack Data {C}
-
     101325,                        !- Reference Barometric Pressure for Crack Data {Pa}
-
     0.0;                           !- Reference Humidity Ratio for Crack Data {kgWater/kgDryAir}
+```
 
 ### AirflowNetwork:MultiZone:Surface:Crack
 
@@ -2963,15 +2708,13 @@ The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which s
 
 An IDF example is shown below:
 
+```idf
 AirflowNetwork:MultiZone:Surface:Crack,
-
     CR-1,                     !- Name of Surface Crack Component
-
     0.01,                     !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
-
     0.667,                    !- Air Mass Flow Exponent {dimensionless}
-
     ReferenceCrackConditions; !- Reference Crack Conditions
+```
 
 ### AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea
 
@@ -3021,17 +2764,14 @@ Note: There are two common sets of reference conditions: C<sub>d</sub> = 1.0 and
 
 An IDF example is shown below:
 
+```idf
 AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
-
     SurfaceELR,              !- Name of surface effective leakage area component
-
     0.07,                    !- Effective leakage area {dimensionless}
-
     1.00,                    !- Discharge coefficient {dimensionless}
-
     4.0,                     !- Reference pressure difference {Pa}
-
     0.65;                    !- Air mass flow exponent {dimensionless}
+```
 
 ### AirflowNetwork:MultiZone:Component:DetailedOpening
 
@@ -3135,33 +2875,23 @@ When the opening factor value (as described under the field Window/Door Opening 
 
 An IDF example is shown below:
 
+```idf
 AirflowNetwork:MultiZone:Component:DetailedOpening,
-
     WiOpen1,                 !- Detailed Opening Name
-
     0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
-
     0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-
     NonPivoted,             !- Type of Large Vertical Opening (LVO)
-
     0.0,                     !- Extra crack length for LVO type 1 with multiple openable parts,
-
                              !- or Height of pivoting axis for LVO type 2 {m}
-
     2,                       !- Number of Sets of Opening Factor Data
-
     0.0,                     !- Opening factor 1 {dimensionless}
-
     0.5,                     !- Discharge coefficient for opening factor 1 {dimensionless}
-
     0.0,                     !- Width factor for opening factor 1 {dimensionless}
-
     1.0,                     !- Height factor for opening factor 1 {dimensionless}
-
     0.0,                     !- Start height factor for opening factor 1 {dimensionless}
-
     1.0,  0.6,  1.0,  1.0,  0.0;  !-  Set of values for opening factor 2
+```
+
 
 ### AirflowNetwork:MultiZone:Component:HorizontalOpening
 
@@ -3191,19 +2921,14 @@ This numeric field is used to input the discharge coefficient. This is a require
 
 An IDF example is shown below:
 
-
-
+```idf
 AirflowNetwork:MultiZone:Component:HorizontalOpening,
-
     HrOpen,                  !- Name
-
     0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
-
     0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-
     90.0,                    !- Sloping Plane Angle
-
     0.2;                     !- Discharge Coefficient
+```
 
 ### AirflowNetwork:MultiZone:Component:SimpleOpening
 
@@ -3233,19 +2958,14 @@ This numeric field is used to input the discharge coefficient. This value must b
 
 An IDF example is shown below:
 
-
-
+```idf
  AirflowNetwork:MultiZone:Component:SimpleOpening,
-
     WiOpen2,                 !- Simple Opening Name
-
     0.001,                   !- Air Mass Flow Coefficient When Opening Is Closed {kg/s-m}
-
     0.650,                   !- Air Mass Flow Exponent When Opening Is Closed {dimensionless}
-
     0.0001,                  !- Minimum density difference for two-way flow (kg/m3)
-
     1.0;                     !- Discharge coefficient (dimensionless)
+```
 
 ### AirflowNetwork:MultiZone:Component:ZoneExhaustFan
 
@@ -3301,15 +3021,13 @@ The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which s
 
 An IDF example is shown below:
 
+```idf
 AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
-
    Zone3 Exhaust Fan,       !- Name
-
    0.01,     !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
-
     0.667;    !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off{dimensionless}
-
     ReferenceCrackConditions; !- Reference Crack Conditions
+```
 
 ### AirflowNetwork:MultiZone:ExternalNode
 
@@ -3333,54 +3051,32 @@ IDF examples are provided below:
 
 
 
+```idf
 AirflowNetwork:MultiZone:ExternalNode,
-
     NFacade,                 !- Name
-
     1.524,                   !- External Node Height {m}
-
-    NFacade\_WPCValue;        !- Wind Pressure Coefficient Values Object Name
-
-
+    NFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
 
 AirflowNetwork:MultiZone:ExternalNode,
-
     EFacade,                 !- Name
-
     1.524,                   !- External Node Height {m}
-
-    EFacade\_WPCValue;        !- Wind Pressure Coefficient Values Object Name
-
-
+    EFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
 
 AirflowNetwork:MultiZone:ExternalNode,
-
     SFacade,                 !- Name
-
     1.524,                   !- External Node Height {m}
-
-    SFacade\_WPCValue;        !- Wind Pressure Coefficient Values Object Name
-
-
+    SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
 
 AirflowNetwork:MultiZone:ExternalNode,
-
     WFacade,                 !- Name
-
     1.524,                   !- External Node Height {m}
-
-    WFacade\_WPCValue;        !- Wind Pressure Coefficient Values Object Name
-
-
+    WFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
 
 AirflowNetwork:MultiZone:ExternalNode,
-
     Horizontal,              !- Name
-
-3.028,                   !- External Node Height {m}
-
-Horizontal\_WPCValue;     !- Wind Pressure Coefficient Values Object Name
-
+    3.028,                   !- External Node Height {m}
+    Horizontal_WPCValue;     !- Wind Pressure Coefficient Values Object Name
+```
 
 
 ### AirflowNetwork:MultiZone:WindPressureCoefficientArray
@@ -3401,33 +3097,23 @@ An IDF example is provided below:
 
 
 
+```idf
 AirflowNetwork:MultiZone:WindPressureCoefficientArray,
-
     Every 30 Degrees,        !- WPC Array Name
+    0,                       !- Wind Direction #1 {deg}
+    30,                      !- Wind Direction #2 {deg}
+    60,                      !- Wind Direction #3 {deg}
+    90,                      !- Wind Direction #4 {deg}
+    120,                     !- Wind Direction #5 {deg}
+    150,                     !- Wind Direction #6 {deg}
+    180,                     !- Wind Direction #7 {deg}
+    210,                     !- Wind Direction #8 {deg}
+    240,                     !- Wind Direction #9 {deg}
+    270,                     !- Wind Direction #10 {deg}
+    300,                     !- Wind Direction #11 {deg}
+    330;                     !- Wind Direction #12 {deg}
+```
 
-    0,                       !- Wind Direction \#1 {deg}
-
-    30,                      !- Wind Direction \#2 {deg}
-
-    60,                      !- Wind Direction \#3 {deg}
-
-    90,                      !- Wind Direction \#4 {deg}
-
-    120,                     !- Wind Direction \#5 {deg}
-
-    150,                     !- Wind Direction \#6 {deg}
-
-    180,                     !- Wind Direction \#7 {deg}
-
-    210,                     !- Wind Direction \#8 {deg}
-
-    240,                     !- Wind Direction \#9 {deg}
-
-    270,                     !- Wind Direction \#10 {deg}
-
-    300,                     !- Wind Direction \#11 {deg}
-
-    330;                     !- Wind Direction \#12 {deg}
 
 ### AirflowNetwork:MultiZone:WindPressureCoefficientValues
 
@@ -3455,18 +3141,14 @@ For **rectangular buildings** EnergyPlus will automatically calculate surface-av
 
 Wind pressure coefficients are reported in the eplusout.eio either from inputs using “INPUT” as the choice for the Wind Pressure Coefficient Type field defined in the AirflowNetwork:SimulationControl object, or from internal calculation using SurfaceAverageCalculation as the choice for the Wind Pressure Coefficient Type field defined in the same object. Below is an output example from the eplusout.eio file:
 
+```
 AirflowNetwork Model:Wind Direction, 0.0,30.0,60.0,90.0,120.0,150.0,180.0,210.0,240.0,270.0,300.0,330.0
-
-! &lt;AirflowNetwork Model:Wind Pressure Coefficients, WPC Name, Wind Pressure Coefficients \#1 to n (dimensionless)&gt;
-
+! <AirflowNetwork Model:Wind Pressure Coefficients, WPC Name, Wind Pressure Coefficients #1 to n (dimensionless)>
 AirflowNetwork Model:Wind Pressure Coefficients, NFACADE, 0.60,0.48,4.00E-002,-0.56,-0.56,-0.42,-0.37,-0.42,-0.56,-0.56,4.00E-002,0.48
-
 AirflowNetwork Model:Wind Pressure Coefficients, EFACADE, -0.56,4.00E-002,0.48,0.60,0.48,4.00E-002,-0.56,-0.56,-0.42,-0.37,-0.42,-0.56
-
 AirflowNetwork Model:Wind Pressure Coefficients, SFACADE, -0.37,-0.42,-0.56,-0.56,4.00E-002,0.48,0.60,0.48,4.00E-002,-0.56,-0.56,-0.42
-
 AirflowNetwork Model:Wind Pressure Coefficients, WFACADE, -0.56,-0.56,-0.42,-0.37,-0.42,-0.56,-0.56,4.00E-002,0.48,0.60,0.48,4.00E-002
-
+```
 
 
 An IDF example is provided below:
@@ -3474,33 +3156,19 @@ An IDF example is provided below:
 
 ```idf
 AirflowNetwork:MultiZone:WindPressureCoefficientValues,
-
-    NFacade\_WPCValue,        !- Name
-
+    NFacade_WPCValue,        !- Name
     Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name
-
     0.60,                    !- Wind Pressure Coefficient Value 1 {dimensionless}
-
     0.48,                    !- Wind Pressure Coefficient Value 2 {dimensionless}
-
     0.04,                    !- Wind Pressure Coefficient Value 3 {dimensionless}
-
     -0.56,                   !- Wind Pressure Coefficient Value 4 {dimensionless}
-
     -0.56,                   !- Wind Pressure Coefficient Value 5 {dimensionless}
-
     -0.42,                   !- Wind Pressure Coefficient Value 6 {dimensionless}
-
     -0.37,                   !- Wind Pressure Coefficient Value 7 {dimensionless}
-
     -0.42,                   !- Wind Pressure Coefficient Value 8 {dimensionless}
-
     -0.56,                   !- Wind Pressure Coefficient Value 9 {dimensionless}
-
     -0.56,                   !- Wind Pressure Coefficient Value 10 {dimensionless}
-
     0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}
-
     0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}
 ```
 
@@ -3549,16 +3217,16 @@ An IDF example is provided below:
 
 ```idf
 AirlowNetwork:OccupantVentilationControl,
-VentilationControl,      !- Name
-5.0,                     !- Minimum Opening Time
-5.0,                     !- Minimum Opening Time
-ComfortLowTempCurve,     !- Thermal Comfort Low Temperature Curve Name
-10.0,                    !- Thermal Comfort Temperature Boundary Point
-ComfortHighTempCurve,    !- Thermal Comfort High Temperature Curve Name
-10.0,                    !- Maximum Threshold for Persons Dissatisfied PPD
-Yes,                     !- Occupancy Check
-OpeningProbabilitySch,   !- Opening Probability Schedule Name
-ClosingProbabilitySch;   !- Closing Probability Schedule Name
+ VentilationControl,      !- Name
+ 5.0,                     !- Minimum Opening Time
+ 5.0,                     !- Minimum Opening Time
+ ComfortLowTempCurve,     !- Thermal Comfort Low Temperature Curve Name
+ 10.0,                    !- Thermal Comfort Temperature Boundary Point
+ ComfortHighTempCurve,    !- Thermal Comfort High Temperature Curve Name
+ 10.0,                    !- Maximum Threshold for Persons Dissatisfied PPD
+ Yes,                     !- Occupancy Check
+ OpeningProbabilitySch,   !- Opening Probability Schedule Name
+ ClosingProbabilitySch;   !- Closing Probability Schedule Name
 ```
 
 The previous sections of this AirflowNetwork model discussion describe input objects used for multizone airflow calculations. The following sections describe input objects used for air distribution system simulations. These objects work when control option “MultiZone with Distribution” or “MultiZone with Distribution Only During Fan Operation” is defined in the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.
@@ -3607,52 +3275,34 @@ Designates the reference height in meters used to calculate relative pressure. T
 
 IDF examples are provided below:
 
+```idf
 AirflowNetwork:Distribution:Node,
-
     EquipmentInletNode,      !- Name
-
     Zone Equipment Inlet Node,  !- Component Name or Node Name
-
     Other,                   !- Component Object Type or Node Type
-
     3.0;                     !- Node Height {m}
 
 
-
 AirflowNetwork:Distribution:Node,
-
     SupplyMainNode,          !- Name
-
     ,                        !- Component Name or Node Name
-
     Other,                   !- Component Object Type or Node Type
-
     3.0;                     !- Node Height {m}
 
 
-
 AirflowNetwork:Distribution:Node,
-
     MainSplitterNode,        !- Name
-
     ,                        !- Component Name or Node Name
-
     AirLoopHVAC:ZoneSplitter,  !- Component Object Type or Node Type
-
     3.0;                     !- Node Height {m}
-
 
 
 AirflowNetwork:Distribution:Node,
-
     MainSplitterNode,        !- Name of Node
-
     ,                        !- Name of Associated EnergyPlus Node or Object
-
     AirLoopHVAC:ZoneSplitter,  !- EnergyPlus Object or Node Type
-
     3.0;                     !- Node Height {m}
-
+```
 
 
 The next section describes AirflowNetwork Distribution Components, with 7 available types listed below. All required fields for each component represent a relationship between pressure difference and airflow. The components are referenced in AirflowNetwork:Distribution:Linkage objects.
@@ -3720,24 +3370,19 @@ This numeric field is defined as the pressure difference exponent across the com
 An IDF example is provided below:
 
 
-
+```idf
 AirflowNetwork:Distribution:Component:Leak,
-
     MainSupplyLeak,          !- Name of Supply or Return Leak
-
     0.0001,                  !- Air Mass Flow Coefficient {kg/s}
-
     0.65;                    !- Air Mass Flow Exponent {dimensionless}
-
 
 
 AirflowNetwork:Distribution:Component:Leak,
-
     ZoneSupplyLeak,          !- Name of Supply or Return Leak
-
     0.01,                    !- Air Mass Flow Coefficient {kg/s}
-
     0.65;                    !- Air Mass Flow Exponent {dimensionless}
+```
+
 
 ### AirflowNetwork:Distribution:Component:LeakageRatio
 
@@ -3796,18 +3441,14 @@ When a VAV system is used with Supply Fan Object Type = Fan:VariableVolume in th
 An IDF example is provided below:
 
 
-
+```idf
 AirflowNetwork:Distribution:Component:LeakageRatio,
-
     Zone1SupplyLeakELA,      !- Name of Effective Leakage Ratio
-
     0.043527,                !- Effective Leakage Ratio {dimensionless}
-
     1.0,                     !- Maximum Flow Rate {m3/s}
-
     20.0,                    !- Reference Pressure Difference {Pa}
-
     0.65;                    !- Air Mass Flow Exponent {dimensionless}
+```
 
 ### AirflowNetwork:Distribution:Component:Duct
 
@@ -3887,25 +3528,19 @@ This numeric field is defined as the overall moisture transmittance coefficient 
 
 An IDF example is provided below:
 
+```idf
 AirflowNetwork:Distribution:Component:Duct,
-
     MainTruck1,              !- Name of Duct Component
-
     3.0,                     !- Duct Length {m}
-
     0.6,                     !- Hydraulic Diameter {m}
-
     0.2827,                  !- Cross Section Area {m2}
-
     0.0009,                  !- Surface Roughness {m}
-
     0.01,                    !- Coefficient for local dynamic loss due to fitting {dimensionless}
-
     0.772,                   !- Overall heat transmittance coefficient (U value) from air to air
-
                              !- {W/m2-K}
-
     0.0001;                  !- Overall moisture transmittance coefficient from air to air {kg/m2}
+```
+
 
 ### AirflowNetwork:Distribution:Component:Fan
 
@@ -3925,11 +3560,12 @@ Note: Make sure that the volumetric air flow rates for the fan, coils, and paren
 
 An IDF example is provided below:
 
+```idf
 AirflowNetwork:Distribution:Component:Fan,
-
     Supply Fan 1,            !- Name of Constant Volume Fan
-
     Fan:ConstantVolume;  !- Supply fan type
+```
+
 
 ### AirflowNetwork:Distribution:Component:Coil
 
@@ -3989,27 +3625,21 @@ Note: Make sure that the volumetric air flow rates for the fan, coils, and paren
 
 An IDF example is provided below:
 
+```idf
 AirflowNetwork:Distribution:Component:Coil,
-
     ACDXCoil 1,                            !- Name of Associated EnergyPlus Coil
-
     Coil:Cooling:DX:SingleSpeed,           !- EnergyPlus Coil Type
-
     0.1,                                   !- Air Path Length {m}
-
 1.00;                                  !- Air Path Hydraulic Diameter {m}
 
 
-
 AirflowNetwork:Distribution:Component:Coil,
-
     HP Heating Coil 1,                     !- Name of Associated EnergyPlus Coil
-
     Coil:Heating:DX:SingleSpeed,           !- EnergyPlus Coil Type
-
     0.1,                                   !- Air Path Length {m}
-
     1.00;                                  !- Air Path Hydraulic Diameter {m}
+```
+
 
 ### AirflowNetwork:Distribution:Component:HeatExchanger
 
@@ -4055,27 +3685,21 @@ When a heat exchanger is used in an exhaust air energy recovery system (i.e., in
 
 An IDF example is provided below:
 
+```idf
 AirflowNetwork:Distribution:Component:HeatExchanger,
-
     OA Heat Recovery 1,      !- HeatExchanger Name
-
     HeatExchanger:AirToAir:SensibleAndLatent,  !- HeatExchanger Object Type
-
     0.1,                     !- Air Path Length {m}
-
     1.00;                    !- Air Path Hydraulic Diameter {m}
-
 
 
 AirflowNetwork:Distribution:Component:HeatExchanger,
-
     Desiccant Heat Exchanger 1, !- HeatExchanger Name
-
     HeatExchanger:Desiccant:BalancedFlow,  !- HeatExchanger Object Type
-
     0.1,                     !- Air Path Length {m}
-
     1.00;                    !- Air Path Hydraulic Diameter {m}
+```
+
 
 
 
@@ -4119,15 +3743,13 @@ When a VAV system is used with Supply Fan Object Type = Fan:VariableVolume in th
 
 An IDF example is provided below:
 
+```idf
 AirflowNetwork:Distribution:Component:TerminalUnit,
-
     Reheat Zone 1,                    !- Name of Associated Energyplus Terminal Unit
-
     AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- EnergyPlus Terminal Unit Type
-
     0.1,                              !- Air Path Length {m}
-
     0.44;                             !- Air Path Hydraulic Diameter {m}
+```
 
 
 
@@ -4149,11 +3771,11 @@ Note: This object should be used with caution. Each node connected to this objec
 
 An IDF example is provided below:
 
+```idf
 AirflowNetwork:Distribution:Component:ConstantPressureDrop,
-
  SupplyCPDComp, ! Name of Constant Pressure Drop Component
-
  1.0;           ! Pressure Difference Across the Component [Pa]
+```
 
 ### AirflowNetwork:Distribution:Linkage
 
@@ -4181,17 +3803,14 @@ Designates a thermal zone where the linkage is located. The information provides
 
 An IDF example is provided below:
 
+```idf
 AirflowNetwork:Distribution:Linkage,
-
     Main Link 1,             !- Name of Linkage
-
     EquipmentInletNode,      !- Node 1 Name
-
     SupplyMainNode,          !- Node 2 Name
-
     MainTruck1,              !- Component Name
-
     Attic Zone;              !- Thermal Zone Name
+```
 
 ### Airflow Network Outputs
 
@@ -4201,165 +3820,167 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
 
 
 
-HVAC,Average,AFN Node Temperature [C]
+* HVAC,Average,AFN Node Temperature [C]
 
-HVAC,Average,AFN Node Humidity Ratio [kgWater/kgDryAir]
+* HVAC,Average,AFN Node Humidity Ratio [kgWater/kgDryAir]
 
-HVAC,Average,AFN Node Total Pressure [Pa]
+* HVAC,Average,AFN Node Total Pressure [Pa]
 
-HVAC,Average,AFN Node Wind Pressure [Pa]
+* HVAC,Average,AFN Node Wind Pressure [Pa]
 
-HVAC,Average,AFN Node CO2 Concentration [ppm]
+* HVAC,Average,AFN Node CO2 Concentration [ppm]
 
-HVAC,Average,AFN Node Generic Air Contaminant Concentration [ppm]
+* HVAC,Average,AFN Node Generic Air Contaminant Concentration [ppm]
 
-HVAC,Average,AFN Linkage Node 1 to Node 2 Mass Flow Rate [kg/s]
+* HVAC,Average,AFN Linkage Node 1 to Node 2 Mass Flow Rate [kg/s]
 
-HVAC,Average,AFN Linkage Node 2 to Node 1 Mass Flow Rate [kg/s]
+* HVAC,Average,AFN Linkage Node 2 to Node 1 Mass Flow Rate [kg/s]
 
-HVAC,Average,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]
+* HVAC,Average,AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]
 
-HVAC,Average,AFN Linkage Node 2 to Node 1 Volume Flow Rate [m3/s]
+* HVAC,Average,AFN Linkage Node 2 to Node 1 Volume Flow Rate [m3/s]
 
-HVAC,Average,AFN Linkage Node 1 to Node 2 Pressure Difference [Pa]
+* HVAC,Average,AFN Linkage Node 1 to Node 2 Pressure Difference [Pa]
 
-HVAC,Average,AFN Surface Venting Window or Door Opening Factor []
+* HVAC,Average,AFN Surface Venting Window or Door Opening Factor []
 
-HVAC,Average,AFN Surface Venting Window or Door Opening Modulation Multiplier []
+* HVAC,Average,AFN Surface Venting Window or Door Opening Modulation Multiplier []
 
-HVAC,Average,AFN Surface Venting Inside Setpoint Temperature [C]
+* HVAC,Average,AFN Surface Venting Inside Setpoint Temperature [C]
 
-HVAC,Average,AFN Surface Venting Availability Status []
+* HVAC,Average,AFN Surface Venting Availability Status []
 
-HVAC,Average,AFN Zone Infiltration Sensible Heat Gain Rate [W]
+* HVAC,Average,AFN Zone Infiltration Sensible Heat Gain Rate [W]
 
-HVAC,Sum,AFN Zone Infiltration Sensible Heat Gain Energy [J]
+* HVAC,Sum,AFN Zone Infiltration Sensible Heat Gain Energy [J]
 
-HVAC,Average,AFN Zone Mixing Sensible Heat Gain Rate [W]
+* HVAC,Average,AFN Zone Mixing Sensible Heat Gain Rate [W]
 
-HVAC,Sum,AFN Zone Mixing Sensible Heat Gain Energy [J]
+* HVAC,Sum,AFN Zone Mixing Sensible Heat Gain Energy [J]
 
-HVAC,Average,AFN Zone Infiltration Sensible Heat Loss Rate [W]
+* HVAC,Average,AFN Zone Infiltration Sensible Heat Loss Rate [W]
 
-HVAC,Sum,AFN Zone Infiltration Sensible Heat Loss Energy [J]
+* HVAC,Sum,AFN Zone Infiltration Sensible Heat Loss Energy [J]
 
-HVAC,Average,AFN Zone Mixing Sensible Heat Loss Rate [W]
+* HVAC,Average,AFN Zone Mixing Sensible Heat Loss Rate [W]
 
-HVAC,Sum,AFN Zone Mixing Sensible Heat Loss Energy [J]
+* HVAC,Sum,AFN Zone Mixing Sensible Heat Loss Energy [J]
 
-HVAC,Average,AFN Zone Infiltration Latent Heat Gain Rate [W]
+* HVAC,Average,AFN Zone Infiltration Latent Heat Gain Rate [W]
 
-HVAC,Sum,AFN Zone Infiltration Latent Heat Gain Energy [J]
+* HVAC,Sum,AFN Zone Infiltration Latent Heat Gain Energy [J]
 
-HVAC,Average,AFN Zone Infiltration Latent Heat Loss Rate [W]
+* HVAC,Average,AFN Zone Infiltration Latent Heat Loss Rate [W]
 
-HVAC,Sum,AFN Zone Infiltration Latent Heat Loss Energy [J]
+* HVAC,Sum,AFN Zone Infiltration Latent Heat Loss Energy [J]
 
-HVAC,Average,AFN Zone Mixing Latent Heat Gain Rate [W]
+* HVAC,Average,AFN Zone Mixing Latent Heat Gain Rate [W]
 
-HVAC,Sum,AFN Zone Mixing Latent Heat Gain Energy [J]
+* HVAC,Sum,AFN Zone Mixing Latent Heat Gain Energy [J]
 
-HVAC,Average,AFN Zone Mixing Latent Heat Loss Rate [W]
+* HVAC,Average,AFN Zone Mixing Latent Heat Loss Rate [W]
 
-HVAC,Sum,AFN Zone Mixing Latent Heat Loss Energy [J]
+* HVAC,Sum,AFN Zone Mixing Latent Heat Loss Energy [J]
 
-HVAC,Average,AFN Zone Duct Leaked Air Sensible Heat Gain Rate [W]
+* HVAC,Average,AFN Zone Duct Leaked Air Sensible Heat Gain Rate [W]
 
-HVAC,Sum,AFN Zone Duct Leaked Air Sensible Heat Gain Energy [J]
+* HVAC,Sum,AFN Zone Duct Leaked Air Sensible Heat Gain Energy [J]
 
-HVAC,Average,AFN Zone Duct Leaked Air Sensible Heat Loss Rate [W]
+* HVAC,Average,AFN Zone Duct Leaked Air Sensible Heat Loss Rate [W]
 
-HVAC,Sum,AFN Zone Duct Leaked Air Sensible Heat Loss Energy [J]
+* HVAC,Sum,AFN Zone Duct Leaked Air Sensible Heat Loss Energy [J]
 
-HVAC,Average,AFN Zone Duct Leaked Air Latent Heat Gain Rate [W]
+* HVAC,Average,AFN Zone Duct Leaked Air Latent Heat Gain Rate [W]
 
-HVAC,Sum,AFN Zone Duct Leaked Air Latent Heat Gain Energy [J]
+* HVAC,Sum,AFN Zone Duct Leaked Air Latent Heat Gain Energy [J]
 
-HVAC,Average,AFN Zone Duct Leaked Air Latent Heat Loss Rate [W]
+* HVAC,Average,AFN Zone Duct Leaked Air Latent Heat Loss Rate [W]
 
-HVAC,Sum,AFN Zone Duct Leaked Air Latent Heat Loss Energy [J]
+* HVAC,Sum,AFN Zone Duct Leaked Air Latent Heat Loss Energy [J]
 
-HVAC,Average,AFN Zone Duct Conduction Sensible Heat Gain Rate [W]
+* HVAC,Average,AFN Zone Duct Conduction Sensible Heat Gain Rate [W]
 
-HVAC,Sum,AFN Zone Duct Conduction Sensible Heat Gain Energy [J]
+* HVAC,Sum,AFN Zone Duct Conduction Sensible Heat Gain Energy [J]
 
-HVAC,Average,AFN Zone Duct Conduction Sensible Heat Loss Rate [W]
+* HVAC,Average,AFN Zone Duct Conduction Sensible Heat Loss Rate [W]
 
-HVAC,Sum,AFN Zone Duct Conduction Sensible Heat Loss Energy [J]
+* HVAC,Sum,AFN Zone Duct Conduction Sensible Heat Loss Energy [J]
 
-HVAC,Average,AFN Zone Duct Diffusion Latent Heat Gain Rate [W]
+* HVAC,Average,AFN Zone Duct Diffusion Latent Heat Gain Rate [W]
 
-HVAC,Sum,AFN Zone Duct Diffusion Latent Heat Gain Energy [J]
+* HVAC,Sum,AFN Zone Duct Diffusion Latent Heat Gain Energy [J]
 
-HVAC,Average,AFN Zone Duct Diffusion Latent Heat Loss Rate [W]
+* HVAC,Average,AFN Zone Duct Diffusion Latent Heat Loss Rate [W]
 
-HVAC,Sum,AFN Zone Duct Diffusion Latent Heat Loss Energy [J]
+* HVAC,Sum,AFN Zone Duct Diffusion Latent Heat Loss Energy [J]
 
-HVAC,Average,AFN Distribution Sensible Heat Gain Rate [W]
+* HVAC,Average,AFN Distribution Sensible Heat Gain Rate [W]
 
-HVAC,Sum,AFN Distribution Sensible Heat Gain Energy [J]
+* HVAC,Sum,AFN Distribution Sensible Heat Gain Energy [J]
 
-HVAC,Average,AFN Distribution Sensible Heat Loss Rate [W]
+* HVAC,Average,AFN Distribution Sensible Heat Loss Rate [W]
 
-HVAC,Sum,AFN Distribution Sensible Heat Loss Energy [J]
+* HVAC,Sum,AFN Distribution Sensible Heat Loss Energy [J]
 
-HVAC,Average,AFN Distribution Latent Heat Gain Rate [W]
+* HVAC,Average,AFN Distribution Latent Heat Gain Rate [W]
 
-HVAC,Sum,AFN Distribution Latent Heat Gain Energy [J]
+* HVAC,Sum,AFN Distribution Latent Heat Gain Energy [J]
 
-HVAC,Average,AFN Distribution Latent Heat Loss Rate [W]
+* HVAC,Average,AFN Distribution Latent Heat Loss Rate [W]
 
-HVAC,Sum,AFN Distribution Latent Heat Loss Energy [J]
+* HVAC,Sum,AFN Distribution Latent Heat Loss Energy [J]
 
-HVAC,Sum,AFN Zone Infiltration Volume [m3]
+* HVAC,Sum,AFN Zone Infiltration Volume [m3]
 
-HVAC,Sum,AFN Zone Infiltration Mass [kg]
+* HVAC,Sum,AFN Zone Infiltration Mass [kg]
 
-HVAC,Average,AFN Zone Infiltration Air Change Rate [ach]
+* HVAC,Average,AFN Zone Infiltration Air Change Rate [ach]
 
-HVAC,Sum,AFN Zone Mixing Volume [m3]
+* HVAC,Sum,AFN Zone Mixing Volume [m3]
 
-HVAC,Sum,AFN Zone Mixing Mass [kg]
+* HVAC,Sum,AFN Zone Mixing Mass [kg]
 
 
 
 **The following output variables are reported only when a Fan:OnOff object is used:**
 
-HVAC,Average,AFN Zone Average Pressure [Pa]
+* HVAC,Average,AFN Zone Average Pressure [Pa]
 
-HVAC,Average,AFN Zone On Cycle Pressure [Pa]
+* HVAC,Average,AFN Zone On Cycle Pressure [Pa]
 
-HVAC,Average,AFN Zone Off Cycle Pressure [Pa]
+* HVAC,Average,AFN Zone Off Cycle Pressure [Pa]
 
-HVAC,Average,AFN Linkage Node 1 to 2 Average Mass Flow Rate [kg/s]
+* HVAC,Average,AFN Linkage Node 1 to 2 Average Mass Flow Rate [kg/s]
 
-HVAC,Average,AFN Linkage Node 2 to 1 Average Mass Flow Rate [kg/s]
+* HVAC,Average,AFN Linkage Node 2 to 1 Average Mass Flow Rate [kg/s]
 
-HVAC,Average,AFN Linkage Node 1 to 2 Average Volume Flow Rate [m3/s]
+* HVAC,Average,AFN Linkage Node 1 to 2 Average Volume Flow Rate [m3/s]
 
-HVAC,Average,AFN Linkage Node 2 to 1 Average Volume Flow Rate [m3/s]
+* HVAC,Average,AFN Linkage Node 2 to 1 Average Volume Flow Rate [m3/s]
 
-HVAC,Average,AFN Surface Average Pressure Difference [Pa]
+* HVAC,Average,AFN Surface Average Pressure Difference [Pa]
 
-HVAC,Average,AFN Surface On Cycle Pressure Difference [Pa]
+* HVAC,Average,AFN Surface On Cycle Pressure Difference [Pa]
 
-HVAC,Average,AFN Surface Off Cycle Pressure Difference [Pa]
+* HVAC,Average,AFN Surface Off Cycle Pressure Difference [Pa]
+
 
 **The following output variables are reported only when an AirflowNetwork:OccupantVentilationControl object is used:**
 
-HVAC,Average,AFN Surface Venting Window or Door Opening Factor at Previous Time Step []
+* HVAC,Average,AFN Surface Venting Window or Door Opening Factor at Previous Time Step []
 
-HVAC,Average,AFN Surface Opening Elapsed Time [min]
+* HVAC,Average,AFN Surface Opening Elapsed Time [min]
 
-HVAC,Average,AFN Surface Closing Elapsed Time [min]
+* HVAC,Average,AFN Surface Closing Elapsed Time [min]
 
-HVAC,Average,AFN Surface Opening Status at Previous Time Step []
+* HVAC,Average,AFN Surface Opening Status at Previous Time Step []
 
-HVAC,Average,AFN Surface Opening Status []
+* HVAC,Average,AFN Surface Opening Status []
 
-HVAC,Average,AFN Surface Opening Probability Status []
+* HVAC,Average,AFN Surface Opening Probability Status []
 
-HVAC,Average,AFN Surface Closing Probability Status []
+* HVAC,Average,AFN Surface Closing Probability Status []
+
 
 #### AFN Node Temperature [C]
 
@@ -4493,49 +4114,43 @@ When modulation is in effect the value of the multiplier is between 0.0 and 1.0.
 
 Table 25. Value of opening factor multiplier for different venting conditions.
 
-**Is surface in aZone?**
-
-**Ventilation Control Mode**
-
-**Is surface venting?**
-
-**Value of opening factor multiplier**
-
-Yes
-
-**Temperature**
-
-Yes
-
-0.0 to 1.0
-
-No
-
--1.0
-
-**Enthalpy**
-
-Yes
-
-0.0 to 1.0
-
-No
-
--1.0
-
-**Constant**
-
-Yes
-
-1.0
-
-**NoVent**
-
-No
-
--1.0
-
-
+<table class="table table-striped">
+  <tr>
+    <th>Is surface in a Zone?</th>
+    <th>Ventilation Control Mode</th>
+    <th>Is surface venting?</th>
+    <th>Value of opening factor multiplier</th>
+  </tr>
+  <tr>
+    <td rowspan="6">Yes</td>
+    <td rowspan="2">Temperature</td>
+    <td>Yes</td>
+    <td>0.0 to 1.0</td>
+  </tr>
+  <tr>
+    <td>No</td>
+    <td>-1.0</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Enthalpy</td>
+    <td>Yes</td>
+    <td>0.0 to 1.0</td>
+  </tr>
+  <tr>
+    <td>No</td>
+    <td>-1.0</td>
+  </tr>
+  <tr>
+    <td>Constant</td>
+    <td>Yes</td>
+    <td>1.0</td>
+  </tr>
+  <tr>
+    <td>NoVent</td>
+    <td>No</td>
+    <td>-1.0</td>
+  </tr>
+</table>
 
 #### AFN Surface Venting Inside Setpoint Temperature [C]
 
@@ -4875,34 +4490,34 @@ Table 26. Available Zone Equipment Types
 
 <table class="table table-striped">
 <tr>
-<td>Air Distribution Equipment</td>
-<td>AirTerminal:SingleDuct:Uncontrolled
-AirTerminal:SingleDuct:ConstantVolume:Reheat
-AirTerminal:SingleDuct:VAV:Reheat
-AirTerminal:SingleDuct:VAV:NoReheat
-AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
-AirTerminal:DualDuct:ConstantVolume
-AirTerminal:DualDuct:VAV
+<th>Air Distribution Equipment</th>
+<td>AirTerminal:SingleDuct:Uncontrolled <BR>
+AirTerminal:SingleDuct:ConstantVolume:Reheat <BR>
+AirTerminal:SingleDuct:VAV:Reheat <BR>
+AirTerminal:SingleDuct:VAV:NoReheat <BR>
+AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan <BR>
+AirTerminal:DualDuct:ConstantVolume <BR>
+AirTerminal:DualDuct:VAV <BR>
 Powered Induction Units (Series and Parallel)</td>
 </tr>
 <tr>
-<td>Zone Forced Air Units
+<th>Zone Forced Air Units
  </td>
-<td>ZoneHVAC:IdealLoadsAirSystem
-ZoneHVAC:FourPipeFanCoil
-ZoneHVAC:WindowAirConditioner
-ZoneHVAC:RefrigerationChillerSet
-Unit Ventilator/Heater
-Air-to-Air Heat Pumps
-Unitary Systems (heat only and heat/cool)
-Furnaces (heat only and heat/cool)
-Energy Recovery Ventilator:Stand Alone
+<td>ZoneHVAC:IdealLoadsAirSystem <BR>
+ZoneHVAC:FourPipeFanCoil <BR>
+ZoneHVAC:WindowAirConditioner <BR>
+ZoneHVAC:RefrigerationChillerSet <BR>
+Unit Ventilator/Heater <BR>
+Air-to-Air Heat Pumps <BR>
+Unitary Systems (heat only and heat/cool) <BR>
+Furnaces (heat only and heat/cool) <BR>
+Energy Recovery Ventilator:Stand Alone <BR>
 CoilSystem:Cooling:DX</td>
 </tr>
 <tr>
-<td>Radiative/Convective Units</td>
-<td>Baseboard Heaters
-Low Temp Radiant Systems
+<th>Radiative/Convective Units</th>
+<td>Baseboard Heaters <BR>
+Low Temp Radiant Systems <BR>
 High Temp Radiant System</td>
 </tr>
 </table>
@@ -4927,29 +4542,30 @@ Each zone served by an HVAC system must have three additional statements to comp
 
 The ZoneHVAC:AirDistributionUnit object gives further information on what air loop equipment (air terminal units) will be serving a particular zone. The ZoneHVAC:AirDistributionUnit is the part of the system that is supplied from a common main air handler simulated in the Air Loop Simulation and includes the equipment that controls or tempers the air going to each individual zone according to the desired thermostatic control. The current options for ZoneHVAC:AirDistributionUnit terminal unit types are:
 
-AirTerminal:DualDuct:ConstantVolume
+* AirTerminal:DualDuct:ConstantVolume
 
-AirTerminal:DualDuct:VAV
+* AirTerminal:DualDuct:VAV
 
-AirTerminal:DualDuct:VAV:OutdoorAir
+* AirTerminal:DualDuct:VAV:OutdoorAir
 
-AirTerminal:SingleDuct:ConstantVolume:Reheat
+* AirTerminal:SingleDuct:ConstantVolume:Reheat
 
-AirTerminal:SingleDuct:VAV:Reheat
+* AirTerminal:SingleDuct:VAV:Reheat
 
-AirTerminal:SingleDuct:VAV:NoReheat
+* AirTerminal:SingleDuct:VAV:NoReheat
 
-AirTerminal:SingleDuct:SeriesPIU:Reheat
+* AirTerminal:SingleDuct:SeriesPIU:Reheat
 
-AirTerminal:SingleDuct:ParallelPIU:Reheat
+* AirTerminal:SingleDuct:ParallelPIU:Reheat
 
-AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+* AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
 
-AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
+* AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
 
-AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
+* AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
 
-AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+* AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+
 
 Connections between the air distribution unit, the supply air duct, and the zone are specified in the input syntax for the air distribution unit and the AirLoopHVAC:ZoneSplitter. The input syntax also explicitly defines an outlet identifier. This implies a connection to a zone through a NodeList for zone inlets (see the ZoneHVAC:EquipmentConnections statement). The air distribution unit is limited to one combined component-controller unit; because controls are normally based on the zone thermostat and can work in parallel or series in complex fashion. Since the control and the flow resolution can be complex, each air distribution unit is unique in addressing these combinations and therefore only one is allowed per zone.
 
@@ -4981,31 +4597,22 @@ This is the leakage downstream of the terminal unit as a fraction of the current
 
 Two example IDF excerpts (one with duct leakage, one without):
 
+```idf
 ZoneHVAC:AirDistributionUnit,
-
     SPACE1-1 ATU,            !- Air Distribution Unit Name
-
     SPACE1-1 In Node,        !- Air Dist Unit Outlet Node Name
-
     AIRTERMINAL:SINGLEDUCT:VAV:REHEAT,  !- KEY--System Component Type 1
-
     SPACE1-1 VAV Reheat;     !- Component Name 1
 
-
-
 ZoneHVAC:AirDistributionUnit,
-
     SPACE4-1 ATU,            !- Air Distribution Unit Name
-
     SPACE4-1 In Node,        !- Air Dist Unit Outlet Node Name
-
     AIRTERMINAL:SINGLEDUCT:VAV:REHEAT,  !- KEY--System Component Type 1
-
     SPACE4-1 VAV Reheat,     !- Component Name 1
-
     0.05,                    !- upstream nominal leakage fraction
-
     0.07;                    !- downstream constant leakage fraction
+```
+
 
 ### ZoneHVAC:EquipmentConnections
 
@@ -5039,19 +4646,16 @@ The name of the return air node which attaches the zone to the return air path d
 
 An example of this statement in an IDF is:
 
+```idf
 ZoneHVAC:EquipmentConnections,
-
     SPACE3-1,              !- Zone Name
-
     SPACE3-1 Eq,           !- List Name: Zone Equipment
-
     SPACE3-1 In Nodes,     !- List Name: Zone Air Inlet Nodes
-
     ,                      !- List Name: Zone Air Exhaust Nodes
-
     SPACE3-1 Node,         !- Zone Air Node Name
-
     SPACE3-1 Out Node;     !- Zone Return Air Node Name
+```
+
 
 ### ZoneHVAC:EquipmentList
 
@@ -5077,7 +4681,7 @@ Table 27. Legal Zone Equipment Types (ZoneHVAC:EquipmentList)
 
 <table class="table table-striped">
 <tr>
-<td>Legal Zone Equipment Types</td>
+<th>Legal Zone Equipment Types</th>
 </tr>
 <tr>
 <td>AirTerminal:SingleDuct:Uncontrolled</td>
@@ -5177,39 +4781,26 @@ Specifies the zone equipment simulation order when the zone thermostat requests 
 
 Examples of this statement in an IDF are:
 
+```idf
   ZoneHVAC:EquipmentList,
-
     Zone1Equipment,          !- Name
-
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-
     Zone1TermReheat,         !- Zone Equipment 1 Name
-
     1,                       !- Zone Equipment 1 Cooling Sequence
-
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
 
-
   ZoneHVAC:EquipmentList,
-
     Zone1Equipment,          !- Name
-
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-
     Zone1DirectAir,          !- Zone Equipment 1 Name
-
     1,                       !- Zone Equipment 1 Cooling Sequence
-
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-
     Zone1WTAHP,              !- Zone Equipment 2 Name
-
     2,                       !- Zone Equipment 2 Cooling Sequence
-
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+```
 
 Group – Air Distribution Equipment
 ----------------------------------
@@ -5242,45 +4833,34 @@ The design maximum volume flow rate  (m<sup>3</sup>/sec) specified for the AirT
 
 An example input follows.
 
+```idf
 AirTerminal:SingleDuct:Uncontrolled,
-
     Zone1DirectAir,
-
     FanAndCoilAvailSched,
-
     Zone 1 Inlet Node,
-
     0.47;
-
 AirTerminal:SingleDuct:Uncontrolled,
-
     Zone2DirectAir,
-
     FanAndCoilAvailSched,
-
     Zone 2 Inlet Node,
-
     0.36;
-
 AirTerminal:SingleDuct:Uncontrolled,
-
     Zone3DirectAir,
-
     FanAndCoilAvailSched,
-
     Zone 3 Inlet Node,
-
     0.47;
+```
+
 
 ### Single Duct Uncontrolled AirTerminal Outputs
 
-HVAC,Sum,Zone Air Terminal Sensible Heating Energy [J]
+* HVAC,Sum,Zone Air Terminal Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Air Terminal Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Air Terminal Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Air Terminal Sensible Heating Rate [W]
+* HVAC,Average,Zone Air Terminal Sensible Heating Rate [W]
 
-HVAC,Average,Zone Air Terminal Sensible Cooling Rate [W]
+* HVAC,Average,Zone Air Terminal Sensible Cooling Rate [W]
 
 #### Zone Air Terminal Sensible Heating Energy  [J]
 
@@ -5330,13 +4910,13 @@ For the hot water reheat coil there is a node on the water side that would contr
 
 The valid reheat component objects currently available are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Reheat Coil Name
 
@@ -5360,29 +4940,20 @@ This is the upper limit on the temperature in degrees C of the air leaving the t
 
 An IDF example:
 
+```idf
 AirTerminal:SingleDuct:ConstantVolume:Reheat,
-
     Reheat Zone 1,  !- Name of System
-
     FanAndCoilAvailSched,  !- Availability schedule for VAV System
-
     Zone 1 Reheat Air Outlet Node,  !- Unit Air Outlet Node
-
     Zone 1 Reheat Air Inlet Node,  !- Unit Air Inlet Node
-
     0.59,  !- Maximum air flow rate {m3/s}
-
     ,  !- Control node
-
     COIL:Gas:Heating,  !- Reheat Component Object
-
     Reheat Coil Zone 1,  !- Name of Reheat Component
-
     0.0,  !- Max Reheat Water Flow {m3/s}
-
     0.0,  !- Min Reheat Water Flow {m3/s}
-
     0.001;  !- Convergence Tolerance
+```
 
 ### Single Duct Constant Volume Reheat AirTerminal Outputs
 
@@ -5434,13 +5005,13 @@ The name of a schedule that determines the value of the minimum air flow fractio
 
 The valid reheat component objects currently available are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 If there is no reheat coil,use AirTerminal:SingleDuct:VAV:NoReheat instead of this object.
 
@@ -5506,106 +5077,64 @@ This alpha field specifies the name of a DesignSpecification:OutdoorAir object. 
 
 An IDF example:
 
+```idf
 AirTerminal:SingleDuct:VAV:Reheat,
-
     SPACE2-1 VAV Reheat,  !- Name of System
-
     ReheatCoilAvailSched,  !- Availability schedule for VAV System
-
     SPACE2-1 Zone Coil Air In Node,  !- Damper Air Outlet Node
-
     SPACE2-1 ATU In Node,  !- Unit Air Inlet Node
-
     autosize,  !- Maximum air flow rate {m3/s}
-
     Constant,  !- Zone Minimum Air Flow Input Method
-
     0.3,  !- Constant Minimum Air Flow Fraction
-
     ,  !- Fixed Minimum Air Flow Rate
-
     ,  !- Minimum Air Flow Fraction Schedule Name
-
     COIL:Gas:Heating,  !- Reheat Component Object
-
     SPACE2-1 Zone Coil,  !- Name of Reheat Component
-
     0.0,  !- Max Reheat Water Flow {m3/s}
-
     0.0,  !- Min Reheat Water Flow {m3/s}
-
     SPACE2-1 In Node,  !- Unit Air Outlet Node
-
     0.001,  !- Convergence Tolerance
-
-Reverse,  !- Damper Heating Action
-
-,         !- Maximum Flow per Zone Floor Area During Reheat
-
-,         !- Maximum Flow Fraction During Reheat
-
-35.0,     !- Maximum Reheat Air Temperature {C}
-
+    Reverse,  !- Damper Heating Action
+    ,         !- Maximum Flow per Zone Floor Area During Reheat
+    ,         !- Maximum Flow Fraction During Reheat
+    35.0,     !- Maximum Reheat Air Temperature {C}
     ;         !- Design Specification Outdoor Air Object Name
 
-
   DesignSpecification:OutdoorAir,
-
     ZoneMinOARequirements,    !- Name
-
     Sum,                      !- Outdoor Air Method
-
     0.00472,                  !- Outdoor Air Flow per Person {m3/s}
-
     0.000508,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-
     ,                         !- Outdoor Air Flow per Zone
-
     ,                         !- Outdoor Air Flow Air Changes per Hour
-
     Min OARequirements Sched; !- Outdoor Air Flow Rate Fraction Schedule Name
 
 
-
   Schedule:Compact,
-
     Min OARequirements Sched,  !- Name
-
     Any Number,                !- Schedule Type Limits Name
-
     Through: 12/31,            !- Field 1
-
     For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
-
     Until: 24:00,1.0,          !- Field 7
-
     For: AllOtherDays,         !- Field 9
-
     Until: 24:00,0.25;         !- Field 10
-
-COIL:Heating:Gas,
-
+    COIL:Heating:Gas,
     SPACE1-1 Zone Coil,  !- Coil Name
-
     ReheatCoilAvailSched,  !- Availability Schedule Name
-
     0.8,  !- Gas Burner Efficiency of the Coil
-
     autosize,  !- Nominal Capacity of the Coil {W}
-
-    SPACE1-1 Zone Coil Air In Node,  !- Coil\_Air\_Inlet\_Node
-
-    SPACE1-1 In Node;  !- Coil\_Air\_Outlet\_Node
-
+    SPACE1-1 Zone Coil Air In Node,  !- Coil_Air_Inlet_Node
+    SPACE1-1 In Node;  !- Coil_Air_Outlet_Node
+```
 
 
 ### Single Duct VAV Reheat AirTerminal Outputs
 
-HVAC,Average,Zone Air Terminal VAV Damper Position []
+* HVAC,Average,Zone Air Terminal VAV Damper Position []
 
-HVAC,Average,Zone Air Terminal Minimum Air Flow Fraction []
+* HVAC,Average,Zone Air Terminal Minimum Air Flow Fraction []
 
-HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]
+* HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]
 
 #### Zone Air Terminal VAV Damper Position []
 
@@ -5675,13 +5204,13 @@ The name of the particular fan object in this terminal unit.
 
 The type of heating coil in the terminal unit. The valid choices are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Heating Coil Name
 
@@ -5703,97 +5232,53 @@ The default is 0.001.
 
 An IDF example:
 
+```idf
 AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
-
     SPACE2-1 VAV Reheat,     !- Name of System
-
     ReheatCoilAvailSched,    !- System Availability schedule
-
     autosize,                !- Maximum cooling air volume flow rate
-
     autosize,                !- Maximum heating air volume flow rate
-
     0.05,                     !- Zone Minimum Air Flow Fraction
-
     SPACE2-1 ATU In Node,    !- Unit supply air inlet node
-
     SPACE2-1 In Node,        !- Unit supply air outlet node
-
     SPACE2-1 Zone Coil Air In Node,  !- heating coil air inlet node
-
     SPACE2-1 Zone Coil Water In Node,!- Hot water control node
-
     FAN:SIMPLE:VariableVolume,       !- Fan object
-
     SPACE2-1 Zone Fan,       !- Fan name
-
     COIL:Water:SimpleHeating,!- Heating coil object
-
     SPACE2-1 Zone Coil,      !- Heating coil name
-
     autosize,                !- Max hot water flow
-
     0.0,                     !- Min hot water flow
-
     0.001;                   !- Heating Convergence Tolerance
 
-
-
-
-
 Coil:Heating:Water,
-
     SPACE2-1 Zone Coil,      !- Coil Name
-
     ReheatCoilAvailSched,    !- Availability Schedule Name
-
     autosize,                !- UA of the Coil {W/K}
-
     autosize,                !- Max Water Flow Rate of Coil {m3/s}
-
-    SPACE2-1 Zone Coil Water In Node,  !- Coil\_Water\_Inlet\_Node
-
-    SPACE2-1 Zone Coil Water Out Node,  !- Coil\_Water\_Outlet\_Node
-
-    SPACE2-1 Zone Coil Air In Node,  !- Coil\_Air\_Inlet\_Node
-
-    SPACE2-1 In Node;        !- Coil\_Air\_Outlet\_Node
-
-
-
-
+    SPACE2-1 Zone Coil Water In Node,  !- Coil_Water_Inlet_Node
+    SPACE2-1 Zone Coil Water Out Node,  !- Coil_Water_Outlet_Node
+    SPACE2-1 Zone Coil Air In Node,  !- Coil_Air_Inlet_Node
+    SPACE2-1 In Node;        !- Coil_Air_Outlet_Node
 
 Fan:VariableVolume,
-
     SPACE2-1 Zone Fan,       !- Fan Name
-
     FanAvailSched,           !- Availability Schedule Name
-
     0.7,                     !- Fan Total Efficiency
-
     125.0,                   !- Delta Pressure {Pa}
-
     autosize,                !- Max Flow Rate {m3/s}
-
     0.0,                     !- Min Flow Rate {m3/s}
-
     0.9,                     !- Motor Efficiency
-
     1.0,                     !- Motor In Airstream Fraction
-
     0.00153028,              !- FanCoefficient 1
-
     0.00520806,              !- FanCoefficient 2
-
     1.1086242,               !- FanCoefficient 3
-
     -.11635563,              !- FanCoefficient 4
-
     0.000,                   !- FanCoefficient 5
+    SPACE2-1 ATU In Node,    !- Fan_Inlet_Node
+    SPACE2-1 Zone Coil Air In Node;   !- Fan_Outlet_Node
+```
 
-    SPACE2-1 ATU In Node,    !- Fan\_Inlet\_Node
-
-    SPACE2-1 Zone Coil Air In Node;   !- Fan\_Outlet\_Node
 
 ### Single Duct VAV Reheat Variable Speed Fan AirTerminal Outputs
 
@@ -5851,13 +5336,13 @@ For the hot water reheat coil there is a node on the water side that would contr
 
 The valid reheat component objects currently available are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 If no reheat coil is required, use AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat instead of this object.
 
@@ -5887,49 +5372,31 @@ This is the upper limit on the temperature in degrees C of the air leaving the t
 
 An IDF example is provided below:
 
+```idf
 AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
-
     Zone 1 VAV System,             !- Name of System
-
     FanAndCoilAvailSched,          !- System Availability schedule
-
     Zone 1 Reheat Air Inlet Node,  !- DAMPER Air Outlet Node
-
     Zone 1 VAV Inlet Node,         !- UNIT Air Inlet Node
-
     0.583,                         !- Maximum air flow rate {m3/s}
-
     0.25,                          !- Zone Minimum Air Flow Fraction
-
     ,                              !- Control node
-
     Coil:Heating:Electric,         !- Reheat Component Object
-
     Reheat Coil Zone 1,            !- Name of Reheat Component
-
     0.0,                           !- Max Reheat Water Flow {m3/s}
-
     0.0,                           !- Min Reheat Water Flow {m3/s}
-
     Zone 1 Reheat Air Outlet Node, !- UNIT Air Outlet Node
-
     0.001;                         !- Convergence Tolerance
 
-
-
 Coil:Heating:Electric,
-
     Reheat Coil Zone 1,            !- Coil Name
-
     FanAndCoilAvailSched,          !- Availability Schedule Name
-
     1.0,                           !- Efficiency of the Coil
-
     3000.0,                        !- Nominal Capacity of the Coil {W}
+    Zone 1 Reheat Air Inlet Node,  !- Coil_Air_Inlet_Node
+    Zone 1 Reheat Air Outlet Node; !- Coil_Air_Outlet_Node
+```
 
-    Zone 1 Reheat Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
-
-    Zone 1 Reheat Air Outlet Node; !- Coil\_Air\_Outlet\_Node
 
 ### Single Duct VAV Heat and Cool Reheat AirTerminal Outputs
 
@@ -5987,71 +5454,44 @@ This alpha field specifies the name of a DesignSpecification:OutdoorAir object. 
 
 An IDF example:
 
+```idf
   AirTerminal:SingleDuct:VAV:NoReheat,
-
     Zone 1 VAV System,       !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
-
     Zone 1 Damper Inlet Node,!- Air Inlet Node Name
-
     0.47,                    !- Maximum Air Flow Rate {m3/s}
-
     Constant,                !- Zone Minimum Air Flow Input Method
-
     0.3,                     !- Constant Minimum Air Flow Fraction
-
     ,                        !- Fixed Minimum Air Flow Rate
-
     ,                        !- Minimum Air Flow Fraction Schedule Name
-
     ZoneOAData;              !- Design Specification Outdoor Air Object Name
 
-
-
   DesignSpecification:OutdoorAir,
-
     ZoneOAData,            !- Name
-
     Sum,                   !- Outdoor Air Method
-
     0.00236,               !- Outdoor Air Flow per Person {m3/s}
-
     0.00305,               !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-
     ,                      !- Outdoor Air Flow per Zone {m3/s}
-
     ,                      !- Outdoor Air Flow Air Changes per Hour
-
     OARequirements Sched;  !- Outdoor Air Flow Rate Fraction Schedule Name
 
-
-
 Schedule:Compact,
-
     OARequirements Sched,    !- Name
-
     Any Number,              !- Schedule Type Limits Name
-
     Through: 12/31,          !- Field 1
-
     For: Weekdays SummerDesignDay WinterDesignDay,  !- Field 2
-
     Until: 24:00, 1.0,       !- Field 4
-
     For: AllOtherDays,       !- Field 5
-
     Until: 24:00, 0.5;       !- Field 7
-
+```
 
 
 ### Single Duct VAV NoReheat AirTerminal Outputs
 
-HVAC,Average,Zone Air Terminal VAV Damper Position []
+* HVAC,Average,Zone Air Terminal VAV Damper Position []
 
-HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]
+* HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]
 
 #### Zone Air Terminal VAV Damper Position []
 
@@ -6099,19 +5539,15 @@ This numeric field defines the minimum air volume flow rate to the zone while th
 
 An IDF example is provided below:
 
+```idf
 AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
-
     Zone 3 VAV System,       !- Name of System
-
     FanAndCoilAvailSched,    !- System Availability schedule
-
     Zone 3 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
-
     Zone 3 VAV Inlet Node,   !- UNIT Air Inlet Node
-
     0.584,                   !- Maximum air flow rate {m3/s}
-
     0.25;                    !- Zone Minimum Air Flow Fraction
+```
 
 ### Single Duct VAV Heat and Cool NoReheat AirTerminal Outputs
 
@@ -6179,13 +5615,13 @@ The name of a fan component which composes part of the unit. Note that the fan�
 
 The type of coil in the PIU. The valid choices are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 In other words the PIU may have a hot water, gas, electric or steam reheat coil.
 
@@ -6215,53 +5651,37 @@ For gas or electric heating coils, this input should be left blank. The default 
 
 An IDF example:
 
+```idf
 AirTerminal:SingleDuct:SeriesPIU:Reheat,
-
           Zone 1 SPIU ATU,          ! Name of air terminal unit
-
           FanAndCoilAvailSched,     ! Availability schedule for series PIU ATU
-
           0.47,                     ! Total volume flow rate through ATU
-
           0.47,                     ! Maximum primary air flow rate through terminal unit
-
           0.3,                      ! Minimum primary air flow rate (fraction of max)
-
           Zone 1 PIU Pri Air Inlet Node,   ! Air Terminal unit supply air inlet node
-
           Zone 1 PIU Sec Air Inlet Node,   ! Air Terminal unit secondary air inlet node
-
           Zone 1 PIU Air Outlet Node,      ! Air Terminal unit outlet node
-
           Zone 1 Reheat Air Inlet Node,    ! Reheat coil air inlet node (fan outlet node)
-
           Zone 1 PIU Mixer,                ! Air terminal unit mixer name
-
           Zone 1 PIU Fan,                  ! Air terminal unit fan name
-
           COIL:Heating:Water,              ! type of air terminal unit reheat coil
-
           Reheat Coil Zone 1,              ! name of air terminal unit reheat coil
-
           0.0013,                          ! Max Reheat Water Flow {Flow: m3/sec}
-
           0.0,                             ! Min Reheat Water Flow {Flow: m3/sec}
-
           Zone 1 Reheat Water Inlet Node,  ! Control node
-
           0.001;                    ! Convergence tolerance
-
+```
 
 
 ### Single Duct Series PIU Reheat AirTerminal Outputs
 
-HVAC,Average,Zone Air Terminal Heating Rate [W]
+* HVAC,Average,Zone Air Terminal Heating Rate [W]
 
-HVAC,Sum,Zone Air Terminal Heating Energy [J]
+* HVAC,Sum,Zone Air Terminal Heating Energy [J]
 
-HVAC,Average,Zone Air Terminal Sensible Cooling Rate [W]
+* HVAC,Average,Zone Air Terminal Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Air Terminal Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Air Terminal Sensible Cooling Energy [J]
 
 #### Zone Air Terminal Heating Rate [W]
 
@@ -6286,8 +5706,6 @@ The parallel powered induction unit is an air system terminal unit that mixes va
 At full cooling load the primary air damper is fully open and the fan is off. The primary air flow is at maximum and there is little or no secondary air flow. As the cooling load decreases, the primary air damper gradually closes and the secondary air flow remains close to zero. At some point, usually when the primary air flow has reached the minimum, the fan switches on and secondary air is induced. The heating coil will switch on as needed to meet any heating demand.
 
 The EnergyPlus model of the parallel PIU terminal unit is composed of three components: a constant volume fan, a zone mixer, and a heating coil (hot water, electric, or gas).
-
-
 
 ![ParallelPIUPicture.png](InputOutputReference/media/image271.png)
 
@@ -6345,13 +5763,13 @@ The name of a fan component which composes part of the unit. Note that the fan�
 
 The type of coil in the PIU. The valid choices are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 In other words the PIU may have a hot water, gas, electric or steam reheat coil.
 
@@ -6381,55 +5799,38 @@ For gas or electric heating coils, this input should be left blank. The default 
 
 An IDF example:
 
+```idf
 AirTerminal:SingleDuct:ParallelPIU:Reheat,
-
           Zone 3 PPIU ATU,          ! Name of air terminal unit
-
           FanAndCoilAvailSched,     ! Availability schedule for series PIU ATU
-
           0.47,                     ! Maximum primary air flow rate through terminal unit
-
           0.375,                    ! Maximum secondary air flow rate through the terminal unit
-
           0.1,                      ! Minimum primary air flow rate (fraction of max)
-
           0.1,                      ! fan on flow fraction
-
           Zone 3 PIU Pri Air Inlet Node,   ! Air Terminal unit supply air inlet node
-
           Zone 3 PIU Sec Air Inlet Node,   ! Air Terminal unit secondary air inlet node
-
           Zone 3 PIU Air Outlet Node,      ! Air Terminal unit outlet node
-
           Zone 3 Reheat Air Inlet Node,    ! Reheat coil air inlet node (fan outlet node)
-
           Zone 3 PIU Mixer,                ! Air terminal unit mixer name
-
           Zone 3 PIU Fan,                  ! Air terminal unit fan name
-
           Coil:Heating:Water,              ! type of air terminal unit reheat coil
-
           Reheat Coil Zone 3,              ! name of air terminal unit reheat coil
-
           0.0013,                          ! Max Reheat Water Flow {Flow: m3/sec}
-
           0.0,                             ! Min Reheat Water Flow {Flow: m3/sec}
-
           Zone 3 Reheat Water Inlet Node,  ! Control node
-
           0.001;                    ! Convergence tolerance
-
+```
 
 
 ### Single Duct Parallel PIU Reheat AirTerminal Outputs
 
-HVAC,Average,Zone Air Terminal Heating Rate [W]
+* HVAC,Average,Zone Air Terminal Heating Rate [W]
 
-HVAC,Sum,Zone Air Terminal Heating Energy [J]
+* HVAC,Sum,Zone Air Terminal Heating Energy [J]
 
-HVAC,Average,Zone Air Terminal Sensible Cooling Rate [W]
+* HVAC,Average,Zone Air Terminal Sensible Cooling Rate [W]
 
-HVAC,Sum, Zone Air Terminal Sensible Cooling Energy [J]
+* HVAC,Sum, Zone Air Terminal Sensible Cooling Energy [J]
 
 #### Zone Air Terminal Heating Rate [W]
 
@@ -6493,7 +5894,7 @@ The name of the HVAC system node which regulates the flow of cold water through 
 
 The type of heating coil in the terminal unit. The choices are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
 In other words the unit may have a hot water coil only.
 
@@ -6521,9 +5922,9 @@ The default is 0.001.
 
 The type of cooling coil in the terminal unit. The choices are:
 
-Coil:Cooling:Water
+* Coil:Cooling:Water
 
-Coil:Cooling:Water:DetailedGeometry
+* Coil:Cooling:Water:DetailedGeometry
 
 In other words the unit must use only the water cooling coils.
 
@@ -6553,105 +5954,56 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 An IDF example:
 
+```idf
 AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
-
     SPACE2-1 FPIU,            !- Name of System
-
     ReheatCoilAvailSched,     !- System Availability schedule
-
     autosize,                 !- Maximum total air volume flow rate
-
     1.0,                      !- Induction ratio
-
     SPACE2-1 ATU Supply Node, !- Terminal unit supply air inlet node
-
     SPACE2-1 ATU Induc Node,  !- Terminal unit induced air inlet node
-
     SPACE2-1 In Node,         !- Terminal unit air outlet node
-
     SPACE2-1 HW Coil Water In Node, !- Hot water control node
-
     SPACE2-1 CW Coil Water In Node, !- Cold water control node
-
     COIL:Heating:Water,       !- Heating coil object
-
     SPACE2-1 HW Coil,         !- Heating coil name
-
     autosize,                 !- Max hot water flow
-
     0.0,                      !- Min hot water flow
-
     0.001,                    !- Heating Convergence Tolerance
-
     COIL:Cooling:Water,       !- Cooling coil object
-
     SPACE2-1 CW Coil,         !- Cooling coil name
-
     autosize,                 !- Max cold water flow
-
     0.0,                      !- Min cold water flow
-
     0.001,                    !- Cooling Convergence Tolerance
-
     SPACE2-1 ATU Mixer;       !- Zone mixer component name
 
-
-
-
-
 COIL:Heating:Water,
-
     SPACE2-1 HW Coil,        !- Coil Name
-
     ReheatCoilAvailSched,    !- Availability Schedule Name
-
     autosize,                !- UA of the Coil {W/K}
-
     autosize,                !- Max Water Flow Rate of Coil {m3/s}
-
-    SPACE2-1 HW Coil Water In Node,  !- Coil\_Water\_Inlet\_Node
-
-    SPACE2-1 HW Coil Water Out Node, !- Coil\_Water\_Outlet\_Node
-
-    SPACE2-1 ATU Induc Node, !- Coil\_Air\_Inlet\_Node
-
-    SPACE2-1 HW Coil Air Out Node;   !- Coil\_Air\_Outlet\_Node
-
-
-
-
+    SPACE2-1 HW Coil Water In Node,  !- Coil_Water_Inlet_Node
+    SPACE2-1 HW Coil Water Out Node, !- Coil_Water_Outlet_Node
+    SPACE2-1 ATU Induc Node, !- Coil_Air_Inlet_Node
+    SPACE2-1 HW Coil Air Out Node;   !- Coil_Air_Outlet_Node
 
 COIL:Cooling:Water,
-
     SPACE2-1 CW Coil,        !- Coil Name
-
     CWCoilAvailSched,        !- Availability Schedule
-
     autosize,                !- UA of the Coil
-
     autosize,                !- Max Water Flow Rate of Coil
-
     ,                        !- Leaving Relative Humidity of Coil
-
-    SPACE2-1 CW Coil Water In Node,  !- Coil\_Water\_Inlet\_Node
-
-    SPACE2-1 CW Coil Water Out Node, !- Coil\_Water\_Outlet\_Node
-
-    SPACE2-1 HW Coil Air Out Node,   !- Coil\_Air\_Inlet\_Node
-
-    SPACE2-1 CW Coil Air Out Node;   !- Coil\_Air\_Outlet\_Node
-
-
+    SPACE2-1 CW Coil Water In Node,  !- Coil_Water_Inlet_Node
+    SPACE2-1 CW Coil Water Out Node, !- Coil_Water_Outlet_Node
+    SPACE2-1 HW Coil Air Out Node,   !- Coil_Air_Inlet_Node
+    SPACE2-1 CW Coil Air Out Node;   !- Coil_Air_Outlet_Node
 
 AirLoopHVAC:ZoneMixer,
-
     SPACE2-1 ATU Mixer,              !- Mixer Name
-
-    SPACE2-1 In Node,                !- Outlet\_Node
-
-    SPACE2-1 ATU Supply Node,        !- Inlet\_Node\_1
-
-    SPACE2-1 CW Coil Air Out Node;   !- Inlet\_Node\_2
+    SPACE2-1 In Node,                !- Outlet_Node
+    SPACE2-1 ATU Supply Node,        !- Inlet_Node_1
+    SPACE2-1 CW Coil Air Out Node;   !- Inlet_Node_2
+```
 
 ### Single Duct Constant Volume Four Pipe Induction AirTerminal Outputs
 
@@ -6777,69 +6129,49 @@ The water pipe inside diameter in meters. The default is 0.0145.
 
 An example input is:
 
+```idf
   AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
-
     SPACE2-1 CB,             !- Name
-
     CWCoilAvailSched,        !- Availability Schedule Name
-
     Active,                  !- Cooled Beam Type
-
     SPACE2-1 ATU Supply Node,!- Supply Air Inlet Node Name
-
     SPACE2-1 In Node,        !- Supply Air Outlet Node Name
-
     SPACE2-1 CW Coil Water In Node,  !- Chilled Water Inlet Node Name
-
     SPACE2-1 CW Coil Water Out Node, !- Chilled Water Outlet Node Name
-
     ,                        !- Supply Air Volumetric Flow Rate
-
     ,                   !- Maximum Total Chilled Water Volumetric Flow Rate
-
     ,                        !- Number of Beams
-
     ,                        !- Beam Length
-
     ,                        !- Design Inlet Water Temperature
-
     ,                        !- Design Outlet Water temperature
-
     ,                        !- Coil Surface Area per Coil Length
-
     ,                        !- Model Parameter a
-
     ,                        !- Model Parameter n1
-
     ,                        !- Model Parameter n2
-
    ,                        !- Model Parameter n3
-
     ,                        !- Model Parameter a0
-
     ,                        !- Model Parameter K1
-
     ,                        !- Model Parameter n
-
     ,                        !- Coefficient of Induction Kin
-
     ;                        !- Leaving Pipe Inside Diameter
+```
+
 
 ### Singled Duct Constant Volume Cooled Beam AirTerminal Outputs
 
-HVAC,Sum,Zone Air Terminal Beam Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Air Terminal Beam Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Air Terminal Beam Sensible Cooling Rate [W]
+* HVAC,Average,Zone Air Terminal Beam Sensible Cooling Rate [W]
 
-HVAC,Sum, Zone Air Terminal Supply Air Sensible Cooling Energy [J]
+* HVAC,Sum, Zone Air Terminal Supply Air Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Air Terminal Supply Air Sensible Cooling Rate [W]
+* HVAC,Average,Zone Air Terminal Supply Air Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Air Terminal Supply Air Sensible Heating Energy [J]
+* HVAC,Sum,Zone Air Terminal Supply Air Sensible Heating Energy [J]
 
-HVAC,Average,Zone Air Terminal Supply Air Sensible Heating Rate [W]
+* HVAC,Average,Zone Air Terminal Supply Air Sensible Heating Rate [W]
 
-HVAC,Sum,Zone Air Terminal Beam Chilled Water Energy [J]
+* HVAC,Sum,Zone Air Terminal Beam Chilled Water Energy [J]
 
 #### Zone Air Terminal Beam Sensible Cooling Rate [W]
 
@@ -6875,8 +6207,6 @@ The inlet side mixer air terminal unit provides a means of supplying central sys
 
 The AirTerminal:SingleDuct:InletSideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is recirculated air from the zone. The outlet air stream of the inlet side mixer is then the inlet to the zone AC unit.
 
-
-
 ![](InputOutputReference/media/image275.svg)
 
 Figure 108. Inlet Side Mixer Air Terminal Unit with Fan Coil
@@ -6905,33 +6235,23 @@ The name of the primary air inlet node of the inlet side mixer. This will be an 
 
 The name of the secondary air inlet node of the inlet side mixer. This will be an exhaust node of the zone that is being conditioned.
 
-
-
 An IDF example:
 
+```idf
 AirTerminal:SingleDuct:InletSideMixer,
-
     SPACE2-1 DOAS Air Terminal,  !- Name
-
     ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-
     SPACE2-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-
     SPACE2-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
-
     SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-
     SPACE2-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
-
-
+```
 
 ### AirTerminal:SingleDuct:SupplySideMixer
 
 The supply side mixer air terminal unit provides a means of supplying central system air to the air outlet of a zone AC unit such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
 
 The AirTerminal:SingleDuct:SupplySideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is outlet air from the zone AC unit. The outlet air stream from the supply side mixer is then the inlet to the conditioned zone.
-
-
 
 ![](InputOutputReference/media/image276.svg)
 
@@ -6961,25 +6281,17 @@ The name of the primary air inlet node of the supply side mixer. This will be an
 
 The name of the secondary air inlet node of the supply side mixer. This will be the outlet air node of the zone AC unit.
 
-
-
 An IDF example:
 
+```idf
 AirTerminal:SingleDuct:SupplySideMixer,
-
     SPACE1-1 DOAS Air Terminal,  !- Name
-
     ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-
     SPACE1-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-
     SPACE1-1 Supply Inlet,   !- Terminal Unit Outlet Node Name
-
     SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-
     SPACE1-1 Fan Coil Outlet;!- Terminal Unit Secondary Air Inlet Node Name
-
-
+```
 
 ### AirTerminal:DualDuct:ConstantVolume
 
@@ -7011,25 +6323,21 @@ The design constant volume flow rate  (m<sup>3</sup>/sec) specified for that Mu
 
 An IDF example:
 
+```idf
 AirTerminal:DualDuct:ConstantVolume,
-
     Zone2MixDamp,  !- Name
-
     FanAndCoilAvailSched,  !- Availability Schedule
-
     Zone 2 Dual Duct Outlet,  !- Unit Air Outlet Node
-
     Zone 2 Dual Duct Hot Inlet,  !- Unit Hot Air Inlet Node
-
     Zone 2 Dual Duct Cold Inlet,  !- Unit Cold Air Inlet Node
-
     0.36;  !- Max Air Flow Rate {m3/s}
+```
 
 ### Dual Duct Constant Volume AirTerminal Outputs
 
-HVAC,Average,Zone Air Terminal Cold Supply Duct Damper Position []
+* HVAC,Average,Zone Air Terminal Cold Supply Duct Damper Position []
 
-HVAC,Average,Zone Air Terminal Hot Supply Duct Damper Position []
+* HVAC,Average,Zone Air Terminal Hot Supply Duct Damper Position []
 
 #### Zone Air Terminal Cold Supply Duct Damper Position
 
@@ -7077,70 +6385,44 @@ This alpha field specifies the name of a DesignSpecification:OutdoorAir object. 
 
 An IDF example:
 
+```idf
   AirTerminal:DualDuct:VAV,
-
     Zone1MixDamp,            !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     Zone 1 Dual Duct Outlet, !- Air Outlet Node Name
-
     Zone 1 Dual Duct Hot Inlet,  !- Hot Air Inlet Node Name
-
     Zone 1 Dual Duct Cold Inlet,  !- Cold Air Inlet Node Name
-
     autosize,                !- Maximum Air Flow Rate {m3/s}
-
     0.1,                     !- Zone Minimum Air Flow Fraction
-
     ZoneMinOARequirements;   !- Design Specification Outdoor Air Object Name
 
-
-
 ! Outdoor air specification should be consistent with Sizing:Zone object inputs.
-
   DesignSpecification:OutdoorAir,
-
     ZoneMinOARequirements,    !- Name
-
     Sum,                      !- Outdoor Air Method
-
     0.00944,                  !- Outdoor Air Flow per Person {m3/s}
-
     0.000508,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-
     ,                         !- Outdoor Air Flow per Zone
-
     ,                         !- Outdoor Air Flow Air Changes per Hour
-
     Min OARequirements Sched; !- Outdoor Air Flow Rate Fraction Schedule Name
 
-
-
   Schedule:Compact,
-
     Min OARequirements Sched,  !- Name
-
     Any Number,                !- Schedule Type Limits Name
-
     Through: 12/31,            !- Field 1
-
     For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
-
     Until: 24:00,1.0,          !- Field 7
-
     For: AllOtherDays,         !- Field 9
-
     Until: 24:00,0.25;         !- Field 10
+```
 
 ### Dual Duct VAV AirTerminal Outputs
 
-HVAC,Average,Zone Air Terminal Cold Supply Duct Damper Position []
+* HVAC,Average,Zone Air Terminal Cold Supply Duct Damper Position []
 
-HVAC,Average,Zone Air Terminal Hot Supply Duct Damper Position []
+* HVAC,Average,Zone Air Terminal Hot Supply Duct Damper Position []
 
-HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]
-
+* HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]
 
 
 #### Zone Air Terminal Cold Supply Duct Damper Position []
@@ -7199,51 +6481,37 @@ This field specifies how the outdoor air ventilation rates are calculated when b
 
 An example input object follows.
 
+```idf
   AirTerminal:DualDuct:VAV:OutdoorAir,
-
-    Media\_Center Dual Duct Box Component,          !- Name
-
-    ALWAYS\_ON,                                     !- Availability Schedule Name
-
-    Media\_Center Dual Duct Box Outlet Node Name,   !- Air Outlet Node Name
-
-    Media\_Center Dual Duct Box Inlet Node Name,    !- Outdoor Air Inlet Node Name
-
-    RC Media\_Center Dual Duct Box Inlet Node Name, !- Recirculated Air Inlet Node Name
-
+    Media_Center Dual Duct Box Component,          !- Name
+    ALWAYS_ON,                                     !- Availability Schedule Name
+    Media_Center Dual Duct Box Outlet Node Name,   !- Air Outlet Node Name
+    Media_Center Dual Duct Box Inlet Node Name,    !- Outdoor Air Inlet Node Name
+    RC Media_Center Dual Duct Box Inlet Node Name, !- Recirculated Air Inlet Node Name
     AUTOSIZE,                                      !- Maximum Terminal Air Flow Rate {m3/s}
-
-    Media\_Center Dual Duct Box OA Design Spec,     !- Design Specification Outdoor Air Object Name
-
+    Media_Center Dual Duct Box OA Design Spec,     !- Design Specification Outdoor Air Object Name
     CurrentOccupancy;                              !- Per Person Ventilation Rate Mode
 
 
-
   DesignSpecification:OutdoorAir,
-
-    Media\_Center Dual Duct Box OA Design Spec,  !- Name
-
+    Media_Center Dual Duct Box OA Design Spec,  !- Name
     Sum,                     !- Outdoor Air Method
-
     0.004719,                !- Outdoor Air Flow per Person {m3/s-person}
-
     0.00061,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
-
     0.0,                     !- Outdoor Air Flow Air Changes per Hour
-
-    MinOA\_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+```
 
 
 
 ### Dual Duct VAV Outdoor Air AirTerminal Outputs
 
-Output:Variable,\*,Zone Air Terminal Outdoor Air Duct Damper Position,hourly; !- HVAC Average []
+* Output:Variable,\*,Zone Air Terminal Outdoor Air Duct Damper Position,hourly; !- HVAC Average []
 
-Output:Variable,\*,Zone Air Terminal Recirculated Air Duct Damper Position,hourly; !- HVAC Average []
+* Output:Variable,\*,Zone Air Terminal Recirculated Air Duct Damper Position,hourly; !- HVAC Average []
 
-Output:Variable,\*,Zone Air Terminal Outdoor Air Fraction,hourly; !- HVAC Average []
+* Output:Variable,\*,Zone Air Terminal Outdoor Air Fraction,hourly; !- HVAC Average []
 
 #### Zone Air Terminal Outdoor Air Duct Damper Position []
 
@@ -7402,163 +6670,140 @@ An example of this object in an IDF is:
 
 
 
+```idf
   ZoneHVAC:IdealLoadsAirSystem,
-
     Zone1 Ideal Loads System, !- Name
-
     AlwaysOn,                !- Availability Schedule Name
-
     Zone1 Ideal Loads Supply Node, !- Zone Supply Air Node Name
-
     Zone1 Ideal Loads Return Node, ! Zone Exhaust Air Node Name
-
     50,                      !- Maximum Heating Supply Air Temperature {C}
-
     13,                      !- Minimum Cooling Supply Air Temperature {C}
-
     0.0156,                  !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
-
     0.0077,                  !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
-
     NoLimit,                 !- Heating Limit
-
     ,                        !- Maximum Heating Air Flow Rate {m3/s}
-
     ,                        !- Maximum Sensible Heating Capacity {W}
-
     NoLimit,                 !- Cooling Limit
-
     ,                        !- Maximum Cooling Air Flow Rate {m3/s}
-
     ,                        !- Maximum Total Cooling Capacity {W}
-
     ,                        !- Heating Availability Schedule Name
-
     ,                        !- Cooling Availability Schedule Name
-
     ConstantSensibleHeatRatio,  !- Dehumidification Control Type
-
     0.7,                     !- Cooling Sensible Heat Ratio
-
     None,                    !- Humidification Control Type
-
     Office OA Specification, !- Design Specification Outdoor Air Object Name
-
     Zone1 Ideal Loads OA Inlet Node, !- Outdoor Air Inlet Node Name
-
     None,                    !- Demand Controlled Ventilation Type
-
     NoEconomizer,            !- Outdoor Air Economizer Type
-
     Enthalpy,                !- Heat Recovery Type
-
     0.70,                    !- Sensible Heat Recovery Effectiveness
-
     0.65;                    !- Latent Heat Recovery Effectiveness
+```
 
 ### ZoneHVAC:IdealLoadsAirSystem Outputs
 
-HVAC,Sum,Zone Ideal Loads Supply Air Sensible Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Supply Air Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Supply Air Total Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Supply Air Total Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Supply Air Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Supply Air Sensible Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Supply Air Latent Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Supply Air Latent Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Supply Air Total Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Supply Air Total Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Supply Air Latent Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Supply Air Latent Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Zone Sensible Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Zone Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Zone Latent Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Zone Latent Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Zone Total Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Zone Total Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Zone Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Zone Sensible Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Zone Latent Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Zone Latent Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Zone Total Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Zone Total Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Outdoor Air Sensible Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Outdoor Air Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Outdoor Air Latent Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Outdoor Air Latent Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Outdoor Air Total Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Outdoor Air Total Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Outdoor Air Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Outdoor Air Sensible Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Outdoor Air Latent Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Outdoor Air Latent Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Outdoor Air Total Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Outdoor Air Total Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Heat Recovery Sensible Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Heat Recovery Sensible Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Heat Recovery Latent Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Heat Recovery Latent Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Heat Recovery Total Heating Energy [J]
+* HVAC,Sum,Zone Ideal Loads Heat Recovery Total Heating Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Heat Recovery Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Heat Recovery Sensible Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Heat Recovery Latent Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Heat Recovery Latent Cooling Energy [J]
 
-HVAC,Sum,Zone Ideal Loads Heat Recovery Total Cooling Energy [J]
+* HVAC,Sum,Zone Ideal Loads Heat Recovery Total Cooling Energy [J]
 
-HVAC,Average,Zone Ideal Loads Supply Air Sensible Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Supply Air Sensible Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Supply Air Latent Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Supply Air Latent Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Supply Air Total Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Supply Air Total Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Supply Air Sensible Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Supply Air Sensible Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Supply Air Latent Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Supply Air Latent Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Supply Air Total Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Supply Air Total Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Zone Sensible Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Zone Sensible Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Zone Latent Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Zone Latent Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Zone Total Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Zone Total Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Zone Sensible Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Zone Sensible Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Zone Latent Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Zone Latent Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Zone Total Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Zone Total Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Outdoor Air Sensible Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Outdoor Air Sensible Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Outdoor Air Latent Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Outdoor Air Latent Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Outdoor Air Total Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Outdoor Air Total Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Outdoor Air Sensible Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Outdoor Air Sensible Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Outdoor Air Latent Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Outdoor Air Latent Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Outdoor Air Total Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Outdoor Air Total Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Heat Recovery Sensible Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Heat Recovery Sensible Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Heat Recovery Latent Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Heat Recovery Latent Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Heat Recovery Total Heating Rate [W]
+* HVAC,Average,Zone Ideal Loads Heat Recovery Total Heating Rate [W]
 
-HVAC,Average,Zone Ideal Loads Heat Recovery Sensible Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Heat Recovery Sensible Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Heat Recovery Latent Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Heat Recovery Latent Cooling Rate [W]
 
-HVAC,Average,Zone Ideal Loads Heat Recovery Total Cooling Rate [W]
+* HVAC,Average,Zone Ideal Loads Heat Recovery Total Cooling Rate [W]
 
-HVAC,Sum,Zone Ideal Loads Economizer Active Time [hr]
+* HVAC,Sum,Zone Ideal Loads Economizer Active Time [hr]
 
-HVAC,Sum,Zone Ideal Loads Heat Recovery Active Time [hr]
+* HVAC,Sum,Zone Ideal Loads Heat Recovery Active Time [hr]
 
-HVAC,Average,Zone Ideal Loads Hybrid Ventilation Available Status []
+* HVAC,Average,Zone Ideal Loads Hybrid Ventilation Available Status []
+
 
 #### Ideal Loads Output Variable Overview
 
@@ -7805,11 +7050,11 @@ The name of an outdoor air mixer component (object: OutdoorAir:Mixer) which comp
 
 This field specifies the type of supply air fan object used by this fan coil. The supply air fan is part of the fan coil compound object. The only valid supply air fan types are:
 
-Fan:OnOff
+* Fan:OnOff
 
-Fan:ConstantVolume
+* Fan:ConstantVolume
 
-Fan:VariableVolume
+* Fan:VariableVolume
 
 #### Field: Supply Air Fan Name
 
@@ -7821,11 +7066,11 @@ The fan’s outlet node should be the same as the cooling coil’s air inlet nod
 
 This field specifies the type of chilled water cooling coil to be modeled for this fan coil unit. Only the following coil types can be used:
 
-Coil:Cooling:Water
+* Coil:Cooling:Water
 
-Coil:Cooling:Water:DetailedGeometry
+* Coil:Cooling:Water:DetailedGeometry
 
-CoilSystem:Cooling:Water:HeatExchangerAssisted
+* CoilSystem:Cooling:Water:HeatExchangerAssisted
 
 The input requirements for these chilled water coil objects are described elsewhere in this document.
 
@@ -7835,11 +7080,11 @@ The name of the cooling coil component that composes part of the fan coil unit. 
 
 Only the following coil types can be used:
 
-Coil:Cooling:Water
+* Coil:Cooling:Water
 
-Coil:Cooling:Water:DetailedGeometry
+* Coil:Cooling:Water:DetailedGeometry
 
-CoilSystem:Cooling:Water:HeatExchangerAssisted
+* CoilSystem:Cooling:Water:HeatExchangerAssisted
 
 #### Field: Maximum Cold Water Flow Rate
 
@@ -7859,7 +7104,7 @@ The convergence tolerance for the control of the unit cooling output. The unit i
 
 This field is the type of coil that is used for heating in the fan coil system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. The only allowable heating coil type is:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
 #### Field: Heating Coil Name
 
@@ -7867,7 +7112,7 @@ The name of the heating coil component that composes part of the fan coil unit. 
 
 Only the following coil type can be used:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
 #### Field: Maximum Hot Water Flow Rate
 
@@ -7897,236 +7142,133 @@ This optional input field is the name of a DesignSpecificationZoneHVACSizing obj
 
 An example input for a fan coil unit, including its constituent components, is shown below.
 
+```idf
   ZoneHVAC:FourPipeFanCoil,
-
     Zone1FanCoil,            !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     ConstantFanVariableFlow, !- Capacity Control Method
-
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
-
     ,                        !- Low Speed Supply Air Flow Ratio
-
     ,                        !- Medium Speed Supply Air Flow Ratio
-
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-
     OUTAIRFANCOILSCHEDULE,   !- Outdoor Air Schedule Name
-
     Zone1FanCoilAirInletNode,!- Air Inlet Node Name
-
     Zone1FanCoilAirOutletNode,  !- Air Outlet Node Name
-
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
-
     Zone1FanCoilOAMixer,     !- Outdoor Air Mixer Name
-
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
-
     Zone1FanCoilFan,         !- Supply Air Fan Name
-
     Coil:Cooling:Water,      !- Cooling Coil Object Type
-
     Zone1FanCoilCoolingCoil, !- Cooling Coil Name
-
     autosize,                !- Maximum Cold Water Flow Rate {m3/s}
-
     0.0,                     !- Minimum Cold Water Flow Rate {m3/s}
-
     0.001,                   !- Cooling Convergence Tolerance
-
     Coil:Heating:Water,      !- Heating Coil Object Type
-
     Zone1FanCoilHeatingCoil, !- Heating Coil Name
-
     autosize,                !- Maximum Hot Water Flow Rate {m3/s}
-
     0.0,                     !- Minimum Hot Water Flow Rate {m3/s}
-
     0.001;                   !- Heating Convergence Tolerance
 
-
-
 OutdoorAir:Mixer,
-
     Zone1FanCoilOAMixer, ! name
-
     Zone1FanCoilOAMixerOutletNode, !Mixed Air Node Name
-
     Zone1FanCoilOAInNode, !Outdoor Air Stream Node Name
-
     Zone1FanCoilExhNode, !Relief Air Stream Node Name
-
     Zone1FanCoilAirInletNode; !Return Air Stream Node Name
 
-
-
-
 Fan:OnOff,
-
    Zone1FanCoilFan,         !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.5,                     !- Fan Total Efficiency
-
     75.0,                    !- Pressure Rise {Pa}
-
     autosize,                !- Maximum Flow Rate {m3/s}
-
     0.9,                     !- Motor Efficiency
-
     1.0,                     !- Motor In Airstream Fraction
-
     Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name
-
     Zone1FanCoilFanOutletNode,  !-Air Outlet Node Name
-
     FanPowerRatioCurve,      !- Fan Power Ratio Function of Speed Ratio Curve Name
-
     FanEffRatioCurve;        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
 
-
-
-
-
 Coil:Cooling:Water,
-
     Zone1FanCoilCoolingCoil, !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     autosize,                !- Design Water Flow Rate {m3/s}
-
     autosize,                !- Design Air Flow Rate {m3/s}
-
     autosize,                !- Design Inlet Water Temperature {C}
-
     autosize,                !- Design Inlet Air Temperature {C}
-
     autosize,                !- Design Outlet Air Temperature {C}
-
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
-
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-
     Zone1FanCoilChWInletNode,!- Water Inlet Node Name
-
     Zone1FanCoilChWOutletNode,  !- Water Outlet Node Name
-
     Zone1FanCoilFanOutletNode,  !- Air Inlet Node Name
-
     Zone1FanCoilCCOutletNode,!-Air Outlet Node Name
-
     SimpleAnalysis,          !- Type of Analysis
-
     CrossFlow;               !- Heat Exchanger Configuration
 
-
-
 Coil:Heating:Water,
-
     Zone1FanCoilHeatingCoil, !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     autosize,                !- U-Factor Times Area Value {W/K}
-
     autosize,                !- Maximum Water Flow Rate {m3/s}
-
     Zone1FanCoilHWInletNode, !- Water Inlet Node Name
-
     Zone1FanCoilHWOutletNode,!- Water Outlet Node Name
-
     Zone1FanCoilCCOutletNode,!- Air Inlet Node Name
-
     Zone1FanCoilAirOutletNode,  !-Air Outlet Node Name
-
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-
     autosize,                !- Nominal Capacity {W}
-
     82.2,                    !- Design Inlet Water Temperature {C}
-
     16.6,                    !- Design Inlet Air Temperature {C}
-
     71.1,                    !- Design Outlet Water Temperature {C}
-
     32.2;                    !- Design Outlet Air Temperature {C}
 
-
-
 Curve:Exponent,
-
     FanPowerRatioCurve,      !- Name
-
     0.0,                     !- Coefficient1 Constant
-
     1.0,                     !- Coefficient2 Constant
-
     3.0,                     !- Coefficient3 Constant
-
    0.0,                     !- Minimum Value of x
-
     1.5,                     !- Maximum Value of x
-
     0.01,                    !- Minimum Curve Output
-
     1.5;                     !- Maximum Curve Output
 
-
-
-
-
 Curve:Cubic,
-
    FanEffRatioCurve,        !- Name
-
    0.33856828,              !- Coefficient1 Constant
-
    1.72644131,              !- Coefficient2 x
-
-   -1.49280132,             !- Coefficient3 x\*\*2
-
-  0.42776208,              !- Coefficient4 x\*\*3
-
+   -1.49280132,             !- Coefficient3 x**2
+  0.42776208,              !- Coefficient4 x**3
    0.5,                     !- Minimum Value of x
-
    1.5,                     !- Maximum Value of x
-
    0.3,                     !- Minimum Curve Output
-
    1.0;                     !- Maximum Curve Output
-
-
+```
 
 ### Fan Coil Outputs
 
-HVAC,Average,Fan Coil Heating Rate [W]
+* HVAC,Average,Fan Coil Heating Rate [W]
 
-HVAC,Sum,Fan Coil Heating Energy [J]
+* HVAC,Sum,Fan Coil Heating Energy [J]
 
-HVAC,Average,Fan Coil Total Cooling Rate [W]
+* HVAC,Average,Fan Coil Total Cooling Rate [W]
 
-HVAC,Sum,Fan Coil Total Cooling Energy [J]
+* HVAC,Sum,Fan Coil Total Cooling Energy [J]
 
-HVAC,Average,Fan Coil Sensible Cooling Rate [W]
+* HVAC,Average,Fan Coil Sensible Cooling Rate [W]
 
-HVAC,Sum,Fan Coil Sensible Cooling Energy [J]
+* HVAC,Sum,Fan Coil Sensible Cooling Energy [J]
 
-HVAC,Average,Fan Coil Fan Electric Power[W]
+* HVAC,Average,Fan Coil Fan Electric Power[W]
 
-HVAC,Sum,Fan Coil Fan Electric Energy [J]
+* HVAC,Sum,Fan Coil Fan Electric Energy [J]
 
-HVAC,Average,Fan Coil Runtime Fraction []
+* HVAC,Average,Fan Coil Runtime Fraction []
 
-HVAC,Average, Fan Coil Fan Speed Level []
+* HVAC,Average, Fan Coil Fan Speed Level []
 
-HVAC,Average,Fan Coil Part Load Ratio []
+* HVAC,Average,Fan Coil Part Load Ratio []
 
-HVAC,Average,Fan Coil Availability Status []
+* HVAC,Average,Fan Coil Availability Status []
 
 #### Fan Coil Heating Rate [W]
 
@@ -8268,11 +7410,11 @@ This field is a node name used to identify the node associated with the “mixed
 
 This field specifies the type of supply air fan used by this unit ventilator. The supply air fan is part of the unit ventilator compound object. The only valid supply air fan types are:
 
-Fan:OnOff
+* Fan:OnOff
 
-Fan:ConstantVolume
+* Fan:ConstantVolume
 
-Fan:VariableVolume
+* Fan:VariableVolume
 
 #### Field: Supply Air Fan Name
 
@@ -8286,13 +7428,13 @@ This field allows the user to specify the coil operating options as one of the f
 
 This field is the type of coil that is used for heating in the unit ventilator system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. Allowable heating coil types are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Heating Coil Name
 
@@ -8312,11 +7454,11 @@ This field is the type of coil that is used for cooling in the unit ventilator s
 
 Only the following coil types can be used:
 
-Coil:Cooling:Water
+* Coil:Cooling:Water
 
-Coil:Cooling:Water:DetailedGeometry
+* Coil:Cooling:Water:DetailedGeometry
 
-CoilSystem:Cooling:Water:HeatExchangerAssisted
+* CoilSystem:Cooling:Water:HeatExchangerAssisted
 
 #### Field: Cooling Coil Name
 
@@ -8342,171 +7484,102 @@ This optional input field is the name of a DesignSpecificationZoneHVACSizing obj
 
 An example input for a unit ventilator, including its constituent components, is shown below.
 
+```idf
 ZoneHVAC:UnitVentilator,
-
     Zone1UnitVent,           !- Name
-
     UnitVentAvailability,    !- Availability Schedule Name
-
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-
     VariablePercent,         !- Outdoor Air Control Type
-
     0.168,                   !- Minimum Outdoor Air Flow Rate {m3/s}
-
     UnitVentMinOA,           !- Minimum Outdoor Air Schedule Name
-
     0.84,                    !- Maximum Outdoor Air Flow Rate {m3/s}
-
     UnitVentMaxOA,           !- Maximum Outdoor Air Fraction or Temperature Schedule Name
-
     Zone1UnitVentAirInletNode,  !- Air Inlet Node Name
-
     Zone1UnitVentAirOutletNode,  !- Air Outlet Node Name
-
     Zone1UnitVentOAInNode,   !- Outdoor Air Node Name
-
     Zone1UnitVentExhNode,    !- Exhaust Air Node Name
-
     Zone1UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
-
     Fan: ConstantVolume,     !- Supply Air Fan Object Type
-
     Zone1UnitVentFan,        !- Fan Name
-
     HeatingAndCooling,       !- Coil Option
-
     Coil:Heating:Water,      !- Heating Coil Object Type
-
     Zone1UnitVentHeatingCoil,!- Heating Coil Name
-
     0.001,                   !- Heating Convergence Tolerance
-
     Coil:Cooling:Water,      !- Cooling Coil Object Type
-
     Zone1UnitVentCoolingCoil,!- Cooling Coil Name
-
     0.001;                   !- Cooling Convergence Tolerance
 
-
-
-  OutdoorAir:Node,
-
+OutdoorAir:Node,
     Zone1UnitVentOAInNode,   !- Name
-
     -1.0;                    !- Height Above Ground {m}
 
-
-
 Fan:ConstantVolume,
-
     Zone1UnitVentFan,        !- Name
-
     UnitVentAvailability,    !- Availability Schedule Name
-
     0.5,                     !- Fan Total Efficiency
-
     75.0,                    !- Pressure Rise {Pa}
-
     0.84,                    !- Maximum Flow Rate {m3/s}
-
     0.9,                     !- Motor Efficiency
-
     1.0,                     !- Motor In Airstream Fraction
-
     Zone1UnitVentOAMixerOutletNode,  !- Fan Inlet Node Name
-
     Zone1UnitVentFanOutletNode;  !- Fan Outlet Node Name
 
-
-
-
-
 Coil:Cooling:Water,
-
     Zone1UnitVentCoolingCoil,!- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.0010,                  !- Design Water Flow Rate {m3/s}
-
     0.84,                    !- Design Air Flow Rate {m3/s}
-
     6.67,                    !- Design Inlet Water Temperature {C}
-
     30,                      !- Design Inlet Air Temperature {C}
-
     12,                      !- Design Outlet Air Temperature {C}
-
     0.013,                   !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
-
     0.008,                   !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-
     Zone1UnitVentChWInletNode,  !- Water Inlet Node Name
-
     Zone1UnitVentChWOutletNode,  !- Water Outlet Node Name
-
     Zone1UnitVentFanOutletNode,  !- Air Inlet Node Name
-
     Zone1UnitVentCCOutletNode,  !- Air Outlet Node Name
-
     SimpleAnalysis,          !- Type of Analysis
-
     CrossFlow;               !- Heat Exchanger Configuration
 
-
-
 Coil:Heating:Water,
-
     Zone1UnitVentHeatingCoil,!- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     400.,                    !- U-Factor Times Area Value {W/K}
-
     0.0005,                  !- Maximum Water Flow Rate {m3/s}
-
     Zone1UnitVentHWInletNode,!- Water Inlet Node Name
-
     Zone1UnitVentHWOutletNode,  !- Water Outlet Node Name
-
     Zone1UnitVentCCOutletNode,  !- Air Inlet Node Name
-
     Zone1UnitVentAirOutletNode,  !- Air Outlet Node Name
-
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-
     autosize,                !- Nominal Capacity {W}
-
     82.2,                    !- Design Inlet Water Temperature {C}
-
     16.6,                    !- Design Inlet Air Temperature {C}
-
     71.1,                    !- Design Outlet Water Temperature {C}
-
     32.2;                    !- Design Outlet Air Temperature {C}
+```
+
 
 ### Unit Ventilator Outputs
 
-HVAC,Average,Zone Unit Ventilator Heating Rate [W]
+* HVAC,Average,Zone Unit Ventilator Heating Rate [W]
 
-HVAC,Sum,Zone Unit Ventilator Heating Energy [J]
+* HVAC,Sum,Zone Unit Ventilator Heating Energy [J]
 
-HVAC,Average,Zone Unit Ventilator Total Cooling Rate [W]
+* HVAC,Average,Zone Unit Ventilator Total Cooling Rate [W]
 
-HVAC,Sum,Zone Unit Ventilator Total Cooling Energy [J]
+* HVAC,Sum,Zone Unit Ventilator Total Cooling Energy [J]
 
-HVAC,Average,Zone Unit Ventilator Sensible Cooling Rate [W]
+* HVAC,Average,Zone Unit Ventilator Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Unit Ventilator Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Unit Ventilator Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Unit Ventilator Fan Electric Power[W]
+* HVAC,Average,Zone Unit Ventilator Fan Electric Power[W]
 
-HVAC,Sum,Zone Unit Ventilator Fan Electric Energy [J]
+* HVAC,Sum,Zone Unit Ventilator Fan Electric Energy [J]
 
-HVAC,Average,Zone Unit Ventilator Fan Availability Status []
+* HVAC,Average,Zone Unit Ventilator Fan Availability Status []
 
-HVAC,Average, Zone Unit Ventilator Fan Part Load Ratio []
+* HVAC,Average, Zone Unit Ventilator Fan Part Load Ratio []
 
 #### Zone Unit Ventilator Heating Rate [W]
 
@@ -8540,11 +7613,11 @@ This field reports the electric power consumption rate of the fan of the unit ve
 
 This field reports the electric power consumed by the fan of the unit ventilator over the timestep in Joules.
 
-***Zone Unit Ventilator Fan Availability Status []***
+#### Zone Unit Ventilator Fan Availability Status []
 
 This is the availability status of the unit ventilator fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the unit ventilator  object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:\* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-***Zone Unit Ventilator Fan Part Load Ratio []***
+#### Zone Unit Ventilator Fan Part Load Ratio []
 
 This is the fan’s part load ratio for the report timestep during which the fan had operated. This variable is available for OnOff supply air fan type only.
 
@@ -8582,11 +7655,11 @@ This field is a node name used to identify the node that serves as the outlet (a
 
 This field specifies the type of supply air fan used by this unit heater. The supply air fan is part of the unit heater compound object. The only valid supply air fan types are:
 
-Fan:OnOff
+* Fan:OnOff
 
-Fan:ConstantVolume
+* Fan:ConstantVolume
 
-Fan:VariableVolume
+* Fan:VariableVolume
 
 #### Field: Supply Air Fan Name
 
@@ -8600,13 +7673,13 @@ This field allows the user to enter the maximum volumetric flow rate of air thro
 
 This field is the type of coil that is used for heating in the unit heater system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. Allowable heating coil types are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Heating Coil Name
 
@@ -8648,103 +7721,68 @@ This optional input field is the name of a DesignSpecificationZoneHVACSizing obj
 
 An example input for a unit heater, including its constituent components, is shown below.
 
+```idf
 ZoneHVAC:UnitHeater,
-
     Zone1UnitHeat,           !- Name
-
     UnitHeatAvailability,    !- Availability Schedule Name
-
     Zone1UnitHeatAirInletNode,  !- Air Inlet Node Name
-
     Zone1UnitHeatAirOutletNode,  !- Air Outlet Node Name
-
     Fan: ConstantVolume,     !- Supply Air Fan Object Type
-
     Zone1UnitHeatFan,        !- Fan Name
-
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-
     Continuous,              !- Fan Control Type
-
     Coil:Heating:Water,      !- Heating Coil Object Type
-
     Zone1UnitHeatHeatingCoil,!- Heating Coil Name
-
     0.0005,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
-
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
-
     0.001;                   !- Heating Convergence Tolerance
 
 
-
 Fan:ConstantVolume,
-
     Zone1UnitHeatFan,        !- Name
-
     UnitHeatAvailability,    !- Availability Schedule Name
-
     0.5,                     !- Fan Total Efficiency
-
     75.0,                    !- Pressure Rise {Pa}
-
     0.84,                    !- Maximum Flow Rate {m3/s}
-
     0.9,                     !- Motor Efficiency
-
     1.0,                     !- Motor In Airstream Fraction
-
     Zone1UnitHeatAirInletNode,  !- Fan Inlet Node Name
-
     Zone1UnitHeatFanOutletNode;  !- Fan Outlet Node Name
 
 
-
 Coil:Heating:Water,
-
     Zone1UnitHeatHeatingCoil,!- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     400.,                    !- U-Factor Times Area Value {W/K}
-
     0.0005,                  !- Maximum Water Flow Rate {m3/s}
-
     Zone1UnitHeatHWInletNode,!- Water Inlet Node Name
-
     Zone1UnitHeatHWOutletNode,  !- Water Outlet Node Name
-
     Zone1UnitHeatFanOutletNode,  !- Air Inlet Node Name
-
     Zone1UnitHeatAirOutletNode,  !- Air Outlet Node Name
-
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-
     autosize,                !- Nominal Capacity {W}
-
     82.2,                    !- Design Inlet Water Temperature {C}
-
     16.6,                    !- Design Inlet Air Temperature {C}
-
     71.1,                    !- Design Outlet Water Temperature {C}
-
     32.2;                    !- Design Outlet Air Temperature {C}
+```
+
 
 
 
 ### Unit Heater Outputs
 
-HVAC,Average,Zone Unit Heater Heating Rate [W]
+* HVAC,Average,Zone Unit Heater Heating Rate [W]
 
-HVAC,Sum,Zone Unit Heater Heating Energy [J]
+* HVAC,Sum,Zone Unit Heater Heating Energy [J]
 
-HVAC,Average,Zone Unit Heater Fan Electric Power[W]
+* HVAC,Average,Zone Unit Heater Fan Electric Power[W]
 
-HVAC,Sum,Zone Unit Heater Fan Electric Energy [J]
+* HVAC,Sum,Zone Unit Heater Fan Electric Energy [J]
 
-HVAC,Average, Zone Unit Heater Fan Availability Status []
+* HVAC,Average, Zone Unit Heater Fan Availability Status []
 
-HVAC,Average, Zone Unit Heater Fan Part Load Ratio []
+* HVAC,Average, Zone Unit Heater Fan Part Load Ratio []
 
 #### Zone Unit Heater Heating Rate [W]
 
@@ -8762,11 +7800,11 @@ This field reports the electric power consumption rate of the fan of the unit he
 
 This field reports the electric power consumed by the fan of the unit heater over the timestep in Joules.
 
-***Zone Unit Heater Fan Availability Status []***
+#### Zone Unit Heater Fan Availability Status []
 
 This is the availability status of the unit heater fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the unit heater  object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:\* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-***Zone Unit Heater Fan Part Load Ratio []***
+#### Zone Unit Heater Fan Part Load Ratio []
 
 This is the fan’s part load ratio for the report timestep during which the fan had operated. This variable is available for OnOff supply air fan type only.
 
@@ -8858,65 +7896,50 @@ This optional input field is the name of a DesignSpecificationZoneHVACSizing obj
 
 An example input object follows.
 
+```idf
 ZoneHVAC:EvaporativeCoolerUnit,
-
    Zone Evap Unit, !- Name
-
    System Availability Schedule , !- Availability Schedule Name
-
    , !- Availability Manager List Name
-
    Cooler Unit OA inlet , !- Outdoor Air Inlet Node Name
-
    Main Zone Inlet Node, !- Cooler Outlet Node Name
-
    Main Zone Relief Node , !- Zone Relief Air Node Name
-
    Fan:ConstantVolume , !- Supply Air Fan Object Type
-
    Supply Fan , !- Supply Air Fan Name
-
    2.0, !- Design Supply Air Flow Rate
-
    DrawThrough , !- Fan Placement
-
    ZoneCoolingLoadOnOffCycling, !- Cooler Unit Control Method
-
    1.1, !- Throttling Range Temperature Difference
-
    100.0, !- Cooling Load Control Threshold Heat Transfer Rate
-
    EvaporativeCooler:Direct:CelDekPad, !- First Evaporative Cooler Object Type
-
    Evaporative Cooler, !- First Evaporative Cooler Object Name
-
     , !- Second Evaporative Cooler Object Type
-
     ; !- Second Evaporative Cooler Name
-
+```
 
 
 ### ZoneHVAC:EvaporativeCoolerUnit Outputs
 
-HVAC,Average,Zone Evaporative Cooler Unit Total Cooling Rate [W]
+* HVAC,Average,Zone Evaporative Cooler Unit Total Cooling Rate [W]
 
-HVAC,Sum,Zone Evaporative Cooler Unit Total Cooling Energy [J]
+* HVAC,Sum,Zone Evaporative Cooler Unit Total Cooling Energy [J]
 
-HVAC,Average,Zone Evaporative Cooler Unit Sensible Cooling Rate [W]
+* HVAC,Average,Zone Evaporative Cooler Unit Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Evaporative Cooler Unit Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Evaporative Cooler Unit Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Evaporative Cooler Unit Latent Heating Rate [W]
+* HVAC,Average,Zone Evaporative Cooler Unit Latent Heating Rate [W]
 
-HVAC,Sum,Zone Evaporative Cooler Unit Latent Heating Energy [J]
+* HVAC,Sum,Zone Evaporative Cooler Unit Latent Heating Energy [J]
 
-HVAC,Average,Zone Evaporative Cooler Unit Latent Cooling Rate [W]
+* HVAC,Average,Zone Evaporative Cooler Unit Latent Cooling Rate [W]
 
-HVAC,Sum,Zone Evaporative Cooler Unit Latent Cooling Energy [J]
+* HVAC,Sum,Zone Evaporative Cooler Unit Latent Cooling Energy [J]
 
-HVAC,Average,Zone Evaporative Cooler Unit Fan Speed Ratio []
+* HVAC,Average,Zone Evaporative Cooler Unit Fan Speed Ratio []
 
-HVAC,Average,Zone Evaporative Cooler Unit Fan Availability Status []
+* HVAC,Average,Zone Evaporative Cooler Unit Fan Availability Status []
+
 
 #### Zone Evaporative Cooler Unit Total Cooling Rate [W]
 
@@ -8998,9 +8021,9 @@ This field is the name of a fan (ref: Fan:ConstantVolume, Fan: VariableVolume) t
 
 This field has two choices: **BlowThrough** or **DrawThrough**. The first choice stands for “blow through fan”. It means that the unit consists of outdoor air node followed by a supply fan followed by the equipment that are part of the system. The second choice stands for “draw through fan”. It means that the supply fan placed at the end of supply air stream and supply fan outlet node is identified with the air outlet node. The fan “draws air through” the equipment system.
 
-BlowThrough
+* BlowThrough
 
-DrawThrough
+* DrawThrough
 
 If the user does not select a fan placement type, **DrawThrough** is assumed as default by EnergyPlus.
 
@@ -9020,9 +8043,9 @@ This field contains a schedule name (ref: Schedule) that should contain values f
 
 The unit control type field determines with conditions in the zone being served what the response of the zone outdoor air system will be. It is important to note that this only controls the temperature of the air being delivered to the space not whether or not the system will operate.  There are two options for this field: Neutral or Temperature. Neutral control tries to have no energy impact on the zone by delivering air at the temperature of the zone. This allows air to be delivered to the zone without affecting the zone air heat balance and thus provides outside air without impacting any other system providing conditioning to this zone. The temperature control option will supply air to the zone based on the high and low air control temperature schedules (see next two fields). For temperature control, when the outside air temperature is less than the low air control temperature, the zone outdoor air unit will provide whatever heating is available from its components to achieve the low air temperature value.  When the outside air temperature is above the high air control temperature, the zone outdoor air unit will provide whatever cooling is available from its components to achieve the high air temperature value.  When the outdoor air temperature is between the high and low air control temperatures, the unit will simply provide air at whatever the outdoor air conditions are, modified by any fan heat added by the supply fan. In summary, the user must select from the following two options:
 
-NeutralControl
+* NeutralControl
 
-TemperatureControl
+* TemperatureControl
 
 If the user does not select a unit control type, **NeutralControl** is assumed as the default by EnergyPlus.
 
@@ -9060,69 +8083,52 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 An example of this object defined in an input data file is shown below**:**
 
+```idf
 ZoneHVAC:OutdoorAirUnit,
-
     Zone5DXOutAir,           !- Name
-
     OAUnitOASched,           !- Availability Schedule Name
-
     SPACE5-1,                !- Zone Name
-
     0.42,                    !- Outdoor Air Flow Rate {m3/s}
-
     OAUnitOASched,           !- Outdoor Air Schedule Name
-
     Zone5OAUFan1,            !- Supply Fan Name
-
     BlowThrough,             !- Supply Fan Placement
-
     ,                        !- Exhaust Fan Name
-
     ,                        !- Exhaust Air Flow Rate {m3/s}
-
     ,                        !- Exhaust Air Schedule Name
-
     TemperatureControl,      !- Unit Control Type
-
     OAUHitemp2,              !- High Air Control Temperature Schedule Name
-
     OAULotemp2,              !- Low Air Control Temperature Schedule Name
-
     Zone5OAUOANode,          !- Outdoor Air Node Name
-
     Zone5OAUZoneInletNode,   !- AirOutlet Node Name
-
     Zone5OAUZoneOutletNode,  !- AirInlet Node Name
-
     Zone5OAUFanOutletNode,   !- Supply FanOutlet Node Name
-
     Zone5OAUEquip1;          !- Outdoor Air Unit List Name
+```
+
 
 ### Outdoor Air Unit Outputs
 
+* HVAC,Average, Zone Outdoor Air Unit Total Heating Rate [W]
 
+* HVAC,Sum, Zone Outdoor Air Unit Total Heating Energy [J]
 
-HVAC,Average, Zone Outdoor Air Unit Total Heating Rate [W]
+* HVAC,Average, Zone Outdoor Air Unit Total Cooling Rate [W]
 
-HVAC,Sum, Zone Outdoor Air Unit Total Heating Energy [J]
+* HVAC,Sum, Zone Outdoor Air Unit Total Cooling Energy [J]
 
-HVAC,Average, Zone Outdoor Air Unit Total Cooling Rate [W]
+* HVAC,Average, Zone Outdoor Air Unit Sensible Cooling Rate [W]
 
-HVAC,Sum, Zone Outdoor Air Unit Total Cooling Energy [J]
+* HVAC,Sum, Zone Outdoor Air Unit Sensible Heating Energy [J]
 
-HVAC,Average, Zone Outdoor Air Unit Sensible Cooling Rate [W]
+* HVAC,Average, Zone Outdoor Air Unit Fan Electric Power [W]
 
-HVAC,Sum, Zone Outdoor Air Unit Sensible Heating Energy [J]
+* HVAC,Sum, Zone Outdoor Air Unit Fan Electric Energy [J]
 
-HVAC,Average, Zone Outdoor Air Unit Fan Electric Power [W]
+* HVAC,Average, Zone Outdoor Air Unit Air Mass Flow Rate [kg/s]
 
-HVAC,Sum, Zone Outdoor Air Unit Fan Electric Energy [J]
+* HVAC,Average, Zone Outdoor Air Unit Fan Availability Status []
 
-HVAC,Average, Zone Outdoor Air Unit Air Mass Flow Rate [kg/s]
-
-HVAC,Average, Zone Outdoor Air Unit Fan Availability Status []
-
-Zone Outdoor Air Unit Latent Cooling Energy
+* Zone Outdoor Air Unit Latent Cooling Energy
 
 #### Zone Outdoor Air Unit Total Heating Rate [W]
 
@@ -9204,25 +8210,19 @@ Note: If any of the components use the autosized option at the component level, 
 
 An example from an IDF:
 
+```idf
 ZoneHVAC:OutdoorAirUnit:EquipmentList,
-
     Zone5OAUEquip1,          !- Name
-
     Dehumidifier:Desiccant:NoFans,  !- Component 1 Object Type
-
     Z5Dessicant,             !- Component 1 Name
-
     HeatExchanger:AirToAir:FlatPlate,  !- Component 2 Object Type
-
     Zone5A2AHeat Recovery,   !- Component 2 Name
-
     CoilSystem:Cooling:DX,  !- Component 3 Object Type
-
     DX Cooling Coil System 5,!- Component 3 Name
-
     Coil:Heating:Electric,   !- Component 4 Object Type
-
     Zone5DESHCoil;           !- Component 4 Name
+```
+
 
 ### ZoneHVAC:WindowAirConditioner
 
@@ -9268,9 +8268,9 @@ The name of an outdoor air mixer component which composes part of the window air
 
 This field specifies the type of supply air fan used by window air conditioner. The supply air fan is part of the window air conditioner compound object. The only valid supply air fan types are:
 
-Fan:OnOff
+* Fan:OnOff
 
-Fan:ConstantVolume
+* Fan:ConstantVolume
 
 #### Field:Supply Air Fan Name
 
@@ -9280,9 +8280,9 @@ The name of a constant volume fan component that composes part of the window air
 
 This field specifies the type of cooling coil to be modeled for this window air conditioner. The input requirements for these cooling coil objects are described elsewhere in this document. If the user wants to control the enhanced dehumidification performance of the Heat Exchanger Assisted coil type based on zone air humidity level, then the input file must include a humidistat object (ref. ZoneControl:Humidistat) for the zone being served by this air conditioner and a high humidity set point manager (ref. SetpointManager:SingleZone:Humidity:Maximum) with the high humidity set point placed on the outlet node of the heat exchanger assisted cooling coil. Only allowable coil types are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
 #### Field: DX Cooling Coil Name
 
@@ -9318,143 +8318,94 @@ This optional input field is the name of a DesignSpecificationZoneHVACSizing obj
 
 Following is an example input for the cycling window air conditioner, along with its constituent components.
 
+```idf
 ZoneHVAC:WindowAirConditioner,
-
        Zone3WindAC,                  ! name of window AC unit
-
        FanAndCoilAvailSched,         ! Availability Schedule Name
-
        0.6,                          ! Maximum Supply Air Flow Rate {m3/s}
-
        0.05,                         ! Maximum Outdoor Air Flow Rate {m3/s}
-
        Zone3WindACAirInletNode,      ! Air Inlet Node Name
-
        Zone3WindACAirOutletNode,     ! Air Outlet Node Name
-
        OutdoorAir:Mixer,             ! Outdoor Air Mixer Object Type
-
        Zone3WindACOAMixer,           ! Outdoor Air Mixer Name
-
        Fan:ConstantVolume,           ! Supply Air Fan Object Type
-
        Zone3WindACFan,               ! Fan Name
-
        Zone3WindACDXCoil,            ! DX Cooling Coil Name
-
        CyclingFanSch,                ! Supply Air Fan Operation Mode Schedule Name
-
        DrawThrough,                  ! Fan Placement
-
        0.001,                        ! Cooling Convergence Tolerance
-
        Coil:Cooling:DX:SingleSpeed;  ! Cooling Coil Object Type
 
 
-
 Schedule:Compact,
-
        CyclingFanSch,                !- Name
-
        Fraction,                     !- ScheduleType
-
        Through: 12/31,               !- Complex Field \#1
-
        For: AllDays,                 !- Complex Field \#2
-
        Until: 24:00,                 !- Complex Field \#7
-
        0.0;                          !- Complex Field \#8
 
 
-
 OutdoorAir:Mixer,
-
        Zone3WindACOAMixer,           ! Name
-
        Zone3WindACOAMixerOutletNode, ! Mixed Air Node Name
-
        Zone3WindACOAInNode,          ! Outdoor Air Stream Node Name
-
        Zone3WindACExhNode,           ! Relief Air Stream Node Name
-
        Zone3WindACAirInletNode;      ! Return Air Stream Node Name
 
 
-
 Fan:ConstantVolume,
-
        Zone3WindACFan,               ! Name
-
        FanAndCoilAvailSched,         ! Availability Schedule Name
-
        0.5,                          ! Fan Total Efficiency
-
        75.0,                         ! Pressure Rise {Pa}
-
        0.6,                          ! Maximum Flow Rate {m3/s}
-
        0.9,                          ! Motor Efficiency
-
        1.0,                          ! Motor In Airstream Fraction
-
        Zone3WindACDXOutletNode,      ! Air Inlet Node Name
-
        Zone3WindACAirOutletNode;     ! Air Outlet Node Name
 
 
-
 Coil:Cooling:DX:SingleSpeed,
-
     Zone3WindACDXCoil,       !- Name
-
     CoolingCoilAvailSched,   !- Availability Schedule Name
-
     autosize,                !- Rated Total Cooling Capacity {W}
-
     autosize,                !- Rated Sensible Heat Ratio
-
     3.0,                     !- Rated COP
-
     autosize,                !- Rated Air Flow Rate {m3/s}
-
     Zone3WindACOAMixerOutletNode,  !- Air Inlet Node Name
-
     Zone3WindACDXOutletNode, !- Air Outlet Node Name
-
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
-
     WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
     WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
-
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
-
     WindACPLFFPLR;           !- Part Load Fraction Correlation Curve Name
+```
+
 
 ### Window Air Conditioner Outputs
 
-HVAC,Average,Zone Window Air Conditioner Total Cooling Rate [W]
+* HVAC,Average,Zone Window Air Conditioner Total Cooling Rate [W]
 
-HVAC,Sum,Zone Window Air Conditioner Total Cooling Energy [J]
+* HVAC,Sum,Zone Window Air Conditioner Total Cooling Energy [J]
 
-HVAC,Average,Zone Window Air Conditioner Sensible Cooling Rate [W]
+* HVAC,Average,Zone Window Air Conditioner Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Window Air Conditioner Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Window Air Conditioner Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Window Air Conditioner Latent Cooling Rate [W]
+* HVAC,Average,Zone Window Air Conditioner Latent Cooling Rate [W]
 
-HVAC,Sum,Zone Window Air Conditioner Latent Cooling Energy [J]
+* HVAC,Sum,Zone Window Air Conditioner Latent Cooling Energy [J]
 
-HVAC,Average,Zone Window Air Conditioner Electric Power[W]
+* HVAC,Average,Zone Window Air Conditioner Electric Power[W]
 
-HVAC,Sum,Zone Window Air Conditioner Electric Energy [J]
+* HVAC,Sum,Zone Window Air Conditioner Electric Energy [J]
 
-HVAC,Average, Zone Window Air Conditioner Fan Part Load Ratio []
+* HVAC,Average, Zone Window Air Conditioner Fan Part Load Ratio []
 
-HVAC,Average, Zone Window Air Conditioner Compressor Part Load Ratio []
+* HVAC,Average, Zone Window Air Conditioner Compressor Part Load Ratio []
 
-HVAC,Average,Zone Window Air Conditioner Fan Availability Status []
+* HVAC,Average,Zone Window Air Conditioner Fan Availability Status []
 
 #### Zone Window Air Conditioner Total Cooling Rate [W]
 
@@ -9530,7 +8481,7 @@ This alpha field defines the name of the HVAC system node to which the air condi
 
 This field specifies the type of outdoor air mixer used by this PTAC. The outdoor air mixer component is part of the PTAC unit. The only available outdoor air mixer type is:
 
-OutdoorAir:Mixer
+* OutdoorAir:Mixer
 
 #### Field: Outdoor Air Mixer Name
 
@@ -9572,13 +8523,13 @@ The name of a constant volume fan component that composes part of the PTAC. Note
 
 This alpha field defines the type of heating coil to be used by this PTAC. The input requirements for this heating coil object are described elsewhere in this document. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (PTAC) itself provides the "controller" function of modulating water flow. Allowable heating coil types are:
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Heating Coil Name
 
@@ -9588,11 +8539,11 @@ This alpha field defines the name of the heating coil used by this PTAC, and thi
 
 This alpha field defines the type of DX cooling coil used by this PTAC. The input requirements for these DX cooling coil objects are described elsewhere in this document. Only allowable coil types are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-Coil:Cooling:DX:VariableSpeed
+* Coil:Cooling:DX:VariableSpeed
 
 #### Field: Cooling Coil Name
 
@@ -9652,145 +8603,95 @@ ZoneHVAC:PackagedTerminalAirConditioner,
 
 
 Schedule:Compact,
-
     SupplyFanSch,            !- Name
-
     Fraction,                !- ScheduleType
-
     Through: 12/31,          !- Complex Field \#1
-
     For: AllDays,            !- Complex Field \#2
-
     Until:  7:00,            !- Complex Field \#3
-
     0.0,                     !- Complex Field \#4
-
     Until: 18:00,            !- Complex Field \#5
-
     1.0,                     !- Complex Field \#6
-
     Until: 24:00,            !- Complex Field \#7
-
     0.0;                     !- Complex Field \#8
 
-
-
 OutdoorAir:Mixer,
-
     Zone2PTACOAMixer,            !- Name
-
     Zone2PTACOAMixerOutletNode,  !-Mixed Air Node Name
-
     Zone2PTACOAInNode,           !-Outdoor Air Stream Node Name
-
     Zone2PTACExhNode,            !- Relief Air Stream Node Name
-
     Zone2PTACAirInletNode;       !- Return Air Stream Node Name
 
-
-
   Fan:OnOff,
-
     Zone2PTACFan,                !- Name
-
     FanAndCoilAvailSched,        !- Availability Schedule Name
-
     0.5,                         !- Fan Total Efficiency
-
     75.0,                        !- Pressure Rise {Pa}
-
     autosize,                    !- Maximum Flow Rate{m3/s}
-
     0.9,                         !- Motor Efficiency
-
     1.0,                         !- Motor In Airstream Fraction
-
     Zone2PTACOAMixerOutletNode,  !- Air Inlet Node Name
-
     Zone2PTACFanOutletNode;      !- Air Outlet Node Name
 
-
-
 Coil:Cooling:DX:SingleSpeed,
-
     Zone2PTACDXCoolCoil,         !- Coil Name
-
     CoolingCoilAvailSched,       !- Availability Schedule Name
-
     autosize,                    !- Rated Total Cooling Capacity (gross) {W}
-
     autosize,                    !- Rated SHR
-
     3.0,                         !- Rated COP
-
     autosize,                    !- Rated Air Volume Flow Rate {m3/s}
-
     Zone2PTACFanOutletNode,      !- Coil Air Inlet Node
-
     Zone2PTACCoolCoilOutletNode, !-Coil Air Outlet Node
-
     HPACCoolCapFT,               !- Total Cooling Capacity Modifier Curve (function of temperature)
-
     HPACCoolCapFFF,              !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
     HPACEIRFT,                   !- Energy Input Ratio Modifier Curve (function of temperature)
-
     HPACEIRFFF,                  !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
     HPACPLFFPLR;                 !- Part Load Fraction Correlation (function of part load ratio)
 
-
-
 Coil:Heating:Electric,
-
     Zone2PTACHeatCoil,           !- Coil Name
-
     HeatingCoilAvailSched,       !- Availability Schedule Name
-
     1.0,                         !- Efficiency
-
     autosize,                    !- Nominal Capacity {W}
-
     Zone2PTACCoolCoilOutletNode, !- Air Inlet Node Name
-
     Zone2PTACAirOutletNode;      !- Air Outlet Node Name
 ```
 
 ### Packaged Terminal Air Conditioner (PTAC) Outputs
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Total Heating Rate [W]
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Total Heating Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Air Conditioner Total Heating Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Air Conditioner Total Heating Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Total Cooling Rate [W]
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Total Cooling Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Air Conditioner Total Cooling Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Air Conditioner Total Cooling Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Sensible Heating Rate [W]
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Sensible Heating Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Air Conditioner Sensible Heating Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Air Conditioner Sensible Heating Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Sensible Cooling Rate [W]
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Air Conditioner Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Air Conditioner Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Latent Heating Rate [W]
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Latent Heating Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Air Conditioner Latent Heating Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Air Conditioner Latent Heating Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Latent Cooling Rate [W]
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Latent Cooling Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Air Conditioner Latent Cooling Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Air Conditioner Latent Cooling Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Electric Power [W]
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Electric Power [W]
 
-HVAC,Sum,Zone Packaged Terminal Air Conditioner Electric Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Air Conditioner Electric Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio []
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio []
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio []
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio []
 
-HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Availability Status []
+* HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Availability Status []
+
 
 #### Zone Packaged Terminal Air Conditioner Total Heating Rate [W]
 
@@ -9864,8 +8765,6 @@ This is the availability status of the packaged terminal air conditioner fan. Th
 
 The packaged terminal heat pump (PTHP) is a compound object made up of other components. Each PTHP consists of an outdoor air mixer, direct expansion (DX) cooling coil, DX heating coil, supply air fan, and a supplemental heating coil as shown in the figure below. These individual components are described elsewhere in this document. The packaged terminal heat pump coordinates the operation of these components and is modeled as a type of zone equipment (Ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-
-
 ![PTPFigure](InputOutputReference/media/image285.png)
 
 Figure 112. Schematic of a packaged terminal heat pump (draw through fan placement)
@@ -9892,7 +8791,7 @@ This alpha field defines the name of the HVAC system node to which the heat pump
 
 This field specifies the type of outdoor air mixer used by this PTHP. The outdoor air mixer component is part of the PTHP compound object. The only available outdoor air mixer type is:
 
-OutdoorAir:Mixer
+* OutdoorAir:Mixer
 
 #### Field: Outdoor Air Mixer Name
 
@@ -9956,11 +8855,11 @@ This numeric field defines the minimum outdoor dry-bulb temperature in degrees C
 
 This alpha field defines the type of DX cooling coil used by this PTHP. The input requirements for these DX cooling coil objects are described elsewhere in this document. Only allowable coil types are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-Coil:Cooling:DX:VariableSpeed
+* Coil:Cooling:DX:VariableSpeed
 
 #### Field: Cooling Coil Name
 
@@ -9980,13 +8879,13 @@ The maximum number of iterations is limited, with a warning message generated if
 
 This alpha field defines the type of supplemental heating coil to be used by this PTHP. The input requirements for these heating coil objects are described elsewhere in this document. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (PTHP) itself provides the "controller" function of modulating water flow. Allowable coil types are:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Supplemental Heating Coil Name
 
@@ -10017,8 +8916,6 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
 This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
-
-
 
 As shown in the example below, correct specification of the packaged terminal heat pump requires the following objects in addition to the compound object itself:
 
@@ -10064,184 +8961,114 @@ ZoneHVAC:PackagedTerminalHeatPump,
 
 
 Schedule:Compact,
-
     CyclingFanSch,               !- Name
-
     Fraction,                    !- ScheduleType
-
     Through: 12/31,              !- Complex Field \#1
-
     For: AllDays,                !- Complex Field \#2
-
     Until: 24:00,                !- Complex Field \#7
-
     0.0;                         !- Complex Field \#8
 
-
-
 OutdoorAir:Mixer,
-
     Zone2PTHPOAMixer,            !- Name
-
     Zone2PTHPOAMixerOutletNode,  !-Mixed Air Node Name
-
     Zone2PTHPOAInNode,           !-Outdoor Air Stream Node Name
-
     Zone2PTHPExhNode,            !- Relief Air Stream Node Name
-
     Zone2PTHPAirInletNode;       !- Return Air Stream Node Name
 
-
-
 Fan:OnOff,
-
     Zone2PTHPFan,                !- Name
-
     FanAndCoilAvailSched,        !- Availability Schedule Name
-
     0.5,                         !- Fan Total Efficiency
-
     75.0,                        !- Pressure Rise {Pa}
-
     autosize,                    !- Maximum Flow Rate {m3/s}
-
     0.9,                         !- Motor Efficiency
-
     1.0,                         !- Motor In Airstream Fraction
-
     Zone2PTHPOAMixerOutletNode,  !- Air Inlet Node Name
-
     Zone2PTHPFanOutletNode;      !- Air Outlet Node Name
 
-
-
 Coil:Cooling:DX:SingleSpeed,
-
     Zone2PTHPDXCoolCoil,         !- Coil Name
-
     CoolingCoilAvailSched,       !- Availability Schedule
-
     autosize,                    !- Rated Total Cooling Capacity (gross) {W}
-
     autosize,                    !- Rated SHR
-
     3.0,                         !- Rated COP
-
     autosize,                    !- Rated Air Volume Flow Rate {m3/s}
-
     Zone2PTHPFanOutletNode,      !- Coil Air Inlet Node
-
     Zone2PTHPCoolCoilOutletNode, !- Coil Air Outlet Node
-
     HPACCoolCapFT,               !- Total Cooling Capacity Modifier Curve (function of temperature)
-
     HPACCoolCapFFF,              !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
     HPACEIRFT,                   !- Energy Input Ratio Modifier Curve (function of temperature)
-
     HPACEIRFFF,                  !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
     HPACPLFFPLR;                 !- Part Load Fraction Correlation (function of part load ratio)
 
-
-
 COIL:Heating:DX:SingleSpeed,
-
     Zone2PTHPDXHeatCoil,         !- Coil Name
-
     HeatingCoilAvailSched,       !- Availability Schedule
-
     autosize,                    !- Rated Total Heating Capacity {W}
-
     2.75,                        !- Rated COP
-
     autosize,                    !- Rated Air Volume Flow Rate {m3/s}
-
     Zone2PTHPCoolCoilOutletNode, !- Coil Air Inlet Node
-
     Zone2PTHPDXHeatCoilOutletNode, !- Coil Air Outlet Node
-
     HPACHeatCapFT,              !- Total heating capacity modifier curve (function of temperature)
-
     HPACHeatCapFFF,             !- Total heating capacity modifier curve (function of flow fraction)
-
     HPACHeatEIRFT,              !- Energy input ratio modifier curve (function of temperature)
-
     HPACHeatEIRFFF,             !- Energy input ratio modifier curve (function of flow fraction)
-
     HPACCOOLPLFFPLR,            !- Part load fraction correlation (function of part load ratio)
-
     ,                           !- Defrost energy input ratio modifier curve (function of temperature)
-
     2.0,                        !- Minimum Outdoor Dry-bulb Temperature for Compressor Operation {C}
-
     5.0,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
-
     200.0,                      !- Crankcase Heater Capacity {W}
-
     10.0,                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
-
     Resistive,                  !- Defrost Strategy
-
     TIMED,                      !- Defrost Control
-
     0.166667,                   !- Defrost Time Period Fraction
-
     20000;                      !- Resistive Defrost Heater Capacity {W}
 
-
-
 Coil:Heating:Electric,
-
     Zone2PTHPSupHeater,          !- Name
-
     HeatingCoilAvailSched,       !- Availability Schedule Name
-
     1.0,                         !- Efficiency
-
     autosize,                    !- Nominal Capacity {W}
-
     Zone2PTHPDXHeatCoilOutletNode, !- Air Inlet Node Name
-
     Zone2PTHPAirOutletNode;      !- Air Outlet Node Name
 ```
 
 
 ### Packaged Terminal Heat Pump (PTHP) Outputs
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Total Heating Rate [W]
+* HVAC,Average,Zone Packaged Terminal Heat Pump Total Heating Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Heat Pump Total Heating Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Heat Pump Total Heating Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Total Cooling Rate [W]
+* HVAC,Average,Zone Packaged Terminal Heat Pump Total Cooling Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Heat Pump Total Cooling Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Heat Pump Total Cooling Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Sensible Heating Rate [W]
+* HVAC,Average,Zone Packaged Terminal Heat Pump Sensible Heating Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Heat Pump Sensible Heating Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Heat Pump Sensible Heating Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Sensible Cooling Rate [W]
+* HVAC,Average,Zone Packaged Terminal Heat Pump Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Heat Pump Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Heat Pump Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Latent Heating Rate [W]
+* HVAC,Average,Zone Packaged Terminal Heat Pump Latent Heating Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Heat Pump Latent Heating Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Heat Pump Latent Heating Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Latent Cooling Rate [W]
+* HVAC,Average,Zone Packaged Terminal Heat Pump Latent Cooling Rate [W]
 
-HVAC,Sum,Zone Packaged Terminal Heat Pump Latent Cooling Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Heat Pump Latent Cooling Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Electric Power [W]
+* HVAC,Average,Zone Packaged Terminal Heat Pump Electric Power [W]
 
-HVAC,Sum,Zone Packaged Terminal Heat Pump Electric Energy [J]
+* HVAC,Sum,Zone Packaged Terminal Heat Pump Electric Energy [J]
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Fan Part Load Ratio []
+* HVAC,Average,Zone Packaged Terminal Heat Pump Fan Part Load Ratio []
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Compressor Part Load Ratio []
+* HVAC,Average,Zone Packaged Terminal Heat Pump Compressor Part Load Ratio []
 
-HVAC,Average,Zone Packaged Terminal Heat Pump Fan Availability Status []
+* HVAC,Average,Zone Packaged Terminal Heat Pump Fan Availability Status []
 
 #### Zone Packaged Terminal Heat Pump Total Heating Rate [W]
 
@@ -10357,24 +9184,17 @@ The name of the nth air chiller that will be used to meet the zone cooling load.
 
 The following is an example input for a refrigeration chiller set.
 
+```idf
    ZoneHVAC:RefrigerationChillerSet,
-
     SubFreezerChillerSet ,     !- Name
-
     ,                         !- Availability Schedule Name
-
     SubFreezer,                !- Zone Name
-
-    NODE\_142,                   !- Air Inlet Node Name
-
-    NODE\_141,                   !- Air Outlet Node Name
-
-    SubFreezerAirChiller\_1,    !- Air Chiller \#1 Name
-
-    SubFreezerAirChiller\_2,    !- Air Chiller \#2 Name
-
-    SubFreezerAirChiller\_3;    !- Air Chiller \#3 Name
-
+    NODE_142,                   !- Air Inlet Node Name
+    NODE_141,                   !- Air Outlet Node Name
+    SubFreezerAirChiller_1,    !- Air Chiller \#1 Name
+    SubFreezerAirChiller_2,    !- Air Chiller \#2 Name
+    SubFreezerAirChiller_3;    !- Air Chiller \#3 Name
+```
 
 
 There are no outputs variables for a ZoneHVAC:RefrigerationChillerSet. Outputs for the refrigeration impact on any zone are listed in the Group:Refrigeration.
@@ -10385,21 +9205,17 @@ The zone water-to-air heat pump is a compound component consisting of a fan, wat
 
 For this zone heat pump,there are two types of WaterToAirHeatPump coil model allowed:
 
-Coil:Cooling:WaterToAirHeatPump:EquationFit
+* Coil:Cooling:WaterToAirHeatPump:EquationFit
 
-Coil:Heating:WaterToAirHeatPump:EquationFit
+* Coil:Heating:WaterToAirHeatPump:EquationFit
 
-Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
+* Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
 
-Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
-
-
+* Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
 
 ![Schematic\_ZoneWSHP](InputOutputReference/media/image288.png)
 
 Figure 113. Zone Water to Air Heat Pump Schematic for a DrawThrough Configuration with Ground Heat Exchanger
-
-
 
 #### Field: Name
 
@@ -10421,7 +9237,7 @@ This alpha field contains the name of the HVAC system node to which the heat pum
 
 This field specifies the type of outdoor air mixer used by this WaterToAirHeatPump unit. The outdoor air mixer component is part of the WaterToAirHeatPump compound object. The only available outdoor air mixer type is:
 
-OutdoorAir:Mixer
+* OutdoorAir:Mixer
 
 #### Field: Outdoor Air Mixer Name
 
@@ -10501,13 +9317,13 @@ This numeric field contains the time delay in seconds for the heat pump supply a
 
 This is the object type of the supplemental heating coil. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Zone Water to Air Heat Pump) itself provides the "controller" function of modulating water flow. The valid choices are:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Supplemental Heating Coil Name
 
@@ -10608,190 +9424,117 @@ ZoneHVAC:WaterToAirHeatPump,
     CyclingFanSch;            !- Supply Air Fan Operating Mode Schedule Name
 
 Schedule:Compact,
-
     CyclingFanSch,           !- Name
-
     Fraction,                !- Schedule Type Limits Name
-
     Through: 12/31,          !- Field 1
-
     For: AllDays,            !- Field 2
-
     Until: 24:00,            !- Field 3
-
     0.0;                     !- Field 4
 
-
-
   Coil:Heating:WaterToAirHeatPump:EquationFit,
-
     Sys 1 Heat Pump Heating Mode,  !- Name
-
     Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,   !- Water Inlet Node Name
-
     Sys 1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
-
     Sys 1 Heating Coil Air Inlet Node,      !- Air Inlet Node Name
-
     Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
-
     Autosize,                !- Rated Air Flow Rate {m3/s}
-
     Autosize,                !- Rated Water Flow Rate {m3/s}
-
     Autosize,                !- Rated Heating Capacity {W}
-
     4.75,                    !- Rated Heating Coefficient of Performance
-
     -1.361311959,            !- Heating Capacity Coefficient 1
-
     -2.471798046,            !- Heating Capacity Coefficient 2
-
     4.173164514,             !- Heating Capacity Coefficient 3
-
     0.640757401,             !- Heating Capacity Coefficient 4
-
     0.0,                     !- Heating Capacity Coefficient 5
-
     -2.176941116,            !- Heating Power Consumption Coefficient 1
-
     0.832114286,             !- Heating Power Consumption Coefficient 2
-
     1.570743399,             !- Heating Power Consumption Coefficient 3
-
     0.690793651,             !- Heating Power Consumption Coefficient 4
-
     0.0;                     !- Heating Power Consumption Coefficient 5
 
-
-
   OutdoorAir:Mixer,
-
     Zone 1 Mixer,          !- Name
-
     Sys 1 Mixed Air Node,  !- Mixed Air Node Name
-
     Sys 1 Outside Air Inlet Node,  !- Outdoor Air Stream Node Name
-
     Sys 1 Relief Air Outlet Node,  !- Relief Air Stream Node Name
-
     Zone 1 Outlet Node;  !- Return Air Stream Node Name
 
-
-
   Fan:OnOff,
-
     Zone 1 Fan,              !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.7,                     !- Fan Total Efficiency
-
     300.0,                   !- Pressure Rise {Pa}
-
     Autosize,                !- Maximum Flow Rate {m3/s}
-
     0.9,                     !- Motor Efficiency
-
     1.0,                     !- Motor In Airstream Fraction
-
     Sys 1 Mixed Air Node,    !- Air Inlet Node Name
-
     Sys 1 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-
-
   Coil:Heating:Gas,
-
     Heat Pump DX Supp Heating Coil 1,  !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.8,                     !- Gas Burner Efficiency
-
     32000,                   !- Nominal Capacity {W}
-
     Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
-
     Zone 1 Inlet Node;  !-Air Outlet Node Name
 
-
-
   BRANCH,
-
     Gshp Cooling Condenser Branch,  !- Name
-
     0,  !- Maximum Flow Rate {m3/s}
-
      ,  !- Pressure Drop Curve Name
-
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
-
     Heat Pump Cooling Mode,  !- Component 1 Name
-
     Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-
     Water to Air Heat Pump Source Side1 Outlet Node, !- Component 1 Outlet Node Name
-
     ACTIVE;  !- Component 1 Branch Control Type
 
-
-
   BRANCH,
-
     Gshp Heating Condenser Branch,  !- Name
-
     0,  !- Maximum Flow Rate {m3/s}
-
      ,  !- Pressure Drop Curve Name
-
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
-
     Heat Pump Heating Mode,  !- Component 1 Name
-
     Water to Air Heat Pump Source Side2 Inlet Node,   !- Component 1 Inlet Node Name
-
     Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-
     ACTIVE;  !- Component 1 Branch Control Type
 ```
 
 
 ### Water to Air Heat Pump (ZoneHVAC) Outputs
 
-HVAC,Average,Zone Water to Air Heat Pump Total Heating Rate [W]
+* HVAC,Average,Zone Water to Air Heat Pump Total Heating Rate [W]
 
-HVAC,Sum,Zone Water to Air Heat Pump Total Heating Energy [J]
+* HVAC,Sum,Zone Water to Air Heat Pump Total Heating Energy [J]
 
-HVAC,Average,Zone Water to Air Heat Pump Total Cooling Rate [W]
+* HVAC,Average,Zone Water to Air Heat Pump Total Cooling Rate [W]
 
-HVAC,Sum,Zone Water to Air Heat Pump Total Cooling Energy [J]
+* HVAC,Sum,Zone Water to Air Heat Pump Total Cooling Energy [J]
 
-HVAC,Average,Zone Water to Air Heat Pump Sensible Heating Rate [W]
+* HVAC,Average,Zone Water to Air Heat Pump Sensible Heating Rate [W]
 
-HVAC,Sum,Zone Water to Air Heat Pump Sensible Heating Energy [J]
+* HVAC,Sum,Zone Water to Air Heat Pump Sensible Heating Energy [J]
 
-HVAC,Average,Zone Water to Air Heat Pump Sensible Cooling Rate [W]
+* HVAC,Average,Zone Water to Air Heat Pump Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Water to Air Heat Pump Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Water to Air Heat Pump Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Water to Air Heat Pump Latent Heating Rate [W]
+* HVAC,Average,Zone Water to Air Heat Pump Latent Heating Rate [W]
 
-HVAC,Sum,Zone Water to Air Heat Pump Latent Heating Energy [J]
+* HVAC,Sum,Zone Water to Air Heat Pump Latent Heating Energy [J]
 
-HVAC,Average,Zone Water to Air Heat Pump Latent Cooling Rate [W]
+* HVAC,Average,Zone Water to Air Heat Pump Latent Cooling Rate [W]
 
-HVAC,Sum,Zone Water to Air Heat Pump Latent Cooling Energy [J]
+* HVAC,Sum,Zone Water to Air Heat Pump Latent Cooling Energy [J]
 
-HVAC,Average,Zone Water to Air Heat Pump Electric Power [W]
+* HVAC,Average,Zone Water to Air Heat Pump Electric Power [W]
 
-HVAC,Sum,Zone Water to Air Heat Pump Electric Energy [J]
+* HVAC,Sum,Zone Water to Air Heat Pump Electric Energy [J]
 
-HVAC,Average,Zone Water to Air Heat Pump Fan Part Load Ratio []
+* HVAC,Average,Zone Water to Air Heat Pump Fan Part Load Ratio []
 
-HVAC,Average,Zone Water to Air Heat Pump Compressor Part Load Ratio []
+* HVAC,Average,Zone Water to Air Heat Pump Compressor Part Load Ratio []
 
-HVAC,Average,Zone Water to Air Heat Pump Fan Availability Status []
+* HVAC,Average,Zone Water to Air Heat Pump Fan Availability Status []
 
 #### Zone Water to Air Heat Pump Total Heating Rate [W]
 
@@ -10947,77 +9690,62 @@ Following is an example input for a zone DX dehumidifier object. A ZoneControl:H
 
 
 
+```idf
   ZoneHVAC:Dehumidifier:DX,
-
     North Zone Dehumidifier,  !- Name
-
     ON,                       !- Availability Schedule Name
-
     Zone3DehumidifierInlet,   !- Air Inlet Node Name
-
     Dehumidifier Outlet Node, !- Air Outlet Node Name
-
     50.16,                    !- Rated Water Removal {L/day} (106 pints/day)
-
     3.412,                    !- Rated Energy Factor {L/kWh} (7.21 pints/kWh)
-
     0.12036,                  !- Rated Air Flow Rate {m3/s} (255 cfm)
-
     ZoneDehumidWaterRemoval,  !- Water Removal Curve Name
-
     ZoneDehumidEnergyFactor,  !- Energy Factor Curve Name
-
     ZoneDehumidPLFFPLR,        !- Part Load Fraction Correlation Curve Name
-
     10.0,  !- Minimum Dry-Bulb Temperature for Compressor Operation {C}
-
     32.0,  !- Maximum Dry-Bulb Temperature for Compressor Operation {C}
-
     0.0;   !- Off Cycle Parasitic Electric Load {W}
 
 
-
   ZoneControl:Humidistat,
-
     Zone 3 Humidistat,       !- Name
-
     NORTH ZONE,              !- Zone Name
-
     Seasonal Relative Humidity Sch;  !- Relative Humidity Setpoint Schedule Name
+```
 
 
 
 ### DX Dehumidifier (ZoneHVAC) Outputs
 
-HVAC,Average,Zone Dehumidifier Sensible Heating Rate [W]
+* HVAC,Average,Zone Dehumidifier Sensible Heating Rate [W]
 
-HVAC,Sum,Zone Dehumidifier Sensible Heating Energy [J]
+* HVAC,Sum,Zone Dehumidifier Sensible Heating Energy [J]
 
-HVAC,Average,Zone Dehumidifier Removed Water Mass Flow Rate [kg/s]
+* HVAC,Average,Zone Dehumidifier Removed Water Mass Flow Rate [kg/s]
 
-HVAC,Sum,Zone Dehumidifier Removed Water Mass [kg]
+* HVAC,Sum,Zone Dehumidifier Removed Water Mass [kg]
 
-HVAC,Average,Zone Dehumidifier Electric Power [W]
+* HVAC,Average,Zone Dehumidifier Electric Power [W]
 
-HVAC,Sum,Zone Dehumidifier Electric Energy [J]
+* HVAC,Sum,Zone Dehumidifier Electric Energy [J]
 
-HVAC,Average,Zone Dehumidifier Off Cycle Parasitic Electric Power [W]
+* HVAC,Average,Zone Dehumidifier Off Cycle Parasitic Electric Power [W]
 
-HVAC,Sum,Zone Dehumidifier Off Cycle Parasitic Electric Energy [J]
+* HVAC,Sum,Zone Dehumidifier Off Cycle Parasitic Electric Energy [J]
 
-HVAC,Average,Zone Dehumidifier Part Load Ratio []
+* HVAC,Average,Zone Dehumidifier Part Load Ratio []
 
-HVAC,Average,Zone Dehumidifier Runtime Fraction []
+* HVAC,Average,Zone Dehumidifier Runtime Fraction []
 
-HVAC,Average,Zone Dehumidifier Outlet Air Temperature [C]
+* HVAC,Average,Zone Dehumidifier Outlet Air Temperature [C]
 
 
 
 If Condensate Collection Water Storage Tank Name is specified:
 
-HVAC,Average,Zone Dehumidifier Condensate Volume Flow Rate [m3/s]
+* HVAC,Average,Zone Dehumidifier Condensate Volume Flow Rate [m3/s]
 
-HVAC,Sum,Zone Dehumidifier Condensate Volume [m3]
+* HVAC,Sum,Zone Dehumidifier Condensate Volume [m3]
 
 
 
@@ -11170,252 +9898,161 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 Following is an example input for this compound object and associated objects that may be defined:
 
 
-
+```idf
 ZoneHVAC:EnergyRecoveryVentilator,
-
     Stand Alone ERV 1,                        !- Stand alone ERV name
-
     FanAndCoilAvailSched,                     !- Availability schedule name
-
     OA Heat Recovery 1,                       !- Heat exchanger name
-
     0.05,                                     !- Supply air flow rate {m3/s}
-
     0.05,                                     !- Exhaust air flow rate {m3/s}
-
     Stand Alone ERV Supply Fan,               !- Supply air fan name
-
     Stand Alone ERV Exhaust Fan,              !- Exhaust air fan name
-
     ERV OA Controller 1;                      !- ERV controller name
 
 
-
 OutdoorAir:NodeLine,
-
     OutsideAirInletNodes;       !- 1st Node name or node list name
 
 
-
 NodeList,
-
     OutsideAirInletNodes,       !- Node List Name
-
-    ERV Outdoor air Inlet Node; !- Node\_ID\_1
-
+    ERV Outdoor air Inlet Node; !- Node_ID_1
 
 
 
 
 ZoneHVAC:EquipmentConnections,
-
     RESISTIVE ZONE,      !- Zone Name
-
     Zone1Equipment,      !- List Name: Zone Equipment
-
     Zone1Inlets,         !- List Name: Zone Inlet Nodes
-
     Zone1Exhausts,       !- List Name: Zone Exhaust Nodes
-
     Zone 1 Node,         !- Zone Air Node Name
-
     Zone 1 Outlet Node;  !- Zone Return Air Node Name
 
 
-
 ZoneHVAC:EquipmentList,
-
     Zone1Equipment,                          !-Name
-
 ZoneHVAC:EnergyRecoveryVentilator,  !- KEY--Zone Equipment Type 1
-
     Stand Alone ERV 1,                       !- Type Name 1
-
     1,                                       !- Cooling Priority
-
     1;                                       !- Heating Priority
 
 
-
 NodeList,
-
     Zone1Inlets,                             !- Node List Name
-
-    Stand Alone ERV Supply Fan Outlet Node;  !- Node\_ID\_1
-
+    Stand Alone ERV Supply Fan Outlet Node;  !- Node_ID_1
 
 
 NodeList,
-
     Zone1Exhausts,         !- Node List Name
-
-    Zone 1 Exhaust Node;   !- Node\_ID\_1
-
+    Zone 1 Exhaust Node;   !- Node_ID_1
 
 
 ZoneHVAC:EnergyRecoveryVentilator:Controller,
-
     ERV OA Controller 1,           !- ERV controller name
-
     0.05,                          !- Outdoor air flow rate {m3/s}
-
     19.,                           !- Temperature high limit {C}
-
     14.,                           !- Temperature low limit {C}
-
     0.0,                           !- Enthalpy high limit {J/kg}
-
     NoExhaustAirTemperatureLimit,     !- Exhaust air temperature limit
-
     NoExhaustAirEnthalpyLimit; !- Exhaust air enthalpy limit
 
 
 
 
-
 HeatExchanger:AirToAir:SensibleAndLatent,
-
     OA Heat Recovery 1,            !- Heat exchanger name
-
     FanAndCoilAvailSched,          !- Availability schedule name
-
     0.05,                          !- Nominal supply air flow rate {m3/s}
-
     .76,                           !- Sensible effectiveness at 100% airflow heating condition
-
     .68,                           !- Latent effectiveness at 100% airflow heating condition
-
     .81,                           !- Sensible effectiveness at 75% airflow heating condition
-
     .73,                           !- Latent effectiveness at 75% airflow heating condition
-
     .76,                           !- Sensible effectiveness at 100% airflow cooling condition
-
     .68,                           !- Latent effectiveness at 100% airflow cooling condition
-
     .81,                           !- Sensible effectiveness at 75% airflow cooling condition
-
     .73,                           !- Latent effectiveness at 75% airflow cooling condition
-
     ERV Outdoor air Inlet Node,    !- Supply air inlet node name
-
     Heat Recovery Outlet Node,     !- Supply air outlet node name
-
     Zone 1 Exhaust Node,           !- Exhaust air inlet node name
-
     Heat Recovery Secondary Outlet Node,  !- Exhaust air outlet node name
-
     50.0,                          !- Nominal electric power {W}
-
     Yes,                           !- Supply air outlet temperature control
-
     Rotary,                        !- Heat exchanger type
-
     MinimumExhaustTemperature,   !- Frost control type
-
     1.7;                           !- Threshold temperature
 
 
 
 
-
 Fan:OnOff,
-
     Stand Alone ERV Supply Fan,               !- Fan Name
-
     FanAndCoilAvailSched,                     !- Availability Schedule Name
-
     0.5,                                      !- Fan Total Efficiency
-
     75.0,                                     !- Delta Pressure {Pa}
-
     0.05,                                     !- Max Flow Rate {m3/s}
-
     0.9,                                      !- Motor Efficiency
-
     1.0,                                      !- Motor In Airstream Fraction
-
-    Heat Recovery Outlet Node,                !- Fan\_Inlet\_Node
-
-    Stand Alone ERV Supply Fan Outlet Node;   !- Fan\_Outlet\_Node
-
+    Heat Recovery Outlet Node,                !- Fan_Inlet_Node
+    Stand Alone ERV Supply Fan Outlet Node;   !- Fan_Outlet_Node
 
 
 Fan:OnOff,
-
     Stand Alone ERV Exhaust Fan,              !- Fan Name
-
     FanAndCoilAvailSched,                     !- Availability Schedule Name
-
     0.5,                                      !- Fan Total Efficiency
-
     75.0,                                     !- Delta Pressure {Pa}
-
     0.05,                                     !- Max Flow Rate {m3/s}
-
     0.9,                                      !- Motor Efficiency
-
     1.0,                                      !- Motor In Airstream Fraction
-
-    Heat Recovery Secondary Outlet Node,      !- Fan\_Inlet\_Node
-
-    Stand Alone ERV Exhaust Fan Outlet Node;  !- Fan\_Outlet\_Node
-
+    Heat Recovery Secondary Outlet Node,      !- Fan_Inlet_Node
+    Stand Alone ERV Exhaust Fan Outlet Node;  !- Fan_Outlet_Node
 
 
 SetpointManager:Scheduled,
-
     Heat Exhchanger Supply Air Temp Manager,  !- Name
-
     Temperature,  !- Control variable
-
     Heat Exchanger Supply Air Temp Sch,  !- Schedule Name
-
     Heat Exchanger Supply Air Nodes;     !- Name of the set point Node List
 
 
-
 NodeList,
-
     Heat Exchanger Supply Air Nodes,  !- Node List Name
-
-    Heat Recovery Outlet Node;        !- Node\_ID\_1
-
-
-
+    Heat Recovery Outlet Node;        !- Node_ID_1
+```
 
 
 ### Energy Recovery Ventilator (ERV) (ZoneHVAC) Outputs
 
-HVAC,Average,Zone Ventilator Electric Power[W]
+* HVAC,Average,Zone Ventilator Electric Power[W]
 
-HVAC,Sum,Zone Ventilator Electric Energy [J]
+* HVAC,Sum,Zone Ventilator Electric Energy [J]
 
-HVAC,Average,Zone Ventilator Total Cooling Rate [W]
+* HVAC,Average,Zone Ventilator Total Cooling Rate [W]
 
-HVAC,Sum,Zone Ventilator Total Cooling Energy [J]
+* HVAC,Sum,Zone Ventilator Total Cooling Energy [J]
 
-HVAC,Average,Zone Ventilator Total Heating Rate [W]
+* HVAC,Average,Zone Ventilator Total Heating Rate [W]
 
-HVAC,Sum,Zone Ventilator Total Heating Energy [J]
+* HVAC,Sum,Zone Ventilator Total Heating Energy [J]
 
-HVAC,Average,Zone Ventilator Sensible Cooling Rate [W]
+* HVAC,Average,Zone Ventilator Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Ventilator Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Ventilator Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Ventilator Sensible Heating Rate [W]
+* HVAC,Average,Zone Ventilator Sensible Heating Rate [W]
 
-HVAC,Sum,Zone Ventilator Sensible Heating Energy [J]
+* HVAC,Sum,Zone Ventilator Sensible Heating Energy [J]
 
-HVAC,Average,Zone Ventilator Latent Cooling Rate [W]
+* HVAC,Average,Zone Ventilator Latent Cooling Rate [W]
 
-HVAC,Sum,Zone Ventilator Latent Cooling Energy [J]
+* HVAC,Sum,Zone Ventilator Latent Cooling Energy [J]
 
-HVAC,Average,Zone Ventilator Latent Heating Rate [W]
+* HVAC,Average,Zone Ventilator Latent Heating Rate [W]
 
-HVAC,Sum,Zone Ventilator Latent Heating Energy [J]
+* HVAC,Sum,Zone Ventilator Latent Heating Energy [J]
 
-HVAC,Average,Zone Ventilator Supply Fan Availability Status []
+* HVAC,Average,Zone Ventilator Supply Fan Availability Status []
 
 #### Zone Ventilator Electric Power [W]
 
@@ -11626,39 +10263,39 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
 
 ### Variable Refrigerant Flow (VRF) Terminal Unit (ZoneHVAC) Outputs
 
-HVAC,Average,Zone VRF Air Terminal Total Cooling Rate [W]
+* HVAC,Average,Zone VRF Air Terminal Total Cooling Rate [W]
 
-HVAC,Sum, Zone VRF Air Terminal Total Cooling Energy [J]
+* HVAC,Sum, Zone VRF Air Terminal Total Cooling Energy [J]
 
-HVAC,Average, Zone VRF Air Terminal Sensible Cooling Rate [W]
+* HVAC,Average, Zone VRF Air Terminal Sensible Cooling Rate [W]
 
-HVAC,Sum, Zone VRF Air Terminal Sensible Cooling Energy [J]
+* HVAC,Sum, Zone VRF Air Terminal Sensible Cooling Energy [J]
 
-HVAC,Average, Zone VRF Air Terminal Latent Cooling Rate [W]
+* HVAC,Average, Zone VRF Air Terminal Latent Cooling Rate [W]
 
-HVAC,Sum, Zone VRF Air Terminal Latent Cooling Energy [J]
+* HVAC,Sum, Zone VRF Air Terminal Latent Cooling Energy [J]
 
-HVAC,Average,Zone VRF Air Terminal Total Heating Rate [W]
+* HVAC,Average,Zone VRF Air Terminal Total Heating Rate [W]
 
-HVAC,Sum, Zone VRF Air Terminal Total Heating Energy [J]
+* HVAC,Sum, Zone VRF Air Terminal Total Heating Energy [J]
 
-HVAC,Average, Zone VRF Air Terminal Sensible Heating Rate [W]
+* HVAC,Average, Zone VRF Air Terminal Sensible Heating Rate [W]
 
-HVAC,Sum, Zone VRF Air Terminal Sensible Heating Energy [J]
+* HVAC,Sum, Zone VRF Air Terminal Sensible Heating Energy [J]
 
-HVAC,Average, Zone VRF Air Terminal Latent Heating Rate [W]
+* HVAC,Average, Zone VRF Air Terminal Latent Heating Rate [W]
 
-HVAC,Sum, Zone VRF Air Terminal Latent Heating Energy [J]
+* HVAC,Sum, Zone VRF Air Terminal Latent Heating Energy [J]
 
-HVAC,Average, Zone VRF Air Terminal Cooling Electric Power [W]
+* HVAC,Average, Zone VRF Air Terminal Cooling Electric Power [W]
 
-HVAC,Sum, Zone VRF Air Terminal Cooling Electric Energy [J]
+* HVAC,Sum, Zone VRF Air Terminal Cooling Electric Energy [J]
 
-HVAC,Average,Zone VRF Air Terminal Heating Electric Power [W]
+* HVAC,Average,Zone VRF Air Terminal Heating Electric Power [W]
 
-HVAC,Sum,Zone VRF Air Terminal Heating Electric Energy [J]
+* HVAC,Sum,Zone VRF Air Terminal Heating Electric Energy [J]
 
-HVAC,Average, Zone VRF Air Terminal Fan Availability Status []
+* HVAC,Average, Zone VRF Air Terminal Fan Availability Status []
 
 
 #### Zone VRF Air Terminal Total Cooling Rate [W]
@@ -11737,85 +10374,57 @@ This object is used to describe general sizing and scalable sizing methods which
 
 List of zoneHVAC objects than can reference this object include:
 
-ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+* ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
 
-ZoneHVAC:PackagedTerminalAirConditioner
+* ZoneHVAC:PackagedTerminalAirConditioner
 
-ZoneHVAC:PackagedTerminalHeatPump
+* ZoneHVAC:PackagedTerminalHeatPump
 
-ZoneHVAC:WaterToAirHeatPump
+* ZoneHVAC:WaterToAirHeatPump
 
-ZoneHVAC:WindowAirConditioner
+* ZoneHVAC:WindowAirConditioner
 
-ZoneHVAC:UnitHeater
+* ZoneHVAC:UnitHeater
 
-ZoneHVAC:UnitVentilator
+* ZoneHVAC:UnitVentilator
 
-ZoneHVAC:FourPipeFanCoil
+* ZoneHVAC:FourPipeFanCoil
 
-ZoneHVAC:VentilatedSlab
+* ZoneHVAC:VentilatedSlab
 
-ZoneHVAC:EvaporativeCoolerUnit
+* ZoneHVAC:EvaporativeCoolerUnit
 
-ZoneHVAC:IdealLoadsAirSystem
+* ZoneHVAC:IdealLoadsAirSystem
 
 
 
 The sizing methods input fields available in this objects are for supply air flow and capacity for heating and cooling operating modes. Some zone HVAC equipment has single supply air flow rate input field that serves both cooling and heating operating modes.  So entering either of the cooling or heating scalable sizing input field is sufficient.  When there are separate input fields for cooling, heating, no-cooling, and no-heating operating modes, the corresponding input fields are specified.  The child components supply air flow rate are also sized using scalable sizing methods specified in the parent objects. The methods allow users to enter a fixed or hard sized values, autosizable, or scalable sizing methods.  Methods allowed for sizing supply air flow rates include: *SupplyAirFlowRate*, *FractionOfAutosizedCoolingAirflow*, *FractionOfAutosizedHeatingAirflow*, *FlowPerFloorArea, FlowPerCoolingCapacity*, and *FlowPerHeatingCapacity*.  The different sizing options are defined as follows:
 
+* **SupplyAirFlowRate**: entered when it is intended that the user specified either hard value or the simulation engine autosize the supply air flow rates for cooling, heating, and no-cooling or no-heating operating modes.
 
+* **FlowPerFloorArea**: entered when it is intended that the simulation engine determine the supply air flow rates from the user specified *supply air flow rates per unit floor area* and the zone floor area of the zone served by the zone HVAC equipment.
 
-**SupplyAirFlowRate**: entered when it is intended that the user specified either hard value or the simulation engine autosize the supply air flow rates for cooling, heating, and no-cooling or no-heating operating modes.
+* **FractionOfAutosizedCoolingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized cooling design supply air flow rate*.
 
+* **FractionOfAutosizedHeatingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized heating design supply air flow rate*.
 
+* **FlowPerCoolingCapacity**: entered when it is intended t that he simulation engine determines the supply air flow rates from the user specified *supply air flow per cooling capacity value* and *autosized cooling design capacity*.
 
-**FlowPerFloorArea**: entered when it is intended that the simulation engine determine the supply air flow rates from the user specified *supply air flow rates per unit floor area* and the zone floor area of the zone served by the zone HVAC equipment.
-
-
-
-**FractionOfAutosizedCoolingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized cooling design supply air flow rate*.
-
-
-
-**FractionOfAutosizedHeatingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized heating design supply air flow rate*.
-
-
-
-**FlowPerCoolingCapacity**: entered when it is intended t that he simulation engine determines the supply air flow rates from the user specified *supply air flow per cooling capacity value* and *autosized cooling design capacity*.
-
-
-
-**FlowPerHeatingCapacity**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *supply air flow per heating capacity value* and *autosized heating design capacity*.
-
-
+* **FlowPerHeatingCapacity**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *supply air flow per heating capacity value* and *autosized heating design capacity*.
 
 The  Design Specification ZoneHVAC Sizing object also has input fields for sizing or scalable sizing of cooling and heating capacity. However, most of the parent zone HVAC objects do not have input fields for sizing capacities. So, the capacity scalable sizing fields in the parent objects are used for sizing child components capacity sizings.  The scalable capacity sizing may be indirectly impacted by the scalable supply air flow rates sizing values. Moreover, the autosized cold water, hot water and steam flow rates in the parent zone HVAC objects (e.g. FanCoils, UnitHeaters, UnitVentilators, and VentilatedSlabs) and capacity in child components are determined using the scalable sizing methods.  Sizing methods allowed for cooling and heating capacity include: *CoolingDesignCapacity, HeatingDesignCapacity*, *CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity*, *FractionOfAutosizedHeatingCapacity*.
 
+* **CoolingDesignCapacity**: entered when it is intended that user specifies either a hard sized cooling capacity value or the simulation engine autosizes cooling capacity value for the cooling design capacity.
 
+* **HeatingDesignCapacity**: entered when it is intended that user specifies either a hard sized heating capacity value or the simulation engine autosized heating capacity value for the heating design capacity.
 
-**CoolingDesignCapacity**: entered when it is intended that user specifies either a hard sized cooling capacity value or the simulation engine autosizes cooling capacity value for the cooling design capacity.
+* **CapacityPerFloorArea**: is entered when it is intended that the simulation engine determines the cooling or heating capacity from user specified capacity per floor area value and the floor area of the zone served by the zone HVAC equipment.
 
+* **FractionOfAutosizedCoolingCapacity**: entered when it is intended that the simulation engine sizes the cooling capacity from the user specified *capacity fraction* and *autosized cooling design capacity* value.
 
-
-**HeatingDesignCapacity**: entered when it is intended that user specifies either a hard sized heating capacity value or the simulation engine autosized heating capacity value for the heating design capacity.
-
-
-
-**CapacityPerFloorArea**: is entered when it is intended that the simulation engine determines the cooling or heating capacity from user specified capacity per floor area value and the floor area of the zone served by the zone HVAC equipment.
-
-
-
-**FractionOfAutosizedCoolingCapacity**: entered when it is intended that the simulation engine sizes the cooling capacity from the user specified *capacity fraction* and *autosized cooling design capacity* value.
-
-
-
-**FractionOfAutosizedHeatingCapacity**: entered when it is intended that the simulation engine sizes the heating capacity from the user specified *capacity fraction* and *autosized heating design capacity* value.
-
-
+* **FractionOfAutosizedHeatingCapacity**: entered when it is intended that the simulation engine sizes the heating capacity from the user specified *capacity fraction* and *autosized heating design capacity* value.
 
 Description of the input fields of the design specification zone HVAC sizing object “DesignSpecification:ZoneHVAC:Sizing”:
-
-
 
 #### Field: Name
 
@@ -11913,223 +10522,111 @@ Enter the heating capacity per unit floor area in m3/s-m2. This field is require
 
 Enter the heating capacity as a fraction of the autosized heating capacity. This input field is required when the Heating Design Capacity Method is *FractionOfAutosizedHeatingCapacity*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *FractionOfAutosizedHeatingCapacity*. The program calculates the heating capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
 
-
-
-
-
+```idf
   DesignSpecification:ZoneHVAC:Sizing,
-
     VRFDesignSpec1,          !- Name
-
     SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-
     autosize,                !- Cooling Design Supply Air Flow Rate
-
     ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-
     ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-
     ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-
     autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-
     ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-
     ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-
     ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-
     SupplyAirFlowRate,       !- Heating Design Air Flow Method
-
     autosize,                !- Heating Design Supply Air Flow Rate
-
     ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-
     ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-
     ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
-
     autosize,                !- Cooling Design Capacity {W}
-
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-
     ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-
     autosize,                !- Heating Design Capacity {W}
-
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-
     ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-
 
   DesignSpecification:ZoneHVAC:Sizing,
-
     VRFDesignSpec2,          !- Name
-
     FlowPerFloorArea,        !- Cooling Design Air Flow Method
-
     ,                        !- Cooling Design Supply Air Flow Rate
-
     3.6311418E-03,           !- Cooling Design Supply Air Flow Rate Per Floor Area
-
     ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-
     ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-
     FlowPerFloorArea,        !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-
     ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-
     3.6311418E-03,           !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-
     ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-
     ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-
     FlowPerFloorArea,        !- Heating Design Air Flow Method
-
     ,                        !- Heating Design Supply Air Flow Rate
-
     3.6311418E-03,           !- Heating Design Supply Air Flow Rate Per Floor Area
-
     ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-
     ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
-
     autosize,                !- Cooling Design Capacity {W}
-
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-
     ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-
     autosize,                !- Heating Design Capacity {W}
-
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-
     ;                        !- Fraction of Autosized Cooling Design Capacity {-}
 
-
-
-
-
 DesignSpecification:ZoneHVAC:Sizing,
-
     VRFDesignSpec3,          !- Name
-
     FractionOfAutosizedCoolingAirflow,  !- Cooling Design Air Flow Method
-
     ,                        !- Cooling Design Supply Air Flow Rate
-
     ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-
     0.5,                     !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-
     ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-
   FractionOfAutosizedCoolingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-
     ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-
     ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-
     0.5,                 !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-
     ,                    !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-
     FractionOfAutosizedHeatingAirflow,  !- Heating Design Air Flow Method
-
     ,                        !- Heating Design Supply Air Flow Rate
-
     ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-
     0.5,                     !- Fraction of Autosized Heating Design Supply Air Flow Rate
-
     ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
-
     autosize,                !- Cooling Design Capacity {W}
-
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-
     ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-
     autosize,                !- Heating Design Capacity {W}
-
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-
     ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-
 
 DesignSpecification:ZoneHVAC:Sizing,
-
     VRFDesignSpec4,          !- Name
-
     FlowPerCoolingCapacity,  !- Cooling Design Air Flow Method
-
     ,                        !- Cooling Design Supply Air Flow Rate
-
     ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-
     ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-
     2.9541628E-05,           !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-
   FractionOfAutosizedHeatingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-
     ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-
     ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-
     ,                    !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-
     0.413231177,         !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-
     FlowPerHeatingCapacity,  !- Heating Design Air Flow Method
-
     ,                        !- Heating Design Supply Air Flow Rate
-
     ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-
     ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-
     2.9541628E-05,           !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
-
     autosize,                !- Cooling Design Capacity {W}
-
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-
     ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-
     autosize,                !- Heating Design Capacity {W}
-
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-
     ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-
-
-
-
-
+```
 
 Group – Unitary Equipment
 -------------------------
@@ -12138,19 +10635,19 @@ Group – Unitary Equipment
 
 The components
 
-AirLoopHVAC:UnitarySystem
+* AirLoopHVAC:UnitarySystem
 
-AirLoopHVAC:Unitary:Furnace:HeatOnly
+* AirLoopHVAC:Unitary:Furnace:HeatOnly
 
-AirLoopHVAC:Unitary:Furnace:HeatCool
+* AirLoopHVAC:Unitary:Furnace:HeatCool
 
-AirLoopHVAC:UnitaryHeatOnly
+* AirLoopHVAC:UnitaryHeatOnly
 
-AirLoopHVAC:UnitaryHeatCool
+* AirLoopHVAC:UnitaryHeatCool
 
-AirLoopHVAC:UnitaryHeatPump:AirToAir
+* AirLoopHVAC:UnitaryHeatPump:AirToAir
 
-AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
+* AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
 
 are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., AirTerminal:SingleDuct:Uncontrolled objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.
 
@@ -12220,33 +10717,33 @@ This alpha field specifies the name of the supply air fan operating mode schedul
 
 This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. Allowable coil types are:
 
-Coil:Heating:DX:SingleSpeed
+* Coil:Heating:DX:SingleSpeed
 
-Coil:Heating:DX:TwoSpeed
+* Coil:Heating:DX:TwoSpeed
 
-Coil:Heating:DX:MultiSpeed
+* Coil:Heating:DX:MultiSpeed
 
-Coil:Heating:DX:VariableSpeed
+* Coil:Heating:DX:VariableSpeed
 
-Coil:Heating:WaterToAirHeatPump:ParameterEstimation
+* Coil:Heating:WaterToAirHeatPump:ParameterEstimation
 
-Coil:Heating:WaterToAirHeatPump:EquationFit
+* Coil:Heating:WaterToAirHeatPump:EquationFit
 
-Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
+* Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Gas:MultiStage
+* Coil:Heating:Gas:MultiStage
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Electric:MultiStage
+* Coil:Heating:Electric:MultiStage
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
-Coil:Heating:Desuperheater
+* Coil:Heating:Desuperheater
 
 #### Field: Heating Coil Name
 
@@ -12260,29 +10757,29 @@ This numeric field is used to adjust heat pump heating capacity with respect to 
 
 This alpha field contains the identifying type of cooling coil specified in the unitary system. Allowable coil types are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-Coil:Cooling:DX:TwoSpeed
+* Coil:Cooling:DX:TwoSpeed
 
-Coil:Cooling:DX:MultiSpeed
+* Coil:Cooling:DX:MultiSpeed
 
-Coil:Cooling:DX:VariableSpeed
+* Coil:Cooling:DX:VariableSpeed
 
-Coil:Cooling:DX:TwoStageWithHumidityControlMode
+* Coil:Cooling:DX:TwoStageWithHumidityControlMode
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
+* Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
 
-Coil:Cooling:WaterToAirHeatPump:EquationFit
+* Coil:Cooling:WaterToAirHeatPump:EquationFit
 
-Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
+* Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
 
-Coil:Cooling:Water
+* Coil:Cooling:Water
 
-Coil:Cooling:Water:DetailedGeometry
+* Coil:Cooling:Water:DetailedGeometry
 
-CoilSystem:Cooling:Water:HeatExchangerAssisted
+* CoilSystem:Cooling:Water:HeatExchangerAssisted
 
 #### Field: Cooling Coil Name
 
@@ -12304,15 +10801,15 @@ This alpha field defines the latent load control method. Available choices are S
 
 This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. supplemental heating type must be one of:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Desuperheater
+* Coil:Heating:Desuperheater
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Supplemental Heating Coil Name
 
@@ -12454,8 +10951,6 @@ This alpha field contains the identifying type for the design specification mult
 
 This alpha field contains the identifying name for the design specification multispeed object. This field is only needed when multispeed cooling or heating coil is specified.
 
-
-
 As shown in the example below, correct specification of the heat/cool unitary system requires specification of the following objects in addition to the unitary system object:
 
 1) Fan (Fan:OnOff or Fan:ConstantVolume)
@@ -12541,63 +11036,63 @@ UnitarySystemPerformance:HeatPump:Multispeed,
 
 ### Unitary System (AirLoopHVAC) Outputs
 
-HVAC,Average, Unitary System Fan Part Load Ratio []
+* HVAC,Average, Unitary System Fan Part Load Ratio []
 
-HVAC,Average, Unitary System Compressor Part Load Ratio
+* HVAC,Average, Unitary System Compressor Part Load Ratio
 
-HVAC,Average,Unitary System Total Cooling Rate [W]
+* HVAC,Average,Unitary System Total Cooling Rate [W]
 
-HVAC,Average,Unitary System Total Heating Rate [W]
+* HVAC,Average,Unitary System Total Heating Rate [W]
 
-HVAC,Average,Unitary System Sensible Cooling Rate [W]
+* HVAC,Average,Unitary System Sensible Cooling Rate [W]
 
-HVAC,Average,Unitary System Sensible Heating Rate [W]
+* HVAC,Average,Unitary System Sensible Heating Rate [W]
 
-HVAC,Average,Unitary System Latent Cooling Rate [W]
+* HVAC,Average,Unitary System Latent Cooling Rate [W]
 
-HVAC,Average,Unitary System Latent Heating Rate [W]
+* HVAC,Average,Unitary System Latent Heating Rate [W]
 
-HVAC,Average,Unitary System Ancillary Electric Power[W]
+* HVAC,Average,Unitary System Ancillary Electric Power[W]
 
 Two speed coil outputs
 
-HVAC,Average,Unitary System Cycling Ratio []
+* HVAC,Average,Unitary System Cycling Ratio []
 
 Multi speed coil outputs
 
-HVAC,Average,Unitary System DX Coil Cycling Ratio []
+* HVAC,Average,Unitary System DX Coil Cycling Ratio []
 
-HVAC,Average,Unitary System DX Coil Speed Ratio []
+* HVAC,Average,Unitary System DX Coil Speed Ratio []
 
-HVAC,Average,Unitary System DX Coil Speed Level []
+* HVAC,Average,Unitary System DX Coil Speed Level []
 
-HVAC,Average,Unitary System Electric Power[W]
+* HVAC,Average,Unitary System Electric Power[W]
 
-HVAC,Sum,Unitary System Electric Energy [J]
+* HVAC,Sum,Unitary System Electric Energy [J]
 
-HVAC,Sum,Unitary System Cooling Ancillary Electric Energy [J]
+* HVAC,Sum,Unitary System Cooling Ancillary Electric Energy [J]
 
-HVAC,Sum,Unitary System Heating Ancillary Electric Energy [J]
+* HVAC,Sum,Unitary System Heating Ancillary Electric Energy [J]
 
 Multi speed coil outputs(If heat recovery is specified)
 
-HVAC,Average, Unitary System Heat Recovery Rate [W]
+* HVAC,Average, Unitary System Heat Recovery Rate [W]
 
-HVAC,Average, Unitary System Heat Recovery Inlet Temperature [C]
+* HVAC,Average, Unitary System Heat Recovery Inlet Temperature [C]
 
-HVAC,Average, Unitary System Heat Recovery Outlet Temperature [C]
+* HVAC,Average, Unitary System Heat Recovery Outlet Temperature [C]
 
-HVAC,Average, Unitary System Heat Recovery Fluid Mass Flow Rate [kg/s]
+* HVAC,Average, Unitary System Heat Recovery Fluid Mass Flow Rate [kg/s]
 
-HVAC,Sum, Unitary System Heat Recovery Energy [J]
+* HVAC,Sum, Unitary System Heat Recovery Energy [J]
 
 Water to air heat pump outputs
 
-HVAC,Average, Unitary System Requested Sensible Cooling Rate [W]
+* HVAC,Average, Unitary System Requested Sensible Cooling Rate [W]
 
-HVAC,Average, Unitary System Requested Latent Cooling Rate [W]
+* HVAC,Average, Unitary System Requested Latent Cooling Rate [W]
 
-HVAC,Average, Unitary System Requested Heating Rate [W]
+* HVAC,Average, Unitary System Requested Heating Rate [W]
 
 #### Unitary System Fan Part Load Ratio []
 
@@ -12805,13 +11300,13 @@ This alpha field has two choices: **BlowThrough** or **DrawThrough**. The first 
 
 This alpha field contains the identifying type of heating coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat and Cool Furnace) itself provides the "controller" function of modulating water flow. Allowable coil types are:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Heating Coil Name
 
@@ -12821,11 +11316,11 @@ This alpha field contains the identifying name given to the furnace heating coil
 
 This alpha field contains the identifying type of cooling coil specified in the furnace. Only allowable coil types are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-Coil:Cooling:DX:VariableSpeed
+* Coil:Cooling:DX:VariableSpeed
 
 #### Field: Cooling Coil Name
 
@@ -12835,11 +11330,11 @@ This alpha field contains the identifying name given to the furnace cooling coil
 
 This alpha field contains the type of dehumidification control. The following options are valid for this field:
 
-**None** - meet sensible load only, no active dehumidification control
+* **None** - meet sensible load only, no active dehumidification control
 
-**Multimode** - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
+* **Multimode** - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
 
-**CoolReheat** - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil’s inlet and outlet airstreams when the cooling coil is operating.
+* **CoolReheat** - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil’s inlet and outlet airstreams when the cooling coil is operating.
 
 The default is **None**. For the other dehumidification control modes, the maximum humidity setpoint is used. This must be set using a **ZoneControl:Humidistat** object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as **CoolReheat**, then two additional inputs (reheat coil type and name) are also required as shown below. Although the reheat coil is required only when **CoolRheat** is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types. If the reheat coil is present and the dehumidification control type is not specified as **CoolReheat**, the reheat coil will not be active,
 
@@ -12847,15 +11342,15 @@ The default is **None**. For the other dehumidification control modes, the maxim
 
 This alpha field contains the identifying type of reheat coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the reheat coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat and Cool Furnace) itself provides the "controller" function of modulating water flow. Reheat coil type must be one of:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Desuperheater
+* Coil:Heating:Desuperheater
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Reheat Coil Name
 
@@ -12898,108 +11393,57 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
 
 
 Coil:Heating:Gas,
-
     Furnace Heating Coil 1,         !- Coil Name
-
     FanAndCoilAvailSched,           !- Availability Schedule Name
-
     0.8,    !- Gas Burner Efficiency of the Coil
-
     25000,  !- Nominal Capacity of the Coil {W}
-
     Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
-
     Air Loop Outlet Node;           !- Coil\_Air\_Outlet\_Node
 
-
-
   Coil:Cooling:DX:SingleSpeed,
-
     Furnace ACDXCoil 1,    !- Coil Name
-
     FanAndCoilAvailSched,  !- Availability Schedule
-
     25000,  !- Rated Total Cooling Capacity (gross) {W}
-
     0.75,   !- Rated SHR
-
     3.0,    !- Rated COP
-
     1.3,    !- Rated Air Volume Flow Rate {m3/s}
-
     DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
-
     Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
-
     WindACCoolCapFT,  !- Total Cooling Capacity Modifier Curve (function of temperature)
-
     WindACCoolCapFFF, !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
     WindACEIRFT,      !- Energy Input Ratio Modifier Curve (function of temperature)
-
     WindACEIRFFF,     !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
     WindACPLFFPLR,    !- Part Load Fraction Correlation (function of part load ratio)
-
     CyclingFanAndCompressor;    !- Supply Air Fan Operation Mode
 
-
-
   Fan:OnOff,
-
     Supply Fan 1,                !- Fan Name
-
     FanAndCoilAvailSched,        !- Availability Schedule Name
-
     0.7,    !- Fan Total Efficiency
-
     600.0,  !- Delta Pressure {Pa}
-
     1.3,    !- Max Flow Rate {m3/s}
-
     0.9,    !- Motor Efficiency
-
     1.0,    !- Motor In Airstream Fraction
-
     Air Loop Inlet Node,         !- Fan\_Inlet\_Node
-
     DX Cooling Coil Air Inlet Node; !- Fan\_Outlet\_Node
 
-
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone1DirectAir,        !- Direct Air Name
-
     FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-
     Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-
-   0.47;  !- Maximum air flow rate {m3/s}
-
-
+    0.47;  !- Maximum air flow rate {m3/s}
 
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone2DirectAir,        !- Direct Air Name
-
     FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-
     Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-
-   0.36;  !- Maximum air flow rate {m3/s}
-
-
+    0.36;  !- Maximum air flow rate {m3/s}
 
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone3DirectAir,        !- Direct Air Name
-
     FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-
     Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-
-   0.47;  !- Maximum air flow rate {m3/s}
+    0.47;  !- Maximum air flow rate {m3/s}
 ```
 
  Example of Heat/Cool Furnace Specification
@@ -13084,13 +11528,13 @@ This alpha field has two choices: **BlowThrough** or **DrawThrough**. The first 
 
 This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat and Cool System) itself provides the "controller" function of modulating water flow. Allowable coil types are:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Heating Coil Name
 
@@ -13100,11 +11544,11 @@ This alpha field contains the identifying name given to the unitary system heati
 
 This alpha field contains the identifying type of cooling coil specified in the unitary system. Only allowable coil types are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-Coil:Cooling:DX:VariableSpeed
+* Coil:Cooling:DX:VariableSpeed
 
 #### Field: Cooling Coil Name
 
@@ -13114,11 +11558,11 @@ This alpha field contains the identifying name given to the unitary system cooli
 
 This alpha field contains the type of dehumidification control. The following options are valid for this field:
 
-**None** - meet sensible load only, no active dehumidification control
+* **None** - meet sensible load only, no active dehumidification control
 
-**Multimode** - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
+* **Multimode** - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
 
-**CoolReheat** - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil’s inlet and outlet airstreams when the cooling coil is operating.
+* **CoolReheat** - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil’s inlet and outlet airstreams when the cooling coil is operating.
 
 The default is **None**. For the other dehumidification control modes, the maximum humidity setpoint is used. This must be set using a **ZoneControl:Humidistat** object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as **CoolReheat**, then two additional inputs (reheat coil type and name) are also required as shown below. Although the reheat coil is required only when **CoolReheat** is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types. If the reheat coil is present and the dehumidification control type is not specified as **CoolReheat**, the reheat coil will not be active,
 
@@ -13126,15 +11570,15 @@ The default is **None**. For the other dehumidification control modes, the maxim
 
 This alpha field contains the identifying type of reheat coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the reheat coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat and Cool System) itself provides the "controller" function of modulating water flow. Reheat coil type must be one of:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Desuperheater
+* Coil:Heating:Desuperheater
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Reheat Coil Name
 
@@ -13177,111 +11621,58 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
     None;        !- High humidity control
 
   Coil:Heating:Gas,
-
     Unitary System Heating Coil 1,  !- Coil Name
-
     FanAndCoilAvailSched,           !- Availability Schedule Name
-
     0.8,    !- Gas Burner Efficiency of the Coil
-
     25000,  !- Nominal Capacity of the Coil {W}
-
     Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
-
     Air Loop Outlet Node;           !- Coil\_Air\_Outlet\_Node
 
 
-
-
-
   Coil:Cooling:DX:SingleSpeed,
-
     Unitary System ACDXCoil 1,      !- Coil Name
-
     FanAndCoilAvailSched,  !- Availability Schedule
-
     25000,  !- Rated Total Cooling Capacity (gross) {W}
-
     0.75,   !- Rated SHR
-
     3.0,    !- Rated COP
-
     1.3,    !- Rated Air Volume Flow Rate {m3/s}
-
     DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
-
     Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
-
     WindACCoolCapFT,  !- Total Cooling Capacity Modifier Curve (function of temperature)
-
     WindACCoolCapFFF, !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
     WindACEIRFT,      !- Energy Input Ratio Modifier Curve (function of temperature)
-
     WindACEIRFFF,     !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
     WindACPLFFPLR,    !- Part Load Fraction Correlation (function of part load ratio)
-
     CyclingFanAndCompressor;    !- Supply Air Fan Operation Mode
 
 
-
-
-
   Fan:OnOff,
-
     Supply Fan 1,                !- Fan Name
-
     FanAndCoilAvailSched,        !- Availability Schedule Name
-
     0.7,    !- Fan Total Efficiency
-
     600.0,  !- Delta Pressure {Pa}
-
     1.3,    !- Max Flow Rate {m3/s}
-
     0.9,    !- Motor Efficiency
-
     1.0,    !- Motor In Airstream Fraction
-
     Air Loop Inlet Node,         !- Fan\_Inlet\_Node
-
     DX Cooling Coil Air Inlet Node; !- Fan\_Outlet\_Node
 
-
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone1DirectAir,        !- Direct Air Name
-
     FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-
     Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-
    0.47;  !- Maximum air flow rate {m3/s}
 
-
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone2DirectAir,        !- Direct Air Name
-
     FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-
     Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-
    0.36;  !- Maximum air flow rate {m3/s}
 
-
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone3DirectAir,        !- Direct Air Name
-
     FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-
     Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-
    0.47;  !- Maximum air flow rate {m3/s}
 ```
 
@@ -13290,9 +11681,9 @@ Example of Heat/Cool Unitary System Specification
 
 ### Unitary System Heat and Cool (AirLoopHVAC) Outputs
 
-HVAC,Average, Unitary System Fan Part Load Ratio []
+* HVAC,Average, Unitary System Fan Part Load Ratio []
 
-HVAC,Average, Unitary System Compressor Part Load Ratio
+* HVAC,Average, Unitary System Compressor Part Load Ratio
 
 #### Unitary System Fan Part Load Ratio []
 
@@ -13364,11 +11755,11 @@ This alpha field contains the identifying name given to the heat pump DX heating
 
 This alpha field contains the identifying type of cooling coil specified in the heat pump. There are three valid choices for this field:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-Coil:Cooling:DX:VariableSpeed
+* Coil:Cooling:DX:VariableSpeed
 
 #### Field: Cooling Coil Name
 
@@ -13378,13 +11769,13 @@ This alpha field contains the identifying name given to the heat pump cooling co
 
 This alpha field contains the identifying type of supplemental heating coil specified in the heat pump. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Airloop Air to Air Heat Pump) itself provides the "controller" function of modulating water flow. Heating coil type must be:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Supplemental Heating Coil Name
 
@@ -13422,11 +11813,11 @@ As shown in the example below, correct specification of the air-to-air heat pump
 
 This alpha input field contains the type of dehumidification control. The following options are valid for this field:
 
-**None** - meet sensible load only, no active dehumidification control
+* **None** - meet sensible load only, no active dehumidification control
 
-**Multimode** - activate enhanced dehumidification mode as needed and meet sensible cooling load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
+* **Multimode** - activate enhanced dehumidification mode as needed and meet sensible cooling load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
 
-**CoolReheat** - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. The excess cooling beyond the cooling set point temperature is offset by the supplemental heating coil. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil’s inlet and outlet airstreams when the cooling coil is operating.
+* **CoolReheat** - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. The excess cooling beyond the cooling set point temperature is offset by the supplemental heating coil. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil’s inlet and outlet airstreams when the cooling coil is operating.
 
 The default is **None**. For the other dehumidification control modes, the maximum humidity setpoint is required. This must be set using a **ZoneControl:Humidistat** object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in AirToAir HeatPumps. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to extra dehumidification required to meet the high relative humidity setpoint.
 
@@ -13434,215 +11825,116 @@ Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplemen
 
 #### AirLoopHVAC:UnitaryHeatPump:AirToAir Example Specification
 
+```idf
 AirLoopHVAC:UnitaryHeatPump:AirToAir,
-
       DXAC Heat Pump 1,            ! Heat Pump name
-
       FanAndCoilAvailSched,        ! Heat Pump availability schedule
-
       Mixed Air Node,              ! Heat Pump air inlet  node
-
       Air Loop Outlet Node,        ! Heat Pump air outlet  node
-
       1.3,                  !- Cooling Supply Air Flow Rate {m3/s}
-
       1.3,                  !- Heating Supply Air Flow Rate {m3/s}
-
       0.0,                  !- No Load Suuply Air Flow Rate {m3/s}
-
       East Zone,                   ! Controlling zone or thermostat location
-
       Fan:OnOff,            ! Supply air fan type
-
       Supply Fan 1,                ! Supply air fan name –- same name used in fan object
-
       Coil:Heating:DX:SingleSpeed,    ! Heating coil type
-
       Heat Pump DX Heating Coil 1, ! Heating coil name –- same name used in DX heating coil object
-
       Coil:Cooling:DX:SingleSpeed, !  Cooling coil type
-
       Heat Pump ACDXCoil 1,        ! Cooling coil name –- same name used in DX cooling coil object
-
       Coil:Heating:Gas,            ! Supplemental heating coil type
-
       Heat Pump DX Supp Heating Coil 1, ! Supplemental heating coil name–- same as in heating coil object
-
       50,                          ! Maximum supply air temperature from supplemental heater [C]
-
       21,                      ! Maximum outdoor dry-bulb temp for supplemental heating coil operation [C]
-
       BlowThrough,                ! Fan  placement
-
       CycFanSchedule,              ! Supply air fan operating mode schedule name
-
       CoolReheat;                  !- Dehumidification Control Type
 
-
-
    Coil:Heating:DX:SingleSpeed,
-
       Heat Pump DX Heating Coil 1,     ! Name of heating coil
-
       FanAndCoilAvailSched,            ! Heating coil schedule
-
       35000,                           ! Rated total heating capacity [W] (at 21.11C/8.33C)
-
       2.75,                            ! Rated heating COP
-
       1.7,                             ! Rated air flow rate [m3/s]
-
       Heating Coil Air Inlet Node,     ! Coil air inlet node
-
       SuppHeating Coil Air Inlet Node, ! Coil air outlet node
-
       HPACHeatCapFT,                   ! Heating capacity modifier curve (temperature,C)
-
       HPACHeatCapFFF,                  ! Heating capacity modifier curve (flow fraction)
-
       HPACHeatEIRFT,                   ! Energy input ratio modifier curve (temperature,C)
-
       HPACHeatEIRFFF,                  ! Energy input ratio modifier curve (flow fraction)
-
       HPACCoolPLFFPLR,                 ! Part load fraction modifier curve (function of part-load ratio)
-
       ,                         ! defrost EIR modifier curve (temp, C) not required for resistive defrost
-
       CyclingFanAndCompressor,                   ! Operation mode (cycling fan, cycling compressor)
-
       -5.0,                            ! Minimum OAT for heat pump compressor operation [C]
-
       5.0,                             ! Maximum outdoor dry-bulb temp for defrost operation [C]
-
       200.0,                           ! Crankcase heater capacity[W]
-
       10.0,                            ! Maximum OAT for crankcase heater operation [C]
-
       resistive,                       ! Defrost strategy (resistive or reverse-cycle)
-
       timed,                           ! Defrost control (timed or on-demand)
-
       0.166667,                        !Defrost time period fraction (used for timed defrost control only)
-
       20000;                           ! Resistive defrost heater capacity [W]
 
-
-
    Coil:Cooling:DX:SingleSpeed,
-
       Heat Pump ACDXCoil 1,            ! Name of cooling coil
-
       FanAndCoilAvailSched,            ! Availability schedule
-
       32000,                           ! Rated total cooling capacity [W]
-
       0.75,                            ! Rated sensible heat ratio
-
       3.0,                             ! Rated COP
-
       1.7,                             ! Rated air flow rate [m3/s]
-
       DX Cooling Coil Air Inlet Node,  ! Coil air inlet node
-
       Heating Coil Air Inlet Node,     ! Coil air outlet node
-
       HPACCoolCapFT,                   ! Cooling capacity modifier curve (temperature,C)
-
       HPACCoolCapFFF,                  ! Cooling capacity modifier curve (flow fraction)
-
       HPACCoolEIRFT,                   ! Energy input ratio modifier curve (temperature,C)
-
       HPACCoolEIRFFF,                  ! Energy input ratio modifier curve (flow fraction)
-
       HPACCoolPLFFPLR,                 ! Part load factor modifier curve (function of part-load ratio)
-
       CyclingFanAndCompressor;                   ! Operation mode (cycling fan, cycling compressor)
 
-
-
    Coil:Heating:Gas,
-
       Heat Pump DX Supp Heating Coil 1, ! Name of heating coil
-
       FanAndCoilAvailSched,             ! Availability schedule
-
       0.8 ,                             ! Gas Burner Efficiency of the Coil
-
       32000,                            ! Nominal Capacity of the Coil [W]
-
       SuppHeating Coil Air Inlet Node,  ! Supplementary heating coil air side inlet node
-
       Air Loop Outlet Node;             ! Supplementary heating coil air side outlet node
 
-
-
-
-
    Fan:OnOff,
-
       Supply Fan 1,                    ! Fan Name
-
       FanAndCoilAvailSched,            ! Fan Schedule
-
       0.7,                             ! Fan Total Efficiency
-
       300.0,                           ! Delta Pressure [N/M^2]
-
       1.7,                             ! Max Vol Flow Rate  [m^3/Sec]
-
       0.9,                             ! motor efficiency
-
       1.0,                             ! motor in air stream fraction
-
       Mixed Air Node,                  ! fan inlet node
-
       DX Cooling Coil Air Inlet Node;  ! fan outlet node
 
-
-
    AirTerminal:SingleDuct:Uncontrolled,
-
       Zone1DirectAir,                  ! direct air unit name
-
      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-
       Zone 1 Inlet Node,               ! zone supply air node name
-
      0.612;                           ! maximum air flow rate, m3/s
 
-
-
    AirTerminal:SingleDuct:Uncontrolled,
-
       Zone2DirectAir,                  ! direct air unit name
-
      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-
       Zone 2 Inlet Node,               ! zone supply air node name
-
      0.476;                           ! maximum air flow rate, m3/s
 
-
-
    AirTerminal:SingleDuct:Uncontrolled,
-
       Zone3DirectAir,                  ! direct air unit name
-
      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-
       Zone 3 Inlet Node,               ! zone supply air node name
-
      0.612;                           ! maximum air flow rate, m3/s
-
+```
 
 
 ### Unitary Air to Air Heat Pump (AirLoopHVAC) Outputs
 
-HVAC, Average, Unitary System Fan Part Load Ratio []
+* HVAC, Average, Unitary System Fan Part Load Ratio []
 
-HVAC, Average, Unitary System Compressor Part Load Ratio []
+* HVAC, Average, Unitary System Compressor Part Load Ratio []
 
-HVAC, Average, Unitary System Dehumidification Induced Heating Demand Rate [W]
+* HVAC, Average, Unitary System Dehumidification Induced Heating Demand Rate [W]
 
 #### Unitary System Fan Part Load Ratio []
 
@@ -13665,8 +11957,6 @@ The main difference between this heat pump object and other EnergyPlus heat pump
 Links to the fan, DX multispeed cooling coil, DX multispeed heating coil, and supplementary heating coil specifications are provided in the heat pump’s input data syntax. In addition, the control zone name and airflow rates at the corresponding compressor speeds are specified by the heat pump syntax.
 
 If the ZoneControl:Thermostat:StagedDualSetpoint object and other zone control thermostat and humidistat are assigned to the same controlled zone in the Controlling Zone or Thermostat Location field, the ZoneControl:Thermostat:StagedDualSetpoint object takes precedence and the stage number provided by the the ZoneControl:Thermostat:StagedDualSetpoint object is used to set the speed number.
-
-
 
 ![FurnaceSchematic\_BlowThru\_Multispeed](InputOutputReference/media/image301.png)
 
@@ -13734,13 +12024,13 @@ This alpha field contains the identifying name given to the heat pump cooling co
 
 This alpha field contains the identifying type of supplemental heating coil specified in the heat pump. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary MultiSpeed Air to Air Heat Pump) itself provides the "controller" function of modulating water flow. Heating coil type must be:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Supplemental Heating Coil Name
 
@@ -13862,435 +12152,244 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
     1.2,                     !- Cooling Speed 3 Supply Air Flow Rate 
     1.7;                     !- Cooling Speed 4 Supply Air Flow Rate 
 
-
 Coil:Heating:DX:MultiSpeed,
-
     Heat Pump DX Heating Coil 1,  !- Name of heat pump heating coil
-
     FanAndCoilAvailSched,    !- Availability Schedule
-
     Heating Coil Air Inlet Node,  !- Coil Air Inlet Node
-
     SuppHeating Coil Air Inlet Node,  !- Coil Air Outlet Node
-
     CyclingFanAndCompressor,           !- Supply Air Fan Operation Mode
-
     -8.0,                    !- Minimum Outdoor Dry-bulb Temperature for Compressor Operation {C}
-
     200.0,                   !- Crankcase Heater Capacity {W}
-
-10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
-
+    10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
                          !- Operation {C}
-
     HPACDefrostCAPFT,        !- Defrost energy input ratio modifier curve (temperature)
-
     7.22,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
-
     reverse-cycle,           !- Defrost Strategy
-
     timed,                   !- Defrost Control
-
     0.058333,                !- Defrost Time Period Fraction
-
     2000.0,                  !- Resistive Defrost Heater Capacity {W}
-
     No,                      !- Apply Part Load Fraction to Speeds greater than 1
-
     NaturalGas,              !- Fuel type
-
     4,                       !- Number of speeds
-
     7500,                    !- Rated Total Heating Capacity, Speed 1 {W}
-
     2.75,                    !- Rated COP, Speed 1
-
     0.45,                    !- Rated Air Volume Flow Rate, Speed 1 {m3/s}
-
     HPACHeatCapFT Speed 1,   !- Total Heating Capacity Modifier Curve, Speed 1 (temperature)
-
     HPACHeatCapFF Speed 1,   !- Total Heating capacity modifier curve, Speed 1 (flow fraction)
-
     HPACHeatEIRFT Speed 1,   !- Energy input ratio modifier curve, Speed 1 (temperature)
-
     HPACHeatEIRFF Speed 1,   !- Energy input ratio modifier curve, Speed 1 (flow fraction)
-
     HPACHeatPLFFPLR Speed 1, !- Part load fraction correlation, Speed 1 (part load ratio)
-
     0.2,                     !- Rated waste heat fraction of power input, Speed 1
-
     HAPCHeatWHFT Speed 1,    !- Waste heat modifier curve, Speed 1 (temperature)
-
     17500,                   !- Rated Total Heating Capacity, Speed 2 {W}
-
     2.75,                    !- Rated COP, Speed 2
-
     0.85,                    !- Rated Air Volume Flow Rate, Speed 2 {m3/s}
-
     HPACHeatCapFT Speed 2,   !- Total Heating Capacity Modifier Curve, Speed 2 (temperature)
-
     HPACHeatCapFF Speed 2,   !- Total Heating capacity modifier curve, Speed 2 (flow fraction)
-
     HPACHeatEIRFT Speed 2,   !- Energy input ratio modifier curve, Speed 2 (temperature)
-
     HPACHeatEIRFF Speed 2,   !- Energy input ratio modifier curve, Speed 2 (flow fraction)
-
     HPACHeatPLFFPLR Speed 2, !- Part load fraction correlation, Speed 2 (part load ratio)
-
     0.2,                     !- Rated waste heat fraction of power input, Speed 2
-
     HAPCHeatWHFT Speed 2,    !- Waste heat modifier curve, Speed 2 (temperature)
-
     25500,                   !- Rated Total Heating Capacity, Speed 3 {W}
-
     2.75,                    !- Rated COP, Speed 3
-
     1.25,                    !- Rated Air Volume Flow Rate, Speed 3 {m3/s}
-
     HPACHeatCapFT Speed 3,   !- Total Heating Capacity Modifier Curve, Speed 3 (temperature)
-
     HPACHeatCapFF Speed 3,   !- Total Heating capacity modifier curve, Speed 3 (flow fraction)
-
     HPACHeatEIRFT Speed 3,   !- Energy input ratio modifier curve, Speed 3 (temperature)
-
     HPACHeatEIRFF Speed 3,   !- Energy input ratio modifier curve, Speed 3 (flow fraction)
-
     HPACHeatPLFFPLR Speed 3, !- Part load fraction correlation, Speed 3 (part load ratio)
-
     0.2,                     !- Rated waste heat fraction of power input, Speed 3
-
     HAPCHeatWHFT Speed 3,    !- Waste heat modifier curve, Speed 3 (temperature)
-
     35500,                   !- Rated Total Heating Capacity, Speed 4 {W}
-
     2.75,                    !- Rated COP, Speed 4
-
     1.75,                    !- Rated Air Volume Flow Rate, Speed 4 {m3/s}
-
     HPACHeatCapFT Speed 4,   !- Total Heating Capacity Modifier Curve, Speed 4 (temperature)
-
     HPACHeatCapFF Speed 4,   !- Total Heating capacity modifier curve, Speed 4 (flow fraction)
-
     HPACHeatEIRFT Speed 4,   !- Energy input ratio modifier curve, Speed 4 (temperature)
-
     HPACHeatEIRFF Speed 4,   !- Energy input ratio modifier curve, Speed 4 (flow fraction)
-
     HPACHeatPLFFPLR Speed 4, !- Part load fraction correlation, Speed 4 (part load ratio)
-
     0.2,                     !- Rated waste heat fraction of power input, Speed 4
-
     HAPCHeatWHFT Speed 4;    !- Waste heat modifier curve, Speed 4 (temperature)
 
 
-
-
-
   COIL:Cooling:DX:MultiSpeed,
-
     Heat Pump ACDXCoil 1,    !- Coil Name
-
     FanAndCoilAvailSched,    !- Availability Schedule
-
     DX Cooling Coil Air Inlet Node,  !- Coil Air Inlet Node
-
     Heating Coil Air Inlet Node,  !- Coil Air Outlet Node
-
     CyclingFanAndCompressor,           !- Supply Air Fan Operation Mode
-
     Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name
-
     AirCooled,              !- Condenser Type
-
     ,                        !- Name of Water Storage Tank for Supply
-
     ,                        !- Name of Water Storage Tank for Condensate Collection
-
     No,                      !- Apply Part Load Fraction to Speeds greater than 1
-
     No,                      !- Apply Latent Degradation to Speeds greater than 1
-
     200.0,                   !- Crankcase Heater Capacity {W}
-
 10.0,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
-
                          !- Operation {C}
-
     NaturalGas,              !- Fuel type
-
     4,                       !- Number of speeds
-
     7500,                    !- Rated Total Cooling Capacity, Speed 1 (gross) {W}
-
     0.75,                    !- Rated SHR, Speed 1
-
     3.0,                     !- Rated COP, Speed 1
-
     0.40,                    !- Rated Air Volume Flow Rate, Speed 1 {m3/s}
-
     HPACCoolCapFT Speed 1,   !- Total Cooling Capacity Modifier Curve, Speed 1 (temperature)
-
     HPACCoolCapFF Speed 1,   !- Total Cooling Capacity Modifier Curve, Speed 1 (flow fraction)
-
     HPACCOOLEIRFT Speed 1,   !- Energy Input Ratio Modifier Curve, Speed 1 (temperature)
-
     HPACCOOLEIRFF Speed 1,   !- Energy Input Ratio Modifier Curve, Speed 1 (flow fraction)
-
     HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 1 (part load ratio)
-
     1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 1 {s}
-
 1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-
                          !- Capacity, Speed 1 {dimensionless}
-
     3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 1 {cycles/hr}
-
     45.0,                    !- Latent Capacity Time Constant, Speed 1 {s}
-
     0.2,                     !- Rated waste heat fraction of power input, Speed 1 {dimensionless}
-
     HAPCCoolWHFT Speed 1,    !- Waste heat modifier curve, Speed 1 (temperature)
-
     0.9,                     !- Evaporative Condenser Effectiveness, Speed 1 {dimensionless}
-
     0.05,                    !- Evaporative Condenser Air Volume Flow Rate, Speed 1 {m3/s}
-
     50,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 1 {W}
-
     17500,                   !- Rated Total Cooling Capacity, Speed 2 (gross) {W}
-
     0.75,                    !- Rated SHR, Speed 2
-
     3.0,                     !- Rated COP, Speed 2
-
     0.85,                    !- Rated Air Volume Flow Rate, Speed 2 {m3/s}
-
     HPACCoolCapFT Speed 2,   !- Total Cooling Capacity Modifier Curve, Speed 2 (temperature)
-
     HPACCoolCapFF Speed 2,   !- Total Cooling Capacity Modifier Curve, Speed 2 (flow fraction)
-
     HPACCOOLEIRFT Speed 2,   !- Energy Input Ratio Modifier Curve, Speed 2 (temperature)
-
     HPACCOOLEIRFF Speed 2,   !- Energy Input Ratio Modifier Curve, Speed 2 (flow fraction)
-
     HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 2 (part load ratio)
-
     1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 2 {s}
-
 1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-
                          !- Capacity, Speed 2 {dimensionless}
-
     3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 2 {cycles/hr}
-
     45.0,                    !- Latent Capacity Time Constant, Speed 2 {s}
-
     0.2,                     !- Rated waste heat fraction of power input, Speed 2 {dimensionless}
-
     HAPCCoolWHFT Speed 2,    !- Waste heat modifier curve, Speed 2 (temperature)
-
     0.9,                     !- Evaporative Condenser Effectiveness, Speed 2 {dimensionless}
-
     0.1,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 2 {m3/s}
-
     60,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 2 {W}
-
     25500,                   !- Rated Total Cooling Capacity, Speed 3 (gross) {W}
-
     0.75,                    !- Rated SHR, Speed 3
-
     3.0,                     !- Rated COP, Speed 3
-
     1.25,                    !- Rated Air Volume Flow Rate, Speed 3 {m3/s}
-
     HPACCoolCapFT Speed 3,   !- Total Cooling Capacity Modifier Curve, Speed 3 (temperature)
-
     HPACCoolCapFF Speed 3,   !- Total Cooling Capacity Modifier Curve, Speed 3 (flow fraction)
-
     HPACCOOLEIRFT Speed 3,   !- Energy Input Ratio Modifier Curve, Speed 3 (temperature)
-
     HPACCOOLEIRFF Speed 3,   !- Energy Input Ratio Modifier Curve, Speed 3 (flow fraction)
-
     HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 3 (part load ratio)
-
     1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 3 {s}
-
 1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-
                          !- Capacity, Speed 3 {dimensionless}
-
     3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 3 {cycles/hr}
-
     45.0,                    !- Latent Capacity Time Constant, Speed 3 {s}
-
     0.2,                     !- Rated waste heat fraction of power input, Speed 3 {dimensionless}
-
     HAPCCoolWHFT Speed 3,    !- Waste heat modifier curve, Speed 3 (temperature)
-
     0.9,                     !- Evaporative Condenser Effectiveness, Speed 3 {dimensionless}
-
     0.2,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 3 {m3/s}
-
     80,                      !- Evaporative Condenser Pump Rated Power Consumption, Speed 3 {W}
-
     35500,                   !- Rated Total Cooling Capacity, Speed 4 (gross) {W}
-
     0.75,                    !- Rated SHR, Speed 4
-
     3.0,                     !- Rated COP, Speed 4
-
     1.75,                    !- Rated Air Volume Flow Rate, Speed 4 {m3/s}
-
     HPACCoolCapFT Speed 4,   !- Total Cooling Capacity Modifier Curve, Speed 4 (temperature)
-
     HPACCoolCapFF Speed 4,   !- Total Cooling Capacity Modifier Curve, Speed 4 (flow fraction)
-
     HPACCOOLEIRFT Speed 4,   !- Energy Input Ratio Modifier Curve, Speed 4 (temperature)
-
     HPACCOOLEIRFF Speed 4,   !- Energy Input Ratio Modifier Curve, Speed 4 (flow fraction)
-
     HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 4 (part load ratio)
-
     1000.0,                  !- Nominal Time for Condensate Removal to Begin, Speed 4 {s}
-
 1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-
                          !- Capacity, Speed 4 {dimensionless}
-
     3.0,                     !- Maximum ON/OFF Cycling Rate, Speed 4 {cycles/hr}
-
     45.0,                    !- Latent Capacity Time Constant, Speed 4 {s}
-
     0.2,                     !- Rated waste heat fraction of power input, Speed 4 {dimensionless}
-
     HAPCCoolWHFT Speed 4,    !- Waste heat modifier curve, Speed 4 (temperature)
-
     0.9,                     !- Evaporative Condenser Effectiveness, Speed 4 {dimensionless}
-
     0.3,                     !- Evaporative Condenser Air Volume Flow Rate, Speed 4 {m3/s}
-
     100;                     !- Evaporative Condenser Pump Rated Power Consumption, Speed 4 {W}
 
-
-
 Coil:Heating:Gas,
-
     Supp Gas Heating Coil 1,  !- Coil Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.8,                     !- Gas Burner Efficiency of the Coil
-
     45000,                   !- Nominal Capacity of the Coil {W}
-
     SuppHeating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
-
     Air Loop Outlet Node;    !- Coil\_Air\_Outlet\_Node
 
-
-
 Fan:OnOff,
-
     Supply Fan 1,            !- Fan Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.7,                     !- Fan Total Efficiency
-
     300.0,                   !- Delta Pressure {Pa}
-
     1.7,                     !- Max Flow Rate {m3/s}
-
     0.9,                     !- Motor Efficiency
-
     1.0,                     !- Motor In Airstream Fraction
-
     Mixed Air Node,          !- Fan\_Inlet\_Node
-
     DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
 
-
-
 AirTerminal:SingleDuct:Uncontrolled,
-
       Zone1DirectAir,                  ! direct air unit name
-
      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-
       Zone 1 Inlet Node,               ! zone supply air node name
-
      0.612;                           ! maximum air flow rate, m3/s
 
-
-
 AirTerminal:SingleDuct:Uncontrolled,
-
       Zone2DirectAir,                  ! direct air unit name
-
      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-
       Zone 2 Inlet Node,               ! zone supply air node name
-
      0.476;                           ! maximum air flow rate, m3/s
 
-
-
 AirTerminal:SingleDuct:Uncontrolled,
-
       Zone3DirectAir,                  ! direct air unit name
-
      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-
       Zone 3 Inlet Node,               ! zone supply air node name
-
      0.612;                           ! maximum air flow rate, m3/s
 ```
 
 ### Unitary Air to Air MultiSpeed Heat Pump (AirLoopHVAC) Outputs
 
-HVAC,Average,Unitary System Fan Part Load Ratio []
+* HVAC,Average,Unitary System Fan Part Load Ratio []
 
-HVAC,Average,Unitary System Compressor Part Load Ratio []
+* HVAC,Average,Unitary System Compressor Part Load Ratio []
 
-HVAC,Average,Unitary System DX Coil Cycling Ratio []
+* HVAC,Average,Unitary System DX Coil Cycling Ratio []
 
-HVAC,Average,Unitary System DX Coil Speed Ratio []
+* HVAC,Average,Unitary System DX Coil Speed Ratio []
 
-HVAC,Average,Unitary System DX Coil Speed Level []
+* HVAC,Average,Unitary System DX Coil Speed Level []
 
-HVAC,Average,Unitary System Electric Power[W]
+* HVAC,Average,Unitary System Electric Power[W]
 
-HVAC,Sum,Unitary System Electric Energy [J]
+* HVAC,Sum,Unitary System Electric Energy [J]
 
-HVAC,Average,Unitary System Total Cooling Rate [W]
+* HVAC,Average,Unitary System Total Cooling Rate [W]
 
-HVAC,Average,Unitary System Total Heating Rate [W]
+* HVAC,Average,Unitary System Total Heating Rate [W]
 
-HVAC,Average,Unitary System Sensible Cooling Rate [W]
+* HVAC,Average,Unitary System Sensible Cooling Rate [W]
 
-HVAC,Average,Unitary System Sensible Heating Rate [W]
+* HVAC,Average,Unitary System Sensible Heating Rate [W]
 
-HVAC,Average,Unitary System Latent Cooling Rate [W]
+* HVAC,Average,Unitary System Latent Cooling Rate [W]
 
-HVAC,Average,Unitary System Latent Heating Rate [W]
+* HVAC,Average,Unitary System Latent Heating Rate [W]
 
-HVAC,Average,Unitary System Ancillary Electric Power[W]
+* HVAC,Average,Unitary System Ancillary Electric Power[W]
 
-HVAC,Sum,Unitary System Cooling Ancillary Electric Energy [J]
+* HVAC,Sum,Unitary System Cooling Ancillary Electric Energy [J]
 
-HVAC,Sum,Unitary System Heating Ancillary Electric Energy [J]
+* HVAC,Sum,Unitary System Heating Ancillary Electric Energy [J]
 
 If heat recovery is specified:
 
-HVAC,Average, Unitary System Heat Recovery Rate [W]
+* HVAC,Average, Unitary System Heat Recovery Rate [W]
 
-HVAC,Average, Unitary System Heat Recovery Inlet Temperature [C]
+* HVAC,Average, Unitary System Heat Recovery Inlet Temperature [C]
 
-HVAC,Average, Unitary System Heat Recovery Outlet Temperature [C]
+* HVAC,Average, Unitary System Heat Recovery Outlet Temperature [C]
 
-HVAC,Average, Unitary System Heat Recovery Fluid Mass Flow Rate [kg/s]
+* HVAC,Average, Unitary System Heat Recovery Fluid Mass Flow Rate [kg/s]
 
-HVAC,Sum, Unitary System Heat Recovery Energy [J]
+* HVAC,Sum, Unitary System Heat Recovery Energy [J]
 
 #### Unitary System Fan Part Load Ratio []
 
@@ -14430,19 +12529,17 @@ This alpha field has two choices: **BlowThrough** or **DrawThrough**. The first 
 
 This alpha field contains the identifying type of heating coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat Only Furnace) itself provides the "controller" function of modulating water flow. Heating coil type must be:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Heating Coil Name
 
 This alpha field contains the identifying name given to the furnace heating coil.
-
-
 
 As shown in the example below, correct specification of the furnace requires specification of the following objects in addition to the furnace object:
 
@@ -14453,134 +12550,78 @@ As shown in the example below, correct specification of the furnace requires spe
 3)   direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
 
 Note: the furnace’s fan and heating coil must be connected in the air loop according to the configuration shown above (Figure 120) when a blow through fan configuration is specified. If a draw through fan is used, the fan is located down stream of the heating coil. In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the furnace object.
-
+```idf
 AirLoopHVAC:Unitary:Furnace:HeatOnly,
-
     Gas Furnace 1,        !- Name
-
     FanAndCoilAvailSched, !- Availability Schedule Name
-
     Air Loop Inlet Node,  !- Furnace Air Inlet Node Name
-
     Air Loop Outlet Node, !- Furnace Air Outlet Node Name
-
     CycFanSchedule,       !- Supply Air Fan Operating Mode Schedule Name
-
     80,                   !- Maximum Supply Air Temperature {C}
-
     1.3,                  !- Heating Supply Air Flow Rate {m3/s}
-
     East Zone,            !- Controlling Zone or Thermostat Location
-
     Fan:OnOff,            !- Supply Fan Object Type
-
     Supply Fan 1,         !- Supply Fan Fame
-
     BlowThrough,          !- Fan Placement
-
     Coil:Heating:Gas,     !- Heating Coil Object Type
-
     Furnace Coil;         !- Heating Coil Name
 
 
-
   Coil:Heating:Gas,
-
     Furnace Coil,          !- Coil Name
-
     FanAndCoilAvailSched,  !- Availability Schedule Name
-
     0.8,                   !- Gas Burner Efficiency of the Coil
-
     20000,                 !- Nominal Capacity of the Coil {W}
-
-    Heating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
-
-    Air Loop Outlet Node,         !- Coil\_Air\_Outlet\_Node
-
-    ,                      !- Coil\_Temp\_Setpoint\_Node
-
+    Heating Coil Air Inlet Node,  !- Coil_Air_Inlet_Node
+    Air Loop Outlet Node,         !- Coil_Air_Outlet_Node
+    ,                      !- Coil_Temp_Setpoint_Node
     100,                   !- Parasitic Electric Load {W}
-
     PLFCurveforGasFurnace, !- Part load fraction correlation (function of part load ratio)
-
     10;                    !- Parasitic Gas Load {W}
 
 
-
 Curve:Cubic,
-
     PLFCurveforGasFurnace, !- Name
-
     0.8,  !- Coefficient1 Constant
-
     0.2,  !- Coefficient2 x
-
-    0.0,  !- Coefficient3 x\*\*2
-
-    0.0,  !- Coefficient4 x\*\*3
-
+    0.0,  !- Coefficient3 x**2
+    0.0,  !- Coefficient4 x**3
     0,  !- Minimum Value of x
-
     1;  !- Maximum Value of x
 
 
-
   Fan:OnOff,
-
     Supply Fan 1,          !- Fan Name
-
     FanAndCoilAvailSched,  !- Availability Schedule Name
-
     0.7,    !- Fan Total Efficiency
-
     600.0,  !- Delta Pressure {Pa}
-
     1.3,    !- Max Flow Rate {m3/s}
-
     0.9,    !- Motor Efficiency
-
     1.0,    !- Motor In Airstream Fraction
-
-    Air Loop Inlet Node,          !- Fan\_Inlet\_Node
-
-    Heating Coil Air Inlet Node;  !- Fan\_Outlet\_Node
-
+    Air Loop Inlet Node,          !- Fan_Inlet_Node
+    Heating Coil Air Inlet Node;  !- Fan_Outlet_Node
 
 
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone1DirectAir,       !-Direct Air Name
-
     FanAndCoilAvailSched, !- Schedule name for on/off schedule
-
     Zone 1 Inlet Node,    !- Zone Supply Air Node Name
-
    0.47;   !- Maximum air flow rate {m3/s}
 
 
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone2DirectAir,       !- Direct Air Name
-
    FanAndCoilAvailSched, !- Schedule name for on/off schedule
-
     Zone 2 Inlet Node,    !- Zone Supply Air Node Name
-
    0.36;   !- Maximum air flow rate {m3/s}
 
 
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone3DirectAir,       !- Direct Air Name
-
    FanAndCoilAvailSched, !- Schedule name for on/off schedule
-
     Zone 3 Inlet Node,    !- Zone Supply Air Node Name
-
    0.47;   !- Maximum air flow rate {m3/s}
+```
 
 
 
@@ -14588,7 +12629,7 @@ Example of Heat-Only Furnace Specification
 
 ### Unitary/Furnace Heat Only (AirLoopHVAC) Outputs
 
-HVAC,Average,Unitary System Fan Part Load Ratio []
+* HVAC,Average,Unitary System Fan Part Load Ratio []
 
 #### Unitary System Fan Part Load Ratio []
 
@@ -14652,19 +12693,17 @@ This alpha field has two choices: **BlowThrough** or **DrawThrough**. The first 
 
 This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat Only) itself provides the "controller" function of modulating water flow. Heating coil type must be:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Heating Coil Name
 
 This alpha field contains the identifying name given to the unitary system heating coil.
-
-
 
 As shown in the example below, correct specification of the heat-only unitary system requires specification of the following objects in addition to the unitary system object:
 
@@ -14678,131 +12717,74 @@ Note: the unitary system’s fan and heating coil must be connected in the air l
 
 ```idf
 AirLoopHVAC:UnitaryHeatOnly,
-
     Gas Unitary System 1, !- Name
-
     FanAndCoilAvailSched, !- Availability Schedule Name
-
     Air Loop Inlet Node,  !- Unitary System Air Inlet Node Name
-
     Air Loop Outlet Node, !- Unitary System Air Outlet Node Name
-
     CycFanSchedule,       !- Supply Air Fan Operating Mode Schedule Name
-
     80,                   !- Maximum Supply Air Temperature {C}
-
     1.3,                  !- Heating Supply Air Flow Rate {m3/s}
-
     East Zone,            !- Controlling Zone or Thermostat Location
-
     Fan:OnOff,            !- Supply Fan Object Type
-
     Supply Fan 1,         !- Supply Fan Name
-
     BlowThrough,          !- Fan Placement
-
     Coil:Heating:Gas,     !- Heating Coil Object Type
-
     Unitary System Heating Coil; !- Heating Coil Name
 
 
-
   Coil:Heating:Gas,
-
     Unitary System Heating Coil, !- Coil Name
-
     FanAndCoilAvailSched,        !- Availability Schedule Name
-
     0.8,                         !- Gas Burner Efficiency of the Coil
-
     20000,                       !- Nominal Capacity of the Coil {W}
-
-    Heating Coil Air Inlet Node, !- Coil\_Air\_Inlet\_Node
-
-    Air Loop Outlet Node,        !- Coil\_Air\_Outlet\_Node
-
-    ,                            !- Coil\_Temp\_Setpoint\_Node
-
+    Heating Coil Air Inlet Node, !- Coil_Air_Inlet_Node
+    Air Loop Outlet Node,        !- Coil_Air_Outlet_Node
+    ,                            !- Coil_Temp_Setpoint_Node
     100,                         !- Parasitic Electric Load {W}
-
     PLFCurveforUnitarySystem,    !- Part load fraction correlation (function of part load ratio)
-
     10;                          !- Parasitic Gas Load {W}
 
 
-
 Curve:Cubic,
-
     PLFCurveforUnitarySystem,  !- Name
-
     0.8,  !- Coefficient1 Constant
-
     0.2,  !- Coefficient2 x
-
-    0.0,  !- Coefficient3 x\*\*2
-
-    0.0,  !- Coefficient4 x\*\*3
-
+    0.0,  !- Coefficient3 x**2
+    0.0,  !- Coefficient4 x**3
     0,  !- Minimum Value of x
-
     1;  !- Maximum Value of x
 
 
-
 Fan:OnOff,
-
     Supply Fan 1,          !- Fan Name
-
     FanAndCoilAvailSched,  !- Availability Schedule Name
-
     0.7,    !- Fan Total Efficiency
-
     600.0,  !- Delta Pressure {Pa}
-
     1.3,    !- Max Flow Rate {m3/s}
-
     0.9,    !- Motor Efficiency
-
     1.0,    !- Motor In Airstream Fraction
-
-    Air Loop Inlet Node,          !- Fan\_Inlet\_Node
-
-    Heating Coil Air Inlet Node;  !- Fan\_Outlet\_Node
-
+    Air Loop Inlet Node,          !- Fan_Inlet_Node
+    Heating Coil Air Inlet Node;  !- Fan_Outlet_Node
 
 
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone1DirectAir,       !-Direct Air Name
-
     FanAndCoilAvailSched, !- Schedule name for on/off schedule
-
     Zone 1 Inlet Node,    !- Zone Supply Air Node Name
-
    0.47;   !- Maximum air flow rate {m3/s}
 
 
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone2DirectAir,       !- Direct Air Name
-
    FanAndCoilAvailSched, !- Schedule name for on/off schedule
-
     Zone 2 Inlet Node,    !- Zone Supply Air Node Name
-
    0.36;   !- Maximum air flow rate {m3/s}
 
 
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone3DirectAir,       !- Direct Air Name
-
    FanAndCoilAvailSched, !- Schedule name for on/off schedule
-
     Zone 3 Inlet Node,    !- Zone Supply Air Node Name
-
    0.47;   !- Maximum air flow rate {m3/s}
 ```
 
@@ -14810,7 +12792,7 @@ Example of Heat-Only Unitary System Specification
 
 ### Unitary Heat Only (AirLoopHVAC) Outputs
 
-HVAC,Average,Unitary System Fan Part Load Ratio []
+* HVAC,Average,Unitary System Fan Part Load Ratio []
 
 #### Unitary System Fan Part Load Ratio []
 
@@ -14822,21 +12804,17 @@ The unitary water-to-air heat pump is similar to the unitary air-to-air heat pum
 
 There are three type of WaterToAirHeatPump coil models available:
 
-Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
+* Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
 
-Coil:Heating:WaterToAirHeatPump:ParameterEstimation
+* Coil:Heating:WaterToAirHeatPump:ParameterEstimation
 
-Coil:Cooling:WaterToAirHeatPump:EquationFit
+* Coil:Cooling:WaterToAirHeatPump:EquationFit
 
-Coil:Heating:WaterToAirHeatPump:EquationFit
+* Coil:Heating:WaterToAirHeatPump:EquationFit
 
-Coil:Cooling:WatertoAirHeatPump:VariableSpeedEquationFit
+* Coil:Cooling:WatertoAirHeatPump:VariableSpeedEquationFit
 
-Coil:Heating:WatertoAirHeatPump:VariableSpeedEquationFit
-
-
-
-
+* Coil:Heating:WatertoAirHeatPump:VariableSpeedEquationFit
 
 ![FurnaceSchematic\_WSHP](InputOutputReference/media/image304.png)
 
@@ -14880,11 +12858,11 @@ This alpha field contains the identifying name given to the heat pump supply air
 
 This alpha field contains the identifying type of heating coil specified in the heat pump. Heating coil types are:
 
-Coil:Heating:WaterToAirHeatPump:ParameterEstimation
+* Coil:Heating:WaterToAirHeatPump:ParameterEstimation
 
-Coil:Heating:WaterToAirHeatPump:EquationFit
+* Coil:Heating:WaterToAirHeatPump:EquationFit
 
-Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
+* Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
 
 #### Field: Heating Coil Name
 
@@ -14898,11 +12876,11 @@ This numeric value allows the user to determine how close the air side has to be
 
 This alpha field contains the identifying type of cooling coil specified in the heat pump. Cooling coil types are:
 
-Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
+* Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
 
-Coil:Cooling:WaterToAirHeatPump:EquationFit
+* Coil:Cooling:WaterToAirHeatPump:EquationFit
 
-Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
+* Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
 
 #### Field: Cooling Coil Name
 
@@ -14938,13 +12916,13 @@ This numeric field contains the time delay for the heat pump supply air fan to s
 
 This is the object type of the supplemental heating coil. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (AirLoop Unitary Water to Air Heat Pump) itself provides the "controller" function of modulating water flow. The valid choices are:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Supplemental Heating Coil Name
 
@@ -15015,290 +12993,165 @@ This field specifies the way in which water flow through the heat pump coils wil
 
 
 Following is an example of IDF usage:
-
+```idf
 AirLoopHVAC:UnitaryHeatPump:WaterToAir,
-
     DXAC Heat Pump 1,        !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     Mixed Air Node,          !- Air Inlet Node Name
-
     Air Loop Outlet Node,    !- Air Outlet Node Name
-
     2,                       !- Supply Air Flow Fate {m3/s}
-
     East Zone,               !- Controlling Zone or Thermostat Location
-
     Fan:OnOff,        !- Supply Air Fan Object Type
-
     Supply Fan 1,            !- Supply Air Fan Name
-
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Heating Coil Object Type
-
     Heat Pump Heating Mode,  !- Heating Coil Name
-
     0.001,                   !- Heating Convergence
-
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
-
     Heat Pump Cooling Mode,  !- Cooling Coil Name
-
     0.001,                   !- Cooling Convergence
-
     2.5, !- Maximum Cycling Rate {cycles/hr}
-
     60, !- Heat Pump Time Constant {s}
-
     0.01, !- Fraction of On-Cycle Power Use
-
     60,    !- Heat Pump Fan Delay Time {s}
-
     Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
-
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
-
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
-
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-
     Outside Air Inlet Node, !- Outdoor Dry-Bulb Temperature Sensor Node Name
-
     BlowThrough,             !- Fan Placement
-
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
-
     CoolReheat;              !- Dehumidification Control Type
 
 
-
 Schedule:Compact,
-
     CyclingFanSch,           !- Name
-
     Fraction,                !- Schedule Type Limits Name
-
     Through: 12/31,          !- Field 1
-
     For: AllDays,            !- Field 2
-
     Until: 24:00,            !- Field 3
-
     0.0;                     !- Field 4
 
 
 
 
-
   Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
-
     Heat Pump Cooling Mode,  !- Name
-
     Scroll,                !- Compressor Type
-
     R22,                   !- Refrigerant Type
-
     0.0015,                  !- Design Source Side Flow Rate {m3/s}
-
     38000,  !- Nominal Cooling Coil Capacity {W)
-
     0,            !- Nominal Time for Condensate Removal to Begin {s}
-
     0,      !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-
     3000000,                 !- High Pressure CutOff {Pa}
-
     0,                       !- Low Pressure CutOff {Pa}
-
     Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name
-
     Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name
-
     Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
-
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
-
     3.78019E+03,!-Parameter 1 {W/K}
-
     2.80303E+03,!- Parameter 2 {W/K}
-
    7.93591E-01,!- Parameter 3 {C}
-
     1.91029E+03,!- Parameter 4 {W}
-
     2.66127E+00,!- Parameter 5
-
     1.06009E-02,!- Parameter 6
-
     1.65103E+00,!- Parameter 7
-
     9.73887E-03,!- Parameter 8
-
     1.04563E+03;!- Parameter 9
 
 
 
 
-
  Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
-
     Heat Pump HEATING Mode,  !- Name
-
     Scroll,                !- Compressor Type
-
     R22,                   !- Refrigerant Type
-
     0.0015,                  !- Design Source Side Flow Rate {m3/s}
-
     38000,                   !- Nominal Heating Coil Capacity {W}
-
     3000000,                 !- High Pressure CutOff
-
     0,                       !- Low Pressure CutOff {Pa}
-
     Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
-
     Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
-
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
-
     SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
-
     3.91379E+03,  !-Parameter 1 {W/K}
-
    5.94753E-01,  !- Parameter 2 {C}
-
     2.49945E+03,  !- Parameter 3 {W}
-
     8.68734E-01,  !- Parameter 4
-
     7.23595E-03,  !- Parameter 5
-
     3.69126E+00,  !- Parameter 6
-
     1.75701E-05,  !- Parameter 7
-
    3.65348E+03;  !-Parameter 8
 
 
 
 
-
   Coil:Heating:Gas,
-
     Heat Pump DX Supp Heating Coil 1,  !- Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.8,                     !- Gas Burner Efficiency
-
     32000,                   !- Nominal Capacity {W}
-
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
-
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
 
 
 
-
   BRANCH,
-
     Gshp Cooling Condenser Branch,  !- Name
-
     0,  !- Maximum Flow Rate {m3/s}
-
      , !- Pressure Drop Curve Name
-
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
-
     Heat Pump Cooling Mode,  !- Component 1 Name
-
     Water to Air Heat Pump Source Side1 Inlet Node, !- Component 1 Inlet Node Name
-
     Water to Air Heat Pump Source Side1 Outlet Node, !- Component 1 Outlet Node Name
-
     ACTIVE;  !- Component 1 Branch Control Type
-
 
 
   BRANCH,
-
     Gshp Heating Condenser Branch,  !- Name
-
     0,  !- Maximum Flow Rate {m3/s}
-
      , !- Pressure Drop Curve Name
-
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
-
     Heat Pump Heating Mode,  !- Component 1 Name
-
     Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-
     Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-
     ACTIVE;  !- Component 1 Branch Control Type
-
 
 
 
 
   Fan:OnOff,
-
     Supply Fan 1,          !- Name
-
     FanAndCoilAvailSched,  !- Availability Schedule Name
-
     0.7,                   !- FanTotal Efficiency
-
     300.0,                 !– Pressure Rise {Pa}
-
     2.0,                   !- Maximum Flow Rate {m3/s}
-
     0.9,                   !- Motor Efficiency
-
     1.0,                   !- Motor In Airstream Fraction
-
-    Mixed Air Node,        !- Air Inlet\_Node Name
-
+    Mixed Air Node,        !- Air Inlet_Node Name
     Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
 
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone1DirectAir,        !- Name
-
     FanAndCoilAvailSched,  !- Availability Schedule Name
-
    Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-
    0.7;                   !- Maximum Air Flow Rate {m3/s}
 
 
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone2DirectAir,        !- Name
-
     FanAndCoilAvailSched,  !- Availability Schedule Name
-
    Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-
    0.6;                   !- Maximum Air Flow Rate {m3/s}
 
 
-
   AirTerminal:SingleDuct:Uncontrolled,
-
     Zone3DirectAir,        !- Name
-
     FanAndCoilAvailSched,  !- Availability Schedule Name
-
    Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-
    0.7;                   !- Maximum Air Flow Rate {m3/s}
+```
 
 
 
@@ -15306,29 +13159,29 @@ Schedule:Compact,
 
 Energy use reporting for the water-to-air heat pump is documented under the heat pump coil object types:
 
-Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
+* Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
 
-Coil:Heating:WaterToAirHeatPump:ParameterEstimation
+* Coil:Heating:WaterToAirHeatPump:ParameterEstimation
 
-Coil:Cooling:WaterToAirHeatPump:EquationFit
+* Coil:Cooling:WaterToAirHeatPump:EquationFit
 
-Coil:Heating:WaterToAirHeatPump:EquationFit
+* Coil:Heating:WaterToAirHeatPump:EquationFit
 
 
 
 The heat pump *demand* as well as the compressor and fan part-load ratios may be obtained with the output variables shown below.
 
-HVAC,Average, Unitary System Requested Sensible Cooling Rate [W]
+* HVAC,Average, Unitary System Requested Sensible Cooling Rate [W]
 
-HVAC,Average, Unitary System Requested Latent Cooling Rate [W]
+* HVAC,Average, Unitary System Requested Latent Cooling Rate [W]
 
-HVAC,Average, Unitary System Requested Heating Rate [W]
+* HVAC,Average, Unitary System Requested Heating Rate [W]
 
-HVAC,Average, Unitary System Compressor Part Load Ratio []
+* HVAC,Average, Unitary System Compressor Part Load Ratio []
 
-HVAC,Average, Unitary System Fan Part Load Ratio
+* HVAC,Average, Unitary System Fan Part Load Ratio
 
-HVAC,Average, Unitary System Dehumidification Induced Heating Demand Rate [W]
+* HVAC,Average, Unitary System Dehumidification Induced Heating Demand Rate [W]
 
 
 
@@ -15362,17 +13215,11 @@ The changeover-bypass variable air volume (CBVAV) unitary system is a compound o
 
 ![DrawthruCBVAV](InputOutputReference/media/image308.png)
 
-
-
 Figure 123. Schematic of a CBVAV unitary system (draw through fan placement)
-
-
 
 ![BlowthruCBVAV](InputOutputReference/media/image309.png)
 
 Figure 124. Schematic of a CBVAV unitary system (blow through fan placement)
-
-
 
 Links to the CBVAV system’s supply air fan, coils, and outdoor air mixer specifications are provided in the object’s input syntax. Additional inputs include system and outdoor air flow rates during heating and cooling operation, the priority control mode, and dehumidification control type. A description of each input field for the CBVAV unitary system compound object is provided below.
 
@@ -15432,7 +13279,7 @@ This alpha field defines the name of the HVAC system node to which the system se
 
 This field specifies the type of outdoor air mixer used by this CBVAV unitary system. The outdoor air mixer component is part of the CBVAV unitary compound object. The only available outdoor air mixer type is:
 
-OutdoorAir:Mixer
+* OutdoorAir:Mixer
 
 #### Field: Outdoor Air Mixer Name
 
@@ -15458,11 +13305,11 @@ This alpha field defines the name of a schedule that specifies the supply air fa
 
 This alpha field defines the type of cooling coil used by this unitary system. There are three valid choices for this field:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-Coil:Cooling:DX:TwoStageWithHumidityControlMode
+* Coil:Cooling:DX:TwoStageWithHumidityControlMode
 
 The input requirements for these cooling coil objects are described elsewhere in this document.
 
@@ -15474,15 +13321,15 @@ This alpha field defines the name of the cooling coil used by this unitary syste
 
 This alpha field defines the type of heating coil used by this unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (CBVAV Unitary System) itself provides the "controller" function of modulating water flow. The valid choices are:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:DX:SingleSpeed
+* Coil:Heating:DX:SingleSpeed
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 The input requirements for these heating coil objects are described elsewhere in this document.
 
@@ -15494,11 +13341,11 @@ This alpha field defines the name of the heating coil used by this unitary syste
 
 This choice field defines the cooling or heating priority control mode for the unitary system. Valid choices are:
 
-CoolingPriority
+* CoolingPriority
 
-HeatingPriority
+* HeatingPriority
 
-ZonePriority
+* ZonePriority
 
 If CoolingPriority is selected, the system operates to meet the cooling load if any zone served by this system (air loop) requires cooling. If no zones require cooling, then the system operates in heating mode if needed. If HeatingPriority is selected, the system operates to meet the heating load if any zone requires heating. If no zones require heating, then the system operates in cooling mode if needed. If ZonePriority is selected, the system operates based on the maximum number of zones requiring either heating or cooling. If the number of zones requiring cooling is greater than the number of zones requiring heating, then the system operates in cooling mode. If the number of zones requiring heating is greater than the number of zones requiring cooling, then the system operates in heating mode. If the number of zones requiring cooling equals the number of zones requiring heating, then the largest combined load (i.e., the sum of the cooling loads for zones requiring cooling compared to the sum of the heating loads for zones that require heating) sets the cooling or heating operating mode for the system during that simulation timestep.
 
@@ -15575,197 +13422,121 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
     None;                    !- Dehumidification control type
 
 OutdoorAir:Mixer,
-
     Outdoor air Mixer,       !- Name
-
     Mixed Air Node,          !- Mixed Air Node Name
-
     Outdoor air Inlet Node,  !- Outdoor Air Stream Node
-
     Relief Air Outlet Node,  !- Relief Air Stream Node Name
-
     Mixer Inlet Node;        !- Return Air Stream Node Name
 
-
-
 Fan:OnOff,
-
     Supply Fan 1,            !- Fan Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.7,                     !- Fan Total Efficiency
-
     600.0,                   !- Delta Pressure {Pa}
-
     1.8,                     !- Max Flow Rate {m3/s}
-
     0.9,                     !- Motor Efficiency
-
     1.0,                     !- Motor In Airstream Fraction
-
     Mixed Air Node,          !- Fan\_Inlet\_Node
-
     DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
 
-
-
 Coil:Cooling:DX:TwoStageWithHumidityControlMode,
-
     ACDXCoil 2,              !- Coil Name
-
     FanAndCoilAvailSched,    !- Availability Schedule
-
     DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node
-
     Heating Coil Air Inlet Node,    !- Coil Air Outlet Node
-
     ,                        !- Crankcase Heater Capacity {W}
-
     ,                        !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
-
     2,                       !- Number of Capacity Stages
-
     0,                       !- Number of Enhanced Dehumidification Modes
-
     CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
-
     ACDXCoil 2 Standard Mode-Stage 1,  !- Normal Mode Stage 1 Coil Performance Object Name
-
     CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
-
     ACDXCoil 2 Standard Mode-Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Object Name
 
-
-
 Coil:Heating:Gas,
-
     Furnace Heating Coil 1,  !- Coil Name
-
     FanAndCoilAvailSched,    !- Availability Schedule Name
-
     0.8,                     !- Gas Burner Efficiency of the Coil
-
     35000,                   !- Nominal Capacity of the Coil {W}
-
     Heating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
-
     Heating Coil Air Outlet Node; !- Coil\_Air\_Outlet\_Node
 
-
-
 AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
-
     Zone 1 VAV System,       !- Name of System
-
     FanAndCoilAvailSched,    !- System Availability schedule
-
     Zone 1 Reheat Air Inlet Node,  !- DAMPER Air Outlet Node
-
     Zone 1 VAV Inlet Node,   !-UNIT Air Inlet Node
-
     0.583,                   !- Maximum air flow rate {m3/s}
-
     0.25,                    !- Zone Minimum Air Flow Fraction
-
     ,                        !- Control node
-
     Coil:Heating:Electric,   !- Reheat Component Object
-
     Reheat Coil Zone 1,      !- Name of Reheat Component
-
     0.0,                     !- Max Reheat Water Flow {m3/s}
-
     0.0,                     !- Min Reheat Water Flow {m3/s}
-
     Zone 1 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
-
     0.001;                   !- Convergence Tolerance
-
-
 
 AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
-
     Zone 2 VAV System,       !- Name of System
-
     FanAndCoilAvailSched,    !- System Availability schedule
-
     Zone 2 Reheat Air Inlet Node,  !- DAMPER Air Outlet Node
-
     Zone 2 VAV Inlet Node,   !-UNIT Air Inlet Node
-
     0.583,                   !- Maximum air flow rate {m3/s}
-
     0.25,                    !- Zone Minimum Air Flow Fraction
-
     ,                        !- Control node
-
     Coil:Heating:Electric,   !- Reheat Component Object
-
     Reheat Coil Zone 2,      !- Name of Reheat Component
-
     0.0,                     !- Max Reheat Water Flow {m3/s}
-
     0.0,                     !- Min Reheat Water Flow {m3/s}
-
     Zone 2 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
-
     0.001;                   !- Convergence Tolerance
-
-
 
 AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
-
     Zone 3 VAV System,       !- Name of System
-
     FanAndCoilAvailSched,    !- System Availability schedule
-
     Zone 3 Reheat Air Outlet Node,  !- UNIT Air Outlet Node
-
     Zone 3 VAV Inlet Node,   !-UNIT Air Inlet Node
-
     0.584,                   !- Maximum air flow rate {m3/s}
-
     0.25;                    !- Zone Minimum Air Flow Fraction
 ```
 
 ### Unitary VAV Changeover Bypass Heat and Cool (AirLoopHVAC) Outputs
 
-HVAC,Average,Unitary System Total Heating Rate [W]
+* HVAC,Average,Unitary System Total Heating Rate [W]
 
-HVAC,Sum,Unitary System Total Heating Energy [J]
+* HVAC,Sum,Unitary System Total Heating Energy [J]
 
-HVAC,Average,Unitary System Total Cooling Rate [W]
+* HVAC,Average,Unitary System Total Cooling Rate [W]
 
-HVAC,Sum,Unitary System Total Cooling Energy [J]
+* HVAC,Sum,Unitary System Total Cooling Energy [J]
 
-HVAC,Average,Unitary System Sensible Heating Rate [W]
+* HVAC,Average,Unitary System Sensible Heating Rate [W]
 
-HVAC,Sum,Unitary System Sensible Heating Energy [J]
+* HVAC,Sum,Unitary System Sensible Heating Energy [J]
 
-HVAC,Average,Unitary System Sensible Cooling Rate [W]
+* HVAC,Average,Unitary System Sensible Cooling Rate [W]
 
-HVAC,Sum,Unitary System Sensible Cooling Energy [J]
+* HVAC,Sum,Unitary System Sensible Cooling Energy [J]
 
-HVAC,Average,Unitary System Latent Heating Rate [W]
+* HVAC,Average,Unitary System Latent Heating Rate [W]
 
-HVAC,Sum,Unitary System Latent Heating Energy [J]
+* HVAC,Sum,Unitary System Latent Heating Energy [J]
 
-HVAC,Average,Unitary System Latent Cooling Rate [W]
+* HVAC,Average,Unitary System Latent Cooling Rate [W]
 
-HVAC,Sum,Unitary System Latent Cooling Energy [J]
+* HVAC,Sum,Unitary System Latent Cooling Energy [J]
 
-HVAC,Average,Unitary System Electric Power [W]
+* HVAC,Average,Unitary System Electric Power [W]
 
-HVAC,Sum,Unitary System Electric Energy [J]
+* HVAC,Sum,Unitary System Electric Energy [J]
 
-HVAC,Average,Unitary System Fan Part Load Ratio []
+* HVAC,Average,Unitary System Fan Part Load Ratio []
 
-HVAC,Average,Unitary System Compressor Part Load Ratio []
+* HVAC,Average,Unitary System Compressor Part Load Ratio []
 
-HVAC,Average,Unitary System Bypass Air Mass Flow Rate [kg/s]
+* HVAC,Average,Unitary System Bypass Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Unitary System Air Outlet Setpoint Temperature [C]
+* HVAC,Average,Unitary System Air Outlet Setpoint Temperature [C]
 
 #### Unitary System Total Heating Rate [W]
 
@@ -15863,8 +13634,6 @@ The following schematic demonstrates these connection rules.
 ![VRFSchematic](InputOutputReference/media/image310.png)
 
 Figure 125. Variable Refrigerant Flow Schematic
-
-
 
 Energyplus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
 
@@ -16220,275 +13989,196 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow syste
 
 
 
+```idf
 AirConditioner:VariableRefrigerantFlow,
-
   VRF Heat Pump,        !- Heat Pump Name
-
   VRFCondAvailSched,    !- Availability Schedule Name
-
   autosize,             !- Gross Rated Total Cooling Capacity {W}
-
   3.16038,              !- Gross Rated Cooling COP {W}
-
   -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
-
   43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
-
   VRFCoolCapFT,         !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
-
   VRFCoolCapFTBoundary, !- Cooling Capacity Ratio Boundary Curve Name
-
   VRFCoolCapFTHi,       !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
-
   VRFCoolEIRFT,         !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name
-
   VRFCoolEIRFTBoundary, !- Cooling Energy Input Ratio Boundary Curve Name
-
   VRFCoolEIRFTHi,       !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name
-
   CoolingEIRLowPLR,     !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
-
   CoolingEIRHiPLR,      !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
-
   CoolingCombRatio,     !- Cooling Combination Ratio Correction Factor Curve Name
-
   VRFCPLFFPLR,          !- Cooling Part-Load Fraction Correlation Curve Name
-
   autosize,             !- Gross Rated Heating Capacity {W}
-
   ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
-
   3.40909,              !- Gross Rated Heating COP
-
   -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
-
   15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
-
   VRFHeatCapFT,         !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
-
   VRFHeatCapFTBoundary, !- Heating Capacity Ratio Boundary Curve Name
-
   VRFHeatCapFTHi,       !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
-
   VRFHeatEIRFT,         !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name
-
   VRFHeatEIRFTBoundary, !- Heating Energy Input Ratio Boundary Curve Name
-
   VRFHeatEIRFTHi,       !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name
-
   WetBulbTemperature,   !- Heating Performance Curve Outdoor Temperature Type
-
   HeatingEIRLowPLR,     !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name
-
   HeatingEIRHiPLR,      !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name
-
   HeatingCombRatio,     !- Heating Combination Ratio Correction Factor Curve Name
-
   VRFCPLFFPLR,          !- Heating Part-Load Fraction Correlation Curve Name
-
   0.25,                 !- Minimum Heat Pump Part-Load Ratio
-
   SPACE1-1,             !- Zone Name for Master Thermostat Location
-
   LoadPriority,         !- Master Thermostat Priority Control Type
-
   ,                     !- Thermostat Priority Schedule Name
-
   VRF Heat Pump TU List, !- Zone Terminal Unit List Name
-
   No,                   !- Heat Pump Waste Heat Recovery
-
   30,                   !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}
-
   10,                   !- Vertical Height used for Piping Correction Factor {m}
-
   CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name
-
   -0.000386,            !- Piping Correction Factor for Height in Cooling Mode Coefficient
-
   30,                   !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}
-
   ,                     !- Piping Correction Factor for Length in Heating Mode Curve Name
-
   ,                     !- Piping Correction Factor for Height in Heating Mode Coefficient
-
   15,                   !- Crankcase Heater Power per Compressor {W}
-
   3,                    !- Number of Compressors
-
   0.33,                 !- Ratio of Compressor Size to Total Compressor Capacity
-
   7,                    !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
-
   Resistive,            !- Defrost Strategy
-
   Timed,                !- Defrost Control
-
   ,                     !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
-
   ,                     !- Defrost Time Period Fraction
-
   autosize,             !- Resistive Defrost Heater Capacity {W}
-
   7,                    !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
-
   EvaporativelyCooled,  !- Condenser Type
-
   MyVRFOANode,          !- Condenser Inlet Node Name
-
   ,                     !- Condenser Outlet Node Name
-
   ,                     !- Water Condenser Volume Flow Rate
-
   ,                     !- Evaporative Condenser Effectiveness {dimensionless}
-
   autosize,             !- Evaporative Condenser Air Flow Rate {m3/s}
-
   autosize,             !- Evaporative Condenser Pump Rated Power Consumption {W}
-
   ,                     !- Supply Water Storage Tank Name
-
   200,                  !- Basin Heater Capacity {W/K}
-
   ,                     !- Basin Heater Set Point Temperature (C)
-
   ,                     !- Basin Heater Operating Schedule Name
-
   ,                     !- Fuel Type
-
   ,                     !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
-
   ,                     !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
-
   ,                     !- Heat Recovery Cooling Capacity Modifier Function of Temperature Curve Name
-
   ,                     !- Initial Heat Recovery Cooling Capacity Fraction
-
   ,                     !- Heat Recovery Cooling Capacity Time Constant (hr)
-
   ,                     !- Heat Recovery Cooling Energy Modifier Function of Temperature Curve Name
-
   ,                     !- Initial Heat Recovery Cooling Energy Fraction
-
   ,                     !- Heat Recovery Cooling Energy Time Constant (hr)
-
   ,                     !- Heat Recovery Heating Capacity Modifier Function of Temperature Curve Name
-
   ,                     !- Initial Heat Recovery Heating Capacity Fraction
-
   ,                     !- Heat Recovery Heating Capacity Time Constant (hr)
-
   ,                     !- Heat Recovery Heating Energy Modifier Function of Temperature Curve Name
-
   ,                     !- Initial Heat Recovery Heating Energy Fraction
-
   ;                     !- Heat Recovery Heating Energy Time Constant (hr)
+```
 
 
 
 ### Variable Refrigerant Flow (VRF) Air Conditioner Outputs
 
-HVAC,Average,VRF Heat Pump Total Cooling Rate [W]
+* HVAC,Average,VRF Heat Pump Total Cooling Rate [W]
 
-HVAC,Average,VRF Heat Pump Total Heating Rate [W]
+* HVAC,Average,VRF Heat Pump Total Heating Rate [W]
 
-HVAC,Average,VRF Heat Pump Cooling COP []
+* HVAC,Average,VRF Heat Pump Cooling COP []
 
-HVAC,Average,VRF Heat Pump Heating COP []
+* HVAC,Average,VRF Heat Pump Heating COP []
 
-HVAC,Average,VRF Heat Pump COP []
+* HVAC,Average,VRF Heat Pump COP []
 
-HVAC,Average,VRF Heat Pump Part Load Ratio []
+* HVAC,Average,VRF Heat Pump Part Load Ratio []
 
-HVAC,Average,VRF Heat Pump Runtime Fraction []
+* HVAC,Average,VRF Heat Pump Runtime Fraction []
 
-HVAC,Average,VRF Heat Pump Cycling Ratio []
+* HVAC,Average,VRF Heat Pump Cycling Ratio []
 
-HVAC,Average,VRF Heat Pump Operating Mode []
+* HVAC,Average,VRF Heat Pump Operating Mode []
 
-HVAC,Average,VRF Heat Pump Condenser Inlet Temperature [C]
+* HVAC,Average,VRF Heat Pump Condenser Inlet Temperature [C]
 
-HVAC,Average,VRF Heat Pump Maximum Capacity Cooling Rate [W]
+* HVAC,Average,VRF Heat Pump Maximum Capacity Cooling Rate [W]
 
-HVAC,Average,VRF Heat Pump Maximum Capacity Heating Rate [W]
+* HVAC,Average,VRF Heat Pump Maximum Capacity Heating Rate [W]
 
-HVAC,Average,VRF Heat Pump Crankcase Heater Electric Power [W]
+* HVAC,Average,VRF Heat Pump Crankcase Heater Electric Power [W]
 
-HVAC,Sum,VRF Heat Pump Crankcase Heater Electric Energy [J]
+* HVAC,Sum,VRF Heat Pump Crankcase Heater Electric Energy [J]
 
-HVAC,Average,VRF Heat Pump Terminal Unit Heating Load Rate [W]
+* HVAC,Average,VRF Heat Pump Terminal Unit Heating Load Rate [W]
 
-HVAC,Average,VRF Heat Pump Terminal Unit Cooling Load Rate [W]
+* HVAC,Average,VRF Heat Pump Terminal Unit Cooling Load Rate [W]
 
 
 
 Heat Recovery:
 
-HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier []
+* HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier []
 
 
 
 Evap-cooled:
 
-HVAC,Sum,VRF Heat Pump Evaporative Condenser Water Use Volume [m3]
+* HVAC,Sum,VRF Heat Pump Evaporative Condenser Water Use Volume [m3]
 
-HVAC,Average,VRF Heat Pump Evaporative Condenser Pump Electric Power [W]
+* HVAC,Average,VRF Heat Pump Evaporative Condenser Pump Electric Power [W]
 
-HVAC,Sum,VRF Heat Pump Evaporative Condenser Pump Electric Energy [J]
+* HVAC,Sum,VRF Heat Pump Evaporative Condenser Pump Electric Energy [J]
 
-HVAC,Average,VRF Heat Pump Basin Heater Electric Power [W]
+* HVAC,Average,VRF Heat Pump Basin Heater Electric Power [W]
 
-HVAC,Average,VRF Heat Pump Basin Heater Electric Energy [J]
+* HVAC,Average,VRF Heat Pump Basin Heater Electric Energy [J]
 
-HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier []
+* HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier []
 
 
 
 Water-cooled:
 
-HVAC,Average,VRF Heat Pump Condenser Outlet Temperature [C]
+* HVAC,Average,VRF Heat Pump Condenser Outlet Temperature [C]
 
-HVAC,Average,VRF Heat Pump Condenser Mass Flow Rate [kg/s]
+* HVAC,Average,VRF Heat Pump Condenser Mass Flow Rate [kg/s]
 
-HVAC,Sum,VRF Heat Pump Condenser Heat Transfer Energy [J]
+* HVAC,Sum,VRF Heat Pump Condenser Heat Transfer Energy [J]
 
-HVAC,Average, VRF Heat Pump Condenser Heat Transfer Rate [W]
+* HVAC,Average, VRF Heat Pump Condenser Heat Transfer Rate [W]
 
 
 
 Electric Fuel type (default):
 
-HVAC,Average,VRF Heat Pump Cooling Electric Power [W]
+* HVAC,Average,VRF Heat Pump Cooling Electric Power [W]
 
-HVAC,Sum,VRF Heat Pump Cooling Electric Energy [J]
+* HVAC,Sum,VRF Heat Pump Cooling Electric Energy [J]
 
-HVAC,Average,VRF Heat Pump Heating Electric Power [W]
+* HVAC,Average,VRF Heat Pump Heating Electric Power [W]
 
-HVAC,Sum,VRF Heat Pump Heating Electric Energy [J]
+* HVAC,Sum,VRF Heat Pump Heating Electric Energy [J]
 
 
 
 Electric defrost always used for Defrost Strategy = Resistive regardless of fuel type
 
-HVAC,Average,VRF Heat Pump Defrost Electric Power [W]
+* HVAC,Average,VRF Heat Pump Defrost Electric Power [W]
 
-HVAC,Sum,VRF Heat Pump Defrost Electric Energy [J]
+* HVAC,Sum,VRF Heat Pump Defrost Electric Energy [J]
 
 
 
 Alternate Fuel types (e.g., FuelType = NaturalGas):
 
-HVAC,Average,VRF Heat Pump Cooling &lt;FuelType&gt; Rate [W]
+* HVAC,Average,VRF Heat Pump Cooling &lt;FuelType&gt; Rate [W]
 
-HVAC,Sum,VRF Heat Pump Cooling &lt;FuelType&gt; Energy [J]
+* HVAC,Sum,VRF Heat Pump Cooling &lt;FuelType&gt; Energy [J]
 
-HVAC,Average,VRF Heat Pump Heating &lt;FuelType&gt; Rate [W]
+* HVAC,Average,VRF Heat Pump Heating &lt;FuelType&gt; Rate [W]
 
-HVAC,Sum,VRF Heat Pump Heating &lt;FuelType&gt; Energy [J]
+* HVAC,Sum,VRF Heat Pump Heating &lt;FuelType&gt; Energy [J]
 
-HVAC,Average,VRF Heat Pump Defrost &lt;FuelType&gt; Rate [W]
+* HVAC,Average,VRF Heat Pump Defrost &lt;FuelType&gt; Rate [W]
 
-HVAC,Sum,VRF Heat Pump Defrost &lt;FuelType&gt; Energy [J]
+* HVAC,Sum,VRF Heat Pump Defrost &lt;FuelType&gt; Energy [J]
 
 
 
@@ -16628,8 +14318,6 @@ This output applies only when heat recovery is used and represents the multiplie
 
 The zone terminal unit list defines the names of the terminal units connected to a single variable refrigerant flow air-conditioning system. The zone terminal unit list is used exclusively in the variable refrigerant flow (VRF) air conditioner object (ref: AirConditioner:VariableRefrigerantFlow). Up to 20 terminal units may be connected to a single VRF outdoor condensing unit. This list is extensible if additional indoor terminal units are required. The name of this zone terminal unit list object is then input into the corresponding variable refrigerant flow air conditioner object. The following figure demonstrates this concept.
 
-
-
 ![ZoneTUObjectSchematic](InputOutputReference/media/image313.png)
 
 Figure 127. Zone Terminal Unit List Diagram
@@ -16644,19 +14332,16 @@ This alpha field defines the name of the zone terminal unit used in a variable r
 
 Following is an example input for a ZoneTerminalUnitList object.
 
+```idf
 ZoneTerminalUnitList,
-
    VRF Heat Pump TU List, !- Zone Terminal Unit List Name
-
    TU3,                   !- Zone Terminal Unit Name 1
-
    TU4,                   !- Zone Terminal Unit Name 2
-
    TU1,                   !- Zone Terminal Unit Name 3
-
    TU2,                   !- Zone Terminal Unit Name 4
-
    TU5;                   !- Zone Terminal Unit Name 5
+```
+
 
 Group – Radiative **/** Convective Units
 ----------------------------------------
@@ -16797,21 +14482,21 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
 
 ### Baseboard (Water) Radiant Convective (ZoneHVAC) Outputs
 
-HVAC,Average,Baseboard Total Heating Rate [W]
+* HVAC,Average,Baseboard Total Heating Rate [W]
 
-HVAC,Average,Baseboard Convective Heating Rate [W]
+* HVAC,Average,Baseboard Convective Heating Rate [W]
 
-HVAC,Average,Baseboard Radiant Heating Rate [W]
+* HVAC,Average,Baseboard Radiant Heating Rate [W]
 
-HVAC,Sum,Baseboard Total Heating Energy [J]
+* HVAC,Sum,Baseboard Total Heating Energy [J]
 
-HVAC,Sum,Baseboard Total Heating Energy [J]
+* HVAC,Sum,Baseboard Total Heating Energy [J]
 
-HVAC,Sum,Baseboard Convective Heating Energy [J]
+* HVAC,Sum,Baseboard Convective Heating Energy [J]
 
-HVAC,Sum,Baseboard Radiant Heating Energy [J]
+* HVAC,Sum,Baseboard Radiant Heating Energy [J]
 
-HVAC,Meter,Baseboard:EnergyTransfer [J]
+* HVAC,Meter,Baseboard:EnergyTransfer [J]
 
 #### Baseboard Total Heating Rate [W]
 
@@ -16968,25 +14653,25 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
 
 ### Baseboard (Steam) Radiant Convective (ZoneHVAC) Outputs
 
-HVAC,Average,Baseboard Total Heating Rate [W]
+* HVAC,Average,Baseboard Total Heating Rate [W]
 
-HVAC,Average,Baseboard Convective Heating Rate [W]
+* HVAC,Average,Baseboard Convective Heating Rate [W]
 
-HVAC,Average,Baseboard Radiant Heating Rate [W]
+* HVAC,Average,Baseboard Radiant Heating Rate [W]
 
-HVAC,Sum,Baseboard Total Heating Energy [J]
+* HVAC,Sum,Baseboard Total Heating Energy [J]
 
-HVAC,Sum,Baseboard Convective Heating Energy [J]
+* HVAC,Sum,Baseboard Convective Heating Energy [J]
 
-HVAC,Sum,Baseboard Radiant Heating Energy [J]
+* HVAC,Sum,Baseboard Radiant Heating Energy [J]
 
-HVAC,Meter,Baseboard:EnergyTransfer [J]
+* HVAC,Meter,Baseboard:EnergyTransfer [J]
 
-HVAC,Average,Baseboard Steam Mass Flow Rate [kg/s]
+* HVAC,Average,Baseboard Steam Mass Flow Rate [kg/s]
 
-HVAC,Average,Baseboard Steam Inlet temperature [C]
+* HVAC,Average,Baseboard Steam Inlet temperature [C]
 
-HVAC,Average,Baseboard Steam Outlet temperature [C]
+* HVAC,Average,Baseboard Steam Outlet temperature [C]
 
 #### Baseboard Total Heating Rate [W]
 
@@ -17115,25 +14800,25 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
 
 ### Baseboard (Electric) Radiant Convective (ZoneHVAC) Outputs
 
-HVAC,Average,Baseboard Total Heating Rate [W]
+* HVAC,Average,Baseboard Total Heating Rate [W]
 
-HVAC,Average,Baseboard Radiant Heating Rate [W]
+* HVAC,Average,Baseboard Radiant Heating Rate [W]
 
-HVAC,Average,Baseboard Convective Heating Rate [W]
+* HVAC,Average,Baseboard Convective Heating Rate [W]
 
-HVAC,Average,Baseboard Electric Power[W]
+* HVAC,Average,Baseboard Electric Power[W]
 
-HVAC,Sum,Baseboard Total Heating Energy [J]
+* HVAC,Sum,Baseboard Total Heating Energy [J]
 
-HVAC,Sum,Baseboard Radiant Heating Energy [J]
+* HVAC,Sum,Baseboard Radiant Heating Energy [J]
 
-HVAC,Sum,Baseboard Convective Heating Energy [J]
+* HVAC,Sum,Baseboard Convective Heating Energy [J]
 
-HVAC,Sum,Baseboard Electric Energy [J]
+* HVAC,Sum,Baseboard Electric Energy [J]
 
-HVAC,Meter,Baseboard:EnergyTransfer [J]
+* HVAC,Meter,Baseboard:EnergyTransfer [J]
 
-HVAC,Meter,Heating:Electricity[J]
+* HVAC,Meter,Heating:Electricity[J]
 
 #### Baseboard Total Heating Rate [W]
 
@@ -17186,8 +14871,6 @@ The name of the hot water inlet node for the baseboard heater.
 #### Field: Outlet Node Name
 
 The name of the hot water outlet node for the baseboard heater.
-
-
 
 #### Field: Heating Design Capacity Method
 
@@ -17244,25 +14927,23 @@ ZoneHVAC:Baseboard:Convective:Water,
 
 ### Baseboard (Water) Convective (ZoneHVAC) Outputs
 
-HVAC,Average,Baseboard Total Heating Rate [W]
+* HVAC,Average,Baseboard Total Heating Rate [W]
 
-HVAC,Sum,Baseboard Total Heating Energy [J]
+* HVAC,Sum,Baseboard Total Heating Energy [J]
 
-HVAC,Sum,Baseboard Hot Water Energy [J]
+* HVAC,Sum,Baseboard Hot Water Energy [J]
 
-HVAC,Average,Baseboard Hot Water Mass Flow Rate [kg/s]
+* HVAC,Average,Baseboard Hot Water Mass Flow Rate [kg/s]
 
-HVAC,Average,Baseboard Air Mass Flow Rate [kg/s]
+* HVAC,Average,Baseboard Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Baseboard Air Inlet Temperature [C]
+* HVAC,Average,Baseboard Air Inlet Temperature [C]
 
-HVAC,Average,Baseboard Air Outlet Temperature [C]
+* HVAC,Average,Baseboard Air Outlet Temperature [C]
 
-HVAC,Average,Baseboard Water Inlet Temperature [C]
+* HVAC,Average,Baseboard Water Inlet Temperature [C]
 
-HVAC,Average,Baseboard Water Outlet Temperature [C]
-
-
+* HVAC,Average,Baseboard Water Outlet Temperature [C]
 
 #### Baseboard Total Heating Rate [W]
 
@@ -17347,17 +15028,17 @@ ZoneHVAC:Baseboard:Convective:Electric,
 
 ### Baseboard (Electric) Convective (ZoneHVAC) Outputs
 
-HVAC,Average,Baseboard Total Heating Rate [W]
+* HVAC,Average,Baseboard Total Heating Rate [W]
 
-HVAC,Sum,Baseboard Total Heating Energy [J]
+* HVAC,Sum,Baseboard Total Heating Energy [J]
 
-HVAC,Meter,Baseboard:EnergyTransfer [J]
+* HVAC,Meter,Baseboard:EnergyTransfer [J]
 
-HVAC,Sum,Baseboard Electric Energy [J]
+* HVAC,Sum,Baseboard Electric Energy [J]
 
-HVAC,Average,Baseboard Electric Power[W]
+* HVAC,Average,Baseboard Electric Power[W]
 
-HVAC,Meter,Heating:Electricity[J]
+* HVAC,Meter,Heating:Electricity[J]
 
 #### Baseboard Total Heating Rate [W]
 
@@ -17374,7 +15055,6 @@ This is the total electric consumption of the baseboard for the zone it is servi
 #### Baseboard Electric Power [W]
 
 This is the electric power required by the baseboard to the zone it is serving in Watts.
-
 
 ### ZoneHVAC:LowTemperatureRadiant:VariableFlow
 
@@ -17410,15 +15090,15 @@ This field is the total length of pipe embedded in the surface named above in th
 
 This field specifies along with the throttling range and setpoint schedules how the user wishes to control the hydronic radiant system. The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature. The choice of temperature is controlled by the current field—temperature control type. The user must select from the following options:
 
-MeanAirTemperature
+* MeanAirTemperature
 
-MeanRadiantTemperature
+* MeanRadiantTemperature
 
-OperativeTemperature
+* OperativeTemperature
 
-OutdoorDryBulbTemperature
+* OutdoorDryBulbTemperature
 
-OutdoorWetBulbTemperature
+* OutdoorWetBulbTemperature
 
 Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, **MeanAirTemperature** control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
 
@@ -17547,25 +15227,25 @@ An example IDF with a hydronic low temperature radiant system is shown below.
 
 ### Low Temperature Radiant Variable Flow (ZoneHVAC) Outputs
 
-HVAC,Average,Zone Radiant HVAC Heating Rate [W]
+* HVAC,Average,Zone Radiant HVAC Heating Rate [W]
 
-HVAC,Sum,Zone Radiant HVAC Heating Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Heating Energy [J]
 
-HVAC,Average,Zone Radiant HVAC Cooling Rate [W]
+* HVAC,Average,Zone Radiant HVAC Cooling Rate [W]
 
-HVAC,Sum,Zone Radiant HVAC Cooling Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Cooling Energy [J]
 
-HVAC,Average,Zone Radiant HVAC Mass Flow Rate [kg/s]
+* HVAC,Average,Zone Radiant HVAC Mass Flow Rate [kg/s]
 
-HVAC,Average,Zone Radiant HVAC Inlet Temperature [C]
+* HVAC,Average,Zone Radiant HVAC Inlet Temperature [C]
 
-HVAC,Average,Zone Radiant HVAC Outlet Temperature [C]
+* HVAC,Average,Zone Radiant HVAC Outlet Temperature [C]
 
-HVAC,Sum,Zone Radiant HVAC Moisture Condensation Time[s]
+* HVAC,Sum,Zone Radiant HVAC Moisture Condensation Time[s]
 
-HVAC,Sum,Zone Radiant HVAC Heating Fluid Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Heating Fluid Energy [J]
 
-HVAC,Sum,Zone Radiant HVAC Cooling Fluid Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Cooling Fluid Energy [J]
 
 #### Zone Radiant HVAC Heating Rate [W]
 
@@ -17643,15 +15323,15 @@ This field is the total length of pipe embedded in the surface named above in th
 
 This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature. The choice of temperature is controlled by the current field—temperature control type. The user must select from the following options:
 
-MeanAirTemperature
+* MeanAirTemperature
 
-MeanRadiantTemperature
+* MeanRadiantTemperature
 
-OperativeTemperature
+* OperativeTemperature
 
-OutdoorDryBulbTemperature
+* OutdoorDryBulbTemperature
 
-OutdoorWetBulbTemperature
+* OutdoorWetBulbTemperature
 
 Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, **MeanAirTemperature** control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
 
@@ -17782,41 +15462,41 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
 
 ### Low Temperature Radiant Constant Flow (ZoneHVAC) Outputs
 
-HVAC,Average,Zone Radiant HVAC Heating Rate [W]
+* HVAC,Average,Zone Radiant HVAC Heating Rate [W]
 
-HVAC,Sum,Zone Radiant HVAC Heating Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Heating Energy [J]
 
-HVAC,Average,Zone Radiant HVAC Cooling Rate [W]
+* HVAC,Average,Zone Radiant HVAC Cooling Rate [W]
 
-HVAC,Sum,Zone Radiant HVAC Cooling Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Cooling Energy [J]
 
-HVAC,Average,Zone Radiant HVAC Mass Flow Rate [kg/s]
+* HVAC,Average,Zone Radiant HVAC Mass Flow Rate [kg/s]
 
-HVAC,Average,Zone Radiant HVAC Injection Mass Flow Rate [kg/s]
+* HVAC,Average,Zone Radiant HVAC Injection Mass Flow Rate [kg/s]
 
-HVAC,Average,Zone Radiant HVAC Recirculation Mass Flow Rate [kg/s]
+* HVAC,Average,Zone Radiant HVAC Recirculation Mass Flow Rate [kg/s]
 
-HVAC,Average,Zone Radiant HVAC Inlet Temperature [C]
+* HVAC,Average,Zone Radiant HVAC Inlet Temperature [C]
 
-HVAC,Average,Zone Radiant HVAC Outlet Temperature [C]
+* HVAC,Average,Zone Radiant HVAC Outlet Temperature [C]
 
-HVAC,Average,Zone Radiant HVAC Pump Inlet Temperature [C]
+* HVAC,Average,Zone Radiant HVAC Pump Inlet Temperature [C]
 
-HVAC,Average,Zone Radiant HVAC Pump Electric Power[W]
+* HVAC,Average,Zone Radiant HVAC Pump Electric Power[W]
 
-HVAC,Sum,Zone Radiant HVAC Pump Electric Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Pump Electric Energy [J]
 
-HVAC,Average,Zone Radiant HVAC Pump Mass Flow Rate [kg/s]
+* HVAC,Average,Zone Radiant HVAC Pump Mass Flow Rate [kg/s]
 
-HVAC,Average,Zone Radiant HVAC Pump Fluid Heat Gain Rate [W]
+* HVAC,Average,Zone Radiant HVAC Pump Fluid Heat Gain Rate [W]
 
-HVAC,Sum,Zone Radiant HVAC Pump Fluid Heat Gain Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Pump Fluid Heat Gain Energy [J]
 
-HVAC,Sum,Zone Radiant HVAC Moisture Condensation Time [s]
+* HVAC,Sum,Zone Radiant HVAC Moisture Condensation Time [s]
 
-HVAC,Sum,Zone Radiant HVAC Cooling Fluid Heat Transfer Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Cooling Fluid Heat Transfer Energy [J]
 
-HVAC,Sum,Zone Radiant HVAC Heating Fluid Heat Transfer Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Heating Fluid Heat Transfer Energy [J]
 
 
 
@@ -17934,15 +15614,15 @@ Enter the heating capacity as a fraction of the autosized heating capacity of lo
 
 This field specifies along with the throttling range and setpoint schedules how the user wishes to control the low temperature electric radiant system. The temperature denoted in the setpoint schedule can refer to one of three different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature. The choice of temperature is controlled by the current field—temperature control type. The user must select from the following options:
 
-MeanAirTemperature
+* MeanAirTemperature
 
-MeanRadiantTemperature
+* MeanRadiantTemperature
 
-OperativeTemperature
+* OperativeTemperature
 
-OutdoorDryBulbTemperature
+* OutdoorDryBulbTemperature
 
-OutdoorWetBulbTemperature
+* OutdoorWetBulbTemperature
 
 Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, **MeanAirTemperature** control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
 
@@ -17972,13 +15652,13 @@ ZoneHVAC:LowTemperatureRadiant:Electric, Zone 2 Radiant Floor,
 
 ### Low Temperature Radiant Electric (ZoneHVAC) Outputs
 
-HVAC,Average, Zone Radiant HVAC Electric Power[W]
+* HVAC,Average, Zone Radiant HVAC Electric Power[W]
 
-HVAC,Sum, Zone Radiant HVAC Electric Energy [J]
+* HVAC,Sum, Zone Radiant HVAC Electric Energy [J]
 
-HVAC,Sum,Zone Radiant HVAC Heating Energy [J]
+* HVAC,Sum,Zone Radiant HVAC Heating Energy [J]
 
-HVAC,Average, Zone Radiant HVAC Heating Rate [W]
+* HVAC,Average, Zone Radiant HVAC Heating Rate [W]
 
 #### Zone Radiant HVAC Electric Power [W]
 
@@ -18083,17 +15763,17 @@ This field specifies the fraction of power input to the high temperature radiant
 
 This field specifies along with the throttling range and setpoint schedules how the user wishes to control the high temperature radiant system. The temperature denoted in the setpoint schedule can refer to one of three different temperatures: a mean air temperature, a mean radiant temperature, or an operative temperature. The choice of temperature is controlled by the current field—temperature control type. The user must select from the following options:
 
-MeanAirTemperature
+* MeanAirTemperature
 
-MeanRadiantTemperature
+* MeanRadiantTemperature
 
-OperativeTemperature
+* OperativeTemperature
 
-MeanAirTemperatureSetpoint
+* MeanAirTemperatureSetpoint
 
-MeanRadiantTemperatureSetpoint
+* MeanRadiantTemperatureSetpoint
 
-OperativeTemperatureSetpoint
+* OperativeTemperatureSetpoint
 
 If the user does not select a control type, OperativeTemperature control is assumed by EnergyPlus. For the setpoint control strategies (those ending in Setpoint above), EnergyPlus will attempt to find the correct heater output to meet the heating setpoint temperature (see below) through iteration and interpolation. This will more closely match the operation of an actual thermostat, but it will require significantly longer execution times.  For more information on the standard piecewise linear control algorithm used by the Mean Air Temperature, Mean Radiant Temperature, and Operative Temperature control types (the “non-Setpoint” controls), see the throttling range and control temperature schedule fields below for more information.
 
@@ -18148,17 +15828,17 @@ ZoneHVAC:HighTemperatureRadiant, Zone 2 Radiant Heater,
 
 ### High Temperature Radiant (ZoneHVAC) Outputs
 
-HVAC,Average, Zone Radiant HVAC Heating Rate [W]
+* HVAC,Average, Zone Radiant HVAC Heating Rate [W]
 
-HVAC,Sum, Zone Radiant HVAC Heating Energy [J]
+* HVAC,Sum, Zone Radiant HVAC Heating Energy [J]
 
-HVAC,Average, Zone Radiant HVAC Gas Rate [W]
+* HVAC,Average, Zone Radiant HVAC Gas Rate [W]
 
-HVAC,Sum, Zone Radiant HVAC Gas Energy [J]
+* HVAC,Sum, Zone Radiant HVAC Gas Energy [J]
 
-HVAC,Average, Zone Radiant HVAC Electric Power[W]
+* HVAC,Average, Zone Radiant HVAC Electric Power[W]
 
-HVAC,Sum, Zone Radiant HVAC Electric Energy [J]
+* HVAC,Sum, Zone Radiant HVAC Electric Energy [J]
 
 #### Zone Radiant HVAC Heating Rate [W]
 
@@ -18240,11 +15920,11 @@ This field can have one of two meanings depending the type of control selected i
 
 This field allows the user to control how the air is circulated using the ventilated slab system.  The options for system configuration are
 
-SlabOnly
+* SlabOnly
 
-SlabAndZone
+* SlabAndZone
 
-SeriesSlabs
+* SeriesSlabs
 
 In the **SlabOnly**, the ventilation air is sent to the slab only and does not enter the zone.  In the **SlabAndZone**, the air first enters the slab and then is delivered to the zone before returning to the system. With the **SeriesSlabs** option, the user specifies a list of slabs (ZoneHVAC:VentilatedSlab:SlabGroup). This list determines the order of slabs through which the air passes.  In this option, air is not delivered to any zone.
 
@@ -18264,19 +15944,19 @@ This field allows the user to specify how many cores there are in the ventilated
 
 This field specifies along with the throttling range and setpoint schedules how the user wishes to control the ventilated slab system.  The temperature denoted in the set temperature schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the surface temperature of the ventilated slab, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, or the dewpoint temperature of zone mean air temperature.  The choice of temperature is controlled by the current field—temperature control type.  The user must select from the following options:
 
-MeanAirTemperature
+* MeanAirTemperature
 
-MeanRadiantTemperature
+* MeanRadiantTemperature
 
-OperativeTemperature
+* OperativeTemperature
 
-OutdoorDryBulbTemperature
+* OutdoorDryBulbTemperature
 
-OutdoorWetBulbTemperature
+* OutdoorWetBulbTemperature
 
-SurfaceTemperature
+* SurfaceTemperature
 
-ZoneAirDewPointTemperature
+* ZoneAirDewPointTemperature
 
 If the user does not select a control type, **MeanAirTemperature** control is assumed by EnergyPlus. See the control temperature schedule fields below for more information.
 
@@ -18348,13 +16028,13 @@ This field is the name of a fan (ref: Fan:ConstantVolume) that is part of the ve
 
 This field allows the user to specify the coil operating options as one of the following options:
 
-None
+* None
 
-Heating
+* Heating
 
-Cooling
+* Cooling
 
-HeatingAndCooling
+* HeatingAndCooling
 
 If **None** is selected, the ventilated slab does not have any coils, and any other input will be ignored. If either **Heating** or **Cooling** is selected, only a heating or cooling coil, respectively, is present.  Thus, only four more inputs will be expected. If **HeatingAndCooling** is selected, both heating and cooling coil input must be entered, and the ventilated slab will have both a heating and a cooling coil.
 
@@ -18391,130 +16071,92 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
 
 An example IDF with a ventilated slab is shown below.
-
+```idf
   ZoneHVAC:VentilatedSlab,
-
     Zone4VentSlab,           !- Name
-
     VentSlabAvailability,    !- Availability Schedule Name
-
     SPACE4-1,                !- Zone Name
-
     F4-1,                    !- Surface Name or Radiant Surface Group Name
-
     0.84,                    !- Maximum Air Flow Rate {m3/s}
-
     VariablePercent,         !- Outdoor Air Control Type
-
     0.168,                   !- Minimum Outdoor Air Flow Rate {m3/s}
-
     U2MinOASched,            !- Minimum Outdoor Air Schedule Name
-
     0.84,                    !- Maximum Outdoor Air Flow Rate {m3/s}
-
     VentSlabMaxOA,           !- Maximum Outdoor Air Fraction or Temperature Schedule Name
-
     SlabAndZone,             !- System Configuration Type
-
     0.050,                   !- Hollow Core Inside Diameter {m}
-
     15.0,                    !- Hollow Core Length {m}
-
     50.0,                    !- Number of Cores
-
     MeanRadiantTemperature,  !- Temperature Control Type
-
     VentSlabHotHighAir,      !- Heating High Air Temperature Schedule Name
-
     VentSlabHotLowAir,       !- Heating Low Air Temperature Schedule Name
-
     VentSlabHotHighControl,  !- Heating High Control Temperature Schedule Name
-
     VentSlabHotLowControl,   !- Heating Low Control Temperature Schedule Name
-
     VentSlabCoolHighAir,     !- Cooling High Air Temperature Schedule Name
-
     VentSlabCoolLowAir,      !- Cooling Low Air Temperature Schedule Name
-
     VentSlabCoolHighControl, !- Cooling High Control Temperature Schedule Name
-
     VentSlabCoolLowControl,  !- Cooling Low Control Temperature Schedule Name
-
     Zone4VentSlabReturnAirNode,  !- Return Air Node Name
-
     Zone4VentslabSlabInNode, !- Slab In Node Name
-
     Zone4Inlets,             !-Zone Supply Air Node Name
-
     Zone4VentSlabOAInNode,   !- Outdoor Air Node Name
-
     Zone4VentSlabExhNode,    !- Relief Air Node Name
-
     Zone4VentSlabOAMixerOutletNode,  !-Outdoor Air Mixer Outlet Node Name
-
     Zone4VentSlabFanOutletNode,  !- Fan Outlet Node Name
-
     Zone4VentSlabFan,        !- Fan Name
-
     HeatingAndCooling,       !- Coil Option Type
-
     Coil:Heating:Electric,   !- Heating Coil Object Type
-
     Zone4VentSlabHeatingCoil,!- Heating Coil Name
-
     ,                        !- Hot Water or Steam Inlet Node Name
-
     Coil:Cooling:Water,      !- Cooling Coil Object Type
-
     Zone4VentSlabCoolingCoil,!- Cooling Coil Name
-
     Zone4VentSlabChWInletNode;  !- Cold Water Inlet Node Name
-
+```
 
 
 ### Ventilated Slab (ZoneHVAC) Outputs
 
-HVAC,Average,Zone Ventilated Slab Radiant Heating Rate [W]
+* HVAC,Average,Zone Ventilated Slab Radiant Heating Rate [W]
 
-HVAC,Sum,Zone Ventilated Slab Radiant Heating Energy [J]
+* HVAC,Sum,Zone Ventilated Slab Radiant Heating Energy [J]
 
-HVAC,Average,Zone Ventilated Slab Radiant Cooling Rate [W]
+* HVAC,Average,Zone Ventilated Slab Radiant Cooling Rate [W]
 
-HVAC,Sum,Zone Ventilated Slab Radiant Cooling Energy [J]
+* HVAC,Sum,Zone Ventilated Slab Radiant Cooling Energy [J]
 
-HVAC,Average,Zone Ventilated Slab Coil Heating Rate [W]
+* HVAC,Average,Zone Ventilated Slab Coil Heating Rate [W]
 
-HVAC,Sum,Zone Ventilated Slab Coil Heating Energy [J]
+* HVAC,Sum,Zone Ventilated Slab Coil Heating Energy [J]
 
-HVAC,Average,Zone Ventilated Slab Coil Total Cooling Rate [W]
+* HVAC,Average,Zone Ventilated Slab Coil Total Cooling Rate [W]
 
-HVAC,Sum,Zone Ventilated Slab Coil Total Cooling Energy [J]
+* HVAC,Sum,Zone Ventilated Slab Coil Total Cooling Energy [J]
 
-HVAC,Average,Zone Ventilated Slab Coil Sensible Cooling Rate [W]
+* HVAC,Average,Zone Ventilated Slab Coil Sensible Cooling Rate [W]
 
-HVAC,Sum,Zone Ventilated Slab Coil Sensible Cooling Energy [J]
+* HVAC,Sum,Zone Ventilated Slab Coil Sensible Cooling Energy [J]
 
-HVAC,Average,Zone Ventilated Slab Coil Latent Cooling Rate [W]
+* HVAC,Average,Zone Ventilated Slab Coil Latent Cooling Rate [W]
 
-HVAC,Sum,Zone Ventilated Slab Coil Latent Cooling Energy [J]
+* HVAC,Sum,Zone Ventilated Slab Coil Latent Cooling Energy [J]
 
-HVAC,Average, Zone Ventilated Slab Air Mass Flow Rate [kg/s]
+* HVAC,Average, Zone Ventilated Slab Air Mass Flow Rate [kg/s]
 
-HVAC,Average, Zone Ventilated Slab Fan Electric Power [W]
+* HVAC,Average, Zone Ventilated Slab Fan Electric Power [W]
 
-HVAC,Sum,Zone Ventilated Slab Fan Electric Energy [J]
+* HVAC,Sum,Zone Ventilated Slab Fan Electric Energy [J]
 
-HVAC,Average,Zone Ventilated Slab Inlet Air Temperature [C]
+* HVAC,Average,Zone Ventilated Slab Inlet Air Temperature [C]
 
-HVAC,Average,Zone Ventilated Slab Outlet Air Temperature [C]
+* HVAC,Average,Zone Ventilated Slab Outlet Air Temperature [C]
 
-HVAC,Average,Zone Ventilated Slab Zone Inlet Air Temperature [C]
+* HVAC,Average,Zone Ventilated Slab Zone Inlet Air Temperature [C]
 
-HVAC,Average,Zone Ventilated Slab Return Air Temperature [C]
+* HVAC,Average,Zone Ventilated Slab Return Air Temperature [C]
 
-HVAC,Average,Zone Ventilated Slab Fan Outlet Air Temperature [C]
+* HVAC,Average,Zone Ventilated Slab Fan Outlet Air Temperature [C]
 
-HVAC,Average,Zone Ventilated Slab Fan Availability Status []
+* HVAC,Average,Zone Ventilated Slab Fan Availability Status []
 
 #### Zone Ventilated Slab Radiant Heating Rate  [W]
 
@@ -18638,51 +16280,31 @@ This field is a node name (character string) used to identify the node that serv
 
 An Example IDF with a ventilated slab system is shown below
 
+```idf
 ZoneHVAC:VentilatedSlab:SlabGroup,
-
     Z125,                    !- Name
-
     SPACE1-1,                !- Zone 1 Name
-
     C1-1,                    !- Surface 1 Name
-
     0.05,                    !- Core Diameter for Surface 1
-
     30,                      !- Core Length for Surface 1
-
     20,                      !- Core Numbers for Surface 1
-
     Z1VentslabIn,            !- Slab In Node Name for Surface 1
-
     Z1VentSlabout,           !- Slab Outlet Node Name for Surface 1
-
     SPACE2-1,                !- Zone 2 Name
-
     C2-1,                    !- Surface 2 Name
-
     0.05,                    !- Core Diameter for Surface 2
-
     15,                      !- Core Length for Surface 2
-
     20,                      !- Core Numbers for Surface 2
-
     Z2VentSlabIn,            !- Slab In Node Name for Surface 2
-
     Z2VentSlabOut,           !- Slab Outlet Node Name for Surface 2
-
     SPACE5-1,                !- Zone 3 Name
-
     C5-1,                    !- Surface 3 Name
-
     0.05,                    !- Core Diameter for Surface 3
-
     30,                      !- Core Length for Surface 3
-
     20,                      !- Core Numbers for Surface 3
-
     Z5VentSlabIn,            !- Slab In Node Name for Surface 3
-
     Z5VentSlabOut;           !- Slab Outlet Node Name for Surface 3
+```
 
 
 
@@ -18877,132 +16499,110 @@ If the Heat Rejection Location is “Zone” and any walk-in coolers are connect
 
 The following is an example input for a  Refrigeration Compressor Rack with water cooled condenser.
 
+```idf
 Refrigeration:CompressorRack,
-
     MediumTempRack,          !- Name
-
     Outdoors,                !- Heat Rejection Location
-
     1.7,                     !- Design Compressor Rack COP {W/W}
-
     RackCOPfTCurve,          !- Compressor Rack COP as a Function of Temperature Curve Name
-
     1025.0,                  !- Design Condenser Fan Power {W}
-
     RackCondFanCurve,        !- Condenser Fan Power as a Function of Temperature Curve Name
-
     WaterCooled,             !- Condenser Type
-
     Condenser Inlet Node,    !- Water-cooled Condenser Inlet Node Name
-
     Condenser Outlet Node,   !- Water-cooled Condenser Outlet Node Name
-
     VariableFlow,            !- Water-cooled Loop Flow Type
-
     Cond Outlet Temp Sch,    !- Water-cooled Condenser Outlet Temperature Schedule Name
-
     ,                        !- Water-cooled Condenser Design Flow Rate {m3/s}
-
     0.003,                   !- Water-cooled Condenser Maximum Flow Rate {m3/s}
-
     55,                      !- Water-cooled Condenser Maximum Water Outlet Temperature {C}
-
     ,                        !- Water-cooled Condenser Minimum Water Inlet Temperature {C}
-
     ,                        !- Evaporative Condenser Availability Schedule Name
-
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-
     ,                        !- Evaporative Condenser Air Volume Flow Rate {m3/s}
-
     ,                        !- Basin Heater Capacity {W/K}
-
     ,                        !- Basin Heater Set Point Temperature {C}
-
     ,                        !- Design Evaporative Condenser Water Pump Power {W}
-
     ,                        !- Evaporative Water Supply Tank Name
-
     ,                        !- Condenser Air Inlet Node Name
-
     ,                        !- End-Use Subcategory
-
     MediumTempCaseList;      !- Refrigeration Case Name or WalkIn Name or CaseAndWalkInList Name
+```
+
 
 ### Refrigeration Compressor Rack Outputs
 
 If Condenser Type = Water Cooled:
 
-System,Average, Refrigeration Compressor Rack Condenser Refrigerant Mass Flow Rate [kg/s]
+* System,Average, Refrigeration Compressor Rack Condenser Refrigerant Mass Flow Rate [kg/s]
 
-System,Average, Refrigeration Compressor Rack Condenser Heat Transfer Rate [W]
+* System,Average, Refrigeration Compressor Rack Condenser Heat Transfer Rate [W]
 
-System,Sum, Refrigeration Compressor Rack Condenser Heat Transfer Energy [J]
+* System,Sum, Refrigeration Compressor Rack Condenser Heat Transfer Energy [J]
 
 
 
 IF THE RACK SERVES CASES AND/OR WALKINS:
 
-Zone,Average, Refrigeration Compressor Rack Electric Power [W]
+* Zone,Average, Refrigeration Compressor Rack Electric Power [W]
 
-Zone,Sum, Refrigeration Compressor Rack Electric Energy [J]
+* Zone,Sum, Refrigeration Compressor Rack Electric Energy [J]
 
-Zone,Average, Refrigeration Compressor Rack Condenser Fan Electric Power [W]
+* Zone,Average, Refrigeration Compressor Rack Condenser Fan Electric Power [W]
 
-Zone,Sum, Refrigeration Compressor Rack Condenser Fan Electric Energy [J]
+* Zone,Sum, Refrigeration Compressor Rack Condenser Fan Electric Energy [J]
 
-Zone,Average, Refrigeration Compressor Rack Total Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Compressor Rack Total Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Compressor Rack Total Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Compressor Rack Total Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Compressor Rack COP [W/W]
+* Zone,Average, Refrigeration Compressor Rack COP [W/W]
 
 
 If Condenser Type = Evap Cooled:
 
-Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Pump Electric Power [W]
+* Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Pump Electric Power [W]
 
-Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Pump Electric Energy [J]
+* Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Pump Electric Energy [J]
 
-Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Power [W]
+* Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Power [W]
 
-Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Energy [J]
+* Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Energy [J]
 
-Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Water Volume Flow Rate [m<sup>3</sup>/s]
+* Zone,Average, Refrigeration Compressor Rack Evaporative Condenser Water Volume Flow Rate [m<sup>3</sup>/s]
 
-Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Water Volume [m<sup>3</sup>]
+* Zone,Sum, Refrigeration Compressor Rack Evaporative Condenser Water Volume [m<sup>3</sup>]
 
 
 
 If Heat Rejection Location = Zone:
 
-Zone,Average, Refrigeration Compressor Rack Zone Sensible Heating Rate [W]
+* Zone,Average, Refrigeration Compressor Rack Zone Sensible Heating Rate [W]
 
-Zone,Sum,Refrigeration Compressor Rack Zone Sensible Heating Energy [J]
+* Zone,Sum,Refrigeration Compressor Rack Zone Sensible Heating Energy [J]
 
-Zone,Average, Refrigeration Compressor Rack Return Air Sensible Heating Rate [W]
+* Zone,Average, Refrigeration Compressor Rack Return Air Sensible Heating Rate [W]
 
-Zone,Sum,Refrigeration Compressor Rack Return Air Sensible Heating Energy [J]
+* Zone,Sum,Refrigeration Compressor Rack Return Air Sensible Heating Energy [J]
 
 
 
 IF THE RACK SERVES REFRIGERATION CHILLERS
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack Electric Power [W]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack Electric Power [W]
 
-HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electric Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electric Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller System Compressor Runtime Fraction []
+* HVAC,Average,Refrigeration Air Chiller System Compressor Runtime Fraction []
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Power [W]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Power [W]
 
-HVAC,Sum, Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack Total Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack Total Heat Transfer Rate [W]
 
-HVAC,Sum, Refrigeration Air Chiller Compressor Rack Total Heat Transfer Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller Compressor Rack Total Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack COP [W/W]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack COP [W/W]
 
 
 
@@ -19013,28 +16613,28 @@ HVAC,Average, Refrigeration Air Chiller Compressor Rack COP [W/W]
 
 If Condenser Type = Evap Cooled:
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Power [W]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Power [W]
 
-HVAC,Sum, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Power [W]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Power [W]
 
-HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electric PowerRefrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller Compressor Rack Electric PowerRefrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume Flow Rate [m3/s]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume Flow Rate [m3/s]
 
-HVAC,Sum, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume [m3]
+* HVAC,Sum, Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume [m3]
 
 
 If Heat Rejection Location = Zone:
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack Zone Sensible Heating Rate [W]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack Zone Sensible Heating Rate [W]
 
-HVAC,Sum,Refrigeration Air Chiller Compressor Rack Zone Sensible Heating Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller Compressor Rack Zone Sensible Heating Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller Compressor Rack Return Air Sensible Heating Rate [W]
+* HVAC,Average, Refrigeration Air Chiller Compressor Rack Return Air Sensible Heating Rate [W]
 
-HVAC,Sum,Refrigeration Air Chiller Compressor Rack Return Air Sensible Heating Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller Compressor Rack Return Air Sensible Heating Energy [J]
 
 #### Refrigeration Compressor Rack Condenser Mass Flow Rate [kg/s]
 
@@ -19388,143 +16988,110 @@ The value of this optional field is the refrigerant inventory present in the ref
 
 The following is an example input for a refrigerated case.
 
+```idf
  Refrigeration:Case,
-
   Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Name [Based on Hill Phoenix 6DMLH-NRG]
-
   ,   !- Availability Schedule [Used to turn case on/off including all power draws (ie fans, lights, etc)]
-
   UserProvideZoneName,    !- Zone Name [Location of Fixture]
-
   23.89,                  !- Rated Ambient Temperature {C}  [75øF]
-
   55,                     !- Rated Ambient Relative Humidity {percent}
-
   1394,         !- Rated Total Cooling Capacity per Unit length {W/m}  [1,450 Btu/hr/ft = 11,600 Btu/hr]
-
   0.30,                   !- Rated Latent Heat Ratio  [ Rated Latent Capacity]
-
   0.85,                   !- Rated Runtime Fraction
-
   2.4,                    !- Case Length {m}  [8 ft]
-
   3.33,                   !- Case Operating Temperature {C}  [38øF]
-
   CaseTemperatureMethod,  !- Latent Case Credit Curve Type
-
-  Multi\_Shelf\_Vertical\_Latent\_Case\_Credit\_Curve,            !- Latent Case Credit Curve Name
-
+  Multi_Shelf_Vertical_Latent_Case_Credit_Curve,            !- Latent Case Credit Curve Name
   27.3,                   !- Standard Case Fan Power per Unit Length {W/m}  [8.3 W/ft]
-
   27.3,                   !- Operating Case Fan Power per Unit Length {W/m}  [8.3 W/ft = 67 W]
-
   0.0,                    !- Standard Case Lighting Power per Unit Length {W/m}  [0.0 W/ft]
-
   114.8,                  !- Installed Case Lighting Power per Unit Length {W/m}  [35.0 W/ft = 280 W]
-
   ,                       !- Case Lighting Schedule Name
-
   1.0,                    !- Fraction Of Lighting Energy To Case
-
   0.0,                    !- Case Anti-Sweat Heater Power per Unit Length {W/m}  [0.0 W/ft = 0 W]
-
   ,                       !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}  []
-
   None,                   !- Anti-Sweat Heater Control Type
-
   ,                       !- Humidity At Zero Anti-Sweat Heater Energy {%}
-
   ,                       !- Case Height {m}  []
-
   1.0,                    !- Fraction of Anti-Sweat Heater Energy To Case
-
   0.0,                    !- Case Defrost Power per Unit Length {W/m}  [0.0 W/ft  0 W]
-
   Off Cycle,              !- Case Defrost Type
-
   UserProvideDefSched6PerDay45MinEa,                        !- Case Defrost Schedule Name
-
   UserProvideDefSched4PerDay42MinEa,                        !- Case Defrost Drip-Down Schedule
-
   CaseTemperatureMethod,  !- Defrost Energy Correction Curve Type
-
   Multi Shelf Vertical,   !- Defrost Energy Correction Curve Name
-
   0.00,                   !- Under Case HVAC Return Air Fraction
-
   ,                       !- Refrigerated Case Restocking Schedule Name  [Not modeling any restocking]
-
   ,                       !- Case Credit Fraction Schedule Name
-
   -3.33,                  !- Design Evaporator Temperature or Brine Inlet Temperature {C}  [26øF]
-
   ;                       !- Average Refrigerant Charge Inventory {kg/m}  [ = ]
+```
 
 
 
 ### Refrigeration:Case Outputs
 
-Zone,Average,Refrigeration Case Evaporator Total Cooling Rate [W]
+* Zone,Average,Refrigeration Case Evaporator Total Cooling Rate [W]
 
-Zone,Sum,Refrigeration Case Evaporator Total Cooling Energy [J]
+* Zone,Sum,Refrigeration Case Evaporator Total Cooling Energy [J]
 
-Zone,Average,Refrigeration Case Evaporator Sensible Cooling Rate [W]
+* Zone,Average,Refrigeration Case Evaporator Sensible Cooling Rate [W]
 
-Zone,Sum,Refrigeration Case Evaporator Sensible Cooling Energy [J]
+* Zone,Sum,Refrigeration Case Evaporator Sensible Cooling Energy [J]
 
-Zone,Average, Refrigeration Case Evaporator Latent Cooling Rate [W]
+* Zone,Average, Refrigeration Case Evaporator Latent Cooling Rate [W]
 
-Zone,Sum, Refrigeration Case Evaporator Latent Cooling Energy [J]
+* Zone,Sum, Refrigeration Case Evaporator Latent Cooling Energy [J]
 
-Zone,Average,Refrigeration Case Zone Sensible Cooling Rate [W]
+* Zone,Average,Refrigeration Case Zone Sensible Cooling Rate [W]
 
-Zone,Sum,Refrigeration Case Zone Sensible Cooling Energy [J]
+* Zone,Sum,Refrigeration Case Zone Sensible Cooling Energy [J]
 
-Zone,Average,Refrigeration Case Zone Sensible Heating Rate [W]
+* Zone,Average,Refrigeration Case Zone Sensible Heating Rate [W]
 
-Zone,Sum,Refrigeration Case Zone Sensible Heating Energy [J]
+* Zone,Sum,Refrigeration Case Zone Sensible Heating Energy [J]
 
-Zone,Average,Refrigeration Case Zone Latent Rate [W]
+* Zone,Average,Refrigeration Case Zone Latent Rate [W]
 
-Zone,Sum,Refrigeration Case Zone Latent Energy [J]
+* Zone,Sum,Refrigeration Case Zone Latent Energy [J]
 
-Zone,Average,Refrigeration Case Return Air Sensible Cooling Rate [W]
+* Zone,Average,Refrigeration Case Return Air Sensible Cooling Rate [W]
 
-Zone,Sum,Refrigeration Case Return Air Sensible Cooling Energy [J]
+* Zone,Sum,Refrigeration Case Return Air Sensible Cooling Energy [J]
 
-Zone,Average,Refrigeration Case Return Air Sensible Heating Rate [W]
+* Zone,Average,Refrigeration Case Return Air Sensible Heating Rate [W]
 
-Zone,Sum,Refrigeration Case Return Air Sensible Heating Energy [J]
+* Zone,Sum,Refrigeration Case Return Air Sensible Heating Energy [J]
 
-Zone,Average,Refrigeration Case Return Air Latent Rate [W]
+* Zone,Average,Refrigeration Case Return Air Latent Rate [W]
 
-Zone,Sum,Refrigeration Case Return Air Latent Energy [J]
+* Zone,Sum,Refrigeration Case Return Air Latent Energy [J]
 
-Zone,Average,Refrigeration Case Evaporator Fan Electric Power [W]
+* Zone,Average,Refrigeration Case Evaporator Fan Electric Power [W]
 
-Zone,Sum,Refrigeration Case Evaporator Fan Electric Energy [J]
+* Zone,Sum,Refrigeration Case Evaporator Fan Electric Energy [J]
 
-Zone,Average,Refrigeration Case Lighting Electric Power [W]
+* Zone,Average,Refrigeration Case Lighting Electric Power [W]
 
-Zone,Sum,Refrigeration Case Lighting Electric Energy [J]
+* Zone,Sum,Refrigeration Case Lighting Electric Energy [J]
 
-Zone,Average,Refrigeration Case Latent Credit Curve Value []
+* Zone,Average,Refrigeration Case Latent Credit Curve Value []
 
 If case defrost type is Electric, Hot-Gas, or Hot-Brine with Temperature Termination
 
-Zone,Average,Refrigeration Case Defrost Energy Correction Curve Value
+* Zone,Average,Refrigeration Case Defrost Energy Correction Curve Value
 
 If anti-sweat heater control type is not equal to None:
 
-Zone,Average,Refrigeration Case Anti Sweat Electric Power [W]
+* Zone,Average,Refrigeration Case Anti Sweat Electric Power [W]
 
-Zone,Sum,Refrigeration Case Anti Sweat Electric Energy [J]
+* Zone,Sum,Refrigeration Case Anti Sweat Electric Energy [J]
 
 If case defrost type is Electric or Electric with Temperature Termination:
 
-Zone,Average,Refrigeration Case Defrost Electric Power [W]
+* Zone,Average,Refrigeration Case Defrost Electric Power [W]
 
-Zone,Sum,Refrigeration Case Defrost Electric Energy [J]
+* Zone,Sum,Refrigeration Case Defrost Electric Energy [J]
 
 #### Refrigeration Case Evaporator Total Cooling Rate [W]
 
@@ -19650,17 +17217,14 @@ Identifies a particular refrigerated case or walk-in. The name will be validated
 
 The following is an example input for a CaseAndWalkInList.
 
+```idf
 Refrigeration:CaseAndWalkInList,
-
     MediumTempCaselist,      !- Name
-
     UprightDairyCase,        !- Refrigeration Case or WalkIn Name \#1
-
     LunchmeatCase,           !- Refrigeration Case or WalkIn Name \#2
-
     MeatWalkIn,              !- Refrigeration Case or WalkIn Name \#3
-
     DeliCaseOne;             !- Refrigeration Case or WalkIn Name \#4
+```
 
 
 
@@ -19812,131 +17376,99 @@ The type of stocking door opening protection used for this walkin. Valid choices
 
 The following is an example input for a refrigeration walkin.
 
+```idf
    Refrigeration:WalkIn,
-
     WalkInFreezer,           !- Name
-
     CaseOperatingSched,      !- Availability Schedule Name
-
     4690.,                   !- Rated Coil Cooling Capacity {W}
-
     -2.22,                   !- Operating Temperature {C}
-
     -6.67,                   !- Rated Cooling Source Temperature {C}
-
     0.0,                     !- Rated Total Heating Power {W}
-
     CaseOperatingSched,      !- Heating Power Schedule Name
-
     735.,                    !- Rated Cooling Coil Fan Power {W}
-
     0.0,                     !- Rated Circulation Fan Power {W}
-
     120.,                    !- Rated Total Lighting Power {W}
-
     CaseLightingSched2,      !- Lighting Schedule Name
-
     Electric,                !- Defrost Type
-
     TimeSchedule,            !- Defrost Control Type
-
     CaseDefrostSched3,       !- Defrost Schedule Name
-
     CaseDripDownSched3,      !- Defrost Drip-Down Schedule Name
-
     5512.,                   !- Defrost Power {W}
-
     ,                        !- Temperature Termination Defrost Fraction to Ice {dimensionless}
-
     WalkInStockingSched,     !- Restocking Schedule Name
-
     ,                        !- Average Refrigerant Charge Inventory {kg}
-
     13.0,                    !- Insulated Floor Surface Area {m2}
-
     0.207,                   !- Insulated Floor U-Value {W/m2-C}
-
     BackRoom,                !- Zone Name
-
     43.4,                    !- Total Insulated Surface Area Facing this Zone {m2}
-
     .235,                    !- Insulated Surface U-Value Facing this Zone {W/m2-C}
-
     ,                        !- Area of Glass Reach In Doors Facing this Zone {m2}
-
     ,                        !- Height of Glass Reach In Doors Facing this Zone {m}
-
     ,                        !- Glass Reach In Door U Value Facing this Zone {W/m2-C}
-
     ,                        !- Glass Reach In Door Opening Schedule Name Facing this Zone
-
     2.0,                     !- Area of Stocking Doors Facing this Zone {m2}
-
     2.0,                     !- Height of Stocking Doors Facing this Zone {m}
-
     ,                        !- Stocking Door U Value Facing this Zone {W/m2-C}
-
     WIStockDoorOpenSch,      !- Stocking Door Opening Schedule Name Facing this Zone
-
     StripCurtain;            !- Stocking Door Opening Protection Type Facing this Zone
-
+```
 
 
 
 
 ### Refrigeration Case and WalkIn Outputs
 
-Zone,Average,Refrigeration Walk In Evaporator Total Cooling Rate [W]
+* Zone,Average,Refrigeration Walk In Evaporator Total Cooling Rate [W]
 
-Zone,Sum,Refrigeration Walk In Evaporator Total Cooling Energy [J]
+* Zone,Sum,Refrigeration Walk In Evaporator Total Cooling Energy [J]
 
-Zone,Average,Refrigeration Walk In Evaporator Sensible Cooling Rate [W]
+* Zone,Average,Refrigeration Walk In Evaporator Sensible Cooling Rate [W]
 
-Zone,Sum,Refrigeration Walk In Evaporator Sensible Cooling Energy [J]
+* Zone,Sum,Refrigeration Walk In Evaporator Sensible Cooling Energy [J]
 
-Zone,Average,Refrigeration Walk In Evaporator Latent Cooling Rate [W]
+* Zone,Average,Refrigeration Walk In Evaporator Latent Cooling Rate [W]
 
-Zone,Sum,Refrigeration Walk In Evaporator Latent Cooling Energy [J]
+* Zone,Sum,Refrigeration Walk In Evaporator Latent Cooling Energy [J]
 
-Zone,Average,Refrigeration Walk In Ancillary Electric Power [W]
+* Zone,Average,Refrigeration Walk In Ancillary Electric Power [W]
 
-Zone,Sum,Refrigeration Walk In Ancillary Electric Energy [J]
+* Zone,Sum,Refrigeration Walk In Ancillary Electric Energy [J]
 
-Zone,Average,Refrigeration Walk In Fan Electric Power [W]
+* Zone,Average,Refrigeration Walk In Fan Electric Power [W]
 
-Zone,Sum,Refrigeration Walk In Fan Electric Energy [J]
+* Zone,Sum,Refrigeration Walk In Fan Electric Energy [J]
 
-Zone,Average,Refrigeration Walk In Lighting Electric Power [W]
+* Zone,Average,Refrigeration Walk In Lighting Electric Power [W]
 
-Zone,Sum,Refrigeration Walk In Lighting Electric Energy [J]
+* Zone,Sum,Refrigeration Walk In Lighting Electric Energy [J]
 
-Zone,Average,Refrigeration Walk In Heater Electric Power [W]
+* Zone,Average,Refrigeration Walk In Heater Electric Power [W]
 
-Zone,Sum,Refrigeration Walk In Heater Electric Energy [J]
+* Zone,Sum,Refrigeration Walk In Heater Electric Energy [J]
 
 
 
 *Report only for WalkIns using electric defrost*
 
-Zone,Average,Refrigeration Walk In Defrost Electric Power [W]
+* Zone,Average,Refrigeration Walk In Defrost Electric Power [W]
 
-Zone,Sum,Refrigeration Walk In Defrost Electric Energy [J]
+* Zone,Sum,Refrigeration Walk In Defrost Electric Energy [J]
 
 
 
 ***Report for each Zone exchanging energy with the WalkIn***
 
-Zone,Average,Refrigeration Walk In Zone Sensible Cooling Rate [W]
+* Zone,Average,Refrigeration Walk In Zone Sensible Cooling Rate [W]
 
-Zone,Sum,Refrigeration Walk In Zone Sensible Cooling Energy [J]
+* Zone,Sum,Refrigeration Walk In Zone Sensible Cooling Energy [J]
 
-Zone,Average, Zone,Average,Refrigeration Walk In Zone Sensible Heating Rate [W]
+* Zone,Average, Zone,Average,Refrigeration Walk In Zone Sensible Heating Rate [W]
 
-Zone,Sum,Refrigeration Walk In Zone Sensible Heating Energy [J]
+* Zone,Sum,Refrigeration Walk In Zone Sensible Heating Energy [J]
 
-Zone,Average,Zone,Average,Refrigeration Walk In Zone Latent Rate [W]
+* Zone,Average,Zone,Average,Refrigeration Walk In Zone Latent Rate [W]
 
-Zone,Sum,Refrigeration Walk In Zone Latent Energy [J]
+* Zone,Sum,Refrigeration Walk In Zone Latent Energy [J]
 
 #### Refrigeration Walk In Evaporator Total Cooling Rate [W]
 
@@ -20114,73 +17646,47 @@ Identifies a single compressor, or a particular list of compressors, that compri
 
 The following is an example input for a single-stage compression refrigeration system.
 
+```idf
  Refrigeration:System,
-
     MediumTempSystem,        !- Refrigeration System Name
-
    MediumTempCaselist,      !-  Refrigeration Case or Walkin or CaseAndWalkInList Name
-
     ,                        !- Refrigeration Transfer Load or TransferLoad List Name
-
     AirCooledCondenserA,     !- Refrigeration Condenser Name
-
     MediumTempCompressorlist, !- Refrigeration Compressor or CompressorList Name
-
     25.0,                    !- Minimum Condensing Temperture {C}
-
     R134a,                   !- Refrigeration System Working Fluid
-
     ConstantSuctionTemperature,  !- Suction Temperature Control Type
-
     ,                        !- Optional mechanical subcooler name
-
     ,                        !- Optional LSHX subcooler name
-
     ,                        !- Sum UA Distribution Piping {W/K}
-
     ,                        !- Distribution Piping Zone Name
-
     MedTempRefrig;           !- End-Use Subcategory
+```
 
 
 
 The following is an example input for a two-stage compression refrigeration system.
 
+```idf
  Refrigeration:System,
-
     LowTempSystem,           !- Refrigeration System Name
-
    LowTempCaselist,         !-  Refrigeration Case or Walkin or CaseAndWalkInList Name
-
     ,                        !- Refrigeration Transfer Load or TransferLoad List Name
-
     AirCooledCondenserB,     !- Refrigeration Condenser Name
-
     LowStageCompressorList,  !- Refrigeration Compressor or CompressorList Name
-
     25.0,                    !- Minimum Condensing Temperture {C}
-
     R404A,                   !- Refrigeration System Working Fluid
-
     ConstantSuctionTemperature,  !- Suction Temperature Control
-
     ,                        !- Optional mechanical subcooler name
-
     ,                        !- Optional LSHX subcooler name
-
     ,                        !- Sum UA Distribution Piping {W/K}
-
     ,                        !- Distribution Piping Zone Name
-
     LowTempRefrig,           !- End-Use Subcategory
-
     2,                       !- Number of Compressor Stages
-
     Shell-and-Coil Intercooler,  !- Intercooler Type
-
     0.7,                     !- Shell-and-Coil Intercooler Effectiveness
-
     HiStageCompressorList    !- High-Stage Compressor or CompressorList Name
+```
 
 
 
@@ -20188,71 +17694,71 @@ The following is an example input for a two-stage compression refrigeration syst
 
 THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS:
 
-Zone,Average, Refrigeration System Total Compressor Electric Power [W]
+* Zone,Average, Refrigeration System Total Compressor Electric Power [W]
 
-Zone,Sum, Refrigeration System Total Compressor Electric Energy [J]
+* Zone,Sum, Refrigeration System Total Compressor Electric Energy [J]
 
-Zone,Average, Refrigeration System Average Compressor COP [W/W]
+* Zone,Average, Refrigeration System Average Compressor COP [W/W]
 
-Zone,Average, Refrigeration System Total Compressor Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Total Compressor Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration System Total Compressor Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration System Total Compressor Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Total Cases and Walk Ins Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Total Cases and Walk Ins Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration System Total Cases and Walk Ins Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration System Total Cases and Walk Ins Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Total Transferred Load Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Total Transferred Load Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration System Total Transferred Load Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration System Total Transferred Load Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Total Suction Pipe Heat Gain Rate [W]
+* Zone,Average, Refrigeration System Total Suction Pipe Heat Gain Rate [W]
 
-Zone,Sum, Refrigeration System Total Suction Pipe Heat Gain Energy [J]
+* Zone,Sum, Refrigeration System Total Suction Pipe Heat Gain Energy [J]
 
-Zone,Average, Refrigeration System Net Rejected Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Net Rejected Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration System Net Rejected Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration System Net Rejected Heat Transfer Energy [J]
 
-Zone,Average,Refrigeration System Estimated Refrigerant Inventory Mass [kg]
+* Zone,Average,Refrigeration System Estimated Refrigerant Inventory Mass [kg]
 
-Zone,Average, Refrigeration System Liquid Suction Subcooler Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Liquid Suction Subcooler Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Liquid Suction Subcooler Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Liquid Suction Subcooler Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Estimated Refrigerant Inventory [kg]
+* Zone,Average, Refrigeration System Estimated Refrigerant Inventory [kg]
 
-Zone,Average, Refrigeration System Estimated Refrigerant Mass Flow Rate [kg/s]
+* Zone,Average, Refrigeration System Estimated Refrigerant Mass Flow Rate [kg/s]
 
-Zone,Average, Refrigeration System Condensing Temperature [C]'
+* Zone,Average, Refrigeration System Condensing Temperature [C]'
 
-Zone,Average, Refrigeration System Evaporating Temperature [C]
+* Zone,Average, Refrigeration System Evaporating Temperature [C]
 
-Zone,Average, Refrigeration System Suction Pipe Suction Temperature [C]
+* Zone,Average, Refrigeration System Suction Pipe Suction Temperature [C]
 
-Zone,Average, Refrigeration System Thermostatic Expansion Valve Liquid Temperature [C]
+* Zone,Average, Refrigeration System Thermostatic Expansion Valve Liquid Temperature [C]
 
-Zone,Average, Refrigeration System Estimated High Stage Refrigerant Mass Flow Rate [kg/s]
+* Zone,Average, Refrigeration System Estimated High Stage Refrigerant Mass Flow Rate [kg/s]
 
-Zone,Sum,Refrigeration System Total High Stage Compressor Electric Energy [J]
+* Zone,Sum,Refrigeration System Total High Stage Compressor Electric Energy [J]
 
-Zone,Average,Refrigeration System Total High Stage Compressor Electric Power [W]
+* Zone,Average,Refrigeration System Total High Stage Compressor Electric Power [W]
 
-Zone,Sum,Refrigeration System Total High Stage Compressor Heat Transfer Energy [J]
+* Zone,Sum,Refrigeration System Total High Stage Compressor Heat Transfer Energy [J]
 
-Zone,Average,Refrigeration System Total High Stage Compressor Heat Transfer Rate [W]
+* Zone,Average,Refrigeration System Total High Stage Compressor Heat Transfer Rate [W]
 
-Zone,Sum,Refrigeration System Total Low and High Stage Compressor Electric Energy [J]
+* Zone,Sum,Refrigeration System Total Low and High Stage Compressor Electric Energy [J]
 
-Zone,Sum,Refrigeration System Total Low Stage Compressor Electric Energy [J]
+* Zone,Sum,Refrigeration System Total Low Stage Compressor Electric Energy [J]
 
-Zone,Average,Refrigeration System Total Low Stage Compressor Electric Power [W]
+* Zone,Average,Refrigeration System Total Low Stage Compressor Electric Power [W]
 
-Zone,Sum,Refrigeration System Total Low Stage Compressor Heat Transfer Energy [J]
+* Zone,Sum,Refrigeration System Total Low Stage Compressor Heat Transfer Energy [J]
 
-Zone,Average,Refrigeration System Total Low Stage Compressor Heat Transfer Rate [W]
+* Zone,Average,Refrigeration System Total Low Stage Compressor Heat Transfer Rate [W]
 
-Zone,Average,Refrigeration System Estimated Low Stage Refrigerant Mass Flow Rate [kg/s]
+* Zone,Average,Refrigeration System Estimated Low Stage Refrigerant Mass Flow Rate [kg/s]
 
 
 
@@ -20260,73 +17766,73 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 
 
 
-HVAC,Average, Refrigeration Air Chiller System Total Compressor Electric Power [W]
+* HVAC,Average, Refrigeration Air Chiller System Total Compressor Electric Power [W]
 
-HVAC,Sum, Refrigeration Air Chiller System Total Compressor Electric Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller System Total Compressor Electric Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Average Compressor COP [W/W]
+* HVAC,Average, Refrigeration Air Chiller System Average Compressor COP [W/W]
 
-HVAC,Average, Refrigeration Air Chiller System Total Compressor Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Total Compressor Heat Transfer Rate [W]
 
-HVAC,Sum, Refrigeration Air Chiller System Total Compressor Heat Transfer Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller System Total Compressor Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Total Air Chiller Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Total Air Chiller Heat Transfer Rate [W]
 
-HVAC,Sum, Refrigeration Air Chiller System Total Case and Walk In Heat Transfer Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller System Total Case and Walk In Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Total Transferred Load Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Total Transferred Load Heat Transfer Rate [W]
 
-HVAC,Sum, Refrigeration Air Chiller System Total Transferred Load Heat Transfer Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller System Total Transferred Load Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Total Suction Pipe Heat Gain Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Total Suction Pipe Heat Gain Rate [W]
 
-HVAC,Sum, Refrigeration Air Chiller System Total Suction Pipe Heat Gain Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller System Total Suction Pipe Heat Gain Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Net Rejected Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Net Rejected Heat Transfer Rate [W]
 
-HVAC,Sum, Refrigeration Air Chiller System Net Rejected Heat Transfer Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller System Net Rejected Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Liquid Suction Subcooler Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Liquid Suction Subcooler Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Liquid Suction Subcooler Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Liquid Suction Subcooler Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Estimated Refrigerant Inventory Mass [kg]
+* HVAC,Average, Refrigeration Air Chiller System Estimated Refrigerant Inventory Mass [kg]
 
-HVAC,Average, Refrigeration Air Chiller System Estimated Refrigerant Mass Flow Rate [kg/s]
+* HVAC,Average, Refrigeration Air Chiller System Estimated Refrigerant Mass Flow Rate [kg/s]
 
-HVAC,Average,Refrigeration Air Chiller System Intercooler Temperature [C]
+* HVAC,Average,Refrigeration Air Chiller System Intercooler Temperature [C]
 
-HVAC,Average,Refrigeration Air Chiller System Intercooler Pressure [Pa]
+* HVAC,Average,Refrigeration Air Chiller System Intercooler Pressure [Pa]
 
-HVAC,Average, Refrigeration Air Chiller System Condensing Temperature [C]'
+* HVAC,Average, Refrigeration Air Chiller System Condensing Temperature [C]'
 
-HVAC,Average, Refrigeration Air Chiller System Evaporating Temperature [C]
+* HVAC,Average, Refrigeration Air Chiller System Evaporating Temperature [C]
 
-HVAC,Average, Refrigeration Air Chiller System Suction Temperature [C]
+* HVAC,Average, Refrigeration Air Chiller System Suction Temperature [C]
 
-HVAC,Average, Refrigeration Air Chiller System TXV Liquid Temperature [C]
+* HVAC,Average, Refrigeration Air Chiller System TXV Liquid Temperature [C]
 
-HVAC,Average,Refrigeration Air Chiller System Estimated High Stage Refrigerant Mass Flow Rate [kg/s]
+* HVAC,Average,Refrigeration Air Chiller System Estimated High Stage Refrigerant Mass Flow Rate [kg/s]
 
-HVAC,Sum,Refrigeration Air Chiller System Total High Stage Compressor Electric Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller System Total High Stage Compressor Electric Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller System Total High Stage Compressor Electric Power [W]
+* HVAC,Average,Refrigeration Air Chiller System Total High Stage Compressor Electric Power [W]
 
-HVAC,Sum,Refrigeration Air Chiller System Total High Stage Compressor Heat Transfer Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller System Total High Stage Compressor Heat Transfer Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller System Total High Stage Compressor Heat Transfer Rate [W]
+* HVAC,Average,Refrigeration Air Chiller System Total High Stage Compressor Heat Transfer Rate [W]
 
-HVAC,Sum, Refrigeration Air Chiller System Total Low and High Stage Compressor Electric Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller System Total Low and High Stage Compressor Electric Energy [J]
 
-HVAC,Sum,Refrigeration Air Chiller System Total Low Stage Compressor Electric Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller System Total Low Stage Compressor Electric Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller System Total Low Stage Compressor Electric Power [W]
+* HVAC,Average,Refrigeration Air Chiller System Total Low Stage Compressor Electric Power [W]
 
-HVAC,Sum, Refrigeration Air Chiller System Total Low Stage Compressor Heat Transfer Energy [J]
+* HVAC,Sum, Refrigeration Air Chiller System Total Low Stage Compressor Heat Transfer Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller System Total Low Stage Compressor Heat Transfer Rate [W]
+* HVAC,Average,Refrigeration Air Chiller System Total Low Stage Compressor Heat Transfer Rate [W]
 
-HVAC,Average,Refrigeration Air Chiller System Estimated Low Stage Refrigerant Mass Flow Rate [kg/s]
+* HVAC,Average,Refrigeration Air Chiller System Estimated Low Stage Refrigerant Mass Flow Rate [kg/s]
 
 
 
@@ -20704,95 +18210,82 @@ This field allows the specification of a user-defined end-use subcategory (e.g.,
 
 The following is an example input for a transcritical CO<sub>2</sub> refrigeration system.
 
+```idf
 Refrigeration:TranscriticalSystem,
-
     TransRefrigSys,          !- Name
-
     TwoStage,                !- System Type
-
     MTLoads,                 !- Medium Temperature Refrigerated Case or Walkin or CaseAndWalkInList Name
-
     LTLoads,                 !- Low Temperature Refrigerated Case or Walkin or CaseAndWalkInList Name
-
     RefrigGasCooler,         !- Refrigeration Gas Cooler Name
-
     HPCompressors,           !- High Pressure Compressor or CompressorList Name
-
     LPCompressors,           !- Low Pressure Compressor or CompressorList Name
-
     4000000,                 !- Receiver Pressure
-
     0.4,                     !- Subcooler Effectiveness
-
     R744,                    !- Refrigeration System Working Fluid Type
-
     ,                        !- Sum UA Suction Piping for Medium Temperature Loads
-
     ,                        !- Medium Temperature Suction Piping Zone Name
-
     ,                        !- Sum UA Suction Piping for Low Temperature Loads
-
     ,                        !- Low Temperature Suction Piping Zone Name
-
     TransRefrigSys;          !- End-Use Subcategory
+```
 
 
 
 ### Refrigeration Transcritical System Outputs
 
-Zone,Average, Refrigeration Transcritical System Total High Pressure Compressor Electric Power [W]
+* Zone,Average, Refrigeration Transcritical System Total High Pressure Compressor Electric Power [W]
 
-Zone,Sum, Refrigeration Transcritical System Total High Pressure Compressor Electric Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Total High Pressure Compressor Electric Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Low Pressure Compressor Electric Power [W]
+* Zone,Average, Refrigeration Transcritical System Low Pressure Compressor Electric Power [W]
 
-Zone,Sum, Refrigeration Transcritical System Low Pressure Compressor Electric Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Low Pressure Compressor Electric Energy [J]
 
-Zone,Sum, Refrigeration Transcritical System Total Compressor Electric Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Total Compressor Electric Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Average COP [W/W]
+* Zone,Average, Refrigeration Transcritical System Average COP [W/W]
 
-Zone,Average, Refrigeration Transcritical System Medium Temperature Cases and Walk Ins Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System Medium Temperature Cases and Walk Ins Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System Medium Temperature Cases and Walk Ins Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Medium Temperature Cases and Walk Ins Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Low Temperature Cases and Walk Ins Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System Low Temperature Cases and Walk Ins Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System Low Temperature Cases and Walk Ins Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Low Temperature Cases and Walk Ins Heat Transfer Energy [J]
 
-Zone,Sum, Refrigeration Transcritical System Total Cases and Walk Ins Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Total Cases and Walk Ins Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Medium Temperature Suction Pipe Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System Medium Temperature Suction Pipe Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System Medium Temperature Suction Pipe Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Medium Temperature Suction Pipe Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Low Temperature Suction Pipe Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System Low Temperature Suction Pipe Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System Low Temperature Suction Pipe Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Low Temperature Suction Pipe Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Transcritical System High Pressure Compressor Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System High Pressure Compressor Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System High Pressure Compressor Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System High Pressure Compressor Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Low Pressure Compressor Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System Low Pressure Compressor Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System Low Pressure Compressor Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Low Pressure Compressor Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Net Rejected Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System Net Rejected Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System Net Rejected Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Net Rejected Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Estimated Refrigerant Inventory Mass [kg]
+* Zone,Average, Refrigeration Transcritical System Estimated Refrigerant Inventory Mass [kg]
 
-Zone,Average, Refrigeration Transcritical System Refrigerant Mass Flow Rate [kg/s]
+* Zone,Average, Refrigeration Transcritical System Refrigerant Mass Flow Rate [kg/s]
 
-Zone,Average, Refrigeration Transcritical System Medium Temperature Evaporating Temperature [C]
+* Zone,Average, Refrigeration Transcritical System Medium Temperature Evaporating Temperature [C]
 
-Zone,Average, Refrigeration Transcritical System Medium Temperature Suction Temperature [C]
+* Zone,Average, Refrigeration Transcritical System Medium Temperature Suction Temperature [C]
 
-Zone,Average, Refrigeration Transcritical System Low Temperature Evaporating Temperature [C]
+* Zone,Average, Refrigeration Transcritical System Low Temperature Evaporating Temperature [C]
 
-Zone,Average, Refrigeration Transcritical System Low Temperature Suction Temperature [C]
+* Zone,Average, Refrigeration Transcritical System Low Temperature Suction Temperature [C]
 
 
 
@@ -20972,51 +18465,46 @@ This field allows the specification of a user-defined end-use subcategory (e.g.,
 
 
 
+
 The following is an example input for a refrigeration compressor.
 
+```idf
 Refrigeration:Compressor,
-
     CompressorA,             !- Name
-
     PowerCurveCompA,         !- Refrigeration Compressor Power Curve Name
-
     CapCurveCompA,           !- Refrigeration Compressor Capacity Curve Name
-
     10.0,                    ! – Rated Superheat {delta C}
-
     ,                        !- Rated Return Gas Temperature {C}
-
     ,                        ! – Rated Liquid Temperature{C}
-
     15.0,                    !- Rated Subcooling {delta C}
-
     MedTempRefrig;           !- End-Use Subcategory
+```
 
 ### Refrigeration Compressor Outputs
 
 THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS:
 
-Zone,Average,Refrigeration Compressor Electric Power [W]
+* Zone,Average,Refrigeration Compressor Electric Power [W]
 
-Zone,Sum,Refrigeration Compressor Electric Energy [J]
+* Zone,Sum,Refrigeration Compressor Electric Energy [J]
 
-Zone,Average,Refrigeration Compressor Heat Transfer Rate [W]
+* Zone,Average,Refrigeration Compressor Heat Transfer Rate [W]
 
-Zone,Sum,Refrigeration Compressor Heat Transfer Energy [J]
+* Zone,Sum,Refrigeration Compressor Heat Transfer Energy [J]
 
-Zone,Sum,Refrigeration Compressor Run Time  Fraction []
+* Zone,Sum,Refrigeration Compressor Run Time Fraction []
 
 THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 
-HVAC,Average,Refrigeration Air Chiller System Compressor Electric Power [W]
+* HVAC,Average,Refrigeration Air Chiller System Compressor Electric Power [W]
 
-HVAC,Sum,Refrigeration Air Chiller System Compressor Electric Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller System Compressor Electric Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller System Compressor Heat Transfer Rate [W]
+* HVAC,Average,Refrigeration Air Chiller System Compressor Heat Transfer Rate [W]
 
-HVAC,Sum,Refrigeration Air Chiller System Compressor Heat Transfer Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller System Compressor Heat Transfer Energy [J]
 
-HVAC,Average,Refrigeration Chiller Compressor Run TimeFraction []
+* HVAC,Average,Refrigeration Chiller Compressor Run TimeFraction []
 
 #### THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS
 
@@ -21078,15 +18566,14 @@ Identifies a particular compressor that works in conjunction with the other comp
 
 The following is an example input for a compressor list.
 
+```idf
 Refrigeration:CompressorList,
-
     MediumTempCompressorlist, !- Refrigeration Compressor List Name
-
     CompressorA,             !- Refrigeration Compressor Name \#1
-
     CompressorB,             !- Refrigeration Compressor Name \#2
-
     CompressorC;             !- Refrigeration Compressor Name \#3
+```
+
 
 ### Refrigeration:Subcooler
 
@@ -21120,61 +18607,48 @@ This field is the name of the refrigeration system object that provides the cool
 
 This numeric field is the controlled outlet temperature (C) for subcooled liquid exiting a mechanical subcooler. This field should be blank for a liquid suction heat exchanger.
 
-
-
-
-
 The following is example input for both liquid suction and mechanical subcoolers.
 
-  REFRIGERATION:SUBCOOLER,
-
+```idf
+REFRIGERATION:SUBCOOLER,
        SampleLSHx,          !Subcooler Name
-
        LiquidSuction,             !subcooler type
-
        6,                   !design liquid suction subcooling {deltaC}
-
        16,                  !design inlet temperature on liquid side {C}
-
        0,                   !design inlet temperature on vapor side {C}
-
        ,                    !Refrigeration System Detailed Name providing cooling capacity
-
        ;                    !Control Temperature Out for subcooled liquid {C}
+```
 
 
 
 ! Mechanical Subcooler (uses Med Temp System to cool low temp liquid to 10C)
 
+```idf
   REFRIGERATION:SUBCOOLER,
-
        SampleMSC,           !Subcooler Name
-
        Mechanical,          !subcooler type
-
        ,                    !design liquid suction subcooling {C}
-
        ,                    !design inlet temperature on liquid side {C}
-
        ,                    !design inlet temperature on vapor side {C}
-
        MediumTempSystem,    !Refrigeration System Detailed Name providing cooling capacity
-
        10;                  !Control Temperature Out for subcooled liquid {C}
+```
+
 
 ### Refrigeration Subcooler Outputs
 
 FOR SUBCOOLERS ON SYSTEMS SERVING CASES AND/OR WALKINS:
 
-Zone,Average, Refrigeration System Mechanical Subcooler Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Mechanical Subcooler Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration System Mechanical Subcooler Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration System Mechanical Subcooler Heat Transfer Energy [J]
 
 FOR SUBCOOLERS ON SYSTEMS SERVING AIR CHILLERS:
 
-Zone,Average, Refrigeration Air Chiller System Mechanical Subcooler Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Air Chiller System Mechanical Subcooler Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Air Chiller System Mechanical Subcooler Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Air Chiller System Mechanical Subcooler Heat Transfer Energy [J]
 
 #### FOR SUBCOOLERS ON SYSTEMS SERVING CASES AND/OR WALKINS:
 
@@ -21248,65 +18722,59 @@ This numeric field specifies the amount of refrigerant present within the conden
 
 The following is an example input for an air-cooled condenser.
 
+```idf
 Refrigeration:Condenser:AirCooled,
-
     MediumTempCondenser,     !- Name of condenser
-
     MediumTempCondenserHRCurve, !-name of condenser heat of rejection curve, linear
-
     0.,                      ! Rated subcooling {deltaC}
-
     VariableSpeed,           ! Fan speed control type
-
     4000.,                   ! Design condenser fan power {W}
-
     0.25,                    !Minimum air flow fraction through condenser fan {dimensionless}
-
     Refrigeration MediumTempSystem CondenserNode,  !- Condenser Air Inlet Node Name or Zone Name
-
     MediumTempRefrig;        !- End-Use Subcategory
+```
 
 ### Refrigeration Condenser (AirCooled) Outputs
 
 FOR CONDENSERS COOLING SYSTEMS SERVING CASES AND/OR WALKINS:
 
-Zone,Average, Refrigeration System Condenser Fan Electric Power [W]
+* Zone,Average, Refrigeration System Condenser Fan Electric Power [W]
 
-Zone, Sum, Refrigeration System Condenser Fan Electric Energy [J]
+* Zone, Sum, Refrigeration System Condenser Fan Electric Energy [J]
 
-Zone,Average, Refrigeration System Condenser Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Total Recovered Heat Transfer Rate [W] Zone, Sum, Refrigeration System Condenser Total Recovered Heat Transfer Energy [J]
+* Zone,Average, Refrigeration System Condenser Total Recovered Heat Transfer Rate [W] Zone, Sum, Refrigeration System Condenser Total Recovered Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Heat Recovered for Non-Refrigeration Purposes Energy [J]
+* Zone, Sum, Refrigeration System Condenser Heat Recovered for Non-Refrigeration Purposes Energy [J]
 
-Zone,Average, Refrigeration System Condenser Defrost Recovered Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Defrost Recovered Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Defrost Recovered Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Defrost Recovered Heat Transfer Energy [J]
 
 FOR CONDENSERS COOLING SYSTEMS SERVING AIR CHILLERS:
 
-HVAC,Average, Refrigeration System Condenser Fan Electric Power [W]
+* HVAC,Average, Refrigeration System Condenser Fan Electric Power [W]
 
-HVAC, Sum, Refrigeration System Condenser Fan Electric Consumption [J]
+* HVAC, Sum, Refrigeration System Condenser Fan Electric Consumption [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Rate [W] HVAC, Sum, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Energy [J]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Rate [W] HVAC, Sum, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Energy [J]
 
 #### FOR CONDENSERS ON SYSTEMS SERVING CASES AND/OR WALKINS:
 
@@ -21510,121 +18978,101 @@ This numeric field specifies the amount of refrigerant present within the conden
 
 The following is an example input for an evaporative condenser
 
+```idf
 Refrigeration:Condenser:EvaporativeCooled,
-
     MedTempEvapCooledCondenser ,  !- Refrigeration Condenser Name
-
     64800. ,                    !- Rated Total Heat Rejection Effect, {W}
-
     0. ,                        !- Rated Subcooling
-
     VariableSpeed ,             !- Condenser Fan Speed Control
-
     746.,                       !- Rated Condenser Fan Power
-
     0.25,                       !- Minimum air flow fraction through condenser fan {dimensionless}
-
     6.63  ,                     !- Evaporative Condenser Approach Temp Const, {C}
-
     0.468 ,                     !- Evaporative Condenser Approach Temp HRCF Cooefficient
-
     17.93 ,                     !- Evaporative Condenser Approach Temp 1/hrcf coefficient
-
     -0.322,                     !- Evaporative Condenser Approach Temp Twb coefficient {1/C}
-
     0.6  ,                      !- Minimum Condenser Capacity Factor
-
     4.8  ,                      !- Maximum Condenser Capacity Factor
-
     Outside Air Inlet Node,     !- Condenser Air Inlet Node Name
-
     1.79 ,                      !- Rated Air Flow Rate {m3/s}
-
     66.7 ,                      !- Basin Heater Capacity {W/C}
-
     1.0  ,                      !- Basin Heater Set Point Temperature {C}
-
     250. ,                      !- Rated Water Pump Power {W}
-
     EvapWaterStorageTank,       !- Evaporative Water Supply Tank Name
-
     EvapCondAvail,              !- Evaporative Condenser Availability Schedule Name
-
     ,                           !- End-UseSubcategory
-
     21.9 ,                      !- Condenser Refrigerant Operating Charge {kg}
-
     10.  ,                      !- Condensate Receiver Refrigerant Inventory
-
     25. ;                       !- Condensate Piping Refrigerant Inventory
+```
+
 
 
 
 ### Refrigeration Condenser (EvaporativeCooled) Outputs
 
-Zone,Average, Refrigeration System Condenser Fan Electric Power [W]
+* Zone,Average, Refrigeration System Condenser Fan Electric Power [W]
 
-Zone, Sum, Refrigeration System Condenser Fan Electric Consumption [J]
+* Zone, Sum, Refrigeration System Condenser Fan Electric Consumption [J]
 
 FOR CONDENSERS COOLING SYSTEMS SERVING CASES AND/OR WALKINS:
 
-Zone,Average, Refrigeration System Condenser Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Total Recovered Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Total Recovered Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Total Recovered Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Total Recovered Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Non Refrigeration Recovered Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Non Refrigeration Recovered Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Defrost Recovered Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Defrost Recovered Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Defrost Recovered Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Defrost Recovered Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Pump Electric Power [W]
+* Zone,Average, Refrigeration System Condenser Pump Electric Power [W]
 
-Zone, Sum, Refrigeration System Condenser Pump Electric Energy [J]
+* Zone, Sum, Refrigeration System Condenser Pump Electric Energy [J]
 
-Zone,Average, Refrigeration System Condenser Basin Heater Electric Power [W]
+* Zone,Average, Refrigeration System Condenser Basin Heater Electric Power [W]
 
-Zone, Sum, Refrigeration System Condenser Basin Heater Electric Energy [J]
+* Zone, Sum, Refrigeration System Condenser Basin Heater Electric Energy [J]
 
-Zone,Average, Refrigeration System Condenser Evaporated Water Volume Flow Rate  [m3/s]
+* Zone,Average, Refrigeration System Condenser Evaporated Water Volume Flow Rate  [m3/s]
 
-Zone, Sum, Refrigeration System Condenser Evaporated Water Volume [m3]
+* Zone, Sum, Refrigeration System Condenser Evaporated Water Volume [m3]
 
 FOR CONDENSERS COOLING SYSTEMS SERVING AIR CHILLERS:
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Pump Electric Power [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Pump Electric Power [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Pump Electric Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Pump Electric Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Basin Heater Electric Power [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Basin Heater Electric Power [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Basin Heater Electric Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Basin Heater Electric Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Evaporated Water Volume Flow Rate [m3/s]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Evaporated Water Volume Flow Rate [m3/s]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Evaporated Water Volume [m3]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Evaporated Water Volume [m3]
 
 #### FOR CONDENSERS ON SYSTEMS SERVING CASES AND/OR WALKINS:
 
@@ -21836,79 +19284,64 @@ This numeric field specifies the amount of refrigerant present within the conden
 
 The following is an example input for a water cooled condenser.
 
+```idf
 Refrigeration:Condenser:WaterCooled,
-
     MediumTempCondenser ,    !- Name
-
     58000. ,                 !- Rated Effective Total Heat Rejection Rate {W}
-
     29.4 ,                   !- Rated Condensing Temperature {C}
-
     0.0 ,                    !- Rated Subcooling Temperature Difference{deltaC}
-
     10.0,                    !- Rated Water Inlet Temperature {C}
-
     Condenser Inlet Node,    !- Water Inlet Node Name
-
     Condenser Outlet Node,   !- Water- Outlet Node Name
-
     Variable Flow,           !- Water-cooled Loop Flow Type
-
     Cond Outlet Temp Sch,    !- Water Outlet Temperature Schedule Name
-
     ,                        !- Water Design Flow Rate {m3/s}
-
     0.003,                   !- Water Maximum Flow Rate {m3/s}
-
     55.,                     !- Maximum Water Outlet Temperature {C}
-
     ,                        !- Minimum Water Inlet Temperature {C}
-
     ,                        !- End-Use Subcategory
-
     30. ,                    !- Condenser Refrigerant Operating Charge {kg}
-
     65. ,                    !- Condensate Receiver Refrigerant Inventory {kg}
-
     20. ;                    !- Condensate Piping Refrigerant Inventory {kg}
+```
 
 ### Refrigeration Condenser (WaterCooled) Outputs
 
 FOR CONDENSERS COOLING SYSTEMS SERVING CASES AND/OR WALKINS:
 
-Zone,Average, Refrigeration System Condenser Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Total Recovered Heat Transfer Rate [W] Zone, Sum, Refrigeration System Condenser Total Recovered Heat Transfer Energy [J]
+* Zone,Average, Refrigeration System Condenser Total Recovered Heat Transfer Rate [W] Zone, Sum, Refrigeration System Condenser Total Recovered Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Heat Recovered for Non-Refrigeration Purposes Energy [J]
+* Zone, Sum, Refrigeration System Condenser Heat Recovered for Non-Refrigeration Purposes Energy [J]
 
-Zone,Average, Refrigeration System Condenser Defrost Recovered Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Defrost Recovered Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Defrost Recovered Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Defrost Recovered Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration System Condenser Water Mass Flow Rate [kg/s]
+* Zone,Average, Refrigeration System Condenser Water Mass Flow Rate [kg/s]
 
 FOR CONDENSERS COOLING SYSTEMS SERVING AIR CHILLERS:
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Rate [W] HVAC, Sum, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Energy [J]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Rate [W] HVAC, Sum, Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Non Refrigeration Recovered Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Defrost Recovered Heat Transfer Energy [J]
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Fluid Mass Flow Rate [kg/s]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Fluid Mass Flow Rate [kg/s]
 
 
 
@@ -22032,31 +19465,28 @@ This numeric field specifies the amount of refrigerant present within the conden
 
 The following is an example input for a cascade condenser.
 
+```idf
 Refrigeration:Condenser:Cascade,
-
     CascadeCondenser1 ,      !- Name
-
     -4. ,                    !- Rated Condensing Temperature {C}
-
     3. ,                     !- Rated Approach Temperature Difference {DeltaC}
-
     20000.0 ,                !- Rated Effective Total Heat Rejection Rate {W}
-
     Fixed;                   !- Condensing Temperature Control Type
+```
 
 ### Refrigeration Condenser (Cascade) Outputs
 
 FOR CONDENSERS COOLING SYSTEMS SERVING CASES AND/OR WALKINS:
 
-Zone,Average, Refrigeration System Condenser Heat Transfer Rate [W]
+* Zone,Average, Refrigeration System Condenser Heat Transfer Rate [W]
 
-Zone, Sum, Refrigeration System Condenser Heat Transfer Energy [J]
+* Zone, Sum, Refrigeration System Condenser Heat Transfer Energy [J]
 
 FOR CONDENSERS COOLING SYSTEMS SERVING AIR CHILLERS:
 
-HVAC,Average, Refrigeration Air Chiller System Condenser Heat Transfer Rate [W]
+* HVAC,Average, Refrigeration Air Chiller System Condenser Heat Transfer Rate [W]
 
-HVAC, Sum, Refrigeration Air Chiller System Condenser Heat Transfer Energy [J]
+* HVAC, Sum, Refrigeration Air Chiller System Condenser Heat Transfer Energy [J]
 
 
 
@@ -22146,55 +19576,43 @@ This numeric field specifies the amount of refrigerant present within the gas co
 
 The following is an example input for an air-cooled gas cooler.
 
+```idf
 Refrigeration:GasCooler:AirCooled,
-
     RefrigGasCooler,         !- Name
-
     GasCoolerHRCurve,        !- Rated Total Heat Rejection Rate Curve Name
-
     Fixed,                   !- Gas Cooler Fan Speed Control Type
-
     6400,                    !- Rated Fan Power
-
     0.2,                     !- Minimum Fan Air Flow Ratio
-
     27.0,                    !- Transition Temperature
-
     3.0,                     !- Transcritical Approach Temperature
-
     10.0,                    !- Subcritical Temperature Difference
-
     10.0,                    !- Minimum Condensing Temperature
-
     ,                        !- Air Inlet Node Name
-
     RefrigGasCooler,         !- End-Use Subcategory
-
     ,                        !- Gas Cooler Refrigerant Operating Charge Inventory
-
     ,                        !- Gas Cooler Receiver Refrigerant Inventory
-
     ;                        !- Gas Cooler Outlet Piping Refrigerant Inventory
+```
 
 
 
 ### Refrigeration GasCooler (AirCooled) Outputs
 
-Zone,Average, Refrigeration Transcritical System Gas Cooler Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System Gas Cooler Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System Gas Cooler Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Gas Cooler Heat Transfer Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Gas Cooler Fan Electric Power [W]
+* Zone,Average, Refrigeration Transcritical System Gas Cooler Fan Electric Power [W]
 
-Zone,Sum, Refrigeration Transcritical System Gas Cooler Fan Electric Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Gas Cooler Fan Electric Energy [J]
 
-Zone,Average, Refrigeration Transcritical System Gas Cooler Outlet Temperature [C]
+* Zone,Average, Refrigeration Transcritical System Gas Cooler Outlet Temperature [C]
 
-Zone,Average, Refrigeration Transcritical System Gas Cooler Outlet Pressure [Pa]
+* Zone,Average, Refrigeration Transcritical System Gas Cooler Outlet Pressure [Pa]
 
-Zone,Average, Refrigeration Transcritical System Gas Cooler Defrost Recovered Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Transcritical System Gas Cooler Defrost Recovered Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Transcritical System Gas Cooler Defrost Recovered Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Transcritical System Gas Cooler Defrost Recovered Heat Transfer Energy [J]
 
 
 
@@ -22250,13 +19668,12 @@ The list is extensible; ten fields are provided in the IDD.
 
 The following is an example input for a transfer load list.
 
+```idf
 Refrigeration:TransferLoadList,
-
     MedTempTransferLoads ,   !- Name
-
     CascadeCondFrozen,       !- Cascade Condenser Name or Secondary System Name
-
     SecondLoopDairy;         !- Cascade Condenser Name or Secondary System Name
+```
 
 ### Refrigeration:SecondarySystem
 
@@ -22380,157 +19797,114 @@ This field allows the specification of a user-defined end-use subcategory (e.g.,
 
 The following is an example input for a brine-type (“FluidAlwaysLiquid”)refrigeration secondary system.
 
+```idf
   Refrigeration:SecondarySystem,
-
     SecondaryMedLoop,        !- Name
-
     MedTempCaseList,         !- Refrigerated Case or Walkin or CaseAndWalkInList Name
-
     FluidAlwaysLiquid,       !- Circulating Fluid Type
-
     ProGly30Percent,         !- Circulating Fluid Name
-
     3.5E4,                   !- Evaporator Capacity {W}
-
     0.0021,                  !- Evaporator Flow Rate for Secondary Fluid {M3/s}
-
     -12.6,                   !- Evaporator Evaporating Temperature {C}
-
     2.7,                     !- Evaporator Approach Temperature Difference {DeltaC}
-
     4.,                      !- Evaporator Range Temperature Difference {DeltaC}
-
     3,                       !- Number of Pumps in Loop
-
     .0023,                   !- Total Pump Flow Rate {M3/s}
-
     ,                        !- Total Pump Power {W}
-
     2.09E5,                  !- Total Pump Head {Pa}
-
     ,                        !- PhaseChange Circulating Rate
-
     ,                        !- Pump Drive Type
-
     ,                        !- Variable Speed Pump Cubic Curve Name
-
     1.0,                     !- Pump Motor Heat to Fluid
-
     21.,                     !- Sum UA Distribution Piping {W/C}
-
     SalesFloor,              !- Distribution Piping Zone Name
-
     ,                        !- Sum UA Receiver/Separator Shell
-
     ,                        !- Receiver/Separator Zone Name
-
     ,                        !- Evaporator Refrigerant Inventory {kg}
-
     ;                        !- End-Use Subcategory
-
+```
 
 
 The following is an example input for a liquid-overfeed-type (“FluidPhaseChange”) refrigeration secondary system.
 
+```idf
   Refrigeration:SecondarySystem,
-
     SecondaryLowLoop,        !- Name
-
     LowTempCaseList,         !- Refrigerated Case or Walkin or CaseAndWalkInList Name
-
     FluidPhaseChange,        !- Circulating Fluid Type
-
     R744,                    !- Circulating Fluid Name
-
     ,                        !- Evaporator Capacity {W}
-
     ,                        !- Evaporator Flow Rate for Secondary Fluid {M3/s}
-
     -39.2,                   !- Evaporator Evaporating Temperature {C}
-
     2.,                      !- Evaporator Approach Temperature Difference {DeltaC}
-
     ,                        !- Evaporator Range Temperature Difference {DeltaC}
-
     3,                       !- Number of Pumps in Loop
-
     ,                        !- Total Pump Flow Rate {M3/s}
-
     ,                        !- Total Pump Power {W}
-
     2.09E5,                  !- Total Pump Head {Pa}
-
     2.5,                     !- PhaseChange Circulating Rate
-
     Variable,                !- Pump Drive Type
-
     SecondaryVarSpeedPump,   !- Variable Speed Pump Cubic Curve Name
-
     1.0,                     !- Pump Motor Heat to Fluid
-
     10.4,                    !- Sum UA Distribution Piping {W/C}
-
     SalesFloor,              !- Distribution Piping Zone Name
-
     1.4,                     !- Sum UA Receiver/Separator Shell
-
     BackRoom,                !- Receiver/Separator Zone Name
-
     ,                        !- Evaporator Refrigerant Inventory {kg}
-
     ;                        !- End-Use Subcategory
+```
 
 ### Refrigeration Secondary System Outputs
 
 FOR SECONDARY SYSTEMS SERVING CASES AND/OR WALKINS:
 
-Zone,Average,Refrigeration Secondary Loop Pump Electric Power [W]
+* Zone,Average,Refrigeration Secondary Loop Pump Electric Power [W]
 
-Zone,Sum,Refrigeration Secondary Loop Pump Electric Energy [J]
+* Zone,Sum,Refrigeration Secondary Loop Pump Electric Energy [J]
 
-Zone,Average,Refrigeration Secondary Loop Load Heat Transfer Rate [W]
+* Zone,Average,Refrigeration Secondary Loop Load Heat Transfer Rate [W]
 
-Zone,Sum,Refrigeration Secondary Loop Load Heat Transfer Energy [J]
+* Zone,Sum,Refrigeration Secondary Loop Load Heat Transfer Energy [J]
 
-Zone,Average,Refrigeration Secondary Loop Total Heat Transfer Rate [W]
+* Zone,Average,Refrigeration Secondary Loop Total Heat Transfer Rate [W]
 
-Zone,Sum,Refrigeration Secondary Loop Total Heat Transfer Energy [J]
+* Zone,Sum,Refrigeration Secondary Loop Total Heat Transfer Energy [J]
 
-Zone,Average,Refrigeration Secondary Loop Estimated Refrigerant Inventory Mass[kg] Zone,Average,Refrigeration Secondary Loop Volume Flow Rate [m3/s]
+* Zone,Average,Refrigeration Secondary Loop Estimated Refrigerant Inventory Mass[kg] Zone,Average,Refrigeration Secondary Loop Volume Flow Rate [m3/s]
 
-Zone,Average,Refrigeration Secondary Loop Pipe Heat Gain Rate [W]
+* Zone,Average,Refrigeration Secondary Loop Pipe Heat Gain Rate [W]
 
-Zone,Average,Refrigeration Secondary Loop Pipe Heat Gain Energy [J]
+* Zone,Average,Refrigeration Secondary Loop Pipe Heat Gain Energy [J]
 
-Zone,Average,Refrigeration Secondary Loop Receiver Heat Gain Rate [W]
+* Zone,Average,Refrigeration Secondary Loop Receiver Heat Gain Rate [W]
 
-Zone,Average,Refrigeration Secondary Loop Receiver Heat Gain Energy [J]
+* Zone,Average,Refrigeration Secondary Loop Receiver Heat Gain Energy [J]
 
 FOR SECONDARY SYSTEMS SERVING AIR CHILLERS:
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Pump Electric Power [W]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Pump Electric Power [W]
 
-HVAC,Sum,Refrigeration Air Chiller Secondary Loop Pump Electric Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller Secondary Loop Pump Electric Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Load Heat Transfer Rate [W]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Load Heat Transfer Rate [W]
 
-HVAC,Sum,Refrigeration Air Chiller Secondary Loop Load Heat Transfer Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller Secondary Loop Load Heat Transfer Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Total Heat Transfer Rate [W]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Total Heat Transfer Rate [W]
 
-HVAC,Sum,Refrigeration Air Chiller Secondary Loop Total Heat Transfer Energy [J]
+* HVAC,Sum,Refrigeration Air Chiller Secondary Loop Total Heat Transfer Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Estimated Refrigerant Inventory Mass[kg]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Estimated Refrigerant Inventory Mass[kg]
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Volume Flow Rate [m3/s]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Volume Flow Rate [m3/s]
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Pipe Heat Gain Rate [W]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Pipe Heat Gain Rate [W]
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Pipe Heat Gain Energy [J]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Pipe Heat Gain Energy [J]
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Receiver Heat Gain Rate [W]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Receiver Heat Gain Rate [W]
 
-HVAC,Average,Refrigeration Air Chiller Secondary Loop Receiver Heat Gain Energy [J]
+* HVAC,Average,Refrigeration Air Chiller Secondary Loop Receiver Heat Gain Energy [J]
 
 
 
@@ -22642,69 +20016,45 @@ Multiple refrigeration cases and walkins may be located within a single zone.  
 
 FOR THE SUM OF ALL COOLING SYSTEMS SERVING CASES AND/OR WALKINS:
 
-Zone,Average, Refrigeration Zone Case and Walk In Sensible Cooling Rate [W]
+* Zone,Average, Refrigeration Zone Case and Walk In Sensible Cooling Rate [W]
 
-Zone,Sum, Refrigeration Zone Case and Walk In Sensible Cooling Energy [J]
+* Zone,Sum, Refrigeration Zone Case and Walk In Sensible Cooling Energy [J]
 
-Zone,Average, Refrigeration Zone Case and Walk In Heating Rate [W]
+* Zone,Average, Refrigeration Zone Case and Walk In Heating Rate [W]
 
-Zone,Sum, Refrigeration Zone Case and Walk In Heating Energy [J]
+* Zone,Sum, Refrigeration Zone Case and Walk In Heating Energy [J]
 
-Zone,Average, Refrigeration Zone Case and Walk In Total Sensible Cooling Rate [W]
+* Zone,Average, Refrigeration Zone Case and Walk In Total Sensible Cooling Rate [W]
 
-Zone,Sum, Refrigeration Zone Case and Walk In Total Sensible Cooling Energy [J]
+* Zone,Sum, Refrigeration Zone Case and Walk In Total Sensible Cooling Energy [J]
 
-Zone,Average, Refrigeration Zone Case and Walk In Total Latent Cooling Rate [W]
+* Zone,Average, Refrigeration Zone Case and Walk In Total Latent Cooling Rate [W]
 
-Zone,Sum, Refrigeration Zone Case and Walk In Total Latent Cooling Energy [J]
+* Zone,Sum, Refrigeration Zone Case and Walk In Total Latent Cooling Energy [J]
 
-Zone,Sum, Refrigeration Zone Case and Walk In Total Cooling Energy [J]
+* Zone,Sum, Refrigeration Zone Case and Walk In Total Cooling Energy [J]
 
-Zone,Average,Refrigeration Zone Case and Walk In Total Cooling Rate [W]
+* Zone,Average,Refrigeration Zone Case and Walk In Total Cooling Rate [W]
 
-Zone,Average, Refrigeration Zone Case and Walk In Total Heat Transfer Rate [W]
+* Zone,Average, Refrigeration Zone Case and Walk In Total Heat Transfer Rate [W]
 
-Zone,Sum, Refrigeration Zone Case and Walk In Total Heat Transfer Energy [J]
+* Zone,Sum, Refrigeration Zone Case and Walk In Total Heat Transfer Energy [J]
 
 
 
 FOR THE SUM OF ALL COOLING SYSTEMS SERVING CHILLERS:
 
-HVAC,Average,
+* HVAC,Average, Refrigeration Zone Air Chiller Sensible Heat Transfer Rate [W]
 
-Refrigeration Zone Air Chiller Sensible Heat Transfer Rate
+* HVAC,Sum, Refrigeration Zone Air Chiller Sensible Heat Transfer Energy  [J]
 
- [W]
+* HVAC,Average, Refrigeration Zone Air Chiller Latent Cooling Rate [W]
 
-HVAC,Sum,
+* HVAC,Sum, Refrigeration Zone Air Chiller Latent Cooling Energy [J]
 
-Refrigeration Zone Air Chiller Sensible Heat Transfer Energy
+* HVAC,Average, Refrigeration Zone Air Chiller Total Cooling Rate [W]
 
- [J]
-
-HVAC,Average,
-
-Refrigeration Zone Air Chiller Latent Cooling Rate
-
- [W]
-
-HVAC,Sum,
-
-Refrigeration Zone Air Chiller Latent Cooling Energy
-
- [J]
-
-HVAC,Average,
-
-Refrigeration Zone Air Chiller Total Cooling Rate
-
- [W]
-
-HVAC,Sum,
-
-Refrigeration Zone Air Chiller Total Cooling Energy
-
- [J]
+* HVAC,Sum, Refrigeration Zone Air Chiller Total Cooling Energy [J]
 
 #### FOR THE SUM OF ALL COOLING SYSTEMS SERVING CASES AND/OR WALKINS:
 
@@ -22930,203 +20280,150 @@ The value of this optional field is the refrigerant inventory present in the ref
 
 The following is an example input for a refrigeration air chiller.
 
+```idf
    Refrigeration:AirChiller,
-
-    Freezer\_1AirChiller\_1,    !- Name
-
+    Freezer_1AirChiller_1,    !- Name
     AvailAllYear,             !- Availability Schedule Name
-
     UnitLoadFactorSensibleOnly, !- Capacity Rating Type
-
     10900.,                   !- Rated Unit Load Factor {W/deltaC}
-
     ,                         !- Rated Capacity {W}
-
     ,                         !- Rated Relative Humidity
-
     -26.,                     !- Rated Cooling Source Temperature {C}
-
     8.,                       !- Rated Temperature Difference DT1 {DeltaC}
-
     11.,                      !- Maximum Temperature Difference DT1 {DeltaC}
-
     ,                         !- Material Correction Factor
-
     ,                         !- Refrigerant Correction Factor
-
     LinearSHR60,              !- Capacity Correction Curve Type
-
     ,                         !- Capacity Correction Curve Name
-
     1.5,                      !- SHR60 Correction Factor {dimensionless}
-
     200.,                     !- Rated Total Heating Power {W}
-
     AirChillerDripDownSched1,    !- Heating Power Schedule Name
-
     ,                         !- Fan Speed Control Type
-
     375.,                     !- Rated Fan Power {W}
-
     12.4,                     !- Rated Air Flow {m3/s}
-
     ,                         !- Minimum Fan Air Flow Ratio
-
     Electric,                 !- Defrost Type
-
     TimeSchedule,             !- Defrost Control Type
-
     AirChillerDefrostSched1,  !- Defrost Schedule Name
-
     AirChillerDripDownSched1, !- Defrost Drip-Down Schedule Name
-
     55066.,                  !- Defrost Power {W}
-
     ,                         !- Temperature Termination Defrost Fraction to Ice
-
     ,                         !- Vertical Location
-
     ;                         !- Average Refrigerant Charge Inventory {kg}
+```
 
 
 
 The following is an example input for a refrigeration air chiller.
 
+```idf
    Refrigeration:AirChiller,
-
-    Freezer\_1AirChiller\_1,    !- Name
-
+    Freezer_1AirChiller_1,    !- Name
     AvailAllYear,             !- Availability Schedule Name
-
     UnitLoadFactorSensibleOnly, !- Capacity Rating Type
-
     10900.,                   !- Rated Unit Load Factor {W/deltaC}
-
     ,                         !- Rated Capacity {W}
-
     ,                         !- Rated Relative Humidity
-
     -26.,                     !- Rated Cooling Source Temperature {C}
-
     8.,                       !- Rated Temperature Difference DT1 {DeltaC}
-
     11.,                      !- Maximum Temperature Difference DT1 {DeltaC}
-
     ,                         !- Material Correction Factor
-
     ,                         !- Refrigerant Correction Factor
-
     LinearSHR60,              !- Capacity Correction Curve Type
-
     ,                         !- Capacity Correction Curve Name
-
     1.5,                      !- SHR60 Correction Factor {dimensionless}
-
     200.,                     !- Rated Total Heating Power {W}
-
     AirChillerDripDownSched1,    !- Heating Power Schedule Name
-
     ,                         !- Fan Speed Control Type
-
     375.,                     !- Rated Fan Power {W}
-
     12.4,                     !- Rated Air Flow {m3/s}
-
     ,                         !- Minimum Fan Air Flow Ratio
-
     Electric,                 !- Defrost Type
-
     TimeSchedule,             !- Defrost Control Type
-
     AirChillerDefrostSched1,  !- Defrost Schedule Name
-
     AirChillerDripDownSched1, !- Defrost Drip-Down Schedule Name
-
     55066.,                  !- Defrost Power {W}
-
     ,                         !- Temperature Termination Defrost Fraction to Ice
-
     ,                         !- Vertical Location
-
     ;                         !- Average Refrigerant Charge Inventory {kg}
-
+```
 
 
 
 
 ### Refrigeration Air Chiller Outputs
 
-HVAC,Average,Refrigeration Zone Air Chiller Total Cooling Rate [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Total Cooling Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Total Cooling Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Total Cooling Energy [J]
 
-HVAC,Average,Refrigeration Zone Air Chiller Sensible Cooling Rate [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Sensible Cooling Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Sensible Cooling Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Sensible Cooling Energy [J]
 
-HVAC,Average,Refrigeration Zone Air Chiller Latent Cooling Rate [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Latent Cooling Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Latent Cooling Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Latent Cooling Energy [J]
 
-HVAC,Average, Refrigeration Zone Air Chiller Water Removed Mass Flow Rate [kg/s]
+* HVAC,Average, Refrigeration Zone Air Chiller Water Removed Mass Flow Rate [kg/s]
 
-HVAC,Average,Refrigeration Zone Air Chiller Total Electric Power [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Total Electric Power [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Total Electric Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Total Electric Energy [J]
 
-HVAC,Average,Refrigeration Zone Air Chiller Fan Electric Power [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Fan Electric Power [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Fan Electric Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Fan Electric Energy [J]
 
-HVAC,Average,Refrigeration Zone Air Chiller Heater Electric Power [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Heater Electric Power [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Heater Electric Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Heater Electric Energy [J]
 
-HVAC,Average,Refrigeration Zone Air Chiller Sensible Heat Ratio []
+* HVAC,Average,Refrigeration Zone Air Chiller Sensible Heat Ratio []
 
-HVAC,Average,Refrigeration Zone Air Chiller Frost Accumulation Mass [kg]
+* HVAC,Average,Refrigeration Zone Air Chiller Frost Accumulation Mass [kg]
 
-HVAC,Average,Refrigeration Zone Air Chiller Zone Total Cooling Rate [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Zone Total Cooling Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Zone Total Cooling Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Zone Total Cooling Energy [J]
 
-HVAC,Average,Refrigeration Zone Air Chiller Zone Sensible Cooling Rate [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Zone Sensible Cooling Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Zone Sensible Cooling Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Zone Sensible Cooling Energy [J]
 
-HVAC,Average,Refrigeration Zone Air Chiller Zone Heating Rate [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Zone Heating Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Zone Heating Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Zone Heating Energy [J]
 
 
 
 *Report only for Air Chillers using electric defrost*
 
-HVAC,Average,Refrigeration Zone Air Chiller Defrost Electric Power [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Defrost Electric Power [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Defrost Electric Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Defrost Electric Energy [J]
 
 
 
 ***Report for each Zone exchanging energy with the Air Chiller***
 
-HVAC,Average,Refrigeration Zone Air Chiller Sensible Cooling Rate [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Sensible Cooling Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Sensible Cooling Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Sensible Cooling Energy [J]
 
-HVAC,Average, Refrigeration Zone Air Chiller Heating Rate [W]
+* HVAC,Average, Refrigeration Zone Air Chiller Heating Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Heating Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Heating Energy [J]
 
-HVAC,Average, Refrigeration Zone Air Chiller Latent Cooling Rate [W]
+* HVAC,Average, Refrigeration Zone Air Chiller Latent Cooling Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Latent Cooling Energy [J
+* HVAC,Sum,Refrigeration Zone Air Chiller Latent Cooling Energy [J
 
-HVAC,Average,Refrigeration Zone Air Chiller Total Cooling Rate [W]
+* HVAC,Average,Refrigeration Zone Air Chiller Total Cooling Rate [W]
 
-HVAC,Sum,Refrigeration Zone Air Chiller Total Cooling Energy [J]
+* HVAC,Sum,Refrigeration Zone Air Chiller Total Cooling Energy [J]
 
-HVAC,Average,Refrigeration Zone Air Chiller Water Removed Mass Flow Rate [kg/s]
+* HVAC,Average,Refrigeration Zone Air Chiller Water Removed Mass Flow Rate [kg/s]
 
 #### Refrigeration Zone Air Chiller Total Cooling Rate [W]
 
