@@ -1520,7 +1520,13 @@ With the “effective” SHR for the coil at the current operating conditions, i
 
 Calculations are also made to estimate the electric power input to the DX coil basin heater. A schedule may be used to disable the basin heater during regular maintenance periods or other time periods (e.g., during summer). If a schedule is not provided, the basin heater is assumed to be available the entire simulation time period. The basin heater operates when it is scheduled on, the outdoor air dry-bulb temperature is below the basin heater setpoint temperature, and the DX coil is not active. The user is required to enter a basin heater capacity (watts per degree Kelvin) and a heater setpoint temperature (<sup>o</sup>C) if they want to model basin heater electric power.
 
-<span>$\begin{array}{l}\mathop P\nolimits_{basinheater}  = MAX(0.0,{\rm{ }}\mathop {CAP}\nolimits_{basinheater} (\mathop T\nolimits_{setpoint,basin}  - \mathop T\nolimits_{db,outdoor} )(1 - RTF))\\\{\rm{   }}\end{array}$</span><span>$\mathop E\nolimits_{basinheater}  = \mathop {(P}\nolimits_{basinheater} )(TimeStepSys)3600$</span>
+<div>\[
+  \mathop P\nolimits_{basinheater}  = MAX(0.0,{\rm{ }}\mathop {CAP}\nolimits_{basinheater} (\mathop T\nolimits_{setpoint,basin}  - \mathop T\nolimits_{db,outdoor} )(1 - RTF)) \\ 
+\]</div>
+
+<div>\[
+  \mathop E\nolimits_{basinheater}  = \mathop {(P}\nolimits_{basinheater} )(TimeStepSys)3600
+\]</div>
 
 where:
 
@@ -2287,223 +2293,163 @@ For units when operating continuously at maximum (high) compressor speed (k=2) a
 
 Table 56. Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor
 
-&lt;&lt; Source: AHRI Standard 210-240, 2008,  Table 5, Page 65  &gt;&gt;
-
-Test description
-
-Air Entering Indoor Unit
-
-Temperature (°F/C)
-
-Air Entering Outdoor
-
-Unit Temperature (°F/C)
-
-Compressor Capacity
-
-Cooling Air Volume Rate
-
-Dry Bulb
-
-Wet Bulb
-
-Dry Bulb
-
-Wet Bulb
-
-A2 Test—required (steady, wet coil)
-
-80.0  26.7
-
-67.0   19.4
-
-95.0 35.0
-
-75.0  23.9
-
-High
-
-Cooling Full-load
-
-B2 Test—required (steady, wet coil)
-
-80.0  26.7
-
-67.0   19.4
-
-82.0 27.8
-
-65.0  18.3
-
-High
-
-Cooling Full-load
-
-B1 Test—required (steady, wet coil)
-
-80.0  26.7
-
-67.0   19.4
-
-82.0 27.8
-
-65.0  18.3
-
-Low
-
-Cooling minimum
-
-C2Test – Optional
-
-(steady, dry coil)
-
-80.0  26.7
-
-
-
-82.0  27.8
-
-................
-
-High
-
-Cooling Full-load
-
-D<sub>2</sub> Test—required (cyclic, dry coil)
-
-80.0  26.7
-
-(4)
-
-82.0  27.8
-
-................
-
-High
-
-
-
-C1 Test —optional (steady, dry coil)
-
-80.0  26.7
-
-
-
-82.0  27.8
-
-................
-
-Low
-
-Cooling minimum
-
-D1 Test<sup>—</sup>optional (cyclic, dry coil)
-
-80.0  26.7
-
-
-
-82.0  27.8
-
-................
-
-Low
-
-
-
-F1 Test—optional (steady, dry coil)
-
-80.0  26.7
-
-67.0   19.4
-
-67.0   19.4
-
-53.5  11.9
-
-Low
-
-Cooling minimum
-
-
+<table class="table table-striped">
+  <tr>
+    <th colspan="7">Source: AHRI Standard 210-240, 2008; Table 5, Page 65</th>
+  </tr>
+  <tr>
+    <td>Test Description</td>
+    <td>Air Entering Indoor Unit Temperature (F / C)</td>
+    <td></td>
+    <td>Air Entering Outdoor Unit Temperature (F / C)</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Dry Bulb</td>
+    <td>Wet Bulb</td>
+    <td>Dry Bulb</td>
+    <td>Wet Bulb</td>
+    <td>Compressor Capacity</td>
+    <td>Cooling Air Volume Rate</td>
+  </tr>
+  <tr>
+    <td>A2 Test-required (steady, wet coil)</td>
+    <td>80.0/26.7</td>
+    <td>67.0/19.4</td>
+    <td>95.0/35.0</td>
+    <td>75.0/23.9</td>
+    <td>High</td>
+    <td>Cooling Full-load</td>
+  </tr>
+  <tr>
+    <td>B2 Test-required (steady, wet coil)</td>
+    <td>80.0/26.7</td>
+    <td>67.0/19.4</td>
+    <td>82.0/27.8</td>
+    <td>65.0/18.3</td>
+    <td>High</td>
+    <td>Cooling Full-load</td>
+  </tr>
+  <tr>
+    <td>B1 Test-required (steady, wet coil)</td>
+    <td>80.0/26.7</td>
+    <td>67.0/19.4</td>
+    <td>82.0/27.8</td>
+    <td>65.0/18.3</td>
+    <td>Low</td>
+    <td>Cooling Minimum</td>
+  </tr>
+  <tr>
+    <td>C2 Test-optional (steady, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td></td>
+    <td>82.0/27.8</td>
+    <td></td>
+    <td>High</td>
+    <td>Cooling Full-load</td>
+  </tr>
+  <tr>
+    <td>D2 Test-required (cyclic, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td></td>
+    <td>82.0/27.8</td>
+    <td></td>
+    <td>High</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>C1 Test-optional (steady, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td></td>
+    <td>82.0/27.8</td>
+    <td></td>
+    <td>Low</td>
+    <td>Cooling Minimum</td>
+  </tr>
+  <tr>
+    <td>D1 Test-optional (cyclic, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td></td>
+    <td>82.0/27.8</td>
+    <td></td>
+    <td>Low</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>F1 Test-optional (steady, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td>67.0/19.4</td>
+    <td>67.0/19.4</td>
+    <td>53.5/11.9</td>
+    <td>High</td>
+    <td>Cooling Minimum</td>
+  </tr>
+</table>
 
 Table 57. Distribution of Fractional Hours with in Cooling Season Temperature Bins
 
-&lt;&lt; Source: AHRI Standard 210-240, 2008, Table 16, Page 94 &gt;&gt;
-
-Bin Number, j
-
-Bin Temperature Range °C,
-
-Representative Temperature for bin °C,
-
-Fraction of Total Temperature Bin Hours,
-
-N<sub>j</sub>/N
-
-1
-
-18.33 - 20.56
-
-19.44
-
-0.214
-
-2
-
-21.11 - 23.33
-
-22.22
-
-0.231
-
-3
-
-23.89 - 26.11
-
-25.00
-
-0.216
-
-4
-
-26.67 - 28.89
-
-27.78
-
-0.161
-
-5
-
-29.44 - 31.67
-
-30.56
-
-0.104
-
-6
-
-32.22 - 34.44
-
-33.33
-
-0.052
-
-7
-
-35.00 - 37.22
-
-36.11
-
-0.018
-
-8
-
-37.78 – 40.00
-
-38.89
-
-0.004
+<table class="table table-striped">
+  <tr>
+    <th colspan="4">Source: AHRI Standard 210-240, 2008; Table 16, Page 94</th>
+  </tr>
+  <tr>
+    <td>Bin Number j</td>
+    <td>Bin Temperature Range (C)</td>
+    <td>Representative Temperature for bin (C)</td>
+    <td>Fraction of Total Temperature Bin Hours Nj/N</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Dry Bulb</td>
+    <td>Wet Bulb</td>
+    <td>Dry Bulb</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>18.33 - 20.56</td>
+    <td>19.44</td>
+    <td>0.214</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>21.11 - 23.33</td>
+    <td>22.22</td>
+    <td>0.231</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>23.89 - 26.11</td>
+    <td>25</td>
+    <td>0.216</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>26.67 - 28.89</td>
+    <td>27.78</td>
+    <td>0.161</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>29.44 - 31.67</td>
+    <td>30.56</td>
+    <td>0.104</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>32.22 - 34.44</td>
+    <td>33.33</td>
+    <td>0.052</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>35.00 - 37.22</td>
+    <td>36.11</td>
+    <td>0.018</td>
+  </tr>
+</table>
 
 #### References
 
