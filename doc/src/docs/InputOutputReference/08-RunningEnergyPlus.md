@@ -28,8 +28,8 @@ Table 47. EnergyPlus Output Files
 
 <table class="table table-striped">
 <tr>
-<td>FileName</td>
-<td>Description</td>
+<th>FileName</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>Eplusout.audit</td>
@@ -128,8 +128,8 @@ Table 48. EnergyPlus Errors and Required Actions
 
 <table class="table table-striped">
 <tr>
-<td>Error Level</td>
-<td>Action</td>
+<th>Error Level</th>
+<th>Action</th>
 </tr>
 <tr>
 <td>Information, shown as *********</td>

@@ -60,17 +60,14 @@ This field is used to indicate the kind of units that may be associated with the
 
 An example of a time bins input object follows.
 
+```idf
 Output:Table:TimeBins,
-
-  \*,                     ! Key Value
-
+  *,                     ! Key Value
   Electricity:HVAC,      ! Variable Name
-
   4000000,               ! Interval Start
-
   500000,                ! Interval Size
-
   20;                    ! Interval Count
+```
 
 Output:Table:Monthly
 --------------------
@@ -131,23 +128,17 @@ The advanced aggregation types are described below. These aggregation types rely
 
 An example of this object follows.
 
+```idf
 Output:Table:Monthly,
-
   Building Monthly Cooling Load Report,               ! Name
-
   3,                                                  ! Digits After Decimal
-
   Zone Air System Sensible Cooling Energy,                   ! Variable or Meter 1 Name
-
   SumOrAverage,                                       ! Aggregation Type for Variable or Meter 1
-
   Zone Air System Sensible Cooling Energy,                   ! Variable or Meter 2 Name
-
   Maximum,                                            ! Aggregation Type for Variable or Meter 2
-
   Site Outdoor Air Drybulb Temperature,                                   ! Variable or Meter 3 Name
-
   ValueWhenMaxMin;                                    ! Aggregation Type for Variable or Meter 3
+```
 
 Output:Table:SummaryReports
 ---------------------------
@@ -1396,11 +1387,11 @@ The predefined monthly report options are shown below. The key name of the prede
 
 Sample IDF Input – Output:Table:SummaryReports
 
+```idf
 Output:Table:SummaryReports,
-
         AllSummary,  !- Report 1 Name
-
         AllMonthly;  !- Report 2 Name
+```
 
 OutputControl:Table:Style
 -------------------------
@@ -1461,11 +1452,11 @@ The JtoKWH, JtoMJ and JtoGJ unit conversion input option applies only to the Out
 
 An example IDF input object follows.
 
+```idf
 OutputControl:Table:Style,
-
   Comma,                     ! Column Separator
-
    InchPound;                 ! Unit Conversion
+```
 
 
 

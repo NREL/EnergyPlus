@@ -53,29 +53,21 @@ While it is true that monthly utility bills are often directly related to monthl
 
 To show you how simple the specification of a rate can be here is a simple example for a flat charge of 8 cents for every kWh sold.
 
+```idf
 UtilityCost:Tariff,
-
   TariffExample1,          ! Name
-
   Electricity:Facility,    ! Output Meter Name
-
   kWh;               ! Conversion Factor Choice
 
 
-
 UtilityCost:Charge:Simple,
-
   ChargeExample1,          ! Charge Variable Name
-
   TariffExample1,          ! Tariff Name
-
   totalEnergy,             ! Source Variable
-
   Annual,                   ! Season
-
   EnergyCharges,           ! Category Variable Name
-
   0.08;                    ! Cost Per Unit Value or Variable Name
+```
 
 
 
@@ -102,8 +94,8 @@ Table 35. Example Electric Energy Use (for Economics Calculation)
 
 <table class="table table-striped">
 <tr>
-<td>Month</td>
-<td>Electric Energy Use</td>
+<th>Month</th>
+<th>Electric Energy Use</th>
 </tr>
 <tr>
 <td>January</td>
@@ -167,21 +159,16 @@ Figure 162. Hierarchy for Economics Charges
 
 Any charges included in the EnergyCharges category are added together. The EnergyCharges, DemandCharges and ServiceCharges are added together to form the Basis. The Basis, Adjustments and Surcharges are added together to form the Subtotal. The Subtotal and Taxes are added together to be the Total. The total represents the total monthly charges on that tariff for the energy source used. The combining of categories together is performed automatically unless the user specifies the UtilityCost:Computation. In addition, each category, which is also a variable, may be used as a source. For example, a tax that is 5% of the subtotal would be shown as:
 
-
-
+```idf
 UtilityCost:Charge:Simple,
-
   TaxOfFivePercent,        ! Charge Variable Name
-
   TariffExample1,          ! Tariff Name
-
   Subtotal,                ! Source Variable
-
   Annual,                  ! Season
-
   Taxes,                   ! Category Variable Name
-
   0.05;                    ! Cost Per Unit Value or Variable Name
+```
+
 
 As you can see, the UtilityCost:Charge:Simple and UtilityCost:Charge:Block objects do most of the “work” of computing the annual energy cost. The benefit of using this categorization is that totals of each category are shown in the output reports and it organizes the charges in the monthly calculations in a logical way that fits almost all tariffs. If no categorization is desired, theoretically, all charges could be assigned to the Total category. The categories themselves are simply variable names. Charges may also be assigned to the “NotIncluded” category if the result of the charge is used as an intermediate calculation and should not be included in the Total.
 
@@ -234,9 +221,9 @@ Table 36. Built in UtilityCost:Tariff Conversion Factors
 
 <table class="table table-striped">
 <tr>
-<td>Choice</td>
-<td>Energy Conversion Factor</td>
-<td>Demand Conversion Factor</td>
+<th>Choice</th>
+<th>Energy Conversion Factor</th>
+<th>Demand Conversion Factor</th>
 </tr>
 <tr>
 <td>kWh</td>
@@ -389,32 +376,21 @@ The name of the schedule that defines the billing periods of the year. Normally 
 
 Thus, the schedule that represents this would look like the following. If no schedule is specified the following Month Schedule is used which defines the months of the year as the normal calendar months.
 
+```idf
 Schedule:Compact, defaultMonths, number,
-
 Through: 1/31, For: AllDays, Until: 24:00, 1,
-
 Through: 2/28, For: AllDays, Until: 24:00, 2,
-
 Through: 3/31, For: AllDays, Until: 24:00, 3,
-
 Through: 4/30, For: AllDays, Until: 24:00, 4,
-
 Through: 5/31, For: AllDays, Until: 24:00, 5,
-
 Through: 6/30, For: AllDays, Until: 24:00, 6,
-
 Through: 7/31, For: AllDays, Until: 24:00, 7,
-
 Through: 8/31, For: AllDays, Until: 24:00, 8,
-
 Through: 9/30, For: AllDays, Until: 24:00, 9,
-
 Through: 10/31, For: AllDays, Until: 24:00, 10,
-
 Through: 11/30, For: AllDays, Until: 24:00, 11,
-
 Through: 12/31, For: AllDays, Until: 24:00, 12;
-
+```
 
 
 #### Field: Demand Window Length
@@ -663,23 +639,17 @@ While the details of the UtilityCost:Ratchet command are described further in th
 
 Ratchet Example: A utility has a single ratchet that says that the billing demand for each month of the year is the higher value of the actual demand or 60% of the peak summer demand
 
+```idf
 UtilityCost:Ratchet,
-
   BillingDemand1,   ! Ratchet Variable Name
-
   ExampleTariff1,   ! Tariff Name
-
   TotalDemand,      ! Baseline Source Variable
-
   TotalDemand,      ! Adjustment Source Variable
-
   Summer,           ! Season From
-
   Annual,           ! Season To
-
   0.60,             ! Multiplier Value or Variable Name
-
   0;                ! Offset Value or Variable Name
+```
 
 
 
@@ -830,43 +800,28 @@ Energy Charge:    5.5342 cents/kWh
 
 This tariff would use a single UtilityCost:Charge:Simple object. The monthly charge is part of the UtilityCost:Tariff object.
 
+```idf
 UtilityCost:Tariff,
-
   ExampleA,                     ! Name
-
   Electricity:Facility,         ! Output Meter Name
-
   kWh,                          ! Conversion Factor Choice
-
   ,                             ! Energy Conversion Factor
-
   ,                             ! Demand Conversion Factor
-
   ,                             ! Time of Use Period Schedule Name
-
   ,                             ! Season Schedule Name
-
   ,                             ! Month Schedule Name
-
   ,                             ! Demand Window Length
-
   2.51;                         ! Monthly Charge or Variable Name
 
 
-
 UtilityCost:Charge:Simple,
-
   FlatEnergyCharge,             ! Charge Variable Name
-
   ExampleA,                     ! Tariff Name
-
   totalEnergy,                  ! Source Variable
-
   Annual,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   0.055342;                     ! Cost Per Unit Value or Variable Name
+```
 
 
 
@@ -884,57 +839,35 @@ Energy Charge:        7.231 cents/kWh for first 200 kWh
 
 This tariff would use a single UtilityCost:Charge:Block object. The monthly charge is part of the UtilityCost:Tariff object. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called “remaining” that contains a very large number.
 
+```idf
 UtilityCost:Tariff,
-
   ExampleB,                     ! Name
-
   Electricity:Facility,         ! Output Meter Name
-
   kWh,                          ! Conversion Factor Choice
-
   ,                             ! Energy Conversion Factor
-
   ,                             ! Demand Conversion Factor
-
   ,                             ! Time of Use Period Schedule Name
-
   ,                             ! Season Schedule Name
-
   ,                             ! Month Schedule Name
-
   ,                             ! Demand Window Length
-
   5.75;                         ! Monthly Charge or Variable Name
 
 
-
 UtilityCost:Charge:Block,
-
   BlockEnergyCharge,            ! Charge Variable Name
-
   ExampleB,                     ! Tariff Name
-
   totalEnergy,                  ! Source Variable
-
   Annual,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   ,                             ! Remaining Into Variable
-
   ,                             ! Block Size Multiplier Value or Variable Name
-
   200,                          ! Block Size 1 Value or Variable Name
-
   0.07231,                      ! Block 1 Cost per Unit Value or Variable Name
-
   1000,                         ! Block Size 2 Value or Variable Name
-
   0.06656,                      ! Block 2 Cost per Unit Value or Variable Name
-
   remaining,                    ! Block Size 3 Value or Variable Name
-
   0.05876;                      ! Block 3 Cost per Unit Value or Variable Name
+```
 
 
 
@@ -956,73 +889,44 @@ Demand Charge:      5.38 dollars per kW for first 20 kW
 
 This tariff would use two UtilityCost:Charge:Block objects. No monthly charge is shown so the UtilityCost:Tariff object can include just the first four fields. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called “remaining” that contains a very large number.
 
+```idf
 UtilityCost:Tariff,
-
   ExampleC,                     ! Name
-
   Electricity:Facility,         ! Output Meter Name
-
   KWh;                          ! Conversion Factor Choice
 
 
-
 UtilityCost:Charge:Block,
-
   BlockEnergyCharge,            ! Charge Variable Name
-
   ExampleC,                     ! Tariff Name
-
   totalEnergy,                  ! Source Variable
-
   Annual,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   ,                             ! Remaining Into Variable
-
   ,                             ! Block Size Multiplier Value or Variable Name
-
   20000,                        ! Block Size 1 Value or Variable Name
-
   0.0474,                       ! Block 1 Cost per Unit Value or Variable Name
-
   180000,                       ! Block Size 2 Value or Variable Name
-
   0.0424,                       ! Block 2 Cost per Unit Value or Variable Name
-
   remaining,                    ! Block Size 3 Value or Variable Name
-
   0.0383;                       ! Block 3 Cost per Unit Value or Variable Name
 
 
-
 UtilityCost:Charge:Block,
-
   BlockDemandCharge,            ! Charge Variable Name
-
   ExampleC,                     ! Tariff Name
-
   totalDemand,                  ! Source Variable
-
   Annual,                       ! Season
-
   DemandCharges,                ! Category Variable Name
-
   ,                             ! Remaining Into Variable
-
   ,                             ! Block Size Multiplier Value or Variable Name
-
   20,                           ! Block Size 1 Value or Variable Name
-
   5.38,                         ! Block 1 Cost per Unit Value or Variable Name
-
   80,                           ! Block Size 2 Value or Variable Name
-
   4.23,                         ! Block 2 Cost per Unit Value or Variable Name
-
   remaining,                    ! Block Size 3 Value or Variable Name
-
   3.60;                         ! Block 3 Cost per Unit Value or Variable Name
+```
 
 
 
@@ -1050,100 +954,58 @@ Energy Charge:        8.385 cents/kWh for first 650 kWh
 
 This tariff would use two UtilityCost:Charge:Block objects. The monthly charge is part of the UtilityCost:Tariff object. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called “remaining” that contains a very large number.
 
+```idf
 UtilityCost:Tariff,
-
   ExampleD,                     ! Name
-
   Electricity:Facility,         ! Output Meter Name
-
   KWh,                          ! Conversion Factor Choice
-
   ,                             ! Energy Conversion Factor
-
   ,                             ! Demand Conversion Factor
-
   ,                             ! Time of Use Period Schedule Name
-
   TwoSeasonSchedule,            ! Season Schedule Name
-
   ,                             ! Month Schedule Name
-
   ,                             ! Demand Window Length
-
   ,                             ! Monthly Charge or Variable Name
-
   7.00;                         ! Minimum Monthly Charge or Variable Name
 
 
-
 UtilityCost:Charge:Block,
-
   WinterEnergyCost,             ! Charge Variable Name
-
   ExampleD,                     ! Tariff Name
-
   totalEnergy,                  ! Source Variable
-
   Winter,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   ,                             ! Remaining Into Variable
-
   ,                             ! Block Size Multiplier Value or Variable Name
-
   650,                          ! Block Size 1 Value or Variable Name
-
   0.04385,                      ! Block 1 Cost per Unit Value or Variable Name
-
   350,                          ! Block Size 2 Value or Variable Name
-
   0.03763,                      ! Block 2 Cost per Unit Value or Variable Name
-
   remaining,                    ! Block Size 3 Value or Variable Name
-
   0.03704;                      ! Block 3 Cost per Unit Value or Variable Name
 
 
-
 UtilityCost:Charge:Block,
-
   SummerEnergyCost,             ! Charge Variable Name
-
   ExampleD,                     ! Tariff Name
-
   totalEnergy,                  ! Source Variable
-
   Summer,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   ,                             ! Remaining Into Variable
-
   ,                             ! Block Size Multiplier Value or Variable Name
-
   650,                          ! Block Size 1 Value or Variable Name
-
   0.08385,                      ! Block 1 Cost per Unit Value or Variable Name
-
   350,                          ! Block Size 2 Value or Variable Name
-
   0.07588,                      ! Block 2 Cost per Unit Value or Variable Name
-
   remaining,                    ! Block Size 3 Value or Variable Name
-
   0.07103;                      ! Block 3 Cost per Unit Value or Variable Name
 
 
-
 Schedule:Compact, TwoSeasonSchedule, number,
-
 Through: 5/31, For: AllDays, Until: 24:00, 1,
-
 Through: 9/30, For: AllDays, Until: 24:00, 3,
-
 Through: 12/31, For: AllDays, Until: 24:00, 1;
-
+```
 
 
 #### Example E – kWh/kW Energy Charges
@@ -1160,58 +1022,35 @@ Energy Charge:   8.756 cents/kWh for all consumption not greater than 200 hour
 
 This tariff would use a single  UtilityCost:Charge:Block object. The monthly charge is part of the  UtilityCost:Tariff object. In this case the Block Size Multiplier Value (or Variable) is set to the totalDemand variable.
 
+```idf
 UtilityCost:Tariff,
-
   ExampleE,                     ! Name
-
   Electricity:Facility,         ! Output Meter Name
-
   KWh,                          ! Conversion Factor Choice
-
   ,                             ! Energy Conversion Factor
-
   ,                             ! Demand Conversion Factor
-
   ,                             ! Time of Use Period Schedule Name
-
   ,                             ! Season Schedule Name
-
   ,                             ! Month Schedule Name
-
   ,                             ! Demand Window Length
-
   14;                           ! Monthly Charge or Variable Name
 
 
-
 UtilityCost:Charge:Block,
-
   BlockEnergyCharge,            ! Charge Variable Name
-
   ExampleE,                     ! Tariff Name
-
   totalEnergy,                  ! Source Variable
-
   Annual,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   ,                             ! Remaining Into Variable
-
   totalDemand,                  ! Block Size Multiplier Value or Variable Name
-
   200,                          ! Block Size 1 Value or Variable Name
-
   0.08756,                      ! Block 1 Cost per Unit Value or Variable Name
-
   200,                          ! Block Size 2 Value or Variable Name
-
   0.06812,                      ! Block 2 Cost per Unit Value or Variable Name
-
   remaining,                    ! Block Size 3 Value or Variable Name
-
   0.05029;                      ! Block 3 Cost per Unit Value or Variable Name
-
+```
 
 
 #### Example F – Seasonal Time of Use Energy
@@ -1238,144 +1077,84 @@ The tariff is only applicable for customers that use 50KW for at least one month
 
 This tariff uses four different UtilityCost:Charge:Simple objects to capture the variation with time of the energy cost. The monthly charge is part of the UtilityCost:Tariff object.
 
+```idf
 UtilityCost:Tariff,
-
   ExampleF,                     ! Name
-
   Electricity:Facility,         ! Output Meter Name
-
   kWh,                          ! Conversion Factor Choice
-
   ,                             ! Energy Conversion Factor
-
   ,                             ! Demand Conversion Factor
-
   TimeOfDaySchedule,            ! Time of Use Period Schedule Name
-
   TwoSeasonSchedule,            ! Season Schedule Name
-
   ,                             ! Month Schedule Name
-
   ,                             ! Demand Window Length
-
   37.75;                        ! Monthly Charge or Variable Name
 
 
-
 UtilityCost:Charge:Simple,
-
   SummerOnPeak,                 ! Charge Variable Name
-
   ExampleF,                     ! Tariff Name
-
   peakEnergy,                   ! Source Variable
-
   Summer,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   0.14009;                      ! Cost per Unit Value or Variable Name
 
 
-
 UtilityCost:Charge:Simple,
-
   SummerOffPeak,                ! Charge Variable Name
-
   ExampleF,                     ! Tariff Name
-
   offPeakEnergy,                ! Source Variable
-
   Summer,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   0.06312;                      ! Cost per Unit Value or Variable Name
 
 
-
 UtilityCost:Charge:Simple,
-
   WinterOnPeak,                 ! Charge Variable Name
-
   ExampleF,                     ! Tariff Name
-
   peakEnergy,                   ! Source Variable
-
   Winter,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   0.08315;                      ! Cost per Unit Value or Variable Name
 
 
-
 UtilityCost:Charge:Simple,
-
   WinterOffPeak,                ! Charge Variable Name
-
   ExampleF,                     ! Tariff Name
-
   offPeakEnergy,                ! Source Variable
-
   Winter,                       ! Season
-
   EnergyCharges,                ! Category Variable Name
-
   0.02420;                      ! Cost per Unit Value or Variable Name
 
 
-
 UtilityCost:Qualify,
-
   MinDemand,                    ! Name
-
   ExampleF,                     ! Tariff Name
-
   TotalDemand,                  ! Variable Name
-
   Minimum,                      ! Qualify Type
-
   50,                           ! Threshold Value or Variable Name
-
   Annual,                       ! Season
-
   Count,                        ! Threshold Test
-
   1;                            ! Number of Months
 
 
-
 Schedule:Compact, TwoSeasonSchedule, number,
-
 Through: 5/31, For: AllDays,  Until: 24:00, 1,
-
 Through: 9/30, For: AllDays,  Until: 24:00, 3,
-
 Through: 12/31, For: AllDays, Until: 24:00, 1;
 
 
-
 Schedule:Compact, TimeOfDaySchedule, number,
-
 Through: 5/31, For: AllDays,  Until: 15:00, 3,
-
                               Until: 22:00, 1,
-
                               Until: 24:00, 3,
-
 Through: 9/30, For: AllDays,  Until: 10:00, 3,
-
                               Until: 19:00, 1,
-
                               Until: 24:00, 3,
-
 Through: 12/31, For: AllDays, Until: 15:00, 3,
-
                               Until: 22:00, 1,
-
                               Until: 24:00, 3;
-
+```
 
 
 #### Example G – Blocks within Blocks
@@ -1402,110 +1181,63 @@ To set up this “block within a block” a UtilityCost:Charge:Block is first us
 
 
 
+```idf
   UtilityCost:Tariff,
-
     ExampleG,                !- Name
-
     ElectricityPurchased:Facility,  !- Output Meter Name
-
     KWh,                     !- Conversion Factor Choice
-
     ,                        !- Energy Conversion Factor
-
     ,                        !- Demand Conversion Factor
-
     ,                        !- Time of Use Period Schedule Name
-
     ,                        !- Season Schedule Name
-
     ,                        !- Month Schedule Name
-
     ,                        !- Demand Window Length
-
     35;                      !- Monthly Charge or Variable Name
 
 
-
   UtilityCost:Charge:Block,
-
     EnergyFirst200kWhPerkW,  !- Charge Variable Name
-
     ExampleG,                !- Tariff Name
-
     totalEnergy,             !- Source Variable
-
     Annual,                  !- Season
-
     NotIncluded,             !- Category Variable Name
-
     restOfEnergy,            !- Remaining Into Variable
-
     totalDemand,             !- Block Size Multiplier Value or Variable Name
-
     200,                     !- Block Size 1 Value or Variable Name
-
     1;                       !- Block 1 Cost Per Unit Value or Variable Name
 
 
-
   UtilityCost:Charge:Block,
-
     CostOfFirst200kWhPerkW,  !- Charge Variable Name
-
     ExampleG,                !- Tariff Name
-
     EnergyFirst200kWhPerkW,  !- Source Variable
-
     Annual,                  !- Season
-
     EnergyCharges,           !- Category Variable Name
-
     ,                        !- Remaining Into Variable
-
     ,                        !- Block Size Multiplier Value or Variable Name
-
     1000,                    !- Block Size 1 Value or Variable Name
-
     0.1032,                  !- Block 1 Cost Per Unit Value or Variable Name
-
     4000,                    !- Block Size 2 Value or Variable Name
-
     0.0743,                  !- Block 2 Cost Per Unit Value or Variable Name
-
     5000,                    !- Block Size 3 Value or Variable Name
-
     0.0623,                  !- Block 3 Cost Per Unit Value or Variable Name
-
     remaining,               !- Block Size 4 Value or Variable Name
-
     0.0427;                  !- Block 4 Cost Per Unit Value or Variable Name
 
 
-
   UtilityCost:Charge:Block,
-
     CostOfRestOfEnergy,      !- Charge Variable Name
-
     ExampleG,                !- Tariff Name
-
     restOfEnergy,            !- Source Variable
-
     Annual,                  !- Season
-
     EnergyCharges,           !- Category Variable Name
-
     ,                        !- Remaining Into Variable
-
     totalDemand,             !- Block Size Multiplier Value or Variable Name
-
     200,                     !- Block Size 1 Value or Variable Name
-
     0.0682,                  !- Block 1 Cost Per Unit Value or Variable Name
-
     remaining,               !- Block Size 2 Value or Variable Name
-
     0.0503;                  !- Block 2 Cost Per Unit Value or Variable Name
-
+```
 
 
 #### Example H – Real Time Pricing
@@ -1519,95 +1251,53 @@ Example H, shown below, is an example of how to use the UtilityCost:Tariff objec
 !  EXAMPLE H - Real Time Pricing (RTP)
 
 
-
+```idf
   UtilityCost:Tariff,
-
     ExampleH,                !- Name
-
     ElectricityPurchased:Facility,  !- Output Meter Name
-
     kWh,                     !- Conversion Factor Choice
-
     ,                        !- Energy Conversion Factor
-
     ,                        !- Demand Conversion Factor
-
     ,                        !- Time of Use Period Schedule Name
-
     ,                        !- Season Schedule Name
-
     ,                        !- Month Schedule Name
-
     ,                        !- Demand Window Length
-
     37.75,                   !- Monthly Charge or Variable Name
-
     ,                        !- Minimum Monthly Charge or Variable Name
-
     RTPpriceSchedule-H,      !- Real Time Pricing Charge Schedule Name
-
     ,                        !- Customer Baseline Load Schedule Name
-
     ,                        !- Group Name
-
     buyFromUtility;          !- Buy Or Sell
 
 
-
   Schedule:Compact,
-
     RTPpriceSchedule-H,      !- Name
-
     Any Number,              !- Schedule Type Limits Name
-
     Through: 5/31,           !- Field 1
-
     For: AllDays,            !- Field 2
-
     Until: 15:00,            !- Field 3
-
     0.02420,                 !- Field 4
-
     Until: 22:00,            !- Field 5
-
     0.08315,                 !- Field 6
-
     Until: 24:00,            !- Field 7
-
     0.02420,                 !- Field 8
-
     Through: 9/30,           !- Field 9
-
     For: AllDays,            !- Field 10
-
     Until: 10:00,            !- Field 11
-
     0.06312,                 !- Field 12
-
     Until: 19:00,            !- Field 13
-
     0.14009,                 !- Field 14
-
     Until: 24:00,            !- Field 15
-
     0.06312,                 !- Field 16
-
     Through: 12/31,          !- Field 17
-
     For: AllDays,            !- Field 18
-
     Until: 15:00,            !- Field 19
-
     0.02420,                 !- Field 20
-
     Until: 22:00,            !- Field 21
-
     0.08315,                 !- Field 22
-
     Until: 24:00,            !- Field 23
-
     0.02420;                 !- Field 24
-
+```
 
 
 #### Example I – Selling and Net-Metering
@@ -1623,131 +1313,79 @@ The second tariff needs to be defined with the “Buy or Sell” field set to �
 !  EXAMPLE I - Selling
 
 
-
+```idf
   UtilityCost:Charge:Simple,
-
     GeneratedElectricSold,   !- Charge Variable Name
-
     ExampleI-Sell,           !- Tariff Name
-
     totalEnergy,             !- Source Variable
-
     Annual,                  !- Season
-
     EnergyCharges,           !- Category Variable Name
-
     -0.02;                   !- Cost Per Unit Value (or Variable)
 
 
-
   UtilityCost:Tariff,
-
     ExampleI-Sell,           !- Name
-
     ElectricitySurplusSold:Facility,  !- Output Meter Name
-
     kWh,                     !- Conversion Factor Choice
-
     ,                        !- Energy Conversion Factor
-
     ,                        !- Demand Conversion Factor
-
     ,                        !- Time of Use Period Schedule Name
-
     ,                        !- Season Schedule Name
-
     ,                        !- Month Schedule Name
-
     ,                        !- Demand Window Length
-
     ,                        !- Monthly Charge or Variable Name
-
     ,                        !- Minimum Monthly Charge or Variable Name
-
     ,                        !- Real Time Pricing Charge Schedule Name
-
     ,                        !- Customer Baseline Load Schedule Name
-
     ,                        !- Group Name
-
     sellToUtility;           !- Buy Or Sell
 
 
-
   UtilityCost:Charge:Simple,
-
     GeneratedElectricSold,   !- Charge Variable Name
-
     ExampleI-Sell,           !- Tariff Name
-
     totalEnergy,             !- Source Variable
-
     Annual,                  !- Season
-
     EnergyCharges,           !- Category Variable Name
-
     -0.02;                   !- Cost Per Unit Value or Variable Name
 
-
+```
 
 
 
 The next part of this example is a rate that uses net-metering. With net metering the meter conceptually turns backwards when the energy is being sold to the utility directly reducing the energy consumption being charged.  Effectively, the rate charge for purchased electricity is the same as the rate credited for electricity sold to the utility. In this the “Buy or Sell” field should be set to “netMetering.”  It is also important the “Output Meter” is set to a meter that represents net metering such as “ElectricityNet:Facility.” The following example shows a simple example tariff using net metering with a single UtilityCost:Charge:Simple:
 
 
-
+```idf
 !  EXAMPLE I – Net Metering
 
 
-
   UtilityCost:Tariff,
-
     ExampleI-NetMeter,       !- Name
-
     ElectricityNet:Facility, !- Output Meter Name
-
     kWh,                     !- Conversion Factor Choice
-
     ,                        !- Energy Conversion Factor
-
     ,                        !- Demand Conversion Factor
-
     ,                        !- Time of Use Period Schedule Name
-
     ,                        !- Season Schedule Name
-
     ,                        !- Month Schedule Name
-
     ,                        !- Demand Window Length
-
     30.00,                   !- Monthly Charge or Variable Name
-
     ,                        !- Minimum Monthly Charge or Variable Name
-
     ,                        !- Real Time Pricing Charge Schedule Name
-
     ,                        !- Customer Baseline Load Schedule Name
-
     ,                        !- Group Name
-
     netMetering;             !- Buy Or Sell
 
 
-
   UtilityCost:Charge:Simple,
-
     NetMeteredCharge,        !- Charge Variable Name
-
     ExampleI-NetMeter,       !- Tariff Name
-
     totalEnergy,             !- Source Variable
-
     Annual,                  !- Season
-
     EnergyCharges,           !- Category Variable Name
-
     0.065;                   !- Cost Per Unit Value or Variable Name
-
+```
 
 
 UtilityCost:Tariff Reporting
@@ -1805,47 +1443,35 @@ When the UtilityCost:Computation object is used, it must contain references to a
 
 A typical rate will have a simple series of steps. For example F the following steps would be created automatically by the software:
 
+```idf
 UtilityCost:Computation,
-
   SpecialStepsForF,             !- Name
-
   ExampleF,                     !- Tariff Name
-
   EnergyCharges SUM SummerOnPeak SummerOffPeak WinterOnPeak WinterOffPeak, Compute Step 1
-
   Basis SUM EnergyCharges DemandCharges ServiceCharges, Compute Step 2
-
   SubTotal SUM Basis Adjustments Surcharges, Compute Step 3
-
   Total SUM SubTotal Taxes, Compute Step 4
-
   MinDemand; Compute Step 5
+```
+
 
 This example does not have any dependency of different charges that are summed on the same line but if it did the charges could appear by themselves on lines and this would indicate the order that they should be computed. Here is the same example again showing that form.
 
+```idf
 UtilityCost:Computation,
-
   SpecialStepsForF,            !- Name
-
   ExampleF,                    !- Tariff Name
-
   SummerOnPeak,                !- Compute Step 1
-
   SummerOffPeak,               !- Compute Step 2
-
   WinterOnPeak,                !- Compute Step 3
-
   WinterOffPeak,               !- Compute Step 4
-
   EnergyCharges SUM SummerOnPeak SummerOffPeak WinterOnPeak WinterOffPeak,  !- Compute Step 5
-
   Basis SUM EnergyCharges DemandCharges ServiceCharges,                     !- Compute Step 6
-
   SubTotal SUM Basis Adjustments Surcharges,   !- Compute Step 7
-
   Total SUM SubTotal Taxes,                    !- Compute Step 8
-
   MinDemand;                   !- Compute Step 9
+```
+
 
 This second expanded format is generated automatically when no UtilityCost:Computation object is provided.
 
@@ -2002,16 +1628,16 @@ Table 37. Cost Line Item Types (ref Objects)
 
 <table class="table table-striped">
 <tr>
-<td>Object Types available (choice keys)</td>
-<td>Cost per each</td>
-<td>Cost per m<sup>2</sup></td>
-<td>Cost per kW</td>
-<td>Cost per kW *COP</td>
-<td>Cost per m<sup>3</sup></td>
-<td>Cost per m<sup>3</sup>/s</td>
-<td>Cost per W/K</td>
-<td>Qty</td>
-<td>Wildcard for Name</td>
+<th>Object Types available (choice keys)</th>
+<th>Cost per each</th>
+<th>Cost per m<sup>2</sup></th>
+<th>Cost per kW</th>
+<th>Cost per kW *COP</th>
+<th>Cost per m<sup>3</sup></th>
+<th>Cost per m<sup>3</sup>/s</th>
+<th>Cost per W/K</th>
+<th>Qty</th>
+<th>Wildcard for Name</th>
 </tr>
 <tr>
 <td>General</td>
@@ -2133,42 +1759,6 @@ Table 37. Cost Line Item Types (ref Objects)
 <td> </td>
 <td> </td>
 </tr>
-<tr>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-</tr>
-<tr>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-</tr>
-<tr>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-</tr>
 </table>
 
 
@@ -2255,57 +1845,37 @@ This field is used to directly enter the line item quantity. The units should co
 
 Some examples of this object in an IDF:
 
+```idf
   ComponentCost:LineItem,
-
    PSZ Equipment from scaling , !- Name
-
    ,                            !- Type
-
    Coil:DX,                     !- Line Item Type
-
    ACDXCoil ZN1 ,               !- Item Name
-
    ,                            !- Object End Use Key
-
    ,                            !- Cost per Each {$}
-
    ,                            !- Cost per Area {$/m2}
-
    ,                            !- Cost per Unit of Output Capacity {$/kW}
-
    82.5;                   !- Cost per Unit of Output Capacity per COP {$/kW}
 
 
-
   ComponentCost:LineItem,
-
-    Lighting Equip: ZN2\_E\_Space\_1, ,
-
+    Lighting Equip: ZN2_E_Space_1, ,
     Lights,!- Line Item Type
-
-    ZN2\_E\_Space\_1, ,
-
+    ZN2_E_Space_1, ,
     ,!- Cost per Each {$}
-
     ,!- Cost per Area {$/m2}
-
     3300.000;!- Cost per Unit of Output Capacity {$/kW}
 
 
 
 
-
-  ComponentCost:LineItem, DL controls: ZN4\_W\_Space\_1, ,
-
+  ComponentCost:LineItem, DL controls: ZN4_W_Space_1, ,
     Daylighting:Detailed, !- Line Item Type
-
-    ZN4\_W\_Space\_1, ,!- Item Name
-
+    ZN4_W_Space_1, ,!- Item Name
     125.000, !- Cost per Each {$}
-
     ,!- Cost per Area {$/m2}
-
     ;!- Cost per Unit of Output Capacity {$/kW}
+```
 
 
 
@@ -2343,21 +1913,16 @@ This optional field can be used to enter an adjustment factor to account for reg
 
 An example of this object in an IDF is:
 
+```idf
 ComponentCost:Adjustments,
-
           467, !- Miscellaneous Cost per Conditioned Area
-
          0.07, !- Design and Engineering Fees
-
          0.07, !- Contractor Fee
-
          0.10, !- Contingency
-
          0.04, !- Permits, Bonding and Insurance
-
          0.015,!- Commissioning Fee
-
         1.136; !- Regional Adjustment Factor
+```
 
 
 
@@ -2399,23 +1964,17 @@ This optional field can be used to enter an adjustment factor to account for reg
 
 An example of this object in an IDF is:
 
+```idf
 ComponentCost:Reference,
-
   683060.000, !- Reference Building Line Item Costs {$}
-
   467.0, !- Reference Building Miscellaneous Cost per Conditioned Area {$/m2}
-
   0.060, !- Reference Building Design and Engineering Fees {dimensionless}
-
   0.070, !- Reference Building Contractor Fee {dimensionless}
-
   0.100, !- Reference Building Contingency
-
   0.04,  !- Reference Building Permits, Bonding and Insurance {dimensionless}
-
   0.0075,!- Reference Building Commissioning Fee {dimensionless}
-
   1.136; !- Reference Building Regional Adjustment Factor {dimensionless}
+```
 
 
 
@@ -2641,33 +2200,23 @@ The default value is None.
 
 An example of this object in an IDF:
 
+```idf
 LifeCycleCost:Parameters,
-
     TypicalLCC,              !- Name
-
     EndOfYear,               !- Discounting Convention
-
     ConstantDollar,          !- Inflation Approach
-
     0.034314,                !- Real Discount Rate
-
     ,                        !- Nominal Discount Rate
-
     ,                        !- Inflation
-
     January,                 !- Base Date Month
-
     2010,                    !- Base Date Year
-
     January,                 !- Service Date Month
-
     2010,                    !- Service Date Year
-
     25,                      !- Length of Study Period in Years
-
     0.39,                    !- Tax rate
-
     StraightLine-39year;     !- Depreciation Method
+```
+
 
 LifeCycleCost:RecurringCosts
 ----------------------------
@@ -2736,25 +2285,19 @@ Enter the annual escalation rate as a decimal. For a 1% rate, enter the value 0.
 
 An example of this object in an IDF:
 
+```idf
 LifeCycleCost:RecurringCosts,
-
     AnnualMaint,             !- Name
-
     Maintenance,             !- Category
-
     2000,                    !- Cost
-
     ServicePeriod,           !- Start of Costs
-
     0,                       !- Years from Start
-
     0,                       !- Months from Start
-
     1,                       !- Repeat Period Years
-
     0,                       !- Repeat Period Months
-
     0;                       !- Annual escalation rate
+```
+
 
 LifeCycleCost:NonrecurringCost
 ------------------------------
@@ -2803,19 +2346,16 @@ This field and the Years From Start field together represent the time from eithe
 
 An example of this object in an IDF:
 
+```idf
 LifeCycleCost:NonrecurringCost,
-
     EstimatedSalvage,        !- Name
-
     Salvage,                 !- Category
-
     -2000,                   !- Cost
-
     ServicePeriod,           !- Start of Costs
-
     20,                      !- Years from Start
-
     0;                       !- Months from Start
+```
+
 
 LifeCycleCost:UsePriceEscalation
 --------------------------------
@@ -2904,75 +2444,44 @@ If the number of years in LifeCycleCost:UsePriceEscalation is less than the numb
 
 An example of this object in an IDF:
 
+```idf
 LifeCycleCost:UsePriceEscalation,
-
     NorthEast  Residential-Electricity,  !- Name
-
     Electricity,                         !- Resource
-
     2010,                                !- Escalation Start Year
-
     January,                             !- Escalation Start Month
-
     0.9374,                              !- Year 1 Escalation
-
     0.9790,                              !- Year 2 Escalation
-
     1.0138,                              !- Year 3 Escalation
-
     1.0127,                              !- Year 4 Escalation
-
     1.0096,                              !- Year 5 Escalation
-
     1.0177,                              !- Year 6 Escalation
-
     1.0279,                              !- Year 7 Escalation
-
     1.0334,                              !- Year 8 Escalation
-
     1.0327,                              !- Year 9 Escalation
-
     1.0382,                              !- Year 10 Escalation
-
     1.0454,                              !- Year 11 Escalation
-
     1.0494,                              !- Year 12 Escalation
-
     1.0564,                              !- Year 13 Escalation
-
     1.0587,                              !- Year 14 Escalation
-
     1.0549,                              !- Year 15 Escalation
-
     1.0566,                              !- Year 16 Escalation
-
     1.0630,                              !- Year 17 Escalation
-
     1.0707,                              !- Year 18 Escalation
-
     1.0857,                              !- Year 19 Escalation
-
     1.0953,                              !- Year 20 Escalation
-
     1.1063,                              !- Year 21 Escalation
-
     1.1165,                              !- Year 22 Escalation
-
     1.1227,                              !- Year 23 Escalation
-
     1.1292,                              !- Year 24 Escalation
-
     1.1349,                              !- Year 25 Escalation
-
     1.1414,                              !- Year 26 Escalation
-
     1.1480,                              !- Year 27 Escalation
-
     1.1550,                              !- Year 28 Escalation
-
     1.1617,                              !- Year 29 Escalation
-
     1.1686;                              !- Year 30 Escalation
+```
+
 
 LifeCycleCost:UseAdjustment
 ---------------------------
@@ -3017,25 +2526,19 @@ The multiplier to be applied to the end use cost for each following year. The to
 
 An example of this object in an IDF:
 
+```idf
 LifeCycleCost:UseAdjustment,
-
     ElecAdjustment,          !- Name
-
     Electricity,             !- Resource
-
     1.0000,                  !- Year 1 Multiplier
-
     1.0022,                  !- Year 2 Multiplier
-
     1.0023,                  !- Year 3 Multiplier
-
     1.0024,                  !- Year 4 Multiplier
-
     1.0025,                  !- Year 5 Multiplier
-
     1.0026,                  !- Year 6 Multiplier
-
     1.0027;                  !- Year 7 Multiplier
+```
+
 
 ### CurrencyType
 
