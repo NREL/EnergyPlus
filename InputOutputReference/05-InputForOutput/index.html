@@ -334,14 +334,20 @@
 <h4 id="field-sort-option">Field: Sort Option</h4>
 <p>For this field there are two choices: <strong>Name</strong> and <strong>Unsorted</strong>. By default, the listing of available reporting variables are unsorted – listed in the streaming order that EnergyPlus generates them. Or, you can have them sorted by name.</p>
 <p>Examples of the options for this object follow:</p>
-<p>Output:VariableDictionary,regular;</p>
+<pre><code class="idf">Output:VariableDictionary,regular;
+</code></pre>
+
 <p>Results of this are shown in the Output Details document under the <strong>eplusout.rdd</strong> (output variables) and <strong>eplusout.mdd</strong> (meter variables) files.</p>
 <p>The eplusout.mdd file has a similar format for meters:</p>
 <h4 id="variable-dictionary-report-in-idf-format">Variable Dictionary Report in IDF Format</h4>
 <p>The common workflow process of examining Variable Dictionary Reports and then adding reporting requests to an IDF file can be facilitated by using the following alternate form (Report Name = IDF) of the input object that requests the reports.</p>
-<p>Output:VariableDictionary, IDF;</p>
+<pre><code class="idf">Output:VariableDictionary, IDF;
+</code></pre>
+
 <p>A sorted request would appear similarly:</p>
-<p>Output:VariableDictionary, IDF, Name;</p>
+<pre><code class="idf">Output:VariableDictionary, IDF, Name;
+</code></pre>
+
 <h3 id="surface-reports">Surface Reports</h3>
 <p>There are two specific objects for surfaces: <strong>Output:Surfaces:List</strong> and <strong>Output:Surfaces:Drawing</strong> – as the names imply, the list reports are simple text reports that are contained in one of the output files whereas the drawing reports will create files that are used in other graphic tools.</p>
 <p>These objects and their use is described in the following:</p>
@@ -349,39 +355,55 @@
 <p>Examples of using the Output:Surfaces:List object follow:</p>
 <h4 id="lines-data-report">Lines Data Report</h4>
 <p>An example input object for this report follows.</p>
-<p>Output:Surfaces:List, Lines;</p>
+<pre><code class="idf">Output:Surfaces:List, Lines;
+</code></pre>
+
 <p>The above IDF line will produce a simple file of line segments that constitute the surfaces in the IDF file. This file is the  “lines” report (<strong>eplusout.sln</strong>) and is decribed in more detail in the Output Details and Examples document.</p>
 <h4 id="field-report-specifications">Field: Report Specifications</h4>
 <p>An extra option of entering “IDF” in this field directs the Lines report to produce coordinates transformed into Surface Geometry (Lower Left Corner, CounterClockwise, WorldCoordinates).  An example of this follows.</p>
-<p>Output:Surfaces:List, Lines, IDF;</p>
+<pre><code class="idf">Output:Surfaces:List, Lines, IDF;
+</code></pre>
+
 <p>The result is put on the <strong>eplusout.sln</strong> file and is nearly ready for putting into a IDF. Again, it is described in more detail in the Output Details and Examples document.</p>
 <h4 id="detailed-surface-data-report">Detailed Surface Data Report</h4>
 <p>An example input object for this report follows.</p>
-<p>Output:Surfaces:List, Details;</p>
+<pre><code class="idf">Output:Surfaces:List, Details;
+</code></pre>
+
 <p>This report (in <strong>eplusout.eio</strong>) contains details about each surface – including surface name, associated zone, area, approximate height and width, tilt, outward facing angle. Specific details on this report can be found in the Output Details and Examples document.</p>
 <h4 id="vertices-data-report">Vertices Data Report</h4>
 <p>An example input object for this report follows.</p>
-<p>Output:Surfaces:List, Vertices;</p>
+<pre><code class="idf">Output:Surfaces:List, Vertices;
+</code></pre>
+
 <p>This report (in <strong>eplusout.eio</strong>) contains the vertices of each surface along with surface name and other information. Specific details on this report can be found in the Output Details and Examples document.</p>
 <h4 id="detailed-surface-data-with-vertices-report">Detailed Surface Data With Vertices Report</h4>
 <p>An example input object for this report follows.</p>
-<p>Output:Surfaces:List, DetailsWithVertices;</p>
+<pre><code class="idf">Output:Surfaces:List, DetailsWithVertices;
+</code></pre>
+
 <p>This report (in <strong>eplusout.eio</strong>) is the combination of the two preceding reports (Details and Vertices). Specific details on this report can be found in the Output Details and Examples document.</p>
 <h4 id="view-factor-information-report">View Factor Information Report</h4>
 <p>An example input object for this report follows.</p>
-<p>Output:Surfaces:List, ViewFactorInfo;</p>
+<pre><code class="idf">Output:Surfaces:List, ViewFactorInfo;
+</code></pre>
+
 <p>This report (in <strong>eplusout.eio</strong>) provides details about the thermal radiation exchange view factors and interchange factors.  Specific details on this report can be found in the Output Details and Examples document.</p>
 <h4 id="decaycurvesfromzonecomponentloads">DecayCurvesfromZoneComponentLoads</h4>
 <p>An example input object for this report follows.</p>
-<p>Output:Surfaces:List, DecayCurvesfromZoneComponentLoads;</p>
+<pre><code class="idf">Output:Surfaces:List, DecayCurvesfromZoneComponentLoads;
+</code></pre>
+
 <p>This report (in <strong>eplusout.eio</strong>) provides an intermediate calculation used, called a decay curve,  in the Zone Component Loads Summary report for the estimate of the sensible-delayed column values. A decay curve is created for each surface in a zone by introducing a radiant pulse. Each value in each row of the report corresponds to a zone time step from the time the pulse was introduced. See Zone Component Load Summary described in object Output:Table:SummaryReports for more detailed information.</p>
 <h3 id="outputsurfacesdrawing">Output:Surfaces:Drawing</h3>
 <p>Examples of using the Output:Surfaces:Drawing object follow:</p>
 <h4 id="dxf-surface-report">DXF Surface Report</h4>
 <p>Examples input objects follow.</p>
-<p>Output:Surfaces:Drawing, DXF;</p>
-<p>Output:Surfaces:Drawing, DXF, RegularPolyline;</p>
-<p>Output:Surfaces:Drawing, DXF, Triangulate3DFace, mycolorscheme;</p>
+<pre><code class="idf">Output:Surfaces:Drawing, DXF;
+Output:Surfaces:Drawing, DXF, RegularPolyline;
+Output:Surfaces:Drawing, DXF, Triangulate3DFace, mycolorscheme;
+</code></pre>
+
 <p>The above IDF specification will produce a DXF file (<strong>eplusout.dxf</strong>) of the surfaces in the IDF file.  Only one DXF report can be produced. More specifics on this report can be found in the Output Details and Examples document.</p>
 <h4 id="field-report-specifications-1">Field: Report Specifications 1</h4>
 <p>As indicated in the example, you can select among three different ways that surfaces with more than four sides will appear in the DXF file. These are:</p>
@@ -401,12 +423,16 @@
 <p>Several software programs can render this file into something viewable and are described in more detail in the Output Details and Examples document under the file name (<strong>eplusout.dxf</strong>).</p>
 <h4 id="dxf-wire-frame-report">DXF Wire Frame Report</h4>
 <p>An example input object for this report follows.</p>
-<p>Output:Surfaces:Drawing, DXF:WireFrame;</p>
+<pre><code class="idf">Output:Surfaces:Drawing, DXF:WireFrame;
+</code></pre>
+
 <p>The above IDF specification will produce a DXF (Drawing Exchange Format) file (<strong>eplusout.dxf</strong>) of the surfaces in the IDF file using the DXF “Lines” command – producing only a wire frame capable file. More specifics on this report can be found in the Output Details and Examples document. Only one DXF report can be produced.</p>
 <h4 id="vrml-report">VRML Report</h4>
 <p>Examples input objects for this report follow.</p>
-<p>Output:Surfaces:Drawing, VRML;</p>
-<p>Output:Surfaces:Drawing, VRML, Triangulate3DFace;</p>
+<pre><code class="idf">Output:Surfaces:Drawing, VRML;
+Output:Surfaces:Drawing, VRML, Triangulate3DFace;
+</code></pre>
+
 <p>The above IDF specification produces a VRML (Virtual Reality Modeling Language) file (<strong>eplusout.wrl</strong>) of the surfaces in the IDF file.  Only one VRML report can be produced. VRML files can be viewed in many web browsers after adding a “plug-in” and there are some stand-alone viewers as well. More specifics on this report can be found in the Output Details and Examples document.</p>
 <h4 id="field-report-specifications-1_1">Field: Report Specifications 1</h4>
 <p>As indicated in the example, you can select several figure types (for &gt;4 sided surfaces) in the DXF report. These are:</p>
@@ -427,19 +453,25 @@
 <p>This is a condensed reporting that illustrates the full range of schedule values – in the style of input: DaySchedule, WeekSchedule, and Annual Schedule.</p>
 <h4 id="field-key-field_1">Field: Key Field</h4>
 <p>This field should contain the word <strong>Hourly</strong> or <strong>TimeStep</strong> to obtain the respective reports.</p>
-<p>Output:Schedules, Hourly;  ! values on hourly increments (day schedule resolution)</p>
-<p>Output:Schedules, TimeStep; ! will give them at the timestep of the simulation</p>
+<pre><code class="idf">Output:Schedules, Hourly;  ! values on hourly increments (day schedule resolution)
+Output:Schedules, TimeStep; ! will give them at the timestep of the simulation
+</code></pre>
+
 <p>This report is placed on the <strong>eplusout.eio</strong> file. Details of this reporting are shown in the Output Details and Examples document.  Schedule values over time can also be obtained in the EnergyPlus Standard Output (in eplusout.eso) using Output:Variable objects.</p>
 <h3 id="outputconstructions">Output:Constructions</h3>
 <h4 id="constructions-report">Constructions Report</h4>
 <p>This report content is added to the “<strong>eplusout.eio</strong>” file. It shows the calculated results related to conduction transfer functions for each construction. It also includes similar details about the windows. Specific details on this report can be found in the Output Details and Examples document.  The following input object is used to obtain the Construction report.</p>
-<p>Output:Constructions,Constructions;</p>
+<pre><code class="idf">Output:Constructions,Constructions;
+</code></pre>
+
 <h4 id="field-details-type-1-details-type-2">Field: Details Type 1, Details Type 2</h4>
 <p>Either field can contain the word “<strong>Constructions</strong>” to get the constructions report.</p>
 <p>Or either field can contain the word “<strong>Materials</strong>” to obtain the Materials report.</p>
 <h4 id="materials-report">Materials Report</h4>
 <p>This report content is added to the “<strong>eplusout.eio</strong>” file. It provides a summary of the thermal properties and thickness of the construction and window materials in the model.  Specific details on this report can be found in the Output Details and Examples document.  The following input object is used to obtain the Materials report.</p>
-<p>Output:Constructions,Materials;</p>
+<pre><code class="idf">Output:Constructions,Materials;
+</code></pre>
+
 <h3 id="outputdaylightfactors">Output:DaylightFactors</h3>
 <p>Daylight factors are ratios of interior illuminance at a specific location to exterior horizontal illuminance. In EnergyPlus, they are pre-calculated hourly for every shadow calculation day for every exterior window of a daylight zone. The pre-calculated daylight factors are interpolated between hours and for the actual sky conditions in the time-step calculation of the daylighting performance of daylight zones.</p>
 <p>EnergyPlus reports the daylight factors for four sky types (clear, turbid clear, intermediate, and overcast) at noon time (12:00pm) for each exterior windows (base window without shading) in the eio file when the daylight factors are first calculated. This new object can report all hourly pre-calculated daylight factors. Details of the report are shown in the Output Details document.</p>
@@ -454,10 +486,12 @@
 <h4 id="field-energyplus-runtime-language-debug-output-level">Field: EnergyPlus Runtime Language Debug Output Level</h4>
 <p>This field is used to control the level of output reporting related to the execution of EnergyPlus Runtime Language, or Erl. This reporting is valuable for debugging Erl programs. When Erl programs are run inside EnergyPlus they can report error situations (such as divide by zero) or a full trace of each Erl statement. There are three levels of reporting. The “None” choice means that no reporting of Erl debug information is done. The “ErrorsOnly” choice means that Erl debugging traces are only output if the statement produces an error situation. The “Verbose” choice means that Erl debugging traces are done for each line of each Erl program. The verbose setting needs to be used with care because a large model with a long runperiod can easily create an EDD file that is too large for most computer systems (e.g. many GBs of text).</p>
 <p>An example of this object follows.</p>
-<p>Output:EnergyManagementSystem,</p>
-<p>Verbose,    ! Actuator Availability Dictionary Reporting</p>
-<p>Verbose,    ! Internal Variable Availability Dictionary Reporting</p>
-<p>ErrorsOnly; ! EnergyPlus Runtime Language Debug Output Level</p>
+<pre><code class="idf">Output:EnergyManagementSystem,
+    Verbose,    ! Actuator Availability Dictionary Reporting
+    Verbose,    ! Internal Variable Availability Dictionary Reporting
+    ErrorsOnly; ! EnergyPlus Runtime Language Debug Output Level
+</code></pre>
+
 <h3 id="outputcontrolsurfacecolorscheme">OutputControl:SurfaceColorScheme</h3>
 <p>This object provides control over the colors that appear in the DXF report, by surface.  In addition, the Datasets folder contains example objects, including the “original” color scheme (prior to the 2.1 release).</p>
 <h4 id="field-name">Field: Name</h4>
@@ -481,23 +515,29 @@
 <p>Zone Cooling Setpoint Not Met While Occupied Time</p>
 <p>This also impacts table report "Annual Building Utility Performance Summary" subtable "Comfort and Setpoint Not Met Summary".</p>
 <p>As seen in an IDF:</p>
-<p>OutputControl:ReportingTolerances,.21,.21;</p>
+<pre><code class="idf">OutputControl:ReportingTolerances,.21,.21;
+</code></pre>
+
 <h3 id="outputvariable">Output:Variable</h3>
 <p>This input object is used request results reporting.  As shown above in the Variable Dictionary Report section, there are many different output variables available for reporting results from EnergyPlus.  The Output:Variable object is primarily used for reporting time series data at various frequencys.</p>
 <p>Each Output:Variable object causes a specific number assignment for outputs. For example, you could request separate reporting for the outside temperature:</p>
-<p>Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;</p>
-<p>Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;</p>
-<p>Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;</p>
+<pre><code class="idf">Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
+Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;
+</code></pre>
+
 <h4 id="field-key-value">Field: Key Value</h4>
 <p>This alpha field can be used to make a specific reference for reporting. In addition to the generic variable names listed in the Variable Dictionary Report for the input file, variables will also have a key designator (such as Zone name or Surface name). You can reference the standard output file (<strong>eplusout.eso</strong>) to see just how these look.</p>
-<p>41,2,ZN001:WALL004,Surface Inside Temperature [C]</p>
-<p>42,2,ZN001:WALL004,Surface Outside Temperature [C]</p>
-<p>43,2,ZN001:WALL004,Surface Int Convection Coeff[W/m2-K]</p>
-<p>44,2,ZN001:WALL004,Surface Ext Convection Coeff[W/m2-K]</p>
-<p>46,2,ZONE ONE,Zone Mean Radiant Temperature [C]</p>
-<p>47,2,ZONE ONE,Zone Total Internal Latent Gain Energy [J]</p>
-<p>51,2,ZONE ONE,Zone Lights Electric Energy [J]</p>
-<p>58,2,ZONE ONE,Zone Air Temperature [C]</p>
+<pre><code>41,2,ZN001:WALL004,Surface Inside Temperature [C]
+42,2,ZN001:WALL004,Surface Outside Temperature [C]
+43,2,ZN001:WALL004,Surface Int Convection Coeff[W/m2-K]
+44,2,ZN001:WALL004,Surface Ext Convection Coeff[W/m2-K]
+46,2,ZONE ONE,Zone Mean Radiant Temperature [C]
+47,2,ZONE ONE,Zone Total Internal Latent Gain Energy [J]
+51,2,ZONE ONE,Zone Lights Electric Energy [J]
+58,2,ZONE ONE,Zone Air Temperature [C]
+</code></pre>
+
 <p>For example, in the previous block, the key for the surface variables is <strong>ZN001:WALL004</strong> whereas the key for the zone variables is <strong>ZONE ONE</strong> (note that the space is required and significant for this key).</p>
 <p>You can have all keys listed in the standard output file by putting a “*” in this field or you can have specific items listed by putting in a key value. If this field is left blank, it will use a * as the default (i.e., you will get all variables of Variable Name).</p>
 <h4 id="field-variable-name">Field: Variable Name</h4>
@@ -507,12 +547,14 @@
 <h4 id="field-schedule-name">Field: Schedule Name</h4>
 <p>The final field is a schedule name. This can be used to limit the number of lines that appear in your output file. For example, a schedule such as “ON PEAK” or “OFF PEAK” could provide a slice of values. Or, a seasonal schedule could be devised. The output variable will be active during any hour in which the schedule value is &gt;0. For daily, monthly, and environment reporting frequencies, the aggregate value will be only for active schedule hours. Summed variables will report the sum for the active hours only. Averaged variables will report the average during the active hours only. If Schedule_Name is omitted, the output variable will be active for all hours.</p>
 <p>Other IDF examples:</p>
-<p>Output:Variable, * , Zone Mean Air Temperature, hourly;</p>
-<p>Output:Variable, * , Zone Mean Radiant Temperature, timestep;</p>
-<p>Output:Variable, * , Zone Air System Sensible Heating Energy, hourly;</p>
-<p>Output:Variable, * , Zone Air System Sensible Cooling Energy, hourly;</p>
-<p>Output:Variable, * , Zone Air Temperature, hourly;</p>
-<p>Output:Variable, * , Zone Air Temperature;  ! same as previous line</p>
+<pre><code class="idf">Output:Variable, * , Zone Mean Air Temperature, hourly;
+Output:Variable, * , Zone Mean Radiant Temperature, timestep;
+Output:Variable, * , Zone Air System Sensible Heating Energy, hourly;
+Output:Variable, * , Zone Air System Sensible Cooling Energy, hourly;
+Output:Variable, * , Zone Air Temperature, hourly;
+Output:Variable, * , Zone Air Temperature;  ! same as previous line
+</code></pre>
+
 <h3 id="outputmeter-and-outputmetermeterfileonly">Output:Meter and Output:Meter:MeterFileOnly</h3>
 <h3 id="outputmetercumulative-and-outputmetercumulativemeterfileonly">Output:Meter:Cumulative and Output:Meter:Cumulative:MeterFileOnly</h3>
 <p>Appropriate variables are grouped onto “meters” for reporting purposes.  (The meters available are listed in the eplusout.mdd file, see Variable Dictionary Report section.) If the “Output:Meter” input object is used, these results written out to both the <strong>eplusout.eso</strong> and <strong>eplusout.mtr</strong> files. This allows easy graphing and comparison with “normal” values (such as Zone Temperature or Outdoor Temperature). If the “Output:Meter:MeterFileOnly” input object is used, then the values results written out to only the <strong>eplusout.mtr</strong> file. The <strong>eplusout.mtr</strong> file has the same structure as the <strong>eplusout.eso</strong> file. A companion file, the <strong>eplusout.mtd</strong> file, contains a detailed list and explanation of all meters for a given run and the component values that are accumulated on each meter.</p>
@@ -533,19 +575,23 @@
 </ul>
 <p>The user requests reporting by either specifying the full name above (without Units) or a “wildcard” representation of that name (to obtain all meters of a type). For example, entering “Electricity:*” for the meter name will report on all the Electricity: meters (Electricity:Facility, Electricity:Building, Electricity:Zone:Resistive Zone, Electricity:Zone:East Zone, Electricity:North Zone in the example above). Both the resource types and end-use types are set within the program by the developers. End-use subcategories are user-defined and are an input field for certain objects.</p>
 <p>To summarize the previous paragraph, you could use:</p>
-<p>Output:Meter,Electricity:*;</p>
+<pre><code class="idf">Output:Meter,Electricity:*;
+</code></pre>
+
 <p>To get the same outputs as if you had entered:</p>
-<p>Output:Meter,Electricity:Facility;</p>
-<p>Output:Meter,Electricity:Building;</p>
-<p>Output:Meter,Electricity:Zone:South Zone;</p>
-<p>Output:Meter,Electricity:Zone:East Zone;</p>
-<p>Output:Meter,Electricity:North Zone;</p>
+<pre><code class="idf">Output:Meter,Electricity:Facility;
+Output:Meter,Electricity:Building;
+Output:Meter,Electricity:Zone:South Zone;
+Output:Meter,Electricity:Zone:East Zone;
+Output:Meter,Electricity:North Zone;
+</code></pre>
+
 <p>From a three zone file that had no HVAC electricity (i.e., had only electric equipment or lighting equipment in an uncontrolled three zone building).</p>
 <p>Current resource types are shown in the table below:</p>
 <p>Table 38. Table of Metered Resource  Types</p>
 <table class="table table-striped">
 <tr>
-<td>Utility/Fuel Types</td>
+<th>Utility/Fuel Types</th>
 </tr>
 <tr>
 <td>Electricity</td>
@@ -602,7 +648,7 @@
 
 <table class="table table-striped">
 <tr>
-<td>Other Resource Types</td>
+<th>Other Resource Types</th>
 </tr>
 <tr>
 <td>EnergyTransfer</td>
@@ -613,7 +659,7 @@
 <p>Table 39. End Use Category Types</p>
 <table class="table table-striped">
 <tr>
-<td>Utility/Fuel End Use Types</td>
+<th>Utility/Fuel End Use Types</th>
 </tr>
 <tr>
 <td>InteriorLights</td>
@@ -664,7 +710,7 @@
 
 <table class="table table-striped">
 <tr>
-<td>Additional End Use Types Only Used for EnergyTransfer</td>
+<th>Additional End Use Types Only Used for EnergyTransfer</th>
 </tr>
 <tr>
 <td>HeatingCoils</td>
@@ -693,7 +739,7 @@
 <p>Table 40. Overall Meter Types</p>
 <table class="table table-striped">
 <tr>
-<td>Meters</td>
+<th>Meters</th>
 </tr>
 <tr>
 <td>Facility</td>
@@ -722,9 +768,11 @@
 <h4 id="field-reporting-frequency_1">Field: Reporting Frequency</h4>
 <p>Similar to the output variables, meters can be reported at different frequencies. Their resolution is the Zone Timestep interval (Number of Timesteps input). For this frequency, the elemental value of the meter will be reported. For more inclusive frequencies, the summed value along with the maximum and minimum values for the time interval will be reported. Default for this field if left blank or omitted is <strong>Hourly</strong>.</p>
 <p>Examples of specifying the object in the IDF follow.</p>
-<p>Output:Meter,Electricity:*,RunPeriod;</p>
-<p>Output:Meter,ExteriorEquipment*,RunPeriod;</p>
-<p>Output:Meter:Cumulative,Electricity:*,Monthly;</p>
+<pre><code class="idf">Output:Meter,Electricity:*,RunPeriod;
+Output:Meter,ExteriorEquipment*,RunPeriod;
+Output:Meter:Cumulative,Electricity:*,Monthly;
+</code></pre>
+
 <h4 id="meter-details-file-eplusoutmtd">Meter Details File (eplusout.mtd)</h4>
 <p>The meter details file illustrates what is on each meter and vice versa.  It is described in the Output Details and Examples document under the file name.</p>
 <h3 id="outputenvironmentalimpactfactors">Output:EnvironmentalImpactFactors</h3>
@@ -740,8 +788,8 @@
 <p>The energy is obtained internally from the following facility meters:</p>
 <table class="table table-striped">
 <tr>
-<td>Electricity:Facility</td>
-<td>Diesel:Facility</td>
+<th>Electricity:Facility</th>
+<th>Diesel:Facility</th>
 </tr>
 <tr>
 <td>DistrictCooling:Facility</td>
@@ -774,8 +822,10 @@
 <p>Similar to the output variables and meters the environmental impact calculations can be reported at different frequencies. Their resolution is the Zone Timestep interval (Number of Timesteps input). For this frequency, the elemental value of the Environmental Impact Factors Calculation will be reported. For more inclusive frequencies, the summed value along with the maximum and minimum values for the time interval will be reported.</p>
 <p>Valid values are Timestep, Hourly, Daily, Monthly or RunPeriod.</p>
 <p>An example of specifying in the IDF:</p>
-<p>Output:EnvironmentalImpactFactors,</p>
-<p>Monthly;  !- Reporting_Frequency</p>
+<pre><code class="idf">  Output:EnvironmentalImpactFactors,
+    Monthly;  !- Reporting_Frequency
+</code></pre>
+
 <h3 id="environmentalimpactfactors">EnvironmentalImpactFactors</h3>
 <p>The EnvironmentalImpactFactors object contains additional information that is not individually specified in the FuelFactors object and is the second object needed to complete the calculation.  Source to Site conversion factors for District Heating, District Cooling and Steam are entered in this object.</p>
 <h4 id="field-district-heating-efficiency">Field: District Heating Efficiency</h4>
@@ -791,13 +841,15 @@
 <h4 id="field-total-carbon-equivalent-emission-factor-from-co2">Field: Total Carbon Equivalent Emission Factor From CO2</h4>
 <p>The Intergovernmental Panel on Climate Change has studied the effects on the relative radiative forcing effects of various greenhouse gases. This effect, called Global Warming Potential (GWP), is described in terms of the Carbon Equivalent of a particular greenhouse gas. CO<sub>2</sub> (carbon dioxide) can be produced by all Fuel Types and has a default carbon equivalent emission factor of 0.2727 kg C/kg CO<sub>2</sub>.</p>
 <p>An example of specifying in the IDF:</p>
-<p>EnvironmentalImpactFactors,</p>
-<p>0.3,         !- Disctrict Heating Efficiency</p>
-<p>3.0,         !- District Cooling COP</p>
-<p>0.25,        !- Steam Conversion Efficiency</p>
-<p>80.7272,     !- Total Carbon Equivalent Emission Factor From N2O</p>
-<p>6.2727,      !- Total Carbon Equivalent Emission Factor From CH4</p>
-<p>0.2727;      !- Total Carbon Equivalent Emission Factor From CO2</p>
+<pre><code class="idf">  EnvironmentalImpactFactors,
+    0.3,         !- Disctrict Heating Efficiency
+    3.0,         !- District Cooling COP
+    0.25,        !- Steam Conversion Efficiency
+    80.7272,     !- Total Carbon Equivalent Emission Factor From N2O
+    6.2727,      !- Total Carbon Equivalent Emission Factor From CH4
+    0.2727;      !- Total Carbon Equivalent Emission Factor From CO2
+</code></pre>
+
 <h3 id="fuelfactors">FuelFactors</h3>
 <h4 id="field-existing-fuel-resource-name">Field: Existing Fuel Resource Name</h4>
 <p>This is the name of the Fuel that is being described with this object. Source to Site conversion factors for each tool are entered with these objects. Allowable Fuel Types are:  Electricity, Natural Gas, FuelOil#1, FuelOil#2, Coal, Gasoline, Propane, Diesel, OtherFuel1, OtherFuel2.</p>
@@ -878,221 +930,575 @@
 <h4 id="field-nuclear-low-level-emission-factor-schedule-name">Field: Nuclear Low Level Emission Factor Schedule Name</h4>
 <p>Similar to the source energy calculation, this field contains the name of a schedule containing values that are multiplied by the fuel consumption to determine the total emission values. Specifically, each value in the schedule are multiplied by the emission factor field value and by the fuel consumption to determine the overall emission factor for the fuel. If the values in the schedule fully represent the emission factor, the value in the previous field, should be set to one.</p>
 <p>An example of specifying in the IDF:</p>
-<p>FuelFactors,                 !  USA national average based on eGRID, EIA 1605</p>
-<p>Electricity,             !- Existing Fuel Resource Name</p>
-<p>kg,                      !- Units of Measure (kg or m3)</p>
-<p>,                        !- Energy per Unit Factor</p>
-<p>2.253,                   !- Source Energy Factor {J/J}</p>
-<p>,                        !- Source Energy Schedule Name</p>
-<p>168.33317,               !- CO2 Emission Factor {g/MJ}</p>
-<p>,                        !- CO2 Emission Factor Schedule Name</p>
-<p>4.20616E-02,             !- CO Emission Factor {g/MJ}</p>
-<p>,                        !- CO Emission Factor Schedule Name</p>
-<p>1.39858E-03,             !- CH4 Emission Factor {g/MJ}</p>
-<p>,                        !- CH4 Emission Factor Schedule Name</p>
-<p>4.10753E-01,             !- NOx Emission Factor {g/MJ}</p>
-<p>,                        !- NOx Emission Factor Schedule Name</p>
-<p>2.41916E-03,             !- N2O Emission Factor {g/MJ}</p>
-<p>,                        !- N2O Emission Factor Schedule Name</p>
-<p>8.65731E-01,             !- SO2 Emission Factor {g/MJ}</p>
-<p>,                        !- SO2 Emission Factor Schedule Name</p>
-<p>2.95827E-02,             !- PM Emission Factor {g/MJ}</p>
-<p>,                        !- PM Emission Factor Schedule Name</p>
-<p>1.80450E-02,             !- PM10 Emission Factor {g/MJ}</p>
-<p>,                        !- PM10 Emission Factor Schedule Name</p>
-<p>1.15377E-02,             !- PM2.5 Emission Factor {g/MJ}</p>
-<p>,                        !- PM2.5 Emission Factor Schedule Name</p>
-<p>1.10837E-03,             !- NH3 Emission Factor {g/MJ}</p>
-<p>,                        !- NH3 Emission Factor Schedule Name</p>
-<p>3.72332E-03,             !- NMVOC Emission Factor {g/MJ}</p>
-<p>,                        !- NMVOC Emission Factor Schedule Name</p>
-<p>3.36414E-06,             !- Hg Emission Factor {g/MJ}</p>
-<p>,                        !- Hg Emission Factor Schedule Name</p>
-<p>0,                       !- Pb Emission Factor {g/MJ}</p>
-<p>,                        !- Pb Emission Factor Schedule Name</p>
-<p>2.10074,                 !- Water Emission Factor {L/MJ}</p>
-<p>,                        !- Water Emission Factor Schedule Name</p>
-<p>0,                       !- Nuclear High Level Emission Factor {g/MJ}</p>
-<p>,                        !- Nuclear High Level Emission Factor Schedule Name</p>
-<p>0;                       !- Nuclear Low Level Emission Factor {m3/MJ}</p>
+<pre><code class="idf">FuelFactors,                 !  USA national average based on eGRID, EIA 1605
+    Electricity,             !- Existing Fuel Resource Name
+    kg,                      !- Units of Measure (kg or m3)
+    ,                        !- Energy per Unit Factor
+    2.253,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    168.33317,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    4.20616E-02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.39858E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.10753E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.41916E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    8.65731E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.95827E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.80450E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.15377E-02,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.10837E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.72332E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.36414E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    2.10074,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+</code></pre>
+
 <h3 id="environmental-pollution-impact-outputs">Environmental Pollution Impact Outputs</h3>
 <p>Various output variables and meters related to emissions are available when modeling with environmental impact and fuel factor inputs.   Output is available as either output variables or output meters.   The variables and meters available depending on the number of FuelFactor input objects and the type of fuel used in them.  Most of the fuel types have the same set of outputs for emissions that correspond to the types of emission factors in the input objects.  The exception is electricity which has two additional outputs to track possible net metering situations that can occur with on-site generation.</p>
 <p>The following pollution-emission-related outputs are available for environmental impacts.</p>
+<ul>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Nuclear High Level Waste From Natural Gas [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Natural Gas Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity Nuclear High Level Waste Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Electricity Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Purchased Electricity Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Surplus Sold Electricity Source [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal Nuclear High Level Waste Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Coal Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 Nuclear High Level Waste Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #2 Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 Nuclear High Level Waste Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Fuel Oil #1 Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane Nuclear High Level Waste Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Propane Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline Nuclear High Level Waste Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Gasoline Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Diesel Nuclear High Level Waste Mass [kg]</p>
-<p>HVAC,Sum,Environmental Impact Diesel Nuclear Low Level Waste Volume [m3]
- HVAC,Sum,Environmental Impact OtherFuel1 Source Energy [J]</p>
+</li>
+<li>
+<p>HVAC,Sum,Environmental Impact Diesel Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
+<p>HVAC,Sum,Environmental Impact OtherFuel1 Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 Nuclear High Level Waste Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel1 Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 Source Energy [J]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 CO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 CO Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 CH4 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 NOx Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 N2O Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 SO2 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 PM Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 PM10 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 PM2.5 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 NH3 Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 NMVOC Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 Hg Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 Pb Emissions Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 Water Consumption Volume [L]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 Nuclear High Level Waste Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact OtherFuel2 Nuclear Low Level Waste Volume [m3]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Total N2O Emissions Carbon Equivalent Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Total CH4 Emissions Carbon Equivalent Mass [kg]</p>
+</li>
+<li>
 <p>HVAC,Sum,Environmental Impact Total CO2 Emissions Carbon Equivalent Mass [kg]</p>
+</li>
+</ul>
 <h4 id="environmental-impact-electricity-source-energy-j">Environmental Impact Electricity Source Energy [J]</h4>
 <h4 id="environmental-impact-purchased-electricity-source-energy-j">Environmental Impact Purchased Electricity Source Energy [J]</h4>
 <h4 id="environmental-impact-surplus-sold-electricity-source-j">Environmental Impact Surplus Sold Electricity Source [J]</h4>
@@ -1289,212 +1695,600 @@
 <h4 id="environmental-impact-total-co2-emissions-carbon-equivalent-mass-kg">Environmental Impact Total CO2 Emissions Carbon Equivalent Mass [kg]</h4>
 <p>This output provides the result for equivalent carbon mass associated with the carbon dioxide releases that stem from the consumption of each type of fuel that might be used at the site.  The units are kg.</p>
 <p>The following different output meters could appear in the standard meter output (.mdd) file:</p>
+<ul>
+<li>
 <p>Zone,Meter,Source:Facility [J]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,CO2:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CO:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CH4:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NOx:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,N2O:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,SO2:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PM:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PM10:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PM2.5:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NH3:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NMVOC:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,Hg:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,Pb:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,WaterEnvironmentalFactors:Facility [L]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,Nuclear High:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,Nuclear Low:Facility [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,NaturalGasEmissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,ElectricEmissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,PurchasedElectricEmissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,SoldElectricEmissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CoalEmissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#2Emissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,FuelOil#1Emissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,PropaneEmissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,GasolineEmissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,DieselEmissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel1Emissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:Source [J]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:CO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:CO [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:CH4 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:NOx [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:N2O [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:SO2 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:PM [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:PM10 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:PM2.5 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:NH3 [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:NMVOC [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:Hg [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:Pb [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:WaterEnvironmentalFactors [L]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:Nuclear High [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,OtherFuel2Emissions:Nuclear Low [m3]</p>
+</li>
+<li>
 <p>Zone,Meter,Carbon Equivalent:Facility [kg]</p>
+</li>
+<li>
 <p>Zone,Meter,CarbonEquivalentEmissions:Carbon Equivalent [kg]</p>
+</li>
+</ul>
 <p>What shows up in the output are the Energy Meters that were utilized in this particular input file, the pollutants, and the Total Carbon Equivalent.</p>
 <h3 id="outputsqlite">Output:SQLite</h3>
 <p>Output from EnergyPlus can be written to SQLite files for manipulation outside some of the standard (such as spreadsheet) tools.</p>
 <h4 id="field-option">Field: Option</h4>
 <p>Currently, there are limited capabilities for specifying SQLite generation.  The Simple option will include all of the predefined database tables as well as time series related data.  Using the SimpleAndTabular choice adds database tables related to the tabular reports that are already output by EnergyPlus in other formats.  The description for SQLite outputs is described fully in the Output Details document.</p>
 <p>And one includes it in the IDF using the following.</p>
-<p>Output:SQLite, Simple;</p>
+<pre><code class="idf">Output:SQLite, Simple;
+</code></pre>
+
 <h1 id="output">Output</h1>
 <p>EnergyPlus produces several output files as shown in the section on “Running EnergyPlus”.  This section will discuss the data contained in the “standard” output files (<strong>eplusout.eso, eplusout.mtr</strong>). They, too, have data dictionaries but unlike the input files, the output data dictionary is contained within the output file. Thus, the basic structure of the standard output file is:</p>
-<p>Data Dictionary Information</p>
-<p>End of Data Dictionary</p>
-<p>Data</p>
-<p>…</p>
-<p>Data</p>
-<p>End of Data</p>
+<pre><code>Data Dictionary Information
+End of Data Dictionary
+Data
+...
+Data
+End of Data
+</code></pre>
+
 <p>As with the IDF structure, there are rules associated with the interpretation of the standard output data dictionary. These rules are summarized as follows:</p>
 <ul>
 <li>
@@ -1505,36 +2299,55 @@
 </li>
 </ul>
 <p>Six standard items appear at the start of every EnergyPlus Standard Output File Data Dictionary:</p>
-<p>Program Version,EnergyPlus &lt;version number indicated&gt;</p>
-<p>1,5,Environment Title[],Latitude[degrees],Longitude[degrees],Time Zone[],Elevation[m]</p>
-<p>2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType</p>
-<p>3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Output variables Requested</p>
-<p>4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Output variables Requested</p>
-<p>5,1,Cumulative Days of Simulation[] ! When Run Period Output variables Requested</p>
+<pre><code>Program Version,EnergyPlus &lt;version number indicated&gt;
+1,5,Environment Title[],Latitude[degrees],Longitude[degrees],Time Zone[],Elevation[m]
+2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Output variables Requested
+4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Output variables Requested
+5,1,Cumulative Days of Simulation[] ! When Run Period Output variables Requested
+</code></pre>
+
+<ul>
+<li>
 <p>Item 0 is the program version statement.</p>
+</li>
+<li>
 <p>Item 1 is produced at the beginning of each new “environment” (design day, run period).</p>
+</li>
+<li>
 <p>Item 2 is produced prior to any variable reported at the timestep or hourly intervals. Hourly intervals will be shown with a start minute of 0.0 and an end minute of 60.0. Timestep intervals will show the appropriate start and end minutes.</p>
+</li>
+<li>
 <p>Item 3 is produced prior to any variable reported at the daily interval.</p>
+</li>
+<li>
 <p>Item 4 is produced prior to any variable reported at the monthly interval.</p>
+</li>
+<li>
 <p>Item 5 is produced prior to any variable reported at the end of the “environment”.</p>
+</li>
+</ul>
 <p>Following these five standard lines will be the variables requested for reporting from the input file (ref. Output:Variable object). For example:</p>
-<p>6,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly</p>
-<p>40,1,ZONE ONE,Zone Total Internal Latent Gain Energy [J] !Hourly</p>
-<p>68,1,ZONE ONE,Zone Mean Radiant Temperature [C] !Hourly</p>
-<p>69,1,ZONE ONE,Zone Mean Air Temperature [C] !Hourly</p>
-<p>70,1,ZONE ONE,Zone Air Heat Balance Surface Convection Rate [W] !Hourly</p>
-<p>71,1,ZONE ONE,Zone Air Heat Balance Air Energy Storage Rate [W] !Hourly</p>
+<pre><code>6,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly
+40,1,ZONE ONE,Zone Total Internal Latent Gain Energy [J] !Hourly
+68,1,ZONE ONE,Zone Mean Radiant Temperature [C] !Hourly
+69,1,ZONE ONE,Zone Mean Air Temperature [C] !Hourly
+70,1,ZONE ONE,Zone Air Heat Balance Surface Convection Rate [W] !Hourly
+71,1,ZONE ONE,Zone Air Heat Balance Air Energy Storage Rate [W] !Hourly
+</code></pre>
+
 <p>This example illustrates the non-consecutive nature of the “report codes”. Internally, EnergyPlus counts each variable that <em>could</em> be reported. This is the assigned “report code”. However, the user may not request each possible variable for reporting. Note that, currently, the requested reporting frequency is shown as a comment (!) line in the standard output file.</p>
 <p>The data is produced when the actual simulation is performed (after the warmup days unless the Output:Diagnostics requesting ReportDuringWarmup is used). Data output is simpler in format than the data dictionary lines. From the dictionary above:</p>
-<p>1,DENVER STAPLETON INTL ARPT ANN HTG 99% CONDNS DB,  39.74,-105.18,  -7.00,1829.00</p>
-<p>2,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay</p>
-<p>6,-16.</p>
-<p>40,0.0</p>
-<p>68,-19.8183039170649</p>
-<p>69,-19.8220899203323</p>
-<p>70,-3.175272922406513E-002</p>
-<p>71,-3.181520440307718E-002</p>
-<p>…</p>
+<pre><code>1,DENVER STAPLETON INTL ARPT ANN HTG 99% CONDNS DB,  39.74,-105.18,  -7.00,1829.00
+2,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay
+6,-16.
+40,0.0
+68,-19.8183039170649
+69,-19.8220899203323
+70,-3.175272922406513E-002
+71,-3.181520440307718E-002
+</code></pre>
+
 <p>This output file can be easily turned into a form that is read into commonly used spreadsheet programs where it can be further analyzed, graphed, etc.</p>
 <p>More details including graphs are shown in the Output Details and Examples Document under the file <strong>eplusout.eso</strong>.</p>
 <h2 id="using-readvarseso">Using ReadVarsESO</h2>
@@ -1545,8 +2358,8 @@
 <p>Table 41. ReadVarsESO Command Line Options</p>
 <table class="table table-striped">
 <tr>
-<td>Option</td>
-<td>Description</td>
+<th>Option</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>&lt;filename&gt;</td>
@@ -1583,8 +2396,8 @@
 <p>Table 42. "RVI" file contents</p>
 <table class="table table-striped">
 <tr>
-<td>.rvi line description</td>
-<td>Actual .rvi File Contents</td>
+<th>.rvi line description</th>
+<th>Actual .rvi File Contents</th>
 </tr>
 <tr>
 <td>Input File</td>
@@ -1664,15 +2477,17 @@
 <p>ReadVarsESO takes the input stream but recognizes the date/time information and appropriately places the required data onto the “output file”. Following these lines are a list of variables to be culled from the “input file” and placed onto the output file. “Variable Name” will take all variables matching that description whereas “Specific Variable Name” will only match the full description of the variable. So, in the above example, “Zone Air Temperature” will report air temperatures for all the zones (but available at the HVAC timestep if you choose the “detailed” reporting frequency in your input file) but “AIR LOOP OUTLET NODE” and “COOLING COIL AIR OUTLET NODE” will be the only values reported for the “System Node Temperature” variable (the node temperature is available for all nodes used in the simulation). The termination line (0) is included to terminate the input to the ReadVarsESO program and begin the scanning.</p>
 <p>The output from ReadVarsESO is in the form commonly called “comma de-limited” or “comma separated variable”. This format can be read easily in spreadsheet programs, such as Excel™.</p>
 <p>Note as described in the “Input for Output” above, only variables as listed on the <strong>eplusout.rdd</strong> file are available for reporting. If you request others, they will become “Warning” messages in the <strong>eplusout.err</strong> file.</p>
-<p>** Warning ** The following Output variables were requested but not generated</p>
-<p>**   ~~~   ** because IDF did not contain these elements or misspelled variable name -- check .rdd file</p>
-<p>************* Key=*, VarName=SYSTEM SENSIBLE COOLING RATE</p>
+<pre><code>** Warning ** The following Output variables were requested but not generated
+**   ~~~   ** because IDF did not contain these elements or misspelled variable name -- check .rdd file
+************* Key=*, VarName=SYSTEM SENSIBLE COOLING RATE
+</code></pre>
+
 <p>The above message was generated from an IDF that requested reporting of the “SYSTEM SENSIBLE COOLING RATE” but that variable was not available from the components in the execution.</p>
 <p>Table 43. Example ReadVarsESO command lines and results</p>
 <table class="table table-striped">
 <tr>
-<td>Command Line</td>
-<td>Description/Result</td>
+<th>Command Line</th>
+<th>Description/Result</th>
 </tr>
 <tr>
 <td>ReadVarsESO</td>

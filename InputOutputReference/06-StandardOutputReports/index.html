@@ -372,12 +372,14 @@
 </li>
 </ul>
 <p>An example of a time bins input object follows.</p>
-<p>Output:Table:TimeBins,</p>
-<p>*,                     ! Key Value</p>
-<p>Electricity:HVAC,      ! Variable Name</p>
-<p>4000000,               ! Interval Start</p>
-<p>500000,                ! Interval Size</p>
-<p>20;                    ! Interval Count</p>
+<pre><code class="idf">Output:Table:TimeBins,
+  *,                     ! Key Value
+  Electricity:HVAC,      ! Variable Name
+  4000000,               ! Interval Start
+  500000,                ! Interval Size
+  20;                    ! Interval Count
+</code></pre>
+
 <h2 id="outputtablemonthly">Output:Table:Monthly</h2>
 <p>The Output:Table:Monthly object provides a generic method of setting up tables of monthly results. These tables are good for creating reports that broadly summarize the building performance. At the bottom of the tables, three rows are added for the sum or average depending on the type of variable, the maximum and the minimum of each column. The report produced has multiple columns that are each defined using a repeated group of fields. The fields for the variable name and the aggregation type can be repeated for any number of columns. A single Output:Table:Monthly object often produces multiple tables in the output. A table is produced for every “key” for a particular output variable. A single table of results shows values only for a specific “key”. The exception to this are environment variables, such as outdoor air temperature, that are included in each table, no matter what the key.</p>
 <h4 id="field-name">Field: Name</h4>
@@ -407,15 +409,17 @@
 <p><strong>MaximumDuringHoursShown</strong> – Reports the maximum value and the time that the maximum value occurred but only during the hours reported with the previous “hours-“ aggregation type. When the maximum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the maximum for a variable in Joules is reported in Watts. Order of the variables in the report is important when using this aggregation type.</p>
 <p><strong>MinimumDuringHoursShown</strong> - Reports the minimum value and the time that the minimum value occurred but only during the hours reported with the previous “hours-“ aggregation type. When the minimum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the minimum for a variable in Joules is reported in Watts. Order of the variables in the report is important when using this aggregation type.</p>
 <p>An example of this object follows.</p>
-<p>Output:Table:Monthly,</p>
-<p>Building Monthly Cooling Load Report,               ! Name</p>
-<p>3,                                                  ! Digits After Decimal</p>
-<p>Zone Air System Sensible Cooling Energy,                   ! Variable or Meter 1 Name</p>
-<p>SumOrAverage,                                       ! Aggregation Type for Variable or Meter 1</p>
-<p>Zone Air System Sensible Cooling Energy,                   ! Variable or Meter 2 Name</p>
-<p>Maximum,                                            ! Aggregation Type for Variable or Meter 2</p>
-<p>Site Outdoor Air Drybulb Temperature,                                   ! Variable or Meter 3 Name</p>
-<p>ValueWhenMaxMin;                                    ! Aggregation Type for Variable or Meter 3</p>
+<pre><code class="idf">Output:Table:Monthly,
+  Building Monthly Cooling Load Report,               ! Name
+  3,                                                  ! Digits After Decimal
+  Zone Air System Sensible Cooling Energy,                   ! Variable or Meter 1 Name
+  SumOrAverage,                                       ! Aggregation Type for Variable or Meter 1
+  Zone Air System Sensible Cooling Energy,                   ! Variable or Meter 2 Name
+  Maximum,                                            ! Aggregation Type for Variable or Meter 2
+  Site Outdoor Air Drybulb Temperature,                                   ! Variable or Meter 3 Name
+  ValueWhenMaxMin;                                    ! Aggregation Type for Variable or Meter 3
+</code></pre>
+
 <h2 id="outputtablesummaryreports">Output:Table:SummaryReports</h2>
 <p>The Output:Table:SummaryReports object controls which predefined tabular reports are produced.  The easiest option is to specify “AllSummary” which will produce all of the summary reports described in this section and does not include the Zone Component Load report. In addition, “AllMonthly” will produce all of the monthly reports described. If all predefined reports are needed. “AllSummaryAndMonthly” shows all of the summary and monthly predefined reports and does not include the Zone Component Load report. The “AllSummaryAndSizingPeriod” option and “AllSummaryMonthlyAndSizingPeriod” option are similar and add the Zone Component Load report. Including the Zone Component Load Summary report may increase the simulation run time.</p>
 <h4 id="field-report-35-name">Field: Report &lt;#&gt; Name</h4>
@@ -2160,9 +2164,11 @@
 </li>
 </ul>
 <p>Sample IDF Input – Output:Table:SummaryReports</p>
-<p>Output:Table:SummaryReports,</p>
-<p>AllSummary,  !- Report 1 Name</p>
-<p>AllMonthly;  !- Report 2 Name</p>
+<pre><code class="idf">Output:Table:SummaryReports,
+        AllSummary,  !- Report 1 Name
+        AllMonthly;  !- Report 2 Name
+</code></pre>
+
 <h2 id="outputcontroltablestyle">OutputControl:Table:Style</h2>
 <p>The OutputControl:Table:Style object controls how all standardized reports are produced.</p>
 <h4 id="field-column-separator">Field: Column Separator</h4>
@@ -2224,9 +2230,11 @@
 <p>The current options are limited to just how the energy is being reported. The default is to report energy in the form of Joules but since the magnitude of those numbers for many buildings is very large, these other conversion factors are available.</p>
 <p>The JtoKWH, JtoMJ and JtoGJ unit conversion input option applies only to the Output:Table:Monthly reports and partially to the ABUPS report. For ABUPS, the JtoKWH option changes the report but the JtoMJ and JtoGJ options do not change the report since they it is already in MJ/m2 and GJ.. The InchPound unit conversion input option applies to all annual, monthly, timebins and economic reports that appear in the tabular output file.  In addition, this option does not effect the standard eplusout.eso file. The eplusout.eso file may be converted by using the ConvertESOMTR utility.</p>
 <p>An example IDF input object follows.</p>
-<p>OutputControl:Table:Style,</p>
-<p>Comma,                     ! Column Separator</p>
-<p>InchPound;                 ! Unit Conversion</p>
+<pre><code class="idf">OutputControl:Table:Style,
+  Comma,                     ! Column Separator
+   InchPound;                 ! Unit Conversion
+</code></pre>
+
 <p>Examples of the tabular reports and descriptions are contained in the Output Details and Examples document.</p>
 
           <div class="footer">

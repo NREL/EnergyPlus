@@ -334,23 +334,27 @@
 </li>
 </ul>
 <p>A simple example of part of an IDF file is shown below:</p>
-<p>Parametric:SetValueForRun,</p>
-<p>$insDepth,                  !- Parameter Name</p>
-<p>0.0508,                     !- Value 1</p>
-<p>0.0762,                     !- Value 2</p>
-<p>0.1016,                     !- Value 3</p>
-<p>0.1270;                     !- Value 4</p>
-<p>Material,</p>
-<p>IN1,                     !- Name</p>
-<p>VeryRough,               !- Roughness</p>
-<p>=$insDepth,              !- Thickness {m}</p>
-<p>2.3000000E-02,           !- Conductivity {W/m-K}</p>
-<p>24.00000,                !- Density {kg/m3}</p>
-<p>1590.000,                !- Specific Heat {J/kg-K}</p>
-<p>0.9000000,               !- Thermal Absorptance</p>
-<p>0.5000000,               !- Solar Absorptance</p>
-<p>0.5000000;               !- Visible Absorptance</p>
-<p>In this example, the parameter $insDepth is used in the Material object to describe the thickness of the material, in this case insulation.  For the first simulation, $insDepth is set to 0.0508 (2 inches) shown as the first value in the Parametric:SetValueForRun object. This value is then substituted in where ever the $insDepth is shown in the file, in this example, in the Material object. The simulation would use this first value and produce a set of results based on this insulation thickness. The second simulation would use the second value of the Parametric:SetValueForRun object of 0.0762 (3 inches) for the thickness of the insulation described in the Material object. This would then be simulated with a second set of results. This would be repeated a third time with 0.1015 (4 inches) and 0.1270 (5 inches) of insulation.</p>
+<pre><code class="idf">  Parametric:SetValueForRun,
+    $insDepth,                  !- Parameter Name
+    0.0508,                     !- Value 1
+    0.0762,                     !- Value 2
+    0.1016,                     !- Value 3
+    0.1270;                     !- Value 4
+
+
+  Material,
+    IN1,                     !- Name
+    VeryRough,               !- Roughness
+    =$insDepth,              !- Thickness {m}
+    2.3000000E-02,           !- Conductivity {W/m-K}
+    24.00000,                !- Density {kg/m3}
+    1590.000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+</code></pre>
+
+<p>In this example, the parameter \$insDepth is used in the Material object to describe the thickness of the material, in this case insulation.  For the first simulation, $insDepth is set to 0.0508 (2 inches) shown as the first value in the Parametric:SetValueForRun object. This value is then substituted in where ever the $insDepth is shown in the file, in this example, in the Material object. The simulation would use this first value and produce a set of results based on this insulation thickness. The second simulation would use the second value of the Parametric:SetValueForRun object of 0.0762 (3 inches) for the thickness of the insulation described in the Material object. This would then be simulated with a second set of results. This would be repeated a third time with 0.1015 (4 inches) and 0.1270 (5 inches) of insulation.</p>
 <p>A new IDF file is created for each of these simulations and is named the original name of the file plus either a number or a user defined suffix (if Parametric:FileNameSuffix is used). Looking at how these created IDF files show the substituted values can help understand problems that may occur.</p>
 <p>The “=$insDepth” is a simple substation but could also be a more complex expression involving operators and predefined functions such as</p>
 <p>=$insDepth * 1.1 + 0.0004 * SQRT(12)</p>
@@ -365,19 +369,23 @@
 <h3 id="parametricsetvalueforrun">Parametric:SetValueForRun</h3>
 <p>The core parametric object is Parametric:SetValueForRun which sets the parameters value to different values depending on which run is being simulated.</p>
 <p>For example</p>
-<p>Parametric:SetValueForRun</p>
-<p>$ConstructionToUse,  !- Parameter Name</p>
-<p>TiltUpConcreteWall,  !- Value for run 1</p>
-<p>BlockWall,           !- Value for run 2</p>
-<p>SteelFrameWall,      !- Value for run 3</p>
-<p>WoodFrameWall;       !- Value for run 4</p>
-<p>Parametric:SetValueForRun</p>
-<p>$WallRValue,           !- Parameter Name</p>
-<p>5,                     !- Value for run 1</p>
-<p>8,                     !- Value for run 2</p>
-<p>11,                    !- Value for run 3</p>
-<p>17;                    !- Value for run 4</p>
-<p>Using Parametric:SetValueForRun, the value is set based on the which run number is currently being simulated. Multiple objects can be used and a set of parameter values would be defined for a given simulation. For example, the 3rd simulation would assign the "Value 3" value, 11, to the parameter $WallRValue and the “Value 3” value, “SteelFrameWall” to $ConstructionToUse. Since many Parametric:SetValueForRun objects can be used at once, all of the  3rd values would be assigned to the appropriate parameters. In IDF Editor, this object will appear as a table of values with each row being all the parameter values for a specific simulation and each column belonging to a specific parameter.</p>
+<pre><code class="idf">Parametric:SetValueForRun
+  $ConstructionToUse,  !- Parameter Name
+  TiltUpConcreteWall,  !- Value for run 1
+  BlockWall,           !- Value for run 2
+  SteelFrameWall,      !- Value for run 3
+  WoodFrameWall;       !- Value for run 4
+
+
+Parametric:SetValueForRun
+  $WallRValue,           !- Parameter Name
+  5,                     !- Value for run 1
+  8,                     !- Value for run 2
+  11,                    !- Value for run 3
+  17;                    !- Value for run 4
+</code></pre>
+
+<p>Using Parametric:SetValueForRun, the value is set based on the which run number is currently being simulated. Multiple objects can be used and a set of parameter values would be defined for a given simulation. For example, the 3rd simulation would assign the "Value 3" value, 11, to the parameter \$WallRValue and the “Value 3” value, “SteelFrameWall” to $ConstructionToUse. Since many Parametric:SetValueForRun objects can be used at once, all of the  3rd values would be assigned to the appropriate parameters. In IDF Editor, this object will appear as a table of values with each row being all the parameter values for a specific simulation and each column belonging to a specific parameter.</p>
 <h4 id="field-parameter-name">Field: Parameter Name</h4>
 <p>The name of the parameter. It must begin with the dollar sign character, and the second character must be a letter. The parameter name, unlike a typical EnergyPlus name, cannot contain spaces or any characters other than letters and numerals.</p>
 <h4 id="field-value-for-run-n">Field: Value for run n</h4>
@@ -385,129 +393,173 @@
 <h3 id="parametriclogic">Parametric:Logic</h3>
 <p>The approach of using parameters and expressions, by itself, is very flexible and allows for many possible parametric simulations but it does not allow for objects to be included for some parametric cases and not others. For example, you might want an overhang on a window in some parametric runs and not others. The Parametric:Logic object can help in that scenario.</p>
 <p>A single Parametric:Logic object is allowed per file. It has a freeform syntax including IF and SELECT blocks with each field in the object representing a single "line" of code. Essentially, this logic object looks like simple programming code.</p>
-<p>Parametric:Logic,</p>
-<p>Main,                            !- name</p>
-<p>IF $insDepth &lt; 0.1,              !- parametric logic line 1</p>
-<p>DISABLE “MaterialWallBoard”,  !- parametric logic line 2</p>
-<p>DISABLE “MaterialExtFinish”,  !- parametric logic line 3</p>
-<p>ENDIF;                           !- parametric logic line 4</p>
+<pre><code class="idf">Parametric:Logic,
+  Main,                            !- name
+  IF $insDepth &lt; 0.1,              !- parametric logic line 1
+     DISABLE “MaterialWallBoard”,  !- parametric logic line 2
+     DISABLE “MaterialExtFinish”,  !- parametric logic line 3
+  ENDIF;                           !- parametric logic line 4
+</code></pre>
+
 <p>In addition, lines could contain assignment statements in the form of</p>
 <p>parameter  = expression such as the second control line in the following example.</p>
-<p>Parametric:Logic,</p>
-<p>Main,                              !- name</p>
-<p>PARAMETER $THICKNESS,              !- parametric logic line 1</p>
-<p>$THICKNESS = 0.01 * $CMDEPTH,      !- parametric logic line 2</p>
-<p>IF $THICKNESS &gt; 0.5,               !- parametric logic line 3</p>
-<p>DISABLE “MaterialWallBoard”,    !- parametric logic line 4</p>
-<p>DISABLE “MaterialExtFinish”,    !- parametric logic line 5</p>
-<p>ENDIF;                             !- parametric logic line 6</p>
+<pre><code class="idf">Parametric:Logic,
+  Main,                              !- name
+  PARAMETER $THICKNESS,              !- parametric logic line 1
+  $THICKNESS = 0.01 * $CMDEPTH,      !- parametric logic line 2
+  IF $THICKNESS &gt; 0.5,               !- parametric logic line 3
+     DISABLE “MaterialWallBoard”,    !- parametric logic line 4
+     DISABLE “MaterialExtFinish”,    !- parametric logic line 5
+  ENDIF;                             !- parametric logic line 6
+</code></pre>
+
 <p>The statements include PARAMETER, IF, ELSE, ELSEIF, ENDIF, SELECT, CASE, DEFAULT, ENDSELECT, ENABLE, DISABLE, and REMARK. Nested IF and SELECT statements are allowed.  All objects are enabled until they are specifically disabled using the DISABLE statement and could be later re-enabled with ENABLE. An object that is named with the DISABLE statement would not appear in that simulation run.</p>
 <p>The PARAMETER statement declares the name of the parameter. It is necessary that every parameter used in the Parametric:Logic object be initialized using the PARAMETER statement unless the parametes are created using the Parametric:SetValueForRun object. Requiring explicit parameter declaration reduces errors in software programming. Parameter names would not be case sensitive.</p>
 <p>The DISABLE and ENABLE commands can have one or two arguments. If a second argument is present it is the kind of object.</p>
-<p>DISABLE “MaterialWallBoard” “Material”,    !- parametric control line 4</p>
+<pre><code>DISABLE “MaterialWallBoard” “Material”,    !- parametric control line 4
+</code></pre>
+
 <p>The following sections describe each type of statement in more detail.</p>
 <h4 id="if-endif-block">IF ENDIF Block</h4>
 <p>As previously shown, the simplest IF block is in the form of</p>
-<p>IF &lt;conditional-expression&gt;</p>
-<p>&lt;true-block-of-statements&gt;</p>
-<p>ENDIF</p>
+<pre><code class="idf">IF &lt;conditional-expression&gt;
+  &lt;true-block-of-statements&gt;
+ENDIF
+</code></pre>
+
 <p>The &lt;conditional-expression&gt; usually contains a logical comparison operator such as:</p>
+<ul>
+<li>
 <p>== equal</p>
+</li>
+<li>
 <p>&gt; greater than</p>
+</li>
+<li>
 <p>&lt; less than</p>
+</li>
+<li>
 <p>&lt;= less than or equal to</p>
+</li>
+<li>
 <p>&gt;= greater than or equal to</p>
+</li>
+<li>
 <p>&lt;&gt; not equal to</p>
+</li>
+</ul>
 <p>The &lt;true-block-of-statements&gt; can contain other statements including other lines of IF and ENDIF. These statement are only executed when the &lt;conditional-expression&gt; evaluates to true. If the &lt;conditional-expression&gt; is false, none of the statements before the ENDIF are executed and instead execution begins again with the statement after the ENDIF statement.</p>
 <h4 id="if-else-endif-block">IF ELSE  ENDIF Block</h4>
 <p>Another form of the IF block can contain the ELSE statement:</p>
-<p>IF &lt;conditional-expression&gt;</p>
-<p>&lt;true-block-of-statements&gt;</p>
-<p>ELSE</p>
-<p>&lt;false-block-of-statements&gt;</p>
-<p>ENDIF</p>
+<pre><code class="idf">IF &lt;conditional-expression&gt;
+  &lt;true-block-of-statements&gt;
+ELSE
+  &lt;false-block-of-statements&gt;
+ENDIF
+</code></pre>
+
 <p>Like the simpler IF ENDIF form the &lt;conditional-expression&gt; is computed and the &lt;true-block-of-statements&gt; are executed if it is true. The additional feature of this form is that if the &lt;conditional-expression&gt; is false, the &lt;false-block-of-statements&gt; is executed instead of the &lt;true-block-of-statements&gt;.</p>
 <h4 id="if-elseif-else-endif-block">IF ELSEIF ELSE ENDIF Block</h4>
 <p>The most complex form of the IF block contains both ELSEIF statement (or statements)  and the ELSE statement:</p>
-<p>IF &lt;conditional-expression-1&gt;</p>
-<p>&lt;true-block-of-statements-1&gt;</p>
-<p>ELSEIF &lt;conditional-expression-2&gt;</p>
-<p>&lt;true-block-of-statements-2&gt;</p>
-<p>ELSEIF &lt;conditional-expression-2&gt;</p>
-<p>&lt;true-block-of-statements-2&gt;</p>
-<p>ELSE</p>
-<p>&lt;false-block-of-statements&gt;</p>
-<p>ENDIF</p>
+<pre><code class="idf">IF &lt;conditional-expression-1&gt;
+  &lt;true-block-of-statements-1&gt;
+ELSEIF &lt;conditional-expression-2&gt;
+  &lt;true-block-of-statements-2&gt;
+ELSEIF &lt;conditional-expression-2&gt;
+  &lt;true-block-of-statements-2&gt;
+ELSE
+  &lt;false-block-of-statements&gt;
+ENDIF
+</code></pre>
+
 <p>This form allows more complex logic to be expressed. If the &lt;conditional-expression-1&gt; is true then &lt;true-block-of-statements-1&gt; executed and when that is complete, execution resumes after the ENDIF statement. If &lt;conditional-expression-1&gt; is false then the ELSEIF &lt;conditional-expression-2&gt; is evaluated and if that is true then &lt;true-block-of-statement-2&gt; is executed. On the other hand, if &lt;conditional-expression-2&gt; is  false, then the next ELSEIF conditional expression is evaluated following the same patter if another ELSEIF is present, otherwise, the &lt;false-block-of-statements&gt; after the ELSE are executed. Another way of thinking of this block is that the conditional expressions are evaluated from the top to the bottom until one is found to be true and then the associated block of statements are executed. If none of the conditional expressions is true, the &lt;false-block-of-statements&gt; are executed.</p>
 <h4 id="select-case-default-endselect-block">SELECT CASE DEFAULT ENDSELECT Block</h4>
 <p>The SELECT block is related to the IF block but is for the specific case of trying to match a variable with several specific values. The form of the SELECT block is:</p>
-<p>SELECT &lt;expression&gt;</p>
-<p>CASE &lt;constant-1&gt;</p>
-<p>&lt;case-block-of-statements-1&gt;</p>
-<p>CASE &lt;constant-2&gt;</p>
-<p>&lt;case-block-of-statements-2&gt;</p>
-<p>CASE &lt;constant-3&gt;</p>
-<p>&lt;case-block-of-statements-3&gt;</p>
-<p>DEFAULT</p>
-<p>&lt;default-block-of-statements&gt;</p>
-<p>ENDSELECT</p>
+<pre><code class="idf">SELECT &lt;expression&gt;
+CASE &lt;constant-1&gt;
+  &lt;case-block-of-statements-1&gt;
+CASE &lt;constant-2&gt;
+  &lt;case-block-of-statements-2&gt;
+CASE &lt;constant-3&gt;
+  &lt;case-block-of-statements-3&gt;
+DEFAULT
+  &lt;default-block-of-statements&gt;
+ENDSELECT
+</code></pre>
+
 <p>With any number of CASE statements. The &lt;expression&gt; is evaluated and compared to the constants with each CASE statement. If a match is found the corresponding &lt;case-block-of-statements&gt; are executed otherwise if no match if found the &lt;default-block-of-statements&gt; is excecuted. One one matching CASE statement for each SELECT block is executed. An example of how this works is shown below:</p>
-<p>Parametric:SetValueForRun,</p>
-<p>$EndMonth,</p>
-<p>2;</p>
-<p>Parametric:Logic,</p>
-<p>Main2,</p>
-<p>PARAMETER $EndDay,</p>
-<p>SELECT $EndMonth,</p>
-<p>CASE 1,</p>
-<p>$EndDay = 31,</p>
-<p>CASE 2,</p>
-<p>$EndDay = 28,</p>
-<p>CASE 3,</p>
-<p>$EndDay = 31,</p>
-<p>CASE 4,</p>
-<p>$EndDay = 30,</p>
-<p>CASE 5,</p>
-<p>$EndDay = 31,</p>
-<p>CASE 6,</p>
-<p>$EndDay = 30,</p>
-<p>CASE 7,</p>
-<p>$EndDay = 31,</p>
-<p>CASE 8,</p>
-<p>$EndDay = 31,</p>
-<p>CASE 9,</p>
-<p>$EndDay = 30,</p>
-<p>CASE 10,</p>
-<p>$EndDay = 31,</p>
-<p>CASE 11,</p>
-<p>$EndDay = 30,</p>
-<p>CASE 12,</p>
-<p>$EndDay = 31,</p>
-<p>DEFAULT,</p>
-<p>$EndDay = 30,</p>
-<p>ENDSELECT;</p>
+<pre><code class="idf">Parametric:SetValueForRun,
+  $EndMonth,
+  2;
+
+
+Parametric:Logic,
+  Main2,
+  PARAMETER $EndDay,
+  SELECT $EndMonth,
+   CASE 1,
+    $EndDay = 31,
+   CASE 2,
+    $EndDay = 28,
+   CASE 3,
+    $EndDay = 31,
+   CASE 4,
+    $EndDay = 30,
+   CASE 5,
+    $EndDay = 31,
+   CASE 6,
+    $EndDay = 30,
+   CASE 7,
+    $EndDay = 31,
+   CASE 8,
+    $EndDay = 31,
+   CASE 9,
+    $EndDay = 30,
+   CASE 10,
+    $EndDay = 31,
+   CASE 11,
+    $EndDay = 30,
+   CASE 12,
+    $EndDay = 31,
+   DEFAULT,
+    $EndDay = 30,
+   ENDSELECT;
+</code></pre>
+
 <p>With this example the $EndDay value would be set to 28.</p>
 <h4 id="enable-disable">ENABLE DISABLE</h4>
 <p>The ENABLE and DISABLE statements specifically are for removing (and not removing) other objects that appear in the EnergyPlus IDF file. It has two syntaxes:</p>
-<p>DISABLE &lt;objectname&gt;</p>
+<pre><code class="idf">DISABLE &lt;objectname&gt;
+</code></pre>
+
 <p>and</p>
-<p>DISABLE &lt;objectname&gt;, &lt;kind-of-object&gt;</p>
+<pre><code class="idf">DISABLE &lt;objectname&gt;, &lt;kind-of-object&gt;
+</code></pre>
+
 <p>The DISABLE statement removes the object identified with either &lt;objectname&gt; or the combination of &lt;objectname&gt; and &lt;kind-of-object&gt; if the &lt;objectname&gt; is not unique in the EnergyPlus input file. By default, all objects are enabled in the input file. Objects need to be specifically disabled using the DISABLE statement. After an object is disabled in can later be re-enabled with the ENABLE statement which has similar syntax.</p>
-<p>DISABLE &lt;objectname&gt;</p>
+<pre><code class="idf">DISABLE &lt;objectname&gt;
+</code></pre>
+
 <p>and</p>
-<p>DISABLE &lt;objectname&gt;, &lt;kind-of-object&gt;</p>
-<p>Parametric:Logic,</p>
-<p>Main,</p>
-<p>DISABLE  "SOUTH WALL OVERHANG";</p>
-<p>Shading:Zone:Detailed,</p>
-<p>SOUTH WALL OVERHANG,     !- Name</p>
-<p>ZONE SURFACE SOUTH,      !- Base Surface Name</p>
-<p>SCH 2,                   !- Transmittance Schedule Name</p>
-<p>4,                       !- Number of Vertices</p>
-<p>0.0,-1.0,3.0,  !- X,Y,Z ==&gt; Vertex 1 {m}</p>
-<p>0.0,0.0,3.0,  !- X,Y,Z ==&gt; Vertex 2 {m}</p>
-<p>4.0,0.0,3.0,  !- X,Y,Z ==&gt; Vertex 3 {m}</p>
-<p>4.0,-1.0,3.0;  !- X,Y,Z ==&gt; Vertex 4 {m}</p>
+<pre><code class="idf">DISABLE &lt;objectname&gt;, &lt;kind-of-object&gt;
+</code></pre>
+
+<pre><code class="idf">  Parametric:Logic,
+    Main,
+    DISABLE  &quot;SOUTH WALL OVERHANG&quot;;
+
+
+  Shading:Zone:Detailed,
+    SOUTH WALL OVERHANG,     !- Name
+    ZONE SURFACE SOUTH,      !- Base Surface Name
+    SCH 2,                   !- Transmittance Schedule Name
+    4,                       !- Number of Vertices
+    0.0,-1.0,3.0,  !- X,Y,Z ==&gt; Vertex 1 {m}
+    0.0,0.0,3.0,  !- X,Y,Z ==&gt; Vertex 2 {m}
+    4.0,0.0,3.0,  !- X,Y,Z ==&gt; Vertex 3 {m}
+    4.0,-1.0,3.0;  !- X,Y,Z ==&gt; Vertex 4 {m}
+</code></pre>
+
 <p>An object that is named with the DISABLE statement would not appear in that simulation run.</p>
 <h4 id="remark">REMARK</h4>
 <p>The REMARK statement is simply a way to include a comment in the Parametric:Logic fields. The text that follows the REMARK statement is ignored.</p>
@@ -517,21 +569,53 @@
 <p>The name of the Parametric:Logic object.</p>
 <h4 id="field-parametric-logic-line-n">Field: Parametric Logic Line n</h4>
 <p>The line that contains one statement in one of the following forms:</p>
-<p>&lt;parameter&gt; = &lt;expression&gt; </p>
+<ul>
+<li>
+<p>&lt;parameter&gt; = &lt;expression&gt;</p>
+</li>
+<li>
 <p>PARAMETER &lt;parameter&gt;</p>
+</li>
+<li>
 <p>IF &lt;expression&gt;</p>
+</li>
+<li>
 <p>ELSEIF &lt;expression&gt;</p>
+</li>
+<li>
 <p>ELSE</p>
+</li>
+<li>
 <p>ENDIF</p>
+</li>
+<li>
 <p>SELECT &lt;expression&gt;</p>
+</li>
+<li>
 <p>CASE &lt;constant&gt;</p>
+</li>
+<li>
 <p>DEFAULT</p>
+</li>
+<li>
 <p>ENDSELECT</p>
+</li>
+<li>
 <p>ENABLE &lt;constant&gt;</p>
+</li>
+<li>
 <p>ENABLE &lt;constant&gt; &lt;constant&gt;</p>
+</li>
+<li>
 <p>DISABLE &lt;constant&gt;</p>
+</li>
+<li>
 <p>DISABLE &lt;constant&gt; &lt;constant&gt;</p>
+</li>
+<li>
 <p>REMARK &lt;text to ignore&gt;</p>
+</li>
+</ul>
 <h3 id="parametricruncontrol">Parametric:RunControl</h3>
 <p>The following Parametric:RunControl object controls which runs are simulated. The series of entries indicate if the run should be performed or not. This object is optional and if it is not included all runs are performed.</p>
 <h4 id="field-name_1">Field: Name</h4>

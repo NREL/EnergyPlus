@@ -342,112 +342,326 @@
 <h2 id="group-hvac-templates">Group -- HVAC Templates</h2>
 <p>This group of objects allows for the specification of simple zone thermostats and HVAC systems with automatically generated node names. The combinations of HVACTemplate objects are shown below.</p>
 <p>For a simple ideal loads system to use for sizing and loads oriented simulations:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:IdealLoadsAirSystem</p>
+</li>
+</ul>
 <p>For baseboard heating systems with optional hot water boiler:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:BaseboardHeat</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:HotWaterLoop (optional)</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler (optional)</p>
+</li>
+</ul>
 <p>For fan coil systems with boilers and chillers:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:FanCoil</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:ChilledWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:HotWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Chiller</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Tower</p>
+</li>
+</ul>
 <p>For packaged terminal air conditioner (PTAC) systems with optional hot water boiler:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:PTAC</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:HotWaterLoop (optional)</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler (optional)</p>
+</li>
+</ul>
 <p>For packaged terminal air-to-air  heat pump (PTHP) systems:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:PTHP</p>
+</li>
+</ul>
 <p>For water to air heat pumps with boiler and cooling tower:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:WaterToAirHeatPump</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:MixedWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Tower</p>
+</li>
+</ul>
 <p>For variable refrigerant flow heat pumps (air-to-air):</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VRF</p>
+</li>
+<li>
 <p>HVACTemplate:System:VRF</p>
+</li>
+</ul>
 <p>For variable refrigerant flow heat pumps (water-to-air)with boiler and cooling tower:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VRF</p>
+</li>
+<li>
 <p>HVACTemplate:System:VRF</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:MixedWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Tower</p>
+</li>
+</ul>
 <p>For direct-expansion cooling, packaged and split system simulations:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:Unitary</p>
+</li>
+<li>
 <p>HVACTemplate:System:Unitary or</p>
+</li>
+<li>
 <p>HVACTemplate:System:UnitarySystem</p>
+</li>
+</ul>
 <p>For direct-expansion heat pump systems:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:Unitary</p>
+</li>
+<li>
 <p>HVACTemplate:System:UnitaryHeatPump:AirToAir or</p>
+</li>
+<li>
 <p>HVACTemplate:System:UnitarySystem</p>
+</li>
+</ul>
 <p>For packaged variable air volume systems using direct-expansion cooling:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV or</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV:FanPowered or</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV:HeatAndCool</p>
+</li>
+<li>
 <p>HVACTemplate:System:PackagedVAV</p>
+</li>
+</ul>
 <p>For variable air volume systems with boilers and air-cooled chillers:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV or</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV:FanPowered or</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV:HeatAndCool</p>
+</li>
+<li>
 <p>HVACTemplate:System:VAV</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:ChilledWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:HotWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Chiller</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler</p>
+</li>
+</ul>
 <p>For variable air volume systems with boilers and water-cooled chillers, an object related to towers is added:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV or</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV:FanPowered or</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VAV:HeatAndCool</p>
+</li>
+<li>
 <p>HVACTemplate:System:VAV</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:ChilledWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:HotWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Chiller</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Tower</p>
+</li>
+</ul>
 <p>For constant air volume systems with boilers and water-cooled chillers:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:ConstantVolume</p>
+</li>
+<li>
 <p>HVACTemplate:System:ConstantVolume</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:ChilledWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:HotWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Chiller</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Tower</p>
+</li>
+</ul>
 <p>For dual-duct systems (constant or variable air volume) with boilers and water-cooled chillers:</p>
+<ul>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:DualDuct</p>
+</li>
+<li>
 <p>HVACTemplate:System:DualDuct</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:ChilledWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:HotWaterLoop</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Chiller</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Boiler</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:Tower</p>
+</li>
+</ul>
 <p>For dedicated outdoor air systems (DOAS) combined with a zonal template system:</p>
+<ul>
+<li>
 <p>HVACTemplate:System:DedicatedOutdoorAir</p>
+</li>
+<li>
 <p>HVACTemplate:Thermostat</p>
+</li>
+</ul>
 <p>One of the following for each zone served by the (DOAS) –</p>
+<ul>
+<li>
 <p>HVACTemplate:Zone:BaseboardHeat</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:PTAC</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:PTHP</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:FanCoil</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:WaterToAirHeatPump</p>
+</li>
+<li>
 <p>HVACTemplate:Zone:VRF</p>
+</li>
+<li>
 <p>HVACTemplate:Plant:* objects as needed (depending on the type of zonal system and the type of coils specified in the DOAS system:WaterToAirHeatPump).</p>
+</li>
+</ul>
 <p>The <em>only</em> other HVAC related objects besides the HVACTemplate objects that need to be specified related to HVAC systems are:</p>
 <ul>
 <li>
@@ -477,12 +691,14 @@
 <h4 id="field-constant-cooling-setpoint">Field: Constant Cooling Setpoint</h4>
 <p>Enter the cooling setpoint temperature in degrees C if constant throughout the year. If the previous field is used this field should be left blank and will be ignored.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Thermostat,</p>
-<p>Office Thermostat,                                    !- Thermostat Name</p>
-<p>Htg-SetP-Sch,          !- Heating Setpoint Schedule</p>
-<p>,          !- Constant Heating Setpoint {C}</p>
-<p>Clg-SetP-Sch,          !- Cooling Setpoint Schedule</p>
-<p>;          !- Constant Cooling Setpoint {C}</p>
+<pre><code class="idf">HVACTemplate:Thermostat,
+    Office Thermostat,                                    !- Thermostat Name
+    Htg-SetP-Sch,          !- Heating Setpoint Schedule
+    ,          !- Constant Heating Setpoint {C}
+    Clg-SetP-Sch,          !- Cooling Setpoint Schedule
+    ;          !- Constant Cooling Setpoint {C}
+</code></pre>
+
 <h3 id="hvactemplatezoneidealloadsairsystem">HVACTemplate:Zone:IdealLoadsAirSystem</h3>
 <p>This object provides an ideal system to supply conditioned air to the zone that meets all the load requirements and consumes no energy. It is often used for load calculations, an evaluation where the load components of the building are all that is being investigated, or as the first step to a more realistic model of a building.</p>
 <p>This component can be operated with infinite or finite heating and cooling capacity. For either mode – infinite or limited capacity – the user can also specify on/off schedules for heating and cooling and outdoor air controls. There are also optional controls for dehumidification, humidification, economizer, and heat recovery. This component may be used in combination with other HVAC equipment serving the same zone.</p>
@@ -565,37 +781,39 @@
 <h4 id="field-latent-heat-recovery-effectiveness">Field: Latent Heat Recovery Effectiveness</h4>
 <p>The latent heat recovery effectiveness, where effectiveness is defined as the change in supply humidity ratio divided by the difference in entering supply and relief air humidity ratios. The default is 0.65.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:IdealLoadsAirSystem,</p>
-<p>Zone 1,                  !- Zone Name</p>
-<p>All Zones,               !- Thermostat Name</p>
-<p>FanAvailSched,           !- System Availability Schedule Name</p>
-<p>50,                      !- Maximum Heating Supply Air Temperature {C}</p>
-<p>13,                      !- Minimum Cooling Supply Air Temperature {C}</p>
-<p>0.0156,         !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}</p>
-<p>0.0077,         !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}</p>
-<p>NoLimit,                 !- Heating Limit</p>
-<p>,                        !- Maximum Heating Air Flow Rate {m3/s}</p>
-<p>,                        !- Maximum Sensible Heating Capacity {W}</p>
-<p>NoLimit,                 !- Cooling Limit</p>
-<p>,                        !- Maximum Cooling Air Flow Rate {m3/s}</p>
-<p>,                        !- Maximum Total Cooling Capacity {W}</p>
-<p>,                        !- Heating Availability Schedule Name</p>
-<p>,                        !- Cooling Availability Schedule Name</p>
-<p>ConstantSensibleHeatRatio,  !- Dehumidification Control Type</p>
-<p>0.7,                     !- Cooling Sensible Heat Ratio</p>
-<p>60,                      !- Dehumidification Setpoint {percent}</p>
-<p>None,                    !- Humidification Control Type</p>
-<p>30,                      !- Humidification Setpoint {percent}</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>,                        !- Design Specification Outdoor Air Object Name</p>
-<p>None,                    !- Demand Controlled Ventilation Type</p>
-<p>NoEconomizer,            !- Outdoor Air Economizer Type</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>0.70,                    !- Sensible Heat Recovery Effectiveness</p>
-<p>0.65;                    !- Latent Heat Recovery Effectiveness</p>
+<pre><code class="idf">  HVACTemplate:Zone:IdealLoadsAirSystem,
+    Zone 1,                  !- Zone Name
+    All Zones,               !- Thermostat Name
+    FanAvailSched,           !- System Availability Schedule Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    13,                      !- Minimum Cooling Supply Air Temperature {C}
+    0.0156,         !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0077,         !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Heating Limit
+    ,                        !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    NoLimit,                 !- Cooling Limit
+    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    ,                        !- Heating Availability Schedule Name
+    ,                        !- Cooling Availability Schedule Name
+    ConstantSensibleHeatRatio,  !- Dehumidification Control Type
+    0.7,                     !- Cooling Sensible Heat Ratio
+    60,                      !- Dehumidification Setpoint {percent}
+    None,                    !- Humidification Control Type
+    30,                      !- Humidification Setpoint {percent}
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    None,                    !- Demand Controlled Ventilation Type
+    NoEconomizer,            !- Outdoor Air Economizer Type
+    None,                    !- Heat Recovery Type
+    0.70,                    !- Sensible Heat Recovery Effectiveness
+    0.65;                    !- Latent Heat Recovery Effectiveness
+</code></pre>
+
 <h3 id="hvactemplatezonebaseboardheat">HVACTemplate:Zone:BaseboardHeat</h3>
 <p>This object simulates a hot water or electric thermostatically controlled baseboard heating system. This object includes optional fields to combine the baseboard heat with a dedicated outdoor air system. If the zone is also served by another HVAC system, such as a PTAC or unitary air handler, then do not use this object. Instead, use the HVACTemplate:Zone:* object for the forced air system and use the baseboard heating fields in that object.</p>
 <h4 id="field-zone-name_1">Field: Zone Name</h4>
@@ -636,20 +854,22 @@
 <h4 id="field-design-specification-zone-air-distribution-object-name">Field: Design Specification Zone Air Distribution Object Name</h4>
 <p>This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when Outdoor Air Method <em>= DetailedSpecification</em>.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:BaseboardHeat,</p>
-<p>SPACE1-1,          !- Zone Name</p>
-<p>All Zones,         !- Template Thermostat Name</p>
-<p>,                  !- Zone Heating Sizing Factor</p>
-<p>HotWater,          !- Baseboard Heating Type</p>
-<p>,                  !- Baseboard Heating Availability Schedule Name</p>
-<p>Autosize;          !- Baseboard Heating Capacity {W}</p>
-<p>,                  !- Dedicated Outdoor Air System Name</p>
-<p>flow/person,       !- Outdoor Air Method</p>
-<p>0.00944,           !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,               !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>,                  !- Design Specification Outdoor Air Object Name</p>
-<p>;                  !- Design Specification Zone Air Distribution Object Name</p>
+<pre><code class="idf">  HVACTemplate:Zone:BaseboardHeat,
+    SPACE1-1,          !- Zone Name
+    All Zones,         !- Template Thermostat Name
+    ,                  !- Zone Heating Sizing Factor
+    HotWater,          !- Baseboard Heating Type
+    ,                  !- Baseboard Heating Availability Schedule Name
+    Autosize;          !- Baseboard Heating Capacity {W}
+    ,                  !- Dedicated Outdoor Air System Name
+    flow/person,       !- Outdoor Air Method
+    0.00944,           !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,               !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                  !- Design Specification Outdoor Air Object Name
+    ;                  !- Design Specification Zone Air Distribution Object Name
+</code></pre>
+
 <h3 id="hvactemplatezonefancoil">HVACTemplate:Zone:FanCoil</h3>
 <p>This object simulates a 4 pipe fan coil unit with hot water heating coil, chilled water cooling coil, and an outdoor air mixer. The coils are served directly by HVACTemplate:Plant:ChilledWaterLoop and HVACTemplate:Plant:HotWaterLoop objects. No HVACTemplate:System object is required. Reference ZoneHVAC:FourPipeFanCoil for more details about the fan coil model.</p>
 <h4 id="field-zone-name_2">Field: Zone Name</h4>
@@ -721,7 +941,7 @@
 <p>This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when <em>Outdoor Air Method = DetailedSpecification</em>.</p>
 <h4 id="field-design-specification-zone-air-distribution-object-name_1">Field: Design Specification Zone Air Distribution Object Name</h4>
 <p>This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when <em>Outdoor Air Method = DetailedSpecification</em>.</p>
-<p><strong><em>Field: Fan Coil Capacity Control Method</em></strong></p>
+<h4 id="field-fan-coil-capacity-control-method">Field: Fan Coil Capacity Control Method</h4>
 <p>This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are <em>ConstantFanVariableFlow</em>, <em>CyclingFan</em>, <em>VariableFanVariableFlow</em> or <em>VariableFanConstantFlow</em>. For <em>ConstantFanVariableFlow</em>, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For <em>CyclingFan</em>, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For <em>VariableFanVariableFlow</em>  both air and water flow rates are varied to match the load. For <em>VariableFanConstantFlow,</em> the water flow rate is at full flow and the fan speed varies to meet the load. If this field is left blank, it will default to <em>CyclingFan</em> if a Dedicated Outdoor Air System is specified (see above), otherwise it will default to <em>ConstantFanVariableFlow.</em></p>
 <h4 id="field-low-speed-supply-air-flow-ratio">Field: Low Speed Supply Air Flow Ratio</h4>
 <p>This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. Its value should be less than <em>Medium Speed Supply Air Flow Ratio.</em> If left blank, the default value is 0.33. This field is ignored if the capacity control method selected is not <em>CyclingFan</em>.</p>
@@ -748,41 +968,43 @@
 <h4 id="field-baseboard-heating-capacity_1">Field: Baseboard Heating Capacity</h4>
 <p>Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the fan coil system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the fan coil system.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:FanCoil,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Supply Air Maximum Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>FanAvailSched,           !- System Availability Schedule Name</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>75,                      !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>ChilledWater,            !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>12.5,                    !- Cooling Coil Design Setpoint {C}</p>
-<p>HotWater,                !- Heating Coil Type</p>
-<p>,                        !- Heating Coil Availability Schedule Name</p>
-<p>50,                      !- Heating Coil Design Setpoint {C}</p>
-<p>,                        !- Dedicated Outdoor Air System Name</p>
-<p>SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
-<p>,            !- Design Specification Outdoor Air Object Name</p>
-<p>,            !- Design Specification Zone Air Distribution Object Name</p>
-<p>ConstantFanVariableFlow, !- Fan Coil Capacity Control Method</p>
-<p>,                        !- Low Speed Supply Air Flow Ratio</p>
-<p>,                        !- Medium Speed Supply Air Flow Ratio</p>
-<p>OUTAIRFANCOILSCHEDULE,   !- Outdoor Air Schedule Name</p>
-<p>None,        !- Baseboard Heating Type</p>
-<p>,            !- Baseboard Heating Availability Schedule Name</p>
-<p>Autosize;    !- Baseboard Heating Capacity {W}</p>
+<pre><code class="idf">  HVACTemplate:Zone:FanCoil,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    FanAvailSched,           !- System Availability Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.5,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    50,                      !- Heating Coil Design Setpoint {C}
+    ,                        !- Dedicated Outdoor Air System Name
+    SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+    SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+    ,            !- Design Specification Zone Air Distribution Object Name
+    ConstantFanVariableFlow, !- Fan Coil Capacity Control Method
+    ,                        !- Low Speed Supply Air Flow Ratio
+    ,                        !- Medium Speed Supply Air Flow Ratio
+    OUTAIRFANCOILSCHEDULE,   !- Outdoor Air Schedule Name
+    None,        !- Baseboard Heating Type
+    ,            !- Baseboard Heating Availability Schedule Name
+    Autosize;    !- Baseboard Heating Capacity {W}
+</code></pre>
+
 <h3 id="hvactemplatezoneptac">HVACTemplate:Zone:PTAC</h3>
 <p>This object simulates a packaged terminal air conditioner (PTAC) with a DX cooling coil, a heating coil (electric, gas, or hot water), and an outdoor air mixer. The optional hot water heating coil is served directly by HVACTemplate:Plant:HotWaterLoop and HVACTemplate:Plant:Boiler objects. No HVACTemplate:System object is required. Reference ZoneHVAC:PackagedTerminalAirConditioner for more details about the PTAC model.</p>
 <p><img alt="PTAC_Drawthrough" src="../../InputOutputReference/media/image603.png" /></p>
@@ -892,46 +1114,48 @@
 <h4 id="field-baseboard-heating-capacity_2">Field: Baseboard Heating Capacity</h4>
 <p>Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTAC system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTAC system.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:PTAC,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Cooling Supply Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Heating Supply Air Flow Rate {m3/s}</p>
-<p>,                        !- No Load Supply Air Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>,                  !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>,                        !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>,                        !- System Availability Schedule Name</p>
-<p>,                        !- Supply Fan Operating Mode Schedule Name</p>
-<p>DrawThrough,             !- Supply Fan Placement</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>75,                      !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>SingleSpeedDX,           !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>autosize,                !- Cooling Coil Gross Rated Total Capacity {W}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>3,                       !- Cooling Coil Gross Rated COP</p>
-<p>Electric,                !- Heating Coil Type</p>
-<p>,                        !- Heating Coil Availability Schedule Name</p>
-<p>autosize,                !- Heating Coil Capacity {W}</p>
-<p>0.8,                     !- Gas Heating Coil Efficiency</p>
-<p>,                        !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>,                        !- Dedicated Outdoor Air System Name</p>
-<p>SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method</p>
-<p>14.0,        !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>50.0,        !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
-<p>,            !- Design Specification Outdoor Air Object Name</p>
-<p>,            !- Design Specification Zone Air Distribution Object Name</p>
-<p>None,        !- Baseboard Heating Type</p>
-<p>,            !- Baseboard Heating Availability Schedule Name</p>
-<p>Autosize;    !- Baseboard Heating Capacity {W}</p>
+<pre><code class="idf">  HVACTemplate:Zone:PTAC,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    ,                  !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- System Availability Schedule Name
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    SingleSpeedDX,           !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    Electric,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    autosize,                !- Heating Coil Capacity {W}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    ,                        !- Dedicated Outdoor Air System Name
+ SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+    ,            !- Design Specification Zone Air Distribution Object Name
+    None,        !- Baseboard Heating Type
+    ,            !- Baseboard Heating Availability Schedule Name
+    Autosize;    !- Baseboard Heating Capacity {W}
+</code></pre>
+
 <h3 id="hvactemplatezonepthp">HVACTemplate:Zone:PTHP</h3>
 <p>This object simulates a packaged terminal air-to-air heat pump (PTHP) with a DX cooling coil, a DX air-to-air heat pump heating coil, a supplemental heating coil (electric or gas), and an outdoor air mixer. No HVACTemplate:System object is required. Reference ZoneHVAC:PackagedTerminalHeatPump for more details about the PTHP model.</p>
 <p><img alt="PTPFigure" src="../../InputOutputReference/media/image604.png" /></p>
@@ -1061,56 +1285,58 @@
 <h4 id="field-baseboard-heating-capacity_3">Field: Baseboard Heating Capacity</h4>
 <p>Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTHP system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTHP system.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:PTHP,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Cooling Supply Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Heating Supply Air Flow Rate {m3/s}</p>
-<p>,                        !- No Load Supply Air Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>,                  !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>,                        !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>,                        !- System Availability Schedule Name</p>
-<p>,                        !- Supply Fan Operating Mode Schedule Name</p>
-<p>DrawThrough,             !- Supply Fan Placement</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>75,                      !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>SingleSpeedDX,           !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>autosize,                !- Cooling Coil Gross Rated Total Capacity {W}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>3,                       !- Cooling Coil Gross Rated COP</p>
-<p>SingleSpeedDXHeatPump,   !- Heat Pump Heating Coil Type</p>
-<p>,                    !- Heat Pump Heating Coil Availability Schedule Name</p>
-<p>autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}</p>
-<p>2.75,                    !- Heat Pump Heating Coil Gross Rated COP</p>
-<p>-8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}</p>
-<p>5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}</p>
-<p>ReverseCycle,            !- Heat Pump Defrost Strategy</p>
-<p>Timed,                   !- Heat Pump Defrost Control</p>
-<p>0.058333,                !- Heat Pump Defrost Time Period Fraction</p>
-<p>Electric,                !- Supplemental Heating Coil Type</p>
-<p>,           !- Supplemental Heating Coil Availability Schedule Name</p>
-<p>autosize,                !- Supplemental Heating Coil Capacity {W}</p>
-<p>21,     !- Supplemental Heating Coil Max Outdoor Dry-Bulb Temperature {C}</p>
-<p>0.8,                     !- Supplemental Gas Heating Coil Efficiency</p>
-<p>,          !- Supplemental Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>,                        !- Dedicated Outdoor Air System Name</p>
-<p>SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method</p>
-<p>14.0,        !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>50.0,        !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
-<p>,            !- Design Specification Outdoor Air Object Name</p>
-<p>,            !- Design Specification Zone Air Distribution Object Name</p>
-<p>None,        !- Baseboard Heating Type</p>
-<p>,            !- Baseboard Heating Availability Schedule Name</p>
-<p>Autosize;    !- Baseboard Heating Capacity {W}</p>
+<pre><code class="idf">  HVACTemplate:Zone:PTHP,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    ,                  !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- System Availability Schedule Name
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    SingleSpeedDX,           !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    SingleSpeedDXHeatPump,   !- Heat Pump Heating Coil Type
+    ,                    !- Heat Pump Heating Coil Availability Schedule Name
+    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
+    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
+    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
+    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
+    ReverseCycle,            !- Heat Pump Defrost Strategy
+    Timed,                   !- Heat Pump Defrost Control
+    0.058333,                !- Heat Pump Defrost Time Period Fraction
+    Electric,                !- Supplemental Heating Coil Type
+    ,           !- Supplemental Heating Coil Availability Schedule Name
+    autosize,                !- Supplemental Heating Coil Capacity {W}
+    21,     !- Supplemental Heating Coil Max Outdoor Dry-Bulb Temperature {C}
+    0.8,                     !- Supplemental Gas Heating Coil Efficiency
+    ,          !- Supplemental Gas Heating Coil Parasitic Electric Load {W}
+    ,                        !- Dedicated Outdoor Air System Name
+ SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+    ,            !- Design Specification Zone Air Distribution Object Name
+    None,        !- Baseboard Heating Type
+    ,            !- Baseboard Heating Availability Schedule Name
+    Autosize;    !- Baseboard Heating Capacity {W}
+</code></pre>
+
 <h3 id="hvactemplatezonewatertoairheatpump">HVACTemplate:Zone:WaterToAirHeatPump</h3>
 <p>This object simulates the zone portion of a water source heat pump system. Often many HVACTemplate:Zone:WaterToAirHeatPump objects will be used in a building along with a single HVACTemplate:Plant:MixedWaterLoop that contains a cooling tower and boiler.</p>
 <h4 id="field-zone-name_5">Field: Zone Name</h4>
@@ -1242,47 +1468,49 @@
 <h4 id="field-baseboard-heating-capacity_4">Field: Baseboard Heating Capacity</h4>
 <p>Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the heat pump system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the heat pump system.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:WaterToAirHeatPump,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Cooling Supply Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Heating Supply Air Flow Rate {m3/s}</p>
-<p>,                        !- No Load Supply Air Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>Flow/Person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>,                !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>,                        !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>,                        !- System Availability Schedule Name</p>
-<p>,                        !- Supply Fan Operating Mode Schedule Name</p>
-<p>DrawThrough,             !- Supply Fan Placement</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>75,                      !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Type</p>
-<p>autosize,                !- Cooling Coil Gross Rated Total Capacity {W}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>3,                       !- Cooling Coil Gross Rated COP</p>
-<p>Coil:Heating:WaterToAirHeatPump:EquationFit,  !- HPump Heating Coil Type</p>
-<p>autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}</p>
-<p>2.75,                    !- Heat Pump Heating Coil Gross Rated COP</p>
-<p>,                !- Supplemental Heating Coil Availability Schedule Name</p>
-<p>autosize,                !- Supplemental Heating Coil Capacity {W}</p>
-<p>2.5,                     !- Maximum Cycling Rate {cycles/hr}</p>
-<p>60,                      !- Heat Pump Time Constant {s}</p>
-<p>0.01,                    !- Fraction of On-Cycle Power Use</p>
-<p>60,                      !- Heat Pump Fan Delay Time {s}</p>
-<p>,                        !- Dedicated Outdoor Air System Name</p>
-<p>Electric,                !- Supplemental Heating Coil Type</p>
-<p>SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method</p>
-<p>14.0,        !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>50.0,        !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
-<p>,            !- Design Specification Outdoor Air Object Name</p>
-<p>!- Design Specification Zone Air Distribution Object Name</p>
+<pre><code class="idf">  HVACTemplate:Zone:WaterToAirHeatPump,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    ,                !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- System Availability Schedule Name
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Type
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- HPump Heating Coil Type
+    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
+    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
+    ,                !- Supplemental Heating Coil Availability Schedule Name
+    autosize,                !- Supplemental Heating Coil Capacity {W}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Heat Pump Time Constant {s}
+    0.01,                    !- Fraction of On-Cycle Power Use
+    60,                      !- Heat Pump Fan Delay Time {s}
+    ,                        !- Dedicated Outdoor Air System Name
+    Electric,                !- Supplemental Heating Coil Type
+ SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+                 !- Design Specification Zone Air Distribution Object Name
+</code></pre>
+
 <h3 id="hvactemplatezonevrf">HVACTemplate:Zone:VRF</h3>
 <p>This object simulates a variable refrigerant flow (VRF) zone terminal unit which is served by an HVACTemplate:System:VRF condenser unit. Reference ZoneHVAC:TerminalUnit:VariableRefrigerantFlow for more details about the VRF terminal unit model.</p>
 <h4 id="field-zone-name_6">Field: Zone Name</h4>
@@ -1496,30 +1724,32 @@
 <h4 id="field-design-specification-zone-air-distribution-object-name_6">Field: Design Specification Zone Air Distribution Object Name</h4>
 <p>This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when <em>Outdoor Air Method = DetailedSpecification</em>.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:Unitary,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>Furnace DX 1-1,          !- Template Unitary System Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Supply Air Maximum Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule Name</p>
-<p>Autosize,                !- Baseboard Heating Capacity {W}</p>
-<p>SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SystemSupplyAirTemperature, !- Zone Heating Design Supply Air . . . Input Method</p>
-<p>,            !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
-<p>,            !- Design Specification Outdoor Air Object Name</p>
-<p>;            !- Design Specification Zone Air Distribution Object Name</p>
+<pre><code class="idf">  HVACTemplate:Zone:Unitary,
+    SPACE1-1,                !- Zone Name
+    Furnace DX 1-1,          !- Template Unitary System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    Autosize,                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SystemSupplyAirTemperature, !- Zone Heating Design Supply Air . . . Input Method
+    ,            !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+    ;            !- Design Specification Zone Air Distribution Object Name
+</code></pre>
+
 <h3 id="hvactemplatezonevav">HVACTemplate:Zone:VAV</h3>
 <p>This object simulates the zone portion of a variable air volume HVAC configuration with several different heating options. When heating is required, this terminal unit will activate the reheat coil first, and then increase airflow if reverse action is specified. Multiple HVACTemplate:Zone:VAV, HVACTemplate:Zone:VAV:FanPowered or HVACTemplate:Zone:VAV:HeatAndCool objects are usually specified for each HVACTemplate:System:VAV or HVACTemplate:System:PackagedVAV object. Reheat is specified at the zone level. Reference AirTerminal:SingleDuct:VAV:Reheat and AirTerminal:SingleDuct:VAV:NoReheat for more details about VAV terminal units.</p>
 <h4 id="field-zone-name_8">Field: Zone Name</h4>
@@ -1633,41 +1863,43 @@
 <h4 id="field-design-specification-zone-air-distribution-object-name_7">Field: Design Specification Zone Air Distribution Object Name</h4>
 <p>This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when <em>Outdoor Air Method = DetailedSpecification</em>.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:VAV,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>VAV Sys 1,               !- Template VAV System Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Supply Air Maximum Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>Constant,                !- Zone Minimum Air Flow Input Method</p>
-<p>0.3,                     !- Constant Minimum Air Flow Fraction</p>
-<p>,                        !- Fixed Minimum Air Flow Rate {m3/s}</p>
-<p>,                        !- Minimum Air Flow Fraction Schedule Name</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>HotWater,                !- Reheat Coil Type</p>
-<p>,                        !- Reheat Coil Availability Schedule Name</p>
-<p>Reverse,                 !- Heating Damper Action</p>
-<p>,             !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</p>
-<p>,                        !- Maximum Flow Fraction During Reheat</p>
-<p>,                        !- Maximum Reheat Air Temperature</p>
-<p>,             !- Design Specification Outdoor Air Object Name for Control</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule Name</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p>SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>50.0,        !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
-<p>,            !- Design Specification Outdoor Air Object Name for Sizing</p>
-<p>;            !- Design Specification Zone Air Distribution Object Name</p>
+<pre><code class="idf">  HVACTemplate:Zone:VAV,
+    SPACE1-1,                !- Zone Name
+    VAV Sys 1,               !- Template VAV System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    Constant,                !- Zone Minimum Air Flow Input Method
+    0.3,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Fixed Minimum Air Flow Rate {m3/s}
+    ,                        !- Minimum Air Flow Fraction Schedule Name
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule Name
+    Reverse,                 !- Heating Damper Action
+    ,             !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ,                        !- Maximum Flow Fraction During Reheat
+    ,                        !- Maximum Reheat Air Temperature
+    ,             !- Design Specification Outdoor Air Object Name for Control
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name for Sizing
+    ;            !- Design Specification Zone Air Distribution Object Name
+</code></pre>
+
 <h3 id="hvactemplatezonevavfanpowered">HVACTemplate:Zone:VAV:FanPowered</h3>
 <p>This object simulates the zone portion of a variable air volume HVAC configuration with a series or parallel fan powered terminal unit (also know as a powered induction unit or PIU) and several different heating options. Multiple HVACTemplate:Zone:VAV, HVACTemplate:Zone:VAV:FanPowered or HVACTemplate:Zone:VAV:HeatAndCool objects are usually specified for each HVACTemplate:System:VAV or HVACTemplate:System:PackagedVAV object. Reheat is specified at the zone level.</p>
 <p>The series powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a fixed flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The fan runs at a constant volume flow rate whenever the unit is on (and the fan’s availability schedule is on or it is activated by an availability manager). With HVACTemplate:Zone:VAV:FanPowered, the secondary fan will operate according to the Zone PIU Fan Schedule and any Night Cycle Control specified in the  system it is served by.) The fan is downstream of the primary and secondary air inlets. The variable mixing is accomplished by a damper in the unit’s primary air supply inlet duct. This damper can move from fully open (100% primary air. 0% secondary air) to a minimum stop that is specified in the input description. At full cooling the damper will be fully open. At minimum cooling and for heating the damper will be at the minimum stop and the secondary air flow will be at its maximum. Reference object AirTerminal:SingleDuct:SeriesPIU:Reheat for more details.</p>
@@ -1785,40 +2017,42 @@
 <h4 id="field-design-specification-zone-air-distribution-object-name_8">Field: Design Specification Zone Air Distribution Object Name</h4>
 <p>This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when <em>Outdoor Air Method = DetailedSpecification</em>.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:VAV:FanPowered,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>VAV Sys 1,               !- Template VAV System Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Primary Supply Air Maximum Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>autosize,                !- Primary Supply Air Minimum Flow Fraction</p>
-<p>autosize,                !- Secondary Supply Air Maximum Flow Rate {m3/s}</p>
-<p>Series,                  !- Flow Type</p>
-<p>autosize,                !- Parallel Fan On Flow Fraction</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>HotWater,                !- Reheat Coil Type</p>
-<p>,                        !- Reheat Coil Availability Schedule Name</p>
-<p>0.7,                     !- Fan Total Efficiency</p>
-<p>1000,                    !- Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Fan Motor Efficiency</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule Name</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p>SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>50.0,        !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
-<p>,            !- Zone PIU Fan Schedule Name</p>
-<p>,            !- Design Specification Outdoor Air Object Name</p>
-<p>;            !- Design Specification Zone Air Distribution Object Name</p>
+<pre><code class="idf">  HVACTemplate:Zone:VAV:FanPowered,
+    SPACE1-1,                !- Zone Name
+    VAV Sys 1,               !- Template VAV System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Primary Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    autosize,                !- Primary Supply Air Minimum Flow Fraction
+    autosize,                !- Secondary Supply Air Maximum Flow Rate {m3/s}
+    Series,                  !- Flow Type
+    autosize,                !- Parallel Fan On Flow Fraction
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    1000,                    !- Fan Delta Pressure {Pa}
+    0.9,                     !- Fan Motor Efficiency
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Zone PIU Fan Schedule Name
+    ,            !- Design Specification Outdoor Air Object Name
+    ;            !- Design Specification Zone Air Distribution Object Name
+</code></pre>
+
 <h3 id="hvactemplatezonevavheatandcool">HVACTemplate:Zone:VAV:HeatAndCool</h3>
 <p>This object simulates the zone portion of a variable air volume HVAC configuration with several different heating options. When heating is required, this terminal unit will increase airflow first and then activate the optional reheat coil. Multiple HVACTemplate:Zone:VAV, HVACTemplate:Zone:VAV:FanPowered, or HVACTemplate:Zone:VAV:HeatAndCool objects are usually specified for each HVACTemplate:System:VAV or HVACTemplate:System:PackagedVAV object. Reheat is specified at the zone level. Reference AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat and AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat for more details about these VAV terminal units.</p>
 <h4 id="field-zone-name_10">Field: Zone Name</h4>
@@ -1906,34 +2140,36 @@
 <h4 id="field-zone-heating-design-supply-air-temperature-difference_8">Field: Zone Heating Design Supply Air Temperature Difference</h4>
 <p>The temperature difference between heating design supply air temperature and zone air temperature in degrees Celsius for the zone heating design air flow rate calculation and heating coil sizing. The absolute value is used, so the sign may be positive or negative. This field is used only when Zone Heating Design Supply Air Temperature Input Method is <em>TemperatureDifference.</em> The default is 30 deltaC.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:VAV:HeatAndCool,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>VAV Sys 1,               !- Template VAV System Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Supply Air Maximum Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>0.3,                     !- Constant Minimum Air Flow Fraction</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}</p>
-<p>,            !- Design Specification Outdoor Air Object Name for Sizing</p>
-<p>,            !- Design Specification Zone Air Distribution Object Name</p>
-<p>HotWater,                !- Reheat Coil Type</p>
-<p>,                        !- Reheat Coil Availability Schedule Name</p>
-<p>,                        !- Maximum Reheat Air Temperature</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule Name</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p>SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>50.0,        !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
+<pre><code class="idf">  HVACTemplate:Zone:VAV:HeatAndCool,
+    SPACE1-1,                !- Zone Name
+    VAV Sys 1,               !- Template VAV System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    0.3,                     !- Constant Minimum Air Flow Fraction
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,            !- Design Specification Outdoor Air Object Name for Sizing
+    ,            !- Design Specification Zone Air Distribution Object Name
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule Name
+    ,                        !- Maximum Reheat Air Temperature
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ;            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+</code></pre>
+
 <h3 id="hvactemplatezoneconstantvolume">HVACTemplate:Zone:ConstantVolume</h3>
 <p>This object simulates the zone portion of a constant volume HVAC configuration with or without reheat. One or more HVACTemplate:Zone:ConstantVolume objects will be used with a single HVACTemplate:System:ConstantVolume which has optional chilled water cooling and several types of heating. Reference AirTerminal:SingleDuct:Uncontrolled and AirTerminal:SingleDuct:ConstantVolume:Reheat for more details about the terminal units.</p>
 <h4 id="field-zone-name_11">Field: Zone Name</h4>
@@ -2019,33 +2255,35 @@
 <h4 id="field-zone-heating-design-supply-air-temperature-difference_9">Field: Zone Heating Design Supply Air Temperature Difference</h4>
 <p>The temperature difference between heating design supply air temperature and zone air temperature in degrees Celsius for the zone heating design air flow rate calculation and heating coil sizing. The absolute value is used, so the sign may be positive or negative. This field is used only when Zone Heating Design Supply Air Temperature Input Method is <em>TemperatureDifference.</em> The default is 30 deltaC.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Zone:ConstantVolume,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>CAV Sys 1,               !- Template Constant Volume System Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Supply Air Maximum Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+<pre><code class="idf">HVACTemplate:Zone:ConstantVolume,
+    SPACE1-1,                !- Zone Name
+    CAV Sys 1,               !- Template Constant Volume System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
      ,                        !- Design Specification Outdoor Air Object Name
-     ,                       !- Design Specification Zone Air Distribution Object Name</p>
-<p>HotWater,                !- Reheat Coil Type</p>
-<p>,                        !- Reheat Coil Availability Schedule Name</p>
-<p>,                        !- Maximum Reheat Air Temperature {C}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule Name</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p>SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method</p>
-<p>12.8,                    !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>11.11,          !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method</p>
-<p>50,                      !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>30;             !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
+     ,                       !- Design Specification Zone Air Distribution Object Name
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule Name
+    ,                        !- Maximum Reheat Air Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    12.8,                    !- Zone Cooling Design Supply Air Temperature {C]
+    11.11,          !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50,                      !- Zone Heating Design Supply Air Temperature {C]
+    30;             !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+</code></pre>
+
 <h3 id="hvactemplatezonedualduct">HVACTemplate:Zone:DualDuct</h3>
 <p>This object simulates the zone portion of a constant volume or variable volume dual-duct HVAC system. One or more HVACTemplate:Zone:DualDuct objects may be used with a single HVACTemplate:System:DualDuct object which has optional chilled water cooling and several types of heating. A constant air volume dual duct system is simulated by setting the Zone Minimum Air Flow Fraction =1.0.  A variable air volume duct duct system is simulated by setting the Zone Minimum Air Flow Fraction &lt;1.0. . Reference AirTerminal:DualDuct:ConstantVolume and AirTerminal:DualDuct:VAV for more details about the terminal units.</p>
 <h4 id="field-zone-name_12">Field: Zone Name</h4>
@@ -2117,33 +2355,35 @@
 <h4 id="field-zone-heating-design-supply-air-temperature-difference_10">Field: Zone Heating Design Supply Air Temperature Difference</h4>
 <p>The temperature difference between heating design supply air temperature and zone air temperature in degrees Celsius for the zone heating design air flow rate calculation and heating coil sizing. The absolute value is used, so the sign may be positive or negative. This field is used only when Zone Heating Design Supply Air Temperature Input Method is <em>TemperatureDifference.</em> The default is 30 deltaC.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate: Zone:DualDuct,</p>
-<p>SPACE1-1,                !- Zone Name</p>
-<p>DD Sys 1,                !- Template Dual Duct System Name</p>
-<p>All Zones,               !- Template Thermostat Name</p>
-<p>autosize,                !- Supply Air Maximum Flow Rate {m3/s}</p>
-<p>,                        !- Zone Heating Sizing Factor</p>
-<p>,                        !- Zone Cooling Sizing Factor
-     0.2,                     !- Zone Minimum Air Flow Fraction</p>
-<p>flow/person,             !- Outdoor Air Method</p>
-<p>0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}</p>
-<p>0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+<pre><code class="idf">HVACTemplate:Zone:DualDuct,
+    SPACE1-1,                !- Zone Name
+    DD Sys 1,                !- Template Dual Duct System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+     0.2,                     !- Zone Minimum Air Flow Fraction
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
      ,                    !- Design Specification Outdoor Air Object Name for Sizing
-     ,                      !- Design Specification Zone Air Distribution Object Name</p>
-<p>,                    !- Design Specification Outdoor Air Object Name for Control
+     ,                      !- Design Specification Zone Air Distribution Object Name
+    ,                    !- Design Specification Outdoor Air Object Name for Control
      ,                        !- Cold Supply Plenum Name
-     ,                        !- Hot Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>None,                    !- Baseboard Heating Type</p>
-<p>,                        !- Baseboard Heating Availability Schedule Name</p>
-<p>autosize;                !- Baseboard Heating Capacity {W}</p>
-<p>SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method</p>
-<p>12.8,                    !- Zone Cooling Design Supply Air Temperature {C]</p>
-<p>11.11,          !- Zone Cooling Design Supply Air Temperature Difference {deltaC]</p>
-<p>SystemSupplyAirTemperature, !- Zone Heating Design Supply Air . . . Input Method</p>
-<p>50,                      !- Zone Heating Design Supply Air Temperature {C]</p>
-<p>30;             !- Zone Heating Design Supply Air Temperature Difference {deltaC]</p>
+     ,                        !- Hot Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    12.8,                    !- Zone Cooling Design Supply Air Temperature {C]
+    11.11,          !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SystemSupplyAirTemperature, !- Zone Heating Design Supply Air . . . Input Method
+    50,                      !- Zone Heating Design Supply Air Temperature {C]
+    30;             !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+</code></pre>
+
 <h3 id="hvactemplatesystemvrf">HVACTemplate:System:VRF</h3>
 <p>This model simulates a variable-refrigerant-flow (or variable-refrigerant-volume) air-conditioning system. This system type models direct-expansion cooling and/or heating coils configured in a zone terminal unit (ref. HVACTemplate:Zone:VRF). For more details about this system type see AirConditioner:VariableRefrigerantFlow.</p>
 <h4 id="field-name_1">Field: Name</h4>
@@ -2235,49 +2475,51 @@
 <h4 id="field-maximum-outdoor-temperature-in-heat-recovery-mode">Field: Maximum Outdoor Temperature in Heat Recovery Mode</h4>
 <p>This numeric field defines the maximum outdoor dry-bulb temperature allowed for heat recovery operation. Above this temperature, heat recovery is disabled. This input must be less than the smaller of the maximum outdoor temperature in cooling or heating mode. If this field is left blank, the default value is the lower of the Maximum Outdoor Temperature in Cooling Mode or Maximum Outdoor Temperature in Heating Mode inputs.. This system may still operate in cooling or heating only mode when outdoor temperatures are above the maximum outdoor temperature in heat recovery mode. This input is only used when Heat Pump Waste Heat Recovery is selected as Yes.</p>
 <p>Following is an example input for a AirConditioner:VariableRefrigerantFlow system.</p>
-<p>HVACTemplate:System:VRF,</p>
-<p>VRF Heat Pump,        !- Name</p>
-<p>VRFCondAvailSched,    !- Availability Schedule Name</p>
-<p>autosize,             !- Gross Rated Total Cooling Capacity {W}</p>
-<p>3.16038,              !- Gross Rated Cooling COP {W}</p>
-<p>-5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}</p>
-<p>43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}</p>
-<p>autosize,             !- Gross Rated Heating Capacity {W}</p>
-<p>,                     !- Rated Heating Capacity Sizing Ratio (W/W)</p>
-<p>3.40909,              !- Gross Rated Heating COP</p>
-<p>-20,                  !- Minimum Outdoor Temperature in Heating Mode {C}</p>
-<p>15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}</p>
-<p>0.25,                 !- Minimum Heat Pump Part-Load Ratio</p>
-<p>SPACE1-1,             !- Zone Name for Master Thermostat Location</p>
-<p>LoadPriority,         !- Master Thermostat Priority Control Type</p>
-<p>,                     !- Thermostat Priority Schedule Name</p>
-<p>No,                   !- Heat Pump Waste Heat Recovery</p>
-<p>30,  !- Equivalent Piping Length . . . Factor in Cooling Mode {m}</p>
-<p>10,  !- Vertical Height used for Piping Correction Factor {m}</p>
-<p>30,  !- Equivalent Piping Length . . . Factor in Heating Mode {m}</p>
-<p>15,  !- Crankcase Heater Power per Compressor {W}</p>
-<p>3,   !- Number of Compressors</p>
-<p>0.33,!- Ratio of Compressor Size to Total Compressor Capacity</p>
-<p>7,   !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}</p>
-<p>Resistive,            !- Defrost Strategy</p>
-<p>Timed,                !- Defrost Control</p>
-<p>,                     !- Defrost Time Period Fraction</p>
-<p>autosize,             !- Resistive Defrost Heater Capacity {W}</p>
-<p>7,   !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}</p>
-<p>EvaporativelyCooled,  !- Condenser Type</p>
-<p>MyVRFOANode,          !- Condenser Inlet Node Name</p>
-<p>,                     !- Condenser Outlet Node Name</p>
-<p>,                     !- Water Condenser Volume Flow Rate</p>
-<p>,             !- Evaporative Condenser Effectiveness {dimensionless}</p>
-<p>autosize,     !- Evaporative Condenser Air Flow Rate {m3/s}</p>
-<p>autosize,     !- Evaporative Condenser Pump Rated Power Consumption {W}</p>
-<p>,                     !- Supply Water Storage Tank Name</p>
-<p>200,                  !- Basin Heater Capacity {W/K}</p>
-<p>,                     !- Basin Heater Set Point Temperature (C)</p>
-<p>,                     !- Basin Heater Operating Schedule Name</p>
-<p>,                     !- Fuel Type</p>
-<p>,    !- Minimum Outdoor Temperature in Heat Recovery Mode (C)</p>
-<p>;    !- Maximum Outdoor Temperature in Heat Recovery Mode (C)</p>
+<pre><code class="idf">HVACTemplate:System:VRF,
+  VRF Heat Pump,        !- Name
+  VRFCondAvailSched,    !- Availability Schedule Name
+  autosize,             !- Gross Rated Total Cooling Capacity {W}
+  3.16038,              !- Gross Rated Cooling COP {W}
+  -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
+  43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
+  autosize,             !- Gross Rated Heating Capacity {W}
+  ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
+  3.40909,              !- Gross Rated Heating COP
+  -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
+  15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
+  0.25,                 !- Minimum Heat Pump Part-Load Ratio
+  SPACE1-1,             !- Zone Name for Master Thermostat Location
+  LoadPriority,         !- Master Thermostat Priority Control Type
+  ,                     !- Thermostat Priority Schedule Name
+  No,                   !- Heat Pump Waste Heat Recovery
+  30,  !- Equivalent Piping Length . . . Factor in Cooling Mode {m}
+  10,  !- Vertical Height used for Piping Correction Factor {m}
+  30,  !- Equivalent Piping Length . . . Factor in Heating Mode {m}
+  15,  !- Crankcase Heater Power per Compressor {W}
+  3,   !- Number of Compressors
+  0.33,!- Ratio of Compressor Size to Total Compressor Capacity
+  7,   !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
+  Resistive,            !- Defrost Strategy
+  Timed,                !- Defrost Control
+  ,                     !- Defrost Time Period Fraction
+  autosize,             !- Resistive Defrost Heater Capacity {W}
+  7,   !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
+  EvaporativelyCooled,  !- Condenser Type
+  MyVRFOANode,          !- Condenser Inlet Node Name
+  ,                     !- Condenser Outlet Node Name
+  ,                     !- Water Condenser Volume Flow Rate
+  ,             !- Evaporative Condenser Effectiveness {dimensionless}
+  autosize,     !- Evaporative Condenser Air Flow Rate {m3/s}
+  autosize,     !- Evaporative Condenser Pump Rated Power Consumption {W}
+  ,                     !- Supply Water Storage Tank Name
+  200,                  !- Basin Heater Capacity {W/K}
+  ,                     !- Basin Heater Set Point Temperature (C)
+  ,                     !- Basin Heater Operating Schedule Name
+  ,                     !- Fuel Type
+  ,    !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
+  ;    !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
+</code></pre>
+
 <h3 id="hvactemplatesystemunitary">HVACTemplate:System:Unitary</h3>
 <p>This object simulates the system portion of a constant volume direct-expansion based HVAC configuration with several different heating options. Often a single HVACTemplate:Zone:Unitary object will be used with a single HVACTemplate:System:Unitary object to simulate single zone direct-expansion based air conditioning systems. In addition, multiple HVACTemplate:Zone:Unitary objects may appear that all reference the same HVACTemplate:System:Unitary object in a multiple zone version. For a multizone system, only one zone is specified as the control zone. Direct expansion includes single packaged rooftop systems commonly seen in commercial buildings and split systems commonly seen in residential buildings.</p>
 <h4 id="field-name_2">Field: Name</h4>
@@ -2352,28 +2594,28 @@
 <p>The options for this field are</p>
 <ul>
 <li>
-<p>‘FixedDryBulb’</p>
+<p>'FixedDryBulb'</p>
 </li>
 <li>
-<p>‘DifferentialDryBulb’</p>
+<p>'DifferentialDryBulb'</p>
 </li>
 <li>
-<p>‘FixedEnthalpy’</p>
+<p>'FixedEnthalpy'</p>
 </li>
 <li>
-<p>‘ DifferentialEnthalpy’</p>
+<p>'DifferentialEnthalpy'</p>
 </li>
 <li>
-<p>‘ElectronicEnthalpy’ (i.e., humidity ratio curve strategy)</p>
+<p>'ElectronicEnthalpy' (i.e., humidity ratio curve strategy)</p>
 </li>
 <li>
-<p>‘FixedDewPointAndDryBulb’</p>
+<p>'FixedDewPointAndDryBulb'</p>
 </li>
 <li>
-<p>‘DifferentialDryBulbAndEnthalpy’</p>
+<p>'DifferentialDryBulbAndEnthalpy'</p>
 </li>
 <li>
-<p>‘NoEconomizer’</p>
+<p>'NoEconomizer'</p>
 </li>
 </ul>
 <p>Choosing <strong>NoEconomizer</strong> means the economizer will not operate and the outdoor airflow rate will be at the minimum for the entire simulation.</p>
@@ -2484,59 +2726,61 @@
 <h4 id="field-return-fan-motor-in-air-stream-fraction">Field: Return Fan Motor in Air Stream Fraction</h4>
 <p>Enter the fraction of the motor heat that is added to the air stream. A value of 0 means that the motor is completely outside the air stream. A value of 1 means that all of the motor heat will go into the air stream and act to cause a temperature rise. Must be between 0 and 1. Default is 1.0.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:System:Unitary,</p>
-<p>AHU 1,                   !- Air Handling System Name</p>
-<p>FanAndCoilAvailSched,    !- System Availability Schedule</p>
-<p>EAST ZONE,               !- Control Zone Name or Thermostat Location</p>
-<p>autosize,                !- Supply Fan Max Flow Rate {m3/s}</p>
-<p>Fan Mode Schedule,       !- Supply Fan Operating Mode Schedule</p>
-<p>.7,                      !- Supply Fan Total Efficiency</p>
-<p>600,                     !- Supply Fan Delta Pressure {Pa}</p>
-<p>.9,                      !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>SingleSspeedDX,          !- Cooling Coil Type</p>
-<p>FanAndCoilAvailSched,    !- Cooling Coil Availability Schedule</p>
-<p>14.0,                    !- Cooling Design Supply Air Temperature {C}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Total Capacity {W}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>3,                       !- Cooling Coil Gross Rated COP</p>
-<p>Gas,                     !- Heating Coil Type</p>
-<p>FanAndCoilAvailSched,    !- Heating Coil Availability Schedule</p>
-<p>50.0,                    !- Heating Design Supply Air Temperature {C}</p>
-<p>autosize,                !- Heating Coil Capacity {W}</p>
-<p>.8,                      !- Gas Heating Coil Efficiency</p>
-<p>0,                       !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>autosize,                !- Maximum Outdoor air Flow Rate {m3/s}</p>
-<p>autosize,                !- Minimum Outdoor air Flow Rate {m3/s}</p>
-<p>,                        !- Minimum Outdoor air Schedule Name</p>
-<p>NoEconomizer,            !- Economizer Type</p>
-<p>NoLockout,               !- Economizer Lockout</p>
-<p>,                        !- Economizer Upper Temperature Limit {C}</p>
-<p>,                        !- Economizer Lower Temperature Limit {C}</p>
-<p>,                        !- Economizer Upper Enthalpy Limit {J/kg}</p>
-<p>,                    !- Economizer Maximum Limit Dewpoint Temperature {C}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>BlowThrough,             !- Supply Fan Placement</p>
-<p>CycleOnAny,              !- Night Cycle Control</p>
-<p>,                        !- Night Cycle Control Zone Name</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>,                        !- Sensible Heat Recovery Effectiveness</p>
-<p>,                        !- Latent Heat Recovery Effectiveness</p>
-<p>None,                    !- Dehumidification Control Type</p>
-<p>,                        !- Dehumidification Control Zone Name</p>
-<p>60,                      !- Dehumidification Setpoint {percent}</p>
-<p>ElectricSteam,           !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule</p>
-<p>0.000001,                !- Humidifier Rated Capacity {m3/s}</p>
-<p>2690,                    !- Humidifier Rated Electric Power {W}</p>
-<p>EAST ZONE,               !- Humidifier Control Zone Name</p>
-<p>30,                      !- Humidifier Setpoint {percent}</p>
-<p>No,                      !- Return Fan</p>
-<p>0.7,                     !- Return Fan Total Efficiency
-     300,                     !- Return Fan Delta Pressure {Pa}
-     0.9,                     !- Return Fan Motor Efficiency
-     1.0;                     !- Return Fan Motor in Air Stream Fraction</p>
+<pre><code class="idf">HVACTemplate:System:Unitary,
+    AHU 1,                   !- Air Handling System Name
+    FanAndCoilAvailSched,    !- System Availability Schedule
+    EAST ZONE,               !- Control Zone Name or Thermostat Location
+    autosize,                !- Supply Fan Max Flow Rate {m3/s}
+    Fan Mode Schedule,       !- Supply Fan Operating Mode Schedule
+    .7,                      !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    .9,                      !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    SingleSspeedDX,          !- Cooling Coil Type
+    FanAndCoilAvailSched,    !- Cooling Coil Availability Schedule
+    14.0,                    !- Cooling Design Supply Air Temperature {C}
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    Gas,                     !- Heating Coil Type
+    FanAndCoilAvailSched,    !- Heating Coil Availability Schedule
+    50.0,                    !- Heating Design Supply Air Temperature {C}
+    autosize,                !- Heating Coil Capacity {W}
+    .8,                      !- Gas Heating Coil Efficiency
+    0,                       !- Gas Heating Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor air Flow Rate {m3/s}
+    ,                        !- Minimum Outdoor air Schedule Name
+    NoEconomizer,            !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    ,                        !- Economizer Upper Temperature Limit {C}
+    ,                        !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    BlowThrough,             !- Supply Fan Placement
+    CycleOnAny,              !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    ,                        !- Sensible Heat Recovery Effectiveness
+    ,                        !- Latent Heat Recovery Effectiveness
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60,                      !- Dehumidification Setpoint {percent}
+    ElectricSteam,           !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690,                    !- Humidifier Rated Electric Power {W}
+    EAST ZONE,               !- Humidifier Control Zone Name
+    30,                      !- Humidifier Setpoint {percent}
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+    300,                     !- Return Fan Delta Pressure {Pa}
+    0.9,                     !- Return Fan Motor Efficiency
+    1.0;                     !- Return Fan Motor in Air Stream Fraction
+</code></pre>
+
 <h3 id="hvactemplatesystemunitaryheatpumpairtoair">HVACTemplate:System:UnitaryHeatPump:AirToAir</h3>
 <p>This object simulates the system portion of an air to air direct-expansion unitary heat pump. Often a single HVACTemplate:Zone:Unitary object will be used with a single HVACTemplate:System:UnitaryHeatPump:AirToAir object to simulate single zone direct-expansion based heat pump systems. In addition, multiple HVACTemplate:Zone:Unitary objects may appear that all reference the same HVACTemplate:System:UnitaryHeatPump:AirToAir object in a multiple zone version. For a multizone system, only one zone is specified as the control zone. The model can simulate heat pumps seen in commercial buildings and split systems commonly seen in residential buildings.</p>
 <h4 id="field-name_3">Field: Name</h4>
@@ -2630,28 +2874,28 @@
 <p>The options for this field are</p>
 <ul>
 <li>
-<p>‘FixedDryBulb’</p>
+<p>'FixedDryBulb'</p>
 </li>
 <li>
-<p>‘DifferentialDryBulb’</p>
+<p>'DifferentialDryBulb'</p>
 </li>
 <li>
-<p>‘FixedEnthalpy’</p>
+<p>'FixedEnthalpy'</p>
 </li>
 <li>
-<p>‘DifferentialEnthalpy’</p>
+<p>'DifferentialEnthalpy'</p>
 </li>
 <li>
-<p>‘ElectronicEnthalpy’ (i.e., humidity ratio curve strategy)</p>
+<p>'ElectronicEnthalpy' (i.e., humidity ratio curve strategy)</p>
 </li>
 <li>
-<p>‘FixedDewPointAndDryBulb’</p>
+<p>'FixedDewPointAndDryBulb'</p>
 </li>
 <li>
-<p>‘DifferentialDryBulbAndEnthalpy’</p>
+<p>'DifferentialDryBulbAndEnthalpy'</p>
 </li>
 <li>
-<p>‘NoEconomizer’</p>
+<p>'NoEconomizer'</p>
 </li>
 </ul>
 <p>Choosing <strong>NoEconomizer</strong> means the economizer will not operate and the outdoor airflow rate will be at the minimum for the entire simulation.</p>
@@ -2740,68 +2984,70 @@
 <h4 id="field-return-fan-motor-in-air-stream-fraction_1">Field: Return Fan Motor in Air Stream Fraction</h4>
 <p>Enter the fraction of the motor heat that is added to the air stream. A value of 0 means that the motor is completely outside the air stream. A value of 1 means that all of the motor heat will go into the air stream and act to cause a temperature rise. Must be between 0 and 1. Default is 1.0.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:System:UnitaryHeatPump:AirToAir,</p>
-<p>Heat Pump 1,             !- Name</p>
-<p>FanAvailSched,           !- System Availability Schedule Name</p>
-<p>SPACE1-1,                !- Control Zone or Thermostat Location Name</p>
-<p>autosize,                !- Cooling Supply Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Heating Supply Air Flow Rate {m3/s}</p>
-<p>autosize,                !- No Load Supply Air Flow Rate {m3/s}</p>
-<p>,                        !- Supply Fan Operating Mode Schedule Name</p>
-<p>BlowThrough,             !- Supply Fan Placement</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>600,                     !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>SingleSpeedDX,           !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>14,                      !- Cooling Design Supply Air Temperature {C}</p>
-<p>autosize,                !- Cooling Coil Gross Rated TotalCapacity {W}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>3,                       !- Cooling Coil Gross Rated COP</p>
-<p>SingleSpeedDXHeatPump,   !- Heat Pump Heating Coil Type</p>
-<p>,                    !- Heat Pump Heating Coil Availability Schedule Name</p>
-<p>50.0,                    !- Heating Design Supply Air Temperature {C}</p>
-<p>autosize,            !- Heat Pump Heating Coil Gross Rated Capacity {W}</p>
-<p>2.75,                    !- Heat Pump Heating Coil Gross Rated COP</p>
-<p>-8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}</p>
-<p>5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}</p>
-<p>ReverseCycle,            !- Heat Pump Defrost Strategy</p>
-<p>Timed,                   !- Heat Pump Defrost Control</p>
-<p>0.058333,                !- Heat Pump Defrost Time Period Fraction</p>
-<p>Electric,                !- Supplemental Heating Coil Type</p>
-<p>,           !- Supplemental Heating Coil Availability Schedule Name</p>
-<p>autosize,                !- Supplemental Heating Coil Capacity {W}</p>
-<p>21,    !-  Supplemental Heating Coil Max Outdoor Dry-Bulb Temperature {C}</p>
-<p>0.8,                     !- Supplemental Gas Heating Coil Efficiency</p>
-<p>,           !- Supplemental Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}</p>
-<p>Min OA Sched,            !- Minimum Outdoor Air Schedule Name</p>
-<p>DifferentialDryBulb,     !- Economizer Type</p>
-<p>NoLockout,               !- Economizer Lockout</p>
-<p>19,                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}</p>
-<p>,                        !- Economizer Maximum Limit Enthalpy {J/kg}</p>
-<p>,                   !- Economizer Maximum Limit Dewpoint Temperature {C}</p>
-<p>4,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>CycleOnAny,              !- Night Cycle Control</p>
-<p>,                        !- Night Cycle Control Zone Name</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>0.7,                     !- Sensible Heat Recovery Effectiveness</p>
-<p>0.65,                    !- Latent Heat Recovery Effectiveness</p>
-<p>None,                    !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule Name</p>
-<p>0.000001,                !- Humidifier Rated Capacity {m3/s}</p>
-<p>2690,                    !- Humidifier Rated Electric Power {W}</p>
-<p>,                        !- Humidifier Control Zone Name</p>
-<p>30,                      !- Humidifier Setpoint {percent}</p>
-<p>No,                      !- Return Fan</p>
-<p>0.7,                     !- Return Fan Total Efficiency
-     300,                     !- Return Fan Delta Pressure {Pa}
-     0.9,                     !- Return Fan Motor Efficiency
-     1.0;                     !- Return Fan Motor in Air Stream Fraction</p>
+<pre><code class="idf">HVACTemplate:System:UnitaryHeatPump:AirToAir,
+    Heat Pump 1,             !- Name
+    FanAvailSched,           !- System Availability Schedule Name
+    SPACE1-1,                !- Control Zone or Thermostat Location Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    BlowThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    SingleSpeedDX,           !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    14,                      !- Cooling Design Supply Air Temperature {C}
+    autosize,                !- Cooling Coil Gross Rated TotalCapacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    SingleSpeedDXHeatPump,   !- Heat Pump Heating Coil Type
+    ,                    !- Heat Pump Heating Coil Availability Schedule Name
+    50.0,                    !- Heating Design Supply Air Temperature {C}
+    autosize,            !- Heat Pump Heating Coil Gross Rated Capacity {W}
+    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
+    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
+    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
+    ReverseCycle,            !- Heat Pump Defrost Strategy
+    Timed,                   !- Heat Pump Defrost Control
+    0.058333,                !- Heat Pump Defrost Time Period Fraction
+    Electric,                !- Supplemental Heating Coil Type
+    ,           !- Supplemental Heating Coil Availability Schedule Name
+    autosize,                !- Supplemental Heating Coil Capacity {W}
+    21,    !-  Supplemental Heating Coil Max Outdoor Dry-Bulb Temperature {C}
+    0.8,                     !- Supplemental Gas Heating Coil Efficiency
+    ,           !- Supplemental Gas Heating Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    19,                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                   !- Economizer Maximum Limit Dewpoint Temperature {C}
+    4,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    CycleOnAny,              !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690,                    !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30,                      !- Humidifier Setpoint {percent}
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+    300,                     !- Return Fan Delta Pressure {Pa}
+    0.9,                     !- Return Fan Motor Efficiency
+    1.0;                     !- Return Fan Motor in Air Stream Fraction
+</code></pre>
+
 <h3 id="hvactemplatesystemunitarysystem">HVACTemplate:System:UnitarySystem</h3>
 <p>This object simulates a unitary system with option cooling coil (air-cooled DX, water-cooled DX, and chilled water), options heating coil (gas, electric, hot water, air-to-air heat pump, and water-to-air heat pump) with cycling or continous fan controls. Often a single HVACTemplate:Zone:Unitary object will be used with a single HVACTemplate:System:UnitarySystem object to simulate single zone system. In addition, multiple HVACTemplate:Zone:Unitary objects may reference the same HVACTemplate:System:UnitarySystem object in a multiple zone version. For a multiple zone system, only one zone is specified as the control zone. The model can simulate chilled water or heat pump systems seen in commercial buildings and split systems commonly seen in residential buildings. HVACTemplate:System:UnitarySystem is similar to HVACTemplate:System:Unitary and HVACTemplate:System:UnitaryHeatPump:AirToAir, but it offers more flexilbility by using the more general AirLoopHVAC:UnitarySystem object instead of the more specific unitary furnace and heat pump objects.</p>
 <h4 id="field-name_4">Field: Name</h4>
@@ -3135,78 +3381,80 @@
 <h4 id="field-return-fan-motor-in-air-stream-fraction_2">Field: Return Fan Motor in Air Stream Fraction</h4>
 <p>Enter the fraction of the motor heat that is added to the air stream. A value of 0 means that the motor is completely outside the air stream. A value of 1 means that all of the motor heat will go into the air stream and act to cause a temperature rise. Must be between 0 and 1. Default is 1.0.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:System:UnitarySystem,</p>
-<p>AHU 1,                   !- Name</p>
-<p>FanAvailSched,           !- System Availability Schedule Name</p>
-<p>Load,                    !- Control Type</p>
-<p>SPACE1-1,                !- Control Zone or Thermostat Location Name</p>
-<p>autosize,                !- Cooling Supply Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Heating Supply Air Flow Rate {m3/s}</p>
-<p>autosize,                !- No Load Supply Air Flow Rate {m3/s}</p>
-<p>FanModeSchedule,         !- Supply Fan Operating Mode Schedule Name</p>
-<p>BlowThrough,             !- Supply Fan Placement</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>600,                     !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>SingleSpeedDX,           !- Cooling Coil Type</p>
-<p>1,                       !- Number of Speeds for Cooling</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>12.8,                    !- Cooling Design Supply Air Temperature {C}</p>
-<p>autosize,                !- DX Cooling Coil Gross Rated Total Capacity{W}</p>
-<p>autosize,            !- DX Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>3,                       !- DX Cooling Coil Gross Rated COP</p>
-<p>Gas,                     !- Heating Coil Type</p>
-<p>1,                       !- Number of Speeds for Heating</p>
-<p>,                        !- Heating Coil Availability Schedule Name</p>
-<p>50.0,                    !- Heating Design Supply Air Temperature {C}</p>
-<p>autosize,                !- Heating Coil Gross Rated Capacity{W}</p>
-<p>.8,                      !- Gas Heating Coil Efficiency</p>
-<p>0,                       !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>2.75,                    !- Heat Pump Heating Coil Gross Rated COP</p>
-<p>-8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}</p>
-<p>5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}</p>
-<p>ReverseCycle,            !- Heat Pump Defrost Strategy</p>
-<p>Timed,                   !- Heat Pump Defrost Control</p>
-<p>0.058333,                !- Heat Pump Defrost Time Period Fraction</p>
-<p>Electric,                !- Supplemental Heating or Reheat Coil Type</p>
-<p>,     !- Supplemental Heating  or ReheatCoil Availability Schedule Name</p>
-<p>autosize,         !- Supplemental Heating or Reheat Coil Capacity {W}</p>
-<p>21,   !-  Supplemental Heating or Reheat Coil Max . . . Temperature {C}</p>
-<p>0.8,  !- Supplemental Gas Heating or Reheat Coil Efficiency</p>
-<p>,     !- Supplemental Gas Heating or Reheat Coil Parasitic . . . Load {W}</p>
-<p>autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}</p>
-<p>Min OA Sched,            !- Minimum Outdoor Air Schedule Name</p>
-<p>DifferentialDryBulb,     !- Economizer Type</p>
-<p>NoLockout,               !- Economizer Lockout</p>
-<p>19,                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}</p>
-<p>,                   !- Economizer Maximum Limit Enthalpy {J/kg}</p>
-<p>,                   !- Economizer Maximum Limit Dewpoint Temperature {C}</p>
-<p>4,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>,                        !- Return Plenum Name</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>0.7,                     !- Sensible Heat Recovery Effectiveness</p>
-<p>0.65,                    !- Latent Heat Recovery Effectiveness</p>
-<p>,                        !- Heat Recovery Heat Exchanger Type</p>
-<p>,                        !- Heat Recovery Frost Control Type</p>
-<p>None,                    !- Dehumidification Control Type</p>
-<p>,                        !- Dehumidification Control Zone Name</p>
-<p>60.0,       !- Dehumidification Relative Humidity Setpoint {percent}</p>
-<p>,           !- Dehumidification Relative Humidity Setpoint Schedule Name</p>
-<p>None,                    !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule Name</p>
-<p>0.000001,                !- Humidifier Rated Capacity {m3/s}</p>
-<p>2690.0,                  !- Humidifier Rated Electric Power {W}</p>
-<p>,                        !- Humidifier Control Zone Name</p>
-<p>30.0,       !- Humidifier Relative Humidity Setpoint {percent}</p>
-<p>,           !- Humidifier Relative Humidity Setpoint Schedule Name</p>
-<p>No,                      !- Return Fan</p>
-<p>0.7,                     !- Return Fan Total Efficiency
+<pre><code class="idf">HVACTemplate:System:UnitarySystem,
+    AHU 1,                   !- Name
+    FanAvailSched,           !- System Availability Schedule Name
+    Load,                    !- Control Type
+    SPACE1-1,                !- Control Zone or Thermostat Location Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    FanModeSchedule,         !- Supply Fan Operating Mode Schedule Name
+    BlowThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    SingleSpeedDX,           !- Cooling Coil Type
+    1,                       !- Number of Speeds for Cooling
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.8,                    !- Cooling Design Supply Air Temperature {C}
+    autosize,                !- DX Cooling Coil Gross Rated Total Capacity{W}
+    autosize,            !- DX Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- DX Cooling Coil Gross Rated COP
+    Gas,                     !- Heating Coil Type
+    1,                       !- Number of Speeds for Heating
+    ,                        !- Heating Coil Availability Schedule Name
+    50.0,                    !- Heating Design Supply Air Temperature {C}
+    autosize,                !- Heating Coil Gross Rated Capacity{W}
+    .8,                      !- Gas Heating Coil Efficiency
+    0,                       !- Gas Heating Coil Parasitic Electric Load {W}
+    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
+    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
+    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
+    ReverseCycle,            !- Heat Pump Defrost Strategy
+    Timed,                   !- Heat Pump Defrost Control
+    0.058333,                !- Heat Pump Defrost Time Period Fraction
+    Electric,                !- Supplemental Heating or Reheat Coil Type
+    ,     !- Supplemental Heating  or ReheatCoil Availability Schedule Name
+    autosize,         !- Supplemental Heating or Reheat Coil Capacity {W}
+    21,   !-  Supplemental Heating or Reheat Coil Max . . . Temperature {C}
+    0.8,  !- Supplemental Gas Heating or Reheat Coil Efficiency
+    ,     !- Supplemental Gas Heating or Reheat Coil Parasitic . . . Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    19,                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    ,                   !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                   !- Economizer Maximum Limit Dewpoint Temperature {C}
+    4,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    ,                        !- Heat Recovery Heat Exchanger Type
+    ,                        !- Heat Recovery Frost Control Type
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60.0,       !- Dehumidification Relative Humidity Setpoint {percent}
+    ,           !- Dehumidification Relative Humidity Setpoint Schedule Name
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690.0,                  !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30.0,       !- Humidifier Relative Humidity Setpoint {percent}
+    ,           !- Humidifier Relative Humidity Setpoint Schedule Name
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
      300,                     !- Return Fan Delta Pressure {Pa}
      0.9,                     !- Return Fan Motor Efficiency
-     1.0;                     !- Return Fan Motor in Air Stream Fraction</p>
+     1.0;                     !- Return Fan Motor in Air Stream Fraction
+</code></pre>
+
 <h3 id="hvactemplatesystemvav">HVACTemplate:System:VAV</h3>
 <p>This object simulates the system portion of a variable air volume HVAC configuration with chilled water cooling and several different heating options. Multiple HVACTemplate:Zone:VAV objects are usually specified for each HVACTemplate:System:VAV object.</p>
 <h4 id="field-name_5">Field: Name</h4>
@@ -3501,68 +3749,70 @@
 </ul>
 <p>The default is <em>InletVaneDampers</em>. The resulting power curves are shown in Figure 158. VAV Supply Fan Part-Load Power Coefficient Options (see Supply Fan Part-Load Power Coefficients above). The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table. The <em>VariableSpeedMotorPressureReset</em> option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: <em>Design Guidelines: Advanced Variable Air Volume (VAV) Systems</em> (EDR_DesignGuidelines_VAV.pdf).</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:System:VAV,</p>
-<p>VAV Sys 1,               !-Name</p>
-<p>FanAvailSched,           !- System Availability Schedule Name</p>
-<p>autosize,                !- Supply Fan Maximum Flow Rate {m3/s}</p>
-<p>autosize,                !- Supply Fan Minimum Flow Rate {m3/s}</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>600,                     !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>ChilledWater,            !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>,                        !- Cooling Coil Setpoint Schedule Name</p>
-<p>12.8,                    !- Cooling Coil Design Setpoint {C}</p>
-<p>HotWater,                !- Heating Coil Type</p>
-<p>,                        !- Heating Coil Availability Schedule Name</p>
-<p>,                        !- Heating Coil Setpoint Schedule Name</p>
-<p>10.0,                    !- Heating Coil Design Setpoint {C}</p>
-<p>0.8,                     !- Gas Heating Coil Efficiency</p>
-<p>0.0,                     !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>None,                    !- Preheat Coil Type</p>
-<p>,                        !- Preheat Coil Availability Schedule Name</p>
-<p>,                        !- Preheat Coil Setpoint Schedule Name</p>
-<p>,                        !- Preheat Coil Design Setpoint {C}</p>
-<p>0.8,                     !- Gas Preheat Coil Efficiency</p>
-<p>0.0,                     !- Gas Preheat Coil Parasitic Electric Load {W}</p>
-<p>autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}</p>
-<p>FixedMinimum,            !- Minimum Outdoor Air Control Type</p>
-<p>Min OA Sched,            !- Minimum Outdoor Air Schedule Name</p>
-<p>DifferentialDryBulb,     !- Economizer Type</p>
-<p>NoLockout,               !- Economizer Lockout</p>
-<p>19,                      !- Economizer Upper Temperature Limit {C}</p>
-<p>4,                       !- Economizer Lower Temperature Limit {C}</p>
-<p>,                        !- Economizer Upper Enthalpy Limit {J/kg}</p>
-<p>,                    !- Economizer Maximum Limit Dewpoint Temperature {C}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>PLENUM-1,                !- Return Plenum Name</p>
-<p>DrawThrough,             !- Supply Fan Placement</p>
-<p>InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients</p>
-<p>CycleOnAnyZoneFansOnly,  !- Night Cycle Control</p>
-<p>,                        !- Night Cycle Control Zone Name</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>0.70,                    !- Sensible Heat Recovery Effectiveness</p>
-<p>0.65,                    !- Latent Heat Recovery Effectiveness</p>
-<p>None,                    !- Cooling Coil Setpoint Reset Type</p>
-<p>None,                    !- Heating Coil Setpoint Reset Type</p>
-<p>None,                    !- Dehumidification Control Type</p>
-<p>,                        !- Dehumidification Control Zone Name</p>
-<p>60.0,                    !- Dehumidification Setpoint {percent}</p>
-<p>None,                    !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule Name</p>
-<p>0.000001,                !- Humidifier Rated Capacity {m3/s}</p>
-<p>2690.0,                  !- Humidifier Rated Electric Power {W}</p>
-<p>,                        !- Humidifier Control Zone Name</p>
-<p>30.0,                    !- Humidifier Setpoint {percent}</p>
-<p>NonCoincident,           !- Sizing Option</p>
-<p>No,                      !- Return Fan</p>
-<p>0.7,                     !- Return Fan Total Efficiency</p>
-<p>500,                     !- Return Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Return Fan Motor Efficiency</p>
-<p>1.0,                     !- Return Fan Motor in Air Stream Fraction</p>
-<p>InletVaneDampers;        !- Return Fan Part-Load Power Coefficients</p>
+<pre><code class="idf">  HVACTemplate:System:VAV,
+    VAV Sys 1,               !-Name
+    FanAvailSched,           !- System Availability Schedule Name
+    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
+    autosize,                !- Supply Fan Minimum Flow Rate {m3/s}
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    ,                        !- Cooling Coil Setpoint Schedule Name
+    12.8,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    ,                        !- Heating Coil Setpoint Schedule Name
+    10.0,                    !- Heating Coil Design Setpoint {C}
+    0.8,                     !- Gas Heating Coil Efficiency
+    0.0,                     !- Gas Heating Coil Parasitic Electric Load {W}
+    None,                    !- Preheat Coil Type
+    ,                        !- Preheat Coil Availability Schedule Name
+    ,                        !- Preheat Coil Setpoint Schedule Name
+    ,                        !- Preheat Coil Design Setpoint {C}
+    0.8,                     !- Gas Preheat Coil Efficiency
+    0.0,                     !- Gas Preheat Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    FixedMinimum,            !- Minimum Outdoor Air Control Type
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    19,                      !- Economizer Upper Temperature Limit {C}
+    4,                       !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+   ,                        !- Supply Plenum Name
+    PLENUM-1,                !- Return Plenum Name
+    DrawThrough,             !- Supply Fan Placement
+    InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients
+    CycleOnAnyZoneFansOnly,  !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.70,                    !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    None,                    !- Cooling Coil Setpoint Reset Type
+    None,                    !- Heating Coil Setpoint Reset Type
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60.0,                    !- Dehumidification Setpoint {percent}
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690.0,                  !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30.0,                    !- Humidifier Setpoint {percent}
+    NonCoincident,           !- Sizing Option
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+    500,                     !- Return Fan Delta Pressure {Pa}
+    0.9,                     !- Return Fan Motor Efficiency
+    1.0,                     !- Return Fan Motor in Air Stream Fraction
+    InletVaneDampers;        !- Return Fan Part-Load Power Coefficients
+</code></pre>
+
 <h3 id="hvactemplatesystempackagedvav">HVACTemplate:System:PackagedVAV</h3>
 <p>This object simulates the system portion of a packaged direct-expansion based variable air volume HVAC configuration with several different heating options. Multiple HVACTemplate:Zone:VAV objects are usually specified for each HVACTemplate:System:PackagedVAV object.</p>
 <h4 id="field-name_6">Field: Name</h4>
@@ -3845,66 +4095,68 @@
 </ul>
 <p>The default is <em>InletVaneDampers</em>. The resulting power curves are shown in Figure 158. VAV Supply Fan Part-Load Power Coefficient Options (see Supply Fan Part-Load Power Coefficients above). The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table. The <em>VariableSpeedMotorPressureReset</em> option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: <em>Design Guidelines: Advanced Variable Air Volume (VAV) Systems</em> (EDR_DesignGuidelines_VAV.pdf).</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:System:PackagedVAV,</p>
-<p>DXVAV Sys 1,             !-Name</p>
-<p>FanAvailSched,           !- System Availability Schedule Name</p>
-<p>autosize,                !- Supply Fan Maximum Flow Rate {m3/s}</p>
-<p>autosize,                !- Supply Fan Minimum Flow Rate {m3/s}</p>
-<p>DrawThrough,             !- Supply Fan Placement</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>1000,                    !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>TwoSpeedDX,              !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>,                        !- Cooling Coil Setpoint Schedule Name</p>
-<p>12.8,                    !- Cooling Coil Design Setpoint {C}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Total Capacity {W}</p>
-<p>autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>3,                       !- Cooling Coil Gross Rated COP</p>
-<p>Gas,                     !- Heating Coil Type</p>
-<p>,                        !- Heating Coil Availability Schedule Name</p>
-<p>,                        !- Heating Coil Setpoint Schedule Name</p>
-<p>10,                      !- Heating Coil Design Setpoint {C}</p>
-<p>autosize,                !- Heating Coil Capacity {W}</p>
-<p>0.8,                     !- Gas Heating Coil Efficiency</p>
-<p>,                        !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}</p>
-<p>ProportionalMinimum,     !- Minimum Outdoor Air Control Type</p>
-<p>Min OA Sched,            !- Minimum Outdoor Air Schedule Name</p>
-<p>DifferentialDryBulb,     !- Economizer Type</p>
-<p>NoLockout,               !- Economizer Lockout</p>
-<p>19,                  !- Economizer Maximum Limit Dry-Bulb Temperature {C}</p>
-<p>,                        !- Economizer Maximum Limit Enthalpy {J/kg}</p>
-<p>,                    !- Economizer Maximum Limit Dewpoint Temperature {C}</p>
-<p>4,                   !- Economizer Minimum Limit Dry-Bulb Temperature {C}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>PLENUM-1,                !- Return Plenum Name</p>
-<p>InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients</p>
-<p>CycleOnAny,              !- Night Cycle Control</p>
-<p>,                        !- Night Cycle Control Zone Name</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>0.7,                     !- Sensible Heat Recovery Effectiveness</p>
-<p>0.65,                    !- Latent Heat Recovery Effectiveness</p>
-<p>None,                    !- Cooling Coil Setpoint Reset Type</p>
-<p>None,                    !- Heating Coil Setpoint Reset Type</p>
-<p>None,                    !- Dehumidification Control Type</p>
-<p>,                        !- Dehumidification Control Zone Name</p>
-<p>60,                      !- Dehumidification Setpoint {percent}</p>
-<p>None,                    !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule Name</p>
-<p>0.000001,                !- Humidifier Rated Capacity {m3/s}</p>
-<p>2690,                    !- Humidifier Rated Electric Power {W}</p>
-<p>,                        !- Humidifier Control Zone Name</p>
-<p>30,                      !- Humidifier Setpoint {percent}</p>
-<p>NonCoincident,           !- Sizing Option</p>
-<p>No,                      !- Return Fan</p>
-<p>0.7,                     !- Return Fan Total Efficiency</p>
-<p>500,                     !- Return Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Return Fan Motor Efficiency</p>
-<p>1.0,                     !- Return Fan Motor in Air Stream Fraction</p>
-<p>InletVaneDampers;        !- Return Fan Part-Load Power Coefficients</p>
+<pre><code class="idf">HVACTemplate:System:PackagedVAV,
+    DXVAV Sys 1,             !-Name
+    FanAvailSched,           !- System Availability Schedule Name
+    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
+    autosize,                !- Supply Fan Minimum Flow Rate {m3/s}
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    1000,                    !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    TwoSpeedDX,              !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    ,                        !- Cooling Coil Setpoint Schedule Name
+    12.8,                    !- Cooling Coil Design Setpoint {C}
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    Gas,                     !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    ,                        !- Heating Coil Setpoint Schedule Name
+    10,                      !- Heating Coil Design Setpoint {C}
+    autosize,                !- Heating Coil Capacity {W}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    ProportionalMinimum,     !- Minimum Outdoor Air Control Type
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    19,                  !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+    4,                   !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    ,                        !- Supply Plenum Name
+    PLENUM-1,                !- Return Plenum Name
+    InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients
+    CycleOnAny,              !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    None,                    !- Cooling Coil Setpoint Reset Type
+    None,                    !- Heating Coil Setpoint Reset Type
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60,                      !- Dehumidification Setpoint {percent}
+    None,                    !- Humidifier Type
+   ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690,                    !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30,                      !- Humidifier Setpoint {percent}
+    NonCoincident,           !- Sizing Option
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+    500,                     !- Return Fan Delta Pressure {Pa}
+    0.9,                     !- Return Fan Motor Efficiency
+    1.0,                     !- Return Fan Motor in Air Stream Fraction
+    InletVaneDampers;        !- Return Fan Part-Load Power Coefficients
+</code></pre>
+
 <h3 id="hvactemplatesystemconstantvolume">HVACTemplate:System:ConstantVolume</h3>
 <p>This object simulates the system portion of a constant air volume HVAC configuration with option chilled water cooling and several different heating options. One or more  HVACTemplate:Zone:ConstantVolume objects are specified for each zone served by the HVACTemplate:System:ConstantVolume object.</p>
 <h4 id="field-name_7">Field: Name</h4>
@@ -4195,77 +4447,79 @@
 <h4 id="field-return-fan-motor-in-air-stream-fraction_5">Field: Return Fan Motor in Air Stream Fraction</h4>
 <p>Enter the fraction of the motor heat that is added to the air stream. A value of 0 means that the motor is completely outside the air stream. A value of 1 means that all of the motor heat will go into the air stream and act to cause a temperature rise. Must be between 0 and 1. Default is 1.0.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:System:ConstantVolume,</p>
-<p>CAV Sys 1,               !-Name</p>
-<p>FanAvailSched,           !- System Availability Schedule Name</p>
-<p>autosize,                !- Supply Fan Maximum Flow Rate {m3/s}</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>600,                     !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction
-     DrawThrough,             !- Supply Fan Placement</p>
-<p>ChilledWater,            !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name
+<pre><code class="idf">HVACTemplate:System:ConstantVolume,
+    CAV Sys 1,               !-Name
+    FanAvailSched,           !- System Availability Schedule Name
+    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+     DrawThrough,             !- Supply Fan Placement
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
      ControlZone,             !- Cooling Coil Setpoint Control Type
      SPACE 1-1,               !- Cooling Coil Conrol Zone
-     12.8,                        !- Cooling Coil Design Setpoint {C}</p>
-<p>,                        !- Cooling Coil Setpoint Schedule Name
+     12.8,                        !- Cooling Coil Design Setpoint {C}
+    ,                        !- Cooling Coil Setpoint Schedule Name
      ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
      ,                        !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
      ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
-     ,                        !- Cooling Coil Reset Outdoor Dry-Bulb High {C}</p>
-<p>HotWater,                !- Heating Coil Type</p>
-<p>,                        !- Heating Coil Availability Schedule Name
+     ,                        !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
      FixedSetpoint,           !- Heating Coil Setpoint Control Type
      ,                        !- Heating Coil Control Zone
-     50,                        !- Heating Coil Design Setpoint {C}</p>
-<p>,                        !- Heating Coil Setpoint Schedule Name
+     50,                        !- Heating Coil Design Setpoint {C}
+    ,                        !- Heating Coil Setpoint Schedule Name
      ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
      ,                        !- Hedating Coil Reset Outdoor Dry-Bulb Low {C}
      ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
-     ,                        !- Heating Coil Reset Outdoor Dry-Bulb High {C}</p>
-<p>Autosize,                !- Heating Coil Capacity {W}</p>
-<p>0.8,                     !- Gas Heating Coil Efficiency</p>
-<p>0.0,                     !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>None,                    !- Preheat Coil Type</p>
-<p>,                        !- Preheat Coil Availability Schedule Name</p>
-<p>,                        !- Preheat Coil Design Setpoint {C}</p>
-<p>,                        !- Preheat Coil Setpoint Schedule Name</p>
-<p>0.8,                     !- Gas Preheat Coil Efficiency</p>
-<p>0.0,                     !- Gas Preheat Coil Parasitic Electric Load {W}</p>
-<p>autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}</p>
-<p>autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}</p>
-<p>Min OA Sched,            !- Minimum Outdoor Air Schedule Name</p>
-<p>DifferentialDryBulb,     !- Economizer Type</p>
-<p>19,                      !- Economizer Upper Temperature Limit {C}</p>
-<p>4,                       !- Economizer Lower Temperature Limit {C}</p>
-<p>,                        !- Economizer Upper Enthalpy Limit {J/kg}</p>
-<p>,                    !- Economizer Maximum Limit Dewpoint Temperature {C}</p>
-<p>,                        !- Supply Plenum Name</p>
-<p>PLENUM-1,                !- Return Plenum Name
-     CycleOnAnyZoneFansOnly,  !- Night Cycle Control</p>
-<p>,                        !- Night Cycle Control Zone Name</p>
-<p>None,                    !- Heat Recovery Type</p>
-<p>0.70,                    !- Sensible Heat Recovery Effectiveness
+     ,                        !- Heating Coil Reset Outdoor Dry-Bulb High {C}
+    Autosize,                !- Heating Coil Capacity {W}
+    0.8,                     !- Gas Heating Coil Efficiency
+    0.0,                     !- Gas Heating Coil Parasitic Electric Load {W}
+    None,                    !- Preheat Coil Type
+    ,                        !- Preheat Coil Availability Schedule Name
+    ,                        !- Preheat Coil Design Setpoint {C}
+    ,                        !- Preheat Coil Setpoint Schedule Name
+    0.8,                     !- Gas Preheat Coil Efficiency
+    0.0,                     !- Gas Preheat Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    19,                      !- Economizer Upper Temperature Limit {C}
+    4,                       !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Supply Plenum Name
+    PLENUM-1,                !- Return Plenum Name
+     CycleOnAnyZoneFansOnly,  !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.70,                    !- Sensible Heat Recovery Effectiveness
      0.65,                    !- Latent Heat Recovery Effectiveness
      ,                        !- Heat Recovery Heat Exchanger Type
      ,                        !- Heat Recovery Frost Control Type
-     None,                    !- Dehumidification Control Type</p>
-<p>,                        !- Dehumidification Control Zone Name</p>
-<p>60.0,     !- Dehumidification Relative Humidity Setpoint {percent}</p>
-<p>,         !- Dehumidification Relative Humidity Setpoint Schedule Name</p>
-<p>None,                    !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule Name</p>
-<p>0.000001,                !- Humidifier Rated Capacity {m3/s}</p>
-<p>2690.0,                  !- Humidifier Rated Electric Power {W}</p>
-<p>,                        !- Humidifier Control Zone Name</p>
-<p>30.0,     !- Humidifier Relative Humidity Setpoint {percent}</p>
-<p>,         !- Humidifier Relative Humidity Setpoint Schedule Name</p>
-<p>No,                      !- Return Fan</p>
-<p>0.7,                     !- Return Fan Total Efficiency
+     None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60.0,     !- Dehumidification Relative Humidity Setpoint {percent}
+    ,         !- Dehumidification Relative Humidity Setpoint Schedule Name
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690.0,                  !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30.0,     !- Humidifier Relative Humidity Setpoint {percent}
+    ,         !- Humidifier Relative Humidity Setpoint Schedule Name
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
      600,                     !- Return Fan Delta Pressure {Pa}
      0.9,                     !- Return Fan Motor Efficiency
-     1.0;                     !- Return Fan Motor in Air Stream Fraction</p>
+     1.0;                     !- Return Fan Motor in Air Stream Fraction
+</code></pre>
+
 <h3 id="hvactemplatesystemdualduct">HVACTemplate:System:DualDuct</h3>
 <p>This object simulates the system portion of a constant air volume or variable air volume dual-duct HVAC configuration with optional chilled water cooling and several different heating options. One or more HVACTemplate:Zone:DualDuct objects may be specified for each zone served by the HVACTemplate:System:DualDuct object. The system will be constant volume if all of the HVACTemplate:Zone:DualDuct objects served by this system have Zone Minimum Air Flow Fraction =1.0.</p>
 <h4 id="field-name_8">Field: Name</h4>
@@ -4668,9 +4922,9 @@
 </ul>
 <p>The default is <em>InletVaneDampers</em>. The resulting power curves are shown in Figure 158. VAV Supply Fan Part-Load Power Coefficient Options below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table. The <em>VariableSpeedMotorPressureReset</em> option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: <em>Design Guidelines: Advanced Variable Air Volume (VAV) Systems</em> (EDR_DesignGuidelines_VAV.pdf).</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:System:DualDuct,</p>
-<p>DD Sys 1,               !-Name</p>
-<p>FanAvailSched,          !- System Availability Schedule Name
+<pre><code class="idf">HVACTemplate:System:DualDuct,
+    DD Sys 1,               !-Name
+    FanAvailSched,          !- System Availability Schedule Name
      Single,                 !- Supply Fan Configuration Type  
      autosize,               !- Main Supply Fan Maximum Flow Rate {m3/s}
      0.2,                    !- Main Supply Fan Minimum Flow Fraction
@@ -4678,88 +4932,90 @@
      600,                    !- Main Supply Fan Delta Pressure {Pa}
      0.9,                    !- Main Supply Fan Motor Efficiency
      1,                      !- Main Supply Fan Motor in Air Stream Fraction
-     InletVaneDampers,       !- Main Supply Fan Part-Load Power Coefficients</p>
-<p>autosize,               !- Cold Duct Supply Fan Maximum Flow Rate {m3/s}
+     InletVaneDampers,       !- Main Supply Fan Part-Load Power Coefficients
+    autosize,               !- Cold Duct Supply Fan Maximum Flow Rate {m3/s}
      0.2,                    !- Cold Duct Supply Fan Minimum Flow Fraction
      0.7,                    !- Cold Duct Supply Fan Total Efficiency
      600,                    !- Cold Duct Supply Fan Delta Pressure {Pa}
      0.9,                    !- Cold Duct Supply Fan Motor Efficiency
      1,                   !- Cold Duct Supply Fan Motor in Air Stream Fraction
-     InletVaneDampers,    !- Cold Duct Supply Fan Part-Load Power Coefficients</p>
-<p>DrawThrough,            !- Cold Duct Supply Fan Placement
+     InletVaneDampers,    !- Cold Duct Supply Fan Part-Load Power Coefficients
+    DrawThrough,            !- Cold Duct Supply Fan Placement
      autosize,               !- Hot Duct Supply Fan Maximum Flow Rate {m3/s}
      0.2,                    !- Hot Duct Supply Fan Minimum Flow Fraction
      0.7,                    !- Hot Duct Supply Fan Total Efficiency
      600,                    !- Hot Duct Supply Fan Delta Pressure {Pa}
      0.9,                    !- Hot Duct Supply Fan Motor Efficiency
      1,                   !- Hot Duct Supply Fan Motor in Air Stream Fraction
-     InletVaneDampers,    !- Hot Duct Supply Fan Part-Load Power Coefficients</p>
-<p>DrawThrough,            !- Hot Duct Supply Fan Placement</p>
-<p>ChilledWater,           !- Cooling Coil Type</p>
-<p>,                       !- Cooling Coil Availability Schedule Name
+     InletVaneDampers,    !- Hot Duct Supply Fan Part-Load Power Coefficients
+    DrawThrough,            !- Hot Duct Supply Fan Placement
+    ChilledWater,           !- Cooling Coil Type
+    ,                       !- Cooling Coil Availability Schedule Name
      ControlZone,            !- Cooling Coil Setpoint Control Type
-     12.8,                   !- Cooling Coil Design Setpoint {C}</p>
-<p>,                       !- Cooling Coil Setpoint Schedule Name
+     12.8,                   !- Cooling Coil Design Setpoint {C}
+    ,                       !- Cooling Coil Setpoint Schedule Name
      ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
      ,                       !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
      ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
-     ,                       !- Cooling Coil Reset Outdoor Dry-Bulb High {C}</p>
-<p>HotWater,               !- Heating Coil Type</p>
-<p>,                       !- Heating Coil Availability Schedule Name
+     ,                       !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
+    HotWater,               !- Heating Coil Type
+    ,                       !- Heating Coil Availability Schedule Name
      FixedSetpoint,          !- Heating Coil Setpoint Control Type
-     50,                     !- Heating Coil Design Setpoint {C}</p>
-<p>,                       !- Heating Coil Setpoint Schedule Name
+     50,                     !- Heating Coil Design Setpoint {C}
+    ,                       !- Heating Coil Setpoint Schedule Name
      ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
      ,                       !- Hedating Coil Reset Outdoor Dry-Bulb Low {C}
      ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
-     ,                       !- Heating Coil Reset Outdoor Dry-Bulb High {C}</p>
-<p>Autosize,               !- Heating Coil Capacity {W}</p>
-<p>0.8,                    !- Gas Heating Coil Efficiency</p>
-<p>0.0,                    !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>None,                   !- Preheat Coil Type</p>
-<p>,                       !- Preheat Coil Availability Schedule Name</p>
-<p>,                       !- Preheat Coil Setpoint Schedule Name</p>
-<p>,                       !- Preheat Coil Design Setpoint {C}</p>
-<p>0.8,                    !- Gas Preheat Coil Efficiency</p>
-<p>0.0,                    !- Gas Preheat Coil Parasitic Electric Load {W}</p>
-<p>autosize,               !- Maximum Outdoor Air Flow Rate {m3/s}</p>
-<p>autosize,               !- Minimum Outdoor Air Flow Rate {m3/s}</p>
-<p>FixedMinimum,           !- Minimum Outdoor Air Control Type</p>
-<p>Min OA Sched,           !- Minimum Outdoor Air Schedule Name</p>
-<p>DifferentialDryBulb,    !- Economizer Type</p>
-<p>NoLockout,              !- Economizer Lockout</p>
-<p>19,                     !- Economizer Upper Temperature Limit {C}</p>
-<p>4,                      !- Economizer Lower Temperature Limit {C}</p>
-<p>,                       !- Economizer Upper Enthalpy Limit {J/kg}</p>
-<p>,                    !- Economizer Maximum Limit Dewpoint Temperature {C}</p>
-<p>,                       !- Cold Supply Plenum Name</p>
-<p>,                       !- Hot Supply Plenum Name</p>
-<p>PLENUM-1,               !- Return Plenum Name
-     CycleOnAnyZoneFansOnly, !- Night Cycle Control</p>
-<p>,                       !- Night Cycle Control Zone Name</p>
-<p>None,                   !- Heat Recovery Type</p>
-<p>0.70,                   !- Sensible Heat Recovery Effectiveness
+     ,                       !- Heating Coil Reset Outdoor Dry-Bulb High {C}
+    Autosize,               !- Heating Coil Capacity {W}
+    0.8,                    !- Gas Heating Coil Efficiency
+    0.0,                    !- Gas Heating Coil Parasitic Electric Load {W}
+    None,                   !- Preheat Coil Type
+    ,                       !- Preheat Coil Availability Schedule Name
+    ,                       !- Preheat Coil Setpoint Schedule Name
+    ,                       !- Preheat Coil Design Setpoint {C}
+    0.8,                    !- Gas Preheat Coil Efficiency
+    0.0,                    !- Gas Preheat Coil Parasitic Electric Load {W}
+    autosize,               !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,               !- Minimum Outdoor Air Flow Rate {m3/s}
+    FixedMinimum,           !- Minimum Outdoor Air Control Type
+    Min OA Sched,           !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,    !- Economizer Type
+    NoLockout,              !- Economizer Lockout
+    19,                     !- Economizer Upper Temperature Limit {C}
+    4,                      !- Economizer Lower Temperature Limit {C}
+    ,                       !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                       !- Cold Supply Plenum Name
+    ,                       !- Hot Supply Plenum Name
+    PLENUM-1,               !- Return Plenum Name
+     CycleOnAnyZoneFansOnly, !- Night Cycle Control
+    ,                       !- Night Cycle Control Zone Name
+    None,                   !- Heat Recovery Type
+    0.70,                   !- Sensible Heat Recovery Effectiveness
      0.65,                   !- Latent Heat Recovery Effectiveness
      ,                       !- Heat Recovery Heat Exchanger Type
      ,                       !- Heat Recovery Frost Control Type
-     None,                   !- Dehumidification Control Type</p>
-<p>,                       !- Dehumidification Control Zone Name</p>
-<p>60.0,    !- Dehumidification Relative Humidity Setpoint {percent}</p>
-<p>,         !- Dehumidification Relative Humidity Setpoint Schedule Name</p>
-<p>None,                   !- Humidifier Type</p>
-<p>,                       !- Humidifier Availability Schedule Name</p>
-<p>0.000001,               !- Humidifier Rated Capacity {m3/s}</p>
-<p>2690.0,                 !- Humidifier Rated Electric Power {W}</p>
-<p>,                       !- Humidifier Control Zone Name</p>
-<p>30.0,    !- Humidifier Relative Humidity Setpoint {percent}</p>
-<p>,         !- Humidifier Relative Humidity Setpoint Schedule Name</p>
-<p>NonCoincident,          !- Sizing Option</p>
-<p>No,                     !- Return Fan</p>
-<p>0.7,                    !- Return Fan Total Efficiency
+     None,                   !- Dehumidification Control Type
+    ,                       !- Dehumidification Control Zone Name
+    60.0,    !- Dehumidification Relative Humidity Setpoint {percent}
+    ,         !- Dehumidification Relative Humidity Setpoint Schedule Name
+    None,                   !- Humidifier Type
+    ,                       !- Humidifier Availability Schedule Name
+    0.000001,               !- Humidifier Rated Capacity {m3/s}
+    2690.0,                 !- Humidifier Rated Electric Power {W}
+    ,                       !- Humidifier Control Zone Name
+    30.0,    !- Humidifier Relative Humidity Setpoint {percent}
+    ,         !- Humidifier Relative Humidity Setpoint Schedule Name
+    NonCoincident,          !- Sizing Option
+    No,                     !- Return Fan
+    0.7,                    !- Return Fan Total Efficiency
      600,                    !- Return Fan Delta Pressure {Pa}
      0.9,                    !- Return Fan Motor Efficiency
-     1.0;                    !- Return Fan Motor in Air Stream Fraction</p>
-<p>InletVaneDampers;       !- Return Fan Part-Load Power Coefficients</p>
+     1.0;                    !- Return Fan Motor in Air Stream Fraction
+    InletVaneDampers;       !- Return Fan Part-Load Power Coefficients
+</code></pre>
+
 <h3 id="hvactemplatesystemdedicatedoutdoorair">HVACTemplate:System:DedicatedOutdoorAir</h3>
 <p>The HVACTemplate:System:DedicatedOutdoorAir creates a dedicated outdoor air system which must be used in conjunction with one or more of the following objects:</p>
 <p>HVACTemplate:Zone:BaseboardHeat</p>
@@ -4981,53 +5237,55 @@
 <h4 id="field-humidifier-setpoint-schedule-name">Field: Humidifier Setpoint Schedule Name</h4>
 <p>Enter the name of the humidifier setpoint schedule. If this field is left blank, the setpoint will be constant at the Humidifier Setpoint,  The values in the schedule are in units of humidity ratio (kgWater/kgDryAir or lbWater/lbDryAir).</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:System:DedicatedOutdoorAir,</p>
-<p>DOAS,                    !- Name</p>
-<p>,                        !- System Availability Schedule Name</p>
-<p>DirectIntoZone,          !- Air Outlet Type</p>
-<p>autosize,                !- Supply Fan Flow Rate {m3/s}</p>
-<p>0.7,                     !- Supply Fan Total Efficiency</p>
-<p>1000,                    !- Supply Fan Delta Pressure {Pa}</p>
-<p>0.9,                     !- Supply Fan Motor Efficiency</p>
-<p>1,                       !- Supply Fan Motor in Air Stream Fraction</p>
-<p>DrawThrough,             !- Supply Fan Placement</p>
-<p>ChilledWater,            !- Cooling Coil Type</p>
-<p>,                        !- Cooling Coil Availability Schedule Name</p>
-<p>FixedSetpoint,           !- Cooling Coil Setpoint Control Type</p>
-<p>,                        !- Cooling Coil Setpoint Schedule Name</p>
-<p>12.8,                    !- Cooling Coil Design Setpoint {C}</p>
-<p>15.6,                !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}</p>
-<p>15.6,                    !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}</p>
-<p>12.8,               !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}</p>
-<p>23.3,                    !- Cooling Coil Reset Outdoor Dry-Bulb High {C}</p>
-<p>autosize,           !- DX Cooling Coil Gross Rated Total Capacity {W}</p>
-<p>autosize,           !- DX Cooling Coil Gross Rated Sensible Heat Ratio</p>
-<p>3,                       !- DX Cooling Coil Gross Rated COP</p>
-<p>HotWater,                !- Heating Coil Type</p>
-<p>,                        !- Heating Coil Availability Schedule Name</p>
-<p>FixedSetpoint,           !- Heating Coil Setpoint Control Type</p>
-<p>,                        !- Heating Coil Setpoint Schedule Name</p>
-<p>12.2,                    !- Heating Coil Design Setpoint {C}</p>
-<p>15,                  !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}</p>
-<p>7.8,                     !- Heating Coil Reset Outdoor Dry-Bulb Low {C}</p>
-<p>12.2,               !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}</p>
-<p>12.2,                    !- Heating Coil Reset Outdoor Dry-Bulb High {C}</p>
-<p>0.8,                     !- Gas Heating Coil Efficiency</p>
-<p>,                        !- Gas Heating Coil Parasitic Electric Load {W}</p>
-<p>Enthalpy,                !- Heat Recovery Type</p>
-<p>0.7,                     !- Sensible Heat Recovery Effectiveness</p>
-<p>0.65,                    !- Latent Heat Recovery Effectiveness</p>
-<p>Plate,                   !- Heat Exchanger Type</p>
-<p>None,                    !- Frost Control Type</p>
-<p>None,                    !- Dehumidification Control Type</p>
-<p>0.00924,                 !- Dehumidification Setpoint {kgWater/kgDryAir}</p>
-<p>None,                    !- Humidifier Type</p>
-<p>,                        !- Humidifier Availability Schedule Name</p>
-<p>0.000001,                !- Humidifier Rated Capacity {m3/s}</p>
-<p>2690,                    !- Humidifier Rated Electric Power {W}</p>
-<p>0.003,                   !- Humidifier Setpoint {kgWater/kgDryAir}</p>
-<p>,                        !- Dehumidification Setpoint Schedule Name</p>
-<p>;                        !- Humidifier Setpoint Schedule Name</p>
+<pre><code class="idf">HVACTemplate:System:DedicatedOutdoorAir,
+    DOAS,                    !- Name
+    ,                        !- System Availability Schedule Name
+    DirectIntoZone,          !- Air Outlet Type
+    autosize,                !- Supply Fan Flow Rate {m3/s}
+    0.7,                     !- Supply Fan Total Efficiency
+    1000,                    !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    DrawThrough,             !- Supply Fan Placement
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    FixedSetpoint,           !- Cooling Coil Setpoint Control Type
+    ,                        !- Cooling Coil Setpoint Schedule Name
+    12.8,                    !- Cooling Coil Design Setpoint {C}
+    15.6,                !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
+    15.6,                    !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
+    12.8,               !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
+    23.3,                    !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
+    autosize,           !- DX Cooling Coil Gross Rated Total Capacity {W}
+    autosize,           !- DX Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- DX Cooling Coil Gross Rated COP
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    FixedSetpoint,           !- Heating Coil Setpoint Control Type
+    ,                        !- Heating Coil Setpoint Schedule Name
+    12.2,                    !- Heating Coil Design Setpoint {C}
+    15,                  !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
+    7.8,                     !- Heating Coil Reset Outdoor Dry-Bulb Low {C}
+    12.2,               !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
+    12.2,                    !- Heating Coil Reset Outdoor Dry-Bulb High {C}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    Enthalpy,                !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    Plate,                   !- Heat Exchanger Type
+    None,                    !- Frost Control Type
+    None,                    !- Dehumidification Control Type
+    0.00924,                 !- Dehumidification Setpoint {kgWater/kgDryAir}
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690,                    !- Humidifier Rated Electric Power {W}
+    0.003,                   !- Humidifier Setpoint {kgWater/kgDryAir}
+    ,                        !- Dehumidification Setpoint Schedule Name
+    ;                        !- Humidifier Setpoint Schedule Name
+</code></pre>
+
 <h3 id="hvactemplateplantchilledwaterloop">HVACTemplate:Plant:ChilledWaterLoop</h3>
 <p>The piping systems that connect the chilled water coils in the HVAC template objects with the chillers and the cooling towers (if present) are described with this object. The piping systems are called loops and this object describes the controls and pumps on the loops. Only one of these objects may be defined in an input file and all chilled water coils from HVAC template objects are served with this object.</p>
 <h4 id="field-name_10">Field: Name</h4>
@@ -5305,40 +5563,42 @@
 <h4 id="field-condenser-water-load-distribution-scheme">Field: Condenser Water Load Distribution Scheme</h4>
 <p>The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the condenser loop demand. Currently, three schemes are functional. <strong>Sequential</strong> uses each piece of equipment to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. <strong>Optimal</strong> operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. <strong>Uniform</strong> evenly distributes the loop demand among all available components on the equipment list for a given load range.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Plant:ChilledWaterLoop,</p>
-<p>Chilled Water Loop,      !- Plant Loop Name</p>
-<p>CoolingPumpAvailSched,   !- Pump Schedule</p>
-<p>Intermittent,            !- Pump Control Type</p>
-<p>Default,                 !- Chiller Plant Operation Scheme Type</p>
-<p>,                        !- Chiller Plant Operation Scheme Name</p>
-<p>CW Loop Temp Schedule,   !- Chilled Water Setpoint Schedule</p>
-<p>7.22,                    !- Chilled Water Design Setpoint {C}</p>
-<p>VariableFlowNoSecondary, !- Chilled Water Pump Configuration</p>
-<p>179352,                  !- Primary Chilled Water Pump Rated Head {Pa}</p>
-<p>179352,                  !- Secondary Chilled Water Pump Rated Head {Pa}</p>
-<p>Default,                 !- Condenser Plant Operation Scheme Type</p>
-<p>,                        !- Condenser Plant Operation Scheme List Name</p>
-<p>OutdoorWetBulbTemperature,    !- Condenser Water Temperature Control Type</p>
-<p>,                        !- Condenser Water Setpoint Schedule</p>
-<p>29.4,                    !- Condenser Water Design Setpoint {C}</p>
-<p>179352,                  !- Condenser Water Pump Rated Head {Pa}</p>
-<p>None,                    !- Chilled Water Setpoint Reset Type</p>
-<p>12.2,              !- Chilled Water Setpoint at Outdoor Dry Bulb Low {C}</p>
-<p>15.6,              !- Chilled Water Reset Outdoor Dry Bulb Low {C}</p>
-<p>6.7,               !- Chilled Water Setpoint at Outdoor Dry Bulb High {C}</p>
-<p>26.7,              !- Chilled Water Reset Outdoor Dry Bulb High {C}</p>
-<p>SinglePump,              !- Chilled Water Primary Pump Type</p>
-<p>SinglePump,              !- Chilled Water Secondary Pump Type</p>
-<p>SinglePump,              !- Condenser Water Pump Type</p>
-<p>Yes,                     !- Chilled Water Supply Side Bypass Pipe</p>
-<p>Yes,                     !- Chilled Water Demand Side Bypass Pipe</p>
-<p>Yes,                     !- Condenser Water Supply Side Bypass Pipe</p>
-<p>Yes,                     !- Condenser Water Demand Side Bypass Pipe</p>
-<p>Water,                   !- Fluid Type</p>
-<p>6.67,                    !- Loop Design Delta Temperature {deltaC}</p>
-<p>,                        !- Minimum Outdoor Dry Bulb Temperature {C}</p>
-<p>Sequential,              !- Chilled Water Load Distribution Scheme</p>
-<p>Sequential;              !- Condenser Water Load Distribution Scheme</p>
+<pre><code class="idf">HVACTemplate:Plant:ChilledWaterLoop,
+    Chilled Water Loop,      !- Plant Loop Name
+    CoolingPumpAvailSched,   !- Pump Schedule
+    Intermittent,            !- Pump Control Type
+    Default,                 !- Chiller Plant Operation Scheme Type
+    ,                        !- Chiller Plant Operation Scheme Name
+    CW Loop Temp Schedule,   !- Chilled Water Setpoint Schedule
+    7.22,                    !- Chilled Water Design Setpoint {C}
+    VariableFlowNoSecondary, !- Chilled Water Pump Configuration
+    179352,                  !- Primary Chilled Water Pump Rated Head {Pa}
+    179352,                  !- Secondary Chilled Water Pump Rated Head {Pa}
+    Default,                 !- Condenser Plant Operation Scheme Type
+    ,                        !- Condenser Plant Operation Scheme List Name
+    OutdoorWetBulbTemperature,    !- Condenser Water Temperature Control Type
+    ,                        !- Condenser Water Setpoint Schedule
+    29.4,                    !- Condenser Water Design Setpoint {C}
+    179352,                  !- Condenser Water Pump Rated Head {Pa}
+    None,                    !- Chilled Water Setpoint Reset Type
+    12.2,              !- Chilled Water Setpoint at Outdoor Dry Bulb Low {C}
+    15.6,              !- Chilled Water Reset Outdoor Dry Bulb Low {C}
+    6.7,               !- Chilled Water Setpoint at Outdoor Dry Bulb High {C}
+    26.7,              !- Chilled Water Reset Outdoor Dry Bulb High {C}
+    SinglePump,              !- Chilled Water Primary Pump Type
+    SinglePump,              !- Chilled Water Secondary Pump Type
+    SinglePump,              !- Condenser Water Pump Type
+    Yes,                     !- Chilled Water Supply Side Bypass Pipe
+    Yes,                     !- Chilled Water Demand Side Bypass Pipe
+    Yes,                     !- Condenser Water Supply Side Bypass Pipe
+    Yes,                     !- Condenser Water Demand Side Bypass Pipe
+    Water,                   !- Fluid Type
+    6.67,                    !- Loop Design Delta Temperature {deltaC}
+    ,                        !- Minimum Outdoor Dry Bulb Temperature {C}
+    Sequential,              !- Chilled Water Load Distribution Scheme
+    Sequential;              !- Condenser Water Load Distribution Scheme
+</code></pre>
+
 <h3 id="hvactemplateplantchiller">HVACTemplate:Plant:Chiller</h3>
 <p>A chiller or purchased cooling source is described with this object. To define multiple chillers, use multiple HVACTemplate:Plant:Chiller objects and use the Sizing Factor field to apportion the total capacity if autosizing.</p>
 <h4 id="field-name_11">Field: Name</h4>
@@ -5393,19 +5653,21 @@
 <h4 id="field-leaving-chilled-water-lower-temperature-limit">Field: Leaving Chilled Water Lower Temperature Limit</h4>
 <p>This numeric field contains the lower limit for the leaving chilled water temperature in Celsius. This temperature acts as a cut off for heat transfer in the evaporator, so that the fluid doesn’t get too cold. The default value is 5˚C.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Plant:Chiller,</p>
-<p>District Cooling,        !- Chiller Name</p>
-<p>ElectricCentrifugalChiller,  !- Chiller Type</p>
-<p>autosize,                !- Capacity {W}</p>
-<p>3.2,                     !- COP</p>
-<p>WaterCooled,             !- Condenser Type</p>
-<p>1,                       !- Priority</p>
-<p>1,                       !- Sizing Factor</p>
-<p>0.1,                     !- Minimum Part Load Ratio</p>
-<p>1.1,                     !- Maximum Part Load Ratio</p>
-<p>0.9,                     !- Optimum Part Load Ratio</p>
-<p>0.2,                     !- Minimum Unloading Ratio</p>
-<p>2;                 !- Leaving Chilled Water Lower Temperature Limit {C}</p>
+<pre><code class="idf">HVACTemplate:Plant:Chiller,
+    District Cooling,        !- Chiller Name
+    ElectricCentrifugalChiller,  !- Chiller Type
+    autosize,                !- Capacity {W}
+    3.2,                     !- COP
+    WaterCooled,             !- Condenser Type
+    1,                       !- Priority
+    1,                       !- Sizing Factor
+    0.1,                     !- Minimum Part Load Ratio
+    1.1,                     !- Maximum Part Load Ratio
+    0.9,                     !- Optimum Part Load Ratio
+    0.2,                     !- Minimum Unloading Ratio
+    2;                 !- Leaving Chilled Water Lower Temperature Limit {C}
+</code></pre>
+
 <h3 id="hvactemplateplantchillerobjectreference">HVACTemplate:Plant:Chiller:ObjectReference</h3>
 <h4 id="this-object-references-a-detailed-chiller-object-and-adds-it-to-an-hvactemplateplantchilledwaterloop-the-user-must-create-a-complete-detailed-chiller-object-with-all-required-curve-or-performance-objects-the-detailed-chiller-object-is-referenced-by-object-type-and-name-and-the-chiller-will-be-automatically-to-the-chilled-water-loop-branches-and-equipment-list">This object references a detailed chiller object and adds it to an HVACTemplate:Plant:ChilledWaterLoop. The user must create a complete detailed chiller object with all required curve or performance objects. The detailed chiller object is referenced by object type and name and the chiller will be automatically to the chilled water loop branches and equipment list.</h4>
 <h4 id="field-name_12">Field: Name</h4>
@@ -5425,11 +5687,13 @@
 <h4 id="field-priority_1">Field: Priority</h4>
 <p>Enter the priority number of the chiller where 1 is the highest priority, 2 is just lower, 3 is lower than 2, etc. This is used if Chiller Plant Operation Scheme Type is set to Default in HVACTemplate:Plant:ChilledWaterLoop. Equipment is operated in order of the priority number. This allows multiple chillers to be sequenced.</p>
 <p>An example in an IDF:</p>
-<p>HVACTemplate:Plant:Chiller:ObjectReference,</p>
-<p>Main Chiller Connection, !- Name</p>
-<p>Chiller:Electric:EIR,    !- Chiller Object Type</p>
-<p>Main Chiller,            !- Chiller Name</p>
-<p>1;                       !- Priority</p>
+<pre><code class="idf">HVACTemplate:Plant:Chiller:ObjectReference,
+    Main Chiller Connection, !- Name
+    Chiller:Electric:EIR,    !- Chiller Object Type
+    Main Chiller,            !- Chiller Name
+    1;                       !- Priority
+</code></pre>
+
 <h3 id="hvactemplateplanttower">HVACTemplate:Plant:Tower</h3>
 <p>A cooling tower is described with this object. To define multiple cooling towers, use multiple HVACTemplate:Plant:Tower objects and use the Sizing Factor field to apportion the total capacity if autosizing.</p>
 <h4 id="field-name_13">Field: Name</h4>
@@ -5472,16 +5736,18 @@
 <h4 id="field-template-plant-loop-type">Field: Template Plant Loop Type</h4>
 <p>This field specifies whether this tower will serve a <em>ChilledWaterLoop</em> (ref. HVACTemplate:Plant:ChilledWaterLoop) or a <em>MixedWaterLoop</em> (ref. HVACTemplate:Plant:MixedWaterLoop). If this field is left blank, this tower will serve a ChilledWaterLoop if present or a MixedWaterLoop (if no ChilledWaterLoop is present).</p>
 <p>An example in an IDF:</p>
-<p>HVACTemplate:Plant:Tower,</p>
-<p>Main Tower,              !- Name</p>
-<p>SingleSpeed,             !- Tower Type</p>
-<p>autosize,                !- High Speed Nominal Capacity {W}</p>
-<p>autosize,                !- High Speed Fan Power {W}</p>
-<p>autosize,                !- Low Speed Nominal Capacity {W}</p>
-<p>autosize,                !- Low Speed Fan Power {W}</p>
-<p>autosize,                !- Free Convection Capacity {W}</p>
-<p>1,                       !- Priority</p>
-<p>;                        !- Sizing Factor</p>
+<pre><code class="idf">  HVACTemplate:Plant:Tower,
+    Main Tower,              !- Name
+    SingleSpeed,             !- Tower Type
+    autosize,                !- High Speed Nominal Capacity {W}
+    autosize,                !- High Speed Fan Power {W}
+    autosize,                !- Low Speed Nominal Capacity {W}
+    autosize,                !- Low Speed Fan Power {W}
+    autosize,                !- Free Convection Capacity {W}
+    1,                       !- Priority
+    ;                        !- Sizing Factor
+</code></pre>
+
 <h3 id="hvactemplateplanttowerobjectreference">HVACTemplate:Plant:Tower:ObjectReference</h3>
 <h4 id="this-object-references-a-detailed-cooling-tower-object-and-adds-it-to-an-hvactemplateplantchilledwaterloop-or-mixedwaterloop-the-user-must-create-a-complete-detailed-cooling-tower-object-with-all-required-curve-or-performance-objects-the-detailed-cooling-tower-object-is-referenced-by-object-type-and-name-and-the-tower-will-be-automatically-to-the-chilled-water-loop-or-mixed-water-loop-branches-and-equipment-list">This object references a detailed cooling tower object and adds it to an HVACTemplate:Plant:ChilledWaterLoop or MixedWaterLoop. The user must create a complete detailed cooling tower object with all required curve or performance objects. The detailed cooling tower object is referenced by object type and name and the tower will be automatically to the chilled water loop or mixed water loop branches and equipment list.</h4>
 <h4 id="field-name_14">Field: Name</h4>
@@ -5506,11 +5772,13 @@
 <h4 id="field-template-plant-loop-type_1">Field: Template Plant Loop Type</h4>
 <p>This field specifies whether this tower will serve a <em>ChilledWaterLoop</em> (ref. HVACTemplate:Plant:ChilledWaterLoop) or a <em>MixedWaterLoop</em> (ref. HVACTemplate:Plant:MixedWaterLoop). If this field is left blank, this tower will serve a ChilledWaterLoop if present or a MixedWaterLoop (if no ChilledWaterLoop is present).</p>
 <p>An example in an IDF:</p>
-<p>HVACTemplate:Plant:Tower:ObjectReference,</p>
-<p>Main Tower Connection,   !- Name</p>
-<p>CoolingTower:TwoSpeed,   !- Cooling Tower Object Type</p>
-<p>Main Tower,              !- Cooling Tower Name</p>
-<p>1;                       !- Priority</p>
+<pre><code class="idf">HVACTemplate:Plant:Tower:ObjectReference,
+    Main Tower Connection,   !- Name
+    CoolingTower:TwoSpeed,   !- Cooling Tower Object Type
+    Main Tower,              !- Cooling Tower Name
+    1;                       !- Priority
+</code></pre>
+
 <h3 id="hvactemplateplanthotwaterloop">HVACTemplate:Plant:HotWaterLoop</h3>
 <p>The piping systems that connect the hot water coils in the HVAC template objects with the boilers are described with this object. The piping systems are called loops and this object describes the controls and pumps on the loops. Only one of these objects should be defined in an input file and all hot water coils from HVAC template objects are served with this object.</p>
 <h4 id="field-name_15">Field: Name</h4>
@@ -5673,28 +5941,30 @@
 <h4 id="field-load-distribution-scheme">Field: Load Distribution Scheme</h4>
 <p>The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, three schemes are functional. <strong>Sequential</strong> uses each piece of equipment to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. <strong>Optimal</strong> operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. <strong>Uniform</strong> evenly distributes the loop demand among all available components on the equipment list for a given load range.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Plant:HotWaterLoop,</p>
-<p>Hot Water Loop,          !-Plant Loop Name</p>
-<p>,                        !- Pump Schedule</p>
-<p>Intermittent,            !- Pump Control Type</p>
-<p>Default,                 !- Hot Water Plant Operation Scheme Type</p>
-<p>,                        !- Hot Water Plant Operation Scheme List Name</p>
-<p>HW Loop Temp Schedule,   !- Hot Water Setpoint Schedule</p>
-<p>82,                    !- Hot Water Design Setpoint {C}</p>
-<p>VariableFlow,          !- Hot Water Pump Configuration</p>
-<p>179352,                !- Hot Water Pump Rated Head {Pa}</p>
-<p>None,                  !- Hot Water Setpoint Reset Type</p>
-<p>82.2,                  !- Hot Water Setpoint at Outdoor Dry Bulb Low {C}</p>
-<p>-6.7,                  !- Hot Water Reset Outdoor Dry Bulb Low {C}</p>
-<p>65.6,                  !- Hot Water Setpoint at Outdoor Dry Bulb High {C}</p>
-<p>10,                    !- Hot Water Reset Outdoor Dry Bulb High {C}</p>
-<p>SinglePump,              !- Hot Water Pump Type</p>
-<p>Yes,                     !- Supply Side Bypass Pipe</p>
-<p>Yes,                     !- Demand Side Bypass Pipe</p>
-<p>Water,                   !- Fluid Type</p>
-<p>11,                      !- Loop Design Delta Temperature {deltaC}</p>
-<p>,                        !- Maximum Outdoor Dry Bulb Temperature {C}</p>
-<p>Sequential;              !- Load Distribution Scheme</p>
+<pre><code class="idf">HVACTemplate:Plant:HotWaterLoop,
+    Hot Water Loop,          !-Plant Loop Name
+    ,                        !- Pump Schedule
+    Intermittent,            !- Pump Control Type
+    Default,                 !- Hot Water Plant Operation Scheme Type
+    ,                        !- Hot Water Plant Operation Scheme List Name
+    HW Loop Temp Schedule,   !- Hot Water Setpoint Schedule
+    82,                    !- Hot Water Design Setpoint {C}
+    VariableFlow,          !- Hot Water Pump Configuration
+    179352,                !- Hot Water Pump Rated Head {Pa}
+    None,                  !- Hot Water Setpoint Reset Type
+    82.2,                  !- Hot Water Setpoint at Outdoor Dry Bulb Low {C}
+    -6.7,                  !- Hot Water Reset Outdoor Dry Bulb Low {C}
+    65.6,                  !- Hot Water Setpoint at Outdoor Dry Bulb High {C}
+    10,                    !- Hot Water Reset Outdoor Dry Bulb High {C}
+    SinglePump,              !- Hot Water Pump Type
+    Yes,                     !- Supply Side Bypass Pipe
+    Yes,                     !- Demand Side Bypass Pipe
+    Water,                   !- Fluid Type
+    11,                      !- Loop Design Delta Temperature {deltaC}
+    ,                        !- Maximum Outdoor Dry Bulb Temperature {C}
+    Sequential;              !- Load Distribution Scheme
+</code></pre>
+
 <h3 id="hvactemplateplantboiler">HVACTemplate:Plant:Boiler</h3>
 <p>A boiler or purchased heating source is described with this object. To define multiple boilers, use multiple HVACTemplate:Plant:Boiler objects and use the Sizing Factor field to apportion the total capacity if autosizing.</p>
 <h4 id="field-name_16">Field: Name</h4>
@@ -5767,18 +6037,20 @@
 <h4 id="field-template-plant-loop-type_2">Field: Template Plant Loop Type</h4>
 <p>This field specifies whether this boiler will serve a <em>HotWaterLoop</em> (ref. HVACTemplate:Plant:HotWaterLoop) or a <em>MixedWaterLoop</em> (ref. HVACTemplate:Plant:MixedWaterLoop). If this field is left blank, this tower will serve a HotWaterLoop if present or a MixedWaterLoop (if no HotWaterLoop is present).</p>
 <p>An example in an IDF:</p>
-<p>HVACTemplate:Plant:Boiler,</p>
-<p>Main Boiler,             !- Name</p>
-<p>HotWaterBoiler,          !- Boiler Type</p>
-<p>autosize,                !- Capacity {W}</p>
-<p>0.8,                     !- Efficiency</p>
-<p>NaturalGas,              !- Fuel Type</p>
-<p>1,                       !- Priority</p>
-<p>1,                       !- Sizing Factor</p>
-<p>0.1,                     !- Minimum Part Load Ratio</p>
-<p>1.1,                     !- Maximum Part Load Ratio</p>
-<p>0.9,                     !- Optimum Part Load Ratio</p>
-<p>99.9;                    !- Water Outlet Upper Temperature Limit {C}</p>
+<pre><code class="idf">  HVACTemplate:Plant:Boiler,
+    Main Boiler,             !- Name
+    HotWaterBoiler,          !- Boiler Type
+    autosize,                !- Capacity {W}
+    0.8,                     !- Efficiency
+    NaturalGas,              !- Fuel Type
+    1,                       !- Priority
+    1,                       !- Sizing Factor
+    0.1,                     !- Minimum Part Load Ratio
+    1.1,                     !- Maximum Part Load Ratio
+    0.9,                     !- Optimum Part Load Ratio
+    99.9;                    !- Water Outlet Upper Temperature Limit {C}
+</code></pre>
+
 <h3 id="hvactemplateplantboilerobjectreference">HVACTemplate:Plant:Boiler:ObjectReference</h3>
 <h4 id="this-object-references-a-detailed-boiler-object-and-adds-it-to-an-hvactemplateplanthotwaterloop-or-mixedwaterloop-the-user-must-create-a-complete-detailed-boiler-object-with-all-required-curve-or-performance-objects-the-detailed-boiler-object-is-referenced-by-object-type-and-name-and-the-boiler-will-be-automatically-to-the-hot-water-or-mixed-water-loop-branches-and-equipment-list">This object references a detailed boiler object and adds it to an HVACTemplate:Plant:HotWaterLoop or MixedWaterLoop. The user must create a complete detailed boiler object with all required curve or performance objects. The detailed boiler object is referenced by object type and name and the boiler will be automatically to the hot water or mixed water loop branches and equipment list.</h4>
 <h4 id="field-name_17">Field: Name</h4>
@@ -5795,11 +6067,13 @@
 <h4 id="field-template-plant-loop-type_3">Field: Template Plant Loop Type</h4>
 <p>This field specifies whether this boiler will serve a <em>HotWaterLoop</em> (ref. HVACTemplate:Plant:HotWaterLoop) or a <em>MixedWaterLoop</em> (ref. HVACTemplate:Plant:MixedWaterLoop). If this field is left blank, this tower will serve a HotWaterLoop if present or a MixedWaterLoop (if no HotWaterLoop is present).</p>
 <p>An example in an IDF:</p>
-<p>HVACTemplate:Plant:Boiler:ObjectReference,</p>
-<p>Main Boiler Connection,  !- Name</p>
-<p>Boiler:HotWater,         !- Boiler Object Type</p>
-<p>Main Boiler,             !- Boiler Name</p>
-<p>1;                       !- Priority</p>
+<pre><code class="idf">HVACTemplate:Plant:Boiler:ObjectReference,
+    Main Boiler Connection,  !- Name
+    Boiler:HotWater,         !- Boiler Object Type
+    Main Boiler,             !- Boiler Name
+    1;                       !- Priority
+</code></pre>
+
 <h3 id="hvactemplateplantmixedwaterloop">HVACTemplate:Plant:MixedWaterLoop</h3>
 <p>This object simulates the central plant loop portion of a water source heat pump system. Often many HVACTemplate:Zone:WaterToAirHeatPump objects will be used in a building along with a single HVACTemplate:Plant:MixedWaterLoop that contains one or more cooling towers and boilers.  The piping systems are called loops and this object describes the controls and pumps on the loops. Only one of these objects should be defined in an input file.</p>
 <h4 id="field-name_18">Field: Name</h4>
@@ -5948,24 +6222,26 @@
 <h4 id="field-load-distribution-scheme_1">Field: Load Distribution Scheme</h4>
 <p>The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, three schemes are functional. <strong>Sequential</strong> uses each piece of equipment to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. <strong>Optimal</strong> operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. <strong>Uniform</strong> evenly distributes the loop demand among all available components on the equipment list for a given load range.</p>
 <p>As shown in an IDF:</p>
-<p>HVACTemplate:Plant:MixedWaterLoop,</p>
-<p>Only Water Loop,         !- Name</p>
-<p>,                        !- Pump Schedule Name</p>
-<p>Intermittent,            !- Pump Control Type</p>
-<p>Default,                 !- Operation Scheme Type</p>
-<p>,                        !- Equipment Operation Schemes Name</p>
-<p>,                        !- High Temperature Setpoint Schedule Name</p>
-<p>34,                      !- High Temperature Design Setpoint {C}</p>
-<p>,                        !- Low Temperature Setpoint Schedule Name</p>
-<p>20,                      !- Low Temperature Design Setpoint {C}</p>
-<p>ConstantFlow,            !- Water Pump Configuration</p>
-<p>179352,                  !- Water Pump Rated Head {Pa}</p>
-<p>SinglePump,              !- Water Pump Type</p>
-<p>Yes,                     !- Supply Side Bypass Pipe</p>
-<p>Yes,                     !- Demand Side Bypass Pipe</p>
-<p>Water,                   !- Fluid Type</p>
-<p>6,                       !- Loop Design Delta Temperature {deltaC}</p>
-<p>Sequential;              !- Load Distribution Scheme</p>
+<pre><code class="idf">HVACTemplate:Plant:MixedWaterLoop,
+    Only Water Loop,         !- Name
+    ,                        !- Pump Schedule Name
+    Intermittent,            !- Pump Control Type
+    Default,                 !- Operation Scheme Type
+    ,                        !- Equipment Operation Schemes Name
+    ,                        !- High Temperature Setpoint Schedule Name
+    34,                      !- High Temperature Design Setpoint {C}
+    ,                        !- Low Temperature Setpoint Schedule Name
+    20,                      !- Low Temperature Design Setpoint {C}
+    ConstantFlow,            !- Water Pump Configuration
+    179352,                  !- Water Pump Rated Head {Pa}
+    SinglePump,              !- Water Pump Type
+    Yes,                     !- Supply Side Bypass Pipe
+    Yes,                     !- Demand Side Bypass Pipe
+    Water,                   !- Fluid Type
+    6,                       !- Loop Design Delta Temperature {deltaC}
+    Sequential;              !- Load Distribution Scheme
+</code></pre>
+
 
           <div class="footer">
   <p class="text-center"><a href="https://unmethours.com/questions/scope:all/sort:activity-desc/tags:energyplus/">Get Help</a> | <a href="https://www.energyplus.gov/">More Information</a></p>
