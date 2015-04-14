@@ -1871,7 +1871,14 @@
 <p>With the “effective” SHR for the coil at the current operating conditions, including the impacts of latent degradation, equations (463) through (466) are then used to calculate the properties of the air leaving the cooling coil when it operates. Finally, equations (467) through (469) are used to calculate the average leaving air conditions (average when the coil is on and off) for the simulation time step.</p>
 <h4 id="basin-heater-for-single-speed-dx-coil">Basin Heater For Single-Speed DX Coil</h4>
 <p>Calculations are also made to estimate the electric power input to the DX coil basin heater. A schedule may be used to disable the basin heater during regular maintenance periods or other time periods (e.g., during summer). If a schedule is not provided, the basin heater is assumed to be available the entire simulation time period. The basin heater operates when it is scheduled on, the outdoor air dry-bulb temperature is below the basin heater setpoint temperature, and the DX coil is not active. The user is required to enter a basin heater capacity (watts per degree Kelvin) and a heater setpoint temperature (<sup>o</sup>C) if they want to model basin heater electric power.</p>
-<p><span>$\begin{array}{l}\mathop P\nolimits_{basinheater}  = MAX(0.0,{\rm{ }}\mathop {CAP}\nolimits_{basinheater} (\mathop T\nolimits_{setpoint,basin}  - \mathop T\nolimits_{db,outdoor} )(1 - RTF))\{\rm{   }}\end{array}$</span><span>$\mathop E\nolimits_{basinheater}  = \mathop {(P}\nolimits_{basinheater} )(TimeStepSys)3600$</span></p>
+<div>\[
+  \mathop P\nolimits_{basinheater}  = MAX(0.0,{\rm{ }}\mathop {CAP}\nolimits_{basinheater} (\mathop T\nolimits_{setpoint,basin}  - \mathop T\nolimits_{db,outdoor} )(1 - RTF)) \\ 
+\]</div>
+
+<div>\[
+  \mathop E\nolimits_{basinheater}  = \mathop {(P}\nolimits_{basinheater} )(TimeStepSys)3600
+\]</div>
+
 <p>where:</p>
 <p><span>$\mathop P\nolimits_{basinheater} $</span>             = DX coil basin heater electric power (W)</p>
 <p><span>$\mathop E\nolimits_{basinheater} $</span>            = DX coil basin heater electric consumption (J)</p>
@@ -2369,109 +2376,163 @@
 <div>\[\frac{{{e_c}({T_j})}}{N} = \left[ {\dot E_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}\]</div>
 
 <p>Table 56. Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor</p>
-<p>&lt;&lt; Source: AHRI Standard 210-240, 2008,  Table 5, Page 65  &gt;&gt;</p>
-<p>Test description</p>
-<p>Air Entering Indoor Unit</p>
-<p>Temperature (°F/C)</p>
-<p>Air Entering Outdoor</p>
-<p>Unit Temperature (°F/C)</p>
-<p>Compressor Capacity</p>
-<p>Cooling Air Volume Rate</p>
-<p>Dry Bulb</p>
-<p>Wet Bulb</p>
-<p>Dry Bulb</p>
-<p>Wet Bulb</p>
-<p>A2 Test—required (steady, wet coil)</p>
-<p>80.0  26.7</p>
-<p>67.0   19.4</p>
-<p>95.0 35.0</p>
-<p>75.0  23.9</p>
-<p>High</p>
-<p>Cooling Full-load</p>
-<p>B2 Test—required (steady, wet coil)</p>
-<p>80.0  26.7</p>
-<p>67.0   19.4</p>
-<p>82.0 27.8</p>
-<p>65.0  18.3</p>
-<p>High</p>
-<p>Cooling Full-load</p>
-<p>B1 Test—required (steady, wet coil)</p>
-<p>80.0  26.7</p>
-<p>67.0   19.4</p>
-<p>82.0 27.8</p>
-<p>65.0  18.3</p>
-<p>Low</p>
-<p>Cooling minimum</p>
-<p>C2Test – Optional</p>
-<p>(steady, dry coil)</p>
-<p>80.0  26.7</p>
-<p>82.0  27.8</p>
-<p>................</p>
-<p>High</p>
-<p>Cooling Full-load</p>
-<p>D<sub>2</sub> Test—required (cyclic, dry coil)</p>
-<p>80.0  26.7</p>
-<p>(4)</p>
-<p>82.0  27.8</p>
-<p>................</p>
-<p>High</p>
-<p>C1 Test —optional (steady, dry coil)</p>
-<p>80.0  26.7</p>
-<p>82.0  27.8</p>
-<p>................</p>
-<p>Low</p>
-<p>Cooling minimum</p>
-<p>D1 Test<sup>—</sup>optional (cyclic, dry coil)</p>
-<p>80.0  26.7</p>
-<p>82.0  27.8</p>
-<p>................</p>
-<p>Low</p>
-<p>F1 Test—optional (steady, dry coil)</p>
-<p>80.0  26.7</p>
-<p>67.0   19.4</p>
-<p>67.0   19.4</p>
-<p>53.5  11.9</p>
-<p>Low</p>
-<p>Cooling minimum</p>
+<table class="table table-striped">
+  <tr>
+    <th colspan="7">Source: AHRI Standard 210-240, 2008; Table 5, Page 65</th>
+  </tr>
+  <tr>
+    <td>Test Description</td>
+    <td>Air Entering Indoor Unit Temperature (F / C)</td>
+    <td></td>
+    <td>Air Entering Outdoor Unit Temperature (F / C)</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Dry Bulb</td>
+    <td>Wet Bulb</td>
+    <td>Dry Bulb</td>
+    <td>Wet Bulb</td>
+    <td>Compressor Capacity</td>
+    <td>Cooling Air Volume Rate</td>
+  </tr>
+  <tr>
+    <td>A2 Test-required (steady, wet coil)</td>
+    <td>80.0/26.7</td>
+    <td>67.0/19.4</td>
+    <td>95.0/35.0</td>
+    <td>75.0/23.9</td>
+    <td>High</td>
+    <td>Cooling Full-load</td>
+  </tr>
+  <tr>
+    <td>B2 Test-required (steady, wet coil)</td>
+    <td>80.0/26.7</td>
+    <td>67.0/19.4</td>
+    <td>82.0/27.8</td>
+    <td>65.0/18.3</td>
+    <td>High</td>
+    <td>Cooling Full-load</td>
+  </tr>
+  <tr>
+    <td>B1 Test-required (steady, wet coil)</td>
+    <td>80.0/26.7</td>
+    <td>67.0/19.4</td>
+    <td>82.0/27.8</td>
+    <td>65.0/18.3</td>
+    <td>Low</td>
+    <td>Cooling Minimum</td>
+  </tr>
+  <tr>
+    <td>C2 Test-optional (steady, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td></td>
+    <td>82.0/27.8</td>
+    <td></td>
+    <td>High</td>
+    <td>Cooling Full-load</td>
+  </tr>
+  <tr>
+    <td>D2 Test-required (cyclic, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td></td>
+    <td>82.0/27.8</td>
+    <td></td>
+    <td>High</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>C1 Test-optional (steady, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td></td>
+    <td>82.0/27.8</td>
+    <td></td>
+    <td>Low</td>
+    <td>Cooling Minimum</td>
+  </tr>
+  <tr>
+    <td>D1 Test-optional (cyclic, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td></td>
+    <td>82.0/27.8</td>
+    <td></td>
+    <td>Low</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>F1 Test-optional (steady, dry coil)</td>
+    <td>80.0/26.7</td>
+    <td>67.0/19.4</td>
+    <td>67.0/19.4</td>
+    <td>53.5/11.9</td>
+    <td>High</td>
+    <td>Cooling Minimum</td>
+  </tr>
+</table>
+
 <p>Table 57. Distribution of Fractional Hours with in Cooling Season Temperature Bins</p>
-<p>&lt;&lt; Source: AHRI Standard 210-240, 2008, Table 16, Page 94 &gt;&gt;</p>
-<p>Bin Number, j</p>
-<p>Bin Temperature Range °C,</p>
-<p>Representative Temperature for bin °C,</p>
-<p>Fraction of Total Temperature Bin Hours,</p>
-<p>N<sub>j</sub>/N</p>
-<p>1</p>
-<p>18.33 - 20.56</p>
-<p>19.44</p>
-<p>0.214</p>
-<p>2</p>
-<p>21.11 - 23.33</p>
-<p>22.22</p>
-<p>0.231</p>
-<p>3</p>
-<p>23.89 - 26.11</p>
-<p>25.00</p>
-<p>0.216</p>
-<p>4</p>
-<p>26.67 - 28.89</p>
-<p>27.78</p>
-<p>0.161</p>
-<p>5</p>
-<p>29.44 - 31.67</p>
-<p>30.56</p>
-<p>0.104</p>
-<p>6</p>
-<p>32.22 - 34.44</p>
-<p>33.33</p>
-<p>0.052</p>
-<p>7</p>
-<p>35.00 - 37.22</p>
-<p>36.11</p>
-<p>0.018</p>
-<p>8</p>
-<p>37.78 – 40.00</p>
-<p>38.89</p>
-<p>0.004</p>
+<table class="table table-striped">
+  <tr>
+    <th colspan="4">Source: AHRI Standard 210-240, 2008; Table 16, Page 94</th>
+  </tr>
+  <tr>
+    <td>Bin Number j</td>
+    <td>Bin Temperature Range (C)</td>
+    <td>Representative Temperature for bin (C)</td>
+    <td>Fraction of Total Temperature Bin Hours Nj/N</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Dry Bulb</td>
+    <td>Wet Bulb</td>
+    <td>Dry Bulb</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>18.33 - 20.56</td>
+    <td>19.44</td>
+    <td>0.214</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>21.11 - 23.33</td>
+    <td>22.22</td>
+    <td>0.231</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>23.89 - 26.11</td>
+    <td>25</td>
+    <td>0.216</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>26.67 - 28.89</td>
+    <td>27.78</td>
+    <td>0.161</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>29.44 - 31.67</td>
+    <td>30.56</td>
+    <td>0.104</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>32.22 - 34.44</td>
+    <td>33.33</td>
+    <td>0.052</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>35.00 - 37.22</td>
+    <td>36.11</td>
+    <td>0.018</td>
+  </tr>
+</table>
+
 <h4 id="references_5">References</h4>
 <p>See the references for the single speed DX cooling coil earlier in this document.</p>
 <h3 id="two-speed-electric-dx-air-cooling-coil">Two-Speed Electric DX Air Cooling Coil</h3>
