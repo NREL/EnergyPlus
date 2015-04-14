@@ -83,129 +83,75 @@ An example of this statement in an IDF is:
 
 ```idf
 ZoneControl:Thermostat, Zone 3 Thermostat, NORTH ZONE,
-
                Zone Control Type Sched,
-
                DUAL SETPOINT WITH DEADBAND, VAV Setpoints;
+```
 
 An example of a global thermostat:
 
+```idf
    ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
-
-
    ZoneControl:Thermostat,
-
        AllControlledZones Thermostat,               !- Name
-
        AllControlledZones,                               !- Zone Name
-
        Zone Control Type Sched, !- Control Type Schedule Name
-
        ThermostatSetpoint:SingleCooling,   !- Control 1 Object Type
-
        CoolingSetPoint,                 !- Control 1 Name
-
        ThermostatSetpoint:SingleHeating,   !- Control 2 Object Type
-
        HeatingSetpoint,                 !- Control 2 Name
-
        ThermostatSetpoint:DualSetpoint,   !- Control 3 Object Type
-
        DualSetPoint;                       !- Control 3 Name
+```
 
 A complete zone thermostat example showing this statement and all of the objects it must reference is:
 
+```idf
 ! Zone control object which links thermostats to a particular zone
-
        ZoneControl:Thermostat, Zone 2 Thermostat, EAST ZONE,
-
                Zone Control Type Sched,
-
                ThermostatSetpoint:SingleCooling, Cooling Setpoint with SB,
-
-               ThermostatSetpoint:SingleHeating,, Heating Setpoint with SB;
-
-
+               ThermostatSetpoint:SingleHeating; Heating Setpoint with SB;
 
 ! Control type objects     these may be used in more than one zone
-
-       ThermostatSetpoint:SingleCooling,,
-
+       ThermostatSetpoint:SingleCooling,
                Cooling Setpoint with SB,
-
                Cooling Setpoints;
 
-
-
-       ThermostatSetpoint:SingleHeating,,
-
+       ThermostatSetpoint:SingleHeating,
                Heating Setpoint with SB,
-
                Heating Setpoints;
 
-
-
 ! Schedule type definitions
-
        ScheduleTypeLimits,Temperature,-60:200,CONTINUOUS;
-
        ScheduleTypeLimits,Control Type,0:4,DISCRETE;
 
-
-
 ! Control type schedule definition
-
        Schedule:Compact, Zone Control Type Sched, Control Type,
-
                Through: 3/31,
-
                For: AllDays,
-
                Until: 24:00, 1,   !- Single Heating
-
                Through: 9/30,
-
                For: AllDays,
-
                Until: 24:00, 2,   !- Single Cooling
-
                Through: 12/31,
-
                For: AllDays,
-
                Until: 24:00, 1;   !- Single Heating
 
-
-
 ! Heating setpoint schedule definition
-
        Schedule:Compact, Heating Setpoints, Temperature,
-
                Through: 12/31,
-
                For: AllDays,
-
                Until: 7:00, 15.,
-
                Until: 17:00,20.,
-
                Until: 24:00,15.;
 
-
-
 ! Cooling setpoint schedule definition
-
        Schedule:Compact, Cooling Setpoints, Temperature,
-
                Through: 12/31,
-
                For: AllDays,
-
                Until: 7:00, 30.,
-
                Until: 20:00,23.,
-
                Until: 24:00,30.;
 ```
 
@@ -213,35 +159,35 @@ A complete zone thermostat example showing this statement and all of the objects
 
 Outputs available from controlled zones. The "key" in the below is the Zone Name.
 
-HVAC,Average,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate [W]
+* HVAC,Average,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate [W]
 
-HVAC,Average,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate [W]
+* HVAC,Average,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate [W]
 
-HVAC,Average,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate [W]
+* HVAC,Average,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate [W]
 
-Zone,Average,Zone Thermostat Control Type []
+* Zone,Average,Zone Thermostat Control Type []
 
-Zone,Average,Zone Thermostat Heating Setpoint Temperature [C]
+* Zone,Average,Zone Thermostat Heating Setpoint Temperature [C]
 
-Zone,Average,Zone Thermostat Cooling Setpoint Temperature [C]
+* Zone,Average,Zone Thermostat Cooling Setpoint Temperature [C]
 
-HVAC,Sum,Facility Any Zone Oscillating Temperatures Time [hr]
+* HVAC,Sum,Facility Any Zone Oscillating Temperatures Time [hr]
 
-Zone,Sum,Zone Heating Setpoint Not Met Time [hr]
+* Zone,Sum,Zone Heating Setpoint Not Met Time [hr]
 
-Zone,Sum,Zone Heating Setpoint Not Met While Occupied Time [hr]
+* Zone,Sum,Zone Heating Setpoint Not Met While Occupied Time [hr]
 
-Zone,Sum,Zone Cooling Setpoint Not Met Time [hr]
+* Zone,Sum,Zone Cooling Setpoint Not Met Time [hr]
 
-Zone,Sum,Zone Cooling Setpoint Not Met While Occupied Time [hr]
+* Zone,Sum,Zone Cooling Setpoint Not Met While Occupied Time [hr]
 
-Zone,Sum,Facility Heating Setpoint Not Met Time [hr]
+* Zone,Sum,Facility Heating Setpoint Not Met Time [hr]
 
-Zone,Sum,Facility Cooling Setpoint Not Met Time [hr]
+* Zone,Sum,Facility Cooling Setpoint Not Met Time [hr]
 
-Zone,Sum,Facility Heating Setpoint Not Met While Occupied Time [hr]
+* Zone,Sum,Facility Heating Setpoint Not Met While Occupied Time [hr]
 
-Zone,Sum,Facility Cooling Setpoint Not Met While Occupied Time [hr]
+* Zone,Sum,Facility Cooling Setpoint Not Met While Occupied Time [hr]
 
 
 
@@ -377,13 +323,12 @@ The cooling temperature schedule. Values in the schedule are temperatures {C}.
 
 Examples of these statements in an IDF are:
 
+```idf
 ThermostatSetpoint:SingleHeating, Heating Setpoint with SB, Heating Setpoints;
-
 ThermostatSetpoint:SingleCooling, Cooling Setpoint with SB, Cooling Setpoints;
-
 ThermostatSetpoint:SingleHeatingOrCooling, Heating Cooling Setpoint Sched, Heating Cooling Setpoints;
-
 ThermostatSetpoint:DualSetpoint, VAV Setpoints, Heating Setpoints, Cooling Setpoints;
+```
 
 ### ZoneControl:Thermostat:OperativeTemperature
 
@@ -407,10 +352,10 @@ Table 28. Radiative Fraction vs Air Velocity (Operative Temperature Control)
 
 <table class="table table-striped">
 <tr>
-<td>Air Velocity (m/s)</td>
-<td>&lt; 0.2</td>
-<td>0.2 to 0.6</td>
-<td>0.6 to 1.0</td>
+<th>Air Velocity (m/s)</th>
+<th>&lt; 0.2</th>
+<th>0.2 to 0.6</th>
+<th>0.6 to 1.0</th>
 </tr>
 <tr>
 <td><span>$\gamma $</span></td>
@@ -444,93 +389,71 @@ Note that by setting the values in this schedule separately for design days, the
 
 An example of this object follows.
 
+```idf
 ZoneControl:Thermostat:OperativeTemperature,
+Zone 1 Thermostat,   !- ZoneControl:Thermostat Name
+Constant,                     !- Radiative Fraction Input Mode
+0.5,                               !- Fixed Radiative Fraction
+;   !- Radiative Fraction Schedule
+```
 
-   Zone 1 Thermostat,   !- ZoneControl:Thermostat Name
-
-   Constant,                     !- Radiative Fraction Input Mode
-
-   0.5,                               !- Fixed Radiative Fraction
-
-   ;   !- Radiative Fraction Schedule
 
 Global operative temperature applied to all zones for a global thermostat:
 
-   ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
+```idf
+ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
 
-
-   ZoneControl:Thermostat,
-
-       AllControlledZones Thermostat,               !- Name
-
-       AllControlledZones,                               !- Zone Name
-
-       Zone Control Type Sched, !- Control Type Schedule Name
-
-       ThermostatSetpoint:SingleCooling,   !- Control 1 Object Type
-
-       CoolingSetPoint,                 !- Control 1 Name
-
-       ThermostatSetpoint:SingleHeating,   !- Control 2 Object Type
-
-       HeatingSetpoint,                 !- Control 2 Name
-
-       ThermostatSetpoint:DualSetpoint,   !- Control 3 Object Type
-
-       DualSetPoint;                       !- Control 3 Name
+ZoneControl:Thermostat,
+ AllControlledZones Thermostat,               !- Name
+ AllControlledZones,                               !- Zone Name
+ Zone Control Type Sched, !- Control Type Schedule Name
+ ThermostatSetpoint:SingleCooling,   !- Control 1 Object Type
+ CoolingSetPoint,                 !- Control 1 Name
+ ThermostatSetpoint:SingleHeating,   !- Control 2 Object Type
+ HeatingSetpoint,                 !- Control 2 Name
+ ThermostatSetpoint:DualSetpoint,   !- Control 3 Object Type
+ DualSetPoint;                       !- Control 3 Name
 
 
+ZoneControl:Thermostat:OperativeTemperature,
+ AllControlledZones Thermostat,               !- Thermostat Name
+ CONSTANT,                               !- Radiative Fraction Input Mode
+ 0.4;                                         !- Fixed Radiative Fraction
+```
 
-   ZoneControl:Thermostat:OperativeTemperature,
-
-       AllControlledZones Thermostat,               !- Thermostat Name
-
-       CONSTANT,                               !- Radiative Fraction Input Mode
-
-       0.4;                                         !- Fixed Radiative Fraction
 
 Global operative temperature referencing a single zone from the list:
 
-   ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
+```idf
+ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
+```
+
+```idf
+
+ZoneControl:Thermostat,
+ AllControlledZones Thermostat,               !- Name
+ AllControlledZones,                               !- Zone Name
+ Zone Control Type Sched, !- Control Type Schedule Name
+ ThermostatSetpoint:SingleCooling,   !- Control 1 Object Type
+ CoolingSetPoint,                 !- Control 1 Name
+ ThermostatSetpoint:SingleHeating,   !- Control 2 Object Type
+ HeatingSetpoint,                 !- Control 2 Name
+ ThermostatSetpoint:DualSetpoint,   !- Control 3 Object Type
+ DualSetPoint;                       !- Control 3 Name
 
 
-
-   ZoneControl:Thermostat,
-
-       AllControlledZones Thermostat,               !- Name
-
-       AllControlledZones,                               !- Zone Name
-
-       Zone Control Type Sched, !- Control Type Schedule Name
-
-       ThermostatSetpoint:SingleCooling,   !- Control 1 Object Type
-
-       CoolingSetPoint,                 !- Control 1 Name
-
-       ThermostatSetpoint:SingleHeating,   !- Control 2 Object Type
-
-       HeatingSetpoint,                 !- Control 2 Name
-
-       ThermostatSetpoint:DualSetpoint,   !- Control 3 Object Type
-
-       DualSetPoint;                       !- Control 3 Name
-
-
-
-   ZoneControl:Thermostat:OperativeTemperature,
-
-       SPACE3-1 AllControlledZones Thermostat,               !- Thermostat Name
-
-       CONSTANT,                               !- Radiative Fraction Input Mode
-
-       0.4;                                         !- Fixed Radiative Fraction
+ZoneControl:Thermostat:OperativeTemperature,
+ SPACE3-1 AllControlledZones Thermostat,               !- Thermostat Name
+ CONSTANT,                               !- Radiative Fraction Input Mode
+ 0.4;                                         !- Fixed Radiative Fraction
+```
 
 
 
 ### Zone Control Themostatic Operative Temperature Outputs
 
-Zone,Average,Zone Thermostat Operative Temperature [C]
+* Zone,Average,Zone Thermostat Operative Temperature [C]
 
 #### Zone Thermostat Operative Temperature [C]
 
@@ -574,21 +497,17 @@ The value of this input field is used to adjust the cooling setpoint temperature
 
 An example of this object follows.
 
+```idf
 ZoneControl:Thermostat:TemperatureAndHumidity,
-
        Zone Thermostat,                                 !- Thermostat Name
-
        Seasonal Relative Humidity Sch,   !- Dehumidifying Relative Humidity Setpoint Schedule Name
-
        Overcool,                                               !- Dehumidification Control Type
-
        Constant,                                               !- Overcool Range Input Method
-
        1.7,                                         !- Overcool Constant Range {deltaC}
-
        ,                                               !- Overcool Range Schedule Name
-
        3.0;                                         !- Overcool Control Ratio {percent/K}
+```
+
 
 ### ZoneControl:Thermostat:StagedDualSetpoint
 
@@ -670,39 +589,26 @@ Note: If the stage number is not equal to the number of cooling speed in the Air
 
 An example of this statement in an IDF is:
 
+```idf
 ZoneControl:Thermostat:StagedDualSetpoint,
-
        ZoneThermostat,                   !- Name
-
        AllZones,                               !- Zone or ZoneList Name
-
        2,                                             !- Number of Heating Stages
-
        Heating Setpoints,             !- Heating Temperature Setpoint Schedule Name
-
        1.1,                                         !- Heating Throttling Temperature Range {deltaC}
-
        0.0,                                         !- Stage 1 Heating Temperature Offset {deltaC}
-
        -0.5,                                       !- Stage 2 Heating Temperature Offset {deltaC}
-
        -1.0,                                       !- Stage 3 Heating Temperature Offset {deltaC}
-
        -1.5,                                       !- Stage 4 Heating Temperature Offset {deltaC}
-
        4,                                             !- Number of Cooling Stages
-
        Cooling Setpoints,             !- Cooling Setpoint Temperature Schedule Name
-
        1.1,                                         !- Cooling Throttling Temperature Range {deltaC}
-
        0.0,                                         !- Stage 1 Cooling Temperature Offset {deltaC}
-
        1.0,                                         !- Stage 2 Cooling Temperature Offset {deltaC}
-
        2.0,                                         !- Stage 3 Cooling Temperature Offset {deltaC}
-
        3.0;                                         !- Stage 4 Cooling Temperature Offset {deltaC}
+```
+
 
 ### ZoneControl:Humidistat
 
@@ -760,49 +666,37 @@ Name of a schedule that defines the dehumidifying relative humidity setpoint, ex
 
 An example of this statement in an IDF is:
 
+```idf
 ZoneControl:Humidistat,
-
        Zone 2 Humidistat,             !- Humidistat Name
-
       EAST ZONE,                             !- Zone Name
-
        Min Rel Hum Set Sch,       !- Humidifying Relative Humidity Setpoint SCHEDULE Name
-
        Max Rel Hum Set Sch;       !- Dehumidifying Relative Humidity Setpoint SCHEDULE Name
+```
+
 
 An example schedule for the Zone Control:Humidistat
 
+```idf
    ScheduleTypeLimits,Humidity,0:100,CONTINUOUS;
 
 
-
    Schedule:Compact,
-
        Min Rel Hum Set Sch,       !- Name
-
        Humidity,                               !- ScheduleType
-
        Through: 12/31,                   !- Complex Field \#1
-
        For: AllDays,                       !- Complex Field \#2
-
        Until: 24:00,                       !- Complex Field \#3
-
        30.0;                                       !- Complex Field \#4
-
    Schedule:Compact,,
-
        Max Rel Hum Set Sch,       !- Name
-
        Humidity,                               !- ScheduleType
-
        Through: 12/31,                   !- Complex Field \#1
-
        For: AllDays,                       !- Complex Field \#2
-
        Until: 24:00,                       !- Complex Field \#3
-
        55.0;                                       !- Complex Field \#4
+```
+
 
 
 
@@ -810,11 +704,11 @@ An example schedule for the Zone Control:Humidistat
 
 Outputs available from the ZoneControl:Humidistat:
 
-HVAC,Average,Zone Predicted Moisture Load Moisture Transfer Rate [kgWater/s]
+* HVAC,Average,Zone Predicted Moisture Load Moisture Transfer Rate [kgWater/s]
 
-HVAC,Average,Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate [kgWater/s]
+* HVAC,Average,Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate [kgWater/s]
 
-HVAC,Average,Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate [kgWater/s]
+* HVAC,Average,Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate [kgWater/s]
 
 #### Zone Predicted Moisture Load Moisture Transfer Rate [kgWater/s]
 
@@ -834,7 +728,7 @@ The thermal comfort zone control provides a method to control a zone to a dry-bu
 
 This object references a control type schedule and one or more thermal comfort control type objects which in turn reference one or more setpoint schedules. The example at the end of this section illustrates a complete zone thermal comfort control specification including the control type and setpoint schedules. The control type schedule and the list of control type/name pairs are directly related. The schedule defines the type of control that is to be used during for each hour. Valid Control Types are
 
-0     Uncontrolled (No thermal comfort control)
+0 - Uncontrolled (No thermal comfort control)
 
 1 - Single Thermal Comfort Heating Setpoint:Fanger
 
@@ -918,63 +812,44 @@ The unique name for the corresponding thermal comfort control type.
 
 An example of this statement in an IDF is:
 
+```idf
 ZoneControl:Thermostat:ThermalComfort,
-
        Zone 2 Comfort Control,                   !- Thermal Comfort Control Name
-
        EAST ZONE,                                             !- Zone Name
-
        SpecificObject,                                   !- Averaging Method for Zones with Multiple People Objects
-
        EAST ZONE,                                             !- Object Name for Specific Object Averaging Method
-
        12.8,                                                       !- Minimum dry-bulb temperature setpoint
-
        40.0,                                                       !- Maximum dry-bulb temperature setpoint
-
        Zone Comfort Control Type Sched, !- Thermal Comfort Control Type SCHEDULE Name
+       Dual Thermal Comfort Setpoint WITH DEADBAND:Fanger, !- Control Type #1
+       Dual Comfort Setpoint;                     !- Thermal Comfort Control Type Name #1
+```
 
-       Dual Thermal Comfort Setpoint WITH DEADBAND:Fanger, !- Control Type \#1
-
-       Dual Comfort Setpoint;                     !- Thermal Comfort Control Type Name \#1
 
 Global thermal comfort thermostat example:
 
+```idf
    ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
 
-
    ZoneControl:Thermostat:ThermalComfort,
-
        ControlledZones Comfort Control,   !- Name
-
        AllControlledZones,                             !- Zone Name
-
        PeopleAverage,                     !- Averaging Method
-
        ,                                               !- Specific People Name
-
        12.8,                                       !- Minimum Dry-Bulb Temperature Setpoint {C}
-
        40.0,                                       !- Maximum Dry-Bulb Temperature Setpoint {C}
-
        Zone Comfort Control Type Sched,   !- Thermal Comfort Control Type Schedule Name
-
        ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating,   !- Thermal Comfort Control 1 Object Type
-
        Single Heating Comfort Setpoint,   !- Thermal Comfort Control 1 Name
-
        ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling,   !- Thermal Comfort Control 2 Object Type
-
        Single Cooling Comfort Setpoint,   !- Thermal Comfort Control 2 Name
-
        ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling,   !- Thermal Comfort Control 3 Object Type
-
        Single Heating Cooling Comfort Setpoint,   !- Thermal Comfort Control 3 Name
-
        ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint,   !- Thermal Comfort Control 4 Object Type
-
        Dual Comfort Setpoint;     !- Thermal Comfort Control 4 Name
+```
+
 
 ### ZoneControl Thermostat ThermalComfort Outputs
 
@@ -984,21 +859,20 @@ Three outputs are available from the ZoneControl:Thermostat:ThermalComfort objec
 
 **ZoneControl:ThermalComfort**
 
-Zone,Average,Zone Thermal Comfort Control Type []
+* Zone,Average,Zone Thermal Comfort Control Type []
 
-Zone,Average,Zone Thermal Comfort Control Fanger Low Setpoint PMV []
+* Zone,Average,Zone Thermal Comfort Control Fanger Low Setpoint PMV []
 
-Zone,Average,Zone Thermal Comfort Control Fanger High Setpoint PMV []
+* Zone,Average,Zone Thermal Comfort Control Fanger High Setpoint PMV []
 
 
 
 **ZoneControl:Thermostat**
 
-Zone,Average,Zone Thermostat Heating Setpoint Temperature [C]
+* Zone,Average,Zone Thermostat Heating Setpoint Temperature [C]
 
-Zone,Average,Zone Thermostat Cooling Setpoint Temperature [C]
+* Zone,Average,Zone Thermostat Cooling Setpoint Temperature [C]
 
-***  ***
 
 #### Zone Thermal Comfort Control Type []
 
@@ -1078,37 +952,28 @@ The name of the associated schedule containing cooling setpoint `Zone Thermal Co
 
 An example of this statement in an IDF is:
 
+```idf
 ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating,
-
        Heating Comfort Setpoint,!- Name
-
        Heating PMV Setpoints;     !- Setpoint Temperature SCHEDULE Name
 
 
-
 ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling,
-
        Cooling Comfort Setpoint,!- Name
-
        Cooling PMV Setpoints;     !- Setpoint Temperature SCHEDULE Name
 
 
-
 ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling,
-
        Heating Cooling Comfort Setpoint,!- Name
-
        Heating Cooling PMV Setpoints;     !- Setpoint Temperature SCHEDULE Name
 
 
-
 ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint,
-
        Dual Comfort Setpoint,     !- Name
-
        Heating PMV Setpoints,     !- Fanger Thermal Comfort Heating Setpoint PMV SCHEDULE Name
-
        Cooling PMV Setpoints;     !- Fanger Thermal Comfort Cooling Setpoint PMV SCHEDULE Name
+```
+
 
 ### ZoneControl:ContaminantController
 
@@ -1152,35 +1017,29 @@ This field contains the name of a schedule that contains the zone generic contam
 
 An IDF example is provided below:
 
+```idf
    ZoneControl:ContaminantController,
-
        CO2 Controller1,                 !- Name
-
        EAST ZONE,                             !- Controlled Zone Name
-
        CO2AvailSchedule,               !- Carbon Dioxide Control Availability Schedule Name
-
-CO2SetpointSchedule,         !- Carbon Dioxide Setpoint Schedule Name
-
+       CO2SetpointSchedule,         !- Carbon Dioxide Setpoint Schedule Name
        ,                                               !- Minimum Carbon Dioxide Concentration Schedule Name
-
        GCAvailSchedule,                 !- Generic Contaminant Control Availability Schedule Name
-
        GCSetpointSchedule;           !- Generic Contaminant Setpoint Schedule Name
-
+```
 
 
 ### ZoneControl Contaminant Controller Outputs
 
 The following output variables are available when the ZoneControl:ContaminantController object is specified.
 
-HVAC,Average,Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate [kg/s]
+* HVAC,Average,Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate [kg/s]
 
-HVAC,Average,Zone Air CO2 Setpoint Concentration [ppm]
+* HVAC,Average,Zone Air CO2 Setpoint Concentration [ppm]
 
-HVAC,Average,Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate [kg/s]
+* HVAC,Average,Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate [kg/s]
 
-HVAC,Average,Zone Generic Air Contaminant Setpoint Concentration [ppm]
+* HVAC,Average,Zone Generic Air Contaminant Setpoint Concentration [ppm]
 
 
 
@@ -1265,32 +1124,22 @@ Unique name of the AirLoopHVAC:ReturnPlenum or AirLoopHVAC:ZoneMixer.
 
 Example inputs are shown below
 
+```idf
   AirLoopHVAC:SupplyPath,
-
        SupplyAirPath 1,                       !- Name
-
        Zone Equip In Node,                 !- Supply Air Path Inlet Node Name
-
        AirLoopHVAC:SupplyPlenum,     !- Component 1 Object Type
-
        Supply-Plenum-1,                       !- Component 1 Name
-
        AirLoopHVAC:ZoneSplitter,     !- Component 2 Object Type
-
        Zone Supply Air Splitter 1; !- Component 2 Name
 
 
-
 AirLoopHVAC:ReturnPath,
-
        ReturnAirPath1,                         !- Name
-
        PLENUM-1 Out Node,                   !- Return Air Path Outlet Node Name
-
        Zone Return Plenum,                 !- Component 1 Object Type
-
        Return-Plenum-1;                       !- Component 1 Name
-
+```
 
 
 ### AirLoopHVAC:ReturnPlenum
@@ -1331,53 +1180,38 @@ The name of a plenum inlet node. There is no limit to the number of inlet nodes,
 
 An IDF example of a zone return plenum component specification:
 
+```idf
    AirLoopHVAC:ReturnPlenum,
-
        Return-Plenum-1,                       !- Name
-
        PLENUM-1,                                     !- Zone Name
-
        PLENUM-1 Node,                           !- Zone Node Name
-
        PLENUM-1 Out Node,                   !- Outlet Node Name
-
        PLENUM-1 Induced Air Nodes, !- Induced Air Outlet Node or NodeList Name
-
        SPACE1-1 Out Node,                   !- Inlet 1 Node Name
-
        SPACE2-1 Out Node,                   !- Inlet 2 Node Name
-
        SPACE3-1 Out Node,                   !- Inlet 3 Node Name
-
        SPACE4-1 Out Node,                   !- Inlet 4 Node Name
-
        SPACE5-1 Out Node;                   !- Inlet 5 Node Name
 
 
-
    NodeList,
-
        PLENUM-1 Induced Air Nodes,       !- Name
-
        SPACE1-1 ATU Sec Node,                 !- Node 1 Name
-
        SPACE2-1 ATU Sec Node,                 !- Node 2 Name
-
        SPACE3-1 ATU Sec Node,                 !- Node 3 Name
-
        SPACE4-1 ATU Sec Node;                 !- Node 4 Name
+```
+
 
 Below is an example of the AirLoopHVAC:ReturnPath for the simple case shown above.
 
+```idf
    AirLoopHVAC:ReturnPath,
-
        ReturnAirPath1,                   !- Name
-
        PLENUM-1 Out Node,             !- Return Air Path Outlet Node Name
-
        AirLoopHVAC:ReturnPlenum,!- Component 1 Object Type
-
        Return-Plenum-1;                 !- Component 1 Name
+```
 
 
 
@@ -1417,33 +1251,28 @@ The name of a plenum outlet node. There is no limit to the number of outlet node
 
 An IDF example of an AirLoopHVAC:SupplyPlenum component specification:
 
+```idf
   AirLoopHVAC:SupplyPlenum,
-
        Supply Plenum 1,                         ! Name
-
        SUPPLY PLENUM ZONE,                   ! Zone Name
-
        Supply Plenum 1 Zone Node,     ! Zone Node Name
-
        Zone Equipment Inlet Node,     ! Inlet Node Name
-
        Supply Plenum 1 Outlet Node; ! Outlet 1 Node Name
+```
+
 
 Below is an example of the AirLoopHVAC:SupplyPath for the building shown above.
 
+```idf
   AirLoopHVAC:SupplyPath,
-
        TermReheatSupplyPath,               ! Name
-
        Zone Equipment Inlet Node,     ! Supply Air Path Inlet Node Name
-
        AirLoopHVAC:SupplyPlenum,       ! Component 1 Object Type
-
        Supply Plenum 1,                         ! Component 1 Name
-
        AirLoopHVAC:ZoneSplitter,       ! Component 2 Object Type
-
        Zone Supply Air Splitter;       ! Component 2 Name
+```
+
 
 ### AirLoopHVAC:ZoneSplitter
 
@@ -1463,17 +1292,14 @@ The name of a splitter outlet node. There is no limit to the number of outlet no
 
 An example is shown below.
 
+```idf
 AirLoopHVAC:ZoneSplitter,
-
            Zone Supply Air Splitter,     ! Name
-
            Zone Equipment Inlet Node,   ! Inlet Node Name
-
            Zone 1 Damper Inlet Node,     ! Outlet 1 Node Name
-
           Zone 2 Damper Inlet Node,     ! Outlet 2 Node Name
-
            Zone 3 Damper Inlet Node;     ! Outlet 3 Node Name
+```
 
 ### AirLoopHVAC:ZoneMixer
 
@@ -1493,17 +1319,14 @@ The name of a mixer inlet node. There is no limit to the number of inlet nodes, 
 
 An input example is shown below.
 
+```idf
 AirLoopHVAC:ZoneMixer,
-
                  Zone Return Air Mixer,               ! Name
-
                  Return Air Mixer Outlet Node, ! Outlet Node Name
-
                  Zone 1 Outlet Node,                     ! Inlet 1 Node Name
-
                  Zone 2 Outlet Node,                     ! Inlet 2 Node Name
-
                  Zone 3 Outlet Node;                     ! Inlet 3 Node Name
+```
 
 Group -- Non-Zone Equipment
 ---------------------------
@@ -1546,19 +1369,15 @@ Reference to the schedule object specifying the flow rate fraction relative to t
 
 An example of this object follows.
 
+```idf
 LoadProfile:Plant,
-
    Load Profile 1,                                         !- Name
-
    Demand Load Profile 1 Inlet Node,     !- Inlet Node Name
-
    Demand Load Profile 1 Outlet Node,   !- Outlet Node Name
-
    Load Profile 1 Load Schedule,             !- Load Schedule Name {W}
-
    0.003,                                                           !- Peak Flow Rate {m3/s}
-
    Load Profile 1 Flow Frac Schedule;   !- Flow Rate Fraction Schedule Name
+```
 
 
 
@@ -1566,15 +1385,15 @@ LoadProfile:Plant,
 
 The following output variables and meters are reported for the LoadProfile:Plant object:
 
-HVAC,Average,Plant Load Profile Mass Flow Rate [kg/s]
+* HVAC,Average,Plant Load Profile Mass Flow Rate [kg/s]
 
-HVAC,Average,Plant Load Profile Heat Transfer Rate [W]
+* HVAC,Average,Plant Load Profile Heat Transfer Rate [W]
 
-HVAC,Sum,Plant Load Profile Heat Transfer Energy [J]
+* HVAC,Sum,Plant Load Profile Heat Transfer Energy [J]
 
-HVAC,Sum,Plant Load Profile Heating Energy [J]
+* HVAC,Sum,Plant Load Profile Heating Energy [J]
 
-HVAC,Sum,Plant Load Profile Cooling Energy [J]
+* HVAC,Sum,Plant Load Profile Cooling Energy [J]
 
 #### Plant Load Profile Mass Flow Rate [kg/s]
 
@@ -1594,9 +1413,9 @@ These report the overall cooling or heating energy that the load profile object 
 
 The inlet and outlet node temperatures and mass flow rates can be monitored using the system node output variables:
 
-HVAC,Average,System Node Temperature [C]
+* HVAC,Average,System Node Temperature [C]
 
-HVAC,Average,System Node Mass Flow Rate [kg/s]
+* HVAC,Average,System Node Mass Flow Rate [kg/s]
 
 
 
@@ -1639,37 +1458,32 @@ The maximum flow rate [m<sup>3</sup>/s] allowed through the collector. This fiel
 
 An example follows.
 
+```idf
   SolarCollector:FlatPlate:Water,
-
    Collector 1,                                                       !- Name
-
    ACR Solar International Fireball 2001,   !- Solar Collector Performance Name
-
    Collector Surface,                                           !- Surface Name
-
    Collector Inlet Node,                                     !- Inlet Node Name
-
    Collector Outlet Node,                                   !- Outlet Node Name
-
    0.00005;                                                               !- Maximum Flow Rate (m3/s)
-
+```
 
 
 ### Solar Collector FlatPlate Water Output
 
 The following output variables are reported for the SolarCollector:FlatPlate:Water object:
 
-HVAC,Average,Solar Collector Incident Angle Modifier []
+* HVAC,Average,Solar Collector Incident Angle Modifier []
 
-HVAC,Average,Solar Collector Efficiency []
+* HVAC,Average,Solar Collector Efficiency []
 
-HVAC,Average,Solar Collector Heat Transfer Rate [W]
+* HVAC,Average,Solar Collector Heat Transfer Rate [W]
 
-HVAC,Average,Solar Collector Heat Gain Rate [W]
+* HVAC,Average,Solar Collector Heat Gain Rate [W]
 
-HVAC,Average,Solar Collector Heat Loss Rate [W]
+* HVAC,Average,Solar Collector Heat Loss Rate [W]
 
-HVAC,Sum,Solar Collector Heat Transfer Energy [J]
+* HVAC,Sum,Solar Collector Heat Transfer Energy [J]
 
 #### Solar Collector Incident Angle Modifier [ ]
 
@@ -1695,27 +1509,27 @@ This is the overall rate of heat loss from the collector   s circulating fluid i
 
 In addition, several surface variables are also relevant for the collector   s surface object (BuildingSurface:Detailed or Shading:Zone:Detailed):
 
-Zone,Average,Surface Outside Face Sunlit Area [m2]
+* Zone,Average,Surface Outside Face Sunlit Area [m2]
 
-Zone,Average,Surface Outside Face Sunlit Fraction []
+* Zone,Average,Surface Outside Face Sunlit Fraction []
 
-Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area [W/m2]
+* Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area [W/m2]
 
-Zone,Average,Surface Outside Face Incident Beam Solar Radiation Rate per Area [W/m2]
+* Zone,Average,Surface Outside Face Incident Beam Solar Radiation Rate per Area [W/m2]
 
-Zone,Average,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area [W/m2]
+* Zone,Average,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area [W/m2]
 
-Zone,Average,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area [W/m2]
+* Zone,Average,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area [W/m2]
 
-Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value []
+* Zone,Average,Surface Outside Face Beam Solar Incident Angle Cosine Value []
 
 
 
 The temperatures at the inlet and outlet nodes and the collector mass flow rate can be monitored using the system node output variables:
 
-HVAC,Average,System Node Temperature [C]
+* HVAC,Average,System Node Temperature [C]
 
-HVAC,Average,System Node Mass Flow Rate [kg/s]
+* HVAC,Average,System Node Mass Flow Rate [kg/s]
 
 
 
@@ -1771,27 +1585,19 @@ Third coefficient of the incident angle modifier equation. This is the second-or
 
 An example of this object follows.
 
+```idf
    SolarCollectorPerformance:FlatPlate,
-
        Alternate Energy Technologies AE-32,   !- Name
-
        2.9646,                                   !- Gross Area {m2}
-
        WATER,                                     !- Test Fluid
-
        0.0000388,                             !- Test Flow Rate {m3/s}
-
        INLET,                                     !- Test Correlation Type
-
        0.691,                                     !- Coefficient 1 of Efficiency Equation {dimensionless}
-
        -3.396,                                   !- Coefficient 2 of Efficiency Equation {W/m2-K}
-
        -0.00193,                               !- Coefficient 3 of Efficiency Equation {W/m2-K2}
-
        -0.1939,                                 !- Coefficient 2 of Incident Angle Modifier
-
        -0.0055;                                 !- Coefficient 3 of Incident Angle Modifier
+```
 
 
 
@@ -1839,23 +1645,17 @@ The maximum flow rate [m3/s] allowed through the collector. This field is option
 
 An example follows.
 
+```idf
 SolarCollector:IntegralCollectorStorage,
-
    Collector 1,                                                       !- Name
-
    ICS Solar Collector,                                       !- Solar Collector Performance Name
-
    ICS Collector Surface,                                   !- Surface Name
-
    OtherSideConditionsModel,                             !- Bottom Surface Boundary Conditions Type
-
    ICS OSCM,                                                             !- Boundary Condition Model Name
-
    Collector Inlet Node,                                     !- Inlet Node Name
-
    Collector Outlet Node,                                   !- Outlet Node Name
-
    0.00005;                                                               !- Maximum Flow Rate (m3/s)
+```
 
 ### SolarCollectorPerformance:IntegralCollectorStorage
 
@@ -1941,45 +1741,28 @@ This input field value is thermal emissivity of the absorber plate.   Default va
 
 An example follows.
 
+```idf
      SolarCollectorPerformance:IntegralCollectorStorage,
-
        ICS Experimental,               !- Name
-
        RectangularTank,                 !- ICS Collector Type
-
        0.37275,                                 !- Gross Area {m2}
-
        0.0195875,                             !- Collector Water Volume {m3}
-
        0.10,                                       !- Bottom Heat Loss Conductance
-
        1.00,                                       !- Side Heat Loss Conductance
-
        0.8,                                         !- Collector Aspect Ratio {dimensionless}
-
        0.08,                                       !- Collector Side Height {m}
-
        5800.0,                                         !- Thermal Mass of Absorber Plate {J/m2K}
-
        1,                                             !- Number of Covers {dimensionless}
-
        0.05,                                       !- Cover Spacing {m}
-
        1.526,                                     !- Refractive Index of Outer Cover {dimensionless}
-
        0.0125,           !- Extinction Coefficient Times Thickness of Outer Cover {dimensionless}
-
        0.88,                                       !- Emmissivity of Outer Cover
-
        1.126,                                     !- Refractive Index of Inner Cover {dimensionless}
-
        0.0126,           !- Extinction Coefficient Times Thickness of Inner Cover {dimensionless}
-
        0.88,                                       !- Emmissivity of Inner Cover {dimensionless}
-
        0.96,                                       !- Absorptance of Absorber Plate {dimensionless}
-
        0.60;                                       !- Emmissivity of Absorber Plate {dimensionless}
+```
 
 
 
@@ -1987,27 +1770,27 @@ An example follows.
 
 The following output variables are reported for the SolarCollector:IntegralCollectorStorage object:
 
-HVAC,Average,Solar Collector Storage Water Temperature [C]
+* HVAC,Average,Solar Collector Storage Water Temperature [C]
 
-HVAC,Average,Solar Collector Absorber Plate Temperature [C]
+* HVAC,Average,Solar Collector Absorber Plate Temperature [C]
 
-HVAC,Average,Solar Collector Overall Top Heat Loss Coefficient [W/m2-C]
+* HVAC,Average,Solar Collector Overall Top Heat Loss Coefficient [W/m2-C]
 
-HVAC,Average,Solar Collector Thermal Efficiency []
+* HVAC,Average,Solar Collector Thermal Efficiency []
 
-HVAC,Average,Solar Collector Storage Heat Transfer Rate [W]
+* HVAC,Average,Solar Collector Storage Heat Transfer Rate [W]
 
-HVAC,Sum,Solar Collector Storage Heat Transfer Energy [J]
+* HVAC,Sum,Solar Collector Storage Heat Transfer Energy [J]
 
-HVAC,Average,Solar Collector Heat Transfer Rate [W]
+* HVAC,Average,Solar Collector Heat Transfer Rate [W]
 
-HVAC,Sum,Solar Collector Heat Transfer Energy [J]
+* HVAC,Sum,Solar Collector Heat Transfer Energy [J]
 
-HVAC,Average,Solar Collector Skin Heat Transfer Rate [W]
+* HVAC,Average,Solar Collector Skin Heat Transfer Rate [W]
 
-HVAC,Sum, Solar Collector Skin Heat Transfer Energy [J]
+* HVAC,Sum, Solar Collector Skin Heat Transfer Energy [J]
 
-HVAC,Average,Solar Collector Transmittance Absorptance Product []
+* HVAC,Average,Solar Collector Transmittance Absorptance Product []
 
 #### Solar Collector Storage Water Temperature [C]
 
@@ -2095,27 +1878,19 @@ This field is used to describe the nominal volume flow rate of the thermal worki
 
 An example of this object follows.
 
+```idf
    SolarCollector:FlatPlate:PhotovoltaicThermal,
-
-       PVT: 1\_Ceiling ,                                             !- Name
-
-       1\_Ceiling ,                                                       !- Surface Name
-
+       PVT: 1_Ceiling ,                                             !- Name
+       1_Ceiling ,                                                       !- Surface Name
        30percentPVThalfArea ,                                 !- Photovoltaic-Thermal Model Performance Name
-
-       PV:ZN\_1\_FLR\_1\_SEC\_1\_Ceiling ,                   !- Photovoltaic Name
-
+       PV:ZN_1_FLR_1_SEC_1_Ceiling ,                   !- Photovoltaic Name
        Air ,                                                                   !- Thermal Working Fluid Type
-
        ,                                                                           !- Water Inlet Node Name
-
        ,                                                                           !- Water Outlet Node Name
-
-       ZN\_1\_FLR\_1\_SEC\_1:Sys\_OAInlet Node ,       !- Air Inlet Node Name
-
-       PVT:ZN\_1\_FLR\_1\_SEC\_1\_Ceiling Outlet ,   !- Air Outlet Node Name
-
+       ZN_1_FLR_1_SEC_1:Sys_OAInlet Node ,       !- Air Inlet Node Name
+       PVT:ZN_1_FLR_1_SEC_1_Ceiling Outlet ,   !- Air Outlet Node Name
        Autosize ;                                                         !- Design Flow Rate
+```
 
 
 
@@ -2123,17 +1898,17 @@ An example of this object follows.
 
 The output variables that are available for flat plate PVT include the following.
 
-HVAC,Average,Generator Produced Thermal Rate [W]
+* HVAC,Average,Generator Produced Thermal Rate [W]
 
-HVAC,Sum,Generator Produced Thermal Energy [J]
+* HVAC,Sum,Generator Produced Thermal Energy [J]
 
-HVAC,Average,Generator PVT Fluid Bypass Status [ ]
+* HVAC,Average,Generator PVT Fluid Bypass Status [ ]
 
-HVAC,Average,Generator PVT Fluid Inlet Temperature [C]
+* HVAC,Average,Generator PVT Fluid Inlet Temperature [C]
 
-HVAC,Average,Generator PVT Fluid Outlet Temperature [C]
+* HVAC,Average,Generator PVT Fluid Outlet Temperature [C]
 
-HVAC,Average,Generator PVT Fluid Mass Flow Rate [kg/s]
+* HVAC,Average,Generator PVT Fluid Mass Flow Rate [kg/s]
 
 #### Generator Produced Thermal Rate [W]
 
@@ -2187,19 +1962,15 @@ This field is used to describe an average value for the total hemispherical emit
 
 An example input object follows.
 
+```idf
    SolarCollectorPerformance:PhotovoltaicThermal:Simple,
-
        20percentEffPVhalfArea ,                 !- Name
-
        0.5 ,                                                       !- Fraction of Surface Area with Active Thermal Collector
-
        Fixed ,                                                   !- Thermal Conversion Efficiency Input Mode Type
-
        0.2 ,                                                       !- Value for Thermal Conversion Efficiency if Fixed
-
          ,                                                             !- Name of Schedule for Thermal Conversion Efficiency
-
        0.84 ;                                                     !- Front Surface Emittance
+```
 
 ### Solar Collector Heating System Plant Connections
 
@@ -2217,15 +1988,11 @@ In order to realize energy savings with a solar heating system, it is best to us
 
 ![](InputOutputReference/media/image340.png)
 
-
-
 Figure 133. Two-Tank Solar Heating System Connection Diagram
 
 Another strategy to consider for solar heating systems is to allow the storage tank to reach a much higher temperature than necessary for the end use. This allows the tank to store more energy from the solar collectors, when it is available. However, for applications such as domestic hot water, it is undesirable and unsafe to supply excessive hot water temperatures at the point of demand. To take advantage of higher storage temperatures, yet still avoid scalding temperatures at the faucet, the hot water leaving the storage tank can be tempered with cold water using a three-way valve to achieve the target temperature. See the TemperingValve object documentation for more details.
 
 A complete two-tank solar heating system with tempering valve is shown below.
-
-
 
 ![](InputOutputReference/media/image341.png)
 
@@ -2261,56 +2028,36 @@ To use the availability managers for the control cases described above, a Availa
 
 
 
+```idf
 AvailabilityManagerAssignmentList,
-
    Collector Loop Availability Manager List,             !- Name
-
    AvailabilityManager:HighTemperatureTurnOff,         !- Availability Manager 1 Object Type
-
    High Temperature Turn Off Availability Manager, !- Availability Manager 1 Name
-
    AvailabilityManager:HighTemperatureTurnOn,           !- Availability Manager 2 Object Type
-
     Low Temperature Turn On Availability Manager,     !- Availability Manager 2 Name
-
    AvailabilityManager:DifferentialThermostat,         !- Availability Manager 3 Object Type
-
    Differential Thermostat Availability Manager;     !- Availability Manager 3 Name
 
 
-
   AvailabilityManager:HighTemperatureTurnOff,           ! For water heater safety
-
    High Temperature Turn Off Availability Manager, !- Name
-
    Water Heater Use Outlet Node,                                     !- Sensor Node Name
-
    60.0;                                                                                     !- Temperature (C)
 
 
-
   AvailabilityManager:HighTemperatureTurnOn,             ! For freeze prevention by recirculation
-
    Low Temperature Turn On Availability Manager,     !- Name
-
    Collector Outlet Node,                                                   !- Sensor Node Name
-
    0.0;                                                                                       !- Temperature (C)
 
 
-
   AvailabilityManager:DifferentialThermostat,           ! For useful heat gain from collector to tank
-
    Differential Thermostat Availability Manager,     !- Name
-
    Collector Outlet Node,                                                   !- Hot Node Name
-
    Water Heater Source Outlet Node,                               !- Cold Node Name
-
    10.0,                                                                                     !- Temperature Difference On Limit (delta C)
-
    2.0;                                                                                       !- Temperature Difference Off Limit (delta C)
-
+```
 
 
 The AvailabilityManager:DifferentialThermostat object must always be the last manager in the availability manager list. See the AvailabilityManagerAssignmentList object documentation for more information.
@@ -2375,117 +2122,122 @@ This field is used to enter the solar absorbtivity of the collector. This surfac
 
 
 
-Color Name of Kynar(R) [[1]](#_ftn1) Paint
+<table class="table table-striped">
+  <tr>
+    <th>Color Name of Kynar(R) [[1]](#_ftn1) Paint</th>
+    <th>Solar Absorptivity</th>
+  </tr>
+  <tr>
+    <td>Black</td>
+    <td>0.94</td>
+  </tr>
+  <tr>
+    <td>Classic Bronze</td>
+    <td>0.91</td>
+  </tr>
+  <tr>
+    <td>Chocolate Brown</td>
+    <td>0.9</td>
+  </tr>
+  <tr>
+    <td>Hartford Green</td>
+    <td>0.9</td>
+  </tr>
+  <tr>
+    <td>Med. Bronze</td>
+    <td>0.89</td>
+  </tr>
+  <tr>
+    <td>Boysenberry</td>
+    <td>0.86</td>
+  </tr>
+  <tr>
+    <td>Rocky Grey</td>
+    <td>0.85</td>
+  </tr>
+  <tr>
+    <td>Regal Blue</td>
+    <td>0.85</td>
+  </tr>
+  <tr>
+    <td>Forest Green</td>
+    <td>0.84</td>
+  </tr>
+  <tr>
+    <td>Hemlock Green</td>
+    <td>0.82</td>
+  </tr>
+  <tr>
+    <td>Slate Blue</td>
+    <td>0.8</td>
+  </tr>
+  <tr>
+    <td>Redwood</td>
+    <td>0.79</td>
+  </tr>
+  <tr>
+    <td>Teal</td>
+    <td>0.79</td>
+  </tr>
+  <tr>
+    <td>Slate Grey</td>
+    <td>0.79</td>
+  </tr>
+  <tr>
+    <td>Patina Green</td>
+    <td>0.77</td>
+  </tr>
+  <tr>
+    <td>Mint Green</td>
+    <td>0.71</td>
+  </tr>
+  <tr>
+    <td>Dove Grey</td>
+    <td>0.69</td>
+  </tr>
+  <tr>
+    <td>Mission Red</td>
+    <td>0.69</td>
+  </tr>
+  <tr>
+    <td>Sierra Tan</td>
+    <td>0.65</td>
+  </tr>
+  <tr>
+    <td>Brite Red</td>
+    <td>0.59</td>
+  </tr>
+  <tr>
+    <td>Rawhide</td>
+    <td>0.57</td>
+  </tr>
+  <tr>
+    <td>Sandstone</td>
+    <td>0.54</td>
+  </tr>
+  <tr>
+    <td>Silversmith</td>
+    <td>0.53</td>
+  </tr>
+  <tr>
+    <td>Coppertone</td>
+    <td>0.51</td>
+  </tr>
+  <tr>
+    <td>Concord Cream</td>
+    <td>0.45</td>
+  </tr>
+  <tr>
+    <td>Ascot White</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>Bone White</td>
+    <td>0.3</td>
+  </tr>
+</table>
 
-Solar Absorptivity
-
-Black
-
-0.94
-
-Classic Bronze
-
-0.91
-
-Chocolate Brown
-
-0.90
-
-Hartford Green
-
-0.90
-
-Med. Bronze
-
-0.89
-
-Boysenberry
-
-0.86
-
-Rocky Grey
-
-0.85
-
-Regal Blue
-
-0.85
-
-Forest Green
-
-0.84
-
-Hemlock Green
-
-0.82
-
-Slate Blue
-
-0.80
-
-Redwood
-
-0.79
-
-Teal
-
-0.79
-
-Slate Grey
-
-0.79
-
-Patina Green
-
-0.77
-
-Mint Green
-
-0.71
-
-Dove Grey
-
-0.69
-
-Mission Red
-
-0.69
-
-Sierra Tan
-
-0.65
-
-Brite Red
-
-0.59
-
-Rawhide
-
-0.57
-
-Sandstone
-
-0.54
-
-Silversmith
-
-0.53
-
-Coppertone
-
-0.51
-
-Concord Cream
-
-0.45
-
-Ascot White
-
-0.40
-
-Bone White
-
-0.30
+([[1]](#_ftnref1) Kynar is a registered trademark of Elf Atochem North America, Inc.)
 
 
 
@@ -2535,53 +2287,32 @@ The remaining fields are used to name the BuildingSurface:Detailed objects that 
 
 An example of this object follows.
 
+```idf
 SolarCollector:UnglazedTranspired,
-
        Shop OA UTSC ZN11,                               ! Name
-
        UTSC OSCM ZN11,                                     ! Boundary Conditions Model Name
-
        HeatingAvailSched ,                             ! Availability Schedule Name
-
        Outside Air Inlet Node ZN11 ,         ! Inlet Node Name
-
        UTSC Outlet Node ZN11 ,                     ! Outlet Node Name
-
        Mixed Air Node ZN11 ,                         ! Setpoint Node Name
-
        ZN11 Node,                                               ! Zone Node Name
-
        ShopFreeHeatingSetpoints,                 ! Free Heating Setpoint Schedule Name
-
        0.0016,                                                     ! Diameter of Perforations in Collector
-
        0.01689,                                                   ! Distance Between Perforations in Collector
-
        0.9,                                                           ! Thermal Emissivity of Collector Surface
-
        0.9,                                                           ! Solar Absorbtivity of Collector Surface
-
        4.0,                                                           ! Effective Overall Height of Collector
-
        0.1,                                                           ! Effective Gap Thickness of Plenum Behind Collector
-
        2.0,                                                           ! Effective Cross Section Area of Plenum Behind Collector
-
        Triangle,                                                 ! Hole Layout Pattern for Pitch
-
        Kutscher1994,                                         ! Heat Exchange Effectiveness Correlation
-
        1.165,                                           ! Ratio of Actual Collector Surface Area to Projected Surface Area
-
        MediumRough ,                                         ! Roughness of Collector
-
        0.00086,                                                   ! Collector Thickness
-
        0.25,                                                         ! Effectiveness for Perforations with Respect to Wind
-
        0.5,                                 ! Discharge Coefficient for Openings with Respect to Buoyancy Driven Flow
-
-       ZN11\_Shop\_1:ExtWall:South;               ! Surface 1 Name
+       ZN11_Shop_1:ExtWall:South;               ! Surface 1 Name
+```
 
 
 
@@ -2589,39 +2320,39 @@ SolarCollector:UnglazedTranspired,
 
 In addition to related output that can be obtained for air nodes and surfaces, these outputs are available for UTSC systems:
 
-HVAC,Average,Solar Collector Heat Exchanger Effectiveness []
+* HVAC,Average,Solar Collector Heat Exchanger Effectiveness []
 
-HVAC,Average,Solar Collector Leaving Air Temperature [C]
+* HVAC,Average,Solar Collector Leaving Air Temperature [C]
 
-HVAC,Average,Solar Collector Outside Face Suction Velocity [m/s]
+* HVAC,Average,Solar Collector Outside Face Suction Velocity [m/s]
 
-HVAC,Average,Solar Collector Surface Temperature [C]
+* HVAC,Average,Solar Collector Surface Temperature [C]
 
-HVAC,Average,Solar Collector Plenum Air Temperature [C]
+* HVAC,Average,Solar Collector Plenum Air Temperature [C]
 
-HVAC,Average,Solar Collector Sensible Heating Rate [W]
+* HVAC,Average,Solar Collector Sensible Heating Rate [W]
 
-Zone,Meter,SolarAir:Facility [J]
+* Zone,Meter,SolarAir:Facility [J]
 
-Zone,Meter,SolarAir:HVAC [J]
+* Zone,Meter,SolarAir:HVAC [J]
 
-Zone,Meter,HeatProduced:SolarAir [J]
+* Zone,Meter,HeatProduced:SolarAir [J]
 
-HVAC,Sum,Solar Collector Sensible Heating Energy [J]
+* HVAC,Sum,Solar Collector Sensible Heating Energy [J]
 
-HVAC,Average,Solar Collector Natural Ventilation Air Change Rate [ACH]
+* HVAC,Average,Solar Collector Natural Ventilation Air Change Rate [ACH]
 
-HVAC,Average,Solar Collector Natural Ventilation Mass Flow Rate [kg/s]
+* HVAC,Average,Solar Collector Natural Ventilation Mass Flow Rate [kg/s]
 
-HVAC,Average,Solar Collector Wind Natural Ventilation Mass Flow Rate [kg/s]
+* HVAC,Average,Solar Collector Wind Natural Ventilation Mass Flow Rate [kg/s]
 
-HVAC,Average,Solar Collector Buoyancy Natural Ventilation Mass Flow Rate [kg/s]
+* HVAC,Average,Solar Collector Buoyancy Natural Ventilation Mass Flow Rate [kg/s]
 
-HVAC,Average,Solar Collector Incident Solar Radiation [W/m2]
+* HVAC,Average,Solar Collector Incident Solar Radiation [W/m2]
 
-HVAC,Average,Solar Collector System Efficiency []
+* HVAC,Average,Solar Collector System Efficiency []
 
-HVAC,Average,Solar Collector Surface Efficiency []
+* HVAC,Average,Solar Collector Surface Efficiency []
 
 
 
@@ -2725,49 +2456,30 @@ This field contains the name of an air node for a thermal zone that is ultimatel
 
 An example of this object follows.
 
+```idf
    SolarCollector:UnglazedTranspired:Multisystem,
-
        OFFICE MultiSystem OA UTSC ,   ! Solar Collector Name
-
        Outside Air Inlet Node ZN1,     ! Outdoor Air System 1 Collector Inlet Node
-
        UTSC Outlet Node ZN1,                 ! Outdoor Air System 1 Collector Outlet Node
-
        Mixed Air Node ZN1,                     ! Outdoor Air System 1 Mixed Air Node
-
        ZN1 Node,                                         ! Outdoor Air System 1 Zone Node
-
        Outside Air Inlet Node ZN2,     ! Outdoor Air System 2 Collector Inlet Node
-
        UTSC Outlet Node ZN2,                 ! Outdoor Air System 2 Collector Outlet Node
-
        Mixed Air Node ZN2,                     ! Outdoor Air System 2 Mixed Air Node
-
        ZN2 Node,                                         ! Outdoor Air System 2 Zone Node
-
        Outside Air Inlet Node ZN3,     ! Outdoor Air System 3 Collector Inlet Node
-
        UTSC Outlet Node ZN3,                 ! Outdoor Air System 3 Collector Outlet Node
-
        Mixed Air Node ZN3,                     ! Outdoor Air System 3 Mixed Air Node
-
        ZN3 Node,                                         ! Outdoor Air System 3 Zone Node
-
        Outside Air Inlet Node ZN4,     ! Outdoor Air System 4 Collector Inlet Node
-
        UTSC Outlet Node ZN4,                 ! Outdoor Air System 4 Collector Outlet Node
-
        Mixed Air Node ZN4,                     ! Outdoor Air System 4 Mixed Air Node
-
        ZN4 Node,                                         ! Outdoor Air System 4 Zone Node
-
        Outside Air Inlet Node ZN5,     ! Outdoor Air System 5 Collector Inlet Node
-
        UTSC Outlet Node ZN5,                 ! Outdoor Air System 5 Collector Outlet Node
-
        Mixed Air Node ZN5,                     ! Outdoor Air System 5 Mixed Air Node
-
        ZN5 Node;                                         ! Outdoor Air System 5 Zone Node
+```
 
 
 
@@ -2888,93 +2600,65 @@ This field is optional.   If a Zone is named in the previous field and pump loss
 
 Examples of this object in the IDF follow.
 
+```idf
    Pump:VariableSpeed,
-
        HW Circ Pump,                   !- Name
-
        HW Supply Inlet Node,   !- Inlet Node Name
-
        HW Pump Outlet Node,     !- Outlet Node Name
-
        autosize,                           !- Rated Flow Rate {m3/s}
-
        179352,                               !- Rated Pump Head {Pa}
-
        autosize,                           !- Rated Power Consumption {W}
-
        0.9,                                     !- Motor Efficiency
-
        0.0,                                     !- Fraction of Motor Inefficiencies to Fluid Stream
-
        0,                                         !- Coefficient 1 of the Part Load Performance Curve
-
        1,                                         !- Coefficient 2 of the Part Load Performance Curve
-
        0,                                         !- Coefficient 3 of the Part Load Performance Curve
-
        0,                                         !- Coefficient 4 of the Part Load Performance Curve
-
        0,                                         !- Minimum Flow Rate {m3/s}
-
        Intermittent;                   !- Pump Control Type
-
 
 
    Pump:VariableSpeed,
-
        Circ Pump,                         !- Name
-
        CW Supply Inlet Node,   !- Inlet Node Name
-
        CW Pump Outlet Node,     !- Outlet Node Name
-
        .0011,                                 !- Rated Flow Rate {m3/s}
-
        300000,                               !- Rated Pump Head {Pa}
-
        500,                                     !- Rated Power Consumption {W}
-
        .87,                                     !- Motor Efficiency
-
        0.0,                                     !- Fraction of Motor Inefficiencies to Fluid Stream
-
        0,                                         !- Coefficient 1 of the Part Load Performance Curve
-
        1,                                         !- Coefficient 2 of the Part Load Performance Curve
-
        0,                                         !- Coefficient 3 of the Part Load Performance Curve
-
        0,                                         !- Coefficient 4 of the Part Load Performance Curve
-
        0,                                         !- Minimum Flow Rate {m3/s}
-
        Intermittent;                   !- Pump Control Type
-
+```
 
 
 ### Variable Speed Pump Outputs
 
-HVAC,Average,Pump Electric Power [W]
+* HVAC,Average,Pump Electric Power [W]
 
-HVAC,Sum,Pump Electric Energy [J]
+* HVAC,Sum,Pump Electric Energy [J]
 
-HVAC,Average,Pump Shaft Power [W]
+* HVAC,Average,Pump Shaft Power [W]
 
-HVAC,Average,Pump Fluid Heat Gain Rate [W]
+* HVAC,Average,Pump Fluid Heat Gain Rate [W]
 
-HVAC,Sum,Pump Fluid Heat Gain Energy [J]
+* HVAC,Sum,Pump Fluid Heat Gain Energy [J]
 
-HVAC,Average,Pump Outlet Temperature [C]
+* HVAC,Average,Pump Outlet Temperature [C]
 
-HVAC,Average,Pump Mass Flow Rate [kg/s]
+* HVAC,Average,Pump Mass Flow Rate [kg/s]
 
-HVAC,Average,Pump Zone Total Heating Rate [W]
+* HVAC,Average,Pump Zone Total Heating Rate [W]
 
-HVAC,Sum,Pump Zone Total Heating Energy [J]
+* HVAC,Sum,Pump Zone Total Heating Energy [J]
 
-HVAC,Average,Pump Zone Convective Heating Rate [W]
+* HVAC,Average,Pump Zone Convective Heating Rate [W]
 
-HVAC,Average,Pump Zone Radiative Heating Rate [W]
+* HVAC,Average,Pump Zone Radiative Heating Rate [W]
 
 #### Pump Electric Power [W]
 
@@ -3098,51 +2782,44 @@ This field is optional.   If a Zone is named in the previous field and pump loss
 
 An example of this object follows.
 
+```idf
 Pump:ConstantSpeed,
-
              Circ Pump,                         !- Name
-
              CW Supply Inlet Node,   !- Inlet Node Name
-
              PumpChiller Node,           !- Outlet Node Name
-
              0.0011,                               !- Rated Flow Rate
-
              300000,                               !- Rated Pump Head
-
              700,                                     !- Rated Power Consumption
-
              0.87,                                   !- Motor Efficiency
-
              0.0,                                     !- Fraction of Motor Inefficiencies to Fluid Stream
-
              Intermittent;                   !- Pump Control Type
+```
 
 
 
 ### Constant Speed Pump Outputs
 
-HVAC,Average,Pump Electric Power [W]
+* HVAC,Average,Pump Electric Power [W]
 
-HVAC,Sum,Pump Electric Energy [J]
+* HVAC,Sum,Pump Electric Energy [J]
 
-HVAC,Average,Pump Shaft Power [W]
+* HVAC,Average,Pump Shaft Power [W]
 
-HVAC,Average,Pump Fluid Heat Gain Rate [W]
+* HVAC,Average,Pump Fluid Heat Gain Rate [W]
 
-HVAC,Sum,Pump Fluid Heat Gain Energy [J]
+* HVAC,Sum,Pump Fluid Heat Gain Energy [J]
 
-HVAC,Average,Pump Outlet Temperature [C]
+* HVAC,Average,Pump Outlet Temperature [C]
 
-HVAC,Average,Pump Mass Flow Rate [kg/s]
+* HVAC,Average,Pump Mass Flow Rate [kg/s]
 
-HVAC,Average,Pump Zone Total Heating Rate [W]
+* HVAC,Average,Pump Zone Total Heating Rate [W]
 
-HVAC,Sum,Pump Zone Total Heating Energy [J]
+* HVAC,Sum,Pump Zone Total Heating Energy [J]
 
-HVAC,Average,Pump Zone Convective Heating Rate [W]
+* HVAC,Average,Pump Zone Convective Heating Rate [W]
 
-HVAC,Average,Pump Zone Radiative Heating Rate [W]
+* HVAC,Average,Pump Zone Radiative Heating Rate [W]
 
 
 
@@ -3254,85 +2931,62 @@ This field is optional.   If a Zone is named in the previous field and pump loss
 
 Examples of this object in the IDF follow.
 
+```idf
 Pump:VariableSpeed:Condensate,
-
        Steam Boiler Plant Steam Circ Pump,                 !- Name
-
        Steam Boiler Plant Steam Supply Inlet Node, !- Inlet Node Name
-
        Steam Boiler Plant Steam Pump Outlet Node,   !- Outlet Node Name
-
        0.36,                               !- Rated Flow Rate {m3/s}
-
        179352,                           !- Rated Pump Head {Pa}
-
        400,                                 !- Rated Power Consumption {W}
-
        0.9,                                 !- Motor Efficiency
-
        0.0,                                 !- Fraction of Motor Inefficiencies to Fluid Stream
-
        0,                                     !- Coefficient 1 of the Part Load Performance Curve
-
        1,                                     !- Coefficient 2 of the Part Load Performance Curve
-
        0,                                     !- Coefficient 3 of the Part Load Performance Curve
-
        0;                                     !- Coefficient 4 of the Part Load Performance Curve
-
 
 
 Pump:VariableSpeed:Condensate,
-
        Steam Boiler Plant Steam Circ Pump,                 !- Name
-
        Steam Boiler Plant Steam Supply Inlet Node, !- Inlet Node Name
-
        Steam Boiler Plant Steam Pump Outlet Node,   !- Outlet Node Name
-
        0.36,                               !- Rated Flow Rate {m3/s}
-
        179352,                           !- Rated Pump Head {Pa}
-
        autosize,                       !- Rated Power Consumption {W}
-
        0.9,                                 !- Motor Efficiency
-
        0.0,                                 !- Fraction of Motor Inefficiencies to Fluid Stream
-
        0,                                     !- Coefficient 1 of the Part Load Performance Curve
-
        1,                                     !- Coefficient 2 of the Part Load Performance Curve
-
        0,                                     !- Coefficient 3 of the Part Load Performance Curve
-
        0;                                     !- Coefficient 4 of the Part Load Performance Curve
+```
 
 
 
 ### Variable Speed Condensate Pump Outputs
 
-HVAC,Average,Pump Electric Power [W]
+* HVAC,Average,Pump Electric Power [W]
 
-HVAC,Sum,Pump Electric Energy [J]
+* HVAC,Sum,Pump Electric Energy [J]
 
-HVAC,Average,Pump Shaft Power [W]
+* HVAC,Average,Pump Shaft Power [W]
 
-HVAC,Average,Pump Fluid Heat Gain Rate [W]
+* HVAC,Average,Pump Fluid Heat Gain Rate [W]
 
-HVAC,Sum,Pump Fluid Heat Gain Energy [J]
+* HVAC,Sum,Pump Fluid Heat Gain Energy [J]
 
-HVAC,Average,Pump Outlet Temperature [C]
+* HVAC,Average,Pump Outlet Temperature [C]
 
-HVAC,Average,Pump Mass Flow Rate [kg/s]
+* HVAC,Average,Pump Mass Flow Rate [kg/s]
 
-HVAC,Average, Pump Zone Total Heating Rate [W]
+* HVAC,Average, Pump Zone Total Heating Rate [W]
 
-HVAC, Sum, Pump Zone Total Heating Energy [J]
+* HVAC, Sum, Pump Zone Total Heating Energy [J]
 
-HVAC, Average, Pump Zone Convective Heating Rate [W]
+* HVAC, Average, Pump Zone Convective Heating Rate [W]
 
-HVAC, Average, Pump Zone Radiative Heating Rate [W]
+* HVAC, Average, Pump Zone Radiative Heating Rate [W]
 
 
 
@@ -3438,57 +3092,48 @@ This field is optional.   If a Zone is named in the previous field and pump loss
 
 An example for constant speed pump bank follows.
 
+```idf
    HeaderedPumps:ConstantSpeed,
-
        Chilled Water Headered Pumps,   !- Name
-
        CW Supply Inlet Node,                   !- Inlet Node Name
-
        CW Pumps Outlet Node,                   !- Outlet Node Name
-
        autosize,                                           !- Total Rated Flow Rate
-
        2,                                                         !- Number of Pumps in Bank
-
        SEQUENTIAL,                                       !- Flow Sequencing Control Scheme
-
        179352,                                               !- Rated Pump Head
-
        autosize,                                           !- Rated Power Consumption
-
        0.9,                                                     !- Motor Efficiency
-
        0.0,                                                     !- Fraction of Motor Inefficiencies to Fluid Stream
-
        INTERMITTENT,                                   !- Pump Control Type
-
        CoolingPumpAvailSched;                 !- Pump Flow Rate Schedule Name
+```
+
 
 ### Constant Speed Headered Pumps Outputs
 
-HVAC,Average,Pump Electric Power [W]
+* HVAC,Average,Pump Electric Power [W]
 
-HVAC,Sum, Pump Electric Energy [J]
+* HVAC,Sum, Pump Electric Energy [J]
 
-HVAC,Average,Pump Shaft Power [W]
+* HVAC,Average,Pump Shaft Power [W]
 
-HVAC,Average, Pump Fluid Heat Gain Rate [W]
+* HVAC,Average, Pump Fluid Heat Gain Rate [W]
 
-HVAC,Sum, Pump Fluid Heat Gain Energy [J]
+* HVAC,Sum, Pump Fluid Heat Gain Energy [J]
 
-HVAC,Average, Pump Outlet Temperature [C]
+* HVAC,Average, Pump Outlet Temperature [C]
 
-HVAC,Average,Pump Mass Flow Rate [kg/s]
+* HVAC,Average,Pump Mass Flow Rate [kg/s]
 
-HVAC,Average,Number of Pumps Operating []
+* HVAC,Average,Number of Pumps Operating []
 
-HVAC, Average, Pump Zone Total Heating Rate [W]
+* HVAC, Average, Pump Zone Total Heating Rate [W]
 
-HVAC, Sum, Pump Zone Total Heating Energy [J]
+* HVAC, Sum, Pump Zone Total Heating Energy [J]
 
-HVAC, Average, Pump Zone Convective Heating Rate [W]
+* HVAC, Average, Pump Zone Convective Heating Rate [W]
 
-HVAC, Average, Pump Zone Radiative Heating Rate [W]
+* HVAC, Average, Pump Zone Radiative Heating Rate [W]
 
 
 
@@ -3622,67 +3267,53 @@ This field is optional.   If a Zone is named in the previous field and pump loss
 
 An example of this object follows.
 
+```idf
    HeaderedPumps:VariableSpeed,
-
        Chilled Water Headered Pumps, !- Name
-
        CW Supply Inlet Node,       !- Inlet Node Name
-
        CW Pumps Outlet Node,       !- Outlet Node Name
-
        autosize,                               !- Total Rated Flow Rate {m3/s}
-
        2,                                             !- Number of Pumps in Bank
-
        SEQUENTIAL,                           !- Flow Sequencing Control Scheme
-
        179352,                                   !- Rated Pump Head {Pa}
-
        autosize,                               !- Rated Power Consumption {W}
-
        0.9,                                         !- Motor Efficiency
-
        0.0,                                         !- Fraction of Motor Inefficiencies to Fluid Stream
-
        0,                                             !- Coefficient 1 of the Part Load Performance Curve
-
        1,                                             !- Coefficient 2 of the Part Load Performance Curve
-
        0,                                             !- Coefficient 3 of the Part Load Performance Curve
-
        0,                                             !- Coefficient 4 of the Part Load Performance Curve
-
        0.1,                                         !- Minimum Flow Rate {m3/s}
-
        INTERMITTENT,                       !- Pump Control Type
-
        CoolingPumpAvailSched;     !- Pump Flow Rate Schedule Name
+```
+
 
 ### Variable Speed Headered Pumps Outputs
 
-HVAC,Average,Pump Electric Power [W]
+* HVAC,Average,Pump Electric Power [W]
 
-HVAC,Sum, Pump Electric Energy [J]
+* HVAC,Sum, Pump Electric Energy [J]
 
-HVAC,Average,Pump Shaft Power [W]
+* HVAC,Average,Pump Shaft Power [W]
 
-HVAC,Average, Pump Fluid Heat Gain Rate [W]
+* HVAC,Average, Pump Fluid Heat Gain Rate [W]
 
-HVAC,Sum, Pump Fluid Heat Gain Energy [J]
+* HVAC,Sum, Pump Fluid Heat Gain Energy [J]
 
-HVAC,Average, Pump Outlet Temperature [C]
+* HVAC,Average, Pump Outlet Temperature [C]
 
-HVAC,Average,Pump Mass Flow Rate [kg/s]
+* HVAC,Average,Pump Mass Flow Rate [kg/s]
 
-HVAC,Average,Number of pumps operating []
+* HVAC,Average,Number of pumps operating []
 
-HVAC, Average, Pump Zone Total Heating Rate [W]
+* HVAC, Average, Pump Zone Total Heating Rate [W]
 
-HVAC, Sum, Pump Zone Total Heating Energy [J]
+* HVAC, Sum, Pump Zone Total Heating Energy [J]
 
-HVAC, Average, Pump Zone Convective Heating Rate [W]
+* HVAC, Average, Pump Zone Convective Heating Rate [W]
 
-HVAC, Average, Pump Zone Radiative Heating Rate [W]
+* HVAC, Average, Pump Zone Radiative Heating Rate [W]
 
 
 
@@ -3727,12 +3358,6 @@ This output is the thermal loss from the pump to the surrounding Zone in the for
 This output is the thermal loss from the pump to the surrounding Zone in the form of thermal radiation gains directly to the inside face of the zone   s surfaces. It is only available if a Zone was named in the pump input.
 
 
-
-
-
-------------------------------------------------------------------------
-
-[[1]](#_ftnref1) Kynar is a registered trademark of Elf Atochem North America, Inc.
 
 
 
@@ -3821,85 +3446,64 @@ This field is optional. It is used to describe where condensate from the coil is
 
 Examples when auto sized in an IDF are as below:
 
+```idf
 Coil:Cooling:Water,
-
        Main Cooling Coil 1,       !- Coil Name
-
        CoolingCoilAvailSched,   !-Availability Schedule Name
-
        autosize,         !- Design Water Volume Flow Rate of Coil {m3/s}
-
        autosize,         !- Design Air Flow Rate of Coil {m3/s}
-
        autosize,         !- Design Inlet Water Temperature {C}
-
        autosize,         !- Design Inlet Air Temperature {C}
-
        autosize,         !- Design Outlet Air Temperature {C}
-
        autosize,         !- Design Inlet Air Humidity Ratio(kgWater/kgDryAir)
-
        autosize,         !- Design Outlet Air Humidity Ratio(kgWater/kgDryAir)
-
-       Main Cooling Coil 1 Water Inlet Node,     !- Coil\_Water\_Inlet\_Node
-
-       Main Cooling Coil 1 Water Outlet Node,   !- Coil\_Water\_Outlet\_Node
-
-       Mixed Air Node 1,                                             !- Coil\_Air\_Inlet\_Node
-
-       Main Cooling Coil 1 Outlet Node;               !- Coil\_Air\_Outlet\_Node
+       Main Cooling Coil 1 Water Inlet Node,     !- Coil_Water_Inlet_Node
+       Main Cooling Coil 1 Water Outlet Node,   !- Coil_Water_Outlet_Node
+       Mixed Air Node 1,                                             !- Coil_Air_Inlet_Node
+       Main Cooling Coil 1 Outlet Node;               !- Coil_Air_Outlet_Node
+```
 
 Examples when values (hard-sized) are input in an IDF are as below:
 
 
 
+```idf
 Coil:Cooling:Water,
-
        Main Cooling Coil 1,       !- Coil Name
-
        CoolingCoilAvailSched,   !-Availability Schedule Name
-
        0.0022,       !- Design Water Volume Flow Rate of Coil {m3/s}
-
        1.45,           !- Design Air Flow Rate of Coil {m3/s}
-
        6.1,             !- Design Inlet Water Temperature {C}
-
        25,               !- Design Inlet Air Temperature {C}
-
        10,               !- Design Outlet Air Temperature {C}
-
        0.012,         !- Design Inlet Air Humidity Ratio
-
        0.008,         !- Design Outlet Air Humidity Ratio
+       Main Cooling Coil 1 Water Inlet Node,     !- Coil_Water_Inlet_Node
+       Main Cooling Coil 1 Water Outlet Node,   !- Coil_Water_Outlet_Node
+       Mixed Air Node 1,                                             !- Coil_Air_Inlet_Node
+       Main Cooling Coil 1 Outlet Node;               !- Coil_Air_Outlet_Node
+```
 
-       Main Cooling Coil 1 Water Inlet Node,     !- Coil\_Water\_Inlet\_Node
-
-       Main Cooling Coil 1 Water Outlet Node,   !- Coil\_Water\_Outlet\_Node
-
-       Mixed Air Node 1,                                             !- Coil\_Air\_Inlet\_Node
-
-       Main Cooling Coil 1 Outlet Node;               !- Coil\_Air\_Outlet\_Node
 
 ### Cooling Coil (Water) Outputs
 
 Following are the list of possible output output variables from this coil model:
 
-HVAC,Sum,Cooling Coil Total Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Total Cooling Energy [J]
 
-HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Total Cooling Rate [W]
+* HVAC,Average,Cooling Coil Total Cooling Rate [W]
 
-HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
+* HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
 
-HVAC,Average,Cooling Coil Wetted Area Fraction []
+* HVAC,Average,Cooling Coil Wetted Area Fraction []
 
-HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
+* HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
 
-HVAC,Sum,Cooling Coil Source Side Heat Transfer Energy [J]
+* HVAC,Sum,Cooling Coil Source Side Heat Transfer Energy [J]
 
-HVAC,Sum,Cooling Coil Condensate Volume [m3]
+* HVAC,Sum,Cooling Coil Condensate Volume [m3]
 
 #### Cooling Coil Total Cooling Energy (J)
 
@@ -4015,41 +3619,32 @@ where,
 
 An example input of the object is:
 
+```idf
 Coil:Heating:Water,
-
        SPACE3-1 Zone Coil,           !- Coil Name
-
        ReheatCoilAvailSched,       !- Availability Schedule Name
-
        ,                                               !- UA of the Coil {W/K}
-
        ,                                               !- Max Water Flow Rate of Coil {m3/s}
-
-       SPACE3-1 Zone Coil Water In Node,   !- Coil\_Water\_Inlet\_Node
-
-       SPACE3-1 Zone Coil Water Out Node,   !- Coil\_Water\_Outlet\_Node
-
-       SPACE3-1 Zone Coil Air In Node,   !- Coil\_Air\_Inlet\_Node
-
-       SPACE3-1 In Node,               !- Coil\_Air\_Outlet\_Node
-
+       SPACE3-1 Zone Coil Water In Node,   !- Coil_Water_Inlet_Node
+       SPACE3-1 Zone Coil Water Out Node,   !- Coil_Water_Outlet_Node
+       SPACE3-1 Zone Coil Air In Node,   !- Coil_Air_Inlet_Node
+       SPACE3-1 In Node,               !- Coil_Air_Outlet_Node
        NominalCapacity,                 !- Coil Performance Input Method
-
        10000.,                                   !- Gross Rated Heating Capacity
-
        0.55;                                       !- Rated Ratio for Air and Water Convection
+```
 
 
 
 ### Heating Coil (Water) Outputs
 
-HVAC,Sum, Heating Coil Heating Energy [J]
+* HVAC,Sum, Heating Coil Heating Energy [J]
 
-HVAC,Sum,Heating Coil Source Side Heat Transfer Energy [J]
+* HVAC,Sum,Heating Coil Source Side Heat Transfer Energy [J]
 
-HVAC,Average,Heating Coil Heating Rate [W]
+* HVAC,Average,Heating Coil Heating Rate [W]
 
-HVAC,Average, Heating Coil U Factor Times Area Value [W/K]
+* HVAC,Average, Heating Coil U Factor Times Area Value [W/K]
 
 #### Heating Coil Heating Energy [J]
 
@@ -4117,67 +3712,47 @@ If the coil is used in the air loop simulation and is temperature controlled usi
 
 An example of a Steam Coil input statement (one each for Temperature Controlled and Load Controlled) from an IDF is given below:
 
+```idf
 Coil:Heating:Steam,
-
        VAV SYS 1 Heating Coil,                   !- Coil Name
-
        ReheatCoilAvailSched,                       !- Availability Schedule Name
-
        0.06,                                                       !- Max Steam volume Flow rate
-
        5.0,                                                         !- Deg of Subcooling Desired
-
        15.0,                                                        !- Loop Subcooling Desired
-
        VAV SYS 1 Heating Coil Steam Inlet,   !- Coil Steam Inlet Node
-
        VAV SYS 1 Heating Coil Steam Outlet, !- Coil Water Outlet Node
-
        VAV SYS 1 Cooling Coil Outlet,       !- Coil Air Inlet Node
-
        VAV SYS 1 Heating Coil Outlet,       !- Coil Air Outlet Node
-
        TemperatureSetPointControl,             !- field Coil Control Type
-
        VAV SYS 1 Heating Coil Outlet;       !- field Coil Temp Setpoint Node
 
 
-
 Coil:Heating:Steam,
-
        SPACE1-1 Reheat Coil,                             !- Coil Name
-
        ReheatCoilAvailSched,                             !- Availability Schedule Name
-
        autosize,                                                      !- Max Steam volume Flow rate
-
        5.0,                                                                !- Deg of Subcooling Desired
-
        15.0,                                                              !- Loop Subcooling Desired
-
        SPACE1-1 Reheat Coil Steam Inlet,     !- Coil Steam Inlet Node
-
        SPACE1-1 Reheat Coil Steam Outlet,   !- Coil Water Outlet Node
-
        SPACE1-1 Damper Outlet,                         !- Coil Air Inlet Node
-
        SPACE1-1 Supply Inlet,   !- Coil Air Outlet Node
-
        ZoneLoadControl;         !- field Coil Control Type
+```
 
 ### Heating Coil (Steam) Outputs:
 
-HVAC,Sum, Heating Coil Heating Energy [J]
+* HVAC,Sum, Heating Coil Heating Energy [J]
 
-HVAC,Average,Total Steam Coil Heating Rate [W]
+* HVAC,Average,Total Steam Coil Heating Rate [W]
 
-HVAC,Average,Heating Coil Steam Trap Loss Rate [W]
+* HVAC,Average,Heating Coil Steam Trap Loss Rate [W]
 
-HVAC, Average, Heating Coil Steam Inlet Temperature [C]
+* HVAC, Average, Heating Coil Steam Inlet Temperature [C]
 
-HVAC, Average, Heating Coil Steam Outlet Temperature [C]
+* HVAC, Average, Heating Coil Steam Outlet Temperature [C]
 
-HVAC, Average, Heating Coil Steam Mass Flow Rate [kg/s]
+* HVAC, Average, Heating Coil Steam Mass Flow Rate [kg/s]
 
 #### Heating Coil Heating Energy [J]
 
@@ -4233,6 +3808,7 @@ If the coil is used in the air loop simulation and is temperature controlled usi
 
 An example of IDF usage:
 
+```idf
 Coil:Heating:Electric,
    AHU Reheater,                     !- Name
    2,                                           !- Availability Schedule Name
@@ -4241,16 +3817,17 @@ Coil:Heating:Electric,
    DOAS Supply Fan Outlet, !- Air Inlet Node Name
    AHU Reheater Outlet,       !- Air Outlet Node Name
    AHU Reheater Outlet;       !- Temperature Setpoint Node Name
+```
 
 ### Heating Coil (Electric) Outputs
 
-HVAC,Sum,Heating Coil Air Heating Energy [J]
+* HVAC,Sum,Heating Coil Air Heating Energy [J]
 
-HVAC,Average,Heating Coil Air Heating Rate [W]
+* HVAC,Average,Heating Coil Air Heating Rate [W]
 
-HVAC,Sum,Heating Coil Electric Energy [J]
+* HVAC,Sum,Heating Coil Electric Energy [J]
 
-HVAC,Average,Heating Coil Electric Power [W]
+* HVAC,Average,Heating Coil Electric Power [W]
 
 #### Heating Coil Air Heating Energy (J)
 
@@ -4326,41 +3903,31 @@ This is stage 4 capacity of the coil (W). This field is autosizable.
 
 An example in IDF form:
 
+```idf
    Coil:Heating:Electric:MultiStage,
-
        Heat Pump Heating Coil 1,                 !- Name
-
        FanAndCoilAvailSched,                         !- Availability Schedule Name
-
        Heating Coil Air Inlet Node,           !- Air Inlet Node Name
-
        SuppHeating Coil Air Inlet Node,   !- Air Outlet Node Name
-
        ,                                               !- Temp Setpoint node name
-
        3,                                             !- Number of Stages
-
        1,                                             !- Stage 1 Efficiency
-
        Autosize,                               !- Stage 1 Nominal Capacity {W}
-
        1,                                             !- Stage 2 Efficiency
-
        Autosize,                               !- Stage 2 Nominal Capacity {W}
-
        1,                                             !- Stage 3 Efficiency
-
        Autosize;                               !- Stage 3 Nominal Capacity {W}
+```
 
 ### Heating Coil (Electric Multistage) Outputs
 
-HVAC,Sum,Heating Coil Energy[J]
+* HVAC,Sum,Heating Coil Energy[J]
 
-HVAC,Average,Heating Coil Rate[W]
+* HVAC,Average,Heating Coil Rate[W]
 
-HVAC,Sum,Heating Coil Electric Consumption [J]
+* HVAC,Sum,Heating Coil Electric Consumption [J]
 
-HVAC,Average,Heating Coil Electric Power [W]
+* HVAC,Average,Heating Coil Electric Power [W]
 
 #### Heating Coil Energy (J)
 
@@ -4412,19 +3979,19 @@ This alpha field defines the name of the HVAC system node to which the desuperhe
 
 This alpha field defines the source of superheated refrigerant gas from which the desuperheater heating coil recovers energy. Valid choices are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-Coil:Cooling:DX:TwoSpeed
+* Coil:Cooling:DX:TwoSpeed
 
-Coil:Cooling:DX:TwoStageWithHumidityControlMode
+* Coil:Cooling:DX:TwoStageWithHumidityControlMode
 
-Refrigeration:CompressorRack
+* Refrigeration:CompressorRack
 
-Refrigeration:Condenser:AirCooled
+* Refrigeration:Condenser:AirCooled
 
-Refrigeration:Condenser:EvaporativeCooled
+* Refrigeration:Condenser:EvaporativeCooled
 
-Refrigeration:Condenser:WaterCooled
+* Refrigeration:Condenser:WaterCooled
 
 When the heating coil source is a DX Coil, the air loop   s supply air fan control mode may be auto fan (cycling fan cycling coil), constant fan, or variable volume. When the heating source is a compressor rack for refrigerated cases or a refrigeration condenser, the supply air fan control mode should be either variable volume or constant fan.
 
@@ -4446,47 +4013,40 @@ This optional numeric field defines the parasitic electric load (in Watts) due t
 
 Following is an example input for a desuperheater heating coil.
 
+```idf
 Coil:Heating:Desuperheater,
-
    DesuperheaterCoil,                                   !- Coil Name
-
    FanAndCoilAvailSched,                             !- Availability Schedule
-
    0.3,                                                               !- Heat Reclaim Recovery Efficiency
-
    Cooling Coil Air Outlet Node,             !- Coil Air Inlet Node Name
-
    Air Loop Outlet Node,                             !- Coil Air Outlet Node Name
-
    Coil:Cooling:DX:SingleSpeed, !- Heating Source Type
-
    Furnace ACDXCoil 1,                                 !- Heating Source Name
-
    ,                                                                     !- Coil Temperature Setpoint Node Name
-
    0.1;                                                               !- Parasitic Electric Load {W}
+```
 
 ### Heating Coil (Desuperheater) Outputs
 
-HVAC,Average,Heating Coil Rate [W]
+* HVAC,Average,Heating Coil Rate [W]
 
-HVAC,Sum,Heating Coil Energy [J]
+* HVAC,Sum,Heating Coil Energy [J]
 
-HVAC,Average,Heating Coil Electric Power [W]
+* HVAC,Average,Heating Coil Electric Power [W]
 
-HVAC,Sum,Heating Coil Electric Consumption [J]
+* HVAC,Sum,Heating Coil Electric Consumption [J]
 
-HVAC,Average,Heating Coil Runtime Fraction []
+* HVAC,Average,Heating Coil Runtime Fraction []
 
-HVAC,Average,Heating Coil Air Heating Rate [W]
+* HVAC,Average,Heating Coil Air Heating Rate [W]
 
-HVAC,Sum,Heating Coil Air Heating Energy [J]
+* HVAC,Sum,Heating Coil Air Heating Energy [J]
 
-HVAC,Average,Heating Coil Electric Power [W]
+* HVAC,Average,Heating Coil Electric Power [W]
 
-HVAC,Sum,Heating Coil Electric Energy [J]
+* HVAC,Sum,Heating Coil Electric Energy [J]
 
-HVAC,Average,Heating Coil Runtime Fraction
+* HVAC,Average,Heating Coil Runtime Fraction
 
 #### Heating Coil Air Heating Rate [W]
 
@@ -4556,53 +4116,46 @@ Following is an example input for a Coil:Cooling:DX:VariableRefrigerantFlow obje
 
 
 
+```idf
 COIL:Cooling:DX:VariableRefrigerantFlow,
-
        TU1 VRF DX Cooling Coil, !- Coil Name
-
        VRFAvailSched,                     !- Availability Schedule Name
-
        autosize,                               !- Gross Rated Total Cooling Capacity {W}
-
        autosize,                               !- Gross Rated Sensible Heat Ratio
-
        autosize,                               !- Rated Air Flow Rate {m3/s}
-
        VRFTUCoolCapFT,                   !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name
-
        VRFACCoolCapFFF,                 !- Cooling Capacity Modifier Curve Function of Flow Fraction Name
-
        TU1 VRF DX CCoil Inlet Node,   !- Coil Air Inlet Node
-
        TU1 VRF DX CCoil Outlet Node;   !- Coil Air Outlet Node
+```
 
 
 
 ### Cooling DX Coil (VariableRefrigerantFlow) Outputs
 
-HVAC,Average, Cooling Coil Total Cooling Rate [W]
+* HVAC,Average, Cooling Coil Total Cooling Rate [W]
 
-HVAC,Sum, Cooling Coil Total Cooling Energy [J]
+* HVAC,Sum, Cooling Coil Total Cooling Energy [J]
 
-HVAC,Average, Cooling Coil Sensible Cooling Rate [W]
+* HVAC,Average, Cooling Coil Sensible Cooling Rate [W]
 
-HVAC,Sum, Cooling Coil Sensible Cooling Energy [J]
+* HVAC,Sum, Cooling Coil Sensible Cooling Energy [J]
 
-HVAC,Average, Cooling Coil Latent Cooling Rate [W]
+* HVAC,Average, Cooling Coil Latent Cooling Rate [W]
 
-HVAC,Sum, Cooling Coil Latent Cooling Energy [J]
+* HVAC,Sum, Cooling Coil Latent Cooling Energy [J]
 
-HVAC,Average, Cooling Coil Runtime Fraction []
+* HVAC,Average, Cooling Coil Runtime Fraction []
 
 
 
 Evaporative-cooled condenser:
 
-HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
+* HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
 
-Zone,Meter,Condensate:OnSiteWater [m3]
+* Zone,Meter,Condensate:OnSiteWater [m3]
 
-HVAC,Sum,Cooling Coil Condensate Volume [m3]
+* HVAC,Sum,Cooling Coil Condensate Volume [m3]
 
 #### Cooling Coil Total Cooling Rate [W]
 
@@ -4692,31 +4245,26 @@ Following is an example input for the object.
 
 
 
+```idf
 COIL:Heating:DX:VariableRefrigerantFlow,
-
        TU1 VRF DX Heating Coil, !- Coil Name
-
        VRFAvailSched,                     !- Availability Schedule
-
        autosize,                               !- Gross Rated Heating Capacity {W}
-
        autosize,                               !- Rated Air Flow Rate {m3/s}
-
        TU1 VRF DX CCoil Outlet Node,   !- Coil Air Inlet Node
-
        TU1 VRF DX HCoil Outlet Node,   !- Coil Air Outlet Node
-
        VRFTUHeatCapFT,                   !- Heating Capacity Ratio Modifier Function of Temperature Curve Name
-
        VRFACCoolCapFFF;                 !- Total heating capacity modifier curve Function of Flow Fraction
+```
+
 
 ### Heating DX Coil (VariableRefrigerantFlow) Outputs
 
-HVAC,Average, Heating Coil Total Heating Rate [W]
+* HVAC,Average, Heating Coil Total Heating Rate [W]
 
-HVAC,Sum, Heating Coil Total Heating Energy [J]
+* HVAC,Sum, Heating Coil Total Heating Energy [J]
 
-HVAC,Average, Heating Coil Runtime Fraction []
+* HVAC,Average, Heating Coil Runtime Fraction []
 
 #### Heating Coil Total Heating Rate [W]
 
@@ -4786,23 +4334,23 @@ This numeric field is the parasitic gas load associated with the gas coil   s op
 
 ### Heating Coil (Gas) Outputs
 
-HVAC,Sum,Heating Coil Air Heating Energy [J]
+* HVAC,Sum,Heating Coil Air Heating Energy [J]
 
-HVAC,Average,Heating Coil Air Heating Rate [W]
+* HVAC,Average,Heating Coil Air Heating Rate [W]
 
-HVAC,Sum,Heating Coil Gas Energy [J]
+* HVAC,Sum,Heating Coil Gas Energy [J]
 
-HVAC,Average,Heating Coil Gas Rate [W]
+* HVAC,Average,Heating Coil Gas Rate [W]
 
-HVAC,Sum,Heating Coil Electric Energy [J]
+* HVAC,Sum,Heating Coil Electric Energy [J]
 
-HVAC,Average,Heating Coil Electric Power [W]
+* HVAC,Average,Heating Coil Electric Power [W]
 
-HVAC,Average,Heating Coil Runtime Fraction []
+* HVAC,Average,Heating Coil Runtime Fraction []
 
-HVAC,Sum,Heating Coil Ancillary Gas Energy [J]
+* HVAC,Sum,Heating Coil Ancillary Gas Energy [J]
 
-HVAC,Average,Heating Coil Ancillary Gas Rate [W]
+* HVAC,Average,Heating Coil Ancillary Gas Rate [W]
 
 #### Heating Coil Air Heating Energy [J]
 
@@ -4934,63 +4482,47 @@ This is the stage 4 parasitic electric load associated with the gas coil operati
 
 An example in IDF form:
 
+```idf
    Coil:Heating:Gas:MultiStage,
-
        Heat Pump Heating Coil 1,                 !- Name
-
        FanAndCoilAvailSched,                         !- Availability Schedule Name
-
        Heating Coil Air Inlet Node,           !- Air Inlet Node Name
-
        SuppHeating Coil Air Inlet Node,   !- Air Outlet Node Name
-
        ,                                               !- Temp Setpoint node name
-
        ,                                               !- Part Load Fraction Correlation Curve Name
-
        ,                                               !- Parasitic Gas Load
-
        3,                                             !- Number of Speeds
-
        0.92,                                       !- Speed 1 Gas burner Efficiency
-
        Autosize,                               !- Speed 1 Nominal Capacity {W}
-
        ,                                               !- Stage 1 Parasitic Electric Load {W}
-
        0.88,                                       !- Speed 2 Gas burner Efficiency
-
        Autosize,                               !- Speed 2 Nominal Capacity {W}
-
        ,                                               !- Stage 2 Parasitic Electric Load {W}
-
        0.84,                                       !- Speed 3 Gas burner Efficiency
-
        Autosize,                               !- Speed 3 Nominal Capacity {W}
-
        ;                                               !- Stage 3 Parasitic Electric Load {W}
-
+```
 
 
 ### Heating Coil (Gas Multistage) Outputs
 
-HVAC,Sum,Heating Coil Energy[J]
+* HVAC,Sum,Heating Coil Energy[J]
 
-HVAC,Average,Heating Coil Rate[W]
+* HVAC,Average,Heating Coil Rate[W]
 
-HVAC,Sum,Heating Coil Gas Consumption [J]
+* HVAC,Sum,Heating Coil Gas Consumption [J]
 
-HVAC,Average,Heating Coil Gas Consumption Rate [W]
+* HVAC,Average,Heating Coil Gas Consumption Rate [W]
 
-HVAC,Sum,Heating Coil Electric Consumption [J]
+* HVAC,Sum,Heating Coil Electric Consumption [J]
 
-HVAC,Average,Heating Coil Electric Power [W]
+* HVAC,Average,Heating Coil Electric Power [W]
 
-HVAC,Average,Heating Coil Runtime Fraction
+* HVAC,Average,Heating Coil Runtime Fraction
 
-HVAC,Sum,Heating Coil Parasitic Gas Consumption [J]
+* HVAC,Sum,Heating Coil Parasitic Gas Consumption [J]
 
-HVAC,Average,Heating Coil Parasitic Gas Consumption Rate [W]
+* HVAC,Average,Heating Coil Parasitic Gas Consumption Rate [W]
 
 #### Heating Coil Energy [J]
 
@@ -5140,63 +4672,46 @@ This field is optional. It is used to describe where condensate from the coil is
 
 Examples of these statements in an IDF are:
 
+```idf
 Coil:Cooling:Water:DetailedGeometry,
-
            Detailed Cooling Coil,   !Name of cooling coil
-
            CoolingCoilAvailSched,   !Cooling Coil Schedule
-
            0.0011,                   !Max Water Flow Rate of Coil m3/sec
-
            6.23816,                 !Tube Outside Surf Area
-
            6.20007018,           !Tube Inside Surf Area
-
            101.7158224,         !Fin Surf Area
-
            0.300606367,         !Min Air Flow Area
-
            0.165097968,         !Coil Depth
-
            0.43507152,           !Coil Height
-
            0.001499982,         !Fin Thickness
-
            0.014449958,         !Tube Inside Diameter
-
            0.015879775,         !Tube Outside Diameter
-
            386.0,                     !Tube Thermal Conductivity
-
            204.0,                     !Fin Thermal Conductivity
-
            0.001814292,         !Fin Spacing
-
            0.02589977,           !Tube Depth
-
            6,                             !Number of Tube Rows
-
            16,                           !Number of Tubes per Row
+           NODE_32,NODE_33, !Coil Water Side Inlet & Outlet Node
+           NODE_5, NODE_6;   !Coil Air Side Inlet & Outlet Node
+```
 
-           NODE\_32,NODE\_33, !Coil Water Side Inlet & Outlet Node
-
-           NODE\_5, NODE\_6;   !Coil Air Side Inlet & Outlet Node
 
 ### Detailed Geometry Cooling Coil (Water) Outputs
 
-HVAC,Sum,Cooling Coil Total Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Total Cooling Energy [J]
 
-HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Total Cooling Rate [W]
+* HVAC,Average,Cooling Coil Total Cooling Rate [W]
 
-HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
+* HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
 
-HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
+* HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
 
-HVAC,Sum,Cooling Coil Source Side Heat Transfer Energy [J]
+* HVAC,Sum,Cooling Coil Source Side Heat Transfer Energy [J]
 
-HVAC,Sum,Cooling Coil Condensate Volume [m3]
+* HVAC,Sum,Cooling Coil Condensate Volume [m3]
 
 #### Cooling Coil Total Cooling Energy (J)
 
@@ -5422,58 +4937,34 @@ This input field is name of a conditioned or unconditioned zone where the second
 
 Following is an example input for a Coil:Cooling:DX:SingleSpeed coil.
 
+```idf
 Coil:Cooling:DX:SingleSpeed,
-
              Zone1WindACDXCoil,               ! Coil Name
-
              FanAndCoilAvailSched,         ! Availability Schedule
-
              10548,           ! Gross Rated Total Cooling Capacity
-
              0.75,             ! Gross Rated Sensible Heat Ratio
-
              3.0,               ! Gross Rated Cooling COP
-
              0.637,           ! Rated Air Flow Rate (m3/s)
-
              773.3,           ! Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-
              Zone1WindACFanOutletNode, ! Coil Air Inlet Node
-
              Zone1WindACAirOutletNode, ! Coil Air Outlet Node
-
              WindACCoolCapFT,                   ! Total Cooling Capacity Modifier Curve (function of temperature)
-
              WindACCoolCapFFF,                 ! Total Cooling Capacity Modifier Curve (function of flow fraction)
-
              WindACEIRFT,                           ! Energy Input Ratio Modifier Curve (function of temperature)
-
              WindACEIRFFF,                         ! Energy Input Ratio Modifier Curve (function of flow fraction)
-
              WindACPLFFPLR,                       ! Part Load Fraction Correlation (function of part load ratio)
-
              1000.,                         ! Nominal Time for Condensate Removal to Begin {s}
-
              1.5,                             ! Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
-
              3.0,                             ! Maximum ON/OFF Cycling Rate {cycles/hr}
-
              45.0,                           ! Latent Capacity Time Constant {s}
-
              ,                                   ! Condenser Air Inlet Node Name
-
              AirCooled,               ! Condenser Type
-
              ,                                   ! Evaporative Condenser Effectiveness
-
              ,                                   ! Evaporative Condenser Air Volume Flow Rate {m3/s}
-
              ,                                   ! Evaporative Condenser Pump Rated Power Consumption {W}
-
              30.,                             ! Crankcase Heater Capacity {W}
-
              10.;                             ! Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
-
+```
 
 
 ### Coil:Cooling:DX:TwoSpeed
@@ -5684,179 +5175,98 @@ This input field is name of a conditioned or unconditioned zone where the second
 
 Following are example inputs for the object.
 
+```idf
    Coil:Cooling:DX:TwoSpeed,
-
        Main Cooling Coil 1,         !- Name
-
        CoolingCoilAvailSched,     !- Availability Schedule Name
-
        autosize,                               !- Gross Rated High Speed Total Cooling Capacity {W}
-
        0.68,                                       !- Gross Rated High Speed Sensible Heat Ratio
-
        3.0,                                         !- Gross Rated High Speed Cooling COP
-
        autosize,                               !- Rated High Speed Air Flow Rate {m3/s}
-
        ,                                               !- Unit Internal Static Air Pressure Drop {Pa}
-
        Mixed Air Node 1,               !- Air Inlet Node Name
-
        Main Cooling Coil 1 Outlet Node,   !- Air Outlet Node Name
-
        VarSpeedCoolCapFT,             !- Total Cooling Capacity Function of Temperature Curve Name
-
        PackagedRatedCoolCapFFlow,   !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        VarSpeedCoolEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
-
        PackagedRatedCoolEIRFFlow,   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        VarSpeedCyclingPLFFPLR,   !- Part Load Fraction Correlation Curve Name
-
        autosize,                               !- Rated Low Speed Total Cooling Capacity {W}
-
        0.69,                                       !- Rated Low Speed Sensible Heat Ratio
-
        4.2,                                         !- Rated Low Speed COP
-
        autosize,                               !- Rated Low Speed Air Flow Rate {m3/s}
-
        VarSpeedCoolCapLSFT,         !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
-
        VarSpeedCoolEIRLSFT,         !- Low Speed Energy Input Ratio Function of Temperature Curve Name
-
        Main Cooling Coil 1 Condenser Node;   !- Condenser Air Inlet Node Name
-
 
 
    Coil:Cooling:DX:TwoSpeed,
-
        Main Cooling Coil 1,         !- Name
-
        CoolingCoilAvailSched,     !- Availability Schedule Name
-
        autosize,                               !- High Speed Rated Total Cooling Capacity {W}
-
        0.68,                                       !- High Speed Rated Sensible Heat Ratio
-
        3.0,                                         !- High Speed Rated Cooling COP
-
        autosize,                               !- High Speed Rated Air Flow Rate {m3/s}
-
        ,                                               !- Unit Internal Static Air Pressure Drop {Pa}
-
        Mixed Air Node 1,               !- Air Inlet Node Name
-
        Main Cooling Coil 1 Outlet Node,   !- Air Outlet Node Name
-
        VarSpeedCoolCapFT,             !- Total Cooling Capacity Function of Temperature Curve Name
-
        PackagedRatedCoolCapFFlow,   !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        VarSpeedCoolEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
-
        PackagedRatedCoolEIRFFlow,   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        VarSpeedCyclingPLFFPLR,   !- Part Load Fraction Correlation Curve Name
-
        autosize,                               !- Low Speed Rated Total Cooling Capacity {W}
-
        0.69,                                       !- Low Speed Rated Sensible Heat Ratio
-
        4.2,                                         !- Low Speed Rated Cooling COP
-
        autosize,                               !- Low Speed Rated Air Flow Rate {m3/s}
-
        VarSpeedCoolCapLSFT,         !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
-
        VarSpeedCoolEIRLSFT,         !- Low Speed Energy Input Ratio Function of Temperature Curve Name
-
        Main Cooling Coil 1 Condenser Node;   !- Condenser Air Inlet Node Name
-
        ,                                               !- Condenser Type
-
        ,                                               !- High Speed Evaporative Condenser Effectiveness {dimensionless}
-
        ,                                               !- High Speed Evaporative Condenser Air Flow Rate {m3/s}
-
        ,                                               !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}
-
        ,                                               !- Low Speed Evaporative Condenser Effectiveness {dimensionless}
-
        ,                                               !- Low Speed Evaporative Condenser Air Flow Rate {m3/s}
-
        ,                                               !- Low Speed Evaporative Condenser Pump Rated Power Consumption {W}
-
        ,                                               !- Supply Water Storage Tank Name
-
        ,                                               !- Condensate Collection Water Storage Tank Name
-
        ,                                               !- Basin Heater Capacity {W/K}
-
        ,                                               !- Basin Heater Setpoint Temperature {C}
-
        ,                                               !- Basin Heater Operating Schedule Name
-
        DOAS DX Coil SHR-FT,         !- High Speed Sensible Heat Ratio Function of Temperature Curve Name
-
        DOAS DX Coil SHR-FF,         !- High Speed Sensible Heat Ratio Function of Flow Fraction Curve Name
-
        DOAS DX Coil SHR-FT,         !- Low Speed Sensible Heat Ratio Function of Temperature Curve Name
-
        DOAS DX Coil SHR-FF;         !- Low Speed Sensible Heat Ratio Function of Flow Fraction Curve Name
 
 
-
 Curve:Quadratic,
-
    DOAS DX Coil SHR-FF,                                                                         !- Name
-
    0.9317,                                                                                                   !- Coefficient1 Constant
-
   -0.0077,                                                                                                   !- Coefficient2 x
-
-   0.0760,                                                                                                   !- Coefficient3 x\*\*2
-
+   0.0760,                                                                                                   !- Coefficient3 x**2
    0.69,                                                                                                       !- Minimum Value of x
-
    1.30;                                                                                                       !- Maximum Value of x
 
 
-
 Curve:Biquadratic,
-
    DOAS DX Coil SHR-FT,                                                                         !- Name
-
    1.3294540786,                                                                                       !- Coefficient1 Constant
-
    -0.0990649255,                                                                                     !- Coefficient2 x
-
-   0.0008310043,                                                                                       !- Coefficient3 x\*\*2
-
+   0.0008310043,                                                                                       !- Coefficient3 x**2
    0.0652277735,                                                                                       !- Coefficient4 y
-
-   -0.0000793358,                                                                                     !- Coefficient5 y\*\*2
-
-   -0.0005874422,                                                                                     !- Coefficient6 x\*y
-
+   -0.0000793358,                                                                                     !- Coefficient5 y**2
+   -0.0005874422,                                                                                     !- Coefficient6 x*y
    24.44,                                                                                                     !- Minimum Value of x
-
    26.67,                                                                                                     !- Maximum Value of x
-
    29.44,                                                                                                     !- Minimum Value of y
-
    46.1,                                                                                                       !- Maximum Value of y
-
    0.6661,                                                                                                   !- Minimum Curve Output
-
    1.6009,                                                                                                   !- Maximum Curve Output
-
    Temperature,                                                                                         !- Input Unit Type for X
-
    Temperature,                                                                                         !- Input Unit Type for Y
-
    Dimensionless;                                                                                     !- Output Unit Type
+```
 
 
 
@@ -5944,39 +5354,25 @@ This alpha field contains the name of the basin heater operating schedule. This 
 
 Following is an example IDF use of the object:
 
+```idf
 Coil:Cooling:DX:TwoStageWithHumidityControlMode,
-
    DOAS Cooling Coil,                                   !- Name
-
    HVACTemplate-Always 1,                           !- Availability Schedule Name
-
    DOAS Supply Fan Outlet,                         !- Air Inlet Node Name
-
    DOAS Cooling Coil Outlet,                     !- Air Outlet Node Name
-
    ,                                                                     !- Crankcase Heater Capacity
-
    ,                                                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
-
    2,                                                                   !- Number of Capacity Stages
-
    1,                                                                   !- Number of Enhanced Dehumidification Modes
-
    CoilPerformance:DX:Cooling,                 !- Normal Mode Stage 1 Coil Performance Object Type
-
    DOAS Standard Perf 1,                             !- Normal Mode Stage 1 Coil Performance Name
-
    CoilPerformance:DX:Cooling,                 !- Normal Mode Stage 1+2 Coil Performance Object Type
-
    DOAS Standard Perf 1+2,                         !- Normal Mode Stage 1+2 Coil Performance Name
-
    CoilPerformance:DX:Cooling,                 !- Dehumidification Mode 1 Stage 1 Coil Performance Object Type
-
    DOAS Dehumid Perf 1,                               !- Dehumidification Mode 1 Stage 1 Coil Performance Name
-
    CoilPerformance:DX:Cooling,                 !- Dehumidification Mode 1 Stage 1+2 Coil Performance Object Type
-
    DOAS Dehumid Perf 1+2;                           !- Dehumidification Mode 1 Stage 1+2 Coil Performance Name
+```
 
 ### Coil:Cooling:DX:MultiSpeed
 
@@ -6078,7 +5474,7 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 The volumetric air flow rate for Speed &lt;x&gt;, in m<sup>3</sup> per second, across the DX cooling coil at rated conditions. The rated air volume flow rate for Speed &lt;x&gt; should be between 0.00004027 m<sup>3</sup>/s and 0.00006041 m<sup>3</sup>/s per watt of the gross rated total cooling capacity for Speed &lt;x&gt;. The gross rated total cooling capacity, gross rated SHR and gross rated COP for Speed &lt;x&gt; should be performance information for the unit with air entering the cooling coil at 26.7 &deg;C drybulb/19.4 &deg;C wetbulb, air entering the outdoor condenser coil at 35 &deg;C drybulb/23.9 &deg;C wetbulb, and the rated air volume flow rate defined here.
 
-***Field: Speed &lt;X&gt; Rated Evaporator Fan Power Per Volume Flow Rate***
+#### Field: Speed &lt;X&gt; Rated Evaporator Fan Power Per Volume Flow Rate
 
 This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed &lt;x&gt; in W/(m3/s). The default value is 773.3 W/(m3/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be &gt;= 0.0 and &lt;= 1250 W/(m3/s). This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 
@@ -6176,259 +5572,166 @@ This input field is name of a conditioned or unconditioned zone where the second
 
 Following is an example input for this multispeed DX cooling coil.
 
+```idf
 Coil:Cooling:DX:MultiSpeed,
-
        Heat Pump ACDXCoil 1,       !- Coil Name
-
        FanAndCoilAvailSched,       !- Availability Schedule
-
        DX Cooling Coil Air Inlet Node,   !- Coil Air Inlet Node
-
        Heating Coil Air Inlet Node,         !- Coil Air Outlet Node
-
        Outdoor Condenser Air Node,           !- Condenser Air Inlet Node Name
-
        AirCooled,                           !- Condenser Type
-
        ,                                               !- Name of Water Storage Tank for Supply
-
        ,                                               !- Name of Water Storage Tank for Condensate Collection
-
        No,                                           !- Apply Part Load Fraction to Speeds greater than 1
-
        No,                                           !- Apply latent degradation to Speeds greater than 1
-
        200.0,                                     !- Crankcase Heater Capacity {W}
-
        10.0,                                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation
-
        ,                                               !- Basin Heater Capacity {W/K}
-
        ,                                               !- Basin Heater Setpoint Temperature {C}
-
        ,                                               !- Basin Heater Operating Schedule Name
-
        NaturalGas,                           !- Fuel Type
-
        4,                                             !- Number of speeds
-
        7500,                                       !- Gross Rated Total Cooling Capacity, Speed 1 {W}
-
        0.75,                                       !- Gross Rated Sensible Heat Ratio, Speed 1 {dimensionless}
-
        3.0,                                         !- Gross Rated Cooling COP, Speed 1 {dimensionless}
-
        0.40,                                       !- Rated Air Flow Rate, Speed 1 {m3/s}
-
        ,                                               !- Rated Evaporator Fan Power Per Volume Flow Rate, Speed 1 {W/(m3/s)}
-
        HPACCoolCapFT Speed 1,     !- Total Cooling Capacity Modifier Curve, Speed 1 (temperature)
-
        HPACCoolCapFF Speed 1,     !- Total Cooling Capacity Modifier Curve, Speed 1 (flow fraction)
-
        HPACCOOLEIRFT Speed 1,     !- Energy Input Ratio Modifier Curve, Speed 1 (temperature)
-
        HPACCOOLEIRFF Speed 1,     !- Energy Input Ratio Modifier Curve, Speed 1 (flow fraction)
-
        HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 1 (part load ratio)
-
        1000.0,                                   !- Nominal Time for Condensate Removal to Begin, Speed 1 {s}
-
        1.5,                                         !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-
        3.0,                                         !- Maximum ON/OFF Cycling Rate, Speed 1 {cycles/hr}
-
        45.0,                                       !- Latent Capacity Time Constant, Speed 1 {s}
-
        0.2,                                         !- Rated waste heat fraction of power input, Speed 1 {dimensionless}
-
        HAPCCoolWHFT Speed 1,       !- Waste heat modifier curve, Speed 1 (temperature)
-
        0.9,                                         !- Evaporative Condenser Effectiveness, Speed 1 {dimensionless}
-
        0.05,                                       !- Evaporative Condenser Air Volume Flow Rate, Speed 1 {m3/s}
-
        50,                                           !- Evaporative Condenser Pump Rated Power Consumption, Speed 1 {W}
-
        17500,                                     !- Gross Rated Total Cooling Capacity, Speed 2 {W}
-
        0.75,                                       !- Gross Rated Sensible Heat Ratio, Speed 2 {dimensionless}
-
        3.0,                                         !- Gross Rated Cooling COP, Speed 2 {dimensionless}
-
        0.85,                                       !- Rated Air Flow Rate, Speed 2 {m3/s}
-
        ,                                               !- Rated Evaporator Fan Power Per Volume Flow Rate, Speed 2 {W/(m3/s)}
-
        HPACCoolCapFT Speed 2,     !- Total Cooling Capacity Modifier Curve, Speed 2 (temperature)
-
        HPACCoolCapFF Speed 2,     !- Total Cooling Capacity Modifier Curve, Speed 2 (flow fraction)
-
        HPACCOOLEIRFT Speed 2,     !- Energy Input Ratio Modifier Curve, Speed 2 (temperature)
-
        HPACCOOLEIRFF Speed 2,     !- Energy Input Ratio Modifier Curve, Speed 2 (flow fraction)
-
        HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 2 (part load ratio)
-
        1000.0,                                   !- Nominal Time for Condensate Removal to Begin, Speed 2
-
        1.5,                                         !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-
        3.0,                                         !- Maximum ON/OFF Cycling Rate, Speed 2
-
        45.0,                                       !- Latent Capacity Time Constant, Speed 2
-
        0.2,                                         !- Rated waste heat fraction of power input, Speed 2 {dimensionless}
-
-
-
        HAPCCoolWHFT Speed 2,       !- Waste heat modifier curve, Speed 2 (temperature)
-
        0.9,                                         !- Evaporative Condenser Effectiveness, Speed 2 {dimensionless}
-
        0.1,                                         !- Evaporative Condenser Air Volume Flow Rate, Speed 2 {m3/s}
-
        60,                                           !- Evaporative Condenser Pump Rated Power Consumption, Speed 2 {W}
-
        25500,                                     !- Gross Rated Total Cooling Capacity, Speed 3 {W}
-
        0.75,                                       !- Gross Rated Sensible Heat Ratio, Speed 3 {dimensionless}
-
        3.0,                                         !- Gross Rated Cooling COP, Speed 3 {dimensionless}
-
        1.25,                                       !- Rated Air Flow Rate, Speed 3 {m3/s}
-
        ,                                               !- Rated Evaporator Fan Power Per Volume Flow Rate, Speed 3 {W/(m3/s)}
-
        HPACCoolCapFT Speed 3,     !- Total Cooling Capacity Modifier Curve, Speed 3 (temperature)
-
        HPACCoolCapFF Speed 3,     !- Total Cooling Capacity Modifier Curve, Speed 3 (flow fraction)
-
        HPACCOOLEIRFT Speed 3,     !- Energy Input Ratio Modifier Curve, Speed 3 (temperature)
-
        HPACCOOLEIRFF Speed 3,     !- Energy Input Ratio Modifier Curve, Speed 3 (flow fraction)
-
        HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 3 (part load ratio)
-
        1000.0,                                   !- Nominal Time for Condensate Removal to Begin, Speed 3 {s}
-
        1.5,                                         !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-
        3.0,                                         !- Maximum ON/OFF Cycling Rate, Speed 3 {cycles/hr}
-
        45.0,                                       !- Latent Capacity Time Constant, Speed 3 {s}
-
        0.2,                                         !- Rated waste heat fraction of power input, Speed 3 {dimensionless}
-
        HAPCCoolWHFT Speed 3,       !- Waste heat modifier curve, Speed 3 (temperature)
-
        0.9,                                         !- Evaporative Condenser Effectiveness, Speed 3 {dimensionless}
-
        0.2,                                         !- Evaporative Condenser Air Volume Flow Rate, Speed 3 {m3/s}
-
        80,                                           !- Evaporative Condenser Pump Rated Power Consumption, Speed 3 {W}
-
        35500,                                     !- Gross Rated Total Cooling Capacity, Speed 4 {W}
-
        0.75,                                       !- Gross Rated Sensible Heat Ratio, Speed 4 {dimensionless}
-
        3.0,                                         !- Gross Rated Cooling COP, Speed 4 {dimensionless}
-
        1.75,                                       !- Rated Air Flow Rate, Speed 4 {m3/s}
-
        ,                                               !- Rated Evaporator Fan Power Per Volume Flow Rate, Speed 4 {W/(m3/s)}
-
        HPACCoolCapFT Speed 4,     !- Total Cooling Capacity Modifier Curve, Speed 4 (temperature)
-
        HPACCoolCapFF Speed 4,     !- Total Cooling Capacity Modifier Curve, Speed 4 (flow fraction)
-
        HPACCOOLEIRFT Speed 4,     !- Energy Input Ratio Modifier Curve, Speed 4 (temperature)
-
        HPACCOOLEIRFF Speed 4,     !- Energy Input Ratio Modifier Curve, Speed 4 (flow fraction)
-
        HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 4 (part load ratio)
-
        1000.0,                                   !- Nominal Time for Condensate Removal to Begin, Speed 4 {s}
-
        1.5,                                         !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent                                                     !- Capacity, Speed 4 {dimensionless}
-
        3.0,                                         !- Maximum ON/OFF Cycling Rate, Speed 4 {cycles/hr}
-
        45.0,                                       !- Latent Capacity Time Constant, Speed 4 {s}
-
        0.2,                                         !- Rated waste heat fraction of power input, Speed 4 {dimensionless}
-
        HAPCCoolWHFT Speed 4,       !- Waste heat modifier curve, Speed 4 (temperature)
-
        0.9,                                         !- Evaporative Condenser Effectiveness, Speed 4 {dimensionless}
-
        0.3,                                         !- Evaporative Condenser Air Volume Flow Rate, Speed 4 {m3/s}
-
        100;                                         !- Evaporative Condenser Pump Rated Power Consumption, Speed 4 {W}
+```
 
 ### DX Cooling Coil Outputs
 
-HVAC,Average,Cooling Coil Total Cooling Rate [W]
+* HVAC,Average,Cooling Coil Total Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Total Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Total Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
+* HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Latent Cooling Rate [W]
+* HVAC,Average,Cooling Coil Latent Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Electric Power[W]
+* HVAC,Average,Cooling Coil Electric Power[W]
 
-HVAC,Sum,Cooling Coil Electric Energy [J]
+* HVAC,Sum,Cooling Coil Electric Energy [J]
 
-HVAC,Average,Cooling Coil Runtime Fraction []
+* HVAC,Average,Cooling Coil Runtime Fraction []
 
 
 
 If not part of AirLoopHVAC:UnitaryHeatPump:AirToAir (if part of a heat pump, crankcase heater is reported only for the heating coil):
 
-HVAC,Average,Cooling Coil Crankcase Heater Electric Power[W]
+* HVAC,Average,Cooling Coil Crankcase Heater Electric Power[W]
 
-HVAC,Sum,Cooling Coil Crankcase Heater Electric Energy [J]
+* HVAC,Sum,Cooling Coil Crankcase Heater Electric Energy [J]
 
 
 
 Evaporative-cooled condenser:
 
-HVAC,Average,Cooling Coil Condenser Inlet Temperature [C]
+* HVAC,Average,Cooling Coil Condenser Inlet Temperature [C]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Water Volume[m3]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Water Volume[m3]
 
-HVAC,Average,Cooling Coil Evaporative Condenser Pump Electric Power[W]
+* HVAC,Average,Cooling Coil Evaporative Condenser Pump Electric Power[W]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Pump Electric Energy [J]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Pump Electric Energy [J]
 
-HVAC,Average,Cooling Coil Basin Heater Electric Power[W]
+* HVAC,Average,Cooling Coil Basin Heater Electric Power[W]
 
-HVAC,Sum,Cooling Coil Basin Heater Electric Energy [J]
+* HVAC,Sum,Cooling Coil Basin Heater Electric Energy [J]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]
 
 
 
 Additional variables for Coil:Cooling:DX:TwoStageWithHumidityControlMode only:
 
-HVAC,Average,Cooling Coil Stage 2 Runtime Fraction []
+* HVAC,Average,Cooling Coil Stage 2 Runtime Fraction []
 
-HVAC,Average,Cooling Coil Dehumidification Mode []
+* HVAC,Average,Cooling Coil Dehumidification Mode []
 
 
 
 Additional variables when condensate is collected using a storage tank:
 
-HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
+* HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
 
-Zone,Meter,Condensate:OnSiteWater [m3]
+* Zone,Meter,Condensate:OnSiteWater [m3]
 
-HVAC,Sum,Cooling Coil Condensate Volume [m3]
+* HVAC,Sum,Cooling Coil Condensate Volume [m3]
 
 
 
@@ -6436,9 +5739,9 @@ Additional variables for Coil:Cooling:DX:Multispeed:
 
 If Fuel Type is not Electricity:
 
-HVAC,Average,DX Cooling Coil &lt;Fuel Type&gt; Power[W]
+* HVAC,Average,DX Cooling Coil &lt;Fuel Type&gt; Power[W]
 
-HVAC,Sum,DX Cooling Coil &lt;Fuel Type&gt; Consumption[J]
+* HVAC,Sum,DX Cooling Coil &lt;Fuel Type&gt; Consumption[J]
 
 #### 
 
@@ -6688,309 +5991,191 @@ This alpha field defines the name of a quadratic or cubic performance curve for 
 
 An example of this statement in an IDF is:
 
+```idf
   Coil:Cooling:DX:VariableSpeed,
-
        Heat Pump ACDXCoil 1,                       !- Name
-
        DX Cooling Coil Air Inlet Node,   !- Air Inlet Node Name
-
        Heating Coil Air Inlet Node,         !- Air Outlet Node Name
-
        10.0,                                     !- Number of Speeds {dimensionless}
-
        10.0,                                     !- Nominal Speed Level {dimensionless}
-
        32000,                                   !- Gross Rated Total Cooling Capacity {W}
-
        1.7,                                       !- Rated Air Flow Rate {m3/s}
-
        0.0,                                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}
-
        0.0,   !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
-
        HPACCOOLPLFFPLR,                     !- Part Load Fraction Correlation Curve Name
-
        ,                                      ! - Condenser Air Inlet Node Name
-
        AirCooled,                                ! - Condenser Type
-
        ,                                      ! - Evaporative Condenser Pump Rated Power Consumption
-
        200.0,                                      ! - Crankcase Heater Capacity, {w}
-
        10.0,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-
        ,                               ! - Supply Water Storage Tank Name
-
        ,                                ! - Condensate Collection Water Storage Tank Name
-
        ,                                             ! - Basin Heater Capacity
-
        ,                               ! - Basin Heater Setpoint Temperature
-
        ,                                             ! - Basin Heater Operating Schedule Name
-
        1524.1,                                 !- Speed 1 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 1 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 1 Gross Rated Cooling COP {dimensionless}
-
        0.1359072,                           !- Speed 1 Rated Air Flow Rate {m3/s}
-
        0.26,                                     ! - Speed 1 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             ! - Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        1877.9,                                 !- Speed 2 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 2 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 2 Gross Rated Cooling COP {dimensionless}
-
        0.151008,                             !- Speed 2 Rated Air Flow Rate {m3/s}
-
        0.30,                                     ! - Speed 2 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             ! - Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        2226.6,                                 !- Speed 3 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 3 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 3 Gross Rated Cooling COP {dimensionless}
-
        0.1661088,                           !- Speed 3 Rated Air Flow Rate {m3/s}
-
        0.33,                                     !- Speed 3 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             !- Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        2911.3,                                 !- Speed 4 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 4 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 4 Gross Rated Cooling COP {dimensionless}
-
        0.1963104,                           !- Speed 4 Rated Air Flow Rate {m3/s}
-
        0.38,                                     !- Speed 4 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             !- Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        3581.7,                                 !- Speed 5 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 5 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 5 Gross Rated Cooling COP {dimensionless}
-
        0.226512,                             !- Speed 5 Rated Air Flow Rate {m3/s}
-
        0.44,                                     !- Speed 5 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             !- Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        4239.5,                                 !- Speed 6 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 6 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 6 Gross Rated Cooling COP {dimensionless}
-
        0.2567136,                           !- Speed 6 Rated Air Flow Rate {m3/s}
-
        0.50,                                     ! - Speed 6 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             ! - Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        4885.7,                                 !- Speed 7 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 7 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 7 Gross Rated Cooling COP {dimensionless}
-
        0.2869152,                           !- Speed 7 Rated Air Flow Rate {m3/s}
-
        0.57,                                     ! - Speed 7 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             ! - Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        5520.7,                                 !- Speed 8 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 8 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 8 Gross Rated Cooling COP {dimensionless}
-
        0.3171168,                           !- Speed 8 Rated Air Flow Rate {m3/s}
-
        0.63,                                     ! - Speed 8 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             ! - Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        6144.8,                                 !- Speed 9 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 9 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 9 Rated Cooling COP {dimensionless}
-
        0.3473184,                           !- Speed 9 Rated Air Flow Rate {m3/s}
-
        0.69,                                     ! - Speed 9 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             ! - Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        6758.0,                                 !- Speed 10 Gross Rated Total Cooling Capacity {w}
-
        0.75,                                     !- Speed 10 Gross Rated Sensible Heat Ratio {dimensionless}
-
        4.0,                                       !- Speed 10 Gross Rated Cooling COP {dimensionless}
-
        0.37752,                               !- Speed 10 Rated Air Flow Rate {m3/s}
-
        0.74,                                     ! - Speed 10 Rated Condenser Air Flow Rate {m3/s}, for evaporatively cooled
-
        ,                                             ! - Evaporative precooling effectiveness
-
        HPACCoolCapFT,                   !- Total Cooling Capacity Function of Temperature Curve Name
-
        HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        HPACCOOLEIRFT,                   !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACCOOLEIRFFF;                 !- Energy Input Ratio Function of Flow Fraction Curve Name
+```
 
 ### Variable Speed DX Cooling Coil Outputs
 
-HVAC,Average,Cooling Coil Electric Power [W]
+* HVAC,Average,Cooling Coil Electric Power [W]
 
-HVAC,Average,Cooling Coil Total Cooling Rate [W]
+* HVAC,Average,Cooling Coil Total Cooling Rate [W]
 
-HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
+* HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
 
-HVAC,Average,Cooling Coil Source Side Heat Transfer Rate [W]
+* HVAC,Average,Cooling Coil Source Side Heat Transfer Rate [W]
 
-HVAC,Average,Cooling Coil Part Load Ratio []
+* HVAC,Average,Cooling Coil Part Load Ratio []
 
-HVAC,Average, Cooling Coil Runtime Fraction []
+* HVAC,Average, Cooling Coil Runtime Fraction []
 
-HVAC,Average, Cooling Coil Air Mass Flow Rate [kg/s]
+* HVAC,Average, Cooling Coil Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Cooling Coil Air Inlet Temperature [C]
+* HVAC,Average,Cooling Coil Air Inlet Temperature [C]
 
-HVAC,Average,Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC,Average,Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC,Average,Cooling Coil Air Outlet Temperature [C]
+* HVAC,Average,Cooling Coil Air Outlet Temperature [C]
 
-HVAC,Average,Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC,Average,Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC,Average,Cooling Coil Upper Speed Level []
+* HVAC,Average,Cooling Coil Upper Speed Level []
 
-HVAC,Average,Cooling Coil Neighboring Speed Levels Ratio []
+* HVAC,Average,Cooling Coil Neighboring Speed Levels Ratio []
 
-HVAC,Average,VSAirtoAirHP Recoverable Waste Heat [W]
+* HVAC,Average,VSAirtoAirHP Recoverable Waste Heat [W]
 
-HVAC,Sum,Cooling Coil Electric Energy [J]
+* HVAC,Sum,Cooling Coil Electric Energy [J]
 
-HVAC,Sum,Cooling Coil Total Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Total Cooling Energy [J]
 
-HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
 
-HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
 
-HVAC,Sum,Cooling Coil Source Side Heat Transfer Energy [J]
+* HVAC,Sum,Cooling Coil Source Side Heat Transfer Energy [J]
 
-HVAC,Average,Cooling Coil Crankcase Heater Electric Power [W]
+* HVAC,Average,Cooling Coil Crankcase Heater Electric Power [W]
 
-HVAC,Sum,Cooling Coil Crankcase Heater Electric Energy [J]
+* HVAC,Sum,Cooling Coil Crankcase Heater Electric Energy [J]
 
-HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
+* HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
 
-HVAC,Sum,Cooling Coil Condensate Volume [m3]
+* HVAC,Sum,Cooling Coil Condensate Volume [m3]
 
-HVAC,Average,Cooling Coil Condenser Inlet Temperature [C]
+* HVAC,Average,Cooling Coil Condenser Inlet Temperature [C]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Water Volume [m3]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Water Volume [m3]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Mains Water Volume [m3]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Mains Water Volume [m3]
 
-HVAC,Average,Cooling Coil Evaporative Condenser Pump Electric Power[W]
+* HVAC,Average,Cooling Coil Evaporative Condenser Pump Electric Power[W]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Pump Electric Energy [J]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Pump Electric Energy [J]
 
-HVAC,Average,Cooling Coil Basin Heater Electric Power [W]
+* HVAC,Average,Cooling Coil Basin Heater Electric Power [W]
 
-HVAC,Sum,Cooling Coil Basin Heater Electric Energy [J]
+* HVAC,Sum,Cooling Coil Basin Heater Electric Energy [J]
 
 #### Cooling Coil Electric Power [W]
 
@@ -7262,231 +6447,125 @@ The name of a quadratic or cubic normalized curve (Ref: Performance Curves) that
 
 Following is an example input for a Coil:Cooling:DX:TwoStageWithHumidityControlMode with 2 capacity stages and one enhanced dehumidification mode so it requires four   CoilPerformance:DX:Cooling objects.
 
+```idf
 Coil:Cooling:DX:TwoStageWithHumidityControlMode,
-
        DXSystem 1 Cooling Coil, !- Coil Name
-
        OfficeHeatCoolAvail,         !- Availability Schedule
-
        DXSystem 1 Mixed Air Node,   !- Coil Air Inlet Node
-
        DXSystem 1 Fan Air Inlet Node,   !- Coil Air Outlet Node
-
        ,                                               !- Crankcase Heater Capacity {W}
-
        ,                                               !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
-
        2,                                             !- Number of Capacity Stages
-
        1,                                             !- Number of Enhanced Dehumidification Modes
-
        CoilPerformance:DX:Cooling,   !- Normal Mode Stage 1 Coil Performance Object Type
-
        DXSystem 1 DX Coil Standard Mode-Stage 1,   !- Normal Mode Stage 1 Coil Performance Object Name
-
        CoilPerformance:DX:Cooling,   !- Normal Mode Stage 1+2 Coil Perf Object Type
-
        DXSystem 1 DX Coil Standard Mode-Stage 1&2,   !- Normal Mode Stage 1+2 Coil Perf Object Name
-
        CoilPerformance:DX:Cooling,   !- Dehumid Mode 1 Stage 1 Coil Perf Object Type
-
        DXSystem 1 DX Coil SubCoolReheat Mode-Stage 1,   !- Dehumid Mode 1 Stage 1 Coil Perf Object Name
-
        CoilPerformance:DX:Cooling,   !- Dehumid Mode 1 Stage 1+2 Coil Perf Object Type
-
        DXSystem 1 DX Coil SubCoolReheat Mode-Stage 1&2;   !- Dehumid Mode 1 Stage 1+2 Coil Perf Object Name
 
 
-
 CoilPerformance:DX:Cooling,
-
        DXSystem 1 DX Coil Standard Mode-Stage 1,   !- Coil Performance Specification Name
-
        21327.57812,                         !- Gross Rated Total Cooling Capacity {W}
-
        0.68,                                       !- Gross Rated Sensible Heat Ratio
-
        3.56,                                       !- Gross Rated Cooling COP
-
        1.695372105,                         !- Rated Air Flow Rate {m3/s}
-
        0.4,                                         !- Fraction of Air Flow Bypassed Around Coil
-
        HPACCoolCapFT,                     !- Total Cooling Capacity Modifier Curve (function of temperature)
-
        HPACCoolCapFFF,                   !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
        HPACCOOLEIRFT,                     !- Energy Input Ratio Modifier Curve (function of temperature)
-
        HPACCOOLEIRFFF,                   !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
        HPACCOOLPLFFPLR,                 !- Part Load Fraction Correlation (function of part load ratio)
-
        1000,                                       !- Nominal Time for Condensate Removal to Begin {s}
-
        1.5, !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity {dimensionless}
-
        3,                                             !- Maximum ON/OFF Cycling Rate {cycles/hr}
-
        45,                                           !- Latent Capacity Time Constant {s}
-
        ,                                               !- Condenser Air Inlet Node Name
-
        ,                                               !- Condenser Type
-
        ,                                               !- Evaporative Condenser Effectiveness
-
        ,                                               !- Evaporative Condenser Air Flow Rate
-
        ,                                               !- Evaporative Condenser Pump Rated Power Consumption
-
        DOAS DX Coil SHR-FT,         !- Sensible Heat Ratio Function of Temperature Curve Name
-
        DOAS DX Coil SHR-FF;         !- Sensible Heat Ratio Function of Flow Fraction Curve Name
 
 
-
 CoilPerformance:DX:Cooling,
-
        DXSystem 1 DX Coil Standard Mode-Stage 1&2,   !- Coil Performance Specification Name
-
        35545.96484,                         !- Gross Rated Total Cooling Capacity {W}
-
        0.68,                                       !- Gross Rated Sensible Heat Ratio
-
        3.56,                                       !- Gross Rated Cooling COP
-
        1.695372105,                         !- Rated Air Flow Rate {m3/s}
-
        0.0,                                         !- Fraction of Air Flow Bypassed Around Coil
-
        HPACCoolCapFT,                     !- Total Cooling Capacity Modifier Curve (function of temperature)
-
        HPACCoolCapFFF,                   !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
        HPACCOOLEIRFT,                     !- Energy Input Ratio Modifier Curve (function of temperature)
-
        HPACCOOLEIRFFF,                   !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
        HPACCOOLPLFFPLR,                 !- Part Load Fraction Correlation (function of part load ratio)
-
        1000,                                       !- Nominal Time for Condensate Removal to Begin {s}
-
        1.5, !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity {dimensionless}
-
        3,                                             !- Maximum ON/OFF Cycling Rate {cycles/hr}
-
        45,                                           !- Latent Capacity Time Constant {s}
-
        ,                                               !- Condenser Air Inlet Node Name
-
        ,                                               !- Condenser Type
-
        ,                                               !- Evaporative Condenser Effectiveness
-
        ,                                               !- Evaporative Condenser Air Flow Rate
-
        ,                                               !- Evaporative Condenser Pump Rated Power Consumption
-
        DOAS DX Coil SHR-FT,         !- Sensible Heat Ratio Function of Temperature Curve Name
-
        DOAS DX Coil SHR-FF;         !- Sensible Heat Ratio Function of Flow Fraction Curve Name
 
 
-
 CoilPerformance:DX:Cooling,
-
        DXSystem 1 DX Coil SubCoolReheat Mode-Stage 1,   !- Coil Performance Specification Name
-
        19962.61328,                         !- Gross Rated Total Cooling Capacity (gross) {W}
-
        0.60,                                       !- Gross Rated SHR
-
        3.31,                                       !- Gross Rated Cooling COP
-
        1.695372105,                         !- Rated Air Flow Rate {m3/s}
-
        0.4,                                         !- Fraction of Air Flow Bypassed Around Coil
-
        SubCoolReheatCoolCapFT,   !- Total Cooling Capacity Modifier Curve (function of temperature)
-
        SubCoolReheatCoolCapFFF, !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
        SubCoolReheatCOOLEIRFT,   !- Energy Input Ratio Modifier Curve (function of temperature)
-
        SubCoolReheatCoolEIRFFF, !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
        SubCoolReheatCoolPLFFPLR, !- Part Load Fraction Correlation (function of part load ratio)
-
        1000,                                       !- Nominal Time for Condensate Removal to Begin {s}
-
        1.5, !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity {dimensionless}
-
        3,                                             !- Maximum ON/OFF Cycling Rate {cycles/hr}
-
        45,                                           !- Latent Capacity Time Constant {s}
-
        ,                                               !- Condenser Air Inlet Node Name
-
        ,                                               !- Condenser Type
-
        ,                                               !- Evaporative Condenser Effectiveness
-
        ,                                               !- Evaporative Condenser Air Flow Rate
-
        ,                                               !- Evaporative Condenser Pump Rated Power Consumption
-
        DOAS DX Coil SHR-FT,         !- Sensible Heat Ratio Function of Temperature Curve Name
-
        DOAS DX Coil SHR-FF;         !- Sensible Heat Ratio Function of Flow Fraction Curve Name
-
 
 
 CoilPerformance:DX:Cooling,
-
        DXSystem 1 DX Coil SubCoolReheat Mode-Stage 1&2,   !- Coil Performance Specification Name
-
        33271.01953,                         !- Gross Rated Total Cooling Capacity (gross) {W}
-
        0.60,                                       !- Gross Rated SHR
-
        3.31,                                       !- Gross Rated Cooling COP
-
        1.695372105,                         !- Rated Air Flow Rate {m3/s}
-
        0.0,                                         !- Fraction of Air Flow Bypassed Around Coil
-
        SubCoolReheatCoolCapFT,   !- Total Cooling Capacity Modifier Curve (function of temperature)
-
        SubCoolReheatCoolCapFFF, !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
        SubCoolReheatCOOLEIRFT,   !- Energy Input Ratio Modifier Curve (function of temperature)
-
        SubCoolReheatCoolEIRFFF, !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
        SubCoolReheatCoolPLFFPLR, !- Part Load Fraction Correlation (function of part load ratio)
-
        1000,                                       !- Nominal Time for Condensate Removal to Begin {s}
-
        1.5, !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity {dimensionless}
-
        3,                                             !- Maximum ON/OFF Cycling Rate {cycles/hr}
-
        45,                                           !- Latent Capacity Time Constant {s}
-
        ,                                               !- Condenser Air Inlet Node Name
-
        ,                                               !- Condenser Type
-
        ,                                               !- Evaporative Condenser Effectiveness
-
        ,                                               !- Evaporative Condenser Air Flow Rate
-
        ,                                               !- Evaporative Condenser Pump Rated Power Consumption
-
        DOAS DX Coil SHR-FT,         !- Sensible Heat Ratio Function of Temperature Curve Name
-
        DOAS DX Coil SHR-FF;         !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+```
 
 ### Coil Performance DX Cooling Outputs
 
@@ -7656,73 +6735,52 @@ This input field is name of sensible heat ratio modifier curve as function of se
 
 Following is an example input for the object.
 
+```idf
 Coil:Heating:DX:SingleSpeed,
-
    Heat Pump DX Heating Coil 1,     ! Name of heating coil
-
    FanAndCoilAvailSched,                   ! Heating coil schedule
-
    35000,                                                 ! Gross Rated Heating Capacity
-
    2.75,                                                   ! Gross Rated Heating COP
-
    1.7,                                                     !rated air flow rate (m3/s)
-
    ,                                                       !rated evaporator fan power per volume flow rate (m3/s)
-
    Heating Coil Air Inlet Node,     !heating coil air side inlet node
-
    SuppHeating Coil Air Inlet Node, !Heating coil air side outlet node
-
    HPACHeatCapFT,     ! heating cap modifier curve (temperature, C)
-
    HPACHeatCapFFF,   ! heating cap modifier curve (flow fraction)
-
    HPACHeatEIRFT,     ! energy input ratio modifier curve (temperature, C)
-
    HPACHeatEIRFFF,   ! energy input ratio modifier curve (flow fraction)
-
    HPACCOOLPLFFPLR, ! part load fraction modifier curve (function of part load ratio)
-
    ,                 ! defrost EIR modifier curve (temp, C) not required for resistive defrost
-
    -5.0,                       ! minimum OAT for compressor operation   (C)
-
    ,                               ! outdoor dry-bulb temperature to turn on compressor   (C)
-
    5.0,                         ! maximum outdoor dry-bulb temp for defrost operation (C)
-
    200.0,                     ! Crankcase heater capacity (W)
-
    10.0,                       ! Maximum outdoor temp for crankcase heater operation (C)
-
    Resistive,             ! Defrost strategy (resistive or reverse-cycle)
-
    Timed,                     ! Defrost control (timed or on-demand)
-
    0.166667,             ! Defrost time period fraction (used for timed defrost control only)
-
    20000;! Resistive defrost heater capacity (used for resistive defrost strategy only)
+```
 
 ### DX Heating Coil Outputs
 
-HVAC,Average,Heating Coil Total Heating Rate [W]
+* HVAC,Average,Heating Coil Total Heating Rate [W]
 
-HVAC,Sum,Heating Coil Total Heating Energy [J]
+* HVAC,Sum,Heating Coil Total Heating Energy [J]
 
-HVAC,Average,Heating Coil Electric Power[W]
+* HVAC,Average,Heating Coil Electric Power[W]
 
-HVAC,Sum,Heating Coil Electric Energy [J]
+* HVAC,Sum,Heating Coil Electric Energy [J]
 
-HVAC,Average,Heating Coil Defrost Electric Power[W]
+* HVAC,Average,Heating Coil Defrost Electric Power[W]
 
-HVAC,Sum,Heating Coil Defrost Electric Energy [J]
+* HVAC,Sum,Heating Coil Defrost Electric Energy [J]
 
-HVAC,Average,Heating Coil Crankcase Heater Electric Power[W]
+* HVAC,Average,Heating Coil Crankcase Heater Electric Power[W]
 
-HVAC,Sum,Heating Coil Crankcase Heater Electric Energy [J]
+* HVAC,Sum,Heating Coil Crankcase Heater Electric Energy [J]
 
-HVAC,Average,Heating Coil Runtime Fraction []
+* HVAC,Average,Heating Coil Runtime Fraction []
 
 
 
@@ -7944,155 +7002,97 @@ Following is an example input for a multi-speed heating DX coil.
 
 
 
+```idf
    COIL:Heating:DX:MultiSpeed,
-
        Heat Pump DX Heating Coil 1,   !- Name of heat pump heating coil
-
        FanAndCoilAvailSched,       !- Availability Schedule
-
        Heating Coil Air Inlet Node,   !- Coil Air Inlet Node
-
        SuppHeating Coil Air Inlet Node,   !- Coil Air Outlet Node
-
        -8.0,                                       !- Minimum Outdoor Dry-bulb Temperature for Compressor Operation {C}
-
        200.0,                                     !- Crankcase Heater Capacity {W}
-
        10.0,                                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
-
        HPACDefrostCAPFT,               !- Defrost energy input ratio modifier curve (temperature)
-
        7.22,                                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
-
        reverse-cycle,                     !- Defrost Strategy
-
        timed,                                     !- Defrost Control
-
        0.058333,                               !- Defrost Time Period Fraction
-
        2000.0,                                   !- Resistive Defrost Heater Capacity {W}
-
        No,                                           !- Apply Part Load Fraction to Speeds greater than 1
-
        NaturalGas,                           !- Fuel type
-
        4,                                             !- Number of speeds
-
        7500,                                       !- Gross Rated Heating Capacity, Speed 1 {W}
-
        2.75,                                       !- Gross Rated Heating COP, Speed 1
-
        0.45,                                       !- Rated Air Flow Rate, Speed 1 {m3/s}
-
        HPACHeatCapFT Speed 1,     !- Heating Capacity Modifier Curve, Speed 1 (temperature)
-
        HPACHeatCapFF Speed 1,     !- Heating capacity modifier curve, Speed 1 (flow fraction)
-
        HPACHeatEIRFT Speed 1,     !- Energy input ratio modifier curve, Speed 1 (temperature)
-
        HPACHeatEIRFF Speed 1,     !- Energy input ratio modifier curve, Speed 1 (flow fraction)
-
        HPACHeatPLFFPLR Speed 1, !- Part load fraction correlation, Speed 1 (part load ratio)
-
        0.2,                                         !- Rated waste heat fraction of power input, Speed 1
-
        HAPCHeatWHFT Speed 1,       !- Waste heat modifier curve, Speed 1 (temperature)
-
        17500,                                     !- Gross Rated Heating Capacity, Speed 2 {W}
-
        2.75,                                       !- Gross Rated Heating COP, Speed 2
-
        0.85,                                       !- Rated Air Flow Rate, Speed 2 {m3/s}
-
        HPACHeatCapFT Speed 2,     !- Heating Capacity Modifier Curve, Speed 2 (temperature)
-
        HPACHeatCapFF Speed 2,     !- Heating capacity modifier curve, Speed 2 (flow fraction)
-
        HPACHeatEIRFT Speed 2,     !- Energy input ratio modifier curve, Speed 2 (temperature)
-
        HPACHeatEIRFF Speed 2,     !- Energy input ratio modifier curve, Speed 2 (flow fraction)
-
        HPACHeatPLFFPLR Speed 2, !- Part load fraction correlation, Speed 2 (part load ratio)
-
        0.2,                                         !- Rated waste heat fraction of power input, Speed 2
-
        HAPCHeatWHFT Speed 2,       !- Waste heat modifier curve, Speed 2 (temperature)
-
-
-
-
-
        25500,                                     !- Gross Rated Heating Capacity, Speed 3 {W}
-
        2.75,                                       !- Gross Rated Heating COP, Speed 3
-
        1.25,                                       !- Rated Air Flow Rate, Speed 3 {m3/s}
-
        HPACHeatCapFT Speed 3,     !- Heating Capacity Modifier Curve, Speed 3 (temperature)
-
        HPACHeatCapFF Speed 3,     !- Heating capacity modifier curve, Speed 3 (flow fraction)
-
        HPACHeatEIRFT Speed 3,     !- Energy input ratio modifier curve, Speed 3 (temperature)
-
        HPACHeatEIRFF Speed 3,     !- Energy input ratio modifier curve, Speed 3 (flow fraction)
-
        HPACHeatPLFFPLR Speed 3, !- Part load fraction correlation, Speed 3 (part load ratio)
-
        0.2,                                         !- Rated waste heat fraction of power input, Speed 3
-
        HAPCHeatWHFT Speed 3,       !- Waste heat modifier curve, Speed 3 (temperature)
-
        35500,                                     !- Gross Rated Heating Capacity, Speed 4 {W}
-
        2.75,                                       !- Gross Rated Heating COP, Speed 4
-
        1.75,                                       !- Rated Air Flow Rate, Speed 4 {m3/s}
-
        HPACHeatCapFT Speed 4,     !- Heating Capacity Modifier Curve, Speed 4 (temperature)
-
        HPACHeatCapFF Speed 4,     !- Heating capacity modifier curve, Speed 4 (flow fraction)
-
        HPACHeatEIRFT Speed 4,     !- Energy input ratio modifier curve, Speed 4 (temperature)
-
        HPACHeatEIRFF Speed 4,     !- Energy input ratio modifier curve, Speed 4 (flow fraction)
-
        HPACHeatPLFFPLR Speed 4, !- Part load fraction correlation, Speed 4 (part load ratio)
-
        0.2,                                         !- Rated waste heat fraction of power input, Speed 4
-
        HAPCHeatWHFT Speed 4;       !- Waste heat modifier curve, Speed 4 (temperature)
+```
 
 
 
 ### MultiSpeed DX Heating Coil Outputs
 
-HVAC,Average,Heating Coil Total Heating Rate [W]
+* HVAC,Average,Heating Coil Total Heating Rate [W]
 
-HVAC,Sum,Heating Coil Total Heating Energy [J]
+* HVAC,Sum,Heating Coil Total Heating Energy [J]
 
-HVAC,Average,Heating Coil Electric Power[W]
+* HVAC,Average,Heating Coil Electric Power[W]
 
-HVAC,Sum,Heating Coil Electric Energy [J]
+* HVAC,Sum,Heating Coil Electric Energy [J]
 
-HVAC,Average,Heating Coil Defrost Electric Power[W]
+* HVAC,Average,Heating Coil Defrost Electric Power[W]
 
-HVAC,Sum,Heating Coil Defrost Electric Energy [J]
+* HVAC,Sum,Heating Coil Defrost Electric Energy [J]
 
-HVAC,Average,Heating Coil Defrost Gas Rate [W]
+* HVAC,Average,Heating Coil Defrost Gas Rate [W]
 
-HVAC,Sum,Heating Coil Defrost Gas Energy [J]
+* HVAC,Sum,Heating Coil Defrost Gas Energy [J]
 
-HVAC,Average,Heating Coil Crankcase Heater Electric Power[W]
+* HVAC,Average,Heating Coil Crankcase Heater Electric Power[W]
 
-HVAC,Sum,Heating Coil Crankcase Heater Electric Energy [J]
+* HVAC,Sum,Heating Coil Crankcase Heater Electric Energy [J]
 
-HVAC,Average,Heating Coil Runtime Fraction []
+* HVAC,Average,Heating Coil Runtime Fraction []
 
 If Fuel Type is not Electricity:
 
-HVAC,Average, Heating Coil &lt;Fuel Type&gt; Rate [W]
+* HVAC,Average, Heating Coil &lt;Fuel Type&gt; Rate [W]
 
-HVAC,Sum, Heating Coil &lt;Fuel Type&gt; Energy [J]
+* HVAC,Sum, Heating Coil &lt;Fuel Type&gt; Energy [J]
 
 
 
@@ -8274,229 +7274,141 @@ This alpha field defines the name of a quadratic or cubic performance curve for 
 
 An example of this statement in an IDF is:
 
+```idf
 Coil:Heating:DX:VariableSpeed,
-
        Heat Pump DX Heating Coil 1,         !- Name
-
        Heating Coil Air Inlet Node,         !- Air Inlet Node Name
-
        SuppHeating Coil Air Inlet Node,   !- Air Outlet Node Name
-
        10.0,                                     !- Number of Speeds {dimensionless}
-
        10.0,                                     !- Nominal Speed Level {dimensionless}
-
        35000,                                   !- Gross Rated Heating Capacity {W}
-
        1.7,                                         !- Rated Air Flow Rate {m3/s}
-
        HPACCOOLPLFFPLR,                 !- Part Load Fraction Correlation Curve Name
-
        ,                                               !- Defrost Energy Input Ratio Function of Temperature Curve Name
-
        -5.0,                                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-
        ,                                               !- Outdoor Dry-Bulb Temperature to Turn Back On Compressor{C}
-
        5.0,                                         !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
-
        200.0,                                     !- Crankcase Heater Capacity {W}
-
        10.0,                                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-
        Resistive,                             !- Defrost Strategy
-
        TIMED,                                     !- Defrost Control
-
        0.166667,                               !- Defrost Time Period Fraction
-
        20000,                                     !- Resistive Defrost Heater Capacity {W}
-
        1838.7,                                   !- Speed 1 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 1 Gross Rated Heating COP {dimensionless}
-
        0.1661088,                             !- Speed 1 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        2295.5,                                   !- Speed 2 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 2 Gross Rated Heating COP {dimensionless}
-
        0.179322,                               !- Speed 2 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        2751.3,                                   !- Speed 3 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 3 Gross Rated Heating COP {dimensionless}
-
        0.1925352,                             !- Speed 3 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        3659.6,                                   !- Speed 4 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 4 Gross Rated Heating COP {dimensionless}
-
        0.2189616,                             !- Speed 4 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
-
-
        4563.7,                                   !- Speed 5 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 5 Gross Rated Heating COP {dimensionless}
-
        0.245388,                               !- Speed 5 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Total Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Total Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        5463.3,                                   !- Speed 6 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 6 Gross Rated Heating COP {dimensionless}
-
        0.2718144,                             !- Speed 6 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        6358.4,                                   !- Speed 7 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 7 Gross Rated Heating COP {dimensionless}
-
        0.2982408,                             !- Speed 7 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        7248.5,                                   !- Speed 8 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 8 Gross Rated Heating COP {dimensionless}
-
        0.3246672,                             !- Speed 8 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        8133.6,                                   !- Speed 9 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 9 Gross Rated Heating COP {dimensionless}
-
        0.3510936,                             !- Speed 9 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        9013.2,                                   !- Speed 10 Gross Rated Heating Capacity {w}
-
        5.0,                                         !- Speed 10 Gross Rated Heating COP {dimensionless}
-
        0.37752,                                 !- Speed 10 Rated Air Flow Rate {m3/s}
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF;                   !- Energy Input Ratio Function of Flow Fraction Curve Name
+```
 
 ### Variable Speed DX Heating Coil Outputs
 
-HVAC,Average,Heating Coil Electric Power [W]
+* HVAC,Average,Heating Coil Electric Power [W]
 
-HVAC,Average,Heating Coil Heating Rate [W]
+* HVAC,Average,Heating Coil Heating Rate [W]
 
-HVAC,Average,Heating Coil Sensible Heating Rate [W]
+* HVAC,Average,Heating Coil Sensible Heating Rate [W]
 
-HVAC,Average,Heating Coil Source Side Heat Transfer Rate [W]
+* HVAC,Average,Heating Coil Source Side Heat Transfer Rate [W]
 
-HVAC,Average,Heating Coil Part Load Ratio []
+* HVAC,Average,Heating Coil Part Load Ratio []
 
-HVAC,Average, Heating Coil Runtime Fraction []
+* HVAC,Average, Heating Coil Runtime Fraction []
 
-HVAC,Average, Heating Coil Air Mass Flow Rate [kg/s]
+* HVAC,Average, Heating Coil Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Heating Coil Air Inlet Temperature [C]
+* HVAC,Average,Heating Coil Air Inlet Temperature [C]
 
-HVAC,Average,Heating Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC,Average,Heating Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC,Average,Heating Coil Air Outlet Temperature [C]
+* HVAC,Average,Heating Coil Air Outlet Temperature [C]
 
-HVAC,Average,Heating Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC,Average,Heating Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC,Average,Heating Coil Upper Speed Level []
+* HVAC,Average,Heating Coil Upper Speed Level []
 
-HVAC,Average,Heating Coil Neighboring Speed Levels Ratio []
+* HVAC,Average,Heating Coil Neighboring Speed Levels Ratio []
 
-HVAC,Average,VSAirtoAirHP Recoverable Waste Heat [W]
+* HVAC,Average,VSAirtoAirHP Recoverable Waste Heat [W]
 
-HVAC,Sum,Heating Coil Electric Energy [J]
+* HVAC,Sum,Heating Coil Electric Energy [J]
 
-HVAC,Sum,Heating Coil Heating Energy [J]
+* HVAC,Sum,Heating Coil Heating Energy [J]
 
-HVAC,Sum,Heating Coil Source Side Heat Transfer Energy [J]
+* HVAC,Sum,Heating Coil Source Side Heat Transfer Energy [J]
 
-HVAC,Average,Heating Coil Defrost Electric Power [W]
+* HVAC,Average,Heating Coil Defrost Electric Power [W]
 
-HVAC,Sum,Heating Coil Defrost Electric Energy [J]
+* HVAC,Sum,Heating Coil Defrost Electric Energy [J]
 
-HVAC,Average,Heating Coil Crankcase Heater Electric Power[W]
+* HVAC,Average,Heating Coil Crankcase Heater Electric Power[W]
 
-HVAC,Sum,Heating Coil Crankcase Heater Electric Energy [J]
+* HVAC,Sum,Heating Coil Crankcase Heater Electric Energy [J]
 
 #### Heating Coil Electric Power [W]
 
@@ -8654,19 +7566,19 @@ This alpha (choice) field defines the source of superheated refrigerant gas from
 
 This alpha (choice) field defines the source of superheated refrigerant gas from which the desuperheater water heating coil recovers energy through heat reclaim. Valid choices are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-Coil:Cooling:DX:TwoSpeed
+* Coil:Cooling:DX:TwoSpeed
 
-Coil:Cooling:DX:TwoStageWithHumidityControlMode
+* Coil:Cooling:DX:TwoStageWithHumidityControlMode
 
-Refrigeration:CompressorRack
+* Refrigeration:CompressorRack
 
-Refrigeration:Condenser:AirCooled
+* Refrigeration:Condenser:AirCooled
 
-Refrigeration:Condenser:EvaporativeCooled
+* Refrigeration:Condenser:EvaporativeCooled
 
-Refrigeration:Condenser:WaterCooled
+* Refrigeration:Condenser:WaterCooled
 
 #### Field: Heating Source Name
 
@@ -8696,71 +7608,53 @@ This optional numeric field contains the off-cycle parasitic electric power in W
 
 Following is an example input for a desuperheater water heating coil.
 
+```idf
 Coil:WaterHeating:Desuperheater,
-
        WaterHeatingCoil,               !- Coil Name
-
        DesuperheaterSched,           !- Availability Schedule Name
-
        DesuperheaterTempSch,       !- Desuperheater Coil Set Point Temperature Schedule Name
-
        5.0,                                         !- Dead Band Temperature Difference {deltaC}
-
        0.25,                                       !- Rated Heat Reclaim Recovery Efficiency
-
        50.0,                                       !- Rated Inlet Water Temperature {C}
-
        35.0,                                       !- Rated Outdoor Air Temperature {C}
-
        60.0,                                       !- Maximum Inlet Water Temperature for Heat Reclaim {C}
-
        HEffFTemp,                             !- Heat Reclaim Efficiency Modifier Curve Name (function of temperature)
-
        WaterHeatingCoilInletNode,     !- Desuperheater Water Inlet Node Name
-
        WaterHeatingCoilOutletNode,   !- Desuperheater Water Outlet Node Name
-
        WaterHeater:Mixed,           !- Water Heater Tank Type
-
        WaterHeatingCoilTank,       !- Water Heater Tank Name
-
        Coil:Cooling:DX:SingleSpeed,   !- Heating Source Type
-
        Furnace ACDXCoil 1,           !- Heating Source Name
-
        0.0001,                                   !- Desuperheater Water Volumetric Flow Rate {m3/s}
-
        100.0,                                     !- Water Pump Power {W}
-
        0.2,                                         !- Fraction of Pump Heat to Water
-
        10.0,                                       !- On-Cycle Parasitic Electric Load {W}
-
        10.0;                                       !- Off-Cycle Parasitic Electric Load {W}
+```
 
 
 
 ### WaterHeating Coil (Desuperheater) Outputs
 
-HVAC,Average,Water Heater Part Load Ratio
+* HVAC,Average,Water Heater Part Load Ratio
 
-HVAC,Average,Water Heater Heating Rate [W]
+* HVAC,Average,Water Heater Heating Rate [W]
 
-HVAC,Sum,Water Heater Heating Energy [J]
+* HVAC,Sum,Water Heater Heating Energy [J]
 
-HVAC,Average,Water Heater Pump Electric Power [W]
+* HVAC,Average,Water Heater Pump Electric Power [W]
 
-HVAC,Sum,Water Heater Pump Electric Energy [J]
+* HVAC,Sum,Water Heater Pump Electric Energy [J]
 
-  HVAC,Average,Water Heater Heat Reclaim Efficiency Modifier Multiplier []
+* HVAC,Average,Water Heater Heat Reclaim Efficiency Modifier Multiplier []
 
-HVAC,Average,Water Heater On Cycle Parasitic Electric Power [W]
+* HVAC,Average,Water Heater On Cycle Parasitic Electric Power [W]
 
-HVAC,Sum,Water Heater On Cycle Parasitic Electric Energy [J]
+* HVAC,Sum,Water Heater On Cycle Parasitic Electric Energy [J]
 
-HVAC,Average,Water Heater Off Cycle Parasitic Electric Power [W]
+* HVAC,Average,Water Heater Off Cycle Parasitic Electric Power [W]
 
-HVAC,Sum,Water Heater Off Cycle Parasitic Electric Energy [J]
+* HVAC,Sum,Water Heater Off Cycle Parasitic Electric Energy [J]
 
 Water Heater Part Load Ratio []This output field contains the part load ratio of the desuperheater heating coil for the timestep being reported. This ratio represents the fraction of the timestep that the desuperheater heating coil is operating.
 
@@ -8796,7 +7690,7 @@ These outputs are the parasitic electric power and consumption associated with t
 
 ### CoilSystem:Cooling:DX
 
-The CoilSystem:Cooling:DX object is a    virtual    container component that consists of a DX cooling coil component and its associated controls, as shown in the Figure below. This control object supports several different types of DX cooling coils (see field Cooling Coil Object Type).
+The CoilSystem:Cooling:DX object is a virtual container component that consists of a DX cooling coil component and its associated controls, as shown in the Figure below. This control object supports several different types of DX cooling coils (see field Cooling Coil Object Type).
 
 This component may be used as a cooling coil in constant volume or variable volume systems, as blow through or draw through, with or without humidity controls. Unlike AirLoopHVAC:Unitary system types, this component controls only the DX coil, not the supply fan.   CoilSystem:Cooling:DX is added to a system by placing it in an air loop branch (see Branch object) or in an AirLoopHVAC:OutdoorAirSystem:EquipmentList or in a ZoneHVAC:OutdoorAirUnit:EquipmentList . It requires one or more setpoint manager (see SetpointManager:\*) objects to specify temperature and/or humidity setpoints (unless it is used in a ZoneHVAC:OutdoorAirUnit which has its own temperature setpoints).   This object is the one that is listed in the Branch or equipment list object rather than the coil itself.   A constant volume or variable volume fan is modeled separately from this cooling system. These are the only fan types allowed for this system type (ref. Fan:ConstantVolume and Fan:VariableVolume).   Cycling fan operation is not available with this model. The CoilSystem:Cooling:DX object can also be placed on dedicated outdoor air system (DOAS) airloop branches or in arloop branches where the air flow to capacity ratio range is between 100     300 cfm/ton. 100% DOAS DX cooling coils operate in lower flow to capacity ratio range compared to regular DX cooling coils. The CoilSystem:Cooling:DX is selected to operate in DOAS application or in low flow to capacity ratio range by specifying    YES    to the input field    Use Outdoor Air DX Cooling Coil   . If this optional input field is left blank or specified as    NO   , then the coil is modeled as regular DX cooling coil. If the CoilSystem:Cooling:DX object is in an AirLoopHVAC:OutdoorAirSystem:EquipmentList or in a ZoneHVAC:OutdoorAirUnit:EquipmentList then it is treated as 100% DOAS DX cooling coil only if the choice input field    Use Outdoor Air DX Cooling Coil    is set too    YES   . All the control options of the regular DX cooling coils are available to DOAS DX coils as well. Heating DX coils in DOAS airloop operate at the same flow to capacity ratio limits as the DOAS DX cooling coils.
 
@@ -8828,15 +7722,15 @@ This alpha field contains the identifying name given to the DX cooling coil cont
 
 This alpha field specifies the type of DX cooling coil. The valid choices for this field are:
 
-Coil:Cooling:DX:SingleSpeed
+* Coil:Cooling:DX:SingleSpeed
 
-CoilSystem:Cooling:DX:HeatExchangerAssisted
+* CoilSystem:Cooling:DX:HeatExchangerAssisted
 
-Coil:Cooling:DX:TwoSpeed
+* Coil:Cooling:DX:TwoSpeed
 
-Coil:Cooling:DX:TwoStageWithHumidityControlMode
+* Coil:Cooling:DX:TwoStageWithHumidityControlMode
 
-Coil:Cooling:DX:VariableSpeed
+* Coil:Cooling:DX:VariableSpeed
 
 #### Field: Cooling Coil Name
 
@@ -8884,61 +7778,37 @@ This input field is the DX cooling coil leaving supply air minimum temperature s
 
 An example IDF specification:
 
+```idf
 CoilSystem:Cooling:DX,
-
        DX Cooling Coil System 1,!- Name
-
        CoolingCoilAvailSched,     !- Availability Schedule Name
-
        Cooling Coil Air Inlet Node,   !- DX Cooling Coil System Inlet Node Name
-
        Air Loop Outlet Node,       !- DX Cooling Coil System Outlet Node Name
-
        Air Loop Outlet Node,       !- DX Cooling Coil System Sensor Node Name
-
        Coil:Cooling:DX:SingleSpeed,   !- Cooling Coil Object Type
-
        ACDXCoil 1,                           !- Cooling Coil Name
-
        None,                                       !- Dehumidification Control Type
-
        Yes,                                         !- Run on Sensible Load
-
        No,                                           !- Run on Latent Load
-
        Yes,                                         !- Use DOAS DX Cooling Coil
-
        2.0;                                         !- DOAS DX Cooling Coil Leaving Minimum Air Temperature
 
 
-
 Coil:Cooling:DX:SingleSpeed,
-
        ACDXCoil 1,                           !- Name
-
        CoolingCoilAvailSched,     !- Availability Schedule Name
-
        25000,                                     !- Gross Rated Total Cooling Capacity {W}
-
        0.75,                                       !- Gross Rated Sensible Heat Ratio
-
        3.0,                                         !- Gross Rated Cooling COP
-
        1.3,                                         !- Rated Air Flow Rate {m3/s}
-
        Cooling Coil Air Inlet Node,   !- Air Inlet Node Name
-
        Air Loop Outlet Node,       !- Air Outlet Node Name
-
        WindACCoolCapFT,                 !- Total Cooling Capacity Function of Temperature Curve Name
-
        WindACCoolCapFFF,               !- Total Cooling Capacity Function of Flow Fraction Curve Name
-
        WindACEIRFT,                         !- Energy Input Ratio Function of Temperature Curve Name
-
        WindACEIRFFF,                       !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        WindACPLFFPLR;                     !- Part Load Fraction Correlation Curve Name
+```
 
 
 
@@ -8946,23 +7816,21 @@ Coil:Cooling:DX:SingleSpeed,
 
 ***All DX Coils:***
 
-HVAC,Average,Coil System Frost Control Status
+* HVAC,Average,Coil System Frost Control Status
 
 
 
 ***Coil Type= Coil:Cooling:DX:TwoStageWithHumidityControlMode***
 
-HVAC,Average,Coil System Cycling Ratio
+* HVAC,Average,Coil System Cycling Ratio
 
-HVAC,Average,Coil System Compressor Speed Ratio
+* HVAC,Average,Coil System Compressor Speed Ratio
 
 
 
 ***Coil types=Coil:Cooling:DX:SingleSpeed & CoilSystem:Cooling:DX:HeatExchangerAssisted***
 
-HVAC,Average,Coil System Part Load Ratio
-
-**  **
+* HVAC,Average,Coil System Part Load Ratio
 
 #### Coil System Cycling Ratio
 
@@ -8982,7 +7850,7 @@ This is a flag indicating whether frost control is active at current time step o
 
 ### CoilSystem:Heating:DX
 
-The CoilSystem:Heating:DX object is a    virtual    container component for a DX heating coil that provides the controls needed to operate the coil.   Only single speed DX air-to-air heating coils are supported.
+The CoilSystem:Heating:DX object is a virtual container component for a DX heating coil that provides the controls needed to operate the coil.   Only single speed DX air-to-air heating coils are supported.
 
 
 
@@ -9012,63 +7880,39 @@ This alpha field specifies the unique name of the DX heating coil.   This field 
 
 An example of a DX heating coil system follows.
 
+```idf
 CoilSystem:Heating:DX,
-
        HeatPump DX Coil 1, !- Name
-
        FanAndCoilAvailSched , !- Availability Schedule Name
-
        Coil:Heating:DX:SingleSpeed,   !- Heating Coil Object Type
-
        Heat Pump DX Heating Coil 1;   !- Heating Coil Name
 
 
-
    Coil:Heating:DX:SingleSpeed,
-
        Heat Pump DX Heating Coil 1,   !- Name
-
        FanAndCoilAvailSched,       !- Availability Schedule Name
-
        autosize,                               !- Gross Rated Heating Capacity {W}
-
        2.75,                                       !- Gross Rated Heating COP {W/W}
-
        autosize,                               !- Rated Air Flow Rate {m3/s}
-
        Heating Coil Air Inlet Node,   !- Air Inlet Node Name
-
        SuppHeating Coil Air Inlet Node,   !- Air Outlet Node Name
-
        HPACHeatCapFT,                     !- Heating Capacity Function of Temperature Curve Name
-
        HPACHeatCapFFF,                   !- Heating Capacity Function of Flow Fraction Curve Name
-
        HPACHeatEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name
-
        HPACHeatEIRFFF,                   !- Energy Input Ratio Function of Flow Fraction Curve Name
-
        HPACCOOLPLFFPLR,                 !- Part Load Fraction Correlation Curve Name
-
        ,                                               !- Defrost Energy Input Ratio Function of Temperature Curve Name
-
        -8.0,                                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-
        5.0,                                         !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
-
        200.0,                                     !- Crankcase Heater Capacity {W}
-
        10.0,                                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-
        Resistive,                             !- Defrost Strategy
-
        TIMED,                                     !- Defrost Control
-
        0.166667,                               !- Defrost Time Period Fraction
-
        autosize,                               !- Resistive Defrost Heater Capacity {W}
-
        Heat Pump 1 Evaporator Node;
+```
+
 
 ### DX Heating Coil System Outputs
 
@@ -9108,11 +7952,11 @@ A unique user-assigned name for the heat exchanger-assisted DX cooling coil. Any
 
 This alpha field denotes the type of heat exchanger being modeled. Valid choices are:
 
-HeatExchanger:AirToAir:FlatPlate
+* HeatExchanger:AirToAir:FlatPlate
 
-HeatExchanger:AirToAir:SensibleAndLatent
+* HeatExchanger:AirToAir:SensibleAndLatent
 
-HeatExchanger:Desiccant:BalancedFlow
+* HeatExchanger:Desiccant:BalancedFlow
 
 #### Field: Heat Exchanger Name
 
@@ -9128,89 +7972,53 @@ This alpha field denotes the name of the DX cooling coil being modeled.
 
 Following is an example input for this compound object:
 
+```idf
 CoilSystem:Cooling:DX:HeatExchangerAssisted,
-
        HeatExchangerAssistedCoolingCoil,               ! Name of the heat exchanger assisted cooling coil
-
        HeatExchanger:AirToAir:SensibleAndLatent,             ! Heat exchanger type
-
        Air to Air Heat Exchanger 1,                         ! Heat exchanger name
-
        Coil:Cooling:DX:SingleSpeed,       ! Cooling coil type
-
        DX Cooling Coil 1;                                             ! Cooling coil name
 
 
-
    HeatExchanger:AirToAir:SensibleAndLatent,
-
        Air to Air Heat Exchanger 1,             !- Heat exchanger name
-
        FanAndCoilAvailSched,                           !- Availability schedule name
-
        1.3,                                                             !- Nominal supply air flow rate {m3/s}
-
        .2,                                                               !- Sensible effectiveness at 100% airflow heating condition
-
        .0,                                                               !- Latent effectiveness at 100% airflow heating condition
-
        .23,                                                             !- Sensible effectiveness at 75% airflow heating condition
-
        .0,                                                               !- Latent effectiveness at 75% airflow heating condition
-
        .2,                                                               !- Sensible effectiveness at 100% airflow cooling condition
-
        .0,                                                               !- Latent effectiveness at 100% airflow cooling condition
-
        .23,                                                             !- Sensible effectiveness at 75% airflow cooling condition
-
        .0,                                                               !- Latent effectiveness at 75% airflow cooling condition
-
        HeatExchangerSupplyAirInletNode,     !- Supply air inlet node name
-
        DX Cooling Coil Air Inlet Node,       !- Supply air outlet node name
-
        HeatExchangerExhaustAirInletNode,   !- Exhaust air inlet node name
-
        HeatExchangerExhaustAirOutletNode, !- Exhaust air outlet node name
-
        50.0,                                                           !- Nominal electric power {W}
-
        No,                                                               !- Supply air outlet temperature control
-
        Rotary,                                                       !- Heat exchanger type
-
        None;                                                           !- Frost control type
 
 
-
    Coil:Cooling:DX:SingleSpeed,
-
        DX Cooling Coil 1,                               !- Coil Name
-
        FanAndCoilAvailSched,                         !- Availability Schedule
-
        25000,                                                       !- Gross Rated Total Cooling Capacity {W}
-
        0.75,                                                         !- Gross Rated Sensible Heat Ratio
-
        3.0,                                                           !- Gross Rated Cooling COP
-
        1.3,                                                           !- Rated Air Flow Rate {m3/s}
-
        DX Cooling Coil Air Inlet Node,     !- Coil Air Inlet Node
-
        HeatExchangerExhaustAirInletNode, !- Coil Air Outlet Node
-
        ACCoolCapFT,                   !- Total Cooling Capacity Modifier Curve (function of temperature)
-
        ACCoolCapFFF,                 !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-
        ACEIRFT,                           !- Energy Input Ratio Modifier Curve (function of temperature)
-
        ACEIRFFF,                         !- Energy Input Ratio Modifier Curve (function of flow fraction)
-
        ACPLFFPLR;                       !- Part Load Fraction Correlation (function of part load ratio)
+```
+
 
 ### CoilSystem:Cooling:DX:HeatExchangerAssisted Outputs
 
@@ -9268,101 +8076,59 @@ This alpha field denotes the name of the chilled-water cooling coil being modele
 
 Following is an example input for this compound object:
 
+```idf
 CoilSystem:Cooling:Water:HeatExchangerAssisted,
-
        Heat Exchanger Assisted Cooling Coil 1, !- Name of the heat exchanger assisted cooling coil
-
        HeatExchanger:AirToAir:FlatPlate,     !- Heat exchanger type
-
        Heat Exchanger Assisting Cooling Coil,   !- Heat exchanger name
-
        Coil:Cooling:Water:DetailedGeometry,                 !- Cooling coil type
-
        Main Cooling Coil 1;                                       !- Cooling coil name
 
 
-
 HeatExchanger:AirToAir:FlatPlate,
-
        Heat Exchanger Assisting Cooling Coil,   !- Name
-
        CoolingCoilAvailSched,     !- Availability Schedule Name
-
        Counter Flow,                       !- flow arrangement
-
        Yes,                                         !- Economizer lockout
-
        1.0,                                         !- hA ratio
-
        1.32,                                       !- Nominal supply air flow rate {m3/s}
-
        24.0,                                       !- Nominal supply air inlet temperature {C}
-
        21.0,                                       !- Nominal supply air outlet temperature {C}
-
        1.32,                                       !- Nominal secondary air flow rate {m3/s}
-
        12.0,                                       !- Nominal secondary air inlet temperature {C}
-
        100.0,                                     !- Nominal electric power {W}
-
        Mixed Air Node 1,               !- Supply air inlet node
-
        Main Cooling Coil 1 Inlet Node,   !- Supply air outlet node
-
        Main Cooling Coil 1 Outlet Node, !- Secondary air inlet node
-
        Main Heating Coil 1 Inlet Node;   !- Secondary air outlet node
 
 
 
 
-
 Coil:Cooling:Water:DetailedGeometry,
-
        Main Cooling Coil 1,         !- Coil Name
-
        CoolingCoilAvailSched,     !- Availability Schedule Name
-
        autosize,                               !- Max Water Flow Rate of Coil {m3/s}
-
        autosize,                               !- Tube Outside Surf Area {m2}
-
        autosize,                               !- Total Tube Inside Area {m2}
-
        autosize,                               !- Fin Surface Area {m2}
-
        autosize,                               !- Minimum Air Flow Area {m2}
-
        autosize,                               !- Coil Depth {m}
-
        autosize,                               !- Fin Diameter {m}
-
        ,                                               !- Fin Thickness {m}
-
       ,                                               !- Tube Inside Diameter {m}
-
        ,                                               !- Tube Outside Diameter {m}
-
        ,                                               !- Tube Thermal Conductivity {W/m-K}
-
        ,                                               !- Fin Thermal Conductivity {W/m-K}
-
        ,                                               !- Fin Spacing {m}
-
        ,                                               !- Tube Depth Spacing {m}
-
        ,                                               !- Number of Tube Rows
-
        autosize,                               !- Number of Tubes per Row
-
-       Main Cooling Coil 1 Water Inlet Node,   !- Coil\_Water\_Inlet\_Node
-
-       Main Cooling Coil 1 Water Outlet Node, !- Coil\_Water\_Outlet\_Node
-
-       Main Cooling Coil 1 Inlet Node,     !- Coil\_Air\_Inlet\_Node
-
-       Main Cooling Coil 1 Outlet Node;   !- Coil\_Air\_Outlet\_Node
+       Main Cooling Coil 1 Water Inlet Node,   !- Coil_Water_Inlet_Node
+       Main Cooling Coil 1 Water Outlet Node, !- Coil_Water_Outlet_Node
+       Main Cooling Coil 1 Inlet Node,     !- Coil_Air_Inlet_Node
+       Main Cooling Coil 1 Outlet Node;   !- Coil_Air_Outlet_Node
+```
 
 ### CoilSystem:Cooling:Water:HeatExchangerAssisted Outputs
 
@@ -9514,91 +8280,65 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
 Following is an example input for the Coil:WaterHeating:AirToWaterHeatPump object.
 
+```idf
 Coil:WaterHeating:AirToWaterHeatPump,
-
        Zone4HPWHDXCoil,                         !- Coil Name
-
        4000.0,                                           !- Heating Capacity {W}
-
        3.2,                                                 !- Rated COP {W/W}
-
        0.6956,                                           !- Rated SHR (gross)
-
        19.7,                                               !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
-
        13.5,                                               !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
-
        57.5,                                               !- Rated Condenser Inlet Water Temperature {C}
-
        autocalculate,                             !- Rated Evaporator Air Volumetric Flow Rate {m3/s}
-
        autocalculate,                             !- Rated Condenser Water Volumetric Flow Rate {m3/s}
-
        No,                                                   !- Evaporator Fan Power Included in Rated COP
-
        No,                                                   !- Condenser Pump Power Included in Rated COP
-
        No,                                                   !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
-
        150.0,                                             !- Condenser Water Pump Power {W}
-
        0.1,                                                 !- Fraction of Condenser Pump Heat to Water
-
        Zone4AirOutletNode,                   !- Evaporator Air Inlet Node Name
-
        Zone4DXCoilAirOutletNode,       !- Evaporator Air Outlet Node Name
-
        Zone4WaterInletNode,                 !- Condenser Water Inlet Node Name
-
        Zone4WaterOutletNode,               !- Condenser Water Outlet Node Name
-
        100.0,                                             !- Crankcase Heater Capacity {W}
-
        5.0,                                                 !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
-
        wet-bulb temperature,               !- Evaporator Air Temperature Type for Curve Objects
-
        HPWHHeatingCapFTemp,                 !- Heating Capacity Modifier Curve Name (function of temperature)
-
        ,                                                       !- Heating Capacity Modifier Curve Name (function of air flow fraction)
-
        ,                                                       !- Heating Capacity Modifier Curve Name (function of water flow fraction)
-
        HPWHHeatingCOPFTemp,                 !- Heating COP Modifier Curve Name (function of temperature)
-
        ,                                                       !- Heating COP Modifier Curve Name (function of air flow fraction)
-
        ,                                                       !- Heating COP Modifier Curve Name (function of water flow fraction)
-
        HPWHPLFFPLR;                                 !- Part Load Fraction Correlation Name (function of part load ratio)
+```
 
 ### Coil:WaterHeating:AirToWaterHeatPump Outputs
 
-HVAC,Average,Cooling Coil Total Cooling Rate [W]
+* HVAC,Average,Cooling Coil Total Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Total Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Total Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
+* HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Latent Cooling Rate [W]
+* HVAC,Average,Cooling Coil Latent Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
 
-HVAC,Average, Cooling Coil Runtime Fraction []
+* HVAC,Average, Cooling Coil Runtime Fraction []
 
-HVAC,Average,DX Cooling Coil Crankcase Heater Electric Power [W]
+* HVAC,Average,DX Cooling Coil Crankcase Heater Electric Power [W]
 
-HVAC,Sum, Cooling Coil Crankcase Heater Electric Energy [J]
+* HVAC,Sum, Cooling Coil Crankcase Heater Electric Energy [J]
 
-HVAC,Average,Cooling Coil Total Water Heating Rate [W]
+* HVAC,Average,Cooling Coil Total Water Heating Rate [W]
 
-HVAC,Sum,Cooling Coil Total Water Heating Energy [J]
+* HVAC,Sum,Cooling Coil Total Water Heating Energy [J]
 
-HVAC,Average,Cooling Coil Water Heating Electric Power[W]
+* HVAC,Average,Cooling Coil Water Heating Electric Power[W]
 
-HVAC,Sum,Cooling Coil Water Heating Electric Energy [J]
+* HVAC,Sum,Cooling Coil Water Heating Electric Energy [J]
 
 #### Cooling Coil Total Cooling Rate [W]
 
@@ -9778,61 +8518,36 @@ This numeric field defines the estimated parameter **source side heat transfer r
 
 Following is an example for COIL:WaterToAirHP:ParameterEstimation:Cooling coil input
 
+```idf
    Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
-
        Heat Pump Cooling Mode AHU1,   !- Name
-
        Scroll,                                   !- Compressor Type
-
        R22,                                         !- Refrigerant Type
-
        0.0015,                                   !- Design Source Side Flow Rate {m3/s}
-
        38000,                                     !- Nominal Cooling Coil Capacity {W}
-
        0,                                             !- Nominal Time for Condensate Removal to Begin {s}
-
        0,         !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
        3000000,                                 !- High Pressure Cutoff {Pa}
-
        0,                                             !- Low Pressure Cutoff {Pa}
-
        AHU1 Water to Air Heat Pump Source Side1 Inlet Node,   !- Water Inlet Node Name
-
        AHU1 Water to Air Heat Pump Source Side1 Outlet Node,   !- Water Outlet Node Name
-
        AHU 1 Supply Fan Outlet, !- Air Inlet Node Name
-
        Cooling Coil Air Outlet Node AHU1,   !- Air Outlet Node Name
-
        3.78019E+03,                         !- Load Side Total Heat Transfer Coefficient {W/K}
-
        3.41103E+03,                         !- Load Side Outside Surface Heat Transfer Coefficient {W/K}
-
        1.57066E+00,                         !- Superheat Temperature at the Evaporator Outlet {C}
-
        2.23529E+03,                         !- Compressor Power Losses {W}
-
        1.34624E+00,                         !- Compressor Efficiency
-
        ,                                               !- Compressor Piston Displacement {m3/s}
-
        ,                                               !- Compressor Suction/Discharge Pressure Drop {Pa}
-
        ,                                               !- Compressor Clearance Factor {dimensionless}
-
        9.74424E-03,                         !- Refrigerant Volume Flow Rate {m3/s}
-
        2.30803E+00,                         !- Volume Ratio {dimensionless}
-
        2.06530E-02,                         !-Leak Rate Coefficient
-
        1.92757E+03,                         !- Source Side Heat Transfer Coefficient {W/K}
-
        ,                                               !- Source Side Heat Transfer Resistance1 {dimensionless}
-
        ;                                               !- Source Side Heat Transfer Resistance2 {W/K}
+```
 
 ### Coil:Cooling:WaterToAirHeatPump:EquationFit
 
@@ -9902,113 +8617,81 @@ This numeric field defines ratio of the initial moisture evaporation rate from t
 
 Following is an example of the input for Coil:WaterToAirHP:EquationFit:Cooling coil
 
+```idf
 Coil:Cooling:WaterToAirHeatPump:EquationFit,
-
        Heat Pump Cooling Mode,!- Name of Coil
-
        Water to Air Heat Pump Source Side1 Inlet Node,!- Coil Water Inlet Node Name
-
        Water to Air Heat Pump Source Side1 Outlet Node,!- Coil Water Outlet Node Name
-
        Cooling Coil Air Inlet Node,!- Coil Air Inlet Node Name
-
        Heating Coil Air Inlet Node,!- Coil Air Outlet Node Name
-
        4.6015E-01,!- Rated Air Volumetric Flow Rate
-
        2.8391E-04,!- Rated Water Volumetric Flow Rate
-
        23125.59,!- Gross Rated Total Cooling Capacity
-
        16267.05,!- Gross Rated Sensible Cooling Capacity
-
        4.7,!- Rated Cooling Coefficient of Performance
-
        -0.68126221,!- Total Cooling Capacity Coefficient 1
-
        1.99529297,!- Total Cooling Capacity Coefficient 2
-
        -0.93611888,!- Total Cooling Capacity Coefficient 3
-
        0.02081177,!- Total Cooling Capacity Coefficient 4
-
        0.008438868,!- Total Cooling Capacity Coefficient 5
-
        2.24209455,!- Sensible Cooling Capacity Coefficient 1
-
        7.28913391,!- Sensible Cooling Capacity Coefficient 2
-
        -9.06079896,!- Sensible Cooling Capacity Coefficient 3
-
        -0.36729404,!- Sensible Cooling Capacity Coefficient 4
-
        0.218826161,!- Sensible Cooling Capacity Coefficient 5
-
        0.00901534,!- Sensible Cooling Capacity Coefficient 6
-
        -3.20456384,!- Cooling Power Consumption Coefficient 1
-
        0.47656454,!- Cooling Power Consumption Coefficient 2
-
        3.16734236,!- Cooling Power Consumption Coefficient 3
-
        0.10244637,!- Cooling Power Consumption Coefficient 4
-
        -0.038132556,!- Cooling Power Consumption Coefficient 5
-
        0,!- Nominal Time for Condensate Removal to Begin
-
        0;!- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+```
 
 ### Water to Air Heat Pump Cooling Coil (Parameter Estimation and Equation Fit) Outputs
 
 Coil:Cooling:WaterToAirHeatPump:ParameterEstimation and Coil:Cooling:WaterToAirHeatPump:EquationFit have the same output variables listed as follows;
 
-HVAC, Average, Cooling Coil Electric Power [W]
+* HVAC, Average, Cooling Coil Electric Power [W]
 
-HVAC, Average, Cooling Coil Total Cooling Rate [W]
+* HVAC, Average, Cooling Coil Total Cooling Rate [W]
 
-HVAC, Average, Cooling Coil Sensible Cooling Rate [W]
+* HVAC, Average, Cooling Coil Sensible Cooling Rate [W]
 
-HVAC, Average, Cooling Coil Source Side Heat Transfer Rate [W]
+* HVAC, Average, Cooling Coil Source Side Heat Transfer Rate [W]
 
-HVAC, Average, Cooling Coil Part Load Ratio []
+* HVAC, Average, Cooling Coil Part Load Ratio []
 
-HVAC, Average, Cooling Coil Runtime Fraction []
+* HVAC, Average, Cooling Coil Runtime Fraction []
 
+* HVAC, Average, Cooling Coil Air Mass Flow Rate [kg/s]
 
+* HVAC, Average, Cooling Coil Air Inlet Temperature [C]
 
-HVAC, Average, Cooling Coil Air Mass Flow Rate [kg/s]
+* HVAC, Average, Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC, Average, Cooling Coil Air Inlet Temperature [C]
+* HVAC, Average, Cooling Coil Air Outlet Temperature [C]
 
-HVAC, Average, Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC, Average, Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC, Average, Cooling Coil Air Outlet Temperature [C]
+* HVAC, Average, Cooling Coil Source Side Mass Flow Rate [kg/s]
 
-HVAC, Average, Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC, Average, Cooling Coil Source Side Inlet Temperature [C]
 
+* HVAC, Average, Cooling Coil Source Side Outlet Temperature [C]
 
+* HVAC, Sum, Cooling Coil Electric Energy [J]
 
-HVAC, Average, Cooling Coil Source Side Mass Flow Rate [kg/s]
+* HVAC, Sum, Cooling Coil Total Cooling Energy [J]
 
-HVAC, Average, Cooling Coil Source Side Inlet Temperature [C]
+* HVAC, Sum, Cooling Coil Sensible Cooling Energy [J]
 
-HVAC, Average, Cooling Coil Source Side Outlet Temperature [C]
+* HVAC, Sum, Cooling Coil Latent Cooling Energy [J]
 
+* HVAC, Average, Cooling Coil Latent Cooling Rate [W]
 
-
-HVAC, Sum, Cooling Coil Electric Energy [J]
-
-HVAC, Sum, Cooling Coil Total Cooling Energy [J]
-
-HVAC, Sum, Cooling Coil Sensible Cooling Energy [J]
-
-HVAC, Sum, Cooling Coil Latent Cooling Energy [J]
-
-HVAC, Average, Cooling Coil Latent Cooling Rate [W]
-
-HVAC, Sum, Cooling Coil Source Side Heat Transfer Energy [J]
+* HVAC, Sum, Cooling Coil Source Side Heat Transfer Energy [J]
 
 #### Cooling Coil Electric Power [W]
 
@@ -10088,10 +8771,6 @@ These output variables are the total latent cooling output of the coil in Joules
 
 The output variable is the total source side heat transfer of the coil in Joules over the timestep being reported
 
-
-
-
-
 ------------------------------------------------------------------------
 
 [[1]](#_ftnref1) The 23.9 &deg;C wet-bulb temperature condition is not applicable for air-cooled condensers which do not evaporate condensate.
@@ -10101,8 +8780,6 @@ The output variable is the total source side heat transfer of the coil in Joules
 [[3]](#_ftnref3) The 23.9 &deg;C wet-bulb temperature condition is not applicable for air-cooled condensers which do not evaporate condensate.
 
 [[4]](#_ftnref4) The 23.9 &deg;C wet-bulb temperature condition is not applicable for air-cooled condensers which do not evaporate condensate.
-
-
 
 ### Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
 
@@ -10268,343 +8945,201 @@ The actual recoverable waste heat at Speed &lt;x&gt; is calculated as below:
 
 An example of this statement in an IDF is:
 
+```idf
 Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
-
        Sys 1 Heat Pump Cooling Mode,                                              !- Name
-
        Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,   !- Water Inlet Node Name
-
        Sys 1 Water to Air Heat Pump Source Side1 Outlet Node, !- Water Outlet Node Name
-
        Sys 1 Cooling Coil Air Inlet Node,                                    !- Air Inlet Node Name
-
        Sys 1 Heating Coil Air Inlet Node,                                    !- Air Outlet Node Name
-
        10.0,                                                                                                !- Number of Speeds
-
        10.0,                                                                                                !- Nominal Speed Level
-
        Autosize,                                                                                      !- Gross Rated Total Cooling Capacity {W}
-
        Autosize,                                                                                      !- Rated Air Flow Rate {m3/s}
-
        Autosize,                                                                                      !- Rated Water Flow Rate {m3/s}
-
        0.0,                                     !Nominal time for Condensate to Begin Leaving the Coil
-
        0.0,                                     !Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity
-
        1,                                !Flag for Using Hot Gas Reheat or Not, 0 = false; 1 = true
-
        VS Energy Part Load Fraction 1,   !Energy Part Load Fraction Curve
-
        1524.1,                                    !-Speed 1 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                     !-Speed 1 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                       !-Speed 1 Reference Unit Gross Cooling COP
-
        0.1359072,                           !-Speed 1 Reference Unit Rated air flow rate
-
        0.000381695,                       !-Speed 1 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,             !-Speed 1 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,          !-Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test,     !-Speed 1 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,             !-Speed 1 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,        !-Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test,     !-Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                        !-Speed 1 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test, !-Speed 1 Waste Heat Function of Temperature Curve Name
-
        1877.9,                                      !-Speed 2 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                       !-Speed 2 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                         !-Speed 2 Reference Unit Gross Cooling COP
-
        0.151008,                               !-Speed 2 Reference Unit Rated air flow rate
-
        0.000381695,                         !-Speed 2 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,               !-Speed 2 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,          !-Speed 2   Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test,     !-Speed 2   Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,             !-Speed 2   Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,        !-Speed 2   Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test,     !-Speed 2   Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                        !-Speed 2   Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test, !-Speed 2   Waste Heat Function of Temperature Curve Name
-
        2226.6,                                      !-Speed 3 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                       !-Speed 3 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                         !-Speed 3 Reference Unit Gross Cooling COP
-
        0.1661088,                               !-Speed 3 Reference Unit Rated air flow rate
-
        0.000381695,                           !-Speed 3 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,                 !-Speed 3 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,      !-Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test,   !-Speed 3 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,        !-Speed 3 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,     !-Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test, !-Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                        !-Speed 3 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test,!-Speed 3 Waste Heat Function of Temperature Curve Name
-
        2911.3,                                  !-Speed 4 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                   !-Speed 4 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                     !-Speed 4 Reference Unit Gross Cooling COP
-
        0.1963104,                         !-Speed 4 Reference Unit Rated air flow rate
-
        0.000381695,                     !-Speed 4 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,           !-Speed 4 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,      !-Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test, !-Speed 4 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,        !-Speed 4 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,    !-Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test, !-Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                    !-Speed 4 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test, !-Speed 4 Waste Heat Function of Temperature Curve Name
-
        3581.7,                                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                   !- Speed 5 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                     !- Speed 5 Reference Unit Gross Cooling COP
-
        0.226512,                           !- Speed 5 Reference Unit Rated air flow rate
-
        0.000381695,                     !- Speed 5 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test, !- Speed 5 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,        !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,    !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test, !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                    !- Speed 5 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
-
        4239.5,                                !-Speed 6 Reference Unit Gross Total Cooling Capacity
-
        0.75,                                   !-Speed 6 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                     !-Speed 6 Reference Unit Gross Cooling COP
-
        0.2567136,                         !-Speed 6 Reference Unit Rated air flow rate
-
        0.000381695,                     !-Speed 6 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,           !-Speed 6 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,      !-Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test, !-Speed 6 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,        !-Speed 6 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,    !-Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test, !-Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                    !-Speed 6 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test, !-Speed 6 Waste Heat Function of Temperature Curve Name
-
        4885.7,                                  !-Speed 7 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                   !-Speed 7 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                     !-Speed 7 Reference Unit Gross Cooling COP
-
        0.2869152,                         !-Speed 7 Reference Unit Rated air flow rate
-
        0.000381695,                     !-Speed 7 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,           !-Speed 7 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,      !-Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test, !-Speed 7 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,        !-Speed 7 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,    !-Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test, !-Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                    !-Speed 7 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test, !-Speed 7 Waste Heat Function of Temperature Curve Name
-
        5520.7,                                  !-Speed 8 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                     !-Speed 8 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                       !-Speed 8 Reference Unit Gross Cooling COP
-
        0.3171168,                           !-Speed 8 Reference Unit Rated air flow rate
-
        0.000381695,                       !-Speed 8 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,             !-Speed 8 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,        !-Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test, !-Speed 8 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,        !-Speed 8 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,    !-Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test, !-Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                    !-Speed 8 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test, !-Speed 8 Waste Heat Function of Temperature Curve Name
-
        6144.8,                                      !-Speed 9 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                       !-Speed 9 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                         !-Speed 9 Reference Unit Gross Cooling COP
-
        0.3473184,                             !-Speed 9 Reference Unit Rated air flow rate
-
        0.000381695,                         !-Speed 9 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,               !-Speed 9 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,        !-Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test,   !-Speed 9 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,          !-Speed 9 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,      !-Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test,   !-Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                      !-Speed 9 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test, !-Speed 9 Waste Heat Function of Temperature Curve Name
-
        6758.0,                                    !-Speed 10 Reference Unit Gross Rated Total Cooling Capacity
-
        0.75,                                       !-Speed 10 Reference Unit Gross Sensible Heat Ratio
-
        4.0,                                         !-Speed 10 Reference Unit Gross Cooling COP
-
        0.37752,                                 !-Speed 10 Reference Unit Rated air flow rate
-
        0.000381695,                         !-Speed 10 Reference Unit Rated water flow rate
-
        TC VS Temp1 Test,               !-Speed 10 Total Cooling Capacity Function of Temperature Curve Name
-
        TC VS AirFrac Test,          !-Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-
        TC VS WaterFrac Test,     !-Speed 10 Total Cooling Capacity Function of Water Flow Fraction Curve Name
-
        EIR VS Temp1 Test,            !-Speed 10 Energy Input Ratio Function of Temperature Curve Name
-
        EIR VS AirFrac Test,        !-Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIR VS WaterFrac Test, !-Speed 10 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                    !-Speed 10 Waste Heat fraction to power input
-
        wasteHeat VS Temp1 Test; !-Speed 10 Waste Heat Function of Temperature Curve Name
+```
 
 ### Variable Speed Water to Air Heat Pump Cooling Coil Outputs
 
-HVAC, Average, Cooling Coil Electric Power [W]
+* HVAC, Average, Cooling Coil Electric Power [W]
 
-HVAC, Average, Cooling Coil Total Cooling Rate [W]
+* HVAC, Average, Cooling Coil Total Cooling Rate [W]
 
-HVAC, Average, Cooling Coil Sensible Cooling Rate [W]
+* HVAC, Average, Cooling Coil Sensible Cooling Rate [W]
 
-HVAC, Average, Cooling Coil Source Side Heat Transfer Rate [W]
+* HVAC, Average, Cooling Coil Source Side Heat Transfer Rate [W]
 
-HVAC, Average, Cooling Coil Part Load Ratio []
+* HVAC, Average, Cooling Coil Part Load Ratio []
 
-HVAC, Average, Cooling Coil Runtime Fraction []
+* HVAC, Average, Cooling Coil Runtime Fraction []
 
-HVAC, Average, Cooling Coil Air Mass Flow Rate [kg/s]
+* HVAC, Average, Cooling Coil Air Mass Flow Rate [kg/s]
 
-HVAC, Average, Cooling Coil Air Inlet Temperature [C]
+* HVAC, Average, Cooling Coil Air Inlet Temperature [C]
 
-HVAC, Average, Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC, Average, Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC, Average, Cooling Coil Air Outlet Temperature [C]
+* HVAC, Average, Cooling Coil Air Outlet Temperature [C]
 
-HVAC, Average, Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC, Average, Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC, Average, Cooling Coil Source Side Mass Flow Rate [kg/s]
+* HVAC, Average, Cooling Coil Source Side Mass Flow Rate [kg/s]
 
-HVAC, Average, Cooling Coil Source Side Inlet Temperature [C]
+* HVAC, Average, Cooling Coil Source Side Inlet Temperature [C]
 
-HVAC, Average, Cooling Coil Source Side Outlet Temperature [C]
+* HVAC, Average, Cooling Coil Source Side Outlet Temperature [C]
 
-HVAC, Average, Cooling Coil Upper Speed Level []
+* HVAC, Average, Cooling Coil Upper Speed Level []
 
-HVAC, Average, Cooling Coil Neighboring Speed Levels Ratio []
+* HVAC, Average, Cooling Coil Neighboring Speed Levels Ratio []
 
-HVAC, Average, Cooling Coil Recoverable Heat Transfer Rate [W]
+* HVAC, Average, Cooling Coil Recoverable Heat Transfer Rate [W]
 
-HVAC, Sum, Cooling Coil Electric Energy [J]
+* HVAC, Sum, Cooling Coil Electric Energy [J]
 
-HVAC, Sum, Cooling Coil Total Cooling Energy [J]
+* HVAC, Sum, Cooling Coil Total Cooling Energy [J]
 
-HVAC, Sum, Cooling Coil Sensible Cooling Energy [J]
+* HVAC, Sum, Cooling Coil Sensible Cooling Energy [J]
 
-HVAC, Sum, Cooling Coil Latent Cooling Energy [J]
+* HVAC, Sum, Cooling Coil Latent Cooling Energy [J]
 
-HVAC, Average, Cooling Coil Latent Cooling Rate [W]
+* HVAC, Average, Cooling Coil Latent Cooling Rate [W]
 
-HVAC, Sum, Cooling Coil Source Side Heat Transfer Energy [J]
+* HVAC, Sum, Cooling Coil Source Side Heat Transfer Energy [J]
 
 #### Cooling Coil Electric Power [W]
 
@@ -10806,55 +9341,33 @@ This numeric field defines the estimated **parameter source side heat transfer r
 
 Following is an example input for Coil:WatertoAirHP:ParameterEstimation:Heating
 
+```idf
    Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
-
        Heat Pump HEATING Mode AHU1,   !- Name
-
        Scroll,                                   !- Compressor Type
-
        R22,                                         !- Refrigerant Type
-
        0.0015,                                   !- Design Source Side Flow Rate {m3/s}
-
        38000,                                     !- Gross Rated Heating Capacity {W}
-
        3000000,                                 !- High Pressure Cutoff
-
        0,                                             !- Low Pressure Cutoff {Pa}
-
        AHU1 Water to Air Heat Pump Source Side2 Inlet Node,   !- Water Inlet Node Name
-
        AHU1 Water to Air Heat Pump Source Side2 Outlet Node,   !- Water Outlet Node Name
-
        Cooling Coil Air Outlet Node AHU1,   !- Air Inlet Node Name
-
        Heating Coil Air Outlet Node AHU1,   !- Air Outlet Node Name
-
        5.79505E+03,                         !- Load Side Total Heat Transfer Coefficient {W/K}
-
        1.56696E+00,                         !- Superheat Temperature at the Evaporator Outlet {C}
-
        3.91338E+03,                         !- Compressor Power Losses {W}
-
        1.26356E+00,                         !- Compressor Efficiency
-
        ,                                               !- Compressor Piston Displacement {m3/s}
-
        ,                                               !- Compressor Suction/Discharge Pressure Drop {Pa}
-
        ,                                               !- Compressor Clearance Factor {dimensionless}
-
        6.99573E-03,                         !- Refrigerant Volume Flow Rate {m3/s}
-
        4.96167E+00,                         !- Volume Ratio {dimensionless}
-
        2.07750E-06,                         !-Leak Rate Coefficient {dimensionless}
-
        4.00322E+03,                         !- Source Side Heat Transfer Coefficient {W/K}
-
        ,                                               !- Source Side Heat Transfer Resistance1 {dimensionless}
-
        ;                                               !- Source Side Heat Transfer Resistance2 {W/K}
+```
 
 ### Coil:Heating:WaterToAirHeatPump:EquationFit
 
@@ -10908,49 +9421,39 @@ These numeric fields contain the first to fifth coefficient for the heat pump po
 
 Coil:Heating:WaterToAirHeatPump:ParameterEstimation and Coil:Heating:WaterToAirHeatPump:EquationFit have the same output variables listed as follows;
 
+* HVAC, Average, Heating Coil Electric Power [W]
 
+* HVAC, Average, Heating Coil Heating Rate [W]
 
-HVAC, Average, Heating Coil Electric Power [W]
+* HVAC, Average, Heating Coil Sensible Heating Rate [W]
 
-HVAC, Average, Heating Coil Heating Rate [W]
+* HVAC, Average, Heating Coil Source Side Heat Transfer Rate [W]
 
-HVAC, Average, Heating Coil Sensible Heating Rate [W]
+* HVAC, Average, Heating Coil Part Load Ratio
 
-HVAC, Average, Heating Coil Source Side Heat Transfer Rate [W]
+* HVAC, Average, Heating Coil Runtime Fraction []
 
-HVAC, Average, Heating Coil Part Load Ratio
+* HVAC, Average, Heating Coil Air Mass Flow Rate [kg/s]
 
-HVAC, Average, Heating Coil Runtime Fraction []
+* HVAC, Average, Heating Coil Air Inlet Temperature [C]
 
+* HVAC, Average, Heating Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
 
+* HVAC, Average, Heating Coil Air Outlet Temperature [C]
 
-HVAC, Average, Heating Coil Air Mass Flow Rate [kg/s]
+* HVAC, Average, Heating Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC, Average, Heating Coil Air Inlet Temperature [C]
+* HVAC, Average, Heating Coil Source Side Mass Flow Rate [kg/s]
 
-HVAC, Average, Heating Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC, Average, Heating Coil Source Side Inlet Temperature [C]
 
-HVAC, Average, Heating Coil Air Outlet Temperature [C]
+* HVAC, Average, Heating Coil Source Side Outlet Temperature [C]
 
-HVAC, Average, Heating Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC, Sum, Heating Coil Electric Energy [J]
 
+* HVAC, Sum, Heating Coil Heating Energy [J]
 
-
-HVAC, Average, Heating Coil Source Side Mass Flow Rate [kg/s]
-
-HVAC, Average, Heating Coil Source Side Inlet Temperature [C]
-
-HVAC, Average, Heating Coil Source Side Outlet Temperature [C]
-
-
-
-HVAC, Sum, Heating Coil Electric Energy [J]
-
-HVAC, Sum, Heating Coil Heating Energy [J]
-
-HVAC, Sum, Heating Coil Source Side Heat Transfer Energy [J]
-
-
+* HVAC, Sum, Heating Coil Source Side Heat Transfer Energy [J]
 
 #### Heating Coil Electric Power [W]
 
@@ -11166,315 +9669,186 @@ The actual recoverable waste heat at Speed &lt;x&gt; is calculated as below:
 
 An example of this statement in an IDF is:
 
+```idf
 Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
-
        Sys 1 Heat Pump Heating Mode,                                                        !- Name
-
        Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,        !- Water Inlet Node Name
-
        Sys 1 Water to Air Heat Pump Source Side2 Outlet Node,      !- Water Outlet Node Name
-
        Sys 1 Heating Coil Air Inlet Node,                                              !- Air Inlet Node Name
-
        Sys 1 SuppHeating Coil Air Inlet Node,                                      !- Air Outlet Node Name
-
        10.0,                                                                                                         !- Number of Speeds
-
        10.0,                                                                                                         !- Nominal Speed Level
-
        Autosize,                                                                                                !- Rated Heating Capacity {W}
-
        Autosize,                                                                                                !- Rated Air Flow Rate {m3/s}
-
        Autosize,                                                                                                !- Rated Water Flow Rate {m3/s}
-
        VS Energy Part Load Fraction 1,                                                    !- Energy part load fraction curve
-
        1838.7,                                                                       !- Speed 1 Reference Unit Gross Rated Heating Capacity
-
        5.0,                                                                              !- Speed 1 Reference Unit Gross Rated Heating COP
-
        0.1661088,                                                                                !- Speed 1 Reference Unit Rated Air Flow Rate
-
        0.000381695,                                                                            !- Speed 1 Reference Unit Rated Water Flow Rate
-
        Heating VS Temp1 Test,       !- Speed 1 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test,   !- Speed 1 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 1 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,             !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,         !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                           !- Speed 1 Waste Heat Fraction to Power Input
-
        Heating wasteHeat VS Temp1 Test,     !- Speed 1 Waste Heat Function of Temperature Curve Name
-
        2295.5,                                        !- Speed 2 Reference Unit Gross Rated Heating Capacity
-
        5.0,                                           !- Speed 2 Reference Unit Gross Rated Heating COP
-
        0.179322,                                 !- Speed 2 Reference Unit Rated air flow rate
-
        0.000381695,                           !- Speed 2 Reference Unit Rated water flow rate
-
        Heating VS Temp1 Test,       !- Speed 2 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test,   !- Speed 2 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 2 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,            !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,       !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                          !- Speed 2 Waste Heat Fraction to Power Input
-
        Heating wasteHeat VS Temp1 Test,   !- Speed 2 Waste Heat Function of Temperature Curve Name
-
        2751.3,                                        !- Speed 3 Reference Unit Gross Rated Heating Capacity
-
        5.0*,*                                             !- Speed 3 Reference Unit Gross COP
-
        0.1925352,                                 !- Speed 3 Reference Unit Rated Air Flow Rate
-
        0.000381695,                             !- Speed 3 Reference Unit Rated Water Flow Rate
-
        Heating VS Temp1 Test,         !- Speed 3 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test,     !- Speed 3 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 3 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,             !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,         !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                          !- Speed 3 Waste Heat fraction to power input
-
        Heating wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
-
        3659.6,                                          !- Speed 4 Reference Unit Gross Rated Heating Capacity
-
        5.0,                                               !- Speed 4 Reference Unit Gross Rated Heating COP
-
        0.2189616,                                   !- Speed 4 Reference Unit Rated air flow rate
-
        0.000381695,                               !- Speed 4 Reference Unit Rated water flow rate
-
        Heating VS Temp1 Test,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test,       !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 4 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,            !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,       !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                          !- Speed 4 Waste Heat fraction to power input
-
        Heating wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
 
 
-
        4563.7,                                        !- Speed 5 Reference Unit Gross Rated Heating Capacity
-
        5.0,                                             !- Speed 5 Reference Unit Gross Rated Heating COP
-
        0.245388,                                   !- Speed 5 Reference Unit Rated air flow rate
-
        0.000381695,                             !- Speed 5 Reference Unit Rated water flow rate
-
        Heating VS Temp1 Test,         !- Speed 5 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test,     !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 5 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,            !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,       !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                          !- Speed 5 Waste Heat fraction to power input
-
        Heating wasteHeat VS Temp1 Test,   !- Speed 5 Waste Heat Function of Temperature Curve Name
-
        5463.3,                                                  !- Speed 6 Reference Unit Gross Rated Heating Capacity
-
        5.0,                                                           !- Speed 6 Reference Unit Gross Rated Heating COP
-
        0.2718144,                                               !- Speed 6 Reference Unit Rated air flow rate
-
        0.000381695,                                           !- Speed 6 Reference Unit Rated water flow rate
-
        Heating VS Temp1 Test,                       !- Speed 6 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test, !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 6 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,             !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,       !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                          !- Speed 6 Waste Heat fraction to power input
-
        Heating wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
-
        6358.4,                                      !- Speed 7 Reference Unit Gross Rated Heating Capacity
-
        5.0,                                           !- Speed 7 Reference Unit Gross Rated Heating COP
-
        0.2982408,                               !- Speed 7 Reference Unit Rated air flow rate
-
        0.000381695,                           !- Speed 7 Reference Unit Rated water flow rate
-
        Heating VS Temp1 Test,       !- Speed 7 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test,   !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 7 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,             !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,         !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                          !- Speed 7 Waste Heat fraction to power input
-
        Heating wasteHeat VS Temp1 Test,!- Speed 7 Waste Heat Function of Temperature Curve Name
-
        7248.5,                                      !- Speed 8 Reference Unit Gross Rated Heating Capacity
-
        5.0,                                           !- Speed 8 Reference Unit Gross Rated Heating COP
-
        0.3246672,                               !- Speed 8 Reference Unit Rated air flow rate
-
        0.000381695,                           !- Speed 8 Reference Unit Rated water flow rate
-
        Heating VS Temp1 Test,       !- Speed 8 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test,   !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 8 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,            !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,       !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                          !- Speed 8 Waste Heat fraction to power input
-
        Heating wasteHeat VS Temp1 Test,   !- Speed 8 Waste Heat Function of Temperature Curve Name
-
        8133.6,                                      !- Speed 9 Reference Unit Gross Heating Capacity
-
        5.0,                                           !- Speed 9 Reference Unit Gross Rated Heating COP
-
        0.3510936,                               !- Speed 9 Reference Unit Rated air flow rate
-
        0.000381695,                           !- Speed 9 Reference Unit Rated water flow rate
-
        Heating VS Temp1 Test,       !- Speed 9 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test,   !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 9 Heating Capacity Function of Water Flow Fraction Curve Name
-
        EIRH VS Temp1 Test,            !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test,       !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test,     !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                          !- Speed 9 Waste Heat fraction to power input
-
        Heating wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
 
 
-
        9013.2,                                !- Speed 10 Reference Unit Gross Rated Heating Capacity
-
        5.0,                                     !- Speed 10 Reference Unit Gross Rated Heating COP
-
        0.37752,                             !- Speed 10 Reference Unit Rated air flow rate
-
        0.000381695,                     !- Speed 10 Reference Unit Rated water flow rate
-
        Heating VS Temp1 Test, !- Speed 10 Heating Capacity Function of Temperature Curve Name
-
        Heating VS AirFrac Test, !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
-
        Heating VS WaterFrac Test,!- Speed 10 Heating Capacity Function of Water Flow Fraction Curve
-
        EIRH VS Temp1 Test,      !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
-
        EIRH VS AirFrac Test, !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
        EIRH VS WaterFrac Test, !- Speed 10 Energy Input Ratio Function of Water Flow Fraction Curve Name
-
        0.1,                                    !- Speed 10 Waste Heat fraction to power input
-
        Heating wasteHeat VS Temp1 Test; !- Speed 10 Waste Heat Function of Temperature Curve Name
+```
 
 ### Variable Speed Water to Air Heat Pump Heating Coil Outputs
 
-HVAC, Average, Heating Coil Electric Power [W]
+* HVAC, Average, Heating Coil Electric Power [W]
 
-HVAC, Average, Heating Coil Heating Rate [W]
+* HVAC, Average, Heating Coil Heating Rate [W]
 
-HVAC, Average, Heating Coil Sensible Heating Rate [W]
+* HVAC, Average, Heating Coil Sensible Heating Rate [W]
 
-HVAC, Average, Heating Coil Source Side Heat Transfer Rate [W]
+* HVAC, Average, Heating Coil Source Side Heat Transfer Rate [W]
 
-HVAC, Average, Heating Coil Part Load Ratio
+* HVAC, Average, Heating Coil Part Load Ratio
 
-HVAC, Average, Heating Coil Runtime Fraction []
+* HVAC, Average, Heating Coil Runtime Fraction []
 
-HVAC, Average, Heating Coil Air Mass Flow Rate [kg/s]
+* HVAC, Average, Heating Coil Air Mass Flow Rate [kg/s]
 
-HVAC, Average, Heating Coil Air Inlet Temperature [C]
+* HVAC, Average, Heating Coil Air Inlet Temperature [C]
 
-HVAC, Average, Heating Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC, Average, Heating Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC, Average, Heating Coil Air Outlet Temperature [C]
+* HVAC, Average, Heating Coil Air Outlet Temperature [C]
 
-HVAC, Average, Heating Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
+* HVAC, Average, Heating Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]
 
-HVAC, Average, Heating Coil Source Side Mass Flow Rate [kg/s]
+* HVAC, Average, Heating Coil Source Side Mass Flow Rate [kg/s]
 
-HVAC, Average, Heating Coil Source Side Inlet Temperature [C]
+* HVAC, Average, Heating Coil Source Side Inlet Temperature [C]
 
-HVAC, Average, Heating Coil Source Side Outlet Temperature [C]
+* HVAC, Average, Heating Coil Source Side Outlet Temperature [C]
 
-HVAC, Average, Heating Coil Upper Speed Level []
+* HVAC, Average, Heating Coil Upper Speed Level []
 
-HVAC, Average, Heating Coil Neighboring Speed Levels Ratio []
+* HVAC, Average, Heating Coil Neighboring Speed Levels Ratio []
 
-HVAC, Average, Heating Coil Recoverable Heat Transfer Rate [W]
+* HVAC, Average, Heating Coil Recoverable Heat Transfer Rate [W]
 
-HVAC, Sum, Heating Coil Electric Energy [J]
+* HVAC, Sum, Heating Coil Electric Energy [J]
 
-HVAC, Sum, Heating Coil Heating Energy [J]
+* HVAC, Sum, Heating Coil Heating Energy [J]
 
-HVAC, Sum, Heating Coil Source Side Heat Transfer Energy [J]
+* HVAC, Sum, Heating Coil Source Side Heat Transfer Energy [J]
 
 #### Heating Coil Electric Power [W]
 
@@ -11575,8 +9949,6 @@ The model offers various modes of operation that can be controlled over time usi
 - Charge Only Mode.   This mode is where the coil charges the TES tank but does not provide any cooling at the process air cooling section.
 
 - Discharge Only Mode.   This mode is where the coil cools process air by discharging the TES tank.
-
-
 
 This cooling coil can be autosized.   The cooling capacity for the cooling only mode is sized to meet the air system   s final design cooling capacity.   The cooling capacity for the other modes, and the storage capacity, can all be scaled relative to that one capacity using sizing factors that can be input by the user.
 
@@ -12062,59 +10434,59 @@ This field is used for fluid-based TES tank (Storage Type of Water or UserDefine
 
 ### Coil:Cooling:DX:SingleSpeed:ThermalStorage Outputs
 
-HVAC,Average,Cooling Coil Operating Mode Index []
+* HVAC,Average,Cooling Coil Operating Mode Index []
 
-HVAC,Average,Cooling Coil Total Cooling Rate [W]
+* HVAC,Average,Cooling Coil Total Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Total Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Total Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
+* HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Latent Cooling Rate [W]
+* HVAC,Average,Cooling Coil Latent Cooling Rate [W]
 
-HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
+* HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
 
-HVAC,Average,Cooling Coil Electric Power [W]
+* HVAC,Average,Cooling Coil Electric Power [W]
 
-HVAC,Sum,Cooling Coil Electric Energy [J]
+* HVAC,Sum,Cooling Coil Electric Energy [J]
 
-HVAC,Average,Cooling Coil Runtime Fraction []
+* HVAC,Average,Cooling Coil Runtime Fraction []
 
-HVAC,Sum,Cooling Coil Cold Weather Protection Electric Energy [J]
+* HVAC,Sum,Cooling Coil Cold Weather Protection Electric Energy [J]
 
-HVAC,Average,Cooling Coil Cold Weather Protection Electric Power [W]
+* HVAC,Average,Cooling Coil Cold Weather Protection Electric Power [W]
 
-HVAC,Average,Cooling Coil Thermal Storage Mechanical Heat Transfer Rate [W]
+* HVAC,Average,Cooling Coil Thermal Storage Mechanical Heat Transfer Rate [W]
 
-HVAC,Sum,Cooling Coil Thermal Storage Mechanical Heat Transfer Energy [J]
+* HVAC,Sum,Cooling Coil Thermal Storage Mechanical Heat Transfer Energy [J]
 
-HVAC,Average,Cooling Coil Thermal Storage Ambient Heat Transfer Rate [W]
+* HVAC,Average,Cooling Coil Thermal Storage Ambient Heat Transfer Rate [W]
 
-HVAC,Sum,Cooling Coil Thermal Storage Ambient Heat Transfer Energy [J]
+* HVAC,Sum,Cooling Coil Thermal Storage Ambient Heat Transfer Energy [J]
 
-HVAC,Average,Cooling Coil Ice Thermal Storage End Fraction []
+* HVAC,Average,Cooling Coil Ice Thermal Storage End Fraction []
 
-HVAC,Average,Cooling Coil Condenser Inlet Temperature [C]
+* HVAC,Average,Cooling Coil Condenser Inlet Temperature [C]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Water Volume [m3]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Water Volume [m3]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]
 
-HVAC,Average,Cooling Coil Evaporative Condenser Pump Electric Power [W]
+* HVAC,Average,Cooling Coil Evaporative Condenser Pump Electric Power [W]
 
-HVAC,Sum,Cooling Coil Evaporative Condenser Pump Electric Energy [J]
+* HVAC,Sum,Cooling Coil Evaporative Condenser Pump Electric Energy [J]
 
-HVAC,Average,Cooling Coil Basin Heater Electric Power [W]
+* HVAC,Average,Cooling Coil Basin Heater Electric Power [W]
 
-HVAC,Sum,Cooling Coil Basin Heater Electric Energy [J]
+* HVAC,Sum,Cooling Coil Basin Heater Electric Energy [J]
 
-HVAC,Average,Cooling Coil Thermal Storage Plant Heat Transfer Rate [W]
+* HVAC,Average,Cooling Coil Thermal Storage Plant Heat Transfer Rate [W]
 
-HVAC,Sum,Cooling Coil Thermal Storage Plant Heat Transfer Energy [J]
+* HVAC,Sum,Cooling Coil Thermal Storage Plant Heat Transfer Energy [J]
 
-HVAC,Average,Cooling Coil Fluid Thermal Storage End Temperature [C]
+* HVAC,Average,Cooling Coil Fluid Thermal Storage End Temperature [C]
 
 #### Cooling Coil Operating Mode Index [ ]
 
@@ -12122,8 +10494,8 @@ This output variable reports the operating mode for the cooling coil.   The numb
 
 <table class="table table-striped">
 <tr>
-<td>Code</td>
-<td>Operating Mode</td>
+<th>Code</th>
+<th>Operating Mode</th>
 </tr>
 <tr>
 <td>0</td>
@@ -12637,12 +11009,12 @@ Table 29. Fan Coefficient Values
 
 <table class="table table-striped">
 <tr>
-<td>Type of Fan</td>
-<td>Fan Coeff. 1</td>
-<td>Fan Coeff. 2</td>
-<td>Fan Coeff. 3</td>
-<td>Fan Coeff. 4</td>
-<td>Fan Coeff. 5</td>
+<th>Type of Fan</th>
+<th>Fan Coeff. 1</th>
+<th>Fan Coeff. 2</th>
+<th>Fan Coeff. 3</th>
+<th>Fan Coeff. 4</th>
+<th>Fan Coeff. 5</th>
 </tr>
 <tr>
 <td>Inlet Vane Dampers</td>
@@ -12720,11 +11092,11 @@ Allows you to specify a user-defined end-use subcategory, e.g., "Central System"
 
 ### Constant Volume Fan Outputs
 
-HVAC,Average,Fan Electric Power[W]
+* HVAC,Average,Fan Electric Power[W]
 
-HVAC,Average,Fan Rise in Air Temperature [deltaC]
+* HVAC,Average,Fan Rise in Air Temperature [deltaC]
 
-HVAC,Sum,Fan Electric Energy [J]
+* HVAC,Sum,Fan Electric Energy [J]
 
 #### Fan Electric Power [W]
 
@@ -12796,23 +11168,17 @@ Allows you to specify a user-defined end-use subcategory, e.g., "Main Fans", etc
 
 Following is an example input for an OnOff Fan.
 
+```idf
 Fan:OnOff,
-
            Supply Fan 1,                   ! Fan Name
-
            FanAndCoilAvailSched,   ! Fan Schedule
-
            0.7,                                     ! Fan Total Efficiency
-
            600.0,                                 ! Delta Pressure [N/M^2]
-
            1.3,                                     ! Max Flow Rate   [m^3/Sec]
-
            0.9,                                     ! Motor Efficiency
-
            1.0,                                     ! Motor in Airstream Fraction (1.0 means motor in air stream)
-
            Air Loop Inlet Node, Cooling Coil Air Inlet Node;   !Inlet Node, Outlet Node
+```
 
 ### On Off Fan Outputs
 
@@ -12940,11 +11306,11 @@ Allows you to specify a user-defined end-use subcategory, e.g., "Central System"
 
 ### Variable Volume Fan Outputs
 
-HVAC,Average,Fan Electric Power[W]
+* HVAC,Average,Fan Electric Power[W]
 
-HVAC,Average,Fan Rise in Air Temperature [deltaC]
+* HVAC,Average,Fan Rise in Air Temperature [deltaC]
 
-HVAC,Sum,Fan Electric Energy [J]
+* HVAC,Sum,Fan Electric Energy [J]
 
 #### Fan Electric Power [W]
 
@@ -13020,15 +11386,15 @@ This field is optional.   If it is not used, then all the exhaust air flow is as
 
 ### Zone Exhaust Fan Outputs
 
-HVAC,Average,Fan Electric Power [W]
+* HVAC,Average,Fan Electric Power [W]
 
-HVAC,Average,Fan Rise in Air Temperature[deltaC]
+* HVAC,Average,Fan Rise in Air Temperature[deltaC]
 
-HVAC,Sum,Fan Electric Energy [J]
+* HVAC,Sum,Fan Electric Energy [J]
 
-HVAC,Average,Fan Unbalanced Air Mass Flow Rate [kg/s]
+* HVAC,Average,Fan Unbalanced Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Fan Balanced Air Mass Flow Rate [kg/s]
+* HVAC,Average,Fan Balanced Air Mass Flow Rate [kg/s]
 
 #### Fan Electric Power [W]
 
@@ -13052,98 +11418,57 @@ These two output variables are available when the exhaust fan uses the input fie
 
 Examples of Fan:ConstantVolume, Fan:VariableVolume, Fan:ZoneExhaust, and , Fan:OnOff,   fans in an IDF are:
 
+```idf
 Fan:ConstantVolume,
-
            Supply Fan 1,   !- Name
-
            FanAndCoilAvailSched,               !- Availability Schedule Name
-
            0.7,                     !- Fan Total Efficiency
-
            600.0,                 !- Pressure Rise {Pa}
-
            1.3,                     !- Maximum Flow Rate {m3/sec}
-
            0.9,                     !- Motor Efficiency
-
            1.0,                     !- Motor in Airstream Fraction
-
            Air Loop Inlet Node, Cooling Coil Air Inlet Node;   !- Air Inlet Node Name, Air Outlet Node Name
 
 
-
 Fan:VariableVolume,
-
            Var Vol Supply Fan 1,   !- Name
-
            FanAndCoilAvailSched,   !-Availability Schedule Name
-
            0.7,                    !- Fan Total Efficiency
-
            600.0,                !- Pressure Rise {Pa}
-
            1.3,                    !- Maximum Flow Rate {m3/s}
-
            0.20,                   !- Minimum Flow Rate {m3/s}
-
            0.9,                    !- Motor Efficiency
-
            1.0,                     !- Motor in Airstream Fraction
-
            0.35071223,       !- Fan Coefficient 1
-
            0.30850535,       !- Fan Coefficient 2
-
          -0.54137364,       !- Fan Coefficient 3
-
            0.87198823,       !- Fan Coefficient 4
-
            0.000,                 !- Fan Coefficient 5
-
            Air Loop Inlet Node, Cooling Coil Air Inlet Node;  !- Air Inlet Node Name,Air Outlet Node Name
 
 
-
 Fan:ZoneExhaust,
-
    Zone 2 Exhaust Fan,                           !-Name
-
    FanAndCoilAvailSched,                       !-Availability Schedule Name
-
    0.6,                                                         !-Fan Total Efficiency
-
    125,                                                         !-Pressure Rise {Pa}
-
    0.1,                                                         !-Maximum Flow Rate {m3/s}
-
    Zone 2 Exhaust Node,                         !-Air Inlet Node Name
-
    Zone 2 Exhaust Fan Outlet Node,   !-Air Outlet Node Name
-
    Kitchen Exhaust;                                 !- End-Use Subcategory
 
 
-
    Fan:OnOff,
-
        AHU 1 Supply Fan,               !- Name
-
        FanAvailSched,                     !- Availability Schedule Name
-
        0.7,                                         !- Fan Total Efficiency
-
        600.0,                                     !- Pressure Rise {Pa}
-
        2.0,                                         !- Maximum Flow Rate {m3/s}
-
        0.9,                                         !- Motor Efficiency
-
        1.0,                                         !- Motor in Airstream Fraction
-
        AHU 1 Air Loop Inlet,       !- Air Inlet Node Name
-
        AHU 1 Supply Fan Outlet; !- Air Outlet Node Name
-
+```
 
 
 ### FanPerformance:NightVentilation
@@ -13176,53 +11501,33 @@ The fraction of the motor heat that is added to the air stream. A value of 0 mea
 
 An example of use in an IDF:
 
+```idf
    Fan:VariableVolume,
-
        Supply Fan 1,                       !- Name
-
        FanAvailSched,                     !- Availability Schedule Name
-
        0.7,                                         !- Fan Efficiency
-
        600.0,                                     !- Pressure Rise {Pa}
-
        autosize,                               !- Maximum Flow Rate {m3/s}
-
        autosize,                               !- Minimum Flow Rate {m3/s}
-
        0.9,                                         !- Motor Efficiency
-
        1.0,                                         !- Motor In Airstream Fraction
-
        0.35071223,                           !- Fan Coefficient 1
-
        0.30850535,                           !- Fan Coefficient 2
-
        -0.54137364,                         !- Fan Coefficient 3
-
        0.87198823,                           !- Fan Coefficient 4
-
        0.000,                                     !- Fan Coefficient 5
-
        Main Heating Coil 1 Outlet Node,   !- Air Inlet Node Name
-
        VAV Sys 1 Outlet Node;     !- Air Outlet Node Name
 
 
-
    FanPerformance:NightVentilation,
-
        Supply Fan 1,                       !- Fan Name
-
        0.7,                                         !- Fan Total Efficiency
-
        67.0,                                       !- Pressure Rise {Pa}
-
        autosize,                               !- Maximum Flow Rate {m3/s}
-
        0.9,                                         !- Motor Efficiency
-
        1.0;                                         !- Motor in Airstream Fraction
+```
 
 ### Fan:ComponentModel
 
@@ -13490,89 +11795,54 @@ Allows you to specify a user-defined end-use subcategory, e.g., "Central System"
 
 An example of use in an IDF:
 
+```idf
 Fan:ComponentModel,
-
        Supply Fan 1,                                       ! Fan Name
-
        Main Heating Coil 1 Outlet Node, ! Inlet Node Name
-
        VAV Sys 1 Outlet Node,                     ! Outlet Node Name
-
        FanAvailSched,                                     ! Fan Schedule
-
        autosize,                                               ! Maximum Flow Rate [m3/s]
-
        autosize,                                               ! Minimum Flow Rate [m3/s]
-
        1.0,                                                         ! Fan Sizing Factor [-]
-
        0.3048,                                                   ! Fan Wheel Diameter [m]
-
        0.0873288576,                                       ! Fan Outlet Area [m2]
-
        0.514,                                                     ! Maximum Fan Static Efficiency [-]
-
        9.76,                                                       ! Euler Number at Maximum Fan Static Efficiency [-]
-
        0.160331811647483,                             ! Maximum Dimensionless Fan Airflow [-]
-
        autosize,                                               ! Motor/Fan Pulley Ratio [-]
-
        autosize,                                               ! Belt Maximum Torque [N m]
-
        1.0,                                                         ! Belt Sizing Factor [-]
-
        0.167,                                                     ! Belt Fractional Torque Transition [-]
-
        1800,                                                       ! Motor Maximum Speed [rpm]
-
        autosize,                                               ! Maximum Motor Output Power [W]
-
        1.0,                                                         ! Motor Sizing Factor [-]
-
        1.0,                                                         ! Motor In Airstream Fraction [-]
-
        Power,                                                     ! VFD Efficiency Type
-
        autosize,                                               ! Maximum VFD Output Power [W]
-
        1.0,                                                         ! VFD Sizing Factor [-]
-
        VSD Example,                                         ! Fan Pressure Rise Curve Name
-
        DiagnosticSPR,                                     ! Duct Static Pressure Reset Curve Name
-
        FanEff120CPLANormal,                         ! Fan Efficiency Curve Name     Non-Stall
-
        FanEff120CPLAStall,                           ! Fan Efficiency Curve Name - Stall
-
        FanDimFlowNormal,                               ! Dimensionless Airflow Curve Name-Non-Stall
-
        FanDimFlowStall,                                 ! Dimensionless Airflow Curve Name-Stall
-
        BeltMaxEffMedium,                               ! Maximum Belt Efficiency Curve Name
-
        BeltPartLoadRegion1,                         ! Normalized Belt Efficiency Curve Name
-
        BeltPartLoadRegion2,                         ! Normalized Belt Efficiency Curve Name
-
        BeltPartLoadRegion3,                         ! Normalized Belt Efficiency Curve Name
-
        MotorMaxEffAvg,                                   ! Maximum Motor Efficiency Curve Name
-
        MotorPartLoad,                                     ! Normalized Motor Efficiency Curve Name
-
        VFDPartLoad;                                         ! VFD Efficiency Curve Name
-
+```
 
 
 ### Component Model Fan Outputs
 
-HVAC,Average,Fan Electric Power[W]
+* HVAC,Average,Fan Electric Power[W]
 
-HVAC,Average,Fan Rise in Air Temperature [deltaC]
+* HVAC,Average,Fan Rise in Air Temperature [deltaC]
 
-HVAC,Sum,Fan Electric Energy [J]
+* HVAC,Sum,Fan Electric Energy [J]
 
 #### Fan Electric Power [W]
 
@@ -13637,47 +11907,44 @@ This field is optional. If left blank or omitted, then the humidifier obtains it
 
 An IDF example:
 
+```idf
 Humidifier:Steam:Electric,
-
            Humidifier 1,                   !- Name
-
            FanAndCoilAvailSched,   !- Availability Schedule Name
-
            0.00000379,                       !- Rated Capacity {m3/s}
-
            10200.,                               !- Rated Power {W}
-
            27.,                                     !- Rated Fan Power {W}
-
            2.,                                       !- Standby Power {W}
-
            Cooling Coil Air Outlet Node, !- Air Inlet Node Name
-
            Air Loop Outlet Node;   !- Air Outlet Node Name
+```
+
 
 ### Steam Electric Humidfier Outputs
 
-HVAC,Average,Humidifier Water Volume Flow Rate [m3/s]
- HVAC,Sum,Humidifier Water Volume[m3]
+* HVAC,Average,Humidifier Water Volume Flow Rate [m3/s]
 
-HVAC,Average,Humidifier Electric Power[W]
+* HVAC,Sum,Humidifier Water Volume[m3]
 
-HVAC,Sum,Humidifier Electric Energy [J]
+* HVAC,Average,Humidifier Electric Power[W]
 
-Zone,Meter,Humidifier:Water [m3]
- Zone,Meter,Humidifier:Electricity [J]
+* HVAC,Sum,Humidifier Electric Energy [J]
 
-HVAC,Average,Humidifier Storage Tank Water Volume Flow Rate [m3/s]
+* Zone,Meter,Humidifier:Water [m3]
 
-HVAC,Sum,Humidifier Storage Tank Water Volume [m3]
+* Zone,Meter,Humidifier:Electricity [J]
 
-HVAC,Average,Humidifier Starved Storage Tank Water Volume Flow Rate [m3/s]
+* HVAC,Average,Humidifier Storage Tank Water Volume Flow Rate [m3/s]
 
-HVAC,Sum,Humidifier Starved Storage Tank Water Volume [m3]
+* HVAC,Sum,Humidifier Storage Tank Water Volume [m3]
 
-Zone,Meter,Humidifier:MainsWater [m3]
+* HVAC,Average,Humidifier Starved Storage Tank Water Volume Flow Rate [m3/s]
 
-HVAC,Sum,Humidifier Mains Water Volume [m3]
+* HVAC,Sum,Humidifier Starved Storage Tank Water Volume [m3]
+
+* Zone,Meter,Humidifier:MainsWater [m3]
+
+* HVAC,Sum,Humidifier Mains Water Volume [m3]
 
 #### Humidifier Water Volume Flow Rate [m3/s]
 
@@ -13926,13 +12193,13 @@ Power input to wheel rotor motor in W. If this field is unknown, electricity con
 
 Type of heating coil object for regeneration air. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the regeneration air heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Dehumidifier:Desiccant:NoFans) itself provides the "controller" function of modulating water flow. The valid choices are:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Regeneration Coil Name
 
@@ -14079,85 +12346,60 @@ This field is nominal power consumption per unit air flow rate. It is used to ca
 
 An example of this statement in an IDF is:
 
+```idf
    Dehumidifier:Desiccant:NoFans,
-
        Desiccant 1,                         !- Name
-
        FanAndCoilAvailSched,       !- Availability Schedule Name
-
        Outside Air Inlet Node,   !- Process Air Inlet Node Name
-
        Desiccant Process Outlet Node,   !- Process Air Outlet Node Name
-
        Regen Coil Out Node,         !- Regeneration Air Inlet Node Name
-
        Outside Air Inlet Node 2,!- Regeneration Fan Inlet Node Name
-
        SystemNodeMaximumHumidityRatioSetpoint,   !- Control Type
-
        0.007,                                     !- Leaving Maximum Humidity Ratio Setpoint {kgWater/kgDryAir}
-
        1,                                             !- Nominal Process Air Flow Rate {m3/s}
-
        2.5,                                         !- Nominal Process Air Velocity {m/s}
-
        10,                                           !- Rotor Power {W}
-
        Coil:Heating:Gas,               !- Regeneration Coil Object Type
-
        Desiccant Regen Coil,       !- Regeneration Coil Name
-
        Fan:VariableVolume,           !- Regeneration Fan Object Type
-
        Desiccant Regen Fan,         !- Regeneration Fan Name
-
        UserCurves,                           !- Performance Model Type
-
        Desiccant DryBulb fTW Curve, !- Leaving Dry-Bulb Function of Entering Dry-Bulb and Humidity Ratio
-
                          !                                                 Curve Name
-
        Desiccant DryBulb fV Curve,   !- Leaving Dry-Bulb Function of Air Velocity Curve Name
-
        Desiccant HumRat fTW Curve,   !- Leaving Humidity Ratio Function of Entering Dry-Bulb and Humidity Ratio Curve Name
-
        Desiccant HumRat fV Curve,     !- Leaving Humidity Ratio Function of Air Velocity Curve Name
-
        Desiccant RegenEnergy fTW Curve, !- Regeneration Energy Function of Entering Dry-Bulb and Humidity Ratio Curve Name
-
        Desiccant RegenEnergy fV Curve,   !- Regeneration Energy Function of Air Velocity Curve Name
-
        Desiccant RegenVel fTW Curve,       !- Regeneration Velocity Function of Entering Dry-Bulb and Humidity Ratio Curve Name
-
        Desiccant RegenVel fV Curve,         !- Regeneration Velocity Function of Air Velocity Curve Name
-
        121,                                         !- Nominal Regeneration Temperature {C}
-
        ;                                  !- Nominal Power Per Unit Air Flow Rate {W/m3/s}
+```
 
 ### Desiccant Dehumidifier (NoFans) Outputs
 
-HVAC,Sum,Dehumidifier Removed Water Mass [kg]
+* HVAC,Sum,Dehumidifier Removed Water Mass [kg]
 
-HVAC,Average,Dehumidifier Removed Water Mass Flow Rate [kg/s]
+* HVAC,Average,Dehumidifier Removed Water Mass Flow Rate [kg/s]
 
-HVAC,Average,Dehumidifier Part Load Ratio []
+* HVAC,Average,Dehumidifier Part Load Ratio []
 
-HVAC,Average,Dehumidifier Electric Power [W]
+* HVAC,Average,Dehumidifier Electric Power [W]
 
-HVAC,Sum,Dehumidifier Electric Energy [J]
+* HVAC,Sum,Dehumidifier Electric Energy [J]
 
-HVAC,Average,Dehumidifier Regeneration Specific Energy [J/kgWater]
+* HVAC,Average,Dehumidifier Regeneration Specific Energy [J/kgWater]
 
-HVAC,Average,Dehumidifier Regeneration Rate [W]
+* HVAC,Average,Dehumidifier Regeneration Rate [W]
 
-HVAC,Sum,Dehumidifier Regeneration Energy [J]
+* HVAC,Sum,Dehumidifier Regeneration Energy [J]
 
-HVAC,Average,Dehumidifier Regeneration Air Speed [m/s]
+* HVAC,Average,Dehumidifier Regeneration Air Speed [m/s]
 
-HVAC,Average,Dehumidifier Regeneration Air Mass Flow Rate [kg/s]
+* HVAC,Average,Dehumidifier Regeneration Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Dehumidifier Process Air Mass Flow Rate [kg/s]
+* HVAC,Average,Dehumidifier Process Air Mass Flow Rate [kg/s]
 
 #### Dehumidifier Removed Water Mass   [kg]
 
@@ -14295,13 +12537,13 @@ This alpha field specifies the fan configuration used in the desiccant dehumidif
 
 This alpha field contains the type of heating coil used to heat the regeneration air stream. This field may be left blank when no regeneration air heater is required. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the regeneration air heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Dehumidifier:Desiccant:System) itself provides the "controller" function of modulating water flow. Valid choices are:
 
-Coil:Heating:Electric
+* Coil:Heating:Electric
 
-Coil:Heating:Gas
+* Coil:Heating:Gas
 
-Coil:Heating:Water
+* Coil:Heating:Water
 
-Coil:Heating:Steam
+* Coil:Heating:Steam
 
 #### Field: Regeneration Air Heater Name
 
@@ -14341,57 +12583,41 @@ This optional alpha field contains the name of the exhaust fan power modifier cu
 
 Following is an example input for this object:
 
+```idf
    Dehumidifier:Desiccant:System,
-
        Desiccant 1,                         !- Name
-
        FanAvailSched,                     !- Availability Schedule Name
-
        HeatExchanger:Desiccant:BalancedFlow,   !- Desiccant Heat Exchanger Object Type
-
        Desiccant Heat Exchanger 1,   !- Desiccant Heat Exchanger Name
-
        HX Process Outlet Node,   !- Sensor Node Name
-
        Fan:ConstantVolume,           !- Regeneration Air Fan Object Type
-
        Desiccant Regen Fan,         !- Regeneration Air Fan Name
-
        DrawThrough,                         !- Regeneration Air Fan Placement
-
        Coil:Heating:Gas,               !- Regeneration Air Heater Object Type
-
        Desiccant Regen Coil,       !- Regeneration Air Heater Name
-
        46.111111,                             !- Regeneration Inlet Air Setpoint Temperature {C}
-
        Coil:Cooling:DX:SingleSpeed,   !- Companion Cooling Coil Object Type
-
        Desiccant DXSystem Cooling Coil,   !- Companion Cooling Coil Name
-
        Yes,                           !- Companion Cooling Coil Upstream of Dehumidifier Process Inlet
-
        Yes,                                         !- Companion Coil Regeneration Air Heating
-
        1.05,                                       !- Exhaust Fan Maximum Flow Rate {m3/s}
-
        50,                                           !- Exhaust Fan Maximum Power {W}
-
        EXHAUSTFANPLF;                     !- Exhaust Fan Power Curve Name
+```
 
 
 
 ### Desiccant Dehumidifier Outputs
 
-HVAC,Sum,Dehumidifier Removed Water Mass [kg]
+* HVAC,Sum,Dehumidifier Removed Water Mass [kg]
 
-HVAC,Average,Dehumidifier Removed Water Mass Flow Rate [kg/s]
+* HVAC,Average,Dehumidifier Removed Water Mass Flow Rate [kg/s]
 
-HVAC,Average,Dehumidifier Part Load Ratio []
+* HVAC,Average,Dehumidifier Part Load Ratio []
 
-HVAC,Average,Dehumidifier Exhaust Fan Electric Power [W]
+* HVAC,Average,Dehumidifier Exhaust Fan Electric Power [W]
 
-HVAC,Sum,Dehumidifier Exhaust Fan Electric Energy [J]
+* HVAC,Sum,Dehumidifier Exhaust Fan Electric Energy [J]
 
 #### Dehumidifier Removed Water Mass   [kg]
 
@@ -14440,48 +12666,27 @@ The name of the output variable or meter that is to be mapped to the Erl variabl
 
 Examples of this object follow.
 
+```idf
 EnergyManagementSystem:Sensor,
-
      T1, !Name
-
-     Perimeter\_ZN\_1 , ! Output:Variable or Output:Meter Index Key Name
-
+     Perimeter_ZN_1 , ! Output:Variable or Output:Meter Index Key Name
      Zone Mean Air Temperature ; ! Output:Variable or Output:Meter Name
 
-
-
-
-
-
-
 EnergyManagementSystem:Sensor,
-
      PMV5, !Name
-
-     Core\_ZN , ! Output:Variable Index Key Name
-
+     Core_ZN , ! Output:Variable Index Key Name
      Zone Thermal Comfort Fanger Model PMV ; ! Output:Variable Name
 
-
-
 EnergyManagementSystem:Sensor,
-
-     T\_VAV5FanIn, !Name
-
-     VAV\_5\_HeatC-VAV\_5\_FanNode , ! Output:Variable Index Key Name
-
+     T_VAV5FanIn, !Name
+     VAV_5_HeatC-VAV_5_FanNode , ! Output:Variable Index Key Name
      System Node Temperature ; ! Output:Variable Name
 
-
-
 EnergyManagementSystem:Sensor,
-
-   cooling\_setpoint,                                   ! Name
-
-   CLGSETP\_SCH ,                 ! Output:Variable Index Key Name
-
-   Schedule Value ; ! Output:Variable Name
-
+     cooling_setpoint,                                   ! Name
+     CLGSETP_SCH ,                 ! Output:Variable Index Key Name
+     Schedule Value ; ! Output:Variable Name
+```
 
 
 ### EnergyManagementSystem:Actuator
@@ -14506,43 +12711,25 @@ This field defines the type of control to be done on the specific entity being c
 
 Example input objects.
 
+```idf
   EnergyManagementSystem:Actuator,
-
-      VAV\_5\_NightCycleStatus,     ! Name
-
-      VAV\_5,                                       ! Actuated Component Unique Name
-
+      VAV_5_NightCycleStatus,     ! Name
+      VAV_5,                                       ! Actuated Component Unique Name
       AirLoopHVAC,                           ! Actuated Component Type
-
-     Availability Status;           ! Actuated Component Control Type
-
-
-
-
-
-
+      Availability Status;           ! Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
-
-     VAV\_1\_SAT\_setpoint,                                       ! Name
-
-     VAV\_1 Supply Equipment Outlet Node ,     ! Actuated Component Unique Name
-
-     System Node Setpoint,                                   ! Actuated Component Type
-
-     Temperature Setpoint;                                   ! Actuated Component Control Type
-
-
+      VAV_1_SAT_setpoint,                                       ! Name
+      VAV_1 Supply Equipment Outlet Node ,     ! Actuated Component Unique Name
+      System Node Setpoint,                                   ! Actuated Component Type
+      Temperature Setpoint;                                   ! Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
-
-       myCLGSETP\_SCH\_Override,                             ! Name
-
-       CLGSETP\_SCH,                                                   !- Actuated Component Unique Name
-
-       Schedule:Constant,                                       ! Actuated Component Type
-
-       Schedule Value;                                             ! Actuated Component Control Type
+      myCLGSETP_SCH_Override,                             ! Name
+      CLGSETP_SCH,                                                   !- Actuated Component Unique Name
+      Schedule:Constant,                                       ! Actuated Component Type
+      Schedule Value;                                             ! Actuated Component Control Type
+```
 
 ### EnergyManagementSystem:ProgramCallingManager
 
@@ -14600,51 +12787,33 @@ The name of the EnergyManagementSystem:Program object that will be the second to
 
 IDF examples:
 
-  EnergyManagementSystem:ProgramCallingManager,
-
+```idf
+EnergyManagementSystem:ProgramCallingManager,
      Initialize EMS for Run , ! Name
-
      BeginNewEnvironment ,       ! EnergyPlus Model Calling Point
-
      InitializeMyEMS;                 ! Program Name 1
 
 
-
 EnergyManagementSystem:ProgramCallingManager,
-
      EMS-based Setpoint Managers , ! Name
-
      AfterPredictorAfterHVACManagers , ! EnergyPlus Model Calling Point
-
-     VAV\_5\_SchedSetpoint , !Program Name 2
-
+     VAV_5_SchedSetpoint , !Program Name 2
      VAV5MixedAirManagers,
-
-     VAV\_1\_SchedSetpoint,
-
+     VAV_1_SchedSetpoint,
      VAV1MixedAirManagers,
-
-     VAV\_3\_SchedSetpoint,
-
+     VAV_3_SchedSetpoint,
      VAV3MixedAirManagers,
-
-     VAV\_2\_SchedSetpoint,
-
+     VAV_2_SchedSetpoint,
      VAV2MixedAirManagers,
+     CoolSys1_SchedSetpoint,
+     HeatSys1_SchedSetpoint,
+     SHWSys1_SchedSetpoint,
+     VAV_5_NightCycleMGR,
+     VAV_1_NightCycleMGR,
+     VAV_2_NightCycleMGR,
+     VAV_3_NightCycleMGR;
+```
 
-     CoolSys1\_SchedSetpoint,
-
-     HeatSys1\_SchedSetpoint,
-
-     SHWSys1\_SchedSetpoint,
-
-     VAV\_5\_NightCycleMGR,
-
-     VAV\_1\_NightCycleMGR,
-
-     VAV\_2\_NightCycleMGR,
-
-     VAV\_3\_NightCycleMGR;
 
 ### EnergyManagementSystem:Program
 
@@ -14662,57 +12831,35 @@ Each remaining field contains a single line of code for the *EnergyPlus Runtime 
 
 Example IDF input objects follow.
 
+```idf
 EnergyManagementSystem:Program,
-
-   RH\_OpeningController ,         ! Name
-
-   IF ZoneRH &lt; 25,
-
+   RH_OpeningController ,         ! Name
+   IF ZoneRH < 25,
        SET MyOpenFactor = 0.0 ,
-
-   ELSEIF ZoneRH &gt; 60,
-
+   ELSEIF ZoneRH > 60,
        SET MyOpenFactor = 1.0 ,
-
    ELSE,
-
        SET MyOpenFactor = (ZoneRH - 25) / (60 - 25),
-
    ENDIF;
 
-
-
 EnergyManagementSystem:Program,
-
      AverageZoneTemps , ! Name
-
      SET Zn1vol = 346.0225, ! zone air volume
-
      SET Zn2vol = 205.2650, ! zone air volume
-
      SET Zn3vol = 346.0225, ! zone air volume
-
      SET Zn4vol = 205.2650, ! zone air volume
-
      SET Zn5vol = 456.4551, ! zone air volume
-
-     SET SumNumerator = T1\*Zn1vol + T2\*Zn2vol + T3\*Zn3vol + T4\*Zn4vol + T5\*Zn5vol,
-
+     SET SumNumerator = T1*Zn1vol + T2*Zn2vol + T3*Zn3vol + T4*Zn4vol + T5*Zn5vol,
      SET SumDenominator = Zn1vol + Zn2vol + Zn3vol + Zn4vol + Zn5vol,
-
      SET AverageBuildingTemp = SumNumerator / SumDenominator;
 
 
-
 EnergyManagementSystem:Program,
-
      VAV2MixedAirManagers , ! Name
-
-     SET VAV\_2\_CoolC\_Setpoint = Seasonal\_Reset\_SAT\_Sched - ( T\_VAV2FanOut - T\_VAV2FanIn),
-
-     SET VAV\_2\_HeatC\_Setpoint = Seasonal\_Reset\_SAT\_Sched - ( T\_VAV2FanOut - T\_VAV2FanIn),
-
-     SET VAV\_2\_OA\_Setpoint = Seasonal\_Reset\_SAT\_Sched - ( T\_VAV2FanOut - T\_VAV2FanIn);
+     SET VAV_2_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn),
+     SET VAV_2_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn),
+     SET VAV_2_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn);
+```
 
 ### EnergyManagementSystem:Subroutine
 
@@ -14728,53 +12875,33 @@ Each remaining field contains a single line of code for the *EnergyPlus Runtime 
 
 IDF examples:
 
+```idf
 EnergyManagementSystem:Subroutine,
-
    Add4ToN,                                                           !- Name
-
    SET N = N + 4;                                               !- EnergyPlus Runtime Language
 
-
-
 EnergyManagementSystem:Subroutine,
-
-   manage\_ext\_lights,                                       !- Name
-
-   IF inc\_solar &gt; 0,                                         !- EnergyPlus Runtime Language
-
-       SET ext\_lights\_pwr = Off,
-
+   manage_ext_lights,                                       !- Name
+   IF inc_solar > 0,                                         !- EnergyPlus Runtime Language
+       SET ext_lights_pwr = Off,
    ELSE,
-
-       SET ext\_lights\_pwr = On,
-
+       SET ext_lights_pwr = On,
    ENDIF;
 
-
-
 EnergyManagementSystem:Subroutine,
-
-   manage\_solar\_collector,                             !- Name
-
-   IF Tout\_F &lt; 32,                                             !- EnergyPlus Runtime Language
-
-       SET pump\_pwr = On,
-
+   manage_solar_collector,                             !- Name
+   IF Tout_F < 32,                                             !- EnergyPlus Runtime Language
+       SET pump_pwr = On,
        EXIT,
-
    ENDIF,
-
-   SET delta\_T = Tcollector     Ttank,
-
-   IF delta\_T &gt; 0,
-
-       SET pump\_pwr = On,
-
+   SET delta_T = Tcollector     Ttank,
+   IF delta_T > 0,
+       SET pump_pwr = On,
    ELSE,
-
-       SET pump\_pwr = Off,
-
+       SET pump_pwr = Off,
    ENDIF;
+```
+
 
 ### EnergyManagementSystem:GlobalVariable
 
@@ -14786,43 +12913,28 @@ The name becomes the global Erl variable name that can be referenced in the *Ene
 
 IDF examples using this object follow:
 
+```idf
 EnergyManagementSystem:GlobalVariable,
+   global_var;                                                                   !- Name
 
-   global\_var;                                                                   !- Name
+EnergyManagementSystem:GlobalVariable, Temp_C;
 
-
-
-EnergyManagementSystem:GlobalVariable, Temp\_C;
-
-
-
-EnergyManagementSystem:GlobalVariable, Temp\_F;
-
-
+EnergyManagementSystem:GlobalVariable, Temp_F;
 
 EnergyManagementSystem:Subroutine,
-
    CalcFahrenheit,                                                           !- Name
-
-   SET Temp\_F = Temp\_C \* (9/5) + 32;
-
-
+   SET Temp_F = Temp_C * (9/5) + 32;
 
 EnergyManagementSystem:Program,
-
     DummyProgram,                                                               !- Name
-
-   SET Temp\_C = Tout,
-
+   SET Temp_C = Tout,
    RUN CalcFahrenheit,
-
-   SET Tout\_F = Temp\_F,
-
-   IF Tout\_F &gt; 32,
-
+   SET Tout_F = Temp_F,
+   IF Tout_F > 32,
        RUN FreezeProtect,
-
    ENDIF;
+```
+
 
 ### EnergyManagementSystem:OutputVariable
 
@@ -14856,35 +12968,24 @@ This field should contain the units for the output variable in standard EnergyPl
 
 Examples of this object follow.
 
+```idf
 EnergyManagementSystem:OutputVariable,
-
      Weighted Average Building Zone Air Temperature, ! Name
-
      AverageBuildingTemp, ! EMS Variable Name
-
      Averaged, ! Type of Data in Variable
-
      ZoneTimeStep , ! Update Frequency
-
      ,           ! EMS Program or Subroutine Name
-
      C;
 
 
-
    EnergyManagementSystem:OutputVariable,
-
        Main CW Coil Total Cooling Rate,   !- Name
-
-       CWcoil1\_tot\_cool\_Power,   !- EMS Variable Name
-
+       CWcoil1_tot_cool_Power,   !- EMS Variable Name
        Averaged,                               !- Type of Data in Variable
-
        SystemTimestep,                   !- Update Frequency
-
-       MainCWCoil1\_ModelOuput,   !- EMS Program or Subroutine Name
-
+       MainCWCoil1_ModelOuput,   !- EMS Program or Subroutine Name
        W;                                             !- Units
+```
 
 ### EnergyManagementSystem:MeteredOutputVariable,
 
@@ -15004,25 +13105,18 @@ This field should contain the units for the output variable in standard EnergyPl
 
 Examples of this object follow.
 
+```idf
    EnergyManagementSystem:MeteredOutputVariable,
-
        Zone 1 WinAC Electricity Consumption,   !- Name
-
-       Zone1WinAC\_ElectEnergy,   !- EMS Variable Name
-
+       Zone1WinAC_ElectEnergy,   !- EMS Variable Name
        SystemTimestep,                   !- Update Frequency
-
-       Zone1\_WinAC\_ModelOuput,   !- EMS Program or Subroutine Name
-
+       Zone1_WinAC_ModelOuput,   !- EMS Program or Subroutine Name
        Electricity,                         !- Resource Type
-
        HVAC,                                       !- Group Type
-
        Cooling,                                 !- End-Use Category
-
        Window Air Conditioners, !- End-Use Subcategory
-
        J;                                             !- Units
+```
 
 ### EnergyManagementSystem:TrendVariable
 
@@ -15042,23 +13136,18 @@ This field describes how much data are to be held in the trend variable. The tre
 
 Examples of this object follow.
 
+```idf
 EnergyManagementSystem:TrendVariable,
-
      AvgTemptrendLog1,                   !- Name
-
      AverageBuildingTemp,             !- EMS Variable Name
-
      300;                                             !- Number of Timesteps to be Logged
 
 
-
 EnergyManagementSystem:TrendVariable,
-
      PMVtrendLog1, ,                       !- Name
-
      PMV5,                                           !- EMS Variable Name
-
      144;                                             !- Number of Timesteps to be Logged
+```
 
 ### EnergyManagementSystem:InternalVariable
 
@@ -15078,13 +13167,12 @@ This field defines the type of internal data source that is to be mapped to the 
 
 An example of this object follows.
 
+```idf
 EnergyManagementSystem:InternalVariable,
-
      Zn1vol,                   !- Name
-
-     Perimeter\_ZN\_1,   !- Internal Data Index Key Name
-
+     Perimeter_ZN_1,   !- Internal Data Index Key Name
      Zone Air Volume; !- Internal Data Type
+```
 
 ### EnergyManagementSystem:CurveOrTableIndexVariable
 
@@ -15100,11 +13188,11 @@ This field contains the unique name of a Curve:\* or Table:\* object defined els
 
 An example IDF object is:
 
+```idf
    EnergyManagementSystem:CurveOrTableIndexVariable,
-
-       Curve\_Quadratic\_Ptr,             !- Name
-
-       HPACCOOLPLFFPLR\_curve;         !- Curve or Table Object Name
+       Curve_Quadratic_Ptr,             !- Name
+       HPACCOOLPLFFPLR_curve;         !- Curve or Table Object Name
+```
 
 ### EnergyManagementSystem:ConstructionIndexVariable
 
@@ -15120,27 +13208,21 @@ This field contains the unique name of a Construction object defined elsewhere i
 
 An example IDF object is:
 
+```idf
    Construction,
-
-       TCwindow\_25,                               !- Name
-
+       TCwindow_25,                               !- Name
        Clear3PPG,                             !- Outside Layer
-
        AIR 3MM,                                 !- Layer 2
-
        WO18RT25,                           !- Layer 3
-
        AIR 8MM,                                 !- Layer 4
-
        SB60Clear3PPG;                     !- Layer 5
 
 
-
    EnergyManagementSystem:ConstructionIndexVariable,
+       TCwindow_25,
+       TCwindow_25;
+```
 
-       TCwindow\_25,
-
-       TCwindow\_25;
 
 Group     ExternalInterface
 -------------------------
@@ -15157,9 +13239,10 @@ The name of the external interface. The only valid entries are **PtolemyServer**
 
 An example IDF object is:
 
+```idf
 ExternalInterface,                     !- Object to activate the external interface
-
   PtolemyServer;                           !- Name of external interface
+```
 
 ### Building Controls Virtual Test Bed (BCVTB)
 
@@ -15185,13 +13268,12 @@ This field contains the schedule value that is used during the warm-up period an
 
 ! During warm-up and system-sizing, it is fixed at 24 degC.
 
+```idf
    ExternalInterface:Schedule,
-
        TSetCoo,                                 !- Name
-
        Temperature,                         !- ScheduleType
-
        24;                                           !- Initial value, used during warm-up
+```
 
 
 
@@ -15199,13 +13281,12 @@ This field contains the schedule value that is used during the warm-up period an
 
 ! During warm-up and system-sizing, it is fixed at 20 degC.
 
+```idf
    ExternalInterface:Schedule,
-
        TSetHea,                                 !- Name
-
        Temperature,                         !- ScheduleType
-
        20;                                           !- Initial value, used during warm-up
+```
 
 ### ExternalInterface:Actuator
 
@@ -15231,17 +13312,14 @@ This field defines the type of control to be done on the specific entity being c
 
 This field contains the initial value. If a value is specified, then this value is used during the warm-up period and the system sizing. If no value is specified, then the actuated component will only be updated once the time stepping starts, i.e., after the warm-up and the system-sizing. This allows, for example, to schedule a setpoint with a Schedule:Compact during warm-up and system-sizing, and then overwrite the value of this schedule during each zone time step based on a feedback control loop that is implemented in the BCVTB.
 
+```idf
 ExternalInterface:Actuator,
-
-       Zn001\_Wall001\_Win001\_Shading\_Deploy\_Status,   !- Name
-
+       Zn001_Wall001_Win001_Shading_Deploy_Status,   !- Name
        Zn001:Wall001:Win001,       !- Actuated Component Unique Name
-
        Window Shading Control,   !- Actuated Component Type
-
        Control Status,                   !- Actuated Component Control Type
-
          ;                                             ! initial value
+```
 
 ### ExternalInterface:Variable
 
@@ -15255,11 +13333,11 @@ This field becomes the global Erl variable name that can be referenced in the En
 
 This field contains the initial value that is used during the warm-up period and during the system sizing.
 
+```idf
 ExternalInterface:Variable,
-
        yShade,                                   !- Name of Erl variable
-
        1;                                             !- Initial value
+```
 
 ### Functional Mock-up Unit (FMU) Import
 
@@ -15281,13 +13359,12 @@ This field contains the communication timeout value in milli-seconds to allow in
 
 This field contains the loggingOn value to enable or disable debug in FMU. If loggingOn=1, debug logging is enabled. If loggingOn=0, debug logging is disabled.
 
+```idf
 ExternalInterface:FunctionalMockupUnitImport,
-
        MoistAir.fmu,                       !- FMU File Name
-
        15,                                           !- FMU Timeout
-
        0;                                             !- FMU LoggingOn
+```
 
 ### ExternalInterface:FunctionalMockupUnitImport:From:Variable
 
@@ -15313,59 +13390,38 @@ This field contains the EnergyPlus instance name of the FMU. See External Interf
 
 This field contains the name of the variable in the FMU that will be mapped to the corresponding variable in EnergyPlus.
 
+```idf
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
        Environment,                         !- EnergyPlus Key Value
-
        Site Outdoor Air Drybulb Temperature,       !- EnergyPlus Variable Name
-
        MoistAir.fmu,                       !- FMU File Name
-
        Model1,                                   !- FMU Instance Name
-
        TDryBul;                                 !- FMU Variable Name
 
 
-
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
        ZONE ONE,                               !- EnergyPlus Key Value
-
        Zone Mean Air Temperature, !- EnergyPlus Variable Name
-
        MoistAir.fmu,                       !- FMU File Name
-
        Model1,                                   !- FMU Instance Name
-
        TRooMea;                                 !- FMU Variable Name
 
 
-
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
        Environment,                         !- EnergyPlus Key Value
-
        Site Outdoor Air Relative Humidity,   !- EnergyPlus Variable Name
-
        MoistAir.fmu,                       !- FMU File Name
-
        Model1,                                   !- FMU Instance Name
-
        outRelHum;                             !- FMU Variable Name
 
 
-
 ExternalInterface:FunctionalMockupUnitImport:From:Variable,
-
        ZONE ONE,                               !- EnergyPlus Key Value
-
        Zone Air Relative Humidity,   !- EnergyPlus Variable Name
-
        MoistAir.fmu,                       !-FMU File Name
-
        Model1,                                   !- FMU Instance Name
-
        rooRelHum;                             !- FMU Variable Name
+```
 
 ### ExternalInterface:FunctionalMockupUnitImport:To:Schedule
 
@@ -15395,35 +13451,24 @@ This field contains the name of the variable in the FMU that will be mapped to t
 
 This field contains the schedule value that is used during the system sizing.
 
+```idf
 ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
-
-       FMU\_OthEquSen\_ZoneOne,     !- EnergyPlus Variable Name
-
+       FMU_OthEquSen_ZoneOne,     !- EnergyPlus Variable Name
        Any Number,                           !- Schedule Type Limits Names
-
        MoistAir.fmu,                       !- FMU File Name
-
        Model1,                                   !- FMU Instance Name
-
        QSensible,                             !- FMU Variable Name
-
        0;                                             !- Initial Value
-
 
 
 ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
-
-       FMU\_OthEquLat\_ZoneOne,     !- EnergyPlus Variable Name
-
+       FMU_OthEquLat_ZoneOne,     !- EnergyPlus Variable Name
        Any Number,                           !- Schedule Type Limits Names
-
        MoistAir.fmu,                       !- FMU File Name
-
        Model1,                                   !- FMU Instance Name
-
        QLatent,                                 !- FMU Variable Name
-
        0;                                             !- Initial Value
+```
 
 ### ExternalInterface:FunctionalMockupUnitImport:To:Actuator
 
@@ -15461,23 +13506,17 @@ This field contains the name of the variable in the FMU that will be mapped to t
 
 This field contains the value that is used during the system sizing.
 
+```idf
 ExternalInterface:FunctionalMockupUnitImport:To:Actuator,
-
-Zn001\_Wall001\_Win001\_Shading\_Deploy\_Status,   !- EnergyPlus Variable Name
-
+Zn001_Wall001_Win001_Shading_Deploy_Status,   !- EnergyPlus Variable Name
        Zn001:Wall001:Win001,                                 !- Actuated Component Unique Name
-
        Window Shading Control,                                   !- Actuated Component Type
-
        Control Status,                                             !- Actuated Component Control Type
-
        ShadingController.fmu,                                     !- FMU File Name
-
        Model1,                                                                   !- FMU Instance Name
-
        yShade,                                                                   !- FMU Variable Name
-
        6;                                                                             !- Initial Value
+```
 
 ### ExternalInterface:FunctionalMockupUnitImport:To:Variable
 
@@ -15503,17 +13542,14 @@ This field contains the name of the variable in the FMU that will be mapped to t
 
 This field contains the initial value that is used during the system sizing.
 
+```idf
 ExternalInterface:FunctionalMockupUnitImport:To:Variable,
-
-       Shade\_Signal,                       !- EnergyPlus Variable Name
-
+       Shade_Signal,                       !- EnergyPlus Variable Name
        ShadingController.fmu,     !- FMU File Name
-
        Model1,                                   !- FMU Instance Name
-
        yShade,                                   !- FMU Variable Name
-
        1;                                             !- Initial Value
+```
 
 ### Functional Mock-up Unit (FMU) Export
 
@@ -15535,43 +13571,27 @@ This field contains the Variable Name as defined in the InputOutput Reference. F
 
 This field contains the name of the variable in the model description file of the FMU that will be mapped to the corresponding variable in EnergyPlus.
 
+```idf
 ExternalInterface:FunctionalMockupUnitExport:From:Variable,
-
        Environment,                         !- EnergyPlus Key Value
-
        Site Outdoor Air Drybulb Temperature,   !- EnergyPlus Variable Name
-
        TDryBul;                                 !- FMU Variable Name
 
-
-
 ExternalInterface: FunctionalMockupUnitExport:From:Variable,
-
        ZONE ONE,                                   !- EnergyPlus Key Value
-
        Zone Mean Air Temperature, !- EnergyPlus Variable Name
-
        TRooMea;                                     !- FMU Variable Name
 
-
-
 ExternalInterface: FunctionalMockupUnitExport:From:Variable,
-
        Environment,                               !- EnergyPlus Key Value
-
        Site Outdoor Air Relative Humidity,   !- EnergyPlus Variable Name
-
        outRelHum;                                   !- FMU Variable Name
 
-
-
 ExternalInterface:FunctionalMockupUnitExport:From:Variable,
-
        ZONE ONE,                                       !- EnergyPlus Key Value
-
        Zone Air Relative Humidity,   !- EnergyPlus Variable Name
-
        rooRelHum;                                     !- FMU Variable Name
+```
 
 ### ExternalInterface:FunctionalMockupUnitExport:To:Schedule
 
@@ -15593,15 +13613,13 @@ This field contains the name of the variable in the model description file of th
 
 This field contains the schedule value that is used during the warm-up period and during the system sizing.
 
+```idf
 ExternalInterface:FunctionalMockupUnitExport:To:Schedule,
-
-       FMU\_OthEquSen\_ZoneOne,     !- EnergyPlus Variable Name
-
+       FMU_OthEquSen_ZoneOne,     !- EnergyPlus Variable Name
        Any Number,                           !- Schedule Type Limits Names
-
        QSensible,                             !- FMU Variable Name
-
        0;                                             !- Initial Value
+```
 
 ### ExternalInterface:FunctionalMockupUnitExport:To:Actuator
 
@@ -15631,19 +13649,15 @@ This field contains the name of the variable in the model description file of th
 
 This field contains the initial value. If a value is specified, then this value is used during the warm-up period and the system sizing. If no value is specified, then the actuated component will only be updated once the time stepping starts, i.e., after the warm-up and the system-sizing.
 
+```idf
 ExternalInterface:FunctionalMockupUnitExport:To:Actuator,
-
-Zn001\_Wall001\_Win001\_Shading\_Deploy\_Status,   !- EnergyPlus Variable Name
-
+Zn001_Wall001_Win001_Shading_Deploy_Status,   !- EnergyPlus Variable Name
        Zn001:Wall001:Win001,                                   !- Actuated Component Unique Name
-
        Window Shading Control,                               !- Actuated Component Type
-
        Control Status,                                               !- Actuated Component Control Type
-
        yShade,                                                               !- FMU Variable Name
-
        6;                                                                         !- Initial Value
+```
 
 ### ExternalInterface:FunctionalMockupUnitExport:To:Variable
 
@@ -15661,14 +13675,12 @@ This field contains the name of the variable in the model description file of th
 
 This field contains the initial value that is used during the warm-up period and during the system sizing.
 
+```idf
 ExternalInterface:FunctionalMockupUnitExport:To:Variable,
-
-       Shade\_Signal,                       !- EnergyPlus Variable Name
-
+       Shade_Signal,                       !- EnergyPlus Variable Name
        yShade,                                   !- FMU Variable Name
-
        1;                                             !- Initial Value
-
+```
 
 
 Group     User Defined HVAC and Plant Component Models
@@ -15754,23 +13766,17 @@ This field is used to connect ancillary losses from the zone unit to a thermal z
 
 An example of this input object follows.
 
+```idf
 ZoneHVAC:ForcedAir:UserDefined,
-
      Zone1WindAC,   !- Name
-
      Zone 1 Window AC Model Program Manager , !- Overall Model Simulation Program Calling Manager Name
-
      Zone 1 Window AC Init Program Manager , !- Model Setup and Sizing Program Calling Manager Name
-
      Zone1WindACAirInletNode , !- Primary Air Inlet Node Name
-
      Zone1WindACAirOutletNode, !- Primary Air Outlet Node Name
-
      Zone1WindACOAInNode,   !- Secondary Air Inlet Node Name
-
      Zone1WindACExhNode,   !- Secondary Air Outlet Node Name
-
      0 ; !- Number of Plant Loop Connections
+```
 
 ### AirTerminal:SingleDuct:UserDefined
 
@@ -15838,27 +13844,19 @@ This field is used to connect ancillary losses from the air terminal unit to a t
 
 An example of this input object follows.
 
+```idf
 AirTerminal:SingleDuct:UserDefined,
-
      SPACE1-1 VAV Reheat,   !- Name
-
      Space1 ATU Sim Programs , !- Overall Model Simulation Program Calling Manager Name
-
      Space1 ATU Init Programs , !- Model Setup and Sizing Program Calling Manager Name
-
      SPACE1-1 ATU In Node , !- Primary Air Inlet Node Name
-
      SPACE1-1 In Node , !- Primary Air Outlet Node Name
-
      ,   !- Secondary Air Inlet Node Name
-
      ,   !- Secondary Air Outlet Node Name
-
      1,   !- Number of Plant Loop Connections
-
      SPACE1-1 Zone Coil Water In Node , !- Plant Connection 1 Inlet Node Name
-
      SPACE1-1 Zone Coil Water Out Node; !- Plant Connection 1 Outlet Node Name
+```
 
 ### Coil:UserDefined
 
@@ -15922,29 +13920,20 @@ This field is used to connect ancillary losses from the coil to a thermal zone. 
 
 An example of this input object follows.
 
+```idf
 Coil:UserDefined,
-
      Main Cooling Coil 1, !- Name
-
      Main Cooling Coil Model Program Manager , !- Overall Model Simulation Program Calling Manager Name
-
      Main Cooling Coil Init Program Manager , !- Model Setup and Sizing Program Calling Manager Name
-
      1 , !- Number of Air Connections
-
      Mixed Air Node 1 , !- Air Connection 1 Inlet Node Name
-
      Main Cooling Coil 1 Outlet Node , !- Air Connection 1 Outlet Node Name
-
      , !- Air Connection 2 Inlet Node Name
-
      , !- Air Connection 2 Outlet Node Name
-
      Yes , !- Plant Connection is Used
-
      Main Cooling Coil 1 Water Inlet Node, !- Plant Connection Inlet Node Name
-
      Main Cooling Coil 1 Water Outlet Node; !- Plant Connection Outlet Node Name
+```
 
 ### PlantComponent:UserDefined
 
@@ -16030,71 +14019,42 @@ This field is used to connect ancillary losses from the plant component to a the
 
 An example of this input object follows:
 
+```idf
 PlantComponent:UserDefined,
-
      Central Chiller,   !- Name
-
      , !- Main Model Program Calling Manager Name
-
      1 ,   !- Number of Plant Loop Connections
-
      Central Chiller Inlet Node,     !- Plant Connection 1 Inlet Node Name
-
      Central Chiller Outlet Node , !- Plant Connection 1 Outlet Node Name
-
      MeetsLoadWithNominalCapacityLowOutLimit, !- Plant Connection 1 Loading Mode
-
      NeedsFlowIfLoopOn , !- Plant Connection 1 Loop Flow Request Mode
-
      Chiller model init programs, !- Plant Connection 1 Initialization Program Calling Manager Name
-
      Chiller model simulation programs ,!- Plant Connection 1 Simulation Program Calling Manager Name
-
      , !- Plant Connection 2 Inlet Node Name
-
      , !- Plant Connection 2 Outlet Node Name
-
      , !- Plant Connection 2 Loading Mode
-
      , !- Plant Connection 2 Loop Flow Request Mode
-
      , !- Plant Connection 2 Initialization Program Calling Manager Names
-
      , !- Plant Connection 2 Simulation Program Calling Manager Name
-
      , !- Plant Connection 3 Inlet Node Name
-
      , !- Plant Connection 3 Outlet Node Name
-
      , !- Plant Connection 3 Loading Mode
-
      , !- Plant Connection 3 Loop Flow Request Mode
-
      , !- Plant Connection 3 Initialization Program Calling Manager Name
-
      , !- Plant Connection 3 Simulation Program Calling Manager Name
-
      , !- Plant Connection 4 Inlet Node Name
-
      , !- Plant Connection 4 Outlet Node Name
-
      , !- Plant Connection 4 Loading Mode
-
      , !- Plant Connection 4 Loop Flow Request Mode
-
      , !- Plant Connection 4 Initialization Program Calling Manager Name
-
      , !- Plant Connection 4 Simulation Program Calling Manager Name
-
      Central Chiller Condenser Inlet Node, !- Air Connection Inlet Node Name
-
      Central Chiller Condenser Outlet Node, !- Air Connection Outlet Node Name
-
      , !- Supply Inlet Water Storage Tank Name
-
      , !- Collection Outlet Water Storage Tank Name
-
      ; !- Ambient Zone Name
+```
+
 
 ### PlantEquipmentOperation:UserDefined
 
@@ -16206,17 +14166,17 @@ The name of a schedule defined elsewhere in the input. Schedule values greater t
 
 An example of this statement in an IDF is:
 
+```idf
 AvailabilityManager:Scheduled,
-
        VAV Sys 1 Avail, !- Name
-
        FanAvailSched;     !- Schedule Name
+```
 
 AvailabilityManager:Scheduled Outputs
 
 The scheduled availability manager has one output variable.
 
-HVAC,Average,Availability Manager Scheduled Control Status
+* HVAC,Average,Availability Manager Scheduled Control Status
 
 #### Availability Manager Scheduled Control Status
 
@@ -16236,17 +14196,17 @@ The name of a schedule defined elsewhere in the input. Schedule values greater t
 
 An example of this statement in an IDF is:
 
+```idf
 AvailabilityManager:ScheduledOn,
-
        VAV Sys 1 Avail On,   !- Name
-
        FanAvailSched;             !- Schedule Name
+```
 
 ### AvailabilityManager:ScheduledOn Outputs
 
 The scheduled on availability manager has one output variable.
 
-HVAC,Average,Availability Manager Scheduled On Control Status
+* HVAC,Average,Availability Manager Scheduled On Control Status
 
 #### Availability Manager Scheduled On Control Status []
 
@@ -16265,18 +14225,17 @@ The unique, user-assigned name of an instance of a scheduled off availability ma
 The name of a schedule defined elsewhere in the input. Schedule values equal to zero indicate that the system is off. Schedule values other than (usually 0 is used) denote that *NoAction* is desired.
 
 An example of this statement in an IDF is:
-
+```idf
 AvailabilityManager:ScheduledOff,
-
        VAV Sys 1 Avail Off,     !- Name
-
        FanAvailSched;                 !- Schedule Name
+```
 
 ### AvailabilityManager:ScheduledOff Outputs
 
 The scheduled off availability manager has one output variable.
 
-HVAC,Average,Availability Manager Scheduled Off Control Status
+* HVAC,Average,Availability Manager Scheduled Off Control Status
 
 #### Availability Manager Scheduled Off Control Status []
 
@@ -16318,25 +14277,21 @@ For the option *CycleOnControlZone* this is the name of the control zone.
 
 An example of this statement in an IDF is:
 
+```idf
 AvailabilityManager:NightCycle,
-
       VAV Sys 1 Avail,         ! Name
-
        SysAvailApplicSch,     !Applicability Schedule Name
-
        FanAvailSched,             ! Fan Schedule Name
-
        CycleOnAny,                   ! Control Type
-
        4.0,                                 ! Temperature Tolerance {delta C}
-
        7200.;                             ! Cycle Run Time {s}
+```
 
 ### AvailabilityManager:NightCycle Outputs
 
 The night cycle availability manager has one output variable.
 
-HVAC,Average,Availability Manager Night Cycle Control Status
+* HVAC,Average,Availability Manager Night Cycle Control Status
 
 #### Availability Manager Night Cycle Control Status
 
@@ -16370,25 +14325,21 @@ Temperature difference [deltaC] between hot and cold nodes necessary to turn the
 
 An example of this object in an IDF is:
 
+```idf
 AvailabilityManager:DifferentialThermostat,
-
    Differential Thermostat Availability Manager,   !- Name
-
    Collector Outlet Node,                       !- Hot Node Name
-
    Water Heater Source Outlet Node,   !- Cold Node Name
-
    10.0,   !- Temperature Difference On Limit {delta C}
-
    2.0;     !- Temperature Difference Off Limit {delta C}
-
+```
 
 
 ### AvailabilityManager:DifferentialThermostat Outputs
 
 The differential thermostat availability manager has one output variable.
 
-HVAC,Average,Availability Manager Differential Thermostat Control Status
+* HVAC,Average,Availability Manager Differential Thermostat Control Status
 
 #### Availability Manager Differential Thermostat Control Status
 
@@ -16412,19 +14363,18 @@ The setpoint temperature [C] at which the system is turned off.
 
 An example of this object in an IDF is:
 
+```idf
 AvailabilityManager:HighTemperatureTurnOff,
-
    High Temperature Turn Off Availability Manager,   !- Name
-
    Water Heater Use Outlet Node,   !- Sensor Node Name
-
    60.0;   !- Temperature {C}
+```
 
 ### AvailabilityManager:HighTemperatureTurnOff Outputs
 
 The high temperature turn off availability manager has one output variable.
 
-HVAC,Average,Availability Manager High Temperature Turn Off Control Status
+* HVAC,Average,Availability Manager High Temperature Turn Off Control Status
 
 #### Availability Manager High Temperature Turn Off Control Status []
 
@@ -16448,19 +14398,18 @@ The setpoint temperature [C] at which the system is turned on.
 
 An example of this object in an IDF is:
 
+```idf
 AvailabilityManager:HighTemperatureTurnOn,
-
    High Temperature Turn On Availability Manager,   !- Name
-
    Outside Air Inlet Node,   !- Sensor Node
-
    30.0;   !- Temperature {C}
+```
 
 ### AvailabilityManager:HighTemperatureTurnOn Outputs
 
 The high temperature turn on availability manager has one output variable.
 
-HVAC,Average,Availability Manager High Temperature Turn On Control Status
+* HVAC,Average,Availability Manager High Temperature Turn On Control Status
 
 #### Availability Manager High Temperature Turn On Control Status []
 
@@ -16487,22 +14436,19 @@ The setpoint temperature [C] at which the system is turned off.
 The name of a schedule defined elsewhere in the input file. This schedule determines whether or not for a given time period this availability manager is to be applied. Schedule values greater than zero (usually 1 is used) indicate the availability manager is to be applied. Schedule values less than or equal to zero (usually 0 is used) denote that the availability manager is not used for this time period. If this field is left blank, this availability manager is always active.
 
 An example of this object in an IDF is:
-
+```idf
 AvailabilityManager:LowTemperatureTurnOff,
-
    Low Temperature Turn Off Availability Manager,   !- Name
-
    Outside Air Inlet Node,   !- Sensor Node Name
-
    0.0,   !- Temperature {C}
-
    Low Temp Control Schedule;   !- Applicability Schedule Name
+```
 
 ### AvailabilityManager:LowTemperatureTurnOff Outputs
 
 The low temperature turn off availability manager has one output variable.
 
-HVAC,Average,Availability Manager Low Temperature Turn Off Control Status
+* HVAC,Average,Availability Manager Low Temperature Turn Off Control Status
 
 Availability Manager Low Temperature Turn Off Control Status []
 
@@ -16525,20 +14471,18 @@ The air or plant node where the temperature is monitored.
 The setpoint temperature [C] at which the system is turned on.
 
 An example of this object in an IDF is:
-
+```idf
 AvailabilityManager:LowTemperatureTurnOn,
-
    Low Temperature Turn On Availability Manager,   !- Name
-
    Collector Outlet Node,   !- Sensor Node Name
-
    0.0;   !- Temperature {C}
+```
 
 ### AvailabilityManager:LowTemperatureTurnOn Outputs
 
 The low temperature turn on availability manager has one output variable.
 
-HVAC,Average,Availability Manager Low Temperature Turn On Control Status []
+* HVAC,Average,Availability Manager Low Temperature Turn On Control Status []
 
 #### Availability Manager Low Temperature Turn On Control Status []
 
@@ -16585,30 +14529,23 @@ The fraction (could be greater than 1) of the design flow rate at which the nigh
 The name of the control zone used in the ventilation temperature difference check.
 
 An example of this object in an input file:
-
+```idf
 AvailabilityManager:NightVentilation,
-
        VAV Sys 1 Avail,                 !- Name
-
        NightVentSched,                   !- Applicability Schedule Name
-
        FanAvailSched,                     !- Fan Schedule Name
-
        VentTempSched,                     !- Ventilation Temperature Schedule Name
-
        2.0,                                         !- Ventilation Temperature Difference   {C}
-
        15.,                                         !- Ventilation Temperature Low Limit
-
        0.3333,                                   !- Night Venting Flow Fraction
-
        SPACE3-1;                               !- Control Zone Name
+```
 
 ### System Availability Manager Night Ventilation Outputs
 
 The night ventilation availability manager has one output variable.
 
-HVAC,Average,Availability Manager Night Ventilation Control Status []
+* HVAC,Average,Availability Manager Night Ventilation Control Status []
 
 #### Availability Manager Night Ventilation Control Status []
 
@@ -16778,57 +14715,31 @@ This input is required if AdaptiveTemperatureGradient algorithm is selected in t
 
 Sample IDFs:
 
+```idf
 AvailabilityManager:OptimumStart,
-
    AdaptiveSetbackRecovery, !- Name
-
    AppliSch,                                             !- Applicability Schedule Name
-
    FanSch,                                                 !- Fan Schedule Name
-
    ControlZone,                                       !- Control Type
-
    MainZone,                                             !- Control Zone Name
-
    ,                                                             !- Zone List Name
-
    4,                                                           !- Maximum Value for Optimum Start Time
-
    AdaptiveTemperatureGradient,       !- Control Algorithm
-
    ,                                                             !- Constant Temperature Gradient during Cooling
-
    ,                                                             !- Constant Temperature Gradient during Heating
-
    5,                                                           !- Initial Temperature Gradient during Cooling
-
    5;                                                           !- Initial Temperature Gradient during Heating
 
-
-
-
-
 AvailabilityManager:OptimumStart,
-
    SetbackRecovery,                               !- Name
-
    AppliSch,                                             !- Applicability Schedule Name
-
    FanSch,                                                 !- Fan Schedule Name
-
    MaximumofZoneList,             !- Control Type
-
    ,                                                            !- Control Zone Name
-
    ZoneList,                                             !- Zone List Name
-
    ,                                                             !- Maximum Value for Optimum Start Time
-
    AdaptiveASHRAE;                                 !- Control Algorithm
-
-
-
-
+```
 
 ### AvailabilityManager:OptimumStart Outputs
 
@@ -16957,15 +14868,13 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 Following is an example of the input for a Scheduled Setpoint Manager.
 
+```idf
 SetpointManager:Scheduled,
-
        Supply Air Temp Manager 1,   !- Name
-
        Temperature,                               !- Control Variable
-
        Seasonal Reset Supply Air Temp Sch,   !- Schedule Name
-
        VAV Sys 1 Outlet Node;           !- Setpoint Node or NodeList Name
+```
 
 ### SetpointManager:Scheduled:DualSetpoint
 
@@ -16993,17 +14902,14 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 Following is an example of the input for a SetpointManager:Scheduled:DualSetpoint object.
 
+```idf
 SetpointManager:Scheduled:DualSetpoint,
-
        Water Loop Setpoint Manager,       !- Name
-
        Temperature,                                       !- Control Variable
-
        Plant Loop High Temp Schedule,   !- High Setpoint Schedule Name
-
        Plant Loop Low Temp Schedule,     !- Low Setpoint Schedule Name
-
        Plant Supply Outlet Node;             !- Setpoint Node or NodeList Name
+```
 
 ### SetpointManager:OutdoorAirReset
 
@@ -17063,29 +14969,21 @@ The outdoor air high temperature in <sup>o</sup>C for the second supply air temp
 
 Below is an example of the input for an Outdoor Air Reset Setpoint Manager:
 
+```idf
 SetpointManager:OutdoorAirReset,
-
            Supply Air Temp Manager 1,   !- Name
-
            Temperature,   !- Control Variable
-
            16.7,   !- Setpoint at Outdoor Low Temperature {C}
-
            0.0,     !- Outdoor Low Temperature {C}
-
            12.8,   !- Setpoint at Outdoor High Temperature {C}
-
            32.0,   !- Outdoor High Temperature {C}
-
            Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
 
-
-
 NodeList,
-
            Supply Air Temp Nodes, !- Name
-
            Air Loop Outlet Node;   !- Node 1 Name
+```
+
 
 ### SetpointManager:SingleZone:Reheat
 
@@ -17125,33 +15023,24 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 Below is an example input for a SetpointManager:SingleZone:Reheat object.
 
+```idf
 SetpointManager:SingleZone:Reheat,
-
            Supply Air Temp Manager,   !- Name
-
            Temperature,  !- Control Variable
-
            13.,  !- Minimum Supply Air Temperature {C}
-
            45.,  !- Maximum Supply Air Temperature {C}
-
            NORTH ZONE,     !- Control Zone Name
-
            Zone 3 Node,   !- Zone Node Name
-
            Zone 3 Inlet Node,  !- Zone Inlet Node Name
-
            Supply Air Temp Nodes;  !- Setpoint Node or NodeList Name
 
 
-
 NodeList,
-
            Supply Air Temp Nodes, !- Name
-
            Heating Coil Air Inlet Node,   !- Node 1 Name
-
            Air Loop Outlet Node; !- Node 2 Name
+```
+
 
 ### SetpointManager:SingleZone:Heating
 
@@ -17191,23 +15080,18 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 Below is an example input for a SetpointManager:SingleZone:Heating object.
 
+```idf
 SetpointManager:SingleZone:Heating,
-
        Zone 1 Heating Supply Air Temp Manager,   !- Name
-
        Temperature,                         !- Control Variable
-
        7.22,                                       !- Minimum Supply Air Temperature {C}
-
        45.,                                         !- Maximum Supply Air Temperature {C}
-
        Zone 1,                                   !- Control Zone Name
-
       Zone 1 Zone Node,               !- Zone Node Name
-
       Zone 1 Supply Inlet,         !- Zone Inlet Node Name
-
        Zone 1 Heating Coil Outlet;   !- Setpoint Node or NodeList Name
+```
+
 
 ### SetpointManager:SingleZone:Cooling
 
@@ -17247,23 +15131,18 @@ The name of a Node List object containing the names of the HVAC system nodes or 
 
 Below is an example input for a SetpointManager:SingleZone:Cooling object.
 
+```idf
 SetpointManager:SingleZone:Cooling,
-
        Zone 1 Cooling Supply Air Temp Manager,   !- Name
-
        Temperature,                         !- Control Variable
-
        7.22,                                       !- Minimum Supply Air Temperature {C}
-
        45.,                                         !- Maximum Supply Air Temperature {C}
-
        Zone 1,                                   !- Control Zone Name
-
       Zone 1 Zone Node,               !- Zone Node Name
-
       Zone 1 Supply Inlet,         !- Zone Inlet Node Name
-
        Zone 1 Cooling Coil Outlet;   !- Setpoint Node or NodeList Name
+```
+
 
 
 
@@ -17295,27 +15174,21 @@ The name of the zone node for the humidity control zone (as specified in the obj
 
 An IDF example for this setpoint manager is shown below with the required humidistat:
 
+```idf
 SetpointManager:SingleZone:Humidity:Minimum,
-
        Zone Min Set Point Manager,   !- Name
-
        ,   !- Control Variable
-
        ,   !- Schedule Name
-
        Air Loop Outlet Node,   !- Setpoint Node or NodeList Name
-
        Zone 2 Node;                     !- Control Zone Air Node Name
 
 
-
 ZoneControl:Humidistat,
-
        Zone 2 Humidistat,             !- Name
-
        ZONE 2,                                   !-Zone Name
-
        Min rel Hum Set Sch2;       !- Humidifying Relative Humidity Setpoint Schedule Name
+```
+
 
 
 
@@ -17349,61 +15222,40 @@ The name of the zone air node for the humidity control zone (as specified in the
 
 An example of this object in an input data file (IDF), along with a temperature set point manager, humidistat, and a simple controller, is shown below:
 
+```idf
    SetpointManager:SingleZone:Humidity:Maximum,
-
        Zone Max Set Point Manager,                     !- Name
-
        ,                                                                         !- Control Variable
-
        ,                                                                         !- Schedule Name
-
        VAV Sys 1 Outlet Node,                               !- Setpoint Node or NodeList Name
-
        Zone 2 Node;                                                   !-Control Zone Air Node Name
 
 
-
    SetpointManager:Scheduled,
-
        Scheduled Set Point Manager 1,               !- Name
-
        Temperature,                                                   !- Control Variable
-
        Seasonal Reset Supply Air Temp Sch,     !- Schedule Name
-
        VAV Sys 1 Outlet Node;                               !- Setpoint Node or NodeList Name
 
 
-
    ZoneControl:Humidistat,
-
        Zone 2 Humidistat,             !-Name
-
        ZONE 2,                                   !- Zone Name
-
        Min rel Hum Set Sch2;       !- Humidifying Relative Humidity Setpoint Schedule Name
 
 
-
    Controller:WaterCoil,
-
        Central Cooling Coil Contoller 1,         !- Name
-
        TEMPandHUMRAT,                                               !- Control Variable
-
        Reverse,                                                           !- Action
-
        FLOW,                                                                 !- Actuator Variable
-
        VAV Sys 1 Outlet Node,                               !- Sensor Node Name
-
        Main Cooling Coil 1 Water Inlet Node, !- Actuator Node Name
-
        0.002,                                                               !- Controller Convergence Tolerance {deltaC}
-
        0.025,                                                               !- Maximum Actuated Flow {m3/s}
-
        0.0;                                                                   !- Minimum Actuated Flow {m3/s}
+```
+
 
 
 
@@ -17441,49 +15293,33 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 Below is an example input for a Mixed Air Setpoint Manager.
 
+```idf
 SetpointManager:SingleZone:Reheat, ! establishes the setpoint at the system outlet node
-
            Supply Air Temp Manager,   !- Name
-
            Temperature,   !- Control Variable
-
            13.,  !- Minimum Supply Air Temperature
-
            45.,  !- Maximum Supply Air Temperature
-
            NORTH ZONE,  !- Control Zone Name
-
            Zone 3 Node,  !- Zone Node Name
-
            Zone 3 Inlet Node,  !- Zone Inlet Node Name
-
           Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
 
 
-
 SetpointManager:MixedAir, ! uses the system outlet setpoint to establish the mixed air setpoint
-
            Mixed Air Temp Manager 1,   !- Name
-
            Temperature,   !- Control Variable
-
            Air Loop Outlet Node,                   !- Reference Setpoint Node Name
-
            Heating Coil Air Outlet Node,   !- Fan Inlet Node Name
-
            Air Loop Outlet Node,                   !- Fan Outlet Node Name
-
            Mixed Air Nodes;                             !- Setpoint Node or NodeList Name
 
 
-
 NodeList, Supply Air Temp Nodes,
-
            Air Loop Outlet Node; ! Setpoint Nodes
-
 NodeList, Mixed Air Nodes,
-
            Mixed Air Node; ! Setpoint Nodes
+```
+
 
 
 
@@ -17549,29 +15385,21 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 Below is an example input for an Outdoor Air Pretreat Setpoint Manager.
 
+```idf
 SetpointManager:OutdoorAirPretreat,
-
        DXSystem 1 Desiccant Set Point Manager,   !- Name
-
        MaximumHumidityRatio,       !- Control Variable
-
        -99,                                         !- Minimum Setpoint Temperature {C}
-
        99,                                           !- Maximum Setpoint Temperature {C}
-
        0.00001,                                 !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
        1.0,                                         !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
        DXSystem 1 Fan Air Inlet Node,   !- Reference Setpoint Node Name
-
        DXSystem 1 Mixed Air Node,           !- Mixed Air Stream Node Name
-
        Heat Recovery Outlet Node,           !- Outdoor Air Stream Node Name
-
        DXSystem 1 Air Loop Inlet Node, !- Return Air Stream Node Name
-
        Desiccant Process Outlet Node;   !- Setpoint Node or NodeList Name
+```
+
 
 ### SetpointManager:Warmest
 
@@ -17607,43 +15435,30 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 Below is an example input for a Warmest Setpoint Manager.
 
+```idf
 SetpointManager:Warmest,
-
        Supply Air Temperature Manager 1,   !- Name
-
        Temperature,   !- Control Variable
-
        VAV Sys 1,   !- HVAC Air Loop Name
-
        11.2,   !- Minimum Setpoint Temperature
-
        16.,   !- Maximum Setpoint Temperature
-
        MaximumTemperature,   !- Strategy
-
        Supply Air Temp Nodes 1;   !- Setpoint Node or NodeList Name
 
 
-
 SetpointManager:MixedAir,
-
        Mixed Air Temp Manager 1,   !- Name
-
        Temperature,   !- Control Variable
-
        VAV Sys 1 Outlet Node,   !- Reference Setpoint Node Name
-
        Main Heating Coil 1 Outlet Node,   !- Fan Inlet Node Name
-
        VAV Sys 1 Outlet Node,   !- Fan Outlet Node Name
-
        Mixed Air Node 1;             !- Setpoint Node or NodeList Name
 
 
-
 NodeList, Supply Air Temp Nodes 1,
-
        VAV Sys 1 Outlet Node; ! Setpoint Node
+```
+
 
 ### SetpointManager:Coldest
 
@@ -17679,99 +15494,61 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 Below is an example input for a Coldest Setpoint Manager.
 
+```idf
    Controller:Simple,
-
        Central Cooling Coil Controller 1,   !- Name
-
        Temperature,   !- Control Variable
-
        Reverse,   !- Action
-
        Flow,         !- Actuator Variable
-
        VAV Sys 1 Cold Outlet Node,                       !- Sensor Node Name
-
        Main Cooling Coil 1 Water Inlet Node,   !- Actuator Node Name
-
        0.001,       !- Controller Convergence Tolerance {deltaC}
-
        autosize, !- Maximum Actuated Flow {m3/s}
-
        0.0;           !- Minimum Actuated Flow {m3/s}
 
 
-
    Controller:WaterCoil,
-
        Central Heating Coil Controller 1,   !- Name
-
        Temperature,   !- Control Variable
-
        Normal,   !- Action
-
        Flow,       !- Actuator Variable
-
        VAV Sys 1 Hot Outlet Node,                         !- Sensor Node Name
-
        Main Heating Coil 1 Water Inlet Node,   !- Actuator Node Name
-
        0.001,         !- Controller Convergence Tolerance {deltaC}
-
        autosize,   !- Maximum Actuated Flow {m3/s}
-
        0.0;             !- Minimum Actuated Flow {m3/s}
 
 
-
    SetpointManager:Warmest,
-
        Supply Air Temperature Manager 1,   !- Name
-
        Temperature,             !- Control Variable
-
        VAV Sys 1,   !- HVAC Air Loop Name
-
        11.2,             !- Minimum Setpoint Temperature {C}
-
        16.,               !- Maximum Setpoint Temperature {C}
-
        MaximumTemperature,             !- Strategy
-
        Supply Air Temp Nodes 1;   !- Setpoint Node or NodeList Name
 
 
-
    NodeList,
-
        Supply Air Temp Nodes 1,         !- Name
-
        VAV Sys 1 Cold Outlet Node;   !- Node 1 Name
 
 
-
    SetpointManager:Coldest,
-
        Supply Air Temperature Manager 2,   !- Name
-
        Temperature,             !- Control Variable
-
        VAV Sys 1,   !- HVAC Air Loop Name
-
        25.,               !- Minimum Setpoint Temperature {C}
-
        50.,               !- Maximum Setpoint Temperature {C}
-
        MinimumTemperature,             !- Strategy
-
        Supply Air Temp Nodes 2;   !- Setpoint Node or NodeList Name
 
 
-
    NodeList,
-
        Supply Air Temp Nodes 2,       !- Name
-
        VAV Sys 1 Hot Outlet Node;   !- Node 1 Name
+```
+
 
 
 
@@ -17799,15 +15576,13 @@ The name of a schedule whose values are temperatures in   <sup>o</sup>C. The sch
 
 The following shows an example input for SetpointManager:ReturnAirBypassFlow.
 
+```idf
 SetpointManager:ReturnAirBypassFlow,
-
        RETURN AIR BYPASS Manager 1,   !- Name
-
        Flow,   !- Control Variable
-
        VAV Sys 1,   !- HVAC Air Loop Name
-
        Seasonal Reset Supply Air Temp Sch;   !- Temperature Setpoint Schedule Name
+```
 
 ### SetpointManager:WarmestTemperatureFlow
 
@@ -17853,45 +15628,31 @@ The minimum value of the ratio of the actual air flow rate to the maximum air fl
 
 Below is an example input for a SetpointManager:WarmestTemperatureFlow object.
 
+```idf
 SetpointManager:WarmestTemperatureFlow,
-
        Supply Air Temperature Manager 1,   !- Name
-
        Temperature,   !- Control Variable
-
        VAV Sys 1,   !- HVAC Air Loop Name
-
        11.2,   !- Minimum Setpoint Temperature
-
        16.,     !- Maximum Setpoint Temperature
-
        TemperatureFirst,   !- Strategy
-
        Supply Air Temp Nodes 1,   !- Setpoint Node or NodeList Name
-
        0.3;   !- Minimum Turndown Ratio
 
 
-
 SetpointManager:MixedAir,
-
        Mixed Air Temp Manager 1,   !- Name
-
        Temperature,   !- Control Variable
-
        VAV Sys 1 Outlet Node,   !- Reference Setpoint Node Name
-
        Main Heating Coil 1 Outlet Node,   !- Fan Inlet Node Name
-
        VAV Sys 1 Outlet Node,   !- Fan Outlet Node Name
-
        Mixed Air Node 1;   !- Setpoint Node or NodeList Name
 
 
-
 NodeList, Supply Air Temp Nodes 1,
-
        VAV Sys 1 Outlet Node; ! Set Point Node
+```
+
 
 ### SetpointManager:WarmestTemperatureFlow Outputs
 
@@ -17929,17 +15690,15 @@ The name of a NodeList object containing the names of the HVAC system nodes, or 
 
 Below is an example of this object in an input file.
 
+```idf
    SetpointManager:MultiZone:Cooling:Average,
-
        Cooling Coil Air Sys Branch Set Point,   !- Name
-
        Main Dual Duct Air Loop, !- HVAC Air Loop Name
-
        12.0,                                       !- Minimum Setpoint Temperature {C}
-
        22.0,                                       !- Maximum Setpoint Temperature {C}
-
        Cooling Coil Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
+```
+
 
 
 
@@ -17969,17 +15728,14 @@ The name of a NodeList object containing the names of the HVAC system nodes, or 
 
 Below is an example of this object in an input file.
 
+```idf
    SetpointManager:MultiZone:Heating:Average,
-
        Heating Coil Air Sys Branch Set Point,   !- Name
-
        Main Dual Duct Air Loop, !- HVAC Air Loop Name
-
        24.0,                                       !- Minimum Setpoint Temperature {C}
-
        41.0,                                       !- Maximum Setpoint Temperature {C}
-
        Heating Coil Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
+```
 
 
 
@@ -18009,30 +15765,21 @@ The name of a NodeList object containing the names of the HVAC system nodes, or 
 
 An example of this object in an input data file (IDF), along with a humidistat object, is shown below.
 
+```idf
 SetpointManager:MultiZone:MinimumHumidity:Average,
-
-   VAV\_1 Humidifier HUMRAT setpoint, !- Name
-
-   VAV\_1,                                                       !- HVAC Air Loop Name
-
+   VAV_1 Humidifier HUMRAT setpoint, !- Name
+   VAV_1,                                                       !- HVAC Air Loop Name
    0.003,                                                       !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
    0.012,                                                       !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
-   VAV\_1 Humidifier-Outlet Nodes List;           !- Setpoint Node or NodeList Name
-
+   VAV_1 Humidifier-Outlet Nodes List;           !- Setpoint Node or NodeList Name
 
 
 ZoneControl:Humidistat,
-
-   ICU\_NURSESTN\_LOBBY\_FLR\_2 Humidistat,   !- Name
-
-   ICU\_NURSESTN\_LOBBY\_FLR\_2,   !- Zone Name
-
+   ICU_NURSESTN_LOBBY_FLR_2 Humidistat,   !- Name
+   ICU_NURSESTN_LOBBY_FLR_2,   !- Zone Name
    MinRelHumSetSch,   !- Humidifying Relative Humidity Setpoint Schedule Name
-
    MaxRelHumSetSch;   !- Dehumidifying Relative Humidity Setpoint Schedule Name
-
+```
 
 
 ### SetpointManager:MultiZone:MaximumHumidity:Average
@@ -18063,29 +15810,22 @@ The name of a NodeList object containing the names of the HVAC system nodes, or 
 
 An example of this object in an input data file (IDF), along with a humidistat object, is shown below:
 
+```idf
 SetpointManager:MultiZone:MaximumHumidity:Average,
-
-   VAV\_1\_CoolC HUMRAT setpoint,           !- Name
-
-   VAV\_1,                                                       !- HVAC Air Loop Name
-
+   VAV_1_CoolC HUMRAT setpoint,           !- Name
+   VAV_1,                                                       !- HVAC Air Loop Name
    0.005,                                                       !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
    0.015,                                                       !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
-   VAV\_1 DeHumidifier-Outlet Nodes List;       !- Setpoint Node or NodeList Name
-
+   VAV_1 DeHumidifier-Outlet Nodes List;       !- Setpoint Node or NodeList Name
 
 
 ZoneControl:Humidistat,
-
-   ICU\_NURSESTN\_LOBBY\_FLR\_2 Humidistat,   !- Name
-
-   ICU\_NURSESTN\_LOBBY\_FLR\_2,   !- Zone Name
-
+   ICU_NURSESTN_LOBBY_FLR_2 Humidistat,   !- Name
+   ICU_NURSESTN_LOBBY_FLR_2,   !- Zone Name
    MinRelHumSetSch,   !- Humidifying Relative Humidity Setpoint Schedule Name
-
    MaxRelHumSetSch;   !- Dehumidifying Relative Humidity Setpoint Schedule Name
+```
+
 
 ### SetpointManager:MultiZone:Humidity:Minimum
 
@@ -18113,29 +15853,22 @@ The name of a NodeList object containing the names of the HVAC system nodes, or 
 
 An example of this object in an input data file (IDF), along with a humidistat object, is shown below.
 
+```idf
 SetpointManager:MultiZone:Humidity:Minimum,
-
        Main Humidifier setpoint Mgr,     !- Name
-
        VAV Sys 1,                                           !- HVAC Air Loop Name
-
        0.003,                                                   !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
        0.015,                                                   !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
        Main Humidifier Outlet Node;       !- Setpoint Node or NodeList Name
 
 
-
 ZoneControl:Humidistat,
-
        Space5-1 Humidistat,         !- Name
-
        SPACE5-1,                               !- Zone Name
-
        HumidifyingHumSetSch,       !- Humidifying Relative Humidity Setpoint Schedule Name
-
        DehumidifyingHumSetSch;   !- Dehumidifying Relative Humidity Setpoint Schedule Name
+```
+
 
 ### SetpointManager:MultiZone:Humidity:Maximum
 
@@ -18167,27 +15900,21 @@ An example of this object in an input data file (IDF), along with a humidistat o
 
 
 
+```idf
    SetpointManager:MultiZone:Humidity:Maximum,
-
        Maximum Mzone HUMRAT setpoint,   !- Name
-
        VAV Sys 1,                                           !- HVAC Air Loop Name
-
        0.003,                                                   !- Minimum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
        0.015,                                                   !- Maximum Setpoint Humidity Ratio (kgWater/kgDryAir)
-
        DeHumidifier-Outlet Nodes;           !- Setpoint Node or NodeList Name
 
 
-
 ZoneControl:Humidistat,
-
        Space5-1 Humidistat,         !- Name
-
        SPACE5-1,                               !- Zone Name
-
        HumidifyingHumSetSch,       !- Humidifying Relative Humidity Setpoint Schedule Name
+```
+
 
 ### SetpointManager:FollowOutdoorAirTemperature
 
@@ -18223,21 +15950,17 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 An IDF example of use:
 
+```idf
 SetpointManager:FollowOutdoorAirTemperature,
-
    MyCondenserControl,         !- Name
-
    Temperature,                       !- Control Variable
-
    OutdoorAirDryBulb,           !- Reference Temperature Type
-
    0.5,                                       !- Offset Temperature Difference {deltaC}
-
    200,                                       !- Maximum Setpoint Temperature {C}
-
    21.1,                                     !- Minimum Setpoint Temperature {C}
-
    CondSupplyOutletNode;     !- Setpoint Node or NodeList Name
+```
+
 
 ### SetpointManager:FollowSystemNodeTemperature
 
@@ -18277,23 +16000,18 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 An IDF example of use:
 
+```idf
 SetpointManager:FollowSystemNodeTemperature,
-
    MyCondenserControl,         !- Name
-
    Temperature,                       !- Control Variable
-
    MyOAinletNode,                   !- Reference Node Name
-
    NodeDryBulb,                       !- Reference Temperature Type
-
    0.5,                                       !- Offset Temperature Difference {deltaC}
-
    200,                                       !- Maximum Setpoint Temperature {C}
-
    24.0,                                     !- Minimum Setpoint Temperature {C}
-
    CondSupplyOutletNode;     !- Setpoint Node or NodeList Name
+```
+
 
 ### SetpointManager:FollowGroundTemperature
 
@@ -18329,21 +16047,17 @@ The name of a NodeList object containing the names of the HVAC system nodes or t
 
 An IDF example of use:
 
+```idf
 SetpointManager:FollowGroundTemperature,
-
    MyCondenserControl,                   !- Name
-
    Temperature,                                 !- Control Variable
-
    Site:GroundTemperature:Deep, !- Reference Ground Temperature Object Type
-
    1.5,                                                 !- Offset Temperature Difference {deltaC}
-
    50.0,                                               !- Maximum Setpoint Temperature {C}
-
    10.0,                                               !- Minimum Setpoint Temperature {C}
-
    CondSupplyOutletNode;               !- Setpoint Node or NodeList Name
+```
+
 
 ### SetpointManager:CondenserEnteringReset
 
@@ -18427,33 +16141,24 @@ This field defines the condenser node being controlled.
 
 Below is an example input for a CondenserEnteringReset Setpoint Manager.
 
+```idf
 SetpointManager:CondenserEnteringReset,
-
        Condenser Optimized Setpoint Manager,   !- Name
-
        Temperature,                   !- Control Variable
-
        DefaultCondEntSch,       !- Default Condenser Entering Water Temperature Schedule Name
-
        MinDsnWBCurveName,       !- Minimum Design Wetbulb Temperature Curve Name
-
        MinActWBCurveName,       !- Minimum Outside Air Wetbulb Temperature Curve Name
-
        OptCondEntCurveName,   !- Optimized Cond Entering Water Temperature Curve Name
-
        12,                                     !- Minimum Lift, C
-
        32,                                     !- Maximum Condenser Entering Water Temp, C
-
        25.56,                               !- Cooling Tower Design Inlet Air Wetbulb Temperature, C
-
        Cond Water Setpoint Node;   !- Setpoint Node or Node List Name
-
+```
 
 
 ### SetpointManager:CondenserEnteringReset:Ideal
 
-The object determines a    near-optimal    condenser water entering setpoint at each time step that will result in minimum net energy consumption for the chiller and coolingtower plant. The    ideal    chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint at a given timestep. Note that this object will work with only one chiller object and only one cooling tower object in a plant loop.
+The object determines a near-optimal condenser water entering setpoint at each time step that will result in minimum net energy consumption for the chiller and coolingtower plant. The    ideal    chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint at a given timestep. Note that this object will work with only one chiller object and only one cooling tower object in a plant loop.
 
 #### Field: Name
 
@@ -18477,17 +16182,15 @@ This field defines the condenser node being controlled.
 
 Below is an example input for a IdealCondenserEnteringReset Setpoint Manager.
 
+```idf
 SetpointManager:CondenserEnteringReset:Ideal,
-
        Condenser Optimized Setpoint Manager,   !- Name
-
        Temperature,                   !- Control Variable
-
        12,                                     !- Minimum Lift, C
-
        32,                                     !- Maximum Condenser Entering Water Temp, C
-
        Cond Water Setpoint Node;   !- Setpoint Node or Node List Name
+```
+
 
 ### SetpointManager:SingleZone:OneStageCooling
 
@@ -18519,17 +16222,14 @@ This alpha field is the name of a NodeList objet containing the names of the HVA
 
 An example input follows.
 
+```idf
 SetpointManager:SingleZone:OneStageCooling,
-
-       ZSF2 cooling on\_off , !- Name
-
+       ZSF2 cooling on_off , !- Name
        -99.0 , !- Cooling Stage On Supply Air Setpoint Temperature
-
        99.0 , !- Cooling Stage Off Supply Air Setpoint Temperature
-
        ZSF2 , !- Control Zone Name
-
        DX Cooling Coil 3 Outlet Node ; !- Setpoint Node or NodeList Name
+```
 
 ### SetpointManager:SingleZoneOneStageHeating
 
@@ -18559,17 +16259,14 @@ This alpha field is the name of a NodeList objet containing the names of the HVA
 
 An example input follows.
 
+```idf
 SetpointManager:SingleZone:OneStageHeating,
-
-       ZNF1 heating on\_off , !- Name
-
+       ZNF1 heating on_off , !- Name
        99.0 , !- Heating Stage On Supply Air Setpoint Temperature
-
        -99.0 , !- Heating Stage Off Supply Air Setpoint Temperature
-
        ZNF1 , !- Control Zone Name
-
        Main Heating Coil 2 Air Outlet Node ; !- Setpoint Node or NodeList Name
+```
 
 
 
@@ -18632,54 +16329,33 @@ An example of this object in an IDF, along with appropriate setpoint managers, i
 
 
 
+```idf
    Controller:WaterCoil,
-
        Central Cooling Coil Contoller 1,         !- Name
-
        TemperatureAndHumidityRatio,                   !- Control Variable
-
        Reverse,                                                           !- Action
-
        Flow,                                                                 !- Actuator Variable
-
        VAV Sys 1 Outlet Node,                               !- Sensor Node Name
-
        Main Cooling Coil 1 Water Inlet Node, !- Actuator Node Name
-
        0.002,                                                               !- Controller Convergence Tolerance {deltaC}
-
        0.025,                                                               !- Maximum Actuated Flow {m3/s}
-
        0.0;                                                                   !- Minimum Actuated Flow {m3/s}
 
 
-
    SetpointManager:SingleZone:Humidity:Maximum,
-
        Zone Max Set Point Manager,                     !- Name
-
        ,                                                                         !- Control Variable
-
        ,                                                                         !- Schedule name
-
        VAV Sys 1 Outlet Node,                               !- Setpoint Node or NodeList Name
-
        Zone 2 Node;                                                   !- Control Zone Air Node Name
 
 
-
    SetpointManager:Scheduled,
-
        Scheduled Set Point Manager 1,               !- Name
-
        Temperature,                                                   !- Control Variable
-
        Seasonal Reset Supply Air Temp Sch,     !- Schedule Name
-
        VAV Sys 1 Outlet Node;                               !- Setpoint Node or NodeList Name
-
-
-
+```
 
 
 ### Controller:OutdoorAir
@@ -18868,97 +16544,67 @@ This choice field determines if specialized control is used to optimize the use 
 
 An Example IDF specification:
 
+```idf
    Controller:OutdoorAir,
-
        OA Controller 1,                 !- Name
-
        Relief Air Outlet Node,   !- Relief Air Outlet Node Name
-
        Outdoor Air Mixer Inlet Node,   !- Return Air Node Name
-
        Mixed Air Node,                   !- Mixed Air Node Name
-
        Outdoor Air Inlet Node,   !- Actuator Node Name
-
        0.25,                                       !- Minimum Outdoor Air Flow Rate {m3/s}
-
        1.6,                                         !- Maximum Outdoor Air Flow Rate {m3/s}
-
        ElectronicEnthalpy,           !- Economizer Control Type
-
        ModulateFlow,                       !- Economizer Control Action Type
-
        23.,                                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-
        ,                                       !- Economizer Maximum Limit Enthalpy {J/kg}
-
        13.5,                               !- Economizer Maximum Limit Dewpoint Temperature {C}
-
        ElectronicEnthalpyCurveA,!- Electronic Enthalpy Limit Curve Name
-
        14.,                                 !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-
        NoLockout,                             !- Lockout Type
-
        FixedMinimum,                       !- Minimum Limit Type
-
        OAFractionSched,                 !- Minimum Outdoor Air Schedule Name
-
        ,                                               !- Minimum Fraction of Outdoor Air Schedule Name
-
        ,                                               !- Maximum Fraction of Outdoor Air Schedule Name
-
        ,                                               !- Mechanical Ventilation Controller Name
-
        TimeOfDayEconomizerSch,   !- Time of Day Economizer Control Schedule Name
-
        Yes,                                         !- High Humidity Control
-
        EAST ZONE,                             !- Humidistat Control Zone Name
-
        0.9,                                         !- High Humidity Outdoor Air Flow Ratio
-
        Yes;           !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
 
 
-
    Curve:Cubic,
-
        ElectronicEnthalpyCurveA,!- Name
-
        0.01342704,                           !- Coefficient1 Constant
-
        -0.00047892,                         !- Coefficient2 x
-
-       0.000053352,                         !- Coefficient3 x\*\*2
-
-       -0.0000018103,                     !- Coefficient4 x\*\*3
-
+       0.000053352,                         !- Coefficient3 x**2
+       -0.0000018103,                     !- Coefficient4 x**3
       16.6,                                       !- Minimum Value of x
-
        29.13;                                     !- Maximum Value of x
+```
+
 
 ### Controller:OutdoorAir Outputs
 
 Note that the key value for these outputs is the AirLoopHVAC name, not the name of the Controller:OutdoorAir.
 
-HVAC,Average,Air System Outdoor Air Economizer Status []
+* HVAC,Average,Air System Outdoor Air Economizer Status []
 
-HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Status []
+* HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Status []
 
-HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status []
+* HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status []
 
-HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature [C]
+* HVAC,Average,Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature [C]
 
-HVAC,Average,Air System Outdoor Air High Humidity Control Status []
+* HVAC,Average,Air System Outdoor Air High Humidity Control Status []
 
-HVAC,Average,Air System Outdoor Air Flow Fraction []
+* HVAC,Average,Air System Outdoor Air Flow Fraction []
 
-HVAC,Average,Air System Outdoor Air Minimum Flow Fraction []
+* HVAC,Average,Air System Outdoor Air Minimum Flow Fraction []
 
-HVAC,Average,Air System Outdoor Air Mass Flow Rate [kg/s]
+* HVAC,Average,Air System Outdoor Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Air System Mixed Air Mass Flow Rate [kg/s]
+* HVAC,Average,Air System Mixed Air Mass Flow Rate [kg/s]
 
 #### Air System Outdoor Air Economizer Status []
 
@@ -19052,67 +16698,40 @@ The actual outdoor air flow rate may be higher than the minimum if free cooling 
 
 An example input for this object is shown below:
 
+```idf
    Controller:MechanicalVentilation,
-
        VentObject,                             !- Name
-
        VentSchedule,                         !- Availability Schedule Name
-
        VentilationRateProcedure, !- System Outdoor Air Method
-
        1.0,                                           !- Zone Maximum Outdoor Air Fraction
-
        Resistive Zone,                     !- Zone 1 Name
-
        DSOA1,                                       !- Design Specification Outdoor Air Object Name 1
-
-      DSZADO1,                                   !- Design Specification Zone Air Distribution Object Name 1
-
+       DSZADO1,                                   !- Design Specification Zone Air Distribution Object Name 1
        DCV Zone List,                       !- Zone 2 Name
-
-       DSO\_ZList,                               !- Design Specification Outdoor Air Object Name 2
-
+       DSO_ZList,                               !- Design Specification Outdoor Air Object Name 2
        ;                                                !- Design Specification Zone Air Distribution Object Name 2
 
-
-
    ZoneList,
-
        DCV Zone List,                       !- Zone List Name
-
        East Zone,                               !- Zone Name 1
-
        North Zone;                             !- Zone Name 2
 
-DesignSpecification:OutdoorAir,
+   DesignSpecification:OutdoorAir,
+       DSOA1,                                     !- Name
+       SUM,                                         !- Outdoor Air Method
+       0.00236,                                 !- Outdoor Air Flow per Person
+       0.000305,                               !- Outdoor Air Flow per Zone Floor Area
+       0.0,                                         !- Outdoor Air Flow per Zone
+       0.0,                                         !- Outdoor Air Flow Air Changes per Hour
+       ;                                               !- Outdoor Air Flow Rate Fraction Schedule Name
 
-DSOA1,                                     !- Name
-
-SUM,                                         !- Outdoor Air Method
-
-0.00236,                                 !- Outdoor Air Flow per Person
-
-0.000305,                               !- Outdoor Air Flow per Zone Floor Area
-
-0.0,                                         !- Outdoor Air Flow per Zone
-
-0.0,                                         !- Outdoor Air Flow Air Changes per Hour
-
-;                                               !- Outdoor Air Flow Rate Fraction Schedule Name
-
-
-
-DesignSpecification:ZoneAirDistribution,
-
+   DesignSpecification:ZoneAirDistribution,
        DSZADO1,                                 !- Name
-
        1.2,                                         !- Zone Air Distribution Effectiveness in Cooling Mode
-
        1.0,                                         !- Zone Air Distribution Effectiveness in Heating Mode
-
        ,                                               !- Zone Air Distribution Effectiveness Schedule Name
-
        0.3;                                         !- Zone Secondary Recirculation Fraction
+```
 
 ### ZoneHVAC:EnergyRecoveryVentilator:Controller
 
@@ -19178,51 +16797,32 @@ This optional choice field determines if high humidity control is activated base
 
 Following is an example input for this stand alone ERV controller object:
 
+```idf
 ZoneHVAC:EnergyRecoveryVentilator:Controller,
-
        ERV OA Controller 1,                       !- ERV controller name
-
        19.,                                                       !- Temperature high limit {C}
-
        14.,                                                       !- Temperature low limit {C}
-
        ,                                                             !- Enthalpy high limit {J/kg}
-
        15.55,                                                   !- dew point temperature limit (C)
-
        ElectronicEnthalpyCurveA,             !- electronic enthalpy limit curve name
-
        NoExhaustAirTemperatureLimit,     !- Exhaust air temperature limit
-
        NoExhaustAirEnthalpyLimit,           !- Exhaust air enthalpy limit
-
        OutsideAirFlowSchedule,                 !- Time of Day Economizer Flow Control Schedule Name
-
        Yes,                                                       !- High Humidity Control Flag
-
        East Zone,                                           !- Humidistat Control Zone Name
-
        1.2,                                                       !- High Humidity Outdoor air Flow Ratio
-
        Yes;                           !- Control High Indoor Humidity based on Outdoor Humidity Ratio
 
 
-
 Curve:Cubic,
-
        ElectronicEnthalpyCurveA, !- Name
-
        0.01342704,                             !- Coefficient1 Constant
-
      -0.00047892,                             !- Coefficient2 x
-
-       0.000053352,                           !- Coefficient3 x\*\*2
-
-     -0.0000018103,                         !- Coefficient4 x\*\*3
-
+       0.000053352,                           !- Coefficient3 x**2
+     -0.0000018103,                         !- Coefficient4 x**3
       16.6,                                         !- Minimum Value of x
-
        29.13;                                       !- Maximum Value of x
+```
 
 Group     Evaporative Coolers
 ---------------------------
@@ -19285,41 +16885,36 @@ This field is optional.   It is used to describe where the cooler obtains water 
 
 An IDF example showing how this object is:
 
+```idf
    EvaporativeCooler:Direct:CelDekPad,
-
        Evaporative Cooler,           !- Name
-
        System Availability Schedule,   !- Availability Schedule Name
-
        0.6,                                         !- Direct Pad Area {m2}
-
        0.2,                                         !- Direct Pad Depth {m}
-
        225,                                         !- Recirculating Water Pump Power Consumption {W}
-
        Evap Cooler Inlet Node,   !- Air Inlet Node Name
-
        Supply Outlet Node;           !- Air Outlet Node Name
+```
 
 ### EvaporativeCooler:Direct:CelDekPad Outputs
 
 The output variables that are available for this direct evaporative cooler are shown below:
 
-HVAC,Average, Evaporative Cooler Wet Bulb Effectiveness
+* HVAC,Average, Evaporative Cooler Wet Bulb Effectiveness
 
-HVAC,Average, Evaporative Cooler Electric Power[W]
+* HVAC,Average, Evaporative Cooler Electric Power[W]
 
-HVAC,Sum, Evaporative Cooler Electric Energy [J]
+* HVAC,Sum, Evaporative Cooler Electric Energy [J]
 
-HVAC,Sum, Evaporative Cooler Water Volume[m3]
+* HVAC,Sum, Evaporative Cooler Water Volume[m3]
 
-HVAC,Sum,Evaporative Cooler Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Mains Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
 
 #### Evaporative Cooler Wet Bulb Effectiveness
 
@@ -19446,21 +17041,21 @@ EvaporativeCooler:Direct:ResearchSpecial,
 
 The output variables that are available for this direct evaporative cooler are shown below:
 
-HVAC,Average, Evaporative Cooler Electric Power[W]
+* HVAC,Average, Evaporative Cooler Electric Power[W]
 
-HVAC,Average, Evaporative Cooler Stage Effectiveness []
+* HVAC,Average, Evaporative Cooler Stage Effectiveness []
 
-HVAC,Sum, Evaporative Cooler Electric Energy [J]
+* HVAC,Sum, Evaporative Cooler Electric Energy [J]
 
-HVAC,Sum, Evaporative Cooler Water Volume[m3]
+* HVAC,Sum, Evaporative Cooler Water Volume[m3]
 
-HVAC,Sum,Evaporative Cooler Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Mains Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
 
 #### Evaporative Cooler Electric Power[W]
 
@@ -19566,57 +17161,45 @@ This field is optional. It is used to explicitly define an outdoor air node for 
 
 And an IDF example showing how this object is specified:
 
+```idf
   EvaporativeCooler:Indirect:CelDekPad,
-
        IndirectEvapCooler1,         !- Name
-
        FanAndCoilAvailSched,       !- Availability Schedule Name
-
        0.6,                                         !- Direct Pad Area {m2}
-
        0.2,                                         !- Direct Pad Depth {m}
-
        225.,                                       !- Recirculating Water Pump Power Consumption {W}
-
        1.0,                                         !- Secondary Fan Flow Rate {m3/s}
-
        0.7,                                         !- Secondary Fan Total Efficiency
-
        200.0,                                     !- Secondary Fan Delta Pressure {Pa}
-
        0.67,                                       !- Indirect Heat Exchanger Effectiveness
-
        EvapCoolerIndirectInletAirNode,   !- Primary Air Inlet Node Name
-
        EvapCoolerDirectInletAirNode,   !- Primary Air Outlet Node Name
-
        ,                                           !- Control Type
-
        ,                                               !- Water Supply Storage Tank Name
-
        Secondary side OA inlet node;   !- Secondary Air Inlet Node Name
+```
 
 ### EvaporativeCooler:Indirect:CelDekPad Outputs
 
 The output variables that are available for the indirect dry evaporative cooler are shown below:
 
-HVAC,Average, Evaporative Cooler Wetbulb Effectiveness
+* HVAC,Average, Evaporative Cooler Wetbulb Effectiveness
 
-HVAC,Average, Evaporative Cooler Total Stage Effectiveness
+* HVAC,Average, Evaporative Cooler Total Stage Effectiveness
 
-HVAC,Average, Evaporative Cooler Electric Power[W]
+* HVAC,Average, Evaporative Cooler Electric Power[W]
 
-HVAC,Sum, Evaporative Cooler Electric Energy [J]
+* HVAC,Sum, Evaporative Cooler Electric Energy [J]
 
-HVAC,Sum, Evaporative Cooler Water Volume[m3]
+* HVAC,Sum, Evaporative Cooler Water Volume[m3]
 
-HVAC,Sum,Evaporative Cooler Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Mains Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
 
 #### Evaporative Cooler Wetbulb Effectiveness
 
@@ -19730,33 +17313,22 @@ This field is optional and can be used to model additional water consumed by the
 
 And an IDF example showing how this object is specified:
 
+```idf
 EvaporativeCooler:Indirect:WetCoil,
-
        IndirectEvapCooler1,         !- Name
-
        FanAndCoilAvailSched,       !- Availability Schedule Name
-
        0.8,                                         !- Coil Maximum Efficiency
-
        0.16,                                       !- Coil Flow Ratio
-
        225.,                                       !- Recirculating Water Pump Power Consumption {W}
-
        1.0,                                         !- Secondary Fan Flow Rate {m3/s}
-
        0.7,                                         !- Secondary Fan Total Efficiency
-
        200.0,                                     !- Secondary Fan Delta Pressure {Pa}
-
        EvapCoolerIndirectInletAirNode,   !- Primary Air Inlet Node Name
-
        EvapCoolerDirectInletAirNode,   !- Primary Air Outlet Node Name
-
        ,                                               !- Control Type
-
        ,                                               !- Water Supply Storage Tank Name
-
        Secondary side OA inlet node;   !- Secondary Air Inlet Node Name
+```
 
 
 
@@ -19764,21 +17336,21 @@ EvaporativeCooler:Indirect:WetCoil,
 
 The output variables that are available for the wet indirect evaporative cooler are shown below:
 
-HVAC,Average, Evaporative Cooler Total Stage Effectiveness
+* HVAC,Average, Evaporative Cooler Total Stage Effectiveness
 
-HVAC,Average, Evaporative Cooler Electric Power[W]
+* HVAC,Average, Evaporative Cooler Electric Power[W]
 
-HVAC,Sum, Evaporative Cooler Electric Energy [J]
+* HVAC,Sum, Evaporative Cooler Electric Energy [J]
 
-HVAC,Sum, Evaporative Cooler Water Volume[m3]
+* HVAC,Sum, Evaporative Cooler Water Volume[m3]
 
-HVAC,Sum,Evaporative Cooler Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Mains Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
 
 #### Evaporative Cooler Total Stage Effectiveness []
 
@@ -19964,23 +17536,23 @@ EvaporativeCooler:Indirect:ResearchSpecial,
 
 The output variables that are available for the EvaporativeCooler:Indirect:ResearchSpecial object are shown below:
 
-HVAC,Average,Evaporative Cooler Total Stage Effectiveness
+* HVAC,Average,Evaporative Cooler Total Stage Effectiveness
 
-HVAC,Average,Evaporative Cooler Part Load Ratio
+* HVAC,Average,Evaporative Cooler Part Load Ratio
 
-HVAC,Average,Evaporative Cooler Dewpoint Bound Status
+* HVAC,Average,Evaporative Cooler Dewpoint Bound Status
 
-HVAC,Average,Evaporative Cooler Operating Mode Satus []
+* HVAC,Average,Evaporative Cooler Operating Mode Satus []
 
-HVAC,Sum,Evaporative Cooler Electric Energy [J]
+* HVAC,Sum,Evaporative Cooler Electric Energy [J]
 
-HVAC,Average,Evaporative Cooler Electric Power [W]
+* HVAC,Average,Evaporative Cooler Electric Power [W]
 
-HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Storage Tank Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Water Volume [m3]
 
-HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
+* HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
 
 
 
@@ -20097,67 +17669,54 @@ The name of the HVAC system node to which the unit sends its secondary outlet ai
 
 An IDF example:
 
+```idf
    HeatExchanger:AirToAir:FlatPlate,
-
        OA Heat Recovery 1,           !- Name
-
        FanAndCoilAvailSched,       !- Availability Schedule Name
-
        CounterFlow,                         !- Flow Arrangement Type
-
        Yes,                                         !- Economizer Lockout
-
        1.0,                                         !- Ratio of Supply to Secondary hA Values
-
        0.4333,                                   !- Nominal Supply Air Flow Rate {m3/s}
-
        5.0,                                         !- Nominal Supply Air Inlet Temperature {C}
-
        15.0,                                       !- Nominal Supply Air Outlet Temperature {C}
-
        0.4333,                                   !- Nominal Secondary Air Flow Rate {m3/s}
-
        20.0,                                       !- Nominal Secondary Air Inlet Temperature {C}
-
        0.0,                                         !- Nominal Electric Power {W}
-
        Desiccant Process Outlet Node,   !- Supply Air Inlet Node Name
-
        Heat Recovery Outlet Node,   !- Supply Air Outlet Node Name
-
        Relief Air Outlet Node,   !- Secondary Air Inlet Node Name
-
        Heat Recovery Secondary Outlet Node;   !- Secondary Air Outlet Node Name
+```
 
 ### HeatExchanger:AirToAir:FlatPlate Outputs
 
-HVAC,Average,Heat Exchanger Sensible Heating Rate [W]
+* HVAC,Average,Heat Exchanger Sensible Heating Rate [W]
 
-HVAC,Sum,Heat Exchanger Sensible Heating Energy [J]
+* HVAC,Sum,Heat Exchanger Sensible Heating Energy [J]
 
-HVAC,Average,Heat Exchanger Latent Gain Rate [W]
+* HVAC,Average,Heat Exchanger Latent Gain Rate [W]
 
-HVAC,Sum,Heat Exchanger Latent Gain Energy [J]
+* HVAC,Sum,Heat Exchanger Latent Gain Energy [J]
 
-HVAC,Average,Heat Exchanger Total Heating Rate [W]
+* HVAC,Average,Heat Exchanger Total Heating Rate [W]
 
-HVAC,Sum,Heat Exchanger Total Heating Energy [J]
+* HVAC,Sum,Heat Exchanger Total Heating Energy [J]
 
-HVAC,Average,Heat Exchanger Sensible Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Sensible Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Sensible Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Sensible Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Latent Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Latent Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Latent Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Latent Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Total Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Total Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Total Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Total Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Electric Power[W]
+* HVAC,Average,Heat Exchanger Electric Power[W]
 
-HVAC,Sum,Heat Exchanger Electric Energy [J]
+* HVAC,Sum,Heat Exchanger Electric Energy [J]
 
 #### Heat Exchanger Sensible Heating Rate [W]
 
@@ -20215,70 +17774,56 @@ This output is the electric consumption rate of the unit in Watts. This rate is 
 
 This output is the electric consumption of the unit in Joules for the timestep being reported. This ouput is also added to a meter with ResourceType = Electricity, EndUseKey = HeatRecovery, GroupKey = System (ref. Output:Meter objects).
 
-
-
-
-
-
-
-
-
 ### HeatExchanger:AirToAir:SensibleAndLatent
 
 ![](InputOutputReference/media/image423.svg)
 
- The sensible and latent air-to-air heat exchanger is an HVAC component typically used for exhaust or relief air heat recovery (Figure 150). Heat exchanger performance can be specified to transfer sensible energy, latent energy or both between the supply and exhaust air streams. The input requires no geometric data. Performance is defined by specifying sensible and/or latent effectiveness at 75% and 100% of the nominal (rated) supply air flow rate at two operating conditions as shown in Table 30.
-
+The sensible and latent air-to-air heat exchanger is an HVAC component typically used for exhaust or relief air heat recovery (Figure 150). Heat exchanger performance can be specified to transfer sensible energy, latent energy or both between the supply and exhaust air streams. The input requires no geometric data. Performance is defined by specifying sensible and/or latent effectiveness at 75% and 100% of the nominal (rated) supply air flow rate at two operating conditions as shown in Table 30.
 
 Figure 150. Schematic of the Sensible and Latent Air-to-Air Heat Exchanger
 
-
-
 Table 30. Operating Conditions for Defining Heat Exchanger Performance
 
-Parameter
-
-Conditions
-
-Heating
-
-Cooling
-
-Entering supply air temperature:
-
-         Dry-bulb
-
-         Wet-bulb
-
-
-
-1.7 &deg;C (35 &deg;F)
-
-0.6 &deg;C (33 &deg;F)
-
-
-
-35 &deg;C (95 &deg;F)
-
-26 &deg;C (78 &deg;F)
-
-Entering exhaust air temperature:
-
-         Dry-bulb
-
-         Wet-bulb
-
-
-
-21 &deg;C (70 &deg;F)
-
-14 &deg;C (58 &deg;F)
-
-
-
-24 &deg;C (75 &deg;F)
-
-17 &deg;C (63 &deg;F)
+<table class="table table-striped">
+  <tr>
+    <th rowspan="2">Parameter</th>
+    <th colspan="2">Conditions</th>
+  </tr>
+  <tr>
+    <td>Heating</td>
+    <td>Cooling</td>
+  </tr>
+  <tr>
+    <td>Entering supply air temperature:</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>    Dry-bulb:</td>
+    <td>1.7°C (35°F)</td>
+    <td>35°C (95°F)</td>
+  </tr>
+  <tr>
+    <td>    Wet-bulb:</td>
+    <td>0.6°C (33°F)</td>
+    <td>26°C (78°F)</td>
+  </tr>
+  <tr>
+    <td>Entering supply air temperature:</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>    Dry-bulb:</td>
+    <td>21°C (70°F)</td>
+    <td>24°C (75°F)</td>
+  </tr>
+  <tr>
+    <td>    Wet-bulb:<br></td>
+    <td>14°C (58°F)</td>
+    <td>17C (63F)</td>
+  </tr>
+</table>
 
 Note: Conditions consistent with the Air-Conditioning and Refrigeration Institute   s (ARI) Standard 1060-2001.
 
@@ -20491,7 +18036,90 @@ Sensible-only
 Sensible + latent
 
 -23.3 &deg;C (-10 &deg;F)
-
+<table>
+  <tr>
+    <th>Frost Control Type</th>
+    <th>Heat Exchanger Type</th>
+    <th>Energy Exchange</th>
+    <th>Threshold Temperature</th>
+  </tr>
+  <tr>
+    <td rowspan="4">Exhaust Air Recirculation</td>
+    <td rowspan="2">Plate</td>
+    <td>Sensible-only</td>
+    <td>-1.1°C (30°F)</td>
+  </tr>
+  <tr>
+    <td>Sensible + latent</td>
+    <td>-12.2&deg;C (10&deg;F)</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Rotary</td>
+    <td>Sensible-only</td>
+    <td>-12.2&deg;C (10&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Sensible + latent</td>
+    <td>-12.2&deg;C (10&deg;F)</td>
+  </tr>
+  <tr>
+    <td rowspan="4">Exhaust Only</td>
+    <td rowspan="2">Plate</td>
+    <td>Sensible-only</td>
+    <td>-23.3&deg;C (-10&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Sensible + latent</td>
+    <td>-1.1&deg;C (30&deg;F)</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Rotary</td>
+    <td>Sensible-only</td>
+    <td>-12.2&deg;C (10&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Sensible + latent</td>
+    <td>-12.2&deg;C (10&deg;F)</td>
+  </tr>
+  <tr>
+    <td rowspan="4">Minimum Exhaust Temperature</td>
+    <td rowspan="2">Plate</td>
+    <td>Sensible-only</td>
+    <td>-23.3&deg;C (-10&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Sensible + latent</td>
+    <td>1.7&deg;C (35&deg;F)</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Rotary</td>
+    <td>Sensible-only</td>
+    <td>1.7&deg;C (35&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Sensible + latent</td>
+    <td>1.7&deg;C (35&deg;F)</td>
+  </tr>
+  <tr>
+    <td rowspan="4">Preheat **</td>
+    <td rowspan="2">Plate</td>
+    <td>Sensible-only</td>
+    <td>1.7&deg;C (35&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Sensible + latent</td>
+    <td>-1.1&deg;C (30&deg;F)</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Rotary</td>
+    <td>Sensible-only</td>
+    <td>-12.2&deg;C (10&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Sensible + latent</td>
+    <td>-23.3&deg;C (-10&deg;F)</td>
+  </tr>
+</table>
 Source: Indoor Humidity Assessment Tool, U.S. Environmental Protection Agency,[http://www.epa.gov/iaq/schooldesign/saves.html](http://www.epa.gov/iaq/schooldesign/saves.html)
 
 \*\* To model preheat frost control, specify frost control type as    None    and place a heating coil in the supply inlet air stream controlled to the keep the air temperature above the frost threshold temperature.
@@ -20545,41 +18173,41 @@ Following is an example input for this heat exchanger object:
 
 ### HeatExchanger:AirToAir:SensibleAndLatent Outputs
 
-HVAC,Average,Heat Exchanger Sensible Heating Rate [W]
+* HVAC,Average,Heat Exchanger Sensible Heating Rate [W]
 
-HVAC,Sum,Heat Exchanger Sensible Heating Energy [J]
+* HVAC,Sum,Heat Exchanger Sensible Heating Energy [J]
 
-HVAC,Average,Heat Exchanger Latent Gain Rate [W]
+* HVAC,Average,Heat Exchanger Latent Gain Rate [W]
 
-HVAC,Sum,Heat Exchanger Latent Gain Energy [J]
+* HVAC,Sum,Heat Exchanger Latent Gain Energy [J]
 
-HVAC,Average,Heat Exchanger Total Heating Rate [W]
+* HVAC,Average,Heat Exchanger Total Heating Rate [W]
 
-HVAC,Sum,Heat Exchanger Total Heating Energy [J]
+* HVAC,Sum,Heat Exchanger Total Heating Energy [J]
 
-HVAC,Average,Heat Exchanger Sensible Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Sensible Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Sensible Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Sensible Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Latent Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Latent Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Latent Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Latent Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Total Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Total Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Total Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Total Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Electric Power[W]
+* HVAC,Average,Heat Exchanger Electric Power[W]
 
-HVAC,Sum,Heat Exchanger Electric Energy [J]
+* HVAC,Sum,Heat Exchanger Electric Energy [J]
 
-HVAC,Average,Heat Exchanger Sensible Effectiveness[]
+* HVAC,Average,Heat Exchanger Sensible Effectiveness[]
 
-HVAC,Average,Heat Exchanger Latent Effectiveness[]
+* HVAC,Average,Heat Exchanger Latent Effectiveness[]
 
-HVAC,Average,Heat Exchanger Supply Air Bypass Mass Flow Rate [kg/s]
+* HVAC,Average,Heat Exchanger Supply Air Bypass Mass Flow Rate [kg/s]
 
-HVAC,Average,Heat Exchanger Exhaust Air Bypass Mass Flow Rate [kg/s] HVAC,Average,Heat Exchanger Defrost Time Fraction[]
+* HVAC,Average,Heat Exchanger Exhaust Air Bypass Mass Flow Rate [kg/s] HVAC,Average,Heat Exchanger Defrost Time Fraction[]
 
 #### Heat Exchanger Sensible Heating Rate [W]
 
@@ -20709,53 +18337,47 @@ This input denotes whether the heat exchanger unit is locked out (heat exchanger
 
 Following is an example input for this heat exchanger object:
 
+```idf
 HeatExchanger:Desiccant:BalancedFlow,
-
   Desiccant Heat Exchanger 1,                 !- Name
-
   OfficeHeatCoolAvail,                               !- Availability Schedule Name
-
   DXSystem 1 Mixed Air Node,                   !- Regeneration Air Inlet Node Name
-
   DX Cooling Coil Air Inlet Node,         !- Regeneration Air Outlet Node Name
-
   DX Cooling Coil Air Outlet Node,       !- Process Air Inlet Node Name
-
   DXSystem 1 Fan Air Inlet Node,           !- Process Air Outlet Node Name
-
   HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1, !- Heat Exchanger Performance Object Type
-
   HXDesPerf1;                                                 !- Heat Exchanger Performance Name
+```
 
 ### HeatExchanger:Desiccant:BalancedFlow Outputs
 
-HVAC,Average,Heat Exchanger Sensible Heating Rate [W]
+* HVAC,Average,Heat Exchanger Sensible Heating Rate [W]
 
-HVAC,Sum,Heat Exchanger Sensible Heating Energy [J]
+* HVAC,Sum,Heat Exchanger Sensible Heating Energy [J]
 
-HVAC,Average,Heat Exchanger Latent Gain Rate [W]
+* HVAC,Average,Heat Exchanger Latent Gain Rate [W]
 
-HVAC,Sum,Heat Exchanger Latent Gain Energy [J]
+* HVAC,Sum,Heat Exchanger Latent Gain Energy [J]
 
-HVAC,Average,Heat Exchanger Total Heating Rate [W]
+* HVAC,Average,Heat Exchanger Total Heating Rate [W]
 
-HVAC,Sum,Heat Exchanger Total Heating Energy [J]
+* HVAC,Sum,Heat Exchanger Total Heating Energy [J]
 
-HVAC,Average,Heat Exchanger Sensible Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Sensible Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Sensible Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Sensible Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Latent Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Latent Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Latent Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Latent Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Total Cooling Rate [W]
+* HVAC,Average,Heat Exchanger Total Cooling Rate [W]
 
-HVAC,Sum,Heat Exchanger Total Cooling Energy [J]
+* HVAC,Sum,Heat Exchanger Total Cooling Energy [J]
 
-HVAC,Average,Heat Exchanger Electric Power[W]
+* HVAC,Average,Heat Exchanger Electric Power[W]
 
-HVAC,Sum,Heat Exchanger Electric Energy [J]
+* HVAC,Sum,Heat Exchanger Electric Energy [J]
 
 
 
@@ -21073,113 +18695,63 @@ The maximum relative humidity of the process inlet air for the humidity ratio eq
 
 Following is an example input for this heat exchanger performance data type object:
 
+```idf
    HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1,
-
        HXDesPerf1,         !- Name
-
        1.05,                     !- Nominal Air Flow Rate {m3/s}
-
        3.25,                     !- Nominal Air Face Velocity {m/s}
-
        50.0,                     !- Nominal Electric Power {W}
-
        -2.53636E+00,     !- Temperature Equation Coefficient 1
-
        2.13247E+01,       !- Temperature Equation Coefficient 2
-
        9.23308E-01,       !- Temperature Equation Coefficient 3
-
        9.43276E+02,       !- Temperature Equation Coefficient 4
-
        -5.92367E+01,     !- Temperature Equation Coefficient 5
-
        -4.27465E-02,     !- Temperature Equation Coefficient 6
-
        1.12204E+02,       !- Temperature Equation Coefficient 7
-
        7.78252E-01,       !- Temperature Equation Coefficient 8
 
 
-
        0.007143,             !- Minimum Regeneration Inlet Air Humidity Ratio for Temperature Equation
-
        0.024286,             !- Maximum Regeneration Inlet Air Humidity Ratio for Temperature Equation
-
        46.111110,           !- Minimum Regeneration Inlet Air Temperature for Temperature Equation {C}
-
        46.111112,           !- Maximum Regeneration Inlet Air Temperature for Temperature Equation {C}
-
        0.005000,             !- Minimum Process Inlet Air Humidity Ratio for Temperature Equation
-
        0.015714,             !- Maximum Process Inlet Air Humidity Ratio for Temperature Equation
-
        4.583333,             !- Minimum Process Inlet Air Temperature for Temperature Equation {C}
-
        21.83333,             !- Maximum Process Inlet Air Temperature for Temperature Equation {C}
-
        2.286,                   !- Minimum Regeneration Air Velocity for Temperature Equation {m/s}
-
        4.826,                   !- Maximum Regeneration Air Velocity for Temperature Equation {m/s}
-
        35.0,                     !- Minimum Regeneration Outlet Air Temperature for Temperature Equation {C}
-
        50.0,                     !- Maximum Regeneration Outlet Air Temperature for Temperature Equation {C}
-
        5.0,                       !- Minimum Regeneration Inlet Air Relative Humidity for Temperature Equation {percent}
-
        45.0,                     !- Maximum Regeneration Inlet Air Relative Humidity for Temperature Equation {percent}
-
        80.0,                     !- Minimum Process Inlet Air Relative Humidity for Temperature Equation {percent}
-
        100.0,                   !- Maximum Process Inlet Air Relative Humidity for Temperature Equation {percent}
-
        -2.25547E+01,     !- Humidity Ratio Equation Coefficient 1
-
        9.76839E-01,       !- Humidity Ratio Equation Coefficient 2
-
        4.89176E-01,       !- Humidity Ratio Equation Coefficient 3
-
        -6.30019E-02,     !- Humidity Ratio Equation Coefficient 4
-
        1.20773E-02,       !- Humidity Ratio Equation Coefficient 5
-
        5.17134E-05,       !- Humidity Ratio Equation Coefficient 6
-
        4.94917E-02,       !- Humidity Ratio Equation Coefficient 7
-
        -2.59417E-04,     !- Humidity Ratio Equation Coefficient 8
-
        0.007143,             !- Minimum Regeneration Inlet Air Humidity Ratio for Humidity Ratio Equation
-
        0.024286,             !- Maximum Regeneration Inlet Air Humidity Ratio for Humidity Ratio Equation
-
        46.111110,           !- Minimum Regeneration Inlet Air Temperature for Humidity Ratio Equation {C}
-
        46.111112,           !- Maximum Regeneration Inlet Air Temperature for Humidity Ratio Equation {C}
-
        0.005000,             !- Minimum Process Inlet Air Humidity Ratio for Humidity Ratio Equation
-
        0.015714,             !- Maximum Process Inlet Air Humidity Ratio for Humidity Ratio Equation
-
        4.583333,             !- Minimum Process Inlet Air Temperature for Humidity Ratio Equation {C}
-
        21.83333,             !- Maximum Process Inlet Air Temperature for Humidity Ratio Equation {C}
-
        2.286,                   !- Minimum Regeneration Air Velocity for Humidity Ratio Equation {m/s}
-
        4.826,                   !- Maximum Regeneration Air Velocity for Humidity Ratio Equation {m/s}
-
        0.007914,             !- Minimum Regeneration Outlet Air Humidity Ratio for Humidity Ratio Equation
-
        0.026279,             !- Maximum Regeneration Outlet Air Humidity Ratio for Humidity Ratio Equation
-
        5.0,                 !- Minimum Regeneration Inlet Air Relative Humidity for Humidity Ratio Equation {%}
-
        45.0,               !- Maximum Regeneration Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
-
        80.0,                   !- Minimum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
-
        100.0;                 !- Maximum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+```
 
 ### HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1 Outputs
 
@@ -21262,47 +18834,29 @@ DemandManagers are listed by pairs of data items:   *Demand Manager Type* and *D
 
 An example IDF showing how this object is used is provided below:
 
-       DemandManagerAssignmentList,
-
+```idf
+   DemandManagerAssignmentList,
        Demand Manager,                   !- Name
-
        Electricity:Facility,       !- Meter Name
-
        Limit Schedule,                   !- Demand Limit Schedule Name
-
        1.0,                                         !- Demand Limit Safety Fraction
-
        ,                                               !- Billing Period Schedule Name
-
        ,                                               !- Peak Period Schedule Name
-
        15,                                           !- Demand Window Length {minutes}
-
        Sequential,                           !- Demand Manager Priority
-
        DemandManager:ExteriorLights,   !- DemandManager 1 Object Type
-
        Ext Lights Manager,           !- DemandManager 1 Name
-
        DemandManager:ElectricEquipment,   !- DemandManager 2 Object Type
-
        Eq Mgr Stage 1,                   !- DemandManager 2 Name
-
        DemandManager:ElectricEquipment,   !- DemandManager 3 Object Type
-
        Eq Mgr Stage 2,                   !- DemandManager 3 Name
-
        DemandManager:ElectricEquipment,   !- DemandManager 4 Object Type
-
        Eq Mgr Stage 3,                   !- DemandManager 4 Name
-
        DemandManager:Lights,       !- DemandManager 5 Object Type
-
        Lights Manager,                   !- DemandManager 5 Name
-
        DemandManager:Thermostats,   !- DemandManager 6 Object Type
-
        Thermostats Manager;         !- DemandManager 6 Name
+```
 
 
 
@@ -21310,27 +18864,27 @@ An example IDF showing how this object is used is provided below:
 
 The following output variables are reported for the DemandManagerAssignmentList object:
 
-Zone,Average,Demand Manager Meter Demand Power [W]
+* Zone,Average,Demand Manager Meter Demand Power [W]
 
-Zone,Average,Demand Manager Average Demand Power [W]
+* Zone,Average,Demand Manager Average Demand Power [W]
 
-Zone,Average,Demand Manager Peak Demand Power [W]
+* Zone,Average,Demand Manager Peak Demand Power [W]
 
-Zone,Average,Demand Manager Scheduled Limit Power [W]
+* Zone,Average,Demand Manager Scheduled Limit Power [W]
 
-Zone,Average,Demand Manager Demand Limit Power [W]
+* Zone,Average,Demand Manager Demand Limit Power [W]
 
-Zone,Average,Demand Manager Avoided Demand [W]
+* Zone,Average,Demand Manager Avoided Demand [W]
 
-Zone,Average,Demand Manager Over Limit Power [W]
+* Zone,Average,Demand Manager Over Limit Power [W]
 
-Zone,Sum,Demand Manager Over Limit Time [hr]
+* Zone,Sum,Demand Manager Over Limit Time [hr]
 
-Zone,Sum,Demand Manager Exterior Energy Iteration Count []
+* Zone,Sum,Demand Manager Exterior Energy Iteration Count []
 
-Zone,Sum,Demand Manager Heat Balance Iteration Count []
+* Zone,Sum,Demand Manager Heat Balance Iteration Count []
 
-Zone,Sum,Demand Manager HVAC Iteration Count []
+* Zone,Sum,Demand Manager HVAC Iteration Count []
 
 
 
@@ -21424,25 +18978,18 @@ An example IDF showing how this object is used is provided below:
 
 
 
+```idf
    DemandManager:ExteriorLights,
-
        Ext Lights Manager,           !- Name
-
        ,                                               !- Availability Schedule Name
-
        Fixed,                                     !- Limit Control
-
        60,                                           !- Minimum Limit Duration {minutes}
-
        0.0,                                         !- Maximum Limit Fraction
-
        ,                                               !- Limit Step Change
-
        All,                                         !- Selection Control
-
        ,                                               !- Rotation Duration {minutes}
-
        Exterior Lights;                 !- Exterior Lights 1 Name
+```
 
 
 
@@ -21500,33 +19047,23 @@ An example IDF showing how this object is used is provided below:
 
 
 
+```idf
    DemandManager:Lights,
-
        Lights Manager,                   !- Name
-
        ,                                               !- Availability Schedule Name
-
        Fixed,                                     !- Limit Control
-
        60,                                           !- Minimum Limit Duration {minutes}
-
        0.5,                                         !- Maximum Limit Fraction
-
        ,                                               !- Limit Step Change
-
        All,                                         !- Selection Control
-
        ,                                               !- Rotation Duration {minutes}
-
        Space1-1 Lights 1,             !- Lights 1 Name
-
        Space2-1 Lights 1,             !- Lights 2 Name
-
        Space3-1 Lights 1,             !- Lights 3 Name
-
        Space4-1 Lights 1,             !- Lights 4 Name
-
        Space5-1 Lights 1;             !- Lights 5 Name
+```
+
 
 
 
@@ -21582,25 +19119,18 @@ If a global Electric Equipment statement is used (Ref: ElectricEquipment), then 
 
 An example IDF showing how this object is used is provided below:
 
+```idf
    DemandManager:ElectricEquipment,
-
        Eq Mgr Stage 3,                   !- Name
-
        ,                                               !- Availability Schedule Name
-
        Fixed,                                     !- Limit Control
-
        60,                                           !- Minimum Limit Duration {minutes}
-
        0.0,                                         !- Maximum Limit Fraction
-
        ,                                               !- Limit Step Change
-
        All,                                         !- Selection Control
-
        ,                                               !- Rotation Duration {minutes}
-
        Space5-1 ElecEq 1;             !- Electric Equipment 1 Name
+```
 
 
 
@@ -21662,36 +19192,23 @@ An example IDF showing how this object is used is provided below:
 
 
 
+```idf
    DemandManager:Thermostats,
-
        Thermostats Manager,         !- Name
-
        ,                                               !- Availability Schedule Name
-
        Fixed,                                     !- Reset Control
-
        60,                                           !- Minimum Reset Duration {minutes}
-
        19,                                           !- Maximum Heating Setpoint Reset {C}
-
        26,                                           !- Maximum Cooling Setpoint Reset {C}
-
        ,                                               !- Reset Step Change
-
        All,                                         !- Selection Control
-
        ,                                               !- Rotation Duration {minutes}
-
        SPACE1-1 Control,               !- Thermostat 1 Name
-
        SPACE2-1 Control,               !- Thermostat 2 Name
-
        SPACE3-1 Control,               !- Thermostat 3 Name
-
        SPACE4-1 Control,               !- Thermostat 4 Name
-
        SPACE5-1 Control;               !- Thermostat 5 Name
-
+```
 
 
 ### DemandManager:Thermostats Outputs
@@ -21787,91 +19304,67 @@ An example input of the ElectricLoadCenter:Transformer input is:
 
 
 
+```idf
    ElectricLoadCenter:Transformer,
-
        Transformer 1,                       !-Name
-
        Always On,                               !- Availability Schedule Name
-
        PowerInFromGrid,                   !- Transformer Usage
-
        ,                                                 !- Zone Name
-
        ,                                                 !-Radiative Fraction
-
        15000,                                       !- Nameplate Rating {VA}
-
        3,                                               !- Phase
-
        Aluminum,                                 !- Conductor Material
-
        150,                                           !- Full Load Temperature Rise { &deg;C}
-
        0.1,                                           !- Fraction of Eddy Current Losses
-
        NominalEfficiency,               !- Performance Input Method
-
        ,                                                 !- Rated No Load Loss {W}
-
        ,                                                 !- Rated Load Loss {W}
-
        0.985,                                       !- Nameplate Efficiency
-
        0.35,                                         !- Per Unit Load for Nameplate Efficiency
-
        75,                                             !- Reference Temperature for Nameplate Efficiency { &deg;C}
-
        ,                                                 !- Per Unit Load for Maximum Efficiency
-
        Yes,                                           !- Consider Transformer Loss for Utility Cost
-
        Electricity:Building;         !- Meter 1 Name
 
 
-
    Schedule:Compact,
-
        Always On,                             !- Name
-
        Fraction,                               !- ScheduleType
-
-       Through: 12/31,                   !- Field \#1
-
-       For: AllDays,                       !- Field \#2
-
-       Until: 24:00,                       !- Field \#3
-
-       1.0;                                         !- Field \#4
+       Through: 12/31,                   !- Field #1
+       For: AllDays,                       !- Field #2
+       Until: 24:00,                       !- Field #3
+       1.0;                                         !- Field #4
+```
 
 
 
 ### ElectricLoadCenter:Transformer Outputs
 
-HVAC,Average,Transformer Efficiency[]
+* HVAC,Average,Transformer Efficiency[]
 
-HVAC,Average,Transformer Output Electric Power[W]
+* HVAC,Average,Transformer Output Electric Power[W]
 
-HVAC,Sum,Transformer Output Elecric Energy [J]
+* HVAC,Sum,Transformer Output Elecric Energy [J]
 
-HVAC,Average,Transformer Input Electric Power[W]
+* HVAC,Average,Transformer Input Electric Power[W]
 
-HVAC,Sum,Transformer Input Electric Energy [J]
+* HVAC,Sum,Transformer Input Electric Energy [J]
 
-HVAC,Average,Transformer No Load Loss Rate [W]
+* HVAC,Average,Transformer No Load Loss Rate [W]
 
-HVAC,Sum,Transformer No Load Loss Energy [J]
+* HVAC,Sum,Transformer No Load Loss Energy [J]
 
-HVAC,Average,Transformer Load Loss Rate [W]
+* HVAC,Average,Transformer Load Loss Rate [W]
 
-HVAC,Sum,Transformer Load Loss Energy [J]
+* HVAC,Sum,Transformer Load Loss Energy [J]
 
-HVAC,Average,Transformer Thermal Loss Rate [W]
+* HVAC,Average,Transformer Thermal Loss Rate [W]
 
-HVAC,Sum,Transformer Thermal Loss Energy [J]
+* HVAC,Sum,Transformer Thermal Loss Energy [J]
 
-HVAC,Sum,Transformer Distribution Electric Loss Energy [J]
+* HVAC,Sum,Transformer Distribution Electric Loss Energy [J]
 
-HVAC,Sum,Transformer Cogeneration Electric Loss Energy [J]
+* HVAC,Sum,Transformer Cogeneration Electric Loss Energy [J]
 
 #### Transformer Efficiency
 
@@ -21983,47 +19476,30 @@ This field is used to identify the transformer connected to this load center (if
 
 Examples of this object are:
 
+```idf
 ElectricLoadCenter:Distribution,
-
        SOFC Electric Load Center,   !- Name
-
        Micro-Generators,               !- Generator List Name
-
        Baseload,                               !- Generator Operation Scheme Type
-
        0.0,                                         !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-
        ,                                               !- Track Schedule Name Scheme Schedule Name
-
        ,                                               !- Track Meter Scheme Meter Name
-
        AlternatingCurrent,           !- Electrical Buss Type
-
        ,                                               !- Inverter Object Name
-
        ;                                               !- Electrical Storage Object Name
-
 
 
    ElectricLoadCenter:Distribution,
-
        Electric Load Center,       !- Name
-
        Backup Generators,             !- Generator List Name
-
        DemandLimit,                         !- Generator Operation Scheme Type
-
        10000.0,                                 !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-
        ,                                               !- Track Schedule Name Scheme Schedule Name
-
        ,                                               !- Track Meter Scheme Meter Name
-
        AlternatingCurrent,           !- Electrical Buss Type
-
        ,                                               !- Inverter Object Name
-
        ;                                               !- Electrical Storage Object Name
+```
 
 ### ElectricLoadCenter:Distribution Outputs
 
@@ -22031,27 +19507,28 @@ There are three levels of results reporting related to electric load centers and
 
 The whole-building summary output variables are:
 
-HVAC,Average,Facility Total Produced Electric Power [W]
+* HVAC,Average,Facility Total Produced Electric Power [W]
 
-HVAC,Sum,Facility Total Produced Electric Energy [J]
+* HVAC,Sum,Facility Total Produced Electric Energy [J]
 
-HVAC,Average,Facility Total Purchased Electric Power [W]
+* HVAC,Average,Facility Total Purchased Electric Power [W]
 
-HVAC,Sum,Facility Total Purchased Electric Energy [J]
+* HVAC,Sum,Facility Total Purchased Electric Energy [J]
 
-HVAC,Average,Facility Total Building Electric Demand Power [W]
+* HVAC,Average,Facility Total Building Electric Demand Power [W]
 
-HVAC,Average,Facility Total HVAC Electric Demand Power [W]
+* HVAC,Average,Facility Total HVAC Electric Demand Power [W]
 
-HVAC,Average,Facility Total Electric Demand Power [W]
+* HVAC,Average,Facility Total Electric Demand Power [W]
 
 These output variables all use a default keyword    Whole Building.   
 
 These output variables can also be accessed without specifying generation equipment by including the syntax shown below:
 
+```idf
 ElectricLoadCenter:Distribution,
-
    Electric Load Center; !- Name
+```
 
 Even if no ElectricLoadCenter:Distribution object is included, these output variables are also available for all simulations that have any electricity consuming equipment with the default keyword name    Electrical Service.   
 
@@ -22167,45 +19644,31 @@ This numeric field contains the ratio of the rated thermal output to the rated e
 
 An example IDF showing how this object is used is provided below:
 
+```idf
    ElectricLoadCenter:Generators,
-
        Backup Generators,             !- Name
-
        Cat Diesel,                           !- Generator 1 Name
-
        Generator:InternalCombustionEngine,   !- Generator 1 Object Type
-
        50000,                                     !- Generator 1 Rated Electric Power Output
-
        ON PEAK GENERATOR SCHEDULE,   !- Generator 1 Availability Schedule Name
-
        ,                                               !- Generator 1 Rated Thermal to Electrical Power Ratio
-
        Solar Turbine,                     !- Generator 2 Name
-
        Generator:CombustionTurbine,   !- Generator 2 Object Type
-
        30000,                                     !- Generator 2 Rated Electric Power Output
-
        OFF PEAK GENERATOR SCHEDULE,   !- Generator 2 Availability Schedule Name
-
        ,                                               !- Generator 2 Rated Thermal to Electrical Power Ratio
-
        Capstone C65,                       !- Generator 3 Name
-
        Generator:Microturbine,   !- Generator 3 Object Type
-
        65000,                                     !- Generator 3 Rated Electric Power Output
-
        MID PEAK GENERATOR SCHEDULE,   !- Generator 3 Availability Schedule Name
-
        ;                                               !- Generator 3 Rated Thermal to Electrical Power Ratio
+```
 
 ### ElectricLoadCenter:Generators Outputs
 
 A single output variable is available for each generator specified via this object as described below:
 
-HVAC,Average,Generator Requested Electric Power [W]
+* HVAC,Average,Generator Requested Electric Power [W]
 
 #### Generator Requested Electric Power [W]
 
@@ -22237,17 +19700,14 @@ This field contains the value for inverter efficiency.   In the simple model, ef
 
 An example IDF showing how this object is used is provided below:
 
+```idf
    ElectricLoadCenter:Inverter:Simple,
-
        Simple Ideal Inverter,     !- Name
-
        Always On,                             !- Availability Schedule Name
-
        ,                                               !- Zone Name
-
        0.0,                                         !- Radiative Fraction
-
        1.0;                                         !- Inverter Efficiency
+```
 
 ### ElectricLoadCenter:Inverter:FunctionOfPower
 
@@ -22299,29 +19759,20 @@ This field contains the ancillary power in watts used by the inverter when not p
 
 An example IDF showing how this object is used is provided below:
 
+```idf
    ElectricLoadCenter:Inverter:FunctionOfPower,
-
        Curve Inverter,                   !- Name
-
-       ALWAYS\_ON,                             !- Availability Schedule Name
-
+       ALWAYS_ON,                             !- Availability Schedule Name
        ,                                               !- Zone Name
-
        0.3,                                         !- Radiative Fraction
-
        Inverter Curve,                   !- Efficiency Function of Power Curve Name
-
        15000,                                     !- Rated Maximum Continuous Input Power {W}
-
        0.0,                                         !- Minimum Efficiency
-
        1.0,                                         !- Maximum Efficiency
-
        200,                                         !- Minimum Power Output {W}
-
        20000,                                     !- Maximum Power Output {W}
-
        0.0;                                         !- Ancillary Power Consumed In Standby {W}
+```
 
 ### ElectricLoadCenter:Inverter:LookUpTable
 
@@ -22383,55 +19834,44 @@ This field contains the fractional efficiency at nominal voltage and 100% power.
 
 An example IDF showing how this object is used is provided below:
 
+```idf
    ElectricLoadCenter:Inverter:LookUpTable,
-
        PV Inverter,                         !- Name
-
-       ALWAYS\_ON,                             !- Availability Schedule Name
-
+       ALWAYS_ON,                             !- Availability Schedule Name
        ,                                               !- Zone Name
-
        0.25,                                       !- Radiative Fraction
-
        14000,                                     !- Rated Maximum Continuous Output Power {W}
-
        200.0,                                     !- Night Tare Loss Power {W}
-
        368,                                         !- Nominal Voltage Input {V}
-
        0.839,                                     !- Efficiency at 10% Power and Nominal Voltage
-
        0.897,                                     !- Efficiency at 20% Power and Nominal Voltage
-
        0.916,                                     !- Efficiency at 30% Power and Nominal Voltage
-
        0.931,                                     !- Efficiency at 50% Power and Nominal Voltage
-
        0.934,                                     !- Efficiency at 75% Power and Nominal Voltage
-
        0.930;                                     !- Efficiency at 100% Power and Nominal Voltage
+```
 
 ### Electric Load Center Inverter Outputs
 
 Each inverter can report the following seven output variables.
 
-HVAC,Average,Inverter DC to AC Efficiency [ ]
+* HVAC,Average,Inverter DC to AC Efficiency [ ]
 
-HVAC,Average,Inverter DC Input Elecric Power [W]
+* HVAC,Average,Inverter DC Input Elecric Power [W]
 
-HVAC,Sum,Inverter DC Input Electric Energy [J]
+* HVAC,Sum,Inverter DC Input Electric Energy [J]
 
-HVAC,Average,Inverter AC Output Electric Power [W]
+* HVAC,Average,Inverter AC Output Electric Power [W]
 
-HVAC,Sum,Inverter AC Output Electric Energy [J]
+* HVAC,Sum,Inverter AC Output Electric Energy [J]
 
-HVAC,Average,Inverter Thermal Loss Rate [W]
+* HVAC,Average,Inverter Thermal Loss Rate [W]
 
-HVAC,Sum,Inverter Thermal Loss Energy [J]
+* HVAC,Sum,Inverter Thermal Loss Energy [J]
 
-HVAC,Sum,Inverter Ancillary AC Electric Energy [J]
+* HVAC,Sum,Inverter Ancillary AC Electric Energy [J]
 
-HVAC,Average,Inverter Ancillary AC Electric Power [W]
+* HVAC,Average,Inverter Ancillary AC Electric Power [W]
 
 #### Inverter DC to AC Efficiency [ ]
 
@@ -22507,47 +19947,39 @@ This field describes the value for the initial state of charge in Joules.   This
 
 An example IDF showing how this object is used is provided below:
 
+```idf
    ElectricLoadCenter:Storage:Simple,
-
        Battery,                                 !- Name
-
-       ALWAYS\_ON,                             !- Availability Schedule Name
-
+       ALWAYS_ON,                             !- Availability Schedule Name
        ,                                               !- Zone Name
-
        0.0,                                         !- Radiative Fraction for Zone Heat Gains
-
        0.7,                                         !- Nominal Energetic Efficiency for Charging
-
        0.7,                                         !- Nominal Discharging Energetic Efficiency
-
        1.0E11,                                   !- Maximum Storage Capacity {J}
-
        50000,                                     !- Maximum Power for Discharging {W}
-
        25000,                                     !- Maximum Power for Charging {W}
-
        1.0E10;                                   !- Initial State of Charge {J}
+```
 
 ### ElectricLoadCenter:Storage:Simple Outputs
 
 Each electrical storage device can report the following seven output variables.
 
-HVAC,Average,Electric Storage Charge State [J]
+* HVAC,Average,Electric Storage Charge State [J]
 
-HVAC,Average,Electric Storage Charge Power [W]
+* HVAC,Average,Electric Storage Charge Power [W]
 
-HVAC,Sum,Electric Storage Charge Energy [J]
+* HVAC,Sum,Electric Storage Charge Energy [J]
 
-HVAC,Average,Electric Storage Discharge Power [W]
+* HVAC,Average,Electric Storage Discharge Power [W]
 
-HVAC,Sum,Electric Storage Discharge Energy [J]
+* HVAC,Sum,Electric Storage Discharge Energy [J]
 
-HVAC,Average,Electric Storage Thermal Loss Rate [W]
+* HVAC,Average,Electric Storage Thermal Loss Rate [W]
 
-HVAC,Sum,Electric Storage Thermal Loss Energy [J]
+* HVAC,Sum,Electric Storage Thermal Loss Energy [J]
 
-HVAC,Sum,Electric Storage Production Decrement Energy [J]
+* HVAC,Sum,Electric Storage Production Decrement Energy [J]
 
 #### Electric Storage Charge State [J]
 
@@ -22691,145 +20123,88 @@ An example input of the ElectricLoadCenter:Storage: Battery input is:
 
 
 
+```idf
    ElectricLoadCenter:Storage:Battery,
-
        Lead Acid Battery A,   !-Name
-
        Always On,                       !- Availability Schedule Name
-
        ,                                         !- Zone Name
-
        ,                                         !-Radiative Fraction
-
        1,                                       !- Number of Battery Modules in Parallel
-
        1,                                       !- Number of Battery Modules in Series
-
        86.1,                                 !- Maximum Module Capacity {Ah}
-
        1.0,                                   !- Initial Fractional State of Charge
-
        0.3747,                             !- Fraction of Available Charge Capacity
-
        0.5874,                             !- Change Rate from Bound Charge to Available Charge {hr<sup>-1</sup>}
-
        12.60,                               !- Fully Charged Module Open Circuit Voltage {V}
-
        12.37,                               !- Fully Discharged Module Open Circuit Voltage {V}
-
        BatteryChargeCurve,     !- Voltage Change Curve Name for Charging
-
        BatteryDischargeCurve,!- Voltage Change Curve Name for Discharging
-
        0.0538,                             !- Module Internal Electrical Resistance {Ohm}
-
        100,                                   !- Maximum Module Discharging Current {A}
-
        10.2,                                 !- Module Cut-off Voltage {V}
-
        1,                                       !- Module Charge Rate Limit {1/hr}
-
        Yes,                                   !- Battery Life Calculation
-
          10,                                   !- Number of Cycle Bins
-
        BatteryCycleCurve;       !- Battery Cycle Life Curve Name
 
-
-
-
-
    Curve:RectangularHyperbola2,
-
        BatteryChargeCurve,     !- Name
-
        -0.2765,                           !- Coefficient1 C1
-
        -93.27,                             !- Coefficient2 C2
-
        0.0068,                             !- Coefficient3 C3
-
        0,                                       !- Minimum Value of x
-
        1.0,                                   !- Maximum Value of x
-
        -100,                                 !- Minimum Curve Output
-
        100;                                   !- Maximum Curve Output
 
-
-
-
-
    Curve:RectangularHyperbola2,
-
        BatteryDischargeCurve,     !- Name
-
        0.0899,                                   !- Coefficient1 C1
-
        -98.24,                                   !- Coefficient2 C2
-
        -0.0082,                                 !- Coefficient3 C3
-
        0,                                             !- Minimum Value of x
-
        1.0,                                         !- Maximum Value of x
-
        -100,                                       !- Minimum Curve Output
-
        100;                                         !- Maximum Curve Output
 
-
-
-
-
    Curve:DoubleExponentialDecay,
-
        BatteryCycleCurve,         !- Name
-
        1380,                                   !- Coefficient1 C1
-
        6834,                                   !- Coefficient2 C2
-
        -8.75,                                 !- Coefficient3 C3
-
        6747,                                   !- Coefficient4 C4
-
        -6.22,                                 !- Coefficient5 C5
-
        0,                                         !- Minimum Value of x
-
        1.0;                                     !- Maximum Value of x
-
-
+```
 
 ### ElectricLoadCenter: Storage:Battery Outputs
 
-HVAC,Average, Electric Storage Operating Mode Index []
+* HVAC,Average, Electric Storage Operating Mode Index []
 
-HVAC,Average,Electric Storage Charge State[Ah]
+* HVAC,Average,Electric Storage Charge State[Ah]
 
-HVAC,Average, Electric Storage Charge Fraction []
+* HVAC,Average, Electric Storage Charge Fraction []
 
-HVAC,Average,Electric Storage Charge Power[W]
+* HVAC,Average,Electric Storage Charge Power[W]
 
-HVAC,Sum,Electric Storage Charge Energy [J]
+* HVAC,Sum,Electric Storage Charge Energy [J]
 
-HVAC,Average,Electric Storage Discharge Power[W]
+* HVAC,Average,Electric Storage Discharge Power[W]
 
-HVAC,Sum,Electric Storage Discharge Energy [J]
+* HVAC,Sum,Electric Storage Discharge Energy [J]
 
-HVAC,Average,Electric Storage Total Current[A]
+* HVAC,Average,Electric Storage Total Current[A]
 
-HVAC,Average, Electric Storage Total Voltage [V]
+* HVAC,Average, Electric Storage Total Voltage [V]
 
-HVAC,Average,Electric Storage Thermal Loss Rate [W]
+* HVAC,Average,Electric Storage Thermal Loss Rate [W]
 
-HVAC,Average, Electric Storage Degradation Fraction []
+* HVAC,Average, Electric Storage Degradation Fraction []
 
-HVAC,Sum,Electric Storage Production Decrement Energy [J]
+* HVAC,Sum,Electric Storage Production Decrement Energy [J]
 
-HVAC,Sum,Electric Storage Thermal Loss Energy [J]
+* HVAC,Sum,Electric Storage Thermal Loss Energy [J]
 
 
 
@@ -23009,187 +20384,127 @@ The temperature is specified in degrees C.
 
 An IDF example showing how it is used is provided below:
 
+```idf
    Generator:InternalCombustionEngine,
-
        Cat Diesel,                           !- Name
-
        50000,                                     !- Rated Power Output {W}
-
        Generator Diesel Electric Node,   !- Electric Circuit Node Name
-
        0.15,                                       !- Minimum Part Load Ratio
-
        1.0,                                         !- Maximum Part Load Ratio
-
        0.65,                                       !- Optimum Part Load Ratio
-
        BG Shaft Power Curve,       !- Shaft Power Curve Name
-
        BG Recovery Jacket Heat Curve,   !- Jacket Heat Recovery Curve Name
-
        BG Recovery Lube Heat Curve,   !- Lube Heat Recovery Curve Name
-
        BG Total Exhaust Energy Curve,   !- Total Exhaust Energy Curve Name
-
        BG Exhaust Temperature Curve,   !- Exhaust Temperature Curve Name
-
        0.00952329,                           !- Coefficient 1 of U-Factor Times Area Curve
-
        0.9,                                         !- Coefficient 2 of U-Factor Times Area Curve
-
        0.00000063,                           !- Maximum Exhaust Flow per Unit of Power Output {(kg/s)/W}
-
        150,                                         !- Design Minimum Exhaust Temperature {C}
-
        45500,                                     !- Fuel Higher Heating Value {kJ/kg}
-
        0.0,                                         !- Design Heat Recovery Water Flow Rate {m3/s}
-
        ,                                               !- Heat Recovery Inlet Node Name
-
        ,                                               !- Heat Recovery Outlet Node Name
-
        Diesel;                                   !- Fuel Type
 
-
-
    Curve:Quadratic,
-
        BG Shaft Power Curve,       !- Name
-
        0.09755,                                 !- Coefficient1 Constant
-
        0.6318,                                   !- Coefficient2 x
-
-       -0.4165,                                 !- Coefficient3 x\*\*2
-
+       -0.4165,                                 !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
 
-
-
-
-
    Curve:Quadratic,
-
        BG Recovery Jacket Heat Curve,   !- Name
-
        0.25,                                       !- Coefficient1 Constant
-
        0,                                             !- Coefficient2 x
-
-       0,                                             !- Coefficient3 x\*\*2
-
+       0,                                             !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
 
-
-
    Curve:Quadratic,
-
        BG Recovery Lube Heat Curve,   !- Name
-
        0.15,                                       !- Coefficient1 Constant
-
        0,                                             !- Coefficient2 x
-
-       0,                                             !- Coefficient3 x\*\*2
-
+       0,                                             !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
 
-
-
    Curve:Quadratic,
-
        BG Total Exhaust Energy Curve,   !- Name
-
        0.1,                                         !- Coefficient1 Constant
-
        0,                                             !- Coefficient2 x
-
-       0,                                             !- Coefficient3 x\*\*2
-
+       0,                                             !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
-
-
 
    Curve:Quadratic,
-
        BG Exhaust Temperature Curve,   !- Name
-
        425,                                         !- Coefficient1 Constant
-
        0,                                             !- Coefficient2 x
-
-       0,                                             !- Coefficient3 x\*\*2
-
+       0,                                             !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
+```
 
 ### Generator:InternalCombustionEngine Outputs
 
 The output variables that are available for the IC engine generator are:
 
-HVAC,Average,Generator Produced Electric Power [W]
+* HVAC,Average,Generator Produced Electric Power [W]
 
-HVAC,Sum,Generator Produced Electric Energy [J]
-
-
-
-HVAC,Average,Generator Lube Heat Recovery Rate [W]
-
-HVAC,Sum,Generator Lube Heat Recovery Energy [J]
+* HVAC,Sum,Generator Produced Electric Energy [J]
 
 
 
-HVAC,Average,Generator Jacket Heat Recovery Rate [W]
+* HVAC,Average,Generator Lube Heat Recovery Rate [W]
 
-HVAC,Sum,Generator Jacket Heat Recovery Energy [J]
-
-
-
-HVAC,Average,Generator Exhaust Heat Recovery Rate [W]
-
-HVAC,Sum,Generator Exhaust Heat Recovery Energy [J]
+* HVAC,Sum,Generator Lube Heat Recovery Energy [J]
 
 
 
-HVAC,Average,Generator Total Heat Recovery Rate [W]
+* HVAC,Average,Generator Jacket Heat Recovery Rate [W]
 
-HVAC,Sum,Generator Total Heat Recovery [J]
-
-
-
-HVAC,Average,Generator Exhaust Air Temperature [C]
+* HVAC,Sum,Generator Jacket Heat Recovery Energy [J]
 
 
 
-HVAC,Average,Generator Heat Recovery Inlet Temperature [C]
+* HVAC,Average,Generator Exhaust Heat Recovery Rate [W]
 
-HVAC,Average,Generator Heat Recovery Outlet Temperature [C]
-
-HVAC,Average,Generator Heat Recovery Mass Flow Rate [kg/s]
+* HVAC,Sum,Generator Exhaust Heat Recovery Energy [J]
 
 
 
-HVAC,Average,Generator Fuel HHV Basis Rate [W]
+* HVAC,Average,Generator Total Heat Recovery Rate [W]
 
-HVAC,Sum,Generator Fuel HHV Basis Energy [J]
+* HVAC,Sum,Generator Total Heat Recovery [J]
 
 
 
-HVAC,Average,Generator &lt;Fuel Type&gt; Rate [W]
+* HVAC,Average,Generator Exhaust Air Temperature [C]
 
-HVAC,Sum,Generator&lt;Fuel Type&gt; Energy [J]
 
-HVAC,Average,Generator &lt;Fuel Type&gt; Mass Flow Rate [kg/s]
+
+* HVAC,Average,Generator Heat Recovery Inlet Temperature [C]
+
+* HVAC,Average,Generator Heat Recovery Outlet Temperature [C]
+
+* HVAC,Average,Generator Heat Recovery Mass Flow Rate [kg/s]
+
+
+
+* HVAC,Average,Generator Fuel HHV Basis Rate [W]
+
+* HVAC,Sum,Generator Fuel HHV Basis Energy [J]
+
+
+
+* HVAC,Average,Generator &lt;Fuel Type&gt; Rate [W]
+
+* HVAC,Sum,Generator&lt;Fuel Type&gt; Energy [J]
+
+* HVAC,Average,Generator &lt;Fuel Type&gt; Mass Flow Rate [kg/s]
 
 #### Generator Produced Electric Power [W]
 
@@ -23383,207 +20698,133 @@ This field is optional. It is used to explicitly define an outdoor air node for 
 
 An IDF example showing how it is used is provided below:
 
+```idf
    Generator:CombustionTurbine,
-
        Solar Turbine,                     !- Name
-
        30000,                                     !- Rated Power Output {W}
-
        GT gen Electric Node,       !- Electric Circuit Node Name
-
        0.15,                                       !- Minimum Part Load Ratio
-
        1.0,                                         !- Maximum Part Load Ratio
-
        0.65,                                       !- Optimum Part Load Ratio
-
        BG PL Based Fuel Input Curve,   !- Part Load Based Fuel Input Curve Name
-
        BG Temp Based Fuel Input Curve,   !- Temperature Based Fuel Input Curve Name
-
        BG Exhaust Flow Curve,     !- Exhaust Flow Curve Name
-
        BG PL Based Exhaust Temp Curve,   !- Part Load Based Exhaust Temperature Curve Name
-
        BG Temp Based Exhaust Temp Curve,   !- Temperature Based Exhaust Temperature Curve Name
-
        BG Tur Recovery Lube Heat Curve,   !- Heat Recovery Lube Energy Curve Name
-
        0.01907045,                           !- Coefficient 1 of U-Factor Times Area Curve
-
        0.9,                                         !- Coefficient 2 of U-Factor Times Area Curve
-
        0.00000504,                           !- Maximum Exhaust Flow per Unit of Power Output {(Kg/s)/W}
-
        150,                                         !- Design Minimum Exhaust Temperature {C}
-
        25,                                           !- Design Air Inlet Temperature {C}
-
        43500,                                     !- Fuel Higher Heating Value {kJ/kg}
-
        0.0,                                         !- Design Heat Recovery Water Flow Rate {m3/s}
-
        ,                                               !- Heat Recovery Inlet Node Name
-
        ,                                               !- Heat Recovery Outlet Node Name
-
        NaturalGas,                           !- Fuel Type
-
        ,                                               !- Heat Recovery Maximum Temperature {C}
-
        CT OA inlet;                         !- Outdoor Air Inlet Node Name
 
-
-
-
-
    Curve:Quadratic,
-
        BG PL Based Fuel Input Curve,   !- Name
-
        9.41,                                       !- Coefficient1 Constant
-
        -9.48,                                     !- Coefficient2 x
-
-       4.32,                                       !- Coefficient3 x\*\*2
-
+       4.32,                                       !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
 
-
-
    Curve:Quadratic,
-
        BG Temp Based Fuel Input Curve,   !- Name
-
        1.0044,                                   !- Coefficient1 Constant
-
        -0.0008,                                 !- Coefficient2 x
-
-       0,                                             !- Coefficient3 x\*\*2
-
+       0,                                             !- Coefficient3 x**2
        -30,                                         !- Minimum Value of x
-
        +30;                                         !- Maximum Value of x
 
-
-
    Curve:Quadratic,
-
        BG Exhaust Flow Curve,     !- Name
-
        0.05,                                       !- Coefficient1 Constant
-
        0.0,                                         !- Coefficient2 x
-
-       0.0,                                         !- Coefficient3 x\*\*2
-
+       0.0,                                         !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
 
-
-
    Curve:Quadratic,
-
        BG PL Based Exhaust Temp Curve,   !- Name
-
        450,                                         !- Coefficient1 Constant
-
        0,                                             !- Coefficient2 x
-
-       0,                                             !- Coefficient3 x\*\*2
-
+       0,                                             !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
 
-
-
-
-
    Curve:Quadratic,
-
        BG Temp Based Exhaust Temp Curve,   !- Name
-
        1.005,                                     !- Coefficient1 Constant
-
        0.0018,                                   !- Coefficient2 x
-
-       0,                                             !- Coefficient3 x\*\*2
-
+       0,                                             !- Coefficient3 x**2
        -30,                                         !- Minimum Value of x
-
        +30;                                         !- Maximum Value of x
 
-
-
    Curve:Quadratic,
-
        BG Tur Recovery Lube Heat Curve,   !- Name
-
        0.223,                                     !- Coefficient1 Constant
-
        -0.4,                                       !- Coefficient2 x
-
-       0.2286,                                   !- Coefficient3 x\*\*2
-
+       0.2286,                                   !- Coefficient3 x**2
        0,                                             !- Minimum Value of x
-
        1;                                             !- Maximum Value of x
+```
 
 ### Generator:CombustionTurbine Outputs
 
 The output variables that are available for the combustion turbine generator are:
 
-HVAC,Average,Generator Produced Electric Power [W]
+* HVAC,Average,Generator Produced Electric Power [W]
 
-HVAC,Sum,Generator Produced Electric Energy [J]
+* HVAC,Sum,Generator Produced Electric Energy [J]
 
-Zone,Meter,ElectricityProduced:Facility [J]
+* Zone,Meter,ElectricityProduced:Facility [J]
 
-Zone,Meter,ElectricityProduced:Plant [J]
+* Zone,Meter,ElectricityProduced:Plant [J]
 
-Zone,Meter,Cogeneration:ElectricityProduced [J]
-
-
-
-HVAC,Average,Generator Lube Heat Recovery Rate [W]
-
-HVAC,Sum,Generator Lube Heat Recovery Energy [J]
+* Zone,Meter,Cogeneration:ElectricityProduced [J]
 
 
 
-HVAC,Average,Generator Exhaust Heat Recovery Rate [W]
+* HVAC,Average,Generator Lube Heat Recovery Rate [W]
 
-HVAC,Sum,Generator Exhaust Heat Recovery [J]
-
-
-
-HVAC,Average,Generator Total Heat Recovery Rate [W]
-
-HVAC,Sum,Generator Total Heat Recovery [J]
+* HVAC,Sum,Generator Lube Heat Recovery Energy [J]
 
 
 
-HVAC,Average,Generator Exhaust Air Temperature [C]
+* HVAC,Average,Generator Exhaust Heat Recovery Rate [W]
+
+* HVAC,Sum,Generator Exhaust Heat Recovery [J]
 
 
 
-HVAC,Average,Generator Heat Recovery Inlet Temperature [C]
+* HVAC,Average,Generator Total Heat Recovery Rate [W]
 
-HVAC,Average,Generator Heat Recovery Outlet Temperature [C]
-
-HVAC,Average,Generator Heat Recovery Mass Flow Rate [kg/s]
+* HVAC,Sum,Generator Total Heat Recovery [J]
 
 
 
-HVAC,Average,Generator &lt;Fuel Type&gt; Rate [W]
+* HVAC,Average,Generator Exhaust Air Temperature [C]
 
-HVAC,Sum,Generator &lt;Fuel Type&gt; Energy [J]
 
-HVAC,Average,Generator &lt;Fuel Type&gt; Mass Flow Rate [kg/s]
+
+* HVAC,Average,Generator Heat Recovery Inlet Temperature [C]
+
+* HVAC,Average,Generator Heat Recovery Outlet Temperature [C]
+
+* HVAC,Average,Generator Heat Recovery Mass Flow Rate [kg/s]
+
+
+
+* HVAC,Average,Generator &lt;Fuel Type&gt; Rate [W]
+
+* HVAC,Sum,Generator &lt;Fuel Type&gt; Energy [J]
+
+* HVAC,Average,Generator &lt;Fuel Type&gt; Mass Flow Rate [kg/s]
 
 All of these outputs, except for the Combustion use outputs, are described above under "Generator:InternalCombustionEngine Outputs."
 
@@ -23763,237 +21004,152 @@ An example IDF showing how this object is used is provided below:
 
 
 
+```idf
 Generator:MicroTurbine,
-
        Generator 3,                         !- Name
-
        65000,                                     !- Reference Electrical Power Output {W}
-
        29900,                                     !- Minimum Full Load Electrical Power Output {W}
-
        65000,                                     !- Maximum Full Load Electrical Power Output {W}
-
        0.29,                                       !- Reference Electrical Efficiency Using Lower Heating Value
-
        15.0,                                       !- Reference Combustion Air Inlet Temperature {C}
-
        0.00638,                                 !- Reference Combustion Air Inlet Humidity Ratio (kgWater/kgDryAir)
-
        0.0,                                         !- Reference Elevation {m}
-
-       Power\_vs\_Temp\_Elev,           !- Electrical Power Function of Temperature and Elevation Curve Name
-
-       Efficiency\_vs\_Temp,           !- Electrical Efficiency Function of Temperature Curve Name
-
-       Efficiency\_vs\_PLR,             !- Electrical Efficiency Function of Part Load Ratio Curve Name
-
+       Power_vs_Temp_Elev,           !- Electrical Power Function of Temperature and Elevation Curve Name
+       Efficiency_vs_Temp,           !- Electrical Efficiency Function of Temperature Curve Name
+       Efficiency_vs_PLR,             !- Electrical Efficiency Function of Part Load Ratio Curve Name
        NaturalGas,                           !- Fuel Type
-
        50000,                                     !- Fuel Higher Heating Value {kJ/kg}
-
        45450,                                     !- Fuel Lower Heating Value {kJ/kg}
-
        300,                                         !- Standby Power {W}
-
        4500;                                       !- Ancillary Power {W}
 
-
-
 ! Electrical Power Modifier Curve (function of temperature and elevation)
-
 ! x = Dry-Bulb Temperature of Combustion Inlet Air (C) and y = Elevation (meters)
-
    Curve:Biquadratic,
-
-       Power\_vs\_Temp\_Elev,           !- Name
-
+       Power_vs_Temp_Elev,           !- Name
        1.2027697,                             !- Coefficient1 Constant
-
        -9.671305E-03,                     !- Coefficient2 x
-
-       -4.860793E-06,                     !- Coefficient3 x\*\*2
-
+       -4.860793E-06,                     !- Coefficient3 x**2
        -1.542394E-04,                     !- Coefficient4 y
-
-       9.111418E-09,                       !- Coefficient5 y\*\*2
-
-       8.797885E-07,                       !- Coefficient6 x\*y
-
+       9.111418E-09,                       !- Coefficient5 y**2
+       8.797885E-07,                       !- Coefficient6 x*y
       -17.8,                                     !- Minimum Value of x
-
        50.0,                                       !- Maximum Value of x
-
        0.0,                                         !- Minimum Value of y
-
        3050.;                                     !- Maximum Value of y
 
-
-
 ! Electrical Efficiency Modifier Curve (function of temperature)
-
 ! x = Dry-Bulb Temperature of Combustion Inlet Air (C)
-
    Curve:Cubic,
-
-       Efficiency\_vs\_Temp,           !- Name
-
+       Efficiency_vs_Temp,           !- Name
        1.0402217,                             !- Coefficient1 Constant
-
        -0.0017314,                           !- Coefficient2 x
-
-       -6.497040E-05,                     !- Coefficient3 x\*\*2
-
-       5.133175E-07,                       !- Coefficient4 x\*\*3
-
+       -6.497040E-05,                     !- Coefficient3 x**2
+       5.133175E-07,                       !- Coefficient4 x**3
        -20.0,                                     !- Minimum Value of x
-
        50.0;                                       !- Maximum Value of x
 
-
-
-
-
 ! Electrical Efficiency Modifier Curve (function of part-load ratio)
-
 ! x = Part-Load Ratio (electrical load/steady-state electrical power output)
-
    Curve:Cubic,
-
-       Efficiency\_vs\_PLR,             !- Name
-
+       Efficiency_vs_PLR,             !- Name
        0.215290,                               !- Coefficient1 Constant
-
        2.561463,                               !- Coefficient2 x
-
-       -3.24613,                               !- Coefficient3 x\*\*2
-
-       1.497306,                               !- Coefficient4 x\*\*3
-
+       -3.24613,                               !- Coefficient3 x**2
+       1.497306,                               !- Coefficient4 x**3
        0.03,                                       !- Minimum Value of x
-
        1.0;                                         !- Maximum Value of x!
 
-
-
    ElectricLoadCenter:Distribution,
-
        Electric Load Center,       !- Name
-
        Backup Generators,             !- Generator List Name
-
        DemandLimit,                         !- Generator Operation Scheme Type
-
        10000.0,                                 !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-
        ,                                               !- Track Schedule Name Scheme Schedule Name
-
        ,                                               !- Track Meter Scheme Meter Name
-
        AlternatingCurrent,           !- Electrical Buss Type
-
        ,                                               !- Inverter Object Name
-
        ;                                               !- Electrical Storage Object Name
 
-
-
-
-
    ElectricLoadCenter:Generators,
-
        Backup Generators,             !- Name
-
        Generator 1,                         !- Generator 1 Name
-
        Generator:InternalCombustionEngine,   !- Generator 1 Object Type
-
        50000,                                     !- Generator 1 Rated Electric Power Output
-
        ON PEAK GENERATOR SCHEDULE,   !- Generator 1 Availability Schedule Name
-
        ,                                               !- Generator 1 Rated Thermal to Electrical Power Ratio
-
        Generator 2,                         !- Generator 2 Name
-
        Generator:CombustionTurbine,   !- Generator 2 Object Type
-
        30000,                                     !- Generator 2 Rated Electric Power Output
-
        OFF PEAK GENERATOR SCHEDULE,   !- Generator 2 Availability Schedule Name
-
        ,                                               !- Generator 2 Rated Thermal to Electrical Power Ratio
-
        Generator 3,                         !- Generator 3 Name
-
        Generator:MicroTurbine,   !- Generator 3 Object Type
-
        65000,                                     !- Generator 3 Rated Electric Power Output
-
        MID PEAK GENERATOR SCHEDULE,   !- Generator 3 Availability Schedule Name
-
        ;                                               !- Generator 3 Rated Thermal to Electrical Power Ratio
-
+```
 
 
 ### Generator:MicroTurbine Outputs
 
 The output variables that are available for the microturbine generator are:
 
-HVAC,Average,Generator Produced Electric Power [W]
+* HVAC,Average,Generator Produced Electric Power [W]
 
-HVAC,Sum,Generator Produced Electric Energy [J]
+* HVAC,Sum,Generator Produced Electric Energy [J]
 
-HVAC,Average,Generator LHV Basis Electric Efficiency [-]
+* HVAC,Average,Generator LHV Basis Electric Efficiency [-]
 
-HVAC,Average,Generator &lt;Fuel Type&gt; HHV Basis Rate [W]
+* HVAC,Average,Generator &lt;Fuel Type&gt; HHV Basis Rate [W]
 
-HVAC,Average,Generator Fuel HHV Basis Rate [W]
+* HVAC,Average,Generator Fuel HHV Basis Rate [W]
 
-HVAC,Sum,Generator &lt;Fuel Type&gt; HHV Basis Energy [J]
+* HVAC,Sum,Generator &lt;Fuel Type&gt; HHV Basis Energy [J]
 
-HVAC,Sum,Generator Fuel HHV Basis Energy [J]
+* HVAC,Sum,Generator Fuel HHV Basis Energy [J]
 
-HVAC,Average,Generator &lt;Fuel Type&gt; Mass Flow Rate [kg/s]
+* HVAC,Average,Generator &lt;Fuel Type&gt; Mass Flow Rate [kg/s]
 
 
 
 If Standby Power input field &gt; 0.0:
 
-HVAC,Average,Generator Standby Electric Power [W]
+* HVAC,Average,Generator Standby Electric Power [W]
 
-HVAC,Sum,Generator Standby Electric Energy [J]
+* HVAC,Sum,Generator Standby Electric Energy [J]
 
 
 
 If Ancillary Power input field &gt; 0.0:
 
-HVAC,Average,Generator Ancillary Electric Power [W]
+* HVAC,Average,Generator Ancillary Electric Power [W]
 
-HVAC,Sum,Generator Ancillary Electric Energy [J]
+* HVAC,Sum,Generator Ancillary Electric Energy [J]
 
 
 
 If heat recovery water inlet and outlet node names are entered (and valid):
 
-HVAC,Average,Generator Produced Thermal Rate [W]
+* HVAC,Average,Generator Produced Thermal Rate [W]
 
-HVAC,Sum,Generator Produced Thermal Energy [J]
+* HVAC,Sum,Generator Produced Thermal Energy [J]
 
-HVAC,Average,Generator Thermal Efficiency LHV Basis [-]
+* HVAC,Average,Generator Thermal Efficiency LHV Basis [-]
 
-HVAC,Average,Generator Heat Recovery Inlet Temperature [C]
+* HVAC,Average,Generator Heat Recovery Inlet Temperature [C]
 
-HVAC,Average,Generator Heat Recovery Outlet Temperature [C]
+* HVAC,Average,Generator Heat Recovery Outlet Temperature [C]
 
-HVAC,Average,Generator Heat Recovery Water Mass Flow Rate [kg/s]
+* HVAC,Average,Generator Heat Recovery Water Mass Flow Rate [kg/s]
 
 
 
 If exhaust air calculations are performed:
 
-HVAC,Average,Generator Exhaust Air Mass Flow Rate [kg/s]
+* HVAC,Average,Generator Exhaust Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Generator Exhaust Air Temperature   [C]
+* HVAC,Average,Generator Exhaust Air Temperature   [C]
 
 
 
@@ -24125,25 +21281,18 @@ This field contains the name of a schedule used to control whether or not the un
 
 An example IDF showing how this object is used is provided below:
 
+```idf
    Generator:MicroCHP,
-
        MicroCoGen1,                         !- Name
-
-       SENERTECH5\_5KW,                   !- Performance Parameters Name
-
-       ZN\_1\_FLR\_1\_SEC\_1,               !- Zone Name
-
+       SENERTECH5_5KW,                   !- Performance Parameters Name
+       ZN_1_FLR_1_SEC_1,               !- Zone Name
        MICROCHP SENERTECH Pump-MicroCoGen1Node,   !- Cooling Water Inlet Node Name
-
        MICROCHP SENERTECH Supply Equipment Outlet Node,   !- Cooling Water Outlet Node Name
-
        MicroCoGen1 air inlet node,   !- Air Inlet Node Name
-
        ,                                               !- Air Outlet Node Name
-
        NATURALGAS,                           !- Generator Fuel Supply Name
-
-       ALWAYS\_ON;                             !- Availability Schedule Name
+       ALWAYS_ON;                             !- Availability Schedule Name
+```
 
 ### Generator:MicroCHP:NonNormalizedParameters
 
@@ -24275,121 +21424,96 @@ This field is used to choose between two different control situations for the co
 
 An example IDF showing how this object is used is provided below:
 
+```idf
    Generator:MicroCHP:NonNormalizedParameters,
-
-       SENERTECH5\_5KW,                   !- Name
-
+       SENERTECH5_5KW,                   !- Name
        5500.0000,                             !- Maximum Electric Power {W}
-
        0.0000,                                   !- Minimum Electric Power {W}
-
        0.0000,                                   !- Minimum Cooling Water Flow Rate {kg/s}
-
        80.0000,                                 !- Maximum Cooling Water Temperature {C}
-
        SenerTechElEff,                   !- Electrical Efficiency Curve Name
-
        SenerTechThermEff,             !- Thermal Efficiency Curve Name
-
        InternalControl,                 !- Cooling Water Flow Rate Mode
-
        SenerTechCoolWaterflow,   !- Cooling Water Flow Rate Curve Name
-
        SenerTechAirFlow,               !- Air Flow Rate Curve Name
-
        1000000000.0000,                 !- Maximum Net Electrical Power Rate of Change {W/s}
-
        1000000000.0000,                 !- Maximum Fuel Flow Rate of Change {kg/s2}
-
        741.0000,                               !- Heat Exchanger U-Factor Times Area Value {W/K}
-
        13.7000,                                 !- Skin Loss U-Factor Times Area Value {W/K}
-
        0.5000,                                   !- Skin Loss Radiative Fraction
-
        63605.6000,                           !- Aggregated Thermal Mass of Energy Conversion Portion of Generator {W/K}
-
        1000.7000,                             !- Aggregated Thermal Mass of Heat Recovery Portion of Generator {W/K}
-
        0.0000,                                   !- Standby Power {W}
-
        TimeDelay,                             !- Warm Up Mode
-
        ,                                               !- Warm Up Fuel Flow Rate Coefficient
-
        ,                                               !- Nominal Engine Operating Temperature {C}
-
        ,                                               !- Warm Up Power Coefficient
-
        ,                                               !- Warm Up Fuel Flow Rate Limit Ratio
-
        60.0000,                                 !- Warm Up Delay Time {s}
-
        0.0000,                                   !- Cool Down Power {W}
-
        60.0000,                                 !- Cool Down Delay Time {s}
-
        OptionalCoolDown;               !- Restart Mode
+```
 
 ### Generator:MicroCHP Outputs
 
-HVAC,Sum,Generator Off Mode Time [s]
+* HVAC,Sum,Generator Off Mode Time [s]
 
-HVAC,Sum,Generator Standby Mode Time [s]
+* HVAC,Sum,Generator Standby Mode Time [s]
 
-HVAC,Sum,Generator Warm Up Mode Time [s]
+* HVAC,Sum,Generator Warm Up Mode Time [s]
 
-HVAC,Sum,Generator Normal Operating Mode Time [s]
+* HVAC,Sum,Generator Normal Operating Mode Time [s]
 
-HVAC,Sum,Generator Cool Down Mode Time [s]
+* HVAC,Sum,Generator Cool Down Mode Time [s]
 
-HVAC,Average,Generator Produced Electric Power [W]
+* HVAC,Average,Generator Produced Electric Power [W]
 
-HVAC,Sum,Generator Produced Electric Energy [J]
+* HVAC,Sum,Generator Produced Electric Energy [J]
 
-HVAC,Average,Generator Electric Efficiency [ ]
+* HVAC,Average,Generator Electric Efficiency [ ]
 
-HVAC,Average,Generator Thermal Efficiency [ ]
+* HVAC,Average,Generator Thermal Efficiency [ ]
 
-HVAC,Average,Generator Gross Input Heat Rate [W]
+* HVAC,Average,Generator Gross Input Heat Rate [W]
 
-HVAC,Average,Generator Steady State Engine Heat Generation Rate [W]
+* HVAC,Average,Generator Steady State Engine Heat Generation Rate [W]
 
-HVAC,Average, Generator Engine Heat Exchange Rate [W]
+* HVAC,Average, Generator Engine Heat Exchange Rate [W]
 
-HVAC,Average,Generator Air Mass Flow Rate [kg/s]
+* HVAC,Average,Generator Air Mass Flow Rate [kg/s]
 
-HVAC,Average,Generator Fuel Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Fuel Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Fuel Mass Flow Rate [kg/s]
+* HVAC,Average,Generator Fuel Mass Flow Rate [kg/s]
 
-HVAC,Average,Generator Engine Temperature [C]
+* HVAC,Average,Generator Engine Temperature [C]
 
-HVAC,Average,Generator Coolant Inlet Temperature [C]
+* HVAC,Average,Generator Coolant Inlet Temperature [C]
 
-HVAC,Average,Generator Coolant Outlet Temperature [C]
+* HVAC,Average,Generator Coolant Outlet Temperature [C]
 
-HVAC,Sum,Generator Fuel HHV Basis Energy [J]
+* HVAC,Sum,Generator Fuel HHV Basis Energy [J]
 
-HVAC,Average,Generator Fuel HHV Basis Rate [W]
+* HVAC,Average,Generator Fuel HHV Basis Rate [W]
 
-HVAC,Sum,Generator Fuel LHV Basis Energy [J]
+* HVAC,Sum,Generator Fuel LHV Basis Energy [J]
 
-HVAC,Average,Generator Fuel LHV Basis Rate [W]
+* HVAC,Average,Generator Fuel LHV Basis Rate [W]
 
-HVAC,Average,Generator Fuel Compressor Electric Power [W]
+* HVAC,Average,Generator Fuel Compressor Electric Power [W]
 
-HVAC,Sum,Generator Fuel Compressor Electric Energy [J]
+* HVAC,Sum,Generator Fuel Compressor Electric Energy [J]
 
-HVAC,Average,Generator Fuel Compressor Skin Heat Loss Rate [W]
+* HVAC,Average,Generator Fuel Compressor Skin Heat Loss Rate [W]
 
-HVAC,Average,Generator Zone Sensible Heat Transfer Rate [W]
+* HVAC,Average,Generator Zone Sensible Heat Transfer Rate [W]
 
-HVAC,Sum,Generator Zone Sensible Heat Transfer Energy [J]
+* HVAC,Sum,Generator Zone Sensible Heat Transfer Energy [J]
 
-HVAC,Average,Generator Zone Convection Heat Transfer Rate [W]
+* HVAC,Average,Generator Zone Convection Heat Transfer Rate [W]
 
-HVAC,Average,Generator Zone Radiation Heat Transfer Rate [W]
+* HVAC,Average,Generator Zone Radiation Heat Transfer Rate [W]
 
 #### Generator Off Mode Time [s]
 
@@ -24555,53 +21679,47 @@ This field contains the name of a Generator:FuelCell:StackCooler input object. T
 
 An example input data file (IDF) entry for this object is provided below:
 
+```idf
    Generator:FuelCell,
-
        FCT SOFC,                               !- Name
-
        FCT SOFC Power Module,     !- Power Module Name
-
        FCT SOFC Air Supply,         !- Air Supply Name
-
        FCT SOFC Fuel Supply,       !- Fuel Supply Name
-
        FCT SOFC Water Supply,     !- Water Supply Name
-
        FCT SOFC Auxiliary Heater,   !- Auxiliary Heater Name
-
        FCT SOFC Exhaust HX,         !- Heat Exchanger Name
-
        FCT SOFC Battery,               !- Electrical Storage Name
-
        FCT SOFC Inverter;             !- Inverter Name
+```
+
 
 ### Generator:FuelCell Outputs
 
 The following output variables are available for the fuel cell model.
 
-Output:Variable,\*,Generator Produced Electric Power,hourly; !- HVAC Average [W]
+* Output:Variable,\*,Generator Produced Electric Power,hourly; !- HVAC Average [W]
 
-Output:Variable,\*,Generator Produced Electric Energy,hourly; !- HVAC Sum [J]
+* Output:Variable,\*,Generator Produced Electric Energy,hourly; !- HVAC Sum [J]
 
-Output:Variable,\*,Generator Produced Thermal Rate,hourly; !- HVAC Average [W]
+* Output:Variable,\*,Generator Produced Thermal Rate,hourly; !- HVAC Average [W]
 
-Output:Variable,\*,Generator Produced Thermal Energy,hourly; !- HVAC Sum [J]
+* Output:Variable,\*,Generator Produced Thermal Energy,hourly; !- HVAC Sum [J]
 
-Output:Variable,\*,Generator Fuel HHV Basis Energy,hourly; !- HVAC Sum [J]
+* Output:Variable,\*,Generator Fuel HHV Basis Energy,hourly; !- HVAC Sum [J]
 
-Output:Variable,\*,Generator Fuel HHV Basis Rate,hourly; !- HVAC Average [W]
+* Output:Variable,\*,Generator Fuel HHV Basis Rate,hourly; !- HVAC Average [W]
 
-Output:Variable,\*,Generator Fuel LHV Basis Energy,hourly; !- HVAC Sum [J]
+* Output:Variable,\*,Generator Fuel LHV Basis Energy,hourly; !- HVAC Sum [J]
 
-Output:Variable,\*,Generator Fuel Consumption Rate LHV Basis,hourly; !- HVAC Average [W]
+* Output:Variable,\*,Generator Fuel Consumption Rate LHV Basis,hourly; !- HVAC Average [W]
 
-Output:Variable,\*,FuelCell Heat Loss Rate to Zone,hourly; !- HVAC Average [W]
+* Output:Variable,\*,FuelCell Heat Loss Rate to Zone,hourly; !- HVAC Average [W]
 
-Output:Variable,\*,FuelCell Heat Loss Energy to Zone,hourly; !- HVAC Sum [J]
+* Output:Variable,\*,FuelCell Heat Loss Energy to Zone,hourly; !- HVAC Sum [J]
 
-Output:Variable,\*,FuelCell Convection Heat Loss Rate to Zone,hourly; !- HVAC Average [W]
+* Output:Variable,\*,FuelCell Convection Heat Loss Rate to Zone,hourly; !- HVAC Average [W]
 
-Output:Variable,\*,FuelCell Radiation Heat Loss Rate to Zone,hourly; !- HVAC Average [W]
+* Output:Variable,\*,FuelCell Radiation Heat Loss Rate to Zone,hourly; !- HVAC Average [W]
 
 #### Generator Produced Electric Power [W]
 
@@ -24649,97 +21767,95 @@ This variable provides the results for the rate of skin losses in the form of su
 
 This variable provides the results for the rate of skin losses in the form of radiation heat transfer from the fuel cell to the surrounding zone.
 
-
-
 Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object or use of operating system   s environment variables) makes the following output variables available as listed in the RDD file. There are a large number of output variables that provide access to the inner workings of the model and individual subsystems that are not likely to be useful for the average user.
 
-HVAC,Average,Generator Air Inlet Temperature [C]
+* HVAC,Average,Generator Air Inlet Temperature [C]
 
-HVAC,Average,Generator Power Module Entering Air Temperature [C]
+* HVAC,Average,Generator Power Module Entering Air Temperature [C]
 
-HVAC,Average,Generator Air Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Air Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Power Module Entering Air Enthalpy [W]
+* HVAC,Average,Generator Power Module Entering Air Enthalpy [W]
 
-HVAC,Average,Generator Blower Electric Power [W]
+* HVAC,Average,Generator Blower Electric Power [W]
 
-HVAC,Sum,Generator Blower Electric Energy [J]
+* HVAC,Sum,Generator Blower Electric Energy [J]
 
-HVAC,Average,Generator Blower Skin Heat Loss Rate [W]
+* HVAC,Average,Generator Blower Skin Heat Loss Rate [W]
 
-HVAC,Average,Generator Fuel Inlet Temperature [C]
+* HVAC,Average,Generator Fuel Inlet Temperature [C]
 
-HVAC,Average,Generator Power Module Entering Fuel Temperature [C]
+* HVAC,Average,Generator Power Module Entering Fuel Temperature [C]
 
-HVAC,Average,Generator Fuel Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Fuel Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Power Module Entering Fuel Enthalpy [W]
+* HVAC,Average,Generator Power Module Entering Fuel Enthalpy [W]
 
-HVAC,Average,Generator Fuel Compressor Electric Power [W]
+* HVAC,Average,Generator Fuel Compressor Electric Power [W]
 
-HVAC,Sum,Generator Fuel Compressor Electric Energy [J]
+* HVAC,Sum,Generator Fuel Compressor Electric Energy [J]
 
-HVAC,Average,Generator Fuel Compressor Skin Heat Loss Rate [W]
+* HVAC,Average,Generator Fuel Compressor Skin Heat Loss Rate [W]
 
-HVAC,Average,Generator Fuel Reformer Water Inlet Temperature [C]
+* HVAC,Average,Generator Fuel Reformer Water Inlet Temperature [C]
 
-HVAC,Average,Generator Power Module Entering Reforming Water Temperature [C]
+* HVAC,Average,Generator Power Module Entering Reforming Water Temperature [C]
 
-HVAC,Average,Generator Fuel Reformer Water Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Fuel Reformer Water Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Fuel Reformer Water Pump Electric Power [W]
+* HVAC,Average,Generator Fuel Reformer Water Pump Electric Power [W]
 
-HVAC,Sum,Generator Fuel Reformer Water Pump Electric Energy [J]
+* HVAC,Sum,Generator Fuel Reformer Water Pump Electric Energy [J]
 
-HVAC,Average,Generator Power Module Entering Reforming Water Enthalpy [W]
+* HVAC,Average,Generator Power Module Entering Reforming Water Enthalpy [W]
 
-HVAC,Average,Generator Product Gas Temperature [C]
+* HVAC,Average,Generator Product Gas Temperature [C]
 
-HVAC,Average,Generator Product Gas Enthalpy [W]
+* HVAC,Average,Generator Product Gas Enthalpy [W]
 
-HVAC,Average,Generator Product Gas Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Product Gas Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Product Gas Ar Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Product Gas Ar Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Product Gas CO2 Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Product Gas CO2 Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Product Gas H2O Vapor Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Product Gas H2O Vapor Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Product Gas N2 Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Product Gas N2 Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Product Gas O2 Molar Flow Rate [kmol/s]
+* HVAC,Average,Generator Product Gas O2 Molar Flow Rate [kmol/s]
 
-HVAC,Average,Generator Inverter Loss Power [W]
+* HVAC,Average,Generator Inverter Loss Power [W]
 
-HVAC,Average,Generator Produced DC Electric Power [W]
+* HVAC,Average,Generator Produced DC Electric Power [W]
 
-HVAC,Average,Generator DC Power Efficiency [ ]
+* HVAC,Average,Generator DC Power Efficiency [ ]
 
-HVAC,Average,Generator Electric Storage Charge State [J]
+* HVAC,Average,Generator Electric Storage Charge State [J]
 
-HVAC,Average,Generator Produced DC Electric Power [W]
+* HVAC,Average,Generator Produced DC Electric Power [W]
 
-HVAC,Sum,Generator DC Storage Charging Energy [J]
+* HVAC,Sum,Generator DC Storage Charging Energy [J]
 
-HVAC,Average,Generator DC Storage Discharging Power [W]
+* HVAC,Average,Generator DC Storage Discharging Power [W]
 
-HVAC,Sum,Generator DC Storage Discharging Energy [J]
+* HVAC,Sum,Generator DC Storage Discharging Energy [J]
 
-HVAC,Average,Generator Ancillary AC Electric Power [W]
+* HVAC,Average,Generator Ancillary AC Electric Power [W]
 
-HVAC,Sum,Generator Ancillary AC Electric Energy [J]
+* HVAC,Sum,Generator Ancillary AC Electric Energy [J]
 
-HVAC,Average,Generator Zone Sensible Heat Transfer Rate [W]
+* HVAC,Average,Generator Zone Sensible Heat Transfer Rate [W]
 
-HVAC,Sum,Generator Zone Sensible Heat Transfer Energy [J]
+* HVAC,Sum,Generator Zone Sensible Heat Transfer Energy [J]
 
-HVAC,Average,Generator Zone Convection Heat Transfer Rate [W]
+* HVAC,Average,Generator Zone Convection Heat Transfer Rate [W]
 
-HVAC,Average,Generator Zone Radiation Heat Transfer Rate [W]
+* HVAC,Average,Generator Zone Radiation Heat Transfer Rate [W]
 
-HVAC,Sum, Generator Fuel Cell Model Iteration Count [ ]
+* HVAC,Sum, Generator Fuel Cell Model Iteration Count [ ]
 
-HVAC,Sum,Generator Regula Falsi Iteration Count [ ]
+* HVAC,Sum,Generator Regula Falsi Iteration Count [ ]
 
 #### Generator Air Inlet Temperature [C]
 
@@ -24933,8 +22049,6 @@ This field contains the name of a Curve:Quadratic input object described elsewhe
 
 where the Curve:Quadratic input object named in this field serves to define the quadratic portion in the first set of brackets. For the Normalized mode the full relation for efficiency is,
 
-
-
 <div>\[{\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot \frac{{{P_{el}}}}{{{P_{nom}}}} + {\varepsilon_2} \cdot {{\left( {\frac{{{P_{el}}}}{{{P_{nom}}}}} \right)}^2}} \right] \cdot {\varepsilon_{nom}} \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_0 {dt - {t_{threshold}},0.0))}  \cdot L} \right]\]</div>
 
 where <span>${\varepsilon_{nom}}$</span>  is the nominal electrical efficiency at the rating point <span>${P_{nom}}$</span>  which are described in the next two fields. The Normalized mode may be more useful for a simulation study that needs to vary the capacity of the FC.
@@ -25067,75 +22181,42 @@ This field is used to describe the maximum operating point for the net DC electr
 
 An example input data file (IDF) entry for this object is provided below:
 
+```idf
 Generator:FuelCell:PowerModule,
-
        FCT SOFC Power Module,     !- Name
-
        Annex42,                                 !- Efficiency Curve Mode
-
        FCT Power Curve,                 !- Efficiency Curve Name
-
        0.354,                                     !- Nominal Efficiency
-
        3400,                                       !- Nominal Electrical Power {W}
-
        0,                                             !- Number of Stops at Start of Simulation
-
        0.0,                                         !- Cycling Performance Degradation Coefficient
-
        0,                                             !- Number of Run Hours at Beginning of Simulation {hr}
-
        0.0,                                         !- Accumulated Run Time Degradation Coefficient
-
        10000,                                     !- Run Time Degradation Initiation Time Threshold {hr}
-
        1.4,                                         !- Power Up Transient Limit {W/s}
-
        0.2,                                         !- Power Down Transient Limit {W/s}
-
        0.0,                                         !- Start Up Time {s}
-
        0.2,                                         !- Start Up Fuel {kmol}
-
        ,                                               !- Start Up Electricity Consumption {J}
-
        0.0,                                         !- Start Up Electricity Produced {J}
-
        0.0,                                         !- Shut Down Time {s}
-
        0.2,                                         !- Shut Down Fuel {kmol}
-
        ,                                               !- Shut Down Electricity Consumption {J}
-
        0.0,                                         !- Ancilliary Electricity Constant Term
-
        0.0,                                         !- Ancilliary Electricity Linear Term
-
        ConstantRate,                       !- Skin Loss Calculation Mode
-
-       ZN\_1\_FLR\_1\_SEC\_5,               !- Zone Name
-
+       ZN_1_FLR_1_SEC_5,               !- Zone Name
        0.6392,                                   !- Skin Loss Radiative Fraction
-
        729,                                         !- Constant Skin Loss Rate {W}
-
        0.0,                                         !- Skin Loss U-Factor Times Area Term {W/K}
-
        ,                                               !- Skin Loss Quadratic Curve Name
-
        6.156E-3,                               !- Dilution Air Flow Rate {kmol/s}
-
        2307,                                       !- Stack Heat loss to Dilution Air {W}
-
        SOFC Air HR Inlet,             !- Dilution Inlet Air Node Name
-
        SOFC Air HR Outlet,           !- Dilution Outlet Air Node Name
-
        3010,                                       !- Minimum Operating Point {W}
-
        3728;                                       !- Maximum Operating Point {W}
-
-
+```
 
 ### Generator:FuelCell:StackCooler
 
@@ -25157,11 +22238,7 @@ This field contains the node name for the water outlet from the stack cooler.
 
 This field contains the nominal stack operating temperature for the PEMFC, <span>$T_{stack}^o$</span>. This field and the next five provide values for use in the empirical equation for the rate of heat extracted from the fuel cell power module by the stack cooler using the following relation
 
-
-
 <div>\[{q_{s - cool}} = \left[ {{r_0} + {r_1}\left( {{T_{stack}} - T_{stack}^o} \right)} \right] \cdot \left[ {1 + {r_2}{P_{el}} + {r_3}P_{el}^2} \right]\]</div>
-
-
 
 #### Field: Actual Stack Temperature]
 
@@ -25291,10 +22368,10 @@ Table 32. Air Intake Heat Recovery Mode Choices
 
 <table class="table table-striped">
 <tr>
-<td>Field Choice</td>
-<td>Inverter Heat Losses Recovered?</td>
-<td>Electrical Storage Heat Losses Recovered?</td>
-<td>Auxiliary Heater Losses Recovered?</td>
+<th>Field Choice</th>
+<th>Inverter Heat Losses Recovered?</th>
+<th>Electrical Storage Heat Losses Recovered?</th>
+<th>Auxiliary Heater Losses Recovered?</th>
 </tr>
 <tr>
 <td>NoRecovery   </td>
@@ -25354,97 +22431,59 @@ These fields describe the molar fraction of the air stream constituents. It is v
 
 An example input data file (IDF) entry for this object is provided below:
 
+```idf
    Generator:FuelCell:AirSupply,
-
        FCT SOFC Air Supply,         !- Name
-
        SOFC Air Inlet Node,         !- Air Inlet Node Name
-
        FCT Blower Power Curve,   !- Blower Power Curve Name
-
        1.0,                                         !- Blower Heat Loss Factor
-
        QuadraticFunctionofElectricPower,   !- Air Supply Rate Calculation Mode
-
        ,                                               !- Stoichiometric Ratio
-
        FCT Excess Air Ratio Curve,   !- Air Rate Function of Electric Power Curve Name
-
        2.83507E-3,                           !- Air Rate Air Temperature Coefficient
-
        ,                                               !- Air Rate Function of Fuel Rate Curve Name
-
        NoRecovery,                           !- Air Intake Heat Recovery Mode
-
        UserDefinedConstituents,   !- Air Supply Constituent Mode
-
        5,                                             !- Number of UserDefined Constituents
-
        Nitrogen,                               !- Constituent 1 Name
-
        0.7728,                                   !- Molar Fraction 1
-
        Oxygen,                                   !- Constituent 2 Name
-
        0.2073,                                   !- Molar Fraction 2
-
        Water,                                     !- Constituent 3 Name
-
        0.0104,                                   !- Molar Fraction 3
-
        Argon,                                     !- Constituent 4 Name
-
        0.0092,                                   !- Molar Fraction 4
-
        CarbonDioxide,                     !- Constituent 5 Name
-
        0.0003;                                   !- Molar Fraction 5
+```
 
 ### Generator:FuelCell:WaterSupply
 
 This object is used to provide details of the water supply subsystem. This water is used for steam reforming of the fuel and is not the same as the water used for thermal heat recovery.
 
+```idd
 Generator:FuelCell:WaterSupply,
-
-   A1, \\field Name
-
-           \\required-field
-
-           \\reference FCWaterSupNames
-
-   A2, \\field Reformer Water Flow Rate Function of Fuel Rate Curve Name
-
-           \\type object-list
-
-           \\object-list QuadraticCurves
-
-   A3, \\field Reformer Water Pump Power Function of Fuel Rate Curve Name
-
-           \\type object-list
-
-           \\object-list QubicCurves
-
-   N1, \\field Pump Heat Loss Factor
-
-   A4, \\field Water Temperature Modeling Mode
-
-           \\type choice
-
-           \\key TemperatureFromAirNode
-
-           \\key TemperatureFromWaterNode
-
-           \\key TemperatureFromSchedule
-
-           \\key MainsWaterTemperature
-
-   A5, \\field Water Temperature Reference Node Name
-
-   A6; \\field Water Temperature Schedule Name
-
-           \\type object-list
-
-           \\object-list ScheduleNames
+   A1, \field Name
+           \required-field
+           \reference FCWaterSupNames
+   A2, \field Reformer Water Flow Rate Function of Fuel Rate Curve Name
+           \type object-list
+           \object-list QuadraticCurves
+   A3, \field Reformer Water Pump Power Function of Fuel Rate Curve Name
+           \type object-list
+           \object-list QubicCurves
+   N1, \field Pump Heat Loss Factor
+   A4, \field Water Temperature Modeling Mode
+           \type choice
+           \key TemperatureFromAirNode
+           \key TemperatureFromWaterNode
+           \key TemperatureFromSchedule
+           \key MainsWaterTemperature
+   A5, \field Water Temperature Reference Node Name
+   A6; \field Water Temperature Schedule Name
+           \type object-list
+           \object-list ScheduleNames
+```
 
 #### Field: Name
 
@@ -25484,55 +22523,33 @@ This field is used to define the name of a schedule, defined elsewhere in the in
 
 An example input data file (IDF) entry for this object is provided below:
 
+```idf
    Generator:FuelCell:WaterSupply,
-
        FCT SOFC Water Supply,     !- Name
-
        Null Quadratic,                   !- Reformer Water Flow Rate Function of Fuel Rate Curve Name
-
        Null Cubic,                           !- Reformer Water Pump Power Function of Fuel Rate Curve Name
-
        0.0,                                         !- Pump Heat Loss Factor
-
        TemperatureFromAirNode,   !- Water Temperature Modeling Mode
-
        SOFC Air Inlet Node,         !- Water Temperature Reference Node Name
-
        ;                                               !- Water Temperature Schedule Name
 
-
-
    Curve:Quadratic,
-
        Null Quadratic,                   !- Name
-
        0.0,                                         !- Coefficient1 Constant
-
        0.0,                                         !- Coefficient2 x
-
-       0.0,                                         !- Coefficient3 x\*\*2
-
+       0.0,                                         !- Coefficient3 x**2
        -1.0E+10,                               !- Minimum Value of x
-
        1.0E+10;                                 !- Maximum Value of x
-
-
 
    Curve:Cubic,
-
        Null Cubic,                           !- Name
-
        0.0,                                         !- Coefficient1 Constant
-
        0.0,                                         !- Coefficient2 x
-
-       0.0,                                         !- Coefficient3 x\*\*2
-
-       0.0,                                         !- Coefficient4 x\*\*3
-
+       0.0,                                         !- Coefficient3 x**2
+       0.0,                                         !- Coefficient4 x**3
        -1.0E+10,                               !- Minimum Value of x
-
        1.0E+10;                                 !- Maximum Value of x
+```
 
 ### Generator:FuelCell:AuxiliaryHeater
 
@@ -25594,32 +22611,21 @@ This field is used to describe the minimum fuel use rate for the auxiliary burne
 
 An example input data file (IDF) entry for this object is provided below:
 
+```idf
    Generator:FuelCell:AuxiliaryHeater,
-
        FCT SOFC Auxiliary Heater,   !- Name
-
        0.0,                                         !- Excess Air Ratio
-
        0.0,                                         !- Ancilliary Power Constant Term
-
        0.0,                                         !- Ancilliary Power Linear Term
-
        0.5,                                         !- Skin Loss U-Factor Times Area Value
-
        SurroundingZone,                 !- Skin Loss Destination
-
-       ZN\_1\_FLR\_1\_SEC\_5,               !- Zone Name to Receive Skin Losses
-
+       ZN_1_FLR_1_SEC_5,               !- Zone Name to Receive Skin Losses
        Watts,                                     !- Heating Capacity Units
-
        0.0,                                         !- Maximum Heating Capacity in Watts
-
        0.0,                                         !- Minimum Heating Capacity in Watts
-
        ,                                               !- Maximum Heating Capacity in Kmol per Second
-
        ;                                               !- Minimum Heating Capacity in Kmol per Second
-
+```
 
 
 Generator:FuelCell:ExhaustGasToWaterHeatExchanger
@@ -25760,55 +22766,33 @@ An example input data file (IDF) entry for this object is provided below:
 
 
 
+```idf
    Generator:FuelCell:ExhaustGasToWaterHeatExchanger,
-
        FCT SOFC Exhaust HX,         !- Name
-
        Small SOFC Heat Rec Inlet Node,   !- Heat Recovery Water Inlet Node Name
-
        Small SOFC Heat Rec Outlet Node,   !- Heat Recovery Water Outlet Node Name
-
        0.0004,                                   !- Heat Recovery Water Maximum Flow Rate {m3/s}
-
        SOFC Air Outlet Node,       !- Exhaust Outlet Air Node Name
-
        CONDENSING,                           !- Heat Exchanger Calculation Method
-
        ,                                               !- Method 1 Heat Exchanger Effectiveness
-
        83.1,                                       !- Method 2 Parameter hxs0
-
        4798,                                       !- Method 2 Parameter hxs1
-
        -138E+3,                                 !- Method 2 Parameter hxs2
-
        -353.8E+3,                             !- Method 2 Parameter hxs3
-
        5.15E+8,                                 !- Method 2 Parameter hxs4
-
        ,                                               !- Method 3 h0Gas Coefficient
-
        ,                                               !- Method 3 NdotGasRef Coefficient
-
        ,                                               !- Method 3 n Coefficient
-
        ,                                               !- Method 3 Gas Area
-
        ,                                               !- Method 3 h0 Water Coefficient
-
        ,                                               !- Method 3 N dot Water ref Coefficient
-
        ,                                               !- Method 3 m Coefficient
-
        ,                                               !- Method 3 Area Water Coefficient
-
        ,                                               !- Method 3 F Adjustment Factor
-
        -1.96E-4,                               !- Method 4 hxl1 Coefficient
-
        3.1E-3,                                   !- Method 4 hxl2 Coefficient
-
        35.0;                                       !- Method 4 Condensation Threshold {C}
+```
 
 ### Generator:FuelCell:ElectricalStorage
 
@@ -25860,23 +22844,17 @@ An example input data file (IDF) entry for this object is provided below:
 
 
 
+```idf
    Generator:FuelCell:ElectricalStorage,
-
        FCT SOFC Battery,               !- Name
-
        SimpleEfficiencyWithConstraints,   !- Choice of Model
-
        1.0,                                         !- Nominal Charging Energetic Efficiency
-
        1.0,                                         !- Nominal Discharging Energetic Efficiency
-
        0,                                             !- Simple Maximum Capacity {J}
-
        0,                                             !- Simple Maximum Power Draw {W}
-
        0,                                             !- Simple Maximum Power Store {W}
-
        0;                                             !- Initial Charge State {J}
+```
 
 ### Generator:FuelCell:Inverter
 
@@ -25904,31 +22882,22 @@ An example input data file (IDF) entry for this object is provided below:
 
 
 
+```idf
    Generator:FuelCell:Inverter,
-
        FCT SOFC Inverter,             !- Name
-
        Quadratic,                             !- Inverter Efficiency Calculation Mode
-
        ,                                               !- Inverter Efficiency
-
        FCT Inverter Quadratic;   !- Efficiency Function of DC Power Curve Name
 
 
-
    Curve:Quadratic,
-
        FCT Inverter Quadratic,   !- Name
-
        0.560717,                               !- Coefficient1 Constant
-
        1.24019E-4,                           !- Coefficient2 x
-
-       -2.01648E-8,                         !- Coefficient3 x\*\*2
-
+       -2.01648E-8,                         !- Coefficient3 x**2
        -1.0E+10,                               !- Minimum Value of x
-
        1.0E+10;                                 !- Maximum Value of x
+```
 
 ### Generator:FuelSupply
 
@@ -26046,11 +23015,11 @@ This field is the name of a surface that defines the location and geometry of th
 
 This field is the type of PV performance model.   The choices are the class names for the three modeling options:
 
-PhotovoltaicPerformance:Simple
+* PhotovoltaicPerformance:Simple
 
-PhotovoltaicPerformance:EquivalentOne-Diode
+* PhotovoltaicPerformance:EquivalentOne-Diode
 
-PhotovoltaicPerformance:Sandia.
+* PhotovoltaicPerformance:Sandia.
 
 #### Field: Module Performance Name
 
@@ -26084,17 +23053,17 @@ This field is the number of modules wired in series (on each string) to form the
 
 Using the Generator:PV:Simple object makes a number of output variables available.\\
 
-HVAC,Average,Generator Produced DC Electric Power [W]
+* HVAC,Average,Generator Produced DC Electric Power [W]
 
-HVAC,Sum,Generator Produced DC Electric Energy [J]
+* HVAC,Sum,Generator Produced DC Electric Energy [J]
 
-HVAC,Average,Generator PV Cell Temperature [C]
+* HVAC,Average,Generator PV Cell Temperature [C]
 
-HVAC,Average,Generator PV Short Circuit Current [A]
+* HVAC,Average,Generator PV Short Circuit Current [A]
 
-HVAC,Average,Generator PV Open Circuit Voltage [V]
+* HVAC,Average,Generator PV Open Circuit Voltage [V]
 
-HVAC,Average,Generator PV Array Efficiency []
+* HVAC,Average,Generator PV Array Efficiency []
 
 #### Generator Produced DC Electric Power [W]
 
@@ -26150,17 +23119,14 @@ This field should be set to the name of schedule defined elsewhere in the input 
 
 An example idf instance of this object follows:
 
+```idf
 PhotovoltaicPerformance:Simple,
-
      Simple PV Flat, !- Name
-
      0.1044 , !- Fraction of Surface area that has active solar cells
-
      FIXED ,   !- Conversion efficiency input mode
-
      0.12 ,     !- Value for cell efficiency if fixed
-
          ;           !- Name of Schedule that Defines Efficiency
+```
 
 ### PhotovoltaicPerformance:EquivalentOne-Diode
 
@@ -26172,16 +23138,16 @@ Table 33. Photovoltaics Array Types with Values
 
 <table class="table table-striped">
 <tr>
-<td>  </td>
-<td>Short Circuit Current</td>
-<td>Open Circuit Voltage</td>
-<td>Voltage at Maximum Power</td>
-<td>Current at Maximum Power</td>
-<td>Temperature Coefficient of Short Circuit Current</td>
-<td>Temperature Coefficient of Open Circuit Voltage</td>
-<td>Number of Cells in Series per Module</td>
-<td>Cell Temperature at NOCT Conditions</td>
-<td>Module Area</td>
+<th>  </th>
+<th>Short Circuit Current</th>
+<th>Open Circuit Voltage</th>
+<th>Voltage at Maximum Power</th>
+<th>Current at Maximum Power</th>
+<th>Temperature Coefficient of Short Circuit Current</th>
+<th>Temperature Coefficient of Open Circuit Voltage</th>
+<th>Number of Cells in Series per Module</th>
+<th>Cell Temperature at NOCT Conditions</th>
+<th>Module Area</th>
 </tr>
 <tr>
 <td>Units:</td>
@@ -26439,29 +23405,29 @@ Table 33. Photovoltaics Array Types with Values
 
 Where:
 
-Shunt Resistance: the value of shunt resistance is finite only if the PV Module being modeled is a thin film variety. For all crystaline silicon modules the value is essentially infinite
+* Shunt Resistance: the value of shunt resistance is finite only if the PV Module being modeled is a thin film variety. For all crystaline silicon modules the value is essentially infinite
 
-Shunt Resistance value: 1,000,000 W (ohms)
+* Shunt Resistance value: 1,000,000 W (ohms)
 
-Module Heat Loss Coefficient: this value is dependent more on the array configuration than on the module itself.
+* Module Heat Loss Coefficient: this value is dependent more on the array configuration than on the module itself.
 
-Module Heat Loss Coefficient value: 30 W/m2-K
+* Module Heat Loss Coefficient value: 30 W/m2-K
 
-Module Heat Capacity: this is a typical value for a silicon based sandwich construction framed PV panel.
+* Module Heat Capacity: this is a typical value for a silicon based sandwich construction framed PV panel.
 
-Module Heat Capacity Value: 50,000 J/m2-K
+* Module Heat Capacity Value: 50,000 J/m2-K
 
-Reference Temperature: 298K (25C)
+* Reference Temperature: 298K (25C)
 
-Insolation at Reference Conditions: 1000 W/m2
+* Insolation at Reference Conditions: 1000 W/m2
 
-Ambient Temperature at NOCT conditions: 293K (20C)
+* Ambient Temperature at NOCT conditions: 293K (20C)
 
-Insolation at NOCT Conditions: 800 W/m2
+* Insolation at NOCT Conditions: 800 W/m2
 
-Average tau-alpha Product: .9
+* Average tau-alpha Product: .9
 
-Semiconductor Bandgap: 1.12 eV
+* Semiconductor Bandgap: 1.12 eV
 
 
 
@@ -26549,47 +23515,29 @@ This field is the heat capacity (in J/m<sup>2</sup>.K) of the modules in the arr
 
 An IDF example:
 
+```idf
 PhotovoltaicPerformance:EquivalentOne-Diode,
-
        Siemens, ! Name
-
        CrystallineSilicon, !cell Type
-
        36,           !cells in series [-]
-
        1.0,         !module area [m2]
-
        0.9,         !tau alpha product at normal incidence [-]
-
        1.12,       !electron bandgap [eV]
-
        1000000, !shunt resistance [ohms]
-
        6.5,         !short circuit current at reference conditions [A/K]
-
        21.6,       !open circuit voltage at reference conditions [V/K]
-
        25,           !temperature at reference conditions [C]
-
        1000,       !radiation at reference conditions [W/m2]
-
        5.9,         !current at max power
-
        17,           !voltage at max power
-
        0.002,     !temperature coefficient of short circuit current
-
        -0.079,   !temperature coefficient of open circuit voltage
-
        20,           !ambient temperature at NOCT [C]
-
        45,           !cell temperature at NOCT [C]
-
        800,         !radiation at NOCT [W/m2]
-
        30,           !heat loss coefficient [W/m2.K]
-
        50000;     !total heat capacity (only used in TC mode 1)
+```
 
 
 
@@ -26769,95 +23717,54 @@ Units m<sup>2</sup> , real number, area of active solar electric cell for the en
 
 An example of the object follows:
 
+```idf
 PhotovoltaicPerformance:Sandia,
-
-     ASE-50-ATF-17\_45, ! Module Name (production Name)
-
+     ASE-50-ATF-17_45, ! Module Name (production Name)
      0.43, ! field Active Area Acoll {m2}, single module
-
      36, ! NcellSer {unitless}
-
      1, ! NparSerCells
-
      2.90, ! Isc0 {Amps}
-
      20.70, ! Voc0 {Volts}
-
      2.65, ! Imp0 {Amps}
-
      17.00, ! Vmp0 {Volts}
-
      7.8e-04, ! aIsc {1/degC}
-
      1.0e-04, ! aImp {1/degC}
-
      0.99, ! C0 {unitless}
-
      3.0e-03, ! C1 {unitless}
-
      -0.07, ! BVoc0 {Volts/degC}
-
      0.00, ! mBVoc {Volts/degC}
-
      -0.07, ! BVmp0 {Volts/degC}
-
      0.00, ! mBVmp {Volts/degC}
-
      1.29, ! Diode Factor (n) {Unitless}
 
 
-
      0.20, ! C2 {Unitless}
-
      -8.60, ! C3 {Unitless}
-
      0.93, ! A0 {Unitless}
-
      0.05, ! A1 {Unitless}
-
      -7.9402e-03, ! A2 {Unitless}
-
      5.2228e-04, ! A3 {Unitless}
-
      -1.3142e-05, ! A4 {Unitless}
-
      1.00, ! B0 {Unitless}
-
      -2.438e-03, ! B1 {Unitless}
-
      3.103e-04, ! B2 {Unitless}
-
      -1.246e-05, ! B3 {Unitless}
-
      2.112e-07, ! B4 {Unitless}
-
      -1.359e-09, ! B5 {Unitless}
-
      3.00, ! dT0 {degC}
-
      1.00, ! fd {Unitless}
-
      -3.47, ! a {Unitless}
-
      -0.05, ! b {Unitless}
-
      0.98, ! C4 {Unitless}
-
      0.01, ! C5 {Unitless}
-
      2.86, ! Ix0 {Amps}
-
      1.85, ! Ixx0 {Amps}
-
      1.13, ! C6 {Unitless}
-
      -0.13, ! C7 {Unitless}
-
      -1.359e-09, ! B5 {Unitless}
-
      3.00, ! dT0 {degC}
-
      1.00; ! fd {Unitless}
+```
 
 When using EpMacro with an typical installation of EnergyPlus, the above entry can be included in an input file by adding the following two lines to an input macro file (\*.imf).
 
@@ -26998,12 +23905,12 @@ If the user does not input any field of these parameters, the simple approximati
 
 <table class="table table-striped">
 <tr>
-<td>C<sub>1</sub></td>
-<td>C<sub>2</sub></td>
-<td>C<sub>3</sub></td>
-<td>C<sub>4</sub></td>
-<td>C<sub>5</sub></td>
-<td>C<sub>6</sub></td>
+<th>C<sub>1</sub></th>
+<th>C<sub>2</sub></th>
+<th>C<sub>3</sub></th>
+<th>C<sub>4</sub></th>
+<th>C<sub>5</sub></th>
+<th>C<sub>6</sub></th>
 </tr>
 <tr>
 <td>0.5176</td>
@@ -27019,81 +23926,59 @@ These fields are only valid for HAWT systems.
 
 An example input for the wind turbine is shown in below.
 
+```idf
 Generator:WindTurbine,
-
 WT1,                     ! Name
-
 WT Schedule,     ! Availability Schedule Name
-
 HorizontalAxisWindTurbine,     ! Rotor type
-
 FixedSpeedVariablePitch,         ! Power control type
-
 41,                       ! Maximum rotational speed of the rotor {rev/min}
-
 19.2,                   ! Diameter of the rotor {m}
-
 30.5,                   ! Overall height of the system {m}
-
 3,                         ! Number of blades
-
 55000,                 ! Rated power output at the rated wind speed {W}
-
 11,                       ! Rated wind speed {m/s}
-
 3.5,                     ! Cut In wind speed {m/s}
-
 25,                       ! Cut Out wind speed {m/s}
-
 0.835,                 ! Overall wind turbine system efficiency
-
 8,                         ! Maximum tip speed ratio
-
 0.4,                     ! Maximum power coefficient
-
 6.4,                     ! Annual local wind speed {m/s}
-
 50,                       ! Height of local meteorological station {m}
-
 ,                           ! Blade chord area {m2}
-
 ,                           ! Blade drag coefficient
-
 ,                           ! Blade lift coefficient
-
 0.5176,               ! Power Coefficient C1
-
 116,                     ! Power Coefficient C2
-
 0.4,                     ! Power Coefficient C3
-
 0,                         ! Power Coefficient C4
-
 5,                         ! Power Coefficient C5
-
 21;                       ! Power Coefficient C6
+```
+
 
 ### Generator:WindTurbine Outputs
 
-HVAC,Average, Generator Produced Electric Power [W]
+* HVAC,Average, Generator Produced Electric Power [W]
 
-HVAC,Sum, Generator Produced Electric Energy [J]
+* HVAC,Sum, Generator Produced Electric Energy [J]
 
-HVAC,Average, Generator Turbine Local Wind Speed [m/s]
+* HVAC,Average, Generator Turbine Local Wind Speed [m/s]
 
-HVAC,Average, Generator Turbine Local Air Density [kg/m3]
+* HVAC,Average, Generator Turbine Local Air Density [kg/m3]
 
-HVAC,Average, Generator Turbine Power Coefficient []
+* HVAC,Average, Generator Turbine Power Coefficient []
 
-HVAC,Average, Generator Turbine Tip Speed Ratio []
+* HVAC,Average, Generator Turbine Tip Speed Ratio []
 
-HVAC,Average, Generator Turbine Chordal Component Velocity [m/s]
+* HVAC,Average, Generator Turbine Chordal Component Velocity [m/s]
 
-HVAC,Average, Generator Turbine Normal Component Velocity [m/s]
+* HVAC,Average, Generator Turbine Normal Component Velocity [m/s]
 
-HVAC,Average, Generator Turbine Relative Flow Velocity [m/s]
+* HVAC,Average, Generator Turbine Relative Flow Velocity [m/s]
 
-HVAC,Average, Generator Turbine Attack Angle [deg]
+* HVAC,Average, Generator Turbine Attack Angle [deg]
+
 
 #### Generator Produced Electric Power [W]
 
@@ -27136,17 +24021,11 @@ This report is the local relative flow velocity that represents actual direction
 This report is the azimuth angle between the relative flow velocity and the plane of chord. It varies as the wind speed increases, so that the lift and drag forces change.
 
 
-
-
-
 ------------------------------------------------------------------------
 
 [[1]](#_ftnref1) Ulleberg &#216; . (1997) Simulation of autonomous PV-H2 systems: analysis of the PHOEBUS plant design, operation and energy management. In *Proceedings of ISES 1997 Solar World Congress*, August 24-30, Taejon, Korea.
 
 Ulleberg &#216; . (1998) *Stand-Alone Power Systems for the Future: Optimal Design, Operation & Control of Solar-Hydrogen Energy Systems*. PhD thesis, Norwegian University of Science and Technology, Trondheim.
-
-
-
 
 
 Group     Water Systems
@@ -27160,90 +24039,96 @@ In addition to the input objects described in this section below, there are a va
 
 Table 34. Water Systems Objects
 
-**Input Object Name**
-
-**Type of Water Interactions**
-
-Site:Precipitation
-
-Describes rainfall for WaterUse:RainCollector
-
-Coil:Cooling:Water
-
-Condensate collection to WaterUse:Storage
-
-Coil:Cooling:Water:DetailedGeometry
-
-Condensate collection to WaterUse:Storage
-
-Coil:Cooling:DX:SingleSpeed
-
-Optional evaporative condenser can be supplied by WaterUse:Storage
-
-Condensate collection to WaterUse:Storage
-
-Coil:Cooling:DX:TwoSpeed
-
-Evaporative condenser supplied by WaterUse:Storage
-
-Condensate collection to WaterUse:Storage
-
-Coil:Cooling:DX:TwoStageWithHumidityControlMode
-
-Evaporative condenser supplied by WaterUse:Storage
-
-Condensate collection to WaterUse:Storage
-
-Coil:Cooling:DX:MultiSpeed
-
-Evaporative condenser supplied by WaterUse:Storage
-
-Condensate collection to WaterUse:Storage
-
-Humidifier:Steam:Electric
-
-Water supplied by WaterUse:Storage
-
-CoolingTower:SingleSpeed
-
-Water supplied by WaterUse:Storage
-
-CoolingTower:TwoSpeed
-
-Water supplied by WaterUse:Storage
-
-CoolingTower:VariableSpeed
-
-Water supplied by WaterUse:Storage
-
-ZoneCoolTower:Shower
-
-Water supplied by WaterUse:Storage
-
-Refrigeration:CompressorRack
-
-Water supplied by WaterUse:Storage
-
-Refrigeration:Condenser:EvaporativeCooled
-
-Water supplied by WaterUse:Storage
-
-EvaporativeCooler:Direct:CelDekPad
-
-Evaporation water supplied by WaterUse:Storage
-
-EvaporativeCooler:Indirect:CelDekPad
-
-Evaporation water supplied by WaterUse:Storage
-
-EvaporativeCooler:Indirect:WetCoil
-
-Evaporation water supplied by WaterUse:Storage
-
-EvaporativeCooler:Indirect:ResearchSpecial
-
-Evaporation water supplied by WaterUse:Storage
-
+<table class="table table-striped">
+  <tr>
+    <th>Input Object Name</th>
+    <th>Type of Water Interactions</th>
+  </tr>
+  <tr>
+    <td>Site:Precipitation</td>
+    <td>Describes rainfall for WaterUse:RainCollector</td>
+  </tr>
+  <tr>
+    <td>Coil:Cooling:Water</td>
+    <td>Condensate collection to WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>Coil:Cooling:Water:DetailedGeometry</td>
+    <td>Condensate collection to WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Coil:Cooling:DX:SingleSpeed</td>
+    <td>Optional evaporative condenser can be supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>Condensate collection to WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Coil:Cooling:DX:TwoSpeed</td>
+    <td>Evaporative condenser supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>Condensate collection to WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Coil:Cooling:DX:TwoStageWithHumidityControlMode</td>
+    <td>Evaporative condenser supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>Condensate collection to WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Coil:Cooling:DX:MultiSpeed</td>
+    <td>Evaporative condenser supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>Condensate collection to WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>Humidifier:Steam:Electric</td>
+    <td>Water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>CoolingTower:SingleSpeed</td>
+    <td>Water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>CoolingTower:TwoSpeed</td>
+    <td>Water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>CoolingTower:VariableSpeed</td>
+    <td>Water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>ZoneCoolTower:Shower</td>
+    <td>Water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>Refrigeration:CompressorRack</td>
+    <td>Water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>Refrigeration:Condenser:EvaporativeCooled</td>
+    <td>Water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>EvaporativeCooler:Direct:CelDekPad</td>
+    <td>Evaporation water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>EvaporativeCooler:Indirect:CelDekPad</td>
+    <td>Evaporation water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>EvaporativeCooler:Indirect:WetCoil</td>
+    <td>Evaporation water supplied by WaterUse:Storage</td>
+  </tr>
+  <tr>
+    <td>EvaporativeCooler:Indirect:ResearchSpecial</td>
+    <td>Evaporation water supplied by WaterUse:Storage</td>
+  </tr>
+</table>
 
 
 ### WaterUse:Equipment
@@ -27300,107 +24185,84 @@ Reference to the schedule object specifying the fraction of the maximum possible
 
 IDF examples:
 
-   WaterUse:Equipment,
-
+```idf
+WaterUse:Equipment,
    Landscaping,   !- Name
-
    Landscaping,   !- End-Use Subcategory
-
    0.003;               !- Peak Flow Rate {m3/s}
 
-
-
-   WaterUse:Equipment,
-
+WaterUse:Equipment,
    Dishwashing,   !- Name
-
    Domestic Hot Water,   !- End-Use Subcategory
-
    0.001,   !- Peak Flow Rate {m3/s}
-
    Dishwashing Schedule,   !- Flow Rate Fraction Schedule Name
-
    Dishwashing Target Temp,   !- Target Temperature Schedule Name
-
    Hot Water Temp,   !- Hot Water Supply Temperature Schedule Name
-
    Mains Water;   !- Cold Water Supply Temperature Schedule Name
 
-
-
-
-
-   WaterUse:Equipment,
-
+WaterUse:Equipment,
    Showers,   !- Name
-
    Domestic Hot Water,   !- End-Use Subcategory
-
    0.0002,   !- Peak Flow Rate {m3/s}
-
    Shower Schedule,   !- Flow Rate Fraction Schedule Name
-
    Shower Target Temp,   !- Target Temperature Schedule Name
-
    Hot Water Temp,   !- Hot Water Supply Temperature Schedule Name
-
    ,   !- Cold Water Supply Temperature Schedule Name
-
    Shower Room,   !- Zone Name
-
    Sensible Frac Schedule,   !- Sensible Fraction Schedule Name
-
    Latent Frac Schedule;   !- Latent Fraction Schedule Name
+```
+
 
 ### WaterUse:Equipment Outputs
 
 The following output variables are reported for the WaterUse:Equipment object:
 
-HVAC,Average,Water Use Equipment Hot Water Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Equipment Hot Water Mass Flow Rate [kg/s]
 
-HVAC,Average,Water Use Equipment Cold Water Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Equipment Cold Water Mass Flow Rate [kg/s]
 
-HVAC,Average,Water Use Equipment Total Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Equipment Total Mass Flow Rate [kg/s]
 
-HVAC,Average,Water Use Equipment Hot Water Volume Flow Rate [m3/s]
+* HVAC,Average,Water Use Equipment Hot Water Volume Flow Rate [m3/s]
 
-HVAC,Average,Water Use Equipment Cold Water Volume Flow Rate [m3/s]
+* HVAC,Average,Water Use Equipment Cold Water Volume Flow Rate [m3/s]
 
-HVAC,Average,Water Use Equipment Total Volume Flow Rate [m3/s]
+* HVAC,Average,Water Use Equipment Total Volume Flow Rate [m3/s]
 
-HVAC,Sum,Water Use Equipment Hot Water Volume [m3]
+* HVAC,Sum,Water Use Equipment Hot Water Volume [m3]
 
-HVAC,Sum,Water Use Equipment Cold Water Volume [m3]
+* HVAC,Sum,Water Use Equipment Cold Water Volume [m3]
 
-HVAC,Sum,Water Use Equipment Total Volume [m3]
+* HVAC,Sum,Water Use Equipment Total Volume [m3]
 
-HVAC,Sum,Water Use Equipment Mains Water Volume [m3]
+* HVAC,Sum,Water Use Equipment Mains Water Volume [m3]
 
-HVAC,Average,Water Use Equipment Hot Water Temperature [C]
+* HVAC,Average,Water Use Equipment Hot Water Temperature [C]
 
-HVAC,Average,Water Use Equipment Cold Water Temperature [C]
+* HVAC,Average,Water Use Equipment Cold Water Temperature [C]
 
-HVAC,Average,Water Use Equipment Target Water Temperature [C]
+* HVAC,Average,Water Use Equipment Target Water Temperature [C]
 
-HVAC,Average,Water Use Equipment Mixed Water Temperature [C]
+* HVAC,Average,Water Use Equipment Mixed Water Temperature [C]
 
-HVAC,Average,Water Use Equipment Drain Water Temperature [C]
+* HVAC,Average,Water Use Equipment Drain Water Temperature [C]
 
-HVAC,Average,Water Use Equipment Heating Rate [W]
+* HVAC,Average,Water Use Equipment Heating Rate [W]
 
-HVAC,Sum,Water Use Equipment Heating Energy [J]
+* HVAC,Sum,Water Use Equipment Heating Energy [J]
 
-HVAC,Average,Water Use Equipment Zone Sensible Heat Gain Rate [W]
+* HVAC,Average,Water Use Equipment Zone Sensible Heat Gain Rate [W]
 
-HVAC,Sum,Water Use Equipment Zone Sensible Heat Gain Energy [J]
+* HVAC,Sum,Water Use Equipment Zone Sensible Heat Gain Energy [J]
 
-HVAC,Average,Water Use Equipment Zone Latent Gain Rate [W]
+* HVAC,Average,Water Use Equipment Zone Latent Gain Rate [W]
 
-HVAC,Sum,Water Use Equipment Zone Latent Gain Energy [J]
+* HVAC,Sum,Water Use Equipment Zone Latent Gain Energy [J]
 
-HVAC,Average,Water Use Equipment Zone Moisture Gain Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Equipment Zone Moisture Gain Mass Flow Rate [kg/s]
 
-HVAC,Sum,Water Use Equipment Zone Moisture Gain Mass [kg]
+* HVAC,Sum,Water Use Equipment Zone Moisture Gain Mass [kg]
 
 #### Water Use Equipment Hot Water Mass Flow Rate [kg/s]
 
@@ -27566,81 +24428,69 @@ References to WaterUse:Equipment objects.
 
 IDF examples:
 
+```idf
 WaterUse:Connections,
-
    Domestic Water Uses,   !- Name
-
    Water Eq Inlet Node,   !- Inlet Node Name
-
    Water Eq Outlet Node, !- Outlet Node Name
-
    Rainwater Storage,   !- Supply Water Storage Tank Name
-
    Graywater Storage,   !- Reclamation Water Storage Tank Name
-
    ,   !- Hot Water Supply Temperature Schedule Name
-
    ,   !- Cold Water Supply Temperature Schedule Name
-
    CounterFlow,   !- Drain Water Heat Exchanger Type
-
    Plant,   !- Drain Water Heat Exchanger Destination
-
    1500,   !- Drain Water Heat Exchanger U-Factor Times Area {W/K}
-
    Sinks,   !- Water Use Equipment 1 Name
-
    Showers,   !- Water Use Equipment 2 Name
-
    Dishwasher,   !-   Water Use Equipment 3 Name
-
    Clotheswasher;   !- Water Use Equipment 4 Name
+```
 
 ### WaterUse:Connections Outputs
 
 The following output variables are reported for the WaterUse:Connections object:
 
-HVAC,Average,Water Use Connections Hot Water Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Connections Hot Water Mass Flow Rate [kg/s]
 
-HVAC,Average,Water Use Connections Cold Water Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Connections Cold Water Mass Flow Rate [kg/s]
 
-HVAC,Average,Water Use Connections Total Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Connections Total Mass Flow Rate [kg/s]
 
-HVAC,Average,Water Use Connections Drain Water Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Connections Drain Water Mass Flow Rate [kg/s]
 
-HVAC,Average,Water Use Connections Heat Recovery Mass Flow Rate [kg/s]
+* HVAC,Average,Water Use Connections Heat Recovery Mass Flow Rate [kg/s]
 
-HVAC,Average,Water Use Connections Hot Water Volume Flow Rate [m3/s]
+* HVAC,Average,Water Use Connections Hot Water Volume Flow Rate [m3/s]
 
-HVAC,Average,Water Use Connections Cold Water Volume Flow Rate [m3/s]
+* HVAC,Average,Water Use Connections Cold Water Volume Flow Rate [m3/s]
 
-HVAC,Average,Water Use Connections Total Volume Flow Rate [m3/s]
+* HVAC,Average,Water Use Connections Total Volume Flow Rate [m3/s]
 
-HVAC,Sum,Water Use Connections Hot Water Volume [m3]
+* HVAC,Sum,Water Use Connections Hot Water Volume [m3]
 
-HVAC,Sum,Water Use Connections Cold Water Volume [m3]
+* HVAC,Sum,Water Use Connections Cold Water Volume [m3]
 
-HVAC,Sum,Water Use Connections Total Volume [m3]
+* HVAC,Sum,Water Use Connections Total Volume [m3]
 
-HVAC,Average,Water Use Connections Hot Water Temperature [C]
+* HVAC,Average,Water Use Connections Hot Water Temperature [C]
 
-HVAC,Average,Water Use Connections Cold Water Temperature [C]
+* HVAC,Average,Water Use Connections Cold Water Temperature [C]
 
-HVAC,Average,Water Use Connections Drain Water Temperature [C]
+* HVAC,Average,Water Use Connections Drain Water Temperature [C]
 
-HVAC,Average,Water Use Connections Return Water Temperature [C]
+* HVAC,Average,Water Use Connections Return Water Temperature [C]
 
-HVAC,Average,Water Use Connections Waste Water Temperature [C]
+* HVAC,Average,Water Use Connections Waste Water Temperature [C]
 
-HVAC,Average,Water Use Connections Heat Recovery Water Temperature [C]
+* HVAC,Average,Water Use Connections Heat Recovery Water Temperature [C]
 
-HVAC,Average,Water Use Connections Heat Recovery Effectiveness []
+* HVAC,Average,Water Use Connections Heat Recovery Effectiveness []
 
-HVAC,Average,Water Use Connections Heat Recovery Rate [W]
+* HVAC,Average,Water Use Connections Heat Recovery Rate [W]
 
-HVAC,Sum,Water Use Connections Heat Recovery Energy [J]
+* HVAC,Sum,Water Use Connections Heat Recovery Energy [J]
 
-HVAC,Sum,Water Use Connections Plant Hot Water Energy [J]
+* HVAC,Sum,Water Use Connections Plant Hot Water Energy [J]
 
 
 
@@ -27818,47 +24668,29 @@ Reserved for future zone thermal model.
 
 IDF examples:
 
+```idf
   WaterUse:Storage,
-
    Tower 2 water tank, !- Name
-
    Tower water make up Holding tank, !- Water Quality Subcategory
-
    30.0 , !- Maximum Capacity {m3}
-
    10.0 , !- Initial Volume   {m3}
-
    20.0, !- Design In Flow Rate {m3}
-
    20.0, !- Design Out Flow Rate {m3}
-
    ,   !- Overflow Destination
-
    Mains, !- Type of Supply Controlled by Float Valve
-
    8.0 , !- Float Valve On Capacity {m3}
-
    10.0,   !- Float Valve Off Capacity {m3}
-
    3.0, !- Backup Mains Capacity {m3}
-
    ,   !- Other Tank Name
-
    ScheduledTemperature , !- Water Thermal Mode
-
    Water Tank Temp Sched , !- Water Temperature Schedule Name
-
    , !- Ambient Temperature Indicator
-
    , !- Ambient Temperature Schedule Name
-
    , !- Zone Name
-
    , !- Tank Surface Area {m2}
-
    , !- Tank U Value {W/m2-K}
-
    ; !- Tank Outside Surface Material Name
+```
 
 
 
@@ -27866,25 +24698,25 @@ IDF examples:
 
 The following output variables are available for reporting for each WaterUse:Storage object.
 
-HVAC,Average,Water System Storage Tank Volume [m3]
+* HVAC,Average,Water System Storage Tank Volume [m3]
 
-HVAC,Average,Water System Storage Tank Net Volume Flow Rate [m3/s]
+* HVAC,Average,Water System Storage Tank Net Volume Flow Rate [m3/s]
 
-HVAC,Average,Water System Storage Tank Inlet Volume Flow Rate [m3/s]
+* HVAC,Average,Water System Storage Tank Inlet Volume Flow Rate [m3/s]
 
-HVAC,Average,Water System Storage Tank Outlet Volume Flow Rate [m3/s]
+* HVAC,Average,Water System Storage Tank Outlet Volume Flow Rate [m3/s]
 
-HVAC,Sum,Water System Storage Tank Mains Water Volume [m3]
+* HVAC,Sum,Water System Storage Tank Mains Water Volume [m3]
 
-HVAC,Average,Water System Storage Tank Mains Water Volume Flow Rate [m3/s]
+* HVAC,Average,Water System Storage Tank Mains Water Volume Flow Rate [m3/s]
 
-HVAC,Average,Water System Storage Tank Water Temperature [C]
+* HVAC,Average,Water System Storage Tank Water Temperature [C]
 
-HVAC,Average,Water System Storage Tank Overflow Volume Flow Rate [m3/s]
+* HVAC,Average,Water System Storage Tank Overflow Volume Flow Rate [m3/s]
 
-HVAC,Sum,Water System Storage Tank Overflow Water Volume [m3]
+* HVAC,Sum,Water System Storage Tank Overflow Water Volume [m3]
 
-HVAC,Average,Water System Storage Tank Overflow Temperature [C]
+* HVAC,Average,Water System Storage Tank Overflow Temperature [C]
 
 #### Water System Storage Tank Volume [m3]
 
@@ -27962,33 +24794,26 @@ A reference to the name of a surface object which will collect the rain. Typical
 
 IDF examples:
 
+```idf
 WaterUse:RainCollector,
-
    My Test Rain Collector ,!- Name
-
    My Test Tank ,   !-   Storage Tank Name
-
    CONSTANT,   !- Loss Factor Mode
-
    0.9 ,   !- Collection Loss Factor
-
    ,   !- Collection Loss Factor Schedule Name
-
    1.0 ,   !- Maximum Collection Rate
-
    SouthRoof ,   !- Collection Surface 1 Name
-
    NorthRoof1,   !- Collection Surface 2 Name
-
    NorthRoof3 ,   !- Collection Surface 3 Name
-
    NorthRoof2 ;   !- Collection Surface 4 Name
+```
+
 
 ### WaterUse:RainCollector Outputs
 
-HVAC,Average,Water System Rainwater Collector Volume Flow Rate [m3/s]
+* HVAC,Average,Water System Rainwater Collector Volume Flow Rate [m3/s]
 
-HVAC,Sum,Water System Rainwater Collector Volume [m3]
+* HVAC,Sum,Water System Rainwater Collector Volume [m3]
 
 #### Water System Rainwater Collector Volume Flow Rate [m3/s]
 
@@ -28054,45 +24879,36 @@ Reserved for future use.
 
 An example input object:
 
+```idf
 WaterUse:Well,
-
    My Test Well,   !- Name
-
    Tower 1 Water Tank,   !- Storage Tank Name
-
    ,   !- Pump Depth
-
    0.1,   !- Pump Rated Flow Rate {m3/s}
-
    ,   !- Pump Rated Head {Pa}
-
    120,   !- Pump Rated Power Consumption {W}
-
    ,   !- Pump Efficiency
-
    ,   !- Well Recovery Rate {m3/s}
-
    ,   !- Nominal Well Storage Volume {m3}
-
    ,   !- Water Table Depth Mode
-
    ,   !- Water Table Depth
-
    ;   !- Water Table Depth Schedule Name
+```
+
 
 ### WaterUse:Well Outputs
 
 The following output variables are available for reporting for each WaterUse:Well object.
 
-HVAC,Average,Water System Groundwater Well Requested Volume Flow Rate [m3/s]
+* HVAC,Average,Water System Groundwater Well Requested Volume Flow Rate [m3/s]
 
-HVAC,Average,Water System Groundwater Well Volume Flow Rate [m3/s]
+* HVAC,Average,Water System Groundwater Well Volume Flow Rate [m3/s]
 
-HVAC,Sum,Water System Groundwater Well Volume [m3]
+* HVAC,Sum,Water System Groundwater Well Volume [m3]
 
-HVAC,Average,Water System Groundwater Well Pump Electric Power [W]
+* HVAC,Average,Water System Groundwater Well Pump Electric Power [W]
 
-HVAC,Sum,Water System Groundwater Well Pump Electric Energy [J]
+* HVAC,Sum,Water System Groundwater Well Pump Electric Energy [J]
 
 #### Water System Groundwater Well Requested Volume Flow Rate [m3/s]
 
@@ -28995,21 +25811,13 @@ Following is an input example.
 
 ```idf
    Curve:Quartic,
-
        BGSeries60,                                 !- y = -611.41x4 + 192.68x3 - 88.843x2 + 4.7634x + 5.5656
-
        5.5656,                                         !- Constant
-
        4.7634,                                         !- 1st coefficient
-
        -88.843,                                       !- 2nd coefficient
-
        192.68,                                         !- 3rd coefficient
-
        -611.41,                                       !- 4th coefficient
-
        0.0,                                               !- Min Phi Value
-
        0.2412;                                         !- Max Phi Value
 ```
 
@@ -29017,25 +25825,15 @@ The following is another example, as might be applied in the Fan:ComponentModel 
 
 ```idf
    Curve:Quartic,
-
        BeltMaxEffMedium,                               ! Curve Name
-
        -0.09504,                                               ! CoefficientC1
-
        0.03415,                                                 ! CoefficientC2
-
        -0.008897,                                             ! CoefficientC3
-
        0.001159,                                               ! CoefficientC4
-
        -0.00006132,                                         ! CoefficientC5
-
        -1.2,                                                       ! Minimum Value of x
-
        6.2,                                                         ! Maximum Value of x
-
        -4.6,                                                       ! Minimum Curve Output
-
        0.;                                                           ! Maximum Curve Output
 ```
 
@@ -29108,23 +25906,14 @@ Following is an input example.
 
 ```idf
    Curve:Exponent,
-
 !     Curve = C1 + C2\*x\*\*C3, x = fan speed ratio
-
        FanPowerExponentCurve, !- Name
-
        0.0,                                     !- Coefficient1 Constant
-
        1.0,                                     !- Coefficient2 Constant
-
        3.0,                                     !- Coefficient3 Constant
-
        0.0,                                     !- Minimum Value of x
-
        1.5,                                     !- Maximum Value of x
-
        0.1,                                     !- Minimum Curve Output
-
        1.5;                                     !- Maximum Curve Output
 ```
 
@@ -29248,35 +26037,20 @@ Below is an example input.
 
 ```idf
    Curve:Bicubic,
-
       Main Chiller EIRFPLR,             !- Name
-
        7.086284E-02,                             !- Coefficient1 Constant
-
        2.787561E-03,                             !- Coefficient2 x
-
      -8.917038E-06,                             !- Coefficient3 x\*\*2
-
        2.309734E-01,                             !- Coefficient4 y
-
        1.250442E+00,                             !- Coefficient5 y\*\*2
-
      -2.161029E-03,                             !- Coefficient6 x\*y
-
        0.000000E+00,                             !- Coefficient7 x\*\*3
-
      -5.630094E-01,                             !- Coefficient8 y\*\*3
-
        0.000000E+00,                             !- Coefficient9 x\*\*2\*y
-
        0.000000E+00,                             !- Coefficient10 x\*y\*\*2
-
        20.33,                                           !- Minimum Value of x
-
        35.00,                                           !- Maximum Value of x
-
        0.25,                                             !- Minimum Value of y
-
        1.01;                                             !- Maximum Value of y
 ```
 
@@ -29983,17 +26757,11 @@ Following is an input example.
 
 ```idf
 Curve:Functional:PressureDrop,
-
    PressureMinorAndFriction,!- Name
-
    0.05,                                       !- Diameter
-
    53.8,                                       !- Minor Loss Coefficient
-
    200,                                         !- Length
-
    ,                                               !- Roughness
-
    0.008;                                     !- Fixed Friction Factor
 ```
 
@@ -30059,29 +26827,20 @@ The optional numeric maximum allowable value of the evaluated curve (Pa). Values
 
 The following is an input example describing the fan total pressure rise for a VAV system with a constant non-zero duct static pressure set point (the set point is described separately; see the Curve:Linear object for a related example):
 
+```idf
    Curve:FanPressureRise,
-
-       VSD Example,                   ! Curve Name f = C1\*Qfan\*\*2+C2\*Qfan+C3\*Qfan\*(Psm-Po)\*\*0.5+C4\*(Psm-Po) with Po=0
-
+       VSD Example,                   ! Curve Name f = C1*Qfan**2+C2*Qfan+C3*Qfan*(Psm-Po)**0.5+C4*(Psm-Po) with Po=0
        1446.75833497653,         ! CoefficientC1 Alpha [Pa s2/m6]
-
        0.,                                     ! CoefficientC2 Beta [Pa s/m3]
-
        0.,                                     ! CoefficientC3 Gamma [Pa0.5 s/m3]
-
        1.,                                     ! CoefficientC4 Delta [-]
-
        0.,                                     ! Minimum Value of Qfan [m3/s]
-
        100.,                                 ! Maximum Value of Qfan [m3/s]
-
        62.5,                                 ! Minimum Value of Psm [Pa]
-
        300.,                                 ! Maximum Value of Psm [Pa]
-
        0.;                                     ! Minimum Curve Output [Pa]
-
        5000.;                               ! Maximum Curve Output [Pa]
+```
 
 ### Curve:ExponentialSkewNormal
 
@@ -30137,47 +26896,31 @@ This optional field is provided for future purposes so that the IDF Editor could
 
 The following are input examples describing the normalized fan efficiency for the normal (non-stall) and stall operating regions of a backward-curved airfoil centrifugal fan:
 
+```idf
    Curve:ExponentialSkewNormal,
-
        FanEff120CPLANormal,                         ! Curve Name
-
        0.072613,                                               ! CoefficientC1 Afan
-
        0.833213,                                               ! CoefficientC2 Bfan
-
        0.,                                                           ! CoefficientC3 Cfan
-
        0.013911,                                               ! CoefficientC4 Dfan
-
        -4.,                                                         ! Minimum Value of x
-
        5.,                                                           ! Maximum Value of x
-
        0.1,                                                         ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
-
 
 
    Curve:ExponentialSkewNormal,
-
        FanEff120CPLAStall,                           ! Curve Name
-
        -1.674931,                                             ! CoefficientC1 Afan
-
        1.980182,                                               ! CoefficientC2 Bfan
-
        0.,                                                           ! CoefficientC3 Cfan
-
        1.844950,                                               ! CoefficientC4 Dfan
-
        -4.,                                                         ! Minimum Value of x
-
        5.,                                                           ! Maximum Value of x
-
        0.1,                                                         ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
+```
+
 
 ### Curve:Sigmoid
 
@@ -30237,49 +26980,27 @@ The following are input examples describing the normalized dimensionless flow fo
 
 ```idf
    Curve:Sigmoid,
-
        FanDimFlowNormal,                               ! Curve Name
-
        0.,                                                           ! CoefficientC1 Aspd
-
        1.001423,                                               ! CoefficientC2 Bspd
-
        0.123935,                                               ! CoefficientC3 Cspd
-
        -0.476026,                                             ! CoefficientC4 Dspd
-
        1.,                                                           ! CoefficientC5 Espd
-
        -4.,                                                         ! Minimum Value of x
-
        5.,                                                           ! Maximum Value of x
-
        0.05,                                                       ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
 
-
-
    Curve:Sigmoid,
-
        FanDimFlowStall,                                 ! Curve Name
-
        0.,                                                           ! CoefficientC1 Aspd
-
        5.924993,                                               ! CoefficientC2 Bspd
-
        -1.91636,                                               ! CoefficientC3 Cspd
-
        -0.851779,                                             ! CoefficientC4 Dspd
-
        1.,                                                           ! CoefficientC5 Espd
-
        -4.,                                                         ! Minimum Value of x
-
        5.,                                                           ! Maximum Value of x
-
        0.05,                                                       ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
 ```
 
@@ -30333,21 +27054,13 @@ The following is an input example describing the maximum efficiency variation fo
 
 ```idf
        Curve:RectangularHyperbola1,
-
        MotorMaxEffAvg,                                   ! Curve Name
-
        0.29228,                                                 ! CoefficientC1
-
        3.368739,                                               ! CoefficientC2
-
        0.762471,                                               ! CoefficientC3
-
        0.,                                                           ! Minimum Value of x
-
        7.6,                                                         ! Maximum Value of x
-
        0.01,                                                       ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
 ```
 
@@ -30401,81 +27114,43 @@ The following are input examples describing part-load efficiency variations for 
 
 ```idf
 Curve:RectangularHyperbola2,
-
        BeltPartLoadRegion1,                         ! Curve Name
-
        0.920797,                                               ! CoefficientC1
-
        0.0262686,                                             ! CoefficientC2
-
        0.151594,                                               ! CoefficientC3
-
        0.,                                                           ! Minimum Value of x
-
        1.,                                                           ! Maximum Value of x
-
        0.01,                                                       ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
 
-
-
    Curve:RectangularHyperbola2,
-
        BeltPartLoadRegion3,                         ! Curve Name
-
        1.037778,                                               ! CoefficientC1
-
        0.0103068,                                             ! CoefficientC2
-
        -0.0268146,                                           ! CoefficientC3
-
        0.,                                                           ! Minimum Value of x
-
        1.,                                                           ! Maximum Value of x
-
        0.01,                                                       ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
 
-
-
    Curve:RectangularHyperbola2,
-
        MotorPartLoad,                                     ! Curve Name
-
        1.137209,                                               ! CoefficientC1
-
        0.0502359,                                             ! CoefficientC2
-
        -0.0891503,                                           ! CoefficientC3
-
        0.,                                                           ! Minimum Value of x
-
        1.,                                                           ! Maximum Value of x
-
        0.01,                                                       ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
 
-
-
    Curve:RectangularHyperbola2,
-
        VFDPartLoad,                                         ! Curve Name
-
        0.987405,                                               ! CoefficientC1
-
        0.0155361,                                             ! CoefficientC2
-
        -0.0059365,                                           ! CoefficientC3
-
        0.,                                                           ! Minimum Value of x
-
        1.,                                                           ! Maximum Value of x
-
        0.01,                                                       ! Minimum Curve Output
-
        1.;                                                           ! Maximum Curve Output
 ```
 
@@ -30599,21 +27274,13 @@ An example input of the Curve:DoubleExponentialDecay input is:
 
 ```idf
    Curve:DoubleExponentialDecay,
-
        BatteryCycleCurve,         !- Name
-
        1380,                                   !- Coefficient1 C1
-
        6834,                                   !- Coefficient2 C2
-
        -8.75,                                 !- Coefficient3 C3
-
        6747,                                   !- Coefficient4 C4
-
        -6.22,                                 !- Coefficient5 C5
-
        0,                                         !- Minimum Value of x
-
        1.0;                                     !- Maximum Value of x
 ```
 
@@ -30726,31 +27393,22 @@ The value of the dependent variable n (i.e., dependent variable values for data 
 
 Following is an example input for a Table:OneIndependentVariable object:
 
+```idf
 Table:OneIndependentVariable,
-
 WindACCoolCapFFF,             !- Name
-
 Linear,                                 !- Curve Type
-
 EvaluateCurveToLimits,   !- Interpolation Type
-
 0,                                           !- Minimum Value of X1,
-
 1.5,                                       !- Maximum Value of X1,
-
 0.8,                                       !- Minimum Table Output
-
 1.1,                                       !- Maximum Table Output
-
 Dimensionless,                   !- Input Unit Type for X1
-
 Dimensionless,                   !- Output Unit Type
-
 ,                                             !- Normalization Point
+0,0.8,                                   !- X Value #1, Output Value #1
+1.5,1.1;                               !- X Value #2, Output Value #2
+```
 
-0,0.8,                                   !- X Value \#1, Output Value \#1
-
-1.5,1.1;                               !- X Value \#2, Output Value \#2
 
 ### Performance Table Outputs
 
@@ -30874,69 +27532,41 @@ The value of the dependent variable n (i.e., dependent variable values for data 
 
 Following is an example input for a Table:TwoIndependentVariable object:
 
+```idf
 Table:TwoIndependentVariables,
-
 CCOOLEIRFT,                         !- Name
-
 BiQuadratic,                       !- Curve Type
-
 EvaluateCurveToLimits,   !- Interpolation Type
-
 5.0,                                       !- Minimum Value of x,
-
 60.0,                                     !- Maximum Value of x,
-
 5.0,                                       !- Minimum Value of y,
-
 70.0,                                     !- Maximum Value of y,
-
 0.01,                                     !- Minimum Table Output
-
 0.5,                                       !- Maximum Table Output
-
 Temperature,                       !- Input Unit Type for x
-
 Temperature,                       !- Input Unit Type for y
-
 Dimensionless,                   !- Output Unit Type
-
 0.258266502,                       !- Normalization Point
+17.2222222,18.3333333,0.18275919, !-X Value #1,Y Value #1,Output #1
+17.2222222,23.8888889,0.207383768,!-X Value #2,Y Value #2,Output #2
+17.2222222,29.4444444,0.237525541,!-X Value #3,Y Value #3,Output #3
+17.2222222,35,0.274217751,               !-X Value #4,Y Value #4,Output #4
+17.2222222,40.5555556,0.318548624,!-X Value #5,Y Value #5,Output #5
+17.2222222,46.1111111,0.374560389,!-X Value #6,Y Value #6,Output #6
+19.4444444,18.3333333,0.172982816,!-X Value #7,Y Value #7,Output #7
+19.4444444,23.8888889,0.19637691, !-X Value #8,Y Value #8,Output #8
+19.4444444,29.4444444,0.224789822,!-X Value #9,Y Value #9,Output #9
+19.4444444,35,0.258266502,               !-X Value #10,Y Value #10,Output #10
+19.4444444,40.5555556,0.299896794,!-X Value #11,Y Value #11,Output #11
+19.4444444,46.1111111,0.351242021,!-X Value #12,Y Value #12,Output #12
+21.6666667,18.3333333,0.164081122,!-X Value #13,Y Value #13,Output #13
+21.6666667,23.8888889,0.185603303,!-X Value #14,Y Value #14,Output #14
+21.6666667,29.4444444,0.211709812,!-X Value #15,Y Value #15,Output #15
+21.6666667,35,0.243492052,               !-X Value #16,Y Value #16,Output #16
+21.6666667,40.5555556,0.281757875,!-X Value #17,Y Value #17,Output #17
+21.6666667,46.1111111,0.331185659;!-X Value #18,Y Value #18,Output #18
+```
 
-17.2222222,18.3333333,0.18275919, !-X Value \#1,Y Value \#1,Output \#1
-
-17.2222222,23.8888889,0.207383768,!-X Value \#2,Y Value \#2,Output \#2
-
-17.2222222,29.4444444,0.237525541,!-X Value \#3,Y Value \#3,Output \#3
-
-17.2222222,35,0.274217751,               !-X Value \#4,Y Value \#4,Output \#4
-
-17.2222222,40.5555556,0.318548624,!-X Value \#5,Y Value \#5,Output \#5
-
-17.2222222,46.1111111,0.374560389,!-X Value \#6,Y Value \#6,Output \#6
-
-19.4444444,18.3333333,0.172982816,!-X Value \#7,Y Value \#7,Output \#7
-
-19.4444444,23.8888889,0.19637691, !-X Value \#8,Y Value \#8,Output \#8
-
-19.4444444,29.4444444,0.224789822,!-X Value \#9,Y Value \#9,Output \#9
-
-19.4444444,35,0.258266502,               !-X Value \#10,Y Value \#10,Output \#10
-
-19.4444444,40.5555556,0.299896794,!-X Value \#11,Y Value \#11,Output \#11
-
-19.4444444,46.1111111,0.351242021,!-X Value \#12,Y Value \#12,Output \#12
-
-21.6666667,18.3333333,0.164081122,!-X Value \#13,Y Value \#13,Output \#13
-
-21.6666667,23.8888889,0.185603303,!-X Value \#14,Y Value \#14,Output \#14
-
-21.6666667,29.4444444,0.211709812,!-X Value \#15,Y Value \#15,Output \#15
-
-21.6666667,35,0.243492052,               !-X Value \#16,Y Value \#16,Output \#16
-
-21.6666667,40.5555556,0.281757875,!-X Value \#17,Y Value \#17,Output \#17
-
-21.6666667,46.1111111,0.331185659;!-X Value \#18,Y Value \#18,Output \#18
 
 ### Two Independent Variable Performance Table Outputs
 
@@ -30950,11 +27580,11 @@ The current value of the performance table. Performance curves and tables use th
 
 The current value of the first and second independent variable passed to the performance curve. The order of the independent variables is in the same order as the model equation represented by this performance curve object. This value is averaged over the time step being reported.
 
-HVAC,Average,Performance Curve Output Value []
+* HVAC,Average,Performance Curve Output Value []
 
-HVAC,Average,Performance Curve Input Variable 1 Value []
+* HVAC,Average,Performance Curve Input Variable 1 Value []
 
-HVAC,Average,Performance Curve Input Variable 2 Value []
+* HVAC,Average,Performance Curve Input Variable 2 Value []
 
 ### Lookup Tables
 
@@ -30982,65 +27612,50 @@ The format specifier which determines the method used to read the lookup table. 
 
 Key:
 
-IV = independent variable (i.e., the X1, or X2, etc)
+* IV = independent variable (i.e., the X1, or X2, etc)
 
-NIV = number of independent variables (i.e., number of values for X1, or X2, etc.)
+* NIV = number of independent variables (i.e., number of values for X1, or X2, etc.)
 
-IVV = independent variable value (i.e., the value for X1, or X2, etc.)
+* IVV = independent variable value (i.e., the value for X1, or X2, etc.)
 
-NIV1 = number of values for independent variable \#1 (i.e., X1)
+* NIV1 = number of values for independent variable \#1 (i.e., X1)
 
-NIV2 = number of values for independent variable \#2 (i.e., X2)
+* NIV2 = number of values for independent variable \#2 (i.e., X2)
 
-NIV3 = number of values for independent variable \#3 (i.e., X3)
+* NIV3 = number of values for independent variable \#3 (i.e., X3)
 
-NIV4 = number of values for independent variable \#4 (i.e., X4)
+* NIV4 = number of values for independent variable \#4 (i.e., X4)
 
-NIV5 = number of values for independent variable \#5 (i.e., X5)
+* NIV5 = number of values for independent variable \#5 (i.e., X5)
 
-OV = output value
+* OV = output value
 
-**  **
-
-**Header:**
-
-Row 1: &lt;NIV&gt;, &lt;NIV1&gt;, &lt;NIV2&gt; (only used if NIV&gt;1), &lt;NIV3&gt; (only used if NIV&gt;2),
-
-&lt;NIV4&gt; (only used if NIV&gt;3), &lt;NIV5&gt; (only used if NIV&gt;4)
+```
+Header:
+Row 1: <NIV>, <NIV1>, <NIV2> (only used if NIV>1), <NIV3> (only used if NIV>2),
+<NIV4> (only used if NIV>3), <NIV5> (only used if NIV>4)
 
 
-
-**Independent Variable Values:**
-
-Row 2: &lt;IVV1 to IVVn for IV1&gt; where n = NIV1 (max = 10)
-
-Row 2a (row included only when NIV &gt; 1): IVV1 to IVVn for IV2 where n = NIV2 (max = 10)
-
-Row 2b (row included only when NIV &gt; 2): IVV1 to IVVn for IV3 where n = NIV3 (max = 10)
-
-Row 2c (row included only when NIV &gt; 3): IVV1 to IVVn for IV4 where n = NIV4 (max = 10)
-
-Row 2d (row included only when NIV &gt; 4): IVV1 to IVVn for IV5 where n = NIV5 (max = 10)
+Independent Variable Values:
+Row 2: <IVV1 to IVVn for IV1> where n = NIV1 (max = 10)
+Row 2a (row included only when NIV > 1): IVV1 to IVVn for IV2 where n = NIV2 (max = 10)
+Row 2b (row included only when NIV > 2): IVV1 to IVVn for IV3 where n = NIV3 (max = 10)
+Row 2c (row included only when NIV > 3): IVV1 to IVVn for IV4 where n = NIV4 (max = 10)
+Row 2d (row included only when NIV > 4): IVV1 to IVVn for IV5 where n = NIV5 (max = 10)
 
 
-
-**Tabular Data Matrix Format** (repeat rows 3 and 4(1)     4(m) for each occurrence of a unique data pair for independent variable \#3, \#4, and \#5):
-
+Tabular Data Matrix Format (repeat rows 3 and 4(1)     4(m) for each occurrence of a unique data pair for independent variable #3, #4, and #5):
 
 
-Row 3 (row included only when NIV &gt; 2): IVVn for IV3, IVVn for IV4 (included only when NIV &gt; 3), IVVn for IV5 (included only when NIV &gt; 4), (where n = a unique value for the independent variable)
-
+Row 3 (row included only when NIV > 2): IVVn for IV3, IVVn for IV4 (included only when NIV > 3), IVVn for IV5 (included only when NIV > 4), (where n = a unique value for the independent variable)
 
 
 Row 4(1): OV1/1 to OVn/1 for each value of IV1 where n = NIV1 representing IV2(1)
-
 Row 4(2): OV1/2 to OVn/2 for each value of IV1 where n = NIV1 representing IV2(2)
-
 Row 4(3): OV1/3 to OVn/3 for each value of IV1 where n = NIV1 representing IV2(3)
-
 ...
-
 Row 4(m): OV1/m to OVn/m for each value of IV1 where n = NIV1 representing IV2(m) where m = NIV2
+```
 
 
 
@@ -31334,85 +27949,47 @@ The value specified in this field is dependent on the number entered in Field \#
 
 Following is an example input for a Table:MultiVariableLookup object:
 
+```idf
 Table:MultiVariableLookup,
-
 HPACCoolCapFT,                       !- Name
-
 LagrangeinterpolationLinearExtrapolation,   !- Interpolation Method
-
 3,                                               !- Number of Interpolation Points
-
 BiQuadratic,                           !- Interpolation Type
-
 SingleLineIndependentVariableWithMatrix, !- Table Data Format
-
 ,                                                 !- External File Name
-
 ASCENDING,                               !- X1 Sort Order
-
 ASCENDING,                               !- X2 Sort Order
-
 24999.9597049817,                 !- Normalization reference
-
 12.77778,                                 !- Minimum Value of X1,
-
 23.88889,                                 !- Maximum Value of X1,
-
 18.0,                                         !- Minimum Value of X2,
-
 46.11111,                                 !- Maximum Value of X2,
-
 ,                                                 !- Minimum Value of X3
-
 ,                                                 !- Maximum Value of X3
-
 ,                                                 !- Minimum Value of X4
-
 ,                                                 !- Maximum Value of X4
-
 ,                                                 !- Minimum Value of X5
-
 ,                                                 !- Maximum Value of X5
-
 ,                                                 !- Minimum Table Output
-
 ,                                                 !- Maximum Table Output
-
 Temperature,                           !- Input Unit Type for X1
-
 Temperature,                           !- Input Unit Type for X2
-
 ,                                                 !- Input Unit Type for X3
-
 ,                                                 !- Input Unit Type for X4
-
 ,                                                 !- Input Unit Type for X5
-
 Dimensionless,                       !- Output Unit Type
-
 2, 6, 7,
-
 12.77778, 15, 18, 19.44448943, 21, 23.88889,
-
 18, 24, 30, 35, 36, 41, 46.11111,
-
 24421.69383, 25997.3589, 28392.31868, 29655.22876, 31094.97495, 33988.3473,
-
 22779.73113, 24352.1562, 26742.74198, 28003.546, 29441.02425, 32330.1846,
-
 21147.21662, 22716.4017, 25102.61348, 26361.31143, 27796.52175, 30681.4701,
-
 19794.00525, 21360.49033, 23743.0571, 25000, 26433.32038, 29314.75872,
-
 19524.15032, 21090.0954, 23471.93318, 24728.52506, 26161.46745, 29042.2038,
-
 18178.81244, 19742.05753, 22120.2503, 23375.08713, 24806.13958, 27683.36592,
-
 16810.36004, 18370.84513, 20745.3119, 21998.35468, 23427.47518, 26301.11353;
+```
 
-
-
-### Lookup Table Outputs
 
 ### Lookup Table Outputs
 
@@ -31459,45 +28036,34 @@ Each fluid name must be identified by type - either **Refrigerant** or **Glycol*
 
 An example of these statements in an input data file is:
 
+```idf
 FluidProperties:Name,
-
    R11,Refrigerant;
 
 
-
 FluidProperties:Name,
-
    R12,Refrigerant;
 
 
-
 FluidProperties:Name,
-
    R22,Refrigerant;
 
 
-
 FluidProperties:Name,
-
    NH3,Refrigerant;
 
 
-
 FluidProperties:Name,
-
    Steam,Refrigerant;
 
 
-
 FluidProperties:Name,
-
   SaltBrine, Glycol;
 
 
-
 FluidProperties:Name,
-
    NewGlycol, Glycol;
+```
 
 ### FluidProperties:GlycolConcentration
 
@@ -31521,17 +28087,15 @@ This field allows the user to specify the actual concentration of glycol being u
 
 An example of this statement in an input data file is:
 
+```idf
 FluidProperties:GlycolConcentration,
-
    EthGly25Percent, EthyleneGlycol, ,0.25;
-
 FluidProperties:GlycolConcentration,
-
    ProGly40Percent, PropyleneGlycol, ,0.40;
-
 FluidProperties:GlycolConcentration,
-
    HalfAndHalf, UserDefinedGlycolType, NewBrine, 0.5;
+```
+
 
 ### FluidProperties:Temperatures
 
@@ -31547,17 +28111,15 @@ These fields (up to 250) are the temperatures at which the data for the thermal 
 
 An example of this statement in an input data file is:
 
+```idf
 FluidProperties:Temperatures,
-
            R11Temperatures,
-
            -70,-65,-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,-5,0,2,4,6,8,10,12,
-
            14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,55,60,65,70,
-
            75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,
-
            165,170,175,180,185,190,198;
+```
+
 
 ### FluidProperties:Saturated
 
@@ -31585,23 +28147,18 @@ These fields (up to 250) are the values of the thermal property specified in the
 
 An example of this statement in an input data file is:
 
+```idf
 FluidProperties:Saturated,
-
            R11,Enthalpy,Fluid,R11Temperatures, ! Enthalpy in J/kg
-
            153580,154600,156310,158580,161300,164380,167740,171330,175100,179020,183060,
-
            187190,191400,195680,200000,201740,203490,205240,207000,208770,210530,212310,
-
            214080,215870,217650,219860,221230,223030,224830,226630,228860,230250,232060,
-
            233860,235700,237520,239350,241180,243010,246350,249450,254080,258730,263480,
-
            268110,272860,277000,282410,287240,292120,297030,302000,307090,312080,317210,
-
            322400,327670,333020,338460,344010,349680,355500,361480,367690,374100,381060,
-
            388850,397280,426300;
+```
+
 
 ### FluidProperties:Superheated
 
@@ -31629,15 +28186,14 @@ These fields (up to 250) are the values of the thermal property specified in the
 
 An example of this statement in an input data file is:
 
+```idf
 FluidProperties:Superheated,
-
        R11,Density,SuperR11Temperatures, ! Density in kg/m^3
-
        62000., !Pressure = 62000Pa
-
        0,0,0,0,0,0,0,0.0139,0.0134,0.0129,0.0124,0.012,0.0116,0.0112,0.0109,0.0105,
-
        0.0102,0.0099,0.0097,0.0094,0.0092,0.0089,0,0,0,0,0,0,0,0,0,0;
+```
+
 
 ### Glycol Fluid Types
 
@@ -31669,15 +28225,13 @@ These fields (up to 250) are the values of the thermal property specified in the
 
 An example of this statement in an input data file is:
 
+```idf
 FluidProperties:Concentration,
-
          NewGlycol,SpecificHeat ,GlycolTemperatures, ! Spec. heat in J/kg-K
-
          0.8, ! Concentration
-
          2572,2600,2627,2655,2683,2710,2738,2766,2793,2821,2849,2876,2904,2931,2959,
-
          2987,3014,3042,3070,3097,3125,3153,3180,3208,3236,3263,3291,3319,3346,3374,
-
          3402,3429,3457;
+```
+
 
