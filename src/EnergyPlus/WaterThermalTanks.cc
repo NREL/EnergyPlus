@@ -3577,18 +3577,24 @@ namespace WaterThermalTanks {
 										Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac = SameFrac;
 									}
 								} else {
-									Real64 CurHeight(0.0);
+                                    Real64 H0 = Tank.Height; // height of top of node
+                                    Real64 H; // height of bottom of node
 									Real64 SumFrac(0.0);
 									// Get the fraction of each stratified node that is wrapped by the condenser
 									for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
 										StratifiedNodeData &CurNode = Tank.Node( NodeNum );
-										if ( CurHeight < HPWH.WrappedCondenserBottomLocation && ( CurHeight + CurNode.Height ) > HPWH.WrappedCondenserBottomLocation ) {
+                                        if ( NodeNum == Tank.Nodes ) {
+                                            H = -1.0;
+                                        } else {
+                                            H = H0 - CurNode.Height;
+                                        }
+										if ( H < HPWH.WrappedCondenserBottomLocation && H0 > HPWH.WrappedCondenserBottomLocation ) {
 											// The bottom of the condenser starts partway through this node.
-											CurNode.HPWHWrappedCondenserHeatingFrac = 1.0 - ( HPWH.WrappedCondenserBottomLocation - CurHeight ) / CurNode.Height;
-										} else if ( CurHeight >= HPWH.WrappedCondenserBottomLocation && CurHeight <= HPWH.WrappedCondenserTopLocation ) {
-											if ( (CurHeight + CurNode.Height) > HPWH.WrappedCondenserTopLocation ) {
+											CurNode.HPWHWrappedCondenserHeatingFrac = 1.0 - ( HPWH.WrappedCondenserBottomLocation - H ) / CurNode.Height;
+										} else if ( H >= HPWH.WrappedCondenserBottomLocation && H <= HPWH.WrappedCondenserTopLocation ) {
+											if ( H0 > HPWH.WrappedCondenserTopLocation ) {
 												// the top of the condenser ends partway through this node.
-												CurNode.HPWHWrappedCondenserHeatingFrac = ( HPWH.WrappedCondenserTopLocation - CurHeight ) / CurNode.Height;
+												CurNode.HPWHWrappedCondenserHeatingFrac = ( HPWH.WrappedCondenserTopLocation - H ) / CurNode.Height;
 											} else {
 												// the entire node is wrapped by the condenser
 												CurNode.HPWHWrappedCondenserHeatingFrac = 1.0;
@@ -3597,7 +3603,7 @@ namespace WaterThermalTanks {
 											CurNode.HPWHWrappedCondenserHeatingFrac = 0.0;
 										}
 										SumFrac += CurNode.HPWHWrappedCondenserHeatingFrac;
-										CurHeight += CurNode.Height;
+                                        H0 = H;
 									}
 									// Normalize the fractions so they sum to 1.
 									for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
