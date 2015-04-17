@@ -45,6 +45,7 @@ set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
+option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
@@ -170,6 +171,8 @@ if( BUILD_FORTRAN )
 endif()
 
 configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
+configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
+configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
@@ -315,4 +318,19 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # Clang
 endif()
 
 
+
+
+
+if (BUILD_VALIDATION_REPORTS)
+  include(ExternalProject)
+  ExternalProject_Add(ValidationReports
+    DEPENDS energyplus ReadVarsESO Basement Slab
+    GIT_REPOSITORY git://github.com/NREL/EnergyPlusValidationReports
+    GIT_TAG master
+    CMAKE_CACHE_ARGS
+      -DENERGYPLUS_PATH:PATH=${CMAKE_BINARY_DIR}
+      -DENERGYPLUS_VERSION:STRING=${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}
+    INSTALL_COMMAND ""
+    )
+endif()
 
