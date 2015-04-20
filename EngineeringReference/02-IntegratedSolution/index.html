@@ -347,7 +347,7 @@
 <p><span>$\sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}} $</span> = sum of the convective internal loads</p>
 <p><span>$\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right)$</span> = convective heat transfer from the zone surfaces</p>
 <p><span>${\dot m_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right)$</span> = heat transfer due to infiltration of outside air</p>
-<p><span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}<em>i}} {C_p}\left( {{T</em>{zi}} - {T_z}} \right)$</span> = heat transfer due to interzone air mixing</p>
+<p><span>$\sum_{i=1}^{N_{zones}} \dot m_i C_p\left( T_{zi} - {T_z} \right)$</span> = heat transfer due to interzone air mixing</p>
 <p><span>${\dot Q_{sys}}$</span> = air systems output</p>
 <p><span>${C_z}\frac{{d{T_z}}}{{dt}} = $</span>energy stored in zone air</p>
 <p>C<sub>z</sub> = ρ<sub>air</sub>C<sub>p</sub>C<sub>T</sub></p>
@@ -479,13 +479,15 @@
 <p>C<sub>W</sub> = humidity capacity multiplier (See the InputOutput Reference for additional information on the object ZoneCapacitanceMultiplier:ResearchSpecial)</p>
 <p>In the same manner as described above for zone air temperature (ref. Basis for the Zone and Air System Integration), the solution algorithms provided in the ZoneAirHeatBalanceAlgorithm object are also applied to zone air moisture calculations.</p>
 <p>In order to calculate the derivative term with respect to time, the first order backward finite difference method, defined as the EulerMethod in the ZoneAirHeatBalanceAlgorithm object, may be used:</p>
-<p><span>$\frac{{dW}}{{dt}} = {\left( {\delta t} \right)^{ - 1}}(W_z^t - W_z^{t - \delta t}) + O(\delta t)$</span></p>
+<p><div>[\frac{{dW}}{{dt}} = {\left( {\delta t} \right)^{ - 1}}(W_z^t - W_z^{t - \delta t}) + O(\delta t)]</div></p>
 <p>The zone air humidity ratio update at the current time step using the EulerMethod may be expressed as follows:</p>
 <div>\[\begin{array}{l}{\rho_{air}}V{C_W}{\left( {\delta t} \right)^{ - 1}}\left( {W_z^t - W_z^{t - \delta t}} \right) = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}\left( {{W_{surf{s_i}}} - W_z^t} \right) + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{W_{zi}} - W_z^t} \right)\\\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; + {{\dot m}_{\inf }}\left( {{W_\infty } - W_z^t} \right) + {{\dot m}_{sys}}\left( {{W_{\sup }} - W_z^t} \right)\end{array}\]</div>
 
 <p>To preserve the stability of the calculation of the zone humidity ratio, the third order differential approximation, derived by a Taylor Series and used in the calculation of the next time step’s zone air temperature, is also applied to the zone air humidity ratio calculations. This algorithm is the default choice and is defined as 3rdOrderBackwardDifference in the ZoneAirHeatBalanceAlgorithm object.</p>
 <p>The third order derivative derived from a Taylor Series expansion is defined as:</p>
-<p><span>${\left. {\frac{{d{W_z}}}{{dt}}} \right|_t} \approx \frac{{\left( {{\textstyle{{11} \over 6}}W_z^t - 3W_z^{t - \delta t} + {\textstyle{3 \over 2}}W_z^{t - 2\delta t} - {\textstyle{1 \over 3}}W_z^{t - 3\delta t}} \right)}}{{\delta t}} + O\left( {\delta {t^3}} \right)$</span>.</p>
+<div>\[{\left. {\frac{{d{W_z}}}{{dt}}} \right|_t} \approx \frac{{\left( {{\textstyle{{11} \over 6}}W_z^t - 3W_z^{t - \delta t} + {\textstyle{3 \over 2}}W_z^{t - 2\delta t} - {\textstyle{1 \over 3}}W_z^{t - 3\delta t}} \right)}}{{\delta t}} + O\left( {\delta {t^3}} \right)\]</div>
+
+<p>.</p>
 <p>The coefficients of the approximated derivative are very close to the coefficients of the analogous Adams-Bashforth algorithm. Then the approximated derivative is substituted into the mass balance and the terms with the humidity ratio at past time steps are all put on the right hand side of the equation. This third order derivative zone humidity ratio update increases the number of previous time steps that are used in calculating the new zone humidity ratio, and decreases the dependence on the most recent. The higher order derivative approximations have the potential to allow the use of larger time steps by smoothing transitions through sudden changes in zone operating conditions.</p>
 <div>\[\begin{array}{l}\frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\left( {\frac{{11}}{6}} \right)W_z^t + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}W_z^t + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} W_z^t + {{\dot m}_{\inf }}W_z^t + {{\dot m}_{sys}}W_z^t = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}}\\\;\;\;\;\;\;\;\;\;\; + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}} + {{\dot m}_{\inf }}{W_\infty } + {{\dot m}_{sys}}{W_{\sup }} - \frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\left( { - 3W_z^{t - \delta t} + \frac{3}{2}W_z^{t - 2\delta t} - \frac{1}{2}W_z^{t - 3\delta t}} \right)\end{array}\]</div>
 
@@ -563,7 +565,7 @@
 
 <p>where:</p>
 <p><span>$\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} $</span> = sum of scheduled internal carbon dioxide loads. The zone air density is used to convert the volumetric rate of carbon dioxide generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of carbon dioxide as ppm.</p>
-<p><span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}<em>i}} \left( {{C</em>{zi}} - C_z^t} \right)$</span> = carbon dioxide transfer due to interzone air mixing [ppm-kg/s]</p>
+<p><span>$ \sum_{i=1}^{N_{zones}} \dot m_i \left( C_{zi} - C_z^t \right) $</span> = carbon dioxide transfer due to interzone air mixing [ppm-kg/s]</p>
 <p><span>${C_{zi}}$</span> = carbon dioxide concentration in the zone air being transferred into this zone [ppm]</p>
 <p><span>${\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right)$</span> = carbon dioxide transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]</p>
 <p><span>${C_\infty }$</span> = carbon dioxide concentration in outdoor air [ppm]</p>
@@ -635,7 +637,7 @@
 <p><span>$\sum\limits_{i = 1}^{{N_{source}}} {{\rho_{air}}{G_{f,i}}} $</span>=  Sum of internal generic contaminant loads from sources in a zone or interior surfaces.</p>
 <p>The zone air density is used to convert the volumetric rate of generic contaminant generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of generic contaminant as ppm.</p>
 <p><span>${\rho_{air}}\sum\limits_i^{N{\rm{sink}}} {{R_{f,i}}{C_{f,z}}} $</span>= Sum of removal rate from sinks in a zone or interior surfaces [ppm-kg/s]</p>
-<p><span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}<em>i}} \left( {{C</em>{f,z,i}} - C_{f,z}^t} \right)$</span> = Generic contaminant transfer due to interzone air mixing [ppm-kg/s]</p>
+<p><span>$\sum_{i=1}^{N_{zones}} \dot m_i \left( C_{f,z,i} - C_{f,z}^t \right)$</span> = Generic contaminant transfer due to interzone air mixing [ppm-kg/s]</p>
 <p><span>${C_{f,z,i}}$</span> = Generic contaminant concentration in the zone air being transferred into this zone [ppm]</p>
 <p><span>${\dot m_{\inf }}\left( {{C_{f,\infty }} - C_{f,z}^t} \right)$</span>   = Generic contaminant transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]</p>
 <p><span>${C_{f,\infty }}$</span> = Generic contaminant concentration in outdoor air [ppm]</p>

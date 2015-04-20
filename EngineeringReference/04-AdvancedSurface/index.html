@@ -341,11 +341,11 @@
 <h4 id="external-lw-radiation">External LW Radiation</h4>
 <p><span>${q''_{LWR,Env}}$</span> is a standard radiation exchange formulation between the surface, the sky, the ground, and the atmosphere.  The radiation heat flux is calculated from the surface absorptivity, surface temperature, sky, air, and ground temperatures, and sky and ground view factors.  Radiation is modeled using linearized coefficients.  The baffle blocks all longwave radiation.</p>
 <h4 id="external-convection">External Convection</h4>
-<p><sub><span>${q''<em>{conv,Env}}$</span> </sub>is modeled using the classical formulation: <span>${q''</em>{conv}}$</span> <sub> </sub>= h<sub>co</sub>(T<sub>air</sub> - T<sub>o</sub>) where h<sub>co</sub>, is the convection coefficient.  The h<sub>co</sub> is treated in the same way as an outside face with ExteriorEnvironment conditions.  In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for <span>${h_{co}}$</span>.</p>
+<p><span>$q''<em>{conv,env}$</span> is modeled using the classical formulation: <span>$q''</em>{conv} = h_{co}(T_{air} - T_{o})$</span> where h<sub>co</sub>, is the convection coefficient.  The h<sub>co</sub> is treated in the same way as an outside face with ExteriorEnvironment conditions.  In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for <span>${h_{co}}$</span>.</p>
 <h4 id="cavity-lw-radiation">Cavity LW Radiation</h4>
 <p><span>${q''_{LWR,cav}}$</span>is a standard radiation exchange formulation between the baffle surface and the underlying heat transfer surface located across the cavity.  Radiation is modeled using linearized coefficients.</p>
 <h4 id="cavity-convection">Cavity Convection</h4>
-<p><sub><span>${q''<em>{conv,cav}}$</span> </sub>is modeled using the classical formulation: <span>${q''</em>{conv}}$</span> <sub> </sub>= h<sub>cp</sub>(T<sub>air</sub> - T<sub>o</sub>) where h<sub>cp</sub>, is the convection coefficient.  The value for h<sub>cp</sub> is obtained from correlations used for window gaps from ISO (2003) standard 15099.</p>
+<p><span>$q''<em>{conv,cav}$</span> is modeled using the classical formulation: <span>$ q''</em>{conv} = h_{cp}(T_{air} - T_{o))$</span>  where h<sub>cp</sub>, is the convection coefficient.  The value for h<sub>cp</sub> is obtained from correlations used for window gaps from ISO (2003) standard 15099.</p>
 <p>Substituting models into (113) and solving for <span>${T_{s,baff}}$</span> yields the following equation:</p>
 <div>\[{T_{s,baff}} = \frac{{\left( {{I_s}\alpha  + {h_{co}}{T_{amb}} + {h_{r,atm}}{T_{amb}} + {h_{r,sky}}{T_{sky}} + {h_{r,gnd}}{T_{amb}} + {h_{r,cav}}{T_{so}} + {h_{c,cav}}{T_{a,cav}} + {{q''}_{source}}} \right)}}{{\left( {{h_{co}} + {h_{r,air}} + {h_{r,sky}} + {h_{r,gnd}} + {h_{r,cav}} + {h_{c,cav}}} \right)}}\]</div>
 
@@ -383,8 +383,17 @@
 
 <p>where,</p>
 <p><span>$\rho $</span> is the density of air [kg/m<sup>3</sup>], and</p>
-<p><span>${{\rm{\rlap{--} \dot V}}<em>{{\rm{tot}}}} = {{\rm{\rlap{--}\dot V}}</em>{{\rm{wind}}}} + \,{{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}}$</span> is the total volumetric flow rate of air ventilating in and out of the cavity.</p>
-<div>\[{{\rm{\rlap{--} \dot V}}_{{\rm{wind}}}} = {C_v}{A_{in}}{U_\infty }\]</div>
+<p><span>$\dot{V}<em>{tot} = \dot{V}</em>{wind} + \dot{V}_{thermal} $</span> is the total volumetric flow rate of air ventilating in and out of the cavity.</p>
+<div>\[\dot{V}_{wind} = C_{v}A_{in}U_{\infty}\]</div>
+
+<div>\[
+  \dot{V}_{thermal} = \left\{
+    \begin{array}{cl}
+      C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{a,cav}-T_{amb}\right)/T_{a,cov}} & \; \left(T_{a,cav}>T_{amb}\right) \\
+      C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{amb}-T_{a,cav}\right)/T_{amb}} & \; \left(T_{a,cav} \lt T_{amb}\,\text{and baffle is vertical}\right) 
+    \end{array}
+  \right.
+\]</div>
 
 <p><span>${{\rm{\rlap{--} \dot V}}<em>{{\rm{thermal}}}} = {C_D}{A</em>{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} $</span>  (if <span>${T_{a,cav}} &gt; {T_{amb}}$</span>)</p>
 <p><span>${{\rm{\rlap{--} \dot V}}<em>{{\rm{thermal}}}} = {C_D}{A</em>{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,cav}}} \right)/{T_{amb}}} $</span>  (if <span>${T_{amb}} &gt; {T_{a,cav}}$</span> and baffle is vertical)</p>
@@ -408,18 +417,11 @@
 <p>where z is the height of the centroid of the system, z<sub>met</sub> is the height of the standard meteorological wind speed measurement, and a and d are terrain-dependent coefficients.  d is the boundary layer thickness for the given terrain type.  The values of a and d are shown in the following tables:</p>
 <p>Table 19. Terrain-Dependent Coefficients (ASHRAE 2001).</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Terrain</td>
-<td>Description</td>
-<td>Exponent, a</td>
-<td>Layer Thickness,d (m)</td>
+<th>Terrain</th>
+<th>Description</th>
+<th>Exponent, a</th>
+<th>Layer Thickness,d (m)</th>
 </tr>
 <tr>
 <td>1</td>
@@ -479,16 +481,34 @@
 <h3 id="overview">Overview</h3>
 <p>The input object Material:RoofVegetation provides a model for green roofs (aka ecoroofs or vegetated roofs) that are becoming increasingly common for both new and retrofit buildings. There is widespread recognition and a growing literature of measured data that suggest green roofs can reduce building energy consumption. Currently, however, there are few design tools available to assist developers and architects in assessing the likely magnitude of energy savings associated with various implementation options (e.g., soil type/depth, irrigation options, plant type). As a result there is a significant need for a quantitative and physically-based building energy simulation tool that represents the effects of green roof constructions. Such a tool would facilitate more rapid spread of green roof technologies and make it possible to account for green roof benefits in state energy codes and related energy efficiency standards such as LEED.</p>
 <p>In response to the need for green roof design tools a computational model of the heat transfer processes involved on a vegetated roof has been developed. This model accounts for:</p>
-<p>·        long wave and short wave radiative exchange within the plant canopy,</p>
-<p>·        plant canopy effects on convective heat transfer,</p>
-<p>·        evapotranspiration from the soil and plants, and</p>
-<p>·        heat conduction (and storage) in the soil layer</p>
+<ul>
+<li>
+<p>long wave and short wave radiative exchange within the plant canopy,</p>
+</li>
+<li>
+<p>plant canopy effects on convective heat transfer,</p>
+</li>
+<li>
+<p>evapotranspiration from the soil and plants, and</p>
+</li>
+<li>
+<p>heat conduction (and storage) in the soil layer</p>
+</li>
+</ul>
 <p>The ability to track moisture-dependent thermal properties is not implemented yet due to stability issues in the CTF scheme, but is under development for use with the finite difference solution scheme made available in EnergyPlus starting in version 2.</p>
 <p>As implemented in EnergyPlus the green roof module allows the user to specify “ecoroof” as the outer layer of a rooftop construction using a “Material:RoofVegetation” object. The user can then specify various aspects of the green roof construction including growing media depth, thermal properties, plant canopy density, plant height, stomatal conductance (ability to transpire moisture), and soil moisture conditions (including irrigation).</p>
 <p>The model formulation includes the following:</p>
-<p>·        simplified moisture balance that allows precipitation, irrigation, and moisture transport between two soil layers (top and root zone).</p>
-<p>·        soil and plant canopy energy balance based on the Army Corps of Engineers’ FASST vegetation models (Frankenstein and Koenig), drawing heavily from BATS (Dickenson et al.) and SiB (Sellers et al.).</p>
-<p>·        soil surface (T<sub>g</sub>) and foliage (T<sub>f</sub>) temperature equations are solved simultaneously each time step, inverting the CTF to extract heat flux information for the energy balance calculation.</p>
+<ul>
+<li>
+<p>simplified moisture balance that allows precipitation, irrigation, and moisture transport between two soil layers (top and root zone).</p>
+</li>
+<li>
+<p>soil and plant canopy energy balance based on the Army Corps of Engineers’ FASST vegetation models (Frankenstein and Koenig), drawing heavily from BATS (Dickenson et al.) and SiB (Sellers et al.).</p>
+</li>
+<li>
+<p>soil surface (T<sub>g</sub>) and foliage (T<sub>f</sub>) temperature equations are solved simultaneously each time step, inverting the CTF to extract heat flux information for the energy balance calculation.</p>
+</li>
+</ul>
 <p>The detailed energy balance analysis and resulting equations, being rather complicated, are summarized here. The interested reader is referred to the FASST documentation cited herein for the complete development. The end result is a set of two simultaneous equations for temperature—one for the soil surface and the other for the foliage.</p>
 <h3 id="green-roof-model-description">Green Roof Model Description</h3>
 <p>As with a traditional roof, the energy balance of an green roof is dominated by radiative forcing from the sun. This solar radiation is balanced by sensible (convection) and latent (evaporative) heat flux from soil and plant surfaces combined with conduction of heat into the soil substrate. This energy balance is illustrated in Figure 35. The variables introduced in this figure are defined in the equations that follow.</p>
@@ -530,7 +550,19 @@
 <div>\[{r_s} = \frac{{{r_{s,\min }}}}{{LAI}} \cdot {f_1} \cdot {f_2} \cdot {f_3}\]</div>
 
 <p>Here, r<sub>s,min</sub> is the minimum stomatal resistance. The actual stomatal resistance at any time is proportional to this minimum resistance and inversely proportional to LAI. The stomatal resistance is further modified by fractional multiplying factors that relate to incoming solar radiation and atmospheric moisture. As found in Frankenstein and Koenig the inverses of the multiplying factors f<sub>1</sub>, f<sub>2</sub>, and f<sub>3</sub> are given by:</p>
-<div>\[\begin{array}{l}\frac{1}{{{f_1}}} = \min \left[ {1,\frac{{0.004*{I_s}^ \downarrow  + 0.005}}{{0.81*(0.004*{I_s}^ \downarrow  + 1)}}} \right]\\\frac{1}{{{f_2}}} = \left\{ {\begin{array}{*{20}{c}}0&{when}&{{\theta_r} > \overline \theta  }\\\{\frac{{\overline \theta   - {\theta_r}}}{{{\theta_{\max }} - {\theta_r}}}}&{when}&{{\theta_r} \le \overline \theta   \le {\theta_{\max }}}\end{array}} \right.\\\frac{1}{{{f_3}}} = \exp \left[ { - {g_d}({e_{f,sat}} - {e_a}} \right]\end{array}\]</div>
+<div>
+ \[
+  \begin{array}{l}
+   \frac{1}{f_1} = \min \left[ 1,\frac{{0.004*{I_s}^ \downarrow  + 0.005}}{{0.81*(0.004*{I_s}^ \downarrow  + 1)}} \right] \\
+   \frac{1}{f_2} = \left\{ 
+     \begin{array}{cl}
+       0                                                                 & \text{when} \; \theta_r \gt \overline \theta \\
+       \frac{ \overline \theta   - \theta_r }{ \theta_{max} - \theta_r } & \text{when} \; \theta_r \le \overline \theta \le \theta_{max}
+     \end{array} \right. \\
+   \frac{1}{f_3} = \exp \left[ - {g_d}({e_{f,sat}} - {e_a} \right]
+  \end{array}
+ \]
+</div>
 
 <p>Here, Q<sub>r</sub>, is the residual moisture content (defined as the amount of moisture in soil when plants begin to wilt), Q<sub>max</sub> is the maximum moisture content (defined as the maximum amount of moisture a particular type of soil can hold and above which run off occurs), and <span>$\overline \Theta  $</span> is the average soil moisture in the root zone. The residual moisture content is typically around 0.01 m<sup>3</sup>/m<sup>3</sup> (Frankenstein and Koenig). The maximum moisture content depends upon the soil, but generally varies from 0.3 to 0.6 m<sup>3</sup>/m<sup>3</sup> (Guymon et al.). In the expression for f<sub>3</sub>, g<sub>d</sub> is a plant specific characteristic that is only non-zero for trees, e<sub>f,sat</sub> is the saturated vapor pressure at the leaf temperature, and e<sub>a</sub> is the air vapor pressure.</p>
 <p>Resistance to moisture exchange offered by the boundary layer formed on the leaf surface is known as aerodynamic resistance. It is measured in units of (s/m) and is influenced by wind speed, surface roughness and stability of the atmosphere (Oke). It is formulated as:</p>
@@ -576,7 +608,14 @@
 <div>\[{R_{ib}} = \frac{{2g{Z_a}\left( {{T_{af}} - {T_g}} \right)}}{{\left( {{T_{af}} + {T_g}} \right)W_{af}^2}}\]</div>
 
 <p>The atmospheric stability factor is then given by Businger and Lumley and Panofsky as:</p>
-<div>\[{\Gamma_h} = \left\{ {\begin{array}{*{20}{c}}{\frac{{1.0}}{{{{\left( {1.0 - 16.0{R_{ib}}} \right)}^{0.5}}}}}&{for}&{{R_{ib}} < 0}\\\{\frac{{1.0}}{{\left( {1.0 - 5.0{R_{ib}}} \right)}}}&{for}&{{R_{ib}} > 0}\end{array}} \right.\]</div>
+<div>\[
+  \Gamma_h = \left\{ 
+    \begin{array}{cl}
+      \frac{1.0}{\left( 1.0 - 16.0 R_{ib} \right)^{0.5}} & \text{for} \; R_{ib} \lt 0 \\
+      \frac{1.0}{\left( 1.0 - 5.0  R_{ib} \right)      } & \text{for} \; R_{ib} \gt 0
+    \end{array}
+  \right.
+\]</div>
 
 <h5 id="latent-heat-flux-in-the-soil-layer">Latent heat flux in the soil layer</h5>
 <p>Removal of water vapor from the soil surface depends on the difference between the mixing ratio of the soil surface and air and the wind speed within the canopy. The resulting latent heat flux is then given by:</p>
@@ -588,7 +627,7 @@
 <p>The bulk transfer coefficient for latent heat exchange is analogous to that for sensible heat exchange and is given by:</p>
 <div>\[C_e^g = {\Gamma_e}\left[ {\left( {1 - {\sigma_f}} \right)C_{en}^g + {\sigma_f}C_{hn}^f} \right]\]</div>
 
-<p>where<span>$C_{en}^g$</span>is the near ground bulk transfer coefficient for Latent heat flux and G<sub>e</sub> is the latent heat exchange stability correction factor (assumed to be the same as G<sub>h</sub>).</p>
+<p>where <span>$C_{en}^g$</span> is the near ground bulk transfer coefficient for Latent heat flux and G<sub>e</sub> is the latent heat exchange stability correction factor (assumed to be the same as G<sub>h</sub>).</p>
 <h3 id="linearization">Linearization</h3>
 <p>In order to solve the foliage and soil heat budget equations, the 4<sup>th</sup> <sup> </sup>order terms T<sub>f</sub><sup>4</sup> and T<sub>g</sub><sup>4</sup>  and mixing ratio terms q<sub>g,sat</sub> and q<sub>f,sat</sub> <sub> </sub>are linearized as given by Deardorff:</p>
 <div>\[{\left[ {T_f^{\left( {n + 1} \right)}} \right]^4} = {\left[ {T_f^n} \right]^4} + 4{\left[ {T_f^n} \right]^3}\left[ {T_f^{n + 1} - T_f^n} \right]\]</div>

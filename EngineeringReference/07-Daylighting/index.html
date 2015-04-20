@@ -340,302 +340,447 @@
 <p>The EnergyPlus daylighting calculation is derived from the daylighting calculation in DOE-2.1E, which is described in [Winkelmann, 1983] and [Winkelmann and Selkowitz, 1985]. There are two major differences between the two implementations: (1) In EnergyPlus daylight factors are calculated for four different sky types—clear, clear turbid, intermediate, and overcast; in DOE-2 only two sky types are used—clear and overcast. (2) In EnergyPlus the clear-sky daylight factors are calculated for hourly sun-path sun positions several times a year whereas in DOE-2 these daylight factors are calculated for a set of 20 sun positions that span the annual range of sun positions for a given geographical location.</p>
 <h2 id="daylight-factor-calculation">Daylight Factor Calculation</h2>
 <p>Table 25.  Variables in Daylighting Calculations</p>
-<p>Mathematical variable</p>
-<p>Description</p>
-<p>Units</p>
-<p>FORTRAN variable</p>
-<p>E<sub>h,sky</sub></p>
-<p>Exterior horizontal illuminance due to light from the sky</p>
-<p>lux</p>
-<p>GILSK</p>
-<p>E<sub>h,sun</sub></p>
-<p>Exterior horizontal illuminance due to light from the sun</p>
-<p>lux</p>
-<p>GILSU</p>
-<p>d<sub>sky</sub>, d<sub>sun</sub></p>
-<p>Interior illuminance factor due to sky, sun related light</p>
-<p>-</p>
-<p>DFACSK, DFACSU</p>
-<p>w<sub>sky</sub>, w<sub>sun</sub></p>
-<p>Window luminance factor due to sky, sun related light</p>
-<p>cd/lm</p>
-<p>SFACSK, SFACSU</p>
-<p>b<sub>sky</sub>, b<sub>sun</sub></p>
-<p>Window background luminance factor due to sky, sun related light</p>
-<p>cd/lm</p>
-<p>BFACSK, BFACSU</p>
-<p>N</p>
-<p>Number of exterior windows in a zone</p>
-<p>-</p>
-<p>NWD</p>
-<p>θ<sub>sky</sub>, φ<sub>sky</sub></p>
-<p>Azimuth and altitude angles of a point in the sky</p>
-<p>radians</p>
-<p>THSKY, PHSKY</p>
-<p>ψ<sub>cs</sub></p>
-<p>Clear sky luminance distribution</p>
-<p>cd/m<sup>2</sup></p>
-<p>-</p>
-<p>ψ<sub>ts</sub></p>
-<p>Clear turbid sky luminance distribution</p>
-<p>cd/m<sup>2</sup></p>
-<p>-</p>
-<p>ψ<sub>is</sub></p>
-<p>Intermediate sky luminance distribution</p>
-<p>cd/m<sup>2</sup></p>
-<p>-</p>
-<p>ψ<sub>os</sub></p>
-<p>Overcast sky luminance distribution</p>
-<p>cd/m<sup>2</sup></p>
-<p>-</p>
-<p>φ<sub>sun</sub></p>
-<p>Altitude angle of the sun</p>
-<p>radians or degrees</p>
-<p>PHSUN</p>
-<p>γ</p>
-<p>Angle between point in the sky and the sun; or angle between vertical and ray from reference point to window element</p>
-<p>radians</p>
-<p>G</p>
-<p>L<sub>z</sub></p>
-<p>Sky zenith luminance</p>
-<p>cd/m<sup>2</sup></p>
-<p>ZENL</p>
-<p>m</p>
-<p>Optical air mass of the atmosphere</p>
-<p>m</p>
-<p>AM</p>
-<p>h</p>
-<p>Building altitude</p>
-<p>m</p>
-<p>Elevation</p>
-<p>E<sub>h,k</sub></p>
-<p>Exterior horizontal illuminance for sky type k</p>
-<p>lux</p>
-<p>-</p>
-<p>N<sub>θ</sub>, N<sub>φ</sub></p>
-<p>Number of azimuth, altitude steps for sky integration</p>
-<p>NTH, NPH</p>
-<div>\[{\vec R_{ref}}\]</div>
+<table class="table table-striped">
+  <tr>
+    <th>Mathematical Variable</th>
+    <th>Description</th>
+    <th>Units</th>
+    <th>Internal Variable</th>
+  </tr>
+  <tr>
+    <td>E<sub>h,sky</sub></td>
+    <td>Exterior horizontal illuminance due to light from the sky</td>
+    <td>lux</td>
+    <td>GILSK</td>
+  </tr>
+  <tr>
+    <td>E<sub>h,sun</sub></td>
+    <td>Exterior horizontal illuminance due to light from the sun</td>
+    <td>lux</td>
+    <td>GILSU</td>
+  </tr>
+  <tr>
+    <td>d<sub>sky</sub>,d<sub>sun</sub></td>
+    <td>Interior illuminance factor due</td>
+    <td>-</td>
+    <td>DFACSK,DFACSU</td>
+  </tr>
+  <tr>
+    <td>w<sub>sky</sub>,w<sub>sun</sub></td>
+    <td>Window luminance factor due to sky, sun related light</td>
+    <td>cd/lm</td>
+    <td>SFACSK, SFACSU</td>
+  </tr>
+  <tr>
+    <td>b<sub>sky</sub>,b<sub>sun</sub></td>
+    <td>Window background luminance factor due to sky, sun related light</td>
+    <td>cd/lm</td>
+    <td>BFACSK, BFACSU</td>
+  </tr>
+  <tr>
+    <td>N Number of exterior windows</td>
+    <td>Number of exterior windows in a zone</td>
+    <td>-</td>
+    <td>NWD</td>
+  </tr>
+  <tr>
+    <td>θ<sub>sky</sub>,φ<sub>sky</sub></td>
+    <td>Azimuth and altitude angles of a point in the sky</td>
+    <td>radians</td>
+    <td>THSKY, PHSKY</td>
+  </tr>
+  <tr>
+    <td>ψ<sub>cs</sub></td>
+    <td>Clear sky luminance distribution</td>
+    <td>cd/m2</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>ψ<sub>ts</sub></td>
+    <td>Clear turbid sky luminance distribution</td>
+    <td>cd/m2</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>ψ<sub>os</sub></td>
+    <td>Intermediate sky luminance distribution</td>
+    <td>cd/m2</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>ψ<sub>os</sub></td>
+    <td>Overcast sky luminance distribution</td>
+    <td>cd/m2</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>φ<sub>sun</sub></td>
+    <td>Altitude angle of the sun</td>
+    <td>radians or degrees</td>
+    <td>PHSUN</td>
+  </tr>
+  <tr>
+    <td>γ</td>
+    <td>Angle between point in the sky and the sun; or angle between vertical and ray from reference point to window element</td>
+    <td>radians</td>
+    <td>G</td>
+  </tr>
+  <tr>
+    <td>L<sub>z</sub></td>
+    <td>Sky zenith luminance</td>
+    <td>cd/m2</td>
+    <td>ZENL</td>
+  </tr>
+  <tr>
+    <td>Mathematical Variable</td>
+    <td>Optical air mass of the atmosphere</td>
+    <td>m</td>
+    <td>AM</td>
+  </tr>
+  <tr>
+    <td>h</td>
+    <td>Building altitude</td>
+    <td>m</td>
+    <td>ELEVATION</td>
+  </tr>
+  <tr>
+    <td>E<sub>h,k</sub></td>
+    <td>Exterior horizontal illuminance for sky type k</td>
+    <td>lux</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>N<sub>θ</sub>,N<sub>φ</sub></td>
+    <td>Number of azimuth, altitude steps for sky integration</td>
+    <td></td>
+    <td>NTH, NPH</td>
+  </tr>
+  <tr>
+    <td><span>$\vec{R}_{ref}$</span></td>
+    <td>Vector from zone origin to reference point</td>
+    <td>m</td>
+    <td>RREF</td>
+  </tr>
+  <tr>
+    <td><span>$\vec{R}_{win}$</span></td>
+    <td>Vector from zone origin to window element</td>
+    <td>m</td>
+    <td>RWIN</td>
+  </tr>
+  <tr>
+    <td>dΩ</td>
+    <td>Solid angle subtended by window element</td>
+    <td>steradians</td>
+    <td>DOMEGA</td>
+  </tr>
+  <tr>
+    <td>L<sub>w</sub></td>
+    <td>Luminance of a window element as seen from reference point</td>
+    <td>cd/m2</td>
+    <td>WLUMSK, WLUMSU</td>
+  </tr>
+  <tr>
+    <td>L<sub>w,shade</sub></td>
+    <td>Luminance of window element with shade in place</td>
+    <td>cd/m2</td>
+    <td>WLUMSK, WLUMSU</td>
+  </tr>
+  <tr>
+    <td>dE<sub>h</sub></td>
+    <td>Horizontal illuminance at reference point from window element</td>
+    <td>lux</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>dx, dy</td>
+    <td>Size of window element</td>
+    <td>m</td>
+    <td>DWX, DWY</td>
+  </tr>
+  <tr>
+    <td>D</td>
+    <td>Distance from reference point to window element</td>
+    <td>m</td>
+    <td>DIS</td>
+  </tr>
+  <tr>
+    <td>B</td>
+    <td>Angle between window element's outward normal and rat from reference point to window element</td>
+    <td>radians</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td><span>$\hat{R}_{ref}$</span></td>
+    <td>Unit vector from reference point to window element</td>
+    <td>-</td>
+    <td>RAY</td>
+  </tr>
+  <tr>
+    <td><span>$\hat{W}_{n}$</span></td>
+    <td>Unit vector normal to window element, pointing away from zone</td>
+    <td>-</td>
+    <td>WNORM</td>
+  </tr>
+  <tr>
+    <td><span>$\hat{W}_{21}$</span></td>
+    <td>Unit vector along window y-axis</td>
+    <td>-</td>
+    <td>W21</td>
+  </tr>
+  <tr>
+    <td><span>$\hat{W}_{23}$</span></td>
+    <td>Unit vector along window x-axis</td>
+    <td>-</td>
+    <td>W23</td>
+  </tr>
+  <tr>
+    <td>τ<sub>vis</sub></td>
+    <td>Glass visible transmittance</td>
+    <td>-</td>
+    <td>TVISB</td>
+  </tr>
+  <tr>
+    <td>L</td>
+    <td>Luminance of sky or obstruction</td>
+    <td>cd/m2</td>
+    <td>ELUM, -</td>
+  </tr>
+  <tr>
+    <td>Φ<sub>FW</sub></td>
+    <td>Downgoing luminous flux from a window</td>
+    <td>lm</td>
+    <td>FLFW –</td>
+  </tr>
+  <tr>
+    <td>Φ<sub>CW</sub></td>
+    <td>Upgoing luminous flux from a window</td>
+    <td>lm</td>
+    <td>FLCW –</td>
+  </tr>
+  <tr>
+    <td>F<sub>1</sub></td>
+    <td>First-reflected flux</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>ρ<sub>FW</sub></td>
+    <td>Area-weighted reflectance of floor and upper part of walls</td>
+    <td>-</td>
+    <td>SurfaceWindow%RhoFloorWall</td>
+  </tr>
+  <tr>
+    <td>ρ<sub>CW</sub></td>
+    <td>Area-weighted reflectance of ceiling and upper part of walls</td>
+    <td>-</td>
+    <td>SurfaceWindow%RhoCeilingWall</td>
+  </tr>
+  <tr>
+    <td>E<sub>r</sub></td>
+    <td>Average internally-reflected illuminance</td>
+    <td>lux</td>
+    <td>EINTSK, EINTSU</td>
+  </tr>
+  <tr>
+    <td>A</td>
+    <td>Total inside surface area of a zone</td>
+    <td>m2</td>
+    <td>ATOT</td>
+  </tr>
+  <tr>
+    <td>ρ</td>
+    <td>Area-weighted average reflectance of zone interior surfaces</td>
+    <td>-</td>
+    <td>ZoneDaylight%AveVisDiffREflect</td>
+  </tr>
+  <tr>
+    <td>θ, φ</td>
+    <td>Azimuth and altitude angle of a sky or ground element</td>
+    <td>radians</td>
+    <td>TH, PH</td>
+  </tr>
+  <tr>
+    <td>L(θ, φ)</td>
+    <td>Luminance of sky or ground element at (θ, φ)</td>
+    <td>cd/m2</td>
+    <td>HitPointLum--</td>
+  </tr>
+  <tr>
+    <td>A<sub>w</sub></td>
+    <td>Area of glazed part of window</td>
+    <td>m2</td>
+    <td>Surface%Area</td>
+  </tr>
+  <tr>
+    <td>β</td>
+    <td>Angle of incidence, at center of window, of light from a sky or ground element</td>
+    <td>radians</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>T(β)</td>
+    <td>Glazing visible transmittance at incidence angle β</td>
+    <td></td>
+    <td>TVISBR</td>
+  </tr>
+  <tr>
+    <td>dΦ<sub>inc</sub></td>
+    <td>Luminous flux incident on window from sky or ground element</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>dΦ</td>
+    <td>Luminous flux from sky or ground element transmitted through window</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>dΦ<sub>FW|, dΦ<sub>CW</sub></td>
+    <td>Luminous flux from sky or ground element transmitted through window and going downward, upward</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>{min</sub>, θ{max</sub></td>
+    <td>Azimuth angle integration limits</td>
+    <td>radians</td>
+    <td>THMIN, THMAX</td>
+  </tr>
+  <tr>
+    <td>φ<sub>w</sub></td>
+    <td>Window normal altitude angle</td>
+    <td>radians</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Φ<sub>sh</sub>,Φ<sub>unsh</sub></td>
+    <td>Transmitted flux through window and shade, without shade</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Φ<sub>CW,sh</sub>,Φ<sub>FW,sh</sub></td>
+    <td>Upgoing and downgoing portions of transmitted flux through window with shade</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Φ<sub>CW,unsh</sub>,Φ<sub>FW,unsh</sub></td>
+    <td>Upgoing and downgoing portions of transmitted flux through window without shade</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>f</td>
+    <td>Fraction of hemisphere seen by the inside of window that lies above the window midplane</td>
+    <td>-</td>
+    <td>SurfaceWindow%Fraction UpGoing</td>
+  </tr>
+  <tr>
+    <td>Φ<sub>inc</sub></td>
+    <td>Flux incident on glazing from direct sun</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>f<sub>sunlit</sub></td>
+    <td>Fraction of glazing that is sunlit</td>
+    <td>-</td>
+    <td>SunLitFrac</td>
+  </tr>
+  <tr>
+    <td>Φ</td>
+    <td>Transmitted flux from direct sun</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>L<sub>sh</sub></td>
+    <td>Luminance of window with shade</td>
+    <td>cd/m2</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>L<sub>b</sub></td>
+    <td>Window background luminance</td>
+    <td>cd/m2</td>
+    <td>BLUM</td>
+  </tr>
+  <tr>
+    <td>G</td>
+    <td>Discomfort glare constant</td>
+    <td>-</td>
+    <td>GTOT</td>
+  </tr>
+  <tr>
+    <td>G<sub>i</sub></td>
+    <td>Discomfort glare constant from window I</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>ω</td>
+    <td>Solid angle subtended by window with respect to reference point</td>
+    <td>steradians</td>
+    <td>SolidAngAtRefPt</td>
+  </tr>
+  <tr>
+    <td>Ω</td>
+    <td>Solid angle subtended by window with respect to reference point, modified to take direction of occupant view into account</td>
+    <td>steradians</td>
+    <td>SolidAngAtRefPtWtd</td>
+  </tr>
+  <tr>
+    <td>N<sub>x</sub>,N<sub>y</sub></td>
+    <td>Number of elements in x and y direction that window is divided into for glare calculation</td>
+    <td>-</td>
+    <td>NWX, NWY</td>
+  </tr>
+  <tr>
+    <td>p(x<sub>R</sub>,y<sub>R</sub>)</td>
+    <td>Position factor for horizontal and vertical displacement ratios x_{R} and y_{R}</td>
+    <td>-</td>
+    <td>DayltgGlarePositionFactor</td>
+  </tr>
+  <tr>
+    <td>p<sub>H</sub></td>
+    <td>Hopkinson position factor</td>
+    <td>-</td>
+    <td>DayltgGlarePositionFactor</td>
+  </tr>
+  <tr>
+    <td>L<sub>b</sub></td>
+    <td>Window background luminance</td>
+    <td>cd/m2</td>
+    <td>BLUM</td>
+  </tr>
+  <tr>
+    <td>E<sub>b</sub></td>
+    <td>Illuminance on window background</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>E<sub>r</sub></td>
+    <td>Total internally-reflected component of daylight illuminance</td>
+    <td>lm</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>E<sub>s</sub></td>
+    <td>Illuminance setpoint</td>
+    <td>lm</td>
+    <td>IllumSetPoint</td>
+  </tr>
+  <tr>
+    <td>G<sub>i</sub></td>
+    <td>Glare Index</td>
+    <td>-</td>
+    <td>GLINDX</td>
+  </tr>
+</table>
 
-<p>Vector from zone origin to  reference point</p>
-<p>m</p>
-<p>RREF</p>
-<div>\[{\vec R_{win}}\]</div>
-
-<p>Vector from zone origin to window element</p>
-<p>m</p>
-<p>RWIN</p>
-<p>dΩ</p>
-<p>Solid angle subtended by window element</p>
-<p>steradians</p>
-<p>DOMEGA</p>
-<p>L<sub>w</sub></p>
-<p>Luminance of a window element as seen from reference point</p>
-<p>cd/m<sup>2</sup></p>
-<p>WLUMSK, WLUMSU</p>
-<p>L<sub>w,shade</sub></p>
-<p>Luminance of window element with shade in place</p>
-<p>cd/m<sup>2</sup></p>
-<p>WLUMSK, WLUMSU</p>
-<p>dE<sub>h</sub></p>
-<p>Horizontal illuminance at reference point from window element</p>
-<p>lux</p>
-<p>-</p>
-<p>dx, dy</p>
-<p>Size of window element</p>
-<p>m</p>
-<p>DWX, DWY</p>
-<p>D</p>
-<p>Distance from reference point to window element</p>
-<p>m</p>
-<p>DIS</p>
-<p>B</p>
-<p>Angle between window element’s outward normal and ray from reference point to window element</p>
-<p>radians</p>
-<p>-</p>
-<div>\[{\hat R_{ray}}\]</div>
-
-<p>Unit vector from reference point to window element</p>
-<p>-</p>
-<p>RAY</p>
-<div>\[{\hat W_n}\]</div>
-
-<p>Unit vector normal to window element, pointing away from zone</p>
-<p>-</p>
-<p>WNORM</p>
-<div>\[{\hat W_{21}}\]</div>
-
-<p>Unit vector along window y-axis</p>
-<p>-</p>
-<p>W21</p>
-<div>\[{\hat W_{23}}\]</div>
-
-<p>Unit vector along window x-axis</p>
-<p>-</p>
-<p>W23</p>
-<p>τ<sub>vis</sub></p>
-<p>Glass visible transmittance</p>
-<p>-</p>
-<p>TVISB</p>
-<p>L</p>
-<p>Luminance of sky or obstruction</p>
-<p>cd/m<sup>2</sup></p>
-<p>ELUM, -</p>
-<p>Φ<sub>FW</sub></p>
-<p>Downgoing luminous flux from a window</p>
-<p>lm</p>
-<p>FLFW--</p>
-<p>Φ<sub>CW</sub></p>
-<p>Upgoing luminous flux from a window</p>
-<p>lm</p>
-<p>FLCW--</p>
-<p>F<sub>1</sub></p>
-<p>First-reflected flux</p>
-<p>lm</p>
-<p>-</p>
-<p>ρ<sub>FW</sub></p>
-<p>Area-weighted reflectance of floor and upper part of walls</p>
-<p>-</p>
-<p>SurfaceWindow%RhoFloorWall</p>
-<p>ρ<sub>CW</sub></p>
-<p>Area-weighted reflectance of ceiling and upper part of walls</p>
-<p>-</p>
-<p>SurfaceWindow%RhoCeilingWall</p>
-<p>E<sub>r</sub></p>
-<p>Average internally-reflected illuminance</p>
-<p>lux</p>
-<p>EINTSK, EINTSU</p>
-<p>A</p>
-<p>Total inside surface area of a zone</p>
-<p>m<sup>2</sup></p>
-<p>ATOT</p>
-<p>ρ</p>
-<p>Area-weighted average reflectance of zone interior surfaces</p>
-<p>-</p>
-<p>ZoneDaylight%AveVisDiffReflect</p>
-<p>θ, φ</p>
-<p>Azimuth and altitude angle of a sky or ground element</p>
-<p>radians</p>
-<p>TH, PH</p>
-<p>L(θ,φ)</p>
-<p>Luminance of sky or ground element at (θ,φ)</p>
-<p>cd/m<sup>2</sup></p>
-<p>HitPointLum--</p>
-<p>A<sub>w</sub></p>
-<p>Area of glazed part of window</p>
-<p>m<sup>2</sup></p>
-<p>Surface%Area</p>
-<p>β</p>
-<p>Angle of incidence, at center of window,  of light from a sky or ground element</p>
-<p>radians</p>
-<p>-</p>
-<p>T(β)</p>
-<p>Glazing visible transmittance at incidence angle β</p>
-<p>TVISBR</p>
-<p>dΦ<sub>inc</sub></p>
-<p>Luminous flux incident on window from sky or ground element</p>
-<p>lm</p>
-<p>-</p>
-<p>dΦ</p>
-<p>Luminous flux from sky or ground element transmitted through window</p>
-<p>lm</p>
-<p>-</p>
-<p>dΦ<sub>FW</sub>, dΦ<sub>CW</sub></p>
-<p>Luminous flux from sky or ground element transmitted through window and goind downwar, upward</p>
-<p>lm</p>
-<p>-</p>
-<p>θ<sub>min</sub>, θ<sub>max</sub></p>
-<p>Azimuth angle integration limits</p>
-<p>radians</p>
-<p>THMIN, THMAX</p>
-<p>φ<sub>w</sub></p>
-<p>Window normal altitude angle</p>
-<p>radians</p>
-<p>-</p>
-<p>Φ<sub>sh</sub>, Φ<sub>unsh</sub>,</p>
-<p>Transmitted flux through window with shade, without shade</p>
-<p>lm</p>
-<p>-</p>
-<p>Φ<sub>CW,sh</sub>, Φ<sub>FW,sh</sub></p>
-<p>Upgoing and downgoing portions of transmitted flux through window with shade</p>
-<p>lm</p>
-<p>-</p>
-<p>Φ<sub>CW,unsh</sub>, Φ<sub>FW,unsh</sub></p>
-<p>Upgoing and downgoing portions of transmitted flux through window without shade</p>
-<p>lm</p>
-<p>-</p>
-<p>f</p>
-<p>Fraction of hemisphere seen by the inside of window that lies above the window midplane</p>
-<p>-</p>
-<p>SurfaceWindow%FractionUpgoing</p>
-<p>Φ<sub>inc</sub></p>
-<p>Flux incident on glazing from direct sun</p>
-<p>lm</p>
-<p>-</p>
-<p>f<sub>sunlit</sub></p>
-<p>Fraction of glazing that is sunlit</p>
-<p>-</p>
-<p>SunLitFrac</p>
-<p>Φ</p>
-<p>Transmitted flux from direct sun</p>
-<p>-</p>
-<p>-</p>
-<p>L<sub>sh</sub></p>
-<p>Luminance of window with shade</p>
-<p>cd/m<sup>2</sup></p>
-<p>-</p>
-<p>L<sub>b</sub></p>
-<p>Window background luminance</p>
-<p>cd/m<sup>2</sup></p>
-<p>BLUM</p>
-<p>G</p>
-<p>Discomfort glare constant</p>
-<p>-</p>
-<p>GTOT</p>
-<p>G<sub>i</sub></p>
-<p>Discomfort glare constant from window i</p>
-<p>-</p>
-<p>-</p>
-<p>ω</p>
-<p>Solid angle subtended by window with respect to reference point</p>
-<p>steradians</p>
-<p>SolidAngAtRefPt</p>
-<p>Ω</p>
-<p>Solid angle subtended by window with respect to reference point, modified to take direction of occupant view into account</p>
-<p>steradians</p>
-<p>SolidAngAtRefPtWtd</p>
-<p>N<sub>x</sub><sub>,</sub> N<sub>y</sub></p>
-<p>Number of elements in x and y direction that window is divided into for glare calculation</p>
-<p>-</p>
-<p>NWX, NWY</p>
-<p>p(x<sub>R</sub>, y<sub>R</sub>)</p>
-<p>Position factor for horizontal and vertical displacement ratios x<sub>R</sub> and y<sub>R</sub></p>
-<p>-</p>
-<p>DayltgGlarePositionFactor</p>
-<p>p<sub>H</sub></p>
-<p>Hopkinson position factor</p>
-<p>-</p>
-<p>DayltgGlarePositionFactor</p>
-<p>L<sub>b</sub></p>
-<p>Window background luminance</p>
-<p>cd/m<sup>2</sup></p>
-<p>BLUM</p>
-<p>E<sub>b</sub></p>
-<p>Illuminance on window background</p>
-<p>lm</p>
-<p>-</p>
-<p>E<sub>r</sub></p>
-<p>Total internally-reflected component of daylight illuminance</p>
-<p>lm</p>
-<p>-</p>
-<p>E<sub>s</sub></p>
-<p>Illuminance setpoint</p>
-<p>lm</p>
-<p>IllumSetPoint</p>
-<p>G<sub>I</sub></p>
-<p>Glare index</p>
-<p>-</p>
-<p>GLINDX</p>
 <h3 id="overview">Overview</h3>
 <p>There are three types of daylight factors: interior illuminance factors, window luminance factors, and window background luminance factors. To calculate these factors the following steps are carried out for each hourly sun position on the sun paths for the design days and for representative days<a href="#_ftn8">[8]</a> during the simulation run period:</p>
 <p>1.    Calculate exterior horizontal daylight illuminance from sky and sun for standard (CIE) clear and overcast skies.</p>
@@ -659,7 +804,42 @@
 <div>\[{b_{sun}} = \frac{{{\rm{Window background luminance due to sun - related light}}}}{{{E_{h,sun}}}}\]</div>
 
 <p>For a daylit zone with <em>N</em> windows these six daylight factors are calculated for each of the following combinations of reference point, window, sky-condition/sun-position and shading device:</p>
-<div>\[\left[ {\begin{array}{*{20}{c}}{{\rm{Ref}}{\rm{. pt}}{\rm{. \# 1}}}\\\{{\rm{Ref}}{\rm{. pt}}{\rm{. \# 2}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{\rm{Window \# 1}}}\\\{{\rm{Window \# 2}}}\\\{...}\\\{{\rm{Window \# N}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}\begin{array}{l}{\rm{Clear sky, first sun - up hour}}\\\{\rm{Clear/turbid sky, first sun - up hour}}\\\{\rm{Intermediate sky, first sun - up hour}}\\\{\rm{Overcast sky, first sun - up hour}}\end{array}\\\{...}\\\begin{array}{l}{\rm{Clear sky, last sun - up hour}}\\\{\rm{Clear/turbid sky, last sun - up hour}}\\\{\rm{Intermediate sky, last sun - up hour}}\\\{\rm{Overcast sky, last sun - up hour}}\end{array}\\\{}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{\rm{Unshaded window}}}\\\begin{array}{l}{\rm{ Shaded window }}\\\{\rm{(if shade assigned)}}\end{array}\end{array}} \right]\]</div>
+<div>\[
+  \left[
+    \begin{array}{c}
+      Ref pt 1 \\
+      Ref pt 2
+    \end{array}
+  \right]
+  \left[
+    \begin{array}{c}
+      Window 1 \\
+      Window 2 \\
+      ... \\
+      Window N
+    \end{array}
+  \right]
+  \left[
+    \begin{array}{c}
+      Clear sky, first sun-up hour \\
+      Clear/turbid sky, first sun-up hour \\
+      Intermediate sky, first sun-up hour \\
+      Overcast sky, first sun-up hour \\
+      ...
+      Clear sky, last sun-up hour \\
+      Clear/turbid sky, last sun-up hour \\
+      Intermediate sky, last sun-up hour \\
+      Overcase sky, last sun-up hour
+    \end{array}
+   \right]
+   \left[
+     \begin{array}{c}
+       Unshaded window \\
+       Shaded window \\
+       (if shade assigned)
+     \end{array}
+   \right]
+\]</div>
 
 <h3 id="sky-luminance-distributions">Sky Luminance Distributions</h3>
 <p>The luminance distribution of the sky is represented as a superposition of four standard CIE skies using the approach described in (Perez et al. 1990). The standard skies are as follows.</p>
@@ -703,7 +883,14 @@
 <div>\[{E_{h,k}} = \sum\limits_{i = 1}^{{N_\theta }} {\sum\limits_{j = 1}^{{N_\phi }} {{\psi_k}\left( {{\theta_{sky}}(i),{\phi_{sky}}(j)} \right)} } \sin {\phi_{sky}}(j)\cos {\phi_{sky}}(j)\Delta {\theta_{sky}}\Delta {\phi_{sky}}\]</div>
 
 <p>where</p>
-<div>\[\begin{array}{l}{\theta_{sky}}(i) = (i - 1/2)\Delta {\theta_{sky}}\\\{\phi_{sky}}(j) = (j - 1/2)\Delta {\phi_{sky}}\\\Delta {\theta_{sky}} = 2\pi /{N_\theta }\\\Delta {\phi_{sky}} = \pi /2{N_\phi }\end{array}\]</div>
+<div>\[
+  \begin{array}{l}
+    \theta_{sky}(i) = (i - 1/2) \Delta \theta_{sky} \\
+    \phi_{sky}(j) = (j - 1/2) \Delta \phi_{sky} \\
+    \Delta \theta_{sky} = 2 \pi / N_{\theta} \\
+    \Delta \phi_{sky} = \pi / 2N_{\phi} 
+  \end{array}
+\]</div>
 
 <p><span>${N_\theta } = 18$</span> and <span>${N_\phi } = 8$</span> were found to give a <span>$ \pm 1\% $</span>accuracy in the calculation of <span>${E_h}_{,k}$</span>.</p>
 <h3 id="direct-component-of-interior-daylight-illuminance">Direct Component of Interior Daylight Illuminance</h3>
@@ -772,7 +959,12 @@
 <div>\[{\Phi_{sh}} = {A_w}\int\limits_{{\theta_{\min }}}^{{\theta_{\max }}} {\int\limits_{\pi /2 - {\phi_w}}^{\pi /2} {L(\theta ,\phi )T(\beta )\cos \beta \cos \phi d\theta d\phi } } \]</div>
 
 <p>The downgoing and upgoing portions of this flux are</p>
-<div>\[\begin{array}{l}{\Phi_{FW,sh}} = \Phi (1 - f)\\\{\Phi_{CW,sh}} = \Phi f\end{array}\]</div>
+<div>\[
+  \begin{array}{l}
+    \Phi_{FW,sh} = \Phi (1 - f) \\
+    \Phi_{CW,sh} = \Phi f
+  \end{array}
+\]</div>
 
 <p>where <em>f</em>, the fraction of the hemisphere seen by the inside of the window that lies above the window midplane, is given by</p>
 <div>\[f = 0.5 - {\phi_w}/\pi \]</div>
@@ -789,7 +981,12 @@
 <div>\[A = {\cos ^{ - 1}}(\tan \phi \tan {\phi_w})\]</div>
 
 <p>Thus</p>
-<div>\[\begin{array}{l}{\theta_{\min }} =  - \left| {{{\cos }^{ - 1}}( - \tan \phi \tan {\phi_w})} \right|\\\{\theta_{\max }} = \left| {{{\cos }^{ - 1}}( - \tan \phi \tan {\phi_w})} \right|\end{array}\]</div>
+<div>\[
+  \begin{array}{l}
+    \theta_{min} &=  - \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| \\
+    \theta_{max} &= \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| 
+  \end{array}
+\]</div>
 
 <h3 id="transmitted-flux-from-direct-sun">Transmitted Flux from Direct Sun</h3>
 <p>The flux incident on the window from direct sun is</p>
@@ -800,10 +997,20 @@
 
 <p>where T is the net transmittance of the window glazing (plus shade, if present).</p>
 <p>For an unshaded window all of the transmitted flux is downward since the sun always lies above the window midplane. Therefore</p>
-<div>\[\begin{array}{l}{\Phi_{FW,unsh}} = \Phi \\\{\Phi_{CW,unsh}} = 0\end{array}\]</div>
+<div>\[
+  \begin{array}{l}
+    \Phi_{FW,unsh} = \Phi \\
+    \Phi_{CW,unsh} = 0
+  \end{array}
+\]</div>
 
 <p>For a window with a diffusing shade</p>
-<div>\[\begin{array}{l}{\Phi_{FW,sh}} = \Phi (1 - f)\\\{\Phi_{CW,sh}} = \Phi f\end{array}\]</div>
+<div>\[
+  \begin{array}{l}
+    \Phi_{FW,sh} = \Phi (1 - f) \\
+    \Phi_{CW,sh} = \Phi f
+  \end{array}
+\]</div>
 
 <h3 id="luminance-of-shaded-window">Luminance of Shaded Window</h3>
 <p>The luminance of a shaded window is determined at the same time that the transmitted flux is calculated. It is given by</p>
@@ -829,81 +1036,121 @@
 <p>The modified solid angle is</p>
 <p><span>$\Omega  = \sum\limits_{j = 1}^{{N_y}} {\sum\limits_{i = 1}^{{N_x}} {d\omega (i,j)} } p({x_R},{y_R})$</span></p>
 <p>where p is a “position factor” [Petherbridge &amp; Longmore, 1954] that accounts for the decrease in visual excitation as the luminous element moves away from the line of sight. This factor depends on the horizontal and vertical displacement ratios, <em>x<sub>R</sub></em> and <em>y<sub>R</sub></em> (Figure 59),  given by</p>
-<div>\[\begin{array}{l}{x_R}(i,j) = \frac{{{{\left| {{A^2} - {{(YD)}^2}} \right|}^{1/2}}}}{{RR}}\\\{y_R}(i,j) = \left| {YD/RR} \right|\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    x_R(i,j) &= \frac{\sqrt{A^2-(YD)^2}}{RR} \\
+    y_R(i,j) &= \left|YD/RR\right|
+  \end{array}
+\]</div>
 
 <p>where</p>
-<div>\[\begin{array}{l}RR = D({{\hat R}_{ray}} \cdot {{\hat v}_{view}})\\\{A^2} = {D^2} - {(RR)^2}\\YD = {R_{win}}(3) - {R_{ref}}(3)\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    RR &= D (\hat{R}_{ray}\cdot\hat{v}_{view}) \\
+    A^2 &= D^2 - (RR)^2 \\
+    YD = R_{win}(3) - R_{ref}(3)
+  \end{array}
+\]</div>
 
 <p><img alt="GeomGlare" src="../../EngineeringReference/media/image794.png" /></p>
 <p>Figure 59.  Geometry for calculation of displacement ratios used in the glare formula.</p>
 <p>The factor <em>p</em> can be obtained from graphs given in [Petherbridge &amp; Longmore, 1954] or it can be calculated from tabulated values of <em>p<sub>H</sub></em>, the Hopkinson position factor [Hopkinson, 1966], since <span>$p = p_H^{1.25}$</span>. The values resulting from the latter approach are given in Table 26. Interpolation of this table is used in EnergyPlus to evaluate <em>p</em> at intermediate values of <em>x<sub>R</sub></em> and <em>y<sub>R</sub></em>.</p>
 <p>Table 26.  Position factor for glare calculation</p>
-<p><strong><em>x<sub>R</sub></em>: Horizontal Displacement Factor</strong></p>
-<p><strong>0</strong></p>
-<p><strong>0.5</strong></p>
-<p><strong>1.0</strong></p>
-<p><strong>1.5</strong></p>
-<p><strong>2.0</strong></p>
-<p><strong>2.5</strong></p>
-<p><strong>3.0</strong></p>
-<p><strong>&gt;3.0</strong></p>
-<p><strong><em>y<sub>R</sub></em>:</strong></p>
-<p><strong>Vertical
- Displacement Factor</strong></p>
-<p><strong>0</strong></p>
-<p>1.00</p>
-<p>0.492</p>
-<p>0.226</p>
-<p>0.128</p>
-<p>0.081</p>
-<p>0.061</p>
-<p>0.057</p>
-<p>0</p>
-<p><strong>0.5</strong></p>
-<p>0.123</p>
-<p>0.119</p>
-<p>0.065</p>
-<p>0.043</p>
-<p>0.029</p>
-<p>0.026</p>
-<p>0.023</p>
-<p>0</p>
-<p><strong>1.0</strong></p>
-<p>0.019</p>
-<p>0.026</p>
-<p>0.019</p>
-<p>0.016</p>
-<p>0.014</p>
-<p>0.011</p>
-<p>0.011</p>
-<p>0</p>
-<p><strong>1.5</strong></p>
-<p>0.008</p>
-<p>0.008</p>
-<p>0.008</p>
-<p>0.008</p>
-<p>0.008</p>
-<p>0.006</p>
-<p>0.006</p>
-<p>0</p>
-<p><strong>2.0</strong></p>
-<p>0</p>
-<p>0</p>
-<p>0.003</p>
-<p>0.003</p>
-<p>0.003</p>
-<p>0.003</p>
-<p>0.003</p>
-<p>0</p>
-<p><strong>&gt;2.0</strong></p>
-<p>0</p>
-<p>0</p>
-<p>0</p>
-<p>0</p>
-<p>0</p>
-<p>0</p>
-<p>0</p>
-<p>0</p>
+<table class="table table-striped">
+ <tr>
+  <th colspan="2" rowspan="2"></th>
+  <th colspan="8">X<sub>R</sub>: Horizontal Displacement Factor</th>
+ </tr>
+ <tr>
+  <th>0.0</th>
+  <th>0.5</th>
+  <th>1.0</th>
+  <th>1.5</th>
+  <th>2.0</th>
+  <th>2.5</th>
+  <th>3.0</th>
+  <th>&gt;3.0</th>
+ </tr>
+ <tr>
+  <th rowspan="6">y<sub>R</sub>: Vertical Displacement Factor</th>
+  <th>0</th>
+  <td>1.00</td>
+  <td>0.492</td>
+  <td>0.226</td>
+  <td>0.128</td>
+  <td>0.081</td>
+  <td>0.061</td>
+  <td>0.057</td>
+  <td>0</td>
+ </tr>
+ <tr>
+  <th>0.5</th>
+  <td>0.123</td>
+  <td>0.119</td>
+  <td>0.065</td>
+  <td>0.043</td>
+  <td>0.029</td>
+  <td>0.026</td>
+  <td>0.023</td>
+  <td>0</td>
+ </tr>
+ <tr>
+  <th>1.0</th>
+  <td>0.019</td>
+  <td>0.026</td>
+  <td>0.019</td>
+  <td>0.016</td>
+  <td>0.014</td>
+  <td>0.011</td>
+  <td>0.011</td>
+  <td>0</td>
+ </tr>
+ <tr>
+  <th>1.5</th>
+  <td>0.008</td>
+  <td>0.008</td>
+  <td>0.008</td>
+  <td>0.008</td>
+  <td>0.008</td>
+  <td>0.006</td>
+  <td>0.006</td>
+  <td>0</td>
+ </tr>
+ <tr>
+  <th>2.0</th>
+  <td>0</td>
+  <td>0</td>
+  <td>0.003</td>
+  <td>0.003</td>
+  <td>0.003</td>
+  <td>0.003</td>
+  <td>0.003</td>
+  <td>0</td>
+ </tr>
+ <tr>
+  <th>&gt;2.0</th>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+ </tr>
+ <tr>
+  <th>1.5</th>
+  <td>0.008</td>
+  <td>0.008</td>
+  <td>0.008</td>
+  <td>0.008</td>
+  <td>0.008</td>
+  <td>0.006</td>
+  <td>0.006</td>
+  <td>0</td>
+ </tr>
+</table>
+
 <p>The background luminance is</p>
 <div>\[{L_b} = {E_b}{\rho_b}\]</div>
 
@@ -921,19 +1168,11 @@
 <p>A daylighting calculation is performed each time step that the sun is up for each zone that has one or two daylighting reference points specified. The exterior horizontal illuminance from the sun and sky is determined from solar irradiance data from the weather file. The interior illuminance at each reference point is found for each window by interpolating the daylight illuminance factors for the current sun position, then, for sky-related interior illuminance, multiplying by the exterior horizontal illuminance from the appropriate sky types that time step, and, for sun-related interior illuminance, multiplying by the exterior horizontal solar illuminance that time step. By summation, the net illuminance and glare due to all of the windows in a zone are found. If glare control has been specified window shading (by movable shading devices or switchable glazing) is deployed to reduce glare. Finally the illuminance at each reference point for the final window and shade configuration is used by the lighting control system simulation to determine the electric lighting power required to meet the illuminance setpoint at each reference point.</p>
 <p>Table 27.  Variables in Time-Step Calculations</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
-<td>Units
- </td>
-<td>FORTRAN variable</td>
+<th>Mathematical variable</th>
+<th>Description</th>
+<th>Units</th>
+<th>FORTRAN variable</th>
 </tr>
 <tr>
 <td>S<sub>norm,dir</sub></td>
@@ -1068,18 +1307,6 @@
 <td>WeightNow</td>
 </tr>
 <tr>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-</tr>
-<tr>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-</tr>
-<tr>
 <td>i<sub>L</sub></td>
 <td>Reference point index</td>
 <td>-</td>
@@ -1179,14 +1406,24 @@
 
 <p>where <em>E<sub>h,sun</sub></em> and <em>E<sub>h,sky</sub></em> are the exterior horizontal illuminance from the sun and sky, respectively, and <em>f<sub>k</sub></em> and <em>f<sub>k’</sub></em> are the fraction of the exterior horizontal illuminance from the sky that is due to sky type <em>k</em> and <em>k’</em>, respectively.</p>
 <p>The horizontal illuminance from sun and sky are given by</p>
-<div>\[\begin{array}{l}{E_{h,sun}} = {\eta_{dir}}{S_{norm,dir}}cosZ\\\{E_{h,sky}} = {\eta_{dif}}{S_{h,dif}}\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    E_{h,sun} &= \eta_{dir} S_{norm,dir} \cos Z \\
+    E_{h,sky} &= \eta_{dif} S_{h,dif}
+  \end{array}
+\]</div>
 
 <p>where <em>Z</em> is the solar zenith angle,  <em>η<sub>dif</sub></em> is the luminous efficacy (in lumens/Watt) of diffuse solar radiation from the sky and <em>η<sub>dir</sub></em> is the luminous efficacy of direct radiation from the sun. The efficacies are calculated from direct and global solar irradiance using a method described in (Perez et al, 1990).</p>
 <p>The fractions <em>f<sub>k</sub></em> and <em>f<sub>k’</sub></em> are given by</p>
-<div>\[\begin{array}{l}{f_k} = \frac{{{s_{k,k'}}{E_{h,k}}}}{{{s_{k,k'}}{E_{h,k}} + (1 - {s_{k,k'}}){E_{h,k'}}}}\\\{f_{k'}} = \frac{{(1 - {s_{k,k'}}){E_{h,k'}}}}{{{s_{k,k'}}{E_{h,k}} + (1 - {s_{k,k'}}){E_{h,k'}}}}\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    f_k    &= \frac{ s_{k,k'} E_{h,k} } { s_{k,k'} E_{h,k} + (1 - s_{k,k'})E_{h,k'}} \\
+    f_{k'} &= \frac{ (1 - s_{k,k'} ) E_{h,k'} } { s_{k,k'} E_{h,k} + (1 - s_{k,k'} ) E_{h,k'}}
+  \end{array}
+\]</div>
 
 <p>where <em>E<sub>h,k</sub></em> and <em>E<sub>h,k’</sub></em> are the horizontal illuminances from skies <em>k</em> and <em>k’</em>, respectively (see “Exterior Horizontal Luminance,” above), and <em>s<sub>k,k’</sub></em> is the interpolation factor for skies <em>k</em>and <em>k’</em>(see “Time-Step Sky Luminance,” above).  For example, if  <em>ε</em> &gt; 3, <em>k</em>= <em>cs</em> (clear sky), <em>k’</em> = <em>ts</em> (clear turbid sky) and</p>
-<p><span>${s_{k,k'}} = {s_{cs,ts}} = \min [1,(\varepsilon  - 3)/3]{\rm{image790}}$</span></p>
+<p><span>$s_{k,k'} = s_{cs,ts} = \min [1,(\varepsilon  - 3)/3]$</span></p>
 <p>Similarly, the window source luminance, <em>S<sub>win</sub></em>, and window background luminance, <em>B<sub>win</sub></em>, for a window are calculated from</p>
 <div>\[{S_{win}}({i_L},{i_S}) = {\bar w_{sun}}{E_{h,sun}} + [{\bar w_{sky,k}}({i_L},{i_S}){f_k} + {\bar w_{sky,k'}}({i_L},{i_S}){f_{k'}}]{E_{h,sky}}\]</div>
 
@@ -1211,9 +1448,11 @@
 <p>If glare control has been specified and the glare index at either reference point exceeds a user-specified maximum value, <em>G<sub>I,max</sub></em>, then the windows in the zone are shaded one by one in attempt to bring the glare at both points below <em>G<sub>I,max</sub></em>. (Each time a window is shaded the glare and illuminance at each reference point is recalculated.) The following logic is used:</p>
 <p>5)   If there is only one reference point, shade a window if it is unshaded and shading it decreases the glare, even if it does not decrease the glare below <em>G<sub>I,max</sub></em>. Note that if a window  has already been shaded, say to control solar gain, it will be left in the shaded state.</p>
 <p>6)   If there are two reference points, then:</p>
-<p>n If glare is too high at both points, shade the window if it decreases glare at both points.</p>
-<p>n If glare is too high only at the first point, shade the window if the glare at the first point decreases, and the glare at the second point stays below <em>G<sub>I,max</sub></em>.</p>
-<p>n If glare is too high only at the second point, shade the window if the glare at the second point decreases, and the glare at the first point stays below <em>G<sub>I,max</sub></em>.</p>
+<p>* If glare is too high at both points, shade the window if it decreases glare at both points.</p>
+<p><em> If glare is too high only at the first point, shade the window if the glare at the first point decreases, and the glare at the second point stays below </em>G<sub>I,max</sub>*.</p>
+<ul>
+<li>If glare is too high only at the second point, shade the window if the glare at the second point decreases, and the glare at the first point stays below <em>G<sub>I,max</sub></em>.</li>
+</ul>
 <p>7)   Shades are closed in the order of window input until glare at both points is below <em>G<sub>I,max</sub></em>, or until there are no more windows left to shade.</p>
 <h3 id="lighting-control-system-simulation">Lighting Control System Simulation</h3>
 <p>Once the final daylight illuminance value at each reference point has been determined, the electric lighting control is simulated. The fractional electric lighting output, <em>f<sub>L</sub></em>, required to meet the setpoint at reference point <em>i<sub>L</sub></em> is given by</p>
@@ -1272,17 +1511,35 @@
 <p>2.    <em>Time-Step Interior Daylighting Calculation</em>:  A daylighting calculation is performed for each heat-balance time step when the sun is up. In this calculation the illuminance at the reference points in each zone is found by interpolating the stored daylight factors using the current time step sun position and sky condition, then multiplying by the exterior horizontal illuminance.</p>
 <p>3.    <em>Electric Lighting Control Calculation</em>:  The electric lighting control system is simulated to determine the proportion of lighting energy needed to make up the difference between the daylighting illuminance level at the given time step, and the design illuminance level. Finally, the zone lighting electric reduction factor is passed to the thermal calculation, which uses this factor to reduce the heat gain from lights.</p>
 <h3 id="delight-daylight-factor-calculation-differences-from-energyplus-detailed-methods">DElight Daylight Factor Calculation Differences from EnergyPlus Detailed Methods</h3>
-<p>Ø <em>Initial Interior Illuminance/Luminance Calculation:</em>  DElight calculates the total initial contribution of light transmitted through all simple fenestration systems (i.e., windows and skylights) in the zone to the illuminance at each reference point, and to the luminance at each gridded nodal patch of interior surfaces.  This differs from the models behind the “Daylighting:Controls” object (henceforth referred to as “EnergyPlus Detailed”) in two ways. The first is that EnergyPlus Detailed calculates initial illuminace values at reference points for each pair of reference point and aperture (window/skylight) in the zone, whereas DElight calculates the total contribution from all apertures to each reference point.  The second difference from EnergyPlus Detailed is that the initial luminance of interior surface nodal patches is calculated to support the inter-reflection calculation described below.  This calculation uses the same formula as EnergyPlus Detailed modified for arbitrarily oriented surfaces (i.e., non-horizontal), and to calculate luminance rather than illuminance.  Note however, DElight does not account for interior surface obstructions (e.g., partitions) in this initial interior illuminance/luminance distribution.  The EnergyPlus Detailed method does account for interior surface obstruction of initial illuminance distribution on reference points.</p>
-<p>Ø <em>Reference Points:</em>  DElight allows up to 100 reference points to be arbitrarily positioned with a daylighting zone.  At this time all reference points are assumed to be oriented on a horizontal virtual surface “facing” toward the zenith and “seeing” the hemisphere above the horizontal plane.</p>
-<p>Ø <em>Complex Fenestration System Calculation:</em>  DElight calculates the contribution to the initial interior illuminance at each reference point, and to the luminance at each gridded nodal patch of interior surfaces, of the light transmitted by complex fenestration systems (CFS).  The analysis of a CFS within DElight is based on the characterization of the system using bi-directional transmittance distribution functions (BTDF), which must be either pre-calculated (e.g., using ray-tracing techniques) or pre-measured, prior to analysis by DElight.  A BTDF is a set of data for a given CFS, which gives the ratios of incident to transmitted light for a range of incoming and outgoing directions.  As illustrated in Figure 62, a BTDF can be thought of as collapsing a CFS to a “black box” that is represented geometrically as a flat two-dimensional light-transmitting surface that will be treated as an aperture surface in the daylit zone description. For each incoming direction across the exterior hemisphere of the CFS, varying portions of that light are transmitted at multiple outgoing directions across the interior hemisphere of the CFS.  The two-dimensional CFS “surface” and directional hemispheres are “abstract” in that they may not literally correspond to actual CFS component geometric details.</p>
+<ul>
+<li>
+<p><em>Initial Interior Illuminance/Luminance Calculation:</em>  DElight calculates the total initial contribution of light transmitted through all simple fenestration systems (i.e., windows and skylights) in the zone to the illuminance at each reference point, and to the luminance at each gridded nodal patch of interior surfaces.  This differs from the models behind the “Daylighting:Controls” object (henceforth referred to as “EnergyPlus Detailed”) in two ways. The first is that EnergyPlus Detailed calculates initial illuminace values at reference points for each pair of reference point and aperture (window/skylight) in the zone, whereas DElight calculates the total contribution from all apertures to each reference point.  The second difference from EnergyPlus Detailed is that the initial luminance of interior surface nodal patches is calculated to support the inter-reflection calculation described below.  This calculation uses the same formula as EnergyPlus Detailed modified for arbitrarily oriented surfaces (i.e., non-horizontal), and to calculate luminance rather than illuminance.  Note however, DElight does not account for interior surface obstructions (e.g., partitions) in this initial interior illuminance/luminance distribution.  The EnergyPlus Detailed method does account for interior surface obstruction of initial illuminance distribution on reference points.</p>
+</li>
+<li>
+<p><em>Reference Points:</em>  DElight allows up to 100 reference points to be arbitrarily positioned with a daylighting zone.  At this time all reference points are assumed to be oriented on a horizontal virtual surface “facing” toward the zenith and “seeing” the hemisphere above the horizontal plane.</p>
+</li>
+<li>
+<p><em>Complex Fenestration System Calculation:</em>  DElight calculates the contribution to the initial interior illuminance at each reference point, and to the luminance at each gridded nodal patch of interior surfaces, of the light transmitted by complex fenestration systems (CFS).  The analysis of a CFS within DElight is based on the characterization of the system using bi-directional transmittance distribution functions (BTDF), which must be either pre-calculated (e.g., using ray-tracing techniques) or pre-measured, prior to analysis by DElight.  A BTDF is a set of data for a given CFS, which gives the ratios of incident to transmitted light for a range of incoming and outgoing directions.  As illustrated in Figure 62, a BTDF can be thought of as collapsing a CFS to a “black box” that is represented geometrically as a flat two-dimensional light-transmitting surface that will be treated as an aperture surface in the daylit zone description. For each incoming direction across the exterior hemisphere of the CFS, varying portions of that light are transmitted at multiple outgoing directions across the interior hemisphere of the CFS.  The two-dimensional CFS “surface” and directional hemispheres are “abstract” in that they may not literally correspond to actual CFS component geometric details.</p>
+</li>
+</ul>
 <p><img alt="" src="../../EngineeringReference/media/image827.png" /></p>
 <p>Figure 62.  Bi-Directional Transmittance Data.</p>
 <p>The pre-calculated or pre-measured BTDF for a CFS is independent of its final position and orientation within a building.  Once a specific instance of a CFS aperture has been positioned within a building, the incident light from all exterior sources across the CFS exterior hemisphere can be integrated over all incident directions for each relevant transmitted direction to determine the light transmitted by the CFS surface in that direction. The light transmitted by the CFS aperture is then distributed to surfaces in the zone according to its non-uniform directionality.  The algorithms for this BTDF treatment of CFS in DElight are still under development, and are subject to change in the future.</p>
-<p>Ø <em>Inter-reflected Interior Illuminance/Luminance Calculation:</em>  The effect of inter-reflection of the initial interior illuminance/luminance between interior reflecting surfaces is calculated using a radiosity method derived from Superlite [Modest, 1982].  This method subdivides each reflecting surface in the zone into nodal patches and uses view factors between all nodal patch pairs in an iterative calculation of the total contribution of reflected light within the zone.  This method replaces the split-flux method used in EnergyPlus Detailed, resulting in a more accurate calculation of the varied distribution of inter-reflected light throughout the zone.  The ability to input up to 100 reference points supports a more complete assessment of this distribution.  Also, the radiosity method explicitly accounts for interior obstructions between pairs of nodal patches.  The split-flux method used in the EnergyPlus Detailed approach only implicitly accounts for interior surfaces by including their reflectance and surface area in the zone average surface reflectance calculations.</p>
+<ul>
+<li><em>Inter-reflected Interior Illuminance/Luminance Calculation:</em>  The effect of inter-reflection of the initial interior illuminance/luminance between interior reflecting surfaces is calculated using a radiosity method derived from Superlite [Modest, 1982].  This method subdivides each reflecting surface in the zone into nodal patches and uses view factors between all nodal patch pairs in an iterative calculation of the total contribution of reflected light within the zone.  This method replaces the split-flux method used in EnergyPlus Detailed, resulting in a more accurate calculation of the varied distribution of inter-reflected light throughout the zone.  The ability to input up to 100 reference points supports a more complete assessment of this distribution.  Also, the radiosity method explicitly accounts for interior obstructions between pairs of nodal patches.  The split-flux method used in the EnergyPlus Detailed approach only implicitly accounts for interior surfaces by including their reflectance and surface area in the zone average surface reflectance calculations.</li>
+</ul>
 <h3 id="delight-time-step-interior-daylighting-calculation-differences-from-energyplus-detailed-methods">DElight Time-Step Interior Daylighting Calculation Differences from EnergyPlus Detailed Methods</h3>
-<p>Ø <em>Interior Illuminance Calculation:</em>  As discussed above, DElight only calculates daylight factors for the total contribution from all windows/skylights and CFS to each defined reference point.  Thus DElight does not support dynamic control of fenestration shading during the subsequent time-step calculations, as does EnergyPlus Detailed.</p>
-<p>Ø <em>Visual Quality:</em>  DElight does not currently calculate a measure of visual quality such as glare due to daylighting.  DElight does calculate luminance on nodal patches of all interior, reflecting surfaces.  A variety of visual quality metrics could be calculated from these data in future implementations.</p>
-<p>Ø <em>Electric Lighting Control Calculation:</em>  Up to 100 reference points can be defined within a DElight daylighting zone.  One or more of these reference points must be included in the control of the electric lighting system in the zone.  Each reference point input includes the fraction of the zone controlled by that point.  Values of 0.0 are valid, which allows the definition of reference points for which interior illuminance levels are calculated, but which do not control the electric lighting.  Any non-zero fraction is thus the equivalent of a relative weighting given to that reference point’s influence on the overall electric lighting control.  The sum of all fractions for defined reference points must less than or equal to 1.0 for this relative weighting to make physical sense.  If the sum is less than 1.0, the remaining fraction is assumed to have no lighting control.</p>
+<ul>
+<li>
+<p><em>Interior Illuminance Calculation:</em>  As discussed above, DElight only calculates daylight factors for the total contribution from all windows/skylights and CFS to each defined reference point.  Thus DElight does not support dynamic control of fenestration shading during the subsequent time-step calculations, as does EnergyPlus Detailed.</p>
+</li>
+<li>
+<p><em>Visual Quality:</em>  DElight does not currently calculate a measure of visual quality such as glare due to daylighting.  DElight does calculate luminance on nodal patches of all interior, reflecting surfaces.  A variety of visual quality metrics could be calculated from these data in future implementations.</p>
+</li>
+<li>
+<p><em>Electric Lighting Control Calculation:</em>  Up to 100 reference points can be defined within a DElight daylighting zone.  One or more of these reference points must be included in the control of the electric lighting system in the zone.  Each reference point input includes the fraction of the zone controlled by that point.  Values of 0.0 are valid, which allows the definition of reference points for which interior illuminance levels are calculated, but which do not control the electric lighting.  Any non-zero fraction is thus the equivalent of a relative weighting given to that reference point’s influence on the overall electric lighting control.  The sum of all fractions for defined reference points must less than or equal to 1.0 for this relative weighting to make physical sense.  If the sum is less than 1.0, the remaining fraction is assumed to have no lighting control.</p>
+</li>
+</ul>
 <h3 id="references_1">References</h3>
 <p>Modest, M. 1982. A General Model for the Calculation of Daylighting in Interior Spaces, Energy and Buildings 5, 66-79, and Lawrence Berkeley Laboratory report no. LBL-12599A.</p>
 <p>Winkelmann, F.C. 1983. Daylighting Calculation in DOE-2<em>.</em> Lawrence Berkeley Laboratory report no. LBL-11353, January 1983.</p>
@@ -1294,9 +1551,17 @@
 <p>For the direct path, the window is subdivided using existing subdivision procedures. From the center of each subdivided element, the angle is calculated to the reference point. The illuminance is calculated based on the BSDF data for the outgoing direction that corresponds to that angle and the incident illumination from sky, ground and sun.</p>
 <h3 id="internal-average-reflected-illuminance-from-window">Internal Average Reflected Illuminance From Window</h3>
 <p>To calculate internal average reflected illumiance from the window it is necessary to calculate transmitted flux at the window.  Observing an infinitesimal window element, illuminance can originate from the sky or sun, and in both cases the ray can reach the window directly or after reflecting from the ground.  Based on this, the calculation of luminance at the window is divided into three parts:</p>
-<p>·        Sky-related illuminance and luminous flux</p>
-<p>·        Sun-related illuminance and luminous flux, excluding entering beam</p>
-<p>·        Sun-related illuminance and luminous flux, due to entering beam</p>
+<ul>
+<li>
+<p>Sky-related illuminance and luminous flux</p>
+</li>
+<li>
+<p>Sun-related illuminance and luminous flux, excluding entering beam</p>
+</li>
+<li>
+<p>Sun-related illuminance and luminous flux, due to entering beam</p>
+</li>
+</ul>
 <p>where total illuminance will be calculated as a superposition of these three parts.</p>
 <p>For any case, illuminace at a window element can be calculated by using the following general approach:</p>
 <div>\[dE{W_{at\_window}} = Lu{m_{el}}({\theta_{el}},{\phi_{el}}) \cdot cos({\beta_{el}}) \cdot \cos ({\phi_{el}}) \cdot d{\theta_{el}} \cdot d{\phi_{el}}\]</div>
@@ -1368,9 +1633,17 @@
 <p>Figure 66.  Tubular Daylighting Devices</p>
 <p>The dome is typically a hemisphere made of clear plastic.  It allows daylight into the pipe while keeping exterior weather out.  The pipe is assumed to be a smooth cylinder with a highly reflective inside surface.  The surface is usually either bare polished metal or a special reflective sheet adhered to the inside.  The pipe channels the daylight from the dome to the diffuser via multiple internal reflections.  The diffuser is typically a flat frosted plastic cover.  The diffuser evenly distributes the daylight to the zone.  The dome/diffuser area and pipe area must be approximately equal (within 2%) for running the simulation successfully.</p>
 <p>In EnergyPlus the TDD model includes three different, but related, phenomena:</p>
-<p>·        Daylighting</p>
-<p>·        Solar gains</p>
-<p>·        Conductive/convective gains</p>
+<ul>
+<li>
+<p>Daylighting</p>
+</li>
+<li>
+<p>Solar gains</p>
+</li>
+<li>
+<p>Conductive/convective gains</p>
+</li>
+</ul>
 <p>Solar gains and conductive/convective gains are simulated by the zone heat balance.  Daylighting is simulated independently.</p>
 <p>For both daylighting and heat balance simulations, the dome and diffuser are treated as special window surfaces to take advantage of many of the standard daylighting and heat transfer routines.  Together the dome and diffuser become "receiver" and "transmitter", i.e. radiation entering the dome ends up exiting the diffuser.</p>
 <p><img alt="" src="../../EngineeringReference/media/image870.png" /></p>
@@ -1476,11 +1749,23 @@
 <p>Although little research has been done on the thermal characteristics of TDDs, one experiment (Harrison 1998) reports an average effective thermal resistance of 0.279 m<sup>2</sup> K/W for a commercial TDD measuring 0.33 m in diameter by 1.83 m in length.  This value, however, reflects a measurement from outdoor air temperature to indoor air temperature.  The model assumes an effective thermal resistance from outside surface temperature to inside surface temperature.</p>
 <p>Solar radiation is inevitably absorbed by the TDD before it reaches the zone.  Every reflection in the pipe leaves behind some solar radiation according to the surface absorptance.  Rays incident at a greater angle make more reflections and leave behind more absorbed solar in the pipe wall.</p>
 <p>The total absorbed solar radiation in the TDD is the sum of the following gains:</p>
-<p>n Inward bound solar absorbed by multiple pipe reflections</p>
-<p>n Outward bound solar absorbed by multiple pipe reflections due to:</p>
-<p>n Reflection off of diffuser surface (inside of TDD)</p>
-<p>n Zone diffuse interior shortwave incident on the diffuser from lights, etc.</p>
-<p>n Inward flowing absorbed solar in dome and diffuser glazing</p>
+<ul>
+<li>
+<p>Inward bound solar absorbed by multiple pipe reflections</p>
+</li>
+<li>
+<p>Outward bound solar absorbed by multiple pipe reflections due to:</p>
+</li>
+<li>
+<p>Reflection off of diffuser surface (inside of TDD)</p>
+</li>
+<li>
+<p>Zone diffuse interior shortwave incident on the diffuser from lights, etc.</p>
+</li>
+<li>
+<p>Inward flowing absorbed solar in dome and diffuser glazing</p>
+</li>
+</ul>
 <div>\[{Q_{abs,pipe}} = {Q_{abs,in}} + {Q_{abs,out}} + {Q_{abs,glazing}}\]</div>
 
 <p>The inward bound solar absorbed by the pipe is the difference between the solar transmitted by the dome and the solar incident on the diffuser.</p>
@@ -1607,30 +1892,34 @@
 <h2 id="window-calculation-module">Window Calculation Module</h2>
 <p>This section describes two potential modeling approaches for Windows.  The first (layer by layer) is implemented.  The second, simple approach, reuses the layer-by-layer approach but converts an arbitrary window performance into an equivalent single layer.</p>
 <p>The primary Window calculation is a layer-by-layer approach where windows are considered to be composed of the following components, only the first of which, glazing, is required to be present:</p>
-<p>n <strong><em>Glazing</em></strong>, which consists of one or more plane/parallel glass layers. If there are two or more glass layers, the layers are separated by gaps filled with air or another gas. The glazing optical and thermal calculations are based on algorithms from the WINDOW 4 and WINDOW 5 programs [Arasteh et al., 1989], [Finlayson et al., 1993].  Glazing layers are described using te input object WindowMaterial:Glazing.</p>
-<p>n <strong><em>Gap</em></strong>, layers filled with air or another gas that separate glazing layers.  Gaps are described using the input object WindowMaterial:Gas.</p>
-<p>n <strong><em>Frame</em></strong>, which surrounds the glazing on four sides.  Frames are described using the input object WindowProperty:FrameAndDivider.</p>
-<p>n <strong><em>Divider</em></strong>, which consists of horizontal and/or vertical elements that divide the glazing into individual lites.</p>
-<p>n <strong><em>Shading device</em></strong>, which is a separate layer, such as drapery, roller shade or blind, on the inside or outside of the glazing, whose purpose is to reduce solar gain, reduce heat loss (movable insulation) or control daylight glare.  Shading layers are described using “WindowProperty:ShadingControl” input objects.</p>
+<ul>
+<li>
+<p><strong><em>Glazing</em></strong>, which consists of one or more plane/parallel glass layers. If there are two or more glass layers, the layers are separated by gaps filled with air or another gas. The glazing optical and thermal calculations are based on algorithms from the WINDOW 4 and WINDOW 5 programs [Arasteh et al., 1989], [Finlayson et al., 1993].  Glazing layers are described using te input object WindowMaterial:Glazing.</p>
+</li>
+<li>
+<p><strong><em>Gap</em></strong>, layers filled with air or another gas that separate glazing layers.  Gaps are described using the input object WindowMaterial:Gas.</p>
+</li>
+<li>
+<p><strong><em>Frame</em></strong>, which surrounds the glazing on four sides.  Frames are described using the input object WindowProperty:FrameAndDivider.</p>
+</li>
+<li>
+<p><strong><em>Divider</em></strong>, which consists of horizontal and/or vertical elements that divide the glazing into individual lites.</p>
+</li>
+<li>
+<p><strong><em>Shading device</em></strong>, which is a separate layer, such as drapery, roller shade or blind, on the inside or outside of the glazing, whose purpose is to reduce solar gain, reduce heat loss (movable insulation) or control daylight glare.  Shading layers are described using “WindowProperty:ShadingControl” input objects.</p>
+</li>
+</ul>
 <p>In the following, the description of the layer-by-layer glazing algorithms is based on material from Finlayson et al., 1993. The frame and divider thermal model, and the shading device optical and thermal models, are new to EnergyPlus.</p>
 <p>A second approch has been developed where windows are modeled in a simplified approach that requires minimal user input that is processed to develop and equivalent layer that then reuses much of the layer-by-model.  This “Simple Window Construction: model is described below.</p>
 <h3 id="optical-properties-of-glazing">Optical Properties of Glazing</h3>
 <p>The solar radiation transmitted by a system of glass layers and the solar radiation absorbed in each layer depends on the solar transmittance, reflectance and absorptance properties of the individual layers. The absorbed solar radiation enters the glazing heat balance calculation that determines the inside surface temperature and, therefore, the heat gain to the zone from the glazing (see “Window Heat Balance Calculation”). The transmitted solar radiation is absorbed by interior zone surfaces and, therefore, contributes to the zone heat balance. In addition, the visible transmittance of the glazing is an important factor in the calculation of interior daylight illuminance from the glazing.</p>
 <p>Table 28.  Variables in Window Calculations</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
-<td>Units
- </td>
-<td>FORTRAN variable</td>
+<th>Mathematical variable</th>
+<th>Description</th>
+<th>Units</th>
+<th>FORTRAN variable</th>
 </tr>
 <tr>
 <td>T</td>
@@ -1951,9 +2240,17 @@ SpacingRatio</td>
 <p>3)   A single-layer calculation is faster than multi-layer calculations.</p>
 <p>Note: This use of U and SHGC to describe the thermal properties of windows is only appropriate for specular glazings.</p>
 <p>While it is important to include the ability to model windows with only U-value and SHGC, we note that any method to use U and SHGC alone in building simulation software will inherently be approximate.  This is due primarily to the following factors:</p>
-<p>·        SHGC combines directly transmitted solar radiation and radiation absorbed by the glass which flows inward.  These have different implications for space heating/cooling.  Different windows with the same SHGC often have different ratios of transmitted to absorbed solar radiation.</p>
-<p>·        SHGC is determined at normal incidence; angular properties of glazings vary with number of layers, tints, coatings.  So products which have the same SHGC, can have different angular properties.</p>
-<p>·        Window U-factors vary with temperatures.</p>
+<ul>
+<li>
+<p>SHGC combines directly transmitted solar radiation and radiation absorbed by the glass which flows inward.  These have different implications for space heating/cooling.  Different windows with the same SHGC often have different ratios of transmitted to absorbed solar radiation.</p>
+</li>
+<li>
+<p>SHGC is determined at normal incidence; angular properties of glazings vary with number of layers, tints, coatings.  So products which have the same SHGC, can have different angular properties.</p>
+</li>
+<li>
+<p>Window U-factors vary with temperatures.</p>
+</li>
+</ul>
 <p>Thus, for modeling specific windows, we recommend using more detailed data than just the U and SHGC, if at all possible.</p>
 <p>The simplified window model determines the properties of an equivalent layer in the following steps.</p>
 <h4 id="step-1-determine-glass-to-glass-resistance">Step 1.  Determine glass-to-glass Resistance.</h4>
@@ -2067,9 +2364,6 @@ SpacingRatio</td>
 <p>If a glazing layer has optical properties that are roughly constant with wavelength, the wavelength-dependent values of <em>T<sub>i,i</sub></em> , <em>R<sup>f</sup><sub>i,i</sub></em> and <em>R<sup>b</sup><sub>i,i</sub></em> in Eqs. to can be replaced with constant values for that layer.</p>
 <p>Table 29. Solar spectral irradiance function.</p>
 <table class="table table-striped">
-
-
-
 <tr>
 <td>Air mass 1.5 terrestrial solar global spectral irradiance values (W/m<sup>2</sup>-micron) on a 37<sup>o</sup> tilted surface. Corresponds to wavelengths in following data block. Based on ISO 9845-1 and ASTM E 892; derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99.</td>
 </tr>
@@ -2183,22 +2477,13 @@ SpacingRatio</td>
 <p>The polynomial coefficients are given in Table 31.</p>
 <p>Table 31. Polynomial coefficients used to determine angular properties of coated glass.</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
-
-
 <tr>
-<td> </td>
-<td>0</td>
-<td>1</td>
-<td>2</td>
-<td>3</td>
-<td>4</td>
+<th> </th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
 </tr>
 <tr>
 <td><span>${\bar \tau_{clr}}$</span></td>
@@ -2337,10 +2622,20 @@ SpacingRatio</td>
 <p>Figure 78. Variations of Window Properties with the Temperature of the Thermochromic Glazing Layer</p>
 <p>On cloudy days the window is at full transmission and letting in diffuse daylighting. On sunny days the window maximizes diffuse daylighting and tints based on the angle of the sun relative to the window. For a south facing window (northern hemisphere) the daylight early and late in the day is maximized and the direct sun at mid day is minimized.</p>
 <p>The active thermochromic material can be embodied within a laminate layer or a surface film. The overall optical state of the window at a given time is a function primarily of</p>
-<p>·        thermochromic material properties</p>
-<p>·        solar energy incident on the window</p>
-<p>·        construction of the window system that incorporates the thermochromic layer</p>
-<p>·        environmental conditions (interior, exterior, air temperature, wind, etc).</p>
+<ul>
+<li>
+<p>thermochromic material properties</p>
+</li>
+<li>
+<p>solar energy incident on the window</p>
+</li>
+<li>
+<p>construction of the window system that incorporates the thermochromic layer</p>
+</li>
+<li>
+<p>environmental conditions (interior, exterior, air temperature, wind, etc).</p>
+</li>
+</ul>
 <p>The tinted film, in combination with a heat reflecting, low-e layer allows the window to reject most of the absorbed radiation thus reducing undesirable heat load in a building. In the absence of direct sunlight the window cools and clears and again allows lower intensity diffuse radiation into a building. TC windows can be designed in several ways (Figure 79), with the most common being a triple pane windows with the TC glass layer in the middle a double pane windows with the TC layer on the inner surface of the outer pane or for sloped glazing a double pane with the laminate layer on the inner pane with a low-e layer toward the interior. The TC glass layer has variable optical properties depending on its temperature, with a lower temperature at which the optical change is initiated, and an upper temperature at which a minimum transmittance is reached. TC windows act as passive solar shading devices without the need for sensors, controls and power supplies but their optical performance is dependent on varying solar and other environmental conditions at the location of the window.</p>
 <p><img alt="" src="../../EngineeringReference/media/image1016.png" /> <img alt="" src="../../EngineeringReference/media/image1017.png" /></p>
 <p>Figure 79. Configurations of Thermochromic Windows</p>
@@ -2348,20 +2643,27 @@ SpacingRatio</td>
 <h4 id="blinds">Blinds</h4>
 <p>Window blinds in EnergyPlus are defined as a series of equidistant slats that are oriented horizontally or vertically. All of the slats are assumed to have the same optical properties. The overall optical properties of the blind are determined by the slat geometry (width, separation and angle) and the slat optical properties (front-side and back-side transmittance and reflectance). Blind properties for direct radiation are also sensitive to the “profile angle,” which is the angle of incidence in a plane that is perpendicular to the window plane and to the direction of the slats. The blind optical model in EnergyPlus is based on Simmler, Fischer and Winkelmann, 1996; however, that document has numerous typographical errors and should be used with caution.</p>
 <p>The following assumptions are made in calculating the blind optical properties:</p>
-<p>·        The slats are flat.</p>
-<p>·        The spectral dependence of inter-reflections between slats and glazing is ignored; spectral-average slat optical properties are used.</p>
-<p>·        The slats are perfect diffusers. They have a perfectly matte finish so that reflection from a slat is isotropic (hemispherically uniform) and independent of angle of incidence, i.e., the reflection has no specular component. This also means that absorption by the slats is hemispherically uniform with no incidence angle dependence. If the transmittance of a slat is non-zero, the transmitted radiation is isotropic and the transmittance is independent of angle of incidence.</p>
-<p>·        Inter-reflection between the blind and wall elements near the periphery of the blind is ignored.</p>
-<p>·        If the slats have holes through which support strings pass, the holes and strings are ignored. Any other structures that support or move the slats are ignored.</p>
+<ul>
+<li>
+<p>The slats are flat.</p>
+</li>
+<li>
+<p>The spectral dependence of inter-reflections between slats and glazing is ignored; spectral-average slat optical properties are used.</p>
+</li>
+<li>
+<p>The slats are perfect diffusers. They have a perfectly matte finish so that reflection from a slat is isotropic (hemispherically uniform) and independent of angle of incidence, i.e., the reflection has no specular component. This also means that absorption by the slats is hemispherically uniform with no incidence angle dependence. If the transmittance of a slat is non-zero, the transmitted radiation is isotropic and the transmittance is independent of angle of incidence.</p>
+</li>
+<li>
+<p>Inter-reflection between the blind and wall elements near the periphery of the blind is ignored.</p>
+</li>
+<li>
+<p>If the slats have holes through which support strings pass, the holes and strings are ignored. Any other structures that support or move the slats are ignored.</p>
+</li>
+</ul>
 <h4 id="slat-optical-properties">Slat Optical Properties</h4>
 <p>The slat optical properties used by EnergyPlus are shown in the following table.</p>
 <p>Table 32.  Slat Optical Properties</p>
 <table class="table table-striped">
-
-
-
-
-
 <tr>
 <td><span>${\tau_{dir,dif}}$</span>
  </td>
@@ -2404,7 +2706,16 @@ SpacingRatio</td>
 <p><em>G<sub>i</sub></em>= the irradiance on the cell side of <em>s<sub>i</sub></em></p>
 <p><em>Q<sub>i</sub></em>= the source flux from the cell side of s<em><sub>i</sub></em></p>
 <p>Based on these definitions we have the following equations that relate <em>J</em>, <em>G</em> and <em>Q</em> for the different segments:</p>
-<div>\[\begin{array}{l}{J_1} = {Q_1}\\\{J_2} = {Q_2}\\\{J_3} = {Q_3} + \rho_{dif,dif}^b{G_3} + \tau_{dif,dif}^{}{G_4}\\\{J_4} = {Q_4} + \tau_{dif,dif}^{}{G_3} + \rho_{dif,dif}^f{G_4}\\\{J_5} = {Q_5} + \rho_{dif,dif}^b{G_5} + \tau_{dif,dif}^{}{G_6}\\\{J_6} = {Q_6} + \tau_{dif,dif}^{}{G_5} + \rho_{dif,dif}^f{G_6}\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+   J_1 &= Q_1 \\
+   J_2 &= Q_2 \\
+   J_3 &= Q_3 + \rho_{dif,dif}^b G_3 + \tau_{dif,dif} G_4 \\
+   J_4 &= Q_4 + \tau_{dif,dif} G_3 + \rho_{dif,dif}^f G_4 \\
+   J_5 &= Q_5 + \rho_{dif,dif}^b G_5 + \tau_{dif,dif} G_6 \\
+   J_6 &= Q_6 + \tau_{dif,dif} G_5 + \rho_{dif,dif}^f G_6
+  \end{array}
+\]</div>
 
 <p>In addition we have the following equation relating <em>G</em> and<em> J</em>:</p>
 <div>\[{G_i} = \sum\limits_{j = 1}^6 {{J_j}{F_{ji}}{\rm{ ,    }}i = 1,6} \]</div>
@@ -2423,7 +2734,21 @@ SpacingRatio</td>
 <div>\[Q' = XJ'\]</div>
 
 <p>where <em>X</em> is a 4x4 matrix and</p>
-<div>\[J' = \left[ {\begin{array}{*{20}{c}}{{J_3}}\\\{{J_4}}\\\{{J_5}}\\\{{J_6}}\end{array}} \right]{\rm{         Q'}} = \left[ {\begin{array}{*{20}{c}}{{Q_3}}\\\{{Q_4}}\\\{{Q_5}}\\\{{Q_6}}\end{array}} \right]\]</div>
+<div>\[
+  J' = \left[ \begin{array}
+   J_3 \\
+   J_4 \\
+   J_5 \\
+   J_6 \end{array} \right]
+\]</div>
+
+<div>\[
+  Q' = \left[ \begin{array}
+    Q_3 \\
+    Q_4 \\
+    Q_5 \\
+    Q_6 \end{array} \right]
+\]</div>
 
 <p>We then obtain <span>$J'$</span> from</p>
 <div>\[J' = {X^{ - 1}}Q'\]</div>
@@ -2447,17 +2772,44 @@ SpacingRatio</td>
 <p><img alt="" src="../../EngineeringReference/media/image1063.png" /></p>
 <p>Figure 81. Slat cell showing geometry for calculation of view factors between the segments of the cell.</p>
 <p>The sources for the direct-to-diffuse transmittance calculation are:</p>
-<div>\[{Q_1} = {Q_2} = {Q_5} = {Q_6} = 0{\rm{  (and therefore }}{J_1} = {J_2} = 0{\rm{)}}\]</div>
+<div>\[{Q_1} = {Q_2} = {Q_5} = {Q_6} = 0 \;  (and therefore) {J_1} = {J_2} = 0\]</div>
 
-<div>\[\left. \begin{array}{l}{Q_3} = {\tau_{dir,dif}}\\\{Q_4} = \rho_{dir,dif}^f\end{array} \right\}{\rm{ }}{\varphi_b} \le {\varphi_s} + \frac{\pi }{2}{\rm{  (beam hits front of slats)}}\]</div>
+<div>\[
+  \left. 
+    \begin{array}{l}
+      Q_3 = \tau_{dir,dif} \\
+      Q_4 = \rho_{dir,dif}^f 
+    \end{array} 
+  \right\} 
+  \;
+  \varphi_b \le \varphi_s + \frac{\pi }{2} 
+  \;
+  \rm{ (beam hits front of slats)}
+\]</div>
 
-<div>\[\left. \begin{array}{l}{Q_3} = \rho_{dir,dif}^b\\\{Q_4} = {\tau_{dir,dif}}\end{array} \right\}{\rm{ }}{\varphi_b} > {\varphi_s} + \frac{\pi }{2}{\rm{  (beam hits back of slats)}}\]</div>
+<div>\[
+  \left.
+    \begin{array}{l}
+      Q_3 = \rho_{dir,dif}^b \\
+      Q_4 = \tau_{dir,dif}
+    \end{array}
+  \right\}
+  \;
+  \varphi_b \gt \varphi_s + \frac{\pi }{2}
+  \;
+  \rm{ (beam hits back of slats)}
+\]</div>
 
 <p>For unit incident direct flux, the front direct-to-diffuse transmittance and reflectance of the blind are:</p>
 <div>\[\begin{array}{l}\tau_{bl,f}^{dir,dif} = {G_2}\\\rho_{bl,f}^{dir,dif} = {G_1}\end{array}\]</div>
 
 <p>where</p>
-<div>\[\begin{array}{l}{G_2} = \sum\limits_{j = 3}^6 {{J_j}{F_{j2}}} \\\{G_1} = \sum\limits_{j = 3}^6 {{J_j}{F_{j1}}} \end{array}\]</div>
+<div>\[
+  \begin{array}{l}
+    G_2 = \sum_{j=3}^6 J_j F_{j2} \\
+    G_1 = \sum_{j=3}^6 J_j F_{j1} 
+  \end{array}
+\]</div>
 
 <p>and <span>${J_3}$</span>to <span>${J_6}$</span>are given by Eq. .  </p>
 <p>The front direct absorptance of the blind is then</p>
@@ -2487,7 +2839,8 @@ SpacingRatio</td>
 <p>These are obtained by integrating over sky and ground elements, as shown in Figure 83, treating each element as a source of direct radiation of irradiance <span>$I({\phi_s})$</span> incident on the blind at profile angle <span>${\phi_s}$</span>. This gives:</p>
 <div>\[\tau_{bl,f}^{sky - dif,dif} = \frac{{\int\limits_0^{\pi /2} {\left[ {\tau_{bl,f}^{dir,dir}({\phi_s}) + \tau_{bl,f}^{dir,dif}({\phi_s})} \right]{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}{{\int\limits_0^{\pi /2} {{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}\]</div>
 
-<p><span>$\rho_{bl,f}^{sky - dif,dif} = \frac{{\int\limits_0^{\pi /2} {\rho_{bl,f}^{dir,dif}{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}{{\int\limits_0^{\pi /2} {{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}$</span></p>
+<div>\[\rho_{bl,f}^{sky - dif,dif} = \frac{{\int\limits_0^{\pi /2} {\rho_{bl,f}^{dir,dif}{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}{{\int\limits_0^{\pi /2} {{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}\]</div>
+
 <div>\[\alpha_{bl,f}^{sky - dif} = \frac{{\int\limits_0^{\pi /2} {\alpha_{bl,f}^{dir}{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}{{\int\limits_0^{\pi /2} {{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}\]</div>
 
 <p><img alt="" src="../../EngineeringReference/media/image1090.png" /></p>
@@ -2514,266 +2867,406 @@ SpacingRatio</td>
 <h4 id="comparison-with-iso-15099-calculation-of-blind-optical-properties">Comparison with ISO 15099 Calculation of Blind Optical Properties</h4>
 <p>Table 33 compares EnergyPlus and ISO 15099 [2001] calculations of blind optical properties for a variety of profile angles, slat angles and slat optical properties. The ISO 15099 calculation method is similar to that used in EnergyPlus, except that the slats are divided into five equal segments. The ISO 15099 and EnergyPlus results agree to within 12%, except for the solar transmittances for the 10-degree slat angle case. Here the transmittances are small (from 1% to about 5%) but differ by about a factor of up to two between ISO 15099 and EnergyPlus. This indicates that the slats should be divided into more than two segments at small slat angles.</p>
 <p>Table 33. Comparison of blind optical properties calculated with the EnergyPlus and ISO 15099 methods. EnergyPlus values that differ by more than 12% from ISO 15099 values are shown in bold italics.</p>
-<p><strong>Slat properties</strong></p>
-<p>Separation (m)</p>
-<p>0.012</p>
-<p>0.012</p>
-<p>0.012</p>
-<p>0.012</p>
-<p>0.012</p>
-<p>Width (m)</p>
-<p>0.016</p>
-<p>0.016</p>
-<p>0.016</p>
-<p>0.016</p>
-<p>0.016</p>
-<p>Angle (deg)</p>
-<p>45</p>
-<p>45</p>
-<p>45</p>
-<p>10</p>
-<p>45</p>
-<p>IR transmittance</p>
-<p>0.0</p>
-<p>0.0</p>
-<p>0.0</p>
-<p>0.0</p>
-<p>0.4</p>
-<p>IR emissivity, front side</p>
-<p>0.9</p>
-<p>0.9</p>
-<p>0.9</p>
-<p>0.9</p>
-<p>0.55</p>
-<p>IR emissivity, back side</p>
-<p>0.9</p>
-<p>0.9</p>
-<p>0.9</p>
-<p>0.9</p>
-<p>0.55</p>
-<p>Solar transmittance</p>
-<p>0.0</p>
-<p>0.0</p>
-<p>0.0</p>
-<p>0.0</p>
-<p>0.4</p>
-<p>Solar reflectance, front side</p>
-<p>0.70</p>
-<p>0.55</p>
-<p>0.70</p>
-<p>0.70</p>
-<p>0.50</p>
-<p>Solar reflectance, back side</p>
-<p>0.70</p>
-<p>0.55</p>
-<p>0.40</p>
-<p>0.40</p>
-<p>0.50</p>
-<p>Solar Profile angle (deg)</p>
-<p>0</p>
-<p>60</p>
-<p>0</p>
-<p>60</p>
-<p>0</p>
-<p>60</p>
-<p>0</p>
-<p>60</p>
-<p>0</p>
-<p>60</p>
-<p><strong>Calculated blind properties</strong>(first row = ISO 15099 calculation, second row (in italics) = EnergyPlus calculation)</p>
-<p>Front solar transmittance, direct to direct</p>
-<p>0.057
- <em>0.057</em></p>
-<p>0.0
- <em>0.0</em></p>
-<p>0.057
- <em>0.057</em></p>
-<p>0.0
- <em>0.0</em></p>
-<p>0.057
- <em>0.057</em></p>
-<p>0.0
- <em>0.0</em></p>
-<p>0.0
- <em>0.0</em></p>
-<p>0.0
- <em>0.0</em></p>
-<p>0.057
- <em>0.057</em></p>
-<p>0.0
- <em>0.0</em></p>
-<p>Back solar transmittance, direct to direct</p>
-<p>0.057
- <em>0.057</em></p>
-<p>0.310
- <em>0.309</em></p>
-<p>0.057
- <em>0.057</em></p>
-<p>0.310
- <em>0.309</em></p>
-<p>0.057
- <em>0.057</em></p>
-<p>0.310
- <em>0.309</em></p>
-<p>0.0
- <em>0.0</em></p>
-<p>0.088
- <em>0.087</em></p>
-<p>0.057
- <em>0.057</em></p>
-<p>0.310
- <em>0.309</em></p>
-<p>Front solar transmittance, direct to diffuse</p>
-<p>0.141
- <em>0.155</em></p>
-<p>0.073
- <em>0.074</em></p>
-<p>0.090
- <em>0.100</em></p>
-<p>0.047
- <em>0.048</em></p>
-<p>0.096
- <em>0.104</em></p>
-<p>0.051
- <em>0.051</em></p>
-<p>0.012
- <strong><em>0.019</em></strong></p>
-<p>0.005
- <strong><em>0.006</em></strong></p>
-<p>0.373
- <em>0.375</em></p>
-<p>0.277
- <em>0.275</em></p>
-<p>Back solar transmittance, direct to diffuse</p>
-<p>0.141
- <em>0.155</em></p>
-<p>0.288
- <em>0.284</em></p>
-<p>0.090
- <em>0.100</em></p>
-<p>0.216
- <em>0.214</em></p>
-<p>0.076
- <em>0.085</em></p>
-<p>0.271
- <em>0.269</em></p>
-<p>0.011
- <strong><em>0.019</em></strong></p>
-<p>0.027
- <strong><em>0.052</em></strong></p>
-<p>0.373
- <em>0.375</em></p>
-<p>0.306
- <em>0.304</em></p>
-<p>Front solar reflectance, direct to diffuse</p>
-<p>0.394
- <em>0.389</em></p>
-<p>0.558
- <em>0.558</em></p>
-<p>0.295
- <em>0.293</em></p>
-<p>0.430
- <em>0.431</em></p>
-<p>0.371
- <em>0.368</em></p>
-<p>0.544
- <em>0.546</em></p>
-<p>0.622
- <em>0.636</em></p>
-<p>0.678<em>
- 0.679</em></p>
-<p>0.418
- <em>0.416</em></p>
-<p>0.567
- <em>0.568</em></p>
-<p>Back solar reflectance, direct to diffuse</p>
-<p>0.394
- <em>0.389</em></p>
-<p>0.103
- <em>0.115</em></p>
-<p>0.295
- <em>0.293</em></p>
-<p>0.066
- <em>0.074</em></p>
-<p>0.216
- <em>0.214</em></p>
-<p>0.070
- <em>0.077</em></p>
-<p>0.356
- <em>0.363</em></p>
-<p>0.273
- <em>0.272</em></p>
-<p>0.418
- <em>0.416</em></p>
-<p>0.273
- <em>0.275</em></p>
-<p>Front solar transmittance, hemispherical diffuse to diffuse</p>
-<p>0.332
- <em>0.338</em></p>
-<p>0.294
- <em>0.298</em></p>
-<p>0.291
- <em>0.295</em></p>
-<p>0.038
- <strong><em>0.053</em></strong></p>
-<p>0.495
- <em>0.502</em></p>
-<p>Back solar transmittance, hemispherical diffuse to diffuse</p>
-<p>0.332
- <em>0.338</em></p>
-<p>0.294
- <em>0.298</em></p>
-<p>0.291
- <em>0.295</em></p>
-<p>0.038
- <strong><em>0.053</em></strong></p>
-<p>0.495
- <em>0.502</em></p>
-<p>Front hemispherical IR transmittance</p>
-<p>0.227
- <em>0.227</em></p>
-<p>0.227
- <em>0.227</em></p>
-<p>0.227
- <em>0.227</em></p>
-<p>0.0245
- <em>0.025</em></p>
-<p>0.385
- <em>0.387</em></p>
-<p>Back hemispherical IR transmittance</p>
-<p>0.227
- <em>0.227</em></p>
-<p>0.227
- <em>0.227</em></p>
-<p>0.227
- <em>0.227</em></p>
-<p>0.0245
- <em>0.025</em></p>
-<p>0.385
- <em>0.387</em></p>
-<p>Front hemispherical IR emissivity</p>
-<p>0.729
- <em>0.730</em></p>
-<p>0.729
- <em>0.730</em></p>
-<p>0.729
- <em>0.730</em></p>
-<p>0.890
- <em>0.895</em></p>
-<p>d’d</p>
-<p>0.536
- <em>0.534</em></p>
-<p>Back hemispherical IR emissivity</p>
-<p>0.729
- <em>0.730</em></p>
-<p>0.729
- <em>0.730</em></p>
-<p>0.729
- <em>0.730</em></p>
-<p>0.890
- <em>0.895</em></p>
-<p>0.536
- <em>0.534</em></p>
+<table class="table table-striped">
+  <tr>
+    <th colspan="11">Slat Properties</th>
+  </tr>
+  <tr>
+    <td>Separation (m)</td>
+    <td colspan="2">0.012</td>
+    <td colspan="2">0.012</td>
+    <td colspan="2">0.012</td>
+    <td colspan="2">0.012</td>
+    <td colspan="2">0.012</td>
+  </tr>
+  <tr>
+    <td>Width (m)</td>
+    <td colspan="2">0.016</td>
+    <td colspan="2">0.016</td>
+    <td colspan="2">0.016</td>
+    <td colspan="2">0.016</td>
+    <td colspan="2">0.016</td>
+  </tr>
+  <tr>
+    <td>Angle (deg)</td>
+    <td colspan="2">45</td>
+    <td colspan="2">45</td>
+    <td colspan="2">45</td>
+    <td colspan="2">10</td>
+    <td colspan="2">45</td>
+  </tr>
+  <tr>
+    <td>IR transmittance</td>
+    <td colspan="2">0</td>
+    <td colspan="2">0</td>
+    <td colspan="2">0</td>
+    <td colspan="2">0</td>
+    <td colspan="2">0.4</td>
+  </tr>
+  <tr>
+    <td>IR emissivity, front side</td>
+    <td colspan="2">0.9</td>
+    <td colspan="2">0.9</td>
+    <td colspan="2">0.9</td>
+    <td colspan="2">0.9</td>
+    <td colspan="2">0.55</td>
+  </tr>
+  <tr>
+    <td>IR emissivity, back side</td>
+    <td colspan="2">0.9</td>
+    <td colspan="2">0.9</td>
+    <td colspan="2">0.9</td>
+    <td colspan="2">0.9</td>
+    <td colspan="2">0.55</td>
+  </tr>
+  <tr>
+    <td>Solar transmittance</td>
+    <td colspan="2">0</td>
+    <td colspan="2">0</td>
+    <td colspan="2">0</td>
+    <td colspan="2">0</td>
+    <td colspan="2">0.4</td>
+  </tr>
+  <tr>
+    <td>Solar reflectance, front side</td>
+    <td colspan="2">0.7</td>
+    <td colspan="2">0.55</td>
+    <td colspan="2">0.7</td>
+    <td colspan="2">0.7</td>
+    <td colspan="2">0.5</td>
+  </tr>
+  <tr>
+    <td>Solar reflectance, back side</td>
+    <td colspan="2">0.7</td>
+    <td colspan="2">0.55</td>
+    <td colspan="2">0.4</td>
+    <td colspan="2">0.4</td>
+    <td colspan="2">0.5</td>
+  </tr>
+  <tr>
+    <td colspan="11"></td>
+  </tr>
+  <tr>
+    <td>Solar Profile angle (deg)</td>
+    <td>0</td>
+    <td>60</td>
+    <td>0</td>
+    <td>60</td>
+    <td>0</td>
+    <td>60</td>
+    <td>0</td>
+    <td>60</td>
+    <td>0</td>
+    <td>60</td>
+  </tr>
+  <tr>
+    <td colspan="11"></td>
+  </tr>
+  <tr>
+    <td colspan="11">Calculated blind properties (first row = ISO 15099 calculation, second row (in italics) = EnergyPlus calculation)</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Front solar transmittance, direct to Direct</td>
+    <td>0.057</td>
+    <td>0</td>
+    <td>0.057</td>
+    <td>0</td>
+    <td>0.057</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0.057</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>0.057</td>
+    <td>0</td>
+    <td>0.057</td>
+    <td>0</td>
+    <td>0.057</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0.057</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Back solar transmittance, direct to direct</td>
+    <td>0.057</td>
+    <td>0.31</td>
+    <td>0.057</td>
+    <td>0.31</td>
+    <td>0.057</td>
+    <td>0.31</td>
+    <td>0</td>
+    <td>0.088</td>
+    <td>0.057</td>
+    <td>0.31</td>
+  </tr>
+  <tr>
+    <td>0.057</td>
+    <td>0.309</td>
+    <td>0.057</td>
+    <td>0.309</td>
+    <td>0.057</td>
+    <td>0.309</td>
+    <td>0</td>
+    <td>0.087</td>
+    <td>0.057</td>
+    <td>0.309</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Front solar transmittance, direct to diffuse</td>
+    <td>0.141</td>
+    <td>0.073</td>
+    <td>0.09</td>
+    <td>0.047</td>
+    <td>0.096</td>
+    <td>0.051</td>
+    <td>0.012</td>
+    <td>0.005</td>
+    <td>0.373</td>
+    <td>0.277</td>
+  </tr>
+  <tr>
+    <td>0.155</td>
+    <td>0.074</td>
+    <td>0.1</td>
+    <td>0.048</td>
+    <td>0.104</td>
+    <td>0.051</td>
+    <td>0.019</td>
+    <td>0.006</td>
+    <td>0.375</td>
+    <td>0.275</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Back solar transmittance, direct to diffuse</td>
+    <td>0.141</td>
+    <td>0.288</td>
+    <td>0.09</td>
+    <td>0.216</td>
+    <td>0.076</td>
+    <td>0.271</td>
+    <td>0.011</td>
+    <td>0.027</td>
+    <td>0.373</td>
+    <td>0.306</td>
+  </tr>
+  <tr>
+    <td>0.155</td>
+    <td>0.284</td>
+    <td>0.1</td>
+    <td>0.214</td>
+    <td>0.085</td>
+    <td>0.269</td>
+    <td>0.019</td>
+    <td>0.052</td>
+    <td>0.375</td>
+    <td>0.304</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Front solar reflectance, direct to diffuse</td>
+    <td>0.394</td>
+    <td>0.558</td>
+    <td>0.295</td>
+    <td>0.43</td>
+    <td>0.371</td>
+    <td>0.544</td>
+    <td>0.622</td>
+    <td>0.678</td>
+    <td>0.418</td>
+    <td>0.567</td>
+  </tr>
+  <tr>
+    <td>0.389</td>
+    <td>0.558</td>
+    <td>0.293</td>
+    <td>0.431</td>
+    <td>0.368</td>
+    <td>0.546</td>
+    <td>0.636</td>
+    <td>0.679</td>
+    <td>0.416</td>
+    <td>0.568</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Back solar reflectance, direct to diffuse</td>
+    <td>0.394</td>
+    <td>0.103</td>
+    <td>0.295</td>
+    <td>0.066</td>
+    <td>0.216</td>
+    <td>0.07</td>
+    <td>0.356</td>
+    <td>0.273</td>
+    <td>0.418</td>
+    <td>0.273</td>
+  </tr>
+  <tr>
+    <td>0.389</td>
+    <td>0.115</td>
+    <td>0.293</td>
+    <td>0.074</td>
+    <td>0.214</td>
+    <td>0.077</td>
+    <td>0.363</td>
+    <td>0.272</td>
+    <td>0.416</td>
+    <td>0.275</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Front solar transmittance, hemispherical diffuse to diffuse</td>
+    <td>0.332</td>
+    <td></td>
+    <td>0.294</td>
+    <td></td>
+    <td>0.291</td>
+    <td></td>
+    <td>0.038</td>
+    <td></td>
+    <td>0.495</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>0.338</td>
+    <td></td>
+    <td>0.298</td>
+    <td></td>
+    <td>0.295</td>
+    <td></td>
+    <td>0.053</td>
+    <td></td>
+    <td>0.502</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td rowspan="2">Back solar transmittance, hemispherical diffuse to diffuse</td>
+    <td>0.332</td>
+    <td></td>
+    <td>0.294</td>
+    <td></td>
+    <td>0.291</td>
+    <td></td>
+    <td>0.038</td>
+    <td></td>
+    <td>0.495</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>0.338</td>
+    <td></td>
+    <td>0.298</td>
+    <td></td>
+    <td>0.295</td>
+    <td></td>
+    <td>0.053</td>
+    <td></td>
+    <td>0.502</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td rowspan="2">Front hemispherical IR transmittance</td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.0245</td>
+    <td></td>
+    <td>0.385</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>0.227</td>
+    <td></td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.025</td>
+    <td></td>
+    <td>0.387</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td rowspan="2">Back hemispherical IR transmittance</td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.0245</td>
+    <td></td>
+    <td>0.385</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>0.227</td>
+    <td></td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.227</td>
+    <td></td>
+    <td>0.025</td>
+    <td></td>
+    <td>0.387</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td rowspan="2">Front hemispherical IR emissivity</td>
+    <td>0.729</td>
+    <td></td>
+    <td>0.729</td>
+    <td></td>
+    <td>0.729</td>
+    <td></td>
+    <td>0.89</td>
+    <td></td>
+    <td>0.536</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>0.73</td>
+    <td></td>
+    <td>0.73</td>
+    <td></td>
+    <td>0.73</td>
+    <td></td>
+    <td>0.895</td>
+    <td></td>
+    <td>0.534</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td rowspan="2">Back hemispherical IR emissivity</td>
+    <td>0.729</td>
+    <td></td>
+    <td>0.729</td>
+    <td></td>
+    <td>0.729</td>
+    <td></td>
+    <td>0.89</td>
+    <td></td>
+    <td>0.536</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>0.73</td>
+    <td></td>
+    <td>0.73</td>
+    <td></td>
+    <td>0.73</td>
+    <td></td>
+    <td>0.895</td>
+    <td></td>
+    <td>0.534</td>
+    <td></td>
+  </tr>
+</table>
+
 <h4 id="blindglazing-system-properties-for-short-wave-radiation">Blind/Glazing System Properties for Short-Wave Radiation</h4>
 <p>When a blind is in place we have the following expressions for the system transmittance, the system glass layer absorptance, and the system blind absorptance, taking inter-reflection between blind and glazing into account. The system properties, indicated by “sys,” are given in terms of the isolated blind properties (i.e., blind properties in the absence of the glazing)—indicated by “bl” —and the isolated glazing properties (i.e., glazing properties in the absence of the blind)—indicated by “gl.”</p>
 <h4 id="interior-blind">Interior Blind</h4>
@@ -2806,9 +3299,31 @@ SpacingRatio</td>
 <p>The system properties when an exterior blind is in place are the following:</p>
 <div>\[T_{f,sys}^{dir,all}(\phi ,{\phi_s}) = \tau_{bl,f}^{dir,dir}({\phi_s})\left( {T_{gl}^{dir}(\phi ) + \frac{{T_{gl}^{dif}R_{gl,f}^{dir}\rho_{bl,b}^{dir,dif}}}{{1 - R_{gl,f}^{dif}\rho_{bl,b}^{dif}}}} \right) + \frac{{\tau_{bl}^{dir,dif}({\phi_s})T_{gl}^{dif}}}{{1 - R_{gl,f}^{dif}\rho_{bl,b}^{dif}}}\]</div>
 
-<div>\[\begin{array}{l}A_{gl,j,f}^{dir,sys}(\phi ,{\phi_s}) = \tau_{bl,f}^{dir,dir}({\phi_s})A_{gl,j,f}^{dir}(\phi ) + \\\{\rm{                      }}\frac{{\left( {\tau_{bl,f}^{dir,dir}({\phi_s})R_{gl}^{dir}(\phi )\rho_{bl,b}^{dir}({\phi_s}) + \tau_{bl,f}^{dir,dif}({\phi_s})} \right)A_{gl,j,f}^{dif}}}{{1 - R_{gl,f}^{dif}\rho_{bl,b}^{dif}}},{\rm{    }}j = 1,N\end{array}\]</div>
+<div>\[
+  A_{gl,j,f}^{dir,sys}(\phi ,\phi_s) = 
+     \tau_{bl,f}^{dir,dir}(\phi_s) A_{gl,j,f}^{dir}(\phi ) + 
+     \frac{
+       \left(
+         \tau_{bl,f}^{dir,dir}(\phi_s) R_{gl}^{dir}(\phi) \rho_{bl,b}^{dir}(\phi_s)+ \tau_{bl,f}^{dir,dif}(\phi_s)
+       \right) A_{gl,j,f}^{dif}
+     } {
+       1 - R_{gl,f}^{dif}\rho_{bl,b}^{dif}
+     },\;j = 1,N
+\]</div>
 
-<div>\[\begin{array}{l}\alpha_{bl,f}^{dir,sys}(\phi ,{\phi_s}) = \alpha_{bl,f}^{dir}({\phi_s}) + \alpha_{bl,b}^{dir}({\phi_s})R_{gl,f}^{dir}(\phi )\tau_{bl,f}^{dir,dir}({\phi_s}) + \\\{\rm{                       }}\frac{{\alpha_{bl,b}^{dif}R_{gl,f}^{dif}}}{{1 - \rho_{bl,b}^{dif}R_{gl,f}^{dif}}}\left( {R_{gl,f}^{dir}(\phi )\tau_{bl,f}^{dir,dir}({\phi_s})\rho_{bl,b}^{dir}({\phi_s}) + \tau_{bl,f}^{dir,dif}({\phi_s})} \right)\end{array}\]</div>
+<div>\[
+  \alpha_{bl,f}^{dir,sys}(\phi ,\phi_s) = 
+     \alpha_{bl,f}^{dir}(\phi_s) + 
+     \alpha_{bl,b}^{dir}(\phi_s) R_{gl,f}^{dir}(\phi) \tau_{bl,f}^{dir,dir}(\phi_s) + 
+     \frac{
+       \alpha_{bl,b}^{dif}R_{gl,f}^{dif}
+     }{
+       1 - \rho_{bl,b}^{dif} R_{gl,f}^{dif}
+     }
+     \left(
+       R_{gl,f}^{dir}(\phi) \tau_{bl,f}^{dir,dir}(\phi_s) \rho_{bl,b}^{dir}(\phi_s) + \tau_{bl,f}^{dir,dif}(\phi_s) 
+     \right)
+\]</div>
 
 <div>\[T_{f,sys}^{dif,dif} = \frac{{\tau_{bl,f}^{dif,dif}T_{gl}^{dif}}}{{1 - R_{gl,f}^{dif}\rho_{bl,b}^{dif}}}\]</div>
 
@@ -2889,10 +3404,20 @@ SpacingRatio</td>
 <p><img alt="ScreenDiameter_Spacing" src="../../EngineeringReference/media/image1148.png" /></p>
 <p>Figure 85. Screen model rendering of intersecting orthogonal crossed cylinders</p>
 <p>If the required screen material dimensions are not available from the manufacturer, they may be determined using the following procedure:</p>
-<p>·        Lay the screen next to a finely-divided scale or ruler. A magnifying glass may be helpful in determining the screen material dimensions. Alternately, a photograph can be taken and the image enlarged.</p>
-<p>·        Determine the diameter <em>D</em> of an individual screen material “cylinder”. Average the diameter values if different in opposing directions.</p>
-<p>·        Determine the average center-to-center spacing <em>S</em> of the screen material or measure from one side of a “cylinder” to the same side of the next ”cylinder” and record the spacing <em>S</em>. Average the spacing values if different in opposing directions.</p>
-<p>·        Enter these values as inputs to the exterior window screen model.</p>
+<ul>
+<li>
+<p>Lay the screen next to a finely-divided scale or ruler. A magnifying glass may be helpful in determining the screen material dimensions. Alternately, a photograph can be taken and the image enlarged.</p>
+</li>
+<li>
+<p>Determine the diameter <em>D</em> of an individual screen material “cylinder”. Average the diameter values if different in opposing directions.</p>
+</li>
+<li>
+<p>Determine the average center-to-center spacing <em>S</em> of the screen material or measure from one side of a “cylinder” to the same side of the next ”cylinder” and record the spacing <em>S</em>. Average the spacing values if different in opposing directions.</p>
+</li>
+<li>
+<p>Enter these values as inputs to the exterior window screen model.</p>
+</li>
+</ul>
 <p>The screen material diameter and spacing are then used to determine the screen material aspect ratio for use in the screen model.</p>
 <div>\[\gamma  = {D \mathord{\left/ {\vphantom {D S}} \right. } S}\]</div>
 
@@ -2954,7 +3479,15 @@ SpacingRatio</td>
 
 <div>\[T_{scatt}^{vis}\left( {\alpha ',\varphi '} \right) = 0.2\rho_{sc}^{vis}T_{scattmax}^{vis}\left( {1 - \gamma } \right)\left( {1 + \left( {Peak_{ratio}^{vis} - 1} \right){e^{\frac{{ - {{\left| {\delta  - {\delta_{max}}} \right|}^{2.0}}}}{{600}}}}} \right)\]</div>
 
-<p><span>$\begin{array}{l}IF\left( {\delta  &gt; {\delta_{max}}} \right)\;{T_{scatt}}\left( {\alpha ',\varphi '} \right) = 0.2{\rho_{sc}}{T_{scattmax}}\left( {1 - \gamma } \right)\left( {1 + \left( {Pea{k_{ratio}} - 1} \right){e^{\frac{{ - {{\left| {\delta  - {\delta_{max}}} \right|}^{2.5}}}}{{600}}}}} \right)\, - \\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,0.2{\rho_{sc}}{T_{scattmax}}\left( {1 - \gamma } \right)\left( {MAX\left( {0.0,\frac{{\delta  - {\delta_{\max }}}}{{90. - {\delta_{\max }}}}} \right)} \right)\end{array}$</span><span>$\begin{array}{l}IF\left( {\delta  &gt; {\delta_{max}}} \right)\;T_{scatt}^{vis}\left( {\alpha ',\varphi '} \right) = 0.2\rho_{sc}^{vis}T_{<em>{scattmax}}^{vis}\left( {1 - \gamma } \right)\left( {1 + \left( {Peak</em>{ratio}^{vis} - 1} \right){e^{\frac{{ - {{\left| {\delta  - {\delta_{max}}} \right|}^{2.5}}}}{{600}}}}} \right) - \\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,0.2\rho_{sc}^{vis}T_{<em>{scattmax}}^{vis}\left( {1 - \gamma } \right)\left( {MAX\left( {0.0,\frac{{\delta  - {\delta</em>{\max }}}}{{90. - {\delta_{\max }}}}} \right)} \right)\end{array}$</span></p>
+<div>\[
+  \begin{array}{rl}
+    IF \left( \delta \gt \delta_{max} \right) \; T_{scatt} \left( \alpha ',\varphi ' \right) &= 
+      0.2 \rho_{sc} T_{scattmax} \left( 1 - \gamma \right) \left( 1 + \left( Peak_{ratio} - 1 \right) e^{\frac{- \left| \delta - \delta_{max} \right|^{2.5}}{600}} \right) - 0.2 \rho_{sc} T_{scattmax} \left( 1 - \gamma \right) \left( \max \left( 0.0, \frac{\delta  - \delta_{max}}{90. - {delta_{max}}} \right) \right) \\
+    IF \left( \delta \gt \delta_{max} \right) \; T_{scatt}^{vis} \left( \alpha ',\varphi ' \right) &= 
+      0.2 \rho_{sc}^{vis} T_{scattmax}^{vis} \left( 1 - \gamma \right) \left( 1 + \left( Peak_{ratio}^{vis} - 1 \right) e^{\frac{- \left| \delta - \delta_{max} \right|^{2.5}}{600}} \right) - 0.2 \rho_{sc}^{vis} T_{scattmax}^{vis} \left( 1 - \gamma \right) \left( \max \left( 0.0, \frac{\delta  - \delta_{max}}{90. - {delta_{max}}} \right) \right) \\
+  \end{array}
+\]</div>
+
 <p>where</p>
 <p><span>${T_{scattmax}}$</span> = maximum reflected (scattered) beam transmittance</p>
 <p><span>$T_{scattmax}^{vis}$</span> = maximum visible reflected (scattered) beam transmittance</p>
@@ -3151,7 +3684,12 @@ SpacingRatio</td>
 <div>\[{E^{{\rm{(2)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = {S^{{\rm{(T)}}}}({{\bf{p}}^{{\rm{(T)}}}})\left( { - {{\bf{p}}^{{\rm{(T)}}}} \cdot {{\bf{n}}^{{\rm{(2)}}}}} \right)d{\Omega ^{{\rm{(T)}}}}\]</div>
 
 <p>Substituting equation for <em>S</em><sup>(T)</sup>(<strong><em>p</em></strong><sup>(T)</sup>, we obtain a propagation equation for outside radiation passing through the window and arriving at surface element 2:</p>
-<div>\[\begin{array}{l}{E^{{\rm{(2)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = \\\{\rm{        }}\int\limits_{{\Omega ^{{\rm{(I)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(I)}}}}({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {{\bf{n}}^{{\rm{(I)}}}}} \right)d{\Omega ^{{\rm{(I)}}}}} \left( { - {{\bf{p}}^{{\rm{(T)}}}} \cdot {{\bf{n}}^{{\rm{(2)}}}}} \right)d{\Omega ^{{\rm{(T)}}}}\end{array}\]</div>
+<div>\[
+    E^{(2)}(\bf{p}^{(T)}) = \int_{\Omega^{(I)}} 
+      \rm T (\bf{p}^{(T)},\bf{p}^{(I)}) 
+      S^{(I)}(\bf{p}^{(I)})(-\bf{p}^{(I)}\cdot\bf{n}^{(I)})
+      d\Omega^{(I)}(-\bf{p}^{(T)}\cdot\bf{n}^{(2)})d\Omega^{(T)}
+\]</div>
 
 <p>or, in terms involving only irradiance,</p>
 <div>\[{E^{{\rm{(2)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = \int\limits_{{\Omega ^{{\rm{(I)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})E({{\bf{p}}^{{\rm{(I)}}}})d{\Omega ^{{\rm{(I)}}}}} \left( { - {{\bf{p}}^{{\rm{(T)}}}} \cdot {{\bf{n}}^{{\rm{(2)}}}}} \right)d{\Omega ^{{\rm{(T)}}}}\]</div>
@@ -3176,7 +3714,7 @@ SpacingRatio</td>
 <p>In equations and the functions T and R pertain to the overall glazing system, and are assumed to be averaged over both wavelength and polarization with appropriate weightings.  [EnergyPlus considers wavelength only in that it distinguishes between radiation in the longwave thermal IR region and in the shortwave solar/visible region.  (In considering daylighting, there is a further limitation to the visible region.)  In this discussion we are concerned solely with the shortwave solar/visible region.]  While fenestration properties may depend on both wavelength and polarization, for externally incident radiation this dependence is taken into account in the calculation and averaging of T and R.  However, both the wavelength distribution (within the solar region) and the polarization state of the outgoing radiation will generally be different from that of the incident radiation.  This is not a feature peculiar to non-specular fenestration systems; it is also true of specular ones, and may in fact be more important there.  For most interior surfaces, where the radiation is either absorbed or diffusely reflected (and where both processes are assumed wavelength and polarization independent), this is of no importance, but in the case of either interior windows or the back-reflectance from exterior windows, it could in principle cause errors, unless proper account is taken in specifying T and R for these cases.</p>
 <h6 id="discretization-the-lbnl-method">Discretization: The LBNL Method</h6>
 <p>A series of 6 papers (Papamichael, Klems et al. 1988; Klems 1994A; Klems 1994B; Klems and Warner 1995; Klems and Kelley 1996; Klems, Warner et al. 1996) formulated the LBNL method of characterizing scattering fenestration systems.  The relevant aspects of that method will be summarized here.  This method has been incorporated into the WINDOW (from LBNL 2012) computer program.</p>
-<p>The method begins by approximating the integrals in equations and by finite sums.  It does this by defining a set of finite solid angle elements <span>$\left{ {\Delta {\Omega_i}} \right}$</span> that covers the relevant solid angle hemisphere (whether incident, transmitted or reflected directions).  Each solid angle element is characterized by a direction <strong><em>p</em></strong><em><sub>i</sub></em>, and it is assumed that this may be substituted for any direction within the solid angle element.  This set of solid angle elements and corresponding directions is termed a basis.  Note that, since <strong><em>p</em></strong><em><sub>i</sub></em> is a two-dimensional vector, enumerating the solid angle elements with a single index <em>i</em> implicitly includes specifying an ordering of the direction vectors.  Equation then becomes</p>
+<p>The method begins by approximating the integrals in equations and by finite sums.  It does this by defining a set of finite solid angle elements {<span>$ \Delta {\Omega_i} $</span>} that covers the relevant solid angle hemisphere (whether incident, transmitted or reflected directions).  Each solid angle element is characterized by a direction <strong><em>p</em></strong><em><sub>i</sub></em>, and it is assumed that this may be substituted for any direction within the solid angle element.  This set of solid angle elements and corresponding directions is termed a basis.  Note that, since <strong><em>p</em></strong><em><sub>i</sub></em> is a two-dimensional vector, enumerating the solid angle elements with a single index <em>i</em> implicitly includes specifying an ordering of the direction vectors.  Equation then becomes</p>
 <div>\[S({{\bf{p}}_j}^{{\rm{(T)}}}) = \sum\limits_i {{\mathop{\rm T}\nolimits} ({{\bf{p}}_j}^{{\rm{(T)}}},{{\bf{p}}_i}^{{\rm{(I)}}}){S^{{\rm{(I)}}}}({{\bf{p}}_i}^{{\rm{(I)}}})\left( { - {{\bf{p}}_i}^{{\rm{(I)}}}\cdot {\bf{n}}} \right)\Delta {\Omega_i}^{{\rm{(I)}}}} \]</div>
 
 <p>and equation becomes</p>
@@ -3197,7 +3735,15 @@ SpacingRatio</td>
 <div>\[\begin{array}{*{20}{c}}{{\bf{\Lambda }^{{\rm{(s)}}}} = \left( {{\Lambda ^{{\rm{(s)}}}}_{ij}} \right)}&{{\rm{where}}}&{\Lambda_{ij}^{{\rm{(s)}}} = \left( {{{\bf{p}}_j}\cdot {{\bf{n}}^{{\rm{(s)}}}}} \right)\Delta {\Omega_j}{\delta_{ij}}}\end{array}\]</div>
 
 <p>Considering the radiance in the various basis directions to be the components of a vector,</p>
-<div>\[\begin{array}{*{20}{c}}{{\bf{S}} = \left( {\begin{array}{*{20}{c}}{{S_1}}\\\{...}\\\{{S_j}}\\\{...}\end{array}} \right)}&{{\rm{where}}}&{{S_j} = S({{\bf{p}}_j})}\end{array}\]</div>
+<div>\[
+  \bf{S} = \left( 
+    \begin{array}
+      S_1 \\ ... \\ S_j \\ ...
+    \end{array}
+  \right)
+  \text{where}
+  S_j = S(\bf{p}_j)
+\]</div>
 
 <p>equation becomes</p>
 <div>\[\begin{array}{*{20}{c}}{{S^{{\rm{(T)}}}}_j = \sum\limits_i {{T_{ji}}} \sum\limits_k {{\Lambda_{ik}}} {S_k}}&{{\rm{where}}}&{{T_{ji}} = {\mathop{\rm T}\nolimits} ({{\bf{p}}_j}^{{\rm{(T)}}},{{\bf{p}}_i}^{{\rm{(I)}}})}\end{array}\]</div>
@@ -3206,7 +3752,15 @@ SpacingRatio</td>
 <div>\[{R_{ij}} = {\mathop{\rm R}\nolimits} ({{\bf{p}}^{{\rm{(R)}}}},{{\bf{p}}^{{\rm{(I)}}}})\]</div>
 
 <p>The method then identifies the infinitesimal directional irradiances in equation with the components of an irradiance vector,</p>
-<div>\[\begin{array}{*{20}{c}}{E = \left( {\begin{array}{*{20}{c}}{{E_1}}\\\{...}\\\{{E_i}}\\\{...}\end{array}} \right)}&{{\rm{where}}}&{{E_i} = \frac{{dE({{\bf{p}}_i})}}{{d\Omega }}}\end{array}\]</div>
+<div>\[
+  E = \left( 
+    \begin{array}
+      E_1 \\ ... \\ E_i \\ ...
+    \end{array}
+  \right)
+  \text{where}
+  E_i = \frac{dE(\bf{p}_j)}{d\Omega}
+\]</div>
 
 <p>and equations - can be rewritten as matrix equations,</p>
 <div>\[{{\bf{S}}^{{\rm{(T)}}}} = {\bf{T}} \cdot {{\bf{E}}^{{\rm{(I)}}}}\]</div>
@@ -3326,8 +3880,14 @@ SpacingRatio</td>
 <p>where</p>
 <div>\[{s_i} = s({{\bf{p}}_i}^{{\rm{(I)}}})\]</div>
 
-<p>is the sky radiance shape factor evaluated at the central direction of the i<sup>th</sup> solid angle bin.  A “T” superscript has been added on the left-hand side of the equation to denote that <em>S</em> is the transmitted outgoing radiance (due to incident sky radiation for the fenestration under discussion).  The stipulation <span>$i \in {\Omega ^{{\rm{(Sky)}}}}$</span> on the summation means that the sum is to include only those solid angle elements for which the sky is viewed by the fenestration.  This is essentially a shading calculation, in addition to a restriction to downward-going incident directions.  We anticipate the result of this calculation by defining a sky geometric factor, <div>[V_i^{{\rm{(Sky)}}}]</div>:</p>
-<div>\[V_i^{{\rm{(Sky)}}} = \left\{ {\begin{array}{*{20}{c}}1&{{\rm{all of }}\Delta {\Omega_i}{\rm{ views sky for all of fenestration}}}\\\{viewed{\rm{ }}fraction}&{{\rm{some of }}\Delta {\Omega_i}{\rm{ , fenestration views sky}}}\\0&{{\rm{none of }}\Delta {\Omega_i}{\rm{ views sky for any part of fenestration}}}\end{array}} \right.\]</div>
+<p>is the sky radiance shape factor evaluated at the central direction of the i<sup>th</sup> solid angle bin.  A “T” superscript has been added on the left-hand side of the equation to denote that <em>S</em> is the transmitted outgoing radiance (due to incident sky radiation for the fenestration under discussion).  The stipulation <span>$i \in {\Omega ^{{\rm{(Sky)}}}}$</span> on the summation means that the sum is to include only those solid angle elements for which the sky is viewed by the fenestration.  This is essentially a shading calculation, in addition to a restriction to downward-going incident directions.  We anticipate the result of this calculation by defining a sky geometric factor:</p>
+<div>\[
+  V_i^{(Sky)} = \left\{
+    \begin{array}
+      1                      & \text{all of } \Delta\Omega_i \text{ views sky for all of fenestration} \\
+      \text{viewed fraction} & \text{some of } \Delta\Omega_i \text{, fenestration views sky} \\
+      0                      & \text{none of } \Delta\Omega_i \text{ views sky for any part of fenestration
+\]</div>
 
 <p>Then we can carry out the summation over all downward directions and write</p>
 <div>\[{S_j}^{{\rm{(T,Sky)}}} = {I^{({\bf{Sky}})}}(t)\sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sky)}}}{s_i}} \]</div>
@@ -3338,11 +3898,17 @@ SpacingRatio</td>
 <p>where <em>V<sub>i</sub></em><sup>(Sf,\ n)</sup> is another geometric view factor, defined analogously to equation , giving the fraction of the solid angle <span>$\Delta {\Omega_i}$</span> that views the exterior surface <em>n</em>.  Note that</p>
 <div>\[V_i^{{\rm{(Sky)}}} + \sum\limits_{\rm{n}} {V_i^{{\rm{(Sf, n)}}}}  = 1\]</div>
 
-<p>The quantity <span>${S^{{\rm{(Refl, n)}}}}({{\bf{p}}<em>i}^{{\rm{(I)}}},t)$</span> is in fact the reflected radiance at a particular location on the n<sup>th</sup> exterior surface—the location where the direction <strong><em>p</em></strong><em><sub>i</sub></em><sup>(I)</sup> intersects the surface.  (This statement will become more precise when the spatial dependence dropped from equation is re-inserted.)  This surface is assumed to have either a diffuse reflectance <em>r</em><sup>(n)</sup> or a specular reflectance <em>r</em><sup>(sp,\ n)</sup>.  (Both properties are possible simultaneously, but EnergyPlus assumes that an exterior surface is either diffusing or specular, but not both.)  The reflectance is assumed uniform over the surface, but the particular location (effectively, the image of the fenestration projected onto surface n) may or may not view the sky, or, at a particular time, the sun.  We denote the incident irradiance of the surface n by <span>$E_i^n$</span>.  This irradiance pertains only to the surface n (in the present EnergyPlus calculation) and is independent of the fenestration or its basis.  We attach the subscript i simply as a reminder that (2) the irradiance pertains to the portion of the surface that is viewed by the solid angle element <span>$\Delta {\Omega_i}$</span> of the fenestration f (which would become important if the EnergyPlus shading calculations were modified to relax the assumption of uniform incident irradiance on exterior surfaces) and that the irradiance pertains only to those surfaces n that are viewed by the solid angle element i.  For specularly reflecting surfaces, we make the following definitions: First, within the set of basis solid angles <span>$\Delta {\Omega_i}$</span>, let s(<em>t</em>) identify the one containing the sun direction at time <em>t</em>, and let r(<em>t</em>) identify the one containing the specular reflection direction of the sun at time <em>t</em>.  We then define a contingent direct beam irradiance, which we denote by <span>$E</em>{i{\rm{ }}r(t)}^{(D,n)}$</span>. This irradiance is non-zero only if <span>$i = r(t)$</span>this direction is such that i is the specularly reflected direction for the surface n.  If this is the case, then <span>$E_{i{\rm{ }}r(t)}^{(D,n)}$</span> is the incident direct beam irradiance.  With this definition,</p>
+<p>The quantity <span>$S^{(Refl,n)} (\bf{p}<em>i^{(I)},t)$</span> is in fact the reflected radiance at a particular location on the n<sup>th</sup> exterior surface—the location where the direction <strong><em>p</em></strong><em><sub>i</sub></em><sup>(I)</sup> intersects the surface.  (This statement will become more precise when the spatial dependence dropped from equation is re-inserted.)  This surface is assumed to have either a diffuse reflectance <em>r</em><sup>(n)</sup> or a specular reflectance <em>r</em><sup>(sp,\ n)</sup>.  (Both properties are possible simultaneously, but EnergyPlus assumes that an exterior surface is either diffusing or specular, but not both.)  The reflectance is assumed uniform over the surface, but the particular location (effectively, the image of the fenestration projected onto surface n) may or may not view the sky, or, at a particular time, the sun.  We denote the incident irradiance of the surface n by <span>$E_i^n$</span>.  This irradiance pertains only to the surface n (in the present EnergyPlus calculation) and is independent of the fenestration or its basis.  We attach the subscript i simply as a reminder that (2) the irradiance pertains to the portion of the surface that is viewed by the solid angle element <span>$\Delta {\Omega_i}$</span> of the fenestration f (which would become important if the EnergyPlus shading calculations were modified to relax the assumption of uniform incident irradiance on exterior surfaces) and that the irradiance pertains only to those surfaces n that are viewed by the solid angle element i.  For specularly reflecting surfaces, we make the following definitions: First, within the set of basis solid angles <span>$\Delta {\Omega_i}$</span>, let s(<em>t</em>) identify the one containing the sun direction at time <em>t</em>, and let r(<em>t</em>) identify the one containing the specular reflection direction of the sun at time <em>t</em>.  We then define a contingent direct beam irradiance, which we denote by <span>$E</em>{i{\rm{ }}r(t)}^{(D,n)}$</span>. This irradiance is non-zero only if <span>$i = r(t)$</span>this direction is such that i is the specularly reflected direction for the surface n.  If this is the case, then <span>$E_{i=r(t)}^{(D,n)}$</span> is the incident direct beam irradiance.  With this definition,</p>
 <div>\[{S^{{\rm{(Refl, n)}}}}({{\bf{p}}_i}^{{\rm{(I)}}},t) = {\rho ^{{\rm{(sp, n)}}}}E_{i{\rm{ }}r(t)}^{(D,n)} + {\rho ^{{\rm{(n)}}}}E_i^n\]</div>
 
 <p>If we then define normalized irradiance factors <em>U</em> by <span>$E_i^n = U_i^{(Sky,n)}{I^{(Sky)}}(t) + U_{i{\rm{ }}Sun(tsh)}^{(D,n)}{I^{(D)}}(t)$</span> and <span>$E_{i{\rm{ }}r(t)}^{(D,n)} = U_{i{\rm{ }}r(t)}^{(D,n)}{I^{(D)}}(t)$</span>, where <span>$U_{i{\rm{ }}Sun(tsh)}^{(D,n)}$</span> denotes the fraction of the beam solar that irradiates the surface for a given sun direction.  It is evaluated during the shading calculation, as indicated by the notation <em>Sun(tsh)</em>.  With these definitions we can rewrite the equation as</p>
-<p><span>$\begin{array}{l}{S^{{\rm{(Refl, n)}}}}({{\bf{p}}<em>i}^{{\rm{(I)}}},t) = \{\rm{        }}{I^{{\rm{(D)}}}}(t)U</em>{i{\rm{ r(}}t{\rm{)}}}^{{\rm{(D,n)}}}{\rho ^{{\rm{(sp, n)}}}} + {I^{{\rm{(D)}}}}(t)U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}}{\rho ^{{\rm{(n)}}}} + {I^{(Sky)}}(t)U_i^{{\rm{(Sky,n)}}}{\rho ^{{\rm{(n)}}}}\end{array}$</span></p>
+<div>\[
+  S^{(Refl,n)}(\bf{p}_i^{(I)},t) = 
+  I^{(D)}(t) U_{i r(t)}^{(D,n)} \rho^{(sp,n)} +
+  I^{(D)}(t) U_{i Sun(tsh)}^{(D,n)} \rho^{(n)} +
+  I^{(sky)}(t) U_i^{(Sky,n)} \rho^{(n)}
+\]</div>
+
 <p>and equation becomes, in terms of the incident irradiances,</p>
 <div>\[{S_j}^{{\rm{(T, Sf, n)}}} = \sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}\left( {{\rho ^{{\rm{(sp, n)}}}}E_{i{\rm{ }}r(t)}^{(D,n)} + {\rho ^{{\rm{(n)}}}}E_i^n} \right)} \]</div>
 
@@ -3366,13 +3932,18 @@ SpacingRatio</td>
 <p>The transmitted radiance from direct beam radiation is</p>
 <div>\[{S_j}^{{\rm{(T, Sun)}}} = {T_{j{\rm{ s}}(t)}}\cos {\theta ^{{\rm{(Sun)}}}}{I^{{\rm{(D)}}}}(t)V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}\]</div>
 
-<p>This introduces yet one more geometric view factor: <div>[V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}]</div> is zero if the sun direction s<em>(t)</em> is not <em>i</em>; if <em>i</em>=s(<em>t</em>) it is the fraction of the fenestration area irradiated by the direct sun.  Equation uses the fact that the angular size of the sun is smaller than any basis solid angle element, and that EnergyPlus treats the sun and circumsolar region as a point source [hence the absence of the sky correction in equation ].</p>
+<p>This introduces yet one more geometric view factor: </p>
+<div>\[
+  V_{i s(t)}^(D)}
+\]</div>
+
+<p>is zero if the sun direction s<em>(t)</em> is not <em>i</em>; if <em>i</em>=s(<em>t</em>) it is the fraction of the fenestration area irradiated by the direct sun.  Equation uses the fact that the angular size of the sun is smaller than any basis solid angle element, and that EnergyPlus treats the sun and circumsolar region as a point source [hence the absence of the sky correction in equation ].</p>
 <p>At this point we have developed separate expressions for a fenestration’s  transmitted radiance in a particular direction depending on the exterior source of the radiation.  These expressions utilize the discretized BTDF of the fenestration in the form of transmittance matrix elements over an angular basis.  The exterior geometry is re-expressed in the form of geometric view factors in this basis.  In the process, the explicit time dependence of the exterior radiation has been reduced to the time-varying direct and diffuse solar intensities and the solar position.  The time dependence of the solar position, however, consists merely in specifying, for a particular time, which of the basis solid angle elements contains the solar direction.  The entire exterior geometry necessary for the fenestration transmittance calculation can therefore be pre-calculated.</p>
 <p>Interior</p>
 <p>We begin with the discretized form of equation , in which we also modify the surface notation.  In that equation, the surfaces involved are termed (1) and (2), where radiation is outgoing from surface 1 and incoming to surface 2.  Here radiation is outgoing from the inner surface of the fenestration, so we label that surface (f).  The receiving surface is one of the surfaces of the zone in which the fenestration is located.  We number those surfaces with the index <em>k</em>, so the receiving surface is labeled (<em>k</em>).  Equation then becomes</p>
 <div>\[dW_j^{{\rm{(f}} \to k{\rm{)}}} = {E^{{\rm{(}}k{\rm{)}}}}({{\bf{p}}_j}^{{\rm{(T)}}})d{A^{{\rm{(}}k{\rm{)}}}} = {S_j}^{{\rm{(T)}}} \cdot \left( {{{\bf{n}}^{{\rm{(f)}}}} \cdot {{\bf{p}}_j}^{{\rm{(T)}}}} \right)\Delta {\Omega_j}^{{\rm{(T)}}}d{A^{{\rm{(f)}}}}\]</div>
 
-<p>or, noting that <span>$\left( {{{\bf{n}}^{{\rm{(f)}}}} \cdot {{\bf{p}}<em>j}^{{\rm{(T)}}}} \right)\Delta {\Omega_j}^{{\rm{(T)}}} = \Lambda</em>{jj}^{{\rm{(T)}}}$</span> (where the superscript T is retained in case the incoming and outgoing bases are defined differently),</p>
+<p>or, noting that <span>$  \left(\bf{n}^{(f)}\cdot\bf{p}<em>j^{(T)}\right) \Delta\Omega^{(T)} = \Lambda</em>{jj}^{(T)} $</span> (where the superscript T is retained in case the incoming and outgoing bases are defined differently),</p>
 <div>\[dW_j^{{\rm{(f}} \to k{\rm{)}}} = {E^{{\rm{(}}k{\rm{)}}}}({{\bf{p}}_j}^{{\rm{(T)}}})d{A^{{\rm{(}}k{\rm{)}}}} = {S_j}^{{\rm{(T)}}}\Lambda_{jj}^{{\rm{(T)}}}d{A^{{\rm{(f)}}}}\]</div>
 
 <p>If we integrate this expression over the fenestration area <em>A</em><sup>(f)</sup> we obtain the total power leaving the fenestration surface in direction <em>j</em>; however, all of that power may not reach surface <em>k</em>: some may strike the inner window reveal or a different zone surface.  If we define a spatial projection operator by</p>
@@ -3431,99 +4002,147 @@ SpacingRatio</td>
 <p>Figure 94. Sun Paths and Incident Basis for Three Window Orientations, 38º N. Latitude.  The nodal positions (blue dots) for a W6 full basis are compared with the summer solstice (red curve) and winter solstice (green curve) solar paths.  Solar paths for other days of the year will lie between these two extremes.  (Note: the basis points are to be interpreted as the direction of a vector pointing from the fenestration to the sun.)  (a) South facing.  (b) West facing.  (c) North facing (the winter path is off the figure (i.e., the window is shaded); allowed paths will be outside the red path.</p>
 <p>The reason for the definition of the Z factors is that to a great extent they can be precalculated, so that within the hourly calculation only equations - need to be used.  In addition, there are fewer Z factors to be stored than transmittance matrix elements.  The storage determinants for the foregoing calculations are summarized in the following table.</p>
 <p>Table 35: Determination of array sizes</p>
-<p>Parameters</p>
-<p><em>N<sub>Basis</sub></em></p>
-<p>Number of elements in the (incoming or outgoing) basis</p>
-<p><em>N<sub>Sun</sub></em></p>
-<p>Number of basis directions that may be sun directions (depends on fenestration orientation</p>
-<p><em><span>$N_{Sun}^{(Gnd)}$</span></em></p>
-<p>Number of sun directions that give significantly different ground irradiation conditions, as seen by fenestration</p>
-<p><em>N<sub>Sf</sub></em></p>
-<p>Number of reflecting surfaces viewable by fenestration (depends on fenestration orientation)</p>
-<p><sup><span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span></sup></p>
-<p>Number of time steps for which surface <em>n</em> is sunlit (depends on orientation of surface <em>n</em>; determined during shading calculation)</p>
-<p><sup><span>$N_{Refl}^{{\rm{(Sf, n)}}}$</span></sup></p>
-<p>Number of basis directions that may be reflected sun directions from surface <em>n</em> (depends on orientation of fenestration and surface <em>n</em>).</p>
-<p><em>N<sub>IntSurf</sub></em></p>
-<p>Number of interior surfaces in the zone containing the fenestration</p>
-<p><em>N<sub>Layers</sub></em></p>
-<p>Number of thermal layers in the fenestration system</p>
-<p>Arrays</p>
-<div>\[\begin{array}{*{20}{c}}{{\mathop{\rm A}\nolimits}_i^{F,l},}&{{\mathop{\rm A}\nolimits}_i^{B,l}}\end{array}\]</div>
+<table class="table table-striped">
+  <tr>
+    <th colspan="2">Parameters</th>
+  </tr>
+  <tr>
+    <td>*N<sub>Basis</sub>*</td>
+    <td>Number of elements in the (incoming or outgoing) basis</td>
+  </tr>
+  <tr>
+    <td>*N<sub>Sun</sub>*</td>
+    <td>Number of basis directions that may be sun directions (depends on fenestration orientation</td>
+  </tr>
+  <tr>
+    <td>*<span>$N_{Sun}^{(Gnd)}$</span>*</td>
+    <td>Number of sun directions that give significantly different ground irradiation conditions, as seen by fenestration</td>
+  </tr>
+  <tr>
+    <td>*N<sub>Sf</sub>*</td>
+    <td>Number of reflecting surfaces viewable by fenestration (depends on fenestration orientation)</td>
+  </tr>
+  <tr>
+    <td><sup><span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span></sup></td>
+    <td>Number of time steps for which surface *n* is sunlit (depends on orientation of surface *n*; determined during shading calculation)</td>
+  </tr>
+  <tr>
+    <td><sup><span>$N_{Refl}^{{\rm{(Sf, n)}}}$</span></sup></td>
+    <td>Number of basis directions that may be reflected sun directions from surface *n* (depends on orientation of fenestration and surface *n*).</td>
+  </tr>
+  <tr>
+    <td>*N<sub>IntSurf</sub>*</td>
+    <td>Number of interior surfaces in the zone containing the fenestration</td>
+  </tr>
+  <tr>
+    <td>*N<sub>Layers</sub>*</td>
+    <td>Number of thermal layers in the fenestration system</td>
+  </tr>
+  <tr>
+    <td colspan="2">Arrays</td>
+  </tr>
+  <tr>
+    <td><div>\[\begin{array}{*{20}{c}}{{\mathop{\rm A}\nolimits}_i^{F,l},}&amp;{{\mathop{\rm A}\nolimits}_i^{B,l}}\end{array}\]</div></td>
+    <td>Absorptance vector element; *N<sub>Basis</sub>*</td>
+  </tr>
+  <tr>
+    <td>*T<sub>ij</sub>*</td>
+    <td>Transmittance matrix element; *N<sub>Basis </sub>* X *N<sub>Basis</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[V_i^{{\rm{(Sky)}}}\]</div></td>
+    <td>Sky viewed fraction; one-dimensional, *N<sub>Basis</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[V_i^{{\rm{(Sf, n)}}}\]</div></td>
+    <td>Fraction of surface *n* viewed; *N<sub>Basis</sub>* X *N<sub>Sf</sub>*</td>
+  </tr>
+  <tr>
+    <td>*r*<sup>(n)</sup>,*r*<sup>(sp,\\ n)</sup></td>
+    <td>Surface *n* diffuse, specular reflectance; *N<sub>Sf</sub>*  (already stored by E+)</td>
+  </tr>
+  <tr>
+    <td><div>\[U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}}\]</div></td>
+    <td>Fraction of the image of <span>$\Delta {\Omega_i}$</span> on surface *n* that views the sun when it is in direction Sun(tsh); *N<sub>Basis</sub>* X *N<sub>Sf</sub>* X <span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span></td>
+  </tr>
+  <tr>
+    <td><div>\[V_i^{{\rm{(Gnd)}}}\]</div></td>
+    <td>Fraction of <span>$\Delta {\Omega_i}$</span> that views ground; *N<sub>Basis</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[U_i^{{\rm{(Sky, Gnd)}}}\]</div></td>
+    <td>Fraction of sky radiation received by the image of <span>$\Delta {\Omega_i}$</span> on the ground; *N<sub>Basis</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D, Gnd)}}}\]</div></td>
+    <td>Fraction of direct solar radiation for sun direction Sun(tsh) received by image of <span>$\Delta {\Omega_i}$</span> on ground; <span>$N_{Sim}^{Gnd}$</span>*<sub> </sub>*X *N<sub>Basis</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}\]</div></td>
+    <td>Fraction of fenestration area irradiated by direct solar radiation for direction *i*, given that sun angle is s(*t*); N*<sub>Sun</sub>* X *N<sub>Basis</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[F_j^{{\rm{(}}k{\rm{)}}}\]</div></td>
+    <td>Fraction of radiation in direction *j* leaving fenestration interior that arrives at surface *k*; *N<sub>Basis</sub>* X *N<sub>IntSurf</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{Z^{{\rm{(Sky), }}k}}\]</div></td>
+    <td>Sky irradiation factor; *N<sub>IntSurf</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{Z_{{\rm{r(}}t{\rm{)}}}}^{{\rm{(sp, Sf, n)}},k}\]</div></td>
+    <td>Exterior surface specular irradiation factor; <span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span>X *N<sub>Sf</sub>* X *N<sub>IntSurf</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun, Sf, n)}},k}\]</div></td>
+    <td>Exterior surface direct-diffuse irradiation factor; <span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span> X *N<sub>Sf</sub>* X *N<sub>IntSurf</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{Z^{{\rm{(Sky, Sf, n)}},k}}\]</div></td>
+    <td>Exterior surface sky irradiation factor; *N<sub>Sf</sub>* X *N<sub>IntSurf</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(D, Gnd)}},k}\]</div></td>
+    <td>Ground-reflected direct solar irradiaton factor (given sun direction s(*t*)); <span>$N_{Sun}^{Gnd}$</span> X *N<sub>IntSurf</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{Z^{{\rm{(Sky, Gnd)}},k}}\]</div></td>
+    <td>Ground-reflected diffuse solar irradiation factor; *N<sub>IntSurf</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}},k}\]</div></td>
+    <td>Direct solar irradiation factor; *N<sub>Sun</sub>* X *N<sub>IntSurf</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{K^{{\rm{(Sky), }}l}}\]</div></td>
+    <td>Sky absorption factor; *N<sub>Layers</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{K_{{\rm{r(}}t{\rm{)}}}}^{{\rm{(sp, Sf, n)}},l}\]</div></td>
+    <td>Exterior surface specular absorption factor; *N<sub>Sf</sub>* X <span>$N_{Refl}^{{\rm{(Sf, n)}}}$</span> X *N<sub>Layers</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun, Sf, n)}},l}\]</div></td>
+    <td>Exterior surface diffusely reflected direct sun absorption factor; *N<sub>Sf</sub>* X <span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span> X *N<sub>Layers</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{K^{{\rm{(Sky, Sf, n)}},l}}\]</div></td>
+    <td>Exterior surface reflected sky radiation absorption factor;</td>
+  </tr>
+  <tr>
+    <td><div>\[{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(D, Gnd)}},l}\]</div></td>
+    <td>Ground-reflected direct solar absorption factor; <span>$N_{Sun}^{(Gnd)}$</span>X *N<sub>Layers</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{K^{{\rm{(Sky, Gnd)}},l}}\]</div></td>
+    <td>Ground-reflected sky radiation absorption factor; *N<sub>Layers</sub>*</td>
+  </tr>
+  <tr>
+    <td><div>\[{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}},l}\]</div></td>
+    <td>Direct sunlight absorption factor; *N<sub>Sun</sub>* X *N<sub>Layers</sub>*</td>
+  </tr>
+</table>
 
-<p>Absorptance vector element; <em>N<sub>Basis</sub></em></p>
-<p><em>T<sub>ij</sub></em></p>
-<p>Transmittance matrix element; <em>N<sub>Basis </sub></em> X <em>N<sub>Basis</sub></em></p>
-<div>\[V_i^{{\rm{(Sky)}}}\]</div>
-
-<p>Sky viewed fraction; one-dimensional, <em>N<sub>Basis</sub></em></p>
-<div>\[V_i^{{\rm{(Sf, n)}}}\]</div>
-
-<p>Fraction of surface <em>n</em> viewed; <em>N<sub>Basis</sub></em> X <em>N<sub>Sf</sub></em></p>
-<p><em>r</em><sup>(n)</sup>,<em>r</em><sup>(sp,\ n)</sup></p>
-<p>Surface <em>n</em> diffuse, specular reflectance; <em>N<sub>Sf</sub></em>  (already stored by E+)</p>
-<div>\[U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}}\]</div>
-
-<p>Fraction of the image of <span>$\Delta {\Omega_i}$</span> on surface <em>n</em> that views the sun when it is in direction Sun(tsh); <em>N<sub>Basis</sub></em> X <em>N<sub>Sf</sub></em> X <span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span></p>
-<div>\[V_i^{{\rm{(Gnd)}}}\]</div>
-
-<p>Fraction of <span>$\Delta {\Omega_i}$</span> that views ground; <em>N<sub>Basis</sub></em></p>
-<div>\[U_i^{{\rm{(Sky, Gnd)}}}\]</div>
-
-<p>Fraction of sky radiation received by the image of <span>$\Delta {\Omega_i}$</span> on the ground; <em>N<sub>Basis</sub></em></p>
-<div>\[U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D, Gnd)}}}\]</div>
-
-<p>Fraction of direct solar radiation for sun direction Sun(tsh) received by image of <span>$\Delta {\Omega_i}$</span> on ground; <span>$N_{Sim}^{Gnd}$</span><em><sub> </sub></em>X <em>N<sub>Basis</sub></em></p>
-<div>\[V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}\]</div>
-
-<p>Fraction of fenestration area irradiated by direct solar radiation for direction <em>i</em>, given that sun angle is s(<em>t</em>); N<em><sub>Sun</sub></em> X <em>N<sub>Basis</sub></em></p>
-<div>\[F_j^{{\rm{(}}k{\rm{)}}}\]</div>
-
-<p>Fraction of radiation in direction <em>j</em> leaving fenestration interior that arrives at surface <em>k</em>; <em>N<sub>Basis</sub></em> X <em>N<sub>IntSurf</sub></em></p>
-<div>\[{Z^{{\rm{(Sky), }}k}}\]</div>
-
-<p>Sky irradiation factor; <em>N<sub>IntSurf</sub></em></p>
-<div>\[{Z_{{\rm{r(}}t{\rm{)}}}}^{{\rm{(sp, Sf, n)}},k}\]</div>
-
-<p>Exterior surface specular irradiation factor; <span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span>X <em>N<sub>Sf</sub></em> X <em>N<sub>IntSurf</sub></em></p>
-<div>\[{Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun, Sf, n)}},k}\]</div>
-
-<p>Exterior surface direct-diffuse irradiation factor; <span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span> X <em>N<sub>Sf</sub></em> X <em>N<sub>IntSurf</sub></em></p>
-<div>\[{Z^{{\rm{(Sky, Sf, n)}},k}}\]</div>
-
-<p>Exterior surface sky irradiation factor; <em>N<sub>Sf</sub></em> X <em>N<sub>IntSurf</sub></em></p>
-<div>\[{Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(D, Gnd)}},k}\]</div>
-
-<p>Ground-reflected direct solar irradiaton factor (given sun direction s(<em>t</em>)); <span>$N_{Sun}^{Gnd}$</span> X <em>N<sub>IntSurf</sub></em></p>
-<div>\[{Z^{{\rm{(Sky, Gnd)}},k}}\]</div>
-
-<p>Ground-reflected diffuse solar irradiation factor; <em>N<sub>IntSurf</sub></em></p>
-<div>\[{Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}},k}\]</div>
-
-<p>Direct solar irradiation factor; <em>N<sub>Sun</sub></em> X <em>N<sub>IntSurf</sub></em></p>
-<div>\[{K^{{\rm{(Sky), }}l}}\]</div>
-
-<p>Sky absorption factor; <em>N<sub>Layers</sub></em></p>
-<div>\[{K_{{\rm{r(}}t{\rm{)}}}}^{{\rm{(sp, Sf, n)}},l}\]</div>
-
-<p>Exterior surface specular absorption factor; <em>N<sub>Sf</sub></em> X <span>$N_{Refl}^{{\rm{(Sf, n)}}}$</span> X <em>N<sub>Layers</sub></em></p>
-<div>\[{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun, Sf, n)}},l}\]</div>
-
-<p>Exterior surface diffusely reflected direct sun absorption factor;</p>
-<p><em>N<sub>Sf</sub></em> X <span>$N_{Sun}^{{\rm{(Sf, n)}}}$</span> X <em>N<sub>Layers</sub></em></p>
-<div>\[{K^{{\rm{(Sky, Sf, n)}},l}}\]</div>
-
-<p>Exterior surface reflected sky radiation absorption factor;</p>
-<p><em>N<sub>Sf</sub></em> X <em>N<sub>Layers</sub></em></p>
-<div>\[{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(D, Gnd)}},l}\]</div>
-
-<p>Ground-reflected direct solar absorption factor; <span>$N_{Sun}^{(Gnd)}$</span>X <em>N<sub>Layers</sub></em></p>
-<div>\[{K^{{\rm{(Sky, Gnd)}},l}}\]</div>
-
-<p>Ground-reflected sky radiation absorption factor; <em>N<sub>Layers</sub></em></p>
-<div>\[{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}},l}\]</div>
-
-<p>Direct sunlight absorption factor; <em>N<sub>Sun</sub></em> X <em>N<sub>Layers</sub></em></p>
 <h6 id="absorption">Absorption</h6>
 <p>For thermal calculations it is necessary to know the energy absorbed in each layer of the fenestration.  This depends only on the incident geometry, but otherwise is calculated in the same manner as the solar flux incident on interior surfaces.  For a given layer l of a fenestration f, we define a source-referenced absorption factor, K(source),l.  This is the amount of energy absorbed in layer l divided by the relevant solar intensity (which might be beam, diffuse, or reflected beam or diffuse, depending on the source of the radiation).  These absorption factors and the resultant source-specific absorbed solar powers are calculated by the analogs [see equation of equations through :</p>
 <div>\[{K^{{\rm{(Sky), }}l}} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}down} {{\mathop{\rm A}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Sky)}}}{s_i}} \]</div>
@@ -3554,9 +4173,9 @@ SpacingRatio</td>
 <p>The specular property means that one should not be using equation at all to describe the transmittance.  Instead, one should use the equation</p>
 <div>\[S({{\bf{p}}^{{\rm{(T)}}}}) = \tau ({{\bf{p}}^{{\rm{(T)}}}}) \cdot E({{\bf{p}}^{{\rm{(T)}}}})\]</div>
 
-<p>This equation is shoehorned into the integral calculation  of  equation through the use of a delta function in the incident direction vector, resulting (after the discretization) in a diagonal matrix for the transmittance (or reflectance).  The outgoing radiance element on the diagonal would be calculated as <em>T<sub>ii</sub></em>L<em><sub>ii</sub></em>, where multiplication by L<em><sub>ii</sub></em> substitutes for integration over the basis solid angle element.  For a specular glazing, <span>${T_{ii}} = {{\tau ({\bf{p}}<em>i^{{\rm{(T)}}})} \mathord{\left/ {\vphantom {{\tau ({\bf{p}}_i^{{\rm{(T)}}})} {{\Lambda</em>{ii}}}}} \right. } {{\Lambda_{ii}}}}$</span>, so one recovers the correct transmittance when one does the multiplication.  However, there is still a problem in principle:  For a specular fenestration, the angular spread of the outgoing radiation will be that of the source, which for direct sunlight is very small; the calculation, however, assumes the angular spread of the basis element.  This problem disappears in the geometric approximation to be used in EnergyPlus: by considering only the central direction of each basis element, the outgoing radiation in that direction is essentially assumed to be specular, so the blurring in the discretization is undone.</p>
+<p>This equation is shoehorned into the integral calculation  of  equation through the use of a delta function in the incident direction vector, resulting (after the discretization) in a diagonal matrix for the transmittance (or reflectance).  The outgoing radiance element on the diagonal would be calculated as <em>T<sub>ii</sub></em>L<em><sub>ii</sub></em>, where multiplication by L<em><sub>ii</sub></em> substitutes for integration over the basis solid angle element.  For a specular glazing, <span>$T_{ii} = \tau(\bf{p}<em>i^{(T)})/\Lambda</em>{ii} $</span>, so one recovers the correct transmittance when one does the multiplication.  However, there is still a problem in principle:  For a specular fenestration, the angular spread of the outgoing radiation will be that of the source, which for direct sunlight is very small; the calculation, however, assumes the angular spread of the basis element.  This problem disappears in the geometric approximation to be used in EnergyPlus: by considering only the central direction of each basis element, the outgoing radiation in that direction is essentially assumed to be specular, so the blurring in the discretization is undone.</p>
 <p>The axial symmetry of conventional glazings means that the transmittance (or reflectance) depends on only the incident angle, not the azimuthal angle about the normal to the fenestration plane.  So if one specifies the diagonal elements of the matrix, all of the terms with the same incident angles but different azimuthal angles will be the same.  One could alternatively specify only the specular transmittance at each of the incident angle values, provided one also indicated that it was for an axially symmetric fenestration.  Since expanding this set of values to the equivalent diagonal elements is a trivial calculation, how one specifies a specular glazing is completely a question of user convenience.  For example, if one were dealing with the WINDOW full basis, would it be more user-friendly to specify</p>
-<p>(1) <span>${T_{ii}} = {{\tau ({\bf{p}}<em>i^{{\rm{(T)}}})} \mathord{\left/ {\vphantom {{\tau ({\bf{p}}_i^{{\rm{(T)}}})} {{\Lambda</em>{ii}}}}} \right. } {{\Lambda_{ii}}}}$</span>, for 145 values, 135 of which are repeats of the previous value</p>
+<p>(1) <span>$T_{ii} = \tau(\bf{p}<em>i^{(T)})/\Lambda</em>{ii}$</span>, for 145 values, 135 of which are repeats of the previous value</p>
 <p>(2) <span>$\tau ({\theta_i})$</span> for 9 values of incident angle, <em>q<sub>i</sub></em> ?</p>
 <h6 id="interior-solar-radiation-transmitted-by-complex-fenestration">Interior Solar Radiation Transmitted by Complex Fenestration</h6>
 <p>Diffuse Solar Radiation Transmitted by Complex Fenestration</p>
@@ -3564,7 +4183,15 @@ SpacingRatio</td>
 <p>Diffuse solar transmitted through exterior complex fenestration and absorbed in interor walls is calculated and treated in same way as described in the section on Initial Distribution of Diffuse Solar Transmitted through Exterior and Interior Windows. Even though that BSDF is given for various directions, for purpose of diffuse solar radiation, transmittance and reflectances of fenestration system is integrated over incoming and outgoing hemisphere.  Because incoming diffuse solar radiation is divided on ground and sky parts, integration of incoming hemisphere is also perfomed over ground and sky part (see equation .</p>
 <p>Direct Solar Radiation Transmitted by Complex Fenestration</p>
 <p>Direct solar (beam) transmitted through exterior window is using same overlap calculations (see Figure 49) for each outgoing basis direction.  For certain sun position, algorithm calculatates equivalent incoming beam number.  The inside beam solar irradiance is calculated in similar manner as described in the section titled Interior Beam Radiation.</p>
-<div>\[\begin{array}{l}AISurf\left( {SurfNum} \right) = \\\{\rm{        }}\frac{{AbsIntSurf\left( {SurfNum} \right)}}{{A\left( {SurfNum} \right)}}\cdot\\\{\rm{        }}\mathop \sum \limits_{i = 1}^{{N_{extwin}}} \left( {\mathop \sum \limits_{j = 1}^{{N_{out}}} TB{m_{k,j}}\cdot{\Lambda_{k,j}}\cdot Aoverla{p_{k,j}}\left( {SurfNum} \right)} \right)\cdot CosIn{c_i}\end{array}\]</div>
+<div>\[
+  AISurf\left(SurfNum\right) = 
+    \frac{AbsIntSurf\left(SurfNum\right)}
+         {A\left(SurfNum\right)} \cdot
+    \sum_{i=1}^{N_{extwin}} \left( 
+       \sum_{j=1}^{N_{out}} 
+          TB{m_{k,j}} \cdot \Lambda_{k,j} \cdot \text{Aoverlap}_{k,j} \left( SurfNum \right)
+       \right) \cdot \text{CosInc}_i
+\]</div>
 
 <p><em>i</em> = exterior window number</p>
 <p><em>N<sub>extwin</sub>=</em> number of exterior windows in zone</p>
@@ -3580,7 +4207,12 @@ SpacingRatio</td>
 <p>Solar radiation absorbed in window layers is coming from three sources: Diffuse radiation from sky and ground, direct radiation from the sun and beam radiation coming from the sun and it is transmitted through other exterior windows.</p>
 <p>Diffuse Radiation from Sky and Ground</p>
 <p>Energy absorbed in the layers and which originates from diffuse radiation from sky and ground is represented by following equation:</p>
-<div>\[\begin{array}{l}QRadSWwinAbs\left( {Surf,Lay} \right) = \\\{\rm{        }}\mathop \sum \limits_{i = 1}^{{N_{layers}}} \left( \begin{array}{l}WinSkyFtAbs\left( {Surf,Lay} \right)\cdot SkySolarInc\\ + WinSkyGndAbs\left( {Surf,Lay} \right)\cdot GndSolarInc\end{array} \right)\end{array}\]</div>
+<div>\[
+  \text{QRadSWwinAbs}(Surf, Lay) = 
+  \sum_{i=1}^{N_{layers}} \left(
+    \text{WinSkyFtAbs}(Surf, Lay) \cdot \text{SkySolarInc} + \text{WinSkyGndAbs}(Surf, Lay) \cdot \text{GndSolarInc}
+  \right)
+\]</div>
 
 <p>where,</p>
 <p><em>WinSkyFtAbs(Lay)</em> = front absorptance averaged over sky for layer (Lay) and window belonging to Surf</p>
@@ -3589,13 +4221,18 @@ SpacingRatio</td>
 <p><em>GndSolarInc</em> = incident diffuse solar from the ground</p>
 <p>Direct Radiation from the Sun</p>
 <p>Energy absorbed in the layers and which originates from direct solar radiation is given by following equation:</p>
-<div>\[\begin{array}{l}QRadSWwinAbs\left( {SurfNum,Lay} \right) = \\\{\rm{        }}AWinSurf\left( {SurfNum,Lay} \right)\cdot BeamSolar\end{array}\]</div>
+<div>\[
+  \text{QRadSWwinAbs}(SurfNum, Lay) = \text{AWinSurf}(SurfNum, Lay) \cdot \text{BeamSolar}
+\]</div>
 
 <p>where,</p>
 <p><em>AWinSurf(SurfNum,Lay)</em> – is time step value of factor for beam absorbed in fenestration glass layers</p>
 <p><em>BeamSolar</em> – Current beam normal solar irradiance</p>
 <p>Factor for time step value is given by equation:</p>
-<p><span>$\begin{array}{l}AWinSurf\left( {SurfNum,Lay} \right) = \{\rm{        }}WinBmFtAbs\left( {Lay,HourOfDay,TimeStep} \right)\cdot CosInc\cdot\{\rm{        }}SunLitFract\cdot OutProjSLFracMult\left( {HourOfDay} \right)\end{array}$</span></p>
+<div>\[
+  \text{AWinSurf}(SurfNum,Lay) = \text{WinBmFtAbs}(Lay,HourOfDay,TimeStep) \cdot \text{CosInc} \cdot \text{SunLitFract} \cdot \text{OutProjSLFracMult}(HourOfDay)
+\]</div>
+
 <p>where,</p>
 <p><em>WinBmFtAbs(Lay,HourOfDay,TimeStep)</em> – is front directional absorptance for given layer and time</p>
 <p><em>CosInc</em> – cosine of beam solar incident angle</p>
@@ -3610,7 +4247,14 @@ SpacingRatio</td>
 <p>out<sub>p</sub> – current transmitting complex fenestration direction</p>
 <p>in<sub>1</sub>, ..., in<sub>N</sub> – set of receiving complex fenestration basis directions</p>
 <p>Result of equation is minimal dot product, which corresponds to best matching direction of receiving surface.  If we mark that direction with index k, then equation becomes:</p>
-<div>\[\begin{array}{l}AWinSurf(SurfNum,Lay) = \\\{\rm{        }}\frac{1}{{A(SurfNum)}}\cdot \\\{\rm{        }}\sum\limits_{i = 1}^{{N_{extwin}}} {(\sum\limits_{j = 1}^{{N_{out}}} {AbsIntSur{f_k}(SurfNum)\cdot } } TB{m_{k,j}}\cdot \\\{\rm{                     }}{A_{k,j}}\cdot Aoverla{p_{k,j}}(SurfNum))\cdot CosIn{c_i}\end{array}\]</div>
+<div>\[
+  \begin{array}{l}
+    AWinSurf(SurfNum,Lay) = \\
+      \frac{1}{A(SurfNum)} \cdot \\
+      \sum_{i = 1}^{N_{extwin}} (\sum\limits_{j = 1}^{N_{out}} AbsIntSur{f_k}(SurfNum) \cdot TB{m_{k,j}} \cdot \\
+      A_{k,j} \cdot \text{Aoverlap}_{k,j}(SurfNum)) \cdot \text{CosInc}_i
+  \end{array}
+\]</div>
 
 <p>where,</p>
 <p><em>AbsIntSurf<sub>k</sub>(SurfNum)</em> – directional absorptance for the receiving surface for the best matching direction</p>
@@ -3625,19 +4269,11 @@ SpacingRatio</td>
 <h2 id="window-heat-balance-calculation">Window Heat Balance Calculation</h2>
 <p>Table 36.  Fortran Variables used in Window Heat Balance Calculations</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
-<td>Units
- </td>
-<td>FORTRAN variable</td>
+<th>Mathematical variable</th>
+<th>Description</th>
+<th>Units</th>
+<th>FORTRAN variable</th>
 </tr>
 <tr>
 <td>N</td>
@@ -3854,19 +4490,11 @@ SpacingRatio</td>
 <h3 id="edge-of-glass-effects">Edge-Of-Glass Effects</h3>
 <p>Table 37.  Fortran Variables used in Edge of Glass calculations</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
-<td>Units
- </td>
-<td>FORTRAN variable</td>
+<th>Mathematical variable</th>
+<th>Description</th>
+<th>Units</th>
+<th>FORTRAN variable</th>
 </tr>
 <tr>
 <td><span>$\bar h$</span></td>
@@ -4000,25 +4628,28 @@ SpacingRatio</td>
 <p>If a shading device has a non-zero short-wave transmittance then absorption takes place throughout the shading device layer. The following algorithm is used to apportion the absorbed short-wave radiation to the two faces of the layer. Here <em>f<sub>1</sub></em> is the fraction assigned to the face closest to the incident radiation and <em>f<sub>2</sub></em> is the fraction assigned to the face furthest from the incident radiation.</p>
 <p><span>${f_1} = 1,{\rm{ }}{f_2} = 0{\rm{   if }}{\tau_{sh}} = 0$</span></p>
 <p>Otherwise</p>
-<div>\[\begin{array}{l}{f_1} = 0,{\rm{ }}{f_2} = 0{\rm{  if }}{\alpha_{sh}} \le 0.01\\\{f_1} = 1,{\rm{ }}{f_2} = 0{\rm{  if }}{\alpha_{sh}} > 0.999\\\left. \begin{array}{l}{f_1} = \frac{{1 - {e^{\frac{1}{2}\ln (1 - {\alpha_{sh}})}}}}{{{\alpha_{sh}}}}\\\{f_2} = 1 - {f_1}\end{array} \right\}0.01 < {\alpha_{sh}} \le 0.999\end{array}\]</div>
+<div>\[
+  \begin{array}{cl}
+    f_1 = 0,\;f_2 = 0 &\text{if} \alpha_{sh} \le 0.01 \\
+    f_1 = 1,\;f_2 = 0 &\text{if} \alpha_{sh} \gt 0.999 \\
+    \left.
+      \begin{array}{l}
+        f_1 = \frac{1 - e^{0.5 \ln (1 - \alpha_{sh}}} {\alpha_{sh}} \\
+        f_2 = 1 - {f_1}
+      \end{array}
+    \right\} &\text{if} 0.01 lt \alpha_{sh} \le 0.999
+  \end{array}
+\]</div>
 
 <h3 id="window-frame-and-divider-calculation">Window  Frame and Divider Calculation</h3>
 <p>For the zone heat balance calculation the inside surface temperature of the frame and that of the divider are needed. These temperatures are determined by solving the heat balance equations on the inside and outside surfaces of the frame and divider.</p>
 <p>Table 38.  Fortran Variables used in Window/Frame and Divider calculations</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
-<td>Units
- </td>
-<td>FORTRAN variable</td>
+<th>Mathematical variable</th>
+<th>Description</th>
+<th>Units</th>
+<th>FORTRAN variable</th>
 </tr>
 <tr>
 <td>Q<sub>ExtIR,abs</sub></td>
@@ -4375,9 +5006,17 @@ SpacingRatio</td>
 <p><img alt="" src="../../EngineeringReference/media/image1593.png" /></p>
 <p>Figure 98.  Example of shadowing of reveal surfaces by other reveal surfaces.</p>
 <p>The size of the shadowed areas, and the size of the corresponding illuminated areas, depends on the following factors:</p>
-<p>·        The sun position relative to the window</p>
-<p>·        The height and width of the window</p>
-<p>·        The depth of the outside and inside reveal surfaces</p>
+<ul>
+<li>
+<p>The sun position relative to the window</p>
+</li>
+<li>
+<p>The height and width of the window</p>
+</li>
+<li>
+<p>The depth of the outside and inside reveal surfaces</p>
+</li>
+</ul>
 <p>We will assume that the reveal surfaces are perpendicular to the window plane and that the window is rectangular. Then the above factors determine a unique shadow pattern. From the geometry of the pattern the shadowed areas and corresponding illuminated areas can be determined. This calculation is done in subroutine CalcBeamSolarReflectedFromWinRevealSurface in the SolarShading module. The window reveal input data is specified in the WindowProperty:FrameAndDivider object expect for the depth of the outside reveal, which is determined from the vertex locations of the window and its parent wall.</p>
 <p>If an exterior shading device (shade, screen or blind) is in place it is assumed that it blocks beam solar before it reaches outside or inside reveal surfaces. Correspondingly, it is assumed that an interior or between-glass shading device blocks beam solar before it reaches inside reveal surfaces.</p>
 <p>Representative shadow patterns are shown in Figure 99 for a window with no shading device, and without and with a frame. The case with a frame has to be considered separately because the frame can cast an additional shadow on the inside reveal surfaces.</p>
@@ -4412,119 +5051,121 @@ SpacingRatio</td>
 <p>L = <span>$L$</span></p>
 <p>L1 = average distance to frame of illuminated area of outside reveal (used to calculate view factor to frame).</p>
 <p>L2 = average distance to frame of illuminated area of inside reveal (used to calculate view factor to frame).</p>
-<p>IF(window does not have a frame) THEN</p>
-<p>IF(d2prime &lt;= d2) THEN</p>
-<p>IF(d12*TanAlpha &lt;= L) THEN</p>
-<p>A1sh = 0.5*TanAlpha*d1**2</p>
-<p>A2sh = d2prime*L + 0.5*TanAlpha*d12**2 - A1sh</p>
-<p>ELSE  ! d12*TanAlpha &gt; L</p>
-<p>IF(d1*TanAlpha &lt;= L) THEN</p>
-<p>A1sh = 0.5*TanAlpha*d1**2</p>
-<p>A2sh = d2*L - 0.5*TanAlpha*(L/TanAlpha - d1)**2</p>
-<p>ELSE  ! d1*TanAlpha &gt; L</p>
-<p>A1sh = d1*L - (0.5/TanAlpha)*L**2</p>
-<p>A2sh = d2*L</p>
-<p>END IF</p>
-<p>END IF</p>
-<p>ELSE  ! d2prime &gt; d2</p>
-<p>A2sh = d2*L</p>
-<p>IF(d2prime &lt; d1+d2) THEN</p>
-<p>IF(d12*TanAlpha &lt;= L) THEN</p>
-<p>A1sh = L*(d2prime-d2) + 0.5*TanAlpha*d12**2</p>
-<p>ELSE  ! d12*TanAlpha &gt; L</p>
-<p>A1sh = d1*L - 0.5*L**2/TanAlpha</p>
-<p>END IF</p>
-<p>ELSE  ! d2prime &gt;= d1+d2</p>
-<p>A1sh = d1*L</p>
-<p>END IF</p>
-<p>END IF</p>
-<p>ELSE  ! Window has a frame</p>
-<p>f1 = d1-P1</p>
-<p>f2 = d2-P2</p>
-<p>d2prime2 = FrameWidth/TanGamma</p>
-<p>IF(vertical reveal) THEN  ! Vertical reveal</p>
-<p>IF(InsReveal+0.5*GlazingThickness &lt;= P2) d2 = P2 + 0.001</p>
-<p>ELSE                      ! Horizontal</p>
-<p>IF(bottom reveal surfaces may be illuminated) THEN</p>
-<p>! Bottom reveal surfaces may be illuminated</p>
-<p>IF(InsSillDepth+0.5*GlazingThickness&lt;=P2) d2= P2 + 0.001</p>
-<p>ELSE</p>
-<p>! Top reveal surfaces may be illuminated</p>
-<p>IF(InsReveal+0.5*GlazingThickness &lt;= P2) d2 = P2 + 0.001</p>
-<p>END IF</p>
-<p>END IF</p>
-<p>IF(d2prime &lt;= f2) THEN</p>
-<p>! Shadow from opposing reveal does not go beyond inside
-     !  surface of frame</p>
-<p>IF(d12*TanAlpha &lt;= L) THEN</p>
-<p>A1sh = 0.5*TanAlpha*f1**2</p>
-<p>L1   = f1*(f1*TanAlpha/(6*L)+0.5)</p>
-<p>IF(d2-(d2prime+d2prime2+P2) &gt;= 0.) THEN</p>
-<p>A2sh = (d2prime+d2prime2)*L + &amp;</p>
-<p>0.5*TanAlpha*((d1+d2-d2prime)**2-d1+p2+d2prime2)**2)</p>
-<p>L2   = d2prime2 + 0.5*(d2-(d2prime+d2prime2+P2))</p>
-<p>ELSE  ! d2-(d2prime+d2prime2+P2) &lt; 0.</p>
-<p>! Inside reveal is fully shadowed by frame and/or
-         !opposing reveal</p>
-<p>A2sh = f2*L</p>
-<p>L2   = f2</p>
-<p>END IF</p>
-<p>ELSE  ! d12*TanAlpha &gt;= L</p>
-<p>IF((d1+P2)*TanAlpha &lt;= L) THEN</p>
-<p>A1sh = 0.5*TanAlpha*f1**2</p>
-<p>L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)</p>
-<p>IF((d1+P2+d2prime2)*TanAlpha &gt;= L) THEN</p>
-<p>A2sh = f2*L</p>
-<p>L2   = f2</p>
-<p>ELSE  ! (d1+P2+d2prime2)*TanAlpha &lt; L</p>
-<p>A2sh = f2*L - 0.5*(L-(d1+P2)*TanAlpha)**2/TanAlpha &amp;
-             + d2prime2*(L-(d1+P2+d2prime2/2)*TanAlpha)</p>
-<p>L2 = d2prime2 + (L/TanAlpha - (d1+P2+d2prime2))/3</p>
-<p>END IF</p>
-<p>ELSE  ! (d1+P2)*TanAlpha &gt; L</p>
-<p>L2 = f2</p>
-<p>A2sh = f2*L</p>
-<p>IF(f1*TanAlpha &lt;= L) THEN</p>
-<p>A1sh = 0.5*TanAlpha*f1**2</p>
-<p>L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)</p>
-<p>ELSE  ! f1*TanAlpha &gt; L</p>
-<p>A1sh = f1*L - 0.5*L**2/TanAlpha</p>
-<p>L1 = f1-(L/TanAlpha)/3</p>
-<p>END IF</p>
-<p>END IF</p>
-<p>END IF</p>
-<p>ELSE
+<pre><code> IF(window does not have a frame) THEN
+      IF(d2prime &lt;= d2) THEN
+     IF(d12*TanAlpha &lt;= L) THEN
+       A1sh = 0.5*TanAlpha*d1**2
+       A2sh = d2prime*L + 0.5*TanAlpha*d12**2 - A1sh
+     ELSE  ! d12*TanAlpha &gt; L
+       IF(d1*TanAlpha &lt;= L) THEN
+         A1sh = 0.5*TanAlpha*d1**2
+         A2sh = d2*L - 0.5*TanAlpha*(L/TanAlpha - d1)**2
+       ELSE  ! d1*TanAlpha &gt; L
+         A1sh = d1*L - (0.5/TanAlpha)*L**2
+         A2sh = d2*L
+       END IF
+     END IF
+   ELSE  ! d2prime &gt; d2
+     A2sh = d2*L
+     IF(d2prime &lt; d1+d2) THEN
+       IF(d12*TanAlpha &lt;= L) THEN
+         A1sh = L*(d2prime-d2) + 0.5*TanAlpha*d12**2
+       ELSE  ! d12*TanAlpha &gt; L
+         A1sh = d1*L - 0.5*L**2/TanAlpha
+       END IF
+     ELSE  ! d2prime &gt;= d1+d2
+       A1sh = d1*L
+     END IF
+   END IF
+ ELSE  ! Window has a frame
+  f1 = d1-P1
+  f2 = d2-P2
+  d2prime2 = FrameWidth/TanGamma
+  IF(vertical reveal) THEN  ! Vertical reveal
+    IF(InsReveal+0.5*GlazingThickness &lt;= P2) d2 = P2 + 0.001
+  ELSE                      ! Horizontal
+    IF(bottom reveal surfaces may be illuminated) THEN
+      ! Bottom reveal surfaces may be illuminated
+      IF(InsSillDepth+0.5*GlazingThickness&lt;=P2) d2= P2 + 0.001
+    ELSE
+      ! Top reveal surfaces may be illuminated
+      IF(InsReveal+0.5*GlazingThickness &lt;= P2) d2 = P2 + 0.001
+    END IF
+  END IF
+  IF(d2prime &lt;= f2) THEN
+    ! Shadow from opposing reveal does not go beyond inside
+     !  surface of frame
+    IF(d12*TanAlpha &lt;= L) THEN
+      A1sh = 0.5*TanAlpha*f1**2
+      L1   = f1*(f1*TanAlpha/(6*L)+0.5)
+      IF(d2-(d2prime+d2prime2+P2) &gt;= 0.) THEN
+        A2sh = (d2prime+d2prime2)*L + &amp;
+          0.5*TanAlpha*((d1+d2-d2prime)**2-d1+p2+d2prime2)**2)
+        L2   = d2prime2 + 0.5*(d2-(d2prime+d2prime2+P2))
+      ELSE  ! d2-(d2prime+d2prime2+P2) &lt; 0.
+        ! Inside reveal is fully shadowed by frame and/or
+         !opposing reveal
+        A2sh = f2*L
+        L2   = f2
+      END IF
+    ELSE  ! d12*TanAlpha &gt;= L
+      IF((d1+P2)*TanAlpha &lt;= L) THEN
+        A1sh = 0.5*TanAlpha*f1**2
+        L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
+        IF((d1+P2+d2prime2)*TanAlpha &gt;= L) THEN
+          A2sh = f2*L
+          L2   = f2
+        ELSE  ! (d1+P2+d2prime2)*TanAlpha &lt; L
+          A2sh = f2*L - 0.5*(L-(d1+P2)*TanAlpha)**2/TanAlpha &amp;
+             + d2prime2*(L-(d1+P2+d2prime2/2)*TanAlpha)
+          L2 = d2prime2 + (L/TanAlpha - (d1+P2+d2prime2))/3
+        END IF
+      ELSE  ! (d1+P2)*TanAlpha &gt; L
+        L2 = f2
+        A2sh = f2*L
+        IF(f1*TanAlpha &lt;= L) THEN
+          A1sh = 0.5*TanAlpha*f1**2
+          L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
+        ELSE  ! f1*TanAlpha &gt; L
+          A1sh = f1*L - 0.5*L**2/TanAlpha
+          L1 = f1-(L/TanAlpha)/3
+        END IF
+      END IF
+    END IF
+  ELSE
      ! d2prime &gt; f2 -- Shadow from opposing reveal goes beyond
-     ! inside of frame</p>
-<p>A2sh = f2*L</p>
-<p>L2 = f2</p>
-<p>IF(d2prime &gt;= d1+d2) THEN</p>
-<p>A1sh = 0.0</p>
-<p>L1   = f1</p>
-<p>ELSE  ! d2prime &lt; d1+d2</p>
-<p>IF(d2prime &lt;= d2+P1) THEN</p>
-<p>IF(f1*TanAlpha &lt;= L) THEN</p>
-<p>A1sh = 0.5*TanAlpha*f1**2</p>
-<p>L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)</p>
-<p>ELSE  ! f1*TanAlpha &gt; L</p>
-<p>A1sh = f1*L - 0.5*L**2/TanAlpha</p>
-<p>L1   = f1 - (L/TanAlpha)/3</p>
-<p>END IF</p>
-<p>ELSE  ! d2prime &gt; d2+P1</p>
-<p>IF(d12*TanAlpha &lt;= L) THEN</p>
-<p>A1sh = L*(d2prime-(d2+P1)) + 0.5*TanAlpha*d12**2</p>
-<p>L1   = (L*(f1-d12/2)-d12*TanAlpha* &amp;
-                 (f1/2-d12/3))/(L-d12*TanAlpha/2)</p>
-<p>ELSE  ! d12*TanAlpha &gt; L</p>
-<p>A1sh = f1*L - 0.5*L**2/TanAlpha</p>
-<p>L1   = f1 - (L/TanAlpha)/3</p>
-<p>END IF</p>
-<p>END IF</p>
-<p>END IF</p>
-<p>END IF</p>
-<p>FracToGlassOuts = 0.5*(1.0 - ATAN(FrameWidth/L1)/PiOvr2)</p>
-<p>FracToGlassIns  = 0.5*(1.0 - ATAN(FrameWidth/L2)/PiOvr2)</p>
-<p>END IF  ! End of check if window has frame</p>
+     ! inside of frame
+    A2sh = f2*L
+    L2 = f2
+    IF(d2prime &gt;= d1+d2) THEN
+      A1sh = 0.0
+      L1   = f1
+    ELSE  ! d2prime &lt; d1+d2
+      IF(d2prime &lt;= d2+P1) THEN
+        IF(f1*TanAlpha &lt;= L) THEN
+          A1sh = 0.5*TanAlpha*f1**2
+          L1 = f1*((f1*TanAlpha)/(6*L) + 0.5)
+        ELSE  ! f1*TanAlpha &gt; L
+          A1sh = f1*L - 0.5*L**2/TanAlpha
+              L1   = f1 - (L/TanAlpha)/3
+            END IF
+          ELSE  ! d2prime &gt; d2+P1
+            IF(d12*TanAlpha &lt;= L) THEN
+              A1sh = L*(d2prime-(d2+P1)) + 0.5*TanAlpha*d12**2
+              L1   = (L*(f1-d12/2)-d12*TanAlpha* &amp;
+                 (f1/2-d12/3))/(L-d12*TanAlpha/2)
+            ELSE  ! d12*TanAlpha &gt; L
+              A1sh = f1*L - 0.5*L**2/TanAlpha
+              L1   = f1 - (L/TanAlpha)/3
+            END IF
+          END IF
+        END IF
+      END IF
+      FracToGlassOuts = 0.5*(1.0 - ATAN(FrameWidth/L1)/PiOvr2)
+      FracToGlassIns  = 0.5*(1.0 - ATAN(FrameWidth/L2)/PiOvr2)
+    END IF  ! End of check if window has frame
+</code></pre>
+
 <p>The beam solar reflected from a sunlit region of area <span>$A$</span>is given by</p>
 <div>\[R = {I_B}A\cos \beta (1 - a){\rm{ }}\]</div>
 
@@ -4548,13 +5189,29 @@ SpacingRatio</td>
 <p>Shading devices in EnergyPlus can be on the exterior or interior sides of the window or between glass layers. The window shading device thermal model accounts for the thermal interactions between the shading layer (shade, screen or blind) and the adjacent glass, and between the shading layer and the room (for interior shading) or the shading layer and the outside surround (for exterior shading).</p>
 <p>An important feature of the shading device thermal model is calculating the natural convection airflow between the shading device and glass. This flow affects the temperature of the shading device and glazing and, for interior shading, is a determinant of the convective heat gain from the shading layer and glazing to the zone air. The airflow model is based on one described in the ISO Standard 15099, “Thermal Performance of Windows, Doors and Shading Devices—Detailed Calculations” [ISO15099, 2001]. (Between-glass forced airflow is also modeled; see “Airflow Windows.”)</p>
 <p>The following effects are considered by the shading device thermal model:</p>
-<p>·        For interior and exterior shading device: Long-wave radiation (IR) from the surround absorbed by shading device, or transmitted by the shading device and absorbed by the adjacent glass. For interior shading the surround consists of the other zone surfaces. For exterior shading the surround is the sky and ground plus exterior shadowing surfaces and exterior building surfaces “seen” by the window.</p>
-<p>·        Inter-reflection of IR between the shading device and adjacent glass.</p>
-<p>·        Direct and diffuse solar radiation absorbed by the shading device.</p>
-<p>·        Inter-reflection of solar radiation between shading layer and glass layers.</p>
-<p>·        Convection from shading layer and glass to the air in the gap (or, for between-glass shading, gaps) between the shading layer and adjacent glass, and convection from interior shading layer to zone air or from exterior shading layer to outside air.</p>
-<p>·        Natural convection airflow in the gap (or, for between-glass shading, gaps) between shading layer and adjacent glass induced by buoyancy effects, and the effect of this flow on the shading-to-gap and glass-to-gap convection coefficients.</p>
-<p>·        For interior shading, convective gain (or loss) to zone air from gap airflow.</p>
+<ul>
+<li>
+<p>For interior and exterior shading device: Long-wave radiation (IR) from the surround absorbed by shading device, or transmitted by the shading device and absorbed by the adjacent glass. For interior shading the surround consists of the other zone surfaces. For exterior shading the surround is the sky and ground plus exterior shadowing surfaces and exterior building surfaces “seen” by the window.</p>
+</li>
+<li>
+<p>Inter-reflection of IR between the shading device and adjacent glass.</p>
+</li>
+<li>
+<p>Direct and diffuse solar radiation absorbed by the shading device.</p>
+</li>
+<li>
+<p>Inter-reflection of solar radiation between shading layer and glass layers.</p>
+</li>
+<li>
+<p>Convection from shading layer and glass to the air in the gap (or, for between-glass shading, gaps) between the shading layer and adjacent glass, and convection from interior shading layer to zone air or from exterior shading layer to outside air.</p>
+</li>
+<li>
+<p>Natural convection airflow in the gap (or, for between-glass shading, gaps) between shading layer and adjacent glass induced by buoyancy effects, and the effect of this flow on the shading-to-gap and glass-to-gap convection coefficients.</p>
+</li>
+<li>
+<p>For interior shading, convective gain (or loss) to zone air from gap airflow.</p>
+</li>
+</ul>
 <p>In the following it is assumed that the shading device, when in place, covers the glazed part of the window (and dividers, if present) and is parallel to the glazing. For interior and exterior shading devices it is assumed that the shading layer is separated from the glazing by an air gap. A between-glass shading layer is assumed to be centered between two glass layers and separated from the adjacent glass layers by gaps that is filled with the same gas. If the window has a frame, it is assumed that the shading device does <em>not</em> cover the frame.</p>
 <h3 id="heat-balance-equations-for-shading-device-and-adjacent-glass">Heat Balance Equations for Shading Device and Adjacent Glass</h3>
 <p>If a window shading device is deployed the heat balance equations for the glass surfaces facing the shading layer are modified, and two new equations, one for each face of the shading layer, are added. Figure 101 illustrates the case of double glazing with an interior shading device.</p>
@@ -4585,8 +5242,24 @@ SpacingRatio</td>
 <p><em>h<sub>c</sub></em>= surface-to-surface heat transfer coefficient for non-vented (closed) cavities (W/m<sup>2</sup>K)</p>
 <p><em>v</em> = mean air velocity in the gap (m/s).</p>
 <p>The quantities <em>h<sub>cv</sub></em> and <em>T<sub>gap</sub></em> depend on the airflow velocity in the gap, which in turn depends on several factors, including height of shading layer, glass/shading layer separation (gap depth), zone air temperature for interior shading or outside air temperature for exterior shading, and shading layer and glass face temperatures. The calculation of <em>h<sub>cv</sub></em> and <em>T<sub>gap</sub></em> is described in the following sections.</p>
-<p>The heat balance equation for the**shading layer surface facing the gap is</p>
-<div>\[\begin{array}{l}\frac{{{E_i}{\tau_{sh}}{\rho_4}{\varepsilon_{sh}}}}{{1 - {\rho_4}{\rho_{sh}}}} + \frac{{\sigma {\varepsilon_{sh}}}}{{1 - {\rho_4}{\rho_{sh}}}}\left[ {{\varepsilon_4}\theta_4^4 - \theta_5^4(1 - {\rho_4}({\varepsilon_{sh}} + {\rho_{sh}}))} \right] + \\\{\rm{               }}{k_{sh}}\left( {{\theta_6} - {\theta_5}} \right) + {h_{cv}}\left( {{T_{gap}} - {\theta_5}} \right) + {S_{sh,1}} = 0\end{array}\]</div>
+<p>The heat balance equation for the shading layer surface facing the gap is</p>
+<div>\[
+  \frac{E_i \tau_{sh} \rho_4 \varepsilon_{sh}} {1 - \rho_4 \rho_{sh}} + 
+  \frac{\sigma \varepsilon_{sh}} {1 - \rho_4 \rho_{sh}} \left[
+    \varepsilon_4 \theta_4^4 - \theta_5^4 (
+      1 - \rho_4( 
+        \varepsilon_{sh} + \rho_{sh}
+      )
+    )
+  \right] + 
+  k_{sh} \left(
+    \theta_6 - \theta_5
+  \right) + 
+  h_{cv} \left(
+    T_{gap} - \theta_5
+  \right) + 
+  S_{sh,1} = 0
+\]</div>
 
 <p>where</p>
 <p><em>k<sub>sh</sub></em> = shading layer conductance (W/m<sup>2</sup>K).</p>
@@ -4628,6 +5301,13 @@ SpacingRatio</td>
 <div>\[\Delta {p_Z} = \frac{{\rho {v^2}}}{2}\left( {{Z_{in}} + {Z_{out}}} \right){\rm{    (Pa)}}\]</div>
 
 <p>Here, the inlet pressure drop factor,<em> Z<sub>in</sub></em>, and the outlet pressure drop factor, <em>Z<sub>out</sub></em>, are given by</p>
+<div>\[
+  \begin{array}{rl}
+    Z_{in}  &= \left( \frac{A_{gap}}{0.66A_{eq,in}}  - 1 \right)^2 \\
+    Z_{out} &= \left( \frac{A_{gap}}{0.60A_{eq,out}} - 1 \right)^2
+  \end{array}
+\]</div>
+
 <div>\[\begin{array}{l}{Z_{in}} = {\left( {\frac{{{A_{gap}}}}{{0.66{A_{eq,in}}}} - 1} \right)^2}\\\{Z_{out}} = {\left( {\frac{{{A_{gap}}}}{{0.60{A_{eq,out}}}} - 1} \right)^2}\end{array}\]</div>
 
 <p>where</p>
@@ -4635,10 +5315,20 @@ SpacingRatio</td>
 <p><em>A<sub>eq,out</sub></em> = equivalent outlet opening area (m<sup>2</sup>)</p>
 <p><em>A<sub>gap</sub></em> = cross-sectional area of the gap = <em>sW</em>(m<sup>2</sup>)</p>
 <p>If  T<sub>gap</sub> &gt; T<sub>gap,in</sub></p>
-<div>\[\begin{array}{l}{A_{eq,in}} = {A_{bot}} + \frac{{{A_{top}}}}{{2({A_{bot}} + {A_{top}})}}\left( {{A_l} + {A_r} + {A_h}} \right)\\\{A_{eq,out}} = {A_{top}} + \frac{{{A_{bot}}}}{{2({A_{bot}} + {A_{top}})}}\left( {{A_l} + {A_r} + {A_h}} \right)\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    A_{eq,in}  &= A_{bot} + \frac{A_{top}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) \\
+    A_{eq,out} &= A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
+  \end{array}
+\]</div>
 
 <p>If  T<sub>gap</sub> ≤ T<sub>gap,in</sub></p>
-<div>\[\begin{array}{l}{A_{eq,in}} = {A_{top}} + \frac{{{A_{bot}}}}{{2({A_{bot}} + {A_{top}})}}\left( {{A_l} + {A_r} + {A_h}} \right)\\\{A_{eq,out}} = {A_{bot}} + \frac{{{A_{top}}}}{{2({A_{bot}} + {A_{top}})}}\left( {{A_l} + {A_r} + {A_h}} \right)\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    A_{eq,in}  &= A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
+    A_{eq,out} &= A_{bot} + \frac{A_{top}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) \\
+  \end{array}
+\]</div>
 
 <p>Here, the area of the openings through which airflow occurs (see Figure 102 and Figure 103) are defined as follows:</p>
 <p>A<sub>bot</sub> = area of the bottom opening (m<sup>2</sup>)</p>
@@ -4703,7 +5393,15 @@ SpacingRatio</td>
 <p>Figure 105. Glazing system with two glass layers and a between-glass shading device showing variables used in the heat balance equations.</p>
 <p>The heat balance equations for the two glass surfaces facing the shading device are the following.</p>
 <p>For face #2:</p>
-<div>\[\begin{array}{l}{h_{cv,1}}({T_{gap,1}} - {\theta_2}) + {k_1}({\theta_1} - {\theta_2}) + \\\{\rm{           }}\frac{{\sigma {\varepsilon_2}}}{{1 - {\rho_2}{R_1}}}\left[ {\frac{{{\tau_{sh}}}}{{1 - {\rho_6}{\rho_3}}}\left( {{\varepsilon_3}\theta_3^4 + {\varepsilon_6}\theta_6^4{\rho_3}} \right) + {\varepsilon_5}\theta_5^4 + {\varepsilon_2}\theta_2^4{R_1}} \right] - \sigma {\varepsilon_2}\theta_2^4 + {S_2} = 0\end{array}\]</div>
+<div>\[
+  h_{cv,1} (T_{gap,1}-\theta_2) + k_1 (\theta_1-\theta_2) +
+    \frac{\sigma \epsilon_2}{1-\rho_2 R_1} \left[
+      \frac{\tau_{sh}}{1-\rho_6\rho_3} (
+        \epsilon_3 \theta_3^4 + \epsilon_6\theta_6^4\rho_3
+      )
+      + \epsilon_5\theta_5^4 + \epsilon_2\theta_2^4R_1
+    \right]
+\]</div>
 
 <p>where</p>
 <div>\[{R_1} = {\rho_5} + \frac{{\tau_{sh}^2{\rho_3}}}{{1 - {\rho_6}{\rho_3}}}\]</div>
@@ -4711,7 +5409,15 @@ SpacingRatio</td>
 <p><span>${T_{gap,1}} = $</span> effective mean air temperature in gap 1 (K)</p>
 <p><span>${h_{cv,1}} = $</span> convective heat transfer coefficient from glass or shading layer to gas in gap 1 (W/m<sup>2</sup>K)</p>
 <p>For face #3:</p>
-<div>\[\begin{array}{l}{h_{cv,2}}({T_{gap,2}} - {\theta_3}) + {k_2}({\theta_4} - {\theta_3}) + \\\{\rm{           }}\frac{{\sigma {\varepsilon_3}}}{{1 - {\rho_3}{R_2}}}\left[ {\frac{{{\tau_{sh}}}}{{1 - {\rho_5}{\rho_2}}}\left( {{\varepsilon_2}\theta_2^4 + {\varepsilon_5}\theta_5^4{\rho_2}} \right) + {\varepsilon_6}\theta_6^4 + {\varepsilon_7}\theta_3^4{R_2}} \right] - \sigma {\varepsilon_3}\theta_3^4 + {S_3} = 0\end{array}\]</div>
+<div>\[
+  h_{cv,2} (T_{gap,2}-\theta_3) + k_2 (\theta_4-\theta_3) +
+    \frac{\sigma \epsilon_3}{1-\rho_3 R_2} \left[
+      \frac{\tau_{sh}}{1-\rho_5\rho_2} (
+        \epsilon_3 \theta_2^4 + \epsilon_5\theta_5^4\rho_2
+      )
+      + \epsilon_6\theta_6^4 + \epsilon_7\theta_3^4R_2
+    \right]
+\]</div>
 
 <p>where</p>
 <div>\[{R_2} = {\rho_6} + \frac{{\tau_{sh}^2{\rho_2}}}{{1 - {\rho_5}{\rho_2}}}\]</div>
@@ -4720,10 +5426,26 @@ SpacingRatio</td>
 <p><span>${h_{cv,2}} = $</span> convective heat transfer coefficient from glass or shading layer to gas in gap 2 (W/m<sup>2</sup>K)</p>
 <p>The heat balance equations for the shading layer faces are:</p>
 <p>For face #5:</p>
-<div>\[\begin{array}{l}{h_{cv,1}}({T_{gap,1}} - {\theta_5}) + {k_{sh}}({\theta_6} - {\theta_5}) + \\\{\rm{           }}\frac{{\sigma {\varepsilon_5}}}{{1 - {\rho_2}{R_1}}}\left[ {\frac{{{\tau_{sh}}{\rho_2}}}{{1 - {\rho_5}{\rho_3}}}\left( {{\varepsilon_3}\theta_3^4 + {\varepsilon_6}\theta_6^4{\rho_3}} \right) + {\varepsilon_2}\theta_2^4 + {\varepsilon_5}\theta_5^4{\rho_2}} \right] - \sigma {\varepsilon_5}\theta_5^4 + {S_5} = 0\end{array}\]</div>
+<div>\[
+  h_{cv,1} (T_{gap,1}-\theta_5) + k_sh (\theta_6-\theta_5) +
+    \frac{\sigma \epsilon_5}{1-\rho_2 R_1} \left[
+      \frac{\tau_{sh}\rho_2}{1-\rho_5\rho_3} (
+        \epsilon_3 \theta_3^4 + \epsilon_6\theta_6^4\rho_3
+      )
+      + \epsilon_2\theta_2^4 + \epsilon_5\theta_5^4\rho_2
+    \right]
+\]</div>
 
 <p>For face #6:</p>
-<div>\[\begin{array}{l}{h_{cv,2}}({T_{gap,2}} - {\theta_3}) + {k_2}({\theta_4} - {\theta_3}) + \\\{\rm{           }}\frac{{\sigma {\varepsilon_3}}}{{1 - {\rho_3}{R_2}}}\left[ {\frac{{{\tau_{sh}}}}{{1 - {\rho_5}{\rho_2}}}\left( {{\varepsilon_2}\theta_2^4 + {\varepsilon_5}\theta_5^4{\rho_2}} \right) + {\varepsilon_6}\theta_6^4 + {\varepsilon_7}\theta_3^4{R_2}} \right] - \sigma {\varepsilon_3}\theta_3^4 + {S_3} = 0\end{array}\]</div>
+<div>\[
+  h_{cv,2} (T_{gap,2}-\theta_3) + k_2 (\theta_4-\theta_3) +
+    \frac{\sigma \epsilon_3}{1-\rho_3 R_2} \left[
+      \frac{\tau_{sh}}{1-\rho_5\rho_2} (
+        \epsilon_2 \theta_2^4 + \epsilon_5\theta_5^4\rho_2
+      )
+      + \epsilon_2\theta_2^4 + \epsilon_7\theta_3^4R_2
+    \right]
+\]</div>
 
 <p>The convective heat transfer coefficients are given by</p>
 <div>\[\begin{array}{l}{h_{cv,1}} = 2{h_{c,1}} + 4v\\\{h_{cv,2}} = 2{h_{c,2}} + 4v\end{array}\]</div>
@@ -5220,7 +5942,14 @@ SpacingRatio</td>
 
 <div>\[{\rm{\tau }}_{{\rm{bt}}}^{}\left( {\rm{\theta }} \right) = {\rm{\tau }}_{{\rm{bt}}}^{}{\rm{(\theta }} = {\rm{0)}} \cdot {\rm{co}}{{\rm{s}}^{\rm{b}}}{\kern 1pt} \left( {\rm{\theta }} \right)\]</div>
 
-<div>\[{\rm{b}} = \left\{ \begin{array}{l}{\rm{0}}{\rm{.133}} \cdot {\left( {{\rm{\tau }}_{}^{{\rm{str}}} + 0.003} \right)^{ - 0.467}}\quad \quad \left( {0 \le {\rm{\tau }}_{}^{{\rm{str}}} \le 0.33} \right)\\\{\rm{b}} = {\rm{0}}{\rm{.33}} \cdot \left( {{\rm{1}} - {\rm{\tau }}_{}^{{\rm{str}}}} \right)\quad \quad \;\;\quad \quad \left( {0.33 < {\rm{\tau }}_{}^{{\rm{str}}} \le 1} \right)\end{array} \right.\]</div>
+<div>\[
+  b = \left\{ 
+    \begin{array}{lc}
+      0.133 \cdot \left( \rm{\tau}^{str} + 0.003 \right)^{-0.467} &\text{if} \left( 0 \le \rm{\tau}^{str} \le 0.33 \right) \\
+      0.33 \cdot \left( 1 - \rm{\tau}^{str} \right)               &\text{if} \left( 0.33 < \rm{\tau}^{str} \le 1 \right)
+    \end{array}
+  \right.
+\]</div>
 
 <div>\[{\rm{\tau }}_{}^{{\rm{str}}} = \frac{{{\rm{\tau }}_{{\rm{bt}}}^{}\left( {{\rm{\theta }} = {\rm{0}}} \right) - {{\rm{\tau }}_{{\rm{bb}}}}\left( {{\rm{\theta }} = {\rm{0}}} \right)}}{{{\rm{1}} - {{\rm{\tau }}_{{\rm{bb}}}}\left( {{\rm{\theta }} = {\rm{0}}} \right)}}\]</div>
 
