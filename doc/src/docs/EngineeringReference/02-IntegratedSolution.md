@@ -32,7 +32,7 @@ where:
 
 <span>${\dot m_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right)$</span> = heat transfer due to infiltration of outside air
 
-<span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}\left( {{T_{zi}} - {T_z}} \right)$</span> = heat transfer due to interzone air mixing
+<span>$\sum_{i=1}^{N_{zones}} \dot m_i C_p\left( T_{zi} - {T_z} \right)$</span> = heat transfer due to interzone air mixing
 
 <span>${\dot Q_{sys}}$</span> = air systems output
 
@@ -229,7 +229,7 @@ In the same manner as described above for zone air temperature (ref. Basis for t
 
 In order to calculate the derivative term with respect to time, the first order backward finite difference method, defined as the EulerMethod in the ZoneAirHeatBalanceAlgorithm object, may be used:
 
- <span>$\frac{{dW}}{{dt}} = {\left( {\delta t} \right)^{ - 1}}(W_z^t - W_z^{t - \delta t}) + O(\delta t)$</span>
+ <div>\[\frac{{dW}}{{dt}} = {\left( {\delta t} \right)^{ - 1}}(W_z^t - W_z^{t - \delta t}) + O(\delta t)\]</div>
 
 The zone air humidity ratio update at the current time step using the EulerMethod may be expressed as follows:
 
@@ -239,7 +239,7 @@ To preserve the stability of the calculation of the zone humidity ratio, the thi
 
 The third order derivative derived from a Taylor Series expansion is defined as:
 
-<span>${\left. {\frac{{d{W_z}}}{{dt}}} \right|_t} \approx \frac{{\left( {{\textstyle{{11} \over 6}}W_z^t - 3W_z^{t - \delta t} + {\textstyle{3 \over 2}}W_z^{t - 2\delta t} - {\textstyle{1 \over 3}}W_z^{t - 3\delta t}} \right)}}{{\delta t}} + O\left( {\delta {t^3}} \right)$</span>.
+<div>\[{\left. {\frac{{d{W_z}}}{{dt}}} \right|_t} \approx \frac{{\left( {{\textstyle{{11} \over 6}}W_z^t - 3W_z^{t - \delta t} + {\textstyle{3 \over 2}}W_z^{t - 2\delta t} - {\textstyle{1 \over 3}}W_z^{t - 3\delta t}} \right)}}{{\delta t}} + O\left( {\delta {t^3}} \right)\]</div>.
 
 The coefficients of the approximated derivative are very close to the coefficients of the analogous Adams-Bashforth algorithm. Then the approximated derivative is substituted into the mass balance and the terms with the humidity ratio at past time steps are all put on the right hand side of the equation. This third order derivative zone humidity ratio update increases the number of previous time steps that are used in calculating the new zone humidity ratio, and decreases the dependence on the most recent. The higher order derivative approximations have the potential to allow the use of larger time steps by smoothing transitions through sudden changes in zone operating conditions.
 
@@ -353,7 +353,7 @@ where:
 
 <span>$\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} $</span> = sum of scheduled internal carbon dioxide loads. The zone air density is used to convert the volumetric rate of carbon dioxide generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of carbon dioxide as ppm.
 
-<span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_z^t} \right)$</span> = carbon dioxide transfer due to interzone air mixing [ppm-kg/s]
+<span>$ \sum_{i=1}^{N_{zones}} \dot m_i \left( C_{zi} - C_z^t \right) $</span> = carbon dioxide transfer due to interzone air mixing [ppm-kg/s]
 
 <span>${C_{zi}}$</span> = carbon dioxide concentration in the zone air being transferred into this zone [ppm]
 
@@ -474,7 +474,7 @@ The zone air density is used to convert the volumetric rate of generic contamina
 
 <span>${\rho_{air}}\sum\limits_i^{N{\rm{sink}}} {{R_{f,i}}{C_{f,z}}} $</span>= Sum of removal rate from sinks in a zone or interior surfaces [ppm-kg/s]
 
-<span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{f,z,i}} - C_{f,z}^t} \right)$</span> = Generic contaminant transfer due to interzone air mixing [ppm-kg/s]
+<span>$\sum_{i=1}^{N_{zones}} \dot m_i \left( C_{f,z,i} - C_{f,z}^t \right)$</span> = Generic contaminant transfer due to interzone air mixing [ppm-kg/s]
 
 <span>${C_{f,z,i}}$</span> = Generic contaminant concentration in the zone air being transferred into this zone [ppm]
 

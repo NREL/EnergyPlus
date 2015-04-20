@@ -342,16 +342,10 @@ Dependencies on moisture content are indicated by a superscript <sup>w</sup>, on
 Table 2. Combined Heat and Moisture Transfer Model Nomenclature
 
 <table class="table table-striped">
-
-
-
-
-
-
 <tr>
-<td>Symbol</td>
-<td>Units</td>
-<td>Meaning</td>
+<th>Symbol</th>
+<th>Units</th>
+<th>Meaning</th>
 </tr>
 <tr>
 <td>T</td>
@@ -525,11 +519,11 @@ The three terms in equation describe the storage of moisture, the transport of l
 
 <div>\[\delta  = \frac{{\left( {2 \times {{10}^{ - 7}} \times {{\left( {T + 273.15} \right)}^{0.81}}} \right)}}{{{P_{ambient}}}}\]</div>
 
-The heat storage capacity (<span>${\raise0.7ex\hbox{${\partial H}$} \!\mathord{\left/ {\vphantom {{\partial H} {\partial T}}}\right.}\!\lower0.7ex\hbox{${\partial T}$}}$</span>) depends on the moisture content w of the material by the following equation.
+The heat storage capacity (<span>$\frac{\partial H}{\partial T}$</span>) depends on the moisture content w of the material by the following equation.
 
 <div>\[\frac{{\partial H}}{{\partial T}} = \left( {c\rho  + {c^w}w} \right)\]</div>
 
-The moisture content of the material w and the vapor diffusion resistance factor μ depend on the relative humidity inside the material. The parameters <span>${\raise0.7ex\hbox{${\partial w}$} \!\mathord{\left/ {\vphantom {{\partial w} {\partial \phi }}}\right.}\!\lower0.7ex\hbox{${\partial \phi }$}}$</span>, <span>${k^w}$</span> and <span>${D^w}$</span>are also moisture dependent parameters.
+The moisture content of the material w and the vapor diffusion resistance factor μ depend on the relative humidity inside the material. The parameters <span>$\frac{\partial w}{\partial \phi}$</span>, <span>${k^w}$</span> and <span>${D^w}$</span>are also moisture dependent parameters.
 
 The following sections describe how the above equations are used within the HAMT model.
 
@@ -551,7 +545,7 @@ Rearranging equation and including other sources of heat (<span>$q_i^{adds}$</sp
 
 <div>\[T_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{T_j^{p + 1}}}{{R_{ij}^h}}}  + q_i^v + q_i^{adds} + C_i^h\frac{{T_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^h}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^h}}} }}\]</div>
 
-where<span>$C_i^h = \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}$</span> is thermal heat capacitance of cell i and<span>$R_{ij}^h = {\raise0.7ex\hbox{${{x_{ij}}}$} \!\mathord{\left/ {\vphantom {{{x_{ij}}} {{k_{ij}}{A_{ij}}}}}\right.}\!\lower0.7ex\hbox{${{k_{ij}}{A_{ij}}}$}}$</span> is the thermal resistance between cells i and j.
+where<span>$C_i^h = \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}$</span> is thermal heat capacitance of cell i and <span>$R_{ij}^h = \frac{x_{ij}}{k_{ij}A_{ij}}$</span> is the thermal resistance between cells i and j.
 
 This equation can be solved using the Gauss-Seidel iteration technique. The i<sup>th</sup> cell temperature is calculated whilst the j<sup>th</sup> cell temperatures are kept as up to date as possible. The iteration is stopped when the maximum difference between two consecutive calculations in all cells is less than a threshold of 0.002°C.
 
@@ -581,11 +575,11 @@ Equation can be rearranged to provide the relative humidity of the i<sup>th</sup
 
 <div>\[\phi_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{\phi_j^{p + 1}}}{{R_{ij}^w}}}  + \sum\nolimits_j {\frac{{p_i^{p + 1}}}{{R_{ij}^v}}}  + C_i^w\frac{{\phi_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^w}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^w}} + \sum\nolimits_j {\frac{{p_i^{sat}}}{{R_{ij}^v}}} } }}\]</div>
 
-where<span>$C_i^w = {\raise0.7ex\hbox{${dw}$} \!\mathord{\left/ {\vphantom {{dw} {d{\phi_i}}}}\right.}\!\lower0.7ex\hbox{${d{\phi_i}}$}}\Delta {V_i}$</span> is the “Moisture Capacitance” of cell i,
+where <span>$C_i^w = \frac{dw}{d\phi_{i}}\Delta {V_i}$</span> is the "Moisture Capacitance" of cell i,
 
 <div>\[R_{ij}^w = \frac{{{x_{ij}}}}{{{A_{ij}}D_{ij}^w\frac{{dw}}{{d\phi }}}}\]</div>
 
-is the moisture resistance between cells i and j and<span>$R_{ij}^v = {\raise0.7ex\hbox{${{\mu_{ij}}{x_{ij}}}$} \!\mathord{\left/ {\vphantom {{{\mu_{ij}}{x_{ij}}} {{A_{ij}}{\delta_{ij}}}}}\right.}\!\lower0.7ex\hbox{${{A_{ij}}{\delta_{ij}}}$}}$</span> is the vapor resistance  between cells i and j.
+is the moisture resistance between cells i and j and <span>$R_{ij}^v = \frac{\mu_{ij}x_{ij}}{A_{ij}\delta_{ij}}$</span> is the vapor resistance between cells i and j.
 
 Equation can be used together with the heat equation in an alternate step by step fashion to calculate the new temperature and relative humidity profiles for each cell for the next time step.
 
@@ -593,7 +587,7 @@ Equation can be used together with the heat equation in an alternate step by ste
 
 The Moisture Dependant Liquid Transport Coefficient is entered as a series of moisture density and liquid transport coefficient data points. There are two different coefficients, one for suction, where the surface is wet due to rain, and one for redistribution where the surface is no longer wet. If the weather file has a rain flag it is used to switch between these two types of coefficient. HAMT-SUCTION and HAMT-REDISTRIBUTION.
 
-#### Moisture Dependent Moisture Capacity<span>${\raise0.7ex\hbox{${\partial w}$} \!\mathord{\left/ {\vphantom {{\partial w} {\partial \phi }}}\right.}\!\lower0.7ex\hbox{${\partial \phi }$}}$</span>
+#### Moisture Dependent Moisture Capacity <span>$\frac{\partial w}{\partial \phi}$</span>
 
 This is simply the gradient of moisture sorption isotherm at the RH of the material.
 
@@ -814,18 +808,10 @@ These assumptions are frequently used in all but the most critical engineering a
 Table 3. Nomenclature List of Variables.
 
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
-<td>Units
- </td>
+<th>Mathematical variable</th>
+<th>Description</th>
+<th>Units</th>
 <td>Range</td>
 </tr>
 <tr>
@@ -979,20 +965,12 @@ Impetus for using this modeling is illustrated in the next table.  Using a 70 s
 Table 4.  Atmospheric Variables at Two Different Altitudes above Ground Level
 
 <table class="table table-striped">
-
-
-
-
-
-
-
-
 <tr>
-<td>Variable</td>
-<td>1.5 Meters</td>
-<td>284 meters</td>
-<td>Absolute Diff</td>
-<td>Percent Diff</td>
+<th>Variable</th>
+<th>1.5 Meters</th>
+<th>284 meters</th>
+<th>Absolute Diff</th>
+<th>Percent Diff</th>
 </tr>
 <tr>
 <td>Air Temperature</td>
@@ -1095,16 +1073,10 @@ The wind speed profile coefficients *a*, *d*, *a<sub>met</sub>*, and *d<sub>met<
 Table 5. Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005).
 
 <table class="table table-striped">
-
-
-
-
-
-
 <tr>
-<td>Terrain Description</td>
-<td>Exponent,a</td>
-<td>Boundary Layer Thickness,d (m)</td>
+<th>Terrain Description</th>
+<th>Exponent,a</th>
+<th>Boundary Layer Thickness,d (m)</th>
 </tr>
 <tr>
 <td>Flat, open country</td>
@@ -1160,15 +1132,15 @@ where
 
 Substantial research has gone into the formulation of models for estimating the exterior convection coefficient. Since the 1930's there have been many different methods published for calculating this coefficient, with much disparity between them (Cole and Sturrock 1977; Yazdanian and Klems 1994).  More recently Palyvos (2008) surveyed correlations cataloging some 91 different correlations into four categories based on functional form of the model equation.  EnergyPlus therefore offers a wide selection of different methods for determining values for *h<sub>c,ext</sub>*. The selection of model equations for *h<sub>c,ext</sub>* can be made at two different levels. The first is the set of options available in the input object SurfaceConvectionAlgorithm:Outside that provides a way of broadly selecting which model equations are applied throughout the model.  The input objects SurfaceProperty:ConvectionCoefficients and SurfaceProperty:ConvectionCoefficients:MultipleSurface also provide ways of selecting which model equations or values are applied for specific surfaces.  These basic options are identified by the key used for input and include:
 
-·        SimpleCombined
+* SimpleCombined
 
-·        TARP
+* TARP
 
-·        MoWiTT
+* MoWiTT
 
-·        DOE-2
+* DOE-2
 
-·        AdaptiveConvectionAlgorithm
+* AdaptiveConvectionAlgorithm
 
 Note that when the outside environment indicates that it is raining, the exterior surfaces (exposed to wind) are assumed to be wet.  The convection coefficient is set to a very high number (1000) and the outside temperature used for the surface will be the wet-bulb temperature.  (If you choose to report this variable, you will see 1000 as its value.)
 
@@ -1176,11 +1148,11 @@ When the AdaptiveConvectionAlgorithm is used, there is a second, deeper level of
 
 In addition to the correlation choices described below, it is also possible to override the convection coefficients on the outside of any surface by other means:
 
-n Use the SurfaceProperty:ConvectionCoefficients object in the input file to set the convection coefficient value on either side of any surface.
+* Use the SurfaceProperty:ConvectionCoefficients object in the input file to set the convection coefficient value on either side of any surface.
 
-n Use the SurfaceProperty:OtherSideCoefficients object in the input file to set heat transfer coefficients and temperatures on surfaces.
+* Use the SurfaceProperty:OtherSideCoefficients object in the input file to set heat transfer coefficients and temperatures on surfaces.
 
-n Use the EnergyManagementSystem Actuators that are available for overriding h<sub>c</sub> values.
+* Use the EnergyManagementSystem Actuators that are available for overriding h<sub>c</sub> values.
 
 These options can also use schedules to control values over time. Specific details are given in the Input Output Reference document.
 
@@ -1203,20 +1175,12 @@ The roughness correlation is taken from Figure 1, Page 22.4, ASHRAE Handbook of 
 Table 6.  Roughness Coefficients D, E, and F.
 
 <table class="table table-striped">
-
-
-
-
-
-
-
-
 <tr>
-<td>Roughness Index</td>
-<td>D</td>
-<td>E</td>
-<td>F</td>
-<td>Example Material</td>
+<th>Roughness Index</th>
+<th>D</th>
+<th>E</th>
+<th>F</th>
+<th>Example Material</th>
 </tr>
 <tr>
 <td>1 (Very Rough)</td>
@@ -1274,18 +1238,11 @@ TARP, or Thermal Analysis Research Program, is an important predecessor of Energ
 Table 7. Nomenclature List of Variables.
 
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Variable</td>
-<td>Description</td>
-<td>Units</td>
-<td>Range</td>
+<th>Variable</th>
+<th>Description</th>
+<th>Units</th>
+<th>Range</th>
 </tr>
 <tr>
 <td>A</td>
@@ -1393,16 +1350,10 @@ The surface roughness multiplier Rf is based on the ASHRAE graph of surface con
 Table 8.  Surface Roughness Multipliers (Walton 1981).
 
 <table class="table table-striped">
-
-
-
-
-
-
 <tr>
-<td>Roughness Index</td>
-<td>Rf</td>
-<td>Example Material</td>
+<th>Roughness Index</th>
+<th>Rf</th>
+<th>Example Material</th>
 </tr>
 <tr>
 <td>1 (Very Rough)</td>
@@ -1460,19 +1411,11 @@ where S is the surface tilt angle.
 Table 9.  Nomenclature List of Variables.
 
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Variable</td>
-<td>Description</td>
-<td>Units
- </td>
-<td>Range</td>
+<th>Variable</th>
+<th>Description</th>
+<th>Units</th>
+<th>Range</th>
 </tr>
 <tr>
 <td>A</td>
@@ -1526,18 +1469,11 @@ NOTE:  The MoWiTT algorithm may not be appropriate for rough surfaces, high-ris
 Table 10. MoWiTT Coefficients (Yazdanian and Klems 1994, Booten et al. 2012)
 
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Wind Direction</td>
-<td>Ct</td>
-<td>a</td>
-<td>b</td>
+<th>Wind Direction</th>
+<th>Ct</th>
+<th>a</th>
+<th>b</th>
 </tr>
 <tr>
 <td>(Units)</td>
@@ -1567,19 +1503,11 @@ Table 10. MoWiTT Coefficients (Yazdanian and Klems 1994, Booten et al. 2012)
 Table 11.  Nomenclature List of Variables.
 
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Variable</td>
-<td>Description</td>
-<td>Units
- </td>
-<td>Range</td>
+<th>Variable</th>
+<th>Description</th>
+<th>Units</th>
+<th>Range</th>
 </tr>
 <tr>
 <td>a</td>
@@ -1662,12 +1590,12 @@ Table 12. Adaptive Convection Algorithm Details
 
 <table class="table table-striped">
 <tr>
-<td>#</td>
-<td>Surface Classifi-cation</td>
-<td>Heat Flow Direction</td>
-<td>Wind Direct-ion</td>
-<td>h<sub>f</sub>  Models</td>
-<td>h<sub>n</sub> Models</td>
+<th>#</th>
+<th>Surface Classifi-cation</th>
+<th>Heat Flow Direction</th>
+<th>Wind Direct-ion</th>
+<th>h<sub>f</sub>  Models</th>
+<th>h<sub>n</sub> Models</th>
 </tr>
 <tr>
 <td>1</td>
@@ -1761,23 +1689,21 @@ Clear et al. (2003) developed correlations from measurements for horizontal roof
 
 Where
 
-      *x* is the distance to the surface centroid from where the wind begins to intersect the roof. In EnergyPlus this is currently simplified to half the square root of the roof surface.
+* *x* is the distance to the surface centroid from where the wind begins to intersect the roof. In EnergyPlus this is currently simplified to half the square root of the roof surface.
 
-<span>${L_n} = \frac{{Area}}{{Perimeter}}$</span> of overall roof
+* <span>${L_n} = \frac{{Area}}{{Perimeter}}$</span> of overall roof
 
-      <span>$k$</span> is the thermal conductivity of air
+* <span>$k$</span> is the thermal conductivity of air
 
-<span>$\eta  = \frac{{\ln \left( {1 + {\raise0.7ex\hbox{${G{r_{{L_x}}}}$} \!\mathord{\left/ {\vphantom {{G{r_{{L_x}}}} {{\mathop{\rm Re}\nolimits}_x^2}}}\right.}\!\lower0.7ex\hbox{${{\mathop{\rm Re}\nolimits}_x^2}$}}} \right)}}{{1 + \ln \left( {1 + {\raise0.7ex\hbox{${G{r_{{L_x}}}}$} \!\mathord{\left/ {\vphantom {{G{r_{{L_x}}}} {{\mathop{\rm Re}\nolimits}_x^2}}}\right.}\!\lower0.7ex\hbox{${{\mathop{\rm Re}\nolimits}_x^2}$}}} \right)}}$</span>is the weighting factor for natural convection (suppressed at high forced convection rates)
+* <span>$\eta  = \frac{ln\left(1+\frac{Gr_{L,x}}{Re_x^2}\right)} {1+ln\left(1+\frac{Gr_{L,x}}{Re_x^2}\right)} is the weighting factor for natural convection (suppressed at high forced convection rates)
 
-      <span>$R{a_{{L_n}}} = G{r_{{L_n}}}\Pr $</span> is the Rayleigh number
+* <span>$R{a_{{L_n}}} = G{r_{{L_n}}}\Pr $</span> is the Rayleigh number
 
-      <span>$G{r_{{L_n}}} = \frac{{g{\rho ^2}{L_n}^3\Delta T}}{{{T_f}{\mu ^2}}}$</span>is the Grashof number
+* <span>$G{r_{{L_n}}} = \frac{{g{\rho ^2}{L_n}^3\Delta T}}{{{T_f}{\mu ^2}}}$</span>is the Grashof number
 
+* <span>${{\mathop{\rm Re}\nolimits}_x} = \frac{{{V_z}\rho x}}{\mu }$</span>is the Reynolds number at x
 
-
-      <span>${{\mathop{\rm Re}\nolimits}_x} = \frac{{{V_z}\rho x}}{\mu }$</span>is the Reynolds number at x
-
-      Pr is the Prandtl number
+* Pr is the Prandtl number
 
 This model only claims to be applicable to horizontal roof surfaces so it may not be applicable to tilted roofs. It combines natural and forced convection and therefore should not be used in conjunction with yet another natural convection model.
 
@@ -2603,7 +2529,43 @@ Beausoleil-Morrison (2000) used blending techniques to combine correlations orig
 
 Beausoleil-Morrison (2000) used blending techniques to combine correlations originally developed by Alamdari and Hammond (1983) and Fisher and Pedersen (1997) to create the following correlation is for ceilings where the flow driving forces include both mechanical forces and thermally unstable buoyancy.
 
-#### <span>$h = {\left( {{{\left\{ {{{\left[ {1.4{{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_h}}}} \right)}^{^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}}} \right]}^6} + {{\left[ {1.63{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^6}} \right\}}^{{\raise0.7ex\hbox{$3$} \!\mathord{\left/ {\vphantom {3 6}}\right.}\!\lower0.7ex\hbox{$6$}}}} + {{\left\{ {\left[ {\frac{{{T_{surf}} - {T_{SAT}}}}{{\left| {\Delta T} \right|}}} \right]\cdot\left[ { - 0.166 + 0.484AC{H^{0.8}}} \right]} \right\}}^3}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}$</span>       Fohanno Polidori Vertical Wall
+<div>
+ \[
+  h = \left(
+   \left(
+    \left[
+     1.4 \left(
+      \frac{
+       \left|
+        \Delta T
+       \right|
+      }{
+       D_h
+      }
+     \right)^{1/4}
+    \right]^6 +
+    \left[
+     1.63 \left|\Delta T\right|^{1/3}
+    \right]^6
+   \right)^{3/6} +
+   \left(
+    \left[
+     \frac{
+      T_{surf}-T_{SAT}
+     }{
+      \left|\Delta T\right|
+     }
+    \right]
+    \cdot
+    \left[
+     -0.166 + 0.484 \cdot ACH^{0.8}
+    \right]
+   \right)^3
+  \right)^{1/3}
+ \]
+</div>
+
+#### Fohanno Polidori Vertical Wall
 
 Fohanno and Polidori (2006) developed the following equation for *h<sub>c</sub>* for vertical walls under simple buoyancy flow conditions.
 
@@ -3141,20 +3103,12 @@ The following two tables shows data for two series of runs.  The first “summe
 Table 14.  TIM with Summer Conditions
 
 <table class="table table-striped">
-
-
-
-
-
-
-
-
 <tr>
-<td> </td>
-<td>Conductivity</td>
-<td>Thick-ness.</td>
-<td>Sensible</td>
-<td>Energy Saved</td>
+<th> </th>
+<th>Conductivity</th>
+<th>Thick-ness.</th>
+<th>Sensible</th>
+<th>Energy Saved</th>
 </tr>
 <tr>
 <td>EXTWALL80 Construction</td>
@@ -3260,24 +3214,14 @@ Without any Insulation</td>
 Table 15. TIM with Winter Conditions
 
 <table class="table table-striped">
-
-
-
-
-
-
-
-
-
-
 <tr>
-<td> </td>
-<td>Conduc-tivity</td>
-<td>Thick-ness.</td>
-<td>Sensible</td>
-<td>Energy Saved</td>
-<td>Sensible</td>
-<td> Energy Saved</td>
+<th> </th>
+<th>Conduc-tivity</th>
+<th>Thick-ness.</th>
+<th>Sensible</th>
+<th>Energy Saved</th>
+<th>Sensible</th>
+<th> Energy Saved</th>
 </tr>
 <tr>
 <td>EXTWALL80 Construction</td>
@@ -3534,10 +3478,9 @@ From Equations and
 #### Case5: Y<sub>0</sub>  small, simple conductance, with movable insulation:
 
 From Equations and
-
- <span>${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + }}{{\rm{F}}_{\rm{2}}}\cdot \left( {{\rm{QSM + HO}}\cdot {\rm{TM}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM - }}{{\rm{F}}_{\rm{2}}}\cdot {\rm{UM}}}}} \right]{\rm{  }}$</span>
-
-
+<span>$
+  TO_t = \left[ \frac{ KOP_t + QSO + HA \cdot T_a + HS \cdot T_s + HG \cdot T_g + F_1 \cdot \left( KIP_t QS1 + HI \cdot TZ + HR \cdot TR \right) } { X_0 + HA + HS + HG - F_1 \cdot Y_0 } \right]
+$</span>
 
 #### Case6: Y<sub>0</sub> not small, simple conductance, with movable insulation:
 
@@ -3685,11 +3628,11 @@ Table 16.  Fortran Variables and Descriptions
 
 <table class="table table-striped">
 <tr>
-<td>FORTRAN Variable</td>
-<td>Description</td>
-<td>Tarp Variable</td>
-<td>Units</td>
-<td>Description</td>
+<th>FORTRAN Variable</th>
+<th>Description</th>
+<th>Tarp Variable</th>
+<th>Units</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>TH(SurfNum,1,1)</td>
@@ -3863,11 +3806,11 @@ A simplified approach is introduced to create equivalent constructions and model
 
 Three objects are used in the C and F factor calculations:
 
-n Construction:CfactorUndergroundWall
+* Construction:CfactorUndergroundWall
 
-n Construction:FfactorGroundFloor
+* Construction:FfactorGroundFloor
 
-n Site:GroundTemperature:FCfactorMethod
+* Site:GroundTemperature:FCfactorMethod
 
 Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (Construction:CfactorUndergroundWall) and F-factor (Construction:FfactorGroundFloor) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available.
 

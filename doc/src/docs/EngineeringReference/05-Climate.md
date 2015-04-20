@@ -117,24 +117,14 @@ Table 20. Extraterrestrial Solar Irradiance and Related Data
  Note: Data are for 21st day of each month during the base year of 1964.
 
 <table class="table table-striped">
-
-
-
-
-
-
-
-
-
-
 <tr>
-<td> </td>
-<td>I<sub>o</sub> {W/m<sup>2</sup>}</td>
-<td>Equation of Time {minutes}</td>
-<td>Declination {degrees}</td>
-<td>A {W/m<sup>2</sup>}</td>
-<td>B {}</td>
-<td>C {}</td>
+<th> </th>
+<th>I<sub>o</sub> {W/m<sup>2</sup>}</th>
+<th>Equation of Time {minutes}</th>
+<th>Declination {degrees}</th>
+<th>A {W/m<sup>2</sup>}</th>
+<th>B {}</th>
+<th>C {}</th>
 </tr>
 <tr>
 <td>Jan</td>
@@ -388,231 +378,176 @@ The *horizon brightening* is assumed to be a linear source at the horizon and to
 
 Table 21.  Variables in Anisotropic Sky Model and Shadowing of Sky Diffuse Radiation
 
-Mathematical variable
-
-Description
-
-Units
-
-
-
-FORTRANvariable
-
-I<sub>sky</sub>
-
-Solar irradiance on surface from sky
-
-W/m<sup>2</sup>
-
--
-
-I<sub>horizon</sub>
-
-Solar irradiance on surface from sky horizon
-
-W/m<sup>2</sup>
-
--
-
-I<sub>dome</sub>
-
-Solar irradiance on surface from sky dome
-
-W/m<sup>2</sup>
-
--
-
-I<sub>circumsolar</sub>
-
-Solar irradiance on surface from circumsolar region
-
-W/m<sup>2</sup>
-
--
-
-I<sub>h</sub>
-
-Horizontal solar irradiance
-
-W/m<sup>2</sup>
-
--
-
-S
-
-Surface tilt
-
-radians
-
-Surface(SurfNum)%Tilt\*DegToRadians
-
-a, b
-
-intermediate variables
-
--
-
--
-
-F<sub>1</sub>, F<sub>2</sub>
-
-Circumsolar and horizon brightening coefficients
-
--
-
-F1, F2
-
-* α*
-
-Incidence angle of sun on surface
-
-radians
-
-IncAng
-
-Z
-
-Solar zenith angle
-
-radians
-
-ZenithAng
-
-Δ
-
-Sky brightness factor
-
--
-
-Delta
-
-ε
-
-Sky clearness factor
-
--
-
-Epsilon
-
-m
-
-relative optical air mass
-
--
-
-AirMass
-
-I<sub>O</sub>
-
-Extraterrestrial solar irradiance
-
-W/m<sup>2</sup>
-
--
-
-I
-
-Direct normal solar irradiance
-
-W/m<sup>2</sup>
-
-Material%Thickness
-
-κ
-
-constant = 1.041 for Z in radians
-
-radians<sup>-3</sup>
-
--
-
-F<sub>ij</sub>
-
-Brightening coefficient factors
-
--
-
-F11R, F12R, etc.
-
-R<sub>circumsolar</sub>
-
-Shadowing factor for circumsolar radiation
-
--
-
-SunLitFrac
-
-R<sub>dome</sub>
-
-Shadowing factor for sky dome radiation
-
--
-
-DifShdgRatioIsoSky
-
-R<sub>horizon</sub>
-
-Shadowing factor for horizon radiation
-
--
-
-DifShdgRatioHoriz
-
-E
-
-Sky radiance
-
-W/m<sup>2</sup>
-
--
-
-*θ*
-
-Azimuth angle of point in sky
-
-radians
-
-Theta
-
-φ
-
-Altitude angle of point in sky
-
-radians
-
-Phi
-
-I<sub>i</sub>
-
-Irradiance on surface from a horizon element
-
-W/m<sup>2</sup>
-
--
-
-I<sub>ij</sub>
-
-Irradiance on surface from a sky dome element
-
-W/m<sup>2</sup>
-
--
-
-SF
-
-Sunlit fraction
-
--
-
-FracIlluminated
-
-I’
-
-Sky solar irradiance on surface with shadowing
-
-W/m<sup>2</sup>
-
--
+<table class="table table-striped">
+ <tr>
+  <th>Mathematical variable</th>
+  <th>Description</th>
+  <th>Units</th>
+  <th>FORTRAN variable</th>
+ </tr>
+ <tr>
+  <td>I<sub>sky</sub></td>
+  <td>Solar irradiance on surface from sky</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>I<sub>horizon</sub></td>
+  <td>Solar irradiance on surface from sky horizon</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>I<sub>dome</sub></td>
+  <td>Solar irradiance on surface from sky dome</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>I<sub>circumsolar</sub></td>
+  <td>Solar irradiance on surface from circumsolar region</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>I<sub>h</sub></td>
+  <td>Horizontal solar irradiance</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>S</td>
+  <td>Surface tilt</td>
+  <td>radians</td>
+  <td>Surface(SurfNum)%Tilt\*DegToRadians</td>
+ </tr>
+ <tr>
+  <td>a, b</td>
+  <td>intermediate variables</td>
+  <td>-</td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>F<sub>1</sub>, F<sub>2</sub></td>
+  <td>Circumsolar and horizon brightening coefficients</td>
+  <td>-</td>
+  <td>F1, F2</td>
+ </tr>
+ <tr>
+  <td>α</td>
+  <td>Incidence angle of sun on surface</td>
+  <td>radians</td>
+  <td>IncAng</td>
+ </tr>
+ <tr>
+  <td>Z</td>
+  <td>Solar zenith angle</td>
+  <td>radians</td>
+  <td>ZenithAng</td>
+ </tr>
+ <tr>
+  <td><div>$\Delta$</div></td>
+  <td>Sky brightness factor</td>
+  <td>-</td>
+  <td>Delta</td>
+ </tr>
+ <tr>
+  <td>ε</td>
+  <td>Sky clearness factor</td>
+  <td>-</td>
+  <td>Epsilon</td>
+ </tr>
+ <tr>
+  <td>m</td>
+  <td>relative optical air mass</td>
+  <td>-</td>
+  <td>AirMass</td>
+ </tr>
+ <tr>
+  <td>I<sub>O</sub></td>
+  <td>Extraterrestrial solar irradiance</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>I</td>
+  <td>Direct normal solar irradiance</td>
+  <td>W/m<sup>2</sup></td>
+  <td>Material%Thickness</td>
+ </tr>
+ <tr>
+  <td>κ</td>
+  <td>constant = 1.041 for Z in radians</td>
+  <td>radians<sup>-3</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>F<sub>ij</sub></td>
+  <td>Brightening coefficient factors</td>
+  <td>-</td>
+  <td>F11R, F12R, etc.</td>
+ </tr>
+ <tr>
+  <td>R<sub>circumsolar</sub></td>
+  <td>Shadowing factor for circumsolar radiation</td>
+  <td>-</td>
+  <td>SunLitFrac</td>
+ </tr>
+ <tr>
+  <td>R<sub>dome</sub></td>
+  <td>Shadowing factor for sky dome radiation</td>
+  <td>-</td>
+  <td>DifShdgRatioIsoSky</td>
+ </tr>
+ <tr>
+  <td>R<sub>horizon</sub></td>
+  <td>Shadowing factor for horizon radiation</td>
+  <td>-</td>
+  <td>DifShdgRatioHoriz</td>
+ </tr>
+ <tr>
+  <td>E</td>
+  <td>Sky radiance</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>*θ*</td>
+  <td>Azimuth angle of point in sky</td>
+  <td>radians</td>
+  <td>Theta</td>
+ </tr>
+ <tr>
+  <td>φ</td>
+  <td>Altitude angle of point in sky</td>
+  <td>radians</td>
+  <td>Phi</td>
+ </tr>
+ <tr>
+  <td>I<sub>i</sub></td>
+  <td>Irradiance on surface from a horizon element</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>I<sub>ij</sub></td>
+  <td>Irradiance on surface from a sky dome element</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+ <tr>
+  <td>SF</td>
+  <td>Sunlit fraction</td>
+  <td>-</td>
+  <td>FracIlluminated</td>
+ </tr>
+ <tr>
+  <td>I’</td>
+  <td>Sky solar irradiance on surface with shadowing</td>
+  <td>W/m<sup>2</sup></td>
+  <td>-</td>
+ </tr>
+</table>
 
 ### Sky Diffuse Solar Radiation on a Tilted Surface
 
@@ -624,7 +559,13 @@ In the absence of shadowing, the sky formulation described above gives the follo
 
 where
 
-<div>\[\begin{array}{l}{I_{horizon}}{\rm{    }} = {\rm{irradiance on surface from sky horizon           }} = {I_h}{F_2}\sin S\\\{I_{dome{\rm{     }}}}{\rm{   }} = {\rm{irradiance on surface from sky dome              }} = {I_h}(1 - {F_1})(1 + \cos S)/2\\\{I_{circumsolar}} = {\rm{irradiance on surface from circumsolar region}} = {I_h}{F_1}a/b\end{array}\]</div>
+<div>\[
+  \begin{array}{rcl}
+    I_{horizon} &= \rm{irradiance on surface from sky horizon} &= I_h F_2\sin S \\
+    I_{dome}    &= \rm{irradiance on surface from sky dome}    &= I_h (1 - F_1)(1 + \cos S)/2 \\
+    I_{circumsolar} &= \rm{irradiance on surface from circumsolar region} &= I_h F_1 a/b
+  \end{array}
+\]</div>
 
 AnisoSkyMult is then *I<sub>sky</sub>* /DifSolarRad.
 
@@ -650,7 +591,12 @@ where
 
 The brightening coefficients are a function of sky conditions; they are given by
 
-<div>\[\begin{array}{l}{F_1} = {F_{11}}(\varepsilon ) + {F_{12}}(\varepsilon )\Delta  + {F_{13}}(\varepsilon )Z\\\{F_2} = {F_{21}}(\varepsilon ) + {F_{22}}(\varepsilon )\Delta  + {F_{23}}(\varepsilon )Z\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    F_1 &= F_{11}(\varepsilon ) + F_{12}(\varepsilon )\Delta  + F_{13}(\varepsilon )Z  \\
+    F_2 &= F_{21}(\varepsilon ) + F_{22}(\varepsilon )\Delta  + F_{23}(\varepsilon )Z
+  \end{array}
+\]</div>
 
 Here the sky brightness factor is
 
@@ -677,28 +623,16 @@ The factors *F<sub>ij</sub>*  are shown in the following table. The F<sub>ij</s
 Table 22.  F<sub>ij</sub> Factors as a Function of Sky Clearness Range.
 
 <table class="table table-striped">
-
-
-
-
-
-
-
-
-
-
-
-
 <tr>
-<td>ε  Range</td>
-<td>1.000-1.065</td>
-<td>1.065-1.230</td>
-<td>1.230-1.500</td>
-<td>1.500-1.950</td>
-<td>1.950-2.800</td>
-<td>2.800-4.500</td>
-<td>4.500-6.200</td>
-<td>&gt; 6.200</td>
+<th>ε  Range</th>
+<th>1.000-1.065</th>
+<th>1.065-1.230</th>
+<th>1.230-1.500</th>
+<th>1.500-1.950</th>
+<th>1.950-2.800</th>
+<th>2.800-4.500</th>
+<th>4.500-6.200</th>
+<th>&gt; 6.200</th>
 </tr>
 <tr>
 <td>F<sub>11</sub></td>
@@ -865,14 +799,9 @@ Solar HourAngle (*H*) gives the apparent solar time for the current time period 
 Table 23.  Relationship of Angles (degrees) to Time
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Unit of Angle</td>
-<td>Equivalent time</td>
+<th>Unit of Angle</th>
+<th>Equivalent time</th>
 </tr>
 <tr>
 <td>1 radian</td>
@@ -1045,9 +974,9 @@ Note that the use of homogeneous coordinates as outlined above provides a consis
 
 Two methods for polygon clipping (treating of overlapping shadows) are currently in use in EnergyPlus.
 
-n Convex Weiler - Atherton
+* Convex Weiler - Atherton
 
-n Sutherland – Hodgman
+* Sutherland – Hodgman
 
 The original EnergyPlus method for polygon clipping is a special version of the Weiler-Atherton model (Weiler, Atherton, 1977). It was developed to be sufficiently general to clip concave polygons with holes. The implementation in the current version of EnergyPlus, however, does not support concave shadowing surfaces or holes. The relative computational complexity is preserved – the algorithm is carried out in four steps. For example, if A and B are polygons (see Figure 43).
 
@@ -1071,11 +1000,11 @@ For ConvexWeilerAtherton, there is considerable simplification if only convex (n
 
 The vertices that define the overlap between two convex polygons, A and B, consist of:
 
-n the vertices of A enclosed by B
+* the vertices of A enclosed by B
 
-n the vertices of B enclosed by A
+* the vertices of B enclosed by A
 
-n and the intercepts of the sides of A with the sides of B
+* and the intercepts of the sides of A with the sides of B
 
 In Figure 43, point a is the result of rule 1, point c is the result of rule 2, and points b and d result from rule 3. The overlap of A and B is the polygon a-b-c-d. Figure 44 shows an overlap where all of the vertices of B are enclosed by A.  Figure 45 shows an overlap defined only by the intercepts of A and B. Figure 46 shows a more complex overlap.
 
@@ -1116,14 +1045,9 @@ The following convention was adopted:
 Table 24.  Surface / Area Characteristic / Convention
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Surface Characteristic</td>
-<td>Area Convention</td>
+<th>Surface Characteristic</th>
+<th>Area Convention</th>
 </tr>
 <tr>
 <td>receiving surface</td>
@@ -1240,7 +1164,9 @@ This new treatment of diffuse solar is intended to more accurately account for t
 
 The short-wave radiation absorbed on the inside face of an opaque surface (floor, wall or ceiling) is given by
 
-<div>\[\begin{array}{l}QRadSWInAbs(SurfNum) = QS(ZoneNum)*AbsIntSurf(SurfNum) + \\\{\rm{                                            }}AISurf(SurfNum)*BeamSolarRad{\rm{  [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}\]</div>
+<div>\[
+  QRadSWInAbs(SurfNum) = QS(ZoneNum)*AbsIntSurf(SurfNum) + AISurf(SurfNum)*BeamSolarRad [W/m2]
+\]</div>
 
 where
 
@@ -1282,7 +1208,9 @@ where
 
 *Q<sub>sw</sub>* is given by
 
- <span>$\begin{array}{l}Q{S_{SW}} = QD(ZoneNum) + \\\{\rm{             }}ZoneIntGain(ZoneNum)\% QLTSW + \\\{\rm{             }}ZoneIntGain(ZoneNum)\% T\_QLTSW{\rm{    [W]}}\end{array}$</span>
+<div>\[
+  Q{S_{SW}} = QD(ZoneNum) + ZoneIntGain(ZoneNum)\% QLTSW + ZoneIntGain(ZoneNum)\% T\_QLTSW [W]
+\]</div>
 
 where
 
@@ -1354,7 +1282,13 @@ Figure 49. Vertical section through a two-zone building showing where transmitte
 
 If zone *ZoneNum* shares interior windows with other zones, *QS(ZoneNum)* is modified to take into account short-wave radiation received from the other zones through these windows:
 
-<div>\[\begin{array}{l}QS(ZoneNum) \to QS(ZoneNum) + \\\sum\limits_{\scriptstyle{\rm{other}}\atop\scriptstyle{\rm{zones}}} {FractDifShortZtoZ(OtherZoneNum,ZoneNum)*} \\\{\rm{       }}[QD(OtherZoneNum) + ZoneIntGain(OtherZoneNum)\% QLTSW + \\\{\rm{         }}ZoneIntGain(OtherZoneNum)\% T\_QLTSW]\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+   QS(ZoneNum) &= QS(ZoneNum) \\
+               &+ \sum_{otherZones}\text{FractDifShortZtoZ(OtherZoneNum,ZoneNum)} \\
+               &* [QD(OtherZoneNum) + ZoneIntGain(OtherZoneNum)\% QLTSW + ZoneIntGain(OtherZoneNum)\% T\_QLTSW]
+  \end{array}
+\]</div>
 
 where
 
