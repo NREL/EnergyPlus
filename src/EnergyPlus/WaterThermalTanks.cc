@@ -3584,7 +3584,7 @@ namespace WaterThermalTanks {
 									for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
 										StratifiedNodeData &CurNode = Tank.Node( NodeNum );
                                         if ( NodeNum == Tank.Nodes ) {
-                                            H = -1.0;
+                                            H = 0.0;
                                         } else {
                                             H = H0 - CurNode.Height;
                                         }
@@ -3608,6 +3608,7 @@ namespace WaterThermalTanks {
 									// Normalize the fractions so they sum to 1.
 									for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
 										Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac /= SumFrac;
+										std::cout << "Node = " << NodeNum << ", Fraction = " << Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac << std::endl;
 									}
 								}
 							}
@@ -6358,10 +6359,22 @@ namespace WaterThermalTanks {
 				Tank.UseOutletTemp = Tank.UseInletTemp * ( 1.0 - Tank.UseEffectiveness ) + Tank.UseOutletTemp * Tank.UseEffectiveness;
 			}
 		}
-		NodeNum = Tank.SourceOutletStratNode;
-		if ( NodeNum > 0 ) Tank.SourceOutletTemp = Tank.Node( NodeNum ).TempAvg;
-		if ( Tank.HeatPumpNum > 0 && HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped && SourceMassFlowRate > 0.0 ) {
-			Tank.SourceInletTemp = Tank.SourceOutletTemp + Qheatpump / ( SourceMassFlowRate * Cp );
+		if ( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped ) {
+			Real64 WeightedAverageSourceOutletTemp( 0.0 );
+			for ( int i = 1; i <= Tank.Nodes; ++i ) {
+				WeightedAverageSourceOutletTemp += Tank.Node( i ).TempAvg * Tank.Node( i ).HPWHWrappedCondenserHeatingFrac;
+			}
+			Tank.SourceOutletTemp = WeightedAverageSourceOutletTemp;
+		} else if ( NodeNum > 0 ) {
+			NodeNum = Tank.SourceOutletStratNode;
+			Tank.SourceOutletTemp = Tank.Node( NodeNum ).TempAvg;
+		}
+		if ( Tank.HeatPumpNum > 0 ) {
+			if ( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped && SourceMassFlowRate > 0.0 ) {
+				Tank.SourceInletTemp = Tank.SourceOutletTemp + Qheatpump / ( SourceMassFlowRate * Cp );
+			} else if ( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped && Qheatpump > 0.0 ) {
+				Tank.SourceInletTemp = Tank.SourceOutletTemp; // TODO: figure out if this makes sense...
+			}
 		} else {
 			Tank.SourceInletTemp = Tank.SourceOutletTemp;
 		}
