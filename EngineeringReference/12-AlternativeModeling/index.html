@@ -520,7 +520,9 @@
 <p>We assume that the model for multiple, equal strength plumes (equations and will be adequate for our calculations. The supply air flow rate <span>$\dot V$</span> is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain <span>$\dot Q$</span> is estimated by summing all the convective internal gains located in the occupied subzone – task lights, people, equipment – and dividing this power equally among the n plumes. With these assumptions we can describe the implementation.</p>
 <p>The UCSD DV model is controlled by the subroutine <em>ManageUCSDDVModel</em> which is called from the <em>RoomAirModelManager</em>. The <em>RoomAirModelManager</em> selects which zone model will be used for each zone.</p>
 <p>The calculation is done in subroutine <em>CalcUCSDDV</em>. First we calculate the convective heat gain going into the upper and lower regions.</p>
-<div>\[\begin{array}{l}{{\dot Q}_{ocz}} = {{\dot Q}_{oc,conv}} + {{\dot Q}_{tl,conv}} + {{\dot Q}_{eleq,conv}} + {{\dot Q}_{gaseq,conv}} + {{\dot Q}_{otheq,conv}} + {{\dot Q}_{hw,conv}}\\\{\rm{        }} + {{\dot Q}_{stmeq,conv}} + {{\dot Q}_{bb,conv}}\end{array}\]</div>
+<div>\[
+  \dot Q_{ocz} = \dot Q_{oc,conv} + \dot Q_{tl,conv} + \dot Q_{eleq,conv} + \dot Q_{gaseq,conv} + \dot Q_{otheq,conv} + \dot Q_{hw,conv} + \dot Q_{stmeq,conv} + \dot Q_{bb,conv}
+\]</div>
 
 <div>\[{\dot Q_{mxz}} = {\dot Q_{gl,conv}} + {\dot Q_{ltp}} + {\dot Q_{htrad,conv}}\]</div>
 
@@ -563,9 +565,17 @@
 <p>During the surface loop, once the h<sub>c</sub> for a surface is calculated, the appropriate subzone HA and HAT sums are incremented. If a surface is in 2 subzones the HA and HAT for each subzone are incremented based on the area of the surface in each subzone.</p>
 <h4 id="step-3">Step 3</h4>
 <p>The calculation of  subzone temperatures follows the method used in the <strong><em>ZoneTempPredictorCorrector</em></strong> module and described in the section <strong>Basis for the System and Zone Integration</strong>. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.</p>
-<div>\[\begin{array}{l}{T_{fl}} = ({C_{air,fl}} \cdot (3 \cdot {T_{ - 1,fl}} - (3/2) \cdot {T_{ - 2,fl}} + (1/3) \cdot {T_{ - 3,fl}}) + HA{T_{fl}} + MCP{T_{tot}})\\\{\rm{          }}/((11/6) \cdot {C_{air,fl}} + H{A_{fl}} + MC{P_{tot}})\end{array}\]</div>
+<div>\[
+  T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3) \cdot T_{ - 3,fl}) + HAT_{fl} + MCPT_{tot})  / ((11/6) \cdot C_{air,fl} + HA_{fl} + MCP_{tot})
+\]</div>
 
-<p><span>$\begin{array}{l}{T_{oc}} = ({C_{air,oc}} \cdot (3 \cdot {T_{ - 1,oc}} - (3/2) \cdot {T_{ - 2,oc}} + (1/3) \cdot {T_{ - 3,oc}}) + {{\dot Q}<em>{ocz}} \cdot F{r</em>{gains}} + HA{T_{oc}} + {T_{fl}} \cdot MC{P_{tot}})\{\rm{          }}/((11/6) \cdot {C_{air,oc}} + H{A_{oc}} + MC{P_{tot}})\end{array}$</span><span>$\begin{array}{l}{T_{mx}} = ({C_{air,mx}} \cdot (3 \cdot {T_{ - 1,mx}} - (3/2) \cdot {T_{ - 2,mx}} + (1/3) \cdot {T_{ - 3,mx}}) + {{\dot Q}<em>{ocz}} \cdot (1 - F{r</em>{gains}}) + {{\dot Q}<em>{mxz}}\{\rm{        }} + HA{T</em>{mx}} + {T_{oc}} \cdot MC{P_{tot}})/((11/6) \cdot {C_{air,mx}} + H{A_{mx}} + MC{P_{tot}})\end{array}$</span></p>
+<div>\[
+  \begin{array}{l}
+    T_{oc} = (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + T_{fl} \cdot MCP_{tot}) / (11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot})
+    T_{mx} = (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot}) / ((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
+  \end{array}
+\]</div>
+
 <p>Here <span>${C_{air,fl}}$</span>, <span>${C_{air,oc}}$</span>, and <span>${C_{air,mx}}$</span> are the heat capacities of the air volume in each subzone. <span>${C_{air,mx}}$</span> is calculated by</p>
 <div>\[{R_{air,mx}} = {V_{mx}} \cdot (\Delta {z_{mx}}/{z_{ceil}}) \cdot {\rho_{air,mx}} \cdot {c_{p,air,mx}} \cdot Mu{l_{cap}}/(\Delta {t_z} \cdot 3600)\]</div>
 
@@ -580,7 +590,9 @@
 <p>First, <em>Fr<sub>hb</sub></em>  is set equal to zero.</p>
 <p>Then the code iterates over these steps.</p>
 <p>1.    Calculate <em>T<sub>avg</sub></em> using</p>
-<div>\[\begin{array}{l}{T_{avg}} = ({C_{air,z}} \cdot (3 \cdot {T_{ - 1,z}} - (3/2) \cdot {T_{ - 2,z}} + (1/3) \cdot {T_{ - 3,z}}) + {{\dot Q}_{tot,conv}} + HA{T_{oc}} + HA{T_{mx}}\\\{\rm{           }} + HA{T_{fl}} + MCP{T_{tot}})/((11/6) \cdot {C_{air,z}} + H{A_{oc}} + H{A_{mx}} + H{A_{fl}} + MC{P_{tot}})\end{array}\]</div>
+<div>\[
+  T_{avg} = (C_{air,z} \cdot (3 \cdot T_{ - 1,z} - (3/2) \cdot T_{ - 2,z} + (1/3) \cdot T_{ - 3,z}) + \dot Q_{tot,conv} + HAT_{oc} + HAT_{mx} + HAT_{fl} + MCPT_{tot}) / ((11/6) \cdot C_{air,z} + HA_{oc} + HA_{mx} + HA_{fl} + MCP_{tot})
+\]</div>
 
 <div>\[{T_{mx}} = {T_{avg}}\]</div>
 
@@ -743,7 +755,9 @@
 <p>We will use to calculate the interface height and do a heat balance calculation on each subzone. <em>G</em> is given by . The supply air flow rate <span>$\dot V$</span> is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain <span>$\dot Q$</span> is estimated by summing all the convective internal gains located in the occupied subzone – task lights, people, equipment – and dividing this power equally among the n plumes. With these assumptions we can describe the implementation.</p>
 <p>The UCSD UFI model is controlled by the subroutine <em>ManageUCSDUFModels</em> which is called from the <em>RoomAirModelManager</em>. The <em>RoomAirModelManager</em> selects which zone model will be used for each zone.</p>
 <p>The calculation is done in subroutine <em>CalcUCSDUI</em>. First we calculate the convective heat gain going into the upper and lower regions.</p>
-<div>\[\begin{array}{l}{{\dot Q}_{ocz}} = {{\dot Q}_{oc,conv}} + {{\dot Q}_{tl,conv}} + {{\dot Q}_{eleq,conv}} + {{\dot Q}_{gaseq,conv}} + {{\dot Q}_{otheq,conv}} + {{\dot Q}_{hw,conv}}\\\{\rm{        }} + {{\dot Q}_{stmeq,conv}} + {{\dot Q}_{bb,conv}} + {{\dot Q}_{waterheater,conv}} + {{\dot Q}_{fuelcell,conv}}\end{array}\]</div>
+<div>\[
+  \dot Q_{ocz} = \dot Q_{oc,conv} + \dot Q_{tl,conv} + \dot Q_{eleq,conv} + \dot Q_{gaseq,conv} + \dot Q_{otheq,conv} + \dot Q_{hw,conv} + \dot Q_{stmeq,conv} + \dot Q_{bb,conv} + \dot Q_{waterheater,conv} + \dot Q_{fuelcell,conv}
+\]</div>
 
 <div>\[{\dot Q_{mxz}} = {\dot Q_{gl,conv}} + {\dot Q_{ltp}} + {\dot Q_{htrad,conv}}\]</div>
 
@@ -796,7 +810,13 @@
 <p>During the surface loop, once the h<sub>c</sub> for a surface is calculated, the appropriate subzone HA and HAT sums are incremented. If a surface is in 2 subzones the HA and HAT for each subzone are incremented based on the area of the surface in each subzone.</p>
 <h4 id="step-2">Step 2</h4>
 <p>The calculation of  subzone temperatures follows the method used in the <strong><em>ZoneTempPredictorCorrector</em></strong> module and described in the section <strong>Basis for the System and Zone Integration</strong>. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.</p>
-<p><span>$\begin{array}{l}{T_{oc}} = ({C_{air,oc}} \cdot (3 \cdot {T_{ - 1,oc}} - (3/2) \cdot {T_{ - 2,oc}} + (1/3) \cdot {T_{ - 3,oc}}) + {{\dot Q}<em>{ocz}} \cdot F{r</em>{gains}} + HA{T_{oc}} + MCP{T_{tot}})\{\rm{          }}/((11/6) \cdot {C_{air,oc}} + H{A_{oc}} + MC{P_{tot}})\end{array}$</span><span>$\begin{array}{l}{T_{mx}} = ({C_{air,mx}} \cdot (3 \cdot {T_{ - 1,mx}} - (3/2) \cdot {T_{ - 2,mx}} + (1/3) \cdot {T_{ - 3,mx}}) + {{\dot Q}<em>{ocz}} \cdot (1 - F{r</em>{gains}}) + {{\dot Q}<em>{mxz}}\{\rm{        }} + HA{T</em>{mx}} + {T_{oc}} \cdot MC{P_{tot}})/((11/6) \cdot {C_{air,mx}} + H{A_{mx}} + MC{P_{tot}})\end{array}$</span></p>
+<div>\[
+  \begin{array}{cl}
+    T_{oc} &= (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + MCPT_{tot}) / ((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot}) \\
+    T_{mx} &= (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot}) / ((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
+  \end{array}
+\]</div>
+
 <p>Here <span>${C_{air,oc}}$</span> and <span>${C_{air,mx}}$</span> are the heat capacities of the air volume in each subzone. <span>${C_{air,mx}}$</span> is calculated by</p>
 <div>\[{R_{air,mx}} = {V_{mx}} \cdot \left( {\Delta {z_{mx}}/{z_{ceil}}} \right) \cdot {\rho_{air,mx}} \cdot {c_{p,air,mx}} \cdot Mu{l_{cap}}/\left( {\Delta {t_z} \cdot 3600} \right)\]</div>
 
@@ -891,7 +911,9 @@
 <p>We will use to calculate the interface height and do a heat balance calculation on each subzone. <em>G</em> is given by . The supply air flow rate <span>$\dot V$</span> is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain <span>$\dot Q$</span> is estimated by summing all the convective internal gains located in the occupied subzone – task lights, people, equipment – and adding to this the convective gain coming from the window surface. With these assumptions we can describe the implementation.</p>
 <p>The UCSD UFE model is controlled by the subroutine <em>ManageUCSDUFModels</em> which is called from the <em>RoomAirModelManager</em>. The <em>RoomAirModelManager</em> selects which zone model will be used for each zone.</p>
 <p>The calculation is done in subroutine <em>CalcUCSDUEI</em>. First we calculate the convective heat gain going into the upper and lower regions.</p>
-<div>\[\begin{array}{l}{{\dot Q}_{ocz}} = {{\dot Q}_{oc,conv}} + {{\dot Q}_{tl,conv}} + {{\dot Q}_{eleq,conv}} + {{\dot Q}_{gaseq,conv}} + {{\dot Q}_{otheq,conv}} + {{\dot Q}_{hw,conv}}\\\{\rm{        }} + {{\dot Q}_{stmeq,conv}} + {{\dot Q}_{bb,conv}} + {{\dot Q}_{waterheater,conv}} + {{\dot Q}_{fuelcell,conv}}\end{array}\]</div>
+<div>\[
+  \dot Q_{ocz} = \dot Q_{oc,conv} + \dot Q_{tl,conv} + \dot Q_{eleq,conv} + \dot Q_{gaseq,conv} + \dot Q_{otheq,conv} + \dot Q_{hw,conv} + \dot Q_{stmeq,conv} + \dot Q_{bb,conv} + \dot Q_{waterheater,conv} + \dot Q_{fuelcell,conv}
+\]</div>
 
 <div>\[{\dot Q_{mxz}} = {\dot Q_{gl,conv}} + {\dot Q_{ltp}} + {\dot Q_{htrad,conv}}\]</div>
 
@@ -941,14 +963,21 @@
 <p>For surfaces that bound 2 subzones, the subroutine calculates h<sub>c</sub> for each subzone and then averages them, weighting by the amount of surface in each subzone.</p>
 <p>During the surface loop, once the h<sub>c</sub> for a surface is calculated, the appropriate subzone HA and HAT sums are incremented. If a surface is in 2 subzones the HA and HAT for each subzone are incremented based on the area of the surface in each subzone. The subroutine calculates a separate HA and HAT for the windows for use in calculating the window convective gain.</p>
 <h4 id="step-2_1">Step 2</h4>
-<p>The calculation of  subzone temperatures follows the method used in the <strong><em>ZoneTempPredictorCorrector</em></strong> module and described in the section <strong>Basis for the System and Zone Integration</strong>. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.</p>
-<p><span>$\begin{array}{l}{T_{oc}} = ({C_{air,oc}} \cdot (3 \cdot {T_{ - 1,oc}} - (3/2) \cdot {T_{ - 2,oc}} + (1/3) \cdot {T_{ - 3,oc}}) + \\quad \quad {{\dot Q}<em>{ocz}} \cdot F{r</em>{gains}} + HA{T_{oc}} + MCP{T_{tot}})/((11/6) \cdot {C_{air,oc}} + H{A_{oc}} + MC{P_{tot}})\end{array}$</span><span>$\begin{array}{l}{T_{mx}} = ({C_{air,mx}} \cdot (3 \cdot {T_{ - 1,mx}} - (3/2) \cdot {T_{ - 2,mx}} + (1/3) \cdot {T_{ - 3,mx}}) + \\quad \quad {{\dot Q}<em>{ocz}} \cdot (1 - F{r</em>{gains}}) + {{\dot Q}<em>{mxz}} + HA{T</em>{mx}} + {T_{oc}} \cdot MC{P_{tot}})/((11/6) \cdot {C_{air,mx}} + H{A_{mx}} + MC{P_{tot}})\end{array}$</span></p>
+<p>The calculation of 
+subzone temperatures follows the method used in the <strong><em>ZoneTempPredictorCorrector</em></strong> module and described in the section <strong>Basis for the System and Zone Integration</strong>. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.</p>
+<div>\[
+ \begin{array}{rl}
+  T_{oc} &= (C_{air,oc} \cdot (3 \cdot T_{ - 1,oc} - (3/2) \cdot T_{ - 2,oc} + (1/3) \cdot T_{ - 3,oc}) + \dot Q_{ocz} \cdot Fr_{gains} + HAT_{oc} + MCPT_{tot})/((11/6) \cdot C_{air,oc} + HA_{oc} + MCP_{tot}) \\
+  T_{mx} &= (C_{air,mx} \cdot (3 \cdot T_{ - 1,mx} - (3/2) \cdot T_{ - 2,mx} + (1/3) \cdot T_{ - 3,mx}) + \dot Q_{ocz} \cdot (1 - Fr_{gains}) + \dot Q_{mxz} + HAT_{mx} + T_{oc} \cdot MCP_{tot})/((11/6) \cdot C_{air,mx} + HA_{mx} + MCP_{tot})
+ \end{array}
+\]</div>
+
 <p>Here <span>${C_{air,oc}}$</span> and <span>${C_{air,mx}}$</span> are the heat capacities of the air volume in each subzone. <span>${C_{air,mx}}$</span> is calculated by</p>
 <div>\[{R_{air,mx}} = {V_{mx}} \cdot \left( {\Delta {z_{mx}}/{z_{ceil}}} \right) \cdot {\rho_{air,mx}} \cdot {c_{p,air,mx}} \cdot Mu{l_{cap}}/\left( {\Delta {t_z} \cdot 3600} \right)\]</div>
 
 <div>\[{c_{air,mx}} = {R_{air,mx}} \cdot \Delta {t_z}/\Delta {t_{sys}}\]</div>
 
-<p>The gains fraction <span>$F{r_{gains}}$</span>is a user input via a schedule. It is the fraction of the convective gains in the occupied subzone that remain in that subzone.</p>
+<p>The gains fraction <span>$F{r_{gains}}$</span> is a user input via a schedule. It is the fraction of the convective gains in the occupied subzone that remain in that subzone.</p>
 <p>The other subzone air heat capacities are calculated in the same manner.</p>
 <h4 id="mixed-calculation_2">Mixed calculation</h4>
 <p>The above iterative procedure assumed that the UFAD zone model was applicable: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.</p>
@@ -1033,11 +1062,11 @@
 <p>The room lengths for which these models are expected to be applied range between the smallest room size of 4m and the maximum achievable CV room flushing length of 15-18m.</p>
 <p><img alt="" src="../../EngineeringReference/media/image2622.png" /></p>
 <p>Figure 136. Development of an axisymmetric jet from airflow through a window.</p>
-<p>Air flows into the room through an inflow window in the form of an approximately axisymmetric jet, with characteristic diameter <em>L</em>=<em>A</em><sub>in</sub><sup>1/2</sup>, that is confined by the room surfaces (see Figure 137). The initial portion of the jet (up to six diameters) is called the potential core and is characterized by shear layer development along the perimeter of the jet. After this phase the jet transitions into a self similar profile whose centerline velocity decays as 1/<em>x</em>¢, where <em>x</em>¢ = <em>x</em>/<em>D</em> (Awbi, 2003).</p>
+<p>Air flows into the room through an inflow window in the form of an approximately axisymmetric jet, with characteristic diameter <em>L</em>=<em>A</em><sub>in</sub><sup>1/2</sup>, that is confined by the room surfaces (see Figure 137). The initial portion of the jet (up to six diameters) is called the potential core and is characterized by shear layer development along the perimeter of the jet. After this phase the jet transitions into a self similar profile whose centerline velocity decays as 1/<em>x</em>', where <em>x</em>' = <em>x</em>/<em>D</em> (Awbi, 2003).</p>
 <p>For the relevant room length range the geometries used in the two models result in:</p>
-<p>New model:       6 &lt; x¢ &lt; 60</p>
-<p>Existing model:             2 &lt; x¢ &lt; 18</p>
-<p>The smaller openings used in the new model result in significantly more space for jet development along the room length. In all but the shortest rooms the jet will enter the fully developed stage characterized by a 1/<em>x</em>¢ centerline velocity decay rate. For this reason, the updated model uses the average jet velocity profile as opposed to shear layer momentum transfer.</p>
+<p>New model:       6 &lt; x' &lt; 60</p>
+<p>Existing model:             2 &lt; x' &lt; 18</p>
+<p>The smaller openings used in the new model result in significantly more space for jet development along the room length. In all but the shortest rooms the jet will enter the fully developed stage characterized by a 1/<em>x</em>' centerline velocity decay rate. For this reason, the updated model uses the average jet velocity profile as opposed to shear layer momentum transfer.</p>
 <h4 id="components-of-the-flow">Components of the flow</h4>
 <p>Figure 136 shows the schematic development of a free axisymmetric jet in an unconfined environment, and Figure 137 depicts the confinement effects. The air entrained by the jet is detrained at the outlet, creating two recirculation zones that do not exist in a free jet.</p>
 <p>The recirculation flow is similar to the flow in a lid driven cavity, where here the driving force is the confined jet flow. Turbulent lid driven cavity flows have been shown to have self-similar velocity profiles, as shown in Figure 138.</p>
@@ -1049,7 +1078,7 @@
 <p><img alt="" src="../../EngineeringReference/media/image2624.png" /></p>
 <p>Figure 138. Top view of one half of a cross ventilated room. The flow is approximately composed of a confined jet and two lid driven cavity flows (one on each side).</p>
 <p>The goal of the model is to obtain the value and functional form of the constant term shown in the scaling laws for the characteristic average velocities in the two flow regions: jet and recirculation regions.</p>
-<p>To estimate the average jet velocity we integrate along the depth of the room (including both the core region and the 1/<em>x</em>¢ velocity decay region) to derive an average maximum jet velocity, <em>V</em><sub>J,m</sub>:∙</p>
+<p>To estimate the average jet velocity we integrate along the depth of the room (including both the core region and the 1/<em>x</em>' velocity decay region) to derive an average maximum jet velocity, <em>V</em><sub>J,m</sub>:∙</p>
 <div>\[{V_{J,m}} = {U_{in}}\sqrt {{A_{in}}} \left\{ {6 + 6.3\ln \left( {{D^*}/6\sqrt {{A_{in}}} } \right)} \right\}/{D^*}\]</div>
 
 <p>(To allow for wind angle effects the room depth <em>D</em> has been replaced by <em>D</em>* - see a later section.) The lid-driven cavity flow profile that characterizes the recirculation region has a maximum velocity that is approximately one half of the driving velocity, which in this case is due to the jet. For this reason we define the separation between the two regions along the virtual surface where the jet reaches 50% of its maximum, centerline, velocity.</p>
@@ -1085,105 +1114,137 @@
 <p><img alt="" src="../../EngineeringReference/media/image2634.png" /></p>
 <p>Figure 139. Jet and recirculation regions in typical vertical cross-section through room (y-z plane). Jet boundary occurs where jet velocity has fallen to 50% of centerline maximum. Remainder of cross-section is treated as recirculation. Volumetric heat sources ar</p>
 <p>Table 44. Test cases used to develop correlations</p>
-<p>Case</p>
-<p>Opening area,</p>
-<p><em>A</em><sub>in</sub> (m<sup>2</sup>)</p>
-<p>Room width,</p>
-<p><em>W</em> (m)</p>
-<p>Room depth,</p>
-<p><em>D</em> (m)</p>
-<p>Room height,</p>
-<p><em>H</em> (m)</p>
-<p>1</p>
-<p>0.25</p>
-<p>6.0</p>
-<p>9.0</p>
-<p>2.3</p>
-<p>2</p>
-<p>0.25</p>
-<p>11.0</p>
-<p>9.0</p>
-<p>2.3</p>
-<p>3</p>
-<p>0.5</p>
-<p>9.0</p>
-<p>4.5</p>
-<p>2.3</p>
-<p>4</p>
-<p>0.5</p>
-<p>9.0</p>
-<p>6.0</p>
-<p>2.3</p>
-<p>5</p>
-<p>0.5</p>
-<p>6.0</p>
-<p>9.0</p>
-<p>2.3</p>
-<p>6</p>
-<p>0.5</p>
-<p>9.0</p>
-<p>9.0</p>
-<p>2.3</p>
-<p>7</p>
-<p>0.5</p>
-<p>11.0</p>
-<p>9.0</p>
-<p>2.3</p>
-<p>8</p>
-<p>0.5</p>
-<p>13.5</p>
-<p>9.0</p>
-<p>2.3</p>
-<p>9</p>
-<p>0.5</p>
-<p>9.0</p>
-<p>13.5</p>
-<p>2.3</p>
-<p>10</p>
-<p>0.5</p>
-<p>9.0</p>
-<p>18.0</p>
-<p>2.3</p>
-<p>11</p>
-<p>0.5</p>
-<p>13.5</p>
-<p>18.0</p>
-<p>2.3</p>
-<p>12</p>
-<p>1.0</p>
-<p>9.0</p>
-<p>9.0</p>
-<p>2.3</p>
-<p>13</p>
-<p>1.0</p>
-<p>9.0</p>
-<p>13.5</p>
-<p>2.3</p>
-<p>14</p>
-<p>1.0</p>
-<p>9.0</p>
-<p>18.0</p>
-<p>2.3</p>
-<p>RANGE (max:min ratio)</p>
-<p>4.0</p>
-<p>2.25</p>
-<p>4.0</p>
-<p>1.0</p>
-<p><strong> </strong></p>
+<table class="table table-striped">
+  <tr>
+    <th rowspan="2">Case</th>
+    <th>Opening area</th>
+    <th>Room width</th>
+    <th>Room depth</th>
+    <th>Room height</th>
+  </tr>
+  <tr>
+    <td>A in (m 2 )</td>
+    <td>W (m)</td>
+    <td>D (m)</td>
+    <td>H (m)</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>0.25</td>
+    <td>6</td>
+    <td>9</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>0.25</td>
+    <td>11</td>
+    <td>9</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>4.5</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>6</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>0.5</td>
+    <td>6</td>
+    <td>9</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>9</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>0.5</td>
+    <td>11</td>
+    <td>9</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>0.5</td>
+    <td>13.5</td>
+    <td>9</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>9</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>13.5</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>18</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>11</td>
+    <td>0.5</td>
+    <td>13.5</td>
+    <td>18</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>1</td>
+    <td>9</td>
+    <td>9</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>13</td>
+    <td>1</td>
+    <td>9</td>
+    <td>13.5</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>1</td>
+    <td>9</td>
+    <td>18</td>
+    <td>2.3</td>
+  </tr>
+  <tr>
+    <td colspan="5">RANGE (max:min ratio)</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>4</td>
+    <td>2.25</td>
+    <td>4</td>
+    <td>1</td>
+  </tr>
+</table>
+
 <p>Table 45. Definitions of output variables</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Output variable</td>
-<td>Symbol</td>
-<td>Units</td>
-<td>Definition</td>
+<th>Output variable</th>
+<th>Symbol</th>
+<th>Units</th>
+<th>Definition</th>
 </tr>
 <tr>
 <td>Jet velocity</td>
@@ -1215,30 +1276,18 @@
 <td>°C</td>
 <td>Volume-average temperature variations in the recirculation region. The average is calculated over the cuboidal volume placed in each recirculation containing the volumetric sensible heat gains (see main text).</td>
 </tr>
-
 </table>
 
-<p><strong> </strong></p>
-<p>See also Figure 139<strong>.</strong> Note the <em>x</em>-coordinate is along the room, the <em>y</em>-coordinate is across the room and the <em>z</em>-coordinate is vertical.</p>
-<p><strong> </strong></p>
+<p>See also Figure 139. Note the <em>x</em>-coordinate is along the room, the <em>y</em>-coordinate is across the room and the <em>z</em>-coordinate is vertical.</p>
 <p>Table 46. Correlation formulae in the form Y = aX + b</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
-
-
 <tr>
-<td> </td>
-<td>Y</td>
-<td>X</td>
-<td>a</td>
-<td>b</td>
-<td>R<sup>2</sup></td>
+<th> </th>
+<th>Y</th>
+<th>X</th>
+<th>a</th>
+<th>b</th>
+<th>R<sup>2</sup></th>
 </tr>
 <tr>
 <td>Jet velocity</td>
@@ -1283,170 +1332,202 @@
 
 </table>
 
-<p><strong> </strong></p>
 <p>Table 47. Accuracy of correlation formulae in predicting test case results</p>
-<p>Cases</p>
-<p>Errors (%)</p>
-<p>ID</p>
-<p><em>A</em><sub>in</sub></p>
-<p>(m<sup>2</sup>)</p>
-<p><em>W</em></p>
-<p>(m)</p>
-<p><em>D</em></p>
-<p>(m)</p>
-<p><em>H</em></p>
-<p>(m)</p>
-<p>Jet velocity</p>
-<p>Recirculation velocity</p>
-<p>Recirculation flow rate</p>
-<p>Jet temperature rise</p>
-<p>Recirculation temperature rise</p>
-<p>1</p>
-<p>0.25</p>
-<p>6</p>
-<p>9</p>
-<p>2.3</p>
-<p>16</p>
-<p>45</p>
-<p>60</p>
-<p>1</p>
-<p>10</p>
-<p>2</p>
-<p>0.25</p>
-<p>11</p>
-<p>9</p>
-<p>2.3</p>
-<p>5</p>
-<p>43</p>
-<p>32</p>
-<p>5</p>
-<p>7</p>
-<p>3</p>
-<p>0.5</p>
-<p>9</p>
-<p>4.5</p>
-<p>2.3</p>
-<p>2</p>
-<p>18</p>
-<p>27</p>
-<p>15</p>
-<p>2</p>
-<p>4</p>
-<p>0.5</p>
-<p>9</p>
-<p>6</p>
-<p>2.3</p>
-<p>6</p>
-<p>32</p>
-<p>28</p>
-<p>7</p>
-<p>1</p>
-<p>5</p>
-<p>0.5</p>
-<p>6</p>
-<p>9</p>
-<p>2.3</p>
-<p>7</p>
-<p>6</p>
-<p>21</p>
-<p>7</p>
-<p>0</p>
-<p>6</p>
-<p>0.5</p>
-<p>9</p>
-<p>9</p>
-<p>2.3</p>
-<p>10</p>
-<p>4</p>
-<p>6</p>
-<p>15</p>
-<p>17</p>
-<p>7</p>
-<p>0.5</p>
-<p>11</p>
-<p>9</p>
-<p>2.3</p>
-<p>6</p>
-<p>7</p>
-<p>0</p>
-<p>14</p>
-<p>20</p>
-<p>8</p>
-<p>0.5</p>
-<p>13.5</p>
-<p>9</p>
-<p>2.3</p>
-<p>14</p>
-<p>9</p>
-<p>5</p>
-<p>21</p>
-<p>2</p>
-<p>9</p>
-<p>0.5</p>
-<p>9</p>
-<p>13.5</p>
-<p>2.3</p>
-<p>10</p>
-<p>11</p>
-<p>17</p>
-<p>7</p>
-<p>8</p>
-<p>10</p>
-<p>0.5</p>
-<p>9</p>
-<p>18</p>
-<p>2.3</p>
-<p>10</p>
-<p>25</p>
-<p>29</p>
-<p>8</p>
-<p>3</p>
-<p>11</p>
-<p>0.5</p>
-<p>13.5</p>
-<p>18</p>
-<p>2.3</p>
-<p>8</p>
-<p>2</p>
-<p>23</p>
-<p>9</p>
-<p>6</p>
-<p>12</p>
-<p>1</p>
-<p>9</p>
-<p>9</p>
-<p>2.3</p>
-<p>2</p>
-<p>5</p>
-<p>3</p>
-<p>3</p>
-<p>4</p>
-<p>13</p>
-<p>1</p>
-<p>9</p>
-<p>13.5</p>
-<p>2.3</p>
-<p>8</p>
-<p>10</p>
-<p>10</p>
-<p>3</p>
-<p>6</p>
-<p>14</p>
-<p>1</p>
-<p>9</p>
-<p>18</p>
-<p>2.3</p>
-<p>0</p>
-<p>18</p>
-<p>6</p>
-<p>13</p>
-<p>2</p>
-<p>Average</p>
-<p><strong>8</strong></p>
-<p><strong>17</strong></p>
-<p><strong>19</strong></p>
-<p><strong>9</strong></p>
-<p><strong>6</strong></p>
+<table class="table table-striped">
+  <tr>
+    <th colspan="5">Cases</th>
+    <th colspan="5">Errors (%)</th>
+  </tr>
+  <tr>
+    <td>ID</td>
+    <td>A (m2)</td>
+    <td>W (m)</td>
+    <td>D (m)</td>
+    <td>H (m)</td>
+    <td>Jet Velocity</td>
+    <td>Recirculation Velocity</td>
+    <td>Recirculation Flow Rate</td>
+    <td>Jet Temperature Rise</td>
+    <td>Recirculation Temperature Rise</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>0.25</td>
+    <td>6</td>
+    <td>9</td>
+    <td>2.3</td>
+    <td>16</td>
+    <td>45</td>
+    <td>60</td>
+    <td>1</td>
+    <td>10</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>0.25</td>
+    <td>11</td>
+    <td>9</td>
+    <td>2.3</td>
+    <td>5</td>
+    <td>43</td>
+    <td>32</td>
+    <td>5</td>
+    <td>7</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>4.5</td>
+    <td>2.3</td>
+    <td>2</td>
+    <td>18</td>
+    <td>27</td>
+    <td>15</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>6</td>
+    <td>2.3</td>
+    <td>6</td>
+    <td>32</td>
+    <td>28</td>
+    <td>7</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>0.5</td>
+    <td>6</td>
+    <td>9</td>
+    <td>2.3</td>
+    <td>7</td>
+    <td>6</td>
+    <td>21</td>
+    <td>7</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>9</td>
+    <td>2.3</td>
+    <td>10</td>
+    <td>4</td>
+    <td>6</td>
+    <td>15</td>
+    <td>17</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>0.5</td>
+    <td>11</td>
+    <td>9</td>
+    <td>2.3</td>
+    <td>6</td>
+    <td>7</td>
+    <td>0</td>
+    <td>14</td>
+    <td>20</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>0.5</td>
+    <td>13.5</td>
+    <td>9</td>
+    <td>2.3</td>
+    <td>14</td>
+    <td>9</td>
+    <td>5</td>
+    <td>21</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>9</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>13.5</td>
+    <td>2.3</td>
+    <td>10</td>
+    <td>11</td>
+    <td>17</td>
+    <td>7</td>
+    <td>8</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>0.5</td>
+    <td>9</td>
+    <td>18</td>
+    <td>2.3</td>
+    <td>10</td>
+    <td>25</td>
+    <td>29</td>
+    <td>8</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td>11</td>
+    <td>0.5</td>
+    <td>13.5</td>
+    <td>18</td>
+    <td>2.3</td>
+    <td>8</td>
+    <td>2</td>
+    <td>23</td>
+    <td>9</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>1</td>
+    <td>9</td>
+    <td>9</td>
+    <td>2.3</td>
+    <td>2</td>
+    <td>5</td>
+    <td>3</td>
+    <td>3</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>13</td>
+    <td>1</td>
+    <td>9</td>
+    <td>13.5</td>
+    <td>2.3</td>
+    <td>8</td>
+    <td>10</td>
+    <td>10</td>
+    <td>3</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>1</td>
+    <td>9</td>
+    <td>18</td>
+    <td>2.3</td>
+    <td>0</td>
+    <td>18</td>
+    <td>6</td>
+    <td>13</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td colspan="5">Average</td>
+    <td>8</td>
+    <td>17</td>
+    <td>19</td>
+    <td>9</td>
+    <td>6</td>
+  </tr>
+</table>
+
 <p>In each case the error is the percentage difference between the given correlation prediction and the test case result obtained from CFD, i.e. 100*|(correlation prediction – CFD)/CFD|.</p>
 <p><span>$\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)$</span><span>${U_J}/{U_{in}}$</span><img alt="" src="../../EngineeringReference/media/image2652.png" /></p>
 <p>Figure 140. Jet velocity correlation.</p>
@@ -1484,7 +1565,13 @@
 
 <h4 id="predicting-air-temperature-in-the-recirculation-region-of-the-flow">Predicting air temperature in the recirculation region of the flow</h4>
 <p>An accurate representation of system behavior must consider both the local heat transfer in the shear layer (varying along the <em>x</em> direction, driven by the temperature profiles <em>T<sub>J</sub>(x)</em> and <em>T<sub>R</sub>(x)</em>) and the heat transfer in the wall boundary layers (with temperature <em>T<sub>W</sub>(r)</em>). Both transfers can be modeled using differential equations, resulting in the following system of equations:</p>
-<div>\[\left\{ {\begin{array}{*{20}{c}}\begin{array}{l}\rho \,{C_P}\,F\,R\,\frac{{\partial {T_W}(r)}}{{\partial r}}\, = \,\,\frac{{{A_S}\,{h_S}}}{{{L_{}}}}\left( {{T_S} - {T_W}(r)} \right)\\\\\rho \,{C_P}\,F\,R\,\frac{{\partial {T_R}(x)}}{{\partial x}}\, = \,\,\frac{{{A_{SL}}\,{h_{SL}}}}{L}\left( {{T_J}(x) - {T_R}(x)} \right)\\\\\rho \,{C_P}\,F\,\frac{{\partial {T_J}(x)}}{{\partial x}} =  - \frac{{{A_{SL}}\,{h_{SL}}}}{L}\,\left( {{T_J}(x) - {T_R}(x)\,} \right)\end{array}\\\{}\end{array}} \right.\,\]</div>
+<div>\[
+  \begin{array}{rl}
+    \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} &= \frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) \\
+    \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
+  \end{array}
+\]</div>
 
 <p>The relevant boundary conditions are:</p>
 <div>\[{T_W}({L_{}}) = {T_R}(0)\,,\,{T_W}(0) = {T_R}(L)\,,\,\,{T_J}(0) = {T_{IN}}\]</div>
@@ -1504,7 +1591,13 @@
 <h4 id="heat-gains-in-the-recirculation-region">Heat gains in the recirculation region</h4>
 <p>When heat gains occur in the recirculation region significant heat accumulation occurs due to the limited heat transfer ability of the shear layer. Due to this limited ability, the recirculation is partially isolated from the main jet flow and higher temperatures are generated in this region whenever heat gains are present. The concept of a global heat transfer coefficient is not applicable.</p>
 <p>In the case of a flow in a room with adiabatic surfaces and heat gains in the recirculation region the indoor air temperatures can be predicted using the solution to the following system of equations:</p>
-<div>\[\left\{ {\begin{array}{*{20}{c}}\begin{array}{l}\rho \,{C_P}\,F\,R\,({T_R}(0) - {T_R}(L))\, = \,\,{G_R}\\\\\rho \,{C_P}\,F\,R\,\frac{{\partial {T_R}(x)}}{{\partial x}}\, = \,\,\frac{{{A_{SL}}\,{h_{SL}}}}{L}\left( {{T_J}(x) - {T_R}(x)} \right)\\\\\rho \,{C_P}\,F\,\frac{{\partial {T_J}(x)}}{{\partial x}} =  - \frac{{{A_{SL}}\,{h_{SL}}}}{L}\,\left( {{T_J}(x) - {T_R}(x)\,} \right)\end{array}\\\{}\end{array}} \right.\,\]</div>
+<div>\[
+  \begin{array}{rl}
+    \rho C_p F R \left(T_R\left(0\right) - T_R\left(L\right)\right) &= G_R \\
+    \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right)
+  \end{array}
+\]</div>
 
 <p>This system of equations differs from system F16 in several ways. Because there is no wall heat transfer there is no need to split the recirculation flow in two parts (<em>R</em> and <em>W</em>). The temperature increase in the recirculation flow is simply defined by the internal gains (first equation in ). The second and third equations in model shear layer heat transfer are similar in the two cases ( and ).</p>
 <p>The recirculation flow temperature at <em>x</em>=0 is given by:</p>
@@ -1518,7 +1611,13 @@
 
 <h4 id="combined-effects-of-surface-heat-transfer-and-internal-gains-in-the-recirculation-region">Combined effects of surface heat transfer and internal gains in the recirculation region</h4>
 <p>In this case, the following system of equations must be solved:</p>
-<div>\[\left\{ {\begin{array}{*{20}{c}}\begin{array}{l}\rho \,{C_P}\,F\,R\,\frac{{\partial {T_W}(r)}}{{\partial r}}\, = \,\, - \frac{{{A_S}\,{h_S}}}{{{L_{}}}}\left( {{T_S} - {T_W}(r)} \right) - \frac{{{G_R}}}{{{L_R}}}\\\\\rho \,{C_P}\,F\,R\,\frac{{\partial {T_R}(x)}}{{\partial x}}\, = \,\,\frac{{{A_{SL}}\,{h_{SL}}}}{L}\left( {{T_J}(x) - {T_R}(x)} \right)\\\\\rho \,{C_P}\,F\,\frac{{\partial {T_J}(x)}}{{\partial x}} =  - \frac{{{A_{SL}}\,{h_{SL}}}}{L}\,\left( {{T_J}(x) - {T_R}(x)\,} \right)\end{array}\\\{}\end{array}} \right.\,\]</div>
+<div>\[
+  \begin{array}{rl}
+    \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} &= -\frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) - \frac{G_R}{L_R} \\
+    \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
+  \end{array}
+\]</div>
 
 <p>With the boundary conditions: <span>${T_W}(L) = {T_R}(0)\,,\,{T_W}(0) = {T_R}(L)\,,\,\,{T_J}(0) = {T_{IN}}$</span></p>
 <p>For simplicity the heat gains are considered to be evenly distributed along the recirculation path. The temperature variation in the recirculation region is given by:</p>
@@ -1526,15 +1625,10 @@
 
 <p>Table 48. List of variables for CV model</p>
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Symbol</td>
-<td>Units</td>
-<td>Description</td>
+<th>Symbol</th>
+<th>Units</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>a</td>
@@ -1657,7 +1751,7 @@
 <td>Coordinate along room depth, 0 ≤ x ≤ D</td>
 </tr>
 <tr>
-<td>x¢</td>
+<td>x'</td>
 <td>-</td>
 <td>Non-dimensional x-coordinate, x/D</td>
 </tr>
@@ -1720,9 +1814,17 @@
 <h3 id="model-description_3">Model Description</h3>
 <p>The input object AirflowNetwork:SimulationControl provides access to the airflow network method, which consists of a set of nodes connected by airflow components through linkages. The objects AirflowNetwork:Multizone:Zone,  AirflowNetwork:Multizone:ExternalNode, and AirflowNetwork:Distribution:Node represent airflow nodes. The objects AirflowNetwork:Multizone:Surface and AirflowNetwork:Distribution:Linkage represent airflow linkages. The other objects with a relationship between pressure and airflow represent airflow components.</p>
 <p>The AirflowNetwork model consists of three sequential steps:</p>
-<p>n Pressure and airflow calculations</p>
-<p>n Node temperature and humidity calculations</p>
-<p>n Sensible and latent load calculations</p>
+<ul>
+<li>
+<p>Pressure and airflow calculations</p>
+</li>
+<li>
+<p>Node temperature and humidity calculations</p>
+</li>
+<li>
+<p>Sensible and latent load calculations</p>
+</li>
+</ul>
 <p>The pressure and airflow calculations determine pressure at each node and airflow through each linkage given wind pressures and forced airflows. Based on the airflow calculated for each linkage, the model then calculates node temperatures and humidity ratios given zone air temperatures and zone humidity ratios.  Using these node temperatures and humidity ratios, the sensible and latent loads from duct system conduction and leakage are summed for each zone. The sensible and latent loads obtained in this step are then used in the zone energy balance equations to predict HVAC system loads and to calculate the final zone air temperatures, humidity ratios, and pressures.</p>
 <p>The present AirflowNetwork model may only be applied to a single heating and cooling system that uses a single air distribution system (a single AirLoopHVAC object). The model excludes the impact of the air and duct system thermal capacitance. The impact of thermal capacity will be addressed in future upgrades to this model.</p>
 <h3 id="pressure-and-airflow-calculations">Pressure and Airflow Calculations</h3>
@@ -1740,8 +1842,8 @@
 <p>The second initialization method assumes the initial pressures are zero and uses Newton’s method directly.</p>
 <h4 id="convergence-criteria">Convergence criteria</h4>
 <p>Conservation of air mass flow rate at each linkage provides the convergence criterion. When the sum of mass flow rates in all the linkages approaches zero within the convergence tolerance, the solution has converged. The solution is assumed to have converged when the sum is less than the convergence value, in order to reduce the number of iterations and obtain sufficient accuracy. There are two convergence criteria used in the AirflowNetwork model: Relative airflow convergence tolerance and Absolute airflow convergence tolerance.</p>
-<p>Relative airflow tolerance = <span>$\frac{{\,\,\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }<em>{_i}}} } \right|\,\,}}{{\sum\limits</em>{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}$</span></p>
-<p>Absolute airflow tolerance = <span>$\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|$</span></p>
+<p>Relative airflow tolerance = <span>$\frac{\left| \sum \dot m_i \right|}{\sum \dot m_i}$</span></p>
+<p>Absolute airflow tolerance = <span>$\left| \sum \dot m_i \right|$</span></p>
 <p>The relative airflow tolerance is equivalent to the ratio of the absolute value of the sum of all network airflows to the sum of the network airflow magnitudes.  The absolute airflow tolerance is the summation of the absolute value of all network airflows. The solution has converged when both of these convergence criteria have been met.</p>
 <h4 id="linkage-models">Linkage models</h4>
 <p>A linkage used in the AirflowNetwork model has two nodes, inlet and outlet, and is linked by a component which has a relationship between airflow and pressure.  The pressure difference across each component in a linkage is assumed to be governed by Bernoulli’s equation:</p>
@@ -1917,7 +2019,8 @@
 
 <div>\[{\mathop m\limits^ \bullet_{_L}} = {\mathop m\limits^ \bullet_{buo}}\]</div>
 
-<p><span>$\frac{{{{\mathop {\partial m}\limits^ \bullet  }_L}}}{{\partial {P_L}}} = 0$</span></p>
+<div>\[\frac{{{{\mathop {\partial m}\limits^ \bullet  }_L}}}{{\partial {P_L}}} = 0\]</div>
+
 <p>b.                           P<sub>L</sub> &gt; P<sub>U</sub></p>
 <div>\[{\mathop m\limits^ \bullet_{_U}} = {\mathop m\limits^ \bullet_{buo}}\]</div>
 
@@ -1952,15 +2055,10 @@
 <p>Figure 152 demonstrates possible forced and buoyancy flow rates at different ratios of pressure difference to purging pressure across a horizontal opening when the upper zone air density is greater than the lower zone air density. The pressure difference is the lower zone pressure minus the upper zone pressure. Otherwise, the buoyancy flow is zero. In addition, when the absolute ratio is above 1, the buoyancy flow is also zero. The following table provides a brief description for the legend listed in Figure 152.</p>
 <p>Table 49.  Legend Description</p>
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Legend</td>
-<td>Description</td>
-</tr>
+<th>Legend</th>
+<th>Description</th>
+* </tr>
 <tr>
 <td>Forced downward</td>
 <td>Forced flow rate from upper to lower at P<sub>L</sub>-P<sub>U</sub> &lt; 0</td>
@@ -2137,7 +2235,8 @@
 <p>The air distribution system (ADS) loads due to duct conduction and leakage depend on the air distribution system component (e.g., duct) location. The air distribution system sensible and latent loads are calculated for each zone as follows:</p>
 <div>\[{Q_{ADS,i}} = \sum\limits_j {{Q_{cond(i,j)}} + } \sum\limits_j {{Q_{leak(i,j)}}} \]</div>
 
-<p><span>${Q_{ADS,m,i}} = \sum\limits_j {{Q_{cond,m(i,j)}} + } \sum\limits_j {{Q_{leak,m(i,j)}}} $</span></p>
+<div>\[{Q_{ADS,m,i}} = \sum\limits_j {{Q_{cond,m(i,j)}} + } \sum\limits_j {{Q_{leak,m(i,j)}}} \]</div>
+
 <p>where</p>
 <p><em>Q<sub>ADS,i</sub></em>         = Total sensible load in the i-th zone due to ADS losses [W]</p>
 <p><em>Q<sub>cond(ij)</sub></em>       = Duct wall conduction loss at the j-th duct located in the i-th zone [W]</p>

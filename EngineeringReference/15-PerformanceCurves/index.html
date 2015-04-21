@@ -382,23 +382,25 @@
 <p><img alt="RegressionAnalysis" src="../../EngineeringReference/media/image7866.png" /></p>
 <p>The regression analysis and summary statistical output is shown below. The equation coefficients are shown highlighted. In this example, the equation coefficents are: a = 0.757382, b = 0.014666, c= 0.000459, d = -0.00095, e = -6.7E-05, and f = -0.00015. These coefficients would be entered in a Curve:BiQuadratic object and used to describe the cooling capacity as a function of temperature for the DX cooling coil model. Minimum and Maximum values from the tabular data are entered as Min/Max values for the curve object. The values may be relaxed slightly with care to allow extrapolation as needed. A performance table may be used to automatically perform the regression analysis as described in the following section.</p>
 <p><img alt="RegressionSummaryOutput" src="../../EngineeringReference/media/image7867.png" /></p>
-<p>Curve:Biquadratic,</p>
-<p>CoolCapFTExample,        !- Name</p>
-<p>0.757382,                !- Coefficient1 Constant</p>
-<p>0.014666,                !- Coefficient2 x</p>
-<p>0.000459,                !- Coefficient3 x**2</p>
-<p>-0.00095,                !- Coefficient4 y</p>
-<p>-0.000067,               !- Coefficient5 y**2</p>
-<p>-0.00015,                !- Coefficient6 x*y</p>
-<p>17.22222,                !- Minimum Value of x</p>
-<p>21.66667,                !- Maximum Value of x</p>
-<p>18.33333,                !- Minimum Value of y</p>
-<p>46.11111,                !- Maximum Value of y</p>
-<p>,                        !- Minimum Curve Output</p>
-<p>,                        !- Maximum Curve Output</p>
-<p>Temperature,             !- Input Unit Type for X</p>
-<p>Temperature,             !- Input Unit Type for Y</p>
-<p>Dimensionless;           !- Output Unit Type</p>
+<pre><code class="idf">  Curve:Biquadratic,
+    CoolCapFTExample,        !- Name
+    0.757382,                !- Coefficient1 Constant
+    0.014666,                !- Coefficient2 x
+    0.000459,                !- Coefficient3 x**2
+    -0.00095,                !- Coefficient4 y
+    -0.000067,               !- Coefficient5 y**2
+    -0.00015,                !- Coefficient6 x*y
+    17.22222,                !- Minimum Value of x
+    21.66667,                !- Maximum Value of x
+    18.33333,                !- Minimum Value of y
+    46.11111,                !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+</code></pre>
+
 <h3 id="curves-based-on-three-independent-variables">Curves based on three independent variables</h3>
 <p>A polynomial having three independent variables represents a three-dimensional relationship between a condition (the model inputs) and response (the model output).</p>
 <h4 id="triquadratic-curves">TriQuadratic Curves</h4>
@@ -417,18 +419,11 @@
 <p>The equation form is user selected as either linear, quadratic, cubic, quartic, or exponent. This choice determines: 1) where this table object may be used (i.e., certain objects may required a specific form of the equation), and 2) the degree or order used to calculate the regression coefficients. The following example describes the methodology used when tabular input data is used in place of common performance curve objects. Although Energyplus does not use a performance curve in the manner described in this example, this example is ideally suited for teaching the basics of tabular data entry.</p>
 <p>Given a generic manufacturers fan data for a fan having a maximum flow rate of 5 m3/s and power of 125 W, the power is shown in the table below to be proportional to the cube of flow rate. Since, in this example, the flow rate is not a valid input for calculating fan power, the flow rate will be converted to flow fraction (or PLR). The power data is entered as the actual fan power and will be normalized by the program according to the maximum power of 125W. Also shown here are the performance curve outputs using the regression coefficients calculated by the program. The performance curve outputs represent the fan power ratio as a function of flow fraction. Additional significant digits are included to show the impact a given data set may have on the resulting coefficients (i.e., not quite 0 at the zero crossing, rounding causes slight errors in the actual coefficient values, etc).</p>
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Air Flow (m3/s)</td>
-<td>Flow Fraction  or Fan PLR</td>
-<td>Power (W)</td>
-<td>Power Ratio Curve Output</td>
+<th>Air Flow (m3/s)</th>
+<th>Flow Fraction  or Fan PLR</th>
+<th>Power (W)</th>
+<th>Power Ratio Curve Output</th>
 </tr>
 <tr>
 <td>0</td>
@@ -460,26 +455,27 @@
 <td>64</td>
 <td>0.51199999999999</td>
 </tr>
-
 </table>
 
 <p>The tabular data can be entered directly into a table object. The data for flow fraction (or fan part-load ratio) and power are entered as data pairs. As this example describes how the fan power changes with changes in air flow, the curve type selected is Cubic and, therefore, the minimum number of data pairs equals 4 (i.e., number of coefficients in a cubic equation) although 5 are used in this example. In addition, since calculating regression coefficients for this data set would yield more accurate results than linearly interpolating this data set, the selection is made to evaluate the curve to the limits specified. In this example, the fan in question is capable of operating up to 5 m3/s at 125 Watts (which is purposely not provided in this set of tabular data). We need this information because we want to create a fan power ratio equation with an input of 0-1 for fan part-load ratio and a table output of 0-1 for fan power ratio. Therefore, the tabular data need to be normalized at a part-load ratio of 1 (i.e., normalized to the power at full flow). The following table object describes the input necessary for this particular data set.</p>
-<p>Table:OneIndependentVariable,</p>
-<p>MyFanPower,   !- Name  [Fit from catalog performance data]</p>
-<p>Cubic,     !- Curve Type</p>
-<p>EvaluateCurveToLimits,  !- Interpolation Type</p>
-<p>0,         !- Minimum Value of X1,</p>
-<p>1,         !- Maximum Value of X1,</p>
-<p>0,         !- Minimum Table Output</p>
-<p>64,        !- Maximum Table Output</p>
-<p>Dimensionless,  !- Input Unit Type for X1</p>
-<p>Dimensionless,  !- Output Unit Type</p>
-<p>125,       !- Normalization Point</p>
-<p>0.8,64,    !- X Value #1, Output Value #1</p>
-<p>0,0.0,     !- X Value #2, Output Value #2</p>
-<p>0.2,1,     !- X Value #3, Output Value #3</p>
-<p>0.1,0.125, !- X Value #4, Output Value #4</p>
-<p>0.6,27;    !- X Value #5, Output Value #5</p>
+<pre><code class="idf">Table:OneIndependentVariable,
+MyFanPower,   !- Name  [Fit from catalog performance data]
+Cubic,     !- Curve Type
+EvaluateCurveToLimits,  !- Interpolation Type
+0,         !- Minimum Value of X1,
+1,         !- Maximum Value of X1,
+0,         !- Minimum Table Output
+64,        !- Maximum Table Output
+Dimensionless,  !- Input Unit Type for X1
+Dimensionless,  !- Output Unit Type
+125,       !- Normalization Point
+0.8,64,    !- X Value #1, Output Value #1
+0,0.0,     !- X Value #2, Output Value #2
+0.2,1,     !- X Value #3, Output Value #3
+0.1,0.125, !- X Value #4, Output Value #4
+0.6,27;    !- X Value #5, Output Value #5
+</code></pre>
+
 <p>Notice in this example that:</p>
 <p>1)    The data pairs do not need to be entered in ascending order, this data set will automatically be re-ordered in ascending order by the program.</p>
 <p>2)    The minimum and maximum table output entered by the user uses the same units as the output values and are subsequently normalized in the same manner as the dependent variable in the data pairs.</p>
@@ -489,22 +485,24 @@
 <p>6)    In the graph below, the linearly interpolated tabular data (blue line) represent a less accurate fan power ratio curve than the performance curve itself (red line). In this specific example, it is more accurate to rely on the performance curve results (i.e., Interpolation Type = EvaluateCurveToLimits in table object). In addition, the performance curve is able to extrapolate outside the limits of the data set since the regression analysis provides a smooth continuous curve through 1. Selecting the LagrangeInterpolationLinearExtrapolation interpolation method with a cubic curve type is similar to the performance curve results.</p>
 <p>7)    Including additional data in the table object (e.g., data points for flow fractions = 0.4 and 1) would allow direct linear interpolation of the tabular data without significant loss of accuracy compared to the performance curve or lagrange methods.</p>
 <p>Curve output in eio file (when using Output:Diagnostics, DisplayAdvancedReportVariables):</p>
-<p>!...GENERATING NEW CURVE OBJECT</p>
-<p>! Input as Table:OneIndependentVariable "MYFANPOWER"</p>
-<p>! RSquared = 1.0000000000</p>
-<p>! Standard Error = 7.3549798168E-016</p>
-<p>! Degrees of Freedom = 5</p>
-<p>Curve:Cubic,</p>
-<p>MYFANPOWER,         !- Name</p>
-<p>-1.1102230246E-016, !- Coefficient1 Constant</p>
-<p>5.0571599639E-015,  !- Coefficient2 x</p>
-<p>-2.1582431250E-014, !- Coefficient3 x**2</p>
-<p>1.0000000000,       !- Coefficient3 x**3</p>
-<p>0.0000000000,       !- Minimum Value of x</p>
-<p>1.0000000000,       !- Maximum Value of x</p>
-<p>0.0000000000,       !- Minimum Curve Output</p>
-<p>1.0000000000;       !- Maximum Curve Output</p>
-<p>!...END GENERATING NEW CURVE OBJECT</p>
+<pre><code>!...GENERATING NEW CURVE OBJECT
+! Input as Table:OneIndependentVariable &quot;MYFANPOWER&quot;
+! RSquared = 1.0000000000
+! Standard Error = 7.3549798168E-016
+! Degrees of Freedom = 5
+Curve:Cubic,
+ MYFANPOWER,         !- Name
+ -1.1102230246E-016, !- Coefficient1 Constant
+ 5.0571599639E-015,  !- Coefficient2 x
+ -2.1582431250E-014, !- Coefficient3 x**2
+ 1.0000000000,       !- Coefficient3 x**3
+ 0.0000000000,       !- Minimum Value of x
+ 1.0000000000,       !- Maximum Value of x
+ 0.0000000000,       !- Minimum Curve Output
+ 1.0000000000;       !- Maximum Curve Output
+!...END GENERATING NEW CURVE OBJECT
+</code></pre>
+
 <p><img alt="FanPowerRatioExample" src="../../EngineeringReference/media/image7870.png" /></p>
 <h3 id="tables-based-on-two-independent-variables">Tables based on two independent variables</h3>
 <p>The tabular data entered for polynomials with two independent variables represent x, y and output data pairs as described in the previous section for performance curves.  The x and y in each of the previous equations represent the independent variables (model inputs) and the output represents the dependent variable. The data pairs are organized as the data points for the independent variables followed by the data point for the dependent variable. The order of the data is significant in that the x and y data are entered in the same order as shown in the model’s fundamental equation. The data pairs form a two-dimensional array that may either be linearly interpolated, interpolated using a second order polynomial, or this data may be used to calculate the equation coefficients (a-f) as described in the previous section.</p>
@@ -525,55 +523,59 @@
 <p>5)    For the resulting curve object, the calculated coefficients may not perfectly represent the entire data set since all data was not used (i.e., in this example the regressed data do not line up exactly with all the manufacturers data, however, do line up well with the data included in the table object).</p>
 <p>6)    Selecting LinearInterpolationOfTable would interpolate the tabular data within the limits of the data set (characters) resulting in a maximum X1, X2 and Curve value of 22.2, 40.8 and 1.25 (i.e., 9206.0/7375.1), respectively. Note how these maximum values compare to the maximum values in the generated curve object below which chose the EvaluateCurveToLimits option instead (i.e., the user min/max inputs were used to generate these fields when creating the curve object). The minimum values would be affected in a similar manner. Selecting Lagrange or EvaluateCurveToLimits allows extrapolation of the data set to values specified by the user.</p>
 <p>7)    In the graph below, the linearly interpolated tabular data (character data set representing manufacturers data) may better represent the capacity ratio than the performance curve (lines representing the regressed data) given the non-linear relationship between capacity and temperature shown in the table and/or graph. However, extrapolation of the data set is performed linearly and the second order affects of temperature would be lost when extrapolating. Either the data set would be expanded to include other relevant data (e.g., data at colder outdoor temperatures where cooling may be required) which could then be interpolated or additional existing data could be added to the table object to allow more accurate regression coefficients to be used to predict data outside the table data limits.</p>
-<p>Table:TwoIndependentVariables,</p>
-<p>CCoolCapFT,       !- Name  [Fit from catalog performance data]</p>
-<p>BiQuadratic,      !- Curve Type</p>
-<p>EvaluateCurveToLimits,  !- Interpolation Type</p>
-<p>1,                !- Minimum Value of x,</p>
-<p>30,               !- Maximum Value of x,</p>
-<p>5,                !- Minimum Value of y,</p>
-<p>50,               !- Maximum Value of y,</p>
-<p>4500,             !- Minimum Table Output</p>
-<p>15000,            !- Maximum Table Output</p>
-<p>Temperature,      !- Input Unit Type for x</p>
-<p>Temperature,      !- Input Unit Type for y</p>
-<p>Dimensionless,    !- Output Unit Type</p>
-<p>7735.1,           !- Normalization Point</p>
-<p>17.2,29.4,7462.6, !- X, Y, and Output data pair #1</p>
-<p>17.2,23.9,7735.1, !- X, Y, and Output data pair #2</p>
-<p>13.9,29.4,7283.9, !- X, Y, and Output data pair #3</p>
-<p>13.9,23.9,7474.4, !- X, Y, and Output data pair #4</p>
-<p>13.9,35,7067.1,   !- X, Y, and Output data pair #5</p>
-<p>13.9,40.8,6818.0, !- X, Y, and Output data pair #6</p>
-<p>17.2,35,7157.9,   !- X, Y, and Output data pair #7</p>
-<p>17.2,40.8,6818.0, !- X, Y, and Output data pair #8</p>
-<p>22.2,35,8552.6,   !- X, Y, and Output data pair #9</p>
-<p>22.2,29.4,8898.3, !- X, Y, and Output data pair #10</p>
-<p>22.2,23.9,9206.0, !- X, Y, and Output data pair #11</p>
-<p>22.2,40.8,8165.8; !- X, Y, and Output data pair #12</p>
+<pre><code class="idf">Table:TwoIndependentVariables,
+CCoolCapFT,       !- Name  [Fit from catalog performance data]
+BiQuadratic,      !- Curve Type
+EvaluateCurveToLimits,  !- Interpolation Type
+1,                !- Minimum Value of x,
+30,               !- Maximum Value of x,
+5,                !- Minimum Value of y,
+50,               !- Maximum Value of y,
+4500,             !- Minimum Table Output
+15000,            !- Maximum Table Output
+Temperature,      !- Input Unit Type for x
+Temperature,      !- Input Unit Type for y
+Dimensionless,    !- Output Unit Type
+7735.1,           !- Normalization Point
+17.2,29.4,7462.6, !- X, Y, and Output data pair #1
+17.2,23.9,7735.1, !- X, Y, and Output data pair #2
+13.9,29.4,7283.9, !- X, Y, and Output data pair #3
+13.9,23.9,7474.4, !- X, Y, and Output data pair #4
+13.9,35,7067.1,   !- X, Y, and Output data pair #5
+13.9,40.8,6818.0, !- X, Y, and Output data pair #6
+17.2,35,7157.9,   !- X, Y, and Output data pair #7
+17.2,40.8,6818.0, !- X, Y, and Output data pair #8
+22.2,35,8552.6,   !- X, Y, and Output data pair #9
+22.2,29.4,8898.3, !- X, Y, and Output data pair #10
+22.2,23.9,9206.0, !- X, Y, and Output data pair #11
+22.2,40.8,8165.8; !- X, Y, and Output data pair #12
+</code></pre>
+
 <p>Curve output in eio file (when using Output:Diagnostics, DisplayAdvancedReportVariables):</p>
-<p>CREATING NEW CURVE OBJECT</p>
-<p>! Input as Table:TwoIndependentVariables "CCOOLCAPFT"</p>
-<p>! RSquared       = 0.9993993101</p>
-<p>! Standard Error = 3.4649248573E-003</p>
-<p>! Sample Size    = 12</p>
-<p>Curve:BiQuadratic,</p>
-<p>FromTable_CCOOLCAPFT,  !- Name</p>
-<p>1.7214120578,  !- Coefficient1 Constant</p>
-<p>-0.1011737262,  !- Coefficient2 x</p>
-<p>3.7738833967E-003,  !- Coefficient3 x**2</p>
-<p>2.8686934910E-003,  !- Coefficient4 y</p>
-<p>-5.3785351258E-005,  !- Coefficient5 y**2</p>
-<p>-3.4086036156E-004,  !- Coefficient6 x*y</p>
-<p>1.0000000000,  !- Minimum Value of x</p>
-<p>30.0000000000,  !- Maximum Value of x</p>
-<p>5.0000000000,  !- Minimum Value of y</p>
-<p>50.0000000000,  !- Maximum Value of y</p>
-<p>0.5817636488,  !- Minimum Curve Output</p>
-<p>1.9392121627;  !- Maximum Curve Output</p>
-<p>END CREATING NEW CURVE OBJECT</p>
+<pre><code>CREATING NEW CURVE OBJECT
+! Input as Table:TwoIndependentVariables &quot;CCOOLCAPFT&quot;
+! RSquared       = 0.9993993101
+! Standard Error = 3.4649248573E-003
+! Sample Size    = 12
+Curve:BiQuadratic,
+FromTable_CCOOLCAPFT,  !- Name
+  1.7214120578,  !- Coefficient1 Constant
+  -0.1011737262,  !- Coefficient2 x
+  3.7738833967E-003,  !- Coefficient3 x**2
+  2.8686934910E-003,  !- Coefficient4 y
+  -5.3785351258E-005,  !- Coefficient5 y**2
+  -3.4086036156E-004,  !- Coefficient6 x*y
+  1.0000000000,  !- Minimum Value of x
+  30.0000000000,  !- Maximum Value of x
+   5.0000000000,  !- Minimum Value of y
+  50.0000000000,  !- Maximum Value of y
+  0.5817636488,  !- Minimum Curve Output
+  1.9392121627;  !- Maximum Curve Output
+END CREATING NEW CURVE OBJECT
+</code></pre>
+
 <p><img alt="NormalizedCapacity" src="../../EngineeringReference/media/image7873.png" /></p>
-<p>Lookup Tables</p>
+<h3 id="lookup-tables">Lookup Tables</h3>
 <p>Lookup tables provide a method to evaluate a group of data that may or may not conform to a fundamental equation. Only tabular data which conform to existing performance curve equations are currently allowed (i.e., that lookup table name is entered where any valid performance curve is allowed therefore the table data must conform to the models fundamental equation for that specific curve). Efforts to include this lookup table in the energy management system would allow custom use of lookup tables, however, calling lookup tables from the EMS system is not currenly possible. Lookup tables can interpolate the actual data using a non-linear polynomial equation (order higher than 1). As with other table or curve objects, the lookup table can be used anywhere a valid curve object name is allowed. Care must be taken to ensure the table data format is consistent with the associate model that is using the performance curve (e.g., DX cooling coil capacity as a function of temperature where independent variable X1 = indoor wet-bulb temperature and independent variable X2 = outdoor dry-bulb temperature).</p>
 <p>The lookup tables are evaluated using the Lagrange form of the interpolation polynomial or the previously described interpolation methods of LinearInterpolationOfTable and EvaluateCurveToLimits. When using the Lagrange method, the number of points used in the interpolation is equal to 1 plus the polynomial order (e.g., a second order interpolation would use 3 points).</p>
 <div>\[{p_n}\left( x \right) = \sum\limits_{i = 0}^n {{y_i}{l_i}\left( x \right)} \]</div>
@@ -597,41 +599,43 @@
 <p>The lookup table is interpolated using the interpolation polynomial shown above. If the table input value (interpolation point) is near the bottom edge or exceeds the table boundaries, a linear extrapolation is used (2-point extrapolation). The interpolation order is determined by the user entered number of interpolation points.</p>
 <p>A regression analysis may be performed on any lookup table having one or two indpenedent variables. As with performance tables, the resulting performance curve coefficients are calculated and used in the simulation only when the interpolation method is selected as EvaluateCurveToLimits. In addition, the performance curve is only written to the eio file when the output diagnostics flag is set to DisplayAdvancedReportVariables (ref. Output:Diagnostics, DisplayAdvancedReportVariables;)..</p>
 <p>Using the example provided in the section above for Tables based on two indpendent variables, the lookup table object would be defined as follows:</p>
-<p>Table:MultiVariableLookup,</p>
-<p>CCoolCapFT,</p>
-<p>EvaluateCurveToLimits,</p>
-<p>3,</p>
-<p>BiQuadratic,</p>
-<p>SingleLineIndependentVariableWithMatrix,</p>
-<p>,</p>
-<p>ASCENDING,</p>
-<p>ASCENDING,</p>
-<p>7735.1,  !- Normalization reference</p>
-<p>1,       !- Minimum Value of X1</p>
-<p>30,      !- Maximum Value of X1</p>
-<p>5,       !- Minimum Value of X2</p>
-<p>50,      !- Maximum Value of X2</p>
-<p>,        !- Minimum Value of X3</p>
-<p>,        !- Maximum Value of X3</p>
-<p>,        !- Minimum Value of X4</p>
-<p>,        !- Maximum Value of X4</p>
-<p>,        !- Minimum Value of X5</p>
-<p>,        !- Maximum Value of X5</p>
-<p>4500,    !- Minimum Table Output</p>
-<p>15000,   !- Maximum Table Output</p>
-<p>Temperature,  !- Input Unit Type for X1</p>
-<p>Temperature,  !- Input Unit Type for X2</p>
-<p>,        !- Input Unit Type for X3</p>
-<p>,        !- Input Unit Type for X4</p>
-<p>,        !- Input Unit Type for X5</p>
-<p>Dimensionless,    !- Output Unit Type</p>
-<p>2, 3, 4,</p>
-<p>13.9, 17.2, 22.2,</p>
-<p>23.9, 29.4, 35.0, 40.8,</p>
-<p>7474.4,  7735.1,  9206.0,</p>
-<p>7283.9,  7462.6,  8898.3,</p>
-<p>7067.1,  7157.9,  8552.6,</p>
-<p>6818.0,  6818.0,  8165.8;</p>
+<pre><code class="idf">Table:MultiVariableLookup,
+CCoolCapFT,
+EvaluateCurveToLimits,
+3,
+BiQuadratic,
+SingleLineIndependentVariableWithMatrix,
+,
+ASCENDING,
+ASCENDING,
+7735.1,  !- Normalization reference
+1,       !- Minimum Value of X1
+30,      !- Maximum Value of X1
+5,       !- Minimum Value of X2
+50,      !- Maximum Value of X2
+,        !- Minimum Value of X3
+,        !- Maximum Value of X3
+,        !- Minimum Value of X4
+,        !- Maximum Value of X4
+,        !- Minimum Value of X5
+,        !- Maximum Value of X5
+4500,    !- Minimum Table Output
+15000,   !- Maximum Table Output
+Temperature,  !- Input Unit Type for X1
+Temperature,  !- Input Unit Type for X2
+,        !- Input Unit Type for X3
+,        !- Input Unit Type for X4
+,        !- Input Unit Type for X5
+Dimensionless,    !- Output Unit Type
+   2, 3, 4,
+  13.9, 17.2, 22.2,
+  23.9, 29.4, 35.0, 40.8,
+  7474.4,  7735.1,  9206.0,
+  7283.9,  7462.6,  8898.3,
+  7067.1,  7157.9,  8552.6,
+  6818.0,  6818.0,  8165.8;
+</code></pre>
+
 
           <div class="footer">
   <p class="text-center"><a href="https://unmethours.com/questions/scope:all/sort:activity-desc/tags:energyplus/">Get Help</a> | <a href="https://www.energyplus.gov/">More Information</a></p>
