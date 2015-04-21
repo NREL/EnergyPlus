@@ -28,8 +28,8 @@ TEST( SizePurchasedAirTest, Test1 )
 	int PurchAirNum = 1;
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber( );
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
+	OutputFileInits = GetNewUnitNumber();
+	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 //	eso_stream = gio::out_stream( OutputFileStandard );
 
 	//ZoneEquipConfig.allocate( 1 );
@@ -97,8 +97,8 @@ TEST( SizePurchasedAirTest, Test1 )
 
 	ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
 	ZoneEqSizing.deallocate();
-	ZoneHVACSizing.deallocate( );
-	FinalZoneSizing.deallocate( );
+	ZoneHVACSizing.deallocate();
+	FinalZoneSizing.deallocate();
 	PurchAir.deallocate();
 	PurchAirNumericFields.deallocate();
 	UnitarySysEqSizing.deallocate();

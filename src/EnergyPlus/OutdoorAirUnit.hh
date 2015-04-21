@@ -2,7 +2,7 @@
 #define OutdoorAirUnit_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -44,7 +44,7 @@ namespace OutdoorAirUnit {
 	extern int const CoolingMode; // normal cooling coil operation
 	extern int const NeutralMode; // signal coil shouldn't run
 
-	extern FArray1D_string const CurrentModuleObjects;
+	extern Array1D_string const CurrentModuleObjects;
 
 	// Parameters below (CO - Current module Object.  used primarily in Get Inputs)
 	// Multiple Get Input routines in this module or these would be in individual routines.
@@ -56,12 +56,12 @@ namespace OutdoorAirUnit {
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumOfOAUnits; // Number of outdoor air unit in the input file
 	extern Real64 OAMassFlowRate; // Outside air mass flow rate for the zone outdoor air unit
-	extern FArray1D_bool MyOneTimeErrorFlag;
+	extern Array1D_bool MyOneTimeErrorFlag;
 	extern bool GetOutdoorAirUnitInputFlag; // Flag set to make sure you get input once
 
 	// Autosizing variables
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE OUTDOOR AIR UNIT
 	//PRIVATE UpdateOutdoorAirUnit
@@ -209,7 +209,7 @@ namespace OutdoorAirUnit {
 		Real64 CompOutSetTemp; // component outlet setpoint temperature
 		int AvailStatus;
 		std::string AvailManagerListName; // Name of an availability manager list object
-		FArray1D< OAEquipList > OAEquip;
+		Array1D< OAEquipList > OAEquip;
 		// Report data
 		Real64 TotCoolingRate; // Rate of total cooling delivered to the zone [W]
 		Real64 TotCoolingEnergy; // Total cooling energy delivered by the OAU supply air to the zone [J]
@@ -330,7 +330,7 @@ namespace OutdoorAirUnit {
 			Real64 const CompOutSetTemp, // component outlet setpoint temperature
 			int const AvailStatus,
 			std::string const & AvailManagerListName, // Name of an availability manager list object
-			FArray1< OAEquipList > const & OAEquip,
+			Array1< OAEquipList > const & OAEquip,
 			Real64 const TotCoolingRate, // Rate of total cooling delivered to the zone [W]
 			Real64 const TotCoolingEnergy, // Total cooling energy delivered by the OAU supply air to the zone [J]
 			Real64 const SensCoolingRate, // Rate of sensible cooling delivered to the zone [W]
@@ -414,7 +414,7 @@ namespace OutdoorAirUnit {
 	};
 
 	// Object Data
-	extern FArray1D< OAUnitData > OutAirUnit;
+	extern Array1D< OAUnitData > OutAirUnit;
 
 	// Functions
 

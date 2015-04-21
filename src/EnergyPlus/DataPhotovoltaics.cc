@@ -72,7 +72,7 @@ namespace DataPhotovoltaics {
 	Real64 ShuntResistance( 0.0 ); // old "RSH" in common block of trnsys code
 
 	// Object Data
-	FArray1D< PVArrayStruct > PVarray;
+	Array1D< PVArrayStruct > PVarray;
 
 	// ___________________________________________________________________________
 

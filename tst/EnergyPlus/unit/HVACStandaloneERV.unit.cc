@@ -27,8 +27,8 @@ TEST( SizeStandAloneERVTest, Test1 )
 
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber( );
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
+	OutputFileInits = GetNewUnitNumber();
+	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";

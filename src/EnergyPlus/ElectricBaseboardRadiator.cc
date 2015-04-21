@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <ElectricBaseboardRadiator.hh>
@@ -74,20 +74,20 @@ namespace ElectricBaseboardRadiator {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumElecBaseboards( 0 );
-	FArray1D< Real64 > QBBElecRadSource; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > QBBElecRadSrcAvg; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+	Array1D< Real64 > QBBElecRadSource; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > QBBElecRadSrcAvg; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QBBRadSrcAvg locally
-	FArray1D< Real64 > LastQBBElecRadSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D< Real64 > LastQBBElecRadSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< ElecBaseboardParams > ElecBaseboard;
-	FArray1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
+	Array1D< ElecBaseboardParams > ElecBaseboard;
+	Array1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
 
 	// Functions
 
@@ -522,7 +522,7 @@ namespace ElectricBaseboardRadiator {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int ZoneNum;
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {

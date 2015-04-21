@@ -2,8 +2,8 @@
 #define ConvectionCoefficients_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -33,7 +33,7 @@ namespace ConvectionCoefficients {
 	extern Real64 const FourFifths; // 4/5 in highest precision
 
 	// Coefficients that modify the convection coeff based on surface roughness
-	extern FArray1D< Real64 > const RoughnessMultiplier;
+	extern Array1D< Real64 > const RoughnessMultiplier;
 
 	// parameters for identifying more specific hc model equations, inside face
 	extern int const HcInt_UserValue;
@@ -714,7 +714,7 @@ namespace ConvectionCoefficients {
 		BoundingBoxVertStruct XuYuZd; // 6 hi x, hi y, low z
 		BoundingBoxVertStruct XuYdZu; // 7 hi x, low y, hi z
 		BoundingBoxVertStruct XuYuZu; // 8 hi x, hi y, hi z
-		FArray1D< Vector > BoundSurf; // long edge of roof group bounding surface
+		Array1D< Vector > BoundSurf; // long edge of roof group bounding surface
 		Real64 Area;
 		Real64 Perimeter;
 		Real64 Height;
@@ -737,7 +737,7 @@ namespace ConvectionCoefficients {
 			BoundingBoxVertStruct const & XuYuZd, // 6 hi x, hi y, low z
 			BoundingBoxVertStruct const & XuYdZu, // 7 hi x, low y, hi z
 			BoundingBoxVertStruct const & XuYuZu, // 8 hi x, hi y, hi z
-			FArray1< Vector > const & BoundSurf, // long edge of roof group bounding surface
+			Array1< Vector > const & BoundSurf, // long edge of roof group bounding surface
 			Real64 const Area,
 			Real64 const Perimeter,
 			Real64 const Height
@@ -761,15 +761,15 @@ namespace ConvectionCoefficients {
 	// Object Data
 	extern InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
 	extern OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
-	extern FArray1D< HcInsideFaceUserCurveStruct > HcInsideUserCurve;
-	extern FArray1D< HcOutsideFaceUserCurveStruct > HcOutsideUserCurve;
+	extern Array1D< HcInsideFaceUserCurveStruct > HcInsideUserCurve;
+	extern Array1D< HcOutsideFaceUserCurveStruct > HcOutsideUserCurve;
 	extern RoofGeoCharactisticsStruct RoofGeo;
 
 	// Functions
 
 	void
 	InitInteriorConvectionCoeffs(
-		FArray1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+		Array1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
 		Optional_int_const ZoneToResimulate = _ // if passed in, then only calculate surfaces that have this zone
 	);
 
@@ -844,9 +844,9 @@ namespace ConvectionCoefficients {
 	void
 	CalcDetailedHcInForDVModel(
 		int const SurfNum, // surface number for which coefficients are being calculated
-		FArray1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-		FArray1S< Real64 > HcIn, // Interior Convection Coeff Array
-		Optional< FArray1S< Real64 > const > Vhc = _ // Velocity array for forced convection coeff calculation
+		Array1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+		Array1S< Real64 > HcIn, // Interior Convection Coeff Array
+		Optional< Array1S< Real64 > const > Vhc = _ // Velocity array for forced convection coeff calculation
 	);
 
 	void
@@ -858,13 +858,13 @@ namespace ConvectionCoefficients {
 	void
 	CalcCeilingDiffuserInletCorr(
 		int const ZoneNum, // Zone number
-		FArray1S< Real64 > const SurfaceTemperatures // For CalcASHRAEDetailed, if called
+		Array1S< Real64 > const SurfaceTemperatures // For CalcASHRAEDetailed, if called
 	);
 
 	void
 	CalcTrombeWallIntConvCoeff(
 		int const ZoneNum, // Zone number for which coefficients are being calculated
-		FArray1S< Real64 > const SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
+		Array1S< Real64 > const SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
 	);
 
 	void

@@ -2,7 +2,7 @@
 #define PondGroundHeatExchanger_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -46,7 +46,7 @@ namespace PondGroundHeatExchanger {
 	extern int WaterIndex; // Fluid index for pond water
 	extern bool NoDeepGroundTempObjWarning; // This will cause a warning to be issued if no "deep" ground
 	// temperature object was input.
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PlantPondGroundHeatExchangers
 
@@ -193,8 +193,8 @@ namespace PondGroundHeatExchanger {
 	};
 
 	// Object Data
-	extern FArray1D< PondGroundHeatExchangerData > PondGHE;
-	extern FArray1D< PondGroundHeatExchangerReport > PondGHEReport;
+	extern Array1D< PondGroundHeatExchangerData > PondGHE;
+	extern Array1D< PondGroundHeatExchangerReport > PondGHEReport;
 
 	// Functions
 

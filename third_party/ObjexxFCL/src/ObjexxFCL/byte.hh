@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -17,6 +17,7 @@
 #include <cassert>
 #include <cstddef>
 #include <istream>
+#include <ostream>
 
 namespace ObjexxFCL {
 
@@ -378,7 +379,7 @@ public: // Comparison
 
 public: // I/O
 
-	// Stream Input
+	// Stream >> byte
 	inline
 	friend
 	std::istream &
@@ -388,6 +389,18 @@ public: // I/O
 			short int i;
 			stream >> i;
 			b.b_ = static_cast< signed char >( i );
+		}
+		return stream;
+	}
+
+	// Stream << byte
+	inline
+	friend
+	std::ostream &
+	operator <<( std::ostream & stream, byte const & b )
+	{
+		if ( stream ) {
+			stream << static_cast< short int >( b.b_ );
 		}
 		return stream;
 	}
@@ -453,9 +466,13 @@ operator >( byte const & i, byte const & j );
 bool
 operator >=( byte const & i, byte const & j );
 
-// Stream Input
+// Stream >> byte
 std::istream &
 operator >>( std::istream & stream, byte & b );
+
+// Stream << byte
+std::ostream &
+operator <<( std::ostream & stream, byte const & b );
 
 } // ObjexxFCL
 

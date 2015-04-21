@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -130,14 +130,14 @@ namespace SingleDuct {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	FArray1D< Real64 > MassFlow1; // previous value of the terminal unit mass flow rate
-	FArray1D< Real64 > MassFlow2; // previous value of the previous value of the mass flow rate
-	FArray1D< Real64 > MassFlow3;
-	FArray1D< Real64 > MassFlowDiff;
+	Array1D< Real64 > MassFlow1; // previous value of the terminal unit mass flow rate
+	Array1D< Real64 > MassFlow2; // previous value of the previous value of the mass flow rate
+	Array1D< Real64 > MassFlow3;
+	Array1D< Real64 > MassFlowDiff;
 	bool GetInputFlag( true ); // Flag set to make sure you get input once
 	bool GetATMixerFlag( true ); // Flag set to make sure you get input once
 	int NumConstVolSys( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -157,10 +157,10 @@ namespace SingleDuct {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< SysDesignParams > Sys;
-	FArray1D< SysFlowConditions > SysInlet;
-	FArray1D< SysFlowConditions > SysOutlet;
-	FArray1D< AirTerminalMixerData > SysATMixer;
+	Array1D< SysDesignParams > Sys;
+	Array1D< SysFlowConditions > SysInlet;
+	Array1D< SysFlowConditions > SysOutlet;
+	Array1D< AirTerminalMixerData > SysATMixer;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -357,12 +357,12 @@ namespace SingleDuct {
 		int SupAirIn; // controlled zone supply air inlet index
 		int ADUNum; // air distribution unit index
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -1388,7 +1388,7 @@ namespace SingleDuct {
 		NumZoneSiz = GetNumObjectsFound( "Sizing:Zone" );
 		if ( NumZoneSiz > 0 ) {
 			for ( SysIndex = 1; SysIndex <= NumSys; ++SysIndex ) {
-				SizLoop: for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex ) {
+				for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex ) {
 					if ( DoZoneSizing ) {
 						if ( FinalZoneSizing( ZoneSizIndex ).ActualZoneNum == Sys( SysIndex ).ActualZoneNum ) {
 							if ( FinalZoneSizing( ZoneSizIndex ).ZoneSecondaryRecirculation > 0.0 ) {
@@ -1400,7 +1400,6 @@ namespace SingleDuct {
 							}
 						}
 					}
-					SizLoop_loop: ;
 				}
 				SizLoop_exit: ;
 			}
@@ -1484,15 +1483,15 @@ namespace SingleDuct {
 		int SysIndex;
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
 		Real64 SteamTemp;
 		Real64 SteamDensity;
 		Real64 rho;
 		bool errFlag;
 
-		static FArray1D_bool PlantLoopScanFlag;
+		static Array1D_bool PlantLoopScanFlag;
 
 		// FLOW:
 
@@ -3116,7 +3115,7 @@ namespace SingleDuct {
 		Real64 UnitFlowToler; // flow rate tolerance
 		Real64 QDelivered;
 		Real64 FracDelivered;
-		FArray1D< Real64 > Par( 11 );
+		Array1D< Real64 > Par( 11 );
 		int SolFlag;
 		Real64 ErrTolerance;
 		Real64 MaxSteamCap; // steam coil capacity at full load
@@ -3746,7 +3745,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSCoolingResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3820,7 +3819,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHWNoFanResidual(
 		Real64 const HWMassFlow, // hot water mass flow rate [kg/s]
-		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3913,7 +3912,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHWFanOnResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3987,7 +3986,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHCFanOnResidual(
 		Real64 const HeatingFrac, // fraction of maximum heating output
-		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -4433,7 +4432,7 @@ namespace SingleDuct {
 
 			// Air Terminal inlet node must be the same as a zone exhaust node
 			ZoneNodeNotFound = true;
-			ControlledZoneLoop: for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
 					if ( SysATMixer( InletATMixerNum ).SecInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
@@ -4449,7 +4448,6 @@ namespace SingleDuct {
 						goto ControlledZoneLoop_exit;
 					}
 				}
-				ControlledZoneLoop_loop: ;
 			}
 			ControlledZoneLoop_exit: ;
 			if ( ZoneNodeNotFound ) {
@@ -4508,7 +4506,7 @@ namespace SingleDuct {
 
 			// Air Terminal outlet node must be the same as a zone inlet node
 			ZoneNodeNotFound = true;
-			ControlZoneLoop: for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 					if ( SysATMixer( SupplyATMixerNum ).MixedAirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
@@ -4524,7 +4522,6 @@ namespace SingleDuct {
 						goto ControlZoneLoop_exit;
 					}
 				}
-				ControlZoneLoop_loop: ;
 			}
 			ControlZoneLoop_exit: ;
 			if ( ZoneNodeNotFound ) {

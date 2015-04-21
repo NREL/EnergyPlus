@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -58,7 +58,6 @@ namespace OutsideEnergySources {
 	using DataPlant::TypeOf_PurchChilledWater;
 	using DataPlant::ScanPlantLoopsForObject;
 
-
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const EnergyType_DistrictHeating( 1 );
@@ -72,8 +71,8 @@ namespace OutsideEnergySources {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
 
 	// Object Data
-	FArray1D< OutsideEnergySourceSpecs > EnergySource;
-	FArray1D< ReportVars > EnergySourceReport;
+	Array1D< OutsideEnergySourceSpecs > EnergySource;
+	Array1D< ReportVars > EnergySourceReport;
 
 	// Functions
 
@@ -493,18 +492,18 @@ namespace OutsideEnergySources {
 	// *****************************************************************************
 
 	void
-	SizeDistrictEnergy( 
-		int const EnergySourceNum 
+	SizeDistrictEnergy(
+		int const EnergySourceNum
 	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Daeho Kang
 		//       DATE WRITTEN   April 2014
-		//       MODIFIED       
+		//       MODIFIED
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		//  This subroutine is for sizing capacities of district cooling and heating objects. 
+		//  This subroutine is for sizing capacities of district cooling and heating objects.
 
 		// USE STATEMENTS:
 		using DataSizing::AutoSize;
@@ -545,18 +544,18 @@ namespace OutsideEnergySources {
 				if ( EnergySource( EnergySourceNum ).NomCapWasAutoSized ) {
 					EnergySource( EnergySourceNum ).NomCap = NomCapDes;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
+						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
 							"Design Size Nominal Capacity [W]", NomCapDes );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
+						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
 							"Initial Design Size Nominal Capacity [W]", NomCapDes );
 					}
 				} else {  // Hard-size with sizing data
 					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 && NomCapDes > 0.0 ) {
 						NomCapUser = EnergySource( EnergySourceNum ).NomCap;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
+							ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
 								"Design Size Nominal Capacity [W]", NomCapDes, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( NomCapDes - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
@@ -576,10 +575,10 @@ namespace OutsideEnergySources {
 				ShowSevereError( "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in District" + typeName + " object=" + EnergySource( EnergySourceNum ).Name );
 				ErrorsFound = true;
-			} 
+			}
 			if ( ! EnergySource( EnergySourceNum ).NomCapWasAutoSized && EnergySource( EnergySourceNum ).NomCap > 0.0 && PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
-						"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
+				ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
+				 "User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
 			}
 		}
 		if ( ErrorsFound ) {

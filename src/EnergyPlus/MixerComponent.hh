@@ -2,8 +2,7 @@
 #define MixerComponent_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,7 +25,7 @@ namespace MixerComponent {
 	extern int LoopInletNode;
 	extern int LoopOutletNode;
 	extern bool GetInputFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
 
@@ -46,14 +45,14 @@ namespace MixerComponent {
 		Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
 		bool InitFlag;
 		int NumInletNodes;
-		FArray1D_int InletNode;
-		FArray1D< Real64 > InletMassFlowRate;
-		FArray1D< Real64 > InletMassFlowRateMaxAvail;
-		FArray1D< Real64 > InletMassFlowRateMinAvail;
-		FArray1D< Real64 > InletTemp;
-		FArray1D< Real64 > InletHumRat;
-		FArray1D< Real64 > InletEnthalpy;
-		FArray1D< Real64 > InletPressure;
+		Array1D_int InletNode;
+		Array1D< Real64 > InletMassFlowRate;
+		Array1D< Real64 > InletMassFlowRateMaxAvail;
+		Array1D< Real64 > InletMassFlowRateMinAvail;
+		Array1D< Real64 > InletTemp;
+		Array1D< Real64 > InletHumRat;
+		Array1D< Real64 > InletEnthalpy;
+		Array1D< Real64 > InletPressure;
 
 		// Default Constructor
 		MixerConditions() :
@@ -82,14 +81,14 @@ namespace MixerComponent {
 			Real64 const OutletMassFlowRateMinAvail, // [kg/Sec]
 			bool const InitFlag,
 			int const NumInletNodes,
-			FArray1_int const & InletNode,
-			FArray1< Real64 > const & InletMassFlowRate,
-			FArray1< Real64 > const & InletMassFlowRateMaxAvail,
-			FArray1< Real64 > const & InletMassFlowRateMinAvail,
-			FArray1< Real64 > const & InletTemp,
-			FArray1< Real64 > const & InletHumRat,
-			FArray1< Real64 > const & InletEnthalpy,
-			FArray1< Real64 > const & InletPressure
+			Array1_int const & InletNode,
+			Array1< Real64 > const & InletMassFlowRate,
+			Array1< Real64 > const & InletMassFlowRateMaxAvail,
+			Array1< Real64 > const & InletMassFlowRateMinAvail,
+			Array1< Real64 > const & InletTemp,
+			Array1< Real64 > const & InletHumRat,
+			Array1< Real64 > const & InletEnthalpy,
+			Array1< Real64 > const & InletPressure
 		) :
 			MixerName( MixerName ),
 			OutletTemp( OutletTemp ),
@@ -115,7 +114,7 @@ namespace MixerComponent {
 	};
 
 	// Object Data
-	extern FArray1D< MixerConditions > MixerCond;
+	extern Array1D< MixerConditions > MixerCond;
 
 	// Functions
 
@@ -173,15 +172,15 @@ namespace MixerComponent {
 	// Beginning of Utility subroutines for the Mixer Component
 	// *****************************************************************************
 	void
-		GetZoneMixerIndex(
+	GetZoneMixerIndex(
 		std::string const & MixerName,
 		int & MixerIndex,
 		bool & ErrorsFound,
-		Optional_string_const ThisObjectType
-		);
+		std::string const & ThisObjectType = std::string()
+	);
 
-		// End of Utility subroutines for the Mixer Component
-		// *****************************************************************************
+	// End of Utility subroutines for the Mixer Component
+	// *****************************************************************************
 
 	//     NOTICE
 

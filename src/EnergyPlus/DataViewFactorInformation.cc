@@ -43,7 +43,7 @@ namespace DataViewFactorInformation {
 	// MODULE VARIABLE DECLARATIONS:
 
 	// Object Data
-	FArray1D< ZoneViewFactorInformation > ZoneInfo;
+	Array1D< ZoneViewFactorInformation > ZoneInfo;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

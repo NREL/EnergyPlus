@@ -25,7 +25,7 @@ using namespace ObjexxFCL;
 TEST( ProcessOAControllerTest, Test1 )
 {
 	ShowMessage( "Begin Test: ProcessOAControllerTest, Test1" );
-	
+
 // Test input processing of portion of Controller:OutdoorAir object
 	//  Controller:OutdoorAir,
 	//    OA Controller 1,         !- Name
@@ -45,7 +45,7 @@ TEST( ProcessOAControllerTest, Test1 )
 	OAController.allocate( NumOfOAControllers );
 
 	// Set up OutdoorAir:Node list
-	GetOutAirNodesInput( );
+	GetOutAirNodesInput();
 	OutsideAirNodeList.allocate( 1 );
 	OutsideAirNodeList( 1 ) = 2; // Nodes will be registered in the order they appear in the firat controller object, so the OA actuator node will be node 5
 
@@ -126,7 +126,7 @@ TEST( ProcessOAControllerTest, Test1 )
 	lNumericFieldBlanks( 6 ) = true;
 	cAlphaArgs( 9 ) = "NoLockout";
 	cAlphaArgs( 10 ) = "ProportionalMinimum";
-	lAlphaFieldBlanks( 11 ) = true;	
+	lAlphaFieldBlanks( 11 ) = true;
 	lAlphaFieldBlanks( 12 ) = true;
 	lAlphaFieldBlanks( 13 ) = true;
 	lAlphaFieldBlanks( 14 ) = true;

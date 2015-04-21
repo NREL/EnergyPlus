@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -22,9 +22,6 @@
 #include <type_traits>
 
 namespace ObjexxFCL {
-
-// Forward
-class Fstring;
 
 inline
 int
@@ -145,13 +142,6 @@ kind( std::string const & )
 	return 1;
 }
 
-inline
-int
-kind( Fstring const & )
-{
-	return 1;
-}
-
 template< typename T >
 inline
 int
@@ -190,9 +180,6 @@ selected_char_kind( char const & )
 
 int
 selected_char_kind( std::string const & s );
-
-int
-selected_char_kind( Fstring const & s );
 
 template< typename S >
 inline

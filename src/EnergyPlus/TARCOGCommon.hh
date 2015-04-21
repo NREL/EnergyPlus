@@ -2,8 +2,8 @@
 #define TARCOGCommon_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2A.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -32,29 +32,29 @@ namespace TARCOGCommon {
 	void
 	matrixQBalance(
 		int const nlayer,
-		FArray2A< Real64 > a,
-		FArray1A< Real64 > b,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const hcgas,
+		Array2A< Real64 > a,
+		Array1A< Real64 > b,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const hcgas,
 		Real64 const hcout,
 		Real64 const hcin,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const qv,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const qv,
 		Real64 const Tin,
 		Real64 const Tout,
 		Real64 const Gin,
 		Real64 const Gout,
-		FArray1A< Real64 > const theta,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const rir,
-		FArray1A< Real64 > const emis
+		Array1A< Real64 > const theta,
+		Array1A< Real64 > const tir,
+		Array1A< Real64 > const rir,
+		Array1A< Real64 > const emis
 	);
 
 	void
 	EquationsSolver(
-		FArray2A< Real64 > a,
-		FArray1A< Real64 > b,
+		Array2A< Real64 > a,
+		Array1A< Real64 > b,
 		int const n,
 		int & nperr,
 		std::string & ErrorMessage
@@ -62,9 +62,9 @@ namespace TARCOGCommon {
 
 	void
 	ludcmp(
-		FArray2A< Real64 > a,
+		Array2A< Real64 > a,
 		int const n,
-		FArray1A_int indx,
+		Array1A_int indx,
 		Real64 & d,
 		int & nperr,
 		std::string & ErrorMessage
@@ -72,10 +72,10 @@ namespace TARCOGCommon {
 
 	void
 	lubksb(
-		FArray2A< Real64 > const a,
+		Array2A< Real64 > const a,
 		int const n,
-		FArray1A_int const indx,
-		FArray1A< Real64 > b
+		Array1A_int const indx,
+		Array1A< Real64 > b
 	);
 
 	Real64

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -84,8 +84,8 @@ namespace MicroCHPElectricGenerator {
 
 	// DERIVED TYPE DEFINITIONS
 	bool GetMicroCHPInput( true ); // When TRUE, calls subroutine to read input file.
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Combustion ElectricGenerator
 
@@ -228,8 +228,8 @@ namespace MicroCHPElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 25 ); // character string data
-		FArray1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
+		Array1D_string AlphArray( 25 ); // character string data
+		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -560,8 +560,8 @@ namespace MicroCHPElectricGenerator {
 		static int DynaCntrlNum( 0 );
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
 
 		bool errFlag;
 		Real64 mdot; // local temporary for mass flow rate

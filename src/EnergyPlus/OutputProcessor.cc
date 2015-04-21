@@ -9,7 +9,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -121,7 +121,7 @@ namespace OutputProcessor {
 	static gio::Fmt DailyStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',A)" );
 	static gio::Fmt MonthlyStampFormat( "(A,',',A,',',i2)" );
 	static gio::Fmt RunPeriodStampFormat( "(A,',',A)" );
-	FArray1D_string const DayTypes( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
+	Array1D_string const DayTypes( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 	static std::string const BlankString;
 	int const UnitsStringLength( 16 );
 
@@ -144,7 +144,7 @@ namespace OutputProcessor {
 
 	int InstMeterCacheSize( 1000 ); // the maximum size of the instant meter cache used in GetInstantMeterValue
 	int InstMeterCacheSizeInc( 1000 ); // the increment for the instant meter cache used in GetInstantMeterValue
-	FArray1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
+	Array1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
 	int InstMeterCacheLastUsed( 0 ); // the last item in the instant meter cache used
 
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -172,17 +172,17 @@ namespace OutputProcessor {
 	int NumHoursInDay( 24 );
 	int NumHoursInMonth( 0 );
 	int NumHoursInSim( 0 );
-	FArray1D_int ReportList;
+	Array1D_int ReportList;
 	int NumReportList( 0 );
 	int NumExtraVars( 0 );
-	FArray2D_string FreqNotice( {-1,4}, {1,2} ); // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
+	Array2D_string FreqNotice( {1,2}, {-1,4} ); // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
 
 	int NumOfReqVariables( 0 ); // Current number of Requested Report Variables
 
 	int NumVarMeterArrays( 0 ); // Current number of Arrays pointing to meters
 
 	int NumEnergyMeters( 0 ); // Current number of Energy Meters
-	FArray1D< Real64 > MeterValue; // This holds the current timestep value for each meter.
+	Array1D< Real64 > MeterValue; // This holds the current timestep value for each meter.
 
 	int TimeStepStampReportNbr; // TimeStep and Hourly Report number
 	std::string TimeStepStampReportChr; // TimeStep and Hourly Report number (character -- for printing)
@@ -207,18 +207,18 @@ namespace OutputProcessor {
 	//PUBLIC  SetReportNow
 
 	// Object Data
-	FArray1D< TimeSteps > TimeValue( 2 ); // Pointers to the actual TimeStep variables
-	FArray1D< RealVariableType > RVariableTypes; // Variable Types structure (use NumOfRVariables to traverse)
-	FArray1D< IntegerVariableType > IVariableTypes; // Variable Types structure (use NumOfIVariables to traverse)
-	FArray1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
+	Array1D< TimeSteps > TimeValue( 2 ); // Pointers to the actual TimeStep variables
+	Array1D< RealVariableType > RVariableTypes; // Variable Types structure (use NumOfRVariables to traverse)
+	Array1D< IntegerVariableType > IVariableTypes; // Variable Types structure (use NumOfIVariables to traverse)
+	Array1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
 	Reference< RealVariables > RVariable;
 	Reference< IntegerVariables > IVariable;
 	Reference< RealVariables > RVar;
 	Reference< IntegerVariables > IVar;
-	FArray1D< ReqReportVariables > ReqRepVars;
-	FArray1D< MeterArrayType > VarMeterArrays;
-	FArray1D< MeterType > EnergyMeters;
-	FArray1D< EndUseCategoryType > EndUseCategory;
+	Array1D< ReqReportVariables > ReqRepVars;
+	Array1D< MeterArrayType > VarMeterArrays;
+	Array1D< MeterType > EnergyMeters;
+	Array1D< EndUseCategoryType > EndUseCategory;
 
 	// Routines tagged on the end of this module:
 	//  AddToOutputVariableList
@@ -291,18 +291,18 @@ namespace OutputProcessor {
 		// First index is the frequency designation (-1 = each call, etc)
 		// Second index is the variable type (1=Average, 2=Sum)
 		// Note, Meters always report like Average (with min/max, etc) for hourly and above
-		FreqNotice( -1, 1 ) = " !Each Call";
-		FreqNotice( 0, 1 ) = " !TimeStep";
+		FreqNotice( 1, -1 ) = " !Each Call";
+		FreqNotice( 1, 0 ) = " !TimeStep";
 		FreqNotice( 1, 1 ) = " !Hourly";
-		FreqNotice( 2, 1 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
-		FreqNotice( 3, 1 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
-		FreqNotice( 4, 1 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
-		FreqNotice( -1, 2 ) = " !Each Call";
-		FreqNotice( 0, 2 ) = " !TimeStep";
-		FreqNotice( 1, 2 ) = " !Hourly";
+		FreqNotice( 1, 2 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
+		FreqNotice( 1, 3 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+		FreqNotice( 1, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
+		FreqNotice( 2, -1 ) = " !Each Call";
+		FreqNotice( 2, 0 ) = " !TimeStep";
+		FreqNotice( 2, 1 ) = " !Hourly";
 		FreqNotice( 2, 2 ) = " !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]";
-		FreqNotice( 3, 2 ) = " !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
-		FreqNotice( 4, 2 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
+		FreqNotice( 2, 3 ) = " !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+		FreqNotice( 2, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
 
 		ReportList.allocate( 500 );
 		NumReportList = 500;
@@ -556,7 +556,7 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		FArray1D_int TmpReportList;
+		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
@@ -633,7 +633,7 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		FArray1D_int TmpReportList;
+		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;
@@ -731,12 +731,12 @@ namespace OutputProcessor {
 		int Item;
 		static bool ErrorsFound( false ); // If errors detected in input
 		std::string cCurrentModuleObject;
-		FArray1D_string cAlphaArgs( 4 );
-		FArray1D_string cAlphaFieldNames( 4 );
-		FArray1D_bool lAlphaFieldBlanks( 4 );
-		FArray1D< Real64 > rNumericArgs( 1 );
-		FArray1D_string cNumericFieldNames( 1 );
-		FArray1D_bool lNumericFieldBlanks( 1 );
+		Array1D_string cAlphaArgs( 4 );
+		Array1D_string cAlphaFieldNames( 4 );
+		Array1D_bool lAlphaFieldBlanks( 4 );
+		Array1D< Real64 > rNumericArgs( 1 );
+		Array1D_string cNumericFieldNames( 1 );
+		Array1D_bool lNumericFieldBlanks( 1 );
 
 		// Formats
 		static gio::Fmt Format_800( "('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')" );
@@ -747,7 +747,7 @@ namespace OutputProcessor {
 			DetermineFrequency( cMinReportFrequency, Item ); // Use local variable Item so as not to possibly confuse things
 			MinReportFrequency = max( MinReportFrequency, Item );
 			gio::write( OutputFileInits, Format_800 );
-			gio::write( OutputFileInits, Format_801 ) << FreqNotice( MinReportFrequency, 1 ) << cMinReportFrequency;
+			gio::write( OutputFileInits, Format_801 ) << FreqNotice( 1, MinReportFrequency ) << cMinReportFrequency;
 		}
 
 		cCurrentModuleObject = "Output:Variable";
@@ -840,11 +840,11 @@ namespace OutputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const PossibleFreq( {-1,6}, { "deta", "time", "hour", "dail", "mont", "runp", "envi", "annu" } );
+		static Array1D_string const PossibleFreq( {-1,6}, { "deta", "time", "hour", "dail", "mont", "runp", "envi", "annu" } );
 		//=(/'detail','Timestep','Hourly','Daily','Monthly','RunPeriod','Environment','Annual'/)
-		static FArray1D_string const ExactFreqString( {-1,6}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Environment", "Annual" } );
+		static Array1D_string const ExactFreqString( {-1,6}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Environment", "Annual" } );
 
-		static FArray1D_int const FreqValues( {-1,6}, { -1, 0, 1, 2, 3, 4, 4, 4 } );
+		static Array1D_int const FreqValues( {-1,6}, { -1, 0, 1, 2, 3, 4, 4, 4 } );
 		// note: runperiod, environment, and annual are synonomous
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -1060,8 +1060,8 @@ namespace OutputProcessor {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_string ZoneIndexTypes( 3 );
-		static FArray1D_string SystemIndexTypes( 3 );
+		static Array1D_string ZoneIndexTypes( 3 );
+		static Array1D_string SystemIndexTypes( 3 );
 		static bool Initialized( false );
 		int Item;
 
@@ -1186,8 +1186,8 @@ namespace OutputProcessor {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string StateVariables( 3 );
-		FArray1D_string NonStateVariables( 4 );
+		Array1D_string StateVariables( 3 );
+		Array1D_string NonStateVariables( 4 );
 		static bool Initialized( false );
 		int Item;
 
@@ -1492,8 +1492,8 @@ namespace OutputProcessor {
 		bool IsBlank;
 		int fldIndex;
 		bool KeyIsStar;
-		FArray1D_string NamesOfKeys; // Specific key name
-		FArray1D_int IndexesForKeyVar; // Array index
+		Array1D_string NamesOfKeys; // Specific key name
+		Array1D_int IndexesForKeyVar; // Array index
 		std::string UnitsVar; // Units sting, may be blank
 		std::string MeterUnits; // Units sting, may be blank
 		int KeyCount;
@@ -1503,10 +1503,10 @@ namespace OutputProcessor {
 		int iKey;
 		int iKey1;
 		bool MeterCreated;
-		FArray1D_int VarsOnCustomMeter;
+		Array1D_int VarsOnCustomMeter;
 		int MaxVarsOnCustomMeter;
 		int NumVarsOnCustomMeter;
-		FArray1D_int VarsOnSourceMeter;
+		Array1D_int VarsOnSourceMeter;
 		int MaxVarsOnSourceMeter;
 		int NumVarsOnSourceMeter;
 		int iOnMeter;
@@ -2755,9 +2755,9 @@ namespace OutputProcessor {
 	UpdateMeterValues(
 		Real64 const TimeStepValue, // Value of this variable at the current time step.
 		int const NumOnMeters, // Number of meters this variable is "on".
-		FArray1S_int const OnMeters, // Which meters this variable is on (index values)
+		Array1S_int const OnMeters, // Which meters this variable is on (index values)
 		Optional_int_const NumOnCustomMeters, // Number of custom meters this variable is "on".
-		Optional< FArray1S_int const > OnCustomMeters // Which custom meters this variable is on (index values)
+		Optional< Array1S_int const > OnCustomMeters // Which custom meters this variable is on (index values)
 	)
 	{
 
@@ -3851,7 +3851,7 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string FreqString;
 
-		FreqString = FreqNotice( reportingInterval, storeType );
+		FreqString = FreqNotice( storeType, reportingInterval );
 
 		if ( present( ScheduleName ) ) {
 			FreqString += "," + ScheduleName;
@@ -3932,7 +3932,7 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string::size_type lenString;
 
-		std::string const FreqString( FreqNotice( reportingInterval, storeType ) );
+		std::string const FreqString( FreqNotice( storeType, reportingInterval ) );
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( ! cumulativeMeterFlag ) {
@@ -4000,7 +4000,7 @@ namespace OutputProcessor {
 		}
 
 		static std::string const keyedValueStringCum( "Cumulative " );
-		static std::string const keyedValueStringNon( "" );
+		static std::string const keyedValueStringNon;
 		std::string const & keyedValueString( cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon );
 
 		if ( sqlite ) {
@@ -6008,7 +6008,7 @@ GenOutputVariablesAuditReport()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static FArray1D_string const ReportFrequency( {-1,4}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "Annual" } );
+	static Array1D_string const ReportFrequency( {-1,4}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "Annual" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -6122,8 +6122,8 @@ UpdateMeterReporting()
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
-	FArray1D_string Alphas( 2 );
-	FArray1D< Real64 > Numbers( 1 );
+	Array1D_string Alphas( 2 );
+	Array1D< Real64 > Numbers( 1 );
 	int NumAlpha;
 	int NumNumbers;
 	int IOStat;
@@ -6562,8 +6562,8 @@ GetMeterIndex( std::string const & MeterName )
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
 	// Valid Meter names because matching case insensitive
-	static FArray1D_string ValidMeterNames;
-	static FArray1D_int iValidMeterNames;
+	static Array1D_string ValidMeterNames;
+	static Array1D_int iValidMeterNames;
 	static int NumValidMeters( 0 );
 	static bool FirstCall( true );
 	int Found;
@@ -7111,16 +7111,16 @@ void
 GetMeteredVariables(
 	std::string const & ComponentType, // Given Component Type
 	std::string const & ComponentName, // Given Component Name (user defined)
-	FArray1S_int VarIndexes, // Variable Numbers
-	FArray1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
-	FArray1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
-	FArray1S_string UnitsStrings, // UnitsStrings for each variable
-	FArray1S_int ResourceTypes, // ResourceTypes for each variable
-	Optional< FArray1S_string > EndUses, // EndUses for each variable
-	Optional< FArray1S_string > Groups, // Groups for each variable
-	Optional< FArray1S_string > Names, // Variable Names for each variable
+	Array1S_int VarIndexes, // Variable Numbers
+	Array1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
+	Array1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
+	Array1S_string UnitsStrings, // UnitsStrings for each variable
+	Array1S_int ResourceTypes, // ResourceTypes for each variable
+	Optional< Array1S_string > EndUses, // EndUses for each variable
+	Optional< Array1S_string > Groups, // Groups for each variable
+	Optional< Array1S_string > Names, // Variable Names for each variable
 	Optional_int NumFound, // Number Found
-	Optional< FArray1S_int > VarIDs // Variable Report Numbers
+	Optional< Array1S_int > VarIDs // Variable Report Numbers
 )
 {
 
@@ -7294,7 +7294,7 @@ GetVariableKeyCountandType(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static FArray1D_int keyVarIndexes; // Array index for specific key name
+	static Array1D_int keyVarIndexes; // Array index for specific key name
 	static int curKeyVarIndexLimit; // current limit for keyVarIndexes
 	static bool InitFlag( true ); // for initting the keyVarIndexes array
 	int Loop; // Loop counters
@@ -7305,8 +7305,8 @@ GetVariableKeyCountandType(
 	bool Duplicate; // True if keyname is a duplicate
 	std::string VarKeyPlusName; // Full variable name including keyname and units
 	std::string varNameUpper; // varName pushed to all upper case
-	static FArray1D_string varNames; // stored variable names
-	static FArray1D_int ivarNames; // pointers for sorted information
+	static Array1D_string varNames; // stored variable names
+	static Array1D_int ivarNames; // pointers for sorted information
 	static int numVarNames; // number of variable names
 
 	// INITIALIZATIONS
@@ -7442,8 +7442,8 @@ void
 GetVariableKeys(
 	std::string const & varName, // Standard variable name
 	int const varType, // 1=integer, 2=real, 3=meter
-	FArray1S_string keyNames, // Specific key name
-	FArray1S_int keyVarIndexes // Array index for
+	Array1S_string keyNames, // Specific key name
+	Array1S_int keyVarIndexes // Array index for
 )
 {
 
@@ -7699,7 +7699,7 @@ InitPollutionMeterReporting( std::string const & ReportFreqName )
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	//             Now for the Pollution Meters
-	static FArray1D_string const PollutionMeters( {1,29}, { "Electricity:Facility", "Diesel:Facility", "DistrictCooling:Facility", "DistrictHeating:Facility", "Gas:Facility", "GASOLINE:Facility", "COAL:Facility", "FuelOil#1:Facility", "FuelOil#2:Facility", "Propane:Facility", "ElectricityProduced:Facility", "Steam:Facility", "CO2:Facility", "CO:Facility", "CH4:Facility", "NOx:Facility", "N2O:Facility", "SO2:Facility", "PM:Facility", "PM10:Facility", "PM2.5:Facility", "NH3:Facility", "NMVOC:Facility", "Hg:Facility", "Pb:Facility", "WaterEnvironmentalFactors:Facility", "Nuclear High:Facility", "Nuclear Low:Facility", "Carbon Equivalent:Facility" } );
+	static Array1D_string const PollutionMeters( {1,29}, { "Electricity:Facility", "Diesel:Facility", "DistrictCooling:Facility", "DistrictHeating:Facility", "Gas:Facility", "GASOLINE:Facility", "COAL:Facility", "FuelOil#1:Facility", "FuelOil#2:Facility", "Propane:Facility", "ElectricityProduced:Facility", "Steam:Facility", "CO2:Facility", "CO:Facility", "CH4:Facility", "NOx:Facility", "N2O:Facility", "SO2:Facility", "PM:Facility", "PM10:Facility", "PM2.5:Facility", "NH3:Facility", "NMVOC:Facility", "Hg:Facility", "Pb:Facility", "WaterEnvironmentalFactors:Facility", "Nuclear High:Facility", "Nuclear Low:Facility", "Carbon Equivalent:Facility" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -7911,9 +7911,9 @@ ProduceRDDMDD()
 		mdd_stream << "! Output:Meter Objects (applicable to this run)" << '\n';
 	}
 
-	FArray1D_string VariableNames( NumVariablesForOutput );
+	Array1D_string VariableNames( NumVariablesForOutput );
 	VariableNames = DDVariableTypes( {1,NumVariablesForOutput} ).VarNameOnly();
-	FArray1D_int iVariableNames( NumVariablesForOutput );
+	Array1D_int iVariableNames( NumVariablesForOutput );
 
 	if ( SortByName ) {
 		SetupAndSort( VariableNames, iVariableNames );

@@ -17,7 +17,7 @@ using namespace ObjexxFCL;
 TEST( VectorsTest, AreaPolygon )
 {
 	ShowMessage( "Begin Test: VectorsTest, AreaPolygon" );
-	FArray1D< Vector > a( 4 ); // 3 x 7 rectangle
+	Array1D< Vector > a( 4 ); // 3 x 7 rectangle
 	a( 1 ).x = a( 1 ).y = a( 1 ).z = 0.0;
 	a( 2 ).x = 3.0;
 	a( 2 ).y = a( 2 ).z = 0.0;

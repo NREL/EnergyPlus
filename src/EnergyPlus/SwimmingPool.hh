@@ -2,7 +2,7 @@
 #define SwimmingPool_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,19 +17,19 @@ namespace SwimmingPool {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	//na
-	
+
 	// MODULE VARIABLE DECLARATIONS:
 	// Standard, run-of-the-mill variables...
 	extern int NumSwimmingPools; // Number of swimming pools
-	extern FArray1D< int > SurfaceToPoolIndex; // Average source over the time step for a particular radiant surface
-	extern FArray1D< Real64 > QPoolSrcAvg; // Average source over the time step for a particular pool
-	extern FArray1D< Real64 > HeatTransCoefsAvg; // Average denominator term over the time step for a particular pool
-	extern FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	extern Array1D< int > SurfaceToPoolIndex; // Average source over the time step for a particular radiant surface
+	extern Array1D< Real64 > QPoolSrcAvg; // Average source over the time step for a particular pool
+	extern Array1D< Real64 > HeatTransCoefsAvg; // Average denominator term over the time step for a particular pool
+	extern Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QPoolSrcAvg locally
-	extern FArray1D< Real64 > LastQPoolSrc; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastQPoolSrc; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
 
 	// Types
 
@@ -282,7 +282,7 @@ namespace SwimmingPool {
 	};
 
 	// Object Data
-	extern FArray1D< SwimmingPoolData > Pool;
+	extern Array1D< SwimmingPoolData > Pool;
 
 	// Functions
 
@@ -312,16 +312,16 @@ namespace SwimmingPool {
 
 	void
 	UpdatePoolSourceValAvg( bool & SwimmingPoolOn ); // .TRUE. if the swimming pool has "run" this zone time step
-	
+
 	Real64
 	SumHATsurf( int const ZoneNum ); // Zone number
-	
+
 	void
-	ReportSwimmingPool( );
+	ReportSwimmingPool();
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -38,7 +38,7 @@ TEST_F( DataPlantTest, AnyPlantLoopSidesNeedSim )
 {
 	ShowMessage( "Begin Test: DataPlantTest, AnyPlantLoopSidesNeedSim" );
 
-	EXPECT_TRUE( AnyPlantLoopSidesNeedSim( ) ); // SimLoopSideNeeded is set to true in default ctor
+	EXPECT_TRUE( AnyPlantLoopSidesNeedSim() ); // SimLoopSideNeeded is set to true in default ctor
 	SetAllPlantSimFlagsToValue( false ); // Set all SimLoopSideNeeded to false
 	EXPECT_FALSE( AnyPlantLoopSidesNeedSim() );
 }

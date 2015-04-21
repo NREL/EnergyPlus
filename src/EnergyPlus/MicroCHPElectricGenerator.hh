@@ -2,7 +2,7 @@
 #define MicroCHPElectricGenerator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,8 +16,8 @@ namespace MicroCHPElectricGenerator {
 
 	// DERIVED TYPE DEFINITIONS
 	extern bool GetMicroCHPInput; // When TRUE, calls subroutine to read input file.
-	extern FArray1D_bool CheckEquipName;
-	extern FArray1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Combustion ElectricGenerator
 

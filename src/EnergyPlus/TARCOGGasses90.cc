@@ -3,6 +3,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -53,14 +55,14 @@ namespace TARCOGGasses90 {
 	void
 	GASSES90(
 		Real64 const tmean,
-		FArray1A_int const iprop,
-		FArray1A< Real64 > const frct,
+		Array1A_int const iprop,
+		Array1A< Real64 > const frct,
 		Real64 const pres,
 		int const nmix,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 & con,
 		Real64 & visc,
 		Real64 & dens,
@@ -78,9 +80,9 @@ namespace TARCOGGasses90 {
 		iprop.dim( maxgas );
 		frct.dim( maxgas );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 
 		// Locals
 
@@ -89,15 +91,15 @@ namespace TARCOGGasses90 {
 		int i;
 		int j;
 
-		FArray1D< Real64 > fvis( maxgas );
-		FArray1D< Real64 > fcon( maxgas );
-		FArray1D< Real64 > fdens( maxgas );
-		FArray1D< Real64 > fcp( maxgas );
-		FArray1D< Real64 > kprime( maxgas );
-		FArray1D< Real64 > kdblprm( maxgas );
-		FArray1D< Real64 > mukpdwn( maxgas );
-		FArray1D< Real64 > kpdown( maxgas );
-		FArray1D< Real64 > kdpdown( maxgas );
+		Array1D< Real64 > fvis( maxgas );
+		Array1D< Real64 > fcon( maxgas );
+		Array1D< Real64 > fdens( maxgas );
+		Array1D< Real64 > fcp( maxgas );
+		Array1D< Real64 > kprime( maxgas );
+		Array1D< Real64 > kdblprm( maxgas );
+		Array1D< Real64 > mukpdwn( maxgas );
+		Array1D< Real64 > kpdown( maxgas );
+		Array1D< Real64 > kdpdown( maxgas );
 		Real64 molmix;
 		Real64 cpmixm;
 		Real64 kpmix;
@@ -113,7 +115,7 @@ namespace TARCOGGasses90 {
 
 		//Simon: TODO: this is used for EN673 calculations and it is not assigned properly. Check this
 		//REAL(r64), dimension(maxgas, 3) :: xgrho //Autodesk:Unused
-		FArray2D< Real64 > grho( maxgas, 3 );
+		Array2D< Real64 > grho( 3, maxgas );
 
 		//REAL(r64) gaslaw
 		//DATA gaslaw /8314.51d0/   ! Molar gas constant in Joules/(kmol*K)
@@ -136,9 +138,9 @@ namespace TARCOGGasses90 {
 		grho = 0.0;
 
 		Real64 const tmean_2( pow_2( tmean ) );
-		fcon( 1 ) = xgcon( iprop( 1 ), 1 ) + xgcon( iprop( 1 ), 2 ) * tmean + xgcon( iprop( 1 ), 3 ) * tmean_2;
-		fvis( 1 ) = xgvis( iprop( 1 ), 1 ) + xgvis( iprop( 1 ), 2 ) * tmean + xgvis( iprop( 1 ), 3 ) * tmean_2;
-		fcp( 1 ) = xgcp( iprop( 1 ), 1 ) + xgcp( iprop( 1 ), 2 ) * tmean + xgcp( iprop( 1 ), 3 ) * tmean_2;
+		fcon( 1 ) = xgcon( 1, iprop( 1 ) ) + xgcon( 2, iprop( 1 ) ) * tmean + xgcon( 3, iprop( 1 ) ) * tmean_2;
+		fvis( 1 ) = xgvis( 1, iprop( 1 ) ) + xgvis( 2, iprop( 1 ) ) * tmean + xgvis( 3, iprop( 1 ) ) * tmean_2;
+		fcp( 1 ) = xgcp( 1, iprop( 1 ) ) + xgcp( 2, iprop( 1 ) ) * tmean + xgcp( 3, iprop( 1 ) ) * tmean_2;
 		// Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
 		fdens( 1 ) = pres * xwght( iprop( 1 ) ) / ( UniversalGasConst * tmean );
 		// Mollecular weights in kg/kmol
@@ -172,9 +174,9 @@ namespace TARCOGGasses90 {
 					return;
 				}
 				// calculate properties of mixture constituents:
-				fcon( i ) = xgcon( iprop( i ), 1 ) + xgcon( iprop( i ), 2 ) * tmean + xgcon( iprop( i ), 3 ) * tmean_2;
-				fvis( i ) = xgvis( iprop( i ), 1 ) + xgvis( iprop( i ), 2 ) * tmean + xgvis( iprop( i ), 3 ) * tmean_2;
-				fcp( i ) = xgcp( iprop( i ), 1 ) + xgcp( iprop( i ), 2 ) * tmean + xgcp( iprop( i ), 3 ) * tmean_2;
+				fcon( i ) = xgcon( 1, iprop( i ) ) + xgcon( 2, iprop( i ) ) * tmean + xgcon( 3, iprop( i ) ) * tmean_2;
+				fvis( i ) = xgvis( 1, iprop( i ) ) + xgvis( 2, iprop( i ) ) * tmean + xgvis( 3, iprop( i ) ) * tmean_2;
+				fcp( i ) = xgcp( 1, iprop( i ) ) + xgcp( 2, iprop( i ) ) * tmean + xgcp( 3, iprop( i ) ) * tmean_2;
 				fdens( i ) = pres * xwght( iprop( i ) ) / ( UniversalGasConst * tmean );
 				if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
 					//fdens( i ) = grho( iprop( i ), 1 ) + grho( iprop( i ), 2 ) * tmean + grho( iprop( i ), 3 ) * pow_2( tmean );

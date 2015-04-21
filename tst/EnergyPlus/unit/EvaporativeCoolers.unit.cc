@@ -46,7 +46,7 @@ TEST( EvaporativeCoolers, CalcSecondaryAirOutletCondition )
 		QHXTotal,
 		QHXLatent
 	);
-	
+
 	// check outputs for evap cooler set off
 	EXPECT_DOUBLE_EQ( EvaporativeCoolers::EvapCond( EvapCoolNum ).SecOutletEnthalpy, EvaporativeCoolers::EvapCond( EvapCoolNum ).SecInletEnthalpy );
 	EXPECT_DOUBLE_EQ( 0.0, QHXLatent );
@@ -95,7 +95,7 @@ TEST( EvaporativeCoolers, CalcSecondaryAirOutletCondition )
 
 	// check outputs for wet operating condition
 	EXPECT_DOUBLE_EQ( 20.0, EvaporativeCoolers::EvapCond( EvapCoolNum ).SecOutletTemp );
-	EXPECT_DOUBLE_EQ( 47103.205375000471, EvaporativeCoolers::EvapCond( EvapCoolNum ).SecOutletEnthalpy );	
+	EXPECT_DOUBLE_EQ( 47103.205375000471, EvaporativeCoolers::EvapCond( EvapCoolNum ).SecOutletEnthalpy );
 	EXPECT_DOUBLE_EQ( QHXTotal, QHXLatent );
 
 	EvaporativeCoolers::EvapCond.deallocate();
@@ -104,7 +104,7 @@ TEST( EvaporativeCoolers, CalcSecondaryAirOutletCondition )
 
 TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
 {
-	
+
 	ShowMessage( "Begin Test: EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp" );
 
 	OutBaroPress = 101325.0;
@@ -123,7 +123,7 @@ TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
 	Real64 const EHumRatSec( 0.0075 );
 
 	// testing full capacity in dry operating mode
-	EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp( 
+	EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(
 	EvapCoolNum,
 	DryOrWetOperatingMode,
 	AirMassFlowSec,
@@ -147,7 +147,7 @@ TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
 
 	EXPECT_DOUBLE_EQ( 14.25, EvaporativeCoolers::EvapCond( EvapCoolNum ).OutletTemp );
 
-	EvaporativeCoolers::EvapCond.deallocate( );
+	EvaporativeCoolers::EvapCond.deallocate();
 
 }
 
@@ -187,7 +187,7 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 	PerfCurve( CurveNum ).Var1Max = 1.0;
 	PerfCurve( CurveNum ).Var2Min = 0;
 	PerfCurve( CurveNum ).Var2Max = 0;
-	
+
 	// make the call for dry full load operating condition
 	EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(
 		EvapCoolNum,
@@ -199,9 +199,9 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 
 	// set up arguments for wet modulated operating condition
 	DryWetMode = EvaporativeCoolers::WetModulated;
-	FlowRatio = 0.5;	
+	FlowRatio = 0.5;
 	EvaporativeCoolers::EvapCond( EvapCoolNum ).PartLoadFract = 0.5;
-	
+
 	// make the call for wet modulated operating condition
 	EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(
 	EvapCoolNum,
@@ -211,6 +211,6 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 	// check outputs for wet modulated operating condition
 	EXPECT_EQ( 150.0, EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerPower );
 
-	EvaporativeCoolers::EvapCond.deallocate( );
-	PerfCurve.deallocate( );
+	EvaporativeCoolers::EvapCond.deallocate();
+	PerfCurve.deallocate();
 }

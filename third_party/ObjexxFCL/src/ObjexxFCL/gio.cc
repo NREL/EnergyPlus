@@ -6,14 +6,13 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/Backspace.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/GlobalStreams.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/Stream.hh>
@@ -23,7 +22,10 @@
 // C++ Headers
 #include <cassert>
 #include <cstdio>
+#include <fstream>
 #include <iostream>
+#include <istream>
+#include <ostream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef _WIN32
@@ -121,13 +123,6 @@ open( Unit const unit, Name const & name, IOFlags & flags )
 
 // Open File on Specified Unit
 bool
-open( Unit const unit, Fstring const & name, IOFlags & flags )
-{
-	return open( unit, std::string( name.trimmed() ), flags );
-}
-
-// Open File on Specified Unit
-bool
 open( Unit const unit, Name const & name, std::ios_base::openmode const mode )
 {
 	IOFlags flags( IOFlags::handler() );
@@ -141,24 +136,10 @@ open( Unit const unit, Name const & name, std::ios_base::openmode const mode )
 
 // Open File on Specified Unit
 bool
-open( Unit const unit, Fstring const & name, std::ios_base::openmode const mode )
-{
-	return open( unit, std::string( name.trimmed() ), mode );
-}
-
-// Open File on Specified Unit
-bool
 open( Unit const unit, Name const & name )
 {
 	IOFlags flags( IOFlags::handler() );
 	return open( unit, name, flags );
-}
-
-// Open File on Specified Unit
-bool
-open( Unit const unit, Fstring const & name )
-{
-	return open( unit, std::string( name.trimmed() ) );
 }
 
 // Open Default File on Specified Unit
@@ -193,13 +174,6 @@ open( Name const & name, IOFlags & flags )
 
 // Open File and Return Unit
 Unit
-open( Fstring const & name, IOFlags & flags )
-{
-	return open( std::string( name.trimmed() ), flags );
-}
-
-// Open File and Return Unit
-Unit
 open( Name const & name, std::ios_base::openmode const mode )
 {
 	Unit const unit( streams().next_unit() );
@@ -209,25 +183,11 @@ open( Name const & name, std::ios_base::openmode const mode )
 
 // Open File and Return Unit
 Unit
-open( Fstring const & name, std::ios_base::openmode const mode )
-{
-	return open( std::string( name.trimmed() ), mode );
-}
-
-// Open File and Return Unit
-Unit
 open( Name const & name )
 {
 	Unit const unit( streams().next_unit() );
 	open( unit, name );
 	return unit;
-}
-
-// Open File and Return Unit
-Unit
-open( Fstring const & name )
-{
-	return open( std::string( name.trimmed() ) );
 }
 
 // Open Default File and Return Unit
@@ -679,13 +639,6 @@ inquire( Name const & name, IOFlags & flags )
 		stat( name.c_str(), &fs );
 		flags.size( fs.st_size );
 	}
-}
-
-// Inquire by Name
-void
-inquire( Fstring const & name, IOFlags & flags )
-{
-	inquire( std::string( name.trimmed() ), flags );
 }
 
 // Inquire by Name

@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -81,7 +81,7 @@ namespace WindTurbine {
 	// Subroutine Specifications for the Heat Balance Module
 
 	// Object Data
-	FArray1D< WindTurbineParams > WindTurbineSys;
+	Array1D< WindTurbineParams > WindTurbineSys;
 
 	// Functions
 
@@ -269,12 +269,12 @@ namespace WindTurbine {
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int NumArgs;
 		int IOStat;
-		FArray1D_string cAlphaArgs; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > rNumericArgs; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaArgs; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > rNumericArgs; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// Initializations and allocations
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
@@ -617,7 +617,7 @@ namespace WindTurbine {
 		bool fileExists; // true if Stat file exists
 		bool warningShown; // true if the <365 warning has already been shown
 		std::string lineIn;
-		FArray1D< Real64 > MonthWS( 12 );
+		Array1D< Real64 > MonthWS( 12 );
 		static Real64 AnnualTMYWS( 0.0 ); // Annual average wind speed in stat file
 		Real64 LocalTMYWS; // Annual average wind speed at the rotor height
 

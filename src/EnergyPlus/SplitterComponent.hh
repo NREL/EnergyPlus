@@ -2,7 +2,7 @@
 #define SplitterComponent_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,7 +26,7 @@ namespace SplitterComponent {
 	extern bool GetSplitterInputFlag;
 	// Public because Used by SimAirServingZones and the Direct Air Unit
 	extern int NumSplitters; // The Number of Splitters found in the Input
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -56,14 +56,14 @@ namespace SplitterComponent {
 		Real64 InletMassFlowRateMaxAvail; // Max Avail MassFlow through the Splitter being Simulated [kg/Sec]
 		Real64 InletMassFlowRateMinAvail; // Min Avail MassFlow through the Splitter being Simulated [kg/Sec]
 		int NumOutletNodes;
-		FArray1D_int OutletNode;
-		FArray1D< Real64 > OutletMassFlowRate;
-		FArray1D< Real64 > OutletMassFlowRateMaxAvail;
-		FArray1D< Real64 > OutletMassFlowRateMinAvail;
-		FArray1D< Real64 > OutletTemp;
-		FArray1D< Real64 > OutletHumRat;
-		FArray1D< Real64 > OutletEnthalpy;
-		FArray1D< Real64 > OutletPressure;
+		Array1D_int OutletNode;
+		Array1D< Real64 > OutletMassFlowRate;
+		Array1D< Real64 > OutletMassFlowRateMaxAvail;
+		Array1D< Real64 > OutletMassFlowRateMinAvail;
+		Array1D< Real64 > OutletTemp;
+		Array1D< Real64 > OutletHumRat;
+		Array1D< Real64 > OutletEnthalpy;
+		Array1D< Real64 > OutletPressure;
 
 		// Default Constructor
 		SplitterConditions() :
@@ -90,14 +90,14 @@ namespace SplitterComponent {
 			Real64 const InletMassFlowRateMaxAvail, // Max Avail MassFlow through the Splitter being Simulated [kg/Sec]
 			Real64 const InletMassFlowRateMinAvail, // Min Avail MassFlow through the Splitter being Simulated [kg/Sec]
 			int const NumOutletNodes,
-			FArray1_int const & OutletNode,
-			FArray1< Real64 > const & OutletMassFlowRate,
-			FArray1< Real64 > const & OutletMassFlowRateMaxAvail,
-			FArray1< Real64 > const & OutletMassFlowRateMinAvail,
-			FArray1< Real64 > const & OutletTemp,
-			FArray1< Real64 > const & OutletHumRat,
-			FArray1< Real64 > const & OutletEnthalpy,
-			FArray1< Real64 > const & OutletPressure
+			Array1_int const & OutletNode,
+			Array1< Real64 > const & OutletMassFlowRate,
+			Array1< Real64 > const & OutletMassFlowRateMaxAvail,
+			Array1< Real64 > const & OutletMassFlowRateMinAvail,
+			Array1< Real64 > const & OutletTemp,
+			Array1< Real64 > const & OutletHumRat,
+			Array1< Real64 > const & OutletEnthalpy,
+			Array1< Real64 > const & OutletPressure
 		) :
 			SplitterName( SplitterName ),
 			InletTemp( InletTemp ),
@@ -122,7 +122,7 @@ namespace SplitterComponent {
 	};
 
 	// Object Data
-	extern FArray1D< SplitterConditions > SplitterCond;
+	extern Array1D< SplitterConditions > SplitterCond;
 
 	// Functions
 
@@ -197,7 +197,7 @@ namespace SplitterComponent {
 		bool & ErrorsFound // set to true if problem
 	);
 
-	FArray1D_int
+	Array1D_int
 	GetSplitterNodeNumbers(
 		std::string const & SplitterName, // must match Splitter names for the Splitter type
 		int const SplitterNum, // Index of Splitters

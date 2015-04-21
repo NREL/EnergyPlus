@@ -2,9 +2,9 @@
 #define WindowComplexManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -49,9 +49,9 @@ namespace WindowComplexManager {
 
 	extern int NumComplexWind; // Total number of complex windows
 	//Debug
-	extern FArray2D_int DbgIBm;
-	extern FArray2D< Real64 > DbgTheta;
-	extern FArray2D< Real64 > DbgPhi;
+	extern Array2D_int DbgIBm;
+	extern Array2D< Real64 > DbgTheta;
+	extern Array2D< Real64 > DbgPhi;
 	extern Real64 DdbgTheta;
 	extern Real64 DdbgPhi;
 	//EndDebug
@@ -122,9 +122,9 @@ namespace WindowComplexManager {
 	};
 
 	// Object Data
-	extern FArray1D< BasisStruct > BasisList;
-	extern FArray1D< WindowIndex > WindowList;
-	extern FArray2D< WindowStateIndex > WindowStateList;
+	extern Array1D< BasisStruct > BasisList;
+	extern Array1D< WindowIndex > WindowList;
+	extern Array2D< WindowStateIndex > WindowStateList;
 
 	// Functions
 
@@ -279,7 +279,7 @@ namespace WindowComplexManager {
 	CheckGasCoefs(
 		Real64 const currentWeight,
 		int & indexNumber,
-		FArray1A< Real64 > wght,
+		Array1A< Real64 > wght,
 		bool & feedData
 	);
 
@@ -287,16 +287,16 @@ namespace WindowComplexManager {
 	SearchAscTable(
 		Real64 const y, // Value to be found in the table
 		int const n, // Number of values in the table
-		FArray1S< Real64 > const ytab // Table of values, monotonic, ascending order
+		Array1S< Real64 > const ytab // Table of values, monotonic, ascending order
 	);
 
 	//=================================================================================================
 
 	void
 	CrossProduct(
-		FArray1A< Real64 > A, // Vector components: C = A X B
-		FArray1A< Real64 > B,
-		FArray1A< Real64 > C
+		Array1A< Real64 > A, // Vector components: C = A X B
+		Array1A< Real64 > B,
+		Array1A< Real64 > C
 	);
 
 	void

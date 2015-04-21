@@ -2,8 +2,8 @@
 #define TarcogShading_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2A.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -16,50 +16,50 @@ namespace TarcogShading {
 
 	void
 	shading(
-		FArray1A< Real64 > const theta,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > hgas,
-		FArray1A< Real64 > hcgas,
-		FArray1A< Real64 > hrgas,
-		FArray2A< Real64 > const frct,
-		FArray2A_int const iprop,
-		FArray1A< Real64 > const pressure,
-		FArray1A_int const nmix,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const theta,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > hgas,
+		Array1A< Real64 > hcgas,
+		Array1A< Real64 > hrgas,
+		Array2A< Real64 > const frct,
+		Array2A_int const iprop,
+		Array1A< Real64 > const pressure,
+		Array1A_int const nmix,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		int const nlayer,
 		Real64 const width,
 		Real64 const height,
 		Real64 const angle,
 		Real64 const Tout,
 		Real64 const Tin,
-		FArray1A< Real64 > const Atop,
-		FArray1A< Real64 > const Abot,
-		FArray1A< Real64 > const Al,
-		FArray1A< Real64 > const Ar,
-		FArray1A< Real64 > const Ah,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const tvent,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > Tgaps,
-		FArray1A< Real64 > qv,
+		Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const tvent,
+		Array1A_int const LayerType,
+		Array1A< Real64 > Tgaps,
+		Array1A< Real64 > qv,
 		int & nperr,
 		std::string & ErrorMessage,
-		FArray1A< Real64 > vfreevent
+		Array1A< Real64 > vfreevent
 	);
 
 	void
 	forcedventilation(
-		FArray1A_int const iprop,
-		FArray1A< Real64 > const frct,
+		Array1A_int const iprop,
+		Array1A< Real64 > const frct,
 		Real64 const press,
 		int const nmix,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 const s,
 		Real64 const H,
 		Real64 const hc,
@@ -75,18 +75,18 @@ namespace TarcogShading {
 
 	void
 	shadingin(
-		FArray1A_int const iprop1,
-		FArray1A< Real64 > const frct1,
+		Array1A_int const iprop1,
+		Array1A< Real64 > const frct1,
 		Real64 const press1,
 		int const nmix1,
-		FArray1A_int const iprop2,
-		FArray1A< Real64 > const frct2,
+		Array1A_int const iprop2,
+		Array1A< Real64 > const frct2,
 		Real64 const press2,
 		int const nmix2,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 & Atop,
 		Real64 & Abot,
 		Real64 const Al,
@@ -115,18 +115,18 @@ namespace TarcogShading {
 
 	void
 	shadingedge(
-		FArray1A_int const iprop1,
-		FArray1A< Real64 > const frct1,
+		Array1A_int const iprop1,
+		Array1A< Real64 > const frct1,
 		Real64 const press1,
 		int const nmix1,
-		FArray1A_int const iprop2,
-		FArray1A< Real64 > const frct2,
+		Array1A_int const iprop2,
+		Array1A< Real64 > const frct2,
 		Real64 const press2,
 		int const nmix2,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 & Atop,
 		Real64 & Abot,
 		Real64 const Al,

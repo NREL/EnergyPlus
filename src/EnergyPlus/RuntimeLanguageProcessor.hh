@@ -2,8 +2,8 @@
 #define RuntimeLanguageProcessor_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -65,8 +65,8 @@ namespace RuntimeLanguageProcessor {
 	extern int OffVariableNum;
 	extern int OnVariableNum;
 	extern int PiVariableNum;
-	extern FArray1D_int CurveIndexVariableNums;
-	extern FArray1D_int ConstructionIndexVariableNums;
+	extern Array1D_int CurveIndexVariableNums;
+	extern Array1D_int ConstructionIndexVariableNums;
 	extern int YearVariableNum;
 	extern int MonthVariableNum;
 	extern int DayOfMonthVariableNum;
@@ -163,7 +163,7 @@ namespace RuntimeLanguageProcessor {
 	};
 
 	// Object Data
-	extern FArray1D< RuntimeReportVarType > RuntimeReportVar;
+	extern Array1D< RuntimeReportVarType > RuntimeReportVar;
 
 	// Functions
 
@@ -218,7 +218,7 @@ namespace RuntimeLanguageProcessor {
 
 	int
 	ProcessTokens(
-		FArray1S< TokenType > const TokenIN,
+		Array1S< TokenType > const TokenIN,
 		int const NumTokensIN,
 		int const StackNum,
 		std::string const & ParsingString

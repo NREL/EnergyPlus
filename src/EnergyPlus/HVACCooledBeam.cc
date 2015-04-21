@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -92,7 +92,7 @@ namespace HVACCooledBeam {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// INTEGER :: NumPassiveCB = 0
 	// INTEGER :: NumActiveCB = 0
@@ -101,7 +101,7 @@ namespace HVACCooledBeam {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACCooledBeam:
 
 	// Object Data
-	FArray1D< CoolBeamData > CoolBeam;
+	Array1D< CoolBeamData > CoolBeam;
 
 	// Functions
 
@@ -250,12 +250,12 @@ namespace HVACCooledBeam {
 		int CBIndex; // loop index
 		int CBNum; // current fan coil number
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
 		static int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -458,9 +458,9 @@ namespace HVACCooledBeam {
 		int OutWaterNode; // unit outlet chilled water node
 		Real64 RhoAir; // air density at outside pressure and standard temperature and humidity
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool PlantLoopScanFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool PlantLoopScanFlag;
 		Real64 rho; // local fluid density
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
@@ -857,7 +857,7 @@ namespace HVACCooledBeam {
 		int ControlNode; // the water inlet node
 		int InAirNode; // the air inlet node
 		bool UnitOn; // TRUE if unit is on
-		FArray1D< Real64 > Par( 5 );
+		Array1D< Real64 > Par( 5 );
 		int SolFlag;
 		Real64 ErrTolerance;
 
@@ -1068,7 +1068,7 @@ namespace HVACCooledBeam {
 	Real64
 	CoolBeamResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		FArray1< Real64 > const & Par
+		Array1< Real64 > const & Par
 	)
 	{
 

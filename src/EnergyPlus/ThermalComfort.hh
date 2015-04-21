@@ -2,7 +2,7 @@
 #define ThermalComfort_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -117,7 +117,7 @@ namespace ThermalComfort {
 	extern Real64 TotalAnyZoneNotMetHeatingOccupied;
 	extern Real64 TotalAnyZoneNotMetCoolingOccupied;
 	extern Real64 TotalAnyZoneNotMetOccupied;
-	extern FArray1D< Real64 > ZoneOccHrs;
+	extern Array1D< Real64 > ZoneOccHrs;
 
 	// Subroutine Specifications for the Thermal Comfort module
 
@@ -328,10 +328,10 @@ namespace ThermalComfort {
 	struct AngleFactorData
 	{
 		// Members
-		FArray1D< Real64 > AngleFactor; // Angle factor of each surface
+		Array1D< Real64 > AngleFactor; // Angle factor of each surface
 		std::string Name; // Angle factor list name
-		FArray1D_string SurfaceName; // Names of the Surfces
-		FArray1D_int SurfacePtr; // ALLOCATABLE to the names of the Surfces
+		Array1D_string SurfaceName; // Names of the Surfces
+		Array1D_int SurfacePtr; // ALLOCATABLE to the names of the Surfces
 		int TotAngleFacSurfaces; // Total number of surfaces
 		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
@@ -344,10 +344,10 @@ namespace ThermalComfort {
 
 		// Member Constructor
 		AngleFactorData(
-			FArray1< Real64 > const & AngleFactor, // Angle factor of each surface
+			Array1< Real64 > const & AngleFactor, // Angle factor of each surface
 			std::string const & Name, // Angle factor list name
-			FArray1_string const & SurfaceName, // Names of the Surfces
-			FArray1_int const & SurfacePtr, // ALLOCATABLE to the names of the Surfces
+			Array1_string const & SurfaceName, // Names of the Surfces
+			Array1_int const & SurfacePtr, // ALLOCATABLE to the names of the Surfces
 			int const TotAngleFacSurfaces, // Total number of surfaces
 			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr // Point to this zone in the Zone derived type
@@ -364,10 +364,10 @@ namespace ThermalComfort {
 	};
 
 	// Object Data
-	extern FArray1D< ThermalComfortInASH55Type > ThermalComfortInASH55;
-	extern FArray1D< ThermalComfortSetPointType > ThermalComfortSetPoint;
-	extern FArray1D< ThermalComfortDataType > ThermalComfortData;
-	extern FArray1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
+	extern Array1D< ThermalComfortInASH55Type > ThermalComfortInASH55;
+	extern Array1D< ThermalComfortSetPointType > ThermalComfortSetPoint;
+	extern Array1D< ThermalComfortDataType > ThermalComfortData;
+	extern Array1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
 
 	// Functions
 
@@ -393,8 +393,8 @@ namespace ThermalComfort {
 	void
 	DERIV(
 		int & TempIndiceNum, // Number of temperature indices  unused1208
-		FArray1A< Real64 > Temp, // Temperature unused1208
-		FArray1A< Real64 > TempChange // Change of temperature
+		Array1A< Real64 > Temp, // Temperature unused1208
+		Array1A< Real64 > TempChange // Change of temperature
 	);
 
 	void
@@ -402,9 +402,9 @@ namespace ThermalComfort {
 		int & NEQ,
 		Real64 & H,
 		Real64 & X,
-		FArray1A< Real64 > Y,
-		FArray1A< Real64 > DY,
-		FArray1A< Real64 > C
+		Array1A< Real64 > Y,
+		Array1A< Real64 > DY,
+		Array1A< Real64 > C
 	);
 
 	void

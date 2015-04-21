@@ -2,7 +2,7 @@
 #define UserDefinedComponents_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -30,10 +30,10 @@ namespace UserDefinedComponents {
 	extern int NumUserZoneAir;
 	extern int NumUserAirTerminals;
 
-	extern FArray1D_bool CheckUserPlantCompName;
-	extern FArray1D_bool CheckUserCoilName;
-	extern FArray1D_bool CheckUserZoneAirName;
-	extern FArray1D_bool CheckUserAirTerminal;
+	extern Array1D_bool CheckUserPlantCompName;
+	extern Array1D_bool CheckUserCoilName;
+	extern Array1D_bool CheckUserZoneAirName;
+	extern Array1D_bool CheckUserAirTerminal;
 	extern bool GetInput;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
@@ -314,7 +314,7 @@ namespace UserDefinedComponents {
 		std::string Name; // user identifier
 		int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
 		int NumPlantConnections; // count of how many plant loop connections there are
-		FArray1D< PlantConnectionStruct > Loop; // collect data for each plant loop connection
+		Array1D< PlantConnectionStruct > Loop; // collect data for each plant loop connection
 		AirConnectionStruct Air;
 		WaterUseTankConnectionStruct Water;
 		ZoneInternalGainsStruct Zone;
@@ -330,7 +330,7 @@ namespace UserDefinedComponents {
 			std::string const & Name, // user identifier
 			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
 			int const NumPlantConnections, // count of how many plant loop connections there are
-			FArray1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
+			Array1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
 			AirConnectionStruct const & Air,
 			WaterUseTankConnectionStruct const & Water,
 			ZoneInternalGainsStruct const & Zone
@@ -354,7 +354,7 @@ namespace UserDefinedComponents {
 		int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
 		int NumAirConnections; // count of how many air connectiosn there are
 		bool PlantIsConnected;
-		FArray1D< AirConnectionStruct > Air;
+		Array1D< AirConnectionStruct > Air;
 		PlantConnectionStruct Loop;
 		WaterUseTankConnectionStruct Water;
 		ZoneInternalGainsStruct Zone;
@@ -374,7 +374,7 @@ namespace UserDefinedComponents {
 			int const ErlInitProgramMngr, // EMS:ProgramManager to  run when this model is initialized and setup
 			int const NumAirConnections, // count of how many air connectiosn there are
 			bool const PlantIsConnected,
-			FArray1< AirConnectionStruct > const & Air,
+			Array1< AirConnectionStruct > const & Air,
 			PlantConnectionStruct const & Loop,
 			WaterUseTankConnectionStruct const & Water,
 			ZoneInternalGainsStruct const & Zone
@@ -401,7 +401,7 @@ namespace UserDefinedComponents {
 		AirConnectionStruct ZoneAir;
 		AirConnectionStruct SourceAir;
 		int NumPlantConnections; // count of how many plant loop (demand) connections there are
-		FArray1D< PlantConnectionStruct > Loop; // collect data for each plant loop connection
+		Array1D< PlantConnectionStruct > Loop; // collect data for each plant loop connection
 		WaterUseTankConnectionStruct Water;
 		ZoneInternalGainsStruct Zone; // for skin losses
 		Real64 RemainingOutputToHeatingSP; // sensible load remaining for device, to heating setpoint [W]
@@ -428,7 +428,7 @@ namespace UserDefinedComponents {
 			AirConnectionStruct const & ZoneAir,
 			AirConnectionStruct const & SourceAir,
 			int const NumPlantConnections, // count of how many plant loop (demand) connections there are
-			FArray1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
+			Array1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
 			WaterUseTankConnectionStruct const & Water,
 			ZoneInternalGainsStruct const & Zone, // for skin losses
 			Real64 const RemainingOutputToHeatingSP, // sensible load remaining for device, to heating setpoint [W]
@@ -463,7 +463,7 @@ namespace UserDefinedComponents {
 		AirConnectionStruct AirLoop;
 		AirConnectionStruct SourceAir;
 		int NumPlantConnections; // count of how many plant loop (demand) connections there are
-		FArray1D< PlantConnectionStruct > Loop; // collect data for each plant loop connection
+		Array1D< PlantConnectionStruct > Loop; // collect data for each plant loop connection
 		WaterUseTankConnectionStruct Water;
 		ZoneInternalGainsStruct Zone; // for skin losses
 		Real64 RemainingOutputToHeatingSP; // sensible load remaining for device, to heating setpoint [W]
@@ -492,7 +492,7 @@ namespace UserDefinedComponents {
 			AirConnectionStruct const & AirLoop,
 			AirConnectionStruct const & SourceAir,
 			int const NumPlantConnections, // count of how many plant loop (demand) connections there are
-			FArray1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
+			Array1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
 			WaterUseTankConnectionStruct const & Water,
 			ZoneInternalGainsStruct const & Zone, // for skin losses
 			Real64 const RemainingOutputToHeatingSP, // sensible load remaining for device, to heating setpoint [W]
@@ -519,10 +519,10 @@ namespace UserDefinedComponents {
 	};
 
 	// Object Data
-	extern FArray1D< UserPlantComponentStruct > UserPlantComp;
-	extern FArray1D< UserCoilComponentStruct > UserCoil;
-	extern FArray1D< UserZoneHVACForcedAirComponentStruct > UserZoneAirHVAC;
-	extern FArray1D< UserAirTerminalComponentStruct > UserAirTerminal;
+	extern Array1D< UserPlantComponentStruct > UserPlantComp;
+	extern Array1D< UserCoilComponentStruct > UserCoil;
+	extern Array1D< UserZoneHVACForcedAirComponentStruct > UserZoneAirHVAC;
+	extern Array1D< UserAirTerminalComponentStruct > UserAirTerminal;
 
 	// Functions
 

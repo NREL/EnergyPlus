@@ -2,7 +2,7 @@
 #define DataMoistureBalanceEMPD_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,12 +26,12 @@ namespace DataMoistureBalanceEMPD {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Variables that are used in both the Surface Heat Balance and the Moisture Balance
-	extern FArray1D< Real64 > MoistEMPDOld; // Moisture level at interior surfaces at previous time step
-	extern FArray1D< Real64 > MoistEMPDInt; // Moisture level at interior surfaces at previous interation
+	extern Array1D< Real64 > MoistEMPDOld; // Moisture level at interior surfaces at previous time step
+	extern Array1D< Real64 > MoistEMPDInt; // Moisture level at interior surfaces at previous interation
 	// and current time step
-	extern FArray1D< Real64 > MoistEMPDNew; // Moisture level at interior surfaces at current interation
+	extern Array1D< Real64 > MoistEMPDNew; // Moisture level at interior surfaces at current interation
 	// and current time step
-	extern FArray1D< Real64 > MoistEMPDFlux; // Moisture flux at interior surfaces [W]
+	extern Array1D< Real64 > MoistEMPDFlux; // Moisture flux at interior surfaces [W]
 
 } // DataMoistureBalanceEMPD
 
