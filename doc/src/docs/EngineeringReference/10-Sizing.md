@@ -1030,7 +1030,9 @@ The analysis will proceed as follows:
 
 6. Compare the flow rate from step 5 to the current value for plant loop flow rate and calculate a normalized change using 
 
-    * <span>$\rm{Normalized_Change} = \left|\frac{\rm{NewFlowRate}-\rm{PreviousFlowRate}}\right|{\rm{PreviousFlowRate}}$</span>
+    * <span>$
+        \rm{Normalized_Change} = \frac{ \left| \rm{NewFlowRate}-\rm{PreviousFlowRate} \right|} \rm{PreviousFlowRate}
+      $</span>
 
 7. Normalized_Change = <span>$\frac{\left|\text{NewFlowRate}-\text{PreviousFlowRate}\right|}{\text{PreviousFlowRate}}$</span>
     * Compare magnitude of Normalized_Change to a threshold, currently set at 0.005, to determine if it was significant or not.
@@ -2008,9 +2010,9 @@ For the heat pump the resistive defrost heat capacity is set equal to the coolin
 
 The sizing calculations are done in subroutine *SizeDXCoil* in module *DXCoils*. This section covers the sizing of the objects
 
-n Coil:Heating:DX:MultiSpeed
+* Coil:Heating:DX:MultiSpeed
 
-n Coil:Cooling:DX: MultiSpeed
+* Coil:Cooling:DX: MultiSpeed
 
 The rated air volume flow rate, rated total cooling capacity, rated heating capacity, rated SHR, evaporative condenser air volume flow rate, evaporative condenser pump rated power consumption at the highest speed are sized in the same ways as DX Coil Sizing.
 
@@ -2445,11 +2447,11 @@ If *Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate* then
 
 #### Design Air Flow Rate
 
-n For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
+* For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
 
   <span>${\dot Q_{fluidcooler,nom}} = {C_{p,w}} \bullet {\rho_w} \bullet {\dot V_{fluidcooler,w,des}} \bullet \Delta {T_{loop,des}}$</span>
 
-n For Performance Input Method = NominalCapacity
+* For Performance Input Method = NominalCapacity
 
   <span>${\dot Q_{fluidcooler,nom}}$</span> is provided by the user.
 
@@ -2467,11 +2469,11 @@ To obtain the UA of the fluid cooler, we specify the model inputs (other than th
 
 The design fluid cooler load is:
 
-n For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
+* For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
 
   <span>${\dot Q_{fluidcooler,nom}} = {C_{p,w}} \bullet {\rho_w} \bullet {\dot V_{fluidcooler,w,des}} \bullet \Delta {T_{loop,des}}$</span>
 
-n For Performance Input Method = NominalCapacity
+* For Performance Input Method = NominalCapacity
 
   <span>${\dot Q_{fluidcooler,nom}}$</span> is provided by the user.
 
@@ -2487,11 +2489,11 @@ The  inlet water mass flow rate is just the design entering volumetric flow rat
 
 The inlet water temperature is set slightly differently for the 2 input methods. For
 
-n UFactorTimesAreaAndDesignWaterFlowRate
+* UFactorTimesAreaAndDesignWaterFlowRate
 
 <div>\[{T_{in,water}} = {T_{loop,exit,des}} + \Delta {T_{loop,des}}\]</div>
 
-n NominalCapacity
+* NominalCapacity
 
 <div>\[{T_{in,water}} = Provided\,by\,the\,user\]</div>
 
@@ -2571,13 +2573,13 @@ To obtain the UA of the evaporative fluid cooler, we specify the model inputs (o
 
 The design fluid cooler load is:
 
-n For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
+* For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
 
 <div>\[{\dot Q_{fluidcooler,design}} = {C_{p,w}} \bullet {\rho_w} \bullet {\dot V_{fluidcooler,w,des}} \bullet \Delta {T_{loop,des}}\]</div>
 
 
 
-n For Performance Input Method = StandardDesignCapacity
+* For Performance Input Method = StandardDesignCapacity
 
 <span>${\dot Q_{fluidcooler,design}} = 1.25 \bullet {\dot Q_{fluidcooler,standarddesign}}$</span> (to allow for compressor heat)
 
@@ -2591,7 +2593,7 @@ Then we assign the inputs needed for the model.
 
 
 
-n For Performance Input Method = UserSpecifiedDesignCapacity
+* For Performance Input Method = UserSpecifiedDesignCapacity
 
 <div>\[{\dot Q_{fluidcooler,design}} = {\dot Q_{fluidcooler,userspecifieddesign}}\]</div>
 
@@ -2611,15 +2613,15 @@ The inlet water mass flow rate is just the design entering volumetric flow rate 
 
 The inlet water temperature is set slightly differently for the 3 input methods. For
 
-n UFactorTimesAreaAndDesignWaterFlowRate
+* UFactorTimesAreaAndDesignWaterFlowRate
 
 <div>\[{T_{in,water}} = {T_{loop,exit,des}} + \Delta {T_{loop,des}}\]</div>
 
-n StandardDesignCapacity
+* StandardDesignCapacity
 
 <div>\[{T_{in,water}} = 35^\circ C\;(95^\circ F\,design\,inlet\,water\,temperature)\]</div>
 
-n UserSpecifiedDesignCapacity
+* UserSpecifiedDesignCapacity
 
 <div>\[{T_{in,water}} = Provided\,by\,the\,user\]</div>
 
@@ -3107,23 +3109,19 @@ This design data is entered in an outdoor air design data object and may be refe
 
 The outdoor air design data is entered as a group and referenced through name association to this group of design data (Ref. DesignSpecification:OutdoorAir). The reference name in the following example is "ZoneOAData".
 
-A DesignSpecification:OutdoorAirexample:
+A DesignSpecification:OutdoorAir example:
 
+```idf
 DesignSpecification:OutdoorAir,
-
     ZoneOAData,            !- Name
-
     Maximum,               !- Outdoor Air Method
-
     0.00944,               !- Outdoor Air Flow per Person {m3/s}
-
     0.00305;               !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-
     ,                      !- Outdoor Air Flow per Zone
-
     ,                      !- Outdoor Air Flow Air Changes per Hour
-
     Min OARequirements Sched; !- Outdoor Air Flow Rate Fraction Schedule Name
+```
+
 
 Given this set of data, the quantity of outdoor air is calculated based on the Outdoor Air Method specified in each outdoor air design data object. In this example, the maximum of the per person and per zone floor area is used to establish the outdoor air quantity.
 
@@ -3179,9 +3177,9 @@ If an Outdoor Air Flow Rate Fraction Schedule Name is specified, the flow rate d
 
 Examples of objects that reference the outdoor air design data object are:
 
-n AirTerminal:SingleDuct:VAV:NoReheat
+* AirTerminal:SingleDuct:VAV:NoReheat
 
-n AirTerminal:SingleDuct:VAV:Reheat
+* AirTerminal:SingleDuct:VAV:Reheat
 
 ### References
 

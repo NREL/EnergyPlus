@@ -38,65 +38,39 @@ Air Loop Simulation
 
 A complete simulation of each primary air system – zone equipment air loop is done in the following manner.
 
-n If this is the first simulation this system time-step, just call *ManageAirLoops* (simulates the primary air systems) and *ManageZoneEquipment* (simulates the zone equipment sets) once and quit. This initial pass is simulated with full design air flow rates and allows the zone equipment to set the flow rates for each zone that will meet the zone loads.
+* If this is the first simulation this system time-step, just call *ManageAirLoops* (simulates the primary air systems) and *ManageZoneEquipment* (simulates the zone equipment sets) once and quit. This initial pass is simulated with full design air flow rates and allows the zone equipment to set the flow rates for each zone that will meet the zone loads.
 
-n Otherwise loop over primary air systems and zone equipment sets until the temperatures, flow rates, enthalpies, humidity ratios etc. agree to within tolerance at each primary air system – zone equipment gap.
+* Otherwise loop over primary air systems and zone equipment sets until the temperatures, flow rates, enthalpies, humidity ratios etc. agree to within tolerance at each primary air system – zone equipment gap.
 
-
-
+```
 DO WHILE ((SimAirLoops .OR. SimZoneEquipment) .AND. (IterAir.LE.MaxAir) )
-
   IF (SimAirLoops) THEN
-
     CALL ManageAirLoops(FirstHVACIteration,SimAirLoops,SimZoneEquipment)
-
     SimPlantDemandLoops = .TRUE
-
     SimElecCircuits =.TRUE.
-
   END IF
-
-
 
   IF (SimZoneEquipment) THEN
-
     CALL ResolveAirLoopFlowLimits(IterAir+1)
-
     CALL ManageZoneEquipment(FirstHVACIteration,SimZoneEquipment,SimAirLoops)
-
     SimPlantDemandLoops = .TRUE.
-
     SimElecCircuits =.TRUE.
-
   END IF
-
-
 
   IterAir = IterAir + 1
 
-
-
 END DO
 
-
-
 CALL ResolveLockoutFlags(SimAirLoops)
-
+```
 
 
 The logical flags *SimAirLoops* and *SimZoneEquipment* are used to signal whether the primary air systems or the zone equipment sets need to be resimulated. These flags are set by the subroutine *UpdateHVACInterface* which is called  from within *ManageAirLoops* and *ManageZoneEquipment* at the end of each half-loop simulation. *UpdateHVACInterface* (when called from *ManageAirLoops*) passes the values at the outlet nodes of a primary air system on to the inlet nodes of the corresponding zone equipment half-loop and similarly (when called from *ManageZoneEquipment*) passes the values of the outlet nodes of a zone equipment half-loop on to the inlet nodes of its corresponding  primary air system. Each time *UpdateHVACInterface* is called it also checks whether the values at the half-loop outlet nodes are in agreement with the values at the downstream half-loop inlet nodes. If they are not it sets the simulate flag of the downstream half-loop to *true*. The values checked by *UpdateHVACInterface* and their tolerances are as follows.
 
-
-
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Quantities</td>
-<td>Tolerances</td>
+<th>Quantities</th>
+<th>Tolerances</th>
 </tr>
 <tr>
 <td>specific enthalpy [J/kg}</td>
@@ -146,79 +120,62 @@ Like the other manager routines in EnergyPlus, *ManageAirLoops* has a very simpl
 
 Table 39.  ManageAirLoop Code
 
+
+```
 IF (GetInputFlag) THEN  !First time subroutine has been entered
-
       CALL GetAirPathData ! Get air loop descriptions from input file
-
       GetInputFlag=.false.
-
   END IF
-
-
 
     ! Initialize air loop related parameters
-
   CALL InitAirLoops(FirstHVACIteration)
 
-
-
     ! Call the AirLoop Simulation
-
   IF (SysSizingCalc) THEN
-
     CALL SizeAirLoops
-
   ELSE
-
     CALL SimAirLoops(FirstHVACIteration,SimZoneEquipment)
-
   END IF
-
-
 
   ! No Update
 
-
-
     ! Report information at the Manage Air Loop Level
-
   CALL ReportAirLoops
+```
 
+1.  If the user input data has not been input, get the data and store it in the air loop data structures.
 
+2.  Perform air loop initialization calculations:
 
-1)    If the user input data has not been input, get the data and store it in the air loop data structures.
+    a. at the beginning of the simulation (one time initializations);
 
-2)    Perform air loop initialization calculations:
+    b. at the start of each environment (design day or simulation run period);
+ 
+    c.  before each air loop simulation.
 
-a)    at the beginning of the simulation (one time initializations);
+3. If automatic sizing of the loop flow rates is called for, do it.
 
-b)   at the start of each environment (design day or simulation run period);
-
-c)    before each air loop simulation.
-
-3)    If automatic sizing of the loop flow rates is called for, do it.
-
-4)    Otherwise perform a simulation of the air loop.
+4. Otherwise perform a simulation of the air loop.
 
 ### Input data
 
 The input data specifying an air loop consists of:
 
-1)    the loop configuration;
+1. the loop configuration;
 
-(a)  Splitters, Mixers, and Branches;
+    a. Splitters, Mixers, and Branches;
 
-(b)  Components on the Branches
+    b. Components on the Branches
 
-2)    loop control;
+2. loop control;
 
-(a)  Controllers;
+    a. Controllers;
 
-(b)  System Availability Managers;
+    b. System Availability Managers;
 
-3)    connection to zone equipment;
+3. connection to zone equipment;
 
-4)    design flow rate.
+4. design flow rate.
 
 These objects and their data are described in the EnergyPlus *Input Output Reference* document. The utility routines used to get and check the data are described in the EnergyPlus *Guide for Module Developers*, section Input Services.
 
@@ -302,17 +259,17 @@ The subroutine *SimAirLoops* does the actual simulation the central air system e
 
 *SimAirLoops* accomplishes its task using a set of nested loops.
 
-n Loop over all of the central air systems (*Air Primary Loops*).
+* Loop over all of the central air systems (*Air Primary Loops*).
 
-n For each air system, make 1 or 2 simulation passes
+* For each air system, make 1 or 2 simulation passes
 
-n Loop over each controller in the *Air Primary Loop*
+* Loop over each controller in the *Air Primary Loop*
 
-n For each controller, repeat the simulation of all the *Air Primary Loop* components until the controller has converged
+* For each controller, repeat the simulation of all the *Air Primary Loop* components until the controller has converged
 
-n Loop over each branch in the *Air Primary Loop*
+* Loop over each branch in the *Air Primary Loop*
 
-n On each branch, simulate in sequence each component
+* On each branch, simulate in sequence each component
 
 During and at the end of each loop some tests are performed.
 
@@ -333,11 +290,11 @@ The AirLoopHVAC:OutdoorAirSystem is a subsystem of the primary air system (objec
 
 The data for and simulation of the outside air system are contained in the MixedAir module. This includes the data and simulation of the OutdoorAir:Mixer and the Controller:OutdoorAir. The simulation of the outside air system is straightforward.
 
-·        All controllers other than Controller:OutdoorAir are moved up to the primary air system level, where they are simulated with the primary air system controllers.
+* All controllers other than Controller:OutdoorAir are moved up to the primary air system level, where they are simulated with the primary air system controllers.
 
-·        The Controller:OutdoorAir is simulated.
+* The Controller:OutdoorAir is simulated.
 
-·        The compnents contained in the outside air system are simulated in the order of their input in the AirLoopHVAC:OutdoorAirSystem:EquipmentList.
+* The compnents contained in the outside air system are simulated in the order of their input in the AirLoopHVAC:OutdoorAirSystem:EquipmentList.
 
 Outdoor Air Mixer
 -----------------
@@ -353,75 +310,55 @@ Zone Equipment Simulation
 
 When the EnergyPlus HVAC simulation manager needs to simulate the zone equipment side of the air loop it calls *ManageZoneEquipment*, the zone equipment simulation manager subroutine. Like the other managers, *ManageZoneEquipment* has a very simple structure:
 
+```
         IF (GetInputFlag) THEN
-
           CALL GetZoneEquipment
-
           GetInputFlag = .FALSE.
-
         END IF
-
-
 
         CALL InitZoneEquipment(FirstHVACIteration)
 
-
-
         IF (ZoneSizingCalc) THEN
-
           CALL SizeZoneEquipment
-
         ELSE
-
           CALL SimZoneEquipment(FirstHVACIteration, SimAir)
-
         END IF
-
-
 
         CALL RecordZoneEquipment(SimAir)
 
-
-
         CALL ReportZoneEquipment
-
-
 
         SimZone = .False.
 
-
-
         RETURN
+```
+1. If the user input data has not been input, get the data and store it in the zone equipment data structures
 
+2. Perform zone equipment initialization calculations.
 
+3. If calculation of the design zone air flow rates and loads needs to be done, do it. The results of this calculation are stored in the zone sizing data structures and used by the component automatic sizing algorithms and the central system sizing calculations.
 
-1)    If the user input data has not been input, get the data and store it in the zone equipment data structures
+4. Otherwise simulate all of the zone equipment.
 
-2)    Perform zone equipment initialization calculations.
-
-3)    If calculation of the design zone air flow rates and loads needs to be done, do it. The results of this calculation are stored in the zone sizing data structures and used by the component automatic sizing algorithms and the central system sizing calculations.
-
-4)    Otherwise simulate all of the zone equipment.
-
-5)    Transfer the zone equipment outlet node data to the inlet nodes of the primary air systems and check for convergence (done in RecordZoneEquipment by calling UpdateHVACInterface).
+5. Transfer the zone equipment outlet node data to the inlet nodes of the primary air systems and check for convergence (done in RecordZoneEquipment by calling UpdateHVACInterface).
 
 ### Input data
 
 The input specifying a set of zone equipment consists of:
 
-1)    the ZoneHVAC:EquipmentConnections object data;
+1. the ZoneHVAC:EquipmentConnections object data;
 
-(a)  the zone connection to the air loop – air inlet nodes, exhaust nodes, outlet node, zone node;
+    a. the zone connection to the air loop – air inlet nodes, exhaust nodes, outlet node, zone node;
 
-(b)  the components serving each zone – air terminal units, fan coils etc.;
+    b. the components serving each zone – air terminal units, fan coils etc.;
 
-2)    zone supply air path data;
+2. zone supply air path data;
 
-(a)  zone splitters and supply plenums;
+    a. zone splitters and supply plenums;
 
-3)    zone return air path data;
+3. zone return air path data;
 
-(a)  zone mixer and return plenums;
+    a. zone mixer and return plenums;
 
 ### Initialization Calculations
 
@@ -461,33 +398,33 @@ If multiple air-conditioning components are attached to a zone, the components a
 
 For each full air loop there should be 1 supply air path for each primary air system outlet (i.e. 1 for single duct systems,  2 for dual duct systems). For each full air loop there should be one return air path. The supply air paths consist of any combination of zone splitters and zone supply air plenums as long as it forms a tree structure with the supply air path inlet node the root and the air terminal unit inlet nodes as the leaves. The return air path configuration is limited to a single mixer; there may be multiple return plenums.
 
-(1)  Loop over all the supply air paths.
+1. Loop over all the supply air paths.
 
-(a)  Loop over each component (supply plenum or zone splitter) on the supply air path and simulate each component. The components are simulated in input order.
+    a. Loop over each component (supply plenum or zone splitter) on the supply air path and simulate each component. The components are simulated in input order.
 
-(2)  Loop over all the controlled zones.
+2. Loop over all the controlled zones.
 
-(a)  Set the required system output.
+    a. Set the required system output.
 
-(b)  Loop over the components serving the zone in the user prioritized order.
+    b. Loop over the components serving the zone in the user prioritized order.
 
-(i)    Simulate each component.
+        i. Simulate each component.
 
-(ii)   Increment the required system output.
+        ii. Increment the required system output.
 
-(3)  Loop over all the supply air paths
+3. Loop over all the supply air paths
 
-(a)  Loop over the components on each supply air path in reverse input order. This reverse order simulation passes the air terminal units inlet mass flows back upstream to the return air path inlet node.
+    a. Loop over the components on each supply air path in reverse input order. This reverse order simulation passes the air terminal units inlet mass flows back upstream to the return air path inlet node.
 
-(b)  Check to see if the supply air path inlet node mass flow rate has changed. If it has set the *SimAir* flag to *true*. This signals the HVAC manager that the supply-side of the air loop needs to be resimulated.
+    b. Check to see if the supply air path inlet node mass flow rate has changed. If it has set the *SimAir* flag to *true*. This signals the HVAC manager that the supply-side of the air loop needs to be resimulated.
 
-(4)  Calculate the zone air flow mass balance – the zone inlet and exhaust mass flow rates are summed and the zone node and return air node mass flow rates are determined by a mass balance for each zone.
+4. Calculate the zone air flow mass balance – the zone inlet and exhaust mass flow rates are summed and the zone node and return air node mass flow rates are determined by a mass balance for each zone.
 
-(5)  Calculate the conditions at each zone return air node. Here energy not included in the zone energy balance such as light-heat-to-return-air is added to the return nodes of the controlled zones.
+5. Calculate the conditions at each zone return air node. Here energy not included in the zone energy balance such as light-heat-to-return-air is added to the return nodes of the controlled zones.
 
-(6)  Loop over all of the return air paths.
+6. Loop over all of the return air paths.
 
-(a)  Loop over each component (return plenum or zone mixer) on the return air path and simulate each component.
+    a. Loop over each component (return plenum or zone mixer) on the return air path and simulate each component.
 
 This completes a single simulation sequence of all the zone equipment.
 
@@ -674,17 +611,17 @@ Component models, such as boilers, chillers, condensers and cooling towers are s
 
 In order to achieve these design criteria without resorting to a pressure based flow network solver in the HVAC portion of the code, a rules-based “flow resolver” was developed for the EnergyPlus plant manager. The flow resolver is based on the following assumptions and limitations:
 
-Ø Each loop is only allowed to have a single splitter and a single mixer
+* Each loop is only allowed to have a single splitter and a single mixer
 
-Ø Due to the fact that there can only be one splitter and one mixer on a given loop, it follows logically that there can be at most one bypass on each loop side
+* Due to the fact that there can only be one splitter and one mixer on a given loop, it follows logically that there can be at most one bypass on each loop side
 
-Ø No other components may be in series with a bypass, i.e., a branch that contains a bypass may have no other equipment on that branch
+* No other components may be in series with a bypass, i.e., a branch that contains a bypass may have no other equipment on that branch
 
-Ø Equipment may be in parallel only between the splitter and mixer components of a loop
+* Equipment may be in parallel only between the splitter and mixer components of a loop
 
-Ø Equipment may be hooked together in series in each branch of the loop
+* Equipment may be hooked together in series in each branch of the loop
 
-Ø Flow rates on individual branches will be controlled using maximum and minimum available flow rate limits
+* Flow rates on individual branches will be controlled using maximum and minimum available flow rate limits
 
 The flow resolver employs a simple predictor-corrector algorithm to enforce mass continuity across the plant loop splitter as shown in the following figure.
 
@@ -710,7 +647,14 @@ if there is not enough flow to meet all active branch requests (i.e., a “flow 
 
 where:
 
-<div>\[\begin{array}{l}{{\dot m}_{br}} = {\rm{ final resolved branch flow rate}}\\\{{\dot m}_{br\_request}} = {\rm{ requested branch flow rate }}\\\{{\dot m}_{tot\_request}} = {\rm{ total loop mass flow rate request}}\\\{{\dot m}_{tot\_available}} = {\rm{ total loop mass flow rate available}}\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    \dot m_{br} &= \rm{ final resolved branch flow rate} \\
+    \dot m_{br\_request} &= \rm{ requested branch flow rate } \\
+    \dot m_{tot\_request} &= \rm{ total loop mass flow rate request} \\
+    \dot m_{tot\_available} &= \rm{ total loop mass flow rate available}
+  \end{array}
+\]</div>
 
 It is also necessary to monitor the flow constraints at the branches and components since once the flow rates are changed, the components must be resimulated by the controlling loop (air loop, zone equipment, or plant supply side). The controllers for these components must know if the constraints have been modified so that the simulation does not toggle between a component requesting a flow that the pump cannot meet and the pump then resetting the flow to what it can provide. Note that once a flow rate for any component has changed that this signals the need to resimulate any sub-loop to which it might have an indirect connection. Currently, this means that if a flow rate on the plant demand side changes, the simulation must recalculate the conditions on both the air loop and zone equipment sub-loops since coils and other equipment could be on either side of the main air loop. Similarly, if the condenser demand side simulation results in a change in flow rate through a chiller condenser, then the plant supply side must be triggered to perform its calculations again. Care has been taken to avoid cases where the various half-loops might simply keep triggering the resimulation of their indirect connections in an infinite loop.
 
@@ -806,51 +750,32 @@ The sign of the Loop Demand determines if the loop has a cooling or heating load
 
 The DualSetPointDeadband scheme for the PlantLoop takes the value that is placed on the Node%TempSetPointHi and Node%TempSetPointLo calculates the heating or cooling load necessary to obtain that setpoint; if in the DeadBand then no load is calculated. The pseudo code below shows the basis of the algorithm.
 
+```
         !Calculate the demand on the loop
-
-        IF (mdot &gt; 0.0) THEN
-
-          LoadtoHeatingSetPoint = mdot\*Cp\*(LoopSetPointLo - LoopTempIn)
-
-          LoadtoCoolingSetPoint = mdot\*Cp\*(LoopSetPointHi - LoopTempIn)
-
+        IF (mdot > 0.0) THEN
+          LoadtoHeatingSetPoint = mdot*Cp*(LoopSetPointLo - LoopTempIn)
+          LoadtoCoolingSetPoint = mdot*Cp*(LoopSetPointHi - LoopTempIn)
           ! Possible combinations:
-
-          ! 1  LoadToHeatingSetPoint &gt; 0 & LoadToCoolingSetPoint &gt; 0 --&gt;  Heating required
-
-          ! 2  LoadToHeatingSetPoint &lt; 0 & LoadToCoolingSetPoint &lt; 0 --&gt;  Cooling Required
-
-          ! 3  LoadToHeatingSetPoint &lt; 0 & LoadToCoolingSetPoint &gt; 0 --&gt;  Dead Band Operation
-
-          ! 4  LoadToHeatingSetPoint &gt; 0 & LoadToCoolingSetPoint &lt; 0 --&gt;  Not Feasible
-
+          ! 1  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
+          ! 2  LoadToHeatingSetPoint < 0 & LoadToCoolingSetPoint < 0 -->  Cooling Required
+          ! 3  LoadToHeatingSetPoint < 0 & LoadToCoolingSetPoint > 0 -->  Dead Band Operation
+          ! 4  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint < 0 -->  Not Feasible
           IF (LoadToHeatingSetPoint .GT. 0.0 .AND. LoadToCoolingSetPoint .GT. 0.0) THEN
-
              LoopDemand = LoadToHeatingSetPoint
-
           ELSE IF (LoadToHeatingSetPoint .LT. 0.0 .AND. LoadToCoolingSetPoint .LT. 0.0) THEN
-
              LoopDemand = LoadToCoolingSetPoint
-
           ELSE IF (LoadToHeatingSetPoint .LT. 0.0 .AND. LoadToCoolingSetPoint .GT. 0.0) THEN
-
              LoopDemand = 0.0
-
           ELSE
-
              CALL ShowSevereError
-
           END IF
-
         ELSE
-
           LoopDemand = 0.0
-
         END IF
 
+        IF(ABS(LoopDemand) < LoopDemandTol) LoopDemand = 0.0
+```
 
-
-        IF(ABS(LoopDemand) &lt; LoopDemandTol) LoopDemand = 0.0
 
 The sign of the Loop Demand determines if the loop has a cooling or heating load. Then the Load Distribution scheme distributes this calculated load to the appropriate equipment, if there is any.
 
@@ -902,13 +827,13 @@ The method to simulate a primary-secondary system in EnergyPlus is termed Common
 
 Common pipe feature eliminates the need of specifying two different EnergyPlus loops each for Primary and Secondary half loops. Instead the user can set up the system as it is used in real life applications. A common pipe simulation requires that pumps be placed on both Demand (Secondary) and Supply (Primary) sides of the loop. A typical Common Pipe layout as used in EnergyPlus is shown in figure 92. The major assumptions in the common pipe implementation are as follows:
 
-§ Pumps are placed on both demand and supply side of the loop.
+* Pumps are placed on both demand and supply side of the loop.
 
-§ Secondary pump flow rate can be less than, equal to or greater than the primary pump flow rate.
+* Secondary pump flow rate can be less than, equal to or greater than the primary pump flow rate.
 
-§ The flow at the inlet node of the half loop is equal to the flow at the outlet node of the half loop.
+* The flow at the inlet node of the half loop is equal to the flow at the outlet node of the half loop.
 
-§ The pumps can have different schedules and any loop can be shut off when the other loop is still running.
+* The pumps can have different schedules and any loop can be shut off when the other loop is still running.
 
 ![CommonPipe](EngineeringReference/media/image1975.png)
 
@@ -916,45 +841,45 @@ Figure 125. Common Pipe Layout Schematic
 
 Common pipe simulation is done during the interface update call at both Supply-to-Demand and Demand-to-Supply. Appropriate checks are used to make sure that the effect of flow reversal in between iteration is taken care of. Moreover, the common pipe keeps track of the flow rates and temperatures at all the four nodes linked to it; namely, the inlet and outlet nodes of each sub loop. This record will help to decide if loops have converged or not. In situations where the primary component meets the setpoint and the coil controls does not change its flow request, the common pipe converges quickly. The simple description of the control algorithm for common Pipe implementation is as follows:
 
-1.    At FirstHVACiteration, the common pipe flow is initialized to zero.
+1. At FirstHVACiteration, the common pipe flow is initialized to zero.
 
-2.    Common pipe is simulated at interfaces and thus we will have 2 different flows handle on either side of interface.
+2. Common pipe is simulated at interfaces and thus we will have 2 different flows handle on either side of interface.
 
-3.    Loops and corresponding flow rates are assigned inlet or outlet (to common pipe) depending on the interface which calls it. So when common pipe is called from demand to supply interface, the inlet loop is demand side and outlet loop is supply side and vice versa.
+3. Loops and corresponding flow rates are assigned inlet or outlet (to common pipe) depending on the interface which calls it. So when common pipe is called from demand to supply interface, the inlet loop is demand side and outlet loop is supply side and vice versa.
 
-4.    Inlet flow is compared to outlet flow and the difference is set as the common pipe flow.
+4. Inlet flow is compared to outlet flow and the difference is set as the common pipe flow.
 
-5.    At each interface the common pipe flow is assigned a direction which can be into the interface (Inlet flow &lt; Outlet flow) or away from interface (Inlet flow &gt; Outlet flow).
+5. At each interface the common pipe flow is assigned a direction which can be into the interface (Inlet flow &lt; Outlet flow) or away from interface (Inlet flow &gt; Outlet flow).
 
-6.    Outlet temperature is calculated depending on the flow rate and flow direction. When flow is away from interface outlet flow temperature is same as inlet flow temperature. For a common pipe flow into the interface, the outlet flow temperature is calculated as mixed temperature of inlet flow and the common pipe flow.
+6. Outlet temperature is calculated depending on the flow rate and flow direction. When flow is away from interface outlet flow temperature is same as inlet flow temperature. For a common pipe flow into the interface, the outlet flow temperature is calculated as mixed temperature of inlet flow and the common pipe flow.
 
-7.    At demand to supply interface, the supply side inlet node temperature and flow rate are updated every iteration. At supply to demand interface, only flow is updated. The temperature is updated only at the end of timestep.
+7. At demand to supply interface, the supply side inlet node temperature and flow rate are updated every iteration. At supply to demand interface, only flow is updated. The temperature is updated only at the end of timestep.
 
-8.    Loops iterate till the flow and temperatures at all the 4 concerned nodes do not change.
+8. Loops iterate till the flow and temperatures at all the 4 concerned nodes do not change.
 
 #### Two-Way Common Pipe
 
 A model referred to as Two-Way Common Pipe is available which provides a way to model Primary-Secondary systems as a single Plant Loop.  In a typical EnergyPlus plant loop simulation, the only half loop inlet/outlet node that is controlled is the supply side outlet node. In some cases this requirement becomes a limitation in analyzing different options. A good example is ice thermal storage application, where during charging phase, the coil setpoint can be different from the ice storage equipment setpoint. With this model, the interface between the two half loops includes two additional flow paths that essentially split a single plant loop into both primary and secondary loop sides.  Though the Two-Way common pipe is designed to be generic some assumptions apply in modeling the component. The assumptions are as follows
 
-·        The secondary flow may be less than, equal to, or greater than the primary flow.
+* The secondary flow may be less than, equal to, or greater than the primary flow.
 
-·        The mass flow rate at the Primary Side Outlet Node is always equal to the mass flow rate at the Primary Side Inlet Node.
+* The mass flow rate at the Primary Side Outlet Node is always equal to the mass flow rate at the Primary Side Inlet Node.
 
-·        The mass flow rate at the Secondary Side Outlet Node is always equal to the mass flow rate at the Secondary Side Inlet Node.
+* The mass flow rate at the Secondary Side Outlet Node is always equal to the mass flow rate at the Secondary Side Inlet Node.
 
-·        Only one additional node, either primary-side inlet or secondary-side inlet, (along with the primary-side/supply-side outlet node) can be controlled. The system of equations that describe the loop interface will be under specified if both the Primary and Secondary Inlet nodes have to be controlled.
+* Only one additional node, either primary-side inlet or secondary-side inlet, (along with the primary-side/supply-side outlet node) can be controlled. The system of equations that describe the loop interface will be under specified if both the Primary and Secondary Inlet nodes have to be controlled.
 
 Figure 126 shows a schematic of the Two-Way Common Pipe. There are two common pipe legs, shown as broken lines, allow for some recirculation at the half loop level.  The model allows for common pipe flow in either or both directions. The model determines flow rates in the common pipes and temperatures at nodes based on the following:
 
-·        Which additional node is being controlled to meet a temperature setpoint? If the primary-side inlet node is controlled, then the flows are controlled to deliver the desired temperature at supply side inlet. If the secondary-side inlet node is controlled then the flows are controlled to deliver the desired temperature at the demand side inlet.
+* Which additional node is being controlled to meet a temperature setpoint? If the primary-side inlet node is controlled, then the flows are controlled to deliver the desired temperature at supply side inlet. If the secondary-side inlet node is controlled then the flows are controlled to deliver the desired temperature at the demand side inlet.
 
-·        Is the specified setpoint achievable with current secondary and primary outlet conditions? If the setpoint is not achievable, then the flow in each common pipe leg is reduced to its minimum possible value.
+* Is the specified setpoint achievable with current secondary and primary outlet conditions? If the setpoint is not achievable, then the flow in each common pipe leg is reduced to its minimum possible value.
 
-·        At the controlled node, with known demand outlet temperature, supply outlet temperature, primary flow rate and secondary flow rate, and energy balance is used to calculate recirculation flows in the common pipes for that particular half loop, so that the desired temperature setpoint is achieved.
+* At the controlled node, with known demand outlet temperature, supply outlet temperature, primary flow rate and secondary flow rate, and energy balance is used to calculate recirculation flows in the common pipes for that particular half loop, so that the desired temperature setpoint is achieved.
 
-·        With a known flow in one common pipe leg, the flow on Primary to Secondary (or secondary to primary) is easily obtained by mass balance.
+* With a known flow in one common pipe leg, the flow on Primary to Secondary (or secondary to primary) is easily obtained by mass balance.
 
-·        When the Two Way Common Pipe is controlling conditions at the secondary-side, or demand side, inlet node, then the loop capacitance model usually used for the conditions at the demand inlet is not used as it would interfere with control.
+* When the Two Way Common Pipe is controlling conditions at the secondary-side, or demand side, inlet node, then the loop capacitance model usually used for the conditions at the demand inlet is not used as it would interfere with control.
 
 ![](EngineeringReference/media/image1976.svg)
 
@@ -984,17 +909,17 @@ Model does not resolve flow rates on parallel branches to match pressure drop, t
 
 Model works for the following configurations:
 
-1)   Pump Location
+1. Pump Location
 
-2)   Loop Pump
+2. Loop Pump
 
-3)   Branch Pumps
+3. Branch Pumps
 
-4)   Loop Types
+4. Loop Types
 
-5)   PlantLoop
+5. PlantLoop
 
-6)   CondenserLoop
+6. CondenserLoop
 
 The supply side inlet (before the pump) is always set to standard atmospheric pressure. This allows the node pressures around the loop to stay positive. The actual values of pressure are not all that important, it is the delta pressure that is of interest for our calculations, but this makes the pressure values appear realistic if one plots the pressure around the loop.
 
@@ -1103,17 +1028,17 @@ A steam system uses the vapor phase of water to supply enthalpy or kinetic energ
 
 The advantages that steam system offer over hot water or other heating systems are:
 
-1.    Steam flows through the system unaided by external energy source such as pumps; pressure difference moves steam across the system.
+1. Steam flows through the system unaided by external energy source such as pumps; pressure difference moves steam across the system.
 
-2.    Steam, because of its low-density, can be used in high-rise buildings where water systems create excessive pressure.
+2. Steam, because of its low-density, can be used in high-rise buildings where water systems create excessive pressure.
 
-3.    Terminal units such as heating coils can be added or removed without making any changes to the system.
+3. Terminal units such as heating coils can be added or removed without making any changes to the system.
 
-4.    Steam components can be repaired or replaced by closing the steam supply without the difficulties associated with draining and refilling like in the water systems.
+4. Steam components can be repaired or replaced by closing the steam supply without the difficulties associated with draining and refilling like in the water systems.
 
-5.    Steam is pressure-temperature dependent, therefore the system temperature can be controlled by varying either steam pressure or temperature.
+5. Steam is pressure-temperature dependent, therefore the system temperature can be controlled by varying either steam pressure or temperature.
 
-6.    Steam can be distributed through out the system without any change in temperature.
+6. Steam can be distributed through out the system without any change in temperature.
 
 In view of the advantages mentioned, the steam systems are suitable for applications where heat is required for process and comfort heating such as in industrial plants, hospitals, restaurants, dry cleaning plants laundries and commercial buildings.  They are also suitable in places where the heating medium has to travel great distances such as in facilities with scattered building locations or where the building height would result in excessive pressure in a water system, or locations where the load changes occur intermittently.  Thus steam system is an essential and necessary development step for EnergyPlus.
 
@@ -1137,11 +1062,11 @@ Figure 129. Schematic of Temperature – Entropy Diagram for Steam loop
 
 It should be noted that the figure is simply a schematic and not a scaled representation of the process on a Mollier Chart.  For the following descriptions, please refer to the schematic figure above.
 
-n Process 1–2 on the Ts diagram, represents condensation of steam in the coil at constant pressure; this is where the steam gives up latent heat to the zone.
+*  Process 1–2 on the Ts diagram, represents condensation of steam in the coil at constant pressure; this is where the steam gives up latent heat to the zone.
 
-n Process 2–3 represents the subcooling of condensed steam at higher pressure, this subcooling takes place inside the steam coil, just before the steam trap.  The delta temperature represented by 2-3 is the degree of subcooling in the steam coil, and is a user input to the steam coil.  This subcool generally accounts for 1 to 2 % of the total heat transfer in the steam coil.
+*  Process 2–3 represents the subcooling of condensed steam at higher pressure, this subcooling takes place inside the steam coil, just before the steam trap.  The delta temperature represented by 2-3 is the degree of subcooling in the steam coil, and is a user input to the steam coil.  This subcool generally accounts for 1 to 2 % of the total heat transfer in the steam coil.
 
-n Process 3–4’ represents the isenthalpic expansion of water from high-pressure steam side to atmospheric pressure across the steam trap.  As steam gives up its latent heat at the steam coil the condensate that forms in the steam coil still exists at higher pressure.  This condensate is discharged to a lower pressure across the steam trap, this condensate contains more heat than necessary to maintain the liquid phase at the lower pressure, this excess heat causes some of the condensate to vaporize or flash to steam at lower pressure at some quality.  The amount of water that flashes to steam can be calculated by the following equation
+*  Process 3–4’ represents the isenthalpic expansion of water from high-pressure steam side to atmospheric pressure across the steam trap.  As steam gives up its latent heat at the steam coil the condensate that forms in the steam coil still exists at higher pressure.  This condensate is discharged to a lower pressure across the steam trap, this condensate contains more heat than necessary to maintain the liquid phase at the lower pressure, this excess heat causes some of the condensate to vaporize or flash to steam at lower pressure at some quality.  The amount of water that flashes to steam can be calculated by the following equation
 
 <div>\[\% Flash\,\,Steam\,\, = \frac{{{h_{4'}} - \,{h_4}}}{{{h_{fg}}}}\,\, \times \,\,\,100\]</div>
 
@@ -1149,17 +1074,17 @@ Where h4’ is Enthalpy of liquid at steam pressure just before condensate is su
 
 For example, water at 102LC and 120 Kpa flashes to steam at at100LC and atmospheric pressure, with quality equal to 0.003.  This results in loss of some latent capacity of steam and is one of the terms contributing to loop loss in steam system.
 
-n Process 4’- 4 represents the condensation of the flashed steam, which has exited from steam trap into the condensate drain.  Condensation occurs at atmospheric pressure Patm, there is loss in latent capacity due to this unavoidable process, only condensate can be returned back to the boiler in a steam system.
+*  Process 4’- 4 represents the condensation of the flashed steam, which has exited from steam trap into the condensate drain.  Condensation occurs at atmospheric pressure Patm, there is loss in latent capacity due to this unavoidable process, only condensate can be returned back to the boiler in a steam system.
 
-n Process 4-5 represents the loop sub cooling at atmospheric pressure; this is the sub cooling of the condensate that takes place during condensate return to the boiler because the return loop is not insulated, loop sub cooling is of the order of 20LC to 30LC.  This is a user-defined input in every steam coil, because the variability in location of steam coils in a building will result in different condensate return temperatures for each of the coils.
+*  Process 4-5 represents the loop sub cooling at atmospheric pressure; this is the sub cooling of the condensate that takes place during condensate return to the boiler because the return loop is not insulated, loop sub cooling is of the order of 20LC to 30LC.  This is a user-defined input in every steam coil, because the variability in location of steam coils in a building will result in different condensate return temperatures for each of the coils.
 
-n Process 5-6 represents the temperature and pressure rise in condensate due to pump heat addition.  The pumping process generates heat, which is added to the condensate.  The condensate is pumped back to the boiler at higher pressure.
+*  Process 5-6 represents the temperature and pressure rise in condensate due to pump heat addition.  The pumping process generates heat, which is added to the condensate.  The condensate is pumped back to the boiler at higher pressure.
 
-n Process 6-2 represents the sensible heat addition by the boiler to the return condensate.
+*  Process 6-2 represents the sensible heat addition by the boiler to the return condensate.
 
-n Process 2-1 represents the latent enthalpy of steam, added by the boiler to the water to convert it to steam at saturation pressure.
+*  Process 2-1 represents the latent enthalpy of steam, added by the boiler to the water to convert it to steam at saturation pressure.
 
-n Point 3, which is outlet of the coil and Point 5, which is inlet of the pump are specified directly by the user, subsequently the loop losses in EnergyPlus are directly summed up as the enthalpy difference between point 3 and 5, which is calculated by fluid property routines in EnergyPlus.  This helps to maintain flexibility and at the same time helps negate the intermediate points calculation in the system.
+*  Point 3, which is outlet of the coil and Point 5, which is inlet of the pump are specified directly by the user, subsequently the loop losses in EnergyPlus are directly summed up as the enthalpy difference between point 3 and 5, which is calculated by fluid property routines in EnergyPlus.  This helps to maintain flexibility and at the same time helps negate the intermediate points calculation in the system.
 
 Aspects of the steam loop such as quality of steam, steam pressure, and steam generation which play an important role in EnergyPlus simulation are described in following sections.
 

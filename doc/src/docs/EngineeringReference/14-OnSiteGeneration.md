@@ -192,7 +192,14 @@ where,
 
 <span>${X_c}$</span>, <span>${X_d}$</span>        : Normalized maximum capacity at a given charging or discharging current, calculated as:
 
-<div>\[X = \left\{ \begin{array}{l}{q_0}/{q_{\max }}(I)\begin{array}{*{20}{c}}{}&{}&{}&{(ch\arg ing)}\end{array}\\\({q_{\max }} - {q_0})/{q_{\max }}(I)\begin{array}{*{20}{c}}{}&{(disch\arg ing)}\end{array}\end{array} \right.\]</div>
+<div>\[
+  X = \left\{
+    \begin{array}{cl}
+      q_0 / q_{max}(I) & \; (charging) \\
+      (q_{max}-q_0)/q_{max}(I) & \; (discharging)
+    \end{array}
+  \right.
+\]</div>
 
 It needs to be noted that the performance curve (Curve:RectangularHyperbola2) used in the model input covers the 2<sup>nd</sup> and the 3<sup>rd</sup> item of the open circuit voltage equation. Due to the reformatting of performance curve, the voltage function regression coefficients can map to the curve coefficients as follows:
 
@@ -390,14 +397,9 @@ The Generator:PV:Simple object describes about the simplest model for predicting
 Table 89. Nomenclature for Simple Photovoltaic model
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
+<th>Mathematical variable</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>P</td>
@@ -449,14 +451,9 @@ The module determines PV current as a function of load voltage. Other OUTPUTS in
 Table 90. General Nomenclature for the PV model
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
+<th>Mathematical variable</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>b</td>
@@ -649,8 +646,6 @@ The four-parameter equivalent circuit is shown in the following figure:
 
 Figure 339. Equivalent circuit in the four parameter model
 
-
-
 *V* is the load voltage and *I* is the current flowing through the load and PV.
 
 **Determining Performance under Operating Conditions**
@@ -752,14 +747,9 @@ This section presents the mathematical description of the Sandia model from a dr
 Table 91. Nomenclature for Sandia PV model
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Mathematical variable</td>
-<td>Description</td>
+<th>Mathematical variable</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>I<sub>sc</sub></td>
@@ -1128,7 +1118,16 @@ The actual (operating) electrical power output from the generator is determined 
 
 <div>\[{P_{Elec,Operating}} = MIN\left( {{P_{Elec,Operating}},{P_{Elec,Full\,Load}}} \right)\]</div>
 
-<div>\[\begin{array}{l}IF\,\,\left( {{P_{Elec,Full\,Load}}\, > \,0.0} \right)\,\,THEN\\\,\,\,\,\,PLR = {\raise0.7ex\hbox{${{P_{Elec,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Elec,Operating}}} {{P_{Elec,Full\,Load}}}}}\right.}\!\lower0.7ex\hbox{${{P_{Elec,Full\,Load}}}$}}\\\,\,\,\,\,PLR = MIN\left( {PLR,PL{R_{\max }}} \right)\\\,\,\,\,\,PLR = MAX\left( {PLR,PL{R_{\min }}} \right)\\ELSE\\\,\,\,\,\,PLR = 0.0\\END\,IF\\\{P_{Elec,Operating}} = {P_{Elec,Full\,Load}}\left( {PLR} \right)\end{array}\]</div>
+```
+ IF (P_elec_fullload > 0) THEN
+   PLR = P_elec_operating / P_elec_fullload
+   PLR = MIN( PLR, PLR_max )
+   PLR = MAX( PLR, PLR_min )
+ ELSE
+   PLR = 0
+ END IF
+ P_elec_operating = P_elec_fullload * PLR
+```
 
 where:
 
@@ -1400,11 +1399,25 @@ The Micro CHP model is a straightforward empirical model with the exception that
 
 <div>\[{\dot N_{fuel}} = {q_{gross}}/LH{V_{fuel}}\]</div>
 
-<div>\[\dot m_{fuel}^{t + \Delta t} = \left\{ {\begin{array}{*{20}{c}}{\dot m_{fuel,demand}^{t + \Delta t}}\\\{\dot m_{fuel}^t \pm {{\left( {d{{\dot m}_{fuel}}/dt} \right)}_{max}}}\end{array}\,\,\,\,\,\begin{array}{*{20}{c}}{{\rm{if}}\,\,\,d{{\dot m}_{fuel}}/dt \le {{\left( {d{{\dot m}_{fuel}}/dt} \right)}_{max}}}\\\{{\rm{if}}\,\,\,d{{\dot m}_{fuel}}/dt > {{\left( {d{{\dot m}_{fuel}}/dt} \right)}_{max}}}\end{array}} \right.\]</div>
+<div>\[
+  \dot m_{fuel}^{t+\Delta t} = \left\{
+    \begin{array}{cl}
+      \dot m_{fuel,demand}^{t+\Delta t}       &\; if d\dot m_{fuel} / dt \le (d\dot m_{fuel}/dt)_{max} \\
+      \dot m_{fuel,demand}^t \pm (d\dot m_{fuel}/dt)_{max}      &\; if d\dot m_{fuel} / dt \gt (d\dot m_{fuel}/dt)_{max} 
+    \end{array}
+  \right.
+\]</div>
 
 <div>\[{\dot m_{air}} = f({P_{net,ss}})\]</div>
 
-<div>\[P_{net}^{t + \Delta t} = \left\{ {\begin{array}{*{20}{c}}{P_{net,ss}^{t + \Delta t}}\\\{P_{net}^t \pm {{\left( {d{P_{net}}/dt} \right)}_{max}}}\end{array}\,\,\,\,\,\begin{array}{*{20}{c}}{{\rm{if}}\,\,\,d{P_{net}}/dt \le {{\left( {d{P_{net}}/dt} \right)}_{max}}}\\\{{\rm{if}}\,\,\,d{P_{net}}/dt > {{\left( {d{P_{net}}/dt} \right)}_{max}}}\end{array}} \right.\]</div>
+<div>\[
+  P_{net}^{t+\Delta t} = \left\{
+    \begin{array}{cl}
+      P_{net,ss}^{t+\Delta t}       &\; if dP_{net} / dt \le (dP_{net}/dt)_{max} \\
+      P_{net,ss}^t \pm (dP_{net}/dt)_{max}      &\; if dP_{net} / dt \gt (dP_{net}/dt)_{max} 
+    \end{array}
+  \right.
+\]</div>
 
 <div>\[{[MC]_{eng}}\frac{{d{T_{eng}}}}{{dt}} = U{A_{HX}}\left( {{T_{cw,p}} - {T_{eng}}} \right) + U{A_{loss}}\left( {{T_{room}} - {T_{eng}}} \right) + {q_{gen,ss}}\]</div>
 
@@ -1478,21 +1491,15 @@ Number of iterations &gt; 3\\
 
 <div>\[\frac{{{{\left( {{q_{gen,ss}}} \right)}_{\max }}}}{{10000000}} > U{A_{HX}}\left( {{T_{cw,o}} - {T_{eng}}} \right) + U{A_{loss}}\left( {{T_{room}} - {T_{eng}}} \right) + {q_{gen,ss}} - {[MC]_{eng}}\frac{{d{T_{eng}}}}{{dt}}\]</div>
 
-<span>$\frac{{{{\left( {{q_{gen,ss}}} \right)}_{\max }}}}{{10000000}}$</span><span>$ > {[\dot m{c_p}]_{cw}}\left( {{T_{cw,i}} - {T_{cw,o}}} \right) + U{A_{HX}}\left( {{T_{eng}} - {T_{cw,o}}} \right) - {[MC]_{cw}}\frac{{d{T_{cw,o}}}}{{dt}}$</span>
+<div>\[\frac{{{{\left( {{q_{gen,ss}}} \right)}_{\max }}}}{{10000000}} > {[\dot m{c_p}]_{cw}}\left( {{T_{cw,i}} - {T_{cw,o}}} \right) + U{A_{HX}}\left( {{T_{eng}} - {T_{cw,o}}} \right) - {[MC]_{cw}}\frac{{d{T_{cw,o}}}}{{dt}}\]</div>
 
 The Micro CHP model has a number of different operating modes.  The operating mode for a given system timestep is determined from the mode during the previous timestep, user inputs, and high-level controls from elsewhere in EnergyPlus.  The operating mode is reported for the state at the end of each timestep.  The following table summarizes the various operating modes and the criteria for switching to a new mode for any given timestep.  The EnergyPlus implementation adds the “Off” mode to the modes specified by Annex 42 which corresponds to the unit being scheduled to be unavailable.  The difference between OFF and Standby modes determines whether or not standby power is consumed.
 
 <table class="table table-striped">
-
-
-
-
-
-
 <tr>
-<td>Operating mode</td>
-<td>Main Criteria</td>
-<td>Notes</td>
+<th>Operating mode</th>
+<th>Main Criteria</th>
+<th>Notes</th>
 </tr>
 <tr>
 <td>Off</td>
@@ -1587,7 +1594,7 @@ where,
 
 <span>${F_{HX}}$</span> is an adjustment factor,
 
-<span>${h_{gas}} = h_{gas}^0 \cdot {\left( {\frac{{{{\dot N}_{gas}}}}{{\dot N_{gas}^0}}} \right)^n}$</span>,
+<div>\[h_{gas} = h_{gas}^0 \left( \frac{\dot N_{gas}}{\dot N_{gas}^0} \right)^n}\]</div>
 
 <div>\[{h_{water}} = h_{water}^0 \cdot {\left( {\frac{{{{\dot N}_{water}}}}{{\dot N_{water}^0}}} \right)^m}\]</div>
 
@@ -1660,28 +1667,16 @@ Where,
 The Shomate coefficients used in EnergyPlus are listed in the table below.  Data source “NIST” indicates the data were directly from Chemistry WebBook.  Data source “CHEMKIN” indicates the data were developed by curve fitting library data for the CHEMKIN commercial program (which uses the Gorden-McBride polynomial rather than the Shomate formulation).
 
 <table class="table table-striped">
-
-
-
-
-
-
-
-
-
-
-
-
 <tr>
-<td>Constituent</td>
-<td>A</td>
-<td>B</td>
-<td>C</td>
-<td>D</td>
-<td>E</td>
-<td>F</td>
-<td>H</td>
-<td>Source</td>
+<th>Constituent</th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+<th>E</th>
+<th>F</th>
+<th>H</th>
+<th>Source</th>
 </tr>
 <tr>
 <td>N<sub>2</sub></td>
@@ -1999,16 +1994,10 @@ The overall power production delivered from a wind turbine system is thus:
 Table 92. Nomenclature for Wind Turbine model
 
 <table class="table table-striped">
-
-
-
-
-
-
 <tr>
-<td>Variable</td>
-<td>Description</td>
-<td>Units</td>
+<th>Variable</th>
+<th>Description</th>
+<th>Units</th>
 </tr>
 <tr>
 <td>A<sub>R</sub></td>

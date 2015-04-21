@@ -16,13 +16,9 @@ To calculate the mass or volume of each pollutant, consumption is multiplied by 
 
 EPA categorizes pollutants as either Criteria Pollutants or Hazardous Pollutants. Criteria pollutants are the six substances for which EPA has set health-based standards, including carbon monoxide (CO), nitrogen oxides (NO<sub>x</sub>), sulfur dioxide (SO<sub>2</sub>), and particulate matter (PM10 and PM2.5), ozone (O<sub>3</sub>), and lead (Pb).  Because ozone is created in atmospheric photochemical reactions of volatile organic compounds, ammonia, and other substances rather than direct building-related energy emissions, we do not calculated ozone emissions in EnergyPlus.  But we do include ozone precursors: methane (CH<sub>4</sub>), non-methane volatile organic compounds (NMVOC), and ammonia (NH<sub>3</sub>). Hazardous pollutants are substances that are known or suspected to cause serious health problems such as cancer.  We include typical hazardous substances associated with energy production and use including lead (Pb) and mercury (Hg). We also include CO<sub>2</sub> (carbon dioxide) since it is largest greenhouse gas in terms of impact.
 
-
-
 ![](EngineeringReference/media/image7910.svg)
 
 Figure 341.  Example Annual Atmospheric Pollutants and Water Consumption
-
-
 
 ![](EngineeringReference/media/image7911.svg)
 
@@ -35,14 +31,9 @@ The Intergovernmental Panel on Climate Change has studied the effects on the rel
 Table 93. Carbon Equivalents (IPCC 2001)
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Gas</td>
-<td>Carbon Equivalent</td>
+<th>Gas</th>
+<th>Carbon Equivalent</th>
 </tr>
 <tr>
 <td>NO<sub>x</sub></td>
@@ -56,10 +47,7 @@ Table 93. Carbon Equivalents (IPCC 2001)
 <td>CO<sub>2</sub></td>
 <td>0.2727</td>
 </tr>
-
 </table>
-
-
 
 The resulting carbon equivalents by fuel type are shown in the output of the program along with the individual gas pollutants.
 
@@ -67,19 +55,12 @@ The resulting carbon equivalents by fuel type are shown in the output of the pro
 
 Emission factors for on-site fossil fuel consumption are based on Section 1.4 Natural Gas Combustion in EPA (1998a) Table 94 shows the greenhouse gas and precursors and criteria pollutant emissions factors for natural gas.  Similar emissions factors are shown for residual fuel oil (No. 4 and No. 6 fuel oil) [Table 95], distillates (No. 1 and No. 2 fuel oil) [Table 96], residential oil furnace [Table 97], LPG (butane and propane) [Table 98], gasoline and diesel [Table 99], and coal [Table 100] in the indicated tables.  Note that a zero for a pollutant in the table may mean that no data were available, not that there are no emissions of that pollutant.
 
-
-
 Table 94.  Emission Factors for Natural Gas
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Pollutant</td>
-<td>Emission Factor<sup>a</sup>   (g/MJ)</td>
+<th>Pollutant</th>
+<th>Emission Factor<sup>a</sup>   (g/MJ)</th>
 </tr>
 <tr>
 <td>Carbon Dioxide (CO<sub>2</sub>)</td>
@@ -133,230 +114,200 @@ Table 94.  Emission Factors for Natural Gas
 <td>Lead (Pb)</td>
 <td>2.09310E-07</td>
 </tr>
-
+<tr>
+<td colspan="2">a Based on data from Tables 1.4-1, 1.4.-2 and 1.4.4  in EPA (1998a), Natural gas heat value of 1027 Btu/ft3 based on data for 2003 in Table A-4 in DOE (2004)</td>
+</tr>
+<tr>
+<td colspan="2">b Values shown are for uncontrolled burner.  For controlled-low NO<sub>X</sub> burner, use 0.64 lb/106 ft3, 0.000627 lb/MMBtu, 0.0002679 g/MJ</td>
+</tr>
+<tr>
+<td colspan="2">c Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes sulfur content is natural gas of 2,000 grains/106 ft3. The SO2 emission factor can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by the ratio of the site-specific sulfur content (grains/106 ft3) to 2,000 grains/106 ft3.</td>
+</tr>
+<tr>
+<td colspan="2">d PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.</td>
+</tr>
+<tr>
+<td colspan="2">e No data</td>
+</tr>
 </table>
 
-a Based on data from Tables 1.4-1, 1.4.-2 and 1.4.4  in EPA (1998a), Natural gas heat value of 1027 Btu/ft3 based on data for 2003 in Table A-4 in DOE (2004)
-
-b Values shown are for uncontrolled burner.  For controlled-low NO<sub>X</sub> burner, use 0.64 lb/106 ft3, 0.000627 lb/MMBtu, 0.0002679 g/MJ
-
-c Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes sulfur content is natural gas of 2,000 grains/106 ft3. The SO2 emission factor can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by the ratio of the site-specific sulfur content (grains/106 ft3) to 2,000 grains/106 ft3.
-
-d PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.
-
-e No data.
-
-
-
 Table 95.  Emission Factors for Residual Fuel Oil (No. 4 and No. 6 Fuel Oil)
-
-**Pollutant**
-
-**No. 6 Fuel Oil**
-
-**No. 4 Fuel Oil**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-Carbon Dioxide (CO<sub>2</sub>)
-
-76.77128
-
-76.77128
-
-Carbon Monoxide (CO)
-
-1.53543E-02
-
-1.53543E-02
-
-Methane (CH<sub>4</sub>)
-
-1.45865E-03
-
-6.63304E-04
-
-Nitrogen Oxides (NO<sub>X</sub>)
-
-1.68897E-01
-
-6.14170E-02
-
-Nitrous Oxide (N<sub>2</sub>O)
-
-3.37794E-04
-
-3.37794E-04
-
-Sulphur Dioxide (SO<sub>2</sub>)<sup>b</sup>
-
-4.82124E-01
-
-4.60628E-01
-
-Particulate Matter (PM)<sup>c</sup>
-
-2.56109E-02
-
-2.14960E-02
-
-Particulate Matter (PM10)<sup>c</sup>
-
-1.58763E-02
-
-1.58763E-02
-
-Particulate Matter (PM2.5)<sup>c</sup>
-
-5.89603E-03
-
-5.89603E-03
-
-Ammonia (NH<sub>3</sub>)
-
-0<sup>d</sup>
-
-0<sup>d</sup>
-
-Volatile Organic Compounds (NMVOC)
-
-3.47006E-03
-
-1.04409E-03
-
-Mercury (Hg)
-
-3.47006E-06
-
-3.47006E-06
-
-Lead (Pb)
-
-4.63699E-06
-
-4.63699E-06
-
-a Based on data from Tables 1.3-1, 1.3-3, 1.3-8, 1.3-10, and 1.3-12 in EPA (1998b).
-
-b Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes 1% sulfur content. The SO<sub>2</sub> emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by percentage sulfur content.
-
-c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.
-
-d No Data.
+<table class="table table-striped">
+  <tr>
+    <th>Pollutant</th>
+    <th>Emission Factor <sup>a</sup> (g/MJ)</th>
+  </tr>
+  <tr>
+    <td>Carbon Dioxide (CO 2 )</td>
+    <td>50.23439</td>
+  </tr>
+  <tr>
+    <td>Carbon Monoxide (CO)</td>
+    <td>3.52E-002</td>
+  </tr>
+  <tr>
+    <td>Methane (CH 4 )</td>
+    <td>9.63E-004</td>
+  </tr>
+  <tr>
+    <td>Nitrogen Oxides (NO X )</td>
+    <td>4.19E-002</td>
+  </tr>
+  <tr>
+    <td>Nitrous Oxide (N 2 O) <sup>b</sup></td>
+    <td>9.21E-004</td>
+  </tr>
+  <tr>
+    <td>Sulphur Dioxide (SO 2 ) <sup>c</sup></td>
+    <td>2.51E-004</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM) <sup>d</sup></td>
+    <td>3.18E-003</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM10) <sup>d</sup></td>
+    <td>2.39E-003</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM2.5) <sup>d</sup></td>
+    <td>7.95E-004</td>
+  </tr>
+  <tr>
+    <td>Ammonia (NH 3 )</td>
+    <td>0 <sup>e</sup></td>
+  </tr>
+  <tr>
+    <td>Volatile Organic Compounds (NMVOC)</td>
+    <td>2.30E-003</td>
+  </tr>
+  <tr>
+    <td>Mercury (Hg)</td>
+    <td>1.09E-007</td>
+  </tr>
+  <tr>
+    <td>Lead (Pb)</td>
+    <td>2.09E-007</td>
+  </tr>
+  <tr>
+    <td colspan="2"><sup>a</sup> Based on data from Tables 1.4-1, 1.4.-2 and 1.4.4 in EPA (1998a), Natural gas heat value of 1027 Btu/ft3 based on data for 2003 in Table A-4 in DOE (2004)</td>
+  </tr>
+  <tr>
+    <td colspan="2"><sup>b</sup> Values shown are for uncontrolled burner. For controlled-low NOX burner, use 0.64 lb/106 ft3, 0.000627 lb/MMBtu, 0.0002679 g/MJ</td>
+  </tr>
+  <tr>
+    <td colspan="2"><sup>c</sup> Based on 100% conversion of fuel sulfur to SO2. Assumes sulfur content is natural gas of 2,000 contents by multiplying the SO2 emission factor by the ratio of the site-specific sulfur content (grains/106 ft3) to 2,000 grains/106 ft3. grains/106 ft3. The SO2 emission factor can be converted to other natural gas sulfur</td>
+  </tr>
+  <tr>
+    <td colspan="2"><sup>d</sup> PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.</td>
+  </tr>
+  <tr>
+    <td colspan="2"><sup>e</sup> No data.</td>
+  </tr>
+</table>
 
 Table 96.  Emission Factors for Distillates (No. 1 and No. 2 Fuel Oil)
 
-**Pollutant**
-
-**No. 1 Fuel Oil**
-
-**No. 2 Fuel Oil**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-Carbon Dioxide (CO<sub>2</sub>)
-
-66.02330
-
-68.47998
-
-Carbon Monoxide (CO)
-
-1.53543E-02
-
-1.53543E-02
-
-Methane (CH<sub>4</sub>)
-
-6.63304E-04
-
-6.63304E-04
-
-Nitrogen Oxides (NO<sub>X</sub>)
-
-6.14170E-02
-
-7.37004E-02
-
-Nitrous Oxide (N<sub>2</sub>O)
-
-3.37794E-04
-
-3.37794E-04
-
-Sulphur Dioxide (SO<sub>2</sub>)<sup>b</sup>
-
-4.36061E-01
-
-4.82124E-01
-
-Particulate Matter (PM)<sup>c</sup>
-
-6.14170E-03
-
-6.14170E-03
-
-Particulate Matter (PM10)<sup>c</sup>
-
-3.31652E-03
-
-3.31652E-03
-
-Particulate Matter (PM2.5)<sup>c</sup>
-
-2.54881E-03
-
-2.54881E-03
-
-Ammonia (NH<sub>3</sub>)
-
-0<sup>d</sup>
-
-0<sup>d</sup>
-
-Volatile Organic Compounds (NMVOC)
-
-1.04409E-03
-
-1.04409E-03
-
-Mercury (Hg)
-
-3.47006E-06
-
-3.47006E-06
-
-Lead (Pb)
-
-4.63699E-06
-
-4.63699E-06
-
-a Based on data from Tables 1.3-1, 1.3-3, 1.3-8, 1.3-10, and 1.3-12 in EPA (1998b).
-
-b Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes 1% sulfur content. The SO<sub>2</sub> emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by percentage sulfur content.
-
-c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.
-
-d No data.
-
+<table class="table table-striped">
+  <tr>
+    <th>Pollutant</th>
+    <th>No. 1 Fuel Oil Emission Factor<sup>a</sup> (g/MJ)</th>
+    <th>No. 2 Fuel Oil Emission Factor<sup>a</sup> (g/MJ)</th>
+  </tr>
+  <tr>
+    <td>Carbon Dioxide (CO<sub>2</sub>)</td>
+    <td>66.0233</td>
+    <td>68.47998</td>
+  </tr>
+  <tr>
+    <td>Carbon Monoxide (CO)</td>
+    <td>1.54E-002</td>
+    <td>1.54E-002</td>
+  </tr>
+  <tr>
+    <td>Methane (CH<sub>4</sub>)</td>
+    <td>6.63E-004</td>
+    <td>6.63E-004</td>
+  </tr>
+  <tr>
+    <td>Nitrogen Oxides (NO<sub>X</sub>)</td>
+    <td>6.14E-002</td>
+    <td>7.37E-002</td>
+  </tr>
+  <tr>
+    <td>Nitrous Oxide (N<sub>2</sub>O)</td>
+    <td>3.38E-004</td>
+    <td>3.38E-004</td>
+  </tr>
+  <tr>
+    <td>Sulphur Dioxide (SO<sub>2</sub>)<sup>b</sup></td>
+    <td>4.36E-001</td>
+    <td>4.82E-001</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM)<sup>c</sup></td>
+    <td>6.14E-003</td>
+    <td>6.14E-003</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM10)<sup>c</sup></td>
+    <td>3.32E-003</td>
+    <td>3.32E-003</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM2.5)<sup>c</sup></td>
+    <td>2.55E-003</td>
+    <td>2.55E-003</td>
+  </tr>
+  <tr>
+    <td>Ammonia (NH<sub>3</sub>)</td>
+    <td>0<sup>d</sup></td>
+    <td>0<sup>d</sup></td>
+  </tr>
+  <tr>
+    <td>Volatile Organic Compounds (NMVOC)</td>
+    <td>1.04E-003</td>
+    <td>1.04E-003</td>
+  </tr>
+  <tr>
+    <td>Mercury (Hg)</td>
+    <td>3.47E-006</td>
+    <td>3.47E-006</td>
+  </tr>
+  <tr>
+    <td>Lead (Pb)</td>
+    <td>4.64E-006</td>
+    <td>4.64E-006</td>
+  </tr>
+  <tr>
+    <td>a Based on data from Tables 1.3-1, 1.3-3, 1-3.8, 1.3-10 and 1.3-12 in EPA (1998b).</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>b Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes 1% sulfur content. The SO<sub>2</sub> emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by percentage sulfur content.</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>d No data.</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
 
 Table 97.  Emission Factors for Residential Oil Furnace
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Pollutant</td>
-<td>Emission Factor<sup>a</sup>   (g/MJ)</td>
+<th>Pollutant</th>
+<th>Emission Factor<sup>a</sup>   (g/MJ)</th>
 </tr>
 <tr>
 <td>Carbon Dioxide (CO<sub>2</sub>)</td>
@@ -410,343 +361,298 @@ Table 97.  Emission Factors for Residential Oil Furnace
 <td>Lead (Pb)</td>
 <td>4.63699E-06</td>
 </tr>
-
+<tr>
+ <td colspan="2">a Based on data from Tables 1.3-1, 1.3-3, 1.3-8, 1.3-10, and 1.3-12 in EPA (1998b).</td>
+</tr>
+<tr>
+ <td colspan="2">b Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes 1% sulfur content. The SO<sub>2</sub> emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by percentage sulfur content.</td>
+</tr>
+<tr>
+ <td colspan="2">c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.</td>
+</tr>
+<tr>
+ <td colspan="2">d No data.</td>
+</tr>
 </table>
-
-a Based on data from Tables 1.3-1, 1.3-3, 1.3-8, 1.3-10, and 1.3-12 in EPA (1998b).
-
-b Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes 1% sulfur content. The SO<sub>2</sub> emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by percentage sulfur content.
-
-c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.
-
-d No data.
-
-
 
 Table 98.  Emission Factors for LPG (butane and propane)
 
-**Pollutant**
-
-**LPG (butane)**
-
-**Propane**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-Carbon Dioxide (CO<sub>2</sub>)
-
-66.02330
-
-68.47998
-
-Carbon Monoxide (CO)
-
-1.53543E-02
-
-1.53543E-02
-
-Methane (CH<sub>4</sub>)
-
-6.63304E-04
-
-6.63304E-04
-
-Nitrogen Oxides (NO<sub>X</sub>)
-
-6.14170E-02
-
-7.37004E-02
-
-Nitrous Oxide (N<sub>2</sub>O)
-
-3.37794E-04
-
-3.37794E-04
-
-Sulphur Dioxide (SO<sub>2</sub>)<sup>b</sup>
-
-4.36061E-01
-
-4.82124E-01
-
-Particulate Matter (PM)<sup>c</sup>
-
-6.14170E-03
-
-6.14170E-03
-
-Particulate Matter (PM10)<sup>c</sup>
-
-3.31652E-03
-
-3.31652E-03
-
-Particulate Matter (PM2.5)<sup>c</sup>
-
-2.54881E-03
-
-2.54881E-03
-
-Ammonia (NH<sub>3</sub>)
-
-0<sup>d</sup>
-
-0<sup>d</sup>
-
-Volatile Organic Compounds (NMVOC)
-
-1.04409E-03
-
-1.04409E-03
-
-Mercury (Hg)
-
-3.47006E-06
-
-3.47006E-06
-
-Lead (Pb)
-
-4.63699E-06
-
-4.63699E-06
-
-a Based on data from Table # 1.5-1 in EPA (1996), Higher Heating value of 1.02 MMBtu/gal for butane and 0.915 MMBtu/gal for propane based on data in EPA (1996).
-
-b Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes sulphur content is 0.18 gr/100 ft3.The SO<sub>2</sub> emission factor can be converted to other LPG sulphur contents by multiplying the SO<sub>2</sub> emission factor by the ratio of the site-specific sulphur content gr/100 ft3 to 0.18 gr/100 ft3.
-
-c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.
-
-d No data.
-
-
+<table class="table table-striped">
+  <tr>
+    <th>Pollutant</th>
+    <th>LPG (butane) Emission Factor <sup>a</sup> (g/MJ)</th>
+    <th>Propane Emission Factor <sup>a</sup> (g/MJ)</th>
+  </tr>
+  <tr>
+    <td>Carbon Dioxide (CO<sub>2</sub>)</td>
+    <td>66.0233</td>
+    <td>68.47998</td>
+  </tr>
+  <tr>
+    <td>Carbon Monoxide (CO)</td>
+    <td>1.54E-002</td>
+    <td>1.54E-002</td>
+  </tr>
+  <tr>
+    <td>Methane (CH<sub>4</sub>)</td>
+    <td>6.63E-004</td>
+    <td>6.63E-004</td>
+  </tr>
+  <tr>
+    <td>Nitrogen Oxides (NO<sub>X</sub>)</td>
+    <td>6.14E-002</td>
+    <td>7.37E-002</td>
+  </tr>
+  <tr>
+    <td>Nitrous Oxide (N<sub>2</sub>O)</td>
+    <td>3.38E-004</td>
+    <td>3.38E-004</td>
+  </tr>
+  <tr>
+    <td>Sulphur Dioxide (SO<sub>2</sub>)<sup>b</sup></td>
+    <td>4.36E-001</td>
+    <td>4.82E-001</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM)<sup>c</sup></td>
+    <td>6.14E-003</td>
+    <td>6.14E-003</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM10)<sup>c</sup></td>
+    <td>3.32E-003</td>
+    <td>3.32E-003</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM2.5)<sup>c</sup></td>
+    <td>2.55E-003</td>
+    <td>2.55E-003</td>
+  </tr>
+  <tr>
+    <td>Ammonia (NH<sub>3</sub>)</td>
+    <td>0<sup>d</sup></td>
+    <td>0<sup>d</sup></td>
+  </tr>
+  <tr>
+    <td>Volatile Organic Compounds (NMVOC)</td>
+    <td>1.04E-003</td>
+    <td>1.04E-003</td>
+  </tr>
+  <tr>
+    <td>Mercury (Hg)</td>
+    <td>3.47E-006</td>
+    <td>3.47E-006</td>
+  </tr>
+  <tr>
+    <td>Lead (Pb)</td>
+    <td>4.64E-006</td>
+    <td>4.64E-006</td>
+  </tr>
+  <tr>
+    <td colspan="3">a Based on data from Table # 1.5-1 in EPA (1996); Higher Heating value of 1.02 MMBtu/gal for butane and 0.915 MMBtu/gal for propane based on data in EPA (1996).</td>
+  </tr>
+  <tr>
+    <td colspan="3">b Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes sulphur content is 0.18 gr/100 ft3.The SO<sub>2</sub> emission factor can be converted to other LPG sulphur contents by multiplying the SO<sub>2</sub> emission factor by the ratio of the site-specific sulphur content gr/100 ft3 to 0.18 gr/100 ft3.</td>
+  </tr>
+  <tr>
+    <td colspan="3">c PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns; respectively.</td>
+  </tr>
+  <tr>
+    <td colspan="3">d No data.</td>
+  </tr>
+</table>
 
 Table 99.  Emission Factors for Gasoline and Diesel
 
-**Pollutant**
-
-**Gasoline**
-
-**Diesel**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-Carbon Dioxide (CO<sub>2</sub>)
-
-66.20808
-
-70.50731
-
-Carbon Monoxide (CO)
-
-2.69561E+01
-
-4.08426E-01
-
-Methane (CH<sub>4</sub>)
-
-0<sup>c</sup>
-
-0<sup>c</sup>
-
-Nitrogen Oxides (NO<sub>X</sub>)
-
-7.00774E-01
-
-1.89596E+00
-
-Nitrous Oxide (N<sub>2</sub>O)
-
-0<sup>c</sup>
-
-0<sup>c</sup>
-
-Sulphur Dioxide (SO<sub>2</sub>)
-
-3.61135E-02
-
-1.24678E-01
-
-Particulate Matter (PM)<sup>b</sup>
-
-0<sup>c</sup>
-
-0<sup>c</sup>
-
-Particulate Matter (PM10)<sup>b</sup>
-
-4.29923E-02
-
-1.33276E-01
-
-Particulate Matter (PM2.5)<sup>b</sup>
-
-0<sup>c</sup>
-
-0<sup>c</sup>
-
-Ammonia (NH<sub>3</sub>)
-
-0<sup>c</sup>
-
-0<sup>c</sup>
-
-Volatile Organic Compounds (NMVOC)
-
-9.02837E-01
-
-1.50473E-01
-
-Mercury (Hg)
-
-0<sup>c</sup>
-
-0<sup>c</sup>
-
-Lead (Pb)
-
-0<sup>c</sup>
-
-0<sup>c</sup>
-
-a Based on data from Table # 3.3-1 in EPA (1996), Diesel higher heating value of 19,300 Btu/lb, and gasoline higher heating value of 20,300 Btu/lb based on data in EPA (1996).
-
-b PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.
-
-c No data.
-
+<table class="table table-striped">
+  <tr>
+    <th>Pollutant</th>
+    <th>Gasoline Emission Factor<sup>a</sup> (g/MJ)</th>
+    <th>Diesel Emission Factor<sup>a</sup> (g/MJ)</th>
+  </tr>
+  <tr>
+    <td>Carbon Dioxide (CO<sub>2</sub>)</td>
+    <td>66.20808</td>
+    <td>70.50731</td>
+  </tr>
+  <tr>
+    <td>Carbon Monoxide (CO)</td>
+    <td>2.70E+001</td>
+    <td>4.08E-001</td>
+  </tr>
+  <tr>
+    <td>Methane (CH<sub>4</sub>)</td>
+    <td>0<sup>c</sup></td>
+    <td>0<sup>c</sup></td>
+  </tr>
+  <tr>
+    <td>Nitrogen Oxides (NO<sub>X</sub>)</td>
+    <td>7.01E-001</td>
+    <td>1.90E+000</td>
+  </tr>
+  <tr>
+    <td>Nitrous Oxide (N<sub>2</sub>O)</td>
+    <td>0<sup>c</sup></td>
+    <td>0<sup>c</sup></td>
+  </tr>
+  <tr>
+    <td>Sulphur Dioxide (SO<sub>2</sub>)</td>
+    <td>3.61E-002</td>
+    <td>1.25E-001</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM)<sup>b</sup></td>
+    <td>0<sup>c</sup></td>
+    <td>0<sup>c</sup></td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM10)<sup>b</sup></td>
+    <td>4.30E-002</td>
+    <td>1.33E-001</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM2.5)<sup>b</sup></td>
+    <td>0<sup>c</sup></td>
+    <td>0<sup>c</sup></td>
+  </tr>
+  <tr>
+    <td>Ammonia (NH<sub>3</sub>)</td>
+    <td>0<sup>c</sup></td>
+    <td>0<sup>c</sup></td>
+  </tr>
+  <tr>
+    <td>Volatile Organic Compounds (NMVOC)</td>
+    <td>9.03E-001</td>
+    <td>1.50E-001</td>
+  </tr>
+  <tr>
+    <td>Mercury (Hg)</td>
+    <td>0<sup>c</sup></td>
+    <td>0<sup>c</sup></td>
+  </tr>
+  <tr>
+    <td>Lead (Pb)</td>
+    <td>0<sup>c</sup></td>
+    <td>0<sup>c</sup></td>
+  </tr>
+  <tr>
+    <td colspan="3">a Based on data from Table # 3.3-1 in EPA (1996); Diesel higher heating value of 19300 Btu/lb and gasoline higher heating value of 20300 Btu/lb based on data in EPA (1996).</td>
+  </tr>
+  <tr>
+    <td colspan="3">b PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns; respectively.</td>
+  </tr>
+  <tr>
+    <td colspan="3">c No data.</td>
+  </tr>
+</table>
 
 
 Table 100.  Emission Factors for Coal
 
-**Pollutant**
-
-**Bituminous**
-
-**Anthracite**
-
-**Lignite**
-
-**Emission Factor<sup>a</sup>   (g/MJ)**
-
-**Emission Factor<sup>b</sup>   (g/MJ)**
-
-**Emission Factor<sup>c</sup>   (g/MJ)**
-
-Carbon Dioxide (CO<sub>2</sub>)
-
-91.11052
-
-99.26669
-
-152.12646
-
-Carbon Monoxide (CO)
-
-8.26774E-03
-
-1.04859E-02
-
-8.26774E-03
-
-Methane (CH<sub>4</sub>)
-
-6.61419E-04
-
-0<sup>f</sup>
-
-0<sup>f</sup>
-
-Nitrogen Oxides (NO<sub>X</sub>)
-
-1.98426E-01
-
-3.14578E-01
-
-2.34804E-01
-
-Nitrous Oxide (N<sub>2</sub>O)
-
-4.96065E-04
-
-0<sup>f</sup>
-
-0<sup>f</sup>
-
-Sulphur Dioxide (SO<sub>2</sub>)<sup>d</sup>
-
-6.28348E-01
-
-6.81585E-01
-
-9.92129E-01
-
-Particulate Matter (PM)<sup>e</sup>
-
-1.65355E-01
-
-1.74765E-01
-
-2.18268E-01
-
-Particulate Matter (PM10)<sup>e</sup>
-
-3.80316E-02
-
-4.01960E-02
-
-7.60632E-02
-
-Particulate Matter (PM2.5)<sup>e</sup>
-
-9.92129E-03
-
-1.04859E-02
-
-2.18268E-02
-
-Ammonia (NH<sub>3</sub>)
-
-0<sup>f</sup>
-
-0<sup>f</sup>
-
-0<sup>f</sup>
-
-Volatile Organic Compounds (NMVOC)
-
-9.92129E-04
-
-2.14961E-02
-
-1.32284E-03
-
-Mercury (Hg)
-
-6.94490E-06
-
-2.27195E-06
-
-2.74489E-06
-
-Lead (Pb)
-
-1.37245E-06
-
-1.55541E-04
-
-1.38898E-05
-
-a Based on data on pulverized coal from Tables 1.1-3, 1.1-6, 1.1-18, 1.1-19 in EPA (1998a), Coal average higher heating value of 26.0 MMBtu/ton based on EPA (1998a).
- b Based on data on pulverized coal from Tables 1.2-1, 1.2-2, 1.2-3, 1.2-4, 1.2-7 in EPA (1996), Coal average higher heating value of 24.6 MMBtu/ton based on EPA (1996).
- c Based on data on pulverized coal from Tables 1.7-1, 1.7-3, 1.7-7, 1.7-14 in EPA (1998b), Coal average higher heating value of 13.0 MMBtu/ton based on EPA (1998b).
- d Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes 1% sulfur content. The SO<sub>2</sub> emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by percentage sulfur content.
- e PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 are particles smaller than 10 and 2.5 microns, respectively. Expressed in terms of coal ash content, assumes 1% ash content.  Multiply weight % ash content of coal (as fired) by the value.
- f No data.
+<table class="table table-striped">
+  <tr>
+    <th>Pollutant</th>
+    <th>Bituminous Emission Factor<sup>a</sup> (g/MJ)</th>
+    <th>Anthracite Emission Factor<sup>a</sup> (g/MJ)</th>
+    <th>Lignite Emission Factor<sup>a</sup> (g/MJ)</th>
+  </tr>
+  <tr>
+    <td>Carbon Dioxide (CO<sub>2</sub>)</td>
+    <td>91.11052</td>
+    <td>99.26669</td>
+    <td>152.12646</td>
+  </tr>
+  <tr>
+    <td>Carbon Monoxide (CO)</td>
+    <td>8.27E-003</td>
+    <td>1.05E-002</td>
+    <td>8.27E-003</td>
+  </tr>
+  <tr>
+    <td>Methane (CH<sub>4</sub>)</td>
+    <td>6.61E-004</td>
+    <td>0<sup>f</sup></td>
+    <td>0<sup>f</sup></td>
+  </tr>
+  <tr>
+    <td>Nitrogen Oxides (NO<sub>X</sub>)</td>
+    <td>1.98E-001</td>
+    <td>3.15E-001</td>
+    <td>2.35E-001</td>
+  </tr>
+  <tr>
+    <td>Nitrous Oxide (N<sub>2</sub>O)</td>
+    <td>4.96E-004</td>
+    <td>0<sup>f</sup></td>
+    <td>0<sup>f</sup></td>
+  </tr>
+  <tr>
+    <td>Sulphur Dioxide (SO<sub>2</sub>)<sup>d</sup></td>
+    <td>6.28E-001</td>
+    <td>6.82E-001</td>
+    <td>9.92E-001</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM)<sup>e</sup></td>
+    <td>1.65E-001</td>
+    <td>1.75E-001</td>
+    <td>2.18E-001</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM10)<sup>e</sup></td>
+    <td>3.80E-002</td>
+    <td>4.02E-002</td>
+    <td>7.61E-002</td>
+  </tr>
+  <tr>
+    <td>Particulate Matter (PM2.5)<sup>e</sup></td>
+    <td>9.92E-003</td>
+    <td>1.05E-002</td>
+    <td>2.18E-002</td>
+  </tr>
+  <tr>
+    <td>Ammonia (NH<sub>3</sub>)</td>
+    <td>0<sup>f</sup></td>
+    <td>0<sup>f</sup></td>
+    <td>0<sup>f</sup></td>
+  </tr>
+  <tr>
+    <td>Volatile Organic Compounds (NMVOC)</td>
+    <td>9.92E-004</td>
+    <td>2.15E-002</td>
+    <td>1.32E-003</td>
+  </tr>
+  <tr>
+    <td>Mercury (Hg)</td>
+    <td>6.94E-006</td>
+    <td>2.27E-006</td>
+    <td>2.74E-006</td>
+  </tr>
+  <tr>
+    <td>Lead (Pb)</td>
+    <td>1.37E-006</td>
+    <td>1.56E-004</td>
+    <td>1.39E-005</td>
+  </tr>
+  <tr>
+    <td colspan="4">a Based on data on pulverized coal from Tables 1.1-3, 1.1-6, 1.1-18, 1.1-19 in EPA (1998a), Coal average higher heating value of 26.0 MMBtu/ton based on EPA (1998a).</td>
+  </tr>
+  <tr>
+    <td colspan="4">b Based on data on pulverized coal from Tables 1.2-1, 1.2-2, 1.2-3, 1.2-4, 1.2-7 in EPA (1996), Coal average higher heating value of 24.6 MMBtu/ton based on EPA (1996).</td>
+  </tr>
+  <tr>
+    <td colspan="4">c Based on data on pulverized coal from Tables 1.7-1, 1.7-3, 1.7-7, 1.7-14 in EPA (1998b), Coal average higher heating value of 13.0 MMBtu/ton based on EPA (1998b).</td>
+  </tr>
+  <tr>
+    <td colspan="4">d Based on 100% conversion of fuel sulfur to SO<sub>2</sub>. Assumes 1% sulfur content. The SO<sub>2</sub> emission factor in this table can be converted to other natural gas sulfur contents by multiplying the SO<sub>2</sub> emission factor by percentage sulfur content.</td>
+  </tr>
+  <tr>
+    <td colspan="4">e PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 are particles smaller than 10 and 2.5 microns, respectively. Expressed in terms of coal ash content, assumes 1% ash content.  Multiply weight % ash content of coal (as fired) by the value.</td>
+  </tr>
+  <tr>
+    <td colspan="4">f No data.</td>
+  </tr>
+</table>
 
 ### Off-Site Electricity Generation Emissions
 
@@ -757,14 +663,9 @@ As mentioned in the introduction to this section, EnergyPlus also calculates wat
 Table 101.  United States National Average Emission Factors for Electricity Generation
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
 <td> </td>
-<td>Efficiency Ratio (J/J)</td>
+<th>Efficiency Ratio (J/J)</th>
 </tr>
 <tr>
 <td>Ratio of Heat Input to Electricity Output<sup>a</sup></td>
@@ -775,8 +676,8 @@ Table 101.  United States National Average Emission Factors for Electricity Gen
 <td> </td>
 </tr>
 <tr>
-<td>Pollutant</td>
-<td>Emission Factor   (g/MJ)</td>
+<th>Pollutant</th>
+<th>Emission Factor   (g/MJ)</th>
 </tr>
 <tr>
 <td>Carbon Dioxide (CO<sub>2</sub>)<sup>b</sup></td>
@@ -830,882 +731,575 @@ Table 101.  United States National Average Emission Factors for Electricity Gen
 <td>Lead (Pb)</td>
 <td>0<sup>e</sup></td>
 </tr>
-
+<tr>
+ <td colspan="2"><sup>a</sup> Data based on 1999 data from *eGRID* version 2.01 (EPA 2003a).</td>
+</tr>
+<tr>
+ <td colspan="2"><sup>b</sup> Data based on 1998-2000 average data in DOE (2002).</td>
+</tr>
+<tr>
+ <td colspan="2"><sup>c</sup> Data based on tier emissions report for criteria air pollutants in EPA (2003b).</td>
+</tr>
+<tr>
+ <td colspan="2"><sup>d</sup> PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.</td>
+</tr>
+<tr>
+ <td colspan="2"><sup>e</sup> No data.</td>
+</tr>
 </table>
-
-<sup>a</sup> Data based on 1999 data from *eGRID* version 2.01 (EPA 2003a).
- <sup>b</sup> Data based on 1998-2000 average data in DOE (2002).
- <sup>c</sup> Data based on tier emissions report for criteria air pollutants in EPA (2003b).
- <sup>d</sup> PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.
- <sup>e</sup> No data.
 
 Table 102.  U. S. State Average Greenhouse Gas Emission Factors for Electricity Generation, in g/MJ
 
-
-
-Ratio of Heat Input to Electric Output
-
-Carbon Dioxide (CO<sub>2</sub>)<sup>b</sup>
-
-Carbon Monoxide (CO)<sup>c</sup>
-
-Methane (CH4)<sup>b</sup>
-
-Nitrogen Oxides (NO<sub>X</sub>)<sup>a</sup>
-
-Nitrous Oxide (N<sub>2</sub>O)<sup>b</sup>
-
-Sulphur Dioxide (SO<sub>2</sub>)<sup>a</sup>
-
-Alabama
-
-2.230
-
-165.30922
-
-1.45087E+03
-
-1.72617E-03
-
-4.02311E-01
-
-2.80975E-03
-
-1.13940E+00
-
-Alaska
-
-2.734
-
-173.87708
-
-3.71694E+02
-
-8.56786E-04
-
-7.29024E-01
-
-1.12138E-03
-
-2.38136E-01
-
-Arizona
-
-1.694
-
-132.29777
-
-8.26924E+02
-
-8.56786E-04
-
-2.74423E-01
-
-1.94037E-03
-
-2.27552E-01
-
-Arkansas
-
-2.207
-
-162.03327
-
-6.41833E+02
-
-1.57497E-03
-
-2.87149E-01
-
-2.55776E-03
-
-4.24991E-01
-
-California
-
-1.422
-
-76.35472
-
-2.91370E+03
-
-8.44186E-04
-
-6.56449E-02
-
-4.66192E-04
-
-3.04915E-02
-
-Colorado
-
-3.101
-
-242.67192
-
-1.51197E+03
-
-1.60017E-03
-
-4.74004E-01
-
-3.64134E-03
-
-5.83874E-01
-
-Connecticut
-
-1.720
-
-118.69000
-
-3.21421E+02
-
-2.19236E-03
-
-1.81563E-01
-
-1.51197E-03
-
-3.78750E-01
-
-Delaware
-
-2.736
-
-230.57612
-
-1.31290E+02
-
-1.54977E-03
-
-4.12517E-01
-
-2.86015E-03
-
-1.10866E+00
-
-District of Columbia
-
-4.844
-
-172.11310
-
-8.94585E+00
-
-1.48677E-03
-
-7.29528E-01
-
-2.59556E-03
-
-1.62487E+00
-
-Florida
-
-2.694
-
-175.64105
-
-6.12954E+03
-
-1.88997E-03
-
-4.73122E-01
-
-2.26796E-03
-
-1.00584E+00
-
-Georgia
-
-2.119
-
-172.11310
-
-1.05889E+03
-
-1.62537E-03
-
-4.00043E-01
-
-2.84755E-03
-
-1.11974E+00
-
-Hawaii
-
-2.950
-
-209.40848
-
-1.17682E+02
-
-2.69635E-03
-
-7.27512E-01
-
-2.30576E-03
-
-5.44437E-01
-
-Idaho
-
-0.213
-
-3.52794
-
-0
-
-1.00798E-03
-
-1.07098E-02
-
-4.15793E-04
-
-1.05838E-02
-
-Illinois
-
-1.694
-
-146.66153
-
-1.85292E+03
-
-1.03318E-03
-
-4.41749E-01
-
-2.26796E-03
-
-1.11811E+00
-
-Indiana
-
-3.281
-
-261.57160
-
-2.14058E+03
-
-1.80177E-03
-
-7.30284E-01
-
-4.06973E-03
-
-1.88846E+00
-
-Iowa
-
-3.033
-
-237.12801
-
-7.57877E+02
-
-1.73877E-03
-
-5.61447E-01
-
-3.75474E-03
-
-1.04566E+00
-
-Kansas
-
-2.826
-
-212.18043
-
-8.65983E+02
-
-1.41118E-03
-
-5.58801E-01
-
-3.20035E-03
-
-7.06596E-01
-
-Kentucky
-
-3.234
-
-253.00374
-
-1.50857E+03
-
-1.76397E-03
-
-8.41036E-01
-
-4.04453E-03
-
-1.79257E+00
-
-Lousiana
-
-2.624
-
-148.42550
-
-1.68116E+04
-
-1.18438E-03
-
-3.41958E-01
-
-1.41118E-03
-
-5.05755E-01
-
-Maine
-
-2.191
-
-107.35019
-
-4.92778E+02
-
-7.11888E-03
-
-1.79547E-01
-
-3.40194E-03
-
-4.04327E-01
-
-Maryland
-
-2.277
-
-172.11310
-
-4.89502E+02
-
-1.48677E-03
-
-5.37759E-01
-
-2.59556E-03
-
-1.38837E+00
-
-Massachusetts
-
-2.729
-
-161.02529
-
-7.89125E+02
-
-2.19236E-03
-
-2.89165E-01
-
-2.00337E-03
-
-8.01347E-01
-
-Michigan
-
-2.616
-
-199.07665
-
-1.69354E+03
-
-1.83957E-03
-
-4.91770E-01
-
-3.14995E-03
-
-9.76988E-01
-
-Minnesota
-
-2.331
-
-163.04126
-
-6.96264E+02
-
-1.66317E-03
-
-5.02354E-01
-
-2.07897E-03
-
-5.06889E-01
-
-Mississippi
-
-2.404
-
-231.83610
-
-2.17976E+03
-
-1.58757E-03
-
-4.66570E-01
-
-3.62874E-03
-
-8.98239E-01
-
-Missouri
-
-2.857
-
-192.02077
-
-1.29753E+03
-
-1.97817E-03
-
-6.41707E-01
-
-3.11215E-03
-
-9.07059E-01
-
-Montana
-
-1.936
-
-180.68096
-
-4.13147E+02
-
-1.36078E-03
-
-3.58212E-01
-
-2.86015E-03
-
-2.01219E-01
-
-Nebraska
-
-2.195
-
-176.39703
-
-4.68208E+02
-
-1.19698E-03
-
-3.94121E-01
-
-2.75935E-03
-
-5.29065E-01
-
-Nevada
-
-2.615
-
-191.26478
-
-3.82278E+02
-
-1.13398E-03
-
-4.01807E-01
-
-2.45696E-03
-
-4.02815E-01
-
-New Hampshire
-
-1.394
-
-85.93055
-
-2.63588E+02
-
-2.16716E-03
-
-2.03109E-01
-
-1.77657E-03
-
-8.71275E-01
-
-New Jersey
-
-1.451
-
-88.95450
-
-2.27250E+03
-
-9.70184E-04
-
-1.76649E-01
-
-9.95383E-04
-
-2.31206E-01
-
-New Mexico
-
-3.307
-
-254.26372
-
-8.56408E+02
-
-1.65057E-03
-
-6.57583E-01
-
-3.72954E-03
-
-5.70140E-01
-
-New York
-
-1.808
-
-108.10618
-
-1.93835E+03
-
-1.02058E-03
-
-1.69089E-01
-
-1.12138E-03
-
-4.68082E-01
-
-North Carolina
-
-1.969
-
-156.48937
-
-1.10286E+03
-
-1.32298E-03
-
-4.68712E-01
-
-2.55776E-03
-
-1.00131E+00
-
-North Dakota
-
-3.244
-
-282.48725
-
-9.01389E+02
-
-1.85217E-03
-
-6.44731E-01
-
-4.27133E-03
-
-1.52697E+00
-
-Ohio
-
-2.736
-
-226.79619
-
-1.58757E+03
-
-1.63797E-03
-
-7.67579E-01
-
-3.62874E-03
-
-2.33562E+00
-
-Oklahoma
-
-3.024
-
-216.96835
-
-1.67262E+03
-
-1.38598E-03
-
-5.11425E-01
-
-2.80975E-03
-
-5.11047E-01
-
-Oregon
-
-0.526
-
-35.53140
-
-1.86855E+02
-
-4.15793E-04
-
-5.26671E-02
-
-4.28393E-04
-
-7.50947E-02
-
-Pennsylvania
-
-1.827
-
-159.26132
-
-1.85885E+03
-
-1.34818E-03
-
-3.29232E-01
-
-2.55776E-03
-
-1.25834E+00
-
-Rhode Island
-
-2.561
-
-132.54977
-
-1.67955E+02
-
-8.56786E-04
-
-6.21170E-02
-
-5.92190E-04
-
-4.53592E-03
-
-South Carolina
-
-1.300
-
-105.08223
-
-8.38642E+02
-
-1.14658E-03
-
-2.54264E-01
-
-1.82697E-03
-
-6.04790E-01
-
-South Dakota
-
-1.192
-
-100.54631
-
-9.79004E+01
-
-6.67789E-04
-
-5.44941E-01
-
-1.52457E-03
-
-5.81354E-01
-
-Tennessee
-
-1.902
-
-163.29325
-
-9.09579E+02
-
-1.32298E-03
-
-5.10165E-01
-
-2.67116E-03
-
-1.18123E+00
-
-Texas
-
-2.749
-
-184.46090
-
-9.63405E+03
-
-9.70184E-04
-
-3.27720E-01
-
-1.83957E-03
-
-4.90888E-01
-
-Utah
-
-3.095
-
-243.67990
-
-5.13063E+02
-
-1.68837E-03
-
-5.26545E-01
-
-3.88073E-03
-
-2.13314E-01
-
-Vermont
-
-0.306
-
-3.52794
-
-1.38472E+02
-
-1.20958E-03
-
-1.94037E-02
-
-4.91392E-04
-
-2.14196E-03
-
-Virginia
-
-1.924
-
-146.66153
-
-9.12729E+02
-
-1.72617E-03
-
-3.65016E-01
-
-2.41916E-03
-
-7.86857E-01
-
-Washington
-
-0.414
-
-30.99548
-
-4.29653E+02
-
-4.66192E-04
-
-5.30451E-02
-
-5.03992E-04
-
-1.90383E-01
-
-West Virginia
-
-2.917
-
-248.97181
-
-1.27938E+03
-
-1.72617E-03
-
-7.77659E-01
-
-3.98153E-03
-
-1.86918E+00
-
-Wisconsin
-
-2.680
-
-206.88852
-
-1.00471E+03
-
-1.73877E-03
-
-4.97440E-01
-
-3.27594E-03
-
-9.25076E-01
-
-Wyoming
-
-3.534
-
-270.39145
-
-9.01389E+02
-
-1.85217E-03
-
-5.59431E-01
-
-4.25873E-03
-
-5.78708E-01
-
-a Data based on 1999 data from *eGRID* version 2.01 (EPA 2003a).
-
-b Data based on 1998-2000 average data in DOE (2002).
-
-c Data based on tier emissions report for criteria air pollutants in EPA (2003b).
-
-d PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.
-
-e No data.
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th>Ratio of Heat Input to Electric Output</th>
+    <th>Carbon Dioxide (CO 2 ) b</th>
+    <th>Carbon Monoxide (CO) c</th>
+    <th>Methane (CH4) b</th>
+    <th>Nitrogen Oxides (NO X ) a</th>
+    <th>Nitrous Oxide (N 2 O) b</th>
+    <th>Sulphur Dioxide (SO 2 ) a</th>
+  </tr>
+  <tr>
+    <td>Alabama</td>
+    <td>2.23</td>
+    <td>165.30922</td>
+    <td>1.45E+003</td>
+    <td>1.73E-003</td>
+    <td>4.02E-001</td>
+    <td>2.81E-003</td>
+    <td>1.14E+000</td>
+  </tr>
+  <tr>
+    <td>Alaska</td>
+    <td>2.734</td>
+    <td>173.87708</td>
+    <td>3.72E+002</td>
+    <td>8.57E-004</td>
+    <td>7.29E-001</td>
+    <td>1.12E-003</td>
+    <td>2.38E-001</td>
+  </tr>
+  <tr>
+    <td>Arizona</td>
+    <td>1.694</td>
+    <td>132.29777</td>
+    <td>8.27E+002</td>
+    <td>8.57E-004</td>
+    <td>2.74E-001</td>
+    <td>1.94E-003</td>
+    <td>2.28E-001</td>
+  </tr>
+  <tr>
+    <td>Arkansas</td>
+    <td>2.207</td>
+    <td>162.03327</td>
+    <td>6.42E+002</td>
+    <td>1.57E-003</td>
+    <td>2.87E-001</td>
+    <td>2.56E-003</td>
+    <td>4.25E-001</td>
+  </tr>
+  <tr>
+    <td>California</td>
+    <td>1.422</td>
+    <td>76.35472</td>
+    <td>2.91E+003</td>
+    <td>8.44E-004</td>
+    <td>6.56E-002</td>
+    <td>4.66E-004</td>
+    <td>3.05E-002</td>
+  </tr>
+  <tr>
+    <td>Colorado</td>
+    <td>3.101</td>
+    <td>242.67192</td>
+    <td>1.51E+003</td>
+    <td>1.60E-003</td>
+    <td>4.74E-001</td>
+    <td>3.64E-003</td>
+    <td>5.84E-001</td>
+  </tr>
+  <tr>
+    <td>Connecticut</td>
+    <td>1.72</td>
+    <td>118.69</td>
+    <td>3.21E+002</td>
+    <td>2.19E-003</td>
+    <td>1.82E-001</td>
+    <td>1.51E-003</td>
+    <td>3.79E-001</td>
+  </tr>
+  <tr>
+    <td>Delaware</td>
+    <td>2.736</td>
+    <td>230.57612</td>
+    <td>1.31E+002</td>
+    <td>1.55E-003</td>
+    <td>4.13E-001</td>
+    <td>2.86E-003</td>
+    <td>1.11E+000</td>
+  </tr>
+  <tr>
+    <td>District of Columbia</td>
+    <td>4.844</td>
+    <td>172.1131</td>
+    <td>8.95E+000</td>
+    <td>1.49E-003</td>
+    <td>7.30E-001</td>
+    <td>2.60E-003</td>
+    <td>1.62E+000</td>
+  </tr>
+  <tr>
+    <td>Florida</td>
+    <td>2.694</td>
+    <td>175.64105</td>
+    <td>6.13E+003</td>
+    <td>1.89E-003</td>
+    <td>4.73E-001</td>
+    <td>2.27E-003</td>
+    <td>1.01E+000</td>
+  </tr>
+  <tr>
+    <td>Georgia</td>
+    <td>2.119</td>
+    <td>172.1131</td>
+    <td>1.06E+003</td>
+    <td>1.63E-003</td>
+    <td>4.00E-001</td>
+    <td>2.85E-003</td>
+    <td>1.12E+000</td>
+  </tr>
+  <tr>
+    <td>Hawaii</td>
+    <td>2.95</td>
+    <td>209.40848</td>
+    <td>1.18E+002</td>
+    <td>2.70E-003</td>
+    <td>7.28E-001</td>
+    <td>2.31E-003</td>
+    <td>5.44E-001</td>
+  </tr>
+  <tr>
+    <td>Idaho</td>
+    <td>0.213</td>
+    <td>3.52794</td>
+    <td>0</td>
+    <td>1.01E-003</td>
+    <td>1.07E-002</td>
+    <td>4.16E-004</td>
+    <td>1.06E-002</td>
+  </tr>
+  <tr>
+    <td>Illinois</td>
+    <td>1.694</td>
+    <td>146.66153</td>
+    <td>1.85E+003</td>
+    <td>1.03E-003</td>
+    <td>4.42E-001</td>
+    <td>2.27E-003</td>
+    <td>1.12E+000</td>
+  </tr>
+  <tr>
+    <td>Indiana</td>
+    <td>3.281</td>
+    <td>261.5716</td>
+    <td>2.14E+003</td>
+    <td>1.80E-003</td>
+    <td>7.30E-001</td>
+    <td>4.07E-003</td>
+    <td>1.89E+000</td>
+  </tr>
+  <tr>
+    <td>Iowa</td>
+    <td>3.033</td>
+    <td>237.12801</td>
+    <td>7.58E+002</td>
+    <td>1.74E-003</td>
+    <td>5.61E-001</td>
+    <td>3.75E-003</td>
+    <td>1.05E+000</td>
+  </tr>
+  <tr>
+    <td>Kansas</td>
+    <td>2.826</td>
+    <td>212.18043</td>
+    <td>8.66E+002</td>
+    <td>1.41E-003</td>
+    <td>5.59E-001</td>
+    <td>3.20E-003</td>
+    <td>7.07E-001</td>
+  </tr>
+  <tr>
+    <td>Kentucky</td>
+    <td>3.234</td>
+    <td>253.00374</td>
+    <td>1.51E+003</td>
+    <td>1.76E-003</td>
+    <td>8.41E-001</td>
+    <td>4.04E-003</td>
+    <td>1.79E+000</td>
+  </tr>
+  <tr>
+    <td>Lousiana</td>
+    <td>2.624</td>
+    <td>148.4255</td>
+    <td>1.68E+004</td>
+    <td>1.18E-003</td>
+    <td>3.42E-001</td>
+    <td>1.41E-003</td>
+    <td>5.06E-001</td>
+  </tr>
+  <tr>
+    <td>Maine</td>
+    <td>2.191</td>
+    <td>107.35019</td>
+    <td>4.93E+002</td>
+    <td>7.12E-003</td>
+    <td>1.80E-001</td>
+    <td>3.40E-003</td>
+    <td>4.04E-001</td>
+  </tr>
+  <tr>
+    <td>Maryland</td>
+    <td>2.277</td>
+    <td>172.1131</td>
+    <td>4.90E+002</td>
+    <td>1.49E-003</td>
+    <td>5.38E-001</td>
+    <td>2.60E-003</td>
+    <td>1.39E+000</td>
+  </tr>
+  <tr>
+    <td>Massachusetts</td>
+    <td>2.729</td>
+    <td>161.02529</td>
+    <td>7.89E+002</td>
+    <td>2.19E-003</td>
+    <td>2.89E-001</td>
+    <td>2.00E-003</td>
+    <td>8.01E-001</td>
+  </tr>
+  <tr>
+    <td>Michigan</td>
+    <td>2.616</td>
+    <td>199.07665</td>
+    <td>1.69E+003</td>
+    <td>1.84E-003</td>
+    <td>4.92E-001</td>
+    <td>3.15E-003</td>
+    <td>9.77E-001</td>
+  </tr>
+  <tr>
+    <td>Minnesota</td>
+    <td>2.331</td>
+    <td>163.04126</td>
+    <td>6.96E+002</td>
+    <td>1.66E-003</td>
+    <td>5.02E-001</td>
+    <td>2.08E-003</td>
+    <td>5.07E-001</td>
+  </tr>
+  <tr>
+    <td>Mississippi</td>
+    <td>2.404</td>
+    <td>231.8361</td>
+    <td>2.18E+003</td>
+    <td>1.59E-003</td>
+    <td>4.67E-001</td>
+    <td>3.63E-003</td>
+    <td>8.98E-001</td>
+  </tr>
+  <tr>
+    <td>Missouri</td>
+    <td>2.857</td>
+    <td>192.02077</td>
+    <td>1.30E+003</td>
+    <td>1.98E-003</td>
+    <td>6.42E-001</td>
+    <td>3.11E-003</td>
+    <td>9.07E-001</td>
+  </tr>
+  <tr>
+    <td>Montana</td>
+    <td>1.936</td>
+    <td>180.68096</td>
+    <td>4.13E+002</td>
+    <td>1.36E-003</td>
+    <td>3.58E-001</td>
+    <td>2.86E-003</td>
+    <td>2.01E-001</td>
+  </tr>
+  <tr>
+    <td>Nebraska</td>
+    <td>2.195</td>
+    <td>176.39703</td>
+    <td>4.68E+002</td>
+    <td>1.20E-003</td>
+    <td>3.94E-001</td>
+    <td>2.76E-003</td>
+    <td>5.29E-001</td>
+  </tr>
+  <tr>
+    <td>Nevada</td>
+    <td>2.615</td>
+    <td>191.26478</td>
+    <td>3.82E+002</td>
+    <td>1.13E-003</td>
+    <td>4.02E-001</td>
+    <td>2.46E-003</td>
+    <td>4.03E-001</td>
+  </tr>
+  <tr>
+    <td>New Hampshire</td>
+    <td>1.394</td>
+    <td>85.93055</td>
+    <td>2.64E+002</td>
+    <td>2.17E-003</td>
+    <td>2.03E-001</td>
+    <td>1.78E-003</td>
+    <td>8.71E-001</td>
+  </tr>
+  <tr>
+    <td>New Jersey</td>
+    <td>1.451</td>
+    <td>88.9545</td>
+    <td>2.27E+003</td>
+    <td>9.70E-004</td>
+    <td>1.77E-001</td>
+    <td>9.95E-004</td>
+    <td>2.31E-001</td>
+  </tr>
+  <tr>
+    <td>New Mexico</td>
+    <td>3.307</td>
+    <td>254.26372</td>
+    <td>8.56E+002</td>
+    <td>1.65E-003</td>
+    <td>6.58E-001</td>
+    <td>3.73E-003</td>
+    <td>5.70E-001</td>
+  </tr>
+  <tr>
+    <td>New York</td>
+    <td>1.808</td>
+    <td>108.10618</td>
+    <td>1.94E+003</td>
+    <td>1.02E-003</td>
+    <td>1.69E-001</td>
+    <td>1.12E-003</td>
+    <td>4.68E-001</td>
+  </tr>
+  <tr>
+    <td>North Carolina</td>
+    <td>1.969</td>
+    <td>156.48937</td>
+    <td>1.10E+003</td>
+    <td>1.32E-003</td>
+    <td>4.69E-001</td>
+    <td>2.56E-003</td>
+    <td>1.00E+000</td>
+  </tr>
+  <tr>
+    <td>North Dakota</td>
+    <td>3.244</td>
+    <td>282.48725</td>
+    <td>9.01E+002</td>
+    <td>1.85E-003</td>
+    <td>6.45E-001</td>
+    <td>4.27E-003</td>
+    <td>1.53E+000</td>
+  </tr>
+  <tr>
+    <td>Ohio</td>
+    <td>2.736</td>
+    <td>226.79619</td>
+    <td>1.59E+003</td>
+    <td>1.64E-003</td>
+    <td>7.68E-001</td>
+    <td>3.63E-003</td>
+    <td>2.34E+000</td>
+  </tr>
+  <tr>
+    <td>Oklahoma</td>
+    <td>3.024</td>
+    <td>216.96835</td>
+    <td>1.67E+003</td>
+    <td>1.39E-003</td>
+    <td>5.11E-001</td>
+    <td>2.81E-003</td>
+    <td>5.11E-001</td>
+  </tr>
+  <tr>
+    <td>Oregon</td>
+    <td>0.526</td>
+    <td>35.5314</td>
+    <td>1.87E+002</td>
+    <td>4.16E-004</td>
+    <td>5.27E-002</td>
+    <td>4.28E-004</td>
+    <td>7.51E-002</td>
+  </tr>
+  <tr>
+    <td>Pennsylvania</td>
+    <td>1.827</td>
+    <td>159.26132</td>
+    <td>1.86E+003</td>
+    <td>1.35E-003</td>
+    <td>3.29E-001</td>
+    <td>2.56E-003</td>
+    <td>1.26E+000</td>
+  </tr>
+  <tr>
+    <td>Rhode Island</td>
+    <td>2.561</td>
+    <td>132.54977</td>
+    <td>1.68E+002</td>
+    <td>8.57E-004</td>
+    <td>6.21E-002</td>
+    <td>5.92E-004</td>
+    <td>4.54E-003</td>
+  </tr>
+  <tr>
+    <td>South Carolina</td>
+    <td>1.3</td>
+    <td>105.08223</td>
+    <td>8.39E+002</td>
+    <td>1.15E-003</td>
+    <td>2.54E-001</td>
+    <td>1.83E-003</td>
+    <td>6.05E-001</td>
+  </tr>
+  <tr>
+    <td>South Dakota</td>
+    <td>1.192</td>
+    <td>100.54631</td>
+    <td>9.79E+001</td>
+    <td>6.68E-004</td>
+    <td>5.45E-001</td>
+    <td>1.52E-003</td>
+    <td>5.81E-001</td>
+  </tr>
+  <tr>
+    <td>Tennessee</td>
+    <td>1.902</td>
+    <td>163.29325</td>
+    <td>9.10E+002</td>
+    <td>1.32E-003</td>
+    <td>5.10E-001</td>
+    <td>2.67E-003</td>
+    <td>1.18E+000</td>
+  </tr>
+  <tr>
+    <td>Texas</td>
+    <td>2.749</td>
+    <td>184.4609</td>
+    <td>9.63E+003</td>
+    <td>9.70E-004</td>
+    <td>3.28E-001</td>
+    <td>1.84E-003</td>
+    <td>4.91E-001</td>
+  </tr>
+  <tr>
+    <td>Utah</td>
+    <td>3.095</td>
+    <td>243.6799</td>
+    <td>5.13E+002</td>
+    <td>1.69E-003</td>
+    <td>5.27E-001</td>
+    <td>3.88E-003</td>
+    <td>2.13E-001</td>
+  </tr>
+  <tr>
+    <td>Vermont</td>
+    <td>0.306</td>
+    <td>3.52794</td>
+    <td>1.38E+002</td>
+    <td>1.21E-003</td>
+    <td>1.94E-002</td>
+    <td>4.91E-004</td>
+    <td>2.14E-003</td>
+  </tr>
+  <tr>
+    <td>Virginia</td>
+    <td>1.924</td>
+    <td>146.66153</td>
+    <td>9.13E+002</td>
+    <td>1.73E-003</td>
+    <td>3.65E-001</td>
+    <td>2.42E-003</td>
+    <td>7.87E-001</td>
+  </tr>
+  <tr>
+    <td>Washington</td>
+    <td>0.414</td>
+    <td>30.99548</td>
+    <td>4.30E+002</td>
+    <td>4.66E-004</td>
+    <td>5.30E-002</td>
+    <td>5.04E-004</td>
+    <td>1.90E-001</td>
+  </tr>
+  <tr>
+    <td>West Virginia</td>
+    <td>2.917</td>
+    <td>248.97181</td>
+    <td>1.28E+003</td>
+    <td>1.73E-003</td>
+    <td>7.78E-001</td>
+    <td>3.98E-003</td>
+    <td>1.87E+000</td>
+  </tr>
+  <tr>
+    <td>Wisconsin</td>
+    <td>2.68</td>
+    <td>206.88852</td>
+    <td>1.00E+003</td>
+    <td>1.74E-003</td>
+    <td>4.97E-001</td>
+    <td>3.28E-003</td>
+    <td>9.25E-001</td>
+  </tr>
+  <tr>
+    <td>Wyoming</td>
+    <td>3.534</td>
+    <td>270.39145</td>
+    <td>9.01E+002</td>
+    <td>1.85E-003</td>
+    <td>5.59E-001</td>
+    <td>4.26E-003</td>
+    <td>5.79E-001</td>
+  </tr>
+  <tr>
+    <td colspan="8">a Data based on 1999 data from eGRID version 2.01 (EPA 2003a).</td>
+  </tr>
+  <tr>
+    <td colspan="8">b Data based on 1998-2000 average data in DOE (2002).</td>
+  </tr>
+  <tr>
+    <td colspan="8">c Data based on tier emissions report for criteria air pollutants in EPA (2003b).</td>
+  </tr>
+  <tr>
+    <td colspan="8">d PM is the sum of all particulate matter including PM10 and PM2.5. PM10 and PM2.5 stand for particles smaller than 10 and 2.5 microns, respectively.</td>
+  </tr>
+  <tr>
+    <td colspan="8">e No data.</td>
+  </tr>
+</table>
 
 Table 103.  U. S. State Average Criteria Pollutant Emission Factors for Electricity Generation, in g/MJ
 
 <table class="table table-striped">
-
-
-
-
-
-
-
-
-
-
-
 <tr>
-<td> </td>
-<td>Particulate Matter (PM)<sup>cd</sup></td>
-<td>Particulate Matter (PM10)<sup>cd</sup></td>
-<td>Particulate Matter (PM2.5)<sup>cd</sup></td>
-<td>Ammonia (NH<sub>3</sub>)<sup>c</sup></td>
-<td>Volatile Organic Compounds (NMVOC)<sup>a</sup></td>
-<td>Mercury (Hg)<sup>c</sup></td>
-<td>Lead (Pb)<sup>e</sup></td>
+<th> </th>
+<th>Particulate Matter (PM)<sup>cd</sup></th>
+<th>Particulate Matter (PM10)<sup>cd</sup></th>
+<th>Particulate Matter (PM2.5)<sup>cd</sup></th>
+<th>Ammonia (NH<sub>3</sub>)<sup>c</sup></th>
+<th>Volatile Organic Compounds (NMVOC)<sup>a</sup></th>
+<th>Mercury (Hg)<sup>c</sup></th>
+<th>Lead (Pb)<sup>e</sup></th>
 </tr>
 <tr>
 <td>Alabama</td>
@@ -2217,703 +1811,467 @@ Table 103.  U. S. State Average Criteria Pollutant Emission Factors for Electri
 <td>5.27931E-06</td>
 <td>0<sup>e</sup></td>
 </tr>
-
 </table>
-
-
 
 Table 104.  United States National Average Water Consumption Factors<sup>a</sup>
 
-
-
-**Thermoelectric Generation**
-
-**Hydroelectric Generation**
-
-**Weighted Total Water Consumption**
-
-** **
-
-**L/MJ**
-
-**Percent of Total Generation**
-
-**L/MJ**
-
-**Percent of Total Generation**
-
-**L/MJ**
-
-**United States**
-
-** **
-
-0.4960
-
-
-
-89.4%
-
-
-
-19.2095
-
-
-
-8.6%
-
-
-
-2.1007
-
-
-
-<sup>a</sup> Based on data from Torcellini, Long, and Judkoff (2004).
-
-
-
-
-
-
-
-
+<table class="table table-striped">
+ <tr>
+  <th></th>
+  <th colspan="2">ThermoElectric Generation</th>
+  <th colspan="2">HydroElectric Generation</th>
+  <th>Weighted Total Water Consumption</th>
+ </tr>
+ <tr>
+  <th></th>
+  <th>L/MJ</th>
+  <th>Percent of Total Generation</th>
+  <th>L/MJ</th>
+  <th>Percent of Total Generation</th>
+  <th>L/MJ</th>
+ </tr>
+ <tr>
+  <th>United States</th>
+  <td>0.4960</td>
+  <td>89.4%</td>
+  <td>19.2095</td>
+  <td>8.6%</td>
+  <td>2.1007</td>
+ </tr>
+ <tr>
+  <td colspan="6">a Based on data from Torcellini, Long, and Judkoff (2004).</td>
+ </tr>
+</table>
 
 Table 105.   U.S. State Average Water Consumption Factors for Electricity Generation<sup>a</sup>
 
-
-
-**Thermoelectric Generation**
-
-**Hydroelectric Generation**
-
-**Weighted Total Water Consumption**
-
-**State**
-
-**L/MJ**
-
-**Percent of Total Generation**
-
-**L/MJ**
-
-**Percent of Total Generation**
-
-**L/MJ**
-
-Alabama
-
-0.1503
-
-89.8%
-
-38.9053
-
-6.4%
-
-2.6274
-
-Alaska
-
-0.3295
-
-86.2%
-
---
-
-13.8%
-
-0.2839
-
-Arizona
-
-0.3313
-
-88.3%
-
-68.1928
-
-11.7%
-
-8.2533
-
-Arkansas
-
-0.3000
-
-89.5%
-
---
-
-5.7%
-
-0.2684
-
-California
-
-0.0511
-
-74.1%
-
-21.9430
-
-22.0%
-
-4.8739
-
-Colorado
-
-0.5368
-
-96.0%
-
-18.8333
-
-4.0%
-
-1.2600
-
-Connecticut
-
-0.0860
-
-90.8%
-
---
-
-1.5%
-
-0.0781
-
-Delaware
-
-0.0132
-
-99.9%
-
---
-
-0.0%
-
-0.0132
-
-District of Columbia
-
-1.6959
-
-100.0%
-
---
-
-0.0%
-
-1.6959
-
-Florida
-
-0.1506
-
-95.7%
-
---
-
-0.1%
-
-0.1441
-
-Georgia
-
-0.6267
-
-93.6%
-
-49.8599
-
-2.3%
-
-1.7339
-
-Hawaii
-
-0.0440
-
-92.4%
-
---
-
-1.1%
-
-0.0407
-
-Idaho
-
-0.0000
-
-2.7%
-
-8.9528
-
-92.2%
-
-8.2501
-
-Illinois
-
-1.1093
-
-99.4%
-
---
-
-0.1%
-
-1.1032
-
-Indiana
-
-0.4350
-
-99.6%
-
---
-
-0.3%
-
-0.4331
-
-Iowa
-
-0.1229
-
-97.3%
-
---
-
-2.5%
-
-0.1196
-
-Kansas
-
-0.6099
-
-100.0%
-
---
-
-0.0%
-
-0.6098
-
-Kentucky
-
-1.1521
-
-97.2%
-
-162.2884
-
-2.8%
-
-5.5990
-
-Louisiana
-
-1.6411
-
-94.2%
-
---
-
-0.9%
-
-1.5461
-
-Maine
-
-0.3049
-
-40.4%
-
---
-
-28.7%
-
-0.1231
-
-Maryland
-
-0.0343
-
-95.3%
-
-7.0617
-
-2.7%
-
-0.2259
-
-Massachusetts
-
-0.0000
-
-92.4%
-
---
-
-2.4%
-
-0.0000
-
-Michigan
-
-0.5221
-
-95.8%
-
---
-
-1.4%
-
-0.4999
-
-Minnesota
-
-0.4657
-
-93.4%
-
---
-
-2.4%
-
-0.4351
-
-Mississippi
-
-0.4145
-
-94.4%
-
---
-
-0.0%
-
-0.3912
-
-Missouri
-
-0.3213
-
-97.4%
-
---
-
-2.5%
-
-0.3130
-
-Montana
-
-1.0051
-
-55.8%
-
-38.6619
-
-44.1%
-
-17.5997
-
-Nebraska
-
-0.2020
-
-94.5%
-
-2.2888
-
-5.5%
-
-0.3165
-
-Nevada
-
-0.5936
-
-90.6%
-
-77.1023
-
-9.2%
-
-7.6260
-
-New Hampshire
-
-0.1231
-
-83.9%
-
---
-
-8.6%
-
-0.1033
-
-New Jersey
-
-0.0747
-
-97.6%
-
---
-
-0.0%
-
-0.0729
-
-New Mexico
-
-0.6609
-
-99.3%
-
-71.5070
-
-0.7%
-
-1.1886
-
-New York
-
-0.8951
-
-81.3%
-
-5.8535
-
-16.7%
-
-1.7040
-
-North Carolina
-
-0.2445
-
-95.5%
-
-10.9089
-
-3.1%
-
-0.5751
-
-North Dakota
-
-0.3809
-
-91.7%
-
-60.7730
-
-8.3%
-
-5.3968
-
-Ohio
-
-0.9972
-
-99.1%
-
---
-
-0.3%
-
-0.9884
-
-Oklahoma
-
-0.5378
-
-93.7%
-
-144.0133
-
-5.8%
-
-8.8254
-
-Oregon
-
-0.8633
-
-18.4%
-
-4.6351
-
-80.7%
-
-3.8990
-
-Pennsylvania
-
-0.5700
-
-97.6%
-
---
-
-1.0%
-
-0.5563
-
-Rhode Island
-
-0.0000
-
-98.2%
-
---
-
-0.1%
-
-0.0000
-
-South Carolina
-
-0.2754
-
-97.2%
-
---
-
-1.9%
-
-0.2677
-
-South Dakota
-
-0.0143
-
-36.7%
-
-120.7558
-
-63.2%
-
-76.3811
-
-Tennessee
-
-0.0026
-
-90.8%
-
-45.5853
-
-8.3%
-
-3.7833
-
-Texas
-
-0.4595
-
-99.0%
-
---
-
-0.3%
-
-0.4550
-
-Utah
-
-0.5959
-
-96.6%
-
-77.1150
-
-3.4%
-
-3.2090
-
-Vermont
-
-0.3642
-
-71.5%
-
---
-
-20.9%
-
-0.2605
-
-Virginia
-
-0.0693
-
-94.9%
-
---
-
-0.9%
-
-0.0657
-
-Washington
-
-0.3013
-
-15.7%
-
-3.3506
-
-83.2%
-
-2.8344
-
-West Virginia
-
-0.6180
-
-99.0%
-
---
-
-1.0%
-
-0.6119
-
-Wisconsin
-
-0.5199
-
-93.6%
-
---
-
-3.3%
-
-0.4867
-
-Wyoming
-
-0.5190
-
-97.1%
-
-144.0177
-
-2.7%
-
-4.3654
-
-<sup>a</sup> Based on data from Torcellini, Long, and Judkoff (2004).
-
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th colspan="2">ThermoElectric Generation</th>
+    <th colspan="2">HydroElectric Generation</th>
+    <th>Weighted Total Water Consumption</th>
+  </tr>
+  <tr>
+    <th>State</th>
+    <th>L/MJ</th>
+    <th>Percent of Total Generation</th>
+    <th>L/MJ</th>
+    <th>Percent of Total Generation</th>
+    <th>L/MJ</th>
+  </tr>
+  <tr>
+    <td>Alabama</td>
+    <td>0.1503</td>
+    <td>89.80%</td>
+    <td>38.9053</td>
+    <td>6.4%</td>
+    <td>2.6274</td>
+  </tr>
+  <tr>
+    <td>Alaska</td>
+    <td>0.3295</td>
+    <td>86.20%</td>
+    <td>--</td>
+    <td>13.8%</td>
+    <td>0.2839</td>
+  </tr>
+  <tr>
+    <td>Arizona</td>
+    <td>0.3313</td>
+    <td>88.30%</td>
+    <td>68.1928</td>
+    <td>11.7%</td>
+    <td>8.2533</td>
+  </tr>
+  <tr>
+    <td>Arkansas</td>
+    <td>0.3</td>
+    <td>89.50%</td>
+    <td>--</td>
+    <td>5.7%</td>
+    <td>0.2684</td>
+  </tr>
+  <tr>
+    <td>California</td>
+    <td>0.0511</td>
+    <td>74.10%</td>
+    <td>21.943</td>
+    <td>22.0%</td>
+    <td>4.8739</td>
+  </tr>
+  <tr>
+    <td>Colorado</td>
+    <td>0.5368</td>
+    <td>96.00%</td>
+    <td>18.8333</td>
+    <td>4.0%</td>
+    <td>1.26</td>
+  </tr>
+  <tr>
+    <td>Connecticut</td>
+    <td>0.086</td>
+    <td>90.80%</td>
+    <td>--</td>
+    <td>1.5%</td>
+    <td>0.0781</td>
+  </tr>
+  <tr>
+    <td>Delaware</td>
+    <td>0.0132</td>
+    <td>99.90%</td>
+    <td>--</td>
+    <td>0.0%</td>
+    <td>0.0132</td>
+  </tr>
+  <tr>
+    <td>District of Columbia</td>
+    <td>1.6959</td>
+    <td>100.00%</td>
+    <td>--</td>
+    <td>0.0%</td>
+    <td>1.6959</td>
+  </tr>
+  <tr>
+    <td>Florida</td>
+    <td>0.1506</td>
+    <td>95.70%</td>
+    <td>--</td>
+    <td>0.1%</td>
+    <td>0.1441</td>
+  </tr>
+  <tr>
+    <td>Georgia</td>
+    <td>0.6267</td>
+    <td>93.60%</td>
+    <td>49.8599</td>
+    <td>2.3%</td>
+    <td>1.7339</td>
+  </tr>
+  <tr>
+    <td>Hawaii</td>
+    <td>0.044</td>
+    <td>92.40%</td>
+    <td>--</td>
+    <td>1.1%</td>
+    <td>0.0407</td>
+  </tr>
+  <tr>
+    <td>Idaho</td>
+    <td>0</td>
+    <td>2.70%</td>
+    <td>8.9528</td>
+    <td>92.2%</td>
+    <td>8.2501</td>
+  </tr>
+  <tr>
+    <td>Illinois</td>
+    <td>1.1093</td>
+    <td>99.40%</td>
+    <td>--</td>
+    <td>0.1%</td>
+    <td>1.1032</td>
+  </tr>
+  <tr>
+    <td>Indiana</td>
+    <td>0.435</td>
+    <td>99.60%</td>
+    <td>--</td>
+    <td>0.3%</td>
+    <td>0.4331</td>
+  </tr>
+  <tr>
+    <td>Iowa</td>
+    <td>0.1229</td>
+    <td>97.30%</td>
+    <td>--</td>
+    <td>2.5%</td>
+    <td>0.1196</td>
+  </tr>
+  <tr>
+    <td>Kansas</td>
+    <td>0.6099</td>
+    <td>100.00%</td>
+    <td>--</td>
+    <td>0.0%</td>
+    <td>0.6098</td>
+  </tr>
+  <tr>
+    <td>Kentucky</td>
+    <td>1.1521</td>
+    <td>97.20%</td>
+    <td>162.2884</td>
+    <td>2.8%</td>
+    <td>5.599</td>
+  </tr>
+  <tr>
+    <td>Louisiana</td>
+    <td>1.6411</td>
+    <td>94.20%</td>
+    <td>--</td>
+    <td>0.9%</td>
+    <td>1.5461</td>
+  </tr>
+  <tr>
+    <td>Maine</td>
+    <td>0.3049</td>
+    <td>40.40%</td>
+    <td>--</td>
+    <td>28.7%</td>
+    <td>0.1231</td>
+  </tr>
+  <tr>
+    <td>Maryland</td>
+    <td>0.0343</td>
+    <td>95.30%</td>
+    <td>7.0617</td>
+    <td>2.7%</td>
+    <td>0.2259</td>
+  </tr>
+  <tr>
+    <td>Massachusetts</td>
+    <td>0</td>
+    <td>92.40%</td>
+    <td>--</td>
+    <td>2.4%</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>Michigan</td>
+    <td>0.5221</td>
+    <td>95.80%</td>
+    <td>--</td>
+    <td>1.4%</td>
+    <td>0.4999</td>
+  </tr>
+  <tr>
+    <td>Minnesota</td>
+    <td>0.4657</td>
+    <td>93.40%</td>
+    <td>--</td>
+    <td>2.4%</td>
+    <td>0.4351</td>
+  </tr>
+  <tr>
+    <td>Mississippi</td>
+    <td>0.4145</td>
+    <td>94.40%</td>
+    <td>--</td>
+    <td>0.0%</td>
+    <td>0.3912</td>
+  </tr>
+  <tr>
+    <td>Missouri</td>
+    <td>0.3213</td>
+    <td>97.40%</td>
+    <td>--</td>
+    <td>2.5%</td>
+    <td>0.313</td>
+  </tr>
+  <tr>
+    <td>Montana</td>
+    <td>1.0051</td>
+    <td>55.80%</td>
+    <td>38.6619</td>
+    <td>44.1%</td>
+    <td>17.5997</td>
+  </tr>
+  <tr>
+    <td>Nebraska</td>
+    <td>0.202</td>
+    <td>94.50%</td>
+    <td>2.2888</td>
+    <td>5.5%</td>
+    <td>0.3165</td>
+  </tr>
+  <tr>
+    <td>Nevada</td>
+    <td>0.5936</td>
+    <td>90.60%</td>
+    <td>77.1023</td>
+    <td>9.2%</td>
+    <td>7.626</td>
+  </tr>
+  <tr>
+    <td>New Hampshire</td>
+    <td>0.1231</td>
+    <td>83.90%</td>
+    <td>--</td>
+    <td>8.6%</td>
+    <td>0.1033</td>
+  </tr>
+  <tr>
+    <td>New Jersey</td>
+    <td>0.0747</td>
+    <td>97.60%</td>
+    <td>--</td>
+    <td>0.0%</td>
+    <td>0.0729</td>
+  </tr>
+  <tr>
+    <td>New Mexico</td>
+    <td>0.6609</td>
+    <td>99.30%</td>
+    <td>71.507</td>
+    <td>0.7%</td>
+    <td>1.1886</td>
+  </tr>
+  <tr>
+    <td>New York</td>
+    <td>0.8951</td>
+    <td>81.30%</td>
+    <td>5.8535</td>
+    <td>16.7%</td>
+    <td>1.704</td>
+  </tr>
+  <tr>
+    <td>North Carolina</td>
+    <td>0.2445</td>
+    <td>95.50%</td>
+    <td>10.9089</td>
+    <td>3.1%</td>
+    <td>0.5751</td>
+  </tr>
+  <tr>
+    <td>North Dakota</td>
+    <td>0.3809</td>
+    <td>91.70%</td>
+    <td>60.773</td>
+    <td>8.3%</td>
+    <td>5.3968</td>
+  </tr>
+  <tr>
+    <td>Ohio</td>
+    <td>0.9972</td>
+    <td>99.10%</td>
+    <td>--</td>
+    <td>0.3%</td>
+    <td>0.9884</td>
+  </tr>
+  <tr>
+    <td>Oklahoma</td>
+    <td>0.5378</td>
+    <td>93.70%</td>
+    <td>144.0133</td>
+    <td>5.8%</td>
+    <td>8.8254</td>
+  </tr>
+  <tr>
+    <td>Oregon</td>
+    <td>0.8633</td>
+    <td>18.40%</td>
+    <td>4.6351</td>
+    <td>80.7%</td>
+    <td>3.899</td>
+  </tr>
+  <tr>
+    <td>Pennsylvania</td>
+    <td>0.57</td>
+    <td>97.60%</td>
+    <td>--</td>
+    <td>1.0%</td>
+    <td>0.5563</td>
+  </tr>
+  <tr>
+    <td>Rhode Island</td>
+    <td>0</td>
+    <td>98.20%</td>
+    <td>--</td>
+    <td>0.1%</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>South Carolina</td>
+    <td>0.2754</td>
+    <td>97.20%</td>
+    <td>--</td>
+    <td>1.9%</td>
+    <td>0.2677</td>
+  </tr>
+  <tr>
+    <td>South Dakota</td>
+    <td>0.0143</td>
+    <td>36.70%</td>
+    <td>120.7558</td>
+    <td>63.2%</td>
+    <td>76.3811</td>
+  </tr>
+  <tr>
+    <td>Tennessee</td>
+    <td>0.0026</td>
+    <td>90.80%</td>
+    <td>45.5853</td>
+    <td>8.3%</td>
+    <td>3.7833</td>
+  </tr>
+  <tr>
+    <td>Texas</td>
+    <td>0.4595</td>
+    <td>99.00%</td>
+    <td>--</td>
+    <td>0.3%</td>
+    <td>0.455</td>
+  </tr>
+  <tr>
+    <td>Utah</td>
+    <td>0.5959</td>
+    <td>96.60%</td>
+    <td>77.115</td>
+    <td>3.4%</td>
+    <td>3.209</td>
+  </tr>
+  <tr>
+    <td>Vermont</td>
+    <td>0.3642</td>
+    <td>71.50%</td>
+    <td>--</td>
+    <td>20.9%</td>
+    <td>0.2605</td>
+  </tr>
+  <tr>
+    <td>Virginia</td>
+    <td>0.0693</td>
+    <td>94.90%</td>
+    <td>--</td>
+    <td>0.9%</td>
+    <td>0.0657</td>
+  </tr>
+  <tr>
+    <td>Washington</td>
+    <td>0.3013</td>
+    <td>15.70%</td>
+    <td>3.3506</td>
+    <td>83.2%</td>
+    <td>2.8344</td>
+  </tr>
+  <tr>
+    <td>West Virginia</td>
+    <td>0.618</td>
+    <td>99.00%</td>
+    <td>--</td>
+    <td>1.0%</td>
+    <td>0.6119</td>
+  </tr>
+  <tr>
+    <td>Wisconsin</td>
+    <td>0.5199</td>
+    <td>93.60%</td>
+    <td>--</td>
+    <td>3.3%</td>
+    <td>0.4867</td>
+  </tr>
+  <tr>
+    <td>Wyoming</td>
+    <td>0.519</td>
+    <td>97.10%</td>
+    <td>144.0177</td>
+    <td>2.7%</td>
+    <td>4.3654</td>
+  </tr>
+  <tr>
+    <td colspan="6">a Based on data from Torcellini, Long, and Judkoff (2004).</td>
+  </tr>
+</table>
 
 
 ### Other Energy-Related Pollutants and Sources of Other Information
@@ -3007,91 +2365,91 @@ In HeatBalanceInternalHeatGains, in the InitInternalHeatGains routine, the singl
 
 The gains from “People” contain:
 
-n IntGainTypeOf\_People
+* IntGainTypeOf\_People
 
 The gains from “Lights” contain:
 
-n IntGainTypeOf\_Lights
+* IntGainTypeOf\_Lights
 
 The gains from “Equipment” contain:
 
-n IntGainTypeOf\_ElectricEquipment
+* IntGainTypeOf\_ElectricEquipment
 
-n IntGainTypeOf\_GasEquipment
+* IntGainTypeOf\_GasEquipment
 
-n IntGainTypeOf\_HotWaterEquipment
+* IntGainTypeOf\_HotWaterEquipment
 
-n IntGainTypeOf\_SteamEquipment
+* IntGainTypeOf\_SteamEquipment
 
-n IntGainTypeOf\_OtherEquipment
+* IntGainTypeOf\_OtherEquipment
 
 The gains from “Refrigeration” contain:
 
-n IntGainTypeOf\_RefrigerationCase
+* IntGainTypeOf\_RefrigerationCase
 
-n IntGainTypeOf\_RefrigerationCompressorRack
+* IntGainTypeOf\_RefrigerationCompressorRack
 
-n IntGainTypeOf\_RefrigerationSystemAirCooledCondenser
+* IntGainTypeOf\_RefrigerationSystemAirCooledCondenser
 
-n IntGainTypeOf\_RefrigerationSystemSuctionPipe
+* IntGainTypeOf\_RefrigerationSystemSuctionPipe
 
-n IntGainTypeOf\_RefrigerationSecondaryReceiver
+* IntGainTypeOf\_RefrigerationSecondaryReceiver
 
-n IntGainTypeOf\_RefrigerationSecondaryPipe
+* IntGainTypeOf\_RefrigerationSecondaryPipe
 
-n IntGainTypeOf\_RefrigerationWalkIn
+* IntGainTypeOf\_RefrigerationWalkIn
 
 The gains from “Water Use Equipment” contain:
 
-n IntGainTypeOf\_WaterUseEquipment
+* IntGainTypeOf\_WaterUseEquipment
 
-n IntGainTypeOf\_WaterHeaterMixed
+* IntGainTypeOf\_WaterHeaterMixed
 
-n IntGainTypeOf\_WaterHeaterStratified
+* IntGainTypeOf\_WaterHeaterStratified
 
 The gains from “HVAC Equipment Losses” which are gains to the zone due to the location of the equipment within the zone include:
 
-n IntGainTypeOf\_ZoneBaseboardOutdoorTemperatureControlled
+* IntGainTypeOf\_ZoneBaseboardOutdoorTemperatureControlled
 
-n IntGainTypeOf\_ThermalStorageChilledWaterMixed
+* IntGainTypeOf\_ThermalStorageChilledWaterMixed
 
-n IntGainTypeOf\_ThermalStorageChilledWaterStratified
+* IntGainTypeOf\_ThermalStorageChilledWaterStratified
 
-n IntGainTypeOf\_PipeIndoor
+* IntGainTypeOf\_PipeIndoor
 
-n IntGainTypeOf\_Pump\_VarSpeed
+* IntGainTypeOf\_Pump\_VarSpeed
 
-n IntGainTypeOf\_Pump\_ConSpeed
+* IntGainTypeOf\_Pump\_ConSpeed
 
-n IntGainTypeOf\_Pump\_Cond
+* IntGainTypeOf\_Pump\_Cond
 
-n IntGainTypeOf\_PumpBank\_VarSpeed
+* IntGainTypeOf\_PumpBank\_VarSpeed
 
-n IntGainTypeOf\_PumpBank\_ConSpeed
+* IntGainTypeOf\_PumpBank\_ConSpeed
 
-n IntGainTypeOf\_PlantComponentUserDefined
+* IntGainTypeOf\_PlantComponentUserDefined
 
-n IntGainTypeOf\_CoilUserDefined
+* IntGainTypeOf\_CoilUserDefined
 
-n IntGainTypeOf\_ZoneHVACForcedAirUserDefined
+* IntGainTypeOf\_ZoneHVACForcedAirUserDefined
 
-n IntGainTypeOf\_AirTerminalUserDefined
+* IntGainTypeOf\_AirTerminalUserDefined
 
 The gains from “Power Generation Equipment” include:
 
-n IntGainTypeOf\_GeneratorFuelCell
+* IntGainTypeOf\_GeneratorFuelCell
 
-n IntGainTypeOf\_GeneratorMicroCHP
+* IntGainTypeOf\_GeneratorMicroCHP
 
-n IntGainTypeOf\_ElectricLoadCenterTransformer
+* IntGainTypeOf\_ElectricLoadCenterTransformer
 
-n IntGainTypeOf\_ElectricLoadCenterInverterSimple
+* IntGainTypeOf\_ElectricLoadCenterInverterSimple
 
-n IntGainTypeOf\_ElectricLoadCenterInverterFunctionOfPower
+* IntGainTypeOf\_ElectricLoadCenterInverterFunctionOfPower
 
-n IntGainTypeOf\_ElectricLoadCenterInverterLookUpTable
+* IntGainTypeOf\_ElectricLoadCenterInverterLookUpTable
 
-n IntGainTypeOf\_ElectricLoadCenterStorageBattery
+* IntGainTypeOf\_ElectricLoadCenterStorageBattery
 
 The ReportSurfaceHeatBalance routine in the HeatBalanceSurfaceManger module gathers the shortwave radiant heat gain from lighting and fenestration solar gains on each surface. In the same module, the CalcHeatBalanceInsideSurf routine gathers the surface by surface convection for both the normal and pulse zone sizing times along with the net radiation on the surface during the normal zone sizing times. In addition, a routine called GatherComponentLoadSurfAbsFact gathers the factors used in distributing the radiant heat from a zone to each surface (TMULT and ITABSF).
 
@@ -3099,55 +2457,45 @@ The SizingManager module repeats the zone sizing portion of the procedure when t
 
 The following subroutines in the OutputReportTabular module produce the report:
 
-n ComputeLoadComponentDecayCurve
+* ComputeLoadComponentDecayCurve
 
-n GatherComponentLoadsSurface
+* GatherComponentLoadsSurface
 
-n GatherComonentLoadsHVAC
+* GatherComonentLoadsHVAC
 
-n ComputeDelayedComponents
+* ComputeDelayedComponents
 
-n WriteZoneLoadComponentTable
+* WriteZoneLoadComponentTable
 
 
 
 The ComputeLoadComponentDecayCurve routine determines the heating and cooling decay curves using the following (for cooling but repeated also for heating):
 
+```
   TimeOfPulse = radiantPulseTimestep(ZoneNum,CoolDesSelected)
-
-  DO TimeStep = TimeOfPulse, NumOfTimeStepInHour\* 24
-
+  DO TimeStep = TimeOfPulse, NumOfTimeStepInHour* 24
     IF (radiantPulseReceived(surfNum,CoolDesSelected) .NE. 0.0) THEN
-
       diff = loadConvectedWithPulse(surfNum,TimeStep,CoolDesSelected)
-
            - loadConvectedNormal(surfNum,TimeStep,CoolDesSelected)
-
       decayCurveCool(surfNum, TimeStep - TimeOfPulse + 1) = -diff /
-
           radiantPulseReceived(surfNum,CoolDesSelected)
-
     ELSE
-
       decayCurveCool(surfNum, TimeStep - TimeOfPulse + 1) = 0.0
-
     END IF
-
   END DO
-
-
+```
 
 The ComputeDelayedComponents routine applies the decay curve to the load components. It does the following for the heating and cooling sizing period that was selected and for each zone and each surface in the zone
 
-a)    Determine the heat gain on the surface of people, equipment, hvac losses, power generation and long wave light radiation.
+1. Determine the heat gain on the surface of people, equipment, hvac losses, power generation and long wave light radiation.
 
-b)   For each time step backwards from the current timestep, estimate the delayed convected heat from people, equipment, HVAC losses, power generation, lighting long wave radiation, lighting short wave radiation, and fenestration solar by multiplying the decay curve with the value determined from (a).
+2. For each time step backwards from the current timestep, estimate the delayed convected heat from people, equipment, HVAC losses, power generation, lighting long wave radiation, lighting short wave radiation, and fenestration solar by multiplying the decay curve with the value determined from (a).
 
-c)    Accumulate the values on a zone basis
+3. Accumulate the values on a zone basis
 
-d)   Determine the remaining convective heat from surfaces that are not from these gains and remove the net surface radiation (output variable Surface Inside Face Convection Heat Gain Rate)
+4. Determine the remaining convective heat from surfaces that are not from these gains and remove the net surface radiation (output variable Surface Inside Face Convection Heat Gain Rate)
 
-e)    Store the estimated values in a sequence to be later averaged over the averaging window.
+5. Store the estimated values in a sequence to be later averaged over the averaging window.
 
 
 

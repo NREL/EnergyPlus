@@ -6,11 +6,11 @@ Component Costs
 
 EnergyPlus provides simple cost estimating capabilities as an aid to design analysis and for life cycle costs.  There are three broad steps involved.  The first involves determining *construction* costs by summing individual “line items.”  The second involves determining *project* costs by adjusting construction costs to account for things like profit and design fees.  The third involves comparing the current simulation to a reference case so that marginal increases can be calculated.  The reference documentation contained in this section pertains to the following input object names.
 
-·        **ComponentCost:LineItem**
+* **ComponentCost:LineItem**
 
-·        **ComponentCost:Adjustments**
+* **ComponentCost:Adjustments**
 
-·        **ComponentCost:Reference**
+* **ComponentCost:Reference**
 
 ### Line Item Costs
 
@@ -138,11 +138,11 @@ The subtotal for miscellaneous construction costs (typically those costs not exp
 
 The subtotal for the amount that the construction costs should be altered because of regional differences in material and labor costs (e.g. when using national average data), *S<sub>r</sub>*, is determined by multiplying the Regional Adjustment Factor, *R<sub>f\\ ,</sub>* by the sum of *S<sub>L </sub>* and *S<sub>m:</sub>*
 
-<sub><span>${S_r} = ({S_L} + {S_m}){R_f}$</span></sub>
+<div>\[{S_r} = ({S_L} + {S_m}){R_f}\]</div>
 
 Remaining adjustments are applied to the subtotal for construction costs, *S<sub>c</sub>*, which is the sum of *S<sub>L</sub>*, *S<sub>m,</sub>*, and *S<sub>r:</sub>*
 
-<sub><span>${S_C} = {S_L} + {S_m} + {S_r}$</span></sub>
+<div>\[{S_C} = {S_L} + {S_m} + {S_r}\]</div>
 
 The **Design and Engineering Fee Fraction**,*F<sub>d</sub>*,is the fraction of construction costs, *S<sub>c</sub>*, attributable to costs associated with architectural and engineering services needed for the project.  The subtotal for costs associated with these fees, *S<sub>D</sub>*, are determined by multiplying *S<sub>C</sub>* by *F<sub>d</sub>*:
 
@@ -181,19 +181,19 @@ Tariff Computation
 
 The EnergyPlus economic (Utility Costs) objects related to computing utility bills include:
 
-n UtilityCost:Tariff
+* UtilityCost:Tariff
 
-n UtilityCost:Qualify
+* UtilityCost:Qualify
 
-n UtilityCost:Charge:Simple
+* UtilityCost:Charge:Simple
 
-n UtilityCost:Charge:Block
+* UtilityCost:Charge:Block
 
-n UtilityCost:Ratchet
+* UtilityCost:Ratchet
 
-n UtilityCost:Variable
+* UtilityCost:Variable
 
-n UtilityCost:Computation
+* UtilityCost:Computation
 
 This section builds upon the discussion that appears in the Input Output Reference under the heading “EnergyPlus Economics.”  The actual computation of monthly utility bills is not difficult since it is mostly consists of multiplying energy consumptions or demands by the price on a per unit basis and adding different bill components.  The implementation in EnergyPlus becomes more complex since the objects were crafted to allow a great deal of  flexibility in specifying a utility tariff while, at the same time, being as simple as possible.
 
@@ -204,14 +204,9 @@ The following discussion on variables and hierarchies is based on the text that 
 To understand how to use the utility bill calculation portion of EnergyPlus you first need to understand some important concepts of variables and hierarchy.  A variable, for the purposes of this section, is simply a named holder of a series of numbers. In most cases, the variable will be a named holder of 12 numbers, one number for each monthly utility bill. Here is a visualization of a variable called Electric Energy Use:
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Month</td>
-<td>Electric Energy Use</td>
+<th>Month</th>
+<th>Electric Energy Use</th>
 </tr>
 <tr>
 <td>January</td>
@@ -270,58 +265,33 @@ In many of today’s utility rates, the charges for energy or demand are broken 
 
 The categories are combined in following hierarchy:
 
-#### 
-
-#### 
-
-#### 
-
-#### 
-
-#### 
-
-#### 
-
-#### 
-
-#### 
-
 #### ![](EngineeringReference/media/image7909.png)
-
 
 Any charges included in the EnergyCharges category are added together. The EnergyCharges, DemandCharges and ServiceCharges are added together to form the Basis. The Basis, Adjustments and Surcharges are added together to form the Subtotal. The Subtotal and Taxes are added together to be the Total.  The total represents the total monthly charges on that tariff for the energy source used.  The combining of categories together is performed automatically unless the user specifies the UtilityCost:Computation.  In addition, each category, which is also a variable, may be used as a source. For example, a tax that is 5% of the subtotal would be shown as:
 
-
-
+```idf
 UtilityCost:Charge:Simple,
-
   TaxOfFivePercent,        ! Charge Variable Name
-
   TariffExample1,          ! Tariff Name
-
   Subtotal,                ! Source Variable
-
   Annual,                  ! Season
-
   Taxes,                   ! Category Variable Name
-
   0.05;                    ! Cost Per Unit Value (or Variable)
-
-
+```
 
 As you can see, the UtilityCost:Charge:Simple and UtilityCost:Charge:Block objects do most of the “work” of computing the annual energy cost.  The benefit of using this categorization is that totals of each category are shown in the output reports and it organizes the charges in the monthly calculations in a logical way that fits almost all tariffs.  If no categorization is desired, theoretically, all charges could be assigned to the Total category. The categories themselves are simply variable names. Charges may also be assigned to the “NotIncluded” category if the result of the charge is used as an intermediate calculation and should not be included in the Total.
 
 The objects that create variables are:
 
-n UtilityCost:Qualify
+* UtilityCost:Qualify
 
-n UtilityCost:Charge:Simple
+* UtilityCost:Charge:Simple
 
-n UtilityCost:Charge:Block
+* UtilityCost:Charge:Block
 
-n UtilityCost:Ratchet
+* UtilityCost:Ratchet
 
-n UtilityCost:Variable
+* UtilityCost:Variable
 
 ### Default Order of Computation
 
@@ -356,16 +326,10 @@ The objects have specific variables that are used as inputs and outputs, and thu
 ***Object Variables Inputs and Outputs***
 
 <table class="table table-striped">
-
-
-
-
-
-
 <tr>
-<td>Object</td>
-<td>Outputs</td>
-<td>Inputs</td>
+<th>Object</th>
+<th>Outputs</th>
+<th>Inputs</th>
 </tr>
 <tr>
 <td>Qualify</td>
@@ -427,7 +391,6 @@ The objects have specific variables that are used as inputs and outputs, and thu
 <td> </td>
 <td>Offset</td>
 </tr>
-
 </table>
 
 
@@ -445,15 +408,15 @@ Life-Cycle Cost Computations
 
 The objects used for performing a life-cycle cost analysis are:
 
-n LifeCycleCost:Parameters
+* LifeCycleCost:Parameters
 
-n LifeCycleCost:RecurringCosts
+* LifeCycleCost:RecurringCosts
 
-n LifeCycleCost:NonrecurringCost
+* LifeCycleCost:NonrecurringCost
 
-n LifeCycleCost:UsePriceEscalation
+* LifeCycleCost:UsePriceEscalation
 
-n LifeCycleCost:UseAdjustment
+* LifeCycleCost:UseAdjustment
 
 The computation of life-cycle costs is broken into three main routines which are described below.
 

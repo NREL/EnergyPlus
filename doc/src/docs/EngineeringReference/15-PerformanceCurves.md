@@ -111,39 +111,26 @@ The regression analysis and summary statistical output is shown below. The equat
 
 
 
+```idf
   Curve:Biquadratic,
-
     CoolCapFTExample,        !- Name
-
     0.757382,                !- Coefficient1 Constant
-
     0.014666,                !- Coefficient2 x
-
-    0.000459,                !- Coefficient3 x\*\*2
-
+    0.000459,                !- Coefficient3 x**2
     -0.00095,                !- Coefficient4 y
-
-    -0.000067,               !- Coefficient5 y\*\*2
-
-    -0.00015,                !- Coefficient6 x\*y
-
+    -0.000067,               !- Coefficient5 y**2
+    -0.00015,                !- Coefficient6 x*y
     17.22222,                !- Minimum Value of x
-
     21.66667,                !- Maximum Value of x
-
     18.33333,                !- Minimum Value of y
-
     46.11111,                !- Maximum Value of y
-
     ,                        !- Minimum Curve Output
-
     ,                        !- Maximum Curve Output
-
     Temperature,             !- Input Unit Type for X
-
     Temperature,             !- Input Unit Type for Y
-
     Dimensionless;           !- Output Unit Type
+```
+
 
 
 
@@ -181,18 +168,11 @@ Given a generic manufacturers fan data for a fan having a maximum flow rate of 5
 
 
 <table class="table table-striped">
-
-
-
-
-
-
-
 <tr>
-<td>Air Flow (m3/s)</td>
-<td>Flow Fraction  or Fan PLR</td>
-<td>Power (W)</td>
-<td>Power Ratio Curve Output</td>
+<th>Air Flow (m3/s)</th>
+<th>Flow Fraction  or Fan PLR</th>
+<th>Power (W)</th>
+<th>Power Ratio Curve Output</th>
 </tr>
 <tr>
 <td>0</td>
@@ -224,7 +204,6 @@ Given a generic manufacturers fan data for a fan having a maximum flow rate of 5
 <td>64</td>
 <td>0.51199999999999</td>
 </tr>
-
 </table>
 
 
@@ -233,37 +212,24 @@ The tabular data can be entered directly into a table object. The data for flow 
 
 
 
+```idf
 Table:OneIndependentVariable,
-
 MyFanPower,   !- Name  [Fit from catalog performance data]
-
 Cubic,     !- Curve Type
-
 EvaluateCurveToLimits,  !- Interpolation Type
-
 0,         !- Minimum Value of X1,
-
 1,         !- Maximum Value of X1,
-
 0,         !- Minimum Table Output
-
 64,        !- Maximum Table Output
-
 Dimensionless,  !- Input Unit Type for X1
-
 Dimensionless,  !- Output Unit Type
-
 125,       !- Normalization Point
-
-0.8,64,    !- X Value \#1, Output Value \#1
-
-0,0.0,     !- X Value \#2, Output Value \#2
-
-0.2,1,     !- X Value \#3, Output Value \#3
-
-0.1,0.125, !- X Value \#4, Output Value \#4
-
-0.6,27;    !- X Value \#5, Output Value \#5
+0.8,64,    !- X Value #1, Output Value #1
+0,0.0,     !- X Value #2, Output Value #2
+0.2,1,     !- X Value #3, Output Value #3
+0.1,0.125, !- X Value #4, Output Value #4
+0.6,27;    !- X Value #5, Output Value #5
+```
 
 
 
@@ -287,39 +253,24 @@ Notice in this example that:
 
 Curve output in eio file (when using Output:Diagnostics, DisplayAdvancedReportVariables):
 
+```
 !...GENERATING NEW CURVE OBJECT
-
 ! Input as Table:OneIndependentVariable "MYFANPOWER"
-
 ! RSquared = 1.0000000000
-
 ! Standard Error = 7.3549798168E-016
-
 ! Degrees of Freedom = 5
-
 Curve:Cubic,
-
  MYFANPOWER,         !- Name
-
  -1.1102230246E-016, !- Coefficient1 Constant
-
  5.0571599639E-015,  !- Coefficient2 x
-
- -2.1582431250E-014, !- Coefficient3 x\*\*2
-
- 1.0000000000,       !- Coefficient3 x\*\*3
-
+ -2.1582431250E-014, !- Coefficient3 x**2
+ 1.0000000000,       !- Coefficient3 x**3
  0.0000000000,       !- Minimum Value of x
-
  1.0000000000,       !- Maximum Value of x
-
  0.0000000000,       !- Minimum Curve Output
-
  1.0000000000;       !- Maximum Curve Output
-
 !...END GENERATING NEW CURVE OBJECT
-
-
+```
 
 ![FanPowerRatioExample](EngineeringReference/media/image7870.png)
 
@@ -361,107 +312,63 @@ Given this form of the fundamental equation, the data pairs for the cooling coil
 
 
 
+```idf
 Table:TwoIndependentVariables,
-
 CCoolCapFT,       !- Name  [Fit from catalog performance data]
-
 BiQuadratic,      !- Curve Type
-
 EvaluateCurveToLimits,  !- Interpolation Type
-
 1,                !- Minimum Value of x,
-
 30,               !- Maximum Value of x,
-
 5,                !- Minimum Value of y,
-
 50,               !- Maximum Value of y,
-
 4500,             !- Minimum Table Output
-
 15000,            !- Maximum Table Output
-
 Temperature,      !- Input Unit Type for x
-
 Temperature,      !- Input Unit Type for y
-
 Dimensionless,    !- Output Unit Type
-
 7735.1,           !- Normalization Point
-
-17.2,29.4,7462.6, !- X, Y, and Output data pair \#1
-
-17.2,23.9,7735.1, !- X, Y, and Output data pair \#2
-
-13.9,29.4,7283.9, !- X, Y, and Output data pair \#3
-
-13.9,23.9,7474.4, !- X, Y, and Output data pair \#4
-
-13.9,35,7067.1,   !- X, Y, and Output data pair \#5
-
-13.9,40.8,6818.0, !- X, Y, and Output data pair \#6
-
-17.2,35,7157.9,   !- X, Y, and Output data pair \#7
-
-17.2,40.8,6818.0, !- X, Y, and Output data pair \#8
-
-22.2,35,8552.6,   !- X, Y, and Output data pair \#9
-
-22.2,29.4,8898.3, !- X, Y, and Output data pair \#10
-
-22.2,23.9,9206.0, !- X, Y, and Output data pair \#11
-
-22.2,40.8,8165.8; !- X, Y, and Output data pair \#12
-
-
+17.2,29.4,7462.6, !- X, Y, and Output data pair #1
+17.2,23.9,7735.1, !- X, Y, and Output data pair #2
+13.9,29.4,7283.9, !- X, Y, and Output data pair #3
+13.9,23.9,7474.4, !- X, Y, and Output data pair #4
+13.9,35,7067.1,   !- X, Y, and Output data pair #5
+13.9,40.8,6818.0, !- X, Y, and Output data pair #6
+17.2,35,7157.9,   !- X, Y, and Output data pair #7
+17.2,40.8,6818.0, !- X, Y, and Output data pair #8
+22.2,35,8552.6,   !- X, Y, and Output data pair #9
+22.2,29.4,8898.3, !- X, Y, and Output data pair #10
+22.2,23.9,9206.0, !- X, Y, and Output data pair #11
+22.2,40.8,8165.8; !- X, Y, and Output data pair #12
+```
 
 Curve output in eio file (when using Output:Diagnostics, DisplayAdvancedReportVariables):
 
+```
 CREATING NEW CURVE OBJECT
-
 ! Input as Table:TwoIndependentVariables "CCOOLCAPFT"
-
 ! RSquared       = 0.9993993101
-
 ! Standard Error = 3.4649248573E-003
-
 ! Sample Size    = 12
-
 Curve:BiQuadratic,
-
-FromTable\_CCOOLCAPFT,  !- Name
-
+FromTable_CCOOLCAPFT,  !- Name
   1.7214120578,  !- Coefficient1 Constant
-
   -0.1011737262,  !- Coefficient2 x
-
-  3.7738833967E-003,  !- Coefficient3 x\*\*2
-
+  3.7738833967E-003,  !- Coefficient3 x**2
   2.8686934910E-003,  !- Coefficient4 y
-
-  -5.3785351258E-005,  !- Coefficient5 y\*\*2
-
-  -3.4086036156E-004,  !- Coefficient6 x\*y
-
+  -5.3785351258E-005,  !- Coefficient5 y**2
+  -3.4086036156E-004,  !- Coefficient6 x*y
   1.0000000000,  !- Minimum Value of x
-
   30.0000000000,  !- Maximum Value of x
-
    5.0000000000,  !- Minimum Value of y
-
   50.0000000000,  !- Maximum Value of y
-
   0.5817636488,  !- Minimum Curve Output
-
   1.9392121627;  !- Maximum Curve Output
-
 END CREATING NEW CURVE OBJECT
-
-
+```
 
 ![NormalizedCapacity](EngineeringReference/media/image7873.png)
 
-Lookup Tables
+### Lookup Tables
 
 Lookup tables provide a method to evaluate a group of data that may or may not conform to a fundamental equation. Only tabular data which conform to existing performance curve equations are currently allowed (i.e., that lookup table name is entered where any valid performance curve is allowed therefore the table data must conform to the models fundamental equation for that specific curve). Efforts to include this lookup table in the energy management system would allow custom use of lookup tables, however, calling lookup tables from the EMS system is not currenly possible. Lookup tables can interpolate the actual data using a non-linear polynomial equation (order higher than 1). As with other table or curve objects, the lookup table can be used anywhere a valid curve object name is allowed. Care must be taken to ensure the table data format is consistent with the associate model that is using the performance curve (e.g., DX cooling coil capacity as a function of temperature where independent variable X1 = indoor wet-bulb temperature and independent variable X2 = outdoor dry-bulb temperature).
 
@@ -499,75 +406,44 @@ A regression analysis may be performed on any lookup table having one or two ind
 
 Using the example provided in the section above for Tables based on two indpendent variables, the lookup table object would be defined as follows:
 
+```idf
 Table:MultiVariableLookup,
-
 CCoolCapFT,
-
 EvaluateCurveToLimits,
-
 3,
-
 BiQuadratic,
-
 SingleLineIndependentVariableWithMatrix,
-
 ,
-
 ASCENDING,
-
 ASCENDING,
-
 7735.1,  !- Normalization reference
-
 1,       !- Minimum Value of X1
-
 30,      !- Maximum Value of X1
-
 5,       !- Minimum Value of X2
-
 50,      !- Maximum Value of X2
-
 ,        !- Minimum Value of X3
-
 ,        !- Maximum Value of X3
-
 ,        !- Minimum Value of X4
-
 ,        !- Maximum Value of X4
-
 ,        !- Minimum Value of X5
-
 ,        !- Maximum Value of X5
-
 4500,    !- Minimum Table Output
-
 15000,   !- Maximum Table Output
-
 Temperature,  !- Input Unit Type for X1
-
 Temperature,  !- Input Unit Type for X2
-
 ,        !- Input Unit Type for X3
-
 ,        !- Input Unit Type for X4
-
 ,        !- Input Unit Type for X5
-
 Dimensionless,    !- Output Unit Type
-
    2, 3, 4,
-
   13.9, 17.2, 22.2,
-
   23.9, 29.4, 35.0, 40.8,
-
   7474.4,  7735.1,  9206.0,
-
   7283.9,  7462.6,  8898.3,
-
   7067.1,  7157.9,  8552.6,
-
   6818.0,  6818.0,  8165.8;
+```
+
 
 
 
