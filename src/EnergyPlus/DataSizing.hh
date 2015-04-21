@@ -459,7 +459,6 @@ namespace DataSizing {
 		Real64 HeatSizingFactor; // the zone heating sizing ratio
 		Real64 CoolSizingFactor; // the zone cooling sizing ratio
 		int ActualZoneNum; // index into the Zone data array (in DataHeatBalance)
-		int SupplyAirNode; // node number of supply air node
 		Real64 DesHeatMassFlow; // zone design heating air mass flow rate [kg/s]
 		Real64 DesHeatOAFlowFrac; // zone design heating OA air volume fraction [-]
 		bool EMSOverrideDesHeatMassOn; // true if EMS is acting on this structure
@@ -599,7 +598,6 @@ namespace DataSizing {
 			HeatSizingFactor( 0.0 ),
 			CoolSizingFactor( 0.0 ),
 			ActualZoneNum( 0 ),
-			SupplyAirNode( 0 ),
 			DesHeatMassFlow( 0.0 ),
 			DesHeatOAFlowFrac( 0.0 ),
 			EMSOverrideDesHeatMassOn( false ),
@@ -715,7 +713,6 @@ namespace DataSizing {
 			Real64 const HeatSizingFactor, // the zone heating sizing ratio
 			Real64 const CoolSizingFactor, // the zone cooling sizing ratio
 			int const ActualZoneNum, // index into the Zone data array (in DataHeatBalance)
-			int const SupplyAirNode, // node number of supply air node
 			Real64 const DesHeatMassFlow, // zone design heating air mass flow rate [kg/s]
 			Real64 const DesHeatOAFlowFrac, // zone design heating OA air volume fraction [-]
 			bool const EMSOverrideDesHeatMassOn, // true if EMS is acting on this structure
@@ -848,7 +845,6 @@ namespace DataSizing {
 			HeatSizingFactor( HeatSizingFactor ),
 			CoolSizingFactor( CoolSizingFactor ),
 			ActualZoneNum( ActualZoneNum ),
-			SupplyAirNode( SupplyAirNode ),
 			DesHeatMassFlow( DesHeatMassFlow ),
 			DesHeatOAFlowFrac( DesHeatOAFlowFrac ),
 			EMSOverrideDesHeatMassOn( EMSOverrideDesHeatMassOn ),

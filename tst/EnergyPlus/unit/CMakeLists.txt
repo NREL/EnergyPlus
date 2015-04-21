@@ -8,6 +8,7 @@ set( test_src
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
+  DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc

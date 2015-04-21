@@ -119,6 +119,7 @@ namespace ZoneEquipmentManager {
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHgAirFnWTdb;
 	using Psychrometrics::PsyWFnTdpPb;
+	using Psychrometrics::PsyWFnTdbRhPb;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -518,6 +519,9 @@ namespace ZoneEquipmentManager {
 		using DataHVACGlobals::SmallTempDiff;
 		using General::RoundSigDigits;
 
+		// Parameters
+		static std::string const RoutineName( "SizeZoneEquipment" );
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -535,7 +539,9 @@ namespace ZoneEquipmentManager {
 		static bool MyOneTimeFlag( true );
 		int ControlledZoneNum; // controlled zone index
 		int ActualZoneNum; // index into Zone array (all zones)
-		int SupplyAirNode; // node number of zone supply air node
+		int SupplyAirNode1; // node number of 1st zone supply air node
+		int SupplyAirNode2; // node number of 2nd zone supply air node
+		int SupplyAirNode; // node number of supply air node for ideal air system
 		int ZoneNode; // node number of controlled zone
 		int ReturnNode; // node number of controlled zone return node
 		Real64 DeltaTemp; // difference between supply air temp and zone temp [C]
@@ -547,6 +553,13 @@ namespace ZoneEquipmentManager {
 		Real64 Enthalpy; // inlet specific enthalpy [J/kg]
 		Real64 MassFlowRate; // inlet mass flow rate [kg/s]
 		Real64 RetTemp; // zone return temperature [C]
+		Real64 DOASMassFlowRate( 0.0 ); // DOAS air mass flow rate for sizing [kg/s]
+		Real64 DOASSupplyTemp( 0.0 ); // DOAS supply air temperature [C]
+		Real64 DOASSupplyHumRat( 0.0 ); // DOAS supply air humidity ratio [kg H2O / kg dry air]
+		Real64 DOASCpAir( 0.0 ); // heat capacity of DOAS air [J/kg-C]
+		Real64 DOASSysOutputProvided( 0.0 ); // heating / cooling provided by DOAS system [W]
+		Real64 HR90H;
+		Real64 HR90L;
 
 		if ( MyOneTimeFlag ) {
 			SetUpZoneSizingArrays();
@@ -555,14 +568,49 @@ namespace ZoneEquipmentManager {
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
+
 			ActualZoneNum = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).ActualZoneNum;
 			NonAirSystemResponse( ActualZoneNum ) = 0.0;
 			SysDepZoneLoads( ActualZoneNum ) = 0.0;
-
 			InitSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided );
-
-			SupplyAirNode = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).SupplyAirNode;
 			ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
+			// calculate DOAS heating/cooling effect
+			if ( ZoneSizingInput( ControlledZoneNum ).AccountForDOAS ) {
+				// check for adequate number of supply nodes
+				if ( ZoneEquipConfig( ControlledZoneNum ).NumInletNodes >= 2 ) {
+					SupplyAirNode1 = ZoneEquipConfig( ControlledZoneNum ).InletNode( 1 );
+					SupplyAirNode2 = ZoneEquipConfig( ControlledZoneNum ).InletNode( 2 );
+				}
+				else if ( ZoneEquipConfig( ControlledZoneNum ).NumInletNodes >= 1 ) {
+					SupplyAirNode1 = ZoneEquipConfig( ControlledZoneNum ).InletNode( 1 );
+					SupplyAirNode2 = 0;
+				}
+				else {
+					ShowSevereError( RoutineName + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing" );
+					ShowContinueError( "there must be at least one zone air inlet node" );
+					ShowFatalError( "Previous severe error causes abort " );
+				}
+				// set the DOAS mass flow rate and supply temperature and humidity ratio
+				HR90H = PsyWFnTdbRhPb( ZoneSizingInput( ControlledZoneNum ).DOASHighSetpoint, 0.9, 101325. );
+				HR90L = PsyWFnTdbRhPb( ZoneSizingInput( ControlledZoneNum ).DOASLowSetpoint, 0.9, 101325. );
+				DOASMassFlowRate = CalcFinalZoneSizing( ControlledZoneNum ).MinOA;
+				CalcDOASSupCondsForSizing( OutDryBulbTemp, OutHumRat, ZoneSizingInput(ControlledZoneNum).DOASControlStrategy,
+					ZoneSizingInput( ControlledZoneNum ).DOASLowSetpoint, ZoneSizingInput( ControlledZoneNum ).DOASHighSetpoint,
+					HR90H, HR90L,
+					DOASSupplyTemp, DOASSupplyHumRat );
+				DOASCpAir = PsyCpAirFnWTdb( DOASSupplyHumRat, DOASSupplyTemp );
+				DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * ( DOASSupplyTemp - Node( ZoneNode ).Temp );
+				UpdateSystemOutputRequired( ActualZoneNum, DOASSysOutputProvided, LatOutputProvided );
+				Node( SupplyAirNode1 ).Temp = DOASSupplyTemp;
+				Node( SupplyAirNode1 ).HumRat = DOASSupplyHumRat;
+				Node( SupplyAirNode1 ).Enthalpy = Enthalpy;
+				Node( SupplyAirNode1 ).MassFlowRate = DOASMassFlowRate;
+				Node( SupplyAirNode1 ).Enthalpy = PsyHFnTdbW( DOASSupplyTemp, DOASSupplyHumRat );
+				SupplyAirNode = SupplyAirNode2;
+			}
+			else {
+				SupplyAirNode = SupplyAirNode1;
+			}
 
 			// Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
 			//                  SysOutputProvided >0 Supply air is cooled on entering zone (zone is heated)
@@ -684,6 +732,8 @@ namespace ZoneEquipmentManager {
 		int DOASControl, // dedicated outside air control strategy
 		Real64 DOASLowTemp, // DOAS low setpoint [C]
 		Real64 DOASHighTemp, // DOAS high setpoint [C]
+		Real64 W90H; // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+		Real64 W90L; // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 		Real64 & DOASSupTemp, // DOAS supply temperature [C]
 		Real64 & DOASSupHR // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
 		)
@@ -706,19 +756,15 @@ namespace ZoneEquipmentManager {
 		// Consult the "DOAS Effect On Zone Sizing" new feature proposal and design documents
 
 		// Using/Aliasing
-		using Psychrometrics::PsyWFnTdbRhPb;
-		using DataEnvironment::StdBaroPress;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcDOASSupCondsForSizing" );
 
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 W90H; // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
-		Real64 W90L; // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
-		W90H = PsyWFnTdbRhPb( DOASHighTemp, 0.9, StdBaroPress, RoutineName );
-		W90L = PsyWFnTdbRhPb( DOASLowTemp, 0.9, StdBaroPress, RoutineName );
+		DOASSupTemp = 0.0;
+		DOASSupHR = 0.0;
+		// neutral supply air
 		if ( DOASControl == 1 ) {
 			if ( OutDB < DOASLowTemp ) {
 				DOASSupTemp = DOASLowTemp;
@@ -732,7 +778,9 @@ namespace ZoneEquipmentManager {
 				DOASSupHR = OutHR;
 			}
 		}
-		else if ( DOASControl == 2 ) {
+
+		// neutral dehumidified supply air
+		else if ( DOASControl == 2 ) { // 
 			if ( OutDB < DOASLowTemp ) {
 				DOASSupTemp = DOASHighTemp;
 				DOASSupHR = OutHR;
@@ -742,6 +790,8 @@ namespace ZoneEquipmentManager {
 				DOASSupHR = min( OutHR, W90L );
 			}
 		}
+
+		// cold supply air
 		else if ( DOASControl == 3 ) {
 			if ( OutDB < DOASLowTemp ) {
 				DOASSupTemp = DOASHighTemp;
@@ -897,14 +947,8 @@ namespace ZoneEquipmentManager {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				ZoneSizing( DesDayNum, CtrlZoneNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
 				ZoneSizing( DesDayNum, CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
-				if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
-					ZoneSizing( DesDayNum, CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
-				}
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
-				if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
-					CalcZoneSizing( DesDayNum, CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
-				}
 				// For each Zone Sizing object, find the corresponding controlled zone
 				ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
 				if ( ZoneSizNum > 0 ) { // move data from zone sizing input
@@ -1091,14 +1135,8 @@ namespace ZoneEquipmentManager {
 			if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 			FinalZoneSizing( CtrlZoneNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
 			FinalZoneSizing( CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
-			if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
-				FinalZoneSizing( CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
-			}
 			CalcFinalZoneSizing( CtrlZoneNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
 			CalcFinalZoneSizing( CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
-			if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
-				CalcFinalZoneSizing( CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
-			}
 			ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
 			if ( ZoneSizNum > 0 ) { // move data from zone sizing input
 				FinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;

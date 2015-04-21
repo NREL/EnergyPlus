@@ -155,6 +155,17 @@ namespace ZoneEquipmentManager {
 	void
 	ReportZoneEquipment();
 
+	void
+	CalcDOASSupCondsForSizing(
+		Real64 OutDB, // outside air temperature [C]
+		Real64 OutHR, // outside humidity ratio [kg Water / kg Dry Air]
+		int DOASControl, // dedicated outside air control strategy
+		Real64 DOASLowTemp, // DOAS low setpoint [C]
+		Real64 DOASHighTemp, // DOAS high setpoint [C]
+		Real64 & DOASSupTemp, // DOAS supply temperature [C]
+		Real64 & DOASSupHR // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
+		);
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
