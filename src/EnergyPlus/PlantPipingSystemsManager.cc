@@ -329,7 +329,7 @@ namespace PlantPipingSystemsManager {
 		using DataGlobals::AnyBasementsInModel;
 		using DataGlobals::OutputFileInits;
 		using DataHeatBalFanSys::ZTAV;
-		
+				
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -344,18 +344,21 @@ namespace PlantPipingSystemsManager {
 		static gio::Fmt DomainCellsToEIOHeader( "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')" );
 		static gio::Fmt DomainCellsToEIO( "(A,',',I5',',I5',',I5)" );
 
-		int DomainNum = 0;
-		int X = 0;
-		int Y = 0;
-		int Z = 0;
-		int Xmax = 0;
-		int Ymax = 0;
-		int Zmax = 0;
-		Real64 Tzone = 0.0;
-		Real64 Atotal = 0;
-		Real64 WeightedArea = 0;
-		Array2D< Real64 > WeightedTerm;
-		Array2D< Real64 > HF;
+		int DomainNum( 0 );
+		int X( 0 );
+		int Y( 0 );
+		int Z( 0 );
+		int Xmax( 0 );
+		int Ymax( 0 );
+		int Zmax( 0 );
+		int ZoneNum( 0 );
+		int SurfCtr( 0 );
+		Real64 ZoneTemp( 0.0 );
+		Real64 SlabArea( 0.0 );
+		Array2D< Real64 > WeightingFactor;
+		Array2D< Real64 > WeightedHeatFlux;
+		Real64 WeightingFactorTimesArea( 0.0 );
+		Real64 RunningTemp( 0.0 );
 
 		std::ofstream static myfile("HeatFluxDebug.csv", std::ofstream::out);
 
@@ -405,49 +408,51 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
 				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 						
-						Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
-						Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
-						Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
-						Y = Ymax;
+					Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
+					Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
+					Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
+					Y = Ymax;
+					SlabArea = (PipingSystemDomains(DomainNum).SlabLength / 2) * (PipingSystemDomains(DomainNum).SlabWidth / 2);
 
-						//Set Tzone = Zone Air temperature. Modify to use average of all zones coupled to the ground ..?
-						Tzone = ZTAV( 1 );
-						Atotal = GetSlabArea( DomainNum, CellType_ZoneGroundInterface );
+					//Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of. 
+					for ( SurfCtr = 1; SurfCtr <= isize( PipingSystemDomains( DomainNum ).ZoneCoupledSurfaces ); ++SurfCtr ) {
+						ZoneNum = PipingSystemDomains( DomainNum ).ZoneCoupledSurfaces( SurfCtr ).Zone;
+						RunningTemp += ZTAV( ZoneNum );
+					}
+					ZoneTemp = RunningTemp / ( SurfCtr - 1 );
+											
+					WeightingFactor.allocate( { 0, Xmax }, { 0, Zmax } );
+					WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
+					PipingSystemDomains( DomainNum ).WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
 
-						WeightedTerm.allocate( { 0, Xmax }, { 0, Zmax } );
-						HF.allocate( { 0, Xmax }, { 0, Zmax } );
-						PipingSystemDomains( DomainNum ).WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
-
-						for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
-							for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
-								// Zone interface cells
-								if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
-									WeightedTerm( X, Z ) = ( Tzone - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) / ( Tzone - PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep );
-									WeightedArea += WeightedTerm( X, Z ) * YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
-									if ( DayOfMonth == 30 && HourOfDay == 23 ){
-										myfile << Atotal << "," << Tzone << "," << PipingSystemDomains( DomainNum ).HeatFlux << "," << X << "," << Z << "," << WeightedTerm( X, Z ) << "," << WeightedArea << "," << HF( Xmax, Zmax ) << "," << HF( X, Z ) << std::endl;
-									}
+					for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+						for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
+							// Zone interface cells
+							if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
+								if ( abs( ZoneTemp - PipingSystemDomains(DomainNum).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep ) < 0.0001 ){
+									PipingSystemDomains(DomainNum).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep = ZoneTemp - 0.0001;
 								}
+								WeightingFactor( X, Z ) = abs(( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) / ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep ));
+								WeightingFactorTimesArea += WeightingFactor( X, Z ) * YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
+								myfile << X << "," << Y << "," << ZoneTemp << "," << PipingSystemDomains( DomainNum ).HeatFlux << "," << WeightingFactor(X, Z) << "," << WeightingFactorTimesArea << "," << WeightedHeatFlux(Xmax, Zmax) << "," << WeightedHeatFlux(X, Z) << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature_PrevTimeStep << "," << PipingSystemDomains(DomainNum).Cells(Xmax, Ymax, Zmax).MyBase.Temperature_PrevTimeStep << std::endl;
 							}
 						}
-						//Get heat flux for center cell first
-						HF( Xmax, Zmax ) = PipingSystemDomains( DomainNum ).HeatFlux * Atotal / WeightedArea;
+					}
+					//Get heat flux for center cell first
+					WeightedHeatFlux( Xmax, Zmax ) = PipingSystemDomains( DomainNum ).HeatFlux * SlabArea / WeightingFactorTimesArea;
 
-						//Then get temperature weighted heat flux for each cell 
-						for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
-							for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
-								// Zone interface cells
-								if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
-									HF( X, Z ) = WeightedTerm( X, Z ) * HF( Xmax, Zmax );
-									if ( DayOfMonth == 30 && HourOfDay == 23 ){
-										myfile << Atotal << "," << Tzone << "," << PipingSystemDomains( DomainNum ).HeatFlux << "," << X << "," << Z << "," << WeightedTerm( X, Z ) << "," << WeightedArea << "," << HF( Xmax, Zmax ) << "," << HF( X, Z ) << std::endl;
-									}
-								}
+					//Then get temperature weighted heat flux for each cell 
+					for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
+						for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
+							// Zone interface cells
+							if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
+									WeightedHeatFlux( X, Z ) = WeightingFactor( X, Z ) * WeightedHeatFlux( Xmax, Zmax );
+									myfile << X << "," << Y << "," << ZoneTemp << "," << PipingSystemDomains(DomainNum).HeatFlux << "," << WeightingFactor(X, Z) << "," << WeightingFactorTimesArea << "," << WeightedHeatFlux(Xmax, Zmax) << "," << WeightedHeatFlux(X, Z) << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature_PrevTimeStep << "," << PipingSystemDomains(DomainNum).Cells(Xmax, Ymax, Zmax).MyBase.Temperature_PrevTimeStep << std::endl;
 							}
 						}
-						//Finally, assign heat flux values to PipingSystem arrays for temperture calculations for this time step
-						PipingSystemDomains( DomainNum ).WeightedHeatFlux = HF;
-
+					}
+					//Finally, assign heat flux values to PipingSystem arrays for temperture calculations for this time step
+					PipingSystemDomains( DomainNum ).WeightedHeatFlux = WeightedHeatFlux;
 
 				} else { // Coupled basement
 				// basement walls
@@ -3078,6 +3083,7 @@ namespace PlantPipingSystemsManager {
 					++FoundSurfIndexCtr;
 					RetVal( FoundSurfIndexCtr ).IndexInSurfaceArray = SurfCtr;
 					RetVal( FoundSurfIndexCtr ).SurfaceArea = Surface( SurfCtr ).Area;
+					RetVal( FoundSurfIndexCtr ).Zone = Surface( SurfCtr ).Zone;
 				}
 			}
 
@@ -7822,86 +7828,6 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	Real64
-		GetSlabArea(
-		int const DomainNum,
-		int const CellType
-		)
-	{
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Sushobhit Acharya
-		//       DATE WRITTEN   Spring 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 RetVal;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-		std::ofstream static myfile("CoreArea.csv", std::ofstream::out);
-
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 RunningSummation;
-		Real64 CellArea;
-		Real64 RunningArea;
-		Real64 SlabEdge;
-		Real64 PerimeterWidth;
-
-		int X;
-		int Y;
-		int Z;
-
-
-		RunningSummation = 0.0;
-		RunningArea = 0.0;
-		CellArea = 0.0;
-
-		for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
-			for ( Y = lbound( PipingSystemDomains( DomainNum ).Cells, 2 ); Y <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ); ++Y ) {
-				for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
-					if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType ) {
-							CellArea = YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
-							RunningArea += CellArea;
-							myfile << X << "," << Y << "," << Z << "," << PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).Centroid.X << "," << PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).Centroid.Z << "," << CellArea << "," << RunningArea << std::endl;
-
-					}
-				}
-			}
-		}
-
-		if ( RunningArea > 0 ) {
-			RetVal = RunningArea;
-		}
-		else {
-			//ERROR!!!
-			RetVal = 0.0; //Autodesk:Return Line added to assure return value is set: Proper error handling needed here!
-		}
-
-		return RetVal;
-
-
-	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
 	Real64
 	EvaluateFarfieldBoundaryTemperature(
 		int const DomainNum,

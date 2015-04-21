@@ -1239,6 +1239,7 @@ namespace DataPlantPipingSystems {
 		Real64 Density;
 		Real64 InsulationConductivity;
 		Real64 InsulationDensity;
+		int Zone;
 
 		// Default Constructor
 		ZoneCoupledSurfaceData() :
@@ -1250,7 +1251,8 @@ namespace DataPlantPipingSystems {
 			Conductivity( 0.0 ),
 			Density( 0.0 ),
 			InsulationConductivity( 0.0 ),
-			InsulationDensity( 0.0 )
+			InsulationDensity( 0.0 ),
+			Zone( 0 )
 
 		{}
 
@@ -1265,7 +1267,9 @@ namespace DataPlantPipingSystems {
 			Real64 const Conductivity,
 			Real64 const Density,
 			Real64 const InsulationConductivity,
-			Real64 const InsulationDensity
+			Real64 const InsulationDensity,
+			int const Zone
+
 		) :
 			Name( Name ),
 			IndexInSurfaceArray( IndexInSurfaceArray ),
@@ -1276,7 +1280,8 @@ namespace DataPlantPipingSystems {
 			Conductivity( Conductivity ),
 			Density( Density ),
 			InsulationConductivity( InsulationConductivity ),
-			InsulationDensity( InsulationDensity )
+			InsulationDensity( InsulationDensity ),
+			Zone( Zone )
 		{}
 
 	};
