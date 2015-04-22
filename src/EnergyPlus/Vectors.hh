@@ -2,8 +2,8 @@
 #define Vectors_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -31,7 +31,7 @@ namespace Vectors {
 	Real64
 	AreaPolygon(
 		int const n,
-		FArray1A< Vector > p
+		Array1A< Vector > p
 	);
 
 	Real64
@@ -54,7 +54,7 @@ namespace Vectors {
 
 	void
 	DetermineAzimuthAndTilt(
-		FArray1S< Vector > Surf, // Surface Definition
+		Array1S< Vector > Surf, // Surface Definition
 		int const NSides, // Number of sides to surface
 		Real64 & Azimuth, // Outward Normal Azimuth Angle
 		Real64 & Tilt, // Tilt angle of surface
@@ -67,7 +67,7 @@ namespace Vectors {
 
 	void
 	PlaneEquation(
-		FArray1A< Vector > verts, // Structure of the surface
+		Array1A< Vector > verts, // Structure of the surface
 		int const nverts, // Number of vertices in the surface
 		PlaneEq & plane, // Equation of plane from inputs
 		bool & error // returns true for degenerate surface
@@ -81,14 +81,14 @@ namespace Vectors {
 
 	void
 	CreateNewellAreaVector(
-		FArray1S< Vector > const VList,
+		Array1S< Vector > const VList,
 		int const NSides,
 		Vector & OutNewellAreaVector
 	);
 
 	void
 	CreateNewellSurfaceNormalVector(
-		FArray1S< Vector > const VList,
+		Array1S< Vector > const VList,
 		int const NSides,
 		Vector & OutNewellSurfaceNormalVector
 	);
@@ -103,7 +103,7 @@ namespace Vectors {
 
 	void
 	CalcCoPlanarNess(
-		FArray1A< Vector > Surf,
+		Array1A< Vector > Surf,
 		int const NSides,
 		bool & IsCoPlanar,
 		Real64 & MaxDist,

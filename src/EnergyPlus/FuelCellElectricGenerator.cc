@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -87,7 +87,7 @@ namespace FuelCellElectricGenerator {
 
 	// MODULE VARIABLE DECLARATIONS:
 	bool GetFuelCellInput( true ); // When TRUE, calls subroutine to read input file.
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE FuelCell ElectricGenerator
 
@@ -223,8 +223,8 @@ namespace FuelCellElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 25 ); // character string data
-		FArray1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
+		Array1D_string AlphArray( 25 ); // character string data
+		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -1172,7 +1172,7 @@ namespace FuelCellElectricGenerator {
 		Real64 Acc; // accuracy control for SolveRegulaFalsi
 		int MaxIter; // iteration control for SolveRegulaFalsi
 		int SolverFlag; // feed back flag from SolveRegulaFalsi
-		FArray1D< Real64 > Par( 3 ); // parameters passed in to SolveRegulaFalsi
+		Array1D< Real64 > Par( 3 ); // parameters passed in to SolveRegulaFalsi
 		// Par(1) = generator number index in structure
 		// Par(2) = targeted enthalpy (W)
 		// Par(3) = molar flow rate of product gases (kmol/s)
@@ -1858,7 +1858,7 @@ namespace FuelCellElectricGenerator {
 	Real64
 	FuelCellProductGasEnthResidual(
 		Real64 const TprodGas, // temperature, this is "x" being searched
-		FArray1< Real64 > const & Par // par(1) = Generator Number
+		Array1< Real64 > const & Par // par(1) = Generator Number
 	)
 	{
 
@@ -3753,12 +3753,12 @@ namespace FuelCellElectricGenerator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool InitGeneratorOnce( true ); // flag for 1 time initialization
-		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
-		static FArray1D_bool MyWarmupFlag; // flag for init after warmup complete
+		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
 		int inNode; // inlet index in Node array
 		int outNode; // outlet, index in Node array
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyPlantScanFlag;
 		Real64 mdot; // local temporary mass flow rate
 		Real64 rho; // local temporary fluid density
 		bool errFlag;

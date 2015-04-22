@@ -2,7 +2,7 @@
 #define VentilatedSlab_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -62,20 +62,20 @@ namespace VentilatedSlab {
 	extern bool HCoilOn; // TRUE if the heating coil (gas or electric especially) should be running
 	extern int NumOfVentSlabs; // Number of ventilated slab in the input file
 	extern Real64 OAMassFlowRate; // Outside air mass flow rate for the ventilated slab
-	extern FArray1D_double QRadSysSrcAvg; // Average source over the time step for a particular radiant surfaceD
-	extern FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	extern Array1D_double QRadSysSrcAvg; // Average source over the time step for a particular radiant surfaceD
+	extern Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
 	extern int MaxCloNumOfSurfaces; // Used to set allocate size in CalcClo routine
 	extern Real64 QZnReq; // heating or cooling needed by system [watts]
 
 	// Record keeping variables used to calculate QRadSysSrcAvg locally
 
-	extern FArray1D_double LastQRadSysSrc; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_double LastQRadSysSrc; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	extern Array1D_bool CheckEquipName;
 
 	// Autosizing variables
-	extern FArray1D_bool MySizeFlag;
+	extern Array1D_bool MySizeFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
 	// PRIVATE UpdateVentilatedSlabValAvg
@@ -92,18 +92,18 @@ namespace VentilatedSlab {
 		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
 		// Variables for Delivery Config.
-		FArray1D_string ZName; // Name of zone the system is serving
-		FArray1D_int ZPtr; // Point to this zone in the Zone derived type
+		Array1D_string ZName; // Name of zone the system is serving
+		Array1D_int ZPtr; // Point to this zone in the Zone derived type
 		std::string SurfListName; // Name of surface/surface list that is the radiant system
 		int NumOfSurfaces; // Number of surfaces included in this system (coordinated control)
-		FArray1D_int SurfacePtr; // Pointer to the slabs in the Surface derived type
-		FArray1D_string SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
-		FArray1D< Real64 > SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
-		FArray1D< Real64 > CDiameter; // Number of core diameter
-		FArray1D< Real64 > CLength; // Number of core length
-		FArray1D< Real64 > CNumbers; // Number of core numbers
-		FArray1D_string SlabIn; // Name of node that is slab inlet node
-		FArray1D_string SlabOut; // Name of node that is slab outlet node
+		Array1D_int SurfacePtr; // Pointer to the slabs in the Surface derived type
+		Array1D_string SurfaceName; // Name of surfaces that are the radiant system (can be one or more)
+		Array1D< Real64 > SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
+		Array1D< Real64 > CDiameter; // Number of core diameter
+		Array1D< Real64 > CLength; // Number of core length
+		Array1D< Real64 > CNumbers; // Number of core numbers
+		Array1D_string SlabIn; // Name of node that is slab inlet node
+		Array1D_string SlabOut; // Name of node that is slab outlet node
 		Real64 TotalSurfaceArea; // Total surface area for all surfaces that are part of this system
 		Real64 CoreDiameter; // tube diameter for embedded tubing
 		Real64 CoreLength; // tube length embedded in radiant surface
@@ -373,18 +373,18 @@ namespace VentilatedSlab {
 			int const SchedPtr, // index to schedule
 			std::string const & ZoneName, // Name of zone the system is serving
 			int const ZonePtr, // Point to this zone in the Zone derived type
-			FArray1_string const & ZName, // Name of zone the system is serving
-			FArray1_int const & ZPtr, // Point to this zone in the Zone derived type
+			Array1_string const & ZName, // Name of zone the system is serving
+			Array1_int const & ZPtr, // Point to this zone in the Zone derived type
 			std::string const & SurfListName, // Name of surface/surface list that is the radiant system
 			int const NumOfSurfaces, // Number of surfaces included in this system (coordinated control)
-			FArray1_int const & SurfacePtr, // Pointer to the slabs in the Surface derived type
-			FArray1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
-			FArray1< Real64 > const & SurfaceFlowFrac, // Fraction of flow/pipe length for a particular surface
-			FArray1< Real64 > const & CDiameter, // Number of core diameter
-			FArray1< Real64 > const & CLength, // Number of core length
-			FArray1< Real64 > const & CNumbers, // Number of core numbers
-			FArray1_string const & SlabIn, // Name of node that is slab inlet node
-			FArray1_string const & SlabOut, // Name of node that is slab outlet node
+			Array1_int const & SurfacePtr, // Pointer to the slabs in the Surface derived type
+			Array1_string const & SurfaceName, // Name of surfaces that are the radiant system (can be one or more)
+			Array1< Real64 > const & SurfaceFlowFrac, // Fraction of flow/pipe length for a particular surface
+			Array1< Real64 > const & CDiameter, // Number of core diameter
+			Array1< Real64 > const & CLength, // Number of core length
+			Array1< Real64 > const & CNumbers, // Number of core numbers
+			Array1_string const & SlabIn, // Name of node that is slab inlet node
+			Array1_string const & SlabOut, // Name of node that is slab outlet node
 			Real64 const TotalSurfaceArea, // Total surface area for all surfaces that are part of this system
 			Real64 const CoreDiameter, // tube diameter for embedded tubing
 			Real64 const CoreLength, // tube length embedded in radiant surface
@@ -674,7 +674,7 @@ namespace VentilatedSlab {
 	struct VentSlabNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		VentSlabNumericFieldData()
@@ -682,15 +682,15 @@ namespace VentilatedSlab {
 
 		// Member Constructor
 		VentSlabNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< VentilatedSlabData > VentSlab;
-	extern FArray1D< VentSlabNumericFieldData > VentSlabNumericFields;
+	extern Array1D< VentilatedSlabData > VentSlab;
+	extern Array1D< VentSlabNumericFieldData > VentSlabNumericFields;
 
 	// Functions
 

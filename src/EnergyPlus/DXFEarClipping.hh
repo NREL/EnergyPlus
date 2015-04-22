@@ -2,7 +2,7 @@
 #define DXFEarClipping_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -32,7 +32,7 @@ namespace DXFEarClipping {
 	bool
 	InPolygon(
 		Vector const & point,
-		FArray1A< Vector > poly,
+		Array1A< Vector > poly,
 		int const nsides
 	);
 
@@ -42,8 +42,8 @@ namespace DXFEarClipping {
 	int
 	Triangulate(
 		int const nsides, // number of sides to polygon
-		FArray1A< Vector > polygon,
-		FArray1D< dTriangle > & outtriangles,
+		Array1A< Vector > polygon,
+		Array1D< dTriangle > & outtriangles,
 		Real64 const surfazimuth, // surface azimuth angle (outward facing normal)
 		Real64 const surftilt, // surface tilt angle
 		std::string const & surfname, // surface name (for error messages)
@@ -63,45 +63,45 @@ namespace DXFEarClipping {
 	bool
 	polygon_contains_point_2d(
 		int const nsides, // number of sides (vertices)
-		FArray1A< Vector_2d > polygon, // points of polygon
+		Array1A< Vector_2d > polygon, // points of polygon
 		Vector_2d const & point // point to be tested
 	);
 
 	void
 	generate_ears(
 		int const nvert, // number of vertices in polygon
-		FArray1A< Vector_2d > vertex,
-		FArray1A_int ears, // number of ears possible (dimensioned to nvert)
+		Array1A< Vector_2d > vertex,
+		Array1A_int ears, // number of ears possible (dimensioned to nvert)
 		int & nears, // number of ears found
-		FArray1A_int r_vertices, // number of reflex vertices (>180) possible
+		Array1A_int r_vertices, // number of reflex vertices (>180) possible
 		int & nrverts, // number of reflex vertices found (>=180)
-		FArray1A_int c_vertices, // number of convex vertices
+		Array1A_int c_vertices, // number of convex vertices
 		int & ncverts, // number of convex vertices found (< 180)
-		FArray1A_bool removed, // array that shows if a vertex has been removed (calling routine)
-		FArray1A_int earvert, // vertex indicators for first ear
-		FArray1A< Real64 > rangles
+		Array1A_bool removed, // array that shows if a vertex has been removed (calling routine)
+		Array1A_int earvert, // vertex indicators for first ear
+		Array1A< Real64 > rangles
 	);
 
 	void
 	CalcWallCoordinateTransformation(
 		int const nsides,
-		FArray1A< Vector > polygon,
+		Array1A< Vector > polygon,
 		Real64 const surfazimuth,
 		Real64 const surftilt, // unused1208
-		FArray1A< Real64 > xvt,
-		FArray1A< Real64 > yvt,
-		FArray1A< Real64 > zvt
+		Array1A< Real64 > xvt,
+		Array1A< Real64 > yvt,
+		Array1A< Real64 > zvt
 	);
 
 	void
 	CalcRfFlrCoordinateTransformation(
 		int const nsides,
-		FArray1A< Vector > polygon,
+		Array1A< Vector > polygon,
 		Real64 const surfazimuth, // unused1208
 		Real64 const surftilt,
-		FArray1A< Real64 > xvt,
-		FArray1A< Real64 > yvt,
-		FArray1A< Real64 > zvt
+		Array1A< Real64 > xvt,
+		Array1A< Real64 > yvt,
+		Array1A< Real64 > zvt
 	);
 
 	void

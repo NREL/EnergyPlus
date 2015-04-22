@@ -78,7 +78,7 @@ namespace Vectors {
 	Real64
 	AreaPolygon(
 		int const n,
-		FArray1A< Vector > p
+		Array1A< Vector > p
 	)
 	{
 
@@ -262,7 +262,7 @@ namespace Vectors {
 
 	void
 	DetermineAzimuthAndTilt(
-		FArray1S< Vector > Surf, // Surface Definition
+		Array1S< Vector > Surf, // Surface Definition
 		int const NSides, // Number of sides to surface
 		Real64 & Azimuth, // Outward Normal Azimuth Angle
 		Real64 & Tilt, // Tilt angle of surface
@@ -409,7 +409,7 @@ namespace Vectors {
 
 	void
 	PlaneEquation(
-		FArray1A< Vector > verts, // Structure of the surface
+		Array1A< Vector > verts, // Structure of the surface
 		int const nverts, // Number of vertices in the surface
 		PlaneEq & plane, // Equation of plane from inputs
 		bool & error // returns true for degenerate surface
@@ -448,16 +448,15 @@ namespace Vectors {
 			normal.z += ( u.x - v.x ) * ( u.y + v.y );
 			refpt += u;
 		}
-		// /* normalize the polygon normal to obtain the first
-		//    three coefficients of the plane equation
-		// */
+		// normalize the polygon normal to obtain the first
+		//  three coefficients of the plane equation
 		lenvec = VecLength( normal );
 		error = false;
 		if ( lenvec != 0.0 ) { // should this be >0
 			plane.x = normal.x / lenvec;
 			plane.y = normal.y / lenvec;
 			plane.z = normal.z / lenvec;
-			// /* compute the last coefficient of the plane equation */
+			// compute the last coefficient of the plane equation
 			lenvec *= nverts;
 			plane.w = -dot( refpt, normal ) / lenvec;
 		} else {
@@ -498,7 +497,7 @@ namespace Vectors {
 
 	void
 	CreateNewellAreaVector(
-		FArray1S< Vector > const VList,
+		Array1S< Vector > const VList,
 		int const NSides,
 		Vector & OutNewellAreaVector
 	)
@@ -561,7 +560,7 @@ namespace Vectors {
 
 	void
 	CreateNewellSurfaceNormalVector(
-		FArray1S< Vector > const VList,
+		Array1S< Vector > const VList,
 		int const NSides,
 		Vector & OutNewellSurfaceNormalVector
 	)
@@ -701,7 +700,7 @@ namespace Vectors {
 
 	void
 	CalcCoPlanarNess(
-		FArray1A< Vector > Surf,
+		Array1A< Vector > Surf,
 		int const NSides,
 		bool & IsCoPlanar,
 		Real64 & MaxDist,

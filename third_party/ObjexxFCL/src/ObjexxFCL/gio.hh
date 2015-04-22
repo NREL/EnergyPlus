@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -29,7 +29,6 @@
 namespace ObjexxFCL {
 
 // Forward
-class Fstring;
 class IOFlags;
 
 namespace gio {
@@ -54,10 +53,6 @@ bool
 open( Unit const unit, Name const & name, IOFlags & flags );
 
 // Open File on Specified Unit
-bool
-open( Unit const unit, Fstring const & name, IOFlags & flags );
-
-// Open File on Specified Unit
 inline
 bool
 open( Unit const unit, c_cstring const name, IOFlags & flags )
@@ -70,10 +65,6 @@ bool
 open( Unit const unit, Name const & name, std::ios_base::openmode const mode );
 
 // Open File on Specified Unit
-bool
-open( Unit const unit, Fstring const & name, std::ios_base::openmode const mode );
-
-// Open File on Specified Unit
 inline
 bool
 open( Unit const unit, c_cstring const name, std::ios_base::openmode const mode )
@@ -84,10 +75,6 @@ open( Unit const unit, c_cstring const name, std::ios_base::openmode const mode 
 // Open File on Specified Unit
 bool
 open( Unit const unit, Name const & name );
-
-// Open File on Specified Unit
-bool
-open( Unit const unit, Fstring const & name );
 
 // Open File on Specified Unit
 inline
@@ -114,10 +101,6 @@ Unit
 open( Name const & name, IOFlags & flags );
 
 // Open File and Return Unit
-Unit
-open( Fstring const & name, IOFlags & flags );
-
-// Open File and Return Unit
 inline
 Unit
 open( c_cstring const name, IOFlags & flags )
@@ -129,9 +112,6 @@ open( c_cstring const name, IOFlags & flags )
 Unit
 open( Name const & name, std::ios_base::openmode const mode );
 
-// Open File and Return Unit
-Unit
-open( Fstring const & name, std::ios_base::openmode const mode );
 
 // Open File and Return Unit
 inline
@@ -144,10 +124,6 @@ open( c_cstring const name, std::ios_base::openmode const mode )
 // Open File and Return Unit
 Unit
 open( Name const & name );
-
-// Open File and Return Unit
-Unit
-open( Fstring const & name );
 
 // Open File and Return Unit
 inline
@@ -385,54 +361,6 @@ write( std::string & str, Fmt & fmt, IOFlags & flags )
 	return Write( str, fmt, flags );
 }
 
-// Write to Fstring
-inline
-Write
-write( Fstring & str, std::string const & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, Fmt const & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, Fmt & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, std::string const & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, Fmt const & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
-
-// Write to Fstring
-inline
-Write
-write( Fstring & str, Fmt & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
-
 // Output Stream of Unit
 std::ostream *
 out_stream( Unit const unit );
@@ -470,10 +398,6 @@ inquire( Unit const unit, IOFlags & flags );
 // Inquire by Name
 void
 inquire( Name const & name, IOFlags & flags );
-
-// Inquire by Name
-void
-inquire( Fstring const & name, IOFlags & flags );
 
 // Inquire by Name
 void

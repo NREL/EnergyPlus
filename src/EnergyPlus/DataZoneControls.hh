@@ -2,7 +2,7 @@
 #define DataZoneControls_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -30,9 +30,9 @@ namespace DataZoneControls {
 	extern int NumTempAndHumidityControlledZones; // number of zones with over cool control
 	extern bool AnyOpTempControl; // flag set true if any zones have op temp control
 	extern bool AnyZoneTempAndHumidityControl; // flag set true if any zones have over cool control
-	extern FArray1D_bool StageZoneLogic; // Logical array, A zone with staged thermostat = .TRUE.
-	extern FArray1D< Real64 > OccRoomTSetPointHeat; // occupied heating set point for optimum start period
-	extern FArray1D< Real64 > OccRoomTSetPointCool; // occupied cooling set point for optimum start period
+	extern Array1D_bool StageZoneLogic; // Logical array, A zone with staged thermostat = .TRUE.
+	extern Array1D< Real64 > OccRoomTSetPointHeat; // occupied heating set point for optimum start period
+	extern Array1D< Real64 > OccRoomTSetPointCool; // occupied cooling set point for optimum start period
 	extern bool GetZoneAirStatsInputFlag; // True when need to get input
 
 	// Types
@@ -46,9 +46,9 @@ namespace DataZoneControls {
 		std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
 		int CTSchedIndex; // Index for this schedule
 		int NumControlTypes;
-		FArray1D_string ControlType;
-		FArray1D_string ControlTypeName;
-		FArray1D_int ControlTypeSchIndx;
+		Array1D_string ControlType;
+		Array1D_string ControlTypeName;
+		Array1D_int ControlTypeSchIndx;
 		int SchIndx_SingleHeatSetPoint;
 		int SchIndx_SingleCoolSetPoint;
 		int SchIndx_SingleHeatCoolSetPoint;
@@ -113,9 +113,9 @@ namespace DataZoneControls {
 			std::string const & ControlTypeSchedName, // Name of the schedule which determines the zone temp setpoint
 			int const CTSchedIndex, // Index for this schedule
 			int const NumControlTypes,
-			FArray1_string const & ControlType,
-			FArray1_string const & ControlTypeName,
-			FArray1_int const & ControlTypeSchIndx,
+			Array1_string const & ControlType,
+			Array1_string const & ControlTypeName,
+			Array1_int const & ControlTypeSchIndx,
 			int const SchIndx_SingleHeatSetPoint,
 			int const SchIndx_SingleCoolSetPoint,
 			int const SchIndx_SingleHeatCoolSetPoint,
@@ -244,9 +244,9 @@ namespace DataZoneControls {
 		std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
 		int ComfortSchedIndex; // Index for this schedule
 		int NumControlTypes; // Number of control types in ZoneControl:ThermalComfort object
-		FArray1D_string ControlType; // Type of control
-		FArray1D_string ControlTypeName; // Name of control type
-		FArray1D_int ControlTypeSchIndx; // Index to control type schedule
+		Array1D_string ControlType; // Type of control
+		Array1D_string ControlTypeName; // Name of control type
+		Array1D_int ControlTypeSchIndx; // Index to control type schedule
 		int SchIndx_SglHeatSetPointFanger; // Index to fanger single heating setpoint schedule
 		int SchIndx_SglCoolSetPointFanger; // Index to fanger single cooling setpoint schedule
 		int SchIndx_SglHCSetPointFanger; // Index to fanger single heating/cooling setpoint schedule
@@ -324,9 +324,9 @@ namespace DataZoneControls {
 			std::string const & ControlTypeSchedName, // Name of the schedule which determines the zone temp setpoint
 			int const ComfortSchedIndex, // Index for this schedule
 			int const NumControlTypes, // Number of control types in ZoneControl:ThermalComfort object
-			FArray1_string const & ControlType, // Type of control
-			FArray1_string const & ControlTypeName, // Name of control type
-			FArray1_int const & ControlTypeSchIndx, // Index to control type schedule
+			Array1_string const & ControlType, // Type of control
+			Array1_string const & ControlTypeName, // Name of control type
+			Array1_int const & ControlTypeSchIndx, // Index to control type schedule
 			int const SchIndx_SglHeatSetPointFanger, // Index to fanger single heating setpoint schedule
 			int const SchIndx_SglCoolSetPointFanger, // Index to fanger single cooling setpoint schedule
 			int const SchIndx_SglHCSetPointFanger, // Index to fanger single heating/cooling setpoint schedule
@@ -417,8 +417,8 @@ namespace DataZoneControls {
 		int NumOfCoolStages; // Number of cooling stages
 		Real64 HeatThroRange; // Heating throttling tempeature range
 		Real64 CoolThroRange; // Cooling throttling tempeature range
-		FArray1D< Real64 > HeatTOffset; // Heating temperature offset
-		FArray1D< Real64 > CoolTOffset; // Cooling temperature offset
+		Array1D< Real64 > HeatTOffset; // Heating temperature offset
+		Array1D< Real64 > CoolTOffset; // Cooling temperature offset
 		Real64 HeatSetPoint; // Heating throttling tempeature range
 		Real64 CoolSetPoint; // Cooling throttling tempeature range
 		int StageErrCount; // Staged setpoint erro count
@@ -452,8 +452,8 @@ namespace DataZoneControls {
 			int const NumOfCoolStages, // Number of cooling stages
 			Real64 const HeatThroRange, // Heating throttling tempeature range
 			Real64 const CoolThroRange, // Cooling throttling tempeature range
-			FArray1< Real64 > const & HeatTOffset, // Heating temperature offset
-			FArray1< Real64 > const & CoolTOffset, // Cooling temperature offset
+			Array1< Real64 > const & HeatTOffset, // Heating temperature offset
+			Array1< Real64 > const & CoolTOffset, // Cooling temperature offset
 			Real64 const HeatSetPoint, // Heating throttling tempeature range
 			Real64 const CoolSetPoint, // Cooling throttling tempeature range
 			int const StageErrCount, // Staged setpoint erro count
@@ -523,13 +523,13 @@ namespace DataZoneControls {
 	};
 
 	// Object Data
-	extern FArray1D< ZoneHumidityControls > HumidityControlZone;
-	extern FArray1D< ZoneTempControls > TempControlledZone;
-	extern FArray1D< ZoneComfortControls > ComfortControlledZone;
-	extern FArray1D< TStatObject > TStatObjects;
-	extern FArray1D< TStatObject > ComfortTStatObjects;
-	extern FArray1D< TStatObject > StagedTStatObjects;
-	extern FArray1D< ZoneStagedControls > StageControlledZone;
+	extern Array1D< ZoneHumidityControls > HumidityControlZone;
+	extern Array1D< ZoneTempControls > TempControlledZone;
+	extern Array1D< ZoneComfortControls > ComfortControlledZone;
+	extern Array1D< TStatObject > TStatObjects;
+	extern Array1D< TStatObject > ComfortTStatObjects;
+	extern Array1D< TStatObject > StagedTStatObjects;
+	extern Array1D< ZoneStagedControls > StageControlledZone;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

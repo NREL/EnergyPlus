@@ -2,7 +2,7 @@
 #define ChillerElectricEIR_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -49,7 +49,7 @@ namespace ChillerElectricEIR {
 	extern Real64 ChillerFalseLoadRate; // Chiller false load over and above the water-side load [W]
 	extern Real64 AvgCondSinkTemp; // condenser temperature value for use in curves [C]
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	extern bool GetInputEIR; // When TRUE, calls subroutine to read input file.
 
@@ -297,8 +297,8 @@ namespace ChillerElectricEIR {
 	};
 
 	// Object Data
-	extern FArray1D< ElectricEIRChillerSpecs > ElectricEIRChiller; // Dimension to number of machines
-	extern FArray1D< ReportEIRVars > ElectricEIRChillerReport;
+	extern Array1D< ElectricEIRChillerSpecs > ElectricEIRChiller; // Dimension to number of machines
+	extern Array1D< ReportEIRVars > ElectricEIRChillerReport;
 
 	// Functions
 

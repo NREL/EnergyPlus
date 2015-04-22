@@ -11,7 +11,6 @@
 #include <DataIPShortCuts.hh>
 #include <DataGlobals.hh>
 #include <DataStringGlobals.hh>
-#include <ObjexxFCL/gio.hh>
 #include <DataLoopNode.hh>
 
 using namespace EnergyPlus;
@@ -25,6 +24,8 @@ using namespace ObjexxFCL;
 
 TEST( ProcessOAControllerTest, Test1 )
 {
+	ShowMessage( "Begin Test: ProcessOAControllerTest, Test1" );
+
 // Test input processing of portion of Controller:OutdoorAir object
 	//  Controller:OutdoorAir,
 	//    OA Controller 1,         !- Name
@@ -40,19 +41,11 @@ TEST( ProcessOAControllerTest, Test1 )
 	int NumAlphas ( 17 );
 	int NumNumbers ( 7 );
 	int NumOfOAControllers( 2 );
-
-	// Open the Error Output File (lifted from UtilityRoutines.cc)
-	int StandardErrorOutput = GetNewUnitNumber( );
-	IOFlags flags;
-	flags.ACTION( "write" );
-	gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags );
-	int write_stat = flags.ios( );
-
 	cCurrentModuleObject = "Controller:OutdoorAir";
 	OAController.allocate( NumOfOAControllers );
 
 	// Set up OutdoorAir:Node list
-	GetOutAirNodesInput( );
+	GetOutAirNodesInput();
 	OutsideAirNodeList.allocate( 1 );
 	OutsideAirNodeList( 1 ) = 2; // Nodes will be registered in the order they appear in the firat controller object, so the OA actuator node will be node 5
 
@@ -133,7 +126,7 @@ TEST( ProcessOAControllerTest, Test1 )
 	lNumericFieldBlanks( 6 ) = true;
 	cAlphaArgs( 9 ) = "NoLockout";
 	cAlphaArgs( 10 ) = "ProportionalMinimum";
-	lAlphaFieldBlanks( 11 ) = true;	
+	lAlphaFieldBlanks( 11 ) = true;
 	lAlphaFieldBlanks( 12 ) = true;
 	lAlphaFieldBlanks( 13 ) = true;
 	lAlphaFieldBlanks( 14 ) = true;

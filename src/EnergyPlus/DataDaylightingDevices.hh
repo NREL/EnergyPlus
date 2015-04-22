@@ -2,7 +2,7 @@
 #define DataDaylightingDevices_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -51,18 +51,18 @@ namespace DataDaylightingDevices {
 		Real64 TotLength; // Total length of pipe, including exterior
 		Real64 Reff; // Effective R value between TDD:DOME and TDD:DIFFUSER
 		int NumOfTZones; // Number of transition zone
-		FArray1D_int TZone; // Pointers to transition zones
-		FArray1D< Real64 > TZoneLength; // Length of pipe in each transition zone
+		Array1D_int TZone; // Pointers to transition zones
+		Array1D< Real64 > TZoneLength; // Length of pipe in each transition zone
 		// Calculated variables
 		Real64 AspectRatio; // Aspect ratio, length / diameter
 		Real64 ReflectVis; // Visible reflectance of surface
 		Real64 ReflectSol; // Solar reflectance of surface
-		FArray1D< Real64 > PipeTransVisBeam; // Table of beam visible transmittance vs. cosine angle
-		FArray1D< Real64 > PipeTransSolBeam; // Table of beam solar transmittance vs. cosine angle
+		Array1D< Real64 > PipeTransVisBeam; // Table of beam visible transmittance vs. cosine angle
+		Array1D< Real64 > PipeTransSolBeam; // Table of beam solar transmittance vs. cosine angle
 		Real64 TransSolIso; // Diffuse isotropic solar transmittance (constant)
 		Real64 TransSolHorizon; // Diffuse horizon solar transmittance (constant)
 		Real64 ExtLength; // Exterior exposed length of pipe
-		FArray1D< Real64 > TZoneHeatGain; // convection gain to transition zones
+		Array1D< Real64 > TZoneHeatGain; // convection gain to transition zones
 		// Report variables
 		Real64 TransmittedSolar; // Solar transmitted by the TDD [W]
 		Real64 PipeAbsorbedSolar; // Solar absorbed in the walls of the pipe [W]
@@ -110,17 +110,17 @@ namespace DataDaylightingDevices {
 			Real64 const TotLength, // Total length of pipe, including exterior
 			Real64 const Reff, // Effective R value between TDD:DOME and TDD:DIFFUSER
 			int const NumOfTZones, // Number of transition zone
-			FArray1_int const & TZone, // Pointers to transition zones
-			FArray1< Real64 > const & TZoneLength, // Length of pipe in each transition zone
+			Array1_int const & TZone, // Pointers to transition zones
+			Array1< Real64 > const & TZoneLength, // Length of pipe in each transition zone
 			Real64 const AspectRatio, // Aspect ratio, length / diameter
 			Real64 const ReflectVis, // Visible reflectance of surface
 			Real64 const ReflectSol, // Solar reflectance of surface
-			FArray1< Real64 > const & PipeTransVisBeam, // Table of beam visible transmittance vs. cosine angle
-			FArray1< Real64 > const & PipeTransSolBeam, // Table of beam solar transmittance vs. cosine angle
+			Array1< Real64 > const & PipeTransVisBeam, // Table of beam visible transmittance vs. cosine angle
+			Array1< Real64 > const & PipeTransSolBeam, // Table of beam solar transmittance vs. cosine angle
 			Real64 const TransSolIso, // Diffuse isotropic solar transmittance (constant)
 			Real64 const TransSolHorizon, // Diffuse horizon solar transmittance (constant)
 			Real64 const ExtLength, // Exterior exposed length of pipe
-			FArray1< Real64 > const & TZoneHeatGain, // convection gain to transition zones
+			Array1< Real64 > const & TZoneHeatGain, // convection gain to transition zones
 			Real64 const TransmittedSolar, // Solar transmitted by the TDD [W]
 			Real64 const PipeAbsorbedSolar, // Solar absorbed in the walls of the pipe [W]
 			Real64 const HeatGain, // Solar heat gain [W]
@@ -211,8 +211,8 @@ namespace DataDaylightingDevices {
 	};
 
 	// Object Data
-	extern FArray1D< TDDPipeData > TDDPipe;
-	extern FArray1D< ShelfData > Shelf;
+	extern Array1D< TDDPipeData > TDDPipe;
+	extern Array1D< ShelfData > Shelf;
 
 } // DataDaylightingDevices
 

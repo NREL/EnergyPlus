@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -93,12 +93,12 @@ namespace PlantHeatExchangerFluidToFluid {
 	std::string ComponentClassName( "HeatExchanger:FluidToFluid" );
 	int NumberOfPlantFluidHXs( 0 );
 	bool GetInput( true );
-	FArray1D_bool CheckFluidHXs;
+	Array1D_bool CheckFluidHXs;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< HeatExchangerStruct > FluidHX;
+	Array1D< HeatExchangerStruct > FluidHX;
 
 	// Functions
 
@@ -178,7 +178,6 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		if ( InitLoopEquip ) {
 			InitFluidHeatExchanger( CompNum, LoopNum );
-
 			if ( LoopNum == FluidHX( CompNum ).DemandSideLoop.LoopNum ) {
 				MinCap = 0.0;
 				MaxCap = FluidHX( CompNum ).DemandSideLoop.MaxLoad;
@@ -272,12 +271,12 @@ namespace PlantHeatExchangerFluidToFluid {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int CompLoop;
 		bool NodeEMSSetPointMissing;
@@ -362,7 +361,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 				if ( ! lNumericFieldBlanks( 3 ) ) {
 					FluidHX( CompLoop ).UA = rNumericArgs( 3 );
-					if ( FluidHX( CompLoop ).UA == AutoSize ){
+					if ( FluidHX( CompLoop ).UA == AutoSize ) {
 						FluidHX( CompLoop ).UAWasAutoSized = true;
 					}
 				} else {
@@ -588,8 +587,8 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyEnvrnFlag; // environment flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag; // environment flag
+		static Array1D_bool MyFlag;
 		bool errFlag;
 		static std::string const RoutineName( "InitFluidHeatExchanger: " );
 		Real64 rho;
@@ -789,12 +788,12 @@ namespace PlantHeatExchangerFluidToFluid {
 					tmpSupSideDesignVolFlowRate = 0.0;
 					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
 				}
-				if ( PlantFinalSizesOkayToReport ) { 
-					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
 						"Loop Supply Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate );
 				}
-				if ( PlantFirstSizesOkayToReport ) { 
-					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
 						"Initial Loop Supply Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate );
 				}
 			} else {
@@ -818,11 +817,11 @@ namespace PlantHeatExchangerFluidToFluid {
 				if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
 			}
 			if ( PlantFinalSizesOkayToReport ) {
-				ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
+				ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
 					"Loop Demand Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate );
 			}
 			if ( PlantFirstSizesOkayToReport ) {
-				ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
+				ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
 					"Initial Loop Demand Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate );
 			}
 		}
@@ -864,15 +863,15 @@ namespace PlantHeatExchangerFluidToFluid {
 					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
 				}
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
 						"Heat Exchanger U-Factor Times Area Value [W/C]", FluidHX( CompNum ).UA );
-					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
 						"Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
 						"Initial Heat Exchanger U-Factor Times Area Value [W/C]", FluidHX( CompNum ).UA );
-					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
+					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name,
 						"Initial Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}
 			} else {
@@ -1646,7 +1645,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 2 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 2 ); // Parameter array passed to solver
 
 		Real64 LeavingTempMinFlow;
 		Real64 LeavingTempFullFlow;
@@ -1755,7 +1754,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	Real64
 	HXDemandSideLoopFlowResidual(
 		Real64 const DmdSideMassFlowRate,
-		FArray1< Real64 > const & Par // Par(1) = HX index number
+		Array1< Real64 > const & Par // Par(1) = HX index number
 	)
 	{
 

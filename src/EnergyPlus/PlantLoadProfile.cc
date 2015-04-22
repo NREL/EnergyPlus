@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <PlantLoadProfile.hh>
@@ -62,7 +62,7 @@ namespace PlantLoadProfile {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< PlantProfileData > PlantProfile;
+	Array1D< PlantProfileData > PlantProfile;
 
 	// MODULE SUBROUTINES:
 

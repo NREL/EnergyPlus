@@ -2,8 +2,8 @@
 #define TARCOGGasses90_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2A.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -20,14 +20,14 @@ namespace TARCOGGasses90 {
 	void
 	GASSES90(
 		Real64 const tmean,
-		FArray1A_int const iprop,
-		FArray1A< Real64 > const frct,
+		Array1A_int const iprop,
+		Array1A< Real64 > const frct,
 		Real64 const pres,
 		int const nmix,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 & con,
 		Real64 & visc,
 		Real64 & dens,

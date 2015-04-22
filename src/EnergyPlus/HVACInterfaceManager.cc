@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -72,7 +72,7 @@ namespace HVACInterfaceManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
 	// Object Data
-	FArray1D< CommonPipeData > PlantCommonPipe;
+	Array1D< CommonPipeData > PlantCommonPipe;
 
 	// MODULE SUBROUTINES:
 
@@ -122,14 +122,14 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
+		static Array1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
 		Real64 DeltaEnergy;
 		// FLOW:
 
 		//Calculate the approximate energy difference across interface for comparison
 		DeltaEnergy = HVACCpApprox * ( ( Node( OutletNode ).MassFlowRate * Node( OutletNode ).Temp ) - ( Node( InletNode ).MassFlowRate * Node( InletNode ).Temp ) );
 
-		if( CalledFrom == CalledFromAirSystemDemandSide ) {
+		if ( CalledFrom == CalledFromAirSystemDemandSide ) {
 
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
 			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = false;
@@ -186,7 +186,7 @@ namespace HVACInterfaceManager {
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
-		} else if( CalledFrom == CalledFromAirSystemSupplySideDeck1 ) {
+		} else if ( CalledFrom == CalledFromAirSystemSupplySideDeck1 ) {
 
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 2 ) = false;
 			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 2 ) = false;
@@ -243,7 +243,7 @@ namespace HVACInterfaceManager {
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
-		} else if( CalledFrom == CalledFromAirSystemSupplySideDeck2 ) {
+		} else if ( CalledFrom == CalledFromAirSystemSupplySideDeck2 ) {
 
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 3 ) = false;
 			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 3 ) = false;
@@ -326,13 +326,11 @@ namespace HVACInterfaceManager {
 
 	// In-Place Right Shift by 1 of Array Elements
 	void
-	rshift1( FArray1< Real64 > & a )
+	rshift1( Array1< Real64 > & a )
 	{
 		assert( a.size_bounded() );
-		if ( a.dimensions_initialized() ) {
-			for ( int i = a.u(), e = a.l(); i > e; --i ) {
-				a( i ) = a( i - 1 );
-			}
+		for ( int i = a.u(), e = a.l(); i > e; --i ) {
+			a( i ) = a( i - 1 );
 		}
 	}
 
@@ -870,7 +868,7 @@ namespace HVACInterfaceManager {
 		static int NodeNumPriIn( 0 );
 		static int NodeNumSecIn( 0 );
 		int CPFlowDir; // flow direction in single common pipe
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		static bool OneTimeData( true );
 		Real64 CommonPipeTemp;
 
@@ -1025,7 +1023,7 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		static bool OneTimeData( true );
 		int CurCallingCase; // local temporary
 		static Real64 MdotPri( 0.0 ); // flow rate on primary side kg/s

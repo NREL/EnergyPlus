@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
 
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
@@ -80,7 +80,7 @@ namespace DataEnvironment {
 	Real64 GroundTempFC; // Current ground temperature defined for F or C factor method {C}
 	Real64 GroundTemp_Surface; // Current surface ground temperature {C}
 	Real64 GroundTemp_Deep; // Current deep ground temperature
-	FArray1D< Real64 > PubGroundTempSurface( 12 ); // All 12 Surf Gnd Temps (assigned in Weather Mgr, used in PlantPipeHeatTransfer)
+	Array1D< Real64 > PubGroundTempSurface( 12 ); // All 12 Surf Gnd Temps (assigned in Weather Mgr, used in PlantPipeHeatTransfer)
 	bool PubGroundTempSurfFlag; // Flag for if Surf Ground Temps Exist in idf  (assigned, used same as PubGroundTempSurface)
 	int HolidayIndex; // Indicates whether current day is a holiday and if so what type
 	// HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
@@ -119,7 +119,7 @@ namespace DataEnvironment {
 	Real64 WaterMainsTemp; // Current water mains temperature
 	int Year; // Current calendar year of the simulation
 	int YearTomorrow; // Tomorrow's calendar year of the simulation
-	FArray1D< Real64 > SOLCOS( 3 ); // Solar direction cosines at current time step
+	Array1D< Real64 > SOLCOS( 3 ); // Solar direction cosines at current time step
 	Real64 CloudFraction; // Fraction of sky covered by clouds
 	Real64 HISKF; // Exterior horizontal illuminance from sky (lux).
 	Real64 HISUNF; // Exterior horizontal beam illuminance (lux)
@@ -428,9 +428,9 @@ namespace DataEnvironment {
 	void
 	SetOutBulbTempAt(
 		int const NumItems,
-		FArray1S< Real64 > const Heights,
-		FArray1S< Real64 > DryBulb,
-		FArray1S< Real64 > WetBulb,
+		Array1S< Real64 > const Heights,
+		Array1S< Real64 > DryBulb,
+		Array1S< Real64 > WetBulb,
 		std::string const & Settings
 	)
 	{
@@ -517,8 +517,8 @@ namespace DataEnvironment {
 	void
 	SetWindSpeedAt(
 		int const NumItems,
-		FArray1S< Real64 > const Heights,
-		FArray1S< Real64 > LocalWindSpeed,
+		Array1S< Real64 > const Heights,
+		Array1S< Real64 > LocalWindSpeed,
 		std::string const & Settings
 	)
 	{

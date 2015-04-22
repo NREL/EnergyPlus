@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -16,8 +16,8 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/MArray.all.hh>
 #include <ObjexxFCL/MArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
@@ -35,11 +35,11 @@ struct C
 
 TEST( MArrayTest, Basic1D )
 {
-	FArray1D< C > a( 5 );
+	Array1D< C > a( 5 );
 	for ( int i = a.l(); i <= a.u(); ++i ) a( i ).m = i;
 //	int C::*pm( &C::m ); // Can give the pointer to member a name like this also
-//	MArray1< FArray1D< C >, int > ma( a, pm );
-	MArray1< FArray1D< C >, int > ma( a, &C::m );
+//	MArray1< Array1D< C >, int > ma( a, pm );
+	MArray1< Array1D< C >, int > ma( a, &C::m );
 	EXPECT_EQ( a( 1 ).m, ma( 1 ) );
 	EXPECT_EQ( a( 2 ).m, ma( 2 ) );
 	EXPECT_EQ( a( 3 ).m, ma( 3 ) );
@@ -60,9 +60,9 @@ TEST( MArrayTest, Basic1D )
 
 TEST( MArrayTest, Range1D )
 {
-	FArray1D< C > a( FArray1D< C >::IR( -3, 3 ) );
+	Array1D< C > a( Array1D< C >::IR( -3, 3 ) );
 	for ( int i = a.l(); i <= a.u(); ++i ) a( i ).m = i;
-	MArray1< FArray1D< C >, int > ma( a, &C::m ); // MArray has 1-based indexing
+	MArray1< Array1D< C >, int > ma( a, &C::m ); // MArray has 1-based indexing
 	EXPECT_EQ( 1, ma.l() );
 	EXPECT_EQ( 1, ma.l1() );
 	EXPECT_EQ( 1, ma.l( 1 ) );
@@ -87,7 +87,7 @@ TEST( MArrayTest, Range1D )
 
 TEST( MArrayTest, MakerFree1D )
 {
-	FArray1D< C > a( 5 );
+	Array1D< C > a( 5 );
 	for ( int i = a.l(); i <= a.u(); ++i ) a( i ).m = i;
 	auto ma( make_MArray1( a, &C::m ) ); // MArray maker function (shorthand MA1() version avail)
 	EXPECT_EQ( a( 1 ).m, ma( 1 ) );
@@ -99,7 +99,7 @@ TEST( MArrayTest, MakerFree1D )
 
 TEST( MArrayTest, MakerMethod1D )
 {
-	FArray1D< C > a( 5 );
+	Array1D< C > a( 5 );
 	for ( int i = 1; i <= a.u(); ++i ) a( i ).m = i;
 	auto ma( a.ma( &C::m ) ); // Array ma maker method
 //	auto ma( a.ma( &decltype( a )::Value::m ) ); // Array ma maker method when you don't want to look up the value type of a // Intel C++ 14.x doesn't support this yet
@@ -113,10 +113,10 @@ TEST( MArrayTest, MakerMethod1D )
 TEST( MArrayTest, Basic2D )
 {
 	C const c( 42, 123.5 );
-	FArray2D< C > a( 2, 2, c );
+	Array2D< C > a( 2, 2, c );
 //	int C::*pm( &C::m ); // Can give the pointer to member a name like this also
-//	MArray2< FArray2D< C >, int > ma( a, pm );
-	MArray2< FArray2D< C >, int > ma( a, &C::m );
+//	MArray2< Array2D< C >, int > ma( a, pm );
+	MArray2< Array2D< C >, int > ma( a, &C::m );
 	EXPECT_EQ( a( 1, 1 ).m, ma( 1, 1 ) );
 	EXPECT_EQ( a( 2, 2 ).m, ma( 2, 2 ) );
 	ma += 1;
@@ -129,10 +129,10 @@ TEST( MArrayTest, Basic2D )
 TEST( MArrayTest, Functions1D )
 {
 	C const ca( 42, 5.0f );
-	FArray1D< C > a( 3, ca );
+	Array1D< C > a( 3, ca );
 	auto A( make_MArray1( a, &C::x ) );
 	C const cb( 42, 4.0f );
-	FArray1D< C > b( 3, cb );
+	Array1D< C > b( 3, cb );
 	auto B( make_MArray1( b, &C::x ) );
 	EXPECT_EQ( 75.0f, magnitude_squared( A ) );
 	EXPECT_EQ( 3.0f, distance_squared( A, B ) );
@@ -142,7 +142,7 @@ TEST( MArrayTest, Functions1D )
 TEST( MArrayTest, dot1D )
 {
 	C const c( 42, 5.0f );
-	FArray1D< C > a( 5, c );
+	Array1D< C > a( 5, c );
 	auto A( make_MArray1( a, &C::x ) );
 	auto B( make_MArray1( a, &C::x ) );
 	EXPECT_EQ( 125.0f, dot( A, B ) );
@@ -153,16 +153,16 @@ TEST( MArrayTest, dot1D )
 
 //TEST( MArrayTest, EoshiftPos1D )
 //{
-//	FArray1D< C > a( 5 );
+//	Array1D< C > a( 5 );
 //	for ( int i = a.l(); i <= a.u(); ++i ) a( i ).m = i;
 //	auto A( make_MArray1( a, &C::m ) );
-//	EXPECT_TRUE( eq( FArray1D_int( { 3, 4, 5, 0, 0 } ), eoshift( A, 2 ) ) );
-//	EXPECT_TRUE( eq( FArray1D_int( { 3, 4, 5, 9, 9 } ), eoshift( A, 2, 9 ) ) );
+//	EXPECT_TRUE( eq( Array1D_int( { 3, 4, 5, 0, 0 } ), eoshift( A, 2 ) ) );
+//	EXPECT_TRUE( eq( Array1D_int( { 3, 4, 5, 9, 9 } ), eoshift( A, 2, 9 ) ) );
 //}
 
 TEST( MArrayTest, AnyOp2D )
 {
-	FArray2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 3 ), C( 4 ), C( 5 ), C( 6 ), C( 7 ), C( 8 ), C( 9 ) } );
+	Array2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 3 ), C( 4 ), C( 5 ), C( 6 ), C( 7 ), C( 8 ), C( 9 ) } );
 	auto M( make_MArray2( A, &C::m ) );
 	EXPECT_TRUE( any_eq( M, 6 ) );
 	EXPECT_FALSE( any_eq( M, 22 ) );
@@ -175,7 +175,7 @@ TEST( MArrayTest, AnyOp2D )
 
 TEST( MArrayTest, AllOp2D )
 {
-	FArray2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 3 ), C( 4 ), C( 5 ), C( 6 ), C( 7 ), C( 8 ), C( 9 ) } );
+	Array2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 3 ), C( 4 ), C( 5 ), C( 6 ), C( 7 ), C( 8 ), C( 9 ) } );
 	auto M( make_MArray2( A, &C::m ) );
 	EXPECT_FALSE( all_eq( M, 6 ) );
 	EXPECT_FALSE( all_eq( M, 22 ) );
@@ -189,7 +189,7 @@ TEST( MArrayTest, AllOp2D )
 
 TEST( MArrayTest, CountOp2D )
 {
-	FArray2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 2 ), C( 3 ), C( 3 ), C( 3 ), C( 7 ), C( 8 ), C( 9 ) } );
+	Array2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 2 ), C( 3 ), C( 3 ), C( 3 ), C( 7 ), C( 8 ), C( 9 ) } );
 	auto M( make_MArray2( A, &C::m ) );
 	EXPECT_EQ( 0u, count_eq( M, 0 ) );
 	EXPECT_EQ( 1u, count_eq( M, 1 ) );

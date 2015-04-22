@@ -67,7 +67,7 @@ namespace DataSurfaces {
 	int const OtherSideCondModeledExt( -4 );
 	int const GroundFCfactorMethod( -5 );
 
-	FArray1D_string const cExtBoundCondition( {-5,0}, { "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment" } );
+	Array1D_string const cExtBoundCondition( {-5,0}, { "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment" } );
 
 	// Parameters to indicate the first "corner" of a surface
 	// Currently, these are used only during input of surfaces
@@ -311,130 +311,130 @@ namespace DataSurfaces {
 
 	bool ShadingTransmittanceVaries( false ); // overall, shading transmittance varies for the building
 
-	FArray1D_int InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
+	Array1D_int InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
 	// 0 otherwise
-	FArray1D_int InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
+	Array1D_int InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
 	// 0 otherwise
-	FArray1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;
+	Array1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;
 	// 0 otherwise
-	FArray1D_int AdjacentZoneToSurface; // Array of adjacent zones to each surface
+	Array1D_int AdjacentZoneToSurface; // Array of adjacent zones to each surface
 
-	FArray1D< Real64 > X0; // X-component of translation vector
-	FArray1D< Real64 > Y0; // Y-component of translation vector
-	FArray1D< Real64 > Z0; // Z-component of translation vector
-	FArray1D< Real64 > DSZone; // Factor for sky diffuse solar radiation into a zone
-	FArray1D< Real64 > DGZone; // Factor for ground diffuse solar radiation into a zone
-	FArray1D< Real64 > DBZone; // Factor for diffuse radiation in a zone from
+	Array1D< Real64 > X0; // X-component of translation vector
+	Array1D< Real64 > Y0; // Y-component of translation vector
+	Array1D< Real64 > Z0; // Z-component of translation vector
+	Array1D< Real64 > DSZone; // Factor for sky diffuse solar radiation into a zone
+	Array1D< Real64 > DGZone; // Factor for ground diffuse solar radiation into a zone
+	Array1D< Real64 > DBZone; // Factor for diffuse radiation in a zone from
 	// beam reflecting from inside surfaces
-	FArray1D< Real64 > DBZoneSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-	FArray1D< Real64 > CBZone; // Factor for beam solar absorbed by interior shades
-	FArray1D< Real64 > AISurf; // Time step value of factor for beam
+	Array1D< Real64 > DBZoneSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
+	Array1D< Real64 > CBZone; // Factor for beam solar absorbed by interior shades
+	Array1D< Real64 > AISurf; // Time step value of factor for beam
 	// absorbed on inside of opaque surface
-	FArray1D< Real64 > AOSurf; // Time step value of factor for beam
+	Array1D< Real64 > AOSurf; // Time step value of factor for beam
 	// absorbed on outside of opaque surface
-	FArray1D< Real64 > BmToBmReflFacObs; // Factor for incident solar from specular beam refl
+	Array1D< Real64 > BmToBmReflFacObs; // Factor for incident solar from specular beam refl
 	// from obstructions (W/m2)/(W/m2)
-	FArray1D< Real64 > BmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl
+	Array1D< Real64 > BmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl
 	// from obstructions (W/m2)/(W/m2)
-	FArray1D< Real64 > BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
+	Array1D< Real64 > BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
 
-	FArray2D< Real64 > AWinSurf; // Time step value of factor for beam
+	Array2D< Real64 > AWinSurf; // Time step value of factor for beam
 	// absorbed in window glass layers
 
-	FArray2D< Real64 > AWinCFOverlap; // Time step value of factor for beam
+	Array2D< Real64 > AWinCFOverlap; // Time step value of factor for beam
 	// absorbed in window glass layers which comes from other windows
 	// It happens sometimes that beam enters one window and hits back of
 	// second window. It is used in complex fenestration only
 
-	FArray1D< Real64 > AirSkyRadSplit; // Fractional split between the air and
+	Array1D< Real64 > AirSkyRadSplit; // Fractional split between the air and
 	// the sky for radiation from the surface
 	// Fraction of sky IR coming from sky itself; 1-AirSkyRadSplit comes from the atmosphere.
 
-	FArray1D< Real64 > WinTransSolar; // Exterior beam plus diffuse solar transmitted through window, or
+	Array1D< Real64 > WinTransSolar; // Exterior beam plus diffuse solar transmitted through window, or
 	// window plus shade/blind, into zone (W)
-	FArray1D< Real64 > WinBmSolar; // Exterior beam solar transmitted through window, or
+	Array1D< Real64 > WinBmSolar; // Exterior beam solar transmitted through window, or
 	// window plus blind, into zone (W)
 
-	FArray1D< Real64 > WinBmBmSolar; // Exterior beam-to-beam solar transmitted through window, or
+	Array1D< Real64 > WinBmBmSolar; // Exterior beam-to-beam solar transmitted through window, or
 	// window plus blind, into zone (W)
-	FArray1D< Real64 > WinBmDifSolar; // Exterior beam-to-diffuse solar transmitted through window, or
+	Array1D< Real64 > WinBmDifSolar; // Exterior beam-to-diffuse solar transmitted through window, or
 	// window plus blind, into zone (W)
 
-	FArray1D< Real64 > WinDifSolar; // Exterior diffuse solar transmitted through window, or
+	Array1D< Real64 > WinDifSolar; // Exterior diffuse solar transmitted through window, or
 	// window plus shade/blind, into zone (W)
-	FArray1D< Real64 > WinDirSolTransAtIncAngle; // Window's beam-beam solar transmittance at current timestep's
+	Array1D< Real64 > WinDirSolTransAtIncAngle; // Window's beam-beam solar transmittance at current timestep's
 	// angle of incidence
-	FArray1D< Real64 > WinHeatGain; // Total heat gain from window = WinTransSolar + (IR and convection from
+	Array1D< Real64 > WinHeatGain; // Total heat gain from window = WinTransSolar + (IR and convection from
 	// glazing, or, if interior shade, IR and convection from
 	// zone-side of shade plus gap air convection to zone) + (IR and
 	// convection from frame) + (IR and convection from divider if no
 	// interior shade) (W)
-	FArray1D< Real64 > WinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
-	FArray1D< Real64 > WinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
+	Array1D< Real64 > WinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
+	Array1D< Real64 > WinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
 
-	FArray1D< Real64 > WinGainConvGlazToZoneRep; // component of WinHeatGain convect to zone from glazing (W)
-	FArray1D< Real64 > WinGainIRGlazToZoneRep; // component of WinHeatGain net IR to zone from glazing (W)
-	FArray1D< Real64 > WinLossSWZoneToOutWinRep; // component of WinHeatGain shortwave transmit back out (W)
-	FArray1D< Real64 > WinGainFrameDividerToZoneRep; // component of WinHeatGain to zone from frame/divider (W)
-	FArray1D< Real64 > WinGainConvGlazShadGapToZoneRep; // component of WinHeatGain convection to zone from
+	Array1D< Real64 > WinGainConvGlazToZoneRep; // component of WinHeatGain convect to zone from glazing (W)
+	Array1D< Real64 > WinGainIRGlazToZoneRep; // component of WinHeatGain net IR to zone from glazing (W)
+	Array1D< Real64 > WinLossSWZoneToOutWinRep; // component of WinHeatGain shortwave transmit back out (W)
+	Array1D< Real64 > WinGainFrameDividerToZoneRep; // component of WinHeatGain to zone from frame/divider (W)
+	Array1D< Real64 > WinGainConvGlazShadGapToZoneRep; // component of WinHeatGain convection to zone from
 	// the gap between the inner most glazing and the shade   (W)
-	FArray1D< Real64 > WinGainConvShadeToZoneRep; // component of WinHeatGain convect to zone from front shade (W)
-	FArray1D< Real64 > WinGainIRShadeToZoneRep; // component of WinHeatGain net IR to zone from front shade (W)
-	FArray1D< Real64 > OtherConvGainInsideFaceToZoneRep; // net imbalance of convection heat gain from equivalent Layer window inside face to zone air
+	Array1D< Real64 > WinGainConvShadeToZoneRep; // component of WinHeatGain convect to zone from front shade (W)
+	Array1D< Real64 > WinGainIRShadeToZoneRep; // component of WinHeatGain net IR to zone from front shade (W)
+	Array1D< Real64 > OtherConvGainInsideFaceToZoneRep; // net imbalance of convection heat gain from equivalent Layer window inside face to zone air
 
-	FArray1D< Real64 > WinGapConvHtFlowRep; // Convective heat flow from gap in airflow window (W)
+	Array1D< Real64 > WinGapConvHtFlowRep; // Convective heat flow from gap in airflow window (W)
 	//REAL(r64), ALLOCATABLE, DIMENSION(:) :: OpaqSurfInsFaceCondGainRep !Equals Opaq Surf Ins Face Cond
 	//                                                                   ! when Opaq Surf Ins Face Cond >= 0
 	//REAL(r64), ALLOCATABLE, DIMENSION(:) :: OpaqSurfInsFaceCondLossRep !Equals -Opaq Surf Ins Face Cond
 	//                                                                   ! when Opaq Surf Ins Face Cond  < 0
-	FArray1D< Real64 > WinShadingAbsorbedSolar; // Exterior beam plus diffuse solar absorbed by
+	Array1D< Real64 > WinShadingAbsorbedSolar; // Exterior beam plus diffuse solar absorbed by
 	//  window shading device (W)
-	FArray1D< Real64 > WinSysSolTransmittance; // Effective solar transmittance of window + shading device,
+	Array1D< Real64 > WinSysSolTransmittance; // Effective solar transmittance of window + shading device,
 	// if present
-	FArray1D< Real64 > WinSysSolReflectance; // Effective solar reflectance of window + shading device,
+	Array1D< Real64 > WinSysSolReflectance; // Effective solar reflectance of window + shading device,
 	// if present
-	FArray1D< Real64 > WinSysSolAbsorptance; // Effective solar absorptance of window + shading device,
+	Array1D< Real64 > WinSysSolAbsorptance; // Effective solar absorptance of window + shading device,
 	// if present
-	FArray2D< Real64 > SUNCOSHR( 3, 24, 0.0 ); // Hourly values of SUNCOS (solar direction cosines) //Autodesk:Init Zero-initialization added to avoid use uninitialized
-	FArray2D< Real64 > ReflFacBmToDiffSolObs;
-	FArray2D< Real64 > ReflFacBmToDiffSolGnd;
-	FArray2D< Real64 > ReflFacBmToBmSolObs;
-	FArray1D< Real64 > ReflFacSkySolObs;
-	FArray1D< Real64 > ReflFacSkySolGnd;
-	FArray2D< Real64 > CosIncAveBmToBmSolObs;
-	FArray1D< Real64 > DBZoneIntWin; // Value of factor for beam solar entering a zone through interior windows
+	Array2D< Real64 > SUNCOSHR( 24, 3, 0.0 ); // Hourly values of SUNCOS (solar direction cosines) //Autodesk:Init Zero-initialization added to avoid use uninitialized
+	Array2D< Real64 > ReflFacBmToDiffSolObs;
+	Array2D< Real64 > ReflFacBmToDiffSolGnd;
+	Array2D< Real64 > ReflFacBmToBmSolObs;
+	Array1D< Real64 > ReflFacSkySolObs;
+	Array1D< Real64 > ReflFacSkySolGnd;
+	Array2D< Real64 > CosIncAveBmToBmSolObs;
+	Array1D< Real64 > DBZoneIntWin; // Value of factor for beam solar entering a zone through interior windows
 	// (considered to contribute to diffuse in zone)
-	FArray1D< Real64 > SurfSunlitArea; // Sunlit area by surface number
-	FArray1D< Real64 > SurfSunlitFrac; // Sunlit fraction by surface number
+	Array1D< Real64 > SurfSunlitArea; // Sunlit area by surface number
+	Array1D< Real64 > SurfSunlitFrac; // Sunlit fraction by surface number
 	//energy
-	FArray1D< Real64 > WinTransSolarEnergy; // Energy of WinTransSolar [J]
-	FArray1D< Real64 > WinBmSolarEnergy; // Energy of WinBmSolar [J]
+	Array1D< Real64 > WinTransSolarEnergy; // Energy of WinTransSolar [J]
+	Array1D< Real64 > WinBmSolarEnergy; // Energy of WinBmSolar [J]
 
-	FArray1D< Real64 > WinBmBmSolarEnergy; // Beam-to-beam energy of WinBmSolar [J]
-	FArray1D< Real64 > WinBmDifSolarEnergy; // Beam-to-diffuse energy of WinBmSolar [J]
+	Array1D< Real64 > WinBmBmSolarEnergy; // Beam-to-beam energy of WinBmSolar [J]
+	Array1D< Real64 > WinBmDifSolarEnergy; // Beam-to-diffuse energy of WinBmSolar [J]
 
-	FArray1D< Real64 > WinDifSolarEnergy; // Energy of WinDifSolar [J]
-	FArray1D< Real64 > WinHeatGainRepEnergy; // Energy of WinHeatGainRep [J]
-	FArray1D< Real64 > WinHeatLossRepEnergy; // Energy of WinHeatLossRep [J]
-	FArray1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
-	FArray1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
+	Array1D< Real64 > WinDifSolarEnergy; // Energy of WinDifSolar [J]
+	Array1D< Real64 > WinHeatGainRepEnergy; // Energy of WinHeatGainRep [J]
+	Array1D< Real64 > WinHeatLossRepEnergy; // Energy of WinHeatLossRep [J]
+	Array1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
+	Array1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
 	// Object Data
-	FArray1D< SurfaceData > Surface;
-	FArray1D< SurfaceWindowCalc > SurfaceWindow;
-	FArray1D< FrameDividerProperties > FrameDivider;
-	FArray1D< StormWindowData > StormWindow;
-	FArray1D< WindowShadingControlData > WindowShadingControl;
-	FArray1D< OSCData > OSC;
-	FArray1D< OSCMData > OSCM;
-	FArray1D< ConvectionCoefficient > UserIntConvectionCoeffs;
-	FArray1D< ConvectionCoefficient > UserExtConvectionCoeffs;
-	FArray1D< ShadingVertexData > ShadeV;
-	FArray1D< ExtVentedCavityStruct > ExtVentedCavity;
-	FArray1D< SurfaceSolarIncident > SurfIncSolSSG;
-	FArray1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
+	Array1D< SurfaceData > Surface;
+	Array1D< SurfaceWindowCalc > SurfaceWindow;
+	Array1D< FrameDividerProperties > FrameDivider;
+	Array1D< StormWindowData > StormWindow;
+	Array1D< WindowShadingControlData > WindowShadingControl;
+	Array1D< OSCData > OSC;
+	Array1D< OSCMData > OSCM;
+	Array1D< ConvectionCoefficient > UserIntConvectionCoeffs;
+	Array1D< ConvectionCoefficient > UserExtConvectionCoeffs;
+	Array1D< ShadingVertexData > ShadeV;
+	Array1D< ExtVentedCavityStruct > ExtVentedCavity;
+	Array1D< SurfaceSolarIncident > SurfIncSolSSG;
+	Array1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
 
 	// Functions
 

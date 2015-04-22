@@ -44,25 +44,25 @@ namespace DataUCSDSharedData {
 	// type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
 	// for each zone it has 2 positions: the start and end positions in the Apos_Wall array
 	// for that specific zone.
-	FArray1D_int APos_Wall;
-	FArray1D_int APos_Floor;
-	FArray1D_int APos_Ceiling;
-	FArray1D_int PosZ_Wall;
-	FArray1D_int PosZ_Floor;
-	FArray1D_int PosZ_Ceiling;
-	FArray1D_int APos_Window;
-	FArray1D_int APos_Door;
-	FArray1D_int APos_Internal;
-	FArray1D_int PosZ_Window;
-	FArray1D_int PosZ_Door;
-	FArray1D_int PosZ_Internal;
+	Array1D_int APos_Wall;
+	Array1D_int APos_Floor;
+	Array1D_int APos_Ceiling;
+	Array1D_int PosZ_Wall;
+	Array1D_int PosZ_Floor;
+	Array1D_int PosZ_Ceiling;
+	Array1D_int APos_Window;
+	Array1D_int APos_Door;
+	Array1D_int APos_Internal;
+	Array1D_int PosZ_Window;
+	Array1D_int PosZ_Door;
+	Array1D_int PosZ_Internal;
 	// Convection coeficients for the various surfaces
-	FArray1D< Real64 > HCeiling;
-	FArray1D< Real64 > HWall;
-	FArray1D< Real64 > HFloor;
-	FArray1D< Real64 > HInternal;
-	FArray1D< Real64 > HWindow;
-	FArray1D< Real64 > HDoor;
+	Array1D< Real64 > HCeiling;
+	Array1D< Real64 > HWall;
+	Array1D< Real64 > HFloor;
+	Array1D< Real64 > HInternal;
+	Array1D< Real64 > HWindow;
+	Array1D< Real64 > HDoor;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

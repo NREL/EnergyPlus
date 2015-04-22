@@ -10,7 +10,7 @@ extern "C" {
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -91,18 +91,18 @@ namespace ExternalInterface {
 	// which phase an error occured.
 	// (1=initialization, 2=time stepping)
 
-	FArray1D_int keyVarIndexes; // Array index for specific key name
-	FArray1D_int varTypes; // Types of variables in keyVarIndexes
-	FArray1D_int varInd; // Index of ErlVariables for ExternalInterface
+	Array1D_int keyVarIndexes; // Array index for specific key name
+	Array1D_int varTypes; // Types of variables in keyVarIndexes
+	Array1D_int varInd; // Index of ErlVariables for ExternalInterface
 	int socketFD( -1 ); // socket file descriptor
 	bool ErrorsFound( false ); // Set to true if errors are found
 	bool noMoreValues( false ); // Flag, true if no more values
 	// will be sent by the server
 
-	FArray1D_string varKeys; // Keys of report variables used for data exchange
-	FArray1D_string varNames; // Names of report variables used for data exchange
-	FArray1D_int inpVarTypes; // Names of report variables used for data exchange
-	FArray1D_string inpVarNames; // Names of report variables used for data exchange
+	Array1D_string varKeys; // Keys of report variables used for data exchange
+	Array1D_string varNames; // Names of report variables used for data exchange
+	Array1D_int inpVarTypes; // Names of report variables used for data exchange
+	Array1D_string inpVarNames; // Names of report variables used for data exchange
 
 	bool configuredControlPoints( false ); // True if control points have been configured
 	bool useEMS( false ); // Will be set to true if ExternalInterface writes to EMS variables or actuators
@@ -110,9 +110,9 @@ namespace ExternalInterface {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ExternalInterface:
 
 	// Object Data
-	FArray1D< FMUType > FMU; // Variable Types structure
-	FArray1D< FMUType > FMUTemp; // Variable Types structure
-	FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
+	Array1D< FMUType > FMU; // Variable Types structure
+	Array1D< FMUType > FMUTemp; // Variable Types structure
+	Array1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
 
 	// Functions
 
@@ -384,7 +384,7 @@ namespace ExternalInterface {
 	void
 	ParseString(
 		std::string const & str, // The string, with all elements separated by ';'
-		FArray1S_string ele, // The elements
+		Array1S_string ele, // The elements
 		int const nEle // The number of elements
 	)
 	{
@@ -1007,20 +1007,20 @@ namespace ExternalInterface {
 		std::string Name_NEW; // Units sting, may be blank
 		std::string Name_OLD; // Units sting, may be blank
 
-		FArray1D_int keyIndexes( 1 ); // Array index for
-		FArray1D_int varTypes( 1 ); // Array index for
-		FArray1D_string NamesOfKeys( 1 ); // Specific key name
+		Array1D_int keyIndexes( 1 ); // Array index for
+		Array1D_int varTypes( 1 ); // Array index for
+		Array1D_string NamesOfKeys( 1 ); // Specific key name
 		int retValue;
 		int retValfmiVersion;
 		int retValfmiPathLib;
-		FArray1D_string NameListInstances( 5 );
+		Array1D_string NameListInstances( 5 );
 		bool IsNotOK;
 		bool IsBlank;
 		static bool FirstCallIni( true ); // First time, input has been read
 		bool fileExist;
 		std::string tempFullFileName;
-		FArray1D_string strippedFileName; // remove path from entered file name
-		FArray1D_string fullFileName; // entered file name/found
+		Array1D_string strippedFileName; // remove path from entered file name
+		Array1D_string fullFileName; // entered file name/found
 		std::string::size_type pos;
 		int FOUND;
 
@@ -1310,8 +1310,8 @@ namespace ExternalInterface {
 
 							// The next call expects an array, but a single item is passed
 							// Therefore create a single item array here first
-							FArray1D_string tempSingleStringA( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey );
-							FArray1D_string tempSingleStringB( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).Name );
+							Array1D_string tempSingleStringA( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey );
+							Array1D_string tempSingleStringB( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).Name );
 
 							// Make the call with arrays
 							GetReportVariableKey( tempSingleStringA, 1, tempSingleStringB, keyIndexes, varTypes );
@@ -1640,8 +1640,8 @@ namespace ExternalInterface {
 			}
 		} else {
 			switch ( Month ) {
-				case  1: simtime =   0  ; break;
-				case  2: simtime =  31  ; break;
+				case  1: simtime =   0; break;
+				case  2: simtime =  31; break;
 				case  3: simtime =  59+1; break;
 				case  4: simtime =  90+1; break;
 				case  5: simtime = 120+1; break;
@@ -1718,7 +1718,7 @@ namespace ExternalInterface {
 		static bool FirstCallTStep( true ); // Flag for first call during time stepping
 		int Count;
 
-		FArray1D_string Alphas( 5 );
+		Array1D_string Alphas( 5 );
 
 		int NumAlpha, NumNumber, IOStat;
 		int Num;
@@ -1737,8 +1737,8 @@ namespace ExternalInterface {
 		int Loop; // Loop counter
 		int NumTSObjects;
 
-		FArray1D_int keyIndexes( 1 ); // Array index for
-		FArray1D_string NamesOfKeys( 1 ); // Specific key name
+		Array1D_int keyIndexes( 1 ); // Array index for
+		Array1D_string NamesOfKeys( 1 ); // Specific key name
 
 		if ( WarmupFlag && ( KindOfSim != ksRunPeriodWeather ) ) { // No data exchange during design days
 			if ( FirstCallDesignDays ) {
@@ -2035,8 +2035,8 @@ namespace ExternalInterface {
 		Real64 curSimTim; // current simulation time
 		Real64 preSimTim; // previous time step's simulation time
 
-		FArray1D< Real64 > dblValWri( nDblMax );
-		FArray1D< Real64 > dblValRea( nDblMax );
+		Array1D< Real64 > dblValWri( nDblMax );
+		Array1D< Real64 > dblValRea( nDblMax );
 		std::string retValCha;
 		bool continueSimulation; // Flag, true if simulation should continue
 		static bool firstCall( true );
@@ -2148,11 +2148,11 @@ namespace ExternalInterface {
 
 	void
 	GetReportVariableKey(
-		FArray1S_string const varKeys, // Standard variable name
+		Array1S_string const varKeys, // Standard variable name
 		int const numberOfKeys, // Number of keys=size(varKeys)
-		FArray1S_string const varNames, // Standard variable name
-		FArray1S_int keyVarIndexes, // Array index
-		FArray1S_int varTypes // Types of variables in keyVarIndexes
+		Array1S_string const varNames, // Standard variable name
+		Array1S_int keyVarIndexes, // Array index
+		Array1S_int varTypes // Types of variables in keyVarIndexes
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2173,8 +2173,8 @@ namespace ExternalInterface {
 		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
 		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		std::string varUnits; // Units sting, may be blank
-		FArray1D_int keyIndexes; // Array index for
-		FArray1D_string NamesOfKeys; // Specific key name
+		Array1D_int keyIndexes; // Array index for
+		Array1D_string NamesOfKeys; // Specific key name
 		int Loop, iKey; // Loop counters
 
 		// Get pointers for variables to be sent to Ptolemy

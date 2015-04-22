@@ -3,9 +3,9 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -126,7 +126,7 @@ ControlCompOutput(
 	// Note - order in routine must match order below
 	//  Plus -- order in ListOfComponents array must be in sorted order.
 	int const NumComponents( 11 );
-	static FArray1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
+	static Array1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -860,7 +860,7 @@ ValidateComponent(
 
 void
 CalcPassiveExteriorBaffleGap(
-	FArray1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+	Array1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
 	Real64 const VentArea, // Area available for venting the gap [m2]
 	Real64 const Cv, // Oriface coefficient for volume-based discharge, wind-driven [--]
 	Real64 const Cd, // oriface coefficient for discharge,  bouyancy-driven [--]
@@ -942,12 +942,12 @@ CalcPassiveExteriorBaffleGap(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 	// following arrays are used to temporarily hold results from multiple underlying surfaces
-	FArray1D< Real64 > HSkyARR;
-	FArray1D< Real64 > HGroundARR;
-	FArray1D< Real64 > HAirARR;
-	FArray1D< Real64 > HPlenARR;
-	FArray1D< Real64 > HExtARR;
-	FArray1D< Real64 > LocalWindArr;
+	Array1D< Real64 > HSkyARR;
+	Array1D< Real64 > HGroundARR;
+	Array1D< Real64 > HAirARR;
+	Array1D< Real64 > HPlenARR;
+	Array1D< Real64 > HExtARR;
+	Array1D< Real64 > LocalWindArr;
 
 	// local working variables
 	Real64 RhoAir; // density of air
@@ -1024,7 +1024,7 @@ CalcPassiveExteriorBaffleGap(
 		InitExteriorConvectionCoeff( SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR( ThisSurf ), HSkyARR( ThisSurf ), HGroundARR( ThisSurf ), HAirARR( ThisSurf ) );
 		ConstrNum = Surface( SurfPtr ).Construction;
 		AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
-		TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
+		TsoK = TH( 1, 1, SurfPtr ) + KelvinConv;
 		TsBaffK = TmpTsBaf + KelvinConv;
 		if ( TsBaffK == TsoK ) { // avoid divide by zero
 			HPlenARR( ThisSurf ) = 0.0; // no net heat transfer if same temperature
@@ -1082,8 +1082,8 @@ CalcPassiveExteriorBaffleGap(
 
 	if ( IsRain ) HExt = 1000.0;
 
-//	Tso = sum( TH( SurfPtrARR, 1, 1 ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-	Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
+//	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+	Tso = sum_product_sub( TH( 1, 1, _ ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 
@@ -1349,15 +1349,15 @@ TestAirPathIntegrity( bool & ErrFound )
 	int Count;
 	int TestNode;
 	bool errFlag;
-	FArray2D_int ValRetAPaths;
-	FArray2D_int NumRAPNodes;
-	FArray2D_int ValSupAPaths;
-	FArray2D_int NumSAPNodes;
+	Array2D_int ValRetAPaths;
+	Array2D_int NumRAPNodes;
+	Array2D_int ValSupAPaths;
+	Array2D_int NumSAPNodes;
 
-	NumSAPNodes.allocate( NumPrimaryAirSys, NumOfNodes );
-	NumRAPNodes.allocate( NumPrimaryAirSys, NumOfNodes );
-	ValRetAPaths.allocate( NumPrimaryAirSys, NumOfNodes );
-	ValSupAPaths.allocate( NumPrimaryAirSys, NumOfNodes );
+	NumSAPNodes.allocate( NumOfNodes, NumPrimaryAirSys );
+	NumRAPNodes.allocate( NumOfNodes, NumPrimaryAirSys );
+	ValRetAPaths.allocate( NumOfNodes, NumPrimaryAirSys );
+	ValSupAPaths.allocate( NumOfNodes, NumPrimaryAirSys );
 	NumSAPNodes = 0;
 	NumRAPNodes = 0;
 	ValRetAPaths = 0;
@@ -1370,20 +1370,20 @@ TestAirPathIntegrity( bool & ErrFound )
 
 	// Final tests, look for duplicate nodes
 	for ( Loop = 1; Loop <= NumPrimaryAirSys; ++Loop ) {
-		if ( ValRetAPaths( Loop, 1 ) != 0 ) continue;
+		if ( ValRetAPaths( 1, Loop ) != 0 ) continue;
 		if ( AirToZoneNodeInfo( Loop ).NumReturnNodes <= 0 ) continue;
-		ValRetAPaths( Loop, 1 ) = AirToZoneNodeInfo( Loop ).ZoneEquipReturnNodeNum( 1 );
+		ValRetAPaths( 1, Loop ) = AirToZoneNodeInfo( Loop ).ZoneEquipReturnNodeNum( 1 );
 	}
 
 	for ( Loop = 1; Loop <= NumPrimaryAirSys; ++Loop ) {
 		for ( Loop1 = 1; Loop1 <= NumOfNodes; ++Loop1 ) {
-			TestNode = ValRetAPaths( Loop, Loop1 );
+			TestNode = ValRetAPaths( Loop1, Loop );
 			Count = 0;
 			for ( Loop2 = 1; Loop2 <= NumPrimaryAirSys; ++Loop2 ) {
 				for ( Loop3 = 1; Loop3 <= NumOfNodes; ++Loop3 ) {
 					if ( Loop2 == Loop && Loop1 == Loop3 ) continue; // Don't count test node
-					if ( ValRetAPaths( Loop2, Loop3 ) == 0 ) break;
-					if ( ValRetAPaths( Loop2, Loop3 ) == TestNode ) ++Count;
+					if ( ValRetAPaths( Loop3, Loop2 ) == 0 ) break;
+					if ( ValRetAPaths( Loop3, Loop2 ) == TestNode ) ++Count;
 				}
 			}
 			if ( Count > 0 ) {
@@ -1453,9 +1453,9 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	int Count;
 	std::string AirPathNodeName; // Air Path Inlet Node Name
 	std::string PrimaryAirLoopName; // Air Loop to which this supply air path is connected
-	FArray1D_bool FoundSupplyPlenum;
-	FArray1D_bool FoundZoneSplitter;
-	FArray1D_string FoundNames;
+	Array1D_bool FoundSupplyPlenum;
+	Array1D_bool FoundZoneSplitter;
+	Array1D_string FoundNames;
 	int NumErr( 0 ); // Error Counter //Autodesk:Init Initialization added
 	int BCount;
 	int Found;
@@ -1668,7 +1668,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 void
 TestReturnAirPathIntegrity(
 	bool & ErrFound,
-	FArray2S_int ValRetAPaths
+	Array2S_int ValRetAPaths
 )
 {
 
@@ -1744,9 +1744,9 @@ TestReturnAirPathIntegrity(
 	int Count;
 	std::string AirPathNodeName; // Air Path Inlet Node Name
 	std::string PrimaryAirLoopName; // Air Loop to which this return air path is connected
-	FArray1D_bool FoundReturnPlenum;
-	FArray1D_bool FoundZoneMixer;
-	FArray1D_string FoundNames;
+	Array1D_bool FoundReturnPlenum;
+	Array1D_bool FoundZoneMixer;
+	Array1D_string FoundNames;
 	int NumErr; // Error Counter
 	int BCount;
 	int Found;
@@ -1755,7 +1755,7 @@ TestReturnAirPathIntegrity(
 	int Count2;
 	bool HasMixer;
 	int MixerComp;
-	FArray1D_int AllNodes;
+	Array1D_int AllNodes;
 	int MixerCount;
 	int Count3;
 	int NumComp;
@@ -1952,8 +1952,8 @@ TestReturnAirPathIntegrity(
 			if ( AirToZoneNodeInfo( Count2 ).NumReturnNodes > 0 ) {
 				if ( AllNodes( 1 ) == AirToZoneNodeInfo( Count2 ).ZoneEquipReturnNodeNum( 1 ) ) {
 					WAirLoop = Count2;
-					ValRetAPaths( WAirLoop, _ ) = 0;
-					ValRetAPaths( WAirLoop, {1,CountNodes} ) = AllNodes( {1,CountNodes} );
+					ValRetAPaths( _, WAirLoop ) = 0;
+					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
 					break;
 				}
 			} else {

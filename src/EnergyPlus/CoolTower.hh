@@ -2,7 +2,7 @@
 #define CoolTower_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -218,7 +218,7 @@ namespace CoolTower {
 	};
 
 	// Object Data
-	extern FArray1D< CoolTowerParams > CoolTowerSys;
+	extern Array1D< CoolTowerParams > CoolTowerSys;
 
 	// Functions
 

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -71,14 +71,14 @@ namespace WaterUse {
 	//INTEGER :: MaxIterationsErrorCount =0
 	bool GetWaterUseInputFlag( true );
 
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool CheckPlantLoop;
+	Array1D_bool CheckEquipName;
+	Array1D_bool CheckPlantLoop;
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< WaterEquipmentType > WaterEquipment;
-	FArray1D< WaterConnectionsType > WaterConnections;
+	Array1D< WaterEquipmentType > WaterEquipment;
+	Array1D< WaterConnectionsType > WaterConnections;
 
 	// MODULE SUBROUTINES:
 
@@ -965,7 +965,7 @@ namespace WaterUse {
 		int InletNode;
 		int OutletNode;
 		static bool MyOneTimeFlag( true ); // one time flag                    !DSU
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
 		bool errFlag;
 
 		if ( MyOneTimeFlag ) { //DSU

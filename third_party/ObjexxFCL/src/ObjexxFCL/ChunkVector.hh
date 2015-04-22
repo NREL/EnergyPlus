@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -17,14 +17,19 @@
 #include <ObjexxFCL/ChunkVector.fwd.hh>
 #include <ObjexxFCL/Chunk.hh>
 #include <ObjexxFCL/ChunkExponent.hh>
+#include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <iomanip>
+#include <istream>
+#include <ostream>
 #include <limits>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace ObjexxFCL {
@@ -55,6 +60,7 @@ private: // Friend
 public: // Types
 
 	typedef  std::vector< Chunk< T > >  Chunks;
+	typedef  TypeTraits< T >  Traits;
 
 	// STL style
 	typedef  Chunk< T >  Chunk_type;
@@ -85,10 +91,10 @@ public: // Creation
 	// Default Constructor
 	inline
 	ChunkVector() :
-	 size_( 0 ),
-	 chunk_exponent_( 0 ),
-	 chunk_size_( 1 ),
-	 chunk_mask_( 0 )
+	 size_( 0u ),
+	 chunk_exponent_( 0u ),
+	 chunk_size_( 1u ),
+	 chunk_mask_( 0u )
 	{}
 
 	// Copy Constructor
@@ -101,6 +107,22 @@ public: // Creation
 	 chunks_( v.chunks_ )
 	{
 		assert( v.n_chunk() == computed_n_chunk() );
+	}
+
+	// Move Constructor
+	inline
+	ChunkVector( ChunkVector && v ) NOEXCEPT :
+	 size_( v.size_ ),
+	 chunk_exponent_( v.chunk_exponent_ ),
+	 chunk_size_( v.chunk_size_ ),
+	 chunk_mask_( v.chunk_mask_ ),
+	 chunks_( std::move( v.chunks_ ) )
+	{
+		assert( n_chunk() == computed_n_chunk() );
+		v.size_ = 0u;
+		v.chunk_exponent_ = 0u;
+		v.chunk_size_ = 1u;
+		v.chunk_mask_ = 0u;
 	}
 
 	// Copy Constructor Template
@@ -259,6 +281,26 @@ public: // Assignment
 			}
 			assert( n_chunk() == computed_n_chunk() );
 		}
+		return *this;
+	}
+
+	// Move Assignment
+	inline
+	ChunkVector &
+	operator =( ChunkVector && v ) NOEXCEPT
+	{
+		assert( this != &v );
+		size_ = v.size_;
+		chunk_exponent_ = v.chunk_exponent_;
+		chunk_size_ = v.chunk_size_;
+		chunk_mask_ = v.chunk_mask_;
+		chunks_ = std::move( v.chunks_ );
+		assert( n_chunk() == computed_n_chunk() );
+		v.chunks_.clear();
+		v.size_ = 0u;
+		v.chunk_exponent_ = 0u;
+		v.chunk_size_ = 1u;
+		v.chunk_mask_ = 0u;
 		return *this;
 	}
 
@@ -632,7 +674,7 @@ public: // Subscript
 	T const &
 	operator ()( size_type const i ) const
 	{
-		assert( ( i > 0 ) && ( i <= size_ ) );
+		assert( ( i > 0u ) && ( i <= size_ ) );
 		return chunks_[ ( i - 1 ) >> chunk_exponent_ ][ ( i - 1 ) & chunk_mask_ ];
 	}
 
@@ -641,7 +683,7 @@ public: // Subscript
 	T &
 	operator ()( size_type const i )
 	{
-		assert( ( i > 0 ) && ( i <= size_ ) );
+		assert( ( i > 0u ) && ( i <= size_ ) );
 		return chunks_[ ( i - 1 ) >> chunk_exponent_ ][ ( i - 1 ) & chunk_mask_ ];
 	}
 
@@ -1051,13 +1093,9 @@ private: // Functions
 private: // Data
 
 	size_type size_; // Number of elements
-
 	size_type chunk_exponent_; // Chunk size exponent (< number of bits in size_type)
-
 	size_type chunk_size_; // Chunk size (a power of 2) (last Chunk can be smaller)
-
 	size_type chunk_mask_; // Chunk index identification mask
-
 	Chunks chunks_; // Vector of Chunks
 
 }; // ChunkVector
@@ -1595,6 +1633,46 @@ operator >( T const & t, ChunkVector< T > const & a )
 		if ( !( t > a[ i ] ) ) return false;
 	}
 	return true;
+}
+
+// Stream >> ChunkVector
+template< typename T >
+inline
+std::istream &
+operator >>( std::istream & stream, ChunkVector< T > & v )
+{
+	typedef  typename ChunkVector< T >::size_type  size_type;
+	if ( stream && ( ! v.emtpy() ) ) {
+		for ( size_type i = 0, e = v.size(); i < e; ++i ) {
+			stream >> v[ i ];
+			if ( ! stream ) break;
+		}
+	}
+	return stream;
+}
+
+// Stream << ChunkVector
+template< typename T >
+inline
+std::ostream &
+operator <<( std::ostream & stream, ChunkVector< T > const & v )
+{
+	using std::setw;
+	typedef  TypeTraits< T >  Traits;
+	typedef  typename ChunkVector< T >::size_type  size_type;
+	if ( stream && ( ! v.empty() ) ) {
+		std::ios_base::fmtflags const old_flags( stream.flags() );
+		std::streamsize const old_precision( stream.precision( Traits::precision ) );
+		stream << std::right << std::showpoint << std::uppercase;
+		size_type const e( v.size() - 1 );
+		int const w( Traits::iwidth );
+		for ( size_type i = 0; i < e; ++i ) {
+			stream << setw( w ) << v[ i ] << ' ';
+		} stream << setw( w ) << v[ e ];
+		stream.precision( old_precision );
+		stream.flags( old_flags );
+	}
+	return stream;
 }
 
 } // ObjexxFCL

@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,6 @@ namespace ObjexxFCL {
 template< typename > class Vector2;
 class byte;
 class ubyte;
-class Fstring;
 
 // Types
 typedef  byte  sbyte;
@@ -54,7 +53,6 @@ typedef  Vector2< char >                Vector2_char;
 typedef  Vector2< unsigned char >       Vector2_uchar;
 typedef  Vector2< signed char >         Vector2_schar;
 typedef  Vector2< std::string >         Vector2_string;
-typedef  Vector2< Fstring >             Vector2_Fstring;
 
 } // ObjexxFCL
 

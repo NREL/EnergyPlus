@@ -21,7 +21,7 @@ extern "C" {
 #include <string>
 
 // Objexx Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 
 namespace EnergyPlus {
@@ -54,10 +54,10 @@ namespace ExternalInterface {
 	extern std::string const BlankString;
 
 	struct fmuInputVariableType {
-		
+
 		std::string Name; // Name of FMU input variable
 		int ValueReference; // = fmiValueReference specific to FMU variable
-		
+
 		// Default Constructor
 		fmuInputVariableType() :
 			Name( BlankString ),
@@ -210,42 +210,42 @@ namespace ExternalInterface {
 		fmiStatus fmistatus; // Status of fmi
 		int Index; // Index of FMU
 		// Variable Types structure for fmu input variables
-		FArray1D< fmuInputVariableType > fmuInputVariable;
+		Array1D< fmuInputVariableType > fmuInputVariable;
 		// Variable Types structure for checking duplicates fmu input variables
-		FArray1D< fmuInputVariableType > checkfmuInputVariable;
+		Array1D< fmuInputVariableType > checkfmuInputVariable;
 		// Variable Types structure for energyplus output variables
-		FArray1D< eplusOutputVariableType > eplusOutputVariable;
+		Array1D< eplusOutputVariableType > eplusOutputVariable;
 		// Variable Types structure for fmu output variables from type schedule
-		FArray1D< fmuOutputVariableScheduleType > fmuOutputVariableSchedule;
+		Array1D< fmuOutputVariableScheduleType > fmuOutputVariableSchedule;
 		// Variable Types structure for energyplus input variables from type schedule
-		FArray1D< eplusInputVariableScheduleType > eplusInputVariableSchedule;
+		Array1D< eplusInputVariableScheduleType > eplusInputVariableSchedule;
 		// Variable Types structure for fmu output variables from type variable
-		FArray1D< fmuOutputVariableVariableType > fmuOutputVariableVariable;
+		Array1D< fmuOutputVariableVariableType > fmuOutputVariableVariable;
 		// Variable Types structure for energyplus input variables from type variable
-		FArray1D< eplusInputVariableVariableType > eplusInputVariableVariable;
+		Array1D< eplusInputVariableVariableType > eplusInputVariableVariable;
 		// Variable Types structure for fmu output variables from type actuator
-		FArray1D< fmuOutputVariableActuatorType > fmuOutputVariableActuator;
+		Array1D< fmuOutputVariableActuatorType > fmuOutputVariableActuator;
 		// Variable Types structure for energyplus input variables from type actuator
-		FArray1D< eplusInputVariableActuatorType > eplusInputVariableActuator;
+		Array1D< eplusInputVariableActuatorType > eplusInputVariableActuator;
 
 		// Default Constructor
 		InstanceType() :
 			Name( BlankString ),
 			modelID( BlankString ),
-			modelGUID( BlankString ), 
-			WorkingFolder( BlankString ), 
-			WorkingFolder_wLib( BlankString ), 
-			fmiVersionNumber( BlankString ), 
-			NumInputVariablesInFMU( 0 ), 
-			NumInputVariablesInIDF( 0 ), 
-			NumOutputVariablesInFMU( 0 ), 
-			NumOutputVariablesInIDF( 0 ), 
-			NumOutputVariablesSchedule( 0 ), 
-			NumOutputVariablesVariable( 0 ), 
-			NumOutputVariablesActuator( 0 ), 
-			LenModelID( 0 ), 
-			LenModelGUID( 0 ), 
-			LenWorkingFolder( 0 ), 
+			modelGUID( BlankString ),
+			WorkingFolder( BlankString ),
+			WorkingFolder_wLib( BlankString ),
+			fmiVersionNumber( BlankString ),
+			NumInputVariablesInFMU( 0 ),
+			NumInputVariablesInIDF( 0 ),
+			NumOutputVariablesInFMU( 0 ),
+			NumOutputVariablesInIDF( 0 ),
+			NumOutputVariablesSchedule( 0 ),
+			NumOutputVariablesVariable( 0 ),
+			NumOutputVariablesActuator( 0 ),
+			LenModelID( 0 ),
+			LenModelGUID( 0 ),
+			LenWorkingFolder( 0 ),
 			LenWorkingFolder_wLib( 0 )
 		{
 			//fmiStatus, Index, and arrays not initialized in default constructor
@@ -265,7 +265,7 @@ namespace ExternalInterface {
 		int TotNumOutputVariablesSchedule; // Number of output variables from type schedule
 		int TotNumOutputVariablesVariable; // Number of output variables from type variable
 		int TotNumOutputVariablesActuator; // Number of output variables from type actuator
-		FArray1D< InstanceType > Instance; // Variable Types structure for energyplus input variables from type actuator
+		Array1D< InstanceType > Instance; // Variable Types structure for energyplus input variables from type actuator
 
 		// Default Constructor
 		FMUType() :
@@ -285,9 +285,9 @@ namespace ExternalInterface {
 
 	};
 
-	extern FArray1D< FMUType > FMU; // Variable Types structure
-	extern FArray1D< FMUType > FMUTemp; // Variable Types structure
-	extern FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
+	extern Array1D< FMUType > FMU; // Variable Types structure
+	extern Array1D< FMUType > FMUTemp; // Variable Types structure
+	extern Array1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
 	extern int NumExternalInterfaces; //Number of ExternalInterface objects
 	extern int NumExternalInterfacesBCVTB; //Number of BCVTB ExternalInterface objects
 	extern int NumExternalInterfacesFMUImport; //Number of FMU ExternalInterface objects
@@ -301,18 +301,18 @@ namespace ExternalInterface {
 	// which phase an error occured.
 	// (1=initialization, 2=time stepping)
 
-	extern FArray1D< int > keyVarIndexes; // Array index for specific key name
-	extern FArray1D< int > varTypes; // Types of variables in keyVarIndexes
-	extern FArray1D< int > varInd; // Index of ErlVariables for ExternalInterface
+	extern Array1D< int > keyVarIndexes; // Array index for specific key name
+	extern Array1D< int > varTypes; // Types of variables in keyVarIndexes
+	extern Array1D< int > varInd; // Index of ErlVariables for ExternalInterface
 	extern int socketFD; // socket file descriptor
 	extern bool ErrorsFound; // Set to true if errors are found
 	extern bool noMoreValues; //Flag, true if no more values
 	// will be sent by the server
 
-	extern FArray1D< std::string > varKeys; // Keys of report variables used for data exchange
-	extern FArray1D< std::string > varNames; // Names of report variables used for data exchange
-	extern FArray1D< int > inpVarTypes; // Names of report variables used for data exchange
-	extern FArray1D< std::string > inpVarNames; // Names of report variables used for data exchange
+	extern Array1D< std::string > varKeys; // Keys of report variables used for data exchange
+	extern Array1D< std::string > varNames; // Names of report variables used for data exchange
+	extern Array1D< int > inpVarTypes; // Names of report variables used for data exchange
+	extern Array1D< std::string > inpVarNames; // Names of report variables used for data exchange
 
 	extern bool configuredControlPoints; // True if control points have been configured
 	extern bool useEMS; // Will be set to true if ExternalInterface writes to EMS variables or actuators
@@ -323,60 +323,60 @@ namespace ExternalInterface {
 	ExternalInterfaceExchangeVariables();
 
 	void
-	CloseSocket( int const FlagToWriteToSocket ); 
+	CloseSocket( int const FlagToWriteToSocket );
 
 	void
 	InitExternalInterface();
-	
+
 	void
 	GetExternalInterfaceInput();
-	
+
 	void
 	CalcExternalInterface();
-	
+
 	void
 	ParseString(
 		std::string const & str,
-		FArray1S_string ele,
+		Array1S_string ele,
 		int const nEle
 	);
-	
+
 	void
 	GetReportVariableKey(
-		FArray1S_string const varKeys,
+		Array1S_string const varKeys,
 		int const numberOfKeys,
-		FArray1S_string const varNames,
-		FArray1S_int keyVarIndexes,
-		FArray1S_int varTypes
+		Array1S_string const varNames,
+		Array1S_int keyVarIndexes,
+		Array1S_int varTypes
 	);
-	
+
 	std::vector< char >
 	getCharArrayFromString( std::string const & originalString );
-	
+
 	std::string
 	getStringFromCharArray( std::vector< char > originalCharArray );
-	
+
 	void
 	StopExternalInterfaceIfError();
-	
+
 	void
 	ValidateRunControl();
-	
+
 	void
 	WarnIfExternalInterfaceObjectsAreUsed( std::string const & ObjectWord );
-	
+
 	void
 	CalcExternalInterfaceFMUImport();
-	
+
 	void
 	InitExternalInterfaceFMUImport();
-	
+
 	void
 	InstantiateInitializeFMUImport();
-	
+
 	void
 	TerminateResetFreeFMUImport();
-	
+
 	void
 	GetSetVariablesAndDoStepFMUImport();
 

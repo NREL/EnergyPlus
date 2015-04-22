@@ -6,6 +6,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/FluidCoolers.hh>
 #include <DataSizing.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 
 using namespace EnergyPlus;
@@ -16,15 +17,17 @@ using namespace ObjexxFCL;
 
 TEST( TwoSpeedFluidCoolerInput, Test1 )
 {
+	ShowMessage( "Begin Test: TwoSpeedFluidCoolerInput, Test1" );
+
 	using DataSizing::AutoSize;
 	int StringArraySize = 20;
-	FArray1D_string cNumericFieldNames;
+	Array1D_string cNumericFieldNames;
 	cNumericFieldNames.allocate( StringArraySize );
-	FArray1D_string cAlphaFieldNames;
+	Array1D_string cAlphaFieldNames;
 	cAlphaFieldNames.allocate( StringArraySize );
-	FArray1D_string AlphArray;
+	Array1D_string AlphArray;
 	AlphArray.allocate( StringArraySize );
-	for ( int i = 1; i <= StringArraySize; ++i ){
+	for ( int i = 1; i <= StringArraySize; ++i ) {
 		cAlphaFieldNames( i ) = "AlphaField";
 		cNumericFieldNames( i ) = "NumerField";
 		AlphArray( i ) = "FieldValues";
@@ -73,7 +76,7 @@ TEST( TwoSpeedFluidCoolerInput, Test1 )
 	testResult = TestFluidCoolerTwoSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 	EXPECT_FALSE( testResult ); // no error message triggered
 
-	SimpleFluidCooler( 1 ).FluidCoolerLowSpeedNomCap = 0; // this should trigger the original error condition 
+	SimpleFluidCooler( 1 ).FluidCoolerLowSpeedNomCap = 0; // this should trigger the original error condition
 	SimpleFluidCooler( 1 ).FluidCoolerLowSpeedNomCapWasAutoSized = false;
 	testResult = TestFluidCoolerTwoSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 	EXPECT_TRUE( testResult ); // error message triggered

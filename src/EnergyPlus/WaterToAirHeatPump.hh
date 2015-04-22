@@ -2,7 +2,7 @@
 #define WaterToAirHeatPump_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,7 +26,7 @@ namespace WaterToAirHeatPump {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	extern int RefrigIndex; // Refrigerant index
 	extern int WaterIndex; // Water index
@@ -338,7 +338,7 @@ namespace WaterToAirHeatPump {
 	};
 
 	// Object Data
-	extern FArray1D< WatertoAirHPEquipConditions > WatertoAirHP;
+	extern Array1D< WatertoAirHPEquipConditions > WatertoAirHP;
 
 	// Functions
 
@@ -406,7 +406,7 @@ namespace WaterToAirHeatPump {
 	Real64
 	CalcCompSuctionTempResidual(
 		Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	void

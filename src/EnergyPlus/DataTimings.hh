@@ -2,7 +2,7 @@
 #define DataTimings_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -97,7 +97,7 @@ namespace DataTimings {
 	};
 
 	// Object Data
-	extern FArray1D< timings > Timing;
+	extern Array1D< timings > Timing;
 
 	// Functions
 

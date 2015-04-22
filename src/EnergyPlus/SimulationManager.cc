@@ -9,8 +9,8 @@ extern "C" {
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -63,6 +63,7 @@ extern "C" {
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACControllers.hh>
 #include <HVACManager.hh>
+#include <HVACSizingSimulationManager.hh>
 #include <InputProcessor.hh>
 #include <ManageElectricPower.hh>
 #include <MixedAir.hh>
@@ -88,7 +89,6 @@ extern "C" {
 #include <ZoneTempPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
-#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -126,7 +126,6 @@ namespace SimulationManager {
 	// and internal Evolutionary Engineering documentation.
 
 	// Using/Aliasing
-
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataSizing;
@@ -629,7 +628,7 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
+		static Array1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -638,8 +637,8 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas( 6 );
-		FArray1D< Real64 > Number( 4 );
+		Array1D_string Alphas( 6 );
+		Array1D< Real64 > Number( 4 );
 		int NumAlpha;
 		int NumNumber;
 		int IOStat;
@@ -943,7 +942,7 @@ namespace SimulationManager {
 			if ( Alphas( 3 ) == "YES" ) DoPlantSizing = true;
 			if ( Alphas( 4 ) == "NO" ) DoDesDaySim = false;
 			if ( Alphas( 5 ) == "NO" ) DoWeathSim = false;
-			if (NumAlpha > 5){
+			if (NumAlpha > 5) {
 				if ( Alphas( 6 ) == "YES") DoHVACSizingSimulation = true;
 			}
 		}
@@ -997,7 +996,7 @@ namespace SimulationManager {
 		}
 		if ( DoHVACSizingSimulation ) {
 			Alphas( 6 ) = "Yes";
-			if ( NumNumber >= 1 ){
+			if ( NumNumber >= 1 ) {
 				HVACSizingSimMaxIterations = Number( 1 );
 			}
 		} else {
@@ -1656,7 +1655,7 @@ namespace SimulationManager {
 		int NumNonParents;
 		int NumNonConnected;
 		std::string ChrOut;
-		FArray1D_bool NonConnectedNodes;
+		Array1D_bool NonConnectedNodes;
 		bool ParentComponentFound;
 
 		// Formats
@@ -2203,12 +2202,12 @@ namespace SimulationManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int Loop1;
-		FArray1D_string ChildCType;
-		FArray1D_string ChildCName;
-		FArray1D_string ChildInNodeName;
-		FArray1D_string ChildOutNodeName;
-		FArray1D_int ChildInNodeNum;
-		FArray1D_int ChildOutNodeNum;
+		Array1D_string ChildCType;
+		Array1D_string ChildCName;
+		Array1D_string ChildInNodeName;
+		Array1D_string ChildOutNodeName;
+		Array1D_int ChildInNodeNum;
+		Array1D_int ChildOutNodeNum;
 		int NumChildren;
 		bool ErrorsFound;
 
@@ -2290,15 +2289,15 @@ namespace SimulationManager {
 		int Loop;
 		int Loop1;
 		int NumVariables;
-		FArray1D_int VarIndexes;
-		FArray1D_int VarIDs;
-		FArray1D_int IndexTypes;
-		FArray1D_int VarTypes;
-		FArray1D_string UnitsStrings;
-		FArray1D_string VarNames;
-		FArray1D_int ResourceTypes;
-		FArray1D_string EndUses;
-		FArray1D_string Groups;
+		Array1D_int VarIndexes;
+		Array1D_int VarIDs;
+		Array1D_int IndexTypes;
+		Array1D_int VarTypes;
+		Array1D_string UnitsStrings;
+		Array1D_string VarNames;
+		Array1D_int ResourceTypes;
+		Array1D_string EndUses;
+		Array1D_string Groups;
 
 		gio::write( OutputFileDebug, fmtA ) << " CompSet,ComponentType,ComponentName,NumMeteredVariables";
 		gio::write( OutputFileDebug, fmtA ) << " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType";

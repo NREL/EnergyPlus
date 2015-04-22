@@ -2,11 +2,10 @@
 #define SurfaceGroundHeatExchanger_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <DataHeatBalance.hh>
 #include <DataGlobals.hh>
 
 namespace EnergyPlus {
@@ -14,7 +13,6 @@ namespace EnergyPlus {
 namespace SurfaceGroundHeatExchanger {
 
 	// Using/Aliasing
-	using DataHeatBalance::MaxCTFTerms;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -24,6 +22,10 @@ namespace SurfaceGroundHeatExchanger {
 
 	extern int const SurfCond_Ground;
 	extern int const SurfCond_Exposed;
+
+namespace loc {
+	extern int const MaxCTFTerms; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms to avoid static initialization order bug: Keep them in sync
+} // loc
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -51,7 +53,7 @@ namespace SurfaceGroundHeatExchanger {
 	extern Real64 TopThermAbs; // Thermal absortivity of top layer
 	extern Real64 BtmThermAbs; // Thermal absortivity of bottom layer
 	extern Real64 TopSolarAbs; // Solar absortivity of top layer
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// weather data records updated every zone time step
 	extern Real64 PastBeamSolarRad; // Previous beam normal solar irradiance
@@ -71,9 +73,9 @@ namespace SurfaceGroundHeatExchanger {
 	extern Real64 PastCloudFraction; // Previous Fraction of sky covered by clouds
 
 	// time keeping variables used for keeping track of average flux over each time step
-	extern FArray1D< Real64 > QRadSysSrcAvg; // Average source over the time step
-	extern FArray1D< Real64 > LastSysTimeElapsed; // record of system time
-	extern FArray1D< Real64 > LastTimeStepSys; // previous time step size
+	extern Array1D< Real64 > QRadSysSrcAvg; // Average source over the time step
+	extern Array1D< Real64 > LastSysTimeElapsed; // record of system time
+	extern Array1D< Real64 > LastTimeStepSys; // previous time step size
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PlantSurfaceGroundHeatExchangers
 
@@ -217,23 +219,23 @@ namespace SurfaceGroundHeatExchanger {
 		// conventional CTF terms
 		int NumCTFTerms; // number of terms for surface
 		// could be allocated rather than hard dimensioning.
-		FArray1D< Real64 > CTFin; // surf flux in ctf - X
-		FArray1D< Real64 > CTFout; // surf flux in ctf - Z
-		FArray1D< Real64 > CTFcross; // surf flux in ctf - Y
-		FArray1D< Real64 > CTFflux; // surf flux in ctf - F
+		Array1D< Real64 > CTFin; // surf flux in ctf - X
+		Array1D< Real64 > CTFout; // surf flux in ctf - Z
+		Array1D< Real64 > CTFcross; // surf flux in ctf - Y
+		Array1D< Real64 > CTFflux; // surf flux in ctf - F
 		// QTF coefficients
-		FArray1D< Real64 > CTFSourceIn; // surf flux in ctf - Wi
-		FArray1D< Real64 > CTFSourceOut; // surf flux out ctf - Wo
-		FArray1D< Real64 > CTFTSourceOut; // surf flux in qtf - x
-		FArray1D< Real64 > CTFTSourceIn; // surf flux in qtf - y
-		FArray1D< Real64 > CTFTSourceQ; // surf flux in qtf - f
+		Array1D< Real64 > CTFSourceIn; // surf flux in ctf - Wi
+		Array1D< Real64 > CTFSourceOut; // surf flux out ctf - Wo
+		Array1D< Real64 > CTFTSourceOut; // surf flux in qtf - x
+		Array1D< Real64 > CTFTSourceIn; // surf flux in qtf - y
+		Array1D< Real64 > CTFTSourceQ; // surf flux in qtf - f
 		// History data
-		FArray1D< Real64 > TbtmHistory;
-		FArray1D< Real64 > TtopHistory;
-		FArray1D< Real64 > TsrcHistory;
-		FArray1D< Real64 > QbtmHistory;
-		FArray1D< Real64 > QtopHistory;
-		FArray1D< Real64 > QsrcHistory;
+		Array1D< Real64 > TbtmHistory;
+		Array1D< Real64 > TtopHistory;
+		Array1D< Real64 > TsrcHistory;
+		Array1D< Real64 > QbtmHistory;
+		Array1D< Real64 > QtopHistory;
+		Array1D< Real64 > QsrcHistory;
 		Real64 QSrc;
 		Real64 QSrcAvg;
 		Real64 LastQSrc;
@@ -249,21 +251,21 @@ namespace SurfaceGroundHeatExchanger {
 			QtopConstCoef( 0.0 ),
 			QtopVarCoef( 0.0 ),
 			NumCTFTerms( 0 ),
-			CTFin( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFout( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFcross( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFflux( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFSourceIn( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFSourceOut( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFTSourceOut( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFTSourceIn( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFTSourceQ( {0,MaxCTFTerms-1}, 0.0 ),
-			TbtmHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			TtopHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			TsrcHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			QbtmHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			QtopHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			QsrcHistory( {0,MaxCTFTerms-1}, 0.0 ),
+			CTFin( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFout( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFcross( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFflux( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFSourceIn( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFSourceOut( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFTSourceOut( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFTSourceIn( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFTSourceQ( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			TbtmHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			TtopHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			TsrcHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			QbtmHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			QtopHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			QsrcHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
 			QSrc( 0.0 ),
 			QSrcAvg( 0.0 ),
 			LastQSrc( 0.0 ),
@@ -280,21 +282,21 @@ namespace SurfaceGroundHeatExchanger {
 			Real64 const QtopConstCoef,
 			Real64 const QtopVarCoef,
 			int const NumCTFTerms, // number of terms for surface
-			FArray1< Real64 > const & CTFin, // surf flux in ctf - X
-			FArray1< Real64 > const & CTFout, // surf flux in ctf - Z
-			FArray1< Real64 > const & CTFcross, // surf flux in ctf - Y
-			FArray1< Real64 > const & CTFflux, // surf flux in ctf - F
-			FArray1< Real64 > const & CTFSourceIn, // surf flux in ctf - Wi
-			FArray1< Real64 > const & CTFSourceOut, // surf flux out ctf - Wo
-			FArray1< Real64 > const & CTFTSourceOut, // surf flux in qtf - x
-			FArray1< Real64 > const & CTFTSourceIn, // surf flux in qtf - y
-			FArray1< Real64 > const & CTFTSourceQ, // surf flux in qtf - f
-			FArray1< Real64 > const & TbtmHistory,
-			FArray1< Real64 > const & TtopHistory,
-			FArray1< Real64 > const & TsrcHistory,
-			FArray1< Real64 > const & QbtmHistory,
-			FArray1< Real64 > const & QtopHistory,
-			FArray1< Real64 > const & QsrcHistory,
+			Array1< Real64 > const & CTFin, // surf flux in ctf - X
+			Array1< Real64 > const & CTFout, // surf flux in ctf - Z
+			Array1< Real64 > const & CTFcross, // surf flux in ctf - Y
+			Array1< Real64 > const & CTFflux, // surf flux in ctf - F
+			Array1< Real64 > const & CTFSourceIn, // surf flux in ctf - Wi
+			Array1< Real64 > const & CTFSourceOut, // surf flux out ctf - Wo
+			Array1< Real64 > const & CTFTSourceOut, // surf flux in qtf - x
+			Array1< Real64 > const & CTFTSourceIn, // surf flux in qtf - y
+			Array1< Real64 > const & CTFTSourceQ, // surf flux in qtf - f
+			Array1< Real64 > const & TbtmHistory,
+			Array1< Real64 > const & TtopHistory,
+			Array1< Real64 > const & TsrcHistory,
+			Array1< Real64 > const & QbtmHistory,
+			Array1< Real64 > const & QtopHistory,
+			Array1< Real64 > const & QsrcHistory,
 			Real64 const QSrc,
 			Real64 const QSrcAvg,
 			Real64 const LastQSrc,
@@ -308,21 +310,21 @@ namespace SurfaceGroundHeatExchanger {
 			QtopConstCoef( QtopConstCoef ),
 			QtopVarCoef( QtopVarCoef ),
 			NumCTFTerms( NumCTFTerms ),
-			CTFin( {0,MaxCTFTerms-1}, CTFin ),
-			CTFout( {0,MaxCTFTerms-1}, CTFout ),
-			CTFcross( {0,MaxCTFTerms-1}, CTFcross ),
-			CTFflux( {0,MaxCTFTerms-1}, CTFflux ),
-			CTFSourceIn( {0,MaxCTFTerms-1}, CTFSourceIn ),
-			CTFSourceOut( {0,MaxCTFTerms-1}, CTFSourceOut ),
-			CTFTSourceOut( {0,MaxCTFTerms-1}, CTFTSourceOut ),
-			CTFTSourceIn( {0,MaxCTFTerms-1}, CTFTSourceIn ),
-			CTFTSourceQ( {0,MaxCTFTerms-1}, CTFTSourceQ ),
-			TbtmHistory( {0,MaxCTFTerms-1}, TbtmHistory ),
-			TtopHistory( {0,MaxCTFTerms-1}, TtopHistory ),
-			TsrcHistory( {0,MaxCTFTerms-1}, TsrcHistory ),
-			QbtmHistory( {0,MaxCTFTerms-1}, QbtmHistory ),
-			QtopHistory( {0,MaxCTFTerms-1}, QtopHistory ),
-			QsrcHistory( {0,MaxCTFTerms-1}, QsrcHistory ),
+			CTFin( {0,loc::MaxCTFTerms-1}, CTFin ),
+			CTFout( {0,loc::MaxCTFTerms-1}, CTFout ),
+			CTFcross( {0,loc::MaxCTFTerms-1}, CTFcross ),
+			CTFflux( {0,loc::MaxCTFTerms-1}, CTFflux ),
+			CTFSourceIn( {0,loc::MaxCTFTerms-1}, CTFSourceIn ),
+			CTFSourceOut( {0,loc::MaxCTFTerms-1}, CTFSourceOut ),
+			CTFTSourceOut( {0,loc::MaxCTFTerms-1}, CTFTSourceOut ),
+			CTFTSourceIn( {0,loc::MaxCTFTerms-1}, CTFTSourceIn ),
+			CTFTSourceQ( {0,loc::MaxCTFTerms-1}, CTFTSourceQ ),
+			TbtmHistory( {0,loc::MaxCTFTerms-1}, TbtmHistory ),
+			TtopHistory( {0,loc::MaxCTFTerms-1}, TtopHistory ),
+			TsrcHistory( {0,loc::MaxCTFTerms-1}, TsrcHistory ),
+			QbtmHistory( {0,loc::MaxCTFTerms-1}, QbtmHistory ),
+			QtopHistory( {0,loc::MaxCTFTerms-1}, QtopHistory ),
+			QsrcHistory( {0,loc::MaxCTFTerms-1}, QsrcHistory ),
 			QSrc( QSrc ),
 			QSrcAvg( QSrcAvg ),
 			LastQSrc( LastQSrc ),
@@ -397,9 +399,9 @@ namespace SurfaceGroundHeatExchanger {
 	};
 
 	// Object Data
-	extern FArray1D< SurfaceGroundHeatExchangerData > SurfaceGHE;
-	extern FArray1D< SurfaceGroundHeatExchangerQTF > SurfaceGHEQTF;
-	extern FArray1D< SurfaceGroundHeatExchngrReport > SurfaceGHEReport;
+	extern Array1D< SurfaceGroundHeatExchangerData > SurfaceGHE;
+	extern Array1D< SurfaceGroundHeatExchangerQTF > SurfaceGHEQTF;
+	extern Array1D< SurfaceGroundHeatExchngrReport > SurfaceGHEReport;
 
 	// Functions
 

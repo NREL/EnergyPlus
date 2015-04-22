@@ -9,9 +9,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 
 namespace ObjexxFCL {
 
@@ -31,6 +34,11 @@ protected: // Creation
 	BArray( BArray const & )
 	{}
 
+	// Move Constructor
+	inline
+	BArray( BArray && ) NOEXCEPT
+	{}
+
 public: // Creation
 
 	// Destructor
@@ -45,6 +53,12 @@ protected: // Assignment
 	inline
 	void
 	operator =( BArray const & )
+	{}
+
+	// Move Assignment
+	inline
+	void
+	operator =( BArray && ) NOEXCEPT
 	{}
 
 }; // BArray

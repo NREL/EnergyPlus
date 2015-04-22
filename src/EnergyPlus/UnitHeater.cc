@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -109,14 +109,14 @@ namespace UnitHeater {
 	bool HCoilOn; // TRUE if the heating coil (gas or electric especially) should be running
 	int NumOfUnitHeats; // Number of unit heaters in the input file
 	Real64 QZnReq; // heating or cooling needed by zone [watts]
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 
 	// Object Data
-	FArray1D< UnitHeaterData > UnitHeat;
-	FArray1D< UnitHeatNumericFieldData > UnitHeatNumericFields;
+	Array1D< UnitHeaterData > UnitHeat;
+	Array1D< UnitHeatNumericFieldData > UnitHeatNumericFields;
 
 	// Functions
 
@@ -289,12 +289,12 @@ namespace UnitHeater {
 		static std::string const RoutineName( "GetUnitHeaterInput: " ); // include trailing blank space
 		Real64 FanVolFlow; // Fan volumetric flow rate
 		std::string CurrentModuleObject;
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int CtrlZone; // index to loop counter
 		int NodeNum; // index to loop counter
 		bool ZoneNodeNotFound; // used in error checking
@@ -636,9 +636,9 @@ namespace UnitHeater {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
 		int HotConNode; // hot water control node number in unit heater loop
@@ -1242,7 +1242,7 @@ namespace UnitHeater {
 		Real64 SpecHumOut; // Specific humidity ratio of outlet air (kg moisture / kg moist air)
 		Real64 SpecHumIn; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 		Real64 mdot; // local temporary for fluid mass flow rate
-		FArray1D< Real64 > Par( 3 ); // parameters passed to RegulaFalsi function
+		Array1D< Real64 > Par( 3 ); // parameters passed to RegulaFalsi function
 		int OpMode;
 		Real64 PartLoadFrac;
 		Real64 NoOutput;
@@ -1647,7 +1647,7 @@ namespace UnitHeater {
 	Real64
 	CalcUnitHeaterResidual(
 		Real64 const PartLoadRatio, // heating coil part load ratio
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	)
 	{
 
