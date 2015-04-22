@@ -16,6 +16,7 @@ set( test_src
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatRecovery.unit.cc
   Humidifiers.unit.cc
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
@@ -28,6 +29,7 @@ set( test_src
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  SecondaryDXCoils.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
