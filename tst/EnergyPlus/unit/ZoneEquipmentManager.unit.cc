@@ -87,8 +87,8 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	DataZoneEquipment::ZoneEquipConfig( NumOfZones ).InletNode.allocate( 1 );
 	DataZoneEquipment::ZoneEquipConfig( NumOfZones ).ExhaustNode.allocate( 1 );
 	DataSizing::ZoneSizingInput.allocate( NumOfZones );
-	DataSizing::ZoneSizing.allocate( NumOfZones, 2 );
-	DataSizing::CalcZoneSizing.allocate( NumOfZones, 2 );
+	DataSizing::ZoneSizing.allocate( 2, NumOfZones );
+	DataSizing::CalcZoneSizing.allocate( 2, NumOfZones );
 	DataSizing::FinalZoneSizing.allocate( NumOfZones );
 	DataSizing::CalcFinalZoneSizing.allocate( NumOfZones );
 	DataZoneEnergyDemands::DeadBandOrSetback.allocate( NumOfZones );
@@ -170,13 +170,13 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	DataContaminantBalance::Contaminant.CO2Simulation = false;
 	DataContaminantBalance::Contaminant.GenericContamSimulation = false;
 
-	CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZnCoolDgnSAMethod = DataSizing::SupplyAirTemperature;
-	CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ActualZoneNum = CtrlZoneNum;
-	CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).SupplyAirNode = ZoneSupplyNode;
-	CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).SupplyAirAdjustFactor = 1.0;
-	CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolDesTemp = 25.0;
-	CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolDesHumRat = 0.0075;
-	CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatLoad = 0.0;
+	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZnCoolDgnSAMethod = DataSizing::SupplyAirTemperature;
+	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ActualZoneNum = CtrlZoneNum;
+	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).SupplyAirNode = ZoneSupplyNode;
+	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).SupplyAirAdjustFactor = 1.0;
+	CalcZoneSizing( CurOverallSimDay,CtrlZoneNum ).CoolDesTemp = 25.0;
+	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDesHumRat = 0.0075;
+	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoad = 0.0;
 	TempZoneThermostatSetPoint( CtrlZoneNum ) = 24.0;
 	DataZoneControls::TempControlledZone( CtrlZoneNum ).ZoneName = "VirtualZone";
 	DataZoneControls::GetZoneAirStatsInputFlag = false;
@@ -198,7 +198,7 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 
 	ZoneEquipmentManager::SizeZoneEquipment();
 	
-	EXPECT_NEAR( 0.0075, CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneHumRat, 0.0001 );
+	EXPECT_NEAR( 0.0075, CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRat, 0.0001 );
 	//EXPECT_NEAR( 0.0075, FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, 0.00001 );
 	
 	
