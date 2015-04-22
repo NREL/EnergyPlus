@@ -1280,11 +1280,25 @@
 <p>Many towers are constructed to be capable of being grouped together to achieve the desired capacity. Thus, many cooling towers are assemblies of two or more individual cooling towers or “cells.” The number of cells they have, e.g., an eight-cell tower, often refers to such towers.</p>
 <p>For the operation of multi-cell towers, the first step is to determine the number of cells <em>n,</em> which will be operating during the timestep using the calculation logic from DOE-2.1E.</p>
 <p>The maximum and minimum flow rates per cell are determined according to the input fractions (<em>Minimum  Water Flow Rate Fraction:</em><span>${k_{min}}$</span><em> </em> and <em>Maximum  Water Flow Rate Fraction:</em> <span>${k_{max}}$</span>) as follows:</p>
-<div>\[\left\{ \begin{array}{ccccc}{{\dot m}_{w,min}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{min}}\\\{{\dot m}_{w,max}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{max}}\end{array} \right.\]</div>
+<div>\[
+  \left\{
+    \begin{array}{rl}
+      {{\dot m}_{w,min}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{min}} \\
+      {{\dot m}_{w,max}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{max}}
+    \end{array}
+  \right.
+\]</div>
 
 <p>where <span>${{{\dot m}_{w,des}}}$</span> is the design water flow rate through the entire cooling tower.</p>
 <p>Then, we determine the minimum and maximum number of cells that can operate with this water flow rate:</p>
-<div>\[\left\{ {\begin{array}{*{20}{c}}{{n_{min}} = MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,max}}}},{n_{tot}}} \right)}\\\{{n_{max}} = MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,min}}}},{n_{tot}}} \right)}\end{array}} \right.\]</div>
+<div>\[
+  \left\{
+    {\begin{array}{c}
+      {{n_{min}} &= MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,max}}}},{n_{tot}}} \right)} \\
+      {{n_{max}} &= MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,min}}}},{n_{tot}}} \right)}
+    \end{array}}
+  \right.
+\]</div>
 
 <p>where <em>n<sub>tot</sub></em> is the total number of cells of the tower, and<span>${{{\dot m}_{w,tot}}}$</span> is the water flow rate to the tower.</p>
 <p>The number of cells operating<em>n</em> is set accordingly:</p>
@@ -3504,7 +3518,12 @@
 <p><span>${w_{max, set\,point}}$</span> = target humidity ratio (setpoint) for the process outlet air (kg/kg)</p>
 <p><span>${w_{Proc,\,\,out,HXon}}$</span>= process outlet air humidity ratio when the desiccant heat exchanger operates       (kg/kg)</p>
 <p>After all of the desiccant dehumidifier components are modeled at the appropriate part load ratio, the water removal rate and water removed are calculated.</p>
-<div>\[\begin{array}{l}{\mathop m\limits^ \bullet_{water\_removed,Proc}} = \,{\mathop m\limits^ \bullet_{Proc,in}}\left( {{w_{Proc,\,\,in}} - {w_{Proc,\,\,out}}} \right)\\\{m_{water\_removed,Proc}} = {\mathop m\limits^ \bullet_{water\_removed,Proc}}*\,\,TimeStepSys\,\,*\,\,3600.\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    {\mathop m\limits^ \bullet_{water\_removed,Proc}} &= \,{\mathop m\limits^ \bullet_{Proc,in}}\left( {{w_{Proc,\,\,in}} - {w_{Proc,\,\,out}}} \right) \\
+    {m_{water\_removed,Proc}}                         &= {\mathop m\limits^ \bullet_{water\_removed,Proc}}*\,\,TimeStepSys\,\,*\,\,3600.
+  \end{array}
+\]</div>
 
 <p>where:</p>
 <p><span>${\mathop m\limits^ \bullet_{water_removed,Proc}}$</span> = output variable ‘Dehumidifier Removed Water Mass Flow Rate, kg/s’</p>

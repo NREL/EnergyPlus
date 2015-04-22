@@ -1010,7 +1010,7 @@ The value is converted to a latent gain (loss) through multiplication of the eva
 <div>\[{a_1}T_{f,i}^n = {a_2}T_{f,i - 1}^n + {a_3}T_{w,i}^n + {a_4}T_{f,i}^{n - 1}\]</div>
 
 <p>where,</p>
-<div>\[\begin{array}{l}{a_1} = {M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t\\\{a_2} = \dot m{C_{P,f}}\Delta t\\\{a_3} = {h_f}{A_i}\Delta t\\\{a_4} = {M_{f,i}}{C_{P,f}}\end{array}\]</div>
+<div>\[\begin{array}{l}{a_1} = {M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t\\ {a_2} = \dot m{C_{P,f}}\Delta t\\ {a_3} = {h_f}{A_i}\Delta t\\ {a_4} = {M_{f,i}}{C_{P,f}}\end{array}\]</div>
 
 <p>Similarly, taking backwards differences for the conduit wall at time step n, the heat balance becomes,</p>
 <div>\[\frac{{{M_{w,i}}{C_{P,w}}}}{{\Delta t}}\left( {T_{w,i}^n - T_{w,i}^{n - 1}} \right) = {h_f}{A_i}\left( {T_{f,i}^n - T_{w,i}^n} \right) - {h_e}{A_i}\left( {T_{w,i}^n - T_e^n} \right)\]</div>
@@ -1022,7 +1022,7 @@ The value is converted to a latent gain (loss) through multiplication of the eva
 <div>\[{b_1}T_{w,i}^n = {b_2}T_{f,i}^n + {b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}\]</div>
 
 <p>where,</p>
-<div>\[\begin{array}{l}{b_1} = {M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t\\\{b_2} = {h_f}{A_i}\Delta t\\\{b_3} = {h_e}{A_o}\Delta t\\\{b_4} = {M_{w,i}}{C_{P,w}}\end{array}\]</div>
+<div>\[\begin{array}{l}{b_1} = {M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t\\ {b_2} = {h_f}{A_i}\Delta t\\ {b_3} = {h_e}{A_o}\Delta t\\ {b_4} = {M_{w,i}}{C_{P,w}}\end{array}\]</div>
 
 <p>Substituting into gives an equation for the current fluid temperature:</p>
 <div>\[{a_1}T_{f,i}^n = {a_2}T_{f,i - 1}^n + {a_3}\left( {{b_2}T_{f,i}^n + {b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}} \right)/{b_1} + {a_4}T_{f,i}^{n - 1}\]</div>
