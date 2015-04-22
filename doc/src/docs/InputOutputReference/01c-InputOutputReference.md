@@ -17842,7 +17842,7 @@ THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS:
 
 This output is the total electric power input to the system compressor(s) in Watts.
 
-#### Refrigeration System Total Compressor  Electric Consumption [J]
+#### Refrigeration System Total Compressor Electric Energy [J]
 
 This is the electricity consumption of the system’s compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -17980,7 +17980,7 @@ This is the temperature entering the thermal expansion valve before the cases, e
 
 This output is the total electric power input to the system compressor(s) in Watts.
 
-#### Refrigeration Chiller System Total Compressor  Electric Consumption [J]
+#### Refrigeration Chiller System Total Compressor Electric Energy [J]
 
 This is the electricity consumption of the system’s compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -18702,7 +18702,7 @@ Fan controls often include a minimum air flow ratio to avoid overheating the fan
 
 #### Field: Air Inlet Node Name or Zone Name
 
-This optional alpha field contains the name of the node from which the condenser draws its outdoor air or the name of the conditioned zone where the condenser is located. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank and an outdoor air node name is entered, this node name must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If a zone name is entered, ….bbb
+This optional alpha field contains the name of the node from which the condenser draws its outdoor air or the name of the conditioned zone where the condenser is located. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank and an outdoor air node name is entered, this node name must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If a zone name is entered, the temperature of that zone is used.
 
 #### Field: End-Use Subcategory
 
