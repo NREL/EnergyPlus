@@ -964,7 +964,12 @@ The implementation of detailed heating coil models in IBLAST was another importa
 
 In addition, it was concluded that, since much simpler and less computationally expensive heating coil simulations are possible, an option was provided in IBLAST for a heating coil design using only the UA value of the coil, the product of heat transfer coefficient and coil area.  This model was largely based on the TYPE10 subroutine implemented in MODSIM.  The equations used to model the performance of the TYPE10 heating coil are as follows:
 
-<div>\[\begin{array}{*{20}{c}}{{T_{a,out}} = {T_{a,in}} + \left( {{T_{w,in}} - {T_{ain}}} \right)\varepsilon \left( {\frac{{\min \left( {{C_{p,a}}{{\dot m}_a},{C_{p,w}}{{\dot m}_w}} \right)}}{{{C_{p,a}}{{\dot m}_a}}}} \right)}\\\{{T_{w,out}} = {T_{w,in}} - \left( {{T_{a,out}} - {T_{ain}}} \right)\left( {\frac{{{C_{p,a}}{{\dot m}_a}}}{{{C_{p,w}}{{\dot m}_w}}}} \right)}\end{array}\]</div>
+<div>\[
+  \begin{array}{rl} 
+    T_{a,out} &= T_{a,in} + \left( T_{w,in} - T_{ain} \right) \varepsilon \left( \frac{\min \left( C_{p,a} \dot m_a,C_{p,w}\dot m_w \right)} {C_{p,a}\dot m_a} \right) \\
+    T_{w,out} &= T_{w,in} - \left( T_{a,out} - T_{ain} \right) \left( \frac{C_{p,a}\dot m_a}{C_{p,w}\dot m_w} \right)
+  \end{array}
+\]</div>
 
 where the coil effectiveness is given by:
 
@@ -1092,7 +1097,7 @@ The user must also input five performance curves or performance tables that desc
 
 Note: The data used to develop the total cooling capacity modifier curve (function of temperature) should represent performance when the cooling coil is ‘wet’ (i.e., coil providing sensible cooling and at least some dehumidification). Performance data when the cooling coil is ‘dry’ (i.e., not providing any dehumidification) should **not** be included when developing this modifier curve. This model automatically detects and adjusts for ‘dry coil’ conditions (see section “Dry Coil Conditions” below).
 
-<div>\[\text{TotCapTempModFac} = \text{Func}\left(T_{wb,i},T_c,i}\right)\]</div>
+<div>\[ \text{TotCapTempModFac} = \text{Func}\left(T_{wb,i},T_c,i\right) \]</div>
 
 where
 
@@ -1114,7 +1119,7 @@ where
 
 Note: The data used to develop the energy input ratio (EIR) modifier curve (function of temperature) should represent performance when the cooling coil is ‘wet’ (i.e., coil providing sensible cooling and at least some dehumidification). Performance data when the cooling coil is ‘dry’ (i.e., not providing any dehumidification) should **not** be included when developing this modifier curve. This model automatically detects and adjusts for ‘dry coil’ conditions (see section “Dry Coil Conditions” below).
 
-<div>\[\text{EIRTempModFac} = \text{Func}\left(T_{wb,i},T_c,i}\right)\]</div>
+<div>\[\text{EIRTempModFac} = \text{Func}\left(T_{wb,i},T_c,i\right)\]</div>
 
 where
 
@@ -3451,9 +3456,16 @@ Where,
 
 For a single speed heat pump with a fixed speed indoor fan installed, a constant-air-volume-rate indoor fan installed, or with no indoor fan installed, the minimum and maximum design heating requirements for each generalized climatic region can be calculated as follows:
 
-<div>\[DH{R_{\min }} = \left\{ \begin{array}{l}{\mathop Q\limits^ \cdot_h}(8.33) \cdot (1.8) \cdot \left[ {\frac{{18.33 - {T_{OD}}}}{{60.0}}} \right],{\rm{ for regions I,II,III,IV, ![](701-800/html/701-800_files/image091.png)  VI}}\\\\\{\mathop Q\limits^ \cdot_h}(8.33),{\rm{                     for regions V}}\end{array} \right\}\]</div>
+<div>\[
+  DH{R_{\min }} = \left\{ 
+    \begin{array}{l}
+      {\mathop Q\limits^ \cdot_h}(8.33) \cdot (1.8) \cdot \left[ {\frac{{18.33 - {T_{OD}}}}{{60.0}}} \right] , {\rm{ for regions I,II,III,IV, and VI}} \\
+      {\mathop Q\limits^ \cdot_h}(8.33),{\rm{                     for regions V}}
+    \end{array}
+  right\}
+\]</div>
 
-<div>\[DH{R_{\max }} = \left\{ \begin{array}{l}2 \cdot {\mathop Q\limits^ \cdot_h}(8.33) \cdot (1.8) \cdot \left[ {\frac{{18.33 - {T_{OD}}}}{{60}}} \right],{\rm{ for regions I,II,III,IV, ![](701-800/html/701-800_files/image092.png)  VI}}\\\\2.2 \cdot {\mathop Q\limits^ \cdot_h}(8.33),{\rm{                     for regions V}}\end{array} \right\}\]</div>
+<div>\[DH{R_{\max }} = \left\{ \begin{array}{l}2 \cdot {\mathop Q\limits^ \cdot_h}(8.33) \cdot (1.8) \cdot \left[ {\frac{{18.33 - {T_{OD}}}}{{60}}} \right],{\rm{ for regions I,II,III,IV, and VI}}\\\\2.2 \cdot {\mathop Q\limits^ \cdot_h}(8.33),{\rm{                     for regions V}}\end{array} \right\}\]</div>
 
 Both <span>$DH{R_{\min }}$</span>and <span>$DH{R_{\max }}$</span>above should be rounded to the nearest standardized DHR given in Table 61.
 
@@ -3465,7 +3477,15 @@ The intermediate term used in the calculations of HSPF can be calculated using t
 
 Where,
 
-<div>\[X({T_j}) = \left\{ \begin{array}{l}BL({T_J})/\mathop {{Q_h}}\limits^ \cdot  ({T_j})\\\{\rm{Or}}\\1\end{array} \right\}\]</div>
+<div>\[
+  X({T_j}) = \left\{ 
+    \begin{array}{l}
+      BL({T_J})/\mathop {{Q_h}}\limits^ \cdot  ({T_j}) \\
+      {\rm{Or}} \\
+      1
+    \end{array}
+  \right\}
+\]</div>
 
 whichever is less; the heating mode load factor for temperature bin <div>\[j\]</div>, dimensionless.
 
@@ -3487,7 +3507,15 @@ Where,
 
 Low temperature cut-out factor <span>$\delta ({T_j})$</span>is determined as follows:
 
-<div>\[\delta ({T_j}) = \left\{ \begin{array}{l}{\rm{0, if }}{T_j} \le {T_{off}}{\rm{ or }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} < 1\\\{\rm{1/2, if }}{T_{off}} < {T_j} \le {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1\\\{\rm{1, if }}{T_j} > {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1\end{array} \right.\]</div>
+<div>\[
+  \delta ({T_j}) = \left\{ 
+    \begin{array}{l}
+      {\rm{0, if }}{T_j} \le {T_{off}}{\rm{ or }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} < 1 \\
+      {\rm{1/2, if }}{T_{off}} < {T_j} \le {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1 \\
+      {\rm{1, if }}{T_j} > {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1
+    \end{array}
+  \right.
+\]</div>
 
 where,
 
@@ -4229,11 +4257,25 @@ The building heating load is calculated as follows:
 
 The minimum and maximum design heating requirements for each generalized climate regions are given by:
 
-<div>\[{\rm{DH}}{{\rm{R}}_{\min }}{\rm{ = }}\left\{ \begin{array}{l}{\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33)}} \cdot \left[ {\frac{{{\rm{18}}{\rm{.33 - }}{{\rm{T}}_{{\rm{OD}}}}}}{{{\rm{33}}{\rm{.33}}}}} \right]{\rm{,}}\quad {\rm{for}}\,{\rm{regions}}\,{\rm{I,}}\,{\rm{II,}}\,{\rm{III,}}\,{\rm{IV,}}\,{\rm{![](701-800/html/701-800_files/image138.png) }}\,{\rm{VI}}\\\{\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33),}}\quad {\rm{for}}\,{\rm{region}}\,{\rm{V}}\end{array} \right\}\]</div>
+<div>\[
+  {\rm{DH}}{{\rm{R}}_{\min }}{\rm{ = }}\left\{ 
+    \begin{array}{l}
+      {\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33)}} \cdot \left[ {\frac{{{\rm{18}}{\rm{.33 - }}{{\rm{T}}_{{\rm{OD}}}}}}{{{\rm{33}}{\rm{.33}}}}} \right]{\rm{,}}\quad {\rm{for}}\,{\rm{regions}}\,{\rm{I,}}\,{\rm{II,}}\,{\rm{III,}}\,{\rm{IV,}}\,\,{\rm{VI}} \\
+      {\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33),}}\quad {\rm{for}}\,{\rm{region}}\,{\rm{V}}
+    \end{array}
+  \right\}
+\]</div>
 
 and
 
-<div>\[{\rm{DH}}{{\rm{R}}_{\max }}{\rm{ = }}\left\{ \begin{array}{l}{\rm{2}} \cdot {\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33)}} \cdot \left[ {\frac{{{\rm{18}}{\rm{.33 - }}{{\rm{T}}_{{\rm{OD}}}}}}{{{\rm{33}}{\rm{.33}}}}} \right]{\rm{,}}\quad {\rm{for}}\,{\rm{regions}}\,{\rm{I,}}\,{\rm{II,}}\,{\rm{III,}}\,{\rm{IV,}}\,{\rm{![](701-800/html/701-800_files/image139.png) }}\,{\rm{VI}}\\\{\rm{2}}{\rm{.2}} \cdot {\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33),}}\quad {\rm{for}}\,{\rm{region}}\,{\rm{V}}\end{array} \right\}\]</div>
+<div>\[
+  \rm{DH}}{{\rm{R}}_{\max }}{\rm{ = }}\left\{
+    \begin{array}{l}
+      \rm{2} \cdot {\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33)}} \cdot \left[ {\frac{{{\rm{18}}{\rm{.33 - }}{{\rm{T}}_{{\rm{OD}}}}}}{{{\rm{33}}{\rm{.33}}}}} \right]{\rm{,}}\quad {\rm{for}}\,{\rm{regions}}\,{\rm{I,}}\,{\rm{II,}}\,{\rm{III,}}\,{\rm{IV,}}\,\,{\rm{VI}} \\
+      \rm{2}{\rm{.2}} \cdot {\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33),}}\quad {\rm{for}}\,{\rm{region}}\,{\rm{V}}
+    \end{array}
+  \right\}
+\]</div>
 
 Where,
 
@@ -4245,17 +4287,35 @@ DHR           =          the design heating requirement for ea
 
 The heating capacity delivered and electric power input of the heat pump when operating at minimum (low) compressor capacity and outdoor air temperature of *T<sub>j</sub>* is given by:
 
-<div>\[{\rm{\dot Q}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}{\rm{\dot Q}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}}\\\{\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} < 4.44{\rm{^\circ C}}\\\{\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} <  - 8.33{\rm{^\circ C}}\,\end{array} \right\}\]</div>
+<div>\[
+  {\rm{\dot Q}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ 
+    \begin{array}{l}
+      {\rm{\dot Q}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}} \\
+      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} < 4.44{\rm{^\circ C}} \\
+      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} <  - 8.33{\rm{^\circ C}}\,
+    \end{array}
+  \right\}
+\]</div>
 
-<span>${\rm{\dot E}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}{\rm{\dot E}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}}\\\{\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} < 4.44{\rm{^\circ C}}\\\{\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} <  - 8.33{\rm{^\circ C}}\,\end{array} \right\}$</span>Where,
+<div>\[
+  {\rm{\dot E}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{
+    \begin{array}{l}
+      {\rm{\dot E}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}} \\
+      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} < 4.44{\rm{^\circ C}} \\
+      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} <  - 8.33{\rm{^\circ C}}\,
+    \end{array}
+  \right\}
+\]</div>
 
-<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{16}}{\rm{.67}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{16}}{\rm{.67}}} \right)$</span>are determined from H0<sub>1</sub> test and
+Where,
 
-<span>${\rm{\dot Q}}_{_{\rm{h}}}^{k = 1}\left( {{\rm{8}}{\rm{.33}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_{_{\rm{h}}}^{k = 1}\left( {{\rm{8}}{\rm{.33}}} \right)$</span>are determined from H1<sub>1</sub> test and
+<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{16}}{\rm{.67}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{16}}{\rm{.67}}} \right)$</span> are determined from H0<sub>1</sub> test and
 
-<span>${\rm{\dot Q}}_{_{\rm{h}}}^{k = 1}\left( {{\rm{1}}{\rm{.67}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_{_{\rm{h}}}^{k = 1}\left( {{\rm{1}}{\rm{.67}}} \right)$</span>are determined from H2<sub>1</sub> test, and
+<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{8}}{\rm{.33}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{8}}{\rm{.33}}} \right)$</span> are determined from H1<sub>1</sub> test and
 
- <span>${\rm{\dot Q}}_{_{\rm{h}}}^{k = 1}\left( {{\rm{ - 8}}{\rm{.33}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_{_{\rm{h}}}^{k = 1}\left( {{\rm{ - 8}}{\rm{.33}}} \right)$</span>are determined from H3<sub>1</sub> test.
+<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{1}}{\rm{.67}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{1}}{\rm{.67}}} \right)$</span> are determined from H2<sub>1</sub> test, and
+
+<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{ - 8}}{\rm{.33}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{ - 8}}{\rm{.33}}} \right)$</span> are determined from H3<sub>1</sub> test.
 
 An alternative to conducting or evaluating the performance at H2<sub>1</sub> test is to approximate the capacity and electric power inputs as follows:
 
@@ -4299,9 +4359,11 @@ The electric energy used by the heat pumps differs depending up on whether the h
 
 <div>\[\dot Q_h^{k = 1}({T_j}) < BL({T_j}) < \dot Q_h^{k = 2}({T_j})\]</div>
 
-<span>$\frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_h^{k = 1}({T_j}) + {X^{k = 2}}({T_j}) \cdot \dot E_h^{k = 2}({T_j})} \right] \cdot {\delta ^\prime}({T_j}) \cdot \frac{{{n_j}}}{N}$</span><span>$\frac{{RH\left( {{{\rm{T}}_{\rm{j}}}} \right)}}{{\rm{N}}}{\rm{ = BL}}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot \left[ {{\rm{1 - }}{{\rm{\delta }}^\prime}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right] \cdot \frac{{{n_j}}}{N}$</span>
+<div>\[\frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_h^{k = 1}({T_j}) + {X^{k = 2}}({T_j}) \cdot \dot E_h^{k = 2}({T_j})} \right] \cdot {\delta ^\prime}({T_j}) \cdot \frac{{{n_j}}}{N}\]</div>
 
-<div>\[{\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\\{\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}\]</div>
+<div>\[\frac{{RH\left( {{{\rm{T}}_{\rm{j}}}} \right)}}{{\rm{N}}}{\rm{ = BL}}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot \left[ {{\rm{1 - }}{{\rm{\delta }}^\prime}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right] \cdot \frac{{{n_j}}}{N}\]</div>
+
+<div>\[{\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\ 1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}\]</div>
 
 <div>\[{X^{k = 1}}({T_j}) = \frac{{\dot Q_h^{k = 2}({T_j}) - BL({T_j})}}{{\dot Q_h^{k = 2}({T_j}) - \dot Q_h^{k = 1}({T_j})}}\]</div>
 
@@ -4317,7 +4379,7 @@ For units when operating continuously at maximum compressor speed (k=2) speed at
 
 <div>\[\frac{{RH\left( {{T_j}} \right)}}{N}{\rm{ = }}\left\{ {BL\left( {{{\rm{T}}_{\rm{j}}}} \right) - \left[ {{\rm{\dot Q}}_h^{k = 2}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot {{\rm{\delta }}^``}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right]} \right\} \cdot \frac{{{n_j}}}{N}\]</div>
 
-<div>\[{\delta ^``}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,{\rm{or}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}\, < \,1\\\{\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\end{array} \right\}\]</div>
+<div>\[{\delta ^``}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,{\rm{or}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}\, < \,1\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\end{array} \right\}\]</div>
 
 X(T<sub>j</sub>)            =          the heating mode load factor for temperature bin j, (-)
 
@@ -4556,7 +4618,7 @@ The Rated Heating Capacity at Selected Nominal Speed Level contains the rated ca
 
 And then, this scaling factor is used to determine capacities at rated conditions for other speed levels, as below:
 
-<div>\[\begin{array}{l}{\rm{RatedTotalHeatingCapacity}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = {\rm{CapacityScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitTotalHeatingCapacity}}@{\rm{SpeedLevel}}({\rm{x}})\end{array}\]</div>
+<div>\[\begin{array}{l}{\rm{RatedTotalHeatingCapacity}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = {\rm{CapacityScaleFactor}} \times \\ \quad \quad \quad {\rm{ReferenceUnitTotalHeatingCapacity}}@{\rm{SpeedLevel}}({\rm{x}})\end{array}\]</div>
 
 The Rated Volumetric Air Flow Rate is used to determine an internal scaling factor, and calculate the air flow rates in the parent objects, as follows:
 

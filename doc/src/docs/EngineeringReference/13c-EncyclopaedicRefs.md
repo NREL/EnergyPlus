@@ -823,13 +823,27 @@ For the operation of multi-cell towers, the first step is to determine the numbe
 
 The maximum and minimum flow rates per cell are determined according to the input fractions (*Minimum  Water Flow Rate Fraction:*<span>${k_{min}}$</span>* * and *Maximum  Water Flow Rate Fraction:* <span>${k_{max}}$</span>) as follows:
 
-<div>\[\left\{ \begin{array}{ccccc}{{\dot m}_{w,min}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{min}}\\\{{\dot m}_{w,max}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{max}}\end{array} \right.\]</div>
+<div>\[
+  \left\{
+    \begin{array}{rl}
+      {{\dot m}_{w,min}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{min}} \\
+      {{\dot m}_{w,max}} =  & \frac{{{{\dot m}_{w,des}}}}{{{n_{tot}}}} \times {k_{max}}
+    \end{array}
+  \right.
+\]</div>
 
 where <span>${{{\dot m}_{w,des}}}$</span> is the design water flow rate through the entire cooling tower.
 
 Then, we determine the minimum and maximum number of cells that can operate with this water flow rate:
 
-<div>\[\left\{ {\begin{array}{*{20}{c}}{{n_{min}} = MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,max}}}},{n_{tot}}} \right)}\\\{{n_{max}} = MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,min}}}},{n_{tot}}} \right)}\end{array}} \right.\]</div>
+<div>\[
+  \left\{
+    {\begin{array}{c}
+      {{n_{min}} &= MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,max}}}},{n_{tot}}} \right)} \\
+      {{n_{max}} &= MIN\left( {\frac{{{{\dot m}_{w,tot}}}}{{{{\dot m}_{w,min}}}},{n_{tot}}} \right)}
+    \end{array}}
+  \right.
+\]</div>
 
 where *n<sub>tot</sub>* is the total number of cells of the tower, and<span>${{{\dot m}_{w,tot}}}$</span> is the water flow rate to the tower.
 
@@ -4430,7 +4444,12 @@ where:
 
 After all of the desiccant dehumidifier components are modeled at the appropriate part load ratio, the water removal rate and water removed are calculated.
 
-<div>\[\begin{array}{l}{\mathop m\limits^ \bullet_{water\_removed,Proc}} = \,{\mathop m\limits^ \bullet_{Proc,in}}\left( {{w_{Proc,\,\,in}} - {w_{Proc,\,\,out}}} \right)\\\{m_{water\_removed,Proc}} = {\mathop m\limits^ \bullet_{water\_removed,Proc}}*\,\,TimeStepSys\,\,*\,\,3600.\end{array}\]</div>
+<div>\[
+  \begin{array}{rl}
+    {\mathop m\limits^ \bullet_{water\_removed,Proc}} &= \,{\mathop m\limits^ \bullet_{Proc,in}}\left( {{w_{Proc,\,\,in}} - {w_{Proc,\,\,out}}} \right) \\
+    {m_{water\_removed,Proc}}                         &= {\mathop m\limits^ \bullet_{water\_removed,Proc}}*\,\,TimeStepSys\,\,*\,\,3600.
+  \end{array}
+\]</div>
 
 where:
 

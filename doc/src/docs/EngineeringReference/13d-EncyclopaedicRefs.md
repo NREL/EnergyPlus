@@ -588,7 +588,7 @@ or,
 
 where,
 
-<div>\[\begin{array}{l}{a_1} = {M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t\\\{a_2} = \dot m{C_{P,f}}\Delta t\\\{a_3} = {h_f}{A_i}\Delta t\\\{a_4} = {M_{f,i}}{C_{P,f}}\end{array}\]</div>
+<div>\[\begin{array}{l}{a_1} = {M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t\\ {a_2} = \dot m{C_{P,f}}\Delta t\\ {a_3} = {h_f}{A_i}\Delta t\\ {a_4} = {M_{f,i}}{C_{P,f}}\end{array}\]</div>
 
 Similarly, taking backwards differences for the conduit wall at time step n, the heat balance becomes,
 
@@ -604,7 +604,7 @@ or,
 
 where,
 
-<div>\[\begin{array}{l}{b_1} = {M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t\\\{b_2} = {h_f}{A_i}\Delta t\\\{b_3} = {h_e}{A_o}\Delta t\\\{b_4} = {M_{w,i}}{C_{P,w}}\end{array}\]</div>
+<div>\[\begin{array}{l}{b_1} = {M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t\\ {b_2} = {h_f}{A_i}\Delta t\\ {b_3} = {h_e}{A_o}\Delta t\\ {b_4} = {M_{w,i}}{C_{P,w}}\end{array}\]</div>
 
 Substituting into gives an equation for the current fluid temperature:
 

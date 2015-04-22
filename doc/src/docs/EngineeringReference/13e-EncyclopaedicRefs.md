@@ -84,7 +84,23 @@ The traditional method for calculating conduction transfer functions is describe
 
 The transformed equations are solved and then put in matrix form as shown below:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\\{{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\\{{q_2}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[
+  \left[ 
+    {\begin{array}{*{20}{c}}
+      {{T_1}\left( s \right)} \\ {{q_1}\left( s \right)}
+    \end{array}}
+  \right] = \left[ 
+    {\begin{array}{*{20}{c}}
+      {{A_1}\left( s \right)}&{{B_1}\left( s \right)} \\
+      {{C_1}\left( s \right)}&{{D_1}\left( s \right)}
+    \end{array}}
+  \right] \left[ 
+    {\begin{array}{*{20}{c}}
+      {{T_2}\left( s \right)} \\
+      {{q_2}\left( s \right)}
+    \end{array}}
+  \right]
+\]</div>
 
 where: T1(s), T2(s), q1(s), and q2(s) are the temperature and flux terms in the Laplace domain,
 
@@ -104,23 +120,23 @@ a1 is the thermal diffusivity of the layer, and
 
 The 2 x 2 matrix consisting of A1(s), B1(s), C1(s), and D1(s) is called the transmission matrix and contains all of the thermophysical properties of the layer necessary to calculate transient conduction heat transfer through it.  It can easily be shown that a second layer could be characterized in a similar way as:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\\{{q_2}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\\{{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\\{{q_3}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\ {{q_2}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\ {{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\ {{q_3}\left( s \right)}\end{array}} \right]\]</div>
 
 where A2(s), B2(s), C2(s), and D2(s) are calculated using the properties of the second layer.  This can be substituted into Equation to provide insight how the extension to multilayered slabs is achieved.
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\\{{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\\{{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\\{{q_3}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\ {{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\ {{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\ {{q_3}\left( s \right)}\end{array}} \right]\]</div>
 
 Thus, for a multilayered element as shown in Figure 267, each separate layer has a transmission matrix of Ai(s), Bi(s), Ci(s), and Di(s) associated with it.  The form of the matrix equation for the multilayered element is the same as the equation for a single layer:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_{n + 1}}\left( s \right)}\\\{{q_{n + 1}}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\ {C\left( s \right)}&{D\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_{n + 1}}\left( s \right)}\\ {{q_{n + 1}}\left( s \right)}\end{array}} \right]\]</div>
 
 but the transmission matrix is replaced by:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\\{{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\\{{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right] \cdots \left[ {\begin{array}{*{20}{c}}{{A_n}\left( s \right)}&{{B_n}\left( s \right)}\\\{{C_n}\left( s \right)}&{{D_n}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\ {C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\ {{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\ {{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right] \cdots \left[ {\begin{array}{*{20}{c}}{{A_n}\left( s \right)}&{{B_n}\left( s \right)}\\ {{C_n}\left( s \right)}&{{D_n}\left( s \right)}\end{array}} \right]\]</div>
 
 Equation is typically rearranged as follows:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\\{{q_{n + 1}}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\\{\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{T_{n + 1}}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\ {{q_{n + 1}}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\ {\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{T_{n + 1}}\left( s \right)}\end{array}} \right]\]</div>
 
 which relates the flux at either surface of the element to the temperature histories at both surfaces.  When the temperature histories are formulated as triangular pulses made up of simple ramp functions, the roots of this equation can be found and result in response factors.  The response factors can be simplified as described above through the introduction of flux history terms to form conduction transfer functions.  A simplified method of finding the roots of the Laplace domain equations is described by Hittle and Bishop (1983) and is used by the current version of BLAST.
 
@@ -136,9 +152,9 @@ where x is a vector of state variables, u is a vector of inputs, y is the output
 
 This formulation can be used to solve the transient heat conduction equation by enforcing a finite difference grid over the various layers in the building element being analyzed.  In this case, the state variables are the nodal temperatures, the environmental temperatures (interior and exterior) are the inputs, and the resulting heat fluxes at both surfaces are the outputs.  Thus, the state space representation with finite difference variables would take the following form:
 
-<div>\[\frac{{d\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\\{{T_n}}\end{array}} \right]}}{{dt}} = \left[ A \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\\{{T_n}}\end{array}} \right] + \left[ B \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\\{{T_o}}\end{array}} \right]\]</div>
+<div>\[\frac{{d\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\ {{T_n}}\end{array}} \right]}}{{dt}} = \left[ A \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\ {{T_n}}\end{array}} \right] + \left[ B \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\ {{T_o}}\end{array}} \right]\]</div>
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\\{{{q''}_o}}\end{array}} \right] = \left[ C \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\\{{T_n}}\end{array}} \right] + \left[ D \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\\{{T_o}}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\ {{{q''}_o}}\end{array}} \right] = \left[ C \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\ {{T_n}}\end{array}} \right] + \left[ D \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\ {{T_o}}\end{array}} \right]\]</div>
 
 where T1, T2, ..., Tn-1, Tn are the finite difference nodal temperatures, n is the number of nodes, Ti and To are the interior and exterior environmental temperatures, and <span>${q''_i}$</span> and <span>${q''_o}$</span> are the heat fluxes (desired output).
 
@@ -170,9 +186,9 @@ A is the area of the surface exposed to the environmental temperatures.
 
 In matrix format:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{\frac{{d{T_1}}}{{dt}}}\\\{\frac{{d{T_2}}}{{dt}}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{ - 1}}{{RC}} - \frac{{hA}}{C}}&{\frac{1}{{RC}}}\\\{\frac{1}{{RC}}}&{\frac{{ - 1}}{{RC}} - \frac{{hA}}{C}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\\{{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{hA}}{C}}&0\\0&{\frac{{hA}}{C}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\\{{T_i}}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{\frac{{d{T_1}}}{{dt}}}\\ {\frac{{d{T_2}}}{{dt}}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{ - 1}}{{RC}} - \frac{{hA}}{C}}&{\frac{1}{{RC}}}\\ {\frac{1}{{RC}}}&{\frac{{ - 1}}{{RC}} - \frac{{hA}}{C}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ {{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{hA}}{C}}&0\\0&{\frac{{hA}}{C}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\ {{T_i}}\end{array}} \right]\]</div>
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\\{{{q''}_o}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\\{{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h\\\{ - h}&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\\{{T_i}}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\ {{{q''}_o}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ {{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h\\ { - h}&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\ {{T_i}}\end{array}} \right]\]</div>
 
 ![](EngineeringReference/media/image6008.svg)
 
@@ -190,13 +206,15 @@ Degiovanni (1988) proposed two methodologies for including sources or sinks in t
 
 The second method that will be analyzed in more detail involves the addition of a source or sink at the interface between two layers.  The derivation of the necessary equations is begun by analyzing the simple two layer element shown in Figure 269.
 
-![](EngineeringReference/media/image6009.png)<div>\[\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\\{{q_2}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\\{{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\\{{q_3}\left( s \right)}\end{array}} \right]\]</div>
+![](EngineeringReference/media/image6009.png)
+
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\ {{q_2}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\ {{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\ {{q_3}\left( s \right)}\end{array}} \right]\]</div>
 
 Figure 269.  Two Layer Example for Deriving the Laplace Transform Extension to Include Sources and Sinks
 
 For the first layer, it was determined that in the Laplace domain
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\\{{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\\{{q_2}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\ {{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\ {{q_2}\left( s \right)}\end{array}} \right]\]</div>
 
 For the second layer:
 
@@ -204,45 +222,45 @@ For the second layer:
 
 To link the two layers and include the heat source between them, the following substitution is made:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\\{{q_2}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{T_{2 + }}\left( s \right)}\\\{{q_{2 + }}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0\\\{{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\ {{q_2}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{T_{2 + }}\left( s \right)}\\ {{q_{2 + }}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0\\ {{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
 
 which results in:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\\{{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left\{ {\left[ {\begin{array}{*{20}{c}}{{T_{2 + }}\left( s \right)}\\\{{q_{2 + }}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0\\\{{q_{source}}\left( s \right)}\end{array}} \right]} \right\}\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\ {{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left\{ {\left[ {\begin{array}{*{20}{c}}{{T_{2 + }}\left( s \right)}\\ {{q_{2 + }}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0\\ {{q_{source}}\left( s \right)}\end{array}} \right]} \right\}\]</div>
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\\{{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left\{ {\left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\\{{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\\{{q_3}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0\\\{{q_{source}}\left( s \right)}\end{array}} \right]} \right\}\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\ {{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left\{ {\left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\ {{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\ {{q_3}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0\\ {{q_{source}}\left( s \right)}\end{array}} \right]} \right\}\]</div>
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\\{{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\\{{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\\{{q_3}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\\{{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}0\\\{{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\ {{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\ {{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\ {{q_3}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{{A_1}\left( s \right)}&{{B_1}\left( s \right)}\\ {{C_1}\left( s \right)}&{{D_1}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}0\\ {{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
 
 While Degiovanni concludes with this formula, some insight into what the generic equation for an element that has n layers might look like is gained by working with Equation .  If a layer is added to the left of the first layer, the entire right hand side of Equation is multiplied by the transmission matrix of the new layer.  Conversely, if a layer is added to the right of the second layer in Figure 269, the vector containing the Laplace transform of the temperature and heat flux at interface 3 is replaced by the product of the transmission matrix of the new layer and the vector for temperature and heat flux at the next interface, and the term dealing with the heat source is not affected.  The general equation for a building element with n layers and m layers between the left hand surface and the heat source can be derived as:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left( {\prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} } \right)\left[ {\begin{array}{*{20}{c}}{{T_{n + 1}}\left( s \right)}\\\{{q_{n + 1}}\left( s \right)}\end{array}} \right] + \left( {\prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} } \right)\left[ {\begin{array}{*{20}{c}}0\\\{{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{q_1}\left( s \right)}\end{array}} \right] = \left( {\prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\ {{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} } \right)\left[ {\begin{array}{*{20}{c}}{{T_{n + 1}}\left( s \right)}\\ {{q_{n + 1}}\left( s \right)}\end{array}} \right] + \left( {\prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\ {{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} } \right)\left[ {\begin{array}{*{20}{c}}0\\ {{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
 
 or in more compact form:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_{n + 1}}\left( s \right)}\\\{{q_{n + 1}}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\\{c\left( s \right)}&{d\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}0\\\{{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\ {C\left( s \right)}&{D\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_{n + 1}}\left( s \right)}\\ {{q_{n + 1}}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\ {c\left( s \right)}&{d\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}0\\ {{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
 
-where:  <span>$\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span>  and  <span>$\left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\\{c\left( s \right)}&{d\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> .
+where:  <span>$\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\ {C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\ {{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span>  and  <span>$\left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\ {c\left( s \right)}&{d\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\ {{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> .
 
 Next, Equation must be rearranged to match the form of Equation , which relates the heat flux at both sides of the element to the temperature at each side.  The matrix equation that is obtained shows that:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\\{{q_{n + 1}}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\\{\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{T_{n + 1}}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{d\left( s \right) - \frac{{D\left( s \right)b\left( s \right)}}{{B\left( s \right)}}}\\\{\frac{{b\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {{q_{source}}\left( s \right)} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\ {{q_{n + 1}}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\ {\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{T_{n + 1}}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{d\left( s \right) - \frac{{D\left( s \right)b\left( s \right)}}{{B\left( s \right)}}}\\ {\frac{{b\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {{q_{source}}\left( s \right)} \right]\]</div>
 
 This equation bears a striking resemblance to Equation .  If the source term in Equation is dropped, then the equation is identical to Equation .  This result conforms with the superposition principle which was used to develop the conduction transfer functions from the summation of a series of triangular pulses or ramp sets.  Now, the effect of the heat source is simply added to the response to the temperature inputs.
 
 While Equation is correct for any single or multilayered element, the first term in the heat source transmission matrix does not appear to match the compactness of the other terms in the matrix equation.  It can be shown (see Strand 1995: equations 32 through 42 which detail this derivation) that the heat source transmission term for a two-layer problem reduces to
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\\{{q_3}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\\{\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{T_3}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{{B_2}\left( s \right)}}{{B\left( s \right)}}}\\\{\frac{{{B_1}\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {{q_{source}}\left( s \right)} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\ {{q_3}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\ {\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{T_3}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{{B_2}\left( s \right)}}{{B\left( s \right)}}}\\ {\frac{{{B_1}\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {{q_{source}}\left( s \right)} \right]\]</div>
 
 If this is extended to a slab with n layers and a source between the m and m+1 layers, the general matrix equation for obtaining heat source transfer functions using the Laplace transform method is:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\\{{q_{n + 1}}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\\{\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{T_{n + 1}}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{\bar b\left( s \right)}}{{B\left( s \right)}}}\\\{\frac{{b\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {{q_{source}}\left( s \right)} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\ {{q_{n + 1}}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\ {\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\ {{T_{n + 1}}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{\bar b\left( s \right)}}{{B\left( s \right)}}}\\ {\frac{{b\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {{q_{source}}\left( s \right)} \right]\]</div>
 
-where: <span>$\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> ,
+where: <span>$\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\ {C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\ {{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> ,
 
-<span>$\left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\\{c\left( s \right)}&{d\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> , and
+<span>$\left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\ {c\left( s \right)}&{d\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\ {{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> , and
 
-<span>$\left[ {\begin{array}{*{20}{c}}{\bar a\left( s \right)}&{\bar b\left( s \right)}\\\{\bar c\left( s \right)}&{\bar d\left( s \right)}\end{array}} \right] = \prod\limits_{i = m + 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> .
+<span>$\left[ {\begin{array}{*{20}{c}}{\bar a\left( s \right)}&{\bar b\left( s \right)}\\ {\bar c\left( s \right)}&{\bar d\left( s \right)}\end{array}} \right] = \prod\limits_{i = m + 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\ {{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> .
 
 At first glance, the terms in the heat source transmission matrix may appear to be reversed.  It is expected that only the layers to the left of the source will affect q1(s), but the presence of <span>$\bar b\left( s \right)$</span> in the element multiplied by qsource(s) to obtain q1(s) seems to be contradictory.  In fact, the entire term, <span>${{\bar b\left( s \right)} \mathord{\left/ {\vphantom {{\bar b\left( s \right)} {B\left( s \right)}}} \right. } {B\left( s \right)}}$</span>, must be analyzed to determine the effect of qsource(s) on q1(s).  In essence, the appearance of <span>$\bar b\left( s \right)$</span> removes the effects of the layers to the right of the source from B(s) leaving only the influence of the layers to the left of the source.  The form displayed by Equation is, however, extremely convenient because the terms in the heat source transmission matrix have the same denominators, and thus roots, as the terms in the temperature transmission matrix.  Thus, the same roots that are calculated for the CTFs can be used for the QTFs, saving a considerable amount of computer time during the calculation of the transfer functions.
 
@@ -272,17 +290,17 @@ Figure 270.  Two Node State Space Example with a Heat Source
 
 In obtaining the matrix equivalent for this set of equations, it should be noted that the source term is not a constant but rather an input that varies with time.  Thus, it must be grouped with the environmental temperatures as inputs.  The resulting matrix equations take the following form:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{\frac{{d{T_1}}}{{dt}}}\\\{\frac{{d{T_2}}}{{dt}}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{ - 1}}{{RC}} - \frac{{hA}}{C}}&{\frac{1}{{RC}}}\\\{\frac{1}{{RC}}}&{\frac{{ - 1}}{{RC}} - \frac{{hA}}{C}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\\{{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{hA}}{C}}&0&{\frac{A}{C}}\\0&{\frac{{hA}}{C}}&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\\{{T_i}}\\\{{q_{source}}}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{\frac{{d{T_1}}}{{dt}}}\\ {\frac{{d{T_2}}}{{dt}}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{ - 1}}{{RC}} - \frac{{hA}}{C}}&{\frac{1}{{RC}}}\\ {\frac{1}{{RC}}}&{\frac{{ - 1}}{{RC}} - \frac{{hA}}{C}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ {{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{hA}}{C}}&0&{\frac{A}{C}}\\0&{\frac{{hA}}{C}}&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\ {{T_i}}\\ {{q_{source}}}\end{array}} \right]\]</div>
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_1}}\\\{{{q''}_2}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\\{{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h&0\\\{ - h}&0&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\\{{T_i}}\\\{{q_{source}}}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_1}}\\ {{{q''}_2}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ {{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h&0\\ { - h}&0&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\ {{T_i}}\\ {{q_{source}}}\end{array}} \right]\]</div>
 
 Equation appears to suggest that the source term has no direct effect on the heat flux at either side of the element because its coefficients are zero.  This is not the case.  Equation only relates variables that have a direct influence on heat flux.  So, while Ti has no direct influence on<span>${q''_o}$</span>, it does have an indirect influence through the nodal network.  The same would hold for the influence of qsource.
 
 If this analysis is extended to a finite difference network with n nodes, the corresponding matrix equations can be shown to be:
 
-<div>\[\frac{{d\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\\{{T_n}}\end{array}} \right]}}{{dt}} = \left[ A \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\\{{T_n}}\end{array}} \right] + \left[ B \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\\{{T_i}}\\\{{q_{source}}}\end{array}} \right]\]</div>
+<div>\[\frac{{d\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\ {{T_n}}\end{array}} \right]}}{{dt}} = \left[ A \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\ {{T_n}}\end{array}} \right] + \left[ B \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\ {{T_i}}\\ {{q_{source}}}\end{array}} \right]\]</div>
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\\{{{q''}_o}}\end{array}} \right] = \left[ C \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\\{{T_n}}\end{array}} \right] + \left[ D \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\\{{T_i}}\\\{{q_{source}}}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\ {{{q''}_o}}\end{array}} \right] = \left[ C \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\ {{T_n}}\end{array}} \right] + \left[ D \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\ {{T_i}}\\ {{q_{source}}}\end{array}} \right]\]</div>
 
 The influence of the heat source is also confirmed by the final solution form, which is identical to the Laplace transform result shown in Equation .  As with the Laplace solution method, the state space method results in a set of QTFs that relate the heat source at the current time step and several previous time steps to the current heat flux at the surface of the element.
 
@@ -330,11 +348,11 @@ Consider again the state space example shown in Figure 270.  Two output variabl
 
 When this equation for T1 is added to Equation , the resulting output matrix equation for the heat flux at both surfaces and the internal temperature is:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\\{{{q''}_o}}\\\{{T_1}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\\1&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\\{{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h&0\\\{ - h}&0&0\\0&0&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\\{{T_o}}\\\{{q_{source}}}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\ {{{q''}_o}}\\ {{T_1}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\\1&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ {{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h&0\\ { - h}&0&0\\0&0&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\ {{T_o}}\\ {{q_{source}}}\end{array}} \right]\]</div>
 
 The only difference between this relation and Equation is the presence of T1 on both the right and left hand side of the equation.  The dual role of T1 as a state variable and an output parameter may seem to contradict the goal of the state space method of eliminating the state variables.  However, due to the flexibility of the formulation, nodal temperatures can be extracted in the same manner that any other output quantity would be obtained.  For an element with n layers, Equation becomes:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\\{{{q''}_o}}\\\{{T_s}}\end{array}} \right] = \left[ C \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\\{{T_n}}\end{array}} \right] + \left[ D \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\\{{T_o}}\\\{{q_{source}}}\end{array}} \right]\]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\ {{{q''}_o}}\\ {{T_s}}\end{array}} \right] = \left[ C \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\ {{T_n}}\end{array}} \right] + \left[ D \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\ {{T_o}}\\ {{q_{source}}}\end{array}} \right]\]</div>
 
 where Ts is the temperature of the node where the heat source or sink is present.  The transfer function equation for the calculation of Ts that results from Equation is identical in form to Equation :
 
@@ -442,7 +460,7 @@ Knowledge of the flow conditions allows Equations through to be calculated.  Th
 
 Knowing the inlet water temperature and water mass flow rate, the calculation procedure is somewhat involved and requires, in addition to Equations , , and , the use of a modified form of Equation .  Equation is the standard conduction transfer function formula for a building element with an embedded source/sink of heat.  In EnergyPlus, the surface flux on the left hand side of the equation is replaced with a surface heat balance:
 
-<div>\[\left[ {\begin{array}{*{20}{c}}{Surface}\\\{Heat}\\\{Balance}\end{array}} \right] = \sum\limits_{m = 1}^M {{X_{k,m}}{T_{1,t - m + 1}}}  - \sum\limits_{m = 1}^M {{Y_{k,m}}{T_{3,t - m + 1}}}  + \sum\limits_{m = 1}^k {{F_m}{{q''}_{1,t - m}}}  + \sum\limits_{m = 1}^M {{W_m}{q_{source,t - m + 1}}} \]</div>
+<div>\[\left[ {\begin{array}{*{20}{c}}{Surface}\\ {Heat}\\ {Balance}\end{array}} \right] = \sum\limits_{m = 1}^M {{X_{k,m}}{T_{1,t - m + 1}}}  - \sum\limits_{m = 1}^M {{Y_{k,m}}{T_{3,t - m + 1}}}  + \sum\limits_{m = 1}^k {{F_m}{{q''}_{1,t - m}}}  + \sum\limits_{m = 1}^M {{W_m}{q_{source,t - m + 1}}} \]</div>
 
 The surface heat balance includes terms for incident solar energy, radiation heat transfer from internal heat sources such as lights and electrical equipment, radiation between surfaces using Hottel’s Gray Interchange concept, and convection to the surrounding air.  The presence of the surface temperature in the heat balance does not pose any problems since Equation will be rearranged to solve for this temperature.  Since the radiation heat balance is dependent on conditions at the other surfaces, an iteration loop is required to provide a more accurate estimate of the radiative exchange within the building.  This is not the case with the mean air temperature.  An assumption of the heat balance is that the mean temperature of the surrounding air is equal to the final air temperature of the previous time step.  Using this estimate in the heat balance avoids a second iterative loop around the radiative iteration loop.
 
@@ -1107,7 +1125,7 @@ Refrigerated cases typically require a specific number of defrost cycles per day
 
 For electric, hot gas, and hot brine defrost types, energy use by the defrost heater occurs during the scheduled defrost period. For defrost with temperature termination, the energy is also multiplied by the defrost ratio simulating a defrost duration shorter than the defined (maximum) period. For all non-electric defrost types, defrost electric power is set equal to zero (and is not available as an output variable). For hot gas and hot brine defrost types in cases served by a detailed system, the condenser heat rejection load is reduced by the amount of heat recovered for use in the defrost system. This condenser credit is not applied for the simple compressor rack system.
 
-<div>\[\begin{array}{l}If\,(DefrostType\, = \,Electric)\,\,Then\\\,\,\,\,\,\,{P_{def}} = {P'}_{def}\left( {{L_{case}}} \right)\left( {SC{H_{defrost}}} \right)\\ElseIf\,(DefrostType\, = \,ElectricWithTempTermination)\,Then\\\,\,\,\,\,\,{P_{def}} = {P'}_{def}\left( {{L_{case}}} \right)\left( {SC{H_{defrost}}} \right)(DefrostRatio)\\Else\\\,\,\,\,\,\,{P_{def}} = 0.0\\EndIf\end{array}\]</div>
+<div>\[\begin{array}{l}If\,(DefrostType\, = \,Electric)\,\,Then\\ ,\,\,\,\,\,{P_{def}} = {P'}_{def}\left( {{L_{case}}} \right)\left( {SC{H_{defrost}}} \right)\\ElseIf\,(DefrostType\, = \,ElectricWithTempTermination)\,Then\\ ,\,\,\,\,\,{P_{def}} = {P'}_{def}\left( {{L_{case}}} \right)\left( {SC{H_{defrost}}} \right)(DefrostRatio)\\Else\\ ,\,\,\,\,\,{P_{def}} = 0.0\\EndIf\end{array}\]</div>
 
 where:
 
@@ -1123,7 +1141,7 @@ where:
 
 Frost accumulation on the case evaporator will vary with the humidity level in the ambient air surrounding the case. Therefore, defrost heater operation can be reduced when ambient air humidity levels are low. Several methods are used to reduce unnecessary defrost heater operation, including terminating heater operation when the measured evaporator temperature indicates that the accumulated frost has been completely melted. For modeling refrigerated cases with temperature-terminated defrost, EnergyPlus allows the user to specify a defrost energy correction curve to account for variations in defrost energy as ambient air humidity levels change. The user can select from four correction curve types: None, Case Temperature Method, Relative Humidity Method, or Dewpoint Method.
 
-<div>\[\begin{array}{l}{\rm{None (default):}}\\\,\,\,\,DefrostRatio = 1\\\{\rm{Case}}\,{\rm{Temperature}}\,{\rm{Method:}}\\\,\,\,\,DefrostRatio = 1 - \left( {R{H_{rated}} - R{H_{air}}} \right)\left[ {a + b\left( {{T_{case}}} \right) + c{{\left( {{T_{case}}} \right)}^2} + d{{\left( {{T_{case}}} \right)}^3}} \right]\,\\\{\rm{RH}}\,{\rm{method:}}\\\,\,\,\,DefrostRatio = e + f\left( {R{H_{air}}} \right) + g{\left( {R{H_{air}}} \right)^2} + h{\left( {R{H_{air}}} \right)^3}\\\{\rm{Dewpoint}}\,{\rm{method:}}\\\,\,\,\,DefrostRatio = i + j\left( {{T_{dp,air}}} \right) + k{\left( {{T_{dp,air}}} \right)^2} + l{\left( {{T_{dp,air}}} \right)^3}\end{array}\]</div>
+<div>\[\begin{array}{l}{\rm{None (default):}}\\ ,\,\,\,DefrostRatio = 1\\ {\rm{Case}}\,{\rm{Temperature}}\,{\rm{Method:}}\\ ,\,\,\,DefrostRatio = 1 - \left( {R{H_{rated}} - R{H_{air}}} \right)\left[ {a + b\left( {{T_{case}}} \right) + c{{\left( {{T_{case}}} \right)}^2} + d{{\left( {{T_{case}}} \right)}^3}} \right]\,\\ {\rm{RH}}\,{\rm{method:}}\\ ,\,\,\,DefrostRatio = e + f\left( {R{H_{air}}} \right) + g{\left( {R{H_{air}}} \right)^2} + h{\left( {R{H_{air}}} \right)^3}\\ {\rm{Dewpoint}}\,{\rm{method:}}\\ ,\,\,\,DefrostRatio = i + j\left( {{T_{dp,air}}} \right) + k{\left( {{T_{dp,air}}} \right)^2} + l{\left( {{T_{dp,air}}} \right)^3}\end{array}\]</div>
 
 where:
 
@@ -1208,7 +1226,7 @@ where:
 
 During defrost (SCHdefrost), the model assumes that the hot gas, hot brine, or electric heater energy directly contributes to melting the frost (heat of fusion of water). Defrost energy not attributed to melting frost from the evaporator coil results in a heat load on the refrigerated case evaporator (<sub><span>${\dot Q_{def}}$</span></sub>). When the defrost drip-down time period ends, this defrost energy heat load is added to the actual case load (up to the maximum evaporator capacity) until the total defrost energy heat load is removed (which may take several simulation time steps)
 
-<div>\[\begin{array}{l}If\left( {DefrostType = Electric\;or\;HotGas\;or\;HotBrine} \right)\;Then\\\quad \quad {{\dot Q}_{def}} = MAX\left( {0.0,\left[ {P_{def}'({L_{case}})(SC{H_{def}}) - \frac{{Frost({h_f})}}{{{t_{zn}}}}} \right]} \right)\\Else\\\quad \quad {{\dot Q}_{def}} = 0.0\\Endif\end{array}\]</div>
+<div>\[\begin{array}{l}If\left( {DefrostType = Electric\;or\;HotGas\;or\;HotBrine} \right)\;Then\\ quad \quad {{\dot Q}_{def}} = MAX\left( {0.0,\left[ {P_{def}'({L_{case}})(SC{H_{def}}) - \frac{{Frost({h_f})}}{{{t_{zn}}}}} \right]} \right)\\Else\\ quad \quad {{\dot Q}_{def}} = 0.0\\Endif\end{array}\]</div>
 
 where:
 
@@ -1302,7 +1320,7 @@ SCH<sub>CC</sub>     = case credit fraction (schedule value, 0 to 1)
 
 Latent load on the refrigerated case evaporator will vary with ambient humidity levels. Therefore, the refrigerated case model allows the user to specify a latent case credit curve to adjust case credits based on ambient humidity, and the user can select from three curve types: Case Temperature Method, Relative Humidity Method, or Dewpoint Method.
 
-<div>\[\begin{array}{l}{\rm{Case}}\,{\rm{Temperature}}\,{\rm{Method:}}\\\,\,\,\,LatentRatio = 1 - \left( {R{H_{rated}} - R{H_{air}}} \right)\left[ {m + n\left( {{T_{case}}} \right) + o{{\left( {{T_{case}}} \right)}^2} + p{{\left( {{T_{case}}} \right)}^3}} \right]\,\\\{\rm{RH}}\,{\rm{method:}}\\\,\,\,\,LatentRatio = q + r\left( {R{H_{air}}} \right) + s{\left( {R{H_{air}}} \right)^2} + t{\left( {R{H_{air}}} \right)^3}\\\{\rm{Dewpoint}}\,{\rm{method:}}\\\,\,\,\,LatentRatio = u + v\left( {{T_{dp,air}}} \right) + w{\left( {{T_{dp,air}}} \right)^2} + x{\left( {{T_{dp,air}}} \right)^3}\end{array}\]</div>
+<div>\[\begin{array}{l}{\rm{Case}}\,{\rm{Temperature}}\,{\rm{Method:}}\\ ,\,\,\,LatentRatio = 1 - \left( {R{H_{rated}} - R{H_{air}}} \right)\left[ {m + n\left( {{T_{case}}} \right) + o{{\left( {{T_{case}}} \right)}^2} + p{{\left( {{T_{case}}} \right)}^3}} \right]\,\\ {\rm{RH}}\,{\rm{method:}}\\ ,\,\,\,LatentRatio = q + r\left( {R{H_{air}}} \right) + s{\left( {R{H_{air}}} \right)^2} + t{\left( {R{H_{air}}} \right)^3}\\ {\rm{Dewpoint}}\,{\rm{method:}}\\ ,\,\,\,LatentRatio = u + v\left( {{T_{dp,air}}} \right) + w{\left( {{T_{dp,air}}} \right)^2} + x{\left( {{T_{dp,air}}} \right)^3}\end{array}\]</div>
 
 where:
 
@@ -1392,7 +1410,7 @@ RAF            = return air factor (see Figure 279 above)
 
 Control systems are now available that increase the evaporator temperature to improve compressor efficiency whenever the total loads on a system are less than the system capacity. To model these systems, a variable evaporator temperature is an option available with the detailed refrigeration system object (Refrigeration:System). If this option is selected, the model will compare the refrigeration load on each case to the load at rated conditions. If the case load in a particular time step is less than the rated load, an acceptable elevated evaporator temperature is determined for that case. The evaporator temperature for the whole refrigeration system is then set by the minimum evaporator temperature needed for any particular case.
 
-<div>\[\begin{array}{l}L{F_{case}} = \frac{{{{\dot Q}_{case,actual}}}}{{{{\dot Q}_{case,rated}}}};0.5 \le L{F_{case}} \le 1.0\\\{T_{{\rm{Evap,Allowed}}}} = {T_{case}} - L{F_{case}}({T_{case}} - {T_{Evap,Design}})\end{array}\]</div>
+<div>\[\begin{array}{l}L{F_{case}} = \frac{{{{\dot Q}_{case,actual}}}}{{{{\dot Q}_{case,rated}}}};0.5 \le L{F_{case}} \le 1.0\\ {T_{{\rm{Evap,Allowed}}}} = {T_{case}} - L{F_{case}}({T_{case}} - {T_{Evap,Design}})\end{array}\]</div>
 
 where:
 
@@ -1660,7 +1678,7 @@ Where:
 
 The total capacity is therefore a function of the sensible heat ratio, which is a function of the total capacity, and they are both, of course a function of the psychometrics of the air flowing through the chiller. This is handled with a two step estimation process.
 
-<div>\[\begin{array}{l}\Delta T = {\rm{Minimum}}(\Delta {T_{{\rm{max}}}},({T_{{\rm{Coil inlet}}}} - {T_{{\rm{evap}}}}))\\\{q_{{\rm{sens,max}}}} = ULF*\Delta T \times (1 - SC{H_{{\rm{Defrost,DripDown}}}}) \times SC{H_{{\rm{Coil}}}}\\\{T_{{\rm{Coil exit estimate}}}} = {T_{{\rm{Coil inlet}}}} - \frac{{{q_{{\rm{sens,max}}}}}}{{{{\dot m}_{{\rm{DryA ir}}}} \times {c_{p,{\rm{Coil Inlet Dry Air}}}}}}\\\{h_{{\rm{Coil exit estimate}}}} = f({T_{{\rm{Coil exit estimate}}}},{P_{{\rm{Barometric}}}}){\rm{at a Relative Humidity of 1}}{\rm{.0}}\\\{Q_{{\rm{Total estimate}}}} = ({h_{{\rm{Coil Inlet}}}} - {h_{{\rm{Coil exit estimate}}}}) \times {{\dot m}_{{\rm{max}}}}\\SHR = \frac{{{q_{{\rm{sens,max}}}}}}{{{Q_{{\rm{Total estimate}}}}}}\\\{\rm{Correction}} = f(SHR);{\rm{Function input by user, linear or quadratic curve}}\\\{Q_{{\rm{Total}}}} = {\rm{Correction}} \times {q_{{\rm{sens,max}}}}\end{array}\]</div>
+<div>\[\begin{array}{l}\Delta T = {\rm{Minimum}}(\Delta {T_{{\rm{max}}}},({T_{{\rm{Coil inlet}}}} - {T_{{\rm{evap}}}}))\\ {q_{{\rm{sens,max}}}} = ULF*\Delta T \times (1 - SC{H_{{\rm{Defrost,DripDown}}}}) \times SC{H_{{\rm{Coil}}}}\\ {T_{{\rm{Coil exit estimate}}}} = {T_{{\rm{Coil inlet}}}} - \frac{{{q_{{\rm{sens,max}}}}}}{{{{\dot m}_{{\rm{DryA ir}}}} \times {c_{p,{\rm{Coil Inlet Dry Air}}}}}}\\ {h_{{\rm{Coil exit estimate}}}} = f({T_{{\rm{Coil exit estimate}}}},{P_{{\rm{Barometric}}}}){\rm{at a Relative Humidity of 1}}{\rm{.0}}\\ {Q_{{\rm{Total estimate}}}} = ({h_{{\rm{Coil Inlet}}}} - {h_{{\rm{Coil exit estimate}}}}) \times {{\dot m}_{{\rm{max}}}}\\SHR = \frac{{{q_{{\rm{sens,max}}}}}}{{{Q_{{\rm{Total estimate}}}}}}\\ {\rm{Correction}} = f(SHR);{\rm{Function input by user, linear or quadratic curve}}\\ {Q_{{\rm{Total}}}} = {\rm{Correction}} \times {q_{{\rm{sens,max}}}}\end{array}\]</div>
 
 Where:
 
@@ -1694,7 +1712,7 @@ Some manufacturers are beginning to provide more comprehensive performance infor
 
 The sensible and latent loads served are then calculated as:
 
-<div>\[\begin{array}{l}{h_{{\rm{Coil exit}}}} = {h_{{\rm{Coil Inlet}}}} - \frac{{{Q_{{\rm{Total}}}}}}{{{{\dot V}_{{\rm{A ir,Max}}}} \times {\rho_{{\rm{Coil Inlet}}}}}}\\\{T_{{\rm{Coil exit}}}} = f({h_{{\rm{Coil exit}}}}){\rm{at a Relative Humidity of 1}}{\rm{.0}}\\H{R_{{\rm{Coil exit}}}} = f({T_{{\rm{Coil exit}}}},{h_{{\rm{Coil exit}}}})\\\{{\dot m}_{Water}} = {{\dot m}_{dryair,\max }} \times (H{R_{{\rm{Coil exit}}}} - H{R_{{\rm{Coil inlet}}}})\\\{q_{latent}} = {{\dot m}_{water}} \times {h_{icetovapor}}\\\{q_{{\rm{sens}}}} = {Q_{Total}} - {q_{latent}}\end{array}\]</div>
+<div>\[\begin{array}{l}{h_{{\rm{Coil exit}}}} = {h_{{\rm{Coil Inlet}}}} - \frac{{{Q_{{\rm{Total}}}}}}{{{{\dot V}_{{\rm{A ir,Max}}}} \times {\rho_{{\rm{Coil Inlet}}}}}}\\ {T_{{\rm{Coil exit}}}} = f({h_{{\rm{Coil exit}}}}){\rm{at a Relative Humidity of 1}}{\rm{.0}}\\H{R_{{\rm{Coil exit}}}} = f({T_{{\rm{Coil exit}}}},{h_{{\rm{Coil exit}}}})\\ {{\dot m}_{Water}} = {{\dot m}_{dryair,\max }} \times (H{R_{{\rm{Coil exit}}}} - H{R_{{\rm{Coil inlet}}}})\\ {q_{latent}} = {{\dot m}_{water}} \times {h_{icetovapor}}\\ {q_{{\rm{sens}}}} = {Q_{Total}} - {q_{latent}}\end{array}\]</div>
 
 Where:
 
@@ -1748,7 +1766,7 @@ These values are in turn used to determine the total heat rejection load on the 
 
 After each detailed refrigeration system has been solved, all energy transfers (subcoolers, secondary loops, and cascade condensers) among the systems are made.
 
-<div>\[\begin{array}{*{20}{c}}{{{\dot Q}_{Transfer}} = \sum {{{\dot Q}_{CascadeCondenser}} + \sum {{{\dot Q}_{SecondaryLoop}} + \sum {{{\dot Q}_{MechanicalSubcooler}}} } } }\\\{{{\dot Q}_{{\rm{Refrigeration}}}} = \sum {{{\dot Q}_{Case}} + \sum {{{\dot Q}_{WalkIn}} + \sum {{{\dot Q}_{Transfer}}( + \sum {{{\dot Q}_{PipeHeatGain}}} )} } } }\end{array}\]</div>
+<div>\[\begin{array}{*{20}{c}}{{{\dot Q}_{Transfer}} = \sum {{{\dot Q}_{CascadeCondenser}} + \sum {{{\dot Q}_{SecondaryLoop}} + \sum {{{\dot Q}_{MechanicalSubcooler}}} } } }\\ {{{\dot Q}_{{\rm{Refrigeration}}}} = \sum {{{\dot Q}_{Case}} + \sum {{{\dot Q}_{WalkIn}} + \sum {{{\dot Q}_{Transfer}}( + \sum {{{\dot Q}_{PipeHeatGain}}} )} } } }\end{array}\]</div>
 
 This two step process is repeated twice to ensure that all the energy transfers among systems are balanced.
 
@@ -1780,7 +1798,7 @@ Figure 280. State Points and Energy Flows for Detailed Refrigeration System
 
 Once the corrected capacity is calculated for each compressor, the compressors are dispatched one at a time until the system load is met. The last compressor dispatched is assumed to run at full load for the fraction of the time step necessary to meet the load, That is, the model neglects compressor cycling losses at part-load conditions. Using the state point identification from Figure 280, these corrections are shown in the following equations. If the capacity available from all the compressors is less than the sum of the case loads for that time period, the unmet load is accumulated to be met in succeeding time steps. If this accumulated unmet load becomes too great, a warning message is generated.
 
-<div>\[\begin{array}{*{20}{c}}{Ca{p_{corrected}} = \frac{{{\rho_{1b}}}}{{{\rho_{1c}}}} \times \frac{{({h_{1b}} - {h_4})}}{{({h_{1c}} - {h_{4c}})}}Ca{p_{rated}}}\\\{\dot m = \frac{{Ca{p_{corrected}}}}{{({h_{1b}} - {h_4})}}}\end{array}\]</div>
+<div>\[\begin{array}{*{20}{c}}{Ca{p_{corrected}} = \frac{{{\rho_{1b}}}}{{{\rho_{1c}}}} \times \frac{{({h_{1b}} - {h_4})}}{{({h_{1c}} - {h_{4c}})}}Ca{p_{rated}}}\\ {\dot m = \frac{{Ca{p_{corrected}}}}{{({h_{1b}} - {h_4})}}}\end{array}\]</div>
 
 where:
 
@@ -1900,7 +1918,7 @@ This calculated condensing temperature is then compared to the minimum condensin
 
 Condenser fan power for air-cooled condensers is determined by the type of fan control, fixed, variable speed, or two-speed. For all three fan control types, the fan power is set equal to the rated fan power whenever the calculated condensing temperature is greater than or equal to the minimum allowed condensing temperature. If the calculated temperature is less than the minimum allowed, the condenser air flow must be reduced. The reduced rated capacity is calculated using the previous equation for *Hrej<sub>Rated</sub>* with the specified minimum condensing temperature. (Note, the minimum condensing temperature is often determined by the expansion valve performance, and is therefore input with the system description, not with the condenser description.) The air flow for the reduced condenser capacity is:
 
-<div>\[\begin{array}{l}Hrej \propto {\left( {AirVelocity} \right)^N}\\\{\rm{Air Velocity}} \propto {\left( {Hrej} \right)^{1/N}}\\\{\rm{Air Volume Ratio}} = {\left( {\frac{{Hrej}}{{Hre{j_{Rated}}}}} \right)^{1/N}}\end{array}\]</div>
+<div>\[\begin{array}{l}Hrej \propto {\left( {AirVelocity} \right)^N}\\ {\rm{Air Velocity}} \propto {\left( {Hrej} \right)^{1/N}}\\ {\rm{Air Volume Ratio}} = {\left( {\frac{{Hrej}}{{Hre{j_{Rated}}}}} \right)^{1/N}}\end{array}\]</div>
 
 where:
 
@@ -1938,7 +1956,7 @@ For an ideal variable speed fan, the power is proportional to the cube of the ai
 
 For a two-speed fan, the fan power is varied as for a constant speed fan with dampers for Air Volume Ratios greater than or equal to 0.6. For lower Air Volume Ratios,  which correspond to a half-speed fan setting, the power is reduced to the variable fan power value at that point and then varied as for damper control below Air Volume Ratios of 0.6.
 
-<div>\[\begin{array}{*{20}{c}}{{P_{CondFan}} = ({\rm{Air Volume Ratio}})\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right){P_{CondFan,design}}{\rm{      for Air Volume Ratio}} \ge 0.6}\\\{{P_{CondFan}} = \left( {\frac{{{\rm{Air Volume Ratio }} + {\rm{ 0}}{\rm{.4}}}}{{{{\rm{2}}^{{\rm{2}}{\rm{.5}}}}}}} \right)\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right)\left( {{P_{CondFan,design}}} \right){\rm{    for Air Volume Ratio }} < {\rm{ 0}}{\rm{.6}}}\end{array}\]</div>
+<div>\[\begin{array}{*{20}{c}}{{P_{CondFan}} = ({\rm{Air Volume Ratio}})\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right){P_{CondFan,design}}{\rm{      for Air Volume Ratio}} \ge 0.6}\\ {{P_{CondFan}} = \left( {\frac{{{\rm{Air Volume Ratio }} + {\rm{ 0}}{\rm{.4}}}}{{{{\rm{2}}^{{\rm{2}}{\rm{.5}}}}}}} \right)\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right)\left( {{P_{CondFan,design}}} \right){\rm{    for Air Volume Ratio }} < {\rm{ 0}}{\rm{.6}}}\end{array}\]</div>
 
 For a water cooled condenser, there is no fan load at the condenser (i.e., the  water/refrigerant heat exchanger). Any fan load would be related to and accounted for at the heat rejection object (e.g., cooling tower)
 
@@ -1968,7 +1986,7 @@ Although based upon an exponential relationship, the resulting correction is ver
 
 To calculate the condensing temperature for an evaporative cooled condenser, it is necessary to provide the manufacturer’s performance data. The manufacturers typically provide this data as a table of condensing temperature as a function of both entering wet-bulb temperature and the ratio of the heat rejected to the rated heat rejected. This data can be well represented, as shown in Figure 284, by a regression of the form:
 
-<div>\[\begin{array}{l}({T_{condense}} - {T_{wetbulb}}) = {C_1} + {C_2} \times HRCF + \frac{{{C_3}}}{{HRCF}} + {C_4}{T_{wetbulb}},or\\\{T_{condense}} = {C_1} + {C_2} \times HRCF + \frac{{{C_3}}}{{HRCF}} + (1 + {C_4}){T_{wetbulb}}\\\{\rm{where:  }}HRCF = \frac{{Hre{j_{Rated}}}}{{Hrej}}\end{array}\]</div>
+<div>\[\begin{array}{l}({T_{condense}} - {T_{wetbulb}}) = {C_1} + {C_2} \times HRCF + \frac{{{C_3}}}{{HRCF}} + {C_4}{T_{wetbulb}},or\\ {T_{condense}} = {C_1} + {C_2} \times HRCF + \frac{{{C_3}}}{{HRCF}} + (1 + {C_4}){T_{wetbulb}}\\ {\rm{where:  }}HRCF = \frac{{Hre{j_{Rated}}}}{{Hrej}}\end{array}\]</div>
 
 C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub>, and C<sub>4</sub>     =          Coefficients determined by regression from manufacturer’s data.
 
@@ -1980,7 +1998,7 @@ Figure 284. Comparison of the condensing temperature predicted by four-factor eq
 
 Again, the condensing temperature is not allowed to fall below the system’s minimum allowed condensing temperature. Just as with an air-cooled condenser, the air flow through the condenser is controlled to maintain this minimum condensing temperature and the air velocity reduction is a function of the decreased capacity (Manske, 1999). For an evaporative condenser, relevant capacity is not the amount of heat rejected, but the rated capacity at that reduced air flow. That decreased rated capacity must first be calculated based upon the specified minimum condensing temperature. Using Equation , the specified condensing temperature is used to calculate the reduced HRCF, which is used with the current heat rejection to calculate the “reduced Rated Heat Rejection”.
 
-<div>\[\begin{array}{l}{\rm{0}} = {C_2} \times HRC{F^2} + (({C_1} + {C_4}{T_{wetbulb}} - ({T_{condense}} - {T_{wetbulb}})) \times HRCF + {C_3}\\\{\rm{Reduced Rated Heat Rejection}} = HRCF \times Hrej\\\{\rm{Air Volume Ratio}} = {\left( {\frac{{{\rm{Reduced Rated Heat Rejection}}}}{{Hre{j_{Rated}}}}} \right)^{1/N}}\end{array}\]</div>
+<div>\[\begin{array}{l}{\rm{0}} = {C_2} \times HRC{F^2} + (({C_1} + {C_4}{T_{wetbulb}} - ({T_{condense}} - {T_{wetbulb}})) \times HRCF + {C_3}\\ {\rm{Reduced Rated Heat Rejection}} = HRCF \times Hrej\\ {\rm{Air Volume Ratio}} = {\left( {\frac{{{\rm{Reduced Rated Heat Rejection}}}}{{Hre{j_{Rated}}}}} \right)^{1/N}}\end{array}\]</div>
 
 where:
 
@@ -1988,7 +2006,7 @@ N = exponent for evaporative condensers, set to 0.76 (Manske, 1999)
 
 The water consumption for an evaporative condenser is calculated based upon the air flow rate, the total heat rejection, and the heat rejection environment. The amount of water consumption also includes the amount of water that is purged to reduce the concentration of contaminants. The purge water is estimated as proportional to the heat rejection, at a rate of 5.0E-10 m<sup>3</sup>/s per Watt of heat rejection (B.A.C., 2007). (This value, which corresponds to 3 gal./min. per 100 tons, is slightly more conservative than the value quoted by ASHRAE, 2004.) For the compressor racks, the condenser effectiveness was input as a function of the environmental wetbulb temperature. For the detailed evaporative condenser, the input data instead describes the capacity as a function of environmental conditions and loading. From that data, the water evaporation is calculated using the effectiveness corresponding to a fully loaded condenser. When the condenser is operating outside the bounds of the manufacturer’s data, the effectiveness is limited to a maximum value of 0.9.
 
-<div>\[\begin{array}{l}\eta  = \frac{{Hrej}}{{{{\dot V}_{air,rated}} \times {\rho_{air}} \times ({{\left. h \right|}_{Tcondense,sat}} - {h_{air,in}})}}\\\{h_{air,out}} = {h_{air,in}} + \eta  \times ({\left. h \right|_{Tcondense,sat}} - {h_{air,in}})\\\{T_{air,out}} = {T_{saturated}}({h_{air,out}},{P_{barometric}})\\\{{\dot V}_{evaporation}} = \frac{{AirVolumeRatio \times {{\dot V}_{air,rated}} \times {\rho_{air,dry}} \times ({\omega_{air,out}} - {\omega_{air,in}})}}{{{\rho_{water}}}}\\\{{\dot V}_{makeup}} = {{\dot V}_{evaporation}} + {{\dot V}_{purge}}\end{array}\]</div>
+<div>\[\begin{array}{l}\eta  = \frac{{Hrej}}{{{{\dot V}_{air,rated}} \times {\rho_{air}} \times ({{\left. h \right|}_{Tcondense,sat}} - {h_{air,in}})}}\\ {h_{air,out}} = {h_{air,in}} + \eta  \times ({\left. h \right|_{Tcondense,sat}} - {h_{air,in}})\\ {T_{air,out}} = {T_{saturated}}({h_{air,out}},{P_{barometric}})\\ {{\dot V}_{evaporation}} = \frac{{AirVolumeRatio \times {{\dot V}_{air,rated}} \times {\rho_{air,dry}} \times ({\omega_{air,out}} - {\omega_{air,in}})}}{{{\rho_{water}}}}\\ {{\dot V}_{makeup}} = {{\dot V}_{evaporation}} + {{\dot V}_{purge}}\end{array}\]</div>
 
 where:
 
@@ -2022,7 +2040,7 @@ The source of the makeup water may be specified as a water storage tank. If not 
 
 An evaporative condenser can be scheduled, using the Evaporative Condenser Availability Schedule described previously, so that it operates in a dry mode for a portion of the year. This is important in climates subject to freezing weather in order to avoid excessive ice formation on the condenser surfaces and surroundings. (The Availability Schedule is the correct way to model the use of evaporative condensers in cold climates. However, some users may take a single input description and use it to model a building with a refrigeration system in a variety of climates. To avoid modeling the use of evaporative coolers in freezing weather, the code includes a cutout to switch to dry operation whenever the outdoor drybulb temperature drops below 4C.) Dry operation can also reduce water use when the dry heat rejection capacity of the equipment is sufficient to meet the load during times of the year when the outside drybulb temperature is reduced. In dry operation, the condenser heat rejection capacity is approximately one third of the rated wetted heat rejection capacity(Manske, 2000). In dry operation, the condensing temperature is estimated by using the same four-factor equation, but using the air drybulb temperature instead of the wetbulb temperature and using the reduced heat rejection capacity factor.
 
-<div>\[\begin{array}{l}HRC{F_{{\rm{dry operation}}}} = HRC{F_{{\rm{wet operation}}}}/3.0\\\{T_{{\rm{condense,dry operation}}}} = {C_1} + {C_2} \times HRC{F_{{\rm{dry operation}}}} + \frac{{{C_3}}}{{HRC{F_{{\rm{dry operation}}}}}} + (1 + {C_4}){T_{drybulb}}\end{array}\]</div>
+<div>\[\begin{array}{l}HRC{F_{{\rm{dry operation}}}} = HRC{F_{{\rm{wet operation}}}}/3.0\\ {T_{{\rm{condense,dry operation}}}} = {C_1} + {C_2} \times HRC{F_{{\rm{dry operation}}}} + \frac{{{C_3}}}{{HRC{F_{{\rm{dry operation}}}}}} + (1 + {C_4}){T_{drybulb}}\end{array}\]</div>
 
 ##### Water-Cooled Condensers
 
@@ -2074,7 +2092,7 @@ where
 
 Subcooler objects (Refrigeration:Subcooler) reduce the temperature of the liquid refrigerant after it leaves the condenser and before it reaches the thermal expansion valve, corresponding to state point, 3b, on Figure 280. The detailed refrigeration system permits the use of two type of subcoolers, mechanical and liquid suction. A mechanical subcooler is used to transfer refrigeration load from a lower-temperature system to a higher-temperature system. For example, the compressors that are used to provide cooling for dairy products could be used to subcool the refrigerant in another system that is serving frozen food cases. For the system providing the cooling, the mechanical subcooler acts like another refrigerated case load. For the system receiving the cooling, the mechanical subcooler reduces the enthalpy of the refrigerant from point 3a to point 3b on Figure 280, and thus reduces the required refrigerant flow rate. Mechanical subcooler performance is defined by the controlled temperature of the subcooled liquid as follows:
 
-<div>\[\begin{array}{l}\dot Q = \dot m \times {c_p}({T_{3a}} - {T_{control}})\\\{h_{3b}} = {h_{3a}} - {c_{p,liquid}}({T_{3a}} - {T_{control}})\end{array}\]</div>
+<div>\[\begin{array}{l}\dot Q = \dot m \times {c_p}({T_{3a}} - {T_{control}})\\ {h_{3b}} = {h_{3a}} - {c_{p,liquid}}({T_{3a}} - {T_{control}})\end{array}\]</div>
 
 where:
 
@@ -2090,7 +2108,7 @@ h    = enthalpy, J/kg
 
 A liquid suction heat exchanger (LSHX) subcooler uses the cold gas exiting the refrigerated cases to subcool the condensed liquid refrigerant in the same system. Depending upon the shape of the refrigerant’s saturation curve and the operating condensing and evaporating temperature, this can save significant energy by reducing the required refrigerant flow (ASHRAE 2006a). (This model neglects the pressure drop through the suction side of the heat exchanger, although this pressure drop will cause the compressor to operate at a lower suction pressure.) A liquid suction heat exchanger is defined by specifying the design values for: inlet liquid temperature, inlet vapor temperature, and liquid temperature change. A liquid suction heat exchanger subcooler will also increase the superheat of the gas returning to the compressor, as shown by the difference between state points 1a and 1b in Figure 280:
 
-<div>\[\begin{array}{l}{\eta_{LSHX}} = \frac{{\Delta {T_{Design}}}}{{\left( {{T_{{\rm{Liquid Design}}}} - {T_{{\rm{Vapor Design}}}}} \right)}}\\\dot Q = \dot m \times {c_{p,liquid}}{\eta_{LSHX}}({T_{3a}} - {T_{1a}})\\\{T_{1b}} = {T_{1a}} + \frac{{\dot Q}}{{\dot m{c_{p,vapor}}}}\\\{h_{3b}} = {h_{3a}} - \frac{{\dot Q}}{{\dot m}}\end{array}\]</div>
+<div>\[\begin{array}{l}{\eta_{LSHX}} = \frac{{\Delta {T_{Design}}}}{{\left( {{T_{{\rm{Liquid Design}}}} - {T_{{\rm{Vapor Design}}}}} \right)}}\\ dot Q = \dot m \times {c_{p,liquid}}{\eta_{LSHX}}({T_{3a}} - {T_{1a}})\\ {T_{1b}} = {T_{1a}} + \frac{{\dot Q}}{{\dot m{c_{p,vapor}}}}\\ {h_{3b}} = {h_{3a}} - \frac{{\dot Q}}{{\dot m}}\end{array}\]</div>
 
 where:
 
@@ -2228,7 +2246,7 @@ Capacity<sub>Max</sub>              = Maximum secondary evaporator c
 
 For a two-phase system, the secondary evaporator effectiveness is not calculated. Both the evaporating and condensing sides of the heat exchanger are assumed to operate at fixed temperatures.  If the capacity of the secondary evaporator is not input, it will be calculated as the sum of the rated loads plus the rated pump power.
 
-<div>\[\begin{array}{*{20}{c}}{Capacit{y_{{\rm{Rated}}}} = {\rm{Input,  OR}}}\\\{Capacit{y_{{\rm{Rated}}}} = \sum {{{\dot Q}_{{\rm{Case}}}} + \sum {{{\dot Q}_{{\rm{WalkIn}}}} + Powe{r_{{\rm{Pump}}}}} } }\\\{Capacit{y_{{\rm{Max}}}} = Capacit{y_{{\rm{Rated}}}}}\end{array}\]</div>
+<div>\[\begin{array}{*{20}{c}}{Capacit{y_{{\rm{Rated}}}} = {\rm{Input,  OR}}}\\ {Capacit{y_{{\rm{Rated}}}} = \sum {{{\dot Q}_{{\rm{Case}}}} + \sum {{{\dot Q}_{{\rm{WalkIn}}}} + Powe{r_{{\rm{Pump}}}}} } }\\ {Capacit{y_{{\rm{Max}}}} = Capacit{y_{{\rm{Rated}}}}}\end{array}\]</div>
 
 If the flow rate through the evaporator is not input, it will be calculated based upon the input value for the Circulating Rate.
 
@@ -2290,7 +2308,7 @@ LF<sub>Pump</sub>         = ratio of total flow needed to the total flow
 
 The user may also specify multiple constant-speed pumps.  Multiple pumps, or pump staging, are often used to reduce the total pumping power requirements while still providing the capacity and constant pressure drop needed to meet peak design loads.(Faramarzi, R. T., and Walker, D. H. 2004) When multiple pumps are specified, the flow rate provided by one pump is compared to the flow rate needed to meet the refrigeration load on the loop during that time step. If that flow rate is insufficient, another pump is added, and the process is continued until the needed flow rate is met or all the pumps are included. The incremental power for each pump is added to determine the total pump power for the loop. Each pump is assumed to operate at full load if it is needed at all.  A bypass is assumed to carry any fluid flow not needed to meet the load.  An iterative solution is required for the total pump load on the heat exchanger because the flow rate is determined by the load, which includes the pump power that is determined by the necessary flow rate. For the first estimate, the pump power load is assumed to be zero.
 
-<div>\[\begin{array}{*{20}{c}}{{{\dot Q}_{{\rm{Refrigeration}}}} = \sum {{{\dot Q}_{{\rm{Case}}}} + \sum {{{\dot Q}_{{\rm{WalkIn}}}}} } }\\\{{{\dot Q}_{{\rm{TotalSecondary}}}} = {{\dot Q}_{{\rm{Refrigeration}}}} + {{\dot Q}_{{\rm{Pump}}}} + \left( {\sum {{{\dot Q}_{{\rm{Pipe and Receiver Shell heat gains}}}}} } \right)}\\\{{\rm{Flo}}{{\rm{w}}_{{\rm{needed}}}}{\rm{ }} = {\rm{ }}\frac{{{{\dot Q}_{{\rm{TotalSecondary}}}}}}{{Eta({C_{{\rm{p,Brine}}}})({\rho_{{\rm{Brine}}}})({T_{{\rm{BrineOutRated}}}} - {T_{{\rm{evap}}}})}}}\end{array}\]</div>
+<div>\[\begin{array}{*{20}{c}}{{{\dot Q}_{{\rm{Refrigeration}}}} = \sum {{{\dot Q}_{{\rm{Case}}}} + \sum {{{\dot Q}_{{\rm{WalkIn}}}}} } }\\ {{{\dot Q}_{{\rm{TotalSecondary}}}} = {{\dot Q}_{{\rm{Refrigeration}}}} + {{\dot Q}_{{\rm{Pump}}}} + \left( {\sum {{{\dot Q}_{{\rm{Pipe and Receiver Shell heat gains}}}}} } \right)}\\ {{\rm{Flo}}{{\rm{w}}_{{\rm{needed}}}}{\rm{ }} = {\rm{ }}\frac{{{{\dot Q}_{{\rm{TotalSecondary}}}}}}{{Eta({C_{{\rm{p,Brine}}}})({\rho_{{\rm{Brine}}}})({T_{{\rm{BrineOutRated}}}} - {T_{{\rm{evap}}}})}}}\end{array}\]</div>
 
 Where:
 
@@ -2394,7 +2412,7 @@ Figure 291.  COP of CO<sub>2</sub> Transcritical Cycle vs. Discharge Pressure a
 
 Several researchers have developed correlations to determine the optimum gas cooler pressure in CO<sub>2</sub> refrigeration systems (Chen and Gu 2005; Ge and Tassou 2011; Kauf 1998; Liao and Zhao 2000; Sawalha 2008).  Using a similar curve-fitting procedure, the following optimum gas cooler pressure correlations are used in EnergyPlus:
 
-<div>\[{p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} < 27}\\\{2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} \ge 27}\end{array}} \right.\]</div>
+<div>\[{p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} < 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} \ge 27}\end{array}} \right.\]</div>
 
 where *p<sub>gc</sub>* is the optimum gas cooler pressure (Pa) and *T<sub>amb</sub>* (°C) is the ambient temperature surrounding the gas cooler.  The corresponding gas cooler exit temperature, *T<sub>gco</sub>* (°C), is determined as follows:
 
@@ -2408,7 +2426,7 @@ During transcritical operation, the gas cooler outlet pressure is not allowed to
 
 During subcritical operation, the gas cooler behaves as a condenser and the condensing pressure is allowed to float with the ambient conditions.  The condensing temperature, *T<sub>cond</sub>* (°C), is determined according to the following:
 
-<div>\[{T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{amb}} \le {T_{cond,min}} - \Delta T}\\\{{T_{amb}} + \Delta T,{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{cond,min}} - \Delta T < {T_{amb}} \le {T_{trans}} - \Delta T}\\\{{T_{trans}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} - \Delta T < {T_{amb}} < {T_{trans}}}\\\{{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} \le {T_{amb}} < 30.978}\end{array}} \right.\]</div>
+<div>\[{T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{cond,min}} - \Delta T < {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} - \Delta T < {T_{amb}} < {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} \le {T_{amb}} < 30.978}\end{array}} \right.\]</div>
 
 where *T<sub>amb</sub>* is the ambient temperature (°C), Δ*T* is the temperature difference between the condensing temperature and the ambient temperature (°C), *T<sub>cond</sub>*<sub>,*min*</sub> is the minimum allowable condensing temperature (°C), and *T<sub>trans</sub>* is the ambient air transition temperature between subcritical and transcritical operation (°C).  The condensing pressure, *P<sub>cond</sub>* (Pa), is determined as the saturation pressure corresponding to the condensing temperature.
 

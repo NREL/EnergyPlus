@@ -129,45 +129,47 @@ where
 
 The outdoor air input fields, if entered, are then used to adjust the terminal unit air mass flow rate to ensure the correct amount of outdoor air enters the zone (within the constraints of the terminal unit maximum and minimum flow rate inputs). The amount of outdoor air is calculated per the outdoor air requirements and is adjusted by the fraction of outdoor air entering the air loop outdoor air system.
 
-<span>$\mathop m\limits^\cdot   = MAX\left( {\mathop m\limits^\cdot  ,\,{\raise0.7ex\hbox{${\mathop {{m_{OA}}}\limits^\cdot  }$} \!\mathord{\left/ {\vphantom {{\mathop {{m_{OA}}}\limits^\cdot  } {OAFrac}}}\right.}\!\lower0.7ex\hbox{${OAFrac}$}}} \right)$</span><div>\[{\mathop m\limits^\cdot_{OA}}\]</div>
+<div>\[
+  \dot m = \max \left( \dot m, \frac{\dot m_{OA}}{OAFrac} \right)
+\]</div>
 
 where:
 
-<span>$OAFrac$</span> = zone outdoor air flow rate, kg/s
+<span>${\mathop m\limits^\cdot_{OA}}$</span> = zone outdoor air flow rate, kg/s
 
-<span>$\mathop m\limits^\cdot  \, = \,MIN\left( {\mathop m\limits^\cdot  ,\,{{\mathop m\limits^\cdot  }_{reheat}}} \right)$</span> = fraction of outdoor air entering the air loop outside air system
+<span>$OAFrac$</span> = fraction of outdoor air entering the air loop outside air system
 
 If the terminal unit is in reheat mode (i.e., the central air loop cooling coil is active, the supply air was overcooled, and the zone thermostat is requesting heating) the maximum air flow rate allowed during reheat mode is adjusted as necessary.
 
-<div>\[{\mathop m\limits^\cdot_{reheat}}\]</div>
+<div>\[\mathop m\limits^\cdot  \, = \,MIN\left( {\mathop m\limits^\cdot  ,\,{{\mathop m\limits^\cdot  }_{reheat}}} \right)\]</div>
 
 where:
 
-<span>$FRA{C_{damper}} = {\raise0.7ex\hbox{${\dot m}$} \!\mathord{\left/ {\vphantom {{\dot m} {{{\dot m}_{max}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot m}_{max}}}$}}$</span> = maximum air mass flow rate during reheat, kg/s
+<span>${\mathop m\limits^\cdot_{reheat}}$</span> = maximum air mass flow rate during reheat, kg/s
 
 The damper position is then calculated as:
 
-<div>\[{\mathop V\limits^\cdot_{OA}} = \mathop m\limits^\cdot  \,\left( {OAFrac} \right)\]</div>
+<div>\[FRAC_{damper} = \frac{\dot m}{\dot m_{max}} \]</div>
 
 And the amount of outdoor air entering the zone is:
 
-<div>\[FRA{C_{damper}}\]</div>
+<div>\[\dot V_{OA} = \dot m (OAFrac)\]</div>
 
 where
 
-<span>${\mathop V\limits^\cdot_{OA}}$</span>  = Output variable ‘Zone Air Terminal VAV Damper Position’, fraction of maximum flow
+<span>$FRAC_{damper}$</span>  = Output variable ‘Zone Air Terminal VAV Damper Position’, fraction of maximum flow
 
-<span>${\dot Q_{reheat}} = {\dot Q_{heatSP}} + \dot m\left( {C{p_{zone}}} \right)\left( {{T_{inlet}} - {T_{zone}}} \right)$</span> = Output variable “Zone Air Terminal Outdoor Air Volume Flow Rate” entering the zone, m3/s
+<span>${\mathop V\limits^\cdot_{OA}}$</span> = Output variable “Zone Air Terminal Outdoor Air Volume Flow Rate” entering the zone, m3/s
 
 Simulation of the reheat coil occurs next when applicable. The heating demand required to maintain the thermostat heating setpoint temperature and the heating capacity of air flowing through the terminal unit are used to determine the amount of reheat required.
 
-<div>\[{\dot Q_{reheat}}\]</div>
+<div>\[{\dot Q_{reheat}} = {\dot Q_{heatSP}} + \dot m C_{p,zone}(T_{inlet}-T_{zone})\]</div>
 
  where
 
-<span>${\dot Q_{heatSP}}$</span>  = Reheat coil load, W (positive values denote heating)
+<span>${\dot Q_{reheat}}$</span>  = Reheat coil load, W (positive values denote heating)
 
-<span>${\dot m_{air,tot}} = {\dot m_{air,pri}} + {\dot m_{air,\sec }}$</span> = Load to heating setpoint temperature, W (positive values denote heating)
+<span>${\dot Q_{heatSP}}$</span> = Load to heating setpoint temperature, W (positive values denote heating)
 
 #### References
 
@@ -185,15 +187,15 @@ The four pipe induction terminal unit is modeled as a compound component consist
 
 The user describes the terminal unit by inputting the name and type of the heating and cooling coils and the name of the zone mixer. The user must also specify the connectivity of the component by naming the inlet air and water nodes and the air outlet node. Finally maximum and fixed flow rates need to be specified (although these can be autosized): maximum and minimum hot and cold water volumetric flow rates and the total air volumetric flow rate (sum of primary and secondary flow rates). The relative convergence tolerances for the hot and cold water flow rates also need to be input (or allowed to default). Finally the induction ratio needs to be specified: this  is defined as the ratio of the secondary air flow rate to the primary air flow rate. The relationship between the flow rates is:
 
-<div>\[{\dot m_{air,sec}} = {R_{induc}}\cdot {\dot m_{air,pri}}\]</div>
+<div>\[{\dot m_{air,tot}} = {\dot m_{air,pri}} + {\dot m_{air,\sec }}\]</div>
 
-<div>\[{\dot m_{air,pri}} = {\dot m_{air,tot}}/(1 + {R_{induc}})\]</div>
+<div>\[{\dot m_{air,sec}} = {R_{induc}}\cdot {\dot m_{air,pri}}\]</div>
 
 so
 
-<div>\[{\dot m_{air,sec}} = {\dot m_{air,tot}}\cdot {R_{induc}}/(1 + {R_{induc}})\]</div>
+<div>\[{\dot m_{air,pri}} = {\dot m_{air,tot}}/(1 + {R_{induc}})\]</div>
 
-<div>\[{\dot Q_{out}} = {\dot m_{tot}}\cdot {c_{p,air}}\cdot ({T_{air,out}} - {T_{air,zone}})\]</div>
+<div>\[{\dot m_{air,sec}} = {\dot m_{air,tot}}\cdot {R_{induc}}/(1 + {R_{induc}})\]</div>
 
 where *R<sub>induc</sub>* is the user-input induction ratio.
 
@@ -211,23 +213,27 @@ The two air streams are mixed (Call *SimAirMixer*).
 
 Finally the load met by the terminal unit is calculated and passed back to the calling routine:
 
-<div>\[{\dot Q_{z,req}}\]</div>
+<div>\[{\dot Q_{out}} = {\dot m_{tot}}\cdot {c_{p,air}}\cdot ({T_{air,out}} - {T_{air,zone}})\]</div>
 
 Note that data is never explicitly passed between the sub-components. This is all handled automatically by the node connections and the data stored on the nodes.
 
 #### Simulation and Control
 
-From the result of the zone simulation we have the heating/cooling demand on the terminal unit <span>$({\dot Q_{z,req}} - {\dot Q_{out}})/{\dot Q_{z,req}}$</span>. For a given hot and cold water flow *CalcFourPipeIndUnit* will give us the terminal unit heating/cooling output. We need to vary the hot or cold water flow to make the unit output match the demand. To do this we need to numerically invert *CalcFourPipeIndUnit*: given the output, we want one of the inputs – the hot or cold water flow. The numerical inversion is carried out by calling subroutine *SolveRegulaFalsi*. This is a general utility routine for finding the zero of a function (the *residual* function) of a single independent variable. In this case the residual function calculates <span>${\dot Q_{pri}}$</span>. *SolveRegulaFalsi* varies either the hot water or cold water mass flow rate to zero the residual
+From the result of the zone simulation we have the heating/cooling demand on the terminal unit 
+<span>${\dot Q_{z,req}}$</span>
+. For a given hot and cold water flow *CalcFourPipeIndUnit* will give us the terminal unit heating/cooling output. We need to vary the hot or cold water flow to make the unit output match the demand. To do this we need to numerically invert *CalcFourPipeIndUnit*: given the output, we want one of the inputs – the hot or cold water flow. The numerical inversion is carried out by calling subroutine *SolveRegulaFalsi*. This is a general utility routine for finding the zero of a function (the *residual* function) of a single independent variable. In this case the residual function calculates 
+<span>$({\dot Q_{z,req}} - {\dot Q_{out}})/{\dot Q_{z,req}}$</span>
+. *SolveRegulaFalsi* varies either the hot water or cold water mass flow rate to zero the residual.
 
 Decide whether the unit is on or off. The unit is off if: a) it is scheduled off; b) the inlet air mass flow rate is zero; c) the zone thermostat is in the deadband; d) or the zone heating/cooling demand is very small.
 
 If the unit is off, call *CalcFourPipeIndUnit* with the hot and cold water flow rates set to their minimum flows and return.
 
-If the unit is on, check whether active heating or cooling by the hydronic coils is needed. Call *CalcFourPipeIndUnit* with minimum water flows to see what how much cooling (or possibly heating) the unit is doing with primary air only. The output for this case is <span>${\dot Q_{z,req}} > {\dot Q_{pri}}$</span>.
+If the unit is on, check whether active heating or cooling by the hydronic coils is needed. Call *CalcFourPipeIndUnit* with minimum water flows to see what how much cooling (or possibly heating) the unit is doing with primary air only. The output for this case is <span>${\dot Q_{pri}}$</span>.
 
-If <span>${\dot Q_{z,req}} < {\dot Q_{pri}}$</span> we need active heating. Set the cold water flow rate to the minimum. Check that the terminal unit can meet the load by setting the hot water flow rate to the maximum and calling *CalcFourPipeIndUnit*. If the output is less than the zone demand we are done – all the outputs have been calculated. Otherwise call *SolveRegulaFalsi* to obtain the hot water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
+If <span>${\dot Q_{z,req}} > {\dot Q_{pri}}$</span> we need active heating. Set the cold water flow rate to the minimum. Check that the terminal unit can meet the load by setting the hot water flow rate to the maximum and calling *CalcFourPipeIndUnit*. If the output is less than the zone demand we are done – all the outputs have been calculated. Otherwise call *SolveRegulaFalsi* to obtain the hot water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
 
-If <span>${\dot Q_{tot}}$</span>we need active cooling. We set the hot water flow rate to the minimum. We check whether the terminal unit can supply the needed output by setting the cold water flow rate to the maximum and calling *CalcFourPipeIndUnit.* If this maximum cooling output is not able to meet the zone cooling demand we are done. Otherwise call *SolveRegulaFalsi* to obtain the cold water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
+If <span>${\dot Q_{z,req}} < {\dot Q_{pri}}$</span>we need active cooling. We set the hot water flow rate to the minimum. We check whether the terminal unit can supply the needed output by setting the cold water flow rate to the maximum and calling *CalcFourPipeIndUnit.* If this maximum cooling output is not able to meet the zone cooling demand we are done. Otherwise call *SolveRegulaFalsi* to obtain the cold water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
 
 Note that the terminal unit output is never explicitly passed to another routine. Instead the output is saved as the outlet conditions on the terminal unit outlet air node. The node data is accessed when the terminal unit output is needed elsewhere in the program (in *SimZoneAirLoopEquipment* for instance).
 
@@ -275,7 +281,7 @@ The calculation is performed by simulating the sub-components in the order given
 
 *Series*
 
-From the result of the zone simulation we have the heating/cooling demand on the terminal unit <span>${T_{out}} = {T_z} + {\dot Q_{z,req}}/({\dot m_{air,tot}}\cdot {c_{p,air,z}})$</span>. The subroutine *CalcSeriesPIU* needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
+From the result of the zone simulation we have the heating/cooling demand on the terminal unit <span>${\dot Q_{tot}}$</span>. The subroutine *CalcSeriesPIU* needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
 
 ·        If the unit is scheduled off, the primary and secondary flow rates are set to zero.
 
@@ -287,37 +293,47 @@ From the result of the zone simulation we have the heating/cooling demand on the
 
 § We determine the fan temperature rise: the secondary air flow is set to the max total air flow, primary air flow to zero, and the mixer and fan are simulated. The fan delta T is the difference between the temperature at the fan’s outlet node and inlet node.
 
-§ We calculate the unit air outlet temperature needed to meet the zone cooling load: <span>${T_{mix}} = {T_{out}} - \Delta {T_{fan}}$</span>
+§ We calculate the unit air outlet temperature needed to meet the zone cooling load: <span>${T_{out}} = C{p_h} + {\dot Q_{z,req}}/({\dot m_{air,tot}}\cdot {c_{p,air,z}})$</span>
 
-§ The temperature needed at the outlet of the mixer is then: <span>${T_{mix}} \le {T_{in,pri}}$</span>
+§ The temperature needed at the outlet of the mixer is then: <span>${T_{mix}} = {T_{out}} - \Delta {T_{fan}}$</span>
 
 § We can then set the primary air flow rate.
 
-·        If <span>${\dot m_{pri}} = {\dot m_{pri,max}}$</span>then <span>${T_{mix}} \ge {T_{in,pri}}$</span>
+·        If 
+         <span>${T_{mix}} \le {T_{in,pri}}$</span>
+         then 
+         <span>${\dot m_{pri}} = {\dot m_{pri,max}}$</span>
 
-·        else if <span>${T_{mix}} \ge {T_{in,sec}}$</span>and <span>${\dot m_{pri}} = {\dot m_{pri,min}}$</span>then <span>${\dot m_{pri}} = {\dot m_{air,tot}}\cdot ({T_{in,sec}} - {T_{mix}})/({T_{in,sec}} - {T_{in,pri}})$</span>
+·        else if 
+         <span>${T_{mix}} \ge {T_{in,pri}}$</span>
+         and 
+         <span>${T_{mix}} \ge {T_{in,sec}}$</span>
+         then 
+         <span>${\dot m_{pri}} = {\dot m_{pri,min}}$</span>
 
-·        otherwise <span>$({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}$</span>, subject to the constraints that the flow rate can’t be bigger than the max and min allowed.
+·        otherwise 
+         <span>${\dot m_{pri}} = {\dot m_{air,tot}}\cdot ({T_{in,sec}} - {T_{mix}})/({T_{in,sec}} - {T_{in,pri}})$</span>
+         , subject to the constraints that the flow rate can’t be bigger than the max and min allowed.
 
 The air flow rates are now determined and we can fire the air mixer (Call *SimAir-Mixer*) and fan (Call *SimulateFanComponents*) component simulations. Finally we simulate the heating coil:
 
 ·        for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call *SimulateWaterCoilComponents*). Otherwise call *ControlCompOutput*; *ControlCompOutput* is a general component control routine. In this case it calls *SimulateWaterCoilComponents* repeatedly while varying the hot water flow rate and minimizing
 
-<div>\[{\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\]</div>
+<div>\[({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}\]</div>
 
 to within the heating convergence tolerance.
 
-·        For gas, electric or steam coils, the required coil output is set to <span>${\dot Q_{sens,out}} = {\rm{PsyHFnTdbW}}({T_{air,out}},{W_z}) - {\rm{PsyHFnTdbW(}}{T_z},{W_z})$</span>. Then the coil simulation is fired (Call *SimulateHeatingCoilComponent* or *SimulateSteamCoilCompo-nents*).
+·        For gas, electric or steam coils, the required coil output is set to <span>${\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})$</span>. Then the coil simulation is fired (Call *SimulateHeatingCoilComponent* or *SimulateSteamCoilCompo-nents*).
 
 Finally the unit sensible output is calculated:
 
-<div>\[{\dot Q_{tot}}\]</div>
+<div>\[{\dot Q_{sens,out}} = {\rm{PsyHFnTdbW}}({T_{air,out}},{W_z}) - {\rm{PsyHFnTdbW(}}{T_z},{W_z})\]</div>
 
 where *PsyHFnTdb* is the EnergyPlus function giving enthalpy as a function of temperature and humidity ratio.
 
 *Parallel*
 
-From the result of the zone simulation we have the heating/cooling demand on the terminal unit <span>${\dot m_{pri}} = {\dot Q_{z,req}}/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))$</span>. The subroutine *CalcParallelPIU* needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
+From the result of the zone simulation we have the heating/cooling demand on the terminal unit <span>${\dot Q_{tot}}$</span>. The subroutine *CalcParallelPIU* needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
 
 ·        If the unit is scheduled off, the primary and secondary flow rates are set to zero.
 
@@ -331,11 +347,11 @@ From the result of the zone simulation we have the heating/cooling demand on the
 
 § Assuming that the fan is off, we calculate the primary air flow needed to meet the cooling demand.
 
-<div>\[{\dot m_{pri}} = ({\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{sec}}\cdot ({T_{in,sec}} + \Delta {T_{fan}} - {T_z}))/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))\]</div>
+<div>\[{\dot m_{pri}} = {\dot Q_{z,req}}/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))\]</div>
 
 The flow rate is constrained to be between the min and max primary air flow rates. If this calculated primary flow rate is greater than the fan-on flow rate, the secondary flow rate is set to zero and we are done. Otherwise, the fan is on and we need to recalculate the primary air flow rate.
 
-<div>\[({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}\]</div>
+<div>\[{\dot m_{pri}} = ({\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{sec}}\cdot ({T_{in,sec}} + \Delta {T_{fan}} - {T_z}))/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))\]</div>
 
 The secondary flow rate is set to the user input fixed flow rate. The primary air flow rate is constrained to be between the min and max primary flow rated.
 
@@ -343,15 +359,15 @@ The air flow rates are now determined and we can fire the fan (Call *SimulateFan
 
 ·        for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call *SimulateWaterCoilComponents*). Otherwise call *ControlCompOutput*; *ControlCompOutput* is a general component control routine. In this case it calls *SimulateWaterCoilComponents* repeatedly while varying the hot water flow rate and minimizing
 
-<div>\[{\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\]</div>
+<div>\[({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}\]</div>
 
 to within the heating convergence tolerance.
 
-·        For gas, electric or steam coils, the required coil output is set to <span>${\dot Q_{sens,out}} = {\rm{PsyHFnTdbW}}({T_{air,out}},{W_z}) - {\rm{PsyHFnTdbW(}}{T_z},{W_z})$</span>. Then the coil simulation is fired (Call *SimulateHeatingCoilComponent* or *SimulateSteamCoilCompo-nents*).
+·        For gas, electric or steam coils, the required coil output is set to <span>${\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})$</span>. Then the coil simulation is fired (Call *SimulateHeatingCoilComponent* or *SimulateSteamCoilCompo-nents*).
 
 Finally the unit sensible output is calculated:
 
-<div>\[{\dot Q_{out}} = {\dot m_{air}}\cdot {c_{p,air}}\cdot ({T_{air,out}} - {T_{air,zone}})\]</div>
+<div>\[{\dot Q_{sens,out}} = {\rm{PsyHFnTdbW}}({T_{air,out}},{W_z}) - {\rm{PsyHFnTdbW(}}{T_z},{W_z})\]</div>
 
 where *PsyHFnTdb* is the EnergyPlus function giving enthalpy as a function of temperature and humidity ratio.
 
@@ -385,13 +401,17 @@ The heating coil is simulated (call *SimulateWaterCoilComponents* if the coil is
 
 Finally the sensible load met by the terminal unit is calculated and passed back to the calling routine:
 
-<div>\[{\dot Q_{tot}}\]</div>
+<div>\[{\dot Q_{out}} = {\dot m_{air}}\cdot {c_{p,air}}\cdot ({T_{air,out}} - {T_{air,zone}})\]</div>
 
 Note that data is never explicitly passed between the sub-components. This is all handled automatically by the node connections and the data stored on the nodes.
 
 #### Simulation and Control
 
-From the result of the zone simulation we have the heating/cooling demand on the terminal unit <span>$({\dot Q_{tot}} - {\dot Q_{out}})/{\dot Q_{tot}}$</span>. For the given inlet conditions *CalcVAVVS* will give us the terminal unit heating/cooling output. We need to vary the air or hot water flow rate or the heating coil power (for gas or electric coils) to make the unit output match the demand. To do this we need to numerically invert *CalcVAVVS*: given the output, we want one of the inputs – the air or hot water flow rate or the heating coil power. The numerical inversion is carried out by calling subroutine *SolveRegulaFalsi*. This is a general utility routine for finding the zero of a function (the *residual* function) of a single independent variable. In this case the residual function calculates <span>${\dot Q_{cool,max,fanon}}$</span>. *SolveRegulaFalsi* varies either the air mass flow rate, the hot water mass flow rate or the heating coil power to zero the residual.
+From the result of the zone simulation we have the heating/cooling demand on the terminal unit 
+<span>${\dot Q_{tot}}$</span>
+. For the given inlet conditions *CalcVAVVS* will give us the terminal unit heating/cooling output. We need to vary the air or hot water flow rate or the heating coil power (for gas or electric coils) to make the unit output match the demand. To do this we need to numerically invert *CalcVAVVS*: given the output, we want one of the inputs – the air or hot water flow rate or the heating coil power. The numerical inversion is carried out by calling subroutine *SolveRegulaFalsi*. This is a general utility routine for finding the zero of a function (the *residual* function) of a single independent variable. In this case the residual function calculates 
+<span>$({\dot Q_{tot}} - {\dot Q_{out}})/{\dot Q_{tot}}$</span>
+. *SolveRegulaFalsi* varies either the air mass flow rate, the hot water mass flow rate or the heating coil power to zero the residual.
 
 The unit is simulated in the following sequence.
 
@@ -401,11 +421,32 @@ If the unit is off, call *CalcVAVVS* with flow rates set to their minimum flows 
 
 If the unit is on, we need to establish the boundaries of 4 conditioning regions: a) active cooling with fan on; b) active heating with fan on; c) active heating with fan off; d) passive cooling with fan off. The heating/cooling demand will fall into one of these regions. Once the correct region is determined, we will know which model input to vary for control and thus how to invert the calculation.
 
-To establish the boundaries of region a) we call *CalcVAVVS* twice: once with the supply air flow rate set to the cooling maximum, once with the cooling air flow rate set to the minimum. In both cases the heating coil output is at the minimum and the fan is on. Call the 2 cooling outputs <span>${\dot Q_{cool,min,fanon}}$</span>and <span>${\dot Q_{tot}} < {\dot Q_{cool,max,fanon}}$</span>. Remembering that EnergyPlus convention is that cooling loads are negative, then if <span>${\dot Q_{cool,max,fanon}} < {\dot Q_{tot}} < {\dot Q_{cool,min,fanon}}$</span>the terminal unit can not meet the demand. Set the air mass flow rate to the cooling maximum and call *CalcVAVV* again. This concludes the simulation. If  <span>${\dot Q_{heat,max,fanon}}$</span>the cooling demand is in the active cooling region. We hold the heating at the minimum, allow the supply air flow to vary between the cooling maximum and the minimum with the fan on, and call *SolveRegulaFalsi* to obtain the supply air flow rate that will produce the unit sensible cooling output that matches the demand. This concludes the simulation.
+To establish the boundaries of region a) we call *CalcVAVVS* twice: once with the supply air flow rate set to the cooling maximum, once with the cooling air flow rate set to the minimum. In both cases the heating coil output is at the minimum and the fan is on. Call the 2 cooling outputs 
+<span>${\dot Q_{cool,max,fanon}}$</span>
+and 
+<span>${\dot Q_{cool,min,fanon}}$</span>
+. Remembering that EnergyPlus convention is that cooling loads are negative, then if 
+<span>${\dot Q_{tot}} < {\dot Q_{cool,max,fanon}}$</span>
+the terminal unit can not meet the demand. Set the air mass flow rate to the cooling maximum and call *CalcVAVV* again. This concludes the simulation. If  
+<span>${\dot Q_{cool,max,fanon}} < {\dot Q_{tot}} < {\dot Q_{cool,min,fanon}}$</span>
+the cooling demand is in the active cooling region. We hold the heating at the minimum, allow the supply air flow to vary between the cooling maximum and the minimum with the fan on, and call *SolveRegulaFalsi* to obtain the supply air flow rate that will produce the unit sensible cooling output that matches the demand. This concludes the simulation.
 
-To establish the boundaries of region b) call *CalcVAVVS* twice: once with the supply air flow rate set to the heating maximum, once with the supply air flow rate set to the minimum. In both calls, if the heating coil is a hot water coil, the hot water flow rate is at the maximum. For electric and gas coils, the heating power is set to the maximum at maximum supply air flow and to zero at the minimum supply air flow. In both calls the fan is set to be on. Call the 2 heating outputs returned from the two calls to *CalcVAVVS* <span>${\dot Q_{heat,min,fanon}}$</span>and <span>${\dot Q_{heat,max,fanon}} < {\dot Q_{tot}}$</span>. If <span>${\dot Q_{heat,min,fanon}} < {\dot Q_{tot}} < {\dot Q_{heat,max,fanon}}$</span> the terminal unit can not meet the load. Set the air flow rate to the heating maximum and the hot water flow rate or heating coil power to the maximum and call *CalcVAVVS* again. This concludes the simulation for this case. If <span>${\dot Q_{heat,max,fanoff}}$</span> the heating demand is in the active heating, fan on region. For a hot water coil we call *SolveRegulaFalsi* with the supply air flow rate as the input that is varied and the hot water flow rate set to the maximum. For electric and gas coils the coil power and the supply air flow rate are both varied together from their minimum to maximum in a call to *SolveRegulaFalsi*.  The call to *SolveRegulaFalsi* concludes the simulation for this case.
+To establish the boundaries of region b) call *CalcVAVVS* twice: once with the supply air flow rate set to the heating maximum, once with the supply air flow rate set to the minimum. In both calls, if the heating coil is a hot water coil, the hot water flow rate is at the maximum. For electric and gas coils, the heating power is set to the maximum at maximum supply air flow and to zero at the minimum supply air flow. In both calls the fan is set to be on. Call the 2 heating outputs returned from the two calls to *CalcVAVVS* 
+<span>${\dot Q_{heat,max,fanon}}$</span>
+and 
+<span>${\dot Q_{heat,min,fanon}}$</span>
+. If 
+<span>${\dot Q_{heat,max,fanon}} < {\dot Q_{tot}}$</span>
+the terminal unit can not meet the load. Set the air flow rate to the heating maximum and the hot water flow rate or heating coil power to the maximum and call *CalcVAVVS* again. This concludes the simulation for this case. If 
+<span>${\dot Q_{heat,min,fanon}} < {\dot Q_{tot}} < {\dot Q_{heat,max,fanon}}$</span>
+the heating demand is in the active heating, fan on region. For a hot water coil we call *SolveRegulaFalsi* with the supply air flow rate as the input that is varied and the hot water flow rate set to the maximum. For electric and gas coils the coil power and the supply air flow rate are both varied together from their minimum to maximum in a call to *SolveRegulaFalsi*.  The call to *SolveRegulaFalsi* concludes the simulation for this case.
 
-This region only applies to terminal units with a hot water coil. To establish the boundaries of region c) the fan is set to off, the supply air flow rate is set to minimum flow and *CalcVAVVS* is called twice: once with the hot water flow at maximum and once with the hot water flow at minimum. Call the two heating outputs <span>${\dot Q_{heat,min,fanoff}}$</span>and <span>${\dot Q_{tot}}$</span>. If <span>${\dot Q_{Zone}} = {\dot m_c}C{p_c}{T_c} + {\dot m_h}C{p_h}{T_h} - {\dot m_d}C{p_z}{T_z}$</span> is between these values, the supply air flow rate is set to its minimum, the fan is set to off, and in the call to *SolveRegulaFalsi* the hot water flow rate is varied to meet the load. This concludes the simulation for this case.
+This region only applies to terminal units with a hot water coil. To establish the boundaries of region c) the fan is set to off, the supply air flow rate is set to minimum flow and *CalcVAVVS* is called twice: once with the hot water flow at maximum and once with the hot water flow at minimum. Call the two heating outputs 
+<span>${\dot Q_{heat,max,fanoff}}$</span> 
+and <span>${\dot Q_{tot}}$</span>
+. If 
+<span>${\dot Q_{tot}}$</span>
+ is between these values, the supply air flow rate is set to its minimum, the fan is set to off, and in the call to *SolveRegulaFalsi* the hot water flow rate is varied to meet the load. This concludes the simulation for this case.
 
 If the cooling demand does not fall into cases a) – c), the unit is assumed to be in the passive cooling state: heating is off or at the minimum, the fan is off, and the minimum supply air flow is delivered to the zone.
 
@@ -513,31 +554,31 @@ The input object AirTerminal:DualDuct:ConstantVolume provides a model for dual d
 
 The DDCAV model will attempt to meet all of the thermostatic loads of a particular zone by explicitly calculating the hot and cold deck mass flow rates. For the energy and mass balance equations shown below, the zone load, temperatures, specific heats and the design mass flow rate are all known. These equations can then be solved directly for the hot deck and cold deck mass flow rates.
 
-<div>\[{\dot m_d} = {\dot m_c} + {\dot m_h}\]</div>
+<div>\[\dot Q_{zone} = \dot m_c C_{p,c} T_c + \dot m_h C_{p,h}T_h - \dot m_d C_{p,z} T_z\]</div>
 
-<div>\[{\dot Q_{Zone}}\]</div>
+<div>\[\dot m_d = \dot m_c + \dot m_h\]</div>
 
 Where:
 
-<span>$C{p_z}$</span>= Zone load, W (positive=heating, negative=cooling)
+<span>$\dot Q_{zone}$</span>= Zone load, W (positive=heating, negative=cooling)
 
-<span>$C{p_c}$</span>= Specific heat of zone air, J/kg-K
+<span>$C{p_z}$</span>= Specific heat of zone air, J/kg-K
 
-<span>$C{p_h}$</span>= Specific heat of cold deck air, J/kg-K
+<span>$C{p_c}$</span>= Specific heat of cold deck air, J/kg-K
 
-<span>${T_z}$</span>= Specific heat of hot deck air, J/kg-K
+<span>$C{p_h}$</span>= Specific heat of hot deck air, J/kg-K
 
-<span>${T_c}$</span>= Zone air dry-bulb temperature, °C
+<span>${T_z}$</span>= Zone air dry-bulb temperature, °C
 
-<span>${T_h}$</span>= Cold deck air dry-bulb temperature, °C
+<span>${T_c}$</span>= Cold deck air dry-bulb temperature, °C
 
-<span>${\dot m_d}$</span>= Hot deck air dry-bulb temperature, °C
+<span>${T_h}$</span>= Hot deck air dry-bulb temperature, °C
 
-<span>${\dot m_c}$</span>= System design air mass flow rate through both heating or cooling duct, kg/s
+<span>${\dot m_d}$</span>= System design air mass flow rate through both heating or cooling duct, kg/s
 
-<span>${\dot m_h}$</span>= Cold deck air mass flow rate, kg/s
+<span>${\dot m_c}$</span>= Cold deck air mass flow rate, kg/s
 
-<span>$C{p_{zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)$</span>= Hot deck air mass flow rate, kg/s
+<span>${\dot m_h}$</span>= Hot deck air mass flow rate, kg/s
 
 #### Simulation and Control
 
@@ -571,27 +612,27 @@ This dual duct air terminal may also be used to provide a minimum outdoor air qu
 
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand using either the heating duct or cooling duct.
 
-<div>\[C{p_{inlet}} = PsyCpAirFnWTdb\left( {{\omega_{inlet}},{T_{inlet}}} \right)\]</div>
+<div>\[C{p_{zone}} = \dot m\left( {C{p_{inlet}},{T_{zone}}} \right)\]</div>
+
+<div>\[C{p_{zone}} = PsyCpAirFnWTdb\left( {{T_{zone}},{T_{inlet}}} \right)\]</div>
 
 <div>\[DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C{p_{zone}}} \right)\left( {{T_{zone}}} \right)\]</div>
 
-<div>\[\dot m = MIN\left( {{{\dot m}_{max}},\,\,\,MAX\left( {{{\dot m}_{max}}*MinAirFlowFrac\,,\,\,\,{\raise0.7ex\hbox{${{{\dot Q}_{zone}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{zone}}} {DeltaCpT}}}\right.}\!\lower0.7ex\hbox{${DeltaCpT}$}}} \right)\,\,} \right)\]</div>
-
-<div>\[C{p_{zone}}\]</div>
+<div>\[ \dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac,\frac{\dot Q_{zone}}{DeltaCpT} \right) \right) \]</div>
 
 where
 
-<span>$C{p_{inlet}}$</span>  = Specific heat of zone air, J/kg-K
+<span>$C{p_{zone}}$</span>  = Specific heat of zone air, J/kg-K
 
-<span>${\omega_{zone}}$</span>  = Specific heat of terminal unit inlet air, J/kg-K
+<span>$C{p_{inlet}}$</span>  = Specific heat of terminal unit inlet air, J/kg-K
 
-<span>${T_{zone}}$</span>    = Zone air humidity ratio, kg/kg
+<span>${\omega_{zone}}$</span>    = Zone air humidity ratio, kg/kg
 
-<span>${\omega_{inlet}}$</span>     = Zone air dry-bulb temperature, °C
+<span>${T_{zone}}$</span>     = Zone air dry-bulb temperature, °C
 
-<span>${T_{inlet}}$</span>    = Terminal unit inlet air humidity ratio, kg/kg
+<span>${\omega_{inlet}}$</span>    = Terminal unit inlet air humidity ratio, kg/kg
 
-<span>${\dot Q_{zone}}$</span>     = Terminal unit inlet air dry-bulb temperature, °C
+<span>${T_{inlet}}$</span>     = Terminal unit inlet air dry-bulb temperature, °C
 
 <span>$\dot m$</span>    = Zone load, W (positive values denote heating, negative values denote cooling)
 
@@ -599,9 +640,9 @@ where
 
 <span>$MinAirFlowFrac$</span>           = Psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
 
-<span>${\dot m_{max}}$</span>    = User-specified zone minimum air flow fraction
+<span>$MinAirFlowFrac$</span>    = User-specified zone minimum air flow fraction
 
-<span>$\mathop m\limits^\cdot   = MAX\left( {\mathop m\limits^\cdot  ,\,{\raise0.7ex\hbox{${\mathop {{m_{OA}}}\limits^\cdot  }$} \!\mathord{\left/ {\vphantom {{\mathop {{m_{OA}}}\limits^\cdot  } {OAFrac}}}\right.}\!\lower0.7ex\hbox{${OAFrac}$}}} \right)$</span>              = Terminal unit maximum air mass flow rate, kg/s
+<span>${\dot m_{max}}$</span>              = Terminal unit maximum air mass flow rate, kg/s
 
 The outdoor air input requirements, if entered, are then used to adjust the terminal unit air mass flow rate to ensure the correct amount of outdoor air enters the zone (within the constraints of the terminal unit maximum and minimum flow rate inputs). The amount of outdoor air is calculated per the outdoor air requirements and is adjusted by the fraction of outdoor air entering the air loop outdoor air system.
 
@@ -1721,7 +1762,13 @@ The heating electric input to the chiller is computed as follows:
 
 If the chiller is delivering heating and cooling simultaneously, the parasitic electric load will be double-counted, so the following logic is applied:
 
-<div>\[\begin{array}{l}{\rm{  IF (}}HeatElectricPower \le CoolElectricPower{\rm{) THEN}}\\\{\rm{    }}HeatElectricPower = {\rm{0}}{\rm{.0}}\\\{\rm{  ELSE}}\\\{\rm{    }}HeatElectricPower = HeatElectricPower - CoolElectricPower\\\{\rm{  ENDIF}}\end{array}\]</div>
+```
+IF ( HeatElectricPower <= CoolElectricPower ) THEN
+  HeatElectricPower = 0.0
+ELSE
+  HeatElectricPower = HeatElectricPower - CoolElectricPower
+ENDIF
+```
 
 The total fuel and electric power input to the chiller is computed as shown below:
 
