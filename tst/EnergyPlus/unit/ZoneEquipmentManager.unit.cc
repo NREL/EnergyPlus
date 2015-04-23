@@ -40,10 +40,11 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::ZoneEquipmentManager;
 using DataZoneControls::TempControlledZone;
 using DataZoneControls::NumTempControlledZones;
-
+using DataHVACGlobals::SingleCoolingSetPoint;
 
 TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 {
+	ShowMessage( "Begin Test: ZoneEquipmentManager, SizeZoneEquipmentTest" );
 	// checks if the CalcZoneSizing().CoolZoneHumRat variables is allocated
 	// to zero value when the zone design cooling load is zero.
 
@@ -102,6 +103,7 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	DataHeatBalFanSys::ZoneMassBalanceFlag.allocate( NumOfZones );
 	DataHeatBalFanSys::ZoneInfiltrationFlag.allocate( NumOfZones );
 	DataHeatBalFanSys::ZoneLatentGain.allocate( NumOfZones );
+	DataHeatBalFanSys::TempControlType.allocate( NumOfZones );
 	DataHeatBalance::Zone.allocate( NumOfZones );
 	DataHeatBalance::MassConservation.allocate( NumOfZones );
 	DataHeatBalance::ZoneIntGain.allocate( NumOfZones );
@@ -166,6 +168,7 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance = false;
 	DataHeatBalFanSys::ZoneMassBalanceFlag( CtrlZoneNum ) = false;
 	DataHeatBalFanSys::ZoneLatentGain( CtrlZoneNum ) = 0.0;
+	DataHeatBalFanSys::TempControlType( CtrlZoneNum ) = DataHVACGlobals::SingleCoolingSetPoint;
 	DataHeatBalance::RefrigCaseCredit( CtrlZoneNum ).LatCaseCreditToHVAC = 0.0;
 	DataContaminantBalance::Contaminant.CO2Simulation = false;
 	DataContaminantBalance::Contaminant.GenericContamSimulation = false;
@@ -174,7 +177,7 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ActualZoneNum = CtrlZoneNum;
 	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).SupplyAirNode = ZoneSupplyNode;
 	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).SupplyAirAdjustFactor = 1.0;
-	CalcZoneSizing( CurOverallSimDay,CtrlZoneNum ).CoolDesTemp = 25.0;
+	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDesTemp = 25.0;
 	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDesHumRat = 0.0075;
 	CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoad = 0.0;
 	TempZoneThermostatSetPoint( CtrlZoneNum ) = 24.0;
@@ -198,9 +201,8 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 
 	ZoneEquipmentManager::SizeZoneEquipment();
 	
-	EXPECT_NEAR( 0.0075, CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRat, 0.0001 );
-	//EXPECT_NEAR( 0.0075, FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, 0.00001 );
-	
+	// tests humidity ratio variable is initialized to zero when zone load is zero
+	EXPECT_EQ( 0.0, CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRat );
 	
 	// delete variables
 	CalcZoneSizing.deallocate();
