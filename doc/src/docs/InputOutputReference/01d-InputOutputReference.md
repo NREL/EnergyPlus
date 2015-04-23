@@ -10623,19 +10623,19 @@ These are the power and energy outputs for the TES tank   s heat exchange with t
 
 ### Secondary Coils of DX System and Heat Pump
 
-Secondary Coils reject to or remove heat from a secondary zone as part of a DX system or an air-to-air heat pump. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed inside a zone either heat is dumped to or extracted from a secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coils but they are add-on features on existing DX coil objects. A secondary DX coil is modelled by specifying additional inputs in one of the following DX coil objects: Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, and Coil:Heating:DX:MultiSpeed. These additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary (active) coil is serving another controlled zone as shown in [Figure](#SecondaryCoilsFigure1).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. Heat is rejected or extracted depending on the primary DX coil operating modes.  For instance, heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only whereas the energy extracted from a secondary zone may contain sensible and latent components.
+Secondary Coils reject to or remove heat from a secondary zone as part of a DX system or an air-to-air heat pump. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed inside a zone either heat is dumped to or extracted from a secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coils but they are add-on features on existing DX coil objects. A secondary DX coil is modeled by specifying additional inputs in one of the following DX coil objects: Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, and Coil:Heating:DX:MultiSpeed. These additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary (active) coil is serving another controlled zone as shown in [Figure](#SecondaryCoilsFigure1).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. Heat is rejected or extracted depending on the primary DX coil operating modes.  For instance, heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only whereas the energy extracted from a secondary zone may contain sensible and latent components.
 
 ![](InputOutputReference/media/image903.png)
 
 Figure: Schematic of DX System and heat pump in cooling operating mode <a name="SecondaryCoilsFigure1"></a>
 
-Heat rejected or extracted by the secondary DX coil installed in a secondary zone is estimated from the DX coil models and it is considered as internal gains of the secondary zone. The capacity and electric power input of the DX system and heat pumps are determined from the operating modes of the primary cooling or heating DX coils. Calculation of a secondary coil tracks the operating modes of the primary DX coil serving the primary conditioned zone(s). Currently allowed DX coil models are single speed, two speed and multi speed DX Systems and Heat Pumps.  To model secondary DX coils the condenser type should be AirCooled.  There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. And the fuel type in multispeed DX coils should Electricity.
+Applications of this technology include: inter-zone heat pump in NTED (Dixon, 2010), and PTAC or PTHP serving Offices attached to a Warehouse, where the office partially or fully enclosed by the warehouse and the condenser is inside the Warehouse. Heat rejected or extracted by the secondary DX coil installed in a secondary zone is estimated from the DX coil models and it is considered as internal gains of the secondary zone. The capacity and electric power input of the DX system and heat pumps are determined from the operating modes of the primary cooling or heating DX coils. Calculation of a secondary coil tracks the operating modes of the primary DX coil serving the primary conditioned zone(s). Currently allowed DX coil models are single speed, two speed and multi speed DX Systems and Heat Pumps.  To model secondary DX coils the condenser type should be AirCooled.  There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. And the fuel type in multispeed DX coils should Electricity.
 
-**Cooling Operating Mode**: the primary DX cooling coil of a DX system serving a primary zone is active and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects.  This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in [Figure](#SecondaryCoilsFigure2). Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked.  New input field required as add-on to the DX cooling coil objects is a zone name for the secondary coil (condenser) placement. 
+**Cooling Operating Mode**: the primary DX cooling coil of a DX system serving a primary zone is active and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects.  This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in [Figure](#SecondaryCoilsFigure2). Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked. The only input field required to invoke the secondary DX coil in cooling operating model is to add a zone name in the input field  _Zone Name for Condenser Placement_ in the DX cooling coil object. 
 
 #### Field: Zone Name for Condenser Placement
 
-This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into a zone.  The heat rejected is modeled as sensible internal gain of a secondary zone. 
+This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into this zone.  The heat rejected is modeled as sensible internal gain of a secondary zone. 
 
 ![](InputOutputReference/media/image904.png)
 
@@ -10824,7 +10824,7 @@ Coil:Cooling:DX:MultiSpeed,
     NORTH ZONE;              !- Zone Name for Condenser Placement
 ```
 
-**Heating Operating Mode**: When a heat pump operates in heating mode then energy is extracted from the secondary zone.  Total energy extracted from a secondary zone may contain sensible and latent components.  The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction.  If the coil operation is dry, then the SHR is set to 1.0.  In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside.  Thus, defrosting energy is not included in the zone energy balance. New input fields required in the single speed DX heating coils include:
+**Heating Operating Mode**: When a heat pump operates in heating mode then energy is extracted from the secondary zone.  Total energy extracted from a secondary zone may contain sensible and latent components.  The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction.  If the coil operation is dry, then the SHR is set to 1.0.  In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside.  Thus, defrosting energy is not included in the zone energy balance. The six optioal input fields required in the DX heating coils are the following. The last five input fields are extensible depending on the speed of the heating DX coil:
 
 #### Field: Zone Name for Evaporator Placement
 
@@ -10976,6 +10976,21 @@ Coil:Heating:DX:MultiSpeed,
     DXSecondaryCoilSHRFFF;   !- Speed 4 Sensible Heat Ratio Function of Flow Fraction Curve Name
 ```
 
+### Secondary DX Coil Output
+
+* HVAC, Average, Secondary Coil Heat Rejection Rate [W] 
+
+* HVAC, Average, Secondary Coil Total Heat Removal Rate [W]
+
+* HVAC, Average, Secondary Coil Sensible Heat Removal Rate [W]
+
+* HVAC, Average, Secondary Coil Latent Heat Removal Rate [W]
+
+* HVAC, Average, Secondary Coil Sensible Heat Ratio []
+
+* HVAC, Average, Secondary Coil Compressor Part Load Ratio []
+
+
 #### Secondary Coil Heat Rejection Rate [W]
 
 This is the sensible heat rejected to a zone by a secondary DX coil (condenser) in Watts. This is sum of the total cooling rate of a DX cooling coil and cooling electric power of the primary DX coil.  This heat is applied as an internal gain to the secondary zone where the condenser is installed.
@@ -10988,7 +11003,7 @@ This is the total energy removed from a a zone by a secondary DX coil (evaporato
 
 This is the sensible heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is determined by multiplying the total heat removed with sensible heat ratio of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that sensible heat is removed from the zone.
 
-#### Secondary Coil Total Heat  Removal Rate [W]
+#### Secondary Coil Latent Heat  Removal Rate [W]
 
 This is the latent heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is the difference between the total heat removal rate and the sensible heat remobal rate of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that moisture is removed from the zone.
 
@@ -10998,7 +11013,9 @@ This is the operating sensible heat ratio the secondary DX coil (condenser) when
 
 #### Secondary Coil Compressor Part Load Ratio []
 
-This is the compressor part load ratio when the heat pump is operating in heating mode and the secondary coil is extracting heat from a zone where the later is installed.
+This is the compressor part load ratio when the heat pump is operating in heating mode and the secondary coil is extracting heat from a zone where the coil is installed. The secondary coil DX coil compressor part load ratio can be different from the primary DX coil compressor part load ratio in that the later may include the defrosting load.
+
+Reference: Dixon, Erin Elizabeth, "Energy Model Development and Heating Energy Investigation of the Nested Thermal Envelope Design (NTED (tm))" (2010). Theses and dissertations. Paper 974.
 
 Group     Fans
 ------------
