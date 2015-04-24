@@ -219,6 +219,7 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	SysDepZoneLoads.deallocate();
 	TempZoneThermostatSetPoint.deallocate();
 	TempControlledZone.deallocate();
+	TempControlType.deallocate();
 	Zone.deallocate();
 	ZoneEquipConfig( 1 ).InletNode.deallocate();
 	ZoneEquipConfig( 1 ).ExhaustNode.deallocate();
