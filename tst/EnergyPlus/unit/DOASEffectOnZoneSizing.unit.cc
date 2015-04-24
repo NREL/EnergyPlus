@@ -7,14 +7,10 @@
 #include <ZoneEquipmentManager.hh>
 #include <InputProcessor.hh>
 #include <DataStringGlobals.hh>
-#include <DataEnvironment.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ZoneEquipmentManager;
 using namespace EnergyPlus::InputProcessor;
-using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::Psychrometrics;
 
 using namespace ObjexxFCL;
 
@@ -35,18 +31,17 @@ TEST(DOASEffectOnZoneSizing, CalcDOASSupCondsForSizing)
   DOASHighTemp = 23.9;
   OutDB = 10.0;
   OutHR = 0.005;
-  StdBaroPress = 101325.0;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, DOASSupTemp, DOASSupHR );  
+  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );  
   EXPECT_DOUBLE_EQ( 21.1, DOASSupTemp );
   EXPECT_DOUBLE_EQ( 0.005, DOASSupHR );
   OutDB = 35.6;
   OutHR = 0.0185;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, DOASSupTemp, DOASSupHR );
+  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );
   EXPECT_DOUBLE_EQ( 23.9, DOASSupTemp );
-  EXPECT_DOUBLE_EQ( 0.017, DOASSupHR );
+  EXPECT_DOUBLE_EQ( 0.016, DOASSupHR );
   OutDB = 22.3;
   OutHR = 0.0085;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, DOASSupTemp, DOASSupHR );
+  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );
   EXPECT_DOUBLE_EQ( 22.3, DOASSupTemp );
   EXPECT_DOUBLE_EQ( 0.0085, DOASSupHR );
   // neutral dehumidified supply air
@@ -55,12 +50,12 @@ TEST(DOASEffectOnZoneSizing, CalcDOASSupCondsForSizing)
   DOASHighTemp = 22.2;
   OutDB = 11;
   OutHR = 0.004;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, DOASSupTemp, DOASSupHR );
+  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0153, 0.0092, DOASSupTemp, DOASSupHR );
   EXPECT_DOUBLE_EQ( 22.2, DOASSupTemp );
   EXPECT_DOUBLE_EQ( 0.004, DOASSupHR );
   OutDB = 35.6;
   OutHR = 0.0185;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, DOASSupTemp, DOASSupHR );
+  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0153, 0.0092, DOASSupTemp, DOASSupHR );
   EXPECT_DOUBLE_EQ( 22.2, DOASSupTemp );
   EXPECT_DOUBLE_EQ( 0.0092, DOASSupHR );
   // cold supply air
@@ -69,12 +64,12 @@ TEST(DOASEffectOnZoneSizing, CalcDOASSupCondsForSizing)
   DOASHighTemp = 14.4;
   OutDB = 11;
   OutHR = 0.005;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, DOASSupTemp, DOASSupHR );
+  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0092, 0.008, DOASSupTemp, DOASSupHR );
   EXPECT_DOUBLE_EQ( 14.4, DOASSupTemp );
   EXPECT_DOUBLE_EQ( 0.005, DOASSupHR );
   OutDB = 35.6;
   OutHR = 0.0185;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, DOASSupTemp, DOASSupHR );
+  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0092, 0.008, DOASSupTemp, DOASSupHR );
   EXPECT_DOUBLE_EQ( 12.2, DOASSupTemp );
   EXPECT_DOUBLE_EQ( 0.008, DOASSupHR );
 }

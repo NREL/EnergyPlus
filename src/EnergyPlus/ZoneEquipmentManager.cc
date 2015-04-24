@@ -518,6 +518,7 @@ namespace ZoneEquipmentManager {
 		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::SmallTempDiff;
 		using General::RoundSigDigits;
+		using DataEnvironment::StdBaroPress;
 
 		// Parameters
 		static std::string const RoutineName( "SizeZoneEquipment" );
@@ -558,8 +559,8 @@ namespace ZoneEquipmentManager {
 		Real64 DOASSupplyHumRat( 0.0 ); // DOAS supply air humidity ratio [kg H2O / kg dry air]
 		Real64 DOASCpAir( 0.0 ); // heat capacity of DOAS air [J/kg-C]
 		Real64 DOASSysOutputProvided( 0.0 ); // heating / cooling provided by DOAS system [W]
-		Real64 HR90H;
-		Real64 HR90L;
+		Real64 HR90H; // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+		Real64 HR90L; // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
 		if ( MyOneTimeFlag ) {
 			SetUpZoneSizingArrays();
@@ -574,6 +575,9 @@ namespace ZoneEquipmentManager {
 			SysDepZoneLoads( ActualZoneNum ) = 0.0;
 			InitSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided );
 			ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
+			SupplyAirNode = 0;
+			SupplyAirNode1 = 0;
+			SupplyAirNode2 = 0;
 			// calculate DOAS heating/cooling effect
 			if ( ZoneSizingInput( ControlledZoneNum ).AccountForDOAS ) {
 				// check for adequate number of supply nodes
@@ -591,25 +595,23 @@ namespace ZoneEquipmentManager {
 					ShowFatalError( "Previous severe error causes abort " );
 				}
 				// set the DOAS mass flow rate and supply temperature and humidity ratio
-				HR90H = PsyWFnTdbRhPb( ZoneSizingInput( ControlledZoneNum ).DOASHighSetpoint, 0.9, 101325. );
-				HR90L = PsyWFnTdbRhPb( ZoneSizingInput( ControlledZoneNum ).DOASLowSetpoint, 0.9, 101325. );
+				HR90H = PsyWFnTdbRhPb( ZoneSizingInput( ControlledZoneNum ).DOASHighSetpoint, 0.9, StdBaroPress );
+				HR90L = PsyWFnTdbRhPb( ZoneSizingInput( ControlledZoneNum ).DOASLowSetpoint, 0.9, StdBaroPress );
 				DOASMassFlowRate = CalcFinalZoneSizing( ControlledZoneNum ).MinOA;
 				CalcDOASSupCondsForSizing( OutDryBulbTemp, OutHumRat, ZoneSizingInput(ControlledZoneNum).DOASControlStrategy,
 					ZoneSizingInput( ControlledZoneNum ).DOASLowSetpoint, ZoneSizingInput( ControlledZoneNum ).DOASHighSetpoint,
-					HR90H, HR90L,
-					DOASSupplyTemp, DOASSupplyHumRat );
+					HR90H, HR90L, DOASSupplyTemp, DOASSupplyHumRat );
 				DOASCpAir = PsyCpAirFnWTdb( DOASSupplyHumRat, DOASSupplyTemp );
 				DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * ( DOASSupplyTemp - Node( ZoneNode ).Temp );
 				UpdateSystemOutputRequired( ActualZoneNum, DOASSysOutputProvided, LatOutputProvided );
 				Node( SupplyAirNode1 ).Temp = DOASSupplyTemp;
 				Node( SupplyAirNode1 ).HumRat = DOASSupplyHumRat;
-				Node( SupplyAirNode1 ).Enthalpy = Enthalpy;
 				Node( SupplyAirNode1 ).MassFlowRate = DOASMassFlowRate;
 				Node( SupplyAirNode1 ).Enthalpy = PsyHFnTdbW( DOASSupplyTemp, DOASSupplyHumRat );
 				SupplyAirNode = SupplyAirNode2;
 			}
 			else {
-				SupplyAirNode = SupplyAirNode1;
+				SupplyAirNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( 1 );
 			}
 
 			// Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
@@ -732,8 +734,8 @@ namespace ZoneEquipmentManager {
 		int DOASControl, // dedicated outside air control strategy
 		Real64 DOASLowTemp, // DOAS low setpoint [C]
 		Real64 DOASHighTemp, // DOAS high setpoint [C]
-		Real64 W90H; // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
-		Real64 W90L; // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+		Real64 W90H, // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+		Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 		Real64 & DOASSupTemp, // DOAS supply temperature [C]
 		Real64 & DOASSupHR // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
 		)
