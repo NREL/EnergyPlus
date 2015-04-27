@@ -3608,7 +3608,6 @@ namespace WaterThermalTanks {
 									// Normalize the fractions so they sum to 1.
 									for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
 										Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac /= SumFrac;
-										std::cout << "Node = " << NodeNum << ", Fraction = " << Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac << std::endl;
 									}
 								}
 							}
