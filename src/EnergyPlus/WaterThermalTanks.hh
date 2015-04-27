@@ -1132,6 +1132,7 @@ namespace WaterThermalTanks {
 		Real64 ControlSensor2Height; // location from bottom of tank of control sensor 2
 		int ControlSensor2Node; // Node number of control sensor 2
 		Real64 ControlSensor2Weight; // weight of control sensor 2
+		bool AllowHeatingElementAndHeatPumpToRunAtSameTime; // if false, if the heating element kicks on, it will recover with that before turning the heat pump back on.
 		
 
 		// Default Constructor
@@ -1226,7 +1227,8 @@ namespace WaterThermalTanks {
 			ControlSensor1Weight( 1.0 ),
 			ControlSensor2Height( -1.0 ),
 			ControlSensor2Node( 2 ),
-			ControlSensor2Weight( 0.0 )
+			ControlSensor2Weight( 0.0 ),
+			AllowHeatingElementAndHeatPumpToRunAtSameTime( true )
 		{}
 
 		// Member Constructor
@@ -1329,7 +1331,8 @@ namespace WaterThermalTanks {
 			Real64 ControlSensor1Weight, // weight of control sensor 1
 			Real64 ControlSensor2Height, // location from bottom of tank of control sensor 2
 			int ControlSensor2Node,
-			Real64 ControlSensor2Weight // weight of control sensor 2
+			Real64 ControlSensor2Weight, // weight of control sensor 2
+			bool AllowHeatingElementAndHeatPumpToRunAtSameTime
 		) :
 			Name( Name ),
 			Type( Type ),
@@ -1429,7 +1432,8 @@ namespace WaterThermalTanks {
 			ControlSensor1Weight( ControlSensor1Weight ),
 			ControlSensor2Height( ControlSensor2Height ),
 			ControlSensor2Node( ControlSensor2Node ),
-			ControlSensor2Weight( ControlSensor2Weight )
+			ControlSensor2Weight( ControlSensor2Weight ),
+			AllowHeatingElementAndHeatPumpToRunAtSameTime( AllowHeatingElementAndHeatPumpToRunAtSameTime )
 		{}
 
 	};
