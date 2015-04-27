@@ -458,6 +458,11 @@ namespace DataSizing {
 		//  (of the cooling design air flow rate)
 		Real64 HeatSizingFactor; // the zone heating sizing ratio
 		Real64 CoolSizingFactor; // the zone cooling sizing ratio
+		bool AccountForDOAS; // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
+		int DOASControlStrategy; // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
+		// 3=supply cold ventilation air
+		Real64 DOASLowSetpoint; // Dedicated Outside Air Low Setpoint for Design [C]
+		Real64 DOASHighSetpoint; // Dedicated Outside Air High Setpoint for Design [C]
 		int ActualZoneNum; // index into the Zone data array (in DataHeatBalance)
 		Real64 DesHeatMassFlow; // zone design heating air mass flow rate [kg/s]
 		Real64 DesHeatOAFlowFrac; // zone design heating OA air volume fraction [-]
@@ -597,6 +602,10 @@ namespace DataSizing {
 			DesHeatMaxAirFlowFrac( 0.0 ),
 			HeatSizingFactor( 0.0 ),
 			CoolSizingFactor( 0.0 ),
+			AccountForDOAS( false ),
+			DOASControlStrategy( 0 ),
+			DOASLowSetpoint( 0.0 ),
+			DOASHighSetpoint( 0.0 ),
 			ActualZoneNum( 0 ),
 			DesHeatMassFlow( 0.0 ),
 			DesHeatOAFlowFrac( 0.0 ),
@@ -712,6 +721,11 @@ namespace DataSizing {
 			Real64 const DesHeatMaxAirFlowFrac, // design heating maximum air flow rate fraction
 			Real64 const HeatSizingFactor, // the zone heating sizing ratio
 			Real64 const CoolSizingFactor, // the zone cooling sizing ratio
+			bool const AccountForDOAS, // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
+			int const DOASControlStrategy, // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
+			// 3=supply cold ventilation air
+			Real64 const DOASLowSetpoint, // Dedicated Outside Air Low Setpoint for Design [C]
+			Real64 const DOASHighSetpoint, // Dedicated Outside Air High Setpoint for Design [C]
 			int const ActualZoneNum, // index into the Zone data array (in DataHeatBalance)
 			Real64 const DesHeatMassFlow, // zone design heating air mass flow rate [kg/s]
 			Real64 const DesHeatOAFlowFrac, // zone design heating OA air volume fraction [-]
@@ -844,6 +858,10 @@ namespace DataSizing {
 			DesHeatMaxAirFlowFrac( DesHeatMaxAirFlowFrac ),
 			HeatSizingFactor( HeatSizingFactor ),
 			CoolSizingFactor( CoolSizingFactor ),
+			AccountForDOAS( AccountForDOAS ),
+			DOASControlStrategy( DOASControlStrategy ),
+			DOASLowSetpoint( DOASLowSetpoint ),
+			DOASHighSetpoint( DOASHighSetpoint ),
 			ActualZoneNum( ActualZoneNum ),
 			DesHeatMassFlow( DesHeatMassFlow ),
 			DesHeatOAFlowFrac( DesHeatOAFlowFrac ),

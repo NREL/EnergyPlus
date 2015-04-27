@@ -579,7 +579,7 @@ namespace ZoneEquipmentManager {
 			SupplyAirNode1 = 0;
 			SupplyAirNode2 = 0;
 			// calculate DOAS heating/cooling effect
-			if ( ZoneSizingInput( ControlledZoneNum ).AccountForDOAS ) {
+			if ( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).AccountForDOAS ) {
 				// check for adequate number of supply nodes
 				if ( ZoneEquipConfig( ControlledZoneNum ).NumInletNodes >= 2 ) {
 					SupplyAirNode1 = ZoneEquipConfig( ControlledZoneNum ).InletNode( 1 );
@@ -595,11 +595,11 @@ namespace ZoneEquipmentManager {
 					ShowFatalError( "Previous severe error causes abort " );
 				}
 				// set the DOAS mass flow rate and supply temperature and humidity ratio
-				HR90H = PsyWFnTdbRhPb( ZoneSizingInput( ControlledZoneNum ).DOASHighSetpoint, 0.9, StdBaroPress );
-				HR90L = PsyWFnTdbRhPb( ZoneSizingInput( ControlledZoneNum ).DOASLowSetpoint, 0.9, StdBaroPress );
+				HR90H = PsyWFnTdbRhPb( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASHighSetpoint, 0.9, StdBaroPress );
+				HR90L = PsyWFnTdbRhPb( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASLowSetpoint, 0.9, StdBaroPress );
 				DOASMassFlowRate = CalcFinalZoneSizing( ControlledZoneNum ).MinOA;
-				CalcDOASSupCondsForSizing( OutDryBulbTemp, OutHumRat, ZoneSizingInput(ControlledZoneNum).DOASControlStrategy,
-					ZoneSizingInput( ControlledZoneNum ).DOASLowSetpoint, ZoneSizingInput( ControlledZoneNum ).DOASHighSetpoint,
+				CalcDOASSupCondsForSizing( OutDryBulbTemp, OutHumRat, CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASControlStrategy,
+					CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASLowSetpoint, CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASHighSetpoint,
 					HR90H, HR90L, DOASSupplyTemp, DOASSupplyHumRat );
 				DOASCpAir = PsyCpAirFnWTdb( DOASSupplyHumRat, DOASSupplyTemp );
 				DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * ( DOASSupplyTemp - Node( ZoneNode ).Temp );
@@ -978,6 +978,10 @@ namespace ZoneEquipmentManager {
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowFrac;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( ZoneSizNum ).HeatSizingFactor;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( ZoneSizNum ).CoolSizingFactor;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).AccountForDOAS = ZoneSizingInput( ZoneSizNum ).AccountForDOAS;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASControlStrategy = ZoneSizingInput( ZoneSizNum ).DOASControlStrategy;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASLowSetpoint = ZoneSizingInput( ZoneSizNum ).DOASLowSetpoint;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASHighSetpoint = ZoneSizingInput( ZoneSizNum ).DOASHighSetpoint;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( ZoneSizNum ).CoolDesTemp;
@@ -1002,6 +1006,10 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowFrac;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( ZoneSizNum ).HeatSizingFactor;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( ZoneSizNum ).CoolSizingFactor;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).AccountForDOAS = ZoneSizingInput( ZoneSizNum ).AccountForDOAS;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASControlStrategy = ZoneSizingInput( ZoneSizNum ).DOASControlStrategy;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASLowSetpoint = ZoneSizingInput( ZoneSizNum ).DOASLowSetpoint;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASHighSetpoint = ZoneSizingInput( ZoneSizNum ).DOASHighSetpoint;
 				} else { // Every controlled zone must be simulated, so set missing inputs to the first
 					//LKL I think this is sufficient for warning -- no need for array
 					if ( DesDayNum == 1 ) {
@@ -1035,6 +1043,10 @@ namespace ZoneEquipmentManager {
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( 1 ).DesHeatMaxAirFlowFrac;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( 1 ).HeatSizingFactor;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( 1 ).CoolSizingFactor;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).AccountForDOAS = ZoneSizingInput( 1 ).AccountForDOAS;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASControlStrategy = ZoneSizingInput( 1 ).DOASControlStrategy;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASLowSetpoint = ZoneSizingInput( 1 ).DOASLowSetpoint;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASHighSetpoint = ZoneSizingInput( 1 ).DOASHighSetpoint;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( 1 ).ZnCoolDgnSAMethod;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( 1 ).ZnHeatDgnSAMethod;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( 1 ).CoolDesTemp;
@@ -1059,6 +1071,11 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( 1 ).DesHeatMaxAirFlowFrac;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( 1 ).HeatSizingFactor;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( 1 ).CoolSizingFactor;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).AccountForDOAS = ZoneSizingInput( 1 ).AccountForDOAS;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASControlStrategy = ZoneSizingInput( 1 ).DOASControlStrategy;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASLowSetpoint = ZoneSizingInput( 1 ).DOASLowSetpoint;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASHighSetpoint = ZoneSizingInput( 1 ).DOASHighSetpoint;
+
 				}
 				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
 				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq.allocate( NumOfTimeStepInDay );
@@ -1166,6 +1183,10 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowFrac;
 				FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( ZoneSizNum ).HeatSizingFactor;
 				FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( ZoneSizNum ).CoolSizingFactor;
+				FinalZoneSizing( CtrlZoneNum ).AccountForDOAS = ZoneSizingInput( ZoneSizNum ).AccountForDOAS;
+				FinalZoneSizing( CtrlZoneNum ).DOASControlStrategy = ZoneSizingInput( ZoneSizNum ).DOASControlStrategy;
+				FinalZoneSizing( CtrlZoneNum ).DOASLowSetpoint = ZoneSizingInput( ZoneSizNum ).DOASLowSetpoint;
+				FinalZoneSizing( CtrlZoneNum ).DOASHighSetpoint = ZoneSizingInput( ZoneSizNum ).DOASHighSetpoint;
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling = ZoneSizingInput( ZoneSizNum ).ZoneADEffCooling;
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating = ZoneSizingInput( ZoneSizNum ).ZoneADEffHeating;
 				FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = ZoneSizingInput( ZoneSizNum ).ZoneSecondaryRecirculation;
@@ -1194,6 +1215,10 @@ namespace ZoneEquipmentManager {
 				CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowFrac;
 				CalcFinalZoneSizing( CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( ZoneSizNum ).HeatSizingFactor;
 				CalcFinalZoneSizing( CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( ZoneSizNum ).CoolSizingFactor;
+				CalcFinalZoneSizing( CtrlZoneNum ).AccountForDOAS = ZoneSizingInput( ZoneSizNum ).AccountForDOAS;
+				CalcFinalZoneSizing( CtrlZoneNum ).DOASControlStrategy = ZoneSizingInput( ZoneSizNum ).DOASControlStrategy;
+				CalcFinalZoneSizing( CtrlZoneNum ).DOASLowSetpoint = ZoneSizingInput( ZoneSizNum ).DOASLowSetpoint;
+				CalcFinalZoneSizing( CtrlZoneNum ).DOASHighSetpoint = ZoneSizingInput( ZoneSizNum ).DOASHighSetpoint;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling = ZoneSizingInput( ZoneSizNum ).ZoneADEffCooling;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating = ZoneSizingInput( ZoneSizNum ).ZoneADEffHeating;
 			} else { // Every controlled zone must be simulated, so set missing inputs to the first
@@ -1222,6 +1247,10 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( 1 ).DesHeatMaxAirFlowFrac;
 				FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( 1 ).HeatSizingFactor;
 				FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( 1 ).CoolSizingFactor;
+				FinalZoneSizing( CtrlZoneNum ).AccountForDOAS = ZoneSizingInput( 1 ).AccountForDOAS;
+				FinalZoneSizing( CtrlZoneNum ).DOASControlStrategy = ZoneSizingInput( 1 ).DOASControlStrategy;
+				FinalZoneSizing( CtrlZoneNum ).DOASLowSetpoint = ZoneSizingInput( 1 ).DOASLowSetpoint;
+				FinalZoneSizing( CtrlZoneNum ).DOASHighSetpoint = ZoneSizingInput( 1 ).DOASHighSetpoint;
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling = ZoneSizingInput( 1 ).ZoneADEffCooling;
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating = ZoneSizingInput( 1 ).ZoneADEffHeating;
 				FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = ZoneSizingInput( 1 ).ZoneSecondaryRecirculation;
@@ -1250,6 +1279,10 @@ namespace ZoneEquipmentManager {
 				CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( 1 ).DesHeatMaxAirFlowFrac;
 				CalcFinalZoneSizing( CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( 1 ).HeatSizingFactor;
 				CalcFinalZoneSizing( CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( 1 ).CoolSizingFactor;
+				CalcFinalZoneSizing( CtrlZoneNum ).AccountForDOAS = ZoneSizingInput( 1 ).AccountForDOAS;
+				CalcFinalZoneSizing( CtrlZoneNum ).DOASControlStrategy = ZoneSizingInput( 1 ).DOASControlStrategy;
+				CalcFinalZoneSizing( CtrlZoneNum ).DOASLowSetpoint = ZoneSizingInput( 1 ).DOASLowSetpoint;
+				CalcFinalZoneSizing( CtrlZoneNum ).DOASHighSetpoint = ZoneSizingInput( 1 ).DOASHighSetpoint;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling = ZoneSizingInput( 1 ).ZoneADEffCooling;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating = ZoneSizingInput( 1 ).ZoneADEffHeating;
 			}
