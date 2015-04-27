@@ -63819,6 +63819,15 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
        \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
        \note proportional to the schedule value.
+  A26, \field Tank Element Control Logic
+       \type choice
+       \key MutuallyExlcusive
+       \key Simultaneous
+       \default Simultaneous
+       \note MutuallyExclusive means that once the tank heating element is active the
+       \note heat pump is shut down until setpoint is reached.
+       \note Simultaneous (default) means that both the tank heating element and
+       \note heat pump are used at the same time recover the tank temperature.
   N7,  \field Control Sensor 1 Height In Stratified Tank
        \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
        \note If left blank, it will default to the height of Heater1
@@ -64029,6 +64038,15 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
        \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
        \note proportional to the schedule value.
+  A24, \field Tank Element Control Logic
+       \type choice
+       \key MutuallyExlcusive
+       \key Simultaneous
+       \default Simultaneous
+       \note MutuallyExclusive means that once the tank heating element is active the
+       \note heat pump is shut down until setpoint is reached.
+       \note Simultaneous (default) means that both the tank heating element and
+       \note heat pump are used at the same time recover the tank temperature.
   N8,  \field Control Sensor 1 Height In Stratified Tank
        \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
        \note If left blank, it will default to the height of Heater1

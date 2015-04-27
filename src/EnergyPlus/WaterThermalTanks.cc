@@ -1861,6 +1861,18 @@ namespace WaterThermalTanks {
 
 					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, FanInletNode, FanOutletNode );
 
+					// Control Logic Flag
+					std::string CtrlLogicFlag = cAlphaArgs( 26 + nAlphaOffset );
+					if ( SameString( CtrlLogicFlag, "SIMULTANEOUS" ) ) {
+						HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = true;
+					} else if ( SameString( CtrlLogicFlag, "MUTUALLYEXCLUSIVE" ) ) {
+						HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = false;
+					} else {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+						ShowContinueError( CtrlLogicFlag + " is not a valid value for field Tank Element Control Logic." );
+						ErrorsFound = true;
+					}
+
 					// Control Sensor 1 Location In Stratified Tank
 					if ( ! lNumericFieldBlanks( 7 + nNumericOffset ) ) {
 						HPWH.ControlSensor1Height = rNumericArgs( 7 + nNumericOffset );
