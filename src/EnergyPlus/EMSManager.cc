@@ -2099,8 +2099,7 @@ SetupEMSActuator(
 		actuator.Actuated >>= lEMSActuated; // Pointer assigment
 		actuator.RealValue >>= rValue; // Pointer assigment
 		actuator.PntrVarTypeUsed = PntrReal;
-//		EMSActuator_lookup.insert( key );
-		EMSActuator_lookup.insert( EMSActuatorKey( cComponentTypeName, cUniqueIDName, cControlTypeName ) ); //Bug Replicate bug pending DOE fix
+		EMSActuator_lookup.insert( key );
 	}
 
 }
@@ -2178,8 +2177,7 @@ SetupEMSActuator(
 		actuator.Actuated >>= lEMSActuated; // Pointer assigment
 		actuator.IntValue >>= iValue; // Pointer assigment
 		actuator.PntrVarTypeUsed = PntrInteger;
-//		EMSActuator_lookup.insert( key );
-		EMSActuator_lookup.insert( EMSActuatorKey( cComponentTypeName, cUniqueIDName, cControlTypeName ) ); //Bug Replicate bug pending DOE fix
+		EMSActuator_lookup.insert( key );
 	}
 
 }
@@ -2252,8 +2250,7 @@ SetupEMSActuator(
 		actuator.Actuated >>= lEMSActuated; // Pointer assigment
 		actuator.LogValue >>= lValue; // Pointer assigment
 		actuator.PntrVarTypeUsed = PntrLogical;
-//		EMSActuator_lookup.insert( key );
-		EMSActuator_lookup.insert( EMSActuatorKey( cComponentTypeName, cUniqueIDName, cControlTypeName ) ); //Bug Replicate bug pending DOE fix
+        EMSActuator_lookup.insert( key );
 	}
 
 }
