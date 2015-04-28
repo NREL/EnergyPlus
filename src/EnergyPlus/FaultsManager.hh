@@ -40,6 +40,8 @@ namespace FaultsManager {
 	extern int const iFault_Fouling_Coil;
 	extern int const iFault_ThermostatOffset;
 	extern int const iFault_HumidistatOffset;
+	extern int const iFault_Fouling_AirFilter;
+	
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset
 	//  2. Humidity sensor offset
@@ -47,11 +49,11 @@ namespace FaultsManager {
 	//  4. Fouling coils
 	//  5. Thermostat offset
 	//  6. Humidistat offset
+	//  7. Fouling air filter
 	// coming ...
-	//  7. Fouling: chillers, boilers, cooling towers
-	//  8. Damper leakage: return air, outdoor air
-	//  9. Blockage: pipe
-	//  10. Dirty: air filter
+	//  8. Fouling: chillers, boilers, cooling towers
+	//  9. Damper leakage: return air, outdoor air
+	//  10. Blockage: pipe
 	//  11. Meter: air flow, water flow
 	//  12. CO2 sensor
 	//  13. Pressure sensor offset
@@ -76,6 +78,7 @@ namespace FaultsManager {
 	extern int NumFouledCoil; // Total number of fouled coils
 	extern int NumFaultyThermostat; // Total number of faulty thermostat with offset
 	extern int NumFaultyHumidistat; // Total number of faulty humidistat with offset
+	extern int NumFaultyAirFilter;  // Total number of fouled air filters
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -111,6 +114,13 @@ namespace FaultsManager {
 		std::string FaultyHumidistatName; // The faulty humidistat name
 		std::string FaultyHumidistatType; // The faulty humidistat type
 
+		std::string FaultyAirFilterFanName;          // The name of the fan corresponding to the fouled air filter
+		std::string FaultyAirFilterFanType;          // The type of the fan corresponding to the fouled air filter
+		std::string FaultyAirFilterFanCurve;         // The name of the fan curve
+		std::string FaultyAirFilterPressureFracSche; // Schedule describing variations of the fan pressure rise
+		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
+		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
+		
 		// Default Constructor
 		FaultProperties() :
 			ControllerTypeEnum( 0 ),
@@ -154,7 +164,13 @@ namespace FaultsManager {
 			Real64 const Rfw, // Water side fouling factor
 			Real64 const Rfa, // Air side fouling factor
 			Real64 const Aout, // Coil outside surface area
-			Real64 const Aratio // Inside to outside surface area ratio
+			Real64 const Aratio, // Inside to outside surface area ratio
+			std::string FaultyAirFilterFanName,          // The name of the fan corresponding to the fouled air filter
+			std::string FaultyAirFilterFanType,          // The type of the fan corresponding to the fouled air filter
+			std::string FaultyAirFilterFanCurve,         // The name of the fan curve
+			std::string FaultyAirFilterPressureFracSche, // Schedule describing variations of the fan pressure rise
+			Real64      FaultyAirFilterFanPressInc,      // The increase of the fan pressure due to fouled air filter
+			Real64      FaultyAirFilterFanFlowDec        // The decrease of the fan airflow rate due to fouled air filter
 		) :
 			Name( Name ),
 			FaultType( FaultType ),
@@ -179,7 +195,13 @@ namespace FaultsManager {
 			Aratio( Aratio ),
 			FaultyThermostatName( FaultyThermostatName ),
 			FaultyHumidistatName( FaultyHumidistatName ),
-			FaultyHumidistatType( FaultyHumidistatType )
+			FaultyHumidistatType( FaultyHumidistatType ),
+			FaultyAirFilterFanName( FaultyAirFilterFanName ),  
+			FaultyAirFilterFanType( FaultyAirFilterFanType ),         
+			FaultyAirFilterFanCurve( FaultyAirFilterFanCurve ),         
+			FaultyAirFilterPressureFracSche( FaultyAirFilterPressureFracSche ), 
+			FaultyAirFilterFanPressInc( FaultyAirFilterFanPressInc ),
+			FaultyAirFilterFanFlowDec( FaultyAirFilterFanFlowDec )
 		{}
 
 	};
@@ -189,6 +211,7 @@ namespace FaultsManager {
 	extern Array1D< FaultProperties > FouledCoils;
 	extern Array1D< FaultProperties > FaultsThermostatOffset;
 	extern Array1D< FaultProperties > FaultsHumidistatOffset;
+	extern Array1D< FaultProperties > FaultsFouledAirFilters;
 
 	// Functions
 

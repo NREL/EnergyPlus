@@ -76122,6 +76122,40 @@ FaultModel:HumidistatOffset,
        \note Required field for Type ThermostatOffsetDependent
        \type object-list
        \object-list ThermostatOffsetFaults   
+	   
+FaultModel:Fouling:AirFilter
+   \memo This object describes fault of dirty air filters
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Fan Name
+       \note Enter the name of a fan object
+       \required-field
+       \type object-list
+       \object-list FansCVandOnOffandVAV 
+   A3, \field Fan Object Type
+       \type choice
+       \key Fan:OnOff
+       \key Fan:ConstantVolume
+       \key Fan:VariableVolume
+   A4, \field Availability Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Pressure Fraction Schedule Name 
+       \note Enter the name of a schedule 
+       \note describing the variations of the fan pressure rise 
+       \note in terms of multipliers to the fan design pressure rise
+       \required-field
+       \type object-list
+       \object-list ScheduleNames   
+   A6; \field Fan Curve Name
+       \note The curve describes the relationship between 
+       \note the fan pressure rise and air flow rate
+       \required-field
+       \type object-list 
+       \object-list CubicCurves
+       \object-list UniVariateTables
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
