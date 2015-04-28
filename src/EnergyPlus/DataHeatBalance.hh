@@ -1853,6 +1853,10 @@ namespace DataHeatBalance {
 		//            Pointers to Surface Data Structure
 		int SurfaceFirst; // First Surface in Zone
 		int SurfaceLast; // Last Surface in Zone
+		int SurfaceWindowFirst; 
+		int SurfaceWindowLast;
+		int SurfaceOpaqueFirst;
+		int SurfaceOpaqueLast;
 		int InsideConvectionAlgo; // Ref: appropriate values for Inside Convection solution
 		int NumSurfaces; // Number of surfaces for this zone
 		int NumSubSurfaces; // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
@@ -1921,6 +1925,10 @@ namespace DataHeatBalance {
 			TempControlledZoneIndex( 0 ),
 			SurfaceFirst( 0 ),
 			SurfaceLast( 0 ),
+			SurfaceWindowFirst( 0 ),
+			SurfaceWindowLast( 0 ),
+			SurfaceOpaqueFirst( 0 ),
+			SurfaceOpaqueLast( 0 ),
 			InsideConvectionAlgo( ASHRAESimple ),
 			NumSurfaces( 0 ),
 			NumSubSurfaces( 0 ),
@@ -1988,6 +1996,10 @@ namespace DataHeatBalance {
 			int const TempControlledZoneIndex, // this is the index number for TempControlledZone structure for lookup
 			int const SurfaceFirst, // First Surface in Zone
 			int const SurfaceLast, // Last Surface in Zone
+			int const SurfaceWindowFirst, 
+			int const SurfaceWindowLast,
+			int const SurfaceOpaqueFirst,
+			int const SurfaceOpaqueLast,
 			int const InsideConvectionAlgo, // Ref: appropriate values for Inside Convection solution
 			int const NumSurfaces, // Number of surfaces for this zone
 			int const NumSubSurfaces, // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
@@ -2052,6 +2064,10 @@ namespace DataHeatBalance {
 			TempControlledZoneIndex( TempControlledZoneIndex ),
 			SurfaceFirst( SurfaceFirst ),
 			SurfaceLast( SurfaceLast ),
+			SurfaceWindowFirst ( SurfaceWindowFirst ),
+			SurfaceWindowLast ( SurfaceWindowLast ),
+			SurfaceOpaqueFirst ( SurfaceOpaqueFirst ),
+			SurfaceOpaqueLast ( SurfaceOpaqueLast ),
 			InsideConvectionAlgo( InsideConvectionAlgo ),
 			NumSurfaces( NumSurfaces ),
 			NumSubSurfaces( NumSubSurfaces ),

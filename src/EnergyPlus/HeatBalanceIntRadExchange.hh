@@ -84,7 +84,7 @@ namespace HeatBalanceIntRadExchange {
 		int & NumIterations, // number of iterations to fixed
 		Real64 & RowSum // RowSum of Fixed
 	);
-
+#ifdef GET_OUT
 	void
 	CalcScriptF(
 		int const N, // Number of surfaces
@@ -99,7 +99,7 @@ namespace HeatBalanceIntRadExchange {
 		Array2< Real64 > & A, // Matrix: Gets reduced to L\U form
 		Array2< Real64 > & I // Returned as inverse matrix
 	);
-
+#endif // GET_OUT
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

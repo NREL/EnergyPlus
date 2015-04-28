@@ -108,6 +108,7 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	Array1D< int > TmpToFinal;
 
 	// Functions
 
@@ -1225,6 +1226,7 @@ namespace SurfaceGeometry {
 
 		MovedSurfs = 0;
 		Surface.allocate( TotSurfaces ); // Allocate the Surface derived type appropriately
+		TmpToFinal.allocate ( TotSurfaces );
 
 		// Move all Detached Surfaces to Front
 
@@ -1244,48 +1246,85 @@ namespace SurfaceGeometry {
 
 			//  For each Base Surface Type (Wall, Floor, Roof)
 
-			for ( Loop = 1; Loop <= 3; ++Loop ) {
-
-				for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-
-					if ( SurfaceTmp( SurfNum ).Zone == 0 ) continue;
-
-					if ( ! SameString( SurfaceTmp( SurfNum ).ZoneName, Zone( ZoneNum ).Name ) ) continue;
-					if ( SurfaceTmp( SurfNum ).Class != BaseSurfIDs( Loop ) ) continue;
-
-					++MovedSurfs;
-					Surface( MovedSurfs ) = SurfaceTmp( SurfNum );
-					SurfaceTmp( SurfNum ).Class = SurfaceClass_Moved; // 'Moved'
-					SurfaceTmp( SurfNum ).BaseSurf = -1; // Default has base surface = base surface
-					BaseSurfNum = MovedSurfs;
-					Surface( MovedSurfs ).BaseSurf = BaseSurfNum;
-
-					//  Find all subsurfaces to this surface
-					for ( SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum ) {
-
-						if ( SurfaceTmp( SubSurfNum ).Zone == 0 ) continue;
-						if ( SurfaceTmp( SubSurfNum ).BaseSurf != SurfNum ) continue;
-
-						++MovedSurfs;
-						Surface( MovedSurfs ) = SurfaceTmp( SubSurfNum );
-						SurfaceTmp( SubSurfNum ).Class = SurfaceClass_Moved; // 'Moved'
-						Surface( MovedSurfs ).BaseSurf = BaseSurfNum;
-						SurfaceTmp( SubSurfNum ).BaseSurf = -1;
-					}
-				}
-			}
-
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 
-				if ( SurfaceTmp( SurfNum ).ZoneName != Zone( ZoneNum ).Name ) continue;
-				if ( SurfaceTmp( SurfNum ).Class != SurfaceClass_IntMass ) continue;
+				if ( SurfaceTmp( SurfNum ).Zone == 0 ) 
+					continue;
+				
+				if ( ! SameString( SurfaceTmp( SurfNum ).ZoneName, Zone( ZoneNum ).Name ) ) 
+					continue;
+				if ( SurfaceTmp( SurfNum ).Class != SurfaceClass_Wall && 
+				     SurfaceTmp( SurfNum ).Class != SurfaceClass_Roof && 
+				     SurfaceTmp( SurfNum ).Class != SurfaceClass_Floor && 
+				     SurfaceTmp( SurfNum ).Class != SurfaceClass_IntMass) 
+					continue;
 
 				++MovedSurfs;
 				Surface( MovedSurfs ) = SurfaceTmp( SurfNum );
 				Surface( MovedSurfs ).BaseSurf = MovedSurfs;
-				SurfaceTmp( SurfNum ).Class = SurfaceClass_Moved; // 'Moved'
-			}
-		}
+
+				SurfaceTmp( SurfNum ).BaseSurf = -1; // Default has base surface = base surface
+				// Don't delete class yet since we have to make another pass over this
+
+				TmpToFinal ( SurfNum ) = MovedSurfs;
+
+				//  Find all subsurfaces to this surface
+				for ( SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum ) {
+					
+					if ( SurfNum == SubSurfNum ) continue;
+					if ( SurfaceTmp( SubSurfNum ).Zone == 0 ) continue;
+					if ( SurfaceTmp( SubSurfNum ).BaseSurf != SurfNum ) continue;
+					
+					if ( SurfaceTmp( SubSurfNum ).Class == SurfaceClass_Window || 
+					     SurfaceTmp( SubSurfNum ).Class == SurfaceClass_GlassDoor || 
+					     SurfaceTmp( SubSurfNum ).Class == SurfaceClass_TDD_Diffuser || 
+					     SurfaceTmp( SubSurfNum ).Class == SurfaceClass_TDD_Dome)
+						continue;
+					     
+					++MovedSurfs;
+					Surface( MovedSurfs ) = SurfaceTmp( SubSurfNum );
+					SurfaceTmp( SubSurfNum ).Class = SurfaceClass_Moved; // 'Moved'
+					Surface( MovedSurfs ).BaseSurf = TmpToFinal( SurfNum );
+					SurfaceTmp( SubSurfNum ).BaseSurf = -1;
+				} // SubSurfNum
+			} // SurfNum
+
+			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+
+				if ( SurfaceTmp( SurfNum ).Zone == 0 ) 
+					continue;
+				
+				if ( ! SameString( SurfaceTmp( SurfNum ).ZoneName, Zone( ZoneNum ).Name ) ) 
+					continue;
+				if ( SurfaceTmp( SurfNum ).Class != SurfaceClass_Wall && 
+				     SurfaceTmp( SurfNum ).Class != SurfaceClass_Roof && 
+				     SurfaceTmp( SurfNum ).Class != SurfaceClass_Floor && 
+				     SurfaceTmp( SurfNum ).Class != SurfaceClass_IntMass) 
+					continue;
+
+				//  Find all subsurfaces to this surface
+				for ( SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum ) {
+					
+					if ( SurfNum == SubSurfNum ) continue;
+					if ( SurfaceTmp( SubSurfNum ).Zone == 0 ) continue;
+					if ( SurfaceTmp( SubSurfNum ).BaseSurf != SurfNum ) continue;
+					
+					if ( !(SurfaceTmp( SubSurfNum ).Class == SurfaceClass_Window || 
+					       SurfaceTmp( SubSurfNum ).Class == SurfaceClass_GlassDoor || 
+					       SurfaceTmp( SubSurfNum ).Class == SurfaceClass_TDD_Diffuser || 
+					       SurfaceTmp( SubSurfNum ).Class == SurfaceClass_TDD_Dome))
+						continue;
+					     
+					++MovedSurfs;
+					Surface( MovedSurfs ) = SurfaceTmp( SubSurfNum );
+					SurfaceTmp( SubSurfNum ).Class = SurfaceClass_Moved; // 'Moved'
+					Surface( MovedSurfs ).BaseSurf = TmpToFinal( SurfNum );
+					SurfaceTmp( SubSurfNum ).BaseSurf = -1;
+				} // SubSurfNum
+
+				SurfaceTmp( SurfNum ).Class = SurfaceClass_Moved;
+			} // SurfNum
+		} // ZoneNum
 
 		if ( MovedSurfs != TotSurfaces ) {
 			gio::write( ClassMsg, fmtLD  ) << MovedSurfs;
@@ -1675,23 +1714,38 @@ namespace SurfaceGeometry {
 
 		//**********************************************************************************
 		//   Set up Zone Surface Pointers
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			for ( SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum ) { //TotSurfaces
-				if ( Surface( SurfNum ).Zone == ZoneNum ) {
-					if ( Zone( ZoneNum ).SurfaceFirst == 0 ) {
-						Zone( ZoneNum ).SurfaceFirst = SurfNum;
-						break;
-					}
-				}
+		for ( SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum ) { //TotSurfaces
+			ZoneData & z = Zone( Surface( SurfNum ).Zone );
+			int sclass = Surface( SurfNum ).Class;
+			if ( z.SurfaceFirst == 0 )
+				z.SurfaceFirst = SurfNum;
+
+			if ( sclass == SurfaceClass_Window || sclass == SurfaceClass_GlassDoor || sclass == SurfaceClass_TDD_Diffuser || sclass == SurfaceClass_TDD_Dome) {
+				if ( z.SurfaceWindowFirst == 0 )
+					z.SurfaceWindowFirst = SurfNum;
+			} else {
+				if ( z.SurfaceOpaqueFirst == 0 )
+					z.SurfaceOpaqueFirst = SurfNum;
 			}
 		}
+
+		for ( SurfNum = MovedSurfs; SurfNum >= 1; --SurfNum ) { //TotSurfaces
+			ZoneData & z = Zone( Surface( SurfNum ).Zone );
+			int sclass = Surface( SurfNum ).Class;
+			if ( z.SurfaceLast == 0 )
+				z.SurfaceLast = SurfNum;
+
+			if ( sclass == SurfaceClass_Window || sclass == SurfaceClass_GlassDoor || sclass == SurfaceClass_TDD_Diffuser || sclass == SurfaceClass_TDD_Dome) {
+				if ( z.SurfaceWindowLast == 0 )
+					z.SurfaceWindowLast = SurfNum;
+			} else {
+				if ( z.SurfaceOpaqueLast == 0 )
+					z.SurfaceOpaqueLast = SurfNum;
+			}
+		}
+
 		//  Surface First pointers are set, set last
-		if ( NumOfZones > 0 ) {
-			Zone( NumOfZones ).SurfaceLast = TotSurfaces;
-		}
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum ) {
-			Zone( ZoneNum ).SurfaceLast = Zone( ZoneNum + 1 ).SurfaceFirst - 1;
-		}
+
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( Zone( ZoneNum ).SurfaceFirst == 0 ) {
