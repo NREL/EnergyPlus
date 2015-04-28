@@ -32,17 +32,9 @@ namespace EnergyPlus {
 #if defined(__GNUC__) && !defined(__clang__)
 #define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
 #elif defined(__INTEL_COMPILER) 
-#define __ep_assume_aligned(A, N) __assume_aligned(A, N)
+#define __ep_assume_aligned(T, A, N) __assume_aligned(A, N)
 #else
-#define __ep_assume_aligned(A, N)
-#endif 
-
-#if defined(__GNUC__) && !defined(__clang__)
-#define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
-#elif defined(__INTEL_COMPILER) 
-#define __ep_assume_aligned(A, N) __assume_aligned(A, N)
-#else
-#define __ep_assume_aligned(A, N)
+#define __ep_assume_aligned(T, A, N)
 #endif 
 
 namespace HeatBalanceIntRadExchange {
