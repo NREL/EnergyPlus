@@ -1303,7 +1303,9 @@ namespace HeatBalanceIntRadExchange {
 		assert( ( F.l1() == 1 ) && ( F.u1() == N ) );
 		assert( ( F.l2() == 1 ) && ( F.u2() == N ) );
 		assert( ( EMISS.l() == 1 ) && ( EMISS.u() == N ) );
+#ifndef ALIGNED_SCRIPTF
 		assert( equal_dimensions( F, ScriptF ) );
+#endif // ALIGNED_SCRIPTF
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
