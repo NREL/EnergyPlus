@@ -99,6 +99,7 @@ namespace FaultsManager {
 		bool Status; // for future use
 		int AvaiSchedPtr;
 		int SeveritySchedPtr;
+		int FaultyAirFilterPressureFracSchePtr;
 		int FaultTypeEnum;
 
 		std::string FouledCoilName; // The fouled coil name
@@ -129,6 +130,7 @@ namespace FaultsManager {
 			Status( false ),
 			AvaiSchedPtr( 0 ),
 			SeveritySchedPtr( 0 ),
+			FaultyAirFilterPressureFracSchePtr( 0 ),
 			FaultTypeEnum( 0 ),
 			FouledCoilID( 0 ),
 			FoulingInputMethod( 0 ),
@@ -153,6 +155,7 @@ namespace FaultsManager {
 			bool const Status, // for future use
 			int const AvaiSchedPtr,
 			int const SeveritySchedPtr,
+			int const FaultyAirFilterPressureFracSchePtr,
 			int const FaultTypeEnum,
 			std::string const & FouledCoilName, // The fouled coil name
 			std::string const & FaultyThermostatName, // The faulty thermostat name
@@ -200,6 +203,7 @@ namespace FaultsManager {
 			FaultyAirFilterFanType( FaultyAirFilterFanType ),         
 			FaultyAirFilterFanCurve( FaultyAirFilterFanCurve ),         
 			FaultyAirFilterPressureFracSche( FaultyAirFilterPressureFracSche ), 
+			FaultyAirFilterPressureFracSchePtr( FaultyAirFilterPressureFracSchePtr ), 
 			FaultyAirFilterFanPressInc( FaultyAirFilterFanPressInc ),
 			FaultyAirFilterFanFlowDec( FaultyAirFilterFanFlowDec )
 		{}

@@ -76134,19 +76134,18 @@ FaultModel:Fouling:AirFilter
        \type object-list
        \object-list FansCVandOnOffandVAV 
    A3, \field Fan Object Type
+       \required-field
        \type choice
        \key Fan:OnOff
        \key Fan:ConstantVolume
        \key Fan:VariableVolume
    A4, \field Availability Schedule Name
-       \required-field
        \type object-list
        \object-list ScheduleNames
    A5, \field Pressure Fraction Schedule Name 
        \note Enter the name of a schedule 
        \note describing the variations of the fan pressure rise 
        \note in terms of multipliers to the fan design pressure rise
-       \required-field
        \type object-list
        \object-list ScheduleNames   
    A6; \field Fan Curve Name
