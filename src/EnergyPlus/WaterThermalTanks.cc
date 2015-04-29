@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -1257,25 +1258,43 @@ namespace WaterThermalTanks {
 					// Get the lists of IDF arguments
 					GetObjectItem( cCurrentModuleObject, HPWaterHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					
+					// Copy those lists into C++ std::maps
+					std::map <int, std::string> hpwhAlpha;
+					std::map <int, Real64> hpwhNumeric;
+					std::map <int, bool> hpwhAlphaBlank;
+					std::map <int, bool> hpwhNumericBlank;
+					std::map <int, std::string> hpwhAlphaFieldNames;
+					std::map <int, std::string> hpwhNumericFieldNames;
+					for ( int i = 1; i <= NumNums; ++i ) {
+						hpwhNumeric[i] = rNumericArgs(i);
+						hpwhNumericBlank[i] = lNumericFieldBlanks(i);
+						hpwhNumericFieldNames[i] = cNumericFieldNames(i);
+					}
+					for ( int i = 1; i <= NumAlphas; ++i ) {
+						hpwhAlpha[i] = cAlphaArgs(i);
+						hpwhAlphaBlank[i] = lAlphaFieldBlanks(i);
+						hpwhAlphaFieldNames[i] = cAlphaFieldNames(i);
+					}
+					
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), HPWaterHeater.Name(), HPWaterHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( hpwhAlpha[ 1 ], HPWaterHeater.Name(), HPWaterHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+						if ( IsBlank ) hpwhAlpha[ 1 ] = "xxxxx";
 					}
 					
 					// Name and type
-					HPWH.Name = cAlphaArgs( 1 );
+					HPWH.Name = hpwhAlpha[ 1 ];
 					HPWH.Type = cCurrentModuleObject;
 					
 					// Availability Schedule
 					// convert schedule name to pointer
-					if ( ! lAlphaFieldBlanks( 2 ) ) {
-						HPWH.AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+					if ( ! hpwhAlphaBlank[ 2 ] ) {
+						HPWH.AvailSchedPtr = GetScheduleIndex( hpwhAlpha[ 2 ] );
 						if ( HPWH.AvailSchedPtr == 0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-							ShowContinueError( cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
+							ShowContinueError( hpwhAlphaFieldNames[ 2 ] + "=\"" + hpwhAlpha[ 2 ] + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
@@ -1284,58 +1303,58 @@ namespace WaterThermalTanks {
 					
 					// Compressor Setpoint Temperature Schedule
 					// convert schedule name to pointer
-					if ( ! lAlphaFieldBlanks( 3 ) ) {
-						HPWH.SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 3 ) );
+					if ( ! hpwhAlphaBlank[ 3 ] ) {
+						HPWH.SetPointTempSchedule = GetScheduleIndex( hpwhAlpha[ 3 ] );
 						if ( HPWH.SetPointTempSchedule == 0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-							ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+							ShowContinueError( hpwhAlphaFieldNames[ 3 ] + "=\"" + hpwhAlpha[ 3 ] + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-						ShowContinueError( "required " + cAlphaFieldNames( 3 ) + " is blank." );
+						ShowContinueError( "required " + hpwhAlphaFieldNames[ 3 ] + " is blank." );
 						ErrorsFound = true;
 					}
 
 					// Dead Band Temperature Difference
-					HPWH.DeadBandTempDiff = rNumericArgs( 1 + nNumericOffset );
+					HPWH.DeadBandTempDiff = hpwhNumeric[ 1 + nNumericOffset ];
 					if ( HPWH.DeadBandTempDiff <= 0.0 || HPWH.DeadBandTempDiff > 20.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-						ShowContinueError( cNumericFieldNames( 1 + nNumericOffset ) + " difference must be > 0 and <= 20. Dead band = " + TrimSigDigits( rNumericArgs( 1 + nNumericOffset ), 1 ) );
+						ShowContinueError( hpwhNumericFieldNames[ 1 + nNumericOffset ] + " difference must be > 0 and <= 20. Dead band = " + TrimSigDigits( hpwhNumeric[ 1 + nNumericOffset ], 1 ) );
 						ErrorsFound = true;
 					}
 
 					if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterPumped ) {
 						
 						// Condenser Inlet/Outlet Nodes
-						HPWH.CondWaterInletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
-						HPWHSaveNode.InletNodeName1 = cAlphaArgs( 4 );
-						HPWH.CondWaterOutletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
-						HPWHSaveNode.OutletNodeName1 = cAlphaArgs( 5 );
+						HPWH.CondWaterInletNode = GetOnlySingleNode( hpwhAlpha[ 4 ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
+						HPWHSaveNode.InletNodeName1 = hpwhAlpha[ 4 ];
+						HPWH.CondWaterOutletNode = GetOnlySingleNode( hpwhAlpha[ 5 ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
+						HPWHSaveNode.OutletNodeName1 = hpwhAlpha[ 5 ];
 						
 						// Condenser Water Flow Rate
-						HPWH.OperatingWaterFlowRate = rNumericArgs( 2 );
-						if ( HPWH.OperatingWaterFlowRate <= 0.0 && rNumericArgs( 2 ) != AutoCalculate ) {
+						HPWH.OperatingWaterFlowRate = hpwhNumeric[ 2 ];
+						if ( HPWH.OperatingWaterFlowRate <= 0.0 && hpwhNumeric[ 2 ] != AutoCalculate ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-							ShowContinueError( cNumericFieldNames( 2 ) + " must be greater than 0. Condenser water flow rate = " + TrimSigDigits( rNumericArgs( 2 ), 6 ) );
+							ShowContinueError( hpwhNumericFieldNames[ 2 ] + " must be greater than 0. Condenser water flow rate = " + TrimSigDigits( hpwhNumeric[ 2 ], 6 ) );
 							ErrorsFound = true;
 						}
 						
 					} else if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 						
 						// Wrapped Condenser Location
-						HPWH.WrappedCondenserBottomLocation = rNumericArgs( 2 + nNumericOffset );
-						HPWH.WrappedCondenserTopLocation = rNumericArgs( 3 + nNumericOffset );
+						HPWH.WrappedCondenserBottomLocation = hpwhNumeric[ 2 + nNumericOffset ];
+						HPWH.WrappedCondenserTopLocation = hpwhNumeric[ 3 + nNumericOffset ];
 						
 						if ( HPWH.WrappedCondenserBottomLocation < 0.0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-							ShowContinueError( cNumericFieldNames( 2 ) + " must be greater than 0. Condenser bottom location = " + TrimSigDigits( HPWH.WrappedCondenserBottomLocation, 6 ));
+							ShowContinueError( hpwhNumericFieldNames[ 2 ] + " must be greater than 0. Condenser bottom location = " + TrimSigDigits( HPWH.WrappedCondenserBottomLocation, 6 ));
 							ErrorsFound = true;
 						}
 
 						if ( HPWH.WrappedCondenserBottomLocation >= HPWH.WrappedCondenserTopLocation ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-							ShowContinueError( cNumericFieldNames( 3 ) + " (" + TrimSigDigits( HPWH.WrappedCondenserTopLocation, 6 ) + ") must be greater than " + cNumericFieldNames( 2 ) + " (" + TrimSigDigits( HPWH.WrappedCondenserBottomLocation, 6 ) + ")." );
+							ShowContinueError( hpwhNumericFieldNames[ 3 ] + " (" + TrimSigDigits( HPWH.WrappedCondenserTopLocation, 6 ) + ") must be greater than " + hpwhNumericFieldNames[ 2 ] + " (" + TrimSigDigits( HPWH.WrappedCondenserBottomLocation, 6 ) + ")." );
 							ErrorsFound = true;
 						}
 
@@ -1348,50 +1367,50 @@ namespace WaterThermalTanks {
 					}
 					
 					// Evaporator Air Flow Rate
-					HPWH.OperatingAirFlowRate = rNumericArgs( 3 + nNumericOffset );
-					if ( HPWH.OperatingAirFlowRate <= 0.0 && rNumericArgs( 3 + nNumericOffset ) != AutoCalculate ) {
+					HPWH.OperatingAirFlowRate = hpwhNumeric[ 3 + nNumericOffset ];
+					if ( HPWH.OperatingAirFlowRate <= 0.0 && hpwhNumeric[ 3 + nNumericOffset ] != AutoCalculate ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-						ShowContinueError( cNumericFieldNames( 3 + nNumericOffset ) + " must be greater than 0. Evaporator air flow rate = " + TrimSigDigits( rNumericArgs( 3 + nNumericOffset ), 6 ) );
+						ShowContinueError( hpwhNumericFieldNames[ 3 + nNumericOffset ] + " must be greater than 0. Evaporator air flow rate = " + TrimSigDigits( hpwhNumeric[ 3 + nNumericOffset ], 6 ) );
 						ErrorsFound = true;
 					}
 					
 					// Inlet Air Configuration
-					{ auto const SELECT_CASE_var( cAlphaArgs( 6 + nAlphaOffset ) );
+					{ auto const SELECT_CASE_var( hpwhAlpha[ 6 + nAlphaOffset ] );
 
 					if ( SELECT_CASE_var == "SCHEDULE" ) {
 						HPWH.InletAirConfiguration = AmbientTempSchedule;
 						
 						// Inlet Air Temperature Schedule
-						if ( ! lAlphaFieldBlanks( 11 + nAlphaOffset ) ) {
-							HPWH.AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 11 + nAlphaOffset ) );
+						if ( ! hpwhAlphaBlank[ 11 + nAlphaOffset ] ) {
+							HPWH.AmbientTempSchedule = GetScheduleIndex( hpwhAlpha[ 11 + nAlphaOffset ] );
 							if ( HPWH.AmbientTempSchedule == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 11 + nAlphaOffset ) + "=\"" + cAlphaArgs( 11 + nAlphaOffset ) + "\"." );
+								ShowContinueError( hpwhAlphaFieldNames[ 11 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 11 + nAlphaOffset ] + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 11 + nAlphaOffset ) + " is blank." );
+							ShowContinueError( "required " + hpwhAlphaFieldNames[ 11 + nAlphaOffset ] + " is blank." );
 							ErrorsFound = true;
 						}
 						
 						// Inlet Air Humidity Schedule
-						if ( ! lAlphaFieldBlanks( 12 + nAlphaOffset ) ) {
-							HPWH.AmbientRHSchedule = GetScheduleIndex( cAlphaArgs( 12 + nAlphaOffset ) );
+						if ( ! hpwhAlphaBlank[ 12 + nAlphaOffset ] ) {
+							HPWH.AmbientRHSchedule = GetScheduleIndex( hpwhAlpha[ 12 + nAlphaOffset ] );
 							if ( HPWH.AmbientRHSchedule == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 12 + nAlphaOffset ) + "=\"" + cAlphaArgs( 12 + nAlphaOffset ) + "\"." );
+								ShowContinueError( hpwhAlphaFieldNames[ 12 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 12 + nAlphaOffset ] + "\"." );
 								ErrorsFound = true;
 							} else {
 								if ( ! CheckScheduleValueMinMax( HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0 ) ) {
 									ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values" );
-									ShowContinueError( cAlphaFieldNames( 12 + nAlphaOffset ) + "=\"" + cAlphaArgs( 12 + nAlphaOffset ) + "\", schedule values must be (>=0., <=1.)" );
+									ShowContinueError( hpwhAlphaFieldNames[ 12 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 12 + nAlphaOffset ] + "\", schedule values must be (>=0., <=1.)" );
 									ErrorsFound = true;
 								}
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 12 + nAlphaOffset ) + " is blank." );
+							ShowContinueError( "required " + hpwhAlphaFieldNames[ 12 + nAlphaOffset ] + " is blank." );
 							ErrorsFound = true;
 						}
 
@@ -1399,16 +1418,16 @@ namespace WaterThermalTanks {
 						HPWH.InletAirConfiguration = AmbientTempZone;
 						
 						// Inlet Air Zone
-						if ( ! lAlphaFieldBlanks( 13 + nAlphaOffset ) ) {
-							HPWH.AmbientTempZone = FindItemInList( cAlphaArgs( 13 + nAlphaOffset ), Zone.Name(), NumOfZones );
+						if ( ! hpwhAlphaBlank[ 13 + nAlphaOffset ] ) {
+							HPWH.AmbientTempZone = FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone.Name(), NumOfZones );
 							if ( HPWH.AmbientTempZone == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 13 + nAlphaOffset ) + "=\"" + cAlphaArgs( 13 + nAlphaOffset ) + "\"." );
+								ShowContinueError( hpwhAlphaFieldNames[ 13 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 13 + nAlphaOffset ] + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 13 + nAlphaOffset ) + " is blank." );
+							ShowContinueError( "required " + hpwhAlphaFieldNames[ 13 + nAlphaOffset ] + " is blank." );
 							ErrorsFound = true;
 						}
 
@@ -1419,16 +1438,16 @@ namespace WaterThermalTanks {
 						HPWH.InletAirConfiguration = AmbientTempZoneAndOA;
 						
 						// Inlet Air Zone
-						if ( ! lAlphaFieldBlanks( 13 + nAlphaOffset ) ) {
-							HPWH.AmbientTempZone = FindItemInList( cAlphaArgs( 13 + nAlphaOffset ), Zone.Name(), NumOfZones );
+						if ( ! hpwhAlphaBlank[ 13 + nAlphaOffset ] ) {
+							HPWH.AmbientTempZone = FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone.Name(), NumOfZones );
 							if ( HPWH.AmbientTempZone == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 13 + nAlphaOffset ) + "=\"" + cAlphaArgs( 13 + nAlphaOffset ) + "\"." );
+								ShowContinueError( hpwhAlphaFieldNames[ 13 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 13 + nAlphaOffset ] + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 13 + nAlphaOffset ) + " is blank." );
+							ShowContinueError( "required " + hpwhAlphaFieldNames[ 13 + nAlphaOffset ] + " is blank." );
 							ErrorsFound = true;
 						}
 
@@ -1439,22 +1458,22 @@ namespace WaterThermalTanks {
 
 					// Tank Name
 					// We will verify this exists and is the right kind of tank later when the tanks are all loaded.
-					HPWH.TankName = cAlphaArgs( 14 + nAlphaOffset );
+					HPWH.TankName = hpwhAlpha[ 14 + nAlphaOffset ];
 					
 					// Use Side Inlet/Outlet
 					// Get the water heater tank use side inlet node names for HPWHs connected to a plant loop
 					// Save the name of the node for use with set up comp sets
-					HPWHSaveNode.InletNodeName2 = cAlphaArgs( 15 + nAlphaOffset );
-					HPWHSaveNode.OutletNodeName2 = cAlphaArgs( 16 + nAlphaOffset );
+					HPWHSaveNode.InletNodeName2 = hpwhAlpha[ 15 + nAlphaOffset ];
+					HPWHSaveNode.OutletNodeName2 = hpwhAlpha[ 16 + nAlphaOffset ];
 
-					if ( ! lAlphaFieldBlanks( 15 + nAlphaOffset ) && ! lAlphaFieldBlanks( 16 + nAlphaOffset ) ) {
+					if ( ! hpwhAlphaBlank[ 15 + nAlphaOffset ] && ! hpwhAlphaBlank[ 16 + nAlphaOffset ] ) {
 						HPWH.WHUseInletNode = GetOnlySingleNode( HPWHSaveNode.InletNodeName2, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsParent );
 						HPWH.WHUseOutletNode = GetOnlySingleNode( HPWHSaveNode.OutletNodeName2, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsParent );
 					}
 
 					// DX Coil
 					// get Coil:DX:HeatPumpWaterHeater object
-					HPWH.DXCoilName = cAlphaArgs( 17 + nAlphaOffset );
+					HPWH.DXCoilName = hpwhAlpha[ 17 + nAlphaOffset ];
 
 					// check that the DX Coil exists
 					DXCoilErrFlag = false;
@@ -1493,27 +1512,27 @@ namespace WaterThermalTanks {
 					}
 
 					// Minimum Inlet Air Temperature for Compressor Operation
-					HPWH.MinAirTempForHPOperation = rNumericArgs( 4 + nNumericOffset );
+					HPWH.MinAirTempForHPOperation = hpwhNumeric[ 4 + nNumericOffset ];
 					if ( HPWH.MinAirTempForHPOperation < -5 ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": minimum inlet air temperature for heat pump compressor operation must be greater than or equal to -5 C." );
-						ShowContinueError( "...Minimum inlet air temperature = " + TrimSigDigits( rNumericArgs( 4 + nNumericOffset ), 1 ) );
+						ShowContinueError( "...Minimum inlet air temperature = " + TrimSigDigits( hpwhNumeric[ 4 + nNumericOffset ], 1 ) );
 					}
 
 					// Compressor Location
-					{ auto const SELECT_CASE_var( cAlphaArgs( 18 + nAlphaOffset ) );
+					{ auto const SELECT_CASE_var( hpwhAlpha[ 18 + nAlphaOffset ] );
 					if ( SELECT_CASE_var == "SCHEDULE" ) {
 						HPWH.CrankcaseTempIndicator = CrankcaseTempSchedule;
-						if ( ! lAlphaFieldBlanks( 19 + nAlphaOffset ) ) {
+						if ( ! hpwhAlphaBlank[ 19 + nAlphaOffset ] ) {
 							// Compressor Ambient Temperature Schedule
-							HPWH.CrankcaseTempSchedule = GetScheduleIndex( cAlphaArgs( 19 + nAlphaOffset ) );
+							HPWH.CrankcaseTempSchedule = GetScheduleIndex( hpwhAlpha[ 19 + nAlphaOffset ] );
 							if ( HPWH.CrankcaseTempSchedule == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 19 + nAlphaOffset ) + "=\"" + cAlphaArgs( 19 + nAlphaOffset ) + "\"." );
+								ShowContinueError( hpwhAlphaFieldNames[ 19 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 19 + nAlphaOffset ] + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 19 + nAlphaOffset ) + " is blank." );
+							ShowContinueError( "required " + hpwhAlphaFieldNames[ 19 + nAlphaOffset ] + " is blank." );
 							ErrorsFound = true;
 						}
 
@@ -1525,19 +1544,19 @@ namespace WaterThermalTanks {
 							ErrorsFound = true;
 						}
 
-						if ( ! lAlphaFieldBlanks( 19 + nAlphaOffset ) ) {
-							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + cAlphaFieldNames( 19 + nAlphaOffset ) + " was provided but will not be used based on compressor location input=\"" + cAlphaArgs( 18 + nAlphaOffset ) + "\"." );
+						if ( ! hpwhAlphaBlank[ 19 + nAlphaOffset ] ) {
+							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[ 19 + nAlphaOffset ] + " was provided but will not be used based on compressor location input=\"" + hpwhAlpha[ 18 + nAlphaOffset ] + "\"." );
 						}
 					} else if ( SELECT_CASE_var == "OUTDOORS" ) {
 						HPWH.CrankcaseTempIndicator = CrankcaseTempExterior;
-						if ( ! lAlphaFieldBlanks( 19 + nAlphaOffset ) ) {
-							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + cAlphaFieldNames( 19 + nAlphaOffset ) + " was provided but will not be used based on " + cAlphaFieldNames( 19 + nAlphaOffset ) + "=\"" + cAlphaArgs( 18 + nAlphaOffset ) + "\"." );
+						if ( ! hpwhAlphaBlank[ 19 + nAlphaOffset ] ) {
+							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[ 19 + nAlphaOffset ] + " was provided but will not be used based on " + hpwhAlphaFieldNames[ 19 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 18 + nAlphaOffset ] + "\"." );
 						}
 
 					}}
 					
 					// Fan Name
-					HPWH.FanName = cAlphaArgs( 20 + nAlphaOffset );
+					HPWH.FanName = hpwhAlpha[ 20 + nAlphaOffset ];
 
 					// check that the fan exists
 					errFlag = false;
@@ -1573,15 +1592,15 @@ namespace WaterThermalTanks {
 					}
 
 					// Fan Placement
-					if ( SameString( cAlphaArgs( 21 + nAlphaOffset ), "BlowThrough" ) ) {
+					if ( SameString( hpwhAlpha[ 21 + nAlphaOffset ], "BlowThrough" ) ) {
 						HPWH.FanPlacement = BlowThru;
 
-					} else if ( SameString( cAlphaArgs( 21 + nAlphaOffset ), "DrawThrough" ) ) {
+					} else if ( SameString( hpwhAlpha[ 21 + nAlphaOffset ], "DrawThrough" ) ) {
 						HPWH.FanPlacement = DrawThru;
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid " );
-						ShowContinueError( cAlphaFieldNames( 21 + nAlphaOffset ) + "=\"" + cAlphaArgs( 21 + nAlphaOffset ) + "\"." );
+						ShowContinueError( hpwhAlphaFieldNames[ 21 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 21 + nAlphaOffset ] + "\"." );
 						ErrorsFound = true;
 					}
 
@@ -1607,31 +1626,31 @@ namespace WaterThermalTanks {
 					}
 
 					// On Cycle Parasitic Electric Load
-					HPWH.OnCycParaLoad = rNumericArgs( 5 + nNumericOffset );
+					HPWH.OnCycParaLoad = hpwhNumeric[ 5 + nNumericOffset ];
 					if ( HPWH.OnCycParaLoad < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"," );
-						ShowContinueError( cNumericFieldNames( 5 + nNumericOffset ) + " must be >= 0. " + cNumericFieldNames( 5 + nNumericOffset ) + " = " + TrimSigDigits( rNumericArgs( 5 + nNumericOffset ), 2 ) );
+						ShowContinueError( hpwhNumericFieldNames[ 5 + nNumericOffset ] + " must be >= 0. " + hpwhNumericFieldNames[ 5 + nNumericOffset ] + " = " + TrimSigDigits( hpwhNumeric[ 5 + nNumericOffset ], 2 ) );
 						ErrorsFound = true;
 					}
 
 					// Off Cycle Parasitic Electric Load
-					HPWH.OffCycParaLoad = rNumericArgs( 6 + nNumericOffset );
+					HPWH.OffCycParaLoad = hpwhNumeric[ 6 + nNumericOffset ];
 					if ( HPWH.OffCycParaLoad < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"," );
-						ShowContinueError( cNumericFieldNames( 6 + nNumericOffset ) + " must be >= 0. " + cNumericFieldNames( 2 + nNumericOffset ) + " = " + TrimSigDigits( rNumericArgs( 6 + nNumericOffset ), 2 ) );
+						ShowContinueError( hpwhNumericFieldNames[ 6 + nNumericOffset ] + " must be >= 0. " + hpwhNumericFieldNames[ 2 + nNumericOffset ] + " = " + TrimSigDigits( hpwhNumeric[ 6 + nNumericOffset ], 2 ) );
 						ErrorsFound = true;
 					}
 
 					// Parasitic Heat Rejection Location
-					if ( SameString( cAlphaArgs( 22 + nAlphaOffset ), "Zone" ) ) {
+					if ( SameString( hpwhAlpha[ 22 + nAlphaOffset ], "Zone" ) ) {
 						HPWH.ParasiticTempIndicator = AmbientTempZone;
 						if ( HPWH.InletAirConfiguration == AmbientTempOutsideAir || HPWH.InletAirConfiguration == AmbientTempSchedule ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"," );
-							ShowContinueError( cAlphaFieldNames( 22 + nAlphaOffset ) + " must be ZoneAirOnly or ZoneAndOutdoorAir" );
+							ShowContinueError( hpwhAlphaFieldNames[ 22 + nAlphaOffset ] + " must be ZoneAirOnly or ZoneAndOutdoorAir" );
 							ShowContinueError( " when parasitic heat rejection location equals Zone." );
 							ErrorsFound = true;
 						}
-					} else if ( SameString( cAlphaArgs( 22 + nAlphaOffset ), "Outdoors" ) ) {
+					} else if ( SameString( hpwhAlpha[ 22 + nAlphaOffset ], "Outdoors" ) ) {
 						HPWH.ParasiticTempIndicator = AmbientTempOutsideAir;
 					} else {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
@@ -1641,30 +1660,30 @@ namespace WaterThermalTanks {
 
 					// Inlet Air Mixer Node
 					// get mixer/splitter nodes only when Inlet Air Configuration is ZoneAndOutdoorAir
-					if ( ! lAlphaFieldBlanks( 23 + nAlphaOffset ) ) {
+					if ( ! hpwhAlphaBlank[ 23 + nAlphaOffset ] ) {
 						// For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
 						if ( HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
-							HPWH.InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 23 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject + " inlet air mixer", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+							HPWH.InletAirMixerNode = GetOnlySingleNode( hpwhAlpha[ 23 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject + " inlet air mixer", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						} else {
 							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 							ShowContinueError( "Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as Zone and OutdoorAir. Node name disregarded and simulation continues." );
 						}
-					} else if ( lAlphaFieldBlanks( 23 + nAlphaOffset ) && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+					} else if ( hpwhAlphaBlank[ 23 + nAlphaOffset ] && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 						ShowContinueError( "Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
 						ErrorsFound = true;
 					}
 
 					// Outlet Air Splitter Node
-					if ( ! lAlphaFieldBlanks( 24 + nAlphaOffset ) ) {
+					if ( ! hpwhAlphaBlank[ 24 + nAlphaOffset ] ) {
 						//  For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
 						if ( HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
-							HPWH.OutletAirSplitterNode = GetOnlySingleNode( cAlphaArgs( 24 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+							HPWH.OutletAirSplitterNode = GetOnlySingleNode( hpwhAlpha[ 24 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						} else {
 							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 							ShowContinueError( "Outlet air splitter node name specified but only required when Inlet Air Configuration is selected as ZoneAndOutdoorAir. Node name disregarded and simulation continues." );
 						}
-					} else if ( lAlphaFieldBlanks( 24 + nAlphaOffset ) && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+					} else if ( hpwhAlphaBlank[ 24 + nAlphaOffset ] && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 						ShowContinueError( "Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
 						ErrorsFound = true;
@@ -1674,44 +1693,44 @@ namespace WaterThermalTanks {
 					if ( HPWH.InletAirMixerNode != 0 ) {
 						// when mixer/splitter nodes are used the HPWH's inlet/outlet node are set up as ObjectIsNotParent
 
-						HPWH.HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject + "-INLET AIR MIXER", HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						HPWH.HeatPumpAirInletNode = GetOnlySingleNode( hpwhAlpha[ 7 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject + "-INLET AIR MIXER", HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-						HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+						HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( hpwhAlpha[ 8 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-						HPWH.OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
-						if ( cAlphaArgs( 9 + nAlphaOffset ) != "" ) {
+						HPWH.OutsideAirNode = GetOnlySingleNode( hpwhAlpha[ 9 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
+						if ( hpwhAlpha[ 9 + nAlphaOffset ] != "" ) {
 							CheckAndAddAirNodeNumber( HPWH.OutsideAirNode, Okay );
 							if ( ! Okay ) {
-								ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": Adding outdoor air node=" + cAlphaArgs( 9 + nAlphaOffset ) );
+								ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": Adding outdoor air node=" + hpwhAlpha[ 9 + nAlphaOffset ] );
 							}
 						}
 
-						HPWH.ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
+						HPWH.ExhaustAirNode = GetOnlySingleNode( hpwhAlpha[ 10 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
 
 					} else {
 						// when mixer/splitter nodes are NOT used the HPWH's inlet/outlet nodes are set up as ObjectIsParent
 						if ( HPWH.InletAirConfiguration == AmbientTempSchedule ) {
 							// for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
 							// to avoid node connection errors
-							HPWH.HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+							HPWH.HeatPumpAirInletNode = GetOnlySingleNode( hpwhAlpha[ 7 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-							HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+							HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( hpwhAlpha[ 8 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 						} else { // HPWH is connected to a zone with no mixer/splitter nodes
 							if ( HPWH.InletAirConfiguration == AmbientTempZone ) {
-								HPWH.HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+								HPWH.HeatPumpAirInletNode = GetOnlySingleNode( hpwhAlpha[ 7 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-								HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+								HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( hpwhAlpha[ 8 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 							} else { // HPWH is located outdoors
-								HPWH.OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
-								if ( ! lAlphaFieldBlanks( 9 + nAlphaOffset ) ) {
+								HPWH.OutsideAirNode = GetOnlySingleNode( hpwhAlpha[ 9 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
+								if ( ! hpwhAlphaBlank[ 9 + nAlphaOffset ] ) {
 									CheckAndAddAirNodeNumber( HPWH.OutsideAirNode, Okay );
 									if ( ! Okay ) {
-										ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": Adding outdoor air node =" + cAlphaArgs( 9 + nAlphaOffset ) );
+										ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": Adding outdoor air node =" + hpwhAlpha[ 9 + nAlphaOffset ] );
 									}
 								}
 
-								HPWH.ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
+								HPWH.ExhaustAirNode = GetOnlySingleNode( hpwhAlpha[ 10 + nAlphaOffset ], ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
 							}
 						}
 					}
@@ -1740,14 +1759,14 @@ namespace WaterThermalTanks {
 								}
 								if ( ! FoundInletNode ) {
 									ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
-									ShowContinueError( "The HPWH's air inlet node name = " + cAlphaArgs( 7 + nAlphaOffset ) + " was not properly specified " );
-									ShowContinueError( "as an exhaust air node for zone = " + cAlphaArgs( 13 + nAlphaOffset ) + " in a ZoneHVAC:EquipmentConnections object." );
+									ShowContinueError( "The HPWH's air inlet node name = " + hpwhAlpha[ 7 + nAlphaOffset ] + " was not properly specified " );
+									ShowContinueError( "as an exhaust air node for zone = " + hpwhAlpha[ 13 + nAlphaOffset ] + " in a ZoneHVAC:EquipmentConnections object." );
 									ErrorsFound = true;
 								}
 								if ( ! FoundOutletNode ) {
 									ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
-									ShowContinueError( "The HPWH's air outlet node name = " + cAlphaArgs( 8 + nAlphaOffset ) + " was not properly specified " );
-									ShowContinueError( "as an inlet air node for zone = " + cAlphaArgs( 13 + nAlphaOffset ) + " in a ZoneHVAC:EquipmentConnections object." );
+									ShowContinueError( "The HPWH's air outlet node name = " + hpwhAlpha[ 8 + nAlphaOffset ] + " was not properly specified " );
+									ShowContinueError( "as an inlet air node for zone = " + hpwhAlpha[ 13 + nAlphaOffset ] + " in a ZoneHVAC:EquipmentConnections object." );
 									ErrorsFound = true;
 								}
 							}
@@ -1759,23 +1778,23 @@ namespace WaterThermalTanks {
 					}
 
 					// only get the inlet air mixer schedule if the inlet air configuration is zone and outdoor air
-					if ( ! lAlphaFieldBlanks( 25 + nAlphaOffset ) && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
-						HPWH.InletAirMixerSchPtr = GetScheduleIndex( cAlphaArgs( 25 + nAlphaOffset ) );
+					if ( ! hpwhAlphaBlank[ 25 + nAlphaOffset ] && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+						HPWH.InletAirMixerSchPtr = GetScheduleIndex( hpwhAlpha[ 25 + nAlphaOffset ] );
 						if ( HPWH.InletAirMixerSchPtr == 0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-							ShowContinueError( cAlphaFieldNames( 25 + nAlphaOffset ) + "=\"" + cAlphaArgs( 25 + nAlphaOffset ) + "\"," );
+							ShowContinueError( hpwhAlphaFieldNames[ 25 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 25 + nAlphaOffset ] + "\"," );
 							ErrorsFound = true;
 						} else {
 							//           check schedule values to be between 0 and 1
 							ValidScheduleValue = CheckScheduleValueMinMax( HPWH.InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0 );
 							if ( ! ValidScheduleValue ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 25 + nAlphaOffset ) + " values out of range of 0 to 1, Schedule=\"" + cAlphaArgs( 25 + nAlphaOffset ) + "\"." );
+								ShowContinueError( hpwhAlphaFieldNames[ 25 + nAlphaOffset ] + " values out of range of 0 to 1, Schedule=\"" + hpwhAlpha[ 25 + nAlphaOffset ] + "\"." );
 								ErrorsFound = true;
 							}
 							//           set outlet air splitter schedule index equal to inlet air mixer schedule index
 							//           (place holder for when zone pressurization/depressurization is allowed and different schedules can be used)
-							HPWH.OutletAirSplitterSchPtr = GetScheduleIndex( cAlphaArgs( 25 + nAlphaOffset ) );
+							HPWH.OutletAirSplitterSchPtr = GetScheduleIndex( hpwhAlpha[ 25 + nAlphaOffset ] );
 						}
 					}
 
@@ -1800,58 +1819,58 @@ namespace WaterThermalTanks {
 
 					if ( HPWH.FanPlacement == BlowThru ) {
 						if ( HPWH.InletAirMixerNode > 0 ) {
-							//           cAlphaArgs( 23 + nAlphaOffset ) = Inlet Air Mixer Node
-							FanInletNode = cAlphaArgs( 23 + nAlphaOffset );
+							//           hpwhAlpha[ 23 + nAlphaOffset ] = Inlet Air Mixer Node
+							FanInletNode = hpwhAlpha[ 23 + nAlphaOffset ];
 							FanOutletNode = "UNDEFINED";
 						} else {
 							if ( HPWH.OutsideAirNode == 0 ) {
-								//             cAlphaArgs( 7 + nAlphaOffset ) = Heat Pump Air Inlet Node
-								FanInletNode = cAlphaArgs( 7 + nAlphaOffset );
+								//             hpwhAlpha[ 7 + nAlphaOffset ] = Heat Pump Air Inlet Node
+								FanInletNode = hpwhAlpha[ 7 + nAlphaOffset ];
 								FanOutletNode = "UNDEFINED";
 							} else {
-								//             cAlphaArgs( 9 + nAlphaOffset ) = Outside Air Node
-								FanInletNode = cAlphaArgs( 9 + nAlphaOffset );
+								//             hpwhAlpha[ 9 + nAlphaOffset ] = Outside Air Node
+								FanInletNode = hpwhAlpha[ 9 + nAlphaOffset ];
 								FanOutletNode = "UNDEFINED";
 							}
 						}
 						if ( HPWH.OutletAirSplitterNode > 0 ) {
-							//           cAlphaArgs( 27 + nAlphaOffset ) = Outlet Air Splitter Node
+							//           hpwhAlpha[ 27 + nAlphaOffset ] = Outlet Air Splitter Node
 							CoilInletNode = "UNDEFINED";
-							CoilOutletNode = cAlphaArgs( 24 + nAlphaOffset );
+							CoilOutletNode = hpwhAlpha[ 24 + nAlphaOffset ];
 						} else {
 							if ( HPWH.OutsideAirNode == 0 ) {
-								//             cAlphaArgs( 8 + nAlphaOffset ) = Heat Pump Air Outlet Node
+								//             hpwhAlpha[ 8 + nAlphaOffset ] = Heat Pump Air Outlet Node
 								CoilInletNode = "UNDEFINED";
-								CoilOutletNode = cAlphaArgs( 8 + nAlphaOffset );
+								CoilOutletNode = hpwhAlpha[ 8 + nAlphaOffset ];
 							} else {
 								CoilInletNode = "UNDEFINED";
-								//             cAlphaArgs( 10 + nAlphaOffset ) = Exhaust Air Node
-								CoilOutletNode = cAlphaArgs( 10 + nAlphaOffset );
+								//             hpwhAlpha[ 10 + nAlphaOffset ] = Exhaust Air Node
+								CoilOutletNode = hpwhAlpha[ 10 + nAlphaOffset ];
 							}
 						}
 					} else {
 						if ( HPWH.InletAirMixerNode > 0 ) {
-							CoilInletNode = cAlphaArgs( 23 + nAlphaOffset );
+							CoilInletNode = hpwhAlpha[ 23 + nAlphaOffset ];
 							CoilOutletNode = "UNDEFINED";
 						} else {
 							if ( HPWH.OutsideAirNode == 0 ) {
-								CoilInletNode = cAlphaArgs( 7 + nAlphaOffset );
+								CoilInletNode = hpwhAlpha[ 7 + nAlphaOffset ];
 								CoilOutletNode = "UNDEFINED";
 							} else {
-								CoilInletNode = cAlphaArgs( 9 + nAlphaOffset );
+								CoilInletNode = hpwhAlpha[ 9 + nAlphaOffset ];
 								CoilOutletNode = "UNDEFINED";
 							}
 						}
 						if ( HPWH.OutletAirSplitterNode > 0 ) {
 							FanInletNode = "UNDEFINED";
-							FanOutletNode = cAlphaArgs( 24 + nAlphaOffset );
+							FanOutletNode = hpwhAlpha[ 24 + nAlphaOffset ];
 						} else {
 							if ( HPWH.OutsideAirNode == 0 ) {
 								FanInletNode = "UNDEFINED";
-								FanOutletNode = cAlphaArgs( 8 + nAlphaOffset );
+								FanOutletNode = hpwhAlpha[ 8 + nAlphaOffset ];
 							} else {
 								FanInletNode = "UNDEFINED";
-								FanOutletNode = cAlphaArgs( 10 + nAlphaOffset );
+								FanOutletNode = hpwhAlpha[ 10 + nAlphaOffset ];
 							}
 						}
 					}
@@ -1862,7 +1881,7 @@ namespace WaterThermalTanks {
 					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, FanInletNode, FanOutletNode );
 
 					// Control Logic Flag
-					std::string CtrlLogicFlag = cAlphaArgs( 26 + nAlphaOffset );
+					std::string CtrlLogicFlag = hpwhAlpha[ 26 + nAlphaOffset ];
 					if ( SameString( CtrlLogicFlag, "SIMULTANEOUS" ) ) {
 						HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = true;
 					} else if ( SameString( CtrlLogicFlag, "MUTUALLYEXCLUSIVE" ) ) {
@@ -1874,19 +1893,19 @@ namespace WaterThermalTanks {
 					}
 
 					// Control Sensor 1 Location In Stratified Tank
-					if ( ! lNumericFieldBlanks( 7 + nNumericOffset ) ) {
-						HPWH.ControlSensor1Height = rNumericArgs( 7 + nNumericOffset );
+					if ( ! hpwhNumericBlank[ 7 + nNumericOffset ] ) {
+						HPWH.ControlSensor1Height = hpwhNumeric[ 7 + nNumericOffset ];
 					} else {
 						// use heater1 location, which we don't know right now
 						HPWH.ControlSensor1Height = -1.0;
 					}
 					
 					// Control Sensor 1 Weight
-					HPWH.ControlSensor1Weight = rNumericArgs( 8 + nNumericOffset );
+					HPWH.ControlSensor1Weight = hpwhNumeric[ 8 + nNumericOffset ];
 					
 					// Control Sensor 2 Location In Stratified Tank
-					if ( ! lNumericFieldBlanks( 9 + nNumericOffset ) ) {
-						HPWH.ControlSensor2Height = rNumericArgs( 9 + nNumericOffset );
+					if ( ! hpwhNumericBlank[ 9 + nNumericOffset ] ) {
+						HPWH.ControlSensor2Height = hpwhNumeric[ 9 + nNumericOffset ];
 					} else {
 						HPWH.ControlSensor2Height = -1.0;
 					}
