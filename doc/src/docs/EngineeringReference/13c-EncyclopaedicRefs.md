@@ -5883,7 +5883,7 @@ As the outdoor air temperature falls further below the setpoint for the supply a
 
 Figure 251.  Air to Air Heat Exchanger with Supply Air Temperature Control
 
-Other temperature set control may also be used. For example, the operation described here is used to minimize heating energy and proper control of the supply air temperature set point could also be used to minimize cooling energy or minimize both heating and cooling energy.
+Other types of temperature setpoint control may also be used. For example, the operation described here is used to minimize heating energy and proper control of the supply air temperature set point could also be used to minimize cooling energy or minimize both heating and cooling energy.
 
 #### References
 
