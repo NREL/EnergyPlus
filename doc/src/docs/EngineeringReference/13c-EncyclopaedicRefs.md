@@ -5525,58 +5525,33 @@ Figure 250. Schematic of the Sensible and Latent Air-to-Air Heat Exchanger
 The sensible and latent air-to-air heat exchanger is typically used for exhaust or relief air heat recovery. Heat exchanger performance can be specified to transfer sensible energy, latent energy or both between the supply and exhaust air streams. The input requires no geometric data. Performance is defined by specifying sensible and/or latent effectiveness at 75% and 100% of the nominal (rated) supply air flow rate in both heating and cooling conditions (Table 74).
 
 Table 74.  Operating Conditions for Defining Heat Exchanger Performance
-
-Parameter
-
-Conditions
-
-Heating
-
-Cooling
-
-Entering supply air temperature:
-
-     Dry-bulb
-
-     Wet-bulb
-
-
-
-1.7°C (35°F)
-
-0.6°C (33°F)
-
-
-
-35°C (95°F)
-
-26°C (78°F)
-
-Entering exhaust air temperature:
-
-     Dry-bulb
-
-     Wet-bulb
-
-
-
-21°C (70°F)
-
-14°C (58°F)
-
-
-
-24°C (75°F)
-
-17°C (63°F)
-
+<table>
+  <tr>
+    <th rowspan="2">Parameter</th>
+    <th colspan="2">Conditions</th>
+  </tr>
+  <tr>
+    <td>Heating</td>
+    <td>Cooling</td>
+  </tr>
+  <tr>
+    <td>Entering supply air temperature:<br>    Dry-bulb<br>    Wet-bulb</td>
+    <td>1.7°C (35°F)<br>0.6°C (33°F)</td>
+    <td>35°C (95°F)<br>26°C (78°F)</td>
+  </tr>
+  <tr>
+    <td>Entering exhaust air temperature:<br>    Dry-bulb<br>    Wet-bulb</td>
+    <td>21°C (70°F)<br>14°C (58°F)</td>
+    <td>24°C (75°F)<br>17°C (63°F)</td>
+  </tr>
+</table>
 Note: Conditions consistent with the Air-Conditioning and Refrigeration Institute’s Standard 1060 (ARI 2001).
 
 Heat exchange between the supply and exhaust air streams occurs whenever the unit is scheduled to be available (availability schedule) and supply/exhaust air flows are present. This heat exchanger object can be used in conjunction with a conventional air-side economizer (i.e., specify an appropriate economizer control type in the Controller:OutdoorAir object), whereby heat exchange is suspended whenever the air-side economizer is active (i.e., air flow is fully bypassed around a fixed-plate heat exchanger or the rotation of a rotary heat exchanger is stopped). This object is also able to suspend heat exchange for the purpose of providing free cooling operation in the absence of a conventional air-side economizer (i.e., specify MinimumFlowWithBypass in the Controller:Outside Air object). Suspension of heat exchange during economizer mode may be customized as necessary using the economizer lockout field. Note that the Economizer Type must be set to something other than NoEconomizer for this control interaction to function.
 
 Several methods of frost control are available to warm the heat exchanger core to prevent frost formation. Available methods are preheat, exhaust only, exhaust air recirculation, and minimum exhaust temperature. Preheat frost control uses a separate heater object placed in the supply inlet air stream to keep the air temperature above the frost threshold temperature. All other frost control methods are modeled within this heat exchanger object.
 
-This heat exchanger object can also control the supply air outlet temperature to a setpoint when a setpoint manager and temperature schedule are used. This temperature control is accomplished through wheel speed modulation or bypassing supply air around the heat exchanger to maintain the desired setpoint and avoid overheating the supply air.
+This heat exchanger object can also control the supply air outlet temperature to a setpoint when a setpoint manager and temperature schedule are used. This temperature control is accomplished through wheel speed modulation or bypassing supply air around the heat exchanger to maintain the desired setpoint and avoid overheating or overcooling the supply air.
 
 #### Model Description
 
@@ -5684,9 +5659,7 @@ The conditions of the exhaust (secondary) air leaving the heat exchanger are the
 
 <span>${\omega_{ExhAirOut}}$</span>          = exhaust air humidity ratio leaving the heat exchanger (kg/kg)
 
-*PsyWFnTdbH* = psychrometric routine calculating air humidity ratio as a function of
-
-    temperature and enthalpy
+*PsyWFnTdbH* = psychrometric routine calculating air humidity ratio as a function of temperature and enthalpy
 
 As was done for the supply air, calculated exhaust air conditions beyond the saturation curve are reset to saturation conditions at the calculated air enthalpy value.
 
@@ -5900,17 +5873,17 @@ Heat recovery for this heat exchanger may also be suspended during a high humidi
 
 #### Supply Air Outlet Temperature Control
 
-This heat exchanger object can also control the supply air outlet temperature to a setpoint to avoid overheating. This temperature control is accomplished through wheel speed modulation or bypassing supply air around the heat exchanger. To model this temperature control, the user must specify ‘Yes’ for the Supply Air Outlet Temperature Control field in this heat exchanger object, and a separate setpoint manager (see object: SetpointManager:Scheduled) and temperature schedule  must be specified for the heat exchanger unit’s supply air outlet node.
+This heat exchanger object can also control the supply air outlet temperature to a setpoint to avoid overheating or overcooling the supply air. This temperature control is accomplished through wheel speed modulation or bypassing supply air around the heat exchanger. To model this temperature control, the user must specify ‘Yes’ for the Supply Air Outlet Temperature Control field in this heat exchanger object, and a separate setpoint manager (see object: SetpointManager:Scheduled) and temperature schedule  must be specified for the heat exchanger unit’s supply air outlet node.
 
 This control strategy is typically used in conjunction with economizer operation (see object Controller:OutdoorAir), and an example control profile is shown in the figure below. When the outdoor air temperature falls to the specified maximum limit for economizer operation, heat exchange is suspended (air is fully bypassed around the heat exchanger core or heat exchanger rotation is stopped). The figure below shows economizer operation being initiated based on outdoor temperature but other triggers can be used (e.g. differential temperature [outdoor temperature with respect to exhaust air temperature], single point enthalpy or differential enthalpy). Heat exchange remains suspended until the outdoor temperature falls to the minimum temperature (temperature lower limit) for economizer control. The setpoint for the supply air outlet temperature control should match the economizer temperature lower limit.
 
-As the outdoor air temperature falls further below the setpoint for the supply air outlet temperature (same as the economizer lower temperature limit), the heat exchanger bypass dampers will modulate closed to maintain the desired supply air temperature for a plate heat exchanger. For a rotary heat exchanger the rotary heat exchanger speed will gradually increase to maintain the desired supply air temperature. Modulation of heat exchanger performance will continue until the supply air temperature setpoint can no longer be maintained. This control is only active if the entering supply (primary) air temperature is less thatn the heat exchanger setpoint temperature.
+As the outdoor air temperature falls further below the setpoint for the supply air outlet temperature (same as the economizer lower temperature limit), the heat exchanger bypass dampers will modulate closed to maintain the desired supply air temperature for a plate heat exchanger. For a rotary heat exchanger the rotary heat exchanger speed will gradually increase to maintain the desired supply air temperature. Modulation of heat exchanger performance will continue until the supply air temperature setpoint can no longer be maintained. This control will attempt to achieve the desired temperature set point whether the heat exchanger is cooling or heating the supply air stream. Care should be used to set the supply outlet air temperature set point to the desired value for proper control.
 
 ![](EngineeringReference/media/image5550.png)
 
-
-
 Figure 251.  Air to Air Heat Exchanger with Supply Air Temperature Control
+
+Other types of temperature setpoint control may also be used. For example, the operation described here is used to minimize heating energy and proper control of the supply air temperature set point could also be used to minimize cooling energy or minimize both heating and cooling energy.
 
 #### References
 
