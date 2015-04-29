@@ -108,11 +108,11 @@ Simple Aggregation Types
 
 **HoursPositive** – The HoursPositive option adds up the elapsed time during the month that this variable has a positive value. Hours with a zero value are not included.
 
-**HoursNonPositive** – The HoursNonPositive option adds up the elaspsed time during the month that this variable has non-positive value. Hours with a negative value and hours with a zero value are all included.
+**HoursNonPositive** – The HoursNonPositive option adds up the elapsed time during the month that this variable has non-positive value. Hours with a negative value and hours with a zero value are all included.
 
 **HoursNegative** – The HoursNegative option adds up the elapsed time during the month that this variable has a negative value. Hours with a zero value are not included.
 
-**HoursNonNegative** – The HoursNonNegative option adds up the elaspsed time during the month that this variable has non-negative value. Hours with a positive value and hours with a zero value are all included.
+**HoursNonNegative** – The HoursNonNegative option adds up the elapsed time during the month that this variable has non-negative value. Hours with a positive value and hours with a zero value are all included.
 
 *Advanced Aggregation Types*
 
@@ -913,7 +913,7 @@ The predefined monthly report options are shown below. The key name of the prede
 
 - Zone Thermal Comfort Fanger Model PPD (SumOrAverageDuringHoursShown)
 
-#### Chille ReportMonthly
+#### ChillerReportMonthly
 
 - Chiller Electric Energy (SumOrAverage)
 

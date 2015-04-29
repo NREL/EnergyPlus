@@ -10917,13 +10917,13 @@ This numeric field contains the fraction of on-cycle power use to adjust the par
 
 This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump’s fan operating mode is continuous. Suggested value is 60 seconds.
 
-#### Field: Ancilliary On-Cycle Electric Power
+#### Field: Ancillary On-Cycle Electric Power
 
-This field defines ancilliary electrical power (W) consumed during the on-cycle period (i.e., when the cooling or heating coil is operating). The model assumes that this ancilliary power does not contribute to heating the supply air. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
+This field defines ancillary electrical power (W) consumed during the on-cycle period (i.e., when the cooling or heating coil is operating). The model assumes that this ancillary power does not contribute to heating the supply air. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
 
-#### Field: Ancilliary Off-Cycle Electric Power
+#### Field: Ancillary Off-Cycle Electric Power
 
-This field defines ancilliary electrical power (W) consumed during the off-cycle period (i.e., when the cooling and heating coil are not operating). The model assumes that this ancilliary power does not contribute to heating the supply air. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
+This field defines ancillary electrical power (W) consumed during the off-cycle period (i.e., when the cooling and heating coil are not operating). The model assumes that this ancillary power does not contribute to heating the supply air. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
 
 #### Field: Design Heat Recovery Water Flow Rate
 
@@ -11010,8 +11010,8 @@ AirLoopHVAC:UnitarySystem,
    ,  !- Heat Pump Time Constant
    ,  !- Fraction of On-Cycle Power Use
    ,  !- Heat Pump Fan Delay Time
-   ,  !- Ancilliary On-Cycle Electric Power
-   ,  !- Ancilliary Off-Cycle Electric Power
+   ,  !- Ancillary On-Cycle Electric Power
+   ,  !- Ancillary Off-Cycle Electric Power
    ,  !- Design Heat Recovery Water Flow Rate
    ,  !- Maximum Temperature for Heat Recovery (Maximum Heat Recovery Outlet Temperature?)
    ,  !- Heat Recovery Water Inlet Node Name
@@ -14196,11 +14196,11 @@ This output field is the operating total heating capacity of the variable refrig
 
 #### VRF Heat Pump Cooling Electric Power [W]
 
-This output field is the cooling mode electricity consumption rate of the variable refrigerant flow heat pump in Watts. The consumption includes electricity used by the compressor (including crankcase heater), and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Cooling NaturalGas Consumption Rate).
+This output field is the cooling mode electricity consumption rate of the variable refrigerant flow heat pump in Watts. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Cooling NaturalGas Consumption Rate).
 
 #### VRF Heat Pump Cooling Electric Energy [J]
 
-This output field is the cooling mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Cooling NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
+This output field is the cooling mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Cooling NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
 #### VRF Heat Pump Heating Electric Power [W]
 

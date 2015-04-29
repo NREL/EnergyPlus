@@ -1642,9 +1642,9 @@ Table 2. Humidity Indicating Field Interactions - Design Day
 
 <table class="table table-striped">
 <tr>
-<th>Humihity Conhition Type</th>
-<th>Primary Humihity Inhicating Fielh</th>
-<th>Humihity Inhicating Day Schehule</th>
+<th>Humidity Conhition Type</th>
+<th>Primary Humidity Indicating Field</th>
+<th>Humidity Indicating Day Schedule</th>
 </tr>
 <tr>
 <td>WetBulb</td>
@@ -2222,7 +2222,7 @@ Table 3. Date Field Interpretation
 
 <table class="table table-striped">
 <tr>
-<th>Fielh Contents</th>
+<th>Field Contents</th>
 <th>Interpretation</th>
 </tr>
 <tr>
@@ -10286,7 +10286,7 @@ Table 8. Window Modeling Options
 <table class="table table-striped">
 <tr>
 <th>Option</th>
-<th>Object/Fielh or Output Variable</th>
+<th>Object/Field or Output Variable</th>
 <th>Input File (histributeh with install)</th>
 </tr>
 <tr>
@@ -13454,51 +13454,51 @@ This object provides options to change the individual convection model equations
 
 A unique name for the object.
 
-#### Field: Simple Bouyancy Vertical Wall Equation Source
+#### Field: Simple Buoyancy Vertical Wall Equation Source
 
 Applies to zone with no HVAC or when HVAC is off.  This is for vertical walls.  The key choice options include:  FohannoPolidoriVerticalWall, ASHRAEVerticalWall, AlamdariHammondVerticalWall, KhalifaEq3WallAwayFromHeat, KhalifaEq6NonHeatedWalls FohannoPolidoriVerticalWall, ISO15099Windows, or UserCurve
 
-#### Field: Simple Bouyancy Vertical Wall User Curve Name
+#### Field: Simple Buoyancy Vertical Wall User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve
 
-#### Field: Simple Bouyancy Stable Horizontal Equation Source
+#### Field: Simple Buoyancy Stable Horizontal Equation Source
 
 Applies to zone with no HVAC or when HVAC is off.  This is for horizontal surfaces with heat flow directed for stable thermal stratification.  The key choice options include: WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve
 
-#### Field: Simple Bouyancy Stable Horizontal Equation User Curve Name
+#### Field: Simple Buoyancy Stable Horizontal Equation User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve
 
-#### Field: Simple Bouyancy Unstable Horizontal Equation Source
+#### Field: Simple Buoyancy Unstable Horizontal Equation Source
 
 Applies to zone with no HVAC or when HVAC is off. This is for passive horizontal surfaces with heat flow for unstable thermal stratification.  The key choice options include:  WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
-#### Field: Simple Bouyancy Unstable Horizontal Equation User Curve Name
+#### Field: Simple Buoyancy Unstable Horizontal Equation User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve.
 
-#### Field: Simple Bouyancy Stable Tilted Equation Source
+#### Field: Simple Buoyancy Stable Tilted Equation Source
 
 Applies to zone with no HVAC or when HVAC is off.  This is for tilted surfaces with heat flow for stable thermal stratification.  The key choice options include:  WaltonStableHorizontalOrTilt, AlamdariHammondStableHorizontal, or UserCurve
 
-#### Field: Simple Bouyancy Stable Tilted Equation User Curve Name
+#### Field: Simple Buoyancy Stable Tilted Equation User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve.
 
-#### Field: Simple Bouyancy Unstable Tilted Equation Source
+#### Field: Simple Buoyancy Unstable Tilted Equation Source
 
 Applies to zone with no HVAC or when HVAC is off.  This is for tilted surfaces with heat flow for unstable thermal stratification.  The key choices include:  WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, or UserCurve.
 
-#### Field: Simple Bouyancy Unstable Tilted Equation User Curve Name
+#### Field: Simple Buoyancy Unstable Tilted Equation User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve.
 
-#### Field: Simple Bouyancy Windows Equation Source
+#### Field: Simple Buoyancy Windows Equation Source
 
 Applies to zone with no HVAC or when HVAC is off.  This is for all window surfaces. The key choice options include: ASHRAEVerticalWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, KaradagChilledCeiling, ISO15099Windows, or UserCurve.
 
-#### Field: Simple Bouyancy Windows Equation User Curve Name
+#### Field: Simple Buoyancy Windows Equation User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve.
 
@@ -13758,19 +13758,19 @@ The key choice options include:  ASHRAEVerticalWall, AlamdariHammondVerticalWal
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve
 
-#### Field: Mixed Regime Bouyancy Assisting Flow on Walls Equation Source
+#### Field: Mixed Regime Buoyancy Assisting Flow on Walls Equation Source
 
 The key choice options include:  BeausoleilMorrisonMixedAssistedWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve.
 
-#### Field: Mixed Regime Bouyancy Assisting Flow on Walls Equation User Curve Name
+#### Field: Mixed Regime Buoyancy Assisting Flow on Walls Equation User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve.
 
-#### Field: Mixed Regime Bouyancy Oppossing Flow on Walls Equation Source
+#### Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation Source
 
 The key choice options include:  BeausoleilMorrisonMixedOpposingWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve
 
-#### Field: Mixed Regime Bouyancy Oppossing Flow on Walls Equation User Curve Name
+#### Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve
 
@@ -14614,37 +14614,37 @@ This variable reports how the surface was classified as part of the adaptive con
 </tr>
 <tr>
 <td>16</td>
-<td>A3 Simple Bouyancy</td>
+<td>A3 Simple Buoyancy</td>
 <td>Vertical Walls</td>
 <td>Any</td>
 </tr>
 <tr>
 <td>17</td>
-<td>A3 Simple Bouyancy</td>
+<td>A3 Simple Buoyancy</td>
 <td>Horizontal</td>
 <td>Stable</td>
 </tr>
 <tr>
 <td>18</td>
-<td>A3 Simple Bouyancy</td>
+<td>A3 Simple Buoyancy</td>
 <td>Horizontal</td>
 <td>Unstable</td>
 </tr>
 <tr>
 <td>19</td>
-<td>A3 Simple Bouyancy</td>
+<td>A3 Simple Buoyancy</td>
 <td>Tilted</td>
 <td>Stable</td>
 </tr>
 <tr>
 <td>20</td>
-<td>A3 Simple Bouyancy</td>
+<td>A3 Simple Buoyancy</td>
 <td>Tilted</td>
 <td>Unstable</td>
 </tr>
 <tr>
 <td>21</td>
-<td>A3 Simple Bouyancy</td>
+<td>A3 Simple Buoyancy</td>
 <td>Windows</td>
 <td>Any</td>
 </tr>
@@ -14752,43 +14752,43 @@ This variable reports how the surface was classified as part of the adaptive con
 </tr>
 <tr>
 <td>39</td>
-<td>E Mixed Forced and Bouyancy</td>
+<td>E Mixed Forced and Buoyancy</td>
 <td>Walls</td>
 <td>Assisting</td>
 </tr>
 <tr>
 <td>40</td>
-<td>E Mixed Forced and Bouyancy</td>
+<td>E Mixed Forced and Buoyancy</td>
 <td>Walls</td>
 <td>Opposing</td>
 </tr>
 <tr>
 <td>41</td>
-<td>E Mixed Forced and Bouyancy</td>
+<td>E Mixed Forced and Buoyancy</td>
 <td>Floor</td>
 <td>Stable</td>
 </tr>
 <tr>
 <td>42</td>
-<td>E Mixed Forced and Bouyancy</td>
+<td>E Mixed Forced and Buoyancy</td>
 <td>Floor</td>
 <td>Unstable</td>
 </tr>
 <tr>
 <td>43</td>
-<td>E Mixed Forced and Bouyancy</td>
+<td>E Mixed Forced and Buoyancy</td>
 <td>Ceiling</td>
 <td>Stable</td>
 </tr>
 <tr>
 <td>44</td>
-<td>E Mixed Forced and Bouyancy</td>
+<td>E Mixed Forced and Buoyancy</td>
 <td>Ceiling</td>
 <td>Unstable</td>
 </tr>
 <tr>
 <td>45</td>
-<td>E Mixed Forced and Bouyancy</td>
+<td>E Mixed Forced and Buoyancy</td>
 <td>Windows</td>
 <td>Any</td>
 </tr>
@@ -15190,7 +15190,7 @@ This field is used to enter a value for the coefficient used to determine natura
 
 <span>${{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,cav}}} \right)/{T_{amb}}} $</span>  (if <span>${T_{amb}} > {T_{a,cav}}$</span> and baffle is vertical)
 
-where <span>$\Delta {H_{NPL}}$</span> is the value input into the field above for the height scale for bouyancy-driven ventilation.
+where <span>$\Delta {H_{NPL}}$</span> is the value input into the field above for the height scale for buoyancy-driven ventilation.
 
 #### Field(s): Surface &lt;1 thru x&gt; Name
 
@@ -15200,18 +15200,18 @@ An example IDF entry is
 
 ```idf
 SurfaceProperty:ExteriorNaturalVentedCavity,
-    PVRoofPaverExtVentCav1 ,   ! Name
-    PVRoofPaverSystem1,        ! OtherSideConditionsModel Object Name
-    0.02,    ! Area Fraction of Openings
-    0.9,     ! Thermal Emissivity of Exterior Baffle Material
-    0.92,    ! Solar Absorbtivity of Exterior Baffle
-    0.05,    ! Height scale for bouyancy-driven ventilation
-    0.05,    ! Effective Thickness of Cavity Behind Exterior Baffle
-    0.97,    ! Ratio of Actual surface area to projected surface area
-    Smooth , ! Roughness of collector
-    0.1 ,    ! Cv, Effectiveness for perforations with respect to Wind
-    0.5 ,    ! Cd, Discharge Coefficient for Openings with respect to bouyancy-driven flow
-    Zn001:Roof001 ;    ! Surface Name
+PVRoofPaverExtVentCav1 ,   ! Name
+    PVRoofPaverSystem1,        ! OtherSideConditionsModel Object Name
+    0.02,    ! Area Fraction of Openings
+    0.9,     ! Thermal Emissivity of Exterior Baffle Material
+    0.92,    ! Solar Absorbtivity of Exterior Baffle
+    0.05,    ! Height scale for buoyancy-driven ventilation
+    0.05,    ! Effective Thickness of Cavity Behind Exterior Baffle
+    0.97,    ! Ratio of Actual surface area to projected surface area
+    Smooth , ! Roughness of collector
+    0.1 ,    ! Cv, Effectiveness for perforations with respect to Wind
+    0.5 ,    ! Cd, Discharge Coefficient for Openings with respect to buoyancy-driven flow
+    Zn001:Roof001 ;    ! Surface Name
 ```
 
 ### SurfaceProperty:ExteriorNaturalVentedCavity Outputs
@@ -15252,7 +15252,7 @@ The part of mass flow rate of natural ventilation air exchange between the plenu
 
 #### Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate [kg/s]
 
-The part of mass flow rate of natural ventilation air exchange between the plenum and ambient when the collector is inactive due to bouyancy-driven forces.
+The part of mass flow rate of natural ventilation air exchange between the plenum and ambient when the collector is inactive due to buoyancy-driven forces.
 
 ### SurfaceProperty:SolarIncidentInside
 
@@ -17262,7 +17262,7 @@ Table 12. Winter Clothes (1.0 Clo)
 <table class="table table-striped">
 <tr>
 <th>Operative Temperature (C)</th>
-<th>Humihity Ratio (kgWater/kgDryAir)</th>
+<th>Humidity Ratio (kgWater/kgDryAir)</th>
 </tr>
 <tr>
 <td>19.6</td>
@@ -17295,7 +17295,7 @@ Table 13. Summer Clothes (0.5 Clo)
 <table class="table table-striped">
 <tr>
 <th>Operative Temperature (C)</th>
-<th>Humihity Ratio (kgWater/kgDryAir)</th>
+<th>Humidity Ratio (kgWater/kgDryAir)</th>
 </tr>
 <tr>
 <td>23.6</td>
@@ -17340,7 +17340,7 @@ The time when any zone is occupied that the combination of humidity ratio and op
 
 The time when any zone is occupied that the combination of humidity ratio and operative temperature is not in the ASHRAE 55-2004 winter clothes region (see above)
 
-#### Facility Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time [hr]
+#### Facility Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time [hr]
 
 The time when any zone is occupied that the combination of humidity ratio and operative temperature is not in the ASHRAE 55-2004 summer or winter clothes region (see above)
 
