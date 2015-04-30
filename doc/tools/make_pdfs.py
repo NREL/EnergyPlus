@@ -101,8 +101,8 @@ def WholeProjectPrep(main_src_dir):
 	shutil.copyfile(os.path.join(main_src_dir, "mkdocs_htmlpdf.yml"), main_mkdocs_yml)
 
 # set up some local settings
-srcdir  = "/home/elee/EnergyPlus/GitHub/EnergyPlusTeamBranch5/doc/src/"
-sitedir = "/home/elee/EnergyPlus/GitHub/EnergyPlusTeamBranch5/doc/src/site"
+srcdir  = "../src/"
+sitedir = "../src/site"
 pdfdir  = "/tmp/pdfs"
 
 # some other one-time settings

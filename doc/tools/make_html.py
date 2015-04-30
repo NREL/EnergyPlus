@@ -5,7 +5,7 @@ import subprocess
 import shutil
 
 # project settings
-srcdir  = "/home/elee/EnergyPlus/GitHub/EnergyPlusTeamBranch5/doc/src/"
+srcdir  = "../src/"
 
 # prep the project for html generation
 def WholeProjectPrep(main_src_dir):
