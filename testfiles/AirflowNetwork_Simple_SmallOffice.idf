@@ -132,7 +132,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -1955,9 +1955,9 @@
     ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
     0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Zone,
     EAST ZONE,               !- Zone Name
@@ -1965,9 +1965,9 @@
     ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
     0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Zone,
     NORTH ZONE,              !- Zone Name
@@ -1975,9 +1975,9 @@
     ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
     0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Zone,
     ATTIC ZONE,              !- Zone Name
@@ -1985,9 +1985,9 @@
     ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
     0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Surface,
     Zn001:Wall001,           !- Surface Name

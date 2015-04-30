@@ -519,8 +519,13 @@ namespace AirflowNetworkSolver {
 			if ( LIST >= 1 ) {
 				gio::write( Unit21, Format_901 ) << "Flow: " << i << n << M << AirflowNetworkLinkSimu( i ).DP << AFLOW( i ) << AFLOW2( i );
 			}
-			SUMAF( n ) = SUMAF( n ) - AFLOW( i ) - AFLOW2( i );
-			SUMAF( M ) += AFLOW( i ) + AFLOW2( i );
+			if ( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_HOP ) {
+				SUMAF( n ) = SUMAF( n ) - AFLOW( i );
+				SUMAF( M ) += AFLOW( i );
+			} else {
+				SUMAF( n ) = SUMAF( n ) - AFLOW( i ) - AFLOW2( i );
+				SUMAF( M ) += AFLOW( i ) + AFLOW2( i );
+			}
 		}
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
 			if ( LIST >= 1 ) gio::write( Unit21, Format_903 ) << "Room: " << n << PZ( n ) << SUMAF( n ) << TZ( n );
@@ -538,9 +543,12 @@ namespace AirflowNetworkSolver {
 				AirflowNetworkLinkSimu( i ).FLOW2 = -AFLOW( i );
 			}
 			if ( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum == CompTypeNum_HOP ) {
-				if ( AFLOW2( i ) != 0.0 ) {
+				if ( AFLOW( i ) > 0.0 ) {
 					AirflowNetworkLinkSimu( i ).FLOW = AFLOW( i ) + AFLOW2( i );
 					AirflowNetworkLinkSimu( i ).FLOW2 = AFLOW2( i );
+				} else {
+					AirflowNetworkLinkSimu( i ).FLOW = AFLOW2( i );
+					AirflowNetworkLinkSimu( i ).FLOW2 = -AFLOW( i ) + AFLOW2( i );
 				}
 			}
 			if ( AirflowNetworkLinkageData( i ).DetOpenNum > 0 ) {
@@ -919,9 +927,6 @@ namespace AirflowNetworkSolver {
 			if ( AirflowNetworkCompData( j ).CompTypeNum == CompTypeNum_DOP ) {
 				AFLOW2( i ) = F( 2 );
 			}
-			if ( AirflowNetworkCompData( j ).CompTypeNum == CompTypeNum_HOP ) {
-				AFLOW2( i ) = F( 2 );
-			}
 			if ( LIST >= 3 ) gio::write( Unit21, Format_901 ) << " NRi:" << i << n << M << AirflowNetworkLinkSimu( i ).DP << F( 1 ) << DF( 1 );
 			FLAG = 1;
 			if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) {
@@ -993,7 +998,7 @@ namespace AirflowNetworkSolver {
 			}
 
 			newh = LHK;
-			if ( allZero == true ) {
+			if ( allZero ) {
 				//print*, "allzero n=", n
 				newh = 0;
 			} else {
@@ -3157,7 +3162,7 @@ Label90: ;
 		DH = 4.0 * ( Width * Height ) / 2.0 / ( Width + Height ) * Fact;
 
 		// Check which zone is higher
-
+		NF = 1;
 		if ( Fact == 0.0 ) {
 			GenericCrack( coef, expn, LFLAG, PDROP, n, M, F, DF, NF );
 			return;
@@ -3217,7 +3222,7 @@ Label90: ;
 		DF( 1 ) = dp1fma12 - dp1fma21;
 		F( 2 ) = 0.0;
 		if ( fma12 != 0.0 && fma21 != 0.0 ) {
-			F( 2 ) = fma21;
+			F( 2 ) = BuoFlow;
 		}
 		DF( 2 ) = 0.0;
 

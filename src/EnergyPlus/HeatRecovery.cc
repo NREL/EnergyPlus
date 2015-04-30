@@ -1891,10 +1891,17 @@ namespace HeatRecovery {
 			//   Control the supply air outlet temperature to a setpoint for Heating Mode only
 			//   (ControlFraction = 0 HX fully bypassed, ControlFraction = 1 air passed entirely through HX)
 			//   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
-			if ( ExchCond( ExNum ).ControlToTemperatureSetPoint && ExchCond( ExNum ).SupInTemp < HXTempSetPoint ) {
-				//     IF secondary inlet temperature is above the supply inlet temperature, control to SP
-				if ( ExchCond( ExNum ).SecInTemp > ExchCond( ExNum ).SupInTemp && ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) != 0.0 ) {
-					ControlFraction = max( 0.0, min( 1.0, ( ExchCond( ExNum ).SupInTemp - HXTempSetPoint ) / ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) ) );
+			if ( ExchCond( ExNum ).ControlToTemperatureSetPoint ) {
+				if ( ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) != 0.0 ) {
+					if ( ( ExchCond( ExNum ).SupInTemp < HXTempSetPoint && ExchCond( ExNum ).SupOutTemp > HXTempSetPoint ) || 
+						( ExchCond( ExNum ).SupInTemp > HXTempSetPoint && ExchCond( ExNum ).SupOutTemp < HXTempSetPoint ) ) {
+						ControlFraction = max( 0.0, min( 1.0, std::abs( ( ExchCond( ExNum ).SupInTemp - HXTempSetPoint ) / ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) ) ) );
+					} else if ( ( ExchCond( ExNum ).SupInTemp < ExchCond( ExNum ).SupOutTemp && ExchCond( ExNum ).SupOutTemp < HXTempSetPoint ) ||
+								( ExchCond( ExNum ).SupInTemp > ExchCond( ExNum ).SupOutTemp && ExchCond( ExNum ).SupOutTemp > HXTempSetPoint ) ) {
+						ControlFraction = 1.0;
+					} else {
+						ControlFraction = 0.0;
+					}
 				} else {
 					//     ELSE fully bypass HX to maintain supply outlet temp as high as possible
 					ControlFraction = 0.0;
@@ -1941,7 +1948,7 @@ namespace HeatRecovery {
 						Error = ( TempSupOut - HXTempSetPoint );
 						//         IF supply inlet temp = supply outlet temp, fully bypass HX - ELSE control to SP
 						if ( TempSupIn != TempSupOut ) {
-							ControlFraction = max( 0.0, min( 1.0, ControlFraction * ( TempSupIn - HXTempSetPoint ) / ( TempSupIn - TempSupOut ) ) );
+							ControlFraction = max( 0.0, min( 1.0, std::abs( ControlFraction * ( TempSupIn - HXTempSetPoint ) / ( TempSupIn - TempSupOut ) ) ) );
 						} else if ( std::abs( TempSupOut - HXTempSetPoint ) < ErrorTol ) {
 							//           IF TempSupIn = TempSupOut then TempSecIn = TempSupIn (ControlFraction = ?)
 							//           Do nothing, variables in ELSE below have already been calculated

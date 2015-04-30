@@ -126,7 +126,7 @@ namespace MicroCHPElectricGenerator {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizeCompleted;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -171,7 +171,7 @@ namespace MicroCHPElectricGenerator {
 		if ( MicroCHP( GenNum ).ModelTypeAnnex42 ) { // call the non normalize calc routines (set for future extension to normalize ones)
 
 			InitMicroCHPNoNormalizeGenerators( GenNum, FirstHVACIteration );
-			if ( PlantSizeNotComplete ) return;
+			if ( ! PlantFirstSizeCompleted ) return;
 			CalcMicroCHPNoNormalizeGeneratorModel( GenNum, RunFlagElectCenter, RunFlagPlant, MyElectricLoad, MyThermalLoad, FirstHVACIteration );
 
 			CalcUpdateHeatRecovery( GenNum, FirstHVACIteration );
@@ -531,10 +531,10 @@ namespace MicroCHPElectricGenerator {
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_MicroCHP;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::SupplySide;
 		using DataPlant::LoopFlowStatus_TakesWhatGets;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::DemandSide;
 		using DataSizing::PlantSizData;
 		using PlantUtilities::SetComponentFlowRate;
@@ -597,7 +597,7 @@ namespace MicroCHPElectricGenerator {
 			MyPlantScanFlag( GeneratorNum ) = false;
 		}
 
-		if ( ! SysSizingCalc && MySizeFlag( GeneratorNum ) && ! MyPlantScanFlag( GeneratorNum ) && ( PlantSizesOkayToFinalize ) ) {
+		if ( ! SysSizingCalc && MySizeFlag( GeneratorNum ) && ! MyPlantScanFlag( GeneratorNum ) && ( PlantFirstSizesOkayToFinalize ) ) {
 			rho = GetDensityGlycol( PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidName, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp, PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidIndex, RoutineName );
 			if ( MicroCHP( GeneratorNum ).A42Model.InternalFlowControl ) { // got a curve
 				MicroCHP( GeneratorNum ).PlantMassFlowRateMax = 2.0 * CurveValue( MicroCHP( GeneratorNum ).A42Model.WaterFlowCurveID, MicroCHP( GeneratorNum ).A42Model.MaxElecPower, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp );

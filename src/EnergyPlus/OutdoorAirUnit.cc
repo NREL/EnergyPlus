@@ -215,6 +215,7 @@ namespace OutdoorAirUnit {
 			if ( OAUnitNum == 0 ) {
 				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
 			}
+			CompIndex = OAUnitNum;
 		} else {
 			OAUnitNum = CompIndex;
 			if ( OAUnitNum > NumOfOAUnits || OAUnitNum < 1 ) {
@@ -1679,7 +1680,7 @@ namespace OutdoorAirUnit {
 		int ControlNode; // the hot water or cold water inlet node
 		int InletNode; // Unit air inlet node
 		int SFanOutletNode; // Unit supply fan outlet node
-		int ZoneAirInNode; // zone supply air node
+//		int ZoneAirInNode; // zone supply air node
 		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/sec]
 		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/sec]
 		int OutletNode; // air outlet node

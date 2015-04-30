@@ -9388,11 +9388,11 @@ namespace DaylightingManager {
 					RefPt += IllumMap( MapNum ).Xnum;
 				} // X
 
-				if ( sqlite->writeOutputToSQLite() ) {
+				if ( sqlite ) {
 					if ( SQFirstTime ) {
 						XValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
 						YValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
-						IllumValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ), maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
+						IllumValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ), maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
 						SQFirstTime = false;
 					}
 
@@ -9404,9 +9404,9 @@ namespace DaylightingManager {
 						for ( X = 1; X <= IllumMap( MapNum ).Xnum; ++X ) {
 							XValue( X ) = IllumMap( MapNum ).Xmin + ( X - 1 ) * IllumMap( MapNum ).Xinc;
 							IllumIndex = X + ( Y - 1 ) * IllumMap( MapNum ).Xnum;
-							IllumValue( Y, X ) = nint( IllumMapCalc( MapNum ).DaylIllumAtMapPtHr( IllumIndex ) );
+							IllumValue( X, Y ) = nint( IllumMapCalc( MapNum ).DaylIllumAtMapPtHr( IllumIndex ) );
 							if ( ! IllumMapCalc( MapNum ).MapRefPtInBounds( IllumIndex ) ) {
-								IllumValue( Y, X ) = -IllumValue( Y, X );
+								IllumValue( X, Y ) = -IllumValue( X, Y );
 							}
 						} // X Loop
 					} // Y Loop
@@ -10273,7 +10273,7 @@ Label903: ;
 		fullmapName = Zone( ZoneNum ).Name + ':' + environmentName + ':' + mapName + " Illuminance [lux] (Hourly)";
 		gio::write( unitNo, FmtA ) << "Date/Time," + fullmapName + MapColSep + refPt1 + MapColSep + refPt2 + MapColSep + MapColSep;
 
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->createSQLiteDaylightMapTitle( mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord );
 		}
 

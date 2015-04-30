@@ -10,7 +10,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <ObjexxFCL/gio.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 
 
 using namespace EnergyPlus;
@@ -24,21 +23,12 @@ using namespace EnergyPlus::DataSizing;
 
 TEST( SizeStandAloneERVTest, Test1 )
 {
+	ShowMessage( "Begin Test: SizeStandAloneERVTest, Test1" );
 
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber( );
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
-//	eso_stream = gio::out_stream( OutputFileStandard );
-
-	//CreateSQLiteDatabase(); (lifted from SimulationManager.cc)
-	try {
-		EnergyPlus::sqlite = std::unique_ptr<SQLite>( new SQLite( ) );
-	}
-	catch ( const std::runtime_error& error ) {
-		// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
-		ShowFatalError( error.what( ) );
-	}
+	OutputFileInits = GetNewUnitNumber();
+	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
@@ -91,5 +81,13 @@ TEST( SizeStandAloneERVTest, Test1 )
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+
+	// Clean up
+	ZoneEquipConfig.deallocate();
+	Zone.deallocate();
+	ZoneEqSizing.deallocate();
+	People.deallocate();
+	StandAloneERV.deallocate();
+
 
 }

@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Building,                !- Name
@@ -3644,14 +3644,14 @@
     VAV Sys 4-1,             !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    0.3,                     !- Minimum System Air Flow Ratio
+    0.3,                     !- Central Heating Maximum System Air Flow Ratio
     7.2,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11,                      !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8,                    !- Central Cooling Design Supply Air Temperature {C}
     10,                      !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -3667,7 +3667,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AirLoopHVAC,
     VAV Sys 4-1,             !- Name

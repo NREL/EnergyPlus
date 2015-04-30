@@ -1291,6 +1291,8 @@ namespace ConductionTransferFunctionCalc {
 		// maximum summation of the elements in a row of AMat multiplied by
 		// the time step.
 
+		//Note With change to row-major arrays "row" here now means "column"
+
 		AMatRowNormMax = 0.0; // Start of Step 1 ...
 
 		for ( i = 1; i <= rcmax; ++i ) {

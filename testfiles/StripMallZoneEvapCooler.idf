@@ -49,7 +49,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,8.2;
+  Version,8.3;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4164,8 +4164,11 @@
   EvaporativeCooler:Direct:ResearchSpecial,
     LGstore1 Direct Evaporative Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Cooler Effectiveness
+    0.7,                     !- Cooler Design Effectiveness
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
     55.0,                    !- Recirculating Water Pump Power Consumption {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
     LGstore1 Indirect Outlet Node,  !- Air Inlet Node Name
     LGstore1 Inlet Node,     !- Air Outlet Node Name
     LGstore1 Inlet Node,     !- Sensor Node Name
@@ -4397,8 +4400,11 @@
   EvaporativeCooler:Direct:ResearchSpecial,
     SMstore4 Evaporative Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Cooler Effectiveness
+    0.7,                     !- Cooler Design Effectiveness
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
     55.0,                    !- Recirculating Water Pump Power Consumption {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
     SMstore4 Fan outlet,     !- Air Inlet Node Name
     SMstore4 Inlet Node,     !- Air Outlet Node Name
     SMstore4 Inlet Node,     !- Sensor Node Name
@@ -4450,17 +4456,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     SMstore5 Evaporative Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7500,                  !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
+    0.7500,                  !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
     55.0000,                 !- Recirculating Water Pump Power Consumption {W}
-    1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.6000,                  !- Secondary Fan Total Efficiency
-    124.6000,                !- Secondary Fan Delta Pressure {Pa}
+    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    ,                        !- Water Pump Power Modifier Curve Name
+    1.0,                     !- Secondary Air Design Air Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power W /(m3/s)
+    ,                        !- Secondary Fan Power Modifier Curve Name
     SMstore5 Fan outlet,     !- Primary Air Inlet Node Name
     SMstore5 Inlet Node,     !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9000,                  !- Dewpoint Effectiveness Factor
     SMstore5 Evap Cooler OA node,  !- Secondary Air Inlet Node Name
+    SMstore5 Evap Cooler OA Outlet Node, !- Secondary Air Outlet Node Name
     SMstore5 Inlet Node,     !- Sensor Node Name
     ,                        !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
@@ -4626,22 +4639,30 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     SMstore8 Indirect Evaporative Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7500,                  !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    55.0000,                 !- Recirculating Water Pump Power Consumption {W}
-    1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.6000,                  !- Secondary Fan Total Efficiency
-    124.6000,                !- Secondary Fan Delta Pressure {Pa}
+    0.7500,                  !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    55.0000,                 !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
+    1.0,                     !- Secondary Air Design Air Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power W /(m3/s)
+    ,                        !- Secondary Fan Power Modifier Curve Name
     SMstore8 Fan outlet,     !- Primary Air Inlet Node Name
     SMstore8 Indirect Outlet Node,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9000,                  !- Dewpoint Effectiveness Factor
     SMstore8 Evap Cooler OA node,  !- Secondary Air Inlet Node Name
+    SMstore8 Evap Cooler OA Outlet Node,     !- Secondary Air Outlet Node Name
     SMstore8 Inlet Node,     !- Sensor Node Name
     ,                        !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     0.2,                     !- Drift Loss Fraction
     3;                       !- Blowdown Concentration Ratio
+
 
   OutdoorAir:Node,
     SMstore8 Evap Cooler OA node;  !- Name
@@ -4649,8 +4670,11 @@
   EvaporativeCooler:Direct:ResearchSpecial,
     SMstore8 Direct Evaporative Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Cooler Effectiveness
+    0.7,                     !- Cooler Design Effectiveness
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
     55.0,                    !- Recirculating Water Pump Power Consumption {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
     SMstore8 Indirect Outlet Node,  !- Air Inlet Node Name
     SMstore8 Inlet Node,     !- Air Outlet Node Name
     SMstore8 Inlet Node,     !- Sensor Node Name

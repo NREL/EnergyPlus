@@ -239,9 +239,9 @@ EnergyPlusPgm( std::string const & filepath )
 #endif
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #ifndef _DEBUG
-	// If WIN32 and not debug then prevent dialogs on error
+    // If _MSC_VER and not debug then prevent dialogs on error
 	SetErrorMode(SEM_NOGPFAULTERRORBOX);
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
@@ -273,7 +273,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
 	DDOnly = env_var_on( cEnvValue ); // Yes or True
-	if(DDOnlySimulation)
+	if (DDOnlySimulation)
 		DDOnly = true;
 
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
@@ -281,7 +281,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
 	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
-	if(AnnualSimulation)
+	if (AnnualSimulation)
 		FullAnnualRun = true;
 
 	get_environment_variable( cDisplayAllWarnings, cEnvValue );
@@ -310,6 +310,9 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
+
+	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
+	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cIgnoreSolarRadiation, cEnvValue );
 	if ( ! cEnvValue.empty() ) IgnoreSolarRadiation = env_var_on( cEnvValue ); // Yes or True
@@ -351,7 +354,7 @@ EnergyPlusPgm( std::string const & filepath )
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	if( ! filepath.empty() ) {
+	if ( ! filepath.empty() ) {
 		// if filepath is not empty, then we are using E+ as a library API call
 		// change the directory to the specified folder, and pass in dummy args to command line parser
 		// this will initialize the paths throughout E+ to the defaults
@@ -392,11 +395,11 @@ EnergyPlusPgm( std::string const & filepath )
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
 
-    if(runReadVars) {
+    if (runReadVars) {
 		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 		bool FileExists;
 		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
-		if (!FileExists){
+		if (!FileExists) {
 			DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
 			exit(EXIT_FAILURE);
 		}

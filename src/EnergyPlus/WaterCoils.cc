@@ -1612,6 +1612,7 @@ namespace WaterCoils {
 		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
+		using ReportSizingManager::GetCoilDesFlowT;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1641,12 +1642,18 @@ namespace WaterCoils {
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value
+		Real64 CpAirStd; // specific heat of air at standard conditions
+		Real64 DesCoilAirFlow; // design air flow rate for the coil [m3/s]
+		Real64 DesCoilExitTemp; // design coil exit temperature [C]
 
 		ErrorsFound = false;
 		PltSizCoolNum = 0;
 		PltSizHeatNum = 0;
 		PltSizNum = 0;
+		DesCoilAirFlow = 0.0;
+		DesCoilExitTemp = 0.0;
 		LoopErrorsFound = false;
+		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 
 		// cooling coils
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling && WaterCoil( CoilNum ).RequestingAutoSize ) {
@@ -1678,9 +1685,18 @@ namespace WaterCoils {
 				bPRINT = true;
 				if ( WaterCoil ( CoilNum ).MaxWaterVolFlowRate != AutoSize ) bPRINT = false;
 				if ( CurSysNum == 0 ) bPRINT = false;
+				if ( CurSysNum > 0 && CurOASysNum == 0 ) {
+					GetCoilDesFlowT( CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp );
+					DataAirFlowUsedForSizing = DesCoilAirFlow;
+					DataFlowUsedForSizing = DesCoilAirFlow;
+					DataDesOutletAirTemp = DesCoilExitTemp;
+					DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.9, StdBaroPress, RoutineName );
+				}
+
 				SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should always print this!)
 				RequestSizing( CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName );
 				WaterCoil( CoilNum ).DesWaterCoolingCoilRate = TempSize;
+				WaterCoil( CoilNum ).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
 				DataCapacityUsedForSizing = WaterCoil( CoilNum ).DesWaterCoolingCoilRate;
 
 				// Why isn't the water volume flow rate based on the user inputs for inlet/outlet air/water temps? Water volume flow rate is always based on autosized inputs.
@@ -1877,10 +1893,13 @@ namespace WaterCoils {
 				DataWaterLoopNum = 0;
 				DataConstantUsedForSizing = 0.0;
 				DataFractionUsedForSizing = 0.0;
+				DataAirFlowUsedForSizing = 0.0;
 				DataFlowUsedForSizing = 0.0;
+				DataWaterFlowUsedForSizing = 0.0;
 				DataCapacityUsedForSizing = 0.0;
 				DataDesInletAirTemp = 0.0;
 				DataDesOutletAirTemp = 0.0;
+				DataDesOutletAirHumRat = 0.0;
 				DataDesInletAirHumRat = 0.0;
 				DataDesInletWaterTemp = 0.0;
 

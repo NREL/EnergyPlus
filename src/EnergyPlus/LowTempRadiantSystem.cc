@@ -2314,7 +2314,7 @@ namespace LowTempRadiantSystem {
 						if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) >= SmallLoad ) {
 							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0,
                              PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
-							Cp  = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0,
+							Cp = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0,
 								PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
 							WaterVolFlowMaxCoolDes = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor /
 								( PlantSizData(PltSizCoolNum).DeltaT * Cp * rho );
@@ -2335,7 +2335,7 @@ namespace LowTempRadiantSystem {
 					} else if ( OpMode == ClgOnly ) {
 						WaterVolFlowMaxDes = WaterVolFlowMaxCoolDes;
 					} else if ( OpMode == HtgOnly ) {
-						WaterVolFlowMaxDes = WaterVolFlowMaxHeatDes   ;
+						WaterVolFlowMaxDes = WaterVolFlowMaxHeatDes;
 					} else {
 						WaterVolFlowMaxDes = 0.0;
 					}

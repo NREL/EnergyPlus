@@ -17,7 +17,7 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,4;
 
@@ -1450,6 +1450,8 @@
   Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,daily;
 
   Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,daily;
+
+  Output:VariableDictionary,regular;
 
   Output:VariableDictionary,regular;
 

@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Building,                !- Name
@@ -2089,14 +2089,14 @@
     AHU 1,                   !- AirLoop Name
     sensible,                !- Type of Load to Size On
     0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.,                     !- Central Cooling Design Supply Air Temperature {C}
     50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2112,7 +2112,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AirLoopHVAC,
     AHU 1,                   !- Name
@@ -2337,14 +2347,14 @@
     AHU 2,                   !- AirLoop Name
     sensible,                !- Type of Load to Size On
     0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.,                     !- Central Cooling Design Supply Air Temperature {C}
     50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2360,7 +2370,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AirLoopHVAC,
     AHU 2,                   !- Name
@@ -2582,14 +2602,14 @@
     AHU 3,                   !- AirLoop Name
     sensible,                !- Type of Load to Size On
     0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.,                     !- Central Cooling Design Supply Air Temperature {C}
     50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2605,7 +2625,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AirLoopHVAC,
     AHU 3,                   !- Name
@@ -2827,14 +2857,14 @@
     AHU 4,                   !- AirLoop Name
     sensible,                !- Type of Load to Size On
     0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.,                     !- Central Cooling Design Supply Air Temperature {C}
     50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2850,7 +2880,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AirLoopHVAC,
     AHU 4,                   !- Name
@@ -3072,14 +3112,14 @@
     AHU 5,                   !- AirLoop Name
     sensible,                !- Type of Load to Size On
     0.0,                     !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.,                     !- Central Cooling Design Supply Air Temperature {C}
     50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -3095,7 +3135,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AirLoopHVAC,
     AHU 5,                   !- Name

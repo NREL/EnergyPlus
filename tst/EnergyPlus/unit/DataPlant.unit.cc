@@ -5,6 +5,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataPlant;
@@ -35,6 +36,8 @@ public:
 
 TEST_F( DataPlantTest, AnyPlantLoopSidesNeedSim )
 {
+	ShowMessage( "Begin Test: DataPlantTest, AnyPlantLoopSidesNeedSim" );
+
 	EXPECT_TRUE( AnyPlantLoopSidesNeedSim() ); // SimLoopSideNeeded is set to true in default ctor
 	SetAllPlantSimFlagsToValue( false ); // Set all SimLoopSideNeeded to false
 	EXPECT_FALSE( AnyPlantLoopSidesNeedSim() );

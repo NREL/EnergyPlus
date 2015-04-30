@@ -1351,8 +1351,7 @@ namespace OutputReportTabular {
 		if ( foundIndex == 0 ) {
 			ShowWarningError( moduleName + ": Specified key not found: " + OutputTableBinned( inObjIndex ).keyValue + " for variable: " + OutputTableBinned( inObjIndex ).varOrMeter );
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 
@@ -1520,20 +1519,15 @@ namespace OutputReportTabular {
 		int unitsStyleReturn;
 		if ( SameString( unitStringIn, "None" ) ) {
 			unitsStyleReturn = unitsStyleNone;
-		}
-		else if ( SameString( unitStringIn, "JTOKWH" ) ) {
+		} else if ( SameString( unitStringIn, "JTOKWH" ) ) {
 			unitsStyleReturn = unitsStyleJtoKWH;
-		}
-		else if ( SameString( unitStringIn, "JTOMJ" ) ) {
+		} else if ( SameString( unitStringIn, "JTOMJ" ) ) {
 			unitsStyleReturn = unitsStyleJtoMJ;
-		}
-		else if ( SameString( unitStringIn, "JTOGJ" ) ) {
+		} else if ( SameString( unitStringIn, "JTOGJ" ) ) {
 			unitsStyleReturn = unitsStyleJtoGJ;
-		}
-		else if ( SameString( unitStringIn, "INCHPOUND" ) ) {
+		} else if ( SameString( unitStringIn, "INCHPOUND" ) ) {
 			unitsStyleReturn = unitsStyleInchPound;
-		}
-		else {
+		} else {
 			unitsStyleReturn = unitsStyleNotFound;
 		}
 		return unitsStyleReturn;
@@ -2292,6 +2286,7 @@ namespace OutputReportTabular {
 			AddMonthlyFieldSetInput( curReport, "Cooling:Gas", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "WaterSystems:Gas", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Cogeneration:Gas", "", aggTypeSumOrAvg );
+			AddMonthlyFieldSetInput( curReport, "Humidifier:Gas", "", aggTypeSumOrAvg );
 		}
 		if ( namedMonthly( 15 ).show ) {
 			curReport = AddMonthlyReport( "EndUseEnergyConsumptionDieselMonthly", 2 );
@@ -2327,6 +2322,7 @@ namespace OutputReportTabular {
 			AddMonthlyFieldSetInput( curReport, "Heating:Propane", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "WaterSystems:Propane", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Cogeneration:Propane", "", aggTypeSumOrAvg );
+			AddMonthlyFieldSetInput( curReport, "Humidifier:Propane", "", aggTypeSumOrAvg );
 		}
 		if ( namedMonthly( 19 ).show ) {
 			curReport = AddMonthlyReport( "EndUseEnergyConsumptionGasolineMonthly", 2 );
@@ -2764,6 +2760,7 @@ namespace OutputReportTabular {
 			AddMonthlyFieldSetInput( curReport, "Air System Heating Coil Gas Energy", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Air System Heating Coil Steam Energy", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Air System Humidifier Electric Energy", "", aggTypeSumOrAvg );
+			AddMonthlyFieldSetInput( curReport, "Air System Humidifier Gas Energy", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Air System Evaporative Cooler Electric Energy", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Air System Desiccant Dehumidifier Electric Energy", "", aggTypeSumOrAvg );
 		}
@@ -6211,7 +6208,9 @@ namespace OutputReportTabular {
 				WriteReportHeaders( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, isAverage );
 				WriteSubtitle( "Custom Monthly Report" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose monthly XML tables.
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
+				}
 			} //jTables
 		} // iInput
 	}
@@ -6421,7 +6420,9 @@ namespace OutputReportTabular {
 				WriteTextLine( "" );
 				WriteSubtitle( "Time Bin Results" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose XML tables
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Time Bin Results" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Time Bin Results" );
+				}
 				//create statistics table
 				rowHeadStat( 1 ) = "Minimum";
 				rowHeadStat( 2 ) = "Mean minus two standard deviations";
@@ -6461,7 +6462,9 @@ namespace OutputReportTabular {
 				}
 				WriteSubtitle( "Statistics" );
 				WriteTable( tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true ); //transpose XML table
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Statistics" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Statistics" );
+				}
 			}
 		}
 	}
@@ -6908,7 +6911,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Site and Source Energy" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy" );
+				}
 			}
 
 			//---- Source and Site Energy Sub-Table
@@ -7040,7 +7045,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Site to Source Energy Conversion Factors" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site to Source Energy Conversion Factors" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site to Source Energy Conversion Factors" );
+				}
 			}
 
 			//---- Building Area Sub-Table
@@ -7077,7 +7084,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Building Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area" );
+				}
 			}
 
 			//---- End Use Sub-Table
@@ -7153,6 +7162,17 @@ namespace OutputReportTabular {
 				}
 				tableBody( iResource, 16 ) = RealToStr( useVal( iResource, 15 ), 2 );
 			}
+			// add warning message if end use values do not add up to total
+			for ( iResource = 1; iResource <= 6; ++iResource ) {
+				Real64 curTotal = 0.0;
+				for ( int jUse = 1; jUse <= 14; ++jUse ) {
+					curTotal += useVal( iResource, jUse );
+				}
+				if ( abs( curTotal - collapsedTotal( iResource ) ) > ( collapsedTotal( iResource ) * 0.001 )) {
+					ShowWarningError( "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + columnHead( 1 ) );
+				}
+			}
+
 			//complete the LEED end use table using the same values
 			// for certain rows in the LEED table the subcategories are necessary so first compute those values
 			leedFansParkFromFan = 0.0;
@@ -7342,7 +7362,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "End Uses" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses" );
+				}
 			}
 
 			//---- End Uses By Subcategory Sub-Table
@@ -7466,7 +7488,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "End Uses By Subcategory" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
+				}
 			}
 			//---- Normalized by Conditioned Area Sub-Table
 			// Calculations for both normalized tables are first
@@ -7535,7 +7559,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Utility Use Per Conditioned Floor Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Conditioned Floor Area" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Conditioned Floor Area" );
+				}
 			}
 			//---- Normalized by Total Area Sub-Table
 			tableBody = "";
@@ -7550,7 +7576,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Utility Use Per Total Floor Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Total Floor Area" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Total Floor Area" );
+				}
 			}
 
 			//---- Electric Loads Satisfied Sub-Table
@@ -7622,7 +7650,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Electric Loads Satisfied" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied" );
+				}
 			}
 
 			//---- On-Site Thermal Sources Sub-Table
@@ -7688,7 +7718,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "On-Site Thermal Sources" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources" );
+				}
 			}
 
 			//---- Water Loads Sub-Table
@@ -7774,7 +7806,9 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Water Source Summary" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary" );
+				}
 			}
 
 			//---- Comfort and Setpoint Not Met Sub-Table
@@ -7806,7 +7840,9 @@ namespace OutputReportTabular {
 				}
 
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria" );
+				}
 			}
 
 			rowHead.allocate( 3 );
@@ -7834,7 +7870,9 @@ namespace OutputReportTabular {
 
 			if ( displayTabularBEPS ) {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Comfort and Setpoint Not Met Summary" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Comfort and Setpoint Not Met Summary" );
+				}
 			}
 
 			//---- Control Summary Sub-Table
@@ -8042,7 +8080,9 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Summary" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Summary" );
+			}
 
 			//---- Normalized by Conditioned Area Sub-Table
 
@@ -8082,7 +8122,9 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Per Conditioned Floor Area" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Component Per Conditioned Floor Area" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Component Per Conditioned Floor Area" );
+			}
 
 			//---- Normalized by Total Area Sub-Table
 			tableBody = "";
@@ -8098,7 +8140,9 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Per Total Floor Area" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area" );
+			}
 
 		}
 	}
@@ -8509,7 +8553,9 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "End Uses" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses" );
+			}
 
 			//---- End Uses By Subcategory Sub-Table
 			numRows = 0;
@@ -8627,7 +8673,9 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "End Uses By Subcategory" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
+			}
 		}
 	}
 
@@ -8807,7 +8855,9 @@ namespace OutputReportTabular {
 
 		WriteSubtitle( "Construction Cost Estimate Summary" );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary" );
+		if ( sqlite ) {
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary" );
+		}
 
 		NumRows = NumLineItems + 1; //body will have the total and line items
 		NumCols = 6; // Line no., Line name, Qty, Units, ValperQty, Subtotal
@@ -8857,7 +8907,9 @@ namespace OutputReportTabular {
 		tableBody( 6, NumRows ) = RealToStr( CurntBldg.LineItemTot, 2 );
 		WriteSubtitle( "Cost Line Item Details" ); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
+		if ( sqlite ) {
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
+		}
 
 	}
 
@@ -9109,7 +9161,9 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "General" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General" );
+			}
 
 			//---- Window Wall Ratio Sub-Table
 			WriteTextLine( "ENVELOPE", true );
@@ -9311,7 +9365,9 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Window-Wall Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio" );
+			}
 
 			//---- Conditioned Window Wall Ratio Sub-Table
 			rowHead.allocate( 5 );
@@ -9372,7 +9428,9 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Conditioned Window-Wall Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio" );
+			}
 
 			//---- Skylight Roof Ratio Sub-Table
 			rowHead.allocate( 3 );
@@ -9399,7 +9457,9 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Skylight-Roof Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
+			}
 
 			if ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) > 0.0 || sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) > 0.0 ) {
 				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
@@ -9584,7 +9644,9 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Zone Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary" );
+			}
 		}
 	}
 
@@ -9675,7 +9737,9 @@ namespace OutputReportTabular {
 			}
 
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary" );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary" );
+			}
 		}
 
 	}
@@ -9901,7 +9965,9 @@ namespace OutputReportTabular {
 						//create the actual output table
 						WriteSubtitle( subTable( jSubTable ).name );
 						WriteTable( tableBody, rowHead, columnHead, columnWidth, false, subTable( jSubTable ).footnote );
-						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName( iReportName ).name, "Entire Facility", subTable( jSubTable ).name );
+						if ( sqlite ) {
+							sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName( iReportName ).name, "Entire Facility", subTable( jSubTable ).name );
+						}
 					}
 				}
 			}
@@ -10119,7 +10185,9 @@ namespace OutputReportTabular {
 				//write the table
 				WriteSubtitle( CompSizeTableEntry( foundEntry ).typeField );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, "User-Specified values were used. Design Size values were used if no User-Specified values were provided." );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
+				}
 			}
 		}
 	}
@@ -10251,10 +10319,14 @@ namespace OutputReportTabular {
 				// write the table
 				if ( iKindRec == recKindSurface ) {
 					WriteSubtitle( "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
+					if ( sqlite ) {
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
+					}
 				} else if ( iKindRec == recKindSubsurface ) {
 					WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
+					if ( sqlite ) {
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
+					}
 				}
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			}
@@ -11431,7 +11503,9 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Estimated Cooling Peak Load Components" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
+				}
 
 				//---- Cooling Peak Conditions
 
@@ -11508,7 +11582,9 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Cooling Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
+				}
 
 				//    !
 				//    !---- Radiant to Convective Decay Curves for Cooling
@@ -11899,7 +11975,9 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Estimated Heating Peak Load Components" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
+				}
 
 				//---- Heating Peak Conditions Sub-Table
 
@@ -11975,7 +12053,9 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Heating Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
+				}
 
 				//    !
 				//    !---- Radiant to Convective Decay Curves for Heating

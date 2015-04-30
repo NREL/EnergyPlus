@@ -36,6 +36,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <HeatBalanceSurfaceManager.hh>
+#include <HVACSizingSimulationManager.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MatrixDataManager.hh>
@@ -3546,6 +3547,7 @@ namespace HeatBalanceManager {
 		//  Window5 data file
 		bool EOFonW5File; // True if EOF encountered reading Window5 data file
 		static bool NoRegularMaterialsUsed( true );
+		int MaterialLayerGroup; // window contruction layer material group index
 
 		int iMatGlass; // number of glass layers
 		Array1D_string WConstructNames;
@@ -3624,6 +3626,12 @@ namespace HeatBalanceManager {
 				// count number of glass layers
 				if ( Construct( ConstrNum ).LayerPoint( Layer ) > 0 ) {
 					if ( Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Group == WindowGlass ) ++iMatGlass;
+					MaterialLayerGroup = Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Group;
+					if ( ( MaterialLayerGroup == GlassEquivalentLayer ) || ( MaterialLayerGroup == ShadeEquivalentLayer ) || ( MaterialLayerGroup == DrapeEquivalentLayer ) || ( MaterialLayerGroup == BlindEquivalentLayer ) || ( MaterialLayerGroup == ScreenEquivalentLayer ) || ( MaterialLayerGroup == GapEquivalentLayer ) ) {
+						ShowSevereError( "Invalid material layer type in window " + CurrentModuleObject + " = " + Construct( ConstrNum ).Name );
+						ShowSevereError( "Equivalent Layer material type = " + ConstructAlphas( Layer ) + " is allowed only in Construction:WindowEquivalentLayer window object." );
+						ErrorsFound = true;
+					}
 				}
 
 				if ( Construct( ConstrNum ).LayerPoint( Layer ) == 0 ) {
@@ -4999,7 +5007,8 @@ namespace HeatBalanceManager {
 		using DataSystemVariables::ReportDuringWarmup; // added for FMI
 		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
 		using namespace DataReportingFlags;
-
+		using DataGlobals::KindOfSim;
+		using DataGlobals::ksHVACSizeDesignDay;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -5025,6 +5034,10 @@ namespace HeatBalanceManager {
 		if ( ! WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+			}
+
 			UpdateTabularReports( ZoneTSReporting );
 			UpdateUtilityBills();
 		} else if ( ! KickOffSimulation && DoOutputReporting && ReportDuringWarmup ) {
@@ -5047,8 +5060,15 @@ namespace HeatBalanceManager {
 			}
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+			}
+
 		} else if ( UpdateDataDuringWarmupExternalInterface ) { // added for FMI
 			UpdateDataandReport( ZoneTSReporting );
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+			}
 		}
 		// There is no hourly reporting in the heat balance.
 

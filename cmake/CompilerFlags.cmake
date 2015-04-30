@@ -6,7 +6,7 @@ ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
 
-IF ( MSVC ) # Visual C++ (VS 2013)
+IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #  4068 Unknown pragma
@@ -104,6 +104,7 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #   177 Variable declared but never referenced
+    #   488 Template parameter not used ...
     #   869 Parameter never referenced
     #  1786 Use of deprecated items
     #  2259 Non-pointer conversions may lose significant bits
@@ -116,7 +117,7 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("/Qcxx-features") # Enables standard C++ features without disabling Microsoft extensions
     ADD_CXX_DEFINITIONS("/Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("/Wp64") # 64-bit warnings
-    ADD_CXX_DEFINITIONS("/Qdiag-disable:177,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+    ADD_CXX_DEFINITIONS("/Qdiag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
 
@@ -147,6 +148,7 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #   177 Variable declared but never referenced
+    #   488 Template parameter not used ...
     #   869 Parameter never referenced
     #  1786 Use of deprecated items
     #  2259 Non-pointer conversions may lose significant bits
@@ -158,7 +160,7 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("-std=c++11") # Specify C++11 language
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
-    ADD_CXX_DEFINITIONS("-diag-disable:177,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+    ADD_CXX_DEFINITIONS("-diag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
 
     # Optimization options that had no significant benefit for EnergyPlus
     #  -inline-factor=200

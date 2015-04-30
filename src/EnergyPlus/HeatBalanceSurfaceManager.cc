@@ -654,8 +654,8 @@ namespace HeatBalanceSurfaceManager {
 				TSC = 0.0;
 				auto l11( TH.index( 1, 2, SurfNum ) );
 				auto l12( TH.index( 2, 2, SurfNum ) );
-				auto const s1( TH.size3() );
-				for ( Term = 1; Term <= construct.NumCTFTerms; ++Term, l11 += s1, l12 += s1 ) { // [ l11 ] == ( SurfNum, Term + 1, 1 ), [ l12 ] == ( SurfNum, Term + 1, 2 )
+				auto const s3( TH.size3() );
+				for ( Term = 1; Term <= construct.NumCTFTerms; ++Term, l11 += s3, l12 += s3 ) { // [ l11 ] == ( 1, Term + 1, SurfNum ), [ l12 ] == ( 1, Term + 1, SurfNum )
 
 					// Sign convention for the various terms in the following two equations
 					// is based on the form of the Conduction Transfer Function equation
@@ -1902,7 +1902,7 @@ namespace HeatBalanceSurfaceManager {
 				// For Complex Fenestrations:
 				SurfaceWindow( SurfNum ).SkyGndSolarInc = SurfaceWindow( SurfNum ).GndSolarInc;
 				SurfaceWindow( SurfNum ).BmGndSolarInc = 0.0;
-				if ( CalcSolRefl ) { //Tuned Linear indexing // [ lSH ] == ( SurfNum, HourOfDay ) // [ lSP ] == ( SurfNum, PreviousHour )
+				if ( CalcSolRefl ) { //Tuned Linear indexing // [ lSH ] == ( HourOfDay, SurfNum ) // [ lSP ] == ( PreviousHour, SurfNum )
 
 					// For Complex Fenestrations:
 					SurfaceWindow( SurfNum ).SkyGndSolarInc = DifSolarRad * GndReflectance * ReflFacSkySolGnd( SurfNum );
@@ -1971,7 +1971,7 @@ namespace HeatBalanceSurfaceManager {
 						auto lZone( FractDifShortZtoZ.index( ZoneNum, 1 ) ); //Tuned Linear indexing
 						for ( OtherZoneNum = 1; OtherZoneNum <= NumOfZones; ++OtherZoneNum, ++lZone ) {
 							if ( ( OtherZoneNum != ZoneNum ) && ( RecDifShortFromZ( OtherZoneNum ) ) ) {
-								QSDifSol_sum += FractDifShortZtoZ[ lZone ] * QDforDaylight( OtherZoneNum ); // [ lZone ] == ( OtherZoneNum, ZoneNum )
+								QSDifSol_sum += FractDifShortZtoZ[ lZone ] * QDforDaylight( OtherZoneNum ); // [ lZone ] == ( ZoneNum, OtherZoneNum )
 							}
 						}
 						QSDifSol( ZoneNum ) += QSDifSol_sum;
@@ -3789,10 +3789,10 @@ namespace HeatBalanceSurfaceManager {
 		}
 
 		auto const l111( TH.index( 1, 1, 1 ) );
-		auto const l112( TH.index( 2, 1, 1 ) );
+		auto const l211( TH.index( 2, 1, 1 ) );
 		auto l11( l111 );
-		auto l12( l112 );
-		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum, ++l11, ++l12 ) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( SurfNum, 1, 1 ), [ l12 ] = ( SurfNum, 1, 2 )
+		auto l21( l211 );
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum, ++l11, ++l21 ) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
 			auto const & surface( Surface( SurfNum ) );
 
 			if ( surface.Class == SurfaceClass_Window || ! surface.HeatTransSurf ) continue;
@@ -3814,7 +3814,7 @@ namespace HeatBalanceSurfaceManager {
 			Real64 const QsrcHist1( QsrcHist( SurfNum, 1 ) );
 
 			// Set current inside flux:
-			Real64 const QH_12 = QH[ l12 ] = TH[ l11 ] * construct.CTFCross( 0 ) - TempSurfIn( SurfNum ) * construct.CTFInside( 0 ) + QsrcHist1 * construct.CTFSourceIn( 0 ) + CTFConstInPart( SurfNum ); // Heat source/sink term for radiant systems
+			Real64 const QH_12 = QH[ l21 ] = TH[ l11 ] * construct.CTFCross( 0 ) - TempSurfIn( SurfNum ) * construct.CTFInside( 0 ) + QsrcHist1 * construct.CTFSourceIn( 0 ) + CTFConstInPart( SurfNum ); // Heat source/sink term for radiant systems
 			if ( surface.Class == SurfaceClass_Floor || surface.Class == SurfaceClass_Wall || surface.Class == SurfaceClass_IntMass || surface.Class == SurfaceClass_Roof || surface.Class == SurfaceClass_Door ) {
 				OpaqSurfInsFaceConduction( SurfNum ) = surface.Area * QH_12;
 				OpaqSurfInsFaceConductionFlux( SurfNum ) = QH_12; //CR 8901
@@ -3849,8 +3849,8 @@ namespace HeatBalanceSurfaceManager {
 		} // ...end of loop over all (heat transfer) surfaces...
 
 		l11 = l111;
-		l12 = l112;
-		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum, ++l11, ++l12 ) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( SurfNum, 1, 1 ), [ l12 ] = ( SurfNum, 1, 2 )
+		l21 = l211;
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum, ++l11, ++l21 ) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
 			auto const & surface( Surface( SurfNum ) );
 
 			if ( surface.Class == SurfaceClass_Window || ! surface.HeatTransSurf ) continue;
@@ -3860,7 +3860,7 @@ namespace HeatBalanceSurfaceManager {
 				TempInt1( SurfNum ) = TempSurfIn( SurfNum );
 				Tsrc1( SurfNum ) = TsrcHist( SurfNum, 1 );
 				QExt1( SurfNum ) = QH[ l11 ];
-				QInt1( SurfNum ) = QH[ l12 ];
+				QInt1( SurfNum ) = QH[ l21 ];
 				Qsrc1( SurfNum ) = QsrcHist( SurfNum, 1 );
 			}
 
@@ -3891,8 +3891,8 @@ namespace HeatBalanceSurfaceManager {
 						auto const li( THM.size3() );
 						auto l1( l + li );
 						for ( HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= li ) { //Tuned Linear indexing
-							//TH( SurfNum, HistTermNum, SideNum ) = THM( SurfNum, HistTermNum, SideNum ) = THM( SurfNum, HistTermNum - 1, SideNum );
-							//QH( SurfNum, HistTermNum, SideNum ) = QHM( SurfNum, HistTermNum, SideNum ) = QHM( SurfNum, HistTermNum - 1, SideNum );
+							//TH( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum - 1, SurfNum );
+							//QH( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum - 1, SurfNum );
 							TH[ l1 ] = THM[ l1 ] = THM[ l ];
 							QH[ l1 ] = QHM[ l1 ] = QHM[ l ];
 						}
@@ -3900,27 +3900,27 @@ namespace HeatBalanceSurfaceManager {
 					auto m( TsrcHistM.index( SurfNum, numCTFTerms ) );
 					auto m1( m + 1 );
 					for ( HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1 ) { //Tuned Linear indexing
-						//TsrcHist( HistTerm, SurfNum ) = TsrcHistM( HistTerm, SurfNum ) = TsrcHistM( HistTermNum - 1, SurfNum );
-						//QsrcHist( HistTerm, SurfNum ) = QsrcHistM( HistTerm, SurfNum ) = QsrcHistM( HistTermNum - 1, SurfNum );
+						//TsrcHist( SurfNum, HistTerm ) = TsrcHistM( SurfNum, HHistTerm ) = TsrcHistM( SurfNum, HistTermNum - 1 );
+						//QsrcHist( SurfNum, HistTerm ) = QsrcHistM( SurfNum, HHistTerm ) = QsrcHistM( SurfNum, HistTermNum - 1 );
 						TsrcHist[ m1 ] = TsrcHistM[ m1 ] = TsrcHistM[ m ];
 						QsrcHist[ m1 ] = QsrcHistM[ m1 ] = QsrcHistM[ m ];
 					}
 				}
 
 				//Tuned Linear indexing
-				//THM( SurfNum, 2, 1 ) = TempExt1( SurfNum );
-				//THM( SurfNum, 2, 2 ) = TempInt1( SurfNum );
-				//TsrcHistM( 2, SurfNum ) = Tsrc1( SurfNum );
-				//QHM( SurfNum, 2, 1 ) = QExt1( SurfNum );
-				//QHM( SurfNum, 2, 2 ) = QInt1( SurfNum );
-				//QsrcHistM( 2, SurfNum ) = Qsrc1( SurfNum );
+				//THM( 1, 2, SurfNum ) = TempExt1( SurfNum );
+				//THM( 2, 2, SurfNum ) = TempInt1( SurfNum );
+				//TsrcHistM( SurfNum, 2 ) = Tsrc1( SurfNum );
+				//QHM( 1, 2, SurfNum ) = QExt1( SurfNum );
+				//QHM( 2, 2, SurfNum ) = QInt1( SurfNum );
+				//QsrcHistM( SurfNum, 2 ) = Qsrc1( SurfNum );
 				//
-				//TH( SurfNum, 2, 1 ) = THM( SurfNum, 2, 1 );
-				//TH( SurfNum, 2, 2 ) = THM( SurfNum, 2, 2 );
-				//TsrcHist( 2, SurfNum ) = TsrcHistM( 2, SurfNum );
-				//QH( SurfNum, 2, 1 ) = QHM( SurfNum, 2, 1 );
-				//QH( SurfNum, 2, 2 ) = QHM( SurfNum, 2, 2 );
-				//QsrcHist( 2, SurfNum ) = QsrcHistM( 2, SurfNum );
+				//TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum );
+				//TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum );
+				//TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 );
+				//QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum );
+				//QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum );
+				//QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 );
 
 				auto const l21( TH.index( 1, 2, SurfNum ) ); // Linear index
 				auto const l22( TH.index( 2, 2, SurfNum ) ); // Linear index
@@ -3945,13 +3945,13 @@ namespace HeatBalanceSurfaceManager {
 					int const numCTFTerms( construct.NumCTFTerms );
 					for ( SideNum = 1; SideNum <= 2; ++SideNum ) { //Tuned Index order switched for cache friendliness
 						auto l( THM.index( SideNum, numCTFTerms, SurfNum ) );
-						auto const s1( THM.size3() );
-						auto l1( l + s1 );
-						for ( HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= s1 ) { //Tuned Linear indexing
-							//Real64 const THM_l1( THM( SurfNum, HistTermNum, SideNum ) );
-							//TH( SurfNum, HistTermNum, SideNum ) = THM_l1 - ( THM_l1 - THM( SurfNum, HistTermNum - 1, SideNum ) ) * sum_steps;
-							//Real64 const QHM_l1( QHM( SurfNum, HistTermNum, SideNum ) );
-							//QH( SurfNum, HistTermNum, SideNum ) = QHM_l1 - ( QHM_l1 - QHM( SurfNum, HistTermNum - 1, SideNum ) ) * sum_steps;
+						auto const s3( THM.size3() );
+						auto l1( l + s3 );
+						for ( HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= s3 ) { //Tuned Linear indexing
+							//Real64 const THM_l1( THM( SideNum, HistTermNum, SurfNum ) );
+							//TH( SideNum, HistTermNum, SurfNum ) = THM_l1 - ( THM_l1 - THM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
+							//Real64 const QHM_l1( QHM( SideNum, HistTermNum, SurfNum ) );
+							//QH( SideNum, HistTermNum, SurfNum ) = QHM_l1 - ( QHM_l1 - QHM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
 							Real64 const THM_l1( THM[ l1 ] );
 							TH[ l1 ] = THM_l1 - ( THM_l1 - THM[ l ] ) * sum_steps;
 							Real64 const QHM_l1( QHM[ l1 ] );
@@ -3961,10 +3961,10 @@ namespace HeatBalanceSurfaceManager {
 					auto m( TsrcHistM.index( SurfNum, numCTFTerms ) );
 					auto m1( m + 1 );
 					for ( HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1 ) { //Tuned Linear indexing [ l ] == ()
-						//Real64 const TsrcHistM_elem( TsrcHistM( HistTermNum, SurfNum ) );
-						//TsrcHist( HistTermNum, SurfNum ) = TsrcHistM_elem - ( TsrcHistM_elem - TsrcHistM( HistTermNum - 1, SurfNum ) ) * sum_steps;
-						//Real64 const QsrcHistM_elem( QsrcHistM( HistTermNum, SurfNum ) );
-						//QsrcHist( HistTermNum, SurfNum ) = QsrcHistM_elem - ( QsrcHistM_elem - QsrcHistM( HistTermNum - 1, SurfNum ) ) * sum_steps;
+						//Real64 const TsrcHistM_elem( TsrcHistM( SurfNum, HistTermNum ) );
+						//TsrcHist( SurfNum, HistTermNum ) = TsrcHistM_elem - ( TsrcHistM_elem - TsrcHistM( SurfNum, HistTermNum - 1 ) ) * sum_steps;
+						//Real64 const QsrcHistM_elem( QsrcHistM( SurfNum, HistTermNum ) );
+						//QsrcHist( SurfNum, HistTermNum ) = QsrcHistM_elem - ( QsrcHistM_elem - QsrcHistM( SurfNum, HistTermNum - 1 ) ) * sum_steps;
 						Real64 const TsrcHistM_m1( TsrcHistM[ m1 ] );
 						TsrcHist[ m1 ] = TsrcHistM_m1 - ( TsrcHistM_m1 - TsrcHistM[ m ] ) * sum_steps;
 						Real64 const QsrcHistM_m1( QsrcHistM[ m1 ] );
@@ -3973,10 +3973,10 @@ namespace HeatBalanceSurfaceManager {
 				}
 
 				//Tuned Linear indexing
-				//TH( SurfNum, 2, 1 ) = THM( SurfNum, 2, 1 ) - ( THM( SurfNum, 2, 1 ) - TempExt1( SurfNum ) ) * sum_steps;
-				//TH( SurfNum, 2, 2 ) = THM( SurfNum, 2, 2 ) - ( THM( SurfNum, 2, 2 ) - TempInt1( SurfNum ) ) * sum_steps;
-				//QH( SurfNum, 2, 1 ) = QHM( SurfNum, 2, 1 ) - ( QHM( SurfNum, 2, 1 ) - QExt1( SurfNum ) ) * sum_steps;
-				//QH( SurfNum, 2, 2 ) = QHM( SurfNum, 2, 2 ) - ( QHM( SurfNum, 2, 2 ) - QInt1( SurfNum ) ) * sum_steps;
+				//TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum ) - ( THM( 1, 2, SurfNum ) - TempExt1( SurfNum ) ) * sum_steps;
+				//TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum ) - ( THM( 2, 2, SurfNum ) - TempInt1( SurfNum ) ) * sum_steps;
+				//QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum ) - ( QHM( 1, 2, SurfNum ) - QExt1( SurfNum ) ) * sum_steps;
+				//QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum ) - ( QHM( 2, 2, SurfNum ) - QInt1( SurfNum ) ) * sum_steps;
 
 				auto const l21( TH.index( 1, 2, SurfNum ) ); // Linear index
 				auto const l22( TH.index( 2, 2, SurfNum ) ); // Linear index
@@ -3986,8 +3986,8 @@ namespace HeatBalanceSurfaceManager {
 				QH[ l22 ] = QHM[ l22 ] - ( QHM[ l22 ] - QInt1( SurfNum ) ) * sum_steps;
 
 				//Tuned Linear indexing
-				//TsrcHist( 2, SurfNum ) = TsrcHistM( 2, SurfNum ) - ( TsrcHistM( 2, SurfNum ) - Tsrc1( SurfNum ) ) * sum_steps;
-				//QsrcHist( 2, SurfNum ) = QsrcHistM( 2, SurfNum ) - ( QsrcHistM( 2, SurfNum ) - Qsrc1( SurfNum ) ) * sum_steps;
+				//TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 ) - ( TsrcHistM( SurfNum, 2 ) - Tsrc1( SurfNum ) ) * sum_steps;
+				//QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 ) - ( QsrcHistM( SurfNum, 2 ) - Qsrc1( SurfNum ) ) * sum_steps;
 
 				auto const l2( TsrcHist.index( SurfNum, 2 ) );
 				TsrcHist[ l2 ] = TsrcHistM[ l2 ] - ( TsrcHistM[ l2 ] - Tsrc1( SurfNum ) ) * sum_steps;
@@ -5081,9 +5081,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			if ( surface.Class == SurfaceClass_TDD_Dome ) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 			if ( ( ZoneNum = surface.Zone ) == 0 ) continue; // Skip non-heat transfer surfaces
 
-			Real64 & TH11( TH( 1, 1, SurfNum )  );
-			Real64 & TH12( TH( 2, 1, SurfNum )  );
-			Real64 & TH22( TH( 2, 2, SurfNum )  );
+			Real64 & TH11( TH( 1, 1, SurfNum ) );
+			Real64 & TH12( TH( 2, 1, SurfNum ) );
+			Real64 & TH22( TH( 2, 2, SurfNum ) );
 
 			ConstrNum = surface.Construction;
 			auto const & construct( Construct( ConstrNum ) );
@@ -5361,6 +5361,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			TH12 = TempSurfInRep( SurfNum ) = TempSurfIn( SurfNum );
 			TempSurfOut( SurfNum ) = TH11; // For reporting
 
+			//if ( std::isnan( TempSurfInRep( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
+				//// throw Error
+				//ShowFatalError( "Inside surface temperature is out of bound = " + Surface( SurfNum ).Name );
+			//}
 			// sign convention is positive means energy going into inside face from the air.
 			auto const HConvInTemp_fac( -HConvIn_surf * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) );
 			QdotConvInRep( SurfNum ) = surface.Area * HConvInTemp_fac;
@@ -5528,7 +5532,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 		// temperatures to the correct value, namely the value calculated by the
 		// inside surface heat balance for the other side.
 		assert( TH.index( 1, 1, 1 ) == 0u ); // Assumed for linear indexing below
-		auto const l112( TH.index( 2, 1, 1 ) - 1 );
+		auto const l211( TH.index( 2, 1, 1 ) - 1 );
 		for ( std::vector< int >::size_type iSurfToResimulate = 0u; iSurfToResimulate < nSurfToResimulate; ++iSurfToResimulate ) {
 			SurfNum = SurfToResimulate[ iSurfToResimulate ];
 			// Interzones must have an exterior boundary condition greater than zero
@@ -5540,7 +5544,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				// of the interzone pair and reassign the reporting variable.  By going
 				// through all of the surfaces, this should pick up the other side as well
 				// as affect the next iteration.
-				TempSurfOut( SurfNum ) = TH[ SurfNum - 1 ] = TH[ l112 + surfExtBoundCond ]; // [ SurfNum - 1 ] == ( SurfNum, 1, 1 ) // [ l112 + surfExtBoundCond ] == ( surfExtBoundCond, 1, 2 )
+				TempSurfOut( SurfNum ) = TH[ SurfNum - 1 ] = TH[ l211 + surfExtBoundCond ]; // [ SurfNum - 1 ] == ( 1, 1, SurfNum ) // [ l211 + surfExtBoundCond ] == ( 2, 1, surfExtBoundCond )
 			}
 		}
 
@@ -5810,7 +5814,7 @@ CalcOutsideSurfTemp(
 	// the next SurfNum.
 
 	// Outside heat balance case: Tubular daylighting device
-	Real64 & TH11( TH( 1, 1, SurfNum )  );
+	Real64 & TH11( TH( 1, 1, SurfNum ) );
 	if ( Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) {
 
 		// Lookup up the TDD:DIFFUSER object

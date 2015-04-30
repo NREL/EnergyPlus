@@ -13,7 +13,7 @@
 ! System:   None.
 ! Plant:    Plant loop with one WATER HEATER:STRATIFIED object connected to two WATER USE EQUIPMENT objects.
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Water Heater DHW Plant Loop Example,  !- Name
@@ -544,4 +544,7 @@
   Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,TIMESTEP;
 
   Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,TIMESTEP;
+
+  Output:SQLite,
+    Simple;
 

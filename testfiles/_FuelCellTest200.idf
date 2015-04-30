@@ -23,7 +23,7 @@
 
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Test Harness for MicroCogen,  !- Name
@@ -410,8 +410,8 @@
     0.0,                     !- Shut Down Time {s}
     0.2,                     !- Shut Down Fuel {kmol}
     6.0E+06,                 !- Shut Down Electricity Consumption {J}
-    0.0,                     !- Ancilliary Electricity Constant Term
-    0.0,                     !- Ancilliary Electricity Linear Term
+    0.0,                     !- Ancillary Electricity Constant Term
+    0.0,                     !- Ancillary Electricity Linear Term
     ConstantRate,            !- Skin Loss Calculation Mode
     GARAGE ZONE,             !- Zone Name
     0.2,                     !- Skin Loss Radiative Fraction
@@ -532,8 +532,8 @@
   Generator:FuelCell:AuxiliaryHeater,
     Fictitious SOFC Auxiliary Heater,  !- Name
     0.3,                     !- Excess Air Ratio
-    10.0,                    !- Ancilliary Power Constant Term
-    1.0E+07,                 !- Ancilliary Power Linear Term
+    10.0,                    !- Ancillary Power Constant Term
+    1.0E+07,                 !- Ancillary Power Linear Term
     0.5,                     !- Skin Loss U-Factor Times Area Value {W/K}
     SurroundingZone,         !- Skin Loss Destination
     GARAGE ZONE,             !- Zone Name to Receive Skin Losses

@@ -8,6 +8,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/SortAndStringUtilities.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SortAndStringUtilities;
@@ -15,6 +16,8 @@ using namespace ObjexxFCL;
 
 TEST( SortAndStringUtilitiesTest, Basic )
 {
+	ShowMessage( "Begin Test: SortAndStringUtilitiesTest, Basic" );
+
 	Array1D_string Alphas( { "ZEBRA", "LION", "RACOON", "BOA", "LEMUR" } );
 	Array1D_int iAlphas( 5 );
 	SetupAndSort( Alphas, iAlphas );

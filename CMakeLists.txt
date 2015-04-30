@@ -5,8 +5,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_VERSION_MAJOR 8 )
-set( CMAKE_VERSION_MINOR 2 )
-set( CMAKE_VERSION_PATCH 8 ) 
+set( CMAKE_VERSION_MINOR 3 )
+set( CMAKE_VERSION_PATCH 2 )
+
+set( PREV_RELEASE_SHA "e53a815" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
 
@@ -43,6 +45,19 @@ set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
+# Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
+# Turn this option OFF for automated testing.
+option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
+option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
+mark_as_advanced( ENABLE_INSTALL_REMOTE )
+
+# we don't need all devs to have Python installed.  There are 2 cases where we do want it
+# 1. Doing regression testing; which would be: BUILD_TESTING AND ENABLE_REGRESSION_TESTING
+# 2. Doing package building, since Python is going to be our tool for some things; thus: BUILD_PACKAGE
+
+if( ( BUILD_TESTING AND ENABLE_REGRESSION_TESTING ) OR ( BUILD_PACKAGE ) )
+  find_package(PythonInterp 2.7 REQUIRED)
+endif()
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -53,7 +68,6 @@ if( BUILD_TESTING )
       set( ARCH_FLAG "" )
     endif()
 
-    find_package(PythonInterp REQUIRED)
     set( REGRESSION_BASELINE_SHA "" CACHE STRING "SHA of baseline comparison" )
     set( COMMIT_SHA "" CACHE STRING "Commit sha of this build" )
     set( REGRESSION_SCRIPT_PATH "" CACHE PATH "Path to regression scripts" )
@@ -77,12 +91,16 @@ if( UNIX AND NOT APPLE )
   set(CMAKE_INSTALL_RPATH "$ORIGIN")
 endif()
 
-if (MSVC)
+if ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) )
   if (CMAKE_C_COMPILER_VERSION VERSION_LESS "18.00.30723")
     message(FATAL_ERROR "Visual Studio 2013 Update 3 or Greater Required")
   endif()
   set(gtest_force_shared_crt ON)
 endif()
+
+if (MINGW)
+  set(CMAKE_SHARED_LIBRARY_PREFIX "")
+endif ()
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
@@ -108,7 +126,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
+INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
 
 if( BUILD_TESTING )
@@ -158,10 +176,6 @@ if( BUILD_PACKAGE )
     "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
   )
 
-  set(EPLUS_BUILDSUPPORT_REPO 
-    "RootOfEnergyPlusBuildSupportRepo" CACHE PATH "Enter the root of the EnergyPlusBuildSupport repo"
-  )
-  
   if( BUILD_FORTRAN )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
@@ -178,20 +192,20 @@ endif()
 
 
 set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib energypluslib2
     )
 if(NOT APPLE AND NOT MSVC)
   list(APPEND OPTIMIZABLE_TARGETS parser)
 endif()
 
 if(NOT MSVC)
-  list(APPEND OPTIMIZABLE_TARGETS objexx_tests EnergyPlus_tests)
+  list(APPEND OPTIMIZABLE_TARGETS objexx_tests energyplus_tests)
 endif()
 
 if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
   get_filename_component(LINKER_DIR "${CMAKE_LINKER}" PATH)
   get_filename_component(LINKER_DIR_NAME "${LINKER_DIR}" NAME)
-  
+
   if (MSVC12)
     set(PGORTVER "120")
   elseif(MSVC14)
@@ -199,7 +213,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
   endif()
 
   message("Examining ${LINKER_DIR_NAME} for PGO RT DLL")
-  
+
   if ("${LINKER_DIR_NAME}" MATCHES ".*amd64.*")
     get_filename_component(LINKER_PARENT_DIR "${LINKER_DIR}" PATH)
     set(PGORTDIR "${LINKER_PARENT_DIR}/amd64")
@@ -207,7 +221,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
   else()
     set(PGORTDIR "${LINKER_DIR}")
   endif()
-  
+
   file(COPY "${PGORTDIR}/pgort${PGORTVER}.dll" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release" )
 
   foreach(target ${OPTIMIZABLE_TARGETS})
@@ -219,7 +233,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
     if(targ_link_flags STREQUAL "targ_link_flags-NOTFOUND")
       set(targ_link_flags "")
     endif()
-    
+
     if(targ_static_link_flags STREQUAL "targ_static_link_flags-NOTFOUND")
       set(targ_static_link_flags "")
     endif()
@@ -231,7 +245,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
     if (ENABLE_LTO OR PROFILE_GENERATE OR PROFILE_USE)
       set(targ_compile_flags "${targ_compile_flags} /GL")
     endif()
-    
+
     if(ENABLE_LTO AND NOT PROFILE_GENERATE AND NOT PROFILE_USE)
       set(targ_link_flags "${targ_link_flags} /LTCG")
       set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
@@ -247,7 +261,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
       set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
     endif()
 
-    set_target_properties(${target} PROPERTIES LINK_FLAGS "${targ_link_flags}" STATIC_LIBRARY_FLAGS "${targ_static_link_flags}" 
+    set_target_properties(${target} PROPERTIES LINK_FLAGS "${targ_link_flags}" STATIC_LIBRARY_FLAGS "${targ_static_link_flags}"
        COMPILE_FLAGS "${targ_compile_flags}")
 
   endforeach()
@@ -256,12 +270,12 @@ elseif (CMAKE_COMPILER_IS_GNUCXX)
   if(ENABLE_LTO)
     set_target_properties(${OPTIMIZABLE_TARGETS}
       PROPERTIES LINK_FLAGS "-flto=7 -fno-use-linker-plugin" COMPILE_FLAGS "-flto=7 -fno-use-linker-plugin")
-    set_target_properties(EnergyPlus
+    set_target_properties(energyplus
       PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program")
   endif()
 
   if (PROFILE_GENERATE)
-    set_target_properties(${OPTIMIZABLE_TARGETS} EnergyPlus_tests TestEnergyPlusCallbacks
+    set_target_properties(${OPTIMIZABLE_TARGETS} energyplus_tests TestEnergyPlusCallbacks
       PROPERTIES LINK_FLAGS "-fprofile-generate"  COMPILE_FLAGS "-fprofile-generate")
   endif()
 
@@ -273,18 +287,18 @@ elseif (CMAKE_COMPILER_IS_GNUCXX)
   if (PROFILE_USE AND ENABLE_LTO)
     set_target_properties(${OPTIMIZABLE_TARGETS}
       PROPERTIES LINK_FLAGS "-flto=7 -fno-use-linker-plugin -fprofile-use" COMPILE_FLAGS "-flto=7 -fno-use-linker-plugin -fprofile-use")
-    set_target_properties(EnergyPlus
+    set_target_properties(energyplus
       PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use")
   endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # Clang
   if(ENABLE_LTO)
-    set_target_properties(EnergyPlus
+    set_target_properties(energyplus
       PROPERTIES LINK_FLAGS "-flto" COMPILE_FLAGS "-flto")
   endif()
 
   if (PROFILE_GENERATE)
     set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "-fprofile-instr-generate" COMPILE_FLAGS "-fprofile-instr-generate") 
+      PROPERTIES LINK_FLAGS "-fprofile-instr-generate" COMPILE_FLAGS "-fprofile-instr-generate")
   endif()
 
   if (PROFILE_USE)
@@ -297,7 +311,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # Clang
       PROPERTIES LINK_FLAGS "-flto -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata" COMPILE_FLAGS "-flto -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
   endif()
 
- 
+
 endif()
 
 

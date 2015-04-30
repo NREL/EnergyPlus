@@ -1224,9 +1224,9 @@ namespace TranspiredCollector {
 				auto & outNode( Node( OutletNode( io ) ) );
 				auto const & inNode( Node( InletNode( ii ) ) );
 				outNode.MassFlowRate = inNode.MassFlowRate;
-				outNode.Temp         = inNode.Temp;
-				outNode.HumRat       = inNode.HumRat;
-				outNode.Enthalpy     = inNode.Enthalpy;
+				outNode.Temp = inNode.Temp;
+				outNode.HumRat = inNode.HumRat;
+				outNode.Enthalpy = inNode.Enthalpy;
 			}
 		}
 

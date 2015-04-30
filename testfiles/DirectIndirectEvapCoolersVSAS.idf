@@ -70,7 +70,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.2;
+  Version,8.3;
 
   AirLoopHVAC:UnitaryHeatCool,
     FURNACE_PACU_CAV:1_Unitary_Package,  !- Name
@@ -79,9 +79,9 @@
     FURNACE_PACU_CAV:1 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
     AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
     units_gr_lf,             !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_fan,  !- Supply Fan Name
@@ -99,9 +99,9 @@
     FURNACE_PACU_CAV:2 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
     AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
     units_gr_rt,             !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_fan,  !- Supply Fan Name
@@ -119,9 +119,9 @@
     FURNACE_PACU_CAV:3 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
     AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
     unit_s_g,                !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_fan,  !- Supply Fan Name
@@ -139,9 +139,9 @@
     FURNACE_PACU_CAV:4 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
     AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
     unit_n_g,                !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_fan,  !- Supply Fan Name
@@ -4468,30 +4468,40 @@
     FURNACE_PACU_CAV:1,      !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0000,                  !- Minimum System Air Flow Ratio
+    1.0000,                  !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     40.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     FURNACE_PACU_CAV:1 Availability Manager List,  !- Name
@@ -4585,28 +4595,39 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     FURNACE_PACU_CAV:1_OAIndRDD Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7500,                  !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30.0000,                 !- Recirculating Water Pump Power Consumption {W}
-    Autosize,                !- Secondary Fan Flow Rate {m3/s}
-    0.6000,                  !- Secondary Fan Total Efficiency
-    124.6000,                !- Secondary Fan Delta Pressure {Pa}
+    0.7500,                  !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30.0000,                 !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
+    Autosize,                !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     FURNACE_PACU_CAV:1_OAInlet Node,  !- Primary Air Inlet Node Name
     FURNACE_PACU_CAV:1_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:1_OADirect Evap CoolerNode,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9000,                  !- Dewpoint Effectiveness Factor
     FURNACE_PACU_CAV:1_OAIndRDD Evap CoolerOA node,  !- Secondary Air Inlet Node Name
+    FURNACE_PACU_CAV:1_OAIndRDD Evap CoolerOA Outlet Node, !- Secondary Air Outlet Node Name
     FURNACE_PACU_CAV:1_OADirect Evap Cooler-FURNACE_PACU_CAV:1_OAMixing BoxNode,  !- Sensor Node Name
     ,                        !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     0.2,                     !- Drift Loss Fraction
     3;                       !- Blowdown Concentration Ratio
 
+
   EvaporativeCooler:Direct:ResearchSpecial,
     FURNACE_PACU_CAV:1_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Cooler Effectiveness
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
+    0.7,                     !- Cooler Design Effectiveness
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
     FURNACE_PACU_CAV:1_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:1_OADirect Evap CoolerNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:1_OADirect Evap Cooler-FURNACE_PACU_CAV:1_OAMixing BoxNode,  !- Air Outlet Node Name
     FURNACE_PACU_CAV:1_OADirect Evap Cooler-FURNACE_PACU_CAV:1_OAMixing BoxNode,  !- Sensor Node Name
@@ -4745,30 +4766,40 @@
     FURNACE_PACU_CAV:2,      !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0000,                  !- Minimum System Air Flow Ratio
+    1.0000,                  !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     40.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     FURNACE_PACU_CAV:2 Availability Manager List,  !- Name
@@ -4860,8 +4891,11 @@
   EvaporativeCooler:Direct:ResearchSpecial,
     FURNACE_PACU_CAV:2_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Cooler Effectiveness
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
+    0.7,                     !- Cooler Design Effectiveness
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
     FURNACE_PACU_CAV:2_OAInlet Node,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:2_OADirect Evap Cooler-FURNACE_PACU_CAV:2_OAMixing BoxNode,  !- Air Outlet Node Name
     FURNACE_PACU_CAV:2_OADirect Evap Cooler-FURNACE_PACU_CAV:2_OAMixing BoxNode,  !- Sensor Node Name
@@ -5000,30 +5034,40 @@
     FURNACE_PACU_CAV:3,      !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0000,                  !- Minimum System Air Flow Ratio
+    1.0000,                  !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     40.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     FURNACE_PACU_CAV:3 Availability Manager List,  !- Name
@@ -5117,24 +5161,34 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     FURNACE_PACU_CAV:3_OAIndRDD Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7500,                  !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30.0000,                 !- Recirculating Water Pump Power Consumption {W}
-    Autosize,                !- Secondary Fan Flow Rate {m3/s}
-    0.6000,                  !- Secondary Fan Total Efficiency
-    124.6000,                !- Secondary Fan Delta Pressure {Pa}
+    0.7500,                  !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30.0000,                 !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    ,                        !- Water Pump Power Modifier Curve Name
+    Autosize,                !- Secondary Air Design Air Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power W /(m3/s)
+    ,                        !- Secondary Fan Power Modifier Curve Name
     FURNACE_PACU_CAV:3_OAInlet Node,  !- Primary Air Inlet Node Name
     FURNACE_PACU_CAV:3_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:3_OADirect Evap CoolerNode,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9000,                  !- Dewpoint Effectiveness Factor
     FURNACE_PACU_CAV:3_OAIndRDD Evap CoolerOA node,  !- Secondary Air Inlet Node Name
+    FURNACE_PACU_CAV:3_OAIndRDD Evap CoolerOA Outlet Node,  !- Secondary Air Outlet Node Name
     FURNACE_PACU_CAV:3_OADirect Evap Cooler-FURNACE_PACU_CAV:3_OAMixing BoxNode;  !- Sensor Node Name
 
   EvaporativeCooler:Direct:ResearchSpecial,
     FURNACE_PACU_CAV:3_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Cooler Effectiveness
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
+    0.7,                     !- Cooler Design Effectiveness
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
     FURNACE_PACU_CAV:3_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:3_OADirect Evap CoolerNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:3_OADirect Evap Cooler-FURNACE_PACU_CAV:3_OAMixing BoxNode,  !- Air Outlet Node Name
     FURNACE_PACU_CAV:3_OADirect Evap Cooler-FURNACE_PACU_CAV:3_OAMixing BoxNode,  !- Sensor Node Name
@@ -5273,30 +5327,40 @@
     FURNACE_PACU_CAV:4,      !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0000,                  !- Minimum System Air Flow Ratio
+    1.0000,                  !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     40.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     FURNACE_PACU_CAV:4 Availability Manager List,  !- Name
@@ -5390,24 +5454,34 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     FURNACE_PACU_CAV:4_OAIndRDD Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7500,                  !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30.0000,                 !- Recirculating Water Pump Power Consumption {W}
-    Autosize,                !- Secondary Fan Flow Rate {m3/s}
-    0.6000,                  !- Secondary Fan Total Efficiency
-    124.6000,                !- Secondary Fan Delta Pressure {Pa}
+    0.7500,                  !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30.0000,                 !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    ,                        !- Water Pump Power Modifier Curve Name
+    Autosize,                !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    207.66666666666666,      !- Secondary Air Fan Sizing Specific Power W /(m3/s)
+    ,                        !- Secondary Fan Power Modifier Curve Name
     FURNACE_PACU_CAV:4_OAInlet Node,  !- Primary Air Inlet Node Name
     FURNACE_PACU_CAV:4_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:4_OADirect Evap CoolerNode,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9000,                  !- Dewpoint Effectiveness Factor
     FURNACE_PACU_CAV:4_OAIndRDD Evap CoolerOA node,  !- Secondary Air Inlet Node Name
+    FURNACE_PACU_CAV:4_OAIndRDD Evap CoolerOA Outlet Node,     !- Secondary Air Outlet Node Name
     FURNACE_PACU_CAV:4_OADirect Evap Cooler-FURNACE_PACU_CAV:4_OAMixing BoxNode;  !- Sensor Node Name
 
   EvaporativeCooler:Direct:ResearchSpecial,
     FURNACE_PACU_CAV:4_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Cooler Effectiveness
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
+    0.7,                     !- Cooler Design Effectiveness
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Modifier Curve Name
     FURNACE_PACU_CAV:4_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:4_OADirect Evap CoolerNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:4_OADirect Evap Cooler-FURNACE_PACU_CAV:4_OAMixing BoxNode,  !- Air Outlet Node Name
     FURNACE_PACU_CAV:4_OADirect Evap Cooler-FURNACE_PACU_CAV:4_OAMixing BoxNode,  !- Sensor Node Name

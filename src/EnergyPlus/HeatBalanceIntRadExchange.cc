@@ -1441,9 +1441,9 @@ namespace HeatBalanceIntRadExchange {
 			// Find pivot row in column i below diagonal
 			int iPiv = i;
 			Real64 aPiv( std::abs( A( i, i ) ) );
-			auto ki( A.index( i, i + 1 ) );
-			for ( int k = i + 1; k <= u; ++k, ++ki ) {
-				Real64 const aAki( std::abs( A[ ki ] ) ); // [ ki ] == ( k, i )
+			auto ik( A.index( i, i + 1 ) );
+			for ( int k = i + 1; k <= u; ++k, ++ik ) {
+				Real64 const aAki( std::abs( A[ ik ] ) ); // [ ik ] == ( i, k )
 				if ( aAki > aPiv ) {
 					iPiv = k;
 					aPiv = aAki;
@@ -1453,6 +1453,7 @@ namespace HeatBalanceIntRadExchange {
 
 			// Swap row i with pivot row
 			if ( iPiv != i ) {
+
 #ifndef GET_OUT
 				auto ij( A.index( l, i ) ); // [ ij ] == ( i, j )
 				auto pj( A.index( l, iPiv ) ); // [ pj ] == ( iPiv, j )
@@ -1460,8 +1461,8 @@ namespace HeatBalanceIntRadExchange {
 					Real64 const Aij( A[ ij ] );
 					A[ ij ] = A[ pj ];
 					A[ pj ] = Aij;
-					Real64 const Iij( I[ ij ] );
-					I[ ij ] = I[ pj ];
+					Real64 const Iij( I[ ji ] );
+					I[ ji ] = I[ pj ];
 					I[ pj ] = Iij;
 				}
 #else 
@@ -1489,17 +1490,17 @@ namespace HeatBalanceIntRadExchange {
 				Real64 const multiplier( A( i, k ) * Aii_inv );
 				A( i, k ) = multiplier;
 				if ( multiplier != 0.0 ) {
-					auto ij( A.index( i + 1, i ) ); // [ ij ] == ( i, j )
-					auto kj( A.index( i + 1, k ) ); // [ kj ] == ( k, j )
-					for ( int j = i + 1; j <= u; ++j, ij += n, kj += n ) {
-						A[ kj ] -= multiplier * A[ ij ];
+					auto ji( A.index( i + 1, i ) ); // [ ji ] == ( j, i )
+					auto jk( A.index( i + 1, k ) ); // [ jk ] == ( j, k )
+					for ( int j = i + 1; j <= u; ++j, ji += n, jk += n ) {
+						A[ jk ] -= multiplier * A[ ji ];
 					}
-					ij = A.index( l, i );
-					kj = A.index( l, k );
-					for ( int j = l; j <= u; ++j, ij += n, kj += n ) {
-						Real64 const Iij( I[ ij ] );
+					ji = A.index( l, i );
+					jk = A.index( l, k );
+					for ( int j = l; j <= u; ++j, ji += n, jk += n ) {
+						Real64 const Iij( I[ ji ] );
 						if ( Iij != 0.0 ) {
-							I[ kj ] -= multiplier * Iij;
+							I[ jk ] -= multiplier * Iij;
 						}
 					}
 				}
@@ -1510,17 +1511,17 @@ namespace HeatBalanceIntRadExchange {
 		// Perform back-substitution on [U|I] to put inverse in I
 		for ( int k = u; k >= l; --k ) {
 			Real64 const Akk_inv( 1.0 / A( k, k ) );
-			auto kj( A.index( l, k ) ); // [ kj ] == ( k, j )
-			for ( int j = l; j <= u; ++j, kj += n ) {
-				I[ kj ] *= Akk_inv;
+			auto jk( A.index( l, k ) ); // [ jk ] == ( j, k )
+			for ( int j = l; j <= u; ++j, jk += n ) {
+				I[ jk ] *= Akk_inv;
 			}
 			auto ik( A.index( k, l ) ); // [ ik ] == ( i, k )
 			for ( int i = l; i < k; ++i, ++ik ) { // Eliminate kth column entries from I in rows above k
 				Real64 const Aik( A[ ik ] );
-				auto ij( A.index( l, i ) ); // [ ij ] == ( i, j )
-				auto kj( A.index( l, k ) ); // [ kj ] == ( k, j )
-				for ( int j = l; j <= u; ++j, ij += n, kj += n ) {
-					I[ ij ] -= Aik * I[ kj ];
+				auto ji( A.index( l, i ) ); // [ ji ] == ( j, i )
+				auto jk( A.index( l, k ) ); // [ jk ] == ( k, j )
+				for ( int j = l; j <= u; ++j, ji += n, jk += n ) {
+					I[ ji ] -= Aik * I[ jk ];
 				}
 			}
 		}

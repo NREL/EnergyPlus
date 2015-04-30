@@ -328,8 +328,6 @@ namespace DXCoils {
 		bool FanPowerIncludedInCOP; // Indicates that fan heat is included in heating capacity and COP
 		bool CondPumpHeatInCapacity; // Indicates that condenser pump heat is included in heating capacity
 		bool CondPumpPowerInCOP; // Indicates that condenser pump power is included in heating COP
-		bool AirVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
-		bool WaterVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
 		// end of variables for heat pump water heater DX coil
 		// Error tracking
 		Real64 LowTempLast; // low ambient temp entering condenser when warning message occurred
@@ -416,6 +414,32 @@ namespace DXCoils {
 		// (function of actual supply air flow vs rated air flow)
 		int SHRFTempCurveType2; // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
 		bool UserSHRCurveExists; // TRUE if user specified SHR modifier curve exists
+		bool ASHRAE127StdRprt; // TRUE if user wishes to report ASHRAE 127 standard ratings
+
+		int SecZonePtr; // index to the zone where the secondary coil is placed
+		int SecCoilSHRFT; // index to the secondary coil sensible heat ratio temperature modifier curve
+		int SecCoilSHRFF; // index to the secondary coil sensible heat ratio flor fraction modifier curve
+		Real64 SecCoilAirFlow; // secondary coil air flow rate
+		Real64 SecCoilAirFlowScalingFactor; // secondary coil air flow rate autosize scaling factor 
+		Real64 SecCoilRatedSHR; // secondary coil nominal or rated sensible heat ratio
+		Real64 SecCoilSHR; // secondary coil current sensible heat ratio
+		int SecZoneAirNodeNum; // secondary zone air node number 
+		Real64 EvapInletWetBulb; // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.) 
+		Real64 SecCoilSensibleHeatGainRate; // secondary zone sensible heat gain rate [W]
+		Real64 SecCoilTotalHeatRemovalRate; // secondary zone total heat removal rate [W]
+		Real64 SecCoilSensibleHeatRemovalRate; // secondary zone sensible heat removal rate [W]
+		Real64 SecCoilLatentHeatRemovalRate; // secondary zone latent heat removal rate [W]
+		bool IsSecondaryDXCoilInZone; // true means secondary dx coil is zone instead of outside
+		Real64 CompressorPartLoadRatio; // compressor part load ratio of the primary DX coil
+		Array1D_int MSSecCoilSHRFT; // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
+		Array1D_int MSSecCoilSHRFF; //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
+		Array1D< Real64 > MSSecCoilAirFlow; // multispeed secondary coil air flow rate
+		Array1D< Real64 > MSSecCoilAirFlowScalingFactor; //multispeed secondary coil air flow rate autosize scaling factor 
+		Array1D< Real64 > MSSecCoilRatedSHR; // multispeed secondary coil nominal or rated sensible heat ratio
+		int MSSpeedNumLS; // current low speed number of multspeed HP
+		int MSSpeedNumHS; // current high speed number of multspeed HP
+		Real64 MSSpeedRatio; // current speed ratio of multspeed HP
+		Real64 MSCycRatio; // current cycling ratio of multspeed HP
 
 		// Default Constructor
 		DXCoilData() :
@@ -574,8 +598,6 @@ namespace DXCoils {
 			FanPowerIncludedInCOP( true ),
 			CondPumpHeatInCapacity( false ),
 			CondPumpPowerInCOP( false ),
-			AirVolFlowAutoSized( false ),
-			WaterVolFlowAutoSized( false ),
 			LowTempLast( 0.0 ),
 			HighTempLast( 0.0 ),
 			ErrIndex1( 0 ),
@@ -613,7 +635,34 @@ namespace DXCoils {
 			SHRFTemp2( 0 ),
 			SHRFFlow2( 0 ),
 			SHRFTempCurveType2( 0 ),
-			UserSHRCurveExists( false )
+			UserSHRCurveExists( false ),
+			ASHRAE127StdRprt( false ),
+			SecZonePtr( 0 ),
+			SecCoilSHRFT( 0 ),
+			SecCoilSHRFF( 0 ),
+			SecCoilAirFlow( 0.0 ),
+			SecCoilAirFlowScalingFactor( 1.0 ),
+			SecCoilRatedSHR( 1.0 ),
+			SecCoilSHR( 1.0 ),
+			SecZoneAirNodeNum( 0 ),
+			EvapInletWetBulb( 0.0 ),
+			SecCoilSensibleHeatGainRate( 0.0 ),
+			SecCoilTotalHeatRemovalRate( 0.0 ),
+			SecCoilSensibleHeatRemovalRate( 0.0 ),
+			SecCoilLatentHeatRemovalRate( 0.0 ),
+			IsSecondaryDXCoilInZone( false ),
+			CompressorPartLoadRatio( 0.0 ),
+			//MSSecCoilSHRFT( 0 ),
+			//MSSecCoilSHRFF( 0 ),
+			//MSSecCoilAirFlow( 0.0 ),
+			//MSSecCoilAirFlowScalingFactor( 0.0 ),
+			//MSSecCoilRatedSHR( 0.0 )
+			MSSpeedNumLS( 1 ),
+			MSSpeedNumHS( 2 ),
+			MSSpeedRatio( 0.0 ),
+			MSCycRatio( 0.0 )
+
+
 		{}
 
 		// Member Constructor
@@ -780,8 +829,6 @@ namespace DXCoils {
 			bool const FanPowerIncludedInCOP, // Indicates that fan heat is included in heating capacity and COP
 			bool const CondPumpHeatInCapacity, // Indicates that condenser pump heat is included in heating capacity
 			bool const CondPumpPowerInCOP, // Indicates that condenser pump power is included in heating COP
-			bool const AirVolFlowAutoSized, // Used to report autosizing info for the HPWH DX coil
-			bool const WaterVolFlowAutoSized, // Used to report autosizing info for the HPWH DX coil
 			Real64 const LowTempLast, // low ambient temp entering condenser when warning message occurred
 			Real64 const HighTempLast, // high ambient temp entering condenser when warning message occurred
 			int const ErrIndex1, // index/pointer to recurring error structure for Air volume flow rate per watt of
@@ -851,7 +898,32 @@ namespace DXCoils {
 			int const SHRFTemp2, // index of sensible heat ratio modifier curve
 			int const SHRFFlow2, // index of sensible heat ratio modifier curve
 			int const SHRFTempCurveType2, // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
-			bool const UserSHRCurveExists // TRUE if user specified SHR modifier curve exists
+			bool const UserSHRCurveExists, // TRUE if user specified SHR modifier curve exists
+			bool const ASHRAE127StdRprt, // TRUE if user wishes to report ASHRAE 127 standard ratings
+			int const SecZonePtr, // index to the zone where the secondary coil is placed
+			int const SecCoilSHRFT, // index to the secondary coil sensible heat ratio temperature modifier curve
+			int const SecCoilSHRFF, // index to the secondary coil sensible heat ratio flor fraction modifier curve
+			Real64 const SecCoilAirFlow, // secondary coil air flow rate
+			Real64 const SecCoilAirFlowScalingFactor, // secondary coil air flow rate autosize scaling factor 
+			Real64 const SecCoilRatedSHR, // secondary coil nominal or rated sensible heat ratio
+			Real64 const SecCoilSHR, // secondary coil current sensible heat ratio
+			int const SecZoneAirNodeNum, // secondary zone air node number 
+			Real64 const EvapInletWetBulb, // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.) 
+			Real64 const SecCoilSensibleHeatGainRate, // secondary zone sensible heat gain rate [W]
+			Real64 const SecCoilTotalHeatRemovalRate, // secondary zone total heat removal rate [W]
+			Real64 const SecCoilSensibleHeatRemovalRate, // secondary zone sensible heat removal rate [W]
+			Real64 const SecCoilLatentHeatRemovalRate, // secondary zone latent heat removal rate [W]
+			bool const IsSecondaryDXCoilInZone, // true means secondary dx coil is zone instead of outside
+			Real64 const CompressorPartLoadRatio, // compressor part load ratio of the primary DX coil
+			Array1_int const & MSSecCoilSHRFT, // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
+			Array1_int const & MSSecCoilSHRFF, //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
+			Array1< Real64 > const & MSSecCoilAirFlow, // multispeed secondary coil air flow rate
+			Array1< Real64 > const & MSSecCoilAirFlowScalingFactor, //multispeed secondary coil air flow rate autosize scaling factor 
+			Array1< Real64 > const & MSSecCoilRatedSHR, // multispeed secondary coil nominal or rated sensible heat ratio
+			int const MSSpeedNumLS, // current low speed number of multspeed HP
+			int const MSSpeedNumHS, // current high speed number of multspeed HP
+			Real64 const MSSpeedRatio, // current speed ratio of multspeed HP
+			Real64 const MSCycRatio // current cycling ratio of multspeed HP
 		) :
 			Name( Name ),
 			DXCoilType( DXCoilType ),
@@ -1015,8 +1087,6 @@ namespace DXCoils {
 			FanPowerIncludedInCOP( FanPowerIncludedInCOP ),
 			CondPumpHeatInCapacity( CondPumpHeatInCapacity ),
 			CondPumpPowerInCOP( CondPumpPowerInCOP ),
-			AirVolFlowAutoSized( AirVolFlowAutoSized ),
-			WaterVolFlowAutoSized( WaterVolFlowAutoSized ),
 			LowTempLast( LowTempLast ),
 			HighTempLast( HighTempLast ),
 			ErrIndex1( ErrIndex1 ),
@@ -1086,7 +1156,33 @@ namespace DXCoils {
 			SHRFTemp2( SHRFTemp2 ),
 			SHRFFlow2( SHRFFlow2 ),
 			SHRFTempCurveType2( SHRFTempCurveType2 ),
-			UserSHRCurveExists( UserSHRCurveExists )
+			UserSHRCurveExists( UserSHRCurveExists ),
+			ASHRAE127StdRprt( ASHRAE127StdRprt ),
+			SecZonePtr( SecZonePtr ),
+			SecCoilSHRFT( SecCoilSHRFT ),
+			SecCoilSHRFF( SecCoilSHRFF ),
+			SecCoilAirFlow( SecCoilAirFlow ),
+			SecCoilAirFlowScalingFactor( SecCoilAirFlowScalingFactor ),
+			SecCoilRatedSHR( SecCoilRatedSHR ),
+			SecCoilSHR( SecCoilSHR ),
+			SecZoneAirNodeNum( SecZoneAirNodeNum ),
+			EvapInletWetBulb( EvapInletWetBulb ),
+			SecCoilSensibleHeatGainRate( SecCoilSensibleHeatGainRate ),
+			SecCoilTotalHeatRemovalRate( SecCoilTotalHeatRemovalRate ),
+			SecCoilSensibleHeatRemovalRate( SecCoilSensibleHeatRemovalRate ),
+			SecCoilLatentHeatRemovalRate( SecCoilLatentHeatRemovalRate ),
+			IsSecondaryDXCoilInZone( IsSecondaryDXCoilInZone ),
+			CompressorPartLoadRatio( CompressorPartLoadRatio ),
+			MSSecCoilSHRFT( MSSecCoilSHRFT ),
+			MSSecCoilSHRFF( MSSecCoilSHRFF ),
+			MSSecCoilAirFlow( MSSecCoilAirFlow ),
+			MSSecCoilAirFlowScalingFactor( MSSecCoilAirFlowScalingFactor ),
+			MSSecCoilRatedSHR( MSSecCoilRatedSHR ),
+			MSSpeedNumLS( MSSpeedNumLS ),
+			MSSpeedNumHS( MSSpeedNumHS ),
+			MSSpeedRatio( MSSpeedRatio ),
+			MSCycRatio( MSCycRatio )
+
 		{}
 
 	};
@@ -1098,7 +1194,7 @@ namespace DXCoils {
 
 		// Default Constructor
 		PerfModeData () :
-			FieldNames( )
+			FieldNames()
 		{}
 
 		// Member Constructor
@@ -1476,6 +1572,26 @@ namespace DXCoils {
 
 	void
 	SetDXCoilTypeData( std::string const & CoilName ); // must match coil names for the coil type
+
+	void
+	CalcSecondaryDXCoils( int const DXCoilNum );
+
+	Real64
+	CalcSecondaryDXCoilsSHR(
+		int const DXCoilNum,
+		Real64 const EvapAirMassFlow,
+		Real64 const TotalHeatRemovalRate,
+		Real64 const PartLoadRatio,
+		Real64 const SecCoilRatedSHR,
+		Real64 const EvapInletDryBulb,
+		Real64 const EvapInletHumRat,
+		Real64 const EvapInletWetBulb,
+		Real64 const EvapInletEnthalpy,
+		Real64 const CondInletDryBulb,
+		Real64 const SecCoilFlowFraction,
+		int const SecCoilSHRFT,
+		int const SecCoilSHRFF
+		);
 
 	//     NOTICE
 
