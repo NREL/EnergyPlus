@@ -10653,7 +10653,9 @@ are compound components usually placed in the primary air loop as the sole compo
 
 ### AirLoopHVAC:UnitarySystem
 
-The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, or VariableVolume), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active,
+The AirloopHVAC:UnitarySystem object is intended to replace all other air loop equipment, although other system types are still available. This system is unique in that it can accommodate all fan and coil types whereas other system types are specific to the type of fan and coil available for simulation. Additionally, although the AirloopHVAC:UnitarySystem is intended for use in the primary airloop, this object can be modeled as zone equipment (i.e., listed in a ZoneHVAC:EquipmentList) or as an outside air system component (i.e., listed in a AirLoopHVAC:OutdoorAirSystem:EquipmentList).
+
+The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, or VariableVolume), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active. All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for heating-only, cooling-only, or both heating and cooling.  It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX.
 
 ![](InputOutputReference/media/image294.png)
 
