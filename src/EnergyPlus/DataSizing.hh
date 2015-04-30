@@ -539,8 +539,8 @@ namespace DataSizing {
 		//  (zone time step)
 		Array1D< Real64 > CoolFlowSeq; // daily sequence of zone cooling air mass flow rate
 		//  (zone time step)
-		Array1D< Real64 > HeatLoadSeq; // daily sequence of zone heating load zone time step)
-		Array1D< Real64 > CoolLoadSeq; // daily sequence of zone cooling load zone time step)
+		Array1D< Real64 > HeatLoadSeq; // daily sequence of zone heating load (zone time step)
+		Array1D< Real64 > CoolLoadSeq; // daily sequence of zone cooling load (zone time step)
 		Array1D< Real64 > HeatZoneTempSeq; // daily sequence of zone temperatures (heating, zone time step)
 		Array1D< Real64 > HeatOutTempSeq; // daily sequence of outdoor temperatures (heating, zone time step)
 		Array1D< Real64 > HeatZoneRetTempSeq; // daily sequence of zone return temperatures (heating,
@@ -574,6 +574,17 @@ namespace DataSizing {
 		Real64 ZpzHtgByZone; // OA Std 62.1 required fraction in heating mode
 		Real64 VozClgByZone; // value of required cooling vent to zone, used in 62.1 tabular report
 		Real64 VozHtgByZone; // value of required heating vent to zone, used in 62.1 tabular report
+		Real64 DOASHeatLoad; // current heating load from DOAS supply air [W]
+		Real64 DOASCoolLoad; // current cooling load from DOAS supply air [W]
+		Real64 DOASSupMassFlow; // current mass flow rate of DOAS supply air [kg/s]
+		Real64 DOASSupTemp; // current DOAS supply air temperature [C]
+		Real64 DOASSupHumRat; // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+		Real64 DOASTotCoolLoad; // current total cooling load imposed by DOAS supply air [W]
+		Array1D< Real64 > DOASHeatLoadSeq; // daily sequence of zone DOAS heating load (zone time step) [W]
+		Array1D< Real64 > DOASCoolLoadSeq; // daily sequence of zone DOAS cooling load (zone time step) [W]
+		Array1D< Real64 > DOASSupMassFlowSeq; // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
+		Array1D< Real64 > DOASSupTempSeq; // daily sequence of zone DOAS supply temperature (zone time step) [C]
+		Array1D< Real64 > DOASTotCoolLoadSeq; // daily sequence of zone DOAS total cooling load (zone time step) [W]
 
 		// Default Constructor
 		ZoneSizingData() :
@@ -688,7 +699,13 @@ namespace DataSizing {
 			ZpzClgByZone( 0.0 ),
 			ZpzHtgByZone( 0.0 ),
 			VozClgByZone( 0.0 ),
-			VozHtgByZone( 0.0 )
+			VozHtgByZone( 0.0 ),
+			DOASHeatLoad( 0.0 ),
+			DOASCoolLoad( 0.0 ),
+			DOASSupMassFlow( 0.0 ),
+			DOASSupTemp( 0.0 ),
+			DOASSupHumRat( 0.0 ),
+			DOASTotCoolLoad( 0.0 )
 		{}
 
 		// Member Constructor
@@ -828,7 +845,18 @@ namespace DataSizing {
 			Real64 const ZpzClgByZone, // OA Std 62.1 required fraction in cooling mode
 			Real64 const ZpzHtgByZone, // OA Std 62.1 required fraction in heating mode
 			Real64 const VozClgByZone, // value of required cooling vent to zone, used in 62.1 tabular report
-			Real64 const VozHtgByZone // value of required heating vent to zone, used in 62.1 tabular report
+			Real64 const VozHtgByZone, // value of required heating vent to zone, used in 62.1 tabular report
+			Real64 const DOASHeatLoad, // current heating load from DOAS supply air [W]
+			Real64 const DOASCoolLoad, // current cooling load from DOAS supply air [W]
+			Real64 const DOASSupMassFlow, // current mass flow rate of DOAS supply air [kg/s]
+			Real64 const DOASSupTemp, // current DOAS supply air temperature [C]
+			Real64 const DOASSupHumRat, // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+			Real64 const DOASTotCoolLoad, // current total cooling load imposed by DOAS supply air [W]
+			Array1D< Real64 > const & DOASHeatLoadSeq, // daily sequence of zone DOAS heating load (zone time step) [W]
+			Array1D< Real64 > const & DOASCoolLoadSeq, // daily sequence of zone DOAS cooling load (zone time step) [W]
+			Array1D< Real64 > const & DOASSupMassFlowSeq, // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
+			Array1D< Real64 > const & DOASSupTempSeq, // daily sequence of zone DOAS supply temperature (zone time step) [C]
+			Array1D< Real64 > const & DOASTotCoolLoadSeq // daily sequence of zone DOAS total cooling load (zone time step) [W]
 		) :
 			ZoneName( ZoneName ),
 			CoolDesDay( CoolDesDay ),
@@ -964,7 +992,13 @@ namespace DataSizing {
 			ZpzClgByZone( ZpzClgByZone ),
 			ZpzHtgByZone( ZpzHtgByZone ),
 			VozClgByZone( VozClgByZone ),
-			VozHtgByZone( VozHtgByZone )
+			VozHtgByZone( VozHtgByZone ),
+			DOASHeatLoad( DOASHeatLoad ),
+			DOASCoolLoad( DOASCoolLoad ),
+			DOASSupMassFlow( DOASSupMassFlow ),
+			DOASSupTemp( DOASSupTemp ),
+			DOASSupHumRat( DOASSupHumRat ),
+			DOASTotCoolLoad( DOASTotCoolLoad )
 		{}
 
 	};
