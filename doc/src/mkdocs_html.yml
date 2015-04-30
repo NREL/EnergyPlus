@@ -1,0 +1,61 @@
+site_name: EnergyPlus Documentation
+site_favicon: favicon.ico
+site_logo: 'EP_32x32.png'
+site_dir: site_html
+repo_url: https://github.com/NREL/EnergyPlus
+
+pages:
+- [index.md, "Home"]
+- [GettingStarted/GettingStarted.md, "Intro & Application", "Getting Started"]
+- [Tips_and_Tricks_Using_EnergyPlus/Tips_and_Tricks_Using_EnergyPlus.md, "Intro & Application", "Tips and Tricks for EnergyPlus"]
+- [EMS_Application_Guide/EMS_Application_Guide.md, "Intro & Application", "EMS Applications"]
+- [ExternalInterfaces_Application_Guide/ExternalInterfaces_Application_Guide.md, "Intro & Application", "External Interface Applications"]
+- [PlantApplicationGuide/PlantApplicationGuide.md, "Intro & Application", "Plant Applications"]
+- [InputOutputReference/01a-InputOutputReference.md, "Input/Output Reference", "Input Output Reference - Vol 1"]
+- [InputOutputReference/01b-InputOutputReference.md, "Input/Output Reference", "Input Output Reference - Vol 2"]
+- [InputOutputReference/01c-InputOutputReference.md, "Input/Output Reference", "Input Output Reference - Vol 3"]
+- [InputOutputReference/01d-InputOutputReference.md, "Input/Output Reference", "Input Output Reference - Vol 4"]
+- [InputOutputReference/02-HVACTemplates.md, "Input/Output Reference", "HVACTemplates"]
+- [InputOutputReference/03-Economics.md, "Input/Output Reference", "Economics"]
+- [InputOutputReference/04-Parametrics.md, "Input/Output Reference", "Parametrics"]
+- [InputOutputReference/05-InputForOutput.md, "Input/Output Reference", "Input for Output"]
+- [InputOutputReference/06-StandardOutputReports.md, "Input/Output Reference", "Standard Output Reports"]
+- [InputOutputReference/07-WeatherData.md, "Input/Output Reference", "Weather Data"]
+- [InputOutputReference/08-RunningEnergyPlus.md, "Input/Output Reference", "Running EnergyPlus"]
+- [InputOutputReference/09-Appendix.md, "Input/Output Reference", "Appendices"]
+- [EngineeringReference/01-Overview.md, "Engineering Reference", "Overview"]
+- [EngineeringReference/02-IntegratedSolution.md, "Engineering Reference", "Integrated Solution Manager"]
+- [EngineeringReference/03-SurfaceHeatBalance.md, "Engineering Reference", "Surface Heat Balance Manager"]
+- [EngineeringReference/04-AdvancedSurface.md, "Engineering Reference", "Advanced Surface Concepts"]
+- [EngineeringReference/05-Climate.md, "Engineering Reference", "Climate, Sky and Solar Calculation"]
+- [EngineeringReference/06-SolarRadiation.md, "Engineering Reference", "Solar Reflection"]
+- [EngineeringReference/07-Daylighting.md, "Engineering Reference", "Daylighting and Window Calcs"]
+- [EngineeringReference/08-AirHeatBalance.md, "Engineering Reference", "Air Heat Balance Manager"]
+- [EngineeringReference/09-BuildingSystemSimulation.md, "Engineering Reference", "Building System Simulation Manager"]
+- [EngineeringReference/10-Sizing.md, "Engineering Reference", "Sizing and Design Data"]
+- [EngineeringReference/OperationalFaults.md, "Engineering Reference", "Operational Faults"]
+- [EngineeringReference/11-DemandLimiting.md, "Engineering Reference", "Demand Limiting"]
+- [EngineeringReference/12-AlternativeModeling.md, "Engineering Reference", "Alternative Modeling Processes"]
+- [EngineeringReference/13-EncyclopaedicRefs.md, "Engineering Reference", "Encyclopedic Reference of Simulation Models"]
+- [EngineeringReference/13a-EncyclopaedicRefs.md, "Engineering Reference", " - - - - Encyclopedia Volume 1"]
+- [EngineeringReference/13b-EncyclopaedicRefs.md, "Engineering Reference", " - - - - Encyclopedia Volume 2"]
+- [EngineeringReference/13c-EncyclopaedicRefs.md, "Engineering Reference", " - - - - Encyclopedia Volume 3"]
+- [EngineeringReference/13d-EncyclopaedicRefs.md, "Engineering Reference", " - - - - Encyclopedia Volume 4"]
+- [EngineeringReference/13e-EncyclopaedicRefs.md, "Engineering Reference", " - - - - Encyclopedia Volume 5"]
+- [EngineeringReference/13f-EncyclopaedicRefs.md, "Engineering Reference", " - - - - Encyclopedia Volume 6"]
+- [EngineeringReference/14-OnSiteGeneration.md, "Engineering Reference", "On-SIte Generation"]
+- [EngineeringReference/15-PerformanceCurves.md, "Engineering Reference", "Performance Curves and Lookup Tables"]
+- [EngineeringReference/16-Economics.md, "Engineering Reference", "Economic Calculations"]
+- [EngineeringReference/17-SpecialModulesReporting.md, "Engineering Reference", "Special Modules and Reporting"]
+- [InterfaceDeveloper/InterfaceDeveloper.md, "Developer Guides", "Interface Developer"]
+- [ModuleDeveloper/ModuleDeveloper.md, "Developer Guides", "Module Developer"]
+- [Acknowledgements/Acknowledgements.md, "Other", "Acknowledgements"]
+- [AuxiliaryPrograms/AuxiliaryPrograms.md, "Other", "Auxiliary Programs"]
+- [OutputDetailsAndExamples/OutputDetailsAndExamples.md, "Other", "Output Details and Examples"]
+- [Using_EnergyPlus_for_Compliance/Using_EnergyPlus_for_Compliance.md, "Other", "Using E+ for Compliance"]
+
+theme: simplex
+theme_dir: 'bootstrap_nrel_html'
+
+
+

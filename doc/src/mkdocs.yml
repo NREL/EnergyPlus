@@ -1,6 +1,7 @@
 site_name: EnergyPlus Documentation
 site_favicon: favicon.ico
 site_logo: 'EP_32x32.png'
+site_dir: site_html
 repo_url: https://github.com/NREL/EnergyPlus
 
 pages:
@@ -48,13 +49,13 @@ pages:
 - [EngineeringReference/17-SpecialModulesReporting.md, "Engineering Reference", "Special Modules and Reporting"]
 - [InterfaceDeveloper/InterfaceDeveloper.md, "Developer Guides", "Interface Developer"]
 - [ModuleDeveloper/ModuleDeveloper.md, "Developer Guides", "Module Developer"]
-- [Acknowledgements/Acknowledgments.md, "Other", "Acknowledgements"]
+- [Acknowledgements/Acknowledgements.md, "Other", "Acknowledgements"]
 - [AuxiliaryPrograms/AuxiliaryPrograms.md, "Other", "Auxiliary Programs"]
 - [OutputDetailsAndExamples/OutputDetailsAndExamples.md, "Other", "Output Details and Examples"]
 - [Using_EnergyPlus_for_Compliance/Using_EnergyPlus_for_Compliance.md, "Other", "Using E+ for Compliance"]
 
 theme: simplex
-theme_dir: 'bootstrap_nrel'
+theme_dir: 'bootstrap_nrel_html'
 
 
 

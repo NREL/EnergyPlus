@@ -1,8 +1,24 @@
-Application Guide for EMS
+![](EMS_Application_Guide/media/ep.gif)
 
-Energy Management System User Guide  
-  
- (a.k.a. The Book of Erl)
+<br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>Application Guide for EMS</h1>
+<h2>Energy Management System User Guide</h2>
+<br/>
+<p><i>(a.k.a. The Book of Erl)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p>
 
 
 Introduction
@@ -2275,7 +2291,7 @@ The example file has six zones, but one is an attic that we do not care about. T
 
 A model for average temperature can be constructed by using the zone air volumes as weights so larger zones have more influence than smaller zones on the resulting average. The model equation we will implement in EMS for our new report variable is
 
-<div>\[T_{average} = \frac{\sum\left(T_{zone}\text{Vol}_{zone}\right)}{\sum\left(\text{Vol}_{zone}\right)}\]</div>
+<div>$$T_{average} = \frac{\sum\left(T_{zone}\text{Vol}_{zone}\right)}{\sum\left(\text{Vol}_{zone}\right)}$$</div>
 
 The example file specifies the zone volume in its zone objects so we have the data needed for the weighting factors from elsewhere in the IDF. However, a study could vary the geometry such that the volumes differ from one simulation to another. Zone Air Volume is available as internal data, so we will use EnergyManagementSystem:InternalVariable input objects to assign these weighting factors into global Erl variables. If we did not know beforehand that Zone Air Volume was an available internal variable, we would have had to prerun the model with some EMS-related objects and the appropriate level of reporting selected in an Output:EnergyManagementSystem object, and then studied the EDD output file. Note that the EDD file is only produced if you have EMS/Erl programs in your input file.
 
@@ -2617,13 +2633,13 @@ The EMS will actuate the opening in an airflow network that is defined by the in
 
 Because we do not know the exactly what the user had in mind, for this example we assume that the desired behavior for the opening area is that the opening should vary linearly with room air relative humidity. When the humidity increases, we want the opening to be larger. When the humidity decreases, we want the opening to be smaller. For relative humidity below 25% we close the opening. At 60% or higher relative humidity, the opening should be completely open. We formulate a model equation for opening factor as
 
-<div>\[
+<div>$$
   F_{open} = \begin{array}{ll}
     0.0 & RH < 25\% \\
     \frac{RH-25}{60-25} & 25\% \leq RH \leq 60\% \\
     1.0 & RH > 60\%  
   \end{array}
-\]</div>
+$$</div>
 
 ### EMS Input Objects
 
@@ -3879,9 +3895,9 @@ A particular manufacturer controls the DX cooling coil such that the capacity of
 
 For this example, we will start with the equation for cooling capacity of the DX coil object (ref. Coil:Cooling:DX:SingleSpeed). From the engineering reference, the equation used to calculate the cooling capacity is:
 
-<div>\[
+<div>$$
 \text{TotCapTempModFac} = a + b \left( T_{wb,i} \right) + c \left( T_{wb,i} \right) + d \left( T_{c,i} \right) + e \left( T_{c,i} \right) + f \left( T_{wb,i} \right)\left( T_{c,i} \right)
-\]</div>
+$$</div>
 
 The first term (Twb,i) refers to the cooling coil inlet air wet-bulb temperature and the second (Tc,i) refers to the outdoor condenser inlet air dry-bulb temperature. Using the EMS, a new total capacity as a function of temperature value will be calculated and used during the simulation. The Energyplus input objects for the cooling coil capacity curve, the associated outdoor air mixer object, and the original cooling capacity performance curve are shown here.
 

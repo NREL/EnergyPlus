@@ -13,11 +13,11 @@ Performance Curves
 
 Performance curves define a polynomial equation which represents a conditional response to a model input. A polynomial is a mathematical expression which uses a sum of powers in one or more variables. The equation below represents an n<sup>th</sup> order univariate polynomial. The highest power in the equation represents its order or degree (n).
 
-<div>\[y = {a_0} + {a_1}x + {a_2}{x^2} + {a_3}{x^3} + ... + {a_n}{x^n}\]</div>
+<div>$$y = {a_0} + {a_1}x + {a_2}{x^2} + {a_3}{x^3} + ... + {a_n}{x^n}$$</div>
 
 A polynomial in two independent variables (multi-variate) is given by:
 
-<div>\[z = {a_{00}} + {a_{10}}x + {a_{01}}y + {a_{11}}xy + {a_{21}}{x^2}y + {a_{12}}x{y^2} + {a_{22}}{x^2}{y^2}... + {a_{nm}}{x^n}{y^m}\]</div>
+<div>$$z = {a_{00}} + {a_{10}}x + {a_{01}}y + {a_{11}}xy + {a_{21}}{x^2}y + {a_{12}}x{y^2} + {a_{22}}{x^2}{y^2}... + {a_{nm}}{x^n}{y^m}$$</div>
 
 In Energyplus, the result of an equation, the dependent variable, represents the response a system or component has given an input (the independent variable) to the system or component model. This response represents the equipment performance related to the mechanism that causes this change (e.g., the change in capacity or power based on a conditional change in temperature, part-load ratio, or other phenomenon). A variety of performance curves are available to describe the most common forms of engineering equations. The coefficients (a-z) in the following equations are entered in the associated curve object to define a specific phenomenon. Minimum and maximum limits may be applied to both the independent and the dependent variables as necessary.
 
@@ -29,31 +29,31 @@ A polynomial having only a single independent variable represents a one-dimensio
 
 A performance curve having an order or degree of 1.
 
-<div>\[y = a + bx\]</div>
+<div>$$y = a + bx$$</div>
 
 #### Quadratic Curves
 
 A performance curve having an order or degree of 2.
 
-<div>\[y = a + bx + c{x^2}\]</div>
+<div>$$y = a + bx + c{x^2}$$</div>
 
 #### Cubic Curves
 
 A performance curve having an order or degree of 3.
 
-<div>\[y = a + bx + c{x^2} + d{x^3}\]</div>
+<div>$$y = a + bx + c{x^2} + d{x^3}$$</div>
 
 #### Quartic Curves
 
 A performance curve having an order or degree of 4.
 
-<div>\[y = a + bx + c{x^2} + d{x^3} + e{x^4}\]</div>
+<div>$$y = a + bx + c{x^2} + d{x^3} + e{x^4}$$</div>
 
 #### Exponent Curves
 
 A performance curve having an order or degree of c.
 
-<div>\[y = a + b{x^c}\]</div>
+<div>$$y = a + b{x^c}$$</div>
 
 ### Curves based on two independent variables
 
@@ -63,29 +63,29 @@ A polynomial having two independent variables represents a two-dimensional relat
 
 A performance curve having an order or degree of 2 in two independent variables.
 
-<div>\[z = a + bx + c{x^2} + dy + exy + f{x^2}y\]</div>
+<div>$$z = a + bx + c{x^2} + dy + exy + f{x^2}y$$</div>
 
 #### CubicLinear Curves
 
 A performance curve having an order or degree of 3 in two independent variables.
 
-<div>\[z = a + bx + c{x^2} + d{x^3} + ey + fxy\]</div>
+<div>$$z = a + bx + c{x^2} + d{x^3} + ey + fxy$$</div>
 
 #### BiQuadratic Curves
 
 A performance curve having an order or degree of 2 in two independent variables.
 
-<div>\[z = a + bx + c{x^2} + dy + e{y^2} + fxy\]</div>
+<div>$$z = a + bx + c{x^2} + dy + e{y^2} + fxy$$</div>
 
 #### BiCubic Curves
 
 A performance curve having an order or degree of 3 in two independent variables.
 
-<div>\[z = a + bx + c{x^2} + dy + e{y^2} + fxy + g{x^3} + h{y^3} + i{x^2}y\]</div>
+<div>$$z = a + bx + c{x^2} + dy + e{y^2} + fxy + g{x^3} + h{y^3} + i{x^2}y$$</div>
 
 Calulating performance curve coefficients in a spreadsheet is a simple matter of finding the data required to perform the regression analysis. For example, the biquadratic equation shown above is representative of the cooling capacity as a function of temperature performance curve for DX cooling coils. The fundamental equation for DX cooling coil capacity is:
 
-<div>\[TotCapTempModFac = a + b\left( {{T_{wb,i}}} \right) + c{\left( {{T_{wb,i}}} \right)^2} + d\left( {{T_{c,i}}} \right) + e{\left( {{T_{c,i}}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_{c,i}}} \right)\]</div>
+<div>$$TotCapTempModFac = a + b\left( {{T_{wb,i}}} \right) + c{\left( {{T_{wb,i}}} \right)^2} + d\left( {{T_{c,i}}} \right) + e{\left( {{T_{c,i}}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_{c,i}}} \right)$$</div>
 
 where
 
@@ -142,7 +142,7 @@ A polynomial having three independent variables represents a three-dimensional r
 
 A performance curve having an order or degree of 2 in three independent variables.
 
-<div>\[\begin{array}{l}Output = a + b{x^2} + cx + d{y^2} + ey + f{z^2} + gz + h{x^2}{y^2} + ixy + jx{y^2} + k{x^2}y\\\,\,\,\, + l{x^2}{z^2} + mxz + nx{z^2} + o{x^2}z + p{y^2}{z^2} + qyz + ry{z^2} + s{y^2}z + t{x^2}{y^2}{z^2}\\\,\,\,\, + u{x^2}{y^2}z + u{x^2}y{z^2} + vx{y^2}{z^2} + w{x^2}yz + x\left( {x{y^2}x} \right) + y\left( {xy{z^2}} \right) + z\left( {xyz} \right)\end{array}\]</div>
+<div>$$\begin{array}{l}Output = a + b{x^2} + cx + d{y^2} + ey + f{z^2} + gz + h{x^2}{y^2} + ixy + jx{y^2} + k{x^2}y\\\,\,\,\, + l{x^2}{z^2} + mxz + nx{z^2} + o{x^2}z + p{y^2}{z^2} + qyz + ry{z^2} + s{y^2}z + t{x^2}{y^2}{z^2}\\\,\,\,\, + u{x^2}{y^2}z + u{x^2}y{z^2} + vx{y^2}{z^2} + w{x^2}yz + x\left( {x{y^2}x} \right) + y\left( {xy{z^2}} \right) + z\left( {xyz} \right)\end{array}$$</div>
 
 ### Pressure drop curve
 
@@ -150,7 +150,7 @@ A performance curve having an order or degree of 2 in three independent variable
 
 A performance curve representing the minor loss and/or friction calculations in plant pressure simulations.
 
-<div>\[\Delta P = \left[ {K + f\left( {L/D} \right)} \right]\left( {\rho {V^2}} \right)/2\]</div>
+<div>$$\Delta P = \left[ {K + f\left( {L/D} \right)} \right]\left( {\rho {V^2}} \right)/2$$</div>
 
 Performance Tables
 ------------------
@@ -286,7 +286,7 @@ Given a generic manufacturers air conditioner data for an AC system having a rat
 
 The tabular data can be entered directly into a table object. As an example, for an air-cooled DX cooling coil object in Energyplus, the capacity as a function of temperature has the following fundamental equation (Ref. Single-Speed Electric DX Air Cooling Coil):
 
-<div>\[TotCapTempModFac = a + b\left( {{T_{wb,i}}} \right) + c{\left( {{T_{wb,i}}} \right)^2} + d\left( {{T_{c,i}}} \right) + e{\left( {{T_{c,i}}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_{c,i}}} \right)\]</div>
+<div>$$TotCapTempModFac = a + b\left( {{T_{wb,i}}} \right) + c{\left( {{T_{wb,i}}} \right)^2} + d\left( {{T_{c,i}}} \right) + e{\left( {{T_{c,i}}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_{c,i}}} \right)$$</div>
 
 where
 
@@ -374,21 +374,21 @@ Lookup tables provide a method to evaluate a group of data that may or may not c
 
 The lookup tables are evaluated using the Lagrange form of the interpolation polynomial or the previously described interpolation methods of LinearInterpolationOfTable and EvaluateCurveToLimits. When using the Lagrange method, the number of points used in the interpolation is equal to 1 plus the polynomial order (e.g., a second order interpolation would use 3 points).
 
-<div>\[{p_n}\left( x \right) = \sum\limits_{i = 0}^n {{y_i}{l_i}\left( x \right)} \]</div>
+<div>$${p_n}\left( x \right) = \sum\limits_{i = 0}^n {{y_i}{l_i}\left( x \right)} $$</div>
 
-<div>\[{l_i}\left( x \right) = \mathop \Pi \limits_{j \ne i} \left( {\frac{{x - {x_j}}}{{{x_i} - {x_j}}}} \right)\,\,\,\,\,\,i = 0,1,...,n\]</div>
+<div>$${l_i}\left( x \right) = \mathop \Pi \limits_{j \ne i} \left( {\frac{{x - {x_j}}}{{{x_i} - {x_j}}}} \right)\,\,\,\,\,\,i = 0,1,...,n$$</div>
 
 First-order Lagrange interpolation polynomial:
 
-<div>\[{p_1}\left( x \right) = \frac{{\left( {x - {x_1}} \right)}}{{\left( {{x_0} - {x_1}} \right)}}{y_0} + \frac{{\left( {x - {x_0}} \right)}}{{\left( {{x_1} - {x_0}} \right)}}{y_1}\]</div>
+<div>$${p_1}\left( x \right) = \frac{{\left( {x - {x_1}} \right)}}{{\left( {{x_0} - {x_1}} \right)}}{y_0} + \frac{{\left( {x - {x_0}} \right)}}{{\left( {{x_1} - {x_0}} \right)}}{y_1}$$</div>
 
 Second-order Lagrange interpolation polynomial:
 
-<div>\[{p_2}\left( x \right) = \frac{{\left( {x - {x_1}} \right)\left( {x - {x_2}} \right)}}{{\left( {{x_0} - {x_1}} \right)\left( {{x_0} - {x_2}} \right)}}{y_0} + \frac{{\left( {x - {x_0}} \right)\left( {x - {x_2}} \right)}}{{\left( {{x_1} - {x_0}} \right)\left( {{x_1} - {x_2}} \right)}}{y_1} + \frac{{\left( {x - {x_0}} \right)\left( {x - {x_1}} \right)}}{{\left( {{x_2} - {x_0}} \right)\left( {{x_2} - {x_1}} \right)}}{y_2}\]</div>
+<div>$${p_2}\left( x \right) = \frac{{\left( {x - {x_1}} \right)\left( {x - {x_2}} \right)}}{{\left( {{x_0} - {x_1}} \right)\left( {{x_0} - {x_2}} \right)}}{y_0} + \frac{{\left( {x - {x_0}} \right)\left( {x - {x_2}} \right)}}{{\left( {{x_1} - {x_0}} \right)\left( {{x_1} - {x_2}} \right)}}{y_1} + \frac{{\left( {x - {x_0}} \right)\left( {x - {x_1}} \right)}}{{\left( {{x_2} - {x_0}} \right)\left( {{x_2} - {x_1}} \right)}}{y_2}$$</div>
 
 Third-order Lagrange interpolation polynomial:
 
-<div>\[\begin{array}{l}{p_3}\left( x \right) = \frac{{\left( {x - {x_1}} \right)\left( {x - {x_2}} \right)\left( {x - {x_3}} \right)}}{{\left( {{x_0} - {x_1}} \right)\left( {{x_0} - {x_2}} \right)\left( {{x_0} - {x_3}} \right)}}{y_0} + \frac{{\left( {x - {x_0}} \right)\left( {x - {x_2}} \right)\left( {x - {x_3}} \right)}}{{\left( {{x_1} - {x_0}} \right)\left( {{x_1} - {x_2}} \right)\left( {{x_1} - {x_3}} \right)}}{y_1} + \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\frac{{\left( {x - {x_0}} \right)\left( {x - {x_1}} \right)\left( {x - {x_3}} \right)}}{{\left( {{x_2} - {x_0}} \right)\left( {{x_2} - {x_1}} \right)\left( {{x_2} - {x_3}} \right)}}{y_2} + \frac{{\left( {x - {x_0}} \right)\left( {x - {x_1}} \right)\left( {x - {x_2}} \right)}}{{\left( {{x_2} - {x_0}} \right)\left( {{x_2} - {x_1}} \right)\left( {{x_2} - {x_2}} \right)}}{y_3}\end{array}\]</div>
+<div>$$\begin{array}{l}{p_3}\left( x \right) = \frac{{\left( {x - {x_1}} \right)\left( {x - {x_2}} \right)\left( {x - {x_3}} \right)}}{{\left( {{x_0} - {x_1}} \right)\left( {{x_0} - {x_2}} \right)\left( {{x_0} - {x_3}} \right)}}{y_0} + \frac{{\left( {x - {x_0}} \right)\left( {x - {x_2}} \right)\left( {x - {x_3}} \right)}}{{\left( {{x_1} - {x_0}} \right)\left( {{x_1} - {x_2}} \right)\left( {{x_1} - {x_3}} \right)}}{y_1} + \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\frac{{\left( {x - {x_0}} \right)\left( {x - {x_1}} \right)\left( {x - {x_3}} \right)}}{{\left( {{x_2} - {x_0}} \right)\left( {{x_2} - {x_1}} \right)\left( {{x_2} - {x_3}} \right)}}{y_2} + \frac{{\left( {x - {x_0}} \right)\left( {x - {x_1}} \right)\left( {x - {x_2}} \right)}}{{\left( {{x_2} - {x_0}} \right)\left( {{x_2} - {x_1}} \right)\left( {{x_2} - {x_2}} \right)}}{y_3}\end{array}$$</div>
 
 where:
 

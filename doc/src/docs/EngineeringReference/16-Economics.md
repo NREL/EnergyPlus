@@ -24,17 +24,17 @@ The rest of this section provides details by organized by the type of line item.
 
 The line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-Each, *P<sub>e</sub>*:
 
-<div>\[L = N * {P_e}\]</div>
+<div>$$L = N * {P_e}$$</div>
 
 #### Construction
 
 This line item type is called “Construction” but is used to estimate the costs of surfaces in the model.  The Construction attribute of Surface objects is useful for categorizing surfaces.  The number of units, *N*, is determined by summing the Area, *A*, of Surface objects that have the type of construction specified in the **Item Name** field.  Surfaces are screened to eliminate any duplicates that may exist for interior partitions creating a list of 1 to *m* unique surfaces.  If a surface is associated with a Zone, then zone multiplier, *M<sub>Z</sub>*, and list multipliers, *M<sub>G</sub>*, are applied (these are usually defaulted to 1).
 
-<div>\[N = \sum\limits_1^m {(A*{M_Z} * {M_G}} )\]</div>
+<div>$$N = \sum\limits_1^m {(A*{M_Z} * {M_G}} )$$</div>
 
 The line item subtotal, *L*, is calculated by multiplying the number of units (actually units of are here), *N* (m<sup>2</sup>) by the Cost-per-Area, *P<sub>a</sub>* , ($/m<sup>2</sup>):
 
-<div>\[L = N * {P_a}\]</div>
+<div>$$L = N * {P_a}$$</div>
 
 #### Coil:DX and Coil:Cooling:DX:SingleSpeed
 
@@ -42,15 +42,15 @@ DX coil costs can be estimated in one of three ways: per-each, per-kW, per-kW-CO
 
 If **cost per each** is greater than 0.0 then the number of units, *N*, is the number of cooling coils.  This will be 1 if the **Item Name** is the name of a specific coil described elsewhere.  If the name is set to the wildcard (\*) then this will equal the total number of DX:Coils in the model.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-Each, *P<sub>e</sub>*:
 
-<div>\[L = N * {P_e}\]</div>
+<div>$$L = N * {P_e}$$</div>
 
 If **cost per kilowatt** is greater than 0.0 then the number of units, *N*, is the number of kilowatts of total, rated, cooling capacity.  This will be based on all the DX:Coils in the model if **Item Name** is set to the wildcard (\*) and will be that of the named coil if set to a valid coil name.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-kilowatt, *P<sub>kW</sub>*:
 
-<div>\[L = N * {P_{kW}}\]</div>
+<div>$$L = N * {P_{kW}}$$</div>
 
 If **Cost per kilowatt per coefficient-of-performance** is greater than 0.0 then the number of units, *N*, is the number of kilowatts of total, rated, cooling capacity multiplied by the nominal coefficient of performance (COP) of the DX:Coils.  This will be based on all the DX:Coils in the model if **Item Name** is set to the wildcard (\*) and will be that of the named coil if set to a valid coil name.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-kilowatt-per-COP, *P<sub>kW-COP</sub>*:
 
-<div>\[L = N * {P_{kW - COP}}\]</div>
+<div>$$L = N * {P_{kW - COP}}$$</div>
 
 #### Coil:Heating:Gas
 
@@ -58,15 +58,15 @@ Gas-fired heating coil costs can be estimated in one of three ways: per-each, pe
 
 If **cost per each** is greater than 0.0 then the number of units, *N*, is the number of heaters.  This will be 1 if the **Item Name** is the name of a specific heater described elsewhere.  If the name is set to the wildcard (\*) then this will equal the total number of Coil:Heating:Gas objects in the model.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-Each, *P<sub>e</sub>*:
 
-<div>\[L = N * {P_e}\]</div>
+<div>$$L = N * {P_e}$$</div>
 
 If **Cost per kilowatt** is greater than 0.0 then the number of units, *N*, is the number of kilowatts of total, rated, heating capacity.  This will be based on all the Coil:Heating:Gas objects in the model if **Item Name** is set to the wildcard (\*) and will be that of the named coil if set to a valid coil name.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-kilowatt, *P<sub>kW</sub>*:
 
-<div>\[L = N * {P_{kW}}\]</div>
+<div>$$L = N * {P_{kW}}$$</div>
 
 If **Cost per kilowatt per coefficient-of-performance** is greater than 0.0 then the number of units, *N*, is the number of kilowatts of total, rated, heating capacity multiplied by the theoretical efficiency of the heater(s).  (Here we are treating gas heating efficiency as a Coefficient of Performance (COP)).  This will be based on all the Coil:Heating:Gas objects in the model if **Item Name** is set to the wildcard (\*) and will be that of the named coil if set to a valid coil name.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-kilowatt-per-COP, *P<sub>kW-COP</sub>*:
 
-<div>\[L = N * {P_{kW - COP}}\]</div>
+<div>$$L = N * {P_{kW - COP}}$$</div>
 
 #### Chiller:Electric
 
@@ -74,31 +74,31 @@ Electric chiller costs can be estimated in one of three ways: per-each, per-kW, 
 
 If **cost per each** is greater than 0.0 then the number of units, *N*, is the number of chillers.  This will be 1 if the **Item Name** is the name of a specific coil described elsewhere.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-Each, *P<sub>e</sub>*:
 
-<div>\[L = N * {P_e}\]</div>
+<div>$$L = N * {P_e}$$</div>
 
 If **Cost per kilowatt** is greater than 0.0 then the number of units, *N*, is the number of kilowatts of total, rated, cooling capacity for the specified chiller.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-kilowatt, *P<sub>kW</sub>*:
 
-<div>\[L = N * {P_{kW}}\]</div>
+<div>$$L = N * {P_{kW}}$$</div>
 
 If **Cost per kilowatt per coefficient-of-performance** is greater than 0.0, then the number of units, *N*, is the number of kilowatts of total, rated, cooling capacity multiplied by the nominal coefficient of performance (COP) of the chiller.  This will be based on the named chiller (if set to a valid coil name).  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-kilowatt-per-COP, *P<sub>kW-COP</sub>*:
 
-<div>\[L = N * {P_{kW - COP}}\]</div>
+<div>$$L = N * {P_{kW - COP}}$$</div>
 
 #### Daylighting:Controls
 
 The costs of controllers for harvesting daylight are determined by the number of reference points.  The cost for each controller, *P<sub>e</sub>* , are input.  The of units, *N*, is determined from the number of daylight reference points in all the zones if the **Item Name** is the wildcard (\*).  If **Item Name** is set to a valid Zone name then N is the number of daylight reference points in just that zone (zones can have more than one daylight controllers).  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-Each, *P<sub>e</sub>*:
 
-<div>\[L = N * {P_e}\]</div>
+<div>$$L = N * {P_e}$$</div>
 
 #### Shading:Zone:Detailed
 
 Shading surfaces need to be handled separately because they do not have the **Construction** attribute.  The **Item Name** must be set to a valid name for a **Shading:Zone:Detailed** object defined elsewhere in the file.  The number of units, N, is determined from the area of the named surface multiplied by zone multiplier, *M<sub>Z</sub>*, and list multipliers, *M<sub>G</sub>*:
 
-<div>\[N = A*{M_Z} * {M_g}\]</div>
+<div>$$N = A*{M_Z} * {M_g}$$</div>
 
 The line item subtotal, *L*, is calculated by multiplying the number of units, *N* (m<sup>2</sup>) by the Cost-per-Area, *P<sub>a</sub>* , ($/m<sup>2</sup>):
 
-<div>\[L = N * {P_a}\]</div>
+<div>$$L = N * {P_a}$$</div>
 
 #### Lights
 
@@ -106,21 +106,21 @@ The cost of electric lighting systems can be modeled in two ways: per-each and p
 
 If **cost per each** is greater than 0.0, then the number of units, *N*, is the number lighting systems in the zone and is assumed to be 1.  Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-Each, *P<sub>e</sub>*:
 
-<div>\[L = N * {P_e}\]</div>
+<div>$$L = N * {P_e}$$</div>
 
 If **Cost per kilowatt** is greater than 0.0 then the number of units, *N*, is the number of kilowatts in the design level for electric lighting systems defined in Lights objects associated with the zone.  The **Item Name** must be the name of a valid Zone defined elsewhere in the input.  *N* is then the sum of all the Lights associated with the named Zone. Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-kilowatt, *P<sub>kW</sub>*:
 
-<div>\[L = N * {P_{kW}}\]</div>
+<div>$$L = N * {P_{kW}}$$</div>
 
 #### Generator:Photovoltaic
 
 The costs of simple photovoltaic power systems can be modeled using cost per kilowatt.  The number of units, N, is the nominal rated peak power of the photovoltaic panels.  The photovoltaic generator must be modeled using the PhotovoltaicPerformance:Simple input object which is a very simplistic model and does not include input for the nominal rated peak power of the system.  Therefore a peak power is calculated using the usual 1000 W/m<sup>2</sup> of incident solar radiation, *G<sub>p</sub>*, multiplied by the active solar cell area, *A* and the efficiency, *E*, and converted to units of kilowatts.
 
-<div>\[N = \frac{{{G_p} * A * E}}{{1000.0}}\]</div>
+<div>$$N = \frac{{{G_p} * A * E}}{{1000.0}}$$</div>
 
 Where, the cell area A is calculated by multiplying the area of the surface associated with the simple photovoltaic system and the active area fraction defined in the PhotovoltaicPerformance:Simple. Then the line item subtotal, *L*, is calculated by multiplying the number of units, *N*, by the Cost-per-kilowatt, *P<sub>kW</sub>*:
 
-<div>\[L = N * {P_{kW}}\]</div>
+<div>$$L = N * {P_{kW}}$$</div>
 
 ### Adjustments
 
@@ -128,49 +128,49 @@ Various adjustments are available to model total project costs from the componen
 
 The subtotal of individual line items, *S<sub>L</sub>*, is obtained by summing all line item subtotals, *L*:
 
-<div>\[{S_L} = \sum L \]</div>
+<div>$${S_L} = \sum L $$</div>
 
 For the reference building, *S<sub>L,</sub>*is user input (typically from a prior run of baseline building model).
 
 The subtotal for miscellaneous construction costs (typically those costs not explicitly included as line items), *S<sub>m</sub>*, are calculated by multiplying the **Miscellaneous Cost Model** (per Square Meter), *C<sub>m</sub>*,  by the total conditioned floor area, *A<sub>c</sub>*:
 
-<div>\[{S_m} = {A_c} * {C_m}\]</div>
+<div>$${S_m} = {A_c} * {C_m}$$</div>
 
 The subtotal for the amount that the construction costs should be altered because of regional differences in material and labor costs (e.g. when using national average data), *S<sub>r</sub>*, is determined by multiplying the Regional Adjustment Factor, *R<sub>f\\ ,</sub>* by the sum of *S<sub>L </sub>* and *S<sub>m:</sub>*
 
-<div>\[{S_r} = ({S_L} + {S_m}){R_f}\]</div>
+<div>$${S_r} = ({S_L} + {S_m}){R_f}$$</div>
 
 Remaining adjustments are applied to the subtotal for construction costs, *S<sub>c</sub>*, which is the sum of *S<sub>L</sub>*, *S<sub>m,</sub>*, and *S<sub>r:</sub>*
 
-<div>\[{S_C} = {S_L} + {S_m} + {S_r}\]</div>
+<div>$${S_C} = {S_L} + {S_m} + {S_r}$$</div>
 
 The **Design and Engineering Fee Fraction**,*F<sub>d</sub>*,is the fraction of construction costs, *S<sub>c</sub>*, attributable to costs associated with architectural and engineering services needed for the project.  The subtotal for costs associated with these fees, *S<sub>D</sub>*, are determined by multiplying *S<sub>C</sub>* by *F<sub>d</sub>*:
 
-<div>\[{S_D} = {S_c}*{F_D}\]</div>
+<div>$${S_D} = {S_c}*{F_D}$$</div>
 
 The **Contractor Fee Fraction**,*F<sub>c</sub>*,is the fraction of construction costs, *S<sub>c</sub>*, attributable to costs associated with the contractor’s profit that should be included in the project.  The subtotal for costs associated with contracting, *S<sub>P</sub>*, are determined by multiplying *S<sub>C</sub>* by *F<sub>d</sub>*:
 
-<div>\[{S_P} = {S_c}*{F_C}\]</div>
+<div>$${S_P} = {S_c}*{F_C}$$</div>
 
 The **Contingency Fraction**,*F<sub>S</sub>*,is the fraction of construction costs, *S<sub>c</sub>*, which should be included in a cost estimate to provide for contingencies (perhaps related to errors and uncertainty in the estimate and project).  The subtotal for contingency costs, *S<sub>S</sub>*, are determined by multiplying *S<sub>C</sub>* by *F<sub>S</sub>*:
 
-<div>\[{S_S} = {S_c}*{F_S}\]</div>
+<div>$${S_S} = {S_c}*{F_S}$$</div>
 
 The **Permits, Bonding, Insurance Fraction,***F<sub>B</sub>*,is the fraction of construction costs, *S<sub>c</sub>*, which should be included in a cost estimate to provide for things like taxes, bonding, insurance, and permits.  The subtotal for these extra costs, *S<sub>B</sub>*, are determined by multiplying *S<sub>C</sub>* by *F<sub>B</sub>*:
 
-<div>\[{S_B} = {S_c}*{F_B}\]</div>
+<div>$${S_B} = {S_c}*{F_B}$$</div>
 
 The **Commissioning Fee Fraction,***F<sub>CX</sub>*,is the fraction of construction costs, *S<sub>c</sub>*, which should be included in a cost estimate to provide for commissioning the building systems.  The subtotal for these extra costs, *S<sub>CX</sub>*, are determined by multiplying *S<sub>C</sub>* by *F<sub>CX</sub>*:
 
-<div>\[{S_{CX}} = {S_c}*{F_{CX}}\]</div>
+<div>$${S_{CX}} = {S_c}*{F_{CX}}$$</div>
 
 Finally, the cost estimate total, *T*, is obtained by summing the various subtotals:
 
-<div>\[T = {S_L} + {S_m} + {S_r} + {S_D} + {S_P} + {S_S} + {S_B} + {S_{CX}}\]</div>
+<div>$$T = {S_L} + {S_m} + {S_r} + {S_D} + {S_P} + {S_S} + {S_B} + {S_{CX}}$$</div>
 
 The normalized total cost estimate, C, is calculated by dividing *T* by the total conditioned floor area, *A<sub>c</sub>*:
 
-<div>\[C = \frac{T}{{{A_C}}}\]</div>
+<div>$$C = \frac{T}{{{A_C}}}$$</div>
 
 ### Comparisons
 
