@@ -1461,8 +1461,8 @@ namespace HeatBalanceIntRadExchange {
 					Real64 const Aij( A[ ij ] );
 					A[ ij ] = A[ pj ];
 					A[ pj ] = Aij;
-					Real64 const Iij( I[ ji ] );
-					I[ ji ] = I[ pj ];
+					Real64 const Iij( I[ ij ] );
+					I[ ij ] = I[ pj ];
 					I[ pj ] = Iij;
 				}
 #else 
