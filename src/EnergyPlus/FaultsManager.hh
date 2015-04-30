@@ -99,7 +99,6 @@ namespace FaultsManager {
 		bool Status; // for future use
 		int AvaiSchedPtr;
 		int SeveritySchedPtr;
-		int FaultyAirFilterPressureFracSchePtr;
 		int FaultTypeEnum;
 
 		std::string FouledCoilName; // The fouled coil name
@@ -118,7 +117,9 @@ namespace FaultsManager {
 		std::string FaultyAirFilterFanName;          // The name of the fan corresponding to the fouled air filter
 		std::string FaultyAirFilterFanType;          // The type of the fan corresponding to the fouled air filter
 		std::string FaultyAirFilterFanCurve;         // The name of the fan curve
-		std::string FaultyAirFilterPressureFracSche; // Schedule describing variations of the fan pressure rise
+		int         FaultyAirFilterFanCurvePtr;      // The index to the curve 
+		std::string FaultyAirFilterPressFracSche;    // Schedule describing variations of the fan pressure rise
+		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule  
 		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
 		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
 		
@@ -130,7 +131,8 @@ namespace FaultsManager {
 			Status( false ),
 			AvaiSchedPtr( 0 ),
 			SeveritySchedPtr( 0 ),
-			FaultyAirFilterPressureFracSchePtr( 0 ),
+			FaultyAirFilterPressFracSchePtr( 0 ),
+			FaultyAirFilterFanCurvePtr( 0 ),
 			FaultTypeEnum( 0 ),
 			FouledCoilID( 0 ),
 			FoulingInputMethod( 0 ),
@@ -155,7 +157,6 @@ namespace FaultsManager {
 			bool const Status, // for future use
 			int const AvaiSchedPtr,
 			int const SeveritySchedPtr,
-			int const FaultyAirFilterPressureFracSchePtr,
 			int const FaultTypeEnum,
 			std::string const & FouledCoilName, // The fouled coil name
 			std::string const & FaultyThermostatName, // The faulty thermostat name
@@ -168,12 +169,14 @@ namespace FaultsManager {
 			Real64 const Rfa, // Air side fouling factor
 			Real64 const Aout, // Coil outside surface area
 			Real64 const Aratio, // Inside to outside surface area ratio
-			std::string FaultyAirFilterFanName,          // The name of the fan corresponding to the fouled air filter
-			std::string FaultyAirFilterFanType,          // The type of the fan corresponding to the fouled air filter
-			std::string FaultyAirFilterFanCurve,         // The name of the fan curve
-			std::string FaultyAirFilterPressureFracSche, // Schedule describing variations of the fan pressure rise
-			Real64      FaultyAirFilterFanPressInc,      // The increase of the fan pressure due to fouled air filter
-			Real64      FaultyAirFilterFanFlowDec        // The decrease of the fan airflow rate due to fouled air filter
+			std::string  FaultyAirFilterFanName,          // The name of the fan corresponding to the fouled air filter
+			std::string  FaultyAirFilterFanType,          // The type of the fan corresponding to the fouled air filter
+			std::string  FaultyAirFilterFanCurve,         // The name of the fan curve
+			int const    FaultyAirFilterFanCurvePtr,      // The pointer to the curve 
+			std::string  FaultyAirFilterPressFracSche,    // Schedule describing variations of the fan pressure rise
+			int const    FaultyAirFilterPressFracSchePtr, // The pointer to the schedule describing fan pressure rise
+			Real64 const FaultyAirFilterFanPressInc,      // The increase of the fan pressure due to fouled air filter
+			Real64 const FaultyAirFilterFanFlowDec        // The decrease of the fan airflow rate due to fouled air filter
 		) :
 			Name( Name ),
 			FaultType( FaultType ),
@@ -201,9 +204,10 @@ namespace FaultsManager {
 			FaultyHumidistatType( FaultyHumidistatType ),
 			FaultyAirFilterFanName( FaultyAirFilterFanName ),  
 			FaultyAirFilterFanType( FaultyAirFilterFanType ),         
-			FaultyAirFilterFanCurve( FaultyAirFilterFanCurve ),         
-			FaultyAirFilterPressureFracSche( FaultyAirFilterPressureFracSche ), 
-			FaultyAirFilterPressureFracSchePtr( FaultyAirFilterPressureFracSchePtr ), 
+			FaultyAirFilterFanCurve( FaultyAirFilterFanCurve ),          
+			FaultyAirFilterFanCurvePtr( FaultyAirFilterFanCurvePtr ),    
+			FaultyAirFilterPressFracSche( FaultyAirFilterPressFracSche ), 
+			FaultyAirFilterPressFracSchePtr( FaultyAirFilterPressFracSchePtr ), 
 			FaultyAirFilterFanPressInc( FaultyAirFilterFanPressInc ),
 			FaultyAirFilterFanFlowDec( FaultyAirFilterFanFlowDec )
 		{}
@@ -221,6 +225,12 @@ namespace FaultsManager {
 
 	void
 	CheckAndReadFaults();
+
+	bool 
+	CheckFaultyAirFilterFanCurve(
+		std::string const CompName, // name of the fan 
+		int const FanCurvePtr       // pointer of the fan curve
+	);
 
 	// *****************************************************************************
 	//     NOTICE

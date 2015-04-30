@@ -7,6 +7,7 @@
 #include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <CurveManager.hh>
+#include <Fans.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -16,7 +17,7 @@ namespace FaultsManager {
 	// MODULE INFORMATION:
 	//       AUTHOR         Tianzhen Hong, LBNL
 	//       DATE WRITTEN   August 2013
-	//       MODIFIED       Sep. 2013 Xiufeng Pang (XP) added fouling coil fault
+	//       MODIFIED       Sep. 2013 Xiufeng Pang (XP), added fouling coil fault
 	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat/humidistat offset faults
 	//       MODIFIED       Apr. 2015 Rongpeng Zhang, added fouling air filter fault
 	//       RE-ENGINEERED
@@ -90,7 +91,7 @@ namespace FaultsManager {
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	Array1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset, iFault_HumidistatOffset } );
+	Array1D_int const iFaultTypeEnums(NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset, iFault_HumidistatOffset, iFault_Fouling_AirFilter });
 
 	bool AnyFaultsInModel( false ); // True if there are operationla faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
@@ -230,8 +231,16 @@ namespace FaultsManager {
 					FaultsFouledAirFilters( jFaultyAirFilter ).FaultType = cFault1;
 					FaultsFouledAirFilters( jFaultyAirFilter ).FaultTypeEnum = iFaultTypeEnums( i );
 					FaultsFouledAirFilters( jFaultyAirFilter ).Name = cAlphaArgs( 1 );
+
+					// Informatin of the fan associated with the fouling air filter
 					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName = cAlphaArgs( 2 );
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType = cAlphaArgs( 3 );
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType = cAlphaArgs( 3 );	
+
+					// Check whether the specified fan exsits in the fan list
+					if ( FindItemInList( cAlphaArgs( 2 ), EnergyPlus::Fans::Fan.FanName(), EnergyPlus::Fans::NumFans ) != 1 ) {
+						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+						ErrorsFound = true;
+					}				
 
 					// Fault availability schedule
 					FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedule = cAlphaArgs( 4 );
@@ -246,26 +255,33 @@ namespace FaultsManager {
 					}
 					
 					// Fan pressure increase fraction schedule
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressureFracSche = cAlphaArgs( 5 );
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSche = cAlphaArgs( 5 );
 					if ( lAlphaFieldBlanks( 5 ) ) {
-						FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressureFracSchePtr = -1; // returns schedule value of 1
+						FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr = -1; // returns schedule value of 1
 					} else {
-						FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressureFracSchePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
-						if ( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressureFracSchePtr == 0 ) {
+						FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
+						if ( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr == 0 ) {
 							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 					
 					// Fan curve describing the relationship between fan pressure rise and air flow rate
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurve = GetCurveIndex( cAlphaArgs( 6 ) );
-					if ( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurve == 0 ) {
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurve = cAlphaArgs( 6 );
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr = GetCurveIndex( cAlphaArgs( 6 ) ); 
+					if ( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr == 0 ) {
 						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 )  + "\"" );
-						ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found."  );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" not found."  );
 						ErrorsFound = true;
 					}
 					
-					// Check whether the fan design operational point fall on the fan curve: Get the fan input ......
+					// Check whether the specified fan curve covers the design operational point of the fan
+					if ( !CheckFaultyAirFilterFanCurve( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName, FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr ) ) {
+						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 )  + "\"" );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" does not cover "  );
+						ShowContinueError( "the operational point of Fan " + FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName  );
+						ErrorsFound = true;
+					} 
 					
 					//In the fan object, calculate by each time-step: 1) pressure inc value; 2) air flow rate decrease value ......
 
@@ -476,12 +492,76 @@ namespace FaultsManager {
 		}
 
 		RunMeOnceFlag = true;
-
+		
 		if ( ErrorsFound ) {
 			ShowFatalError( "Errors getting FaultModel input data.  Preceding condition(s) cause termination." );
 		}
 
 	}
+
+	bool CheckFaultyAirFilterFanCurve(
+		std::string const FanName, // name of the fan 
+		int const FanCurvePtr      // pointer of the fan curve
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Apr. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
+		// covers the rated operational point of the corresponding fan 
+		// Return true if the curve covers the fan rated operational point
+
+		// METHODOLOGY EMPLOYED:
+		// NA
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using namespace Fans;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 FanMaxAirFlowRate; // Design Max Specified Volume Flow Rate of Fan [m3/sec]
+		Real64 FanDeltaPress;     // Design Delta Pressure Across the Fan [Pa]
+		Real64 FanDeltaPressCal;  // Calculated Delta Pressure Across the Fan [Pa]
+
+		// FLOW
+		
+		for ( int FanNum = 1; FanNum <= NumFans; ++FanNum ) {
+			if ( SameString( Fan( FanNum ).FanName, FanName ) ) { 
+				FanMaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;
+				FanDeltaPress = Fan( FanNum ).DeltaPress;
+				break;
+			}
+		}
+		
+		FanDeltaPressCal = CurveValue( FanCurvePtr, FanMaxAirFlowRate );
+		
+		if ( ( FanDeltaPressCal > 0.95*FanDeltaPress ) && ( FanDeltaPressCal < 1.05*FanDeltaPress ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 
 	// *****************************************************************************
 	//     NOTICE

@@ -232,7 +232,7 @@ namespace SimulationManager {
 		using DataSystemVariables::FullAnnualRun;
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
-		using namespace FaultsManager;
+		using FaultsManager::CheckAndReadFaults;
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
@@ -302,12 +302,12 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 
-		CheckAndReadFaults();
-
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
 		ManageSizing();
+
+		CheckAndReadFaults();
 
 		BeginFullSimFlag = true;
 		SimsDone = false;

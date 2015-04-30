@@ -76123,7 +76123,7 @@ FaultModel:HumidistatOffset,
        \type object-list
        \object-list ThermostatOffsetFaults   
 	   
-FaultModel:Fouling:AirFilter
+FaultModel:Fouling:AirFilter,
    \memo This object describes fault of dirty air filters
    A1, \field Name
        \required-field
