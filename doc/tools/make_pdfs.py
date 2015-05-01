@@ -102,7 +102,7 @@ def WholeProjectPrep(main_src_dir):
 
 # set up some local settings
 srcdir  = "../src/"
-sitedir = "../src/site"
+sitedir = "../src/site_htmlpdf"
 pdfdir  = "/tmp/pdfs"
 
 # some other one-time settings
@@ -114,7 +114,7 @@ documents = []
 documents.append(SingleDocInfo(srcdir, sitedir, "Acknowledgements", "Acknowledgements", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "AuxiliaryPrograms", "AuxiliaryPrograms", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "EMS_Application_Guide", "EMS_Application_Guide", 30000))
-documents.append(SingleDocInfo(srcdir, sitedir, "EngineeringReference", "EngRef", 14400000, EngRefConcatenate))  # yes...14400000ms = 14400s = 4h
+documents.append(SingleDocInfo(srcdir, sitedir, "EngineeringReference", "EngRef", 18000000, EngRefConcatenate))  # yes...18000000ms = 18000s = 5h ... don't need that much, but just let it go overnight
 documents.append(SingleDocInfo(srcdir, sitedir, "ExternalInterfaces_Application_Guide", "ExternalInterfaces_Application_Guide", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "GettingStarted", "GettingStarted", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "InputOutputReference", "IORef", 300000, IORefConcatenate)) # 300000ms = 300s = 5m
@@ -158,8 +158,20 @@ docs_running = -1
 for document in documents:
 	docs_running += 1
 	os.chdir
-	args = "wkhtmltopdf -q --outline --outline-depth 3 --javascript-delay %i --page-size Letter --margin-bottom 30mm --margin-top 30mm --margin-left 30mm --margin-right 30mm index.html %s.pdf" % (document.delay, document.doc_name)
-	p = subprocess.Popen(args.split(" "), cwd=document.working_dir, stderr=FNULL)
+	args = []
+	args.extend(["wkhtmltopdf"]) # The main executable name
+	args.extend(["-q"]) # Be quiet
+	args.extend(["--outline", "--outline-depth", "3"]) # Set up the bookmarks in the pdf
+	args.extend(["--javascript-delay", "%i" % document.delay]) # Set the delay for javascript rendering
+	args.extend(["--page-size", "Letter"]) # Set the page size
+	if document.doc_name in ["AuxiliaryPrograms","EngineeringReference", "InputOutputReference", "ModuleDeveloper","OutputDetailsAndExamples"]:
+		args.extend(["--minimum-font-size", "16"]) # Do an override to get the font an appropriate size
+	args.extend(["--margin-bottom", "20mm", "--margin-top", "20mm"]) # Top and bottom margins, 
+	args.extend(["--margin-left", "20mm", "--margin-right", "20mm"]) # Left and right margins
+	args.extend(["--footer-font-size", "9", "--footer-line", "--footer-left", "EnergyPlus Documentation", "--footer-right", "Page [page] of [toPage]"]) # Set the footer
+	args.extend(["index.html"]) # Input file name
+	args.extend(["%s.pdf" % document.doc_name]) # Output file name
+	p = subprocess.Popen(args, cwd=document.working_dir, stderr=FNULL)
 	pids.append(DocStateInfo(docs_running, p.pid, document.doc_name))
 while docs_running > -1:
 	pid, retval = os.wait()
@@ -169,6 +181,8 @@ while docs_running > -1:
 print("***PDF build complete")
 
 print("***Storing pdfs")
+if os.path.exists(pdfdir):
+	shutil.rmtree(pdfdir)
 os.makedirs(pdfdir)
 for document in documents:
 	src_pdf = os.path.join(sitedir, document.doc_name, document.site_md_filename, document.doc_name+".pdf")
