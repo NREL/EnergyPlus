@@ -698,6 +698,15 @@ namespace Fans {
 		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
 	);
 
+	Real64 
+	CalFaultyFanAirFlowReduction(
+		std::string const FanName,            // Name of the Fan 
+		Real64 const FanDesignAirFlowRate,    // Fan Design Volume Flow Rate [m3/s]
+		Real64 const FanDesignDeltaPress,     // Fan Design Delta Pressure [Pa]
+		Real64 const FanFaultyDeltaPressInc,  // Increase of Fan Delta Pressure in the Faulty Case [Pa]
+		int const FanCurvePtr                 // Fan Curve Pointer
+	);
+
 	Real64
 	FanDesHeatGain(
 		int const FanNum, // index of fan in Fan array

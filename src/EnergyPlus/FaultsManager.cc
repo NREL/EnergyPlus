@@ -237,7 +237,7 @@ namespace FaultsManager {
 					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType = cAlphaArgs( 3 );	
 
 					// Check whether the specified fan exsits in the fan list
-					if ( FindItemInList( cAlphaArgs( 2 ), EnergyPlus::Fans::Fan.FanName(), EnergyPlus::Fans::NumFans ) != 1 ) {
+					if ( FindItemInList( cAlphaArgs( 2 ), Fans::Fan.FanName(), Fans::NumFans ) != 1 ) {
 						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
 						ErrorsFound = true;
 					}				
@@ -499,7 +499,8 @@ namespace FaultsManager {
 
 	}
 
-	bool CheckFaultyAirFilterFanCurve(
+	bool 
+	CheckFaultyAirFilterFanCurve(
 		std::string const FanName, // name of the fan 
 		int const FanCurvePtr      // pointer of the fan curve
 	)
