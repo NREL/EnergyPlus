@@ -2122,8 +2122,8 @@ namespace LowTempRadiantSystem {
 			}
 			if ( CurZoneEqNum > 0 ) {
 				if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
-					if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat > 0.0 ) {
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat );
+					if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxCool > 0.0 ) {
+						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", HydrRadSys( RadSysNum ).WaterVolFlowMaxCool );
 					}
 				} else { // Autosize or hard-size with sizing run
 					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name );
@@ -2135,7 +2135,7 @@ namespace LowTempRadiantSystem {
 							DataFracOfAutosizedCoolingCapacity = 1.0;
 							DataZoneNumber = HydrRadSys( RadSysNum ).ZonePtr;
 							SizingMethod = CoolingCapacitySizing;
-							FieldNum = 3;
+							FieldNum = 8;
 							PrintFlag = false;
 							SizingString = HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( FieldNum ) + " [W]";
 							CapSizingMethod = HydrRadSys( RadSysNum ).CoolingCapMethod;
