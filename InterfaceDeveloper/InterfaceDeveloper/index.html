@@ -531,8 +531,8 @@
 </li>
 </ul>
 <h1 id="input-details">Input Details</h1>
-<p>This document does not cover the input “classes” in detail.  For details on each class and examples of both input and output resulting from that class/object, please view the <a href="file:///E:\Docs4PDFs\InputOutputReference.pdf">Input Output Reference</a> document.  In this document, we will show the “conventions” used in the IDD and provide limited examples for illustration purposes. Even the list of objects is dynamic, so we give you a method to see them from the IDFEditor.</p>
-<p>An intelligent editor (IDFEditor) has been written and can be used as an illustration of how the comments in the IDD might be used by Interface Developers to guide their developments.  IDFEditor is described in the <a href="file:///E:\Docs4PDFs\GettingStarted.pdf">Getting Started</a> document.</p>
+<p>This document does not cover the input “classes” in detail.  For details on each class and examples of both input and output resulting from that class/object, please view the Input Output Reference document.  In this document, we will show the “conventions” used in the IDD and provide limited examples for illustration purposes. Even the list of objects is dynamic, so we give you a method to see them from the IDFEditor.</p>
+<p>An intelligent editor (IDFEditor) has been written and can be used as an illustration of how the comments in the IDD might be used by Interface Developers to guide their developments.  IDFEditor is described in the <a href="../../GettingStarted/GettingStarted">Getting Started</a> document.</p>
 <p>A full example of a very simple IDF is included in Appendix A to this document.</p>
 <h2 id="idd-conventions">IDD Conventions</h2>
 <p>The following is a basic description of the structure of the IDD (it’s actually taken directly from the IDD file). As noted within, <strong>!</strong> signifies a comment character as does the <strong>\</strong>. <strong>\</strong> has also been adopted as a convention for including more specific comments about each field in an object. These have been used with success in the IDFEditor and it is hoped the flexibility will provide other interface developers with useful information.</p>
@@ -943,7 +943,7 @@
 <p>\min-fields deserves some explanation.  This has object level enforcement.  When min-fields is specified for an object, it has meaning to the InputProcessor – telling the IP the number of fields that must be returned to a GetInput routine regardless of how many fields may actually appear in the IDF.  So, min-fields is actually an automatic assistance in most instances.</p>
 <p>Some objects need all the parameters listed by the definition; some do not.  In the descriptions that are contained in the Input Output Reference, we try to indicate which parts are optional.  Usually, these will be the last fields in the object input or definition.</p>
 <h3 id="using-the-input-output-reference-document">Using the Input-Output Reference Document</h3>
-<p>To assist you in using the <a href="file:///E:\Docs4PDFs\InputOutputReference.pdf">Input Output Reference</a> document, it is grouped similarly to the IDD file.</p>
+<p>To assist you in using the Input Output Reference document, it is grouped similarly to the IDD file.</p>
 <p>To determine the latest set of groups and objects, it will be useful for you to open the IDFEditor (an intelligent editor that is installed with EnergyPlus) and write out the current object list.  The following figure shows the screen shot of the IDFEditor and the help menu to select the objectlist.  Select “<strong>create objectlist.txt</strong>” to create the object list – it will be put into the IDFEditor program folder.</p>
 <p><img alt="" src="../../InterfaceDeveloper/media/image002.jpg" /></p>
 <p>Figure 2. Using IDFEditor to find the latest groups and objects for the Energy+.idd</p>
@@ -1277,7 +1277,7 @@ End of Data
 </ul>
 <p>The input data dictionary and input data file have been discussed in the previous sections of this document.</p>
 <p>For weather simulations, EnergyPlus accepts EnergyPlus weather files. Previous versions accepted BLAST formatted weather files and now a BLASTWeatherConverter program is provided.  The actual file name is <strong>in.epw</strong>.</p>
-<p>The Energy+.ini file is a “standard” Windows™ ini file and can be manipulated using the Windows API calls though EnergyPlus uses standard Fortran to manipulate it.  It is a very simple ini file and is fully described in the <a href="file:///E:\Docs4PDFs\AuxiliaryPrograms.pdf">Auxiliary Programs</a> document. Energy+.ini and in.idf file should be in the directory from which you are running EnergyPlus.exe.</p>
+<p>The Energy+.ini file is a “standard” Windows™ ini file and can be manipulated using the Windows API calls though EnergyPlus uses standard Fortran to manipulate it.  It is a very simple ini file and is fully described in the <a href="../../AuxiliaryPrograms/AuxiliaryPrograms">Auxiliary Programs</a> document. Energy+.ini and in.idf file should be in the directory from which you are running EnergyPlus.exe.</p>
 <p>For the advanced user, there is also the “EPMacro” program, described in the Auxiliary Programs Document.  You run it as a separate program before EnergyPlus (the batch file included in the install and shown in the GettingStarted document contains the commands).</p>
 <p>EnergyPlus creates the following files (plus more):</p>
 <p>Table 2.  EnergyPlus Output Files</p>
