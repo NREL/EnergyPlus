@@ -1654,6 +1654,8 @@ namespace WaterCoils {
 		DesCoilExitTemp = 0.0;
 		LoopErrorsFound = false;
 		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
+		DataScalableSizingON = false;
+		DataScalableCapSizingON = false;
 
 		// cooling coils
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling && WaterCoil( CoilNum ).RequestingAutoSize ) {
