@@ -253,7 +253,7 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+                <a href="../../Acknowledgements/Acknowledgements">Acknowledgements</a>
               </li>
             
               <li>
@@ -332,9 +332,32 @@
            })();
           </script>
           <gcse:search></gcse:search>
-          <p>External Interface(s)
- Application Guide</p>
-<p>Guide for using EnergyPlus with External Interface(s)</p>
+          <p><img alt="" src="../../ExternalInterfaces_Application_Guide/media/ep.gif" /></p>
+<p><br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>External Interface(s) Application Guide</h1>
+<h2>Guide for using EnergyPlus with External Interface(s)</h2>
+<br/>
+<p><i>(internalize these external details...)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p></p>
 <h1 id="external-interfaces">External Interface(s)</h1>
 <h2 id="introduction">Introduction</h2>
 <p>The ExternalInterface allows coupling EnergyPlus to the Building Controls Virtual Test Bed (BCVTB). It supports the import of Functional Mock-up Units (FMUs) for co-simulation as well as the export of EnergyPlus as a FMU for co-simulation. BCVTB is a software environment that allows expert users to couple different simulation programs for distributed simulation or for a real-time simulation that is connected to a building control system. For example, the BCVTB allows simulation of the building envelope and HVAC system in EnergyPlus and the control logic in MATLAB/Simulink, while exchanging data between the two programs as they simulate. The BCVTB can be downloaded from http://simulationresearch.lbl.gov/bcvtb. A FMU is a component which implements the Functional Mock-up Interface (FMI) standard (http://www.modelisar.com).</p>
@@ -1384,6 +1407,7 @@ Output:Variable,
       MathJax.Hub.Config({
         extensions: ["tex2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
         showMathMenu: true,
         showMathMenuMSIE: false,
         "HTML-CSS": {

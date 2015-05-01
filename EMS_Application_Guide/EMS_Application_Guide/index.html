@@ -253,7 +253,7 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+                <a href="../../Acknowledgements/Acknowledgements">Acknowledgements</a>
               </li>
             
               <li>
@@ -476,9 +476,26 @@
            })();
           </script>
           <gcse:search></gcse:search>
-          <p>Application Guide for EMS</p>
-<p>Energy Management System User Guide  </p>
-<p>(a.k.a. The Book of Erl)</p>
+          <p><img alt="" src="../../EMS_Application_Guide/media/ep.gif" /></p>
+<p><br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>Application Guide for EMS</h1>
+<h2>Energy Management System User Guide</h2>
+<br/>
+<p><i>(a.k.a. The Book of Erl)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p></p>
 <h1 id="introduction">Introduction</h1>
 <p>This document provides an in-depth look at the Energy Management System (EMS) feature in EnergyPlus and provides a way to develop custom control and modeling routines for EnergyPlus models. EMS is an advanced feature of EnergyPlus and is not for beginners. You will need to write your own custom computer programs and have a thorough understanding of how you want your models to behave. If you are intimidated by the idea of writing computer programs to adjust the fine details of how an EnergyPlus model runs, be aware that EMS is not for all (or even most) users. However, if you relish the idea of being able to write small computer programs that override some annoying behavior, you may find that writing Erl programs can solve many problems faced by energy modelers. EMS is a complicated feature  and this application guide augments the Input/Output Reference by providing an overall discussion of how to use EMS.</p>
 <p>EMS provides high-level, supervisory control to override selected aspects of EnergyPlus modeling. A small programming language called EnergyPlus Runtime Language (Erl) is used to describe the control algorithms. EnergyPlus interprets and executes your Erl program as the model is being run. This guide serves as a programming manual for Erl and attempts to show you how to customize your EnergyPlus simulations.</p>
@@ -2640,7 +2657,7 @@ IF a - 1
 <p>This is a fairly simple example in that the EMS controls nothing. There are no actuators.</p>
 <p>The example file has six zones, but one is an attic that we do not care about. Therefore, the main inputs, or EMS sensors, will be the zone air temperatures for the five occupied zones. We will use EnergyManagementSystem:Sensor objects to obtain the values for the air temperatures by mapping to the output variable called “Zone Mean Air Temperature.”</p>
 <p>A model for average temperature can be constructed by using the zone air volumes as weights so larger zones have more influence than smaller zones on the resulting average. The model equation we will implement in EMS for our new report variable is</p>
-<div>\[T_{average} = \frac{\sum\left(T_{zone}\text{Vol}_{zone}\right)}{\sum\left(\text{Vol}_{zone}\right)}\]</div>
+<div>$$T_{average} = \frac{\sum\left(T_{zone}\text{Vol}_{zone}\right)}{\sum\left(\text{Vol}_{zone}\right)}$$</div>
 
 <p>The example file specifies the zone volume in its zone objects so we have the data needed for the weighting factors from elsewhere in the IDF. However, a study could vary the geometry such that the volumes differ from one simulation to another. Zone Air Volume is available as internal data, so we will use EnergyManagementSystem:InternalVariable input objects to assign these weighting factors into global Erl variables. If we did not know beforehand that Zone Air Volume was an available internal variable, we would have had to prerun the model with some EMS-related objects and the appropriate level of reporting selected in an Output:EnergyManagementSystem object, and then studied the EDD output file. Note that the EDD file is only produced if you have EMS/Erl programs in your input file.</p>
 <p>The custom output variable will be defined by using an EnergyManagementSystem:OutputVariable input object. This requires the Erl variable to be global, so we need to declare a variable. Let’s call it AverageBuildingTemp, to be global using an EnergyManagementSystem:GlobalVariable object so we have a way to connect the result calculated in the Erl program to the custom output.</p>
@@ -2945,13 +2962,13 @@ EnergyManagementSystem:Program,
 <p>The main EMS sensor will be the zone air humidity, so we use an EnergyManagementSystem:Sensor object that maps to the output variable called System Node Relative Humidity for the zone’s air node. This zone has the detailed opening.</p>
 <p>The EMS will actuate the opening in an airflow network that is defined by the input object AirflowNetwork:MultiZone:Component:DetailedOpening. The program will setup the actuator for this internally, but we need to use an EnergyManagementSystem:Actuator object to declare that we want to use the actuator and provide the variable name we want for the Erl programs.</p>
 <p>Because we do not know the exactly what the user had in mind, for this example we assume that the desired behavior for the opening area is that the opening should vary linearly with room air relative humidity. When the humidity increases, we want the opening to be larger. When the humidity decreases, we want the opening to be smaller. For relative humidity below 25% we close the opening. At 60% or higher relative humidity, the opening should be completely open. We formulate a model equation for opening factor as</p>
-<div>\[
+<div>$$
   F_{open} = \begin{array}{ll}
     0.0 & RH < 25\% \\
     \frac{RH-25}{60-25} & 25\% \leq RH \leq 60\% \\
     1.0 & RH > 60\%  
   \end{array}
-\]</div>
+$$</div>
 
 <h3 id="ems-input-objects_2">EMS Input Objects</h3>
 <p>EMS-related input objects to solve this problem are listed below and are included in the example file called “EMSAirflowNetworkOpeningControlByHumidity.idf.”</p>
@@ -4089,9 +4106,9 @@ EnergyManagementSystem:InternalVariable,
 <p>A particular manufacturer controls the DX cooling coil such that the capacity of the coil changes at 31°C outdoor air dry-bulb temperature. The following EMS program logic will calculate alternate inputs for cooling coil capacity and over-write the existing performance curve results.</p>
 <h3 id="ems-design-discussion_10">EMS Design Discussion</h3>
 <p>For this example, we will start with the equation for cooling capacity of the DX coil object (ref. Coil:Cooling:DX:SingleSpeed). From the engineering reference, the equation used to calculate the cooling capacity is:</p>
-<div>\[
+<div>$$
 \text{TotCapTempModFac} = a + b \left( T_{wb,i} \right) + c \left( T_{wb,i} \right) + d \left( T_{c,i} \right) + e \left( T_{c,i} \right) + f \left( T_{wb,i} \right)\left( T_{c,i} \right)
-\]</div>
+$$</div>
 
 <p>The first term (Twb,i) refers to the cooling coil inlet air wet-bulb temperature and the second (Tc,i) refers to the outdoor condenser inlet air dry-bulb temperature. Using the EMS, a new total capacity as a function of temperature value will be calculated and used during the simulation. The Energyplus input objects for the cooling coil capacity curve, the associated outdoor air mixer object, and the original cooling capacity performance curve are shown here.</p>
 <pre><code class="idf">  Coil:Cooling:DX:SingleSpeed,
@@ -4513,6 +4530,7 @@ Output:Variable, Perimeter_ZN_1_wall_south_Window_1, Surface Construction Index,
       MathJax.Hub.Config({
         extensions: ["tex2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
         showMathMenu: true,
         showMathMenuMSIE: false,
         "HTML-CSS": {

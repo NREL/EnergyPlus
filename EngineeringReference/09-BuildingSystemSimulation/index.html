@@ -253,7 +253,7 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+                <a href="../../Acknowledgements/Acknowledgements">Acknowledgements</a>
               </li>
             
               <li>
@@ -499,33 +499,33 @@ CALL ResolveLockoutFlags(SimAirLoops)
 <p>If this <em>not</em> an air loop sizing calculation, but is the first pass through the HVAC code in a normal simulation, loop over all the branches in all air loops and trigger the branch design air flow auto-sizing calculation. The actual calculation is described in the Sizing section of this document.</p>
 <h4 id="begin-environment-initializations">Begin Environment Initializations</h4>
 <p>For each air loop, loop over all the branches in the loop. Initialize each branch mass flow rate:</p>
-<div>\[{\dot m_{br,\max }} = {\rho_{std}} \cdot {\dot V_{br,\max }}\]</div>
+<div>$${\dot m_{br,\max }} = {\rho_{std}} \cdot {\dot V_{br,\max }}$$</div>
 
-<div>\[{\dot m_{br,\min }} = {\rho_{std}} \cdot {\dot V_{br,\min }}\]</div>
+<div>$${\dot m_{br,\min }} = {\rho_{std}} \cdot {\dot V_{br,\min }}$$</div>
 
 <p>where <span>${\rho_{std}}$</span> is the density of air at 20 degrees C, humidity ratio = 0, standard pressure.</p>
 <p>For each branch, loop over all the nodes on the branch and set the node data to the following values:</p>
-<div>\[{T_{node}} = {20^{\rm{o}}}C\]</div>
+<div>$${T_{node}} = {20^{\rm{o}}}C$$</div>
 
-<div>\[{W_{node}} = {W_{oa}}\]</div>
+<div>$${W_{node}} = {W_{oa}}$$</div>
 
-<div>\[{h_{node}} = {\mathop{\rm PsyHFnTdbW}\nolimits} {\rm{(}}20.0,{W_{oa}}{\rm{)}}\]</div>
+<div>$${h_{node}} = {\mathop{\rm PsyHFnTdbW}\nolimits} {\rm{(}}20.0,{W_{oa}}{\rm{)}}$$</div>
 
-<div>\[{\dot m_{node}} = {\dot m_{br,\max }}\]</div>
+<div>$${\dot m_{node}} = {\dot m_{br,\max }}$$</div>
 
-<div>\[{\dot m_{\max ,node}} = {\dot m_{br,\max }}\]</div>
+<div>$${\dot m_{\max ,node}} = {\dot m_{br,\max }}$$</div>
 
-<div>\[{\dot m_{\max avail,node}} = {\dot m_{br,\max }}\]</div>
+<div>$${\dot m_{\max avail,node}} = {\dot m_{br,\max }}$$</div>
 
-<div>\[{\dot m_{\min ,node}} = 0.0\]</div>
+<div>$${\dot m_{\min ,node}} = 0.0$$</div>
 
-<div>\[{\dot m_{setpt,node}} = 0.0\]</div>
+<div>$${\dot m_{setpt,node}} = 0.0$$</div>
 
-<div>\[{\dot m_{\min avail,node}} = 0.0\]</div>
+<div>$${\dot m_{\min avail,node}} = 0.0$$</div>
 
-<div>\[{p_{node}} = {p_{std,baro}}\]</div>
+<div>$${p_{node}} = {p_{std,baro}}$$</div>
 
-<div>\[Q{u_{node}} = 0.0\]</div>
+<div>$$Q{u_{node}} = 0.0$$</div>
 
 <p>where <span>${W_{oa}}$</span> is the humidity ratio of the outside air; <span>${\rm{PsyHFnTdbW}}$</span>is the EnergyPlus psychrometric function for enthalpy <em>h</em>, given temperature and humidity ratio; and <em>Qu</em> is quality.</p>
 <h4 id="system-time-step-initializations">System Time Step Initializations</h4>
@@ -644,17 +644,17 @@ CALL ResolveLockoutFlags(SimAirLoops)
 <p>There are no one time calculations for zone equipment</p>
 <h4 id="begin-environment-initializations_1">Begin Environment Initializations</h4>
 <p>For each controlled zone initialize the zone inlet, exhaust and zone nodes to standard conditions. Namely:</p>
-<div>\[{T_{node}} = {20^{\rm{o}}}C\]</div>
+<div>$${T_{node}} = {20^{\rm{o}}}C$$</div>
 
-<div>\[{W_{node}} = {W_{oa}}\]</div>
+<div>$${W_{node}} = {W_{oa}}$$</div>
 
-<div>\[{h_{node}} = {\mathop{\rm PsyHFnTdbW}\nolimits} {\rm{(}}20.0,{W_{oa}}{\rm{)}}\]</div>
+<div>$${h_{node}} = {\mathop{\rm PsyHFnTdbW}\nolimits} {\rm{(}}20.0,{W_{oa}}{\rm{)}}$$</div>
 
-<div>\[{\dot m_{node}} = 0\]</div>
+<div>$${\dot m_{node}} = 0$$</div>
 
-<div>\[Q{u_{node}} = 1.0\]</div>
+<div>$$Q{u_{node}} = 1.0$$</div>
 
-<div>\[{p_{node}} = {p_{oa}}\]</div>
+<div>$${p_{node}} = {p_{oa}}$$</div>
 
 <p>where <em>W<sub>oa</sub></em> is the humidity of the outside air; <span>${\rm{PsyHFnTdbW}}$</span>is the EnergyPlus psychrometric function for enthalpy <em>h</em>, given temperature and humidity ratio; <em>p<sub>oa</sub></em> is the pressure of the outside air; and <em>Qu</em> is quality.</p>
 <h4 id="system-time-step-initializations_1">System Time Step Initializations</h4>
@@ -709,33 +709,33 @@ ii. Increment the required system output.
 <p>The AirLoopHVAC:ReturnPaths are simulated after all the zone equipment is simulated (in module ZoneEquipmentManager, subroutine SimZoneEquipment). The simulation is accomplished by a call to <em>SimReturnAirPath</em> (in module <em>ReturnAirPathManager</em>). The simulation just consists of looping over all the AirLoopHVAC:ReturnPaths and simulating the components (AirLoopHVAC:ZoneMixer or AirLoopHVAC:ReturnPlenum) in each path.</p>
 <h3 id="zone-mixer">Zone Mixer</h3>
 <p>The AirLoopHVAC:ZoneMixer combines multiple inlet air streams into a single outlet air stream. Its data and simulation model are encapsulated in the module <em>MixerComponent</em>. The following mass and energy balance equations are used.</p>
-<div>\[{\dot m_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \]</div>
+<div>$${\dot m_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} $$</div>
 
-<div>\[{\dot m_{air,out}}\cdot {W_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \cdot {W_{air,in,i}}\]</div>
+<div>$${\dot m_{air,out}}\cdot {W_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \cdot {W_{air,in,i}}$$</div>
 
-<div>\[{\dot m_{air,out}}\cdot {h_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \cdot {h_{air,in,i}}\]</div>
+<div>$${\dot m_{air,out}}\cdot {h_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \cdot {h_{air,in,i}}$$</div>
 
-<div>\[{\dot m_{air,out}}\cdot {P_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \cdot {P_{air,in,i}}\]</div>
+<div>$${\dot m_{air,out}}\cdot {P_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \cdot {P_{air,in,i}}$$</div>
 
-<div>\[{T_{air,out}} = PsyTdbFnHW({h_{air,out}},{W_{air,out}})\]</div>
+<div>$${T_{air,out}} = PsyTdbFnHW({h_{air,out}},{W_{air,out}})$$</div>
 
 <p>Where <span>$\dot m$</span>is air mass flow rate, <em>W</em> is humidity ratio, <em>h</em> is specific enthalpy, <em>P</em> is pressure, and <em>T</em> is temperature. <em>PsyTdbFnHW</em> is the EnergyPlus psychrometric function for drybulb temperature as a function of enthalpy and humidity ratio. The air mass flow rate calculation is also done for the maximum and minimum available mass flow rates.</p>
 <h3 id="zone-return-plenum">Zone Return Plenum</h3>
 <p>The AirLoopHVAC:ReturnPlenum acts analogously to the AirLoopHVAC:ZoneMixer. The only difference is that the AirLoopHVAC:ReturnPlenum is associated with a Zone for which it sets the supply air flow rate and from which it gets its outlet air conditions. The AirLoopHVAC:ReturnPlenum combines multiple inlet air streams into a single outlet air stream. Its data and simulation model are encapsulated in the module <em>ZonePlenum</em>. The outlet air mass flow rate is obtained from</p>
-<div>\[{\dot m_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \]</div>
+<div>$${\dot m_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} $$</div>
 
 <p>The outlet air temperature, enthalpy, humidity ratio and pressure are set to the zone conditions.</p>
 <p>In addition to its normal function of acting as an air stream mixer, the return plenum can have 2 types of special connection to upstream air terminal units.</p>
 <p>(1) The user can model the effects of duct leakage in VAV single duct systems using the Simplified Duct Leakage Model (see ZoneHVAC:AirDistributionUnit for how to set up this model). After the normal outlet air flow calculation is completed as above, the calculation loops over the air distribution units connected to the zones that feed air to the plenum and adds in to the outlet air mass flow rate the leakage air flow rates from the upstream leaks defined in the ZoneHVAC:AirDistributionUnit inputs. This connection between the leaks and the plenum is not explicit: no extra nodes are defined in the return plenum or in the terminal unit.</p>
 <p>(2) The user can model secondary (recirculated) air drawn from the plenum into a fan powered induction unit (AirTerminal:SingleDuct:SeriesPIU:Reheat or AirTerminal:SingleDuct:ParallelPIU:Reheat). In this case the connection is explicit: extra outlet nodes are defined in the return plenum which act as the secondary air inlet nodes for the terminal units. The recirculated air flow rates are set by the terminal units. The outlet return air is then:</p>
-<div>\[{\dot m_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}}  - \sum\limits_{j = 1,m}^{} {{{\dot m}_{air,recirc,j}}} \]</div>
+<div>$${\dot m_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}}  - \sum\limits_{j = 1,m}^{} {{{\dot m}_{air,recirc,j}}} $$</div>
 
 <h2 id="plant-load-profile">Plant Load Profile</h2>
 <p>The LoadProfile:Plant object is used to simulate a scheduled demand profile. This can be useful when the building loads are already known. Demanded load and flow rate are schedules specified in the object definition. The load profile can specify heating and cooling loads. Cooling loads are entered as negative numbers. The actual load met is dependent on the performance of the supply loop components.</p>
 <p>The LoadProfile:Plant object must be connected on the demand side of the plant loop. If desired, multiple LoadProfile:Plant objects can be combined in series and/or parallel.</p>
 <h3 id="calculation-model">Calculation Model</h3>
 <p>The LoadProfile:Plant object calculates the outlet water temperature based on the inlet water temperature from the plant loop and user inputs for the scheduled plant load and the requested flow rate.  The calculation can be expressed with the equation:</p>
-<div>\[{T_{out}} = {T_{in}} - \frac{{{Q_{load}}}}{{\dot m{c_p}}}\]</div>
+<div>$${T_{out}} = {T_{in}} - \frac{{{Q_{load}}}}{{\dot m{c_p}}}$$</div>
 
 <p>where</p>
 <p><span>${T_{out}}$</span> = the outlet water temperature</p>
@@ -746,7 +746,7 @@ ii. Increment the required system output.
 <p>The user requested flow rate is not always available from the plant loop.  The actual flow rate used in the calculation is the lesser of the user requested value and the plant available value.</p>
 <p>Note that the LoadProfile:Plant object can still request and receive flow even if the scheduled plant load is zero.  In this case the outlet temperature will be the same as the inlet temperature.  This allows users to drive the plant loop flow without necessarily affecting the loop temperature.</p>
 <p>For reporting purposes the energy consumption of the object is calculated using the equation:</p>
-<div>\[E = {Q_{load}}\Delta t\]</div>
+<div>$$E = {Q_{load}}\Delta t$$</div>
 
 <p>where</p>
 <p><span>$E$</span> = the energy consumption</p>
@@ -758,13 +758,13 @@ ii. Increment the required system output.
 <h3 id="current-primary-system-modeling-methodology">Current Primary System Modeling Methodology</h3>
 <p>There are two main types of loops within the HVAC simulation in EnergyPlus: an air loop and a plant loop. The air loop is assumed to use air as the transport medium as part of an air handling system while the plant loops use a liquid fluid of the user’s choosing (typically water).  Condenser loops are a special case of plant loop that are for heat rejection and are distinguished by slightily different control options and applicable equipment types.  A user may have any number of each type of loop in a particular input file. There are no explicit limits on the number of loops within the program—the user is only limited by computer hardware. Execution speed will naturally vary with the complexity of the input file.</p>
 <p>Plant loops are further divided into “half-loops” or “semi-loops” for organizational clarity and simulation logistics (see Figure “Connections between the Main HVAC Simulation Loops and Half-Loops”). These sub-loops, or half-loop sides, are matched pairs that consist of half of a main plant loop. Plant loops are broken into supply and demand sides. The plant demand side half-loop contains equipment that places a load on the primary equipment. This might include coils, baseboards, radiant systems, etc. The load is met by primary equipment such as chillers or boilers on the supply side half-loop. Each supply side half-loop must be connected to a demand side half-loop and vice versa. A similar breakdown is present on condenser loops where the demand side includes the water side of chiller’s condensers while the supply side includes condenser equipment such as cooling towers.</p>
-<p><img alt="" src="../../EngineeringReference/media/image1957.svg" /></p>
+<p><img alt="" src="../../EngineeringReference/media/image1957.svg.png" /></p>
 <p>Figure 120. Connections between the Main HVAC Simulation Loops and Half-Loops.</p>
 <p>The breakdown into two half-loops allows for better handling and control of information and simulation flow throughout the program. Direct connections between the half-loops of the air, plant, and condenser loops are enhanced by components with connections between the various main loop types. For example, coils (heating or cooling) are in reality heat exchangers with an air and a water or refrigerant side. The air side of the coil is handled within the air loop where the control of the device is also maintained. The fluid side of the coil is handled within the plant demand side, which passes the energy requirements of the coil on to the plant supply side. All loops are simulated together by successively modeling each half-loop in a particulary calling order. Overall iterations ensure that the results for the current time step are balanced and updated information has been passed to both sides of the sub-loops as well as across to the other side of air loop connections such as coils.</p>
 <p>The plant equipment on a half-loop is described by a set of branches for that half-loop.  Components can be arranged on a branch in series, and branches can be placed in parallel, with some restrictions. Figure “Branch Layout for Individual Plant Half-Loops” provides an overview of the intended branch layout for each plant half-loop. Branches are individual legs within the loop structure. Thus, the segment between point A and point B is defined as a branch, as is the section between points E and F. There may be multiple sections (C1 to D1 through Cn to Dn) in between the splitter and mixer.</p>
 <p>Each half-loop may only have one splitter and one mixer. Thus, equipment may be in parallel between the mixer and splitter, however, within any single branch, there can only be components in series and not in parallel. The topology rules for individual half-loops allow a reasonable amount of flexibility without requiring a complicated solver routine to determine the actual flow and temperature conditions. Note that since plant supply and demand are broken up into two separate half-loops, chillers or boilers may be in parallel to each other in the supply side and coils may be in parallel to each other on the demand side. Thus, the restriction of only a single splitter and mixer on a particular half-loop does not unduly limit the allowable configurations. In some cases a single branch can be used to define an entire half-loop, but in general a half-loop should have a splitter and a mixer even if all equipment on the sub-loop is simply in series.</p>
 <p>In addition, to avoid the need for overly complex solver routines, there are some restrictions on the placement of pumps within a particular half-loop. There are two general types of pumps, loop pumps and branch pumps. A pump that is the first component on the first branch (between A and B) is termed a “loop pump” while any pump in the parallel section (between Ci and Di) is termed a “branch pump”.   The simplest and most common arrangement is to have one loop pump on the supply side inlet.  In plant demand half-loops pumps can be placed only in the inlet branch. This will allow simulation of primary-secondary systems. For more information on pumps and pump placement rules, see the section on PipingSystem:Underground Simulation Pumps in this document.</p>
-<p><img alt="" src="../../EngineeringReference/media/image1958.svg" /></p>
+<p><img alt="" src="../../EngineeringReference/media/image1958.svg.png" /></p>
 <p>Figure 121. Branch Layout for Individual Plant Half-Loops</p>
 <p>Essentially, each branch is made up of one or more components linked together in series. The branch has system nodes that store properties at a location on the loop (temperature, enthalpy, flow rate, etc.) at the beginning and end of the branch as well as between components. Components on the branch take the conditions of the node at their inlet and use that information as well as overall control information to simulate the component and write the outlet data to the node following the component. This information is then used either by the next component on the branch or establishes the outlet conditions for the branch.</p>
 <p>Although the plant model in EnergyPlus is quite flexible, in most cases the topology of the plant system in the model will be somewhat different from the topology of the actual plant system in a building.  EnergyPlus is focused on modeling building energy performance over long periods of time and is not intended as a completely flexible system that can directly model any actual plant system with its full complexity and exact layout.  Given the design of an actual complex plant system, the modeler will typically need to develop a simpler system that conforms to EnergyPlus’s capabilities and strives to capture the issues important for energy consumption modeling.  Just like complex geometry should be simplified into thermal zones for energy models, complex plants should to be simplified into sets of pairs of closed half-loops with the allowed branch topologies.</p>
@@ -824,17 +824,17 @@ ii. Increment the required system output.
 <p>Once all of the branches have set their flow rates and constraints, the splitter and mixer must resolve the various flow requests. The mixer and any branch following the mixer is passive. Thus, all of the flow control happens at the splitter. The splitter first attempts to sum the maximum and minimum constraints from all of the active branches coming out of the device and compares those to the constraints that are valid for the branch leading into the splitter. When there is a mismatch between the outlet constraints and the inlet constraints, the simulation will defer to the inlet constraints due to the fact that the pump is in reality controlling flow on the loop. Since the constraints of the pump would be passed across to the demand side from the supply side, an assumption is made that the coils or other demand side components must live within the bounds of the pump.</p>
 <p>Once the flow has been resolved at the splitter, the branch flow rates and constraints between the splitter and mixer can be adjusted, if necessary. In some cases, this will be mandatory to maintain a mass balance at the splitter. When the flow rate coming out of the splitter does not match the active branch requests, individual branch flow rates must be adjusted to provide for the extra flow or the “flow deficit”. When there is extra flow, the excess flow is sent through any bypass branch first and then is sent to passive branches in reverse order of their appearance in the splitter outlet list. When all of these branches have been exhausted and there is still excess flow, flow will be increased to the active branches, also in reverse order. The reverse order guarantees that the branch appearing first has the highest priority to receive the flow rate it has requested.</p>
 <p>if there is not enough flow to meet all active branch requests (i.e., a “flow deficit”), then the flow rates through the bypass and passive branches are set to zero. The flow rates through the active branches will then be decreased in reverse order until the splitter outlet flow rate matches the available flow at the splitter inlet. For a plant loop flow deficit, the bypass and passive branch flows are also set to zero, and flow rates for each active branch are calculated as follows:</p>
-<div>\[{\dot m_{br}} = \frac{{{{\dot m}_{br\_request}}}}{{{{\dot m}_{tot\_request}}}}*{\dot m_{tot\_available}}\]</div>
+<div>$${\dot m_{br}} = \frac{{{{\dot m}_{br\_request}}}}{{{{\dot m}_{tot\_request}}}}*{\dot m_{tot\_available}}$$</div>
 
 <p>where:</p>
-<div>\[
+<div>$$
   \begin{array}{rl}
     \dot m_{br} &= \rm{ final resolved branch flow rate} \\
     \dot m_{br\_request} &= \rm{ requested branch flow rate } \\
     \dot m_{tot\_request} &= \rm{ total loop mass flow rate request} \\
     \dot m_{tot\_available} &= \rm{ total loop mass flow rate available}
   \end{array}
-\]</div>
+$$</div>
 
 <p>It is also necessary to monitor the flow constraints at the branches and components since once the flow rates are changed, the components must be resimulated by the controlling loop (air loop, zone equipment, or plant supply side). The controllers for these components must know if the constraints have been modified so that the simulation does not toggle between a component requesting a flow that the pump cannot meet and the pump then resetting the flow to what it can provide. Note that once a flow rate for any component has changed that this signals the need to resimulate any sub-loop to which it might have an indirect connection. Currently, this means that if a flow rate on the plant demand side changes, the simulation must recalculate the conditions on both the air loop and zone equipment sub-loops since coils and other equipment could be on either side of the main air loop. Similarly, if the condenser demand side simulation results in a change in flow rate through a chiller condenser, then the plant supply side must be triggered to perform its calculations again. Care has been taken to avoid cases where the various half-loops might simply keep triggering the resimulation of their indirect connections in an infinite loop.</p>
 <h4 id="loop-capacitance-and-pump-heat">Loop Capacitance and Pump Heat</h4>
@@ -845,13 +845,13 @@ ii. Increment the required system output.
 <p><img alt="Loop Capacitance.tif" src="../../EngineeringReference/media/image1962.png" /></p>
 <p>Figure 123. Loop Capacitance Tank Models</p>
 <p>The total plant loop volume is separated into two tanks, on on each half-loop inlet. For normal loops (without common pipes) each tank is one half of the plant loop volume. For common pipe plant loops, the tank on the supply side inlet has three fourths of the volume and the tank on the demand side inlet has one fourth. Each plant loop is assigned a total fluid volume as user input or an autocalculate routine based on the design flow rate. The size of the thermal capacitance affects the speed of recovery from situations where the setpoint was not maintained. The user must estimate a fluid volume based on the size of the pipes in the loop. Note that rough estimates seem to be sufficient. Loop capacitance (m<sup>3</sup>) could be calculated from pipe size data but this is not usually known. If zero capacitance is specified the above formulation reduces to an instantaneous update in demand update temperature and the demand inlet temperature becomes the supply outlet temperature at the previous time step. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The loop capacitance ‘autocalculate’ option gives reasonable values and is calculated as follows,</p>
-<div>\[Capacity = \frac{{{{\dot m}_s}*{t_{sys}}*3600}}{{0.8\rho }}\]</div>
+<div>$$Capacity = \frac{{{{\dot m}_s}*{t_{sys}}*3600}}{{0.8\rho }}$$</div>
 
 <p>The tank temperature is modeled by drawing a control volume and energy balance around the tank and solving for the temperature.  The temperature of each tank is recalculated whenever the two half-loops are interfaced together. The tank temperature history is stored at the end of the simulation timestep.  The model equation for tank (and outlet temperature) is formulated as follows:</p>
-<div>\[{T_{tank,new}} = \frac{{\dot m{c_p}{T_{inlet}} + \frac{{{M_{tank}}{c_p}{T_{tank,old}}}}{{{t_{sys}}3600}} + {{\dot Q}_{pumpheat}}}}{{\mathop {m{c_P} + }\limits^ \frac{{{M_{tank}}{c_p}}}{{{t_{sys}}3600}}}}\]</div>
+<div>$${T_{tank,new}} = \frac{{\dot m{c_p}{T_{inlet}} + \frac{{{M_{tank}}{c_p}{T_{tank,old}}}}{{{t_{sys}}3600}} + {{\dot Q}_{pumpheat}}}}{{\mathop {m{c_P} + }\limits^ \frac{{{M_{tank}}{c_p}}}{{{t_{sys}}3600}}}}$$</div>
 
 <p>The tank temperature at the end of the simulation timestep is solved by the analytical approach and expressed as</p>
-<div>\[T_{tank}^t = \left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}} \right)\exp \left( { - \frac{{\dot m{c_p}}}{{{M_{tank}}{c_p}}}t} \right) + \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}\]</div>
+<div>$$T_{tank}^t = \left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}} \right)\exp \left( { - \frac{{\dot m{c_p}}}{{{M_{tank}}{c_p}}}t} \right) + \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}$$</div>
 
 <p>where:</p>
 <p><span>$T_{tank}^{t - \delta t}$</span>          = Previous system time-step tank temperature [°C]</p>
@@ -863,7 +863,7 @@ ii. Increment the required system output.
 <p><span>${\dot Q_{pumpheat}}$</span>    = Heat generated by a pump in the tank [W]</p>
 <p>When modeling plants using one of the common pipe modes for plant loops, the same tank model is used but the tanks are situated differently and account for extra connections.  For common pipe situation, the tanks are located on the outlet of a half loop with common pipe interactions downstream of the tank.</p>
 <p>The average temperature is reported as the tank temperature. The average temperature is defined as the value of an integral function of tank temperature on an interval [<em>0</em>,<em>δt</em>]</p>
-<div>\[\mathop T\limits^ -   = \frac{1}{{\delta t}}\int_0^{\delta t} {T_{tank}^tdt} \;\; = \frac{{{M_{tank}}{c_p}}}{{\dot m{c_p}\delta t}}\left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}} \right)\left( {1 - \exp \left( { - \frac{{\dot m{c_p}}}{{{M_{tank}}{c_p}}}\delta t} \right)} \right) + \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}\]</div>
+<div>$$\mathop T\limits^ -   = \frac{1}{{\delta t}}\int_0^{\delta t} {T_{tank}^tdt} \;\; = \frac{{{M_{tank}}{c_p}}}{{\dot m{c_p}\delta t}}\left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}} \right)\left( {1 - \exp \left( { - \frac{{\dot m{c_p}}}{{{M_{tank}}{c_p}}}\delta t} \right)} \right) + \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}$$</div>
 
 <h4 id="plant-flow-resolver-input">Plant Flow Resolver Input</h4>
 <p>The input specifically related to the flow resolver consists of the plant BranchList and the plant ConnectorList as shown in the Input Output Reference. User defined names link the plant loop to its branches (contained in the BranchList) and define the loop splitters and mixers contained in the ConnectorList. The Connector:Splitter and Connector:Mixer syntax in turn define the relative connection of the branches to each other on the loop.</p>
@@ -1010,7 +1010,7 @@ ii. Increment the required system output.
 <p>When the Two Way Common Pipe is controlling conditions at the secondary-side, or demand side, inlet node, then the loop capacitance model usually used for the conditions at the demand inlet is not used as it would interfere with control.</p>
 </li>
 </ul>
-<p><img alt="" src="../../EngineeringReference/media/image1976.svg" /></p>
+<p><img alt="" src="../../EngineeringReference/media/image1976.svg.png" /></p>
 <p>Figure 126. Schematic of a Two-Way Common Pipe used in Primary-Secondary System.</p>
 <h3 id="heat-recovery-loop-systems">Heat Recovery Loop Systems</h3>
 <p>Heat Recovery is accomplished by specifying another set of supply and demand loops. Each of the heat recovery components, i.e. engine driven and combustion turbine chillers, and internal combustion and combustion turbine generators is designed to use the existing component/loop/solution structure to facilitate the simulation with the existing demand side manager and the supply side manager. Heat recovery normally contains components that produce heat that can be recovered, and the ability to store or use that heat elsewhere in the system. The component that can store the excess heat and allow it to be used elsewhere in the system or for domestic hot water is the Water Heater:Simple and is defined in the Input/Output Reference.</p>
@@ -1067,11 +1067,11 @@ ii. Increment the required system output.
 <p>There are two types of pressure drop curves that can be entered, each with its own calculation engine:</p>
 <p>Generic: A curve of any form (single independent variable) such as linear or quadratic may represent the pressure drop in Pascals as a function of current mass flow rate in kg/s. This is common for regressing component pressure drop such as heat pumps into a quadratic best fit form. The branch pressure drop is then calculated by evaluating this curve with the given branch flow rate.</p>
 <p>Pressure Information: This calculation involves two types of pressure drop: frictional effects and minor losses. The governing equation is:</p>
-<div>\[\Delta P = \left( {f\frac{L}{D} + K} \right)\frac{{\rho {V^2}}}{2}\]</div>
+<div>$$\Delta P = \left( {f\frac{L}{D} + K} \right)\frac{{\rho {V^2}}}{2}$$</div>
 
 <p>The user enters value for the minor loss coefficient K to represent all the minor losses on that branch. If the user is entering friction information, the minor loss coefficient may be zero or blank.</p>
 <p>The user enters roughness, e, or a fixed value of friction factor to account for frictional losses on the branch, as well as an equivalent length L. If the user enters roughness then the friction factor is calculated from a Moody chart approximation (Haaland, 1983):</p>
-<div>\[f = {\left\{ { - 1.8\log \left[ {{{\left( {\frac{{e/D}}{{3.7}}} \right)}^{1.11}} + \frac{{6.9}}{{{\mathop{\rm Re}\nolimits} }}} \right]} \right\}^{ - 2}}\]</div>
+<div>$$f = {\left\{ { - 1.8\log \left[ {{{\left( {\frac{{e/D}}{{3.7}}} \right)}^{1.11}} + \frac{{6.9}}{{{\mathop{\rm Re}\nolimits} }}} \right]} \right\}^{ - 2}}$$</div>
 
 <p>If the user enters minor loss information, then the friction factor information can be left out.</p>
 <p>The diameter is an equivalent value and is used to calculate relative roughness for friction calculations as well as velocity for any pressure drop calculation.</p>
@@ -1081,14 +1081,14 @@ ii. Increment the required system output.
 <p>The idea of riding a pump curve, as it is currently implemented, is based on a constant speed pump.  A variable speed pump in EnergyPlus can already effectively vary its flow/pressure characteristics to meet the demand.  Thus, this phase is only implemented for the Pump:ConstantSpeed model.</p>
 <p>The model works by approximating the loop with a quadratic pressure drop form, then iterating to find an operating point.  The entire plant loop then iterates to find the operating point that attempts to match the requested flows.  Note that when doing a pressure based pump simulation, the loop will likely not hit setpoint every timestep, while doing the simpler approach (non-pressure) may result in a tighter-controlled simulation.  In deciding this, you must consider the realism of the pressure approach vs. the non-pressure approach which may be more tightly controlled and will have less input requirements.</p>
 <p>In the first iteration of the plant, there is not yet enough information to determine a pressure-flow simulation, so flow through the loop is set to the rated flow rate of the pump (irrespective of pump performance curve). For this rated flow rate pressure drop in each branch will be calculated by plant pressure system. So after this first pass through the loop, the pressure system now has a valid system flow-pressure point.  From this point (pressure drop in the branch and rated mass flow rate) a pressure constant for each branch is calculated assuming quadratic relationship between pressure drop and mass flow rate.</p>
-<div>\[{K_{Branch(i)}} = \Delta {P_{Branch(i)}}/{m_{Rated}}^2\]</div>
+<div>$${K_{Branch(i)}} = \Delta {P_{Branch(i)}}/{m_{Rated}}^2$$</div>
 
 <p>If there are parallel branches then equivalent K is calculated from following formula.</p>
-<div>\[\frac{1}{{\sqrt {{K_{ParallelEquivalent}}} }} = \sum\limits_{j = 1}^m {\frac{1}{{\sqrt {{K_{Branch(j)}}} }}} \]</div>
+<div>$$\frac{1}{{\sqrt {{K_{ParallelEquivalent}}} }} = \sum\limits_{j = 1}^m {\frac{1}{{\sqrt {{K_{Branch(j)}}} }}} $$</div>
 
 <p>From all these ‘K’ values of the branches a corresponding K value for complete loop is calculated. This representative K value for the loop will lock down a system curve for a single iteration.  This K value will change throughout the higher-level plant iterations and simulation time steps.</p>
 <p>The Non-dimensional pump curve is entered in following way,</p>
-<div>\[\psi  = {C_4} \times {\varphi ^4} + {C_3} \times {\varphi ^3} + {C_2} \times {\varphi ^2} + {C_1} \times \varphi  + {C_0}.\]</div>
+<div>$$\psi  = {C_4} \times {\varphi ^4} + {C_3} \times {\varphi ^3} + {C_2} \times {\varphi ^2} + {C_1} \times \varphi  + {C_0}.$$</div>
 
 <p>C<sub>1-4</sub> are curve coefficients with last mandatory non-zero constant term C<sub>0</sub> (as pump curve will not pass through origin).</p>
 <p>The nondimensional variables in the previous equation are defined in terms of the following expressions:</p>
@@ -1143,7 +1143,7 @@ ii. Increment the required system output.
 <p>Process 3–4’ represents the isenthalpic expansion of water from high-pressure steam side to atmospheric pressure across the steam trap.  As steam gives up its latent heat at the steam coil the condensate that forms in the steam coil still exists at higher pressure.  This condensate is discharged to a lower pressure across the steam trap, this condensate contains more heat than necessary to maintain the liquid phase at the lower pressure, this excess heat causes some of the condensate to vaporize or flash to steam at lower pressure at some quality.  The amount of water that flashes to steam can be calculated by the following equation</p>
 </li>
 </ul>
-<div>\[\% Flash\,\,Steam\,\, = \frac{{{h_{4'}} - \,{h_4}}}{{{h_{fg}}}}\,\, \times \,\,\,100\]</div>
+<div>$$\% Flash\,\,Steam\,\, = \frac{{{h_{4'}} - \,{h_4}}}{{{h_{fg}}}}\,\, \times \,\,\,100$$</div>
 
 <p>Where h4’ is Enthalpy of liquid at steam pressure just before condensate is supposed to leave the coil.  Enthalpy at Point 3 is equal to enthalpy at point 4’, since it is an isenthalpic process, and  hfg is the latent enthalpy of the fluid at atmospheric pressure.</p>
 <p>For example, water at 102LC and 120 Kpa flashes to steam at at100LC and atmospheric pressure, with quality equal to 0.003.  This results in loss of some latent capacity of steam and is one of the terms contributing to loop loss in steam system.</p>
@@ -1175,19 +1175,19 @@ ii. Increment the required system output.
 <p>Building steam heating systems avoid supplying superheated steam because superheat damages the building HVAC equipment.  Superheated steam is generated only if there is a cogeneration power system in building such as steam turbine, which requires superheated steam.  The purpose of having superheated steam is redundant for building steam heating systems because the amount of energy carried by the same is negligible compared to the latent heat. A simple enthalpy calculation, based on each unit of steam mass flow rate (1 kg/s), has been provided in this section to describe the negligible effect of superheat..</p>
 <p>Case 1: Loop Operating at Saturation Conditions (no superheat), calculating enthalpy of saturated steam at boiler outlet temperature.</p>
 <p>Boiler Outlet Temperature = 105BC,</p>
-<div>\[{h_{Case1:NoSuperheat}} = [{h_f}_{{{105}^ \bullet }C}]\]</div>
+<div>$${h_{Case1:NoSuperheat}} = [{h_f}_{{{105}^ \bullet }C}]$$</div>
 
-<div>\[{h_{Case1:NoSuperheat}} = \,\,\,\,2684000\,\,\,\,\,\,J\]</div>
+<div>$${h_{Case1:NoSuperheat}} = \,\,\,\,2684000\,\,\,\,\,\,J$$</div>
 
 <p>Case 2: Loop operating with Superheated steam, calculating enthalpy of superheated steam for 5BC superheat.</p>
 <p>Degree of Superheat = 5BC</p>
 <p>Boiler Outlet Temperature = 110BC,</p>
-<div>\[{h_{Case2:Superheat}} = [{h_f}_{{{110}^ \bullet }C}]\]</div>
+<div>$${h_{Case2:Superheat}} = [{h_f}_{{{110}^ \bullet }C}]$$</div>
 
-<div>\[{h_{Case2:Superheat}} = \,\,\,2691000\,\,\,\,\,\,\,\,J\]</div>
+<div>$${h_{Case2:Superheat}} = \,\,\,2691000\,\,\,\,\,\,\,\,J$$</div>
 
 <p>The energy difference between the superheated state and the saturated state as calculated in the following equation.  A 5BC superheat provides only a 0.2608% increase in heat transfer.  The advantage of this additional increase in heat transfer is negligible, especially when considering the economic aspect of sizing a bigger heat exchanger to accommodate additional superheat transfer.  The detrimental effects of superheated steam on the building HVAC system also come into effect once superheat is used.</p>
-<div>\[\Delta {Q_{2 - 1}}\,\,\, = \,\,\,\frac{{2691000\, - 2684000}}{{2684000}}\,\, \times 100\,\,\,\, = \,\,0.2608\,\,\,percent\]</div>
+<div>$$\Delta {Q_{2 - 1}}\,\,\, = \,\,\,\frac{{2691000\, - 2684000}}{{2684000}}\,\, \times 100\,\,\,\, = \,\,0.2608\,\,\,percent$$</div>
 
 <p>Based on the reasoning above the steam loop in EnergyPlus is designed and implemented to operate at saturated conditions.</p>
 <h4 id="steam-quality">Steam Quality</h4>
@@ -1211,94 +1211,94 @@ ii. Increment the required system output.
 <p>A heating coil can be used either as a zone coil or a coil in the air loop depending on the user and application.  The steam coil simulation model is designed to take these two locations into consideration.  An air-loop steam heating coil is temperature controlled and the zone coil is zone load controlled.  This relatively simple and straightforward concept of coil control is preferred over the iterative method to determine mass flow rates using various numeric techniques.  The assumptions made in the coil model are described in the section below.</p>
 <p>This model accounts for the latent heat transfer and sensible cooling of water; the question of superheat is eliminated because steam is assumed to be saturation conditions.  Steam enters the coil at quality equal to 1.0, at saturation temperature and leaves the coil with desired degree of sub cooling.  The user inputs the desired degree of subcooling, which determines the condensate outlet condition from the coil.</p>
 <p>EnergyPlus heat balance methods determine the amount of heating required in the zone to maintain the zone at the desired conditions.  Based on this value of heating load, the zone coil determines the mass flow rate of steam required since the heating coil load is the control variable in a zone coil.  The following equation describes this calculation to determine steam mass flow rate required for the desired heating capacity. The steam latent heat of vaporization, <em>h</em><sub>fg</sub> and the condensate heat capacity, <em>C</em><sub>p,w</sub> are evaluated at the steam coil inlet node temperature and standard barometric pressure of 101325.0 Pa.</p>
-<div>\[{\dot m_{zc}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{zc}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}\]</div>
+<div>$${\dot m_{zc}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{zc}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}$$</div>
 
 <p>In case of the air loop-heating coil, the load on the coil is calculated within the coil simulation routine.  The air loop coil is setpoint controlled and heats the air to maintain the air stream at the desired setpoint, the setpoint is a user input, generally in the range of 12B C to 16BC. The following equation describes the air loop coil load.</p>
-<div>\[{Q_{al}}\,\, = \,\,{\dot m_a}\,\,\, \times \,\,\,\,\,{c_{p,a}}\,\,\, \times \,\,\,\,\,\left[ {{T_{sp}}\,\,\, - \,\,\,{T_a}} \right]\]</div>
+<div>$${Q_{al}}\,\, = \,\,{\dot m_a}\,\,\, \times \,\,\,\,\,{c_{p,a}}\,\,\, \times \,\,\,\,\,\left[ {{T_{sp}}\,\,\, - \,\,\,{T_a}} \right]$$</div>
 
 <p>The following equation is used to determine the steam mass flow rate required by the air loop coil to meet the heating requirements.</p>
-<div>\[{\dot m_{al}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{al}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}\]</div>
+<div>$${\dot m_{al}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{al}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}$$</div>
 
 <p>Each of the zone coils and air loop coils are simulated independently and the steam mass flow rates for each is added over every time step of simulation.  This value of total mass flow rate is reported to the boiler, which in turns supplies this required amount of steam.</p>
 <p>The control of the steam to air coil is a complex issue.  The loop splitter-splits total steam flow from the boiler and delivers the required amount of steam to each of the coils connected to the loop through the steam pipe network.  In cases where the system is undersized, the coils demand more mass flow rate of steam than the boiler can generate.  The splitter in this case cannot provide all the coils with requested steam mass flow.  Subsequently the coils are starved of steam and the zone temperatures fall.  In some cases the user might schedule off the coil, they should then not operate.  These issues need to be taken care of in the implementation of the steam coil simulation model.  The control algorithm for the steam coil operation under various situations is best explained with the help of pseudo-code using standard IF THEN ELSE blocks.</p>
 <p>*********************PSEUDO CODE SECTION STARTS**************************</p>
 <h4 id="steam-coil-is-zone-load-controlled">Steam coil is zone load controlled.</h4>
-<div>\[IF\,\,\,\,\,(Coil\, = LoadControlled)\,\,\,\,\,\,THEN\,\]</div>
+<div>$$IF\,\,\,\,\,(Coil\, = LoadControlled)\,\,\,\,\,\,THEN\,$$</div>
 
 <p>Check for operational conditions only then continue simulation further.  The operational conditions are the inlet mass flow rates of steam and air to the coil, the user schedule to the coil and heating load on the coil.  The coil is simulated only if these conditions are met.</p>
-<div>\[IF\,\,\,\left[ {\,({{\dot m}_s}\,\,\, > \,\,\,0)\,\,.\,\,\,and.\,\,\,({{\dot m}_a} > \,\,\,0)\,\,.and.\,\,(Schedule\,\, = \,\,\,ON)\,.and.\,\,\,({Q_{ZC}}\,\, > \,\,0.0)\,} \right]\,\,\,THEN\]</div>
+<div>$$IF\,\,\,\left[ {\,({{\dot m}_s}\,\,\, > \,\,\,0)\,\,.\,\,\,and.\,\,\,({{\dot m}_a} > \,\,\,0)\,\,.and.\,\,(Schedule\,\, = \,\,\,ON)\,.and.\,\,\,({Q_{ZC}}\,\, > \,\,0.0)\,} \right]\,\,\,THEN$$</div>
 
 <p>If the heating demand from the zone-heating coil is greater than coil capacity, then the heating coil is undersized, and the coil can only deliver its maximum heating capacity to the zone.  In this case the heating demand on the coil is set equal to this lower value of maximum heating capacity.  If the above is not true then the simulation ignores this statement and proceeds to the next one.</p>
-<div>\[IF\,\,\,\left[ {\,\,\,({Q_{ZC}}\,\, > \,\,{Q_{Z{C_{Max}}}})} \right]\,\,\,\,\,\,THEN\,\,\,\,\,\,\left[ {{Q_{ZC}} = \,\,{Q_{Z{C_{Max}}}}} \right]\]</div>
+<div>$$IF\,\,\,\left[ {\,\,\,({Q_{ZC}}\,\, > \,\,{Q_{Z{C_{Max}}}})} \right]\,\,\,\,\,\,THEN\,\,\,\,\,\,\left[ {{Q_{ZC}} = \,\,{Q_{Z{C_{Max}}}}} \right]$$</div>
 
 <p>The following equation calculates the steam mass flow rate required by the coil.  This flow rate is required to meet the heating requirements for the zone.  This value of mass flow is requested from the splitter outlet.</p>
-<div>\[{\dot m_{zc}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{zc}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}\]</div>
+<div>$${\dot m_{zc}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{zc}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}$$</div>
 
 <p>If the calculated value of steam mass flow with the previous equation is greater than the maximum inlet steam flow that the splitter can provide to the coil at that time step.  Then the requested coil flow rate is set equal to the inlet steam flow rate.  This is the maximum amount of steam that can be supplied to the coil at this moment.  The coil can provide heating capacity equal to this limited amount of steam.  If the requested flow rate is less that what the splitter can provide then the program ignores the logic of the IF Loop Below</p>
-<div>\[IF\,\,({\dot m_{zc}}\,\, > \,\,{\dot m_{in}})\,\,THEN\,\,(\,\,\,{\dot m_{zc}}\,\, = \,\,{\dot m_{in}})\]</div>
+<div>$$IF\,\,({\dot m_{zc}}\,\, > \,\,{\dot m_{in}})\,\,THEN\,\,(\,\,\,{\dot m_{zc}}\,\, = \,\,{\dot m_{in}})$$</div>
 
 <p>Re-Calculating the coil heating capacity with the lower value of steam mass flow rate.</p>
-<div>\[{Q_{ZC}} = {\dot m_{zc}}\,\, \times \,\,({h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}})\]</div>
+<div>$${Q_{ZC}} = {\dot m_{zc}}\,\, \times \,\,({h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}})$$</div>
 
-<div>\[END\,\,IF\]</div>
+<div>$$END\,\,IF$$</div>
 
 <p>The following equations calculate the outlet condensate-water and outlet air temperatures to the zone based on the amount of heating capacity provided by the coil.</p>
-<p><div>[T{w_{out}} = \,\,T{s_{in}}\,\, - \,\,\,\Delta {T_{sc}}]</div></p>
-<div>\[T{a_{out}}\,\,\, = \,\,T{a_{in}}\,\, + \,\,\,\frac{{{Q_{zc}}}}{{\,{{\dot m}_a}\, \times \,\,\,{c_{p,a}}}}\]</div>
+<p><div>$$T{w_{out}} = \,\,T{s_{in}}\,\, - \,\,\,\Delta {T_{sc}}$$</div></p>
+<div>$$T{a_{out}}\,\,\, = \,\,T{a_{in}}\,\, + \,\,\,\frac{{{Q_{zc}}}}{{\,{{\dot m}_a}\, \times \,\,\,{c_{p,a}}}}$$</div>
 
-<div>\[ELSE\]</div>
+<div>$$ELSE$$</div>
 
 <p>Else the coil is not running and in this case set outlets to inlets.</p>
-<div>\[{\dot m_s} = 0\,,\,\,\,{\dot m_a} = 0\,,\,\,\,\,\,\,\,\,\,\,\,\,{Q_{zc}} = 0,\,\,\,\,\,\,\,\,\,\,\,\,T{w_{out}} = T{s_{in\,\,,\,\,\,\,}}\,\,\,\,\,\,T{a_{out}} = T{a_{in}}\]</div>
+<div>$${\dot m_s} = 0\,,\,\,\,{\dot m_a} = 0\,,\,\,\,\,\,\,\,\,\,\,\,\,{Q_{zc}} = 0,\,\,\,\,\,\,\,\,\,\,\,\,T{w_{out}} = T{s_{in\,\,,\,\,\,\,}}\,\,\,\,\,\,T{a_{out}} = T{a_{in}}$$</div>
 
-<div>\[END\,\,IF\]</div>
+<div>$$END\,\,IF$$</div>
 
 <p><span>$END\,\,IF$</span> End IF for the zone load controlled coil.</p>
 <h4 id="steam-coil-is-temperature-controlled">Steam coil is temperature controlled.</h4>
-<div>\[IF\,\,\,\,\,(Coil\, = TemperatureControlled)\,\,\,\,\,\,THEN\,\]</div>
+<div>$$IF\,\,\,\,\,(Coil\, = TemperatureControlled)\,\,\,\,\,\,THEN\,$$</div>
 
 <p>Check for operational conditions and continue simulation further.  The operational conditions are the inlet mass flow rates of steam and air to the coil, the user schedule to the coil and delta temp exists between the setpoint and air inlet temperature.  The coil is simulated only if these conditions are met.</p>
-<div>\[IF\,\left[ \begin{array}{l}\,({{\dot m}_s}\,\,\, > \,\,\,0)\,\,.\,and.\,({{\dot m}_a} > \,\,\,0)\,\,.and.\,\,(Schedule\,\, = \,\,\,ON)\,.and.\,\\\,\,({T_{SP}} - T{a_{in}})\,\, > \,\,0.0001)\,\end{array} \right]\,THEN\]</div>
+<div>$$IF\,\left[ \begin{array}{l}\,({{\dot m}_s}\,\,\, > \,\,\,0)\,\,.\,and.\,({{\dot m}_a} > \,\,\,0)\,\,.and.\,\,(Schedule\,\, = \,\,\,ON)\,.and.\,\\\,\,({T_{SP}} - T{a_{in}})\,\, > \,\,0.0001)\,\end{array} \right]\,THEN$$</div>
 
 <p>Calculate the heating load on the coil using setpoint and inlet air temperatures.</p>
-<div>\[{Q_{al}}\,\, = \,\,\,{\dot m_a}\, \times \,\,\,C{p_a}\,\, \times \,\,\,\,[\,\,{T_{sp}}\,\, - \,\,\,{T_a}]\]</div>
+<div>$${Q_{al}}\,\, = \,\,\,{\dot m_a}\, \times \,\,\,C{p_a}\,\, \times \,\,\,\,[\,\,{T_{sp}}\,\, - \,\,\,{T_a}]$$</div>
 
 <p>The logic loop for temperature-controlled coil begins here.  In case the heating load on the coil is negative, which might occur if the setpoint is below the air inlet temperature, the coil operation needs to be shut off.</p>
-<div>\[IF\,\,({Q_{al}}\,\,\, < \,\,\,\,0.0)\,\,\,\,THEN\]</div>
+<div>$$IF\,\,({Q_{al}}\,\,\, < \,\,\,\,0.0)\,\,\,\,THEN$$</div>
 
 <p>Assigning the inlet to outlet and mass flows to zero shuts off the coil operation.</p>
-<div>\[{\dot m_s} = 0\,,\,\,\,{\dot m_a} = 0\,,\,\,\,\,\,\,\,\,\,\,\,\,{Q_{al}} = 0,\,\,\,\,\,\,\,\,\,\,\,\,T{w_{out}} = T{s_{in\,\,,\,\,\,\,}}\,\,\,\,\,\,T{a_{out}} = T{a_{in}}\]</div>
+<div>$${\dot m_s} = 0\,,\,\,\,{\dot m_a} = 0\,,\,\,\,\,\,\,\,\,\,\,\,\,{Q_{al}} = 0,\,\,\,\,\,\,\,\,\,\,\,\,T{w_{out}} = T{s_{in\,\,,\,\,\,\,}}\,\,\,\,\,\,T{a_{out}} = T{a_{in}}$$</div>
 
 <p>If air loop coil load is greater than maximum coil load calculated at maximum steam mass flow rate, in such case the coil is undersized, the coil can only deliver to the air loop its maximum heating capacity.  Setting the air loop coil load equal to maximum load on coil.  If this is not the case then the program ignores this ELSE IF block and proceeds to the next one.</p>
-<div>\[ELSE\,\,\,IF\,\,\,\,\left[ {\,\,\,({Q_{al}}\,\, > \,\,{Q_{a{l_{Max}}}})} \right]\,\,\,\,\,\,THEN\,\,\,\,\,\,\left[ {{Q_{al}} = \,\,{Q_{a{l_{Max}}}}} \right]\]</div>
+<div>$$ELSE\,\,\,IF\,\,\,\,\left[ {\,\,\,({Q_{al}}\,\, > \,\,{Q_{a{l_{Max}}}})} \right]\,\,\,\,\,\,THEN\,\,\,\,\,\,\left[ {{Q_{al}} = \,\,{Q_{a{l_{Max}}}}} \right]$$</div>
 
 <p>If the heating coil is under sized then it can only provide its maximum heating capacity, in this case the air temperature will be below the setpoint, and is calculated based on this maximum allowed value of heat transfer.  Calculating the air and water outlet temperatures.</p>
-<div>\[T{a_{out}}\,\,\, = \,\,T{a_{in}}\,\, + \,\,\,\frac{{{Q_{al}}}}{{\,\,{{\dot m}_a}\, \times \,\,\,{c_{p,a}}}}\]</div>
+<div>$$T{a_{out}}\,\,\, = \,\,T{a_{in}}\,\, + \,\,\,\frac{{{Q_{al}}}}{{\,\,{{\dot m}_a}\, \times \,\,\,{c_{p,a}}}}$$</div>
 
-<div>\[T{w_{out}} = \,\,T{s_{in}}\,\, - \,\,\,\Delta {T_{sc}}\]</div>
+<div>$$T{w_{out}} = \,\,T{s_{in}}\,\, - \,\,\,\Delta {T_{sc}}$$</div>
 
 <p>Determining the mass flow rate of steam required by the undersized coil.  This value of mass flow is requested from the splitter outlet.</p>
-<div>\[{\dot m_{al}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{al}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}\]</div>
+<div>$${\dot m_{al}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{al}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}$$</div>
 
 <p>A check is introduced to determine if this requested mass flow rate is greater than what the splitter outlet can provide to the coil at that particular time step of simulation.  In this case the requested value of steam mass flow is greater that what the splitter can provide to that coil, subsequently set the requested coil flow rate equal to the inlet steam flow rate, delivered to the coil by the splitter.  This is the maximum amount of steam that can be supplied to the coil at this moment.  If the requested flow rate is less that what the splitter can provide then the program ignores the logic of the IF Loop.</p>
-<div>\[IF\,\,\,({\dot m_{al}}\,\, > \,\,{\dot m_{in}})\,\,THEN\,\,(\,\,\,{\dot m_{al}}\,\, = \,\,{\dot m_{in}})\]</div>
+<div>$$IF\,\,\,({\dot m_{al}}\,\, > \,\,{\dot m_{in}})\,\,THEN\,\,(\,\,\,{\dot m_{al}}\,\, = \,\,{\dot m_{in}})$$</div>
 
 <p>Re-Calculating the coil heating capacity and air outlet temperature with the lower value of steam mass flow rate provided by the splitter.</p>
-<div>\[{Q_{al}}\,\,\,\, = \,\,\,\,{\dot m_{al}}({h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}})\]</div>
+<div>$${Q_{al}}\,\,\,\, = \,\,\,\,{\dot m_{al}}({h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}})$$</div>
 
-<div>\[T{a_{out}}\,\,\, = \,\,T{a_{in}}\,\, + \,\,\,\frac{{{Q_{al}}}}{{\,\,{{\dot m}_a}\, \times \,\,\,{c_{p,a}}}}\]</div>
+<div>$$T{a_{out}}\,\,\, = \,\,T{a_{in}}\,\, + \,\,\,\frac{{{Q_{al}}}}{{\,\,{{\dot m}_a}\, \times \,\,\,{c_{p,a}}}}$$</div>
 
-<div>\[End\,\,\,IF\]</div>
+<div>$$End\,\,\,IF$$</div>
 
 <p>If the above two IF ELSE block are not true, then the coil is perfectly sized, the splitter can provide the required mass flow rate to the coil, and the setpoint temperature can be maintained as desired.</p>
-<div>\[ELSE\]</div>
+<div>$$ELSE$$</div>
 
 <p>The ideal case where the coils can meet the required setpoint temperature.  Setting the outlet air temperature to the setpoint, calculating the water outlet temperature and the required steam mass flow rate.</p>
-<div>\[T{a_{out}}\,\,\, = \,\,{T_{SP}}\]</div>
+<div>$$T{a_{out}}\,\,\, = \,\,{T_{SP}}$$</div>
 
-<div>\[T{w_{out}} = \,\,T{s_{in}}\,\, - \,\,\,\Delta {T_{sc}}\]</div>
+<div>$$T{w_{out}} = \,\,T{s_{in}}\,\, - \,\,\,\Delta {T_{sc}}$$</div>
 
-<div>\[{Q_{al}}\,\, = \,\,\,{\dot m_a}\, \times \,\,\,{c_{p,a}}\,\, \times \,\,\,\,[\,\,{T_{sp}}\,\, - \,\,\,{T_a}]\]</div>
+<div>$${Q_{al}}\,\, = \,\,\,{\dot m_a}\, \times \,\,\,{c_{p,a}}\,\, \times \,\,\,\,[\,\,{T_{sp}}\,\, - \,\,\,{T_a}]$$</div>
 
 <p><span>$END\,\,IF$</span>   End IF statement, for the air coil heating loop.</p>
 <p><span>$END\,\,IF$</span>         End IF statement for the operating condition loop</p>
@@ -1309,14 +1309,14 @@ ii. Increment the required system output.
 <p>The loop loss calculation is included in the steam coil simulation model, because the degree of subcooling in the return piping for the condensate is solely a function of the coil location.  In practical applications a coil, which is further away from boiler would return back condensate at much lower temperatures compared to coil, which is closer to boiler.  Hence for user ease it makes perfect sense to include this input into the coil and calculate the pump inlet conditions in the steam coil simulation model itself.</p>
 <p>The loop losses in the EnergyPlus steam system is calculated by determining the enthalpy difference between point 3 and 5.  The simulation code that determines the loop loss is common to both the coil models, this helps determine the condensate pump inlet conditions.</p>
 <p>The following equation is used to calculate condensate enthalpy at coil outlet, point 3 in Figure 129.  Point 2 represents condensed steam; enthalpy at this point is calculated directly by EnergyPlus property routines.</p>
-<div>\[{h_{f3}} = {h_{f2}} - {c_{p,w}} \times \Delta {T_{SC}}\]</div>
+<div>$${h_{f3}} = {h_{f2}} - {c_{p,w}} \times \Delta {T_{SC}}$$</div>
 
 <p>Point 4 is at atmospheric pressure, enthalpy at this is calculated directly by EnergyPlus property routines.  It is saturation enthalpy of steam at quality equal to 0.0 and saturation temperature at atmospheric pressure.</p>
 <p>Point 5 is inlet to the pump; enthalpy at this point is calculated with the following equation  The delta temperature represents the degree of loop subcooling occurring during condensate return back to the pump.</p>
-<div>\[{h_{f5}} = {h_{f4}} - {c_{p,w}} \times \Delta {T_{LSC}}\]</div>
+<div>$${h_{f5}} = {h_{f4}} - {c_{p,w}} \times \Delta {T_{LSC}}$$</div>
 
 <p>Subsequently loop loss for each coil would be enthalpy difference between 3 and 5 and is calculated using the following equation</p>
-<div>\[\Delta {Q_{loss}} = {\dot m_s}\,\,\, \times \,\,\,\,({h_{f3}} - {h_{f5}})\]</div>
+<div>$$\Delta {Q_{loss}} = {\dot m_s}\,\,\, \times \,\,\,\,({h_{f3}} - {h_{f5}})$$</div>
 
 <p>The total loop loss would be a summation of the individual losses occurring for each of the steam coils, this is the unavoidable loss in current steam system.</p>
 <p>A simple schematic describing the coil framework, inlet and outlet conditions to the coil and the flow rate resolution is shown in Figure 130.  Five zone coils and one air loop coil are described in the picture, Qzone is calculated by EnergyPlus heat balance and it is the input to the zone coils, while in air loop coil the Qal is calculated within the simulation model</p>
@@ -1333,27 +1333,27 @@ ii. Increment the required system output.
 <p>The pump model designed in EnergyPlus is a variable speed condensate pump.  Condensation of steam produces water, this takes place at variable rate hence the return water flow rate would be variable but constant when averaged over a time step.  Condensate pumps operate intermittently; the pump will run at its capacity if a load/flow rate is sensed and will shut off if there is no load on the loop.</p>
 <p>The condensate pump essentially operates between maximum and minimum flow rates, which are the physical limits of the device.  The pump is designed to meet the flow request made by demand side components, which are the coils in case of steam system.</p>
 <p>The main difference between the variable volume pump and the constant volume pump is the Part Load Performance Curve.  The fraction of full load power is determined by the third order equation, which follows:</p>
-<div>\[{P_{Frac}}\,\, = \,\,{C_1} + \,{C_2} \times PLR\,\, + \,\,\,{C_3} \times PL{R^2}\,\, + \,\,{C_4} \times PL{R^3}\]</div>
+<div>$${P_{Frac}}\,\, = \,\,{C_1} + \,{C_2} \times PLR\,\, + \,\,\,{C_3} \times PL{R^2}\,\, + \,\,{C_4} \times PL{R^3}$$</div>
 
 <p>In preceding equation, PLR stands for part load ratio while C1 to C4 are pump- part load coefficients.  The following five equations describe the pump operation and calculation of pump output variables such as total power, shaft power and pump heat to fluid etc.</p>
-<div>\[\dot V\,\, = \,\,\frac{{\,\dot m\,}}{{{\rho_w}}}\]</div>
+<div>$$\dot V\,\, = \,\,\frac{{\,\dot m\,}}{{{\rho_w}}}$$</div>
 
 <p>Using the previous equation the pump volume flow rate is determined; the user enters the value of the maximum and minimum volume flow rate.</p>
 <p>The pump part load ratio is a function of the pump volume flow rate at any instance determined by the loop and the pump nominal volume flow rate, which is a user input.  The following equation calculates the Part Load Ratio (PLR).</p>
-<div>\[PLR = \,\frac{{\dot V}}{{{{\dot V}_{nom}}}}\]</div>
+<div>$$PLR = \,\frac{{\dot V}}{{{{\dot V}_{nom}}}}$$</div>
 
 <p>The pump power is calculated as described in following equation.  Pump power is a product of fractional full load power and pump nominal power use.  Fractional full load power is calculated in a preceding equation while pump nominal power is a user input to the model.</p>
-<div>\[P = {P_{Frac}} \times {P_{Nom}}\]</div>
+<div>$$P = {P_{Frac}} \times {P_{Nom}}$$</div>
 
 <p>The shaft power is simply the product of the pump power and motor efficiency, this is required to calculate the heat generated and delivered to the fluid being pumped.  The following equation is used to calculate pump shaft power.</p>
-<div>\[{P_S}\,\,\, = P\,\,\,\, \times \,\,\,\,{\eta_m}\]</div>
+<div>$${P_S}\,\,\, = P\,\,\,\, \times \,\,\,\,{\eta_m}$$</div>
 
 <p>The model assumes that all heat generated and lost ends up in the fluid to the loop, this assumption is necessary since EnergyPlus operates on a closed loop.  The following equation is used to calculate the pump heat to the fluid, which raises the condensate temperature.  The pump motor efficiency is defined by the user input and the fractional motor loss to fluid is the amount of heat generated by the pump motor that is added to the fluid loop (as opposed to being lost to the environment where the pump is located).  FracMotorLossToFluid is also a user input</p>
-<div>\[{P_H} = {P_S}\,\,\, + \,(\,P\,\, - {P_S}) \times {F_{mf}}\]</div>
+<div>$${P_H} = {P_S}\,\,\, + \,(\,P\,\, - {P_S}) \times {F_{mf}}$$</div>
 
 <p>The shaft power relates to the increase in head through the pump to the loop operating pressure.  The head lost through the piping network due to frictional heat, represents the heat gain by the fluid throughout the network.  .  For model simplicity, this heat is added along with the heat resulting from the pump motor.  The difference between the pump power and the shaft power is the inefficiency of the pump, or the amount of energy input into the pump that the motor converts to heat rather than mechanical energy.  Some of this heat is added to the fluid being pumped.  These two above-mentioned terms are used in the PumpHeatToFluid equation for calculating P<sub>H</sub> shown above.</p>
 <p>A simple energy balance over the pump based on the pump inlet conditions and flow rate is used to calculate the pump outlet temperature.  The condensate outlet temperature from the pump is slightly higher than inlet due to the heat dissipation to the fluid steam during pumping action.  This is calculated in the following equation.  The pump water outlet temperature is the boiler inlet temperature.</p>
-<div>\[{T_{{w_{out}}}} = {T_{{w_{in}}}}\,\,\, + \,\,\,\,\,\frac{{{P_H}}}{{\,\dot m\,\,\, \times \,\,\,\,{c_{p,w}}}}\]</div>
+<div>$${T_{{w_{out}}}} = {T_{{w_{in}}}}\,\,\, + \,\,\,\,\,\frac{{{P_H}}}{{\,\dot m\,\,\, \times \,\,\,\,{c_{p,w}}}}$$</div>
 
 <p>Pump control is an important part of the steam loop.  Existing control structure from EnergyPlus has been utilized to operate the condensate pump.  The pump is simulated first on the supply side of the loop after the demand side loop has determined what the demand on the loop will be.</p>
 <p>A simple schematic describing the flow across the pump is shown in the following figure</p>
@@ -1389,6 +1389,7 @@ ii. Increment the required system output.
       MathJax.Hub.Config({
         extensions: ["tex2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
         showMathMenu: true,
         showMathMenuMSIE: false,
         "HTML-CSS": {

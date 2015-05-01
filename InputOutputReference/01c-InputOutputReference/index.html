@@ -253,7 +253,7 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+                <a href="../../Acknowledgements/Acknowledgements">Acknowledgements</a>
               </li>
             
               <li>
@@ -8891,7 +8891,8 @@ DesignSpecification:ZoneHVAC:Sizing,
 </ul>
 <p>are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., AirTerminal:SingleDuct:Uncontrolled objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.</p>
 <h3 id="airloophvacunitarysystem">AirLoopHVAC:UnitarySystem</h3>
-<p>The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, or VariableVolume), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active,</p>
+<p>The AirloopHVAC:UnitarySystem object is intended to replace all other air loop equipment, although other system types are still available. This system is unique in that it can accommodate all fan and coil types whereas other system types are specific to the type of fan and coil available for simulation. Additionally, although the AirloopHVAC:UnitarySystem is intended for use in the primary airloop, this object can be modeled as zone equipment (i.e., listed in a ZoneHVAC:EquipmentList) or as an outside air system component (i.e., listed in a AirLoopHVAC:OutdoorAirSystem:EquipmentList).</p>
+<p>The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, or VariableVolume), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active.  All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for heating-only, cooling-only, or both heating and cooling.  It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX.</p>
 <p><img alt="" src="../../InputOutputReference/media/image294.png" /></p>
 <p>Figure 1. Schematic of the EnergyPlus Unitary System</p>
 <p>Links to the fan, cooling coil, heating coil and reheat coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the system design operating conditions are specified by the unitary system inputs.</p>
@@ -14474,7 +14475,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 <h4 id="the-following-outputs-are-available-for-systems-that-serve-cases-andor-walkins">THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE CASES AND/OR WALKINS</h4>
 <h4 id="refrigeration-system-total-compressor-electric-power-w">Refrigeration System Total Compressor Electric Power [W]</h4>
 <p>This output is the total electric power input to the system compressor(s) in Watts.</p>
-<h4 id="refrigeration-system-total-compressor-electric-consumption-j">Refrigeration System Total Compressor  Electric Consumption [J]</h4>
+<h4 id="refrigeration-system-total-compressor-electric-energy-j">Refrigeration System Total Compressor Electric Energy [J]</h4>
 <p>This is the electricity consumption of the system’s compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).</p>
 <h4 id="refrigeration-system-total-low-stage-compressor-electric-power-w">Refrigeration System Total Low Stage Compressor Electric Power [W]</h4>
 <p>This output is the total electric power input to the system’s low-stage compressor(s) in Watts.  This output is valid only for two-stage compression systems.</p>
@@ -14543,7 +14544,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 <h4 id="the-following-outputs-are-available-for-systems-that-serve-air-chillers">THE FOLLOWING OUTPUTS ARE AVAILABLE FOR SYSTEMS THAT SERVE AIR CHILLERS</h4>
 <h4 id="refrigeration-air-chiller-system-total-compressor-electric-power-w">Refrigeration Air Chiller System Total Compressor Electric Power [W]</h4>
 <p>This output is the total electric power input to the system compressor(s) in Watts.</p>
-<h4 id="refrigeration-chiller-system-total-compressor-electric-consumption-j">Refrigeration Chiller System Total Compressor  Electric Consumption [J]</h4>
+<h4 id="refrigeration-chiller-system-total-compressor-electric-energy-j">Refrigeration Chiller System Total Compressor Electric Energy [J]</h4>
 <p>This is the electricity consumption of the system’s compressor(s) in Joules for the timestep being reported. The individual consumption for each compressor is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).</p>
 <h4 id="refrigeration-air-chiller-system-total-low-stage-compressor-electric-power-w">Refrigeration Air Chiller System Total Low Stage Compressor Electric Power [W]</h4>
 <p>This output is the total electric power input to the system’s low-stage compressor(s) in Watts.  This output is valid only for two-stage compression systems.</p>
@@ -15030,7 +15031,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 <h4 id="field-minimum-fan-air-flow-ratio">Field: Minimum Fan Air Flow Ratio</h4>
 <p>Fan controls often include a minimum air flow ratio to avoid overheating the fan motor or for other reasons. This numeric field should be between 0. and 1. and has a default value of 0.2<strong>.</strong></p>
 <h4 id="field-air-inlet-node-name-or-zone-name">Field: Air Inlet Node Name or Zone Name</h4>
-<p>This optional alpha field contains the name of the node from which the condenser draws its outdoor air or the name of the conditioned zone where the condenser is located. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank and an outdoor air node name is entered, this node name must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If a zone name is entered, ….bbb</p>
+<p>This optional alpha field contains the name of the node from which the condenser draws its outdoor air or the name of the conditioned zone where the condenser is located. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank and an outdoor air node name is entered, this node name must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If a zone name is entered, the temperature of that zone is used.</p>
 <h4 id="field-end-use-subcategory_4">Field: End-Use Subcategory</h4>
 <p>This field allows the specification of a user-defined end-use subcategory (e.g., "Low Temperature Rack"). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is left blank, the equipment will be assigned to the "General" end-use subcategory.</p>
 <h4 id="field-condenser-refrigerant-operating-charge-inventory">Field: Condenser Refrigerant Operating Charge Inventory</h4>
@@ -16384,6 +16385,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
       MathJax.Hub.Config({
         extensions: ["tex2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
         showMathMenu: true,
         showMathMenuMSIE: false,
         "HTML-CSS": {

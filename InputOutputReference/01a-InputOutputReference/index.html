@@ -253,7 +253,7 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+                <a href="../../Acknowledgements/Acknowledgements">Acknowledgements</a>
               </li>
             
               <li>
@@ -340,8 +340,30 @@
            })();
           </script>
           <gcse:search></gcse:search>
-          <p>Input Output Reference</p>
-<p>The Encyclopedic Reference to EnergyPlus Input and Output</p>
+          <p><img alt="" src="../../InputOutputReference/media/ep.gif" /></p>
+<p><br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>Input Output Reference</h1>
+<h2>The Encyclopedic Reference to EnergyPlus Input and Output</h2>
+<br/>
+<p><i>(the ins and outs of EnergyPlus)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p></p>
 <h1 id="input-output-reference">Input-Output Reference</h1>
 <p>This document is intended to be an encyclopedic reference for the EnergyPlus Input Data Dictionary (IDD), Input Data File (IDF) and potential resultant outputs (various output files).</p>
 <p>The following descriptions are “grouped” by the elements in the IDD (ref: Getting Started Document and the IDD Conventions). In some cases, the descriptions of reporting will be done for an object (e.g. Lighting electrical consumption or thermal comfort value for a group of people) and in some cases for the entire group (e.g., ambient condition reports).</p>
@@ -1626,9 +1648,9 @@ Meter:CustomDecrement,
 <p>Table 2. Humidity Indicating Field Interactions - Design Day</p>
 <table class="table table-striped">
 <tr>
-<th>Humihity Conhition Type</th>
-<th>Primary Humihity Inhicating Fielh</th>
-<th>Humihity Inhicating Day Schehule</th>
+<th>Humidity Conhition Type</th>
+<th>Primary Humidity Inhicating Fielh</th>
+<th>Humidity Inhicating Day Schehule</th>
 </tr>
 <tr>
 <td>WetBulb</td>
@@ -2222,7 +2244,7 @@ RunPeriodControl:DaylightSavingTime, 4/1, 10/1;
 <h3 id="siteheightvariation">Site:HeightVariation</h3>
 <p>The Site:HeightVariation object is used to specify the local variation in atmospheric properties at the site and should be used only if you require advanced control over the height-dependent variations for wind speed and temperature. The coefficients set by this object are used by EnergyPlus, in conjunction with the Site:WeatherStation object (see above), to calculate the local variation in atmospheric properties as a function of height above ground. Outdoor air temperature decreases with height, while wind speed increases with height. The local outdoor air temperature and wind speed are calculated separately for all zones and surfaces, and optionally for outdoor air nodes for which a height has been specified (see OutdoorAir:Node object). With the default inputs, wind speed falls significantly at heights lower than the weather station measurement height, and temperature increases slightly. The algorithms for this calculation are in the Engineering Reference. There are necessary correlations between the entries for this object and some entries in the Building object, specifically the <strong>Terrain</strong> field.</p>
 <p>Table 5. Atmospheric Variables at Two Different Heights Above Ground Level.</p>
-<table class="table table-stripeh">
+<table class="table table-striped">
 <tr>
 <th>Variable</th>
 <th>1.5 m</th>
@@ -12950,7 +12972,7 @@ RoomAirSettings:UnderFloorAirDistributionInterior,
 <table class="table table-striped">
 <tr>
 <th>Operative Temperature (C)</th>
-<th>Humihity Ratio (kgWater/kgDryAir)</th>
+<th>Humidity Ratio (kgWater/kgDryAir)</th>
 </tr>
 <tr>
 <td>19.6</td>
@@ -12976,7 +12998,7 @@ RoomAirSettings:UnderFloorAirDistributionInterior,
 <table class="table table-striped">
 <tr>
 <th>Operative Temperature (C)</th>
-<th>Humihity Ratio (kgWater/kgDryAir)</th>
+<th>Humidity Ratio (kgWater/kgDryAir)</th>
 </tr>
 <tr>
 <td>23.6</td>
@@ -13338,7 +13360,7 @@ RoomAirSettings:UnderFloorAirDistributionInterior,
 <h3 id="meters-for-lights-outputs">Meters for Lights Outputs</h3>
 <p>As described in the Lights Outputs, values for lights will show up on the following meters:</p>
 <p>Table 15. Distribution of Lights to Meters</p>
-<table class="table table-stripeh">
+<table class="table table-striped">
 <tr>
 <th>Meter Name</th>
 <th>Scope</th>
@@ -14730,6 +14752,7 @@ RoomAirSettings:UnderFloorAirDistributionInterior,
       MathJax.Hub.Config({
         extensions: ["tex2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
         showMathMenu: true,
         showMathMenuMSIE: false,
         "HTML-CSS": {

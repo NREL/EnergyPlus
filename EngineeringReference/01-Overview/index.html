@@ -253,7 +253,7 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+                <a href="../../Acknowledgements/Acknowledgements">Acknowledgements</a>
               </li>
             
               <li>
@@ -322,7 +322,34 @@
            })();
           </script>
           <gcse:search></gcse:search>
-          <h1 id="overview">Overview</h1>
+          <p><img alt="" src="../../EngineeringReference/media/ep.gif" /></p>
+<p><br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>Engineering Reference</h1>
+<h2>The Reference to EnergyPlus Calculations</h2>
+<br/>
+<p><i>(in case you want or need to know)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p></p>
+<h1 id="overview">Overview</h1>
 <h2 id="document-overview">Document Overview</h2>
 <p>This document is organized to give you the best possible look into the EnergyPlus calculations. First, the concepts of modeling in EnergyPlus are presented. These include descriptions of the zone heat balance process, air loop/plant loop processes as well as other important processes for the building simulation.</p>
 <p>Discussions during the modeling process may reference specific “object names” as found in the Input/Output Reference document.</p>
@@ -414,13 +441,13 @@ END SUBROUTINE ManageSimulation
 <h2 id="warmup-convergence">Warmup Convergence</h2>
 <p>Since everything in EnergyPlus is based on the foundation of the loads simulation, it stands to reason that any inaccuracies in the loads calculation will result in inaccuracies of similar or larger magnitude in the HVAC calculations. In the presumably limited cases where convergence was not truly achieved before the actual simulation began, it is unknown how much error would be introduced into the results. While simulations that last longer (annual vs. design day) will hopefully have any initial condition problems balanced by the shear number of days in the simulation, shorter simulations—particularly those used for sizing—could result in relatively large errors. The simulation results could be unreliable and inaccurate when steady periodic conditions are not achieved. Therefore, it is important to properly determine when there is enough temperature and flux history terms to start an EnergyPlus simulation since this has a potential economic and energy impact on buildings that use EnergyPlus in design.</p>
 <p>EnergyPlus determines warmup convergence in the following manner as shown in the Figure 2 below. The process of the convergence checks begins by tracking four parameters such including the maximum zone air temperature, the minimum zone air temperature, the maximum heating load, and the maximum cooling load for individual zone. It is note that these convergence checks are only in effective in simulations with at least one zone since the criteria is solely based on the maximum and minimum values obtained from an individual zone. Differences in these parameters between two consecutive days are then compared with the convergence tolerance values at the end of the day during the warmup period. For example, the maximum and minimum air temperature and the percentage difference of zone load for each zone at 9:00AM during the second to last warmup is compared to the values at 9:00AM last warmup day as follows:</p>
-<div>\[{T_{\max ,prev}} - {T_{\max }} < {T_{tol}}\]</div>
+<div>$${T_{\max ,prev}} - {T_{\max }} < {T_{tol}}$$</div>
 
-<div>\[{T_{\min ,prev}} - {T_{\min }} < {T_{tol}}\]</div>
+<div>$${T_{\min ,prev}} - {T_{\min }} < {T_{tol}}$$</div>
 
-<div>\[\frac{{{q_h} - {q_{h,prev}}}}{{{q_h}}} < {q_{tol}}\]</div>
+<div>$$\frac{{{q_h} - {q_{h,prev}}}}{{{q_h}}} < {q_{tol}}$$</div>
 
-<div>\[\frac{{{q_c} - {q_{c,prev}}}}{{{q_c}}} < {q_{tol}}\]</div>
+<div>$$\frac{{{q_c} - {q_{c,prev}}}}{{{q_c}}} < {q_{tol}}$$</div>
 
 <p>where Tmax,prev is the maximum zone temperature of previous day, Tmax is the maximum zone temperature of current day, Ttol is the value of temperature tolerance, qh,prev is the maximum heating load of previous day, qh, is the maximum heating load of current day, qtol is the value of load tolerance, qc,prev is the maximum cooling load of previous day, and qc, is the maximum cooling load of current day.</p>
 <p>Note that a minimum load of 100W is used to establish a fraction for the maximum loads when they are less than the minimum. This is done to avoid a false negative indication for the percentage load difference that may appear when zonal loads are very small. The convergence checks are repeated until passed for all zones. EnergyPlus assumes that the warmup period has been reached steady-periodic when these four parameters are within tolerance. Finally, temperature and load differences between the last two warmup days for individual zone at each time step in the last warmup day are reported so that users can easily track whether or not the warmup period has converged. The input parameters and output related to the warmup period are discussed in the Input-Output Reference.</p>
@@ -447,6 +474,7 @@ END SUBROUTINE ManageSimulation
       MathJax.Hub.Config({
         extensions: ["tex2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
         showMathMenu: true,
         showMathMenuMSIE: false,
         "HTML-CSS": {

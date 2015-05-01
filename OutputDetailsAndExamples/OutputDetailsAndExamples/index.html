@@ -253,7 +253,7 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+                <a href="../../Acknowledgements/Acknowledgements">Acknowledgements</a>
               </li>
             
               <li>
@@ -398,8 +398,33 @@
            })();
           </script>
           <gcse:search></gcse:search>
-          <p>Output Details and Examples</p>
-<p>EnergyPlus Outputs, Example Inputs and Data Set Files</p>
+          <p><img alt="" src="../../OutputDetailsAndExamples/media/ep.gif" /></p>
+<p><br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>Output Details and Examples</h1>
+<h2>EnergyPlus Outputs, Example Inputs and Data Set Files</h2>
+<br/>
+<p><i>( &#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42; Message: This is a snazzy output tagline)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p></p>
 <h1 id="introduction">Introduction</h1>
 <p>This document is intended to give an in-depth look at the various output files produced by EnergyPlus. Some of these may be referenced in various other parts of the documentation but are presented here with more details.</p>
 <p>The scripts that assist in running EnergyPlus will usually rename the standard names used in the program. The two scripts that are distributed with EnergyPlus are: <strong>EPL-Run.bat</strong> (which is used by the EP-Launch program) and <strong>RunEPlus.bat</strong>  (which can be used from the command line). The RunEPlus batch file can also be used to string together several runs such as usually termed “batch processing”. In renaming the files created by the program or its post-processing program(s), usually the file extension will be retained. The following table will illustrate the native EnergyPlus file name, a description of its contents and the EP-Launch “version” of the file. In this table, &lt;filename&gt; refers to the source/original file name (without extension) selected. Files are presented in alphabetic order. For output purposes, the most important files to understand are the eplusout.eso, eplusout.mtr and eplusout.err files. The first two are manipulated with the ReadVarsESO post processing program. The latter will contain any critical errors that were encountered during the run.</p>
@@ -18687,6 +18712,7 @@ Refrigeration:Compressor,
       MathJax.Hub.Config({
         extensions: ["tex2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
         showMathMenu: true,
         showMathMenuMSIE: false,
         "HTML-CSS": {

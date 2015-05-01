@@ -253,7 +253,7 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+                <a href="../../Acknowledgements/Acknowledgements">Acknowledgements</a>
               </li>
             
               <li>
@@ -384,8 +384,21 @@
            })();
           </script>
           <gcse:search></gcse:search>
-          <p>Application Guide for Plant Loops</p>
-<p>User Guide for Modeling Plant Systems</p>
+          <p><img alt="" src="../../PlantApplicationGuide/media/ep.gif" /></p>
+<p><br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>Application Guide for Plant Loops</h1>
+<h2>User Guide for Modeling Plant Systems</h2>
+<br/>
+<p><i>(a central location for central plant knowledge)</i></p>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p></p>
 <h1 id="introduction">Introduction</h1>
 <p>This document provides an in-depth look at plant modeling in EnergyPlus. Plant refers to the subset of HVAC that involves hydronic equipment for heating, cooling, and service water heating (or domestic hot water).</p>
 <p>This guide serves as an aid to help model plant systems in EnergyPlus simulations.  It is intended to augment the Input Output Reference, which describes the syntax and the details of individual input objects. This guide will discuss how the different objects can be used to construct a plant loop that can service a building load.</p>
@@ -915,6 +928,7 @@
       MathJax.Hub.Config({
         extensions: ["tex2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
         showMathMenu: true,
         showMathMenuMSIE: false,
         "HTML-CSS": {
