@@ -613,7 +613,6 @@ namespace ZoneEquipmentManager {
 				HumRat = Node( ZoneNode ).HumRat;
 				Enthalpy = Node( ZoneNode ).Enthalpy;
 				MassFlowRate = 0.0;
-
 			}
 
 			UpdateSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided );
@@ -645,6 +644,8 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatMassFlow = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneTemp = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneHumRat = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutTemp = OutDryBulbTemp;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutHumRat = OutHumRat;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolLoad = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolMassFlow = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneTemp = 0.0;
@@ -1801,6 +1802,7 @@ namespace ZoneEquipmentManager {
 
 		{ auto const SELECT_CASE_var( CallIndicator );
 
+
 		if ( SELECT_CASE_var == BeginDay ) {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
@@ -1828,6 +1830,10 @@ namespace ZoneEquipmentManager {
 				if ( ZoneThermostatSetPointLo( CtrlZoneNum ) > 0.0 && ZoneThermostatSetPointLo( CtrlZoneNum ) < ZoneSizThermSetPtLo( CtrlZoneNum ) ) {
 					ZoneSizThermSetPtLo( CtrlZoneNum ) = ZoneThermostatSetPointLo( CtrlZoneNum );
 				}
+				// check if the CoolZoneHUmRat is zero then, reset it to design supply air humidity ratio
+				if ( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRat == 0.0 ) {
+					CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRat = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDesHumRat;
+				}
 				ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepInDay ) = ZoneThermostatSetPointLo( CtrlZoneNum );
 				ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
 				ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepInDay ) = ZoneThermostatSetPointHi( CtrlZoneNum );
@@ -1846,10 +1852,11 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutTemp * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTemp * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
+				//// when there is load take the maximum of CoolZoneHUmRat and design supply air humidity ratio, BAN and RR April 30, 2015
+				//CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepInDay ) += max( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRat, CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDesHumRat ) * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRat * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutHumRat * FracTimeStepZone;
 			}
-
 		} else if ( SELECT_CASE_var == EndDay ) {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {

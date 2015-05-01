@@ -37,3 +37,4 @@ Builds
 *.geany
 .project
 .cproject
+/src/EnergyPlus/ZoneEquipmentManager.cc
