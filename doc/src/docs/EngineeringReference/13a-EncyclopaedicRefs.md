@@ -4,11 +4,13 @@ Simulation Models – Encyclopedic Reference
 
 The following descriptions are grouped alphabetically (as much as possible) with some also having additional tags of “Heat Balance”, “HVAC”, and “Plant”.  With the integrated solution, these designations signify where the effects of these models have their first impacts.
 
+<!--RemoveStart-->
 Main Sections:
 
 * [Air Terminals](#Terminals)
 * [Boilers](#Boilers)
 * [Chillers](#Chillers)
+<!--RemoveEnd-->
 
 Air System Distribution Terminals <a name="Terminals"></a>
 ---------------------------------
@@ -95,13 +97,13 @@ The reheat version of this terminal unit requires additional information. The na
 
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand.
 
-<div>\[C{p_{zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)\]</div>
+<div>$$C{p_{zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)$$</div>
 
-<div>\[C{p_{inlet}} = PsyCpAirFnWTdb\left( {{\omega_{inlet}},{T_{inlet}}} \right)\]</div>
+<div>$$C{p_{inlet}} = PsyCpAirFnWTdb\left( {{\omega_{inlet}},{T_{inlet}}} \right)$$</div>
 
-<div>\[DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C{p_{zone}}} \right)\left( {{T_{zone}}} \right)\]</div>
+<div>$$DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C{p_{zone}}} \right)\left( {{T_{zone}}} \right)$$</div>
 
-<div>\[\dot m = MIN\left( {{{\dot m}_{max}},\,\,\,MAX\left( {{{\dot m}_{max}}*MinAirFlowFrac\,,\,\,\,{\raise0.7ex\hbox{${{{\dot Q}_{zone}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{zone}}} {DeltaCpT}}}\right.}\!\lower0.7ex\hbox{${DeltaCpT}$}}} \right)\,\,} \right)\]</div>
+<div>$$\dot m = MIN\left( {{{\dot m}_{max}},\,\,\,MAX\left( {{{\dot m}_{max}}*MinAirFlowFrac\,,\,\,\,{\raise0.7ex\hbox{${{{\dot Q}_{zone}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{zone}}} {DeltaCpT}}}\right.}\!\lower0.7ex\hbox{${DeltaCpT}$}}} \right)\,\,} \right)$$</div>
 
 where
 
@@ -129,9 +131,9 @@ where
 
 The outdoor air input fields, if entered, are then used to adjust the terminal unit air mass flow rate to ensure the correct amount of outdoor air enters the zone (within the constraints of the terminal unit maximum and minimum flow rate inputs). The amount of outdoor air is calculated per the outdoor air requirements and is adjusted by the fraction of outdoor air entering the air loop outdoor air system.
 
-<div>\[
+<div>$$
   \dot m = \max \left( \dot m, \frac{\dot m_{OA}}{OAFrac} \right)
-\]</div>
+$$</div>
 
 where:
 
@@ -141,7 +143,7 @@ where:
 
 If the terminal unit is in reheat mode (i.e., the central air loop cooling coil is active, the supply air was overcooled, and the zone thermostat is requesting heating) the maximum air flow rate allowed during reheat mode is adjusted as necessary.
 
-<div>\[\mathop m\limits^\cdot  \, = \,MIN\left( {\mathop m\limits^\cdot  ,\,{{\mathop m\limits^\cdot  }_{reheat}}} \right)\]</div>
+<div>$$\mathop m\limits^\cdot  \, = \,MIN\left( {\mathop m\limits^\cdot  ,\,{{\mathop m\limits^\cdot  }_{reheat}}} \right)$$</div>
 
 where:
 
@@ -149,11 +151,11 @@ where:
 
 The damper position is then calculated as:
 
-<div>\[FRAC_{damper} = \frac{\dot m}{\dot m_{max}} \]</div>
+<div>$$FRAC_{damper} = \frac{\dot m}{\dot m_{max}} $$</div>
 
 And the amount of outdoor air entering the zone is:
 
-<div>\[\dot V_{OA} = \dot m (OAFrac)\]</div>
+<div>$$\dot V_{OA} = \dot m (OAFrac)$$</div>
 
 where
 
@@ -163,7 +165,7 @@ where
 
 Simulation of the reheat coil occurs next when applicable. The heating demand required to maintain the thermostat heating setpoint temperature and the heating capacity of air flowing through the terminal unit are used to determine the amount of reheat required.
 
-<div>\[{\dot Q_{reheat}} = {\dot Q_{heatSP}} + \dot m C_{p,zone}(T_{inlet}-T_{zone})\]</div>
+<div>$${\dot Q_{reheat}} = {\dot Q_{heatSP}} + \dot m C_{p,zone}(T_{inlet}-T_{zone})$$</div>
 
  where
 
@@ -187,15 +189,15 @@ The four pipe induction terminal unit is modeled as a compound component consist
 
 The user describes the terminal unit by inputting the name and type of the heating and cooling coils and the name of the zone mixer. The user must also specify the connectivity of the component by naming the inlet air and water nodes and the air outlet node. Finally maximum and fixed flow rates need to be specified (although these can be autosized): maximum and minimum hot and cold water volumetric flow rates and the total air volumetric flow rate (sum of primary and secondary flow rates). The relative convergence tolerances for the hot and cold water flow rates also need to be input (or allowed to default). Finally the induction ratio needs to be specified: this  is defined as the ratio of the secondary air flow rate to the primary air flow rate. The relationship between the flow rates is:
 
-<div>\[{\dot m_{air,tot}} = {\dot m_{air,pri}} + {\dot m_{air,\sec }}\]</div>
+<div>$${\dot m_{air,tot}} = {\dot m_{air,pri}} + {\dot m_{air,\sec }}$$</div>
 
-<div>\[{\dot m_{air,sec}} = {R_{induc}}\cdot {\dot m_{air,pri}}\]</div>
+<div>$${\dot m_{air,sec}} = {R_{induc}}\cdot {\dot m_{air,pri}}$$</div>
 
 so
 
-<div>\[{\dot m_{air,pri}} = {\dot m_{air,tot}}/(1 + {R_{induc}})\]</div>
+<div>$${\dot m_{air,pri}} = {\dot m_{air,tot}}/(1 + {R_{induc}})$$</div>
 
-<div>\[{\dot m_{air,sec}} = {\dot m_{air,tot}}\cdot {R_{induc}}/(1 + {R_{induc}})\]</div>
+<div>$${\dot m_{air,sec}} = {\dot m_{air,tot}}\cdot {R_{induc}}/(1 + {R_{induc}})$$</div>
 
 where *R<sub>induc</sub>* is the user-input induction ratio.
 
@@ -213,7 +215,7 @@ The two air streams are mixed (Call *SimAirMixer*).
 
 Finally the load met by the terminal unit is calculated and passed back to the calling routine:
 
-<div>\[{\dot Q_{out}} = {\dot m_{tot}}\cdot {c_{p,air}}\cdot ({T_{air,out}} - {T_{air,zone}})\]</div>
+<div>$${\dot Q_{out}} = {\dot m_{tot}}\cdot {c_{p,air}}\cdot ({T_{air,out}} - {T_{air,zone}})$$</div>
 
 Note that data is never explicitly passed between the sub-components. This is all handled automatically by the node connections and the data stored on the nodes.
 
@@ -319,7 +321,7 @@ The air flow rates are now determined and we can fire the air mixer (Call *SimAi
 
 ·        for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call *SimulateWaterCoilComponents*). Otherwise call *ControlCompOutput*; *ControlCompOutput* is a general component control routine. In this case it calls *SimulateWaterCoilComponents* repeatedly while varying the hot water flow rate and minimizing
 
-<div>\[({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}\]</div>
+<div>$$({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}$$</div>
 
 to within the heating convergence tolerance.
 
@@ -327,7 +329,7 @@ to within the heating convergence tolerance.
 
 Finally the unit sensible output is calculated:
 
-<div>\[{\dot Q_{sens,out}} = {\rm{PsyHFnTdbW}}({T_{air,out}},{W_z}) - {\rm{PsyHFnTdbW(}}{T_z},{W_z})\]</div>
+<div>$${\dot Q_{sens,out}} = {\rm{PsyHFnTdbW}}({T_{air,out}},{W_z}) - {\rm{PsyHFnTdbW(}}{T_z},{W_z})$$</div>
 
 where *PsyHFnTdb* is the EnergyPlus function giving enthalpy as a function of temperature and humidity ratio.
 
@@ -347,11 +349,11 @@ From the result of the zone simulation we have the heating/cooling demand on the
 
 § Assuming that the fan is off, we calculate the primary air flow needed to meet the cooling demand.
 
-<div>\[{\dot m_{pri}} = {\dot Q_{z,req}}/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))\]</div>
+<div>$${\dot m_{pri}} = {\dot Q_{z,req}}/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))$$</div>
 
 The flow rate is constrained to be between the min and max primary air flow rates. If this calculated primary flow rate is greater than the fan-on flow rate, the secondary flow rate is set to zero and we are done. Otherwise, the fan is on and we need to recalculate the primary air flow rate.
 
-<div>\[{\dot m_{pri}} = ({\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{sec}}\cdot ({T_{in,sec}} + \Delta {T_{fan}} - {T_z}))/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))\]</div>
+<div>$${\dot m_{pri}} = ({\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{sec}}\cdot ({T_{in,sec}} + \Delta {T_{fan}} - {T_z}))/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))$$</div>
 
 The secondary flow rate is set to the user input fixed flow rate. The primary air flow rate is constrained to be between the min and max primary flow rated.
 
@@ -359,7 +361,7 @@ The air flow rates are now determined and we can fire the fan (Call *SimulateFan
 
 ·        for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call *SimulateWaterCoilComponents*). Otherwise call *ControlCompOutput*; *ControlCompOutput* is a general component control routine. In this case it calls *SimulateWaterCoilComponents* repeatedly while varying the hot water flow rate and minimizing
 
-<div>\[({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}\]</div>
+<div>$$({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}$$</div>
 
 to within the heating convergence tolerance.
 
@@ -367,7 +369,7 @@ to within the heating convergence tolerance.
 
 Finally the unit sensible output is calculated:
 
-<div>\[{\dot Q_{sens,out}} = {\rm{PsyHFnTdbW}}({T_{air,out}},{W_z}) - {\rm{PsyHFnTdbW(}}{T_z},{W_z})\]</div>
+<div>$${\dot Q_{sens,out}} = {\rm{PsyHFnTdbW}}({T_{air,out}},{W_z}) - {\rm{PsyHFnTdbW(}}{T_z},{W_z})$$</div>
 
 where *PsyHFnTdb* is the EnergyPlus function giving enthalpy as a function of temperature and humidity ratio.
 
@@ -401,7 +403,7 @@ The heating coil is simulated (call *SimulateWaterCoilComponents* if the coil is
 
 Finally the sensible load met by the terminal unit is calculated and passed back to the calling routine:
 
-<div>\[{\dot Q_{out}} = {\dot m_{air}}\cdot {c_{p,air}}\cdot ({T_{air,out}} - {T_{air,zone}})\]</div>
+<div>$${\dot Q_{out}} = {\dot m_{air}}\cdot {c_{p,air}}\cdot ({T_{air,out}} - {T_{air,zone}})$$</div>
 
 Note that data is never explicitly passed between the sub-components. This is all handled automatically by the node connections and the data stored on the nodes.
 
@@ -554,9 +556,9 @@ The input object AirTerminal:DualDuct:ConstantVolume provides a model for dual d
 
 The DDCAV model will attempt to meet all of the thermostatic loads of a particular zone by explicitly calculating the hot and cold deck mass flow rates. For the energy and mass balance equations shown below, the zone load, temperatures, specific heats and the design mass flow rate are all known. These equations can then be solved directly for the hot deck and cold deck mass flow rates.
 
-<div>\[\dot Q_{zone} = \dot m_c C_{p,c} T_c + \dot m_h C_{p,h}T_h - \dot m_d C_{p,z} T_z\]</div>
+<div>$$\dot Q_{zone} = \dot m_c C_{p,c} T_c + \dot m_h C_{p,h}T_h - \dot m_d C_{p,z} T_z$$</div>
 
-<div>\[\dot m_d = \dot m_c + \dot m_h\]</div>
+<div>$$\dot m_d = \dot m_c + \dot m_h$$</div>
 
 Where:
 
@@ -612,13 +614,13 @@ This dual duct air terminal may also be used to provide a minimum outdoor air qu
 
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand using either the heating duct or cooling duct.
 
-<div>\[C{p_{zone}} = \dot m\left( {C{p_{inlet}},{T_{zone}}} \right)\]</div>
+<div>$$C{p_{zone}} = \dot m\left( {C{p_{inlet}},{T_{zone}}} \right)$$</div>
 
-<div>\[C{p_{zone}} = PsyCpAirFnWTdb\left( {{T_{zone}},{T_{inlet}}} \right)\]</div>
+<div>$$C{p_{zone}} = PsyCpAirFnWTdb\left( {{T_{zone}},{T_{inlet}}} \right)$$</div>
 
-<div>\[DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C{p_{zone}}} \right)\left( {{T_{zone}}} \right)\]</div>
+<div>$$DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C{p_{zone}}} \right)\left( {{T_{zone}}} \right)$$</div>
 
-<div>\[ \dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac,\frac{\dot Q_{zone}}{DeltaCpT} \right) \right) \]</div>
+<div>$$ \dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac,\frac{\dot Q_{zone}}{DeltaCpT} \right) \right) $$</div>
 
 where
 
@@ -646,7 +648,7 @@ where
 
 The outdoor air input requirements, if entered, are then used to adjust the terminal unit air mass flow rate to ensure the correct amount of outdoor air enters the zone (within the constraints of the terminal unit maximum and minimum flow rate inputs). The amount of outdoor air is calculated per the outdoor air requirements and is adjusted by the fraction of outdoor air entering the air loop outdoor air system.
 
-<div>\[\mathop m\limits^\cdot   = MAX\left( {\mathop m\limits^\cdot  ,\,{\raise0.7ex\hbox{${\mathop {{m_{OA}}}\limits^\cdot  }$} \!\mathord{\left/ {\vphantom {{\mathop {{m_{OA}}}\limits^\cdot  } {OAFrac}}}\right.}\!\lower0.7ex\hbox{${OAFrac}$}}} \right)\]</div>
+<div>$$\mathop m\limits^\cdot   = MAX\left( {\mathop m\limits^\cdot  ,\,{\raise0.7ex\hbox{${\mathop {{m_{OA}}}\limits^\cdot  }$} \!\mathord{\left/ {\vphantom {{\mathop {{m_{OA}}}\limits^\cdot  } {OAFrac}}}\right.}\!\lower0.7ex\hbox{${OAFrac}$}}} \right)$$</div>
 
 where:
 
@@ -656,7 +658,7 @@ where:
 
 The damper position is then calculated as:
 
-<div>\[FRA{C_{damper}} = {\raise0.7ex\hbox{${\dot m}$} \!\mathord{\left/ {\vphantom {{\dot m} {{{\dot m}_{max}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot m}_{max}}}$}}\]</div>
+<div>$$FRA{C_{damper}} = {\raise0.7ex\hbox{${\dot m}$} \!\mathord{\left/ {\vphantom {{\dot m} {{{\dot m}_{max}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot m}_{max}}}$}}$$</div>
 
 where
 
@@ -684,11 +686,11 @@ The outdoor air rate is controlled by the schedule and specifications contained 
 
 The recirculated cool air flow rate is controlled to meet the zone cooling loads.  The first step is to calculate the impact that the outdoor air flow has on the loads starting with the specific heats.
 
-<div>\[{c_{p,zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)\]</div>
+<div>$${c_{p,zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)$$</div>
 
-<div>\[{c_{p,OA}} = PsyCpAirFnWTdb\left( {{\omega_{OA}},{T_{OA}}} \right)\]</div>
+<div>$${c_{p,OA}} = PsyCpAirFnWTdb\left( {{\omega_{OA}},{T_{OA}}} \right)$$</div>
 
-<div>\[{c_{p,RC}} = PsyCpAirFnWTdb\left( {{\omega_{RC}},{T_{RC}}} \right)\]</div>
+<div>$${c_{p,RC}} = PsyCpAirFnWTdb\left( {{\omega_{RC}},{T_{RC}}} \right)$$</div>
 
 where,
 
@@ -714,7 +716,7 @@ where,
 
 The contribution to zone load provided by the outdoor air toward meeting the cooling setpoint, <span>${\dot Q_{OA}}$</span> (W), is then calculated using:
 
-<div>\[{\dot Q_{OA}} = {\dot m_{OA}}\left( {{c_{p,OA}}{T_{OA}} - {c_{p,zone}}{T_{zonesetpoint}}} \right)\]</div>
+<div>$${\dot Q_{OA}} = {\dot m_{OA}}\left( {{c_{p,OA}}{T_{OA}} - {c_{p,zone}}{T_{zonesetpoint}}} \right)$$</div>
 
 where,
 
@@ -724,13 +726,13 @@ where,
 
 This is then used to calculate the load that the recirculated cool air should deliver, <span>${Q_{RC}}$</span> (W):
 
-<div>\[{\dot Q_{RC}} = {\dot Q_{ToCoolSetpointRemain - }}{\dot Q_{OA}}\]</div>
+<div>$${\dot Q_{RC}} = {\dot Q_{ToCoolSetpointRemain - }}{\dot Q_{OA}}$$</div>
 
 where,
 
 <span>${\dot Q_{ToCoolSetpointRemain = }}$</span> is the remaining load to cooling setpoint as determined by Predictor and including the impacts of any other zone equipment sequenced before this terminal. Then the recirculated cool air mass flow rate, <span>${\dot m_{RC}}$</span> (kg/s), is calculated using:
 
-<div>\[{\dot m_{RC}} = \frac{{{{\dot Q}_{RC}}}}{{\left( {{c_{p,RC}}{T_{RC}} - {c_{p,zone}}{T_{zone}}} \right)}}\]</div>
+<div>$${\dot m_{RC}} = \frac{{{{\dot Q}_{RC}}}}{{\left( {{c_{p,RC}}{T_{RC}} - {c_{p,zone}}{T_{zone}}} \right)}}$$</div>
 
 The model also includes a form of damping where the last three values for <span>${\dot m_{RC}}$</span> are stored and used to detect if the solution is oscillating from one iteration to the next and if it is then the new value is not used but rather the value from the previous iteration is used.  Once the two mass flows are known, the moist air properties of the outlet node are calculated using mass flow weighting.
 
@@ -747,15 +749,15 @@ The input object Boiler:HotWater provides a simple model for boilers that only r
 
 The model is based the following three equations
 
-<div>\[OperatingPartLoadRatio = \frac{{BoilerLoad}}{{BoilerNomCapacity}}\]</div>
+<div>$$OperatingPartLoadRatio = \frac{{BoilerLoad}}{{BoilerNomCapacity}}$$</div>
 
-<div>\[TheoreticalFuelUse = \frac{{BoilerLoad}}{{NominalThermalEfficiency}}\]</div>
+<div>$$TheoreticalFuelUse = \frac{{BoilerLoad}}{{NominalThermalEfficiency}}$$</div>
 
-<div>\[FuelUsed = \frac{{TheoreticalFuelUse}}{{BoilerEfficiencyCurveOuput}}\]</div>
+<div>$$FuelUsed = \frac{{TheoreticalFuelUse}}{{BoilerEfficiencyCurveOuput}}$$</div>
 
 -or-
 
-<div>\[FuelUsed = \frac{{BoilerLoad}}{{\left( {NominalThermalEfficiency} \right)\left( {BoilerEfficiencyCurveOutput} \right)}}\]</div>
+<div>$$FuelUsed = \frac{{BoilerLoad}}{{\left( {NominalThermalEfficiency} \right)\left( {BoilerEfficiencyCurveOutput} \right)}}$$</div>
 
 The final equation above includes the impact of the optional boiler efficiency performance curve. To highlight the use of the normalized boiler efficiency curve, the fuel use equation is also shown in an expanded format. The normalized boiler efficiency curve represents the changes in the boiler’s nominal thermal efficiency due to loading and changes in operating temperature. If the optional boiler efficiency curve is not used, the boiler’s nominal thermal efficiency remains constant throughout the simulation (i.e., BoilerEfficiencyCurveOutput = 1).
 
@@ -781,7 +783,7 @@ When a boiler efficiency curve is used, a constant efficiency boiler may be spec
 
 The parasitic electric power is calculated based on the user-defined parasitic electric load and the operating part load ratio calculated above. The model assumes that this parasitic power does not contribute to heating the water.
 
-<div>\[{P_{parasitic}} = {P_{load}}\left( {PLR} \right)\]</div>
+<div>$${P_{parasitic}} = {P_{load}}\left( {PLR} \right)$$</div>
 
 where:
 
@@ -817,19 +819,19 @@ Figure 159.  Schematic of Steam Boiler Operation
 
 Boiler Load is a summation of sensible and latent heat addition to the water stream as described with the following equation.  The mass flow rate through the boiler is known, while delta temp is the temperature difference between the boiler inlet and boiler outlet.  Latent heat of steam is calculated at loop operating temperature.
 
-<div>\[{Q_B} = \,\dot m\, \times \left[ {({c_{p,w}} \times \Delta T)\,\,\, + \,\,\,{h_{fg}}} \right]\]</div>
+<div>$${Q_B} = \,\dot m\, \times \left[ {({c_{p,w}} \times \Delta T)\,\,\, + \,\,\,{h_{fg}}} \right]$$</div>
 
 Theoretical fuel used is calculated with the following equation.  Boiler efficiency is a user input and accounts for all the losses in the steam boiler.
 
-<div>\[{F_t} = \frac{{{Q_B}}}{{{\eta_B}}}\]</div>
+<div>$${F_t} = \frac{{{Q_B}}}{{{\eta_B}}}$$</div>
 
 The operation part load ratio is calculated with the following equation.  This is later used to calculate the actual fuel consumption, its ratio of boiler load to boiler nominal capacity.
 
-<div>\[{O_{PLR}} = \frac{{{Q_B}}}{{{Q_{B,N}}}}\]</div>
+<div>$${O_{PLR}} = \frac{{{Q_B}}}{{{Q_{B,N}}}}$$</div>
 
 The actual fuel consumption by the boiler is calculated as using the following equation, where C1, C2, and C3 are the Part Load Ratio coefficients.
 
-<div>\[{F_{}} = \frac{{{F_t}}}{{{C_1}\,\, + \,\,{C_2}\,\, \times \,\,{O_{PLR}}\,\, + \,\,{C_3} \times \,{O_{PLR}}^2\,}}\]</div>
+<div>$${F_{}} = \frac{{{F_t}}}{{{C_1}\,\, + \,\,{C_2}\,\, \times \,\,{O_{PLR}}\,\, + \,\,{C_3} \times \,{O_{PLR}}^2\,}}$$</div>
 
 Essentially the boiler model provides a first order approximation of performance for fuel oil, gas, and electric boilers.  Boiler performance is based on theoretical boiler efficiency and a single quadratic fuel use-part load ratio curve represented in the equation above.  This single curve accounts for all combustion inefficiencies and stack losses.
 
@@ -841,59 +843,59 @@ The control algorithm for a steam boiler is an important issue.  The user may w
 
 At start of simulation an initial value of steam mass flow rate is calculated.  This is required to start the flow of steam around the loop.
 
-<div>\[If\,\,\,\,(FirstTimeThrough)\,\,\,THEN\]</div>
+<div>$$If\,\,\,\,(FirstTimeThrough)\,\,\,THEN$$</div>
 
 Calculate the boiler supply steam mass flow rate at start of simulation.
 
-<div>\[\,{\dot m_s}\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}\]</div>
+<div>$$\,{\dot m_s}\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}$$</div>
 
-<div>\[ELSE\]</div>   ! Not first time through
+<div>$$ELSE$$</div>   ! Not first time through
 
 Steam boiler calculations rely heavily on the variable <span>$\dot m$</span><sub>b</sub>, boiler mass flow rate.  This variable <span>$\dot m$</span><sub>b</sub> is the assigned equal to mass flow at boiler inlet node for preliminary calculations.
 
-<div>\[\,{\dot m_b}\,\,\, = \,\,\,\mathop {\,{{\dot m}_{Inlet\_Node}}}\limits^{} \]</div>
+<div>$$\,{\dot m_b}\,\,\, = \,\,\,\mathop {\,{{\dot m}_{Inlet\_Node}}}\limits^{} $$</div>
 
 Calculating the boiler delta temperature difference between the inlet and outlet nodes.  This calculation is used to determine various boiler control situation.
 
-<div>\[\Delta {T_{in\_out}}\,\, = \,\,{T_{SP}}\,\, - \,\,{T_{in}}\]</div>
+<div>$$\Delta {T_{in\_out}}\,\, = \,\,{T_{SP}}\,\, - \,\,{T_{in}}$$</div>
 
 In case the temperature difference calculated with the previous equation equation  is zero then the boiler just needs to supply latent heat to steam, else the boiler performs its normal load calculations by providing both sensible and latent heat to the inlet stream.
 
-<div>\[If\,\,(\Delta {T_{in\_out}}\,\, < \,\,\,\,0\,\,\,)\,\,\,THEN\]</div>
+<div>$$If\,\,(\Delta {T_{in\_out}}\,\, < \,\,\,\,0\,\,\,)\,\,\,THEN$$</div>
 
-<div>\[{Q_B}\,\, = \,\,\,{\dot m_b}\,\,\, \times \,\,{h_{fg}}\]</div>
+<div>$${Q_B}\,\, = \,\,\,{\dot m_b}\,\,\, \times \,\,{h_{fg}}$$</div>
 
-<div>\[ELSE\]</div>
+<div>$$ELSE$$</div>
 
-<div>\[{Q_B}\,\, = \,\,\,{\dot m_b}\,\,\, \times \,\,(\,\,\,{h_{fg}} + \,\,{c_{p,w}} \times \Delta {T_{in\_out}}\,\,)\]</div>
+<div>$${Q_B}\,\, = \,\,\,{\dot m_b}\,\,\, \times \,\,(\,\,\,{h_{fg}} + \,\,{c_{p,w}} \times \Delta {T_{in\_out}}\,\,)$$</div>
 
-<div>\[End\,\,If\]</div>
+<div>$$End\,\,If$$</div>
 
 Sometimes the boiler load Q<sub>B</sub> is greater than the demand side requested load at the current time step, which may occur because the boiler inlet conditions is from previous time step.  There is sudden fall in request of steam mass flow from the demand side.  The boiler now recalculates its new mass flow and adjusts to these new conditions.
 
-<div>\[If\,\,({Q_B}\,\, > \,\,{Q_{HeatingDemand}}\,\,\,)\,\,\,THEN\]</div>
+<div>$$If\,\,({Q_B}\,\, > \,\,{Q_{HeatingDemand}}\,\,\,)\,\,\,THEN$$</div>
 
 Boiler load is set equal to the new boiler heating demand and steam mass flow rate is recalculated.
 
-<div>\[{Q_B}\,\, = \,\,{Q_{HeatingDemand}}\]</div>
+<div>$${Q_B}\,\, = \,\,{Q_{HeatingDemand}}$$</div>
 
-<div>\[\,{\dot m_s}\,\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}\]</div>
+<div>$$\,{\dot m_s}\,\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}$$</div>
 
-<div>\[End\,\,If\]</div>
+<div>$$End\,\,If$$</div>
 
 In case the requested load exceeds the boiler nominal capacity, which is its maximum heating capacity.  In this case the requested steam mass flow is not met and the zone is not heated adequately.  This happens if the boiler is undersized.  The steam mass flow rate is recalculated at nominal capacity.
 
-<div>\[If\,\,({Q_B}\,\, > \,\,{Q_{No\min al\_Capacity}}\,\,\,)\,\,\,THEN\]</div>
+<div>$$If\,\,({Q_B}\,\, > \,\,{Q_{No\min al\_Capacity}}\,\,\,)\,\,\,THEN$$</div>
 
 Boiler load is set equal to boiler nominal capacity and steam mass flow rate recalculated.
 
-<div>\[{Q_B}\,\, = \,\,{Q_{No\min al\_Capacity}}\]</div>
+<div>$${Q_B}\,\, = \,\,{Q_{No\min al\_Capacity}}$$</div>
 
-<div>\[\,{\dot m_s}\,\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}\]</div>
+<div>$$\,{\dot m_s}\,\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}$$</div>
 
-<div>\[End\,\,If\]</div>
+<div>$$End\,\,If$$</div>
 
-<div>\[End\,\,If\]</div>
+<div>$$End\,\,If$$</div>
 
 End If statement for the boiler load control algorithm.  This algorithm determines all possible control conditions that might while simulating a system in EnergyPlus.
 
@@ -916,14 +918,9 @@ It is assumed that the steam boiler operates to maintain a desired temperature, 
 Table 50.  Steam Loop Nomenclature
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td><span>${Q_B}$</span></td>
-<td>Boiler Heat Transfer.  W.</td>
+<th><span>${Q_B}$</span></th>
+<th>Boiler Heat Transfer.  W.</th>
 </tr>
 <tr>
 <td><span>${Q_{B,N}}$</span></td>
@@ -1161,7 +1158,7 @@ The input object Chiller:Absorption provides a model for absorption chillers tha
 
 The part-load ratio of the absoprtion chiller’s evaporator is simply the actual cooling effect produced by the chiller divided by the maximum cooling effect available.
 
-<div>\[PLR = {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{{\dot Q}_{evap,\,\,rated}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot Q}_{evap,\,\,rated}}}$}}\]</div>
+<div>$$PLR = {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{{\dot Q}_{evap,\,\,rated}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot Q}_{evap,\,\,rated}}}$}}$$</div>
 
 where
 
@@ -1173,21 +1170,21 @@ where
 
 This absorption chiller model is based on a polynomial fit of absorber performance data.  The Generator Heat Input Part Load Ratio Curve is a quadratic equation that determines the ratio of the generator heat input to the *demand* on the chiller’s evaporator (Q<sub>evap</sub>).
 
-<div>\[GeneratorHeatInputRatio = \frac{{C1}}{{PLR}} + C2 + C3\left( {PLR} \right)\]</div>
+<div>$$GeneratorHeatInputRatio = \frac{{C1}}{{PLR}} + C2 + C3\left( {PLR} \right)$$</div>
 
 The Pump Electric Use Part Load Ratio Curve is a quadratic equation that determines the ratio of the actual absorber pumping power to the nominal pumping power.
 
-<div>\[ElectricInputRatio = C1 + C2 * PLR + C3 * PL{R^2}\]</div>
+<div>$$ElectricInputRatio = C1 + C2 * PLR + C3 * PL{R^2}$$</div>
 
 Thus, the coefficient sets establish the ratio of heat power in-to-cooling effect produced as a function of part load ratio.  The ratio of heat-power-in to cooling-effect-produced is the inverse of the coefficient of performance.
 
 If the operating part-load ratio is greater than the minimum part-load ratio, the chiller will run the entire time step and cycling will not occur (i.e. *CyclingFrac* = 1). If the operating part-load ratio is less than the minimum part-load ratio, the chiller will be on for a fraction of the time step equal to *CyclingFrac*. Steam (or hot water) and pump electrical energy use are also calculated using the chiller part-load cycling fraction.
 
-<div>\[CyclingFrac = MIN\left( {1,\frac{{PLR}}{{PL{R_{min}}}}} \right)\]</div>
+<div>$$CyclingFrac = MIN\left( {1,\frac{{PLR}}{{PL{R_{min}}}}} \right)$$</div>
 
-<div>\[{\dot Q_{generator}} = GeneratorHeatInputRatio\left( {{{\dot Q}_{evap}}} \right)\left( {CyclingFrac} \right)\]</div>
+<div>$${\dot Q_{generator}} = GeneratorHeatInputRatio\left( {{{\dot Q}_{evap}}} \right)\left( {CyclingFrac} \right)$$</div>
 
-<div>\[{\dot Q_{pump}} = ElectricInputRatio\left( {{P_{pump}}} \right)\left( {CyclingFrac} \right)\]</div>
+<div>$${\dot Q_{pump}} = ElectricInputRatio\left( {{P_{pump}}} \right)\left( {CyclingFrac} \right)$$</div>
 
 where
 
@@ -1207,9 +1204,9 @@ The evaporator water mass flow rate is calculated based on the Chiller Flow Mode
 
 **Variable Flow Chillers:**
 
-<div>\[\Delta {T_{evap}} = {T_{evap,\,in}} - {T_{evap,\,SP}}\]</div>
+<div>$$\Delta {T_{evap}} = {T_{evap,\,in}} - {T_{evap,\,SP}}$$</div>
 
-<div>\[{\dot m_{evap}} = {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}$}}\]</div>
+<div>$${\dot m_{evap}} = {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}$}}$$</div>
 
 where
 
@@ -1227,7 +1224,7 @@ where
 
 The evaporator outlet water temperature is then calculated based on the cooling effect produced and the evaporator entering water temperature.
 
-<div>\[{T_{evap,out}} = {T_{evap,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}$}}\]</div>
+<div>$${T_{evap,out}} = {T_{evap,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}$}}$$</div>
 
 where
 
@@ -1241,9 +1238,9 @@ where
 
 The condenser heat transfer and condenser leaving water temperature are also calculated.
 
-<div>\[{\dot Q_{cond}} = {\dot Q_{evap}} + {\dot Q_{generator}} + {\dot Q_{pump}}\]</div>
+<div>$${\dot Q_{cond}} = {\dot Q_{evap}} + {\dot Q_{generator}} + {\dot Q_{pump}}$$</div>
 
-<div>\[{T_{cond,out}} = {T_{cond,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{cond}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{cond}}} {{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}$}}\]</div>
+<div>$${T_{cond,out}} = {T_{cond,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{cond}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{cond}}} {{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}$}}$$</div>
 
 where
 
@@ -1263,9 +1260,9 @@ The absorption chiller can model the impact of steam or hot water entering the g
 
 When a steam loop is used and the inlet and outlet node names are specified (i.e. the nodes are connected to a steam loop), the generator outlet node steam mass flow rate and temperature are calculated based on the generator input power, latent heat of steam, the specific heat of water, and the amount of subcooling in the steam generator. The model assumes dry saturated steam enters the absorption chiller’s generator and exits the generator as a subcooled liquid. The temperature leaving the generator is calculated based on the user entered amount of liquid subcooling in the generator. The effect of subcooling of the liquid (condensate) in the pipe returning to the boiler is not modeled.
 
-<div>\[{\dot m_{steam}}\,\,\,\, = \,\,\,\,\,\frac{{{{\dot Q}_{generator}}}}{{{h_{fg}} + {c_{p,\,water}} \times \Delta {T_{sc}}}}\]</div>
+<div>$${\dot m_{steam}}\,\,\,\, = \,\,\,\,\,\frac{{{{\dot Q}_{generator}}}}{{{h_{fg}} + {c_{p,\,water}} \times \Delta {T_{sc}}}}$$</div>
 
-<div>\[{T_{generator,out}} = {T_{generator,in}} - \Delta {T_{sc}}\]</div>
+<div>$${T_{generator,out}} = {T_{generator,in}} - \Delta {T_{sc}}$$</div>
 
 where
 
@@ -1287,13 +1284,13 @@ When a hot water loop is used and the inlet and outlet node names are specified 
 
 **Constant Flow Chillers:**
 
-<div>\[{\dot m_{generator}} = {\dot m_{generator,max}}\]</div>
+<div>$${\dot m_{generator}} = {\dot m_{generator,max}}$$</div>
 
 **Variable Flow Chillers:**
 
-<div>\[{\dot m_{generator}} = {\raise0.7ex\hbox{${{{\dot Q}_{generator}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{generator}}} {{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}$}}\]</div>
+<div>$${\dot m_{generator}} = {\raise0.7ex\hbox{${{{\dot Q}_{generator}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{generator}}} {{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}$}}$$</div>
 
-<div>\[{T_{generator,out}} = {T_{generator,in}} - \frac{{{{\dot Q}_{generator}}}}{{{{\dot m}_{generator}}\left( {{C_{p\,,\,water}}} \right)}}\]</div>
+<div>$${T_{generator,out}} = {T_{generator,in}} - \frac{{{{\dot Q}_{generator}}}}{{{{\dot m}_{generator}}\left( {{C_{p\,,\,water}}} \right)}}$$</div>
 
 where
 
@@ -1315,13 +1312,13 @@ Figure 160. Schematic Diagram of a Single-Stage Absorption Chiller
 
 The chiller cooling effect (capacity) will change with a change in condenser water temperature. Similarly, the chiller cooling effect will change as the temperature of the evaporator water changes. The chiller cooling effect will also change with a change in or generator inlet water temperature and only applies when Hot Water is used as the generator heat source. A quadratic or cubic equation is used to modify the rated chiller capacity as a function of both the condenser and generator inlet water temperatures and the evaporator outlet water temperature. If any or all of the capacity correction factor curves are not used, the correction factors are assumed to be 1.
 
-<div>\[CAPF{T_{evaporator}} = a + b\left( {{T_{evaporator}}} \right) + c{\left( {{T_{evaporator}}} \right)^2} + d{\left( {{T_{evaporator}}} \right)^3}\]</div>
+<div>$$CAPF{T_{evaporator}} = a + b\left( {{T_{evaporator}}} \right) + c{\left( {{T_{evaporator}}} \right)^2} + d{\left( {{T_{evaporator}}} \right)^3}$$</div>
 
-<div>\[CAPF{T_{condenser}} = e + f\left( {{T_{condenser}}} \right) + g{\left( {{T_{condenser}}} \right)^2} + h{\left( {{T_{condenser}}} \right)^3}\]</div>
+<div>$$CAPF{T_{condenser}} = e + f\left( {{T_{condenser}}} \right) + g{\left( {{T_{condenser}}} \right)^2} + h{\left( {{T_{condenser}}} \right)^3}$$</div>
 
 <span>$CAPF{T_{generator}} = i + j\left( {{T_{generator}}} \right) + k{\left( {{T_{generator}}} \right)^2} + l{\left( {{T_{generator}}} \right)^3}$</span> (*Hot Water only*)
 
-<div>\[{\mathop Q\limits^\cdot_{evap,max}} = {\mathop Q\limits^\cdot_{evap,rated}}\left( {CAPF{T_{evaporator}}} \right)\left( {CAPF{T_{condenser}}} \right)\left( {CAPF{T_{generator}}} \right)\]</div>
+<div>$${\mathop Q\limits^\cdot_{evap,max}} = {\mathop Q\limits^\cdot_{evap,rated}}\left( {CAPF{T_{evaporator}}} \right)\left( {CAPF{T_{condenser}}} \right)\left( {CAPF{T_{generator}}} \right)$$</div>
 
 where
 
@@ -1343,7 +1340,7 @@ where
 
 The part-load ratio of the indirect absoprtion chiller’s evaporator is simply the actual cooling effect required (load) divided by the maximum cooling effect available.
 
-<div>\[PLR = {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{{\dot Q}_{evap,\,\,max}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot Q}_{evap,\,\,max}}}$}}\]</div>
+<div>$$PLR = {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{{\dot Q}_{evap,\,\,max}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot Q}_{evap,\,\,max}}}$}}$$</div>
 
 where
 
@@ -1353,11 +1350,11 @@ where
 
 The generator’s heat input is also a function of several parameters. The primary input for determining the heat input requirements is the Generator Heat Input function of Part-Load Ratio Curve. The curve is a quadratic or cubic equation that determines the ratio of the generator heat input to the chiller’s maximum capacity (Q<sub>evap,\\ max</sub>) and is solely a function of part-load ratio. Typical generator heat input ratios at full load (i.e., PLR=1) are between 1 and 2. Two additional curves are available to modifiy the heat input requirement based on the generator inlet water temperature and the evaporator outlet water temperature.
 
-<div>\[GeneratorHIR = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2} + d{\left( {PLR} \right)^3}\]</div>
+<div>$$GeneratorHIR = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2} + d{\left( {PLR} \right)^3}$$</div>
 
-<div>\[GenfCondT = e + f\left( {{T_{generator}}} \right) + g{\left( {{T_{generator}}} \right)^2} + h{\left( {{T_{generator}}} \right)^3}\]</div>
+<div>$$GenfCondT = e + f\left( {{T_{generator}}} \right) + g{\left( {{T_{generator}}} \right)^2} + h{\left( {{T_{generator}}} \right)^3}$$</div>
 
-<div>\[GenfEvapT = i + j\left( {{T_{evaporator}}} \right) + k{\left( {{T_{evaporator}}} \right)^2} + l{\left( {{T_{evaporator}}} \right)^3}\]</div>
+<div>$$GenfEvapT = i + j\left( {{T_{evaporator}}} \right) + k{\left( {{T_{evaporator}}} \right)^2} + l{\left( {{T_{evaporator}}} \right)^3}$$</div>
 
 where
 
@@ -1369,15 +1366,15 @@ where
 
 The Pump Electric Use function of Part-Load Ratio Curve is a quadratic or cubic equation that determines the ratio of the actual absorber pumping power to the nominal pumping power.
 
-<div>\[ElectricInputRatio = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2} + d{\left( {PLR} \right)^3}\]</div>
+<div>$$ElectricInputRatio = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2} + d{\left( {PLR} \right)^3}$$</div>
 
 If the chiller operating part-load ratio is greater than the minimum part-load ratio, the chiller will run the entire time step and cycling will not occur (i.e. *CyclingFrac* = 1). If the operating part-load ratio is less than the minimum part-load ratio, the chiller will be on for a fraction of the time step equal to *CyclingFrac*. Generator heat input and pump electrical energy use are also calculated using the chiller part-load cycling fraction.
 
-<div>\[CyclingFrac = MIN\left( {1.\frac{{PLR}}{{PL{R_{min}}}}} \right)\]</div>
+<div>$$CyclingFrac = MIN\left( {1.\frac{{PLR}}{{PL{R_{min}}}}} \right)$$</div>
 
-<div>\[{\dot Q_{generator}} = GeneratorHIR\left( {{{\dot Q}_{evap,\,max}}} \right)\left( {GenfCondT} \right)\left( {GenfEvapT} \right)\left( {CyclingFrac} \right)\]</div>
+<div>$${\dot Q_{generator}} = GeneratorHIR\left( {{{\dot Q}_{evap,\,max}}} \right)\left( {GenfCondT} \right)\left( {GenfEvapT} \right)\left( {CyclingFrac} \right)$$</div>
 
-<div>\[{\dot Q_{generator}} = ElectricInputRatio({P_{pump}})(CyclingFrac)\]</div>
+<div>$${\dot Q_{generator}} = ElectricInputRatio({P_{pump}})(CyclingFrac)$$</div>
 
 where
 
@@ -1393,13 +1390,13 @@ The evaporator water mass flow rate is calculated based on the Chiller Flow Mode
 
 **Constant Flow Chillers:**
 
-<div>\[{\dot m_{evap}} = {\dot m_{evap,max}}\]</div>
+<div>$${\dot m_{evap}} = {\dot m_{evap,max}}$$</div>
 
 **Variable Flow Chillers:**
 
-<div>\[\Delta {T_{evap}} = {T_{evap,\,in}} - {T_{evap,\,SP}}\]</div>
+<div>$$\Delta {T_{evap}} = {T_{evap,\,in}} - {T_{evap,\,SP}}$$</div>
 
-<div>\[{\dot m_{evap}} = {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}$}}\]</div>
+<div>$${\dot m_{evap}} = {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,evap}}\left( {\Delta {T_{evap}}} \right)}$}}$$</div>
 
 where
 
@@ -1417,7 +1414,7 @@ where
 
 The evaporator outlet water temperature is then calculated based on the cooling effect produced and the evaporator entering water temperature.
 
-<div>\[{T_{evap,out}} = {T_{evap,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}$}}\]</div>
+<div>$${T_{evap,out}} = {T_{evap,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{evap}}} {{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,evap}}\left( {{{\dot m}_{evap}}} \right)}$}}$$</div>
 
 where
 
@@ -1431,9 +1428,9 @@ where
 
 The condenser heat transfer and condenser leaving water temperature are also calculated.
 
-<div>\[{\dot Q_{cond}} = {\dot Q_{evap}} + {\dot Q_{generator}} + {\dot Q_{pump}}\]</div>
+<div>$${\dot Q_{cond}} = {\dot Q_{evap}} + {\dot Q_{generator}} + {\dot Q_{pump}}$$</div>
 
-<div>\[{T_{cond,out}} = {T_{cond,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{cond}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{cond}}} {{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}$}}\]</div>
+<div>$${T_{cond,out}} = {T_{cond,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{cond}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{cond}}} {{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,cond}}\left( {{{\dot m}_{cond}}} \right)}$}}$$</div>
 
 where
 
@@ -1453,11 +1450,11 @@ The absorption chiller can model the impact of steam or hot water entering the g
 
 When a steam loop is used and the inlet and outlet node names are specified (i.e. the nodes are connected to a steam loop), the generator outlet node steam mass flow rate and temperature are calculated based on the generator heat input, latent heat of steam, the specific heat of water, and the amount of subcooling in the steam generator. The model assumes dry saturated steam enters the generator and exits the generator as a subcooled liquid. The temperature leaving the generator is calculated based on the user entered amount of liquid subcooling in the generator. The effect of subcooling of the liquid (condensate) in the pipe returning to the boiler is also modeled using the user entered abount of steam condensate loop subcooling.
 
-<div>\[{\dot m_{steam}}\,\,\,\, = \,\,\,\,\,\frac{{{{\dot Q}_{generator}}}}{{{h_{fg}} + {c_{p,water}} \times \Delta {T_{sc}}}}\]</div>
+<div>$${\dot m_{steam}}\,\,\,\, = \,\,\,\,\,\frac{{{{\dot Q}_{generator}}}}{{{h_{fg}} + {c_{p,water}} \times \Delta {T_{sc}}}}$$</div>
 
-<div>\[{T_{generator,out}} = {T_{generator,in}} - \Delta {T_{sc}}\]</div>
+<div>$${T_{generator,out}} = {T_{generator,in}} - \Delta {T_{sc}}$$</div>
 
-<div>\[{T_{loop,out}} = {T_{generator,out}} - \Delta {T_{sc,\,\,loop}}\]</div>
+<div>$${T_{loop,out}} = {T_{generator,out}} - \Delta {T_{sc,\,\,loop}}$$</div>
 
 where
 
@@ -1481,13 +1478,13 @@ When a hot water loop is used and the inlet and outlet node names are specified 
 
 **Constant Flow Chillers:**
 
-<div>\[{\dot m_{generator}} = {\dot m_{generator,\,max}}\]</div>
+<div>$${\dot m_{generator}} = {\dot m_{generator,\,max}}$$</div>
 
 **Variable Flow Chillers:**
 
-<div>\[{\dot m_{generator}} = {\raise0.7ex\hbox{${{{\dot Q}_{generator}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{generator}}} {{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}$}}\]</div>
+<div>$${\dot m_{generator}} = {\raise0.7ex\hbox{${{{\dot Q}_{generator}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{generator}}} {{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}}}\right.}\!\lower0.7ex\hbox{${{C_{p,\,water}}\left( {\Delta {T_{generator}}} \right)}$}}$$</div>
 
-<div>\[{T_{generator,out}} = {T_{generator,in}} - \frac{{{{\dot Q}_{generator}}}}{{{{\dot m}_{generator}}\left( {{C_{p\,,\,water}}} \right)}}\]</div>
+<div>$${T_{generator,out}} = {T_{generator,in}} - \frac{{{{\dot Q}_{generator}}}}{{{{\dot m}_{generator}}\left( {{C_{p\,,\,water}}} \right)}}$$</div>
 
 where
 
@@ -1507,7 +1504,7 @@ This chiller is modeled like the electric chiller with the same numerical curve 
 
 The chiller’s temperature rise coefficient which is defined as the ratio of the required change in condenser water temperature to a given change in chilled water temperature, which maintains the capacity at the nominal value.  This is calculated as the following ratio:
 
-<div>\[\frac{{TCEn{t_{required}} - TCEn{t_{rated}}}}{{TEL{v_{required}} - TEL{v_{rated}}}}\]</div>
+<div>$$\frac{{TCEn{t_{required}} - TCEn{t_{rated}}}}{{TEL{v_{required}} - TEL{v_{rated}}}}$$</div>
 
 Where:
 
@@ -1521,11 +1518,11 @@ TELv<sub>rated</sub> = Rated leaving evaporator water outlet temperature at rate
 
 The Capacity Ratio Curve is a quadratic equation that determines the Ratio of Available Capacity to Nominal Capacity.  The defining equation is:
 
-<div>\[AvailToNominalCapacityRatio = {C_1} + {C_2}{\Delta_{temp}} + {C_3}\Delta_{temp}^2\]</div>
+<div>$$AvailToNominalCapacityRatio = {C_1} + {C_2}{\Delta_{temp}} + {C_3}\Delta_{temp}^2$$</div>
 
 Where the Delta Temperature is defined as:
 
-<div>\[{\Delta_{{\rm{Temp}}}} = \frac{{{\rm{TempCondIn  -  TempCondInDesign }}}}{{{\rm{TempRiseCoefficient}}}} - ({\rm{TempEvapOut  -  TempEvapOutDesign)}}\]</div>
+<div>$${\Delta_{{\rm{Temp}}}} = \frac{{{\rm{TempCondIn  -  TempCondInDesign }}}}{{{\rm{TempRiseCoefficient}}}} - ({\rm{TempEvapOut  -  TempEvapOutDesign)}}$$</div>
 
 TempCondIn = Temperature entering the condenser (water or air temperature depending on condenser type).
 
@@ -1541,15 +1538,15 @@ The following three fields contain the coefficients for the quadratic equation.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power.  The defining equation is:
 
-<div>\[FullLoadtoPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}\]</div>
+<div>$$FullLoadtoPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}$$</div>
 
 The Full Load Ratio Curve is a quadratic equation that determines the fraction of full load power.  The defining equation is:
 
-<div>\[FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\]</div>
+<div>$$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$$</div>
 
 The Fuel Input Curve is a polynomial equation that determines the Ratio of Fuel Input to Energy Output.  The equation combines both the Fuel Input Curve Coefficients and the Temperature Based Fuel Input Curve Coefficients.  The defining equation is:
 
-<div>\[FuelEnergyInput = PLoad * (FI{C_1} + FI{C_2}RLoad + FI{C_3}RLoa{d^2}) * (TBFI{C_1} + TBFI{C_2}A{T_{air}} + TBFI{C_3}AT_{air}^2)\]</div>
+<div>$$FuelEnergyInput = PLoad * (FI{C_1} + FI{C_2}RLoad + FI{C_3}RLoa{d^2}) * (TBFI{C_1} + TBFI{C_2}A{T_{air}} + TBFI{C_3}AT_{air}^2)$$</div>
 
 Where FIC represents the Fuel Input Curve Coefficients, TBFIC represents the Temperature Based Fuel Input Curve Coefficients, Rload is the Ratio of Load to Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the current ambient and design ambient temperatures.
 
@@ -1567,13 +1564,13 @@ Where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the T
 
 The Recovery Lubricant Heat Curve is a quadratic equation that determines the recovery lube energy.  The defining equation is:
 
-<div>\[RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})\]</div>
+<div>$$RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})$$</div>
 
 Where Pload is the engine load and RL is the Ratio of Load to Combustion Turbine Engine Capacity
 
 The UA is an equation that determines the overall heat transfer coefficient for the exhaust gasses with the stack.  The heat transfer coefficient ultimately helps determine the exhaust stack temperature.  The defining equation is:
 
-<div>\[UAToCapacityRatio = {C_1}GasTurbineEngineCapacit{y^{{C_2}}}\]</div>
+<div>$$UAToCapacityRatio = {C_1}GasTurbineEngineCapacit{y^{{C_2}}}$$</div>
 
 #### Chiller Basin Heater
 
@@ -1651,45 +1648,45 @@ Five performance curves are used in the calculation of cooling capacity and effi
 
 The cooling capacity function of temperature (*CoolCapfT*) curve represents the fraction of the cooling capacity of the chiller as it varies by temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser fluid temperature. The output of this curve is multiplied by the nominal cooling capacity to give the full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the design temperatures). The curve should have a value of 1.0 at the design temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
-<div>\[CoolCapfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}\]</div>
+<div>$$CoolCapfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}$$</div>
 
 The available cooling capacity of the chiller is then computed as follows:
 
-<div>\[AvailCoolCap = NomCoolCap \cdot CoolCapfT({T_{cw,l}},{T_{cond}})\]</div>
+<div>$$AvailCoolCap = NomCoolCap \cdot CoolCapfT({T_{cw,l}},{T_{cond}})$$</div>
 
 The fuel input to cooling output ratio function of temperature (*CFIRfT*) curve represents the fraction of the fuel input to the chiller at full load as it varies by temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser fluid temperature. The output of this curve is multiplied by the nominal fuel input to cooling output ratio (*CFIR*) to give the full-load fuel input to cooling capacity ratio at specific temperature operating conditions (i.e., at temperatures different from the design temperatures). The curve should have a value of 1.0 at the design temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
-<div>\[CFIRfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}\]</div>
+<div>$$CFIRfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}$$</div>
 
 The fuel input to cooling output ratio function of part load ratio (*CFIRfPLR*) curve represents the fraction of the fuel input to the chiller as the load on the chiller varies at a given set of  operating temperatures. The curve is normalized so that at full load the value of the curve should be 1.0. The curve is usually linear or quadratic.
 
-<div>\[CFIRfPLR = a + b \cdot CPLR + c \cdot CPL{R^2}\]</div>
+<div>$$CFIRfPLR = a + b \cdot CPLR + c \cdot CPL{R^2}$$</div>
 
 The fraction of the time step during which the chiller heater is operating is computed as a function of the cooling and heating part-load ratios and the user-input minimum part-load ratio:
 
-<div>\[RunFrac = {\mathop{\rm MIN}\nolimits} \left( {1.0,{\mathop{\rm MAX}\nolimits} \left( {HPLR,CPLR} \right)/MinPLR} \right)\]</div>
+<div>$$RunFrac = {\mathop{\rm MIN}\nolimits} \left( {1.0,{\mathop{\rm MAX}\nolimits} \left( {HPLR,CPLR} \right)/MinPLR} \right)$$</div>
 
 The cooling fuel input to the chiller is then computed as follows:
 
-<div>\[\begin{array}{l}CoolFuelInput = \\AvailCoolCap \cdot RunFrac \cdot CFIR \cdot CFIRfT({T_{cw,l}},{T_{cond}}) \cdot CFIRfPLR(CPLR)\end{array}\]</div>
+<div>$$\begin{array}{l}CoolFuelInput = \\AvailCoolCap \cdot RunFrac \cdot CFIR \cdot CFIRfT({T_{cw,l}},{T_{cond}}) \cdot CFIRfPLR(CPLR)\end{array}$$</div>
 
 The electric input to cooling output ratio as function of temperature (*CEIRfT*) curve represents the fraction of electricity to the chiller at full load as it varies by temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser fluid temperature.
 
-<div>\[CEIRfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}\]</div>
+<div>$$CEIRfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}$$</div>
 
 The electric input to cooling output ratio function of part load ratio (*CEIRfPLR*) curve represents the fraction of electricity to the chiller as the load on the chiller varies at a given set of operating temperatures. The curve is normalized so that at full load the value of the curve should be 1.0. The curve is usually linear or quadratic.
 
-<div>\[CEIRfPLR = a + b \cdot CPLR + c \cdot CPL{R^2}\]</div>
+<div>$$CEIRfPLR = a + b \cdot CPLR + c \cdot CPL{R^2}$$</div>
 
 The cooling electric input to the chiller is computed as follows:
 
-<div>\[CoolElectricPower = NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT({T_{cw,l}},{T_{cond}}) \cdot CEIRfPLR(CPLR)\]</div>
+<div>$$CoolElectricPower = NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT({T_{cw,l}},{T_{cond}}) \cdot CEIRfPLR(CPLR)$$</div>
 
 All five of these cooling performance curves are accessed through EnergyPlus’ built-in performance curve equation manager (objects Curve:Linear, Curve:Quadratic and Curve:Biquadratic). It is not imperative that the user utilize all coefficients in the performance curve equations if their performance equation has fewer terms (e.g., if the user’s *CFIRfPLR* performance curve is linear instead of quadratic, simply enter the values for a and b, and set coefficient c equal to zero).
 
 The condenser load is computed as follows:
 
-<div>\[CondenserLoad = CoolingLoad + {\raise0.7ex\hbox{${CoolFuelInput}$} \!\mathord{\left/ {\vphantom {{CoolFuelInput} {HFIR}}}\right.}\!\lower0.7ex\hbox{${HFIR}$}} + CoolElectricPower\]</div>
+<div>$$CondenserLoad = CoolingLoad + {\raise0.7ex\hbox{${CoolFuelInput}$} \!\mathord{\left/ {\vphantom {{CoolFuelInput} {HFIR}}}\right.}\!\lower0.7ex\hbox{${HFIR}$}} + CoolElectricPower$$</div>
 
 #### Heating
 
@@ -1738,27 +1735,27 @@ The two performance curves for heating capacity and efficiency are:
 
 The heating capacity function of cooling capacity curve (*HeatCapfCool*) determines how the heating capacity of the chiller varies with cooling capacity when the chiller is simultaneously heating and cooling. The curve is normalized so an input of 1.0 represents the nominal cooling capacity and an output of 1.0 represents the full heating capacity.  An output of 1.0 should occur when the input is 0.0.
 
-<div>\[HeatCapfCPLR = a + b \cdot CPLRh + c \cdot CPLR{h^2}\]</div>
+<div>$$HeatCapfCPLR = a + b \cdot CPLRh + c \cdot CPLR{h^2}$$</div>
 
 The available heating capacity is then computed as follows:
 
-<div>\[AvailHeatCap = NomCoolCap \cdot HeatCoolCapRatio \cdot HeatCapfCPLR(CPLRh)\]</div>
+<div>$$AvailHeatCap = NomCoolCap \cdot HeatCoolCapRatio \cdot HeatCapfCPLR(CPLRh)$$</div>
 
 The fuel input to heat output ratio curve (*HFIRfHPLR*) function is used to represent the fraction of fuel used as the heating load varies as a function of heating part load ratio. It is normalized so that a value of 1.0 is the full available heating capacity. The curve is usually linear or quadratic and will probably be similar to a boiler curve for most chillers.
 
-<div>\[HFIRfHPLR = a + b \cdot HPLR + c \cdot HPL{R^2}\]</div>
+<div>$$HFIRfHPLR = a + b \cdot HPLR + c \cdot HPL{R^2}$$</div>
 
 The fuel use rate when heating is computed as follows:
 
-<div>\[HeatFuelInput = AvailHeatCap \cdot HFIR \cdot HFIRfHPLR(HPLR)\]</div>
+<div>$$HeatFuelInput = AvailHeatCap \cdot HFIR \cdot HFIRfHPLR(HPLR)$$</div>
 
 The fraction of the time step during which the chiller is operating is computed as a function of the cooling and heating part-load ratios and the user-input minimum part-load ratio:
 
-<div>\[RunFrac = {\mathop{\rm MIN}\nolimits} \left( {1.0,{\mathop{\rm MAX}\nolimits} \left( {HPLR,CPLRh} \right)/MinPLR} \right)\]</div>
+<div>$$RunFrac = {\mathop{\rm MIN}\nolimits} \left( {1.0,{\mathop{\rm MAX}\nolimits} \left( {HPLR,CPLRh} \right)/MinPLR} \right)$$</div>
 
 The heating electric input to the chiller is computed as follows:
 
-<div>\[HeatElectricPower = NomCoolCap \cdot HeatCoolCapRatio \cdot HEIR \cdot RunFrac\]</div>
+<div>$$HeatElectricPower = NomCoolCap \cdot HeatCoolCapRatio \cdot HEIR \cdot RunFrac$$</div>
 
 If the chiller is delivering heating and cooling simultaneously, the parasitic electric load will be double-counted, so the following logic is applied:
 
@@ -1772,7 +1769,7 @@ ENDIF
 
 The total fuel and electric power input to the chiller is computed as shown below:
 
-<div>\[\begin{array}{l}TotalElectricPower = HeatElectricPower + CoolElectricPower\\TotalFuelInput = HeatFuelInput + CoolFuelInput\end{array}\]</div>
+<div>$$\begin{array}{l}TotalElectricPower = HeatElectricPower + CoolElectricPower\\TotalFuelInput = HeatFuelInput + CoolFuelInput\end{array}$$</div>
 
 ### ChillerHeater:Absorption:DoubleEffect
 
@@ -1856,51 +1853,51 @@ Five performance curves are used in the calculation of cooling capacity and effi
 
 The cooling capacity function of temperature (*CoolCapfT*) curve represents the fraction of the cooling capacity of the chiller as it varies with temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and the entering condenser fluid temperature. The output of this curve is multiplied by the nominal cooling capacity to give the full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the design temperatures). The curve should have a value of 1.0 at the design temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
-<div>\[CoolCapfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}\]</div>
+<div>$$CoolCapfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}$$</div>
 
 The available cooling capacity of the chiller is then computed as follows:
 
-<div>\[AvailCoolCap = NomCoolCap \cdot CoolCapfT({T_{cw,l}} - {T_{cond}})\]</div>
+<div>$$AvailCoolCap = NomCoolCap \cdot CoolCapfT({T_{cw,l}} - {T_{cond}})$$</div>
 
 The thermal energy input to cooling output ratio function of temperature (*TeFIRfT*) curve represents the fraction of the thermal energy input to the chiller at full load as it varies with temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and the entering condenser fluid temperature. The output of this curve is multiplied by the nominal thermal energy input to cooling output ratio (*TeFIR*) to give the full-load thermal energy input to cooling capacity ratio at specific temperature operating conditions (i.e., at temperatures different from the design temperatures). The curve should have a value of 1.0 at the design temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
-<div>\[TeFIRfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}\]</div>
+<div>$$TeFIRfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}$$</div>
 
 The thermal energy input to cooling output ratio function of part load ratio (*TeFIRfPLR*) curve represents the fraction of the thermal energy input to the chiller as the load on the chiller varies at a given set of  operating temperatures. The curve is normalized so that at full load the value of the curve should be 1.0. The curve is usually linear or quadratic.
 
-<div>\[TeFIRfPLR = a + b \cdot CPLR + c \cdot CPL{R^2}\]</div>
+<div>$$TeFIRfPLR = a + b \cdot CPLR + c \cdot CPL{R^2}$$</div>
 
 The fraction of the time step during which the chiller heater is operating is computed as a function of the cooling and heating part-load ratios and the user-input minimum part-load ratio:
 
-<div>\[RunFrac = MIN(1.0,MAX\left( {HPLR,CPLR} \right)/MinPLR)\]</div>
+<div>$$RunFrac = MIN(1.0,MAX\left( {HPLR,CPLR} \right)/MinPLR)$$</div>
 
 The cooling thermal energy input to the chiller is then computed as follows:
 
-<div>\[CoolThermalEnergyInput = AvailCoolCap \cdot RunFrac \cdot TeFIR \cdot TeFIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \cdot TeFIRfPLR(CPLR)\]</div>
+<div>$$CoolThermalEnergyInput = AvailCoolCap \cdot RunFrac \cdot TeFIR \cdot TeFIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \cdot TeFIRfPLR(CPLR)$$</div>
 
 To make sure that the exhaust mass flow rate and temperature from microturbine are sufficient to drive the chiller, the heat recovery potential is compared with the cooling thermal energy input to the chiller (CoolThermalEergyInput). The heat recovery potential should be greater than the CoolThermalEnergyInput. Heat recovery potential is calculated as:
 
-<div>\[{Q_{Recovery}} = {\dot m_{ExhAir}} \cdot {\rm{}}C{p_{Air}} \cdot {\rm{}}({T_{a,o}} - {T_{Abs,gen,o}})\]</div>
+<div>$${Q_{Recovery}} = {\dot m_{ExhAir}} \cdot {\rm{}}C{p_{Air}} \cdot {\rm{}}({T_{a,o}} - {T_{Abs,gen,o}})$$</div>
 
 T<sub>abs,gen,o </sub> is the minimum temperature required for the proper operation of the double-effect chiller. It will be defaulted to 176°C.
 
 The electric input to cooling output ratio as function of temperature (*CEIRfT*) curve represents the fraction of electricity to the chiller at full load as it varies with temperature. This a biquadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser fluid temperature.
 
-<div>\[CEIRfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}\]</div>
+<div>$$CEIRfT = a + b{T_{cw,l}} + cT_{cw,l}^2 + d{T_{cond}} + eT_{cond}^2 + f{T_{cw,l}}{T_{cond}}$$</div>
 
 The electric input to cooling output ratio function of part load ratio (*CEIRfPLR*) curve represents the fraction of electricity to the chiller as the load on the chiller varies at a given set of operating temperatures. The curve is normalized so that at full load the value of the curve should be 1.0. The curve is usually linear or quadratic.
 
-<div>\[CEIRfPLR = a + b \cdot CPLR + c \cdot CPL{R^2}\]</div>
+<div>$$CEIRfPLR = a + b \cdot CPLR + c \cdot CPL{R^2}$$</div>
 
 The cooling electric input to the chiller is computed as follows:
 
-<div>\[CoolElectricPower = NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \cdot CEIRfPLR(CPLR)\]</div>
+<div>$$CoolElectricPower = NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \cdot CEIRfPLR(CPLR)$$</div>
 
 All five of these cooling performance curves are accessed through EnergyPlus’ built-in performance curve equation manager (objects Curve:Linear, Curve:Quadratic and Curve:Biquadratic). It is not imperative that the user utilize all coefficients in the performance curve equations if their performance equation has fewer terms (e.g., if the user’s *TeFIRfPLR* performance curve is linear instead of quadratic, simply enter the values for a and b, and set coefficient c equal to zero). A set of curves derived from manufacturer’s data are also provided in the dataset (ExhaustFiredChiller.idf) is provided with E+ installation.
 
 The condenser load is computed as follows:
 
-<div>\[CondenserLoad = CoolingLoad + CoolThermalEnergyInput/HFIR + CoolElectricPower\]</div>
+<div>$$CondenserLoad = CoolingLoad + CoolThermalEnergyInput/HFIR + CoolElectricPower$$</div>
 
 #### Heating
 
@@ -1951,37 +1948,37 @@ The two performance curves for heating capacity and efficiency are:
 
 The heating capacity function of cooling capacity curve (*HeatCapfCPLR*) determines how the heating capacity of the chiller varies with cooling capacity when the chiller is simultaneously heating and cooling. The curve is normalized so an input of 1.0 represents the nominal cooling capacity and an output of 1.0 represents the full heating capacity.  An output of 1.0 should occur when the input is 0.0.
 
-<div>\[HeatCapfCPLR = a + b \cdot CPLRh + c \cdot CPLR{h^2}\]</div>
+<div>$$HeatCapfCPLR = a + b \cdot CPLRh + c \cdot CPLR{h^2}$$</div>
 
 The available heating capacity is then computed as follows:
 
-<div>\[AvailHeatCap = NomCoolCap \cdot HeatCoolCapRatio \cdot HeatCapfCPLR(CPLRh)\]</div>
+<div>$$AvailHeatCap = NomCoolCap \cdot HeatCoolCapRatio \cdot HeatCapfCPLR(CPLRh)$$</div>
 
 The thermal energy input to heat output ratio curve (*HFIRfHPLR*) function is used to represent the fraction of thermal energy used as the heating load varies as a function of heating part load ratio. It is normalized so that a value of 1.0 is the full available heating capacity. The curve is usually linear or quadratic and will probably be similar to a boiler curve for most chillers.
 
-<div>\[HFIRfHPLR = a + b \cdot HPLR + c \cdot HPL{R^2}\]</div>
+<div>$$HFIRfHPLR = a + b \cdot HPLR + c \cdot HPL{R^2}$$</div>
 
 The thermal energy use rate when heating is computed as follows:
 
-<div>\[HeatThermalEnergyInput = AvailHeatCap.HFIR.HFIRfHPLR(HPLR)\]</div>
+<div>$$HeatThermalEnergyInput = AvailHeatCap.HFIR.HFIRfHPLR(HPLR)$$</div>
 
 The fraction of the time step during which the chiller is operating is computed as a function of the cooling and heating part-load ratios and the user-input minimum part-load ratio:
 
-<div>\[RunFrac = MIN(1.0,MAX\left( {HPLR,CPLRh} \right)/MinPLR)\]</div>
+<div>$$RunFrac = MIN(1.0,MAX\left( {HPLR,CPLRh} \right)/MinPLR)$$</div>
 
 The heating electric input to the chiller is computed as follows:
 
-<div>\[HeatElectricPower = NomCoolCap \cdot HeatCoolCapRatio \cdot HEIR.RunFrac\]</div>
+<div>$$HeatElectricPower = NomCoolCap \cdot HeatCoolCapRatio \cdot HEIR.RunFrac$$</div>
 
 If the chiller is delivering heating and cooling simultaneously, the parasitic electric load would be double-counted, so the following logic is applied:
 
-<div>\[\begin{array}{l}IF\left( {HeatElectricPower \le CoolElectricPower} \right)THEN\\\quad HeatElectricPower = 0.0\\ELSE\\\quad HeatElectricPower = HeatElectricPower - CoolElectricPower\\ENDIF\end{array}\]</div>
+<div>$$\begin{array}{l}IF\left( {HeatElectricPower \le CoolElectricPower} \right)THEN\\\quad HeatElectricPower = 0.0\\ELSE\\\quad HeatElectricPower = HeatElectricPower - CoolElectricPower\\ENDIF\end{array}$$</div>
 
 The total thermal energy and electric power input to the chiller is computed as shown below:
 
-<div>\[TotalElectricPower = HeatElectricPower + CoolElectricPower\]</div>
+<div>$$TotalElectricPower = HeatElectricPower + CoolElectricPower$$</div>
 
-<div>\[TotalThermalEnergyInput = HeatThermalEnergyInput + CoolThermalEnergyInput\]</div>
+<div>$$TotalThermalEnergyInput = HeatThermalEnergyInput + CoolThermalEnergyInput$$</div>
 
 #### References
 
@@ -2059,13 +2056,13 @@ The algorithm for the heat recovery portion of the chiller needs to be determine
 
 The basic energy balance for the condenser section of a heat recovery chiller is
 
-<div>\[{\dot Q_{tot}} = {\dot Q_{Evap}} + {\dot Q_{Elec}} = {\dot Q_{Cond}} + {\dot Q_{HR}}\]</div>
+<div>$${\dot Q_{tot}} = {\dot Q_{Evap}} + {\dot Q_{Elec}} = {\dot Q_{Cond}} + {\dot Q_{HR}}$$</div>
 
 In practice, if the entering temperature of the heat recovery hot fluid is too high, the chiller’s internal controls will redirect refrigerant away from the heat recovery bundle.  A user input is available for declaring the inlet high temperature limit, and if it is exceeded, the chiller will shut down heat recovery and request no flow and will not reject any condenser heat to that fluid.
 
 The heat recovery condenser bundle is often physically smaller than the tower water condenser bundle and therefore may have limited heat transfer capacity.  User input for the relative capacity of the heat recovery bundle, <span>${F_{HR,Cap}}$</span>, is used to define a maximum rate of heat recovery heat transfer using
 
-<div>\[{\dot Q_{HR,Max}} = {F_{HR,Cap}}\left( {{{\dot Q}_{Evap,Ref}} + \frac{{{{\dot Q}_{Evap,Ref}}}}{{CO{P_{Ref}}}}} \right)\]</div>
+<div>$${\dot Q_{HR,Max}} = {F_{HR,Cap}}\left( {{{\dot Q}_{Evap,Ref}} + \frac{{{{\dot Q}_{Evap,Ref}}}}{{CO{P_{Ref}}}}} \right)$$</div>
 
 This capacity factor is also used to autosize the heat recovery design fluid flow rate when it is set to autosize.  The design heat recover flow rate is calculated by multiplying <span>${F_{HR,Cap}}$</span> by the condenser tower water design flow rate.  If no capacity factor is input, it is assumed to be 1.0.
 
@@ -2073,49 +2070,49 @@ A heat recovery chiller may control the temperature of heat recovery fluid leavi
 
 If no control setpoint node was named, then the model developed by Liesen and Chillar (2004) is used to approximate the relative distribution of refrigerant flow and condenser heat transfer between the bundles.  This model approximates the heat transfer situation by using average temperatures in and out of the condenser section.
 
-<div>\[{Q_{Tot}} = ({\dot m_{Heat{\mathop{\rm Re}\nolimits} c}}*C{p_{Heat{\mathop{\rm Re}\nolimits} c}} + {\dot m_{Cond}}*C{p_{Cond}})*({T_{AvgOut}} - {T_{AvgIn}})\]</div>
+<div>$${Q_{Tot}} = ({\dot m_{Heat{\mathop{\rm Re}\nolimits} c}}*C{p_{Heat{\mathop{\rm Re}\nolimits} c}} + {\dot m_{Cond}}*C{p_{Cond}})*({T_{AvgOut}} - {T_{AvgIn}})$$</div>
 
 Then the inlet temperature is flow-weighted to determine lumped inlet and outlet conditions.
 
-<div>\[{T_{AvgIn}} = \frac{{({{\dot m}_{Heat{\mathop{\rm Re}\nolimits} c}}*C{p_{Heat{\mathop{\rm Re}\nolimits} c}}*{T_{Heat{\mathop{\rm Re}\nolimits} cIn}} + {{\dot m}_{Cond}}*C{p_{Cond}}*{T_{CondIn}})}}{{({{\dot m}_{Heat{\mathop{\rm Re}\nolimits} c}}*C{p_{Heat{\mathop{\rm Re}\nolimits} c}} + {{\dot m}_{Cond}}*C{p_{Cond}})}}\]</div>
+<div>$${T_{AvgIn}} = \frac{{({{\dot m}_{Heat{\mathop{\rm Re}\nolimits} c}}*C{p_{Heat{\mathop{\rm Re}\nolimits} c}}*{T_{Heat{\mathop{\rm Re}\nolimits} cIn}} + {{\dot m}_{Cond}}*C{p_{Cond}}*{T_{CondIn}})}}{{({{\dot m}_{Heat{\mathop{\rm Re}\nolimits} c}}*C{p_{Heat{\mathop{\rm Re}\nolimits} c}} + {{\dot m}_{Cond}}*C{p_{Cond}})}}$$</div>
 
-<div>\[{T_{AvgOut}} = \frac{{{Q_{Tot}}}}{{({{\dot m}_{Heat{\mathop{\rm Re}\nolimits} c}}*C{p_{Heat{\mathop{\rm Re}\nolimits} c}} + {{\dot m}_{Cond}}*C{p_{Cond}})}} + {T_{AvgIn}}\]</div>
+<div>$${T_{AvgOut}} = \frac{{{Q_{Tot}}}}{{({{\dot m}_{Heat{\mathop{\rm Re}\nolimits} c}}*C{p_{Heat{\mathop{\rm Re}\nolimits} c}} + {{\dot m}_{Cond}}*C{p_{Cond}})}} + {T_{AvgIn}}$$</div>
 
 The lumped outlet temperature is then used for an approximate method of determining the heat recovery rate
 
-<div>\[{\dot Q_{HR}} = {\dot m_{HR}}{c_p}_{HR}\left( {{T_{Avg,out}} - {T_{HR,in}}} \right)\]</div>
+<div>$${\dot Q_{HR}} = {\dot m_{HR}}{c_p}_{HR}\left( {{T_{Avg,out}} - {T_{HR,in}}} \right)$$</div>
 
 This rate is then limited by the physical size of the heat recovery bundle.
 
-<div>\[{\dot Q_{HR}} = Min\left( {{{\dot Q}_{HR}},{{\dot Q}_{HR,max}}} \right)\]</div>
+<div>$${\dot Q_{HR}} = Min\left( {{{\dot Q}_{HR}},{{\dot Q}_{HR,max}}} \right)$$</div>
 
 If user input for the leaving temperature setpoint is available, then a second model is used to distribute refrigerant flow and condenser heat transfer between the bundles that attempts to meet the heat recovery load implied by the leaving setpoint.  When setpoint control is used, the desired rate of heat recovery heat transfer is:
 
-<div>\[{\dot Q_{HR,Setpoint}} = {\dot m_{HR}}{c_p}_{HR}\left( {{T_{HR,set}} - {T_{HR,in}}} \right)\]</div>
+<div>$${\dot Q_{HR,Setpoint}} = {\dot m_{HR}}{c_p}_{HR}\left( {{T_{HR,set}} - {T_{HR,in}}} \right)$$</div>
 
-<div>\[{\dot Q_{HR,Setpoint}} = Max\left( {{{\dot Q}_{HR,Setpoint}},0.0} \right)\]</div>
+<div>$${\dot Q_{HR,Setpoint}} = Max\left( {{{\dot Q}_{HR,Setpoint}},0.0} \right)$$</div>
 
 Then the heat recovery rate is simply modeled as the lower of the three different heat flow rates:  the desired capacity, the maximum capacity, and the current total heat rejection rate.
 
-<div>\[{\dot Q_{HR}} = Min\left( {{{\dot Q}_{HR,Setpoint}},{{\dot Q}_{HR,max}},{{\dot Q}_{Tot}}} \right)\]</div>
+<div>$${\dot Q_{HR}} = Min\left( {{{\dot Q}_{HR,Setpoint}},{{\dot Q}_{HR,max}},{{\dot Q}_{Tot}}} \right)$$</div>
 
 For both models, the condenser heat transfer rate is then
 
-<div>\[{\dot Q_{Cond}} = {\dot Q_{Tot}} - {\dot Q_{HR}}\]</div>
+<div>$${\dot Q_{Cond}} = {\dot Q_{Tot}} - {\dot Q_{HR}}$$</div>
 
 The outlet temperatures are then calculated using
 
-<div>\[{T_{HR,out}} = {T_{HR,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{HR}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{HR}}} {{{\dot m}_{HR}}{c_p}_{HR}}}}\right.}\!\lower0.7ex\hbox{${{{\dot m}_{HR}}{c_p}_{HR}}$}}\]</div>
+<div>$${T_{HR,out}} = {T_{HR,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{HR}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{HR}}} {{{\dot m}_{HR}}{c_p}_{HR}}}}\right.}\!\lower0.7ex\hbox{${{{\dot m}_{HR}}{c_p}_{HR}}$}}$$</div>
 
-<div>\[{T_{Cond,out}} = {T_{Cond,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{Cond}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{Cond}}} {{{\dot m}_{Cond}}{c_p}_{cond}}}}\right.}\!\lower0.7ex\hbox{${{{\dot m}_{Cond}}{c_p}_{cond}}$}}\]</div>
+<div>$${T_{Cond,out}} = {T_{Cond,in}} + {\raise0.7ex\hbox{${{{\dot Q}_{Cond}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{Cond}}} {{{\dot m}_{Cond}}{c_p}_{cond}}}}\right.}\!\lower0.7ex\hbox{${{{\dot m}_{Cond}}{c_p}_{cond}}$}}$$</div>
 
 A heat recovery chiller may need to work harder because the refrigeration system faces a higher lift owing to an elevated effective temperature for heat rejection.  With heat recovery, the condenser temperature used with the chiller’s performance curves is determined using one of the following heat-flow-weighted methods. The first is used for the chiller model for the objects Chiller:Electric, and Chiller:Electric:EIR which use the condensing entering temperature for performance.
 
-<div>\[{T_{Cond,in,Avg}} = \frac{{\left( {{{\dot Q}_{HR}}{T_{HR,in}} + {{\dot Q}_{Cond}}{T_{Cond,in}}} \right)}}{{\left( {{{\dot Q}_{HR}} + {{\dot Q}_{Cond}}} \right)}}\]</div>
+<div>$${T_{Cond,in,Avg}} = \frac{{\left( {{{\dot Q}_{HR}}{T_{HR,in}} + {{\dot Q}_{Cond}}{T_{Cond,in}}} \right)}}{{\left( {{{\dot Q}_{HR}} + {{\dot Q}_{Cond}}} \right)}}$$</div>
 
 The second is used for the chiller model for the object Chiller:Electric:ReformulatedEIR which uses the leaving condenser fluid temperature.
 
-<div>\[{T_{Cond,out,Avg}} = \frac{{\left( {{{\dot Q}_{HR}}{T_{HR,out}} + {{\dot Q}_{Cond}}{T_{Cond,out}}} \right)}}{{\left( {{{\dot Q}_{HR}} + {{\dot Q}_{Cond}}} \right)}}\]</div>
+<div>$${T_{Cond,out,Avg}} = \frac{{\left( {{{\dot Q}_{HR}}{T_{HR,out}} + {{\dot Q}_{Cond}}{T_{Cond,out}}} \right)}}{{\left( {{{\dot Q}_{HR}} + {{\dot Q}_{Cond}}} \right)}}$$</div>
 
 Both of these are available as an output variable called Chiller Effective Heat Rejection Tempeature, in C.
 
@@ -2131,15 +2128,15 @@ Leisen and Chillar. 2004. Variable Heat Recovery In Double Bundle Electric Chill
 
 The centrifugal chiller model (object name Chiller:Electric) was originally developed for the BLAST program.  The model is based on a ‘capacity ratio’ curve, which is a quadratic equation that determines the Ratio of Available Capacity to Nominal Capacity. The defining equation is:
 
-<div>\[CapRatio = \frac{{Available Chiller Capacity}}{{Nominal Chiller Capacity}} = {A_1} + {A_2}\Delta {T_{chiller}} + {A_3}\Delta {T_{chiller}}^2\]</div>
+<div>$$CapRatio = \frac{{Available Chiller Capacity}}{{Nominal Chiller Capacity}} = {A_1} + {A_2}\Delta {T_{chiller}} + {A_3}\Delta {T_{chiller}}^2$$</div>
 
 Where the Delta Temperature is defined as:
 
-<div>\[\Delta {T_{chiller}} = \frac{{{T_{cond, in}} - {T_{cond,in,design}}}}{{TempRiseRatio}} - \left( {{T_{evap,out}} - {T_{evap,out,design}}} \right)\]</div>
+<div>$$\Delta {T_{chiller}} = \frac{{{T_{cond, in}} - {T_{cond,in,design}}}}{{TempRiseRatio}} - \left( {{T_{evap,out}} - {T_{evap,out,design}}} \right)$$</div>
 
 where the temperature rise coefficient is defined as the ratio of the required change in condenser water temperature to a given change in chilled water temperature, which maintains the capacity at the nominal value.  If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers. This is calculated as the following ratio:
 
-<div>\[TempRiseRatio = \frac{{{T_{cond, in,required}} - {T_{cond,in,rated}}}}{{{T_{evap, out,required}} - {T_{evap,out,rated}}}} - \left( {{T_{evap,out}} - {T_{evap,out,design}}} \right)\]</div>
+<div>$$TempRiseRatio = \frac{{{T_{cond, in,required}} - {T_{cond,in,rated}}}}{{{T_{evap, out,required}} - {T_{evap,out,rated}}}} - \left( {{T_{evap,out}} - {T_{evap,out,design}}} \right)$$</div>
 
 Where:
 
@@ -2153,21 +2150,21 @@ Where:
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power.  The defining equation is:
 
-<div>\[PowerRatio = {B_1} + {B_2}PLR + {B_3}PL{R^2}\]</div>
+<div>$$PowerRatio = {B_1} + {B_2}PLR + {B_3}PL{R^2}$$</div>
 
 where the part load ratio, PLR is defined as:
 
-<div>\[PLR = \frac{{chiller cooling load}}{{nominal chiller capacity}}\]</div>
+<div>$$PLR = \frac{{chiller cooling load}}{{nominal chiller capacity}}$$</div>
 
 The Load Ratio Curve is a quadratic equation that determines the Ratio of Actual Cooling Load to Full Cooling Load.  The defining equation is:
 
-<div>\[LoadRatio = {C_1} + {C_2}CapRatio + {C_3}CapRati{o^2}\]</div>
+<div>$$LoadRatio = {C_1} + {C_2}CapRatio + {C_3}CapRati{o^2}$$</div>
 
 The evaporator heat transfer rate and the power required by the chiller are then calculated as:
 
-<div>\[Qevap = AvailableChillerCap*PLR\]</div>
+<div>$$Qevap = AvailableChillerCap*PLR$$</div>
 
-<div>\[Power = PowerRatio*LoadRatio*\frac{{AvailableChillerCap}}{{RatedCOP}}\]</div>
+<div>$$Power = PowerRatio*LoadRatio*\frac{{AvailableChillerCap}}{{RatedCOP}}$$</div>
 
 ### Electric Chiller Model Based on Condenser Entering Temperature
 
@@ -2199,7 +2196,7 @@ The chiller model uses user-supplied performance information at reference condit
 
 ·        The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the entering condenser fluid temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
-<div>\[ChillerEIRFTemp = a + b\left( {{T_{cw,l}}} \right) + c{\left( {{T_{cw,l}}} \right)^2} + d\left( {{T_{cond,e}}} \right) + e{\left( {{T_{cond,e}}} \right)^2} + f\left( {{T_{cw,l}}} \right)\left( {{T_{cond,e}}} \right)\]</div>
+<div>$$ChillerEIRFTemp = a + b\left( {{T_{cw,l}}} \right) + c{\left( {{T_{cw,l}}} \right)^2} + d\left( {{T_{cond,e}}} \right) + e{\left( {{T_{cond,e}}} \right)^2} + f\left( {{T_{cw,l}}} \right)\left( {{T_{cond,e}}} \right)$$</div>
 
 where
 
@@ -2211,7 +2208,7 @@ where
 
 ·        The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller’s available cooling capacity. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
 
-<div>\[ChillerEIRFPLR = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2}\, = \,{\raise0.7ex\hbox{${{P_{chiller}}}$} \!\mathord{\left/ {\vphantom {{{P_{chiller}}} {{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}\right.}\!\lower0.7ex\hbox{${{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}$}}\]</div>
+<div>$$ChillerEIRFPLR = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2}\, = \,{\raise0.7ex\hbox{${{P_{chiller}}}$} \!\mathord{\left/ {\vphantom {{{P_{chiller}}} {{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}\right.}\!\lower0.7ex\hbox{${{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}$}}$$</div>
 
 where
 
@@ -2229,7 +2226,7 @@ Note: Chiller:Electric:EIR objects and their associated performance curve object
 
 For any simulation time step, the chiller’s available cooling capacity is calculated as follows:
 
-<div>\[{\mathop Q\limits^ \bullet_{avail}}\,\, = \,\,{\mathop Q\limits^ \bullet_{ref}}\left( {ChillerCapFTemp} \right)\]</div>
+<div>$${\mathop Q\limits^ \bullet_{avail}}\,\, = \,\,{\mathop Q\limits^ \bullet_{ref}}\left( {ChillerCapFTemp} \right)$$</div>
 
 where
 
@@ -2241,7 +2238,7 @@ The model then calculates the evaporator heat transfer rate required to bring th
 
 The evaporator heat transfer rate is then compared to the available capacity. If the available chiller capacity is sufficient to meet the evaporator heat transfer rate, the leaving chilled water temperature is set equal to the chilled water setpoint temperature. If the requested evaporator heat transfer rate is larger than the available capacity the chilled water leaving the evaporator is allowed to float upward. For this case, the exiting chilled water temperature is calculated based on the water temperature entering the evaporator, the available cooling capacity, and the evaporator mass flow rate as follows:
 
-<div>\[{T_{cw,l}} = {T_{cw,e}} - \left( {{\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{avail}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{avail}}} {{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}$}}} \right)\]</div>
+<div>$${T_{cw,l}} = {T_{cw,e}} - \left( {{\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{avail}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{avail}}} {{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}$}}} \right)$$</div>
 
 where
 
@@ -2255,7 +2252,7 @@ where
 
 The part-load ratio is then calculated as the ratio of the evaporator heat transfer rate to the available chiller capacity. The part-load ratio is not allowed to be greater than the maximum part-load ratio specified by the user or less than zero as follows:
 
-<div>\[PLR = MAX\left( {0.0,MIN\left( {{\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{evap}}} {{{\mathop Q\limits^ \bullet  }_{avail}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{avail}}}$}},\,\,PL{R_{\max }}} \right)} \right)\]</div>
+<div>$$PLR = MAX\left( {0.0,MIN\left( {{\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{evap}}} {{{\mathop Q\limits^ \bullet  }_{avail}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{avail}}}$}},\,\,PL{R_{\max }}} \right)} \right)$$</div>
 
 where
 
@@ -2269,15 +2266,15 @@ where
 
 The model assumes that the cooling load is met through chiller unloading down to the minimum unloading ratio. False loading (e.g. hot-gas bypass) is assumed to occur between the minimum unloading ratio and the minimum part load ratio yielding constant electrical power consumption under these conditions. Below the minimum part load ratio, the chiller cycles on and off to meet very small loads and the power consumption during the on cycle is the same as when the chiller is operating at the minimum part load ratio. When the chiller part load ratio is less than the minimum part load ratio, the on-off cycling ratio of the chiller is calculated as follows and is available as an output variable.
 
-<div>\[ChillerCyclingRatio = MIN\left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PL{R_{\min }}}}}\right.}\!\lower0.7ex\hbox{${PL{R_{\min }}}$}},\,\,1.0} \right)\]</div>
+<div>$$ChillerCyclingRatio = MIN\left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PL{R_{\min }}}}}\right.}\!\lower0.7ex\hbox{${PL{R_{\min }}}$}},\,\,1.0} \right)$$</div>
 
 To properly account for chiller electric power consumption when PLR is less than the minimum unloading ratio, the PLR is reset to the greater of the PLR calculated above and the PLR at the minimum unloading ratio. The result is available as the output variable Chiller Part Load Ratio.
 
-<div>\[PLR = MAX(PLR,PL{R_{MinUnloadRatio}})\]</div>
+<div>$$PLR = MAX(PLR,PL{R_{MinUnloadRatio}})$$</div>
 
 This revised PLR accounts for the “false loading” (e.g., hot gas bypass) that is assumed to occur whenever the PLR (based on cooling load divided by available capacity) is less than the minimum unloading ratio specified. The amount of false loading on the chiller is calculated using this revised PLR and is reported as an output variable as follows:
 
-<div>\[{\mathop Q\limits^ \bullet_{falseloading}} = \left( {{{\mathop Q\limits^ \bullet  }_{avail}}} \right)\left( {PLR} \right)\left( {ChillerCyclingRatio} \right) - {\mathop Q\limits^ \bullet_{evap}}\]</div>
+<div>$${\mathop Q\limits^ \bullet_{falseloading}} = \left( {{{\mathop Q\limits^ \bullet  }_{avail}}} \right)\left( {PLR} \right)\left( {ChillerCyclingRatio} \right) - {\mathop Q\limits^ \bullet_{evap}}$$</div>
 
 The electrical power consumption for the chiller compressor(s) for any simulation time step is then calculated using the following equation:
 
@@ -2291,7 +2288,7 @@ The electrical power consumption for the chiller compressor(s) for any simulatio
 
 Heat rejected by the chiller condenser includes the heat transferred in the evaporator plus a portion or all of the compressor electrical energy consumption. For electric chillers with hermetic compressors, all compressor energy consumption is rejected by the condenser (compressor motor efficiency = *eff<sub>motor</sub>* = 1.0). For chillers with semi-hermetic or open compressors, only a portion of the compressor energy use is rejected by the condenser. The heat transfer rate for the chiller condenser is calculated as follows:
 
-<div>\[{\mathop Q\limits^ \bullet_{cond}} = \left( {{P_{chiller}} * ef{f_{motor}}} \right) + {\mathop Q\limits^ \bullet_{evap}} + {\mathop Q\limits^ \bullet_{falseloading}}\]</div>
+<div>$${\mathop Q\limits^ \bullet_{cond}} = \left( {{P_{chiller}} * ef{f_{motor}}} \right) + {\mathop Q\limits^ \bullet_{evap}} + {\mathop Q\limits^ \bullet_{falseloading}}$$</div>
 
 where
 
@@ -2301,7 +2298,7 @@ where
 
 For water-cooled chillers, the water temperature leaving the condenser is then calculated as shown below.
 
-<div>\[{T_{cond,l}} = {T_{cond,e}} + {\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{cond}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{cond}}} {\left( {{{\mathop m\limits^ \bullet  }_{cond}} * {C_{p,cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {{{\mathop m\limits^ \bullet  }_{cond}} * {C_{p,cond}}} \right)}$}}\]</div>
+<div>$${T_{cond,l}} = {T_{cond,e}} + {\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{cond}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{cond}}} {\left( {{{\mathop m\limits^ \bullet  }_{cond}} * {C_{p,cond}}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {{{\mathop m\limits^ \bullet  }_{cond}} * {C_{p,cond}}} \right)}$}}$$</div>
 
 where:
 
@@ -2317,7 +2314,7 @@ For air- and evaporatively-cooled condensers, the exiting air temperature is not
 
 The model then calculates the condenser fan energy for air- and evaporatively-cooled condensers. The amount of condenser fan energy is assumed to be proportional to the chiller cycling ratio and is calculated as follows:
 
-<div>\[{P_{cond}}\, = \,{\mathop Q\limits^ \bullet_{ref}}\,\left( {{P_{condfanratio}}} \right)\,\left( {ChillerCyclingRatio} \right)\]</div>
+<div>$${P_{cond}}\, = \,{\mathop Q\limits^ \bullet_{ref}}\,\left( {{P_{condfanratio}}} \right)\,\left( {ChillerCyclingRatio} \right)$$</div>
 
 where
 
@@ -2329,13 +2326,13 @@ where
 
 The final calculations determine the total heat transfer energy for the condenser and evaporator, as well as the total electric energy consumed by the chiller compressor motor(s) and condenser fan(s). The results are available as output variables.
 
-<div>\[{Q_{cond}} = {\mathop Q\limits^ \bullet_{cond}}*TimeStepSys*3600\]</div>
+<div>$${Q_{cond}} = {\mathop Q\limits^ \bullet_{cond}}*TimeStepSys*3600$$</div>
 
-<div>\[{Q_{evap}} = {\mathop Q\limits^ \bullet_{evap}}\,\,*\,\,TimeStepSys\,\,*\,\,3600\]</div>
+<div>$${Q_{evap}} = {\mathop Q\limits^ \bullet_{evap}}\,\,*\,\,TimeStepSys\,\,*\,\,3600$$</div>
 
-<div>\[{E_{chiller}} = {P_{chiller}}*\,\,TimeStepSys\,\,*\,\,3600\]</div>
+<div>$${E_{chiller}} = {P_{chiller}}*\,\,TimeStepSys\,\,*\,\,3600$$</div>
 
-<div>\[{E_{cond}} = {P_{cond}}\,\, * \,\,TimeStepSys\,\,*\,\,3600\]</div>
+<div>$${E_{cond}} = {P_{cond}}\,\, * \,\,TimeStepSys\,\,*\,\,3600$$</div>
 
 where
 
@@ -2363,7 +2360,7 @@ Note: The standard ratings described in this section require that the EIR/Reform
 
 The IPLV is a single number part-load performance figure of merit for Water-Chilling Packages. The IPLV equations and procedures described below are taken from Appendix D of ANSI/AHRI Std. 550/590, 2011 and provide a consistent method for calculating IPLV. These equations provide representative average part-load efficiency for a single chiller.  For equipment covered by this standard, the *IPLV* is calculated using the following formula:
 
-<div>\[IPLV = (0.01A) + (0.42B) + (0.45C) + (0.12D)\]</div>
+<div>$$IPLV = (0.01A) + (0.42B) + (0.45C) + (0.12D)$$</div>
 
 where,
 
@@ -2379,13 +2376,13 @@ The Coefficient of Performance (*COP*) at the various load capacity points (100%
 
 EER at desired reduced capacity (75%, 50%, and 25%) is calculated as follows
 
-<div>\[COP = \frac{{\rm{1}}}{{EIR}}\]</div>
+<div>$$COP = \frac{{\rm{1}}}{{EIR}}$$</div>
 
-<div>\[EIR = EnergyInputRatio = \left( {\frac{{{\rm{Power }}}}{{{\rm{PartLoadRatio * AvailChillerCap}}}}} \right)\]</div>
+<div>$$EIR = EnergyInputRatio = \left( {\frac{{{\rm{Power }}}}{{{\rm{PartLoadRatio * AvailChillerCap}}}}} \right)$$</div>
 
-<div>\[Power = \left( {\frac{{{\rm{AvailChillerCap}}}}{{CO{P_{reference}}}}} \right)(EIRTempModFa{c_{ReducedTemp}})(EIRPLRModFa{c_{ReducedPLR}})\]</div>
+<div>$$Power = \left( {\frac{{{\rm{AvailChillerCap}}}}{{CO{P_{reference}}}}} \right)(EIRTempModFa{c_{ReducedTemp}})(EIRPLRModFa{c_{ReducedPLR}})$$</div>
 
-<div>\[AvailChillerCap = Capacit{y_{reference}}(CAPTempModFa{c_{ReducedTemp}})\]</div>
+<div>$$AvailChillerCap = Capacit{y_{reference}}(CAPTempModFa{c_{ReducedTemp}})$$</div>
 
 <span>$Capacit{y_{reference}}$</span>= Reference chiller capacity specified by the user, (W).
 
@@ -2399,7 +2396,7 @@ EER at desired reduced capacity (75%, 50%, and 25%) is calculated as follows
 
 If the equipment cannot be unloaded to the desired reduced capacity (75%, 50%, and 25%) i.e. if the minimum unloading ratio of the chiller is greater than desired reduced capacity, then the model is run at the minimum unloading PLR of the equipment at the condenser entering conditions defined in Table 51 and the efficiency is adjusted for cyclic performance.
 
-<div>\[COP = \frac{{\rm{1}}}{{{C_D} \cdot EIRatMinPLR}}\]</div>
+<div>$$COP = \frac{{\rm{1}}}{{{C_D} \cdot EIRatMinPLR}}$$</div>
 
  where,
 
@@ -2409,11 +2406,11 @@ If the equipment cannot be unloaded to the desired reduced capacity (75%, 50%, a
 
 Thedegradation coefficient *C<sub>D</sub>* for the desired reduced load points (75%, 50%, or 25%) is determined using the following equation:
 
-<div>\[{C_D} = 1.13 - 0.13LF\]</div>
+<div>$${C_D} = 1.13 - 0.13LF$$</div>
 
 The load factor (*LF*) for the desired reduced load points (75%, 50%, or 25%) calculated from the following equation:
 
-<div>\[LF = \frac{{\left( {\frac{{\% Load}}{{100}}} \right) \cdot Full{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity}}{{Part{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity}}\]</div>
+<div>$$LF = \frac{{\left( {\frac{{\% Load}}{{100}}} \right) \cdot Full{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity}}{{Part{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity}}$$</div>
 
 Where,
 
@@ -2423,9 +2420,9 @@ Where,
 
 <span>$Part{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity$</span> =           Part load heating capacity (W) of the air-source heat pump units determined from ANSI/AHRI Standard 550/590 at the standard desired reduced ambient test conditions as shown in Table 51  and the minimum part load capacity of the unit.
 
-<div>\[Full{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity = {\dot Q_{total,Reference}}\left( {CapTempModFa{c_{Rated}}} \right)\]</div>
+<div>$$Full{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity = {\dot Q_{total,Reference}}\left( {CapTempModFa{c_{Rated}}} \right)$$</div>
 
-<div>\[Part{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity = MinPLR \cdot {\dot Q_{total,Reference}}\left( {CapTempModFa{c_{ReducedTemp}}} \right)\]</div>
+<div>$$Part{\rm{ }}load{\rm{ }}unit{\rm{ }}capacity = MinPLR \cdot {\dot Q_{total,Reference}}\left( {CapTempModFa{c_{ReducedTemp}}} \right)$$</div>
 
 where,
 
@@ -2437,308 +2434,62 @@ where,
 
 <span>$MinPLR$</span>= Minimum PLR up to which chiller can be unloaded
 
-
-
 Table 51. Standard Rating (Integrated Part Load Value)
 
-Standard Rating (Integrated Part Load Value)
- &lt;&lt;Source: Table 3, Page 10, ANSI/AHRI Standard 550/590 -2011&gt;&gt;
-
-
-
-IPLV
-
-NPLV
-
-Evaporator (All types)
-
-100 % Load LWT
-
-0% Load LWT
-
-Flow Rate (gpm)
-
-F.F.A
-
-
-
-<sup>2</sup>44.0°F
-
- 44.0°F
-
-<sup>3</sup>2.4 gpm/ton
-
-0.0001
-
-h· ft<sup>2</sup> ·°F/Btu
-
-
-
-6.7°C
-
-6.7°C
-
-0.043 L/s per kW
-
-0.000018
-
-m<sup>2</sup>·°C/W
-
-
-
-<sup>2</sup>Selected LWT
-
-Same as 100% load
-
-<sup>3</sup>Selected gpm/ton
-
-As Specified
-
-
-
-<sup>2</sup>Selected LWT
-
-Same as 100% load
-
-<sup>3</sup>[L/s per kW]
-
-As Specified
-
-<sup>1</sup>Condenser (Water Cooled)
-
-100% load EWT
-
-75% load EWT
-
-50% load EWT
-
-25% load EWT
-
-0% load EWT
-
-Flow rate (gpm) [L/s]
-
-F.F.A.
-
-
-
-<sup>2</sup>85.0°F
-
- 75.0°F
-
- 65.0°F
-
- 65.0°F
-
- 65.0°F
-
-<sup>3</sup>3.0 gpm/ton
-
-0.00025
-
- h· ft<sup>2</sup> ·°F/Btu
-
-
-
-29.4°C
-
-23.9°C
-
-18.3°C
-
-18.3°C
-
-18.3°C
-
-0.054 L/s per kW
-
-0.000044
-
- m<sup>2</sup>·°C/W
-
-
-
-<sup>2</sup>Selected EWT
-
-<sup>4</sup>
-
-<sup>4</sup>
-
-<sup>4</sup>
-
-65.0°F
-
-<sup>3</sup>Selected gpm/ton
-
-As Specified
-
-
-
-<sup>2</sup>Selected EWT
-
-<sup>4</sup>
-
-<sup>4</sup>
-
-<sup>4</sup>
-
-18.3°C
-
-<sup> 3</sup>L/s per kW
-
-As Specified
-
-<sup>1</sup>Condenser (Air Cooled)
-
-100% load EDB
-
-75% load EDB
-
-50% load EDB
-
-25% load EDB
-
-0% load EDB
-
-F.F.A.
-
-
-
- 95.0°F
-
- 80.0°F
-
- 65.0°F
-
- 55.0°F
-
- 55.0°F
-
-0.0 h· ft<sup>2</sup> ·°F/Btu
-
-
-
-35°C
-
-26.7°C
-
-18.3°C
-
-12.8°C
-
-12.8°C
-
-0.0 m<sup>2</sup>·°C/W
-
-No Rating Requirements
-
-<sup>1</sup>Condenser (Evaporatively Cooled)
-
-100% load EWB
-
-0% load EWB
-
-F.F.A.
-
-
-
-
-
-75.0°F
-
- 50.0°F
-
-0.0 h· ft<sup>2</sup> ·°F/Btu
-
-
-
-
-
-23.9°C
-
-10.0°C
-
-0.0 m<sup>2</sup>·°C/W
-
-No Rating Requirements
-
-Air-Cooled Without
-
-Condenser
-
-100% load SDT
-
-0% load SDT
-
-
-
-
-
-125.0°F
-
- 55.0°F
-
-
-
-
-
-51.7°C
-
-12.8°C
-
-No Rating Requirements
-
-Water and Evaporatively-
-
-Cooled Without Condenser
-
-100% load SDT
-
-0% load SDT
-
-
-
-
-
-105.0°F
-
- 65.0°F
-
-
-
-
-
-40.6°C
-
-18.3°C
-
-No Rating Requirements
-
-<sup>1</sup>      If the unit Manufacturer’s recommended minimum temperatures are greater than those specified in Table 3, then those may be used in lieu of the specified temperatures.
-
-<sup>2</sup>      Correction for Fouling Factor Allowance
-
-<sup>3</sup>      The flow rates are to be held constant at full load values for all part-load conditions.
-
-<sup>4</sup>      For part-load entering condenser water temperatures, the temperature should vary linearly from the selected
-
-
-
-EWT at 100% load to 65.0 ºF at 50% loads, and fixed at 65.0°F for 50% to 0% loads.
-
-
-
-SDT   - saturated discharge temperature
-
-LWT  - leaving water (liquid) temperature
-
-EWT  - entering water (liquid) temperature
-
-EDB   - entering air dry-bulb temperature
-
-EWB  - entering air wet-bulb temperature
-
-F.F.A. - Fouling Factor Allowance
+<table class="table table-striped">
+  <tr>
+    <th colspan="5">Standard Rating (Integrated Part Load Value)</th>
+  </tr>
+  <tr>
+    <td colspan="5">Source: Table 3, Page 10, ANSI/AHRI Standard 550/590-2011</th>
+  </tr>
+  <tr>
+    <th></th>
+    <td colspan="2">IPLV</th>
+    <td colspan="2">NPLV</th>
+  </tr>
+  <tr>
+    <td>Evaporator (All types)<BR>100 % Load LWT<BR>0% Load LWT<BR>Flow Rate (gpm)<BR>F.F.A</td>
+    <td>2 44.0&deg;F<BR>44.0&deg;F<BR>3 2.4 gpm/ton<BR>0.0001<BR>h- ft 2 -&deg;F/Btu</td>
+    <td>6.7&deg;C<BR>6.7&deg;C<BR>0.043 L/s per<BR>kW<BR>0.000018<BR>m 2 -&deg;C/W</td>
+    <td>2 Selected LWT<BR>Same as 100%<BR>load<BR>3 Selected<BR>gpm/ton<BR>As Specified</td>
+    <td>2 Selected<BR>LWT<BR>Same as 100%<BR>load<BR>3 [L/s per kW]<BR>As Specified</td>
+  </tr>
+  <tr>
+    <td>1 Condenser (Water<BR>Cooled)<BR>100% load EWT<BR>75% load EWT<BR>50% load EWT<BR>25% load EWT<BR>0% load EWT<BR>Flow rate (gpm) [L/s]<BR>F.F.A.</td>
+    <td>2 85.0&deg;F<BR>75.0&deg;F<BR>65.0&deg;F<BR>65.0&deg;F<BR>65.0&deg;F<BR>3 3.0 gpm/ton<BR>0.00025<BR>h- ft 2 -&deg;F/Btu</td>
+    <td>29.4&deg;C<BR>23.9&deg;C<BR>18.3&deg;C<BR>18.3&deg;C<BR>18.3&deg;C<BR>0.054 L/s per<BR>kW<BR>0.000044<BR>m 2 -&deg;C/W</td>
+    <td>2 Selected LWT<BR>4 65.0&deg;F<BR>3 Selected<BR>gpm/ton<BR>As Specified</td>
+    <td>2 Selected LWT<BR>4 18.3&deg;C<BR>3 Selected<BR>L/s per kW<BR>As Specified</td>
+  </tr>
+  <tr>
+    <td>1 Condenser (Air Cooled)<BR>100% load EDB<BR>75% load EDB<BR>50% load EDB<BR>25% load EDB<BR>0% load EDB<BR>F.F.A.</td>
+    <td>95.0&deg;F<BR>80.0&deg;F<BR>65.0&deg;F<BR>55.0&deg;F<BR>55.0&deg;F<BR>0.0 h- ft 2<BR>-&deg;F/Btu</td>
+    <td>35&deg;C<BR>26.7&deg;C<BR>18.3&deg;C<BR>12.8&deg;C<BR>12.8&deg;C<BR>0.0 m 2 -&deg;C/W</td>
+    <td colspan="2">No Rating Requirements</td>
+  </tr>
+  <tr>
+    <td>1 Condenser<BR>(Evaporatively Cooled)<BR>100% load EWB<BR>0% load EWB<BR>F.F.A.</td>
+    <td>75.0&deg;F<BR>50.0&deg;F<BR>0.0 h- ft 2<BR>-&deg;F/Btu</td>
+    <td>23.9&deg;C<BR>10.0&deg;C<BR>0.0 m 2 -&deg;C/W</td>
+    <td colspan="2">No Rating Requirements</td>
+  </tr>
+  <tr>
+    <td>Air-Cooled Without<BR>Condenser<BR>100% load SDT<BR>0% load SDT</td>
+    <td>125.0&deg;F<BR>55.0&deg;F</td>
+    <td>51.7&deg;C<BR>12.8&deg;C</td>
+    <td colspan="2">No Rating Requirements</td>
+  </tr>
+  <tr>
+    <td>Water and Evaporatively-<BR>Cooled Without<BR>Condenser<BR>100% load SDT<BR>0% load SDT</td>
+    <td>105.0&deg;F<BR>65.0&deg;F</td>
+    <td>40.6&deg;C<BR>18.3&deg;C</td>
+    <td colspan="2">No Rating Requirements</td>
+  </tr>
+  <tr>
+    <td colspan="5">1 If the unit Manufacturer’s recommended minimum temperatures are greater than those specified in<BR>Table 3, then those may be used in lieu of the specified temperatures.<BR>2 Correction for Fouling Factor Allowance<BR>3 The flow rates are to be held constant at full load values for all part-load conditions.<BR>4 For part-load entering condenser water temperatures, the temperature should vary linearly from<BR>the selected<BR>EWT at 100% load to 65.0 oF at 50% loads, and fixed at 65.0&deg;F for 50% to 0% loads.<BR>SDT - saturated discharge temperature<BR>LWT - leaving water (liquid) temperature<BR>EWT - entering water (liquid) temperature<BR>EDB - entering air dry-bulb temperature<BR>EWB - entering air wet-bulb temperature<BR>F.F.A. - Fouling Factor Allowance</td>
+  </tr>
+</table>
 
 ### Electric Chiller Model Based on Condenser Leaving Temperature
 
@@ -2762,7 +2513,7 @@ The chiller model uses user-supplied performance information at reference condit
 
 ·        The cooling capacity function of temperature curve is a biquadratic performance curve with two independent variables: the leaving chilled water temperature and the leaving condenser water temperature. The output of this curve is multiplied by the reference capacity to give the full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
 
-<div>\[ChillerCapFTemp = a + b({T_{cw,l}}) + c{({T_{cw,l}})^2} + d({T_{cond,l}}) + e{({T_{cond,l}})^2} + f({T_{cw,l}})({T_{cond,l}})\]</div>
+<div>$$ChillerCapFTemp = a + b({T_{cw,l}}) + c{({T_{cw,l}})^2} + d({T_{cond,l}}) + e{({T_{cond,l}})^2} + f({T_{cw,l}})({T_{cond,l}})$$</div>
 
 where
 
@@ -2786,9 +2537,9 @@ where
 
 The first type is a bicubic performance curve that parameterizes the variation of the chiller input power ratio as a function of the leaving condenser water temperature and the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller’s available cooling capacity.
 
-<div>\[ChillerEIRFPLR = a + b({T_{cond,l}}) + c{({T_{cond,l}})^2} + d(PLR) + e{(PLR)^2} + f({T_{cond,l}})(PLR) + g{(PLR)^3}\]</div>
+<div>$$ChillerEIRFPLR = a + b({T_{cond,l}}) + c{({T_{cond,l}})^2} + d(PLR) + e{(PLR)^2} + f({T_{cond,l}})(PLR) + g{(PLR)^3}$$</div>
 
-<div>\[ChillerEIRFPLR = \,{\raise0.7ex\hbox{${{P_{chiller}}}$} \!\mathord{\left/ {\vphantom {{{P_{chiller}}} {{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}\right.}\!\lower0.7ex\hbox{${{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}$}}\]</div>
+<div>$$ChillerEIRFPLR = \,{\raise0.7ex\hbox{${{P_{chiller}}}$} \!\mathord{\left/ {\vphantom {{{P_{chiller}}} {{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}\right.}\!\lower0.7ex\hbox{${{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}$}}$$</div>
 
 where
 
@@ -2834,7 +2585,7 @@ Although performance curve data sets for 160 chillers are provided in the Energy
 
 For any simulation time step, the chiller’s available cooling capacity is calculated as follows:
 
-<div>\[{\mathop Q\limits^ \bullet_{avail}}\,\, = \,\,{\mathop Q\limits^ \bullet_{ref}}\left( {ChillerCapFTemp} \right)\]</div>
+<div>$${\mathop Q\limits^ \bullet_{avail}}\,\, = \,\,{\mathop Q\limits^ \bullet_{ref}}\left( {ChillerCapFTemp} \right)$$</div>
 
 where
 
@@ -2846,7 +2597,7 @@ The model then calculates the evaporator heat transfer rate required to bring th
 
 The evaporator heat transfer rate is then compared to the available capacity. If the available chiller capacity is sufficient to meet the evaporator heat transfer rate, the leaving chilled water temperature is set equal to the chilled water setpoint temperature. If the requested evaporator heat transfer rate is larger than the available capacity the chilled water leaving the evaporator is allowed to float upward. For this case, the exiting chilled water temperature is calculated based on the water temperature entering the evaporator, the available cooling capacity, and the evaporator mass flow rate as follows:
 
-<div>\[{T_{cw,l}} = {T_{cw,e}} - \left( {{\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{avail}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{avail}}} {{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}$}}} \right)\]</div>
+<div>$${T_{cw,l}} = {T_{cw,e}} - \left( {{\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{avail}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{avail}}} {{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop m\limits^ \bullet  }_{evap}}{C_{p,evap}}}$}}} \right)$$</div>
 
 where
 
@@ -2860,7 +2611,7 @@ where
 
 The part-load ratio is then calculated as the ratio of the evaporator heat transfer rate to the available chiller capacity. The part-load ratio is not allowed to be greater than the maximum part-load ratio specified by the user or less than zero as follows:
 
-<div>\[PLR = MAX\left( {0.0,MIN\left( {{\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{evap}}} {{{\mathop Q\limits^ \bullet  }_{avail}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{avail}}}$}},\,\,PL{R_{\max }}} \right)} \right)\]</div>
+<div>$$PLR = MAX\left( {0.0,MIN\left( {{\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{evap}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{evap}}} {{{\mathop Q\limits^ \bullet  }_{avail}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{avail}}}$}},\,\,PL{R_{\max }}} \right)} \right)$$</div>
 
 where
 
@@ -2874,15 +2625,15 @@ Note that the maximum part-load ratio (PLR<sub>max</sub>, specified in the Chill
 
 The model assumes that the cooling load is met through chiller unloading down to the minimum unloading ratio. False loading (e.g. hot-gas bypass) is assumed to occur between the minimum unloading ratio and the minimum part-load ratio yielding constant electrical power consumption under these conditions. Below the minimum part-load ratio, the chiller cycles on/off to meet very small loads and the power consumption during the on cycle is the same as when the chiller is operating at the minimum part load ratio. When the chiller part-load ratio is less than the minimum part-load ratio, the on-off cycling ratio of the chiller is calculated as follows and is available as an output variable.
 
-<div>\[ChillerCyclingRatio = MIN\left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PL{R_{\min }}}}}\right.}\!\lower0.7ex\hbox{${PL{R_{\min }}}$}},\,\,1.0} \right)\]</div>
+<div>$$ChillerCyclingRatio = MIN\left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PL{R_{\min }}}}}\right.}\!\lower0.7ex\hbox{${PL{R_{\min }}}$}},\,\,1.0} \right)$$</div>
 
 To properly account for chiller electric power consumption when PLR is less than the minimum unloading ratio, the PLR is reset to the greater of the PLR calculated above and the PLR at the minimum unloading ratio. The result is available as the output variable Chiller Part Load Ratio.
 
-<div>\[PLR = MAX(PLR,PL{R_{MinUnloadRatio}})\]</div>
+<div>$$PLR = MAX(PLR,PL{R_{MinUnloadRatio}})$$</div>
 
 This revised PLR accounts for the “false loading” (e.g., hot-gas bypass) that is assumed to occur whenever the PLR (based on cooling load divided by available capacity) is less than the minimum unloading ratio specified. The amount of false loading on the chiller is calculated using this revised PLR and is reported as an output variable as follows:
 
-<div>\[{\mathop Q\limits^ \bullet_{falseloading}} = \left( {{{\mathop Q\limits^ \bullet  }_{avail}}} \right)\left( {PLR} \right)\left( {ChillerCyclingRatio} \right) - {\mathop Q\limits^ \bullet_{evap}}\]</div>
+<div>$${\mathop Q\limits^ \bullet_{falseloading}} = \left( {{{\mathop Q\limits^ \bullet  }_{avail}}} \right)\left( {PLR} \right)\left( {ChillerCyclingRatio} \right) - {\mathop Q\limits^ \bullet_{evap}}$$</div>
 
 The electrical power consumption for the chiller compressor(s) for any simulation time step is then calculated using the following equation:
 
@@ -2894,7 +2645,7 @@ The electrical power consumption for the chiller compressor(s) for any simulatio
 
 Heat rejected by the chiller condenser includes the heat transferred in the evaporator plus a portion or all of the compressor electrical energy consumption. For electric chillers with hermetic compressors, all compressor energy consumption is rejected by the condenser (compressor motor efficiency = *eff<sub>motor</sub>* = 1.0). For chillers with semi-hermetic or open compressors, only a portion of the compressor energy use is rejected by the condenser. The heat transfer rate for the chiller condenser is calculated as follows:
 
-<div>\[{\mathop Q\limits^ \bullet_{cond}} = \left( {{P_{chiller}} * ef{f_{motor}}} \right) + {\mathop Q\limits^ \bullet_{evap}} + {\mathop Q\limits^ \bullet_{falseloading}}\]</div>
+<div>$${\mathop Q\limits^ \bullet_{cond}} = \left( {{P_{chiller}} * ef{f_{motor}}} \right) + {\mathop Q\limits^ \bullet_{evap}} + {\mathop Q\limits^ \bullet_{falseloading}}$$</div>
 
 where
 
@@ -2904,7 +2655,7 @@ where
 
 The above curve values are calculated based on the leaving condenser water temperature found through iteration. After obtaining the condenser heat transfer rate, the final leaving condenser water temperature is then calculated as:
 
-<div>\[{T_{cond,l}} = {T_{cond,e}} + {\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{cond}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{cond}}} {\mathop {\left( {{{\mathop m\limits^ \bullet  }_{cond}}*{C_{p,cond}}} \right)}\limits^{} }}}\right.}\!\lower0.7ex\hbox{${\mathop {\left( {{{\mathop m\limits^ \bullet  }_{cond}}*{C_{p,cond}}} \right)}\limits^{} }$}}\]</div>
+<div>$${T_{cond,l}} = {T_{cond,e}} + {\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{cond}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{cond}}} {\mathop {\left( {{{\mathop m\limits^ \bullet  }_{cond}}*{C_{p,cond}}} \right)}\limits^{} }}}\right.}\!\lower0.7ex\hbox{${\mathop {\left( {{{\mathop m\limits^ \bullet  }_{cond}}*{C_{p,cond}}} \right)}\limits^{} }$}}$$</div>
 
 where:
 
@@ -2918,13 +2669,13 @@ where:
 
 The final calculations determine the total heat transfer energy for the condenser and evaporator, as well as the total electric energy consumed by the chiller compressor motor(s) and condenser fan(s). The results are available as output variables.
 
-<div>\[{Q_{cond}} = {\mathop Q\limits^ \bullet_{cond}}*TimeStepSys*3600\]</div>
+<div>$${Q_{cond}} = {\mathop Q\limits^ \bullet_{cond}}*TimeStepSys*3600$$</div>
 
-<div>\[{Q_{evap}} = {\mathop Q\limits^ \bullet_{evap}}\,\,*\,\,TimeStepSys\,\,*\,\,3600\]</div>
+<div>$${Q_{evap}} = {\mathop Q\limits^ \bullet_{evap}}\,\,*\,\,TimeStepSys\,\,*\,\,3600$$</div>
 
-<div>\[{E_{chiller}} = {P_{chiller}}*\,\,TimeStepSys\,\,*\,\,3600\]</div>
+<div>$${E_{chiller}} = {P_{chiller}}*\,\,TimeStepSys\,\,*\,\,3600$$</div>
 
-<div>\[{E_{cond}} = {P_{cond}}\,\, * \,\,TimeStepSys\,\,*\,\,3600\]</div>
+<div>$${E_{cond}} = {P_{cond}}\,\, * \,\,TimeStepSys\,\,*\,\,3600$$</div>
 
 where
 
@@ -2962,35 +2713,35 @@ The engine driven chiller (Object name: Chiller:EngineDriven) is the empirical m
 
 The engine model was also developed for the BLAST program. It was adapted for use in EnergyPlus. This model is used for both the engine driven generator and the engine driven chiller.  It uses the following set of equations all of which are quadratic fits to the PLR (Part Load Ratio) of the generator.  The coefficients must be derived from manufacturers data.
 
-<div>\[\frac{{chiller\,\,cooling\,\,load}}{{fuel\,\,energy\,\,input}} = \frac{{chiller\,\,cooling\,\,load}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {a_1} + {a_2}PLR + {a_3}PL{R^2}\]</div>
+<div>$$\frac{{chiller\,\,cooling\,\,load}}{{fuel\,\,energy\,\,input}} = \frac{{chiller\,\,cooling\,\,load}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {a_1} + {a_2}PLR + {a_3}PL{R^2}$$</div>
 
 The exhaust gas temp and flow rate are used if a stack heat exchanger is used to recover waste heat from the exhaust.  This temperature is the inlet temperature to the heat exchanger which is modeled in a UA-effectiveness form:
 
-<div>\[\frac{{Total\,Exhaust\,heat}}{{fuel\,energy\,input}} = \frac{{Total\,\,Exhaust\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {d_1} + {d_2}PLR + {d_3}PL{R^2}\]</div>
+<div>$$\frac{{Total\,Exhaust\,heat}}{{fuel\,energy\,input}} = \frac{{Total\,\,Exhaust\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {d_1} + {d_2}PLR + {d_3}PL{R^2}$$</div>
 
-<div>\[\frac{{Exhaust\,\,Gas\,\,Temp\,\,\left\{ K \right\}}}{{fuel\,\,energy\,\,input}} = \frac{{Exhaust\,\,Gas\,\,Temp\,\,\left\{ K \right\}}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {e_1} + {e_2}PLR + {e_3}PL{R^2}\]</div>
+<div>$$\frac{{Exhaust\,\,Gas\,\,Temp\,\,\left\{ K \right\}}}{{fuel\,\,energy\,\,input}} = \frac{{Exhaust\,\,Gas\,\,Temp\,\,\left\{ K \right\}}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {e_1} + {e_2}PLR + {e_3}PL{R^2}$$</div>
 
 The exhaust flow rate is then calculated as:
 
-<div>\[{\dot m_{exhaust}} = \frac{{Total\,\,Exhaust\,\,heat}}{{C{p_{exhaust}} \cdot \left( {{T_{exhaust}} - {T_{reference}}} \right)}}\]</div>
+<div>$${\dot m_{exhaust}} = \frac{{Total\,\,Exhaust\,\,heat}}{{C{p_{exhaust}} \cdot \left( {{T_{exhaust}} - {T_{reference}}} \right)}}$$</div>
 
 where T<sub>reference</sub> is the reference temperature for the fuel lower heating value, and is given as 25°C in manufacturer’s data, and
 
-<div>\[{T_{stack}} = {T_{DesignMinExhaust}} + {\frac{{\left( {{T_{exhaust}} - {T_{DesignMinExhaust}}} \right)}}{{{\rm{exp}}\left( {\frac{{{\rm{UA}}}}{{{{{\rm{\dot m}}}_{{\rm{exhaust}}}}C{p_{exhaust}}}}} \right)}}^2}\]</div>
+<div>$${T_{stack}} = {T_{DesignMinExhaust}} + {\frac{{\left( {{T_{exhaust}} - {T_{DesignMinExhaust}}} \right)}}{{{\rm{exp}}\left( {\frac{{{\rm{UA}}}}{{{{{\rm{\dot m}}}_{{\rm{exhaust}}}}C{p_{exhaust}}}}} \right)}}^2}$$</div>
 
 Finally, heat recovered from the lube oil and the water jacket are accounted for as follows:
 
-<div>\[\frac{{Recoverable\,\,jacket\,\,heat}}{{fuel\,\,energy\,\,input}} = \frac{{Recoverable\,\,jacket\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {b_1} + {b_2}PLR + {b_3}PL{R^2}\]</div>
+<div>$$\frac{{Recoverable\,\,jacket\,\,heat}}{{fuel\,\,energy\,\,input}} = \frac{{Recoverable\,\,jacket\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {b_1} + {b_2}PLR + {b_3}PL{R^2}$$</div>
 
-<div>\[\frac{{Recoverable\,\,lube\,\,oil\,\,heat}}{{fuel\,\,energy\,\,input}} = \frac{{Recoverable\,\,lube\,\,oil\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {c_1} + {c_2}PLR + {c_3}PL{R^2}\]</div>
+<div>$$\frac{{Recoverable\,\,lube\,\,oil\,\,heat}}{{fuel\,\,energy\,\,input}} = \frac{{Recoverable\,\,lube\,\,oil\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {c_1} + {c_2}PLR + {c_3}PL{R^2}$$</div>
 
 #### Chiller Basin Heater
 
 Calculations are also made to estimate the electric power input to the basin heater for chillers with evaporatively-cooled condensers. The chillers which calculate basin heater power are Chiller:Electric:EIR, Chiller:Electric, Chiller:ConstantCOP, Chiller:EngineDriven and Chiller:CombustionTurbine.A schedule may be used to disable the basin heater during regular maintenance periods or other time periods (e.g., during summer). If a schedule is not provided, the basin heater is assumed to be available the entire simulation time period. The basin heater operates when it is scheduled on, the outdoor air dry-bulb temperature is below the basin heater setpoint temperature, and the chiller is not active (i.e., chiller is not operating for the simulation time step --- for example, when there is no cooling load to be met by the chiller, *or if there is no water flow through the chiller due to a chiller or pump availability schedule, etc.*). The user is required to enter a basin heater capacity (watts per degree Kelvin) and a heater setpoint temperature (<sup>o</sup>C) if they want to model basin heater electric power.
 
-<div>\[\begin{array}{l}{P_{heater,basin}} = 0.0\\IF\left( {ChillerIsOFF} \right)THEN\\\,\,\,\,\,\,IF\left( {Schedul{e_{heater,basin}}\,is\,Defined} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,IF\left( {CA{P_{heater,basin}}\, > \,0\,.AND.\,Schedul{e_{heater,basin}}\, = \,ON} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{P_{heater,basin}} = \,MAX\left( {0.0,CA{P_{heater,basin}}\left( {{T_{setpoint,basin}} - {T_{db,outdoor}}} \right)} \right)\,\,\,\,\,\,\\\,\,\,\,\,\,\,\,\,\,\,ENDIF\\\,\,\,\,\,ELSE\\\,\,\,\,\,\,\,\,\,\,\,IF\left( {CA{P_{heater,basin}}\, > \,0\,} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{P_{heater,basin}} = \,MAX\left( {0.0,CA{P_{heater,basin}}\left( {{T_{setpoint,basin}} - {T_{db,outdoor}}} \right)} \right)\,\,\,\,\,\,\\\,\,\,\,\,\,\,\,\,\,\,ENDIF\,\\\,\,\,\,\,ENDIF\\ENDIF\end{array}\]</div>
+<div>$$\begin{array}{l}{P_{heater,basin}} = 0.0\\IF\left( {ChillerIsOFF} \right)THEN\\\,\,\,\,\,\,IF\left( {Schedul{e_{heater,basin}}\,is\,Defined} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,IF\left( {CA{P_{heater,basin}}\, > \,0\,.AND.\,Schedul{e_{heater,basin}}\, = \,ON} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{P_{heater,basin}} = \,MAX\left( {0.0,CA{P_{heater,basin}}\left( {{T_{setpoint,basin}} - {T_{db,outdoor}}} \right)} \right)\,\,\,\,\,\,\\\,\,\,\,\,\,\,\,\,\,\,ENDIF\\\,\,\,\,\,ELSE\\\,\,\,\,\,\,\,\,\,\,\,IF\left( {CA{P_{heater,basin}}\, > \,0\,} \right)THEN\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{P_{heater,basin}} = \,MAX\left( {0.0,CA{P_{heater,basin}}\left( {{T_{setpoint,basin}} - {T_{db,outdoor}}} \right)} \right)\,\,\,\,\,\,\\\,\,\,\,\,\,\,\,\,\,\,ENDIF\,\\\,\,\,\,\,ENDIF\\ENDIF\end{array}$$</div>
 
-<div>\[{E_{heater,basin}} = \left( {{P_{heater,basin}}} \right)\left( {TimeStepSys} \right)3600\]</div>
+<div>$${E_{heater,basin}} = \left( {{P_{heater,basin}}} \right)\left( {TimeStepSys} \right)3600$$</div>
 
 where:
 

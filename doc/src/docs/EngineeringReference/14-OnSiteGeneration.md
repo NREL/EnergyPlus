@@ -24,7 +24,7 @@ The TRACK SCHEDULE scheme tries to have the generators meet all of the electrica
 
 The FOLLOW THERMAL and FOLLOW THERMAL LIMIT ELECTRICAL schemes run the generators to meet thermal demand. The thermal demand is determined from the plant modeling and depends on the flow requested by other components on the demand side of the plant loop, the loop temperatures, and the loop temperature setpoint. The electric load center distribution manager converts the thermal load to an electrical load using a nominal ratio of the thermal to electrical power production for each generator. For these schemes, the generator needs to be connected to the supply side of a plant loop and serve components that use hot water on the demand side of the plant loop. The thermal load request is obtained from the plant data structure (structure location in code is PlantLoop%LoopSide%Branch%Comp%MyLoad).The distribution manager converts the thermal load, <span>${q_{thermal}}$</span>, to an electrical load using:
 
-<div>\[{q_{Elect}} = \frac{{{q_{thermal}}}}{{ThermElectRatio}}\]</div>
+<div>$${q_{Elect}} = \frac{{{q_{thermal}}}}{{ThermElectRatio}}$$</div>
 
 where,
 
@@ -94,7 +94,7 @@ The electric load center generators (object name: ElectricLoadCenter:Generators)
 
 EnergyPlus includes three models for converting Direct Current (DC) electrical power into Alternating Current (AC) electrical power. The DC power into the inverter, <span>${P_{DC - in}}$</span>, is converted to AC power out, <span>${P_{AC - out}}$</span>, of the inverter using:
 
-<div>\[{P_{AC - out}} = {P_{DC - in}} \cdot {\varepsilon_{inverter}}\]</div>
+<div>$${P_{AC - out}} = {P_{DC - in}} \cdot {\varepsilon_{inverter}}$$</div>
 
 The inverter efficiency is determined using one of the three models. For the“Simple” inveter model, efficiency is constant and input by the user. For the “Look Up Table” model, the efficiency is calculated using linear interpolation. For the “Function of Power” model, the efficiency is calculating using a single-variable curve object. For both the Look Up Table and Function of Power models, the power production is normalized by <span>${P_{DC - in}}$</span>.
 
@@ -108,19 +108,19 @@ The simple model might be called “constrained bucket with energy losses.”  
 
 The storage control algorithms determine a value for the charging power, <span>${P_{stor - ch\arg e}}$</span>, or the drawing power, <span>${P_{stor - draw}}$</span>. The basic storage control algorithm is to compare the requested generator electricity loads to the current available supply and make up the difference with storage. If extra power is generated, then store it. If there is a shortage, then attempt to draw from storage to meet the remaining electricity request. The load center dispatchs a requested electric load for each generator, runs each generator, and then stores the actual power. This power dispatch can be a function of many different things depending on the operating scheme. The sum of the generator load requests,<span>${P_{load - request}}$</span>, is then compared to the sum of the generator production, <span>${P_{{\rm{gen}} - {\rm{supply}}}}$</span>
 
-<div>\[IF\quad ({P_{load - request}} < {P_{gen - \sup ply}})\quad {P_{stor - ch\arg e}} = {P_{gen - \sup ply}} - {P_{load - request}}\]</div>
+<div>$$IF\quad ({P_{load - request}} < {P_{gen - \sup ply}})\quad {P_{stor - ch\arg e}} = {P_{gen - \sup ply}} - {P_{load - request}}$$</div>
 
-<div>\[IF\quad ({P_{load - request}} > {P_{gen - \sup ply}})\quad {P_{stor - draw}} = {P_{load - request}} - {P_{gen - \sup ply}}\]</div>
+<div>$$IF\quad ({P_{load - request}} > {P_{gen - \sup ply}})\quad {P_{stor - draw}} = {P_{load - request}} - {P_{gen - \sup ply}}$$</div>
 
 The limits <span>${P_{stor - {\rm{charge - max}}}}$</span> and <span>${P_{stor - {\rm{d}}raw{\rm{ - max}}}}$</span> are applied.
 
 If charging, the new state of charge, <span>$Q_{stor}^{t + \Delta t}$</span>, is determined using:
 
-<div>\[Q_{stor}^{t + \Delta t} = Q_{stor}^t + {P_{stor - ch\arg e}} \cdot {\varepsilon_{{\rm{charge}}}} \cdot \Delta t\]</div>
+<div>$$Q_{stor}^{t + \Delta t} = Q_{stor}^t + {P_{stor - ch\arg e}} \cdot {\varepsilon_{{\rm{charge}}}} \cdot \Delta t$$</div>
 
 If drawing, the new state of charge is:
 
-<div>\[Q_{stor}^{t + \Delta t} = Q_{stor}^t - \frac{{{P_{stor - draw}} \cdot \Delta t}}{{{\varepsilon_{draw}}}}\]</div>
+<div>$$Q_{stor}^{t + \Delta t} = Q_{stor}^t - \frac{{{P_{stor - draw}} \cdot \Delta t}}{{{\varepsilon_{draw}}}}$$</div>
 
 Where <span>$\Delta t$</span> is the length of the system time step in seconds.
 
@@ -134,11 +134,11 @@ The Kinetic Battery Model (KiBaM) (object: ElectricLoadCenter:Storage:Battery) w
 
 The Kinetic Battery Model assumes that the battery charge is distributed over two tanks: an available-charge tank and a bound-charge tank. The tank for available charges can supply electrons directly to the load, whereas the tank for chemically bound charges can only supply electrons to the available-charge tank. At any time, the total charge <span>$q$</span> in the battery is the sum of the available charge (<span>${q_1}$</span>) and bound charge (<span>${q_2}$</span>). That is:
 
-<div>\[q = {q_1} + {q_2}\]</div>
+<div>$$q = {q_1} + {q_2}$$</div>
 
 Based on the governing equations on the change of charge in both tanks (Manwell and McGowan 1993), the battery capacity can be related to a constant charge/discharge current (<span>$I$</span>) as the following equation:
 
-<div>\[{q_{\max }}(I) = \frac{{{q_{\max }}k \cdot c \cdot t}}{{1 - {e^{ - kt}} + c(kt - 1 + {e^{ - kt}})}}\]</div>
+<div>$${q_{\max }}(I) = \frac{{{q_{\max }}k \cdot c \cdot t}}{{1 - {e^{ - kt}} + c(kt - 1 + {e^{ - kt}})}}$$</div>
 
 where,
 
@@ -154,9 +154,9 @@ where,
 
 Assuming that a constant current is used in any time step for charging and discharging, the available charge (<span>${q_1}$</span>) and bound charge (<span>${q_2}$</span>) at any time step are given by:
 
-<div>\[{q_1} = {q_{1,0}}{e^{ - k\Delta t}} + \frac{{({q_0}kc - I)(1 - {e^{ - k\Delta t}})}}{k} - \frac{{Ic(k\Delta t - 1 + {e^{ - k\Delta t}})}}{k}\]</div>
+<div>$${q_1} = {q_{1,0}}{e^{ - k\Delta t}} + \frac{{({q_0}kc - I)(1 - {e^{ - k\Delta t}})}}{k} - \frac{{Ic(k\Delta t - 1 + {e^{ - k\Delta t}})}}{k}$$</div>
 
-<div>\[{q_2} = {q_{2,0}}{e^{ - k\Delta t}} + {q_0}(1 - c)(1 - {e^{ - k\Delta t}}) - \frac{{I(1 - c)(k\Delta t - 1 + {e^{ - k\Delta t}})}}{k}\]</div>
+<div>$${q_2} = {q_{2,0}}{e^{ - k\Delta t}} + {q_0}(1 - c)(1 - {e^{ - k\Delta t}}) - \frac{{I(1 - c)(k\Delta t - 1 + {e^{ - k\Delta t}})}}{k}$$</div>
 
 where,
 
@@ -170,15 +170,15 @@ where,
 
 KiBaM views the battery as a voltage source in series with an electric resistance (Figure 338). The internal resistance is assumed to be constant and the open circuit voltage varies with current and state of charge.
 
-![](EngineeringReference/media/image7528.svg)
+![](EngineeringReference/media/image7528.svg.png)
 
 Figure 338. Electrical equivalent model for KiBaM
 
 The battery’s open circuit voltage is modeled in the same form for charging and discharging, but with different coefficients. The open circuit voltage in charging (<span>${E_c}$</span>) and in discharging (<span>${E_d}$</span>) can be respectively expressed as:
 
-<div>\[{E_c} = {E_{0,d}} + {A_c}{X_c} + \frac{{{C_c}{X_c}}}{{{D_c} - {X_c}}}\]</div>
+<div>$${E_c} = {E_{0,d}} + {A_c}{X_c} + \frac{{{C_c}{X_c}}}{{{D_c} - {X_c}}}$$</div>
 
-<div>\[{E_d} = {E_{0,c}} + {A_d}{X_d} + \frac{{{C_d}{X_d}}}{{{D_d} - {X_d}}}\]</div>
+<div>$${E_d} = {E_{0,c}} + {A_d}{X_d} + \frac{{{C_d}{X_d}}}{{{D_d} - {X_d}}}$$</div>
 
 where,
 
@@ -192,14 +192,14 @@ where,
 
 <span>${X_c}$</span>, <span>${X_d}$</span>        : Normalized maximum capacity at a given charging or discharging current, calculated as:
 
-<div>\[
+<div>$$
   X = \left\{
     \begin{array}{cl}
       q_0 / q_{max}(I) & \; (charging) \\
       (q_{max}-q_0)/q_{max}(I) & \; (discharging)
     \end{array}
   \right.
-\]</div>
+$$</div>
 
 It needs to be noted that the performance curve (Curve:RectangularHyperbola2) used in the model input covers the 2<sup>nd</sup> and the 3<sup>rd</sup> item of the open circuit voltage equation. Due to the reformatting of performance curve, the voltage function regression coefficients can map to the curve coefficients as follows:
 
@@ -207,7 +207,7 @@ It needs to be noted that the performance curve (Curve:RectangularHyperbola2) us
 
 With open circuit voltage, the battery terminal voltage (V) can be calculated as:
 
-<div>\[V = E - IR\]</div>
+<div>$$V = E - IR$$</div>
 
 where, R is the battery internal resistance in Ohms; the current is positive for discharging and negative for charging.
 
@@ -215,7 +215,7 @@ Given desired power in/out of the battery, the desired charge or discharge curre
 
 KiBaM assumes that battery life is a primary function of charge/discharge cycles. One cycle is defined as the process of starting from a certain state of charge (SOC), the battery is discharged to a lower SOC and then recharged back to the starting SOC. It is regarded that the magnitude of cycle plays more important than the average of SOC during the cycle. This means that in terms of the impact on battery life, the cycle from 90% to 70% and then recharge back to 90% of SOC is equivalent to another cycle from 50% to 30% and then recharge back to 50% of SOC.  Battery life in terms of the number of cycles is predicted as a function of the cycle range measured by the fractional depth of discharge. A double exponential equation is used to capture the damage to batteries due to cycling. The equation takes the following form where the coefficients need to be derived from battery test data via curve fitting.
 
-<div>\[{C_F} = {C_1} + {C_2}{e^{{C_3}R}} + {C_4}{e^{{C_5}R}}\]</div>
+<div>$${C_F} = {C_1} + {C_2}{e^{{C_3}R}} + {C_4}{e^{{C_5}R}}$$</div>
 
 where,
 
@@ -227,7 +227,7 @@ R       :    Cycle range in terms of fractional SOC
 
 Following Hybrid2, the rainflow counting method (Downing and Socie 1982) is used to count battery cycles within a state of charge time series. Based on the number of cycles for each fractional SOC range, the battery damage is estimated as:
 
-<div>\[D = \sum\limits_{i = 1}^{} {\left( {{N_i}\frac{1}{{{C_{F,i}}}}} \right)} \]</div>
+<div>$$D = \sum\limits_{i = 1}^{} {\left( {{N_i}\frac{1}{{{C_{F,i}}}}} \right)} $$</div>
 
 where,
 
@@ -261,7 +261,7 @@ There are two main types of energy losses in transformers: no load loss and load
 
 Given the no load loss (NL) and the load loss (LL) at rated load and conditions, the total energy losses in a transformer at time t is calculated as:
 
-<div>\[TL(t) = NL + LL(t) = NL + LL*P{(t)^2}*{f_T}(t)\]</div>
+<div>$$TL(t) = NL + LL(t) = NL + LL*P{(t)^2}*{f_T}(t)$$</div>
 
 where,
 
@@ -277,7 +277,7 @@ where,
 
 The per unit load at time t is calculated as:
 
-<div>\[P(t) = \frac{{Load(t)}}{{{S_B}}}\]</div>
+<div>$$P(t) = \frac{{Load(t)}}{{{S_B}}}$$</div>
 
 where,
 
@@ -287,7 +287,7 @@ where,
 
 The temperature correction factor at time t is calculated as (NEMA 2002):
 
-<div>\[{f_T}(t) = {L_{dc}}*\frac{{R(t)}}{{{R_{ref}}}} + {L_{eddy}}*\frac{{{R_{ref}}}}{{R(t)}}\]</div>
+<div>$${f_T}(t) = {L_{dc}}*\frac{{R(t)}}{{{R_{ref}}}} + {L_{eddy}}*\frac{{{R_{ref}}}}{{R(t)}}$$</div>
 
 where,
 
@@ -301,7 +301,7 @@ where,
 
 The ratio of winding electrical resistance is calculated as:
 
-<div>\[\frac{{R(t)}}{{{R_{ref}}}} = \frac{{F + {T_{winding}}(t) + {T_{amb}}(t)}}{{F + {T_{winding,ref}} + {T_{amb,ref}}}}\]</div>
+<div>$$\frac{{R(t)}}{{{R_{ref}}}} = \frac{{F + {T_{winding}}(t) + {T_{amb}}(t)}}{{F + {T_{winding,ref}} + {T_{amb,ref}}}}$$</div>
 
 where,
 
@@ -317,17 +317,17 @@ where,
 
 The Ambient temperature <span>${T_{amb}}(t)$</span>is equal to the zone temperature if a thermal zone is specified in the input; otherwise, it is assumed equal to 20 °C. The winding temperature rise at time t is calculated as (Barnes et al. 1997):
 
-<div>\[{T_{winding}}(t) = P{(t)^{1.6}}*{T_{winding.ref}}\]</div>
+<div>$${T_{winding}}(t) = P{(t)^{1.6}}*{T_{winding.ref}}$$</div>
 
 Based on the derived total energy losses in a transformer, the transformer efficiency at time t can be calculated according to the following equation:
 
-<div>\[\eta (t) = \frac{{Load(t)}}{{Load(t) + NL + LL(t)}}\]</div>
+<div>$$\eta (t) = \frac{{Load(t)}}{{Load(t) + NL + LL(t)}}$$</div>
 
 The above procedure describes how to calculate the total transformer energy losses based on the no load loss and load loss at rated conditions. The transformer model also supports the case when the nominal transformer efficiency is given. In this case, the user needs to provide the nameplate efficiency and the corresponding per unit load, the maximum efficiency and the corresponding per unit load, and the reference conductor temperature at which the nameplate efficiency is measured. Given these information, both no load loss and load loss at rated conditions can be derived as below.
 
 The nameplate efficiency can be expressed as:
 
-<div>\[{\eta_{np}} = \frac{{{S_B}*{P_{np}}}}{{{S_B}*{P_{np}} + NL + LL*P_{np}^2*{f_{T,np}}}}\]</div>
+<div>$${\eta_{np}} = \frac{{{S_B}*{P_{np}}}}{{{S_B}*{P_{np}} + NL + LL*P_{np}^2*{f_{T,np}}}}$$</div>
 
 where,
 
@@ -341,7 +341,7 @@ where,
 
 Maximum efficiency generally occurs when the load loss is equal to the no-load loss. Because the no-load loss does not vary with the load on the transformer, the following relationship can be established:
 
-<div>\[NL = L{L_{\max ,\eta }} = LL*P_{\max ,\eta }^2*{f_{T,\max  - \eta }}\]</div>
+<div>$$NL = L{L_{\max ,\eta }} = LL*P_{\max ,\eta }^2*{f_{T,\max  - \eta }}$$</div>
 
 where,
 
@@ -351,19 +351,19 @@ where,
 
 Transformers typically have close per unit loads for the nameplate efficiency and the maximum efficiency. Therefore, it is reasonable to assume that the applied temperature correction factors are equal at those two efficiencies. This implies that:
 
-<div>\[\frac{{L{L_{np}}}}{{L{L_{\max ,\eta }}}} = \frac{{LL*{P_{np}}^2*{f_{T,np}}}}{{LL*{P_{\max ,\eta }}^2*{f_{T,\max  - \eta }}}} = {\left( {\frac{{{P_{np}}}}{{{P_{\max ,\eta }}}}} \right)^2}\]</div>
+<div>$$\frac{{L{L_{np}}}}{{L{L_{\max ,\eta }}}} = \frac{{LL*{P_{np}}^2*{f_{T,np}}}}{{LL*{P_{\max ,\eta }}^2*{f_{T,\max  - \eta }}}} = {\left( {\frac{{{P_{np}}}}{{{P_{\max ,\eta }}}}} \right)^2}$$</div>
 
 Rearranging Equation and combining it with Equation leads to:
 
-<div>\[L{L_{np}} = L{L_{\max ,\eta }}*{\left( {\frac{{{P_{np}}}}{{{P_{\max ,\eta }}}}} \right)^2} = NL*{\left( {\frac{{{P_{np}}}}{{{P_{\max ,\eta }}}}} \right)^2}\]</div>
+<div>$$L{L_{np}} = L{L_{\max ,\eta }}*{\left( {\frac{{{P_{np}}}}{{{P_{\max ,\eta }}}}} \right)^2} = NL*{\left( {\frac{{{P_{np}}}}{{{P_{\max ,\eta }}}}} \right)^2}$$</div>
 
 Combining Equations and , we can obtain the no load loss as:
 
-<div>\[NL = \frac{{{S_B}*{P_{np}}*(1 - {\eta_{np}})}}{{{\eta_{np}}*\left[ {1 + {{\left( {\frac{{{P_{ref}}}}{{P{}_{\max ,\eta }}}} \right)}^2}} \right]}}\]</div>
+<div>$$NL = \frac{{{S_B}*{P_{np}}*(1 - {\eta_{np}})}}{{{\eta_{np}}*\left[ {1 + {{\left( {\frac{{{P_{ref}}}}{{P{}_{\max ,\eta }}}} \right)}^2}} \right]}}$$</div>
 
 Substitute NL into Equation , we can calculate the load loss at rated conditions as:
 
-<div>\[LL = \frac{{NL}}{{{f_{T,\max  - \eta }}*P_{\max ,\eta }^2}} = \frac{{NL}}{{{f_{T,np}}*P_{\max ,\eta }^2}}\]</div>
+<div>$$LL = \frac{{NL}}{{{f_{T,\max  - \eta }}*P_{\max ,\eta }^2}} = \frac{{NL}}{{{f_{T,np}}*P_{\max ,\eta }^2}}$$</div>
 
 Since both no load and load losses at rated conditions are known, the total energy losses in a transformer at time t can then be calculated according to Equation
 
@@ -432,7 +432,7 @@ Table 89. Nomenclature for Simple Photovoltaic model
 
 The usable electrical power produced by a PV surface are calculated using:
 
-<div>\[P = {A_{surf}} \cdot {f_{activ}} \cdot {G_T} \cdot {\eta_{cell}} \cdot {\eta_{invert}}\]</div>
+<div>$$P = {A_{surf}} \cdot {f_{activ}} \cdot {G_T} \cdot {\eta_{cell}} \cdot {\eta_{invert}}$$</div>
 
 On the right hand side of this equation, only G<sub>T</sub> is calculated by EnergyPlus and the rest are user inputs. Power levels are assumed constant over the timestep to arrive at energy production.
 
@@ -636,13 +636,13 @@ Table 90. General Nomenclature for the PV model
 
 The four-parameter equivalent circuit model was developed largely by Townsend [1989] and is detailed by Duffie and Beckman [1991]. The model was first incorporated into a component for the TRNSYS simulation package by Eckstein [1990]. The EnergyPlus module employs the Eckstein model for crystalline PV modules, using it whenever the short-circuit IV slope is set to zero or a positive value as modified by Ulleberg [2000]. The four parameter model assumes that the slope of the IV curve is zero at the short-circuit condition:
 
-<div>\[{\left( {\frac{{dI}}{{dV}}} \right)_{v = 0}} = 0\]</div>
+<div>$${\left( {\frac{{dI}}{{dV}}} \right)_{v = 0}} = 0$$</div>
 
 This is a reasonable approximation for crystalline modules. The “four parameters” in the model are *I<sub>L,ref</sub>*, *I<sub>o,ref,</sub>* g, and *R<sub>s</sub>.* These are empirical values that cannot be determined directly through physical measurement. The EnergyPlus model calculates these values from manufactures’ catalog data as discussed in the following section on calculating these parameters
 
 The four-parameter equivalent circuit is shown in the following figure:
 
-![](EngineeringReference/media/image7592.svg)
+![](EngineeringReference/media/image7592.svg.png)
 
 Figure 339. Equivalent circuit in the four parameter model
 
@@ -654,15 +654,15 @@ The IV characteristics of a PV change with both insolation and temperature. The 
 
 The current-voltage equation of circuit shown in the previous figure is as follows:
 
-<div>\[I = {I_L} - {I_o}\left[ {\exp \left( {\frac{q}{{\gamma k{T_c}}}\left( {V + I{R_s}} \right)} \right) - 1} \right]\]</div>
+<div>$$I = {I_L} - {I_o}\left[ {\exp \left( {\frac{q}{{\gamma k{T_c}}}\left( {V + I{R_s}} \right)} \right) - 1} \right]$$</div>
 
 *R<sub>s</sub>* and g are constants. The photocurrent *I<sub>L</sub>* depends linearly on incident radiation:
 
-<div>\[{I_L} = {I_{L,ref}}\frac{{{G_T}}}{{{G_{T,ref}}}}\]</div>
+<div>$${I_L} = {I_{L,ref}}\frac{{{G_T}}}{{{G_{T,ref}}}}$$</div>
 
 The reference insolation *G<sub>ref</sub>*  is nearly always defined as 1000 W/m<sup>2</sup>. The diode reverse saturation current *I<sub>o</sub>* is a temperature dependent quantity:
 
-<div>\[\frac{{{I_o}}}{{{I_{o,ref}}}} = {\left( {\frac{{{T_c}}}{{{T_{c,ref}}}}} \right)^3}\]</div>
+<div>$$\frac{{{I_o}}}{{{I_{o,ref}}}} = {\left( {\frac{{{T_c}}}{{{T_{c,ref}}}}} \right)^3}$$</div>
 
 Equation gives the current implicitly as a function of voltage. Once *I<sub>o</sub>* and *I<sub>L</sub>* are found from Eqs. 3 and 4, Newton’s method is employed to calculate the PV current. In addition, an iterative search routine finds the current (*I<sub>mp</sub>*)  and voltage (*V<sub>mp</sub>*)  at the point of maximum power along the IV curve.
 
@@ -672,27 +672,27 @@ The Idf specification for the PV model include several values which must be read
 
 Three of these values, *I<sub>L,ref</sub>*, *I<sub>o,ref,</sub>* g, may be isolated algebraically. The first step is to substitute the current and voltage into Eq. at the open-circuit, short circuit, and maximum power conditions:
 
-<div>\[0 = {I_{L,ref}} - {I_{o,ref}}\left[ {\exp \left( {\frac{q}{{\gamma k{T_{c,ref}}}}{V_{oc,ref}}} \right) - 1} \right] - \frac{{{V_{oc,ref}}}}{{{R_{sh}}}}\]</div>
+<div>$$0 = {I_{L,ref}} - {I_{o,ref}}\left[ {\exp \left( {\frac{q}{{\gamma k{T_{c,ref}}}}{V_{oc,ref}}} \right) - 1} \right] - \frac{{{V_{oc,ref}}}}{{{R_{sh}}}}$$</div>
 
-<div>\[{I_{sc,ref}} = {I_{L,ref}} - {I_{o,ref}}\left[ {\exp \left( {\frac{{q{I_{sc,ref}}{R_s}}}{{\gamma k{T_{c,ref}}}}} \right) - 1} \right] - \frac{{{I_{sc,ref}}{R_s}}}{{{R_{sh}}}}\]</div>
+<div>$${I_{sc,ref}} = {I_{L,ref}} - {I_{o,ref}}\left[ {\exp \left( {\frac{{q{I_{sc,ref}}{R_s}}}{{\gamma k{T_{c,ref}}}}} \right) - 1} \right] - \frac{{{I_{sc,ref}}{R_s}}}{{{R_{sh}}}}$$</div>
 
-<div>\[{I_{mp,ref}} = {I_{L,ref}} - {I_{o,ref}}\left[ {\exp \left( {\frac{q}{{\gamma k{T_{c,ref}}}}\left( {{V_{mp,ref}} + {I_{mp,ref}}{R_s}} \right)} \right) - 1} \right] - \frac{{{V_{mp,ref}} + {I_{mp,ref}}{R_s}}}{{{R_{sh}}}}\]</div>
+<div>$${I_{mp,ref}} = {I_{L,ref}} - {I_{o,ref}}\left[ {\exp \left( {\frac{q}{{\gamma k{T_{c,ref}}}}\left( {{V_{mp,ref}} + {I_{mp,ref}}{R_s}} \right)} \right) - 1} \right] - \frac{{{V_{mp,ref}} + {I_{mp,ref}}{R_s}}}{{{R_{sh}}}}$$</div>
 
 In each case the “-1” term is may be dropped to simplify the algebra. This approximation has little influence on the right side of the equations since because the magnitude of *I<sub>o</sub>* is very small, generally on the order of 10<sup>-6</sup> A. Some rearrangement then yields the following three expressions which isolate *I<sub>L,ref</sub>*, *I<sub>o,ref,</sub>* g:
 
-<div>\[{I_{L,ref}} \approx {I_{sc,ref}}\]</div>
+<div>$${I_{L,ref}} \approx {I_{sc,ref}}$$</div>
 
-<div>\[\gamma  = \frac{{q\left( {{V_{mp,ref}} - {V_{oc,ref}} + I_{mp,ref}^{}{R_s}} \right)}}{{k{T_{c,ref}}\ln \left( {1 - \frac{{{I_{mp,ref}}}}{{{I_{sc,ref}}}}} \right)}}\]</div>
+<div>$$\gamma  = \frac{{q\left( {{V_{mp,ref}} - {V_{oc,ref}} + I_{mp,ref}^{}{R_s}} \right)}}{{k{T_{c,ref}}\ln \left( {1 - \frac{{{I_{mp,ref}}}}{{{I_{sc,ref}}}}} \right)}}$$</div>
 
-<div>\[{I_{o,ref}} = \frac{{{I_{sc,ref}}}}{{\exp \left( {\frac{{q{V_{oc,ref}}}}{{\gamma k{T_{c,ref}}}}} \right)}}\]</div>
+<div>$${I_{o,ref}} = \frac{{{I_{sc,ref}}}}{{\exp \left( {\frac{{q{V_{oc,ref}}}}{{\gamma k{T_{c,ref}}}}} \right)}}$$</div>
 
 At this point an additional equation is needed in order to determine the last unknown parameter. Taking the analytical derivative of voltage with respect to temperature at the reference open-circuit condition derives the fourth equation. This analytical value is matched to the open-circuit temperature coefficient, a catalog specification:
 
-<div>\[\frac{{\partial {V_{oc}}}}{{\partial {T_c}}} = {\mu_{voc}} = \frac{{\gamma k}}{q}\left[ {\ln \left( {\frac{{{I_{sc,ref}}}}{{{I_{o,ref}}}}} \right) + \frac{{{T_c}\mu_{isc}^{}}}{{{I_{sc,ref}}}} - \left( {3 + \frac{{q\varepsilon }}{{Ak{T_{c,ref}}}}} \right)} \right]\]</div>
+<div>$$\frac{{\partial {V_{oc}}}}{{\partial {T_c}}} = {\mu_{voc}} = \frac{{\gamma k}}{q}\left[ {\ln \left( {\frac{{{I_{sc,ref}}}}{{{I_{o,ref}}}}} \right) + \frac{{{T_c}\mu_{isc}^{}}}{{{I_{sc,ref}}}} - \left( {3 + \frac{{q\varepsilon }}{{Ak{T_{c,ref}}}}} \right)} \right]$$</div>
 
 where
 
-<div>\[A = \frac{\gamma }{{{N_s}}}\]</div>
+<div>$$A = \frac{\gamma }{{{N_s}}}$$</div>
 
 The “TRNSYS PV model” uses an iterative search routine in these four equations to calculate the equivalent circuit characteristics. The first step is to set upper and lower bounds for the series resistance parameter *R<sub>s</sub>*:  physical constraints require the *R<sub>s</sub>* value to lie between 0 and the value such that g = *N<sub>s</sub>*. The initial guess for *R<sub>s</sub>* is midway between these bounds. g and *I<sub>o,ref</sub>*  are found from Eq. and Eq. , while Eq. gives a trivial solution for *I<sub>L,ref</sub>*.  The model then employs Eq. to compare the analytical and catalog values for m<sub>voc</sub>. When all other variables are held constant, the analytical value for m<sub>voc</sub> increases monotonically with series resistance (Townsend 1989). If the analytical voltage coefficient is less than the catalog value, the lower bound for *R<sub>s</sub>* is reset to the present guess value. Likewise, the upper bound is set to the current value if the calculated m<sub>voc</sub> is too large. After resetting the upper or lower bound for *R<sub>s</sub>*, a new guess value is found by averaging the bounds. This procedure repeats until *R<sub>s</sub>* and g converge. Note that for *I<sub>L,ref</sub>*, *I<sub>o,ref,</sub>* g, and *R<sub>s</sub>* are assumed to be constant and are calculated only on the first call in the simulation. Alternatively, the user may enter a known series resistance by entering a **positive** value in the IDF. In this case the iterative routine described above is skipped and Eqs. , , and find *I<sub>L,ref</sub>*, *I<sub>o,ref,</sub>* and g directly from the given value of *R<sub>s</sub>*.
 
@@ -704,11 +704,11 @@ If the value of this parameter is “**Decoupled NOCT Conditions**” then the c
 
 The equation is:
 
-<div>\[{T_c} = {T_a} + \frac{{\left( {1 - {\raise0.7ex\hbox{${{\eta_c}}$} \!\mathord{\left/ {\vphantom {{{\eta_c}} {\tau \alpha }}}\right.}\!\lower0.7ex\hbox{${\tau \alpha }$}}} \right)}}{{\left( {{\raise0.7ex\hbox{${{G_T}\tau \alpha }$} \!\mathord{\left/ {\vphantom {{{G_T}\tau \alpha } {{U_L}}}}\right.}\!\lower0.7ex\hbox{${{U_L}}$}}} \right)}}\]</div>
+<div>$${T_c} = {T_a} + \frac{{\left( {1 - {\raise0.7ex\hbox{${{\eta_c}}$} \!\mathord{\left/ {\vphantom {{{\eta_c}} {\tau \alpha }}}\right.}\!\lower0.7ex\hbox{${\tau \alpha }$}}} \right)}}{{\left( {{\raise0.7ex\hbox{${{G_T}\tau \alpha }$} \!\mathord{\left/ {\vphantom {{{G_T}\tau \alpha } {{U_L}}}}\right.}\!\lower0.7ex\hbox{${{U_L}}$}}} \right)}}$$</div>
 
 If the user specifies the “**Decoupled Ulleberg Dynamic”** mode for calculating cell temperature, then a method developed by Ulleberg is used:
 
-<div>\[{\left. {{T_{cell}}} \right|_t} = {T_{ambient}} + \left( {{{\left. {{T_{cell}}} \right|}_{t - 1}} - {T_{ambient}}} \right)*{e^{\frac{{ - UL}}{{Cap}}\Delta t}}\]</div>
+<div>$${\left. {{T_{cell}}} \right|_t} = {T_{ambient}} + \left( {{{\left. {{T_{cell}}} \right|}_{t - 1}} - {T_{ambient}}} \right)*{e^{\frac{{ - UL}}{{Cap}}\Delta t}}$$</div>
 
 In other words, the cell temperature is a function of the privious cell temperature and the thermal capacity of the PV module material.
 
@@ -965,37 +965,37 @@ Table 91. Nomenclature for Sandia PV model
 
 The current implementation in EnergyPlus focuses on determining performance at the maximum power-point but also calculates, and reports, four other points on the I-V curve so that the data are available for analyses outside of EnergyPlus. The equations below use the module performance parameters that are available in a database provided by Sandia National Laboratory (see www.sandia.gov/pv). The following equations form the basis of the Sandia model implemented in EnergyPlus:
 
-<div>\[{I_{sc}} = {I_{sco}} \cdot {f_1}\left( {A{M_a}} \right) \cdot \left\{ {\left( {{E_b} \cdot {f_2}\left( {AOI} \right) + {f_d} \cdot {E_{diff}}} \right)/{E_o}} \right\} \cdot \left\{ {1 + {\alpha_{Isc}} \cdot \left( {{T_c} - {T_o}} \right)} \right\}\]</div>
+<div>$${I_{sc}} = {I_{sco}} \cdot {f_1}\left( {A{M_a}} \right) \cdot \left\{ {\left( {{E_b} \cdot {f_2}\left( {AOI} \right) + {f_d} \cdot {E_{diff}}} \right)/{E_o}} \right\} \cdot \left\{ {1 + {\alpha_{Isc}} \cdot \left( {{T_c} - {T_o}} \right)} \right\}$$</div>
 
-<div>\[{I_{mp}} = {I_{mpo}} \cdot \left\{ {{C_o} \cdot {E_e} + {C_1} \cdot E_e^2} \right\} \cdot \left\{ {1 + {\alpha_{{\mathop{\rm Im}\nolimits} p}} \cdot ({T_c} - {T_o}} \right\}\]</div>
+<div>$${I_{mp}} = {I_{mpo}} \cdot \left\{ {{C_o} \cdot {E_e} + {C_1} \cdot E_e^2} \right\} \cdot \left\{ {1 + {\alpha_{{\mathop{\rm Im}\nolimits} p}} \cdot ({T_c} - {T_o}} \right\}$$</div>
 
-<div>\[{V_{oc}} = {V_{oco}} + {N_s} \cdot \delta ({T_c}) \cdot \ln ({E_e}) + {\beta_{Voc}}({E_e}) \cdot \left( {{T_c} - {T_o}} \right)\]</div>
+<div>$${V_{oc}} = {V_{oco}} + {N_s} \cdot \delta ({T_c}) \cdot \ln ({E_e}) + {\beta_{Voc}}({E_e}) \cdot \left( {{T_c} - {T_o}} \right)$$</div>
 
-<div>\[{V_{mp}} = {V_{mpo}} + {C_2} \cdot {N_s} \cdot \delta \left( {T_c^{}} \right) \cdot \ln \left( {{E_e}} \right) + {C_3} \cdot {N_3} \cdot {\left\{ {\delta \left( {T_c^{}} \right) \cdot \ln \left( {{E_e}} \right)} \right\}^2} + {\beta_{Vmp}}({E_e}) \cdot ({T_c} - {T_o})\]</div>
+<div>$${V_{mp}} = {V_{mpo}} + {C_2} \cdot {N_s} \cdot \delta \left( {T_c^{}} \right) \cdot \ln \left( {{E_e}} \right) + {C_3} \cdot {N_3} \cdot {\left\{ {\delta \left( {T_c^{}} \right) \cdot \ln \left( {{E_e}} \right)} \right\}^2} + {\beta_{Vmp}}({E_e}) \cdot ({T_c} - {T_o})$$</div>
 
-<div>\[{P_{mp}} = {I_{mp}} \cdot {V_{mp}}\]</div>
+<div>$${P_{mp}} = {I_{mp}} \cdot {V_{mp}}$$</div>
 
-<div>\[{I_x} = {I_{xo}} \cdot \left\{ {{C_4} \cdot {E_e} + {C_5} \cdot E_e^2} \right\} \cdot \left\{ {1 + ({\alpha_{Isc}}) \cdot ({T_c} - {T_o})} \right\}\]</div>
+<div>$${I_x} = {I_{xo}} \cdot \left\{ {{C_4} \cdot {E_e} + {C_5} \cdot E_e^2} \right\} \cdot \left\{ {1 + ({\alpha_{Isc}}) \cdot ({T_c} - {T_o})} \right\}$$</div>
 
-<div>\[{I_{xx}} = {I_{xxo}} \cdot \left\{ {{C_6} \cdot {E_e} + {C_7} \cdot E_e^2} \right\} \cdot \left\{ {1 + ({\alpha_{{\mathop{\rm Im}\nolimits} p}}) \cdot ({T_c} - {T_{o)}}} \right\}\]</div>
+<div>$${I_{xx}} = {I_{xxo}} \cdot \left\{ {{C_6} \cdot {E_e} + {C_7} \cdot E_e^2} \right\} \cdot \left\{ {1 + ({\alpha_{{\mathop{\rm Im}\nolimits} p}}) \cdot ({T_c} - {T_{o)}}} \right\}$$</div>
 
 where,
 
-<div>\[{E_e} = {I_{sc}}/\left[ {{I_{sco}} \cdot \left\{ {1 + {\alpha_{Isc}} \cdot ({T_c} - {T_o})} \right\}} \right]\]</div>
+<div>$${E_e} = {I_{sc}}/\left[ {{I_{sco}} \cdot \left\{ {1 + {\alpha_{Isc}} \cdot ({T_c} - {T_o})} \right\}} \right]$$</div>
 
-<div>\[\delta ({T_c}) = n \cdot k \cdot ({T_c} + 273.15)/q\]</div>
+<div>$$\delta ({T_c}) = n \cdot k \cdot ({T_c} + 273.15)/q$$</div>
 
-<div>\[{f_1}\left( {A{M_a}} \right) = {a_0} + {a_1}A{M_a} + {a_2}{\left( {A{M_a}} \right)^2} + {a_3}{\left( {A{M_a}} \right)^3} + {a_4}{\left( {A{M_a}} \right)^4}\]</div>
+<div>$${f_1}\left( {A{M_a}} \right) = {a_0} + {a_1}A{M_a} + {a_2}{\left( {A{M_a}} \right)^2} + {a_3}{\left( {A{M_a}} \right)^3} + {a_4}{\left( {A{M_a}} \right)^4}$$</div>
 
-<div>\[{f_2}\left( {AOI} \right) = {b_0} + {b_1} \cdot AOI + {b_2}{\left( {AOI} \right)^2} + {b_3}{\left( {AOI} \right)^3} + {b_4}{\left( {AOI} \right)^4} + {b_5}{\left( {AOI} \right)^5}\]</div>
+<div>$${f_2}\left( {AOI} \right) = {b_0} + {b_1} \cdot AOI + {b_2}{\left( {AOI} \right)^2} + {b_3}{\left( {AOI} \right)^3} + {b_4}{\left( {AOI} \right)^4} + {b_5}{\left( {AOI} \right)^5}$$</div>
 
-<div>\[{\beta_{Voc}}({E_e}) = {\beta_{Voco}} + {m_{\beta Voc}} \cdot (1 - {E_e})\]</div>
+<div>$${\beta_{Voc}}({E_e}) = {\beta_{Voco}} + {m_{\beta Voc}} \cdot (1 - {E_e})$$</div>
 
-<div>\[{\beta_{Vmp}}({E_e}) = {\beta_{Vmpo}} + {m_{\beta Vmp}} \cdot (1 - {E_e})\]</div>
+<div>$${\beta_{Vmp}}({E_e}) = {\beta_{Vmpo}} + {m_{\beta Vmp}} \cdot (1 - {E_e})$$</div>
 
-<div>\[{T_m} = E \cdot \left\{ {{e^{a + b \cdot WS}}} \right\} + {T_a}\]</div>
+<div>$${T_m} = E \cdot \left\{ {{e^{a + b \cdot WS}}} \right\} + {T_a}$$</div>
 
-<div>\[{T_c} = {T_m} + \frac{E}{{{E_o}}} \cdot \Delta T\]</div>
+<div>$${T_c} = {T_m} + \frac{E}{{{E_o}}} \cdot \Delta T$$</div>
 
 With the above equations, and the assumption that the panels operate at the maximum power point, it is a direct calculation to determine DC power production. The performance of an array of identical modules is assumed to be linear with the number of modules in series and parallel. The inverter efficiency is applied linearly to derate the energy production. The inverter capacity forms a limit for power production from a PV generator. A ‘load’ is passed the PV array acting as a generator and various trivial calculations compare PV production to this load. If the PV array is associated with a surface that is associated with a zone, then if the zone has any multipliers associated with it, electricity production will be multiplied accordingly.
 
@@ -1018,31 +1018,31 @@ Generators
 
 The engine-driven generator model was originally developed for the BLAST program and was subsequently adapted for use in EnergyPlus. The model uses the following set of equations all of which are quadratic fits to the PLR (Part Load Ratio) of the generator.  The coefficients must be derived from manufacturers data.
 
-<div>\[\frac{{electric\,\,energy\,\,output}}{{fuel\,\,energy\,\,input}} = \frac{{electric\,\,energy\,\,output}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {a_1} + {a_2}PLR + {a_3}PL{R^2}\]</div>
+<div>$$\frac{{electric\,\,energy\,\,output}}{{fuel\,\,energy\,\,input}} = \frac{{electric\,\,energy\,\,output}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {a_1} + {a_2}PLR + {a_3}PL{R^2}$$</div>
 
 The electrical load and engine generator nominal load capacity are used to compute the part load ratio.
 
-<div>\[PLR = \frac{{Electric energy output}}{{nominal generating capacity}}\]</div>
+<div>$$PLR = \frac{{Electric energy output}}{{nominal generating capacity}}$$</div>
 
 The exhaust gas temp and flow rate are used if a stack heat exchanger is used to recover waste heat from the exhaust.  This temperature is the inlet temperature to the heat exchanger which is modeled in a UA-effectiveness form:
 
-<div>\[\frac{{Total\,Exhaust\,heat}}{{fuel\,energy\,input}} = \frac{{Total\,\,Exhaust\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {d_1} + {d_2}PLR + {d_3}PL{R^2}\]</div>
+<div>$$\frac{{Total\,Exhaust\,heat}}{{fuel\,energy\,input}} = \frac{{Total\,\,Exhaust\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {d_1} + {d_2}PLR + {d_3}PL{R^2}$$</div>
 
-<div>\[\frac{{Exhaust\,\,Gas\,\,Temp\,\,\left\{ K \right\}}}{{fuel\,\,energy\,\,input}} = \frac{{Exhaust\,\,Gas\,\,Temp\,\,\left\{ K \right\}}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {e_1} + {e_2}PLR + {e_3}PL{R^2}\]</div>
+<div>$$\frac{{Exhaust\,\,Gas\,\,Temp\,\,\left\{ K \right\}}}{{fuel\,\,energy\,\,input}} = \frac{{Exhaust\,\,Gas\,\,Temp\,\,\left\{ K \right\}}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {e_1} + {e_2}PLR + {e_3}PL{R^2}$$</div>
 
 The exhaust flow rate is then calculated as:
 
-<div>\[{\dot m_{exhaust}} = \frac{{Total\,\,Exhaust\,\,heat}}{{C{p_{exhaust}} \cdot \left( {{T_{exhaust}} - {T_{reference}}} \right)}}\]</div>
+<div>$${\dot m_{exhaust}} = \frac{{Total\,\,Exhaust\,\,heat}}{{C{p_{exhaust}} \cdot \left( {{T_{exhaust}} - {T_{reference}}} \right)}}$$</div>
 
 where T<sub>reference</sub> is the reference temperature for the fuel lower heating value, and is given as 25°C in manufacturer’s data, and
 
-<div>\[{T_{stack}} = {T_{DesignMinExhaust}} + {\frac{{\left( {{T_{exhaust}} - {T_{DesignMinExhaust}}} \right)}}{{{\rm{exp}}\left( {\frac{{{\rm{UA}}}}{{{{{\rm{\dot m}}}_{{\rm{exhaust}}}}C{p_{exhaust}}}}} \right)}}^2}\]</div>
+<div>$${T_{stack}} = {T_{DesignMinExhaust}} + {\frac{{\left( {{T_{exhaust}} - {T_{DesignMinExhaust}}} \right)}}{{{\rm{exp}}\left( {\frac{{{\rm{UA}}}}{{{{{\rm{\dot m}}}_{{\rm{exhaust}}}}C{p_{exhaust}}}}} \right)}}^2}$$</div>
 
 Finally heat recovered from the lube oil and the water jacket are accounted for as follows:
 
-<div>\[\frac{{Recoverable\,\,jacket\,\,heat}}{{fuel\,\,energy\,\,input}} = \frac{{Recoverable\,\,jacket\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {b_1} + {b_2}PLR + {b_3}PL{R^2}\]</div>
+<div>$$\frac{{Recoverable\,\,jacket\,\,heat}}{{fuel\,\,energy\,\,input}} = \frac{{Recoverable\,\,jacket\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {b_1} + {b_2}PLR + {b_3}PL{R^2}$$</div>
 
-<div>\[\frac{{Recoverable\,\,lube\,\,oil\,\,heat}}{{fuel\,\,energy\,\,input}} = \frac{{Recoverable\,\,lube\,\,oil\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {c_1} + {c_2}PLR + {c_3}PL{R^2}\]</div>
+<div>$$\frac{{Recoverable\,\,lube\,\,oil\,\,heat}}{{fuel\,\,energy\,\,input}} = \frac{{Recoverable\,\,lube\,\,oil\,\,heat}}{{\left( {{{\dot m}_{fuel}}\left\{ {kg/s} \right\} \cdot LHV\left\{ {J/kg} \right\}} \right)}} = {c_1} + {c_2}PLR + {c_3}PL{R^2}$$</div>
 
 The manufacturer must supply the recoverable water jacket heat, lube oil heat and exhaust heat and associated fuel consumption for a range of load conditions.  This data is then fit to the PLR to obtain the fifteen a,b,c,d, and e coefficients.
 
@@ -1050,33 +1050,33 @@ The manufacturer must supply the recoverable water jacket heat, lube oil heat an
 
 The combustion turbine generator model was originally developed for the BLAST program and was subsequently adapted for use in EnergyPlus. The model uses the following set of equations all of which are equation fits to the PLR (Part Load Ratio) of the generator and the entering air temperature. The coefficients must be derived from manufacturers data. For electric power generated in Watts, the fuel input rate is calculated in J/s.
 
-<div>\[\frac{{{\rm{fuel energy input rate}}}}{{{\rm{electric power output}}}} = \left[ {{a_1} + {a_2}PLR + {a_3}PL{R^2}} \right] * \left[ {{b_1} + {b_2}\Delta T + {b_3}\Delta {T^2}} \right]\]</div>
+<div>$$\frac{{{\rm{fuel energy input rate}}}}{{{\rm{electric power output}}}} = \left[ {{a_1} + {a_2}PLR + {a_3}PL{R^2}} \right] * \left[ {{b_1} + {b_2}\Delta T + {b_3}\Delta {T^2}} \right]$$</div>
 
 The electrical load and engine generator nominal load capacity are used to compute the part load ratio.
 
-<div>\[PLR = \frac{{{\rm{Electric energy output}}}}{{{\rm{nominal generating capacity}}}}\]</div>
+<div>$$PLR = \frac{{{\rm{Electric energy output}}}}{{{\rm{nominal generating capacity}}}}$$</div>
 
 The temperature difference shows the deviation of ambient air temperature from the manufacturers design air temperature.
 
-<div>\[\Delta T = {T_{air}} - {T_{design}}\]</div>
+<div>$$\Delta T = {T_{air}} - {T_{design}}$$</div>
 
 A second curve fit calculates the exhaust temperature (C) by multiplying the exhaust temperature (C) for a particular part load by a correction factor based on the deviation from design temperature.
 
-<div>\[{{\rm{T}}_{exhaust}} = \left[ {{c_1} + {c_2}PLR + {c_3}PL{R^2}} \right] * \left[ {{d_1} + {d_2}\Delta T + {d_3}\Delta {T^2}} \right]\]</div>
+<div>$${{\rm{T}}_{exhaust}} = \left[ {{c_1} + {c_2}PLR + {c_3}PL{R^2}} \right] * \left[ {{d_1} + {d_2}\Delta T + {d_3}\Delta {T^2}} \right]$$</div>
 
 The exhaust gas temp is used if a stack heat exchanger is used to recover waste heat from the exhaust.  This temperature is the inlet temperature to the heat exchanger which is modeled in a UA-effectiveness form:
 
-<div>\[{T_{stack}} = {T_{DesignMinExhaust}} + {\frac{{\left( {{T_{exhaust}} - {T_{DesignMinExhaust}}} \right)}}{{{\rm{exp}}\left( {\frac{{{\rm{UA}}}}{{{{{\rm{\dot m}}}_{{\rm{exhaust}}}}C{p_{exhaust}}}}} \right)}}^2}\]</div>
+<div>$${T_{stack}} = {T_{DesignMinExhaust}} + {\frac{{\left( {{T_{exhaust}} - {T_{DesignMinExhaust}}} \right)}}{{{\rm{exp}}\left( {\frac{{{\rm{UA}}}}{{{{{\rm{\dot m}}}_{{\rm{exhaust}}}}C{p_{exhaust}}}}} \right)}}^2}$$</div>
 
 Where the design minimum exhaust temperature is a user input to the model and the exhaust mass flow rate and the UA are fit from manufacturers data as follows:
 
-<div>\[UA = {e_3}{{\rm{(Nominal Generating Capacity)}}^{e4}}\]</div>
+<div>$$UA = {e_3}{{\rm{(Nominal Generating Capacity)}}^{e4}}$$</div>
 
-<div>\[\frac{{{\rm{exhaust gas flow rate}}}}{{{\rm{Nominal Generating Capacity}}}} = \left[ {{f_1} + {f_2}\Delta T + {f_3}\Delta {T^2}} \right]\]</div>
+<div>$$\frac{{{\rm{exhaust gas flow rate}}}}{{{\rm{Nominal Generating Capacity}}}} = \left[ {{f_1} + {f_2}\Delta T + {f_3}\Delta {T^2}} \right]$$</div>
 
 Finally, heat recovered from the lube oil is accounted for as follows:
 
-<div>\[\frac{{{\rm{Recoverable lube oil heat}}}}{{{\rm{electric power generated}}}} = {g_1} + {g_2}PLR + {g_3}PL{R^2}\]</div>
+<div>$$\frac{{{\rm{Recoverable lube oil heat}}}}{{{\rm{electric power generated}}}} = {g_1} + {g_2}PLR + {g_3}PL{R^2}$$</div>
 
 ### Microturbine Generator
 
@@ -1086,9 +1086,9 @@ Exhaust air energy recovery for heating water can be also be modeled. Similar to
 
 For each simulation time step that the generator is being asked to operate (i.e., produce electrical power as determined by the ElectricLoadCenter), the full load electrical output of the generator is determined using the user-defined reference electrical power output along with a bi-quadratic modifier curve to account for differences in the combustion air inlet temperature and elevation for the current simulation time step compared to the reference temperature and elevation (i.e., the modifier curve should evaluate to 1.0 at the reference combustion air inlet temperature and reference elevation).
 
-<div>\[{P_{Elec,Full\,Load\,}} = {P_{Elec,Ref}}\left( {PowerFTempElev} \right)\]</div>
+<div>$${P_{Elec,Full\,Load\,}} = {P_{Elec,Ref}}\left( {PowerFTempElev} \right)$$</div>
 
-<div>\[PowerFTempElev = {a_1} + {a_2}\left( {{T_{a,i}}} \right) + {a_3}{\left( {{T_{a,i}}} \right)^2} + {a_4}\left( {Elev} \right) + {a_5}{\left( {Elev} \right)^2} + {a_6}\left( {{T_{a,i}}} \right)\left( {Elev} \right)\]</div>
+<div>$$PowerFTempElev = {a_1} + {a_2}\left( {{T_{a,i}}} \right) + {a_3}{\left( {{T_{a,i}}} \right)^2} + {a_4}\left( {Elev} \right) + {a_5}{\left( {Elev} \right)^2} + {a_6}\left( {{T_{a,i}}} \right)\left( {Elev} \right)$$</div>
 
 where:
 
@@ -1104,9 +1104,9 @@ where:
 
 The full load electrical power output of the generator is then checked against the minimum and maximum full load electrical power outputs specified by the user:
 
-<div>\[{P_{Elec,Full\,Load}} = MIN\left( {{P_{Elec,Full\,Load}},{P_{FL\_Max}}} \right)\]</div>
+<div>$${P_{Elec,Full\,Load}} = MIN\left( {{P_{Elec,Full\,Load}},{P_{FL\_Max}}} \right)$$</div>
 
-<div>\[{P_{Elec,Full\,Load}} = MAX\left( {{P_{Elec,Full\,Load}},{P_{FL\_Min}}} \right)\]</div>
+<div>$${P_{Elec,Full\,Load}} = MAX\left( {{P_{Elec,Full\,Load}},{P_{FL\_Min}}} \right)$$</div>
 
 <span>${P_{FL\_Max}}$</span> = Maximum Full Load Electrical Power Output, user input (W)
 
@@ -1114,9 +1114,9 @@ The full load electrical power output of the generator is then checked against t
 
 The actual (operating) electrical power output from the generator is determined next based on the load requested by the Electric Load Center, the generator’s minimum and maximum part-load ratios, and the ancillary power.
 
-<div>\[{P_{Elec,Operating}} = MAX\left( {0.0,\left( {Load + {P_{Ancillary}}} \right)} \right)\]</div>
+<div>$${P_{Elec,Operating}} = MAX\left( {0.0,\left( {Load + {P_{Ancillary}}} \right)} \right)$$</div>
 
-<div>\[{P_{Elec,Operating}} = MIN\left( {{P_{Elec,Operating}},{P_{Elec,Full\,Load}}} \right)\]</div>
+<div>$${P_{Elec,Operating}} = MIN\left( {{P_{Elec,Operating}},{P_{Elec,Full\,Load}}} \right)$$</div>
 
 ```
  IF (P_elec_fullload > 0) THEN
@@ -1145,11 +1145,11 @@ where:
 
 The generator’s electrical efficiency is then calculated based on the user-specified reference electrical efficiency (lower heating value [LHV] basis) and two electrical efficiency modifier curves.
 
-<div>\[ElecEfficiencyFTemp = {b_1} + {b_2}\left( {{T_{a,i}}} \right) + {b_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,or\,\,\,\,\,{b_1} + {b_2}\left( {{T_{a,i}}} \right) + {b_3}{\left( {{T_{a,i}}} \right)^2} + {b_4}{\left( {{T_{a,i}}} \right)^3}\]</div>
+<div>$$ElecEfficiencyFTemp = {b_1} + {b_2}\left( {{T_{a,i}}} \right) + {b_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,or\,\,\,\,\,{b_1} + {b_2}\left( {{T_{a,i}}} \right) + {b_3}{\left( {{T_{a,i}}} \right)^2} + {b_4}{\left( {{T_{a,i}}} \right)^3}$$</div>
 
-<div>\[ElecEfficiencyFPLR = {c_1} + {c_2}\left( {PLR} \right) + {c_3}{\left( {PLR} \right)^2}\,\,\,\,or\,\,\,\,\,{c_1} + {c_2}\left( {PLR} \right) + {c_3}{\left( {PLR} \right)^2} + {c_4}{\left( {PLR} \right)^3}\]</div>
+<div>$$ElecEfficiencyFPLR = {c_1} + {c_2}\left( {PLR} \right) + {c_3}{\left( {PLR} \right)^2}\,\,\,\,or\,\,\,\,\,{c_1} + {c_2}\left( {PLR} \right) + {c_3}{\left( {PLR} \right)^2} + {c_4}{\left( {PLR} \right)^3}$$</div>
 
-<div>\[ElecEf{f_{Operating}} = ElecEf{f_{Ref,LHV}}\left( {ElecEfficiencyFTemp} \right)\left( {ElecEfficiencyFPLR} \right)\]</div>
+<div>$$ElecEf{f_{Operating}} = ElecEf{f_{Ref,LHV}}\left( {ElecEfficiencyFTemp} \right)\left( {ElecEfficiencyFPLR} \right)$$</div>
 
 where:
 
@@ -1163,7 +1163,7 @@ where:
 
 The fuel energy consumption rate (LHV Basis) is then calculated as follows:
 
-<div>\[{\dot Q_{Fuel,LHV}} = {\raise0.7ex\hbox{${{P_{Elec,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Elec,Operating}}} {ElecEf{f_{Operating}}}}}\right.}\!\lower0.7ex\hbox{${ElecEf{f_{Operating}}}$}}\]</div>
+<div>$${\dot Q_{Fuel,LHV}} = {\raise0.7ex\hbox{${{P_{Elec,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Elec,Operating}}} {ElecEf{f_{Operating}}}}}\right.}\!\lower0.7ex\hbox{${ElecEf{f_{Operating}}}$}}$$</div>
 
 where:
 
@@ -1171,7 +1171,7 @@ where:
 
 If *ElecEff<sub>Operating</sub>* is equal to zero, then *P<sub>Operating</sub>* and <span>${\dot Q_{Fuel,LHV}}$</span><sub> </sub>are set to zero. The fuel mass flow rate is then calculated.
 
-<div>\[{\dot m_{fuel}} = {\raise0.7ex\hbox{${{{\dot Q}_{Fuel,LHV}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{Fuel,LHV}}} {\left( {LHV*1000} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {LHV*1000} \right)}$}}\]</div>
+<div>$${\dot m_{fuel}} = {\raise0.7ex\hbox{${{{\dot Q}_{Fuel,LHV}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{Fuel,LHV}}} {\left( {LHV*1000} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {LHV*1000} \right)}$}}$$</div>
 
 where:
 
@@ -1181,9 +1181,9 @@ where:
 
 The ancillary power is calculated next using the user-specified ancillary power and ancillary power modifier curve. The ancillary power modifier curve is a quadratic function with the generator’s fuel mass flow rate as the independent variable. If an ancillary power modifier curve is not specified in the input file, the modifier is assumed to be 1.0 and the ancillary power will be constant throughout the simulation.
 
-<div>\[AnciPowFMdotFuel = {d_1} + {d_2}\left( {{{\dot m}_{fuel}}} \right) + {d_3}{\left( {{{\dot m}_{fuel}}} \right)^2}\]</div>
+<div>$$AnciPowFMdotFuel = {d_1} + {d_2}\left( {{{\dot m}_{fuel}}} \right) + {d_3}{\left( {{{\dot m}_{fuel}}} \right)^2}$$</div>
 
-<div>\[{P_{Ancillary,Operating}} = {P_{Ancillary}}\left( {AnciPowFMdotFuel} \right)\]</div>
+<div>$${P_{Ancillary,Operating}} = {P_{Ancillary}}\left( {AnciPowFMdotFuel} \right)$$</div>
 
 where:
 
@@ -1197,7 +1197,7 @@ If ancillary power is constant for the simulation (e.g., no modifier curve defin
 
 The generator’s “net” electrical power output is calculated as the difference between the generator’s actual power output and the ancillary electric power as follows.
 
-<div>\[{P_{Elec,Produced}} = {P_{Elec,Operating}} - {P_{Ancillary,Operating}}\]</div>
+<div>$${P_{Elec,Produced}} = {P_{Elec,Operating}} - {P_{Ancillary,Operating}}$$</div>
 
 where:
 
@@ -1205,7 +1205,7 @@ where:
 
 The fuel energy consumption rate (higher heating value basis) for the generator is then calculated as follows:
 
-<div>\[{\dot Q_{Fuel,HHV}} = {\dot m_{fuel}}\left( {HHV} \right)\left( {1000} \right)\]</div>
+<div>$${\dot Q_{Fuel,HHV}} = {\dot m_{fuel}}\left( {HHV} \right)\left( {1000} \right)$$</div>
 
 where:
 
@@ -1215,7 +1215,7 @@ where:
 
 Standby electrical power may also be modeled to simulate controls or other parasitics used by the generator. The standby power is calculated only when the generator is not operating (i.e., *Load* from the Electric Load Center is zero). If the generator operates for a given timestep (i.e., *Load* &gt; 0.0), the standby power is set equal to 0.
 
-<div>\[\begin{array}{l}IF\,\,\left( {Load\, <  = 0.0} \right)\,\,THEN\\\,\,\,\,\,{P_{Standby}} = {P_{Standby,user\,input}}\\ELSE\\\,\,\,\,\,{P_{Standby}} = 0.0\\END\,IF\end{array}\]</div>
+<div>$$\begin{array}{l}IF\,\,\left( {Load\, <  = 0.0} \right)\,\,THEN\\\,\,\,\,\,{P_{Standby}} = {P_{Standby,user\,input}}\\ELSE\\\,\,\,\,\,{P_{Standby}} = 0.0\\END\,IF\end{array}$$</div>
 
 where:
 
@@ -1225,15 +1225,15 @@ where:
 
 Report variables for electric energy produced, electric efficiency (LHV basis), fuel consumption (HHV basis), standby electric consumption and ancillary electric consumption are calculated as follows:
 
-<div>\[{E_{Elec,Produced}} = {P_{Elec,Produced}}\left( {TimeStepSys} \right)\left( {3600} \right)\]</div>
+<div>$${E_{Elec,Produced}} = {P_{Elec,Produced}}\left( {TimeStepSys} \right)\left( {3600} \right)$$</div>
 
-<div>\[ElecEf{f_{Operating,LHV}} = {\raise0.7ex\hbox{${{P_{Elec,Produced}}}$} \!\mathord{\left/ {\vphantom {{{P_{Elec,Produced}}} {{{\dot Q}_{Fuel,LHV}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot Q}_{Fuel,LHV}}}$}}\]</div>
+<div>$$ElecEf{f_{Operating,LHV}} = {\raise0.7ex\hbox{${{P_{Elec,Produced}}}$} \!\mathord{\left/ {\vphantom {{{P_{Elec,Produced}}} {{{\dot Q}_{Fuel,LHV}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot Q}_{Fuel,LHV}}}$}}$$</div>
 
-<div>\[{Q_{Fuel,HHV}} = {\dot Q_{Fuel,HHV}}\left( {TimeStepSys} \right)\left( {3600} \right)\]</div>
+<div>$${Q_{Fuel,HHV}} = {\dot Q_{Fuel,HHV}}\left( {TimeStepSys} \right)\left( {3600} \right)$$</div>
 
-<div>\[{E_{Standby}} = {P_{Standby}}\left( {TimeStepSys} \right)\left( {3600} \right)\]</div>
+<div>$${E_{Standby}} = {P_{Standby}}\left( {TimeStepSys} \right)\left( {3600} \right)$$</div>
 
-<div>\[{E_{Ancillary}} = {P_{Ancillary,Operating}}\left( {TimeStepSys} \right)\left( {3600} \right)\]</div>
+<div>$${E_{Ancillary}} = {P_{Ancillary,Operating}}\left( {TimeStepSys} \right)\left( {3600} \right)$$</div>
 
 where:
 
@@ -1251,7 +1251,7 @@ where:
 
 In addition to calculating electric power production and fuel usage, the model is able to determine thermal power (heat recovery) output for heating water.  For this case, the water flow rate through the heat recovery heat exchanger is established first. If the Heat Recovery Water Flow Operating Mode (user input) is set to Plant Control, then the Reference Heat Recovery Water Flow Rate (user input) is requested whenever the generator operates (constant value), but the actual flow rate may be restricted by other plant components (e.g., pump). If the Heat Recovery Water Flow Operating Mode is set to Internal Control, then the requested water flow when the generator operates is determined by the Reference Heat Recovery Water Flow Rate and a flow rate modifier curve.
 
-<div>\[\begin{array}{l}IF\,\,\left( {Plant\,Control} \right)\,\,THEN\\\,\,\,\,\,{{\dot m}_w} = {{\dot V}_{w,Ref}}\left( {{\rho_w}} \right)\\ELSEIF\,\left( {Internal\,Control} \right)\,THEN\\\,\,\,\,\,\,HeatRecFlowFTempPow = {e_1} + {e_2}\left( {{T_{w,i}}} \right) + {e_3}{\left( {{T_{w,i}}} \right)^2} + {e_4}\left( {{P_{net}}} \right) + {e_5}{\left( {{P_{net}}} \right)^2} + {e_6}\left( {{T_{w,i}}} \right)\left( {{P_{net}}} \right)\\\,\,\,\,\,\,{{\dot m}_w} = {{\dot V}_{w,Ref}}\left( {{\rho_w}} \right)\left( {HeatRecFlowFTempPow} \right)\\END\,IF\end{array}\]</div>
+<div>$$\begin{array}{l}IF\,\,\left( {Plant\,Control} \right)\,\,THEN\\\,\,\,\,\,{{\dot m}_w} = {{\dot V}_{w,Ref}}\left( {{\rho_w}} \right)\\ELSEIF\,\left( {Internal\,Control} \right)\,THEN\\\,\,\,\,\,\,HeatRecFlowFTempPow = {e_1} + {e_2}\left( {{T_{w,i}}} \right) + {e_3}{\left( {{T_{w,i}}} \right)^2} + {e_4}\left( {{P_{net}}} \right) + {e_5}{\left( {{P_{net}}} \right)^2} + {e_6}\left( {{T_{w,i}}} \right)\left( {{P_{net}}} \right)\\\,\,\,\,\,\,{{\dot m}_w} = {{\dot V}_{w,Ref}}\left( {{\rho_w}} \right)\left( {HeatRecFlowFTempPow} \right)\\END\,IF\end{array}$$</div>
 
  where:
 
@@ -1269,9 +1269,9 @@ In addition to calculating electric power production and fuel usage, the model i
 
 The methodology for determining thermal power (heat recovery to water) is similar to that used for calculating electric power production. The generator’s steady-state thermal efficiency is calculated based on the user-specified reference thermal efficiency (LHV basis) and a thermal efficiency modifier curve.
 
-<div>\[ThermalEf{f_{SS\,}} = ThermalEf{f_{Ref,LHV}}\left( {ThermalEffFTempElev} \right)\]</div>
+<div>$$ThermalEf{f_{SS\,}} = ThermalEf{f_{Ref,LHV}}\left( {ThermalEffFTempElev} \right)$$</div>
 
-<div>\[ThermalEffFTempElev = {f_1} + {f_2}\left( {{T_{a,i}}} \right) + {f_3}{\left( {{T_{a,i}}} \right)^2} + {f_4}\left( {Elev} \right) + {f_5}{\left( {Elev} \right)^2} + {f_6}\left( {{T_{a,i}}} \right)\left( {Elev} \right)\]</div>
+<div>$$ThermalEffFTempElev = {f_1} + {f_2}\left( {{T_{a,i}}} \right) + {f_3}{\left( {{T_{a,i}}} \right)^2} + {f_4}\left( {Elev} \right) + {f_5}{\left( {Elev} \right)^2} + {f_6}\left( {{T_{a,i}}} \right)\left( {Elev} \right)$$</div>
 
 where:
 
@@ -1283,15 +1283,15 @@ where:
 
 The steady-state thermal power produced (heat recovery rate) is then calculated:
 
-<div>\[{P_{Thermal,SS}} = ThermalEf{f_{SS}}\left( {{{\dot Q}_{Fuel,LHV}}} \right)\]</div>
+<div>$${P_{Thermal,SS}} = ThermalEf{f_{SS}}\left( {{{\dot Q}_{Fuel,LHV}}} \right)$$</div>
 
 The actual (operating) thermal power is then calculated using the steady-state thermal power and three modifier curves:
 
 <span>${P_{Thermal,Operating}} = {P_{Thermal,SS}}\left( {HeatRecRateFPLR} \right)\left( {HeatRecRateFTemp} \right)\left( {HeatRecRateFFlow} \right)$</span><span>$\begin{array}{l}HeatRecRateFPLR = {g_1} + {g_2}\left( {PLR} \right) + {g_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{g_1} + {g_2}\left( {PLR} \right) + {g_3}{\left( {PLR} \right)^2} + {g_4}{\left( {PLR} \right)^3}\end{array}$</span>
 
-<div>\[HeatRecRateFTemp = {h_1} + {h_2}\left( {{T_{w,i}}} \right) + {h_3}{\left( {{T_{w,i}}} \right)^2}\]</div>
+<div>$$HeatRecRateFTemp = {h_1} + {h_2}\left( {{T_{w,i}}} \right) + {h_3}{\left( {{T_{w,i}}} \right)^2}$$</div>
 
-<div>\[HeatRecRateFFlow = {i_1} + {i_2}\left( {{{\dot m}_w}} \right) + {i_3}{\left( {{{\dot m}_w}} \right)^2}\]</div>
+<div>$$HeatRecRateFFlow = {i_1} + {i_2}\left( {{{\dot m}_w}} \right) + {i_3}{\left( {{{\dot m}_w}} \right)^2}$$</div>
 
 where:
 
@@ -1305,7 +1305,7 @@ where:
 
 The heat recovery output water temperature is then calculated.
 
-<div>\[{T_{w,o}} = {\rm{ }}{T_{w,i}}{\rm{ }} + {\rm{ }}{\raise0.7ex\hbox{${{P_{Thermal,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {\left( {{{\dot m}_w}{\rm{ }}*{\rm{ }}C{p_w}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {{{\dot m}_w}{\rm{ }}*{\rm{ }}C{p_w}} \right)}$}}\]</div>
+<div>$${T_{w,o}} = {\rm{ }}{T_{w,i}}{\rm{ }} + {\rm{ }}{\raise0.7ex\hbox{${{P_{Thermal,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {\left( {{{\dot m}_w}{\rm{ }}*{\rm{ }}C{p_w}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {{{\dot m}_w}{\rm{ }}*{\rm{ }}C{p_w}} \right)}$}}$$</div>
 
 where:
 
@@ -1319,7 +1319,7 @@ If combustion air inlet and outlet node names are specified in the input, along 
 
 <span>${\dot m_{ExhAir}} = {\dot m_{ExhAir,Ref}}\left( {ExhFlowFTemp} \right)\left( {ExhFlowFPLR} \right)\left( {{\raise0.7ex\hbox{${{\rho_{a,i}}}$} \!\mathord{\left/ {\vphantom {{{\rho_{a,i}}} {{\rho_{a,Ref}}}}}\right.}\!\lower0.7ex\hbox{${{\rho_{a,Ref}}}$}}} \right)$</span><span>$\begin{array}{l}ExhFlowFTemp = {j_1} + {j_2}\left( {{T_{a,i}}} \right) + {j_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{j_1} + {j_2}\left( {{T_{a,i}}} \right) + {j_3}{\left( {{T_{a,i}}} \right)^2} + {j_4}{\left( {{T_{a,i}}} \right)^3}\end{array}$</span>
 
-<div>\[\begin{array}{l}ExhFlowFPLR = {k_1} + {k_2}\left( {PLR} \right) + {k_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{k_1} + {k_2}\left( {PLR} \right) + {k_3}{\left( {PLR} \right)^2} + {k_4}{\left( {PLR} \right)^3}\end{array}\]</div>
+<div>$$\begin{array}{l}ExhFlowFPLR = {k_1} + {k_2}\left( {PLR} \right) + {k_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{k_1} + {k_2}\left( {PLR} \right) + {k_3}{\left( {PLR} \right)^2} + {k_4}{\left( {PLR} \right)^3}\end{array}$$</div>
 
 where:
 
@@ -1339,7 +1339,7 @@ In an analogous fashion, the exhaust air temperature is calculated using the Nom
 
 <span>${T_{a,o}} = {T_{a,o,Nom}}\left( {ExhAirTempFTemp} \right)\left( {ExhAirTempFPLR} \right)$</span><span>$\begin{array}{l}ExhAirTempFTemp = {l_1} + {l_2}\left( {{T_{a,i}}} \right) + {l_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{l_1} + {l_2}\left( {{T_{a,i}}} \right) + {l_3}{\left( {{T_{a,i}}} \right)^2} + {l_4}{\left( {{T_{a,i}}} \right)^3}\end{array}$</span>
 
-<div>\[\begin{array}{l}ExhAirTempFPLR = {m_1} + {m_2}\left( {PLR} \right) + {m_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{m_1} + {m_2}\left( {PLR} \right) + {m_3}{\left( {PLR} \right)^2} + {m_4}{\left( {PLR} \right)^3}\end{array}\]</div>
+<div>$$\begin{array}{l}ExhAirTempFPLR = {m_1} + {m_2}\left( {PLR} \right) + {m_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{m_1} + {m_2}\left( {PLR} \right) + {m_3}{\left( {PLR} \right)^2} + {m_4}{\left( {PLR} \right)^3}\end{array}$$</div>
 
 where:
 
@@ -1353,7 +1353,7 @@ where:
 
 The above calculations for exhaust air outlet temperature assume no heat recovery to water is being done.  If thermal power (water heating) is being produced, then the exhaust air outlet temperature is recalculated as follows:
 
-<div>\[{T_{a,o}} = {T_{a,o}} - {\raise0.7ex\hbox{${{P_{Thermal,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {\left( {{{\dot m}_{ExhAir}}*C{p_{air}}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {{{\dot m}_{ExhAir}}*C{p_{air}}} \right)}$}}\]</div>
+<div>$${T_{a,o}} = {T_{a,o}} - {\raise0.7ex\hbox{${{P_{Thermal,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {\left( {{{\dot m}_{ExhAir}}*C{p_{air}}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {{{\dot m}_{ExhAir}}*C{p_{air}}} \right)}$}}$$</div>
 
 where:
 
@@ -1361,7 +1361,7 @@ where:
 
 The exhaust air outlet humidity ratio is also calculated.
 
-<div>\[{w_{a,o}} = {w_{a,i}} + {\raise0.7ex\hbox{${\left[ {{{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} \mathord{\left/ {\vphantom {{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} {\left( {{h_{fg,16}}} \right)}}} \right. } {\left( {{h_{fg,16}}} \right)}}} \right]}$} \!\mathord{\left/ {\vphantom {{\left[ {{{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} \mathord{\left/ {\vphantom {{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} {\left( {{h_{fg,16}}} \right)}}} \right. } {\left( {{h_{fg,16}}} \right)}}} \right]} {\left( {{{\dot m}_{ExhAir}}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {{{\dot m}_{ExhAir}}} \right)}$}}\]</div>
+<div>$${w_{a,o}} = {w_{a,i}} + {\raise0.7ex\hbox{${\left[ {{{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} \mathord{\left/ {\vphantom {{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} {\left( {{h_{fg,16}}} \right)}}} \right. } {\left( {{h_{fg,16}}} \right)}}} \right]}$} \!\mathord{\left/ {\vphantom {{\left[ {{{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} \mathord{\left/ {\vphantom {{{{\dot m}_{fuel}}\left( {HHV - LHV} \right)\left( {1000} \right)} {\left( {{h_{fg,16}}} \right)}}} \right. } {\left( {{h_{fg,16}}} \right)}}} \right]} {\left( {{{\dot m}_{ExhAir}}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {{{\dot m}_{ExhAir}}} \right)}$}}$$</div>
 
 where:
 
@@ -1373,9 +1373,9 @@ where:
 
 The remaining report variables are calculated as follows.
 
-<div>\[{E_{Thermal,Produced}} = {P_{Thermal,Operating}}\left( {TimeStepSys} \right)\left( {3600} \right)\]</div>
+<div>$${E_{Thermal,Produced}} = {P_{Thermal,Operating}}\left( {TimeStepSys} \right)\left( {3600} \right)$$</div>
 
-<div>\[ThermalEf{f_{Operating,LHV}} = {\raise0.7ex\hbox{${{P_{Thermal,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {{{\dot Q}_{Fuel,LHV}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot Q}_{Fuel,LHV}}}$}}\]</div>
+<div>$$ThermalEf{f_{Operating,LHV}} = {\raise0.7ex\hbox{${{P_{Thermal,Operating}}}$} \!\mathord{\left/ {\vphantom {{{P_{Thermal,Operating}}} {{{\dot Q}_{Fuel,LHV}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot Q}_{Fuel,LHV}}}$}}$$</div>
 
 where:
 
@@ -1389,39 +1389,39 @@ The input object Generator:MicroCHP provides a model that is a direct implementa
 
 The Micro CHP model is a straightforward empirical model with the exception that it is dynamic with respect to thermal heat recovery where performance is cast as a function of engine temperature.  It is also dynamic with respect to possible warm up and cool down periods that may affect the ability of the generator to deliver the requested power.  The relevant model equations are:
 
-<div>\[{\eta_e} = f({\dot m_{cw}},{T_{cw,i}},{P_{net,ss}})\]</div>
+<div>$${\eta_e} = f({\dot m_{cw}},{T_{cw,i}},{P_{net,ss}})$$</div>
 
-<div>\[{\eta_q} = f({\dot m_{cw}},{T_{cw,i}},{P_{net,ss}})\]</div>
+<div>$${\eta_q} = f({\dot m_{cw}},{T_{cw,i}},{P_{net,ss}})$$</div>
 
-<div>\[{q_{gross}} = {P_{net,ss}}/{\eta_e}\]</div>
+<div>$${q_{gross}} = {P_{net,ss}}/{\eta_e}$$</div>
 
-<div>\[{q_{gen,ss}} = {\eta_q}{q_{gross}}\]</div>
+<div>$${q_{gen,ss}} = {\eta_q}{q_{gross}}$$</div>
 
-<div>\[{\dot N_{fuel}} = {q_{gross}}/LH{V_{fuel}}\]</div>
+<div>$${\dot N_{fuel}} = {q_{gross}}/LH{V_{fuel}}$$</div>
 
-<div>\[
+<div>$$
   \dot m_{fuel}^{t+\Delta t} = \left\{
     \begin{array}{cl}
       \dot m_{fuel,demand}^{t+\Delta t}       &\; if d\dot m_{fuel} / dt \le (d\dot m_{fuel}/dt)_{max} \\
       \dot m_{fuel,demand}^t \pm (d\dot m_{fuel}/dt)_{max}      &\; if d\dot m_{fuel} / dt \gt (d\dot m_{fuel}/dt)_{max} 
     \end{array}
   \right.
-\]</div>
+$$</div>
 
-<div>\[{\dot m_{air}} = f({P_{net,ss}})\]</div>
+<div>$${\dot m_{air}} = f({P_{net,ss}})$$</div>
 
-<div>\[
+<div>$$
   P_{net}^{t+\Delta t} = \left\{
     \begin{array}{cl}
       P_{net,ss}^{t+\Delta t}       &\; if dP_{net} / dt \le (dP_{net}/dt)_{max} \\
       P_{net,ss}^t \pm (dP_{net}/dt)_{max}      &\; if dP_{net} / dt \gt (dP_{net}/dt)_{max} 
     \end{array}
   \right.
-\]</div>
+$$</div>
 
-<div>\[{[MC]_{eng}}\frac{{d{T_{eng}}}}{{dt}} = U{A_{HX}}\left( {{T_{cw,p}} - {T_{eng}}} \right) + U{A_{loss}}\left( {{T_{room}} - {T_{eng}}} \right) + {q_{gen,ss}}\]</div>
+<div>$${[MC]_{eng}}\frac{{d{T_{eng}}}}{{dt}} = U{A_{HX}}\left( {{T_{cw,p}} - {T_{eng}}} \right) + U{A_{loss}}\left( {{T_{room}} - {T_{eng}}} \right) + {q_{gen,ss}}$$</div>
 
-<div>\[{[MC]_{cw}}\frac{{d{T_{cw,o}}}}{{dt}} = {[\dot m{c_p}]_{cw}}\left( {{T_{cw,i}} - {T_{cw,o}}} \right) + U{A_{HX}}\left( {{T_{eng}} - {T_{cw,o}}} \right)\]</div>
+<div>$${[MC]_{cw}}\frac{{d{T_{cw,o}}}}{{dt}} = {[\dot m{c_p}]_{cw}}\left( {{T_{cw,i}} - {T_{cw,o}}} \right) + U{A_{HX}}\left( {{T_{eng}} - {T_{cw,o}}} \right)$$</div>
 
 where,
 
@@ -1467,31 +1467,31 @@ The functional forms for <span>${\eta_e}$</span> and <span>${\eta_q}$</span> a
 
 EnergyPlus solves these for state values for the engine mass temperature, <span>${T_{eng}}$</span>, and the outlet plant node, <span>${T_{cw,o}}$</span>, in the following manner. The last two equations are interrelated but otherwise ordinary differential equations with the general form
 
-<div>\[\frac{{dT}}{{dt}} = a + bT\]</div>
+<div>$$\frac{{dT}}{{dt}} = a + bT$$</div>
 
 and have analytical solution
 
-<div>\[T = \left( {{T_o} + {\raise0.7ex\hbox{$a$} \!\mathord{\left/ {\vphantom {a b}}\right.}\!\lower0.7ex\hbox{$b$}}} \right){e^{bt}} - {\raise0.7ex\hbox{$a$} \!\mathord{\left/ {\vphantom {a b}}\right.}\!\lower0.7ex\hbox{$b$}}\]</div>
+<div>$$T = \left( {{T_o} + {\raise0.7ex\hbox{$a$} \!\mathord{\left/ {\vphantom {a b}}\right.}\!\lower0.7ex\hbox{$b$}}} \right){e^{bt}} - {\raise0.7ex\hbox{$a$} \!\mathord{\left/ {\vphantom {a b}}\right.}\!\lower0.7ex\hbox{$b$}}$$</div>
 
 The engine temperature at the current timestep is calculated using
 
-<div>\[a = \frac{{U{A_{HX}}}}{{{{[MC]}_{eng}}}}*{T_{cw,o}} + \frac{{U{A_{loss}}}}{{{{[MC]}_{eng}}}}*{T_{room}} + \frac{{{q_{gen,ss}}}}{{{{[MC]}_{eng}}}}\]</div>
+<div>$$a = \frac{{U{A_{HX}}}}{{{{[MC]}_{eng}}}}*{T_{cw,o}} + \frac{{U{A_{loss}}}}{{{{[MC]}_{eng}}}}*{T_{room}} + \frac{{{q_{gen,ss}}}}{{{{[MC]}_{eng}}}}$$</div>
 
-<div>\[b =  - \left( {\frac{{U{A_{HX}}}}{{{{[MC]}_{eng}}}} + \frac{{U{A_{loss}}}}{{{{[MC]}_{eng}}}}} \right)\]</div>
+<div>$$b =  - \left( {\frac{{U{A_{HX}}}}{{{{[MC]}_{eng}}}} + \frac{{U{A_{loss}}}}{{{{[MC]}_{eng}}}}} \right)$$</div>
 
 The plant node outlet fluid temperature (heat recovered) is solved using
 
-<div>\[a = \frac{{{{[\dot m{c_p}]}_{cw}}}}{{{{[MC]}_{cw}}}}*{T_{cw,i}} + \frac{{U{A_{HX}}}}{{{{[MC]}_{cw}}}}*{T_{eng}}\]</div>
+<div>$$a = \frac{{{{[\dot m{c_p}]}_{cw}}}}{{{{[MC]}_{cw}}}}*{T_{cw,i}} + \frac{{U{A_{HX}}}}{{{{[MC]}_{cw}}}}*{T_{eng}}$$</div>
 
-<div>\[b =  - \left( {\frac{{{{[\dot m{c_p}]}_{cw}}}}{{{{[MC]}_{cw}}}} + \frac{{U{A_{HX}}}}{{{{[MC]}_{cw}}}}} \right)\]</div>
+<div>$$b =  - \left( {\frac{{{{[\dot m{c_p}]}_{cw}}}}{{{{[MC]}_{cw}}}} + \frac{{U{A_{HX}}}}{{{{[MC]}_{cw}}}}} \right)$$</div>
 
 The interrelation of these two is handled by sequential substitution using an iteration scheme that alternates between calculations of <span>${T_{eng}}$</span> and <span>${T_{cw,o}}$</span>.  The iteration loop exits once the energy is determined to be balanced using the following criteria:
 
 Number of iterations &gt; 3\\
 
-<div>\[\frac{{{{\left( {{q_{gen,ss}}} \right)}_{\max }}}}{{10000000}} > U{A_{HX}}\left( {{T_{cw,o}} - {T_{eng}}} \right) + U{A_{loss}}\left( {{T_{room}} - {T_{eng}}} \right) + {q_{gen,ss}} - {[MC]_{eng}}\frac{{d{T_{eng}}}}{{dt}}\]</div>
+<div>$$\frac{{{{\left( {{q_{gen,ss}}} \right)}_{\max }}}}{{10000000}} > U{A_{HX}}\left( {{T_{cw,o}} - {T_{eng}}} \right) + U{A_{loss}}\left( {{T_{room}} - {T_{eng}}} \right) + {q_{gen,ss}} - {[MC]_{eng}}\frac{{d{T_{eng}}}}{{dt}}$$</div>
 
-<div>\[\frac{{{{\left( {{q_{gen,ss}}} \right)}_{\max }}}}{{10000000}} > {[\dot m{c_p}]_{cw}}\left( {{T_{cw,i}} - {T_{cw,o}}} \right) + U{A_{HX}}\left( {{T_{eng}} - {T_{cw,o}}} \right) - {[MC]_{cw}}\frac{{d{T_{cw,o}}}}{{dt}}\]</div>
+<div>$$\frac{{{{\left( {{q_{gen,ss}}} \right)}_{\max }}}}{{10000000}} > {[\dot m{c_p}]_{cw}}\left( {{T_{cw,i}} - {T_{cw,o}}} \right) + U{A_{HX}}\left( {{T_{eng}} - {T_{cw,o}}} \right) - {[MC]_{cw}}\frac{{d{T_{cw,o}}}}{{dt}}$$</div>
 
 The Micro CHP model has a number of different operating modes.  The operating mode for a given system timestep is determined from the mode during the previous timestep, user inputs, and high-level controls from elsewhere in EnergyPlus.  The operating mode is reported for the state at the end of each timestep.  The following table summarizes the various operating modes and the criteria for switching to a new mode for any given timestep.  The EnergyPlus implementation adds the “Off” mode to the modes specified by Annex 42 which corresponds to the unit being scheduled to be unavailable.  The difference between OFF and Standby modes determines whether or not standby power is consumed.
 
@@ -1554,69 +1554,69 @@ The Annex 42 Fuel Cell model is characterized as a “grey box” empirical mode
 
 The Annex 42 fuel cell model is described more thoroughly in the references (see below).  Here we provide a summary of the relevant model equations which are taken from the Annex 42 model specification.  The first equation is the main energy balance for the fuel cell power module (includes the fuel reformation and fuel cell stacks).  This energy balance is used to model the enthalpy of the product gases that leave the fuel cell power module.
 
-<div>\[\begin{array}{l}{\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{fuel}} + {\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{air}} + {{\dot N}_{liq - water}} \cdot \left( {{{\left[ {\hat h - {\Delta_f}{{\hat h}^o}} \right]}_{{H_2}O,liq}} - {\Delta_f}\hat h_{{H_2}O,fg}^o} \right)\\\quad \quad  + {{\dot H}_{dilution - air - in}} + {{\dot N}_{fuel}} \cdot LH{V_{fuel}} + {P_{el,ancillaries - AC}}\\ = {P_{el}} + {\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\ddot h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{FCPM - cg}} + {q_{s - cool}} + {q_{skin - loss}} + {{\dot H}_{dilution - air - out}}\end{array}\]</div>
+<div>$$\begin{array}{l}{\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{fuel}} + {\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{air}} + {{\dot N}_{liq - water}} \cdot \left( {{{\left[ {\hat h - {\Delta_f}{{\hat h}^o}} \right]}_{{H_2}O,liq}} - {\Delta_f}\hat h_{{H_2}O,fg}^o} \right)\\\quad \quad  + {{\dot H}_{dilution - air - in}} + {{\dot N}_{fuel}} \cdot LH{V_{fuel}} + {P_{el,ancillaries - AC}}\\ = {P_{el}} + {\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\ddot h}_i} - {\Delta_f}\hat h_i^o} \right]} \right)}_{FCPM - cg}} + {q_{s - cool}} + {q_{skin - loss}} + {{\dot H}_{dilution - air - out}}\end{array}$$</div>
 
 The remaining equations describe various terms and the balance of systems.  The electrical efficiency is modeled using:
 
-<div>\[{\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot {P_{el}} + {\varepsilon_2} \cdot P_{el}^2} \right] \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_{} {dt - {t_{threshold}},0.0))}  \cdot L} \right]\]</div>
+<div>$${\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot {P_{el}} + {\varepsilon_2} \cdot P_{el}^2} \right] \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_{} {dt - {t_{threshold}},0.0))}  \cdot L} \right]$$</div>
 
-<div>\[{P_{blower - el}} = {b_0} + {b_1} \cdot {\dot N_{air}} + {b_2} \cdot \dot N_{air}^2 + {b_3} \cdot \dot N_{air}^3\]</div>
+<div>$${P_{blower - el}} = {b_0} + {b_1} \cdot {\dot N_{air}} + {b_2} \cdot \dot N_{air}^2 + {b_3} \cdot \dot N_{air}^3$$</div>
 
 In several places the model is formulated to offer different options.  For example, the flow rate of process air can be described either as a function of electrical power produced or the fuel flow rate.
 
-<div>\[{\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\]</div>
+<div>$${\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]$$</div>
 
 or
 
-<div>\[{\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\]</div>
+<div>$${\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]$$</div>
 
-<div>\[{\dot N_{liq - water}} = {w_0} + {w_1} \cdot {\dot N_{fuel}} + {w_2} \cdot \dot N_{fuel}^2\]</div>
+<div>$${\dot N_{liq - water}} = {w_0} + {w_1} \cdot {\dot N_{fuel}} + {w_2} \cdot \dot N_{fuel}^2$$</div>
 
-<div>\[{P_{pump - el}} = {p_0} + {p_1} \cdot {\dot N_{water}} + {p_2} \cdot \dot N_{water}^2 + {p_3} \cdot \dot N_{water}^3\]</div>
+<div>$${P_{pump - el}} = {p_0} + {p_1} \cdot {\dot N_{water}} + {p_2} \cdot \dot N_{water}^2 + {p_3} \cdot \dot N_{water}^3$$</div>
 
-<div>\[{P_{comp - el}} = {c_0} + {c_1} \cdot {\dot N_{fuel}} + {c_2} \cdot \dot N_{fuel}^2 + {c_3} \cdot \dot N_{fuel}^3\]</div>
+<div>$${P_{comp - el}} = {c_0} + {c_1} \cdot {\dot N_{fuel}} + {c_2} \cdot \dot N_{fuel}^2 + {c_3} \cdot \dot N_{fuel}^3$$</div>
 
-<div>\[{P_{el,ancillaries - AC}} = an{c_0} + an{c_1} \cdot {\dot N_{fuel}}\]</div>
+<div>$${P_{el,ancillaries - AC}} = an{c_0} + an{c_1} \cdot {\dot N_{fuel}}$$</div>
 
-<div>\[{P_{el,aux - ancillaries}} = {x_0} + {x_1} \cdot {\dot N_{aux - fuel}}\]</div>
+<div>$${P_{el,aux - ancillaries}} = {x_0} + {x_1} \cdot {\dot N_{aux - fuel}}$$</div>
 
-<div>\[{q_{HX}} = {\varepsilon_{HX}} \cdot {\left( {\dot N{{\hat c}_p}} \right)_{\min }} \cdot \left( {{T_{aux - mix}} - {T_{water,in}}} \right)\]</div>
+<div>$${q_{HX}} = {\varepsilon_{HX}} \cdot {\left( {\dot N{{\hat c}_p}} \right)_{\min }} \cdot \left( {{T_{aux - mix}} - {T_{water,in}}} \right)$$</div>
 
-<div>\[{q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}}\]</div>
+<div>$${q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}}$$</div>
 
-<div>\[{\left( {UA} \right)_{eff}} = h{x_{s,0}} + h{x_{s,1}} \cdot {\dot N_{water}} + h{x_{s,2}} \cdot \dot N_{water}^2 + h{x_{s,3}} \cdot {\dot N_{aux - mix}} + h{x_{s,4}} \cdot \dot N_{aux - mix}^2\]</div>
+<div>$${\left( {UA} \right)_{eff}} = h{x_{s,0}} + h{x_{s,1}} \cdot {\dot N_{water}} + h{x_{s,2}} \cdot \dot N_{water}^2 + h{x_{s,3}} \cdot {\dot N_{aux - mix}} + h{x_{s,4}} \cdot \dot N_{aux - mix}^2$$</div>
 
 or
 
-<div>\[{\left( {UA} \right)_{eff}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{gas}}}} + \frac{1}{{{{(hA)}_{water}}}} + {F_{HX}}} \right]^{ - 1}}\]</div>
+<div>$${\left( {UA} \right)_{eff}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{gas}}}} + \frac{1}{{{{(hA)}_{water}}}} + {F_{HX}}} \right]^{ - 1}}$$</div>
 
 where,
 
 <span>${F_{HX}}$</span> is an adjustment factor,
 
-<div>\[h_{gas} = h_{gas}^0 \left( \frac{\dot N_{gas}}{\dot N_{gas}^0} \right)^n}\]</div>
+<div>$$h_{gas} = h_{gas}^0 \left( \frac{\dot N_{gas}}{\dot N_{gas}^0} \right)^n}$$</div>
 
-<div>\[{h_{water}} = h_{water}^0 \cdot {\left( {\frac{{{{\dot N}_{water}}}}{{\dot N_{water}^0}}} \right)^m}\]</div>
+<div>$${h_{water}} = h_{water}^0 \cdot {\left( {\frac{{{{\dot N}_{water}}}}{{\dot N_{water}^0}}} \right)^m}$$</div>
 
-<div>\[{q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}} + {\dot N_{{H_2}O - cond}} \cdot {\hat h_{fg}}\]</div>
+<div>$${q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}} + {\dot N_{{H_2}O - cond}} \cdot {\hat h_{fg}}$$</div>
 
-<div>\[{\dot N_{{H_2}O - cond}} = \left( {{T_{cond - threshold}} - {T_{water,in}}} \right) \cdot \left[ {h{x_{l,1}} \cdot \left( {\frac{{{{\dot N}_{{H_2}O}}}}{{{{\dot N}_{aux - mix}}}}} \right) + h{x_{l,2}} \cdot {{\left( {\frac{{{{\dot N}_{{H_2}O}}}}{{{{\dot N}_{aux - mix}}}}} \right)}^2}} \right]\]</div>
+<div>$${\dot N_{{H_2}O - cond}} = \left( {{T_{cond - threshold}} - {T_{water,in}}} \right) \cdot \left[ {h{x_{l,1}} \cdot \left( {\frac{{{{\dot N}_{{H_2}O}}}}{{{{\dot N}_{aux - mix}}}}} \right) + h{x_{l,2}} \cdot {{\left( {\frac{{{{\dot N}_{{H_2}O}}}}{{{{\dot N}_{aux - mix}}}}} \right)}^2}} \right]$$</div>
 
-<div>\[{q_{aux - skin - losses}} = {(UA)_{aux}} \cdot ({T_{aux - mix}} - {T_{room}})\]</div>
+<div>$${q_{aux - skin - losses}} = {(UA)_{aux}} \cdot ({T_{aux - mix}} - {T_{room}})$$</div>
 
-<div>\[{q_{skin - loss}} = {s_0} + {s_1} \cdot {\dot N_{fuel}} + {s_2} \cdot \dot N_{fuel}^2\]</div>
+<div>$${q_{skin - loss}} = {s_0} + {s_1} \cdot {\dot N_{fuel}} + {s_2} \cdot \dot N_{fuel}^2$$</div>
 
-<div>\[Q_{battery}^{t + \Delta t} = Q_{battery}^t + {P_{battery - charge}} \cdot {\varepsilon_{charge}} \cdot \Delta t\]</div>
+<div>$$Q_{battery}^{t + \Delta t} = Q_{battery}^t + {P_{battery - charge}} \cdot {\varepsilon_{charge}} \cdot \Delta t$$</div>
 
-<div>\[{\eta_{PCU}} = {u_0} + {u_1} \cdot {P_{PCU - in}} + {u_2} \cdot P_{PCU - in}^2\]</div>
+<div>$${\eta_{PCU}} = {u_0} + {u_1} \cdot {P_{PCU - in}} + {u_2} \cdot P_{PCU - in}^2$$</div>
 
-<div>\[{q_{s - cool}} = \left[ {{r_0} + {r_1}\left( {{T_{stack}} - T_{stack}^o} \right)} \right] \cdot \left[ {1 + {r_2}{P_{el}} + {r_3}P_{el}^2} \right]\]</div>
+<div>$${q_{s - cool}} = \left[ {{r_0} + {r_1}\left( {{T_{stack}} - T_{stack}^o} \right)} \right] \cdot \left[ {1 + {r_2}{P_{el}} + {r_3}P_{el}^2} \right]$$</div>
 
-<div>\[{\left( {UA} \right)_{s - cogen}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{s - cogen}}}} + {F_{s - cogen}}} \right]^{ - 1}}\]</div>
+<div>$${\left( {UA} \right)_{s - cogen}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{s - cogen}}}} + {F_{s - cogen}}} \right]^{ - 1}}$$</div>
 
-<div>\[{h_{s - cogen}} = h_{s - cogen}^0 \cdot {\left( {\frac{{{{\dot N}_{s - cogen}}}}{{\dot N_{s - cogen}^0}}} \right)^{{n_s}}}\]</div>
+<div>$${h_{s - cogen}} = h_{s - cogen}^0 \cdot {\left( {\frac{{{{\dot N}_{s - cogen}}}}{{\dot N_{s - cogen}^0}}} \right)^{{n_s}}}$$</div>
 
-<div>\[{P_{s - air - el}} = {f_0} + {f_1} \cdot {q_{s - air}} + {f_2} \cdot q_{s - air}^2\]</div>
+<div>$${P_{s - air - el}} = {f_0} + {f_1} \cdot {q_{s - air}} + {f_2} \cdot q_{s - air}^2$$</div>
 
 The Annex 42 fuel cell was implemented directly in EnergyPlus.  A sequential substitution method is used to handle all the interactions between the different subsystems.  The main energy balance drawn for the fuel cell power module is rearranged to put all the terms on the right hand side.  The enthalpy of the product gas stream is determined from this energy balance.  The Shomate equation is used to evaluate the enthalpy and specific heat of the various streams.  The EnergyPlus implementation evaluates fluid properties using the average temperature of inlet and outlet streams whereas the Annex 42 specification often uses just the inlet temperature.  The Shomate equation is inverted using the regula falsi numerical method available within EnergyPlus to calculate the temperature of the product gases from their enthalpy.
 
@@ -1632,7 +1632,7 @@ The Generator:FuelSupply input object in EnergyPlus implements a fairly comprehe
 
 Gas phase thermochemistry calculations and data are programmed into EnergyPlus to handle the set of constituents listed in the table below.  The relevant properties of each fuel constituent, *i*, are calculated as a function of temperature using the Shomate equation:
 
-<div>\[{\hat h_i} - {\Delta_f}\hat h_i^o = A \cdot \left( {\frac{T}{{1000}}} \right) + \frac{B}{2} \cdot {\left( {\frac{T}{{1000}}} \right)^2} + \frac{C}{3} \cdot {\left( {\frac{T}{{1000}}} \right)^3} + \frac{D}{4} \cdot {\left( {\frac{T}{{1000}}} \right)^4} - \frac{E}{{\left( {\frac{T}{{1000}}} \right)}} + F - H\]</div>
+<div>$${\hat h_i} - {\Delta_f}\hat h_i^o = A \cdot \left( {\frac{T}{{1000}}} \right) + \frac{B}{2} \cdot {\left( {\frac{T}{{1000}}} \right)^2} + \frac{C}{3} \cdot {\left( {\frac{T}{{1000}}} \right)^3} + \frac{D}{4} \cdot {\left( {\frac{T}{{1000}}} \right)^4} - \frac{E}{{\left( {\frac{T}{{1000}}} \right)}} + F - H$$</div>
 
 where,
 
@@ -1646,11 +1646,11 @@ A, B, C, D, E, F, H are the coefficients for the Shomate equation.
 
 The lower heating value (LHV) of a fuel mixture is calculated from the molar fractions using:
 
-<div>\[LH{V_{fuel}} = \sum\limits_i {\left( {{\chi_i} \cdot LH{V_i}} \right)} \]</div>
+<div>$$LH{V_{fuel}} = \sum\limits_i {\left( {{\chi_i} \cdot LH{V_i}} \right)} $$</div>
 
 Where,
 
-<div>\[LH{V_i} = \left[ {{\Delta_f}\hat h_{{C_x}{H_y}}^o - x \cdot {\Delta_f}\hat h_{C{O_2}}^o - \frac{y}{2} \cdot {\Delta_f}\hat h_{{H_2}O}^o} \right]\]</div>
+<div>$$LH{V_i} = \left[ {{\Delta_f}\hat h_{{C_x}{H_y}}^o - x \cdot {\Delta_f}\hat h_{C{O_2}}^o - \frac{y}{2} \cdot {\Delta_f}\hat h_{{H_2}O}^o} \right]$$</div>
 
 *x* is the number of carbon atoms
 
@@ -1658,11 +1658,11 @@ Where,
 
 Similarly, the higher heating value (HHV) of the fuel mixture is calculated using:
 
-<div>\[HH{V_{fuel}} = \sum\limits_i {\left( {{\chi_i} \cdot HH{V_i}} \right)} \]</div>
+<div>$$HH{V_{fuel}} = \sum\limits_i {\left( {{\chi_i} \cdot HH{V_i}} \right)} $$</div>
 
 Where,
 
-<div>\[HH{V_i} = \left[ {{\Delta_f}\hat h_{{C_x}{H_y}}^o - x \cdot {\Delta_f}\hat h_{C{O_2}}^o - \frac{y}{2} \cdot {\Delta_f}\hat h_{{H_2}O}^o + \frac{y}{2} \cdot \left( {{\Delta_f}\hat h_{{H_2}O}^o - {H_{liq}}} \right)} \right]\]</div>
+<div>$$HH{V_i} = \left[ {{\Delta_f}\hat h_{{C_x}{H_y}}^o - x \cdot {\Delta_f}\hat h_{C{O_2}}^o - \frac{y}{2} \cdot {\Delta_f}\hat h_{{H_2}O}^o + \frac{y}{2} \cdot \left( {{\Delta_f}\hat h_{{H_2}O}^o - {H_{liq}}} \right)} \right]$$</div>
 
 The Shomate coefficients used in EnergyPlus are listed in the table below.  Data source “NIST” indicates the data were directly from Chemistry WebBook.  Data source “CHEMKIN” indicates the data were developed by curve fitting library data for the CHEMKIN commercial program (which uses the Gorden-McBride polynomial rather than the Shomate formulation).
 
@@ -1876,59 +1876,59 @@ HAWT systems need a maximum power coefficient and empirical power coefficient pa
 
 Given the inputs needed, the wind turbine model analyzes local wind speed since wind speed is critical to determine the production of electricity of wind turbine systems. To minimize uncertainty involved with wind data, it factors differences between annual average wind speed from weather data and local annual average wind speed at the particular height of the local meteorological station. It reads annual average wind speed from statistical weather file that is automatically copied during the simulation. Note that the user should attach a weather data to the simulation (for a design day simulation, the wind speed data from the design day description is used). This annual average wind speed is converted into a wind speed at the height at which local annual average wind speed that the user inputs is measured and then factored as:
 
-<div>\[{V_{LocalTMY}} = {V_{AnnualAvg}}{\left( {\frac{{{\delta_{met}}}}{{{H_{met}}}}} \right)^{{a_{met}}}}{\left( {\frac{H}{\delta }} \right)^a}\]</div>
+<div>$${V_{LocalTMY}} = {V_{AnnualAvg}}{\left( {\frac{{{\delta_{met}}}}{{{H_{met}}}}} \right)^{{a_{met}}}}{\left( {\frac{H}{\delta }} \right)^a}$$</div>
 
-<div>\[{F_V} = \frac{{{V_{LocalTMY}}}}{{{V_{Local}}}}\]</div>
+<div>$${F_V} = \frac{{{V_{LocalTMY}}}}{{{V_{Local}}}}$$</div>
 
 Note that the wind speed factor *F<sub>v</sub>* of 1.0 is assigned, if the user does not input the local wind conditions or the weather data file is not attached to the simulation.
 
 The local air density can be obtained by using EnergyPlus psychrometric functions as follows:
 
-<div>\[{T_{Local}} = OutDryBulbTempAt(Z)\]</div>
+<div>$${T_{Local}} = OutDryBulbTempAt(Z)$$</div>
 
-<div>\[{P_{Local}} = OutBaro\Pr essAt(Z)\]</div>
+<div>$${P_{Local}} = OutBaro\Pr essAt(Z)$$</div>
 
-<div>\[{\omega_{Local}} = PsyWFnTdbTwbPb({T_{Local}},{T_{wb}},{P_{Local}})\]</div>
+<div>$${\omega_{Local}} = PsyWFnTdbTwbPb({T_{Local}},{T_{wb}},{P_{Local}})$$</div>
 
-<div>\[{\rho_{Local}} = PsyRhoAirFnPbTdbW({P_{Local}},{T_{Local}},{\omega_{initial}})\]</div>
+<div>$${\rho_{Local}} = PsyRhoAirFnPbTdbW({P_{Local}},{T_{Local}},{\omega_{initial}})$$</div>
 
 The model converts TMY wind speed into a wind speed at the specific height of the wind turbine rotor (*V<sub>z</sub>*) at the location by using EnergyPlus function as:
 
-<div>\[{V_Z} = WindSpeedAt(Z)\]</div>
+<div>$${V_Z} = WindSpeedAt(Z)$$</div>
 
 The local wind speed at the rotor height (*V<sub>Local</sub>*) at the location is thus:
 
-<div>\[{V_{Local}} = \frac{{{V_Z}}}{{{F_v}}}\]</div>
+<div>$${V_{Local}} = \frac{{{V_Z}}}{{{F_v}}}$$</div>
 
 The tip speed ratio (TSR) can be obtained as:
 
-<div>\[\lambda  = \frac{{\omega R}}{{{V_{Local}}}}\]</div>
+<div>$$\lambda  = \frac{{\omega R}}{{{V_{Local}}}}$$</div>
 
 #### Horizontal Axis Wind Turbine
 
 Once the local wind speed and air density are determined, the model calculates electrical power produced by a wind turbine system according to the rotor type. For HAWT systems, two different approximations are available. The model uses an analytical approximation when the user inputs all six empirical coefficient parameters *C<sub>1</sub>* through *C<sub>6</sub>*. The equations that define the analytical approximation are:
 
-<div>\[{C_p} = {C_1}(\frac{{{C_2}}}{{{\lambda_i}}} - {C_3}\theta  - {C_4}{\theta ^x} - {C_5}){e^{ - \frac{{{C_6}(\lambda ,\theta )}}{{{\lambda_i}}}}}\]</div>
+<div>$${C_p} = {C_1}(\frac{{{C_2}}}{{{\lambda_i}}} - {C_3}\theta  - {C_4}{\theta ^x} - {C_5}){e^{ - \frac{{{C_6}(\lambda ,\theta )}}{{{\lambda_i}}}}}$$</div>
 
-<div>\[\frac{1}{{{\lambda_i}}} = \frac{1}{{\lambda  + 0.08\theta }} - \frac{{0.035}}{{{\theta ^3} + 1}}\]</div>
+<div>$$\frac{1}{{{\lambda_i}}} = \frac{1}{{\lambda  + 0.08\theta }} - \frac{{0.035}}{{{\theta ^3} + 1}}$$</div>
 
 Note that the model allows changing the rotor speed to meet the maximum tip speed ratio at each time step. That is, the tip speed ratio calculated is limited by the maximum tip speed ratio. Similarly, the power coefficient calculated is also set to the maximum if the calculated is greater than the maximum.
 
 Assuming maximum of rotor angle, i.e. zero, the power production of the wind turbine is thus obtained by:
 
-<div>\[{P_W} = \frac{1}{2}{\rho_{Local}}{A_R}V_{_{Local}}^3{C_p}(\lambda ,\theta )\]</div>
+<div>$${P_W} = \frac{1}{2}{\rho_{Local}}{A_R}V_{_{Local}}^3{C_p}(\lambda ,\theta )$$</div>
 
 The model assumes the simple approximation, if any of empirical power coefficient parameters is not input. The power production of wind turbine is directly obtained from the kinetic energy equation:
 
-<div>\[{P_W} = \frac{1}{2}{\rho_{Local}}{A_R}V_{_{Local}}^3{C_{p,\max }}(\lambda ,\theta )\]</div>
+<div>$${P_W} = \frac{1}{2}{\rho_{Local}}{A_R}V_{_{Local}}^3{C_{p,\max }}(\lambda ,\theta )$$</div>
 
 Here, the model defines *P<sub>W</sub>* as rated power output at the rated wind speed, if either the power production of wind turbine or local wind speed is greater than the rated power or rated wind speed, respectively. The power coefficient in this particular case is thus recalculated as:
 
-<div>\[{C_p} = \frac{{{P_W}}}{{0.5{\rho_{Local}}AV_{_{Local}}^3}}\]</div>
+<div>$${C_p} = \frac{{{P_W}}}{{0.5{\rho_{Local}}AV_{_{Local}}^3}}$$</div>
 
 The overall power production that includes conversion loss and delivery loss is thus:
 
-<div>\[P = \eta {P_W}\]</div>
+<div>$$P = \eta {P_W}$$</div>
 
 #### Vertical Axis Wind Turbine
 
@@ -1939,57 +1939,57 @@ Figure 340. Flow velocities and force diagram of a single blade airfoil
 
 If tip speed ratio at the time step is greater than the maximum tip speed ratio, the model estimates actual rotor speed at the time step as:
 
-<div>\[\omega R = \lambda {V_{Local}}\]</div>
+<div>$$\omega R = \lambda {V_{Local}}$$</div>
 
 The model then employs general mathematical expressions for the aerodynamic analysis of straight-bladed Darrieus-type VAWTs to predict the power production by VAWTs. Assuming quasi-steady state, the induced wind speed (*V<sub>a</sub>*) on the rotor is defined as:
 
-<div>\[{V_a} = \frac{2}{3}{V_{Local}}\]</div>
+<div>$${V_a} = \frac{2}{3}{V_{Local}}$$</div>
 
 The chordal velocity (*V<sub>c</sub>*), normal velocity (*V<sub>n</sub>*), and relative flow velocity (*W*) as shown in figure above can be expressed as:
 
-<div>\[{V_c} = \omega R + {V_a}\cos \theta \]</div>
+<div>$${V_c} = \omega R + {V_a}\cos \theta $$</div>
 
-<div>\[{V_n} = {V_a}\sin \theta \]</div>
+<div>$${V_n} = {V_a}\sin \theta $$</div>
 
-<div>\[W = \sqrt {V_c^2 + V_n^2} \]</div>
+<div>$$W = \sqrt {V_c^2 + V_n^2} $$</div>
 
 The expression for the non-dimensional angle of attack (*α*) with no consideration of blade pitch is:
 
-<div>\[\alpha  = {\tan ^{ - 1}}\left[ {\frac{{\sin \theta }}{{{{(\omega R} \mathord{\left/ {\vphantom {{(\omega R} {{V_{Local}})/({{{V_a}} \mathord{\left/ {\vphantom {{{V_a}} {{V_{Local}}}}} \right. } {{V_{Local}}}}}}} \right. } {{V_{Local}})/({{{V_a}} \mathord{\left/ {\vphantom {{{V_a}} {{V_{Local}}}}} \right. } {{V_{Local}}}}}}) + \cos \theta }}} \right]\]</div>
+<div>$$\alpha  = {\tan ^{ - 1}}\left[ {\frac{{\sin \theta }}{{{{(\omega R} \mathord{\left/ {\vphantom {{(\omega R} {{V_{Local}})/({{{V_a}} \mathord{\left/ {\vphantom {{{V_a}} {{V_{Local}}}}} \right. } {{V_{Local}}}}}}} \right. } {{V_{Local}})/({{{V_a}} \mathord{\left/ {\vphantom {{{V_a}} {{V_{Local}}}}} \right. } {{V_{Local}}}}}}) + \cos \theta }}} \right]$$</div>
 
 The tangential and normal force coefficients, respectively, are expressed as:
 
-<div>\[{C_t} = {C_l}\sin \alpha  + {C_d}\cos \alpha \]</div>
+<div>$${C_t} = {C_l}\sin \alpha  + {C_d}\cos \alpha $$</div>
 
-<div>\[{C_n} = {C_l}\cos \alpha  + {C_d}\sin \alpha \]</div>
+<div>$${C_n} = {C_l}\cos \alpha  + {C_d}\sin \alpha $$</div>
 
 The net tangential and normal forces are obtained from the following expressions:
 
-<div>\[{F_t} = {C_t}\frac{1}{2}{\rho_{Local}}{A_c}{W^2}\]</div>
+<div>$${F_t} = {C_t}\frac{1}{2}{\rho_{Local}}{A_c}{W^2}$$</div>
 
-<div>\[{F_n} = {C_n}\frac{1}{2}{\rho_{Local}}{A_c}{W^2}\]</div>
+<div>$${F_n} = {C_n}\frac{1}{2}{\rho_{Local}}{A_c}{W^2}$$</div>
 
 Average tangential force on a single blade can be defined as:
 
-<div>\[{F_{ta}} = \frac{1}{{2\pi }}\int_0^{2\pi } {{F_t}(\theta )d\theta } \]</div>
+<div>$${F_{ta}} = \frac{1}{{2\pi }}\int_0^{2\pi } {{F_t}(\theta )d\theta } $$</div>
 
 Substituting the values of *F<sub>t</sub>* and arranging tangential force on azimuth angle, <span>$\theta $</span>, equation above can be written as:
 
-<div>\[{F_{ta}} = \frac{1}{{4\pi }}{C_t}{\rho_{Local}}{A_c}(\int_0^{2\pi } {{{(\omega R)}^2}}  + \int_0^{2\pi } {V_a^2} )\]</div>
+<div>$${F_{ta}} = \frac{1}{{4\pi }}{C_t}{\rho_{Local}}{A_c}(\int_0^{2\pi } {{{(\omega R)}^2}}  + \int_0^{2\pi } {V_a^2} )$$</div>
 
 The expression of the total torque for the number of blades is defined as:
 
-<div>\[Q = N{F_{ta}}\]</div>
+<div>$$Q = N{F_{ta}}$$</div>
 
 The power production of wind turbine is thus:
 
-<div>\[{P_W} = Q\omega \]</div>
+<div>$${P_W} = Q\omega $$</div>
 
 The model also defines *P<sub>W</sub>* as the rated power output at the rated wind speed, if either the power production of wind turbine or local wind speed is greater than the rated power.
 
 The overall power production delivered from a wind turbine system is thus:
 
-<div>\[P = \eta {P_W}\]</div>
+<div>$$P = \eta {P_W}$$</div>
 
 Table 92. Nomenclature for Wind Turbine model
 
