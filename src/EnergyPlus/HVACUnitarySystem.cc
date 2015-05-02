@@ -1944,7 +1944,6 @@ namespace HVACUnitarySystem {
 				SizingMethod = CoolingCapacitySizing;
 				DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
 				TempSize = AutoSize;
-				DataFracOfAutosizedCoolingCapacity = 1.0;
 				if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 					DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 					DataIsDXCoil = true;
@@ -2019,7 +2018,6 @@ namespace HVACUnitarySystem {
 				SizingMethod = HeatingCapacitySizing;
 				DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
 				TempSize = AutoSize;
-				DataFracOfAutosizedHeatingCapacity = 1.0;
 				DataHeatSizeRatio = UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
 				if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ) {
 					DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
