@@ -35,8 +35,8 @@ public:
 	Real64 ExpectedResult1;
 	Real64 ExpectedResult2;
 	Real64 ExpectedResult3;
-	int const CpWater = 4180; // For estimating the expected result
-	int const RhoWater = 1000.0; // For estimating the expected result
+	Real64 const CpWater = 4180.0; // For estimating the expected result
+	Real64 const RhoWater = 1000.0; // For estimating the expected result
 
 	// constructor for test fixture class
 	LowTempRadiantSystemTest( )
@@ -53,6 +53,7 @@ public:
 
 		CurSysNum = 0;
 		RadSysNum = 1;
+		SystemType = ElectricSystem;
 		ElecRadSysNumericFields.allocate( 1 );
 		ElecRadSysNumericFields( RadSysNum ).FieldNames.allocate( 1 );
 		HydronicRadiantSysNumericFields.allocate( 1 );
@@ -89,8 +90,10 @@ public:
 		PlantSizData( 2 ).PlantLoopName = "Chilled Water Loop";
 		PlantSizData( 2 ).ExitTemp = 6.0;
 		PlantSizData( 2 ).DeltaT = 5.0;
-//		DataWaterLoopNum = 1;
-//		NumOfGlycols = 1;
+
+		ExpectedResult1 = 0.0;
+		ExpectedResult2 = 0.0;
+		ExpectedResult3 = 0.0;
 
 		int write_stat;
 		// Open the Initialization Output File (lifted from SimulationManager.cc)
