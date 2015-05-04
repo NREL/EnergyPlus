@@ -1131,13 +1131,18 @@ namespace WaterToAirHeatPumpSimple {
 							if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
 								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
 								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+								// if the Zone Cooling Design Supply Air Humidity Ratio  (CoolDesHumRat) exceeds the DesCoolCoilInHumRat reset the CoolDesHumRat to DesCoolCoilInHumRat
+								FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat );
 							} else {
 								MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
 								MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+								FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak  );
 							}
 						} else {
 							MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
 							MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+							// if the Zone Cooling Design Supply Air Humidity Ratio  (CoolDesHumRat) exceeds the DesCoolCoilInHumRat reset the CoolDesHumRat to DesCoolCoilInHumRat
+							FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat );
 						}
 						SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
 						SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
@@ -1298,13 +1303,18 @@ namespace WaterToAirHeatPumpSimple {
 							if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
 								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
 								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+								// if the Zone Cooling Design Supply Air Humidity Ratio  (CoolDesHumRat) exceeds the DesCoolCoilInHumRat reset the CoolDesHumRat to DesCoolCoilInHumRat
+								FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat );
 							} else {
 								MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
 								MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+								FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak );
 							}
 						} else {
 							MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
 							MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+							// if the Zone Cooling Design Supply Air Humidity Ratio  (CoolDesHumRat) exceeds the DesCoolCoilInHumRat reset the CoolDesHumRat to DesCoolCoilInHumRat
+							FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat );
 						}
 						SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
 						SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
