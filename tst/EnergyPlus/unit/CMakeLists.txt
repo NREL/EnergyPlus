@@ -21,6 +21,7 @@ set( test_src
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
+  LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
   HVACUnitarySystem.unit.cc
   MixedAir.unit.cc

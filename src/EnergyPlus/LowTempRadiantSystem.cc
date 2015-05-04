@@ -2104,7 +2104,7 @@ namespace LowTempRadiantSystem {
 							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatDes, "User-Specified Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxHeatDes - WaterVolFlowMaxHeatUser ) / WaterVolFlowMaxHeatUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:Electric = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( WaterVolFlowMaxHeatUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( WaterVolFlowMaxHeatDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -2122,8 +2122,8 @@ namespace LowTempRadiantSystem {
 			}
 			if ( CurZoneEqNum > 0 ) {
 				if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
-					if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat > 0.0 ) {
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat );
+					if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxCool > 0.0 ) {
+						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", HydrRadSys( RadSysNum ).WaterVolFlowMaxCool );
 					}
 				} else { // Autosize or hard-size with sizing run
 					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name );
@@ -2135,7 +2135,7 @@ namespace LowTempRadiantSystem {
 							DataFracOfAutosizedCoolingCapacity = 1.0;
 							DataZoneNumber = HydrRadSys( RadSysNum ).ZonePtr;
 							SizingMethod = CoolingCapacitySizing;
-							FieldNum = 3;
+							FieldNum = 8;
 							PrintFlag = false;
 							SizingString = HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( FieldNum ) + " [W]";
 							CapSizingMethod = HydrRadSys( RadSysNum ).CoolingCapMethod;
@@ -2194,7 +2194,7 @@ namespace LowTempRadiantSystem {
 							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes, "User-Specified Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser ) / WaterVolFlowMaxCoolUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:Electric = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Cool Water Flow of " + RoundSigDigits( WaterVolFlowMaxCoolUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Cool Water Flow of " + RoundSigDigits( WaterVolFlowMaxCoolDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -2228,7 +2228,7 @@ namespace LowTempRadiantSystem {
 							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes, "User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( TubeLengthDes - TubeLengthUser ) / TubeLengthUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:Electric = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Hydronic Tubing Length of " + RoundSigDigits( TubeLengthUser, 5 ) + " [m]" );
 									ShowContinueError( "differs from Design Size Hydronic Tubing Length of " + RoundSigDigits( TubeLengthDes, 5 ) + " [m]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -2351,7 +2351,7 @@ namespace LowTempRadiantSystem {
 								"Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes, "User-Specified Maximum Water Flow [m3/s]", WaterVolFlowMaxUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxDes - WaterVolFlowMaxUser ) / WaterVolFlowMaxUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:Constant = \" " +
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
 										CFloRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Water Flow of " + RoundSigDigits( WaterVolFlowMaxUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Water Flow of " + RoundSigDigits(WaterVolFlowMaxDes, 5 ) + " [m3/s]" );
@@ -2391,7 +2391,7 @@ namespace LowTempRadiantSystem {
 								"User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( TubeLengthDes - TubeLengthUser ) / TubeLengthUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:Constant = \" " + CFloRadSys( RadSysNum ).Name + "\"." );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " + CFloRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Hydronic Tubing Length of " + RoundSigDigits( TubeLengthUser, 5 ) + " [m]" );
 									ShowContinueError( "differs from Design Size Hydronic Tubing Length of " + RoundSigDigits( TubeLengthDes, 5 ) + " [m]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
