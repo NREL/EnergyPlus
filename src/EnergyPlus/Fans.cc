@@ -1420,6 +1420,7 @@ namespace Fans {
 		//       DATE WRITTEN   Unknown
 		//       MODIFIED       Brent Griffith, May 2009, added EMS override
 		//                      Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
+		//                      Rongpeng Zhang, April 2015, added faulty fan operations due to fouling air filters
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1479,16 +1480,9 @@ namespace Fans {
 		//unused0909   Win        = Fan(FanNum)%InletAirHumRat
 		RhoAir = Fan( FanNum ).RhoAirStdInit;
 		MassFlow = Fan( FanNum ).InletAirMassFlowRate;
-
-		//EMS overwrite MassFlow, DeltaPress, and FanEff
-		if ( Fan( FanNum ).EMSMaxMassFlowOverrideOn ) MassFlow = Fan( FanNum ).EMSAirMassFlowValue;
-		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
-		if ( Fan( FanNum ).EMSFanEffOverrideOn ) FanEff = Fan( FanNum ).EMSFanEffValue;
-
-		MassFlow = min( MassFlow, Fan( FanNum ).MaxAirMassFlowRate );
-		MassFlow = max( MassFlow, Fan( FanNum ).MinAirMassFlowRate );
 		
-		//Update MassFlow & DeltaPress if there is a fouling air filter corresponding to the fan_Apr. 2015, zrp
+		//Faulty fan operations_Apr. 2015, zrp
+		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
 		if ( ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
 			
 			//  loop through the FaultsFouledAirFilters objects to find the one for the current fan
@@ -1501,8 +1495,8 @@ namespace Fans {
 					if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
 						Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
 
-						FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirMassFlowRate, Fan( FanNum ).DeltaPress, 
-							( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr )-1 )*Fan( FanNum ).DeltaPress, 
+						FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
+							( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
 							FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
 						
 						//Update MassFlow & DeltaPress of the fan
@@ -1515,6 +1509,14 @@ namespace Fans {
 				}
 			}
 		}
+
+		//EMS overwrite MassFlow, DeltaPress, and FanEff
+		if ( Fan( FanNum ).EMSMaxMassFlowOverrideOn ) MassFlow = Fan( FanNum ).EMSAirMassFlowValue;
+		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
+		if ( Fan( FanNum ).EMSFanEffOverrideOn ) FanEff = Fan( FanNum ).EMSFanEffValue;
+
+		MassFlow = min( MassFlow, Fan( FanNum ).MaxAirMassFlowRate );
+		MassFlow = max( MassFlow, Fan( FanNum ).MinAirMassFlowRate );
 		
 		//Determine the Fan Schedule for the Time step
 		if ( ( GetCurrentScheduleValue( Fan( FanNum ).AvailSchedPtrNum ) > 0.0 || LocalTurnFansOn ) && ! LocalTurnFansOff && MassFlow > 0.0 ) {
@@ -1558,6 +1560,7 @@ namespace Fans {
 		//       MODIFIED       Phil Haves
 		//                      Brent Griffith, May 2009 for EMS
 		//                      Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
+		//                      Rongpeng Zhang, April 2015, added faulty fan operations due to fouling air filters
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1592,6 +1595,7 @@ namespace Fans {
 		Real64 DeltaPress; // [N/m2 = Pa]
 		Real64 FanEff; // Total fan efficiency - combined efficiency of fan, drive train,
 		// motor and variable speed controller (if any)
+		Real64 MaxAirFlowRate;
 		Real64 MaxAirMassFlowRate;
 		Real64 MotInAirFrac;
 		Real64 MotEff;
@@ -1620,6 +1624,7 @@ namespace Fans {
 		// VARIABLE SPEED MOTOR 0.0015302446 0.0052080574  1.1086242   -0.11635563  0.000
 
 		NVPerfNum = Fan( FanNum ).NVPerfNum;
+		MaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;
 
 		if ( NightVentOn && NVPerfNum > 0 ) {
 			DeltaPress = NightVentPerf( NVPerfNum ).DeltaPress;
@@ -1639,16 +1644,48 @@ namespace Fans {
 			MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate;
 		}
 
-		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
-		if ( Fan( FanNum ).EMSFanEffOverrideOn ) FanEff = Fan( FanNum ).EMSFanEffValue;
-
 		//unused0909  Tin         = Fan(FanNum)%InletAirTemp
 		//unused0909  Win         = Fan(FanNum)%InletAirHumRat
 		RhoAir = Fan( FanNum ).RhoAirStdInit;
 		MassFlow = Fan( FanNum ).InletAirMassFlowRate;
-		if ( Fan( FanNum ).EMSMaxMassFlowOverrideOn ) MassFlow = Fan( FanNum ).EMSAirMassFlowValue;
-		MassFlow = min( MassFlow, Fan( FanNum ).MaxAirMassFlowRate );
+		
+		//Faulty fan operations_Apr. 2015, zrp
+		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
+		if ( ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
+			
+			//  loop through the FaultsFouledAirFilters objects to find the one for the current fan
+			for ( int iFault = 1; iFault <= FaultsManager::NumFaultyAirFilter; ++iFault ) {
 
+				// find the FaultsFouledAirFilters object for the current fan
+				if ( SameString( Fan( FanNum ).FanName, FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanName ) ) {
+
+					// Check fault availability schedules
+					if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
+						Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
+
+						FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
+							( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
+							FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
+						
+						//Update MassFlow & DeltaPress of the fan 
+						MaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate - FanDesignFlowRateDec;
+						MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
+						DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
+					}
+					
+					// Stop searching the FaultsFouledAirFilters object for the fan
+					break;
+				}
+			}
+		}
+
+		//EMS overwrite MassFlow, DeltaPress, and FanEff
+		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
+		if ( Fan( FanNum ).EMSFanEffOverrideOn ) FanEff = Fan( FanNum ).EMSFanEffValue;
+		if ( Fan( FanNum ).EMSMaxMassFlowOverrideOn ) MassFlow = Fan( FanNum ).EMSAirMassFlowValue;
+		
+		MassFlow = min( MassFlow, MaxAirMassFlowRate );
+		
 		//Determine the Fan Schedule for the Time step
 		if ( ( GetCurrentScheduleValue( Fan( FanNum ).AvailSchedPtrNum ) > 0.0 || LocalTurnFansOn ) && ! LocalTurnFansOff && MassFlow > 0.0 ) {
 			//Fan is operating - calculate power loss and enthalpy rise
@@ -1656,9 +1693,9 @@ namespace Fans {
 			// Calculate and check limits on fraction of system flow
 			//unused0909    MaxFlowFrac = 1.0
 			// MinFlowFrac is calculated from the ration of the volume flows and is non-dimensional
-			MinFlowFrac = Fan( FanNum ).MinAirFlowRate / Fan( FanNum ).MaxAirFlowRate;
+			MinFlowFrac = Fan( FanNum ).MinAirFlowRate / MaxAirFlowRate;
 			// The actual flow fraction is calculated from MassFlow and the MaxVolumeFlow * AirDensity
-			FlowFracActual = MassFlow / ( Fan( FanNum ).MaxAirMassFlowRate );
+			FlowFracActual = MassFlow / MaxAirMassFlowRate;
 
 			// Calculate the part Load Fraction             (PH 7/13/03)
 
@@ -1737,6 +1774,7 @@ namespace Fans {
 		//                      R. Raustad - FSEC, Jan 2009 - added SpeedRatio for multi-speed fans
 		//                      Brent Griffith, May 2009 for EMS
 		//                      Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
+		//                      Rongpeng Zhang, April 2015, added faulty fan operations due to fouling air filters
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1773,6 +1811,7 @@ namespace Fans {
 		Real64 DeltaPress; // [N/m2]
 		Real64 FanEff;
 		Real64 MassFlow; // [kg/sec]
+		Real64 MaxAirMassFlowRate; // [kg/sec]
 		//unused0909      REAL(r64) Tin         ! [C]
 		//unused0909      REAL(r64) Win
 		Real64 PartLoadRatio; // Ratio of actual mass flow rate to max mass flow rate
@@ -1786,23 +1825,53 @@ namespace Fans {
 		//unused0909   Tin        = Fan(FanNum)%InletAirTemp
 		//unused0909   Win        = Fan(FanNum)%InletAirHumRat
 		MassFlow = Fan( FanNum ).InletAirMassFlowRate;
+		MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate;
 		DeltaPress = Fan( FanNum ).DeltaPress;
 		FanEff = Fan( FanNum ).FanEff;
 		RhoAir = Fan( FanNum ).RhoAirStdInit;
+
+		//Faulty fan operations_Apr. 2015, zrp
+		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
+		if ( ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
+			
+			//  loop through the FaultsFouledAirFilters objects to find the one for the current fan
+			for ( int iFault = 1; iFault <= FaultsManager::NumFaultyAirFilter; ++iFault ) {
+
+				// find the FaultsFouledAirFilters object for the current fan
+				if ( SameString( Fan( FanNum ).FanName, FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanName ) ) {
+
+					// Check fault availability schedules
+					if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
+						Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
+
+						FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
+							( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
+							FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
+						
+						//Update MassFlow & DeltaPress of the fan
+						MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
+						DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
+					}
+					
+					// Stop searching the FaultsFouledAirFilters object for the fan
+					break;
+				}
+			}
+		}
 		
 		//EMS overwrite MassFlow, DeltaPress, and FanEff
 		if ( Fan( FanNum ).EMSMaxMassFlowOverrideOn ) MassFlow = Fan( FanNum ).EMSAirMassFlowValue;
 		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
 		if ( Fan( FanNum ).EMSFanEffOverrideOn ) FanEff = Fan( FanNum ).EMSFanEffValue;
-
-		MassFlow = min( MassFlow, Fan( FanNum ).MaxAirMassFlowRate );
+		
+		MassFlow = min( MassFlow, MaxAirMassFlowRate );
 		MassFlow = max( MassFlow, Fan( FanNum ).MinAirMassFlowRate );
 		Fan( FanNum ).FanRuntimeFraction = 0.0;
 
 		// Determine the Fan Schedule for the Time step
 		if ( ( GetCurrentScheduleValue( Fan( FanNum ).AvailSchedPtrNum ) > 0.0 || LocalTurnFansOn ) && ! LocalTurnFansOff && MassFlow > 0.0 && Fan( FanNum ).MaxAirMassFlowRate > 0.0 ) {
 			// The actual flow fraction is calculated from MassFlow and the MaxVolumeFlow * AirDensity
-			FlowFrac = MassFlow / ( Fan( FanNum ).MaxAirMassFlowRate );
+			FlowFrac = MassFlow / MaxAirMassFlowRate;
 
 			// Calculate the part load ratio, can't be greater than 1
 			PartLoadRatio = min( 1.0, FlowFrac );
@@ -1825,7 +1894,7 @@ namespace Fans {
 			// The fan speed ratio (passed from parent) determines the fan power according to fan laws
 			if ( present( SpeedRatio ) ) {
 				//    Fan(FanNum)%FanPower = MassFlow*DeltaPress/(FanEff*RhoAir*OnOffFanPartLoadFraction)! total fan power
-				Fan( FanNum ).FanPower = Fan( FanNum ).MaxAirMassFlowRate * Fan( FanNum ).FanRuntimeFraction * DeltaPress / ( FanEff * RhoAir );
+				Fan( FanNum ).FanPower = MaxAirMassFlowRate * Fan( FanNum ).FanRuntimeFraction * DeltaPress / ( FanEff * RhoAir );
 
 				//    Do not modify fan power calculation unless fan power vs speed ratio curve is used.
 				if ( Fan( FanNum ).FanPowerRatAtSpeedRatCurveIndex > 0 ) {
@@ -1867,7 +1936,7 @@ namespace Fans {
 					Fan( FanNum ).FanPower *= SpeedRaisedToPower / EffRatioAtSpeedRatio;
 				}
 			} else {
-				Fan( FanNum ).FanPower = Fan( FanNum ).MaxAirMassFlowRate * Fan( FanNum ).FanRuntimeFraction * DeltaPress / ( FanEff * RhoAir ); //total fan power
+				Fan( FanNum ).FanPower = MaxAirMassFlowRate * Fan( FanNum ).FanRuntimeFraction * DeltaPress / ( FanEff * RhoAir ); //total fan power
 			}
 
 			// OnOffFanPartLoadFraction is passed via DataHVACGlobals from the cooling or heating coil that is
@@ -3218,7 +3287,7 @@ namespace Fans {
 		FanCalDeltaPress = FanCalDeltaPresstemp; 	
 
 		while ( FanCalDeltaPress < ( FanDesignDeltaPress + FanFaultyDeltaPressInc ) ) {
-			FanFaultyAirFlowRate = FanFaultyAirFlowRate - 0.01;
+			FanFaultyAirFlowRate = FanFaultyAirFlowRate - 0.005;
 			FanCalDeltaPresstemp = CurveValue( FanCurvePtr, FanFaultyAirFlowRate );	
 
 			if ( ( FanCalDeltaPresstemp <= FanCalDeltaPress ) || ( FanFaultyAirFlowRate <= PerfCurve( FanCurvePtr ).Var1Min ) ) {
