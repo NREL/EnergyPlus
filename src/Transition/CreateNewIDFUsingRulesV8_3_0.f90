@@ -421,6 +421,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! new fields F21-25 are shifted
                 OutArgs(21:25) = InArgs(14:18)
                 ! there are some additional new fields, but they are optional and intentionally blank
+                CurArgs = CurArgs + 7
                 
               CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
                 ! data center hvac changes
@@ -437,6 +438,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! shift the rest
                 OutArgs(8:13) = InArgs(5:10)
                 ! there are some additional new fields, but they are optional and intentionally blank
+                CurArgs = CurArgs + 3
                 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

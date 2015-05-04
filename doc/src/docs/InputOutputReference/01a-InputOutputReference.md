@@ -1,6 +1,29 @@
-Input Output Reference
 
-The Encyclopedic Reference to EnergyPlus Input and Output
+![](InputOutputReference/media/ep.gif)
+
+<br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>Input Output Reference</h1>
+<h2>The Encyclopedic Reference to EnergyPlus Input and Output</h2>
+<br/>
+<p><i>(the ins and outs of EnergyPlus)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p>
 
 
 Input-Output Reference
@@ -1642,9 +1665,9 @@ Table 2. Humidity Indicating Field Interactions - Design Day
 
 <table class="table table-striped">
 <tr>
-<th>Humihity Conhition Type</th>
-<th>Primary Humihity Inhicating Fielh</th>
-<th>Humihity Inhicating Day Schehule</th>
+<th>Humidity Conhition Type</th>
+<th>Primary Humidity Inhicating Fielh</th>
+<th>Humidity Inhicating Day Schehule</th>
 </tr>
 <tr>
 <td>WetBulb</td>
@@ -2449,7 +2472,7 @@ The Site:HeightVariation object is used to specify the local variation in atmosp
 
 Table 5. Atmospheric Variables at Two Different Heights Above Ground Level.
 
-<table class="table table-stripeh">
+<table class="table table-striped">
 <tr>
 <th>Variable</th>
 <th>1.5 m</th>
@@ -17262,7 +17285,7 @@ Table 12. Winter Clothes (1.0 Clo)
 <table class="table table-striped">
 <tr>
 <th>Operative Temperature (C)</th>
-<th>Humihity Ratio (kgWater/kgDryAir)</th>
+<th>Humidity Ratio (kgWater/kgDryAir)</th>
 </tr>
 <tr>
 <td>19.6</td>
@@ -17295,7 +17318,7 @@ Table 13. Summer Clothes (0.5 Clo)
 <table class="table table-striped">
 <tr>
 <th>Operative Temperature (C)</th>
-<th>Humihity Ratio (kgWater/kgDryAir)</th>
+<th>Humidity Ratio (kgWater/kgDryAir)</th>
 </tr>
 <tr>
 <td>23.6</td>
@@ -17768,7 +17791,7 @@ As described in the Lights Outputs, values for lights will show up on the follow
 
 Table 15. Distribution of Lights to Meters
 
-<table class="table table-stripeh">
+<table class="table table-striped">
 <tr>
 <th>Meter Name</th>
 <th>Scope</th>

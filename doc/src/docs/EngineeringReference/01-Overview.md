@@ -1,3 +1,33 @@
+![](EngineeringReference/media/ep.gif)
+
+<br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>Engineering Reference</h1>
+<h2>The Reference to EnergyPlus Calculations</h2>
+<br/>
+<p><i>(in case you want or need to know)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p>
+
+
 Overview
 ========
 
@@ -112,13 +142,13 @@ Since everything in EnergyPlus is based on the foundation of the loads simulatio
 
 EnergyPlus determines warmup convergence in the following manner as shown in the Figure 2 below. The process of the convergence checks begins by tracking four parameters such including the maximum zone air temperature, the minimum zone air temperature, the maximum heating load, and the maximum cooling load for individual zone. It is note that these convergence checks are only in effective in simulations with at least one zone since the criteria is solely based on the maximum and minimum values obtained from an individual zone. Differences in these parameters between two consecutive days are then compared with the convergence tolerance values at the end of the day during the warmup period. For example, the maximum and minimum air temperature and the percentage difference of zone load for each zone at 9:00AM during the second to last warmup is compared to the values at 9:00AM last warmup day as follows:
 
-<div>\[{T_{\max ,prev}} - {T_{\max }} < {T_{tol}}\]</div>
+<div>$${T_{\max ,prev}} - {T_{\max }} < {T_{tol}}$$</div>
 
-<div>\[{T_{\min ,prev}} - {T_{\min }} < {T_{tol}}\]</div>
+<div>$${T_{\min ,prev}} - {T_{\min }} < {T_{tol}}$$</div>
 
-<div>\[\frac{{{q_h} - {q_{h,prev}}}}{{{q_h}}} < {q_{tol}}\]</div>
+<div>$$\frac{{{q_h} - {q_{h,prev}}}}{{{q_h}}} < {q_{tol}}$$</div>
 
-<div>\[\frac{{{q_c} - {q_{c,prev}}}}{{{q_c}}} < {q_{tol}}\]</div>
+<div>$$\frac{{{q_c} - {q_{c,prev}}}}{{{q_c}}} < {q_{tol}}$$</div>
 
 where Tmax,prev is the maximum zone temperature of previous day, Tmax is the maximum zone temperature of current day, Ttol is the value of temperature tolerance, qh,prev is the maximum heating load of previous day, qh, is the maximum heating load of current day, qtol is the value of load tolerance, qc,prev is the maximum cooling load of previous day, and qc, is the maximum cooling load of current day.
 

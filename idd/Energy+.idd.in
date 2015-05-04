@@ -43364,6 +43364,7 @@ Coil:Heating:DX:SingleSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
+       \default 1.25
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -43373,7 +43374,7 @@ Coil:Heating:DX:SingleSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \maximum> 1.0
+       \maximum 1.0
        \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
        \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
        \note This is an optional input field.  If this input field is left blank, then pure sensible 
@@ -43916,6 +43917,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
+       \default 1.25   
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -43925,7 +43927,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \maximum> 1.0
+       \maximum 1.0
        \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
        \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
        \note This is an optional input field.  If this input field is left blank, then pure sensible 
@@ -43965,6 +43967,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
+       \default 1.25   
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -43974,7 +43977,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \maximum> 1.0
+       \maximum 1.0
        \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
        \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
        \note This is an optional input field.  If this input field is left blank, then pure sensible 
@@ -44014,6 +44017,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
+       \default 1.25   
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -44023,7 +44027,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \maximum> 1.0
+       \maximum 1.0
        \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
        \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
        \note This is an optional input field.  If this input field is left blank, then pure sensible 
@@ -44063,6 +44067,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
+       \default 1.25
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -44072,7 +44077,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \maximum> 1.0
+       \maximum 1.0
        \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
        \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
        \note This is an optional input field.  If this input field is left blank, then pure sensible 
