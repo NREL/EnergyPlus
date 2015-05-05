@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -116,7 +116,7 @@ namespace WeatherManager {
 	Real64 const TKelvin( KelvinConv ); // conversion from Kelvin to Celsius
 
 	static std::string const BlankString;
-	FArray1D_string const DaysOfWeek( 7, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" } );
+	Array1D_string const DaysOfWeek( 7, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" } );
 
 	bool Debugout( false );
 
@@ -144,11 +144,11 @@ namespace WeatherManager {
 	Real64 WeatherFileTimeZone( 0.0 );
 	Real64 WeatherFileElevation( 0.0 );
 	int WeatherFileUnitNumber; // File unit number for the weather file
-	FArray1D< Real64 > GroundTemps( 12, 18.0 ); // Bldg Surface
-	FArray1D< Real64 > GroundTempsFC( 12, 0.0 ); // F or C factor method
-	FArray1D< Real64 > SurfaceGroundTemps( 12, 13.0 ); // Surface
-	FArray1D< Real64 > DeepGroundTemps( 12, 16.0 ); // Deep
-	FArray1D< Real64 > GroundReflectances( 12, 0.2 ); // User Specified Ground Reflectances !EPTeam: Using DP causes big diffs
+	Array1D< Real64 > GroundTemps( 12, 18.0 ); // Bldg Surface
+	Array1D< Real64 > GroundTempsFC( 12, 0.0 ); // F or C factor method
+	Array1D< Real64 > SurfaceGroundTemps( 12, 13.0 ); // Surface
+	Array1D< Real64 > DeepGroundTemps( 12, 16.0 ); // Deep
+	Array1D< Real64 > GroundReflectances( 12, 0.2 ); // User Specified Ground Reflectances !EPTeam: Using DP causes big diffs
 	Real64 SnowGndRefModifier( 1.0 ); // Modifier to ground reflectance during snow
 	Real64 SnowGndRefModifierForDayltg( 1.0 ); // Modifier to ground reflectance during snow for daylighting
 	int WaterMainsTempsMethod( 0 ); // Water mains temperature calculation method
@@ -163,9 +163,9 @@ namespace WeatherManager {
 	int TotRunDesPers( 0 ); // Total number of Run Design Periods (Weather data) to Setup
 
 	int NumSpecialDays( 0 );
-	FArray1D_int SpecialDayTypes( 366, 0 ); // To hold holiday types given in input file
-	FArray1D_int WeekDayTypes( 366, 0 ); // To hold Week day types using specified first day
-	FArray1D_int DSTIndex( 366, 0 ); // To hold DST Index based on weather file or input
+	Array1D_int SpecialDayTypes( 366, 0 ); // To hold holiday types given in input file
+	Array1D_int WeekDayTypes( 366, 0 ); // To hold Week day types using specified first day
+	Array1D_int DSTIndex( 366, 0 ); // To hold DST Index based on weather file or input
 
 	int NumDataPeriods( 0 );
 
@@ -186,49 +186,49 @@ namespace WeatherManager {
 	int NumEPWTypExtSets( 0 ); // Number of Typical/Extreme on weather file.
 	int NumWPSkyTemperatures( 0 ); // Number of WeatherProperty:SkyTemperature items in input file
 
-	FArray2D_bool TodayIsRain; // Rain indicator, true=rain
-	FArray2D_bool TodayIsSnow; // Snow indicator, true=snow
-	FArray2D< Real64 > TodayRainAmount; // ficitious indicator of Rain
-	FArray2D< Real64 > TodaySnowAmount; // ficitious indicator of Snow
-	FArray2D< Real64 > TodayOutDryBulbTemp; // Dry bulb temperature of outside air
-	FArray2D< Real64 > TodayOutWetBulbTemp; // Wet bulb temperature of outside air
-	FArray2D< Real64 > TodayOutDewPointTemp; // Dew Point Temperature of outside air
-	FArray2D< Real64 > TodayOutBaroPress; // Barometric pressure of outside air
-	FArray2D< Real64 > TodayOutHumRat; // Humidity ratio of outside air
-	FArray2D< Real64 > TodayOutRelHum; // Relative Humidity of outside air
-	FArray2D< Real64 > TodayWindSpeed; // Wind speed of outside air
-	FArray2D< Real64 > TodayWindDir; // Wind direction of outside air
-	FArray2D< Real64 > TodaySkyTemp; // Sky temperature
-	FArray2D< Real64 > TodayHorizIRSky; // Horizontal IR from Sky
-	FArray2D< Real64 > TodayBeamSolarRad; // Direct normal solar irradiance
-	FArray2D< Real64 > TodayDifSolarRad; // Sky diffuse horizontal solar irradiance
-	FArray2D< Real64 > TodayAlbedo; // Albedo
-	FArray2D< Real64 > TodayLiquidPrecip; // Liquid Precipitation Depth (mm)
+	Array2D_bool TodayIsRain; // Rain indicator, true=rain
+	Array2D_bool TodayIsSnow; // Snow indicator, true=snow
+	Array2D< Real64 > TodayRainAmount; // ficitious indicator of Rain
+	Array2D< Real64 > TodaySnowAmount; // ficitious indicator of Snow
+	Array2D< Real64 > TodayOutDryBulbTemp; // Dry bulb temperature of outside air
+	Array2D< Real64 > TodayOutWetBulbTemp; // Wet bulb temperature of outside air
+	Array2D< Real64 > TodayOutDewPointTemp; // Dew Point Temperature of outside air
+	Array2D< Real64 > TodayOutBaroPress; // Barometric pressure of outside air
+	Array2D< Real64 > TodayOutHumRat; // Humidity ratio of outside air
+	Array2D< Real64 > TodayOutRelHum; // Relative Humidity of outside air
+	Array2D< Real64 > TodayWindSpeed; // Wind speed of outside air
+	Array2D< Real64 > TodayWindDir; // Wind direction of outside air
+	Array2D< Real64 > TodaySkyTemp; // Sky temperature
+	Array2D< Real64 > TodayHorizIRSky; // Horizontal IR from Sky
+	Array2D< Real64 > TodayBeamSolarRad; // Direct normal solar irradiance
+	Array2D< Real64 > TodayDifSolarRad; // Sky diffuse horizontal solar irradiance
+	Array2D< Real64 > TodayAlbedo; // Albedo
+	Array2D< Real64 > TodayLiquidPrecip; // Liquid Precipitation Depth (mm)
 
-	FArray2D_bool TomorrowIsRain; // Rain indicator, true=rain
-	FArray2D_bool TomorrowIsSnow; // Snow indicator, true=snow
-	FArray2D< Real64 > TomorrowRainAmount; // ficitious indicator of Rain
-	FArray2D< Real64 > TomorrowSnowAmount; // ficitious indicator of Snow
-	FArray2D< Real64 > TomorrowOutDryBulbTemp; // Dry bulb temperature of outside air
-	FArray2D< Real64 > TomorrowOutDewPointTemp; // Dew Point Temperature of outside air
-	FArray2D< Real64 > TomorrowOutBaroPress; // Barometric pressure of outside air
-	FArray2D< Real64 > TomorrowOutRelHum; // Relative Humidity of outside air
-	FArray2D< Real64 > TomorrowWindSpeed; // Wind speed of outside air
-	FArray2D< Real64 > TomorrowWindDir; // Wind direction of outside air
-	FArray2D< Real64 > TomorrowSkyTemp; // Sky temperature
-	FArray2D< Real64 > TomorrowHorizIRSky; // Horizontal IR from Sky
-	FArray2D< Real64 > TomorrowBeamSolarRad; // Direct normal solar irradiance
-	FArray2D< Real64 > TomorrowDifSolarRad; // Sky diffuse horizontal solar irradiance
-	FArray2D< Real64 > TomorrowAlbedo; // Albedo
-	FArray2D< Real64 > TomorrowLiquidPrecip; // Liquid Precipitation Depth
+	Array2D_bool TomorrowIsRain; // Rain indicator, true=rain
+	Array2D_bool TomorrowIsSnow; // Snow indicator, true=snow
+	Array2D< Real64 > TomorrowRainAmount; // ficitious indicator of Rain
+	Array2D< Real64 > TomorrowSnowAmount; // ficitious indicator of Snow
+	Array2D< Real64 > TomorrowOutDryBulbTemp; // Dry bulb temperature of outside air
+	Array2D< Real64 > TomorrowOutDewPointTemp; // Dew Point Temperature of outside air
+	Array2D< Real64 > TomorrowOutBaroPress; // Barometric pressure of outside air
+	Array2D< Real64 > TomorrowOutRelHum; // Relative Humidity of outside air
+	Array2D< Real64 > TomorrowWindSpeed; // Wind speed of outside air
+	Array2D< Real64 > TomorrowWindDir; // Wind direction of outside air
+	Array2D< Real64 > TomorrowSkyTemp; // Sky temperature
+	Array2D< Real64 > TomorrowHorizIRSky; // Horizontal IR from Sky
+	Array2D< Real64 > TomorrowBeamSolarRad; // Direct normal solar irradiance
+	Array2D< Real64 > TomorrowDifSolarRad; // Sky diffuse horizontal solar irradiance
+	Array2D< Real64 > TomorrowAlbedo; // Albedo
+	Array2D< Real64 > TomorrowLiquidPrecip; // Liquid Precipitation Depth
 
-	FArray3D< Real64 > DDDBRngModifier; // Design Day Dry-bulb Temperature Range Modifier
-	FArray3D< Real64 > DDHumIndModifier; // Design Day relative humidity values
+	Array3D< Real64 > DDDBRngModifier; // Design Day Dry-bulb Temperature Range Modifier
+	Array3D< Real64 > DDHumIndModifier; // Design Day relative humidity values
 	//   or wet-bulb modifiers (per HumIndType)
-	FArray3D< Real64 > DDBeamSolarValues; // Design Day Beam Solar Values
-	FArray3D< Real64 > DDDiffuseSolarValues; // Design Day Relative Humidity Values
+	Array3D< Real64 > DDBeamSolarValues; // Design Day Beam Solar Values
+	Array3D< Real64 > DDDiffuseSolarValues; // Design Day Relative Humidity Values
 
-	FArray3D< Real64 > DDSkyTempScheduleValues; // Sky temperature - DesignDay input
+	Array3D< Real64 > DDSkyTempScheduleValues; // Sky temperature - DesignDay input
 
 	int RptIsRain( 0 ); // Rain Report Value
 	int RptIsSnow( 0 ); // Snow Report Value
@@ -239,19 +239,19 @@ namespace WeatherManager {
 	Real64 SolarAzimuthAngle( 0.0 ); // Angle of Solar Azimuth (degrees)
 	Real64 HorizIRSky( 0.0 ); // Horizontal Infrared Radiation Intensity (W/m2)
 	Real64 TimeStepFraction( 0.0 ); // Fraction of hour each time step represents
-	FArray1D< Real64 > SPSiteDryBulbRangeModScheduleValue; // reporting Drybulb Temperature Range Modifier Schedule Value
-	FArray1D< Real64 > SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
-	FArray1D< Real64 > SPSiteBeamSolarScheduleValue; // reporting Beam Solar Schedule Value
-	FArray1D< Real64 > SPSiteDiffuseSolarScheduleValue; // reporting Diffuse Solar Schedule Value
-	FArray1D< Real64 > SPSiteSkyTemperatureScheduleValue; // reporting SkyTemperature Modifier Schedule Value
-	FArray1D_int SPSiteScheduleNamePtr; // SP Site Schedule Name Ptrs
-	FArray1D_string SPSiteScheduleUnits; // SP Site Schedule Units
+	Array1D< Real64 > SPSiteDryBulbRangeModScheduleValue; // reporting Drybulb Temperature Range Modifier Schedule Value
+	Array1D< Real64 > SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
+	Array1D< Real64 > SPSiteBeamSolarScheduleValue; // reporting Beam Solar Schedule Value
+	Array1D< Real64 > SPSiteDiffuseSolarScheduleValue; // reporting Diffuse Solar Schedule Value
+	Array1D< Real64 > SPSiteSkyTemperatureScheduleValue; // reporting SkyTemperature Modifier Schedule Value
+	Array1D_int SPSiteScheduleNamePtr; // SP Site Schedule Name Ptrs
+	Array1D_string SPSiteScheduleUnits; // SP Site Schedule Units
 	int NumSPSiteScheduleNamePtrs( 0 ); // Number of SP Site Schedules (DesignDay only)
 	int NumMissing( 0 ); // Number of hours of missing data
-	FArray1D< Real64 > Interpolation; // Interpolation values based on Number of Time Steps in Hour
-	FArray1D< Real64 > SolarInterpolation; // Solar Interpolation values based on
+	Array1D< Real64 > Interpolation; // Interpolation values based on Number of Time Steps in Hour
+	Array1D< Real64 > SolarInterpolation; // Solar Interpolation values based on
 	//      Number of Time Steps in Hour
-	FArray1D_int EndDayOfMonth( 12, { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } );
+	Array1D_int EndDayOfMonth( 12, { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } );
 	bool ErrorInWeatherFile( false ); // Set to TRUE when there is a problem with dates
 	int LeapYearAdd( 0 ); // Set during environment if leap year is active (adds 1 to number days in Feb)
 	bool DatesShouldBeReset( false ); // True when weekdays should be reset
@@ -265,21 +265,21 @@ namespace WeatherManager {
 	// Object Data
 	DayWeatherVariables TodayVariables; // Today's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination angle | Value of the equation of time formula
 	DayWeatherVariables TomorrowVariables; // Tomorrow's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination angle | Value of the equation of time formula
-	FArray1D< DayWeatherVariables > DesignDay; // Design day environments
+	Array1D< DayWeatherVariables > DesignDay; // Design day environments
 	MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) | Wind Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) | Visibility (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth (cm) | Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
 	MissingDataCounts Missed;
 	RangeDataCounts OutOfRange;
-	FArray1D< DesignDayData > DesDayInput; // Design day Input Data
-	FArray1D< EnvironmentData > Environment; // Environment data
-	FArray1D< RunPeriodData > RunPeriodInput;
-	FArray1D< RunPeriodData > RunPeriodDesignInput;
-	FArray1D< TypicalExtremeData > TypicalExtremePeriods;
+	Array1D< DesignDayData > DesDayInput; // Design day Input Data
+	Array1D< EnvironmentData > Environment; // Environment data
+	Array1D< RunPeriodData > RunPeriodInput;
+	Array1D< RunPeriodData > RunPeriodDesignInput;
+	Array1D< TypicalExtremeData > TypicalExtremePeriods;
 	DaylightSavingPeriodData EPWDST; // Daylight Saving Period Data from EPW file
 	DaylightSavingPeriodData IDFDST; // Daylight Saving Period Data from IDF file
 	DaylightSavingPeriodData DST; // Daylight Saving Period Data, if active
-	FArray1D< WeatherProperties > WPSkyTemperature;
-	FArray1D< SpecialDayData > SpecialDays;
-	FArray1D< DataPeriodData > DataPeriods;
+	Array1D< WeatherProperties > WPSkyTemperature;
+	Array1D< SpecialDayData > SpecialDays;
+	Array1D< DataPeriodData > DataPeriods;
 
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
@@ -429,8 +429,8 @@ namespace WeatherManager {
 		static gio::Fmt EnvSpDyFormat( "('Environment:Special Days',4(',',A),',',I3)" );
 		static gio::Fmt DateFormat( "(I2.2,'/',I2.2)" );
 		static gio::Fmt DateFormatwithYear( "(I2.2,'/',I2.2,'/',I4.4)" );
-		static FArray1D_string const SpecialDayNames( 5, { "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
-		static FArray1D_string const ValidDayNames( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
+		static Array1D_string const SpecialDayNames( 5, { "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
+		static Array1D_string const ValidDayNames( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -458,8 +458,8 @@ namespace WeatherManager {
 		bool OkRun;
 		int ThisWeekDay;
 		int TWeekDay;
-		FArray1D_int MonWeekDay( 12 );
-		FArray1D_int ActEndDayOfMonth( 12 );
+		Array1D_int MonWeekDay( 12 );
+		Array1D_int ActEndDayOfMonth( 12 );
 		int ThisDay;
 		int JDay;
 		int JDay1;
@@ -552,7 +552,7 @@ namespace WeatherManager {
 			if ( NumOfEnvrn > 0 ) {
 				ResolveLocationInformation( ErrorsFound ); // Obtain weather related info from input file
 				CheckLocationValidity();
-				if ( Environment( NumOfEnvrn ).KindOfEnvrn != ksDesignDay ) {
+				if ( ( Environment( NumOfEnvrn ).KindOfEnvrn != ksDesignDay ) && ( Environment( NumOfEnvrn ).KindOfEnvrn != ksHVACSizeDesignDay ) ) {
 					CheckWeatherFileValidity();
 				}
 				if ( ErrorsFound ) {
@@ -621,11 +621,11 @@ namespace WeatherManager {
 					ShowSevereError( "Weather Simulation requested, but no weather file attached." );
 					ErrorsFound = true;
 				}
-				Envrn = 0;
+				if ( ! DoingHVACSizingSimulations) Envrn = 0;
 				Available = false;
 			} else if ( ( KindOfSim == ksRunPeriodWeather ) && ( ! WeatherFileExists && ! DoWeathSim ) ) {
 				Available = false;
-				Envrn = 0;
+				if ( ! DoingHVACSizingSimulations) Envrn = 0;
 			} else if ( ( KindOfSim == ksRunPeriodWeather ) && DoingSizing ) {
 				Available = false;
 				Envrn = 0;
@@ -911,16 +911,16 @@ namespace WeatherManager {
 							}
 						}
 
-					} else if ( SELECT_CASE_var == ksDesignDay ) { // Design Day
+					} else if (SELECT_CASE_var == ksDesignDay || SELECT_CASE_var == ksHVACSizeDesignDay ) { // Design Day
 						RunPeriodEnvironment = false;
-						gio::write( StDate, DateFormat ) << DesDayInput( Envrn ).Month << DesDayInput( Envrn ).DayOfMonth;
+						gio::write(StDate, DateFormat) << DesDayInput(Environment(Envrn).DesignDayNum).Month << DesDayInput(Environment(Envrn).DesignDayNum).DayOfMonth;
 						EnDate = StDate;
-						if ( DesDayInput( Envrn ).DayType <= 7 && DoWeatherInitReporting ) {
-							gio::write( OutputFileInits, EnvNameFormat ) << Environment( Envrn ).Title << "SizingPeriod:DesignDay" << StDate << EnDate << DaysOfWeek( DesDayInput( Envrn ).DayType ) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
+						if (DesDayInput(Environment(Envrn).DesignDayNum).DayType <= 7 && DoWeatherInitReporting) {
+							gio::write(OutputFileInits, EnvNameFormat) << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate << DaysOfWeek(DesDayInput(Environment(Envrn).DesignDayNum).DayType) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
 						} else if ( DoWeatherInitReporting ) {
-							gio::write( OutputFileInits, EnvNameFormat ) << Environment( Envrn ).Title << "SizingPeriod:DesignDay" << StDate << EnDate << SpecialDayNames( DesDayInput( Envrn ).DayType - 7 ) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
+							gio::write(OutputFileInits, EnvNameFormat) << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate << SpecialDayNames(DesDayInput(Environment(Envrn).DesignDayNum).DayType - 7) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
 						}
-						if ( DesDayInput( Envrn ).DSTIndicator == 0 && DoWeatherInitReporting ) {
+						if (DesDayInput(Environment(Envrn).DesignDayNum).DSTIndicator == 0 && DoWeatherInitReporting) {
 							gio::write( OutputFileInits, EnvDSTNFormat ) << "SizingPeriod:DesignDay";
 						} else if ( DoWeatherInitReporting ) {
 							gio::write( OutputFileInits, EnvDSTYFormat ) << "SizingPeriod:DesignDay" << StDate << EnDate;
@@ -942,11 +942,46 @@ namespace WeatherManager {
 	}
 
 	void
+	AddDesignSetToEnvironmentStruct(
+		int const HVACSizingIterCount
+	)
+	{
+		// SUBROUTINE INFORMATION:
+
+		using DataGlobals::ksDesignDay;
+		using DataGlobals::ksRunPeriodDesign;
+		using DataGlobals::ksHVACSizeDesignDay;
+		using DataGlobals::ksHVACSizeRunPeriodDesign;
+
+		int OrigNumOfEnvrn;
+
+		OrigNumOfEnvrn = NumOfEnvrn;
+		for ( int i = 1; i <= OrigNumOfEnvrn; ++i ) {
+			if ( Environment(i).KindOfEnvrn == ksDesignDay) {
+				Environment.redimension(++NumOfEnvrn);
+				Environment(NumOfEnvrn) = Environment(i); // copy over seed data from current array element
+				Environment(NumOfEnvrn).SeedEnvrnNum = i;
+				Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeDesignDay;
+				Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Pass " + RoundSigDigits( HVACSizingIterCount );
+				Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
+			} else if (Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+				Environment.redimension(++NumOfEnvrn);
+				Environment(NumOfEnvrn) = Environment(i); // copy over seed data
+				Environment(NumOfEnvrn).SeedEnvrnNum = i;
+				Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeRunPeriodDesign;
+				Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Pass " + RoundSigDigits( HVACSizingIterCount );
+				Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
+			}
+		}  // for each loop over Environment data strucure
+
+	}
+
+	void
 	SetupWeekDaysByMonth(
 		int const StMon,
 		int const StDay,
 		int const StWeekDay,
-		FArray1A_int WeekDays
+		Array1A_int WeekDays
 	)
 	{
 
@@ -1066,7 +1101,7 @@ namespace WeatherManager {
 
 	void
 	ResetWeekDaysByMonth(
-		FArray1A_int WeekDays,
+		Array1A_int WeekDays,
 		int const LeapYearAdd,
 		int const StartMonth,
 		int const StartMonthDay,
@@ -1112,7 +1147,7 @@ namespace WeatherManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_int WeekDaysCopy( 12 );
+		Array1D_int WeekDaysCopy( 12 );
 		int Loop;
 		int CurWeekDay;
 		bool ResetMidSimulation;
@@ -1311,8 +1346,8 @@ namespace WeatherManager {
 
 	void
 	SetDSTDateRanges(
-		FArray1S_int MonWeekDay, // Weekday of each day 1 of month
-		FArray1S_int DSTIndex, // DST Index for each julian day (1:366)
+		Array1S_int MonWeekDay, // Weekday of each day 1 of month
+		Array1S_int DSTIndex, // DST Index for each julian day (1:366)
 		Optional_int DSTActStMon,
 		Optional_int DSTActStDay,
 		Optional_int DSTActEnMon,
@@ -1363,7 +1398,7 @@ namespace WeatherManager {
 		int JDay;
 		int JDay1;
 		bool ErrorsFound;
-		FArray1D_int ActEndDayOfMonth( 12 );
+		Array1D_int ActEndDayOfMonth( 12 );
 
 		ErrorsFound = false;
 		ActEndDayOfMonth = EndDayOfMonth;
@@ -1444,7 +1479,7 @@ namespace WeatherManager {
 	}
 
 	void
-	SetSpecialDayDates( FArray1S_int MonWeekDay ) // Weekday of each day 1 of month
+	SetSpecialDayDates( Array1S_int MonWeekDay ) // Weekday of each day 1 of month
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1489,7 +1524,7 @@ namespace WeatherManager {
 		int JDay1;
 		int Loop1;
 		bool ErrorsFound;
-		FArray1D_int ActEndDayOfMonth( 12 );
+		Array1D_int ActEndDayOfMonth( 12 );
 
 		ErrorsFound = false;
 		ActEndDayOfMonth = EndDayOfMonth;
@@ -1620,8 +1655,9 @@ namespace WeatherManager {
 
 			//Call and setup the Design Day environment
 			if ( Environment( Envrn ).KindOfEnvrn != ksRunPeriodWeather ) {
-				if ( Envrn <= TotDesDays ) {
-					SetUpDesignDay( Envrn );
+				if (Environment(Envrn).DesignDayNum > 0) {
+					SetUpDesignDay(Environment(Envrn).DesignDayNum);
+					EnvironmentName = Environment(Envrn).Title;
 				}
 			}
 
@@ -1680,10 +1716,10 @@ namespace WeatherManager {
 				SpecialDays( Loop ).Used = false;
 			}
 
-			if ( KindOfSim != ksDesignDay ) {
+			if ((KindOfSim != ksDesignDay) && (KindOfSim != ksHVACSizeDesignDay)) {
 				ReadWeatherForDay( 1, Envrn, false ); // Read first day's weather
 			} else {
-				TomorrowVariables = DesignDay( Envrn );
+				TomorrowVariables = DesignDay(Environment(Envrn).DesignDayNum);
 			}
 
 		} // ... end of BeginEnvrnFlag IF-THEN block.
@@ -1703,7 +1739,7 @@ namespace WeatherManager {
 			// In a multi year simulation with run period less than 365, we need to position the weather line
 			// appropriately.
 
-			if ( ( ! WarmupFlag ) && ( Environment( Envrn ).KindOfEnvrn != ksDesignDay ) ) {
+			if ((!WarmupFlag) && ((Environment(Envrn).KindOfEnvrn != ksDesignDay) && (Environment(Envrn).KindOfEnvrn != ksHVACSizeDesignDay))) {
 				if ( DayOfSim < NumOfDayInEnvrn ) {
 					if ( DayOfSim == curSimDayForEndOfRunPeriod ) {
 						curSimDayForEndOfRunPeriod += Environment( Envrn ).RawSimDays;
@@ -1815,7 +1851,7 @@ namespace WeatherManager {
 			DatesShouldBeReset = true;
 		}
 
-		if ( EndEnvrnFlag && ( Environment( Envrn ).KindOfEnvrn != ksDesignDay ) ) {
+		if (EndEnvrnFlag && (Environment(Envrn).KindOfEnvrn != ksDesignDay) && (Environment(Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
 			gio::rewind( WeatherFileUnitNumber );
 			SkipEPlusWFHeader();
 			ReportMissing_RangeData();
@@ -2025,12 +2061,12 @@ namespace WeatherManager {
 			ShowFatalError( "SetCurrentWeather: At " + CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0" );
 		}
 
-		OutDryBulbTemp = TodayOutDryBulbTemp( HourOfDay, TimeStep );
+		OutDryBulbTemp = TodayOutDryBulbTemp( TimeStep, HourOfDay );
 		if ( EMSOutDryBulbOverrideOn ) OutDryBulbTemp = EMSOutDryBulbOverrideValue;
-		OutBaroPress = TodayOutBaroPress( HourOfDay, TimeStep );
-		OutDewPointTemp = TodayOutDewPointTemp( HourOfDay, TimeStep );
+		OutBaroPress = TodayOutBaroPress( TimeStep, HourOfDay );
+		OutDewPointTemp = TodayOutDewPointTemp( TimeStep, HourOfDay );
 		if ( EMSOutDewPointTempOverrideOn ) OutDewPointTemp = EMSOutDewPointTempOverrideValue;
-		OutRelHum = TodayOutRelHum( HourOfDay, TimeStep );
+		OutRelHum = TodayOutRelHum( TimeStep, HourOfDay );
 		OutRelHumValue = OutRelHum / 100.0;
 		if ( EMSOutRelHumOverrideOn ) {
 			OutRelHumValue = EMSOutRelHumOverrideValue / 100.0;
@@ -2051,27 +2087,29 @@ namespace WeatherManager {
 			OutDewPointTemp = OutWetBulbTemp;
 		}
 
-		if ( KindOfSim == ksDesignDay ) {
+		if ( ( KindOfSim == ksDesignDay ) || ( KindOfSim == ksHVACSizeDesignDay ) ) {
 			SPSiteDryBulbRangeModScheduleValue = -999.0; // N/A Drybulb Temperature Range Modifier Schedule Value
 			SPSiteHumidityConditionScheduleValue = -999.0; // N/A Humidity Condition Schedule Value
 			SPSiteBeamSolarScheduleValue = -999.0; // N/A Beam Solar Schedule Value
 			SPSiteDiffuseSolarScheduleValue = -999.0; // N/A Diffuse Solar Schedule Value
 			SPSiteSkyTemperatureScheduleValue = -999.0; // N/A SkyTemperature Modifier Schedule Value
 
-			if ( DesDayInput( Envrn ).DBTempRangeType != DDDBRangeType_Default ) {
-				SPSiteDryBulbRangeModScheduleValue( Envrn ) = DDDBRngModifier( Envrn, HourOfDay, TimeStep );
+			int const envrnDayNum( Environment( Envrn ).DesignDayNum );
+			if ( DesDayInput( envrnDayNum ).DBTempRangeType != DDDBRangeType_Default ) {
+				SPSiteDryBulbRangeModScheduleValue( envrnDayNum ) = DDDBRngModifier( TimeStep, HourOfDay, envrnDayNum );
 			}
-			if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfMul ) {
-				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( Envrn, HourOfDay, TimeStep );
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_RelHumSch ) {
-				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( Envrn, HourOfDay, TimeStep );
+			int const humIndType( DesDayInput( envrnDayNum ).HumIndType );
+			if ( humIndType == DDHumIndType_WBProfDef || humIndType == DDHumIndType_WBProfDif || humIndType == DDHumIndType_WBProfMul ) {
+				SPSiteHumidityConditionScheduleValue( envrnDayNum ) = DDHumIndModifier( TimeStep, HourOfDay, envrnDayNum );
+			} else if ( humIndType == DDHumIndType_RelHumSch ) {
+				SPSiteHumidityConditionScheduleValue( envrnDayNum ) = DDHumIndModifier( TimeStep, HourOfDay, envrnDayNum );
 			}
-			if ( DesDayInput( Envrn ).SolarModel == SolarModel_Schedule ) {
-				SPSiteBeamSolarScheduleValue( Envrn ) = DDBeamSolarValues( Envrn, HourOfDay, TimeStep );
-				SPSiteDiffuseSolarScheduleValue( Envrn ) = DDDiffuseSolarValues( Envrn, HourOfDay, TimeStep );
+			if ( DesDayInput( envrnDayNum ).SolarModel == SolarModel_Schedule ) {
+				SPSiteBeamSolarScheduleValue( envrnDayNum ) = DDBeamSolarValues( TimeStep, HourOfDay, envrnDayNum );
+				SPSiteDiffuseSolarScheduleValue( envrnDayNum ) = DDDiffuseSolarValues( TimeStep, HourOfDay, envrnDayNum );
 			}
 			if ( Environment( Envrn ).WP_Type1 != 0 ) {
-				SPSiteSkyTemperatureScheduleValue( Envrn ) = DDSkyTempScheduleValues( Envrn, HourOfDay, TimeStep );
+				SPSiteSkyTemperatureScheduleValue( envrnDayNum ) = DDSkyTempScheduleValues( TimeStep, HourOfDay, envrnDayNum );
 			}
 		} else if ( TotDesDays > 0 ) {
 			SPSiteDryBulbRangeModScheduleValue = -999.0; // N/A Drybulb Temperature Range Modifier Schedule Value
@@ -2081,26 +2119,26 @@ namespace WeatherManager {
 			SPSiteSkyTemperatureScheduleValue = -999.0; // N/A SkyTemperature Modifier Schedule Value
 		}
 
-		WindSpeed = TodayWindSpeed( HourOfDay, TimeStep );
+		WindSpeed = TodayWindSpeed( TimeStep, HourOfDay );
 		if ( EMSWindSpeedOverrideOn ) WindSpeed = EMSWindSpeedOverrideValue;
-		WindDir = TodayWindDir( HourOfDay, TimeStep );
+		WindDir = TodayWindDir( TimeStep, HourOfDay );
 		if ( EMSWindDirOverrideOn ) WindDir = EMSWindDirOverrideValue;
-		HorizIRSky = TodayHorizIRSky( HourOfDay, TimeStep );
-		SkyTemp = TodaySkyTemp( HourOfDay, TimeStep );
+		HorizIRSky = TodayHorizIRSky( TimeStep, HourOfDay );
+		SkyTemp = TodaySkyTemp( TimeStep, HourOfDay );
 		SkyTempKelvin = SkyTemp + KelvinConv;
-		DifSolarRad = TodayDifSolarRad( HourOfDay, TimeStep );
+		DifSolarRad = TodayDifSolarRad( TimeStep, HourOfDay );
 		if ( EMSDifSolarRadOverrideOn ) DifSolarRad = EMSDifSolarRadOverrideValue;
-		BeamSolarRad = TodayBeamSolarRad( HourOfDay, TimeStep );
+		BeamSolarRad = TodayBeamSolarRad( TimeStep, HourOfDay );
 		if ( EMSBeamSolarRadOverrideOn ) BeamSolarRad = EMSBeamSolarRadOverrideValue;
-		LiquidPrecipitation = TodayLiquidPrecip( HourOfDay, TimeStep ) / 1000.0; // convert from mm to m
+		LiquidPrecipitation = TodayLiquidPrecip( TimeStep, HourOfDay ) / 1000.0; // convert from mm to m
 
 		if ( UseRainValues ) {
-			IsRain = TodayIsRain( HourOfDay, TimeStep ); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
+			IsRain = TodayIsRain( TimeStep, HourOfDay ); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
 		} else {
 			IsRain = false;
 		}
 		if ( UseSnowValues ) {
-			IsSnow = TodayIsSnow( HourOfDay, TimeStep );
+			IsSnow = TodayIsSnow( TimeStep, HourOfDay );
 		} else {
 			IsSnow = false;
 		}
@@ -2270,7 +2308,7 @@ namespace WeatherManager {
 		Real64 Albedo;
 		Real64 LiquidPrecip;
 		int PresWeathObs;
-		FArray1D_int PresWeathConds( 9 );
+		Array1D_int PresWeathConds( 9 );
 		std::string WeatherDataLine;
 		bool Ready;
 		int CurTimeStep;
@@ -2327,20 +2365,20 @@ namespace WeatherManager {
 		struct HourlyWeatherData
 		{
 			// Members
-			FArray1D_bool IsRain; // Rain indicator, true=rain
-			FArray1D_bool IsSnow; // Snow indicator, true=snow
-			FArray1D< Real64 > OutDryBulbTemp; // Hourly dry bulb temperature of outside air
-			FArray1D< Real64 > OutDewPointTemp; // Hourly Dew Point Temperature of outside air
-			FArray1D< Real64 > OutBaroPress; // Hourly barometric pressure of outside air
-			FArray1D< Real64 > OutRelHum; // Hourly relative humidity
-			FArray1D< Real64 > WindSpeed; // Hourly wind speed of outside air
-			FArray1D< Real64 > WindDir; // Hourly wind direction of outside air
-			FArray1D< Real64 > SkyTemp; // Hourly sky temperature
-			FArray1D< Real64 > HorizIRSky; // Hourly Horizontal Infrared Radiation Intensity
-			FArray1D< Real64 > BeamSolarRad; // Hourly direct normal solar irradiance
-			FArray1D< Real64 > DifSolarRad; // Hourly sky diffuse horizontal solar irradiance
-			FArray1D< Real64 > Albedo; // Albedo
-			FArray1D< Real64 > LiquidPrecip; // Liquid Precipitation
+			Array1D_bool IsRain; // Rain indicator, true=rain
+			Array1D_bool IsSnow; // Snow indicator, true=snow
+			Array1D< Real64 > OutDryBulbTemp; // Hourly dry bulb temperature of outside air
+			Array1D< Real64 > OutDewPointTemp; // Hourly Dew Point Temperature of outside air
+			Array1D< Real64 > OutBaroPress; // Hourly barometric pressure of outside air
+			Array1D< Real64 > OutRelHum; // Hourly relative humidity
+			Array1D< Real64 > WindSpeed; // Hourly wind speed of outside air
+			Array1D< Real64 > WindDir; // Hourly wind direction of outside air
+			Array1D< Real64 > SkyTemp; // Hourly sky temperature
+			Array1D< Real64 > HorizIRSky; // Hourly Horizontal Infrared Radiation Intensity
+			Array1D< Real64 > BeamSolarRad; // Hourly direct normal solar irradiance
+			Array1D< Real64 > DifSolarRad; // Hourly sky diffuse horizontal solar irradiance
+			Array1D< Real64 > Albedo; // Albedo
+			Array1D< Real64 > LiquidPrecip; // Liquid Precipitation
 
 			// Default Constructor
 			HourlyWeatherData() :
@@ -2362,20 +2400,20 @@ namespace WeatherManager {
 
 			// Member Constructor
 			HourlyWeatherData(
-				FArray1_bool const & IsRain, // Rain indicator, true=rain
-				FArray1_bool const & IsSnow, // Snow indicator, true=snow
-				FArray1< Real64 > const & OutDryBulbTemp, // Hourly dry bulb temperature of outside air
-				FArray1< Real64 > const & OutDewPointTemp, // Hourly Dew Point Temperature of outside air
-				FArray1< Real64 > const & OutBaroPress, // Hourly barometric pressure of outside air
-				FArray1< Real64 > const & OutRelHum, // Hourly relative humidity
-				FArray1< Real64 > const & WindSpeed, // Hourly wind speed of outside air
-				FArray1< Real64 > const & WindDir, // Hourly wind direction of outside air
-				FArray1< Real64 > const & SkyTemp, // Hourly sky temperature
-				FArray1< Real64 > const & HorizIRSky, // Hourly Horizontal Infrared Radiation Intensity
-				FArray1< Real64 > const & BeamSolarRad, // Hourly direct normal solar irradiance
-				FArray1< Real64 > const & DifSolarRad, // Hourly sky diffuse horizontal solar irradiance
-				FArray1< Real64 > const & Albedo, // Albedo
-				FArray1< Real64 > const & LiquidPrecip // Liquid Precipitation
+				Array1_bool const & IsRain, // Rain indicator, true=rain
+				Array1_bool const & IsSnow, // Snow indicator, true=snow
+				Array1< Real64 > const & OutDryBulbTemp, // Hourly dry bulb temperature of outside air
+				Array1< Real64 > const & OutDewPointTemp, // Hourly Dew Point Temperature of outside air
+				Array1< Real64 > const & OutBaroPress, // Hourly barometric pressure of outside air
+				Array1< Real64 > const & OutRelHum, // Hourly relative humidity
+				Array1< Real64 > const & WindSpeed, // Hourly wind speed of outside air
+				Array1< Real64 > const & WindDir, // Hourly wind direction of outside air
+				Array1< Real64 > const & SkyTemp, // Hourly sky temperature
+				Array1< Real64 > const & HorizIRSky, // Hourly Horizontal Infrared Radiation Intensity
+				Array1< Real64 > const & BeamSolarRad, // Hourly direct normal solar irradiance
+				Array1< Real64 > const & DifSolarRad, // Hourly sky diffuse horizontal solar irradiance
+				Array1< Real64 > const & Albedo, // Albedo
+				Array1< Real64 > const & LiquidPrecip // Liquid Precipitation
 			) :
 				IsRain( 24, IsRain ),
 				IsSnow( 24, IsSnow ),
@@ -2750,15 +2788,15 @@ namespace WeatherManager {
 					//          Missed%DaysLastSnow=Missed%DaysLastSnow+1
 					//        ENDIF
 
-					TomorrowOutDryBulbTemp( Hour, CurTimeStep ) = DryBulb;
-					TomorrowOutDewPointTemp( Hour, CurTimeStep ) = DewPoint;
-					TomorrowOutBaroPress( Hour, CurTimeStep ) = AtmPress;
-					TomorrowOutRelHum( Hour, CurTimeStep ) = RelHum;
+					TomorrowOutDryBulbTemp( CurTimeStep, Hour ) = DryBulb;
+					TomorrowOutDewPointTemp( CurTimeStep, Hour ) = DewPoint;
+					TomorrowOutBaroPress( CurTimeStep, Hour ) = AtmPress;
+					TomorrowOutRelHum( CurTimeStep, Hour ) = RelHum;
 					RelHum *= 0.01;
-					TomorrowWindSpeed( Hour, CurTimeStep ) = WindSpeed;
-					TomorrowWindDir( Hour, CurTimeStep ) = WindDir;
-					TomorrowLiquidPrecip( Hour, CurTimeStep ) = LiquidPrecip;
-					TomorrowHorizIRSky( Hour, CurTimeStep ) = IRHoriz;
+					TomorrowWindSpeed( CurTimeStep, Hour ) = WindSpeed;
+					TomorrowWindDir( CurTimeStep, Hour ) = WindDir;
+					TomorrowLiquidPrecip( CurTimeStep, Hour ) = LiquidPrecip;
+					TomorrowHorizIRSky( CurTimeStep, Hour ) = IRHoriz;
 
 					if ( Environment( Envrn ).WP_Type1 == 0 ) {
 						// Calculate sky temperature, use IRHoriz if not missing
@@ -2775,7 +2813,7 @@ namespace WeatherManager {
 						SkyTemp = 0.0; // dealt with later
 					}
 
-					TomorrowSkyTemp( Hour, CurTimeStep ) = SkyTemp;
+					TomorrowSkyTemp( CurTimeStep, Hour ) = SkyTemp;
 
 					if ( ETHoriz >= 9999.0 ) ETHoriz = 0.0;
 					if ( ETDirect >= 9999.0 ) ETDirect = 0.0;
@@ -2798,19 +2836,19 @@ namespace WeatherManager {
 						DiffuseRad = 0.0;
 					}
 
-					TomorrowBeamSolarRad( Hour, CurTimeStep ) = DirectRad;
-					TomorrowDifSolarRad( Hour, CurTimeStep ) = DiffuseRad;
+					TomorrowBeamSolarRad( CurTimeStep, Hour ) = DirectRad;
+					TomorrowDifSolarRad( CurTimeStep, Hour ) = DiffuseRad;
 
-					TomorrowIsRain( Hour, CurTimeStep ) = false;
+					TomorrowIsRain( CurTimeStep, Hour ) = false;
 					if ( PresWeathObs == 0 ) {
-						if ( PresWeathConds( 1 ) < 9 || PresWeathConds( 2 ) < 9 || PresWeathConds( 3 ) < 9 ) TomorrowIsRain( Hour, CurTimeStep ) = true;
+						if ( PresWeathConds( 1 ) < 9 || PresWeathConds( 2 ) < 9 || PresWeathConds( 3 ) < 9 ) TomorrowIsRain( CurTimeStep, Hour ) = true;
 					} else {
-						TomorrowIsRain( Hour, CurTimeStep ) = false;
+						TomorrowIsRain( CurTimeStep, Hour ) = false;
 					}
-					TomorrowIsSnow( Hour, CurTimeStep ) = ( SnowDepth > 0.0 );
+					TomorrowIsSnow( CurTimeStep, Hour ) = ( SnowDepth > 0.0 );
 
 					// default if rain but none on weather file
-					if ( TomorrowIsRain( Hour, CurTimeStep ) && TomorrowLiquidPrecip( Hour, CurTimeStep ) == 0.0 ) TomorrowLiquidPrecip( Hour, CurTimeStep ) = 2.0; // 2mm in an hour ~ .08 inch
+					if ( TomorrowIsRain( CurTimeStep, Hour ) && TomorrowLiquidPrecip( CurTimeStep, Hour ) == 0.0 ) TomorrowLiquidPrecip( CurTimeStep, Hour ) = 2.0; // 2mm in an hour ~ .08 inch
 
 					Missing.DryBulb = DryBulb;
 					Missing.DewPoint = DewPoint;
@@ -2843,20 +2881,20 @@ namespace WeatherManager {
 			// Create interpolated weather for timestep orientation
 			// First copy ts=1 (hourly) from data arrays to Wthr structure
 			for ( Hour = 1; Hour <= 24; ++Hour ) {
-				Wthr.OutDryBulbTemp( Hour ) = TomorrowOutDryBulbTemp( Hour, 1 );
-				Wthr.OutDewPointTemp( Hour ) = TomorrowOutDewPointTemp( Hour, 1 );
-				Wthr.OutBaroPress( Hour ) = TomorrowOutBaroPress( Hour, 1 );
-				Wthr.OutRelHum( Hour ) = TomorrowOutRelHum( Hour, 1 );
-				Wthr.WindSpeed( Hour ) = TomorrowWindSpeed( Hour, 1 );
-				Wthr.WindDir( Hour ) = TomorrowWindDir( Hour, 1 );
-				Wthr.SkyTemp( Hour ) = TomorrowSkyTemp( Hour, 1 );
-				Wthr.HorizIRSky( Hour ) = TomorrowHorizIRSky( Hour, 1 );
-				Wthr.BeamSolarRad( Hour ) = TomorrowBeamSolarRad( Hour, 1 );
-				Wthr.DifSolarRad( Hour ) = TomorrowDifSolarRad( Hour, 1 );
-				Wthr.IsRain( Hour ) = TomorrowIsRain( Hour, 1 );
-				Wthr.IsSnow( Hour ) = TomorrowIsSnow( Hour, 1 );
-				Wthr.Albedo( Hour ) = TomorrowAlbedo( Hour, 1 );
-				Wthr.LiquidPrecip( Hour ) = TomorrowLiquidPrecip( Hour, 1 );
+				Wthr.OutDryBulbTemp( Hour ) = TomorrowOutDryBulbTemp( 1, Hour );
+				Wthr.OutDewPointTemp( Hour ) = TomorrowOutDewPointTemp( 1, Hour );
+				Wthr.OutBaroPress( Hour ) = TomorrowOutBaroPress( 1, Hour );
+				Wthr.OutRelHum( Hour ) = TomorrowOutRelHum( 1, Hour );
+				Wthr.WindSpeed( Hour ) = TomorrowWindSpeed( 1, Hour );
+				Wthr.WindDir( Hour ) = TomorrowWindDir( 1, Hour );
+				Wthr.SkyTemp( Hour ) = TomorrowSkyTemp( 1, Hour );
+				Wthr.HorizIRSky( Hour ) = TomorrowHorizIRSky( 1, Hour );
+				Wthr.BeamSolarRad( Hour ) = TomorrowBeamSolarRad( 1, Hour );
+				Wthr.DifSolarRad( Hour ) = TomorrowDifSolarRad( 1, Hour );
+				Wthr.IsRain( Hour ) = TomorrowIsRain( 1, Hour );
+				Wthr.IsSnow( Hour ) = TomorrowIsSnow( 1, Hour );
+				Wthr.Albedo( Hour ) = TomorrowAlbedo( 1, Hour );
+				Wthr.LiquidPrecip( Hour ) = TomorrowLiquidPrecip( 1, Hour );
 			}
 
 			if ( ! LastHourSet ) {
@@ -2913,24 +2951,24 @@ namespace WeatherManager {
 						}
 					}
 
-					TomorrowOutDryBulbTemp( Hour, TS ) = LastHrOutDryBulbTemp * WtPrevHour + Wthr.OutDryBulbTemp( Hour ) * WtNow;
-					TomorrowOutBaroPress( Hour, TS ) = LastHrOutBaroPress * WtPrevHour + Wthr.OutBaroPress( Hour ) * WtNow;
-					TomorrowOutDewPointTemp( Hour, TS ) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp( Hour ) * WtNow;
-					TomorrowOutRelHum( Hour, TS ) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum( Hour ) * WtNow;
-					TomorrowWindSpeed( Hour, TS ) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed( Hour ) * WtNow;
-					TomorrowWindDir( Hour, TS ) = LastHrWindDir * WtPrevHour + Wthr.WindDir( Hour ) * WtNow;
-					TomorrowHorizIRSky( Hour, TS ) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky( Hour ) * WtNow;
+					TomorrowOutDryBulbTemp( TS, Hour ) = LastHrOutDryBulbTemp * WtPrevHour + Wthr.OutDryBulbTemp( Hour ) * WtNow;
+					TomorrowOutBaroPress( TS, Hour ) = LastHrOutBaroPress * WtPrevHour + Wthr.OutBaroPress( Hour ) * WtNow;
+					TomorrowOutDewPointTemp( TS, Hour ) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp( Hour ) * WtNow;
+					TomorrowOutRelHum( TS, Hour ) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum( Hour ) * WtNow;
+					TomorrowWindSpeed( TS, Hour ) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed( Hour ) * WtNow;
+					TomorrowWindDir( TS, Hour ) = LastHrWindDir * WtPrevHour + Wthr.WindDir( Hour ) * WtNow;
+					TomorrowHorizIRSky( TS, Hour ) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky( Hour ) * WtNow;
 					if ( Environment( Environ ).WP_Type1 == 0 ) {
-						TomorrowSkyTemp( Hour, TS ) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp( Hour ) * WtNow;
+						TomorrowSkyTemp( TS, Hour ) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp( Hour ) * WtNow;
 					}
-					TomorrowDifSolarRad( Hour, TS ) = LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad( Hour ) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
-					TomorrowBeamSolarRad( Hour, TS ) = LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad( Hour ) * WgtHourNow + NextHrBeamSolarRad * WgtNextHour;
+					TomorrowDifSolarRad( TS, Hour ) = LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad( Hour ) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
+					TomorrowBeamSolarRad( TS, Hour ) = LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad( Hour ) * WgtHourNow + NextHrBeamSolarRad * WgtNextHour;
 
-					TomorrowLiquidPrecip( Hour, TS ) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip( Hour ) * WtNow;
-					TomorrowLiquidPrecip( Hour, TS ) /= double( NumOfTimeStepInHour );
+					TomorrowLiquidPrecip( TS, Hour ) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip( Hour ) * WtNow;
+					TomorrowLiquidPrecip( TS, Hour ) /= double( NumOfTimeStepInHour );
 
-					TomorrowIsRain( Hour, TS ) = TomorrowLiquidPrecip( Hour, TS ) >= ( 0.8 / double( NumOfTimeStepInHour ) ); //Wthr%IsRain(Hour)
-					TomorrowIsSnow( Hour, TS ) = Wthr.IsSnow( Hour );
+					TomorrowIsRain( TS, Hour ) = TomorrowLiquidPrecip( TS, Hour ) >= ( 0.8 / double( NumOfTimeStepInHour ) ); //Wthr%IsRain(Hour)
+					TomorrowIsSnow( TS, Hour ) = Wthr.IsSnow( Hour );
 				} // End of TS Loop
 
 				LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp( Hour );
@@ -2957,7 +2995,7 @@ namespace WeatherManager {
 					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear, CurDayOfWeek );
 					for ( Hour = 1; Hour <= 24; ++Hour ) {
 						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-							TomorrowSkyTemp( Hour, TS ) = TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowSkyTemp( Hour, TS );
+							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 						}
 					}
 
@@ -2965,7 +3003,7 @@ namespace WeatherManager {
 					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear, CurDayOfWeek );
 					for ( Hour = 1; Hour <= 24; ++Hour ) {
 						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-							TomorrowSkyTemp( Hour, TS ) = TomorrowOutDewPointTemp( Hour, TS ) - TomorrowSkyTemp( Hour, TS );
+							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 						}
 					}
 
@@ -3064,7 +3102,7 @@ namespace WeatherManager {
 		Real64 & RField19, // Visibility
 		Real64 & RField20, // CeilHeight
 		int & WObs, // PresWeathObs
-		FArray1A_int WCodesArr, // PresWeathConds
+		Array1A_int WCodesArr, // PresWeathConds
 		Real64 & RField22, // PrecipWater
 		Real64 & RField23, // AerosolOptDepth
 		Real64 & RField24, // SnowDepth
@@ -3324,12 +3362,12 @@ Label902: ;
 		ShowContinueError( "Remainder of line=" + Line );
 		ShowFatalError( "Error in Reading Weather Data" );
 
-Label903: ;
-		gio::write( DateError, "(I4,'/',I2,'/',I2,' Hour#=',I2,' Min#=',I2)" ) << WYear << WMonth << WDay << WHour << WMinute;
-		ShowSevereError( "Invalid Weather Line at date=" + DateError );
-		ShowContinueError( "Full Data Line=" + SaveLine );
-		ShowContinueError( "Partial line read; Remainder of line=" + Line );
-		ShowFatalError( "Error in Reading Weather Data" );
+//Label903: ;
+//		gio::write( DateError, "(I4,'/',I2,'/',I2,' Hour#=',I2,' Min#=',I2)" ) << WYear << WMonth << WDay << WHour << WMinute;
+//		ShowSevereError( "Invalid Weather Line at date=" + DateError );
+//		ShowContinueError( "Full Data Line=" + SaveLine );
+//		ShowContinueError( "Partial line read; Remainder of line=" + Line );
+//		ShowFatalError( "Error in Reading Weather Data" );
 
 	}
 
@@ -3402,7 +3440,7 @@ Label903: ;
 		Real64 ETR; // radiation of an extraterrestrial normal surface, W/m2
 		Real64 HO; // Radiation on an extraterrestial horizontal surface
 		Real64 KT; // Radiation ratio
-		FArray1D< Real64 > SUNCOS( 3 ); // Sun direction cosines
+		Array1D< Real64 > SUNCOS( 3 ); // Sun direction cosines
 		int CurrentYear;
 		int OSky; // Opaque Sky Cover (tenths)
 		Real64 HumidityRatio; // Humidity Ratio -- when constant for day
@@ -3416,7 +3454,7 @@ Label903: ;
 		Real64 DBRange; // working copy of dry-bulb daily range, C (or 1 if input is difference)
 		Real64 WBRange; // working copy of wet-bulb daily range. C (or 1 if input is difference)
 
-		FArray1D_int Date0( 8 );
+		Array1D_int Date0( 8 );
 		static bool PrintDDHeader;
 		std::string AlpUseRain;
 		std::string AlpUseSnow;
@@ -3447,8 +3485,8 @@ Label903: ;
 		struct HourlyWeatherData
 		{
 			// Members
-			FArray1D< Real64 > BeamSolarRad; // Hourly direct normal solar irradiance
-			FArray1D< Real64 > DifSolarRad; // Hourly sky diffuse horizontal solar irradiance
+			Array1D< Real64 > BeamSolarRad; // Hourly direct normal solar irradiance
+			Array1D< Real64 > DifSolarRad; // Hourly sky diffuse horizontal solar irradiance
 
 			// Default Constructor
 			HourlyWeatherData() :
@@ -3458,8 +3496,8 @@ Label903: ;
 
 			// Member Constructor
 			HourlyWeatherData(
-				FArray1< Real64 > const & BeamSolarRad, // Hourly direct normal solar irradiance
-				FArray1< Real64 > const & DifSolarRad // Hourly sky diffuse horizontal solar irradiance
+				Array1< Real64 > const & BeamSolarRad, // Hourly direct normal solar irradiance
+				Array1< Real64 > const & DifSolarRad // Hourly sky diffuse horizontal solar irradiance
 			) :
 				BeamSolarRad( 24, BeamSolarRad ),
 				DifSolarRad( 24, DifSolarRad )
@@ -3473,19 +3511,19 @@ Label903: ;
 		SaveWarmupFlag = WarmupFlag;
 		WarmupFlag = true;
 
-		date_and_time_string( _, _, _, Date0 );
+		date_and_time( _, _, _, Date0 );
 		CurrentYear = Date0( 1 );
 
 		if ( BeginSimFlag ) {
 			PrintDDHeader = true;
 		}
 
-		DesignDay( EnvrnNum ).Year = CurrentYear; // f90 date_and_time_string implemented. full 4 digit year !+ 1900
+		DesignDay( EnvrnNum ).Year = CurrentYear; // f90 date_and_time implemented. full 4 digit year !+ 1900
 		DesignDay( EnvrnNum ).Month = DesDayInput( EnvrnNum ).Month;
 		DesignDay( EnvrnNum ).DayOfMonth = DesDayInput( EnvrnNum ).DayOfMonth;
 		DesignDay( EnvrnNum ).DayOfYear = JulianDay( DesignDay( EnvrnNum ).Month, DesignDay( EnvrnNum ).DayOfMonth, 0 );
 		gio::write( CurMnDy, MnDyFmt ) << DesDayInput( EnvrnNum ).Month << DesDayInput( EnvrnNum ).DayOfMonth;
-		EnvironmentName = DesDayInput( EnvrnNum ).Title;
+		//EnvironmentName = DesDayInput( EnvrnNum ).Title;
 		RunPeriodEnvironment = false;
 		// Following builds Environment start/end for ASHRAE 55 warnings
 		EnvironmentStartEnd = CurMnDy + " - " + CurMnDy;
@@ -3527,56 +3565,56 @@ Label903: ;
 			PrintDDHeader = false;
 		}
 		if ( DoWeatherInitReporting ) {
-			if ( DesDayInput( Envrn ).RainInd == 1 ) {
+			if (DesDayInput(EnvrnNum).RainInd == 1) {
 				AlpUseRain = "Yes";
 			} else {
 				AlpUseRain = "No";
 			}
-			if ( DesDayInput( Envrn ).SnowInd == 1 ) {
+			if (DesDayInput(EnvrnNum).SnowInd == 1) {
 				AlpUseSnow = "Yes";
 			} else {
 				AlpUseSnow = "No";
 			}
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, EnvDDayFormat, flags ); }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).MaxDryBulb, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).MaxDryBulb, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).DailyDBRange, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).DailyDBRange, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = ",";
-			if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Default ) {
+			if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Default) {
 				StringOut = "DefaultMultipliers,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Multiplier ) {
+			} else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Multiplier) {
 				StringOut = "MultiplierSchedule,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Profile ) {
+			} else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Profile) {
 				StringOut = "TemperatureProfile,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Difference ) {
+			} else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Difference) {
 				StringOut = "DifferenceSchedule,";
 			}
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut; }
-			if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WetBulb ) {
-				StringOut = "Wetbulb," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_DewPoint ) {
-				StringOut = "Dewpoint," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_Enthalpy ) {
-				StringOut = "Enthalpy," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {kJ/kg},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_HumRatio ) {
-				StringOut = "HumidityRatio," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 4 ) + " {},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_RelHumSch ) {
+			if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb) {
+				StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+			} else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint) {
+				StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+			} else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_Enthalpy) {
+				StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {kJ/kg},";
+			} else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_HumRatio) {
+				StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + " {},";
+			} else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_RelHumSch) {
 				StringOut = "Schedule,<schedule values from 0.0 to 100.0 {percent},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDef ) {
+			} else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef) {
 				StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDif ) {
-				StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfMul ) {
-				StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
+			} else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
+				StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits( DesDayInput( EnvrnNum ).HumIndValue, 2 ) + " {C},";
+			} else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
+				StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits( DesDayInput( EnvrnNum ).HumIndValue, 2 ) + " {C},";
 			}
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).PressBarom, 0 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).PressBarom, 0);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).WindDir, 0 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).WindDir, 0);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).WindSpeed, 1 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).WindSpeed, 1);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).SkyClear, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).SkyClear, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			gio::write( OutputFileInits, fmtA ) << AlpUseRain + ',' + AlpUseSnow;
 
@@ -3614,7 +3652,7 @@ Label903: ;
 
 		CurrentTime = 25.0;
 
-		{ auto const SELECT_CASE_var( DesDayInput( Envrn ).HumIndType );
+		{ auto const SELECT_CASE_var( DesDayInput( EnvrnNum ).HumIndType );
 
 		if ( SELECT_CASE_var == DDHumIndType_WetBulb ) {
 			HumidityRatio = PsyWFnTdbTwbPb( DesDayInput( EnvrnNum ).MaxDryBulb, DesDayInput( EnvrnNum ).HumIndValue, DesDayInput( EnvrnNum ).PressBarom, RoutineNamePsyWFnTdbTwbPb );
@@ -3635,14 +3673,14 @@ Label903: ;
 		} else if ( SELECT_CASE_var == DDHumIndType_RelHumSch ) {
 			// nothing to do -- DDHumIndModifier already contains the scheduled Relative Humidity
 			ConstantHumidityRatio = false;
-			TomorrowOutRelHum = DDHumIndModifier( EnvrnNum, _, _ );
+			TomorrowOutRelHum = DDHumIndModifier( _, _, EnvrnNum );
 
 		} else if ( ( SELECT_CASE_var == DDHumIndType_WBProfDef ) || ( SELECT_CASE_var == DDHumIndType_WBProfDif ) || ( SELECT_CASE_var == DDHumIndType_WBProfMul ) ) {
 			ConstantHumidityRatio = false;
 
 		} else {
 			ShowSevereError( "SetUpDesignDay: Invalid Humidity Indicator type" );
-			ShowContinueError( "Occurred in Design Day=" + DesDayInput( Envrn ).Title );
+			ShowContinueError( "Occurred in Design Day=" + DesDayInput( EnvrnNum ).Title );
 
 		}}
 
@@ -3690,35 +3728,35 @@ Label903: ;
 
 				if ( DesDayInput( EnvrnNum ).DBTempRangeType != DDDBRangeType_Profile ) {
 					// dry-bulb profile
-					TomorrowOutDryBulbTemp( Hour, TS ) = DesDayInput( EnvrnNum ).MaxDryBulb - DDDBRngModifier( EnvrnNum, Hour, TS ) * DBRange;
+					TomorrowOutDryBulbTemp( TS, Hour ) = DesDayInput( EnvrnNum ).MaxDryBulb - DDDBRngModifier( TS, Hour, EnvrnNum ) * DBRange;
 				} else { // DesDayInput(EnvrnNum)%DBTempRangeType == DDDBRangeType_Profile
-					TomorrowOutDryBulbTemp( Hour, TS ) = DDDBRngModifier( EnvrnNum, Hour, TS );
+					TomorrowOutDryBulbTemp( TS, Hour ) = DDDBRngModifier( TS, Hour, EnvrnNum );
 				}
 
 				// wet-bulb - generate from profile, humidity ratio, or dew point
 				if ( DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfMul ) {
-					WetBulb = DesDayInput( EnvrnNum ).HumIndValue - DDHumIndModifier( EnvrnNum, Hour, TS ) * WBRange;
-					WetBulb = min( WetBulb, TomorrowOutDryBulbTemp( Hour, TS ) ); // WB must be <= DB
-					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
+					WetBulb = DesDayInput( EnvrnNum ).HumIndValue - DDHumIndModifier( TS, Hour, EnvrnNum ) * WBRange;
+					WetBulb = min( WetBulb, TomorrowOutDryBulbTemp( TS, Hour ) ); // WB must be <= DB
+					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( TS, Hour ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutDewPointTemp( TS, Hour ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutRelHum( TS, Hour ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( TS, Hour ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else if ( ConstantHumidityRatio ) {
 					//  Need Dew Point Temperature.  Use Relative Humidity to get Humidity Ratio, unless Humidity Ratio is constant
 					//BG 9-26-07  moved following inside this IF statment; when HumIndType is 'Schedule' HumidityRatio wasn't being initialized
-					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, RoutineNameLong );
+					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( TS, Hour ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, RoutineNameLong );
 
-					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom );
+					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( TS, Hour ), DesDayInput( EnvrnNum ).PressBarom );
 					if ( HumidityRatio > OutHumRat ) {
-						WetBulb = TomorrowOutDryBulbTemp( Hour, TS );
+						WetBulb = TomorrowOutDryBulbTemp( TS, Hour );
 					} else {
-						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
+						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( TS, Hour ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
 					}
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
+					TomorrowOutDewPointTemp( TS, Hour ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutRelHum( TS, Hour ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( TS, Hour ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else {
-					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom );
+					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( TS, Hour ), DDHumIndModifier( TS, Hour, EnvrnNum ) / 100.0, DesDayInput( EnvrnNum ).PressBarom );
 					// TomorrowOutRelHum values set earlier
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutDewPointTemp( TS, Hour ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom );
 				}
 
 				// Determine Sky Temp ==>
@@ -3746,14 +3784,14 @@ Label903: ;
 				//Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
 
 				if ( Environment( EnvrnNum ).WP_Type1 == 0 ) {
-					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
+					TDewK = min( TomorrowOutDryBulbTemp( TS, Hour ), TomorrowOutDewPointTemp( TS, Hour ) ) + TKelvin;
 					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * pow_2( OSky ) + 0.00028 * pow_3( OSky ) );
-					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin );
-					TomorrowSkyTemp( Hour, TS ) = ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) * root_4( ESky ) - TKelvin;
+					TomorrowHorizIRSky( TS, Hour ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( TS, Hour ) + TKelvin );
+					TomorrowSkyTemp( TS, Hour ) = ( TomorrowOutDryBulbTemp( TS, Hour ) + TKelvin ) * root_4( ESky ) - TKelvin;
 				} else {
-					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
+					TDewK = min( TomorrowOutDryBulbTemp( TS, Hour ), TomorrowOutDewPointTemp( TS, Hour ) ) + TKelvin;
 					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * pow_2( OSky ) + 0.00028 * pow_3( OSky ) );
-					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin );
+					TomorrowHorizIRSky( TS, Hour ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( TS, Hour ) + TKelvin );
 				}
 
 				// Generate solar values for timestep
@@ -3761,8 +3799,8 @@ Label903: ;
 				//    stored to program globals at end of loop
 				if ( DesDayInput( EnvrnNum ).SolarModel == SolarModel_Schedule ) {
 					// scheduled: set value unconditionally (whether sun up or not)
-					BeamRad = DDBeamSolarValues( EnvrnNum, Hour, TS );
-					DiffRad = DDDiffuseSolarValues( EnvrnNum, Hour, TS );
+					BeamRad = DDBeamSolarValues( TS, Hour, EnvrnNum );
+					DiffRad = DDDiffuseSolarValues( TS, Hour, EnvrnNum );
 				} else {
 
 					// calc time = fractional hour of day
@@ -3800,7 +3838,7 @@ Label903: ;
 						} else if ( SELECT_CASE_var == Zhang_Huang ) {
 							Hour3Ago = mod( Hour + 20, 24 ) + 1; // hour 3 hours before
 							TotSkyCover = max( 1.0 - DesDayInput( EnvrnNum ).SkyClear, 0.0 );
-							GloHorzRad = ( ZHGlobalSolarConstant * SinSolarAltitude * ( ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * pow_2( TotSkyCover ) + ZhangHuangModCoeff_C3 * ( TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowOutDryBulbTemp( Hour3Ago, TS ) ) + ZhangHuangModCoeff_C4 * TomorrowOutRelHum( Hour, TS ) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed( Hour, TS ) ) + ZhangHuangModCoeff_D ) / ZhangHuangModCoeff_K;
+							GloHorzRad = ( ZHGlobalSolarConstant * SinSolarAltitude * ( ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * pow_2( TotSkyCover ) + ZhangHuangModCoeff_C3 * ( TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowOutDryBulbTemp( TS, Hour3Ago ) ) + ZhangHuangModCoeff_C4 * TomorrowOutRelHum( TS, Hour ) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed( TS, Hour ) ) + ZhangHuangModCoeff_D ) / ZhangHuangModCoeff_K;
 							GloHorzRad = max( GloHorzRad, 0.0 );
 							ClearnessIndex_kt = GloHorzRad / ( GlobalSolarConstant * SinSolarAltitude );
 							//          ClearnessIndex_kt=DesDayInput(EnvrnNum)%SkyClear
@@ -3824,8 +3862,8 @@ Label903: ;
 				if ( IgnoreSolarRadiation || IgnoreBeamRadiation ) BeamRad = 0.0;
 				if ( IgnoreSolarRadiation || IgnoreDiffuseRadiation ) DiffRad = 0.0;
 
-				TomorrowBeamSolarRad( Hour, TS ) = BeamRad;
-				TomorrowDifSolarRad( Hour, TS ) = DiffRad;
+				TomorrowBeamSolarRad( TS, Hour ) = BeamRad;
+				TomorrowDifSolarRad( TS, Hour ) = DiffRad;
 
 			} // Timestep (TS) Loop
 		} // Hour Loop
@@ -3835,11 +3873,11 @@ Label903: ;
 		// insurance: hourly values not known to be needed
 		for ( Hour = 1; Hour <= 24; ++Hour ) {
 			Hour1Ago = mod( Hour + 22, 24 ) + 1;
-			BeamRad = ( TomorrowBeamSolarRad( Hour1Ago, NumOfTimeStepInHour ) + TomorrowBeamSolarRad( Hour, NumOfTimeStepInHour ) ) / 2.0;
-			DiffRad = ( TomorrowDifSolarRad( Hour1Ago, NumOfTimeStepInHour ) + TomorrowDifSolarRad( Hour, NumOfTimeStepInHour ) ) / 2.0;
+			BeamRad = ( TomorrowBeamSolarRad( NumOfTimeStepInHour, Hour1Ago ) + TomorrowBeamSolarRad( NumOfTimeStepInHour, Hour ) ) / 2.0;
+			DiffRad = ( TomorrowDifSolarRad( NumOfTimeStepInHour, Hour1Ago ) + TomorrowDifSolarRad( NumOfTimeStepInHour, Hour ) ) / 2.0;
 			if ( NumOfTimeStepInHour > 1 ) {
-				BeamRad += sum( TomorrowBeamSolarRad( Hour, {1,NumOfTimeStepInHour - 1} ) );
-				DiffRad += sum( TomorrowDifSolarRad( Hour, {1,NumOfTimeStepInHour - 1} ) );
+				BeamRad += sum( TomorrowBeamSolarRad( {1,NumOfTimeStepInHour - 1}, Hour ) );
+				DiffRad += sum( TomorrowDifSolarRad( {1,NumOfTimeStepInHour - 1}, Hour ) );
 			}
 			Wthr.BeamSolarRad( Hour ) = BeamRad / NumOfTimeStepInHour;
 			Wthr.DifSolarRad( Hour ) = DiffRad / NumOfTimeStepInHour;
@@ -3851,22 +3889,22 @@ Label903: ;
 
 			if ( SELECT_CASE_var == WP_ScheduleValue ) {
 				GetSingleDayScheduleValues( WPSkyTemperature( Environment( EnvrnNum ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp );
-				DDSkyTempScheduleValues( EnvrnNum, _, _ ) = TomorrowSkyTemp;
+				DDSkyTempScheduleValues( _, _, EnvrnNum ) = TomorrowSkyTemp;
 			} else if ( SELECT_CASE_var == WP_DryBulbDelta ) {
 				GetSingleDayScheduleValues( WPSkyTemperature( Environment( EnvrnNum ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp );
-				DDSkyTempScheduleValues( EnvrnNum, _, _ ) = TomorrowSkyTemp;
+				DDSkyTempScheduleValues( _, _, EnvrnNum ) = TomorrowSkyTemp;
 				for ( Hour = 1; Hour <= 24; ++Hour ) {
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-						TomorrowSkyTemp( Hour, TS ) = TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowSkyTemp( Hour, TS );
+						TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 					}
 				}
 
 			} else if ( SELECT_CASE_var == WP_DewPointDelta ) {
 				GetSingleDayScheduleValues( WPSkyTemperature( Environment( EnvrnNum ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp );
-				DDSkyTempScheduleValues( EnvrnNum, _, _ ) = TomorrowSkyTemp;
+				DDSkyTempScheduleValues( _, _, EnvrnNum ) = TomorrowSkyTemp;
 				for ( Hour = 1; Hour <= 24; ++Hour ) {
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-						TomorrowSkyTemp( Hour, TS ) = TomorrowOutDewPointTemp( Hour, TS ) - TomorrowSkyTemp( Hour, TS );
+						TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 					}
 				}
 
@@ -4042,62 +4080,62 @@ Label903: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		TodayIsRain.allocate( 24, NumOfTimeStepInHour );
+		TodayIsRain.allocate( NumOfTimeStepInHour, 24 );
 		TodayIsRain = false;
-		TodayIsSnow.allocate( 24, NumOfTimeStepInHour );
+		TodayIsSnow.allocate( NumOfTimeStepInHour, 24 );
 		TodayIsSnow = false;
-		TodayOutDryBulbTemp.allocate( 24, NumOfTimeStepInHour );
+		TodayOutDryBulbTemp.allocate( NumOfTimeStepInHour, 24 );
 		TodayOutDryBulbTemp = 0.0;
-		TodayOutDewPointTemp.allocate( 24, NumOfTimeStepInHour );
+		TodayOutDewPointTemp.allocate( NumOfTimeStepInHour, 24 );
 		TodayOutDewPointTemp = 0.0;
-		TodayOutBaroPress.allocate( 24, NumOfTimeStepInHour );
+		TodayOutBaroPress.allocate( NumOfTimeStepInHour, 24 );
 		TodayOutBaroPress = 0.0;
-		TodayOutRelHum.allocate( 24, NumOfTimeStepInHour );
+		TodayOutRelHum.allocate( NumOfTimeStepInHour, 24 );
 		TodayOutRelHum = 0.0;
-		TodayWindSpeed.allocate( 24, NumOfTimeStepInHour );
+		TodayWindSpeed.allocate( NumOfTimeStepInHour, 24 );
 		TodayWindSpeed = 0.0;
-		TodayWindDir.allocate( 24, NumOfTimeStepInHour );
+		TodayWindDir.allocate( NumOfTimeStepInHour, 24 );
 		TodayWindDir = 0.0;
-		TodaySkyTemp.allocate( 24, NumOfTimeStepInHour );
+		TodaySkyTemp.allocate( NumOfTimeStepInHour, 24 );
 		TodaySkyTemp = 0.0;
-		TodayHorizIRSky.allocate( 24, NumOfTimeStepInHour );
+		TodayHorizIRSky.allocate( NumOfTimeStepInHour, 24 );
 		TodayHorizIRSky = 0.0;
-		TodayBeamSolarRad.allocate( 24, NumOfTimeStepInHour );
+		TodayBeamSolarRad.allocate( NumOfTimeStepInHour, 24 );
 		TodayBeamSolarRad = 0.0;
-		TodayDifSolarRad.allocate( 24, NumOfTimeStepInHour );
+		TodayDifSolarRad.allocate( NumOfTimeStepInHour, 24 );
 		TodayDifSolarRad = 0.0;
-		TodayAlbedo.allocate( 24, NumOfTimeStepInHour );
+		TodayAlbedo.allocate( NumOfTimeStepInHour, 24 );
 		TodayAlbedo = 0.0;
-		TodayLiquidPrecip.allocate( 24, NumOfTimeStepInHour );
+		TodayLiquidPrecip.allocate( NumOfTimeStepInHour, 24 );
 		TodayLiquidPrecip = 0.0;
 
-		TomorrowIsRain.allocate( 24, NumOfTimeStepInHour );
+		TomorrowIsRain.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowIsRain = false;
-		TomorrowIsSnow.allocate( 24, NumOfTimeStepInHour );
+		TomorrowIsSnow.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowIsSnow = false;
-		TomorrowOutDryBulbTemp.allocate( 24, NumOfTimeStepInHour );
+		TomorrowOutDryBulbTemp.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowOutDryBulbTemp = 0.0;
-		TomorrowOutDewPointTemp.allocate( 24, NumOfTimeStepInHour );
+		TomorrowOutDewPointTemp.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowOutDewPointTemp = 0.0;
-		TomorrowOutBaroPress.allocate( 24, NumOfTimeStepInHour );
+		TomorrowOutBaroPress.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowOutBaroPress = 0.0;
-		TomorrowOutRelHum.allocate( 24, NumOfTimeStepInHour );
+		TomorrowOutRelHum.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowOutRelHum = 0.0;
-		TomorrowWindSpeed.allocate( 24, NumOfTimeStepInHour );
+		TomorrowWindSpeed.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowWindSpeed = 0.0;
-		TomorrowWindDir.allocate( 24, NumOfTimeStepInHour );
+		TomorrowWindDir.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowWindDir = 0.0;
-		TomorrowSkyTemp.allocate( 24, NumOfTimeStepInHour );
+		TomorrowSkyTemp.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowSkyTemp = 0.0;
-		TomorrowHorizIRSky.allocate( 24, NumOfTimeStepInHour );
+		TomorrowHorizIRSky.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowHorizIRSky = 0.0;
-		TomorrowBeamSolarRad.allocate( 24, NumOfTimeStepInHour );
+		TomorrowBeamSolarRad.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowBeamSolarRad = 0.0;
-		TomorrowDifSolarRad.allocate( 24, NumOfTimeStepInHour );
+		TomorrowDifSolarRad.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowDifSolarRad = 0.0;
-		TomorrowAlbedo.allocate( 24, NumOfTimeStepInHour );
+		TomorrowAlbedo.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowAlbedo = 0.0;
-		TomorrowLiquidPrecip.allocate( 24, NumOfTimeStepInHour );
+		TomorrowLiquidPrecip.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowLiquidPrecip = 0.0;
 
 	}
@@ -4150,15 +4188,15 @@ Label903: ;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const DayCorrection( Pi * 2.0 / 366.0 );
-		static FArray1D< Real64 > const SineSolDeclCoef( 9, { 0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096 } ); // Fitted coefficients of Fourier series | Sine of declination coefficients
-		static FArray1D< Real64 > const EqOfTimeCoef( 9, { 0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992 } ); // Fitted coefficients of Fourier Series | Equation of Time coefficients
-		static FArray1D< Real64 > const ASHRAE_A_Coef( 9, { 1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198 } ); // Fitted coefficients of Fourier Series | ASHRAE A Factor coefficients
+		static Array1D< Real64 > const SineSolDeclCoef( 9, { 0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096 } ); // Fitted coefficients of Fourier series | Sine of declination coefficients
+		static Array1D< Real64 > const EqOfTimeCoef( 9, { 0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992 } ); // Fitted coefficients of Fourier Series | Equation of Time coefficients
+		static Array1D< Real64 > const ASHRAE_A_Coef( 9, { 1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198 } ); // Fitted coefficients of Fourier Series | ASHRAE A Factor coefficients
 		// English (original) units:
 		//              368.49341,.366502,24.538624,-.169983,-1.193417,            &
 		//              .313261,-1.076093,-.543376,.355197 ,                       &
 
-		static FArray1D< Real64 > const ASHRAE_B_Coef( 9, { 0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867 } ); // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
-		static FArray1D< Real64 > const ASHRAE_C_Coef( 9, { 0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515 } ); // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
+		static Array1D< Real64 > const ASHRAE_B_Coef( 9, { 0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867 } ); // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
+		static Array1D< Real64 > const ASHRAE_C_Coef( 9, { 0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515 } ); // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4207,7 +4245,7 @@ Label903: ;
 		Real64 const EqOfTime, // Equation of Time
 		Real64 const SinSolDeclin, // Sine of Solar Declination
 		Real64 const CosSolDeclin, // Cosine of Solar Declination
-		FArray1A< Real64 > SUNCOS
+		Array1A< Real64 > SUNCOS
 	)
 	{
 
@@ -4269,7 +4307,7 @@ Label903: ;
 	}
 
 	void
-	DetermineSunUpDown( FArray1A< Real64 > SunDirectionCosines )
+	DetermineSunUpDown( Array1A< Real64 > SunDirectionCosines )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4433,7 +4471,7 @@ Label903: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const Header( 8, { "LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS", "GROUND TEMPERATURES", "HOLIDAYS/DAYLIGHT SAVING", "COMMENTS 1", "COMMENTS 2", "DATA PERIODS" } );
+		static Array1D_string const Header( 8, { "LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS", "GROUND TEMPERATURES", "HOLIDAYS/DAYLIGHT SAVING", "COMMENTS 1", "COMMENTS 2", "DATA PERIODS" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5573,7 +5611,7 @@ Label9999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const ValidNames( 12, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
+		static Array1D_string const ValidNames( 12, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5845,7 +5883,7 @@ Label9999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const ValidDayTypes( 5, { "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
+		static Array1D_string const ValidDayTypes( 5, { "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5854,9 +5892,9 @@ Label9999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string AlphArray( 3 );
+		Array1D_string AlphArray( 3 );
 		int NumAlphas;
-		FArray1D< Real64 > Duration( 1 );
+		Array1D< Real64 > Duration( 1 );
 		int NumNumbers;
 		int NumSpecDays;
 		int Count;
@@ -6158,13 +6196,13 @@ Label9999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const ValidNames( 12, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
-		static FArray1D_string const HumidityIndicatingType( {0,DDHumIndType_Count-1}, { "Wetbulb [C]", "Dewpoint [C]", "Enthalpy [J/kg]", "Humidity Ratio []", "Schedule []", "WetBulbProfileDefaultMultipliers []", "WetBulbProfileDifferenceSchedule []", "WetBulbProfileMultiplierSchedule []" } );
+		static Array1D_string const ValidNames( 12, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
+		static Array1D_string const HumidityIndicatingType( {0,DDHumIndType_Count-1}, { "Wetbulb [C]", "Dewpoint [C]", "Enthalpy [J/kg]", "Humidity Ratio []", "Schedule []", "WetBulbProfileDefaultMultipliers []", "WetBulbProfileDifferenceSchedule []", "WetBulbProfileMultiplierSchedule []" } );
 
 		//  REAL(r64), PARAMETER, DIMENSION(24) :: DefaultTempRangeMult=(/ .87d0,.92d0,.96d0,.99d0,1.0d0,.98d0,.93d0,  &
 		//                   .84d0,.71d0,.56d0,.39d0,.23d0, .11d0,.03d0,.00d0,.03d0,.10d0,.21d0,.34d0,.47d0,.58d0,.68d0,.76d0,.82d0 /)
 		// Below are the 2009 fractions, HOF, Chap 14, Table 6
-		static FArray1D< Real64 > const DefaultTempRangeMult( 24, { 0.88, 0.92, 0.95, 0.98, 1.0, 0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13, 0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82 } );
+		static Array1D< Real64 > const DefaultTempRangeMult( 24, { 0.88, 0.92, 0.95, 0.98, 1.0, 0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13, 0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -6196,15 +6234,15 @@ Label9999: ;
 		// FLOW:
 
 		DesDayInput.allocate( TotDesDays ); // Allocate the array to the # of DD's
-		DDDBRngModifier.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDDBRngModifier.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDDBRngModifier = 0.0;
-		DDHumIndModifier.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDHumIndModifier.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDHumIndModifier = 0.0;
-		DDBeamSolarValues.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDBeamSolarValues.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDBeamSolarValues = 0.0;
-		DDDiffuseSolarValues.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDDiffuseSolarValues.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDDiffuseSolarValues = 0.0;
-		DDSkyTempScheduleValues.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDSkyTempScheduleValues.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDSkyTempScheduleValues = 0.0;
 
 		SPSiteDryBulbRangeModScheduleValue.dimension( TotDesDays, 0.0 );
@@ -6353,7 +6391,7 @@ Label9999: ;
 						ShowContinueError( "..invalid field: " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 						ErrorsFound = true;
 					} else {
-						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).TempRangeSchPtr, DDDBRngModifier( EnvrnNum, _, _ ) );
+						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).TempRangeSchPtr, DDDBRngModifier( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).TempRangeSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						if ( schPtr == 0 ) {
 							++NumSPSiteScheduleNamePtrs;
@@ -6382,7 +6420,7 @@ Label9999: ;
 							}
 						}
 						if ( cAlphaArgs( 3 ) == "TemperatureProfileSchedule" ) {
-							testval = maxval( DDDBRngModifier( EnvrnNum, _, _ ) );
+							testval = maxval( DDDBRngModifier( _, _, EnvrnNum ) );
 							if ( MaxDryBulbEntered ) {
 								ShowWarningError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", data override." );
 								ShowContinueError( ".." + cNumericFieldNames( 3 ) + "=[" + RoundSigDigits( DesDayInput( EnvrnNum ).MaxDryBulb, 2 ) + "] will be overwritten." );
@@ -6391,7 +6429,7 @@ Label9999: ;
 							}
 							DesDayInput( EnvrnNum ).MaxDryBulb = testval;
 						}
-						testval = maxval( DDDBRngModifier( EnvrnNum, _, _ ) );
+						testval = maxval( DDDBRngModifier( _, _, EnvrnNum ) );
 						testval = DesDayInput( EnvrnNum ).MaxDryBulb - testval;
 						errFlag = false;
 						RangeCheck( errFlag, cAlphaFieldNames( 4 ), cCurrentModuleObject, "Severe", ">= -90", ( testval >= -90.0 ), "<= 70", ( testval <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
@@ -6412,7 +6450,7 @@ Label9999: ;
 					for ( TSLoop = 1; TSLoop <= NumOfTimeStepInHour; ++TSLoop ) {
 						WNow = Interpolation( TSLoop );
 						WPrev = 1.0 - WNow;
-						DDDBRngModifier( EnvrnNum, HrLoop, TSLoop ) = LastHrValue * WPrev + DefaultTempRangeMult( HrLoop ) * WNow;
+						DDDBRngModifier( TSLoop, HrLoop, EnvrnNum ) = LastHrValue * WPrev + DefaultTempRangeMult( HrLoop ) * WNow;
 					}
 					LastHrValue = DefaultTempRangeMult( HrLoop );
 				}
@@ -6552,7 +6590,7 @@ Label9999: ;
 						// reset HumIndType ?
 					} else {
 
-						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).HumIndSchPtr, DDHumIndModifier( EnvrnNum, _, _ ) );
+						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).HumIndSchPtr, DDHumIndModifier( _, _, EnvrnNum ) );
 
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).HumIndSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						if ( schPtr == 0 ) {
@@ -6604,7 +6642,7 @@ Label9999: ;
 					for ( TSLoop = 1; TSLoop <= NumOfTimeStepInHour; ++TSLoop ) {
 						WNow = Interpolation( TSLoop );
 						WPrev = 1.0 - WNow;
-						DDHumIndModifier( EnvrnNum, HrLoop, TSLoop ) = LastHrValue * WPrev + DefaultTempRangeMult( HrLoop ) * WNow;
+						DDHumIndModifier( TSLoop, HrLoop, EnvrnNum ) = LastHrValue * WPrev + DefaultTempRangeMult( HrLoop ) * WNow;
 					}
 					LastHrValue = DefaultTempRangeMult( HrLoop );
 				}
@@ -6655,7 +6693,7 @@ Label9999: ;
 						ShowContinueError( "..Required when " + cAlphaFieldNames( 10 ) + " indicates \"Schedule\"." );
 						ErrorsFound = true;
 					} else {
-						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).BeamSolarSchPtr, DDBeamSolarValues( EnvrnNum, _, _ ) );
+						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).BeamSolarSchPtr, DDBeamSolarValues( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).BeamSolarSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						units = "[W/m2]";
 						if ( schPtr == 0 ) {
@@ -6690,7 +6728,7 @@ Label9999: ;
 						ShowContinueError( "..Required when " + cAlphaFieldNames( 10 ) + " indicates \"Schedule\"." );
 						ErrorsFound = true;
 					} else {
-						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, DDDiffuseSolarValues( EnvrnNum, _, _ ) );
+						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, DDDiffuseSolarValues( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						units = "[W/m2]";
 						if ( schPtr == 0 ) {
@@ -6776,6 +6814,8 @@ Label9999: ;
 
 			Environment( EnvrnNum ).Title = DesDayInput( EnvrnNum ).Title;
 			Environment( EnvrnNum ).KindOfEnvrn = ksDesignDay;
+			Environment( EnvrnNum ).DesignDayNum = EnvrnNum;
+			Environment( EnvrnNum ).RunPeriodDesignNum = 0;
 			Environment( EnvrnNum ).TotalDays = 1;
 			Environment( EnvrnNum ).StartMonth = DesDayInput( EnvrnNum ).Month;
 			Environment( EnvrnNum ).StartDay = DesDayInput( EnvrnNum ).DayOfMonth;
@@ -6843,8 +6883,8 @@ Label9999: ;
 		int LocNumAlpha; // Number of alpha names being passed
 		int LocNumProp; // Number of properties being passed
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string LocNames( 1 ); // Temp Array to transfer location info
-		FArray1D< Real64 > LocProps( 4 ); // Temporary array to transfer location info
+		Array1D_string LocNames( 1 ); // Temp Array to transfer location info
+		Array1D< Real64 > LocProps( 4 ); // Temporary array to transfer location info
 		int NumLocations;
 
 		// FLOW:
@@ -7114,8 +7154,8 @@ Label9999: ;
 		int GndNumProp; // dummy variable for properties being passed
 		int IOStat; // IO Status when calling get input subroutine
 		int I; // Loop counter variable
-		FArray1D_string GndAlphas( 1 ); // Construction Alpha names defined
-		FArray1D< Real64 > GndProps( 12 ); // Temporary array to transfer ground temperatures
+		Array1D_string GndAlphas( 1 ); // Construction Alpha names defined
+		Array1D< Real64 > GndProps( 12 ); // Temporary array to transfer ground temperatures
 		static bool GenErrorMessage( false );
 
 		// Formats
@@ -7305,8 +7345,8 @@ Label9999: ;
 		int GndNumProp; // dummy variable for properties being passed
 		int IOStat; // IO Status when calling get input subroutine
 		int I; // Loop counter variable
-		FArray1D_string GndAlphas; // Construction Alpha names defined
-		FArray1D< Real64 > GndProps; // Temporary array to transfer ground reflectances
+		Array1D_string GndAlphas; // Construction Alpha names defined
+		Array1D< Real64 > GndProps; // Temporary array to transfer ground reflectances
 
 		// Formats
 		static gio::Fmt Format_720( "(' Site:GroundReflectance',12(', ',F5.2))" );
@@ -7387,8 +7427,8 @@ Label9999: ;
 		int GndNumProp; // dummy variable for properties being passed
 		int IOStat; // IO Status when calling get input subroutine
 		int I; // Loop counter variable
-		FArray1D_string GndAlphas; // Construction Alpha names defined
-		FArray1D< Real64 > GndProps; // Temporary array to transfer ground reflectances
+		Array1D_string GndAlphas; // Construction Alpha names defined
+		Array1D< Real64 > GndProps; // Temporary array to transfer ground reflectances
 
 		// Formats
 		static gio::Fmt Format_720( "(' Site:GroundReflectance:SnowModifier',2(', ',F7.3))" );
@@ -7460,8 +7500,8 @@ Label9999: ;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 2 ); // Character string data
-		FArray1D< Real64 > NumArray( 2 ); // Numeric data
+		Array1D_string AlphArray( 2 ); // Character string data
+		Array1D< Real64 > NumArray( 2 ); // Numeric data
 
 		// FLOW:
 		cCurrentModuleObject = "Site:WaterMainsTemperature";
@@ -7599,8 +7639,8 @@ Label9999: ;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 1 ); // Character string data
-		FArray1D< Real64 > NumArray( 4 ); // Numeric data
+		Array1D_string AlphArray( 1 ); // Character string data
+		Array1D< Real64 > NumArray( 4 ); // Numeric data
 		Real64 WeatherFileWindSensorHeight; // Height of the wind sensor at the weather station, i.e., weather file
 		Real64 WeatherFileWindExp; // Exponent for the wind velocity profile at the weather station
 		Real64 WeatherFileWindBLHeight; // Boundary layer height for the wind velocity profile at the weather station (m)
@@ -7753,15 +7793,15 @@ Label9999: ;
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D< Real64 > const ADiffLumEff( 8, { 97.24, 107.22, 104.97, 102.39, 100.71, 106.42, 141.88, 152.23 } ); // Diffuse luminous efficacy coefficients
-		static FArray1D< Real64 > const BDiffLumEff( 8, { -0.46, 1.15, 2.96, 5.59, 5.94, 3.83, 1.90, 0.35 } );
-		static FArray1D< Real64 > const CDiffLumEff( 8, { 12.00, 0.59, -5.53, -13.95, -22.75, -36.15, -53.24, -45.27 } );
-		static FArray1D< Real64 > const DDiffLumEff( 8, { -8.91, -3.95, -8.77, -13.90, -23.74, -28.83, -14.03, -7.98 } );
-		static FArray1D< Real64 > const ADirLumEff( 8, { 57.20, 98.99, 109.83, 110.34, 106.36, 107.19, 105.75, 101.18 } ); // Direct luminous efficacy coefficients
-		static FArray1D< Real64 > const BDirLumEff( 8, { -4.55, -3.46, -4.90, -5.84, -3.97, -1.25, 0.77, 1.58 } );
-		static FArray1D< Real64 > const CDirLumEff( 8, { -2.98, -1.21, -1.71, -1.99, -1.75, -1.51, -1.26, -1.10 } );
-		static FArray1D< Real64 > const DDirLumEff( 8, { 117.12, 12.38, -8.81, -4.56, -6.16, -26.73, -34.44, -8.29 } );
-		static FArray1D< Real64 > const ExtraDirNormIll( 12, { 131153.0, 130613.0, 128992.0, 126816.0, 124731.0, 123240.0, 122652.0, 123120.0, 124576.0, 126658.0, 128814.0, 130471.0 } ); // Monthly exterrestrial direct normal illuminance (lum/m2)
+		static Array1D< Real64 > const ADiffLumEff( 8, { 97.24, 107.22, 104.97, 102.39, 100.71, 106.42, 141.88, 152.23 } ); // Diffuse luminous efficacy coefficients
+		static Array1D< Real64 > const BDiffLumEff( 8, { -0.46, 1.15, 2.96, 5.59, 5.94, 3.83, 1.90, 0.35 } );
+		static Array1D< Real64 > const CDiffLumEff( 8, { 12.00, 0.59, -5.53, -13.95, -22.75, -36.15, -53.24, -45.27 } );
+		static Array1D< Real64 > const DDiffLumEff( 8, { -8.91, -3.95, -8.77, -13.90, -23.74, -28.83, -14.03, -7.98 } );
+		static Array1D< Real64 > const ADirLumEff( 8, { 57.20, 98.99, 109.83, 110.34, 106.36, 107.19, 105.75, 101.18 } ); // Direct luminous efficacy coefficients
+		static Array1D< Real64 > const BDirLumEff( 8, { -4.55, -3.46, -4.90, -5.84, -3.97, -1.25, 0.77, 1.58 } );
+		static Array1D< Real64 > const CDirLumEff( 8, { -2.98, -1.21, -1.71, -1.99, -1.75, -1.51, -1.26, -1.10 } );
+		static Array1D< Real64 > const DDirLumEff( 8, { 117.12, 12.38, -8.81, -4.56, -6.16, -26.73, -34.44, -8.29 } );
+		static Array1D< Real64 > const ExtraDirNormIll( 12, { 131153.0, 130613.0, 128992.0, 126816.0, 124731.0, 123240.0, 122652.0, 123120.0, 124576.0, 126658.0, 128814.0, 130471.0 } ); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7865,8 +7905,8 @@ Label9999: ;
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > longl( {-12,12} ); // Lower Longitude value for a Time Zone
-		FArray1D< Real64 > longh( {-12,12} ); // Upper Longitude value for a Time Zone
+		Array1D< Real64 > longl( {-12,12} ); // Lower Longitude value for a Time Zone
+		Array1D< Real64 > longh( {-12,12} ); // Upper Longitude value for a Time Zone
 		int i; // Loop variable
 		Real64 temp; // temporary value used to determine time zone
 		Real64 tz; // resultant tz meridian
@@ -9158,6 +9198,8 @@ Label9998: ;
 			Environment( Envrn ).Title = RunPeriodDesignInput( Loop ).Title;
 			Environment( Envrn ).cKindOfEnvrn = RunPeriodDesignInput( Loop ).PeriodType;
 			Environment( Envrn ).KindOfEnvrn = ksRunPeriodDesign;
+			Environment( Envrn ).DesignDayNum = 0;
+			Environment( Envrn ).RunPeriodDesignNum = Loop;
 			Environment( Envrn ).DayOfWeek = RunPeriodDesignInput( Loop ).DayOfWeek;
 			Environment( Envrn ).MonWeekDay = RunPeriodDesignInput( Loop ).MonWeekDay;
 			Environment( Envrn ).SetWeekDays = false;

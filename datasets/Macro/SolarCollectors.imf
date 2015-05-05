@@ -198,7 +198,7 @@
 !***********************************************************************************************************
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   SolarCollectorPerformance:FlatPlate,
     ACR Solar International 10-01,  !- Name

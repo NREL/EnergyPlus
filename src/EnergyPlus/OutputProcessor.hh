@@ -5,9 +5,9 @@
 #include <iosfwd>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
 
@@ -58,7 +58,7 @@ namespace OutputProcessor {
 	extern int const MeterType_CustomDec; // Type value for custom meters that decrement another meter
 	extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
 
-	extern FArray1D_string const DayTypes;
+	extern Array1D_string const DayTypes;
 	extern int const UnitsStringLength;
 
 	extern int const RVarAllocInc;
@@ -80,7 +80,7 @@ namespace OutputProcessor {
 
 	extern int InstMeterCacheSize; // the maximum size of the instant meter cache used in GetInstantMeterValue
 	extern int InstMeterCacheSizeInc; // the increment for the instant meter cache used in GetInstantMeterValue
-	extern FArray1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
+	extern Array1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
 	extern int InstMeterCacheLastUsed; // the last item in the instant meter cache used
 
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -108,17 +108,17 @@ namespace OutputProcessor {
 	extern int NumHoursInDay;
 	extern int NumHoursInMonth;
 	extern int NumHoursInSim;
-	extern FArray1D_int ReportList;
+	extern Array1D_int ReportList;
 	extern int NumReportList;
 	extern int NumExtraVars;
-	extern FArray2D_string FreqNotice; // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
+	extern Array2D_string FreqNotice; // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
 
 	extern int NumOfReqVariables; // Current number of Requested Report Variables
 
 	extern int NumVarMeterArrays; // Current number of Arrays pointing to meters
 
 	extern int NumEnergyMeters; // Current number of Energy Meters
-	extern FArray1D< Real64 > MeterValue; // This holds the current timestep value for each meter.
+	extern Array1D< Real64 > MeterValue; // This holds the current timestep value for each meter.
 
 	extern int TimeStepStampReportNbr; // TimeStep and Hourly Report number
 	extern std::string TimeStepStampReportChr; // TimeStep and Hourly Report number (character -- for printing)
@@ -534,9 +534,9 @@ namespace OutputProcessor {
 		// Members
 		int NumOnMeters; // Number of OnMeter Entries for variable
 		int RepVariable; // Backwards pointer to real Variable
-		FArray1D_int OnMeters; // Forward pointer to Meter Numbers
+		Array1D_int OnMeters; // Forward pointer to Meter Numbers
 		int NumOnCustomMeters; // Number of OnCustomMeter Entries for variable
-		FArray1D_int OnCustomMeters; // Forward pointer to Custom Meter Numbers
+		Array1D_int OnCustomMeters; // Forward pointer to Custom Meter Numbers
 
 		// Default Constructor
 		MeterArrayType() :
@@ -550,9 +550,9 @@ namespace OutputProcessor {
 		MeterArrayType(
 			int const NumOnMeters, // Number of OnMeter Entries for variable
 			int const RepVariable, // Backwards pointer to real Variable
-			FArray1_int const & OnMeters, // Forward pointer to Meter Numbers
+			Array1_int const & OnMeters, // Forward pointer to Meter Numbers
 			int const NumOnCustomMeters, // Number of OnCustomMeter Entries for variable
-			FArray1_int const & OnCustomMeters // Forward pointer to Custom Meter Numbers
+			Array1_int const & OnCustomMeters // Forward pointer to Custom Meter Numbers
 		) :
 			NumOnMeters( NumOnMeters ),
 			RepVariable( RepVariable ),
@@ -865,7 +865,7 @@ namespace OutputProcessor {
 		std::string Name; // End use category name
 		std::string DisplayName; // Display name for output table
 		int NumSubcategories;
-		FArray1D_string SubcategoryName; // Array of subcategory names
+		Array1D_string SubcategoryName; // Array of subcategory names
 
 		// Default Constructor
 		EndUseCategoryType() :
@@ -877,7 +877,7 @@ namespace OutputProcessor {
 			std::string const & Name, // End use category name
 			std::string const & DisplayName, // Display name for output table
 			int const NumSubcategories,
-			FArray1_string const & SubcategoryName // Array of subcategory names
+			Array1_string const & SubcategoryName // Array of subcategory names
 		) :
 			Name( Name ),
 			DisplayName( DisplayName ),
@@ -888,18 +888,18 @@ namespace OutputProcessor {
 	};
 
 	// Object Data
-	extern FArray1D< TimeSteps > TimeValue; // Pointers to the actual TimeStep variables
-	extern FArray1D< RealVariableType > RVariableTypes; // Variable Types structure (use NumOfRVariables to traverse)
-	extern FArray1D< IntegerVariableType > IVariableTypes; // Variable Types structure (use NumOfIVariables to traverse)
-	extern FArray1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
+	extern Array1D< TimeSteps > TimeValue; // Pointers to the actual TimeStep variables
+	extern Array1D< RealVariableType > RVariableTypes; // Variable Types structure (use NumOfRVariables to traverse)
+	extern Array1D< IntegerVariableType > IVariableTypes; // Variable Types structure (use NumOfIVariables to traverse)
+	extern Array1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
 	extern Reference< RealVariables > RVariable;
 	extern Reference< IntegerVariables > IVariable;
 	extern Reference< RealVariables > RVar;
 	extern Reference< IntegerVariables > IVar;
-	extern FArray1D< ReqReportVariables > ReqRepVars;
-	extern FArray1D< MeterArrayType > VarMeterArrays;
-	extern FArray1D< MeterType > EnergyMeters;
-	extern FArray1D< EndUseCategoryType > EndUseCategory;
+	extern Array1D< ReqReportVariables > ReqRepVars;
+	extern Array1D< MeterArrayType > VarMeterArrays;
+	extern Array1D< MeterType > EnergyMeters;
+	extern Array1D< EndUseCategoryType > EndUseCategory;
 
 	// Functions
 
@@ -959,7 +959,7 @@ namespace OutputProcessor {
 	inline
 	void
 	ReallocateIntegerArray(
-		FArray1D_int & Array,
+		Array1D_int & Array,
 		int & ArrayMax, // Current and resultant dimension for Array
 		int const ArrayInc // increment for redimension
 	)
@@ -1071,9 +1071,9 @@ namespace OutputProcessor {
 	UpdateMeterValues(
 		Real64 const TimeStepValue, // Value of this variable at the current time step.
 		int const NumOnMeters, // Number of meters this variable is "on".
-		FArray1S_int const OnMeters, // Which meters this variable is on (index values)
+		Array1S_int const OnMeters, // Which meters this variable is on (index values)
 		Optional_int_const NumOnCustomMeters = _, // Number of custom meters this variable is "on".
-		Optional< FArray1S_int const > OnCustomMeters = _ // Which custom meters this variable is on (index values)
+		Optional< Array1S_int const > OnCustomMeters = _ // Which custom meters this variable is on (index values)
 	);
 
 	void
@@ -1380,16 +1380,16 @@ void
 GetMeteredVariables(
 	std::string const & ComponentType, // Given Component Type
 	std::string const & ComponentName, // Given Component Name (user defined)
-	FArray1S_int VarIndexes, // Variable Numbers
-	FArray1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
-	FArray1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
-	FArray1S_string UnitsStrings, // UnitsStrings for each variable
-	FArray1S_int ResourceTypes, // ResourceTypes for each variable
-	Optional< FArray1S_string > EndUses = _, // EndUses for each variable
-	Optional< FArray1S_string > Groups = _, // Groups for each variable
-	Optional< FArray1S_string > Names = _, // Variable Names for each variable
+	Array1S_int VarIndexes, // Variable Numbers
+	Array1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
+	Array1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
+	Array1S_string UnitsStrings, // UnitsStrings for each variable
+	Array1S_int ResourceTypes, // ResourceTypes for each variable
+	Optional< Array1S_string > EndUses = _, // EndUses for each variable
+	Optional< Array1S_string > Groups = _, // Groups for each variable
+	Optional< Array1S_string > Names = _, // Variable Names for each variable
 	Optional_int NumFound = _, // Number Found
-	Optional< FArray1S_int > VarIDs = _ // Variable Report Numbers
+	Optional< Array1S_int > VarIDs = _ // Variable Report Numbers
 );
 
 void
@@ -1406,8 +1406,8 @@ void
 GetVariableKeys(
 	std::string const & varName, // Standard variable name
 	int const varType, // 1=integer, 2=real, 3=meter
-	FArray1S_string keyNames, // Specific key name
-	FArray1S_int keyVarIndexes // Array index for
+	Array1S_string keyNames, // Specific key name
+	Array1S_int keyVarIndexes // Array index for
 );
 
 bool
@@ -1429,7 +1429,7 @@ AddToOutputVariableList(
 );
 
 //     NOTICE
-//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

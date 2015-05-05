@@ -2,6 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -53,14 +54,14 @@ namespace TARCOGDeflection {
 		Real64 const Pa,
 		Real64 const Pini,
 		Real64 const Tini,
-		FArray1A< Real64 > const PaneThickness,
-		FArray1A< Real64 > const NonDeflectedGapWidth,
-		FArray1A< Real64 > DeflectedGapWidthMax,
-		FArray1A< Real64 > DeflectedGapWidthMean,
-		FArray1A< Real64 > const PanelTemps,
-		FArray1A< Real64 > const YoungsMod,
-		FArray1A< Real64 > const PoissonsRat,
-		FArray1A< Real64 > LayerDeflection,
+		Array1A< Real64 > const PaneThickness,
+		Array1A< Real64 > const NonDeflectedGapWidth,
+		Array1A< Real64 > DeflectedGapWidthMax,
+		Array1A< Real64 > DeflectedGapWidthMean,
+		Array1A< Real64 > const PanelTemps,
+		Array1A< Real64 > const YoungsMod,
+		Array1A< Real64 > const PoissonsRat,
+		Array1A< Real64 > LayerDeflection,
 		int & nperr,
 		std::string & ErrorMessage
 	)
@@ -86,7 +87,7 @@ namespace TARCOGDeflection {
 		//OUTPUT
 
 		//Localy used
-		FArray1D< Real64 > DCoeff( maxlay );
+		Array1D< Real64 > DCoeff( maxlay );
 		int i;
 
 		i = 0;
@@ -116,12 +117,12 @@ namespace TARCOGDeflection {
 		Real64 const Pa,
 		Real64 const Pini,
 		Real64 const Tini,
-		FArray1A< Real64 > const NonDeflectedGapWidth,
-		FArray1A< Real64 > DeflectedGapWidthMax,
-		FArray1A< Real64 > DeflectedGapWidthMean,
-		FArray1A< Real64 > const PanelTemps,
-		FArray1A< Real64 > DCoeff,
-		FArray1A< Real64 > LayerDeflection,
+		Array1A< Real64 > const NonDeflectedGapWidth,
+		Array1A< Real64 > DeflectedGapWidthMax,
+		Array1A< Real64 > DeflectedGapWidthMean,
+		Array1A< Real64 > const PanelTemps,
+		Array1A< Real64 > DCoeff,
+		Array1A< Real64 > LayerDeflection,
 		int & nperr,
 		std::string & ErrorMessage
 	)
@@ -147,11 +148,11 @@ namespace TARCOGDeflection {
 		static Real64 const Pi_6( pow_6( Pi ) );
 
 		//localy used
-		FArray1D< Real64 > DPressure( maxlay ); // delta pressure at each glazing layer
-		FArray1D< Real64 > Vini( MaxGap );
-		FArray1D< Real64 > Vgap( MaxGap );
-		FArray1D< Real64 > Pgap( MaxGap );
-		FArray1D< Real64 > Tgap( MaxGap );
+		Array1D< Real64 > DPressure( maxlay ); // delta pressure at each glazing layer
+		Array1D< Real64 > Vini( MaxGap );
+		Array1D< Real64 > Vgap( MaxGap );
+		Array1D< Real64 > Pgap( MaxGap );
+		Array1D< Real64 > Tgap( MaxGap );
 		Real64 MaxLDSum;
 		Real64 MeanLDSum;
 		Real64 Ratio;
@@ -222,11 +223,11 @@ namespace TARCOGDeflection {
 		int const nlayer,
 		Real64 const W,
 		Real64 const H,
-		FArray1A< Real64 > DCoeff,
-		FArray1A< Real64 > const NonDeflectedGapWidth,
-		FArray1A< Real64 > const DeflectedGapWidthMax,
-		FArray1A< Real64 > DeflectedGapWidthMean,
-		FArray1A< Real64 > LayerDeflection
+		Array1A< Real64 > DCoeff,
+		Array1A< Real64 > const NonDeflectedGapWidth,
+		Array1A< Real64 > const DeflectedGapWidthMax,
+		Array1A< Real64 > DeflectedGapWidthMean,
+		Array1A< Real64 > LayerDeflection
 	)
 	{
 		//INPUT

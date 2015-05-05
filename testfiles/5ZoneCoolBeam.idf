@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Building,                !- Name
@@ -198,7 +198,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes    
 
 ! SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4°C
 
@@ -2072,20 +2074,27 @@
     Hot Water Loop,          !- Plant or Condenser Loop Name
     heating,                 !- Loop Type
     82.,                     !- Design Loop Exit Temperature {C}
-    11;                      !- Loop Design Temperature Difference {deltaC}
-
+    11,                      !- Loop Design Temperature Difference {deltaC}
+    Coincident,              !- Sizing Option
+    1,                       !- Zone Timesteps in Averaging Window
+    None;                    !- Coincident Sizing Factor Mode
+    
   Sizing:Plant,
     Secondary Chilled Water Loop,  !- Plant or Condenser Loop Name
     cooling,                 !- Loop Type
     15.0,                    !- Design Loop Exit Temperature {C}
-    3.0;                     !- Loop Design Temperature Difference {deltaC}
-
+    3.0,                     !- Loop Design Temperature Difference {deltaC}
+    Coincident,              !- Sizing Option
+    1,                       !- Zone Timesteps in Averaging Window
+    None;                    !- Coincident Sizing Factor Mode
+    
   Sizing:Plant,
     Condenser Water Loop,    !- Plant or Condenser Loop Name
     condenser,               !- Loop Type
     29.4,                    !- Design Loop Exit Temperature {C}
     5.6;                     !- Loop Design Temperature Difference {deltaC}
 
+    
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
 
@@ -3045,7 +3054,10 @@
     Primary Chilled Water Loop,  !- Plant or Condenser Loop Name
     cooling,                 !- Loop Type
     7.0,                     !- Design Loop Exit Temperature {C}
-    6.0;                     !- Loop Design Temperature Difference {deltaC}
+    6.0,                     !- Loop Design Temperature Difference {deltaC}
+    Coincident,              !- Sizing Option
+    1,                       !- Zone Timesteps in Averaging Window
+    None;                    !- Coincident Sizing Factor Mode
 
   SetpointManager:Scheduled,
     Primary Chilled Water Loop Setpoint Manager,  !- Name

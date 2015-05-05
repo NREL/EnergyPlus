@@ -2,7 +2,7 @@
 #define PurchasedAirManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -22,7 +22,7 @@ namespace PurchasedAirManager {
 	extern int const LimitFlowRate;
 	extern int const LimitCapacity;
 	extern int const LimitFlowRateAndCapacity;
-	extern FArray1D_string const cLimitType;
+	extern Array1D_string const cLimitType;
 	// Dehumidification and Humidification control type parameters
 	extern int const None;
 	extern int const ConstantSensibleHeatRatio;
@@ -55,7 +55,7 @@ namespace PurchasedAirManager {
 
 	extern int NumPurchAir;
 	extern bool GetPurchAirInputFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
 
 	// Types
@@ -547,7 +547,7 @@ namespace PurchasedAirManager {
 	struct PurchAirNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		PurchAirNumericFieldData()
@@ -555,15 +555,15 @@ namespace PurchasedAirManager {
 
 		// Member Constructor
 		PurchAirNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
-	extern FArray1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indecies of scalable sizing object for zone HVAC
+	extern Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
+	extern Array1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indecies of scalable sizing object for zone HVAC
 
 	// Functions
 

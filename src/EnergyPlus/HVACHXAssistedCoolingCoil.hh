@@ -2,7 +2,7 @@
 #define HVACHXAssistedCoolingCoil_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -25,11 +25,11 @@ namespace HVACHXAssistedCoolingCoil {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int TotalNumHXAssistedCoils; // The total number of HXAssistedCoolingCoil compound objects
-	extern FArray1D< Real64 > HXAssistedCoilOutletTemp; // Outlet temperature from this compound object
-	extern FArray1D< Real64 > HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
+	extern Array1D< Real64 > HXAssistedCoilOutletTemp; // Outlet temperature from this compound object
+	extern Array1D< Real64 > HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
 	// PUBLIC so others can access this information
 	extern bool GetCoilsInputFlag; // Flag to allow input data to be retrieved from idf on first call to this subroutine
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -133,7 +133,7 @@ namespace HVACHXAssistedCoolingCoil {
 	};
 
 	// Object Data
-	extern FArray1D< HXAssistedCoilParameters > HXAssistedCoil;
+	extern Array1D< HXAssistedCoilParameters > HXAssistedCoil;
 
 	// Functions
 

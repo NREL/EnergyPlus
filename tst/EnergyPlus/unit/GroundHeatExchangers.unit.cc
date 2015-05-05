@@ -7,6 +7,7 @@
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundHeatExchangers;
@@ -17,6 +18,8 @@ using namespace EnergyPlus::DataLoopNode;
 
 TEST( GroundHeatExchangerTest, KAGroundTemps)
 {
+	ShowMessage( "Begin Test: GroundHeatExchangerTest, KAGroundTemps" );
+
 	// Initialization
 	GLHESlinky thisGLHE;
 
@@ -37,6 +40,8 @@ TEST( GroundHeatExchangerTest, KAGroundTemps)
 
 TEST( GroundHeatExchangerTest, Interpolate )
 {
+	ShowMessage( "Begin Test: GroundHeatExchangerTest, Interpolate" );
+
 	// Initialization
 	GLHESlinky thisGLHE;
 	Real64 thisLNTTS;
@@ -70,6 +75,8 @@ TEST( GroundHeatExchangerTest, Interpolate )
 
 TEST( SlinkyGroundHeatExchangerTest, GetGFunc )
 {
+
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, GetGFunc" );
 
 	// Initialization
 	GLHESlinky thisGLHE;
@@ -132,6 +139,8 @@ TEST( VerticalGroundHeatExchangerTest, GetGFunc )
 
 TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 {
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, CalcHXResistance" );
+
 	// Initializations
 	GLHESlinky thisGLHE;
 
@@ -150,9 +159,19 @@ TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 	thisGLHE.pipeThick = 0.004;
 	thisGLHE.kPipe = 0.4;
 
-	// Non-zero mass flow rate
+	// Re < 2300 mass flow rate
 	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.11030, thisGLHE.HXResistance, 0.0001 );
+	EXPECT_NEAR( 0.13487, thisGLHE.HXResistance, 0.0001 );
+
+	// 4000 > Re > 2300 mass flow rate
+	thisGLHE.massFlowRate = 0.07;
+	thisGLHE.calcHXResistance();
+	EXPECT_NEAR( 0.08582, thisGLHE.HXResistance, 0.0001 );
+
+	// Re > 4000 mass flow rate
+	thisGLHE.massFlowRate = 0.1;
+	thisGLHE.calcHXResistance();
+	EXPECT_NEAR( 0.077185, thisGLHE.HXResistance, 0.0001 );
 
 	// Zero mass flow rate
 	thisGLHE.massFlowRate = 0.0;
@@ -162,6 +181,8 @@ TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 
 TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 {
+	ShowMessage( "Begin Test: VerticalGroundHeatExchangerTest, CalcHXResistance" );
+
 	// Initializations
 	GLHEVert thisGLHE;
 
@@ -182,27 +203,32 @@ TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 	thisGLHE.boreholeRadius = 0.1;
 	thisGLHE.kGrout = 1.0;
 
-	// Non-zero mass flow rate; 0.0 <= distanceRatio <= 2.5 correction factor
+	// Re < 2300 mass flow rate; 0.0 <= distanceRatio <= 2.5 correction factor
 	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.46965, thisGLHE.HXResistance, 0.0001 );
+	EXPECT_NEAR( 0.49421, thisGLHE.HXResistance, 0.0001 );
 
-	// Non-zero mass flow rate; 0.25 < distanceRatio < 0.5 correction factor
+	// Re < 2300 mass flow rate; 0.25 < distanceRatio < 0.5 correction factor
 	thisGLHE.UtubeDist = 0.05;
 	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.44403, thisGLHE.HXResistance, 0.0001 );
+	EXPECT_NEAR( 0.46859, thisGLHE.HXResistance, 0.0001 );
 
-	// Non-zero mass flow rate; 0.5 <= distanceRatio < 0.75 correction factor
+	// Re < 2300 mass flow rate; 0.5 <= distanceRatio < 0.75 correction factor
 	thisGLHE.UtubeDist = 0.087;
 	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.30435, thisGLHE.HXResistance, 0.0001 );
+	EXPECT_NEAR( 0.32891, thisGLHE.HXResistance, 0.0001 );
 
-	// Non-zero mass flow rate; all other distance ratios correction factor
+	// 4000 > Re > 2300 mass flow rate; all other distance ratios correction factor
 	thisGLHE.UtubeDist = 0.12;
+	thisGLHE.massFlowRate = 0.07;
 	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.20839, thisGLHE.HXResistance, 0.0001 );
+	EXPECT_NEAR( 0.18391, thisGLHE.HXResistance, 0.0001 );
+
+	// Re > 4000 mass flow rate; all other distance ratios correction factor
+	thisGLHE.massFlowRate = 0.1;
+	thisGLHE.calcHXResistance();
+	EXPECT_NEAR( 0.17526, thisGLHE.HXResistance, 0.0001 );
 
 	// Zero mass flow rate; distance ratio > 0.75 correction factor
-	thisGLHE.UtubeDist = 0.12;
 	thisGLHE.massFlowRate = 0.0;
 	thisGLHE.calcHXResistance();
 	EXPECT_NEAR( 0.16903, thisGLHE.HXResistance, 0.0001 );
@@ -210,6 +236,8 @@ TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 
 TEST( SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger )
 {
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger" );
+
 	// Initializations
 	GLHESlinky thisGLHE;
 

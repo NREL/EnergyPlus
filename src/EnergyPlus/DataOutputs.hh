@@ -2,7 +2,7 @@
 #define DataOutputs_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,7 +17,7 @@ namespace DataOutputs {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const NumMonthlyReports;
-	extern FArray1D_string const MonthlyNamedReports;
+	extern Array1D_string const MonthlyNamedReports;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -64,7 +64,7 @@ namespace DataOutputs {
 	};
 
 	// Object Data
-	extern FArray1D< OutputReportingVariables > OutputVariablesForSimulation;
+	extern Array1D< OutputReportingVariables > OutputVariablesForSimulation;
 
 	// Functions
 

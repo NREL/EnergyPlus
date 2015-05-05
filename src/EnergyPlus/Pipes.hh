@@ -2,7 +2,7 @@
 #define Pipes_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -88,7 +88,7 @@ namespace Pipes {
 	};
 
 	// Object Data
-	extern FArray1D< LocalPipeData > LocalPipe; // dimension to number of pipes
+	extern Array1D< LocalPipeData > LocalPipe; // dimension to number of pipes
 
 	// Functions
 

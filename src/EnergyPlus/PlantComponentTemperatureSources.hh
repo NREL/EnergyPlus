@@ -2,7 +2,7 @@
 #define PlantComponentTemperatureSources_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -38,6 +38,7 @@ namespace PlantComponentTemperatureSources {
 		int InletNodeNum; // Node number on the inlet side of the plant
 		int OutletNodeNum; // Node number on the outlet side of the plant
 		Real64 DesVolFlowRate; // m**3/s - design nominal volumetric flow rate
+		bool DesVolFlowRateWasAutoSized; // true if desing flow rate was autosized on input
 		Real64 MassFlowRateMax; // kg/s - design mass flow rate
 		bool EMSOverrideOnMassFlowRateMax; // if true EMS is calling to override maximum mass flow
 		Real64 EMSOverrideValueMassFlowRateMax; // value to use if EMS is overriding max mass flow
@@ -62,6 +63,7 @@ namespace PlantComponentTemperatureSources {
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
 			DesVolFlowRate( 0.0 ),
+			DesVolFlowRateWasAutoSized( false ),
 			MassFlowRateMax( 0.0 ),
 			EMSOverrideOnMassFlowRateMax( false ),
 			EMSOverrideValueMassFlowRateMax( 0.0 ),
@@ -81,59 +83,10 @@ namespace PlantComponentTemperatureSources {
 			IsThisSized( false )
 		{}
 
-		// Member Constructor
-		WaterSourceSpecs(
-			std::string const & Name, // user identifier
-			int const InletNodeNum, // Node number on the inlet side of the plant
-			int const OutletNodeNum, // Node number on the outlet side of the plant
-			Real64 const DesVolFlowRate, // m**3/s - design nominal volumetric flow rate
-			Real64 const MassFlowRateMax, // kg/s - design mass flow rate
-			bool const EMSOverrideOnMassFlowRateMax, // if true EMS is calling to override maximum mass flow
-			Real64 const EMSOverrideValueMassFlowRateMax, // value to use if EMS is overriding max mass flow
-			Real64 const MassFlowRate,
-			int const TempSpecType, // temperature specification type
-			std::string const & TempSpecScheduleName,
-			int const TempSpecScheduleNum,
-			Real64 const BoundaryTemp,
-			Real64 const OutletTemp, // may be different if the flow is off
-			Real64 const InletTemp,
-			Real64 const HeatRate,
-			Real64 const HeatEnergy,
-			PlantLocation const & Location,
-			Real64 const SizFac, // sizing factor
-			bool const CheckEquipName,
-			bool const MyFlag,
-			bool const MyEnvironFlag,
-			bool const IsThisSized // TRUE if sizing is done
-		) :
-			Name( Name ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			DesVolFlowRate( DesVolFlowRate ),
-			MassFlowRateMax( MassFlowRateMax ),
-			EMSOverrideOnMassFlowRateMax( EMSOverrideOnMassFlowRateMax ),
-			EMSOverrideValueMassFlowRateMax( EMSOverrideValueMassFlowRateMax ),
-			MassFlowRate( MassFlowRate ),
-			TempSpecType( TempSpecType ),
-			TempSpecScheduleName( TempSpecScheduleName ),
-			TempSpecScheduleNum( TempSpecScheduleNum ),
-			BoundaryTemp( BoundaryTemp ),
-			OutletTemp( OutletTemp ),
-			InletTemp( InletTemp ),
-			HeatRate( HeatRate ),
-			HeatEnergy( HeatEnergy ),
-			Location( Location ),
-			SizFac( SizFac ),
-			CheckEquipName( CheckEquipName ),
-			MyFlag( MyFlag ),
-			MyEnvironFlag( MyEnvironFlag ),
-			IsThisSized( IsThisSized )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
+	extern Array1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
 
 	// Functions
 

@@ -2,10 +2,10 @@
 #define WeatherManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -63,7 +63,7 @@ namespace WeatherManager {
 	extern Real64 const Sigma; // Stefan-Boltzmann constant
 	extern Real64 const TKelvin; // conversion from Kelvin to Celsius
 
-	extern FArray1D_string const DaysOfWeek;
+	extern Array1D_string const DaysOfWeek;
 
 	extern bool Debugout;
 
@@ -91,11 +91,11 @@ namespace WeatherManager {
 	extern Real64 WeatherFileTimeZone;
 	extern Real64 WeatherFileElevation;
 	extern int WeatherFileUnitNumber; // File unit number for the weather file
-	extern FArray1D< Real64 > GroundTemps; // Bldg Surface
-	extern FArray1D< Real64 > GroundTempsFC; // F or C factor method
-	extern FArray1D< Real64 > SurfaceGroundTemps; // Surface
-	extern FArray1D< Real64 > DeepGroundTemps; // Deep
-	extern FArray1D< Real64 > GroundReflectances; // User Specified Ground Reflectances
+	extern Array1D< Real64 > GroundTemps; // Bldg Surface
+	extern Array1D< Real64 > GroundTempsFC; // F or C factor method
+	extern Array1D< Real64 > SurfaceGroundTemps; // Surface
+	extern Array1D< Real64 > DeepGroundTemps; // Deep
+	extern Array1D< Real64 > GroundReflectances; // User Specified Ground Reflectances
 	extern Real64 SnowGndRefModifier; // Modifier to ground reflectance during snow
 	extern Real64 SnowGndRefModifierForDayltg; // Modifier to ground reflectance during snow for daylighting
 	extern int WaterMainsTempsMethod; // Water mains temperature calculation method
@@ -110,9 +110,9 @@ namespace WeatherManager {
 	extern int TotRunDesPers; // Total number of Run Design Periods (Weather data) to Setup
 
 	extern int NumSpecialDays;
-	extern FArray1D_int SpecialDayTypes; // To hold holiday types given in input file
-	extern FArray1D_int WeekDayTypes; // To hold Week day types using specified first day
-	extern FArray1D_int DSTIndex; // To hold DST Index based on weather file or input
+	extern Array1D_int SpecialDayTypes; // To hold holiday types given in input file
+	extern Array1D_int WeekDayTypes; // To hold Week day types using specified first day
+	extern Array1D_int DSTIndex; // To hold DST Index based on weather file or input
 
 	extern int NumDataPeriods;
 
@@ -133,49 +133,49 @@ namespace WeatherManager {
 	extern int NumEPWTypExtSets; // Number of Typical/Extreme on weather file.
 	extern int NumWPSkyTemperatures; // Number of WeatherProperty:SkyTemperature items in input file
 
-	extern FArray2D_bool TodayIsRain; // Rain indicator, true=rain
-	extern FArray2D_bool TodayIsSnow; // Snow indicator, true=snow
-	extern FArray2D< Real64 > TodayRainAmount; // ficitious indicator of Rain
-	extern FArray2D< Real64 > TodaySnowAmount; // ficitious indicator of Snow
-	extern FArray2D< Real64 > TodayOutDryBulbTemp; // Dry bulb temperature of outside air
-	extern FArray2D< Real64 > TodayOutWetBulbTemp; // Wet bulb temperature of outside air
-	extern FArray2D< Real64 > TodayOutDewPointTemp; // Dew Point Temperature of outside air
-	extern FArray2D< Real64 > TodayOutBaroPress; // Barometric pressure of outside air
-	extern FArray2D< Real64 > TodayOutHumRat; // Humidity ratio of outside air
-	extern FArray2D< Real64 > TodayOutRelHum; // Relative Humidity of outside air
-	extern FArray2D< Real64 > TodayWindSpeed; // Wind speed of outside air
-	extern FArray2D< Real64 > TodayWindDir; // Wind direction of outside air
-	extern FArray2D< Real64 > TodaySkyTemp; // Sky temperature
-	extern FArray2D< Real64 > TodayHorizIRSky; // Horizontal IR from Sky
-	extern FArray2D< Real64 > TodayBeamSolarRad; // Direct normal solar irradiance
-	extern FArray2D< Real64 > TodayDifSolarRad; // Sky diffuse horizontal solar irradiance
-	extern FArray2D< Real64 > TodayAlbedo; // Albedo
-	extern FArray2D< Real64 > TodayLiquidPrecip; // Liquid Precipitation Depth (mm)
+	extern Array2D_bool TodayIsRain; // Rain indicator, true=rain
+	extern Array2D_bool TodayIsSnow; // Snow indicator, true=snow
+	extern Array2D< Real64 > TodayRainAmount; // ficitious indicator of Rain
+	extern Array2D< Real64 > TodaySnowAmount; // ficitious indicator of Snow
+	extern Array2D< Real64 > TodayOutDryBulbTemp; // Dry bulb temperature of outside air
+	extern Array2D< Real64 > TodayOutWetBulbTemp; // Wet bulb temperature of outside air
+	extern Array2D< Real64 > TodayOutDewPointTemp; // Dew Point Temperature of outside air
+	extern Array2D< Real64 > TodayOutBaroPress; // Barometric pressure of outside air
+	extern Array2D< Real64 > TodayOutHumRat; // Humidity ratio of outside air
+	extern Array2D< Real64 > TodayOutRelHum; // Relative Humidity of outside air
+	extern Array2D< Real64 > TodayWindSpeed; // Wind speed of outside air
+	extern Array2D< Real64 > TodayWindDir; // Wind direction of outside air
+	extern Array2D< Real64 > TodaySkyTemp; // Sky temperature
+	extern Array2D< Real64 > TodayHorizIRSky; // Horizontal IR from Sky
+	extern Array2D< Real64 > TodayBeamSolarRad; // Direct normal solar irradiance
+	extern Array2D< Real64 > TodayDifSolarRad; // Sky diffuse horizontal solar irradiance
+	extern Array2D< Real64 > TodayAlbedo; // Albedo
+	extern Array2D< Real64 > TodayLiquidPrecip; // Liquid Precipitation Depth (mm)
 
-	extern FArray2D_bool TomorrowIsRain; // Rain indicator, true=rain
-	extern FArray2D_bool TomorrowIsSnow; // Snow indicator, true=snow
-	extern FArray2D< Real64 > TomorrowRainAmount; // ficitious indicator of Rain
-	extern FArray2D< Real64 > TomorrowSnowAmount; // ficitious indicator of Snow
-	extern FArray2D< Real64 > TomorrowOutDryBulbTemp; // Dry bulb temperature of outside air
-	extern FArray2D< Real64 > TomorrowOutDewPointTemp; // Dew Point Temperature of outside air
-	extern FArray2D< Real64 > TomorrowOutBaroPress; // Barometric pressure of outside air
-	extern FArray2D< Real64 > TomorrowOutRelHum; // Relative Humidity of outside air
-	extern FArray2D< Real64 > TomorrowWindSpeed; // Wind speed of outside air
-	extern FArray2D< Real64 > TomorrowWindDir; // Wind direction of outside air
-	extern FArray2D< Real64 > TomorrowSkyTemp; // Sky temperature
-	extern FArray2D< Real64 > TomorrowHorizIRSky; // Horizontal IR from Sky
-	extern FArray2D< Real64 > TomorrowBeamSolarRad; // Direct normal solar irradiance
-	extern FArray2D< Real64 > TomorrowDifSolarRad; // Sky diffuse horizontal solar irradiance
-	extern FArray2D< Real64 > TomorrowAlbedo; // Albedo
-	extern FArray2D< Real64 > TomorrowLiquidPrecip; // Liquid Precipitation Depth
+	extern Array2D_bool TomorrowIsRain; // Rain indicator, true=rain
+	extern Array2D_bool TomorrowIsSnow; // Snow indicator, true=snow
+	extern Array2D< Real64 > TomorrowRainAmount; // ficitious indicator of Rain
+	extern Array2D< Real64 > TomorrowSnowAmount; // ficitious indicator of Snow
+	extern Array2D< Real64 > TomorrowOutDryBulbTemp; // Dry bulb temperature of outside air
+	extern Array2D< Real64 > TomorrowOutDewPointTemp; // Dew Point Temperature of outside air
+	extern Array2D< Real64 > TomorrowOutBaroPress; // Barometric pressure of outside air
+	extern Array2D< Real64 > TomorrowOutRelHum; // Relative Humidity of outside air
+	extern Array2D< Real64 > TomorrowWindSpeed; // Wind speed of outside air
+	extern Array2D< Real64 > TomorrowWindDir; // Wind direction of outside air
+	extern Array2D< Real64 > TomorrowSkyTemp; // Sky temperature
+	extern Array2D< Real64 > TomorrowHorizIRSky; // Horizontal IR from Sky
+	extern Array2D< Real64 > TomorrowBeamSolarRad; // Direct normal solar irradiance
+	extern Array2D< Real64 > TomorrowDifSolarRad; // Sky diffuse horizontal solar irradiance
+	extern Array2D< Real64 > TomorrowAlbedo; // Albedo
+	extern Array2D< Real64 > TomorrowLiquidPrecip; // Liquid Precipitation Depth
 
-	extern FArray3D< Real64 > DDDBRngModifier; // Design Day Dry-bulb Temperature Range Modifier
-	extern FArray3D< Real64 > DDHumIndModifier; // Design Day relative humidity values
+	extern Array3D< Real64 > DDDBRngModifier; // Design Day Dry-bulb Temperature Range Modifier
+	extern Array3D< Real64 > DDHumIndModifier; // Design Day relative humidity values
 	//   or wet-bulb modifiers (per HumIndType)
-	extern FArray3D< Real64 > DDBeamSolarValues; // Design Day Beam Solar Values
-	extern FArray3D< Real64 > DDDiffuseSolarValues; // Design Day Relative Humidity Values
+	extern Array3D< Real64 > DDBeamSolarValues; // Design Day Beam Solar Values
+	extern Array3D< Real64 > DDDiffuseSolarValues; // Design Day Relative Humidity Values
 
-	extern FArray3D< Real64 > DDSkyTempScheduleValues; // Sky temperature - DesignDay input
+	extern Array3D< Real64 > DDSkyTempScheduleValues; // Sky temperature - DesignDay input
 
 	extern int RptIsRain; // Rain Report Value
 	extern int RptIsSnow; // Snow Report Value
@@ -186,19 +186,19 @@ namespace WeatherManager {
 	extern Real64 SolarAzimuthAngle; // Angle of Solar Azimuth (degrees)
 	extern Real64 HorizIRSky; // Horizontal Infrared Radiation Intensity (W/m2)
 	extern Real64 TimeStepFraction; // Fraction of hour each time step represents
-	extern FArray1D< Real64 > SPSiteDryBulbRangeModScheduleValue; // reporting Drybulb Temperature Range Modifier Schedule Value
-	extern FArray1D< Real64 > SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
-	extern FArray1D< Real64 > SPSiteBeamSolarScheduleValue; // reporting Beam Solar Schedule Value
-	extern FArray1D< Real64 > SPSiteDiffuseSolarScheduleValue; // reporting Diffuse Solar Schedule Value
-	extern FArray1D< Real64 > SPSiteSkyTemperatureScheduleValue; // reporting SkyTemperature Modifier Schedule Value
-	extern FArray1D_int SPSiteScheduleNamePtr; // SP Site Schedule Name Ptrs
-	extern FArray1D_string SPSiteScheduleUnits; // SP Site Schedule Units
+	extern Array1D< Real64 > SPSiteDryBulbRangeModScheduleValue; // reporting Drybulb Temperature Range Modifier Schedule Value
+	extern Array1D< Real64 > SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
+	extern Array1D< Real64 > SPSiteBeamSolarScheduleValue; // reporting Beam Solar Schedule Value
+	extern Array1D< Real64 > SPSiteDiffuseSolarScheduleValue; // reporting Diffuse Solar Schedule Value
+	extern Array1D< Real64 > SPSiteSkyTemperatureScheduleValue; // reporting SkyTemperature Modifier Schedule Value
+	extern Array1D_int SPSiteScheduleNamePtr; // SP Site Schedule Name Ptrs
+	extern Array1D_string SPSiteScheduleUnits; // SP Site Schedule Units
 	extern int NumSPSiteScheduleNamePtrs; // Number of SP Site Schedules (DesignDay only)
 	extern int NumMissing; // Number of hours of missing data
-	extern FArray1D< Real64 > Interpolation; // Interpolation values based on Number of Time Steps in Hour
-	extern FArray1D< Real64 > SolarInterpolation; // Solar Interpolation values based on
+	extern Array1D< Real64 > Interpolation; // Interpolation values based on Number of Time Steps in Hour
+	extern Array1D< Real64 > SolarInterpolation; // Solar Interpolation values based on
 	//      Number of Time Steps in Hour
-	extern FArray1D_int EndDayOfMonth;
+	extern Array1D_int EndDayOfMonth;
 	extern bool ErrorInWeatherFile; // Set to TRUE when there is a problem with dates
 	extern int LeapYearAdd; // Set during environment if leap year is active (adds 1 to number days in Feb)
 	extern bool DatesShouldBeReset; // True when weekdays should be reset
@@ -217,6 +217,10 @@ namespace WeatherManager {
 		std::string Title; // Environment name
 		std::string cKindOfEnvrn; // kind of environment
 		int KindOfEnvrn; // Type of environment (see Parameters for KindOfSim in DataGlobals)
+		int DesignDayNum; // index in DesignDay structure and DesignDayInput
+		int RunPeriodDesignNum; // for WeatherFileDays, index in  RunPeriodDesign and RunPeriodDesignInput
+		int SeedEnvrnNum; // for HVAC sizing sim, new environments are copies of original environments, this is the index for original
+		int HVACSizingIterationNum; // environments for HVAC sizing simulations are associated with iteration
 		int TotalDays; // Number of days in environment
 		int StartJDay; // Day of year of first day of environment
 		int StartMonth;
@@ -234,7 +238,7 @@ namespace WeatherManager {
 		bool ApplyWeekendRule; // True if "Weekend Rule" is to be applied to RunPeriod
 		bool UseRain; // True if Rain from weather file should be used (set rain to true)
 		bool UseSnow; // True if Snow from weather file should be used (set Snow to true)
-		FArray1D_int MonWeekDay;
+		Array1D_int MonWeekDay;
 		bool SetWeekDays; // true when weekdays will be reset (after first year or on repeat)
 		int NumSimYears; // Total Number of times this period to be performed
 		int CurrentCycle; // Current cycle through weather file in NumSimYears repeats
@@ -249,9 +253,11 @@ namespace WeatherManager {
 
 		// Default Constructor
 		EnvironmentData() :
-			Title( "" ),
-			cKindOfEnvrn( "" ),
 			KindOfEnvrn( 0 ),
+			DesignDayNum( 0 ),
+			RunPeriodDesignNum( 0 ),
+			SeedEnvrnNum( 0 ),
+			HVACSizingIterationNum( 0 ),
 			TotalDays( 0 ),
 			StartJDay( 0 ),
 			StartMonth( 0 ),
@@ -305,7 +311,7 @@ namespace WeatherManager {
 			bool const ApplyWeekendRule, // True if "Weekend Rule" is to be applied to RunPeriod
 			bool const UseRain, // True if Rain from weather file should be used (set rain to true)
 			bool const UseSnow, // True if Snow from weather file should be used (set Snow to true)
-			FArray1_int const & MonWeekDay,
+			Array1_int const & MonWeekDay,
 			bool const SetWeekDays, // true when weekdays will be reset (after first year or on repeat)
 			int const NumSimYears, // Total Number of times this period to be performed
 			int const CurrentCycle, // Current cycle through weather file in NumSimYears repeats
@@ -493,7 +499,7 @@ namespace WeatherManager {
 		bool ApplyWeekendRule; // True if "Weekend Rule" is to be applied to RunPeriod
 		bool UseRain; // True if Rain from weather file should be used (set rain to true)
 		bool UseSnow; // True if Snow from weather file should be used (set Snow to true)
-		FArray1D_int MonWeekDay;
+		Array1D_int MonWeekDay;
 		int NumSimYears; // Total Number of years of simulation to be performed
 		int BeginYear; // Start year entered in regular RunPeriod object
 		bool IsLeapYear; // True if Begin Year is leap year.
@@ -546,7 +552,7 @@ namespace WeatherManager {
 			bool const ApplyWeekendRule, // True if "Weekend Rule" is to be applied to RunPeriod
 			bool const UseRain, // True if Rain from weather file should be used (set rain to true)
 			bool const UseSnow, // True if Snow from weather file should be used (set Snow to true)
-			FArray1_int const & MonWeekDay,
+			Array1_int const & MonWeekDay,
 			int const NumSimYears, // Total Number of years of simulation to be performed
 			int const BeginYear, // Start year entered in regular RunPeriod object
 			bool const IsLeapYear, // True if Begin Year is leap year.
@@ -713,7 +719,7 @@ namespace WeatherManager {
 		int EnDay;
 		int EnYear;
 		int NumDays;
-		FArray1D_int MonWeekDay;
+		Array1D_int MonWeekDay;
 		int DataStJDay;
 		int DataEnJDay;
 		bool HasYearData;
@@ -748,7 +754,7 @@ namespace WeatherManager {
 			int const EnDay,
 			int const EnYear,
 			int const NumDays,
-			FArray1_int const & MonWeekDay,
+			Array1_int const & MonWeekDay,
 			int const DataStJDay,
 			int const DataEnJDay,
 			bool const HasYearData
@@ -1147,21 +1153,21 @@ namespace WeatherManager {
 	// Object Data
 	extern DayWeatherVariables TodayVariables; // Today's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination angle | Value of the equation of time formula
 	extern DayWeatherVariables TomorrowVariables; // Tomorrow's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination angle | Value of the equation of time formula
-	extern FArray1D< DayWeatherVariables > DesignDay; // Design day environments
+	extern Array1D< DayWeatherVariables > DesignDay; // Design day environments
 	extern MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) | Wind Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) | Visibility (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth (cm) | Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
 	extern MissingDataCounts Missed;
 	extern RangeDataCounts OutOfRange;
-	extern FArray1D< DesignDayData > DesDayInput; // Design day Input Data
-	extern FArray1D< EnvironmentData > Environment; // Environment data
-	extern FArray1D< RunPeriodData > RunPeriodInput;
-	extern FArray1D< RunPeriodData > RunPeriodDesignInput;
-	extern FArray1D< TypicalExtremeData > TypicalExtremePeriods;
+	extern Array1D< DesignDayData > DesDayInput; // Design day Input Data
+	extern Array1D< EnvironmentData > Environment; // Environment data
+	extern Array1D< RunPeriodData > RunPeriodInput;
+	extern Array1D< RunPeriodData > RunPeriodDesignInput;
+	extern Array1D< TypicalExtremeData > TypicalExtremePeriods;
 	extern DaylightSavingPeriodData EPWDST; // Daylight Saving Period Data from EPW file
 	extern DaylightSavingPeriodData IDFDST; // Daylight Saving Period Data from IDF file
 	extern DaylightSavingPeriodData DST; // Daylight Saving Period Data, if active
-	extern FArray1D< WeatherProperties > WPSkyTemperature;
-	extern FArray1D< SpecialDayData > SpecialDays;
-	extern FArray1D< DataPeriodData > DataPeriods;
+	extern Array1D< WeatherProperties > WPSkyTemperature;
+	extern Array1D< SpecialDayData > SpecialDays;
+	extern Array1D< DataPeriodData > DataPeriods;
 
 	// Functions
 
@@ -1178,16 +1184,21 @@ namespace WeatherManager {
 	);
 
 	void
+	AddDesignSetToEnvironmentStruct(
+		int const HVACSizingIterCount // Counter for number of times HVAC Sizing Simulation of Design Period set is being rerun
+	);
+
+	void
 	SetupWeekDaysByMonth(
 		int const StMon,
 		int const StDay,
 		int const StWeekDay,
-		FArray1A_int WeekDays
+		Array1A_int WeekDays
 	);
 
 	void
 	ResetWeekDaysByMonth(
-		FArray1A_int WeekDays,
+		Array1A_int WeekDays,
 		int const LeapYearAdd,
 		int const StartMonth,
 		int const StartMonthDay,
@@ -1199,8 +1210,8 @@ namespace WeatherManager {
 
 	void
 	SetDSTDateRanges(
-		FArray1S_int MonWeekDay, // Weekday of each day 1 of month
-		FArray1S_int DSTIndex, // DST Index for each julian day (1:366)
+		Array1S_int MonWeekDay, // Weekday of each day 1 of month
+		Array1S_int DSTIndex, // DST Index for each julian day (1:366)
 		Optional_int DSTActStMon = _,
 		Optional_int DSTActStDay = _,
 		Optional_int DSTActEnMon = _,
@@ -1208,7 +1219,7 @@ namespace WeatherManager {
 	);
 
 	void
-	SetSpecialDayDates( FArray1S_int MonWeekDay ); // Weekday of each day 1 of month
+	SetSpecialDayDates( Array1S_int MonWeekDay ); // Weekday of each day 1 of month
 
 	void
 	InitializeWeather( bool & PrintEnvrnStamp ); // Set to true when the environment header should be printed
@@ -1270,7 +1281,7 @@ namespace WeatherManager {
 		Real64 & RField19, // Visibility
 		Real64 & RField20, // CeilHeight
 		int & WObs, // PresWeathObs
-		FArray1A_int WCodesArr, // PresWeathConds
+		Array1A_int WCodesArr, // PresWeathConds
 		Real64 & RField22, // PrecipWater
 		Real64 & RField23, // AerosolOptDepth
 		Real64 & RField24, // SnowDepth
@@ -1321,11 +1332,11 @@ namespace WeatherManager {
 		Real64 const EqOfTime, // Equation of Time
 		Real64 const SinSolDeclin, // Sine of Solar Declination
 		Real64 const CosSolDeclin, // Cosine of Solar Declination
-		FArray1A< Real64 > SUNCOS
+		Array1A< Real64 > SUNCOS
 	);
 
 	void
-	DetermineSunUpDown( FArray1A< Real64 > SunDirectionCosines );
+	DetermineSunUpDown( Array1A< Real64 > SunDirectionCosines );
 
 	void
 	OpenWeatherFile( bool & ErrorsFound );

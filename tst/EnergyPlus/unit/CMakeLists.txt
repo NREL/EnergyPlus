@@ -5,6 +5,7 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DXCoils.unit.cc
@@ -12,24 +13,33 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   Fans.unit.cc
   FluidCoolers.unit.cc
+  Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatRecovery.unit.cc
   Humidifiers.unit.cc
+  HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
   ManageElectricPower.unit.cc
+  HVACUnitarySystem.unit.cc
   MixedAir.unit.cc
+  MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  SecondaryDXCoils.unit.cc
+  SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
+  ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
 set( test_dependencies

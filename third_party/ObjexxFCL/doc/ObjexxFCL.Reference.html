@@ -5,7 +5,7 @@
 	<title>ObjexxFCL Users Guide: Reference</title>
 	<meta name="description" content="Objexx Fortran Compatibility Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library, OPTIONAL">
-	<meta name="copyright" content="Copyright 2000-2014 Objexx Engineering, Inc. All rights reserved.">
+	<meta name="copyright" content="Copyright 2000-2015 Objexx Engineering, Inc. All rights reserved.">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
@@ -68,18 +68,18 @@ int j( 33 );
 r.attach( j ); // Now r is a reference to j
 ...
 r &gt;&gt;= i; // Reattach to i using operator &gt;&gt;= syntax</pre>
-                    </td>
+					</td>
 				</tr>
 			</table>
 			<p class="body">References can also allocate their own arrays:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
 					<td bgcolor="#F7F4F7">
-					<pre>Reference< FArray2D_int > r; // Unattached reference to a 2D array
+					<pre>Reference< Array2D_int > r; // Unattached reference to a 2D array
 r.allocate( 3, 3 ); // r creates and refers to a 3x3 array
 ...
 r.deallocate(); // r is unattached again</pre>
-                    </td>
+					</td>
 				</tr>
 			</table>
 
@@ -119,7 +119,7 @@ r.deallocate(); // r is unattached again</pre>
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2014 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2015 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>

@@ -5,7 +5,7 @@
 	<title>ObjexxFCL Users Guide: Formatted I/O</title>
 	<meta name="description" content="Objexx Fortran Compatibility Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright 2000-2014 Objexx Engineering, Inc. All rights reserved.">
+	<meta name="copyright" content="Copyright 2000-2015 Objexx Engineering, Inc. All rights reserved.">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
@@ -121,7 +121,7 @@ Print( "*" ) &lt;&lt; name &lt;&lt; age &lt;&lt; phone; // List-directed
 					</td>
 				</tr>
 			</table>
-			<p class="body">A numeric first argument to <span class="source">bite</span> is the number of characters to read the variable into. Variables of a known width, such as char or Fstring, can be read with a one-argument <span class="source">bite</span> function, as in&nbsp; <span class="source">bite(name)</span>. Character strings are read into the variables as is: no BLANK=ZERO or <i>n</i>P Fortran-like read capability is available at this time.</p>
+			<p class="body">A numeric first argument to <span class="source">bite</span> is the number of characters to read the variable into. Variables of a known width, such as char, can be read with a one-argument <span class="source">bite</span> function, as in&nbsp; <span class="source">bite(name)</span>. Character strings are read into the variables as is: no BLANK=ZERO or <i>n</i>P Fortran-like read capability is available at this time.</p>
 			<p class="body">A numeric argument to <span class="source">skip</span> is the number of characters to skip over. A trailing skip reads the rest of the line and the line terminator.</p>
 
 			<h2 class="h4">Low-Level Formatted Output</h2>
@@ -130,7 +130,7 @@ Print( "*" ) &lt;&lt; name &lt;&lt; age &lt;&lt; phone; // List-directed
 				<tr>
 					<td bgcolor="#F7F4F7">
 						<pre>int i, j;<br />double x, y;
-Fstring name(20);
+std::string name;
 std::string address;
 ...
 stream &lt;&lt; I(i,3) &lt;&lt; space(1) &lt;&lt; I(2,j) &lt;&lt; '\n';
@@ -174,7 +174,7 @@ stream &lt;&lt; A(address,30) &lt;&lt; '\n';</pre>
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2014 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2015 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>

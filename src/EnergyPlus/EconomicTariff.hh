@@ -2,8 +2,8 @@
 #define EconomicTariff_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -39,8 +39,8 @@ namespace EconomicTariff {
 	extern int const conversionMCF; // thousand cubic feet
 	extern int const conversionCCF; // hundred cubic feet
 
-	extern FArray1D_string const convEneStrings;
-	extern FArray1D_string const convDemStrings;
+	extern Array1D_string const convEneStrings;
+	extern Array1D_string const convDemStrings;
 
 	extern int const demandWindowQuarter;
 	extern int const demandWindowHalf;
@@ -48,7 +48,7 @@ namespace EconomicTariff {
 	extern int const demandWindowDay;
 	extern int const demandWindowWeek;
 
-	extern FArray1D_string const demWindowStrings;
+	extern Array1D_string const demWindowStrings;
 
 	extern int const buyFromUtility;
 	extern int const sellToUtility;
@@ -185,7 +185,7 @@ namespace EconomicTariff {
 	extern int sizeEconVar;
 
 	// holds the outbound connections for each variable
-	extern FArray1D_int operand; // sized to sizeOperand
+	extern Array1D_int operand; // sized to sizeOperand
 	extern int numOperand;
 	extern int sizeOperand;
 
@@ -202,8 +202,8 @@ namespace EconomicTariff {
 	extern int numComputation;
 
 	//list of pointers to variable, 0 end of line, negative indicate operations
-	extern FArray1D_int steps;
-	extern FArray1D_int stepsCopy;
+	extern Array1D_int steps;
+	extern Array1D_int stepsCopy;
 	extern int numSteps;
 	extern int sizeSteps;
 
@@ -223,7 +223,7 @@ namespace EconomicTariff {
 		int tariffIndx; // index of the tariff name in the tariff array
 		int kindOfObj; // enumerated list for the kind of economics object
 		int index; // pointer to item in specific array
-		FArray1D< Real64 > values; // values
+		Array1D< Real64 > values; // values
 		// the following items are not part of the object description
 		bool isArgument; // flag if the variable is ever used as an argument (value needed)
 		bool isAssigned; // flag if the variable is ever assigned to
@@ -265,7 +265,7 @@ namespace EconomicTariff {
 			int const tariffIndx, // index of the tariff name in the tariff array
 			int const kindOfObj, // enumerated list for the kind of economics object
 			int const index, // pointer to item in specific array
-			FArray1< Real64 > const & values, // values
+			Array1< Real64 > const & values, // values
 			bool const isArgument, // flag if the variable is ever used as an argument (value needed)
 			bool const isAssigned, // flag if the variable is ever assigned to
 			int const specific, // the specific type of variable - see enumerated lists
@@ -387,17 +387,17 @@ namespace EconomicTariff {
 		int nativeAboveCustomerBaseEnergy;
 		int nativeBelowCustomerBaseEnergy;
 		//arrays for holding gathered values
-		FArray2D< Real64 > gatherEnergy;
-		FArray2D< Real64 > gatherDemand;
+		Array2D< Real64 > gatherEnergy;
+		Array2D< Real64 > gatherDemand;
 		Real64 collectTime;
 		Real64 collectEnergy;
 		//arryas for holding real time pricing gathered values
-		FArray1D< Real64 > RTPcost;
-		FArray1D< Real64 > RTPaboveBaseCost;
-		FArray1D< Real64 > RTPbelowBaseCost;
-		FArray1D< Real64 > RTPaboveBaseEnergy;
-		FArray1D< Real64 > RTPbelowBaseEnergy;
-		FArray1D_int seasonForMonth;
+		Array1D< Real64 > RTPcost;
+		Array1D< Real64 > RTPaboveBaseCost;
+		Array1D< Real64 > RTPbelowBaseCost;
+		Array1D< Real64 > RTPaboveBaseEnergy;
+		Array1D< Real64 > RTPbelowBaseEnergy;
+		Array1D_int seasonForMonth;
 		//overall qualification of the rate
 		bool isQualified;
 		int ptDisqualifier;
@@ -477,8 +477,8 @@ namespace EconomicTariff {
 			nativeBelowCustomerBaseCosts( 0 ),
 			nativeAboveCustomerBaseEnergy( 0 ),
 			nativeBelowCustomerBaseEnergy( 0 ),
-			gatherEnergy( countPeriod, MaxNumMonths, 0.0 ),
-			gatherDemand( countPeriod, MaxNumMonths, 0.0 ),
+			gatherEnergy( MaxNumMonths, countPeriod, 0.0 ),
+			gatherDemand( MaxNumMonths, countPeriod, 0.0 ),
 			collectTime( 0.0 ),
 			collectEnergy( 0.0 ),
 			RTPcost( MaxNumMonths, 0.0 ),
@@ -574,16 +574,16 @@ namespace EconomicTariff {
 			int const nativeBelowCustomerBaseCosts,
 			int const nativeAboveCustomerBaseEnergy,
 			int const nativeBelowCustomerBaseEnergy,
-			FArray2< Real64 > const & gatherEnergy,
-			FArray2< Real64 > const & gatherDemand,
+			Array2< Real64 > const & gatherEnergy,
+			Array2< Real64 > const & gatherDemand,
 			Real64 const collectTime,
 			Real64 const collectEnergy,
-			FArray1< Real64 > const & RTPcost,
-			FArray1< Real64 > const & RTPaboveBaseCost,
-			FArray1< Real64 > const & RTPbelowBaseCost,
-			FArray1< Real64 > const & RTPaboveBaseEnergy,
-			FArray1< Real64 > const & RTPbelowBaseEnergy,
-			FArray1_int const & seasonForMonth,
+			Array1< Real64 > const & RTPcost,
+			Array1< Real64 > const & RTPaboveBaseCost,
+			Array1< Real64 > const & RTPbelowBaseCost,
+			Array1< Real64 > const & RTPaboveBaseEnergy,
+			Array1< Real64 > const & RTPbelowBaseEnergy,
+			Array1_int const & seasonForMonth,
 			bool const isQualified,
 			int const ptDisqualifier,
 			bool const isSelected,
@@ -668,8 +668,8 @@ namespace EconomicTariff {
 			nativeBelowCustomerBaseCosts( nativeBelowCustomerBaseCosts ),
 			nativeAboveCustomerBaseEnergy( nativeAboveCustomerBaseEnergy ),
 			nativeBelowCustomerBaseEnergy( nativeBelowCustomerBaseEnergy ),
-			gatherEnergy( countPeriod, MaxNumMonths, gatherEnergy ),
-			gatherDemand( countPeriod, MaxNumMonths, gatherDemand ),
+			gatherEnergy( MaxNumMonths, countPeriod, gatherEnergy ),
+			gatherDemand( MaxNumMonths, countPeriod, gatherDemand ),
 			collectTime( collectTime ),
 			collectEnergy( collectEnergy ),
 			RTPcost( MaxNumMonths, RTPcost ),
@@ -793,10 +793,10 @@ namespace EconomicTariff {
 		Real64 blkSzMultVal; // block size multiplier value
 		int blkSzMultPt; // block size variable in the variable array (0 is flag for no variable)
 		int numBlk; // number of blocks used
-		FArray1D< Real64 > blkSzVal; // array of block size values
-		FArray1D_int blkSzPt; // block size variables index to the variable array (0 is no variable)
-		FArray1D< Real64 > blkCostVal; // array of block cost values
-		FArray1D_int blkCostPt; // block cost variables index to the variable array (0 is no variable)
+		Array1D< Real64 > blkSzVal; // array of block size values
+		Array1D_int blkSzPt; // block size variables index to the variable array (0 is no variable)
+		Array1D< Real64 > blkCostVal; // array of block cost values
+		Array1D_int blkCostPt; // block cost variables index to the variable array (0 is no variable)
 
 		// Default Constructor
 		ChargeBlockType() :
@@ -826,10 +826,10 @@ namespace EconomicTariff {
 			Real64 const blkSzMultVal, // block size multiplier value
 			int const blkSzMultPt, // block size variable in the variable array (0 is flag for no variable)
 			int const numBlk, // number of blocks used
-			FArray1< Real64 > const & blkSzVal, // array of block size values
-			FArray1_int const & blkSzPt, // block size variables index to the variable array (0 is no variable)
-			FArray1< Real64 > const & blkCostVal, // array of block cost values
-			FArray1_int const & blkCostPt // block cost variables index to the variable array (0 is no variable)
+			Array1< Real64 > const & blkSzVal, // array of block size values
+			Array1_int const & blkSzPt, // block size variables index to the variable array (0 is no variable)
+			Array1< Real64 > const & blkCostVal, // array of block cost values
+			Array1_int const & blkCostPt // block cost variables index to the variable array (0 is no variable)
 		) :
 			namePt( namePt ),
 			tariffIndx( tariffIndx ),
@@ -937,7 +937,7 @@ namespace EconomicTariff {
 	{
 		// Members
 		int varPt; // pointer to item in specific array
-		FArray1D< Real64 > values; // values
+		Array1D< Real64 > values; // values
 
 		// Default Constructor
 		StackType() :
@@ -948,7 +948,7 @@ namespace EconomicTariff {
 		// Member Constructor
 		StackType(
 			int const varPt, // pointer to item in specific array
-			FArray1< Real64 > const & values // values
+			Array1< Real64 > const & values // values
 		) :
 			varPt( varPt ),
 			values( MaxNumMonths, values )
@@ -957,14 +957,14 @@ namespace EconomicTariff {
 	};
 
 	// Object Data
-	extern FArray1D< EconVarType > econVar;
-	extern FArray1D< TariffType > tariff;
-	extern FArray1D< QualifyType > qualify;
-	extern FArray1D< ChargeSimpleType > chargeSimple;
-	extern FArray1D< ChargeBlockType > chargeBlock;
-	extern FArray1D< RatchetType > ratchet;
-	extern FArray1D< ComputationType > computation;
-	extern FArray1D< StackType > stack;
+	extern Array1D< EconVarType > econVar;
+	extern Array1D< TariffType > tariff;
+	extern Array1D< QualifyType > qualify;
+	extern Array1D< ChargeSimpleType > chargeSimple;
+	extern Array1D< ChargeBlockType > chargeBlock;
+	extern Array1D< RatchetType > ratchet;
+	extern Array1D< ComputationType > computation;
+	extern Array1D< StackType > stack;
 
 	// Functions
 
@@ -1121,13 +1121,13 @@ namespace EconomicTariff {
 
 	void
 	pushStack(
-		FArray1A< Real64 > const monthlyArray,
+		Array1A< Real64 > const monthlyArray,
 		int const variablePointer
 	);
 
 	void
 	popStack(
-		FArray1A< Real64 > monthlyArray,
+		Array1A< Real64 > monthlyArray,
 		int & variablePointer
 	);
 
@@ -1182,7 +1182,7 @@ namespace EconomicTariff {
 	void
 	GetMonthlyCostForResource(
 		int const inResourceNumber,
-		FArray1A< Real64 > outMonthlyCosts
+		Array1A< Real64 > outMonthlyCosts
 	);
 
 	//     NOTICE

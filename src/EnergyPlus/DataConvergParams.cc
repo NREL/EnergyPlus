@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -64,7 +64,7 @@ namespace DataConvergParams {
 	//plant pumps can be shut down
 
 	int const ConvergLogStackDepth( 10 );
-	FArray1D< Real64 > const ConvergLogStackARR( ConvergLogStackDepth, { 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0 } );
+	Array1D< Real64 > const ConvergLogStackARR( ConvergLogStackDepth, { 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0 } );
 	Real64 const sum_ConvergLogStackARR( sum( ConvergLogStackARR ) );
 	Real64 const square_sum_ConvergLogStackARR( pow_2( sum_ConvergLogStackARR ) );
 	Real64 const sum_square_ConvergLogStackARR( sum( pow( ConvergLogStackARR, 2 ) ) );
@@ -90,9 +90,9 @@ namespace DataConvergParams {
 	int MinPlantSubIterations( 2 ); // Iteration Min for Plant Simulation sub iterations
 
 	// Object Data
-	FArray1D< HVACZoneInletConvergenceStruct > ZoneInletConvergence;
-	FArray1D< HVACAirLoopIterationConvergenceStruct > AirLoopConvergence;
-	FArray1D< PlantIterationConvergenceStruct > PlantConvergence;
+	Array1D< HVACZoneInletConvergenceStruct > ZoneInletConvergence;
+	Array1D< HVACAirLoopIterationConvergenceStruct > AirLoopConvergence;
+	Array1D< PlantIterationConvergenceStruct > PlantConvergence;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

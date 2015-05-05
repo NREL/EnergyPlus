@@ -2,7 +2,7 @@
 #define WaterToAirHeatPumpSimple_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -29,8 +29,8 @@ namespace WaterToAirHeatPumpSimple {
 	//INTEGER        :: WaterIndex = 0                   ! Water index
 	//INTEGER        :: Count = 0
 	extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
 
 	extern Real64 SourceSideMassFlowRate; // Source Side Mass flow rate [Kg/s]
 	extern Real64 SourceSideInletTemp; // Source Side Inlet Temperature [C]
@@ -428,7 +428,7 @@ namespace WaterToAirHeatPumpSimple {
 	};
 
 	// Object Data
-	extern FArray1D< SimpleWatertoAirHPConditions > SimpleWatertoAirHP;
+	extern Array1D< SimpleWatertoAirHPConditions > SimpleWatertoAirHP;
 
 	// Functions
 

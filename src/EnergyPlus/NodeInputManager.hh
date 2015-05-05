@@ -2,8 +2,8 @@
 #define NodeInputManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -34,13 +34,13 @@ namespace NodeInputManager {
 	// The following is a module level flag because there are several possible "entries" into
 	// this module that may need to get the Node Inputs.
 	extern bool GetNodeInputFlag; // Flag to Get Node Input(s)
-	extern FArray1D_int NodeRef; // Number of times a Node is "referenced"
+	extern Array1D_int NodeRef; // Number of times a Node is "referenced"
 	extern std::string CurCheckContextName; // Used in Uniqueness checks
-	extern FArray1D_string UniqueNodeNames; // used in uniqueness checks
+	extern Array1D_string UniqueNodeNames; // used in uniqueness checks
 	extern int NumCheckNodes; // Num of Unique nodes in check
 	extern int MaxCheckNodes; // Current "max" unique nodes in check
 	extern bool NodeVarsSetup; // Setup indicator of node vars for reporting (also that all nodes have been entered)
-	extern FArray1D_bool NodeWetBulbRepReq;
+	extern Array1D_bool NodeWetBulbRepReq;
 
 	// Types
 
@@ -49,8 +49,8 @@ namespace NodeInputManager {
 		// Members
 		std::string Name; // Name of this Node List
 		int NumOfNodesInList; // Number of Nodes in this Node List
-		FArray1D_string NodeNames; // List of Names in this Node List
-		FArray1D_int NodeNumbers; // Number of each Node (ref NodeNames) in this Node List
+		Array1D_string NodeNames; // List of Names in this Node List
+		Array1D_int NodeNumbers; // Number of each Node (ref NodeNames) in this Node List
 
 		// Default Constructor
 		NodeListDef() :
@@ -61,8 +61,8 @@ namespace NodeInputManager {
 		NodeListDef(
 			std::string const & Name, // Name of this Node List
 			int const NumOfNodesInList, // Number of Nodes in this Node List
-			FArray1_string const & NodeNames, // List of Names in this Node List
-			FArray1_int const & NodeNumbers // Number of each Node (ref NodeNames) in this Node List
+			Array1_string const & NodeNames, // List of Names in this Node List
+			Array1_int const & NodeNumbers // Number of each Node (ref NodeNames) in this Node List
 		) :
 			Name( Name ),
 			NumOfNodesInList( NumOfNodesInList ),
@@ -73,7 +73,7 @@ namespace NodeInputManager {
 	};
 
 	// Object Data
-	extern FArray1D< NodeListDef > NodeLists; // Node Lists
+	extern Array1D< NodeListDef > NodeLists; // Node Lists
 
 	// Functions
 
@@ -81,7 +81,7 @@ namespace NodeInputManager {
 	GetNodeNums(
 		std::string const & Name, // Name for which to obtain information
 		int & NumNodes, // Number of nodes accompanying this Name
-		FArray1S_int NodeNumbers, // Node Numbers accompanying this Name
+		Array1S_int NodeNumbers, // Node Numbers accompanying this Name
 		bool & ErrorsFound, // True when errors are found...
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
 		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
@@ -97,7 +97,7 @@ namespace NodeInputManager {
 	GetNodeList(
 		std::string const & Name, // Node List Name for which information is obtained
 		int & NumNodes, // Number of nodes accompanying this Name
-		FArray1S_int NodeNumbers, // NodeNumbers accompanying this Name
+		Array1S_int NodeNumbers, // NodeNumbers accompanying this Name
 		bool & errFlag, // Set to true when requested Node List not found
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
 		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")

@@ -2,7 +2,7 @@
 #define DataZoneEquipment_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -68,7 +68,7 @@ namespace DataZoneEquipment {
 	// End zone equip objects
 
 	extern int const NumValidSysAvailZoneComponents;
-	extern FArray1D_string const cValidSysAvailManagerCompTypes;
+	extern Array1D_string const cValidSysAvailManagerCompTypes;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -78,12 +78,12 @@ namespace DataZoneEquipment {
 	extern bool ZoneEquipInputsFilled;
 	extern bool ZoneEquipSimulatedOnce;
 	extern int NumOfZoneEquipLists; // The Number of Zone Equipment List objects
-	extern FArray1D_int ZoneEquipAvail;
+	extern Array1D_int ZoneEquipAvail;
 
 	// moved from HVACManager.hh to avoid circular call, B Nigusse, 05/14
-	extern FArray1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-	extern FArray1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
-	extern FArray1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
+	extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
+	extern Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
+	extern Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
 
 	// Utility routines for module
 
@@ -150,7 +150,7 @@ namespace DataZoneEquipment {
 		int InletNodeNum;
 		int OutletNodeNum;
 		int NumMeteredVars;
-		FArray1D< EquipMeterData > MeteredVar; // Index of energy output report data
+		Array1D< EquipMeterData > MeteredVar; // Index of energy output report data
 		int EnergyTransComp; // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
 		int ZoneEqToPlantPtr; // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
 		int OpMode;
@@ -204,7 +204,7 @@ namespace DataZoneEquipment {
 			int const InletNodeNum,
 			int const OutletNodeNum,
 			int const NumMeteredVars,
-			FArray1< EquipMeterData > const & MeteredVar, // Index of energy output report data
+			Array1< EquipMeterData > const & MeteredVar, // Index of energy output report data
 			int const EnergyTransComp, // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
 			int const ZoneEqToPlantPtr, // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
 			int const OpMode,
@@ -264,8 +264,8 @@ namespace DataZoneEquipment {
 		int InletNodeNum;
 		int OutletNodeNum;
 		int NumMeteredVars;
-		FArray1D< EquipMeterData > MeteredVar; // Index of energy output report data
-		FArray1D< SubSubEquipmentData > SubSubEquipData; // Component list
+		Array1D< EquipMeterData > MeteredVar; // Index of energy output report data
+		Array1D< SubSubEquipmentData > SubSubEquipData; // Component list
 		int EnergyTransComp; // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
 		int ZoneEqToPlantPtr; // 0=No plant loop connection, >0 index to ZoneEqToPlant array
 		int OpMode;
@@ -323,8 +323,8 @@ namespace DataZoneEquipment {
 			int const InletNodeNum,
 			int const OutletNodeNum,
 			int const NumMeteredVars,
-			FArray1< EquipMeterData > const & MeteredVar, // Index of energy output report data
-			FArray1< SubSubEquipmentData > const & SubSubEquipData, // Component list
+			Array1< EquipMeterData > const & MeteredVar, // Index of energy output report data
+			Array1< SubSubEquipmentData > const & SubSubEquipData, // Component list
 			int const EnergyTransComp, // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
 			int const ZoneEqToPlantPtr, // 0=No plant loop connection, >0 index to ZoneEqToPlant array
 			int const OpMode,
@@ -386,7 +386,7 @@ namespace DataZoneEquipment {
 		int AirDistUnitIndex; // equipment number in EquipList
 		int SupplyAirPathIndex;
 		Real64 NetBranchCoilDemand;
-		FArray1D< SubSubEquipmentData > Coil;
+		Array1D< SubSubEquipmentData > Coil;
 
 		// Default Constructor
 		AirIn() :
@@ -410,7 +410,7 @@ namespace DataZoneEquipment {
 			int const AirDistUnitIndex, // equipment number in EquipList
 			int const SupplyAirPathIndex,
 			Real64 const NetBranchCoilDemand,
-			FArray1< SubSubEquipmentData > const & Coil
+			Array1< SubSubEquipmentData > const & Coil
 		) :
 			InNode( InNode ),
 			OutNode( OutNode ),
@@ -438,8 +438,8 @@ namespace DataZoneEquipment {
 		int NumInletNodes;
 		int NumExhaustNodes;
 		bool FlowError; // flow error flag
-		FArray1D_int InletNode; // zone supply air inlet nodes
-		FArray1D_int ExhaustNode; // zone air exhaust nodes
+		Array1D_int InletNode; // zone supply air inlet nodes
+		Array1D_int ExhaustNode; // zone air exhaust nodes
 		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
 		int AirLoopNum; // the air loop index for this controlled zone
 		int FanOpMode; // =0 if no central sys;
@@ -447,7 +447,7 @@ namespace DataZoneEquipment {
 		// =2 if central sysis in constant fan mode.
 		bool ZonalSystemOnly; // TRUE if served by a zonal system (only)
 		bool IsControlled; // True when this is a controlled zone.
-		Real64 ZoneExh; // zone exhaust (unbalanced) mass flow rate [kg/s]
+		Real64 ZoneExh; // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
 		Real64 ZoneExhBalanced; // balanced zone exhaust mass flow rate [kg/s]
 		Real64 PlenumMassFlow; // zone air mass flow rate induced from plenum [kg/s]
 		// AirDistUnitCool and AirDistUnitHeat
@@ -457,8 +457,8 @@ namespace DataZoneEquipment {
 		// UNIT object.  That is both AirDistUnitHeat and AirDistUnitCool are required to describe a dual
 		// duct AIR DISTRIBUTION object in the ZoneEquipList.  Although only one AIR DISTRIBUTION UNIT is
 		// allowed in ZoneEquipList, two instances of that object may exist in this data structure
-		FArray1D< AirIn > AirDistUnitHeat; // dimensioned to number of zone inlet nodes
-		FArray1D< AirIn > AirDistUnitCool; // dimensioned to number of zone inlet nodes.
+		Array1D< AirIn > AirDistUnitHeat; // dimensioned to number of zone inlet nodes
+		Array1D< AirIn > AirDistUnitCool; // dimensioned to number of zone inlet nodes.
 		bool SupLeakToRetPlen; // True if there is supply duct leak to the
 		// plenum (simple duct leakage model)
 		bool InFloorActiveElement; // Convection adapation, true if zone has in-floor HVAC
@@ -502,18 +502,18 @@ namespace DataZoneEquipment {
 			int const NumInletNodes,
 			int const NumExhaustNodes,
 			bool const FlowError, // flow error flag
-			FArray1_int const & InletNode, // zone supply air inlet nodes
-			FArray1_int const & ExhaustNode, // zone air exhaust nodes
+			Array1_int const & InletNode, // zone supply air inlet nodes
+			Array1_int const & ExhaustNode, // zone air exhaust nodes
 			int const ReturnZonePlenumCondNum, // number of the zone's return air plenum
 			int const AirLoopNum, // the air loop index for this controlled zone
 			int const FanOpMode, // =0 if no central sys;
 			bool const ZonalSystemOnly, // TRUE if served by a zonal system (only)
 			bool const IsControlled, // True when this is a controlled zone.
-			Real64 const ZoneExh, // zone exhaust (unbalanced) mass flow rate [kg/s]
+			Real64 const ZoneExh, // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
 			Real64 const ZoneExhBalanced, // balanced zone exhaust mass flow rate [kg/s]
 			Real64 const PlenumMassFlow, // zone air mass flow rate induced from plenum [kg/s]
-			FArray1< AirIn > const & AirDistUnitHeat, // dimensioned to number of zone inlet nodes
-			FArray1< AirIn > const & AirDistUnitCool, // dimensioned to number of zone inlet nodes.
+			Array1< AirIn > const & AirDistUnitHeat, // dimensioned to number of zone inlet nodes
+			Array1< AirIn > const & AirDistUnitCool, // dimensioned to number of zone inlet nodes.
 			bool const SupLeakToRetPlen, // True if there is supply duct leak to the
 			bool const InFloorActiveElement, // Convection adapation, true if zone has in-floor HVAC
 			bool const InWallActiveElement, // Convection adapation, true if zone has in-wall HVAC
@@ -559,11 +559,11 @@ namespace DataZoneEquipment {
 		bool ON; // When true, the designated component or operation scheme is available
 		int NumInlets;
 		int NumOutlets;
-		FArray1D_int InletNodeNums;
-		FArray1D_int OutletNodeNums;
+		Array1D_int InletNodeNums;
+		Array1D_int OutletNodeNums;
 		int NumMeteredVars;
-		FArray1D< EquipMeterData > MeteredVar; // Index of energy output report data
-		FArray1D< SubEquipmentData > SubEquipData; // Component list
+		Array1D< EquipMeterData > MeteredVar; // Index of energy output report data
+		Array1D< SubEquipmentData > SubEquipData; // Component list
 		int EnergyTransComp; // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
 		int ZoneEqToPlantPtr; // 0=No plant loop connection, >0 index to ZoneEqToPlant array
 		Real64 TotPlantSupplyElec;
@@ -616,11 +616,11 @@ namespace DataZoneEquipment {
 			bool const ON, // When true, the designated component or operation scheme is available
 			int const NumInlets,
 			int const NumOutlets,
-			FArray1_int const & InletNodeNums,
-			FArray1_int const & OutletNodeNums,
+			Array1_int const & InletNodeNums,
+			Array1_int const & OutletNodeNums,
 			int const NumMeteredVars,
-			FArray1< EquipMeterData > const & MeteredVar, // Index of energy output report data
-			FArray1< SubEquipmentData > const & SubEquipData, // Component list
+			Array1< EquipMeterData > const & MeteredVar, // Index of energy output report data
+			Array1< SubEquipmentData > const & SubEquipData, // Component list
 			int const EnergyTransComp, // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
 			int const ZoneEqToPlantPtr, // 0=No plant loop connection, >0 index to ZoneEqToPlant array
 			Real64 const TotPlantSupplyElec,
@@ -675,13 +675,13 @@ namespace DataZoneEquipment {
 		// Members
 		std::string Name; // Name of the equipment list
 		int NumOfEquipTypes; // Number of items on this list
-		FArray1D_string EquipType;
-		FArray1D_int EquipType_Num;
-		FArray1D_string EquipName;
-		FArray1D_int EquipIndex;
-		FArray1D_int CoolingPriority;
-		FArray1D_int HeatingPriority;
-		FArray1D< EquipmentData > EquipData; // Index of energy output report data
+		Array1D_string EquipType;
+		Array1D_int EquipType_Num;
+		Array1D_string EquipName;
+		Array1D_int EquipIndex;
+		Array1D_int CoolingPriority;
+		Array1D_int HeatingPriority;
+		Array1D< EquipmentData > EquipData; // Index of energy output report data
 
 		// Default Constructor
 		EquipList() :
@@ -692,13 +692,13 @@ namespace DataZoneEquipment {
 		EquipList(
 			std::string const & Name, // Name of the equipment list
 			int const NumOfEquipTypes, // Number of items on this list
-			FArray1_string const & EquipType,
-			FArray1_int const & EquipType_Num,
-			FArray1_string const & EquipName,
-			FArray1_int const & EquipIndex,
-			FArray1_int const & CoolingPriority,
-			FArray1_int const & HeatingPriority,
-			FArray1< EquipmentData > const & EquipData // Index of energy output report data
+			Array1_string const & EquipType,
+			Array1_int const & EquipType_Num,
+			Array1_string const & EquipName,
+			Array1_int const & EquipIndex,
+			Array1_int const & CoolingPriority,
+			Array1_int const & HeatingPriority,
+			Array1< EquipmentData > const & EquipData // Index of energy output report data
 		) :
 			Name( Name ),
 			NumOfEquipTypes( NumOfEquipTypes ),
@@ -718,8 +718,8 @@ namespace DataZoneEquipment {
 		// Members
 		std::string Name;
 		int NumOfControls;
-		FArray1D_string ControlType;
-		FArray1D_string ControlName;
+		Array1D_string ControlType;
+		Array1D_string ControlName;
 
 		// Default Constructor
 		ControlList() :
@@ -730,8 +730,8 @@ namespace DataZoneEquipment {
 		ControlList(
 			std::string const & Name,
 			int const NumOfControls,
-			FArray1_string const & ControlType,
-			FArray1_string const & ControlName
+			Array1_string const & ControlType,
+			Array1_string const & ControlName
 		) :
 			Name( Name ),
 			NumOfControls( NumOfControls ),
@@ -747,17 +747,17 @@ namespace DataZoneEquipment {
 		std::string Name;
 		int NumOfComponents;
 		int InletNodeNum;
-		FArray1D_string ComponentType;
-		FArray1D_int ComponentType_Num;
-		FArray1D_string ComponentName;
-		FArray1D_int ComponentIndex;
-		FArray1D_int SplitterIndex;
-		FArray1D_int PlenumIndex;
+		Array1D_string ComponentType;
+		Array1D_int ComponentType_Num;
+		Array1D_string ComponentName;
+		Array1D_int ComponentIndex;
+		Array1D_int SplitterIndex;
+		Array1D_int PlenumIndex;
 		int NumOutletNodes;
-		FArray1D_int OutletNode;
+		Array1D_int OutletNode;
 		int NumNodes;
-		FArray1D_int Node;
-		FArray1D_int NodeType;
+		Array1D_int Node;
+		Array1D_int NodeType;
 
 		// Default Constructor
 		SupplyAir() :
@@ -772,17 +772,17 @@ namespace DataZoneEquipment {
 			std::string const & Name,
 			int const NumOfComponents,
 			int const InletNodeNum,
-			FArray1_string const & ComponentType,
-			FArray1_int const & ComponentType_Num,
-			FArray1_string const & ComponentName,
-			FArray1_int const & ComponentIndex,
-			FArray1_int const & SplitterIndex,
-			FArray1_int const & PlenumIndex,
+			Array1_string const & ComponentType,
+			Array1_int const & ComponentType_Num,
+			Array1_string const & ComponentName,
+			Array1_int const & ComponentIndex,
+			Array1_int const & SplitterIndex,
+			Array1_int const & PlenumIndex,
 			int const NumOutletNodes,
-			FArray1_int const & OutletNode,
+			Array1_int const & OutletNode,
 			int const NumNodes,
-			FArray1_int const & Node,
-			FArray1_int const & NodeType
+			Array1_int const & Node,
+			Array1_int const & NodeType
 		) :
 			Name( Name ),
 			NumOfComponents( NumOfComponents ),
@@ -808,10 +808,10 @@ namespace DataZoneEquipment {
 		std::string Name;
 		int NumOfComponents;
 		int OutletNodeNum;
-		FArray1D_string ComponentType;
-		FArray1D_int ComponentType_Num;
-		FArray1D_string ComponentName;
-		FArray1D_int ComponentIndex;
+		Array1D_string ComponentType;
+		Array1D_int ComponentType_Num;
+		Array1D_string ComponentName;
+		Array1D_int ComponentIndex;
 
 		// Default Constructor
 		ReturnAir() :
@@ -824,10 +824,10 @@ namespace DataZoneEquipment {
 			std::string const & Name,
 			int const NumOfComponents,
 			int const OutletNodeNum,
-			FArray1_string const & ComponentType,
-			FArray1_int const & ComponentType_Num,
-			FArray1_string const & ComponentName,
-			FArray1_int const & ComponentIndex
+			Array1_string const & ComponentType,
+			Array1_int const & ComponentType_Num,
+			Array1_string const & ComponentName,
+			Array1_int const & ComponentIndex
 		) :
 			Name( Name ),
 			NumOfComponents( NumOfComponents ),
@@ -841,12 +841,12 @@ namespace DataZoneEquipment {
 	};
 
 	// Object Data
-	extern FArray1D< EquipConfiguration > ZoneEquipConfig;
-	extern FArray1D< EquipList > ZoneEquipList;
-	extern FArray1D< ControlList > HeatingControlList;
-	extern FArray1D< ControlList > CoolingControlList;
-	extern FArray1D< SupplyAir > SupplyAirPath;
-	extern FArray1D< ReturnAir > ReturnAirPath;
+	extern Array1D< EquipConfiguration > ZoneEquipConfig;
+	extern Array1D< EquipList > ZoneEquipList;
+	extern Array1D< ControlList > HeatingControlList;
+	extern Array1D< ControlList > CoolingControlList;
+	extern Array1D< SupplyAir > SupplyAirPath;
+	extern Array1D< ReturnAir > ReturnAirPath;
 
 	// Functions
 

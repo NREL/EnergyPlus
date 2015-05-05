@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ page_title }}</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if page_description %}<meta name="description" content="{{ page_description }}">{% endif %}
+    {% if site_author %}<meta name="author" content="{{ site_author }}">{% endif %}
+    {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+    {% if favicon %}<link rel="shortcut icon" href="{{ favicon }}">
+    {% else %}<link rel="shortcut icon" href="{{ base_url }}/img/favicon.ico">{% endif %}
+    <link href="{{ base_url }}/css/bootstrap-3.3.4.min.css" rel="stylesheet">
+    <link href="{{ base_url }}/css/font-awesome-4.3.0.min.css" rel="stylesheet">
+    <link href="{{ base_url }}/css/prettify-1.0.css" rel="stylesheet">
+    <link href="{{ base_url }}/css/base.css" rel="stylesheet">
+    {%- for path in extra_css %}
+    <link href="{{ path }}" rel="stylesheet">
+    {%- endfor %}
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  </head>
+  <body>
+    {% include "nav.html" %}
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          {% include "toc.html" %}
+        </div>
+        <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
+          {% include "content.html" %}
+          {% include "footer.html" %}
+        </div>
+      </div>
+    </div>
+    {% if include_search %}{% include "search.html" %}{% endif %}
+
+    <script src="{{ base_url }}/js/jquery-2.1.3.min.js"></script>
+    <script src="{{ base_url }}/js/bootstrap-3.3.4.min.js"></script>
+    <script src="{{ base_url }}/js/bootstrap-hover-dropdown-2.1.3.min.js"></script>
+    <script src="{{ base_url }}/js/prettify-1.0.min.js"></script>
+    <script src="{{ base_url }}/js/base.js"></script>
+    {%- for path in extra_javascript %}
+    <script src="{{ path }}"></script>
+    {%- endfor %}
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        TeX: { equationNumbers: {autoNumber: "all"}},
+        showMathMenu: true,
+        showMathMenuMSIE: false,
+        "HTML-CSS": {
+          imageFont: null,
+          preferredFont: null
+        },
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+      });
+    </script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js'></script>
+    <script>
+      $(function() {
+        return $("h2, h3, h4, h5, h6").each(function(i, el) {
+          var $el, icon, id;
+          $el = $(el);
+          id = $el.attr('id');
+          icon = '<i class="fa fa-link"></i>';
+          if (id) {
+            return $el.prepend($("<a />").addClass("header-link").attr("href", "#" + id).html(icon));
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

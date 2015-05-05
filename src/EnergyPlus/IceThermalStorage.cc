@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -154,16 +154,16 @@ namespace IceThermalStorage {
 	Real64 ITSCoolingRate( 0.0 ); // ITS Discharge(-)/Charge(+) rate [W]
 	Real64 ITSCoolingEnergy( 0.0 );
 	Real64 ChillerOutletTemp( 0.0 ); // Chiller outlet brine temperature [C]
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 	// General routine
 
 	// Object Data
-	FArray1D< IceStorageSpecs > IceStorage; // dimension to number of machines
-	FArray1D< ReportVars > IceStorageReport; // dimension to number of machines
-	FArray1D< DetailedIceStorageData > DetIceStor; // Derived type for detailed ice storage model
-	FArray1D< IceStorageMapping > IceStorageTypeMap;
+	Array1D< IceStorageSpecs > IceStorage; // dimension to number of machines
+	Array1D< ReportVars > IceStorageReport; // dimension to number of machines
+	Array1D< DetailedIceStorageData > DetIceStor; // Derived type for detailed ice storage model
+	Array1D< IceStorageMapping > IceStorageTypeMap;
 
 	//*************************************************************************
 
@@ -1205,8 +1205,8 @@ namespace IceThermalStorage {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int CompNum; // local do loop index
 		// FLOW:
 
@@ -1311,9 +1311,9 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyPlantScanFlag;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		bool errFlag;
 		int CompNum; // local do loop counter
 

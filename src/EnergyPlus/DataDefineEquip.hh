@@ -2,7 +2,7 @@
 #define DataDefineEquip_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -54,10 +54,10 @@ namespace DataDefineEquip {
 		int OutletNodeNum; // index of outlet node
 		int NumComponents; // number of subcomponents (=1)
 		int NumControls; // number of controls (not used; =0)
-		FArray1D_string EquipType; // Pointer indentifying type of subcomponent
-		FArray1D_int EquipType_Num;
-		FArray1D_string EquipName; // name of subcomponent
-		FArray1D_int EquipIndex;
+		Array1D_string EquipType; // Pointer indentifying type of subcomponent
+		Array1D_int EquipType_Num;
+		Array1D_string EquipName; // name of subcomponent
+		Array1D_int EquipIndex;
 		Real64 UpStreamLeakFrac; // upstream nominal leakage fraction
 		Real64 DownStreamLeakFrac; // downstream constant leakage fraction
 		Real64 MassFlowRateUpStrLk; // current air mass flow rate of the upstream leak [kg/s]
@@ -104,10 +104,10 @@ namespace DataDefineEquip {
 			int const OutletNodeNum, // index of outlet node
 			int const NumComponents, // number of subcomponents (=1)
 			int const NumControls, // number of controls (not used; =0)
-			FArray1_string const & EquipType, // Pointer indentifying type of subcomponent
-			FArray1_int const & EquipType_Num,
-			FArray1_string const & EquipName, // name of subcomponent
-			FArray1_int const & EquipIndex,
+			Array1_string const & EquipType, // Pointer indentifying type of subcomponent
+			Array1_int const & EquipType_Num,
+			Array1_string const & EquipName, // name of subcomponent
+			Array1_int const & EquipIndex,
 			Real64 const UpStreamLeakFrac, // upstream nominal leakage fraction
 			Real64 const DownStreamLeakFrac, // downstream constant leakage fraction
 			Real64 const MassFlowRateUpStrLk, // current air mass flow rate of the upstream leak [kg/s]
@@ -150,7 +150,7 @@ namespace DataDefineEquip {
 	};
 
 	// Object Data
-	extern FArray1D< ZoneAirEquip > AirDistUnit; // Used to specify zone related
+	extern Array1D< ZoneAirEquip > AirDistUnit; // Used to specify zone related
 
 } // DataDefineEquip
 

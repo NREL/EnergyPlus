@@ -19,6 +19,17 @@
 *~
 .directory
 
+# now that we have python, ignore some things
+*.pyc
+
+# ignore the site build folder for mkdocs
+doc/src/site*
+# and also ignore the concatenated markdown docs that are temporarily created for the pdf target
+doc/src/docs/EngineeringReference/EngRef.md
+doc/src/docs/InputOutputReference/IORef.md
+# and oddly enough we want to ignore the mkdocs yml file that is created conditionally depending on html vs pdf target
+doc/src/mkdocs.yml
+
 # build folder, if the dev chooses to put it there
 #  could also do a wildcard for build-* if we suggest that naming approach
 #  which could be useful for: build-eclipse, build-vs2013, build, etc.

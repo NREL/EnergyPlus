@@ -5,11 +5,13 @@
 
 // EnergyPlus Headers
 #include <WaterThermalTanks.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 
 TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 {
+	ShowMessage( "Begin Test: HeatPumpWaterHeaterTests, TestQsourceCalcs" );
 	Real64 DeltaT = 0.0;
 	Real64 const SourceInletTemp = 62.0;
 	Real64 const Cp = 4178.; // water, J/(kg * K)

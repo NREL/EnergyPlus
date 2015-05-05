@@ -5,7 +5,7 @@
 	<title>ObjexxFCL Release Notes</title>
 	<meta name="description" content="Objexx Fortran Compatibility Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright 2000-2014 Objexx Engineering, Inc. All rights reserved.">
+	<meta name="copyright" content="Copyright 2000-2015 Objexx Engineering, Inc. All rights reserved.">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
@@ -55,13 +55,19 @@
 				<li>"Member" array support: Allows members of objects in arrays to be treated as arrays themselves</li>
 				<li>More Fortran 90+ array intrinsics</li>
 				<li>More and faster array operations</li>
+				<li>Assumed-size array parameter changed from <span class="source">star</span> to <span class="source">_</span></li>
 				<li>Optional and Required argument class templates for Fortran style OPTIONAL arguments</li>
 				<li>Reference class template providing Fortran POINTER semantics</li>
-				<li>FArraySection renamed FArrayTail</li>
+				<li>ArraySection renamed ArrayTail</li>
 				<li>Renamed format.* files to fmt.*</li>
+				<li>Renamed FArray* classes to Array*</li>
 				<li>Loop control helper functions added to floops for improved mapping of DO to for loops</li>
 				<li>Fast 2 and 3 element vectors</li>
 				<li>6D array bug fixes</li>
+				<li>Streamlined (no automatic dimensioning) variant of the ObjexxFCL added for max performance applications</li>
+				<li>Row-major array variant of the ObjexxFCL added for applications that want to use the more typical C++ array layout</li>
+				<li>Aligned array memory allocation added for improved vectorization and cache efficiency</li>
+				<li></li>
 			</ul>
 			<hr />
 			<h5 class="h3">ObjexxFCL 3.0.1</h5>
@@ -71,8 +77,8 @@
 			<hr />
 			<h5 class="h3">ObjexxFCL 3.0.0</h5>
 			<ul class="body">
-				<li>FArrays renamed for clarity (breaking change but could be typedef'd away)</li>
-				<li>6-D FArrays added</li>
+				<li>Arrays renamed for clarity (breaking change but could be typedef'd away)</li>
+				<li>6D Arrays added</li>
 				<li>CPArray renamed CArrayP (breaking change but could be typedef'd away)</li>
 				<li>Namespace scope friend function declarations added to avoid dependence on friend injection or ADL lookup mechanisms</li>
 				<li>Minor source reorganization and tweaks</li>
@@ -82,7 +88,7 @@
 			<h5 class="h3">ObjexxFCL 2.7.0</h5>
 			<ul class="body">
 				<li>Optional runtime proxy const-correctness checks</li>
-				<li>Rank 4 and 5 KeyFArrays added</li>
+				<li>Rank 4 and 5 KeyArrays added</li>
 				<li>New date function</li>
 				<li>Minor source reorganization and tweaks</li>
 				<li>Improved development and build systems</li>
@@ -108,7 +114,7 @@
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.6.1</h5>
 			<ul class="body_text">
-				<li>Faster FArray redimensioning</li>
+				<li>Faster Array redimensioning</li>
 				<li>New fast swap functions for IndexRange and Dimension classes</li>
 				<li>Minor source reorganization and tweaks</li>
 			</ul>
@@ -126,7 +132,7 @@
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.5.3</h5>
 			<ul class="body_text">
-				<li>KeyFArrays added</li>
+				<li>KeyArrays added</li>
 				<li>Forward declaration headers added and included in class declarations</li>
 				<li>Fmath: fix for 4-argument template min/max function to return by reference</li>
 				<li>Additional assertions added</li>
@@ -135,7 +141,7 @@
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.5.2</h5>
 			<ul class="body_text">
-				<li>FArray size reporting support added via OBJEXXFCL_FARRAY_SIZE_REPORT macro</li>
+				<li>Array size reporting support added via OBJEXXFCL_ARRAY_SIZE_REPORT macro</li>
 				<li>F formatting in formatted.o changed to show more precision in some cases</li>
 				<li>Container typedefs for <em>Container</em>_size added</li>
 			</ul>
@@ -159,17 +165,17 @@
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.4.1</h5>
 			<ul class="body_text">
-				<li>FArray:
+				<li>Array:
 				<ul>
-					<li>Assignment of differently dimensioned array supported to facilitate storing STL containers of FArrays</li>
-					<li>Cross product functions added for FArray1D</li>
-					<li>New FArray2D functions:
+					<li>Assignment of differently dimensioned array supported to facilitate storing STL containers of Arrays</li>
+					<li>Cross product functions added for Array1D</li>
+					<li>New Array2D functions:
 					<ul>
 						<li>identity:&nbsp;Named identity matrix constructor</li>
 						<li>to_identity:&nbsp;Converts to identity matrix</li>
 						<li>diag: &nbsp;Named diagonal matrix constructor</li>
 						<li>to_diag: &nbsp;Converts to a diagonal matrix</li>
-						<li>operator*= and right_multiply_by: &nbsp;Right-multiply by an FArray</li>
+						<li>operator*= and right_multiply_by: &nbsp;Right-multiply by an Array</li>
 						<li>transposed: &nbsp;Transposed copy of the array</li>
 					</ul>
 					</li>
@@ -179,13 +185,13 @@
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.4.0</h5>
 			<ul class="body_text">
-				<li>FArray:
+				<li>Array:
 				<ul>
-					<li>Data-preserving redimension functions added for real FArrays</li>
-					<li>swap functions added for real FArrays</li>
-					<li>Initializer set and clear functions added for real FArrays</li>
+					<li>Data-preserving redimension functions added for real Arrays</li>
+					<li>swap functions added for real Arrays</li>
+					<li>Initializer set and clear functions added for real Arrays</li>
 					<li>Copy constructor template variants made explicit to prevent unintended copying</li>
-					<li>Generators added for real FArrays: A + B, A - B, A + 1, -A, etc.</li>
+					<li>Generators added for real Arrays: A + B, A - B, A + 1, -A, etc.</li>
 					<li> STL-like typdefs added: reference, pointer, etc.</li>
 				</ul>
 				</li>
@@ -206,7 +212,7 @@
 			<h5 class="h3">ObjexxFCL 2.3.4</h5>
 			<ul class="body_text">
 				<li>Refined/extended string_of and Fstring_of functions</li>
-				<li>Added FArray assign functions that redimension if necessary and assign another array's values</li>
+				<li>Added Array assign functions that redimension if necessary and assign another array's values</li>
 				<li>Microsoft&reg; Visual C++ 7.1 compatibility added</li>
 			</ul>
 			<hr />
@@ -219,14 +225,14 @@
 			<h5 class="h3">ObjexxFCL 2.3.2</h5>
 			<ul class="body_text">
 				<li>ChunkVector class template for very large vector support in a possibly memory fragmented application space added</li>
-				<li>Real FArray copy + IndexRange constructors added</li>
+				<li>Real Array copy + IndexRange constructors added</li>
 				<li>rvalue_cast template function added</li>
 			</ul>
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.3.1</h5>
 			<ul class="body_text">
 				<li>Eliminated convenience header inclusions for finer-grained inclusion control and faster builds</li>
-				<li>Added FArray<em>N</em>.all.h convenience wrapper headers that include all headers for a FArrays of rank <em>N</em></li>
+				<li>Added Array<em>N</em>.all.h convenience wrapper headers that include all headers for a Arrays of rank <em>N</em></li>
 				<li>Dimension.h insulated from DimensionExpression hierarchy headers for faster builds: DimensionExpressions.h must now be included by application code that creates Dimension expressions</li>
 				<li>Moved ObserverMulti std::set into SetWrapper class to allow forward declarations and faster builds</li>
 				<li>Minor refinements</li>
@@ -248,14 +254,14 @@
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.2.4</h5>
 			<ul class="body_text">
-				<li>Migrate FArray assignment operators to concrete classes to avoid ambiguity/visibility issues</li>
+				<li>Migrate Array assignment operators to concrete classes to avoid ambiguity/visibility issues</li>
 			</ul>
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.2.3</h5>
 			<ul class="body_text">
 				<li>GCC 3.4 support</li>
 				<li>ObjexxFCL_Platform.h removed</li>
-				<li>FArray_Section renamed FArraySection</li>
+				<li>Array_Section renamed ArraySection</li>
 				<li>Minor refinements</li>
 			</ul>
 			<hr />
@@ -267,7 +273,7 @@
 			<hr />
 			<h5 class="h3">ObjexxFCL 2.2.1</h5>
 			<ul class="body_text">
-				<li>equal_dimensions FArray functions added</li>
+				<li>equal_dimensions Array functions added</li>
 				<li>Minor refinements</li>
 			</ul>
 			<hr />
@@ -312,7 +318,7 @@
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2014 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2015 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>

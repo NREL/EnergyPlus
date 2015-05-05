@@ -7,6 +7,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/ManageElectricPower.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ManageElectricPower;
@@ -16,6 +17,7 @@ using namespace DataGlobals;
 
 TEST( ManageElectricPowerTest, BatteryDischargeTest )
 {
+	ShowMessage( "Begin Test: ManageElectricPowerTest, BatteryDischargeTest" );
 
 	NumCurves = 1;
 	PerfCurve.allocate( NumCurves );

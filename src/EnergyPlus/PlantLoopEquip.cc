@@ -236,12 +236,14 @@ namespace PlantLoopEquip {
 		// set up a reference for this component
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
 
-		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
 		GeneralEquipType = sim_component.GeneralEquipType;
-		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
-			sim_component.SizFac = 0.0;
-			return;
-		}
+		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
+// no, no, can't do this, because all the plant components need to run their init and size routines, not just chillers, boilers and cooling towers.  Other things happen besides sizing fac.
+
+//		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
+//			sim_component.SizFac = 0.0;
+//			return;
+//		}
 
 		//set local variables
 		// EquipType = sim_component.TypeOf;
@@ -254,7 +256,6 @@ namespace PlantLoopEquip {
 		CurLoad = sim_component.MyLoad;
 
 		//select equipment and call equiment simulation
-		TypeOfEquip:
 		//PIPES
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
@@ -1050,7 +1051,7 @@ namespace PlantLoopEquip {
 			} else if ( EquipTypeNum == TypeOf_UnitarySystemRecovery ) {
 
 			} else if ( EquipTypeNum == TypeOf_SwimmingPool_Indoor ) {
-				
+
 			} else {
 
 				ShowSevereError( "SimPlantEquip: Invalid ZoneHVAC Type=" + sim_component.TypeOf );
@@ -1142,7 +1143,7 @@ namespace PlantLoopEquip {
 
 	//     NOTICE
 
-	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

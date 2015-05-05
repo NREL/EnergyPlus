@@ -368,7 +368,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 if (samestring(OutArgs(8),'autosize')) OutArgs(8)='autocalculate'
                 OutArgs(9)=blank
                 OutArgs(10)=InArgs(9)
-                if (samestring(OutArgs(8),'autosize')) OutArgs(10)='autocalculate'
+                if (samestring(OutArgs(10),'autosize')) OutArgs(10)='autocalculate'
                 OutArgs(11)=blank
                 OutArgs(12)=InArgs(10)
                 OutArgs(13)=blank

@@ -2,7 +2,7 @@
 #define FaultsManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -56,8 +56,8 @@ namespace FaultsManager {
 	//  12. CO2 sensor
 	//  13. Pressure sensor offset
 	//  14. more
-	
-	extern FArray1D_string const cFaults;
+
+	extern Array1D_string const cFaults;
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -69,7 +69,7 @@ namespace FaultsManager {
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	extern FArray1D_int const iFaultTypeEnums;
+	extern Array1D_int const iFaultTypeEnums;
 
 	extern bool AnyFaultsInModel; // True if there are operationla faults in the model
 	extern int NumFaults; // Number of faults (include multiple faults of same type) in the model
@@ -97,7 +97,7 @@ namespace FaultsManager {
 		int AvaiSchedPtr;
 		int SeveritySchedPtr;
 		int FaultTypeEnum;
-		
+
 		std::string FouledCoilName; // The fouled coil name
 		int FouledCoilID; // Point to a fouling coil
 		int FoulingInputMethod; // Coil fouling input method
@@ -109,7 +109,8 @@ namespace FaultsManager {
 
 		std::string FaultyThermostatName; // The faulty thermostat name
 		std::string FaultyHumidistatName; // The faulty humidistat name
-		
+		std::string FaultyHumidistatType; // The faulty humidistat type
+
 		// Default Constructor
 		FaultProperties() :
 			ControllerTypeEnum( 0 ),
@@ -146,6 +147,7 @@ namespace FaultsManager {
 			std::string const & FouledCoilName, // The fouled coil name
 			std::string const & FaultyThermostatName, // The faulty thermostat name
 			std::string const & FaultyHumidistatName, // The faulty humidistat name
+			std::string const & FaultyHumidistatType, // The faulty humidistat type
 			int const FouledCoilID, // Point to a fouling coil
 			int const FoulingInputMethod, // Coil fouling input method
 			Real64 const UAFouled, // Fouling coil UA under rating conditions
@@ -176,16 +178,17 @@ namespace FaultsManager {
 			Aout( Aout ),
 			Aratio( Aratio ),
 			FaultyThermostatName( FaultyThermostatName ),
-			FaultyHumidistatName( FaultyHumidistatName )
+			FaultyHumidistatName( FaultyHumidistatName ),
+			FaultyHumidistatType( FaultyHumidistatType )
 		{}
 
 	};
 
 	// Object Data
-	extern FArray1D< FaultProperties > Faults;
-	extern FArray1D< FaultProperties > FouledCoils;
-	extern FArray1D< FaultProperties > FaultsThermostatOffset;
-	extern FArray1D< FaultProperties > FaultsHumidistatOffset;
+	extern Array1D< FaultProperties > Faults;
+	extern Array1D< FaultProperties > FouledCoils;
+	extern Array1D< FaultProperties > FaultsThermostatOffset;
+	extern Array1D< FaultProperties > FaultsHumidistatOffset;
 
 	// Functions
 

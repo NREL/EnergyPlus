@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -275,6 +275,16 @@ namespace OutputReportPredefined {
 	int pdchSysSizUserClAir;
 	int pdchSysSizCalcHtAir;
 	int pdchSysSizUserHtAir;
+	int pdstPlantSize;
+	int pdchPlantSizCalcVdot;
+	int pdchPlantSizMeasVdot;
+	int pdchPlantSizPrevVdot;
+//	int pdchPlantSizPass;
+	int pdchPlantSizCoincYesNo;
+	int pdchPlantSizDesDay;
+	int pdchPlantSizPkTimeHour;
+	int pdchPlantSizPkTimeDayOfSim;
+	int pdchPlantSizPkTimeMin;
 
 	//System summary
 	int pdrSystem;
@@ -641,12 +651,12 @@ namespace OutputReportPredefined {
 	Real64 TotalTimeNotSimpleASH55EitherForABUPS( 0.0 );
 
 	// Object Data
-	FArray1D< reportNameType > reportName;
-	FArray1D< SubTableType > subTable;
-	FArray1D< ColumnTagType > columnTag;
-	FArray1D< TableEntryType > tableEntry;
-	FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	FArray1D< ShadowRelateType > ShadowRelate;
+	Array1D< reportNameType > reportName;
+	Array1D< SubTableType > subTable;
+	Array1D< ColumnTagType > columnTag;
+	Array1D< TableEntryType > tableEntry;
+	Array1D< CompSizeTableEntryType > CompSizeTableEntry;
+	Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
 
@@ -982,6 +992,17 @@ namespace OutputReportPredefined {
 		pdchSysSizUserClAir = newPreDefColumn( pdstSystemSize, "User cooling [m3/s]" );
 		pdchSysSizCalcHtAir = newPreDefColumn( pdstSystemSize, "Calculated heating [m3/s]" );
 		pdchSysSizUserHtAir = newPreDefColumn( pdstSystemSize, "User heating [m3/s]" );
+
+		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments" );
+//		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
+		pdchPlantSizPrevVdot = newPreDefColumn( pdstPlantSize, "Previous Design Volume Flow Rate [m3/s]" );
+		pdchPlantSizMeasVdot = newPreDefColumn( pdstPlantSize, "Algorithm Volume Flow Rate [m3/s]" );
+		pdchPlantSizCalcVdot = newPreDefColumn( pdstPlantSize, "Coincident Design Volume Flow Rate [m3/s]" );
+		pdchPlantSizCoincYesNo = newPreDefColumn( pdstPlantSize, "Coincident Size Adjusted" );
+		pdchPlantSizDesDay = newPreDefColumn( pdstPlantSize, "Peak Sizing Period Name" );
+		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period" );
+		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day" );
+		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute" );
 
 		// System Summary Report
 

@@ -2,7 +2,7 @@
 #define PlantManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -37,9 +37,9 @@ namespace PlantManager {
 	extern int PlantSupplyLoopCase;
 	extern int PlantDemandLoopCase;
 
-	extern FArray1D_int SupplySideInletNode; // Node number for the supply side inlet
-	extern FArray1D_int SupplySideOutletNode; // Node number for the supply side outlet
-	extern FArray1D_int DemandSideInletNode; // Inlet node on the demand side
+	extern Array1D_int SupplySideInletNode; // Node number for the supply side inlet
+	extern Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
+	extern Array1D_int DemandSideInletNode; // Inlet node on the demand side
 
 	// SUBROUTINE SPECIFICATIONS:
 	//The following public routines are called from HVAC Manager
@@ -55,9 +55,9 @@ namespace PlantManager {
 		std::string BranchList; // Branch list name for the half loop
 		std::string ConnectList; // Connector list name for the half loop
 		int TotalBranches; // Total number of branches on the loop
-		FArray1D< BranchData > Branch; // Branch data
-		FArray1D< SplitterData > Splitter; // Data for splitter on branch (if any)
-		FArray1D< MixerData > Mixer; // Data for mixer on branch (if any)
+		Array1D< BranchData > Branch; // Branch data
+		Array1D< SplitterData > Splitter; // Data for splitter on branch (if any)
+		Array1D< MixerData > Mixer; // Data for mixer on branch (if any)
 		bool SplitterExists; // Logical Flag indication splitter exists in the half loop
 		bool MixerExists; // Logical Flag indication mixer exists in the half loop
 		bool BypassExists;
@@ -78,9 +78,9 @@ namespace PlantManager {
 			std::string const & BranchList, // Branch list name for the half loop
 			std::string const & ConnectList, // Connector list name for the half loop
 			int const TotalBranches, // Total number of branches on the loop
-			FArray1< BranchData > const & Branch, // Branch data
-			FArray1< SplitterData > const & Splitter, // Data for splitter on branch (if any)
-			FArray1< MixerData > const & Mixer, // Data for mixer on branch (if any)
+			Array1< BranchData > const & Branch, // Branch data
+			Array1< SplitterData > const & Splitter, // Data for splitter on branch (if any)
+			Array1< MixerData > const & Mixer, // Data for mixer on branch (if any)
 			bool const SplitterExists, // Logical Flag indication splitter exists in the half loop
 			bool const MixerExists, // Logical Flag indication mixer exists in the half loop
 			bool const BypassExists,
@@ -105,7 +105,7 @@ namespace PlantManager {
 	{
 		// Members
 		int NumPipes; // Total number of pipes
-		FArray1D< PipeData > Pipe; // Pipe data, using definition from DataPlant
+		Array1D< PipeData > Pipe; // Pipe data, using definition from DataPlant
 
 		// Default Constructor
 		LoopPipeData() :
@@ -115,7 +115,7 @@ namespace PlantManager {
 		// Member Constructor
 		LoopPipeData(
 			int const NumPipes, // Total number of pipes
-			FArray1< PipeData > const & Pipe // Pipe data, using definition from DataPlant
+			Array1< PipeData > const & Pipe // Pipe data, using definition from DataPlant
 		) :
 			NumPipes( NumPipes ),
 			Pipe( Pipe )
@@ -124,7 +124,7 @@ namespace PlantManager {
 	};
 
 	// Object Data
-	extern FArray1D< LoopPipeData > LoopPipe;
+	extern Array1D< LoopPipeData > LoopPipe;
 	extern TempLoopData TempLoop; // =(' ',' ',' ',0, , , ,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.)
 
 	// Functions
@@ -271,6 +271,11 @@ namespace PlantManager {
 	SizePlantLoop(
 		int const LoopNum, // Supply side loop being simulated
 		bool const OkayToFinish
+	);
+
+	void
+	ResizePlantLoopLevelSizes(
+		int const LoopNum
 	);
 
 	void
