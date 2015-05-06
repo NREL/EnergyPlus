@@ -17754,7 +17754,7 @@ This output is the sensible cooling energy added to the supply air by the heat e
 
 This output is the latent cooling rate (dehumidification) of the supply air by the heat exchanger in Watts. This rate is determined by taking the difference between the Heat Exchanger Total Cooling Rate and the Heat Exchanger Sensible Cooling Rate. A positive value is reported if the supply air is dehumidified by the heat exchanger, else the rate is set to zero.
 
-#### Heat Exchanger Latent   Cooling Energy [J]
+#### Heat Exchanger Latent Cooling Energy [J]
 
 This output is the latent cooling energy added to the supply air by the heat exchanger in Joules over the timestep being reported.
 
@@ -17917,7 +17917,7 @@ The electric consumption rate of the unit in watts. Electric power is considered
 
 #### Field: Supply Air Outlet Temperature Control
 
-This alpha field determines if the heat exchanger   s supply air outlet is controlled to a temperature set point when the heat exchanger is heating the supply (primary) air. The choices for this input field are    Yes    or    No   , with the default being    No   . When supply air outlet temperature control is used, the wheel rotational speed modulates or supply air is bypassed around the plate heat exchanger to maintain the desired setpoint temperature. A setpoint manager object is required to establish the desired set point at the supply air outlet node (reference: SetpointManager:Scheduled). When an air-side economizer is also being modeled for this air system, the set point for the supply air outlet temperature control should be equal to the economizer outdoor air temperature lower limit (reference: Controller:OutdoorAir, field Economizer Minimum Limit Dry-Bulb Temperature).
+This alpha field determines if the heat exchanger's supply air outlet is controlled to a temperature set point when the heat exchanger is actively conditioning the supply (primary) air. The choices for this input field are Yes or No, with the default being No. When supply air outlet temperature control is used, the wheel rotational speed modulates or supply air is bypassed around the plate heat exchanger to maintain the desired setpoint temperature. A setpoint manager object is required to establish the desired set point at the supply air outlet node (reference: SetpointManager:Scheduled). When an air-side economizer is also being modeled for this air system, the heat exchanger is deactivated during economizer operation. Additionally, the set point for the supply air outlet temperature control should be equal to the economizer outdoor air temperature lower limit (reference: Controller:OutdoorAir, field Economizer Minimum Limit Dry-Bulb Temperature), however, any temperature set point may be used.
 
 #### Field: Heat Exchanger Type
 

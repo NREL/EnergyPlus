@@ -1,8 +1,30 @@
-External Interface(s)
- Application Guide
+![](ExternalInterfaces_Application_Guide/media/ep.gif)
 
-Guide for using EnergyPlus with External Interface(s)
-
+<br/>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<hr>
+<h1>External Interface(s) Application Guide</h1>
+<h2>Guide for using EnergyPlus with External Interface(s)</h2>
+<br/>
+<p><i>(internalize these external details...)</i></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
+<p style="page-break-after:always;"></p>
+<div id="generated-toc"></div>
+<p style="page-break-after:always;"></p>
 
 External Interface(s)
 =====================

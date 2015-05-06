@@ -17,7 +17,7 @@ For convenience, here are links to the core documentation:
     * [Interface Developer](InterfaceDeveloper/InterfaceDeveloper.md)
     * [Module Developer](ModuleDeveloper/ModuleDeveloper.md)
 * Other
-    * [Acknowledgements](Acknowledgements/Acknowledgments.md)
+    * [Acknowledgements](Acknowledgements/Acknowledgements.md)
     * [Auxiliary Programs](AuxiliaryPrograms/AuxiliaryPrograms.md)
     * [Output Details and Examples](OutputDetailsAndExamples/OutputDetailsAndExamples.md)
     * [Using E+ for Compliance](Using_EnergyPlus_for_Compliance/Using_EnergyPlus_for_Compliance.md)

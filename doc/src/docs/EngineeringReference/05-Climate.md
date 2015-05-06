@@ -19,13 +19,13 @@ The ASHRAE Handbook of Fundamentals describes their criteria in creating design 
 
 In EnergyPlus, the typical design day input includes a “high” and a “low” dry-bulb temperature for the day. As these two temperatures are insufficient to represent a full 24 hour period, the program uses a “range multiplier” profile to represent the full day’s temperatures:
 
-![](EngineeringReference/media/image563.svg)
+![](EngineeringReference/media/image563.svg.png)
 
 Figure 36. Default Daily Temperature Range Profile
 
 The multipliers are taken from the ASHRAE 2009 HOF, Table # 6, p. 14.11.. More explicitly, EnergyPlus creates an air temperature for each timestep by using the entered maximum dry-bulb temperature in conjunction with the entered daily range and the above multiplier values. The actual equation used is shown below:
 
-<div>\[{T_{current}} = {T_{Max}} - {T_{range}}\cdot {T_{Multiplier}}\]</div>
+<div>$${T_{current}} = {T_{Max}} - {T_{range}}\cdot {T_{Multiplier}}$$</div>
 
 where
 
@@ -47,7 +47,7 @@ Since this default temperature profile may not be applicable to all locations, t
 
 EnergyPlus calculates the Horizontal Infrared Radiation Intensity in Wh/m<sup>2,</sup> if it is missing on the weather file or for design days, from the Opaque Sky Cover field as shown in the following explanation.
 
-<div>\[Horizontal\_IR = Sk{y_{emissivity}}\cdot Sigma\cdot Temperature_{drybulb}^4\]</div>
+<div>$$Horizontal\_IR = Sk{y_{emissivity}}\cdot Sigma\cdot Temperature_{drybulb}^4$$</div>
 
 where
 
@@ -61,7 +61,7 @@ Temperature<sub>drybulb</sub> = drybulb temperature {K}
 
 The sky emissivity is given by
 
-<div>\[Sk{y_{emissivity}} = \left( {.787 + .764\cdot \ln \left( {\frac{{Temperatur{e_{dewpoint}}}}{{273.}}} \right)} \right)\cdot \left( {1. + .0224N - .0035{N^2} + .00028{N^3}} \right)\]</div>
+<div>$$Sk{y_{emissivity}} = \left( {.787 + .764\cdot \ln \left( {\frac{{Temperatur{e_{dewpoint}}}}{{273.}}} \right)} \right)\cdot \left( {1. + .0224N - .0035{N^2} + .00028{N^3}} \right)$$</div>
 
 where
 
@@ -81,7 +81,7 @@ References for these calculations are contained in the references section at the
 
 The default calculation for sky temperature is:
 
-<div>\[Sk{y_{Temperature}} = {\left( {\frac{{Horizontal\_IR}}{{Sigma}}} \right)^{.25}} - Temperatur{e_{Kelvin}}\]</div>
+<div>$$Sk{y_{Temperature}} = {\left( {\frac{{Horizontal\_IR}}{{Sigma}}} \right)^{.25}} - Temperatur{e_{Kelvin}}$$</div>
 
 Where
 
@@ -103,7 +103,7 @@ The default model used is the ASHRAE Clear Sky model. The ASHRAE clear sky model
 
 At the earth’s surface on a clear day, direct normal irradiation is represented by
 
-<div>\[Direct\;Normal\;Irradiation = \frac{A}{{exp\left( {{\raise0.7ex\hbox{$B$} \!\mathord{\left/ {\vphantom {B {\sin \beta }}}\right.}\!\lower0.7ex\hbox{${\sin \beta }$}}} \right)}}\]</div>
+<div>$$Direct\;Normal\;Irradiation = \frac{A}{{exp\left( {{\raise0.7ex\hbox{$B$} \!\mathord{\left/ {\vphantom {B {\sin \beta }}}\right.}\!\lower0.7ex\hbox{${\sin \beta }$}}} \right)}}$$</div>
 
 where
 
@@ -247,15 +247,15 @@ The ASHRAE 2009 HOF introduced a revised clear sky model based on location-speci
 
 The model requires air mass, m, calculated as follows --
 
-<div>\[m = {1 \mathord{\left/ {\vphantom {1 {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}} \right. } {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}\]</div>
+<div>$$m = {1 \mathord{\left/ {\vphantom {1 {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}} \right. } {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}$$</div>
 
 where <span>$\beta $</span> = solar altitude, degrees.
 
 Direct and diffuse irradiance are determined with the following relationships,
 
-<div>\[{E_b} = {E_o} \cdot \exp \left[ { - {\tau_b} \cdot {m^{ab}}} \right]\]</div>
+<div>$${E_b} = {E_o} \cdot \exp \left[ { - {\tau_b} \cdot {m^{ab}}} \right]$$</div>
 
-<div>\[{E_d} = {E_o} \cdot \exp \left[ { - {\tau_d} \cdot {m^{ad}}} \right]\]</div>
+<div>$${E_d} = {E_o} \cdot \exp \left[ { - {\tau_d} \cdot {m^{ad}}} \right]$$</div>
 
 where:
 
@@ -275,9 +275,9 @@ Values of t<sub>b</sub> and t<sub>d</sub> are location-specific and vary during 
 
 The air mass exponents <span>$ab$</span> and <span>$ad$</span> were correlated to t<sub>b</sub> and t<sub>d</sub> through the following empirical relationships:
 
-<div>\[ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}\]</div>
+<div>$$ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}$$</div>
 
-<div>\[ad = 0.202 + 0.852 \cdot {\tau_b} - 0.007 \cdot {\tau_d} - 0.357 \cdot {\tau_b} \cdot {\tau_d}\]</div>
+<div>$$ad = 0.202 + 0.852 \cdot {\tau_b} - 0.007 \cdot {\tau_d} - 0.357 \cdot {\tau_b} \cdot {\tau_d}$$</div>
 
 Studies done as part of ASHRAE research projects show that the revised tau model produces more physically plausible irradiance values than does the traditional clear sky model.  In particular, diffuse irradiance values are more realistic.
 
@@ -285,7 +285,7 @@ Studies done as part of ASHRAE research projects show that the revised tau model
 
 The Zhang-Huang solar model was developed for initial use in modeling typical meteorological years for China weather sites. This model seems to be good for other locations as well. Using total cloud cover, dry-bulb temperature, relative humidity, and wind speed as the independent variables, the total (global horizontal) solar radiation is estimated by:
 
-<div>\[I = \frac{{\left[ {{I_0}\cdot \sin (h)\cdot \left( {{c_0} + {c_1}\cdot CC + {c_2}\cdot C{C^2} + {c_3}\left( {{T_n} - {T_{n - 3}}} \right) + {c_4}\cdot \varphi  + {c_5}\cdot {V_w}} \right) + d} \right]}}{k}\]</div>
+<div>$$I = \frac{{\left[ {{I_0}\cdot \sin (h)\cdot \left( {{c_0} + {c_1}\cdot CC + {c_2}\cdot C{C^2} + {c_3}\left( {{T_n} - {T_{n - 3}}} \right) + {c_4}\cdot \varphi  + {c_5}\cdot {V_w}} \right) + d} \right]}}{k}$$</div>
 
 Where
 
@@ -348,7 +348,7 @@ Sky Radiance Model
 
 In EnergyPlus the calculation of diffuse solar radiation from the sky incident on an exterior surface takes into account the anisotropic radiance distribution of the sky. For this distribution, the diffuse sky irradiance on a surface is given by
 
-<div>\[AnisoSkyMultiplie{r_{surface}}\cdot DiffuseSolarIrradiance\]</div>
+<div>$$AnisoSkyMultiplie{r_{surface}}\cdot DiffuseSolarIrradiance$$</div>
 
 Where
 
@@ -555,17 +555,17 @@ The following calculations are done in subroutine AnisoSkyViewFactors in the Sol
 
 In the absence of shadowing, the sky formulation described above gives the following expression for sky diffuse irradiance, *I<sub>sky</sub>*, on a tilted surface:
 
-<div>\[{I_{sky}} = {I_{horizon}} + {I_{dome}} + {I_{circumsolar}}\]</div>
+<div>$${I_{sky}} = {I_{horizon}} + {I_{dome}} + {I_{circumsolar}}$$</div>
 
 where
 
-<div>\[
+<div>$$
   \begin{array}{rcl}
     I_{horizon} &= \rm{irradiance on surface from sky horizon} &= I_h F_2\sin S \\
     I_{dome}    &= \rm{irradiance on surface from sky dome}    &= I_h (1 - F_1)(1 + \cos S)/2 \\
     I_{circumsolar} &= \rm{irradiance on surface from circumsolar region} &= I_h F_1 a/b
   \end{array}
-\]</div>
+$$</div>
 
 AnisoSkyMult is then *I<sub>sky</sub>* /DifSolarRad.
 
@@ -591,16 +591,16 @@ where
 
 The brightening coefficients are a function of sky conditions; they are given by
 
-<div>\[
+<div>$$
   \begin{array}{rl}
     F_1 &= F_{11}(\varepsilon ) + F_{12}(\varepsilon )\Delta  + F_{13}(\varepsilon )Z  \\
     F_2 &= F_{21}(\varepsilon ) + F_{22}(\varepsilon )\Delta  + F_{23}(\varepsilon )Z
   \end{array}
-\]</div>
+$$</div>
 
 Here the sky brightness factor is
 
-<div>\[\Delta  = {I_h}m/{I_o}\]</div>
+<div>$$\Delta  = {I_h}m/{I_o}$$</div>
 
 where
 
@@ -610,7 +610,7 @@ where
 
 and the sky *clearness factor* is
 
-<div>\[\varepsilon  = \frac{{({I_h} + I)/{I_h} + \kappa {Z^3}}}{{1 + \kappa {Z^3}}}\]</div>
+<div>$$\varepsilon  = \frac{{({I_h} + I)/{I_h} + \kappa {Z^3}}}{{1 + \kappa {Z^3}}}$$</div>
 
 where
 
@@ -709,11 +709,11 @@ Sky diffuse solar shadowing on an exterior surface is calculated as follows in s
 
 For the horizon source the following ratio is calculated by dividing the horizon line into 24 intervals of equal length:
 
-<div>\[{R_{horiz}} = \frac{{{\rm{Irradiance from horizon with obstructions}}}}{{{\rm{Irradiance from horizon without obstructions}}}} = \frac{{\sum\limits_{i = 1}^{24} {{I_i}S{F_i}} }}{{\sum\limits_{i = 1}^{24} {{I_i}} }}\]</div>
+<div>$${R_{horiz}} = \frac{{{\rm{Irradiance from horizon with obstructions}}}}{{{\rm{Irradiance from horizon without obstructions}}}} = \frac{{\sum\limits_{i = 1}^{24} {{I_i}S{F_i}} }}{{\sum\limits_{i = 1}^{24} {{I_i}} }}$$</div>
 
 where* I<sub>i</sub>*is the unobstructed irradiance on the surface from the* i*<sup>th</sup> interval, *SF<sub>i</sub>* is the sunlit fraction from radiation coming from the *i*<sup>th</sup> interval, and the sums are over intervals whose center lies in front of the surface. *SF<sub>i</sub>* is calculated using the beam solar shadowing method as though the sun were located at the *i*<sup>th</sup> horizon point. Here
 
-<div>\[{I_i} = E({\theta_i})d\theta \cos {\alpha_i}\]</div>
+<div>$${I_i} = E({\theta_i})d\theta \cos {\alpha_i}$$</div>
 
 where
 
@@ -727,11 +727,11 @@ where
 
 The corresponding ratio for the isotropic sky dome is given by
 
-<div>\[{R_{dome}} = \frac{{{\rm{Irradiance from dome with obstructions}}}}{{{\rm{Irradiance from dome without obstructions}}}} = \frac{{\sum\limits_{i = 1}^{24} {\sum\limits_{j = 1}^6 {{I_{ij}}S{F_{ij}}} } }}{{\sum\limits_{i = 1}^{24} {\sum\limits_{j = 1}^6 {{I_{ij}}} } }}\]</div>
+<div>$${R_{dome}} = \frac{{{\rm{Irradiance from dome with obstructions}}}}{{{\rm{Irradiance from dome without obstructions}}}} = \frac{{\sum\limits_{i = 1}^{24} {\sum\limits_{j = 1}^6 {{I_{ij}}S{F_{ij}}} } }}{{\sum\limits_{i = 1}^{24} {\sum\limits_{j = 1}^6 {{I_{ij}}} } }}$$</div>
 
 where (*i,j*) is a grid of 144 points (6 in altitude by 24 in azimuth) covering the sky dome, *I<sub>ij</sub>* is the unobstructed irradiance on the surface from the sky element at the *ij*<sup>th</sup> point, *SF<sub>ij</sub>* is the sunlit fraction for radiation coming from the *ij*<sup>th</sup> element, and the sum is over points lying in front of the surface. Here
 
-<div>\[{I_{ij}} = E({\theta_i},{\phi_j})\cos {\phi_j}d\theta d\phi \cos {\alpha_{ij}}\]</div>
+<div>$${I_{ij}} = E({\theta_i},{\phi_j})\cos {\phi_j}d\theta d\phi \cos {\alpha_{ij}}$$</div>
 
 where
 
@@ -749,11 +749,11 @@ where
 
 Because the circumsolar region is assumed to be concentrated at the solar disk, the circumsolar ratio is
 
-<div>\[{R_{circumsolar}} = \frac{{{\rm{Irradiance from circumsolar region with obstructions}}}}{{{\rm{Irradiance from circumsolar without obstructions}}}} = S{F_{sun}}\]</div>
+<div>$${R_{circumsolar}} = \frac{{{\rm{Irradiance from circumsolar region with obstructions}}}}{{{\rm{Irradiance from circumsolar without obstructions}}}} = S{F_{sun}}$$</div>
 
 where *SF<sub>sun</sub>* is the beam sunlit fraction. The total sky diffuse irradiance on the surface with shadowing is then
 
-<div>\[{I'_{sky}} = {R_{horizon}}{I_{horizon}} + {R_{dome}}{I_{dome}} + {R_{circumsolar}}{I_{circumsolar}}\]</div>
+<div>$${I'_{sky}} = {R_{horizon}}{I_{horizon}} + {R_{dome}}{I_{dome}} + {R_{circumsolar}}{I_{circumsolar}}$$</div>
 
 *R<sub>horizon</sub>* and *R<sub>dome</sub>* are calculated once for each surface since they are independent of sun position.
 
@@ -786,11 +786,11 @@ Current solar position is described in terms of three direction cosines that are
 
 The fractional year is calculated, in radians:
 
-<div>\[\gamma  = \frac{{2\pi }}{{366}}(day\_of\_year)\]</div>
+<div>$$\gamma  = \frac{{2\pi }}{{366}}(day\_of\_year)$$</div>
 
 From this fractional year, the equation of time and solar declination angle are calculated.  For each time step (time value = fractional hour), the hour angle is calculated from:
 
-<div>\[HourAngle = \left( {15\cdot \left( {12 - \left( {TimeValue + EquationOfTime} \right)} \right) + \left( {TimeZoneMeridian - Longitude} \right)} \right)\]</div>
+<div>$$HourAngle = \left( {15\cdot \left( {12 - \left( {TimeValue + EquationOfTime} \right)} \right) + \left( {TimeZoneMeridian - Longitude} \right)} \right)$$</div>
 
 TimeZoneMeridian is the standard meridian for the location’s time zone {GMT +/-}.
 
@@ -852,11 +852,11 @@ The GlobalGeometryRules object specifies to EnergyPlus how the surface vertices 
 
 When vertices are specified in “relative” coordinates, there can be a “building” north axis as well as a “zone” north axis.  The building north axis/coordinate system is a rotation of y<sub>b</sub> degrees from the global/world coordinate system.  The global coordinates of zone origins are related to the building relative coordinates by:
 
-<div>\[{X_{zo}} = {X_{br}}\cdot \cos {\psi_b} - {Y_{br}}\cdot \sin {\psi_b}\]</div>
+<div>$${X_{zo}} = {X_{br}}\cdot \cos {\psi_b} - {Y_{br}}\cdot \sin {\psi_b}$$</div>
 
-<div>\[{Y_{zo}} = {Y_{br}}\cdot \sin {\psi_b} - {Y_{br}}\cdot \cos {\psi_b}\]</div>
+<div>$${Y_{zo}} = {Y_{br}}\cdot \sin {\psi_b} - {Y_{br}}\cdot \cos {\psi_b}$$</div>
 
-<div>\[{Z_{zo}} = {Z_{br}}\]</div>
+<div>$${Z_{zo}} = {Z_{br}}$$</div>
 
 Where
 
@@ -866,41 +866,41 @@ br – represents the Zone Origin as input (relative to building origin)
 
 The zone may also be rotated y<sub>z</sub> degrees relative to the building coordinates. Origins of zone surfaces are then given relative to the zone coordinate system. The global coordinates of the surface origins are calculated by:
 
-<div>\[{X_{so}} = {X_{zo}} + {X_{zr}}\cdot \cos {\psi_z} - {Y_{zr}}\cdot \sin {\psi_z}\]</div>
+<div>$${X_{so}} = {X_{zo}} + {X_{zr}}\cdot \cos {\psi_z} - {Y_{zr}}\cdot \sin {\psi_z}$$</div>
 
-<div>\[{Y_{so}} = {Y_{zo}} + {X_{zr}}\cdot \sin {\psi_z} - {Y_{zr}}\cdot \cos {\psi_z}\]</div>
+<div>$${Y_{so}} = {Y_{zo}} + {X_{zr}}\cdot \sin {\psi_z} - {Y_{zr}}\cdot \cos {\psi_z}$$</div>
 
-<div>\[{X_{so}} = {X_{zo}} + {X_{zr}}\cdot \cos {\psi_z} - {Y_{zr}}\cdot \sin {\psi_z}\]</div>
+<div>$${X_{so}} = {X_{zo}} + {X_{zr}}\cdot \cos {\psi_z} - {Y_{zr}}\cdot \sin {\psi_z}$$</div>
 
 A surface azimuth angle relative to the zone coordinate system (y<sub>s</sub>) is converted to a global azimuth by:
 
-<div>\[\psi  = {\psi_s} + {\psi_z} + {\psi_b}\]</div>
+<div>$$\psi  = {\psi_s} + {\psi_z} + {\psi_b}$$</div>
 
 The surface tilt angle (f) is not changed by these rotations about the Z-axis.
 
 The coordinates of the surface vertices are given in a coordinate system in the plane of the surface relative to the second vertex as shown for surfaces in Figure 40. The X-axis of the surface coordinate system is a horizontal line through the second vertex. The global coordinates of the surface vertices are given by:
 
-<div>\[X = {X_{so}} + {X_{sr}}\cdot \cos \psi  - {Y_{sr}}\cdot \sin \psi \cdot \cos \phi \]</div>
+<div>$$X = {X_{so}} + {X_{sr}}\cdot \cos \psi  - {Y_{sr}}\cdot \sin \psi \cdot \cos \phi $$</div>
 
-<div>\[Y = {Y_{so}} + {X_{sr}}\cdot \sin \psi  - {Y_{sr}}\cdot \cos \psi \cdot \cos \phi \]</div>
+<div>$$Y = {Y_{so}} + {X_{sr}}\cdot \sin \psi  - {Y_{sr}}\cdot \cos \psi \cdot \cos \phi $$</div>
 
-<div>\[Z = {Z_{so}} + {Y_{sr}}\cdot \sin \phi \]</div>
+<div>$$Z = {Z_{so}} + {Y_{sr}}\cdot \sin \phi $$</div>
 
 #### World Coordinates è Relative Coordinates
 
 Vertices in the global coordinate system can be transformed to the coordinate system relative to a given surface by
 
-<div>\[{X'} = X - {X_{so}}\]</div>
+<div>$${X'} = X - {X_{so}}$$</div>
 
-<div>\[{Y'} = Y - {Y_{so}}\]</div>
+<div>$${Y'} = Y - {Y_{so}}$$</div>
 
-<div>\[{Z'} = Z - {Z_{so}}\]</div>
+<div>$${Z'} = Z - {Z_{so}}$$</div>
 
-<div>\[{X_{sr}} =  - {X'}\cdot \cos \psi  + {Y'}\cdot \sin \psi \]</div>
+<div>$${X_{sr}} =  - {X'}\cdot \cos \psi  + {Y'}\cdot \sin \psi $$</div>
 
-<div>\[{Y_{sr}} =  - {X'}\cdot \sin \psi \cdot \cos \phi  + {Y'}\cdot \cos \psi \cdot \cos \phi  + {Z'}\cdot \sin \phi \]</div>
+<div>$${Y_{sr}} =  - {X'}\cdot \sin \psi \cdot \cos \phi  + {Y'}\cdot \cos \psi \cdot \cos \phi  + {Z'}\cdot \sin \phi $$</div>
 
-<div>\[{Z_{sr}} =  - {X'}\cdot \sin \psi \cdot \sin \phi  + {Y'}\cdot \cos \psi \cdot \sin \phi  + {Z'}\cdot \cos \phi \]</div>
+<div>$${Z_{sr}} =  - {X'}\cdot \sin \psi \cdot \sin \phi  + {Y'}\cdot \cos \psi \cdot \sin \phi  + {Z'}\cdot \cos \phi $$</div>
 
 ### Shadow Projection
 
@@ -914,15 +914,15 @@ Figure 41.  Basic shadowing concept structure
 
 The expressions in equation are the direction cosines of the surface:
 
-<div>\[C{W_1} = \sin \psi \cdot \cos \phi \]</div>
+<div>$$C{W_1} = \sin \psi \cdot \cos \phi $$</div>
 
-<div>\[C{W_2} = \cos \psi \cdot \sin \phi \]</div>
+<div>$$C{W_2} = \cos \psi \cdot \sin \phi $$</div>
 
-<div>\[C{W_3} = \cos \phi \]</div>
+<div>$$C{W_3} = \cos \phi $$</div>
 
 The cosine of the angle of incidence of the sun's rays on the surface are given by the dot product of surface and sun direction cosines.
 
-<div>\[\cos \theta  = C{S_1}\cdot C{W_1} + C{S_2}\cdot C{W_2} + C{S_3}\cdot C{W_3}\]</div>
+<div>$$\cos \theta  = C{S_1}\cdot C{W_1} + C{S_2}\cdot C{W_2} + C{S_3}\cdot C{W_3}$$</div>
 
 If <span>$\cos \theta $</span> is less than zero, the sun is behind the surface.
 
@@ -936,17 +936,17 @@ This is done by finding, through linear interpolation, the points on the perimet
 
 A vertex located at (x, y, z) relative to the RP coordinate system casts a shadow to a point in the plane of the RP given by
 
-<div>\[{x'} = x - \frac{{z\cdot a}}{{\cos \theta }}\]</div>
+<div>$${x'} = x - \frac{{z\cdot a}}{{\cos \theta }}$$</div>
 
-<div>\[{y'} = y - \frac{{z\cdot b}}{{\cos \theta }}\]</div>
+<div>$${y'} = y - \frac{{z\cdot b}}{{\cos \theta }}$$</div>
 
 where
 
-<div>\[a = \sin \psi \cdot C{S_1} - \cos \psi \cdot C{S_2}\]</div>
+<div>$$a = \sin \psi \cdot C{S_1} - \cos \psi \cdot C{S_2}$$</div>
 
 and
 
-<div>\[b =  - \cos \psi \cdot \cos \phi \cdot C{S_1} - \sin \psi \cdot \cos \phi \cdot C{S_2} + \sin \phi \cdot C{S_3}\]</div>
+<div>$$b =  - \cos \psi \cdot \cos \phi \cdot C{S_1} - \sin \psi \cdot \cos \phi \cdot C{S_2} + \sin \phi \cdot C{S_3}$$</div>
 
 More explicitly, a casting surface – a shadow casting surface or general casting surface – is one that casts a shadow on other surfaces. A receiving surface – a shadow receiving surface – is one that receives shadows from other surfaces (i.e. casting surfaces). A back surface – an inside surface – is one that may be partially sunlit/receive solar transmission for interior solar distribution.
 
@@ -954,19 +954,19 @@ More explicitly, a casting surface – a shadow casting surface or general casti
 
 Two-dimensional homogeneous coordinate techniques are used to determine the vertices of shadow overlaps. In homogeneous coordinates, points and lines are represented by a single form that allows simple vector operations between those forms [Newman-Sproul].  A point (X, Y) is represented by a three element vector (x, y, w) where x = w\*X, y = w\*Y, and w is any real number except zero. A line is also represented by a three element vector (a, b, c). The directed line (a, b, c) from point (x<sub>1</sub>, y<sub>1</sub>, w<sub>1</sub>) to point (x<sub>2</sub>, y<sub>2</sub>, w<sub>2</sub>) is given by:
 
-<div>\[(a,b,c) = ({x_1},{y_1},{z_1}) \otimes ({x_2},{y_2},{z_2})\]</div>
+<div>$$(a,b,c) = ({x_1},{y_1},{z_1}) \otimes ({x_2},{y_2},{z_2})$$</div>
 
 The sequence in the cross product is a convention to determine sign. The condition that a point (x, y, w) lie on a line (a, b, c) is that
 
-<div>\[(a,b,c) \bullet (x,y,w) = 0\]</div>
+<div>$$(a,b,c) \bullet (x,y,w) = 0$$</div>
 
 The point is normalized by dividing by w. Then if
 
-<div>\[(a,b,c) \bullet (x/w,y/w,1) > 0\]</div>
+<div>$$(a,b,c) \bullet (x/w,y/w,1) > 0$$</div>
 
 the point is to the left of the line.  If it is less than zero, the point is to the right of the line. The intercept (x, y, w) of line (a<sub>1</sub>, b<sub>1</sub>, c<sub>1</sub>) and line (a<sub>2</sub>, b<sub>2</sub>, c<sub>2</sub>) is given by:
 
-<div>\[(x,y,w) = ({a_1},{b_1},{c_1}) \otimes ({a_2},{b_2},{c_2})\]</div>
+<div>$$(x,y,w) = ({a_1},{b_1},{c_1}) \otimes ({a_2},{b_2},{c_2})$$</div>
 
 Note that the use of homogeneous coordinates as outlined above provides a consistent method and notation for defining points and lines, for determining intercepts, and for determining whether a point lies to the left, to the right, or on a line.  Normalization provides the means for transforming to and from homogeneous notation and Cartesian coordinates.  Thus, if (X, Y) is a Cartesian coordinate pair, its homogeneous coordinates are (X, Y, 1).  Similarly, the homogeneous coordinates (x, y, w) can be transformed to the Cartesian point with coordinates (x/w, y/w).
 
@@ -1026,7 +1026,7 @@ Figure 45.  Figure Formed from Intercept Overlaps Between A and B
 
 Once the vertices are determined, they must be sorted into clockwise order for the area to be computed.  Given a closed, planar polygon of n sequential vertices (x<sub>1</sub>, y<sub>1</sub>), (x<sub>2</sub>, y<sub>2</sub>) …, (x<sub>n</sub>, y<sub>n</sub>), its **area** is given:
 
-<div>\[Area = {\textstyle{1 \over 2}}\sum\limits_{i = 1}^n {({x_i}{y_{i + 1}} - {x_{i + 1}}{y_i})} \]</div>
+<div>$$Area = {\textstyle{1 \over 2}}\sum\limits_{i = 1}^n {({x_i}{y_{i + 1}} - {x_{i + 1}}{y_i})} $$</div>
 
 where (x<sub>n+1</sub>,y<sub>n+1</sub>)= (x<sub>1</sub>, y<sub>1</sub>)
 
@@ -1080,7 +1080,7 @@ When the SutherlandHodgman option is selected, the overlap is computed using the
 
 The total solar gain on any exterior surface is a combination of the absorption of direct and diffuse solar radiation given by
 
-<div>\[{Q_{so}} = \alpha \cdot \left( {{I_b}\cdot \cos \theta \cdot \frac{{{S_s}}}{S} + {I_s}\cdot {F_{ss}} + {I_g}\cdot {F_{sg}}} \right)\]</div>
+<div>$${Q_{so}} = \alpha \cdot \left( {{I_b}\cdot \cos \theta \cdot \frac{{{S_s}}}{S} + {I_s}\cdot {F_{ss}} + {I_g}\cdot {F_{sg}}} \right)$$</div>
 
 where
 
@@ -1104,11 +1104,11 @@ F<sub>sg</sub> = angle factor between the surface and the ground
 
 For the surface of a building located on a featureless plain
 
-<div>\[{F_{ss}} = \frac{{1 + \cos \phi }}{2}\]</div>
+<div>$${F_{ss}} = \frac{{1 + \cos \phi }}{2}$$</div>
 
 and
 
-<div>\[{F_{sg}} = \frac{{1 - \cos \phi }}{2}\]</div>
+<div>$${F_{sg}} = \frac{{1 - \cos \phi }}{2}$$</div>
 
 If the surface is shaded the program modifies *F<sub>ss</sub>*by a correction factor that takes into account the radiance distribution of the sky (see “Shadowing of Sky Diffuse Solar Radiation”).
 
@@ -1164,9 +1164,9 @@ This new treatment of diffuse solar is intended to more accurately account for t
 
 The short-wave radiation absorbed on the inside face of an opaque surface (floor, wall or ceiling) is given by
 
-<div>\[
+<div>$$
   QRadSWInAbs(SurfNum) = QS(ZoneNum)*AbsIntSurf(SurfNum) + AISurf(SurfNum)*BeamSolarRad [W/m2]
-\]</div>
+$$</div>
 
 where
 
@@ -1186,7 +1186,7 @@ where
 
 *QS* is assumed to be uniformly distributed throughout the zone. It is calculated as follows. Let *Q<sub>sw</sub>* be the total diffuse short-wave radiation entering the zone or originating in the zone. Since *Q<sub>sw</sub>* is ultimately absorbed or transmitted by zone heat transfer surfaces, summing over these surfaces gives the following energy balance equation:
 
-<div>\[\sum\limits_{i = 1}^{{N_{surf}}} {QS(ZoneNum)*{\alpha_i}{A_i} = {Q_{SW}}(ZoneNum)} \]</div>
+<div>$$\sum\limits_{i = 1}^{{N_{surf}}} {QS(ZoneNum)*{\alpha_i}{A_i} = {Q_{SW}}(ZoneNum)} $$</div>
 
 where
 
@@ -1200,17 +1200,17 @@ where
 
 Solving this equation for *QS* gives:
 
-<div>\[QS(ZoneNum) = \frac{{{Q_{SW}}(ZoneNum)}}{{\sum\limits_{i = 1}^{{N_{surf}}} {AbsInsSur{f_i}{A_i}} }} = {Q_{SW}}(ZoneNum)*VMULT(ZoneNum)\]</div>
+<div>$$QS(ZoneNum) = \frac{{{Q_{SW}}(ZoneNum)}}{{\sum\limits_{i = 1}^{{N_{surf}}} {AbsInsSur{f_i}{A_i}} }} = {Q_{SW}}(ZoneNum)*VMULT(ZoneNum)$$</div>
 
 where
 
-<div>\[VMULT(ZoneNum) = \frac{1}{{\sum\limits_{i = 1}^{{N_{surf}}} {AbsIntSur{f_i}*{A_i}} }}{\rm{    [}}{{\rm{m}}^{{\rm{ - 2}}}}]\]</div>
+<div>$$VMULT(ZoneNum) = \frac{1}{{\sum\limits_{i = 1}^{{N_{surf}}} {AbsIntSur{f_i}*{A_i}} }}{\rm{    [}}{{\rm{m}}^{{\rm{ - 2}}}}]$$</div>
 
 *Q<sub>sw</sub>* is given by
 
-<div>\[
+<div>$$
   Q{S_{SW}} = QD(ZoneNum) + ZoneIntGain(ZoneNum)\% QLTSW + ZoneIntGain(ZoneNum)\% T\_QLTSW [W]
-\]</div>
+$$</div>
 
 where
 
@@ -1222,7 +1222,7 @@ where
 
 *QD(ZoneNum)* is given by:
 
-<div>\[QD(ZoneNum) = DBZone(ZoneNum)*BeamSolarRad + InitialDifSolDistReflectedW(ZoneNum)\]</div>
+<div>$$QD(ZoneNum) = DBZone(ZoneNum)*BeamSolarRad + InitialDifSolDistReflectedW(ZoneNum)$$</div>
 
 where
 
@@ -1234,7 +1234,7 @@ where
 
 *DBZone(ZoneNum)* is calculated as:
 
-<div>\[DBZone(ZoneNum) = BTOTZone - BABSZone{\rm{    [}}{{\rm{m}}^{\rm{2}}}]\]</div>
+<div>$$DBZone(ZoneNum) = BTOTZone - BABSZone{\rm{    [}}{{\rm{m}}^{\rm{2}}}]$$</div>
 
 where
 
@@ -1244,7 +1244,7 @@ where
 
 *BTOTZone* is given by:
 
-<div>\[BTOTZone = \sum\limits_{i = 1}^{{N_{extwin}}} {TBmAl{l_i}*SunlitFrac{t_i}*CosIn{c_i}*Are{a_i}*InOutprojSLFracMul{t_i}} \]</div>
+<div>$$BTOTZone = \sum\limits_{i = 1}^{{N_{extwin}}} {TBmAl{l_i}*SunlitFrac{t_i}*CosIn{c_i}*Are{a_i}*InOutprojSLFracMul{t_i}} $$</div>
 
 *+ Diffuse entering zone from beam reflected by window inside reveal surfaces[**[2]**](#_ftn2)*
 
@@ -1282,13 +1282,13 @@ Figure 49. Vertical section through a two-zone building showing where transmitte
 
 If zone *ZoneNum* shares interior windows with other zones, *QS(ZoneNum)* is modified to take into account short-wave radiation received from the other zones through these windows:
 
-<div>\[
+<div>$$
   \begin{array}{rl}
    QS(ZoneNum) &= QS(ZoneNum) \\
                &+ \sum_{otherZones}\text{FractDifShortZtoZ(OtherZoneNum,ZoneNum)} \\
                &* [QD(OtherZoneNum) + ZoneIntGain(OtherZoneNum)\% QLTSW + ZoneIntGain(OtherZoneNum)\% T\_QLTSW]
   \end{array}
-\]</div>
+$$</div>
 
 where
 
@@ -1338,7 +1338,7 @@ Note that as of Version 2.1, the initially distributed diffuse solar absorbed by
 
 The interior diffuse short-wave radiation transmitted by an interior window to the adjacent zone is given by
 
-<div>\[QS(ZoneNum)*{\tau ^{dif}}(SurfNum)*A(SurfNum){\rm{    [W]}}\]</div>
+<div>$$QS(ZoneNum)*{\tau ^{dif}}(SurfNum)*A(SurfNum){\rm{    [W]}}$$</div>
 
 where
 
@@ -1348,17 +1348,17 @@ where
 
 The interior beam solar radiation transmitted by an interior window to the adjacent zone is
 
-<div>\[BeamSolarRad*{\tau ^{beam}}(SurfNum)\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}{\rm{    [W}}]} \]</div>
+<div>$$BeamSolarRad*{\tau ^{beam}}(SurfNum)\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}{\rm{    [W}}]} $$</div>
 
 where <span>${\tau ^{beam}}(SurfNum)$</span>is the beam-to-beam transmittance of the interior window at the angle of incidence of beam solar from the exterior window on the interior window. The program does not track where this radiation falls in the adjacent zone: it is counted as diffuse radiation in that zone. Therefore,
 
-<div>\[QS(ZoneNum) \to QS(ZoneNum) + [{\rm{beam solar from adjacent zones]}}*VMULT(ZoneNum)\]</div>
+<div>$$QS(ZoneNum) \to QS(ZoneNum) + [{\rm{beam solar from adjacent zones]}}*VMULT(ZoneNum)$$</div>
 
 ### Ground Reflectances
 
 Ground reflectance values (Ref Object: Site:GroundReflectance) are used to calculate the ground reflected solar amount.  This fractional amount (entered monthly) is used in the following equation:
 
-<div>\[{\rm{GroundReflectedSolar = (BeamSolar}} \bullet {\rm{COS(SunZenithAngle) + DiffuseSolar)}} \bullet {\rm{GroundReflectance}}\]</div>
+<div>$${\rm{GroundReflectedSolar = (BeamSolar}} \bullet {\rm{COS(SunZenithAngle) + DiffuseSolar)}} \bullet {\rm{GroundReflectance}}$$</div>
 
 Of course, the Ground Reflected Solar is never allowed to be negative.  The Snow Ground Reflectance Modifier can further modify the ground reflectance when snow is on the ground.  If the user enters 0.0 for each month, no ground reflected solar is used.
 
@@ -1368,11 +1368,11 @@ When snow is on the ground, ground reflectances may change.  (Ref Object: Site:
 
 Ground Reflected Solar Modifier is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values). Values can range from 0.0 to 1.0.
 
-<div>\[{\rm{GroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet SolarModifie{r_{Snow}}\]</div>
+<div>$${\rm{GroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet SolarModifie{r_{Snow}}$$</div>
 
 Daylighting Ground Reflected Solar Modifier is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values). Values can range from 0.0 to 1.0.
 
-<div>\[{\rm{DaylightingGroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet DaylightingModifie{r_{Snow}}\]</div>
+<div>$${\rm{DaylightingGroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet DaylightingModifie{r_{Snow}}$$</div>
 
 ### References
 

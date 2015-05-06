@@ -36,7 +36,7 @@ A ray-tracing method is used to calculate beam solar and sky solar radiation tha
 
 An *N*-sided surface is assigned *N* receiving points with the following coordinates, expressed in terms of the surface vertex coordinates:
 
-<div>\[{P_{ij}} = \sum\limits_{k = 1}^N {{a_{ki}}{v_{kj}},{\rm{  }}i = 1,3;{\rm{  }}j = 1,3} \]</div>
+<div>$${P_{ij}} = \sum\limits_{k = 1}^N {{a_{ki}}{v_{kj}},{\rm{  }}i = 1,3;{\rm{  }}j = 1,3} $$</div>
 
 where
 
@@ -86,7 +86,7 @@ Figure 54.  Two-dimensional schematic showing rays going outward from a point o
 
 The factor for reflection of sky radiation from obstructions onto a receiving surface is calculated in subroutine CalcSkySolDiffuseReflFactors. It is given by:
 
-<div>\[\begin{array}{l}{\rm{ReflFacSkySolObs(RecSurfNum)}} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}ViewFacSk{y_{obs,i}}DifShdgRatioIsoSk{y_{obs,i}}{\rho_{obs,i}}\cos {\alpha_i}/\pi } } \end{array}\]</div>
+<div>$$\begin{array}{l}{\rm{ReflFacSkySolObs(RecSurfNum)}} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}ViewFacSk{y_{obs,i}}DifShdgRatioIsoSk{y_{obs,i}}{\rho_{obs,i}}\cos {\alpha_i}/\pi } } \end{array}$$</div>
 
 where
 
@@ -125,7 +125,7 @@ Figure 55.  Two-dimensional schematic showing rays going upward from a ground h
 
 The factor for reflection of sky radiation from the ground onto a receiving surface is calculated in subroutine CalcSkySolDiffuseReflFactors. It is given by:
 
-<div>\[\begin{array}{l}{\rm{ReflFacSkySolGnd(RecSurfNum)}} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {\left[ {(Hi{t_{gnd,i}}d{\Omega_i}\cos {\alpha_i}/\pi )\sum\limits_{j(i)}^{{N_{ray}}} {Hi{t_{sky,j(i)}}\cos {\alpha_{j(i)}}d{\Omega_{j(i)}}/\pi } } \right]} } \end{array}\]</div>
+<div>$$\begin{array}{l}{\rm{ReflFacSkySolGnd(RecSurfNum)}} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {\left[ {(Hi{t_{gnd,i}}d{\Omega_i}\cos {\alpha_i}/\pi )\sum\limits_{j(i)}^{{N_{ray}}} {Hi{t_{sky,j(i)}}\cos {\alpha_{j(i)}}d{\Omega_{j(i)}}/\pi } } \right]} } \end{array}$$</div>
 
 
 
@@ -154,7 +154,7 @@ The calculation is done for the hourly sun positions on each of the design days.
 
 The factor for diffuse reflection of beam solar radiation from obstructions onto a receiving surface is calculated in subroutine CalcBeamSolDiffuseReflFactors. It is given by:
 
-<div>\[{\rm{ReflFacBmToDiffSolObs(RecSurfNum,IHr)}} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}Hi{t_{obs,i,sun}}d{\Omega_i}\cos {\alpha_i}{\rho_{obs,i}}\cos {\alpha_{sun,obs,i}}} } \]</div>
+<div>$${\rm{ReflFacBmToDiffSolObs(RecSurfNum,IHr)}} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}Hi{t_{obs,i,sun}}d{\Omega_i}\cos {\alpha_i}{\rho_{obs,i}}\cos {\alpha_{sun,obs,i}}} } $$</div>
 
 where
 
@@ -179,7 +179,7 @@ where *BeamSolarRad* is the timestep value of beam normal solar intensity (W/m2)
 
 This calculation is the same as that for beam solar diffusely reflected from obstructions except that only rays from a receiving point that hit the ground are considered. The factor for diffuse reflection of beam solar from the ground onto a receiving surface is calculated in subroutine CalcBeamSolDiffuseReflFactors. It is given by:
 
-<div>\[{\rm{ReflFacBmToDiffSolGnd(RecSurfNum,IHr)}} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{gnd,i}}Hi{t_{gnd,i,sun}}d{\Omega_i}\cos {\alpha_{gnd,i}}\cos {\alpha_{sun,gnd}}} } \]</div>
+<div>$${\rm{ReflFacBmToDiffSolGnd(RecSurfNum,IHr)}} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{gnd,i}}Hi{t_{gnd,i,sun}}d{\Omega_i}\cos {\alpha_{gnd,i}}\cos {\alpha_{sun,gnd}}} } $$</div>
 
 where
 
@@ -221,7 +221,7 @@ The calculation procedure is as follows:
 
 7.    If no, find reflected beam irradiance (W/m<sup>2</sup>) at D:
 
-<div>\[I_{D,refl}^{bm} = BeamSolarRad*{\rho_{spec}}({\alpha_C})\cos {\alpha_D}\]</div>
+<div>$$I_{D,refl}^{bm} = BeamSolarRad*{\rho_{spec}}({\alpha_C})\cos {\alpha_D}$$</div>
 
 where
 
@@ -233,7 +233,7 @@ where
 
 The factor for specular reflection of beam solar from obstruction onto a receiving surface is calculated in subroutine CalcBeamSolSpecularReflFactors. It is given by:
 
-<div>\[{\rm{ReflFacBmToBmSolObs(RecSurfNum,IHr) }} = \sum\limits_{\scriptstyle specularly\atop{\scriptstyle reflecting\atop\scriptstyle surfaces}} {} \left[ {\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {{f_{C,glazed}}{\rho_{spec}}({\alpha_C})\cos {\alpha_D}} } \right]\]</div>
+<div>$${\rm{ReflFacBmToBmSolObs(RecSurfNum,IHr) }} = \sum\limits_{\scriptstyle specularly\atop{\scriptstyle reflecting\atop\scriptstyle surfaces}} {} \left[ {\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {{f_{C,glazed}}{\rho_{spec}}({\alpha_C})\cos {\alpha_D}} } \right]$$</div>
 
 The program assumes that specular reflection from a surface is due to glazing. If the reflecting surface is a window belonging to the building itself (as in Figure 51), then <span>${f_{C,glazed}}$</span>is the fraction of the window that is glazed (which is 1.0 unless the window has dividers).
 
