@@ -1086,6 +1086,9 @@ namespace WaterToAirHeatPumpSimple {
 								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
 							}
 						}
+						// supply air condition is capped with that of mixed air to avoid SHR > 1.0
+						SupTemp = min( MixTemp, SupTemp );
+						SupHumRat = min( MixHumRat, SupHumRat );
 						OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
@@ -1100,13 +1103,7 @@ namespace WaterToAirHeatPumpSimple {
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
 						TotCapTempModFac = TotalCapCoeff1 + ( ratioTWB * TotalCapCoeff2 ) + ( ratioTS * TotalCapCoeff3 ) + ( 1.0 * TotalCapCoeff4 ) + ( 1.0 * TotalCapCoeff5 );
-						//       The mixed air temp for zone equipment without an OA mixer is 0.
-						//       This test avoids a negative capacity until a solution can be found.
-						if ( MixEnth > SupEnth ) {
-							CoolCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
-						} else {
-							CoolCapAtPeak = rhoair * VolFlowRate * ( 48000.0 - SupEnth );
-						}
+						CoolCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
 						CoolCapAtPeak = max( 0.0, CoolCapAtPeak );
 						if ( TotCapTempModFac > 0.0 ) {
 							RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
@@ -1131,21 +1128,19 @@ namespace WaterToAirHeatPumpSimple {
 							if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
 								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
 								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-								// if the Zone Cooling Design Supply Air Humidity Ratio  (CoolDesHumRat) exceeds the DesCoolCoilInHumRat reset the CoolDesHumRat to DesCoolCoilInHumRat
-								FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat );
 							} else {
 								MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
 								MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
-								FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak  );
 							}
 						} else {
 							MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
 							MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-							// if the Zone Cooling Design Supply Air Humidity Ratio  (CoolDesHumRat) exceeds the DesCoolCoilInHumRat reset the CoolDesHumRat to DesCoolCoilInHumRat
-							FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat );
 						}
 						SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
 						SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
+						// supply air condition is capped with that of mixed air to avoid SHR > 1.0
+						SupTemp = min( MixTemp, SupTemp );
+						SupHumRat = min( MixHumRat, SupHumRat );
 						TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
 						DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
 						if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
@@ -1166,13 +1161,7 @@ namespace WaterToAirHeatPumpSimple {
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
 						TotCapTempModFac = TotalCapCoeff1 + ( ratioTWB * TotalCapCoeff2 ) + ( ratioTS * TotalCapCoeff3 ) + ( 1.0 * TotalCapCoeff4 ) + ( 1.0 * TotalCapCoeff5 );
-						//       The mixed air temp for zone equipment without an OA mixer is 0.
-						//       This test avoids a negative capacity until a solution can be found.
-						if ( MixEnth > SupEnth ) {
-							CoolCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
-						} else {
-							CoolCapAtPeak = rhoair * VolFlowRate * ( 48000.0 - SupEnth );
-						}
+						CoolCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
 						CoolCapAtPeak = max( 0.0, CoolCapAtPeak );
 						if ( TotCapTempModFac > 0.0 ) {
 							RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
@@ -1187,41 +1176,6 @@ namespace WaterToAirHeatPumpSimple {
 					RatedCapCoolTotalDes = 0.0;
 				}
 			}
-			if ( ! HardSizeNoDesRun ) {
-				if ( RatedCapCoolTotalAutoSized ) {
-					SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal = RatedCapCoolTotalDes;
-					ReportSizingOutput( "COIL:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", SimpleWatertoAirHP( HPNum ).Name, "Design Size Rated Total Cooling Capacity [W]", RatedCapCoolTotalDes );
-					PreDefTableEntry( pdchCoolCoilTotCap, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
-					PreDefTableEntry( pdchCoolCoilLatCap, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal - SimpleWatertoAirHP( HPNum ).RatedCapCoolSens );
-					if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal != 0.0 ) {
-						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedCapCoolSens / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
-						PreDefTableEntry( pdchCoolCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedPowerCool / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
-					} else {
-						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, 0.0 );
-						PreDefTableEntry( pdchCoolCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, 0.0 );
-					}
-				} else { // Hardsized with sizing data
-					if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0 && ! HardSizeNoDesRun ) {
-						RatedCapCoolTotalUser = SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal;
-						ReportSizingOutput( "COIL:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", SimpleWatertoAirHP( HPNum ).Name, "Design Size Rated Total Cooling Capacity [W]", RatedCapCoolTotalDes, "User-Specified Rated Total Cooling Capacity [W]", RatedCapCoolTotalUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( RatedCapCoolTotalDes - RatedCapCoolTotalUser ) / RatedCapCoolTotalUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + SimpleWatertoAirHP( HPNum ).Name + "\"" );
-								ShowContinueError( "User-Specified Rated Total Cooling Capacity of " + RoundSigDigits( RatedCapCoolTotalUser, 2 ) + " [W]" );
-								ShowContinueError( "differs from Design Size Rated Total Cooling Capacity of " + RoundSigDigits( RatedCapCoolTotalDes, 2 ) + " [W]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-					}
-				}
-			}
-
-			// Set the global DX cooling coil capacity variable for use by other objects
-			if ( SimpleWatertoAirHP( HPNum ).WatertoAirHPType == "COOLING" ) {
-				DXCoolCap = SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal;
-			}
-
 			// size rated sensible cooling capacity
 			if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolSens == AutoSize && SimpleWatertoAirHP( HPNum ).WatertoAirHPType == "COOLING" ) {
 				RatedCapCoolSensAutoSized = true;
@@ -1259,11 +1213,14 @@ namespace WaterToAirHeatPumpSimple {
 								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
 							}
 						}
+						// supply air condition is capped with that of mixed air to avoid SHR > 1.0
+						SupTemp = min( MixTemp, SupTemp );
+						SupHumRat = min( MixHumRat, SupHumRat );
 						OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+						SupEnth = PsyHFnTdbW( SupTemp, MixHumRat );
 						SensCapCoeff1 = SimpleWatertoAirHP( HPNum ).SensCoolCap1;
 						SensCapCoeff2 = SimpleWatertoAirHP( HPNum ).SensCoolCap2;
 						SensCapCoeff3 = SimpleWatertoAirHP( HPNum ).SensCoolCap3;
@@ -1274,15 +1231,8 @@ namespace WaterToAirHeatPumpSimple {
 						ratioTWB = ( MixWetBulb + 273.15 ) / 283.15;
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
-						CpAir = PsyCpAirFnWTdb( SupHumRat, SupTemp );
 						SensCapTempModFac = SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( 1.0 * SensCapCoeff5 ) + ( 1.0 * SensCapCoeff6 );
-						//       The mixed air temp for zone equipment without an OA mixer is 0.
-						//       This test avoids a negative capacity until a solution can be found.
-						if ( MixTemp > SupTemp ) {
-							SensCapAtPeak = rhoair * VolFlowRate * CpAir * ( MixTemp - SupTemp );
-						} else {
-							SensCapAtPeak = rhoair * VolFlowRate * CpAir * ( 24.0 - SupTemp );
-						}
+						SensCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
 						SensCapAtPeak = max( 0.0, SensCapAtPeak );
 						RatedCapCoolSensDes = SensCapAtPeak / SensCapTempModFac;
 					} else {
@@ -1303,21 +1253,19 @@ namespace WaterToAirHeatPumpSimple {
 							if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
 								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
 								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-								// if the Zone Cooling Design Supply Air Humidity Ratio  (CoolDesHumRat) exceeds the DesCoolCoilInHumRat reset the CoolDesHumRat to DesCoolCoilInHumRat
-								FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat );
 							} else {
 								MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
 								MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
-								FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak );
 							}
 						} else {
 							MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
 							MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-							// if the Zone Cooling Design Supply Air Humidity Ratio  (CoolDesHumRat) exceeds the DesCoolCoilInHumRat reset the CoolDesHumRat to DesCoolCoilInHumRat
-							FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = min( FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat );
 						}
 						SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
 						SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
+						// supply air condition is capped with that of mixed air to avoid SHR > 1.0
+						SupTemp = min( MixTemp, SupTemp );
+						SupHumRat = min( MixHumRat, SupHumRat );
 						TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
 						DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
 						if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
@@ -1328,7 +1276,7 @@ namespace WaterToAirHeatPumpSimple {
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+						SupEnth = PsyHFnTdbW( SupTemp, MixHumRat );
 						SensCapCoeff1 = SimpleWatertoAirHP( HPNum ).SensCoolCap1;
 						SensCapCoeff2 = SimpleWatertoAirHP( HPNum ).SensCoolCap2;
 						SensCapCoeff3 = SimpleWatertoAirHP( HPNum ).SensCoolCap3;
@@ -1339,15 +1287,8 @@ namespace WaterToAirHeatPumpSimple {
 						ratioTWB = ( MixWetBulb + 273.15 ) / 283.15;
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
-						CpAir = PsyCpAirFnWTdb( SupHumRat, SupTemp );
 						SensCapTempModFac = SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( 1.0 * SensCapCoeff5 ) + ( 1.0 * SensCapCoeff6 );
-						//       The mixed air temp for zone equipment without an OA mixer is 0.
-						//       This test avoids a negative capacity until a solution can be found.
-						if ( MixTemp > SupTemp ) {
-							SensCapAtPeak = rhoair * VolFlowRate * CpAir * ( MixTemp - SupTemp );
-						} else {
-							SensCapAtPeak = rhoair * VolFlowRate * CpAir * ( 24.0 - SupTemp );
-						}
+						SensCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
 						SensCapAtPeak = max( 0.0, SensCapAtPeak );
 						if ( SensCapTempModFac > 0.0 ) {
 							RatedCapCoolSensDes = SensCapAtPeak / SensCapTempModFac;
@@ -1361,6 +1302,40 @@ namespace WaterToAirHeatPumpSimple {
 			}
 			if ( RatedCapCoolSensDes < SmallLoad ) {
 				RatedCapCoolSensDes = 0.0;
+			}
+			if ( RatedCapCoolTotalAutoSized && RatedCapCoolSensAutoSized ) {
+				if ( RatedCapCoolSensDes > RatedCapCoolTotalDes ) {
+					RatedCapCoolTotalDes = RatedCapCoolSensDes;
+				}
+			}
+			if ( !HardSizeNoDesRun ) {
+				if ( RatedCapCoolTotalAutoSized ) {
+					SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal = RatedCapCoolTotalDes;
+					ReportSizingOutput( "COIL:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", SimpleWatertoAirHP( HPNum ).Name, "Design Size Rated Total Cooling Capacity [W]", RatedCapCoolTotalDes );
+					PreDefTableEntry( pdchCoolCoilTotCap, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
+					PreDefTableEntry( pdchCoolCoilLatCap, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal - SimpleWatertoAirHP( HPNum ).RatedCapCoolSens );
+					if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal != 0.0 ) {
+						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedCapCoolSens / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
+						PreDefTableEntry( pdchCoolCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedPowerCool / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
+					} else {
+						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, 0.0 );
+						PreDefTableEntry( pdchCoolCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, 0.0 );
+					}
+				} else { // Hardsized with sizing data
+					if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0 && !HardSizeNoDesRun ) {
+						RatedCapCoolTotalUser = SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal;
+						ReportSizingOutput( "COIL:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", SimpleWatertoAirHP( HPNum ).Name, "Design Size Rated Total Cooling Capacity [W]", RatedCapCoolTotalDes, "User-Specified Rated Total Cooling Capacity [W]", RatedCapCoolTotalUser );
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( RatedCapCoolTotalDes - RatedCapCoolTotalUser ) / RatedCapCoolTotalUser ) > AutoVsHardSizingThreshold ) {
+								ShowMessage( "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + SimpleWatertoAirHP( HPNum ).Name + "\"" );
+								ShowContinueError( "User-Specified Rated Total Cooling Capacity of " + RoundSigDigits( RatedCapCoolTotalUser, 2 ) + " [W]" );
+								ShowContinueError( "differs from Design Size Rated Total Cooling Capacity of " + RoundSigDigits( RatedCapCoolTotalDes, 2 ) + " [W]" );
+								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+							}
+						}
+					}
+				}
 			}
 			if ( ! HardSizeNoDesRun ) {
 				if ( RatedCapCoolSensAutoSized ) {
@@ -1389,7 +1364,10 @@ namespace WaterToAirHeatPumpSimple {
 					}
 				}
 			}
-
+			// Set the global DX cooling coil capacity variable for use by other objects
+			if ( SimpleWatertoAirHP( HPNum ).WatertoAirHPType == "COOLING" ) {
+				DXCoolCap = SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal;
+			}
 			// test autosized sensible and total cooling capacity for total > sensible
 			if ( (RatedCapCoolSensAutoSized && RatedCapCoolTotalAutoSized) || RatedCapCoolSensAutoSized ) {
 				if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolSens > SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal ) {
