@@ -1589,8 +1589,8 @@ An actuator called “AirFlow Network Window/Door Opening” is available with a
 
 The unique identifier is the name of the window or door, not the name of the associated airflow network input objects. The actuator control involves setting the value of the opening factor between 0.0 and 1.0.
 
-Internal Gains
---------------
+Internal Gains and Exterior Lights
+----------------------------------
 
 ### People
 
@@ -1625,6 +1625,10 @@ Other equipment offers a way to adjust the zone air energy balance without consu
 ### Baseboard
 
 An actuator called “ZoneBaseboard:OutdoorTemperatureControlled” is available with a control type called “Power Level” (in W). The unique identifier is the name of the ZoneBaseboard:OutdoorTemperatureControlled input object.
+
+### Exterior Lights
+
+An actuator called "ExteriorLights" is available with a control type called "Electric Power" (in W). The unique identifier is the name of the Exterior:Lights input object.
 
 On-Site Electricity Production
 ------------------------------

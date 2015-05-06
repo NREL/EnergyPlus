@@ -1756,12 +1756,12 @@ An example follows.
        0.05,                                       !- Cover Spacing {m}
        1.526,                                     !- Refractive Index of Outer Cover {dimensionless}
        0.0125,           !- Extinction Coefficient Times Thickness of Outer Cover {dimensionless}
-       0.88,                                       !- Emmissivity of Outer Cover
+       0.88,                                       !- Emissivity of Outer Cover
        1.126,                                     !- Refractive Index of Inner Cover {dimensionless}
        0.0126,           !- Extinction Coefficient Times Thickness of Inner Cover {dimensionless}
-       0.88,                                       !- Emmissivity of Inner Cover {dimensionless}
+       0.88,                                       !- Emissivity of Inner Cover {dimensionless}
        0.96,                                       !- Absorptance of Absorber Plate {dimensionless}
-       0.60;                                       !- Emmissivity of Absorber Plate {dimensionless}
+       0.60;                                       !- Emissivity of Absorber Plate {dimensionless}
 ```
 
 
@@ -2410,7 +2410,7 @@ The part of mass flow rate of natural ventilation air exchange between the plenu
 
 #### Solar Collector Buoyancy Natural Ventilation Mass Flow Rate [kg/s]
 
-The part of mass flow rate of natural ventilation air exchange between the plenum and ambient when the collector is inactive due to bouyancy-driven forces.
+The part of mass flow rate of natural ventilation air exchange between the plenum and ambient when the collector is inactive due to buoyancy-driven forces.
 
 #### Solar Collector Incident Solar Radiation [W/m2]
 
@@ -7975,48 +7975,48 @@ Following is an example input for this compound object:
 ```idf
 CoilSystem:Cooling:DX:HeatExchangerAssisted,
        HeatExchangerAssistedCoolingCoil,               ! Name of the heat exchanger assisted cooling coil
-       HeatExchanger:AirToAir:SensibleAndLatent,             ! Heat exchanger type
-       Air to Air Heat Exchanger 1,                         ! Heat exchanger name
-       Coil:Cooling:DX:SingleSpeed,       ! Cooling coil type
-       DX Cooling Coil 1;                                             ! Cooling coil name
+       HeatExchanger:AirToAir:SensibleAndLatent,       ! Heat exchanger type
+       Air to Air Heat Exchanger 1,                    ! Heat exchanger name
+       Coil:Cooling:DX:SingleSpeed,                    ! Cooling coil type
+       DX Cooling Coil 1;                              ! Cooling coil name
 
 
    HeatExchanger:AirToAir:SensibleAndLatent,
-       Air to Air Heat Exchanger 1,             !- Heat exchanger name
-       FanAndCoilAvailSched,                           !- Availability schedule name
-       1.3,                                                             !- Nominal supply air flow rate {m3/s}
-       .2,                                                               !- Sensible effectiveness at 100% airflow heating condition
-       .0,                                                               !- Latent effectiveness at 100% airflow heating condition
-       .23,                                                             !- Sensible effectiveness at 75% airflow heating condition
-       .0,                                                               !- Latent effectiveness at 75% airflow heating condition
-       .2,                                                               !- Sensible effectiveness at 100% airflow cooling condition
-       .0,                                                               !- Latent effectiveness at 100% airflow cooling condition
-       .23,                                                             !- Sensible effectiveness at 75% airflow cooling condition
-       .0,                                                               !- Latent effectiveness at 75% airflow cooling condition
-       HeatExchangerSupplyAirInletNode,     !- Supply air inlet node name
-       DX Cooling Coil Air Inlet Node,       !- Supply air outlet node name
+       Air to Air Heat Exchanger 1,        !- Heat exchanger name
+       FanAndCoilAvailSched,               !- Availability schedule name
+       1.3,                                !- Nominal supply air flow rate {m3/s}
+       .2,                                 !- Sensible effectiveness at 100% airflow heating condition
+       .0,                                 !- Latent effectiveness at 100% airflow heating condition
+       .23,                                !- Sensible effectiveness at 75% airflow heating condition
+       .0,                                 !- Latent effectiveness at 75% airflow heating condition
+       .2,                                 !- Sensible effectiveness at 100% airflow cooling condition
+       .0,                                 !- Latent effectiveness at 100% airflow cooling condition
+       .23,                                !- Sensible effectiveness at 75% airflow cooling condition
+       .0,                                 !- Latent effectiveness at 75% airflow cooling condition
+       HeatExchangerSupplyAirInletNode,    !- Supply air inlet node name
+       DX Cooling Coil Air Inlet Node,     !- Supply air outlet node name
        HeatExchangerExhaustAirInletNode,   !- Exhaust air inlet node name
-       HeatExchangerExhaustAirOutletNode, !- Exhaust air outlet node name
-       50.0,                                                           !- Nominal electric power {W}
-       No,                                                               !- Supply air outlet temperature control
-       Rotary,                                                       !- Heat exchanger type
-       None;                                                           !- Frost control type
+       HeatExchangerExhaustAirOutletNode,  !- Exhaust air outlet node name
+       50.0,                               !- Nominal electric power {W}
+       No,                                 !- Supply air outlet temperature control
+       Rotary,                             !- Heat exchanger type
+       None;                               !- Frost control type
 
 
    Coil:Cooling:DX:SingleSpeed,
-       DX Cooling Coil 1,                               !- Coil Name
-       FanAndCoilAvailSched,                         !- Availability Schedule
-       25000,                                                       !- Gross Rated Total Cooling Capacity {W}
-       0.75,                                                         !- Gross Rated Sensible Heat Ratio
-       3.0,                                                           !- Gross Rated Cooling COP
-       1.3,                                                           !- Rated Air Flow Rate {m3/s}
+       DX Cooling Coil 1,                  !- Coil Name
+       FanAndCoilAvailSched,               !- Availability Schedule
+       25000,                              !- Gross Rated Total Cooling Capacity {W}
+       0.75,                               !- Gross Rated Sensible Heat Ratio
+       3.0,                                !- Gross Rated Cooling COP
+       1.3,                                !- Rated Air Flow Rate {m3/s}
        DX Cooling Coil Air Inlet Node,     !- Coil Air Inlet Node
-       HeatExchangerExhaustAirInletNode, !- Coil Air Outlet Node
-       ACCoolCapFT,                   !- Total Cooling Capacity Modifier Curve (function of temperature)
+       HeatExchangerExhaustAirInletNode,   !- Coil Air Outlet Node
+       ACCoolCapFT,                  !- Total Cooling Capacity Modifier Curve (function of temperature)
        ACCoolCapFFF,                 !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-       ACEIRFT,                           !- Energy Input Ratio Modifier Curve (function of temperature)
-       ACEIRFFF,                         !- Energy Input Ratio Modifier Curve (function of flow fraction)
-       ACPLFFPLR;                       !- Part Load Fraction Correlation (function of part load ratio)
+       ACEIRFT,                      !- Energy Input Ratio Modifier Curve (function of temperature)
+       ACEIRFFF,                     !- Energy Input Ratio Modifier Curve (function of flow fraction)
+       ACPLFFPLR;                    !- Part Load Fraction Correlation (function of part load ratio)
 ```
 
 
@@ -16456,29 +16456,29 @@ The **ModulateFlow** option can also be used with the HeatExchanger:AirToAir:Fla
 
 Input for this field is the outdoor air temperature high limit ( &deg;C) for economizer operation. If the outdoor air temperature is above this limit, the outdoor airflow rate will be set to the minimum. This field is required if Economizer Control Type    FixedDryBulb    or    FixedDewPointAndDryBulb    has been specified.
 
-No input (blank) in this field means that there is no outdoor air temperature high limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer.
+No input (blank) in this field means that there is no outdoor air temperature high limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Economizer Maximum Limit Enthalpy
 
 Input for this field is the outdoor air enthalpy limit (in J/kg) for economizer operation. If the outdoor air enthalpy is above this value, the outdoor airflow rate will be set to the minimum. This field is required if Economizer Control Type    FixedEnthalpy    has been specified.
 
-No input (blank) in this field means that there is no outdoor air enthalpy limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer.
+No input (blank) in this field means that there is no outdoor air enthalpy limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Economizer Maximum Limit Dewpoint Temperature
 
 Input for this field is the outdoor air dewpoint limit ( &deg;C) for economizer operation. If the outdoor air dewpoint temperature is above this value, the outdoor airflow rate will be set to the minimum. This field is required if the Economizer Control Type       FixedDewPointAndDryBulb    has been specified.
 
-No input (blank) in this field means that there is no outdoor air dewpoint limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer.
+No input (blank) in this field means that there is no outdoor air dewpoint limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Electronic Enthalpy Limit Curve Name
 
-Input for this field is the name of a quadratic or cubic curve which provides the maximum outdoor air humidity ratio (function of outdoor air dry-bulb temperature) for economizer operation. If the outdoor air humidity ratio is greater than the curve   s maximum humidity ratio (evaluated at the outdoor air dry-bulb temperature), the outdoor air flow rate will be set to the minimum. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. No input (blank) in this field means that there is no electronic enthalpy limit control.
+Input for this field is the name of a quadratic or cubic curve which provides the maximum outdoor air humidity ratio (function of outdoor air dry-bulb temperature) for economizer operation. If the outdoor air humidity ratio is greater than the curve   s maximum humidity ratio (evaluated at the outdoor air dry-bulb temperature), the outdoor air flow rate will be set to the minimum. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. No input (blank) in this field means that there is no electronic enthalpy limit control. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Economizer Minimum Limit Dry-Bulb Temperature
 
 Input for this field is the outdoor air temperature low limit ( &deg;C) for economizer operation. If the outdoor air temperature is below this limit, the outdoor airflow rate will be set to the minimum.
 
-No input (blank) in this field means that there is no outdoor air temperature low limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer.
+No input (blank) in this field means that there is no outdoor air temperature low limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Lockout Type
 
@@ -17671,17 +17671,17 @@ An IDF example:
 
 ```idf
    HeatExchanger:AirToAir:FlatPlate,
-       OA Heat Recovery 1,           !- Name
+       OA Heat Recovery 1,         !- Name
        FanAndCoilAvailSched,       !- Availability Schedule Name
-       CounterFlow,                         !- Flow Arrangement Type
-       Yes,                                         !- Economizer Lockout
-       1.0,                                         !- Ratio of Supply to Secondary hA Values
-       0.4333,                                   !- Nominal Supply Air Flow Rate {m3/s}
-       5.0,                                         !- Nominal Supply Air Inlet Temperature {C}
-       15.0,                                       !- Nominal Supply Air Outlet Temperature {C}
-       0.4333,                                   !- Nominal Secondary Air Flow Rate {m3/s}
-       20.0,                                       !- Nominal Secondary Air Inlet Temperature {C}
-       0.0,                                         !- Nominal Electric Power {W}
+       CounterFlow,                !- Flow Arrangement Type
+       Yes,                        !- Economizer Lockout
+       1.0,                        !- Ratio of Supply to Secondary hA Values
+       0.4333,                     !- Nominal Supply Air Flow Rate {m3/s}
+       5.0,                        !- Nominal Supply Air Inlet Temperature {C}
+       15.0,                       !- Nominal Supply Air Outlet Temperature {C}
+       0.4333,                     !- Nominal Secondary Air Flow Rate {m3/s}
+       20.0,                       !- Nominal Secondary Air Inlet Temperature {C}
+       0.0,                        !- Nominal Electric Power {W}
        Desiccant Process Outlet Node,   !- Supply Air Inlet Node Name
        Heat Recovery Outlet Node,   !- Supply Air Outlet Node Name
        Relief Air Outlet Node,   !- Secondary Air Inlet Node Name
@@ -18120,10 +18120,10 @@ Sensible + latent
     <td>-23.3&deg;C (-10&deg;F)</td>
   </tr>
 </table>
+
 Source: Indoor Humidity Assessment Tool, U.S. Environmental Protection Agency,[http://www.epa.gov/iaq/schooldesign/saves.html](http://www.epa.gov/iaq/schooldesign/saves.html)
 
-\*\* To model preheat frost control, specify frost control type as    None    and place a heating coil in the supply inlet air stream controlled to the keep the air temperature above the frost threshold temperature.
-
+\*\* To model preheat frost control, specify frost control type as None and place a heating coil in the supply inlet air stream controlled to the keep the air temperature above the frost threshold temperature.
 
 
 #### Field: Initial Defrost Time Fraction
@@ -18150,25 +18150,25 @@ Following is an example input for this heat exchanger object:
 
 ```idf
    HeatExchanger:AirToAir:SensibleAndLatent,
-       OA Heat Recovery 1,           !- Name
+       OA Heat Recovery 1,         !- Name
        FanAndCoilAvailSched,       !- Availability Schedule Name
-       0.4333,                                   !- Nominal Supply Air Flow Rate {m3/s}
-       .76,                                         !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
-       .68,                                         !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-       .81,                                         !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-       .73,                                         !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
-       .76,                                         !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
-       .68,                                         !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-       .81,                                         !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-       .73,                                         !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
+       0.4333,                     !- Nominal Supply Air Flow Rate {m3/s}
+       .76,                        !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
+       .68,                        !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
+       .81,                        !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
+       .73,                        !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
+       .76,                        !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
+       .68,                        !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
+       .81,                        !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
+       .73,                        !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
        Outside Air Inlet Node Preheated,   !- Supply Air Inlet Node Name
-       Heat Recovery Outlet Node,   !- Supply Air Outlet Node Name
-       Relief Air Outlet Node,   !- Exhaust Air Inlet Node Name
+       Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name
+       Relief Air Outlet Node,     !- Exhaust Air Inlet Node Name
        Heat Recovery Secondary Outlet Node,   !- Exhaust Air Outlet Node Name
-       200.0,                                     !- Nominal Electric Power {W}
-       No,                                           !- Supply Air Outlet Temperature Control
-       Plate,                                     !- Heat Exchanger Type
-       None;                                       !- Frost Control Type
+       200.0,                      !- Nominal Electric Power {W}
+       No,                         !- Supply Air Outlet Temperature Control
+       Plate,                      !- Heat Exchanger Type
+       None;                       !- Frost Control Type
 ```
 
 ### HeatExchanger:AirToAir:SensibleAndLatent Outputs
@@ -19468,7 +19468,7 @@ This field is used to identify the inverter connected to this load center (if an
 
 #### Field: Electrical Storage Object Name
 
-This field is used to identify the electrical storage connected to this load center (if any).   This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverterDCStorage or DirectCurrentWithInverterACStorage.   Enter the name of an ElectricLoadCenter:Storage:Simple object defined elsewhere in the input file.
+This field is used to identify the electrical storage connected to this load center (if any).   This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverterDCStorage or DirectCurrentWithInverterACStorage.   Enter the name of an ElectricLoadCenter:Storage:* object defined elsewhere in the input file.
 
 #### Field: Transformer Object Name
 
@@ -22117,7 +22117,7 @@ This field is used to describe the amount of fuel (kmol) used during the entire 
 
 This field is used to describe the amount of electricity (J) used by ancillary equipment during the entire shut down period.
 
-#### Field: Ancilliary Electricity Constant Term
+#### Field: Ancillary Electricity Constant Term
 
 This field is used to describe the constant term, <span>$an{c_0}$</span>, in a relation that describes the AC electrical power used by ancillary equipment located inside the power module, <span>${P_{el,ancillaries - AC}}$</span>. The model uses this relation,
 
@@ -22125,7 +22125,7 @@ This field is used to describe the constant term, <span>$an{c_0}$</span>, in a r
 
 where <span>${\dot N_{fuel}}$</span>  is the rate of fuel use in the power module (kmol/s).
 
-#### Field: Ancilliary Electricity Linear Term
+#### Field: Ancillary Electricity Linear Term
 
 This field is used to describe the linear term, <span>$an{c_1}$</span>, in the relation shown in the previous field.
 
@@ -22202,8 +22202,8 @@ Generator:FuelCell:PowerModule,
        0.0,                                         !- Shut Down Time {s}
        0.2,                                         !- Shut Down Fuel {kmol}
        ,                                               !- Shut Down Electricity Consumption {J}
-       0.0,                                         !- Ancilliary Electricity Constant Term
-       0.0,                                         !- Ancilliary Electricity Linear Term
+       0.0,                                         !- Ancillary Electricity Constant Term
+       0.0,                                         !- Ancillary Electricity Linear Term
        ConstantRate,                       !- Skin Loss Calculation Mode
        ZN_1_FLR_1_SEC_5,               !- Zone Name
        0.6392,                                   !- Skin Loss Radiative Fraction
@@ -22615,8 +22615,8 @@ An example input data file (IDF) entry for this object is provided below:
    Generator:FuelCell:AuxiliaryHeater,
        FCT SOFC Auxiliary Heater,   !- Name
        0.0,                                         !- Excess Air Ratio
-       0.0,                                         !- Ancilliary Power Constant Term
-       0.0,                                         !- Ancilliary Power Linear Term
+       0.0,                                         !- Ancillary Power Constant Term
+       0.0,                                         !- Ancillary Power Linear Term
        0.5,                                         !- Skin Loss U-Factor Times Area Value
        SurroundingZone,                 !- Skin Loss Destination
        ZN_1_FLR_1_SEC_5,               !- Zone Name to Receive Skin Losses
