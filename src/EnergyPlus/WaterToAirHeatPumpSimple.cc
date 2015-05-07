@@ -1232,7 +1232,7 @@ namespace WaterToAirHeatPumpSimple {
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
 						SensCapTempModFac = SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( 1.0 * SensCapCoeff5 ) + ( 1.0 * SensCapCoeff6 );
-						// Sensible capacity is calculated from enthlpy difference with constant humdity ratio, i.e., 
+						// Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e., 
 						// there is only temperature difference between entering and leaving air enthalpy. Previously
 						// it was calculated using m.cp.dT
 						SensCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
@@ -1291,7 +1291,7 @@ namespace WaterToAirHeatPumpSimple {
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
 						SensCapTempModFac = SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( 1.0 * SensCapCoeff5 ) + ( 1.0 * SensCapCoeff6 );
-						// Sensible capacity is calculated from enthlpy difference with constant humdity ratio, i.e., 
+						// Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e., 
 						// there is only temperature difference between entering and leaving air enthalpy. Previously
 						// it was calculated using m.cp.dT
 						SensCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
