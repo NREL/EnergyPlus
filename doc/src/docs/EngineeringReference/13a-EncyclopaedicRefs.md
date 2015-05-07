@@ -680,7 +680,7 @@ The recirculated cool air duct is actually optional. If no node name is input fo
 
 #### Model Description
 
-The model attempts to meet the ventilation requirements and the cooling loads of a particular zone.  If the zone requires heating, ancilliary heating equipment is needed as this terminal cannot do any heating.  The model first determines the current required outdoor air flow rate for ventilation and then calculates the flow of cool air needed to reach the cooling setpoint.
+The model attempts to meet the ventilation requirements and the cooling loads of a particular zone.  If the zone requires heating, ancillary heating equipment is needed as this terminal cannot do any heating.  The model first determines the current required outdoor air flow rate for ventilation and then calculates the flow of cool air needed to reach the cooling setpoint.
 
 The outdoor air rate is controlled by the schedule and specifications contained in a DesignSpecification:OutdoorAir object and can be based on flows per person, per zone, per area, or air changes per hour.  Using the key CurrentOccupancy, the per person rate can be set to operate based on the current occupancy level to model demand controlled ventilation. Using the key DesignOccupancy it can be set to operate based on the design, or maximum, level of occupancy.   The outdoor air inlet side of the terminal is assigned a design maximum flow rate based on the largest flow rates specified by the associated DesignSpecification:OutdoorAir object. This maximum for the outdoor air is used to calculate the damper position and contributes to the overall maximum if that is autosized.
 

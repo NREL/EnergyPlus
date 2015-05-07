@@ -3579,28 +3579,28 @@ An IDF example:
 
 ```idf
 EARTHTUBE,
-  Zone 2,           !- Zone Name
-  Simple EarthTube, !- Schedule Name
-  3.425198,         !- Design Volume Flow Rate
-  10.0,             !- Minimum Zone Temperature when Cooling
-  30.0,             !- Maximum Zone Temperature when Heating
-  1.0,              !- Delta Temperature
-  NATURAL,          !- EarthTube Type
-  350.0,            !- Fan Pressure Rise
-  0.9,              !- Fan Total Efficiency
-  0.25,             !- Pipe Radius
-  0.2,              !- Pipe Thickness
-  15.0,             !- Pipe Length
-  200.0,            !- Pipe Thermal Conductivity
-  3.5,              !- Pipe Depth Under Ground Surface
-  HeavyAndDamp,     !- Soil Condition
-  15.0,             !- Average Soil Surface Temperature
-  5.6,              !- Amplitude of Soil Surface Temperature
-  0.0,              !- Phase Constant of Soil Surface Temperature
-  0.6060000    ,    !- Constant Term Flow Coef
-  2.0199999E-02,    !- Temp Term Flow Coef
-  5.9800001E-04,    !- Velocity Term Flow Coef
-  0.0000000E+00;    !- Velocity**2 Term Flow Coef
+  Zone 2,           !- Zone Name
+  Simple EarthTube, !- Schedule Name
+  3.425198,         !- Design Volume Flow Rate
+  10.0,             !- Minimum Zone Temperature when Cooling
+  30.0,             !- Maximum Zone Temperature when Heating
+  1.0,              !- Delta Temperature
+  NATURAL,          !- EarthTube Type
+  350.0,            !- Fan Pressure Rise
+  0.9,              !- Fan Total Efficiency
+  0.25,             !- Pipe Radius
+  0.2,              !- Pipe Thickness
+  15.0,             !- Pipe Length
+  200.0,            !- Pipe Thermal Conductivity
+  3.5,              !- Pipe Depth Under Ground Surface
+  HeavyAndDamp,     !- Soil Condition
+  15.0,             !- Average Soil Surface Temperature
+  5.6,              !- Amplitude of Soil Surface Temperature
+  0.0,              !- Phase Constant of Soil Surface Temperature
+  0.6060000    ,    !- Constant Term Flow Coef
+  2.0199999E-02,    !- Temp Term Flow Coef
+  5.9800001E-04,    !- Velocity Term Flow Coef
+  0.0000000E+00;    !- Velocity**2 Term Flow Coef
 ```
 
 
