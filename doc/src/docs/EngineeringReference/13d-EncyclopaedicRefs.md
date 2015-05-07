@@ -1,3 +1,4 @@
+<!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
 
@@ -15,6 +16,7 @@ Main Sections:
 * [CentralHeatPumpSystem](#CentralHeatPumpSystem)
 * [ChillerHeater](#ChillerHeater)
 * [Plant Temperature Source Component](#PlantComponents)
+<!--RemoveEnd-->
 
 Zone Internal Gains <a name="ZoneGains"></a>
 -------------------
@@ -39,7 +41,7 @@ Metabolic rate, children = Metabolic rate, adult male X 0.75
 
 The original data was in I-P (Inch-Pound) units, but the following correlation is in SI (Systems-International) units.
 
-<div>\[\begin{array}{c}S = 6.461927 + .946892\cdot M + .0000255737\cdot {M^2}\\ + 7.139322\cdot T - .0627909\cdot T\cdot M + .0000589172\cdot T\cdot {M^2}\\ - .198550\cdot {T^2} + .000940018\cdot {T^2}\cdot M - .00000149532\cdot {T^2}\cdot {M^2}\end{array}\]</div>
+<div>$$\begin{array}{c}S = 6.461927 + .946892\cdot M + .0000255737\cdot {M^2}\\ + 7.139322\cdot T - .0627909\cdot T\cdot M + .0000589172\cdot T\cdot {M^2}\\ - .198550\cdot {T^2} + .000940018\cdot {T^2}\cdot M - .00000149532\cdot {T^2}\cdot {M^2}\end{array}$$</div>
 
 where
 
@@ -51,7 +53,7 @@ S=Sensible Gain (W)
 
 Latent Gain is simply the total gain (metabolic rate) – sensible gain:
 
-<div>\[LatentGain = MetabolicRate - SensibleGain\]</div>
+<div>$$LatentGain = MetabolicRate - SensibleGain$$</div>
 
 ![](EngineeringReference/media/image5820.png)
 
@@ -178,13 +180,13 @@ The input object ZoneBaseboard:OutdoorTemperatureControlled provides a model for
 
 Figure 260.  Control of Outdoor Temperature Controlled Baseboard Heat
 
-<div>\[Q = Q2 - \frac{{(Q2 - Q1)\cdot (T2 - TA)}}{{(T2 - T1)}}\]</div>
+<div>$$Q = Q2 - \frac{{(Q2 - Q1)\cdot (T2 - TA)}}{{(T2 - T1)}}$$</div>
 
 These temperature and capacity fields can be autosized based upon envelope, infiltration, and ventilation loads. To autosize these fields, users may set a design zone heating temperature that is assumed to be 20°C if blank.
 
 The capacity at low temperature is the maximum capacity of the unit. It includes external envelope conduction load, infiltration load, and ventilation load in a space where the unit serves. The model first finds the lowest outdoor air temperature throughout design days included in the simulation, and determines the conduction load through external envelop as:
 
-<div>\[{q_{Cond}} = UA\left( {{T_{Htg}} - {T_L}} \right)\]</div>
+<div>$${q_{Cond}} = UA\left( {{T_{Htg}} - {T_L}} \right)$$</div>
 
 where
 
@@ -202,7 +204,7 @@ where
 
 The capacity at low temperature that is the maximum capacity of the unit is thus expressed as:
 
-<div>\[Ca{p_{{T_L}}} = {q_{Cond}} + {q_I} + {q_V}\]</div>
+<div>$$Ca{p_{{T_L}}} = {q_{Cond}} + {q_I} + {q_V}$$</div>
 
 where
 
@@ -216,7 +218,7 @@ where
 
 The capacity at high temperature is then prorated against the reference low and high temperatures as:
 
-<div>\[Ca{p_{{T_H}}} = Ca{p_{{T_L}}}\frac{{\left( {{T_{Htg}} - {T_H}} \right)}}{{\left( {{T_{Htg}} - {T_L}} \right)}}\]</div>
+<div>$$Ca{p_{{T_H}}} = Ca{p_{{T_L}}}\frac{{\left( {{T_{Htg}} - {T_H}} \right)}}{{\left( {{T_{Htg}} - {T_L}} \right)}}$$</div>
 
 where
 
@@ -234,11 +236,11 @@ Long wavelength radiation from all internal sources, such as people, lights and 
 
 Some fraction of the beam solar radiation transmitted into the zone is directly absorbed by the interior surfaces according to the solar distribution algorithm (see Solar Distribution) selected by the user.  The beam radiation not directly absorbed, plus the diffuse sky and ground-reflected radiation, plus the short wavelength radiation from lights are combined and distributed over the surfaces of the zone according to:
 
-<div>\[QS{I_i} = Q{S_n}\cdot {\alpha_i}/\sum\limits_{i = 1}^{NS} {{S_i}\cdot (1 - {\rho_i})} \]</div>
+<div>$$QS{I_i} = Q{S_n}\cdot {\alpha_i}/\sum\limits_{i = 1}^{NS} {{S_i}\cdot (1 - {\rho_i})} $$</div>
 
 If all surfaces in the room are opaque, the radiation is distributed in proportion to the area\*absorptance product of each surface.  For surfaces which are transparent,
 
-<div>\[{\rho_i} = 1 - {\alpha_i} - {\tau_i}\]</div>
+<div>$${\rho_i} = 1 - {\alpha_i} - {\tau_i}$$</div>
 
 That fraction of radiation represented by <span>${\tau_i}$</span> is lost from the zone.
 
@@ -550,9 +552,9 @@ Figure 261. Control Volume drawn around node *i*
 
 The model is formulated from the heat balances on the fluid and wall nodes.
 
-<div>\[{M_{f,i}}{C_{P,f}}\frac{{d{T_{f,i}}}}{{dt}} = \dot m{C_{P,f}}\left( {{T_{f,i - 1}} - {T_{f,i}}} \right) - {h_f}{A_i}\left( {{T_{f,i}} - {T_{w,i}}} \right)\]</div>
+<div>$${M_{f,i}}{C_{P,f}}\frac{{d{T_{f,i}}}}{{dt}} = \dot m{C_{P,f}}\left( {{T_{f,i - 1}} - {T_{f,i}}} \right) - {h_f}{A_i}\left( {{T_{f,i}} - {T_{w,i}}} \right)$$</div>
 
-<div>\[{M_{w,i}}{C_{P,w}}\frac{{d{T_{w,i}}}}{{dt}} = {h_f}{A_i}\left( {{T_{f,i}} - {T_{w,i}}} \right) - {h_e}{A_i}\left( {{T_{w,i}} - {T_e}} \right)\]</div>
+<div>$${M_{w,i}}{C_{P,w}}\frac{{d{T_{w,i}}}}{{dt}} = {h_f}{A_i}\left( {{T_{f,i}} - {T_{w,i}}} \right) - {h_e}{A_i}\left( {{T_{w,i}} - {T_e}} \right)$$</div>
 
 Where, subscript *w*, *f* and *e* denote the values for pipe wall, fluid and environment respectively. The current node is represented by a subscript of *i*, while the previous node is represented by *i-1*.
 
@@ -576,41 +578,41 @@ In addition, the exterior resistance from the pipe wall inner surface to the env
 
 Approximating the derivatives using backward differencing enables these equations to be represented as simultaneous algebraic equations. For the fluid, at time step n, the heat balance is:
 
-<div>\[\frac{{{M_{f,i}}{C_{P,f}}}}{{\Delta t}}\left( {T_{f,i}^n - T_{f,i}^{n - 1}} \right) = \dot m{C_{P,f}}\left( {T_{f,i - 1}^n - T_{f,i}^n} \right) - {h_f}{A_i}\left( {T_{f,i}^n - T_{w,i}^n} \right)\]</div>
+<div>$$\frac{{{M_{f,i}}{C_{P,f}}}}{{\Delta t}}\left( {T_{f,i}^n - T_{f,i}^{n - 1}} \right) = \dot m{C_{P,f}}\left( {T_{f,i - 1}^n - T_{f,i}^n} \right) - {h_f}{A_i}\left( {T_{f,i}^n - T_{w,i}^n} \right)$$</div>
 
 Rearranging gives,
 
-<div>\[T_{f,i}^n\left[ {{M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t} \right] = \dot m{C_{P,f}}\Delta tT_{f,i - 1}^n + {h_f}{A_i}\Delta tT_{w,i}^n + {M_{f,i}}{C_{P,f}}T_{f,i}^{n - 1}\]</div>
+<div>$$T_{f,i}^n\left[ {{M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t} \right] = \dot m{C_{P,f}}\Delta tT_{f,i - 1}^n + {h_f}{A_i}\Delta tT_{w,i}^n + {M_{f,i}}{C_{P,f}}T_{f,i}^{n - 1}$$</div>
 
 or,
 
-<div>\[{a_1}T_{f,i}^n = {a_2}T_{f,i - 1}^n + {a_3}T_{w,i}^n + {a_4}T_{f,i}^{n - 1}\]</div>
+<div>$${a_1}T_{f,i}^n = {a_2}T_{f,i - 1}^n + {a_3}T_{w,i}^n + {a_4}T_{f,i}^{n - 1}$$</div>
 
 where,
 
-<div>\[\begin{array}{l}{a_1} = {M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t\\ {a_2} = \dot m{C_{P,f}}\Delta t\\ {a_3} = {h_f}{A_i}\Delta t\\ {a_4} = {M_{f,i}}{C_{P,f}}\end{array}\]</div>
+<div>$$\begin{array}{l}{a_1} = {M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t\\ {a_2} = \dot m{C_{P,f}}\Delta t\\ {a_3} = {h_f}{A_i}\Delta t\\ {a_4} = {M_{f,i}}{C_{P,f}}\end{array}$$</div>
 
 Similarly, taking backwards differences for the conduit wall at time step n, the heat balance becomes,
 
-<div>\[\frac{{{M_{w,i}}{C_{P,w}}}}{{\Delta t}}\left( {T_{w,i}^n - T_{w,i}^{n - 1}} \right) = {h_f}{A_i}\left( {T_{f,i}^n - T_{w,i}^n} \right) - {h_e}{A_i}\left( {T_{w,i}^n - T_e^n} \right)\]</div>
+<div>$$\frac{{{M_{w,i}}{C_{P,w}}}}{{\Delta t}}\left( {T_{w,i}^n - T_{w,i}^{n - 1}} \right) = {h_f}{A_i}\left( {T_{f,i}^n - T_{w,i}^n} \right) - {h_e}{A_i}\left( {T_{w,i}^n - T_e^n} \right)$$</div>
 
 Rearranging gives,
 
-<div>\[T_{w,i}^n\left[ {{M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t} \right] = {h_f}{A_i}\Delta tT_{f,i}^n + {h_e}{A_i}\Delta tT_e^n + {M_{w,i}}{C_{P,w}}T_{w,i}^{n - 1}\]</div>
+<div>$$T_{w,i}^n\left[ {{M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t} \right] = {h_f}{A_i}\Delta tT_{f,i}^n + {h_e}{A_i}\Delta tT_e^n + {M_{w,i}}{C_{P,w}}T_{w,i}^{n - 1}$$</div>
 
 or,
 
-<div>\[{b_1}T_{w,i}^n = {b_2}T_{f,i}^n + {b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}\]</div>
+<div>$${b_1}T_{w,i}^n = {b_2}T_{f,i}^n + {b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}$$</div>
 
 where,
 
-<div>\[\begin{array}{l}{b_1} = {M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t\\ {b_2} = {h_f}{A_i}\Delta t\\ {b_3} = {h_e}{A_o}\Delta t\\ {b_4} = {M_{w,i}}{C_{P,w}}\end{array}\]</div>
+<div>$$\begin{array}{l}{b_1} = {M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t\\ {b_2} = {h_f}{A_i}\Delta t\\ {b_3} = {h_e}{A_o}\Delta t\\ {b_4} = {M_{w,i}}{C_{P,w}}\end{array}$$</div>
 
 Substituting into gives an equation for the current fluid temperature:
 
-<div>\[{a_1}T_{f,i}^n = {a_2}T_{f,i - 1}^n + {a_3}\left( {{b_2}T_{f,i}^n + {b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}} \right)/{b_1} + {a_4}T_{f,i}^{n - 1}\]</div>
+<div>$${a_1}T_{f,i}^n = {a_2}T_{f,i - 1}^n + {a_3}\left( {{b_2}T_{f,i}^n + {b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}} \right)/{b_1} + {a_4}T_{f,i}^{n - 1}$$</div>
 
-<div>\[T_{f,i}^n = \frac{1}{{\left( {{a_1} - {a_3}{b_2}/{b_1}} \right)}}\left[ {{a_2}T_{f,i - 1}^n + {a_3}\left( {{b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}} \right)/{b_1} + {a_4}T_{f,i}^{n - 1}} \right]\]</div>
+<div>$$T_{f,i}^n = \frac{1}{{\left( {{a_1} - {a_3}{b_2}/{b_1}} \right)}}\left[ {{a_2}T_{f,i - 1}^n + {a_3}\left( {{b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}} \right)/{b_1} + {a_4}T_{f,i}^{n - 1}} \right]$$</div>
 
 The conduit is simulated by solving Eq. followed by Eq. for each of the twenty cells in the model and incrementing the time step. The fluid temperature of the last node is taken to be the pipe outlet temperature.
 
@@ -648,15 +650,15 @@ The model develops the pipe depth and ground thickness from the user-entered con
 
 #### Model Assumptions
 
-n Constant properties throughout domain
+* Constant properties throughout domain
 
-n Moisture is not directly involved with the model operation, so careful selection of soil thermal conductivity is a priority
+* Moisture is not directly involved with the model operation, so careful selection of soil thermal conductivity is a priority
 
-n Negligible axial heat transfer compared to radial heat transfer
+* Negligible axial heat transfer compared to radial heat transfer
 
-n Axisymmetric heat transfer in near pipe region
+* Axisymmetric heat transfer in near pipe region
 
-n Surface convection coefficient is constant throughout simulation (does not vary with wind speed)
+* Surface convection coefficient is constant throughout simulation (does not vary with wind speed)
 
 #### References
 
@@ -681,8 +683,6 @@ A new heat transfer model is implemented to handle a diverse set of buried pipe 
 ![](EngineeringReference/media/image5852.png)
 
 Figure 263. Radial "near-pipe" cell within a Cartesian cell
-
-
 
 ![](EngineeringReference/media/image5853.png)
 
@@ -718,17 +718,17 @@ The ground heat transfer model does not perform any transient simulation of the 
 
 The mesh is developed by using a few simple parameters.  There are two distinct categories, the large-scale Cartesian mesh and the near-pipe refined radial mesh.
 
-n X, Y, Z mesh
+* X, Y, Z mesh
 
-n Mesh Layout
+* Mesh Layout
 
-n Cell density
+* Cell density
 
-n Radial mesh
+* Radial mesh
 
-n Radial mesh thickness
+* Radial mesh thickness
 
-n Cell count
+* Cell count
 
 The Cartesian mesh uses a cell density parameter to define the number of cells to use in the simulation.  Instead of requiring a detailed specification of all cell regions in the domain, this one parameter is used to specify a mesh density and is applied to all domain regions.  The cell density parameter represents the number of cells within any two domain partitions.  A domain partition is a basement wall or a pipe placed in the domain.  Once these partitions are all laid out and validated, the regions between them are populated with the number of cells specified in the cell density parameter.  Although this may lead to a variation of cell size within the domain, it is assumed that this will help focus computational intensity in the domain.  Of course, the number of cells (cell density parameter) can be different for each of the X, Y, and Z directions to allow for further fine tuning of the domain.
 
@@ -759,31 +759,31 @@ The water pump is quite simply the component that drives the flow in plant and c
 
 ### Summary of Pump Rules
 
-n Pumps in Plant Loop can be on the supply side or demand side
+* Pumps in Plant Loop can be on the supply side or demand side
 
-n A Pump, if present, in the demand side of plant loop must be the first component of the inlet branch.
+* A Pump, if present, in the demand side of plant loop must be the first component of the inlet branch.
 
-n Pumps in Condenser loop must be on supply side
+* Pumps in Condenser loop must be on supply side
 
-n Pumps can operate as constant or variable flow.
+* Pumps can operate as constant or variable flow.
 
-n Pumps can run continuously or intermittently.
+* Pumps can run continuously or intermittently.
 
-n Single boiler/chiller with NO bypass, use Pump:ConstantSpeed
+* Single boiler/chiller with NO bypass, use Pump:ConstantSpeed
 
-n Boiler/chiller should be constant flow
+* Boiler/chiller should be constant flow
 
-n Pump should be intermittent
+* Pump should be intermittent
 
-n Single boiler/chiller with NO bypass, Pump:VariableSpeed
+* Single boiler/chiller with NO bypass, Pump:VariableSpeed
 
-n Boiler/chiller should be variable flow, regardless of whether pump is intermittent or continuous (runs at the minimum if demand is less than minimum, this includes zero.)
+* Boiler/chiller should be variable flow, regardless of whether pump is intermittent or continuous (runs at the minimum if demand is less than minimum, this includes zero.)
 
-n Single boiler/chiller with bypass, Pump:ConstantSpeed
+* Single boiler/chiller with bypass, Pump:ConstantSpeed
 
-n Boiler/chiller can be constant or variable flow
+* Boiler/chiller can be constant or variable flow
 
-n Pump may be intermittent or continuous as long as the bypass can handle the entire pump volume when the boiler is not operating
+* Pump may be intermittent or continuous as long as the bypass can handle the entire pump volume when the boiler is not operating
 
 Multiple branches add more complexity, but it is nothing more than continuity. If the pump is putting out flow then it has to have a branch to flow down whether it is a chiller or a bypass. It can be safer to add the bypass for a simulation. If the active machines require the flow the bypass will be dry. If performing a pressure simulation, and the flow goes through a machine which is off, the pressure drop will be accounted for, but no heat transfer through the machine will be calculated.
 
@@ -811,7 +811,7 @@ Shown below is the calculation of the total efficiency of the pump and the actua
 
 There is an option when performing plant/condenser loop simulations to account for dynamically changing loop pressure drop. For the current implementation, the loop pressure drop is calculated based on pressure drop data on each branch of the loop, then this total pressure drop is set as the pump pressure head. There is no pump curve implemented yet, so it is assumed that the pump can always handle this pressure value. This is a first approximation to actually having the pump ride a curve, and this initial implementation allows the user to enter minimal data, and yet get a more dynamic output for pump power, which is calculated based on current pressure drop and flow rate. The equation for pump power is now:
 
-<div>\[Pump\;Electric\;Power = Pump\;Volume\;Flow\;Rate*\frac{{Pump\;Head}}{{Total\;Efficiency}}\]</div>
+<div>$$Pump\;Electric\;Power = Pump\;Volume\;Flow\;Rate*\frac{{Pump\;Head}}{{Total\;Efficiency}}$$</div>
 
 Without the pressure simulation, the pump power is based on the rated value entered with the pump object. For further information, see the input-output reference for Branch objects, and PlantLoop/CondenserLoop objects; as well as the Plant/Condenser loop section of this engineering reference.
 
@@ -821,7 +821,7 @@ A variable speed pump (object name: Pump:VariableSpeed) is defined with maximum 
 
 All of the pump rules and efficiency and power calculations are applicable from the introduction in the pump group section. The main difference between the the variable volume pump and the constant volume pump is the Part Load Performance Curve.The fraction of full load power is determined by the cubic equation:
 
-<div>\[FractionFullLoadPower = {C_1} + {C_2}PLR + {C_3}PL{R^2} + {C_4}PL{R^3}\]</div>
+<div>$$FractionFullLoadPower = {C_1} + {C_2}PLR + {C_3}PL{R^2} + {C_4}PL{R^3}$$</div>
 
 where C<sub>1</sub>,C<sub>2</sub>,C<sub>3</sub>,and C<sub>4</sub> are Coefficients 1 – 4 and PLR is the Part Load Ratio. In the pseudo code below the FracFullLoadPower modifies the NomPowerUse for the total pump “Power” and shows the “ShaftPower” and the “PumpHeattoFluid”.
 
@@ -933,9 +933,9 @@ The constant speed pump can flow can also be overridden dynamically based on a r
 
 Due to the fact that a pump is a mechanical device that acts on the fluid it is circulating, it causes the fluid to increase in temperature. The EnergyPlus model assumes that all pressure increase caused by the pump will eventually be lost due to friction, and that friction will be added as heat to the fluid. Since the plant and condenser loops are not yet true pressure-based models, EnergyPlus assumes that all of the heat resulting from the pump itself and from friction throughout the loop. Therefore, as of version 7, the pump heat is added to the plant loop interface by injecting the heat into the mixed tanks used to model loop thermal capacitance(previously it was added at the outlet node of the pump). The amount of heat added to the fluid is calculated using the following two equations:
 
-<div>\[ShaftPower = PumpPower * PumpMotorEfficiency\]</div>
+<div>$$ShaftPower = PumpPower * PumpMotorEfficiency$$</div>
 
-<div>\[PumpHeatToFluid = ShaftPower + \left( {PumpPower - ShaftPower} \right) * FracMotorLossToFluid\]</div>
+<div>$$PumpHeatToFluid = ShaftPower + \left( {PumpPower - ShaftPower} \right) * FracMotorLossToFluid$$</div>
 
 where the pump motor efficiency is defined by the user input and the FracMotorLossToFluid is the amount of heat generated by the pump motor that is added to the fluid loop (as opposed to being lost to the environment where the pump is located). FracMotorLossToFluid is also a user input.
 
@@ -945,21 +945,21 @@ Note that the shaft power relates to the increase in head through the pump. Sinc
 
 If the user input includes naming a Zone that surrounds the pump, then the pump becomes a source of internal heat gain to that zone.  The amount of heat transmitted to the surrounding zone is simply the difference between power input and the rate of heat transferred to the fluid. The user can also input a fraction,<span>${f_{rad}}$</span> , that controls the overall split between thermal radiation and sensible convection.  The pump’s sensible zone gains are determined using the following equations:
 
-<div>\[TotalZoneGain = PumpPower - PumpHeatToFluid\]</div>
+<div>$$TotalZoneGain = PumpPower - PumpHeatToFluid$$</div>
 
-<div>\[ConvectiveZoneGain = \left( {1 - {f_{rad}}} \right)*TotalZoneGain\]</div>
+<div>$$ConvectiveZoneGain = \left( {1 - {f_{rad}}} \right)*TotalZoneGain$$</div>
 
-<div>\[RadiativeZoneGain = {f_{rad}}*TotalZoneGain\]</div>
+<div>$$RadiativeZoneGain = {f_{rad}}*TotalZoneGain$$</div>
 
 ### Headered Pumps
 
 The input objects HeaderedPumps:ConstantSpeed and HeaderedPumps:VariableSpeed  provide models for headered pumps that consist of two or more pumps connected in parallel. The headered pump is simulated as a single component, and it is specified as an integer number of a specific pump. The flow rate provided by the headered pump is determined by the number of pumps in operation and the flow rate of the individual pump. The total flow rate is calculated as
 
-<div>\[FlowProvided = NumPumpsON*IndividualPumpFlowRate\]</div>
+<div>$$FlowProvided = NumPumpsON*IndividualPumpFlowRate$$</div>
 
 The simulation starts by turning ON all pumps in the group. The pumps are then turned OFF one at a time until the flow provided is less than the flow requested. Finally the last pump is turned back ON to meet the remaining flow (FlowDifference) requested. The flow rate of the last pump depends on the pump bank type. For constant speed headered pumps, the last pump runs at the nominal flow rate, thereby giving a final headered pump flow which is equal to or greater than the flow requested. In a variable speed headered pump the last pump runs at part load so that the flow provided matches the flow requested. The power of the headered pump is then calculated as
 
-<div>\[Power = (P{R_{FL}}{\rm{*N}}{}_{{\rm{FL}}} + {\rm{P}}{{\rm{R}}_{{\rm{PL}}}}{\rm{*}}{{\rm{N}}_{{\rm{PL}}}}{\rm{)*}}{{\rm{P}}_{{\rm{Nom}}}}{\rm{  }}\]</div>
+<div>$$Power = (P{R_{FL}}{\rm{*N}}{}_{{\rm{FL}}} + {\rm{P}}{{\rm{R}}_{{\rm{PL}}}}{\rm{*}}{{\rm{N}}_{{\rm{PL}}}}{\rm{)*}}{{\rm{P}}_{{\rm{Nom}}}}{\rm{  }}$$</div>
 
 Where;
 
@@ -1074,7 +1074,7 @@ Else
 
 o   Calculate supply air mass flow rate required to meet zone sensible load at the applicable (heating or cooling) supply temperature limit (*T<sub>max,heating</sub>* or *T<sub>min,cooling</sub>*)
 
-<div>\[{\dot m_s} = {\dot Q_z}/({c_{p,air}}\cdot ({T_s} - {T_z}))\]</div>
+<div>$${\dot m_s} = {\dot Q_z}/({c_{p,air}}\cdot ({T_s} - {T_z}))$$</div>
 
 
 
@@ -1092,17 +1092,17 @@ o   The unit entering conditions are then:
 
 If <span>${\dot m_s}$</span>&gt; <span>${\dot m_{oa}}$</span> then
 
-<div>\[{h_{ma}} = ({\dot m_{oa}} \cdot {h_{oa}} + ({\dot m_s} - {\dot m_{oa}}) \cdot {h_{recirc}})/{\dot m_s}\]</div>
+<div>$${h_{ma}} = ({\dot m_{oa}} \cdot {h_{oa}} + ({\dot m_s} - {\dot m_{oa}}) \cdot {h_{recirc}})/{\dot m_s}$$</div>
 
-<div>\[{W_{ma}} = ({\dot m_{oa}} \cdot {W_{oa}} + ({\dot m_s} - {\dot m_{oa}}) \cdot {W_{recirc}})/{\dot m_s}\]</div>
+<div>$${W_{ma}} = ({\dot m_{oa}} \cdot {W_{oa}} + ({\dot m_s} - {\dot m_{oa}}) \cdot {W_{recirc}})/{\dot m_s}$$</div>
 
-<div>\[{T_{ma}} = {\mathop{\rm PsyHFnTdbW}\nolimits} ({h_{ma}},{W_{ma}})\]</div>
+<div>$${T_{ma}} = {\mathop{\rm PsyHFnTdbW}\nolimits} ({h_{ma}},{W_{ma}})$$</div>
 
 Otherwise the entering air conditions are set equal to the outside air conditions.
 
 ·        Calculate the supply air temperature required to meet the zone sensible load at the supply air mass flow rate, but limit to the applicable (heating or cooling) supply temperature limit (*T<sub>max,heating</sub>* or *T<sub>min,cooling</sub>*)
 
-<div>\[{T_s} = {T_{ma}} + {\dot Q_z}/({c_{p,air}}\cdot {\dot m_s})\]</div>
+<div>$${T_s} = {T_{ma}} + {\dot Q_z}/({c_{p,air}}\cdot {\dot m_s})$$</div>
 
 ·        Calculate the supply humidity ratio based on the specified humidity control types, but limit to the applicable (heating or cooling) supply humidity ratio limit
 
@@ -1225,7 +1225,7 @@ The following nomenclature is used in the following equations:
 
 The model reads node information and local variables of individual chiller-heaters. The nodes and local variables vary with the operating modes as described above in order to calculate mass-weighed temperatures. In the cooling-only mode, it calculates a mass-weighed chilled water temperature (*T<sub>cw,CH</sub>*) and a source water temperature (*T<sub>src,CH</sub>*) as follows:
 
-<div>\[{T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}\]</div>
+<div>$${T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}$$</div>
 
 ***<span>${T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}$</span> ***.
 
@@ -1251,17 +1251,17 @@ In cooling or heating dominant simultaneous cooling-heating mode (mode 4 and 5),
 
 The model then calculates a mass-weighed temperature for the by-pass flows remained in the system as follows:
 
-<div>\[{T_{cw,bypass}} = {T_{cw,i}}\frac{{{{\dot m}_{cw,bypass}}}}{{{m_{cw,sys}}}}\]</div>
+<div>$${T_{cw,bypass}} = {T_{cw,i}}\frac{{{{\dot m}_{cw,bypass}}}}{{{m_{cw,sys}}}}$$</div>
 
-<div>\[{T_{hw,bypass}} = {T_{hw,i}}\frac{{{{\dot m}_{hw,bypass}}}}{{{m_{hw,sys}}}}\]</div>
+<div>$${T_{hw,bypass}} = {T_{hw,i}}\frac{{{{\dot m}_{hw,bypass}}}}{{{m_{hw,sys}}}}$$</div>
 
-<div>\[{T_{src,bypass}} = {T_{src,i}}\frac{{{{\dot m}_{src,bypass}}}}{{{m_{src,sys}}}}\]</div>
+<div>$${T_{src,bypass}} = {T_{src,i}}\frac{{{{\dot m}_{src,bypass}}}}{{{m_{src,sys}}}}$$</div>
 
 The outlet temperatures at each outlet node of the system are then determined as it sums both mass-weighed temperatures up as follows:
 
-<div>\[{T_{cw,sys}} = {T_{cw,CH}} + {T_{cw,bypass}}\]</div>
+<div>$${T_{cw,sys}} = {T_{cw,CH}} + {T_{cw,bypass}}$$</div>
 
-<div>\[{T_{hw,sys}} = {T_{hw,CH}} + {T_{hw,bypass}}\]</div>
+<div>$${T_{hw,sys}} = {T_{hw,CH}} + {T_{hw,bypass}}$$</div>
 
 <span>${T_{src,sys}} = {T_{src,CH}} + {T_{src,bypass}}$</span>.
 
@@ -1360,11 +1360,11 @@ The Cooling Mode Electric Input to Cooling Output Ratio Function of Temperature 
 
 The Cooling Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio (EIRFPLR<sub>clg</sub>) curve represents the fraction of electricity to the chiller-heater as the load on the chiller varies at a given set of operating temperatures. The curve is normalized so that at full load the value of the curve should be 1.0. Note that the bi-cubic formulation below is generally only valid when LeavingCondenser variable is chosen for the field of Cooling Mode Condenser Water Temperature Curve Input Variable whereas the quadratic curve can be used for both choices, i.e., LeavingCondenser and EnteringCondenser. Bi-cubic may also be used when the chiller-heater uses a variable-speed compressor motor drive. The output of this curve can be determined by one of the following three performance curves:
 
-<div>\[EIRFPL{R_{c\lg }} = a + b{T_{Cond,l}} + c{T_{Cond,l}}^2 + dPLR + ePL{R^2} + f{T_{Cond,l}}PLR + g \cdot 0 + hPL{R^3} + i \cdot 0 + j \cdot 0\]</div>
+<div>$$EIRFPL{R_{c\lg }} = a + b{T_{Cond,l}} + c{T_{Cond,l}}^2 + dPLR + ePL{R^2} + f{T_{Cond,l}}PLR + g \cdot 0 + hPL{R^3} + i \cdot 0 + j \cdot 0$$</div>
 
-<div>\[EIRFPL{R_{c\lg }} = a + bPLR + cPL{R^2}\]</div>
+<div>$$EIRFPL{R_{c\lg }} = a + bPLR + cPL{R^2}$$</div>
 
-<div>\[EIRFPL{R_{c\lg }} = a + bPLR + cPL{R^2} + dPL{R^3}\]</div>
+<div>$$EIRFPL{R_{c\lg }} = a + bPLR + cPL{R^2} + dPL{R^3}$$</div>
 
 The full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the design temperatures) is then computed as follows:
 
@@ -1394,7 +1394,7 @@ The model then calculates the part-load ratio as the ratio of the evaporator hea
 
 The part-load ratio calculated is set to be between the maximum of 1.0 and the minimum of 0.0 when it is out of the range. Once the part-load ratio is calculated the cycling ratio and false loading rate can be obtained as follows:
 
-<div>\[CyclingRatio = \frac{{PL{R_{{\rm{actual}}}}}}{{PL{R_{{\rm{min}}}}}}\]</div>
+<div>$$CyclingRatio = \frac{{PL{R_{{\rm{actual}}}}}}{{PL{R_{{\rm{min}}}}}}$$</div>
 
 <span>${\dot Q_{falseloading,c\lg }} = EvapCapAvai{l_{{\rm{clg}}}} \cdot PL{R_{c\lg }} \cdot CyclingRatio - \dot QEva{p_{{\rm{clg}}}}$</span>.
 
@@ -1408,7 +1408,7 @@ The heat transfer rate for the chiller-heater condenser can then be computed as 
 
 The total heat transfer energy by the evaporator and condenser can be calculated as follows:
 
-<div>\[QEva{p_{c\lg }} = \dot QEva{p_{c\lg }} \cdot TimeStepSys \cdot 3600\]</div>
+<div>$$QEva{p_{c\lg }} = \dot QEva{p_{c\lg }} \cdot TimeStepSys \cdot 3600$$</div>
 
 <span>$QCon{d_{c\lg }} = \dot QCon{d_{c\lg }} \cdot TimeStepSys \cdot 3600$</span> .
 
@@ -1504,11 +1504,11 @@ The output of a Heating Mode Cooling Output Ratio Function of Temperature curve 
 
 The output of Heating Mode Cooling Output Ratio Function of Part Load Ratio curve can be determined by one of the following three performance curves as follows:
 
-<div>\[EIRFPL{R_{htg}} = a + b{T_{Cond,l}} + c{T_{Cond,l}}^2 + dPLR + ePL{R^2} + f{T_{Cond,l}}PLR + g \cdot 0 + hPL{R^3} + i \cdot 0 + j \cdot 0\]</div>
+<div>$$EIRFPL{R_{htg}} = a + b{T_{Cond,l}} + c{T_{Cond,l}}^2 + dPLR + ePL{R^2} + f{T_{Cond,l}}PLR + g \cdot 0 + hPL{R^3} + i \cdot 0 + j \cdot 0$$</div>
 
-<div>\[EIRFPL{R_{htg}} = a + bPLR + cPL{R^2}\]</div>
+<div>$$EIRFPL{R_{htg}} = a + bPLR + cPL{R^2}$$</div>
 
-<div>\[EIRFPL{R_{htg}} = a + bPLR + cPL{R^2} + dPL{R^3}\]</div>
+<div>$$EIRFPL{R_{htg}} = a + bPLR + cPL{R^2} + dPL{R^3}$$</div>
 
 The full-load evaporator capacity at specific temperature operating conditions is then given by:
 
@@ -1522,7 +1522,7 @@ The part-load ratio is set to be between zero and the maximum, and the evaporato
 
 Once the part-load ratio is calculated the cycling ratio and false loading rate are computed by:
 
-<div>\[CyclingRatio = \frac{{PL{R_{{\rm{actual}}}}}}{{PL{R_{{\rm{min}}}}}}\]</div>
+<div>$$CyclingRatio = \frac{{PL{R_{{\rm{actual}}}}}}{{PL{R_{{\rm{min}}}}}}$$</div>
 
 <span>${\dot Q_{falseloading,htg}} = EvapCapAvai{l_{{\rm{htg}}}} \cdot PL{R_{htg}} \cdot CyclingRatio - \dot QEva{p_{{\rm{htg}}}}$</span>.
 
@@ -1532,7 +1532,7 @@ The compressor power demand is then computed by:
 
 The heat transfer rate of the chiller-heater condenser is then computed as follows:
 
-<div>\[\dot QCondAvai{l_{htg}} = ComPowe{r_{htg}} \cdot CompMotorEffic + \dot QEva{p_{htg}} + {\dot Q_{falseloading,htg}}\]</div>
+<div>$$\dot QCondAvai{l_{htg}} = ComPowe{r_{htg}} \cdot CompMotorEffic + \dot QEva{p_{htg}} + {\dot Q_{falseloading,htg}}$$</div>
 
 Once condenser available heating capacity is determined, the model calculates current chiller-heater’s condenser heat transfer rate based on the total heating load required a central heat pump system to meet as well as available heating capacity of the chiller-heater. The maximum condenser temperature difference between the entering hot water temperature (*T<sub>hw,e</sub>*) and the leaving hot water temperature (*T<sub>hw,l</sub>*) obtained from the plant loop setpoint temperature can also be obtained. It then calculates condenser water mass flow rate for variable flow control chiller-heaters and the hot water temperature difference for constant flow control chiller-heaters, setting the cooling load that each chiller-heater needs to meet equal the evaporator heat transfer rate.
 

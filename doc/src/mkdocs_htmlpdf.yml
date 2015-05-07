@@ -1,0 +1,26 @@
+site_name: EnergyPlus Documentation
+site_favicon: favicon.ico
+site_logo: 'EP_32x32.png'
+site_dir: site_htmlpdf
+repo_url: https://github.com/NREL/EnergyPlus
+
+pages:
+- [GettingStarted/GettingStarted.md, "Intro & Application", "Getting Started"]
+- [Tips_and_Tricks_Using_EnergyPlus/Tips_and_Tricks_Using_EnergyPlus.md, "Intro & Application", "Tips and Tricks for EnergyPlus"]
+- [EMS_Application_Guide/EMS_Application_Guide.md, "Intro & Application", "EMS Applications"]
+- [ExternalInterfaces_Application_Guide/ExternalInterfaces_Application_Guide.md, "Intro & Application", "External Interface Applications"]
+- [PlantApplicationGuide/PlantApplicationGuide.md, "Intro & Application", "Plant Applications"]
+- [InputOutputReference/IORef.md, "Input/Output Reference", "Input Output Reference"]
+- [EngineeringReference/EngRef.md, "Engineering Reference", "Engineering Reference"]
+- [InterfaceDeveloper/InterfaceDeveloper.md, "Developer Guides", "Interface Developer"]
+- [ModuleDeveloper/ModuleDeveloper.md, "Developer Guides", "Module Developer"]
+- [Acknowledgements/Acknowledgements.md, "Other", "Acknowledgements"]
+- [AuxiliaryPrograms/AuxiliaryPrograms.md, "Other", "Auxiliary Programs"]
+- [OutputDetailsAndExamples/OutputDetailsAndExamples.md, "Other", "Output Details and Examples"]
+- [Using_EnergyPlus_for_Compliance/Using_EnergyPlus_for_Compliance.md, "Other", "Using E+ for Compliance"]
+
+theme: simplex
+theme_dir: 'bootstrap_nrel_htmlpdf'
+
+
+

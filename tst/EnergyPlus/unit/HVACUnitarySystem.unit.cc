@@ -230,7 +230,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 
 	ZoneSizingRunDone = true;
 	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
-	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 16 );
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
 
 	// test cooling only sizing
