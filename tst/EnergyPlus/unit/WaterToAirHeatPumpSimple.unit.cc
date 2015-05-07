@@ -23,8 +23,9 @@ using General::RoundSigDigits;
 
 TEST( WaterToAirHeatPumpSimpleTest, SizeHVACWaterToAir )
 {
-	// This unit test is intended to check if supply air design Humidity ratio is reset to the minimum of 
-	// the equipment entering air humidity ratio and the user specified supply air design Humidity ratio.
+	// This unit test is intended to check if supply air Humidity ratio used in the cooling sizing calculation is 
+	// reset to the minimum of entering mixed air humidity ratio and the user specified supply air design Humidity  
+	// ratio such that the total cooling capacity is always greater than or equal to the sensible cooling capacity.
 	// This test was added to test bug issue #4893 fix, a defect that resulted in SHR greater than 1.0.
 
 	ShowMessage( "Begin Test: WaterToAirHeatPumpSimpleTest, SizeHVACWaterToAir" );
@@ -82,8 +83,11 @@ TEST( WaterToAirHeatPumpSimpleTest, SizeHVACWaterToAir )
 	InitializePsychRoutines();
 	WaterToAirHeatPumpSimple::SizeHVACWaterToAir( HPNum );
 
-	// checks if design HumRat is reset to MIN of ZoneHumRatAtCoolPeak & CoolDesHumRat
-	EXPECT_DOUBLE_EQ( 0.0045, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat );
+	// check that the design oulet air humidity ratio did not change
+	EXPECT_DOUBLE_EQ( 0.0075, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat );
+
+	// check that the total cooling capacity is >= the sensible cooling capacity
+	EXPECT_GE( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal, SimpleWatertoAirHP( HPNum ).RatedCapCoolSens );
 
 	if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal != 0.0 ) {
 		ShowMessage( "SizeHVACWaterToAir: Rated Sensible Heat Ratio = " + RoundSigDigits( SimpleWatertoAirHP( HPNum ).RatedCapCoolSens / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal, 2 ) + " [-]" );
