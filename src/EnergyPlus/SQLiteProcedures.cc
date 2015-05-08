@@ -1690,7 +1690,8 @@ void SQLite::addSQLiteZoneSizingRecord(
 	std::string const & peakHrMin, // time stamp of the peak
 	Real64 const peakTemp, // temperature at peak [C]
 	Real64 const peakHumRat, // humidity ratio at peak [kg water/kg dry air]
-	Real64 const minOAVolFlow // zone design minimum outside air flow rate [m3/s]
+	Real64 const minOAVolFlow, // zone design minimum outside air flow rate [m3/s]
+	Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 )
 {
 	static int zoneSizingIndex = 0;
@@ -1711,6 +1712,7 @@ void SQLite::addSQLiteZoneSizingRecord(
 		sqliteBindDouble(m_zoneSizingInsertStmt, 10, peakTemp);
 		sqliteBindDouble(m_zoneSizingInsertStmt, 11, peakHumRat);
 		sqliteBindDouble(m_zoneSizingInsertStmt, 12, minOAVolFlow);
+		sqliteBindDouble( m_zoneSizingInsertStmt, 13, DOASHeatAddRate );
 
 		sqliteStepCommand(m_zoneSizingInsertStmt);
 		sqliteResetCommand(m_zoneSizingInsertStmt);

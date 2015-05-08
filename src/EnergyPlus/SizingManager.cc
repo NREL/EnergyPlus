@@ -166,6 +166,8 @@ namespace SizingManager {
 		int iZoneCalcIter; // index for repeating the zone sizing calcs
 		static bool runZeroingOnce( true );
 		bool isUserReqCompLoadReport;
+		Real64 DOASHeatGainRateAtHtPk( 0.0 ); // zone heat gain rate from the DOAS at the heating peak [W]
+		Real64 DOASHeatGainRateAtClPk( 0.0 ); // zone heat gain rate from the DOAS at the cooling peak [W]
 
 		// FLOW:
 
@@ -574,11 +576,17 @@ namespace SizingManager {
 					if ( DDNum > 0 && TimeStepAtPeak > 0 ) {
 						TempAtPeak = DesDayWeath( DDNum ).Temp( TimeStepAtPeak );
 						HumRatAtPeak = DesDayWeath( DDNum ).HumRat( TimeStepAtPeak );
+						DOASHeatGainRateAtClPk = CalcZoneSizing( DDNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepAtPeak );
 					} else {
 						TempAtPeak = 0.0;
 						HumRatAtPeak = 0.0;
+						DOASHeatGainRateAtClPk = 0.0;
 					}
-					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad, FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).CoolDesDay, CoolPeakDateHrMin( CtrlZoneNum ), TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, FinalZoneSizing( CtrlZoneNum ).MinOA );
+					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad, 
+						FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 
+						FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).CoolDesDay, CoolPeakDateHrMin( CtrlZoneNum ), 
+						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, 
+						FinalZoneSizing( CtrlZoneNum ).MinOA, DOASHeatGainRateAtClPk );
 					curName = FinalZoneSizing( CtrlZoneNum ).ZoneName;
 					PreDefTableEntry( pdchZnClCalcDesLd, curName, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad );
 					PreDefTableEntry( pdchZnClUserDesLd, curName, FinalZoneSizing( CtrlZoneNum ).DesCoolLoad );
@@ -601,11 +609,17 @@ namespace SizingManager {
 					if ( DDNum > 0 && TimeStepAtPeak > 0 ) {
 						TempAtPeak = DesDayWeath( DDNum ).Temp( TimeStepAtPeak );
 						HumRatAtPeak = DesDayWeath( DDNum ).HumRat( TimeStepAtPeak );
+						DOASHeatGainRateAtHtPk = CalcZoneSizing( DDNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepAtPeak );
 					} else {
 						TempAtPeak = 0.0;
 						HumRatAtPeak = 0.0;
+						DOASHeatGainRateAtHtPk = 0.0;
 					}
-					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad, FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).HeatDesDay, HeatPeakDateHrMin( CtrlZoneNum ), TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, FinalZoneSizing( CtrlZoneNum ).MinOA );
+					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad, 
+						FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, 
+						FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).HeatDesDay, HeatPeakDateHrMin( CtrlZoneNum ), 
+						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, 
+						FinalZoneSizing( CtrlZoneNum ).MinOA, DOASHeatGainRateAtHtPk );
 					curName = FinalZoneSizing( CtrlZoneNum ).ZoneName;
 					PreDefTableEntry( pdchZnHtCalcDesLd, curName, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad );
 					PreDefTableEntry( pdchZnHtUserDesLd, curName, FinalZoneSizing( CtrlZoneNum ).DesHeatLoad );
@@ -2625,7 +2639,8 @@ namespace SizingManager {
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
 		Real64 const FloorArea, // zone floor area [m2]
 		Real64 const TotOccs, // design number of occupants for the zone
-		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
+		Real64 const MinOAVolFlow, // zone design minimum outside air flow rate [m3/s]
+		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 	)
 	{
 
@@ -2665,19 +2680,19 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
-		static gio::Fmt Format_991( "(' Zone Sizing Information',13(', ',A))" );
+		static gio::Fmt Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, Calc DOAS Heat Addition Rate {W}')" );
+		static gio::Fmt Format_991( "(' Zone Sizing Information',14(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
 			MyOneTimeFlag = false;
 		}
 
-		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 );
+		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 ) << RoundSigDigits( DOASHeatAddRate , 5 );
 
 		// BSLLC Start
 		if ( sqlite ) {
-			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
+			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
 		}
 		// BSLLC Finish
 
