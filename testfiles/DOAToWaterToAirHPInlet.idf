@@ -84,9 +84,9 @@
 ! Compact Schedules:              Yes
 !
 ! HVAC:                           Water to air heat pumps in each zone and a dedicated outdoor air system with
-!                                 heat recovery and standard VAV fan and hot and chiled water coils. There is a
-!                                 simple central plant with a hot water boiler, electric compression chiller,
-!                                 and a single-speed tower. All equipment is autosized.
+!                                 heat recovery and standard VAV fan. There are no central HVAC heating or cooling coils.
+!                                 There is no conventional central plant. There is a single water loop running between the
+!                                 zone WLHPs and a ground heat exchanger. 
 !
 ! Zonal Equipment:                Yes
 ! Central Air Handling Equipment: Yes
@@ -95,8 +95,8 @@
 ! Purchased Heating:              None
 ! Coils:                          Yes
 ! Pumps:                          Yes
-! Boilers:                        Yes
-! Chillers:                       Yes
+! Boilers:                        No
+! Chillers:                       No
 !
 ! Results:
 ! Standard Reports:               All
@@ -3376,8 +3376,8 @@ Controller:OutdoorAir,
     DOAS Outdoor Air Inlet,  !- Actuator Node Name
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    DifferentialEnthalpy,    !- Economizer Control Type
-    MinimumFlowWithBypass,   !- Economizer Control Action Type
+    NoEconomizer,            !- Economizer Control Type
+    ModulateFlow,            !- Economizer Control Action Type
     ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}
     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
     ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
@@ -4213,13 +4213,33 @@ Output:Variable,
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
+    DOAS Mixed Air Outlet,   !- Key Value
+    System Node Mass Flow Rate,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    DOAS Mixed Air Outlet,   !- Key Value
+    System Node Temperature, !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    DOAS Heat Recovery Supply Outlet,  !- Key Value
+    System Node Mass Flow Rate,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    DOAS Heat Recovery Supply Outlet,  !- Key Value
+    System Node Temperature, !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
     DOAS Outdoor Air Inlet,  !- Key Value
     System Node Mass Flow Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    DOAS Relief Air Outlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
+    DOAS Outdoor Air Inlet,  !- Key Value
+    System Node Temperature, !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
@@ -4228,8 +4248,18 @@ Output:Variable,
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    DOAS Mixed Air Outlet,   !- Key Value
+    DOAS Air Loop Inlet,     !- Key Value
+    System Node Temperature, !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    DOAS Relief Air Outlet,  !- Key Value
     System Node Mass Flow Rate,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    DOAS Relief Air Outlet,  !- Key Value
+    System Node Temperature, !- Variable Name
     hourly;                  !- Reporting Frequency
 
 
