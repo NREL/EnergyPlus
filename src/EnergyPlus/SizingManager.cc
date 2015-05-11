@@ -602,6 +602,7 @@ namespace SizingManager {
 					PreDefTableEntry( pdchZnClPkIndHum, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, 5 );
 					PreDefTableEntry( pdchZnClPkOATemp, curName, TempAtPeak );
 					PreDefTableEntry( pdchZnClPkOAHum, curName, HumRatAtPeak, 5 );
+					PreDefTableEntry(pdchZnClPkOAMinFlow, curName, FinalZoneSizing( CtrlZoneNum ).MinOA, 3 );
 				}
 				if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
 					TimeStepAtPeak = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
@@ -635,6 +636,7 @@ namespace SizingManager {
 					PreDefTableEntry( pdchZnHtPkIndHum, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, 5 );
 					PreDefTableEntry( pdchZnHtPkOATemp, curName, TempAtPeak );
 					PreDefTableEntry( pdchZnHtPkOAHum, curName, HumRatAtPeak, 5 );
+					PreDefTableEntry( pdchZnHtPkOAMinFlow, curName, FinalZoneSizing( CtrlZoneNum ).MinOA, 3 );
 				}
 			}
 			// Deallocate arrays no longer needed

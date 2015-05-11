@@ -248,6 +248,7 @@ namespace OutputReportPredefined {
 	extern int pdchZnClPkIndHum;
 	extern int pdchZnClPkOATemp;
 	extern int pdchZnClPkOAHum;
+	extern int pdchZnClPkOAMinFlow;
 	extern int pdstZoneHtSize;
 	extern int pdchZnHtCalcDesLd;
 	extern int pdchZnHtUserDesLd;
@@ -261,6 +262,7 @@ namespace OutputReportPredefined {
 	extern int pdchZnHtPkIndHum;
 	extern int pdchZnHtPkOATemp;
 	extern int pdchZnHtPkOAHum;
+	extern int pdchZnHtPkOAMinFlow;
 	extern int pdstSystemSize;
 	extern int pdchSysSizCalcClAir;
 	extern int pdchSysSizUserClAir;
