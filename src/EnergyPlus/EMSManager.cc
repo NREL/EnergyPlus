@@ -2241,7 +2241,7 @@ SetupEMSActuator(
 		actuator.Actuated >>= lEMSActuated; // Pointer assigment
 		actuator.LogValue >>= lValue; // Pointer assigment
 		actuator.PntrVarTypeUsed = PntrLogical;
-        EMSActuator_lookup.insert( key );
+		EMSActuator_lookup.insert( key );
 	}
 
 }
