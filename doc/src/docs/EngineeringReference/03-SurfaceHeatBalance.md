@@ -8,17 +8,17 @@ Conduction Through The Walls
 
 The most basic time series solution is the response factor equation which relates the flux at one surface of an element to an infinite series of temperature histories at both sides as shown by Equation :
 
-<div>\[{q''_{ko}}(t) = \sum\limits_{j = 0}^\infty  {{X_j}} {T_{o,t - j\delta }} - \sum\limits_{j = 0}^\infty  {{Y_j}} {T_{i,t - j\delta }}\]</div>
+<div>$${q''_{ko}}(t) = \sum\limits_{j = 0}^\infty  {{X_j}} {T_{o,t - j\delta }} - \sum\limits_{j = 0}^\infty  {{Y_j}} {T_{i,t - j\delta }}$$</div>
 
 where q” is heat flux, T is temperature, i signifies the inside of the building element, o signifies the outside of the building element, t represents the current time step, and X and Y are the response factors.
 
 While in most cases the terms in the series decay fairly rapidly, the infinite number of terms needed for an exact response factor solution makes it less than desirable.  Fortunately, the similarity of higher order terms can be used to replace them with flux history terms.  The new solution contains elements that are called conduction transfer functions (CTFs).  The basic form of a conduction transfer function solution is shown by the following equation:
 
-<div>\[{q''_{ki}}(t) =  - {Z_o}{T_{i,t}} - \sum\limits_{j = 1}^{nz} {{Z_j}} {T_{i,t - j\delta }} + {Y_o}{T_{o,t}} + \sum\limits_{j = 1}^{nz} {{Y_j}} {T_{o,t - j\delta }} + \sum\limits_{j = 1}^{nq} {{\Phi_j}{{q''}_{ki,t - j\delta }}} \]</div>
+<div>$${q''_{ki}}(t) =  - {Z_o}{T_{i,t}} - \sum\limits_{j = 1}^{nz} {{Z_j}} {T_{i,t - j\delta }} + {Y_o}{T_{o,t}} + \sum\limits_{j = 1}^{nz} {{Y_j}} {T_{o,t - j\delta }} + \sum\limits_{j = 1}^{nq} {{\Phi_j}{{q''}_{ki,t - j\delta }}} $$</div>
 
 for the inside heat flux, and
 
-<div>\[{q''_{ko}}(t) =  - {Y_o}{T_{i,t}} - \sum\limits_{j = 1}^{nz} {{Y_j}} {T_{i,t - j\delta }} + {X_o}{T_{o,t}} + \sum\limits_{j = 1}^{nz} {{X_j}} {T_{o,t - j\delta }} + \sum\limits_{j = 1}^{nq} {{\Phi_j}{{q''}_{ko,t - j\delta }}} \]</div>
+<div>$${q''_{ko}}(t) =  - {Y_o}{T_{i,t}} - \sum\limits_{j = 1}^{nz} {{Y_j}} {T_{i,t - j\delta }} + {X_o}{T_{o,t}} + \sum\limits_{j = 1}^{nz} {{X_j}} {T_{o,t - j\delta }} + \sum\limits_{j = 1}^{nq} {{\Phi_j}{{q''}_{ko,t - j\delta }}} $$</div>
 
 for the outside heat flux (q²=q/A)
 
@@ -48,33 +48,33 @@ The final CTF solution form reveals why it is so elegant and powerful.  With a 
 
 The basic method used in EnergyPlus for CTF calculations is known as the state space method (Ceylan and Myers 1980; Seem 1987; Ouyang and Haghighat 1991).  Another common, older method used Laplace transformations to reach the solution;  the Laplace method was  used in BLAST (Hittle, 1979; Hittle & Bishop, 1983).  The basic state space system is defined by the following linear matrix equations:
 
-<div>\[\frac{{d\left[ {\bf{x}} \right]}}{{dt}} = \left[ {\bf{A}} \right]\left[ {\bf{x}} \right] + \left[ {\bf{B}} \right]\left[ {\bf{u}} \right]\]</div>
+<div>$$\frac{{d\left[ {\bf{x}} \right]}}{{dt}} = \left[ {\bf{A}} \right]\left[ {\bf{x}} \right] + \left[ {\bf{B}} \right]\left[ {\bf{u}} \right]$$</div>
 
-<div>\[\left[ {\bf{y}} \right] = \left[ {\bf{C}} \right]\left[ {\bf{x}} \right] + \left[ {\bf{D}} \right]\left[ {\bf{u}} \right]\]</div>
+<div>$$\left[ {\bf{y}} \right] = \left[ {\bf{C}} \right]\left[ {\bf{x}} \right] + \left[ {\bf{D}} \right]\left[ {\bf{u}} \right]$$</div>
 
 where x is a vector of state variables, u is a vector of inputs, y is the output vector, t is time, and A, B, C, and D are coefficient matrices.  Through the use of matrix algebra, the vector of state variables (x) can be eliminated from the system of equations, and the output vector (y) can be related directly to the input vector (u) and time histories of the input and output vectors.
 
 This formulation can be used to solve the transient heat conduction equation by enforcing a finite difference grid over the various layers in the building element being analyzed.  In this case, the state variables are the nodal temperatures, the environmental temperatures (interior and exterior) are the inputs, and the resulting heat fluxes at both surfaces are the outputs.  Thus, the state space representation with finite difference variables would take the following form:
 
-<div>\[
+<div>$$
   \frac{d\left[\begin{array}{c}T_1 \\ \vdots \\ T_n\end{array}\right]}{dt} = \left[\bf{A}\right]\left[\begin{array}{c}T_1 \\ \vdots \\ T_n\end{array}\right]+\left[\bf{B}\right]\left[\begin{array}{c}T_i \\ T_o\end{array}\right]
-\]</div>
+$$</div>
 
-<div>\[
+<div>$$
   \left[\begin{array}{c}{q''}_i \\ {q''}_o\end{array}\right] = \left[\bf{C}\right]\left[\begin{array}{c}T_1 \\ \vdots \\ T_n\end{array}\right]+\left[\bf{D}\right]\left[\begin{array}{c}T_i \\ T_o\end{array}\right]
-\]</div>
+$$</div>
 
 where T1, T2, ..., Tn-1, Tn are the finite difference nodal temperatures, n is the number of nodes, Ti and To are the interior and exterior environmental temperatures, and q"i and q"o are the heat fluxes (desired output).
 
 Seem (1987) shows that for a simple one layer slab with two interior nodes as in Figure 7 and convection at both sides the resulting finite difference equations are given by:
 
-<div>\[C\frac{{d{T_1}}}{{dt}} = hA\left( {{T_o} - {T_1}} \right) + \frac{{{T_2} - {T_1}}}{R}\]</div>
+<div>$$C\frac{{d{T_1}}}{{dt}} = hA\left( {{T_o} - {T_1}} \right) + \frac{{{T_2} - {T_1}}}{R}$$</div>
 
-<div>\[C\frac{{d{T_2}}}{{dt}} = hA\left( {{T_i} - {T_2}} \right) + \frac{{{T_1} - {T_2}}}{R}\]</div>
+<div>$$C\frac{{d{T_2}}}{{dt}} = hA\left( {{T_i} - {T_2}} \right) + \frac{{{T_1} - {T_2}}}{R}$$</div>
 
-<div>\[q{``_i} = h\left( {{T_i} - {T_2}} \right)\]</div>
+<div>$$q{``_i} = h\left( {{T_i} - {T_2}} \right)$$</div>
 
-<div>\[q{``_o} = h\left( {{T_1} - {T_o}} \right)\]</div>
+<div>$$q{``_o} = h\left( {{T_1} - {T_o}} \right)$$</div>
 
 where:
 
@@ -86,19 +86,19 @@ A is the area of the surface exposed to the environmental temperatures.
 
 In matrix format:
 
-<div>\[
+<div>$$
   \left[\begin{array}{c}\frac{dT_1}{dt} \\ \frac{dT_2}{dt}\end{array}\right] = 
      \left[\begin{array}{cc}-\frac{1}{RC}-\frac{hA}{C} & \frac{1}{RC} \\ \frac{1}{RC} & -\frac{1}{RC}-\frac{hA}{C}\end{array}\right]\left[\begin{array}{c}T_1 \\ T_2\end{array}\right] + 
      \left[\begin{array}{cc}\frac{hA}{C} & 0 \\ 0 & \frac{hA}{C}\end{array}\right]\left[\begin{array}{c}T_o \\ T_i\end{array}\right]
-\]</div>
+$$</div>
 
-<div>\[
+<div>$$
   \left[\begin{array}{c}{q''}_o \\ {q''}_i\end{array}\right] = 
     \left[\begin{array}{cc}0 & -h \\ h & 0\end{array}\right] \left[\begin{array}{c}T_1 \\ T_2\end{array}\right] +
     \left[\begin{array}{cc}0 & h \\ -h & 0\end{array}\right] \left[\begin{array}{c}T_o \\ T_i\end{array}\right]
-\]</div>
+$$</div>
 
-![](EngineeringReference/media/image168.svg)
+![](EngineeringReference/media/image168.svg.png)
 
 Figure 10.  Two Node State Space Example.
 
@@ -122,19 +122,19 @@ Even though CTF methods require that values of the surface temperatures and flux
 
 The method shown in the Figure 11 maintains two sets of histories out of phase with each other.  The figure shows how this would work for two sets of histories out of phase by one half of a time step.  More sets of temperature and flux histories could be used, allowing the simulation time step to take on values: 1/3, 1/4, 1/5, etc., of the minimum time step allowed for the CTF calculations.  The time step between inputs to the CTF series would be the smallest convenient interval at which the CTF series is stable.  This scenario is illustrated in this figure for two separate sets of temperature and flux histories.  Cycling through each history, in order, allowed calculations of the zone energy balance to be performed with updated surface information at a shorter time step than one CTF history series would otherwise allow.  This method required no interpolation between the series once each set of histories was initialized.  However, if the smallest time step for a stable CTF series was large compared to the zone temperature update time step, significant memory was required to store all the sets of histories.
 
-![](EngineeringReference/media/image169.svg)
+![](EngineeringReference/media/image169.svg.png)
 
 Figure 11. Multiple, staggered time history scheme
 
 Another method is shown in Figure 12. Sequential interpolation of new histories that uses successive interpolations to determine the next set of temperature and flux histories.  The current history is interpolated directly from the previous history set using the required time phase shift between the two.  This method required permanent storage for only one set of temperature and flux histories at a time, but smoothed out temperature and flux data as more interpolations were performed.  As a result, at concurrent simulation times current values of history terms were different form previous "in phase" history terms.  This was unacceptable from, a physical point of view, because it allowed current information to change data from a previous time.
 
-![](EngineeringReference/media/image170.svg)
+![](EngineeringReference/media/image170.svg.png)
 
 Figure 12. Sequential interpolation of new histories
 
 A final method, shown in Figure 13. Master history with interpolation, was something of a hybrid of the previous two methods.  One "master" history set was maintained and updated for all time; this solved the problem of current events propagating information backwards in time.  When surface fluxes needed to be calculated at times out of phase with this master history a new, temporary history was interpolated from the master values.  This method proved to be the best of the three options described because it eliminated propagation of information backwards in time and only required concurrent storage of two sets of temperature and flux histories. This method was subsequently incorporated into the IBLAST program in conjunction with Seem's procedure for calculating the coefficients of the CTF series.
 
-![](EngineeringReference/media/image171.svg)
+![](EngineeringReference/media/image171.svg.png)
 
 Figure 13. Master history with interpolation
 
@@ -200,13 +200,13 @@ EnergyPlus includes two different options for the specific scheme or formulation
 
 The Crank-Nicholson scheme is semi-implicit and based on an Adams-Moulton solution approach. It is considered second-order in time.  The algorithm uses an implicit finite difference scheme coupled with an enthalpy-temperature function to account for phase change energy accurately. The implicit formulation for an internal node is shown in the equation below.
 
-<div>\[
+<div>$$
   C_p \rho \Delta x \frac{T_i^{j+1}-T_i^j}{\Delta t} = 
      \frac{1}{2}\left(k_W\frac{T_{i+1}^{j+1}-T_{i}^{j+1}}{\Delta x} +
                       k_E\frac{T_{i-1}^{j+1}-T_{i}^{j+1}}{\Delta x} + 
                       k_W\frac{T_{i+1}^{j}-T_{i}^{j}}{\Delta x} +
                       k_E\frac{T_{i-1}^{j}-T_{i}^{j}}{\Delta x}\right)
-\]</div>
+$$</div>
 
 Where:
 
@@ -238,13 +238,13 @@ r  = density of material
 
 Then, this equation is accompanied by a second equation that relates enthalpy and temperature.
 
-<div>\[{h_i} = HTF\left( {{T_i}} \right)\]</div>
+<div>$${h_i} = HTF\left( {{T_i}} \right)$$</div>
 
 where HTF is an enthalpy-temperature function that uses user input data.
 
 The fully implicit scheme is also based on an Adams-Moulton solution approach. It is considered first order in time.  The model equation for this scheme is show in the following equation.
 
-<div>\[{C_p}\rho {\rm{\Delta x}}\frac{{T_i^{j + 1} - T_i^j}}{{{\rm{\Delta }}t}} = \left( {{k_W}\frac{{\left( {T_{i + 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}}} \right)\]</div>
+<div>$${C_p}\rho {\rm{\Delta x}}\frac{{T_i^{j + 1} - T_i^j}}{{{\rm{\Delta }}t}} = \left( {{k_W}\frac{{\left( {T_{i + 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}}} \right)$$</div>
 
 For both schemes, EnergyPlus uses the following four types of nodes, as shown in the figure below (1) interior surface nodes, (2) interior nodes, (3) material interface nodes and (4) external surface nodes. The grid for each material is established by specifying a half node for each edge of a material and equal size nodes for the rest of the material. Equations such as are formed for all nodes in a construction. The formulation of all node types is basically the same.
 
@@ -254,13 +254,13 @@ Figure 15. Node depiction for Conduction Finite Difference Model
 
 In the CondFD model, surface discretization depends on the thermal diffusivity of the material (α) and time step (Δt) selected, as shown in the equation below. The default value of 3 for the space discretization constant, *C*, is basically the inverse of the Fourier Number:
 
-<div>\[
+<div>$$
 Fo = \frac{\alpha \Delta t}{\Delta x^2}
-\]</div>
+$$</div>
 
 and is based on the stability requirement for the explicit mode that requires values higher than 2, or a Fourier number lower than 0.5. However, CondFD uses implicit schemes that do not have the same stability requirements as the explicit mode. Thus, the default 3 was originally set rather arbitrary.  As of version 7, the value of this constant can be controlled by the user with the input field called Space Discretization Constant in the HeatBalanceSettings:ConductionFiniteDifference input object.   The discretization method allows CondFD to assign different node spacing or grid size to different material layers in a wall or roof, as building walls and roofs typically consist of several layers of different materials having different thermal properties.
 
-<div>\[{\rm{\Delta x}} = \sqrt {{\rm{C\alpha \Delta t}}} \]</div>
+<div>$${\rm{\Delta x}} = \sqrt {{\rm{C\alpha \Delta t}}} $$</div>
 
 The actual integer number of nodes for each layer is then calculated by rounding off the result from dividing the length of the material layer by the result of the equation above. After this, Δx is recalculated by dividing the length of the material by the number of nodes. A full node is equal to two half nodes. Lower values for the Space Discretization Constant yield more nodes, with higher values yield fewer nodes.
 
@@ -268,17 +268,17 @@ Because the solution is implicit, a Gauss-Seidell iteration scheme is used to up
 
 EnergyPlus also uses a separate, outer iteration loop across all the different inside surface heat balances so that internal long-wave radiation exchange can be properly solved.  For CTF formulations, this iteration is controlled by a maximum allowable temperature difference of 0.002C for inside face surface temperatures from one iteration to the next (or a limit of 100 iterations). CondFD uses the same default value for allowable temperature difference as CTF. However, this parameter was found to often need to be smaller for stability and so the inside surface heat balance manager uses a separate allowable maximum temperature difference when modeling CondFD.  The user can control the value of the relaxation factor by using the input field called  Inside Face Surface Temperature Convergence Criteria in the HeatBalanceSettings:ConductionFiniteDifference input object. In addition, if the program detects that there is instability by watching for excessive numbers of iterations in this outer loop and may decrease the relaxation factor. Users can also output the number of iterations inside of CondFD loop for each surface and the outer internal heat balance loop for each zone with “CondFD Inner Solver Loop Iterations” and “Heat Balance Inside Surfaces Calculation Iterations” respectively.
 
-<div>\[{T_{i,new}} = {T_{i,old}} + \left( {{T_{i,new}} - {T_{i,old}}} \right)*Relax\]</div>
+<div>$${T_{i,new}} = {T_{i,old}} + \left( {{T_{i,new}} - {T_{i,old}}} \right)*Relax$$</div>
 
 Because of the iteration scheme used for CondFD,  the node enthalpies get updated each iteration, and then they are used to develop a variable Cp if a phase change material is being simulated. This is done by including a third equation for Cp.
 
-<div>\[Cp = \frac{{{h_{i,new}} - {h_{i,old}}}}{{{T_{i,new}} - {T_{i,old}}}}\]</div>
+<div>$$Cp = \frac{{{h_{i,new}} - {h_{i,old}}}}{{{T_{i,new}} - {T_{i,old}}}}$$</div>
 
 The iteration scheme assures that the correct enthalpy, and therefore the correct Cp is used in each time step, and the enthalpy of the material is accounted for accurately. Of course, if the material is regular, the user input constant Cp is used.
 
 The algorithm also has a provision for including a temperature coefficient to modify the thermal conductivity. The thermal conductivity is obtained from:
 
-<div>\[k = {k_o} + {k_1}\left( {{T_i} - 20} \right)\]</div>
+<div>$$k = {k_o} + {k_1}\left( {{T_i} - 20} \right)$$</div>
 
 where:
 
@@ -288,13 +288,13 @@ k<sub>1</sub> is the change in conductivity per degree temperature difference fr
 
 As of Version 7, the CondFD implementation was changed to evaluate the thermal conductivity at the interface between nodes, as shown below. In this case, EnergyPlus uses a linear interpolation between nodal points.
 
-<div>\[{C_p}\rho {\rm{\Delta x}}\frac{{T_i^{j + 1} - T_i^j}}{{{\rm{\Delta }}t}} = \frac{1}{2}\left[ {\left( {{k_W}\frac{{\left( {T_{i + 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}}} \right) + \left( {{k_W}\frac{{\left( {T_{i + 1}^j - T_i^j} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^j - T_i^j} \right)}}{{{\rm{\Delta x}}}}} \right)} \right]\]</div>
+<div>$${C_p}\rho {\rm{\Delta x}}\frac{{T_i^{j + 1} - T_i^j}}{{{\rm{\Delta }}t}} = \frac{1}{2}\left[ {\left( {{k_W}\frac{{\left( {T_{i + 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}}} \right) + \left( {{k_W}\frac{{\left( {T_{i + 1}^j - T_i^j} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^j - T_i^j} \right)}}{{{\rm{\Delta x}}}}} \right)} \right]$$</div>
 
 Where,
 
-<div>\[{k_W} = \frac{{\left( {k_{i + 1}^{j + 1} + k_i^{j + 1}} \right)}}{2}\]</div>
+<div>$${k_W} = \frac{{\left( {k_{i + 1}^{j + 1} + k_i^{j + 1}} \right)}}{2}$$</div>
 
-<div>\[{{\rm{k}}_{\rm{E}}} = \frac{{\left( {{\rm{k}}_{{\rm{i}} - 1}^{{\rm{j}} + 1} + {\rm{k}}_{\rm{i}}^{{\rm{j}} + 1}} \right)}}{2}\]</div>
+<div>$${{\rm{k}}_{\rm{E}}} = \frac{{\left( {{\rm{k}}_{{\rm{i}} - 1}^{{\rm{j}} + 1} + {\rm{k}}_{\rm{i}}^{{\rm{j}} + 1}} \right)}}{2}$$</div>
 
 These additional property information values are put into the input file as explained in the Input/Output Reference Document, but it consists simply of a value for k1 and set of enthalpy temperature pairs that describe the enthalpy of the phase change material in straight line segments with respect to temperature.
 
@@ -509,19 +509,19 @@ Table 2. Combined Heat and Moisture Transfer Model Nomenclature
 
 Equations and are derived from heat and moisture balance equations and are taken from [Künzel, H.M. (1995)]. They describe a theoretical model for the transfer of heat and moisture through a material.
 
-<div>\[\frac{{\partial H}}{{\partial T}}\frac{{\partial T}}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{k^w}\frac{{\partial T}}{{\partial x}}} \right) + {h_v}\frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)\]</div>
+<div>$$\frac{{\partial H}}{{\partial T}}\frac{{\partial T}}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{k^w}\frac{{\partial T}}{{\partial x}}} \right) + {h_v}\frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)$$</div>
 
 The three terms in equation describe the storage, transport and generation of heat respectively.
 
-<div>\[\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{D^w}\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial x}}} \right) + \frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)\]</div>
+<div>$$\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{D^w}\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial x}}} \right) + \frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)$$</div>
 
 The three terms in equation describe the storage of moisture, the transport of liquid moisture and the transport of vapor respectively. The equation to calculate the vapor diffusion coefficient in air (<span>$\delta $</span>) used in the third term of both equations, is also taken from Künzel,
 
-<div>\[\delta  = \frac{{\left( {2 \times {{10}^{ - 7}} \times {{\left( {T + 273.15} \right)}^{0.81}}} \right)}}{{{P_{ambient}}}}\]</div>
+<div>$$\delta  = \frac{{\left( {2 \times {{10}^{ - 7}} \times {{\left( {T + 273.15} \right)}^{0.81}}} \right)}}{{{P_{ambient}}}}$$</div>
 
 The heat storage capacity (<span>$\frac{\partial H}{\partial T}$</span>) depends on the moisture content w of the material by the following equation.
 
-<div>\[\frac{{\partial H}}{{\partial T}} = \left( {c\rho  + {c^w}w} \right)\]</div>
+<div>$$\frac{{\partial H}}{{\partial T}} = \left( {c\rho  + {c^w}w} \right)$$</div>
 
 The moisture content of the material w and the vapor diffusion resistance factor μ depend on the relative humidity inside the material. The parameters <span>$\frac{\partial w}{\partial \phi}$</span>, <span>${k^w}$</span> and <span>${D^w}$</span>are also moisture dependent parameters.
 
@@ -535,15 +535,15 @@ The following sections describe how the above equations are used within the HAMT
 
 Equation 1 can be re-written and used to describe the heat storage and transfer through the i<sup>th</sup> cell in a surface.
 
-<div>\[\left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}\frac{{T_i^{p + 1} - T_i^p}}{{\Delta \tau }} = \sum\limits_j {k_{ij}^w{A_{ij}}\frac{{T_j^{p + 1} - T_i^{p + 1}}}{{{x_{ij}}}}}  + \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}} \]</div>
+<div>$$\left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}\frac{{T_i^{p + 1} - T_i^p}}{{\Delta \tau }} = \sum\limits_j {k_{ij}^w{A_{ij}}\frac{{T_j^{p + 1} - T_i^{p + 1}}}{{{x_{ij}}}}}  + \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}} $$</div>
 
 In the one dimensional case there are only two adjacent cells each labelled j. The heat generated due to vaporisation<span>$q_i^v$</span> can be calculated separately.
 
-<div>\[q_i^v = \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}} \]</div>
+<div>$$q_i^v = \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}} $$</div>
 
 Rearranging equation and including other sources of heat (<span>$q_i^{adds}$</span>) such as radiation from other surfaces in the calculation gives the temperature in a cell in the next time step as,
 
-<div>\[T_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{T_j^{p + 1}}}{{R_{ij}^h}}}  + q_i^v + q_i^{adds} + C_i^h\frac{{T_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^h}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^h}}} }}\]</div>
+<div>$$T_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{T_j^{p + 1}}}{{R_{ij}^h}}}  + q_i^v + q_i^{adds} + C_i^h\frac{{T_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^h}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^h}}} }}$$</div>
 
 where<span>$C_i^h = \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}$</span> is thermal heat capacitance of cell i and <span>$R_{ij}^h = \frac{x_{ij}}{k_{ij}A_{ij}}$</span> is the thermal resistance between cells i and j.
 
@@ -569,15 +569,15 @@ This is used in the third term of equation to describe the heat transfer due to 
 
 Moisture, as well as heat, is transported through materials as either liquid (w) or vapor (p). There are two different potentials that control the movement though the material. Liquid transfer is driven by differences in relative humidity whereas vapor transfer is driven by differences in vapor pressure. Materials also have a capacity to store moisture. Equation can be re-written for a discrete cell in a continuous material.
 
-<div>\[\frac{{dw}}{{d{\phi_i}}}\Delta {V_i}\frac{{\phi_i^{p + 1} - \phi_i^p}}{{\Delta \tau }} = \sum\limits_j {{k_{ij}}{A_{ij}}\frac{{\phi_j^{p + 1} - \phi_i^{p + 1}}}{{{x_{ij}}}}}  + \sum\limits_j {\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}} \]</div>
+<div>$$\frac{{dw}}{{d{\phi_i}}}\Delta {V_i}\frac{{\phi_i^{p + 1} - \phi_i^p}}{{\Delta \tau }} = \sum\limits_j {{k_{ij}}{A_{ij}}\frac{{\phi_j^{p + 1} - \phi_i^{p + 1}}}{{{x_{ij}}}}}  + \sum\limits_j {\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}} $$</div>
 
 Equation can be rearranged to provide the relative humidity of the i<sup>th</sup> cell in the next time step.
 
-<div>\[\phi_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{\phi_j^{p + 1}}}{{R_{ij}^w}}}  + \sum\nolimits_j {\frac{{p_i^{p + 1}}}{{R_{ij}^v}}}  + C_i^w\frac{{\phi_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^w}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^w}} + \sum\nolimits_j {\frac{{p_i^{sat}}}{{R_{ij}^v}}} } }}\]</div>
+<div>$$\phi_i^{p + 1} = \frac{{\sum\nolimits_j {\frac{{\phi_j^{p + 1}}}{{R_{ij}^w}}}  + \sum\nolimits_j {\frac{{p_i^{p + 1}}}{{R_{ij}^v}}}  + C_i^w\frac{{\phi_i^p}}{{\Delta \tau }}}}{{\frac{{C_i^w}}{{\Delta \tau }} + \sum\nolimits_j {\frac{1}{{R_{ij}^w}} + \sum\nolimits_j {\frac{{p_i^{sat}}}{{R_{ij}^v}}} } }}$$</div>
 
 where <span>$C_i^w = \frac{dw}{d\phi_{i}}\Delta {V_i}$</span> is the "Moisture Capacitance" of cell i,
 
-<div>\[R_{ij}^w = \frac{{{x_{ij}}}}{{{A_{ij}}D_{ij}^w\frac{{dw}}{{d\phi }}}}\]</div>
+<div>$$R_{ij}^w = \frac{{{x_{ij}}}}{{{A_{ij}}D_{ij}^w\frac{{dw}}{{d\phi }}}}$$</div>
 
 is the moisture resistance between cells i and j and <span>$R_{ij}^v = \frac{\mu_{ij}x_{ij}}{A_{ij}\delta_{ij}}$</span> is the vapor resistance between cells i and j.
 
@@ -634,51 +634,51 @@ The EMPD (Effective Moisture Penetration Depth) model is a simplified, lumped ap
 
 The EMPD concept assumes that a thin layer (δ<sub>M</sub>) close to the wall surface behaves dynamically and exchanges moisture with the air domain when exposed to cyclic air moisture pulses.  For short periods where the cyclic integral of the total moisture adsorption and desorption is near zero (i.e. there is no net moisture storage), the EMPD concept has been shown to be a reasonable approximation of reality (Kerestecioglu et al, 1989).  In other words, the following constraint must be met:
 
-<div>\[\int_{{\tau_1}}^{{\tau_2}} {\frac{{dU}}{{d\tau }}} d\tau  = 0\]</div>
+<div>$$\int_{{\tau_1}}^{{\tau_2}} {\frac{{dU}}{{d\tau }}} d\tau  = 0$$</div>
 
 where, τ<sub>2</sub>-τ<sub>1</sub> denotes the finite time interval over which the equation holds.  The EMPD model assumes no spatial distribution of moisture content across the thickness (L) of the solid; rather, a thin layer (δ<sub>M</sub>) of uniform moisture content (U) is assumed to represent the total moisture content of the solid. This may be mathematically stated as:
 
-<div>\[\int_0^L {U(x)dx = U{\delta_M}} \]</div>
+<div>$$\int_0^L {U(x)dx = U{\delta_M}} $$</div>
 
 For most building materials, the equilibrium moisture sorption isotherm can be defined by the following general equation (Kerestecioglu et al. 1988):
 
-<div>\[U = a{\varphi ^b} + c{\varphi ^d}\]</div>
+<div>$$U = a{\varphi ^b} + c{\varphi ^d}$$</div>
 
 where
 
-<div>\[\varphi  \approx \frac{{{W^*}}}{{{W_{sat}}^*}}\]</div>
+<div>$$\varphi  \approx \frac{{{W^*}}}{{{W_{sat}}^*}}$$</div>
 
 and
 
-<div>\[{W_{sat}}^* = \frac{1}{{{R_v}{\rho_a}{T^*}}}\exp \left( {23.7093 - \frac{{4111}}{{{T^*} - 35.45}}} \right)\]</div>
+<div>$${W_{sat}}^* = \frac{1}{{{R_v}{\rho_a}{T^*}}}\exp \left( {23.7093 - \frac{{4111}}{{{T^*} - 35.45}}} \right)$$</div>
 
  Given that U=U(W<sup>\*</sup>,T<sup>\*</sup>), the moisture content may be differentiated with respect to time in the following manner:
 
-<div>\[\frac{{du}}{{d\tau }} = \frac{{\partial U}}{{\partial {W^*}}}\frac{{d{W^*}}}{{d\tau }} + \frac{{\partial U}}{{\partial {T^*}}}\frac{{d{T^*}}}{{d\tau }} = {A_T}\frac{{d{W^*}}}{{d\tau }} - {B_\rho }\frac{{d{T^*}}}{{d\tau }}\]</div>
+<div>$$\frac{{du}}{{d\tau }} = \frac{{\partial U}}{{\partial {W^*}}}\frac{{d{W^*}}}{{d\tau }} + \frac{{\partial U}}{{\partial {T^*}}}\frac{{d{T^*}}}{{d\tau }} = {A_T}\frac{{d{W^*}}}{{d\tau }} - {B_\rho }\frac{{d{T^*}}}{{d\tau }}$$</div>
 
 where A<sub>T</sub> and B<sub>ρ</sub> are the isothermal moisture capacity and thermo-gradient coefficient, respectively.  From Eqs. , and , they can be expressed as:
 
-<div>\[{A_T} = \frac{{ab{\varphi ^b} + cd{\varphi ^d}}}{{{W^*}}}\]</div>
+<div>$${A_T} = \frac{{ab{\varphi ^b} + cd{\varphi ^d}}}{{{W^*}}}$$</div>
 
 and
 
-<div>\[{B_\rho } =  - \left[ {\frac{1}{{{T^*}}} - \frac{{4111}}{{{{({T^*} - 35.45)}^2}}}} \right]*(ab{\varphi ^b} + cd{\varphi ^d})\]</div>
+<div>$${B_\rho } =  - \left[ {\frac{1}{{{T^*}}} - \frac{{4111}}{{{{({T^*} - 35.45)}^2}}}} \right]*(ab{\varphi ^b} + cd{\varphi ^d})$$</div>
 
 The lumped mass transfer equation for the i-th solid domain may be written as
 
-<div>\[{(A{\rho_b}{\delta_M})_i}\frac{{d{U_i}}}{{d\tau }} = {h_{M,i}}{A_i}({W_r} - {W_i}^*)\]</div>
+<div>$${(A{\rho_b}{\delta_M})_i}\frac{{d{U_i}}}{{d\tau }} = {h_{M,i}}{A_i}({W_r} - {W_i}^*)$$</div>
 
 Using Eqs. , , and , one obtains the final equation needed for closure moisture transfer at internal surface.
 
-<div>\[{({A_i}{\rho_b}{\delta_M}{A_T})_i}\frac{{d{W_i}^*}}{{d\tau }} = {h_{M,i}}{A_i}({W_r} - {W_i}^*) + {(A{\rho_b}{\delta_M}{B_\rho })_i}\frac{{d{T_i}^*}}{{d\tau }}\]</div>
+<div>$${({A_i}{\rho_b}{\delta_M}{A_T})_i}\frac{{d{W_i}^*}}{{d\tau }} = {h_{M,i}}{A_i}({W_r} - {W_i}^*) + {(A{\rho_b}{\delta_M}{B_\rho })_i}\frac{{d{T_i}^*}}{{d\tau }}$$</div>
 
 The energy equation for the envelope contains the surface temperature and is given by the conduction equation
 
-<div>\[\rho {C_p}\frac{{dT}}{{d\tau }} = \nabla  \cdot (k\nabla T)\]</div>
+<div>$$\rho {C_p}\frac{{dT}}{{d\tau }} = \nabla  \cdot (k\nabla T)$$</div>
 
 with the boundary conditions at interior surface
 
-<div>\[ - k\nabla T =  - {q_T}`` + {h_T}({T^*} - {T_r}) + \lambda {h_M}({W^*} - {W_r})\]</div>
+<div>$$ - k\nabla T =  - {q_T}`` + {h_T}({T^*} - {T_r}) + \lambda {h_M}({W^*} - {W_r})$$</div>
 
 A more detailed account of the numerical solution procedure can be found in Kerestecioglu et al. (1988).
 
@@ -686,15 +686,15 @@ A more detailed account of the numerical solution procedure can be found in Kere
 
 An effective moisture penetration depth may be determined from either experimental or detailed simulation data by using actual surface areas and moisture vapor diffusivity.  An empirical function derived from the detailed simulation may be used to determine the EMPD value (Kerestecioglu et al, 1989):
 
-<div>\[{\delta_M} = 12.567024 - 12.21373*\exp \left( { - 267.0211*{D_v}^{0.7}*{\xi ^{ - 0.7}}} \right)\]</div>
+<div>$${\delta_M} = 12.567024 - 12.21373*\exp \left( { - 267.0211*{D_v}^{0.7}*{\xi ^{ - 0.7}}} \right)$$</div>
 
 where
 
-<div>\[\xi  = \left| {\frac{{\Delta \varphi }}{{\Delta \tau }}} \right|\]</div>
+<div>$$\xi  = \left| {\frac{{\Delta \varphi }}{{\Delta \tau }}} \right|$$</div>
 
 Figure 17 gives the EMPD values to be used for various vapor diffusivities evaluated at different ambient excitations.
 
-![](EngineeringReference/media/image241.svg)
+![](EngineeringReference/media/image241.svg.png)
 
 Figure 17. Limit of Effective Penetration Depth Values for Various Vapor Diffusivities at Different Ambient Excitations.
 
@@ -769,7 +769,7 @@ Figure 18. Outside Heat Balance Control Volume Diagram
 
 The heat balance on the outside face is:
 
-<div>\[{q''_{\alpha sol}} + {q''_{LWR}} + {q''_{conv}} - {q''_{ko}} = 0\]</div>
+<div>$${q''_{\alpha sol}} + {q''_{LWR}} + {q''_{conv}} - {q''_{ko}} = 0$$</div>
 
 where:
 
@@ -886,11 +886,11 @@ Table 3. Nomenclature List of Variables.
 
 Consider an enclosure consisting of building exterior surface, surrounding ground surface, and sky.  Using the assumptions above, we can determine the longwave radiative heat flux at the building exterior surface (Walton 1983; McClellan and Pedersen 1997).  The total longwave radiative heat flux is the sum of components due to radiation exchange with the ground, sky, and air.
 
-<div>\[q_{LWR}^`` = {q''_{gnd}} + {q''_{sky}} + {q''_{air}}\]</div>
+<div>$$q_{LWR}^`` = {q''_{gnd}} + {q''_{sky}} + {q''_{air}}$$</div>
 
 Applying the Stefan-Boltzmann Law to each component yields:
 
-<div>\[q_{_{LWR}}^`` = \varepsilon \sigma {F_{gnd}}(T_{gnd}^4 - T_{surf}^4) + \varepsilon \sigma {F_{sky}}(T_{sky}^4 - T_{surf}^4) + \varepsilon \sigma {F_{air}}(T_{air}^4 - T_{surf}^4)\]</div>
+<div>$$q_{_{LWR}}^`` = \varepsilon \sigma {F_{gnd}}(T_{gnd}^4 - T_{surf}^4) + \varepsilon \sigma {F_{sky}}(T_{sky}^4 - T_{surf}^4) + \varepsilon \sigma {F_{air}}(T_{air}^4 - T_{surf}^4)$$</div>
 
 where
 
@@ -914,33 +914,33 @@ T<sub>air</sub> = air temperature
 
 Linearized radiative heat transfer coefficients are introduced to render the above equation more compatible with the heat balance formulation,
 
-<div>\[q_{_{LWR}}^`` = {h_{r,gnd}}({T_{gnd}} - {T_{surf}}) + {h_{r,sky}}({T_{sky}} - {T_{surf}}) + {h_{r,air}}({T_{air}} - {T_{surf}})\]</div>
+<div>$$q_{_{LWR}}^`` = {h_{r,gnd}}({T_{gnd}} - {T_{surf}}) + {h_{r,sky}}({T_{sky}} - {T_{surf}}) + {h_{r,air}}({T_{air}} - {T_{surf}})$$</div>
 
 where
 
-<div>\[{h_{r,gnd}} = \frac{{\varepsilon \sigma {F_{gnd}}(T_{surf}^4 - T_{gnd}^4)}}{{{T_{surf}} - {T_{gnd}}}}\]</div>
+<div>$${h_{r,gnd}} = \frac{{\varepsilon \sigma {F_{gnd}}(T_{surf}^4 - T_{gnd}^4)}}{{{T_{surf}} - {T_{gnd}}}}$$</div>
 
-<div>\[{h_{r,sky}} = \frac{{\varepsilon \sigma {F_{sky}}(T_{surf}^4 - T_{sky}^4)}}{{{T_{surf}} - {T_{sky}}}}\]</div>
+<div>$${h_{r,sky}} = \frac{{\varepsilon \sigma {F_{sky}}(T_{surf}^4 - T_{sky}^4)}}{{{T_{surf}} - {T_{sky}}}}$$</div>
 
-<div>\[{h_{r,air}} = \frac{{\varepsilon \sigma {F_{air}}(T_{surf}^4 - T_{air}^4)}}{{{T_{surf}} - {T_{air}}}}\]</div>
+<div>$${h_{r,air}} = \frac{{\varepsilon \sigma {F_{air}}(T_{surf}^4 - T_{air}^4)}}{{{T_{surf}} - {T_{air}}}}$$</div>
 
 The longwave view factors to ground and sky are calculated with the following expressions (Walton 1983):
 
-<div>\[{F_{ground}} = 0.5(1 - \cos \phi )\]</div>
+<div>$${F_{ground}} = 0.5(1 - \cos \phi )$$</div>
 
-<div>\[{F_{sky}} = 0.5(1 + \cos \phi )\]</div>
+<div>$${F_{sky}} = 0.5(1 + \cos \phi )$$</div>
 
 where *f* is the tilt angle of the surface.  The view factor to the sky is further split between sky and air radiation by:
 
-<div>\[\beta  = \sqrt {0.5\left( {1 + \cos \phi } \right)} \]</div>
+<div>$$\beta  = \sqrt {0.5\left( {1 + \cos \phi } \right)} $$</div>
 
 The ground surface temperature is assumed to be the same as the air temperature.  The final forms of the radiative heat transfer coefficients are shown here.
 
-<div>\[{h_{r,gnd}} = \frac{{\varepsilon \sigma {F_{gnd}}(T_{surf}^4 - T_{air}^4)}}{{{T_{surf}} - {T_{air}}}}\]</div>
+<div>$${h_{r,gnd}} = \frac{{\varepsilon \sigma {F_{gnd}}(T_{surf}^4 - T_{air}^4)}}{{{T_{surf}} - {T_{air}}}}$$</div>
 
-<div>\[{h_{r,sky}} = \frac{{\varepsilon \sigma {F_{sky}}\beta (T_{surf}^4 - T_{sky}^4)}}{{{T_{surf}} - {T_{sky}}}}\]</div>
+<div>$${h_{r,sky}} = \frac{{\varepsilon \sigma {F_{sky}}\beta (T_{surf}^4 - T_{sky}^4)}}{{{T_{surf}} - {T_{sky}}}}$$</div>
 
-<div>\[{h_{r,air}} = \frac{{\varepsilon \sigma {F_{sky}}\left( {1 - \beta } \right)(T_{surf}^4 - T_{air}^4)}}{{{T_{surf}} - {T_{air}}}}\]</div>
+<div>$${h_{r,air}} = \frac{{\varepsilon \sigma {F_{sky}}\left( {1 - \beta } \right)(T_{surf}^4 - T_{air}^4)}}{{{T_{surf}} - {T_{air}}}}$$</div>
 
 ### References
 
@@ -1004,7 +1004,7 @@ To accommodate atmospheric variation EnergyPlus automatically calculates the loc
 
 Variation in outdoor air temperature is calculated using the U.S. Standard Atmosphere (1976).  According to this model, the relationship between air temperature and altitude in a given layer of the atmosphere is:
 
-<div>\[{T_z} = {T_b} + L\left( {{H_z} - {H_b}} \right)\]</div>
+<div>$${T_z} = {T_b} + L\left( {{H_z} - {H_b}} \right)$$</div>
 
 where
 
@@ -1020,7 +1020,7 @@ where
 
 The variable *H<sub>z</sub>* is defined by:
 
-<div>\[{H_z} = \frac{{Ez}}{{\left( {E + z} \right)}}\]</div>
+<div>$${H_z} = \frac{{Ez}}{{\left( {E + z} \right)}}$$</div>
 
 where
 
@@ -1032,7 +1032,7 @@ For the purpose of modeling buildings in the troposphere, altitude *z* refers to
 
 The air temperature at ground level, *T<sub>b</sub>*, is derived from the weather file air temperature by inverting the equation above:
 
-<div>\[{T_b} = {T_{z,met}} - L\left( {\frac{{E{z_{met}}}}{{E + {z_{met}}}} - {H_b}} \right)\]</div>
+<div>$${T_b} = {T_{z,met}} - L\left( {\frac{{E{z_{met}}}}{{E + {z_{met}}}} - {H_b}} \right)$$</div>
 
 where
 
@@ -1046,7 +1046,7 @@ The default value for *z<sub>met</sub>* for air temperature measurement is 1.5 m
 
 Chapter 16 of the Handbook of Fundamentals (ASHRAE 2005).  The wind speed measured at a meteorological station is extrapolated to other altitudes with the equation:
 
-<div>\[{V_z} = {V_{met}}{\left( {\frac{{{\delta_{met}}}}{{{z_{met}}}}} \right)^{{\alpha_{met}}}}{\left( {\frac{z}{\delta }} \right)^\alpha }\]</div>
+<div>$${V_z} = {V_{met}}{\left( {\frac{{{\delta_{met}}}}{{{z_{met}}}}} \right)^{{\alpha_{met}}}}{\left( {\frac{z}{\delta }} \right)^\alpha }$$</div>
 
 where
 
@@ -1116,7 +1116,7 @@ The default value for *z<sub>met</sub>* for wind speed measurement is 10 m above
 
 Heat transfer from surface convection is modeled using the classical formulation:
 
-<div>\[{Q_c} = {h_{c,ext}}A\left( {{T_{surf}} - {T_{air}}} \right)\]</div>
+<div>$${Q_c} = {h_{c,ext}}A\left( {{T_{surf}} - {T_{air}}} \right)$$</div>
 
 where
 
@@ -1160,7 +1160,7 @@ These options can also use schedules to control values over time. Specific detai
 
 The simple algorithm uses surface roughness and local surface windspeed to calculate the exterior heat transfer coefficient (key:SimpleCombined).  The basic equation used is:
 
-<div>\[h = D + E{V_z} + F{V_z}^2\]</div>
+<div>$$h = D + E{V_z} + F{V_z}^2$$</div>
 
 where
 
@@ -1329,11 +1329,11 @@ Table 7. Nomenclature List of Variables.
 
 The Detailed, BLAST, and TARP convection models are very similar.  In all three models, convection is split into forced and natural components (Walton 1981).  The total convection coefficient is the sum of these components.
 
-<div>\[{h_c} = {h_f} + {h_n}\]</div>
+<div>$${h_c} = {h_f} + {h_n}$$</div>
 
 The forced convection component is based on a correlation by Sparrow, Ramsey, and Mass (1979):
 
-<div>\[{h_f} = 2.537{W_f}{R_f}{\left( {\frac{{P{V_z}}}{A}} \right)^{1/2}}\]</div>
+<div>$${h_f} = 2.537{W_f}{R_f}{\left( {\frac{{P{V_z}}}{A}} \right)^{1/2}}$$</div>
 
 where
 
@@ -1392,17 +1392,17 @@ The natural convection component *h<sub>n</sub>* is calculated in the same way a
 
 For no temperature difference OR a vertical surface the following correlation is used:
 
-<div>\[h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}\]</div>
+<div>$$h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}$$</div>
 
 For (DT &lt; 0.0 AND an upward facing surface)  OR  (DT &gt; 0.0 AND an downward facing surface) an enhanced convection correlation is used:
 
-<div>\[h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}\]</div>
+<div>$$h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}$$</div>
 
 where S is the surface tilt angle.
 
 For (DT &gt; 0.0 AND an upward facing surface)  OR  (DT &lt; 0.0 AND an downward facing surface) a reduced convection correlation is used:
 
-<div>\[h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}\]</div>
+<div>$$h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}$$</div>
 
 where S is the surface tilt angle.
 
@@ -1460,7 +1460,7 @@ Table 9.  Nomenclature List of Variables.
 
 The MoWiTT model is based on measurements taken at the Mobile Window Thermal Test (MoWiTT) facility (Yazdanian and Klems 1994).  The correlation applies to very smooth, vertical surfaces (e.g. window glass) in low-rise buildings and has the form:
 
-<div>\[{h_c} = \sqrt {{{\left[ {{C_t}{{\left( {\Delta T} \right)}^{\frac{1}{3}}}} \right]}^2} + {{\left[ {aV_z^b} \right]}^2}} \]</div>
+<div>$${h_c} = \sqrt {{{\left[ {{C_t}{{\left( {\Delta T} \right)}^{\frac{1}{3}}}} \right]}^2} + {{\left[ {aV_z^b} \right]}^2}} $$</div>
 
 Constants a, b and turbulent natural convection constant C<sub>t</sub> are given in Table 10.  The original MoWiTT model has been modified for use in EnergyPlus so that it is sensitive to the local suface’s wind speed which varies with the height above ground.  The original MoWiTT model was formulated for use with the air velocity at the location of the weather station.  As of Version 7.2, EnergyPlus uses the “a” model coefficients derived by Booten et al. (2012) rather than the original values from Yazdanian and Klems (1994).
 
@@ -1570,13 +1570,13 @@ Table 11.  Nomenclature List of Variables.
 
 The DOE-2 convection model is a combination of the MoWiTT and BLAST Detailed convection models (LBL 1994). The convection coefficient for very smooth surfaces (e.g. glass) is calculated as:
 
-<div>\[{h_{c,glass}} = \sqrt {h_n^2 + {{\left[ {aV_z^b} \right]}^2}} \]</div>
+<div>$${h_{c,glass}} = \sqrt {h_n^2 + {{\left[ {aV_z^b} \right]}^2}} $$</div>
 
 h<sub>n</sub> is calculated using Equation or Equation .  Constants a and b are given in Table 10.
 
 For less smooth surfaces, the convection coefficient is modified according to the equation
 
-<div>\[{h_c} = {h_n} + {R_f}({h_{c,glass}} - {h_n})\]</div>
+<div>$${h_c} = {h_n} + {R_f}({h_{c,glass}} - {h_n})$$</div>
 
 where R<sub>f</sub> is the roughness multiplier given by Table 8.
 
@@ -1642,19 +1642,19 @@ During an initial setup phase, all the heat transfer surfaces in the input file 
 
 As discussed above for the TARP algorithm, a Sparrow et al. (1979) conducted flat plate measurements and develop the following correlation for finite-size flat plates oriented to windward.
 
-<div>\[{h_f} = 2.53{R_f}{\left( {\frac{{P{V_z}}}{A}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 2}}\right.}\!\lower0.7ex\hbox{$2$}}}}\]</div>
+<div>$${h_f} = 2.53{R_f}{\left( {\frac{{P{V_z}}}{A}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 2}}\right.}\!\lower0.7ex\hbox{$2$}}}}$$</div>
 
 ##### Sparrow Leeward
 
 Sparrow et al. (1979) conducted flat plate measurements and develop the following correlation for finite-size flat plates oriented to leeward.
 
-<div>\[{h_f} = \frac{{2.53}}{2}{R_f}{\left( {\frac{{P{V_z}}}{A}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 2}}\right.}\!\lower0.7ex\hbox{$2$}}}}\]</div>
+<div>$${h_f} = \frac{{2.53}}{2}{R_f}{\left( {\frac{{P{V_z}}}{A}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 2}}\right.}\!\lower0.7ex\hbox{$2$}}}}$$</div>
 
 ##### MoWITT Windward
 
 As discussed above, Yazdanian and Klems (1994) used outdoor laboratory measurements to develop the following correlation for smooth surfaces oriented to windward. Booten et al. (2012) developed revised coefficients for use with local surface wind speeds.
 
-<div>\[{h_c} = \sqrt {{{\left[ {0.84{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^2} + {{\left[ {2.38{\kern 1pt} {\kern 1pt} V_z^{0.89}} \right]}^2}} \]</div>
+<div>$${h_c} = \sqrt {{{\left[ {0.84{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^2} + {{\left[ {2.38{\kern 1pt} {\kern 1pt} V_z^{0.89}} \right]}^2}} $$</div>
 
 This model equation is for the total film coefficient and includes the natural convection portion. Therefore it should not be used in conjunction with a second natural convection model equation.
 
@@ -1662,7 +1662,7 @@ This model equation is for the total film coefficient and includes the natural c
 
 Yazdanian and Klems (1994) used outdoor laboratory measurements to develop the following correlation for smooth surfaces oriented to leeward. Booten et al. (2012) developed revised coefficients for use with local surface wind speeds.
 
-<div>\[{h_c} = \sqrt {{{\left[ {0.84{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^2} + {{\left[ {2.86{\kern 1pt} {\kern 1pt} V_z^{0.617}} \right]}^2}} \]</div>
+<div>$${h_c} = \sqrt {{{\left[ {0.84{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^2} + {{\left[ {2.86{\kern 1pt} {\kern 1pt} V_z^{0.617}} \right]}^2}} $$</div>
 
 This model equation is for the total film coefficient and includes the natural convection portion. Therefore it should not be used in conjunction with a second natural convection model equation.
 
@@ -1670,14 +1670,14 @@ This model equation is for the total film coefficient and includes the natural c
 
 Blocken et al. (2009) developed a set of correlations for windward facing outdoor surfaces using numerical methods (key: BlockenWindward).
 
-<div>\[
+<div>$$
   \begin{array}{lcl}
     h_f = 4.6V^{0.89}_{10m} & : & \theta \leq 11.25 \\
     h_f = 5.0V^{0.80}_{10m} & : & 11.25 < \theta \leq 33.75 \\
     h_f = 4.6V^{0.84}_{10m} & : & 33.75 < \theta \leq 56.25 \\
     h_f = 4.5V^{0.81}_{10m} & : & 56.25 < \theta \leq 100.0
   \end{array}
-\]</div>
+$$</div>
 
 Where *V<sub>10m</sub>* is the air velocity at the location of the weather station and θ is the angle of incidence between the wind and the surface in degrees.  This model is only applicable to windward surfaces and lacks a natural convection component and therefore cannot be used on its own but only within the adaptive convection algorithm for the outside face.
 
@@ -1685,7 +1685,7 @@ Where *V<sub>10m</sub>* is the air velocity at the location of the weather stati
 
 Clear et al. (2003) developed correlations from measurements for horizontal roofs on two commercial buildings. In EnergyPlus the implementation uses the model for natural convection plus turbulent forced convection (eq. 8A in the reference) and applies it to the center point of each surface section that makes up the roof.
 
-<div>\[{h_c} = \eta \frac{k}{{{L_n}}}0.15Ra_{{L_n}}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}} + \frac{k}{x}{R_f}0.0296{\mathop{\rm Re}\nolimits}_x^{{\raise0.7ex\hbox{$4$} \!\mathord{\left/ {\vphantom {4 5}}\right.}\!\lower0.7ex\hbox{$5$}}}{\Pr ^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}\]</div>
+<div>$${h_c} = \eta \frac{k}{{{L_n}}}0.15Ra_{{L_n}}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}} + \frac{k}{x}{R_f}0.0296{\mathop{\rm Re}\nolimits}_x^{{\raise0.7ex\hbox{$4$} \!\mathord{\left/ {\vphantom {4 5}}\right.}\!\lower0.7ex\hbox{$5$}}}{\Pr ^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}$$</div>
 
 Where
 
@@ -1711,7 +1711,7 @@ This model only claims to be applicable to horizontal roof surfaces so it may no
 
 Emmel et al. (2007) developed a set of correlations for outdoor surfaces using numerical methods.  The following equations are for vertical surfaces (key: EmmelVertical):
 
-<div>\[
+<div>$$
   \begin{array}{lcl}
     h_f = 5.15V^{0.81}_{10m} & : & \theta \leq 22.5 \\
     h_f = 3.34V^{0.84}_{10m} & : & 22.5 < \theta \leq 67.5 \\
@@ -1719,17 +1719,17 @@ Emmel et al. (2007) developed a set of correlations for outdoor surfaces using n
     h_f = 4.05V^{0.77}_{10m} & : & 112.5 < \theta \leq 157.5 \\
     h_f = 3.54V^{0.76}_{10m} & : & 157.5 < \theta \leq 180.0
   \end{array}
-\]</div>
+$$</div>
 
 Where *V<sub>10m</sub>* is the air velocity at the location of the weather station and θ is the angle of incidence between the wind and the surface in degrees.  The following equations are used for horizontal (roof) surfaces (key: EmmelRoof):
 
-<div>\[
+<div>$$
   \begin{array}{lcl}
     h_f = 5.11V^{0.78}_{10m} & : & \theta \leq 22.5 \\
     h_f = 4.60V^{0.79}_{10m} & : & 22.5 < \theta \leq 67.5 \\
     h_f = 3.67V^{0.85}_{10m} & : & 67.5 < \theta \leq 90
   \end{array}
-\]</div>
+$$</div>
 
 Where θ is the angle of incidence between the wind and the longest edge of the roof surface in degrees.
 
@@ -1739,7 +1739,7 @@ This model is for all wind directions but lacks a natural convection component.�
 
 Perhaps the oldest equation for wind-driven convection was developed by Nusselt and Jurges (1922).  Palyvos (2008) casts their model in simplified form in SI units as:
 
-<div>\[{h_c} = 5.8 + 3.94\;{V_z}\]</div>
+<div>$${h_c} = 5.8 + 3.94\;{V_z}$$</div>
 
 Where *V<sub>z</sub>* is the wind velocity in m/s, in EnergyPlus that velocity is adjusted for height above ground using the z axis coordinate of the surface’s centroid and the site wind model.  This model can be applied to all surfaces and the relatively large constant is assumed to represent the natural convection portion of a total convection coefficient.  The model is not sensitive to wind direction nor surface roughness.
 
@@ -1747,7 +1747,7 @@ Where *V<sub>z</sub>* is the wind velocity in m/s, in EnergyPlus that velocity i
 
 A venerable equation for wind-driven convection was developed by McAdams (1954) which Palyvos (2008) casts in SI units as:
 
-<div>\[{h_c} = 5.7 + 3.8\;{V_z}\]</div>
+<div>$${h_c} = 5.7 + 3.8\;{V_z}$$</div>
 
 Where *V<sub>z</sub>* is the wind velocity in m/s that has been adjusted for height above ground using the z axis coordinate of the surface’s centroid.  This model can be applied to all surfaces and the relatively large constant is assumed to represent the natural convection portion of a total convection coefficient.  The model is not sensitive to wind direction nor surface roughness.
 
@@ -1755,7 +1755,7 @@ Where *V<sub>z</sub>* is the wind velocity in m/s that has been adjusted for hei
 
 A useful geometric scale based on building volume is used in an equation developed by Mitchell (1976).  The wind-driven convection equation is cast by Palyvos as:
 
-<div>\[{h_f} = \frac{{8.6\;V_z^{0.6}}}{{{L^{0.4}}}}\]</div>
+<div>$${h_f} = \frac{{8.6\;V_z^{0.6}}}{{{L^{0.4}}}}$$</div>
 
 Where *V<sub>z</sub>* is the wind velocity in m/s that has been adjusted for height above ground using the z axis coordinate of the surface’s centroid and *L* is the cube root of the building’s total volume. EnergyPlus interprets this as the sum of the volume of all the zones in the input file.
 
@@ -1800,7 +1800,7 @@ The heart of the heat balance method is the internal heat balance involving the 
 
 The heat balance on the inside face can be written as follows:
 
-<div>\[{q''_{LWX}} + {q''_{SW}} + {q''_{LWS}} + {q''_{ki}} + {q''_{sol}} + {q''_{conv}} = 0\]</div>
+<div>$${q''_{LWX}} + {q''_{SW}} + {q''_{LWS}} + {q''_{ki}} + {q''_{sol}} + {q''_{conv}} = 0$$</div>
 
 where:
 
@@ -1862,7 +1862,7 @@ Warning messages are produced for both of these cases, and the results should be
 
 Once the ScriptF coefficients are determined, the longwave radiant exchange is calculated for each surface using:
 
-<div>\[{q_{i,j}} = {A_i}{F_{i,j}}\left( {T_i^4 - T_j^4} \right)\]</div>
+<div>$${q_{i,j}} = {A_i}{F_{i,j}}\left( {T_i^4 - T_j^4} \right)$$</div>
 
 where ***F***<sub>i,j</sub> is the ScriptF between surfaces i and j.
 
@@ -2346,7 +2346,7 @@ The individual *h<sub>c</sub>* model equations and their respective references a
 
 Walton adopted the following equation for natural convection from ASHRAE .
 
-<div>\[h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}\]</div>
+<div>$$h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}$$</div>
 
 This is usually bound at a minimum of .1 in EnergyPlus. This is a component of the TARP overall algorithm described below.
 
@@ -2354,7 +2354,7 @@ This is usually bound at a minimum of .1 in EnergyPlus. This is a component of t
 
 Walton (11983) developed the following equation by fitting curves from various sources.
 
-<div>\[h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}\]</div>
+<div>$$h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}$$</div>
 
 Unstable refers to the direction of heat flow and the associated buoyancy relative to the surfaces. Unstable is when the natural tendency is to enhance flow in the sense that rising warmer air, or falling cooler air, is free to move away from the surface. This is usually bound at a minimum of .1 in EnergyPlus. This is a component of the TARP overall algorithm described below.
 
@@ -2362,7 +2362,7 @@ Unstable refers to the direction of heat flow and the associated buoyancy relati
 
 Walton (11983) developed the following equation by fitting curves from various sources.
 
-<div>\[h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}\]</div>
+<div>$$h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}$$</div>
 
 Stable refers to the direction of heat flow and the associated buoyancy relative to the surfaces. Stable is when the natural tendency is to retard flow in the sense that rising warmer air, or falling cooler air, is driven against the surface. This is usually bound at a minimum of .1 in EnergyPlus. This is a component of the TARP overall algorithm described below.
 
@@ -2370,7 +2370,7 @@ Stable refers to the direction of heat flow and the associated buoyancy relative
 
 Fisher and Pedersen 1997) developed the following equation from laboratory chamber measurements.
 
-<div>\[h = 1.208 + 1.012 * AC{H^{0.604}}\]</div>
+<div>$$h = 1.208 + 1.012 * AC{H^{0.604}}$$</div>
 
 This is a component of the CeilingDiffuser overall algorithm described below.
 
@@ -2378,7 +2378,7 @@ This is a component of the CeilingDiffuser overall algorithm described below.
 
 Fisher and Pedersen (1997) developed the following equation from laboratory chamber measurements.
 
-<div>\[h = 2.234 + 4.099 * AC{H^{0.503}}\]</div>
+<div>$$h = 2.234 + 4.099 * AC{H^{0.503}}$$</div>
 
 This is a component of the CeilingDiffuser overall algorithm described below.
 
@@ -2386,7 +2386,7 @@ This is a component of the CeilingDiffuser overall algorithm described below.
 
 Fisher and Pedersen 1997) developed the following equation from laboratory chamber measurements.
 
-<div>\[h = 3.873 + 0.082 * AC{H^{0.98}}\]</div>
+<div>$$h = 3.873 + 0.082 * AC{H^{0.98}}$$</div>
 
 This is a component of the CeilingDiffuser overall algorithm described below.
 
@@ -2394,7 +2394,7 @@ This is a component of the CeilingDiffuser overall algorithm described below.
 
 Alamdari and Hammond (1983) developed the following correlation for horizontal surfaces in stable thermal situation.
 
-<div>\[h = 0.6{\left( {\frac{{\left| {\Delta T} \right|}}{{D_h^2}}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}}}\]</div>
+<div>$$h = 0.6{\left( {\frac{{\left| {\Delta T} \right|}}{{D_h^2}}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}}}$$</div>
 
 where,
 
@@ -2404,13 +2404,13 @@ where,
 
 Alamdari and Hammond (1983) developed the following correlation for horizontal surfaces in a buoyant thermal situation.
 
-<div>\[h = {\left\{ {{{\left[ {1.4{{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_h}}}} \right)}^{^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}}} \right]}^6} + {{\left[ {1.63{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^6}} \right\}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 6}}\right.}\!\lower0.7ex\hbox{$6$}}}}\]</div>
+<div>$$h = {\left\{ {{{\left[ {1.4{{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_h}}}} \right)}^{^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}}} \right]}^6} + {{\left[ {1.63{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^6}} \right\}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 6}}\right.}\!\lower0.7ex\hbox{$6$}}}}$$</div>
 
 #### Alamdari Hammond Vertical Wall
 
 Alamdari and Hammond (1983) developed the following correlation for vertical surfaces.
 
-<div>\[h = {\left\{ {{{\left[ {1.5{{\left( {\frac{{\left| {\Delta T} \right|}}{H}} \right)}^{^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}}} \right]}^6} + {{\left[ {1.23{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^6}} \right\}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 6}}\right.}\!\lower0.7ex\hbox{$6$}}}}\]</div>
+<div>$$h = {\left\{ {{{\left[ {1.5{{\left( {\frac{{\left| {\Delta T} \right|}}{H}} \right)}^{^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}}} \right]}^6} + {{\left[ {1.23{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^6}} \right\}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 6}}\right.}\!\lower0.7ex\hbox{$6$}}}}$$</div>
 
 where,
 
@@ -2420,37 +2420,37 @@ where,
 
 Khalifa (1989) conducted experiments with test chambers and developed correlations for certain types of surfaces.  One of them, identified as “Equation 3” in original reference, is for convectively heated zones and applies to the inside surfaces of walls away from the heat source:
 
-<div>\[h = 2.07{\left| {\Delta T} \right|^{0.23}}\]</div>
+<div>$$h = 2.07{\left| {\Delta T} \right|^{0.23}}$$</div>
 
 #### Khalifa Eq4 Ceiling Away From Heat
 
 Khalifa (1989) conducted experiments with test chambers and developed correlations for certain types of surfaces.  One of them, identified as “Equation 4” in original reference, is for convectively heated zones and applies to the inside surfaces of ceilings away from the heat source:
 
-<div>\[h = 2.72{\left| {\Delta T} \right|^{0.13}}\]</div>
+<div>$$h = 2.72{\left| {\Delta T} \right|^{0.13}}$$</div>
 
 #### Khalifa Eq5 Wall Near Heat
 
 Khalifa (1989) conducted experiments with test chambers and developed correlations for certain types of surfaces.  One of them, identified as “Equation 5” in original reference, is for convectively heated zones and applies to the inside surfaces of walls near the heat source:
 
-<div>\[h = 1.98{\left| {\Delta T} \right|^{0.32}}\]</div>
+<div>$$h = 1.98{\left| {\Delta T} \right|^{0.32}}$$</div>
 
 #### Khalifa Eq6 Non Heated Walls
 
 Khalifa (1989) conducted experiments with test chambers and developed correlations for certain types of surfaces.  One of them, identified as “Equation 6” in original reference, is for heated zones and applies to the inside surfaces of walls that are not heated:
 
-<div>\[h = 2.30{\left| {\Delta T} \right|^{0.24}}\]</div>
+<div>$$h = 2.30{\left| {\Delta T} \right|^{0.24}}$$</div>
 
 #### Khalifa Eq7 Ceiling
 
 Khalifa (1989) conducted experiments with test chambers and developed correlations for certain types of surfaces.  One of them, identified as “Equation 7” in original reference, is for heated zones and applies to the inside surfaces of ceilings:
 
-<div>\[h = 3.10{\left| {\Delta T} \right|^{0.17}}\]</div>
+<div>$$h = 3.10{\left| {\Delta T} \right|^{0.17}}$$</div>
 
 #### Awbi Hatton Heated Floor
 
 Awbi and Hatton (1999) conducted laboratory measurements using environmental chambers and developed the following correlation for floor surfaces that are being actively heated.
 
-<div>\[h = \frac{{2.175{{\left| {\Delta T} \right|}^{0.308}}}}{{D_h^{0.076}}}\]</div>
+<div>$$h = \frac{{2.175{{\left| {\Delta T} \right|}^{0.308}}}}{{D_h^{0.076}}}$$</div>
 
 where,
 
@@ -2460,7 +2460,7 @@ where,
 
 Awbi and Hatton (1999) developed the following correlation for wall surfaces that are being actively heated.
 
-<div>\[h = \frac{{1.823{{\left| {\Delta T} \right|}^{0.293}}}}{{D_h^{0.076}}}\]</div>
+<div>$$h = \frac{{1.823{{\left| {\Delta T} \right|}^{0.293}}}}{{D_h^{0.076}}}$$</div>
 
 where,
 
@@ -2471,7 +2471,7 @@ where,
 Beausoleil-Morrison (2000) used blending techniques to combine correlations originally developed by Alamdari and Hammond (1983) and Fisher and Pedersen (1997) to create the following correlation is for walls where the flow driving forces from mechanical forces are augmented by the driving forces from buoyancy.
 
 <div>
-\[
+$$
 h = \left( 
 \left\{
 \left[1.5\left(\frac{\left|\Delta T\right|}{H}\right)^{1/4}\right]^6 +
@@ -2482,7 +2482,7 @@ h = \left(
 \left[-0.199+0.190\cdot ACH^{0.8}\right]
 \right\}^3
 \right)^{1/3}
-\]
+$$
 </div>
 
 where,
@@ -2496,7 +2496,7 @@ Here the reference temperature is the zone air temperature rather than the diffu
 Beausoleil-Morrison (2000) used blending techniques to combine correlations originally developed by Alamdari and Hammond (1983) and Fisher and Pedersen (1997) to create the following correlation is for walls where the flow driving forces from mechanical forces are opposed by the driving forces from buoyancy.
 
 <div>
-\[
+$$
 h = \max \left\{
 \begin{array}{l}
 \left(\left\{\left[1.5\left(\frac{\left|\Delta T\right|}{H}\right)^{1/4}\right]^6+\left[1.23\left|\Delta T\right|^2\right]^{1/6}\right\}^{1/2}-\left\{\left[\frac{T_{surf}-T_{SAT}}{\left|\Delta T\right|}\right]\cdot\left[-0.199+0.190\cdot ACH^{0.8}\right]\right\}^3\right)^{1/3} \\
@@ -2504,33 +2504,33 @@ h = \max \left\{
 0.8\cdot \left\{\left[\frac{T_{surf}-T_{SAT}}{\left|\Delta T\right|}\right]\cdot\left[-0.199+0.190\cdot ACH^{0.8}\right]\right\}
 \end{array}
 \right.
-\]
+$$
 </div>
 
 #### Beausoleil Morrison Mixed Stable Floor
 
 Beausoleil-Morrison (2000) used blending techniques to combine correlations originally developed by Alamdari and Hammond (1983) and Fisher and Pedersen (1997) to create the following correlation is for floors where the flow driving forces include both mechanical forces and thermally stable buoyancy.
 
-<div>\[h = {\left( {{{\left\{ {0.6 \cdot {{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_H}}}} \right)}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}}}} \right\}}^3} + {{\left\{ {\left[ {\frac{{{T_{surf}} - {T_{SAT}}}}{{\left| {\Delta T} \right|}}} \right]\cdot\left[ {0.159 + 0.116AC{H^{0.8}}} \right]} \right\}}^3}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}\]</div>
+<div>$$h = {\left( {{{\left\{ {0.6 \cdot {{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_H}}}} \right)}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}}}} \right\}}^3} + {{\left\{ {\left[ {\frac{{{T_{surf}} - {T_{SAT}}}}{{\left| {\Delta T} \right|}}} \right]\cdot\left[ {0.159 + 0.116AC{H^{0.8}}} \right]} \right\}}^3}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}$$</div>
 
 #### Beausoleil Morrison Mixed Unstable Floor
 
 Beausoleil-Morrison (2000) used blending techniques to combine correlations originally developed by Alamdari and Hammond (1983) and Fisher and Pedersen (1997) to create the following correlation is for floors where the flow driving forces include both mechanical forces and thermally unstable buoyancy.
 
-<div>\[h = {\left( {{{\left\{ {{{\left[ {1.4{{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_h}}}} \right)}^{^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}}} \right]}^6} + {{\left[ {1.63{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^6}} \right\}}^{{\raise0.7ex\hbox{$3$} \!\mathord{\left/ {\vphantom {3 6}}\right.}\!\lower0.7ex\hbox{$6$}}}} + {{\left\{ {\left[ {\frac{{{T_{surf}} - {T_{SAT}}}}{{\left| {\Delta T} \right|}}} \right]\cdot\left[ {0.159 + 0.116AC{H^{0.8}}} \right]} \right\}}^3}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}\]</div>
+<div>$$h = {\left( {{{\left\{ {{{\left[ {1.4{{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_h}}}} \right)}^{^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}}} \right]}^6} + {{\left[ {1.63{{\left| {\Delta T} \right|}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}} \right]}^6}} \right\}}^{{\raise0.7ex\hbox{$3$} \!\mathord{\left/ {\vphantom {3 6}}\right.}\!\lower0.7ex\hbox{$6$}}}} + {{\left\{ {\left[ {\frac{{{T_{surf}} - {T_{SAT}}}}{{\left| {\Delta T} \right|}}} \right]\cdot\left[ {0.159 + 0.116AC{H^{0.8}}} \right]} \right\}}^3}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}$$</div>
 
 #### Beausoleil Morrison Mixed Stable Ceiling
 
 Beausoleil-Morrison (2000) used blending techniques to combine correlations originally developed by Alamdari and Hammond (1983) and Fisher and Pedersen (1997) to create the following correlation is for ceilings where the flow driving forces include both mechanical forces and thermally Stable buoyancy.
 
-<div>\[h = {\left( {{{\left\{ {0.6 \cdot {{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_H}}}} \right)}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}}}} \right\}}^3} + {{\left\{ {\left[ {\frac{{{T_{surf}} - {T_{SAT}}}}{{\left| {\Delta T} \right|}}} \right]\cdot\left[ { - 0.166 + 0.484AC{H^{0.8}}} \right]} \right\}}^3}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}\]</div>
+<div>$$h = {\left( {{{\left\{ {0.6 \cdot {{\left( {\frac{{\left| {\Delta T} \right|}}{{{D_H}}}} \right)}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}}}} \right\}}^3} + {{\left\{ {\left[ {\frac{{{T_{surf}} - {T_{SAT}}}}{{\left| {\Delta T} \right|}}} \right]\cdot\left[ { - 0.166 + 0.484AC{H^{0.8}}} \right]} \right\}}^3}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}}$$</div>
 
 #### Beausoleil Morrison Mixed Unstable Ceiling
 
 Beausoleil-Morrison (2000) used blending techniques to combine correlations originally developed by Alamdari and Hammond (1983) and Fisher and Pedersen (1997) to create the following correlation is for ceilings where the flow driving forces include both mechanical forces and thermally unstable buoyancy.
 
 <div>
- \[
+ $$
   h = \left(
    \left(
     \left[
@@ -2562,30 +2562,30 @@ Beausoleil-Morrison (2000) used blending techniques to combine correlations orig
     \right]
    \right)^3
   \right)^{1/3}
- \]
+ $$
 </div>
 
 #### Fohanno Polidori Vertical Wall
 
 Fohanno and Polidori (2006) developed the following equation for *h<sub>c</sub>* for vertical walls under simple buoyancy flow conditions.
 
-<div>\[h = \left\{ \begin{array}{l}1.332{\left( {\frac{{\left| {\Delta T} \right|}}{H}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}\quad ,\quad Ra_H^* \le 6.3 \times {10^9}\\1.235{e^{\left( {0.0467H} \right)}}{\left| {\Delta T} \right|^{0.316}}\quad ,\quad Ra_H^* > 6.3 \times {10^9}\end{array} \right.\]</div>
+<div>$$h = \left\{ \begin{array}{l}1.332{\left( {\frac{{\left| {\Delta T} \right|}}{H}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}}\quad ,\quad Ra_H^* \le 6.3 \times {10^9}\\1.235{e^{\left( {0.0467H} \right)}}{\left| {\Delta T} \right|^{0.316}}\quad ,\quad Ra_H^* > 6.3 \times {10^9}\end{array} \right.$$</div>
 
 where,
 
-<div>\[Ra_H^* = \frac{{g{\beta_f}{{q''}_c}{H^4}}}{{{k_f}\nu_f^2}}{\Pr_f}\]</div>
+<div>$$Ra_H^* = \frac{{g{\beta_f}{{q''}_c}{H^4}}}{{{k_f}\nu_f^2}}{\Pr_f}$$</div>
 
 #### Karadag Chilled Ceiling
 
 Karadag (2009) used numerical methods to develop the following equation for *h<sub>c</sub>* for chilled-ceiling surfaces.
 
-<div>\[h = 3.1{\left| {\Delta T} \right|^{0.22}}\]</div>
+<div>$$h = 3.1{\left| {\Delta T} \right|^{0.22}}$$</div>
 
 #### ISO 15099 Windows
 
 ISO Standard 15099-2003 includes the equations for *h<sub>c</sub>* for room-side of windows and surfaces with any tilt angle and heat flow direction.  The ISO 15099 correlation is for still room air angle and is determined in terms of the Nusselt number, <span>$Nu$</span>, where
 
-<div>\[{h_i} = Nu\left( {\frac{\lambda }{H}} \right)\]</div>
+<div>$${h_i} = Nu\left( {\frac{\lambda }{H}} \right)$$</div>
 
 where,
 
@@ -2595,7 +2595,7 @@ where,
 
 The Rayleigh number based on height, <span>$R{a_H}$</span>, is calculated using,
 
-<div>\[R{a_H} = \frac{{{\rho ^2}{H^3}g\,{c_p}\left| {{T_{surf,i}} - {T_{air}}} \right|}}{{{T_{m,f}}\mu \lambda }}\]</div>
+<div>$$R{a_H} = \frac{{{\rho ^2}{H^3}g\,{c_p}\left| {{T_{surf,i}} - {T_{air}}} \right|}}{{{T_{m,f}}\mu \lambda }}$$</div>
 
 where,
 
@@ -2609,29 +2609,29 @@ where,
 
 <span>${T_{m,f}}$</span> is the mean film temperature in Kelvin given by,
 
-<div>\[{T_{m,f}} = {T_{air}} + \frac{1}{4}\left( {{T_{surf,i}} - {T_{air}}} \right)\]</div>
+<div>$${T_{m,f}} = {T_{air}} + \frac{1}{4}\left( {{T_{surf,i}} - {T_{air}}} \right)$$</div>
 
 There are four cases for the Nusselt correlation that vary by the tilt angle in degrees, <span>$\gamma $</span>, and are based on heating conditions.  For cooling conditions (where <span>${T_{surf,i}} > {T_{air}}$</span>) the tilt angle is complemented so that <span>$\gamma  = 180 - \gamma $</span>
 
 Case A. <span>${0^\circ } \le \gamma  < 15^\circ $</span>
 
-<div>\[Nu = 0.13Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}\]</div>
+<div>$$Nu = 0.13Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}$$</div>
 
 Case B. <span>$15^\circ  \le \gamma  \le 90^\circ $</span>
 
-<div>\[R{a_{cv}} = 2.5 \times {10^5}{\left( {\frac{{{e^{0.72\gamma }}}}{{\sin \lambda }}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}}}\]</div>
+<div>$$R{a_{cv}} = 2.5 \times {10^5}{\left( {\frac{{{e^{0.72\gamma }}}}{{\sin \lambda }}} \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}}}$$</div>
 
-<div>\[Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;for\;R{a_H} \le R{a_{CV}}\]</div>
+<div>$$Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;for\;R{a_H} \le R{a_{CV}}$$</div>
 
-<div>\[Nu = 0.13\left( {Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}} - Ra_{CV}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}} \right) + 0.56{\left( {R{a_{CV}}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;R{a_H} > R{a_{CV}}\]</div>
+<div>$$Nu = 0.13\left( {Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}} - Ra_{CV}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}} \right) + 0.56{\left( {R{a_{CV}}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;R{a_H} > R{a_{CV}}$$</div>
 
 Case C. <span>$90^\circ  < \gamma  \le 179^\circ $</span>
 
-<div>\[Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;{10^5} \le R{a_H}\sin \gamma  < {10^{11}}\]</div>
+<div>$$Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;{10^5} \le R{a_H}\sin \gamma  < {10^{11}}$$</div>
 
 Case D. <span>$179^\circ  < \gamma  \le 180^\circ $</span>
 
-<div>\[Nu = 0.58Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}};\;R{a_H} \le {10^{11}}\]</div>
+<div>$$Nu = 0.58Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}};\;R{a_H} \le {10^{11}}$$</div>
 
 The material properties are evaluated at the mean film temperature.  Standard EnergyPlus psychrometric functions are used for <span>$\rho $</span> and <span>${c_p}$</span>.  Thermal conductivity is calculated using,
 
@@ -2649,15 +2649,15 @@ Goldstein and Novoselac (2010) used laboratory chamber measurements to develop c
 
 For WWR&lt;50% with window in upper part of wall:
 
-<div>\[h = 0.117{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}\]</div>
+<div>$$h = 0.117{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}$$</div>
 
 For WWR&lt;50% with window in lower part of wall
 
-<div>\[h = 0.093{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}\]</div>
+<div>$$h = 0.093{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}$$</div>
 
 For WWR &gt; 50%
 
-<div>\[h = 0.103{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}\]</div>
+<div>$$h = 0.103{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}$$</div>
 
 Where,
 
@@ -2673,17 +2673,17 @@ Goldstein and Novoselac (2010) used laboratory chamber measurements to develop c
 
 For walls located below a window
 
-<div>\[h = 0.063{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}\]</div>
+<div>$$h = 0.063{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}$$</div>
 
 For walls located above a window
 
-<div>\[h = 0.093{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}\]</div>
+<div>$$h = 0.093{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}$$</div>
 
 #### Goldstein Novoselac Ceiling Diffuser Floor
 
 Goldstein and Novoselac (2010) used laboratory chamber measurements to develop convection correlations for perimeter zones with highly glazed spaces served by overhead slot-diffuser-based air systems. The following is for floors in such spaces.
 
-<div>\[h = 0.048{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}\]</div>
+<div>$$h = 0.048{\left( {\frac{{\dot V}}{L}} \right)^{0.8}}$$</div>
 
 Separate from the above model structure, there are also other comprehensive algorithm structures which are described below.
 
@@ -2713,23 +2713,23 @@ The simple convection model uses constant coefficients for different heat transf
 
 For a vertical surface:
 
-<div>\[{\rm{h  =  3}}{\rm{.076}}\]</div>
+<div>$${\rm{h  =  3}}{\rm{.076}}$$</div>
 
 For a horizontal surface with reduced convection:
 
-<div>\[{\rm{h  =  0}}{\rm{.948}}\]</div>
+<div>$${\rm{h  =  0}}{\rm{.948}}$$</div>
 
 For a horizontal surface with enhanced  convection:
 
-<div>\[{\rm{h  =  4}}{\rm{.040}}\]</div>
+<div>$${\rm{h  =  4}}{\rm{.040}}$$</div>
 
 For a tilted surface with reduced convection:
 
-<div>\[{\rm{h  =  2}}{\rm{.281}}\]</div>
+<div>$${\rm{h  =  2}}{\rm{.281}}$$</div>
 
 For a tilted surface with enhanced convection:
 
-<div>\[{\rm{h  =  3}}{\rm{.870}}\]</div>
+<div>$${\rm{h  =  3}}{\rm{.870}}$$</div>
 
 #### Ceiling Diffuser Algorithm
 
@@ -2779,9 +2779,9 @@ For a vertical cavity, the correlation from ISO 15099 is:
 
 <span>${\rm{NU1 = 1 + 1}}{\rm{.7596678E - 10 R}}{{\rm{a}}^{{\rm{2}}{\rm{.2984755}}}}$</span>                                           for Ra &lt;= 1E4
 
-<div>\[{\rm{NU2}} = 0.242{\left( {{\raise0.7ex\hbox{${{\rm{Ra}}}$} \!\mathord{\left/ {\vphantom {{{\rm{Ra}}} {\rm{A}}}}\right.}\!\lower0.7ex\hbox{${\rm{A}}$}}} \right)^{0.272}}\]</div>
+<div>$${\rm{NU2}} = 0.242{\left( {{\raise0.7ex\hbox{${{\rm{Ra}}}$} \!\mathord{\left/ {\vphantom {{{\rm{Ra}}} {\rm{A}}}}\right.}\!\lower0.7ex\hbox{${\rm{A}}$}}} \right)^{0.272}}$$</div>
 
-<div>\[{\rm{NU = MAX(NU1,NU2)}}\]</div>
+<div>$${\rm{NU = MAX(NU1,NU2)}}$$</div>
 
 where
 
@@ -2795,7 +2795,7 @@ This is then used in EnergyPlus as follows:
 
 Net convection coefficient from glazing to wall is:
 
-<div>\[{h_{net}} = {\rm{k}}\left( {{\raise0.7ex\hbox{${{\rm{NU}}}$} \!\mathord{\left/ {\vphantom {{{\rm{NU}}} {\rm{L}}}}\right.}\!\lower0.7ex\hbox{${\rm{L}}$}}} \right)\]</div>
+<div>$${h_{net}} = {\rm{k}}\left( {{\raise0.7ex\hbox{${{\rm{NU}}}$} \!\mathord{\left/ {\vphantom {{{\rm{NU}}} {\rm{L}}}}\right.}\!\lower0.7ex\hbox{${\rm{L}}$}}} \right)$$</div>
 
 where
 
@@ -2805,7 +2805,7 @@ L = air gap thickness
 
 Convection coefficient applied to each wall separately and actually used in the zone heat balance is:
 
-<div>\[{h_c} = 2{h_{net}}\]</div>
+<div>$${h_c} = 2{h_{net}}$$</div>
 
 #### References
 
@@ -2877,15 +2877,15 @@ Figure 22. Radiation Exchange Model
 
 The radiant exchange between surface 1 and 2 is:
 
-<div>\[{q_{1 - 2}} = \sigma A\left( {T_1^4 - T_2^4} \right)\]</div>
+<div>$${q_{1 - 2}} = \sigma A\left( {T_1^4 - T_2^4} \right)$$</div>
 
 The exchange between surfaces 2 and 3 is:
 
-<div>\[{q_{2 - 3}} = \sigma A\left( {T_2^4 - T_3^4} \right)\]</div>
+<div>$${q_{2 - 3}} = \sigma A\left( {T_2^4 - T_3^4} \right)$$</div>
 
 Equating heat fluxes and eliminating T<sub>2</sub> gives:
 
-<div>\[{q_{1 - 3}} = \frac{\sigma }{2}A\left( {T_1^4 - T_3^4} \right)\]</div>
+<div>$${q_{1 - 3}} = \frac{\sigma }{2}A\left( {T_1^4 - T_3^4} \right)$$</div>
 
 where:
 
@@ -2978,7 +2978,7 @@ Figure 28.  Cross Section of TIM and wall, showing energy flow
 
 Mathematical model to calculate amount of energy absorbed at the surface of moveable insulation (TIM) and at the Outside surface of the Wall.
 
-<div>\[QSM = {\alpha_{TIM}}\cdot Incident\;Solar\]</div>
+<div>$$QSM = {\alpha_{TIM}}\cdot Incident\;Solar$$</div>
 
 The total solar gain on any exterior surface is a combination of the absorption of direct and diffuse solar radiation given by
 
@@ -3006,27 +3006,27 @@ F<sub>sg   </sub> = angle factor between the surface and the ground
 
 Now,
 
-<div>\[{\alpha_{wall}} + {\rho_{wall}} = 1\]</div>
+<div>$${\alpha_{wall}} + {\rho_{wall}} = 1$$</div>
 
 The model for TIM is simplified in that it assumes that absorption of solar radiation takes place at the inside and outside of the TIM only, not throughout the material.  In addition, the model assumes that the solar radiation absorbed during the first pass through the TIM affects the outside surface of the TIM while the solar radiation reflected at the outer wall surface that gets absorbed during the back reflection will affect the inside TIM surface (which is also the outside surface of the wall).  Thus, the heat absorbed at the outside of the TIM is as shown in Equation .
 
 The heat absorbed at the inside of the TIM/outside of the wall includes two components.  The first component is the amount of solar that is transmitted through the TIM and absorbed at the inside of the wall.  This is characterized by the following equation:
 
-<div>\[First\,pass\,solar\,absorbed\,by\,wall = \left( {{\tau_{TIM}}\cdot Incident\,Solar} \right)\cdot \left( {{\alpha_{wall}}} \right)\]</div>
+<div>$$First\,pass\,solar\,absorbed\,by\,wall = \left( {{\tau_{TIM}}\cdot Incident\,Solar} \right)\cdot \left( {{\alpha_{wall}}} \right)$$</div>
 
 The amount of solar absorbed by the TIM and aggregated at the inside surface of the TIM (outside wall surface) is:
 
-<div>\[Amount\,of\,back\,reflection\,absorbed\,by\,TIM = \left( {{\tau_{TIM}}\cdot Incident\,Solar} \right)\cdot \left( {1 - {\alpha_{wall}}} \right)\cdot {\alpha_{TIM}}\]</div>
+<div>$$Amount\,of\,back\,reflection\,absorbed\,by\,TIM = \left( {{\tau_{TIM}}\cdot Incident\,Solar} \right)\cdot \left( {1 - {\alpha_{wall}}} \right)\cdot {\alpha_{TIM}}$$</div>
 
 The heat absorbed at the interface between the wall and the TIM includes both of these components.  Thus, QSO is equal to:
 
-<div>\[QSO = \left( {{\tau_{TIM}}\cdot Incident\,Solar} \right)\cdot \left\{ {{\alpha_{wall}} + \left( {1 - {\alpha_{wall}}} \right)\cdot \alpha {}_{TIM}} \right\}\]</div>
+<div>$$QSO = \left( {{\tau_{TIM}}\cdot Incident\,Solar} \right)\cdot \left\{ {{\alpha_{wall}} + \left( {1 - {\alpha_{wall}}} \right)\cdot \alpha {}_{TIM}} \right\}$$</div>
 
 Substituting the definition for QSM into this equation and rearranging results in:
 
-<div>\[QSO = \left\{ {\frac{{{\tau_{TIM}}\cdot QSM}}{{{\alpha_{TIM}}}}} \right\}\cdot \left\{ {{\alpha_{wall}} + \left( {1 - {\alpha_{wall}}} \right)\cdot {\alpha_{TIM}}} \right\}\]</div>
+<div>$$QSO = \left\{ {\frac{{{\tau_{TIM}}\cdot QSM}}{{{\alpha_{TIM}}}}} \right\}\cdot \left\{ {{\alpha_{wall}} + \left( {1 - {\alpha_{wall}}} \right)\cdot {\alpha_{TIM}}} \right\}$$</div>
 
-<div>\[QSO = \left( {{\tau_{TIM}}\cdot QSM} \right)\cdot \left\{ {\left( {\frac{{{\alpha_{wall}}}}{{{\alpha_{TIM}}}}} \right) + \left( {1 - {\alpha_{wall}}} \right)} \right\}\]</div>
+<div>$$QSO = \left( {{\tau_{TIM}}\cdot QSM} \right)\cdot \left\{ {\left( {\frac{{{\alpha_{wall}}}}{{{\alpha_{TIM}}}}} \right) + \left( {1 - {\alpha_{wall}}} \right)} \right\}$$</div>
 
 Where,
 
@@ -3383,43 +3383,43 @@ Surface Heat Balance With Moveable Insulation
 
 A heat balance must exist at the outside surface-air interface. The incoming conductive, convective, and radiative fluxes must sum up to zero:
 
-<div>\[Conductive + Convective + Radiative = 0\]</div>
+<div>$$Conductive + Convective + Radiative = 0$$</div>
 
 In contrast to the internal surface heat balance that treats all surfaces simultaneously, the external thermal balance for each surface is performed independent of all other surfaces. This implies that there is no direct interaction between the individual surfaces.
 
 TARP includes four possible representations for the basic outside surface heat balance. The first two depend on which of the optimal surface conductance algorithms the user selects. The simple outside surface conductance that includes both the convective and thermal interchange between the surface and the environment in a single coefficient, is represented by the thermal network in Figure 29. Equation can also be expressed as:
 
-<div>\[\left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_t} - {{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}} \right]{\rm{ + }}\left[ {{\rm{HO}}\cdot \left( {{{\rm{T}}_{\rm{a}}} - {\rm{T}}{{\rm{O}}_t}} \right)} \right]{\rm{  + QSO  =  0}}\]</div>
+<div>$$\left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_t} - {{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}} \right]{\rm{ + }}\left[ {{\rm{HO}}\cdot \left( {{{\rm{T}}_{\rm{a}}} - {\rm{T}}{{\rm{O}}_t}} \right)} \right]{\rm{  + QSO  =  0}}$$</div>
 
 This can be solved for the outside surface temperature.
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO}}}}} \right]{\rm{  }}$$</div>
 
 The detailed outside surface conductance model considers convection and radiant interchange with the sky and with the ground as separate factors. Its use in the outside thermal balance is shown in Figure 30.In this case, equation can be expanded to give
 
-<div>\[\left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}}{\rm{ + }}{{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ - }}{{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}} \right]{\rm{ + }}\left[ {{\rm{HA}}\cdot \left( {{{\rm{T}}_{\rm{a}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right){\rm{ + HS}}\cdot \left( {{{\rm{T}}_{\rm{s}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right){\rm{ + HG}}\cdot \left( {{{\rm{T}}_{\rm{g}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right)} \right]{\rm{  + QSO  =  0  }}\]</div>
+<div>$$\left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}}{\rm{ + }}{{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ - }}{{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}} \right]{\rm{ + }}\left[ {{\rm{HA}}\cdot \left( {{{\rm{T}}_{\rm{a}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right){\rm{ + HS}}\cdot \left( {{{\rm{T}}_{\rm{s}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right){\rm{ + HG}}\cdot \left( {{{\rm{T}}_{\rm{g}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right)} \right]{\rm{  + QSO  =  0  }}$$</div>
 
 This can be solved for the outside surface temperature:
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HA + HS + HG}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HA + HS + HG}}}}} \right]{\rm{  }}$$</div>
 
 The third and fourth representations occur when the outside surface has been covered with movable insulation. The insulation has a conductance of UM. The thermal network in Figure 31 represents this case.The insulation must be mass-less because it is not generally possible to perform a correct thermal balance at the juncture of two surfaces each modeled by CTF.
 
 The equation for the thermal balance between the surface and the insulation is
 
-<div>\[\left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_t} - {{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}} + {\rm{UM}}\cdot \left( {{\rm{TM - T}}{{\rm{O}}_{\rm{t}}}} \right)} \right]{\rm{ + QSO  =  0}}\]</div>
+<div>$$\left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_t} - {{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}} + {\rm{UM}}\cdot \left( {{\rm{TM - T}}{{\rm{O}}_{\rm{t}}}} \right)} \right]{\rm{ + QSO  =  0}}$$</div>
 
 Which can be rewritten to solve for TO :
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ + UM}}\cdot {\rm{TM}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ + UM}}\cdot {\rm{TM}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM}}}}} \right]{\rm{  }}$$</div>
 
 Depending on whether or not the detailed or simple algorithm for surface conductance is being used, there are two expressions for TM, the outside temperature of the insulation. For the simple conductance:
 
-<div>\[{\rm{TM}} = \left[ {\frac{{{\rm{QSM + UM}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{\rm{UM + HO}}}}} \right]\]</div>
+<div>$${\rm{TM}} = \left[ {\frac{{{\rm{QSM + UM}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{\rm{UM + HO}}}}} \right]$$</div>
 
 For the detailed conductance:
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{QSM}} + {\rm{UM}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}}}{{{\rm{UM + HA + HS + HG}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{QSM}} + {\rm{UM}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}}}{{{\rm{UM + HA + HS + HG}}}}} \right]{\rm{  }}$$</div>
 
 In this case the values of HA, HS and HG must be found by using an estimated value of TM in place of TO.
 
@@ -3441,39 +3441,39 @@ Figure 31.  Thermal Network for Outside Moveable Insulation
 
 TO<sub>t</sub> and TI<sub>t  </sub> are related through the Y<sub>0</sub> CTF<sub>. </sub> However TI<sub>t  </sub> is also unknown. While it is possible to combine the outside and the inside surface heat balances to compute TO<sub>t</sub> and TI<sub>t  </sub> simultaneously, TARP uses a simpler procedure where TO<sub>t </sub> is based on a previous value of TI. When Y<sub>0</sub> is small, as occurs in well insulated or very massive surfaces, TI<sub>t  </sub> can be replaced by TI<sub>t\\ -1  </sub> (which is known for the previous hour’s heat balance) without significantly effecting the value of TO<sub>t\\ . </sub> When Y<sub>0</sub> is large, TO and TI can so strongly be coupled that separate outside and inside heat balances do not work because the environment and zone temperatures have negligible influence on the heat balances. The TARP uses the inside surface heat balance to couple TO<sub>t  </sub> with TZ and TR. These two temperatures are less strongly influenced by TO and allow a reasonable heat balance. On the first heat balance iteration, TZ and TR are the values at time t-1. The user may optionally require that TO<sub>t </sub> be recomputed with every iteration of TI<sub>t \\ .</sub>  In this case TZ and TR have values from the previous iteration and a true simultaneous solution is achieved. In most conventional constructions, recomputing TO<sub>t</sub> does not significantly change the computed zone loads and temperatures. The inside surface heat balance is given by
 
-<div>\[{\rm{T}}{{\rm{I}}_{\rm{t}}} = \left[ {\frac{{KI{P_t} + QSI + HC\cdot TZ + HR\cdot TR + {Y_0}\cdot TO}}{{{Z_0} + HC + HR}}} \right]\]</div>
+<div>$${\rm{T}}{{\rm{I}}_{\rm{t}}} = \left[ {\frac{{KI{P_t} + QSI + HC\cdot TZ + HR\cdot TR + {Y_0}\cdot TO}}{{{Z_0} + HC + HR}}} \right]$$</div>
 
 The surface heat balances can be combined in eight ways according to conditions for calculations of the outside surface temperature
 
-<div>\[{F_1} = \left[ {\frac{{{Y_0}}}{{{Z_0} + HI + HR}}} \right]\]</div>
+<div>$${F_1} = \left[ {\frac{{{Y_0}}}{{{Z_0} + HI + HR}}} \right]$$</div>
 
-<div>\[{F_2} = \left[ {\frac{{UM}}{{UM + HO}}} \right]\]</div>
+<div>$${F_2} = \left[ {\frac{{UM}}{{UM + HO}}} \right]$$</div>
 
-<div>\[{F_3} = \left[ {\frac{{UM}}{{UM + HA + HS + HG}}} \right]\]</div>
+<div>$${F_3} = \left[ {\frac{{UM}}{{UM + HA + HS + HG}}} \right]$$</div>
 
 #### Case1: Y<sub>0</sub>  small, simple conductance, no movable insulation:
 
 From Equation
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO}}}}} \right]{\rm{  }}$$</div>
 
 #### Case2: Y<sub>0</sub> not small, simple conductance, no movable insulation:
 
 From Equations and
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {\rm{HO}}\cdot {{\rm{T}}_{\rm{a}}} + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_0}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {\rm{HO}}\cdot {{\rm{T}}_{\rm{a}}} + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_0}}}} \right]{\rm{  }}$$</div>
 
 #### Case3: Y<sub>0</sub>  small, detailed conductance, no movable insulation:
 
 From Equation
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + HA}}\cdot {{\rm{T}}_{\rm{a}}} + {\rm{HS}}\cdot {{\rm{T}}_{\rm{s}}} + {\rm{HG}}\cdot {{\rm{T}}_{\rm{g}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HA + HS + HG}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + HA}}\cdot {{\rm{T}}_{\rm{a}}} + {\rm{HS}}\cdot {{\rm{T}}_{\rm{s}}} + {\rm{HG}}\cdot {{\rm{T}}_{\rm{g}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HA + HS + HG}}}}} \right]{\rm{  }}$$</div>
 
 #### Case4: Y<sub>0</sub> not small, detailed conductance, no movable insulation:
 
 From Equations and
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {\rm{HA}}\cdot {{\rm{T}}_{\rm{a}}} + {\rm{HS}}\cdot {{\rm{T}}_{\rm{s}}} + {\rm{HG}}\cdot {{\rm{T}}_{\rm{g}}} + {{\rm{F}}_{\rm{1}}}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HA + HS + HG - }}{{\rm{F}}_1}\cdot {{\rm{Y}}_0}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {\rm{HA}}\cdot {{\rm{T}}_{\rm{a}}} + {\rm{HS}}\cdot {{\rm{T}}_{\rm{s}}} + {\rm{HG}}\cdot {{\rm{T}}_{\rm{g}}} + {{\rm{F}}_{\rm{1}}}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HA + HS + HG - }}{{\rm{F}}_1}\cdot {{\rm{Y}}_0}}}} \right]{\rm{  }}$$</div>
 
 #### Case5: Y<sub>0</sub>  small, simple conductance, with movable insulation:
 
@@ -3486,19 +3486,19 @@ $</span>
 
 From Equations , and
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{F}}_2}\cdot \left( {{\rm{QSM + HO}}\cdot {{\rm{T}}_{\rm{a}}}} \right) + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}} + {\rm{UM - }}{{\rm{F}}_{\rm{2}}}\cdot {\rm{UM - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_{\rm{0}}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{F}}_2}\cdot \left( {{\rm{QSM + HO}}\cdot {{\rm{T}}_{\rm{a}}}} \right) + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}} + {\rm{UM - }}{{\rm{F}}_{\rm{2}}}\cdot {\rm{UM - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_{\rm{0}}}}}} \right]{\rm{  }}$$</div>
 
 #### Case7: Y<sub>0</sub>  small, detailed conductance, with movable insulation:
 
 From Equations and
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + }}{{\rm{F}}_{\rm{3}}}\left( {{\rm{QSM + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM - }}{{\rm{F}}_{\rm{3}}}\cdot {\rm{UM}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + }}{{\rm{F}}_{\rm{3}}}\left( {{\rm{QSM + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM - }}{{\rm{F}}_{\rm{3}}}\cdot {\rm{UM}}}}} \right]{\rm{  }}$$</div>
 
 #### Case8: Y<sub>0</sub> not small, detailed conductance, with movable insulation:
 
 From Equations , and
 
-<div>\[{\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right){\rm{ + }}{{\rm{F}}_{\rm{3}}}\left( {{\rm{QSM + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM - }}{{\rm{F}}_{\rm{3}}}\cdot {\rm{UM - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_{\rm{0}}}}}} \right]{\rm{  }}\]</div>
+<div>$${\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right){\rm{ + }}{{\rm{F}}_{\rm{3}}}\left( {{\rm{QSM + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM - }}{{\rm{F}}_{\rm{3}}}\cdot {\rm{UM - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_{\rm{0}}}}}} \right]{\rm{  }}$$</div>
 
 ### Fortran Algorithm Examples
 

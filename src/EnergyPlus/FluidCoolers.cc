@@ -482,6 +482,9 @@ namespace FluidCoolers {
 			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 
 			SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA = NumArray( 1 );
+			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA == AutoSize ) {
+				SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUAWasAutoSized = true;
+			}
 			SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA = NumArray( 2 );
 			if ( SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA == AutoSize ) {
 				SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUAWasAutoSized = true;

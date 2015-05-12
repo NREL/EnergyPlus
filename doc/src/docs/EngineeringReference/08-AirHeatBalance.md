@@ -7,7 +7,7 @@ Convection from Surfaces
 
 This contribution is expressed using the convective heat transfer coefficient as follows:
 
-<div>\[{q_{conv}} = \sum\limits_{i = 1}^{nsurfaces} {{h_{c,i}}{A_i}\left( {{T_a} - {T_{s,i}}} \right)} \]</div>
+<div>$${q_{conv}} = \sum\limits_{i = 1}^{nsurfaces} {{h_{c,i}}{A_i}\left( {{T_a} - {T_{s,i}}} \right)} $$</div>
 
 The inside heat transfer coefficient is modeled from a choice of correlations.
 
@@ -29,7 +29,7 @@ EnergyPlus contains three models for infiltration. The first is the “Design Fl
 
 Infiltration (Ref Object: ZoneInfiltration:DesignFlowRate) is the unintended flow of air from the outdoor environment directly into a thermal zone. Infiltration is generally caused by the opening and closing of exterior doors, cracks around windows, and even in very small amounts through building elements. In this model, the user defines a design flow rate that can be modified by temperature differences and windspeed. The basic equation (Coblenz and Achenbach 1963) used to calculate infiltration with this model is:
 
-<div>\[Infiltration = \left( {{I_{design}}} \right)\left( {{F_{schedule}}} \right)\left[ {A + B\left| {\left( {{T_{zone}} - {T_{odb}}} \right)} \right| + C\left( {WindSpeed} \right) + D\left( {Windspee{d^2}} \right)} \right]\]</div>
+<div>$$Infiltration = \left( {{I_{design}}} \right)\left( {{F_{schedule}}} \right)\left[ {A + B\left| {\left( {{T_{zone}} - {T_{odb}}} \right)} \right| + C\left( {WindSpeed} \right) + D\left( {Windspee{d^2}} \right)} \right]$$</div>
 
 More advanced infiltration calculations are possible using the EnergyPlus AirflowNetwork model for natural infiltration driven by wind when the HVAC system does not operate and/or driven by wind and forced air for times when the HVAC system operates. Exfiltration (the leakage of zone air to the outside) is generally handled better as zone exhaust air in the zone equipment description.
 
@@ -53,7 +53,7 @@ The Effective Leakage Area model is based on Sherman and Grimsrud (1980) and acc
 
 The Effective Leakage Area, or Sherman-Grimsrud, model is:
 
-<div>\[Infiltration = \left( {{F_{Schedule}}} \right)\frac{{{A_L}}}{{1000}}\sqrt {{C_s}\Delta T + {C_w}{{\left( {WindSpeed} \right)}^2}} \]</div>
+<div>$$Infiltration = \left( {{F_{Schedule}}} \right)\frac{{{A_L}}}{{1000}}\sqrt {{C_s}\Delta T + {C_w}{{\left( {WindSpeed} \right)}^2}} $$</div>
 
 where,
 
@@ -75,7 +75,7 @@ The Flow Coefficient model is based on Walker and Wilson (1998) and accessed usi
 
 The Enhanced, or AIM-2, model is:
 
-<div>\[Infiltration = \left( {{F_{Schedule}}} \right)\sqrt {{{\left( {c\,{C_s}\Delta {T^n}} \right)}^2} + {{\left( {c\,{C_w}{{\left( {s * WindSpeed} \right)}^{2n}}} \right)}^2}} \]</div>
+<div>$$Infiltration = \left( {{F_{Schedule}}} \right)\sqrt {{{\left( {c\,{C_s}\Delta {T^n}} \right)}^2} + {{\left( {c\,{C_w}{{\left( {s * WindSpeed} \right)}^{2n}}} \right)}^2}} $$</div>
 
 where,
 
@@ -111,7 +111,7 @@ These two ventilation objects can be used alone or in combination to determine v
 
 Ventilation (Ref Object: ZoneVentilation:DesignFlowRate) is the purposeful flow of air from the outdoor environment directly into a thermal zone in order to provide some amount of non-mechanical cooling.  Ventilation as specified by this input syntax is intended to model “simple” ventilation as opposed to the more detailed ventilation investigations that can be performed with the AirflowNetwork model.  Simple ventilation in EnergyPlus can be controlled by a schedule and through the specification of minimum, maximum and delta temperatures. The temperatures can be either single constant values for the entire simulation or schedules which can vary over time. Specific details are given in the Input/Output reference document. As with infiltration, the actual flow rate of ventilation can be modified by the temperature difference between the inside and outside environment and the wind speed. The basic equation used to calculate ventilation using this model is:
 
-<div>\[Ventilation = \left( {{V_{design}}} \right)\left( {{F_{schedule}}} \right)\left\lfloor {A + B\left| {{T_{zone}} - {T_{odb}}} \right| + C\left( {WindSpeed} \right) + D\left( {WindSpee{d^2}} \right)} \right\rfloor \]</div>
+<div>$$Ventilation = \left( {{V_{design}}} \right)\left( {{F_{schedule}}} \right)\left\lfloor {A + B\left| {{T_{zone}} - {T_{odb}}} \right| + C\left( {WindSpeed} \right) + D\left( {WindSpee{d^2}} \right)} \right\rfloor $$</div>
 
 More advanced ventilation calculations are possible using the EnergyPlus AirflowNetwork model.
 
@@ -133,7 +133,7 @@ The EnergyPlus example files use all of the above, the BLAST defaults in some (e
 
 For this model (Ref Object: ZoneVentilation:WindandStackOpenArea), the ventilation air flow rate is a function of wind speed and thermal stack effect, along with the area of the opening being modeled. This object can be used alone or in combination with ZoneVentilation:DesignFlowRate objects. This model is intended for simplified ventilation calculations as opposed to the more detailed ventilation investigations that can be performed with the AirflowNetwork model. Using the “Wind and Stack with Open Area” model, the natural ventilation flow rate can be controlled by a multiplier fraction schedule applied to the user-defined opening area and through the specification of minimum, maximum and delta temperatures. The temperatures can be either single constant values for the entire simulation or schedules which can vary over time. The equation used to calculate the ventilation rate driven by wind is given by Eq. 37 in Chapter 16 of the 2009 ASHRAE Handbook of Fundamentals:
 
-<div>\[{Q_w} = {C_w}{A_{opening}}{F_{schedule}}V\]</div>
+<div>$${Q_w} = {C_w}{A_{opening}}{F_{schedule}}V$$</div>
 
 where,
 
@@ -149,13 +149,13 @@ where,
 
 If the user specifies “Autocalculate” for the Opening Effectiveness input field, the opening effectiveness is calculated for each simulation time step based on the angle between the actual wind direction and the Effective Angle (a user-defined input) using the following equation:
 
-<div>\[{C_w} = 0.55 - \frac{{\left| {EffectiveAngle - WindDirection} \right|}}{{180}}*0.25\]</div>
+<div>$${C_w} = 0.55 - \frac{{\left| {EffectiveAngle - WindDirection} \right|}}{{180}}*0.25$$</div>
 
 The difference |EffectiveAngle – WindDirection| should be between 0 and 180 degrees. If the difference |EffectivAngle – WindDirection| is greater than 180, the difference is reset to be minus 180 degrees. This equation is a linear interpolation using the values recommended by the 2009 ASHRAE Handbook of Fundamentals (page 16.13): 0.5 to 0.6 for perpendicular winds and 0.25 to 0.35 for diagonal winds.
 
 The equation used for calculating the ventilation rate due to stack effect is given by Eq. 38 in Chapter 16 of the 2009 ASHRAE Handbook of Fundamentals:
 
-<div>\[{Q_s} = {C_D}{A_{opening}}{F_{schedule}}\sqrt {2g\Delta {H_{NPL}}(|{T_{zone}} - {T_{odb}}|/{T_{zone}})} \]</div>
+<div>$${Q_s} = {C_D}{A_{opening}}{F_{schedule}}\sqrt {2g\Delta {H_{NPL}}(|{T_{zone}} - {T_{odb}}|/{T_{zone}})} $$</div>
 
 where,
 
@@ -177,11 +177,11 @@ Estimation of this value is difficult; refer to Chapter 16 of the 2009 ASHRAE Ha
 
 The following equation, given by Eq. 39 in Chapter 16 of the 2009 ASHRAE Handbook of Fundamentals, is used to calculate the Discharge Coefficient for Opening when the user sets the value for this input field to “Autocalculate”:
 
-<div>\[{C_D} = 0.40 + 0.0045\left| {{T_{zone}} - {T_{odb}}} \right|\]</div>
+<div>$${C_D} = 0.40 + 0.0045\left| {{T_{zone}} - {T_{odb}}} \right|$$</div>
 
 The total ventilation rate calculated by this model is the quadrature sum of the wind and stack air flow components:
 
-<div>\[Ventilatio{n_{WindAndStack}} = \sqrt {{Q_s}^2 + {Q_w}^2} \]</div>
+<div>$$Ventilatio{n_{WindAndStack}} = \sqrt {{Q_s}^2 + {Q_w}^2} $$</div>
 
 If desired, a simple summation, instead of quadrature summation, can be realized by inputting two ZoneVentilation:WindAndStackOpenArea objects. One object can be defined with only a wind-driven component by setting C<sub>D</sub>=0, and the other object can have only stack-effect inputs specified and set C<sub>w</sub>=0.
 
@@ -189,7 +189,7 @@ If desired, a simple summation, instead of quadrature summation, can be realized
 
 ASHRAE 2009 Handbook of Fundamentals specifies that any unbalanced supply or exhaust ventilation air, Q<sub>u,v</sub>, to a zone causes pressurization/depressurization that influences the flow of infiltration air and thus should be combined with natural infiltration, Q<sub>n</sub>, (and, if present, unbalanced duct leakage, Qu,l) in superposition. Balanced ventilation airflow, Q<sub>b,v</sub>, to a zone (such as an ERV or HRV with balanced exhaust and intake air flows) does not interact with infiltration air and is added in whole:
 
-<div>\[Q = \sqrt {{Q_n}^2 + {Q_{u,v}}^2 + ({Q_{u,l}}^2)}  + {Q_{b,v}}\]</div>
+<div>$$Q = \sqrt {{Q_n}^2 + {Q_{u,v}}^2 + ({Q_{u,l}}^2)}  + {Q_{b,v}}$$</div>
 
 where,
 
@@ -205,7 +205,7 @@ where,
 
 The natural infiltration airflow includes all outdoor airflows from all ZoneInfiltration:\* objects for the same zone.
 
-<div>\[{Q_n} = \sum\limits_i {{Q_{Infiltration,i}}} \]</div>
+<div>$${Q_n} = \sum\limits_i {{Q_{Infiltration,i}}} $$</div>
 
 where,
 
@@ -213,7 +213,7 @@ where,
 
 The balanced ventilation airflow is the sum of outdoor airflows from all ZoneVentilation: DesignFlowRate objects with Ventilation Type = Balanced:
 
-<div>\[{Q_{b,v}} = \sum\limits_i {{Q_{v,Balanced,i}}} \]</div>
+<div>$${Q_{b,v}} = \sum\limits_i {{Q_{v,Balanced,i}}} $$</div>
 
 where,
 
@@ -221,7 +221,7 @@ where,
 
 The unbalanced ventilation airflow is given by the following equation:
 
-<div>\[{Q_{u,v}} = {\left[ {{{\left( {\sum\limits_i {{Q_{v,Natural,i}}}  + \sum\limits_i {{Q_{v,Wind,i}}} } \right)}^2} + {{\left( {\sum\limits_i {{Q_{v,Intake,i}}} } \right)}^2} + {{\left( {\sum\limits_i {{Q_{v,Exhaust,i}}} } \right)}^2} + {{\left( {\sum\limits_i {Max\left( {0,\;({Q_{ERV,Exh,i}} - {Q_{ERV,Sup,i}})} \right)} } \right)}^2}} \right]^{0.5}}\]</div>
+<div>$${Q_{u,v}} = {\left[ {{{\left( {\sum\limits_i {{Q_{v,Natural,i}}}  + \sum\limits_i {{Q_{v,Wind,i}}} } \right)}^2} + {{\left( {\sum\limits_i {{Q_{v,Intake,i}}} } \right)}^2} + {{\left( {\sum\limits_i {{Q_{v,Exhaust,i}}} } \right)}^2} + {{\left( {\sum\limits_i {Max\left( {0,\;({Q_{ERV,Exh,i}} - {Q_{ERV,Sup,i}})} \right)} } \right)}^2}} \right]^{0.5}}$$</div>
 
 where
 
@@ -258,7 +258,7 @@ For refrigerated space air exchange (using ZoneRefrigerationDoorMixing object(s)
 
 The volume of air flow into the receiving zone is specified by the user with a number of control parameters and schedules listed in the Input Output Guide. The user can turn this one-way flow on or off based on the temperature difference between the source and receiving zones, or it may be independent of the temperature difference. The density and specific heat of the air flowing into the receiving zone are determined using the average temperature and average humidity ratio in the source and receiving zones. The humidity ratio of the air flowing into the receiving zone is set equal to the humidity ratio of the source zone. The mass, moisture,and energy terms are then used as described in two previous sections, Basis for the Zone and Air System Integration, and Moisture Predictor-Corrector.
 
-<div>\[
+<div>$$
   \begin{array}{cl}
     \rho_{Avg} &= f \left( \frac{T_{ReceivingZone} + T_{SourceZone}}{2},\frac{W_{ReceivingZone} + W_{SourceZone}}{2},P_{Barometric} \right) \\
     c_{P,Avg} &= f \left( \frac{T_{ReceivingZone} + T_{SourceZone}}{2},\frac{W_{ReceivingZone} + W_{SourceZone}}{2}\right) \\
@@ -266,7 +266,7 @@ The volume of air flow into the receiving zone is specified by the user with a n
     \dot Q_{MixingFlowToReceivingZone} &= \sum_{AllSourceZones} \rho_{Avg}C_{p,Avg}\dot V_{Air}\left(T_{sourceZone}-T_{receivingZone}\right) \\
     \text{Moisture}_{MixingFlowToReceivingZone} &= \sum_{AllSourceZones} \rho_{Avg} \dot V_{Air} W_{SourceZone}
   \end{array}
-\]</div>  
+$$</div>  
   
 where:
 
@@ -294,7 +294,7 @@ W<sub>SourceZone</sub>                             =
 
 For cross-mixing, the mass of moist air exchanged between the two zones is assumed to be equal.  Again, the density and specific heat are based on the average conditions in the two zones. Note that the temperature and humidity ratio differences ensure that when the energy and  moisture terms are used in the Moisture Predictor-Corrector, they correctly reflect a loss or gain in each zone.
 
-<div>\[
+<div>$$
   \begin{array}{cl}
     \dot{m}_{MixingFlowToReceivingZone} &= \dot{m}_{MixingFlowToSourceZone} = \rho_{Avg}\dot{V}_{Air} \\
     \dot{Q}_{MixingFlowToSourceZone}    &= \rho_{Avg} C_{p,Avg} \dot{V}_{Air} \left( T_{ReceivingZone}-T_{SourceZone} \right) \\
@@ -302,7 +302,7 @@ For cross-mixing, the mass of moist air exchanged between the two zones is assum
     \text{Moisture}_{MixingFlowToSourceZone} &= \rho_{Avg} \dot{V}_{Air} W_{ReceivingZone} \\
     \text{Moisture}_{MixingFlowToReceivingZone} &= \rho_{Avg} \dot{V}_{Air} W_{SourceZone}
   \end{array}
-\]</div>
+$$</div>
     
 where:
 
@@ -324,7 +324,7 @@ When closed refrigerated spaces exchange air with other closed spaces, the air f
 
 The sensible and latent energy loads are modeled according to the guidance specified in (ASHRAE 2006d, ASHRAE 2009, and Gosney and Olama, 1975).  Equal dry air exchange is assumed, that is, the mass of dry air infiltrating into the receiving zone is assumed to equal the mass of dry air infiltrating out of the source zone.
 
-<div>\[
+<div>$$
   \begin{array}{cl}
     h_{zoneA},\rho_{zoneA} &= f (T_{zoneA},W_{zoneA},P_{Barometric}) \\
     h_{zoneB},\rho_{zoneB} &= f (T_{zoneB},W_{zoneB},P_{Barometric}) \\
@@ -341,7 +341,7 @@ The sensible and latent energy loads are modeled according to the guidance speci
     \dot{Q}_{MixingFlowZoneAtoB} &= \sum_{AllZoneAs} \dot{m}_{ZoneBtoA} C_{p,ZoneA} \left(T_{zoneA}-T_{zoneB}\right) \\
     \text{Moisture}_{MixingFlowZoneAtoB} &= \sum_{AllZoneAs} \dot{m}_{ZoneBtoA} \left( W_{zoneA}-W_{zoneB} \right) 
   \end{array}
-\]</div>
+$$</div>
 
 where:
 
