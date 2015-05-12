@@ -69824,6 +69824,99 @@ SetpointManager:SingleZone:OneStageHeating,
        \required-field
        \type node
 
+SetpointManager:SupplyResetForReturnTemperature:ChilledWater,
+     \memo This setpoint manager is used to place a temperature setpoint on a
+     \memo plant supply outlet node and adjust this setpoint to attempt to achieve a 
+     \memo fixed return water temperature.  The setpoint manager senses plant conditions
+     \memo and adjusts the setpoint each system time step to attempt to achieve this
+     \memo return temperature, which is scheduled.
+  A1,  \field Name
+       \required-field
+  A2,  \field Plant Loop Supply Outlet Node
+       \note This is the name of the "supply node" from the plant supply equipment.
+       \note The setpoint on this node is actuated to achieve a return temperature condition.
+       \type node
+       \required-field
+  A3,  \field Plant Loop Supply Inlet Node
+       \note This is the name of the "return node" for the plant supply equipment.
+       \note The temperature on this node is controlled by actuated the supply outlet node.
+       \type node
+       \required-field
+  N1,  \field Design Chilled Water Supply Temperature Setpoint
+       \note This is the chilled water supply temperature setpoint to be used at design conditions
+       \note During the reset calculation, this is also used as the minimum setpoint reset temperature.
+       \type real
+       \required-field
+  N2,  \field Maximum Chilled Water Supply Temperature Setpoint
+       \note This is the maximum reset temperature for the chilled water supply.
+       \type real
+       \required-field
+  A4,  \field Design Chilled Water Return Temperature Input Type
+       \note This defines whether the chilled water return temperature target is constant or scheduled.
+       \type choice
+       \key Constant
+       \key Scheduled
+       \required-field
+  N3,  \field Design Chilled Water Return Temperature Constant Value
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This constant value is only used if 
+       \note the "Design Chilled Water Return Temperature Input Type" is Constant
+       \type real
+  A5;  \field Design Chilled Water Return Temperature Schedule Name
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This is a schedule name to allow the return temperature
+       \note target value to be scheduled.  This field is only used if 
+       \note the "Design Chilled Water Return Temperature Input Type" is Scheduled
+       \type object-list
+       \object-list ScheduleNames
+       
+
+SetpointManager:SupplyResetForReturnTemperature:HotWater,
+     \memo This setpoint manager is used to place a temperature setpoint on a
+     \memo plant supply outlet node and adjust this setpoint to attempt to achieve a 
+     \memo fixed return water temperature.  The setpoint manager senses plant conditions
+     \memo and adjusts the setpoint each system time step to attempt to achieve this
+     \memo return temperature, which is scheduled.
+  A1,  \field Name
+       \required-field
+  A2,  \field Plant Loop Supply Outlet Node
+       \note This is the name of the "supply node" from the plant supply equipment.
+       \note The setpoint on this node is actuated to achieve a return temperature condition.
+       \type node
+       \required-field
+  A3,  \field Plant Loop Supply Inlet Node
+       \note This is the name of the "return node" for the plant supply equipment.
+       \note The temperature on this node is controlled by actuated the supply outlet node.
+       \type node
+       \required-field
+  N1,  \field Design Hot Water Supply Temperature Setpoint
+       \note This is the hot water supply temperature setpoint to be used at design conditions
+       \note During the reset calculation, this is also used as the maximum setpoint reset temperature.
+       \type real
+       \required-field
+  N2,  \field Minimum Hot Water Supply Temperature Setpoint
+       \note This is the minimum reset temperature for the hot water supply.
+       \type real
+       \required-field
+  A4,  \field Design Hot Water Return Temperature Input Type
+       \note This defines whether the hot water return temperature target is constant or scheduled.
+       \type choice
+       \key Constant
+       \key Scheduled
+       \required-field
+  N3,  \field Design Hot Water Return Temperature Constant Value
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This constant value is only used if 
+       \note the "Design Hot Water Return Temperature Input Type" is Constant
+       \type real
+  A5;  \field Design Hot Water Return Temperature Schedule Name
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This is a schedule name to allow the return temperature
+       \note target value to be scheduled.  This field is only used if 
+       \note the "Design Hot Water Return Temperature Input Type" is Scheduled
+       \type object-list
+       \object-list ScheduleNames
+
 \group Refrigeration
 
 Refrigeration:Case,
