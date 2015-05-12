@@ -2076,10 +2076,7 @@ SetupEMSActuator(
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
-	if ( EMSActuator_lookup.find( key ) != EMSActuator_lookup.end() ) {
-		ShowSevereError( "Duplicate actuator was sent to SetupEMSActuator." );
-		ShowContinueError( "Actuator variable type = " + cComponentTypeName + " ; name = " + cUniqueIDName + " ; control = " + cControlTypeName );
-	} else { // Add new actuator
+	if ( EMSActuator_lookup.find( key ) == EMSActuator_lookup.end() ) {
 		if ( numEMSActuatorsAvailable == 0 ) {
 			EMSActuatorAvailable.allocate( varsAvailableAllocInc );
 			numEMSActuatorsAvailable = 1;
@@ -2154,10 +2151,7 @@ SetupEMSActuator(
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
-	if ( EMSActuator_lookup.find( key ) != EMSActuator_lookup.end() ) {
-		ShowSevereError( "Duplicate actuator was sent to SetupEMSActuator." );
-		ShowContinueError( "Actuator variable type = " + cComponentTypeName + " ; name = " + cUniqueIDName + " ; control = " + cControlTypeName );
-	} else { // Add new actuator
+	if ( EMSActuator_lookup.find( key ) == EMSActuator_lookup.end() ) {
 		if ( numEMSActuatorsAvailable == 0 ) {
 			EMSActuatorAvailable.allocate( varsAvailableAllocInc );
 			numEMSActuatorsAvailable = 1;
@@ -2227,10 +2221,7 @@ SetupEMSActuator(
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
-	if ( EMSActuator_lookup.find( key ) != EMSActuator_lookup.end() ) {
-		ShowSevereError( "Duplicate actuator was sent to SetupEMSActuator." );
-		ShowContinueError( "Actuator variable type = " + cComponentTypeName + " ; name = " + cUniqueIDName + " ; control = " + cControlTypeName );
-	} else { // Add new actuator
+	if ( EMSActuator_lookup.find( key ) == EMSActuator_lookup.end() ) {
 		if ( numEMSActuatorsAvailable == 0 ) {
 			EMSActuatorAvailable.allocate( varsAvailableAllocInc );
 			numEMSActuatorsAvailable = 1;
