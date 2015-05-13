@@ -258,6 +258,7 @@ namespace OutputReportPredefined {
 	int pdchZnClPkOATemp;
 	int pdchZnClPkOAHum;
 	int pdchZnClPkOAMinFlow;
+	int pdchZnClPkDOASHeatGain;
 	int pdstZoneHtSize;
 	int pdchZnHtCalcDesLd;
 	int pdchZnHtUserDesLd;
@@ -272,6 +273,7 @@ namespace OutputReportPredefined {
 	int pdchZnHtPkOATemp;
 	int pdchZnHtPkOAHum;
 	int pdchZnHtPkOAMinFlow;
+	int pdchZnHtPkDOASHeatGain;
 	int pdstSystemSize;
 	int pdchSysSizCalcClAir;
 	int pdchSysSizUserClAir;
@@ -973,6 +975,7 @@ namespace OutputReportPredefined {
 		pdchZnClPkOATemp = newPreDefColumn( pdstZoneClSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnClPkOAHum = newPreDefColumn( pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnClPkOAMinFlow = newPreDefColumn( pdstZoneClSize, "Minimum Outdoor Air Flow Rate [m3/s]" );
+		pdchZnClPkDOASHeatGain = newPreDefColumn( pdstZoneClSize, "Heat Gain Rate from DOAS [W]" );
 
 		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Heating" );
 
@@ -989,6 +992,7 @@ namespace OutputReportPredefined {
 		pdchZnHtPkOATemp = newPreDefColumn( pdstZoneHtSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnHtPkOAHum = newPreDefColumn( pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnHtPkOAMinFlow = newPreDefColumn( pdstZoneHtSize, "Minimum Outdoor Air Flow Rate [m3/s]" );
+		pdchZnHtPkDOASHeatGain = newPreDefColumn( pdstZoneHtSize, "Heat Gain Rate from DOAS [W]" );
 
 		pdstSystemSize = newPreDefSubTable( pdrSizing, "System Design Air Flow Rates" );
 

@@ -168,6 +168,7 @@ namespace SizingManager {
 		bool isUserReqCompLoadReport;
 		Real64 DOASHeatGainRateAtHtPk( 0.0 ); // zone heat gain rate from the DOAS at the heating peak [W]
 		Real64 DOASHeatGainRateAtClPk( 0.0 ); // zone heat gain rate from the DOAS at the cooling peak [W]
+		Real64 TStatSetPtAtPk( 0.0 ); // thermostat set point at peak
 
 		// FLOW:
 
@@ -577,10 +578,12 @@ namespace SizingManager {
 						TempAtPeak = DesDayWeath( DDNum ).Temp( TimeStepAtPeak );
 						HumRatAtPeak = DesDayWeath( DDNum ).HumRat( TimeStepAtPeak );
 						DOASHeatGainRateAtClPk = CalcZoneSizing( DDNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepAtPeak );
+						TStatSetPtAtPk = ZoneSizing( DDNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepAtPeak );
 					} else {
 						TempAtPeak = 0.0;
 						HumRatAtPeak = 0.0;
 						DOASHeatGainRateAtClPk = 0.0;
+						TStatSetPtAtPk = 0.0;
 					}
 					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad, 
 						FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 
@@ -597,12 +600,13 @@ namespace SizingManager {
 					PreDefTableEntry( pdchZnClUserDesAirFlow, curName, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 3 );
 					PreDefTableEntry( pdchZnClDesDay, curName, FinalZoneSizing( CtrlZoneNum ).CoolDesDay );
 					PreDefTableEntry( pdchZnClPkTime, curName, CoolPeakDateHrMin( CtrlZoneNum ) );
-					PreDefTableEntry( pdchZnClPkTstatTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).CoolTstatTemp );
+					PreDefTableEntry( pdchZnClPkTstatTemp, curName, TStatSetPtAtPk );
 					PreDefTableEntry( pdchZnClPkIndTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak );
 					PreDefTableEntry( pdchZnClPkIndHum, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, 5 );
 					PreDefTableEntry( pdchZnClPkOATemp, curName, TempAtPeak );
 					PreDefTableEntry( pdchZnClPkOAHum, curName, HumRatAtPeak, 5 );
 					PreDefTableEntry(pdchZnClPkOAMinFlow, curName, FinalZoneSizing( CtrlZoneNum ).MinOA, 3 );
+					PreDefTableEntry( pdchZnClPkDOASHeatGain, curName, DOASHeatGainRateAtClPk );
 				}
 				if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
 					TimeStepAtPeak = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
@@ -611,10 +615,12 @@ namespace SizingManager {
 						TempAtPeak = DesDayWeath( DDNum ).Temp( TimeStepAtPeak );
 						HumRatAtPeak = DesDayWeath( DDNum ).HumRat( TimeStepAtPeak );
 						DOASHeatGainRateAtHtPk = CalcZoneSizing( DDNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepAtPeak );
+						TStatSetPtAtPk = ZoneSizing( DDNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepAtPeak );
 					} else {
 						TempAtPeak = 0.0;
 						HumRatAtPeak = 0.0;
 						DOASHeatGainRateAtHtPk = 0.0;
+						TStatSetPtAtPk = 0.0;
 					}
 					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad, 
 						FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, 
@@ -631,12 +637,13 @@ namespace SizingManager {
 					PreDefTableEntry( pdchZnHtUserDesAirFlow, curName, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, 3 );
 					PreDefTableEntry( pdchZnHtDesDay, curName, FinalZoneSizing( CtrlZoneNum ).HeatDesDay );
 					PreDefTableEntry( pdchZnHtPkTime, curName, HeatPeakDateHrMin( CtrlZoneNum ) );
-					PreDefTableEntry( pdchZnHtPkTstatTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).HeatTstatTemp );
+					PreDefTableEntry( pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk );
 					PreDefTableEntry( pdchZnHtPkIndTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak );
 					PreDefTableEntry( pdchZnHtPkIndHum, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, 5 );
 					PreDefTableEntry( pdchZnHtPkOATemp, curName, TempAtPeak );
 					PreDefTableEntry( pdchZnHtPkOAHum, curName, HumRatAtPeak, 5 );
 					PreDefTableEntry( pdchZnHtPkOAMinFlow, curName, FinalZoneSizing( CtrlZoneNum ).MinOA, 3 );
+					PreDefTableEntry( pdchZnHtPkDOASHeatGain, curName, DOASHeatGainRateAtHtPk );
 				}
 			}
 			// Deallocate arrays no longer needed
