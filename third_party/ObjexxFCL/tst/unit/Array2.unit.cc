@@ -1206,6 +1206,15 @@ TEST( Array2Test, AssignArithmeticArgument )
 	EXPECT_TRUE( eq( Array2D_int( 2, 3, 11 ), A1 ) );
 }
 
+TEST( Array2Test, RangeBasedFor )
+{
+	Array2D_int A( 2, 3, { 1, 2, 3, 4, 5, 6 } );
+	int v( 0 );
+	for ( auto const e : A ) {
+		EXPECT_EQ( ++v, e );
+	}
+}
+
 TEST( Array2Test, SubscriptTail )
 {
 	Array2D_double A1( 2, 3, { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3 } );
