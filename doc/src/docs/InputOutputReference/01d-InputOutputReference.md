@@ -14843,6 +14843,10 @@ Simulation order for setpoint managers:
 
 - SetpointManager:OutdoorAirPretreat
 
+- SetpointManager:SupplyResetForReturnTemperature:ChilledWater,
+
+- SetpointManager:SupplyResetForReturnTemperature:HotWater
+
 ### SetpointManager:Scheduled
 
 The simplest Setpoint Manager simply uses a schedule to determine one or more setpoints. No node data is used as input. The input consists of the Setpoint Manager name, the control variable, the schedule name, and the name of a node list. The node list contains the name of those nodes at which the setpoint is to be applied. Of course, a node list name can always be simply the name of a single node.
@@ -16285,8 +16289,82 @@ SetpointManager:SingleZone:OneStageHeating,
        Main Heating Coil 2 Air Outlet Node ; !- Setpoint Node or NodeList Name
 ```
 
+### SetpointManager:SupplyResetForReturnTemperature:ChilledWater
+
+This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment.  This setpoint manager is specifically for "chilled water" (although it could be any fluid) applications.  This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what set-point temperature would provide the desired target return temperature.
+
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  In this case, the setpoint will be reset every minute and be able to better control the loop to the target return temperature.  The importance of this aspect will vary by application.
+
+#### Field: Name
+
+This alpha field is a unique, user-assigned name for an instance of a chilled water return temperature reset setpoint manager.
+
+#### Plant Loop Supply Outlet Node
+
+This alpha field is the name of the plant loop supply side outlet node whose setpoint temperature is reset using this setpoint manager.  The current temperature of this node is also sensed in order to calculate current loop demand.
+
+#### Plant Loop Supply Inlet Node
+
+This alpha field is the name of the plant loop supply side inlet node whose temperature is controlled using this setpoint manager by resetting the supply outlet temperature.  The current temperature of this node is also sensed in order to calculate current loop demand.
+
+#### Design Chilled Water Supply Temperature Setpoint
+
+This numeric field plays multiple roles.  During initialization, such as before the plant data structures are fully established, this is used as the default plant supply setpoint temperature.  During normal calculation, this is used as the minimum chilled water supply temperature to avoid resetting the setpoint too low.  During times of no-load, or odd conditions such as a negative load, the setpoint is reset to this design setpoint.
+
+#### Maximum Chilled Water Supply Temperature Setpoint
+
+This numeric field is the maximum value to which the supply setpoint can be reset.  This ensures that the chilled water temperature does not go too high during reset operations.
+
+#### Design Chilled Water Return Temperature Input Type
+
+This alpha field must be one of two strings: either "Constant" or "Scheduled".  The choice determines which of the next two input fields are used as the target return temperature.
+
+#### Design Chilled Water Return Temperature Constant Value
+
+If the "Design Chilled Water Return Temperature Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
+
+#### Design Chilled Water Return Temperature Schedule Name
+
+If the "Design Chilled Water Return Temperature Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
 
 
+### SetpointManager:SupplyResetForReturnTemperature:HotWater
+
+This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment.  This setpoint manager is specifically for "hot water" (although it could be any fluid) applications.  This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what supply set-point temperature would provide the desired target return temperature.
+
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  In this case, the setpoint will be reset every minute and be able to better control the loop to the target return temperature.  The importance of this aspect will vary by application.
+
+#### Field: Name
+
+This alpha field is a unique, user-assigned name for an instance of a hot water return temperature reset setpoint manager.
+
+#### Plant Loop Supply Outlet Node
+
+This alpha field is the name of the plant loop supply side outlet node whose setpoint temperature is reset using this setpoint manager.  The current temperature of this node is also sensed in order to calculate current loop demand.
+
+#### Plant Loop Supply Inlet Node
+
+This alpha field is the name of the plant loop supply side inlet node whose temperature is controlled using this setpoint manager by resetting the supply outlet temperature.  The current temperature of this node is also sensed in order to calculate current loop demand.
+
+#### Design Hot Water Supply Temperature Setpoint
+
+This numeric field plays multiple roles.  During initialization, such as before the plant data structures are fully established, this is used as the default plant supply setpoint temperature.  During normal calculation, this is used as the maximum hot water supply temperature to avoid resetting the setpoint too high.  During times of no-load, or odd conditions such as a negative load, the setpoint is reset to this design setpoint.
+
+#### Minimum Hot Water Supply Temperature Setpoint
+
+This numeric field is the minimum value to which the supply setpoint can be reset.  This ensures that the hot water temperature does not go too low during reset operations.
+
+#### Design Hot Water Return Temperature Input Type
+
+This alpha field must be one of two strings: either "Constant" or "Scheduled".  The choice determines which of the next two input fields are used as the target return temperature.
+
+#### Design Hot Water Return Temperature Constant Value
+
+If the "Design Hot Water Return Temperature Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
+
+#### Design Hot Water Return Temperature Schedule Name
+
+If the "Design Hot Water Return Temperature Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
 
 
 Group     Controllers
