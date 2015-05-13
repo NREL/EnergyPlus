@@ -64462,7 +64462,7 @@ WaterHeater:Mixed,
 WaterHeater:Stratified,
        \memo Water heater with stratified, multi-node water tank. May be used to model a tankless
        \memo water heater (small tank volume), a hot water storage tank (zero heater capacity), or
-       \memo a heat pump water heater (see WaterHeater:HeatPump:PumpedCondenser.)
+       \memo a heat pump water heater (see WaterHeater:HeatPump:*.)
   A1 , \field Name
        \required-field
        \type alpha

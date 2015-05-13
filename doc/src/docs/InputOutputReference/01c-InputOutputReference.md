@@ -4691,7 +4691,10 @@ Table 27. Legal Zone Equipment Types (ZoneHVAC:EquipmentList)
 <td>Fan:ZoneExhaust</td>
 </tr>
 <tr>
-<td>WaterHeater:HeatPump</td>
+<td>WaterHeater:HeatPump:PumpedCondenser</td>
+</tr>
+<tr>
+<td>WaterHeater:HeatPump:WrappedCondenser</td>
 </tr>
 <tr>
 <td>ZoneHVAC:AirDistributionUnit</td>
