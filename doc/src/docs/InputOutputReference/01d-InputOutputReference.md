@@ -16327,6 +16327,19 @@ If the "Design Chilled Water Return Temperature Input Type" field is "constant",
 
 If the "Design Chilled Water Return Temperature Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
 
+An example idf input for a constant return reset setpoint manager is shown here:
+
+```idf
+  SetpointManager:SupplyResetForReturnTemperature:ChilledWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    7.0,                     !- Design Chilled Water Supply Temperature Setpoint
+    10.0,                    !- Maximum Chilled Water Supply Temperature Setpoint
+    Constant,                !- Design Chilled Water Return Temperature Input Type
+    12.0,                    !- Design Chilled Water Return Temperature Constant Value
+    ;                        !- Design Chilled Water Return Temperature Schedule Name
+```
 
 ### SetpointManager:SupplyResetForReturnTemperature:HotWater
 
@@ -16366,6 +16379,28 @@ If the "Design Hot Water Return Temperature Input Type" field is "constant", the
 
 If the "Design Hot Water Return Temperature Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
 
+An example idf input for a scheduled return reset setpoint manager is shown here:
+
+```idf
+  SetpointManager:SupplyResetForReturnTemperature:HotWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    60.0,                    !- Design Hot Water Supply Temperature Setpoint
+    57.0,                    !- Minimum Hot Water Supply Temperature Setpoint
+    Scheduled,               !- Design Hot Water Return Temperature Input Type
+    ,                        !- Design Hot Water Return Temperature Constant Value
+    ReturnTempSchedule;      !- Design Hot Water Return Temperature Schedule Name
+
+  Schedule:Compact,
+    ReturnTempSchedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 12:00, 55,        !- Field 3
+    UNTIL: 17:00, 53,        !- Field 3
+    UNTIL: 24:00, 55;        !- Field 3
+```
 
 Group     Controllers
 -------------------
