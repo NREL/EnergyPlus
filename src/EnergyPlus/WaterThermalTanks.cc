@@ -6533,7 +6533,11 @@ namespace WaterThermalTanks {
 
 		Tank.LossRate = Qloss;
 		Tank.UseRate = Quse;
-		Tank.SourceRate = Qsource;
+		if ( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped ) {
+			Tank.SourceRate = 0.0;
+		} else {
+			Tank.SourceRate = Qsource;
+		}
 		Tank.OffCycParaRateToTank = Qoffcycheat;
 		Tank.OnCycParaRateToTank = Qoncycheat;
 		Tank.TotalDemandRate = -Quse - Qsource - Qloss - Qoffcycheat - Qoncycheat;
