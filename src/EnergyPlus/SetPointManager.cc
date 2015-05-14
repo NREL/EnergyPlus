@@ -6801,6 +6801,7 @@ namespace SetPointManager {
 			for ( int plantIndex = 1; plantIndex <= DataPlant::TotNumLoops; plantIndex++ ) {
 				if ( this->supplyNodeIndex == DataPlant::PlantLoop( plantIndex ).LoopSide( 2 ).NodeNumOut ) {
 					this->plantLoopIndex = plantIndex;
+					this->plantSetpointNodeIndex = DataPlant::PlantLoop( plantIndex ).TempSetPointNodeNum;
 					fluidIndex = DataPlant::PlantLoop( plantIndex ).FluidIndex;
 				}
 			}
@@ -6887,6 +6888,7 @@ namespace SetPointManager {
 			for ( int plantIndex = 1; plantIndex <= DataPlant::TotNumLoops; plantIndex++ ) {
 				if ( this->supplyNodeIndex == DataPlant::PlantLoop( plantIndex ).LoopSide( 2 ).NodeNumOut ) {
 					this->plantLoopIndex = plantIndex;
+					this->plantSetpointNodeIndex = DataPlant::PlantLoop( plantIndex ).TempSetPointNodeNum;
 					fluidIndex = DataPlant::PlantLoop( plantIndex ).FluidIndex;
 				}
 			}
@@ -7537,13 +7539,21 @@ namespace SetPointManager {
 		//return water temperature reset setpoint managers
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 			auto & returnWaterSPM( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ) );
-			Node( returnWaterSPM.supplyNodeIndex ).TempSetPoint = returnWaterSPM.currentSupplySetPt;
+			if ( returnWaterSPM.plantSetpointNodeIndex > 0 ) {
+				Node( returnWaterSPM.plantSetpointNodeIndex ).TempSetPoint = returnWaterSPM.currentSupplySetPt;
+			} else {
+				// if plant isn't set up yet, no need to set anything, just wait
+			}
 		}
 
 		//hot-water return water temperature reset setpoint managers
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 			auto & returnWaterSPM( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ) );
-			Node( returnWaterSPM.supplyNodeIndex ).TempSetPoint = returnWaterSPM.currentSupplySetPt;
+			if ( returnWaterSPM.plantSetpointNodeIndex > 0 ) {
+				Node( returnWaterSPM.plantSetpointNodeIndex ).TempSetPoint = returnWaterSPM.currentSupplySetPt;
+			} else {
+				// if plant isn't set up yet, no need to set anything, just wait
+			}
 		}
 
 	}
