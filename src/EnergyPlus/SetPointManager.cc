@@ -206,8 +206,8 @@ namespace SetPointManager {
 			"SetpointManager:CondenserEnteringReset:Ideal", 
 			"SetpointManager:SingleZone:OneStageCooling", 
 			"SetpointManager:SingleZone:OneStageHeating",
-			"SetpointManager:SupplyResetForReturnTemperature:ChilledWater",
-			"SetpointManager:SupplyResetForReturnTemperature:HotWater"
+			"SetpointManager:ReturnTemperature:ChilledWater",
+			"SetpointManager:ReturnTemperature:HotWater"
 		}
 	);
 
@@ -628,13 +628,13 @@ namespace SetPointManager {
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
-		cCurrentModuleObject = "SetpointManager:SupplyResetForReturnTemperature:ChilledWater";
+		cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
 		NumSZReturnWaterResetChWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		
-		cCurrentModuleObject = "SetpointManager:SupplyResetForReturnTemperature:HotWater";
+		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
 		NumSZReturnWaterResetHWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
@@ -2763,7 +2763,7 @@ namespace SetPointManager {
 
 		if ( NumSZReturnWaterResetChWSetPtMgrs > 0 ) ReturnWaterResetChWSetPtMgr.allocate( NumSZReturnWaterResetChWSetPtMgrs );
 
-		cCurrentModuleObject = "SetpointManager:SupplyResetForReturnTemperature:ChilledWater";
+		cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 
 			// get the object inputs
@@ -2785,7 +2785,7 @@ namespace SetPointManager {
 			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).returnNodeIndex = GetOnlySingleNode( cAlphaArgs( 3 ), errFlag, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_SetPoint, 1, ObjectIsNotParent, cAlphaFieldNames( 3 ) ); // setpoint nodes
 
 			// process the setpoint inputs
-			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).designChilledWaterSetpoint = rNumericArgs( 1 );
+			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).minimumChilledWaterSetpoint = rNumericArgs( 1 );
 			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).maximumChilledWaterSetpoint = rNumericArgs( 2 );
 
 			// process the return temperature type/value
@@ -2818,7 +2818,7 @@ namespace SetPointManager {
 		
 		if ( NumSZReturnWaterResetHWSetPtMgrs > 0 ) ReturnWaterResetHWSetPtMgr.allocate( NumSZReturnWaterResetHWSetPtMgrs );
 
-		cCurrentModuleObject = "SetpointManager:SupplyResetForReturnTemperature:HotWater";
+		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 
 			// get the object inputs
@@ -2840,8 +2840,8 @@ namespace SetPointManager {
 			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).returnNodeIndex = GetOnlySingleNode( cAlphaArgs( 3 ), errFlag, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_SetPoint, 1, ObjectIsNotParent, cAlphaFieldNames( 3 ) ); // setpoint nodes
 
 			// process the setpoint inputs
-			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).designHotWaterSetpoint = rNumericArgs( 1 );
-			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).minimumHotWaterSetpoint = rNumericArgs( 2 );
+			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).minimumHotWaterSetpoint = rNumericArgs( 1 );
+			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).maximumHotWaterSetpoint = rNumericArgs( 2 );
 
 			// process the return temperature type/value
 			std::string returnType( cAlphaArgs( 4 ) );
@@ -4155,11 +4155,11 @@ namespace SetPointManager {
 			}
 
 			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
-				Node( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).designChilledWaterSetpoint;
+				Node( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).minimumChilledWaterSetpoint;
 			}
 			
 			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
-				Node( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).designHotWaterSetpoint;
+				Node( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).maximumHotWaterSetpoint;
 			}
 
 			MyEnvrnFlag = false;
@@ -6818,7 +6818,7 @@ namespace SetPointManager {
 
 		// check for strange conditions
 		if ( Qdemand < 0 ) {
-			this->currentSupplySetPt = this->designChilledWaterSetpoint;
+			this->currentSupplySetPt = this->minimumChilledWaterSetpoint;
 			return;
 		}
 
@@ -6829,13 +6829,13 @@ namespace SetPointManager {
 		}
 
 		// calculate the supply setpoint to use, default to the design value if flow is zero
-		Real64 T_supply_setpoint = this->designChilledWaterSetpoint;
+		Real64 T_supply_setpoint = this->minimumChilledWaterSetpoint;
 		if ( mdot > DataConvergParams::PlantFlowRateToler ) {
 			T_supply_setpoint = T_return_target - Qdemand / ( mdot * cp );
 		}
 
 		// now correct it to bring it into range
-		T_supply_setpoint = min( max( T_supply_setpoint, this->designChilledWaterSetpoint ), this->maximumChilledWaterSetpoint );
+		T_supply_setpoint = min( max( T_supply_setpoint, this->minimumChilledWaterSetpoint ), this->maximumChilledWaterSetpoint );
 
 		// now save it for use in the update routine
 		this->currentSupplySetPt = T_supply_setpoint;
@@ -6904,7 +6904,7 @@ namespace SetPointManager {
 
 		// check for strange conditions
 		if ( Qdemand < 0 ) {
-			this->currentSupplySetPt = this->designHotWaterSetpoint;
+			this->currentSupplySetPt = this->maximumHotWaterSetpoint;
 			return;
 		}
 
@@ -6915,13 +6915,13 @@ namespace SetPointManager {
 		}
 
 		// calculate the supply setpoint to use, default to the design value if flow is zero
-		Real64 T_supply_setpoint = this->designHotWaterSetpoint;
+		Real64 T_supply_setpoint = this->maximumHotWaterSetpoint;
 		if ( mdot > DataConvergParams::PlantFlowRateToler ) {
 			T_supply_setpoint = T_return_target + Qdemand / ( mdot * cp );
 		}
 
 		// now correct it to bring it into range
-		T_supply_setpoint = max( min( T_supply_setpoint, this->designHotWaterSetpoint ), this->minimumHotWaterSetpoint );
+		T_supply_setpoint = max( min( T_supply_setpoint, this->maximumHotWaterSetpoint ), this->minimumHotWaterSetpoint );
 
 		// now save it for use in the update routine
 		this->currentSupplySetPt = T_supply_setpoint;

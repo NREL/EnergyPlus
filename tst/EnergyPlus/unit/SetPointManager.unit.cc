@@ -30,7 +30,7 @@ TEST( SetPointManager, DefineReturnWaterChWSetPointManager )
 	mySPM.returnNodeIndex = 1;
 	mySPM.supplyNodeIndex = 2;
 	mySPM.plantLoopIndex = 0;
-	mySPM.designChilledWaterSetpoint = 7;
+	mySPM.minimumChilledWaterSetpoint = 7;
 	mySPM.maximumChilledWaterSetpoint = 10;
 	mySPM.returnTemperatureConstantTarget = 12;
 
@@ -113,7 +113,7 @@ TEST( SetPointManager, DefineReturnWaterHWSetPointManager )
 	mySPM.returnNodeIndex = 1;
 	mySPM.supplyNodeIndex = 2;
 	mySPM.plantLoopIndex = 0;
-	mySPM.designHotWaterSetpoint = 60;
+	mySPM.maximumHotWaterSetpoint = 60;
 	mySPM.minimumHotWaterSetpoint = 57;
 	mySPM.returnTemperatureConstantTarget = 55;
 	DataLoopNode::Node(2).Temp = 60;

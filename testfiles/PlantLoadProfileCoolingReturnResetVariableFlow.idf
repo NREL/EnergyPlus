@@ -140,15 +140,15 @@
     ,                        !- Demand Side Connector List Name
     OPTIMAL;                 !- Load Distribution Scheme
 
-  SetpointManager:SupplyResetForReturnTemperature:ChilledWater,
+  SetpointManager:ReturnTemperature:ChilledWater,
     Main Loop Setpoint Manager, !- Name
     Supply Outlet Node,      !- Plant Loop Supply Outlet Node
     Supply Inlet Node,       !- Plant Loop Supply Inlet Node
-    7.0,                     !- Design Chilled Water Supply Temperature Setpoint
-    10.0,                    !- Maximum Chilled Water Supply Temperature Setpoint
-    Constant,                !- Design Chilled Water Return Temperature Input Type
-    12.0,                    !- Design Chilled Water Return Temperature Constant Value
-    ;                        !- Design Chilled Water Return Temperature Schedule Name
+    7.0,                     !- Minimum Supply Temperature Setpoint
+    10.0,                    !- Maximum Supply Temperature Setpoint
+    Constant,                !- Return Temperature Setpoint Input Type
+    12.0,                    !- Return Temperature Setpoint Constant Value
+    ;                        !- Return Temperature Setpoint Schedule Name
 
   PlantEquipmentOperationSchemes,
     Main Loop Operation,     !- Name

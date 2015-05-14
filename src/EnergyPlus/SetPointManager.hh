@@ -1852,7 +1852,7 @@ namespace SetPointManager {
 		std::string Name;
 		int returnNodeIndex; // node ID for the plant supply-side return node
 		int supplyNodeIndex; // node ID for the plant supply-side supply node
-		Real64 designChilledWaterSetpoint; // the chilled water setpoint temperature at design conditions
+		Real64 minimumChilledWaterSetpoint; // the minimum reset temperature for the chilled water setpoint
 		Real64 maximumChilledWaterSetpoint; // the maximum reset temperature for the chilled water setpoint
 		int returnTemperatureScheduleIndex; // the index in Schedules array for the scheduled return temperature; zero if not used
 		Real64 returnTemperatureConstantTarget; // the constant value used as the return temperature target; used if schedule index is zero
@@ -1864,7 +1864,7 @@ namespace SetPointManager {
 			Name( "" ),
 			returnNodeIndex( 0 ),
 			supplyNodeIndex( 0 ),
-			designChilledWaterSetpoint( 0.0 ),
+			minimumChilledWaterSetpoint( 0.0 ),
 			maximumChilledWaterSetpoint( 0.0 ),
 			returnTemperatureScheduleIndex( 0 ),
 			returnTemperatureConstantTarget( 0.0 ),
@@ -1883,7 +1883,7 @@ namespace SetPointManager {
 		std::string Name;
 		int returnNodeIndex; // node ID for the plant supply-side return node
 		int supplyNodeIndex; // node ID for the plant supply-side supply node
-		Real64 designHotWaterSetpoint; // the hot water setpoint temperature at design conditions
+		Real64 maximumHotWaterSetpoint; // the maximum reset temperature for the hot water setpoint
 		Real64 minimumHotWaterSetpoint; // the minimum reset temperature for the hot water setpoint
 		int returnTemperatureScheduleIndex; // the index in Schedules array for the scheduled return temperature; zero if not used
 		Real64 returnTemperatureConstantTarget; // the constant value used as the return temperature target; used if schedule index is zero
@@ -1895,7 +1895,7 @@ namespace SetPointManager {
 			Name( "" ),
 			returnNodeIndex( 0 ),
 			supplyNodeIndex( 0 ),
-			designHotWaterSetpoint( 0.0 ),
+			maximumHotWaterSetpoint( 0.0 ),
 			minimumHotWaterSetpoint( 0.0 ),
 			returnTemperatureScheduleIndex( 0 ),
 			returnTemperatureConstantTarget( 0.0 ),
@@ -2046,6 +2046,9 @@ namespace SetPointManager {
 
 	void
 	UpdateSetPointManagers();
+
+	void
+	UpdatePlantSpecificSetPointManagers();
 
 	void
 	UpdateMixedAirSetPoints();

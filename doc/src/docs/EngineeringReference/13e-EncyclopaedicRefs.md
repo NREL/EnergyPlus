@@ -3125,9 +3125,9 @@ The object determines a “near-optimal” condenser water entering set point at
 
 The input objects:
 
-* SetpointManager:SupplyResetForReturnTemperature:ChilledWater, and 
+* SetpointManager:ReturnTemperature:ChilledWater, and 
 
-* SetpointManager:SupplyResetForReturnTemperature:HotWater
+* SetpointManager:ReturnTemperature:HotWater
 
 allow for controlling the temperature of the water (or a different fluid defined for the plant) that is returning back to the plant supply equipment.  In a typical chilled water loop configuration, this is essentially controlling the temperature of the water entering the chiller.  In a typical hot water loop configuration, this is essentially controlling the temperature of the water entering the boiler.
 

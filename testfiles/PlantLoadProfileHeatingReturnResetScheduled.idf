@@ -140,15 +140,15 @@
     ,                        !- Demand Side Connector List Name
     OPTIMAL;                 !- Load Distribution Scheme
 
-  SetpointManager:SupplyResetForReturnTemperature:HotWater,
+  SetpointManager:ReturnTemperature:HotWater,
     Main Loop Setpoint Manager, !- Name
     Supply Outlet Node,      !- Plant Loop Supply Outlet Node
     Supply Inlet Node,       !- Plant Loop Supply Inlet Node
-    60.0,                    !- Design Hot Water Supply Temperature Setpoint
-    57.0,                    !- Minimum Hot Water Supply Temperature Setpoint
-    Scheduled,               !- Design Hot Water Return Temperature Input Type
-    ,                        !- Design Hot Water Return Temperature Constant Value
-    ReturnTempSchedule;      !- Design Hot Water Return Temperature Schedule Name
+    57.0,                    !- Minimum Supply Temperature Setpoint
+    60.0,                    !- Maximum Supply Temperature Setpoint
+    Scheduled,               !- Return Temperature Setpoint Input Type
+    ,                        !- Return Temperature Setpoint Constant Value
+    ReturnTempSchedule;      !- Return Temperature Setpoint Schedule Name
 
   Schedule:Compact,
     ReturnTempSchedule,  !- Name
