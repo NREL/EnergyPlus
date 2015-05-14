@@ -4446,6 +4446,8 @@ Enter the parasitic electric load associated with the gas heating operation, suc
 
 The preheat coil is located in the outdoor air stream, upstream of the outdoor air mixing box and tempers the outdoor air. If no preheat coil is used in the VAV system, then the option “none” should be specified here. Otherwise this indicates the type of preheat coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
 
+- HotWater
+
 - Electric
 
 - Gas
@@ -5405,6 +5407,8 @@ Enter the parasitic electric load associated with the gas heating operation, suc
 
 The preheat coil is located in the outdoor air stream, upstream of the outdoor air mixing box and tempers the outdoor air. If no preheat coil is used in the constant volume system, then the option “none” should be specified here. Otherwise this indicates the type of preheat coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
 
+- HotWater
+
 - Electric
 
 - Gas
@@ -5979,6 +5983,8 @@ Enter the parasitic electric load associated with the gas heating operation, suc
 #### Field: Preheat Coil Type
 
 The preheat coil is located in the outdoor air stream, upstream of the outdoor air mixing box and tempers the outdoor air. If no preheat coil is used in the constant volume system, then the option “none” should be specified here. Otherwise this indicates the type of preheat coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
+
+- HotWater
 
 - Electric
 

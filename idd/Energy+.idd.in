@@ -27903,6 +27903,7 @@ HVACTemplate:System:VAV,
       \default 0.0
   A9, \field Preheat Coil Type
       \type choice
+      \key  HotWater
       \key  Electric
       \key  Gas
       \key  None
@@ -28665,6 +28666,7 @@ HVACTemplate:System:ConstantVolume,
       \default 0.0
  A14, \field Preheat Coil Type
       \type choice
+      \key  HotWater
       \key  Electric
       \key  Gas
       \key  None
@@ -29134,6 +29136,7 @@ HVACTemplate:System:DualDuct,
       \default 0.0
  A17, \field Preheat Coil Type
       \type choice
+      \key  HotWater
       \key  Electric
       \key  Gas
       \key  None
