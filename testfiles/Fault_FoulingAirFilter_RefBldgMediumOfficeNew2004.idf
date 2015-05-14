@@ -1,4 +1,6 @@
-! RefBldgMediumOfficeNew2004_Chicago.idf
+! Fault_FoulingAirFilter_RefBldgMediumOfficeNew2004_Chicago.idf
+!
+! Highlights:  Illustrates modeling of fouling air filter fault  
 !
 ! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
 !
@@ -4361,7 +4363,7 @@
     HVACOperationSchd,       !- Availability Schedule Name
     0.5915,                  !- Fan Total Efficiency
     1109.648,                !- Pressure Rise {Pa}
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
+    7.5202,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
     ,                        !- Fan Power Minimum Flow Fraction
     0.0000,                  !- Fan Power Minimum Air Flow Rate {m3/s}
@@ -7910,109 +7912,30 @@
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
+! ***Pressure_Inc_Sch***
+  Schedule:Compact,
+    Pressure_Inc_Sch,        !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.1;        !- Field 3
 
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn10,        !- Name
-    Core_bottom Thermostat,  !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn11,        !- Name
-    Perimeter_bot_ZN_1 Thermostat, 		 !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn12,        !- Name
-    Perimeter_bot_ZN_2 Thermostat, 		 !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn13,        !- Name
-    Perimeter_bot_ZN_3 Thermostat, 		 !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn14,        !- Name
-    Perimeter_bot_ZN_4 Thermostat, 		 !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn20,        !- Name
-    Core_mid Thermostat,     !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn21,        !- Name
-    Perimeter_mid_ZN_1 Thermostat, !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn22,        !- Name
-    Perimeter_mid_ZN_2 Thermostat,  !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn23,        !- Name
-    Perimeter_mid_ZN_3 Thermostat,  !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn24,        !- Name
-    Perimeter_mid_ZN_4 Thermostat, 		 !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn30,        !- Name
-    Core_top Thermostat, 	 !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn31,        !- Name
-    Perimeter_top_ZN_1 Thermostat, !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn32,        !- Name
-    Perimeter_top_ZN_2 Thermostat, !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn33,        !- Name
-    Perimeter_top_ZN_3 Thermostat, !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:ThermostatOffset,
-    Ther_Offset_Zn34,        !- Name
-    Perimeter_top_ZN_4 Thermostat, !- Thermostat Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    1.0;                     !- Reference Thermostat Offset {deltaC}
+! ***VAV_1_Fan_Curve***	
+  Curve:Cubic,		
+    VAV_1_Fan_Curve,         ! name		
+    1263.1,                  ! Coefficient1 Constant		
+    33.773,                  ! Coefficient2 x		
+   -5.6906,                  ! Coefficient3 x**2		
+   -0.2023,                  ! Coefficient4 x**3		
+    4.0,                     ! Minimum Value of x		
+    15.0;                    ! Maximum Value of x		
+
+!-   ===========  ALL OBJECTS IN CLASS: FaultModel:Fouling:AirFilter ===========
+FaultModel:Fouling:AirFilter,
+   DF_VAV_1_Fan, 	     !- Name
+   VAV_1_Fan, 		     !- Fan Name
+   Fan:VariableVolume,	 !- Fan Object Type
+   ALWAYS_ON,  		     !- Availability Schedule Name
+   Pressure_Inc_Sch,  	 !- Pressure Fraction Schedule Name
+   VAV_1_Fan_Curve; 	 !- Fan Curve Name
 
