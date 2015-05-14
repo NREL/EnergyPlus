@@ -2799,6 +2799,8 @@ namespace SetPointManager {
 				}
 			} else if ( SameString( returnType, "CONSTANT" ) ) {
 				ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).returnTemperatureConstantTarget = rNumericArgs( 3 );
+			} else if ( SameString( returnType, "RETURNTEMPERATURESETPOINT" ) ) {
+				ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).useReturnTempSetpoint = true;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
@@ -2854,6 +2856,8 @@ namespace SetPointManager {
 				}
 			} else if ( SameString( returnType, "CONSTANT" ) ) {
 				ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).returnTemperatureConstantTarget = rNumericArgs( 3 );
+			} else if ( SameString( returnType, "RETURNTEMPERATURESETPOINT" ) ) {
+				ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).useReturnTempSetpoint = true;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
@@ -6823,10 +6827,22 @@ namespace SetPointManager {
 			return;
 		}
 
-		// Determine a return target, default is to use the constant value, but scheduled overwrites it
+		// Determine a return target, default is to use the constant value, but scheduled or externally 
+		//  set on the return node TempSetPoint will overwrite it.  Note that the schedule index is only
+		//  greater than zero if the input type is scheduled, and the useReturnTempSetpoint flag is only
+		//  true if the input type is specified as such
 		Real64 T_return_target = this->returnTemperatureConstantTarget;
 		if ( this->returnTemperatureScheduleIndex > 0 ) {
 			T_return_target = GetCurrentScheduleValue( this->returnTemperatureScheduleIndex );
+		} else if ( this->useReturnTempSetpoint ) {
+			if ( returnNode.TempSetPoint != -999 ) {
+				T_return_target = returnNode.TempSetPoint;
+			} else {
+				ShowSevereError( "Return temperature reset setpoint manager encountered an error." );
+				ShowContinueError( "The manager is specified to look to the return node setpoint to find a target return temperature, but the node setpoint was invalid" );
+				ShowContinueError( "Verify that a separate sepoint manager is specified to set the setpoint on the return node named \"" + NodeID( this->returnNodeIndex ) + "\"" );
+				ShowContinueError( "Or change the target return temperature input type to constant or scheduled" );
+			}
 		}
 
 		// calculate the supply setpoint to use, default to the design value if flow is zero
@@ -6914,6 +6930,15 @@ namespace SetPointManager {
 		Real64 T_return_target = this->returnTemperatureConstantTarget;
 		if ( this->returnTemperatureScheduleIndex > 0 ) {
 			T_return_target = GetCurrentScheduleValue( this->returnTemperatureScheduleIndex );
+		} else if ( this->useReturnTempSetpoint ) {
+			if ( returnNode.TempSetPoint != -999 ) {
+				T_return_target = returnNode.TempSetPoint;
+			} else {
+				ShowSevereError( "Return temperature reset setpoint manager encountered an error." );
+				ShowContinueError( "The manager is specified to look to the return node setpoint to find a target return temperature, but the node setpoint was invalid" );
+				ShowContinueError( "Verify that a separate sepoint manager is specified to set the setpoint on the return node named \"" + NodeID( this->returnNodeIndex ) + "\"" );
+				ShowContinueError( "Or change the target return temperature input type to constant or scheduled" );
+			}
 		}
 
 		// calculate the supply setpoint to use, default to the design value if flow is zero

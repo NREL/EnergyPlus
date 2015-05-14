@@ -3131,6 +3131,14 @@ The input objects:
 
 allow for controlling the temperature of the water (or a different fluid defined for the plant) that is returning back to the plant supply equipment.  In a typical chilled water loop configuration, this is essentially controlling the temperature of the water entering the chiller.  In a typical hot water loop configuration, this is essentially controlling the temperature of the water entering the boiler.
 
+The target return temperature can be specified by:
+
+* providing a constant value to use throughout the simulation, or
+
+* scheduling the value to vary through the simulation (which then allows custom EMS overriding of the scheduled value), or
+
+* using a separate setpoint manager to set the setpoint on the return node itself, which is then retrieved by this reset manager.  
+
 #### Operation
 
 The setpoint senses conditions on two named nodes, which should correspond to a central plant's supply side inlet and outlet nodes, the return and supply nodes, respectively.  The temperature and flow rate information is used in a series of calculations in order to determine a setpoint to specify on the supply outlet node which will in turn provide the target desired return temperature on the supply inlet node.  The calculations are summarized for a chilled water loop here:

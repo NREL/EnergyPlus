@@ -1,4 +1,4 @@
-! PlantLoadProfileCoolingReturnReset.idf
+! PlantLoadProfileCoolingReturnResetLookup.idf
 !
 ! Basic file description:
 ! This input file is a plant-only simulation using the PLANT LOAD PROFILE object; no zones are simulated.
@@ -6,7 +6,8 @@
 ! This is useful when the building plant load profile is already known.  It's also useful for testing the
 ! operation of plant supply side components.
 ! This file simulates a chilled water arrangement, while PlantLoadProfile.idf represents a hot water loop.
-! The key feature of this file is demonstrating the setpoint reset control to maintain return water temperature.
+! The key feature of this file is demonstrating the setpoint reset control to maintain return water temperature,
+!  with the target return temperature being specified on the return node by a separate setpoint manager.
 ! Run:      1 design day.
 ! Building: None.
 ! System:   None.
@@ -139,14 +140,25 @@
     ,                        !- Demand Side Connector List Name
     OPTIMAL;                 !- Load Distribution Scheme
 
+  SetpointManager:Scheduled,
+    Return Temperature Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    Return Temperature Sch,  !- Schedule Name
+    Supply Inlet Node;       !- Setpoint Node or NodeList Name
+
+  Schedule:Constant,
+    Return Temperature Sch,  !- Name
+    Any Number,              !- Schedule Limits
+    11.75;                   !- Value
+
   SetpointManager:ReturnTemperature:ChilledWater,
     Main Loop Setpoint Manager, !- Name
     Supply Outlet Node,      !- Plant Loop Supply Outlet Node
     Supply Inlet Node,       !- Plant Loop Supply Inlet Node
     7.0,                     !- Minimum Supply Temperature Setpoint
     10.0,                    !- Maximum Supply Temperature Setpoint
-    Constant,                !- Return Temperature Setpoint Input Type
-    12.0,                    !- Return Temperature Setpoint Constant Value
+    ReturnTemperatureSetpoint, !- Return Temperature Setpoint Input Type
+    ,                        !- Return Temperature Setpoint Constant Value
     ;                        !- Return Temperature Setpoint Schedule Name
 
   PlantEquipmentOperationSchemes,

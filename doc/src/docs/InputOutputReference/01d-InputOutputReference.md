@@ -16317,7 +16317,7 @@ This numeric field is the maximum value to which the supply setpoint can be rese
 
 #### Return Temperature Setpoint Input Type
 
-This alpha field must be one of two strings: either "Constant" or "Scheduled".  The choice determines which of the next two input fields are used as the target return temperature.
+This alpha field must be one of three strings: "Constant", "Scheduled", or "ReturnTemperatureSetpoint".  If the choice is "Constant", the constant value in the next field is used as the target return temperature.  If the choice is "Scheduled", the current value of the schedule named in the following field is used as the target return temperature.  If the choice is "ReturnTemperatureSetpoint", the actual setpoint temperature on the "Plant Loop Supply Inlet Node" specified above is retrieved and used as the target return temperature.  This is convenient as a separate setpoint manager could be established to pre-calculate the desired return temperature, and will assign the Setpoint internally.  Then when this return temperature manager executes, the setpoint will be updated and utilized.
 
 #### Return Temperature Setpoint Constant Value
 
@@ -16338,6 +16338,31 @@ An example idf input for a constant return reset setpoint manager is shown here:
     10.0,                    !- Maximum Supply Temperature Setpoint
     Constant,                !- Return Temperature Setpoint Input Type
     12.0,                    !- Return Temperature Setpoint Constant Value
+    ;                        !- Return Temperature Setpoint Schedule Name
+```
+
+Another example which uses the "ReturnTemperatureSetpoint" is shown here with the accompanying setpoint being used to set the setpoint on the return node:
+
+```
+  SetpointManager:Scheduled,
+    Return Temperature Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    Return Temperature Sch,  !- Schedule Name
+    Supply Inlet Node;       !- Setpoint Node or NodeList Name
+
+  Schedule:Constant,
+    Return Temperature Sch,  !- Name
+    Any Number,              !- Schedule Limits
+    11.75;                   !- Value
+
+  SetpointManager:ReturnTemperature:ChilledWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    7.0,                     !- Minimum Supply Temperature Setpoint
+    10.0,                    !- Maximum Supply Temperature Setpoint
+    ReturnTemperatureSetpoint, !- Return Temperature Setpoint Input Type
+    ,                        !- Return Temperature Setpoint Constant Value
     ;                        !- Return Temperature Setpoint Schedule Name
 ```
 
@@ -16369,7 +16394,7 @@ This numeric field plays multiple roles.  During initialization, such as before 
 
 #### Return Temperature Setpoint Input Type
 
-This alpha field must be one of two strings: either "Constant" or "Scheduled".  The choice determines which of the next two input fields are used as the target return temperature.
+This alpha field must be one of three strings: "Constant", "Scheduled", or "ReturnTemperatureSetpoint".  If the choice is "Constant", the constant value in the next field is used as the target return temperature.  If the choice is "Scheduled", the current value of the schedule named in the following field is used as the target return temperature.  If the choice is "ReturnTemperatureSetpoint", the actual setpoint temperature on the "Plant Loop Supply Inlet Node" specified above is retrieved and used as the target return temperature.  This is convenient as a separate setpoint manager could be established to pre-calculate the desired return temperature, and will assign the Setpoint internally.  Then when this return temperature manager executes, the setpoint will be updated and utilized.
 
 #### Return Temperature Setpoint Constant Value
 
@@ -16429,7 +16454,7 @@ This was setup to be generic but to date has only been used for temperature cont
 
 #### Field: Action
 
-The next input refers to the    action    of the control. This can be best described by an example. In a coil where water mass flow rate is to be controlled, a coil will increase the mass flow rate through the coil when more heating or cooling is requested. In a heating coil, this increases the value of heat transfer from the water to the air stream. As a result, this is considered a    Normal    action controller. In a cooling coil, an increase in water mass flow rate through the coil decreases the value of heat transfer from the water to the air stream (absolute value increases, but since cooling is traditionally described as a negative number, an increase in absolute value results in a decrease in the actual heat transfer value). Thus, the cooling coil controller has    Reverse    action since an increase in flow rate results in a decrease in heat transfer.
+The next input refers to the action of the control. This can be best described by an example. In a coil where water mass flow rate is to be controlled, a coil will increase the mass flow rate through the coil when more heating or cooling is requested. In a heating coil, this increases the value of heat transfer from the water to the air stream. As a result, this is considered a    Normal    action controller. In a cooling coil, an increase in water mass flow rate through the coil decreases the value of heat transfer from the water to the air stream (absolute value increases, but since cooling is traditionally described as a negative number, an increase in absolute value results in a decrease in the actual heat transfer value). Thus, the cooling coil controller has    Reverse    action since an increase in flow rate results in a decrease in heat transfer.
 
 #### Field: Actuator Variable
 

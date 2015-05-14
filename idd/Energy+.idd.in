@@ -69856,10 +69856,12 @@ SetpointManager:ReturnTemperature:ChilledWater,
        \type real
        \required-field
   A4,  \field Return Temperature Setpoint Input Type
-       \note This defines whether the chilled water return temperature target is constant or scheduled.
+       \note This defines whether the chilled water return temperature target is constant, 
+       \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
        \type choice
        \key Constant
        \key Scheduled
+       \key ReturnTemperatureSetpoint
        \required-field
   N3,  \field Return Temperature Setpoint Constant Value
        \note This is the desired return temperature target, which is met by adjusting the  
@@ -69906,10 +69908,12 @@ SetpointManager:ReturnTemperature:HotWater,
        \type real
        \required-field
   A4,  \field Return Temperature Setpoint Input Type
-       \note This defines whether the hot water return temperature target is constant or scheduled.
+       \note This defines whether the chilled water return temperature target is constant, 
+       \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
        \type choice
        \key Constant
        \key Scheduled
+       \key ReturnTemperatureSetpoint
        \required-field
   N3,  \field Return Temperature Setpoint Constant Value
        \note This is the desired return temperature target, which is met by adjusting the  

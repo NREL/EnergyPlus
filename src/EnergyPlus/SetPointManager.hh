@@ -1859,6 +1859,7 @@ namespace SetPointManager {
 		Real64 currentSupplySetPt; // the current supply setpoint temperature
 		int plantLoopIndex; // the index for the plant loop for this manager, zero if not initialized
 		int plantSetpointNodeIndex; // the index for the node where the plant setpoint is set, need to look up after Plant is established
+		bool useReturnTempSetpoint; // only true if the target return temperature should be looked up as the Node(returnNode).TempSetPoint
 
 		// Default Constructor
 		DefineReturnWaterChWSetPointManager() :
@@ -1871,7 +1872,8 @@ namespace SetPointManager {
 			returnTemperatureConstantTarget( 0.0 ),
 			currentSupplySetPt( 0.0 ),
 			plantLoopIndex( 0 ),
-			plantSetpointNodeIndex( 0 )
+			plantSetpointNodeIndex( 0 ),
+			useReturnTempSetpoint( false )
 		{}
 
 		// Calculation method
@@ -1892,6 +1894,7 @@ namespace SetPointManager {
 		Real64 currentSupplySetPt; // the current supply setpoint temperature
 		int plantLoopIndex; // the index for the plant loop for this manager, zero if not initialized
 		int plantSetpointNodeIndex; // the index for the node where the plant setpoint is set, need to look up after Plant is established
+		bool useReturnTempSetpoint; // only true if the target return temperature should be looked up as the Node(returnNode).TempSetPoint
 
 		// Default Constructor
 		DefineReturnWaterHWSetPointManager() :
@@ -1904,7 +1907,8 @@ namespace SetPointManager {
 			returnTemperatureConstantTarget( 0.0 ),
 			currentSupplySetPt( 0.0 ),
 			plantLoopIndex( 0 ),
-			plantSetpointNodeIndex( 0 )
+			plantSetpointNodeIndex( 0 ),
+			useReturnTempSetpoint( false )
 		{}
 
 		// Calculation method

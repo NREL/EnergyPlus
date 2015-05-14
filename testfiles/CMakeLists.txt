@@ -294,6 +294,7 @@ ADD_SIMULATION_TEST(IDF_FILE PlantHorizontalGroundHX.idf EPW_FILE USA_CO_Golden-
 ADD_SIMULATION_TEST(IDF_FILE PlantLoadProfile.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PlantLoadProfileCooling.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PlantLoadProfileCoolingReturnReset.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE PlantLoadProfileCoolingReturnResetLookup.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PlantLoadProfileCoolingReturnResetVariableFlow.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PlantLoadProfileHeatingReturnResetScheduled.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PlantLoadProfile_AutosizedDistrictHeating.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
