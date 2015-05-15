@@ -196,6 +196,7 @@ INTEGER,PARAMETER :: IniFH  = 5 !Energy+.INI file handle
 LOGICAL :: isChillerWithWaterCooled = .FALSE.
 LOGICAL :: errorCondition = .FALSE.
 LOGICAL :: foundCompactObject = .FALSE.
+LOGICAL :: foundHVACTemplateObject = .FALSE.
 LOGICAL :: iddCanBeRead =.FALSE.
 
 REAL :: startTime=0.0
@@ -5468,10 +5469,12 @@ IF (foundCompactObject) THEN
   CALL WriteComment('')
   ! Do the following only if HVACTemplates are present and not when ground heat
   ! transfer objects are being manipulated.
-  IF (numCompactStat .GE. 1) THEN
+  IF (foundHVACTemplateObject) THEN
     !Make generic schedule type
     CALL CreateNewObj('ScheduleTypeLimits')
     CALL AddToObjStr('Name','HVACTemplate Any Number',.TRUE.)
+    !create some common schedules
+    CALL AddAlwaysSchedule('1')
   END IF
   CALL CheckIfNamesAreUnique
   CALL CreateNewThermostat
@@ -5562,6 +5565,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactZoneVAVbase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + vzMinFlowMethodOff,       'Constant')
     CALL SetIfBlank(fldValStart + vzConstantMinFracOff,     '0.2')
@@ -5592,6 +5596,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactZoneFPVAVbase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + fpvzPriSupplyMaxRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + fpvzPriSupplyMinFracOff, 'autosize')
@@ -5628,6 +5633,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactZoneHCVAVbase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + hcvzSupplyMaxRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + hcvzConstantMinFracOff, '0.2')
@@ -5658,6 +5664,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactSysVAVbase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + vsSupplyMaxRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + vsSupplyMinRateOff, 'autosize')
@@ -5715,6 +5722,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactSysPVAVbase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     ! No defaults for zone names, schedule names,econo limits,
     CALL SetIfBlank(fldValStart + pvavsSupplyMaxRateOff, 'autosize')
@@ -5814,6 +5822,7 @@ DO iObj= 1, prelimCount
     actCount = actCount + 1
     compactStatBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
   END IF
 END DO
 numCompactStat = actCount
@@ -5872,6 +5881,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactZoneUnitBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + uzSupplyMaxRateOff,   'autosize')
     CALL SetIfBlank(fldValStart + uzOutAirTypeOff,      'Flow/Person')
@@ -5900,6 +5910,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactSysUnitBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + usSupplyMaxRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + usSupplyEfficiencyOff, '0.7')
@@ -5950,6 +5961,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactSysUnitHPBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + uhpsSupplyCoolFlowRateOff, 'Autosize')
     CALL SetIfBlank(fldValStart + uhpsSupplyHeatFlowRateOff, 'Autosize')
@@ -6011,6 +6023,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactSysUnitarySystemBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + ussSystemControlTypeOff, 'Load')
     CALL SetIfBlank(fldValStart + ussSupplyCoolFlowRateOff, 'autosize')
@@ -6122,6 +6135,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactZoneConstVolBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + cvzSupplyMaxRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + cvzOutAirTypeOff, 'flow/person')
@@ -6151,6 +6165,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactSysConstVolBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + cvsSupplyRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + cvsSupplyEfficiencyOff, '0.7')
@@ -6256,6 +6271,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactZoneDualDuctBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + ddzSupplyMaxRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + ddzConstantMinFracOff, '0.2')
@@ -6285,6 +6301,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactSysDualDuctBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + ddsSupplyFanConfigTypeOff, 'SingleConstantVolume')
     CALL SetIfBlank(fldValStart + ddsSupplyMaxRateOff, 'autosize')
@@ -6412,6 +6429,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactZoneVRFBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + vrfzHeatCapSizRatOff, '1')
     CALL SetIfBlank(fldValStart + vrfzSupplyCoolFlowRateOff, 'autosize')
@@ -6455,6 +6473,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactSysVRFBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + vrfsCoolCoilCapOff, 'autosize')
     CALL SetIfBlank(fldValStart + vrfsCoolCoilCOPOff, '3.3')
@@ -6546,6 +6565,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactFanCoilBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + fczSupplyMaxRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + fczOutAirTypeOff, 'Flow/Person')
@@ -6624,6 +6644,7 @@ DO iObj= 1, prelimCount
     actCount = actCount + 1
     compactPurchAirBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + pazMaxHeatSupplyTempOff, '50')
     CALL SetIfBlank(fldValStart + pazMinCoolSupplyTempOff, '13')
@@ -6701,6 +6722,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactBaseboardBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + bbzBaseboardTypeOff, 'HotWater')
     CALL SetIfBlank(fldValStart + bbzBaseboardCapOff, 'autosize')
@@ -6763,6 +6785,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactPTACBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + ptaczSupplyCoolFlowRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + ptaczSupplyHeatFlowRateOff, 'autosize')
@@ -6845,6 +6868,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactPTHPBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + pthpzSupplyCoolFlowRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + pthpzSupplyHeatFlowRateOff, 'autosize')
@@ -6937,6 +6961,7 @@ DO iObj= 1, prelimCount
     actCount = actCount + 1
     compactBoilerBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + blrTypeOff, 'HotWaterBoiler')
     CALL SetIfBlank(fldValStart + blrCapacityOff, 'autosize')
@@ -6960,6 +6985,7 @@ DO iObj= 1, prelimCount
     actCount = actCount + 1
     compactBoilerORBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + blrorObjTypeOff, 'Boiler:HotWater')
   END IF
@@ -7033,6 +7059,7 @@ ELSEIF (prelimCount .EQ. 1) THEN
   IF (fldValEnd - fldValStart .EQ. hwpLdDistSchmOff) THEN
     compactHotLoopBase = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !check if loop exist but system doesn't
     IF ((numCompactSysVAV .EQ. 0) .AND. (numCompactFanCoil .EQ. 0) .AND.  &
         (numCompactZoneUnit .EQ. 0) .AND. (numCompactPTAC .EQ. 0) .AND. &
@@ -7118,6 +7145,7 @@ ELSEIF (prelimCount .EQ. 1) THEN
   IF (fldValEnd - fldValStart .EQ. cwpCndLdDistSchmOff) THEN
     compactChldLoopBase = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !check if loop exist but system doesn't
     IF ((numCompactSysVAV .EQ. 0) .AND. (numCompactFanCoil .EQ. 0) .AND. &
         (numCompactDedOutAir .EQ. 0) .AND. (numCompactSysConstVol .EQ. 0) .AND. &
@@ -7208,6 +7236,7 @@ DO iObj= 1, prelimCount
     actCount = actCount + 1
     compactChillerBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + chlTypeOff, 'ElectricReciprocatingChiller')
     CALL SetIfBlank(fldValStart + chlCapacityOff, 'autosize')
@@ -7232,6 +7261,7 @@ DO iObj= 1, prelimCount
     actCount = actCount + 1
     compactChillerORBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + chlorObjTypeOff, 'Chiller:Electric:EIR')
   END IF
@@ -7322,6 +7352,7 @@ DO iObj= 1, prelimCount
     actCount = actCount + 1
     compactTowerBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + twrTypeOff, 'SingleSpeed')
     CALL SetIfBlank(fldValStart + twrHiSpdCapacityOff, 'autosize')
@@ -7344,6 +7375,7 @@ DO iObj= 1, prelimCount
     actCount = actCount + 1
     compactTowerORBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + chlorObjTypeOff, 'CoolingTower:SingleSpeed')
   END IF
@@ -7447,6 +7479,7 @@ DO iZone= 1, prelimCount
     actCount = actCount + 1
     compactWaterAirHPBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + wahpSupplyCoolFlowRateOff, 'autosize')
     CALL SetIfBlank(fldValStart + wahpSupplyHeatFlowRateOff, 'autosize')
@@ -7534,6 +7567,7 @@ ELSEIF (prelimCount .EQ. 1) THEN
   IF (fldValEnd - fldValStart .EQ. mwpLdDistSchmOff) THEN
     compactMixedLoopBase = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !check if loop exist but system doesn't
     IF ((numCompactWaterAirHP .EQ. 0) .AND. (numCompactSysVRF .EQ. 0) .AND. (numCompactSysUnitarySystem .EQ. 0)) THEN
       CALL WriteError('You must specify at least one HVACTemplate:Zone:WaterToAirHeatPump or '//  &
@@ -7607,6 +7641,7 @@ DO iSys = 1, prelimCount
     actCount = actCount + 1
     compactDedOutAirBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
+    foundHVACTemplateObject = .TRUE.
     !fill in defaults
     CALL SetIfBlank(fldValStart + doasAirOutletTypeOff, 'DirectIntoZone')
     CALL SetIfBlank(fldValStart + doasSupplyRateOff, 'autosize')
@@ -8623,12 +8658,6 @@ LOGICAL :: isReturnFanYes = .FALSE.
 ! Node Names
 CHARACTER(len=MaxAlphaLength) :: returnInletToOAMIxer=''
 
-!create some common schedules
-IF (numCompactZoneVAV .NE. 0 .or. numCompactZoneFPVAV /= 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 !======================================================================================================
 ! create Zones
 !======================================================================================================
@@ -8710,6 +8739,7 @@ DO iZone = 1, numCompactZoneVAV
   !ZONE CONTROL:THERMOSTATIC ~ line 5
   !repeat per zone - only if vzTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base +  vzNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base +  vzNameOff,' ')
@@ -9208,6 +9238,7 @@ DO iZone = 1, numCompactZoneFPVAV
   isZnBaseBoardAvailSchedBlank = (FldVal(base + fpvzBaseboardAvailSchedNameOff) .EQ. '')
   IF (.NOT. isTStatNameBlank) THEN
     !ZONE CONTROL:THERMOSTATIC ~line 4 of FPVAV tab
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base + fpvzNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base + fpvzNameOff,'')
@@ -9703,6 +9734,7 @@ DO iZone = 1, numCompactZoneHCVAV
   !ZONE CONTROL:THERMOSTATIC ~ line 5
   !repeat per zone - only if hcvzTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base +  hcvzNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base +  hcvzNameOff,' ')
@@ -13297,12 +13329,6 @@ CHARACTER(len=MaxAlphaLength) :: dehumscheduleName=''
 CHARACTER(len=MaxAlphaLength) :: humscheduleName=''
 CHARACTER(len=2) :: iSpdChar=''
 
-!create some common schedules
-IF (numCompactZoneUnit .NE. 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 !======================================================================================================
 ! create Zones
 !======================================================================================================
@@ -13392,6 +13418,7 @@ DO iZone = 1, numCompactZoneUnit
 !repeat per zone - only if uzTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
     !ZONE CONTROL:THERMOSTATIC
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base +  uzNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base +  uzNameOff,' ')
@@ -18706,11 +18733,6 @@ CHARACTER(len=MaxAlphaLength) :: returnInletToOAMIxer=''
 CHARACTER(len=MaxAlphaLength) :: dehumscheduleName=''
 CHARACTER(len=MaxAlphaLength) :: humscheduleName=''
 
-!create some common schedules
-IF (numCompactZoneConstVol /= 0) THEN
-  CALL AddAlwaysSchedule('1')
-END IF
-
 !======================================================================================================
 ! create Zones
 !======================================================================================================
@@ -20699,12 +20721,6 @@ CHARACTER(len=MaxAlphaLength) :: hotbranchOutlet=''
 CHARACTER(len=MaxAlphaLength) :: dehumscheduleName=''
 CHARACTER(len=MaxAlphaLength) :: humscheduleName=''
 
-!create some common schedules
-IF (numCompactZoneDualDuct /= 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 !======================================================================================================
 ! create Zones
 !======================================================================================================
@@ -20764,6 +20780,7 @@ DO iZone = 1, numCompactZoneDualDuct
   !ZONE CONTROL:THERMOSTATIC ~ line 5
   !repeat per zone - only if ddzTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base +  ddzNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base +  ddzNameOff,' ')
@@ -22825,12 +22842,6 @@ CHARACTER(len=MaxAlphaLength) :: coolCoilUnitOutlet=''
 CHARACTER(len=MaxAlphaLength) :: heatCoilInlet=''
 CHARACTER(len=MaxAlphaLength) :: heatCoilOutlet=''
 
-!create some common schedules
-IF (numCompactZoneVRF .NE. 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 !======================================================================================================
 ! create Zones
 !======================================================================================================
@@ -22900,6 +22911,7 @@ DO iZone = 1, numCompactZoneVRF
   !repeat per zone - only if vrfzTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
     !ZONE CONTROL:THERMOSTATIC ~ line 5
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base + vrfzNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base + vrfzNameOff,'')
@@ -23820,12 +23832,6 @@ INTEGER :: capacityControlKind = 0
 LOGICAL :: isCapacityControlKindBlank = .FALSE.
 CHARACTER(len=1) :: NextSequenceNumber = '1'
 
-!create some common schedules
-IF (numCompactFanCoil .NE. 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 DO iZone = 1, numCompactFanCoil
   base =  compactFanCoilBase(iZone)
   ! set flags
@@ -23906,6 +23912,7 @@ DO iZone = 1, numCompactFanCoil
   !repeat per zone - only if fczTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
     !ZONE CONTROL:THERMOSTATIC ~ line 5
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base + fczNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base + fczNameOff,'')
@@ -24374,11 +24381,6 @@ LOGICAL :: isAnyZoneAutosized = .FALSE.
 LOGICAL :: isNoEconomizer = .FALSE.
 LOGICAL :: isCoolFlowLimited = .FALSE.
 
-!create some common schedules
-IF (numCompactPurchAir .NE. 0) THEN
-  CALL AddAlwaysSchedule('4')
-END IF
-
 ! Check if any of the HVACTemplate:Zone:IdealLoadsAirSystem objects have an autosized field
 isAnyZoneAutosized = .FALSE.
 DO iPurchAir = 1, numCompactPurchAir
@@ -24507,6 +24509,7 @@ DO iPurchAir = 1, numCompactPurchAir
   !repeat per zone - only if pazTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
     !ZONE CONTROL:THERMOSTATIC
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base +  pazNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base +  pazNameOff,' ')
@@ -24700,12 +24703,6 @@ LOGICAL :: isDedOutAirNameBlank = .FALSE.
 LOGICAL :: isOATypeDetailed = .FALSE.
 INTEGER :: baseboardKind = 0
 
-!create some common schedules
-IF (numCompactBaseboard .NE. 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 DO iZone = 1, numCompactBaseboard
   base =  compactBaseboardBase(iZone)
   ! set flags
@@ -24725,6 +24722,7 @@ DO iZone = 1, numCompactBaseboard
   !repeat per zone - only if bbzTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
     !ZONE CONTROL:THERMOSTATIC ~ line 5
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base + bbzNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base + bbzNameOff,'')
@@ -24957,12 +24955,6 @@ LOGICAL :: isBaseboardNone = .FALSE.
 INTEGER :: baseboardKind = 0
 CHARACTER(len=1) :: NextSequenceNumber = '1'
 
-!create some common schedules
-IF (numCompactPTAC .NE. 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 DO iZone = 1, numCompactPTAC
   base =  compactPTACBase(iZone)
   ! set flags
@@ -25025,6 +25017,7 @@ DO iZone = 1, numCompactPTAC
   !repeat per zone - only if pazTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
     !ZONE CONTROL:THERMOSTATIC ~ line 5
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base + ptaczNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base + ptaczNameOff,'')
@@ -25561,12 +25554,6 @@ LOGICAL :: isBaseboardNone = .FALSE.
 INTEGER :: baseboardKind = 0
 CHARACTER(len=1) :: NextSequenceNumber = '1'
 
-!create some common schedules
-IF (numCompactPTHP .NE. 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 DO iZone = 1, numCompactPTHP
   base =  compactPTHPBase(iZone)
   ! set flags
@@ -25629,6 +25616,7 @@ DO iZone = 1, numCompactPTHP
   !repeat per zone - only if pthpzTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
     !ZONE CONTROL:THERMOSTATIC ~ line 5
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base + pthpzNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base + pthpzNameOff,'')
@@ -30064,12 +30052,6 @@ LOGICAL :: isBaseboardNone = .FALSE.
 INTEGER :: baseboardKind = 0
 CHARACTER(len=1) :: NextSequenceNumber = '1'
 
-!create some common schedules
-IF (numCompactWaterAirHP .NE. 0) THEN
-  CALL AddAlwaysSchedule('1')
-  CALL AddAlwaysSchedule('4')
-END IF
-
 DO iZone = 1, numCompactWaterAirHP
   base =  compactWaterAirHPBase(iZone)
   ! set flags
@@ -30139,6 +30121,7 @@ DO iZone = 1, numCompactWaterAirHP
   !repeat per zone - only if wahpTStatNameOff is not blank
   IF (.NOT. isTStatNameBlank) THEN
     !***ZoneControl:Thermostat
+    CALL AddAlwaysSchedule('4')
     CALL CreateNewObj('ZoneControl:Thermostat')
     CALL AddToObjFld('Name', base + wahpNameOff,' Thermostat')
     CALL AddToObjFld('Zone or ZoneList Name', base + wahpNameOff,'')
