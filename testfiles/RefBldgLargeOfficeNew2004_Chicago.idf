@@ -9336,20 +9336,75 @@
 
 ! ***REPORT METERS/VARIABLES***
 
-  Output:Variable,CoolSys1,Plant Supply Side Cooling Demand Rate,HOURLY;
+  Output:Meter,Electricity:Facility,HOURLY;
 
-  Output:Variable,CoolSys1,Plant Supply Side Heating Demand Rate,HOURLY;
+  Output:Meter,Fans:Electricity,HOURLY;
 
-  Output:Variable,CoolSys1,Plant Supply Side Inlet Mass Flow Rate,HOURLY;
+  Output:Meter,Cooling:Electricity,HOURLY;
 
-  Output:Variable,CoolSys1,Plant Supply Side Inlet Temperature,HOURLY;
+  Output:Meter,Heating:Electricity,HOURLY;
 
-  Output:Variable,CoolSys1,Plant Supply Side Outlet Temperature,HOURLY;
+  Output:Meter,InteriorLights:Electricity,HOURLY;
 
-  Output:Variable,CoolSys1,Plant Supply Side Unmet Demand Rate,HOURLY;
+  Output:Meter,InteriorEquipment:Electricity,HOURLY;
 
-  Output:Variable,CoolSys1 Supply Outlet Node,System Node Setpoint Temperature,HOURLY;
-  
+  Output:Meter,Gas:Facility,HOURLY;
+
+  Output:Meter,Heating:Gas,HOURLY;
+
+  Output:Meter,InteriorEquipment:Gas,HOURLY;
+
+  Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
+
+  Output:Variable,*,Site Outdoor Air Humidity Ratio,HOURLY;
+
+  Output:Variable,*,Site Outdoor Air Relative Humidity,HOURLY;
+
+  Output:Variable,*,Boiler Gas Energy,HOURLY;
+
+  Output:Variable,*,Boiler Inlet Temperature,HOURLY;
+
+  Output:Variable,*,Boiler Outlet Temperature,HOURLY;
+
+  Output:Variable,*,Boiler Part Load Ratio,HOURLY;
+
+  Output:Variable,*,Chiller Part Load Ratio,HOURLY;
+
+  Output:Variable,*,Chiller Electric Energy,HOURLY;
+
+  Output:Variable,*,Chiller COP,HOURLY;
+
+  Output:Variable,*,Plant System Cycle On Off Status,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Cooling Demand Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Heating Demand Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Inlet Mass Flow Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Inlet Temperature,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Outlet Temperature,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Unmet Demand Rate,HOURLY;
+
+  Output:Variable,*,Air System Heating Coil Hot Water Energy,HOURLY;
+
+  Output:Variable,*,Air System Outdoor Air Flow Fraction,HOURLY;
+
+  Output:Variable,*,Air System Simulation Cycle On Off Status,HOURLY;
+
+  Output:Variable,*,Air System Outdoor Air Economizer Status,HOURLY;
+
+  Output:Variable,*,Air System Total Heating Energy,HOURLY;
+
+  Output:Variable,*,Air System Total Cooling Energy,HOURLY;
+
+  Output:Variable,*,Air System Fan Electric Energy,HOURLY;
+
+  Output:Variable,*,Zone Mean Air Temperature,hourly;
 
 ! ***REPORT TABLES***
 
