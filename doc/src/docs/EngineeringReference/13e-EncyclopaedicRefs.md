@@ -3153,13 +3153,9 @@ The setpoint senses conditions on two named nodes, which should correspond to a 
 
 5. Then calculate the supply temperature setpoint using: <span>$T_{sup,sp} = T_{ret,target} - \frac{\dot{Q}}{\dot{m} C_p}$</span>
 
-6. Constrain the value to limiting values, which are:
+6. Constrain the value to user-specified limiting min/max values
 
-    * a user-specified design setpoint as the lower bound, and 
-
-    * a user-specified maximum setpoint as an upper bound.
-
-These calculations are nearly identical for the hot water set point manager, only that the sign of the load will change, and the lower/upper bounds are reversed (the design setpoint becomes the upper bound).
+For a chilled water loop, the user-specified minimum is the default setpoint used in cases of no-load or negative-load.  In a hot-water loop the user-specified maximum is used for these situations.  Also, in a hot-water loop the sign of the demand will be reversed.
 
 #### Key control note
 
@@ -3173,8 +3169,15 @@ This isn't necessarily a big problem.  However, some users may be especially int
 
 ![](EngineeringReference/media/SetPointManager-ResetForReturnControl2.png)
 
-With the smaller time step, the reporting frequency is higher.  But more importantly, with the smaller time step, the setpoint can be corrected much more often.  Because of this, the return temperature regains control much quicker than with the larger time step.  The importance of this will be dependent on a specific user's goal with the simulation, and will have to be balanced with the increase in runtime.
+With the smaller time step, the reporting frequency is higher.  But more importantly, with the smaller time step, the setpoint can be corrected much more often.  Because of this, the return temperature regains control much quicker than with the larger time step.  
 
+However, these examples are for a jagged demand profile full of discontinuous step changes in loop demand.  As a final example, this return water temperature control is applied to the large office reference building chilled water loop.  Here is the response:
+
+![](EngineeringReference/media/SetPointManager-ResetForReturnControl3.png)
+
+Note the control is working properly, maintaining a return temperature around the target of 12 degrees where possible.  Since the load profile is a typical -smooth- profile, the control is also much smoother.  This should be a good representation of the capabilities of this setpoint manager.
+
+For jagged load profiles, if tight control is highly important, choosing a smaller timestep (~1 minute) is recommended.  For normal building profiles, the typical range of timesteps (~15 minute) should be fully satisfactory.
 
 Solar Collectors <a name="SolarCollectors"></a>
 ----------------

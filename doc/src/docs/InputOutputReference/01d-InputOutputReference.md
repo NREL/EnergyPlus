@@ -16293,7 +16293,7 @@ SetpointManager:SingleZone:OneStageHeating,
 
 This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment.  This setpoint manager is specifically for "chilled water" (although it could be any fluid) applications.  This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what set-point temperature would provide the desired target return temperature.
 
-Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  In this case, the setpoint will be reset every minute and be able to better control the loop to the target return temperature.  The importance of this aspect will vary by application.
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  However, as described in the EngineeringReference, for most realistic building profiles the control works quite well under normal timestep size.  If your load profile is highly jagged with step changes in demand, a smaller timestep could help achieve tight control.
 
 #### Field: Name
 
@@ -16370,7 +16370,7 @@ Another example which uses the "ReturnTemperatureSetpoint" is shown here with th
 
 This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment.  This setpoint manager is specifically for "hot water" (although it could be any fluid) applications.  This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what supply set-point temperature would provide the desired target return temperature.
 
-Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  In this case, the setpoint will be reset every minute and be able to better control the loop to the target return temperature.  The importance of this aspect will vary by application.
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  However, as described in the EngineeringReference, for most realistic building profiles the control works quite well under normal timestep size.  If your load profile is highly jagged with step changes in demand, a smaller timestep could help achieve tight control.
 
 #### Field: Name
 
