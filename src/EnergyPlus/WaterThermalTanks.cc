@@ -1244,6 +1244,8 @@ namespace WaterThermalTanks {
 				int const NumPumpedCondenser = GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
 				int nAlphaOffset; // the difference of array location between alpha items between pumped and wrapped condensers
 				int nNumericOffset; // the difference of array location between numeric items between pumped and wrapped condensers
+				int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
+				int nNumPossibleAlphaArgs; // the number of possible numeric arguments in the idd
 
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
 
@@ -1258,10 +1260,14 @@ namespace WaterThermalTanks {
 						// Pumped Condenser
 						cCurrentModuleObject = cHPWHPumpedCondenser;
 						HPWH.TypeNum = TypeOf_HeatPumpWtrHeaterPumped;
+						nNumPossibleAlphaArgs = 26;
+						nNumPossibleNumericArgs = 9;
 					} else {
 						// Wrapped Condenser
 						cCurrentModuleObject = cHPWHWrappedCondenser;
 						HPWH.TypeNum = TypeOf_HeatPumpWtrHeaterWrapped;
+						nNumPossibleAlphaArgs = 24;
+						nNumPossibleNumericArgs = 10;
 					}
 
 					// Get the lists of IDF arguments
@@ -1279,10 +1285,16 @@ namespace WaterThermalTanks {
 						hpwhNumericBlank[i] = lNumericFieldBlanks(i);
 						hpwhNumericFieldNames[i] = cNumericFieldNames(i);
 					}
+					for ( int i = NumNums + 1; i <= nNumPossibleNumericArgs; ++i ) {
+						hpwhNumericBlank[i] = true;
+					}
 					for ( int i = 1; i <= NumAlphas; ++i ) {
 						hpwhAlpha[i] = cAlphaArgs(i);
 						hpwhAlphaBlank[i] = lAlphaFieldBlanks(i);
 						hpwhAlphaFieldNames[i] = cAlphaFieldNames(i);
+					}
+					for ( int i = NumAlphas + 1; i <= nNumPossibleAlphaArgs; ++i ) {
+						hpwhAlphaBlank[i] = true;
 					}
 
 					IsNotOK = false;
@@ -1919,7 +1931,7 @@ namespace WaterThermalTanks {
 					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, FanInletNode, FanOutletNode );
 
 					// Control Logic Flag
-					std::string CtrlLogicFlag = hpwhAlpha[ 26 + nAlphaOffset ];
+					std::string CtrlLogicFlag =  hpwhAlphaBlank[ 26 + nAlphaOffset ] ? "SIMULTANEOUS" : hpwhAlpha[ 26 + nAlphaOffset ];
 					if ( SameString( CtrlLogicFlag, "SIMULTANEOUS" ) ) {
 						HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = true;
 					} else if ( SameString( CtrlLogicFlag, "MUTUALLYEXCLUSIVE" ) ) {
@@ -1939,7 +1951,7 @@ namespace WaterThermalTanks {
 					}
 
 					// Control Sensor 1 Weight
-					HPWH.ControlSensor1Weight = hpwhNumeric[ 8 + nNumericOffset ];
+					HPWH.ControlSensor1Weight = hpwhNumericBlank[ 8 + nNumericOffset ] ? 1.0 : hpwhNumeric[ 8 + nNumericOffset ];
 
 					// Control Sensor 2 Location In Stratified Tank
 					if ( ! hpwhNumericBlank[ 9 + nNumericOffset ] ) {
@@ -5443,9 +5455,7 @@ namespace WaterThermalTanks {
 			HeatPumpWaterHeaterData const & HeatPump = HPWaterHeater(Tank.HeatPumpNum);
 			DataLoopNode::NodeData const & HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
 			DataLoopNode::NodeData const & HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
-			if ( HeatPump.Mode == HeatMode ) {
-				HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
-			}
+			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
 		}
 		assert( HPWHCondenserDeltaT >= 0 );
 
@@ -6253,9 +6263,7 @@ namespace WaterThermalTanks {
 			HeatPumpWaterHeaterData const & HPWH = HPWaterHeater(Tank.HeatPumpNum);
 			DXCoils::DXCoilData const & Coil = DXCoils::DXCoil( HPWH.DXCoilNum );
 			HPWHCondenserConfig = HPWH.TypeNum;
-			if ( HPWH.Mode == HeatMode ) {
-				Qheatpump = Coil.TotalHeatingEnergyRate;
-			}
+			Qheatpump = Coil.TotalHeatingEnergyRate;
 		}
 
 		SetPointTemp1 = Tank.SetPointTemp;
@@ -6505,6 +6513,7 @@ namespace WaterThermalTanks {
 				Tank.UseOutletTemp = Tank.UseInletTemp * ( 1.0 - Tank.UseEffectiveness ) + Tank.UseOutletTemp * Tank.UseEffectiveness;
 			}
 		}
+		NodeNum = Tank.SourceOutletStratNode;
 		if ( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped ) {
 			Real64 WeightedAverageSourceOutletTemp( 0.0 );
 			for ( int i = 1; i <= Tank.Nodes; ++i ) {
@@ -6512,7 +6521,6 @@ namespace WaterThermalTanks {
 			}
 			Tank.SourceOutletTemp = WeightedAverageSourceOutletTemp;
 		} else if ( NodeNum > 0 ) {
-			NodeNum = Tank.SourceOutletStratNode;
 			Tank.SourceOutletTemp = Tank.Node( NodeNum ).TempAvg;
 		}
 		if ( Tank.HeatPumpNum > 0 ) {
@@ -7276,6 +7284,7 @@ namespace WaterThermalTanks {
 		// References to objects used in this function
 		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
 		HeatPumpWaterHeaterData & HeatPump = HPWaterHeater( Tank.HeatPumpNum );
+		DXCoils::DXCoilData & Coil = DXCoils::DXCoil( HeatPump.DXCoilNum );
 
 		// FLOW:
 		// initialize local variables
@@ -7430,18 +7439,23 @@ namespace WaterThermalTanks {
 			Tank.SourceInletTemp = Node( HPWaterOutletNode ).Temp;
 
 			// Check tank temperature by setting source inlet mass flow rate to zero.
-			Tank.SourceMassFlowRate = 0.0;
+			
+			 // disables heat pump for stratified tanks
 
 			// Disable the tank's internal heating element to find PLR of the HPWH using floating temperatures.
 			Tank.MaxCapacity = 0.0;
 			Tank.MinCapacity = 0.0;
 			{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
 			if ( SELECT_CASE_var1 == MixedWaterHeater ) {
+				Tank.SourceMassFlowRate = 0.0; // disables heat pump for mixed tanks
 				CalcWaterThermalTankMixed( WaterThermalTankNum );
 				NewTankTemp = Tank.TankTemp;
 			} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
+				Real64 const SavedCoilTotalHeatingEnergyRate = Coil.TotalHeatingEnergyRate;
+				Coil.TotalHeatingEnergyRate = 0.0;
 				CalcWaterThermalTankStratified( WaterThermalTankNum );
 				NewTankTemp = FindStratifiedTankSensedTemp( Tank );
+				Coil.TotalHeatingEnergyRate = SavedCoilTotalHeatingEnergyRate;
 			} else {
 				assert( false );
 			}}

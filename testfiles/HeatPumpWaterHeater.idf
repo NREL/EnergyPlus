@@ -2156,16 +2156,13 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE5-1,                !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
     HPWHTank,                !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
     HPWHDXCoil,              !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
     HPWHFan,                 !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2213,7 +2210,7 @@
     HPWHWaterInletNode,      !- Source Side Outlet Node Name
     0.95;                    !- Source Side Effectiveness
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHDXCoil,              !- Name
     4000.0,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -2374,16 +2371,13 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE4-1,                !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
     Zone4HPWHTank,           !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
     Zone4HPWHDXCoil,         !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
     Zone4HPWHFan,            !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2428,7 +2422,7 @@
     Zone4WaterInletNode,     !- Source Side Outlet Node Name
     0.95;                    !- Source Side Effectiveness
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     Zone4HPWHDXCoil,         !- Name
     4000.0,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -2489,16 +2483,13 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE4-1,                !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
     Zone4bHPWHTank,           !- Tank Name
     Water Heater Use Inlet Node,                        !- Tank Use Side Inlet Node Name
     Water Heater Use Outlet Node,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
     Zone4bHPWHDXCoil,         !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
     Zone4bHPWHFan,            !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2544,7 +2535,7 @@
     1.0,                    !- Source Side Effectiveness
 	autosize;                !- Use Side Design Flow Rate {m3/s}
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     Zone4bHPWHDXCoil,         !- Name
     4000,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -2605,16 +2596,13 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
     HPWHOutdoorTank,         !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
     HPWHOutdoorDXCoil,       !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
     HPWHOutdoorFan,          !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -2662,7 +2650,7 @@
   OutdoorAir:Node,
     HPWHOutdoorTank OA Node; !- Name
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHOutdoorDXCoil,       !- Name
     4000.0,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -2751,16 +2739,13 @@
     ScheduledAmbientTemp,    !- Inlet Air Temperature Schedule Name
     ScheduledAmbientRH,      !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
     HPWHScheduledTank,       !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
     HPWHScheduledDXCoil,     !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Schedule,                !- Compressor Location
     ScheduledCompressorTemp, !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
     HPWHScheduledFan,        !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -2805,7 +2790,7 @@
     HPScheduledWaterInletNode,  !- Source Side Outlet Node Name
     0.95;                    !- Source Side Effectiveness
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHScheduledDXCoil,     !- Name
     4000.0,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -3839,16 +3824,13 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
     HPWHPlantTank,           !- Tank Name
     HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
     HPWHPlantDXCoil,         !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
     HPWHPlantFan,            !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -3897,7 +3879,7 @@
   OutdoorAir:Node,
     HPWHPlantTank OA Node;   !- Name
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHPlantDXCoil,         !- Name
     25000.0,                 !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}

@@ -64902,7 +64902,7 @@ WaterHeater:Sizing,
        \minimum 0.0
 
 WaterHeater:HeatPump:PumpedCondenser,
-       \min-fields 31
+       \min-fields 28
        \memo This object models an air-source heat pump for water heating.
        \memo WaterHeater:HeatPump:PumpedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump:*, Fan:OnOff, WaterHeater:Mixed or WaterHeater:Stratified
@@ -65129,7 +65129,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \minimum 0.0
 
 WaterHeater:HeatPump:WrappedCondenser,
-       \min-fields 31
+       \min-fields 27
        \memo This object models an air-source heat pump for water heating.
        \memo WaterHeater:HeatPump:WrappedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump:Pumped, Fan:OnOff, WaterHeater:Mixed
