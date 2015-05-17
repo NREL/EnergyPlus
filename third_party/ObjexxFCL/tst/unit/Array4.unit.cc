@@ -125,6 +125,15 @@ TEST( Array4Test, ConstructIndexes )
 	EXPECT_FALSE( A.initializer_active() );
 }
 
+TEST( Array4Test, RangeBasedFor )
+{
+	Array4D_int A( 2, 2, 2, 2, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 } );
+	int v( 0 );
+	for ( auto const e : A ) {
+		EXPECT_EQ( ++v, e );
+	}
+}
+
 TEST( Array4Test, Subscript )
 {
 	Array4D_int A( 2, 2, 2, 2, {

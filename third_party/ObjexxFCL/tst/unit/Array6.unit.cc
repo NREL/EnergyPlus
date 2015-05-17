@@ -159,6 +159,16 @@ TEST( Array6Test, ConstructIndexes )
 	EXPECT_FALSE( A.initializer_active() );
 }
 
+TEST( Array6Test, RangeBasedFor )
+{
+	Array6D_int A( 2, 2, 2, 2, 2, 2 );
+	int v( 0 );
+	for ( auto & e : A ) {
+		e = ++v;
+		EXPECT_EQ( v, e );
+	}
+}
+
 TEST( Array6Test, Subscript )
 {
 	Array6D_int A( 2, 2, 2, 2, 2, 2, {
