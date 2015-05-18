@@ -5112,7 +5112,11 @@ namespace WaterThermalTanks {
 		Qoncycheat = Qoncycfuel * Tank.OnCycParaFracToTank;
 
 		SetPointTemp = Tank.SetPointTemp;
-		DeadBandTemp = SetPointTemp - Tank.DeadBandDeltaTemp;
+		if ( Tank.IsChilledWaterTank ) {
+			DeadBandTemp = SetPointTemp + Tank.DeadBandDeltaTemp;
+		} else {
+			DeadBandTemp = SetPointTemp - Tank.DeadBandDeltaTemp;
+		}
 		MaxTemp = Tank.TankTempLimit;
 		AmbientTemp = Tank.AmbientTemp;
 
