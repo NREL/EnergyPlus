@@ -105,6 +105,10 @@ TEST( Array1Test, ConstructionInitializerListOnlyInt )
 	EXPECT_EQ( 1.0, r( 1 ) );
 	EXPECT_EQ( 2.0, r( 2 ) );
 	EXPECT_EQ( 3.0, r( 3 ) );
+	int v( 0 );
+	for ( auto const e : r ) {
+		EXPECT_EQ( ++v, e );
+	}
 }
 
 TEST( Array1Test, ConstructionInitializerListOnlyUnsigned )

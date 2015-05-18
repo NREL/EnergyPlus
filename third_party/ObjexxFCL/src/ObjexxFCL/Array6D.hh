@@ -42,22 +42,30 @@ public: // Types
 	typedef  typename Super::IR  IR;
 
 	// STL Style
-	typedef  typename Base::value_type  value_type;
-	typedef  typename Base::reference  reference;
-	typedef  typename Base::const_reference  const_reference;
-	typedef  typename Base::pointer  pointer;
-	typedef  typename Base::const_pointer  const_pointer;
-	typedef  typename Base::size_type  size_type;
-	typedef  typename Base::difference_type  difference_type;
+	typedef  typename Super::value_type  value_type;
+	typedef  typename Super::reference  reference;
+	typedef  typename Super::const_reference  const_reference;
+	typedef  typename Super::pointer  pointer;
+	typedef  typename Super::const_pointer  const_pointer;
+	typedef  typename Super::iterator  iterator;
+	typedef  typename Super::const_iterator  const_iterator;
+	typedef  typename Super::reverse_iterator  reverse_iterator;
+	typedef  typename Super::const_reverse_iterator  const_reverse_iterator;
+	typedef  typename Super::size_type  size_type;
+	typedef  typename Super::difference_type  difference_type;
 
 	// C++ Style
-	typedef  typename Base::Value  Value;
-	typedef  typename Base::Reference  Reference;
-	typedef  typename Base::ConstReference  ConstReference;
-	typedef  typename Base::Pointer  Pointer;
-	typedef  typename Base::ConstPointer  ConstPointer;
-	typedef  typename Base::Size  Size;
-	typedef  typename Base::Difference  Difference;
+	typedef  typename Super::Value  Value;
+	typedef  typename Super::Reference  Reference;
+	typedef  typename Super::ConstReference  ConstReference;
+	typedef  typename Super::Pointer  Pointer;
+	typedef  typename Super::ConstPointer  ConstPointer;
+	typedef  typename Super::Iterator  Iterator;
+	typedef  typename Super::ConstIterator  ConstIterator;
+	typedef  typename Super::ReverseIterator  ReverseIterator;
+	typedef  typename Super::ConstReverseIterator  ConstReverseIterator;
+	typedef  typename Super::Size  Size;
+	typedef  typename Super::Difference  Difference;
 
 	typedef  ArrayInitializer< T, ObjexxFCL::Array6D >  Initializer;
 	typedef  typename Initializer::Function  InitializerFunction;
