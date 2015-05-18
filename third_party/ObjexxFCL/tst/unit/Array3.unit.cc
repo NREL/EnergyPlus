@@ -108,6 +108,15 @@ TEST( Array3Test, ConstructIndexes )
 	EXPECT_FALSE( A.initializer_active() );
 }
 
+TEST( Array3Test, RangeBasedFor )
+{
+	Array3D_int A( 2, 2, 2, { 1, 2, 3, 4, 5, 6, 7, 8 } );
+	int v( 0 );
+	for ( auto const e : A ) {
+		EXPECT_EQ( ++v, e );
+	}
+}
+
 TEST( Array3Test, Subscript )
 {
 	Array3D_int A( 2, 2, 2, {

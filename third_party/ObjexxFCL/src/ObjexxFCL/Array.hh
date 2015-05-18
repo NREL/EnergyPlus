@@ -42,6 +42,7 @@
 #include <initializer_list>
 #include <iomanip>
 #include <istream>
+#include <iterator>
 #include <limits>
 #include <ostream>
 #include <type_traits>
@@ -92,6 +93,10 @@ public: // Types
 	typedef  T const &  const_reference;
 	typedef  T *  pointer;
 	typedef  T const *  const_pointer;
+	typedef  T *  iterator;
+	typedef  T const *  const_iterator;
+	typedef  std::reverse_iterator< T * >  reverse_iterator;
+	typedef  std::reverse_iterator< T const * >  const_reverse_iterator;
 	typedef  std::size_t  size_type;
 	typedef  std::ptrdiff_t  difference_type;
 
@@ -101,6 +106,10 @@ public: // Types
 	typedef  T const &  ConstReference;
 	typedef  T *  Pointer;
 	typedef  T const *  ConstPointer;
+	typedef  T *  Iterator;
+	typedef  T const *  ConstIterator;
+	typedef  std::reverse_iterator< T * >  ReverseIterator;
+	typedef  std::reverse_iterator< T const * >  ConstReverseIterator;
 	typedef  std::size_t  Size;
 	typedef  std::ptrdiff_t  Difference;
 
@@ -1466,6 +1475,70 @@ public: // Inspector
 	virtual
 	int
 	isize( int const d ) const = 0;
+
+	// Array Begin Iterator
+	inline
+	T const *
+	begin() const
+	{
+		return data_;
+	}
+
+	// Array Begin Iterator
+	inline
+	T *
+	begin()
+	{
+		return data_;
+	}
+
+	// Array End Iterator
+	inline
+	T const *
+	end() const
+	{
+		return ( ( data_ != nullptr ) && ( size_ > 0u ) && ( size_ != npos ) ? data_ + size_ : nullptr );
+	}
+
+	// Array End Iterator
+	inline
+	T *
+	end()
+	{
+		return ( ( data_ != nullptr ) && ( size_ > 0u ) && ( size_ != npos ) ? data_ + size_ : nullptr );
+	}
+
+	// Array Reverse Begin Iterator
+	inline
+	std::reverse_iterator< T const * >
+	rbegin() const
+	{
+		return ( ( data_ != nullptr ) && ( size_ > 0u ) && ( size_ != npos ) ? data_ + size_ - 1 : nullptr );
+	}
+
+	// Array Reverse Begin Iterator
+	inline
+	std::reverse_iterator< T * >
+	rbegin()
+	{
+		return ( ( data_ != nullptr ) && ( size_ > 0u ) && ( size_ != npos ) ? data_ + size_ - 1 : nullptr );
+	}
+
+	// Array Reverse End Iterator
+	inline
+	std::reverse_iterator< T const * >
+	rend() const
+	{
+		return ( ( data_ != nullptr ) && ( size_ > 0u ) && ( size_ != npos ) ? data_ - 1 : nullptr );
+	}
+
+	// Array Reverse End Iterator
+	inline
+	std::reverse_iterator< T * >
+	rend()
+	{
+		return ( ( data_ != nullptr ) && ( size_ > 0u ) && ( size_ != npos ) ? data_ - 1 : nullptr );
+	}
 
 	// Array Data Pointer
 	inline

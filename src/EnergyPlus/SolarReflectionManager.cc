@@ -1347,7 +1347,7 @@ namespace SolarReflectionManager {
 		diff( A( 2 ), vertex( 3 ), V( 2 ) );
 
 		// Vector normal to surface
-		SN.cross( A( 1 ), A( 2 ) );
+		SN = cross( A( 1 ), A( 2 ) );
 
 		// Scale factor, the solution of SN.(CPhit-V2) = 0 and
 		// CPhit = R1 + SCALE*RN, where CPhit is the point that RN,
@@ -1370,20 +1370,20 @@ namespace SolarReflectionManager {
 			// 0 < CCC.BBB < BBB.BBB AND 0 < CCC.AAA < AAA.AAA
 
 			// CCC = CPhit - V2  ! Vector from vertex 2 to CPhit
-			CCC.diff( CPhit, V( 2 ) );
+			CCC = CPhit - V( 2 );
 
 			// Set third V just for here
 			assign( V( 3 ), vertex( 3 ) );
 
 			// BBB = V3 - V2
-			BBB.diff( V( 3 ), V( 2 ) );
+			BBB = V( 3 ) - V( 2 );
 
 			DOTCB = dot( CCC, BBB );
 			if ( DOTCB < 0.0 ) return;
 			if ( DOTCB > BBB.magnitude_squared() ) return;
 
 			// AAA = V1 - V2
-			AAA.diff( V( 1 ), V( 2 ) );
+			AAA = V( 1 ) - V( 2 );
 
 			DOTCA = dot( CCC, AAA );
 			if ( DOTCA < 0.0 ) return;
@@ -1395,13 +1395,13 @@ namespace SolarReflectionManager {
 
 			// First two of V & A already set
 			// test first vertex:
-			C( 1 ).diff( CPhit, V( 1 ) );
-			AXC.cross( A( 1 ), C( 1 ) );
+			C( 1 ) = CPhit - V( 1 );
+			AXC = cross( A( 1 ), C( 1 ) );
 			if ( dot( AXC, SN ) < 0.0 ) return; // If at least one dot product is negative, intersection outside of surface
 
 			// test second vertex:
-			C( 2 ).diff( CPhit, V( 2 ) );
-			AXC.cross( A( 2 ), C( 2 ) );
+			C( 2 ) = CPhit - V( 2 );
+			AXC = cross( A( 2 ), C( 2 ) );
 			if ( dot( AXC, SN ) < 0.0 ) return; // If at least one dot product is negative, intersection outside of surface
 
 			NV = surface.Sides;
@@ -1409,17 +1409,17 @@ namespace SolarReflectionManager {
 				for ( N = 3; N <= NV - 1; ++N ) {
 					assign( V( N ), vertex( N ) );
 					diff( A( N ), vertex( N + 1 ), V( N ) );
-					C( N ).diff( CPhit, V( N ) );
-					AXC.cross( A( N ), C( N ) );
+					C( N ) = CPhit - V( N );
+					AXC = cross( A( N ), C( N ) );
 					if ( dot( AXC, SN ) < 0.0 ) return; // If at least one dot product is negative, intersection outside of surface
 				}
 			}
 
 			// Last vertex (NV=3 or NV=4)
 			assign( V( NV ), vertex( NV ) );
-			A( NV ).diff( V( 1 ), V( NV ) );
-			C( NV ).diff( CPhit, V( NV ) );
-			AXC.cross( A( NV ), C( NV ) );
+			A( NV ) = V( 1 ) - V( NV );
+			C( NV ) = CPhit - V( NV );
+			AXC = cross( A( NV ), C( NV ) );
 			if ( dot( AXC, SN ) < 0.0 ) return; // If at least one dot product is negative, intersection outside of surface
 
 			IPIERC = 1; // Surface is intersected

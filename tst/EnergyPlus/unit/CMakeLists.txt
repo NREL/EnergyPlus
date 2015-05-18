@@ -41,6 +41,7 @@ set( test_src
   Vector.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
+  WaterToAirHeatPumpSimple.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
