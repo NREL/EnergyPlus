@@ -3312,9 +3312,6 @@ namespace OutputReportTabular {
 				if ( DoCostEstimate ) {
 					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Component_Cost_Economics_Summary, Entire_Facility ) << "\">Component Cost Economics Summary</a>\n";
 				}
-				if ( displayComponentSizing ) {
-					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Component_Sizing_Summary, Entire_Facility ) << "\">Component Sizing Summary</a>\n";
-				}
 				if ( displaySurfaceShadowing ) {
 					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Surface_Shadowing_Summary, Entire_Facility ) << "\">Surface Shadowing Summary</a>\n";
 				}
@@ -3322,6 +3319,9 @@ namespace OutputReportTabular {
 					if ( reportName( kReport ).show ) {
 						tbl_stream << "<br><a href=\"#" << MakeAnchorName( reportName( kReport ).namewithspaces, Entire_Facility ) << "\">" << reportName( kReport ).namewithspaces << "</a>\n";
 					}
+				}
+				if ( displayComponentSizing ) {
+					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Component_Sizing_Summary, Entire_Facility ) << "\">Component Sizing Summary</a>\n";
 				}
 				if ( DoWeathSim ) {
 					for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {

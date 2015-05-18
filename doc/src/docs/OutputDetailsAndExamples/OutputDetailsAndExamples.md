@@ -11862,7 +11862,18 @@ Interior Lighting
 
 ### HVAC Sizing Summary
 
-The HVAC Sizing Summary report provides information on the zone cooling and heating sizing and the peak load conditions as well as information about the system air flow sizing. Directly following is an example of the report. The key used to obtain this report is HVACSizingSummary.
+The HVAC Sizing Summary report provides information on the zone cooling and heating sizing and the peak load conditions as well as information about the system air flow sizing. Directly following is an example of the report. 
+The HVAC Sizing Summary report includes the following tables:
+
+- Zone Cooling which includes the following columns for each zone: the calculated design load, the user specified design load, the calculated design air flow, the user specified design air flow, the name of the sizing period, the time of the peak load during the sizing period, the temperature at the time of the peak load during the sizing period, and the humidity ratio at the time of the peak load during the sizing period used.
+
+- Zone Heating which includes the following columns for each zone: the calculated design load, the user specified design load, the calculated design air flow, the user specified design air flow, the name of the sizing period, the time of the peak load during the sizing period, the temperature at the time of the peak load during the sizing period, and the humidity ratio at the time of the peak load during the sizing period used.
+
+- System Design Air Flow Rates which includes the following columns for each air loop: the calculated cooling air flow rate, the user specified air flow rate for cooling, the calculated heating air flow rate, the user specified air flow rate for heating.
+
+*Note:* values listed as "calculated" are the unaltered result of the zone or system sizing calculations, using the design sizing period weather and schedules specified in the input. Values listed as "user specified" are either the calculated values modified by global or zone sizing factors or values specified with the *flow/zone* or *flow/system* design air flow method.
+
+The key used to obtain this report is HVACSizingSummary. 
 
 Report: **HVAC Sizing Summary**
  For: **Entire Facility
