@@ -12,6 +12,7 @@ set( test_src
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   Fans.unit.cc
+  FaultFoulingAirFilters.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
