@@ -1535,7 +1535,6 @@ namespace ChillerElectricEIR {
 			SetComponentFlowRate( CondMassFlowRate, CondInletNode, CondOutletNode, ElectricEIRChiller( EIRChillNum ).CDLoopNum, ElectricEIRChiller( EIRChillNum ).CDLoopSideNum, ElectricEIRChiller( EIRChillNum ).CDBranchNum, ElectricEIRChiller( EIRChillNum ).CDCompNum );
 			PullCompInterconnectTrigger( ElectricEIRChiller( EIRChillNum ).CWLoopNum, ElectricEIRChiller( EIRChillNum ).CWLoopSideNum, ElectricEIRChiller( EIRChillNum ).CWBranchNum, ElectricEIRChiller( EIRChillNum ).CWCompNum, ElectricEIRChiller( EIRChillNum ).CondMassFlowIndex, ElectricEIRChiller( EIRChillNum ).CDLoopNum, ElectricEIRChiller( EIRChillNum ).CDLoopSideNum, CriteriaType_MassFlowRate, CondMassFlowRate );
 
-//			if ( CondMassFlowRate < MassFlowTolerance ) return;
 			if ( CondMassFlowRate < MassFlowTolerance ) {
 				if ( EvapMassFlowRate < MassFlowTolerance ) {
 					// Use SetComponentFlowRate to decide actual flow
@@ -2018,7 +2017,6 @@ namespace ChillerElectricEIR {
 
 		// Using/Aliasing
 		using DataBranchAirLoopPlant::MassFlowTolerance;
-		using DataGlobals::SecInHour;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
