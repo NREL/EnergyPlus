@@ -25289,27 +25289,27 @@ This field provides the name of a Thermostat Offset Fault object that causes the
 FaultModel:ThermostatOffset,
    Ther_Offset_Zone1,   !- Name
    Zone 1 Thermostat,   !- Thermostat Name
-   AlwaysOn,        !- Availability Schedule Name
-   AlwaysOne,       !- Severity Schedule Name
-   2.0;             !- Reference Thermostat Offset
+   AlwaysOn,            !- Availability Schedule Name
+   AlwaysOne,           !- Severity Schedule Name
+   2.0;                 !- Reference Thermostat Offset
 
 FaultModel:HumidistatOffset, 
    Humi_Offset_Zone1,   !- Name
    Zone 1 Humidistat,   !- Humidistat Name
    ThermostatOffsetDependent, !- Humidistat Offset Type
-   ,            !- Availability Schedule Name
-   ,            !- Severity Schedule Name
-   ,                !- Reference Humidistat Offset
+   ,                    !- Availability Schedule Name
+   ,                    !- Severity Schedule Name
+   ,                    !- Reference Humidistat Offset
    Ther_Offset_Zone1;   !- Related Thermostat Offset Fault Name
 
 FaultModel:HumidistatOffset, 
    Humi_Offset_Zone2,   !- Name
    Zone 2 Humidistat,   !- Humidistat Name
    ThermostatOffsetIndependent, !- Humidistat Offset Type
-   AlwaysOn,        !- Availability Schedule Name
-   AlwaysOne,       !- Severity Schedule Name
-   10,              !- Reference Humidistat Offset
-   ;            !- Related Thermostat Offset Fault Name
+   AlwaysOn,            !- Availability Schedule Name
+   AlwaysOne,           !- Severity Schedule Name
+   10,                  !- Reference Humidistat Offset
+   ;                    !- Related Thermostat Offset Fault Name
 ```
 
 Group - Performance Curves
