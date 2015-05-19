@@ -69853,10 +69853,14 @@ SetpointManager:ReturnTemperature:ChilledWater,
        \note This is the minimum chilled water supply temperature setpoint.  This is also used as the default
        \note setpoint during no-load or negative-load conditions and during initialization.
        \type real
+       \units C
+       \default 5
        \required-field
   N2,  \field Maximum Supply Temperature Setpoint
        \note This is the maximum reset temperature for the chilled water supply.
        \type real
+       \units C
+       \default 10
        \required-field
   A4,  \field Return Temperature Setpoint Input Type
        \note This defines whether the chilled water return temperature target is constant, 
@@ -69869,13 +69873,15 @@ SetpointManager:ReturnTemperature:ChilledWater,
   N3,  \field Return Temperature Setpoint Constant Value
        \note This is the desired return temperature target, which is met by adjusting the  
        \note supply temperature setpoint. This constant value is only used if 
-       \note the "Design Chilled Water Return Temperature Input Type" is Constant
+       \note the Design Chilled Water Return Temperature Input Type is Constant
        \type real
+       \units C
+       \default 13
   A5;  \field Return Temperature Setpoint Schedule Name
        \note This is the desired return temperature target, which is met by adjusting the  
        \note supply temperature setpoint. This is a schedule name to allow the return temperature
        \note target value to be scheduled.  This field is only used if 
-       \note the "Design Chilled Water Return Temperature Input Type" is Scheduled
+       \note the Design Chilled Water Return Temperature Input Type is Scheduled
        \type object-list
        \object-list ScheduleNames
 
@@ -69904,14 +69910,18 @@ SetpointManager:ReturnTemperature:HotWater,
   N1,  \field Minimum Supply Temperature Setpoint
        \note This is the minimum reset temperature for the hot water supply.
        \type real
+       \units C
+       \default 57
        \required-field
   N2,  \field Maximum Supply Temperature Setpoint
        \note This is the maximum hot water supply temperature setpoint.  This is also used as the default
        \note setpoint during no-load or negative-load conditions and during initialization.
        \type real
+       \units C
+       \default 60
        \required-field
   A4,  \field Return Temperature Setpoint Input Type
-       \note This defines whether the chilled water return temperature target is constant, 
+       \note This defines whether the hot water return temperature target is constant, 
        \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
        \type choice
        \key Constant
@@ -69921,13 +69931,15 @@ SetpointManager:ReturnTemperature:HotWater,
   N3,  \field Return Temperature Setpoint Constant Value
        \note This is the desired return temperature target, which is met by adjusting the  
        \note supply temperature setpoint. This constant value is only used if 
-       \note the "Design Hot Water Return Temperature Input Type" is Constant
+       \note the Design Hot Water Return Temperature Input Type is Constant
        \type real
+       \units C
+       \default 55
   A5;  \field Return Temperature Setpoint Schedule Name
        \note This is the desired return temperature target, which is met by adjusting the  
        \note supply temperature setpoint. This is a schedule name to allow the return temperature
        \note target value to be scheduled.  This field is only used if 
-       \note the "Design Hot Water Return Temperature Input Type" is Scheduled
+       \note the Design Hot Water Return Temperature Input Type is Scheduled
        \type object-list
        \object-list ScheduleNames
 
