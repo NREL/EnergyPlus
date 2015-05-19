@@ -6835,7 +6835,7 @@ namespace SetPointManager {
 		if ( this->returnTemperatureScheduleIndex > 0 ) {
 			T_return_target = GetCurrentScheduleValue( this->returnTemperatureScheduleIndex );
 		} else if ( this->useReturnTempSetpoint ) {
-			if ( returnNode.TempSetPoint != -999 ) {
+			if ( returnNode.TempSetPoint != SensedNodeFlagValue ) {
 				T_return_target = returnNode.TempSetPoint;
 			} else {
 				ShowSevereError( "Return temperature reset setpoint manager encountered an error." );
@@ -6931,7 +6931,7 @@ namespace SetPointManager {
 		if ( this->returnTemperatureScheduleIndex > 0 ) {
 			T_return_target = GetCurrentScheduleValue( this->returnTemperatureScheduleIndex );
 		} else if ( this->useReturnTempSetpoint ) {
-			if ( returnNode.TempSetPoint != -999 ) {
+			if ( returnNode.TempSetPoint != SensedNodeFlagValue ) {
 				T_return_target = returnNode.TempSetPoint;
 			} else {
 				ShowSevereError( "Return temperature reset setpoint manager encountered an error." );
