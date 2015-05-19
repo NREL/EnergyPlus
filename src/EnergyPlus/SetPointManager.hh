@@ -2056,9 +2056,6 @@ namespace SetPointManager {
 	UpdateSetPointManagers();
 
 	void
-	UpdatePlantSpecificSetPointManagers();
-
-	void
 	UpdateMixedAirSetPoints();
 
 	void
