@@ -6842,6 +6842,7 @@ namespace SetPointManager {
 				ShowContinueError( "The manager is specified to look to the return node setpoint to find a target return temperature, but the node setpoint was invalid" );
 				ShowContinueError( "Verify that a separate sepoint manager is specified to set the setpoint on the return node named \"" + NodeID( this->returnNodeIndex ) + "\"" );
 				ShowContinueError( "Or change the target return temperature input type to constant or scheduled" );
+				ShowFatalError( "Missing reference setpoint" );
 			}
 		}
 
@@ -6938,6 +6939,7 @@ namespace SetPointManager {
 				ShowContinueError( "The manager is specified to look to the return node setpoint to find a target return temperature, but the node setpoint was invalid" );
 				ShowContinueError( "Verify that a separate sepoint manager is specified to set the setpoint on the return node named \"" + NodeID( this->returnNodeIndex ) + "\"" );
 				ShowContinueError( "Or change the target return temperature input type to constant or scheduled" );
+				ShowFatalError( "Missing reference setpoint" );
 			}
 		}
 
