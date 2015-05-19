@@ -16321,11 +16321,11 @@ This alpha field must be one of three strings: "Constant", "Scheduled", or "Retu
 
 #### Return Temperature Setpoint Constant Value
 
-If the "Design Chilled Water Return Temperature Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
+If the "Return Temperature Setpoint Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
 
 #### Return Temperature Setpoint Schedule Name
 
-If the "Design Chilled Water Return Temperature Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
+If the "Return Temperature Setpoint Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
 
 An example idf input for a constant return reset setpoint manager is shown here:
 
@@ -16398,11 +16398,11 @@ This alpha field must be one of three strings: "Constant", "Scheduled", or "Retu
 
 #### Return Temperature Setpoint Constant Value
 
-If the "Design Hot Water Return Temperature Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
+If the "Return Temperature Setpoint Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
 
 #### Return Temperature Setpoint Schedule Name
 
-If the "Design Hot Water Return Temperature Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
+If the "Return Temperature Setpoint Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
 
 An example idf input for a scheduled return reset setpoint manager is shown here:
 
