@@ -244,8 +244,8 @@ namespace SetPointManager {
 	int NumIdealCondEntSetPtMgrs( 0 ); // number of Ideal Condenser Entering Temperature setpoint managers
 	int NumSZOneStageCoolingSetPtMgrs( 0 ); // number of single zone one stage cooling setpoint managers
 	int NumSZOneStageHeatingSetPtMgrs( 0 ); // number of singel zone one stage heating setpoint managers
-	int NumSZReturnWaterResetChWSetPtMgrs( 0 ); // number of return water reset setpoint managers
-	int NumSZReturnWaterResetHWSetPtMgrs( 0 ); // number of hot-water return water reset setpoint managers
+	int NumReturnWaterResetChWSetPtMgrs( 0 ); // number of return water reset setpoint managers
+	int NumReturnWaterResetHWSetPtMgrs( 0 ); // number of hot-water return water reset setpoint managers
 	
 	bool ManagerOn( false );
 	bool GetInputFlag( true ); // First time, input is "gotten"
@@ -629,13 +629,13 @@ namespace SetPointManager {
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
-		NumSZReturnWaterResetChWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
+		NumReturnWaterResetChWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
-		NumSZReturnWaterResetHWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
+		NumReturnWaterResetHWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
@@ -667,8 +667,8 @@ namespace SetPointManager {
 						+ NumIdealCondEntSetPtMgrs 
 						+ NumSZOneStageCoolingSetPtMgrs 
 						+ NumSZOneStageHeatingSetPtMgrs
-						+ NumSZReturnWaterResetChWSetPtMgrs
-						+ NumSZReturnWaterResetHWSetPtMgrs;
+						+ NumReturnWaterResetChWSetPtMgrs
+						+ NumReturnWaterResetHWSetPtMgrs;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
 		cAlphaArgs.allocate( MaxNumAlphas );
@@ -2761,10 +2761,10 @@ namespace SetPointManager {
 
 		}
 
-		if ( NumSZReturnWaterResetChWSetPtMgrs > 0 ) ReturnWaterResetChWSetPtMgr.allocate( NumSZReturnWaterResetChWSetPtMgrs );
+		if ( NumReturnWaterResetChWSetPtMgrs > 0 ) ReturnWaterResetChWSetPtMgr.allocate( NumReturnWaterResetChWSetPtMgrs );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
-		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 
 			// get the object inputs
 			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -2782,7 +2782,7 @@ namespace SetPointManager {
 			// process the sense and actuate nodes
 			bool errFlag = false;
 			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).supplyNodeIndex = GetOnlySingleNode( cAlphaArgs( 2 ), errFlag, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_SetPoint, 1, ObjectIsNotParent, cAlphaFieldNames( 2 ) ); // setpoint nodes
-			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).returnNodeIndex = GetOnlySingleNode( cAlphaArgs( 3 ), errFlag, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_SetPoint, 1, ObjectIsNotParent, cAlphaFieldNames( 3 ) ); // setpoint nodes
+			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).returnNodeIndex = GetOnlySingleNode( cAlphaArgs( 3 ), errFlag, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent, cAlphaFieldNames( 3 ) ); // setpoint nodes
 
 			// process the setpoint inputs
 			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).minimumChilledWaterSetpoint = rNumericArgs( 1 );
@@ -2818,10 +2818,10 @@ namespace SetPointManager {
 
 		}
 		
-		if ( NumSZReturnWaterResetHWSetPtMgrs > 0 ) ReturnWaterResetHWSetPtMgr.allocate( NumSZReturnWaterResetHWSetPtMgrs );
+		if ( NumReturnWaterResetHWSetPtMgrs > 0 ) ReturnWaterResetHWSetPtMgr.allocate( NumReturnWaterResetHWSetPtMgrs );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
-		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 
 			// get the object inputs
 			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -2839,7 +2839,7 @@ namespace SetPointManager {
 			// process the sense and actuate nodes
 			bool errFlag = false;
 			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).supplyNodeIndex = GetOnlySingleNode( cAlphaArgs( 2 ), errFlag, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_SetPoint, 1, ObjectIsNotParent, cAlphaFieldNames( 2 ) ); // setpoint nodes
-			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).returnNodeIndex = GetOnlySingleNode( cAlphaArgs( 3 ), errFlag, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_SetPoint, 1, ObjectIsNotParent, cAlphaFieldNames( 3 ) ); // setpoint nodes
+			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).returnNodeIndex = GetOnlySingleNode( cAlphaArgs( 3 ), errFlag, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent, cAlphaFieldNames( 3 ) ); // setpoint nodes
 
 			// process the setpoint inputs
 			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).minimumHotWaterSetpoint = rNumericArgs( 1 );
@@ -2865,7 +2865,7 @@ namespace SetPointManager {
 			}
 
 			// setup the "base" class
-			AllSetPtMgrNum = SetPtMgrNum + NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs + NumMixedAirSetPtMgrs + NumOAPretreatSetPtMgrs + NumWarmestSetPtMgrs + NumColdestSetPtMgrs + NumWarmestSetPtMgrsTempFlow + NumRABFlowSetPtMgrs + NumMZClgAverageSetPtMgrs + NumMZHtgAverageSetPtMgrs + NumMZAverageMinHumSetPtMgrs + NumMZAverageMaxHumSetPtMgrs + NumMZMinHumSetPtMgrs + NumMZMaxHumSetPtMgrs + NumFollowOATempSetPtMgrs + NumFollowSysNodeTempSetPtMgrs + NumGroundTempSetPtMgrs + NumCondEntSetPtMgrs + NumIdealCondEntSetPtMgrs + NumSZOneStageCoolingSetPtMgrs + NumSZOneStageHeatingSetPtMgrs + NumSZReturnWaterResetChWSetPtMgrs;
+			AllSetPtMgrNum = SetPtMgrNum + NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs + NumMixedAirSetPtMgrs + NumOAPretreatSetPtMgrs + NumWarmestSetPtMgrs + NumColdestSetPtMgrs + NumWarmestSetPtMgrsTempFlow + NumRABFlowSetPtMgrs + NumMZClgAverageSetPtMgrs + NumMZHtgAverageSetPtMgrs + NumMZAverageMinHumSetPtMgrs + NumMZAverageMaxHumSetPtMgrs + NumMZMinHumSetPtMgrs + NumMZMaxHumSetPtMgrs + NumFollowOATempSetPtMgrs + NumFollowSysNodeTempSetPtMgrs + NumGroundTempSetPtMgrs + NumCondEntSetPtMgrs + NumIdealCondEntSetPtMgrs + NumSZOneStageCoolingSetPtMgrs + NumSZOneStageHeatingSetPtMgrs + NumReturnWaterResetChWSetPtMgrs;
 			AllSetPtMgr( AllSetPtMgrNum ).CtrlNodes.allocate( 1 );
 			AllSetPtMgr( AllSetPtMgrNum ).CtrlNodes( 1 ) = ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).supplyNodeIndex;
 			AllSetPtMgr( AllSetPtMgrNum ).Name = ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).Name;
@@ -4158,11 +4158,11 @@ namespace SetPointManager {
 				}
 			}
 
-			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
+			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 				Node( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).minimumChilledWaterSetpoint;
 			}
 			
-			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
+			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 				Node( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).maximumHotWaterSetpoint;
 			}
 
@@ -4420,13 +4420,13 @@ namespace SetPointManager {
 		}
 
 		// return water reset
-		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 			auto & returnWaterSPM( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ) );
 			returnWaterSPM.calculate( Node( returnWaterSPM.returnNodeIndex ), Node( returnWaterSPM.supplyNodeIndex ) );
 		}
 
 		// hot-water return water reset
-		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 			auto & returnWaterSPM( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ) );
 			returnWaterSPM.calculate( Node( returnWaterSPM.returnNodeIndex ), Node( returnWaterSPM.supplyNodeIndex ) );
 		}
@@ -6912,7 +6912,7 @@ namespace SetPointManager {
 
 		// we don't need fluid names since we have a real index, so just pass in the temperature and get properties
 		Real64 avgTemp = ( returnNode.Temp + supplyNode.Temp ) / 2;
-		Real64 cp = FluidProperties::GetSpecificHeatGlycol( "", avgTemp, fluidIndex, "ReturnWaterChWSetPointManager::calculate" );
+		Real64 cp = FluidProperties::GetSpecificHeatGlycol( "", avgTemp, fluidIndex, "ReturnWaterHWSetPointManager::calculate" );
 
 		// get the operating flow rate
 		Real64 mdot = supplyNode.MassFlowRate;
@@ -7562,7 +7562,7 @@ namespace SetPointManager {
 		}
 
 		//return water temperature reset setpoint managers
-		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 			auto & returnWaterSPM( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ) );
 			if ( returnWaterSPM.plantSetpointNodeIndex > 0 ) {
 				Node( returnWaterSPM.plantSetpointNodeIndex ).TempSetPoint = returnWaterSPM.currentSupplySetPt;
@@ -7572,7 +7572,7 @@ namespace SetPointManager {
 		}
 
 		//hot-water return water temperature reset setpoint managers
-		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 			auto & returnWaterSPM( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ) );
 			if ( returnWaterSPM.plantSetpointNodeIndex > 0 ) {
 				Node( returnWaterSPM.plantSetpointNodeIndex ).TempSetPoint = returnWaterSPM.currentSupplySetPt;

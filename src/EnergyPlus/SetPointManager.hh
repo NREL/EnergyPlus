@@ -110,8 +110,8 @@ namespace SetPointManager {
 	extern int NumIdealCondEntSetPtMgrs; // number of Ideal Condenser Entering Temperature setpoint managers
 	extern int NumSZOneStageCoolingSetPtMgrs; // number of single zone one stage cooling setpoint managers
 	extern int NumSZOneStageHeatingSetPtMgrs; // number of singel zone one stage heating setpoint managers
-	extern int NumSZReturnWaterResetChWSetPtMgrs; // number of chilled-water return water reset setpoint managers
-	extern int NumSZReturnWaterResetHWSetPtMgrs; // number of hot-water return water reset setpoint managers
+	extern int NumReturnWaterResetChWSetPtMgrs; // number of chilled-water return water reset setpoint managers
+	extern int NumReturnWaterResetHWSetPtMgrs; // number of hot-water return water reset setpoint managers
 
 	extern bool ManagerOn;
 	extern bool GetInputFlag; // First time, input is "gotten"

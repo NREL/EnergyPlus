@@ -69909,14 +69909,14 @@ SetpointManager:ReturnTemperature:HotWater,
        \note This is the minimum reset temperature for the hot water supply.
        \type real
        \units C
-       \default 57
+       \default 77
        \required-field
   N2,  \field Maximum Supply Temperature Setpoint
        \note This is the maximum hot water supply temperature setpoint.  This is also used as the default
        \note setpoint during no-load or negative-load conditions and during initialization.
        \type real
        \units C
-       \default 60
+       \default 82
        \required-field
   A4,  \field Return Temperature Setpoint Input Type
        \note This defines whether the hot water return temperature target is constant, 
@@ -69932,7 +69932,7 @@ SetpointManager:ReturnTemperature:HotWater,
        \note the Design Hot Water Return Temperature Input Type is Constant
        \type real
        \units C
-       \default 55
+       \default 71
   A5;  \field Return Temperature Setpoint Schedule Name
        \note This is the desired return temperature target, which is met by adjusting the  
        \note supply temperature setpoint. This is a schedule name to allow the return temperature

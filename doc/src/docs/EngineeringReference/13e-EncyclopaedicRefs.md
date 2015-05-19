@@ -3141,7 +3141,7 @@ The target return temperature can be specified by:
 
 #### Operation
 
-The setpoint senses conditions on two named nodes, which should correspond to a central plant's supply side inlet and outlet nodes, the return and supply nodes, respectively.  The temperature and flow rate information is used in a series of calculations in order to determine a setpoint to specify on the supply outlet node which will in turn provide the target desired return temperature on the supply inlet node.  The calculations are summarized for a chilled water loop here:
+The setpoint manager senses conditions on two named nodes, which should correspond to a central plant's supply side inlet and outlet nodes, the return and supply nodes, respectively.  The temperature and flow rate information is used in a series of calculations in order to determine a setpoint to specify on the supply outlet node which will in turn provide the target desired return temperature on the supply inlet node.  The calculations are summarized for a chilled water loop here:
 
 1. Use the current supply and demand temperatures to calculate an average temperature for property calculation: <span>$C_p = f\left(T_{avg}\right) = f\left(\frac{T_{ret}+T_{sup}}{2}\right)$</span>
 
