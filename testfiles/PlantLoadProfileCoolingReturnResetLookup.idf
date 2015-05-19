@@ -319,7 +319,10 @@
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
-    UNTIL: 24:00,1.0;        !- Field 3
+    UNTIL: 06:00,1.0,        !- Field 3
+    UNTIL: 12:00,0.85,       !- Field 3
+    UNTIL: 18:00,0.7,        !- Field 3
+    UNTIL: 24:00,0.9;        !- Field 3
 
   Output:VariableDictionary,Regular;
 
