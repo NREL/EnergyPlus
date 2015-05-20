@@ -20,6 +20,14 @@ TEST( SetPointManager, DefineReturnWaterChWSetPointManager )
 	DataPlant::PlantLoop(1).LoopSide.allocate(2);
 	DataPlant::PlantLoop(1).LoopSide(2).NodeNumIn = 1; // Supply inlet, return
 	DataPlant::PlantLoop(1).LoopSide(2).NodeNumOut = 2; // Supply outlet, supply
+	DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate( 1 );
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 2;
 
 	// Set up the required node data
 	DataLoopNode::Node.allocate(2);
@@ -103,6 +111,14 @@ TEST( SetPointManager, DefineReturnWaterHWSetPointManager )
 	DataPlant::PlantLoop(1).LoopSide.allocate(2);
 	DataPlant::PlantLoop(1).LoopSide(2).NodeNumIn = 1; // Supply inlet, return
 	DataPlant::PlantLoop(1).LoopSide(2).NodeNumOut = 2; // Supply outlet, supply
+	DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate( 1 );
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 2;
 
 	// Set up the required node data
 	DataLoopNode::Node.allocate(2);
