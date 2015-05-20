@@ -2,8 +2,8 @@
 #define ThermalChimney_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2A.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -41,11 +41,11 @@ namespace ThermalChimney {
 		Real64 AirOutletCrossArea;
 		Real64 DischargeCoeff;
 		int TotZoneToDistrib;
-		FArray1D_int ZonePtr;
-		FArray1D_string ZoneName;
-		FArray1D< Real64 > DistanceThermChimInlet;
-		FArray1D< Real64 > RatioThermChimAirFlow;
-		FArray1D< Real64 > EachAirInletCrossArea;
+		Array1D_int ZonePtr;
+		Array1D_string ZoneName;
+		Array1D< Real64 > DistanceThermChimInlet;
+		Array1D< Real64 > RatioThermChimAirFlow;
+		Array1D< Real64 > EachAirInletCrossArea;
 
 		// Default Constructor
 		ThermalChimneyData() :
@@ -68,11 +68,11 @@ namespace ThermalChimney {
 			Real64 const AirOutletCrossArea,
 			Real64 const DischargeCoeff,
 			int const TotZoneToDistrib,
-			FArray1_int const & ZonePtr,
-			FArray1_string const & ZoneName,
-			FArray1< Real64 > const & DistanceThermChimInlet,
-			FArray1< Real64 > const & RatioThermChimAirFlow,
-			FArray1< Real64 > const & EachAirInletCrossArea
+			Array1_int const & ZonePtr,
+			Array1_string const & ZoneName,
+			Array1< Real64 > const & DistanceThermChimInlet,
+			Array1< Real64 > const & RatioThermChimAirFlow,
+			Array1< Real64 > const & EachAirInletCrossArea
 		) :
 			Name( Name ),
 			RealZonePtr( RealZonePtr ),
@@ -155,9 +155,9 @@ namespace ThermalChimney {
 	};
 
 	// Object Data
-	extern FArray1D< ThermalChimneyData > ThermalChimneySys;
-	extern FArray1D< ThermChimZnReportVars > ZnRptThermChim;
-	extern FArray1D< ThermChimReportVars > ThermalChimneyReport;
+	extern Array1D< ThermalChimneyData > ThermalChimneySys;
+	extern Array1D< ThermChimZnReportVars > ZnRptThermChim;
+	extern Array1D< ThermChimReportVars > ThermalChimneyReport;
 
 	// Functions
 
@@ -175,9 +175,9 @@ namespace ThermalChimney {
 
 	void
 	GaussElimination(
-		FArray2A< Real64 > EquaCoef,
-		FArray1A< Real64 > EquaConst,
-		FArray1A< Real64 > ThermChimSubTemp,
+		Array2A< Real64 > EquaCoef,
+		Array1A< Real64 > EquaConst,
+		Array1A< Real64 > ThermChimSubTemp,
 		int const NTC
 	);
 

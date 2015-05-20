@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
@@ -16,7 +16,7 @@ namespace FaultsManager {
 	//       AUTHOR         Tianzhen Hong, LBNL
 	//       DATE WRITTEN   August 2013
 	//       MODIFIED       Sep. 2013 Xiufeng Pang (XP) added fouling coil fault
-	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat/humidistat offset faults 
+	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat/humidistat offset faults
 	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
@@ -74,8 +74,8 @@ namespace FaultsManager {
 	//  12. CO2 sensor
 	//  13. Pressure sensor offset
 	//  14. more
-	
-	FArray1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset", "FaultModel:HumidistatOffset" } );
+
+	Array1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset", "FaultModel:HumidistatOffset" } );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -87,7 +87,7 @@ namespace FaultsManager {
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	FArray1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset, iFault_HumidistatOffset } );
+	Array1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset, iFault_HumidistatOffset } );
 
 	bool AnyFaultsInModel( false ); // True if there are operationla faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
@@ -98,10 +98,10 @@ namespace FaultsManager {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< FaultProperties > Faults;
-	FArray1D< FaultProperties > FouledCoils;
-	FArray1D< FaultProperties > FaultsThermostatOffset;
-	FArray1D< FaultProperties > FaultsHumidistatOffset;
+	Array1D< FaultProperties > Faults;
+	Array1D< FaultProperties > FouledCoils;
+	Array1D< FaultProperties > FaultsThermostatOffset;
+	Array1D< FaultProperties > FaultsHumidistatOffset;
 
 	// Functions
 
@@ -150,12 +150,12 @@ namespace FaultsManager {
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int IOStatus;
-		FArray1D_string cAlphaArgs( 5 ); // Alpha input items for object
-		static FArray1D_bool lAlphaFieldBlanks( 5, false );
-		static FArray1D_bool lNumericFieldBlanks( 5, false );
-		FArray1D_string cAlphaFieldNames( 5 );
-		FArray1D_string cNumericFieldNames( 5 );
-		FArray1D< Real64 > rNumericArgs( 5 ); // Numeric input items for object
+		Array1D_string cAlphaArgs( 10 ); // Alpha input items for object
+		static Array1D_bool lAlphaFieldBlanks( 10, false );
+		static Array1D_bool lNumericFieldBlanks( 10, false );
+		Array1D_string cAlphaFieldNames( 10 );
+		Array1D_string cNumericFieldNames( 10 );
+		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
 
 		int i;
 		int j; 	//Number of fault objects of type 101-105
@@ -200,16 +200,16 @@ namespace FaultsManager {
 		FouledCoils.allocate( NumFouledCoil );
 		FaultsThermostatOffset.allocate( NumFaultyThermostat );
 		FaultsHumidistatOffset.allocate( NumFaultyHumidistat );
-		
+
 		j = 0;
 		jFoulingCoil = 0;
 		jFaultyThermostat = 0;
 		jFaultyHumidistat = 0;
-		
+
 		for ( i = 1; i <= NumFaultTypes; ++i ) {
 			cFault1 = cFaults( i ); // fault object string
 			iFaults = GetNumObjectsFound( cFault1 );
-			
+
 			for ( jj = 1; jj <= iFaults; ++jj ) {
 				GetObjectItem( cFault1, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
@@ -219,33 +219,57 @@ namespace FaultsManager {
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultType = cFault1;
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultTypeEnum = iFaultTypeEnums( i );
 					FaultsHumidistatOffset( jFaultyHumidistat ).Name = cAlphaArgs( 1 );
-					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatName = cAlphaArgs( 4 );
+					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatName = cAlphaArgs( 2 );
+					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType = cAlphaArgs( 3 );
 
-					// Availability schedule
-					FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedule = cAlphaArgs( 2 );
-					if ( lAlphaFieldBlanks( 2 ) ) {
-						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = -1; // returns schedule value of 1
-					} else {
-						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
-						if ( FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					if ( SameString( FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
+					// For Humidistat Offset Type: ThermostatOffsetDependent
+
+						// Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
+						if ( lAlphaFieldBlanks( 6 ) ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cAlphaFieldNames( 6 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\"." );
 							ErrorsFound = true;
+						} else {
+							FaultsHumidistatOffset( jFaultyHumidistat ).FaultyThermostatName = cAlphaArgs( 6 );
 						}
+
+					} else {
+					// For Humidistat Offset Type: ThermostatOffsetIndependent
+
+						// Availability schedule
+						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedule = cAlphaArgs( 4 );
+						if ( lAlphaFieldBlanks( 4 ) ) {
+							FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = -1; // returns schedule value of 1
+						} else {
+							FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+							if ( FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr == 0 ) {
+								ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
+								ErrorsFound = true;
+							}
+						}
+
+						// Severity schedule
+						FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedule = cAlphaArgs( 5 );
+						if ( lAlphaFieldBlanks( 5 ) ) {
+							FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = -1; // returns schedule value of 1
+						} else {
+							FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 5 ) );
+							if ( FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr == 0 ) {
+								ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+								ErrorsFound = true;
+							}
+						}
+
+						// Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
+						if ( lNumericFieldBlanks( 1 ) ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cNumericFieldNames( 1 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\"." );
+							ErrorsFound = true;
+						} else {
+							FaultsHumidistatOffset( jFaultyHumidistat ).Offset = rNumericArgs( 1 );
+						}
+
 					}
 
-					// Severity schedule
-					FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedule = cAlphaArgs( 3 );
-					if ( lAlphaFieldBlanks( 3 ) ) {
-						FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = -1; // returns schedule value of 1
-					} else {
-						FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
-						if ( FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
-							ErrorsFound = true;
-						}
-					}
-
-					FaultsHumidistatOffset( jFaultyHumidistat ).Offset = rNumericArgs( 1 );
 
 				} else if ( SameString( cFault1, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
 					++jFaultyThermostat;
@@ -253,33 +277,39 @@ namespace FaultsManager {
 					FaultsThermostatOffset( jFaultyThermostat ).FaultType = cFault1;
 					FaultsThermostatOffset( jFaultyThermostat ).FaultTypeEnum = iFaultTypeEnums( i );
 					FaultsThermostatOffset( jFaultyThermostat ).Name = cAlphaArgs( 1 );
-					FaultsThermostatOffset( jFaultyThermostat ).FaultyThermostatName = cAlphaArgs( 4 );
+					FaultsThermostatOffset( jFaultyThermostat ).FaultyThermostatName = cAlphaArgs( 2 );
 
 					// Availability schedule
-					FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedule = cAlphaArgs( 2 );
-					if ( lAlphaFieldBlanks( 2 ) ) {
+					FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedule = cAlphaArgs( 3 );
+					if ( lAlphaFieldBlanks( 3 ) ) {
 						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = -1; // returns schedule value of 1
 					} else {
-						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
-							ErrorsFound = true;
-						}
-					}
-
-					// Severity schedule
-					FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedule = cAlphaArgs( 3 );
-					if ( lAlphaFieldBlanks( 3 ) ) {
-						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = -1; // returns schedule value of 1
-					} else {
-						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
-						if ( FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr == 0 ) {
 							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
-					FaultsThermostatOffset( jFaultyThermostat ).Offset = rNumericArgs( 1 );
+					// Severity schedule
+					FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedule = cAlphaArgs( 4 );
+					if ( lAlphaFieldBlanks( 4 ) ) {
+						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = -1; // returns schedule value of 1
+					} else {
+						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+						if ( FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr == 0 ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+
+					// Reference offset value is required
+					if ( lNumericFieldBlanks( 1 ) ) {
+						ShowSevereError( cFault1 + " = \"" + cNumericFieldNames( 1 ) + "\" cannot be blank." );
+						ErrorsFound = true;
+					} else {
+						FaultsThermostatOffset( jFaultyThermostat ).Offset = rNumericArgs( 1 );
+					}
 
 				} else if ( SameString( cFault1, "FaultModel:Fouling:Coil" ) ) { // For Fault_type 106: Fouling_Coil
 					++jFoulingCoil;

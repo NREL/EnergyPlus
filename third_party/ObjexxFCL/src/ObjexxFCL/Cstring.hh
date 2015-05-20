@@ -9,9 +9,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -63,6 +66,14 @@ public: // Creation
 	 str_( new char[ std::strlen( s.str_ ) + 1 ] )
 	{
 		std::memcpy( str_, s.str_, std::strlen( s.str_ ) + 1 );
+	}
+
+	// Move Constructor
+	inline
+	Cstring( Cstring && s ) NOEXCEPT :
+	 str_( s.str_ )
+	{
+		s.str_ = nullptr;
 	}
 
 	// C string Constructor: Implicit Conversion
@@ -189,6 +200,18 @@ public: // Assignment
 			delete[] str_; str_ = new char[ len ];
 			std::memcpy( str_, s.str_, len );
 		}
+		return *this;
+	}
+
+	// Move Assignment
+	inline
+	Cstring &
+	operator =( Cstring && s ) NOEXCEPT
+	{
+		assert( this != &s );
+		delete[] str_;
+		str_ = s.str_;
+		s.str_ = nullptr;
 		return *this;
 	}
 
@@ -768,19 +791,19 @@ public: // Comparison
 
 public: // I/O
 
-	// Output to Stream
-	friend
-	std::ostream &
-	operator <<( std::ostream & stream, Cstring const & s );
-
-	// Input from Stream
+	// Stream >> Cstring
 	friend
 	std::istream &
 	operator >>( std::istream & stream, Cstring & s );
 
+	// Stream << Cstring
+	friend
+	std::ostream &
+	operator <<( std::ostream & stream, Cstring const & s );
+
 public: // Data
 
-	static size_type const npos = static_cast< size_type >( -1 ); // Unbounded "size"
+	static size_type const npos; // Unbounded "size"
 
 private: // Data
 
@@ -900,13 +923,13 @@ equali( Cstring const & s, char const c );
 bool
 equali( char const c, Cstring const & s );
 
-// Output to Stream
-std::ostream &
-operator <<( std::ostream & stream, Cstring const & s );
-
-// Input from Stream
+// Stream >> Cstring
 std::istream &
 operator >>( std::istream & stream, Cstring & s );
+
+// Stream << Cstring
+std::ostream &
+operator <<( std::ostream & stream, Cstring const & s );
 
 } // ObjexxFCL
 

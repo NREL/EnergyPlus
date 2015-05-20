@@ -2,7 +2,7 @@
 #define PlantChillers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -98,6 +98,7 @@ namespace PlantChillers {
 		std::string Name; // user identifier
 		int CondenserType; // Type of Condenser - Air or Water Cooled
 		Real64 NomCap; // design nominal capacity of chiller
+		bool NomCapWasAutoSized; // true if NomCap was autosize on input
 		Real64 COP; // COP
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
@@ -108,8 +109,10 @@ namespace PlantChillers {
 		int CondInletNodeNum; // Node number on the inlet side of the condenser
 		int CondOutletNodeNum; // Node number on the outlet side of the condenser
 		Real64 EvapVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the evaporator
+		bool EvapVolFlowRateWasAutoSized; //true if autosized design evap flow rate on input
 		Real64 EvapMassFlowRateMax; // kg/s - design water mass flow rate through evaporator
 		Real64 CondVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the condenser
+		bool CondVolFlowRateWasAutoSized; // true if previous was autosized
 		Real64 CondMassFlowRateMax; // kg/s - design water mass flow rate through condenser
 		int CWLoopNum; // chilled water plant loop index number
 		int CWLoopSideNum; // chilled water plant loop side index
@@ -133,12 +136,12 @@ namespace PlantChillers {
 		bool CheckEquipName;
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 		int CondMassFlowIndex;
-		bool IsThisSized; // Ture if sizing is done
 
 		// Default Constructor
 		BaseChillerSpecs() :
 			CondenserType( 0 ),
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			COP( 0.0 ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
@@ -149,8 +152,10 @@ namespace PlantChillers {
 			CondInletNodeNum( 0 ),
 			CondOutletNodeNum( 0 ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			EvapMassFlowRateMax( 0.0 ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			CondMassFlowRateMax( 0.0 ),
 			CWLoopNum( 0 ),
 			CWLoopSideNum( 0 ),
@@ -171,93 +176,8 @@ namespace PlantChillers {
 			MsgErrorCount( 0 ),
 			CheckEquipName( true ),
 			PossibleSubcooling( false ),
-			CondMassFlowIndex( 0 ),
-			IsThisSized( false )
+			CondMassFlowIndex( 0 )
 		{}
-
-		// Member Constructor
-		BaseChillerSpecs(
-			std::string const & Name, // user identifier
-			int const CondenserType, // Type of Condenser - Air or Water Cooled
-			Real64 const NomCap, // design nominal capacity of chiller
-			Real64 const COP, // COP
-			int const FlowMode, // one of 3 modes for componet flow during operation
-			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
-			bool const ModulatedFlowErrDone, // true if setpoint warning issued
-			bool const HRSPErrDone, // TRUE if set point warning issued for heat recovery loop
-			int const EvapInletNodeNum, // Node number on the inlet side of the plant
-			int const EvapOutletNodeNum, // Node number on the outlet side of the plant
-			int const CondInletNodeNum, // Node number on the inlet side of the condenser
-			int const CondOutletNodeNum, // Node number on the outlet side of the condenser
-			Real64 const EvapVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the evaporator
-			Real64 const EvapMassFlowRateMax, // kg/s - design water mass flow rate through evaporator
-			Real64 const CondVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the condenser
-			Real64 const CondMassFlowRateMax, // kg/s - design water mass flow rate through condenser
-			int const CWLoopNum, // chilled water plant loop index number
-			int const CWLoopSideNum, // chilled water plant loop side index
-			int const CWBranchNum, // chilled water plant loop branch index
-			int const CWCompNum, // chilled water plant loop component index
-			int const CDLoopNum, // condenser water plant loop index number
-			int const CDLoopSideNum, // condenser water plant loop side index
-			int const CDBranchNum, // condenser water plant loop branch index
-			int const CDCompNum, // condenser water plant loop component index
-			Real64 const SizFac, // sizing factor
-			Real64 const BasinHeaterPowerFTempDiff, // Basin heater capacity per degree C below setpoint (W/C)
-			Real64 const BasinHeaterSetPointTemp, // Setpoint temperature for basin heater operation (C)
-			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
-			int const ErrCount1, // for recurring error messages
-			int const ErrCount2, // for recurring error messages
-			std::string const & MsgBuffer1, // - buffer to print warning messages on following time step
-			std::string const & MsgBuffer2, // - buffer to print warning messages on following time step
-			Real64 const MsgDataLast, // value of data when warning occurred (passed to Recurring Warn)
-			bool const PrintMessage, // logical to determine if message is valid
-			int const MsgErrorCount, // number of occurrences of warning
-			bool const CheckEquipName,
-			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
-			int const CondMassFlowIndex,
-			bool const IsThisSized // Ture if sizing is done
-		) :
-			Name( Name ),
-			CondenserType( CondenserType ),
-			NomCap( NomCap ),
-			COP( COP ),
-			FlowMode( FlowMode ),
-			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
-			ModulatedFlowErrDone( ModulatedFlowErrDone ),
-			HRSPErrDone( HRSPErrDone ),
-			EvapInletNodeNum( EvapInletNodeNum ),
-			EvapOutletNodeNum( EvapOutletNodeNum ),
-			CondInletNodeNum( CondInletNodeNum ),
-			CondOutletNodeNum( CondOutletNodeNum ),
-			EvapVolFlowRate( EvapVolFlowRate ),
-			EvapMassFlowRateMax( EvapMassFlowRateMax ),
-			CondVolFlowRate( CondVolFlowRate ),
-			CondMassFlowRateMax( CondMassFlowRateMax ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CDLoopNum( CDLoopNum ),
-			CDLoopSideNum( CDLoopSideNum ),
-			CDBranchNum( CDBranchNum ),
-			CDCompNum( CDCompNum ),
-			SizFac( SizFac ),
-			BasinHeaterPowerFTempDiff( BasinHeaterPowerFTempDiff ),
-			BasinHeaterSetPointTemp( BasinHeaterSetPointTemp ),
-			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
-			ErrCount1( ErrCount1 ),
-			ErrCount2( ErrCount2 ),
-			MsgBuffer1( MsgBuffer1 ),
-			MsgBuffer2( MsgBuffer2 ),
-			MsgDataLast( MsgDataLast ),
-			PrintMessage( PrintMessage ),
-			MsgErrorCount( MsgErrorCount ),
-			CheckEquipName( CheckEquipName ),
-			PossibleSubcooling( PossibleSubcooling ),
-			CondMassFlowIndex( CondMassFlowIndex ),
-			IsThisSized( IsThisSized )
-		{}
-
 	};
 
 	struct ElectricChillerSpecs
@@ -272,11 +192,12 @@ namespace PlantChillers {
 		Real64 TempRiseCoef; // (Electric ADJTC(2)) correction factor for off ChillDesign oper.
 		Real64 TempDesEvapOut; // C - (Electric ADJTC(3)The design primary loop fluid
 		// temperature at the chiller evaporator side outlet
-		FArray1D< Real64 > CapRatCoef; // (Electric RCAVC() ) coeff of cap ratio poly fit
-		FArray1D< Real64 > PowerRatCoef; // (Electric ADJEC() ) coeff of power rat poly fit
-		FArray1D< Real64 > FullLoadCoef; // (Electric RPWRC() ) coeff of full load poly. fit
+		Array1D< Real64 > CapRatCoef; // (Electric RCAVC() ) coeff of cap ratio poly fit
+		Array1D< Real64 > PowerRatCoef; // (Electric ADJEC() ) coeff of power rat poly fit
+		Array1D< Real64 > FullLoadCoef; // (Electric RPWRC() ) coeff of full load poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		Real64 DesignHeatRecVolFlowRate; // m3/s, Design Water mass flow rate through heat recovery loop
+		bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous was input autosize.
 		Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
 		bool HeatRecActive; // True entered Heat Rec Vol Flow Rate >0
 		int HeatRecInletNodeNum; // Node number on the heat recovery inlet side of the condenser
@@ -289,7 +210,6 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
-		bool IsThisSized; // Ture if sizing is done
 
 		// Default Constructor
 		ElectricChillerSpecs() :
@@ -304,6 +224,7 @@ namespace PlantChillers {
 			FullLoadCoef( 3, 0.0 ),
 			TempLowLimitEvapOut( 0.0 ),
 			DesignHeatRecVolFlowRate( 0.0 ),
+			DesignHeatRecVolFlowRateWasAutoSized( false ),
 			DesignHeatRecMassFlowRate( 0.0 ),
 			HeatRecActive( false ),
 			HeatRecInletNodeNum( 0 ),
@@ -315,65 +236,8 @@ namespace PlantChillers {
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
 			HRBranchNum( 0 ),
-			HRCompNum( 0 ),
-			IsThisSized( false )
+			HRCompNum( 0 )
 		{}
-
-		// Member Constructor
-		ElectricChillerSpecs(
-			BaseChillerSpecs const & Base,
-			Real64 const MinPartLoadRat, // (Electric MIN) min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // (Electric MAX) max allowed operating frac full load
-			Real64 const OptPartLoadRat, // (Electric BEST) optimal operating frac full load
-			Real64 const TempDesCondIn, // C - (Electric ADJTC(1)The design secondary loop fluid
-			Real64 const TempRiseCoef, // (Electric ADJTC(2)) correction factor for off ChillDesign oper.
-			Real64 const TempDesEvapOut, // C - (Electric ADJTC(3)The design primary loop fluid
-			FArray1< Real64 > const & CapRatCoef, // (Electric RCAVC() ) coeff of cap ratio poly fit
-			FArray1< Real64 > const & PowerRatCoef, // (Electric ADJEC() ) coeff of power rat poly fit
-			FArray1< Real64 > const & FullLoadCoef, // (Electric RPWRC() ) coeff of full load poly. fit
-			Real64 const TempLowLimitEvapOut, // C - low temperature shut off
-			Real64 const DesignHeatRecVolFlowRate, // m3/s, Design Water mass flow rate through heat recovery loop
-			Real64 const DesignHeatRecMassFlowRate, // kg/s, Design Water mass flow rate through heat recovery loop
-			bool const HeatRecActive, // True entered Heat Rec Vol Flow Rate >0
-			int const HeatRecInletNodeNum, // Node number on the heat recovery inlet side of the condenser
-			int const HeatRecOutletNodeNum, // Node number on the heat recovery outlet side of the condenser
-			Real64 const HeatRecCapacityFraction, // user input for heat recovery capacity fraction []
-			Real64 const HeatRecMaxCapacityLimit, // Capacity limit for Heat recovery, one time calc [W]
-			int const HeatRecSetPointNodeNum, // index for system node with the heat recover leaving setpoint
-			int const HeatRecInletLimitSchedNum, // index for schedule for the inlet high limit for heat recovery operation
-			int const HRLoopNum, // heat recovery water plant loop side index
-			int const HRLoopSideNum, // heat recovery water plant loop side index
-			int const HRBranchNum, // heat recovery water plant loop branch index
-			int const HRCompNum, // heat recovery water plant loop component index
-			bool const IsThisSized // Ture if sizing is done
-		) :
-			Base( Base ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			TempDesCondIn( TempDesCondIn ),
-			TempRiseCoef( TempRiseCoef ),
-			TempDesEvapOut( TempDesEvapOut ),
-			CapRatCoef( 3, CapRatCoef ),
-			PowerRatCoef( 3, PowerRatCoef ),
-			FullLoadCoef( 3, FullLoadCoef ),
-			TempLowLimitEvapOut( TempLowLimitEvapOut ),
-			DesignHeatRecVolFlowRate( DesignHeatRecVolFlowRate ),
-			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
-			HeatRecActive( HeatRecActive ),
-			HeatRecInletNodeNum( HeatRecInletNodeNum ),
-			HeatRecOutletNodeNum( HeatRecOutletNodeNum ),
-			HeatRecCapacityFraction( HeatRecCapacityFraction ),
-			HeatRecMaxCapacityLimit( HeatRecMaxCapacityLimit ),
-			HeatRecSetPointNodeNum( HeatRecSetPointNodeNum ),
-			HeatRecInletLimitSchedNum( HeatRecInletLimitSchedNum ),
-			HRLoopNum( HRLoopNum ),
-			HRLoopSideNum( HRLoopSideNum ),
-			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			IsThisSized( IsThisSized )
-		{}
-
 	};
 
 	struct EngineDrivenChillerSpecs
@@ -389,9 +253,9 @@ namespace PlantChillers {
 		Real64 TempRiseCoef; // (EngineDriven ADJTC(2)) correction factor for off ChillDesign oper.
 		Real64 TempDesEvapOut; // C - (EngineDriven ADJTC(3)The design primary loop fluid
 		// temperature at the chiller evaporator side outlet
-		FArray1D< Real64 > CapRatCoef; // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
-		FArray1D< Real64 > PowerRatCoef; // (EngineDriven ADJEC() ) coeff of power rat poly fit
-		FArray1D< Real64 > FullLoadCoef; // (EngineDriven RPWRC() ) coeff of full load poly. fit
+		Array1D< Real64 > CapRatCoef; // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
+		Array1D< Real64 > PowerRatCoef; // (EngineDriven ADJEC() ) coeff of power rat poly fit
+		Array1D< Real64 > FullLoadCoef; // (EngineDriven RPWRC() ) coeff of full load poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		int ClngLoadtoFuelCurve; // Coeff of Shaft Power to Fuel Energy Input Coeff Poly Fit
 		int RecJacHeattoFuelCurve; // Curve Index for Ratio of Recoverable Jacket Heat to
@@ -400,7 +264,7 @@ namespace PlantChillers {
 		Real64 ExhaustTemp; // (TEXDC) Exhaust Gas Temp to Fuel Energy Input
 		int ExhaustTempCurve; // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
 		Real64 UA; // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-		FArray1D< Real64 > UACoef; // Heat Exchanger UA Coeffs Poly Fit
+		Array1D< Real64 > UACoef; // Heat Exchanger UA Coeffs Poly Fit
 		Real64 MaxExhaustperPowerOutput; // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
 		Real64 DesignMinExitGasTemp; // Steam Saturation Temperature
 		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
@@ -414,7 +278,6 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
-		bool IsThisSized; // Ture if sizing is done
 
 		// Default Constructor
 		EngineDrivenChillerSpecs() :
@@ -448,81 +311,7 @@ namespace PlantChillers {
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
 			HRBranchNum( 0 ),
-			HRCompNum( 0 ),
-			IsThisSized( false )
-		{}
-
-		// Member Constructor
-		EngineDrivenChillerSpecs(
-			BaseChillerSpecs const & Base,
-			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
-			Real64 const MinPartLoadRat, // (EngineDriven MIN) min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // (EngineDriven MAX) max allowed operating frac full load
-			Real64 const OptPartLoadRat, // (EngineDriven BEST) optimal operating frac full load
-			Real64 const TempDesCondIn, // C - (EngineDriven ADJTC(1)The design secondary loop fluid
-			Real64 const TempRiseCoef, // (EngineDriven ADJTC(2)) correction factor for off ChillDesign oper.
-			Real64 const TempDesEvapOut, // C - (EngineDriven ADJTC(3)The design primary loop fluid
-			FArray1< Real64 > const & CapRatCoef, // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
-			FArray1< Real64 > const & PowerRatCoef, // (EngineDriven ADJEC() ) coeff of power rat poly fit
-			FArray1< Real64 > const & FullLoadCoef, // (EngineDriven RPWRC() ) coeff of full load poly. fit
-			Real64 const TempLowLimitEvapOut, // C - low temperature shut off
-			int const ClngLoadtoFuelCurve, // Coeff of Shaft Power to Fuel Energy Input Coeff Poly Fit
-			int const RecJacHeattoFuelCurve, // Curve Index for Ratio of Recoverable Jacket Heat to
-			int const RecLubeHeattoFuelCurve, // Curve Index for Ratio of Recoverable Lube Oil Heat to
-			int const TotExhausttoFuelCurve, // Curve Index for Total Exhaust heat Input to Fuel Energy Input Coeffs Poly Fit
-			Real64 const ExhaustTemp, // (TEXDC) Exhaust Gas Temp to Fuel Energy Input
-			int const ExhaustTempCurve, // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
-			Real64 const UA, // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-			FArray1< Real64 > const & UACoef, // Heat Exchanger UA Coeffs Poly Fit
-			Real64 const MaxExhaustperPowerOutput, // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
-			Real64 const DesignMinExitGasTemp, // Steam Saturation Temperature
-			Real64 const FuelHeatingValue, // Heating Value of Fuel in kJ/kg
-			Real64 const DesignHeatRecVolFlowRate, // m3/s, Design Water mass flow rate through heat recovery loop
-			Real64 const DesignHeatRecMassFlowRate, // kg/s, Design Water mass flow rate through heat recovery loop
-			bool const HeatRecActive, // True entered Heat Rec Vol Flow Rate >0
-			int const HeatRecInletNodeNum, // Node number on the heat recovery inlet side of the condenser
-			int const HeatRecOutletNodeNum, // Node number on the heat recovery outlet side of the condenser
-			Real64 const HeatRecMaxTemp, // Max Temp that can be produced in heat recovery
-			int const HRLoopNum, // heat recovery water plant loop side index
-			int const HRLoopSideNum, // heat recovery water plant loop side index
-			int const HRBranchNum, // heat recovery water plant loop branch index
-			int const HRCompNum, // heat recovery water plant loop component index
-			bool const IsThisSized // Ture if sizing is done
-		) :
-			Base( Base ),
-			FuelType( FuelType ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			TempDesCondIn( TempDesCondIn ),
-			TempRiseCoef( TempRiseCoef ),
-			TempDesEvapOut( TempDesEvapOut ),
-			CapRatCoef( 3, CapRatCoef ),
-			PowerRatCoef( 3, PowerRatCoef ),
-			FullLoadCoef( 3, FullLoadCoef ),
-			TempLowLimitEvapOut( TempLowLimitEvapOut ),
-			ClngLoadtoFuelCurve( ClngLoadtoFuelCurve ),
-			RecJacHeattoFuelCurve( RecJacHeattoFuelCurve ),
-			RecLubeHeattoFuelCurve( RecLubeHeattoFuelCurve ),
-			TotExhausttoFuelCurve( TotExhausttoFuelCurve ),
-			ExhaustTemp( ExhaustTemp ),
-			ExhaustTempCurve( ExhaustTempCurve ),
-			UA( UA ),
-			UACoef( 2, UACoef ),
-			MaxExhaustperPowerOutput( MaxExhaustperPowerOutput ),
-			DesignMinExitGasTemp( DesignMinExitGasTemp ),
-			FuelHeatingValue( FuelHeatingValue ),
-			DesignHeatRecVolFlowRate( DesignHeatRecVolFlowRate ),
-			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
-			HeatRecActive( HeatRecActive ),
-			HeatRecInletNodeNum( HeatRecInletNodeNum ),
-			HeatRecOutletNodeNum( HeatRecOutletNodeNum ),
-			HeatRecMaxTemp( HeatRecMaxTemp ),
-			HRLoopNum( HRLoopNum ),
-			HRLoopSideNum( HRLoopSideNum ),
-			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			IsThisSized( IsThisSized )
+			HRCompNum( 0 )
 		{}
 
 	};
@@ -540,26 +329,27 @@ namespace PlantChillers {
 		Real64 TempRiseCoef; // (GT ADJTC(2)) correction factor for off ChillDesign oper.
 		Real64 TempDesEvapOut; // C - (GT ADJTC(3)The design primary loop fluid
 		// temperature at the chiller evaporator side outlet
-		FArray1D< Real64 > CapRatCoef; // (GT RCAVC() ) coeff of cap ratio poly fit
-		FArray1D< Real64 > PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
-		FArray1D< Real64 > FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
+		Array1D< Real64 > CapRatCoef; // (GT RCAVC() ) coeff of cap ratio poly fit
+		Array1D< Real64 > PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
+		Array1D< Real64 > FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		// "special" GT chiller input parameters
 		Real64 FuelEnergyIn; // (EFUEL) Amount of Fuel Energy Required to run gas turbine
-		FArray1D< Real64 > PLBasedFuelInputCoef; // (FUL1GC) Part Load Ratio Based Fuel Input Coefficients Poly Fit
-		FArray1D< Real64 > TempBasedFuelInputCoef; // (FUL2GC) Ambient Temperature Based Fuel Input Coeff Poly Fit
+		Array1D< Real64 > PLBasedFuelInputCoef; // (FUL1GC) Part Load Ratio Based Fuel Input Coefficients Poly Fit
+		Array1D< Real64 > TempBasedFuelInputCoef; // (FUL2GC) Ambient Temperature Based Fuel Input Coeff Poly Fit
 		Real64 ExhaustFlow; // (FEX) Exhaust Gas Flow Rate cubic meters per second
-		FArray1D< Real64 > ExhaustFlowCoef; // (FEXGC) Exhaust Gas Flow Rate Input Coef Poly Fit
+		Array1D< Real64 > ExhaustFlowCoef; // (FEXGC) Exhaust Gas Flow Rate Input Coef Poly Fit
 		Real64 ExhaustTemp; // (TEX) Exhaust Gas Temperature in C
-		FArray1D< Real64 > PLBasedExhaustTempCoef; // (TEX1GC) Part Load Ratio Based Exhaust Temperature Input Coeffs Poly Fit
-		FArray1D< Real64 > TempBasedExhaustTempCoef; // (TEX2GC) Ambient Temperature Based Exhaust Gas Temp to
+		Array1D< Real64 > PLBasedExhaustTempCoef; // (TEX1GC) Part Load Ratio Based Exhaust Temperature Input Coeffs Poly Fit
+		Array1D< Real64 > TempBasedExhaustTempCoef; // (TEX2GC) Ambient Temperature Based Exhaust Gas Temp to
 		// Fuel Energy Input Coeffs Poly Fit
 		Real64 HeatRecLubeEnergy; // (ELUBE) Recoverable Lube Oil Energy
 		Real64 HeatRecLubeRate; // (ELUBE) Recoverable Lube Oil Rate of Rwecovery (W)
-		FArray1D< Real64 > HeatRecLubeEnergyCoef; // (ELUBEGC)  Recoverable Lube Oil Energy Input Coef Poly Fit
+		Array1D< Real64 > HeatRecLubeEnergyCoef; // (ELUBEGC)  Recoverable Lube Oil Energy Input Coef Poly Fit
 		Real64 UAtoCapRat; // (UACGC) Heat Exchanger UA to Capacity
-		FArray1D< Real64 > UAtoCapCoef; // Heat Exchanger UA to Capacity Coeffs Poly Fit
+		Array1D< Real64 > UAtoCapCoef; // Heat Exchanger UA to Capacity Coeffs Poly Fit
 		Real64 GTEngineCapacity; // Capacity of GT Unit attached to Chiller
+		bool GTEngineCapacityWasAutoSized; // true if previous field was autosize on inpt
 		Real64 MaxExhaustperGTPower; // Max Exhaust Flow per KW Power Out
 		Real64 DesignSteamSatTemp; // Steam Saturation Temperature
 		Real64 ExhaustStackTemp; // Temperature of Exhaust Gases
@@ -577,7 +367,6 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
-		bool IsThisSized; // Ture if sizing is done
 
 		// Default Constructor
 		GTChillerSpecs() :
@@ -605,6 +394,7 @@ namespace PlantChillers {
 			UAtoCapRat( 0.0 ),
 			UAtoCapCoef( 3, 0.0 ),
 			GTEngineCapacity( 0.0 ),
+			GTEngineCapacityWasAutoSized( false ),
 			MaxExhaustperGTPower( 0.0 ),
 			DesignSteamSatTemp( 0.0 ),
 			ExhaustStackTemp( 0.0 ),
@@ -621,103 +411,8 @@ namespace PlantChillers {
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
 			HRBranchNum( 0 ),
-			HRCompNum( 0 ),
-			IsThisSized( false )
+			HRCompNum( 0 )
 		{}
-
-		// Member Constructor
-		GTChillerSpecs(
-			BaseChillerSpecs const & Base,
-			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
-			Real64 const MinPartLoadRat, // (GT MIN) min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // (GT MAX) max allowed operating frac full load
-			Real64 const OptPartLoadRat, // (GT BEST) optimal operating frac full load
-			Real64 const TempDesCondIn, // C - (GT ADJTC(1)The design secondary loop fluid
-			Real64 const TempRiseCoef, // (GT ADJTC(2)) correction factor for off ChillDesign oper.
-			Real64 const TempDesEvapOut, // C - (GT ADJTC(3)The design primary loop fluid
-			FArray1< Real64 > const & CapRatCoef, // (GT RCAVC() ) coeff of cap ratio poly fit
-			FArray1< Real64 > const & PowerRatCoef, // (GT ADJEC() ) coeff of power rat poly fit
-			FArray1< Real64 > const & FullLoadCoef, // (GT RPWRC() ) coeff of full load poly. fit
-			Real64 const TempLowLimitEvapOut, // C - low temperature shut off
-			Real64 const FuelEnergyIn, // (EFUEL) Amount of Fuel Energy Required to run gas turbine
-			FArray1< Real64 > const & PLBasedFuelInputCoef, // (FUL1GC) Part Load Ratio Based Fuel Input Coefficients Poly Fit
-			FArray1< Real64 > const & TempBasedFuelInputCoef, // (FUL2GC) Ambient Temperature Based Fuel Input Coeff Poly Fit
-			Real64 const ExhaustFlow, // (FEX) Exhaust Gas Flow Rate cubic meters per second
-			FArray1< Real64 > const & ExhaustFlowCoef, // (FEXGC) Exhaust Gas Flow Rate Input Coef Poly Fit
-			Real64 const ExhaustTemp, // (TEX) Exhaust Gas Temperature in C
-			FArray1< Real64 > const & PLBasedExhaustTempCoef, // (TEX1GC) Part Load Ratio Based Exhaust Temperature Input Coeffs Poly Fit
-			FArray1< Real64 > const & TempBasedExhaustTempCoef, // (TEX2GC) Ambient Temperature Based Exhaust Gas Temp to
-			Real64 const HeatRecLubeEnergy, // (ELUBE) Recoverable Lube Oil Energy
-			Real64 const HeatRecLubeRate, // (ELUBE) Recoverable Lube Oil Rate of Rwecovery (W)
-			FArray1< Real64 > const & HeatRecLubeEnergyCoef, // (ELUBEGC)  Recoverable Lube Oil Energy Input Coef Poly Fit
-			Real64 const UAtoCapRat, // (UACGC) Heat Exchanger UA to Capacity
-			FArray1< Real64 > const & UAtoCapCoef, // Heat Exchanger UA to Capacity Coeffs Poly Fit
-			Real64 const GTEngineCapacity, // Capacity of GT Unit attached to Chiller
-			Real64 const MaxExhaustperGTPower, // Max Exhaust Flow per KW Power Out
-			Real64 const DesignSteamSatTemp, // Steam Saturation Temperature
-			Real64 const ExhaustStackTemp, // Temperature of Exhaust Gases
-			int const HeatRecInletNodeNum, // Node number on the heat recovery inlet side of the condenser
-			int const HeatRecOutletNodeNum, // Node number on the heat recovery outlet side of the condenser
-			Real64 const HeatRecInletTemp, // Inlet Temperature of the heat recovery fluid
-			Real64 const HeatRecOutletTemp, // Outlet Temperature of the heat recovery fluid
-			Real64 const HeatRecMdot, // reporting: Heat Recovery Loop Mass flow rate
-			Real64 const DesignHeatRecVolFlowRate, // m3/s, Design Water mass flow rate through heat recovery loop
-			Real64 const DesignHeatRecMassFlowRate, // kg/s, Design Water mass flow rate through heat recovery loop
-			bool const HeatRecActive, // True entered Heat Rec Vol Flow Rate >0
-			Real64 const FuelHeatingValue, // Heating Value of Fuel in kJ/kg
-			Real64 const HeatRecMaxTemp, // Max Temp that can be produced in heat recovery
-			int const HRLoopNum, // heat recovery water plant loop side index
-			int const HRLoopSideNum, // heat recovery water plant loop side index
-			int const HRBranchNum, // heat recovery water plant loop branch index
-			int const HRCompNum, // heat recovery water plant loop component index
-			bool const IsThisSized // Ture if sizing is done
-		) :
-			Base( Base ),
-			FuelType( FuelType ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			TempDesCondIn( TempDesCondIn ),
-			TempRiseCoef( TempRiseCoef ),
-			TempDesEvapOut( TempDesEvapOut ),
-			CapRatCoef( 3, CapRatCoef ),
-			PowerRatCoef( 3, PowerRatCoef ),
-			FullLoadCoef( 3, FullLoadCoef ),
-			TempLowLimitEvapOut( TempLowLimitEvapOut ),
-			FuelEnergyIn( FuelEnergyIn ),
-			PLBasedFuelInputCoef( 3, PLBasedFuelInputCoef ),
-			TempBasedFuelInputCoef( 3, TempBasedFuelInputCoef ),
-			ExhaustFlow( ExhaustFlow ),
-			ExhaustFlowCoef( 3, ExhaustFlowCoef ),
-			ExhaustTemp( ExhaustTemp ),
-			PLBasedExhaustTempCoef( 3, PLBasedExhaustTempCoef ),
-			TempBasedExhaustTempCoef( 3, TempBasedExhaustTempCoef ),
-			HeatRecLubeEnergy( HeatRecLubeEnergy ),
-			HeatRecLubeRate( HeatRecLubeRate ),
-			HeatRecLubeEnergyCoef( 3, HeatRecLubeEnergyCoef ),
-			UAtoCapRat( UAtoCapRat ),
-			UAtoCapCoef( 3, UAtoCapCoef ),
-			GTEngineCapacity( GTEngineCapacity ),
-			MaxExhaustperGTPower( MaxExhaustperGTPower ),
-			DesignSteamSatTemp( DesignSteamSatTemp ),
-			ExhaustStackTemp( ExhaustStackTemp ),
-			HeatRecInletNodeNum( HeatRecInletNodeNum ),
-			HeatRecOutletNodeNum( HeatRecOutletNodeNum ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMdot( HeatRecMdot ),
-			DesignHeatRecVolFlowRate( DesignHeatRecVolFlowRate ),
-			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
-			HeatRecActive( HeatRecActive ),
-			FuelHeatingValue( FuelHeatingValue ),
-			HeatRecMaxTemp( HeatRecMaxTemp ),
-			HRLoopNum( HRLoopNum ),
-			HRLoopSideNum( HRLoopSideNum ),
-			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			IsThisSized( IsThisSized )
-		{}
-
 	};
 
 	struct ConstCOPChillerSpecs
@@ -727,12 +422,6 @@ namespace PlantChillers {
 
 		// Default Constructor
 		ConstCOPChillerSpecs()
-		{}
-
-		// Member Constructor
-		explicit
-		ConstCOPChillerSpecs( BaseChillerSpecs const & Base ) :
-			Base( Base )
 		{}
 
 	};
@@ -772,40 +461,6 @@ namespace PlantChillers {
 			BasinHeaterPower( 0.0 ),
 			BasinHeaterConsumption( 0.0 )
 		{}
-
-		// Member Constructor
-		BaseReportVars(
-			Real64 const Power,
-			Real64 const QEvap,
-			Real64 const QCond,
-			Real64 const Energy,
-			Real64 const EvapEnergy,
-			Real64 const CondEnergy,
-			Real64 const CondInletTemp,
-			Real64 const EvapInletTemp,
-			Real64 const CondOutletTemp,
-			Real64 const EvapOutletTemp,
-			Real64 const Evapmdot,
-			Real64 const Condmdot,
-			Real64 const BasinHeaterPower, // Basin heater power (W)
-			Real64 const BasinHeaterConsumption // Basin heater energy consumption (J)
-		) :
-			Power( Power ),
-			QEvap( QEvap ),
-			QCond( QCond ),
-			Energy( Energy ),
-			EvapEnergy( EvapEnergy ),
-			CondEnergy( CondEnergy ),
-			CondInletTemp( CondInletTemp ),
-			EvapInletTemp( EvapInletTemp ),
-			CondOutletTemp( CondOutletTemp ),
-			EvapOutletTemp( EvapOutletTemp ),
-			Evapmdot( Evapmdot ),
-			Condmdot( Condmdot ),
-			BasinHeaterPower( BasinHeaterPower ),
-			BasinHeaterConsumption( BasinHeaterConsumption )
-		{}
-
 	};
 
 	struct ElectricReportVars
@@ -830,28 +485,6 @@ namespace PlantChillers {
 			HeatRecMassFlow( 0.0 ),
 			ChillerCondAvgTemp( 0.0 )
 		{}
-
-		// Member Constructor
-		ElectricReportVars(
-			BaseReportVars const & Base,
-			Real64 const ActualCOP,
-			Real64 const QHeatRecovery,
-			Real64 const EnergyHeatRecovery,
-			Real64 const HeatRecInletTemp,
-			Real64 const HeatRecOutletTemp,
-			Real64 const HeatRecMassFlow,
-			Real64 const ChillerCondAvgTemp // the effective condenser temperature for chiller performance [C]
-		) :
-			Base( Base ),
-			ActualCOP( ActualCOP ),
-			QHeatRecovery( QHeatRecovery ),
-			EnergyHeatRecovery( EnergyHeatRecovery ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMassFlow( HeatRecMassFlow ),
-			ChillerCondAvgTemp( ChillerCondAvgTemp )
-		{}
-
 	};
 
 	struct EngineDrivenReportVars
@@ -895,45 +528,6 @@ namespace PlantChillers {
 			FuelCOP( 0.0 )
 		{}
 
-		// Member Constructor
-		EngineDrivenReportVars(
-			BaseReportVars const & Base,
-			Real64 const QJacketRecovered, // reporting: Heat Recovered from Jacket (W)
-			Real64 const QLubeOilRecovered, // reporting: Heat Recovered from Lubricant (W)
-			Real64 const QExhaustRecovered, // reporting: exhaust gas heat recovered (W)
-			Real64 const QTotalHeatRecovered, // reporting: Total Heat Recovered (W)
-			Real64 const TotalHeatEnergyRec, // reporting: total heat recovered (J)
-			Real64 const JacketEnergyRec, // reporting: heat recovered from jacket (J)
-			Real64 const LubeOilEnergyRec, // reporting: heat recovered from lube (J)
-			Real64 const ExhaustEnergyRec, // reporting: exhaust gas heat recovered (J)
-			Real64 const FuelEnergy, // reporting: Fuel Energy used (J)
-			Real64 const FuelEnergyUseRate, // reporting: Fuel Energy used (W)
-			Real64 const FuelMdot, // reporting: Fuel used (Kg/s)
-			Real64 const ExhaustStackTemp, // reporting: Exhaust Stack Temperature (C)
-			Real64 const HeatRecInletTemp, // reporting: Heat Recovery Loop Inlet Temperature (C)
-			Real64 const HeatRecOutletTemp, // reporting: Heat Recovery Loop Outlet Temperature (C)
-			Real64 const HeatRecMdot, // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-			Real64 const FuelCOP // reporting: Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
-		) :
-			Base( Base ),
-			QJacketRecovered( QJacketRecovered ),
-			QLubeOilRecovered( QLubeOilRecovered ),
-			QExhaustRecovered( QExhaustRecovered ),
-			QTotalHeatRecovered( QTotalHeatRecovered ),
-			TotalHeatEnergyRec( TotalHeatEnergyRec ),
-			JacketEnergyRec( JacketEnergyRec ),
-			LubeOilEnergyRec( LubeOilEnergyRec ),
-			ExhaustEnergyRec( ExhaustEnergyRec ),
-			FuelEnergy( FuelEnergy ),
-			FuelEnergyUseRate( FuelEnergyUseRate ),
-			FuelMdot( FuelMdot ),
-			ExhaustStackTemp( ExhaustStackTemp ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMdot( HeatRecMdot ),
-			FuelCOP( FuelCOP )
-		{}
-
 	};
 
 	struct GasTurbineReportVars
@@ -966,36 +560,6 @@ namespace PlantChillers {
 			HeatRecMdot( 0.0 ),
 			FuelCOP( 0.0 )
 		{}
-
-		// Member Constructor
-		GasTurbineReportVars(
-			BaseReportVars const & Base,
-			Real64 const HeatRecLubeEnergy, // reporting: Heat Recovered from Lubricant(J)
-			Real64 const HeatRecLubeRate, // reporting: Recoverable Lube Oil Rate of Rwecovery (W)
-			Real64 const FuelEnergyUsed, // reporting: Fuel Energy used
-			Real64 const FuelEnergyUsedRate, // reporting: Fuel energy used rate (fuel consumption rate)
-			Real64 const FuelMassUsed, // reporting: Fuel Amount used
-			Real64 const FuelMassUsedRate, // reporting: Fuel amount used (fuel Mass consumption rate)
-			Real64 const ExhaustStackTemp, // reporting: Exhaust Stack Temperature
-			Real64 const HeatRecInletTemp, // reporting: Heat Recovery Loop Inlet Temperature
-			Real64 const HeatRecOutletTemp, // reporting: Heat Recovery Loop Outlet Temperature
-			Real64 const HeatRecMdot, // reporting: Heat Recovery Loop Mass flow rate
-			Real64 const FuelCOP // reporting: Fuel coefficient of performance (Qevap/FuelEnergyUsedRate)
-		) :
-			Base( Base ),
-			HeatRecLubeEnergy( HeatRecLubeEnergy ),
-			HeatRecLubeRate( HeatRecLubeRate ),
-			FuelEnergyUsed( FuelEnergyUsed ),
-			FuelEnergyUsedRate( FuelEnergyUsedRate ),
-			FuelMassUsed( FuelMassUsed ),
-			FuelMassUsedRate( FuelMassUsedRate ),
-			ExhaustStackTemp( ExhaustStackTemp ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMdot( HeatRecMdot ),
-			FuelCOP( FuelCOP )
-		{}
-
 	};
 
 	struct ConstCOPReportVars
@@ -1008,27 +572,17 @@ namespace PlantChillers {
 		ConstCOPReportVars() :
 			ActualCOP( 0.0 )
 		{}
-
-		// Member Constructor
-		ConstCOPReportVars(
-			BaseReportVars const & Base,
-			Real64 const ActualCOP
-		) :
-			Base( Base ),
-			ActualCOP( ActualCOP )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ElectricChillerSpecs > ElectricChiller; // dimension to number of machines
-	extern FArray1D< ElectricReportVars > ElectricChillerReport;
-	extern FArray1D< EngineDrivenChillerSpecs > EngineDrivenChiller; // dimension to number of machines
-	extern FArray1D< EngineDrivenReportVars > EngineDrivenChillerReport;
-	extern FArray1D< GTChillerSpecs > GTChiller; // dimension to number of machines
-	extern FArray1D< GasTurbineReportVars > GTChillerReport;
-	extern FArray1D< ConstCOPChillerSpecs > ConstCOPChiller; // dimension to number of machines
-	extern FArray1D< ConstCOPReportVars > ConstCOPChillerReport;
+	extern Array1D< ElectricChillerSpecs > ElectricChiller; // dimension to number of machines
+	extern Array1D< ElectricReportVars > ElectricChillerReport;
+	extern Array1D< EngineDrivenChillerSpecs > EngineDrivenChiller; // dimension to number of machines
+	extern Array1D< EngineDrivenReportVars > EngineDrivenChillerReport;
+	extern Array1D< GTChillerSpecs > GTChiller; // dimension to number of machines
+	extern Array1D< GasTurbineReportVars > GTChillerReport;
+	extern Array1D< ConstCOPChillerSpecs > ConstCOPChiller; // dimension to number of machines
+	extern Array1D< ConstCOPReportVars > ConstCOPChillerReport;
 
 	// Functions
 

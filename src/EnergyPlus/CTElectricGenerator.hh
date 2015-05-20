@@ -2,7 +2,7 @@
 #define CTElectricGenerator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,7 +26,7 @@ namespace CTElectricGenerator {
 	extern int NumCTGenerators; // number of CT Generators specified in input
 	extern bool GetCTInput; // then TRUE, calls subroutine to read input file.
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
@@ -65,7 +65,7 @@ namespace CTElectricGenerator {
 		Real64 TotalHeatEnergyRec; // total heat recovered (J)
 		int QLubeOilRecoveredCurve; // (ELUBEGC) Curve Index for Recoverable Lube Oil heat Input Coef Poly Fit
 		Real64 UA; // (UACGC) exhaust gas Heat Exchanger UA
-		FArray1D< Real64 > UACoef; // Heat Exchanger UA  Coeffs Poly Fit
+		Array1D< Real64 > UACoef; // Heat Exchanger UA  Coeffs Poly Fit
 		Real64 MaxExhaustperCTPower; // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
 		Real64 DesignHeatRecVolFlowRate; // m3/s, Design Water mass flow rate through heat recovery loop
 		Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
@@ -168,7 +168,7 @@ namespace CTElectricGenerator {
 			Real64 const TotalHeatEnergyRec, // total heat recovered (J)
 			int const QLubeOilRecoveredCurve, // (ELUBEGC) Curve Index for Recoverable Lube Oil heat Input Coef Poly Fit
 			Real64 const UA, // (UACGC) exhaust gas Heat Exchanger UA
-			FArray1< Real64 > const & UACoef, // Heat Exchanger UA  Coeffs Poly Fit
+			Array1< Real64 > const & UACoef, // Heat Exchanger UA  Coeffs Poly Fit
 			Real64 const MaxExhaustperCTPower, // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
 			Real64 const DesignHeatRecVolFlowRate, // m3/s, Design Water mass flow rate through heat recovery loop
 			Real64 const DesignHeatRecMassFlowRate, // kg/s, Design Water mass flow rate through heat recovery loop
@@ -321,8 +321,8 @@ namespace CTElectricGenerator {
 	};
 
 	// Object Data
-	extern FArray1D< CTGeneratorSpecs > CTGenerator; // dimension to number of machines
-	extern FArray1D< ReportVars > CTGeneratorReport;
+	extern Array1D< CTGeneratorSpecs > CTGenerator; // dimension to number of machines
+	extern Array1D< ReportVars > CTGeneratorReport;
 
 	// Functions
 

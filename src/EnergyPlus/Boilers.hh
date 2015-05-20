@@ -2,7 +2,7 @@
 #define Boilers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -49,7 +49,7 @@ namespace Boilers {
 	extern Real64 BoilerOutletTemp; // W - Boiler outlet temperature
 	extern Real64 BoilerPLR; // Boiler operating part-load ratio
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
@@ -68,12 +68,14 @@ namespace Boilers {
 		bool Available; // TRUE if machine available in current time step
 		bool ON; // TRUE: simulate the machine at it's operating part load ratio
 		Real64 NomCap; // W - design nominal capacity of Boiler
+		bool NomCapWasAutoSized; // true if previous was set to autosize input
 		Real64 Effic; // boiler efficiency at design conditions
 		Real64 TempDesBoilerOut; // C - Boiler design outlet temperature
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
 		bool ModulatedFlowErrDone; // true if setpoint warning issued
 		Real64 VolFlowRate; // m3/s - Boiler water design volumetric flow rate
+		bool VolFlowRateWasAutoSized; // true if previous was set to autosize input
 		Real64 DesMassFlowRate; // kg/s - Boiler water design mass flow rate
 		Real64 MassFlowRate; // kg/s - Boiler water mass flow rate
 		Real64 SizFac; // sizing factor
@@ -105,12 +107,14 @@ namespace Boilers {
 			Available( false ),
 			ON( false ),
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			Effic( 0.0 ),
 			TempDesBoilerOut( 0.0 ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
 			ModulatedFlowErrDone( false ),
 			VolFlowRate( 0.0 ),
+			VolFlowRateWasAutoSized( false ),
 			DesMassFlowRate( 0.0 ),
 			MassFlowRate( 0.0 ),
 			SizFac( 0.0 ),
@@ -130,81 +134,6 @@ namespace Boilers {
 			CalculatedEffError( 0 ),
 			CalculatedEffIndex( 0 ),
 			IsThisSized( false )
-		{}
-
-		// Member Constructor
-		BoilerSpecs(
-			std::string const & Name, // user identifier
-			int const FuelType, // resource type assignment
-			int const TypeNum, // plant loop type identifier
-			int const LoopNum, // plant loop connection
-			int const LoopSideNum, // plant loop side connection
-			int const BranchNum, // plant loop branch connection
-			int const CompNum, // plant loop component connection
-			bool const Available, // TRUE if machine available in current time step
-			bool const ON, // TRUE: simulate the machine at it's operating part load ratio
-			Real64 const NomCap, // W - design nominal capacity of Boiler
-			Real64 const Effic, // boiler efficiency at design conditions
-			Real64 const TempDesBoilerOut, // C - Boiler design outlet temperature
-			int const FlowMode, // one of 3 modes for componet flow during operation
-			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
-			bool const ModulatedFlowErrDone, // true if setpoint warning issued
-			Real64 const VolFlowRate, // m3/s - Boiler water design volumetric flow rate
-			Real64 const DesMassFlowRate, // kg/s - Boiler water design mass flow rate
-			Real64 const MassFlowRate, // kg/s - Boiler water mass flow rate
-			Real64 const SizFac, // sizing factor
-			int const BoilerInletNodeNum, // Node number at the boiler inlet
-			int const BoilerOutletNodeNum, // Node number at the boiler outlet
-			Real64 const MinPartLoadRat, // Minimum allowed operating part load ratio
-			Real64 const MaxPartLoadRat, // Maximum allowed operating part load ratio
-			Real64 const OptPartLoadRat, // Optimal operating part load ratio
-			Real64 const OperPartLoadRat, // Actual operating part load ratio
-			int const CurveTempMode, // water temp to use in curve, switch between entering and leaving
-			int const EfficiencyCurvePtr, // Index to efficiency curve
-			int const EfficiencyCurveType, // Type of efficiency curve
-			Real64 const TempUpLimitBoilerOut, // C - Boiler outlet maximum temperature limit
-			Real64 const ParasiticElecLoad, // W - Parasitic electric power (e.g. forced draft fan)
-			int const EffCurveOutputError, // efficiency curve output <=0 recurring warning error counter
-			int const EffCurveOutputIndex, // efficiency curve output <=0 recurring warning error message index
-			int const CalculatedEffError, // calculated efficiency >1.1 recurring warning error counter
-			int const CalculatedEffIndex, // calculated efficiency >1.1 recurring warning error message index
-			bool const IsThisSized // TRUE if sizing is done
-		) :
-			Name( Name ),
-			FuelType( FuelType ),
-			TypeNum( TypeNum ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			Available( Available ),
-			ON( ON ),
-			NomCap( NomCap ),
-			Effic( Effic ),
-			TempDesBoilerOut( TempDesBoilerOut ),
-			FlowMode( FlowMode ),
-			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
-			ModulatedFlowErrDone( ModulatedFlowErrDone ),
-			VolFlowRate( VolFlowRate ),
-			DesMassFlowRate( DesMassFlowRate ),
-			MassFlowRate( MassFlowRate ),
-			SizFac( SizFac ),
-			BoilerInletNodeNum( BoilerInletNodeNum ),
-			BoilerOutletNodeNum( BoilerOutletNodeNum ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			OperPartLoadRat( OperPartLoadRat ),
-			CurveTempMode( CurveTempMode ),
-			EfficiencyCurvePtr( EfficiencyCurvePtr ),
-			EfficiencyCurveType( EfficiencyCurveType ),
-			TempUpLimitBoilerOut( TempUpLimitBoilerOut ),
-			ParasiticElecLoad( ParasiticElecLoad ),
-			EffCurveOutputError( EffCurveOutputError ),
-			EffCurveOutputIndex( EffCurveOutputIndex ),
-			CalculatedEffError( CalculatedEffError ),
-			CalculatedEffIndex( CalculatedEffIndex ),
-			IsThisSized( IsThisSized )
 		{}
 
 	};
@@ -265,8 +194,8 @@ namespace Boilers {
 	};
 
 	// Object Data
-	extern FArray1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
-	extern FArray1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
+	extern Array1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
+	extern Array1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
 
 	// Functions
 

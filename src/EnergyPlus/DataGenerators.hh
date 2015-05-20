@@ -2,7 +2,7 @@
 #define DataGenerators_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -150,8 +150,8 @@ namespace DataGenerators {
 		Real64 NdotFuel; // molar fuel use rate.  (kmol/sec)
 		Real64 TotFuelInEnthalphy; // Enthalpy of fuel coming into FCPM (watts)
 		Real64 NdotProdGas; // (kmol/sec)
-		FArray1D< Real64 > ConstitMolalFract;
-		FArray1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+		Array1D< Real64 > ConstitMolalFract;
+		Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
 		Real64 TprodGasLeavingFCPM;
 		Real64 NdotAir; // molar air use rate    (kmol/sec)
 		Real64 TotAirInEnthalphy; // Enthalpy of air coming nto FCPM energy balance (watts)
@@ -281,8 +281,8 @@ namespace DataGenerators {
 			Real64 const NdotFuel, // molar fuel use rate.  (kmol/sec)
 			Real64 const TotFuelInEnthalphy, // Enthalpy of fuel coming into FCPM (watts)
 			Real64 const NdotProdGas, // (kmol/sec)
-			FArray1< Real64 > const & ConstitMolalFract,
-			FArray1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
+			Array1< Real64 > const & ConstitMolalFract,
+			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
 			Real64 const TprodGasLeavingFCPM,
 			Real64 const NdotAir, // molar air use rate    (kmol/sec)
 			Real64 const TotAirInEnthalphy, // Enthalpy of air coming nto FCPM energy balance (watts)
@@ -382,10 +382,10 @@ namespace DataGenerators {
 		int IntakeRecoveryMode;
 		int ConstituentMode; // how are air data input
 		int NumConstituents;
-		FArray1D_string ConstitName;
-		FArray1D< Real64 > ConstitMolalFract;
+		Array1D_string ConstitName;
+		Array1D< Real64 > ConstitMolalFract;
 		//Calculated values and input from elsewhere
-		FArray1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+		Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
 		Real64 O2fraction;
 		Real64 TairIntoBlower; // temperature entering blower
 		Real64 TairIntoFCPM; // temperature leaving blower and entering FCPM
@@ -432,9 +432,9 @@ namespace DataGenerators {
 			int const IntakeRecoveryMode,
 			int const ConstituentMode, // how are air data input
 			int const NumConstituents,
-			FArray1_string const & ConstitName,
-			FArray1< Real64 > const & ConstitMolalFract,
-			FArray1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
+			Array1_string const & ConstitName,
+			Array1< Real64 > const & ConstitMolalFract,
+			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
 			Real64 const O2fraction,
 			Real64 const TairIntoBlower, // temperature entering blower
 			Real64 const TairIntoFCPM, // temperature leaving blower and entering FCPM
@@ -671,8 +671,8 @@ namespace DataGenerators {
 		int NumConstituents;
 		Real64 TauxMix;
 		Real64 NdotAuxMix;
-		FArray1D< Real64 > ConstitMolalFract;
-		FArray1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+		Array1D< Real64 > ConstitMolalFract;
+		Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
 		Real64 QskinLoss; // Heat lost to room
 		Real64 QairIntake; // heat into intake air
 
@@ -714,8 +714,8 @@ namespace DataGenerators {
 			int const NumConstituents,
 			Real64 const TauxMix,
 			Real64 const NdotAuxMix,
-			FArray1< Real64 > const & ConstitMolalFract,
-			FArray1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
+			Array1< Real64 > const & ConstitMolalFract,
+			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
 			Real64 const QskinLoss, // Heat lost to room
 			Real64 const QairIntake // heat into intake air
 		) :
@@ -781,8 +781,8 @@ namespace DataGenerators {
 		Real64 WaterInletTemp;
 		Real64 WaterVaporFractExh; // water vapor fraction in exhaust gas stream.
 		Real64 CondensateRate; // water condensation rate.
-		FArray1D< Real64 > ConstitMolalFract;
-		FArray1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+		Array1D< Real64 > ConstitMolalFract;
+		Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
 		Real64 NdotHXleaving;
 		Real64 WaterOutletTemp;
 		Real64 WaterOutletEnthalpy;
@@ -862,8 +862,8 @@ namespace DataGenerators {
 			Real64 const WaterInletTemp,
 			Real64 const WaterVaporFractExh, // water vapor fraction in exhaust gas stream.
 			Real64 const CondensateRate, // water condensation rate.
-			FArray1< Real64 > const & ConstitMolalFract,
-			FArray1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
+			Array1< Real64 > const & ConstitMolalFract,
+			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
 			Real64 const NdotHXleaving,
 			Real64 const WaterOutletTemp,
 			Real64 const WaterOutletEnthalpy
@@ -921,8 +921,8 @@ namespace DataGenerators {
 		Real64 NominalVoltage;
 		Real64 LowVoltsDischarged; // not used
 		int NumTablePairs;
-		FArray1D< Real64 > DischargeCurrent; // amps
-		FArray1D< Real64 > DischargeTime; // hours
+		Array1D< Real64 > DischargeCurrent; // amps
+		Array1D< Real64 > DischargeTime; // hours
 		// calculated variables
 		Real64 k; // parameter in Manwell McGowan model
 		Real64 c; // parameter in Manwell McGowan model
@@ -948,8 +948,8 @@ namespace DataGenerators {
 			Real64 const NominalVoltage,
 			Real64 const LowVoltsDischarged, // not used
 			int const NumTablePairs,
-			FArray1< Real64 > const & DischargeCurrent, // amps
-			FArray1< Real64 > const & DischargeTime, // hours
+			Array1< Real64 > const & DischargeCurrent, // amps
+			Array1< Real64 > const & DischargeTime, // hours
 			Real64 const k, // parameter in Manwell McGowan model
 			Real64 const c, // parameter in Manwell McGowan model
 			Real64 const qmax // parameter in Manwell McGowan model
@@ -1509,10 +1509,10 @@ namespace DataGenerators {
 		int CompPowerCurveID; // "pointer" to compressor power cubic curve
 		Real64 CompPowerLossFactor;
 		int NumConstituents; // number of constituents in fue supply
-		FArray1D_string ConstitName;
-		FArray1D< Real64 > ConstitMolalFract;
+		Array1D_string ConstitName;
+		Array1D< Real64 > ConstitMolalFract;
 		//calculated data (except some for generic liquid)
-		FArray1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+		Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
 		Real64 LHV; // lower heating value of gaseous fuel (kJ/mol)
 		Real64 LHVJperkg; // lower heating value of gaseous fuel (J/kg)
 		Real64 LHVliquid; // userdefined lhv for generic liquid (J/kg)
@@ -1566,9 +1566,9 @@ namespace DataGenerators {
 			int const CompPowerCurveID, // "pointer" to compressor power cubic curve
 			Real64 const CompPowerLossFactor,
 			int const NumConstituents, // number of constituents in fue supply
-			FArray1_string const & ConstitName,
-			FArray1< Real64 > const & ConstitMolalFract,
-			FArray1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
+			Array1_string const & ConstitName,
+			Array1< Real64 > const & ConstitMolalFract,
+			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
 			Real64 const LHV, // lower heating value of gaseous fuel (kJ/mol)
 			Real64 const LHVJperkg, // lower heating value of gaseous fuel (J/kg)
 			Real64 const LHVliquid, // userdefined lhv for generic liquid (J/kg)
@@ -2338,6 +2338,7 @@ namespace DataGenerators {
 		int PlantOutletNodeID;
 		Real64 PlantMassFlowRate; // only if internal control
 		Real64 PlantMassFlowRateMax; // hardware limit for node%massflowrateMax
+		bool PlantMassFlowRateMaxWasAutoSized; // true if mass flow rate was autosized on input
 		std::string AirInletNodeName;
 		int AirInletNodeID;
 		std::string AirOutletNodeName;
@@ -2360,6 +2361,7 @@ namespace DataGenerators {
 			PlantOutletNodeID( 0 ),
 			PlantMassFlowRate( 0.0 ),
 			PlantMassFlowRateMax( 0.0 ),
+			PlantMassFlowRateMaxWasAutoSized( false ),
 			AirInletNodeID( 0 ),
 			AirOutletNodeID( 0 ),
 			FuelSupplyID( 0 ),
@@ -2370,71 +2372,15 @@ namespace DataGenerators {
 			CWBranchNum( 0 ),
 			CWCompNum( 0 )
 		{}
-
-		// Member Constructor
-		MicroCHPDataStruct(
-			std::string const & Name, // name of this Micro CHP Generator
-			std::string const & ParamObjName, // name of parameter object
-			MicroCHPParamsNonNormalized const & A42Model, // Nested parameter data structure
-			bool const ModelTypeAnnex42, // normalized =  non-normalized?
-			Real64 const NomEff, // nominal efficiency
-			std::string const & ZoneName,
-			int const ZoneID,
-			std::string const & PlantInletNodeName,
-			int const PlantInletNodeID,
-			std::string const & PlantOutletNodeName,
-			int const PlantOutletNodeID,
-			Real64 const PlantMassFlowRate, // only if internal control
-			Real64 const PlantMassFlowRateMax, // hardware limit for node%massflowrateMax
-			std::string const & AirInletNodeName,
-			int const AirInletNodeID,
-			std::string const & AirOutletNodeName,
-			int const AirOutletNodeID,
-			MicroCHPReportDataStruct const & Report, // structure of report variables
-			int const FuelSupplyID, // index for fuel supply data structure
-			int const DynamicsControlID, // index in GeneratorDynamics data where control issues are handled
-			int const AvailabilitySchedID, // index for availability schedule
-			int const CWLoopNum, // cooling water plant loop index number
-			int const CWLoopSideNum, // cooling water plant loop side index
-			int const CWBranchNum, // cooling water plant loop branch index
-			int const CWCompNum // cooling water plant loop component index
-		) :
-			Name( Name ),
-			ParamObjName( ParamObjName ),
-			A42Model( A42Model ),
-			ModelTypeAnnex42( ModelTypeAnnex42 ),
-			NomEff( NomEff ),
-			ZoneName( ZoneName ),
-			ZoneID( ZoneID ),
-			PlantInletNodeName( PlantInletNodeName ),
-			PlantInletNodeID( PlantInletNodeID ),
-			PlantOutletNodeName( PlantOutletNodeName ),
-			PlantOutletNodeID( PlantOutletNodeID ),
-			PlantMassFlowRate( PlantMassFlowRate ),
-			PlantMassFlowRateMax( PlantMassFlowRateMax ),
-			AirInletNodeName( AirInletNodeName ),
-			AirInletNodeID( AirInletNodeID ),
-			AirOutletNodeName( AirOutletNodeName ),
-			AirOutletNodeID( AirOutletNodeID ),
-			Report( Report ),
-			FuelSupplyID( FuelSupplyID ),
-			DynamicsControlID( DynamicsControlID ),
-			AvailabilitySchedID( AvailabilitySchedID ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< FCDataStruct > FuelCell; // dimension to number of machines
-	extern FArray1D< GasPropertyDataStruct > GasPhaseThermoChemistryData;
-	extern FArray1D< GeneratorFuelSupplyDataStruct > FuelSupply; // fuel supply (reused across various)
-	extern FArray1D< MicroCHPDataStruct > MicroCHP;
-	extern FArray1D< MicroCHPParamsNonNormalized > MicroCHPParamInput; // Used during get input then put into nested
-	extern FArray1D< GeneratorDynamicsManagerStruct > GeneratorDynamics;
+	extern Array1D< FCDataStruct > FuelCell; // dimension to number of machines
+	extern Array1D< GasPropertyDataStruct > GasPhaseThermoChemistryData;
+	extern Array1D< GeneratorFuelSupplyDataStruct > FuelSupply; // fuel supply (reused across various)
+	extern Array1D< MicroCHPDataStruct > MicroCHP;
+	extern Array1D< MicroCHPParamsNonNormalized > MicroCHPParamInput; // Used during get input then put into nested
+	extern Array1D< GeneratorDynamicsManagerStruct > GeneratorDynamics;
 
 } // DataGenerators
 

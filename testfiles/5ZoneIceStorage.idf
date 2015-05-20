@@ -112,7 +112,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Building,                !- Name
@@ -215,8 +215,10 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
-
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+    
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
   SizingPeriod:DesignDay,
@@ -1938,20 +1940,29 @@
     Hot Water Loop,          !- Plant or Condenser Loop Name
     heating,                 !- Loop Type
     82.,                     !- Design Loop Exit Temperature {C}
-    11;                      !- Loop Design Temperature Difference {deltaC}
-
+    11,                      !- Loop Design Temperature Difference {deltaC}
+    Coincident,              !- Sizing Option
+    1,                       !- Zone Timesteps in Averaging Window
+    None;                    !- Coincident Sizing Factor Mode
+    
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
     cooling,                 !- Loop Type
     7.22,                    !- Design Loop Exit Temperature {C}
-    6.67;                    !- Loop Design Temperature Difference {deltaC}
+    6.67,                    !- Loop Design Temperature Difference {deltaC}
+    Coincident,              !- Sizing Option
+    1,                       !- Zone Timesteps in Averaging Window
+    None;                    !- Coincident Sizing Factor Mode
 
   Sizing:Plant,
     Condenser Water Loop,    !- Plant or Condenser Loop Name
     condenser,               !- Loop Type
     29.4,                    !- Design Loop Exit Temperature {C}
-    5.6;                     !- Loop Design Temperature Difference {deltaC}
-
+    5.6,                     !- Loop Design Temperature Difference {deltaC}
+    Coincident,              !- Sizing Option
+    1,                       !- Zone Timesteps in Averaging Window
+    None;                    !- Coincident Sizing Factor Mode
+    
   Schedule:Compact,
     Htg-SetP-Sch,            !- Name
     Temperature,             !- Schedule Type Limits Name

@@ -2,7 +2,7 @@
 #define HeatingCoils_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -31,11 +31,11 @@ namespace HeatingCoils {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumHeatingCoils; // The Number of HeatingCoils found in the Input
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
 	extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
 	extern bool CoilIsSuppHeater; // Flag set to indicate the heating coil is a supplemental heater
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -108,9 +108,9 @@ namespace HeatingCoils {
 		//                                                            COIL:DX:MultiMode:CoolingEmpirical   = 4
 		//                                                            Refrigeration:Condenser              = 5
 		int NumOfStages; // Number of speeds
-		FArray1D< Real64 > MSNominalCapacity; // Nominal Capacity MS AC Furnace [W]
-		FArray1D< Real64 > MSEfficiency; // Efficiency for MS AC Furnace [dimensionless]
-		FArray1D< Real64 > MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
+		Array1D< Real64 > MSNominalCapacity; // Nominal Capacity MS AC Furnace [W]
+		Array1D< Real64 > MSEfficiency; // Efficiency for MS AC Furnace [dimensionless]
+		Array1D< Real64 > MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
 
 		// Default Constructor
 		HeatingCoilEquipConditions() :
@@ -201,9 +201,9 @@ namespace HeatingCoils {
 			int const ReclaimHeatingSourceIndexNum, // Index to reclaim heating source (condenser) of a specific type
 			int const ReclaimHeatingSource, // The source for the Reclaim Heating Coil
 			int const NumOfStages, // Number of speeds
-			FArray1< Real64 > const & MSNominalCapacity, // Nominal Capacity MS AC Furnace [W]
-			FArray1< Real64 > const & MSEfficiency, // Efficiency for MS AC Furnace [dimensionless]
-			FArray1< Real64 > const & MSParasiticElecLoad // Parasitic elec load MS AC Furnace (gas only) [W]
+			Array1< Real64 > const & MSNominalCapacity, // Nominal Capacity MS AC Furnace [W]
+			Array1< Real64 > const & MSEfficiency, // Efficiency for MS AC Furnace [dimensionless]
+			Array1< Real64 > const & MSParasiticElecLoad // Parasitic elec load MS AC Furnace (gas only) [W]
 		) :
 			Name( Name ),
 			HeatingCoilType( HeatingCoilType ),
@@ -258,7 +258,7 @@ namespace HeatingCoils {
 	struct HeatingCoilNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		HeatingCoilNumericFieldData()
@@ -266,15 +266,15 @@ namespace HeatingCoils {
 
 		// Member Constructor
 		HeatingCoilNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 		) :
 			FieldNames( FieldNames )
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< HeatingCoilEquipConditions > HeatingCoil;
-	extern FArray1D< HeatingCoilNumericFieldData > HeatingCoilNumericFields;
+	extern Array1D< HeatingCoilEquipConditions > HeatingCoil;
+	extern Array1D< HeatingCoilNumericFieldData > HeatingCoilNumericFields;
 
 	// Functions
 

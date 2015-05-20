@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -910,6 +910,30 @@ quoted( std::string & s )
 // Space-Free Head Copy of a string
 std::string
 head( std::string const & s );
+
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( std::string const & s, std::string const & t )
+{
+	return std::string( s ) += t;
+}
+
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( c_cstring const s, std::string const & t )
+{
+	return std::string( s ) += t;
+}
+
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( std::string const & s, c_cstring const t )
+{
+	return s + std::string( t );
+}
 
 // Conversion To std::string
 

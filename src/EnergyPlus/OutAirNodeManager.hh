@@ -2,7 +2,7 @@
 #define OutAirNodeManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,7 +18,7 @@ namespace OutAirNodeManager {
 
 	//MODULE VARIABLE DECLARATIONS:
 
-	extern FArray1D_int OutsideAirNodeList; // List of all outside air inlet nodes
+	extern Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
 	extern int NumOutsideAirNodes; // Number of single outside air nodes
 	extern bool GetOutAirNodesInputFlag; // Flag set to make sure you get input once
 

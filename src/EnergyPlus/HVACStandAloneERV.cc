@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -93,8 +93,8 @@ namespace HVACStandAloneERV {
 
 	int NumStandAloneERVs; // Total number of stand alone ERVs defined in the idf
 
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 	bool GetERVInputFlag( true ); // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -112,7 +112,7 @@ namespace HVACStandAloneERV {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< StandAloneERVData > StandAloneERV;
+	Array1D< StandAloneERVData > StandAloneERV;
 
 	// Functions
 
@@ -268,12 +268,12 @@ namespace HVACStandAloneERV {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StandAloneERVIndex; // loop index
 		int StandAloneERVNum; // current Stand Alone ERV number
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lAlphaBlanks;
-		FArray1D_bool lNumericBlanks;
+		Array1D_string Alphas; // Alpha items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lAlphaBlanks;
+		Array1D_bool lNumericBlanks;
 		std::string CompSetSupplyFanInlet;
 		std::string CompSetSupplyFanOutlet;
 		std::string CompSetExhaustFanInlet;
@@ -1010,7 +1010,7 @@ namespace HVACStandAloneERV {
 		using DataAirLoop::OAControllerInfo;
 
 		// Locals
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MySizeFlag;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1029,8 +1029,8 @@ namespace HVACStandAloneERV {
 		int SupInletNode; // supply air inlet node number for Stand Alone ERV 'StandAloneERVNum'
 		Real64 RhoAir; // air density at SupInNode, standard conditions (dry air @ 20C,actual elevation pressure)
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // loop counter
 

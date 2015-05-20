@@ -2,7 +2,7 @@
 #define DataWindowEquivalentLayer_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -331,8 +331,8 @@ namespace DataWindowEquivalentLayer {
 		// Members
 		std::string Name; // ID (Fenestration Name)
 		int NL; // number of layers
-		FArray1D< CFSLAYER > L; // layer array, L(1) is outside layer
-		FArray1D< CFSGAP > G; // gap array, G(1) is outside-most, betw L(1) and L(2)
+		Array1D< CFSLAYER > L; // layer array, L(1) is outside layer
+		Array1D< CFSGAP > G; // gap array, G(1) is outside-most, betw L(1) and L(2)
 		bool ISControlled; // CFS is not controlled, or has no controlled VB layer
 
 		// Default Constructor
@@ -347,8 +347,8 @@ namespace DataWindowEquivalentLayer {
 		CFSTY(
 			std::string const & Name, // ID (Fenestration Name)
 			int const NL, // number of layers
-			FArray1< CFSLAYER > const & L, // layer array, L(1) is outside layer
-			FArray1< CFSGAP > const & G, // gap array, G(1) is outside-most, betw L(1) and L(2)
+			Array1< CFSLAYER > const & L, // layer array, L(1) is outside layer
+			Array1< CFSGAP > const & G, // gap array, G(1) is outside-most, betw L(1) and L(2)
 			bool const ISControlled // CFS is not controlled, or has no controlled VB layer
 		) :
 			Name( Name ),
@@ -362,9 +362,9 @@ namespace DataWindowEquivalentLayer {
 
 	// Object Data
 	extern CFSSWP SWP_ROOMBLK; // Solar reflectance, BEAM-BEAM, front | Solar reflectance, BEAM-BEAM, back | Solar transmittance, BEAM-BEAM, front | Solar transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE, back | Solar transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance, DIFFUSE-DIFFUSE, front | Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE
-	extern FArray1D< CFSLAYER > CFSLayers;
-	extern FArray1D< CFSTY > CFS;
-	extern FArray1D< CFSGAP > CFSGaps;
+	extern Array1D< CFSLAYER > CFSLayers;
+	extern Array1D< CFSTY > CFS;
+	extern Array1D< CFSGAP > CFSGaps;
 
 } // DataWindowEquivalentLayer
 

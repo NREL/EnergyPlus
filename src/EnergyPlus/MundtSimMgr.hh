@@ -2,8 +2,8 @@
 #define MundtSimMgr_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -27,8 +27,8 @@ namespace MundtSimMgr {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_int FloorSurfSetIDs; // fixed variable for floors
-	extern FArray1D_int TheseSurfIDs; // temporary working variable
+	extern Array1D_int FloorSurfSetIDs; // fixed variable for floors
+	extern Array1D_int TheseSurfIDs; // temporary working variable
 	extern int MundtCeilAirID; // air node index in AirDataManager
 	extern int MundtFootAirID; // air node index in AirDataManager
 	extern int SupplyNodeID; // air node index in AirDataManager
@@ -36,8 +36,8 @@ namespace MundtSimMgr {
 	extern int ReturnNodeID; // air node index in AirDataManager
 	extern int NumRoomNodes; // number of nodes connected to walls
 	extern int NumFloorSurfs; // total number of surfaces for floor
-	extern FArray1D_int RoomNodeIDs; // ids of the first NumRoomNode Air Nodes
-	extern FArray1D_int ID1dSurf; // numbers used to identify surfaces
+	extern Array1D_int RoomNodeIDs; // ids of the first NumRoomNode Air Nodes
+	extern Array1D_int ID1dSurf; // numbers used to identify surfaces
 	extern int MundtZoneNum; // index of zones using Mundt model
 	extern Real64 ZoneHeight; // zone height
 	extern Real64 ZoneFloorArea; // zone floor area
@@ -65,7 +65,7 @@ namespace MundtSimMgr {
 		int ClassType; // Type of air nodes
 		Real64 Height; // Z coordinates [m] node's Control Vol. center
 		Real64 Temp; // Surface temperature BC
-		FArray1D_bool SurfMask; // Limit of 60 surfaces at current sizing
+		Array1D_bool SurfMask; // Limit of 60 surfaces at current sizing
 
 		// Default Constructor
 		DefineLinearModelNode() :
@@ -80,7 +80,7 @@ namespace MundtSimMgr {
 			int const ClassType, // Type of air nodes
 			Real64 const Height, // Z coordinates [m] node's Control Vol. center
 			Real64 const Temp, // Surface temperature BC
-			FArray1_bool const & SurfMask // Limit of 60 surfaces at current sizing
+			Array1_bool const & SurfMask // Limit of 60 surfaces at current sizing
 		) :
 			AirNodeName( AirNodeName ),
 			ClassType( ClassType ),
@@ -150,10 +150,10 @@ namespace MundtSimMgr {
 	};
 
 	// Object Data
-	extern FArray1D< DefineZoneData > ZoneData; // zone data
-	extern FArray2D< DefineLinearModelNode > LineNode; // air nodes
-	extern FArray2D< DefineSurfaceSettings > MundtAirSurf; // surfaces
-	extern FArray1D< DefineSurfaceSettings > FloorSurf; // floor
+	extern Array1D< DefineZoneData > ZoneData; // zone data
+	extern Array2D< DefineLinearModelNode > LineNode; // air nodes
+	extern Array2D< DefineSurfaceSettings > MundtAirSurf; // surfaces
+	extern Array1D< DefineSurfaceSettings > FloorSurf; // floor
 
 	// Functions
 

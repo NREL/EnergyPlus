@@ -36,11 +36,11 @@ namespace DataLoopNode {
 	int const NodeType_Water( 2 ); // 'Water'
 	int const NodeType_Steam( 3 ); // 'Steam'
 	int const NodeType_Electric( 4 ); // 'Electric'
-	FArray1D_string const ValidNodeFluidTypes( {0,4}, { "blank", "Air", "Water", "Steam", "Electric" } );
+	Array1D_string const ValidNodeFluidTypes( {0,4}, { "blank", "Air", "Water", "Steam", "Electric" } );
 	int const NumValidNodeFluidTypes( 4 );
 
 	// Valid Connection Types for Nodes
-	FArray1D_string const ValidConnectionTypes( 15, { "Inlet", "Outlet", "Internal", "ZoneNode", "Sensor", "Actuator", "OutdoorAir", "ReliefAir", "ZoneInlet", "ZoneReturn", "ZoneExhaust", "Setpoint", "Electric", "OutsideAirReference", "InducedAir" } );
+	Array1D_string const ValidConnectionTypes( 15, { "Inlet", "Outlet", "Internal", "ZoneNode", "Sensor", "Actuator", "OutdoorAir", "ReliefAir", "ZoneInlet", "ZoneReturn", "ZoneExhaust", "Setpoint", "Electric", "OutsideAirReference", "InducedAir" } );
 
 	int const NumValidConnectionTypes( 15 );
 
@@ -80,13 +80,13 @@ namespace DataLoopNode {
 	// the following assignments:  Node(somenodenumber)=Node(someothernodenumber) to
 	// set/update Node conditions.  If the Node derived type would include the name
 	// then the name would get changed and bad things would result...
-	FArray1D_string NodeID;
+	Array1D_string NodeID;
 
 	// Object Data
-	FArray1D< NodeData > Node; // dim to num nodes in SimHVAC
+	Array1D< NodeData > Node; // dim to num nodes in SimHVAC
 	NodeData DefaultNodeValues( 0, 0, 0.0, 0.0, 0.0, SensedNodeFlagValue, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, SensedNodeFlagValue, SensedNodeFlagValue, SensedNodeFlagValue, SensedNodeFlagValue, SensedNodeFlagValue, -1.0, 0.0, false, 0.0, 0.0, false, 0.0, 0.0, 0.0, 0.0, 0.0, false ); //Autodesk:Note If intent is default construction drop initializer to elim bug exposure | FluidType | FluidIndex | Temp {C} | TempMin {C} | TempMax {C} | TempSetPoint {C} | TempLastTimeStep {C} | MassFlowRateRequest {kg/s} | MassFlowRate {kg/s} | MassFlowRateMin {kg/s} | MassFlowRateMax {kg/s} //Autodesk:Note SensedNodeFlagValue is default initializer | MassFlowRateMinAvail {kg/s} | MassFlowRateMaxAvail {kg/s} | MassFlowRateSetPoint {kg/s} | Quality {0.0-1.0 vapor fraction/percent} | Press {Pa}   REAL(r64)     :: | Enthalpy {J/kg} | EnthalpyLastTimeStep {J/kg} | HumRat {} | HumRatMin {} | HumRatMax {} | HumRatSetPoint {} | TempSetPointHi {C} | TempSetPointLo {C} | Height {m} | OutAirDryBulb {C} | EMSOverrideOutAirDryBulb | EMSValueForOutAirDryBulb {C} | OutAirWetBulb {C} | EMSOverrideOutAirWetBulb | EMSValueForOutAirWetBulb {C} | CO2 {ppm} | CO2 setpoint {ppm} | Generic contaminant {ppm} | Generic contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
-	FArray1D< MoreNodeData > MoreNodeInfo;
-	FArray1D< MarkedNodeData > MarkedNode;
+	Array1D< MoreNodeData > MoreNodeInfo;
+	Array1D< MarkedNodeData > MarkedNode;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

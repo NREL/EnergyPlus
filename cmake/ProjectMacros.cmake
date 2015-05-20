@@ -10,6 +10,9 @@ include(CMakeParseArguments)
 # If a fifth argument is provided and "TRUE" the file will be saved to the temporary
 # location at ${CMAKE_BINARY_DIR}/install_temp.
 function( install_remote TYPE SOURCE DESTINATION )
+  if( NOT ENABLE_INSTALL_REMOTE )
+    return()
+  endif()
   if( DEFINED ARGV3 )
     set(FILENAME "${ARGV3}")
   else()
@@ -42,6 +45,9 @@ endfunction()
 # This function will configure a unique bundle id based on build number
 # so that packages will not try to relocate the .app to an older version location.
 function( install_remote_plist SOURCE DESTINATION APP_NAME )
+  if( NOT ENABLE_INSTALL_REMOTE )
+    return()
+  endif()
   install(CODE "
     file(DOWNLOAD \"${SOURCE}\" 
       \"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\" 

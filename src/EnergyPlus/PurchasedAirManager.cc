@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -98,7 +98,7 @@ namespace PurchasedAirManager {
 	int const LimitFlowRate( 2 );
 	int const LimitCapacity( 3 );
 	int const LimitFlowRateAndCapacity( 4 );
-	FArray1D_string const cLimitType( 4, { "NoLimit", "LimitFlowRate", "LimitCapacity", "LimitFlowRateAndCapacity" } );
+	Array1D_string const cLimitType( 4, { "NoLimit", "LimitFlowRate", "LimitCapacity", "LimitFlowRateAndCapacity" } );
 	// Dehumidification and Humidification control type parameters
 	int const None( 1 );
 	int const ConstantSensibleHeatRatio( 2 );
@@ -131,12 +131,12 @@ namespace PurchasedAirManager {
 
 	int NumPurchAir;
 	bool GetPurchAirInputFlag( true );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
 
 	// Object Data
-	FArray1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
-	FArray1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indecies of scalable sizing object for zone HVAC
+	Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
+	Array1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indecies of scalable sizing object for zone HVAC
 
 	// Functions
 
@@ -768,9 +768,9 @@ namespace PurchasedAirManager {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool OneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool OneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
 		//      LOGICAL :: ErrorsFound = .FALSE.   ! If errors detected in input
 		bool UnitOn; // simple checks for error
 		bool CoolOn; // simple checks for error

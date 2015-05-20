@@ -7,7 +7,7 @@
 ! See the example input file 5ZoneAutoDXVAV for an example of their use.
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   Curve:Biquadratic,
     VarSpeedCoolCapFT,       !- Name

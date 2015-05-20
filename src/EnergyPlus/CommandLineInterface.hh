@@ -3,6 +3,7 @@
 
 #include <string>
 #include <EnergyPlusAPI.hh>
+
 namespace EnergyPlus{
 
 namespace CommandLineInterface {
@@ -22,4 +23,5 @@ namespace CommandLineInterface {
 } // CommandLineInterface
 
 } // EnergyPlus
+
 #endif

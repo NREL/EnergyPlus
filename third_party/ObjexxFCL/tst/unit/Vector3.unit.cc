@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -15,7 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Vector3.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include "ObjexxFCL.unit.hh"
 
 // C++ Headers
@@ -169,9 +169,9 @@ TEST( Vector3Test, StdVector )
 	EXPECT_EQ( 117, v.z );
 }
 
-TEST( Vector3Test, FArray )
+TEST( Vector3Test, Array )
 {
-	FArray1D_int a( 3, { 33, 52, 17 } );
+	Array1D_int a( 3, { 33, 52, 17 } );
 	Vector3_int v( a );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
@@ -252,13 +252,7 @@ TEST( Vector3Test, Comparisons )
 
 	// Test length relations
 	EXPECT_TRUE( ! equal_length( v, w ) );
-	EXPECT_TRUE( ! v.equal_length( w ) );
 	EXPECT_TRUE( not_equal_length( v, w ) );
-	EXPECT_TRUE( v.not_equal_length( w ) );
-	EXPECT_TRUE( v.longer( w ) );
-	EXPECT_TRUE( ! v.shorter( w ) );
-	EXPECT_TRUE( v.longer_or_equal( w ) );
-	EXPECT_TRUE( ! v.shorter_or_equal( w ) );
 }
 
 TEST( Vector3Test, Generators )

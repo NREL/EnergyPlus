@@ -18562,19 +18562,13 @@ END SUBROUTINE
 !----------------------------------------------------------------------------------
 SUBROUTINE CreateNewConstVol
           ! SUBROUTINE INFORMATION:
-          !    AUTHOR         Jason Glazer and Michael Witte of GARD Analytics, Inc.
-          !    DATE WRITTEN   April 2010-May 2011
+          !    AUTHOR         Michael Witte of GARD Analytics, Inc.
+          !    DATE WRITTEN   October 2013
           !    MODIFIED
           !    RE-ENGINEERED  na
 
           ! PURPOSE OF THIS SUBROUTINE:
-          !    Creates the new objects for a dedicated outdoor air supply system
-          !    that is connected to a zonal system such as:
-          !       HVACTemplate:Zone:FanCoil
-          !       HVACTemplate:Zone:PTAC
-          !       HVACTemplate:Zone:PTHP
-          !       HVACTemplate:Zone:Unitary
-          !       HVACTemplate:Zone:WaterToAirHeatPump
+          !    Creates the new objects for a constant volume air handling system
 
           ! METHODOLOGY EMPLOYED:
 
@@ -18615,11 +18609,15 @@ INTEGER,PARAMETER :: hspFixed    = 1
 INTEGER,PARAMETER :: hspScheduled = 2
 INTEGER,PARAMETER :: hspOAreset = 3
 INTEGER,PARAMETER :: hspControlZone = 5
-          ! parameters for supply fan coef type
-!? INTEGER,PARAMETER :: sfcInletVane = 1
-!? INTEGER,PARAMETER :: sfcDischgDamp = 2
-!? INTEGER,PARAMETER :: sfcVSD = 3
-!? INTEGER,PARAMETER :: sfcAppG = 4
+          ! parameters for economizer type
+INTEGER,PARAMETER :: etFixedDryBulb                   = 1
+INTEGER,PARAMETER :: etFixedEnthalpy                  = 2
+INTEGER,PARAMETER :: etDifferentialDryBulb            = 3
+INTEGER,PARAMETER :: etDifferentialEnthalpy           = 4
+INTEGER,PARAMETER :: etFixedDewPointAndDryBulb        = 5
+INTEGER,PARAMETER :: etElectronicEnthalpy             = 6
+INTEGER,PARAMETER :: etDifferentialDryBulbAndEnthalpy = 7
+INTEGER,PARAMETER :: etNoEconomizer                   = 8
           ! parameters for heat recovery type
 INTEGER,PARAMETER :: htrecNone = 1
 INTEGER,PARAMETER :: htrecSens = 2
@@ -18666,8 +18664,7 @@ LOGICAL :: isSysAvailSchedBlank
 LOGICAL :: isCoolStPtSchedBlank
 LOGICAL :: isHeatStPtSchedBlank
 LOGICAL :: isPreheatStPtSchedBlank
-! INTEGER :: econoKind=0
-! INTEGER :: lockoutKind=0
+LOGICAL :: isPreheatAvailSchedBlank
 INTEGER :: coolSetPtCtrlKind=0
 INTEGER :: heatSetPtCtrlKind=0
 ! INTEGER :: supFanCoef=0
@@ -18687,6 +18684,8 @@ LOGICAL :: usePreheatTempforHeatDesignSuppT = .FALSE.
 LOGICAL :: isReturnFanYes = .FALSE.
 INTEGER :: coolCtrlZoneBase = 0
 INTEGER :: heatCtrlZoneBase = 0
+LOGICAL :: isEconoLowLimitBlank
+INTEGER :: econoKind=0
 
 ! Node Names
 CHARACTER(len=MaxAlphaLength) :: lastOutlet=''
@@ -19115,6 +19114,8 @@ DO iSys = 1, numCompactSysConstVol
   isCoolStPtSchedBlank = (FldVal(base + cvsCoolSetPtSchedNameOff) .EQ. '')
   isHeatStPtSchedBlank = (FldVal(base + cvsHeatSetPtSchedNameOff) .EQ. '')
   isPreheatStPtSchedBlank = (FldVal(base + cvsPreheatSetPtSchedNameOff) .EQ. '')
+  isPreheatAvailSchedBlank = (FldVal(base + cvsPreheatAvailSchedNameOff) .EQ. '')
+  isEconoLowLimitBlank = (FldVal(base + cvsEconoLowLimitOff) .EQ. '')
   isHeatCoilCapAutosize = SameString(FldVal(base + cvsHeatCoilCapOff),'autosize')
   isReturnFanYes = (FldVal(base + cvsReturnFanPresentOff) .EQ. 'Yes')
   !check cooling coil kind
@@ -19188,6 +19189,26 @@ DO iSys = 1, numCompactSysConstVol
     CALL WriteError('Invalid choice in HVACTemplate:System:ConstantVolume  "'//TRIM(FldVal(base + cvsAirHandlerNameOff))//'"'// &
                     ' in the Preheat Coil Type field: '//TRIM(FldVal(base + cvsPreheatCoilKindOff)))
   END IF
+  !set the economizer indicator
+  IF (SameString(FldVal(base +  cvsEconomizerKindOff),'FixedDryBulb')) THEN
+    econoKind = etFixedDryBulb
+  ELSEIF (SameString(FldVal(base +  cvsEconomizerKindOff),'FixedEnthalpy')) THEN
+    econoKind = etFixedEnthalpy
+  ELSEIF (SameString(FldVal(base +  cvsEconomizerKindOff),'DifferentialDryBulb')) THEN
+    econoKind = etDifferentialDryBulb
+  ELSEIF (SameString(FldVal(base +  cvsEconomizerKindOff),'DifferentialEnthalpy')) THEN
+    econoKind = etDifferentialEnthalpy
+  ELSEIF (SameString(FldVal(base +  cvsEconomizerKindOff),'FixedDewPointAndDryBulb')) THEN
+    econoKind = etFixedDewPointAndDryBulb
+  ELSEIF (SameString(FldVal(base +  cvsEconomizerKindOff),'ElectronicEnthalpy')) THEN
+    econoKind = etElectronicEnthalpy
+  ELSEIF (SameString(FldVal(base +  cvsEconomizerKindOff),'DifferentialDryBulbAndEnthalpy')) THEN
+    econoKind = etDifferentialDryBulbAndEnthalpy
+  ELSEIF (SameString(FldVal(base +  cvsEconomizerKindOff),'NoEconomizer')) THEN
+    econoKind = etNoEconomizer
+  ELSE
+    CALL WriteError('Invalid choice in HVACTemplate:System:ConstantVolume in the Economizer Type field')
+  END IF
   !set the Heat Recovery Type indicator
   IF (SameString(FldVal(base + cvsHeatRecTypeOff),'Sensible')) THEN
     heatRecovery = htrecSens
@@ -19205,7 +19226,7 @@ DO iSys = 1, numCompactSysConstVol
     supFanPlacement = sfpDrawThru
   ELSE
     CALL WriteError('Invalid choice in HVACTemplate:System:ConstantVolume "'//TRIM(FldVal(base + cvsAirHandlerNameOff))//'"'// &
-                    ' in the Supply Fan Placement field: '//TRIM(FldVal(base + vsSupplyFanPlaceOff)))
+                    ' in the Supply Fan Placement field: '//TRIM(FldVal(base + cvsSupplyFanPlaceOff)))
   END IF
   !set the dehumidification indicators
   isDehumidifyNone = SameString(FldVal(base + cvsDehumCtrlTypeOff),'None')
@@ -19648,10 +19669,7 @@ DO iSys = 1, numCompactSysConstVol
   CALL AddToObjFld('Control Zone Name', base + cvsNightCycleCtrlZoneNameOff,'',.TRUE.)
 
   ! Cooling coil setpoint manager
-  IF (coolCoilKind .NE. ccNone) THEN
-    CALL CreateNewObj('NodeList')
-    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes')
-    CALL AddToObjStr('Node Name', TRIM(coolCoilUnitOutlet),.TRUE.)
+  IF ((coolCoilKind .NE. ccNone) .OR. (econoKind .NE. etNoEconomizer)) THEN
     IF ((coolSetPtCtrlKind .EQ. cspFixed) .OR. (coolSetPtCtrlKind .EQ. cspScheduled)) THEN
       IF ((coolSetPtCtrlKind .EQ. cspFixed) .OR. (isCoolStPtSchedBlank)) THEN
         CALL AddAlwaysSchedule(FldVal(base + cvsCoolSetPtDesignOff))
@@ -19722,8 +19740,13 @@ DO iSys = 1, numCompactSysConstVol
       CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(airloopOutlet),.TRUE.)
     ELSE
       CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes',.TRUE.)
+      CALL CreateNewObj('NodeList')
+      CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes')
+      CALL AddToObjStr('Node Name 1', TRIM(airloopOutlet))
+      CALL AddToObjStr('Node Name 2', TRIM(coolCoilUnitOutlet),.TRUE.)
     END IF
-    IF (supFanPlacement .EQ. sfpDrawThru) THEN
+
+    IF ((coolCoilKind .NE. ccNone) .AND. (supFanPlacement .EQ. sfpDrawThru)) THEN
       !***SetpointManager:MixedAir
       CALL CreateNewObj('SetpointManager:MixedAir')
       CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Cooling Coil Air Temp Manager')
@@ -19731,7 +19754,17 @@ DO iSys = 1, numCompactSysConstVol
       CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
       CALL AddToObjStr('Fan Inlet Node Name', TRIM(fanInlet))
       CALL AddToObjStr('Fan Outlet Node Name', TRIM(fanOutlet))
-      CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes',.TRUE.)
+      CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(coolCoilUnitOutlet),.TRUE.)
+    END IF
+    IF (econoKind .NE. etNoEconomizer) THEN
+      !***SetpointManager:MixedAir
+      CALL CreateNewObj('SetpointManager:MixedAir')
+      CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Economizer Air Temp Manager')
+      CALL AddToObjStr('Control Variable','Temperature')
+      CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
+      CALL AddToObjStr('Fan Inlet Node Name', TRIM(fanInlet))
+      CALL AddToObjStr('Fan Outlet Node Name', TRIM(fanOutlet))
+      CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Mixed Air Outlet',.TRUE.)
     END IF
   END IF
 
@@ -20197,8 +20230,15 @@ DO iSys = 1, numCompactSysConstVol
   !***AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjStr('Controller Object Type','Controller:OutdoorAir')
-  CALL AddToObjFld('Controller Name', base + cvsAirHandlerNameOff,' OA Controller',.TRUE.)
+  IF (preHeatCoilType .EQ. ctHotWater) THEN
+    CALL AddToObjStr('Controller Object Type','Controller:OutdoorAir')
+    CALL AddToObjFld('Controller Name', base + cvsAirHandlerNameOff,' OA Controller')
+    CALL AddToObjStr('Controller Object Type','Controller:WaterCoil')
+    CALL AddToObjFld('Controller Name', base + cvsAirHandlerNameOff,' Preheat Coil Controller',.TRUE.)
+  ELSE
+    CALL AddToObjStr('Controller Object Type','Controller:OutdoorAir')
+    CALL AddToObjFld('Controller Name', base + cvsAirHandlerNameOff,' OA Controller',.TRUE.)
+  END IF
   !***AirLoopHVAC:OutdoorAirSystem:EquipmentList
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem:EquipmentList')
   CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' OA System Equipment')
@@ -20209,16 +20249,29 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Heat Recovery')
   END IF
+  IF (preHeatCoilType .EQ. ctHotWater) THEN
+    CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
+    CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Preheat Coil')
+  ELSEIF (preHeatCoilType .EQ. ctElectric) THEN
+    CALL AddToObjStr('Component Object Type','Coil:Heating:Electric')
+    CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Preheat Coil')
+  ELSEIF (preHeatCoilType .EQ. ctGas) THEN
+    CALL AddToObjStr('Component Object Type','Coil:Heating:Gas')
+    CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Preheat Coil')
+  END IF
   CALL AddToObjStr('Component Object Type','OutdoorAir:Mixer')
   CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' OA Mixing Box',.TRUE.)
   !***OutdoorAir:Mixer
   CALL CreateNewObj('OutdoorAir:Mixer')
   CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' OA Mixing Box')
   CALL AddToObjFld('Mixed Air Node Name', base + cvsAirHandlerNameOff,' Mixed Air Outlet')
-  IF (heatRecovery .EQ. htrecNone) THEN
+  IF ((heatRecovery .EQ. htrecNone) .AND. (preHeatCoilType .EQ. ctNone)) THEN
     CALL AddToObjFld('Outdoor Air Stream Node Name', base + cvsAirHandlerNameOff,' Outdoor Air Inlet')
   END IF
-  IF (heatRecovery .NE. htrecNone) THEN
+  IF (preHeatCoilType .NE. ctNone) THEN
+    CALL AddToObjFld('Outdoor Air Stream Node Name', base + cvsAirHandlerNameOff,' Preheat Coil Outlet')
+  END IF
+  IF ((heatRecovery .NE. htrecNone) .AND. (preHeatCoilType .EQ. ctNone)) THEN
     CALL AddToObjFld('Outdoor Air Stream Node Name', base + cvsAirHandlerNameOff,' Heat Recovery Supply Outlet')
   ENDIF
   CALL AddToObjFld('Relief Air Stream Node Name', base + cvsAirHandlerNameOff,' Relief Air Outlet')
@@ -20233,39 +20286,162 @@ DO iSys = 1, numCompactSysConstVol
   ! the minimum and maximum are the same volume of air
   CALL AddToObjFld('Minimum Outdoor Air Flow Rate {m3/s}', base + cvsMinOutsideFlowOff,' ')
   CALL AddToObjFld('Maximum Outdoor Air Flow Rate {m3/s}', base + cvsMaxOutsideFlowOff,' ')
-  IF (heatRecovery .EQ. htrecNone) THEN
+  CALL AddToObjFld('Economizer Control Type', base + cvsEconomizerKindOff,' ')
   ! If heat recovery is selected, then set economizer control to bypass
   ! otherwise, set to modulate OA flow
-    CALL AddToObjStr('Economizer Control Type', 'NoEconomizer')
+  IF (heatRecovery .EQ. htrecNone) THEN
     CALL AddtoObjStr('Economizer Control Action Type','ModulateFlow')
-    CALL AddToObjStr('Economizer Maximum Limit Dry-Bulb Temperature {C}',' ')
-    CALL AddToObjStr('Economizer Maximum Limit Enthalpy {J/kg}',' ')
-    CALL AddToObjStr('Economizer Maximum Limit Dewpoint Temperature (C)',' ')
-    CALL AddToObjStr('Electronic Enthalpy Limit Curve Name',' ')
-    CALL AddToObjStr('Economizer Minimum Limit Dry-Bulb Temperature {C}',' ')
-  ELSEIF (heatRecovery .EQ. htrecSens) THEN
-    CALL AddToObjStr('Economizer Control Type', 'DifferentialDryBulb')
+  ELSE
     CALL AddtoObjStr('Economizer Control Action Type','MinimumFlowWithBypass')
-    CALL AddToObjStr('Economizer Maximum Limit Dry-Bulb Temperature {C}',' ')
-    CALL AddToObjStr('Economizer Maximum Limit Enthalpy {J/kg}',' ')
-    CALL AddToObjStr('Economizer Maximum Limit Dewpoint Temperature (C)',' ')
-    CALL AddToObjStr('Electronic Enthalpy Limit Curve Name',' ')
-    CALL AddToObjFld('Economizer Minimum Limit Dry-Bulb Temperature {C}', base + cvsHeatSetPtDesignOff,'')
-  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
-    CALL AddToObjStr('Economizer Control Type', 'DifferentialEnthalpy')
-    CALL AddtoObjStr('Economizer Control Action Type','MinimumFlowWithBypass')
-    CALL AddToObjStr('Economizer Maximum Limit Dry-Bulb Temperature {C}',' ')
-    CALL AddToObjStr('Economizer Maximum Limit Enthalpy {J/kg}',' ')
-    CALL AddToObjStr('Economizer Maximum Limit Dewpoint Temperature (C)',' ')
-    CALL AddToObjStr('Electronic Enthalpy Limit Curve Name',' ')
-    CALL AddToObjFld('Economizer Minimum Limit Dry-Bulb Temperature {C}', base + cvsHeatSetPtDesignOff,'')
   ENDIF
+  CALL AddToObjFld('Economizer Maximum Limit Dry-Bulb Temperature {C}', base + cvsEconoUpLimitOff,' ')
+  CALL AddToObjFld('Economizer Maximum Limit Enthalpy {J/kg}', base + cvsEconoEnthLimitOff,' ')
+  IF (econoKind .EQ. etFixedDewPointAndDryBulb) THEN
+    CALL AddToObjFld('Economizer Maximum Limit Dewpoint Temperature (C)',base + cvsEconoUpDewLimitOff,' ')
+  ELSE
+    CALL AddToObjStr('Economizer Maximum Limit Dewpoint Temperature (C)',' ')
+  ENDIF
+  IF (econoKind .EQ. etElectronicEnthalpy) THEN
+    CALL AddToObjFld('Electronic Enthalpy Limit Curve Name', base + cvsAirHandlerNameOff,' ElectrEnthCurve')
+  ELSE
+    CALL AddToObjStr('Electronic Enthalpy Limit Curve Name',' ')
+  ENDIF
+  CALL AddToObjFld('Economizer Minimum Limit Dry-Bulb Temperature {C}', base + cvsEconoLowLimitOff,' ')
   CALL AddToObjStr('Lockout Type', 'NoLockout')
   CALL AddToObjStr('Minimum Limit Type','ProportionalMinimum')
   CALL AddToObjStr('Minimum Outdoor Air Schedule Name',' ')
   CALL AddToObjStr('Minimum Fraction of Outdoor Air Schedule Name',' ')
   CALL AddToObjStr('Maximum Fraction of Outdoor Air Schedule Name',' ')
   CALL AddToObjStr('Mechanical Ventilation Controller Name','',.TRUE.)
+  ! If economizer type is ElectronicEnthalpy then create curve object
+  IF (econoKind .EQ. etElectronicEnthalpy) THEN
+    !CURVE:CUBIC
+    CALL CreateNewObj('Curve:Cubic')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' ElectrEnthCurve')
+    CALL AddToObjStr('Coefficient1 Constant','0.01342704')
+    CALL AddToObjStr('Coefficient2 x','-0.00047892')
+    CALL AddToObjStr('Coefficient3 x**2','0.000053352')
+    CALL AddToObjStr('Coefficient4 x**3','-0.0000018103')
+    CALL AddToObjStr('Minimum Value of x','16.6')
+    CALL AddToObjStr('Maximum Value of x','29.13',.TRUE.)
+  ENDIF
+  IF (preHeatCoilType .EQ. ctHotWater) THEN
+    !COIL:Water:SimpleHeating  ~ line 614
+    CALL CreateNewObj('Coil:Heating:Water')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil')
+    IF (isPreheatAvailSchedBlank) THEN
+      CALL AddToObjStr('Availability Schedule Name','HVACTemplate-Always 1')
+    ELSE
+      CALL AddToObjFld('Availability Schedule Name', base + cvsPreheatAvailSchedNameOff,' ')
+    END IF
+    CALL AddToObjStr('U-Factor Times Area Value {W/K}','autosize')
+    CALL AddToObjStr('Maximum Water Flow Rate {m3/s}','autosize')
+    CALL AddToObjFld('Water Inlet Node Name ', base + cvsAirHandlerNameOff,' Preheat Coil HW Inlet')
+    CALL AddToObjFld('Water Outlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Outlet')
+    IF (heatRecovery .EQ. htrecNone) THEN
+      CALL AddToObjFld('Air Inlet Node Name', base + cvsAirHandlerNameOff,' Outdoor Air Inlet')
+    ELSE
+      CALL AddToObjFld('Air Inlet Node Name', base + cvsAirHandlerNameOff,' Heat Recovery Supply Outlet')
+    END IF
+    CALL AddToObjFld('Air Outlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil Outlet')
+    CALL AddToObjStr('Performance Input Method','UFactorTimesAreaAndDesignWaterFlowRate')
+    CALL AddToObjStr('Rated Capacity','autosize')
+    CALL AddToObjStr('Rated Inlet Water Temperature','82.2')
+    CALL AddToObjStr('Rated Inlet Air Temperature','16.6')
+    CALL AddToObjStr('Rated Outlet Water Temperature','71.1')
+    CALL AddToObjStr('Rated Outlet Air Temperature','32.2')
+    CALL AddToObjStr('Rated Ratio for Air and Water Convection','0.5',.true.)
+    !BRANCH ~ line 625
+    CALL CreateNewObj('Branch')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Branch')
+    !save this branch name for later use in plan
+    CALL AddToStrList(TRIM(FldVal(base + cvsAirHandlerNameOff)) // ' Preheat Coil HW Branch',handleHeatingCoilBranch)
+    CALL AddToObjStr('Maximum Flow Rate {m3/s}','')
+    CALL AddToObjStr('Pressure Drop Curve Name','')
+    CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
+    CALL AddToObjFld('Component Name', base + cvsAirHandlerNameOff,' Preheat Coil')
+    CALL AddToObjFld('Component Inlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Inlet')
+    CALL AddToObjFld('Component Outlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Outlet')
+    CALL AddToObjStr('Component Branch Control Type','Active',.TRUE.)
+    !CONTROLLER:SIMPLE ~ line 634
+    CALL CreateNewObj('Controller:WaterCoil')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil Controller')
+    CALL AddToObjStr('Control Variable','Temperature')
+    CALL AddToObjStr('Action','Normal')
+    CALL AddToObjStr('Actuator Variable','Flow')
+    CALL AddToObjFld('Sensor Node Name', base + cvsAirHandlerNameOff,' Preheat Coil Outlet')
+    CALL AddToObjFld('Actuator Node Name', base + cvsAirHandlerNameOff,' Preheat Coil HW Inlet')
+    CALL AddToObjStr('Controller Convergence Tolerance {deltaC}','autosize')
+    CALL AddToObjStr('Maximum Actuated Flow {m3/s}','autosize')
+    CALL AddToObjStr('Minimum Actuated Flow {m3/s}','0',.TRUE.)
+  ELSEIF (preHeatCoilType .EQ. ctElectric) THEN
+    !COIL:Electric:Heating  ~ line 646
+    CALL CreateNewObj('Coil:Heating:Electric')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil')
+    IF (isPreheatAvailSchedBlank) THEN
+      CALL AddToObjStr('Availability Schedule Name','HVACTemplate-Always 1')
+    ELSE
+      CALL AddToObjFld('Availability Schedule Name', base + cvsPreheatAvailSchedNameOff,' ')
+    END IF
+    CALL AddToObjStr('Efficiency','1')
+    CALL AddToObjStr('Nominal Capacity of the Coil {W}','autosize')
+    IF (heatRecovery .EQ. htrecNone) THEN
+      CALL AddToObjFld('Air Inlet Node Name', base + cvsAirHandlerNameOff,' Outdoor Air Inlet')
+    ELSE
+      CALL AddToObjFld('Air Inlet Node Name', base + cvsAirHandlerNameOff,' Heat Recovery Supply Outlet')
+    END IF
+    CALL AddToObjFld('Air Outlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil Outlet')
+    CALL AddToObjFld('Coil Temp Setpoint Node', base + cvsAirHandlerNameOff,' Preheat Coil Outlet',.TRUE.)
+  ELSEIF (preHeatCoilType .EQ. ctGas) THEN
+    !COIL:Gas:Heating ~ line 657
+    CALL CreateNewObj('Coil:Heating:Gas')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil')
+    IF (isPreheatAvailSchedBlank) THEN
+      CALL AddToObjStr('Availability Schedule Name','HVACTemplate-Always 1')
+    ELSE
+      CALL AddToObjFld('Availability Schedule Name', base + cvsPreheatAvailSchedNameOff,' ')
+    END IF
+    CALL AddToObjFld('Gas Burner Efficiency', base + cvsPreheatEffiencyOff,' ')
+    CALL AddToObjStr('Nominal Capacity of the Coil {W}','autosize')
+    IF (heatRecovery .EQ. htrecNone) THEN
+      CALL AddToObjFld('Air Inlet Node Name', base + cvsAirHandlerNameOff,' Outdoor Air Inlet')
+    ELSE
+      CALL AddToObjFld('Air Inlet Node Name', base + cvsAirHandlerNameOff,' Heat Recovery Supply Outlet')
+    END IF
+    CALL AddToObjFld('Air Outlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil Outlet')
+    CALL AddToObjFld('Coil Temp Setpoint Node', base + cvsAirHandlerNameOff,' Preheat Coil Outlet')
+    CALL AddToObjFld('Parasitic Electric Load {W}', base + cvsPreheatParasiticOff,' ')
+    CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
+       base + cvsAirHandlerNameOff,' Preheat Coil PLF-FPLR')
+    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    !CURVE:CUBIC ~ line 670
+    CALL CreateNewObj('Curve:Cubic')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil PLF-FPLR')
+    CALL AddToObjStr('Coefficient1 Constant','0.8')
+    CALL AddToObjStr('Coefficient2 x','0.2')
+    CALL AddToObjStr('Coefficient3 x**2','0')
+    CALL AddToObjStr('Coefficient4 x**3','0')
+    CALL AddToObjStr('Minimum Value of x','0')
+    CALL AddToObjStr('Maximum Value of x','1',.TRUE.)
+  END IF
+  IF (preHeatCoilType .NE. ctNone) THEN
+    IF (isPreheatStPtSchedBlank) THEN
+      CALL AddAlwaysSchedule(FldVal(base + cvsPreheatSetPtConstantOff))
+    END IF
+    !SET POINT MANAGER:SCHEDULED ~ line 679
+    IF (isPreheatStPtSchedBlank) THEN
+      CALL AddAlwaysSchedule(FldVal(base + cvsPreheatSetPtConstantOff))
+    END IF
+    CALL CreateNewObj('SetpointManager:Scheduled')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil Air Temp Manager')
+    CALL AddToObjStr('Control Variable','Temperature')
+    IF (isPreheatStPtSchedBlank) THEN
+      CALL AddToObjStr('Schedule Name', 'HVACTemplate-Always ' // TRIM(FldVal(base + cvsPreheatSetPtConstantOff)))
+    ELSE
+      CALL AddToObjFld('Schedule Name', base + cvsPreheatSetPtSchedNameOff,'')
+    END IF
+    CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Preheat Coil Outlet',.TRUE.)
+  END IF
   IF (heatRecovery .EQ. htrecSens) THEN
     htRecSens75 = StringToReal(FldVal(base + cvsHeatRecSenEffOff)) + 0.05
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
@@ -20326,40 +20502,20 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Economizer Lockout','Yes',.TRUE.)
   END IF
   IF (heatRecovery .NE. htrecNone) THEN
-    !***SetpointManager:MixedAir for Heat Recovery Outlet - Reference heating coil setpoint
-    IF (heatCoilType .EQ. ctNone) THEN
-      CALL WriteError('Warning:  In HVACTemplate:System:DedicatedOutdoorAir "'//TRIM(FldVal(base + cvsAirHandlerNameOff))//'"'// &
-                        ' there is heat recovery with no heating coil. The heat recovery heating mode will be'// &
-                        ' controlled to not exceed the cooling setpoint.',msgWarning)
+    IF (isEconoLowLimitBlank) THEN
+      CALL AddAlwaysSchedule('5')
+    ELSE
+      CALL AddAlwaysSchedule(FldVal(base + cvsEconoLowLimitOff))
     END IF
-    CALL CreateNewObj('SetpointManager:MixedAir')
+    CALL CreateNewObj('SetpointManager:Scheduled')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Heat Recovery Air Temp Manager')
     CALL AddToObjStr('Control Variable','Temperature')
-    IF (heatCoilType .NE. ctNone) THEN
-     IF (supFanPlacement .EQ. sfpDrawThru) THEN
-        CALL AddToObjFld('Reference Setpoint Node Name', base + cvsAirHandlerNameOff,' Supply Path Inlet')
-      ELSE
-        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(heatCoilOutlet))
-      END IF
+    IF (isEconoLowLimitBlank) THEN
+      CALL AddToObjStr('Schedule Name','HVACTemplate-Always 5')
     ELSE
-    ! With no heating coil, there is no heating setpoint, so use the cooling setpoint instead
-     IF (supFanPlacement .EQ. sfpDrawThru) THEN
-        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
-      ELSE
-        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(coolCoilUnitOutlet))
-      END IF
+      CALL AddToObjStr('Schedule Name','HVACTemplate-Always ' // FldVal(base + cvsEconoLowLimitOff))
     END IF
-    CALL AddToObjStr('Fan Inlet Node Name', TRIM(fanInlet))
-    CALL AddToObjStr('Fan Outlet Node Name', TRIM(fanOutlet))
     CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Heat Recovery Supply Outlet',.TRUE.)
-    !***SetpointManager:MixedAir for Economizer heat recovery bypass control - Reference cooling coil setpoint
-    CALL CreateNewObj('SetpointManager:MixedAir')
-    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Heat Recovery Economizer Temp Manager')
-    CALL AddToObjStr('Control Variable','Temperature')
-    CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
-    CALL AddToObjStr('Fan Inlet Node Name', TRIM(fanInlet))
-    CALL AddToObjStr('Fan Outlet Node Name', TRIM(fanOutlet))
-    CALL AddToObjFld('Setpoint Node or NodeList Name',  base + cvsAirHandlerNameOff,' Mixed Air Outlet',.TRUE.)
   END IF
 END DO
 END SUBROUTINE

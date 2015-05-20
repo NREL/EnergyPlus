@@ -2,7 +2,7 @@
 #define EarthTube_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -230,8 +230,8 @@ namespace EarthTube {
 	};
 
 	// Object Data
-	extern FArray1D< EarthTubeData > EarthTubeSys;
-	extern FArray1D< EarthTubeZoneReportVars > ZnRptET;
+	extern Array1D< EarthTubeData > EarthTubeSys;
+	extern Array1D< EarthTubeZoneReportVars > ZnRptET;
 
 	// Functions
 

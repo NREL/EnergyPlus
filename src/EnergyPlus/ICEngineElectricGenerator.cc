@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -69,12 +69,12 @@ namespace ICEngineElectricGenerator {
 	// MODULE VARIABLE DECLARATIONS:
 	int NumICEngineGenerators( 0 ); // number of IC ENGINE Generators specified in input
 	bool GetICEInput( true ); // When TRUE, calls subroutine to read input file.
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	// SUBROUTINE SPECIFICATIONS FOR MODULE IC ENGINEElectricGenerator
 
 	// Object Data
-	FArray1D< ICEngineGeneratorSpecs > ICEngineGenerator; // dimension to number of machines
-	FArray1D< ReportVars > ICEngineGeneratorReport;
+	Array1D< ICEngineGeneratorSpecs > ICEngineGenerator; // dimension to number of machines
+	Array1D< ReportVars > ICEngineGeneratorReport;
 
 	// MODULE SUBROUTINES:
 
@@ -318,8 +318,8 @@ namespace ICEngineElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 10 ); // character string data
-		FArray1D< Real64 > NumArray( 11 ); // numeric data
+		Array1D_string AlphArray( 10 ); // character string data
+		Array1D< Real64 > NumArray( 11 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -903,9 +903,9 @@ namespace ICEngineElectricGenerator {
 		int HeatRecOutletNode; // outlet node number in heat recovery loop
 		static bool MyOneTimeFlag( true ); // Initialization flag
 
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MySizeAndNodeInitFlag;
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MySizeAndNodeInitFlag;
 		Real64 mdot;
 		Real64 rho;
 		bool errFlag;

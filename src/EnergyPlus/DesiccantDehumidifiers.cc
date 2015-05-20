@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -136,7 +136,7 @@ namespace DesiccantDehumidifiers {
 	// Name Public routines, optionally name Private routines within this module
 
 	// Object Data
-	FArray1D< DesiccantDehumidifierData > DesicDehum;
+	Array1D< DesiccantDehumidifierData > DesicDehum;
 
 	// Functions
 
@@ -337,12 +337,12 @@ namespace DesiccantDehumidifiers {
 		int DesuperHeaterIndex; // Index of desuperheater heating coil
 		int RegenCoilControlNodeNum; // Control node number of regen heating coil
 		Real64 CoilBypassedFlowFrac; // Bypass air fraction for multimode DX coils
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -1364,8 +1364,8 @@ namespace DesiccantDehumidifiers {
 		int ControlNode; // control node number
 		static bool MySetPointCheckFlag( true );
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
 
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int SteamIndex; // steam coil index
@@ -2662,7 +2662,7 @@ namespace DesiccantDehumidifiers {
 		//unused  REAL(r64)      :: PartLoadFraction  ! heating or cooling part load fraction
 		Real64 MaxHotWaterFlow; // maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		FArray1D< Real64 > Par( 3 );
+		Array1D< Real64 > Par( 3 );
 		int SolFlag;
 
 		RegenCoilActual = 0.0;
@@ -2741,7 +2741,7 @@ namespace DesiccantDehumidifiers {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	)
 	{
 

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -79,8 +79,8 @@ namespace EarthTube {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< EarthTubeData > EarthTubeSys;
-	FArray1D< EarthTubeZoneReportVars > ZnRptET;
+	Array1D< EarthTubeData > EarthTubeSys;
+	Array1D< EarthTubeZoneReportVars > ZnRptET;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -192,7 +192,7 @@ namespace EarthTube {
 		int IOStat;
 		int Loop;
 		int Loop1;
-		FArray1D_bool RepVarSet;
+		Array1D_bool RepVarSet;
 
 		RepVarSet.dimension( NumOfZones, true );
 
@@ -439,7 +439,7 @@ namespace EarthTube {
 		Real64 OutletAirEnthalpy;
 		Real64 InsideDewPointTemp;
 		Real64 InsideHumRat;
-		static FArray1D< Real64 > EVF; // DESIGN EARTHTUBE FLOW RATE (M**3/SEC)
+		static Array1D< Real64 > EVF; // DESIGN EARTHTUBE FLOW RATE (M**3/SEC)
 
 		// Allocate the EVF array
 		if ( ! allocated( EVF ) ) EVF.allocate( NumOfZones );

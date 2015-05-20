@@ -2,7 +2,7 @@
 #define ChillerIndirectAbsorption_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -53,9 +53,13 @@ namespace ChillerIndirectAbsorption {
 		// Members
 		std::string Name; // user identifier
 		Real64 NomCap; // W - design nominal capacity of Absorber
+		bool NomCapWasAutoSized; //true if Nominal capacity was autosize on input
 		Real64 NomPumpPower; // W - design nominal capacity of Absorber
+		bool NomPumpPowerWasAutoSized; // true if nominal pump power was autosize on input
 		Real64 EvapVolFlowRate; // m3/s - design nominal water volumetric flow rate through the evaporator
+		bool EvapVolFlowRateWasAutoSized; //true if evaporator flow rate was autosize on input
 		Real64 CondVolFlowRate; // m3/s - design nominal water volumetric flow rate through the condenser
+		bool CondVolFlowRateWasAutoSized; //true if condenser flow rate was autosize on input
 		Real64 EvapMassFlowRateMax; // kg/s - Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
 		Real64 CondMassFlowRateMax; // Max Design Condeneser Mass Flow Rate [kg/s]
 		Real64 GenMassFlowRateMax; // kg/s - Max Design Generator Mass Flow Rate converted from Volume Flow Rate
@@ -68,9 +72,11 @@ namespace ChillerIndirectAbsorption {
 		Real64 MinGeneratorInletTemp; // C - minimum generator inlet temperature for chiller operation
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		Real64 GeneratorVolFlowRate; // m3/s - hot water volumetric flow rate through generator
+		bool GeneratorVolFlowRateWasAutoSized; //true if hot water flow was autosize on input
 		Real64 GeneratorSubcool; // C - amount of subcooling in steam generator
 		Real64 LoopSubcool; // C - amount of subcooling in steam generator
 		Real64 GeneratorDeltaTemp; // C - generator fluid temperature difference (water only)
+		bool GeneratorDeltaTempWasAutoSized; // true if generator delta T was autosize on input
 		Real64 SizFac; // Sizing factor
 		int EvapInletNodeNum; // Node number on the inlet side of the plant
 		int EvapOutletNodeNum; // Node number on the outlet side of the plant
@@ -110,14 +116,17 @@ namespace ChillerIndirectAbsorption {
 		int GenBranchNum; // generator plant loop branch index
 		int GenCompNum; // generator plant loop component index
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
-		bool IsThisSized; // TRUE if sizing is done
 
 		// Default Constructor
 		IndirectAbsorberSpecs() :
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			NomPumpPower( 0.0 ),
+			NomPumpPowerWasAutoSized( false ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			EvapMassFlowRateMax( 0.0 ),
 			CondMassFlowRateMax( 0.0 ),
 			GenMassFlowRateMax( 0.0 ),
@@ -129,9 +138,11 @@ namespace ChillerIndirectAbsorption {
 			MinGeneratorInletTemp( 0.0 ),
 			TempLowLimitEvapOut( 0.0 ),
 			GeneratorVolFlowRate( 0.0 ),
+			GeneratorVolFlowRateWasAutoSized( false ),
 			GeneratorSubcool( 0.0 ),
 			LoopSubcool( 0.0 ),
 			GeneratorDeltaTemp( -99999.0 ),
+			GeneratorDeltaTempWasAutoSized( true ),
 			SizFac( 0.0 ),
 			EvapInletNodeNum( 0 ),
 			EvapOutletNodeNum( 0 ),
@@ -170,133 +181,8 @@ namespace ChillerIndirectAbsorption {
 			GenLoopSideNum( 0 ),
 			GenBranchNum( 0 ),
 			GenCompNum( 0 ),
-			PossibleSubcooling( false ),
-			IsThisSized( false )
+			PossibleSubcooling( false )
 		{}
-
-		// Member Constructor
-		IndirectAbsorberSpecs(
-			std::string const & Name, // user identifier
-			Real64 const NomCap, // W - design nominal capacity of Absorber
-			Real64 const NomPumpPower, // W - design nominal capacity of Absorber
-			Real64 const EvapVolFlowRate, // m3/s - design nominal water volumetric flow rate through the evaporator
-			Real64 const CondVolFlowRate, // m3/s - design nominal water volumetric flow rate through the condenser
-			Real64 const EvapMassFlowRateMax, // kg/s - Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
-			Real64 const CondMassFlowRateMax, // Max Design Condeneser Mass Flow Rate [kg/s]
-			Real64 const GenMassFlowRateMax, // kg/s - Max Design Generator Mass Flow Rate converted from Volume Flow Rate
-			Real64 const MinPartLoadRat, // (BLAST MIN) min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // (BLAST MAX) max allowed operating frac full load
-			Real64 const OptPartLoadRat, // (BLAST BEST) optimal operating frac full load
-			Real64 const TempDesCondIn, // C - (BLAST ADJTC(1)The design secondary loop fluid
-			Real64 const MinCondInletTemp, // C - minimum condenser inlet temperature for chiller operation
-			Real64 const MinGeneratorInletTemp, // C - minimum generator inlet temperature for chiller operation
-			Real64 const TempLowLimitEvapOut, // C - low temperature shut off
-			Real64 const GeneratorVolFlowRate, // m3/s - hot water volumetric flow rate through generator
-			Real64 const GeneratorSubcool, // C - amount of subcooling in steam generator
-			Real64 const LoopSubcool, // C - amount of subcooling in steam generator
-			Real64 const GeneratorDeltaTemp, // C - generator fluid temperature difference (water only)
-			Real64 const SizFac, // Sizing factor
-			int const EvapInletNodeNum, // Node number on the inlet side of the plant
-			int const EvapOutletNodeNum, // Node number on the outlet side of the plant
-			int const CondInletNodeNum, // Node number on the inlet side of the condenser
-			int const CondOutletNodeNum, // Node number on the outlet side of the condenser
-			int const GeneratorInletNodeNum, // Generator inlet node number, steam/water side
-			int const GeneratorOutletNodeNum, // Generator outlet node number, steam/water side
-			int const GeneratorInputCurvePtr, // Index to steam use curve as a function of PLR
-			int const PumpPowerCurvePtr, // Index to pump power curve as a function of PLR
-			int const CapFCondenserTempPtr, // Index to capacity as a function of absorber temp curve
-			int const CapFEvaporatorTempPtr, // Index to capacity as a function of evaporator temp curve
-			int const CapFGeneratorTempPtr, // Index to capacity as a function of generator temp curve
-			int const HeatInputFCondTempPtr, // Index to generator heat input as a function of absorber temp
-			int const HeatInputFEvapTempPtr, // Index to generator heat input as a function of absorber temp
-			int const ErrCount2, // error counter
-			int const GenHeatSourceType, // Generator heat source type, NodeType_Steam=3 or NodeType_Water=2
-			int const SteamFluidIndex, // index to generator fluid type
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // simulate the machine at it's operating part load ratio
-			int const FlowMode, // one of 3 modes for componet flow during operation
-			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
-			bool const ModulatedFlowErrDone, // true if setpoint warning issued
-			int const MinCondInletTempCtr, // Low condenser temp warning message counter
-			int const MinCondInletTempIndex, // Low condenser temp warning message index
-			int const MinGenInletTempCtr, // Low generator temp warning message counter
-			int const MinGenInletTempIndex, // Low generator temp warning message index
-			int const CWLoopNum, // chilled water plant loop index number
-			int const CWLoopSideNum, // chilled water plant loop side index
-			int const CWBranchNum, // chilled water plant loop branch index
-			int const CWCompNum, // chilled water plant loop component index
-			int const CDLoopNum, // condenser water plant loop index number
-			int const CDLoopSideNum, // condenser water plant loop side index
-			int const CDBranchNum, // condenser water plant loop branch index
-			int const CDCompNum, // condenser water plant loop component index
-			int const GenLoopNum, // generator plant loop index number
-			int const GenLoopSideNum, // generator plant loop side index
-			int const GenBranchNum, // generator plant loop branch index
-			int const GenCompNum, // generator plant loop component index
-			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
-			bool const IsThisSized // TRUE if sizing is done
-		) :
-			Name( Name ),
-			NomCap( NomCap ),
-			NomPumpPower( NomPumpPower ),
-			EvapVolFlowRate( EvapVolFlowRate ),
-			CondVolFlowRate( CondVolFlowRate ),
-			EvapMassFlowRateMax( EvapMassFlowRateMax ),
-			CondMassFlowRateMax( CondMassFlowRateMax ),
-			GenMassFlowRateMax( GenMassFlowRateMax ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			TempDesCondIn( TempDesCondIn ),
-			MinCondInletTemp( MinCondInletTemp ),
-			MinGeneratorInletTemp( MinGeneratorInletTemp ),
-			TempLowLimitEvapOut( TempLowLimitEvapOut ),
-			GeneratorVolFlowRate( GeneratorVolFlowRate ),
-			GeneratorSubcool( GeneratorSubcool ),
-			LoopSubcool( LoopSubcool ),
-			GeneratorDeltaTemp( GeneratorDeltaTemp ),
-			SizFac( SizFac ),
-			EvapInletNodeNum( EvapInletNodeNum ),
-			EvapOutletNodeNum( EvapOutletNodeNum ),
-			CondInletNodeNum( CondInletNodeNum ),
-			CondOutletNodeNum( CondOutletNodeNum ),
-			GeneratorInletNodeNum( GeneratorInletNodeNum ),
-			GeneratorOutletNodeNum( GeneratorOutletNodeNum ),
-			GeneratorInputCurvePtr( GeneratorInputCurvePtr ),
-			PumpPowerCurvePtr( PumpPowerCurvePtr ),
-			CapFCondenserTempPtr( CapFCondenserTempPtr ),
-			CapFEvaporatorTempPtr( CapFEvaporatorTempPtr ),
-			CapFGeneratorTempPtr( CapFGeneratorTempPtr ),
-			HeatInputFCondTempPtr( HeatInputFCondTempPtr ),
-			HeatInputFEvapTempPtr( HeatInputFEvapTempPtr ),
-			ErrCount2( ErrCount2 ),
-			GenHeatSourceType( GenHeatSourceType ),
-			SteamFluidIndex( SteamFluidIndex ),
-			Available( Available ),
-			ON( ON ),
-			FlowMode( FlowMode ),
-			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
-			ModulatedFlowErrDone( ModulatedFlowErrDone ),
-			MinCondInletTempCtr( MinCondInletTempCtr ),
-			MinCondInletTempIndex( MinCondInletTempIndex ),
-			MinGenInletTempCtr( MinGenInletTempCtr ),
-			MinGenInletTempIndex( MinGenInletTempIndex ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CDLoopNum( CDLoopNum ),
-			CDLoopSideNum( CDLoopSideNum ),
-			CDBranchNum( CDBranchNum ),
-			CDCompNum( CDCompNum ),
-			GenLoopNum( GenLoopNum ),
-			GenLoopSideNum( GenLoopSideNum ),
-			GenBranchNum( GenBranchNum ),
-			GenCompNum( GenCompNum ),
-			PossibleSubcooling( PossibleSubcooling ),
-			IsThisSized( IsThisSized )
-		{}
-
 	};
 
 	struct ReportVars
@@ -346,57 +232,11 @@ namespace ChillerIndirectAbsorption {
 			ChillerCyclingFrac( 0.0 ),
 			LoopLoss( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const PumpingPower, // reporting: W - electric pumping power
-			Real64 const QGenerator, // reporting: W - steam heat transfer rate
-			Real64 const QEvap, // reporting: W - evaporator heat transfer rate
-			Real64 const QCond, // reporting: W - condensor heat transfer rate
-			Real64 const PumpingEnergy, // reporting: J - electric pumping power
-			Real64 const GeneratorEnergy, // reporting: J - steam heat transfer rate
-			Real64 const EvapEnergy, // reporting: J - evaporator heat transfer rate
-			Real64 const CondEnergy, // reporting: J - condensor heat transfer rate
-			Real64 const CondInletTemp, // reporting: C - condenser inlet temperature
-			Real64 const EvapInletTemp, // reporting: C - evaporator inlet temperature
-			Real64 const CondOutletTemp, // reporting: C - condenser outlet temperature
-			Real64 const EvapOutletTemp, // reporting: C - evaporator outlet temperature
-			Real64 const Evapmdot, // reporting: kg/ - evaporator mass flow rate
-			Real64 const Condmdot, // reporting: kg/ - condenser mass flow rate
-			Real64 const Genmdot, // reporting: generatore mass flow rate when connected to plant
-			Real64 const SteamMdot, // reporting: kg/s - steam mass flow rate
-			Real64 const ActualCOP, // reporting: coefficient of performance = QEvap/QGenerator
-			Real64 const ChillerPartLoadRatio, // reporting: part-load ratio
-			Real64 const ChillerCyclingFrac, // reporting: chiller on/off cycling fraction
-			Real64 const LoopLoss // reporting: W - loop loss from absorber outlet to condensate pump inlet
-		) :
-			PumpingPower( PumpingPower ),
-			QGenerator( QGenerator ),
-			QEvap( QEvap ),
-			QCond( QCond ),
-			PumpingEnergy( PumpingEnergy ),
-			GeneratorEnergy( GeneratorEnergy ),
-			EvapEnergy( EvapEnergy ),
-			CondEnergy( CondEnergy ),
-			CondInletTemp( CondInletTemp ),
-			EvapInletTemp( EvapInletTemp ),
-			CondOutletTemp( CondOutletTemp ),
-			EvapOutletTemp( EvapOutletTemp ),
-			Evapmdot( Evapmdot ),
-			Condmdot( Condmdot ),
-			Genmdot( Genmdot ),
-			SteamMdot( SteamMdot ),
-			ActualCOP( ActualCOP ),
-			ChillerPartLoadRatio( ChillerPartLoadRatio ),
-			ChillerCyclingFrac( ChillerCyclingFrac ),
-			LoopLoss( LoopLoss )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< IndirectAbsorberSpecs > IndirectAbsorber; // dimension to number of machines
-	extern FArray1D< ReportVars > IndirectAbsorberReport;
+	extern Array1D< IndirectAbsorberSpecs > IndirectAbsorber; // dimension to number of machines
+	extern Array1D< ReportVars > IndirectAbsorberReport;
 
 	// Functions
 

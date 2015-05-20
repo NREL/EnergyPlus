@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -22,7 +22,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
@@ -113,7 +112,6 @@ TEST( NumericTest, kind )
 
 	EXPECT_EQ( 1, kind( char() ) );
 	EXPECT_EQ( 1, kind( std::string() ) );
-	EXPECT_EQ( 1, kind( Fstring() ) );
 }
 
 TEST( NumericTest, KIND )
@@ -141,7 +139,6 @@ TEST( NumericTest, KIND )
 
 	EXPECT_EQ( 1, KIND( char() ) );
 	EXPECT_EQ( 1, KIND( std::string() ) );
-	EXPECT_EQ( 1, KIND( Fstring() ) );
 }
 
 TEST( NumericTest, selectedIntKind )
@@ -267,22 +264,14 @@ TEST( NumericTest, selectedCharKind )
 	};
 	const int N = ARRAY_LENGTH(tests);
 
-	// selected_char_kind(std::string)
+	// selected_char_kind( std::string )
 	for ( int i = 0; i < N; ++i ) {
 		EXPECT_EQ( tests[ i ].output, selected_char_kind( std::string( tests[ i ].input ) ) );
 	}
-	// selected_char_kind(Fstring)
-	for ( int i = 0; i < N; ++i ) {
-		EXPECT_EQ( tests[ i ].output, selected_char_kind( Fstring( std::strlen( tests[ i ].input ), tests[ i ].input ) ) );
-	}
 
-	// SELECTED_CHAR_KIND(std::string)
+	// SELECTED_CHAR_KIND( std::string )
 	for ( int i = 0; i < N; ++i ) {
 		EXPECT_EQ( tests[ i ].output, SELECTED_CHAR_KIND( std::string( tests[ i ].input ) ) );
-	}
-	// SELECTED_CHAR_KIND(Fstring)
-	for ( int i = 0; i < N; ++i ) {
-		EXPECT_EQ( tests[ i ].output, SELECTED_CHAR_KIND( Fstring( std::strlen( tests[ i ].input ), tests[ i ].input ) ) );
 	}
 }
 

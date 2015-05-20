@@ -1,6 +1,6 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -213,15 +213,15 @@ namespace ZoneAirLoopEquipmentManager {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		static FArray1D_string AlphArray( 4 ); //Tuned Made static
-		static FArray1D< Real64 > NumArray( 2 ); //Tuned Made static
+		static Array1D_string AlphArray( 4 ); //Tuned Made static
+		static Array1D< Real64 > NumArray( 2 ); //Tuned Made static
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		static FArray1D_string cAlphaFields( 4 ); // Alpha field names //Tuned Made static
-		static FArray1D_string cNumericFields( 2 ); // Numeric field names //Tuned Made static
-		static FArray1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
-		static FArray1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
+		static Array1D_string cAlphaFields( 4 ); // Alpha field names //Tuned Made static
+		static Array1D_string cNumericFields( 2 ); // Numeric field names //Tuned Made static
+		static Array1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
+		static Array1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
 		bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
 		static int ATMixerPriNode( 0 ); // primary air inlet node for air terminal mixers
 

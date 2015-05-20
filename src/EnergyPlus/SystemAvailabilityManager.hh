@@ -2,7 +2,7 @@
 #define SystemAvailabilityManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -44,7 +44,7 @@ namespace SystemAvailabilityManager {
 	extern int const HybridVentCtrl_Close; // Close windows or doors
 
 	extern int const NumValidSysAvailManagerTypes;
-	extern FArray1D_string const cValidSysAvailManagerTypes;
+	extern Array1D_string const cValidSysAvailManagerTypes;
 	extern int const SysAvailMgr_Scheduled;
 	extern int const SysAvailMgr_ScheduledOn;
 	extern int const SysAvailMgr_ScheduledOff;
@@ -58,7 +58,7 @@ namespace SystemAvailabilityManager {
 	extern int const SysAvailMgr_HybridVent;
 
 	extern int const SysAvailMgr_OptimumStart;
-	extern FArray1D_int const ValidSysAvailManagerTypes;
+	extern Array1D_int const ValidSysAvailManagerTypes;
 	// DERIVED TYPE DEFINITIONS
 
 	//Not used yet
@@ -250,7 +250,7 @@ namespace SystemAvailabilityManager {
 		int ControlledZoneNum; // controlled zone number of control zone
 		std::string ZoneListName; // Zone List name
 		int NumOfZones; // Number of zones in the list
-		FArray1D_int ZonePtrs; // Pointers to zones in the list
+		Array1D_int ZonePtrs; // Pointers to zones in the list
 		Real64 MaxOptStartTime; // Maximum value of start time in hours
 		int CtrlAlgType; // Control algorithm: ConstantTemperatureGradient,
 		// AdaptiveTemperatureGradient, AdaptiveASHRAE, ConstantStartTime
@@ -301,7 +301,7 @@ namespace SystemAvailabilityManager {
 			int const ControlledZoneNum, // controlled zone number of control zone
 			std::string const & ZoneListName, // Zone List name
 			int const NumOfZones, // Number of zones in the list
-			FArray1_int const & ZonePtrs, // Pointers to zones in the list
+			Array1_int const & ZonePtrs, // Pointers to zones in the list
 			Real64 const MaxOptStartTime, // Maximum value of start time in hours
 			int const CtrlAlgType, // Control algorithm: ConstantTemperatureGradient,
 			Real64 const ConstTGradCool, // Constant temperature gradient in cooling mode, unit: degC per hour
@@ -683,9 +683,9 @@ namespace SystemAvailabilityManager {
 		// Members
 		std::string Name; // Availability Manager List Name
 		int NumItems;
-		FArray1D_string AvailManagerName;
-		FArray1D_string cAvailManagerType;
-		FArray1D_int AvailManagerType;
+		Array1D_string AvailManagerName;
+		Array1D_string cAvailManagerType;
+		Array1D_int AvailManagerType;
 
 		// Default Constructor
 		SysAvailManagerList() :
@@ -696,9 +696,9 @@ namespace SystemAvailabilityManager {
 		SysAvailManagerList(
 			std::string const & Name, // Availability Manager List Name
 			int const NumItems,
-			FArray1_string const & AvailManagerName,
-			FArray1_string const & cAvailManagerType,
-			FArray1_int const & AvailManagerType
+			Array1_string const & AvailManagerName,
+			Array1_string const & cAvailManagerType,
+			Array1_int const & AvailManagerType
 		) :
 			Name( Name ),
 			NumItems( NumItems ),
@@ -710,21 +710,21 @@ namespace SystemAvailabilityManager {
 	};
 
 	// Object Data
-	extern FArray1D< DefineSchedSysAvailManager > SchedSysAvailMgrData;
-	extern FArray1D< DefineSchedOnSysAvailManager > SchedOnSysAvailMgrData;
-	extern FArray1D< DefineSchedOffSysAvailManager > SchedOffSysAvailMgrData;
-	extern FArray1D< DefineNightCycSysAvailManager > NCycSysAvailMgrData;
-	extern FArray1D< DefineDiffTSysAvailManager > DiffTSysAvailMgrData;
-	extern FArray1D< DefineHiLoSysAvailManager > HiTurnOffSysAvailMgrData;
-	extern FArray1D< DefineHiLoSysAvailManager > HiTurnOnSysAvailMgrData;
-	extern FArray1D< DefineHiLoSysAvailManager > LoTurnOffSysAvailMgrData;
-	extern FArray1D< DefineHiLoSysAvailManager > LoTurnOnSysAvailMgrData;
-	extern FArray1D< DefineNightVentSysAvailManager > NVentSysAvailMgrData;
-	extern FArray1D< DefineHybridVentSysAvailManager > HybridVentSysAvailMgrData;
-	extern FArray1D< SysAvailManagerList > SysAvailMgrListData;
-	extern FArray1D< DefineOptStartSysAvailManager > OptStartSysAvailMgrData;
-	extern FArray1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffCooling;
-	extern FArray1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffHeating;
+	extern Array1D< DefineSchedSysAvailManager > SchedSysAvailMgrData;
+	extern Array1D< DefineSchedOnSysAvailManager > SchedOnSysAvailMgrData;
+	extern Array1D< DefineSchedOffSysAvailManager > SchedOffSysAvailMgrData;
+	extern Array1D< DefineNightCycSysAvailManager > NCycSysAvailMgrData;
+	extern Array1D< DefineDiffTSysAvailManager > DiffTSysAvailMgrData;
+	extern Array1D< DefineHiLoSysAvailManager > HiTurnOffSysAvailMgrData;
+	extern Array1D< DefineHiLoSysAvailManager > HiTurnOnSysAvailMgrData;
+	extern Array1D< DefineHiLoSysAvailManager > LoTurnOffSysAvailMgrData;
+	extern Array1D< DefineHiLoSysAvailManager > LoTurnOnSysAvailMgrData;
+	extern Array1D< DefineNightVentSysAvailManager > NVentSysAvailMgrData;
+	extern Array1D< DefineHybridVentSysAvailManager > HybridVentSysAvailMgrData;
+	extern Array1D< SysAvailManagerList > SysAvailMgrListData;
+	extern Array1D< DefineOptStartSysAvailManager > OptStartSysAvailMgrData;
+	extern Array1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffCooling;
+	extern Array1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffHeating;
 
 	// Functions
 

@@ -2,7 +2,7 @@
 #define ChillerExhaustAbsorption_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -23,7 +23,7 @@ namespace ChillerExhaustAbsorption {
 
 	// This type holds the output from the algorithm i.e., the Report Variables
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
@@ -40,6 +40,7 @@ namespace ChillerExhaustAbsorption {
 		// Part of Type that directly corresponds with IDD definition
 		std::string Name; // user identifier
 		Real64 NomCoolingCap; // W - design nominal capacity of Absorber
+		bool NomCoolingCapWasAutoSized; // true if nominal capacity was autosize on input
 		Real64 NomHeatCoolRatio; // ratio of heating to cooling capacity
 		Real64 ThermalEnergyCoolRatio; // ratio of thermal energy input to cooling output
 		Real64 ThermalEnergyHeatRatio; // ratio of thermal energy input to heating output
@@ -61,8 +62,11 @@ namespace ChillerExhaustAbsorption {
 		Real64 TempDesCondReturn; // design secondary loop fluid temperature at the Absorber condenser side inlet
 		Real64 TempDesCHWSupply; // design chilled water supply temperature
 		Real64 EvapVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the evaporator
+		bool EvapVolFlowRateWasAutoSized; //true if evaporator flow rate was autosize on input
 		Real64 CondVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the condenser
+		bool CondVolFlowRateWasAutoSized; //true if condenser flow rate was autosize on input
 		Real64 HeatVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the heater side
+		bool HeatVolFlowRateWasAutoSized; // true if hot water flow rate was autosize on input
 		Real64 SizFac; // sizing factor
 		int CoolCapFTCurve; // cooling capacity as a function of temperature curve (chilled water temp,
 		// condenser water temp)
@@ -105,7 +109,6 @@ namespace ChillerExhaustAbsorption {
 		int ExhTempLTAbsLeavingHeatingTempIndex; // index for exhaust potentail less than thermal energy needed during heating
 		std::string TypeOf; // Generator type
 		std::string ExhuastSourceName; // Generator type Name
-		bool IsThisSized; // True if sizing is done
 
 		// Default Constructor
 		ExhaustAbsorberSpecs() :
@@ -114,6 +117,7 @@ namespace ChillerExhaustAbsorption {
 			InCoolingMode( false ),
 			InHeatingMode( false ),
 			NomCoolingCap( 0.0 ),
+			NomCoolingCapWasAutoSized( false ),
 			NomHeatCoolRatio( 0.0 ),
 			ThermalEnergyCoolRatio( 0.0 ),
 			ThermalEnergyHeatRatio( 0.0 ),
@@ -135,8 +139,11 @@ namespace ChillerExhaustAbsorption {
 			TempDesCondReturn( 0.0 ),
 			TempDesCHWSupply( 0.0 ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			HeatVolFlowRate( 0.0 ),
+			HeatVolFlowRateWasAutoSized( false ),
 			SizFac( 0.0 ),
 			CoolCapFTCurve( 0 ),
 			ThermalEnergyCoolFTCurve( 0 ),
@@ -169,147 +176,8 @@ namespace ChillerExhaustAbsorption {
 			HWCompNum( 0 ),
 			CompType_Num( 0 ),
 			ExhTempLTAbsLeavingTempIndex( 0 ),
-			ExhTempLTAbsLeavingHeatingTempIndex( 0 ),
-			IsThisSized( false )
+			ExhTempLTAbsLeavingHeatingTempIndex( 0 )
 		{}
-
-		// Member Constructor
-		ExhaustAbsorberSpecs(
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // simulate the machine at it's operating part load ratio
-			bool const InCoolingMode,
-			bool const InHeatingMode,
-			std::string const & Name, // user identifier
-			Real64 const NomCoolingCap, // W - design nominal capacity of Absorber
-			Real64 const NomHeatCoolRatio, // ratio of heating to cooling capacity
-			Real64 const ThermalEnergyCoolRatio, // ratio of thermal energy input to cooling output
-			Real64 const ThermalEnergyHeatRatio, // ratio of thermal energy input to heating output
-			Real64 const ElecCoolRatio, // ratio of electricity input to cooling output
-			Real64 const ElecHeatRatio, // ratio of electricity input to heating output
-			int const ChillReturnNodeNum, // Node number on the inlet side of the plant
-			int const ChillSupplyNodeNum, // Node number on the outlet side of the plant
-			bool const ChillSetPointErrDone, // flag to report missing setpoint on CW outlet
-			bool const ChillSetPointSetToLoop, // flag to use overall loop setpoint
-			int const CondReturnNodeNum, // Node number on the inlet side of the condenser
-			int const CondSupplyNodeNum, // Node number on the outlet side of the condenser
-			int const HeatReturnNodeNum, // absorber steam inlet node number, water side
-			int const HeatSupplyNodeNum, // absorber steam outlet node number, water side
-			bool const HeatSetPointErrDone, // flag to report missing setpoint on HW outlet
-			bool const HeatSetPointSetToLoop, // flag to use overall loop setpoint
-			Real64 const MinPartLoadRat, // min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // max allowed operating frac full load
-			Real64 const OptPartLoadRat, // optimal operating frac full load
-			Real64 const TempDesCondReturn, // design secondary loop fluid temperature at the Absorber condenser side inlet
-			Real64 const TempDesCHWSupply, // design chilled water supply temperature
-			Real64 const EvapVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the evaporator
-			Real64 const CondVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the condenser
-			Real64 const HeatVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the heater side
-			Real64 const SizFac, // sizing factor
-			int const CoolCapFTCurve, // cooling capacity as a function of temperature curve (chilled water temp,
-			int const ThermalEnergyCoolFTCurve, // Thermal Energy-Input-to cooling output Ratio Function of Temperature Curve (chilled
-			int const ThermalEnergyCoolFPLRCurve, // Thermal Energy-Input-to cooling output Ratio Function of Part Load Ratio Curve
-			int const ElecCoolFTCurve, // Electric-Input-to cooling output Ratio Function of Temperature Curve
-			int const ElecCoolFPLRCurve, // Electric-Input-to cooling output Ratio Function of Part Load Ratio Curve
-			int const HeatCapFCoolCurve, // Heating Capacity Function of Cooling Capacity Curve
-			int const ThermalEnergyHeatFHPLRCurve, // Thermal Energy Input to heat output ratio during heating only function
-			bool const isEnterCondensTemp, // if using entering conderser water temperature is TRUE, exiting is FALSE
-			bool const isWaterCooled, // if water cooled it is TRUE
-			Real64 const CHWLowLimitTemp, // Chilled Water Lower Limit Temperature
-			int const ExhaustAirInletNodeNum, // Node number on Exhaust input from generator
-			Real64 const DesCondMassFlowRate, // design nominal mass flow rate of water through the condenser [kg/s]
-			Real64 const DesHeatMassFlowRate, // design nominal mass flow rate of water through the hot water side [kg/s]
-			Real64 const DesEvapMassFlowRate, // design nominal mass flow rate of water through chilled water side [kg/s]
-			int const DeltaTempCoolErrCount, // error count for Delta Temp = 0 while cooling
-			int const DeltaTempHeatErrCount, // error count for Delta Temp = 0 while heating
-			int const CondErrCount, // error count for poor Condenser Supply Estimate
-			bool const PossibleSubcooling, // Flag to determine whether plant is overcooled
-			int const CWLoopNum, // chilled water plant loop index number
-			int const CWLoopSideNum, // chilled water plant loop side index
-			int const CWBranchNum, // chilled water plant loop branch index
-			int const CWCompNum, // chilled water plant loop component index
-			int const CDLoopNum, // condenser water plant loop index number
-			int const CDLoopSideNum, // condenser water plant loop side index
-			int const CDBranchNum, // condenser water plant loop branch index
-			int const CDCompNum, // condenser water plant loop component index
-			int const HWLoopNum, // hot water plant loop side index
-			int const HWLoopSideNum, // hot water plant loop side index
-			int const HWBranchNum, // hot water plant loop branch index
-			int const HWCompNum, // hot water plant loop component index
-			int const CompType_Num, // Numeric designator for CompType (TypeOf)
-			int const ExhTempLTAbsLeavingTempIndex, // index for exhaust potentail less than thermal energy needed during cooling
-			int const ExhTempLTAbsLeavingHeatingTempIndex, // index for exhaust potentail less than thermal energy needed during heating
-			std::string const & TypeOf, // Generator type
-			std::string const & ExhuastSourceName, // Generator type Name
-			bool const IsThisSized // True if sizing is done
-		) :
-			Available( Available ),
-			ON( ON ),
-			InCoolingMode( InCoolingMode ),
-			InHeatingMode( InHeatingMode ),
-			Name( Name ),
-			NomCoolingCap( NomCoolingCap ),
-			NomHeatCoolRatio( NomHeatCoolRatio ),
-			ThermalEnergyCoolRatio( ThermalEnergyCoolRatio ),
-			ThermalEnergyHeatRatio( ThermalEnergyHeatRatio ),
-			ElecCoolRatio( ElecCoolRatio ),
-			ElecHeatRatio( ElecHeatRatio ),
-			ChillReturnNodeNum( ChillReturnNodeNum ),
-			ChillSupplyNodeNum( ChillSupplyNodeNum ),
-			ChillSetPointErrDone( ChillSetPointErrDone ),
-			ChillSetPointSetToLoop( ChillSetPointSetToLoop ),
-			CondReturnNodeNum( CondReturnNodeNum ),
-			CondSupplyNodeNum( CondSupplyNodeNum ),
-			HeatReturnNodeNum( HeatReturnNodeNum ),
-			HeatSupplyNodeNum( HeatSupplyNodeNum ),
-			HeatSetPointErrDone( HeatSetPointErrDone ),
-			HeatSetPointSetToLoop( HeatSetPointSetToLoop ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			TempDesCondReturn( TempDesCondReturn ),
-			TempDesCHWSupply( TempDesCHWSupply ),
-			EvapVolFlowRate( EvapVolFlowRate ),
-			CondVolFlowRate( CondVolFlowRate ),
-			HeatVolFlowRate( HeatVolFlowRate ),
-			SizFac( SizFac ),
-			CoolCapFTCurve( CoolCapFTCurve ),
-			ThermalEnergyCoolFTCurve( ThermalEnergyCoolFTCurve ),
-			ThermalEnergyCoolFPLRCurve( ThermalEnergyCoolFPLRCurve ),
-			ElecCoolFTCurve( ElecCoolFTCurve ),
-			ElecCoolFPLRCurve( ElecCoolFPLRCurve ),
-			HeatCapFCoolCurve( HeatCapFCoolCurve ),
-			ThermalEnergyHeatFHPLRCurve( ThermalEnergyHeatFHPLRCurve ),
-			isEnterCondensTemp( isEnterCondensTemp ),
-			isWaterCooled( isWaterCooled ),
-			CHWLowLimitTemp( CHWLowLimitTemp ),
-			ExhaustAirInletNodeNum( ExhaustAirInletNodeNum ),
-			DesCondMassFlowRate( DesCondMassFlowRate ),
-			DesHeatMassFlowRate( DesHeatMassFlowRate ),
-			DesEvapMassFlowRate( DesEvapMassFlowRate ),
-			DeltaTempCoolErrCount( DeltaTempCoolErrCount ),
-			DeltaTempHeatErrCount( DeltaTempHeatErrCount ),
-			CondErrCount( CondErrCount ),
-			PossibleSubcooling( PossibleSubcooling ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CDLoopNum( CDLoopNum ),
-			CDLoopSideNum( CDLoopSideNum ),
-			CDBranchNum( CDBranchNum ),
-			CDCompNum( CDCompNum ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSideNum( HWLoopSideNum ),
-			HWBranchNum( HWBranchNum ),
-			HWCompNum( HWCompNum ),
-			CompType_Num( CompType_Num ),
-			ExhTempLTAbsLeavingTempIndex( ExhTempLTAbsLeavingTempIndex ),
-			ExhTempLTAbsLeavingHeatingTempIndex( ExhTempLTAbsLeavingHeatingTempIndex ),
-			TypeOf( TypeOf ),
-			ExhuastSourceName( ExhuastSourceName ),
-			IsThisSized( IsThisSized )
-		{}
-
 	};
 
 	struct ReportVars
@@ -393,91 +261,11 @@ namespace ChillerExhaustAbsorption {
 			ExhHeatRecPotentialHeat( 0.0 ),
 			ExhHeatRecPotentialCool( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const CoolingLoad, // cooling load on the chiller (previously called QEvap)
-			Real64 const CoolingEnergy, // variable to track total cooling load for period (was EvapEnergy)
-			Real64 const HeatingLoad, // heating load on the chiller
-			Real64 const HeatingEnergy, // heating energy
-			Real64 const TowerLoad, // load on the cooling tower/condenser (previously called QCond)
-			Real64 const TowerEnergy, // variable to track total tower load for a period (was CondEnergy)
-			Real64 const ThermalEnergyUseRate, // instantaneous use of Exhaust for period
-			Real64 const ThermalEnergy, // variable to track total ThermalEnergy used for a period
-			Real64 const CoolThermalEnergyUseRate, // instantaneous use of Exhaust for period for cooling
-			Real64 const CoolThermalEnergy, // variable to track total ThermalEnergy used for a period for cooling
-			Real64 const HeatThermalEnergyUseRate, // instantaneous use of Exhaust for period for heating
-			Real64 const HeatThermalEnergy, // variable to track total ThermalEnergy used for a period for heating
-			Real64 const ElectricPower, // parasitic electric power used (was PumpingPower)
-			Real64 const ElectricEnergy, // track the total electricity used for a period (was PumpingEnergy)
-			Real64 const CoolElectricPower, // parasitic electric power used  for cooling
-			Real64 const CoolElectricEnergy, // track the total electricity used for a period for cooling
-			Real64 const HeatElectricPower, // parasitic electric power used  for heating
-			Real64 const HeatElectricEnergy, // track the total electricity used for a period for heating
-			Real64 const ChillReturnTemp, // reporting: evaporator inlet temperature (was EvapInletTemp)
-			Real64 const ChillSupplyTemp, // reporting: evaporator outlet temperature (was EvapOutletTemp)
-			Real64 const ChillWaterFlowRate, // reporting: evaporator mass flow rate (was Evapmdot)
-			Real64 const CondReturnTemp, // reporting: condenser inlet temperature (was CondInletTemp)
-			Real64 const CondSupplyTemp, // reporting: condenser outlet temperature (was CondOutletTemp)
-			Real64 const CondWaterFlowRate, // reporting: condenser mass flow rate (was Condmdot)
-			Real64 const HotWaterReturnTemp, // reporting: hot water return (inlet) temperature
-			Real64 const HotWaterSupplyTemp, // reporting: hot water supply (outlet) temperature
-			Real64 const HotWaterFlowRate, // reporting: hot water mass flow rate
-			Real64 const CoolPartLoadRatio, // operating part load ratio (load/capacity for cooling)
-			Real64 const HeatPartLoadRatio, // operating part load ratio (load/capacity for heating)
-			Real64 const CoolingCapacity, // current capacity after temperature adjustment
-			Real64 const HeatingCapacity, // current heating capacity
-			Real64 const FractionOfPeriodRunning, // fraction of the time period that the unit is operating
-			Real64 const ThermalEnergyCOP, // reporting: cooling output/ThermalEnergy input = CoolingLoad/CoolThermalEnergyUseRate
-			Real64 const ExhaustInTemp, // reporting: Exhaust inlet temperature
-			Real64 const ExhaustInFlow, // reporting: Exhaust Inlet Flow rate
-			Real64 const ExhHeatRecPotentialHeat, // reporting: Heat Recovery Potential during heating
-			Real64 const ExhHeatRecPotentialCool // reporting: Heat Recovery Potential during cooling
-		) :
-			CoolingLoad( CoolingLoad ),
-			CoolingEnergy( CoolingEnergy ),
-			HeatingLoad( HeatingLoad ),
-			HeatingEnergy( HeatingEnergy ),
-			TowerLoad( TowerLoad ),
-			TowerEnergy( TowerEnergy ),
-			ThermalEnergyUseRate( ThermalEnergyUseRate ),
-			ThermalEnergy( ThermalEnergy ),
-			CoolThermalEnergyUseRate( CoolThermalEnergyUseRate ),
-			CoolThermalEnergy( CoolThermalEnergy ),
-			HeatThermalEnergyUseRate( HeatThermalEnergyUseRate ),
-			HeatThermalEnergy( HeatThermalEnergy ),
-			ElectricPower( ElectricPower ),
-			ElectricEnergy( ElectricEnergy ),
-			CoolElectricPower( CoolElectricPower ),
-			CoolElectricEnergy( CoolElectricEnergy ),
-			HeatElectricPower( HeatElectricPower ),
-			HeatElectricEnergy( HeatElectricEnergy ),
-			ChillReturnTemp( ChillReturnTemp ),
-			ChillSupplyTemp( ChillSupplyTemp ),
-			ChillWaterFlowRate( ChillWaterFlowRate ),
-			CondReturnTemp( CondReturnTemp ),
-			CondSupplyTemp( CondSupplyTemp ),
-			CondWaterFlowRate( CondWaterFlowRate ),
-			HotWaterReturnTemp( HotWaterReturnTemp ),
-			HotWaterSupplyTemp( HotWaterSupplyTemp ),
-			HotWaterFlowRate( HotWaterFlowRate ),
-			CoolPartLoadRatio( CoolPartLoadRatio ),
-			HeatPartLoadRatio( HeatPartLoadRatio ),
-			CoolingCapacity( CoolingCapacity ),
-			HeatingCapacity( HeatingCapacity ),
-			FractionOfPeriodRunning( FractionOfPeriodRunning ),
-			ThermalEnergyCOP( ThermalEnergyCOP ),
-			ExhaustInTemp( ExhaustInTemp ),
-			ExhaustInFlow( ExhaustInFlow ),
-			ExhHeatRecPotentialHeat( ExhHeatRecPotentialHeat ),
-			ExhHeatRecPotentialCool( ExhHeatRecPotentialCool )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ExhaustAbsorberSpecs > ExhaustAbsorber; // dimension to number of machines
-	extern FArray1D< ReportVars > ExhaustAbsorberReport;
+	extern Array1D< ExhaustAbsorberSpecs > ExhaustAbsorber; // dimension to number of machines
+	extern Array1D< ReportVars > ExhaustAbsorberReport;
 
 	// Functions
 

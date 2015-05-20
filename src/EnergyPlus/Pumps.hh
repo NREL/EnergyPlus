@@ -2,7 +2,7 @@
 #define Pumps_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -36,7 +36,7 @@ namespace Pumps {
 	extern int const PumpBank_VarSpeed;
 	extern std::string const cPumpBank_ConSpeed;
 	extern int const PumpBank_ConSpeed;
-	extern FArray1D_string const cPumpTypes;
+	extern Array1D_string const cPumpTypes;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -152,22 +152,25 @@ namespace Pumps {
 		int PowerErrIndex2; // for recurring errors
 		Real64 MinVolFlowRateFrac; // minimum schedule value fraction modifier
 		Real64 NomVolFlowRate; // design nominal capacity of Pump
+		bool NomVolFlowRateWasAutoSized; // true if previous was autosize on input
 		Real64 MassFlowRateMax; // design nominal capacity of Pump
 		bool EMSMassFlowOverrideOn; // if true, then EMS is calling to override flow requests.
 		Real64 EMSMassFlowValue; // EMS value to use for mass flow rate [kg/s]
 		Real64 NomSteamVolFlowRate; // For Steam Pump
+		bool NomSteamVolFlowRateWasAutoSized; // true if steam volume flow rate was autosize on input
 		Real64 MinVolFlowRate; // For a Variable Flow Pump this is the minimum capacity during operation.
 		Real64 MassFlowRateMin; // For a Variable Flow Pump this is the minimum capacity during operation.
 		Real64 NomPumpHead; // design nominal head pressure of Pump, [Pa]
 		bool EMSPressureOverrideOn; // if true, EMS is calling to override pump pressure
 		Real64 EMSPressureOverrideValue; // EMS value to use for pressure [Pa]
 		Real64 NomPowerUse; // design nominal capacity of Pump
+		bool NomPowerUseWasAutoSized; // true if power was autosize on input
 		Real64 MotorEffic; // efficiency of the motor
 		Real64 PumpEffic; // efficiency of the pump
 		Real64 FracMotorLossToFluid; // ?????
 		Real64 Energy; // Energy consumed
 		Real64 Power; // Power used
-		FArray1D< Real64 > PartLoadCoef; // Pump Curve Coefficients
+		Array1D< Real64 > PartLoadCoef; // Pump Curve Coefficients
 		int PressureCurve_Index; // Pointer to a pump coefficient curve
 		Real64 PumpMassFlowRateMaxRPM; // Mass flow rate calculated from maximum rpm
 		Real64 PumpMassFlowRateMinRPM; // Mass flow rate calculated from minimum rpm
@@ -206,16 +209,19 @@ namespace Pumps {
 			PowerErrIndex2( 0 ),
 			MinVolFlowRateFrac( 0.0 ),
 			NomVolFlowRate( 0.0 ),
+			NomVolFlowRateWasAutoSized( false ),
 			MassFlowRateMax( 0.0 ),
 			EMSMassFlowOverrideOn( false ),
 			EMSMassFlowValue( 0.0 ),
 			NomSteamVolFlowRate( 0.0 ),
+			NomSteamVolFlowRateWasAutoSized( false ),
 			MinVolFlowRate( 0.0 ),
 			MassFlowRateMin( 0.0 ),
 			NomPumpHead( 0.0 ),
 			EMSPressureOverrideOn( false ),
 			EMSPressureOverrideValue( 0.0 ),
 			NomPowerUse( 0.0 ),
+			NomPowerUseWasAutoSized( false ),
 			MotorEffic( 0.0 ),
 			PumpEffic( 0.0 ),
 			FracMotorLossToFluid( 0.0 ),
@@ -263,6 +269,7 @@ namespace Pumps {
 			int const PowerErrIndex2, // for recurring errors
 			Real64 const MinVolFlowRateFrac, // minimum schedule value fraction modifier
 			Real64 const NomVolFlowRate, // design nominal capacity of Pump
+			bool const NomVolFlowRateWasAutoSized, // true if nom vol flow rate was autosize
 			Real64 const MassFlowRateMax, // design nominal capacity of Pump
 			bool const EMSMassFlowOverrideOn, // if true, then EMS is calling to override flow requests.
 			Real64 const EMSMassFlowValue, // EMS value to use for mass flow rate [kg/s]
@@ -273,12 +280,13 @@ namespace Pumps {
 			bool const EMSPressureOverrideOn, // if true, EMS is calling to override pump pressure
 			Real64 const EMSPressureOverrideValue, // EMS value to use for pressure [Pa]
 			Real64 const NomPowerUse, // design nominal capacity of Pump
+			bool const NomPowerUseWasAutoSized, // true if previous is autosize on input
 			Real64 const MotorEffic, // efficiency of the motor
 			Real64 const PumpEffic, // efficiency of the pump
 			Real64 const FracMotorLossToFluid, // ?????
 			Real64 const Energy, // Energy consumed
 			Real64 const Power, // Power used
-			FArray1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
+			Array1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
 			int const PressureCurve_Index, // Pointer to a pump coefficient curve
 			Real64 const PumpMassFlowRateMaxRPM, // Mass flow rate calculated from maximum rpm
 			Real64 const PumpMassFlowRateMinRPM, // Mass flow rate calculated from minimum rpm
@@ -318,6 +326,7 @@ namespace Pumps {
 			PowerErrIndex2( PowerErrIndex2 ),
 			MinVolFlowRateFrac( MinVolFlowRateFrac ),
 			NomVolFlowRate( NomVolFlowRate ),
+			NomVolFlowRateWasAutoSized( NomVolFlowRateWasAutoSized ),
 			MassFlowRateMax( MassFlowRateMax ),
 			EMSMassFlowOverrideOn( EMSMassFlowOverrideOn ),
 			EMSMassFlowValue( EMSMassFlowValue ),
@@ -328,6 +337,7 @@ namespace Pumps {
 			EMSPressureOverrideOn( EMSPressureOverrideOn ),
 			EMSPressureOverrideValue( EMSPressureOverrideValue ),
 			NomPowerUse( NomPowerUse ),
+			NomPowerUseWasAutoSized( NomPowerUseWasAutoSized ),
 			MotorEffic( MotorEffic ),
 			PumpEffic( PumpEffic ),
 			FracMotorLossToFluid( FracMotorLossToFluid ),
@@ -412,8 +422,8 @@ namespace Pumps {
 	};
 
 	// Object Data
-	extern FArray1D< PumpSpecs > PumpEquip;
-	extern FArray1D< ReportVars > PumpEquipReport;
+	extern Array1D< PumpSpecs > PumpEquip;
+	extern Array1D< ReportVars > PumpEquipReport;
 
 	// Functions
 

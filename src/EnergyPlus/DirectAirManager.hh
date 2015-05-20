@@ -2,7 +2,7 @@
 #define DirectAirManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -21,7 +21,7 @@ namespace DirectAirManager {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumDirectAir;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
@@ -111,7 +111,7 @@ namespace DirectAirManager {
 	};
 
 	// Object Data
-	extern FArray1D< DirectAirProps > DirectAir;
+	extern Array1D< DirectAirProps > DirectAir;
 
 	// Functions
 

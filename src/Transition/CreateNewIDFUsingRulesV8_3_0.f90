@@ -9,8 +9,8 @@ CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
       VerString='Conversion 8.2 => 8.3'
-      VersionNum=8.2
-      sVersionNum='8.2'
+      VersionNum=8.3
+      sVersionNum='8.3'
       IDDFileNameWithPath=TRIM(ProgramPath)//'V8-2-0-Energy+.idd'
       NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-3-0-Energy+.idd'
       RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-2-0 to 8-3-0.csv'
@@ -421,6 +421,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! new fields F21-25 are shifted
                 OutArgs(21:25) = InArgs(14:18)
                 ! there are some additional new fields, but they are optional and intentionally blank
+                CurArgs = CurArgs + 7
                 
               CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
                 ! data center hvac changes
@@ -437,6 +438,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! shift the rest
                 OutArgs(8:13) = InArgs(5:10)
                 ! there are some additional new fields, but they are optional and intentionally blank
+                CurArgs = CurArgs + 3
                 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

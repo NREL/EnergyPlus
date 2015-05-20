@@ -9,12 +9,13 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Vector2.fwd.hh>
+#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -565,48 +566,6 @@ public: // Properties: Predicates
 		return ( length_squared() == T( 1 ) );
 	}
 
-public: // Properties: Comparison
-
-	// Equal Length?
-	inline
-	bool
-	equal_length( Vector2 const & v )
-	{
-		return ( length_squared() == v.length_squared() );
-	}
-
-	// Longer?
-	inline
-	bool
-	longer( Vector2 const & v )
-	{
-		return ( length_squared() > v.length_squared() );
-	}
-
-	// Longer or Equal Length?
-	inline
-	bool
-	longer_or_equal( Vector2 const & v )
-	{
-		return ( length_squared() >= v.length_squared() );
-	}
-
-	// Shorter?
-	inline
-	bool
-	shorter( Vector2 const & v )
-	{
-		return ( length_squared() < v.length_squared() );
-	}
-
-	// Shorter or Equal Length?
-	inline
-	bool
-	shorter_or_equal( Vector2 const & v )
-	{
-		return ( length_squared() <= v.length_squared() );
-	}
-
 public: // Properties: General
 
 	// Size
@@ -673,7 +632,7 @@ public: // Properties: General
 		return std::max( std::abs( x ), std::abs( y ) );
 	}
 
-	// Distance
+	// Distance to a Vector2
 	inline
 	T
 	distance( Vector2 const & v ) const
@@ -681,7 +640,7 @@ public: // Properties: General
 		return std::sqrt( square( x - v.x ) + square( y - v.y ) );
 	}
 
-	// Distance Squared
+	// Distance Squared to a Vector2
 	inline
 	T
 	distance_squared( Vector2 const & v ) const
@@ -689,7 +648,7 @@ public: // Properties: General
 		return square( x - v.x ) + square( y - v.y );
 	}
 
-	// Dot Product
+	// Dot Product with a Vector2
 	inline
 	T
 	dot( Vector2 const & v ) const
@@ -697,7 +656,7 @@ public: // Properties: General
 		return ( x * v.x ) + ( y * v.y );
 	}
 
-	// Dot Product
+	// Dot Product with an Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
 	inline
 	T
@@ -807,6 +766,22 @@ public: // Modifiers
 		return *this;
 	}
 
+	// Normalize to a Length: Uniform Vector2 if Length is Zero
+	inline
+	Vector2 &
+	normalize_uniform( T const & tar_length = T( 1 ) )
+	{
+		T const cur_length( length() );
+		if ( cur_length > T( 0 ) ) {
+			T const dilation( tar_length / cur_length );
+			x *= dilation;
+			y *= dilation;
+		} else { // Set uniform vector
+			operator =( uniform_vector( tar_length ) );
+		}
+		return *this;
+	}
+
 	// Normalize to a Length: x Vector2 if Length is Zero
 	inline
 	Vector2 &
@@ -841,23 +816,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Normalize to a Length: Uniform Vector2 if Length is Zero
-	inline
-	Vector2 &
-	normalize_uniform( T const & tar_length = T( 1 ) )
-	{
-		T const cur_length( length() );
-		if ( cur_length > T( 0 ) ) {
-			T const dilation( tar_length / cur_length );
-			x *= dilation;
-			y *= dilation;
-		} else { // Set uniform vector
-			operator =( uniform_vector( tar_length ) );
-		}
-		return *this;
-	}
-
-	// Set Minimum Coordinates wrt a Vector2
+	// Minimum Coordinates with a Vector2
 	inline
 	Vector2 &
 	min( Vector2 const & v )
@@ -867,7 +826,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Set Maximum Coordinates wrt a Vector2
+	// Maximum Coordinates with a Vector2
 	inline
 	Vector2 &
 	max( Vector2 const & v )
@@ -877,68 +836,27 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Sum of Vector2s
+	// Sum In a Vector2
 	inline
 	Vector2 &
-	sum( Vector2 const & a, Vector2 const & b )
+	sum( Vector2 const & v )
 	{
-		x = a.x + b.x;
-		y = a.y + b.y;
+		x += v.x;
+		y += v.y;
 		return *this;
 	}
 
-	// Difference of Vector2s
+	// Subtract Out a Vector2
 	inline
 	Vector2 &
-	diff( Vector2 const & a, Vector2 const & b )
+	sub( Vector2 const & v )
 	{
-		x = a.x - b.x;
-		y = a.y - b.y;
+		x -= v.x;
+		y -= v.y;
 		return *this;
 	}
 
-	// Midpoint of Two Vector2s
-	inline
-	Vector2 &
-	mid( Vector2 const & a, Vector2 const & b )
-	{
-		x = T( 0.5 * ( a.x + b.x ) );
-		y = T( 0.5 * ( a.y + b.y ) );
-		return *this;
-	}
-
-	// Center of Two Vector2s
-	inline
-	Vector2 &
-	cen( Vector2 const & a, Vector2 const & b )
-	{
-		x = T( 0.5 * ( a.x + b.x ) );
-		y = T( 0.5 * ( a.y + b.y ) );
-		return *this;
-	}
-
-	// Center of Three Vector2s
-	inline
-	Vector2 &
-	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		static long double const third( 1.0 / 3.0 );
-		x = T( third * ( a.x + b.x + c.x ) );
-		y = T( third * ( a.y + b.y + c.y ) );
-		return *this;
-	}
-
-	// Center of Four Vector2s
-	inline
-	Vector2 &
-	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
-	{
-		x = T( 0.25 * ( a.x + b.x + c.x + d.x ) );
-		y = T( 0.25 * ( a.y + b.y + c.y + d.y ) );
-		return *this;
-	}
-
-	// Project Normally onto a Vector2
+	// Project Normal to a Vector2
 	inline
 	Vector2 &
 	project_normal( Vector2 const & v )
@@ -950,7 +868,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Project in Direction of a Vector2
+	// Project onto a Vector2
 	inline
 	Vector2 &
 	project_parallel( Vector2 const & v )
@@ -1011,6 +929,23 @@ public: // Generators
 		}
 	}
 
+	// Normalized to a Length: Uniform Vector2 if Length is Zero
+	inline
+	Vector2
+	normalized_uniform( T const & tar_length = T( 1 ) ) const
+	{
+		T const cur_length( length() );
+		if ( cur_length > T( 0 ) ) {
+			T const dilation( tar_length / cur_length );
+			return Vector2(
+			 x * dilation,
+			 y * dilation
+			);
+		} else { // Return uniform vector
+			return uniform_vector( tar_length );
+		}
+	}
+
 	// Normalized to a Length: x Vector2 if Length is Zero
 	inline
 	Vector2
@@ -1042,40 +977,6 @@ public: // Generators
 			);
 		} else { // Return y vector
 			return Vector2( T( 0 ), tar_length, T( 0 ) );
-		}
-	}
-
-	// Normalized to a Length: z Vector2 if Length is Zero
-	inline
-	Vector2
-	normalized_z( T const & tar_length = T( 1 ) ) const
-	{
-		T const cur_length( length() );
-		if ( cur_length > T( 0 ) ) {
-			T const dilation( tar_length / cur_length );
-			return Vector2(
-			 x * dilation,
-			 y * dilation
-			);
-		} else { // Return z vector
-			return Vector2( tar_length, T( 0 ), T( 0 ), tar_length );
-		}
-	}
-
-	// Normalized to a Length: Uniform Vector2 if Length is Zero
-	inline
-	Vector2
-	normalized_uniform( T const & tar_length = T( 1 ) ) const
-	{
-		T const cur_length( length() );
-		if ( cur_length > T( 0 ) ) {
-			T const dilation( tar_length / cur_length );
-			return Vector2(
-			 x * dilation,
-			 y * dilation
-			);
-		} else { // Return uniform vector
-			return uniform_vector( tar_length );
 		}
 	}
 
@@ -1205,7 +1106,7 @@ public: // Generators
 		return Vector2( t / v.x, t / v.y );
 	}
 
-	// Vector2 with Min Coordinates of Two Vector2s
+	// Minimum of Two Vector2s
 	friend
 	inline
 	Vector2
@@ -1217,7 +1118,31 @@ public: // Generators
 		);
 	}
 
-	// Vector2 with Max Coordinates of Two Vector2s
+	// Minimum of Three Vector2s
+	friend
+	inline
+	Vector2
+	min( Vector2 const & a, Vector2 const & b, Vector2 const & c )
+	{
+		return Vector2(
+		 ObjexxFCL::min( a.x, b.x, c.x ),
+		 ObjexxFCL::min( a.y, b.y, c.y )
+		);
+	}
+
+	// Minimum of Four Vector2s
+	friend
+	inline
+	Vector2
+	min( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
+	{
+		return Vector2(
+		 ObjexxFCL::min( a.x, b.x, c.x, d.x ),
+		 ObjexxFCL::min( a.y, b.y, c.y, d.y )
+		);
+	}
+
+	// Maximum of Two Vector2s
 	friend
 	inline
 	Vector2
@@ -1229,7 +1154,116 @@ public: // Generators
 		);
 	}
 
-	// Projected Normally onto a Vector2
+	// Maximum of Three Vector2s
+	friend
+	inline
+	Vector2
+	max( Vector2 const & a, Vector2 const & b, Vector2 const & c )
+	{
+		return Vector2(
+		 ObjexxFCL::max( a.x, b.x, c.x ),
+		 ObjexxFCL::max( a.y, b.y, c.y )
+		);
+	}
+
+	// Maximum of Four Vector2s
+	friend
+	inline
+	Vector2
+	max( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
+	{
+		return Vector2(
+		 ObjexxFCL::max( a.x, b.x, c.x, d.x ),
+		 ObjexxFCL::max( a.y, b.y, c.y, d.y )
+		);
+	}
+
+	// Sum of Two Vector2s
+	friend
+	inline
+	Vector2
+	sum( Vector2 const & a, Vector2 const & b )
+	{
+		return Vector2( a.x + b.x, a.y + b.y );
+	}
+
+	// Sum of Three Vector2s
+	friend
+	inline
+	Vector2
+	sum( Vector2 const & a, Vector2 const & b, Vector2 const & c )
+	{
+		return Vector2( a.x + b.x + c.x, a.y + b.y + c.y );
+	}
+
+	// Sum of Four Vector2s
+	friend
+	inline
+	Vector2
+	sum( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
+	{
+		return Vector2( a.x + b.x + c.x + d.x, a.y + b.y + c.y + d.y );
+	}
+
+	// Subtract of Two Vector2s
+	friend
+	inline
+	Vector2
+	sub( Vector2 const & a, Vector2 const & b )
+	{
+		return Vector2( a.x - b.x, a.y - b.y );
+	}
+
+	// Midpoint of Two Vector2s
+	friend
+	inline
+	Vector2
+	mid( Vector2 const & a, Vector2 const & b )
+	{
+		return Vector2(
+		 T( 0.5 * ( a.x + b.x ) ),
+		 T( 0.5 * ( a.y + b.y ) )
+		);
+	}
+
+	// Center of Two Vector2s
+	friend
+	inline
+	Vector2
+	cen( Vector2 const & a, Vector2 const & b )
+	{
+		return Vector2(
+		 T( 0.5 * ( a.x + b.x ) ),
+		 T( 0.5 * ( a.y + b.y ) )
+		);
+	}
+
+	// Center of Three Vector2s
+	friend
+	inline
+	Vector2
+	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c )
+	{
+		static long double const third( 1.0 / 3.0 );
+		return Vector2(
+		 T( third * ( a.x + b.x + c.x ) ),
+		 T( third * ( a.y + b.y + c.y ) )
+		);
+	}
+
+	// Center of Four Vector2s
+	friend
+	inline
+	Vector2
+	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
+	{
+		return Vector2(
+		 T( 0.25 * ( a.x + b.x + c.x + d.x ) ),
+		 T( 0.25 * ( a.y + b.y + c.y + d.y ) )
+		);
+	}
+
+	// Projected Normal to a Vector2
 	inline
 	Vector2
 	projected_normal( Vector2 const & v ) const
@@ -1239,7 +1273,7 @@ public: // Generators
 		return Vector2( x - ( c * v.x ), y - ( c * v.y ) );
 	}
 
-	// Projected in Direction of a Vector2
+	// Projected onto a Vector2
 	inline
 	Vector2
 	projected_parallel( Vector2 const & v ) const
@@ -1475,14 +1509,6 @@ public: // Friends: Comparison
 	}
 
 	// Not Equal Length?
-	inline
-	bool
-	not_equal_length( Vector2 const & v )
-	{
-		return ( length_squared() != v.length_squared() );
-	}
-
-	// Not Equal Length?
 	friend
 	inline
 	bool
@@ -1527,55 +1553,6 @@ public: // Friends
 	cross( Vector2 const & a, Vector2 const & b )
 	{
 		return ( a.x * b.y ) - ( a.y * b.x );
-	}
-
-	// Midpoint of Two Vector2s
-	friend
-	inline
-	Vector2
-	mid( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2(
-		 T( 0.5 * ( a.x + b.x ) ),
-		 T( 0.5 * ( a.y + b.y ) )
-		);
-	}
-
-	// Center of Two Vector2s
-	friend
-	inline
-	Vector2
-	cen( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2(
-		 T( 0.5 * ( a.x + b.x ) ),
-		 T( 0.5 * ( a.y + b.y ) )
-		);
-	}
-
-	// Center of Three Vector2s
-	friend
-	inline
-	Vector2
-	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		static long double const third( 1.0 / 3.0 );
-		return Vector2(
-		 T( third * ( a.x + b.x + c.x ) ),
-		 T( third * ( a.y + b.y + c.y ) )
-		);
-	}
-
-	// Center of Four Vector2s
-	friend
-	inline
-	Vector2
-	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
-	{
-		return Vector2(
-		 T( 0.25 * ( a.x + b.x + c.x + d.x ) ),
-		 T( 0.25 * ( a.y + b.y + c.y + d.y ) )
-		);
 	}
 
 	// Angle Between Two Vector2s (in Radians on [0,pi])
@@ -1730,7 +1707,7 @@ public: // Data
 
 }; // Vector2
 
-// stream << Vector2 output operator
+// Stream << Vector2 output operator
 template< typename T >
 std::ostream &
 operator <<( std::ostream & stream, Vector2< T > const & v )
@@ -1754,7 +1731,7 @@ operator <<( std::ostream & stream, Vector2< T > const & v )
 	return stream;
 }
 
-// stream >> Vector2 input operator
+// Stream >> Vector2 input operator
 //  Supports whitespace-separated values with optional commas between values as long as whitespace is also present
 //  String or char values containing whitespace or commas or enclosed in quotes are not supported
 //  Vector can optionally be enclosed in parentheses () or square brackets []
