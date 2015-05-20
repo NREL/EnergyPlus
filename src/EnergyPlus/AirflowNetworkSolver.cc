@@ -843,11 +843,9 @@ namespace AirflowNetworkSolver {
 		int JHK1;
 		int newsum;
 		int newh;
-		int Nzeros;
 		int ispan;
 		int thisIK;
 		bool allZero; // noel
-		static bool firstTime( true ); // noel
 #endif
 		Array1D< Real64 > X( 4 );
 		Real64 DP;
@@ -3878,7 +3876,6 @@ Label90: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const RealMax( 0.1e+37 );
 		Real64 const RealMin( 1e-37 );
 		static Real64 const sqrt_1_2( std::sqrt( 1.2 ) );
 

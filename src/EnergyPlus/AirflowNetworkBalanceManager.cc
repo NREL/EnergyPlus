@@ -260,7 +260,6 @@ namespace AirflowNetworkBalanceManager {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TurnFansOn;
-		using DataHVACGlobals::TurnFansOff;
 		using DataHVACGlobals::VerySmallMassFlow;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
 		using DataAirLoop::LoopOnOffFanRTF;
@@ -399,7 +398,6 @@ namespace AirflowNetworkBalanceManager {
 		using HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent;
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
-		using ThermalComfort::ThermalComfortData;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3639,9 +3637,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// Using/Aliasing
-		using DataAirLoop::AirToZoneNodeInfo;
 		using DataHVACGlobals::TurnFansOn;
-		using DataHVACGlobals::TurnFansOff;
 		using InputProcessor::SameString; // NEEDS TO BE CHANGED after V1.3 release!!!
 
 		// Locals
@@ -4660,8 +4656,6 @@ namespace AirflowNetworkBalanceManager {
 		int LF;
 		int LT;
 		int CompNum;
-		int NF;
-		int NT;
 		int CompTypeNum;
 		int TypeNum;
 		std::string CompName;
@@ -4875,8 +4869,6 @@ namespace AirflowNetworkBalanceManager {
 		int LF;
 		int LT;
 		int CompNum;
-		int NF;
-		int NT;
 		int CompTypeNum;
 		int TypeNum;
 		std::string CompName;
@@ -5173,7 +5165,6 @@ namespace AirflowNetworkBalanceManager {
 		using DataHeatBalance::ZonePreDefRep;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::TurnFansOn;
-		using DataHVACGlobals::TurnFansOff;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5571,7 +5562,6 @@ namespace AirflowNetworkBalanceManager {
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::TurnFansOn;
-		using DataHVACGlobals::TurnFansOff;
 		using DataHVACGlobals::VerySmallMassFlow;
 		using DataAirLoop::LoopSystemOnMassFlowrate;
 		using DataAirLoop::LoopSystemOffMassFlowrate;
@@ -6294,13 +6284,10 @@ namespace AirflowNetworkBalanceManager {
 
 		// Using/Aliasing
 		using DataAirLoop::AirToZoneNodeInfo;
-		using DataAirLoop::AirToOANodeInfo;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using MixedAir::GetNumOAMixers;
 		using MixedAir::GetOAMixerReliefNodeNumber;
 		using MixedAir::GetOAMixerInletNodeNumber;
-		using HeatingCoils::HeatingCoil;
-		using HeatingCoils::NumHeatingCoils;
 		using SingleDuct::GetHVACSingleDuctSysIndex;
 		using InputProcessor::SameString; // NEEDS TO BE CHANGED AFTER V1.3 RELEASE
 		using InputProcessor::MakeUPPERCase;
@@ -7084,8 +7071,6 @@ namespace AirflowNetworkBalanceManager {
 		Real64 ZoneAng1;
 		Real64 ZoneAng2;
 		Real64 ZoneAngDiff;
-		Real64 SSZoneNum;
-		Real64 SmallArea;
 		Array1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
 		Array1D< Real64 > PiFormula; // Formula for the mean pressure difference
 		Array1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference
@@ -7560,7 +7545,6 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const TimeCloseDuration
 		)// function to perform calculations of opening probability
 	{
-		using DataHeatBalance::ZnRpt;
 		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 		using DataHeatBalFanSys::ZoneThermostatSetPointHi;

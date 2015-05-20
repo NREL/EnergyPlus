@@ -128,17 +128,6 @@ namespace BaseboardRadiator {
 		using General::TrimSigDigits;
 		using PlantUtilities::SetActuatedBranchFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 30 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum; // index of unit in baseboard array
@@ -612,7 +601,6 @@ namespace BaseboardRadiator {
 		bool ErrorsFound; // If errors detected in input
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		Real64 tmpWaterVolFlowRateMax; // local design plant fluid flow rate
 		bool FlowAutoSize; // Indicator to autosizing water volume flow
 		bool UAAutoSize; // Indicator to autosizing UA
 		Real64 WaterVolFlowRateMaxDes; // Design water volume flow for reproting
@@ -1214,8 +1202,6 @@ namespace BaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum;
-		int InletNodeNum;
-		int OutletNodeNum;
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {

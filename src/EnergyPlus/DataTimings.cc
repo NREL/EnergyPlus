@@ -136,8 +136,6 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop; // testing if already in structure
-		int found; // indicator for element
 
 		// Object Data
 		Array1D< timings > tempTiming; // used for reallocate.
@@ -146,6 +144,8 @@ namespace DataTimings {
 		return;
 #endif
 #ifdef EP_Timings
+		int loop; // testing if already in structure
+		int found; // indicator for element
 		if ( NumTimingElements == 0 ) {
 			MaxTimingElements = 250;
 			Timing.allocate( MaxTimingElements );
@@ -221,14 +221,14 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop; // testing if already in structure
-		int found; // indicator for element
-		Real64 stoptime;
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop; // testing if already in structure
+		int found; // indicator for element
+		Real64 stoptime;
 		found = 0;
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {
 			if ( Timing( loop ).Element != ctimingElementstring ) continue;
@@ -315,13 +315,13 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop;
-		int EchoInputFile;
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop;
+		int EchoInputFile;
 		EchoInputFile = FindUnitNumber( outputAuditFile );
 		gio::write( EchoInputFile, fmtA ) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 

@@ -212,7 +212,6 @@ namespace CondenserLoopTowers {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using DataPlant::PlantFirstSizesOkayToFinalize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2107,7 +2106,6 @@ namespace CondenserLoopTowers {
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::TypeOf_CoolingTower_VarSpdMerkel;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -5561,7 +5559,6 @@ namespace CondenserLoopTowers {
 
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
-		using DataGlobals::BeginTimeStepFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataWater::WaterStorage;

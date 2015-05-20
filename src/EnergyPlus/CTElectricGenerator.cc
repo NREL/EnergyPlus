@@ -512,7 +512,6 @@ namespace CTElectricGenerator {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 
 		using DataEnvironment::OutDryBulbTemp;

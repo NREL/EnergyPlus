@@ -554,11 +554,9 @@ namespace ICEngineElectricGenerator {
 		// REFERENCES:na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using CurveManager::CurveValue;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using DataPlant::PlantLoop;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -603,7 +601,6 @@ namespace ICEngineElectricGenerator {
 		int HeatRecInNode; // Heat Recovery Fluid Inlet Node Num
 		Real64 HeatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
 		Real64 HeatRecMdot; // Heat Recovery Fluid Mass FlowRate (kg/s)
-		Real64 HeatRecCp; // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 		Real64 HRecRatio; // When Max Temp is reached the amount of recovered heat has to be reduced.
 		// and this assumption uses this ratio to accomplish this task.
 
@@ -615,7 +612,6 @@ namespace ICEngineElectricGenerator {
 		if ( ICEngineGenerator( GeneratorNum ).HeatRecActive ) {
 			HeatRecInNode = ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum;
 			HeatRecInTemp = Node( HeatRecInNode ).Temp;
-			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 			HeatRecMdot = Node( HeatRecInNode ).MassFlowRate;
 
 		} else {
@@ -795,7 +791,6 @@ namespace ICEngineElectricGenerator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HeatRecInNode;
-		int HeatRecOutNode;
 		Real64 MinHeatRecMdot;
 		Real64 HeatRecInTemp;
 		Real64 HeatRecOutTemp;
@@ -803,7 +798,6 @@ namespace ICEngineElectricGenerator {
 
 		//Load inputs to local structure
 		HeatRecInNode = ICEngineGenerator( Num ).HeatRecInletNodeNum;
-		HeatRecOutNode = ICEngineGenerator( Num ).HeatRecOutletNodeNum;
 
 		//Need to set the HeatRecRatio to 1.0 if it is not modified
 		HRecRatio = 1.0;
@@ -1015,11 +1009,9 @@ namespace ICEngineElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int HeatRecInletNode;
 		int HeatRecOutletNode;
 
 		if ( ICEngineGenerator( Num ).HeatRecActive ) {
-			HeatRecInletNode = ICEngineGenerator( Num ).HeatRecInletNodeNum;
 			HeatRecOutletNode = ICEngineGenerator( Num ).HeatRecOutletNodeNum;
 			//      Node(HeatRecOutletNode)%MassFlowRate            = ICEngineGenerator(Num)%HeatRecMdotActual
 			Node( HeatRecOutletNode ).Temp = ICEngineGenerator( Num ).HeatRecOutletTemp;

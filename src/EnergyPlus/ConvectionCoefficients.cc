@@ -1131,7 +1131,6 @@ namespace ConvectionCoefficients {
 		int NumField;
 		std::string CurrentModuleObject;
 		int PotentialAssignedValue;
-		int ZoneNum;
 		int SurfNum;
 
 		// first get user-defined H models so they can be processed for later objects
@@ -3710,7 +3709,6 @@ namespace ConvectionCoefficients {
 		// na
 
 		// Locals
-		Real64 const OneThird( ( 1.0 / 3.0 ) ); // 1/3 in highest precision
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
