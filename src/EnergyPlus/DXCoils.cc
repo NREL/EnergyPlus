@@ -13344,9 +13344,9 @@ Label50: ;
 		Real64 FullLoadOutAirHumRat; // evaporator outlet humidity ratio at full load
 		Real64 FullLoadOutAirTemp; // evaporator outlet air temperature at full load [C]
 		Real64 hTinwout; // Enthalpy at inlet dry-bulb and outlet humidity ratio [J/kg]
-		Real64 SHR; // sensible heat ratio
+		Real64 SHR( 0 ); // sensible heat ratio
 		Real64 RhoAir; // secondary coil entering air density [kg/m3]
-		Real64 PartLoadRatio; // primary coil part-load ratio [-]
+		Real64 PartLoadRatio( 0 ); // primary coil part-load ratio [-]
 		Real64 SecCoilRatedSHR; // secondary DX coil nominal or rated sensible heat ratio
 		Real64 SecCoilFlowFraction; // secondary coil flow fraction, is 1.0 for single speed machine
 		Real64 TotalHeatRemovalRate; // secondary coil total heat removal rate

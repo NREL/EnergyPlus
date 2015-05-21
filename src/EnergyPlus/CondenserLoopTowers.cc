@@ -2984,8 +2984,8 @@ namespace CondenserLoopTowers {
 		Real64 UA0; // Lower bound for UA [W/C]
 		Real64 UA1; // Upper bound for UA [W/C]
 		Real64 DesTowerLoad; // Design tower load [W]
-		Real64 Cp; // local specific heat for fluid
-		Real64 rho; // local density for fluid
+		Real64 Cp( 0 ); // local specific heat for fluid
+		Real64 rho( 0 ); // local density for fluid
 		Real64 UA; // Calculated UA value
 		Real64 OutWaterTemp;
 

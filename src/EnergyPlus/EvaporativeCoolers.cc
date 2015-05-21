@@ -2562,7 +2562,7 @@ namespace EvaporativeCoolers {
 		Real64 PartLoad;
 		Real64 EffModCurveValue; // effectiveness modifier curve value
 		Real64 PumpPowerModCurveValue; // recirculation pump power modifier curve value
-		Real64 FlowRatio; // primary air flow frcation (current flow divided by the design flow rate)
+		Real64 FlowRatio( 0 ); // primary air flow frcation (current flow divided by the design flow rate)
 		Real64 MassFlowRateSysDesign; // primary air design mass flow rate
 		Real64 MassFlowRateSys; // primary air current mass flow rate
 		int InletNode; // inlet node number

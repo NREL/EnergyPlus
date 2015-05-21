@@ -1418,8 +1418,8 @@ namespace ChillerReformulatedEIR {
 		Real64 EIRFTYTmax; // Maximum condenser leaving temperature allowed by EIRFT curve [C]
 		Real64 EIRFPLRTmin; // Minimum condenser leaving temperature allowed by EIRFPLR curve [C]
 		Real64 EIRFPLRTmax; // Maximum condenser leaving temperature allowed by EIRFPLR curve [C]
-		Real64 Tmin; // Minimum condenser leaving temperature allowed by curve objects [C]
-		Real64 Tmax; // Maximum condenser leaving temperature allowed by curve objects [C]
+		Real64 Tmin( -99 ); // Minimum condenser leaving temperature allowed by curve objects [C]
+		Real64 Tmax( -99 ); // Maximum condenser leaving temperature allowed by curve objects [C]
 		Array1D< Real64 > Par( 6 ); // Pass parameters for RegulaFalsi solver
 		Real64 FalsiCondOutTemp; // RegulaFalsi condenser outlet temperature result [C]
 		int SolFla; // Feedback flag from SolveRegulaFalsi

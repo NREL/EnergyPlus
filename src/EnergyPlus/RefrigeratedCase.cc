@@ -11558,7 +11558,7 @@ namespace RefrigeratedCase {
 		Real64 TBrineIn; // Brine temperature going to heat exchanger, C
 		Real64 TCondense; // Condensing temperature for a phase change secondary loop, C
 		Real64 TEvap; // Evaporating temperature in secondary loop heat exchanger (C)
-		Real64 TotalCoolingLoad; // Cooling load reported back to compressor rack or detailed system (W)
+		Real64 TotalCoolingLoad( 0 ); // Cooling load reported back to compressor rack or detailed system (W)
 		Real64 TotalHotDefrostCondCredit; // Used to credit condenser when heat reclaim used for hot gas/brine defrost (W)
 		Real64 TotalPumpPower; // Total Pumping power for loop, W
 		Real64 TotalLoad; // Total Cooling Load on secondary loop, W

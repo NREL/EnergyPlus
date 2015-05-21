@@ -1047,9 +1047,9 @@ namespace Humidifiers {
 		Real64 HumRatSatApp; // the approximate humidity ratio where the line drawn between inlet and desired outlet conditions
 		// crosses the saturation line.
 		Real64 WaterDens; // density of liquid water [kg/m3]
-		Real64 ThermEffCurveOutput; // thermal efficiency modifier normalized curve output value [-]
+		Real64 ThermEffCurveOutput( 0 ); // thermal efficiency modifier normalized curve output value [-]
 		Real64 PartLoadRatio; // gas fired humidifier part load ratio [-]
-		Real64 GasUseRateAtRatedEff; // gas use rate at rated thermal efficiency [W]
+		Real64 GasUseRateAtRatedEff( 0 ); // gas use rate at rated thermal efficiency [W]
 		Real64 WaterSpecHeatAvg; // specific heat of water [J/kgK]
 		Real64 SteamSatEnthalpy; // enthalpy of saturated steam at 100C [J/kg]
 		Real64 WaterSatEnthalpy; // enthalpy of saturated water at 100C [J/kg]

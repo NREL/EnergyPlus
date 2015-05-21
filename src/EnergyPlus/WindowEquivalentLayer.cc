@@ -745,9 +745,9 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NL; // Number of layers
-		Real64 TIN;
+		Real64 TIN( 0 );
 		Real64 TRMIN;
-		Real64 Tout;
+		Real64 Tout( 0 );
 		Real64 TRMOUT;
 		Real64 UCG;
 		Real64 SHGC;
@@ -779,11 +779,11 @@ namespace WindowEquivalentLayer {
 		int ZoneNumAdj; // An interzone surface's adjacent zone number
 		Real64 LWAbsIn; // effective long wave absorptance/emissivity back side
 		Real64 LWAbsOut; // effective long wave absorptance/emissivity front side
-		Real64 outir;
+		Real64 outir( 0 );
 		Real64 rmir;
 		Real64 Ebout;
 		Real64 QXConv; // extra convective gain from this surface
-		Real64 TaIn; // zone air temperature
+		Real64 TaIn( 0 ); // zone air temperature
 		Real64 tsky; // sky temperature
 		Real64 HcIn; // inside convection coeficient at this timestep, W/m2K
 		Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
@@ -4206,13 +4206,13 @@ namespace WindowEquivalentLayer {
 		Real64 XC;
 		Real64 XD;
 		Real64 XE;
-		Real64 XF;
+		Real64 XF( 0 );
 		Real64 YA;
 		Real64 YB;
 		Real64 YC;
 		Real64 YD;
 		Real64 YE;
-		Real64 YF;
+		Real64 YF( 0 );
 		int CORR;
 		// Flow
 

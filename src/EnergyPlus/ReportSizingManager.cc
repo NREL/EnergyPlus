@@ -2049,8 +2049,8 @@ namespace ReportSizingManager {
 		int DDAtTotPeak;
 		int TimeStepAtTotPeak;
 		int TimeStepAtPeak;
-		Real64 ZoneCoolLoadSum; // sum of zone cooling loads at the peak [W]
-		Real64 AvgZoneTemp; // average zone temperature [C]
+		Real64 ZoneCoolLoadSum( 0 ); // sum of zone cooling loads at the peak [W]
+		Real64 AvgZoneTemp( 0 ); // average zone temperature [C]
 		Real64 AvgSupTemp; // average supply temperature for bypass control [C]
 		Real64 TotFlow; // total flow for bypass control [m3/s]
 		Real64 MixTemp; // mixed air temperature at the peak [C]

@@ -247,7 +247,7 @@ namespace GeneratorDynamicsManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool RunFlag; // true if generator supposed to run
-		int DynaCntrlNum; // index in GeneratorDynamics structure for this generator          ! na
+		int DynaCntrlNum( 0 ); // index in GeneratorDynamics structure for this generator          ! na
 		Real64 CurrentFractionalDay; // working var, time in decimal days
 		Real64 EndingFractionalDay; // working var, time is decimal days
 		Real64 LastSystemTimeStepFractionalDay; // working var, time is decimal days
@@ -255,7 +255,7 @@ namespace GeneratorDynamicsManager {
 		Real64 MinPel; // working variabel for min allowed by transient constraint
 		Real64 PelInput; // holds initial value of IN var
 		Real64 Pel;
-		int newOpMode;
+		int newOpMode( 0 );
 		Real64 SchedVal;
 		//  REAL(r64)    :: PelDiff
 		Real64 ElectLoadForThermalRequest;
@@ -773,7 +773,7 @@ namespace GeneratorDynamicsManager {
 		Real64 MdotFuel;
 		Real64 MaxMdot;
 		Real64 MinMdot;
-		int DynaCntrlNum;
+		int DynaCntrlNum( 0 );
 
 		ConstrainedIncreasingMdot = false;
 		ConstrainedDecreasingMdot = false;

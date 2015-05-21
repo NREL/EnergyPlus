@@ -7635,7 +7635,7 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::CycFanCycCoil;
 
 		int WaterThermalTankNum; // index of water heater
-		Real64 NewTankTemp; // resulting tank temperature [C]
+		Real64 NewTankTemp( 0 ); // resulting tank temperature [C]
 		int SpeedNum;
 		int HPNum;
 		Real64 MdotWater(0);

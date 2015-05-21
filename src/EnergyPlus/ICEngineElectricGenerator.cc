@@ -595,7 +595,7 @@ namespace ICEngineElectricGenerator {
 		Real64 ExhaustEnergyRec; // exhaust gas heat recovered (J)
 		Real64 QExhaustTotal; // total engine exhaust heat (W)
 		Real64 ExhaustGasFlow; // exhaust gas mass flow rate (kg/s)
-		Real64 ExhaustStackTemp; // engine stack temp. (C)
+		Real64 ExhaustStackTemp( 0 ); // engine stack temp. (C)
 		Real64 DesignMinExitGasTemp; // design engine stact saturated steam temp. (C)
 		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
 		int HeatRecInNode; // Heat Recovery Fluid Inlet Node Num

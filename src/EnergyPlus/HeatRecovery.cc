@@ -2126,8 +2126,8 @@ namespace HeatRecovery {
 		Real64 Coeff7; // coefficient7 to empirical model (used for both temperature and humidity ratio equations)
 		Real64 Coeff8; // coefficient8 to empirical model (used for both temperature and humidity ratio equations)
 		Real64 BalFaceVelActual; // operating face velocity [m/s]
-		Real64 FullLoadSupOutTemp; // empirical model supply outlet temperature [C]
-		Real64 FullLoadSupOutHumRat; // empirical model supply outlet humidity ratio [kg/kg]
+		Real64 FullLoadSupOutTemp( 0 ); // empirical model supply outlet temperature [C]
+		Real64 FullLoadSupOutHumRat( 0 ); // empirical model supply outlet humidity ratio [kg/kg]
 		Real64 FullLoadDeltaT; // empirical model heat exchanger delta temperature [C]
 		Real64 FullLoadDeltaW; // empirical model heat exchanger delta humidity ratio [kg/kg]
 		Real64 T_RegenInTemp; // empirical model supply (regen) inlet temperature for temperature equation [C]
