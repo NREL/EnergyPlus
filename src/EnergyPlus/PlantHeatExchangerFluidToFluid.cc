@@ -105,8 +105,8 @@ namespace PlantHeatExchangerFluidToFluid {
 	void
 	SimFluidHeatExchanger(
 		int const LoopNum, // plant loop sim call originated from
-		int const EP_UNUSED(LoopSideNum), // plant loop side sim call originated from
-		std::string const & EP_UNUSED(EquipType), // type of equipment, 'PlantComponent:UserDefined'
+		int const EP_UNUSED( LoopSideNum ), // plant loop side sim call originated from
+		std::string const & EP_UNUSED( EquipType ), // type of equipment, 'PlantComponent:UserDefined'
 		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		bool & InitLoopEquip,
@@ -546,7 +546,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	void
 	InitFluidHeatExchanger(
 		int const CompNum,
-		int const EP_UNUSED(LoopNum)
+		int const EP_UNUSED( LoopNum )
 	)
 	{
 
@@ -939,7 +939,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	void
 	ControlFluidHeatExchanger(
 		int const CompNum,
-		int const EP_UNUSED(LoopNum),
+		int const EP_UNUSED( LoopNum ),
 		Real64 const MyLoad
 	)
 	{

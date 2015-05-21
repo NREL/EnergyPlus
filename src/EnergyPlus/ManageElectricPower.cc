@@ -2023,7 +2023,7 @@ namespace ManageElectricPower {
 
 	void
 	CalcLoadCenterThermalLoad(
-		bool const EP_UNUSED(FirstHVACIteration), // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // unused1208
 		int const LoadCenterNum, // Load Center number counter
 		Real64 & ThermalLoad // heat rate called for from cogenerator(watts)
 	)

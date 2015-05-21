@@ -339,7 +339,7 @@ namespace HVACVariableRefrigerantFlow {
 		int & VRFNum, // Index of Equipment
 		bool const FirstHVACIteration, // Flag for first time through HVAC simulation
 		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
-		Real64 const EP_UNUSED(MyLoad), // Loop demand component will meet
+		Real64 const EP_UNUSED( MyLoad ), // Loop demand component will meet
 		Real64 & MaxCap, // Maximum operating capacity of GSHP [W]
 		Real64 & MinCap, // Minimum operating capacity of GSHP [W]
 		Real64 & OptCap, // Optimal operating capacity of GSHP [W]
@@ -426,7 +426,7 @@ namespace HVACVariableRefrigerantFlow {
 	void
 	CalcVRFCondenser(
 		int const VRFCond, // index to VRF condenser
-		bool const EP_UNUSED(FirstHVACIteration) // flag for first time through HVAC system simulation
+		bool const EP_UNUSED( FirstHVACIteration ) // flag for first time through HVAC system simulation
 	)
 	{
 

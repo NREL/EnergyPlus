@@ -2834,7 +2834,7 @@ namespace PlantCondLoopOperation {
 		int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
 		int const CurSchemePtr,
 		Real64 const LoopDemand,
-		Real64 & EP_UNUSED(RemLoopDemand)
+		Real64 & EP_UNUSED( RemLoopDemand )
 	)
 	{
 

@@ -116,8 +116,8 @@ namespace GroundHeatExchangers {
 		int const typeNum,
 		std::string const & name,
 		int & compIndex,
-		bool const EP_UNUSED(runFlag),
-		bool const EP_UNUSED(firstIteration),
+		bool const EP_UNUSED( runFlag ),
+		bool const EP_UNUSED( firstIteration ),
 		bool const initLoopEquip
 	)
 	{
@@ -2239,7 +2239,7 @@ namespace GroundHeatExchangers {
 	Real64
 	GLHEBase::getKAGrndTemp(
 		Real64 const z, // Depth
-		Real64 const EP_UNUSED(dayOfYear), // Day of year
+		Real64 const EP_UNUSED( dayOfYear ), // Day of year
 		Real64 const aveGroundTemp, // Average annual ground tempeature
 		Real64 const aveGroundTempAmplitude, // Average amplitude of annual ground temperature
 		Real64 const phaseShiftInDays // Phase shift

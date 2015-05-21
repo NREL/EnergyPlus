@@ -432,7 +432,7 @@ namespace PondGroundHeatExchanger {
 	InitPondGroundHeatExchanger(
 		int const PondGHENum, // component number
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-		bool const EP_UNUSED(RunFlag) // TRUE if equipment scheduled to operate
+		bool const EP_UNUSED( RunFlag ) // TRUE if equipment scheduled to operate
 	)
 	{
 

@@ -2866,7 +2866,7 @@ namespace VentilatedSlab {
 	void
 	CalcVentilatedSlabRadComps(
 		int const Item, // System index in ventilated slab array
-		bool const EP_UNUSED(FirstHVACIteration) // flag for 1st HVAV iteration in the time step !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // flag for 1st HVAV iteration in the time step !unused1208
 	)
 	{
 
@@ -3612,7 +3612,7 @@ namespace VentilatedSlab {
 	void
 	UpdateVentilatedSlab(
 		int const Item, // Index for the ventilated slab under consideration within the derived types
-		bool const EP_UNUSED(FirstHVACIteration) // TRUE if 1st HVAC simulation of system timestep !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if 1st HVAC simulation of system timestep !unused1208
 	)
 	{
 

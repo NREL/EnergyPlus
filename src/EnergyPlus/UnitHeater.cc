@@ -581,7 +581,7 @@ namespace UnitHeater {
 	InitUnitHeater(
 		int const UnitHeatNum, // index for the current unit heater
 		int const ZoneNum, // number of zone being served
-		bool const EP_UNUSED(FirstHVACIteration) // TRUE if 1st HVAC simulation of system timestep
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if 1st HVAC simulation of system timestep
 	)
 	{
 

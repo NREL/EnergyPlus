@@ -996,7 +996,7 @@ namespace WindowAC {
 	void
 	SimCyclingWindowAC(
 		int const WindACNum, // number of the current window AC unit being simulated
-		int const EP_UNUSED(ZoneNum), // number of zone being served !unused1208
+		int const EP_UNUSED( ZoneNum ), // number of zone being served !unused1208
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
 		Real64 const QZnReq, // Sensible load to be met (W)

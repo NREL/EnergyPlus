@@ -204,7 +204,7 @@ namespace PlantPipingSystemsManager {
 	SimPipingSystemCircuit(
 		std::string const & EquipName, // name of the Pipe Heat Transfer.
 		int & EqNum, // index in local derived types for external calling
-		bool const EP_UNUSED(FirstHVACIteration), // component number
+		bool const EP_UNUSED( FirstHVACIteration ), // component number
 		bool const InitLoopEquip
 	)
 	{
@@ -8249,7 +8249,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateOuterMostRadialSoilSlice(
-		int const EP_UNUSED(DomainNum),
+		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & ThisCell
 	)
@@ -8464,7 +8464,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateInnerMostRadialSoilSlice(
-		int const EP_UNUSED(DomainNum),
+		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & ThisCell
 	)
@@ -8645,7 +8645,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateRadialPipeCell(
-		int const EP_UNUSED(DomainNum),
+		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & ThisCell,
 		Real64 const ConvectionCoefficient

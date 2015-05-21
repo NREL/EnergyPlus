@@ -1244,7 +1244,7 @@ namespace WindowEquivalentLayer {
 	Real64
 	RB_F(
 		Real64 const THETA, // incidence angle, radians
-		int const EP_UNUSED(OPT), // options (unused)
+		int const EP_UNUSED( OPT ), // options (unused)
 		Array1A< Real64 > const P // parameters
 	)
 	{
@@ -2240,14 +2240,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_I(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const EP_UNUSED(OMEGA_H), // horizontal profile angle, radians
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
 		Real64 const DE, // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const EP_UNUSED(RHOBF_BT_PARL),
-		Real64 const EP_UNUSED(TAUBF_BB_PARL),
-		Real64 const EP_UNUSED(TAUBF_BD_PARL),
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -2683,14 +2683,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_II(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const EP_UNUSED(OMEGA_H), // horizontal profile angle, radians
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
 		Real64 const DE, // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const EP_UNUSED(RHOBF_BT_PARL),
-		Real64 const EP_UNUSED(TAUBF_BB_PARL),
-		Real64 const EP_UNUSED(TAUBF_BD_PARL),
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3039,9 +3039,9 @@ namespace WindowEquivalentLayer {
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const EP_UNUSED(RHOBF_BT_PARL),
-		Real64 const EP_UNUSED(TAUBF_BB_PARL),
-		Real64 const EP_UNUSED(TAUBF_BD_PARL),
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3385,14 +3385,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_IV(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const EP_UNUSED(OMEGA_H), // horizontal profile angle, radians
-		Real64 const EP_UNUSED(DE), // width of illumination on pleat bottom (same units as S)
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
+		Real64 const EP_UNUSED( DE ), // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const EP_UNUSED(RHOBF_BT_PARL),
-		Real64 const EP_UNUSED(TAUBF_BB_PARL),
-		Real64 const EP_UNUSED(TAUBF_BD_PARL),
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3590,9 +3590,9 @@ namespace WindowEquivalentLayer {
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const EP_UNUSED(RHOBF_BT_PARL),
-		Real64 const EP_UNUSED(TAUBF_BB_PARL),
-		Real64 const EP_UNUSED(TAUBF_BD_PARL),
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3831,20 +3831,20 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_VI(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const EP_UNUSED(OMEGA_H), // horizontal profile angle, radians
-		Real64 const EP_UNUSED(DE), // width of illumination on pleat bottom (same units as S)
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
+		Real64 const EP_UNUSED( DE ), // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const EP_UNUSED(RHOBF_BT_PARL),
-		Real64 const EP_UNUSED(TAUBF_BB_PARL),
-		Real64 const EP_UNUSED(TAUBF_BD_PARL),
-		Real64 const EP_UNUSED(RHOFF_BT_PERP),
-		Real64 const EP_UNUSED(TAUFF_BB_PERP),
-		Real64 const EP_UNUSED(TAUFF_BD_PERP),
-		Real64 const EP_UNUSED(RHOBF_BT_PERP),
-		Real64 const EP_UNUSED(TAUBF_BB_PERP),
-		Real64 const EP_UNUSED(TAUBF_BD_PERP),
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
+		Real64 const EP_UNUSED( RHOFF_BT_PERP ),
+		Real64 const EP_UNUSED( TAUFF_BB_PERP ),
+		Real64 const EP_UNUSED( TAUFF_BD_PERP ),
+		Real64 const EP_UNUSED( RHOBF_BT_PERP ),
+		Real64 const EP_UNUSED( TAUBF_BB_PERP ),
+		Real64 const EP_UNUSED( TAUBF_BD_PERP ),
 		Real64 const RHOBF_DD, // fabric back diffuse-diffuse reflectance
 		Real64 const RHOFF_DD, // fabric front diffuse-diffuse reflectance
 		Real64 const TAUFF_DD, // fabric front diffuse-diffuse transmittance
@@ -6000,10 +6000,10 @@ namespace WindowEquivalentLayer {
 		Real64 const CK,
 		Real64 const ACP, // gas specific heat coeffs, CP = ACP + BCP*TM + CCP*TM*TM
 		Real64 const BCP,
-		Real64 const EP_UNUSED(CCP),
+		Real64 const EP_UNUSED( CCP ),
 		Real64 const AVISC, // gas viscosity coeffs, VISC = AVISC + BVISC*TM + CVISC*TM*TM
 		Real64 const BVISC,
-		Real64 const EP_UNUSED(CVISC),
+		Real64 const EP_UNUSED( CVISC ),
 		Real64 const RHOGAS // gas density, kg/m3
 	)
 	{

@@ -1066,7 +1066,7 @@ namespace General {
 	std::string
 	TrimSigDigits(
 		int const IntegerValue,
-		Optional_int_const EP_UNUSED(SigDigits) // ignored
+		Optional_int_const EP_UNUSED( SigDigits ) // ignored
 	)
 	{
 
@@ -1255,7 +1255,7 @@ namespace General {
 	std::string
 	RoundSigDigits(
 		int const IntegerValue,
-		Optional_int_const EP_UNUSED(SigDigits) // ignored
+		Optional_int_const EP_UNUSED( SigDigits ) // ignored
 	)
 	{
 

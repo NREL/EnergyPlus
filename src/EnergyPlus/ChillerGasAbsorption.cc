@@ -101,9 +101,9 @@ namespace ChillerGasAbsorption {
 
 	void
 	SimGasAbsorber(
-		std::string const & EP_UNUSED(AbsorberType), // type of Absorber
+		std::string const & EP_UNUSED( AbsorberType ), // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
-		int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE
 		bool const FirstIteration, // initialize variables when TRUE
@@ -540,7 +540,7 @@ namespace ChillerGasAbsorption {
 	void
 	InitGasAbsorber(
 		int const ChillNum, // number of the current engine driven chiller being simulated
-		bool const EP_UNUSED(RunFlag) // TRUE when chiller operating
+		bool const EP_UNUSED( RunFlag ) // TRUE when chiller operating
 	)
 	{
 
@@ -1117,7 +1117,7 @@ namespace ChillerGasAbsorption {
 	CalcGasAbsorberChillerModel(
 		int & ChillNum, // Absorber number
 		Real64 & MyLoad, // operating load
-		bool const EP_UNUSED(RunFlag) // TRUE when Absorber operating
+		bool const EP_UNUSED( RunFlag ) // TRUE when Absorber operating
 	)
 	{
 		// SUBROUTINE INFORMATION:

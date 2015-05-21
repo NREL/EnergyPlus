@@ -101,11 +101,11 @@ namespace SolarCollectors {
 
 	void
 	SimSolarCollector(
-		int const EP_UNUSED(EquipTypeNum),
+		int const EP_UNUSED( EquipTypeNum ),
 		std::string const & CompName,
 		int & CompIndex,
-		bool const EP_UNUSED(InitLoopEquip),
-		bool const EP_UNUSED(FirstHVACIteration)
+		bool const EP_UNUSED( InitLoopEquip ),
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -1382,7 +1382,7 @@ namespace SolarCollectors {
 
 	void
 	ICSCollectorAnalyticalSoluton(
-		int const EP_UNUSED(ColleNum), // solar collector index
+		int const EP_UNUSED( ColleNum ), // solar collector index
 		Real64 const SecInTimeStep, // seconds in a time step
 		Real64 const a1, // coefficient of ODE for Tp
 		Real64 const a2, // coefficient of ODE for Tp

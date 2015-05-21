@@ -87,11 +87,11 @@ namespace WindTurbine {
 
 	void
 	SimWindTurbine(
-		int const EP_UNUSED(GeneratorType), // Type of Generator
+		int const EP_UNUSED( GeneratorType ), // Type of Generator
 		std::string const & GeneratorName, // User specified name of Generator
 		int & GeneratorIndex, // Generator index
 		bool const RunFlag, // ON or OFF
-		Real64 const EP_UNUSED(WTLoad) // Electrical load on WT (not used)
+		Real64 const EP_UNUSED( WTLoad ) // Electrical load on WT (not used)
 	)
 	{
 
@@ -165,7 +165,7 @@ namespace WindTurbine {
 
 	void
 	GetWTGeneratorResults(
-		int const EP_UNUSED(GeneratorType), // Type of Generator
+		int const EP_UNUSED( GeneratorType ), // Type of Generator
 		int const GeneratorIndex, // Generator number
 		Real64 & GeneratorPower, // Electrical power
 		Real64 & GeneratorEnergy, // Electrical energy
@@ -717,7 +717,7 @@ namespace WindTurbine {
 	void
 	CalcWindTurbine(
 		int const WindTurbineNum, // System is on
-		bool const EP_UNUSED(RunFlag) // System is on
+		bool const EP_UNUSED( RunFlag ) // System is on
 	)
 	{
 

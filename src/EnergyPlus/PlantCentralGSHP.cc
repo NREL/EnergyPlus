@@ -1256,8 +1256,8 @@ namespace PlantCentralGSHP {
 	void
 	InitWrapper(
 		int const WrapperNum, // Number of the current wrapper being simulated
-		bool const EP_UNUSED(RunFlag), // TRUE when chiller operating
-		bool const EP_UNUSED(FirstIteration), // Initialize variables when TRUE
+		bool const EP_UNUSED( RunFlag ), // TRUE when chiller operating
+		bool const EP_UNUSED( FirstIteration ), // Initialize variables when TRUE
 		Real64 const MyLoad, // Demand Load
 		int const LoopNum // Loop Number Index
 	)
@@ -1562,12 +1562,12 @@ namespace PlantCentralGSHP {
 	void
 	CalcChillerModel(
 		int const WrapperNum, // Number of wrapper
-		int const EP_UNUSED(OpMode), // Operation mode
-		Real64 & EP_UNUSED(MyLoad), // Operating load
-		bool const EP_UNUSED(RunFlag), // TRUE when chiller operating
-		bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep
-		int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
-		int const EP_UNUSED(LoopNum) // Plant loop number
+		int const EP_UNUSED( OpMode ), // Operation mode
+		Real64 & EP_UNUSED( MyLoad ), // Operating load
+		bool const EP_UNUSED( RunFlag ), // TRUE when chiller operating
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
+		int const EP_UNUSED( LoopNum ) // Plant loop number
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2050,12 +2050,12 @@ namespace PlantCentralGSHP {
 	void
 	CalcChillerHeaterModel(
 		int const WrapperNum, // Wrapper number pointor
-		int const EP_UNUSED(OpMode), // Operation mode
-		Real64 & EP_UNUSED(MyLoad), // Heating load plant should meet
-		bool const EP_UNUSED(RunFlag), // TRUE when chiller operating
-		bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep
-		int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
-		int const EP_UNUSED(LoopNum) // Loop number
+		int const EP_UNUSED( OpMode ), // Operation mode
+		Real64 & EP_UNUSED( MyLoad ), // Heating load plant should meet
+		bool const EP_UNUSED( RunFlag ), // TRUE when chiller operating
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
+		int const EP_UNUSED( LoopNum ) // Loop number
 	)
 	{
 		// SUBROUTINE INFORMATION:

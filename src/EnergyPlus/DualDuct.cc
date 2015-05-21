@@ -1934,7 +1934,7 @@ namespace DualDuct {
 	// *****************************************************************************
 
 	void
-	ReportDualDuct( int const EP_UNUSED(DamperNum) ) // unused1208
+	ReportDualDuct( int const EP_UNUSED( DamperNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2098,7 +2098,7 @@ namespace DualDuct {
 
 	void
 	GetDualDuctOutdoorAirRecircUse(
-		std::string const & EP_UNUSED(CompTypeName),
+		std::string const & EP_UNUSED( CompTypeName ),
 		std::string const & CompName,
 		bool & RecircIsUsed
 	)

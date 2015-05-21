@@ -88,7 +88,7 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTGenerator(
-		int const EP_UNUSED(GeneratorType), // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
@@ -161,17 +161,17 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTPlantHeatRecovery(
-		std::string const & EP_UNUSED(CompType), // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
-		int const EP_UNUSED(CompTypeNum), // unused1208
+		int const EP_UNUSED( CompTypeNum ), // unused1208
 		int & CompNum,
-		bool const EP_UNUSED(RunFlag),
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & EP_UNUSED(MyLoad),
+		Real64 & EP_UNUSED( MyLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const EP_UNUSED(FirstHVACIteration) // TRUE if First iteration of simulation
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation
 	)
 	{
 
@@ -736,7 +736,7 @@ namespace CTElectricGenerator {
 	InitCTGenerators(
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
-		Real64 const EP_UNUSED(MyLoad), // Generator demand
+		Real64 const EP_UNUSED( MyLoad ), // Generator demand
 		bool const FirstHVACIteration
 	)
 	{
@@ -866,7 +866,7 @@ namespace CTElectricGenerator {
 
 	void
 	UpdateCTGeneratorRecords(
-		bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
+		bool const EP_UNUSED( RunFlag ), // TRUE if Generator operating
 		int const Num // Generator number
 	)
 	{
@@ -926,7 +926,7 @@ namespace CTElectricGenerator {
 
 	void
 	GetCTGeneratorResults(
-		int const EP_UNUSED(GeneratorType), // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

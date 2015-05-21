@@ -1653,11 +1653,11 @@ namespace AirflowNetworkSolver {
 	void
 	AFECFR(
 		int const j, // Component number
-		int const EP_UNUSED(LFLAG), // Initialization flag.If = 1, use laminar relationship
-		Real64 const EP_UNUSED(PDROP), // Total pressure drop across a component (P1 - P2) [Pa]
-		int const EP_UNUSED(i), // Linkage number
-		int const EP_UNUSED(n), // Node 1 number
-		int const EP_UNUSED(M), // Node 2 number
+		int const EP_UNUSED( LFLAG ), // Initialization flag.If = 1, use laminar relationship
+		Real64 const EP_UNUSED( PDROP ), // Total pressure drop across a component (P1 - P2) [Pa]
+		int const EP_UNUSED( i ), // Linkage number
+		int const EP_UNUSED( n ), // Node 1 number
+		int const EP_UNUSED( M ), // Node 2 number
 		Array1A< Real64 > F, // Airflow through the component [kg/s]
 		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
@@ -1929,12 +1929,12 @@ Label90: ;
 
 	void
 	AFECPF(
-		int const EP_UNUSED(j), // Component number
+		int const EP_UNUSED( j ), // Component number
 		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
 		int const i, // Linkage number
-		int const EP_UNUSED(n), // Node 1 number
-		int const EP_UNUSED(M), // Node 2 number
+		int const EP_UNUSED( n ), // Node 1 number
+		int const EP_UNUSED( M ), // Node 2 number
 		Array1A< Real64 > F, // Airflow through the component [kg/s]
 		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
@@ -2310,9 +2310,9 @@ Label90: ;
 	void
 	AFECPD(
 		int const j, // Component number
-		int const EP_UNUSED(LFLAG), // Initialization flag.If = 1, use laminar relationship
+		int const EP_UNUSED( LFLAG ), // Initialization flag.If = 1, use laminar relationship
 		Real64 & PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-		int const EP_UNUSED(i), // Linkage number
+		int const EP_UNUSED( i ), // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
 		Array1A< Real64 > F, // Airflow through the component [kg/s]
@@ -2908,7 +2908,7 @@ Label90: ;
 		int const j, // Component number
 		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-		int const EP_UNUSED(i), // Linkage number
+		int const EP_UNUSED( i ), // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
 		Array1A< Real64 > F, // Airflow through the component [kg/s]
@@ -3812,11 +3812,11 @@ Label90: ;
 	void
 	AFEDOP(
 		int const j, // Component number
-		int const EP_UNUSED(LFLAG), // Initialization flag.If = 1, use laminar relationship
+		int const EP_UNUSED( LFLAG ), // Initialization flag.If = 1, use laminar relationship
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
 		int const IL, // Linkage number
-		int const EP_UNUSED(n), // Node 1 number
-		int const EP_UNUSED(M), // Node 2 number
+		int const EP_UNUSED( n ), // Node 1 number
+		int const EP_UNUSED( M ), // Node 2 number
 		Array1A< Real64 > F, // Airflow through the component [kg/s]
 		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2

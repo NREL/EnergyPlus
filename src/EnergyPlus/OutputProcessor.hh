@@ -336,7 +336,7 @@ namespace OutputProcessor {
 			int const MinValue, // Minimum reporting (only for Averaged variables, and those greater than Time Step)
 			int const minValueDate, // Date stamp of minimum
 			int const ReportID, // Report variable ID number
-			std::string const & EP_UNUSED(ReportIDChr), // Report variable ID number (character -- for printing)
+			std::string const & EP_UNUSED( ReportIDChr ), // Report variable ID number (character -- for printing)
 			int const SchedPtr // If scheduled, this points to the schedule
 		) :
 			Which( Which ),

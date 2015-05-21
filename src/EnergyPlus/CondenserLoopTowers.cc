@@ -2073,7 +2073,7 @@ namespace CondenserLoopTowers {
 	void
 	InitTower(
 		int const TowerNum, // Number of the current cooling tower being simulated
-		bool const EP_UNUSED(RunFlag) // Indication of
+		bool const EP_UNUSED( RunFlag ) // Indication of
 	)
 	{
 

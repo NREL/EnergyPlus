@@ -115,7 +115,7 @@ namespace ChillerIndirectAbsorption {
 
 	void
 	SimIndirectAbsorber(
-		std::string const & EP_UNUSED(AbsorberType), // type of Absorber
+		std::string const & EP_UNUSED( AbsorberType ), // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
@@ -1345,7 +1345,7 @@ namespace ChillerIndirectAbsorption {
 		int const ChillNum, // Absorber number
 		Real64 const MyLoad, // operating load
 		bool const RunFlag, // TRUE when Absorber operating
-		bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep !unused1208
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep !unused1208
 		int const EquipFlowCtrl // Flow control mode for the equipment
 	)
 	{

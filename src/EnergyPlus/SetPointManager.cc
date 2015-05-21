@@ -2693,7 +2693,7 @@ namespace SetPointManager {
 	}
 
 	void
-	VerifySetPointManagers( bool & EP_UNUSED(ErrorsFound) ) // flag to denote node conflicts in input. !unused1208
+	VerifySetPointManagers( bool & EP_UNUSED( ErrorsFound ) ) // flag to denote node conflicts in input. !unused1208
 	{
 
 		// SUBROUTINE INFORMATION:

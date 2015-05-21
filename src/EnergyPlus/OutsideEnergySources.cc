@@ -78,9 +78,9 @@ namespace OutsideEnergySources {
 
 	void
 	SimOutsideEnergy(
-		std::string const & EP_UNUSED(EnergyType),
+		std::string const & EP_UNUSED( EnergyType ),
 		std::string const & EquipName,
-		int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int & CompIndex,
 		bool const RunFlag,
 		bool const InitLoopEquip,
@@ -88,7 +88,7 @@ namespace OutsideEnergySources {
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const EP_UNUSED(FirstHVACIteration)
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 

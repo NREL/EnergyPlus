@@ -844,7 +844,7 @@ namespace WaterToAirHeatPump {
 		int const CyclingScheme, // fan/compressor cycling scheme indicator
 		bool const FirstHVACIteration, // first iteration flag
 		Real64 const RuntimeFrac,
-		bool const EP_UNUSED(InitFlag), // suppress property errors if true
+		bool const EP_UNUSED( InitFlag ), // suppress property errors if true
 		Real64 const SensDemand,
 		int const CompOp,
 		Real64 const PartLoadRatio
@@ -1514,7 +1514,7 @@ namespace WaterToAirHeatPump {
 		int const CyclingScheme, // fan/compressor cycling scheme indicator
 		bool const FirstHVACIteration, // first iteration flag
 		Real64 const RuntimeFrac,
-		bool const EP_UNUSED(InitFlag), // first iteration flag
+		bool const EP_UNUSED( InitFlag ), // first iteration flag
 		Real64 const SensDemand,
 		int const CompOp,
 		Real64 const PartLoadRatio

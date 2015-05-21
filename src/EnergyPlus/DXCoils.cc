@@ -464,7 +464,7 @@ namespace DXCoils {
 	void
 	SimDXCoilMultiMode(
 		std::string const & CompName, // name of the fan coil unit
-		int const EP_UNUSED(CompOp), // compressor operation; 1=on, 0=off !unused1208
+		int const EP_UNUSED( CompOp ), // compressor operation; 1=on, 0=off !unused1208
 		bool const FirstHVACIteration, // true if first hvac iteration
 		Real64 const PartLoadRatio, // part load ratio
 		int const DehumidMode, // dehumidification mode (0=normal, 1=enhanced)
@@ -13515,7 +13515,7 @@ Label50: ;
 
 	Real64
 	CalcSecondaryDXCoilsSHR(
-		int const EP_UNUSED(DXCoilNum),
+		int const EP_UNUSED( DXCoilNum ),
 		Real64 const EvapAirMassFlow,
 		Real64 const TotalHeatRemovalRate,
 		Real64 const PartLoadRatio, 

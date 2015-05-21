@@ -98,7 +98,7 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPGenerator(
-		int const EP_UNUSED(GeneratorType), // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlagElectCenter, // simulate Generator when TRUE
@@ -500,7 +500,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	InitMicroCHPNoNormalizeGenerators(
 		int const GeneratorNum, // Generator number
-		bool const EP_UNUSED(FirstHVACIteration)
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -1392,7 +1392,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	CalcUpdateHeatRecovery(
 		int const Num, // Generator number
-		bool const EP_UNUSED(FirstHVACIteration)
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -1449,12 +1449,12 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPPlantHeatRecovery(
-		std::string const & EP_UNUSED(CompType),
+		std::string const & EP_UNUSED( CompType ),
 		std::string const & CompName,
 		int & CompNum,
-		bool const EP_UNUSED(RunFlag),
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & EP_UNUSED(MyThermalLoad),
+		Real64 & EP_UNUSED( MyThermalLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
@@ -1631,7 +1631,7 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	GetMicroCHPGeneratorResults(
-		int const EP_UNUSED(GeneratorType), // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

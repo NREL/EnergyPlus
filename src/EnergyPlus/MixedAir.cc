@@ -2520,7 +2520,7 @@ namespace MixedAir {
 
 	void
 	InitOutsideAirSys(
-		int const EP_UNUSED(OASysNum), // unused1208
+		int const EP_UNUSED( OASysNum ), // unused1208
 		bool const FirstHVACIteration
 	)
 	{
@@ -4709,7 +4709,7 @@ namespace MixedAir {
 	}
 
 	void
-	ReportOAMixer( int const EP_UNUSED(OAMixerNum) ) // unused1208
+	ReportOAMixer( int const EP_UNUSED( OAMixerNum ) ) // unused1208
 	{
 
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -4717,7 +4717,7 @@ namespace MixedAir {
 	}
 
 	void
-	ReportOAController( int const EP_UNUSED(OAControllerNum) ) // unused1208
+	ReportOAController( int const EP_UNUSED( OAControllerNum ) ) // unused1208
 	{
 
 		// SUBROUTINE ARGUMENT DEFINITIONS

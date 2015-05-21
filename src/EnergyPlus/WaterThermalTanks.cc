@@ -215,7 +215,7 @@ namespace WaterThermalTanks {
 		int const CompType,
 		std::string const & CompName,
 		int & CompIndex,
-		bool const EP_UNUSED(RunFlag), // unused1208
+		bool const EP_UNUSED( RunFlag ), // unused1208
 		bool const InitLoopEquip,
 		Real64 & MyLoad,
 		Real64 & MaxCap,
@@ -4264,8 +4264,8 @@ namespace WaterThermalTanks {
 	InitWaterThermalTank(
 		int const WaterThermalTankNum,
 		bool const FirstHVACIteration,
-		Optional_int_const EP_UNUSED(LoopNum),
-		Optional_int_const EP_UNUSED(LoopSideNum)
+		Optional_int_const EP_UNUSED( LoopNum ),
+		Optional_int_const EP_UNUSED( LoopSideNum )
 	)
 	{
 
@@ -7829,7 +7829,7 @@ namespace WaterThermalTanks {
 		bool const FirstHVACIteration,
 		int const WaterThermalTankSide,
 		int const PlantLoopSide,
-		bool const EP_UNUSED(PlumbedInSeries), // !unused1208
+		bool const EP_UNUSED( PlumbedInSeries ), // !unused1208
 		int const BranchControlType,
 		Real64 const OutletTemp,
 		Real64 const DeadBandTemp,

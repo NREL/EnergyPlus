@@ -548,11 +548,11 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 	void
 	CalcGshpModel(
-		std::string const & EP_UNUSED(GSHPType), // type ofGSHP
+		std::string const & EP_UNUSED( GSHPType ), // type ofGSHP
 		std::string const & GSHPName, // user specified name ofGSHP
 		int const GSHPNum, // GSHP Number
 		Real64 & MyLoad, // Operating Load
-		bool const EP_UNUSED(FirstHVACIteration)
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 		// SUBROUTINE INFORMATION:

@@ -581,7 +581,7 @@ namespace MixerComponent {
 	// *****************************************************************************
 
 	void
-	ReportMixer( int const EP_UNUSED(MixerNum) )
+	ReportMixer( int const EP_UNUSED( MixerNum ) )
 	{
 
 		// SUBROUTINE INFORMATION:

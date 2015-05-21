@@ -722,9 +722,9 @@ namespace WindowComplexManager {
 	CFSShadeAndBeamInitialization(
 		int const iSurf, // Window surface number
 		int const iState, // Window state number
-		BSDFWindowGeomDescr & EP_UNUSED(Window), // Window Geometry
-		BSDFGeomDescr & EP_UNUSED(Geom), // State Geometry
-		BSDFStateDescr & EP_UNUSED(State) // State Description
+		BSDFWindowGeomDescr & EP_UNUSED( Window ), // Window Geometry
+		BSDFGeomDescr & EP_UNUSED( Geom ), // State Geometry
+		BSDFStateDescr & EP_UNUSED( State ) // State Description
 	)
 	{
 
@@ -1538,7 +1538,7 @@ namespace WindowComplexManager {
 		int const IConst, // Pointer to construction for this state
 		BSDFWindowGeomDescr & Window, // Window Geometry
 		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & EP_UNUSED(State) // State Description
+		BSDFStateDescr & EP_UNUSED( State ) // State Description
 	)
 	{
 
@@ -2363,7 +2363,7 @@ namespace WindowComplexManager {
 	}
 
 	Real64
-	SkyWeight( Vector const & EP_UNUSED(DirVec) ) // Direction of the element to be weighted
+	SkyWeight( Vector const & EP_UNUSED( DirVec ) ) // Direction of the element to be weighted
 	{
 
 		// FUNCTION INFORMATION:
@@ -2418,7 +2418,7 @@ namespace WindowComplexManager {
 	}
 
 	Real64
-	SkyGndWeight( Vector const & EP_UNUSED(PosVec) ) // x,y,z(=0) of ground intersection pt
+	SkyGndWeight( Vector const & EP_UNUSED( PosVec ) ) // x,y,z(=0) of ground intersection pt
 	{
 
 		// FUNCTION INFORMATION:
@@ -2624,7 +2624,7 @@ namespace WindowComplexManager {
 		Vector const & RayToFind, // Ray vector direction in world CS
 		int const RadType, // Type of radiation: Front_Incident, etc.
 		int const ISurf, // Window Surface number
-		int const EP_UNUSED(IState), // Complex Fenestration state number
+		int const EP_UNUSED( IState ), // Complex Fenestration state number
 		BasisStruct const & Basis, // Complex Fenestration basis root
 		Real64 & Theta, // Theta value for ray
 		Real64 & Phi // Phi value for ray

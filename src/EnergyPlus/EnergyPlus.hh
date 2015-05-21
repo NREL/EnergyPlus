@@ -10,7 +10,7 @@
 
 // macro to supress unused parameter
 // UNUSED( foo );
-#define EP_UNUSED(expr)
+#define EP_UNUSED( expr )
 
 // ObjexxFCL
 namespace ObjexxFCL {

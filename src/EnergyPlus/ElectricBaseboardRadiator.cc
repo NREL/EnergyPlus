@@ -94,7 +94,7 @@ namespace ElectricBaseboardRadiator {
 	void
 	SimElecBaseboard(
 		std::string const & EquipName,
-		int const EP_UNUSED(ActualZoneNum),
+		int const EP_UNUSED( ActualZoneNum ),
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
 		Real64 & PowerMet,
@@ -718,7 +718,7 @@ namespace ElectricBaseboardRadiator {
 	void
 	CalcElectricBaseboard(
 		int const BaseboardNum,
-		int const EP_UNUSED(ControlledZoneNum)
+		int const EP_UNUSED( ControlledZoneNum )
 	)
 	{
 		// SUBROUTINE INFORMATION:

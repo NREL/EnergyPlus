@@ -165,7 +165,7 @@ namespace SwimmingPool {
 			std::string WaterOutletNodeName, // water outlet node name
 			int const WaterOutletNode, // water outlet node number
 			int const HWLoopNum,
-			int const EP_UNUSED(HWLoopSide),
+			int const EP_UNUSED( HWLoopSide ),
 			int const HWBranchNum,
 			int const HWCompNum,
 			Real64 const WaterVolFlowMax, // maximum water flow rate for pool, m3/s

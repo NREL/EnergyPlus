@@ -665,7 +665,7 @@ namespace SplitterComponent {
 	// *****************************************************************************
 
 	void
-	ReportSplitter( int const EP_UNUSED(SplitterNum) )
+	ReportSplitter( int const EP_UNUSED( SplitterNum ) )
 	{
 
 		// SUBROUTINE INFORMATION:

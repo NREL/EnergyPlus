@@ -109,9 +109,9 @@ namespace ChillerExhaustAbsorption {
 
 	void
 	SimExhaustAbsorber(
-		std::string const & EP_UNUSED(AbsorberType), // type of Absorber
+		std::string const & EP_UNUSED( AbsorberType ), // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
-		int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE
 		bool const FirstIteration, // initialize variables when TRUE
@@ -525,7 +525,7 @@ namespace ChillerExhaustAbsorption {
 	void
 	InitExhaustAbsorber(
 		int const ChillNum, // number of the current engine driven chiller being simulated
-		bool const EP_UNUSED(RunFlag) // TRUE when chiller operating
+		bool const EP_UNUSED( RunFlag ) // TRUE when chiller operating
 	)
 	{
 
@@ -1101,7 +1101,7 @@ namespace ChillerExhaustAbsorption {
 	CalcExhaustAbsorberChillerModel(
 		int & ChillNum, // Absorber number
 		Real64 & MyLoad, // operating load
-		bool const EP_UNUSED(RunFlag) // TRUE when Absorber operating
+		bool const EP_UNUSED( RunFlag ) // TRUE when Absorber operating
 	)
 	{
 		// SUBROUTINE INFORMATION:

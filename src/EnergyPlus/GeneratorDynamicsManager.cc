@@ -159,7 +159,7 @@ namespace GeneratorDynamicsManager {
 	void
 	ManageGeneratorControlState(
 		int const GeneratorType, // type of Generator
-		std::string const & EP_UNUSED(GeneratorName), // user specified name of Generator
+		std::string const & EP_UNUSED( GeneratorName ), // user specified name of Generator
 		int const GeneratorNum, // Generator number
 		bool const RunFlagElectCenter, // TRUE when Generator operating per electric load center request
 		bool const RunFlagPlant, // TRUE when generator operating per Plant request (always false)
@@ -169,7 +169,7 @@ namespace GeneratorDynamicsManager {
 		int & OperatingMode, // operating mode
 		Real64 & PLRforSubtimestepStartUp, // part load ratio for switch to normal from start up
 		Real64 & PLRforSubtimestepShutDown, // part load ratio for switch from cool down to other
-		bool const EP_UNUSED(FirstHVACIteration) // True is this is first HVAC iteration
+		bool const EP_UNUSED( FirstHVACIteration ) // True is this is first HVAC iteration
 	)
 	{
 
@@ -726,9 +726,9 @@ namespace GeneratorDynamicsManager {
 	void
 	ManageGeneratorFuelFlow(
 		int const GeneratorType, // type of Generator
-		std::string const & EP_UNUSED(GeneratorName), // user specified name of Generator
+		std::string const & EP_UNUSED( GeneratorName ), // user specified name of Generator
 		int const GeneratorNum, // Generator number
-		bool const EP_UNUSED(RunFlag), // TRUE when Generator operating
+		bool const EP_UNUSED( RunFlag ), // TRUE when Generator operating
 		Real64 const FuelFlowRequest, // Generator demand mdot kg/ s
 		Real64 & FuelFlowProvided, // allowed after constraints kg/s
 		bool & ConstrainedIncreasingMdot, // true if request was altered because of fuel rate of change up

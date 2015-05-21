@@ -173,7 +173,7 @@ namespace PlantChillers {
 	void
 	SimChiller(
 		int const LoopNum, // Flow control mode for the equipment
-		int const EP_UNUSED(LoopSide), // chiller number pointer
+		int const EP_UNUSED( LoopSide ), // chiller number pointer
 		int const ChillerType, // type of chiller
 		std::string const & ChillerName, // user specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
