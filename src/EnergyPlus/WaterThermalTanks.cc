@@ -5112,11 +5112,7 @@ namespace WaterThermalTanks {
 		Qoncycheat = Qoncycfuel * Tank.OnCycParaFracToTank;
 
 		SetPointTemp = Tank.SetPointTemp;
-		if ( Tank.IsChilledWaterTank ) {
-			DeadBandTemp = SetPointTemp + Tank.DeadBandDeltaTemp;
-		} else {
-			DeadBandTemp = SetPointTemp - Tank.DeadBandDeltaTemp;
-		}
+		DeadBandTemp = Tank.getDeadBandTemp();
 		MaxTemp = Tank.TankTempLimit;
 		AmbientTemp = Tank.AmbientTemp;
 
@@ -10100,6 +10096,17 @@ namespace WaterThermalTanks {
 		return SensedTemp;
 
 	}
+	
+	Real64
+	WaterThermalTankData::getDeadBandTemp()
+	{
+		if ( this->IsChilledWaterTank ) {
+			return (this->SetPointTemp + this->DeadBandDeltaTemp);
+		} else {
+			return (this->SetPointTemp - this->DeadBandDeltaTemp);
+		}
+	}
+
 
 	//     NOTICE
 

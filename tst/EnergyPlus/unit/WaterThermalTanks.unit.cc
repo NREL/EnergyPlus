@@ -57,3 +57,20 @@ TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 	EXPECT_DOUBLE_EQ(Qsource, SourceMassFlowRate * Cp * DeltaT);
 	
 }
+
+TEST( WaterThermalTankData, getDeadBandTemp )
+{
+
+	WaterThermalTanks::WaterThermalTankData thisTank;
+	thisTank.SetPointTemp = 10;
+	thisTank.DeadBandDeltaTemp = 1;
+
+	// first the hot water tank
+	thisTank.IsChilledWaterTank = false;
+	EXPECT_DOUBLE_EQ( 9.0,  thisTank.getDeadBandTemp() );
+
+	// then the chilled water tank
+	thisTank.IsChilledWaterTank = true;
+	EXPECT_DOUBLE_EQ( 11.0, thisTank.getDeadBandTemp() );
+
+}
