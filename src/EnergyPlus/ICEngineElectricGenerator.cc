@@ -85,7 +85,7 @@ namespace ICEngineElectricGenerator {
 
 	void
 	SimICEngineGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED(GeneratorType), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
@@ -156,7 +156,7 @@ namespace ICEngineElectricGenerator {
 
 	void
 	GetICEGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED(GeneratorType), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy
@@ -205,13 +205,13 @@ namespace ICEngineElectricGenerator {
 
 	void
 	SimICEPlantHeatRecovery(
-		std::string const & CompType,
+		std::string const & EP_UNUSED(CompType),
 		std::string const & CompName,
-		int const CompTypeNum,
+		int const EP_UNUSED(CompTypeNum),
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED(RunFlag),
 		bool & InitLoopEquip,
-		Real64 & MyLoad,
+		Real64 & EP_UNUSED(MyLoad),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
@@ -536,7 +536,7 @@ namespace ICEngineElectricGenerator {
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
 		Real64 const MyLoad, // Generator demand
-		bool const FirstHVACIteration
+		bool const EP_UNUSED(FirstHVACIteration)
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -852,7 +852,7 @@ namespace ICEngineElectricGenerator {
 	InitICEngineGenerators(
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
-		Real64 const MyLoad, // Generator demand
+		Real64 const EP_UNUSED(MyLoad), // Generator demand
 		bool const FirstHVACIteration
 	)
 	{
@@ -982,7 +982,7 @@ namespace ICEngineElectricGenerator {
 
 	void
 	UpdateICEngineGeneratorRecords(
-		bool const RunFlag, // TRUE if Generator operating
+		bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
 		int const Num // Generator number
 	)
 	{

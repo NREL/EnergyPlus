@@ -6094,7 +6094,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 const QLatReq, // Zone latent load []
 		Real64 & OnOffAirFlowRatio, // ratio of compressor ON airflow to AVERAGE airflow over timestep
 		Real64 & SupHeaterLoad, // supplemental heater load (W)
-		bool const HXUnitOn // flag to enable heat exchanger
+		bool const EP_UNUSED(HXUnitOn) // flag to enable heat exchanger
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -6367,7 +6367,7 @@ namespace PackagedTerminalHeatPump {
 	void
 	SetVSHPAirFlow(
 		int const PTUnitNum, // Unit index
-		int const ZoneNum, // Zone index
+		int const EP_UNUSED(ZoneNum), // Zone index
 		Real64 const PartLoadRatio, // unit part load ratio
 		Real64 & OnOffAirFlowRatio, // ratio of compressor ON airflow to average airflow over timestep
 		Optional_int_const SpeedNum, // Speed number
@@ -6540,11 +6540,11 @@ namespace PackagedTerminalHeatPump {
 		int const PTUnitNum, // index to furnace
 		int const ZoneNum, // index to zone
 		bool const FirstHVACIteration, // Flag for 1st HVAC iteration
-		int const AirLoopNum, // index to air loop !unused1208
+		int const EP_UNUSED(AirLoopNum), // index to air loop !unused1208
 		Real64 & OnOffAirFlowRatio, // ratio of coil on to coil off air flow rate
-		int const OpMode, // fan operating mode
-		Real64 const QZnReq, // sensible load to be met (W) !unused1208
-		Real64 const MoistureLoad, // moisture load to be met (W)
+		int const EP_UNUSED(OpMode), // fan operating mode
+		Real64 const EP_UNUSED(QZnReq), // sensible load to be met (W) !unused1208
+		Real64 const EP_UNUSED(MoistureLoad), // moisture load to be met (W)
 		Real64 & PartLoadRatio // coil part-load ratio
 	)
 	{

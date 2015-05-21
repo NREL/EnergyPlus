@@ -7474,8 +7474,8 @@ namespace AirflowNetworkBalanceManager {
 
 	void OccupantVentilationControlProp::calc(
 		int const ZoneNum,
-		int const SurfNum,
-		int const PrevOpeningstatus,
+		int const EP_UNUSED(SurfNum),
+		int const EP_UNUSED(PrevOpeningstatus),
 		Real64 const TimeOpenDuration,
 		Real64 const TimeCloseDuration,
 		int & OpeningStatus,

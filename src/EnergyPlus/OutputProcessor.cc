@@ -2334,11 +2334,11 @@ namespace OutputProcessor {
 
 	void
 	AttachCustomMeters(
-		std::string const & MtrUnits, // Units for this meter
+		std::string const & EP_UNUSED(MtrUnits), // Units for this meter
 		int const RepVarNum, // Number of this report variable
 		int & MeterArrayPtr, // Input/Output set of Pointers to Meters
 		int const MeterIndex, // Which meter this is
-		bool & ErrorsFound // True if errors in this call
+		bool & EP_UNUSED(ErrorsFound) // True if errors in this call
 	)
 	{
 
@@ -3634,7 +3634,7 @@ namespace OutputProcessor {
 
 	void
 	AddEndUseSubcategory(
-		std::string const & ResourceName,
+		std::string const & EP_UNUSED(ResourceName),
 		std::string const & EndUseName,
 		std::string const & EndUseSubName
 	)
@@ -3806,7 +3806,7 @@ namespace OutputProcessor {
 		int const reportingInterval, // The reporting interval (e.g., hourly, daily)
 		int const storeType,
 		int const reportID, // The reporting ID for the data
-		int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
+		int const EP_UNUSED(indexGroupKey), // The reporting group (e.g., Zone, Plant Loop, etc.)
 		std::string const & indexGroup, // The reporting group (e.g., Zone, Plant Loop, etc.)
 		std::string const & reportIDChr, // The reporting ID for the data
 		std::string const & keyedValue, // The key name for the data
@@ -3884,7 +3884,7 @@ namespace OutputProcessor {
 		int const reportingInterval, // The reporting interval (e.g., hourly, daily)
 		int const storeType,
 		int const reportID, // The reporting ID in for the variable
-		int const indexGroupKey, // The reporting group for the variable
+		int const EP_UNUSED(indexGroupKey), // The reporting group for the variable
 		std::string const & indexGroup, // The reporting group for the variable
 		std::string const & reportIDChr, // The reporting ID in for the variable
 		std::string const & meterName, // The variable's meter name
@@ -7048,7 +7048,7 @@ GetInternalVariableValueExternalInterface(
 
 int
 GetNumMeteredVariables(
-	std::string const & ComponentType, // Given Component Type
+	std::string const & EP_UNUSED(ComponentType), // Given Component Type
 	std::string const & ComponentName // Given Component Name (user defined)
 )
 {

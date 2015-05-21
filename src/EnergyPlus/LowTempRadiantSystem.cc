@@ -4186,7 +4186,7 @@ namespace LowTempRadiantSystem {
 
 	void
 	UpdateLowTempRadiantSystem(
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
 		int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
 		int const SystemType // Type of radiant system: hydronic, constant flow, or electric
 	)
@@ -4433,7 +4433,7 @@ namespace LowTempRadiantSystem {
 		int const RadSysNum,
 		Real64 const outletTemp,
 		Real64 const inletTemp,
-		Real64 const mdot
+		Real64 const EP_UNUSED(mdot)
 	)
 	{
 
@@ -4551,7 +4551,7 @@ namespace LowTempRadiantSystem {
 		Real64 const NumCircs, // Number of fluid circuits in this surface
 		Real64 const TubeLength, // Length of tubing in the radiant system, in m
 		Real64 const TubeDiameter, // Inside diameter of the tubing in the radiant system, in m
-		int & GlycolIndex // Index for the fluid used in this radiant system
+		int & EP_UNUSED(GlycolIndex) // Index for the fluid used in this radiant system
 	)
 	{
 

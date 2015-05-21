@@ -516,7 +516,7 @@ namespace TARCOGOutput {
 	void
 	WriteModifiedArguments(
 		int const InArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED(DBGD),
 		Real64 const esky,
 		Real64 const trmout,
 		Real64 const trmin,
@@ -638,7 +638,7 @@ namespace TARCOGOutput {
 	void
 	WriteOutputArguments(
 		int & OutArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED(DBGD),
 		int const nlayer,
 		Real64 const tamb,
 		Array1A< Real64 > const q,
@@ -945,7 +945,7 @@ namespace TARCOGOutput {
 	void
 	WriteOutputEN673(
 		int & OutArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED(DBGD),
 		int const nlayer,
 		Real64 const ufactor,
 		Real64 const hout,
@@ -955,7 +955,7 @@ namespace TARCOGOutput {
 		Array1A< Real64 > const hg,
 		Array1A< Real64 > const hr,
 		Array1A< Real64 > const hs,
-		int & nperr
+		int & EP_UNUSED(nperr)
 	)
 	{
 

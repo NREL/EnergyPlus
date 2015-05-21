@@ -2279,9 +2279,9 @@ namespace ThermalISO15099Calc {
 		int const nlayer,
 		Array1A< Real64 > const gap,
 		Array1A< Real64 > hcgas,
-		Real64 const VacuumMaxGapThickness,
-		int & nperr,
-		std::string & ErrorMessage
+		Real64 const EP_UNUSED(VacuumMaxGapThickness),
+		int & EP_UNUSED(nperr),
+		std::string & EP_UNUSED(ErrorMessage)
 	)
 	{
 		//***********************************************************************
@@ -2706,7 +2706,7 @@ namespace ThermalISO15099Calc {
 		Array1A< Real64 > const Ebf,
 		Array1A< Real64 > const Rb,
 		Array1A< Real64 > const Rf,
-		int & nperr
+		int & EP_UNUSED(nperr)
 	)
 	{
 

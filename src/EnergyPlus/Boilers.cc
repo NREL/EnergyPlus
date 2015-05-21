@@ -123,7 +123,7 @@ namespace Boilers {
 
 	void
 	SimBoiler(
-		std::string const & BoilerType, // boiler type (used in CASE statement)
+		std::string const & EP_UNUSED(BoilerType), // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier

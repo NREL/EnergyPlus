@@ -1733,7 +1733,7 @@ namespace IceThermalStorage {
 
 	void
 	CalcQiceChargeMaxByITS(
-		int & IceNum,
+		int & EP_UNUSED(IceNum),
 		Real64 const ChillerOutletTemp, // [degC]
 		Real64 & QiceMaxByITS // [W]
 	)
@@ -1802,7 +1802,7 @@ namespace IceThermalStorage {
 		int const IceNum, // ice storage number
 		Real64 const MyLoad, // operating load
 		bool const RunFlag, // TRUE when ice storage operating
-		bool const FirstIteration, // TRUE when first iteration of timestep
+		bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep
 		Real64 const MaxCap // Max possible discharge rate (positive value)
 	)
 	{
@@ -2167,7 +2167,7 @@ namespace IceThermalStorage {
 	UpdateNode(
 		Real64 const MyLoad,
 		bool const RunFlag,
-		int const Num
+		int const EP_UNUSED(Num)
 	)
 	{
 		// SUBROUTINE INFORMATION:

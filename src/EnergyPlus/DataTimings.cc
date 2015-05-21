@@ -98,7 +98,14 @@ namespace DataTimings {
 	// Functions
 
 	void
-	epStartTime( std::string const & ctimingElementstring )
+	epStartTime(
+#ifdef EP_NO_Timings
+		std::string const & EP_UNUSED(ctimingElementstring)
+#endif
+#ifdef EP_Timings
+		std::string const & ctimingElementstring
+#endif
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -179,9 +186,16 @@ namespace DataTimings {
 
 	void
 	epStopTime(
+#ifdef EP_NO_Timings
+		std::string const & EP_UNUSED(ctimingElementstring),
+		Optional_bool_const EP_UNUSED(printit), // true if it should be printed here.
+		Optional_string_const EP_UNUSED(wprint) // only needed (and assumed, if printit is true)
+#endif
+#ifdef EP_Timings
 		std::string const & ctimingElementstring,
 		Optional_bool_const printit, // true if it should be printed here.
 		Optional_string_const wprint // only needed (and assumed, if printit is true)
+#endif
 	)
 	{
 
@@ -280,7 +294,14 @@ namespace DataTimings {
 	}
 
 	void
-	epSummaryTimes( Real64 & TimeUsed_CPUTime )
+	epSummaryTimes( 
+#ifdef EP_NO_Timings
+		Real64 & EP_UNUSED(TimeUsed_CPUTime)
+#endif
+#ifdef EP_Timings
+		Real64 & TimeUsed_CPUTime
+#endif
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
