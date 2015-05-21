@@ -520,14 +520,11 @@ namespace MicroCHPElectricGenerator {
 
 		// Using/Aliasing
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::SysSizingCalc;
-		using DataGlobals::HoursInDay;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_MicroCHP;
 		using DataPlant::PlantLoop;
@@ -731,7 +728,6 @@ namespace MicroCHPElectricGenerator {
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
-		using DataGlobals::HoursInDay;
 		using CurveManager::CurveValue;
 		using namespace DataGlobalConstants;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -1339,7 +1335,6 @@ namespace MicroCHPElectricGenerator {
 		// na
 
 		// Using/Aliasing
-		using DataHeatBalance::ZoneIntGain;
 		using DataGlobals::BeginEnvrnFlag;
 
 		// Locals

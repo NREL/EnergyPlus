@@ -9128,7 +9128,6 @@ namespace RefrigeratedCase {
 		Real64 TotalLoadFromSysID; // total heat rejection load from a single detailed system [W]
 		Real64 TotalLoadFromThisSystem( 0.0 ); // total heat rejection load from the detailed system id'd in subroutine call [W]
 		Real64 TotalLoadFromSystems; // total heat rejection load from all systems served by this condenser [W]
-		Real64 NomCap; // ne "design" capacity when operating evap condenser at reduced air flow [W]
 		Real64 CurMaxCapacity; // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
 
 		LocalTimeStep = TimeStepZone;
@@ -10644,7 +10643,6 @@ namespace RefrigeratedCase {
 		int TransSystemNum;
 		int WalkInID;
 		int WalkInNum;
-		int ZoneNum;
 		int ZoneID;
 		std::string ChrOut;
 		std::string ChrOut2;

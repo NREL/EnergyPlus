@@ -176,7 +176,6 @@ private:
 	Real64 significantNormalizedChange = 0.005; // criteria for if sizing algorithm yeild a change large enough worth making another pass.
 	Real64 densityForSizing = 0.0;
 	Real64 specificHeatForSizing = 0.0;
-	// Real64 plantSizingFraction = 0.0;
 	Real64 previousVolDesignFlowRate = 0.0;
 	Real64 newVolDesignFlowRate = 0.0;
 

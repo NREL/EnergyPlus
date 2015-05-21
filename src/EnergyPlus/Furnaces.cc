@@ -266,8 +266,6 @@ namespace Furnaces {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 25 ); // maximum number of iterations for controlling output
-		int const MaxIterCycl( 100 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -296,12 +294,7 @@ namespace Furnaces {
 		Real64 ZoneLoadToCoolSPSequenced;
 		Real64 ZoneLoadToHeatSPSequenced;
 
-		Real64 QCoilReq; // load passed to heating coil (W)
 		Real64 QActual; // actual heating coil output (W)
-		Real64 mdot; // local temporary for mass flow rate
-		Real64 QCoilMax; // heating coil maximum capacity (W)
-		Real64 MinWaterFlow; // minimum fluid flow rates
-		Real64 PartLoadRatioHeatingCoil; // Heating Coil Part Load Ratio
 		bool SuppHeatingCoilFlag; // true if supplemental heating coil
 
 		// Obtains and Allocates Furnace related parameters from input file
@@ -677,7 +670,6 @@ namespace Furnaces {
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
 		using SteamCoils::GetTypeOfCoil;
-		using SteamCoils::ZoneLoadControl;
 		using Fans::GetFanDesignVolumeFlowRate;
 		using Fans::GetFanInletNode;
 		using Fans::GetFanOutletNode;
@@ -4237,7 +4229,6 @@ namespace Furnaces {
 		static Real64 SumOfMassFlowRateMax( 0.0 ); // the sum of mass flow rates at inlet to zones in an airloop
 		static Real64 CntrlZoneTerminalUnitMassFlowRateMax( 0.0 ); // Maximum mass flow rate through controlled zone terminal unit
 		static int EquipNum( 0 ); // local do loop index for equipment listed for a zone
-		static int InletNodeNum( 0 ); // local do loop index for inlet nodes to a zone
 
 		static bool ErrorsFound( false ); // flag returned from mining call
 		static Real64 mdot( 0.0 ); // local temporary for mass flow rate (kg/s)
@@ -5189,9 +5180,7 @@ namespace Furnaces {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 ControlZoneVolFlow;
 		int ThisCtrlZoneNum; // the controlled zone number of the control zone !!!
-		int ControlledZoneNum;
 		int Iter; // iteration count
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		bool ErrFound; // flag returned from mining functions
@@ -7130,14 +7119,7 @@ namespace Furnaces {
 		Real64 Wout; // Temporary variable used when outlet temp > DesignMaxOutletTemp
 		int CoolingCoilType_Num; // Numeric Equivalent for CoolingCoilType
 		int HeatingCoilType_Num; // Numeric Equivalent for HeatingCoilType
-		Real64 mdot; // hot water or steam heating coil fluid mass flow rates
-		Real64 QCoilReq; // heating coil load
 		Real64 QActual; // heating coil load met or delivered
-		static Real64 MinWaterFlow( 0.0 ); // minimum fluid flow rates
-		int LoopNumber; // plant loop index for water and steam supplemental heating coil
-		int LoopSideNumber; // plant loop side  index for  water and steam supp. heating coil
-		int BranchNumber; // plant loop branch index for water and steam supp. heating coil
-		int CompNumber; // plant loop comp. index for water and steam supp. heating coil
 		bool SuppHeatingCoilFlag; // .TRUE. if supplemental heating coil
 
 		FurnaceOutletNode = Furnace( FurnaceNum ).FurnaceOutletNodeNum;
@@ -7983,9 +7965,7 @@ namespace Furnaces {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 QCoilReq; // Heat addition required from an electric, gas, steam , or hot water heating coil
 		Real64 QActual; // actual heating load
-		int FanOpMode; // cycling fan or constant fan
 		Real64 mdot; // heating coil steam or hot water mass flow rate
 		Real64 MinWaterFlow; // coil minimum hot water mass flow rate, kg/s
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
@@ -8490,7 +8470,6 @@ namespace Furnaces {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::CurrentTime;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using DataEnvironment::OutDryBulbTemp;
@@ -8500,7 +8479,6 @@ namespace Furnaces {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
-		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

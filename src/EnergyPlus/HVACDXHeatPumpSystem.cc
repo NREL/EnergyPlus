@@ -148,7 +148,6 @@ namespace HVACDXHeatPumpSystem {
 		std::string CompName; // Name of CoilSystem:Heating:DX object
 		int DXSystemNum; // Index to CoilSystem:Heating:DX object
 		static bool GetInputFlag( true ); // Flag to get input only once
-		bool HXUnitOn; // Flag to control HX for HXAssisted Cooling Coil
 		Real64 AirMassFlow; // DX System air mass flow rate
 		int InletNodeNum; // DX System inlet node number
 		int OutletNodeNum; // DX System outlet node number
@@ -258,7 +257,6 @@ namespace HVACDXHeatPumpSystem {
 		// Using/Aliasing
 		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -283,7 +281,6 @@ namespace HVACDXHeatPumpSystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int DXSystemNum; // The DXHeatingSystem that you are currently loading input into
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
@@ -292,8 +289,6 @@ namespace HVACDXHeatPumpSystem {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		int DXHeatSysNum;
-		bool FanErrorsFound; // flag returned on fan operating mode check
-		bool DXErrorsFound; // flag returned on DX coil name check
 		std::string CurrentModuleObject; // for ease in getting objects
 		Array1D_string Alphas; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -446,7 +441,6 @@ namespace HVACDXHeatPumpSystem {
 		using DataAirLoop::AirLoopControlInfo;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
-		using EMSManager::iHumidityRatioMaxSetPoint;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 
 		// Locals
@@ -462,7 +456,6 @@ namespace HVACDXHeatPumpSystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int OutNode; // outlet node number
 		int ControlNode; // control node number
 		int DXSysIndex;
 		//  LOGICAL,SAVE        :: MyOneTimeFlag = .TRUE.
@@ -554,7 +547,6 @@ namespace HVACDXHeatPumpSystem {
 
 		// Using/Aliasing
 		using namespace ScheduleManager;
-		using DataEnvironment::OutBaroPress;
 		using DataHVACGlobals::TempControlTol;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
@@ -572,7 +564,6 @@ namespace HVACDXHeatPumpSystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.e-3 ); // Accuracy of solver result
-		Real64 const HumRatAcc( 1.e-6 ); // Accuracy of solver result
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		//  na
@@ -596,11 +587,7 @@ namespace HVACDXHeatPumpSystem {
 		int SolFla; // Flag of solver
 		Array1D< Real64 > Par( 5 ); // Parameter array passed to solver
 		bool SensibleLoad; // True if there is a sensible cooling load on this system
-		bool LatentLoad; // True if there is a latent   cooling load on this system
 		int FanOpMode; // Supply air fan operating mode
-		Real64 TempMinPLR; // Used to find latent PLR when max iterations exceeded
-		Real64 TempMaxPLR; // Used to find latent PLR when max iterations exceeded
-		Real64 TempOutletTempDXCoil; // Used to find latent PLR when max iterations exceeded
 		//added variables to call variable speed DX coils
 		int SpeedNum; // speed number of variable speed DX cooling coil
 		Real64 QZnReq; // Zone load (W), input to variable-speed DX coil

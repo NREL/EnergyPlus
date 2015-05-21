@@ -1432,7 +1432,6 @@ namespace LowTempRadiantSystem {
 		using DataGlobals::NumOfZones;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyPlantInModel;
-		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
@@ -1467,7 +1466,6 @@ namespace LowTempRadiantSystem {
 		int RadSurfNum; // Number of the radiant system surface (DO loop counter)
 		int SurfNum; // Intermediate variable for keeping track of the surface number
 		Real64 TotalEffic; // Intermediate calculation variable for total pump efficiency
-		int WaterNodeIn; // Node number for water inlet node
 		int ZoneNum; // Intermediate variable for keeping track of the zone number
 		static Array1D_bool MyEnvrnFlagHydr;
 		static Array1D_bool MyEnvrnFlagCFlo;
@@ -1930,7 +1928,6 @@ namespace LowTempRadiantSystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // do loop index for plant sizing
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		int SurfNum; // surface index in radiant system data structure
@@ -1939,7 +1936,6 @@ namespace LowTempRadiantSystem {
 		Real64 Cp;
 		bool IsAutoSize; // Indicator to autosize
 		Real64 MaxElecPowerDes; // Design electric power for reproting
-		Real64 MaxElecPowerUser; // User hard-sized electric power for reproting
 		Real64 WaterVolFlowMaxHeatDes; // Design hot water flow for reproting
 		Real64 WaterVolFlowMaxHeatUser; // User hard-sized hot water flow for
 		Real64 WaterVolFlowMaxCoolDes; // Design chilled water flow for reproting
@@ -2467,7 +2463,6 @@ namespace LowTempRadiantSystem {
 		using DataHeatBalance::ZoneData;
 		using DataHeatBalFanSys::MAT;
 		using DataHVACGlobals::SmallLoad;
-		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using PlantUtilities::SetComponentFlowRate;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -2491,8 +2486,6 @@ namespace LowTempRadiantSystem {
 		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/sec]
 		Real64 OffTempCool; // temperature at which the flow rate throttles back to zero for cooling
 		Real64 OffTempHeat; // temperature at which the flow rate throttles back to zero for heating
-		Real64 OpTemp; // operative temperature (approximately the average of MAT and MRT) [Celsius]
-		Real64 QZnReq; // heating or cooling needed by zone [Watts]
 		Real64 SetPointTemp; // temperature "goal" for the radiant system [Celsius]
 		int SurfNum; // Surface number in the Surface derived type for a radiant system surface
 		int SurfNum2; // Surface number in the Surface derived type for a radiant system surface
@@ -2665,8 +2658,6 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const CondDeltaTemp( 1.0 ); // How close the surface temperatures can get to the dewpoint temperature of a space
-		// before the radiant cooling system shuts off the flow.
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3127,7 +3118,6 @@ namespace LowTempRadiantSystem {
 		Real64 OffTempHeat; // temperature at which the heating shuts down
 		Real64 PumpPartLoadRat; // Pump part load ratio (based on user schedule, or 1.0 for no schedule)
 		Real64 PumpTempRise; // Temperature rise of the fluid as it passes through the pump
-		Real64 QZnReq; // heating or cooling needed by zone [Watts]
 		Real64 RadInTemp; // "Desired" radiant system water inlet temperature [Celsius]
 		Real64 SetPointTemp; // temperature that will be used to control the radiant system [Celsius]
 		Real64 SetPointTempHi; // Current high point in setpoint temperature range
@@ -3621,8 +3611,6 @@ namespace LowTempRadiantSystem {
 		// inlet temperature directly)
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const CondDeltaTemp( 1.0 ); // How close the surface temperatures can get to the dewpoint temperature of a space
-		// before the radiant cooling system shuts off the flow.
 		Real64 const TempCheckLimit( 0.1 ); // Maximum allowed temperature difference between outlet temperature calculations
 		Real64 const ZeroSystemResp( 0.1 ); // Response below which the system response is really zero
 		static std::string const RoutineName( "CalcLowTempCFloRadSysComps" );
@@ -4103,8 +4091,6 @@ namespace LowTempRadiantSystem {
 		Real64 ControlTemp; // Temperature of the parameter that is controlling the radiant system
 		Real64 HeatFrac; // fraction of maximum electrical heat input to radiant system [dimensionless]
 		Real64 OffTemp; // Temperature above which the radiant system should be completely off [C]
-		Real64 OpTemp; // Operative temperature (approximately the average of MRT and MAT) [C]
-		Real64 QZnReq; // heating or cooling needed by zone [Watts]
 		int RadSurfNum; // number of surface that is the radiant system
 		Real64 SetPtTemp; // Setpoint temperature [C]
 		int SurfNum; // intermediate variable for surface number in Surface derived type

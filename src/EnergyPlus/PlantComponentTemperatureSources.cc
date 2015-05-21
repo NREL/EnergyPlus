@@ -321,10 +321,8 @@ namespace PlantComponentTemperatureSources {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -583,10 +581,6 @@ namespace PlantComponentTemperatureSources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-		int LoopNum;
-		int LoopSideNum;
 		Real64 Cp;
 		Real64 rDummy;
 		int iDummy;

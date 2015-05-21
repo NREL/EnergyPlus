@@ -171,10 +171,7 @@ namespace WindowComplexManager {
 		static int NumBasis( 0 ); // Number of unique bases (No. in BasisList)
 		static int NBkSurf( 0 ); // Local variable for the number of back surfaces
 		int NumStates; // Local variable for the number of states
-//		static int ThConst( 0 ); // Construct array index of thermal construction of state
 		static int MatrixNo( 0 ); // Index of Basis matrix
-		Real64 Azimuth; // Azimuth of window surface (radians)
-//		Real64 Tilt; // Tilt of window surface (radians)
 		Array1D< Real64 > Thetas; // temp array holding theta values
 		Array1D_int NPhis; // temp array holding number of phis for a given theta
 		Array1D< Real64 > V( 3 ); // vector array
@@ -3169,7 +3166,6 @@ namespace WindowComplexManager {
 		static Array1D_int iMinDT( 1, 0 );
 		static Array1D_int IDConst( 100, 0 );
 
-		int IConst; // Construction number
 		int TotLay; // Total number of layers in a construction
 		//   (sum of solid layers and gap layers)
 		int Lay; // Layer number

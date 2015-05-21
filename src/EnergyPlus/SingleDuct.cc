@@ -349,7 +349,6 @@ namespace SingleDuct {
 		int NumZoneSiz;
 		int ZoneSizIndex;
 		int IOStat;
-		int ZoneNum; // Index to actual zone number
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -4341,7 +4340,6 @@ namespace SingleDuct {
 		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ZoneEquipList;
 		using DataZoneEquipment::EquipmentData;
 		using DataZoneEquipment::SubEquipmentData;
 		using namespace DataLoopNode;
@@ -4349,9 +4347,6 @@ namespace SingleDuct {
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
 		using DataGlobals::NumOfZones;
-		//  USE DataDefineEquip,   ONLY: AirDistUnit, NumAirDistUnits
-		//  USE PackagedTerminalHeatPump, ONLY: GetPTUnitZoneInletAirNode, GetPTUnitIndex, GetPTUnitInletAirNode
-		//  USE FanCoilUnits, ONLY: GetFanCoilIndex, GetFanCoilZoneInletAirNode, GetFanCoilInletAirNode
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -4378,8 +4373,6 @@ namespace SingleDuct {
 		int NodeNum; // Index to node number
 		int CtrlZone; // Index to control zone
 		bool ZoneNodeNotFound; // Flag for error checking
-		bool ZoneEquipNodeNotFound; // Flag for error checking
-		int ADUNum; // Air distribution unit index
 		int SupAirIn; // Supply air inlet node index
 		bool errFlag; // error flag from component validation
 
@@ -4628,19 +4621,16 @@ namespace SingleDuct {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		static Real64 PriMassFlowRate( 0.0 );
-		static Real64 PriPressure( 0.0 );
 		static Real64 PriEnthalpy( 0.0 );
 		static Real64 PriHumRat( 0.0 );
 		static Real64 PriTemp( 0.0 );
 
 		static Real64 SecAirMassFlowRate( 0.0 );
-		static Real64 SecAirPressure( 0.0 );
 		static Real64 SecAirEnthalpy( 0.0 );
 		static Real64 SecAirHumRat( 0.0 );
 		static Real64 SecAirTemp( 0.0 );
 
 		static Real64 MixedAirMassFlowRate( 0.0 );
-		static Real64 MixedAirPressure( 0.0 );
 		static Real64 MixedAirEnthalpy( 0.0 );
 		static Real64 MixedAirHumRat( 0.0 );
 		static Real64 MixedAirTemp( 0.0 );
@@ -4947,7 +4937,6 @@ namespace SingleDuct {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ATMixerIndex; // local air terminal mixer index
 
-		bool ErrorsFound; // for error trapping
 
 		if ( GetATMixerFlag ) {
 			// CALL GetZoneAirLoopEquipment

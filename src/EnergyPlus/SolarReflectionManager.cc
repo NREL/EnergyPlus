@@ -153,7 +153,6 @@ namespace SolarReflectionManager {
 		Real64 ACosTanTan;
 		int J; // DO loop indices
 		int K; // DO loop indices
-		int L; // DO loop indices
 		int NumRecPts; // Number of surface receiving points for reflected solar radiation
 		Real64 VertexWt; // Vertex weighting factor for calculating receiving points
 

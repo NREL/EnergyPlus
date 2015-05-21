@@ -984,12 +984,7 @@ namespace ThermalISO15099Calc {
 		//    2 - store results in new debug output file
 		//   3 - save in-between results (in all iterations) to existing debug file
 
-		// REAL(r64), intent(in) :: sumsol(maxlay)
-		//integer, intent(in) :: nslice(maxlay)
 
-		Real64 glsyswidth;
-		//REAL(r64) :: Ebbold(maxlay), Ebfold(maxlay), Rbold(maxlay), Rfold(maxlay)
-		//REAL(r64) :: rs(maxlay3)
 		Array2D< Real64 > a( 4*nlayer, 4*nlayer );
 		Array1D< Real64 > b( 4*nlayer );
 		Array1D< Real64 > hgas( maxlay1 );
@@ -1039,9 +1034,6 @@ namespace ThermalISO15099Calc {
 		int index;
 		int curTempCorrection;
 
-		Real64 qc_gap_out;
-		Real64 qcgapout2;
-		Real64 hc_modified_out;
 		Real64 qc_gap_in;
 		Real64 hc_modified_in;
 

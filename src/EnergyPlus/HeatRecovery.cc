@@ -2096,7 +2096,6 @@ namespace HeatRecovery {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const ErrorTol( 0.001 ); // error tolerence
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

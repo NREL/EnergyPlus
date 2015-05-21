@@ -290,7 +290,6 @@ namespace ReportSizingManager {
 		using DataAirSystems::PrimaryAirSystem;
 		using DataGlobals::DisplayExtraWarnings;
 		using DataGlobals::InitConvTemp;;
-		using DataHeatBalance::Zone;
 		using namespace DataSizing;
 		using namespace DataHVACGlobals;
 		using General::RoundSigDigits;

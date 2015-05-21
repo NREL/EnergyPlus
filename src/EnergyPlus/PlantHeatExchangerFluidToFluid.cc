@@ -1417,9 +1417,6 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 ExpCheckValue2;
 		Real64 Effectiveness( 0.0 );
 		Real64 HeatTransferRate;
-		Real64 MdotDmdSide;
-		Real64 LeavingTempMinFlow;
-		Real64 LeavingTempFullFlow;
 		int CrossFlowEquation;
 
 		SupSideLoopInletTemp = Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).Temp;

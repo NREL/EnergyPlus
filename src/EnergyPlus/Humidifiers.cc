@@ -504,7 +504,6 @@ namespace Humidifiers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumHum;
 
 		//static bool MySetPointCheckFlag( true );
 
@@ -601,7 +600,6 @@ namespace Humidifiers {
 		using DataSizing::CurDuctType;
 		using DataSizing::FinalZoneSizing;
 		using DataSizing::FinalSysSizing;
-		using DataSizing::AutoVsHardSizingDeltaTempThreshold;
 		using DataSizing::AutoVsHardSizingThreshold;
 		using DataHVACGlobals::Main;
 		using DataHVACGlobals::Cooling;
@@ -624,7 +622,6 @@ namespace Humidifiers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string ModuleObjectType; // for ease in getting objects
-		int NumHum;
 		int RefrigerantIndex; // refiferant index
 		int WaterIndex; // fluid type index
 		Real64 NominalPower; // Nominal power input to humidifier, W
@@ -1204,7 +1201,6 @@ namespace Humidifiers {
 				TankSupplyVdot = AvailTankVdot;
 			}
 
-			TankSupplyVdot = TankSupplyVdot;
 			TankSupplyVol = TankSupplyVdot * ( TimeStepSys * SecInHour );
 			StarvedSupplyVdot = StarvedVdot;
 			StarvedSupplyVol = StarvedVdot * ( TimeStepSys * SecInHour );

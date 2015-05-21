@@ -428,7 +428,6 @@ namespace HeatBalanceAirManager {
 		int Zone2Num;
 		int ZoneNumA;
 		int ZoneNumB;
-		int MixingNum;
 		int SourceCount;
 		int ReceivingCount;
 		int IsSourceZone;

@@ -295,9 +295,6 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< Real64 > MaterialProps( 40 ); // Temporary array to transfer material properties
 		static bool ErrorsFound( false ); // If errors detected in input
 		//  INTEGER :: CondFDMat                ! Number of variable property CondFD materials in input
-		int ConstructNumber; // Cconstruction with CondHBsimple to be overridden with CondHBdetailed
-
-		int NumConstructionAlpha;
 		int Loop;
 		int NumAlphas;
 		int NumNumbers;
@@ -1085,18 +1082,14 @@ namespace HeatBalFiniteDiffManager {
 		// Aliases
 		auto & surfaceFD( SurfaceFD( Surf ) );
 		auto const & T( surfaceFD.T );
-		auto & TOld( surfaceFD.TOld );
 		auto & TT( surfaceFD.TT );
 		auto const & Rhov( surfaceFD.Rhov );
-		auto & RhovOld( surfaceFD.RhovOld );
 		auto & RhoT( surfaceFD.RhoT );
 		auto const & TD( surfaceFD.TD );
 		auto & TDT( surfaceFD.TDT );
 		auto & TDTLast( surfaceFD.TDTLast );
-		auto & TDOld( surfaceFD.TDOld );
 		auto & TDreport( surfaceFD.TDreport );
 		auto & RH( surfaceFD.RH );
-		auto & RHreport( surfaceFD.RHreport );
 		auto & EnthOld( surfaceFD.EnthOld );
 		auto & EnthNew( surfaceFD.EnthNew );
 		auto & EnthLast( surfaceFD.EnthLast );

@@ -139,7 +139,6 @@ namespace PlantManager {
 		// USE STATEMENTS: NA
 
 		// Using/Aliasing
-		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using PlantUtilities::LogPlantConvergencePoints;
 		using DataConvergParams::MinPlantSubIterations;
 		using DataConvergParams::MaxPlantSubIterations;
@@ -676,7 +675,6 @@ namespace PlantManager {
 		using namespace BranchInputManager;
 		using Pipes::InitializePipes;
 		using PipeHeatTransfer::InitializeHeatTransferPipes;
-		using DataGlobals::OutputFileDebug;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -2004,7 +2002,6 @@ namespace PlantManager {
 
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataEnvironment::StdBaroPress;
 		using namespace DataSizing;
 		using PlantLoopEquip::SimPlantEquip;
 		using General::RoundSigDigits;
@@ -2015,7 +2012,6 @@ namespace PlantManager {
 		using PlantUtilities::SetAllFlowLocks;
 		using DataHVACGlobals::NumPlantLoops;
 		using DataHVACGlobals::NumCondLoops;
-		using DataGlobals::FinalSizingHVACSizingSimIteration;
 		using PlantLoopSolver::SimulateAllLoopSidePumps;
 		using DataPlant::PlantFirstSizesOkayToReport;
 
@@ -2023,8 +2019,6 @@ namespace PlantManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const StartQuality( 1.0 );
-		Real64 const StartHumRat( 0.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2340,7 +2334,6 @@ namespace PlantManager {
 		// Using/Aliasing
 		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::GroundTemp_Deep;
 		using DataEnvironment::StdBaroPress;
 		using HVACInterfaceManager::PlantCommonPipe;
 		using ScheduleManager::GetCurrentScheduleValue;
