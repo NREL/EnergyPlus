@@ -902,7 +902,7 @@ namespace HighTempRadiantSystem {
 
 	void
 	CalcHighTempRadiantSystemSP(
-		bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
+		bool const EP_UNUSED(FirstHVACIteration), // true if this is the first HVAC iteration at this system time step !unused1208
 		int const RadSysNum // name of the low temperature radiant system
 	)
 	{

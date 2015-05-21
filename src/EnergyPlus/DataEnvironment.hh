@@ -237,7 +237,7 @@ namespace DataEnvironment {
 		int const NumItems,
 		H const Heights,
 		W LocalWindSpeed,
-		std::string const & Settings
+		std::string const & EP_UNUSED(Settings)
 	)
 	{
 		if ( SiteWindExp == 0.0 ) {

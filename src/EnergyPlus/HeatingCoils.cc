@@ -1589,7 +1589,7 @@ namespace HeatingCoils {
 		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
 		int const FanOpMode, // fan operating mode
-		Real64 const PartLoadRatio // part-load ratio of heating coil
+		Real64 const EP_UNUSED(PartLoadRatio) // part-load ratio of heating coil
 	)
 	{
 		// SUBROUTINE INFORMATION:

@@ -110,7 +110,7 @@ namespace Humidifiers {
 	void
 	SimHumidifier(
 		std::string const & CompName, // name of the humidifier unit
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex // Pointer to Humidifier Unit
 	)
 	{

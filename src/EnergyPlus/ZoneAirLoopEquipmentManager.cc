@@ -419,7 +419,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	InitZoneAirLoopEquipment(
-		bool const FirstHVACIteration, // unused1208
+		bool const EP_UNUSED(FirstHVACIteration), // unused1208
 		int const AirDistUnitNum
 	)
 	{

@@ -226,7 +226,7 @@ namespace InputProcessor {
 
 		// Member Constructor
 		ObjectsDefinition(
-			std::string const & Name, // Name of the Object
+			std::string const & EP_UNUSED(Name), // Name of the Object
 			int const NumParams, // Number of parameters to be processed for each object
 			int const NumAlpha, // Number of Alpha elements in the object
 			int const NumNumeric, // Number of Numeric elements in the object
@@ -345,7 +345,7 @@ namespace InputProcessor {
 
 		// Member Constructor
 		LineDefinition(
-			std::string const & Name, // Object name for this record
+			std::string const & EP_UNUSED(Name), // Object name for this record
 			int const NumAlphas, // Number of alphas on this record
 			int const NumNumbers, // Number of numbers on this record
 			int const ObjectDefPtr, // Which Object Def is this

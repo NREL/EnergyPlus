@@ -4178,10 +4178,10 @@ namespace HeatBalanceManager {
 		int & NumAlphas,
 		Array1< Real64 > const & rNumericArgs,
 		int & NumNumbers,
-		Array1_bool const & lNumericFieldBlanks, //Unused
+		Array1_bool const & EP_UNUSED(lNumericFieldBlanks), //Unused
 		Array1_bool const & lAlphaFieldBlanks,
 		Array1_string const & cAlphaFieldNames,
-		Array1_string const & cNumericFieldNames, //Unused
+		Array1_string const & EP_UNUSED(cNumericFieldNames), //Unused
 		bool & ErrorsFound // If errors found in input
 	)
 	{
@@ -6674,7 +6674,7 @@ Label1000: ;
 	}
 
 	void
-	CreateTCConstructions( bool & ErrorsFound ) // If errors found in input
+	CreateTCConstructions( bool & EP_UNUSED(ErrorsFound) ) // If errors found in input
 	{
 
 		// SUBROUTINE INFORMATION:

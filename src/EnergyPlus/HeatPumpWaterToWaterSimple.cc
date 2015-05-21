@@ -420,9 +420,9 @@ namespace HeatPumpWaterToWaterSimple {
 	void
 	InitWatertoWaterHP(
 		int const GSHPTypeNum, // Type of GSHP
-		std::string const & GSHPName, // User Specified Name of GSHP
+		std::string const & EP_UNUSED(GSHPName), // User Specified Name of GSHP
 		int const GSHPNum, // GSHP Number
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED(FirstHVACIteration),
 		Real64 const MyLoad // Demand Load
 	)
 	{
