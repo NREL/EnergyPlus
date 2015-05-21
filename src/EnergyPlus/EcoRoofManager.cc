@@ -137,9 +137,7 @@ namespace EcoRoofManager {
 		//SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Kv( 0.4 ); // Von Karmen's constant (source FASST)
 		Real64 const rch( 0.63 ); // Turbulent Schimdt Number
-		Real64 const Ks( 0.2 ); // W/m.k. Thermal Conductivity of soil
 		Real64 const rche( 0.71 ); // Turbulent Prandtl Number
-		Real64 const Rv( 461.53 ); // Gas Constant of Water Vapor J/kg K
 		Real64 const Rair( 0.286e3 ); // Gas Constant of air J/Kg K
 		Real64 const g1( 9.81 ); // Gravity. In m/sec^2.
 		Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant W/m^2K^4

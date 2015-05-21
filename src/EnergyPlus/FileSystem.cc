@@ -233,7 +233,7 @@ linkFile(std::string const &fileName, std::string const &link)
 #ifdef _WIN32
 	CopyFile(fileName.c_str(), link.c_str(), false);
 #else
-	int status = symlink(fileName.c_str(), link.c_str());
+	symlink(fileName.c_str(), link.c_str());
 #endif
 }
 

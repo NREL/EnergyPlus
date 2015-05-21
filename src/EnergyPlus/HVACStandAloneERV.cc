@@ -244,9 +244,7 @@ namespace HVACStandAloneERV {
 		auto & GetGenericSupplyAirFlowRate( HeatRecovery::GetSupplyAirFlowRate );
 		using HeatRecovery::GetHeatExchangerObjectTypeNum;
 		auto & GetHXSupplyInletNode( HeatRecovery::GetSupplyInletNode );
-		auto & GetHXSupplyOutletNode( HeatRecovery::GetSupplyOutletNode );
 		auto & GetHXSecondaryInletNode( HeatRecovery::GetSecondaryInletNode );
-		auto & GetHXSecondaryOutletNode( HeatRecovery::GetSecondaryOutletNode );
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;

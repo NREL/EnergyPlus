@@ -465,7 +465,6 @@ namespace DXFEarClipping {
 		// Function argument definitions:
 
 		// Function parameter definitions:
-		Real64 const point_tolerance( 0.00001 );
 
 		// Interface block specifications:
 		// na

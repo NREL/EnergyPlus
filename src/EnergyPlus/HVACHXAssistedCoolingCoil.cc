@@ -1800,7 +1800,6 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
-		static int ErrCount( 0 );
 
 		// Obtains and allocates HXAssistedCoolingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { // First time subroutine has been called, get input data

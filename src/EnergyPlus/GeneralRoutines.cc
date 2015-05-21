@@ -931,7 +931,6 @@ CalcPassiveExteriorBaffleGap(
 	Real64 const g( 9.807 ); // gravitational constant (m/s**2)
 	Real64 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
 	Real64 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
-	Real64 const Pr( 0.71 ); // Prandtl number for air
 	Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 	Real64 const KelvinConv( 273.15 ); // Conversion from Celsius to Kelvin
 	static std::string const RoutineName( "CalcPassiveExteriorBaffleGap" );

@@ -1132,7 +1132,6 @@ namespace FuelCellElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const KJtoJ( 1000.0 ); // convert Kjoules to joules
 
 		// DERIVED TYPE DEFINITIONS
 		// na

@@ -3404,7 +3404,6 @@ namespace General {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		errFlag = false;
-		bool DuplicateNameError = false;
 		std::string::size_type const ItemNameLength = len( ItemName );
 		std::string::size_type const ItemLength = len( ZoneName ) + ItemNameLength;
 		ResultName = ZoneName + ' ' + ItemName;

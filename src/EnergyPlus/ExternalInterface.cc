@@ -204,8 +204,6 @@ namespace ExternalInterface {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		int Loop; // Loop counter
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		cCurrentModuleObject = "ExternalInterface";
 		NumExternalInterfaces = GetNumObjectsFound( cCurrentModuleObject );
@@ -449,7 +447,7 @@ namespace ExternalInterface {
 		std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by ','
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j; // loop counters
+		int i; // loop counters
 		std::string xmlStrOut; // xml values in string, separated by ';'
 		std::string xmlStrOutTyp; // xml values in string, separated by ';'
 		std::string xmlStrIn; // xml values in string, separated by ';'
@@ -457,11 +455,8 @@ namespace ExternalInterface {
 		static int nOutVal; // Number of output values (E+ -> ExternalInterface)
 		static int nInpVar; // Number of input values (ExternalInterface -> E+)
 		int retVal; // Return value of function call, used for error handling
-		int counter( 0 ); // Counter for ErlVariables
 		int mainVersion; // The version number
-		int curNumInpVal; // current number of input values for the InputValType
 		std::string validateErrMsg; // error returned when xml Schema validate failed
-		int errMsgLen; // the length of the error message
 		bool socFileExist; // Set to true if socket configuration
 		// file exists
 		bool simFileExist; // Set to true if simulation configuration
@@ -659,8 +654,6 @@ namespace ExternalInterface {
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const IntegerVar( 1 ); // Integer variable
-		int const RealVar( 2 ); // Real variable
 		static bool FirstCallGetSetDoStep( true ); // Flag to check when External Interface is called first time
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -939,7 +932,7 @@ namespace ExternalInterface {
 		// This routine terminates the FMUs instances
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j, k; // Loop counter
+		int i, j; // Loop counter
 
 		//----Needs to have function that allows to terminates FMU. Was not defined in version 1.0 -- fixme
 		for ( i = 1; i <= NumFMUObjects; ++i ) {
@@ -999,10 +992,6 @@ namespace ExternalInterface {
 		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
 		int IOStatus( 0 ); // Used in GetObjectItem
 		int NumFMUInputVariables( 0 ); // Number of FMU input variables
-		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
-		int numKey( 0 ); // Number of keys found
-		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
-		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		std::string varUnit; // Units sting, may be blank
 		std::string Name_NEW; // Units sting, may be blank
 		std::string Name_OLD; // Units sting, may be blank
@@ -1010,7 +999,6 @@ namespace ExternalInterface {
 		Array1D_int keyIndexes( 1 ); // Array index for
 		Array1D_int varTypes( 1 ); // Array index for
 		Array1D_string NamesOfKeys( 1 ); // Specific key name
-		int retValue;
 		int retValfmiVersion;
 		int retValfmiPathLib;
 		Array1D_string NameListInstances( 5 );
@@ -1698,44 +1686,19 @@ namespace ExternalInterface {
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const IntegerVar( 1 ); // Integer variable
-		int const RealVar( 2 ); // Real variable
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j, k, l; // Loop counter
-		int retVal; // Return value of function call, used for error handling
-		int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
-		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
-		int IOStatus( 0 ); // Used in GetObjectItem
-		int NumFMUInputVariables( 0 ); // Number of FMU input variables
-
-		int NumNumeric; // Number of numbers being input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
-		static bool FirstCallFlag( true ); // Flag for first call
+		int i, j, k; // Loop counter
+		
 		static bool FirstCallDesignDays( true ); // Flag fo first call during warmup
 		static bool FirstCallWUp( true ); // Flag fo first call during warmup
 		static bool FirstCallTStep( true ); // Flag for first call during time stepping
-		int Count;
-
+		
 		Array1D_string Alphas( 5 );
 
-		int NumAlpha, NumNumber, IOStat;
-		int Num;
-
-		int curNumInpVal; // current number of input values for the InputValType
 		std::string validateErrMsg; // error returned when xml Schema validate failed
-		int errMsgLen; // the length of the error message
-
-		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
-		int numKey( 0 ); // Number of keys found
-		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
-		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		std::string varUnits; // Units sting, may be blank
 		std::string tempChar; // Units sting, may be blank
-
-		int Loop; // Loop counter
-		int NumTSObjects;
 
 		Array1D_int keyIndexes( 1 ); // Array index for
 		Array1D_string NamesOfKeys( 1 ); // Specific key name
@@ -2021,11 +1984,9 @@ namespace ExternalInterface {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const nDblMax( 1024 ); // Maximum number of doubles
-		int const nIntMax( 0 ); // Maximum number of integers
-		int const nBooMax( 0 ); // Maximum number of booleans
-
+		
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j; // Loop counter
+		int i; // Loop counter
 		int retVal; // Return value from socket
 
 		int flaWri; // flag to write to the socket

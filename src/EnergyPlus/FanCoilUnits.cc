@@ -1006,13 +1006,8 @@ namespace FanCoilUnits {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
-		Real64 CoilInTemp; // design inlet air temperature for coil [C]
-		Real64 CoilOutTemp; // design outlet air temperature for coil [C]
-		Real64 CoilOutHumRat; // design inlet air humidity ratio for coil [kg/kg]
-		Real64 CoilInHumRat; // design outlet air humidity ratio for coil [kg/kg]
 		bool ErrorsFound; // TRUE if errors foind during sizing
 		Real64 DesCoilLoad; // coil load used for sizing [W]
-		Real64 FCOAFrac; // design outside air fraction for the fan coil unit
 		static int CoilWaterInletNode( 0 );
 		static int CoilWaterOutletNode( 0 );
 		std::string CoolingCoilName;
@@ -1545,7 +1540,6 @@ namespace FanCoilUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 25 ); // maximum number of iterations for controlling output
 		int const iReverseAction( 1 );
 		int const iNormalAction( 2 );
 		int const MaxIterCycl( 100 );

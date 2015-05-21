@@ -535,9 +535,7 @@ namespace HVACControllers {
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		int iNodeType; // for checking actuator node type
-		int WaterCoilNum; // water coil index
 		bool NodeNotFound; // flag true if the sensor node is on the coil air outlet node
-		bool NotHeatingCoil; // flag true if the water coil is a cooling coil
 		bool EMSSetPointErrorFlag; // flag true is EMS is used to set node setpoints
 
 		// All the controllers are loaded into the same derived type, both the PI and Limit

@@ -826,7 +826,6 @@ namespace FluidCoolers {
 		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool OneTimeFlagForEachFluidCooler;
-		bool FatalError;
 		int TypeOf_Num( 0 );
 		int LoopNum;
 		int LoopSideNum;

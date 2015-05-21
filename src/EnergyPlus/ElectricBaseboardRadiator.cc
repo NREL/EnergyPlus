@@ -246,7 +246,6 @@ namespace ElectricBaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
 		int BaseboardNum;
-		int ElecBBNum;
 		int NumAlphas;
 		int NumNumbers;
 		int SurfNum; // surface number that radiant heat delivered
@@ -956,7 +955,6 @@ namespace ElectricBaseboardRadiator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // DO loop counter for surface index
-		int ZoneNum; // DO loop counter for surface index
 
 		// FLOW:
 		ElecBaseboardSysOn = false;

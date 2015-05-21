@@ -949,7 +949,6 @@ namespace EvaporativeCoolers {
 		//inits
 		CoolerOnOApath = false;
 		CoolerOnMainAirLoop = false;
-		bool ErrorsFound;
 
 		if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate == AutoSize || EvapCond( EvapCoolNum ).VolFlowRate == AutoSize ) {
 			if ( CurSysNum > 0 ) { //central system
@@ -1581,8 +1580,6 @@ namespace EvaporativeCoolers {
 
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIte( 500 ); // Maximum number of iterations for solver
-		Real64 const TempTol( 0.001 ); // convergence tollerance
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1877,11 +1874,6 @@ namespace EvaporativeCoolers {
 		Real64 QHX; // Q Across Sec HX in Watts or J/sec
 		Real64 RhoWater;
 		Real64 RhoAir; // Density of the primary side air
-		Real64 CFMAir;
-		Real64 TotalVolFlow;
-		Real64 TertVdot;
-		Real64 SecVdot;
-		Real64 SecMdot;
 		Real64 MassFlowRateSecMin;
 		static Real64 BlowDownVdot( 0.0 );
 		static Real64 DriftVdot( 0.0 );
@@ -2303,25 +2295,18 @@ namespace EvaporativeCoolers {
 		Real64 RhoAirSys; // density of primary air at inlet condition
 		Real64 EffectivenessDry; // dry coil effectiveness
 		Real64 EffectivenessWet; // wet coil effectiveness
-		Real64 TdbOutSysWetMin; // system( primary ) air drybulb outlet temperature minimum based on wet coil
-		Real64 TdbOutSysDryMin; // system (primary) air drybulb outlet temperature minimum based on dry coil
 		Real64 FlowRatio; // flow ratio based on current to the design of secondary air flow rate
 		Real64 EffModDryMode; // dry mode effectiveness modifier for flow ratio
 		Real64 EffModWetMode; // wet mode effectiveness modifier for flow ratio
-		Real64 CapFlowMin; // minimum capacity flow (massFlowRate * Specific Heat) of primary and secondary flows
 		Real64 CapFlowSys; // capacity flow (massFlowRate * Specific Heat) of primary air system
 		Real64 CapFlowSec; // capacity flow (massFlowRate * Specific Heat) of secondary system
 		Real64 CpAirSec; // specific heat of secondary air at inlet condition
 		Real64 CpAirSys; // specific heat of primary air at inlet condition
-		Real64 MassFlowRateTot; // current total mass flow rate of primary and secondary air mass flow rates
-		Real64 DesignMassFlowRateTot; // total design mass flow rate of primary and secondary air mass flow rates
 
 		Real64 QHXRate; // total heat transfer rate
 		Real64 OutletTempSec; // secondary air outlet temperature
-		Real64 SecOutletAirHumRatSat; // secondary air humidity ratio corresponding to saturated temperature
 		Real64 SecOutletAirHumRat; // secondary air humidity ratio at constant temperature (Pure mass transfer)
 		Real64 SecOutletEnthalpy; // secondary air outlet enthalpy
-		Real64 SecOutletTSat; // secondary air saturated temperature corresponding to outlet enthalpy
 
 		if ( EvapCond( EvapCoolNum ).InletMassFlowRate > 0.0 ) {
 			FlowRatio = AirMassFlowSec / EvapCond( EvapCoolNum ).InletMassFlowRate; // ratio of current secondary air flow to current primary air flow
@@ -2439,11 +2424,8 @@ namespace EvaporativeCoolers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 SecOutletAirHumRatSat; // secondary air humidity ratio corresponding to saturated temperature
 		Real64 SecOutletAirHumRat; // secondary air humidity ratio at the outlet node
 		Real64 SecOutletEnthalpy; // secondary air outlet enthalpy
-		Real64 SecOutletTempSat; // secondary air saturated temperature corresponding to outlet enthalpy
-		Real64 SecOutletTemp; // secondary air outlet temperature
 		Real64 CpAirSec; // specific heat of secondary air at inlet condition
 		Real64 hfg; // secondary air side enthaly of evaporation
 
@@ -3361,7 +3343,6 @@ namespace EvaporativeCoolers {
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyFanFlag;
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
-		bool errFlag;
 		int Loop;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		Real64 TimeElapsed;
@@ -3548,7 +3529,6 @@ namespace EvaporativeCoolers {
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
 		int SAFMethod(0); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
-		int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
 		DataScalableSizingON = false;
 		ZoneHeatingOnlyFan = false;

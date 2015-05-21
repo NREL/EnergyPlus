@@ -853,7 +853,6 @@ namespace HVACCooledBeam {
 		static Real64 CpAirZn( 0.0 ); // specific heat of air at zone conditions [J/kg-C]
 		static Real64 CpAirSys( 0.0 ); // specific heat of air at supply air conditions [J/kg-C]
 		static Real64 TWOut( 0.0 ); // outlet water tamperature [C]
-		static Real64 NumBeams( 0.0 ); // number of beams
 		int ControlNode; // the water inlet node
 		int InAirNode; // the air inlet node
 		bool UnitOn; // TRUE if unit is on

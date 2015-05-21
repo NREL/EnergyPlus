@@ -1330,7 +1330,6 @@ namespace DesiccantDehumidifiers {
 		using EMSManager::iHumidityRatioMaxSetPoint;
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
-		auto & GetSteamCoilCapacity( SteamCoils::GetCoilCapacity );
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using DataPlant::TypeOf_CoilSteamAirHeating;

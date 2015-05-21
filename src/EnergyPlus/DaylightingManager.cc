@@ -797,8 +797,6 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const tmpDFCalc( 0.05 ); // cut off illuminance (lux) for exterior horizontal in calculating
-		// the daylighting and glare factors
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -893,8 +891,6 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const tmpDFCalc( 0.05 ); // cut off illuminance (lux) for exterior horizontal in calculating
-		// the daylighting and glare factors
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1150,7 +1146,7 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const tmpDFCalc( 0.05 ); // cut off illuminance (lux) for exterior horizontal in calculating
+
 		// the daylighting and glare factors
 
 		// INTERFACE BLOCK SPECIFICATIONS:
