@@ -409,8 +409,6 @@ namespace MundtSimMgr {
 		using DataSurfaces::Surface;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::HConvIn;
-		using DataHeatBalance::ZoneIntGain;
-		using DataHeatBalance::RefrigCaseCredit;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using Psychrometrics::PsyWFnTdpPb;
 		using Psychrometrics::PsyCpAirFnWTdb;

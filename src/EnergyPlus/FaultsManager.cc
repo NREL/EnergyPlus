@@ -164,7 +164,6 @@ namespace FaultsManager {
 		int jFaultyHumidistat; //Number of fault objects of type 108: faulty humidistat
 		int jj;
 		int iFaults;
-		int iTotalFaults;
 		std::string cFault1;
 
 		if ( RunMeOnceFlag ) return;

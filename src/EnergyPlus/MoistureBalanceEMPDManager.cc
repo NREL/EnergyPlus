@@ -504,7 +504,6 @@ namespace MoistureBalanceEMPDManager {
 		// Finite difference method
 
 		// Using/Aliasing
-		using DataGlobals::TimeStepZone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

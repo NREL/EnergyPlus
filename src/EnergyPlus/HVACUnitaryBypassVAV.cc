@@ -425,9 +425,7 @@ namespace HVACUnitaryBypassVAV {
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using ScheduleManager::GetScheduleIndex;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
-		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataHVACGlobals::FanType_ZoneExhaust;
 		using DataHVACGlobals::NumPrimaryAirSys;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -448,7 +446,6 @@ namespace HVACUnitaryBypassVAV {
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
 		using SteamCoils::GetTypeOfCoil;
-		using SteamCoils::ZoneLoadControl;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
@@ -510,7 +507,6 @@ namespace HVACUnitaryBypassVAV {
 		static int EquipNum( 0 ); // local do loop index for equipment listed for a zone
 		int HeatCoilInletNodeNum; // Heating coil air inlet node number
 		int HeatCoilOutletNodeNum; // Heating coil air outlet node number
-		int TempNodeNum; // HW coil water inlet node
 		int SteamIndex; // steam coil index
 		Real64 SteamDensity; // steam coil steam density
 
@@ -1197,7 +1193,6 @@ namespace HVACUnitaryBypassVAV {
 		using EMSManager::iHumidityRatioMaxSetPoint;
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
-		auto & GetSteamCoilCapacity( SteamCoils::GetCoilCapacity );
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -1864,7 +1859,6 @@ namespace HVACUnitaryBypassVAV {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 50 ); // Maximum number of iterations
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

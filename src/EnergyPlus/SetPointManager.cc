@@ -2937,21 +2937,9 @@ namespace SetPointManager {
 		int HStatZoneNum;
 		bool HstatZoneFound;
 		int ZonesCooledIndex; // Cooled zones index in an air loop
-		int TotalBranches;
-		int TotalComponents;
 		int BranchNumPlantSide;
 		int CompNumPlantSide;
-		int VarNum;
-		//INTEGER  :: ChillerIndexPlantSide    = 0
-		//INTEGER  :: ChillerIndexDemandSide   = 0
-		//INTEGER  :: BranchIndexPlantSide     = 0
-		//INTEGER  :: BranchIndexDemandSide    = 0
-		//INTEGER  :: LoopIndexPlantSide       = 0
-		//INTEGER  :: LoopIndexDemandSide      = 0
 		static int TypeNum( 0 );
-		static int TowerNum( 0 );
-		static int CondLoopNum( 0 );
-		static int CondBranchNum( 0 );
 		static int NumChiller( 0 );
 		static int NumCT( 0 );
 		static int TypeOf_Num( 0 );
@@ -6775,7 +6763,6 @@ namespace SetPointManager {
 		// Using/Aliasing
 		using DataGlobals::SysSizingCalc;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
-		using DataHVACGlobals::DoSetPointTest;
 		using DataHVACGlobals::SetPointErrorFlag;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -7439,7 +7426,6 @@ namespace SetPointManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int write_stat;
 		std::string cCurrentModuleObject;
 
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";

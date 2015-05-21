@@ -102,7 +102,7 @@ namespace EnergyPlus {
 
 			sqlite3_stmt* sqlStmtPtr;
 
-			int code = sqlite3_prepare_v2(sqlite_test->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
+			sqlite3_prepare_v2(sqlite_test->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
 			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
 				std::vector < std::string > valueVector;
 				for ( int i = 0; i < rowCount; ++i ) {

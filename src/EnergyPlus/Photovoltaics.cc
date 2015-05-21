@@ -129,7 +129,6 @@ namespace Photovoltaics {
 		using InputProcessor::FindItemInList;
 		//unused0909  USE DataEnvironment, ONLY : EnvironmentName, DayOfYear
 		//unused0909  USE DataGlobals, ONLY: BeginEnvrnFlag, EndEnvrnFlag
-		using DataGlobalConstants::iGeneratorPV;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -288,15 +287,10 @@ namespace Photovoltaics {
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
-		using DataGlobals::DegToRadians;
 		using DataGlobals::KelvinConv;
 		//unused0909  USE DataEnvironment, ONLY: Longitude, TimeZoneMeridian
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
-		using DataSurfaces::ExternalEnvironment;
-		using DataSurfaces::SurfaceClass_Shading;
-		using DataSurfaces::SurfaceClass_Detached_F;
-		using DataSurfaces::SurfaceClass_Detached_B;
 		using namespace DataHeatBalance;
 		using ScheduleManager::GetScheduleIndex;
 		using TranspiredCollector::GetTranspiredCollectorIndex;
@@ -1203,7 +1197,6 @@ namespace Photovoltaics {
 		Real64 const EPS( 0.001 );
 		Real64 const ERR( 0.001 );
 		Real64 const MinInsolation( 30.0 );
-		int const CCMAX( 10 );
 		int const KMAX( 100 );
 		Real64 const EtaIni( 0.10 ); // initial value of eta
 
@@ -1485,7 +1478,6 @@ namespace Photovoltaics {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const CCMAX( 10 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

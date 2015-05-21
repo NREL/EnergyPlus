@@ -297,7 +297,6 @@ namespace DualDuct {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		int ZoneNum; // Index to actual zone number
 		static Array1D< Real64 > NumArray( 2, 0.0 );
 		static Array1D_string AlphArray( 7 );
 		static Array1D_string cAlphaFields( 7 ); // Alpha field names

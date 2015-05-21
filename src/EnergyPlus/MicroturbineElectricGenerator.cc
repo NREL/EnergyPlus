@@ -1122,10 +1122,8 @@ namespace MicroturbineElectricGenerator {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Num; // Loop index over all generators
 		int HeatRecInletNode; // Inlet node number in heat recovery loop
 		int HeatRecOutletNode; // Outlet node number in heat recovery loop
-		static bool InitGeneratorOnce( true ); // Flag for 1 time initialization
 		static Array1D_bool MyEnvrnFlag; // Flag for init once at start of environment
 		static Array1D_bool MyPlantScanFlag;
 		static Array1D_bool MySizeAndNodeInitFlag;
@@ -1262,7 +1260,6 @@ namespace MicroturbineElectricGenerator {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;

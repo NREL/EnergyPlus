@@ -112,11 +112,9 @@ namespace SizingManager {
 		using ZoneEquipmentManager::RezeroZoneSizingArrays;
 		using SimAirServingZones::ManageAirLoops;
 		using SimAirServingZones::UpdateSysSizing;
-		using DataEnvironment::TotDesDays;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
-		using DataEnvironment::CurEnvirNum;
 		using DataEnvironment::Month;
 		using DataEnvironment::DayOfMonth;
 		using DataEnvironment::EndMonthFlag;
@@ -2775,8 +2773,6 @@ namespace SizingManager {
 		int iNoCoolHeatFlowPerFloorAreaNumericNum; // get input index to Zone HVAC sizing no cool/heat FPA
 		int iNoCoolHeatFlowPerFracCoolNumericNum; // get input index to Zone HVAC sizing no cool/heat FPFC
 		int iNoCoolHeatFlowPerFracHeatNumericNum; // get input index to Zone HVAC sizing no cool/heat FPFH
-		int iNoCoolHeatFlowPerCoolCapNumericNum; // get input index to Zone HVAC sizing no cool/heat FPCC
-		int iNoCoolHeatFlowPerHeatCapNumericNum; // get input index to Zone HVAC sizing no cool/heat FPHC
 
 		int iCoolCAPMAlphaNum; // get input index to Zone HVAC sizing chilled water flow method
 		int iCoolDesignCapacityNumericNum; // get input index to Zone HVAC sizing chilled water flow

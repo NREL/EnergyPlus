@@ -364,8 +364,6 @@ namespace HVACVariableRefrigerantFlow {
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using namespace DataEnvironment;
 		using General::TrimSigDigits;
-		using DataPlant::TypeOf_HPWaterEFCooling;
-		using DataPlant::TypeOf_HPWaterEFHeating;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -451,7 +449,6 @@ namespace HVACVariableRefrigerantFlow {
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
 		using Psychrometrics::RhoH2O;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using DataEnvironment::OutDryBulbTemp;
@@ -1190,7 +1187,6 @@ namespace HVACVariableRefrigerantFlow {
 		using WaterManager::SetupTankDemandComponent;
 		using WaterManager::SetupTankSupplyComponent;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::VRFTerminalUnit_Num;
 		using DataSizing::AutoSize;
 		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
@@ -2821,7 +2817,6 @@ namespace HVACVariableRefrigerantFlow {
 		using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 		using InputProcessor::SameString;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutWetBulbTemp;
@@ -4915,7 +4910,6 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIte( 500 ); // maximum number of iterations
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

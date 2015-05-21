@@ -34,7 +34,6 @@ TEST( TwoSpeedFluidCoolerInput, Test1 )
 	}
 	std::string const cCurrentModuleObject( "FluidCooler:TwoSpeed" );
 	int FluidCoolerNum( 1 );
-	bool ErrrorsFound( false );
 	SimpleFluidCooler.allocate( FluidCoolerNum );
 
 	SimpleFluidCooler( FluidCoolerNum ).Name = "Test";

@@ -911,7 +911,6 @@ namespace WaterToAirHeatPumpSimple {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 rhoair;
-		Real64 CpAir;
 		Real64 MixTemp;
 		Real64 MixHumRat;
 		Real64 MixEnth;

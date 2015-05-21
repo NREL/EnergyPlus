@@ -2440,7 +2440,6 @@ namespace ZoneTempPredictorCorrector {
 		// Using/Aliasing
 		using DataRoomAirModel::AirModel;
 		using DataRoomAirModel::RoomAirModel_Mixing;
-		using DataRoomAirModel::RoomAirModel_UCSDDV;
 		using DataRoomAirModel::IsZoneDV;
 		using DataRoomAirModel::ZoneDVMixedFlag;
 		using DataRoomAirModel::IsZoneUI;
@@ -2464,16 +2463,10 @@ namespace ZoneTempPredictorCorrector {
 		using DataRoomAirModel::XM2TMX;
 		using DataRoomAirModel::XM3TMX;
 		using DataRoomAirModel::XM4TMX;
-		using DataRoomAirModel::RoomAirModel_Mundt;
-		using DataRoomAirModel::RoomAirModel_UserDefined;
 
 		using General::TrimSigDigits;
-		using DataEnvironment::Month;
-		using DataEnvironment::DayOfMonth;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataGlobals::CurrentTime;
-		using DataEnvironment::DayOfYear;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2748,7 +2741,6 @@ namespace ZoneTempPredictorCorrector {
 		int SchedNameIndex;
 		int SchedTypeIndex;
 		Array2D< Real64 > DaySPValues; // Day room temp setpoint values - for optimum start
-		Real64 OccRoomSP; // Occupied room temp set point - for optimum start
 		int OccStartTime; // Occupancy start time - for optimum start
 
 		// FLOW:
@@ -3577,7 +3569,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataLoopNode::Node;
 		using DataRoomAirModel::AirModel;
 		using DataRoomAirModel::RoomAirModel_Mixing;
-		using DataRoomAirModel::RoomAirModel_UCSDDV;
 		using DataRoomAirModel::IsZoneDV;
 		using DataRoomAirModel::ZoneDVMixedFlag;
 		using DataRoomAirModel::IsZoneUI;
@@ -3604,8 +3595,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataRoomAirModel::RoomAirModel_Mundt;
 		using DataRoomAirModel::RoomAirModel_UserDefined;
 		using RoomAirModelManager::ManageAirModel;
-		using DataEnvironment::Month;
-		using DataEnvironment::DayOfMonth;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -4164,7 +4153,6 @@ namespace ZoneTempPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_HAMT;
 		using DataSurfaces::HeatTransferModel_EMPD;
@@ -4529,7 +4517,6 @@ namespace ZoneTempPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
 
@@ -4837,7 +4824,6 @@ namespace ZoneTempPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 		using General::RoundSigDigits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;

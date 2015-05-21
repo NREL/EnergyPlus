@@ -201,7 +201,6 @@ namespace SolarCollectors {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using DataGlobals::DegToRadians;
 		using DataGlobals::InitConvTemp;
 		using namespace DataHeatBalance;
 		using InputProcessor::GetNumObjectsFound;
@@ -221,7 +220,6 @@ namespace SolarCollectors {
 		using DataSurfaces::OSCM;
 		using DataSurfaces::TotOSCM;
 		using DataSurfaces::TotSurfaces;
-		using DataSurfaces::OtherSideCondModeledExt;
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -738,8 +736,6 @@ namespace SolarCollectors {
 		using DataGlobals::DegToRadians;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::TimeStep;
-		using DataGlobals::SecInHour;
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::HourOfDay;
 		using DataLoopNode::Node;
 		using namespace DataPlant;
@@ -748,7 +744,6 @@ namespace SolarCollectors {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::TimeStepSys;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1246,7 +1241,6 @@ namespace SolarCollectors {
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::HourOfDay;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
@@ -1422,7 +1416,6 @@ namespace SolarCollectors {
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::HourOfDay;
 
 		// Locals
@@ -1732,8 +1725,6 @@ namespace SolarCollectors {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const gravity( 9.806 ); // gravitational constant [m/s^2]
-		Real64 const SmallNumber( 1.00e-20 ); // small number to avoid div by zero
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  CHARACTER(len=MaxNameLength):: String        ! Dummy string for converting numbers to strings

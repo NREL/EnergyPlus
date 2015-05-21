@@ -2422,7 +2422,6 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using InputProcessor::MakeUPPERCase;
 		using InputProcessor::FindItem;
-		using DataHeatBalance::Zone;
 		using InputProcessor::SameString;
 
 		// Locals
@@ -3264,14 +3263,12 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		//using namespace OutputReportPredefined;
 		using DataGlobals::mtr_stream;
-		using DataGlobals::OutputFileDebug; // ,DoingPredefinedAndTabularReporting
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const convertJtoGJ( 1.0 / 1000000000.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7091,7 +7088,6 @@ GetNumMeteredVariables(
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
 	int Loop;
-	int Pos;
 
 	NumVariables = 0;
 	for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
@@ -7162,7 +7158,6 @@ GetMeteredVariables(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
-	int Pos;
 	int NumVariables;
 	int MeterPtr;
 	int NumOnMeterPtr;
@@ -7812,8 +7807,6 @@ ProduceRDDMDD()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	int const RealType( 1 );
-	int const IntegerType( 2 );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -7827,7 +7820,6 @@ ProduceRDDMDD()
 	int Item;
 	bool SortByName;
 	int ItemPtr;
-	int write_stat;
 
 	struct VariableTypes
 	{

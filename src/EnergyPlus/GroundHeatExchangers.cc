@@ -83,7 +83,6 @@ namespace GroundHeatExchangers {
 	// MODULE PARAMETER DEFINITIONS
 	Real64 const hrsPerDay( 24.0 ); // Number of hours in a day
 	Real64 const hrsPerMonth( 730.0 ); // Number of hours in month
-	Real64 const DeltaTempLimit( 100.0 ); // temp limit for warnings
 	int const maxTSinHr( 60 ); // Max number of time step in a hour
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -299,7 +298,6 @@ namespace GroundHeatExchangers {
 		int mm1;
 		int nn1;
 		int i;
-		int j;
 		Real64 disRing;
 		int I0;
 		int J0;
@@ -1839,11 +1837,6 @@ namespace GroundHeatExchangers {
 		Real64 hci;
 		Real64 Rcond;
 		Real64 Rconv;
-		Real64 Rgrout;
-		Real64 B0; // grout resistance curve fit coefficients
-		Real64 B1;
-		Real64 maxDistance;
-		Real64 distanceRatio;
 		Real64 smoothingFunction;
 		Real64 A( 3150 );
 		Real64 B( 350 );
@@ -1928,7 +1921,6 @@ namespace GroundHeatExchangers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 RATIO;
 		Real64 gFuncVal;
 
 		//Binary Search Algorithms Variables

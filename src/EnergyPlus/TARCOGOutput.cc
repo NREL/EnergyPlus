@@ -193,7 +193,6 @@ namespace TARCOGOutput {
 
 		int i;
 		int j;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_10001( "('TARCOG v.',A,'compiled ',A)" );
@@ -556,7 +555,6 @@ namespace TARCOGOutput {
 		// Locals
 		int i;
 		int j;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_1014( "('Adjusted input arguments:')" );
@@ -712,7 +710,6 @@ namespace TARCOGOutput {
 		Array1D_string real_CLOCK( 3 );
 
 		int i;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_2000( "('TARCOG calculation results - ',I4,'-',I2.2,'-',I2.2,', ',I2.2,':',I2.2,':',I2.2)" );
@@ -1141,7 +1138,6 @@ namespace TARCOGOutput {
 		Array1D_int DATE_TIME( 8 );
 		Array1D_string real_CLOCK( 3 );
 
-		int nperr;
 
 		static std::string dynFormat;
 
@@ -1402,7 +1398,6 @@ namespace TARCOGOutput {
 	{
 
 		// Locals
-		int ferr;
 
 		// Formats
 		static gio::Fmt Format_2360( "('TARCOG status: ',I3,' - Normal termination.')" );
