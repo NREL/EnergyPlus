@@ -1526,7 +1526,7 @@ void SQLite::createSQLiteReportDataRecord(
 
 void SQLite::createSQLiteTimeIndexRecord(
 	int const reportingInterval,
-	int const recordIndex,
+	int const EP_UNUSED(recordIndex),
 	int const cumlativeSimulationDays,
 	int const curEnvirNum,
 	Optional_int_const month,

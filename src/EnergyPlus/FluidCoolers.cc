@@ -775,7 +775,7 @@ namespace FluidCoolers {
 	void
 	InitFluidCooler(
 		int const FluidCoolerNum, // Number of the current fluid cooler being simulated
-		bool const RunFlag // TRUE if fluid cooler is ON
+		bool const EP_UNUSED(RunFlag) // TRUE if fluid cooler is ON
 	)
 	{
 

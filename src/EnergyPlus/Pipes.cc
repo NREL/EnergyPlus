@@ -77,9 +77,9 @@ namespace Pipes {
 		int const CompType,
 		std::string & PipeName,
 		int & CompIndex,
-		Real64 const MaxVolFlowRate,
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration
+		Real64 const EP_UNUSED(MaxVolFlowRate),
+		bool const EP_UNUSED(InitLoopEquip),
+		bool const EP_UNUSED(FirstHVACIteration)
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -311,10 +311,10 @@ namespace Pipes {
 
 	void
 	InitializePipes(
-		int const PipeType, // Type of Pipe
+		int const EP_UNUSED(PipeType), // Type of Pipe
 		std::string const & PipeName, // Name of Pipe
 		int & PipeNum, // Index into pipe structure for name
-		Real64 const MaxVolFlowRate // unused at present time
+		Real64 const EP_UNUSED(MaxVolFlowRate) // unused at present time
 	)
 	{
 

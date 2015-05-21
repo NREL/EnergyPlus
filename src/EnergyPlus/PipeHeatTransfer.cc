@@ -861,7 +861,7 @@ namespace PipeHeatTransfer {
 
 	void
 	InitPipesHeatTransfer(
-		int const PipeType,
+		int const EP_UNUSED(PipeType),
 		int const PipeHTNum, // component number
 		bool const FirstHVACIteration // component number
 	)
@@ -1210,7 +1210,7 @@ namespace PipeHeatTransfer {
 
 	void
 	InitializeHeatTransferPipes(
-		int const PipeType, // Type of Pipe
+		int const EP_UNUSED(PipeType), // Type of Pipe
 		std::string const & PipeName, // Name of Pipe
 		int & PipeNum // Index into pipe structure for name
 	)

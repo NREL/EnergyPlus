@@ -1895,7 +1895,7 @@ namespace HVACUnitaryBypassVAV {
 		bool const FirstHVACIteration, // Flag for 1st HVAC iteration
 		Real64 & PartLoadFrac, // Compressor part load fraction
 		Real64 & LoadMet, // Load met by unit (W)
-		Real64 & QZnReq, // Zone load (W)
+		Real64 & EP_UNUSED(QZnReq), // Zone load (W)
 		Real64 & OnOffAirFlowRatio, // Ratio of compressor ON airflow to AVERAGE airflow over timestep
 		bool const HXUnitOn // flag to enable heat exchanger
 	)

@@ -1387,7 +1387,7 @@ namespace SteamCoils {
 
 	void
 	CheckSteamCoilSchedule(
-		std::string const & CompType,
+		std::string const & EP_UNUSED(CompType),
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
@@ -1724,7 +1724,7 @@ namespace SteamCoils {
 	GetCoilAirOutletNode(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
-		bool & ErrorsFound // set to true if problem
+		bool & EP_UNUSED(ErrorsFound) // set to true if problem
 	)
 	{
 

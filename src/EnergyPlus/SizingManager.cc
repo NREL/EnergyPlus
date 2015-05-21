@@ -786,10 +786,10 @@ namespace SizingManager {
 		int & NumAlphas,
 		Array1< Real64 > const & Numbers,
 		int & NumNumbers,
-		Array1_bool const & lNumericBlanks, //Unused
+		Array1_bool const & EP_UNUSED(lNumericBlanks), //Unused
 		Array1_bool const & lAlphaBlanks,
 		Array1_string const & cAlphaFields,
-		Array1_string const & cNumericFields, //Unused
+		Array1_string const & EP_UNUSED(cNumericFields), //Unused
 		bool & ErrorsFound // If errors found in input
 	)
 	{

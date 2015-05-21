@@ -195,7 +195,7 @@ namespace WaterUse {
 
 	void
 	SimulateWaterUseConnection(
-		int const EquipTypeNum,
+		int const EP_UNUSED(EquipTypeNum),
 		std::string const & CompName,
 		int & CompIndex,
 		bool const InitLoopEquip,

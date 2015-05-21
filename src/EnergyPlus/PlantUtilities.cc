@@ -67,10 +67,10 @@ namespace PlantUtilities {
 		Real64 const MaxCompMdot,
 		int const InletNode, // component's inlet node index in node structure
 		int const OutletNode, // component's outlet node index in node structure
-		int const LoopNum, // plant loop index for PlantLoop structure
-		int const LoopSideNum, // Loop side index for PlantLoop structure
-		int const BranchIndex, // branch index for PlantLoop
-		int const CompIndex // component index for PlantLoop
+		int const EP_UNUSED(LoopNum), // plant loop index for PlantLoop structure
+		int const EP_UNUSED(LoopSideNum), // Loop side index for PlantLoop structure
+		int const EP_UNUSED(BranchIndex), // branch index for PlantLoop
+		int const EP_UNUSED(CompIndex) // component index for PlantLoop
 	)
 	{
 
@@ -1474,7 +1474,7 @@ namespace PlantUtilities {
 	UpdateChillerComponentCondenserSide(
 		int const LoopNum, // component's loop index
 		int const LoopSide, // component's loop side number
-		int const TypeOfNum, // Component's type index
+		int const EP_UNUSED(TypeOfNum), // Component's type index
 		int const InletNodeNum, // Component's inlet node pointer
 		int const OutletNodeNum, // Component's outlet node pointer
 		Real64 const ModelCondenserHeatRate, // model's heat rejection rate at condenser (W)
@@ -1581,7 +1581,7 @@ namespace PlantUtilities {
 	UpdateComponentHeatRecoverySide(
 		int const LoopNum, // component's loop index
 		int const LoopSide, // component's loop side number
-		int const TypeOfNum, // Component's type index
+		int const EP_UNUSED(TypeOfNum), // Component's type index
 		int const InletNodeNum, // Component's inlet node pointer
 		int const OutletNodeNum, // Component's outlet node pointer
 		Real64 const ModelRecoveryHeatRate, // model's heat rejection rate at recovery (W)
@@ -1688,9 +1688,9 @@ namespace PlantUtilities {
 	UpdateAbsorberChillerComponentGeneratorSide(
 		int const LoopNum, // component's loop index
 		int const LoopSide, // component's loop side number
-		int const TypeOfNum, // Component's type index
+		int const EP_UNUSED(TypeOfNum), // Component's type index
 		int const InletNodeNum, // Component's inlet node pointer
-		int const OutletNodeNum, // Component's outlet node pointer
+		int const EP_UNUSED(OutletNodeNum), // Component's outlet node pointer
 		int const HeatSourceType, // Type of fluid in Generator loop
 		Real64 const ModelGeneratorHeatRate, // model's generator heat rate (W)
 		Real64 const ModelMassFlowRate, // model's generator mass flow rate (kg/s)
@@ -2087,7 +2087,7 @@ namespace PlantUtilities {
 		int const InletNodeNum,
 		int const OutletNodeNum,
 		Optional_int_const LoopNum,
-		Optional< Real64 const > OutletTemp // set on outlet node if present and water.
+		Optional< Real64 const > EP_UNUSED(OutletTemp) // set on outlet node if present and water.
 	)
 	{
 

@@ -900,7 +900,7 @@ namespace Fans {
 	void
 	InitFan(
 		int const FanNum,
-		bool const FirstHVACIteration // unused1208
+		bool const EP_UNUSED(FirstHVACIteration) // unused1208
 	)
 	{
 
@@ -3066,7 +3066,7 @@ namespace Fans {
 	Real64
 	FanDesDT(
 		int const FanNum, // index of fan in Fan array
-		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+		Real64 const EP_UNUSED(FanVolFlow) // fan volumetric flow rate [m3/s]
 	)
 	{
 		// FUNCTION INFORMATION:

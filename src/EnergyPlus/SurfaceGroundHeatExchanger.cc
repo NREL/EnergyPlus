@@ -446,7 +446,7 @@ namespace loc {
 	void
 	InitSurfaceGroundHeatExchanger(
 		int const SurfaceGHENum, // component number
-		bool const RunFlag // TRUE if equipment is operating
+		bool const EP_UNUSED(RunFlag) // TRUE if equipment is operating
 	)
 	{
 

@@ -609,10 +609,10 @@ namespace EcoRoofManager {
 		Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
 		int & ConstrNum, // Indicator for contruction index for the current surface
 		Real64 & Alphag,
-		int const unit, // unused1208
-		Real64 const Tg, // unused1208
-		Real64 const Tf, // unused1208
-		Real64 const Qsoil // unused1208
+		int const EP_UNUSED(unit), // unused1208
+		Real64 const EP_UNUSED(Tg), // unused1208
+		Real64 const EP_UNUSED(Tf), // unused1208
+		Real64 const EP_UNUSED(Qsoil) // unused1208
 	)
 	{
 		// SUBROUTINE INFORMATION

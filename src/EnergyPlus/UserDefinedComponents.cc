@@ -97,7 +97,7 @@ namespace UserDefinedComponents {
 	SimUserDefinedPlantComponent(
 		int const LoopNum, // plant loop sim call originated from
 		int const LoopSideNum, // plant loop side sim call originated from
-		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
+		std::string const & EP_UNUSED(EquipType), // type of equipment, 'PlantComponent:UserDefined'
 		std::string const & EquipName, // user name for component
 		int & CompIndex,
 		bool & InitLoopEquip,
@@ -464,9 +464,9 @@ namespace UserDefinedComponents {
 	void
 	SimAirTerminalUserDefined(
 		std::string const & CompName,
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED(FirstHVACIteration),
 		int const ZoneNum,
-		int const ZoneNodeNum,
+		int const EP_UNUSED(ZoneNodeNum),
 		int & CompIndex
 	)
 	{

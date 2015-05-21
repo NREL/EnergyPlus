@@ -4763,7 +4763,7 @@ Label10: ;
 
 	void
 	CheckWaterCoilSchedule(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED(CompType), // unused1208
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
@@ -5810,11 +5810,11 @@ Label10: ;
 	UpdateWaterToAirCoilPlantConnection(
 		int const CoilTypeNum,
 		std::string const & CoilName,
-		int const EquipFlowCtrl, // Flow control mode for the equipment
+		int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from
 		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED(FirstHVACIteration),
 		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
 	)
 	{

@@ -1359,7 +1359,7 @@ namespace ThermalComfort {
 
 	void
 	DERIV(
-		int & TempIndiceNum, // Number of temperature indices  unused1208
+		int & EP_UNUSED(TempIndiceNum), // Number of temperature indices  unused1208
 		Array1A< Real64 > Temp, // Temperature unused1208
 		Array1A< Real64 > TempChange // Change of temperature
 	)

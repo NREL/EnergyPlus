@@ -219,7 +219,7 @@ namespace HVACControllers {
 		std::string const & ControllerName,
 		int & ControllerIndex,
 		bool const FirstHVACIteration,
-		int const AirLoopNum, // unused1208
+		int const EP_UNUSED(AirLoopNum), // unused1208
 		int const AirLoopPass,
 		int const Operation,
 		bool & IsConvergedFlag,
@@ -740,7 +740,7 @@ namespace HVACControllers {
 	void
 	ResetController(
 		int const ControlNum,
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED(FirstHVACIteration),
 		bool const DoWarmRestartFlag,
 		bool & IsConvergedFlag
 	)
@@ -853,7 +853,7 @@ namespace HVACControllers {
 	void
 	InitController(
 		int const ControlNum,
-		bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+		bool const EP_UNUSED(FirstHVACIteration), // TRUE if first full HVAC iteration in an HVAC timestep
 		bool & IsConvergedFlag
 	)
 	{
@@ -2081,8 +2081,8 @@ namespace HVACControllers {
 
 	void
 	LimitController(
-		int & ControlNum, // unused1208
-		bool & IsConvergedFlag // unused1208
+		int & EP_UNUSED(ControlNum), // unused1208
+		bool & EP_UNUSED(IsConvergedFlag) // unused1208
 	)
 	{
 
@@ -2185,7 +2185,7 @@ namespace HVACControllers {
 	// *****************************************************************************
 
 	void
-	ReportController( int const ControlNum ) // unused1208
+	ReportController( int const EP_UNUSED(ControlNum) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:

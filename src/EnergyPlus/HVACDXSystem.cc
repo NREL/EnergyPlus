@@ -2946,7 +2946,7 @@ namespace HVACDXSystem {
 		int & CoolCoilType,
 		int & CoolCoilIndex,
 		std::string & CoolCoilName,
-		bool & ErrFound
+		bool & EP_UNUSED(ErrFound)
 	)
 	{
 		// SUBROUTINE INFORMATION:

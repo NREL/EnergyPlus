@@ -3643,7 +3643,7 @@ namespace SingleDuct {
 		int const SysNum, // Unit index
 		bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
 		int const ZoneNode, // zone node number
-		int const HCoilType, // type of hot water coil !unused1208
+		int const EP_UNUSED(HCoilType), // type of hot water coil !unused1208
 		Real64 const HWFlow, // hot water flow (kg/s)
 		Real64 const HCoilReq, // gas or elec coil demand requested
 		int const FanType, // type of fan
@@ -4144,7 +4144,7 @@ namespace SingleDuct {
 	// *****************************************************************************
 
 	void
-	ReportSys( int const SysNum ) // unused1208
+	ReportSys( int const EP_UNUSED(SysNum) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:

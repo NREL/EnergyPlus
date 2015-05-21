@@ -721,7 +721,7 @@ namespace PurchasedAirManager {
 	void
 	InitPurchasedAir(
 		int const PurchAirNum,
-		bool const FirstHVACIteration, // unused1208
+		bool const EP_UNUSED(FirstHVACIteration), // unused1208
 		int const ControlledZoneNum,
 		int const ActualZoneNum
 	)
@@ -2429,7 +2429,7 @@ namespace PurchasedAirManager {
 	}
 
 	void
-	UpdatePurchasedAir( int const PurchAirNum )
+	UpdatePurchasedAir( int const EP_UNUSED(PurchAirNum) )
 	{
 
 		// SUBROUTINE INFORMATION:

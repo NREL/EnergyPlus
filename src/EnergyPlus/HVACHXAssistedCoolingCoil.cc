@@ -822,7 +822,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	CheckHXAssistedCoolingCoilSchedule(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED(CompType), // unused1208
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex

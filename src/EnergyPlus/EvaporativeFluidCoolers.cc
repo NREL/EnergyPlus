@@ -1004,7 +1004,7 @@ namespace EvaporativeFluidCoolers {
 	void
 	InitEvapFluidCooler(
 		int const EvapFluidCoolerNum, // Number of the current evaporative fluid cooler being simulated
-		bool const RunFlag // Indication of
+		bool const EP_UNUSED(RunFlag) // Indication of
 	)
 	{
 

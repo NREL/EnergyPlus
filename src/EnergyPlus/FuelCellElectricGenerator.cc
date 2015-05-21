@@ -102,7 +102,7 @@ namespace FuelCellElectricGenerator {
 
 	void
 	SimFuelCellGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED(GeneratorType), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
@@ -1099,7 +1099,7 @@ namespace FuelCellElectricGenerator {
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
 		Real64 const MyLoad, // Generator demand
-		bool const FirstHVACIteration
+		bool const EP_UNUSED(FirstHVACIteration)
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1678,7 +1678,7 @@ namespace FuelCellElectricGenerator {
 	ManageElectStorInteractions(
 		int const Num, // Generator number, index for structure
 		Real64 const Pdemand,
-		Real64 const PpcuLosses,
+		Real64 const EP_UNUSED(PpcuLosses),
 		bool & Constrained,
 		Real64 & Pstorage,
 		Real64 & PgridOverage // electricity that can't be stored and needs to go out
@@ -3610,13 +3610,13 @@ namespace FuelCellElectricGenerator {
 
 	void
 	SimFuelCellPlantHeatRecovery(
-		std::string const & CompType,
+		std::string const & EP_UNUSED(CompType),
 		std::string const & CompName,
 		int const CompTypeNum,
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED(RunFlag),
 		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
+		Real64 & EP_UNUSED(MyLoad), // unused1208
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
@@ -4011,7 +4011,7 @@ namespace FuelCellElectricGenerator {
 	}
 
 	void
-	UpdateExhaustAirFlows( int const Num ) // generator number
+	UpdateExhaustAirFlows( int const EP_UNUSED(Num) ) // generator number
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4052,7 +4052,7 @@ namespace FuelCellElectricGenerator {
 	void
 	CalcUpdateHeatRecovery(
 		int const Num, // Generator number
-		bool const FirstHVACIteration
+		bool const EP_UNUSED(FirstHVACIteration)
 	)
 	{
 
@@ -4125,7 +4125,7 @@ namespace FuelCellElectricGenerator {
 
 	void
 	UpdateFuelCellGeneratorRecords(
-		bool const RunFlag, // TRUE if Generator operating
+		bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
 		int const Num // Generator number
 	)
 	{
@@ -4241,7 +4241,7 @@ namespace FuelCellElectricGenerator {
 
 	void
 	GetFuelCellGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED(GeneratorType), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

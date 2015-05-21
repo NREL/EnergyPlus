@@ -113,7 +113,7 @@ namespace PlantManager {
 		bool const FirstHVACIteration,
 		bool & SimAirLoops, // True when the air loops need to be (re)simulated
 		bool & SimZoneEquipment, // True when zone equipment components need to be (re)simulated
-		bool & SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
+		bool & EP_UNUSED(SimNonZoneEquipment), // True when non-zone equipment components need to be (re)simulated
 		bool & SimPlantLoops, // True when some part of Plant needs to be (re)simulated
 		bool & SimElecCircuits // True when electic circuits need to be (re)simulated
 	)
