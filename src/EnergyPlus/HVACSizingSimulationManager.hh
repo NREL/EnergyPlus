@@ -54,7 +54,7 @@ public:
 	void UpdateSizingLogsSystemStep();
 
 private:
-	int numCoincidentPlantLoops;
+	// int numCoincidentPlantLoops;
 
 	void CreateNewCoincidentPlantAnalysisObject(
 		std::string const & PlantLoopName,
