@@ -94,7 +94,6 @@ namespace PlantUtilities {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataLoopNode::NodeID;
-		using DataPlant::PlantLoop;
 		using DataPlant::DemandOpSchemeType;
 
 		// Locals
@@ -623,8 +622,6 @@ namespace PlantUtilities {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataPlant::PlantLoop;
-		using DataPlant::SupplySide;
-		using DataPlant::DemandSide;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

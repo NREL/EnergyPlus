@@ -9165,7 +9165,6 @@ Label50: ;
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using DataEnvironment::StdRhoAir;
 
 		// Return value
 		Real64 CBF( 0.0 ); // the result - the coil bypass factor

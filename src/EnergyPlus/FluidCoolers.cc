@@ -178,7 +178,6 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using DataPlant::PlantFirstSizesOkayToFinalize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -797,13 +796,10 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		//  USE Psychrometrics,  ONLY: PsyTwbFnTdbWPb
-		//  USE FluidProperties, ONLY : GetDensityGlycol
 		using InputProcessor::SameString;
 		using DataPlant::TypeOf_FluidCooler_SingleSpd;
 		using DataPlant::TypeOf_FluidCooler_TwoSpd;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;

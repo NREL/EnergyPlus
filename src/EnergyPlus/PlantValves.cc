@@ -98,7 +98,6 @@ namespace PlantValves {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::BeginEnvrnFlag;
 		using InputProcessor::FindItemInList;
 
 		// Locals

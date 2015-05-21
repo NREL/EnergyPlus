@@ -2499,7 +2499,6 @@ namespace General {
 
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
-		using DataGlobals::ZoneTSReporting;
 		using DataGlobals::HVACTSReporting;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::CurrentTime;

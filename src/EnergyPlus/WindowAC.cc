@@ -271,11 +271,8 @@ namespace WindowAC {
 		using MixedAir::GetOAMixerIndex;
 		using MixedAir::GetOAMixerNodeNumbers;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
-		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using DataHVACGlobals::cFanTypes;
-		using DataHVACGlobals::ZoneComp;
-		using DataZoneEquipment::WindowAC_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;

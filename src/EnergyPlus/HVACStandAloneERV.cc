@@ -231,7 +231,6 @@ namespace HVACStandAloneERV {
 		using MixedAir::CheckOAControllerName;
 		using DataHeatBalance::Zone;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ERVStandAlone_Num;
 		using DataZoneControls::HumidityControlZone;
 		using DataZoneControls::NumHumidityControlZones;
 		using Fans::GetFanAvailSchPtr;
@@ -1180,7 +1179,6 @@ namespace HVACStandAloneERV {
 		// Using/Aliasing
 		using DataSizing::AutoSize;
 		using DataSizing::CurZoneEqNum;
-		using DataSizing::FinalZoneSizing;
 		using DataSizing::AutoVsHardSizingThreshold;
 		using DataSizing::ZoneEqSizing;
 		using DataHeatBalance::Zone;

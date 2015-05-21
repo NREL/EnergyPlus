@@ -243,7 +243,6 @@ namespace ReturnAirPathManager {
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkFanActivated;
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
-		using DataHVACGlobals::TurnFansOn;
 
 		// Locals
 		int ComponentNum;

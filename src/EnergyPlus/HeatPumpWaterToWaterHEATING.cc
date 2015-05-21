@@ -552,9 +552,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using namespace FluidProperties;
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;

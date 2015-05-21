@@ -258,7 +258,6 @@ namespace EvaporativeCoolers {
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankDemandComponent;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
-		using DataSizing::AutoSize;
 		using CurveManager::GetCurveIndex;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -744,7 +743,6 @@ namespace EvaporativeCoolers {
 
 		// Using/Aliasing
 		using DataHVACGlobals::DoSetPointTest;
-		using DataHVACGlobals::SetPointErrorFlag;
 		using DataEnvironment::OutAirDensity;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutEnthalpy;
@@ -922,7 +920,6 @@ namespace EvaporativeCoolers {
 		using DataAirSystems::PrimaryAirSystem;
 		using InputProcessor::SameString;
 		using ReportSizingManager::ReportSizingOutput;
-		using Fans::Fan;
 		using Fans::SetFanData;
 
 		// Locals
@@ -1566,12 +1563,8 @@ namespace EvaporativeCoolers {
 		// Using/Aliasing
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutWetBulbTemp;
-		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
-		using DataWater::WaterStorage;
 		using CurveManager::CurveValue;
-		//using General::SolveRegulaFalsi;
-		//using General::RoundSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1823,9 +1816,7 @@ namespace EvaporativeCoolers {
 		// Using/Aliasing
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutWetBulbTemp;
-		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
-		using DataWater::WaterStorage;
 		using CurveManager::CurveValue;
 		using General::SolveRegulaFalsi;
 		using General::RoundSigDigits;
@@ -2974,10 +2965,8 @@ namespace EvaporativeCoolers {
 		using InputProcessor::FindItemInList;
 		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHVACGlobals::ZoneComp;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
 		using BranchNodeConnections::SetUpCompSets;
 		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
@@ -3501,8 +3490,6 @@ namespace EvaporativeCoolers {
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
 		using namespace DataSizing;
-		using DataHVACGlobals::SmallAirVolFlow;
-		using DataHVACGlobals::SystemAirflowSizing;
 		using DataHVACGlobals::CoolingAirflowSizing;
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHeatBalance::Zone;

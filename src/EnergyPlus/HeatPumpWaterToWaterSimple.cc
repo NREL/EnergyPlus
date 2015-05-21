@@ -449,7 +449,6 @@ namespace HeatPumpWaterToWaterSimple {
 		// Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;

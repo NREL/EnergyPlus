@@ -134,7 +134,6 @@ namespace HVACCooledBeam {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using DataSizing::TermUnitIU;
 		using General::TrimSigDigits;
 
 		// Locals

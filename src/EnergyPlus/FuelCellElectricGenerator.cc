@@ -1118,8 +1118,6 @@ namespace FuelCellElectricGenerator {
 		// REFERENCES: IEA/ECBCS Annex 42....
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
-		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using CurveManager::CurveValue;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -3924,7 +3922,6 @@ namespace FuelCellElectricGenerator {
 		// USE STATEMENTS:
 		// na
 		// Using/Aliasing
-		using DataHeatBalance::ZoneIntGain;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

@@ -699,9 +699,6 @@ namespace loc {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataGlobals::BeginTimeStepFlag;
-		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using namespace DataEnvironment;
 		using DataPlant::PlantLoop;
 		using General::TrimSigDigits;

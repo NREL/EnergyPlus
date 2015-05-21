@@ -217,7 +217,6 @@ namespace ElectricBaseboardRadiator {
 		using namespace DataIPShortCuts;
 		using General::TrimSigDigits;
 		using DataSizing::AutoSize;
-		using DataSizing::FinalZoneSizing;
 		using DataSizing::HeatingDesignCapacity;
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;

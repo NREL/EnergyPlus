@@ -279,14 +279,12 @@ namespace FanCoilUnits {
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataHVACGlobals::ZoneComp;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using MixedAir::GetOAMixerIndex;
 		using MixedAir::GetOAMixerNodeNumbers;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::FanCoil4Pipe_Num;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
 		using SingleDuct::GetATMixer;

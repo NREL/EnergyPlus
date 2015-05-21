@@ -1074,8 +1074,6 @@ namespace HeatingCoils {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using DataAirSystems::PrimaryAirSystem;
-		using DataAirLoop::AirLoopControlInfo;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using namespace OutputReportPredefined;

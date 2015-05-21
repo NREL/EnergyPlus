@@ -832,7 +832,6 @@ namespace GeneratorDynamicsManager {
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
-		using DataPlant::PlantLoop;
 		using DataLoopNode::Node;
 		using PlantUtilities::SetComponentFlowRate;
 

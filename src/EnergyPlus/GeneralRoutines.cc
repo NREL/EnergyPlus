@@ -906,7 +906,6 @@ CalcPassiveExteriorBaffleGap(
 	using namespace DataPrecisionGlobals;
 	using DataEnvironment::SkyTemp;
 	using DataEnvironment::WindSpeedAt;
-	using DataEnvironment::SunIsUp;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::IsRain;
 	// USE DataLoopNode    , ONLY: Node
@@ -1323,7 +1322,6 @@ TestAirPathIntegrity( bool & ErrFound )
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::OutputFileBNDetails;
 	using namespace DataLoopNode;
 	using DataHVACGlobals::NumPrimaryAirSys;
 	using DataAirLoop::AirToZoneNodeInfo;

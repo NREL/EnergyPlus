@@ -133,7 +133,6 @@ namespace ExternalInterface {
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksRunPeriodWeather;
-		using DataGlobals::ZoneTSReporting;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -437,7 +436,6 @@ namespace ExternalInterface {
 		using ScheduleManager::GetDayScheduleIndex;
 		using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
 		using RuntimeLanguageProcessor::FindEMSVariable;
-		using DataGlobals::WeathSimReq;
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:

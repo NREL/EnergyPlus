@@ -305,7 +305,6 @@ namespace HVACDXSystem {
 		// Using/Aliasing
 		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;

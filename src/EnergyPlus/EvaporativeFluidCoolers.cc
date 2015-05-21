@@ -1032,7 +1032,6 @@ namespace EvaporativeFluidCoolers {
 		using DataPlant::TypeOf_EvapFluidCooler_SingleSpd;
 		using DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;

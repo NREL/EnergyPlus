@@ -505,7 +505,6 @@ namespace PhotovoltaicThermalCollectors {
 
 		// Using/Aliasing
 		using DataGlobals::SysSizingCalc;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataLoopNode::Node;
@@ -710,7 +709,6 @@ namespace PhotovoltaicThermalCollectors {
 		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		using DataHVACGlobals::SmallAirVolFlow;
 		using DataHVACGlobals::Main;
 		using DataHVACGlobals::Cooling;
 		using DataHVACGlobals::Heating;
@@ -718,8 +716,6 @@ namespace PhotovoltaicThermalCollectors {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-		using DataAirSystems::PrimaryAirSystem;
-		using DataAirLoop::AirLoopControlInfo;
 		using DataEnvironment::StdRhoAir;
 		using DataLoopNode::Node;
 		using General::RoundSigDigits;
@@ -917,7 +913,6 @@ namespace PhotovoltaicThermalCollectors {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataHeatBalance::QRadSWOutIncident;
-		using DataPlant::PlantReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

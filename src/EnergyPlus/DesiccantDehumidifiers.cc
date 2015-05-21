@@ -293,7 +293,6 @@ namespace DesiccantDehumidifiers {
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
 		using SteamCoils::GetTypeOfCoil;
-		using SteamCoils::ZoneLoadControl;
 		using SteamCoils::GetSteamCoilControlNodeNum;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;

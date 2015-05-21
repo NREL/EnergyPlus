@@ -791,7 +791,6 @@ namespace DaylightingManager {
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
 		using namespace Vectors;
-		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -883,7 +882,6 @@ namespace DaylightingManager {
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
 		using namespace Vectors;
-		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		using DataEnvironment::SunIsUp;
 
@@ -1138,7 +1136,6 @@ namespace DaylightingManager {
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
 		using namespace Vectors;
-		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		using DataEnvironment::SunIsUp;
 

@@ -1087,7 +1087,6 @@ namespace ZoneContaminantPredictorCorrector {
 		using InternalHeatGains::SumAllInternalGenericContamGains;
 		using DataAirflowNetwork::MultizoneSurfaceData;
 		using DataAirflowNetwork::AirflowNetworkNodeSimu;
-		using DataAirflowNetwork::AirflowNetworkNumOfZones;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlSimple;
 
@@ -1957,7 +1956,6 @@ namespace ZoneContaminantPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

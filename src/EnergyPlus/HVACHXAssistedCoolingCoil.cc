@@ -250,7 +250,6 @@ namespace HVACHXAssistedCoolingCoil {
 		using InputProcessor::SameString;
 		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
