@@ -47,14 +47,14 @@ namespace DataAirSystems {
 	// Temporary arrays
 
 	// Object Data
-	FArray1D< DefinePrimaryAirSystem > PrimaryAirSystem;
-	FArray1D< ConnectionPoint > DemandSideConnect; // Connections between loops
-	FArray1D< ConnectZoneComp > ZoneCompToPlant; // Connections between loops
-	FArray1D< ConnectZoneSubComp > ZoneSubCompToPlant; // Connections between loops
-	FArray1D< ConnectZoneSubSubComp > ZoneSubSubCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
+	Array1D< DefinePrimaryAirSystem > PrimaryAirSystem;
+	Array1D< ConnectionPoint > DemandSideConnect; // Connections between loops
+	Array1D< ConnectZoneComp > ZoneCompToPlant; // Connections between loops
+	Array1D< ConnectZoneSubComp > ZoneSubCompToPlant; // Connections between loops
+	Array1D< ConnectZoneSubSubComp > ZoneSubSubCompToPlant; // Connections between loops
+	Array1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
+	Array1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
+	Array1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

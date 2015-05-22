@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/Time_Date.hh>
 
@@ -93,7 +93,7 @@ namespace DataTimings {
 #endif
 
 	// Object Data
-	FArray1D< timings > Timing;
+	Array1D< timings > Timing;
 
 	// Functions
 
@@ -140,7 +140,7 @@ namespace DataTimings {
 		int found; // indicator for element
 
 		// Object Data
-		FArray1D< timings > tempTiming; // used for reallocate.
+		Array1D< timings > tempTiming; // used for reallocate.
 
 #ifdef EP_NO_Timings
 		return;
@@ -550,7 +550,7 @@ namespace DataTimings {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Int32 > clockvalues( 8 );
+		Array1D< Int32 > clockvalues( 8 );
 		//value(1)   Current year
 		//value(2)   Current month
 		//value(3)   Current day
@@ -560,7 +560,7 @@ namespace DataTimings {
 		//value(7)   Seconds (0-59)
 		//value(8)   Milliseconds (0-999)
 
-		date_and_time_string( _, _, _, clockvalues );
+		date_and_time( _, _, _, clockvalues );
 		calctime = clockvalues( 5 ) * 3600.0 + clockvalues( 6 ) * 60.0 + clockvalues( 7 ) + clockvalues( 8 ) / 1000.0;
 
 		return calctime;

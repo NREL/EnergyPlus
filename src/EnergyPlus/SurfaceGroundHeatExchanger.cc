@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -10,6 +10,7 @@
 #include <BranchNodeConnections.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
@@ -69,10 +70,8 @@ namespace SurfaceGroundHeatExchanger {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::BeginTimeStepFlag;
 	using DataGlobals::KelvinConv;
 	using namespace DataLoopNode;
-	using DataHeatBalance::MaxCTFTerms;
 
 	// Use statements for access to subroutines in other modules
 
@@ -85,6 +84,10 @@ namespace SurfaceGroundHeatExchanger {
 
 	int const SurfCond_Ground( 1 );
 	int const SurfCond_Exposed( 2 );
+
+namespace loc {
+	int const MaxCTFTerms( 19 ); // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms to avoid static initialization order bug: Keep them in sync
+} // loc
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -112,7 +115,7 @@ namespace SurfaceGroundHeatExchanger {
 	Real64 TopThermAbs( 0.0 ); // Thermal absortivity of top layer
 	Real64 BtmThermAbs( 0.0 ); // Thermal absortivity of bottom layer
 	Real64 TopSolarAbs( 0.0 ); // Solar absortivity of top layer
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// weather data records updated every zone time step
 	Real64 PastBeamSolarRad( 0.0 ); // Previous beam normal solar irradiance
@@ -132,16 +135,16 @@ namespace SurfaceGroundHeatExchanger {
 	Real64 PastCloudFraction( 0.0 ); // Previous Fraction of sky covered by clouds
 
 	// time keeping variables used for keeping track of average flux over each time step
-	FArray1D< Real64 > QRadSysSrcAvg; // Average source over the time step
-	FArray1D< Real64 > LastSysTimeElapsed; // record of system time
-	FArray1D< Real64 > LastTimeStepSys; // previous time step size
+	Array1D< Real64 > QRadSysSrcAvg; // Average source over the time step
+	Array1D< Real64 > LastSysTimeElapsed; // record of system time
+	Array1D< Real64 > LastTimeStepSys; // previous time step size
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PlantSurfaceGroundHeatExchangers
 
 	// Object Data
-	FArray1D< SurfaceGroundHeatExchangerData > SurfaceGHE;
-	FArray1D< SurfaceGroundHeatExchangerQTF > SurfaceGHEQTF;
-	FArray1D< SurfaceGroundHeatExchngrReport > SurfaceGHEReport;
+	Array1D< SurfaceGroundHeatExchangerData > SurfaceGHE;
+	Array1D< SurfaceGroundHeatExchangerQTF > SurfaceGHEQTF;
+	Array1D< SurfaceGroundHeatExchngrReport > SurfaceGHEReport;
 
 	//==============================================================================
 
@@ -467,12 +470,10 @@ namespace SurfaceGroundHeatExchanger {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataGlobals::BeginTimeStepFlag;
 		using DataGlobals::Pi;
 		using DataGlobals::BeginEnvrnFlag;
 		using namespace DataEnvironment;
 		using DataLoopNode::Node;
-		using DataHeatBalance::MaxCTFTerms;
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
@@ -509,7 +510,7 @@ namespace SurfaceGroundHeatExchanger {
 		int Surface; // Surface number counter
 		int LayerNum; // material layer number for bottom
 		Real64 OutDryBulb; // Height Dependent dry bulb.
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyFlag;
 		static bool MyOneTimeFlag( true );
 		int LoopNum;
 		int LoopSideNum;
@@ -697,6 +698,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
+		using DataGlobals::BeginTimeStepFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::FirstTimeStepSysFlag;
@@ -1034,7 +1036,6 @@ namespace SurfaceGroundHeatExchanger {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Term;
 
 		// add current surface temperatures to history data
 		SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( 0 ) = Tbottom;
@@ -1042,7 +1043,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// Top Surface Coefficients
 		SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef = 0.0;
-		for ( Term = 0; Term <= SurfaceGHEQTF( SurfaceGHENum ).NumCTFTerms - 1; ++Term ) {
+		for ( int Term = 0; Term <= SurfaceGHEQTF( SurfaceGHENum ).NumCTFTerms - 1; ++Term ) {
 
 			SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef += ( SurfaceGHEQTF( SurfaceGHENum ).CTFout( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( Term ) ) - ( SurfaceGHEQTF( SurfaceGHENum ).CTFcross( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFflux( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QtopHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFSourceOut( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( Term ) );
 
@@ -1311,10 +1312,10 @@ namespace SurfaceGroundHeatExchanger {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
 		int const NumOfPropDivisions( 13 ); // intervals in property correlation
-		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.001652, 0.001422, 0.001225, 0.00108, 0.000959, 0.000855, 0.000769, 0.000695, 0.000631, 0.000577, 0.000528, 0.000489, 0.000453 } ); // Viscosity, in Ns/m2
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656 } ); // Conductivity, in W/mK
-		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
+		static Array1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
+		static Array1D< Real64 > const Mu( NumOfPropDivisions, { 0.001652, 0.001422, 0.001225, 0.00108, 0.000959, 0.000855, 0.000769, 0.000695, 0.000631, 0.000577, 0.000528, 0.000489, 0.000453 } ); // Viscosity, in Ns/m2
+		static Array1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656 } ); // Conductivity, in W/mK
+		static Array1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
 		int const WaterIndex( 1 );
 		static std::string const RoutineName( "SurfaceGroundHeatExchanger:CalcHXEffectTerm" );
 

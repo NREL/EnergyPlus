@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <DataSurfaceColors.hh>
@@ -56,17 +56,17 @@ namespace DataSurfaceColors {
 	int const ColorNo_DaylSensor1( 14 );
 	int const ColorNo_DaylSensor2( 15 );
 
-	FArray1D_int const defaultcolorno( NumColors, { 3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5 } ); // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building) | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor 1 | Daylight Sensor 2
+	Array1D_int const defaultcolorno( NumColors, { 3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5 } ); // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building) | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor 1 | Daylight Sensor 2
 
-	FArray1D_string const colorkeys( NumColors, { "Text", "Walls", "Windows", "GlassDoors", "Doors", "Roofs", "Floors", "DetachedBuildingShades", "DetachedFixedShades", "AttachedBuildingShades", "Photovoltaics", "TubularDaylightDomes", "TubularDaylightDiffusers", "DaylightReferencePoint1", "DaylightReferencePoint2" } );
+	Array1D_string const colorkeys( NumColors, { "Text", "Walls", "Windows", "GlassDoors", "Doors", "Roofs", "Floors", "DetachedBuildingShades", "DetachedFixedShades", "AttachedBuildingShades", "Photovoltaics", "TubularDaylightDomes", "TubularDaylightDiffusers", "DaylightReferencePoint1", "DaylightReferencePoint2" } );
 
-	FArray1D_int const colorkeyptr( NumColors, { ColorNo_Text, ColorNo_Wall, ColorNo_Window, ColorNo_GlassDoor, ColorNo_Door, ColorNo_Floor, ColorNo_Roof, ColorNo_ShdDetBldg, ColorNo_ShdDetFix, ColorNo_ShdAtt, ColorNo_PV, ColorNo_TDDDome, ColorNo_TDDDiffuser, ColorNo_DaylSensor1, ColorNo_DaylSensor2 } );
+	Array1D_int const colorkeyptr( NumColors, { ColorNo_Text, ColorNo_Wall, ColorNo_Window, ColorNo_GlassDoor, ColorNo_Door, ColorNo_Floor, ColorNo_Roof, ColorNo_ShdDetBldg, ColorNo_ShdDetFix, ColorNo_ShdAtt, ColorNo_PV, ColorNo_TDDDome, ColorNo_TDDDiffuser, ColorNo_DaylSensor1, ColorNo_DaylSensor2 } );
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_int DXFcolorno( NumColors, defaultcolorno );
+	Array1D_int DXFcolorno( NumColors, defaultcolorno );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -185,12 +185,12 @@ namespace DataSurfaceColors {
 		int numptr;
 		int numargs;
 		int status;
-		FArray1D_string cAlphas;
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lAlphaBlanks;
-		FArray1D_bool lNumericBlanks;
-		FArray1D< Real64 > rNumerics;
+		Array1D_string cAlphas;
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lAlphaBlanks;
+		Array1D_bool lNumericBlanks;
+		Array1D< Real64 > rNumerics;
 
 		DXFcolorno = defaultcolorno;
 		// first see if there is a scheme name

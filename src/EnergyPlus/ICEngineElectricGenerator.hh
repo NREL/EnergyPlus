@@ -2,7 +2,7 @@
 #define ICEngineElectricGenerator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -27,7 +27,7 @@ namespace ICEngineElectricGenerator {
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
 	extern bool GetICEInput; // When TRUE, calls subroutine to read input file.
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	// SUBROUTINE SPECIFICATIONS FOR MODULE IC ENGINEElectricGenerator
 
 	// Types
@@ -59,7 +59,7 @@ namespace ICEngineElectricGenerator {
 		int ExhaustTempCurve; // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
 		int ErrExhaustTempIndex; // error index for temp curve
 		Real64 UA; // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-		FArray1D< Real64 > UACoef; // Heat Exchanger UA Coeffs Poly Fit
+		Array1D< Real64 > UACoef; // Heat Exchanger UA Coeffs Poly Fit
 		Real64 MaxExhaustperPowerOutput; // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
 		Real64 DesignMinExitGasTemp; // Steam Saturation Temperature
 		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
@@ -170,7 +170,7 @@ namespace ICEngineElectricGenerator {
 			int const ExhaustTempCurve, // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
 			int const ErrExhaustTempIndex, // error index for temp curve
 			Real64 const UA, // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-			FArray1< Real64 > const & UACoef, // Heat Exchanger UA Coeffs Poly Fit
+			Array1< Real64 > const & UACoef, // Heat Exchanger UA Coeffs Poly Fit
 			Real64 const MaxExhaustperPowerOutput, // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
 			Real64 const DesignMinExitGasTemp, // Steam Saturation Temperature
 			Real64 const FuelHeatingValue, // Heating Value of Fuel in kJ/kg
@@ -344,8 +344,8 @@ namespace ICEngineElectricGenerator {
 	};
 
 	// Object Data
-	extern FArray1D< ICEngineGeneratorSpecs > ICEngineGenerator; // dimension to number of machines
-	extern FArray1D< ReportVars > ICEngineGeneratorReport;
+	extern Array1D< ICEngineGeneratorSpecs > ICEngineGenerator; // dimension to number of machines
+	extern Array1D< ReportVars > ICEngineGeneratorReport;
 
 	// Functions
 

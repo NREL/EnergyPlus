@@ -2,8 +2,8 @@
 #define DataViewFactorInformation_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -30,14 +30,14 @@ namespace DataViewFactorInformation {
 		// Members
 		std::string Name; // Zone name
 		int NumOfSurfaces; // Number of surfaces in the zone
-		FArray2D< Real64 > F; // View Factors
-		FArray2D< Real64 > ScriptF; // Hottel's Script F //Tuned Transposed
-		FArray1D< Real64 > Area; // Surface area
-		FArray1D< Real64 > Emissivity; // Surface emissivity
-		FArray1D< Real64 > Azimuth; // Azimuth angle of the surface (in degrees)
-		FArray1D< Real64 > Tilt; // Tilt angle of the surface (in degrees)
-		FArray1D_int SurfacePtr; // Surface ALLOCATABLE (to Surface derived type)
-		FArray1D_string Class; // Class of surface (Wall, Roof, etc.)
+		Array2D< Real64 > F; // View Factors
+		Array2D< Real64 > ScriptF; // Hottel's Script F //Tuned Transposed
+		Array1D< Real64 > Area; // Surface area
+		Array1D< Real64 > Emissivity; // Surface emissivity
+		Array1D< Real64 > Azimuth; // Azimuth angle of the surface (in degrees)
+		Array1D< Real64 > Tilt; // Tilt angle of the surface (in degrees)
+		Array1D_int SurfacePtr; // Surface ALLOCATABLE (to Surface derived type)
+		Array1D_string Class; // Class of surface (Wall, Roof, etc.)
 
 		// Default Constructor
 		ZoneViewFactorInformation() :
@@ -48,14 +48,14 @@ namespace DataViewFactorInformation {
 		ZoneViewFactorInformation(
 			std::string const & Name, // Zone name
 			int const NumOfSurfaces, // Number of surfaces in the zone
-			FArray2< Real64 > const & F, // View Factors
-			FArray2< Real64 > const & ScriptF, // Hottel's Script F //Tuned Transposed
-			FArray1< Real64 > const & Area, // Surface area
-			FArray1< Real64 > const & Emissivity, // Surface emissivity
-			FArray1< Real64 > const & Azimuth, // Azimuth angle of the surface (in degrees)
-			FArray1< Real64 > const & Tilt, // Tilt angle of the surface (in degrees)
-			FArray1_int const & SurfacePtr, // Surface ALLOCATABLE (to Surface derived type)
-			FArray1_string const & Class // Class of surface (Wall, Roof, etc.)
+			Array2< Real64 > const & F, // View Factors
+			Array2< Real64 > const & ScriptF, // Hottel's Script F //Tuned Transposed
+			Array1< Real64 > const & Area, // Surface area
+			Array1< Real64 > const & Emissivity, // Surface emissivity
+			Array1< Real64 > const & Azimuth, // Azimuth angle of the surface (in degrees)
+			Array1< Real64 > const & Tilt, // Tilt angle of the surface (in degrees)
+			Array1_int const & SurfacePtr, // Surface ALLOCATABLE (to Surface derived type)
+			Array1_string const & Class // Class of surface (Wall, Roof, etc.)
 		) :
 			Name( Name ),
 			NumOfSurfaces( NumOfSurfaces ),
@@ -72,7 +72,7 @@ namespace DataViewFactorInformation {
 	};
 
 	// Object Data
-	extern FArray1D< ZoneViewFactorInformation > ZoneInfo;
+	extern Array1D< ZoneViewFactorInformation > ZoneInfo;
 
 } // DataViewFactorInformation
 

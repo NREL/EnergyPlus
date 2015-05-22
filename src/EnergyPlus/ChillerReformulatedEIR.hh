@@ -2,7 +2,7 @@
 #define ChillerReformulatedEIR_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -129,8 +129,8 @@ namespace ChillerReformulatedEIR {
 		Real64 ChillerEIRFPLRTempMax; // Maximum value of EIRFPLR curve condenser outlet temperature [C]
 		Real64 ChillerEIRFPLRPLRMin; // Minimum value of EIRFPLR curve part-load ratio
 		Real64 ChillerEIRFPLRPLRMax; // Maximum value of EIRFPLR curve part-load ratio
-		Real64 ChillerLiftNomMin;	 // Minimum value of EIRFPLR curve Normalized Chiller lift 
-		Real64 ChillerLiftNomMax;	 // Maximum value of EIRFPLR curve Normalized Chiller lift 
+		Real64 ChillerLiftNomMin;	 // Minimum value of EIRFPLR curve Normalized Chiller lift
+		Real64 ChillerLiftNomMax;	 // Maximum value of EIRFPLR curve Normalized Chiller lift
 		Real64 ChillerTdevNomMin;	 // Minimum value of EIRFPLR curve Normalized Tdev
 		Real64 ChillerTdevNomMax;	 // Maximum value of EIRFPLR curve Normalized Tdev
 		int CAPFTXIter; // Iteration counter for evaporator outlet temperature CAPFT warning messages
@@ -234,7 +234,7 @@ namespace ChillerReformulatedEIR {
 			ChillerEIRFPLRTempMax( 0.0 ),
 			ChillerEIRFPLRPLRMin( 0.0 ),
 			ChillerEIRFPLRPLRMax( 0.0 ),
-			ChillerLiftNomMin( 0.0 ), //zrp_Aug2014 
+			ChillerLiftNomMin( 0.0 ), //zrp_Aug2014
 			ChillerLiftNomMax( 10.0 ),
 			ChillerTdevNomMin( 0.0 ),
 			ChillerTdevNomMax( 10.0 ),
@@ -338,8 +338,8 @@ namespace ChillerReformulatedEIR {
 	};
 
 	// Object Data
-	extern FArray1D< ReformulatedEIRChillerSpecs > ElecReformEIRChiller; // dimension to number of machines
-	extern FArray1D< ReportVars > ElecReformEIRChillerReport;
+	extern Array1D< ReformulatedEIRChillerSpecs > ElecReformEIRChiller; // dimension to number of machines
+	extern Array1D< ReportVars > ElecReformEIRChillerReport;
 
 	// Functions
 
@@ -407,7 +407,7 @@ namespace ChillerReformulatedEIR {
 	Real64
 	CondOutTempResidual(
 		Real64 const FalsiCondOutTemp, // RegulaFalsi condenser outlet temperature result [C]
-		FArray1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
+		Array1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
 	);
 
 	void

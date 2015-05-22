@@ -2,7 +2,7 @@
 #define HeatPumpWaterToWaterCOOLING_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,7 +26,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 	// Output Variables Type definition
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	extern std::string GSHPRefrigerant; // refrigerent name and index
 	extern int GSHPRefrigIndex;
@@ -281,8 +281,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 	};
 
 	// Object Data
-	extern FArray1D< GshpSpecs > GSHP; // dimension to number of machines
-	extern FArray1D< ReportVars > GSHPReport;
+	extern Array1D< GshpSpecs > GSHP; // dimension to number of machines
+	extern Array1D< ReportVars > GSHPReport;
 
 	// Functions
 

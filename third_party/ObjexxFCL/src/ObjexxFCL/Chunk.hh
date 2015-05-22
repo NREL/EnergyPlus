@@ -9,9 +9,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -77,6 +80,18 @@ public: // Creation
 		}
 	}
 
+	// Move Constructor
+	inline
+	Chunk( Chunk && c ) NOEXCEPT :
+	 size_( c.size_ ),
+	 capacity_( c.capacity_ ),
+	 data_( c.data_ )
+	{
+		c.size_ = 0u;
+		c.capacity_ = 0u;
+		c.data_ = nullptr;
+	}
+
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
@@ -139,6 +154,21 @@ public: // Assignment
 				data_[ i ] = c.data_[ i ];
 			}
 		}
+		return *this;
+	}
+
+	// Move Assignment
+	inline
+	Chunk &
+	operator =( Chunk && c ) NOEXCEPT
+	{
+		assert( this != &c );
+		size_ = c.size_;
+		capacity_ = c.capacity_;
+		delete[] data_; data_ = c.data_;
+		c.size_ = 0u;
+		c.capacity_ = 0u;
+		c.data_ = nullptr;
 		return *this;
 	}
 
@@ -536,9 +566,7 @@ public: // Modifier
 private: // Data
 
 	size_type size_; // Number of elements in use
-
 	size_type capacity_; // Number of elements it can hold without resizing
-
 	T * data_; // Data array
 
 }; // Chunk

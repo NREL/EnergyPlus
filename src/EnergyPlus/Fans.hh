@@ -2,7 +2,7 @@
 #define Fans_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -33,7 +33,7 @@ namespace Fans {
 	extern int NumFans; // The Number of Fans found in the Input
 	extern int NumNightVentPerf; // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
 	extern bool GetFanInputFlag; // Flag set to make sure you get input once
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	extern bool LocalTurnFansOn; // If True, overrides fan schedule and cycles ZoneHVAC component fans on
 	extern bool LocalTurnFansOff; // If True, overrides fan schedule and LocalTurnFansOn and
 	// forces ZoneHVAC comp fans off
@@ -97,7 +97,7 @@ namespace Fans {
 		Real64 EMSFanEffValue; // EMS value for total efficiency of the Fan, fraction on 0..1
 		Real64 MotEff; // Fan motor efficiency
 		Real64 MotInAirFrac; // Fraction of motor heat entering air stream
-		FArray1D< Real64 > FanCoeff; // Fan Part Load Coefficients to match fan type
+		Array1D< Real64 > FanCoeff; // Fan Part Load Coefficients to match fan type
 		// Mass Flow Rate Control Variables
 		Real64 MassFlowRateMaxAvail;
 		Real64 MassFlowRateMinAvail;
@@ -301,7 +301,7 @@ namespace Fans {
 			Real64 const EMSFanEffValue, // EMS value for total efficiency of the Fan, fraction on 0..1
 			Real64 const MotEff, // Fan motor efficiency
 			Real64 const MotInAirFrac, // Fraction of motor heat entering air stream
-			FArray1< Real64 > const & FanCoeff, // Fan Part Load Coefficients to match fan type
+			Array1< Real64 > const & FanCoeff, // Fan Part Load Coefficients to match fan type
 			Real64 const MassFlowRateMaxAvail,
 			Real64 const MassFlowRateMinAvail,
 			Real64 const RhoAirStdInit,
@@ -512,7 +512,7 @@ namespace Fans {
 	struct FanNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		FanNumericFieldData()
@@ -520,16 +520,16 @@ namespace Fans {
 
 		// Member Constructor
 		FanNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 		) :
 			FieldNames( FieldNames )
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< FanEquipConditions > Fan;
-	extern FArray1D< NightVentPerfData > NightVentPerf;
-	extern FArray1D< FanNumericFieldData > FanNumericFields;
+	extern Array1D< FanEquipConditions > Fan;
+	extern Array1D< NightVentPerfData > NightVentPerf;
+	extern Array1D< FanNumericFieldData > FanNumericFields;
 
 	// Functions
 

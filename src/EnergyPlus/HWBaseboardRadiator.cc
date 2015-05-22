@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -92,23 +92,23 @@ namespace HWBaseboardRadiator {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumHWBaseboards( 0 );
-	FArray1D< Real64 > QBBRadSource; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > QBBRadSrcAvg; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+	Array1D< Real64 > QBBRadSource; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > QBBRadSrcAvg; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 
 	// Record keeping variables used to calculate QBBRadSrcAvg locally
-	FArray1D< Real64 > LastQBBRadSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool SetLoopIndexFlag; // get loop number flag
+	Array1D< Real64 > LastQBBRadSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool SetLoopIndexFlag; // get loop number flag
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< HWBaseboardParams > HWBaseboard;
-	FArray1D< HWBaseboardNumericFieldData > HWBaseboardNumericFields;
+	Array1D< HWBaseboardParams > HWBaseboard;
+	Array1D< HWBaseboardNumericFieldData > HWBaseboardNumericFields;
 
 	// Functions
 
@@ -642,7 +642,7 @@ namespace HWBaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int Loop;
 		int WaterInletNode;
 		int ZoneNode;

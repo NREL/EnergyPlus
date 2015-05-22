@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -137,10 +137,10 @@ namespace ManageElectricPower {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
 	// Object Data
-	FArray1D< ElecStorageDataStruct > ElecStorage;
-	FArray1D< DCtoACInverterStruct > Inverter;
-	FArray1D< ElectricPowerLoadCenter > ElecLoadCenter; // dimension to number of machines
-	FArray1D< ElectricTransformer > Transformer;
+	Array1D< ElecStorageDataStruct > ElecStorage;
+	Array1D< DCtoACInverterStruct > Inverter;
+	Array1D< ElectricPowerLoadCenter > ElecLoadCenter; // dimension to number of machines
+	Array1D< ElectricTransformer > Transformer;
 	WholeBuildingElectricPowerSummary WholeBldgElectSummary;
 
 	// MODULE SUBROUTINES:
@@ -374,7 +374,7 @@ namespace ManageElectricPower {
 			// If a generator is needed in the simulation for a small load and it is less than the minimum part load ratio
 			// the generator will operate at the minimum part load ratio and the excess will either reduce demand or
 			// be available for storage or sell back to the power company.
-			TypeOfEquip: { auto const SELECT_CASE_var( ElecLoadCenter( LoadCenterNum ).OperationScheme );
+			{ auto const SELECT_CASE_var( ElecLoadCenter( LoadCenterNum ).OperationScheme );
 
 			if ( SELECT_CASE_var == iOpSchemeBaseLoad ) { // 'BASELOAD'
 
@@ -917,10 +917,10 @@ namespace ManageElectricPower {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
-		FArray1D_string ListName;
-		FArray1D_string InverterNames;
-		FArray1D_string StorageNames;
-		FArray1D_string TransformerNames;
+		Array1D_string ListName;
+		Array1D_string InverterNames;
+		Array1D_string StorageNames;
+		Array1D_string TransformerNames;
 		int AnyElectricityPresent; // local test for presence of Electricty in Facility
 		int NumGenerators; // local number of generators per electric load center
 		bool SetupWholeBldgReports;
@@ -1968,7 +1968,7 @@ namespace ManageElectricPower {
 		MyLoad = ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).PowerRequestThisTimestep;
 
 		// Select and call models and also collect results for load center power conditioning and reporting
-		TypeOfEquip: { auto const SELECT_CASE_var( GeneratorType );
+		{ auto const SELECT_CASE_var( GeneratorType );
 
 		if ( SELECT_CASE_var == iGeneratorICEngine ) { // 'Generator:InternalCombustionEngine'
 			SimICEngineGenerator( GeneratorType, GeneratorName, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).GeneratorIndex, RunFlag, MyLoad, FirstHVACIteration );
@@ -2073,7 +2073,7 @@ namespace ManageElectricPower {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeSetupFlag( true );
-		static FArray1D_bool MyCoGenSetupFlag;
+		static Array1D_bool MyCoGenSetupFlag;
 		int FoundCount;
 		int i;
 		int j;
@@ -2620,9 +2620,9 @@ namespace ManageElectricPower {
 		static Real64 Pdemand( 0.0 );
 		static Real64 PpcuLosses( 0.0 );
 		static Real64 Pstorage( 0.0 );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyWarmupFlag; // flag for init after warmup complete
+		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		static int BinNum( 0 );
 		static Real64 Input0( 0.0 );
@@ -3029,8 +3029,8 @@ namespace ManageElectricPower {
 
 				Pw = tmpPdraw / Numbattery;
 				q0 = ElecStorage( ElecStorNum ).LastTimeStepAvailable + ElecStorage( ElecStorNum ).LastTimeStepBound;
-				bool ok = determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, ElecStorage( ElecStorNum ).DischargeCurveNum, k, c, qmax, E0c, InternalR );
-				if ( !ok ){
+				bool const ok = determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, ElecStorage( ElecStorNum ).DischargeCurveNum, k, c, qmax, E0c, InternalR );
+				if ( !ok ) {
 					ShowFatalError( "ElectricLoadCenter:Storage:Battery named=\"" + ElecStorage( ElecStorNum ).Name + "\". Battery discharge current could not be estimated due to iteration limit reached. " );
 				}
 
@@ -3175,19 +3175,20 @@ namespace ManageElectricPower {
 
 	//*****************************************************************************************************************
 
-	bool 
-	determineCurrentForBatteryDischarge( 
-		Real64& curI0, 
-		Real64& curT0, 
+	bool
+	determineCurrentForBatteryDischarge(
+		Real64& curI0,
+		Real64& curT0,
 		Real64& curVolt,
-		Real64 const Pw, 
+		Real64 const Pw,
 		Real64 const q0,
 		int const CurveNum,
 		Real64 const k,
 		Real64 const c,
 		Real64 const qmax,
 		Real64 const E0c,
-		Real64 const InternalR )
+		Real64 const InternalR
+	)
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         B. Griffith
@@ -3231,7 +3232,7 @@ namespace ManageElectricPower {
 		int countForIteration = 0;
 		bool exceedIterationLimit = false;
 
-		while ( error > 0.0001 ) { //Iteration process to get converged current(I)
+		while ( error > 0.0001 ) { // Iteration process to get converged current(I)
 			curI0 = Inew;
 			curT0 = Tnew;
 			qmaxf = qmax * k * c * curT0 / ( 1.0 - std::exp( -k * curT0 ) + c * ( k * curT0 - 1.0 + std::exp( -k * curT0 ) ) );
@@ -3241,8 +3242,8 @@ namespace ManageElectricPower {
 			Inew = Pw / curVolt;
 			Tnew = qmaxf / Inew;
 			error = std::abs( Inew - curI0 );
-			countForIteration++;
-			if ( countForIteration > 1000 ){
+			++countForIteration;
+			if ( countForIteration > 1000 ) {
 				exceedIterationLimit = true;
 				break;
 			}
@@ -3598,11 +3599,11 @@ namespace ManageElectricPower {
 	Rainflow(
 		int const numbin, // numbin = constant value
 		Real64 const input, // input = input value from other object (battery model)
-		FArray1A< Real64 > B1, // stores values of points, calculated here - stored for next timestep
-		FArray1A< Real64 > X, // stores values of two data point difference, calculated here - stored for next timestep
+		Array1A< Real64 > B1, // stores values of points, calculated here - stored for next timestep
+		Array1A< Real64 > X, // stores values of two data point difference, calculated here - stored for next timestep
 		int & count, // calculated here - stored for next timestep in main loop
-		FArray1A< Real64 > Nmb, // calculated here - stored for next timestep in main loop
-		FArray1A< Real64 > OneNmb, // calculated here - stored for next timestep in main loop
+		Array1A< Real64 > Nmb, // calculated here - stored for next timestep in main loop
+		Array1A< Real64 > OneNmb, // calculated here - stored for next timestep in main loop
 		int const dim // end dimension of array
 	)
 	{
@@ -3714,10 +3715,10 @@ namespace ManageElectricPower {
 
 	void
 	shift(
-		FArray1A< Real64 > A,
+		Array1A< Real64 > A,
 		int const m,
 		int const n,
-		FArray1A< Real64 > B,
+		Array1A< Real64 > B,
 		int const dim // end dimension of arrays
 	)
 	{

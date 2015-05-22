@@ -2,7 +2,7 @@
 #define ZoneEquipmentManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -22,8 +22,8 @@ namespace ZoneEquipmentManager {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	extern FArray1D< Real64 > AvgData; // scratch array for storing averaged data
-	extern FArray1D_int DefaultSimOrder;
+	extern Array1D< Real64 > AvgData; // scratch array for storing averaged data
+	extern Array1D_int DefaultSimOrder;
 	extern int NumOfTimeStepInDay; // number of zone time steps in a day
 	extern bool GetZoneEquipmentInputFlag;
 
@@ -69,7 +69,7 @@ namespace ZoneEquipmentManager {
 	};
 
 	// Object Data
-	extern FArray1D< SimulationOrder > PrioritySimOrder;
+	extern Array1D< SimulationOrder > PrioritySimOrder;
 
 	// Functions
 

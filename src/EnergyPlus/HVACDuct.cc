@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <HVACDuct.hh>
@@ -61,14 +61,14 @@ namespace HVACDuct {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumDucts( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 
 	// <name Public routines, optionally name Private routines within this module>
 
 	// Object Data
-	FArray1D< DuctData > Duct;
+	Array1D< DuctData > Duct;
 
 	// Functions
 
@@ -264,7 +264,7 @@ namespace HVACDuct {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		// do one time initializations
 		if ( MyOneTimeFlag ) {

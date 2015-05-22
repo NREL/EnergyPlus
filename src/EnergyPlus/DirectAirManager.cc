@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -70,12 +70,12 @@ namespace DirectAirManager {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumDirectAir( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
 	// Object Data
-	FArray1D< DirectAirProps > DirectAir;
+	Array1D< DirectAirProps > DirectAir;
 
 	// Functions
 
@@ -355,8 +355,8 @@ namespace DirectAirManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
 		int ZoneNode;
 		int Loop;
 

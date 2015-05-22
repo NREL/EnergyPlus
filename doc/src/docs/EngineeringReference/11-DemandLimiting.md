@@ -1,0 +1,92 @@
+
+Demand Limiting
+===============
+
+Demand limiting, or demand management, is a strategy for reducing a building's demand for utilities, e.g., electricity.  Utility companies typically charge a monthly fee for "demand charges" that is based on the peak demand during a certain time period.  Often the peak demand charge is set by one exceptional day that is much higher than the peak demand for an average day during the month.  Therefore, to save utility costs, it is in the interest of building owners to find ways to manage the demand on peak days.  While demand management is generally concerned with the demand for electricity, the future will likely see demand management of other utilities, such as natural gas or water.
+
+Demand limiting controls shut off or reduce the power to non-essential loads in order to reduce the overall building demand.  Some typical controls:
+
+* shut off or dim electric lights, equipment, or HVAC systems
+
+* reset the thermostatic setpoints on HVAC systems
+
+* reduce the load of a set of similar components by rotating one or more components "off" for a short time interval
+
+* turn on generators to meet some or all of the building's demand.
+
+The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies.  The DemandManagerAssignmentList object is a high level control that makes demand limiting decisions based on a list of possible demand limiting strategies.  Each demand limiting strategy is described in a separate DemandManager object.  Each DemandManager object controls a group of similar load objects of the same type, such as DemandManager:Lights, DemandManager:ElectricEquipment, or DemandManager:Thermostats objects.
+
+### Algorithm
+
+In EnergyPlus the DemandManagerAssignmentList and DemandManager objects are simulated by the Demand Manager module.  The Demand Manager is built into the overall solution method for the program.  For each zone time step, the program executes three major segments of code:
+
+§ exterior energy use
+
+* zone heat balance (surface heat balances, internal gains, and air flows)
+
+* HVAC system simulation (air and plant loops)
+
+The exterior energy use segment is completely independent of the zone heat balance and HVAC system simulation.  Exterior energy use handles energy use accounting for exterior lights and exterior equipment that are outside of the building and are not part of the zone heat balance.  The zone heat balance segment includes all of the surface heat balances, internal heat gains, and air flows.  The HVAC system simulation includes air and plant loops with their associated HVAC components.  The behaviour of the HVAC system depends on the results of the zone heat balance.  The HVAC system simulation operates on a variable "system" time step which is automatically shortened if necessary for stability.
+
+The Demand Manager is called after the first pass through the HVAC system simulation, before the system time step is shortened.  After evaluating the DemandManagerAssignmentList object, the Demand Manager decides if demand limiting is required.  If demand limiting is required, the individual DemandManager objects are surveyed to determine which loads can be limited.  Based on the *Demand Manager Priority* selected, the Demand Manager then decides which DemandManager objects should be activated.  In turn, the activated DemandManager objects set the demand limiting hooks on their respective load objects.  Finally, depending on the type of DemandManager objects that were activated, one or more of the major segments of code must be called to be resimulated because the load conditions have changed.  The code segments depend on the type of DemandManager and the relationship of its load objects to the overall solution method.  The table below shows the different DemandManager types and the related code segments that must be resimulated.
+
+
+
+Table 42. Demand Manager Types and Resimulation.
+
+<table class="table table-striped">
+<tr>
+<th>Demand Manager Type</th>
+<th>Resimulate Exterior Energy</th>
+<th>Resimulate Zone Heat Balance</th>
+<th>Resimulate HVAC System</th>
+</tr>
+<tr>
+<td>DemandManager:ExteriorLights</td>
+<td>ü</td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>DemandManager:Lights</td>
+<td> </td>
+<td>ü</td>
+<td>ü</td>
+</tr>
+<tr>
+<td>DemandManager:ElectricEquipment</td>
+<td> </td>
+<td>ü</td>
+<td>ü</td>
+</tr>
+<tr>
+<td>DemandManager:Thermostats</td>
+<td> </td>
+<td> </td>
+<td>ü</td>
+</tr>
+
+</table>
+
+
+
+All demand limiting controls are disabled during warmup days and sizing runs.
+
+#### Sequential Priority
+
+If the *Demand Manager Priority* field of the DemandManagerAssignmentList object is set to SEQUENTIAL, each DemandManager in the list is activated in sequence from first to last until demand is reduced below the limit or until all managers are activated.  A DemandManager is skipped if it cannot reduce the demand.  Possible reasons that a manager cannot reduce demand include:
+
+* not enough load to limit
+
+* not available because of its *Availability Schedule*
+
+* already activated; load limited during a previous time step.
+
+For each DemandManager in the list that is successfully activated, one or more of the major code segments must be called to be resimulated (see above).  The DemandManagerAssignmentList object is then reevaluated to determine if further demand limiting is required before the next DemandManager is activated.
+
+The implication of sequential priority is that a DemandManagerAssignmentList with many DemandManagers may make many passes through the Demand Manager before all demand limiting decisions are finalized.  Each pass requires an additional resimulation of the current time step.  In some cases this could significantly slow down the overall simulation runtime.  The use of the *Minimum Limit Duration* field can help to ensure that not every DemandManager is being activated at every time step.
+
+#### All Priority
+
+If the *Demand Manager Priority* field of the DemandManagerAssignmentList object is set to ALL, all DemandManagers in the list are activated simultaneously to achieve the maximum demand reduction.  This priority option requires only one final resimulation after all DemandManagers are activated.
+

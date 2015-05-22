@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -124,7 +124,7 @@ namespace OutdoorAirUnit {
 	int const CoolingMode( 2 ); // normal cooling coil operation
 	int const NeutralMode( 3 ); // signal coil shouldn't run
 
-	FArray1D_string const CurrentModuleObjects( 2, { "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:OutdoorAirUnit:EquipmentList" } );
+	Array1D_string const CurrentModuleObjects( 2, { "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:OutdoorAirUnit:EquipmentList" } );
 
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
@@ -140,19 +140,19 @@ namespace OutdoorAirUnit {
 	// MODULE VARIABLE DECLARATIONS:
 	int NumOfOAUnits( 0 ); // Number of outdoor air unit in the input file
 	Real64 OAMassFlowRate( 0.0 ); // Outside air mass flow rate for the zone outdoor air unit
-	FArray1D_bool MyOneTimeErrorFlag;
+	Array1D_bool MyOneTimeErrorFlag;
 	bool GetOutdoorAirUnitInputFlag( true ); // Flag set to make sure you get input once
 
 	// Autosizing variables
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE OUTDOOR AIR UNIT
 	//PRIVATE UpdateOutdoorAirUnit
 	//PUBLIC GetOutAirCoilOutletTemp
 
 	// Object Data
-	FArray1D< OAUnitData > OutAirUnit;
+	Array1D< OAUnitData > OutAirUnit;
 
 	// Functions
 
@@ -347,14 +347,14 @@ namespace OutdoorAirUnit {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		bool IsValid; // Set for outside air node check
-		FArray1D_string cAlphaArgs; // Alpha input items for object
+		Array1D_string cAlphaArgs; // Alpha input items for object
 		std::string CurrentModuleObject; // Object type for getting and messages
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
-		FArray1D< Real64 > NumArray;
-		FArray1D_string AlphArray;
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D< Real64 > NumArray;
+		Array1D_string AlphArray;
 		static bool errFlag( false );
 
 		// FLOW:
@@ -835,9 +835,9 @@ namespace OutdoorAirUnit {
 		int Loop;
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int InNode; // inlet node number in outdoor air unit
 		int OutNode; // outlet node number in outdoor air unit
 		int OutsideAirNode; // outside air node number outdoor air unit

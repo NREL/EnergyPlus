@@ -9,14 +9,14 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Format.hh>
-#include <ObjexxFCL/FArray.all.hh>
-#include <ObjexxFCL/FArrayS.all.hh>
+#include <ObjexxFCL/Array.all.hh>
+#include <ObjexxFCL/ArrayS.all.hh>
 #include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/MArray.all.hh>
 
@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 namespace ObjexxFCL {
 
@@ -35,10 +36,32 @@ class Print
 
 public: // Creation
 
+	// Move Constructor
+	inline
+	Print( Print && p ) NOEXCEPT :
+#if !defined(__GNUC__) || __GNUC__ >= 5 // GCC 5 adds move constructor
+	 stream_( std::move( p.stream_ ) ),
+#endif
+	 pos_( 0 ),
+	 format_( p.format_ ? &p.format_->reset() : nullptr ),
+	 own_( p.own_ ),
+	 reverts_( 0 )
+	{
+#if !defined(__GNUC__) || __GNUC__ >= 5
+		stream_.clear();
+		stream_.seekp( 0, std::ios::beg );
+		stream_.str( std::string() );
+#endif
+		p.pos_ = 0;
+		p.format_ = nullptr;
+		p.own_ = false;
+		p.reverts_ = 0;
+	}
+
 	// Format String Constructor
 	inline
 	explicit
-	Print( std::string const & fmt = "*" ) :
+	Print( std::string const & fmt = asterisk ) :
 	 pos_( 0 ),
 	 format_( FormatFactory::create( fmt ) ),
 	 own_( true ),
@@ -64,19 +87,6 @@ public: // Creation
 	 own_( false ),
 	 reverts_( 0 )
 	{}
-
-	// Move Constructor
-	inline
-	Print( Print && p ) :
-	 stream_( p.stream_.str() ), // Initialize with contents until compilers have stream move constructors: stream_( std::move( p.stream_ ) ),
-	 pos_( p.pos_ ),
-	 format_( p.format_ ),
-	 own_( p.own_ ),
-	 reverts_( p.reverts_ )
-	{
-		p.format_ = nullptr;
-		p.own_ = false;
-	}
 
 	// Destructor
 	inline
@@ -113,7 +123,7 @@ private: // Assignment
 
 public: // Operators
 
-	// Stream Output
+	// Stream << T
 	template< typename T >
 	inline
 	typename std::enable_if< ! std::is_base_of< BArray, T >::value, Print & >::type // Force array overload selection for array types
@@ -137,7 +147,7 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: complex Overload
+	// Stream << complex
 	template< typename T >
 	inline
 	Print &
@@ -156,14 +166,14 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray Overload
+	// Stream << Array
 	template< typename T >
 	inline
 	Print &
-	operator <<( FArray< T > const & t )
+	operator <<( Array< T > const & t )
 	{
 		if ( stream_ && format_ ) {
-			for ( typename FArray< T >::size_type i = 0; i < t.size(); ++i ) {
+			for ( typename Array< T >::size_type i = 0; i < t.size(); ++i ) {
 				*this << t[ i ];
 				if ( ! stream_ ) break;
 			}
@@ -172,11 +182,11 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray1S Overload
+	// Stream << Array1S
 	template< typename T >
 	inline
 	Print &
-	operator <<( FArray1S< T > const & t )
+	operator <<( Array1S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i = 1, e = t.u(); i <= e; ++i ) {
@@ -188,11 +198,11 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray2S Overload
+	// Stream << Array2S
 	template< typename T >
 	inline
 	Print &
-	operator <<( FArray2S< T > const & t )
+	operator <<( Array2S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -206,11 +216,11 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray3S Overload
+	// Stream << Array3S
 	template< typename T >
 	inline
 	Print &
-	operator <<( FArray3S< T > const & t )
+	operator <<( Array3S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -226,11 +236,11 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray4S Overload
+	// Stream << Array4S
 	template< typename T >
 	inline
 	Print &
-	operator <<( FArray4S< T > const & t )
+	operator <<( Array4S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -248,11 +258,11 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray5S Overload
+	// Stream << Array5S
 	template< typename T >
 	inline
 	Print &
-	operator <<( FArray5S< T > const & t )
+	operator <<( Array5S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -272,11 +282,11 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: FArray6S Overload
+	// Stream << Array6S
 	template< typename T >
 	inline
 	Print &
-	operator <<( FArray6S< T > const & t )
+	operator <<( Array6S< T > const & t )
 	{
 		if ( stream_ && format_ ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
@@ -298,7 +308,7 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray1 Overload
+	// Stream << MArray1
 	template< class A, typename T >
 	inline
 	Print &
@@ -314,7 +324,7 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray2 Overload
+	// Stream << MArray2
 	template< class A, typename T >
 	inline
 	Print &
@@ -332,7 +342,7 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray3 Overload
+	// Stream << MArray3
 	template< class A, typename T >
 	inline
 	Print &
@@ -352,7 +362,7 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray4 Overload
+	// Stream << MArray4
 	template< class A, typename T >
 	inline
 	Print &
@@ -374,7 +384,7 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray5 Overload
+	// Stream << MArray5
 	template< class A, typename T >
 	inline
 	Print &
@@ -398,7 +408,7 @@ public: // Operators
 		return *this;
 	}
 
-	// Stream Output: MArray6 Overload
+	// Stream << MArray6
 	template< class A, typename T >
 	inline
 	Print &
@@ -468,6 +478,10 @@ private: // Data
 	Format * format_; // Format expression
 	bool own_; // Own the Format?
 	Format::Size reverts_; // Reversion count before last next() call
+
+private: // Static Data
+
+	static std::string const asterisk; // List-directed format string
 
 }; // Print
 

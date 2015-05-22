@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,6 @@ namespace ObjexxFCL {
 template< typename > class CArrayP;
 class byte;
 class ubyte;
-class Fstring;
 
 // Types
 typedef  byte  sbyte;
@@ -54,7 +53,6 @@ typedef  CArrayP< char >                CArrayP_char;
 typedef  CArrayP< unsigned char >       CArrayP_uchar;
 typedef  CArrayP< signed char >         CArrayP_schar;
 typedef  CArrayP< std::string >         CArrayP_string;
-typedef  CArrayP< Fstring >             CArrayP_Fstring;
 
 } // ObjexxFCL
 

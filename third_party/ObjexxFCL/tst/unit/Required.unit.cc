@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -15,8 +15,10 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Required.hh>
-#include <ObjexxFCL/Fstring.hh>
 #include "ObjexxFCL.unit.hh"
+
+// C++ Headers
+#include <string>
 
 using namespace ObjexxFCL;
 
@@ -27,8 +29,8 @@ TEST( RequiredTest, ConstructionDefault )
 
 TEST( RequiredTest, ConstructionOmit )
 {
-#ifdef __INTEL_COMPILER
-	EXPECT_DEBUG_DEATH( Required_int_const( Omit{} ), ".*Assertion.*" ); // Intel C++ gives wrong remark about hiding ObjexxFCL::_ if we use _ arg
+#if defined(__INTEL_COMPILER) && __INTEL_COMPILER < 1500
+	EXPECT_DEBUG_DEATH( Required_int_const( Omit{} ), ".*Assertion.*" ); // Intel C++ before 15.0 gives wrong remark about hiding ObjexxFCL::_ if we use _ arg
 #else
 	EXPECT_DEBUG_DEATH( Required_int_const( _ ), ".*Assertion.*" );
 #endif
@@ -76,30 +78,23 @@ TEST( RequiredTest, AssignmentValue )
 	EXPECT_EQ( 42, r );
 }
 
-//TEST( RequiredTest, AssignmentOmit )
-//{
-//	int i( -3 );
-//	Required_int r( i );
-//	EXPECT_DEBUG_DEATH( r = _, ".*Assertion.*" ); // Required = Omit operator removed
-//}
-
-TEST( RequiredTest, FstringFromLiteral )
+TEST( RequiredTest, StringFromLiteral )
 {
-	Required_Fstring_const r( "A literal string" );
-	EXPECT_EQ( Fstring( "A literal string" ), r );
+	Required_string_const r( "A literal string" );
+	EXPECT_EQ( std::string( "A literal string" ), r );
 	EXPECT_EQ( "A literal string", r() ); // Need the () on r() when types don't match exactly
 	EXPECT_TRUE( r.present() );
-	EXPECT_NE( Fstring( "Some other string" ), r );
+	EXPECT_NE( std::string( "Some other string" ), r );
 }
 
-TEST( RequiredTest, FstringAssignment )
+TEST( RequiredTest, StringAssignment )
 {
-	Fstring s( "A literal string" );
-	Required_Fstring o( s );
-	EXPECT_EQ( Fstring( "A literal string" ), o );
+	std::string s( "A literal string" );
+	Required_string o( s );
+	EXPECT_EQ( std::string( "A literal string" ), o );
 	EXPECT_EQ( "A literal string", o() ); // Need the () on o() when types don't match exactly
 	EXPECT_TRUE( o.present() );
-	EXPECT_NE( Fstring( "Some other string" ), o );
+	EXPECT_NE( std::string( "Some other string" ), o );
 	o = "New string";
 	EXPECT_EQ( "New string", o() ); // Need the () on o() when types don't match exactly
 	EXPECT_EQ( "New string", s );

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -70,11 +70,11 @@ namespace HVACHXAssistedCoolingCoil {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotalNumHXAssistedCoils( 0 ); // The total number of HXAssistedCoolingCoil compound objects
-	FArray1D< Real64 > HXAssistedCoilOutletTemp; // Outlet temperature from this compound object
-	FArray1D< Real64 > HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
+	Array1D< Real64 > HXAssistedCoilOutletTemp; // Outlet temperature from this compound object
+	Array1D< Real64 > HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
 	// PUBLIC so others can access this information
 	bool GetCoilsInputFlag( true ); // Flag to allow input data to be retrieved from idf on first call to this subroutine
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -96,7 +96,7 @@ namespace HVACHXAssistedCoolingCoil {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< HXAssistedCoilParameters > HXAssistedCoil;
+	Array1D< HXAssistedCoilParameters > HXAssistedCoil;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -296,12 +296,12 @@ namespace HVACHXAssistedCoolingCoil {
 		int CoolingCoilInletNodeNum; // outlet node number of cooling coil, used for warning messages
 		int CoolingCoilOutletNodeNum; // outlet node number of cooling coil, used for warning messages
 		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a

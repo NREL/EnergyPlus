@@ -5,11 +5,11 @@
 #include <functional>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2A.hh>
+#include <ObjexxFCL/Array2S.hh>
+#include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -43,8 +43,8 @@ namespace WindowEquivalentLayer {
 	extern int const hipTAU_BB0;
 	extern int const hipDIM; // dimension of parameter array
 
-	extern FArray3D< Real64 > CFSDiffAbsTrans;
-	extern FArray1D_bool EQLDiffPropFlag;
+	extern Array3D< Real64 > CFSDiffAbsTrans;
+	extern Array1D_bool EQLDiffPropFlag;
 
 	// MODULE SUBROUTINES:
 	// Initialization routines for module
@@ -78,7 +78,7 @@ namespace WindowEquivalentLayer {
 	CalcEQLWindowOpticalProperty(
 		CFSTY & FS, // fenestration system
 		int const DiffBeamFlag, // isDIFF: calc diffuse properties
-		FArray2A< Real64 > Abs1,
+		Array2A< Real64 > Abs1,
 		Real64 const IncA, // angle of incidence, radians
 		Real64 const VProfA, // inc solar vertical profile angle, radians
 		Real64 const HProfA // inc solar horizontal profile angle, radians
@@ -111,9 +111,9 @@ namespace WindowEquivalentLayer {
 
 	Real64
 	HEMINT(
-		std::function< Real64( Real64 const THETA, int const OPT, FArray1A< Real64 > const ) > F, // property integrand function
+		std::function< Real64( Real64 const THETA, int const OPT, Array1A< Real64 > const ) > F, // property integrand function
 		int const F_Opt, // options passed to F() (hipRHO, hipTAU)
-		FArray1A< Real64 > const F_P // parameters passed to F()
+		Array1A< Real64 > const F_P // parameters passed to F()
 	);
 
 	void
@@ -129,7 +129,7 @@ namespace WindowEquivalentLayer {
 	RB_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (unused)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	);
 
 	void
@@ -156,7 +156,7 @@ namespace WindowEquivalentLayer {
 	IS_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (1=reflectance, 2=transmittance)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	);
 
 	void
@@ -192,7 +192,7 @@ namespace WindowEquivalentLayer {
 	FM_F(
 		Real64 const THETA, // incidence angle, radians
 		int const Opt, // options (hipRHO, hipTAU)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	);
 
 	void
@@ -476,8 +476,8 @@ namespace WindowEquivalentLayer {
 	void
 	SOLMATS(
 		int const N, // # of active rows in A
-		FArray2S< Real64 > A, // matrix, minimum required dimensions: A( N, N+2)
-		FArray1S< Real64 > XSOL // returned: solution vector, min req dimension: XSOL( N)
+		Array2S< Real64 > A, // matrix, minimum required dimensions: A( N, N+2)
+		Array1S< Real64 > XSOL // returned: solution vector, min req dimension: XSOL( N)
 	);
 
 	bool
@@ -490,15 +490,15 @@ namespace WindowEquivalentLayer {
 		Real64 const TRMOUT,
 		Real64 const TRMIN, // indoor / outdoor mean radiant temp, K
 		Real64 const ISOL, // total incident solar, W/m2 (values used for SOURCE derivation)
-		FArray1S< Real64 > const SOURCE, // absorbed solar by layer,  W/m2
+		Array1S< Real64 > const SOURCE, // absorbed solar by layer,  W/m2
 		Real64 const TOL, // convergence tolerance, usually
-		FArray1A< Real64 > QOCF, // returned: heat flux to layer i from gaps i-1 and i
+		Array1A< Real64 > QOCF, // returned: heat flux to layer i from gaps i-1 and i
 		Real64 & QOCFRoom, // returned: open channel heat gain to room, W/m2
-		FArray1A< Real64 > T, // returned: layer temperatures, 1=outside-most layer, K
-		FArray1< Real64 > & Q, // returned: heat flux at ith gap (betw layers i and i+1), W/m2
-		FArray1A< Real64 > JF, // returned: front (outside facing) radiosity of surfaces, W/m2
-		FArray1A< Real64 > JB, // returned: back (inside facing) radiosity, W/m2
-		FArray1A< Real64 > HC, // returned: gap convective heat transfer coefficient, W/m2K
+		Array1A< Real64 > T, // returned: layer temperatures, 1=outside-most layer, K
+		Array1< Real64 > & Q, // returned: heat flux at ith gap (betw layers i and i+1), W/m2
+		Array1A< Real64 > JF, // returned: front (outside facing) radiosity of surfaces, W/m2
+		Array1A< Real64 > JB, // returned: back (inside facing) radiosity, W/m2
+		Array1A< Real64 > HC, // returned: gap convective heat transfer coefficient, W/m2K
 		Real64 & UCG, // returned: center-glass U-factor, W/m2-K
 		Real64 & SHGC, // returned: center-glass SHGC (Solar Heat Gain Coefficient)
 		Optional_bool_const HCInFlag = _ // If true uses ISO Std 150099 routine for HCIn calc
@@ -526,7 +526,7 @@ namespace WindowEquivalentLayer {
 		Real64 const rhodb,
 		Real64 const taud,
 		Real64 const rhom,
-		FArray2A< Real64 > A
+		Array2A< Real64 > A
 	);
 
 	Real64
@@ -617,52 +617,52 @@ namespace WindowEquivalentLayer {
 	void
 	ASHWAT_Solar(
 		int const NL, // # of layers
-		FArray1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
+		Array1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
 		CFSSWP const & SWP_ROOM, // effective SW (solar) properties of room
 		Real64 const IBEAM, // incident beam insolation (W/m2 aperture)
 		Real64 const IDIFF, // incident diffuse insolation (W/m2 aperture)
 		Real64 const ILIGHTS, // incident diffuse insolation (W/m2 aperture)
-		FArray1S< Real64 > SOURCE, // returned: layer-by-layer flux of absorbed
-		Optional< FArray1S< Real64 > > SourceBD = _ // returned: layer-by-layer flux of absorbed
+		Array1S< Real64 > SOURCE, // returned: layer-by-layer flux of absorbed
+		Optional< Array1S< Real64 > > SourceBD = _ // returned: layer-by-layer flux of absorbed
 	);
 
 	void
 	NETRAD(
 		int const NL, // # of layers, 1=outside .. NL=inside
-		FArray1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
+		Array1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
 		Real64 const RHO_room, // effective solar reflectance of room (at inside)
 		Real64 const ISOL, // incident flux (W/m2)
-		FArray1< Real64 > & QPLUS, // returned: see Edwards paper
-		FArray1< Real64 > & QMINUS // returned: see Edwards paper
+		Array1< Real64 > & QPLUS, // returned: see Edwards paper
+		Array1< Real64 > & QMINUS // returned: see Edwards paper
 	);
 
 	void
 	TDMA_R(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > const AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > const AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int const N
 	);
 
 	void
 	TDMA(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > const AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > const AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int const N
 	);
 
 	void
 	AUTOTDMA(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int & N
 	);
 
@@ -705,7 +705,7 @@ namespace WindowEquivalentLayer {
 	Specular_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (unused)
-		FArray1A< Real64 > const P // parameters (none defined)
+		Array1A< Real64 > const P // parameters (none defined)
 	);
 
 	void
@@ -866,7 +866,7 @@ namespace WindowEquivalentLayer {
 	CalcEQLOpticalProperty(
 		int const SurfNum,
 		int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
-		FArray2A< Real64 > CFSAbs // absorbed beam solar radiation by layers fraction
+		Array2A< Real64 > CFSAbs // absorbed beam solar radiation by layers fraction
 	);
 
 	void

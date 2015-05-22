@@ -16,10 +16,12 @@ set( test_src
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatRecovery.unit.cc
   Humidifiers.unit.cc
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
+  LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
   HVACUnitarySystem.unit.cc
   MixedAir.unit.cc
@@ -28,6 +30,7 @@ set( test_src
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  SecondaryDXCoils.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
@@ -37,6 +40,7 @@ set( test_src
   Vector.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
+  WaterToAirHeatPumpSimple.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
