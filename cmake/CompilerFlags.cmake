@@ -88,16 +88,18 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     if( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
+      ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
     elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-  IF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
-    ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
-    ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
-  ENDIF ()
-    ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
+    if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
+      ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
+      ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
+    endif ()
+  
+  ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
 
 ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
