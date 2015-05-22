@@ -238,6 +238,8 @@ SET( SRC
   GlobalNames.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
+  GroundTempManager.cc
+  GroundTempManager.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
