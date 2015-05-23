@@ -32081,7 +32081,8 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \type alpha
         \note Unique name for this packaged terminal air conditioner object.
    A2,  \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
         \note Schedule values of 0 denote the unit is off.
@@ -32968,7 +32969,8 @@ ZoneHVAC:UnitHeater,
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
    A3 , \field Air Inlet Node Name
@@ -33056,7 +33058,8 @@ ZoneHVAC:EvaporativeCoolerUnit,
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
    A3,  \field Availability Manager List Name

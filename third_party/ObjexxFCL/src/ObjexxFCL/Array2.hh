@@ -1366,10 +1366,9 @@ public: // Modifier
 	Array2 &
 	right_multiply_by( Array2< U > const & a )
 	{
-		size_type const as1( a.z1_ );
 		size_type const as2( a.z2_ );
-		assert( z2_ == as1 );
-		assert( as1 == as2 ); // Square so that this array's dimensions aren't changed
+		assert( z2_ == a.z1_ );
+		assert( a.z1_ == as2 ); // Square so that this array's dimensions aren't changed
 		Array2 & t( *this ); // Shorthand name for this array
 		T * const r( new T[ z2_ ] ); // Temporary row
 		for ( size_type i = 0; i < z1_; ++i ) {
@@ -1395,9 +1394,8 @@ public: // Modifier
 	right_multiply_by_transpose( Array2< U > const & a )
 	{
 		size_type const as1( a.z1_ );
-		size_type const as2( a.z2_ );
-		assert( z2_ == as2 );
-		assert( as1 == as2 ); // Square so that this array's dimensions aren't changed
+		assert( z2_ == a.z2_ );
+		assert( as1 == a.z2_ ); // Square so that this array's dimensions aren't changed
 		Array2 & t( *this ); // Shorthand name for this array
 		T * const r( new T[ z2_ ] ); // Temporary row
 		for ( size_type i = 0; i < z1_; ++i ) {
