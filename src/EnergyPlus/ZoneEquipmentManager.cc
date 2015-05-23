@@ -3106,8 +3106,8 @@ namespace ZoneEquipmentManager {
 				if ( ( CurEqCoolingPriority > psc.CoolingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired < 0.0 ) || ( CurEqHeatingPriority > psc.HeatingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired >= 0.0 ) ) {
 
 					//Tuned C++ string swap avoids copying
-					std::swap( pso.EquipType, psc.EquipType );
-					std::swap( pso.EquipName, psc.EquipName );
+					pso.EquipType.swap( psc.EquipType );
+					pso.EquipName.swap( psc.EquipName );
 					std::swap( pso.EquipPtr, psc.EquipPtr );
 					std::swap( pso.EquipType_Num, psc.EquipType_Num );
 					std::swap( pso.CoolingPriority, psc.CoolingPriority );
@@ -3689,8 +3689,6 @@ namespace ZoneEquipmentManager {
 				// Add sensible heat gain from refrigerated cases with under case returns
 				SumAllReturnAirConvectionGains( ActualZoneNum, QRetAir );
 
-				CpAir = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
-
 				// Need to add the energy to the return air from lights and from airflow windows. Where the heat
 				// is added depends on if there is system flow or not.  If there is system flow the heat is added
 				// to the Zone Return Node.  If there is no system flow then the heat is added back to the zone in the
@@ -3728,6 +3726,7 @@ namespace ZoneEquipmentManager {
 				// cases the heat to return air is treated as a zone heat gain and dealt with in CalcZoneSums in
 				// MODULE ZoneTempPredictorCorrector.
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
+					CpAir = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 					if ( MassFlowRA > 0.0 ) {
 						if ( WinGapFlowToRA > 0.0 ) {
 							// Add heat-to-return from window gap airflow
@@ -3770,13 +3769,11 @@ namespace ZoneEquipmentManager {
 				// Update the rest of the Return Air Node conditions, if the return air system exists!
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
-				H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
-				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat );
-
 				// Include impact of under case returns for refrigerated display case when updating the return air node humidity
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
 					if ( MassFlowRA > 0 ) {
 						SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+						H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
 						Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat + ( SumRetAirLatentGainRate / ( H2OHtOfVap * MassFlowRA ) );
 					} else {
 						// If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
