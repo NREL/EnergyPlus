@@ -873,7 +873,7 @@ namespace WaterCoils {
 		Real64 DesEnthAtWaterOutTempAirInHumRat;
 		Real64 DesEnthWaterOut;
 		Real64 Cp; // local fluid specific heat
-		// Real64 rho; // local fluid density
+		Real64 rho; // local fluid density
 		bool errFlag;
 		static Real64 EnthCorrFrac( 0.0 ); // enthalpy correction factor
 		static Real64 TempCorrFrac( 0.0 ); // temperature correction factor
@@ -923,7 +923,7 @@ namespace WaterCoils {
 
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( CoilNum ) ) {
-			double rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 			//Initialize all report variables to a known state at beginning of simulation
 			WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy = 0.0;
 			WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy = 0.0;
@@ -2141,7 +2141,7 @@ namespace WaterCoils {
 		}
 
 		if ( WaterMassFlowRate > MassFlowTolerance ) { // If the coil is operating
-			CapacitanceAir = Psychrometrics::PsyCpAirFnWTdb_fast( Win, 0.5 * ( TempAirIn + TempWaterIn ) ) * AirMassFlow;
+			CapacitanceAir = PsyCpAirFnWTdb( Win, 0.5 * ( TempAirIn + TempWaterIn ) ) * AirMassFlow;
 			Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, TempWaterIn, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 			CapacitanceWater = Cp * WaterMassFlowRate;
 			CapacitanceMin = min( CapacitanceAir, CapacitanceWater );

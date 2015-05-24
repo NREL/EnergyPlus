@@ -2995,8 +2995,6 @@ namespace SystemReports {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// std::string CompType;
-		// std::string CompName;
 		int Idx; // loop counter
 		int nodes; // loop counter
 		int CtrlZoneNum; // ZONE counter
@@ -3575,11 +3573,6 @@ namespace SystemReports {
 		//    cEnergyType=cRT_ValidTypes(EnergyType-ResourceTypeInitialOffset)
 
 		// Find enum for the component type string
-		// std::vector< std::string >::size_type iCompType;
-		// ComponentTypes comp_type( Unknown_ComponentType );
-		// if ( index_in_sorted_string_vector( component_strings, CompType, iCompType ) ) {
-		// 	comp_type = static_cast< ComponentTypes >( iCompType );
-		// }
 		ComponentTypes comp_type;
 		auto const it = component_map.find( CompType );
 		if ( it != component_map.end() ) {
