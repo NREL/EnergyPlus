@@ -6965,11 +6965,16 @@ The minimum outdoor dry bulb temperature that the chilled water loops operate.
 
 #### Field: Chilled Water Load Distribution Scheme
 
-The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, three schemes are functional. **Sequential** uses each piece of equipment to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **Uniform** evenly distributes the loop demand among all available components on the equipment list for a given load range.
+The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **SequentialLoad** loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **UniformLoad** evenly distributes the loop demand among all available components on the equipment list for a given load range. **SequentialUniformPLR** loads all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the PlantEquipmentList until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. **UniformPLR** will load all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the PlantEquipmentList operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
+
+Note: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
+
 
 #### Field: Condenser Water Load Distribution Scheme
 
-The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the condenser loop demand. Currently, three schemes are functional. **Sequential** uses each piece of equipment to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **Uniform** evenly distributes the loop demand among all available components on the equipment list for a given load range.
+The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **SequentialLoad** loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **UniformLoad** evenly distributes the loop demand among all available components on the equipment list for a given load range. **SequentialUniformPLR** loads all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the PlantEquipmentList until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. **UniformPLR** will load all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the PlantEquipmentList operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
+
+Note: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
 
 As shown in an IDF:
 
@@ -7006,8 +7011,8 @@ HVACTemplate:Plant:ChilledWaterLoop,
     Water,                   !- Fluid Type
     6.67,                    !- Loop Design Delta Temperature {deltaC}
     ,                        !- Minimum Outdoor Dry Bulb Temperature {C}
-    Sequential,              !- Chilled Water Load Distribution Scheme
-    Sequential;              !- Condenser Water Load Distribution Scheme
+    SequentialLoad,          !- Chilled Water Load Distribution Scheme
+    SequentialLoad;          !- Condenser Water Load Distribution Scheme
 ```
 
 ### HVACTemplate:Plant:Chiller
@@ -7427,7 +7432,9 @@ The maximum outdoor dry bulb temperature that the hot water loops operate.
 
 #### Field: Load Distribution Scheme
 
-The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, three schemes are functional. **Sequential** uses each piece of equipment to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **Uniform** evenly distributes the loop demand among all available components on the equipment list for a given load range.
+This alpha field contains the Load Distribution Scheme Keyword. The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **SequentialLoad** loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **UniformLoad** evenly distributes the loop demand among all available components on the equipment list for a given load range. **SequentialUniformPLR** loads all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the PlantEquipmentList until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. **UniformPLR** will load all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the PlantEquipmentList operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
+
+Note: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
 
 As shown in an IDF:
 
@@ -7453,7 +7460,7 @@ HVACTemplate:Plant:HotWaterLoop,
     Water,                   !- Fluid Type
     11,                      !- Loop Design Delta Temperature {deltaC}
     ,                        !- Maximum Outdoor Dry Bulb Temperature {C}
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;              !- Load Distribution Scheme
 ```
 
 
@@ -7738,7 +7745,9 @@ The temperature difference used in sizing the loop flow rate. The default is 5.6
 
 #### Field: Load Distribution Scheme
 
-The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, three schemes are functional. **Sequential** uses each piece of equipment to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **Uniform** evenly distributes the loop demand among all available components on the equipment list for a given load range.
+This alpha field contains the Load Distribution Scheme Keyword. The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **SequentialLoad** loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **UniformLoad** evenly distributes the loop demand among all available components on the equipment list for a given load range. **SequentialUniformPLR** loads all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the PlantEquipmentList until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. **UniformPLR** will load all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the PlantEquipmentList operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
+
+Note: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
 
 As shown in an IDF:
 
@@ -7760,7 +7769,7 @@ HVACTemplate:Plant:MixedWaterLoop,
     Yes,                     !- Demand Side Bypass Pipe
     Water,                   !- Fluid Type
     6,                       !- Loop Design Delta Temperature {deltaC}
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;              !- Load Distribution Scheme
 ```
 
 

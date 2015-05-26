@@ -29830,26 +29830,20 @@ HVACTemplate:Plant:ChilledWaterLoop,
       \note Leave blank for no limit.
       \units C
   A21,\field Chilled Water Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
   A22;\field Condenser Water Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 HVACTemplate:Plant:Chiller,
@@ -30169,15 +30163,12 @@ HVACTemplate:Plant:HotWaterLoop,
       \note Leave blank for no limit.
       \units C
   A13;\field Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 HVACTemplate:Plant:Boiler,
@@ -30378,15 +30369,12 @@ HVACTemplate:Plant:MixedWaterLoop,
       \units deltaC
       \default 5.6
   A13;\field Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 \group HVAC Design Objects
