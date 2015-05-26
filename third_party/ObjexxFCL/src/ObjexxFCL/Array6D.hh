@@ -106,7 +106,6 @@ public: // Types
 	using Super::u5;
 	using Super::u6;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::I1_;
 	using Super::I2_;
 	using Super::I3_;
@@ -851,7 +850,7 @@ public: // Subscript
 	{
 		assert( contains( i1, i2, i3, i4, i5, i6 ) );
 		size_type const offset( ( ( ( ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ) * z6_ ) + i6 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), data_size_ - offset );
+		return Tail( static_cast< T const * >( data_ + offset ), size_ - offset );
 	}
 
 	// Tail Starting at array( i1, i2, i3, i4, i5, i6 )
@@ -861,7 +860,7 @@ public: // Subscript
 	{
 		assert( contains( i1, i2, i3, i4, i5, i6 ) );
 		size_type const offset( ( ( ( ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ) * z6_ ) + i6 ) - shift_ );
-		return Tail( data_ + offset, data_size_ - offset );
+		return Tail( data_ + offset, size_ - offset );
 	}
 
 public: // Predicate
