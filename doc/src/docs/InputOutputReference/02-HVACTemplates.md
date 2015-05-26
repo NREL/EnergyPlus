@@ -6,13 +6,13 @@ HVACTemplate Processing
 
 **Unlike other EnergyPlus objects, the HVACTemplate objects are not handled by EnergyPlus directly.** Instead, they are preprocessed by a program called ExpandObjects. If you use EP-Launch or RunEPlus.bat, this preprocessor step is performed automatically using the following sequence:
 
-1)   The preprocessor program, ExpandObjects, reads your IDF file and converts all of the HVACTemplate objects into other EnergyPlus objects.
+1)   The preprocessor program, ExpandObjects, reads your IDF file and converts all of the HVACTemplate objects into other EnergyPlus objects.
 
-2)   The ExpandObjects program copies the original idf file with the HVACTemplate objects commented out (i.e., inserts a “!” in front of the object name and its input fields) plus all of the new objects created in Step 1 and writes a new file which is saved with the extension “expidf”. This “expidf” file may be used as a standard EnergyPlus IDF file if the extension is changed to idf; however, for safety’s sake, both filename and extension should be changed.
+2)   The ExpandObjects program copies the original idf file with the HVACTemplate objects commented out (i.e., inserts a “!” in front of the object name and its input fields) plus all of the new objects created in Step 1 and writes a new file which is saved with the extension “expidf”. This “expidf” file may be used as a standard EnergyPlus IDF file if the extension is changed to idf; however, for safety’s sake, both filename and extension should be changed.
 
-3)   The EnergyPlus simulation proceeds using the expidf file as the input stream.
+3)   The EnergyPlus simulation proceeds using the expidf file as the input stream.
 
-4)   If there are error messages from EnergyPlus, they will refer to the contents of the expidf file. Specific objects referred to in error messages may exist in the original idf, but they may be objects created by ExpandObjects and only exist in the expidf. Remember that the expidf will be overwritten everytime the original idf is run using EP-Launch or RunEPlus.bat.
+4)   If there are error messages from EnergyPlus, they will refer to the contents of the expidf file. Specific objects referred to in error messages may exist in the original idf, but they may be objects created by ExpandObjects and only exist in the expidf. Remember that the expidf will be overwritten everytime the original idf is run using EP-Launch or RunEPlus.bat.
 
 If you are trying to go beyond the capabilities of the HVACTemplate objects, one strategy you can use is to start your specification using the HVACTemplate objects, run EnergyPlus using EP-Launch and producing an expidf file, rename that file and start making modifications. This approach may help with getting all of the objects needed and the node names set consistently.
 
@@ -77,7 +77,7 @@ For packaged terminal air conditioner (PTAC) systems with optional hot water boi
 
 * HVACTemplate:Plant:Boiler (optional)
 
-For packaged terminal air-to-air  heat pump (PTHP) systems:
+For packaged terminal air-to-air heat pump (PTHP) systems:
 
 * HVACTemplate:Thermostat
 
@@ -289,11 +289,11 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:Thermostat,
-    Office Thermostat,                                    !- Thermostat Name
-    Htg-SetP-Sch,          !- Heating Setpoint Schedule
-    ,          !- Constant Heating Setpoint {C}
-    Clg-SetP-Sch,          !- Cooling Setpoint Schedule
-    ;          !- Constant Cooling Setpoint {C}
+    Office Thermostat,     !- Thermostat Name
+    Htg-SetP-Sch,          !- Heating Setpoint Schedule
+    ,                      !- Constant Heating Setpoint {C}
+    Clg-SetP-Sch,          !- Cooling Setpoint Schedule
+    ;                      !- Constant Cooling Setpoint {C}
 ```
 
 ### HVACTemplate:Zone:IdealLoadsAirSystem
@@ -340,7 +340,7 @@ The input must be either *LimitFlowRate, LimitCapacity, LimitFlowRateAndCapacity
 
 #### Field: Maximum Heating Air Flow Rate
 
-The maximum heating supply air flow rate in cubic meters per second if heating limit is set to *LimitFlowRate or LimitFlowRateAndCapacity* *.* This field may be autosized. This field is ignored if heating limit is set to *NoLimit* or *LimitCapacity*.  If blank, there is no limit.
+The maximum heating supply air flow rate in cubic meters per second if heating limit is set to *LimitFlowRate or LimitFlowRateAndCapacity* *.* This field may be autosized. This field is ignored if heating limit is set to *NoLimit* or *LimitCapacity*.  If blank, there is no limit.
 
 #### Field: Maximum Sensible Heating Capacity
 
@@ -380,7 +380,7 @@ When the Dehumidification Control Type is set to *ConstantSensibleHeatRatio* the
 
 #### Field: Dehumidification Setpoint
 
-This field specifies the zone humidistat relative humidity setpoint for dehumidification in percent (0 to 100).  The default is 60%. This field is used only when the Dehumidification Control Type = *Humidistat.*
+This field specifies the zone humidistat relative humidity setpoint for dehumidification in percent (0 to 100).  The default is 60%. This field is used only when the Dehumidification Control Type = *Humidistat.*
 
 #### Field: Humidification Control Type
 
@@ -392,7 +392,7 @@ This allows the ideal loads system to cool and humidify at the same time.
 
 #### Field: Humidification Setpoint
 
-This field specifies the zone humidistat relative humidity setpoint for humidification in percent (0 to 100).  The default is 30%. This field is used only when the Humidification Control Type = *Humidistat.*
+This field specifies the zone humidistat relative humidity setpoint for humidification in percent (0 to 100).  The default is 30%. This field is used only when the Humidification Control Type = *Humidistat.*
 
 #### Field: Outdoor Air Method
 
@@ -402,7 +402,7 @@ The input must be either *None, Flow/Zone*, *Flow/Person*, *Flow/Area*, *Sum*, *
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if Outdoor Air Method is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum.*
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if Outdoor Air Method is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum.*
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -447,37 +447,37 @@ The latent heat recovery effectiveness, where effectiveness is defined as the ch
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:IdealLoadsAirSystem,
-    Zone 1,                  !- Zone Name
-    All Zones,               !- Thermostat Name
-    FanAvailSched,           !- System Availability Schedule Name
-    50,                      !- Maximum Heating Supply Air Temperature {C}
-    13,                      !- Minimum Cooling Supply Air Temperature {C}
-    0.0156,         !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.0077,         !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
-    NoLimit,                 !- Heating Limit
-    ,                        !- Maximum Heating Air Flow Rate {m3/s}
-    ,                        !- Maximum Sensible Heating Capacity {W}
-    NoLimit,                 !- Cooling Limit
-    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
-    ,                        !- Maximum Total Cooling Capacity {W}
-    ,                        !- Heating Availability Schedule Name
-    ,                        !- Cooling Availability Schedule Name
-    ConstantSensibleHeatRatio,  !- Dehumidification Control Type
-    0.7,                     !- Cooling Sensible Heat Ratio
-    60,                      !- Dehumidification Setpoint {percent}
-    None,                    !- Humidification Control Type
-    30,                      !- Humidification Setpoint {percent}
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- Design Specification Outdoor Air Object Name
-    None,                    !- Demand Controlled Ventilation Type
-    NoEconomizer,            !- Outdoor Air Economizer Type
-    None,                    !- Heat Recovery Type
-    0.70,                    !- Sensible Heat Recovery Effectiveness
-    0.65;                    !- Latent Heat Recovery Effectiveness
+  HVACTemplate:Zone:IdealLoadsAirSystem,
+    Zone 1,                  !- Zone Name
+    All Zones,               !- Thermostat Name
+    FanAvailSched,           !- System Availability Schedule Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    13,                      !- Minimum Cooling Supply Air Temperature {C}
+    0.0156,         !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0077,         !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Heating Limit
+    ,                        !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    NoLimit,                 !- Cooling Limit
+    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    ,                        !- Heating Availability Schedule Name
+    ,                        !- Cooling Availability Schedule Name
+    ConstantSensibleHeatRatio,  !- Dehumidification Control Type
+    0.7,                     !- Cooling Sensible Heat Ratio
+    60,                      !- Dehumidification Setpoint {percent}
+    None,                    !- Humidification Control Type
+    30,                      !- Humidification Setpoint {percent}
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    None,                    !- Demand Controlled Ventilation Type
+    NoEconomizer,            !- Outdoor Air Economizer Type
+    None,                    !- Heat Recovery Type
+    0.70,                    !- Sensible Heat Recovery Effectiveness
+    0.65;                    !- Latent Heat Recovery Effectiveness
 ```
 
 
@@ -497,7 +497,7 @@ When this field is blank, it has a special meaning. A blank entry means that det
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating load will be multiplied by the number input in this field when the Baseboard Heating Capacity is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating load will be multiplied by the number input in this field when the Baseboard Heating Capacity is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Baseboard Heating Type
 
@@ -515,7 +515,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the fan coil system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the fan coil system.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the fan coil system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the fan coil system.
 
 #### Field: Dedicated Outdoor Air System Name
 
@@ -529,7 +529,7 @@ The input must be either *Flow/Zone*, or *Flow/Person*, *Flow/Area*, *Sum*, *Max
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if Outdoor Air Method is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum.*
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if Outdoor Air Method is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum.*
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -541,31 +541,31 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when Outdoor Air Method *= DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when Outdoor Air Method *= DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when Outdoor Air Method *= DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when Outdoor Air Method *= DetailedSpecification*.
 
 
 
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:BaseboardHeat,
-    SPACE1-1,          !- Zone Name
-    All Zones,         !- Template Thermostat Name
-    ,                  !- Zone Heating Sizing Factor
-    HotWater,          !- Baseboard Heating Type
-    ,                  !- Baseboard Heating Availability Schedule Name
-    Autosize;          !- Baseboard Heating Capacity {W}
-    ,                  !- Dedicated Outdoor Air System Name
-    flow/person,       !- Outdoor Air Method
-    0.00944,           !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,               !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                  !- Design Specification Outdoor Air Object Name
-    ;                  !- Design Specification Zone Air Distribution Object Name
+  HVACTemplate:Zone:BaseboardHeat,
+    SPACE1-1,          !- Zone Name
+    All Zones,         !- Template Thermostat Name
+    ,                  !- Zone Heating Sizing Factor
+    HotWater,          !- Baseboard Heating Type
+    ,                  !- Baseboard Heating Availability Schedule Name
+    Autosize;          !- Baseboard Heating Capacity {W}
+    ,                  !- Dedicated Outdoor Air System Name
+    flow/person,       !- Outdoor Air Method
+    0.00944,           !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,               !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                  !- Design Specification Outdoor Air Object Name
+    ;                  !- Design Specification Zone Air Distribution Object Name
 ```
 
 
@@ -589,11 +589,11 @@ By entering Autosize, the maximum supply air flow rate is automatically determin
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Outdoor Air Method
 
@@ -603,7 +603,7 @@ The input must be either *Flow/Zone*, or *Flow/Person*, *Flow/Area*, *Sum*, *Max
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -641,7 +641,7 @@ There are two coil types available:
 
 - ChilledWaterDetailedFlatModel
 
-*Chilled Water* uses theCoil:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most applications.  *ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.  The default is *ChilledWater*.
+*Chilled Water* uses theCoil:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most applications.  *ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.  The default is *ChilledWater*.
 
 #### Field: Cooling Coil Availability Schedule Name
 
@@ -689,21 +689,21 @@ The temperature difference between heating design supply air temperature and zon
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Fan Coil Capacity Control Method
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are *ConstantFanVariableFlow*, *CyclingFan*, *VariableFanVariableFlow* or *VariableFanConstantFlow*. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. If this field is left blank, it will default to *CyclingFan* if a Dedicated Outdoor Air System is specified (see above), otherwise it will default to *ConstantFanVariableFlow.*
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are *ConstantFanVariableFlow*, *CyclingFan*, *VariableFanVariableFlow* or *VariableFanConstantFlow*. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. If this field is left blank, it will default to *CyclingFan* if a Dedicated Outdoor Air System is specified (see above), otherwise it will default to *ConstantFanVariableFlow.*
 
 #### Field: Low Speed Supply Air Flow Ratio
 
 This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. Its value should be less than *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. This field is ignored if the capacity control method selected is not *CyclingFan*.
 
-#### Field: Medium Speed Supply Air  Flow Ratio
+#### Field: Medium Speed Supply Air Flow Ratio
 
 This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1.If left blank, the default value is 0.66. This field is ignored if the capacity control method selected is not *CyclingFan*.
 
@@ -729,48 +729,48 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the fan coil system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the fan coil system.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the fan coil system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the fan coil system.
 
 
 
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:FanCoil,
-    SPACE1-1,                !- Zone Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-    FanAvailSched,           !- System Availability Schedule Name
-    0.7,                     !- Supply Fan Total Efficiency
-    75,                      !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    ChilledWater,            !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    12.5,                    !- Cooling Coil Design Setpoint {C}
-    HotWater,                !- Heating Coil Type
-    ,                        !- Heating Coil Availability Schedule Name
-    50,                      !- Heating Coil Design Setpoint {C}
-    ,                        !- Dedicated Outdoor Air System Name
-    SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
-    SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
-    ,            !- Design Specification Outdoor Air Object Name
-    ,            !- Design Specification Zone Air Distribution Object Name
-    ConstantFanVariableFlow, !- Fan Coil Capacity Control Method
-    ,                        !- Low Speed Supply Air Flow Ratio
-    ,                        !- Medium Speed Supply Air Flow Ratio
-    OUTAIRFANCOILSCHEDULE,   !- Outdoor Air Schedule Name
-    None,        !- Baseboard Heating Type
-    ,            !- Baseboard Heating Availability Schedule Name
-    Autosize;    !- Baseboard Heating Capacity {W}
+  HVACTemplate:Zone:FanCoil,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    FanAvailSched,           !- System Availability Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.5,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    50,                      !- Heating Coil Design Setpoint {C}
+    ,                        !- Dedicated Outdoor Air System Name
+    SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+    SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+    ,            !- Design Specification Zone Air Distribution Object Name
+    ConstantFanVariableFlow, !- Fan Coil Capacity Control Method
+    ,                        !- Low Speed Supply Air Flow Ratio
+    ,                        !- Medium Speed Supply Air Flow Ratio
+    OUTAIRFANCOILSCHEDULE,   !- Outdoor Air Schedule Name
+    None,        !- Baseboard Heating Type
+    ,            !- Baseboard Heating Availability Schedule Name
+    Autosize;    !- Baseboard Heating Capacity {W}
 ```
 
 
@@ -780,7 +780,7 @@ This object simulates a packaged terminal air conditioner (PTAC) with a DX cooli
 
 ![PTAC\_Drawthrough](InputOutputReference/media/image603.png)
 
-Figure 154.  Schematic of a packaged terminal air conditioner with draw through fan placement
+Figure 154.  Schematic of a packaged terminal air conditioner with draw through fan placement
 
 #### Field: Zone Name
 
@@ -802,15 +802,15 @@ This field specifies the supply air flow rate when the heating coil is operating
 
 #### Field: No Load Supply Air Flow Rate
 
-This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers.The units are in m3/s. The default is autosize.
+This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers.The units are in m3/s. The default is autosize.
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Heating Supply Air Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Heating Supply Air Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Outdoor Air Method
 
@@ -820,7 +820,7 @@ The input must be either *Flow/Zone*, or *Flow/Person*, *Flow/Area*, *Sum*, *Max
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -868,7 +868,7 @@ Enter autosize to let the automatic sizing algorithm determine the cooling coil 
 
 #### Field: Cooling Coil Gross Rated Sensible Heat Ratio
 
-Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the sensible capacity divided by total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is autosize.
+Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the sensible capacity divided by total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is autosize.
 
 #### Field: Cooling Coil Gross Rated Cooling COP
 
@@ -934,11 +934,11 @@ The temperature difference between heating design supply air temperature and zon
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Baseboard Heating Type
 
@@ -958,53 +958,53 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTAC system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTAC system.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTAC system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTAC system.
 
 
 
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:PTAC,
-    SPACE1-1,                !- Zone Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    ,                  !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- System Availability Schedule Name
-    ,                        !- Supply Fan Operating Mode Schedule Name
-    DrawThrough,             !- Supply Fan Placement
-    0.7,                     !- Supply Fan Total Efficiency
-    75,                      !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    SingleSpeedDX,           !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
-    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
-    3,                       !- Cooling Coil Gross Rated COP
-    Electric,                !- Heating Coil Type
-    ,                        !- Heating Coil Availability Schedule Name
-    autosize,                !- Heating Coil Capacity {W}
-    0.8,                     !- Gas Heating Coil Efficiency
-    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-    ,                        !- Dedicated Outdoor Air System Name
- SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
-    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-    50.0,        !- Zone Heating Design Supply Air Temperature {C]
-    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
-    ,            !- Design Specification Outdoor Air Object Name
-    ,            !- Design Specification Zone Air Distribution Object Name
-    None,        !- Baseboard Heating Type
-    ,            !- Baseboard Heating Availability Schedule Name
-    Autosize;    !- Baseboard Heating Capacity {W}
+  HVACTemplate:Zone:PTAC,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    ,                  !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- System Availability Schedule Name
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    SingleSpeedDX,           !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    Electric,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    autosize,                !- Heating Coil Capacity {W}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    ,                        !- Dedicated Outdoor Air System Name
+ SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+    ,            !- Design Specification Zone Air Distribution Object Name
+    None,        !- Baseboard Heating Type
+    ,            !- Baseboard Heating Availability Schedule Name
+    Autosize;    !- Baseboard Heating Capacity {W}
 ```
 
 
@@ -1036,15 +1036,15 @@ This field specifies the supply air flow rate when the heating coil is operating
 
 #### Field: No Load Supply Air Flow Rate
 
-This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
+This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Heating Supply Air Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Heating Supply Air Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Outdoor Air Method
 
@@ -1054,7 +1054,7 @@ The input must be either *Flow/Zone*, or *Flow/Person*, *Flow/Area*, *Sum*, *Max
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -1078,7 +1078,7 @@ Enter the supply fan placement type. This alpha field has two choices, *DrawThro
 
 #### Field: Supply Fan Total Efficiency
 
-Enter the total efficiency of the supply fan. This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.  The default is 0.7.
+Enter the total efficiency of the supply fan. This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.  The default is 0.7.
 
 #### Field: Supply Fan Delta Pressure
 
@@ -1102,7 +1102,7 @@ Enter autosize to let the automatic sizing algorithm determine the gross cooling
 
 #### Field: Cooling Coil Gross Rated Sensible Heat Ratio
 
-Enter Autosize to allow the sizing algorithm to determine the gross sensible heat ratio based on the gross rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by the gross total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is autosize.
+Enter Autosize to allow the sizing algorithm to determine the gross sensible heat ratio based on the gross rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by the gross total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is autosize.
 
 #### Field: Cooling Coil Gross Rated COP
 
@@ -1206,11 +1206,11 @@ The temperature difference between heating design supply air temperature and zon
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Baseboard Heating Type
 
@@ -1230,63 +1230,63 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTHP system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTHP system.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTHP system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTHP system.
 
 
 
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:PTHP,
-    SPACE1-1,                !- Zone Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    ,                  !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- System Availability Schedule Name
-    ,                        !- Supply Fan Operating Mode Schedule Name
-    DrawThrough,             !- Supply Fan Placement
-    0.7,                     !- Supply Fan Total Efficiency
-    75,                      !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    SingleSpeedDX,           !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
-    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
-    3,                       !- Cooling Coil Gross Rated COP
-    SingleSpeedDXHeatPump,   !- Heat Pump Heating Coil Type
-    ,                    !- Heat Pump Heating Coil Availability Schedule Name
-    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
-    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
-    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
-    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
-    ReverseCycle,            !- Heat Pump Defrost Strategy
-    Timed,                   !- Heat Pump Defrost Control
-    0.058333,                !- Heat Pump Defrost Time Period Fraction
-    Electric,                !- Supplemental Heating Coil Type
-    ,           !- Supplemental Heating Coil Availability Schedule Name
-    autosize,                !- Supplemental Heating Coil Capacity {W}
-    21,     !- Supplemental Heating Coil Max Outdoor Dry-Bulb Temperature {C}
-    0.8,                     !- Supplemental Gas Heating Coil Efficiency
-    ,          !- Supplemental Gas Heating Coil Parasitic Electric Load {W}
-    ,                        !- Dedicated Outdoor Air System Name
- SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
-    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-    50.0,        !- Zone Heating Design Supply Air Temperature {C]
-    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
-    ,            !- Design Specification Outdoor Air Object Name
-    ,            !- Design Specification Zone Air Distribution Object Name
-    None,        !- Baseboard Heating Type
-    ,            !- Baseboard Heating Availability Schedule Name
-    Autosize;    !- Baseboard Heating Capacity {W}
+  HVACTemplate:Zone:PTHP,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    ,                  !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- System Availability Schedule Name
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    SingleSpeedDX,           !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    SingleSpeedDXHeatPump,   !- Heat Pump Heating Coil Type
+    ,                    !- Heat Pump Heating Coil Availability Schedule Name
+    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
+    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
+    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
+    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
+    ReverseCycle,            !- Heat Pump Defrost Strategy
+    Timed,                   !- Heat Pump Defrost Control
+    0.058333,                !- Heat Pump Defrost Time Period Fraction
+    Electric,                !- Supplemental Heating Coil Type
+    ,           !- Supplemental Heating Coil Availability Schedule Name
+    autosize,                !- Supplemental Heating Coil Capacity {W}
+    21,     !- Supplemental Heating Coil Max Outdoor Dry-Bulb Temperature {C}
+    0.8,                     !- Supplemental Gas Heating Coil Efficiency
+    ,          !- Supplemental Gas Heating Coil Parasitic Electric Load {W}
+    ,                        !- Dedicated Outdoor Air System Name
+ SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+    ,            !- Design Specification Zone Air Distribution Object Name
+    None,        !- Baseboard Heating Type
+    ,            !- Baseboard Heating Availability Schedule Name
+    Autosize;    !- Baseboard Heating Capacity {W}
 ```
 
 
@@ -1314,15 +1314,15 @@ This field specifies the supply air flow rate when the unit is operating in heat
 
 #### Field: No Load Supply Air Flow Rate
 
-This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., the coil is off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  . By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
+This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., the coil is off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  . By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Heating Supply Air Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Heating Supply Air Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Outdoor Air Method
 
@@ -1356,7 +1356,7 @@ Enter the supply fan placement type. This alpha field has two choices, *DrawThro
 
 #### Field: Supply Fan Total Efficiency
 
-Enter the total efficiency of the supply fan. This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.  The default is 0.7.
+Enter the total efficiency of the supply fan. This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.  The default is 0.7.
 
 #### Field: Supply Fan Delta Pressure
 
@@ -1376,7 +1376,7 @@ Enter autosize to let the automatic sizing algorithm determine the cooling coil 
 
 #### Field: Cooling Coil Gross Rated Sensible Heat Ratio
 
-Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by gross total cooling capacity of the DX cooling coil at rated conditions (26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature, and 29.4C (85F) entering water temperature). Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross” , i.e., the effect of supply air fan heat is not accounted for.  The default is autosize. If the Cooling Coil Rated Capacity is autosized, this field should also be autosized (any value specified for Cooling Coil Rate Sensibe Heat Ratio will be ignored). If the Cooling Coil Rated Capacity has a specified value, then this field should also have a specified value. This is because the Coil:Cooling:WaterToAirHeatPump:EquationFit object has fields for Rated Total Cooling Capacity and Rated Sensible Cooling Capacity. If this field is autosized, a specified value for Cooling Coil Rated Capacity will not be used when the coil object sensible capacity is autosized.
+Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by gross total cooling capacity of the DX cooling coil at rated conditions (26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature, and 29.4C (85F) entering water temperature). Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross” , i.e., the effect of supply air fan heat is not accounted for.  The default is autosize. If the Cooling Coil Rated Capacity is autosized, this field should also be autosized (any value specified for Cooling Coil Rate Sensibe Heat Ratio will be ignored). If the Cooling Coil Rated Capacity has a specified value, then this field should also have a specified value. This is because the Coil:Cooling:WaterToAirHeatPump:EquationFit object has fields for Rated Total Cooling Capacity and Rated Sensible Cooling Capacity. If this field is autosized, a specified value for Cooling Coil Rated Capacity will not be used when the coil object sensible capacity is autosized.
 
 #### Field: Cooling Coil Gross Rated COP
 
@@ -1464,7 +1464,7 @@ The temperature difference between heating design supply air temperature and zon
 
 #### Field: Heat Pump Coil Water Flow Mode
 
-This field specifies the way in which water flow through the heat pump coils will be modeled.  For this template, WatertoAirHeatPump:EquationFit coil objects are generated and, therefore, there are three options:
+This field specifies the way in which water flow through the heat pump coils will be modeled.  For this template, WatertoAirHeatPump:EquationFit coil objects are generated and, therefore, there are three options:
 
 - Cycling
 
@@ -1472,19 +1472,19 @@ This field specifies the way in which water flow through the heat pump coils wil
 
 - ConstantOnDemand
 
-**Cycling** varies water flow through the coil based on the heat pump Part Load Ratio.  This control method is appropriate for modeling heat pumps that are outfitted with a soleniod valve which allows water to flow through the coil only when the compressor is active. This is the **default** for EnergyPlus V8 and later.
+**Cycling** varies water flow through the coil based on the heat pump Part Load Ratio.  This control method is appropriate for modeling heat pumps that are outfitted with a soleniod valve which allows water to flow through the coil only when the compressor is active. This is the **default** for EnergyPlus V8 and later.
 
-**Constant** provides a constant water flow regardless of heat pump operation.  Remember that EnergyPlus has two coils (a heating coil and a cooling coil) to approximate the operation of one coil that can operate in either heating mode or cooling mode.  Therefore, when the water flow mode is constant, there will be full flow through either the heating coil or the cooling coil, but not both at the same time.
+**Constant** provides a constant water flow regardless of heat pump operation.  Remember that EnergyPlus has two coils (a heating coil and a cooling coil) to approximate the operation of one coil that can operate in either heating mode or cooling mode.  Therefore, when the water flow mode is constant, there will be full flow through either the heating coil or the cooling coil, but not both at the same time.
 
-**ConstantOnDemand** provides full flow through the coil whenever there is a load.  When there is no load, there is zero flow through the coil.  This control strategy represents the way EnergyPlus modeled heat pump water flow prior to Version 8.
+**ConstantOnDemand** provides full flow through the coil whenever there is a load.  When there is no load, there is zero flow through the coil.  This control strategy represents the way EnergyPlus modeled heat pump water flow prior to Version 8.
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Baseboard Heating Type
 
@@ -1504,54 +1504,54 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the heat pump system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the heat pump system.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the heat pump system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the heat pump system.
 
 
 
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:WaterToAirHeatPump,
-    SPACE1-1,                !- Zone Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    Flow/Person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    ,                !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- System Availability Schedule Name
-    ,                        !- Supply Fan Operating Mode Schedule Name
-    DrawThrough,             !- Supply Fan Placement
-    0.7,                     !- Supply Fan Total Efficiency
-    75,                      !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Type
-    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
-    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
-    3,                       !- Cooling Coil Gross Rated COP
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- HPump Heating Coil Type
-    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
-    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
-    ,                !- Supplemental Heating Coil Availability Schedule Name
-    autosize,                !- Supplemental Heating Coil Capacity {W}
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
-    ,                        !- Dedicated Outdoor Air System Name
-    Electric,                !- Supplemental Heating Coil Type
- SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
-    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-    50.0,        !- Zone Heating Design Supply Air Temperature {C]
-    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
-    ,            !- Design Specification Outdoor Air Object Name
-                 !- Design Specification Zone Air Distribution Object Name
+  HVACTemplate:Zone:WaterToAirHeatPump,
+    SPACE1-1,                !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    ,                !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- System Availability Schedule Name
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Type
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- HPump Heating Coil Type
+    autosize,                !- Heat Pump Heating Coil Gross Rated Capacity {W}
+    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
+    ,                !- Supplemental Heating Coil Availability Schedule Name
+    autosize,                !- Supplemental Heating Coil Capacity {W}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Heat Pump Time Constant {s}
+    0.01,                    !- Fraction of On-Cycle Power Use
+    60,                      !- Heat Pump Fan Delay Time {s}
+    ,                        !- Dedicated Outdoor Air System Name
+    Electric,                !- Supplemental Heating Coil Type
+ SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,        !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+                 !- Design Specification Zone Air Distribution Object Name
 ```
 
 
@@ -1571,11 +1571,11 @@ When this field is blank, it has a special meaning. A blank entry means that tra
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Heating Supply Air Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Heating Supply Air Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Cooling Supply Air Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Rated Total Heating Capacity Sizing Ratio
 
@@ -1587,7 +1587,7 @@ This field specifies the supply air flow rate when the terminal unit is operatin
 
 #### Field: No Cooling Supply Air Flow Rate
 
-This field specifies the supply air flow rate when the terminal unit’s cooling coil is not operating and the previous mode was cooling.. This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
+This field specifies the supply air flow rate when the terminal unit’s cooling coil is not operating and the previous mode was cooling.. This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
 
 #### Field: Heating Supply Air Flow Rate
 
@@ -1595,11 +1595,11 @@ This field specifies the supply air flow rate when the heating coil is operating
 
 #### Field: No Heating Supply Air Flow Rate
 
-This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
+This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is autosize.
 
 #### Field: Cooling Outdoor Air Flow Rate
 
-This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in cooling mode.        If this field is set to autosize it will be sized based on the outdoor air inputs below, unless a dedicated outdoor air system is specified for this zone and then it will be set to zero.
+This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in cooling mode.        If this field is set to autosize it will be sized based on the outdoor air inputs below, unless a dedicated outdoor air system is specified for this zone and then it will be set to zero.
 
 #### Field: Heating Outdoor Air Flow Rate
 
@@ -1617,7 +1617,7 @@ The input must be either *Flow/Zone*, or *Flow/Person*, *Flow/Area*, *Sum*, *Max
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -1629,11 +1629,11 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: System Availability Schedule Name
 
@@ -1673,7 +1673,7 @@ Enter autosize to let the automatic sizing algorithm determine the gross cooling
 
 #### Field: Cooling Coil Gross Rated Sensible Heat Ratio
 
-Enter Autosize to allow the sizing algorithm to determine the gross sensible heat ratio based on the gross rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by the gross total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is autosize.
+Enter Autosize to allow the sizing algorithm to determine the gross sensible heat ratio based on the gross rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by the gross total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is autosize.
 
 #### Field: Heat Pump Heating Coil Type
 
@@ -1741,7 +1741,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTHP system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTHP system.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the PTHP system.  The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the PTHP system.
 
 
 
@@ -1818,11 +1818,11 @@ By entering Autosize, the maximum supply air flow rate is automatically determin
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Outdoor Air Method
 
@@ -1834,7 +1834,7 @@ If the air handler serving this zone serves more than one zone, the total outdoo
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -1870,7 +1870,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the unitary air handling system.  The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the unitary system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the unitary air handling system.  The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the unitary system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
 
 #### Field: Zone Cooling Design Supply Air Temperature Input Method
 
@@ -1886,7 +1886,7 @@ The temperature difference between the cooling design supply air temperature and
 
 #### Field: Zone Heating Design Supply Air Temperature Input Method
 
-This field selects the method for specifying the heating design supply air temperature. *SupplyAirTemperature* means that the field Zone Heating Design Supply Air Temperature  will be used for sizing the zone heating design air flow rate. *TemperatureDifference* means that the field Zone Heating Design Supply Air Temperature Difference will be used. *SystemSupplyAirTemperature* means that the Heating Design Supply Air Temperature from the template unitary system serving this zone will be used. The default is *SystemSupplyAirTemperature.*
+This field selects the method for specifying the heating design supply air temperature. *SupplyAirTemperature* means that the field Zone Heating Design Supply Air Temperature  will be used for sizing the zone heating design air flow rate. *TemperatureDifference* means that the field Zone Heating Design Supply Air Temperature Difference will be used. *SystemSupplyAirTemperature* means that the Heating Design Supply Air Temperature from the template unitary system serving this zone will be used. The default is *SystemSupplyAirTemperature.*
 
 #### Field: Zone Heating Design Supply Air Temperature
 
@@ -1898,39 +1898,39 @@ The temperature difference between heating design supply air temperature and zon
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:Unitary,
-    SPACE1-1,                !- Zone Name
-    Furnace DX 1-1,          !- Template Unitary System Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    Autosize,                !- Baseboard Heating Capacity {W}
- SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
-    ,            !- Zone Cooling Design Supply Air Temperature {C]
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SystemSupplyAirTemperature, !- Zone Heating Design Supply Air . . . Input Method
-    ,            !- Zone Heating Design Supply Air Temperature {C]
-    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
-    ,            !- Design Specification Outdoor Air Object Name
-    ;            !- Design Specification Zone Air Distribution Object Name
+  HVACTemplate:Zone:Unitary,
+    SPACE1-1,                !- Zone Name
+    Furnace DX 1-1,          !- Template Unitary System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    Autosize,                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SystemSupplyAirTemperature, !- Zone Heating Design Supply Air . . . Input Method
+    ,            !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name
+    ;            !- Design Specification Zone Air Distribution Object Name
 ```
 
 
@@ -1958,27 +1958,27 @@ By entering Autosize, the maximum supply air flow rate is automatically determin
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Minimum Air Flow Method
 
-This field is used to select how the program will determine the minimum flow rate to the zone while the system is operating.  There are three choices for selecting how the minimum flow rate is specified:  Constant, FixedFlowRate, and Scheduled.  If Constant is entered, then the program will use the value for the constant minimum air flow fraction entered in the following field.  If FixedFlowRate is entered, then the program will use the value entered in the field below called Fixed Minimum Air Flow Rate.If Scheduled is entered, then the program will obtain the value for minimum flow fraction from the schedule named in the field below called Minimum Air Flow Fraction Schedule Name.
+This field is used to select how the program will determine the minimum flow rate to the zone while the system is operating.  There are three choices for selecting how the minimum flow rate is specified:  Constant, FixedFlowRate, and Scheduled.  If Constant is entered, then the program will use the value for the constant minimum air flow fraction entered in the following field.  If FixedFlowRate is entered, then the program will use the value entered in the field below called Fixed Minimum Air Flow Rate.If Scheduled is entered, then the program will obtain the value for minimum flow fraction from the schedule named in the field below called Minimum Air Flow Fraction Schedule Name.
 
 #### Field: Constant Minimum Air Flow Fraction
 
-The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).  This field is used if the previous field is set to Constant.  If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
+The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).  This field is used if the previous field is set to Constant.  If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
 
 #### Field: Fixed Minimum Air Flow Rate
 
-The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).  This field is used if the Zone Minimum Air Flow Method field is set to FixedFlowRate. If the Zone Minimum Air Flow Method field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. Only one of these two minimum air flow fields (i.e., this field and the previous field) should be used at any time. If this field and the previous field have values, the greater of the two is used for sizing.
+The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).  This field is used if the Zone Minimum Air Flow Method field is set to FixedFlowRate. If the Zone Minimum Air Flow Method field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. Only one of these two minimum air flow fields (i.e., this field and the previous field) should be used at any time. If this field and the previous field have values, the greater of the two is used for sizing.
 
 #### Field: Minimum Air Flow Fraction Schedule Name
 
-The name of a schedule that determines the value of the minimum air flow fraction.  The schedule should contain fractions from 0.0 to 1.0.  These values will define the minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate.  The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).  This field is used if the previous field is set to Scheduled.  If the previous field is left blank (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then the air flow rate usedfor sizing normal-action reheat coils is the average of the minimum and maximum values in this schedule.  The air flow rate used for reheat coil sizing is reported with other component sizing information as “Reheat Coil Sizing Air Volume Flow Rate.”
+The name of a schedule that determines the value of the minimum air flow fraction.  The schedule should contain fractions from 0.0 to 1.0.  These values will define the minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate.  The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).  This field is used if the previous field is set to Scheduled.  If the previous field is left blank (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then the air flow rate usedfor sizing normal-action reheat coils is the average of the minimum and maximum values in this schedule.  The air flow rate used for reheat coil sizing is reported with other component sizing information as “Reheat Coil Sizing Air Volume Flow Rate.”
 
 #### Field: Outdoor Air Method
 
@@ -1990,7 +1990,7 @@ If the air handler serving this zone serves more than one zone, the total outdoo
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -2076,7 +2076,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the VAV air handling system. The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the VAV system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the VAV air handling system. The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the VAV system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
 
 #### Field: Zone Cooling Design Supply Air Temperature Input Method
 
@@ -2104,50 +2104,50 @@ The temperature difference between heating design supply air temperature and zon
 
 #### Field: Design Specification Outdoor Air Object Name for Sizing
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field *Design Specification Outdoor Air Object Name for Sizing* (see above) is used to actively control the VAV terminal air flow rate.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field *Design Specification Outdoor Air Object Name for Sizing* (see above) is used to actively control the VAV terminal air flow rate.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:VAV,
-    SPACE1-1,                !- Zone Name
-    VAV Sys 1,               !- Template VAV System Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    Constant,                !- Zone Minimum Air Flow Input Method
-    0.3,                     !- Constant Minimum Air Flow Fraction
-    ,                        !- Fixed Minimum Air Flow Rate {m3/s}
-    ,                        !- Minimum Air Flow Fraction Schedule Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-    HotWater,                !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    Reverse,                 !- Heating Damper Action
-    ,             !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ,                        !- Maximum Flow Fraction During Reheat
-    ,                        !- Maximum Reheat Air Temperature
-    ,             !- Design Specification Outdoor Air Object Name for Control
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    autosize;                !- Baseboard Heating Capacity {W}
- SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
-    ,            !- Zone Cooling Design Supply Air Temperature {C]
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-    50.0,        !- Zone Heating Design Supply Air Temperature {C]
-    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
-    ,            !- Design Specification Outdoor Air Object Name for Sizing
-    ;            !- Design Specification Zone Air Distribution Object Name
+  HVACTemplate:Zone:VAV,
+    SPACE1-1,                !- Zone Name
+    VAV Sys 1,               !- Template VAV System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    Constant,                !- Zone Minimum Air Flow Input Method
+    0.3,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Fixed Minimum Air Flow Rate {m3/s}
+    ,                        !- Minimum Air Flow Fraction Schedule Name
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule Name
+    Reverse,                 !- Heating Damper Action
+    ,             !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ,                        !- Maximum Flow Fraction During Reheat
+    ,                        !- Maximum Reheat Air Temperature
+    ,             !- Design Specification Outdoor Air Object Name for Control
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Design Specification Outdoor Air Object Name for Sizing
+    ;            !- Design Specification Zone Air Distribution Object Name
 ```
 
 
@@ -2155,7 +2155,7 @@ As shown in an IDF:
 
 This object simulates the zone portion of a variable air volume HVAC configuration with a series or parallel fan powered terminal unit (also know as a powered induction unit or PIU) and several different heating options. Multiple HVACTemplate:Zone:VAV, HVACTemplate:Zone:VAV:FanPowered or HVACTemplate:Zone:VAV:HeatAndCool objects are usually specified for each HVACTemplate:System:VAV or HVACTemplate:System:PackagedVAV object. Reheat is specified at the zone level.
 
-The series powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a fixed flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The fan runs at a constant volume flow rate whenever the unit is on (and the fan’s availability schedule is on or it is activated by an availability manager). With HVACTemplate:Zone:VAV:FanPowered, the secondary fan will operate according to the Zone PIU Fan Schedule and any Night Cycle Control specified in the  system it is served by.) The fan is downstream of the primary and secondary air inlets. The variable mixing is accomplished by a damper in the unit’s primary air supply inlet duct. This damper can move from fully open (100% primary air. 0% secondary air) to a minimum stop that is specified in the input description. At full cooling the damper will be fully open. At minimum cooling and for heating the damper will be at the minimum stop and the secondary air flow will be at its maximum. Reference object AirTerminal:SingleDuct:SeriesPIU:Reheat for more details.
+The series powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a fixed flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The fan runs at a constant volume flow rate whenever the unit is on (and the fan’s availability schedule is on or it is activated by an availability manager). With HVACTemplate:Zone:VAV:FanPowered, the secondary fan will operate according to the Zone PIU Fan Schedule and any Night Cycle Control specified in the  system it is served by.) The fan is downstream of the primary and secondary air inlets. The variable mixing is accomplished by a damper in the unit’s primary air supply inlet duct. This damper can move from fully open (100% primary air. 0% secondary air) to a minimum stop that is specified in the input description. At full cooling the damper will be fully open. At minimum cooling and for heating the damper will be at the minimum stop and the secondary air flow will be at its maximum. Reference object AirTerminal:SingleDuct:SeriesPIU:Reheat for more details.
 
 ![SeriesPIUPicture.png](InputOutputReference/media/image608.png)
 
@@ -2187,11 +2187,11 @@ In a fan powered VAV terminal unit, the primary air flow is the air supplied by 
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Primary Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Primary Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Primary Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Primary Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Primary Supply Air Minimum Flow Fraction
 
@@ -2229,7 +2229,7 @@ If the air handler serving this zone serves more than one zone, the total outdoo
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -2293,7 +2293,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the VAV air handling system.  The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the VAV system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the VAV air handling system.  The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the VAV system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
 
 #### Field: Zone Cooling Design Supply Air Temperature Input Method
 
@@ -2325,49 +2325,49 @@ This is the operating schedule for the zone PIU fan. For a parallel PIU, the zon
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:VAV:FanPowered,
-    SPACE1-1,                !- Zone Name
-    VAV Sys 1,               !- Template VAV System Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Primary Supply Air Maximum Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    autosize,                !- Primary Supply Air Minimum Flow Fraction
-    autosize,                !- Secondary Supply Air Maximum Flow Rate {m3/s}
-    Series,                  !- Flow Type
-    autosize,                !- Parallel Fan On Flow Fraction
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-    HotWater,                !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    1000,                    !- Fan Delta Pressure {Pa}
-    0.9,                     !- Fan Motor Efficiency
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    autosize;                !- Baseboard Heating Capacity {W}
- SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
-    ,            !- Zone Cooling Design Supply Air Temperature {C]
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-    50.0,        !- Zone Heating Design Supply Air Temperature {C]
-    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
-    ,            !- Zone PIU Fan Schedule Name
-    ,            !- Design Specification Outdoor Air Object Name
-    ;            !- Design Specification Zone Air Distribution Object Name
+  HVACTemplate:Zone:VAV:FanPowered,
+    SPACE1-1,                !- Zone Name
+    VAV Sys 1,               !- Template VAV System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Primary Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    autosize,                !- Primary Supply Air Minimum Flow Fraction
+    autosize,                !- Secondary Supply Air Maximum Flow Rate {m3/s}
+    Series,                  !- Flow Type
+    autosize,                !- Parallel Fan On Flow Fraction
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    1000,                    !- Fan Delta Pressure {Pa}
+    0.9,                     !- Fan Motor Efficiency
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ,            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    ,            !- Zone PIU Fan Schedule Name
+    ,            !- Design Specification Outdoor Air Object Name
+    ;            !- Design Specification Zone Air Distribution Object Name
 ```
 
 
@@ -2395,15 +2395,15 @@ By entering Autosize, the maximum supply air flow rate is automatically determin
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Constant Minimum Air Flow Fraction
 
-The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).  This field is used if the previous field is set to Constant.  If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
+The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).  This field is used if the previous field is set to Constant.  If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
 
 #### Field: Outdoor Air Method
 
@@ -2415,7 +2415,7 @@ If the air handler serving this zone serves more than one zone, the total outdoo
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -2427,11 +2427,11 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 #### Field: Design Specification Outdoor Air Object Name for Sizing
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field *Design Specification Outdoor Air Object Name for Sizing* (see above) is used to actively control the VAV terminal air flow rate.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field *Design Specification Outdoor Air Object Name for Sizing* (see above) is used to actively control the VAV terminal air flow rate.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Reheat Coil Type
 
@@ -2481,7 +2481,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the VAV air handling system. The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the VAV system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the VAV air handling system. The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the VAV system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
 
 #### Field: Zone Cooling Design Supply Air Temperature Input Method
 
@@ -2510,34 +2510,34 @@ The temperature difference between heating design supply air temperature and zon
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:Zone:VAV:HeatAndCool,
-    SPACE1-1,                !- Zone Name
-    VAV Sys 1,               !- Template VAV System Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    0.3,                     !- Constant Minimum Air Flow Fraction
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,            !- Design Specification Outdoor Air Object Name for Sizing
-    ,            !- Design Specification Zone Air Distribution Object Name
-    HotWater,                !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    ,                        !- Maximum Reheat Air Temperature
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    autosize;                !- Baseboard Heating Capacity {W}
- SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
-    ,            !- Zone Cooling Design Supply Air Temperature {C]
-    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-    50.0,        !- Zone Heating Design Supply Air Temperature {C]
-    ;            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+  HVACTemplate:Zone:VAV:HeatAndCool,
+    SPACE1-1,                !- Zone Name
+    VAV Sys 1,               !- Template VAV System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    0.3,                     !- Constant Minimum Air Flow Fraction
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,               !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,            !- Design Specification Outdoor Air Object Name for Sizing
+    ,            !- Design Specification Zone Air Distribution Object Name
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule Name
+    ,                        !- Maximum Reheat Air Temperature
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    ,            !- Zone Cooling Design Supply Air Temperature {C]
+    ,            !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,        !- Zone Heating Design Supply Air Temperature {C]
+    ;            !- Zone Heating Design Supply Air Temperature Difference {deltaC]
 ```
 
 
@@ -2565,11 +2565,11 @@ By entering Autosize, the maximum supply air flow rate is automatically determin
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Outdoor Air Method
 
@@ -2581,7 +2581,7 @@ If the air handler serving this zone serves more than one zone, the total outdoo
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -2593,11 +2593,11 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Reheat Coil Type
 
@@ -2619,7 +2619,7 @@ Leave this field blank if you want the reheat coil to be available for the entir
 
 #### Field: Maximum Reheat Air Temperature
 
-This field specifies the maximum allowable supply air temperature (°C) leaving the reheat coil  during heating operation. If left blank, there is no limit, and the supply air temperature to the space may become unrealistically high during heating operation. If unknown, a value of 35C (95F) is recommended. There is no default in order to maintain consistency with prior results.
+This field specifies the maximum allowable supply air temperature (°C) leaving the reheat coil  during heating operation. If left blank, there is no limit, and the supply air temperature to the space may become unrealistically high during heating operation. If unknown, a value of 35C (95F) is recommended. There is no default in order to maintain consistency with prior results.
 
 #### Field: Supply Plenum Name
 
@@ -2647,7 +2647,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the air handling system. The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the air handling system.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the air handling system. The baseboard heating will be set to heating sequence 2, which means it will meet any remaining heating load not met by the air handling system.
 
 #### Field: Zone Cooling Design Supply Air Temperature Input Method
 
@@ -2663,7 +2663,7 @@ The temperature difference between the cooling design supply air temperature and
 
 #### Field: Zone Heating Design Supply Air Temperature Input Method
 
-This field selects the method for specifying the heating design supply air temperature. *SupplyAirTemperature* means that the field Zone Heating Design Supply Air Temperature  will be used for sizing the zone heating design air flow rate. *TemperatureDifference* means that the field Zone Heating Design Supply Air Temperature Difference will be used. *SystemSupplyAirTemperature* means that the Heating Coil Design Setpoint Temperature from the template system serving this zone will be used (Ref. HVACTemplate:System:ConstantVolume). The default is *SystemSupplyAirTemperature.*
+This field selects the method for specifying the heating design supply air temperature. *SupplyAirTemperature* means that the field Zone Heating Design Supply Air Temperature  will be used for sizing the zone heating design air flow rate. *TemperatureDifference* means that the field Zone Heating Design Supply Air Temperature Difference will be used. *SystemSupplyAirTemperature* means that the Heating Coil Design Setpoint Temperature from the template system serving this zone will be used (Ref. HVACTemplate:System:ConstantVolume). The default is *SystemSupplyAirTemperature.*
 
 #### Field: Zone Heating Design Supply Air Temperature
 
@@ -2677,38 +2677,38 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:Zone:ConstantVolume,
-    SPACE1-1,                !- Zone Name
-    CAV Sys 1,               !- Template Constant Volume System Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-     ,                        !- Design Specification Outdoor Air Object Name
-     ,                       !- Design Specification Zone Air Distribution Object Name
-    HotWater,                !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    ,                        !- Maximum Reheat Air Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    autosize;                !- Baseboard Heating Capacity {W}
- SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
-    12.8,                    !- Zone Cooling Design Supply Air Temperature {C]
-    11.11,          !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
-    50,                      !- Zone Heating Design Supply Air Temperature {C]
-    30;             !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    SPACE1-1,                !- Zone Name
+    CAV Sys 1,               !- Template Constant Volume System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+     ,                        !- Design Specification Outdoor Air Object Name
+     ,                       !- Design Specification Zone Air Distribution Object Name
+    HotWater,                !- Reheat Coil Type
+    ,                        !- Reheat Coil Availability Schedule Name
+    ,                        !- Maximum Reheat Air Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    12.8,                    !- Zone Cooling Design Supply Air Temperature {C]
+    11.11,          !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method
+    50,                      !- Zone Heating Design Supply Air Temperature {C]
+    30;             !- Zone Heating Design Supply Air Temperature Difference {deltaC]
 ```
 
 
 ### HVACTemplate:Zone:DualDuct
 
-This object simulates the zone portion of a constant volume or variable volume dual-duct HVAC system. One or more HVACTemplate:Zone:DualDuct objects may be used with a single HVACTemplate:System:DualDuct object which has optional chilled water cooling and several types of heating. A constant air volume dual duct system is simulated by setting the Zone Minimum Air Flow Fraction =1.0.  A variable air volume duct duct system is simulated by setting the Zone Minimum Air Flow Fraction &lt;1.0. . Reference AirTerminal:DualDuct:ConstantVolume and AirTerminal:DualDuct:VAV for more details about the terminal units.
+This object simulates the zone portion of a constant volume or variable volume dual-duct HVAC system. One or more HVACTemplate:Zone:DualDuct objects may be used with a single HVACTemplate:System:DualDuct object which has optional chilled water cooling and several types of heating. A constant air volume dual duct system is simulated by setting the Zone Minimum Air Flow Fraction =1.0.  A variable air volume duct duct system is simulated by setting the Zone Minimum Air Flow Fraction &lt;1.0. . Reference AirTerminal:DualDuct:ConstantVolume and AirTerminal:DualDuct:VAV for more details about the terminal units.
 
 #### Field: Zone Name
 
@@ -2730,11 +2730,11 @@ By entering Autosize, the maximum supply air flow rate is automatically determin
 
 #### Field: Zone Heating Sizing Factor
 
-This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level heating sizing ratio. The zone design heating air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Heating Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Cooling Sizing Factor
 
-This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
+This input is the zone level cooling sizing ratio. The zone design cooling air flow rate and load will be multiplied by the number input in this field when Supply Air Maximum Flow Rate is autosized.  If this field is left blank, the Cooling Sizing Factor from Sizing:Parameters will be used.
 
 #### Field: Zone Minimum Air Flow Fraction
 
@@ -2750,7 +2750,7 @@ If the air handler serving this zone serves more than one zone, the total outdoo
 
 #### Field: Outdoor Air Flow Rate per Person
 
-The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
+The design outdoor air flow rate per person for this zone in cubic meters per second. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all People statements assigned to the zone. Occupancy schedule values are not applied. This input is used if *Outdoor Air Method* is one of  *Outdoor Air Flow per Person*, *Sum*, or *Maximum*.
 
 #### Field: Outdoor Air Flow Rate per Zone Floor Area
 
@@ -2762,11 +2762,11 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 #### Field: Design Specification Outdoor Air Object Name for Sizing
 
-This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field *Design Specification Outdoor Air Object Name for Control* (see below) is used to actively control the VAV terminal air flow rate.
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*. Note that this field is used only for specifying the design outdoor air flow rate used for sizing. The field *Design Specification Outdoor Air Object Name for Control* (see below) is used to actively control the VAV terminal air flow rate.
 
 #### Field: Design Specification Zone Air Distribution Object Name
 
-This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
+This alpha field specifies the name of a DesignSpecification:ZoneAirDistribution object which specifies the air distribution effectiveness for the zone.  This field is used only when *Outdoor Air Method = DetailedSpecification*.
 
 #### Field: Design Specification Outdoor Air Object Name for Control
 
@@ -2804,7 +2804,7 @@ Leave this field blank if you want the baseboard heating to be available for the
 
 #### Field: Baseboard Heating Capacity
 
-Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the VAV air handling system. The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the VAV system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
+Enter autosize to allow the sizing algorithm to determine the proper capacity required based on the loads experienced during the heating design day. If a value is specified, it is the maximum amount of heat that the baseboard heating can deliver in Watts.  Note that EnergyPlus autosizing will autosize the baseboard heating to meet the full heating load of the zone, regardless of the heating capability of the VAV air handling system. The baseboard heating will be set to heating priority 2, which means it will meet any remaining heating load not met by the VAV system. Prior to v7.1, the capacity was only applied to electric baseboard. Starting with v7.1, the capacity will be used for both hot water and electric baseboard.
 
 #### Field: Zone Cooling Design Supply Air Temperature Input Method
 
@@ -2820,7 +2820,7 @@ The temperature difference between the cooling design supply air temperature and
 
 #### Field: Zone Heating Design Supply Air Temperature Input Method
 
-This field selects the method for specifying the heating design supply air temperature. *SupplyAirTemperature* means that the field Zone Heating Design Supply Air Temperature  will be used for sizing the zone heating design air flow rate. *TemperatureDifference* means that the field Zone Heating Design Supply Air Temperature Difference will be used. *SystemSupplyAirTemperature* means that the Heating Coil Design Setpoint Temperature from the template system serving this zone will be used (Ref. HVACTemplate:System:DualDuct). The default is *SystemSupplyAirTemperature.*
+This field selects the method for specifying the heating design supply air temperature. *SupplyAirTemperature* means that the field Zone Heating Design Supply Air Temperature  will be used for sizing the zone heating design air flow rate. *TemperatureDifference* means that the field Zone Heating Design Supply Air Temperature Difference will be used. *SystemSupplyAirTemperature* means that the Heating Coil Design Setpoint Temperature from the template system serving this zone will be used (Ref. HVACTemplate:System:DualDuct). The default is *SystemSupplyAirTemperature.*
 
 #### Field: Zone Heating Design Supply Air Temperature
 
@@ -2834,32 +2834,32 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:Zone:DualDuct,
-    SPACE1-1,                !- Zone Name
-    DD Sys 1,                !- Template Dual Duct System Name
-    All Zones,               !- Template Thermostat Name
-    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-    ,                        !- Zone Heating Sizing Factor
-    ,                        !- Zone Cooling Sizing Factor
-     0.2,                     !- Zone Minimum Air Flow Fraction
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-     ,                    !- Design Specification Outdoor Air Object Name for Sizing
-     ,                      !- Design Specification Zone Air Distribution Object Name
-    ,                    !- Design Specification Outdoor Air Object Name for Control
-     ,                        !- Cold Supply Plenum Name
-     ,                        !- Hot Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    autosize;                !- Baseboard Heating Capacity {W}
- SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
-    12.8,                    !- Zone Cooling Design Supply Air Temperature {C]
-    11.11,          !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
- SystemSupplyAirTemperature, !- Zone Heating Design Supply Air . . . Input Method
-    50,                      !- Zone Heating Design Supply Air Temperature {C]
-    30;             !- Zone Heating Design Supply Air Temperature Difference {deltaC]
+    SPACE1-1,                !- Zone Name
+    DD Sys 1,                !- Template Dual Duct System Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+     0.2,                     !- Zone Minimum Air Flow Fraction
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+     ,                    !- Design Specification Outdoor Air Object Name for Sizing
+     ,                      !- Design Specification Zone Air Distribution Object Name
+    ,                    !- Design Specification Outdoor Air Object Name for Control
+     ,                        !- Cold Supply Plenum Name
+     ,                        !- Hot Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize;                !- Baseboard Heating Capacity {W}
+ SystemSupplyAirTemperature, !- Zone Cooling Design Supply Air . . . Input Method
+    12.8,                    !- Zone Cooling Design Supply Air Temperature {C]
+    11.11,          !- Zone Cooling Design Supply Air Temperature Difference {deltaC]
+ SystemSupplyAirTemperature, !- Zone Heating Design Supply Air . . . Input Method
+    50,                      !- Zone Heating Design Supply Air Temperature {C]
+    30;             !- Zone Heating Design Supply Air Temperature Difference {deltaC]
 ```
 
 
@@ -2901,7 +2901,7 @@ This numeric field defines the ratio of gross heating to gross cooling capacity.
 
 #### Field: Gross Rated Heating COP
 
-This numeric field defines the heating coefficient of performance at rated conditions. The heating coefficient of performance includes compressor power and condenser fan power. This gross COP value does NOT account for  the supply air fan. The nominal heat pump heating COP must be greater than 0. If this field is left blank, a coefficient of performance of 3.4 is assumed.
+This numeric field defines the heating coefficient of performance at rated conditions. The heating coefficient of performance includes compressor power and condenser fan power. This gross COP value does NOT account for  the supply air fan. The nominal heat pump heating COP must be greater than 0. If this field is left blank, a coefficient of performance of 3.4 is assumed.
 
 #### Field: Minimum Outdoor Temperature in Heating Mode
 
@@ -2953,7 +2953,7 @@ This numeric field defines the number of compressors in the heat pump condensing
 
 #### Field: Ratio of Compressor Size to Total Compressor Capacity
 
-This numeric field defines the size of the first stage compressor to the total compressor capacity and is used exclusively for calculating crankcase heater energy. If this field and the previous field are left blank, the default value is 0.5.  If this field is left blank and the previous field is not blank, the compressors are assumed to be equally sized. When the number of compressors is greater than 2, the 2<sup>nd</sup> stage compressor and all additional compressors are assumed to be equally sized. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+This numeric field defines the size of the first stage compressor to the total compressor capacity and is used exclusively for calculating crankcase heater energy. If this field and the previous field are left blank, the default value is 0.5.  If this field is left blank and the previous field is not blank, the compressors are assumed to be equally sized. When the number of compressors is greater than 2, the 2<sup>nd</sup> stage compressor and all additional compressors are assumed to be equally sized. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
 
 #### Field: Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
 
@@ -3031,7 +3031,7 @@ This alpha field contains the name of the basin heater operating schedule. This 
 
 #### Field: Fuel Type
 
-This alpha field determines the type of fuel that this variable refrigerant flow system uses.  This field has seven choices: Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil\#1, FuelOil\#2, OtherFuel1, and OtherFuel2. The default is Electricity. The use of alternate fuel types assumes an engine drives the variable speed compression system and also accounts for condenser air flow (i.e., a fan attached to the engine provides air flow through the outdoor condenser.
+This alpha field determines the type of fuel that this variable refrigerant flow system uses.  This field has seven choices: Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil\#1, FuelOil\#2, OtherFuel1, and OtherFuel2. The default is Electricity. The use of alternate fuel types assumes an engine drives the variable speed compression system and also accounts for condenser air flow (i.e., a fan attached to the engine provides air flow through the outdoor condenser.
 
 #### Field: Minimum Outdoor Temperature in Heat Recovery Mode
 
@@ -3049,48 +3049,48 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow syste
 
 ```idf
 HVACTemplate:System:VRF,
-  VRF Heat Pump,        !- Name
-  VRFCondAvailSched,    !- Availability Schedule Name
-  autosize,             !- Gross Rated Total Cooling Capacity {W}
-  3.16038,              !- Gross Rated Cooling COP {W}
-  -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
-  43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
-  autosize,             !- Gross Rated Heating Capacity {W}
-  ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
-  3.40909,              !- Gross Rated Heating COP
-  -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
-  15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
-  0.25,                 !- Minimum Heat Pump Part-Load Ratio
-  SPACE1-1,             !- Zone Name for Master Thermostat Location
-  LoadPriority,         !- Master Thermostat Priority Control Type
-  ,                     !- Thermostat Priority Schedule Name
-  No,                   !- Heat Pump Waste Heat Recovery
-  30,  !- Equivalent Piping Length . . . Factor in Cooling Mode {m}
-  10,  !- Vertical Height used for Piping Correction Factor {m}
-  30,  !- Equivalent Piping Length . . . Factor in Heating Mode {m}
-  15,  !- Crankcase Heater Power per Compressor {W}
-  3,   !- Number of Compressors
-  0.33,!- Ratio of Compressor Size to Total Compressor Capacity
-  7,   !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
-  Resistive,            !- Defrost Strategy
-  Timed,                !- Defrost Control
-  ,                     !- Defrost Time Period Fraction
-  autosize,             !- Resistive Defrost Heater Capacity {W}
-  7,   !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
-  EvaporativelyCooled,  !- Condenser Type
-  MyVRFOANode,          !- Condenser Inlet Node Name
-  ,                     !- Condenser Outlet Node Name
-  ,                     !- Water Condenser Volume Flow Rate
-  ,             !- Evaporative Condenser Effectiveness {dimensionless}
-  autosize,     !- Evaporative Condenser Air Flow Rate {m3/s}
-  autosize,     !- Evaporative Condenser Pump Rated Power Consumption {W}
-  ,                     !- Supply Water Storage Tank Name
-  200,                  !- Basin Heater Capacity {W/K}
-  ,                     !- Basin Heater Set Point Temperature (C)
-  ,                     !- Basin Heater Operating Schedule Name
-  ,                     !- Fuel Type
-  ,    !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
-  ;    !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
+  VRF Heat Pump,        !- Name
+  VRFCondAvailSched,    !- Availability Schedule Name
+  autosize,             !- Gross Rated Total Cooling Capacity {W}
+  3.16038,              !- Gross Rated Cooling COP {W}
+  -5,                   !- Minimum Outdoor Temperature in Cooling Mode {C}
+  43,                   !- Maximum Outdoor Temperature in Cooling Mode {C}
+  autosize,             !- Gross Rated Heating Capacity {W}
+  ,                     !- Rated Heating Capacity Sizing Ratio (W/W)
+  3.40909,              !- Gross Rated Heating COP
+  -20,                  !- Minimum Outdoor Temperature in Heating Mode {C}
+  15.5,                 !- Maximum Outdoor Temperature in Heating Mode {C}
+  0.25,                 !- Minimum Heat Pump Part-Load Ratio
+  SPACE1-1,             !- Zone Name for Master Thermostat Location
+  LoadPriority,         !- Master Thermostat Priority Control Type
+  ,                     !- Thermostat Priority Schedule Name
+  No,                   !- Heat Pump Waste Heat Recovery
+  30,  !- Equivalent Piping Length . . . Factor in Cooling Mode {m}
+  10,  !- Vertical Height used for Piping Correction Factor {m}
+  30,  !- Equivalent Piping Length . . . Factor in Heating Mode {m}
+  15,  !- Crankcase Heater Power per Compressor {W}
+  3,   !- Number of Compressors
+  0.33,!- Ratio of Compressor Size to Total Compressor Capacity
+  7,   !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
+  Resistive,            !- Defrost Strategy
+  Timed,                !- Defrost Control
+  ,                     !- Defrost Time Period Fraction
+  autosize,             !- Resistive Defrost Heater Capacity {W}
+  7,   !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
+  EvaporativelyCooled,  !- Condenser Type
+  MyVRFOANode,          !- Condenser Inlet Node Name
+  ,                     !- Condenser Outlet Node Name
+  ,                     !- Water Condenser Volume Flow Rate
+  ,             !- Evaporative Condenser Effectiveness {dimensionless}
+  autosize,     !- Evaporative Condenser Air Flow Rate {m3/s}
+  autosize,     !- Evaporative Condenser Pump Rated Power Consumption {W}
+  ,                     !- Supply Water Storage Tank Name
+  200,                  !- Basin Heater Capacity {W/K}
+  ,                     !- Basin Heater Set Point Temperature (C)
+  ,                     !- Basin Heater Operating Schedule Name
+  ,                     !- Fuel Type
+  ,    !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
+  ;    !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
 ```
 
 
@@ -3117,7 +3117,7 @@ Enter Autosize to set the system maximum air-flow rate to the sum of the zone ai
 
 #### Field: Supply Fan Operating Mode Schedule Name
 
-This field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.  If this field is left blank, a schedule of always zero (cycling fan) will be used.
+This field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.  If this field is left blank, a schedule of always zero (cycling fan) will be used.
 
 #### Field: Supply Fan Total Efficiency
 
@@ -3155,7 +3155,7 @@ Enter the cooling supply air temperature in °C to be used for sizing the coolin
 
 #### Field: Cooling Coil Gross Rated Total Capacity
 
-Enter autosize to let the automatic sizing algorithm determine the cooling coil gross capacity based on the maximum cooling loads during the cooling design day. If a value is entered, it represents the full load gross total cooling capacity, including both sensible and latent capacity, in watts of the DX coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Capacity should be the “gross”, i.e.,  the effect of supply air fan heat is not accounted for. The units are in W.
+Enter autosize to let the automatic sizing algorithm determine the cooling coil gross capacity based on the maximum cooling loads during the cooling design day. If a value is entered, it represents the full load gross total cooling capacity, including both sensible and latent capacity, in watts of the DX coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Capacity should be the “gross”, i.e.,  the effect of supply air fan heat is not accounted for. The units are in W.
 
 #### Field: Cooling Coil Gross Rated Sensible Heat Ratio
 
@@ -3325,9 +3325,9 @@ There are three dehumidification control type options available:
 
 - CoolReheatDesuperheater
 
-The *CoolReheatHeatingCoil* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the heating coil.  In the simulation, two instances of the heating coil are modeled, one for heating, and one for reheat.  The two coil objects represent the same physical coil and never operate simultaneously.
+The *CoolReheatHeatingCoil* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the heating coil.  In the simulation, two instances of the heating coil are modeled, one for heating, and one for reheat.  The two coil objects represent the same physical coil and never operate simultaneously.
 
-The *CollReheatDesuperheater* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided by a desuperheater coil (see object Coil:Heating:Desuperheater).
+The *CollReheatDesuperheater* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided by a desuperheater coil (see object Coil:Heating:Desuperheater).
 
 The default is *None* which meets the sensible cooling load only. The humidistat is located in the same zone that is specified above as the Control Zone or Thermostat Location Name.
 
@@ -3337,7 +3337,7 @@ This field is deprecated and will be removed. The humidistat is located in the s
 
 #### Field: Dehumidification Setpoint
 
-This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%.
+This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%.
 
 #### Field: Humidifier Type
 
@@ -3347,7 +3347,7 @@ There are two humidifier type options available:
 
 - ElectricSteam
 
-The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
+The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
 
 #### Field: Humidifier Availability Schedule Name
 
@@ -3355,7 +3355,7 @@ If left blank, the humidifier will be available anytime the system is operating.
 
 #### Field: Humidifier Rated Capacity
 
-Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
+Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
 
 #### Field: Humidifier Rated Electric Power
 
@@ -3367,7 +3367,7 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Humidifier Setpoint
 
-This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%.
+This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%.
 
 #### Field: Return Fan Delta Pressure
 
@@ -3385,58 +3385,58 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:System:Unitary,
-    AHU 1,                   !- Air Handling System Name
-    FanAndCoilAvailSched,    !- System Availability Schedule
-    EAST ZONE,               !- Control Zone Name or Thermostat Location
-    autosize,                !- Supply Fan Max Flow Rate {m3/s}
-    Fan Mode Schedule,       !- Supply Fan Operating Mode Schedule
-    .7,                      !- Supply Fan Total Efficiency
-    600,                     !- Supply Fan Delta Pressure {Pa}
-    .9,                      !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    SingleSspeedDX,          !- Cooling Coil Type
-    FanAndCoilAvailSched,    !- Cooling Coil Availability Schedule
-    14.0,                    !- Cooling Design Supply Air Temperature {C}
-    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
-    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
-    3,                       !- Cooling Coil Gross Rated COP
-    Gas,                     !- Heating Coil Type
-    FanAndCoilAvailSched,    !- Heating Coil Availability Schedule
-    50.0,                    !- Heating Design Supply Air Temperature {C}
-    autosize,                !- Heating Coil Capacity {W}
-    .8,                      !- Gas Heating Coil Efficiency
-    0,                       !- Gas Heating Coil Parasitic Electric Load {W}
-    autosize,                !- Maximum Outdoor air Flow Rate {m3/s}
-    autosize,                !- Minimum Outdoor air Flow Rate {m3/s}
-    ,                        !- Minimum Outdoor air Schedule Name
-    NoEconomizer,            !- Economizer Type
-    NoLockout,               !- Economizer Lockout
-    ,                        !- Economizer Upper Temperature Limit {C}
-    ,                        !- Economizer Lower Temperature Limit {C}
-    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
-    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    BlowThrough,             !- Supply Fan Placement
-    CycleOnAny,              !- Night Cycle Control
-    ,                        !- Night Cycle Control Zone Name
-    None,                    !- Heat Recovery Type
-    ,                        !- Sensible Heat Recovery Effectiveness
-    ,                        !- Latent Heat Recovery Effectiveness
-    None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
-    60,                      !- Dehumidification Setpoint {percent}
-    ElectricSteam,           !- Humidifier Type
-    ,                        !- Humidifier Availability Schedule
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    2690,                    !- Humidifier Rated Electric Power {W}
-    EAST ZONE,               !- Humidifier Control Zone Name
-    30,                      !- Humidifier Setpoint {percent}
-    No,                      !- Return Fan
-    0.7,                     !- Return Fan Total Efficiency
-    300,                     !- Return Fan Delta Pressure {Pa}
-    0.9,                     !- Return Fan Motor Efficiency
-    1.0;                     !- Return Fan Motor in Air Stream Fraction
+    AHU 1,                   !- Air Handling System Name
+    FanAndCoilAvailSched,    !- System Availability Schedule
+    EAST ZONE,               !- Control Zone Name or Thermostat Location
+    autosize,                !- Supply Fan Max Flow Rate {m3/s}
+    Fan Mode Schedule,       !- Supply Fan Operating Mode Schedule
+    .7,                      !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    .9,                      !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    SingleSspeedDX,          !- Cooling Coil Type
+    FanAndCoilAvailSched,    !- Cooling Coil Availability Schedule
+    14.0,                    !- Cooling Design Supply Air Temperature {C}
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    Gas,                     !- Heating Coil Type
+    FanAndCoilAvailSched,    !- Heating Coil Availability Schedule
+    50.0,                    !- Heating Design Supply Air Temperature {C}
+    autosize,                !- Heating Coil Capacity {W}
+    .8,                      !- Gas Heating Coil Efficiency
+    0,                       !- Gas Heating Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor air Flow Rate {m3/s}
+    ,                        !- Minimum Outdoor air Schedule Name
+    NoEconomizer,            !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    ,                        !- Economizer Upper Temperature Limit {C}
+    ,                        !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    BlowThrough,             !- Supply Fan Placement
+    CycleOnAny,              !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    ,                        !- Sensible Heat Recovery Effectiveness
+    ,                        !- Latent Heat Recovery Effectiveness
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60,                      !- Dehumidification Setpoint {percent}
+    ElectricSteam,           !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690,                    !- Humidifier Rated Electric Power {W}
+    EAST ZONE,               !- Humidifier Control Zone Name
+    30,                      !- Humidifier Setpoint {percent}
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+    300,                     !- Return Fan Delta Pressure {Pa}
+    0.9,                     !- Return Fan Motor Efficiency
+    1.0;                     !- Return Fan Motor in Air Stream Fraction
 ```
 
 
@@ -3450,7 +3450,7 @@ Enter a name for the HVACTemplate:System:UnitaryHeatPump:AirToAir object. This n
 
 #### Field: System Availability Schedule Name
 
-Leave this field blank if you want the system to be available for the entire year to perform heating or cooling if called for by the thermostat. If a schedule name is specified, those times that the system is available should be specified as 1.0. Those times that the system is not available should have a zero value in the schedule specified. During times when the system is available,  the supply fan operating mode controls fan operation. (See "Supply Fan Operating Mode Schedule Name" below)
+Leave this field blank if you want the system to be available for the entire year to perform heating or cooling if called for by the thermostat. If a schedule name is specified, those times that the system is available should be specified as 1.0. Those times that the system is not available should have a zero value in the schedule specified. During times when the system is available,  the supply fan operating mode controls fan operation. (See "Supply Fan Operating Mode Schedule Name" below)
 
 #### Field: Control Zone or Thermostat Location Name
 
@@ -3466,19 +3466,19 @@ This field specifies the supply air flow rate when the heating coil is operating
 
 #### Field: No Load Supply Air Flow Rate
 
-This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is Autosize.
+This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is Autosize.
 
 #### Field: Supply Fan Operating Mode Schedule Name
 
-This field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.  If this field is left blank, a schedule of always zero (cycling fan) will be used.
+This field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.  If this field is left blank, a schedule of always zero (cycling fan) will be used.
 
 #### Field: Supply Fan Placement
 
-Enter the supply fan placement type. This alpha field has two choices, *DrawThrough* or *BlowThrough*. *DrawThrough* models a system where the supply air fan is after the dx cooling/heating coil and before the supplemental heating coil. *BlowThrough* models a system where the supply air fan is before the dx cooling/heating coil and the  supplemental heating coil. The default is *BlowThrough*.
+Enter the supply fan placement type. This alpha field has two choices, *DrawThrough* or *BlowThrough*. *DrawThrough* models a system where the supply air fan is after the dx cooling/heating coil and before the supplemental heating coil. *BlowThrough* models a system where the supply air fan is before the dx cooling/heating coil and the  supplemental heating coil. The default is *BlowThrough*.
 
 #### Field: Supply Fan Total Efficiency
 
-Enter the total efficiency of the supply fan. This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.  The default is 0.7.
+Enter the total efficiency of the supply fan. This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.  The default is 0.7.
 
 #### Field: Supply Fan Delta Pressure
 
@@ -3714,7 +3714,7 @@ There are two humidifier type options available:
 
 - ElectricSteam
 
-The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
+The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
 
 #### Field: Humidifier Availability Schedule Name
 
@@ -3722,7 +3722,7 @@ If left blank, the humidifier will be available anytime the system is operating.
 
 #### Field: Humidifier Rated Capacity
 
-Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
+Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
 
 #### Field: Humidifier Rated Electric Power
 
@@ -3734,7 +3734,7 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Humidifier Setpoint
 
-This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%.
+This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%.
 
 #### Field: Return Fan Delta Pressure
 
@@ -3752,67 +3752,67 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:System:UnitaryHeatPump:AirToAir,
-    Heat Pump 1,             !- Name
-    FanAvailSched,           !- System Availability Schedule Name
-    SPACE1-1,                !- Control Zone or Thermostat Location Name
-    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    autosize,                !- No Load Supply Air Flow Rate {m3/s}
-    ,                        !- Supply Fan Operating Mode Schedule Name
-    BlowThrough,             !- Supply Fan Placement
-    0.7,                     !- Supply Fan Total Efficiency
-    600,                     !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    SingleSpeedDX,           !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    14,                      !- Cooling Design Supply Air Temperature {C}
-    autosize,                !- Cooling Coil Gross Rated TotalCapacity {W}
-    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
-    3,                       !- Cooling Coil Gross Rated COP
-    SingleSpeedDXHeatPump,   !- Heat Pump Heating Coil Type
-    ,                    !- Heat Pump Heating Coil Availability Schedule Name
-    50.0,                    !- Heating Design Supply Air Temperature {C}
-    autosize,            !- Heat Pump Heating Coil Gross Rated Capacity {W}
-    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
-    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
-    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
-    ReverseCycle,            !- Heat Pump Defrost Strategy
-    Timed,                   !- Heat Pump Defrost Control
-    0.058333,                !- Heat Pump Defrost Time Period Fraction
-    Electric,                !- Supplemental Heating Coil Type
-    ,           !- Supplemental Heating Coil Availability Schedule Name
-    autosize,                !- Supplemental Heating Coil Capacity {W}
-    21,    !-  Supplemental Heating Coil Max Outdoor Dry-Bulb Temperature {C}
-    0.8,                     !- Supplemental Gas Heating Coil Efficiency
-    ,           !- Supplemental Gas Heating Coil Parasitic Electric Load {W}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-    DifferentialDryBulb,     !- Economizer Type
-    NoLockout,               !- Economizer Lockout
-    19,                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
-    ,                   !- Economizer Maximum Limit Dewpoint Temperature {C}
-    4,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    CycleOnAny,              !- Night Cycle Control
-    ,                        !- Night Cycle Control Zone Name
-    None,                    !- Heat Recovery Type
-    0.7,                     !- Sensible Heat Recovery Effectiveness
-    0.65,                    !- Latent Heat Recovery Effectiveness
-    None,                    !- Humidifier Type
-    ,                        !- Humidifier Availability Schedule Name
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    2690,                    !- Humidifier Rated Electric Power {W}
-    ,                        !- Humidifier Control Zone Name
-    30,                      !- Humidifier Setpoint {percent}
-    No,                      !- Return Fan
-    0.7,                     !- Return Fan Total Efficiency
-    300,                     !- Return Fan Delta Pressure {Pa}
-    0.9,                     !- Return Fan Motor Efficiency
-    1.0;                     !- Return Fan Motor in Air Stream Fraction
+    Heat Pump 1,             !- Name
+    FanAvailSched,           !- System Availability Schedule Name
+    SPACE1-1,                !- Control Zone or Thermostat Location Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- Supply Fan Operating Mode Schedule Name
+    BlowThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    SingleSpeedDX,           !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    14,                      !- Cooling Design Supply Air Temperature {C}
+    autosize,                !- Cooling Coil Gross Rated TotalCapacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    SingleSpeedDXHeatPump,   !- Heat Pump Heating Coil Type
+    ,                    !- Heat Pump Heating Coil Availability Schedule Name
+    50.0,                    !- Heating Design Supply Air Temperature {C}
+    autosize,            !- Heat Pump Heating Coil Gross Rated Capacity {W}
+    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
+    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
+    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
+    ReverseCycle,            !- Heat Pump Defrost Strategy
+    Timed,                   !- Heat Pump Defrost Control
+    0.058333,                !- Heat Pump Defrost Time Period Fraction
+    Electric,                !- Supplemental Heating Coil Type
+    ,           !- Supplemental Heating Coil Availability Schedule Name
+    autosize,                !- Supplemental Heating Coil Capacity {W}
+    21,    !-  Supplemental Heating Coil Max Outdoor Dry-Bulb Temperature {C}
+    0.8,                     !- Supplemental Gas Heating Coil Efficiency
+    ,           !- Supplemental Gas Heating Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    19,                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                   !- Economizer Maximum Limit Dewpoint Temperature {C}
+    4,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    CycleOnAny,              !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690,                    !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30,                      !- Humidifier Setpoint {percent}
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+    300,                     !- Return Fan Delta Pressure {Pa}
+    0.9,                     !- Return Fan Motor Efficiency
+    1.0;                     !- Return Fan Motor in Air Stream Fraction
 ```
 
 
@@ -3826,7 +3826,7 @@ Enter a name for the HVACTemplate:System:UnitarySystem object. This name is used
 
 #### Field: System Availability Schedule Name
 
-Leave this field blank if you want the system to be available for the entire year to perform heating or cooling if called for by the thermostat. If a schedule name is specified, those times that the system is available should be specified as 1.0. Those times that the system is not available should have a zero value in the schedule specified. During times when the system is available,  the supply fan operating mode controls fan operation. (See "Supply Fan Operating Mode Schedule Name" below)
+Leave this field blank if you want the system to be available for the entire year to perform heating or cooling if called for by the thermostat. If a schedule name is specified, those times that the system is available should be specified as 1.0. Those times that the system is not available should have a zero value in the schedule specified. During times when the system is available,  the supply fan operating mode controls fan operation. (See "Supply Fan Operating Mode Schedule Name" below)
 
 #### Field: Control Type
 
@@ -3846,11 +3846,11 @@ This field specifies the supply air flow rate when the heating coil is operating
 
 #### Field: No Load Supply Air Flow Rate
 
-This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is Autosize.
+This field specifies the supply air flow rate when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner’s supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).  By entering Autosize, the supply air flow rate will be sized to match the smaller of the Cooling and Heating flow rates. A value entered in this field will *not* be multiplied by the sizing factor or by zone multipliers. It is best to autosize or leave blank when using zone multipliers. The units are in m3/s. The default is Autosize.
 
 #### Field: Supply Fan Operating Mode Schedule Name
 
-This field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.  If this field is left blank, a schedule of always zero (cycling fan) will be used.
+This field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.  If this field is left blank, a schedule of always zero (cycling fan) will be used.
 
 #### Field: Supply Fan Placement
 
@@ -3904,7 +3904,7 @@ There are seven coil types available:
 
 *MultiSpeedDX* uses the Coil:Cooling:DX:MultiSpeed object.
 
-*TwoStageDX* and *TwoStageHumidityControlDX*  use the Coil:Cooling:DX:TwoStageWithHumidityControlMode object.
+*TwoStageDX* and *TwoStageHumidityControlDX*  use the Coil:Cooling:DX:TwoStageWithHumidityControlMode object.
 
 *HeatExchangerAssistedDX* uses the CoilSystem:Cooling:DX:HeatExchangerAssisted, HeatExchanger:AirToAir:SensibleAndLatent, and Coil:Cooling:DX:SingleSpeed objects.
 
@@ -3912,9 +3912,9 @@ There are seven coil types available:
 
 The default type is *SingleSpeedDX*
 
-*ChilledWater* uses the Coil:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most chilled water applications.
+*ChilledWater* uses the Coil:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most chilled water applications.
 
-*ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.
+*ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.
 
 *HeatExchangerAssistedChilledWater* uses the CoilSystem:Cooling:DX:HeatExchangerAssisted, HeatExchanger:AirToAir:SensibleAndLatent, and Coil:Cooling:Water objects.
 
@@ -3932,7 +3932,7 @@ Enter the cooling supply air temperature in °C to be used for sizing the coolin
 
 #### Field: DX Cooling Coil Gross Rated Total Capacity
 
-Enter Autosize to let the automatic sizing algorithm determine the cooling coil gross total cooling capacity based on the maximum cooling loads during the cooling design day. If a value is entered, it represents the full load gross total cooling capacity, including both sensible and latent capacity, in watts of the DX coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. Capacity should be the “gross”, i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is Autosize. This field is only used when the cooling coil type is set to one of the DX options.  For two-speed DX coils, the low-speed capacity is assumed to be 0.33 times this value.  For two-stage DX coils, the stage 1 capacity is assumed to be 0.5 times this value.
+Enter Autosize to let the automatic sizing algorithm determine the cooling coil gross total cooling capacity based on the maximum cooling loads during the cooling design day. If a value is entered, it represents the full load gross total cooling capacity, including both sensible and latent capacity, in watts of the DX coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. Capacity should be the “gross”, i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is Autosize. This field is only used when the cooling coil type is set to one of the DX options.  For two-speed DX coils, the low-speed capacity is assumed to be 0.33 times this value.  For two-stage DX coils, the stage 1 capacity is assumed to be 0.5 times this value.
 
 #### Field: DX Cooling Coil Gross Rated Sensible Heat Ratio
 
@@ -3946,7 +3946,7 @@ For two-speed DX coils, the low-speed SHR is assumed to be equal to this value. 
 
 #### Field: DX Cooling Coil Gross Rated COP
 
-Enter the coefficient of performance defined as the gross cooling coil total capacity in watts divided by electrical power input in watts of the DX cooling coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. The input power includes electric power for the compressor and condenser fan but does not include the power consumption of the supply air fan. The default is 3.0. This field is only used when the cooling coil type is set to one of the DX options.  For two-speed DX coils, the low-speed COP is assumed to be 1.5 times this value.  For two-stage DX coils, the stage 1 COP is assumed to be this this value. For two-stage DX coil with humidity control, the humidity control mode COP is assumed to be 0.9 times this value (for both stage 1 and stage 2). The gross COP should not account for the supply air fan.
+Enter the coefficient of performance defined as the gross cooling coil total capacity in watts divided by electrical power input in watts of the DX cooling coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. The input power includes electric power for the compressor and condenser fan but does not include the power consumption of the supply air fan. The default is 3.0. This field is only used when the cooling coil type is set to one of the DX options.  For two-speed DX coils, the low-speed COP is assumed to be 1.5 times this value.  For two-stage DX coils, the stage 1 COP is assumed to be this this value. For two-stage DX coil with humidity control, the humidity control mode COP is assumed to be 0.9 times this value (for both stage 1 and stage 2). The gross COP should not account for the supply air fan.
 
 #### Field: Heating Coil Type
 
@@ -4196,7 +4196,7 @@ There are three dehumidification control type options available:
 
 - Multimode
 
-The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the reheat coil. In the simulation, two instances of the heating coil are modeled, even if the main heating coil acts as the reheat coil in the actual system.
+The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the reheat coil. In the simulation, two instances of the heating coil are modeled, even if the main heating coil acts as the reheat coil in the actual system.
 
 *Multimode* is only applicable for cooling coil type *TwoStageHumidityControlDX*. In this case, the enhanced dehumidification mode is activated as needed, but the system operates to meet the sensible dry-bulb temperature cooling setpoint.
 
@@ -4208,11 +4208,11 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Dehumidification Relative Humidity Setpoint
 
-This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%. This field is ignored if a Dehumidification Relative Humidity Setpoint Schedule Name is specified.
+This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%. This field is ignored if a Dehumidification Relative Humidity Setpoint Schedule Name is specified.
 
 #### Field: Dehumidification Relative Humidity Setpoint Schedule Name
 
-Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
+Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
 
 #### Field: Humidifier Type
 
@@ -4222,7 +4222,7 @@ There are two humidifier type options available:
 
 - ElectricSteam
 
-The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
+The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
 
 #### Field: Humidifier Availability Schedule Name
 
@@ -4230,7 +4230,7 @@ If left blank, the humidifier will be available anytime the system is operating.
 
 #### Field: Humidifier Rated Capacity
 
-Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
+Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
 
 #### Field: Humidifier Rated Electric Power
 
@@ -4242,11 +4242,11 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Humidifier Relative Humidity Setpoint
 
-This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%. This field is ignored if a Humidifier Relative Humidity Setpoint Schedule Name is specified.
+This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%. This field is ignored if a Humidifier Relative Humidity Setpoint Schedule Name is specified.
 
 #### Field: Humidifier Relative Humidity Setpoint Schedule Name
 
-Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
+Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
 
 #### Field: Sizing Option
 
@@ -4276,77 +4276,77 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:System:UnitarySystem,
-    AHU 1,                   !- Name
-    FanAvailSched,           !- System Availability Schedule Name
-    Load,                    !- Control Type
-    SPACE1-1,                !- Control Zone or Thermostat Location Name
-    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    autosize,                !- No Load Supply Air Flow Rate {m3/s}
-    FanModeSchedule,         !- Supply Fan Operating Mode Schedule Name
-    BlowThrough,             !- Supply Fan Placement
-    0.7,                     !- Supply Fan Total Efficiency
-    600,                     !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    SingleSpeedDX,           !- Cooling Coil Type
-    1,                       !- Number of Speeds for Cooling
-    ,                        !- Cooling Coil Availability Schedule Name
-    12.8,                    !- Cooling Design Supply Air Temperature {C}
-    autosize,                !- DX Cooling Coil Gross Rated Total Capacity{W}
-    autosize,            !- DX Cooling Coil Gross Rated Sensible Heat Ratio
-    3,                       !- DX Cooling Coil Gross Rated COP
-    Gas,                     !- Heating Coil Type
-    1,                       !- Number of Speeds for Heating
-    ,                        !- Heating Coil Availability Schedule Name
-    50.0,                    !- Heating Design Supply Air Temperature {C}
-    autosize,                !- Heating Coil Gross Rated Capacity{W}
-    .8,                      !- Gas Heating Coil Efficiency
-    0,                       !- Gas Heating Coil Parasitic Electric Load {W}
-    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
-    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
-    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
-    ReverseCycle,            !- Heat Pump Defrost Strategy
-    Timed,                   !- Heat Pump Defrost Control
-    0.058333,                !- Heat Pump Defrost Time Period Fraction
-    Electric,                !- Supplemental Heating or Reheat Coil Type
-    ,     !- Supplemental Heating  or ReheatCoil Availability Schedule Name
-    autosize,         !- Supplemental Heating or Reheat Coil Capacity {W}
-    21,   !-  Supplemental Heating or Reheat Coil Max . . . Temperature {C}
-    0.8,  !- Supplemental Gas Heating or Reheat Coil Efficiency
-    ,     !- Supplemental Gas Heating or Reheat Coil Parasitic . . . Load {W}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-    DifferentialDryBulb,     !- Economizer Type
-    NoLockout,               !- Economizer Lockout
-    19,                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-    ,                   !- Economizer Maximum Limit Enthalpy {J/kg}
-    ,                   !- Economizer Maximum Limit Dewpoint Temperature {C}
-    4,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Heat Recovery Type
-    0.7,                     !- Sensible Heat Recovery Effectiveness
-    0.65,                    !- Latent Heat Recovery Effectiveness
-    ,                        !- Heat Recovery Heat Exchanger Type
-    ,                        !- Heat Recovery Frost Control Type
-    None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
-    60.0,       !- Dehumidification Relative Humidity Setpoint {percent}
-    ,           !- Dehumidification Relative Humidity Setpoint Schedule Name
-    None,                    !- Humidifier Type
-    ,                        !- Humidifier Availability Schedule Name
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    2690.0,                  !- Humidifier Rated Electric Power {W}
-    ,                        !- Humidifier Control Zone Name
-    30.0,       !- Humidifier Relative Humidity Setpoint {percent}
-    ,           !- Humidifier Relative Humidity Setpoint Schedule Name
-    No,                      !- Return Fan
-    0.7,                     !- Return Fan Total Efficiency
-     300,                     !- Return Fan Delta Pressure {Pa}
-     0.9,                     !- Return Fan Motor Efficiency
-     1.0;                     !- Return Fan Motor in Air Stream Fraction
+    AHU 1,                   !- Name
+    FanAvailSched,           !- System Availability Schedule Name
+    Load,                    !- Control Type
+    SPACE1-1,                !- Control Zone or Thermostat Location Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    FanModeSchedule,         !- Supply Fan Operating Mode Schedule Name
+    BlowThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    SingleSpeedDX,           !- Cooling Coil Type
+    1,                       !- Number of Speeds for Cooling
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.8,                    !- Cooling Design Supply Air Temperature {C}
+    autosize,                !- DX Cooling Coil Gross Rated Total Capacity{W}
+    autosize,            !- DX Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- DX Cooling Coil Gross Rated COP
+    Gas,                     !- Heating Coil Type
+    1,                       !- Number of Speeds for Heating
+    ,                        !- Heating Coil Availability Schedule Name
+    50.0,                    !- Heating Design Supply Air Temperature {C}
+    autosize,                !- Heating Coil Gross Rated Capacity{W}
+    .8,                      !- Gas Heating Coil Efficiency
+    0,                       !- Gas Heating Coil Parasitic Electric Load {W}
+    2.75,                    !- Heat Pump Heating Coil Gross Rated COP
+    -8,         !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
+    5,          !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
+    ReverseCycle,            !- Heat Pump Defrost Strategy
+    Timed,                   !- Heat Pump Defrost Control
+    0.058333,                !- Heat Pump Defrost Time Period Fraction
+    Electric,                !- Supplemental Heating or Reheat Coil Type
+    ,     !- Supplemental Heating  or ReheatCoil Availability Schedule Name
+    autosize,         !- Supplemental Heating or Reheat Coil Capacity {W}
+    21,   !-  Supplemental Heating or Reheat Coil Max . . . Temperature {C}
+    0.8,  !- Supplemental Gas Heating or Reheat Coil Efficiency
+    ,     !- Supplemental Gas Heating or Reheat Coil Parasitic . . . Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    19,                 !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    ,                   !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                   !- Economizer Maximum Limit Dewpoint Temperature {C}
+    4,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    ,                        !- Heat Recovery Heat Exchanger Type
+    ,                        !- Heat Recovery Frost Control Type
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60.0,       !- Dehumidification Relative Humidity Setpoint {percent}
+    ,           !- Dehumidification Relative Humidity Setpoint Schedule Name
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690.0,                  !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30.0,       !- Humidifier Relative Humidity Setpoint {percent}
+    ,           !- Humidifier Relative Humidity Setpoint Schedule Name
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+     300,                     !- Return Fan Delta Pressure {Pa}
+     0.9,                     !- Return Fan Motor Efficiency
+     1.0;                     !- Return Fan Motor in Air Stream Fraction
 ```
 
 
@@ -4394,7 +4394,7 @@ There are two coil types available:
 
 - ChilledWaterDetailedFlatModel
 
-*ChilledWater* uses the COIL:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most applications.  *ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.  The default is *ChilledWater*.
+*ChilledWater* uses the COIL:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most applications.  *ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.  The default is *ChilledWater*.
 
 #### Field: Cooling Coil Availability Schedule Name
 
@@ -4410,7 +4410,7 @@ Enter the cooling supply air temperature in C to be used for sizing the cooling 
 
 #### Field: Heating Coil Type
 
-The heating coil is located in the supply air stream, upstream of the cooling coil and after the outdoor air mixing box. If no central heating coil is used in the VAV system,  then the option “none” should be specified here. Otherwise this indicates the type of heating coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
+The heating coil is located in the supply air stream, upstream of the cooling coil and after the outdoor air mixing box. If no central heating coil is used in the VAV system,  then the option “none” should be specified here. Otherwise this indicates the type of heating coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
 
 - HotWater
 
@@ -4432,7 +4432,7 @@ If a constant setpoint for the heating coil is to be specified, leave this field
 
 #### Field: Heating Coil Design Setpoint
 
-Enter the heating supply air temperature in C to be used for sizing the heating coil and zone supply air flow rates. If no Heating Coil Setpoint Schedule or Heating Coil Setpoint Reset Type is specified, this value is used as a constant heating supply air setpoint temperature.  The default is 10.0C.
+Enter the heating supply air temperature in C to be used for sizing the heating coil and zone supply air flow rates. If no Heating Coil Setpoint Schedule or Heating Coil Setpoint Reset Type is specified, this value is used as a constant heating supply air setpoint temperature.  The default is 10.0C.
 
 #### Field: Gas Heating Coil Efficiency
 
@@ -4482,7 +4482,7 @@ Enter autosize or a value for the maximum amount of outdoor air flow into the un
 
 #### Field: Minimum Outdoor Air Flow Rate
 
-Enter autosize or the value for the minimum amount of outdoor air that can enter the unit and be distributed to the zones. Usually this is set to autosize and the value is calculated by the outdoor air requirements of each zone. If a value is entered it overrides the outdoor air  specification from the zone level. The units are in m3/s. The default is Autosize. The entered value is used to define the Minimum Outdoor Air Flow Rate for the Controller:OutdoorAir object that will be generated by this template.
+Enter autosize or the value for the minimum amount of outdoor air that can enter the unit and be distributed to the zones. Usually this is set to autosize and the value is calculated by the outdoor air requirements of each zone. If a value is entered it overrides the outdoor air  specification from the zone level. The units are in m3/s. The default is Autosize. The entered value is used to define the Minimum Outdoor Air Flow Rate for the Controller:OutdoorAir object that will be generated by this template.
 
 #### Field: Minimum Outdoor Air Control Type
 
@@ -4648,7 +4648,7 @@ There are two dehumidification control type options available:
 
 - CoolReheat
 
-The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the terminal unit reheat coils if available.
+The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the terminal unit reheat coils if available.
 
 The default is *None* which meets the sensible cooling setpoint only.
 
@@ -4658,7 +4658,7 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Dehumidification Setpoint
 
-This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%.
+This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%.
 
 #### Field: Humidifier Type
 
@@ -4668,7 +4668,7 @@ There are two humidifier type options available:
 
 - ElectricSteam
 
-The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
+The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
 
 #### Field: Humidifier Availability Schedule Name
 
@@ -4676,7 +4676,7 @@ If left blank, the humidifier will be available anytime the system is operating.
 
 #### Field: Humidifier Rated Capacity
 
-Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
+Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
 
 #### Field: Humidifier Rated Electric Power
 
@@ -4688,7 +4688,7 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Humidifier Setpoint
 
-This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%.
+This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%.
 
 #### Field: Sizing Option
 
@@ -4735,68 +4735,68 @@ The default is *InletVaneDampers*. The resulting power curves are shown in Figur
 As shown in an IDF:
 
 ```idf
-  HVACTemplate:System:VAV,
-    VAV Sys 1,               !-Name
-    FanAvailSched,           !- System Availability Schedule Name
-    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
-    autosize,                !- Supply Fan Minimum Flow Rate {m3/s}
-    0.7,                     !- Supply Fan Total Efficiency
-    600,                     !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    ChilledWater,            !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    ,                        !- Cooling Coil Setpoint Schedule Name
-    12.8,                    !- Cooling Coil Design Setpoint {C}
-    HotWater,                !- Heating Coil Type
-    ,                        !- Heating Coil Availability Schedule Name
-    ,                        !- Heating Coil Setpoint Schedule Name
-    10.0,                    !- Heating Coil Design Setpoint {C}
-    0.8,                     !- Gas Heating Coil Efficiency
-    0.0,                     !- Gas Heating Coil Parasitic Electric Load {W}
-    None,                    !- Preheat Coil Type
-    ,                        !- Preheat Coil Availability Schedule Name
-    ,                        !- Preheat Coil Setpoint Schedule Name
-    ,                        !- Preheat Coil Design Setpoint {C}
-    0.8,                     !- Gas Preheat Coil Efficiency
-    0.0,                     !- Gas Preheat Coil Parasitic Electric Load {W}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    FixedMinimum,            !- Minimum Outdoor Air Control Type
-    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-    DifferentialDryBulb,     !- Economizer Type
-    NoLockout,               !- Economizer Lockout
-    19,                      !- Economizer Upper Temperature Limit {C}
-    4,                       !- Economizer Lower Temperature Limit {C}
-    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
-    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
-   ,                        !- Supply Plenum Name
-    PLENUM-1,                !- Return Plenum Name
-    DrawThrough,             !- Supply Fan Placement
-    InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients
-    CycleOnAnyZoneFansOnly,  !- Night Cycle Control
-    ,                        !- Night Cycle Control Zone Name
-    None,                    !- Heat Recovery Type
-    0.70,                    !- Sensible Heat Recovery Effectiveness
-    0.65,                    !- Latent Heat Recovery Effectiveness
-    None,                    !- Cooling Coil Setpoint Reset Type
-    None,                    !- Heating Coil Setpoint Reset Type
-    None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
-    60.0,                    !- Dehumidification Setpoint {percent}
-    None,                    !- Humidifier Type
-    ,                        !- Humidifier Availability Schedule Name
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    2690.0,                  !- Humidifier Rated Electric Power {W}
-    ,                        !- Humidifier Control Zone Name
-    30.0,                    !- Humidifier Setpoint {percent}
-    NonCoincident,           !- Sizing Option
-    No,                      !- Return Fan
-    0.7,                     !- Return Fan Total Efficiency
-    500,                     !- Return Fan Delta Pressure {Pa}
-    0.9,                     !- Return Fan Motor Efficiency
-    1.0,                     !- Return Fan Motor in Air Stream Fraction
-    InletVaneDampers;        !- Return Fan Part-Load Power Coefficients
+  HVACTemplate:System:VAV,
+    VAV Sys 1,               !-Name
+    FanAvailSched,           !- System Availability Schedule Name
+    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
+    autosize,                !- Supply Fan Minimum Flow Rate {m3/s}
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    ,                        !- Cooling Coil Setpoint Schedule Name
+    12.8,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    ,                        !- Heating Coil Setpoint Schedule Name
+    10.0,                    !- Heating Coil Design Setpoint {C}
+    0.8,                     !- Gas Heating Coil Efficiency
+    0.0,                     !- Gas Heating Coil Parasitic Electric Load {W}
+    None,                    !- Preheat Coil Type
+    ,                        !- Preheat Coil Availability Schedule Name
+    ,                        !- Preheat Coil Setpoint Schedule Name
+    ,                        !- Preheat Coil Design Setpoint {C}
+    0.8,                     !- Gas Preheat Coil Efficiency
+    0.0,                     !- Gas Preheat Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    FixedMinimum,            !- Minimum Outdoor Air Control Type
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    19,                      !- Economizer Upper Temperature Limit {C}
+    4,                       !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+   ,                        !- Supply Plenum Name
+    PLENUM-1,                !- Return Plenum Name
+    DrawThrough,             !- Supply Fan Placement
+    InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients
+    CycleOnAnyZoneFansOnly,  !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.70,                    !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    None,                    !- Cooling Coil Setpoint Reset Type
+    None,                    !- Heating Coil Setpoint Reset Type
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60.0,                    !- Dehumidification Setpoint {percent}
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690.0,                  !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30.0,                    !- Humidifier Setpoint {percent}
+    NonCoincident,           !- Sizing Option
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+    500,                     !- Return Fan Delta Pressure {Pa}
+    0.9,                     !- Return Fan Motor Efficiency
+    1.0,                     !- Return Fan Motor in Air Stream Fraction
+    InletVaneDampers;        !- Return Fan Part-Load Power Coefficients
 ```
 
 
@@ -4826,7 +4826,7 @@ Enter the supply fan placement type. This alpha field has two choices, *DrawThro
 
 #### Field: Supply Fan Total Efficiency
 
-Enter the total efficiency of the supply fan. This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.  The default is 0.7.
+Enter the total efficiency of the supply fan. This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.  The default is 0.7.
 
 #### Field: Supply Fan Delta Pressure
 
@@ -4848,7 +4848,7 @@ The coil types available:
 
 - TwoSpeedHumidControlDX
 
-*TwoSpeedDX*  uses the Coil:Cooling:DX:TwoSpeed object.  This is the preferred coil model for most applications.  The *TwoSpeedHumidControlDX*  option uses the Coil:Cooling:DX:TwoStageWithHumidityControlMode object.
+*TwoSpeedDX*  uses the Coil:Cooling:DX:TwoSpeed object.  This is the preferred coil model for most applications.  The *TwoSpeedHumidControlDX*  option uses the Coil:Cooling:DX:TwoStageWithHumidityControlMode object.
 
 #### Field: Cooling Coil Availability Schedule Name
 
@@ -4868,7 +4868,7 @@ Enter Autosize to let the automatic sizing algorithm determine the cooling coil 
 
 #### Field: Cooling Coil Gross Rated Sensible Heat Ratio
 
-Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by the gross total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is Autosize.
+Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by the gross total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is Autosize.
 
 #### Field: Cooling Coil Gross Rated COP
 
@@ -4894,7 +4894,7 @@ If a constant setpoint for the heating coil is to be specified, leave this field
 
 #### Field: Heating Coil Design Setpoint
 
-Enter the heating supply air temperature in degrees C to be used for sizing the heating coil and zone supply air flow rates. If no Heating Coil Setpoint Schedule or Heating Coil Setpoint Reset Type is specified, this value is used as a constant heating supply air setpoint temperature.  The default is 10.0C.
+Enter the heating supply air temperature in degrees C to be used for sizing the heating coil and zone supply air flow rates. If no Heating Coil Setpoint Schedule or Heating Coil Setpoint Reset Type is specified, this value is used as a constant heating supply air setpoint temperature.  The default is 10.0C.
 
 #### Field: Heating Coil Capacity
 
@@ -4914,7 +4914,7 @@ Enter Autosize or a value for the maximum amount of outdoor air flow into the un
 
 #### Field: Minimum Outdoor Air Flow Rate
 
-Enter Autosize or the value for the minimum amount of outdoor air that can enter the unit and be distributed to the zones. Usually this is set to autosize and the value is calculated by the outdoor air requirements of each zone. If a value is entered it overrides the outdoor air  specification from the zone level. The units are in m3/s. The default is Autosize. The entered value is used to define the Minimum Outdoor Air Flow Rate for the Controller:OutdoorAir object that will be generated by this template.
+Enter Autosize or the value for the minimum amount of outdoor air that can enter the unit and be distributed to the zones. Usually this is set to autosize and the value is calculated by the outdoor air requirements of each zone. If a value is entered it overrides the outdoor air  specification from the zone level. The units are in m3/s. The default is Autosize. The entered value is used to define the Minimum Outdoor Air Flow Rate for the Controller:OutdoorAir object that will be generated by this template.
 
 #### Field: Minimum Outdoor Air Control Type
 
@@ -5014,7 +5014,7 @@ Select the set of generic pre-defined coefficients to use for the supply fan par
 
 - VariableSpeedMotorPressureReset
 
-The default is *InletVaneDampers*. The resulting power curves are shown in Figure 159 below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table.  The *VariableSpeedMotorPressureReset* option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: *Design Guidelines: Advanced Variable Air Volume (VAV) Systems* (EDR\_DesignGuidelines\_VAV.pdf).
+The default is *InletVaneDampers*. The resulting power curves are shown in Figure 159 below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table.  The *VariableSpeedMotorPressureReset* option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: *Design Guidelines: Advanced Variable Air Volume (VAV) Systems* (EDR\_DesignGuidelines\_VAV.pdf).
 
 ![](InputOutputReference/media/image612.svg)
 
@@ -5080,7 +5080,7 @@ There are two dehumidification control type options available:
 
 - CoolReheat
 
-The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the terminal unit reheat coils if available.
+The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the terminal unit reheat coils if available.
 
 The default is *None* which meets the sensible cooling setpoint only.
 
@@ -5090,7 +5090,7 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Dehumidification Setpoint
 
-This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%.
+This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%.
 
 #### Field: Humidifier Type
 
@@ -5100,7 +5100,7 @@ There are two humidifier type options available:
 
 - ElectricSteam
 
-The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
+The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
 
 #### Field: Humidifier Availability Schedule Name
 
@@ -5108,7 +5108,7 @@ If left blank, the humidifier will be available anytime the system is operating.
 
 #### Field: Humidifier Rated Capacity
 
-Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
+Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
 
 #### Field: Humidifier Rated Electric Power
 
@@ -5120,7 +5120,7 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Humidifier Setpoint
 
-This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%.
+This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%.
 
 #### Field: Sizing Option
 
@@ -5168,70 +5168,70 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:System:PackagedVAV,
-    DXVAV Sys 1,             !-Name
-    FanAvailSched,           !- System Availability Schedule Name
-    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
-    autosize,                !- Supply Fan Minimum Flow Rate {m3/s}
-    DrawThrough,             !- Supply Fan Placement
-    0.7,                     !- Supply Fan Total Efficiency
-    1000,                    !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    TwoSpeedDX,              !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    ,                        !- Cooling Coil Setpoint Schedule Name
-    12.8,                    !- Cooling Coil Design Setpoint {C}
-    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
-    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
-    3,                       !- Cooling Coil Gross Rated COP
-    Gas,                     !- Heating Coil Type
-    ,                        !- Heating Coil Availability Schedule Name
-    ,                        !- Heating Coil Setpoint Schedule Name
-    10,                      !- Heating Coil Design Setpoint {C}
-    autosize,                !- Heating Coil Capacity {W}
-    0.8,                     !- Gas Heating Coil Efficiency
-    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    ProportionalMinimum,     !- Minimum Outdoor Air Control Type
-    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-    DifferentialDryBulb,     !- Economizer Type
-    NoLockout,               !- Economizer Lockout
-    19,                  !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
-    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
-    4,                   !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-    ,                        !- Supply Plenum Name
-    PLENUM-1,                !- Return Plenum Name
-    InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients
-    CycleOnAny,              !- Night Cycle Control
-    ,                        !- Night Cycle Control Zone Name
-    None,                    !- Heat Recovery Type
-    0.7,                     !- Sensible Heat Recovery Effectiveness
-    0.65,                    !- Latent Heat Recovery Effectiveness
-    None,                    !- Cooling Coil Setpoint Reset Type
-    None,                    !- Heating Coil Setpoint Reset Type
-    None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
-    60,                      !- Dehumidification Setpoint {percent}
-    None,                    !- Humidifier Type
-   ,                        !- Humidifier Availability Schedule Name
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    2690,                    !- Humidifier Rated Electric Power {W}
-    ,                        !- Humidifier Control Zone Name
-    30,                      !- Humidifier Setpoint {percent}
-    NonCoincident,           !- Sizing Option
-    No,                      !- Return Fan
-    0.7,                     !- Return Fan Total Efficiency
-    500,                     !- Return Fan Delta Pressure {Pa}
-    0.9,                     !- Return Fan Motor Efficiency
-    1.0,                     !- Return Fan Motor in Air Stream Fraction
-    InletVaneDampers;        !- Return Fan Part-Load Power Coefficients
+    DXVAV Sys 1,             !-Name
+    FanAvailSched,           !- System Availability Schedule Name
+    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
+    autosize,                !- Supply Fan Minimum Flow Rate {m3/s}
+    DrawThrough,             !- Supply Fan Placement
+    0.7,                     !- Supply Fan Total Efficiency
+    1000,                    !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    TwoSpeedDX,              !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    ,                        !- Cooling Coil Setpoint Schedule Name
+    12.8,                    !- Cooling Coil Design Setpoint {C}
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP
+    Gas,                     !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    ,                        !- Heating Coil Setpoint Schedule Name
+    10,                      !- Heating Coil Design Setpoint {C}
+    autosize,                !- Heating Coil Capacity {W}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    ProportionalMinimum,     !- Minimum Outdoor Air Control Type
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    19,                  !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+    4,                   !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    ,                        !- Supply Plenum Name
+    PLENUM-1,                !- Return Plenum Name
+    InletVaneDampers,        !- Supply Fan Part-Load Power Coefficients
+    CycleOnAny,              !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    None,                    !- Cooling Coil Setpoint Reset Type
+    None,                    !- Heating Coil Setpoint Reset Type
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60,                      !- Dehumidification Setpoint {percent}
+    None,                    !- Humidifier Type
+   ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690,                    !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30,                      !- Humidifier Setpoint {percent}
+    NonCoincident,           !- Sizing Option
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+    500,                     !- Return Fan Delta Pressure {Pa}
+    0.9,                     !- Return Fan Motor Efficiency
+    1.0,                     !- Return Fan Motor in Air Stream Fraction
+    InletVaneDampers;        !- Return Fan Part-Load Power Coefficients
 ```
 
 ### HVACTemplate:System:ConstantVolume
 
-This object simulates the system portion of a constant air volume HVAC configuration with option chilled water cooling and several different heating options. One or more  HVACTemplate:Zone:ConstantVolume objects are specified for each zone served by the HVACTemplate:System:ConstantVolume object.
+This object simulates the system portion of a constant air volume HVAC configuration with option chilled water cooling and several different heating options. One or more  HVACTemplate:Zone:ConstantVolume objects are specified for each zone served by the HVACTemplate:System:ConstantVolume object.
 
 #### Field: Name
 
@@ -5277,7 +5277,7 @@ There are two coil types available:
 
 - None
 
-*ChilledWater* uses the COIL:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most applications.  *ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.  *HeatExchangerAssistedChilledWater* uses the CoilSystem:Cooling:Water:HeatExchangerAssisted, HeatExchanger:AirToAir:SensibleAndLatent, and Coil:Cooling:Water objects. The default is *ChilledWater*.
+*ChilledWater* uses the COIL:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most applications.  *ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.  *HeatExchangerAssistedChilledWater* uses the CoilSystem:Cooling:Water:HeatExchangerAssisted, HeatExchanger:AirToAir:SensibleAndLatent, and Coil:Cooling:Water objects. The default is *ChilledWater*.
 
 #### Field: Cooling Coil Availability Schedule Name
 
@@ -5331,7 +5331,7 @@ The high limit of outdoor dry-bulb temperature in C for outdoor air reset contro
 
 #### Field: Heating Coil Type
 
-The heating coil is located in the supply air stream, upstream of the cooling coil and after the outdoor air mixing box. If no central heating coil is used in the Constant Volume system,  then the option “none” should be specified here. Otherwise this indicates the type of heating coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
+The heating coil is located in the supply air stream, upstream of the cooling coil and after the outdoor air mixing box. If no central heating coil is used in the Constant Volume system,  then the option “none” should be specified here. Otherwise this indicates the type of heating coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
 
 - HotWater
 
@@ -5369,7 +5369,7 @@ Enter the name of the HVACTemplate:Zone:ConstantVolume object that contains the 
 
 #### Field: Heating Coil Design Setpoint
 
-Enter the heating supply air temperature in C to be used for sizing the heating coil and zone supply air flow rates. If no Heating Coil Setpoint Schedule or Heating Coil Setpoint Reset Type is specified, this value is used as a constant heating supply air setpoint temperature.  The default is 10.0C.
+Enter the heating supply air temperature in C to be used for sizing the heating coil and zone supply air flow rates. If no Heating Coil Setpoint Schedule or Heating Coil Setpoint Reset Type is specified, this value is used as a constant heating supply air setpoint temperature.  The default is 10.0C.
 
 #### Field: Heating Coil Setpoint Schedule Name
 
@@ -5443,7 +5443,7 @@ Enter autosize or a value for the maximum amount of outdoor air flow into the un
 
 #### Field: Minimum Outdoor Air Flow Rate
 
-Enter autosize or the value for the minimum amount of outdoor air that can enter the unit and be distributed to the zones. Usually this is set to autosize and the value is calculated by the outdoor air requirements of each zone. If a value is entered it overrides the outdoor air  specification from the zone level. The units are in m3/s. The default is Autosize. The entered value is used to define the Minimum Outdoor Air Flow Rate for the Controller:OutdoorAir object that will be generated by this template.
+Enter autosize or the value for the minimum amount of outdoor air that can enter the unit and be distributed to the zones. Usually this is set to autosize and the value is calculated by the outdoor air requirements of each zone. If a value is entered it overrides the outdoor air  specification from the zone level. The units are in m3/s. The default is Autosize. The entered value is used to define the Minimum Outdoor Air Flow Rate for the Controller:OutdoorAir object that will be generated by this template.
 
 #### Field: Minimum Outdoor Air Schedule Name
 
@@ -5563,7 +5563,7 @@ There are two dehumidification control type options available:
 
 - CoolReheat
 
-The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the central heating coil if available or the terminal unit reheat coils if available.
+The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the central heating coil if available or the terminal unit reheat coils if available.
 
 The default is *None* which meets the sensible cooling setpoint only.
 
@@ -5573,11 +5573,11 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Dehumidification Relative Humidity Setpoint
 
-This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%. This field is ignored if a Dehumidification Relative Humidity Setpoint Schedule Name is specified.
+This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%. This field is ignored if a Dehumidification Relative Humidity Setpoint Schedule Name is specified.
 
 #### Field: Dehumidification Relative Humidity Setpoint Schedule Name
 
-Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
+Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
 
 #### Field: Humidifier Type
 
@@ -5587,7 +5587,7 @@ There are two humidifier type options available:
 
 - ElectricSteam
 
-The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
+The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
 
 #### Field: Humidifier Availability Schedule Name
 
@@ -5595,7 +5595,7 @@ If left blank, the humidifier will be available anytime the system is operating.
 
 #### Field: Humidifier Rated Capacity
 
-Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
+Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
 
 #### Field: Humidifier Rated Electric Power
 
@@ -5607,11 +5607,11 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Humidifier Relative Humidity Setpoint
 
-This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%. This field is ignored if a Humidifier Relative Humidity Setpoint Schedule Name is specified.
+This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%. This field is ignored if a Humidifier Relative Humidity Setpoint Schedule Name is specified.
 
 #### Field: Humidifier Relative Humidity Setpoint Schedule Name
 
-Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
+Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
 
 #### Field: Return Fan
 
@@ -5637,76 +5637,76 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:System:ConstantVolume,
-    CAV Sys 1,               !-Name
-    FanAvailSched,           !- System Availability Schedule Name
-    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
-    0.7,                     !- Supply Fan Total Efficiency
-    600,                     !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-     DrawThrough,             !- Supply Fan Placement
-    ChilledWater,            !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-     ControlZone,             !- Cooling Coil Setpoint Control Type
-     SPACE 1-1,               !- Cooling Coil Conrol Zone
-     12.8,                        !- Cooling Coil Design Setpoint {C}
-    ,                        !- Cooling Coil Setpoint Schedule Name
-     ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
-     ,                        !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
-     ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
-     ,                        !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
-    HotWater,                !- Heating Coil Type
-    ,                        !- Heating Coil Availability Schedule Name
-     FixedSetpoint,           !- Heating Coil Setpoint Control Type
-     ,                        !- Heating Coil Control Zone
-     50,                        !- Heating Coil Design Setpoint {C}
-    ,                        !- Heating Coil Setpoint Schedule Name
-     ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
-     ,                        !- Hedating Coil Reset Outdoor Dry-Bulb Low {C}
-     ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
-     ,                        !- Heating Coil Reset Outdoor Dry-Bulb High {C}
-    Autosize,                !- Heating Coil Capacity {W}
-    0.8,                     !- Gas Heating Coil Efficiency
-    0.0,                     !- Gas Heating Coil Parasitic Electric Load {W}
-    None,                    !- Preheat Coil Type
-    ,                        !- Preheat Coil Availability Schedule Name
-    ,                        !- Preheat Coil Design Setpoint {C}
-    ,                        !- Preheat Coil Setpoint Schedule Name
-    0.8,                     !- Gas Preheat Coil Efficiency
-    0.0,                     !- Gas Preheat Coil Parasitic Electric Load {W}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-    DifferentialDryBulb,     !- Economizer Type
-    19,                      !- Economizer Upper Temperature Limit {C}
-    4,                       !- Economizer Lower Temperature Limit {C}
-    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
-    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
-    ,                        !- Supply Plenum Name
-    PLENUM-1,                !- Return Plenum Name
-     CycleOnAnyZoneFansOnly,  !- Night Cycle Control
-    ,                        !- Night Cycle Control Zone Name
-    None,                    !- Heat Recovery Type
-    0.70,                    !- Sensible Heat Recovery Effectiveness
-     0.65,                    !- Latent Heat Recovery Effectiveness
-     ,                        !- Heat Recovery Heat Exchanger Type
-     ,                        !- Heat Recovery Frost Control Type
-     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
-    60.0,     !- Dehumidification Relative Humidity Setpoint {percent}
-    ,         !- Dehumidification Relative Humidity Setpoint Schedule Name
-    None,                    !- Humidifier Type
-    ,                        !- Humidifier Availability Schedule Name
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    2690.0,                  !- Humidifier Rated Electric Power {W}
-    ,                        !- Humidifier Control Zone Name
-    30.0,     !- Humidifier Relative Humidity Setpoint {percent}
-    ,         !- Humidifier Relative Humidity Setpoint Schedule Name
-    No,                      !- Return Fan
-    0.7,                     !- Return Fan Total Efficiency
-     600,                     !- Return Fan Delta Pressure {Pa}
-     0.9,                     !- Return Fan Motor Efficiency
-     1.0;                     !- Return Fan Motor in Air Stream Fraction
+    CAV Sys 1,               !-Name
+    FanAvailSched,           !- System Availability Schedule Name
+    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+     DrawThrough,             !- Supply Fan Placement
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+     ControlZone,             !- Cooling Coil Setpoint Control Type
+     SPACE 1-1,               !- Cooling Coil Conrol Zone
+     12.8,                        !- Cooling Coil Design Setpoint {C}
+    ,                        !- Cooling Coil Setpoint Schedule Name
+     ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
+     ,                        !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
+     ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
+     ,                        !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+     FixedSetpoint,           !- Heating Coil Setpoint Control Type
+     ,                        !- Heating Coil Control Zone
+     50,                        !- Heating Coil Design Setpoint {C}
+    ,                        !- Heating Coil Setpoint Schedule Name
+     ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
+     ,                        !- Hedating Coil Reset Outdoor Dry-Bulb Low {C}
+     ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
+     ,                        !- Heating Coil Reset Outdoor Dry-Bulb High {C}
+    Autosize,                !- Heating Coil Capacity {W}
+    0.8,                     !- Gas Heating Coil Efficiency
+    0.0,                     !- Gas Heating Coil Parasitic Electric Load {W}
+    None,                    !- Preheat Coil Type
+    ,                        !- Preheat Coil Availability Schedule Name
+    ,                        !- Preheat Coil Design Setpoint {C}
+    ,                        !- Preheat Coil Setpoint Schedule Name
+    0.8,                     !- Gas Preheat Coil Efficiency
+    0.0,                     !- Gas Preheat Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    Min OA Sched,            !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,     !- Economizer Type
+    19,                      !- Economizer Upper Temperature Limit {C}
+    4,                       !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Supply Plenum Name
+    PLENUM-1,                !- Return Plenum Name
+     CycleOnAnyZoneFansOnly,  !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.70,                    !- Sensible Heat Recovery Effectiveness
+     0.65,                    !- Latent Heat Recovery Effectiveness
+     ,                        !- Heat Recovery Heat Exchanger Type
+     ,                        !- Heat Recovery Frost Control Type
+     None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    60.0,     !- Dehumidification Relative Humidity Setpoint {percent}
+    ,         !- Dehumidification Relative Humidity Setpoint Schedule Name
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690.0,                  !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    30.0,     !- Humidifier Relative Humidity Setpoint {percent}
+    ,         !- Humidifier Relative Humidity Setpoint Schedule Name
+    No,                      !- Return Fan
+    0.7,                     !- Return Fan Total Efficiency
+     600,                     !- Return Fan Delta Pressure {Pa}
+     0.9,                     !- Return Fan Motor Efficiency
+     1.0;                     !- Return Fan Motor in Air Stream Fraction
 ```
 
 
@@ -5724,7 +5724,7 @@ Leave this field blank if you want the system to be available for the entire yea
 
 #### Field: Supply Fan Configuration Type
 
-This field specifies the supply fan configuration. * SingleConstantVolume* and *SingleVariableVolume* specify one supply fan located in the main supply air duct before the split into a cold supply air duct and a hot supply air duct. This configuration uses the ‘Main Supply Fan’ input fields which follow immediately below.  *DualConstantVolume* and *DualVariableVolume* specify two supply fans, one located in the cold supply air duct and one located in the hot supply air duct. *Dual* uses the ‘Cold Duct Supply Fan’ and Hot Duct Supply Fan’ inputs which follow below. The default is*SingleConstantVolume*.
+This field specifies the supply fan configuration. * SingleConstantVolume* and *SingleVariableVolume* specify one supply fan located in the main supply air duct before the split into a cold supply air duct and a hot supply air duct. This configuration uses the ‘Main Supply Fan’ input fields which follow immediately below.  *DualConstantVolume* and *DualVariableVolume* specify two supply fans, one located in the cold supply air duct and one located in the hot supply air duct. *Dual* uses the ‘Cold Duct Supply Fan’ and Hot Duct Supply Fan’ inputs which follow below. The default is*SingleConstantVolume*.
 
 #### Field: Main Supply Fan Maximum Flow Rate
 
@@ -5868,7 +5868,7 @@ There are two coil types available:
 
 - None
 
-*ChilledWater* uses the COIL:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most applications.  *ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.  The default is *ChilledWater*.
+*ChilledWater* uses the COIL:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most applications.  *ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.  The default is *ChilledWater*.
 
 #### Field: Cooling Coil Availability Schedule Name
 
@@ -5914,7 +5914,7 @@ The high limit of outdoor dry-bulb temperature in C for outdoor air reset contro
 
 #### Field: Heating Coil Type
 
-The heating coil is located in the supply air stream, upstream of the cooling coil and after the outdoor air mixing box. If no central heating coil is used in the Constant Volume system,  then the option “none” should be specified here. Otherwise this indicates the type of heating coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
+The heating coil is located in the supply air stream, upstream of the cooling coil and after the outdoor air mixing box. If no central heating coil is used in the Constant Volume system,  then the option “none” should be specified here. Otherwise this indicates the type of heating coil. It is unlikely that both a heating coil and a preheat coil would be used at the same time. The choices for this field are
 
 - HotWater
 
@@ -5946,7 +5946,7 @@ FixedSetpoint uses the Heating Coil Design Setpoint as the supply air setpoint. 
 
 #### Field: Heating Coil Design Setpoint
 
-Enter the heating supply air temperature in C to be used for sizing the heating coil and zone supply air flow rates. If no Heating Coil Setpoint Schedule or Heating Coil Setpoint Reset Type is specified, this value is used as a constant heating supply air setpoint temperature.  The default is 50.0C.
+Enter the heating supply air temperature in C to be used for sizing the heating coil and zone supply air flow rates. If no Heating Coil Setpoint Schedule or Heating Coil Setpoint Reset Type is specified, this value is used as a constant heating supply air setpoint temperature.  The default is 50.0C.
 
 #### Field: Heating Coil Setpoint Schedule Name
 
@@ -6020,7 +6020,7 @@ Enter autosize or a value for the maximum amount of outdoor air flow into the un
 
 #### Field: Minimum Outdoor Air Flow Rate
 
-Enter autosize or the value for the minimum amount of outdoor air that can enter the unit and be distributed to the zones. Usually this is set to autosize and the value is calculated by the outdoor air requirements of each zone. If a value is entered it overrides the outdoor air  specification from the zone level. The units are in m3/s. The default is Autosize. The entered value is used to define the Minimum Outdoor Air Flow Rate for the Controller:OutdoorAir object that will be generated by this template.
+Enter autosize or the value for the minimum amount of outdoor air that can enter the unit and be distributed to the zones. Usually this is set to autosize and the value is calculated by the outdoor air requirements of each zone. If a value is entered it overrides the outdoor air  specification from the zone level. The units are in m3/s. The default is Autosize. The entered value is used to define the Minimum Outdoor Air Flow Rate for the Controller:OutdoorAir object that will be generated by this template.
 
 #### Field: Minimum Outdoor Air Control Type
 
@@ -6156,7 +6156,7 @@ There are two dehumidification control type options available:
 
 - CoolReheat
 
-The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the terminal unit reheat coils if available.
+The *CoolReheat* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the terminal unit reheat coils if available.
 
 The default is *None* which meets the sensible cooling setpoint only.
 
@@ -6166,11 +6166,11 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Dehumidification Relative Humidity Setpoint
 
-This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%. This field is ignored if a Dehumidification Relative Humidity Setpoint Schedule Name is specified.
+This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100).  The default is 60%. This field is ignored if a Dehumidification Relative Humidity Setpoint Schedule Name is specified.
 
 #### Field: Dehumidification Relative Humidity Setpoint Schedule Name
 
-Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
+Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
 
 #### Field: Humidifier Type
 
@@ -6180,7 +6180,7 @@ There are two humidifier type options available:
 
 - ElectricSteam
 
-The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
+The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
 
 #### Field: Humidifier Availability Schedule Name
 
@@ -6188,7 +6188,7 @@ If left blank, the humidifier will be available anytime the system is operating.
 
 #### Field: Humidifier Rated Capacity
 
-Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
+Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
 
 #### Field: Humidifier Rated Electric Power
 
@@ -6200,11 +6200,11 @@ This field specifies the zone name where the humidistat is located for controlli
 
 #### Field: Humidifier Relative Humidity Setpoint
 
-This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%. This field is ignored if a Humidifier Relative Humidity Setpoint Schedule Name is specified.
+This field specifies the zone humidistat setpoint for humidification in percent (0 to 100).  The default is 30%. This field is ignored if a Humidifier Relative Humidity Setpoint Schedule Name is specified.
 
 #### Field: Humidifier Relative Humidity Setpoint Schedule Name
 
-Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
+Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Relative Humidity Setpoint,  The values in the schedule are in percent (0 to 100).
 
 #### Field: Sizing Option
 
@@ -6252,97 +6252,97 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:System:DualDuct,
-    DD Sys 1,               !-Name
-    FanAvailSched,          !- System Availability Schedule Name
-     Single,                 !- Supply Fan Configuration Type  
-     autosize,               !- Main Supply Fan Maximum Flow Rate {m3/s}
-     0.2,                    !- Main Supply Fan Minimum Flow Fraction
-     0.7,                    !- Main Supply Fan Total Efficiency
-     600,                    !- Main Supply Fan Delta Pressure {Pa}
-     0.9,                    !- Main Supply Fan Motor Efficiency
-     1,                      !- Main Supply Fan Motor in Air Stream Fraction
-     InletVaneDampers,       !- Main Supply Fan Part-Load Power Coefficients
-    autosize,               !- Cold Duct Supply Fan Maximum Flow Rate {m3/s}
-     0.2,                    !- Cold Duct Supply Fan Minimum Flow Fraction
-     0.7,                    !- Cold Duct Supply Fan Total Efficiency
-     600,                    !- Cold Duct Supply Fan Delta Pressure {Pa}
-     0.9,                    !- Cold Duct Supply Fan Motor Efficiency
-     1,                   !- Cold Duct Supply Fan Motor in Air Stream Fraction
-     InletVaneDampers,    !- Cold Duct Supply Fan Part-Load Power Coefficients
-    DrawThrough,            !- Cold Duct Supply Fan Placement
-     autosize,               !- Hot Duct Supply Fan Maximum Flow Rate {m3/s}
-     0.2,                    !- Hot Duct Supply Fan Minimum Flow Fraction
-     0.7,                    !- Hot Duct Supply Fan Total Efficiency
-     600,                    !- Hot Duct Supply Fan Delta Pressure {Pa}
-     0.9,                    !- Hot Duct Supply Fan Motor Efficiency
-     1,                   !- Hot Duct Supply Fan Motor in Air Stream Fraction
-     InletVaneDampers,    !- Hot Duct Supply Fan Part-Load Power Coefficients
-    DrawThrough,            !- Hot Duct Supply Fan Placement
-    ChilledWater,           !- Cooling Coil Type
-    ,                       !- Cooling Coil Availability Schedule Name
-     ControlZone,            !- Cooling Coil Setpoint Control Type
-     12.8,                   !- Cooling Coil Design Setpoint {C}
-    ,                       !- Cooling Coil Setpoint Schedule Name
-     ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
-     ,                       !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
-     ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
-     ,                       !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
-    HotWater,               !- Heating Coil Type
-    ,                       !- Heating Coil Availability Schedule Name
-     FixedSetpoint,          !- Heating Coil Setpoint Control Type
-     50,                     !- Heating Coil Design Setpoint {C}
-    ,                       !- Heating Coil Setpoint Schedule Name
-     ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
-     ,                       !- Hedating Coil Reset Outdoor Dry-Bulb Low {C}
-     ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
-     ,                       !- Heating Coil Reset Outdoor Dry-Bulb High {C}
-    Autosize,               !- Heating Coil Capacity {W}
-    0.8,                    !- Gas Heating Coil Efficiency
-    0.0,                    !- Gas Heating Coil Parasitic Electric Load {W}
-    None,                   !- Preheat Coil Type
-    ,                       !- Preheat Coil Availability Schedule Name
-    ,                       !- Preheat Coil Setpoint Schedule Name
-    ,                       !- Preheat Coil Design Setpoint {C}
-    0.8,                    !- Gas Preheat Coil Efficiency
-    0.0,                    !- Gas Preheat Coil Parasitic Electric Load {W}
-    autosize,               !- Maximum Outdoor Air Flow Rate {m3/s}
-    autosize,               !- Minimum Outdoor Air Flow Rate {m3/s}
-    FixedMinimum,           !- Minimum Outdoor Air Control Type
-    Min OA Sched,           !- Minimum Outdoor Air Schedule Name
-    DifferentialDryBulb,    !- Economizer Type
-    NoLockout,              !- Economizer Lockout
-    19,                     !- Economizer Upper Temperature Limit {C}
-    4,                      !- Economizer Lower Temperature Limit {C}
-    ,                       !- Economizer Upper Enthalpy Limit {J/kg}
-    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
-    ,                       !- Cold Supply Plenum Name
-    ,                       !- Hot Supply Plenum Name
-    PLENUM-1,               !- Return Plenum Name
-     CycleOnAnyZoneFansOnly, !- Night Cycle Control
-    ,                       !- Night Cycle Control Zone Name
-    None,                   !- Heat Recovery Type
-    0.70,                   !- Sensible Heat Recovery Effectiveness
-     0.65,                   !- Latent Heat Recovery Effectiveness
-     ,                       !- Heat Recovery Heat Exchanger Type
-     ,                       !- Heat Recovery Frost Control Type
-     None,                   !- Dehumidification Control Type
-    ,                       !- Dehumidification Control Zone Name
-    60.0,    !- Dehumidification Relative Humidity Setpoint {percent}
-    ,         !- Dehumidification Relative Humidity Setpoint Schedule Name
-    None,                   !- Humidifier Type
-    ,                       !- Humidifier Availability Schedule Name
-    0.000001,               !- Humidifier Rated Capacity {m3/s}
-    2690.0,                 !- Humidifier Rated Electric Power {W}
-    ,                       !- Humidifier Control Zone Name
-    30.0,    !- Humidifier Relative Humidity Setpoint {percent}
-    ,         !- Humidifier Relative Humidity Setpoint Schedule Name
-    NonCoincident,          !- Sizing Option
-    No,                     !- Return Fan
-    0.7,                    !- Return Fan Total Efficiency
-     600,                    !- Return Fan Delta Pressure {Pa}
-     0.9,                    !- Return Fan Motor Efficiency
-     1.0;                    !- Return Fan Motor in Air Stream Fraction
-    InletVaneDampers;       !- Return Fan Part-Load Power Coefficients
+    DD Sys 1,               !-Name
+    FanAvailSched,          !- System Availability Schedule Name
+     Single,                 !- Supply Fan Configuration Type  
+     autosize,               !- Main Supply Fan Maximum Flow Rate {m3/s}
+     0.2,                    !- Main Supply Fan Minimum Flow Fraction
+     0.7,                    !- Main Supply Fan Total Efficiency
+     600,                    !- Main Supply Fan Delta Pressure {Pa}
+     0.9,                    !- Main Supply Fan Motor Efficiency
+     1,                      !- Main Supply Fan Motor in Air Stream Fraction
+     InletVaneDampers,       !- Main Supply Fan Part-Load Power Coefficients
+    autosize,               !- Cold Duct Supply Fan Maximum Flow Rate {m3/s}
+     0.2,                    !- Cold Duct Supply Fan Minimum Flow Fraction
+     0.7,                    !- Cold Duct Supply Fan Total Efficiency
+     600,                    !- Cold Duct Supply Fan Delta Pressure {Pa}
+     0.9,                    !- Cold Duct Supply Fan Motor Efficiency
+     1,                   !- Cold Duct Supply Fan Motor in Air Stream Fraction
+     InletVaneDampers,    !- Cold Duct Supply Fan Part-Load Power Coefficients
+    DrawThrough,            !- Cold Duct Supply Fan Placement
+     autosize,               !- Hot Duct Supply Fan Maximum Flow Rate {m3/s}
+     0.2,                    !- Hot Duct Supply Fan Minimum Flow Fraction
+     0.7,                    !- Hot Duct Supply Fan Total Efficiency
+     600,                    !- Hot Duct Supply Fan Delta Pressure {Pa}
+     0.9,                    !- Hot Duct Supply Fan Motor Efficiency
+     1,                   !- Hot Duct Supply Fan Motor in Air Stream Fraction
+     InletVaneDampers,    !- Hot Duct Supply Fan Part-Load Power Coefficients
+    DrawThrough,            !- Hot Duct Supply Fan Placement
+    ChilledWater,           !- Cooling Coil Type
+    ,                       !- Cooling Coil Availability Schedule Name
+     ControlZone,            !- Cooling Coil Setpoint Control Type
+     12.8,                   !- Cooling Coil Design Setpoint {C}
+    ,                       !- Cooling Coil Setpoint Schedule Name
+     ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
+     ,                       !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
+     ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
+     ,                       !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
+    HotWater,               !- Heating Coil Type
+    ,                       !- Heating Coil Availability Schedule Name
+     FixedSetpoint,          !- Heating Coil Setpoint Control Type
+     50,                     !- Heating Coil Design Setpoint {C}
+    ,                       !- Heating Coil Setpoint Schedule Name
+     ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
+     ,                       !- Hedating Coil Reset Outdoor Dry-Bulb Low {C}
+     ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
+     ,                       !- Heating Coil Reset Outdoor Dry-Bulb High {C}
+    Autosize,               !- Heating Coil Capacity {W}
+    0.8,                    !- Gas Heating Coil Efficiency
+    0.0,                    !- Gas Heating Coil Parasitic Electric Load {W}
+    None,                   !- Preheat Coil Type
+    ,                       !- Preheat Coil Availability Schedule Name
+    ,                       !- Preheat Coil Setpoint Schedule Name
+    ,                       !- Preheat Coil Design Setpoint {C}
+    0.8,                    !- Gas Preheat Coil Efficiency
+    0.0,                    !- Gas Preheat Coil Parasitic Electric Load {W}
+    autosize,               !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,               !- Minimum Outdoor Air Flow Rate {m3/s}
+    FixedMinimum,           !- Minimum Outdoor Air Control Type
+    Min OA Sched,           !- Minimum Outdoor Air Schedule Name
+    DifferentialDryBulb,    !- Economizer Type
+    NoLockout,              !- Economizer Lockout
+    19,                     !- Economizer Upper Temperature Limit {C}
+    4,                      !- Economizer Lower Temperature Limit {C}
+    ,                       !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                       !- Cold Supply Plenum Name
+    ,                       !- Hot Supply Plenum Name
+    PLENUM-1,               !- Return Plenum Name
+     CycleOnAnyZoneFansOnly, !- Night Cycle Control
+    ,                       !- Night Cycle Control Zone Name
+    None,                   !- Heat Recovery Type
+    0.70,                   !- Sensible Heat Recovery Effectiveness
+     0.65,                   !- Latent Heat Recovery Effectiveness
+     ,                       !- Heat Recovery Heat Exchanger Type
+     ,                       !- Heat Recovery Frost Control Type
+     None,                   !- Dehumidification Control Type
+    ,                       !- Dehumidification Control Zone Name
+    60.0,    !- Dehumidification Relative Humidity Setpoint {percent}
+    ,         !- Dehumidification Relative Humidity Setpoint Schedule Name
+    None,                   !- Humidifier Type
+    ,                       !- Humidifier Availability Schedule Name
+    0.000001,               !- Humidifier Rated Capacity {m3/s}
+    2690.0,                 !- Humidifier Rated Electric Power {W}
+    ,                       !- Humidifier Control Zone Name
+    30.0,    !- Humidifier Relative Humidity Setpoint {percent}
+    ,         !- Humidifier Relative Humidity Setpoint Schedule Name
+    NonCoincident,          !- Sizing Option
+    No,                     !- Return Fan
+    0.7,                    !- Return Fan Total Efficiency
+     600,                    !- Return Fan Delta Pressure {Pa}
+     0.9,                    !- Return Fan Motor Efficiency
+     1.0;                    !- Return Fan Motor in Air Stream Fraction
+    InletVaneDampers;       !- Return Fan Part-Load Power Coefficients
 ```
 
 
@@ -6376,7 +6376,7 @@ This field is a unique name which the user assigns to this system. This name can
 
 #### Field: System Availability Schedule Name
 
-Leave this field blank if you want the system to operate at all times.  If a schedule name is specified, those times that the system is operating should be specified as 1.0. Those times that the system is not operating should have a zero value in the schedule specified. Please note that for this system type, this is a schedule of when the system is providing air flow.
+Leave this field blank if you want the system to operate at all times.  If a schedule name is specified, those times that the system is operating should be specified as 1.0. Those times that the system is not operating should have a zero value in the schedule specified. Please note that for this system type, this is a schedule of when the system is providing air flow.
 
 #### Field: Air Outlet Type
 
@@ -6426,13 +6426,13 @@ There are seven coil types available:
 
 - None
 
-*ChilledWater* uses the Coil:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most chilled water applications.
+*ChilledWater* uses the Coil:Cooling:Water object with the DetailedAnalysis option.  This is the preferred coil model for most chilled water applications.
 
-*ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.
+*ChilledWaterDetailedFlatModel* uses the Coil:Cooling:Water:DetailedGeometry object.  This option is available for special applications.
 
 *TwoSpeedDX* uses the Coil:Cooling:DX:TwoSpeed object.
 
-*TwoStageDX* and *TwoStageHumidityControlDX*  use the Coil:Cooling:DX:TwoStageWithHumidityControlMode object.
+*TwoStageDX* and *TwoStageHumidityControlDX*  use the Coil:Cooling:DX:TwoStageWithHumidityControlMode object.
 
 *HeatExchangerAssistedChilledWater* uses the CoilSystem:Cooling:Water:HeatExchangerAssisted, HeatExchanger:AirToAir:SensibleAndLatent, and Coil:Cooling:Water objects.
 
@@ -6460,11 +6460,11 @@ NOTE: The user must ensure that the cooling coil and heating coil setpoints do n
 
 #### Field: Cooling Coil Design Setpoint
 
-Enter the cooling supply air temperature in C to be used for sizing the cooling coil and zone supply air flow rates. The default is 12.8C. If Cooling Coil Setpoint Control Type  = FixedSetpoint, then this value is also used as the constant cooling supply air setpoint temperature.
+Enter the cooling supply air temperature in C to be used for sizing the cooling coil and zone supply air flow rates. The default is 12.8C. If Cooling Coil Setpoint Control Type  = FixedSetpoint, then this value is also used as the constant cooling supply air setpoint temperature.
 
 #### Field: Cooling Coil Setpoint Schedule Name
 
-This field is used when Cooling Coil Setpoint Control Type  = Scheduled. The schedule should control the supply air temperature delivered to the zones. For Blow Through fan placement, this is the leaving air temperature from the cooling coil. For Draw Through fan placement, this is the leaving air temperature after the supply fan. The values in the schedule are in degrees C. This field is ignored if the Cooling Coil Setpoint Reset Type is something other than Scheduled (see above).
+This field is used when Cooling Coil Setpoint Control Type  = Scheduled. The schedule should control the supply air temperature delivered to the zones. For Blow Through fan placement, this is the leaving air temperature from the cooling coil. For Draw Through fan placement, this is the leaving air temperature after the supply fan. The values in the schedule are in degrees C. This field is ignored if the Cooling Coil Setpoint Reset Type is something other than Scheduled (see above).
 
 #### Field: Cooling Coil Setpoint at Outdoor Dry-Bulb Low
 
@@ -6484,15 +6484,15 @@ The high limit of outdoor dry-bulb temperature in C for outdoor air reset contro
 
 #### Field: DX Cooling Coil Gross Rated Total Capacity
 
-Enter Autosize to let the automatic sizing algorithm determine the cooling coil gross total cooling capacity based on the maximum cooling loads during the cooling design day. If a value is entered, it represents the full load gross total cooling capacity, including both sensible and latent capacity, in watts of the DX coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. Capacity should be the “gross”, i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is Autosize. This field is only used when the cooling coil type is set to one of the DX options.  For two-speed DX coils, the low-speed capacity is assumed to be 0.33 times this value.  For two-stage DX coils, the stage 1 capacity is assumed to be 0.5 times this value.
+Enter Autosize to let the automatic sizing algorithm determine the cooling coil gross total cooling capacity based on the maximum cooling loads during the cooling design day. If a value is entered, it represents the full load gross total cooling capacity, including both sensible and latent capacity, in watts of the DX coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. Capacity should be the “gross”, i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is Autosize. This field is only used when the cooling coil type is set to one of the DX options.  For two-speed DX coils, the low-speed capacity is assumed to be 0.33 times this value.  For two-stage DX coils, the stage 1 capacity is assumed to be 0.5 times this value.
 
 #### Field: DX Cooling Coil Gross Rated Sensible Heat Ratio
 
-Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the gross rated cooling total capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by gross total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is Autosize. This field is only used when the cooling coil type is set to one of the DX options. For two-speed DX coils, the low-speed SHR is assumed to be equal to this value. For two-stage DX coils, the stage 1 SHR is assumed to be equal to this value. For two-stage DX coil with humidity control, the humidity control mode SHR is assumed to be 0.9 times this value (for both stage 1 and stage 2).
+Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the gross rated cooling total capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by gross total cooling capacity of the DX cooling coil at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be “gross”, i.e., the effect of supply air fan heat is not accounted for.  The default is Autosize. This field is only used when the cooling coil type is set to one of the DX options. For two-speed DX coils, the low-speed SHR is assumed to be equal to this value. For two-stage DX coils, the stage 1 SHR is assumed to be equal to this value. For two-stage DX coil with humidity control, the humidity control mode SHR is assumed to be 0.9 times this value (for both stage 1 and stage 2).
 
 #### Field: DX Cooling Coil Gross Rated COP
 
-Enter the coefficient of performance defined as the gross cooling coil total capacity in watts divided by electrical power input in watts of the DX cooling coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. The input power includes electric power for the compressor and condenser fan but does not include the power consumption of the supply air fan. The default is 3.0. This field is only used when the cooling coil type is set to one of the DX options.  For two-speed DX coils, the low-speed COP is assumed to be 1.5 times this value.  For two-stage DX coils, the stage 1 COP is assumed to be this this value. For two-stage DX coil with humidity control, the humidity control mode COP is assumed to be 0.9 times this value (for both stage 1 and stage 2). The gross COP should not account for the supply air fan.
+Enter the coefficient of performance defined as the gross cooling coil total capacity in watts divided by electrical power input in watts of the DX cooling coil unit at rated conditions. Rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb. The input power includes electric power for the compressor and condenser fan but does not include the power consumption of the supply air fan. The default is 3.0. This field is only used when the cooling coil type is set to one of the DX options.  For two-speed DX coils, the low-speed COP is assumed to be 1.5 times this value.  For two-stage DX coils, the stage 1 COP is assumed to be this this value. For two-stage DX coil with humidity control, the humidity control mode COP is assumed to be 0.9 times this value (for both stage 1 and stage 2). The gross COP should not account for the supply air fan.
 
 #### Field: Heating Coil Type
 
@@ -6528,7 +6528,7 @@ NOTE: The user must ensure that the cooling coil and heating coil setpoints do n
 
 #### Field: Heating Coil Design Setpoint
 
-Enter the heating supply air temperature in C to be used for sizing the heating coil and zone supply air flow rates. If Heating Coil Setpoint Control Type = FixedSetpoint, then this value is also used as the constant heating supply air setpoint temperature.  The default is 12.2C.
+Enter the heating supply air temperature in C to be used for sizing the heating coil and zone supply air flow rates. If Heating Coil Setpoint Control Type = FixedSetpoint, then this value is also used as the constant heating supply air setpoint temperature.  The default is 12.2C.
 
 #### Field: Heating Coil Setpoint Schedule Name
 
@@ -6604,7 +6604,7 @@ There are three dehumidification control type options available:
 
 - Multimode
 
-The *CoolReheatHeatingCoil* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the heating coil, if available.
+The *CoolReheatHeatingCoil* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so.  Reheat is provided as required by the heating coil, if available.
 
 The *CollReheatDesuperheater* option cools beyond the dry-bulb setpoint as required to meet the humidity setpoint if the system is capable of doing so. Reheat is provided by a desuperheater coil (Ref. object Coil:Heating:Desuperheater). The desuperheater coil setpoint is set to the cooling setpoint and the desuperheater Heat Reclaim Recovery Efficiency is set to 0.3. *CollReheatDesuperheater* is only applicable for Cooling Coil Type *TwoSpeedDX, TwoStageDX, TwoStageHumidityControlDX, or HeatExchangerAssistedDX.*
 
@@ -6614,7 +6614,7 @@ The default is *None* which meets the sensible dry-bulb temperature cooling setp
 
 #### Field: Dehumidification Setpoint
 
-This field specifies the supply air humidity ratio setpoint for dehumidification.  The default is 0.00924 kgWater/kgDryAir (12.8C or 55F dewpoint).  This value is also used as the Central Cooling Design Supply Air Humidity Ratio in the Sizing:System object. If a Dehumidification Setpoint Schedule Name is specified, the schedule will be used for control.
+This field specifies the supply air humidity ratio setpoint for dehumidification.  The default is 0.00924 kgWater/kgDryAir (12.8C or 55F dewpoint).  This value is also used as the Central Cooling Design Supply Air Humidity Ratio in the Sizing:System object. If a Dehumidification Setpoint Schedule Name is specified, the schedule will be used for control.
 
 #### Field: Humidifier Type
 
@@ -6624,7 +6624,7 @@ There are two humidifier type options available:
 
 - ElectricSteam
 
-The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
+The *ElectricSteam* humidifier option uses the Humidifier:Steam:Electric object.  The default is *None.*
 
 #### Field: Humidifier Availability Schedule Name
 
@@ -6632,7 +6632,7 @@ If left blank, the humidifier will be available anytime the system is operating.
 
 #### Field: Humidifier Rated Capacity
 
-Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
+Enter the rated moisture output rate in m3/s.  The humidifier does not currently autosize, so the default is very large to allow for adequate capacity.  The default is 0.000001 m3/s.
 
 #### Field: Humidifier Rated Electric Power
 
@@ -6644,62 +6644,62 @@ This field specifies the supply air humidity ratio setpoint for humidification. 
 
 #### Field: Dehumidification Setpoint Schedule Name
 
-Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Setpoint,  The values in the schedule are in units of humidity ratio (kgWater/kgDryAir or lbWater/lbDryAir).
+Enter the name of the dehumidification setpoint schedule. If this field is left blank, the setpoint will be constant at the Dehumidification Setpoint,  The values in the schedule are in units of humidity ratio (kgWater/kgDryAir or lbWater/lbDryAir).
 
 #### Field: Humidifier Setpoint Schedule Name
 
-Enter the name of the humidifier setpoint schedule. If this field is left blank, the setpoint will be constant at the Humidifier Setpoint,  The values in the schedule are in units of humidity ratio (kgWater/kgDryAir or lbWater/lbDryAir).
+Enter the name of the humidifier setpoint schedule. If this field is left blank, the setpoint will be constant at the Humidifier Setpoint,  The values in the schedule are in units of humidity ratio (kgWater/kgDryAir or lbWater/lbDryAir).
 
 As shown in an IDF:
 
 ```idf
 HVACTemplate:System:DedicatedOutdoorAir,
-    DOAS,                    !- Name
-    ,                        !- System Availability Schedule Name
-    DirectIntoZone,          !- Air Outlet Type
-    autosize,                !- Supply Fan Flow Rate {m3/s}
-    0.7,                     !- Supply Fan Total Efficiency
-    1000,                    !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    DrawThrough,             !- Supply Fan Placement
-    ChilledWater,            !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    FixedSetpoint,           !- Cooling Coil Setpoint Control Type
-    ,                        !- Cooling Coil Setpoint Schedule Name
-    12.8,                    !- Cooling Coil Design Setpoint {C}
-    15.6,                !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
-    15.6,                    !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
-    12.8,               !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
-    23.3,                    !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
-    autosize,           !- DX Cooling Coil Gross Rated Total Capacity {W}
-    autosize,           !- DX Cooling Coil Gross Rated Sensible Heat Ratio
-    3,                       !- DX Cooling Coil Gross Rated COP
-    HotWater,                !- Heating Coil Type
-    ,                        !- Heating Coil Availability Schedule Name
-    FixedSetpoint,           !- Heating Coil Setpoint Control Type
-    ,                        !- Heating Coil Setpoint Schedule Name
-    12.2,                    !- Heating Coil Design Setpoint {C}
-    15,                  !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
-    7.8,                     !- Heating Coil Reset Outdoor Dry-Bulb Low {C}
-    12.2,               !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
-    12.2,                    !- Heating Coil Reset Outdoor Dry-Bulb High {C}
-    0.8,                     !- Gas Heating Coil Efficiency
-    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-    Enthalpy,                !- Heat Recovery Type
-    0.7,                     !- Sensible Heat Recovery Effectiveness
-    0.65,                    !- Latent Heat Recovery Effectiveness
-    Plate,                   !- Heat Exchanger Type
-    None,                    !- Frost Control Type
-    None,                    !- Dehumidification Control Type
-    0.00924,                 !- Dehumidification Setpoint {kgWater/kgDryAir}
-    None,                    !- Humidifier Type
-    ,                        !- Humidifier Availability Schedule Name
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    2690,                    !- Humidifier Rated Electric Power {W}
-    0.003,                   !- Humidifier Setpoint {kgWater/kgDryAir}
-    ,                        !- Dehumidification Setpoint Schedule Name
-    ;                        !- Humidifier Setpoint Schedule Name
+    DOAS,                    !- Name
+    ,                        !- System Availability Schedule Name
+    DirectIntoZone,          !- Air Outlet Type
+    autosize,                !- Supply Fan Flow Rate {m3/s}
+    0.7,                     !- Supply Fan Total Efficiency
+    1000,                    !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    DrawThrough,             !- Supply Fan Placement
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    FixedSetpoint,           !- Cooling Coil Setpoint Control Type
+    ,                        !- Cooling Coil Setpoint Schedule Name
+    12.8,                    !- Cooling Coil Design Setpoint {C}
+    15.6,                !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
+    15.6,                    !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
+    12.8,               !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
+    23.3,                    !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
+    autosize,           !- DX Cooling Coil Gross Rated Total Capacity {W}
+    autosize,           !- DX Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- DX Cooling Coil Gross Rated COP
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    FixedSetpoint,           !- Heating Coil Setpoint Control Type
+    ,                        !- Heating Coil Setpoint Schedule Name
+    12.2,                    !- Heating Coil Design Setpoint {C}
+    15,                  !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
+    7.8,                     !- Heating Coil Reset Outdoor Dry-Bulb Low {C}
+    12.2,               !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
+    12.2,                    !- Heating Coil Reset Outdoor Dry-Bulb High {C}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    Enthalpy,                !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    Plate,                   !- Heat Exchanger Type
+    None,                    !- Frost Control Type
+    None,                    !- Dehumidification Control Type
+    0.00924,                 !- Dehumidification Setpoint {kgWater/kgDryAir}
+    None,                    !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    0.000001,                !- Humidifier Rated Capacity {m3/s}
+    2690,                    !- Humidifier Rated Electric Power {W}
+    0.003,                   !- Humidifier Setpoint {kgWater/kgDryAir}
+    ,                        !- Dehumidification Setpoint Schedule Name
+    ;                        !- Humidifier Setpoint Schedule Name
 ```
 
 
@@ -6781,7 +6781,7 @@ The rated head of the primary chilled water pump in Pa. The default value is 179
 
 #### Field: Secondary Chilled Water Pump Rated Head
 
-The rated head of the secondary chilled water pump in Pa. The default value is 179352 Pa which is equivalent to 60 feet H<sub>2</sub>O.  This field is applicable only if the “Chilled Water Pump Configuration” is *Constant Primary Variable Secondary* or *Variable Primary Constant Secondary*.
+The rated head of the secondary chilled water pump in Pa. The default value is 179352 Pa which is equivalent to 60 feet H<sub>2</sub>O.  This field is applicable only if the “Chilled Water Pump Configuration” is *Constant Primary Variable Secondary* or *Variable Primary Constant Secondary*.
 
 #### Field: Condenser Plant Operation Scheme Type
 
@@ -6827,7 +6827,7 @@ Used when Condenser Water Temperature Control Type is set to Specified Setpoint.
 
 #### Field: Condenser Water Pump Rated Head
 
-The rated head of the condenser water pumps in  Pa. May be left blank if not serving any water cooled chillers. The default value is 179352 Pa which is equivalent to 60 feet H2O.
+The rated head of the condenser water pumps in  Pa. May be left blank if not serving any water cooled chillers. The default value is 179352 Pa which is equivalent to 60 feet H2O.
 
 #### Field: Chilled Water Setpoint Reset Type
 
@@ -6980,39 +6980,39 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:Plant:ChilledWaterLoop,
-    Chilled Water Loop,      !- Plant Loop Name
-    CoolingPumpAvailSched,   !- Pump Schedule
-    Intermittent,            !- Pump Control Type
-    Default,                 !- Chiller Plant Operation Scheme Type
-    ,                        !- Chiller Plant Operation Scheme Name
-    CW Loop Temp Schedule,   !- Chilled Water Setpoint Schedule
-    7.22,                    !- Chilled Water Design Setpoint {C}
-    VariableFlowNoSecondary, !- Chilled Water Pump Configuration
-    179352,                  !- Primary Chilled Water Pump Rated Head {Pa}
-    179352,                  !- Secondary Chilled Water Pump Rated Head {Pa}
-    Default,                 !- Condenser Plant Operation Scheme Type
-    ,                        !- Condenser Plant Operation Scheme List Name
-    OutdoorWetBulbTemperature,    !- Condenser Water Temperature Control Type
-    ,                        !- Condenser Water Setpoint Schedule
-    29.4,                    !- Condenser Water Design Setpoint {C}
-    179352,                  !- Condenser Water Pump Rated Head {Pa}
-    None,                    !- Chilled Water Setpoint Reset Type
-    12.2,              !- Chilled Water Setpoint at Outdoor Dry Bulb Low {C}
-    15.6,              !- Chilled Water Reset Outdoor Dry Bulb Low {C}
-    6.7,               !- Chilled Water Setpoint at Outdoor Dry Bulb High {C}
-    26.7,              !- Chilled Water Reset Outdoor Dry Bulb High {C}
-    SinglePump,              !- Chilled Water Primary Pump Type
-    SinglePump,              !- Chilled Water Secondary Pump Type
-    SinglePump,              !- Condenser Water Pump Type
-    Yes,                     !- Chilled Water Supply Side Bypass Pipe
-    Yes,                     !- Chilled Water Demand Side Bypass Pipe
-    Yes,                     !- Condenser Water Supply Side Bypass Pipe
-    Yes,                     !- Condenser Water Demand Side Bypass Pipe
-    Water,                   !- Fluid Type
-    6.67,                    !- Loop Design Delta Temperature {deltaC}
-    ,                        !- Minimum Outdoor Dry Bulb Temperature {C}
-    SequentialLoad,          !- Chilled Water Load Distribution Scheme
-    SequentialLoad;          !- Condenser Water Load Distribution Scheme
+    Chilled Water Loop,      !- Plant Loop Name
+    CoolingPumpAvailSched,   !- Pump Schedule
+    Intermittent,            !- Pump Control Type
+    Default,                 !- Chiller Plant Operation Scheme Type
+    ,                        !- Chiller Plant Operation Scheme Name
+    CW Loop Temp Schedule,   !- Chilled Water Setpoint Schedule
+    7.22,                    !- Chilled Water Design Setpoint {C}
+    VariableFlowNoSecondary, !- Chilled Water Pump Configuration
+    179352,                  !- Primary Chilled Water Pump Rated Head {Pa}
+    179352,                  !- Secondary Chilled Water Pump Rated Head {Pa}
+    Default,                 !- Condenser Plant Operation Scheme Type
+    ,                        !- Condenser Plant Operation Scheme List Name
+    OutdoorWetBulbTemperature,    !- Condenser Water Temperature Control Type
+    ,                        !- Condenser Water Setpoint Schedule
+    29.4,                    !- Condenser Water Design Setpoint {C}
+    179352,                  !- Condenser Water Pump Rated Head {Pa}
+    None,                    !- Chilled Water Setpoint Reset Type
+    12.2,              !- Chilled Water Setpoint at Outdoor Dry Bulb Low {C}
+    15.6,              !- Chilled Water Reset Outdoor Dry Bulb Low {C}
+    6.7,               !- Chilled Water Setpoint at Outdoor Dry Bulb High {C}
+    26.7,              !- Chilled Water Reset Outdoor Dry Bulb High {C}
+    SinglePump,              !- Chilled Water Primary Pump Type
+    SinglePump,              !- Chilled Water Secondary Pump Type
+    SinglePump,              !- Condenser Water Pump Type
+    Yes,                     !- Chilled Water Supply Side Bypass Pipe
+    Yes,                     !- Chilled Water Demand Side Bypass Pipe
+    Yes,                     !- Condenser Water Supply Side Bypass Pipe
+    Yes,                     !- Condenser Water Demand Side Bypass Pipe
+    Water,                   !- Fluid Type
+    6.67,                    !- Loop Design Delta Temperature {deltaC}
+    ,                        !- Minimum Outdoor Dry Bulb Temperature {C}
+    SequentialLoad,          !- Chilled Water Load Distribution Scheme
+    SequentialLoad;          !- Condenser Water Load Distribution Scheme
 ```
 
 ### HVACTemplate:Plant:Chiller
@@ -7089,24 +7089,24 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:Plant:Chiller,
-    District Cooling,        !- Chiller Name
-    ElectricCentrifugalChiller,  !- Chiller Type
-    autosize,                !- Capacity {W}
-    3.2,                     !- COP
-    WaterCooled,             !- Condenser Type
-    1,                       !- Priority
-    1,                       !- Sizing Factor
-    0.1,                     !- Minimum Part Load Ratio
-    1.1,                     !- Maximum Part Load Ratio
-    0.9,                     !- Optimum Part Load Ratio
-    0.2,                     !- Minimum Unloading Ratio
-    2;                 !- Leaving Chilled Water Lower Temperature Limit {C}
+    District Cooling,        !- Chiller Name
+    ElectricCentrifugalChiller,  !- Chiller Type
+    autosize,                !- Capacity {W}
+    3.2,                     !- COP
+    WaterCooled,             !- Condenser Type
+    1,                       !- Priority
+    1,                       !- Sizing Factor
+    0.1,                     !- Minimum Part Load Ratio
+    1.1,                     !- Maximum Part Load Ratio
+    0.9,                     !- Optimum Part Load Ratio
+    0.2,                     !- Minimum Unloading Ratio
+    2;                 !- Leaving Chilled Water Lower Temperature Limit {C}
 ```
 
 
 ### HVACTemplate:Plant:Chiller:ObjectReference
 
-#### This object references a detailed chiller object and adds it to an HVACTemplate:Plant:ChilledWaterLoop. The user must create a complete detailed chiller object with all required curve or performance objects. The detailed chiller object is referenced by object type and name and the chiller will be automatically to the chilled water loop branches and equipment list.
+This object references a detailed chiller object and adds it to an HVACTemplate:Plant:ChilledWaterLoop. The user must create a complete detailed chiller object with all required curve or performance objects. The detailed chiller object is referenced by object type and name and the chiller will be automatically to the chilled water loop branches and equipment list.
 
 #### Field: Name
 
@@ -7132,10 +7132,10 @@ An example in an IDF:
 
 ```idf
 HVACTemplate:Plant:Chiller:ObjectReference,
-    Main Chiller Connection, !- Name
-    Chiller:Electric:EIR,    !- Chiller Object Type
-    Main Chiller,            !- Chiller Name
-    1;                       !- Priority
+    Main Chiller Connection, !- Name
+    Chiller:Electric:EIR,    !- Chiller Object Type
+    Main Chiller,            !- Chiller Name
+    1;                       !- Priority
 ```
 
 
@@ -7185,23 +7185,23 @@ Enter the priority number of the tower where 1 is the highest priority, 2 is jus
 
 This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature.For this component the tower object inputs that would be altered by the sizing factor are:
 
-1.    Design Water Flow Rate;
+1.    Design Water Flow Rate;
 
-2.    Air Flow Rate at High Fan Speed;
+2.    Air Flow Rate at High Fan Speed;
 
-3.    Fan Power at High Fan Speed;
+3.    Fan Power at High Fan Speed;
 
-4.    U-Factor Times Area Value at High Fan Speed;
+4.    U-Factor Times Area Value at High Fan Speed;
 
-5.    Air Flow Rate at Low Fan Speed (for two-speed tower);
+5.    Air Flow Rate at Low Fan Speed (for two-speed tower);
 
-6.    Fan Power at Low Fan Speed (for two-speed tower);
+6.    Fan Power at Low Fan Speed (for two-speed tower);
 
-7.    U-Factor Times Area Value at Low Fan Speed (for two-speed tower);
+7.    U-Factor Times Area Value at Low Fan Speed (for two-speed tower);
 
-8.    Air Flow Rate in Free Convection Regime;
+8.    Air Flow Rate in Free Convection Regime;
 
-9.    U-Factor Times Area Value at Free Convection Air Flow Rate.
+9.    U-Factor Times Area Value at Free Convection Air Flow Rate.
 
 Note that the U-Factor Times Area Value at High Fan Speed is not *multiplied* by the Sizing Factor. Instead the design tower load is multiplied by the sizing factor and the design UA then calculated as usual. The U-Factor Times Area Value at Low Fan Speed is set to 60% of the full load design UA. The U-Factor Times Area Value at Free Convection Air Flow Rate is set to 10% of the design Tower UA.
 
@@ -7212,22 +7212,22 @@ This field specifies whether this tower will serve a *ChilledWaterLoop* (ref. HV
 An example in an IDF:
 
 ```idf
-  HVACTemplate:Plant:Tower,
-    Main Tower,              !- Name
-    SingleSpeed,             !- Tower Type
-    autosize,                !- High Speed Nominal Capacity {W}
-    autosize,                !- High Speed Fan Power {W}
-    autosize,                !- Low Speed Nominal Capacity {W}
-    autosize,                !- Low Speed Fan Power {W}
-    autosize,                !- Free Convection Capacity {W}
-    1,                       !- Priority
-    ;                        !- Sizing Factor
+  HVACTemplate:Plant:Tower,
+    Main Tower,              !- Name
+    SingleSpeed,             !- Tower Type
+    autosize,                !- High Speed Nominal Capacity {W}
+    autosize,                !- High Speed Fan Power {W}
+    autosize,                !- Low Speed Nominal Capacity {W}
+    autosize,                !- Low Speed Fan Power {W}
+    autosize,                !- Free Convection Capacity {W}
+    1,                       !- Priority
+    ;                        !- Sizing Factor
 ```
 
 
 ### HVACTemplate:Plant:Tower:ObjectReference
 
-#### This object references a detailed cooling tower object and adds it to an HVACTemplate:Plant:ChilledWaterLoop or MixedWaterLoop. The user must create a complete detailed cooling tower object with all required curve or performance objects. The detailed cooling tower object is referenced by object type and name and the tower will be automatically to the chilled water loop or mixed water loop branches and equipment list.
+This object references a detailed cooling tower object and adds it to an HVACTemplate:Plant:ChilledWaterLoop or MixedWaterLoop. The user must create a complete detailed cooling tower object with all required curve or performance objects. The detailed cooling tower object is referenced by object type and name and the tower will be automatically to the chilled water loop or mixed water loop branches and equipment list.
 
 #### Field: Name
 
@@ -7261,10 +7261,10 @@ An example in an IDF:
 
 ```idf
 HVACTemplate:Plant:Tower:ObjectReference,
-    Main Tower Connection,   !- Name
-    CoolingTower:TwoSpeed,   !- Cooling Tower Object Type
-    Main Tower,              !- Cooling Tower Name
-    1;                       !- Priority
+    Main Tower Connection,   !- Name
+    CoolingTower:TwoSpeed,   !- Cooling Tower Object Type
+    Main Tower,              !- Cooling Tower Name
+    1;                       !- Priority
 ```
 
 
@@ -7440,27 +7440,27 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:Plant:HotWaterLoop,
-    Hot Water Loop,          !-Plant Loop Name
-    ,                        !- Pump Schedule
-    Intermittent,            !- Pump Control Type
-    Default,                 !- Hot Water Plant Operation Scheme Type
-    ,                        !- Hot Water Plant Operation Scheme List Name
-    HW Loop Temp Schedule,   !- Hot Water Setpoint Schedule
-    82,                    !- Hot Water Design Setpoint {C}
-    VariableFlow,          !- Hot Water Pump Configuration
-    179352,                !- Hot Water Pump Rated Head {Pa}
-    None,                  !- Hot Water Setpoint Reset Type
-    82.2,                  !- Hot Water Setpoint at Outdoor Dry Bulb Low {C}
-    -6.7,                  !- Hot Water Reset Outdoor Dry Bulb Low {C}
-    65.6,                  !- Hot Water Setpoint at Outdoor Dry Bulb High {C}
-    10,                    !- Hot Water Reset Outdoor Dry Bulb High {C}
-    SinglePump,              !- Hot Water Pump Type
-    Yes,                     !- Supply Side Bypass Pipe
-    Yes,                     !- Demand Side Bypass Pipe
-    Water,                   !- Fluid Type
-    11,                      !- Loop Design Delta Temperature {deltaC}
-    ,                        !- Maximum Outdoor Dry Bulb Temperature {C}
-    SequentialLoad;              !- Load Distribution Scheme
+    Hot Water Loop,          !-Plant Loop Name
+    ,                        !- Pump Schedule
+    Intermittent,            !- Pump Control Type
+    Default,                 !- Hot Water Plant Operation Scheme Type
+    ,                        !- Hot Water Plant Operation Scheme List Name
+    HW Loop Temp Schedule,   !- Hot Water Setpoint Schedule
+    82,                    !- Hot Water Design Setpoint {C}
+    VariableFlow,          !- Hot Water Pump Configuration
+    179352,                !- Hot Water Pump Rated Head {Pa}
+    None,                  !- Hot Water Setpoint Reset Type
+    82.2,                  !- Hot Water Setpoint at Outdoor Dry Bulb Low {C}
+    -6.7,                  !- Hot Water Reset Outdoor Dry Bulb Low {C}
+    65.6,                  !- Hot Water Setpoint at Outdoor Dry Bulb High {C}
+    10,                    !- Hot Water Reset Outdoor Dry Bulb High {C}
+    SinglePump,              !- Hot Water Pump Type
+    Yes,                     !- Supply Side Bypass Pipe
+    Yes,                     !- Demand Side Bypass Pipe
+    Water,                   !- Fluid Type
+    11,                      !- Loop Design Delta Temperature {deltaC}
+    ,                        !- Maximum Outdoor Dry Bulb Temperature {C}
+    SequentialLoad;              !- Load Distribution Scheme
 ```
 
 
@@ -7549,24 +7549,24 @@ This field specifies whether this boiler will serve a *HotWaterLoop* (ref. HVACT
 An example in an IDF:
 
 ```idf
-  HVACTemplate:Plant:Boiler,
-    Main Boiler,             !- Name
-    HotWaterBoiler,          !- Boiler Type
-    autosize,                !- Capacity {W}
-    0.8,                     !- Efficiency
-    NaturalGas,              !- Fuel Type
-    1,                       !- Priority
-    1,                       !- Sizing Factor
-    0.1,                     !- Minimum Part Load Ratio
-    1.1,                     !- Maximum Part Load Ratio
-    0.9,                     !- Optimum Part Load Ratio
-    99.9;                    !- Water Outlet Upper Temperature Limit {C}
+  HVACTemplate:Plant:Boiler,
+    Main Boiler,             !- Name
+    HotWaterBoiler,          !- Boiler Type
+    autosize,                !- Capacity {W}
+    0.8,                     !- Efficiency
+    NaturalGas,              !- Fuel Type
+    1,                       !- Priority
+    1,                       !- Sizing Factor
+    0.1,                     !- Minimum Part Load Ratio
+    1.1,                     !- Maximum Part Load Ratio
+    0.9,                     !- Optimum Part Load Ratio
+    99.9;                    !- Water Outlet Upper Temperature Limit {C}
 ```
 
 
 ### HVACTemplate:Plant:Boiler:ObjectReference
 
-#### This object references a detailed boiler object and adds it to an HVACTemplate:Plant:HotWaterLoop or MixedWaterLoop. The user must create a complete detailed boiler object with all required curve or performance objects. The detailed boiler object is referenced by object type and name and the boiler will be automatically to the hot water or mixed water loop branches and equipment list.
+This object references a detailed boiler object and adds it to an HVACTemplate:Plant:HotWaterLoop or MixedWaterLoop. The user must create a complete detailed boiler object with all required curve or performance objects. The detailed boiler object is referenced by object type and name and the boiler will be automatically to the hot water or mixed water loop branches and equipment list.
 
 #### Field: Name
 
@@ -7594,16 +7594,16 @@ An example in an IDF:
 
 ```idf
 HVACTemplate:Plant:Boiler:ObjectReference,
-    Main Boiler Connection,  !- Name
-    Boiler:HotWater,         !- Boiler Object Type
-    Main Boiler,             !- Boiler Name
-    1;                       !- Priority
+    Main Boiler Connection,  !- Name
+    Boiler:HotWater,         !- Boiler Object Type
+    Main Boiler,             !- Boiler Name
+    1;                       !- Priority
 ```
 
 
 ### HVACTemplate:Plant:MixedWaterLoop
 
-This object simulates the central plant loop portion of a water source heat pump system. Often many HVACTemplate:Zone:WaterToAirHeatPump objects will be used in a building along with a single HVACTemplate:Plant:MixedWaterLoop that contains one or more cooling towers and boilers.  The piping systems are called loops and this object describes the controls and pumps on the loops. Only one of these objects should be defined in an input file.
+This object simulates the central plant loop portion of a water source heat pump system. Often many HVACTemplate:Zone:WaterToAirHeatPump objects will be used in a building along with a single HVACTemplate:Plant:MixedWaterLoop that contains one or more cooling towers and boilers.  The piping systems are called loops and this object describes the controls and pumps on the loops. Only one of these objects should be defined in an input file.
 
 #### Field: Name
 
@@ -7657,7 +7657,7 @@ Enter the name of a high temperature setpoint schedule that has values that chan
 
 #### Field: High Temperature Design Setpoint
 
-Enter the high temperature setpoint temperature to be used for sizing the water loop and associated equipment in degrees C. If the High Temperature Setpoint Schedule is blank, then this value will be used as the setpoint at all times.  The default is 33C.
+Enter the high temperature setpoint temperature to be used for sizing the water loop and associated equipment in degrees C. If the High Temperature Setpoint Schedule is blank, then this value will be used as the setpoint at all times.  The default is 33C.
 
 #### Field: Low Temperature Setpoint Schedule Name
 
@@ -7665,7 +7665,7 @@ Enter the name of a low temperature setpoint schedule that has values that chang
 
 #### Field: Low Temperature Design Setpoint
 
-Enter the low temperature setpoint temperature to be used for sizing the water loop and associated equipment in degrees C. If the Low Temperature Setpoint Schedule is blank, then this value will be used as the setpoint at all times.  The default is 20C.
+Enter the low temperature setpoint temperature to be used for sizing the water loop and associated equipment in degrees C. If the Low Temperature Setpoint Schedule is blank, then this value will be used as the setpoint at all times.  The default is 20C.
 
 #### Field: Water Pump Configuration
 
@@ -7719,7 +7719,7 @@ The field determines if a demand side bypass pipe is present in the mixed water 
 
 #### Field: Fluid Type
 
-This field determines the type of fluid used for the mixed water loop.  The following options are available:
+This field determines the type of fluid used for the mixed water loop.  The following options are available:
 
 - Water
 
@@ -7753,23 +7753,23 @@ As shown in an IDF:
 
 ```idf
 HVACTemplate:Plant:MixedWaterLoop,
-    Only Water Loop,         !- Name
-    ,                        !- Pump Schedule Name
-    Intermittent,            !- Pump Control Type
-    Default,                 !- Operation Scheme Type
-    ,                        !- Equipment Operation Schemes Name
-    ,                        !- High Temperature Setpoint Schedule Name
-    34,                      !- High Temperature Design Setpoint {C}
-    ,                        !- Low Temperature Setpoint Schedule Name
-    20,                      !- Low Temperature Design Setpoint {C}
-    ConstantFlow,            !- Water Pump Configuration
-    179352,                  !- Water Pump Rated Head {Pa}
-    SinglePump,              !- Water Pump Type
-    Yes,                     !- Supply Side Bypass Pipe
-    Yes,                     !- Demand Side Bypass Pipe
-    Water,                   !- Fluid Type
-    6,                       !- Loop Design Delta Temperature {deltaC}
-    SequentialLoad;              !- Load Distribution Scheme
+    Only Water Loop,         !- Name
+    ,                        !- Pump Schedule Name
+    Intermittent,            !- Pump Control Type
+    Default,                 !- Operation Scheme Type
+    ,                        !- Equipment Operation Schemes Name
+    ,                        !- High Temperature Setpoint Schedule Name
+    34,                      !- High Temperature Design Setpoint {C}
+    ,                        !- Low Temperature Setpoint Schedule Name
+    20,                      !- Low Temperature Design Setpoint {C}
+    ConstantFlow,            !- Water Pump Configuration
+    179352,                  !- Water Pump Rated Head {Pa}
+    SinglePump,              !- Water Pump Type
+    Yes,                     !- Supply Side Bypass Pipe
+    Yes,                     !- Demand Side Bypass Pipe
+    Water,                   !- Fluid Type
+    6,                       !- Loop Design Delta Temperature {deltaC}
+    SequentialLoad;              !- Load Distribution Scheme
 ```
 
 
