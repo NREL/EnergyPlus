@@ -3097,7 +3097,7 @@ HVACTemplate:System:VRF,
 
 ### HVACTemplate:System:Unitary
 
-This object simulates the system portion of a constant volume direct-expansion based HVAC configuration with several different heating options. Often a single HVACTemplate:Zone:Unitary object will be used with a single HVACTemplate:System:Unitary object to simulate single zone direct-expansion based air conditioning systems. In addition, multiple HVACTemplate:Zone:Unitary objects may appear that all reference the same HVACTemplate:System:Unitary object in a multiple zone version. For a multizone system, only one zone is specified as the control zone. Direct expansion includes single packaged rooftop systems commonly seen in commercial buildings and split systems commonly seen in residential buildings.
+This object simulates the system portion of a constant volume air handler with electric, gas, or hot water heating and optional direct-expansion (DX) cooling. This system may serve one or more HVACTemplate:Zone:Unitary objects. If this system serves more than one zone, only one zone is specified as the control zone. Common names for this sytem type include packaged rooftop systems commonly seen in commercial buildings and split systems (furnace with air conditioner)  commonly seen in residential buildings.
 
 #### Field: Name
 
@@ -3442,7 +3442,7 @@ HVACTemplate:System:Unitary,
 
 ### HVACTemplate:System:UnitaryHeatPump:AirToAir
 
-This object simulates the system portion of an air to air direct-expansion unitary heat pump. Often a single HVACTemplate:Zone:Unitary object will be used with a single HVACTemplate:System:UnitaryHeatPump:AirToAir object to simulate single zone direct-expansion based heat pump systems. In addition, multiple HVACTemplate:Zone:Unitary objects may appear that all reference the same HVACTemplate:System:UnitaryHeatPump:AirToAir object in a multiple zone version. For a multizone system, only one zone is specified as the control zone. The model can simulate heat pumps seen in commercial buildings and split systems commonly seen in residential buildings.
+This object simulates the system portion of a constant volume air handler with a direct-expansion (DX) air-to-air heat pump and supplemental heating (electric, gas, or hot water). This system may serve one or more HVACTemplate:Zone:Unitary objects. If this system serves more than one zone, only one zone is specified as the control zone. Common names for this sytem type include packaged rooftop heat pumps commonly seen in commercial buildings and split system heat pumps commonly seen in residential buildings.
 
 #### Field: Name
 
