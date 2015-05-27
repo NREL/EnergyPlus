@@ -162,10 +162,6 @@ namespace PlantCondLoopOperation {
 		int NumEquipLists; // number of equipment lists
 		//Error control flags
 		bool foundlist; // equipment list found
-		bool UpperLimitTooLow; // error processing
-		Real64 HighestRange; // error processing
-		static int TooLowIndex( 0 ); // error processing
-		static int NotTooLowIndex( 0 ); // error processing
 		int NumCompsOnList;
 		int CompIndex;
 		int EquipBranchNum;
@@ -1676,7 +1672,6 @@ namespace PlantCondLoopOperation {
 		int CompNum;
 		int Index;
 		int OpSchemePtr;
-		int SchemeNum;
 		int thisSchemeNum;
 		int SchemeType;
 		static bool MyOneTimeFlag( true );
@@ -1687,7 +1682,6 @@ namespace PlantCondLoopOperation {
 		int ThisTypeOfNum;
 		int CompOpNum;
 		int OldNumOpSchemes;
-		int OldNumEquipLists;
 		int NewNumEquipLists;
 		int NewNumOpSchemes;
 		int NumSearchResults;
@@ -2834,7 +2828,7 @@ namespace PlantCondLoopOperation {
 		int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
 		int const CurSchemePtr,
 		Real64 const LoopDemand,
-		Real64 & RemLoopDemand
+		Real64 & EP_UNUSED( RemLoopDemand )
 	)
 	{
 
@@ -2871,7 +2865,6 @@ namespace PlantCondLoopOperation {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompPtr;
-		int ListPtr;
 
 		auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
 

@@ -40,9 +40,6 @@ ProcessArgs(int argc, const char * argv[])
 {
 	typedef  std::string::size_type  size_type;
 
-	bool annSimulation;
-	bool ddSimulation;
-
 	// Expand long-name options using "=" sign into two arguments
 	// and expand multiple short options into separate arguments
 	std::vector< std::string > arguments;

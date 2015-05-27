@@ -213,7 +213,6 @@ namespace StandardRatings {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const AirCooled( 1 );
 		int const WaterCooled( 2 );
-		int const EvapCooled( 3 );
 
 		Real64 const EvapOutletTemp( 6.67 ); // (44F)
 		Real64 const Acc( 0.0001 ); // Accuracy of result
@@ -619,15 +618,12 @@ namespace StandardRatings {
 
 		int const AirCooled( 1 );
 		int const WaterCooled( 2 );
-		int const EvapCooled( 3 );
 
 		// Following parameters are taken from AHRI 551/591,2011 Table 3
 		Real64 const HighEWTemp( 30.0 ); // Entering water temp in degrees C at full load capacity (85F)
 		Real64 const LowEWTemp( 19.0 ); // Entering water temp in degrees C at minimum reduced capacity (65F)
 		Real64 const OAHighEDBTemp( 35.0 ); // Outdoor air dry-bulb temp in degrees C at full load capacity (95F)
-		Real64 const OALowEDBTemp( 13 ); // Outdoor air dry-bulb temp in degrees C at minimum reduced capacity (55F)
 		Real64 const OAHighEWBTemp( 24.0 ); // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
-		Real64 const OALowEWBTemp( 13.50 ); // Outdoor wet dry-bulb temp in degrees C at minimum reduced capacity (56.25F)
 		Real64 const LeavingWaterTemp( 6.67 ); // Evaporator leaving water temperature in degrees C [44 F]
 
 		static std::string const RoutineName( "CheckCurveLimitsForIPLV: " ); // Include trailing blank space
@@ -874,27 +870,7 @@ namespace StandardRatings {
 		Array1D< Real64 > FanPowerPerEvapAirFlowRate( ns ); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
 
 		// Intermediate values calculated from the inputs in the idf file
-		static Real64 TotCapTempModFacH0( 0.0 ); // Tot capacity modifier (function of entering wetbulb, outside drybulb) at H0 Test [-]
-		static Real64 TotCapTempModFacH1( 0.0 ); // Tot capacity modifier (function of entering wetbulb, outside drybulb) at H1 Test [-]
-		static Real64 TotCapTempModFacH2( 0.0 ); // Tot capacity modifier (function of entering wetbulb, outside drybulb) at H2 Test [-]
-		static Real64 TotCapTempModFacH3( 0.0 ); // Tot capacity modifier (function of entering wetbulb, outside drybulb) at H3 Test [-]
-		static Real64 EIRTempModFacH1( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb)  at H1 Test[-]
-		static Real64 EIRTempModFacH0( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb)  at H0 Test[-]
-		static Real64 EIRTempModFacH2( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb)  at H2 Test[-]
-		static Real64 EIRTempModFacH3( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb)  at H3 Test[-]
-		static Real64 PartLoadFactor( 0.0 ); // Part load factor
-		static Real64 PartLoadRatio( 0.0 ); // compressor cycling ratio between successive speeds, [-]
-		static Real64 PartLoadFraction( 0.0 ); // part-load fraction that account for the cyclic degradation, [-]
-		static Real64 NetHeatingCapWeighted( 0.0 ); // net total heating cap weighted by the fraction of the binned cooling hours [W]
-		static Real64 TotHeatingElecPowerWeighted( 0.0 ); // net total heat pump and resistance heating electric Energy input weighted by
-		// the fraction of the binned cooling hours
-		static Real64 BuildingHeatingLoad( 0.0 ); // Building space heating load corresponding to an outdoor bin temperature [W]
-		static Real64 NetTotHeatCapBinned( 0.0 ); // Net tot heatinging cap corresponding to an outdoor bin temperature [W]
-		static Real64 TotHeatElecPowerBinnedHP( 0.0 ); // Total Heat Pump heating electric power consumption at outdoor bin temp [W]
-		static Real64 TotHeatElecPowerBinnedRH( 0.0 ); // Total Resistance heating electric power consumption at outdoor bin temp [W]
-		int BinNum; // bin number counter
 		int spnum; // compressor speed number
-		int StandardDHRNum; // Integer counter for standardized DHRs
 
 		// Calculated and reported to the EIO file
 		static Real64 SEER( 0.0 ); // Seasonal Energy Efficiency Ratio in SI [W/W]
@@ -1041,7 +1017,6 @@ namespace StandardRatings {
 		Real64 NetHeatingCapH2Test; // Net Heating Coil capacity at H2 test conditions accounting for supply fan heat [W]
 
 		Real64 PartLoadFactor;
-		Real64 LoadFactor; // Frac. "on" time for last stage at the desired reduced capacity, (dimensionless)
 		static Real64 LowTempCutOutFactor( 0.0 ); // Factor which corresponds to compressor operation depending on outdoor temperature
 		static Real64 OATempCompressorOff( 0.0 ); // Minimum outdoor air temperature to turn the commpressor off, [C]
 
@@ -1056,7 +1031,6 @@ namespace StandardRatings {
 		static Real64 DesignHeatingRequirement( 0.0 ); // The amount of heating required to maintain a given indoor temperature
 		// at a particular outdoor design temperature.  [W]
 		static Real64 DesignHeatingRequirementMin( 0.0 ); // minimum design heating requirement [W]
-		static Real64 DesignHeatingRequirementMax( 0.0 ); // maximum design heating requirement [W]
 		static Real64 ElectricalPowerConsumption( 0.0 ); // Electrical power corresponding to an outdoor bin temperature [W]
 		static Real64 HeatPumpElectricalEnergy( 0.0 ); // Heatpump electrical energy corresponding to an outdoor bin temperature [W]
 		static Real64 TotalHeatPumpElectricalEnergy( 0.0 ); // Sum of Heatpump electrical energy over the entire heating season [W]
@@ -1066,7 +1040,6 @@ namespace StandardRatings {
 		// entire heating season [W]
 
 		int BinNum; // bin number counter
-		int spnum; // compressor speed number
 		int StandardDHRNum; // Integer counter for standardized DHRs
 
 		TotalBuildingLoad = 0.0;
@@ -1415,7 +1388,7 @@ namespace StandardRatings {
 		int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
 		int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
 		int const EIRFFlowCurveIndex, // Index for the EIR as a function of flow fraction modifier curve
-		int const PLFFPLRCurveIndex, // Index for the EIR vs part-load ratio curve
+		int const EP_UNUSED( PLFFPLRCurveIndex ), // Index for the EIR vs part-load ratio curve
 		Real64 const RatedTotalCapacity, // Rated gross total cooling capacity
 		Real64 const RatedCOP, // Rated gross COP
 		Real64 const RatedAirVolFlowRate, // air flow rate through the coil at rated condition
@@ -1466,8 +1439,6 @@ namespace StandardRatings {
 		static Real64 TotCapTempModFac( 0.0 ); // Total capacity modifier (function of entering wetbulb, outside drybulb) [-]
 		static Real64 EIRTempModFac( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb) [-]
 		static Real64 TotCoolingCapRated( 0.0 ); // Total Cooling Coil capacity (gross) at one of the rated test conditions [W]
-		static Real64 NetTotCoolingCapRated( 0.0 ); // Net Total Cooling Coil capacity at one of the rated test conditions, accounting for fan heat [W]
-		static Real64 TotalElecPowerRated( 0.0 ); // Net power consumption (Cond Fan+Compressor+Indoor Fan) at Rated test conditions [W]
 		static Real64 EIR( 0.0 ); // Energy Efficiency Ratio at AHRI test conditions for SEER [-]
 		Real64 FanPowerPerEvapAirFlowRate; // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
 
@@ -1513,8 +1484,8 @@ namespace StandardRatings {
 
 	void
 	MultiSpeedDXCoolingCoilStandardRatings(
-		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
-		std::string const & DXCoilType, // Type of DX coil for which HSPF is calculated
+		std::string const & EP_UNUSED( DXCoilName ), // Name of DX coil for which HSPF is calculated
+		std::string const & EP_UNUSED( DXCoilType ), // Type of DX coil for which HSPF is calculated
 		Array1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
 		Array1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
 		Array1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
@@ -1684,8 +1655,8 @@ namespace StandardRatings {
 
 	void
 	MultiSpeedDXHeatingCoilStandardRatings(
-		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
-		std::string const & DXCoilType, // Type of DX coil for which HSPF is calculated
+		std::string const & EP_UNUSED( DXCoilName ), // Name of DX coil for which HSPF is calculated
+		std::string const & EP_UNUSED( DXCoilType ), // Type of DX coil for which HSPF is calculated
 		Array1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
 		Array1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
 		Array1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
@@ -1776,8 +1747,6 @@ namespace StandardRatings {
 		// Intermediate values calculated from the inputs in the idf file
 		Array1D< Real64 > TotCapFlowModFac( nsp ); // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
 		Array1D< Real64 > EIRFlowModFac( nsp ); // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
-		static Real64 TotCapTempModFac( 0.0 ); // Total capacity modifier (function of entering wetbulb, outside drybulb) [-]
-		static Real64 EIRTempModFac( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb) [-]
 
 		static Real64 TotCapTempModFacH0( 0.0 ); // Tot capacity modifier (function of entering wetbulb, outside drybulb) at H0 Test [-]
 		static Real64 EIRTempModFacH0( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb)  at H0 Test[-]
@@ -1788,7 +1757,6 @@ namespace StandardRatings {
 		static Real64 TotCapTempModFacH3( 0.0 ); // Tot capacity modifier (function of entering wetbulb, outside drybulb) at H3 Test [-]
 		static Real64 EIRTempModFacH3( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb)  at H3 Test[-]
 
-		static Real64 PartLoadFactor( 0.0 ); // Part load factor, accounts for thermal lag at compressor startup [-]
 		static Real64 OATempCompressorOff( 0.0 ); // Minimum outdoor air temperature to turn the commpressor off
 		static Real64 PartLoadRatio( 0.0 ); // compressor cycling ratio between successive speeds, [-]
 		static Real64 PartLoadFraction( 0.0 ); // part-load fraction that account for the cyclic degradation, [-]
@@ -1804,31 +1772,12 @@ namespace StandardRatings {
 		Real64 LoadFactor; // Fractional "on" time for last stage at the desired reduced capacity, (dimensionless)
 		static Real64 LowTempCutOutFactor( 0.0 ); // Factor which corresponds to compressor operation depending on outdoor temperature
 
-		static Real64 NetHeatingCapRated( 0.0 ); // Net Heating Coil capacity at Rated conditions, accounting for supply fan heat [W]
-		static Real64 ElecPowerRated( 0.0 ); // Total system power at Rated conditions, accounting for supply fan heat [W]
-		static Real64 NetHeatingCapH2Test( 0.0 ); // Net Heating Coil capacity at H2 test conditions, accounting for supply fan heat [W]
-		static Real64 ElecPowerH2Test( 0.0 ); // Total system power at H2 test conditions, accounting for supply fan heat [W]
-		static Real64 NetHeatingCapH3Test( 0.0 ); // Net Heating Coil capacity at H3 test conditions, accounting for supply fan heat [W]
-		static Real64 ElecPowerH3Test( 0.0 ); // Total system power at H3 test conditions, accounting for supply fan heat [W]
 		static Real64 FractionalBinHours( 0.0 ); // Fractional bin hours for the heating season  [-]
-		static Real64 BuildingLoad( 0.0 ); // Building space conditioning load corresponding to an outdoor bin temperature [W]
-		static Real64 HeatingModeLoadFactor( 0.0 ); // Heating mode load factor corresponding to an outdoor bin temperature  [-]
-		static Real64 NetHeatingCapReduced( 0.0 ); // Net Heating Coil capacity corresponding to an outdoor bin temperature [W]
-		static Real64 TotalBuildingLoad( 0.0 ); // Sum of building load over the entire heating season [W]
-		static Real64 TotalElectricalEnergy( 0.0 ); // Sum of electrical energy consumed by the heatpump over the heating season [W]
 		static Real64 DemandDeforstCredit( 1.0 ); // A factor to adjust HSPF if coil has demand defrost control  [-]
-		static Real64 CheckCOP( 0.0 ); // Checking COP at an outdoor bin temperature against unity [-]
 		static Real64 DesignHeatingRequirement( 0.0 ); // The amount of heating required to maintain a given indoor temperature
 		// at a particular outdoor design temperature.  [W]
 		static Real64 DesignHeatingRequirementMin( 0.0 ); // minimum design heating requirement [W]
 		static Real64 DesignHeatingRequirementMax( 0.0 ); // maximum design heating requirement [W]
-		static Real64 ElectricalPowerConsumption( 0.0 ); // Electrical power corresponding to an outdoor bin temperature [W]
-		static Real64 HeatPumpElectricalEnergy( 0.0 ); // Heatpump electrical energy corresponding to an outdoor bin temperature [W]
-		static Real64 TotalHeatPumpElectricalEnergy( 0.0 ); // Sum of Heatpump electrical energy over the entire heating season [W]
-		static Real64 ResistiveSpaceHeatingElectricalEnergy( 0.0 ); // resistance heating electrical energy corresponding to an
-		// outdoor bin temperature [W]
-		static Real64 TotalResistiveSpaceHeatingElectricalEnergy( 0.0 ); // Sum of resistance heating electrical energy over the
-		// entire heating season [W]
 		int BinNum; // bin number counter
 		int spnum; // compressor speed number
 		int StandardDHRNum; // Integer counter for standardized DHRs
@@ -2217,7 +2166,6 @@ namespace StandardRatings {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyCoolOneTimeFlag( true );
-		static bool MyHeatOneTimeFlag( true );
 		int ClassNum; // class number (Class I, II, II, IV)
 		int Num; // text number counter
 		static std::string ClassName;

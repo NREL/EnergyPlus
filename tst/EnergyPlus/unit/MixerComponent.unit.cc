@@ -22,7 +22,6 @@ TEST(MixerComponent, GetZoneMixerIndex)
 	std::string LINE;
 	bool errFlag;
 	int MixerIndex;
-	int ReadStat;
 	// set some variables
 	CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
 	NumMixers = 3;

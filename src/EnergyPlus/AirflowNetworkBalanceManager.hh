@@ -261,8 +261,8 @@ namespace AirflowNetworkBalanceManager {
 			OpeningProbSchNum( 0 ),
 			ClosingProbSchNum( 0 ),
 			ComfortBouPoint( 10.0 ),
-			MaxPPD( 10.0 ),
 			OccupancyCheck( false ),
+			MaxPPD( 10.0 ),
 			MinTimeControlOnly( false )
 		{}
 

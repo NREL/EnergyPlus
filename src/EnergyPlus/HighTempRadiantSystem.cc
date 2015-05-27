@@ -239,7 +239,6 @@ namespace HighTempRadiantSystem {
 		using ScheduleManager::GetScheduleIndex;
 		using General::TrimSigDigits;
 		using DataSizing::AutoSize;
-		using DataSizing::FinalZoneSizing;
 		using DataSizing::HeatingDesignCapacity;
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
@@ -622,7 +621,6 @@ namespace HighTempRadiantSystem {
 		// Using/Aliasing
 		using DataGlobals::NumOfZones;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
 
@@ -837,7 +835,6 @@ namespace HighTempRadiantSystem {
 		// Using/Aliasing
 		using DataHeatBalance::MRT;
 		using DataHeatBalFanSys::MAT;
-		using DataHVACGlobals::SmallLoad;
 		using namespace DataZoneEnergyDemands;
 		using ScheduleManager::GetCurrentScheduleValue;
 
@@ -902,7 +899,7 @@ namespace HighTempRadiantSystem {
 
 	void
 	CalcHighTempRadiantSystemSP(
-		bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // true if this is the first HVAC iteration at this system time step !unused1208
 		int const RadSysNum // name of the low temperature radiant system
 	)
 	{
@@ -1369,16 +1366,13 @@ namespace HighTempRadiantSystem {
 
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
-		using DataGlobals::OutputFileDebug;
 		using DataHVACGlobals::TimeStepSys;
-		using DataLoopNode::Node;
 		using DataSurfaces::Surface;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const NotOperating( -9999.0 ); // Some unreasonable value that should clue the user in that this is not running
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

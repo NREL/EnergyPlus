@@ -466,7 +466,6 @@ namespace ThermalComfort {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIter( 150 ); // Limit of iteration
 		Real64 const StopIterCrit( 0.00015 ); // Stop criteria for iteration
-		Real64 const SkinEmiss( 0.97 ); // Emissivity of clothing-skin surface
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
 
@@ -1359,7 +1358,7 @@ namespace ThermalComfort {
 
 	void
 	DERIV(
-		int & TempIndiceNum, // Number of temperature indices  unused1208
+		int & EP_UNUSED( TempIndiceNum ), // Number of temperature indices  unused1208
 		Array1A< Real64 > Temp, // Temperature unused1208
 		Array1A< Real64 > TempChange // Change of temperature
 	)
@@ -2434,8 +2433,6 @@ namespace ThermalComfort {
 		Real64 numOccupants;
 		int statFile;
 		int epwFile;
-		int pMonth;
-		int pDay;
 		bool statFileExists;
 		bool epwFileExists;
 		static bool useStatData( false );

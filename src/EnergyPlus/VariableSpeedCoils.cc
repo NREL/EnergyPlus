@@ -190,7 +190,6 @@ namespace VariableSpeedCoils {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using DataHVACGlobals::TimeStepSys;
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
 		using General::SolveRegulaFalsi;
@@ -2432,7 +2431,7 @@ namespace VariableSpeedCoils {
 		Real64 const SensLoad, // Control zone sensible load[W]
 		Real64 const LatentLoad, // Control zone latent load[W]
 		int const CyclingScheme, // fan operating mode
-		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
 		Real64 const SpeedRatio, // compressor speed ratio
 		int const SpeedNum // compressor speed number
 	)
@@ -2495,10 +2494,8 @@ namespace VariableSpeedCoils {
 		// Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
 		Real64 RatedHeatPumpIndoorHumRat; // Inlet humidity ratio to heat pump evaporator at rated conditions [kg/kg]
 		Real64 WaterFlowScale; // water flow scaling factor match rated flow rate
-		Real64 HPInletAirHumRat; // Rated inlet air humidity ratio for heat pump water heater [kgWater/kgDryAir]
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Real64 SmallDifferenceTest( 0.00000001 );
 		static std::string const RoutineName( "InitVarSpeedCoil" );
 
 		if ( MyOneTimeFlag ) {
@@ -2865,7 +2862,6 @@ namespace VariableSpeedCoils {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 rhoair;
-		Real64 CpAir;
 		Real64 MixTemp;
 		Real64 MixHumRat;
 		Real64 MixEnth;
@@ -2878,7 +2874,6 @@ namespace VariableSpeedCoils {
 		Real64 VolFlowRate;
 		Real64 CoolCapAtPeak;
 		Real64 TotCapTempModFac;
-		Real64 SensCapAtPeak;
 		int TimeStepNumAtMax;
 		int DDNum;
 		int PltSizNum;
@@ -3795,11 +3790,11 @@ namespace VariableSpeedCoils {
 		int const DXCoilNum, // Heat Pump Number
 		int const CyclingScheme, // Fan/Compressor cycling scheme indicator
 		Real64 & RuntimeFrac, // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-		Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
-		Real64 const LatentDemand, // Cooling Latent Demand [W]
+		Real64 const EP_UNUSED( SensDemand ), // Cooling Sensible Demand [W] !unused1208
+		Real64 const EP_UNUSED( LatentDemand ), // Cooling Latent Demand [W]
 		int const CompOp, // compressor operation flag
 		Real64 const PartLoadRatio, // compressor part load ratio
-		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
 		Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 		int const SpeedNum // Speed number, high bound
 	)
@@ -3846,7 +3841,6 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
 		static std::string const RoutineName( "CalcMultiSpeedVarSpeedCoilCooling" );
 		static std::string const RoutineNameSourceSideInletTemp( "CalcVSHPCoolingSimple:SourceSideInletTemp" );
 
@@ -3883,9 +3877,6 @@ namespace VariableSpeedCoils {
 		Real64 CpAir_Unit; // calc conditions for unit
 		Real64 AirMassFlowRatio; // airflow ratio at low speed
 		Real64 WaterMassFlowRatio; // airflow ratio at high speed
-		Real64 TotCapAirFFModFac; // air flow fraction modification
-		Real64 TotCapWaterFFModFac; // water flow fraction modification
-		Real64 TotCapTempModFac; // total capacity temperature correctio fraction
 		Real64 EIRAirFFModFac; // air flow fraction modification
 		Real64 EIRWaterFFModFac; // water flow fraction modification
 		Real64 EIRTempModFac; // total capacity temperature correctio fraction
@@ -3907,8 +3898,6 @@ namespace VariableSpeedCoils {
 		Real64 MaxOutletEnth; // max possible outlet enthalpy
 
 		// ADDED VARIABLES FOR air source coil
-		static Real64 OutdoorCoilT( 0.0 ); // Outdoor coil temperature (C)
-		static Real64 OutdoorCoildw( 0.0 ); // Outdoor coil delta w assuming coil temp of OutdoorCoilT (kg/kg)
 		static Real64 OutdoorDryBulb( 0.0 ); // Outdoor dry-bulb temperature at condenser (C)
 		static Real64 OutdoorWetBulb( 0.0 ); // Outdoor wet-bulb temperature at condenser (C)
 		static Real64 OutdoorHumRat( 0.0 ); // Outdoor humidity ratio at condenser (kg/kg)
@@ -4423,7 +4412,6 @@ namespace VariableSpeedCoils {
 		Real64 InletAirTemp; // HPWH inlet air temperature (dry-bulb or wet-bulb) (C)
 		Real64 AirMassFlowRatio; // Ratio of evaporator inlet air mass flow rate to rated mass flow rate
 		Real64 WaterMassFlowRatio; // Ratio of evaporator inlet water mass flow rate to rated mass flow rate
-		Real64 PartLoadFraction; // Output of Part Load Fraction as a Function of Part Load Ratio curve
 		Real64 PumpHeatToWater; // Amount of pump heat attributed to heating water
 		Real64 HPRTF; // Heat pump run time fraction
 		Real64 PLF; // part-load function
@@ -4896,10 +4884,10 @@ namespace VariableSpeedCoils {
 		int const DXCoilNum, // Heat Pump Number
 		int const CyclingScheme, // Fan/Compressor cycling scheme indicator
 		Real64 & RuntimeFrac, // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-		Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
+		Real64 const EP_UNUSED( SensDemand ), // Cooling Sensible Demand [W] !unused1208
 		int const CompOp, // compressor operation flag
 		Real64 const PartLoadRatio, // compressor part load ratio
-		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
 		Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 		int const SpeedNum // Speed number, high bound, i.e. SpeedNum - 1 is the other side
 	)
@@ -4939,7 +4927,6 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Tref( 283.15 ); // Reference Temperature for performance curves,10C [K]
 		static std::string const RoutineName( "CalcVarSpeedCoilHeating" );
 		static std::string const RoutineNameSourceSideInletTemp( "CalcVarSpeedCoilHeating:SourceSideInletTemp" );
 
@@ -6561,7 +6548,6 @@ namespace VariableSpeedCoils {
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using DataEnvironment::StdRhoAir;
 
 		// Return value
 		Real64 CBF; // the result - the coil bypass factor
