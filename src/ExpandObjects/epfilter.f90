@@ -26344,18 +26344,6 @@ ELSEIF (SameString(FldVal(base + hwpFluidTypeOff),'PropyleneGlycol60')) THEN
 ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:HotWaterLoop in the Fluid Type field')
 END IF
-IF (SameString(FldVal(base + hwpLdDistSchmOff),'Sequential')) THEN
-  FldVal(base + hwpLdDistSchmOff) = 'SequentialLoad'
-ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'SequentialLoad')) THEN
-ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'Optimal')) THEN
-ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'Uniform')) THEN
-  FldVal(base + hwpLdDistSchmOff) = 'UniformLoad'
-ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'UniformLoad')) THEN
-ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'UniformPLR')) THEN
-ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'SequentialUniformPLR')) THEN
-ELSE
-  CALL WriteError('Invalid choice in HVACTemplate:Plant:HotWaterLoop in the Load Distribution Scheme field')
-END IF
 isMaxOutTempBlank = SameString(FldVal(base + hwpMaxTOutOff),'')
 IF (SameString(FldVal(base + hwpHWPumpTypeOff),'SinglePump')) THEN
   isPumpHeader = .FALSE.
@@ -28420,30 +28408,6 @@ ELSEIF (SameString(FldVal(base + cwpFluidTypeOff),'PropyleneGlycol60')) THEN
 ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:ChilledWaterLoop in the Fluid Type field')
 END IF
-IF (SameString(FldVal(base + cwpChwLdDistSchmOff),'Sequential')) THEN
-  FldVal(base + cwpChwLdDistSchmOff) = 'SequentialLoad'
-ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'SequentialLoad')) THEN
-ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'Optimal')) THEN
-ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'Uniform')) THEN
-  FldVal(base + cwpChwLdDistSchmOff) = 'UniformLoad'
-ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'UniformLoad')) THEN
-ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'UniformPLR')) THEN
-ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'SequentialUniformPLR')) THEN
-ELSE
-  CALL WriteError('Invalid choice in HVACTemplate:Plant:ChilledWaterLoop in the Chilled Water Load Distribution Scheme field')
-END IF
-IF (SameString(FldVal(base + cwpCndLdDistSchmOff),'Sequential')) THEN
-  FldVal(base + cwpCndLdDistSchmOff) = 'SequentialLoad'
-ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'SequentialLoad')) THEN
-ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'Optimal')) THEN
-ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'Uniform')) THEN
-  FldVal(base + cwpCndLdDistSchmOff) = 'UniformLoad'
-ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'UniformLoad')) THEN
-ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'UniformPLR')) THEN
-ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'SequentialUniformPLR')) THEN
-ELSE
-  CALL WriteError('Invalid choice in HVACTemplate:Plant:ChilledWaterLoop in the Condenser Water Load Distribution Scheme field')
-END IF
 isMinOutTempBlank = SameString(FldVal(base + cwpMinTOutOff),'')
 IF (SameString(FldVal(base + cwpPriChWPumpTypeOff),'SinglePump')) THEN
   isChwPrimPumpHeader = .FALSE.
@@ -30295,18 +30259,6 @@ ELSEIF (SameString(FldVal(base + mwpFluidTypeOff),'PropyleneGlycol60')) THEN
   FluidType = ftPropyleneGlycol60
 ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:MixedWaterLoop in the Fluid Type field')
-END IF
-IF (SameString(FldVal(base + mwpLdDistSchmOff),'Sequential')) THEN
-  FldVal(base + mwpLdDistSchmOff) = 'SequentialLoad'
-ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'SequentialLoad')) THEN
-ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'Optimal')) THEN
-ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'Uniform')) THEN
-  FldVal(base + mwpLdDistSchmOff) = 'UniformLoad'
-ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'UniformLoad')) THEN
-ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'UniformPLR')) THEN
-ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'SequentialUniformPLR')) THEN
-ELSE
-  CALL WriteError('Invalid choice in HVACTemplate:Plant:MixedWaterLoop in the Load Distribution Scheme field')
 END IF
 IF (SameString(FldVal(base + mwpPumpTypeOff),'SinglePump')) THEN
   isPumpHeader = .FALSE.
