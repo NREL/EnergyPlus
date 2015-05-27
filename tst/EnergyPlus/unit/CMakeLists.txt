@@ -32,6 +32,7 @@ set( test_src
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
   SecondaryDXCoils.unit.cc
+  SetPointManager.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
