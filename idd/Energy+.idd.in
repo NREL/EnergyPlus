@@ -29830,26 +29830,20 @@ HVACTemplate:Plant:ChilledWaterLoop,
       \note Leave blank for no limit.
       \units C
   A21,\field Chilled Water Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
   A22;\field Condenser Water Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 HVACTemplate:Plant:Chiller,
@@ -30169,15 +30163,12 @@ HVACTemplate:Plant:HotWaterLoop,
       \note Leave blank for no limit.
       \units C
   A13;\field Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 HVACTemplate:Plant:Boiler,
@@ -30378,15 +30369,12 @@ HVACTemplate:Plant:MixedWaterLoop,
       \units deltaC
       \default 5.6
   A13;\field Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 \group HVAC Design Objects
@@ -32081,7 +32069,8 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \type alpha
         \note Unique name for this packaged terminal air conditioner object.
    A2,  \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
         \note Schedule values of 0 denote the unit is off.
@@ -32968,7 +32957,8 @@ ZoneHVAC:UnitHeater,
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
    A3 , \field Air Inlet Node Name
@@ -33056,7 +33046,8 @@ ZoneHVAC:EvaporativeCoolerUnit,
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
    A3,  \field Availability Manager List Name
@@ -69826,6 +69817,120 @@ SetpointManager:SingleZone:OneStageHeating,
        \note Node(s) at which the temperature will be set
        \required-field
        \type node
+
+SetpointManager:ReturnTemperature:ChilledWater,
+     \memo This setpoint manager is used to place a temperature setpoint on a plant supply
+     \memo  outlet node based on a target return water setpoint. The setpoint manager attempts
+     \memo  to achieve the desired return water temperature by adjusting the supply temperature 
+     \memo  setpoint based on the plant conditions at each system time step.
+     \min-fields 7
+  A1,  \field Name
+       \required-field
+  A2,  \field Plant Loop Supply Outlet Node
+       \note This is the name of the supply outlet node for the plant being controlled by this 
+       \note setpoint manager.  Typically this is where the setpoint will be actuated for
+       \note supply equipment to control to, but not necessarily.  This setpoint manager will
+       \note mine that information from the internal plant data structures.
+       \type node
+       \required-field
+  A3,  \field Plant Loop Supply Inlet Node
+       \note This is the name of the supply inlet node for the plant being controlled with this 
+       \note setpoint manager. The temperature on this node is controlled by actuating the 
+       \note supply setpoint.
+       \type node
+       \required-field
+  N1,  \field Minimum Supply Temperature Setpoint
+       \note This is the minimum chilled water supply temperature setpoint.  This is also used as the default
+       \note setpoint during no-load or negative-load conditions and during initialization.
+       \type real
+       \units C
+       \default 5
+       \required-field
+  N2,  \field Maximum Supply Temperature Setpoint
+       \note This is the maximum reset temperature for the chilled water supply.
+       \type real
+       \units C
+       \default 10
+       \required-field
+  A4,  \field Return Temperature Setpoint Input Type
+       \note This defines whether the chilled water return temperature target is constant, 
+       \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
+       \type choice
+       \key Constant
+       \key Scheduled
+       \key ReturnTemperatureSetpoint
+       \required-field
+  N3,  \field Return Temperature Setpoint Constant Value
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This constant value is only used if 
+       \note the Design Chilled Water Return Temperature Input Type is Constant
+       \type real
+       \units C
+       \default 13
+  A5;  \field Return Temperature Setpoint Schedule Name
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This is a schedule name to allow the return temperature
+       \note target value to be scheduled.  This field is only used if 
+       \note the Design Chilled Water Return Temperature Input Type is Scheduled
+       \type object-list
+       \object-list ScheduleNames
+
+SetpointManager:ReturnTemperature:HotWater,
+     \memo This setpoint manager is used to place a temperature setpoint on a plant supply
+     \memo  outlet node based on a target return water setpoint. The setpoint manager attempts
+     \memo  to achieve the desired return water temperature by adjusting the supply temperature 
+     \memo  setpoint based on the plant conditions at each system time step.
+     \min-fields 7
+  A1,  \field Name
+       \required-field
+  A2,  \field Plant Loop Supply Outlet Node
+       \note This is the name of the supply outlet node for the plant being controlled by this 
+       \note setpoint manager.  Typically this is where the setpoint will be actuated for
+       \note supply equipment to control to, but not necessarily.  This setpoint manager will
+       \note mine that information from the internal plant data structures.
+       \type node
+       \required-field
+  A3,  \field Plant Loop Supply Inlet Node
+       \note This is the name of the supply inlet node for the plant being controlled with this 
+       \note setpoint manager. The temperature on this node is controlled by actuating the 
+       \note supply setpoint.
+       \type node
+       \required-field
+  N1,  \field Minimum Supply Temperature Setpoint
+       \note This is the minimum reset temperature for the hot water supply.
+       \type real
+       \units C
+       \default 77
+       \required-field
+  N2,  \field Maximum Supply Temperature Setpoint
+       \note This is the maximum hot water supply temperature setpoint.  This is also used as the default
+       \note setpoint during no-load or negative-load conditions and during initialization.
+       \type real
+       \units C
+       \default 82
+       \required-field
+  A4,  \field Return Temperature Setpoint Input Type
+       \note This defines whether the hot water return temperature target is constant, 
+       \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
+       \type choice
+       \key Constant
+       \key Scheduled
+       \key ReturnTemperatureSetpoint
+       \required-field
+  N3,  \field Return Temperature Setpoint Constant Value
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This constant value is only used if 
+       \note the Design Hot Water Return Temperature Input Type is Constant
+       \type real
+       \units C
+       \default 71
+  A5;  \field Return Temperature Setpoint Schedule Name
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This is a schedule name to allow the return temperature
+       \note target value to be scheduled.  This field is only used if 
+       \note the Design Hot Water Return Temperature Input Type is Scheduled
+       \type object-list
+       \object-list ScheduleNames
 
 \group Refrigeration
 
