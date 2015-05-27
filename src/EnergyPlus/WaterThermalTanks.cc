@@ -6124,7 +6124,7 @@ namespace WaterThermalTanks {
 	}
 
 	void
-	CalcWaterThermalTankStratified( int const WaterThermalTankNum ) // Water Heater being simulated
+	CalcWaterThermalTankStratified( int const WaterThermalTankNum, Real64 const HeatPumpPartLoadRatio ) // Water Heater being simulated
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6263,7 +6263,7 @@ namespace WaterThermalTanks {
 			HeatPumpWaterHeaterData const & HPWH = HPWaterHeater(Tank.HeatPumpNum);
 			DXCoils::DXCoilData const & Coil = DXCoils::DXCoil( HPWH.DXCoilNum );
 			HPWHCondenserConfig = HPWH.TypeNum;
-			Qheatpump = Coil.TotalHeatingEnergyRate;
+			Qheatpump = Coil.TotalHeatingEnergyRate * Tank.SourceEffectiveness * HeatPumpPartLoadRatio;
 		}
 
 		SetPointTemp1 = Tank.SetPointTemp;
@@ -6523,12 +6523,12 @@ namespace WaterThermalTanks {
 		} else if ( NodeNum > 0 ) {
 			Tank.SourceOutletTemp = Tank.Node( NodeNum ).TempAvg;
 		}
-		if ( Tank.HeatPumpNum > 0 ) {
-			if ( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped && SourceMassFlowRate > 0.0 ) {
-				Tank.SourceInletTemp = Tank.SourceOutletTemp + Qheatpump / ( SourceMassFlowRate * Cp );
-			} else if ( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped && Qheatpump > 0.0 ) {
-				Tank.SourceInletTemp = Tank.SourceOutletTemp; // TODO: figure out if this makes sense...
-			}
+		if ( Tank.HeatPumpNum > 0 && HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped ) {
+			HeatPumpWaterHeaterData const & HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+			DataLoopNode::NodeData const & HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
+			DataLoopNode::NodeData const & HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
+			Real64 const HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
+			Tank.SourceInletTemp = Tank.SourceOutletTemp + HPWHCondenserDeltaT;
 		} else {
 			Tank.SourceInletTemp = Tank.SourceOutletTemp;
 		}
@@ -7367,7 +7367,7 @@ namespace WaterThermalTanks {
 			if ( SELECT_CASE_var == MixedWaterHeater ) {
 				CalcWaterThermalTankMixed( WaterThermalTankNum );
 			} else if ( SELECT_CASE_var == ( StratifiedWaterHeater ) ) {
-				CalcWaterThermalTankStratified( WaterThermalTankNum );
+				CalcWaterThermalTankStratified( WaterThermalTankNum, HPPartLoadRatio );
 			}}
 
 			//   If HPWH compressor is available and unit is off for another reason, off-cycle parasitics are calculated
@@ -7451,11 +7451,8 @@ namespace WaterThermalTanks {
 				CalcWaterThermalTankMixed( WaterThermalTankNum );
 				NewTankTemp = Tank.TankTemp;
 			} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
-				Real64 const SavedCoilTotalHeatingEnergyRate = Coil.TotalHeatingEnergyRate;
-				Coil.TotalHeatingEnergyRate = 0.0;
-				CalcWaterThermalTankStratified( WaterThermalTankNum );
+				CalcWaterThermalTankStratified( WaterThermalTankNum, 0.0 );
 				NewTankTemp = FindStratifiedTankSensedTemp( Tank );
-				Coil.TotalHeatingEnergyRate = SavedCoilTotalHeatingEnergyRate;
 			} else {
 				assert( false );
 			}}
@@ -7530,7 +7527,7 @@ namespace WaterThermalTanks {
 					CalcWaterThermalTankMixed( WaterThermalTankNum );
 					NewTankTemp = Tank.TankTemp;
 				} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
-					CalcWaterThermalTankStratified( WaterThermalTankNum );
+					CalcWaterThermalTankStratified( WaterThermalTankNum, HPPartLoadRatio );
 					NewTankTemp = FindStratifiedTankSensedTemp( Tank );
 				}}
 
@@ -7640,7 +7637,7 @@ namespace WaterThermalTanks {
 							CalcWaterThermalTankMixed(WaterThermalTankNum);
 							NewTankTemp = Tank.TankTemp;
 						} else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
-							CalcWaterThermalTankStratified(WaterThermalTankNum);
+							CalcWaterThermalTankStratified(WaterThermalTankNum, HPPartLoadRatio);
 							NewTankTemp = FindStratifiedTankSensedTemp(Tank);
 						}}
 
@@ -7722,7 +7719,7 @@ namespace WaterThermalTanks {
 						CalcWaterThermalTankMixed(WaterThermalTankNum);
 						NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
 					} else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
-						CalcWaterThermalTankStratified(WaterThermalTankNum);
+						CalcWaterThermalTankStratified(WaterThermalTankNum, HPPartLoadRatio);
 						NewTankTemp = FindStratifiedTankSensedTemp(WaterThermalTank(WaterThermalTankNum));
 					}}
 					//update inlet temp
@@ -8000,7 +7997,7 @@ namespace WaterThermalTanks {
 			CalcWaterThermalTankMixed(WaterThermalTankNum);
 			NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
 		} else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
-			CalcWaterThermalTankStratified(WaterThermalTankNum);
+			CalcWaterThermalTankStratified(WaterThermalTankNum, HPPartLoadRatio);
 			NewTankTemp = FindStratifiedTankSensedTemp(WaterThermalTank(WaterThermalTankNum));
 		}}
 
@@ -8129,7 +8126,7 @@ namespace WaterThermalTanks {
 		WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = Par( 5 ) * HPPartLoadRatio;
 		// FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
 		FirstHVACIteration = ( Par( 4 ) == 1.0 );
-		CalcWaterThermalTankStratified( WaterThermalTankNum );
+		CalcWaterThermalTankStratified( WaterThermalTankNum, HPPartLoadRatio );
 		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
 		NewTankTemp = FindStratifiedTankSensedTemp( Tank );
 		PLRResidualStratifiedTank = Par( 1 ) - NewTankTemp;
