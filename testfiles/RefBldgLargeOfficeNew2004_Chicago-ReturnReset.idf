@@ -13,6 +13,7 @@
 ! ASHRAE Standards 90.1-2004 and 62-1999
 !
 ! Description:  12 story plus basement, office building.
+! The key feature of this file is demonstrating the setpoint reset control to maintain return water temperature.
 ! Form:         Area = 46,320 m2 (498,588 ft2); Number of Stories = 12; Shape = rectangle, Aspect ratio = 1.5
 ! Envelope:     Envelope thermal properties vary with climate according to ASHRAE Standard 90.1-2004.
 !               Opaque constructions: mass walls; built-up flat roof (insulation above deck); slab-on-grade floor
@@ -7639,11 +7640,11 @@
     CoolSys1 Loop Setpoint Manager, !- Name
     CoolSys1 Supply Outlet Node,      !- Plant Loop Supply Outlet Node
     CoolSys1 Supply Inlet Node,       !- Plant Loop Supply Inlet Node
-    6.7,                     !- Design Chilled Water Supply Temperature Setpoint
-    10.0,                    !- Maximum Chilled Water Supply Temperature Setpoint
-    Constant,                !- Design Chilled Water Return Temperature Input Type
-    12.0,                    !- Design Chilled Water Return Temperature Constant Value
-    ;                        !- Design Chilled Water Return Temperature Schedule Name
+    6.7,                     !- Minimum Supply Temperature Setpoint
+    10.0,                    !- Maximum Supply Temperature Setpoint
+    Constant,                !- Return Temperature Setpoint Input Type
+    12.0,                    !- Return Temperature Setpoint Constant Value
+    ;                        !- Return Temperature Setpoint Schedule Name
 
   !SetpointManager:Scheduled,
   !  HeatSys1 Loop Setpoint Manager,  !- Name
