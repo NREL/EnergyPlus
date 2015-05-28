@@ -6423,10 +6423,15 @@ namespace PlantPipingSystemsManager {
 		if ( dir == RegionType_XDirection ) {
 			RetVal = PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount;
 		} else if ( dir == RegionType_YDirection ) {
-			if ( n == 2 && PipingSystemDomains( DomainNum ).SlabInGradeFlag ) {
-				RetVal = PipingSystemDomains( DomainNum ).NumSlabCells;
+			// Set slab cell count
+			if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ) {
+				if ( ( PipingSystemDomains( DomainNum ).VertInsPresentFlag && n == 4 ) || ( !PipingSystemDomains( DomainNum ).VertInsPresentFlag && n == 2 ) ) {
+					RetVal = PipingSystemDomains( DomainNum ).NumSlabCells;
+				} else {
+					RetVal = PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount;
+				}
 			} else {
-				RetVal = PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount;
+				RetVal = PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount;
 			}
 		} else if ( dir == RegionType_ZDirection ) {
 			RetVal = PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount;
@@ -9207,6 +9212,7 @@ namespace PlantPipingSystemsManager {
 					cell.MyBase.Temperature = ThisCellTemp;
 					cell.MyBase.Temperature_PrevIteration = ThisCellTemp;
 					cell.MyBase.Temperature_PrevTimeStep = ThisCellTemp;
+					
 
 					if ( cell.CellType == CellType_Pipe ) {
 
