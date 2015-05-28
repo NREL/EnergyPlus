@@ -48054,8 +48054,8 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Table:OneIndependentVariable object can also be used
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
-       \note ffw = Fraction of the full load Water Flow	   
-	   
+       \note ffw = Fraction of the full load Water Flow
+
 Coil:WaterHeating:Desuperheater,
        \memo Desuperheater air heating coil. The heating energy provided by this coil is reclaimed
        \memo from the superheated refrigerant gas leaving a compressor and does not impact the
@@ -64716,7 +64716,7 @@ WaterHeater:HeatPump,
        \memo This object models an air-source heat pump for water heating.
        \memo WaterHeater:HeatPump is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump, Fan:OnOff, WaterHeater:Mixed
-	   \memo Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, Fan:OnOff, WaterHeater:Mixed
+       \memo Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, Fan:OnOff, WaterHeater:Mixed
   A1 , \field Name
        \required-field
        \type alpha
@@ -64842,7 +64842,7 @@ WaterHeater:HeatPump,
        \required-field
        \type choice
        \key Coil:WaterHeating:AirToWaterHeatPump
-	   \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
+       \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
        \default Coil:WaterHeating:AirToWaterHeatPump
        \note Specify the type of DX coil used by this heat pump water heater. The only
        \note valid choice is Coil:WaterHeating:AirToWaterHeatPump and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
@@ -64850,7 +64850,7 @@ WaterHeater:HeatPump,
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
-	   \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
@@ -76145,7 +76145,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \maximum< 10
        \default 0.0
        \units deltaC
-	   
+
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    A1, \field Name
