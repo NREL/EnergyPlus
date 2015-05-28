@@ -1402,7 +1402,6 @@ namespace HeatRecovery {
 			} else { // Sizing run done
 				CheckZoneSizing( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name );
 				NomSupAirVolFlowDes = std::max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
- 		
 			}
 		}
 
@@ -1451,6 +1450,7 @@ namespace HeatRecovery {
 				}
 
 			}
+		}
 
 		if ( IsAutoSize ) {
 			ExchCond( ExchNum ).NomSupAirVolFlow = NomSupAirVolFlowDes;
