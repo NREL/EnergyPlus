@@ -1367,6 +1367,7 @@ namespace DataPlantPipingSystems {
 		int NumDomainCells;
 		int NumGroundSurfCells;
 		int NumInsulationCells;
+		int NumSlabCells;
 		Array2D< Real64 > WeightedHeatFlux;
 
 		// Main 3D cells array
@@ -1427,7 +1428,8 @@ namespace DataPlantPipingSystems {
 			BasementFloorTemp( 0.0 ),
 			NumDomainCells ( 0 ),
 			NumGroundSurfCells( 0 ),
-			NumInsulationCells( 0 )
+			NumInsulationCells( 0 ),
+			NumSlabCells( 0 )
 
 		{}
 
@@ -1505,6 +1507,7 @@ namespace DataPlantPipingSystems {
 			int const NumDomainCells,
 			int const NumGroundSurfCells,
 			int const NumInsulationCells,
+			int const NumSlabCells,
 			Array2< Real64 > const & WeightedHeatFlux,
 
 			Array3< CartesianCell > const & Cells
@@ -1581,6 +1584,7 @@ namespace DataPlantPipingSystems {
 			NumDomainCells( NumDomainCells ),
 			NumGroundSurfCells( NumGroundSurfCells ),
 			NumInsulationCells( NumInsulationCells ),
+			NumSlabCells( NumSlabCells ),
 			Cells( Cells ),
 			WeightedHeatFlux( WeightedHeatFlux )
 		{}

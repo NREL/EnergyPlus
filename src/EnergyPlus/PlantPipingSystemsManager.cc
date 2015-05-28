@@ -1464,6 +1464,20 @@ namespace PlantPipingSystemsManager {
 					}
 					PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
 				}
+				
+				//Determine number of slab cells in slab-in-grade configuration - set minimum slab cell thickness of 1 in
+				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
+					PipingSystemDomains( DomainCtr ).NumSlabCells = PipingSystemDomains( DomainCtr ).SlabThickness / 0.0254;
+					if ( PipingSystemDomains( DomainCtr ).NumSlabCells > PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount ) {
+						PipingSystemDomains( DomainCtr ).NumSlabCells = PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount;
+					}
+					if ( PipingSystemDomains( DomainCtr ).NumSlabCells < 1 ) {
+						PipingSystemDomains( DomainCtr ).NumSlabCells = 1;
+					}
+				}
+				else {
+					PipingSystemDomains( DomainCtr ).NumSlabCells = PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount;
+				}
 
 				// Unit conversion
 				PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
@@ -5416,7 +5430,7 @@ namespace PlantPipingSystemsManager {
 										RegionType_HorizInsXSide, RegionType_HorizInsZSide, RegionType_FloorInside, RegionType_UnderFloor, RegionType_VertInsLowerEdge } ).count( PreviousRegion.RegionType ) != 0 ) {
 							++CellCountUpToNow;
 						} else {
-							CellCountUpToNow += GetCellWidthsCount( DomainNum, DirDirection );
+							CellCountUpToNow += GetCellWidthsCount( DomainNum, DirDirection, SubIndex );
 						}
 					}
 				} else {
@@ -5479,7 +5493,7 @@ namespace PlantPipingSystemsManager {
 			RetVal( Index ).Min = TempRegions( Index ).Min;
 			RetVal( Index ).Max = TempRegions( Index ).Max;
 			RetVal( Index ).RegionType = TempRegions( Index ).RegionType;
-			NumCellWidths = GetCellWidthsCount( DomainNum, DirDirection );
+			NumCellWidths = GetCellWidthsCount( DomainNum, DirDirection, Index );
 			if ( allocated( RetVal( Index ).CellWidths ) ) RetVal( Index ).CellWidths.deallocate();
 			RetVal( Index ).CellWidths.allocate( {0,NumCellWidths - 1} );
 			GetCellWidths( DomainNum, RetVal( Index ) );
@@ -6377,7 +6391,8 @@ namespace PlantPipingSystemsManager {
 	int
 	GetCellWidthsCount(
 		int const DomainNum,
-		int const dir // From Enum: RegionType
+		int const dir, // From Enum: RegionType
+		int const n
 	)
 	{
 
@@ -6408,7 +6423,11 @@ namespace PlantPipingSystemsManager {
 		if ( dir == RegionType_XDirection ) {
 			RetVal = PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount;
 		} else if ( dir == RegionType_YDirection ) {
-			RetVal = PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount;
+			if ( n == 2 && PipingSystemDomains( DomainNum ).SlabInGradeFlag ) {
+				RetVal = PipingSystemDomains( DomainNum ).NumSlabCells;
+			} else {
+				RetVal = PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount;
+			}
 		} else if ( dir == RegionType_ZDirection ) {
 			RetVal = PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount;
 		} else {
@@ -6492,16 +6511,28 @@ namespace PlantPipingSystemsManager {
 		GridWidth = g.Max - g.Min;
 
 		if ( ThisMesh.MeshDistribution == MeshDistribution_Uniform ) {
+			// Check if slab region in slab-in-grade configuration
+			if (PipingSystemDomains( DomainNum ).SlabInGradeFlag && g.RegionType == RegionType_YDirection && g.Max == PipingSystemDomains( DomainNum ).Extents.Ymax ) {
+				NumCells = PipingSystemDomains( DomainNum ).NumSlabCells;
+				if ( allocated( RetVal ) ) RetVal.deallocate( );
+				RetVal.allocate( { 0, NumCells - 1 } );
+				RetMaxIndex = NumCells - 1;
+				CellWidth = GridWidth / NumCells;
 
-			// we have it quite simple
-
-			assert( ThisMesh.RegionMeshCount > 0 );
-			CellWidth = GridWidth / ThisMesh.RegionMeshCount;
-
-			for ( I = 0; I <= ThisMesh.RegionMeshCount - 1; ++I ) {
-				RetVal( I ) = CellWidth;
+				for (I = 0; I <= NumCells - 1; ++I) {
+					RetVal(I) = CellWidth;
+				}
 			}
+			//All other cases
+			else {
+				// we have it quite simple
+				assert(ThisMesh.RegionMeshCount > 0);
+				CellWidth = GridWidth / ThisMesh.RegionMeshCount;
 
+				for (I = 0; I <= ThisMesh.RegionMeshCount - 1; ++I) {
+					RetVal(I) = CellWidth;
+				}
+			}
 		} else if ( ThisMesh.MeshDistribution == MeshDistribution_SymmetricGeometric ) {
 
 			//'then apply this "direction"'s conditions to generate a cell width array
@@ -6558,13 +6589,18 @@ namespace PlantPipingSystemsManager {
 					}
 				}
 			}
-			else if ( g.RegionType == RegionType_YDirection ){
+			else if ( g.RegionType == RegionType_YDirection ) {
+				//Assign uniform cell thickness to the slab cells.
 				if ( g.Max == PipingSystemDomains( DomainNum ).Extents.Ymax ){
-					//Assign uniform cell widths to the slab cells
-					assert( ThisMesh.RegionMeshCount > 0 );
-					CellWidth = GridWidth / ThisMesh.RegionMeshCount;
+					NumCells = PipingSystemDomains(DomainNum).NumSlabCells;
+					if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
+						if ( allocated( RetVal ) ) RetVal.deallocate( );
+						RetVal.allocate( { 0, NumCells - 1 } );
+						RetMaxIndex = NumCells - 1;
+					}
+					CellWidth = GridWidth / NumCells;
 
-					for ( I = 0; I <= ThisMesh.RegionMeshCount - 1; ++I ) {
+					for ( I = 0; I <= NumCells - 1; ++I ) {
 						RetVal( I ) = CellWidth;
 					}
 				}
@@ -9057,6 +9093,7 @@ namespace PlantPipingSystemsManager {
 		int SegCtr2;
 		Real64 ThisCellTemp;
 
+		
 		//'initialize cell properties
 		auto & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
