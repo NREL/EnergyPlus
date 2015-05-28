@@ -519,7 +519,7 @@ namespace DataEnvironment {
 		int const NumItems,
 		Array1S< Real64 > const Heights,
 		Array1S< Real64 > LocalWindSpeed,
-		std::string const & Settings
+		std::string const & EP_UNUSED( Settings )
 	)
 	{
 

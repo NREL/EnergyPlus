@@ -273,14 +273,12 @@ namespace OutdoorAirUnit {
 		using WaterCoils::CheckWaterCoilSchedule;
 		using SteamCoils::GetCoilAirInletNode;
 		using SteamCoils::GetCoilAirOutletNode;
-		auto & GetSteamCoilMaxFlowRate( SteamCoils::GetCoilMaxWaterFlowRate );
 		using SteamCoils::GetSteamCoilIndex;
 		using SteamCoils::GetCoilSteamInletNode;
 		using FluidProperties::FindRefrigerant;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::Construct;
 		using DataSizing::AutoSize;
 		using ScheduleManager::GetScheduleIndex;
 		using namespace DataLoopNode;
@@ -290,9 +288,6 @@ namespace OutdoorAirUnit {
 		auto & GetWCoilInletNode( WaterCoils::GetCoilInletNode );
 		auto & GetWCoilOutletNode( WaterCoils::GetCoilOutletNode );
 		using WaterCoils::GetCoilWaterOutletNode;
-		auto & GetDXCoilOutletNode( DXCoils::GetCoilOutletNode );
-		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
-		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using HeatingCoils::GetCoilInletNode;
 		using HeatingCoils::GetCoilOutletNode;
 		auto & GetElecCoilInletNode( HeatingCoils::GetCoilInletNode );
@@ -308,8 +303,6 @@ namespace OutdoorAirUnit {
 		using Fans::GetFanType;
 		using Fans::GetFanAvailSchPtr;
 		using DataHVACGlobals::cFanTypes;
-		using DataHVACGlobals::ZoneComp;
-		using DataZoneEquipment::OutdoorAirUnit_Num;
 		using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 
@@ -333,9 +326,6 @@ namespace OutdoorAirUnit {
 		int IOStat;
 		int OAUnitNum;
 		int CompNum;
-		int Item;
-		int NumComponents;
-		int AlphaNum;
 		std::string ComponentListName;
 		int NumInList;
 		int InListNum;
@@ -795,7 +785,6 @@ namespace OutdoorAirUnit {
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::AnyPlantInModel;
@@ -844,13 +833,6 @@ namespace OutdoorAirUnit {
 		Real64 OAFrac; // possible outside air fraction
 		Real64 EAFrac; // possible exhaust air fraction
 		Real64 RhoAir; // air density at InNode
-		Real64 TempSteamIn;
-		Real64 SteamDensity;
-		int EQListNum;
-		int EQNum;
-		int SteamConNode; // Hot Steam control node number for steam coil
-		int HotConNode; // Hot water control node number of hot water coil
-		int ColdConNode; // Cold water control node number of cold water coil
 		int compLoop; // local do loop index
 		Real64 rho;
 		bool errFlag;
@@ -1127,7 +1109,6 @@ namespace OutdoorAirUnit {
 		std::string CoolingCoilType;
 		int SizeComp;
 		int CompNum;
-		int ComponentType_Num;
 		Real64 rho;
 		Real64 Cp;
 		static int DummyWaterIndex( 1 );
@@ -1657,7 +1638,6 @@ namespace OutdoorAirUnit {
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 
 		// Locals
-		Real64 OAMassFlowRate;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1669,20 +1649,14 @@ namespace OutdoorAirUnit {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
-		int CompNum;
 		std::string EquipType;
 		std::string EquipName;
 		std::string CtrlName;
-		bool Sim;
-		bool ReSim;
 		Real64 DesOATemp; // Design OA Temp degree C
 		Real64 AirMassFlow; // air mass flow rate [kg/s]
 		int ControlNode; // the hot water or cold water inlet node
 		int InletNode; // Unit air inlet node
 		int SFanOutletNode; // Unit supply fan outlet node
-//		int ZoneAirInNode; // zone supply air node
-		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/sec]
-		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/sec]
 		int OutletNode; // air outlet node
 		int OutsideAirNode; // outside air node
 		Real64 QTotUnitOut; // total unit output [watts]
@@ -1692,21 +1666,15 @@ namespace OutdoorAirUnit {
 		Real64 SetPointTemp; // temperature that will be used to control the radiant system [Celsius]
 		Real64 HiCtrlTemp; // Current high point in setpoint temperature range
 		Real64 LoCtrlTemp; // Current low point in setpoint temperature range
-		Real64 CpFan; // Intermediate calculational variable for specific heat of air <<NOV9 Updated
 		Real64 AirInEnt; // RE-calcualte the Enthalpy of supply air
-		Real64 outsideent; // RE-calculate the Enthalpy of outdoor air
 		Real64 AirOutletTemp;
 		static int OperatingMode( 0 );
 		static int UnitControlType( 0 );
-		Real64 OutSideAirEnt; // Specific humidity ratio of outlet air (kg moisture / kg moist air)
 		Real64 ZoneSupAirEnt; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 		// Latent output
 		Real64 LatentOutput; // Latent (moisture) add/removal rate, negative is dehumidification [kg/s]
 		Real64 SpecHumOut; // Specific humidity ratio of outlet air (kg moisture / kg moist air)
 		Real64 SpecHumIn; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
-		Real64 EAMassFlowRate;
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool FatalErrorFlag;
 		Real64 ZoneAirEnt; // zone air enthalphy J/kg
 
 		// FLOW:
@@ -1974,7 +1942,7 @@ namespace OutdoorAirUnit {
 		std::string const & EquipType, // the component type
 		std::string const & EquipName, // the component Name
 		int const EquipNum,
-		int const CompTypeNum, // Component Type -- Integerized for this module
+		int const EP_UNUSED( CompTypeNum ), // Component Type -- Integerized for this module
 		bool const FirstHVACIteration,
 		int & CompIndex,
 		bool const Sim // if TRUE, simulate component
@@ -2034,38 +2002,26 @@ namespace OutdoorAirUnit {
 		// DERIVED TYPE DEFINITIONS: None
 
 		// SUBROUTINE LOCAL VARIABLE DEFINITIONS
-		int OperatingMode;
 		Real64 OAMassFlow;
 		Real64 QCompReq;
 		int UnitNum;
 		Real64 MaxWaterFlow;
 		Real64 MinWaterFlow;
 		int ControlNode;
-		int CoilInletNode;
-		int OutletNode;
 		Real64 CpAirZn;
-		int AirOutletNode;
-		int CoilWaterInletNode;
 		int SimCompNum;
 		int OpMode;
 		int EquipTypeNum;
 		int WCCoilInletNode;
 		int WCCoilOutletNode;
-		int WCCoilContNode;
 		int WHCoilInletNode;
 		int WHCoilOutletNode;
-		int WHCoilContNode;
-		int SHCoilInletNode;
-		int SHCoilOutletNode;
-		Real64 Qcoilout;
 		Real64 QUnitOut;
 		static int DXSystemIndex( 0 );
 		Real64 CompAirOutTemp;
 		Real64 FanEffect;
 		bool DrawFan; // fan position If .True., the temperature increasing by fan operating is considered
 		Real64 Dxsystemouttemp;
-		Real64 DXsystemInlettemp;
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool HeatActive( false );
 		static bool CoolActive( false );
 
@@ -2319,18 +2275,9 @@ namespace OutdoorAirUnit {
 		bool DrawFan; // Fan Flag
 		int InletNode;
 		int OutletNode;
-		int AirOutletNode;
-		static int WaterCoilIndex( 0 );
 		Real64 QCompReq; // Actual equipment load
-		Real64 CoilInTemp;
-		Real64 MinWaterFlow;
-		int SHCoilInletNode;
-		int SHCoilOutletNode;
-		int CoilWaterInletNode;
 		int CoilTypeNum;
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		Real64 CoilAirOutTemp;
-		int CoilNum;
 		int CompoNum;
 
 		// Flow

@@ -1074,8 +1074,6 @@ namespace HeatingCoils {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using DataAirSystems::PrimaryAirSystem;
-		using DataAirLoop::AirLoopControlInfo;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using namespace OutputReportPredefined;
@@ -1589,7 +1587,7 @@ namespace HeatingCoils {
 		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
 		int const FanOpMode, // fan operating mode
-		Real64 const PartLoadRatio // part-load ratio of heating coil
+		Real64 const EP_UNUSED( PartLoadRatio ) // part-load ratio of heating coil
 	)
 	{
 		// SUBROUTINE INFORMATION:

@@ -146,7 +146,6 @@ namespace RuntimeLanguageProcessor {
 		// Using/Aliasing
 		using DataGlobals::Pi;
 		using DataGlobals::HourOfDay;
-		using DataGlobals::OutputFileDebug;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::WarmupFlag;
@@ -1084,7 +1083,6 @@ namespace RuntimeLanguageProcessor {
 		bool ErrorFlag;
 		bool OperatorProcessing;
 		int CountDoLooping;
-		int i;
 		bool LastED; // last character in a numeric was an E or D
 
 		// Object Data
@@ -1671,7 +1669,6 @@ namespace RuntimeLanguageProcessor {
 		int OperatorNum;
 		int NumOperands;
 		int ParenthWhileCounter; // used to trap for unbalanced parentheses
-		int i;
 
 		// Object Data
 		Array1D< TokenType > Token( TokenIN );
@@ -1974,10 +1971,8 @@ namespace RuntimeLanguageProcessor {
 		Real64 thisMax; // local temporary
 		Real64 thisMin; // local temporary
 		int OperandNum;
-		int SeedElementInt;
 		int SeedN; // number of digits in the number used to seed the generator
 		Array1D_int SeedIntARR; // local temporary for random seed
-		int Pos; // local temporary for string position.
 		Real64 tmpRANDU1; // local temporary for uniform random number
 		Real64 tmpRANDU2; // local temporary for uniform random number
 		Real64 tmpRANDG; // local temporary for gaussian random number
@@ -2468,7 +2463,6 @@ namespace RuntimeLanguageProcessor {
 		using CurveManager::GetCurveType;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::TotConstructs;
-		using OutputProcessor::UnitsStringLength;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:

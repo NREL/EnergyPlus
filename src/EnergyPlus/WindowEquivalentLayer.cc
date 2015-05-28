@@ -159,7 +159,6 @@ namespace WindowEquivalentLayer {
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 		int ConstrNum; // Construction number
-		int EQLConNum; // Construction number for equivalent layer windows
 		int SurfNum; // surface number
 		// Flow
 
@@ -231,7 +230,6 @@ namespace WindowEquivalentLayer {
 		int EQLNum; // equivalent layer window construction index
 		int NumGLayers; // number of gap layers
 		int NumSLayers; // number of glazing and shade layers (non-gas layers)
-		int DoWhat; // DoWhat =1, index for diffuse, and =2 index for beam
 		Array2D< Real64 > SysAbs1( 2, CFSMAXNL+1 ); // layers absorptance and system transmittance
 		// Flow
 
@@ -553,22 +551,14 @@ namespace WindowEquivalentLayer {
 		Array1D< Real64 > Q( {0,CFSMAXNL} );
 		Array1D< Real64 > H( {0,CFSMAXNL+1} );
 		Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
-		Real64 QRSW;
-		Real64 QRLW;
-		Real64 QCONV;
 		Real64 QOCFRoom;
-		Real64 QROOM;
 		Real64 UCG;
 		Real64 SHGC;
-		Real64 SHGCCheck;
 		Real64 IncA;
 		Real64 VProfA;
 		Real64 HProfA;
 		int NL;
 		int I;
-		int iL;
-		int iLC1;
-		bool DoShadeControlR;
 		bool CFSSHGC;
 		// Flow
 
@@ -737,10 +727,8 @@ namespace WindowEquivalentLayer {
 		using InputProcessor::SameString;
 		using DataHeatBalSurface::HcExtSurf;
 		using DataGlobals::StefanBoltzmann;
-		using DataEnvironment::SunIsUpValue;
 		using DataEnvironment::SkyTempKelvin;
 		using DataEnvironment::IsRain;
-		using DataEnvironment::SunIsUp;
 		using namespace DataHeatBalFanSys;
 
 		// Locals
@@ -757,18 +745,14 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NL; // Number of layers
-		Real64 TIN;
-		Real64 TMrtK;
+		Real64 TIN( 0 );
 		Real64 TRMIN;
-		Real64 Tout;
+		Real64 Tout( 0 );
 		Real64 TRMOUT;
 		Real64 UCG;
 		Real64 SHGC;
-		Real64 QRLW;
-		Real64 QIGLW;
 		Real64 QRLWX;
 		Real64 QCONV;
-		Real64 TSX;
 		Array1D< Real64 > QOCF( CFSMAXNL );
 		Real64 QOCFRoom;
 		Array1D< Real64 > JB( {0,CFSMAXNL} );
@@ -791,21 +775,18 @@ namespace WindowEquivalentLayer {
 		Real64 NodeTemp;
 		Real64 CpAir;
 		Real64 RefAirTemp; // reference air temperatures
-		int tmpGasType;
 		int SurfNumAdj; // An interzone surface's number in the adjacent zone
 		int ZoneNumAdj; // An interzone surface's adjacent zone number
 		Real64 LWAbsIn; // effective long wave absorptance/emissivity back side
 		Real64 LWAbsOut; // effective long wave absorptance/emissivity front side
-		Real64 QLWAbsIn; // Inside surface long wave absorbed flux, W/m2
-		Real64 outir;
+		Real64 outir( 0 );
 		Real64 rmir;
 		Real64 Ebout;
 		Real64 QXConv; // extra convective gain from this surface
-		Real64 TaIn; // zone air temperature
+		Real64 TaIn( 0 ); // zone air temperature
 		Real64 tsky; // sky temperature
 		Real64 HcIn; // inside convection coeficient at this timestep, W/m2K
 		Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
-		Real64 ConvHeatFlowForced; // Convective heat flow from forced airflow gap (W)
 		Real64 NetIRHeatGainWindow; // net radiation gain from the window surface to the zone (W)
 		Real64 ConvHeatGainWindow; // net convection heat gain from inside surface of window to zone air (W)
 		int InSideLayerType; // interior shade type
@@ -1244,7 +1225,7 @@ namespace WindowEquivalentLayer {
 	Real64
 	RB_F(
 		Real64 const THETA, // incidence angle, radians
-		int const OPT, // options (unused)
+		int const EP_UNUSED( OPT ), // options (unused)
 		Array1A< Real64 > const P // parameters
 	)
 	{
@@ -2240,14 +2221,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_I(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const OMEGA_H, // horizontal profile angle, radians
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
 		Real64 const DE, // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -2683,14 +2664,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_II(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const OMEGA_H, // horizontal profile angle, radians
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
 		Real64 const DE, // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3039,9 +3020,9 @@ namespace WindowEquivalentLayer {
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3385,14 +3366,14 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_IV(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const OMEGA_H, // horizontal profile angle, radians
-		Real64 const DE, // width of illumination on pleat bottom (same units as S)
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
+		Real64 const EP_UNUSED( DE ), // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3590,9 +3571,9 @@ namespace WindowEquivalentLayer {
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
 		Real64 const RHOFF_BT_PERP,
 		Real64 const TAUFF_BB_PERP,
 		Real64 const TAUFF_BD_PERP,
@@ -3831,20 +3812,20 @@ namespace WindowEquivalentLayer {
 	PD_BEAM_CASE_VI(
 		Real64 const S, // pleat spacing (> 0)
 		Real64 const W, // pleat depth (>=0, same units as S)
-		Real64 const OMEGA_H, // horizontal profile angle, radians
-		Real64 const DE, // width of illumination on pleat bottom (same units as S)
+		Real64 const EP_UNUSED( OMEGA_H ), // horizontal profile angle, radians
+		Real64 const EP_UNUSED( DE ), // width of illumination on pleat bottom (same units as S)
 		Real64 const RHOFF_BT_PARL,
 		Real64 const TAUFF_BB_PARL,
 		Real64 const TAUFF_BD_PARL,
-		Real64 const RHOBF_BT_PARL,
-		Real64 const TAUBF_BB_PARL,
-		Real64 const TAUBF_BD_PARL,
-		Real64 const RHOFF_BT_PERP,
-		Real64 const TAUFF_BB_PERP,
-		Real64 const TAUFF_BD_PERP,
-		Real64 const RHOBF_BT_PERP,
-		Real64 const TAUBF_BB_PERP,
-		Real64 const TAUBF_BD_PERP,
+		Real64 const EP_UNUSED( RHOBF_BT_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BB_PARL ),
+		Real64 const EP_UNUSED( TAUBF_BD_PARL ),
+		Real64 const EP_UNUSED( RHOFF_BT_PERP ),
+		Real64 const EP_UNUSED( TAUFF_BB_PERP ),
+		Real64 const EP_UNUSED( TAUFF_BD_PERP ),
+		Real64 const EP_UNUSED( RHOBF_BT_PERP ),
+		Real64 const EP_UNUSED( TAUBF_BB_PERP ),
+		Real64 const EP_UNUSED( TAUBF_BD_PERP ),
 		Real64 const RHOBF_DD, // fabric back diffuse-diffuse reflectance
 		Real64 const RHOFF_DD, // fabric front diffuse-diffuse reflectance
 		Real64 const TAUFF_DD, // fabric front diffuse-diffuse transmittance
@@ -3887,7 +3868,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 TAUBF_BT_PERP;
 		Real64 AK; // length of diagonal strings
 		Real64 CG;
 		Real64 Z1_BD; // diffuse source termps
@@ -4226,13 +4206,13 @@ namespace WindowEquivalentLayer {
 		Real64 XC;
 		Real64 XD;
 		Real64 XE;
-		Real64 XF;
+		Real64 XF( 0 );
 		Real64 YA;
 		Real64 YB;
 		Real64 YC;
 		Real64 YD;
 		Real64 YE;
-		Real64 YF;
+		Real64 YF( 0 );
 		int CORR;
 		// Flow
 
@@ -5006,7 +4986,6 @@ namespace WindowEquivalentLayer {
 		Real64 SaveHCNLm; // place to save HC(NL-1) - two resistance networks differ
 		Real64 SaveHCNL; // place to save HC(NL)   - two resistance networks differ
 		// in their definitions of these heat transfer coefficients
-		bool DoPrint; // set true to print debugging info
 		// Flow
 
 		ASHWAT_Thermal = false; // init to failure
@@ -5850,18 +5829,11 @@ namespace WindowEquivalentLayer {
 		Array1D< Real64 > X( 20 );
 		// real FSg_g, FSdf_g, FSdb_g, FSm_g
 		Real64 FSg_df;
-		Real64 FSdf_df;
-		Real64 FSdb_df;
 		Real64 FSm_df;
 		Real64 FSg_db;
-		Real64 FSdf_db;
-		Real64 FSdb_db;
 		Real64 FSm_db;
 		Real64 FSg_m;
-		Real64 FSdf_m;
-		Real64 FSdb_m;
-		Real64 FSm_m;
-
+		
 		//  Calculate 4 emissivities/absorptivities
 
 		Epsg = 1.0 - rhog;
@@ -6000,10 +5972,10 @@ namespace WindowEquivalentLayer {
 		Real64 const CK,
 		Real64 const ACP, // gas specific heat coeffs, CP = ACP + BCP*TM + CCP*TM*TM
 		Real64 const BCP,
-		Real64 const CCP,
+		Real64 const EP_UNUSED( CCP ),
 		Real64 const AVISC, // gas viscosity coeffs, VISC = AVISC + BVISC*TM + CVISC*TM*TM
 		Real64 const BVISC,
-		Real64 const CVISC,
+		Real64 const EP_UNUSED( CVISC ),
 		Real64 const RHOGAS // gas density, kg/m3
 	)
 	{
@@ -6295,7 +6267,6 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 b;
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6387,7 +6358,6 @@ namespace WindowEquivalentLayer {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// a
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6514,7 +6484,6 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6698,11 +6667,7 @@ namespace WindowEquivalentLayer {
 		Array1D< Real64 > H( {0,FS.NL+1} );
 		Array1D< Real64 > SOURCE( FS.NL+1 );
 		Real64 ISOL;
-		Real64 UX;
 		Real64 SHGC;
-		Real64 QRLW;
-		Real64 QCONV;
-		Real64 QROOM;
 		// Flow
 
 		CFSUFactor = false;
@@ -7960,8 +7925,6 @@ namespace WindowEquivalentLayer {
 		bool DODIFFUSE;
 		Real64 RHOBF_BT0;
 		Real64 RHOFF_BT0;
-		Real64 TAUBF_BT0;
-		Real64 TAUFF_BT0;
 		Real64 TAUX;
 		// Flow
 
@@ -8855,7 +8818,6 @@ namespace WindowEquivalentLayer {
 		// may be within L
 		static std::string const RoutineName( "FillDefaultsSWP: " );
 		bool OK;
-		bool ErrorsFound;
 		// Flow
 
 		// default back taus to front (often equal)
@@ -9225,13 +9187,10 @@ namespace WindowEquivalentLayer {
 		Real64 ProfAngHor; // Solar profile angle (radians) for horizontal blind
 		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
-		Real64 IncidAngle; // = ACOS(SOLCOS(3))
 		static Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
 		int Lay; // window layer index
 		int EQLNum; // equivalent layer window construction index
 		int ConstrNum; // construction index
-		int I; // index
-		int J; // index
 		// Flow
 
 		IncAng = 0.0; //Autodesk:Init Added to elim use uninitialized
@@ -9367,8 +9326,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 InsideLWEmiss; // LW inside emissivity
-
+		
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 		// FUNCTION PARAMETER DEFINITIONS:

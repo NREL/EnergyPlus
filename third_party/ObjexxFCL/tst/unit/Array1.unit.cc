@@ -105,6 +105,10 @@ TEST( Array1Test, ConstructionInitializerListOnlyInt )
 	EXPECT_EQ( 1.0, r( 1 ) );
 	EXPECT_EQ( 2.0, r( 2 ) );
 	EXPECT_EQ( 3.0, r( 3 ) );
+	int v( 0 );
+	for ( auto const e : r ) {
+		EXPECT_EQ( ++v, e );
+	}
 }
 
 TEST( Array1Test, ConstructionInitializerListOnlyUnsigned )
@@ -814,6 +818,88 @@ TEST( Array1Test, Redimension )
 	}
 }
 
+TEST( Array1Test, Append )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	A.append( 6 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 6, A.u() );
+	EXPECT_EQ( 6u, A.size() );
+	EXPECT_EQ( 6u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+}
+
+TEST( Array1Test, Push_Back_Empty )
+{
+	Array1D_int A;
+	A.push_back( 1 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 1, A.u() );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+}
+
+TEST( Array1Test, Push_Back )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	A.push_back( 6 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 6, A.u() );
+	EXPECT_EQ( 6u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+}
+
+TEST( Array1Test, Pop_Back )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	EXPECT_EQ( 5, A.back() );
+	A.pop_back();
+	EXPECT_EQ( 4u, A.size() );
+}
+
+TEST( Array1Test, Front )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	EXPECT_EQ( 1, A.front() );
+}
+
+TEST( Array1Test, Reserve )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	EXPECT_EQ( 5u, A.size() );
+	EXPECT_EQ( 5u, A.capacity() );
+	A.reserve( 8u );
+	EXPECT_EQ( 5u, A.size() );
+	EXPECT_EQ( 8u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 2, A( 2 ) );
+	EXPECT_EQ( 3, A( 3 ) );
+	EXPECT_EQ( 4, A( 4 ) );
+	EXPECT_EQ( 5, A( 5 ) );
+	A.push_back( 6 );
+	A.push_back( 7 );
+	A.push_back( 8 );
+	EXPECT_EQ( 8u, A.size() );
+	EXPECT_EQ( 8u, A.capacity() );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
+	EXPECT_EQ( 8, A( 8 ) );
+	A.push_back( 9 );
+	EXPECT_EQ( 9u, A.size() );
+	EXPECT_EQ( 16u, A.capacity() );
+	EXPECT_EQ( 9, A( 9 ) );
+	A.shrink_to_fit();
+	EXPECT_EQ( 9u, A.size() );
+	EXPECT_EQ( 9u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 8, A( 8 ) );
+	EXPECT_EQ( 9, A( 9 ) );
+}
+
 TEST( Array1Test, Swap )
 {
 	Array1D_int A( 4, 11 );
@@ -906,6 +992,24 @@ TEST( Array1Test, Generators )
 	Array1D_double A( 3, 22.0 ), B( 3, 11.0 );
 	EXPECT_TRUE( eq( B, A / 2.0 ) );
 	//EXPECT_TRUE( eq( B, A / 2 ) ); // This doesn't compile: Won't convert
+}
+
+TEST( Array1Test, Iterator )
+{
+	Array1D_int A{ 1, 2, 3 };
+	int j( 0 );
+	for ( Array1D_int::const_iterator i = A.begin(); i != A.end(); ++i ) {
+		EXPECT_EQ( ++j, *i );
+	}
+}
+
+TEST( Array1Test, ReverseIterator )
+{
+	Array1D_int A{ 1, 2, 3 };
+	int j( 4 );
+	for ( Array1D_int::const_reverse_iterator i = A.rbegin(); i != A.rend(); ++i ) {
+		EXPECT_EQ( --j, *i );
+	}
 }
 
 TEST( Array1Test, FunctionAllocateDeallocate )

@@ -80,7 +80,6 @@ TEST( SlinkyGroundHeatExchangerTest, GetGFunc )
 
 	// Initialization
 	GLHESlinky thisGLHE;
-	Real64 thisLNTTS;
 	Real64 thisGFunc;
 	Real64 time;
 	
@@ -106,7 +105,6 @@ TEST( VerticalGroundHeatExchangerTest, GetGFunc )
 
 	// Initialization
 	GLHEVert thisGLHE;
-	Real64 thisLNTTS;
 	Real64 thisGFunc;
 	Real64 time;
 	
@@ -144,8 +142,6 @@ TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 	// Initializations
 	GLHESlinky thisGLHE;
 
-	Real64 inletTemp( 5.0 );
-	
 	PlantLoop.allocate( 1 );
 	thisGLHE.loopNum = 1;
 
@@ -186,8 +182,6 @@ TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 	// Initializations
 	GLHEVert thisGLHE;
 
-	Real64 inletTemp( 5.0 );
-	
 	PlantLoop.allocate( 1 );
 	thisGLHE.loopNum = 1;
 

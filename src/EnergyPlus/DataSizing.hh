@@ -1132,8 +1132,8 @@ namespace DataSizing {
 			Real64 const ScaledCoolingCapacity, // - scaled maximum cooling capacity of zone HVAC equipment, W
 			Real64 const ScaledHeatingCapacity, // - scaled maximum heating capacity of zone HVAC equipment, W
 			bool const RequestAutoSize, // - true if autosizing is requested
-			bool const CoolCoilExists, // True if a cooling coil is specified in the ZoneHVAC equip
-			bool const HeatCoilExists // True if a heating coil is specified in the ZoneHVAC equipm
+			bool const EP_UNUSED( CoolCoilExists ), // True if a cooling coil is specified in the ZoneHVAC equip
+			bool const EP_UNUSED( HeatCoilExists ) // True if a heating coil is specified in the ZoneHVAC equipm
 			) :
 			Name(Name),
 			CoolingSAFMethod(CoolingSAFMethod),
@@ -1271,7 +1271,7 @@ namespace DataSizing {
 			Real64 const ScaledCoolingCapacity, // - scaled maximum cooling capacity of cooling coil in an air loop
 			Real64 const ScaledHeatingCapacity, // - scaled maximum heating capacity of cooling coil in an air loop
 			Real64 const FloorAreaOnAirLoopCooled, // total floor of cooled zones served by an airloop
-			Real64 const FloorAreaOnAirLoopHeated, // total floor of heated zones served by an airloop
+			Real64 const EP_UNUSED( FloorAreaOnAirLoopHeated ), // total floor of heated zones served by an airloop
 			Real64 const FlowPerFloorAreaCooled, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
 			Real64 const FlowPerFloorAreaHeated, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
 			Real64 const FractionOfAutosizedCoolingAirflow, // fraction of of cooling supply air flow rate an airloop

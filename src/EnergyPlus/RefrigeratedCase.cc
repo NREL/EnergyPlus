@@ -9128,7 +9128,6 @@ namespace RefrigeratedCase {
 		Real64 TotalLoadFromSysID; // total heat rejection load from a single detailed system [W]
 		Real64 TotalLoadFromThisSystem( 0.0 ); // total heat rejection load from the detailed system id'd in subroutine call [W]
 		Real64 TotalLoadFromSystems; // total heat rejection load from all systems served by this condenser [W]
-		Real64 NomCap; // ne "design" capacity when operating evap condenser at reduced air flow [W]
 		Real64 CurMaxCapacity; // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
 
 		LocalTimeStep = TimeStepZone;
@@ -10644,7 +10643,6 @@ namespace RefrigeratedCase {
 		int TransSystemNum;
 		int WalkInID;
 		int WalkInNum;
-		int ZoneNum;
 		int ZoneID;
 		std::string ChrOut;
 		std::string ChrOut2;
@@ -11560,7 +11558,7 @@ namespace RefrigeratedCase {
 		Real64 TBrineIn; // Brine temperature going to heat exchanger, C
 		Real64 TCondense; // Condensing temperature for a phase change secondary loop, C
 		Real64 TEvap; // Evaporating temperature in secondary loop heat exchanger (C)
-		Real64 TotalCoolingLoad; // Cooling load reported back to compressor rack or detailed system (W)
+		Real64 TotalCoolingLoad( 0 ); // Cooling load reported back to compressor rack or detailed system (W)
 		Real64 TotalHotDefrostCondCredit; // Used to credit condenser when heat reclaim used for hot gas/brine defrost (W)
 		Real64 TotalPumpPower; // Total Pumping power for loop, W
 		Real64 TotalLoad; // Total Cooling Load on secondary loop, W

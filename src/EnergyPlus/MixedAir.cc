@@ -1115,8 +1115,6 @@ namespace MixedAir {
 		using namespace OutputReportPredefined;
 
 		using DataAirSystems::PrimaryAirSystem;
-		using DataZoneControls::HumidityControlZone;
-		using DataZoneControls::NumHumidityControlZones;
 		using DataContaminantBalance::Contaminant;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
@@ -1177,9 +1175,6 @@ namespace MixedAir {
 		int CompNum; // Used to determine if control zone is served by furnace air loop
 
 		int NumGroups; // Number of extensible input groups of the VentilationMechanical object
-		int numBaseNum; // base number for numeric arguments (for readability)
-		//INTEGER :: OAIndex               ! Loop index for design specification outdoor air object list
-		//INTEGER :: NumControllerList = 0  ! Index to controller lists
 		static int ControllerListNum( 0 ); // Index used to loop through controller list
 		static int ControllerNum( 0 ); // Index to controllers in each controller list
 		static int Num( 0 ); // Index used to loop through controllers in list
@@ -2520,7 +2515,7 @@ namespace MixedAir {
 
 	void
 	InitOutsideAirSys(
-		int const OASysNum, // unused1208
+		int const EP_UNUSED( OASysNum ), // unused1208
 		bool const FirstHVACIteration
 	)
 	{
@@ -3447,7 +3442,6 @@ namespace MixedAir {
 		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
 		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
 
-		static bool MultiPath( false ); // TRUE if multi-path ventilation system such as dual fan dual duct, VAV with fan-powered box
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
 		static Real64 Fa( 1.0 ); // temporary variable used in multi-path VRP calc
@@ -4709,7 +4703,7 @@ namespace MixedAir {
 	}
 
 	void
-	ReportOAMixer( int const OAMixerNum ) // unused1208
+	ReportOAMixer( int const EP_UNUSED( OAMixerNum ) ) // unused1208
 	{
 
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -4717,7 +4711,7 @@ namespace MixedAir {
 	}
 
 	void
-	ReportOAController( int const OAControllerNum ) // unused1208
+	ReportOAController( int const EP_UNUSED( OAControllerNum ) ) // unused1208
 	{
 
 		// SUBROUTINE ARGUMENT DEFINITIONS

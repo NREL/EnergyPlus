@@ -1372,7 +1372,6 @@ namespace SimAirServingZones {
 		static Real64 OAReliefDiff( 0.0 ); // local for massflow change across OA system, kg/s
 
 		Array1D_int tmpNodeARR;
-		int nodeCount;
 		int nodeLoop;
 		int ZoneNum;
 
@@ -2050,7 +2049,6 @@ namespace SimAirServingZones {
 		// Using/Aliasing
 		using HVACInterfaceManager::UpdateHVACInterface;
 		using MixedAir::SimOAController;
-		using DataGlobals::BeginTimeStepFlag;
 		using General::GetPreviousHVACTime;
 		using DataConvergParams::CalledFromAirSystemSupplySideDeck1;
 		using DataConvergParams::CalledFromAirSystemSupplySideDeck2;
@@ -3419,7 +3417,6 @@ namespace SimAirServingZones {
 		using InputProcessor::FindItemInList;
 		using General::FindNumberInList;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using DataEnvironment::OutBaroPress;
 		using namespace OutputReportPredefined;
 		using DataHeatBalance::Zone;
 		using DataDefineEquip::AirDistUnit;
@@ -3456,7 +3453,6 @@ namespace SimAirServingZones {
 		Real64 ZoneOAFracCooling; // zone OA fraction for cooling design air flow
 		Real64 ZoneOAFracHeating; // zone OA fraction for heating design air flow
 		static Real64 Ep( 1.0 ); // zone primary air fraction
-		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
 		Real64 ZoneSA; // Zone supply air flow rate
 		Array1D< Real64 > VdzClgByZone; // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
 		Array1D< Real64 > VdzHtgByZone; // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
@@ -3467,9 +3463,6 @@ namespace SimAirServingZones {
 		Array1D< Real64 > VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
 		Array1D< Real64 > VpzClgSumBySys; // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
 		Array1D< Real64 > VpzHtgSumBySys; // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
-		Real64 NodeTemp; // node temperature
-		Real64 NodeHumRat; // node humidity ratio
-		Real64 MassFlowRate; // Temporary variable
 		Real64 ClgSupplyAirAdjustFactor; // temporary variable
 		Real64 HtgSupplyAirAdjustFactor; // temporary variable
 		Real64 SysOAUnc; // uncorrected system OA summing up people and area based OA for all zones for VRP
@@ -3485,7 +3478,6 @@ namespace SimAirServingZones {
 		Array1D< Real64 > DBySysCool; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
 		Array1D< Real64 > DBySysHeat; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
 		Real64 RpPzSum; // Rp times Pz used for computing the system total Rp value for 62.1 tabular report
-		Real64 PzSum; // Pz sum for system total Pz for 62.1 tabular report
 		Real64 RaAzSum; // Ra time Az used for computing the system tota Ra value for 62.1 tabular report
 		Real64 AzSum; // Az sum for system total Az for 62.1 tabular report
 		Real64 VbzSum; // Vbz sum for system total Vbz for 62.1 tabular report
@@ -4534,7 +4526,6 @@ namespace SimAirServingZones {
 		static Array1D< Real64 > VozSumHtgBySys; // saved value of cooling ventilation required at htg zones
 		static Array1D< Real64 > TotCoolCapTemp; // scratch variable used for calulating peak load [W]
 		static Array1D< Real64 > SensCoolCapTemp; // scratch variable used for calulating peak load [W]
-		static Real64 Evz( 1.0 ); // zone ventilation efficiency
 		static Real64 MinHeatingEvz( 1.0 ); // minimum zone ventilation efficiency for heating (to be used as system efficiency)
 		static Array1D< Real64 > EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
 		static Real64 MinCoolingEvz( 1.0 ); // minimum zone ventilation efficiency for cooling (to be used as system efficiency)
@@ -4544,7 +4535,6 @@ namespace SimAirServingZones {
 		static Real64 Vou( 0.0 ); // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1
 		static Real64 Vot( 0.0 ); // Required outdoor air intake at primary AHU per ASHRAE std 62.1
 		static Real64 VotMax( 0.0 ); // Max of required cooling/heating outdoor air intake at primary AHU per ASHRAE std 62.1
-		static Real64 VozBySys( 0.0 ); // Sum of zone required outdoor air intake per ASHRAE std 62.1
 		static Real64 Ratio( 1 ); // Ratio of VozBySys / VotMax
 		// not changing this for the unitary system check in
 		//  REAL(r64) :: Ratio   = 1.0d0           ! Ratio of VozBySys / VotMax
@@ -6118,12 +6108,6 @@ namespace SimAirServingZones {
 		Real64 CpAirStd; // specific heat of air at standard condition
 		Real64 FractionOfAutosize; // user specified autosized fraction for capacity and supply air flow
 		Real64 AutosizedCapacity; // autosized heating and cooling capacity
-		int NumZonesHeated; // number of zones heated by a system
-		int NumZonesCooled; // numberof zones cooled by a system
-		int ZonesHeatedNum; // loop index of zones heated in a system
-		int ZonesCooledNum; // loop index of zones cooled in a system
-		int NumZonesForHtg; // Number of heating zones for given primary system
-		int CtrlZoneNum; // controlled zone index
 
 		DataFracOfAutosizedCoolingCapacity = 1.0;
 		DataFracOfAutosizedHeatingCapacity = 1.0;

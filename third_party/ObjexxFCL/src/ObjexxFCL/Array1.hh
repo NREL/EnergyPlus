@@ -62,6 +62,10 @@ public: // Types
 	typedef  typename Super::const_reference  const_reference;
 	typedef  typename Super::pointer  pointer;
 	typedef  typename Super::const_pointer  const_pointer;
+	typedef  typename Super::iterator  iterator;
+	typedef  typename Super::const_iterator  const_iterator;
+	typedef  typename Super::reverse_iterator  reverse_iterator;
+	typedef  typename Super::const_reverse_iterator  const_reverse_iterator;
 	typedef  typename Super::size_type  size_type;
 	typedef  typename Super::difference_type  difference_type;
 
@@ -71,6 +75,10 @@ public: // Types
 	typedef  typename Super::ConstReference  ConstReference;
 	typedef  typename Super::Pointer  Pointer;
 	typedef  typename Super::ConstPointer  ConstPointer;
+	typedef  typename Super::Iterator  Iterator;
+	typedef  typename Super::ConstIterator  ConstIterator;
+	typedef  typename Super::ReverseIterator  ReverseIterator;
+	typedef  typename Super::ConstReverseIterator  ConstReverseIterator;
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
@@ -81,8 +89,8 @@ public: // Types
 	using Super::size_of;
 	using Super::slice_k;
 	using Super::swapB;
+	using Super::capacity_;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
@@ -1174,7 +1182,7 @@ public: // Subscript
 	a( int const i ) const
 	{
 		assert( contains( i ) );
-		return Tail( static_cast< T const * >( sdata_ + i ), ( data_size_ != npos ? data_size_ - ( i - shift_ ) : npos ) );
+		return Tail( static_cast< T const * >( sdata_ + i ), ( size_ != npos ? size_ - ( i - shift_ ) : npos ) );
 	}
 
 	// Tail Starting at array( i )
@@ -1183,7 +1191,7 @@ public: // Subscript
 	a( int const i )
 	{
 		assert( contains( i ) );
-		return Tail( sdata_ + i, ( data_size_ != npos ? data_size_ - ( i - shift_ ) : npos ) );
+		return Tail( sdata_ + i, ( size_ != npos ? size_ - ( i - shift_ ) : npos ) );
 	}
 
 public: // Slice Proxy Generators

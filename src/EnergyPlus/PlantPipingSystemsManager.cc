@@ -205,7 +205,7 @@ namespace PlantPipingSystemsManager {
 	SimPipingSystemCircuit(
 		std::string const & EquipName, // name of the Pipe Heat Transfer.
 		int & EqNum, // index in local derived types for external calling
-		bool const FirstHVACIteration, // component number
+		bool const EP_UNUSED( FirstHVACIteration ), // component number
 		bool const InitLoopEquip
 	)
 	{
@@ -312,9 +312,6 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::DayOfMonth;
-		using DataEnvironment::DayOfWeek;
-		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataGlobals::BeginSimFlag;
 		using DataGlobals::BeginEnvrnFlag;
@@ -324,8 +321,6 @@ namespace PlantPipingSystemsManager {
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::TimeStepZoneSec;
 		using DataGlobals::SecInHour;
-		using DataGlobals::InitConvTemp;
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::AnyBasementsInModel;
 		using DataGlobals::OutputFileInits;
 		using DataHeatBalFanSys::ZTAV;
@@ -563,7 +558,6 @@ namespace PlantPipingSystemsManager {
 		int TotalNumSegments;
 		int ThisCircuitPipeSegmentCounter;
 		std::string ThisSegmentName;
-		int InputPipeSegmentCounter;
 
 		// Read number of objects and allocate main data structures - first domains
 		NumGeneralizedDomains = GetNumObjectsFound( ObjName_ug_GeneralDomain );
@@ -777,11 +771,8 @@ namespace PlantPipingSystemsManager {
 		using InputProcessor::SameString;
 		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
-		using DataSurfaces::Surface; // not sure if we need all these...
 		using DataSurfaces::OSCM;
 		using DataSurfaces::TotOSCM;
-		using DataSurfaces::TotSurfaces;
-		using DataSurfaces::OtherSideCondModeledExt;
 		using General::TrimSigDigits;
 		using DataGlobals::SecsInDay;
 
@@ -798,7 +789,6 @@ namespace PlantPipingSystemsManager {
 		int IOStatus; // Used in GetObjectItem
 		int NumCircuitsInThisDomain;
 		int CircuitCtr;
-		bool BasementInputError;
 		int NumSurfacesWithThisOSCM;
 		int NumAlphasBeforePipeCircOne;
 		int CurIndex;
@@ -1010,11 +1000,11 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 	void
-		ReadZoneCoupledDomainInputs(
+	ReadZoneCoupledDomainInputs(
 		int const StartingDomainNumForZone,
 		int const NumZoneCoupledDomains,
 		bool & ErrorsFound
-		)
+	)
 	{
 
 			// SUBROUTINE INFORMATION:
@@ -1038,11 +1028,8 @@ namespace PlantPipingSystemsManager {
 			using InputProcessor::SameString;
 			using InputProcessor::VerifyName;
 			using namespace DataIPShortCuts;
-			using DataSurfaces::Surface; // not sure if we need all these...
 			using DataSurfaces::OSCM;
 			using DataSurfaces::TotOSCM;
-			using DataSurfaces::TotSurfaces;
-			using DataSurfaces::OtherSideCondModeledExt;
 			using General::TrimSigDigits;
 			using DataGlobals::SecsInDay;
 			using DataHeatBalance::Material;
@@ -1065,7 +1052,6 @@ namespace PlantPipingSystemsManager {
 			int NumAlphas; // Number of Alphas for each GetObjectItem call
 			int NumNumbers; // Number of Numbers for each GetObjectItem call
 			int IOStatus; // Used in GetObjectItem
-			int CurIndex;
 			int NumSurfacesWithThisOSCM;
 			int MonthIndex;
 			int SurfCtr;
@@ -1530,11 +1516,8 @@ namespace PlantPipingSystemsManager {
 		using InputProcessor::VerifyName;
 		using InputProcessor::MakeUPPERCase;
 		using namespace DataIPShortCuts;
-		using DataSurfaces::Surface; // not sure if we need all these...
 		using DataSurfaces::OSCM;
 		using DataSurfaces::TotOSCM;
-		using DataSurfaces::TotSurfaces;
-		using DataSurfaces::OtherSideCondModeledExt;
 		using General::TrimSigDigits;
 		using DataGlobals::SecsInDay;
 		using DataHeatBalance::Material;
@@ -1563,7 +1546,6 @@ namespace PlantPipingSystemsManager {
 		int MonthIndex;
 		bool IsBlank;
 		bool IsNotOK;
-		bool BasementInputError;
 		Real64 ThisArea;
 
 		struct GroundDomainData
@@ -1955,8 +1937,7 @@ namespace PlantPipingSystemsManager {
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
-		using DataPlant::TypeOf_PipingSystemPipeCircuit;
-
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4480,12 +4461,6 @@ namespace PlantPipingSystemsManager {
 		bool YPartitionsExist;
 		bool ZPartitionsExist;
 
-		int MinXIndex( 0 );
-		int MaxXIndex( 0 );
-		int YIndex( 0 );
-		int MinZIndex( 0 );
-		int MaxZIndex( 0 );
-
 		// Object Data
 		Array1D< GridRegion > XPartitionRegions;
 		Array1D< GridRegion > YPartitionRegions;
@@ -5692,10 +5667,8 @@ namespace PlantPipingSystemsManager {
 		int MaxBasementXNodeIndex( -1 );
 		int MinBasementYNodeIndex( -1 );
 		int MinXIndex( -1 );
-		int MaxXIndex( -1 );
 		int YIndex( -1 );
 		int MinZIndex( -1 );
-		int MaxZIndex( -1 );
 		int XWallIndex( -1 );
 		int ZWallIndex( -1 );
 		int YFloorIndex( -1 );
@@ -6818,7 +6791,6 @@ namespace PlantPipingSystemsManager {
 		Real64 Resistance;
 		int DirectionCounter;
 		int CurDirection; // From Enum: Direction
-		Real64 AdiabaticMultiplier;
 
 		// Set up once-per-cell items
 		Numerator = 0.0;
@@ -6960,10 +6932,6 @@ namespace PlantPipingSystemsManager {
 		Real64 EvapotransHeatLoss_MJhrmin; // [MJ/m2-hr]
 		Real64 EvapotransHeatLoss_Wm2; // [W/m2]
 		Real64 CurAirTempK;
-		Real64 MyLatitude;
-		Real64 MyLongitude;
-		Real64 MyTimeZoneMeridian;
-		Real64 MyElevation;
 		Real64 GroundCoverCoefficient;
 
 		// retrieve information from E+ globals
@@ -7610,7 +7578,6 @@ namespace PlantPipingSystemsManager {
 			Real64 HeatFlux;
 			int DirectionCounter;
 			int CurDirection; // From Enum: Direction
-			Real64 AdiabaticMultiplier;
 
 			// Initialize
 			Numerator = 0.0;
@@ -8448,7 +8415,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateOuterMostRadialSoilSlice(
-		int const DomainNum,
+		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & ThisCell
 	)
@@ -8663,7 +8630,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateInnerMostRadialSoilSlice(
-		int const DomainNum,
+		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & ThisCell
 	)
@@ -8844,7 +8811,7 @@ namespace PlantPipingSystemsManager {
 
 	void
 	SimulateRadialPipeCell(
-		int const DomainNum,
+		int const EP_UNUSED( DomainNum ),
 		int const CircuitNum,
 		CartesianCell & ThisCell,
 		Real64 const ConvectionCoefficient
@@ -8887,10 +8854,6 @@ namespace PlantPipingSystemsManager {
 		Real64 ThisPipeCellTemperature_PrevTimeStep;
 		Real64 ThisPipeCellTemperature;
 
-		Real64 FluidCellOuterRadius;
-		Real64 FluidCellRadialCentroid;
-		Real64 FluidCellConductivity;
-		Real64 FluidCellInnerRadius;
 		Real64 FluidCellTemperature;
 
 		Real64 OuterNeighborRadialCellOuterRadius;
@@ -9282,7 +9245,6 @@ namespace PlantPipingSystemsManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "PipingSystemCircuit::DoStartOfTimeStepInitializations" );
-		Real64 Temperature;
 		Real64 Beta;
 		Real64 CellTemp;
 		Real64 CellRhoCp;

@@ -140,8 +140,8 @@ namespace Humidifiers {
 			MyEnvrnFlag( true ),
 			MySetPointCheckFlag( true ),
 			ThermalEff( 0.0 ),
-			GasUseEnergy( 0.0 ),
 			GasUseRate( 0.0 ),
+			GasUseEnergy( 0.0 ),
 			AuxElecUseRate( 0.0 ),
 			AuxElecUseEnergy( 0.0 )
 		{}
