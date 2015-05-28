@@ -3663,7 +3663,6 @@ namespace ZoneEquipmentManager {
 		Real64 WinGapFlowTtoRA; // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
 		Real64 WinGapTtoRA; // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
 		Real64 H2OHtOfVap; // Heat of vaporization of water (W/kg)
-		Real64 RhoAir; // Density of air (Kg/m3)
 		Real64 ZoneMult; // zone multiplier
 		Real64 SumRetAirLatentGainRate;
 
