@@ -476,6 +476,18 @@ public: // Modifier
 		return *this;
 	}
 
+	// Grow Upper
+	inline
+	IndexRange &
+	grow( int const n = 1 )
+	{
+		assert( n >= 0 );
+		assert( u_ <= u_max - n );
+		u_ = clean_u( u_ + n );
+		size_ = computed_size();
+		return *this;
+	}
+
 	// Expand to Contain an Index
 	inline
 	IndexRange &

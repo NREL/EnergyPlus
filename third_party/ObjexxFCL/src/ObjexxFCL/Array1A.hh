@@ -67,10 +67,10 @@ public: // Types
 	using Super::shift_set;
 	using Super::size_set;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::I_;
 	using Super::sdata_;
 	using Super::shift_;
+	using Super::size_;
 
 public: // Creation
 
@@ -989,10 +989,10 @@ private: // Functions
 	{
 		if ( I_.bounded() ) {
 			size_set( I_.size() );
-		} else if ( data_size_ == npos ) {
+		} else if ( size_ == npos ) {
 			size_set( npos );
 		} else { // Infer size
-			I_.u( I_.l() + static_cast< int >( data_size_ ) - 1 );
+			I_.u( I_.l() + static_cast< int >( size_ ) - 1 );
 			size_set( I_.size() );
 		}
 		shift_set( I_.l() );
