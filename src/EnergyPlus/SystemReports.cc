@@ -226,25 +226,15 @@ namespace SystemReports {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
-		using DataEnvironment::OutHumRat;
-		using SplitterComponent::SplitterCond;
-		using SplitterComponent::NumSplitters;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneSupplyPlenums;
-		using DataConvergParams::HVACFlowRateToler;
 		using namespace DataGlobalConstants;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const TypeComp( 1 );
-		int const TypeSubComp( 2 );
-		int const TypeSubSubComp( 3 );
 		int const EnergyTransfer( 1 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1116,10 +1106,6 @@ namespace SystemReports {
 		// SUBROUTINE ARGUMENT DEFINITIONS
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const TypeComp( 1 );
-		int const TypeSubComp( 2 );
-		int const TypeSubSubComp( 3 );
-		int const EnergyTransfer( 1 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3528,8 +3514,6 @@ namespace SystemReports {
 		};
 		assert( component_map.size() == n_ComponentTypes );
 
-		Real64 const SmallLoad( 0.1 ); // (W)
-		Real64 const KJperJ( 0.001 ); // kilojoules per joules
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3896,9 +3880,7 @@ namespace SystemReports {
 		using DataHeatBalance::ZonePreDefRep;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZoneAirHumRatAvg;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
-		using DataEnvironment::OutAirDensity;
 		using DataEnvironment::OutBaroPress;
 
 		using WindowAC::GetWindowACOutAirNode;
@@ -3939,7 +3921,6 @@ namespace SystemReports {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallLoad( 0.1 ); // (W)
-		Real64 const KJperJ( 0.001 ); // kilojoules per joules
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4372,7 +4353,6 @@ namespace SystemReports {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const EnergyTrans( 1 );
-		int const PrimaryAirLoop( 1 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

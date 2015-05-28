@@ -293,7 +293,6 @@ namespace DesiccantDehumidifiers {
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
 		using SteamCoils::GetTypeOfCoil;
-		using SteamCoils::ZoneLoadControl;
 		using SteamCoils::GetSteamCoilControlNodeNum;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
@@ -1330,7 +1329,6 @@ namespace DesiccantDehumidifiers {
 		using EMSManager::iHumidityRatioMaxSetPoint;
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
-		auto & GetSteamCoilCapacity( SteamCoils::GetCoilCapacity );
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -1567,7 +1565,7 @@ namespace DesiccantDehumidifiers {
 	ControlDesiccantDehumidifier(
 		int const DesicDehumNum, // number of the current dehumidifier being simulated
 		Real64 & HumRatNeeded, // process air leaving humidity ratio set by controller [kg water/kg air]
-		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if 1st HVAC simulation of system timestep !unused1208
 	)
 	{
 

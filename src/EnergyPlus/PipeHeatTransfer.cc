@@ -144,7 +144,6 @@ namespace PipeHeatTransfer {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-		using DataLoopNode::Node;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -304,7 +303,6 @@ namespace PipeHeatTransfer {
 		int PipeItem;
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
-		int NumFluids; // number of fluids in sim.
 		int NumOfPipeHTInt; // Number of Pipe Heat Transfer objects
 		int NumOfPipeHTExt; // Number of Pipe Heat Transfer objects
 		int NumOfPipeHTUG; // Number of Pipe Heat Transfer objects
@@ -861,7 +859,7 @@ namespace PipeHeatTransfer {
 
 	void
 	InitPipesHeatTransfer(
-		int const PipeType,
+		int const EP_UNUSED( PipeType ),
 		int const PipeHTNum, // component number
 		bool const FirstHVACIteration // component number
 	)
@@ -894,12 +892,9 @@ namespace PipeHeatTransfer {
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
-		using DataGlobals::BeginTimeStepFlag;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::ShortenTimeStepSys;
 		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::GroundTemp;
 		using DataEnvironment::PubGroundTempSurface;
 		using DataEnvironment::PubGroundTempSurfFlag;
 		using DataLoopNode::Node;
@@ -913,21 +908,15 @@ namespace PipeHeatTransfer {
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
-		using DataPlant::DemandSide;
 		using DataPlant::ScanPlantLoopsForObject;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const NumPipeSections( 20 ); // Number of length nodes in Hanby model
-		int const NumberOfDepthNodes( 8 ); // Number of nodes in the cartesian grid
 		int const MonthsInYear( 12 ); // Number of months in the year
 		int const AvgDaysInMonth( 30 ); // Average days in a month
-		int const DemandLoopSide( 1 ); // Demand Loop side indicator
 		Real64 const LargeNumber( 9999.9 ); // Large number (compared to temperature values)
-		Real64 const SecondsInHour( 3600.0 ); // Number of seconds in hour
-		Real64 const HoursInDay( 24.0 ); // Number of hours in day
 		static std::string const RoutineName( "InitPipesHeatTransfer" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -949,10 +938,6 @@ namespace PipeHeatTransfer {
 		Real64 CurrentDepth;
 		Real64 CurTemp;
 		Real64 CurSimDay;
-		int PlantLoopCtr;
-		int LoopSideCtr;
-		int BranchCtr;
-		int CompCtr;
 		bool PushArrays;
 		bool errFlag;
 
@@ -1210,7 +1195,7 @@ namespace PipeHeatTransfer {
 
 	void
 	InitializeHeatTransferPipes(
-		int const PipeType, // Type of Pipe
+		int const EP_UNUSED( PipeType ), // Type of Pipe
 		std::string const & PipeName, // Name of Pipe
 		int & PipeNum // Index into pipe structure for name
 	)
@@ -1481,7 +1466,6 @@ namespace PipeHeatTransfer {
 		using DataEnvironment::DifSolarRad;
 		using DataEnvironment::SOLCOS;
 		using DataGlobals::Pi;
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::TimeStep;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::KelvinConv;
@@ -1812,7 +1796,6 @@ namespace PipeHeatTransfer {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataHeatBalance::ZoneIntGain;
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2026,7 +2009,6 @@ namespace PipeHeatTransfer {
 		Real64 AirVisc;
 		Real64 AirVel;
 		Real64 AirTemp;
-		Real64 MidTemp;
 		Real64 PipeOD;
 		bool ViscositySet;
 		bool CoefSet;

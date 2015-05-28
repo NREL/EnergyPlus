@@ -182,15 +182,8 @@ namespace ManageElectricPower {
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using General::TrimSigDigits;
-		using DataGlobals::DoOutputReporting;
 		using DataGlobals::MetersHaveBeenInitialized;
-		using DataGlobals::WarmupFlag;
-		using DataGlobals::DoingSizing;
-		using DataGlobals::CurrentTime;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataEnvironment::Month;
-		using DataEnvironment::DayOfMonth;
-		using DataHVACGlobals::SysTimeElapsed;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2023,7 +2016,7 @@ namespace ManageElectricPower {
 
 	void
 	CalcLoadCenterThermalLoad(
-		bool const FirstHVACIteration, // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // unused1208
 		int const LoadCenterNum, // Load Center number counter
 		Real64 & ThermalLoad // heat rate called for from cogenerator(watts)
 	)
@@ -2046,18 +2039,11 @@ namespace ManageElectricPower {
 		// Using/Aliasing
 		using namespace DataPlant;
 		using DataHVACGlobals::NumPlantLoops;
-		using DataHVACGlobals::SysTimeElapsed;
 		using InputProcessor::SameString;
 
-		using DataGlobals::DoOutputReporting;
 		using DataGlobals::MetersHaveBeenInitialized;
-		using DataGlobals::WarmupFlag;
-		using DataGlobals::DoingSizing;
-		using DataGlobals::CurrentTime;
 
 		using General::TrimSigDigits;
-		using DataEnvironment::Month;
-		using DataEnvironment::DayOfMonth;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2523,7 +2509,6 @@ namespace ManageElectricPower {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataHeatBalance::ZoneIntGain;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2540,8 +2525,6 @@ namespace ManageElectricPower {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyEnvrnFlag( true );
-		static int InvertNum( 0 );
-		static int ZoneNum( 0 );
 
 		if ( NumInverters == 0 ) return;
 
@@ -2641,7 +2624,6 @@ namespace ManageElectricPower {
 		Real64 E0d; // fully discharged internal battery voltage
 		Real64 InternalR; // internal resistance
 		Real64 Xf; // normalized maximum capacity at the given current
-		Real64 X; // normalized maximum capacity at the given current
 		Real64 Inew; // converged current
 		Real64 Tnew; // charge of discharge time, defined by T=qmaxf/I
 		Real64 Imax; // maximum current
@@ -2656,10 +2638,8 @@ namespace ManageElectricPower {
 		static Real64 error( 0.0 ); // error in iterative process
 		static Real64 Pactual( 0.0 ); // actual Power output
 		static Real64 RHS( 0.0 ); // right hand side of a equation
-		static Real64 I( 0.0 ); // current
 		Real64 DeltaSOC1; // difference of fractional SOC between this time step and last time step
 		Real64 DeltaSOC2; // difference of fractional SOC between last time step and last two time step
-		int SaveArrayBounds; // Maximum size for the arrays used for rainflow counting
 
 		if ( ! ( ElecLoadCenter( LoadCenterNum ).StoragePresent ) ) return;
 
@@ -3289,8 +3269,6 @@ namespace ManageElectricPower {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyEnvrnFlag( true );
-		static int StorNum( 0 );
-		static int ZoneNum( 0 );
 
 		if ( NumElecStorageDevices == 0 ) return;
 
@@ -3559,7 +3537,6 @@ namespace ManageElectricPower {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataHeatBalance::ZoneIntGain;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3576,8 +3553,6 @@ namespace ManageElectricPower {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyEnvrnFlag( true );
-		static int TransfNum( 0 );
-		static int ZoneNum( 0 );
 
 		if ( NumTransformers == 0 ) return;
 
@@ -3645,11 +3620,7 @@ namespace ManageElectricPower {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 var1;
-		Real64 var2;
 		int num;
-		int i;
-		int k;
 
 		X( count ) = input - B1( count - 1 ); // calculate the difference between two data (current and previous)
 

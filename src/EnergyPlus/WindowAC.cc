@@ -271,11 +271,8 @@ namespace WindowAC {
 		using MixedAir::GetOAMixerIndex;
 		using MixedAir::GetOAMixerNodeNumbers;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
-		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using DataHVACGlobals::cFanTypes;
-		using DataHVACGlobals::ZoneComp;
-		using DataZoneEquipment::WindowAC_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
@@ -996,7 +993,7 @@ namespace WindowAC {
 	void
 	SimCyclingWindowAC(
 		int const WindACNum, // number of the current window AC unit being simulated
-		int const ZoneNum, // number of zone being served !unused1208
+		int const EP_UNUSED( ZoneNum ), // number of zone being served !unused1208
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
 		Real64 const QZnReq, // Sensible load to be met (W)

@@ -286,9 +286,7 @@ namespace CostEstimateManager {
 		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::TotConstructs;
-		using DataHeatBalance::Lights;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::TotLights;
 		using InputProcessor::FindItem;
 		using DXCoils::DXCoil;
 		using DXCoils::NumDXCoils;
@@ -297,7 +295,6 @@ namespace CostEstimateManager {
 		using PlantChillers::NumElectricChillers;
 		using DataPhotovoltaics::PVarray;
 		using DataPhotovoltaics::NumPVs;
-		using DataPhotovoltaics::NumSimplePVModuleTypes;
 		using DataPhotovoltaics::iSimplePVModel;
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
@@ -565,7 +562,6 @@ namespace CostEstimateManager {
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Lights;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::TotLights;
 		using InputProcessor::FindItem;
 		using DXCoils::DXCoil;
 		using DXCoils::NumDXCoils;
@@ -574,7 +570,6 @@ namespace CostEstimateManager {
 		using PlantChillers::NumElectricChillers;
 		using DataPhotovoltaics::PVarray;
 		using DataPhotovoltaics::NumPVs;
-		using DataPhotovoltaics::NumSimplePVModuleTypes;
 		using DataPhotovoltaics::iSimplePVModel;
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;

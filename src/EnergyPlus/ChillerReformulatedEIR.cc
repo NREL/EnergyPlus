@@ -138,7 +138,7 @@ namespace ChillerReformulatedEIR {
 
 	void
 	SimReformulatedEIRChiller(
-		std::string const & EIRChillerType, // Type of chiller !unused1208
+		std::string const & EP_UNUSED( EIRChillerType ), // Type of chiller !unused1208
 		std::string const & EIRChillerName, // User specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
@@ -176,7 +176,6 @@ namespace ChillerReformulatedEIR {
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Chiller_ElectricReformEIR;
-		using DataSizing::CurLoopNum;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -669,7 +668,6 @@ namespace ChillerReformulatedEIR {
 		using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using PlantUtilities::InitComponentNodes;
@@ -949,7 +947,6 @@ namespace ChillerReformulatedEIR {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
-		bool LoopErrorsFound; // Plant loop errors found
 		Real64 SizingEvapOutletTemp; // Plant Sizing outlet temperature for CurLoopNum [C]
 		Real64 SizingCondOutletTemp; // Plant Sizing outlet temperature for condenser loop [C]
 		Real64 RefCapFT; // Capacity as a function of temperature curve output used for sizing
@@ -1396,9 +1393,7 @@ namespace ChillerReformulatedEIR {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataHVACGlobals::SmallLoad;
 		using CurveManager::GetCurveMinMaxValues;
-		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using General::SolveRegulaFalsi;
 
 		// Locals
@@ -1423,8 +1418,8 @@ namespace ChillerReformulatedEIR {
 		Real64 EIRFTYTmax; // Maximum condenser leaving temperature allowed by EIRFT curve [C]
 		Real64 EIRFPLRTmin; // Minimum condenser leaving temperature allowed by EIRFPLR curve [C]
 		Real64 EIRFPLRTmax; // Maximum condenser leaving temperature allowed by EIRFPLR curve [C]
-		Real64 Tmin; // Minimum condenser leaving temperature allowed by curve objects [C]
-		Real64 Tmax; // Maximum condenser leaving temperature allowed by curve objects [C]
+		Real64 Tmin( -99 ); // Minimum condenser leaving temperature allowed by curve objects [C]
+		Real64 Tmax( -99 ); // Maximum condenser leaving temperature allowed by curve objects [C]
 		Array1D< Real64 > Par( 6 ); // Pass parameters for RegulaFalsi solver
 		Real64 FalsiCondOutTemp; // RegulaFalsi condenser outlet temperature result [C]
 		int SolFla; // Feedback flag from SolveRegulaFalsi
@@ -1562,7 +1557,6 @@ namespace ChillerReformulatedEIR {
 		//  REAL(r64)    :: QCondTmp            ! Total condenser heat based on average temperatures [W]
 		Real64 HeatRecInletTemp; // Heat reclaim inlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
-		Real64 FracHeatRec; // Fraction of condenser heat reclaimed
 		Real64 TAvgIn; // Average inlet temperature of heat reclaim inlet and condenser inlet [C]
 		Real64 TAvgOut; // Average outlet temperature [C]
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
@@ -1841,7 +1835,7 @@ namespace ChillerReformulatedEIR {
 		int const EIRChillNum, // Chiller number
 		Real64 & MyLoad, // Operating load [W]
 		bool const RunFlag, // TRUE when chiller operating
-		bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep !unused1208
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		Real64 const FalsiCondOutTemp // RegulaFalsi condenser outlet temperature result [C]
 	)
@@ -1868,9 +1862,7 @@ namespace ChillerReformulatedEIR {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::CurrentTime;
 		using DataHVACGlobals::SmallLoad;
-		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
 		using General::RoundSigDigits;
 		using General::CreateSysTimeIntervalString;

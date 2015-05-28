@@ -134,7 +134,6 @@ namespace HVACCooledBeam {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using DataSizing::TermUnitIU;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -800,7 +799,7 @@ namespace HVACCooledBeam {
 		int const CBNum, // number of the current unit being simulated
 		int const ZoneNum, // number of zone being served
 		int const ZoneNodeNum, // zone node number
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		bool const EP_UNUSED( FirstHVACIteration ), // TRUE if 1st HVAC simulation of system timestep
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	)
 	{
@@ -853,7 +852,6 @@ namespace HVACCooledBeam {
 		static Real64 CpAirZn( 0.0 ); // specific heat of air at zone conditions [J/kg-C]
 		static Real64 CpAirSys( 0.0 ); // specific heat of air at supply air conditions [J/kg-C]
 		static Real64 TWOut( 0.0 ); // outlet water tamperature [C]
-		static Real64 NumBeams( 0.0 ); // number of beams
 		int ControlNode; // the water inlet node
 		int InAirNode; // the air inlet node
 		bool UnitOn; // TRUE if unit is on

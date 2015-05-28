@@ -84,21 +84,22 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     ADD_CXX_DEFINITIONS("-ffor-scope")
-    #ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
-    ADD_CXX_DEFINITIONS("-Wno-unused-parameter -Wno-unused-variable -Wno-unused-label") # Suppress unused item warnings until more serious ones are addressed
+    ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     if( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
+      ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
     elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-  IF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
-    ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
-    ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
-  ENDIF ()
-    ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
+    if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
+      ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
+      ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
+    endif ()
+  
+  ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
 
 ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 

@@ -5,6 +5,7 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  ChillerElectricEIR.unit.cc;
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
@@ -31,6 +32,7 @@ set( test_src
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
   SecondaryDXCoils.unit.cc
+  SetPointManager.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc

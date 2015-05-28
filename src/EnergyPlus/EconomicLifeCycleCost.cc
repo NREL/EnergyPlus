@@ -1192,7 +1192,6 @@ namespace EconomicLifeCycleCost {
 		int offset;
 		int month; // number of months since base date
 		int firstMonth;
-		int repeatMonths;
 		static int baseMonths1900( 0 ); // number of months since 1900 for base period
 		static int serviceMonths1900( 0 ); // number of months since 1900 for service period
 		int monthsBaseToService;
@@ -1919,7 +1918,6 @@ namespace EconomicLifeCycleCost {
 		Array1D_string rowHead;
 		Array2D_string tableBody;
 
-		int month;
 		int numColumns;
 		int iYear;
 		int jObj;

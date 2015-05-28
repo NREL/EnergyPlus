@@ -195,7 +195,6 @@ namespace SwimmingPool {
 
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
-		using DataHeatBalance::Zone;
 		using DataHeatBalance::Construct;
 		using General::TrimSigDigits;
 		using InputProcessor::GetNumObjectsFound;
@@ -946,7 +945,6 @@ namespace SwimmingPool {
 
 		// Using/Aliasing
 		using DataGlobals::TimeStepZone;
-		using DataHeatBalance::Zone;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataLoopNode::Node;

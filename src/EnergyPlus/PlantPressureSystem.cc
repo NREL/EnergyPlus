@@ -206,8 +206,6 @@ namespace PlantPressureSystem {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const LoopType_Plant( 1 );
-		int const LoopType_Condenser( 2 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

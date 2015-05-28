@@ -562,8 +562,8 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 const FanDelayTime, // Fan delay time, time delay for the HP's fan to
 		Real64 const SensLoad, // Control zone sensible load[W]
 		Real64 const LatentLoad, // Control zone latent load[W]
-		int const CyclingScheme, // fan operating mode
-		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+		int const EP_UNUSED( CyclingScheme ), // fan operating mode
+		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
 		Real64 const WaterPartLoad,
 		bool const FirstHVACIteration // Iteration flag
 	)
@@ -911,7 +911,6 @@ namespace WaterToAirHeatPumpSimple {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 rhoair;
-		Real64 CpAir;
 		Real64 MixTemp;
 		Real64 MixHumRat;
 		Real64 MixEnth;
@@ -1578,11 +1577,11 @@ namespace WaterToAirHeatPumpSimple {
 		int const HPNum, // Heat Pump Number
 		int const CyclingScheme, // Fan/Compressor cycling scheme indicator
 		Real64 const RuntimeFrac, // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-		Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
-		Real64 const LatentDemand, // Cooling Latent Demand [W]
+		Real64 const EP_UNUSED( SensDemand ), // Cooling Sensible Demand [W] !unused1208
+		Real64 const EP_UNUSED( LatentDemand ), // Cooling Latent Demand [W]
 		int const CompOp, // compressor operation flag
 		Real64 const PartLoadRatio, // compressor part load ratio
-		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
 		Real64 const WaterPartLoad // water part load ratio
 	)
 	{
@@ -1895,10 +1894,10 @@ namespace WaterToAirHeatPumpSimple {
 		int const HPNum, // Heat Pump Number
 		int const CyclingScheme, // Fan/Compressor cycling scheme indicator
 		Real64 const RuntimeFrac, // Runtime Fraction of compressor
-		Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
+		Real64 const EP_UNUSED( SensDemand ), // Cooling Sensible Demand [W] !unused1208
 		int const CompOp, // compressor operation flag
 		Real64 const PartLoadRatio, // compressor part load ratio
-		Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
 		Real64 const WaterPartLoad // water part load ratio
 	)
 	{

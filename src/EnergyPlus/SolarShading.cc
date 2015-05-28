@@ -244,7 +244,6 @@ namespace SolarShading {
 
 		static bool GetInputFlag( true );
 		static bool firstTime( true );
-		int write_stat;
 
 		// FLOW:
 #ifdef EP_Count_Calls
@@ -608,7 +607,6 @@ namespace SolarShading {
 		int SurfLoop;
 		int ZoneLoop;
 		int I;
-		int MaxNumOfLayers;
 		int NumOfLayers;
 
 		// FLOW:
@@ -1778,7 +1776,6 @@ namespace SolarShading {
 		// Function argument definitions:
 
 		// Function parameter definitions:
-		Real64 const point_tolerance( 0.00001 );
 
 		// Interface block specifications:
 		// na
@@ -3308,7 +3305,6 @@ namespace SolarShading {
 		using WindowComplexManager::UpdateComplexWindows;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
-		using DataGlobals::TimeStepZone;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 
@@ -3630,10 +3626,6 @@ namespace SolarShading {
 		// BLAST/IBLAST code, original author George Walton
 
 		// Using/Aliasing
-		using OutputReportPredefined::ShadowRelate;
-		using OutputReportPredefined::numShadowRelate;
-		using OutputReportPredefined::recKindSurface;
-		using OutputReportPredefined::recKindSubsurface;
 		using namespace DataErrorTracking;
 		using General::TrimSigDigits;
 
@@ -4527,8 +4519,6 @@ namespace SolarShading {
 		//  some of these will receive beam radiation from HTSS this hour)
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const None( 0 ); // for use with RevealStatus
-		int const EntireWindowShadedByReveal( 1 ); // for use with RevealStatus
 		int const WindowShadedOnlyByReveal( 2 ); // for use with RevealStatus
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -4734,8 +4724,6 @@ namespace SolarShading {
 		Real64 ShelfSolarRad; // Shelf diffuse solar radiation
 		int BackSurfNum; // Back surface number
 		int IBack; // Back surface counter
-		int RevSurfInd; // Back surface counter value for reversed surfaces
-		int KRevSurf; // Additional Back surface counter for reversed surfaces
 		int FloorNum; // Floor surface number
 		int AdjSurfNum; // Adjacent surface number
 		int AdjZoneNum; // Adjacent zone number
@@ -4794,7 +4782,6 @@ namespace SolarShading {
 		Real64 RGlDiffBack; // Glazing system back diffuse solar reflectance
 		Real64 AGlDiffFront; // Glass layer front diffuse solar absorptance
 		Real64 RGlDiffFront; // Glazing system front diffuse solar reflectance
-		Real64 TotReflect; // Total directional-hemispherical solar reflectance of a back surface window
 		Real64 RhoBlFront; // Blind solar front beam reflectance
 		Real64 RhoBlBack; // Blind solar back beam-diffuse reflectance
 		Real64 RScBack; // Screen solar back beam-diffuse reflectance
@@ -4955,8 +4942,6 @@ namespace SolarShading {
 		Real64 SkySolarInc; // Incident solar radiation on a window: sky diffuse plus beam
 		//   reflected from obstruction (W/m2)
 		Real64 GndSolarInc; // Incident solar radiation on a window from the ground (W/m2)
-		Real64 SkyGndTrans; // complex fen: transmitted ground-reflected sky radiation (W/m2)
-		Real64 BmGndTrans; // complex fen: transmitted ground-reflected beam radiation (W/m2)
 
 		static Array1D< Real64 > ExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade
 		// (1/m2) (absorbed radation = beam incident * ExtBeamAbsByShad
@@ -10560,7 +10545,6 @@ namespace SolarShading {
 		Real64 SdotY; // temporary variable for manipulating .dot. product
 		Real64 SdotZ; // temporary variable for manipulating .dot. product
 		int BackSurfaceNumber; // current back surface number
-		int NVR;
 		int NVT; // Number of vertices of back surface
 		static Array1D< Real64 > XVT; // X,Y,Z coordinates of vertices of
 		static Array1D< Real64 > YVT; // back surfaces projected into system
@@ -10572,13 +10556,8 @@ namespace SolarShading {
 		int KBkSurf; // Current back surface
 		int BaseSurf; // Base surface number
 		int N;
-		int M;
 		int CurBaseSurf; // Currnet base surface number for shadow overlap calcualtions
 		int CurBackSurface; // Current back surface number for base surface
-		int LOCStore; // Use to store pointer to highes data in local array
-		// When that counter is used in this routine, it just
-		// can be taken back to old number because all results
-		// are stored within this routine
 
 		// Daylighting
 		int IConst; // Construction number of back surface
