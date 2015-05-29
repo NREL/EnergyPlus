@@ -25312,6 +25312,82 @@ FaultModel:HumidistatOffset,
    ;                    !- Related Thermostat Offset Fault Name
 ```
 
+### FaultModel:Fouling:AirFilter
+
+This object defines the fault of fouling air filter that leads to inappropriate operations of the corresponding fan. 
+
+#### Field: Name
+
+This is the user-defined name of the fault. 
+
+#### Field: Fan Name
+
+This field defines the name of a fan object associated with the fault. It should be the name of a fan object (Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume). 
+
+#### Field: Fan Object Type
+
+This choice field defines the type of fan. The valid choices are Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume. Both cycling and continuous fan operating modes are allowed for Fan:OnOff. Only the continuous fan operating mode is allowed for Fan:ConstantVolume. The variable airflow rate is allowed for Fan:VariableVolume. 
+
+#### Field: Availability Schedule Name
+
+This field provides the name of a schedule that will determine if this fault is applicable. This field is applicable for the Type ThermostatOffsetIndependent. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined Pressure Fraction Schedule will be applied. This schedule should be set to "1.0" when a fault is applicable and "0.0" when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+#### Field: Pressure Fraction Schedule Name 
+
+This field provides the name of a schedule that describes the pressure rise variations of the fan associated with the fouling air filter. This is used as a multiplier to the fan design pressure rise. Because the fan pressure rise in the faulty case is higher than that in the design case, this schedule should be set to a value that is greater than 1.0 when a fault is applicable. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+#### Field: Fan Curve Name
+
+This field provides the name of a fan curve for the fan associated with the fault. The curve describes the relationship between the fan pressure rise and air flow rate. This is used to estimate the variations of the fan air flow rate in the faulty cases, given the Pressure Rise Variation Schedule. For variable speed fans, the curve should be the one corresponding to the maximum fan speed. The fan curve should cover the design operational point specified in the corresponding fan object. It is also required that the faulty fan operatinal state point falls within the fan selection range that is monotonically decreasing.
+
+### An example of IDF codes for the fouling air filter fault models:
+
+```idf
+FaultModel:Fouling:AirFilter,
+   DF_VAV_1_Fan,             !- Name
+   VAV_1_Fan,                !- Fan Name
+   Fan:VariableVolume,       !- Fan Object Type
+   ALWAYS_ON,                !- Availability Schedule Name
+   Pressure_Inc_Sch,         !- Pressure Fraction Schedule Name
+   VAV_1_Fan_Curve;          !- Fan Curve Name
+   
+Schedule:Compact,
+    Pressure_Inc_Sch,        !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.1;        !- Field 3
+
+Curve:Cubic,		
+    VAV_1_Fan_Curve,         ! name		
+    1263.1,                  ! Coefficient1 Constant		
+    33.773,                  ! Coefficient2 x		
+   -5.6906,                  ! Coefficient3 x**2		
+   -0.2023,                  ! Coefficient4 x**3		
+    4.0,                     ! Minimum Value of x		
+    15.0;                    ! Maximum Value of x		
+
+Fan:VariableVolume,
+    VAV_1_Fan,               !- Name
+    HVACOperationSchd,       !- Availability Schedule Name
+    0.5915,                  !- Fan Total Efficiency
+    1109.648,                !- Pressure Rise {Pa}
+    7.5202,                  !- Maximum Flow Rate {m3/s}
+    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
+    ,                        !- Fan Power Minimum Flow Fraction
+    0.0000,                  !- Fan Power Minimum Air Flow Rate {m3/s}
+    0.91,                    !- Motor Efficiency
+    1.0,                     !- Motor In Airstream Fraction
+    0.0407598940,            !- Fan Power Coefficient 1
+    0.08804497,              !- Fan Power Coefficient 2
+    -0.072926120,            !- Fan Power Coefficient 3
+    0.9437398230,            !- Fan Power Coefficient 4
+    0,                       !- Fan Power Coefficient 5
+    VAV_1_HeatC-VAV_1_FanNode,  !- Air Inlet Node Name
+    VAV_1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
+    Fan Energy;              !- End-Use Subcategory	
+```
+
 Group - Performance Curves
 --------------------------
 

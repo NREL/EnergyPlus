@@ -111,3 +111,150 @@ $A_{water}$  Water side coil surface area, m2
 
 The pressure drop associated with the fouling is ignored in the current implementation.
 
+### Air Filter Fouling 
+
+#### Symptom
+
+Increased air loop system resistance, resulting in a different system curve. This directly affects the operation of corresponding fans. More specifically, it may lead to variations of the fan pressure rise, fan energy consumption, as well as the enthalpy of the fan outlet air. It may also lead to a reduction in the airflow rate and thus affects the performance of other system components (e.g., heat transfer performance of heating/cooling coils).
+
+#### Modeling Approach
+
+The fouling air filter fault is described in the object FaultModel:Fouling:AirFilter, which refers to the fan objects that describe the associated fan. The fan object can be Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume. The design pressure rise variations of the associated fan in the faulty cases are described by the Pressure Fraction Schedule specified in FaultModel:Fouling:AirFilter object, which is used as a multiplier to the fault-free fan design pressure rise specified in the fan object. The variations of the design air flow rate of the fan can then be calculated with the Pressure Fraction Schedule and Fan Curve. When EMS is used to overwrite the the pressure/MassFlow, the EMS values are used.
+
+The effect of the fouling air filter on the fan performance is related with a number of factors, including the fan types, fan curves, and system design and operating conditions. In general, there are three possible situations to be addressed in modeling dirty air filters:
+
+**(a) The required airflow rate can be maintained by the variable speed fan running at higher speed.**
+
+In this case, the fan operation state changes from point A (intersection of the fan curve corresponding to a lower speed and the system curve with clean filters) to point B (intersection of the fan curve corresponding to a higher speed and the system curve with dirty filters), as shown in Figure 345. Point B corresponds to a higher fan pressure rise than Point A, and the same air flow rate.
+
+![](EngineeringReference/media/image8006.png)
+
+Figure 345. Effect of dirty air filter on variable speed fan operation – flow rate maintained 
+
+The required airflow rate m can be maintained while the fan pressure rise $\Delta P$  is increased to $\Delta P_{df}$. This leads to higher fan power ($\dot{Q}_{tot,df}$) and higher power entering the air ($\dot{Q}_{toair,df}$), and thus changes the specific enthalpies of the fan outlet air stream ($h_{out,df}$).
+
+$$ f_{flow,df} = m / m_{design,df} $$
+
+$$ f_{pl,df} = c_{1} + c_{2}*f_{flow,df} + c_{3}*f_{flow,df}^2 + c_{4}*f_{flow,df}^3 + c_{5}*f_{flow,df}^4 $$
+
+$$ \dot{Q}_{tot,df} = f_{pl,df} \times m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$
+
+$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$
+
+$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$
+
+$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m $$
+
+Where,
+
+$e_{tot}$ is the motor efficiency;
+
+$f_{flow}$ is the flow fraction or part-load ratio;
+
+$f_{pl}$ is the part load factor;
+
+$m$ is the air mass flow in kg/s;
+
+$h_{in}$ is the inlet air stream specific enthalpies in J/kg;
+
+$h_{out}$ is the outlet air stream specific enthalpies in J/kg;
+
+$\dot{Q}_{tot}$ is the fan power in watts;
+
+$\dot{Q}_{toair}$ is the power entering the air in watts;
+
+$\dot{Q}_{shaft}$ is the fan shaft power in watts;
+
+$\Delta P$ is the fan pressure increase in Pascal;
+
+$_{design}$ is for the parameters in the design condition;
+
+$_{df}$ is for the parameters in the dirty filter case.
+
+**(b) The variable speed fan cannot increase in speed sufficiently to maintain the required airflow rate.**
+
+In this case, the fan operation state changes from point A (intersection of the fan curve corresponding to a lower speed and the system curve with clean filters) to point B (intersection of the fan curve corresponding to a higher speed and the system curve with dirty filters), as shown in Figure 346. Point B corresponds to a higher fan pressure rise and a lower air flow rate than Point A.
+
+![](EngineeringReference/media/image8007.png)
+
+Figure 346. Effect of dirty air filter on variable speed fan operation – flow rate reduced 
+
+The airflow rate m is reduced to $m_{df}$ while the fan design pressure rise $\Delta P$ is increased to $\Delta P_{df}$. Similarly to case (a), the fan power ($\dot{Q}_{tot}$), the power entering the air ($\dot{Q}_{toair}$), and the specific enthalpies of the fan outlet air stream ($h_{out}$) are all affected. Different from case (a), however, the fan power ($\dot{Q}_{tot}$) may either increase or decrease, depending on the degree of the airflow rate decrease and pressure rise increase. Also note that $f_{flow,df}$ is always 1 in this case, since the fan runs at its maximum speed.
+
+$$ f_{flow,df} = 1 $$
+
+$$ f_{pl,df} = c_{1} + c_{2}*f_{flow,df} + c_{3}*f_{flow,df}^2 + c_{4}*f_{flow,df}^3 + c_{5}*f_{flow,df}^4 $$
+
+$$ \dot{Q}_{tot,df} = f_{pl,df} \times m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$
+
+$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$
+
+$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$
+
+$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m_{design,df} $$
+
+Where,
+
+$e_{tot}$ is the motor efficiency;
+
+$f_{flow}$ is the flow fraction or part-load ratio;
+
+$f_{pl}$ is the part load factor;
+
+$m$ is the air mass flow in kg/s;
+
+$h_{in}$ is the inlet air stream specific enthalpies in J/kg;
+
+$h_{out}$ is the outlet air stream specific enthalpies in J/kg;
+
+$\dot{Q}_{tot}$ is the fan power in watts;
+
+$\dot{Q}_{toair}$ is the power entering the air in watts;
+
+$\dot{Q}_{shaft}$ is the fan shaft power in watts;
+
+$\Delta P$ is the fan pressure increase in Pascal;
+
+$_{design}$ is for the parameters in the design condition;
+
+$_{df}$ is for the parameters in the dirty filter case.
+
+**(c) The constant speed fan cannot maintain the design airflow rate.**
+
+In this case, the fan operation state changes from point A (intersection of the fan curve and the system curve with clean filters) to point B (intersection of the fan curve and the system curve with dirty filters), as shown in Figure 347. Point B corresponds to a higher fan pressure rise and a lower air flow rate than Point A.
+
+![](EngineeringReference/media/image8008.png)
+
+Figure 347. Effect of dirty air filter on constant speed fan operation
+
+Similarly to case (b), the airflow rate m is reduced to $m_{df}$ while the fan pressure rise $\Delta P$ is increased to $\Delta P_{df}$. This results in the variations of the fan power ($\dot{Q}_{tot}$), the power entering the air ($\dot{Q}_{toair}$), and the specific enthalpies of the fan outlet air stream ($h_{out}$).
+
+$$ \dot{Q}_{tot,df} = m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$
+
+$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$
+
+$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$
+
+$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m_{design,df} $$
+
+Where,
+
+$e_{tot}$ is the motor efficiency;
+
+$m$ is the air mass flow in kg/s;
+
+$h_{in}$ is the inlet air stream specific enthalpies in J/kg;
+
+$h_{out}$ is the outlet air stream specific enthalpies in J/kg;
+
+$\dot{Q}_{tot}$ is the fan power in watts;
+
+$\dot{Q}_{toair}$ is the power entering the air in watts;
+
+$\dot{Q}_{shaft}$ is the fan shaft power in watts;
+
+$\Delta P$ is the fan pressure increase in Pascal;
+
+$_{design}$ is for the parameters in the design condition;
+
+$_{df}$ is for the parameters in the dirty filter case.
