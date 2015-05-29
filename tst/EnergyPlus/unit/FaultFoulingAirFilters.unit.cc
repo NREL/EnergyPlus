@@ -126,8 +126,7 @@ TEST( FaultFoulingAirFilters, CalFaultyFanAirFlowReduction )
     FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
                            FanFaultyDeltaPressInc * Fan( FanNum ).DeltaPress, CurveNum );
 							
-	EXPECT_GE( FanDesignFlowRateDec, 3.84 ); 
-	EXPECT_LE( FanDesignFlowRateDec, 3.85 ); 
+	EXPECT_NEAR( 3.845, FanDesignFlowRateDec, 0.005 );
 	
 	// Clean up
 	PerfCurve.deallocate( );
