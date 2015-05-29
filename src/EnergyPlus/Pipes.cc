@@ -80,8 +80,8 @@ namespace Pipes {
 				found = true;
 				thisPipe->name = objectName;
 				thisPipe->compType = TypeOf_PipeSteam;
-				thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				TestCompSet( cCurrentModuleObject2, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
 			}
 		}
@@ -91,6 +91,7 @@ namespace Pipes {
 			return thisPipe;
 		} else {
 			ShowFatalError( "GetPipeInput: Errors getting input for pipes" );
+			// add a dummy return here to hush up the compiler
 			return nullptr;
 		}
 	}

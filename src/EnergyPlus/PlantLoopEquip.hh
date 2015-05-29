@@ -3,6 +3,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -23,6 +24,9 @@ namespace PlantLoopEquip {
 		bool & InitLoopEquip,
 		bool const GetCompSizFac // Tells component routine to return the component sizing fraction
 	);
+
+	void
+	simulateSingleComponent( EnergyPlus::DataPlant::CompData & sim_component );
 
 	//     NOTICE
 

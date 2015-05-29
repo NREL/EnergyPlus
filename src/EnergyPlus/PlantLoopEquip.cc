@@ -208,32 +208,9 @@ namespace PlantLoopEquip {
 		//PIPES
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				if ( sim_component.compPtr->oneTimeInit ) {
-					sim_component.compPtr->performOneTimeInit();
-					sim_component.compPtr->oneTimeInit = false;
-				}
-				if ( DataGlobals::BeginEnvrnFlag && sim_component.compPtr->myEnvrnFlag ) {
-					sim_component.compPtr->performBeginEnvrnInit();
-					sim_component.compPtr->myEnvrnFlag = false;
-				}
-				if ( !DataGlobals::BeginEnvrnFlag ) {
-					sim_component.compPtr->myEnvrnFlag = true;
-				}
-				sim_component.compPtr->performEveryTimeInit();
-				sim_component.compPtr->simulate();
+				simulateSingleComponent( sim_component );
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				if ( sim_component.compPtr->oneTimeInit ) {
-					sim_component.compPtr->performOneTimeInit();
-					sim_component.compPtr->oneTimeInit = false;
-				}
-				if ( sim_component.compPtr->myEnvrnFlag ) {
-					sim_component.compPtr->performBeginEnvrnInit();
-					sim_component.compPtr->myEnvrnFlag = false;
-				} else {
-					sim_component.compPtr->myEnvrnFlag = true;
-				}
-				sim_component.compPtr->performEveryTimeInit();
-				sim_component.compPtr->simulate();
+				simulateSingleComponent( sim_component );
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
 				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
@@ -1108,6 +1085,23 @@ namespace PlantLoopEquip {
 			ShowFatalError( "Preceding condition causes termination." );
 		} // TypeOfEquip
 
+	}
+
+	void
+	simulateSingleComponent( DataPlant::CompData & sim_component ) {
+		if ( sim_component.compPtr->oneTimeInit ) {
+			sim_component.compPtr->performOneTimeInit();
+			sim_component.compPtr->oneTimeInit = false;
+		}
+		if ( DataGlobals::BeginEnvrnFlag && sim_component.compPtr->myEnvrnFlag ) {
+			sim_component.compPtr->performBeginEnvrnInit();
+			sim_component.compPtr->myEnvrnFlag = false;
+		}
+		if ( !DataGlobals::BeginEnvrnFlag ) {
+			sim_component.compPtr->myEnvrnFlag = true;
+		}
+		sim_component.compPtr->performEveryTimeInit();
+		sim_component.compPtr->simulate();
 	}
 
 	//     NOTICE
