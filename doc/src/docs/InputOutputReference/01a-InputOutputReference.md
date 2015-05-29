@@ -2689,6 +2689,14 @@ Name of material object representing the vertical slab insulation. Optional argu
 
 Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from &gt; Slab Thickness to &lt; Domain Depth.
 
+#### Field: x-direction Mesh Parameter
+
+#### Field: y-direction Mesh Parameter
+
+#### Field: z-direction Mesh Parameter
+
+#### Field: Mesh Type
+
 #### Field: Simulation Timestep
 
 Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
@@ -2720,6 +2728,10 @@ Site:GroundDomain:Slab,
     Yes,                !- Vertical Insulation
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface
+    6,                  !- x-direction Mesh Parameter
+    6,                  !- y-direction Mesh Parameter
+    6,                  !- z-direction Mesh Parameter
+    1.3,                !- Mesh Type (Uniform/Geometric)
     Hourly;             !- Simulation timestep</td>
 ```
 
@@ -2750,6 +2762,10 @@ Site:GroundDomain:Slab,
     Yes,                !- Vertical Insulation (Yes/No)
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface
+    6,                  !- x-direction Mesh Parameter
+    6,                  !- y-direction Mesh Parameter
+    6,                  !- z-direction Mesh Parameter
+    1.3,                !- Mesh Type (Uniform/Geometric)
     Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
 ```
 
