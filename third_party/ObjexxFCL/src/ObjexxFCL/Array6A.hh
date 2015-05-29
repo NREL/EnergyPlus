@@ -68,7 +68,6 @@ public: // Types
 	using Super::size_of;
 	using Super::size_set;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::I1_;
 	using Super::I2_;
 	using Super::I3_;
@@ -77,6 +76,7 @@ public: // Types
 	using Super::I6_;
 	using Super::sdata_;
 	using Super::shift_;
+	using Super::size_;
 	using Super::z1_;
 	using Super::z2_;
 	using Super::z3_;
@@ -769,16 +769,16 @@ private: // Functions
 		assert( I6_.bounded() );
 		if ( I1_.bounded() ) {
 			size_set( size_of( z1_, z2_, z3_, z4_, z5_, z6_ ) );
-		} else if ( data_size_ == npos ) {
+		} else if ( size_ == npos ) {
 			size_set( npos );
 		} else {
 			size_type const slice_size( size_of( z2_, z3_, z4_, z5_, z6_ ) );
 			if ( slice_size > 0u ) { // Infer size
-				z1_ = data_size_ / slice_size;
+				z1_ = size_ / slice_size;
 				I1_.u( I1_.l() + static_cast< int >( z1_ ) - 1 );
 				size_set( size_of( z1_, slice_size ) );
 			} else {
-				size_set( data_size_ );
+				size_set( size_ );
 			}
 		}
 		shift_set( ( ( ( ( ( ( ( ( ( I1_.l() * z2_ ) + I2_.l() ) * z3_ ) + I3_.l() ) * z4_ ) + I4_.l() ) * z5_ ) + I5_.l() ) * z6_ ) + I6_.l() );

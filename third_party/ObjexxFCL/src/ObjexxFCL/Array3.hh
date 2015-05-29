@@ -87,7 +87,6 @@ public: // Types
 	using Super::slice_k;
 	using Super::swapB;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
@@ -1004,7 +1003,7 @@ public: // Subscript
 	{
 		assert( contains( i1, i2, i3 ) );
 		size_type const offset( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), ( data_size_ != npos ? data_size_ - offset : npos ) );
+		return Tail( static_cast< T const * >( data_ + offset ), ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 	// Tail Starting at array( i1, i2, i3 )
@@ -1014,7 +1013,7 @@ public: // Subscript
 	{
 		assert( contains( i1, i2, i3 ) );
 		size_type const offset( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) - shift_ );
-		return Tail( data_ + offset, ( data_size_ != npos ? data_size_ - offset : npos ) );
+		return Tail( data_ + offset, ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 public: // Slice Proxy Generators
