@@ -68,24 +68,10 @@ namespace PlantLoopEquip {
 	// This module contains subroutine that calls the required component for simulation. The components are selected
 	// using a CASE statement.
 
-	// METHODOLOGY EMPLOYED:
-	// Needs description, as appropriate.
-
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataPlant;
 	using DataLoopNode::Node;
-
-	// Data
-	// SUBROUTINE SPECIFICATION
-
-	// MODULE SUBROUTINES
-
-	// Functions
 
 	void
 	SimPlantEquip(
@@ -141,9 +127,6 @@ namespace PlantLoopEquip {
 		// as a time reduction measure.  Specific ifs are set to catch those modules that don't.
 		// If you add a module or new equipment type, you must set up this structure.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using Boilers::SimBoiler;
@@ -159,7 +142,6 @@ namespace PlantLoopEquip {
 		using HeatPumpWaterToWaterCOOLING::SimHPWatertoWaterCOOLING;
 		using HeatPumpWaterToWaterSimple::SimHPWatertoWaterSimple;
 		using OutsideEnergySources::SimOutsideEnergy;
-		using Pipes::SimPipes;
 		using PipeHeatTransfer::SimPipesHeatTransfer;
 		using Pumps::SimPumps;
 
@@ -195,24 +177,10 @@ namespace PlantLoopEquip {
 		using PlantComponentTemperatureSources::SimWaterSource;
 		using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EquipNum; // Plant side component list equipment number
 		int EquipTypeNum;
 		bool RunFlag; // TRUE if operating this iteration
-		// std::string EquipType; // local equipment type
-		// std::string EquipName; // local equipment name
 		int EquipFlowCtrl;
 		Real64 CurLoad;
 		Real64 MaxLoad;
@@ -227,34 +195,45 @@ namespace PlantLoopEquip {
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
 
 		GeneralEquipType = sim_component.GeneralEquipType;
-		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
-// no, no, can't do this, because all the plant components need to run their init and size routines, not just chillers, boilers and cooling towers.  Other things happen besides sizing fac.
-
-//		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
-//			sim_component.SizFac = 0.0;
-//			return;
-//		}
 
 		//set local variables
-		// EquipType = sim_component.TypeOf;
 		EquipTypeNum = sim_component.TypeOf_Num;
 		EquipFlowCtrl = sim_component.FlowCtrl;
 		GeneralEquipType = sim_component.GeneralEquipType;
-		// EquipName = sim_component.Name;
 		EquipNum = sim_component.CompNum;
 		RunFlag = sim_component.ON;
 		CurLoad = sim_component.MyLoad;
 
 		//select equipment and call equiment simulation
 		//PIPES
-		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				SimPipes( TypeOf_Pipe, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
-
+				if ( sim_component.compPtr->oneTimeInit ) {
+					sim_component.compPtr->performOneTimeInit();
+					sim_component.compPtr->oneTimeInit = false;
+				}
+				if ( DataGlobals::BeginEnvrnFlag && sim_component.compPtr->myEnvrnFlag ) {
+					sim_component.compPtr->performBeginEnvrnInit();
+					sim_component.compPtr->myEnvrnFlag = false;
+				}
+				if ( !DataGlobals::BeginEnvrnFlag ) {
+					sim_component.compPtr->myEnvrnFlag = true;
+				}
+				sim_component.compPtr->performEveryTimeInit();
+				sim_component.compPtr->simulate();
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				SimPipes( TypeOf_PipeSteam, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
-
+				if ( sim_component.compPtr->oneTimeInit ) {
+					sim_component.compPtr->performOneTimeInit();
+					sim_component.compPtr->oneTimeInit = false;
+				}
+				if ( sim_component.compPtr->myEnvrnFlag ) {
+					sim_component.compPtr->performBeginEnvrnInit();
+					sim_component.compPtr->myEnvrnFlag = false;
+				} else {
+					sim_component.compPtr->myEnvrnFlag = true;
+				}
+				sim_component.compPtr->performEveryTimeInit();
+				sim_component.compPtr->simulate();
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
 				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 

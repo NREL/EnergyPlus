@@ -35,6 +35,7 @@
 #include <SetPointManager.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
+#include <Pipes.hh>
 
 namespace EnergyPlus {
 
@@ -673,7 +674,6 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		using Pipes::InitializePipes;
 		using PipeHeatTransfer::InitializeHeatTransferPipes;
 
 		// Locals
@@ -816,10 +816,12 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Pipe;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::pipeFactory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Adiabatic:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeSteam;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::pipeFactory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Outdoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeExterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
@@ -1257,7 +1259,15 @@ namespace PlantManager {
 							//discover unsupported equipment on branches.
 							ShowSevereError( "GetPlantInput: Branch=\"" + BranchNames( BranchNum ) + "\", invalid component on branch." );
 							ShowContinueError( "...invalid component type=\"" + this_comp_type + "\", name=\"" + CompNames( CompNum ) + "\"." );
-							//            ErrorsFound=.TRUE.
+						}
+						
+						// now a little error handling for the new stuff -- right now it is just pipes
+						if ( this_comp.TypeOf_Num == TypeOf_Pipe && this_comp.compPtr == nullptr ) {
+							ShowSevereError( "GetPlantInput: Could not instantiate plant component" );
+							ShowContinueError( " On branch: \"" + BranchNames( BranchNum ) + "\"" );
+							ShowContinueError( " Comp type: \"" + this_comp_type + "\"" );
+							ShowContinueError( " Comp name: \"" + CompNames( CompNum ) + "\"" );
+							ShowContinueError( "Component may be referenced in this branch but missing actual idf definition; also check spelling" );
 						}
 
 						this_comp.Name = CompNames( CompNum );
