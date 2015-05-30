@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 
+// this is a pure virtual class that should be the base for anything called to simulate by the plant manager
 class PlantComponent
 {
 public:
@@ -14,6 +15,7 @@ public:
 	virtual int performEveryTimeInit() = 0;
 	virtual int performOneTimeInit() = 0;
 	virtual int performBeginEnvrnInit() = 0;
+	virtual int performFirstHVACInit() = 0;
 	virtual int simulate() = 0;
 };
 

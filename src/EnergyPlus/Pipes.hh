@@ -38,7 +38,7 @@ namespace Pipes {
 			CompIndex( 0 )
 		{}
 
-		static std::shared_ptr<PlantComponent> pipeFactory( std::string objectName );
+		static std::shared_ptr<PlantComponent> pipeFactory( int objectType, std::string objectName );
 		int performEveryTimeInit();
 		int performOneTimeInit();
 		int performBeginEnvrnInit();

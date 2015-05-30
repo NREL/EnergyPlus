@@ -816,24 +816,27 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Pipe;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
-							this_comp.compPtr = Pipes::LocalPipeData::pipeFactory( CompNames( CompNum ) );
+							this_comp.compPtr = Pipes::LocalPipeData::pipeFactory( TypeOf_Pipe, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Adiabatic:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeSteam;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
-							this_comp.compPtr = Pipes::LocalPipeData::pipeFactory( CompNames( CompNum ) );
+							this_comp.compPtr = Pipes::LocalPipeData::pipeFactory( TypeOf_PipeSteam, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Outdoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeExterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::pipeHTFactory( TypeOf_PipeExterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Indoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeInterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::pipeHTFactory( TypeOf_PipeInterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Underground" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeUnderground;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::pipeHTFactory( TypeOf_PipeUnderground, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "PipingSystem:Underground:PipeCircuit" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;

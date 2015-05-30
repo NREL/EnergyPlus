@@ -208,18 +208,15 @@ namespace PlantLoopEquip {
 		//PIPES
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				simulateSingleComponent( sim_component );
+				simulateSingleComponent( sim_component, FirstHVACIteration );
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				simulateSingleComponent( sim_component );
+				simulateSingleComponent( sim_component, FirstHVACIteration );
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
-
+				simulateSingleComponent( sim_component, FirstHVACIteration );
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeInterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
-
+				simulateSingleComponent( sim_component, FirstHVACIteration );
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				SimPipesHeatTransfer( TypeOf_PipeUnderground, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
-
+				simulateSingleComponent( sim_component, FirstHVACIteration );
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
@@ -1088,7 +1085,7 @@ namespace PlantLoopEquip {
 	}
 
 	void
-	simulateSingleComponent( DataPlant::CompData & sim_component ) {
+	simulateSingleComponent( DataPlant::CompData & sim_component, bool firstHVACiteration ) {
 		if ( sim_component.compPtr->oneTimeInit ) {
 			sim_component.compPtr->performOneTimeInit();
 			sim_component.compPtr->oneTimeInit = false;
@@ -1099,6 +1096,9 @@ namespace PlantLoopEquip {
 		}
 		if ( !DataGlobals::BeginEnvrnFlag ) {
 			sim_component.compPtr->myEnvrnFlag = true;
+		}
+		if ( firstHVACiteration ) {
+			sim_component.compPtr->performFirstHVACInit();
 		}
 		sim_component.compPtr->performEveryTimeInit();
 		sim_component.compPtr->simulate();

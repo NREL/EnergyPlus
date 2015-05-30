@@ -24,8 +24,6 @@ namespace EnergyPlus {
 
 namespace Pipes {
 
-	// Module containing the routines dealing with the <module_name>
-
 	// MODULE INFORMATION:
 	//       AUTHOR         <author>
 	//       DATE WRITTEN   <date_written>
@@ -48,7 +46,8 @@ namespace Pipes {
 	// Object Data
 	Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
 
-	std::shared_ptr<PlantComponent> LocalPipeData::pipeFactory( std::string objectName ){
+	std::shared_ptr<PlantComponent> 
+	LocalPipeData::pipeFactory( int objectType, std::string objectName ) {
 
 		bool found = false;
 		int NumNums;
