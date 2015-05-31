@@ -337,6 +337,7 @@ namespace HeatBalanceIntRadExchange {
 			} // for ZoneSurfNum
 
 
+#ifdef RESORTED_SURFACES
 			// These are the money loops
 			if ( zd.SurfaceWindowFirst > 0 ) {
 				// This will not vectorize anyway because of the multiple indirections required to the SurfaceWindowCalc structure
@@ -374,6 +375,44 @@ namespace HeatBalanceIntRadExchange {
 					} // for SendZoneSurfNum
 				} // for RecZoneSurfNum
 			} // if zd.SurfaceWindowFirst
+#else // !RESORTED_SURFACES
+			// These are the money loops
+			// This will not vectorize anyway because of the multiple indirections required to the SurfaceWindowCalc structure
+			for ( int RecZoneSurfNum = zd.SurfaceFirst; RecZoneSurfNum < zd.SurfaceLast - zd.SurfaceFirst + 1; ++RecZoneSurfNum) {
+				int RecSurfNum = zvfi.SurfacePtr[ RecZoneSurfNum ];
+				
+				ConstructionData const & construct( Construct( Surface( RecSurfNum ).Construction ) );
+				SurfaceWindowCalc & window( SurfaceWindow( RecSurfNum ) );
+				
+				// Calculate net long-wave radiation for opaque surfaces and incident
+				// long-wave radiation for windows.
+				if ( !construct.TypeIsWindow ) 
+					continue; // This should also be an error or at least a WTF
+
+#ifdef ALIGNED_SCRIPTF					
+				int Npad = ((zvfi.NumOfSurfaces + 1) >> 1) << 1;
+#endif // ALIGNED_SCRIPTF
+				for ( size_type SendZoneSurfNum = 0; SendZoneSurfNum < zvfi.NumOfSurfaces; ++SendZoneSurfNum ) {
+					// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
+#ifndef ALIGNED_SCRIPTF
+					int lSendRec = zvfi.ScriptFx(SendZoneSurfNum+1, RecZoneSurfNum+1);
+					window.IRfromParentZone += zvfi.ScriptF[ lSendRec ] * SurfaceTempK4[ SendZoneSurfNum ] / SurfaceEmiss[ RecZoneSurfNum ];
+#else // ALIGNED_SCRIPTF
+			
+					window.IRfromParentZone += zvfi.ScriptF[ SendZoneSurfNum * (Npad) + RecZoneSurfNum ] * SurfaceTempK4[ SendZoneSurfNum ] / SurfaceEmiss[ RecZoneSurfNum ];
+#endif // !ALIGNED_SCRIPTF						
+					// Per BG -- this should never happened.  (CR6346,CR6550 caused this to be put in.  Now removed. LKL 1/2013)
+					//          IF (SurfaceWindow(RecSurfNum)%IRfromParentZone < 0.0) THEN
+					//            CALL ShowRecurringWarningErrorAtEnd('CalcInteriorRadExchange: Window_IRFromParentZone negative, Window="'// &
+					//                TRIM(Surface(RecSurfNum)%Name)//'"',  &
+					//                SurfaceWindow(RecSurfNum)%IRErrCount)
+					//            CALL ShowRecurringContinueErrorAtEnd('..occurs in Zone="'//TRIM(Surface(RecSurfNum)%ZoneName)//  &
+					//                '", reset to 0.0 for remaining calculations.',SurfaceWindow(RecSurfNum)%IRErrCountC)
+					//            SurfaceWindow(RecSurfNum)%IRfromParentZone=0.0
+					//          ENDIF
+				} // for SendZoneSurfNum
+			} // for RecZoneSurfNum
+#endif // RESORTED_SURFACES
 
 			// RecZoneSurfNum needs to be the inner loop otherwise the carried dependence of NetLWRadToSurf[ RecSurfNum ] will prevent vectorization
 			for ( int SendZoneSurfNum = 0; SendZoneSurfNum < zvfi.NumOfSurfaces; ++SendZoneSurfNum ) {
