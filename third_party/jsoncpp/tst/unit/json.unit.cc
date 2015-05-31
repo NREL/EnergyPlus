@@ -46,6 +46,15 @@ TEST(JsonCppTests, Errors)
   // Bad value
   string = "{\"name\":\"EnergyPlus\", \"value\":, \"string array\":[\"yellow\", \"blue\"]}";
   EXPECT_FALSE(reader.parse(string, root));
+  // Missing comma
+  string = "{\"name\":\"EnergyPlus\", \"value\":1 \"string array\":[\"yellow\", \"blue\"]}";
+  EXPECT_FALSE(reader.parse(string, root));
+  // Extra comma
+  string = "{\"name\":\"EnergyPlus\", \"value\":1,, \"string array\":[\"yellow\", \"blue\"]}";
+  EXPECT_FALSE(reader.parse(string, root));
+  // Extra comma again
+  string = "{\"name\":\"EnergyPlus\", \"value\":1, \"string array\":[\"yellow\", \"blue\",]}";
+  EXPECT_FALSE(reader.parse(string, root));
   // Bad access
   Json::Value stringValue("this is a string");
   EXPECT_THROW(stringValue["key"], std::exception);
