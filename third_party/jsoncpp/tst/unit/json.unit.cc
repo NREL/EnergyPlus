@@ -14,6 +14,7 @@ TEST( JsonCppTests, Simple )
   ASSERT_FALSE(root.isNull());
   ASSERT_TRUE(root.isObject());
   EXPECT_EQ(root["name"], "EnergyPlus");
+  EXPECT_EQ(root["value"], 1);
   EXPECT_TRUE(root["string array"].isArray());
   EXPECT_EQ(2, root["string array"].size());
   int i = 0;
@@ -30,6 +31,24 @@ TEST( JsonCppTests, Simple )
     ++i;
   }
   EXPECT_FALSE(root["not a key"]);
+}
+
+TEST(JsonCppTests, Errors)
+{
+  // Bad object
+  std::string string("{\"name\":\"EnergyPlus\", \"value\":1, \"string array\":[\"yellow\", \"blue\"]");
+  Json::Reader reader;
+  Json::Value root;
+  EXPECT_FALSE(reader.parse(string, root));
+  // Bad array
+  string = "{\"name\":\"EnergyPlus\", \"value\":1, \"string array\":[\"yellow\", \"blue\"}";
+  EXPECT_FALSE(reader.parse(string, root));
+  // Bad value
+  string = "{\"name\":\"EnergyPlus\", \"value\":, \"string array\":[\"yellow\", \"blue\"]}";
+  EXPECT_FALSE(reader.parse(string, root));
+  // Bad access
+  Json::Value stringValue("this is a string");
+  EXPECT_THROW(stringValue["key"], std::exception);
 }
 
 
