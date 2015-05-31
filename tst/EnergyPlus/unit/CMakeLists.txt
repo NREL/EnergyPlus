@@ -5,6 +5,7 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  ChillerElectricEIR.unit.cc;
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
@@ -21,6 +22,7 @@ set( test_src
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
+  LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
   HVACUnitarySystem.unit.cc
   MixedAir.unit.cc
@@ -30,6 +32,7 @@ set( test_src
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
   SecondaryDXCoils.unit.cc
+  SetPointManager.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
@@ -39,6 +42,7 @@ set( test_src
   Vector.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
+  WaterToAirHeatPumpSimple.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )

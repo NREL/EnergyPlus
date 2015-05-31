@@ -59,6 +59,10 @@ public: // Types
 	typedef  typename Super::const_reference  const_reference;
 	typedef  typename Super::pointer  pointer;
 	typedef  typename Super::const_pointer  const_pointer;
+	typedef  typename Super::iterator  iterator;
+	typedef  typename Super::const_iterator  const_iterator;
+	typedef  typename Super::reverse_iterator  reverse_iterator;
+	typedef  typename Super::const_reverse_iterator  const_reverse_iterator;
 	typedef  typename Super::size_type  size_type;
 	typedef  typename Super::difference_type  difference_type;
 
@@ -68,6 +72,10 @@ public: // Types
 	typedef  typename Super::ConstReference  ConstReference;
 	typedef  typename Super::Pointer  Pointer;
 	typedef  typename Super::ConstPointer  ConstPointer;
+	typedef  typename Super::Iterator  Iterator;
+	typedef  typename Super::ConstIterator  ConstIterator;
+	typedef  typename Super::ReverseIterator  ReverseIterator;
+	typedef  typename Super::ConstReverseIterator  ConstReverseIterator;
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
@@ -79,7 +87,6 @@ public: // Types
 	using Super::slice_k;
 	using Super::swapB;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
@@ -1278,7 +1285,7 @@ public: // Subscript
 	{
 		assert( contains( i1, i2, i3, i4, i5, i6 ) );
 		size_type const offset( ( ( ( ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ) * z6_ ) + i6 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), ( data_size_ != npos ? data_size_ - offset : npos ) );
+		return Tail( static_cast< T const * >( data_ + offset ), ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 	// Tail Starting at array( i1, i2, i3, i4, i5, i6 )
@@ -1288,7 +1295,7 @@ public: // Subscript
 	{
 		assert( contains( i1, i2, i3, i4, i5, i6 ) );
 		size_type const offset( ( ( ( ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ) * z6_ ) + i6 ) - shift_ );
-		return Tail( data_ + offset, ( data_size_ != npos ? data_size_ - offset : npos ) );
+		return Tail( data_ + offset, ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 public: // Slice Proxy Generators

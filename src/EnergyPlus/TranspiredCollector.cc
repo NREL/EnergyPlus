@@ -750,7 +750,6 @@ namespace TranspiredCollector {
 		// Using/Aliasing
 		using DataEnvironment::SkyTemp;
 		using DataEnvironment::OutHumRat;
-		using DataEnvironment::SunIsUp;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::IsRain;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -767,12 +766,10 @@ namespace TranspiredCollector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const g( 9.81 ); // gravity constant (m/s**2)
 		Real64 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K
 		// (Mills 1999 Heat Transfer)
 		Real64 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K
 		// (Mills 1999 Heat Transfer)
-		Real64 const Pr( 0.71 ); // Prandtl number for air
 		Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 		//  REAL(r64), PARAMETER  :: KelvinConv = KelvinConv         ! Conversion from Celsius to Kelvin
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -1069,7 +1066,6 @@ namespace TranspiredCollector {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataEnvironment::SunIsUp;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutEnthalpy;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;

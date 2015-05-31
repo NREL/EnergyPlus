@@ -117,7 +117,7 @@ namespace ChillerAbsorption {
 
 	void
 	SimBLASTAbsorber(
-		std::string const & AbsorberType, // type of Absorber
+		std::string const & EP_UNUSED( AbsorberType ), // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
@@ -541,7 +541,6 @@ namespace ChillerAbsorption {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Absorption;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using InputProcessor::SameString;
@@ -572,10 +571,6 @@ namespace ChillerAbsorption {
 		static Array1D_bool MyEnvrnFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
-		int LoopCtr; // Plant loop counter
-		int LoopSideCtr; // Loop side counter
-		int BranchCtr; // Plant branch counter
-		int CompCtr; // Component counter
 		bool errFlag;
 		bool FatalError;
 		Real64 rho; // local fluid density
@@ -1235,7 +1230,7 @@ namespace ChillerAbsorption {
 		int & ChillNum, // Absorber number
 		Real64 & MyLoad, // operating load
 		bool const RunFlag, // TRUE when Absorber operating
-		bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep !unused1208
 		int const EquipFlowCtrl // Flow control mode for the equipment
 	)
 	{
@@ -1259,8 +1254,6 @@ namespace ChillerAbsorption {
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::SecInHour;
-		using DataGlobals::WarmupFlag;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataPlant::DeltaTempTol;
 		using DataPlant::PlantLoop;
@@ -1315,12 +1308,10 @@ namespace ChillerAbsorption {
 		Real64 HfgSteam; // heat of vaporization of steam
 		static Array1D_bool MyEnvironFlag;
 		static Array1D_bool MyEnvironSteamFlag;
-		static bool OneTimeFlag( true );
 		Real64 FRAC;
 		//  LOGICAL,SAVE           :: PossibleSubcooling
 		Real64 CpFluid; // local specific heat of fluid
 		Real64 SteamDeltaT;
-		Real64 SteamDensity;
 		Real64 SteamOutletTemp;
 		int LoopNum;
 		int LoopSideNum;

@@ -1257,7 +1257,7 @@ namespace ZonePlenum {
 	// *****************************************************************************
 
 	void
-	ReportZoneReturnPlenum( int const ZonePlenumNum ) // unused1208
+	ReportZoneReturnPlenum( int const EP_UNUSED( ZonePlenumNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1300,7 +1300,7 @@ namespace ZonePlenum {
 	}
 
 	void
-	ReportZoneSupplyPlenum( int const ZonePlenumNum ) // unused1208
+	ReportZoneSupplyPlenum( int const EP_UNUSED( ZonePlenumNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:

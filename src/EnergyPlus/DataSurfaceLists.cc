@@ -89,7 +89,6 @@ namespace DataSurfaceLists {
 		using InputProcessor::GetObjectDefMaxArgs;
 		using InputProcessor::VerifyName;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::Construct;
 		using DataGlobals::NumOfZones;
 		using General::RoundSigDigits;
 

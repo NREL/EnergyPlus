@@ -16,7 +16,7 @@ Figure 33.  Baffle Surface Heat Balance
 
 The heat balance on the baffle surface’s control volume is:
 
-<div>\[{q''_{\alpha sol}} + {q''_{LWR,Env}} + {q''_{conv,Env}} + {q''_{LWR,cav}} + {q''_{conv,cav}} + {q''_{source}} = 0\]</div>
+<div>$${q''_{\alpha sol}} + {q''_{LWR,Env}} + {q''_{conv,Env}} + {q''_{LWR,cav}} + {q''_{conv,cav}} + {q''_{source}} = 0$$</div>
 
 where:
 
@@ -56,7 +56,7 @@ All terms are positive for net flux to the baffle.  Each of these heat balance 
 
 Substituting models into (113) and solving for <span>${T_{s,baff}}$</span> yields the following equation:
 
-<div>\[{T_{s,baff}} = \frac{{\left( {{I_s}\alpha  + {h_{co}}{T_{amb}} + {h_{r,atm}}{T_{amb}} + {h_{r,sky}}{T_{sky}} + {h_{r,gnd}}{T_{amb}} + {h_{r,cav}}{T_{so}} + {h_{c,cav}}{T_{a,cav}} + {{q''}_{source}}} \right)}}{{\left( {{h_{co}} + {h_{r,air}} + {h_{r,sky}} + {h_{r,gnd}} + {h_{r,cav}} + {h_{c,cav}}} \right)}}\]</div>
+<div>$${T_{s,baff}} = \frac{{\left( {{I_s}\alpha  + {h_{co}}{T_{amb}} + {h_{r,atm}}{T_{amb}} + {h_{r,sky}}{T_{sky}} + {h_{r,gnd}}{T_{amb}} + {h_{r,cav}}{T_{so}} + {h_{c,cav}}{T_{a,cav}} + {{q''}_{source}}} \right)}}{{\left( {{h_{co}} + {h_{r,air}} + {h_{r,sky}} + {h_{r,gnd}} + {h_{r,cav}} + {h_{c,cav}}} \right)}}$$</div>
 
 where,
 
@@ -96,7 +96,7 @@ Figure 34.  Cavity Air Heat Balance
 
 The heat balance on the cavity air control volume is:
 
-<div>\[{\dot Q_{vent}} + {\dot Q_{co}} + {\dot Q_{c,baff}} = 0\]</div>
+<div>$${\dot Q_{vent}} + {\dot Q_{co}} + {\dot Q_{c,baff}} = 0$$</div>
 
 where,
 
@@ -108,7 +108,7 @@ where,
 
 And substituting into yields the following equation:
 
-<div>\[{T_{a,cav}} = \frac{{\left( {{h_{c,cav}}A\,{T_{so}} + {{\dot m}_{vent}}{c_p}{T_{amb}} + {h_{c,cav}}A\,{T_{s,baff}}} \right)}}{{\left( {{h_{c,cav}}A + {{\dot m}_{vent}}{c_p} + {h_{c,cav}}A} \right)}}\]</div>
+<div>$${T_{a,cav}} = \frac{{\left( {{h_{c,cav}}A\,{T_{so}} + {{\dot m}_{vent}}{c_p}{T_{amb}} + {h_{c,cav}}A\,{T_{s,baff}}} \right)}}{{\left( {{h_{c,cav}}A + {{\dot m}_{vent}}{c_p} + {h_{c,cav}}A} \right)}}$$</div>
 
 where,
 
@@ -116,7 +116,7 @@ where,
 
 Modeling natural ventilation air exchanges in a general way is challenging.  Simplistic engineering models are used to model <span>${\dot m_{vent}}$</span> resulting from natural buoyancy and wind forces.  Reasoning that the configuration is similar to single-side natural ventilation, we elect to use correlations for natural ventilation presented as equations (29) and (30) in Chapter 26. of ASHRAE HOF (2001).
 
-<div>\[{\dot m_{vent}} = \rho \,{{\rm{\rlap{--} \dot V}}_{{\rm{tot}}}}\]</div>
+<div>$${\dot m_{vent}} = \rho \,{{\rm{\rlap{--} \dot V}}_{{\rm{tot}}}}$$</div>
 
 where,
 
@@ -124,16 +124,16 @@ where,
 
 <span>$\dot{V}_{tot} = \dot{V}_{wind} + \dot{V}_{thermal} $</span> is the total volumetric flow rate of air ventilating in and out of the cavity.
 
-<div>\[\dot{V}_{wind} = C_{v}A_{in}U_{\infty}\]</div>
+<div>$$\dot{V}_{wind} = C_{v}A_{in}U_{\infty}$$</div>
 
-<div>\[
+<div>$$
   \dot{V}_{thermal} = \left\{
     \begin{array}{cl}
       C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{a,cav}-T_{amb}\right)/T_{a,cov}} & \; \left(T_{a,cav}>T_{amb}\right) \\
       C_{D}A_{in}\sqrt{2g\Delta H_{NPL}\left(T_{amb}-T_{a,cav}\right)/T_{amb}} & \; \left(T_{a,cav} \lt T_{amb}\,\text{and baffle is vertical}\right) 
     \end{array}
   \right.
-\]</div>
+$$</div>
 
 <span>${{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} $</span>  (if <span>${T_{a,cav}} > {T_{amb}}$</span>)
 
@@ -145,7 +145,7 @@ where,
 
 Mass continuity arguments lead to modeling the area of the openings as one half of the total area of the openings, so we have:
 
-<div>\[{A_{in}} = \frac{{A\,}}{2}\]</div>
+<div>$${A_{in}} = \frac{{A\,}}{2}$$</div>
 
 <span>$g$</span> is the gravitational constant taken as 9.81 [m/s<sup>2</sup>].
 
@@ -167,7 +167,7 @@ The outdoor wind speed affects terms used in modeling.  The wind speed in the w
 
 The wind speed is modified from the measured meteorological wind speed by the equation (ASHRAE 2001):
 
-<div>\[{U_\infty } = {V_{met}}{\left( {\frac{{{\delta_{met}}}}{{{z_{met}}}}} \right)^{{a_{met}}}}{\left( {\frac{z}{\delta }} \right)^a}\]</div>
+<div>$${U_\infty } = {V_{met}}{\left( {\frac{{{\delta_{met}}}}{{{z_{met}}}}} \right)^{{a_{met}}}}{\left( {\frac{z}{\delta }} \right)^a}$$</div>
 
 where z is the height of the centroid of the system, z<sub>met</sub> is the height of the standard meteorological wind speed measurement, and a and d are terrain-dependent coefficients.  d is the boundary layer thickness for the given terrain type.  The values of a and d are shown in the following tables:
 
@@ -219,7 +219,7 @@ The exterior vented cavity can be defined such that it has multiple underlying h
 
 Exterior cavity modeling requires calculating up to three different coefficients for surface convection heat transfer.  These coefficients are defined in the classic way by:
 
-<div>\[{h_c} = \frac{{{T_{air}} - {T_{surf}}}}{{{{q''}_{conv}}}}\]</div>
+<div>$${h_c} = \frac{{{T_{air}} - {T_{surf}}}}{{{{q''}_{conv}}}}$$</div>
 
 First, <span>${h_{co}}$</span> is the convection coefficient for the baffle surface facing the outdoors.  It is modeled in exactly the same way as elsewhere in EnergyPlus and will depend on the user setting for Outside Convection Algorithm – Outside Surface Heat Balance entry elsewhere in this document.
 
@@ -231,7 +231,7 @@ Exterior vented cavity modeling requires calculating up to four different linear
 
 The radiation coefficient, <span>${h_{r,cav}}$</span>, is used to model thermal radiation between the collector surface and the outside face of the underlying heat transfer surface.  We assume a view factor of unity.  It is calculated using:
 
-<div>\[{h_{r,cav}} = {\sigma_{SB}}{e_{baff}}{e_{so}}\frac{{\left( {T_{s,baff}^4 - T_{so}^4} \right)}}{{\left( {{T_{s,baff}} - {T_{so}}} \right)}}\]</div>
+<div>$${h_{r,cav}} = {\sigma_{SB}}{e_{baff}}{e_{so}}\frac{{\left( {T_{s,baff}^4 - T_{so}^4} \right)}}{{\left( {{T_{s,baff}} - {T_{so}}} \right)}}$$</div>
 
 where,
 
@@ -298,7 +298,7 @@ In the following discussion this energy budget is divided into a budget for the 
 
 The foliage energy balance is given by:
 
-<div>\[{F_f} = {\sigma_f}\left[ {{I_S}^ \downarrow (1 - {\alpha_f}) + {\varepsilon_f}{I_{ir}}^ \downarrow  - {\varepsilon_f}\sigma {T_f}^4} \right] + \frac{{{\sigma_f}{\varepsilon_g}{\varepsilon_f}\sigma }}{{{\varepsilon_1}}}\left( {{T_g}^4 - {T_f}^4} \right) + {H_f} + {L_f}\]</div>
+<div>$${F_f} = {\sigma_f}\left[ {{I_S}^ \downarrow (1 - {\alpha_f}) + {\varepsilon_f}{I_{ir}}^ \downarrow  - {\varepsilon_f}\sigma {T_f}^4} \right] + \frac{{{\sigma_f}{\varepsilon_g}{\varepsilon_f}\sigma }}{{{\varepsilon_1}}}\left( {{T_g}^4 - {T_f}^4} \right) + {H_f} + {L_f}$$</div>
 
 In addition to convective and sensible heat transfer this equation accounts for both the short and longwave radiation absorbed by the vegetation, including the effects of multiple reflections. The sensible and latent heat flux terms (H<sub>f</sub> and L<sub>f­</sub>) are somewhat complicated and therefore discussed in some detail below.
 
@@ -306,44 +306,44 @@ In addition to convective and sensible heat transfer this equation accounts for 
 
 The sensible heat transfer between the leaf surface and near-canopy air (H<sub>f</sub>) is influenced by the temperature difference between them, wind speed, and Leaf Area Index (LAI). The Leaf Area Index is the dimensionless ratio of the projected leaf area for a unit ground area (Oke). In contrast fractional vegetative cover (s<sub>f</sub>) is the ratio of shaded ground surface to total ground surface area. The sensible heat flux is given by:
 
-<div>\[{H_f} = (1.1*LAI{\rho_{af}}{C_{p,a}}{C_f}{W_{af}})*({T_{af}} - {T_f})\]</div>
+<div>$${H_f} = (1.1*LAI{\rho_{af}}{C_{p,a}}{C_f}{W_{af}})*({T_{af}} - {T_f})$$</div>
 
 In this equation the constant 1.1 accounts for heat transfer from the stems, twigs and limbs (Deardorff). The properties of air near the foliage are modeled using the average from the foliage and instrument conditions:
 
-<div>\[{\rho_{af}} = 0.5({\rho_a} + {\rho_f})\]</div>
+<div>$${\rho_{af}} = 0.5({\rho_a} + {\rho_f})$$</div>
 
 where r<sub>a</sub> is the density of air at the instrument height  and r<sub>f</sub> is the density of air at the leaf temperature. The air temperature within the foliage is estimated by:
 
-<div>\[{T_{af}} = (1 - {\sigma_f})({T_a}) + {\sigma_f}\left( {0.3{T_a} + 0.6{T_f} + 0.1{T_g}} \right)\]</div>
+<div>$${T_{af}} = (1 - {\sigma_f})({T_a}) + {\sigma_f}\left( {0.3{T_a} + 0.6{T_f} + 0.1{T_g}} \right)$$</div>
 
 *where, T<sub>a</sub>* is the air temperature at the instrument height in Kelvin *T<sub>f</sub>*, is leaf temperature in Kelvin and *T<sub>g</sub>*, is the ground surface temperature in Kelvin. The foliage wind speed is estimated as:
 
-<div>\[{W_{af}} = 0.83{\sigma_f}W\sqrt {C_{hn}^f}  + (1 - {\sigma_f})W\]</div>
+<div>$${W_{af}} = 0.83{\sigma_f}W\sqrt {C_{hn}^f}  + (1 - {\sigma_f})W$$</div>
 
 Here *W* is the larger of 2.0 m/s or the actual wind speed above the canopy (Hughes et al.) and C<sup>f</sup><sub>hn</sub> is the transfer coefficient at near-neutral atmospheric stability conditions:
 
-<div>\[C_{hn}^f = {K_v}^2 \cdot {\left( {\ln \left( {\frac{{{Z_a} - {Z_d}}}{{Z_o^f}}} \right)} \right)^{ - 2}}\]</div>
+<div>$$C_{hn}^f = {K_v}^2 \cdot {\left( {\ln \left( {\frac{{{Z_a} - {Z_d}}}{{Z_o^f}}} \right)} \right)^{ - 2}}$$</div>
 
 where *K<sub>v</sub>,* is von Karmen’s constant (0.4), Z<sub>a</sub> is the instrument height, Z<sub>d</sub> is the zero displacement height in meters (height above soil within which the wind speed is effectively zero), and Z<sup>f</sup><sub>o</sub> is the foliage roughness length scale (m). The formulations for zero displacement height, roughness length are based on Balick et al.:
 
-<div>\[{Z_d} = 0.701Z_{_f}^{0.979}\]</div>
+<div>$${Z_d} = 0.701Z_{_f}^{0.979}$$</div>
 
-<div>\[{Z_o} = 0.131Z_{_f}^{0.997}\]</div>
+<div>$${Z_o} = 0.131Z_{_f}^{0.997}$$</div>
 
 Finally, the bulk transfer coefficient as defined by Deardorff is given by:
 
-<div>\[{C_f} = 0.01*\left( {1 + \frac{{0.3(m/s)}}{{{W_{af}}(m/s)}}} \right)\]</div>
+<div>$${C_f} = 0.01*\left( {1 + \frac{{0.3(m/s)}}{{{W_{af}}(m/s)}}} \right)$$</div>
 
 ##### Latent heat flux in the foliage layer
 
 The process of water loss through plant respiration is known as transpiration. It is controlled by the closing and opening of stomata - the intercellular openings between to epidermal (guard) cells (Gates). The resistance to the diffusion of water vapor from these spaces into the atmosphere is called stomatal resistance. It depends on factors such as light intensity, soil moisture content and vapor pressure difference between inside leaf and the outside atmosphere. It is measured in units of s/m and is formulated as:
 
-<div>\[{r_s} = \frac{{{r_{s,\min }}}}{{LAI}} \cdot {f_1} \cdot {f_2} \cdot {f_3}\]</div>
+<div>$${r_s} = \frac{{{r_{s,\min }}}}{{LAI}} \cdot {f_1} \cdot {f_2} \cdot {f_3}$$</div>
 
 Here, r<sub>s,min</sub> is the minimum stomatal resistance. The actual stomatal resistance at any time is proportional to this minimum resistance and inversely proportional to LAI. The stomatal resistance is further modified by fractional multiplying factors that relate to incoming solar radiation and atmospheric moisture. As found in Frankenstein and Koenig the inverses of the multiplying factors f<sub>1</sub>, f<sub>2</sub>, and f<sub>3</sub> are given by:
 
 <div>
- \[
+ $$
   \begin{array}{l}
    \frac{1}{f_1} = \min \left[ 1,\frac{{0.004*{I_s}^ \downarrow  + 0.005}}{{0.81*(0.004*{I_s}^ \downarrow  + 1)}} \right] \\
    \frac{1}{f_2} = \left\{ 
@@ -353,38 +353,38 @@ Here, r<sub>s,min</sub> is the minimum stomatal resistance. The actual stomatal 
      \end{array} \right. \\
    \frac{1}{f_3} = \exp \left[ - {g_d}({e_{f,sat}} - {e_a} \right]
   \end{array}
- \]
+ $$
 </div>
 
 Here, Q<sub>r</sub>, is the residual moisture content (defined as the amount of moisture in soil when plants begin to wilt), Q<sub>max</sub> is the maximum moisture content (defined as the maximum amount of moisture a particular type of soil can hold and above which run off occurs), and <span>$\overline \Theta  $</span> is the average soil moisture in the root zone. The residual moisture content is typically around 0.01 m<sup>3</sup>/m<sup>3</sup> (Frankenstein and Koenig). The maximum moisture content depends upon the soil, but generally varies from 0.3 to 0.6 m<sup>3</sup>/m<sup>3</sup> (Guymon et al.). In the expression for f<sub>3</sub>, g<sub>d</sub> is a plant specific characteristic that is only non-zero for trees, e<sub>f,sat</sub> is the saturated vapor pressure at the leaf temperature, and e<sub>a</sub> is the air vapor pressure.
 
 Resistance to moisture exchange offered by the boundary layer formed on the leaf surface is known as aerodynamic resistance. It is measured in units of (s/m) and is influenced by wind speed, surface roughness and stability of the atmosphere (Oke). It is formulated as:
 
-<div>\[{r_a} = \frac{1}{{{c_f}{W_{af}}}}\]</div>
+<div>$${r_a} = \frac{1}{{{c_f}{W_{af}}}}$$</div>
 
 The combined effect of aerodynamic and stomatal resistances to vapor diffusion is integrated into a foliage surface wetness factor:
 
-<div>\[r'' = \frac{{{r_a}}}{{{r_a} + {r_s}}}\]</div>
+<div>$$r'' = \frac{{{r_a}}}{{{r_a} + {r_s}}}$$</div>
 
 This surface wetness factor is simply a ratio of the aerodynamic resistance to the total resistance. When the aerodynamic resistance is small the wetness factor approaches zero (leaf surfaces remain dry as surface moisture is readily evaporated). As the aerodynamic resistance increases in importance relative to stomatal resistance the wetness factor approaches 1.0 (moisture readily travels to the leaf surfaces, but is not easily evaporated).
 
 The latent heat flux is then given by:
 
-<div>\[{L_f} = {l_f} * LAI{\rho_{af}}{C_f}{W_{af}}{r^``}\left( {{q_{af}} - {q_{f,sat}}} \right)\]</div>
+<div>$${L_f} = {l_f} * LAI{\rho_{af}}{C_f}{W_{af}}{r^``}\left( {{q_{af}} - {q_{f,sat}}} \right)$$</div>
 
 Here *l<sub>f</sub>* , is the latent heat of vaporization (J/kg), q<sub>f,sat</sub> is the saturation mixing ratio at the leaf surface temperature, and q<sub>af</sub> is the mixing ratio of the air within the canopy. As developed in Frankenstein and Koenig the mixing ratio within the canopy can be determined from:
 
-<div>\[{q_{af}} = \left[ {\frac{{\left( {1 - {\sigma_f}} \right){q_a} + {\sigma_f}\left( {0.3{q_a} + 0.6{q_{f,sat}}{r^``} + 0.1{q_{f,sat}}{M_g}} \right)}}{{1 - {\sigma_f}\left[ {0.6\left( {1 - {r^``}} \right) + 0.1\left( {1 - {M_g}} \right)} \right]}}} \right]\]</div>
+<div>$${q_{af}} = \left[ {\frac{{\left( {1 - {\sigma_f}} \right){q_a} + {\sigma_f}\left( {0.3{q_a} + 0.6{q_{f,sat}}{r^``} + 0.1{q_{f,sat}}{M_g}} \right)}}{{1 - {\sigma_f}\left[ {0.6\left( {1 - {r^``}} \right) + 0.1\left( {1 - {M_g}} \right)} \right]}}} \right]$$</div>
 
 where the factor *M<sub>g</sub>*  (ranging from 0 to 1) is the ratio of volumetric moisture content to the porosity of the soil (Koenig). The latent heat of vaporization (*l<sub>f</sub>*) is the amount of energy required to convert a unit mass of water to vapor. It is measured in units of J/kg and is inversely proportional to the temperature. From Henderson-Sellers it is estimated as:
 
-<div>\[{l_f} = 1.91846*{10^6}{\left[ {\frac{{{T_f}}}{{{T_f} - 33.91}}} \right]^2}\]</div>
+<div>$${l_f} = 1.91846*{10^6}{\left[ {\frac{{{T_f}}}{{{T_f} - 33.91}}} \right]^2}$$</div>
 
 #### Soil Energy budget
 
 The energy budget at the soil surface is mainly influenced by the soil thermal properties, the amount of foliage coverage (s<sub>f</sub>) and the amount of moisture in the soil. If the soil surface is densely covered the diurnal range of surface temperature is small. In the soil energy budget the heat released or gained due to phase changes of soil water, precipitation heat flux and heat flux due to vertical transport of water in the soil are ignored. Future refinements to this model will incorporate these phenomena. The sign convention followed here is the same as above (heat flux into the soil is positive). The overall energy balance at the soil surface (as given in Frankenstein and Koenig) is:
 
-<div>\[{F_g} = (1 - {\sigma_f})\left[ {I_s^ \downarrow (1 - {\alpha_g}) + {\varepsilon_g}I_{ir}^ \downarrow  - {\varepsilon_g}T_g^4} \right] - \frac{{{\sigma_f}{\varepsilon_g}{\varepsilon_f}\sigma }}{{{\varepsilon_1}}}\left( {T_g^4 - T_f^4} \right) + {H_g} + {L_g} + K*\frac{{\partial {T_g}}}{{\partial z}}\]</div>
+<div>$${F_g} = (1 - {\sigma_f})\left[ {I_s^ \downarrow (1 - {\alpha_g}) + {\varepsilon_g}I_{ir}^ \downarrow  - {\varepsilon_g}T_g^4} \right] - \frac{{{\sigma_f}{\varepsilon_g}{\varepsilon_f}\sigma }}{{{\varepsilon_1}}}\left( {T_g^4 - T_f^4} \right) + {H_g} + {L_g} + K*\frac{{\partial {T_g}}}{{\partial z}}$$</div>
 
 As with the energy equation for the foliage this equation represents sensible heat flux (H<sub>g</sub>), latent heat flux (L<sub>g</sub>) and the multiple reflections associated with long and short wave radiation. The final term on the right side gives the conduction of heat into the soil substrate.
 
@@ -392,56 +392,56 @@ As with the energy equation for the foliage this equation represents sensible he
 
 Sensible heat flux between the soil surface and air in its vicinity is dependent on the temperature difference between them and the wind speed within the canopy. It is given as
 
-<div>\[{H_g} = {\rho_{ag}}{C_{p,a}}C_h^g{W_{af}}({T_{af}} - {T_g})\]</div>
+<div>$${H_g} = {\rho_{ag}}{C_{p,a}}C_h^g{W_{af}}({T_{af}} - {T_g})$$</div>
 
 where <span>$C_h^g$</span> is the bulk transfer coefficient and r<sub>ag</sub> is the density of air near the soil surface (kg/m<sup>3</sup>) given by:
 
-<div>\[{p_{ag}} = \frac{{{p_a} + {p_g}}}{2}\]</div>
+<div>$${p_{ag}} = \frac{{{p_a} + {p_g}}}{2}$$</div>
 
 Here r<sub>g</sub> is the density of air at the ground surface temperature
 
 The bulk transfer coefficient is given as the linear combination of bulk transfer coefficient near ground (C<sup>f</sup><sub>hn</sub>) and near foliage-atmosphere interface (C<sup>g</sup><sub>hn</sub>) multiplied by the stability factor (G<sub>h</sub>) and is formulated as:
 
-<div>\[C_h^g = {\Gamma_k}\left[ {\left( {1 - {\sigma_f}} \right)C_{hn}^g + {\sigma_f}C_{hn}^f} \right]\]</div>
+<div>$$C_h^g = {\Gamma_k}\left[ {\left( {1 - {\sigma_f}} \right)C_{hn}^g + {\sigma_f}C_{hn}^f} \right]$$</div>
 
 The ground and foliage bulk transfer coefficients, in turn, are given by:
 
-<div>\[C_{hn}^g = r_{ch}^{ - 1}{\left[ {\frac{{{K_v}}}{{\ln \left( {{\raise0.7ex\hbox{${{Z_a}}$} \!\mathord{\left/ {\vphantom {{{Z_a}} {Z_o^g}}}\right.}\!\lower0.7ex\hbox{${Z_o^g}$}}} \right)}}} \right]^2}\]</div>
+<div>$$C_{hn}^g = r_{ch}^{ - 1}{\left[ {\frac{{{K_v}}}{{\ln \left( {{\raise0.7ex\hbox{${{Z_a}}$} \!\mathord{\left/ {\vphantom {{{Z_a}} {Z_o^g}}}\right.}\!\lower0.7ex\hbox{${Z_o^g}$}}} \right)}}} \right]^2}$$</div>
 
 And
 
-<div>\[C_{hn}^f = {\left[ {\frac{{{K_v}}}{{\ln \left( {{\raise0.7ex\hbox{${{Z_a} - {Z_d}}$} \!\mathord{\left/ {\vphantom {{{Z_a} - {Z_d}} {Z_o^f}}}\right.}\!\lower0.7ex\hbox{${Z_o^f}$}}} \right)}}} \right]^2}\]</div>
+<div>$$C_{hn}^f = {\left[ {\frac{{{K_v}}}{{\ln \left( {{\raise0.7ex\hbox{${{Z_a} - {Z_d}}$} \!\mathord{\left/ {\vphantom {{{Z_a} - {Z_d}} {Z_o^f}}}\right.}\!\lower0.7ex\hbox{${Z_o^f}$}}} \right)}}} \right]^2}$$</div>
 
 where<span>$Z_o^g$</span> and <span>$Z_o^f$</span> are the ground and foliage roughness lengths,  r<sub>ch</sub> is turbulent Schmidt number (0.63), and K<sub>v</sub> is the von Karman constant (0.4).
 
 The condition of the atmosphere (G<sub>h</sub>) is determined as stable or unstable based on the sign of the bulk Richardson number:
 
-<div>\[{R_{ib}} = \frac{{2g{Z_a}\left( {{T_{af}} - {T_g}} \right)}}{{\left( {{T_{af}} + {T_g}} \right)W_{af}^2}}\]</div>
+<div>$${R_{ib}} = \frac{{2g{Z_a}\left( {{T_{af}} - {T_g}} \right)}}{{\left( {{T_{af}} + {T_g}} \right)W_{af}^2}}$$</div>
 
 The atmospheric stability factor is then given by Businger and Lumley and Panofsky as:
 
-<div>\[
+<div>$$
   \Gamma_h = \left\{ 
     \begin{array}{cl}
       \frac{1.0}{\left( 1.0 - 16.0 R_{ib} \right)^{0.5}} & \text{for} \; R_{ib} \lt 0 \\
       \frac{1.0}{\left( 1.0 - 5.0  R_{ib} \right)      } & \text{for} \; R_{ib} \gt 0
     \end{array}
   \right.
-\]</div>
+$$</div>
 
 ##### Latent heat flux in the soil layer
 
 Removal of water vapor from the soil surface depends on the difference between the mixing ratio of the soil surface and air and the wind speed within the canopy. The resulting latent heat flux is then given by:
 
-<div>\[{L_R} = C_e^g{l_g}{W_{af}}{\rho_{ag}}\left( {{q_{af}} - {q_g}} \right)\]</div>
+<div>$${L_R} = C_e^g{l_g}{W_{af}}{\rho_{ag}}\left( {{q_{af}} - {q_g}} \right)$$</div>
 
 Here<span>$C_e^g$</span>is the bulk transfer coefficient, l<sub>g</sub> is the latent heat of vaporization at the ground surface temperature, q<sub>af</sub> is the mixing ratio at the foliage-atmosphere interface, and q<sub>f</sub> is the mixing ratio at the ground surface, given by:
 
-<div>\[{q_g} = {M_g}{q_{g,sat}} + \left( {1 - {M_g}} \right){q_{af}}\]</div>
+<div>$${q_g} = {M_g}{q_{g,sat}} + \left( {1 - {M_g}} \right){q_{af}}$$</div>
 
 The bulk transfer coefficient for latent heat exchange is analogous to that for sensible heat exchange and is given by:
 
-<div>\[C_e^g = {\Gamma_e}\left[ {\left( {1 - {\sigma_f}} \right)C_{en}^g + {\sigma_f}C_{hn}^f} \right]\]</div>
+<div>$$C_e^g = {\Gamma_e}\left[ {\left( {1 - {\sigma_f}} \right)C_{en}^g + {\sigma_f}C_{hn}^f} \right]$$</div>
 
 where <span>$C_{en}^g$</span> is the near ground bulk transfer coefficient for Latent heat flux and G<sub>e</sub> is the latent heat exchange stability correction factor (assumed to be the same as G<sub>h</sub>).
 
@@ -449,33 +449,33 @@ where <span>$C_{en}^g$</span> is the near ground bulk transfer coefficient for L
 
 In order to solve the foliage and soil heat budget equations, the 4<sup>th</sup> <sup> </sup>order terms T<sub>f</sub><sup>4</sup> and T<sub>g</sub><sup>4</sup>  and mixing ratio terms q<sub>g,sat</sub> and q<sub>f,sat</sub> <sub> </sub>are linearized as given by Deardorff:
 
-<div>\[{\left[ {T_f^{\left( {n + 1} \right)}} \right]^4} = {\left[ {T_f^n} \right]^4} + 4{\left[ {T_f^n} \right]^3}\left[ {T_f^{n + 1} - T_f^n} \right]\]</div>
+<div>$${\left[ {T_f^{\left( {n + 1} \right)}} \right]^4} = {\left[ {T_f^n} \right]^4} + 4{\left[ {T_f^n} \right]^3}\left[ {T_f^{n + 1} - T_f^n} \right]$$</div>
 
-<div>\[{\left[ {T_g^{\left( {n + 1} \right)}} \right]^4} = {\left[ {T_g^n} \right]^4} + 4{\left[ {T_g^n} \right]^3}\left[ {T_g^{n + 1} - T_g^n} \right]\]</div>
+<div>$${\left[ {T_g^{\left( {n + 1} \right)}} \right]^4} = {\left[ {T_g^n} \right]^4} + 4{\left[ {T_g^n} \right]^3}\left[ {T_g^{n + 1} - T_g^n} \right]$$</div>
 
 Here T<sub>f</sub><sup>n+1</sup> and T<sub>g</sub><sup>n+1</sup> are the current time step leaf and ground surface temperatures in Kelvin. T<sub>f</sub><sup>n</sup> and T<sub>g</sub><sup>n</sup> are the corresponding temperatures at the previous time step.
 
 The saturation mixing ratio at the ground and leaf surface temperatures are given as:
 
-<div>\[{q_{g,sat}}\left( {T_g^{n + 1}} \right) = {q_{sat}}\left( {T_g^n} \right) + {\left( {\frac{{\partial {q_{sat}}}}{{\partial T}}} \right)_{T_g^n}} * \left( {T_g^{n + 1} - T_g^n} \right)\]</div>
+<div>$${q_{g,sat}}\left( {T_g^{n + 1}} \right) = {q_{sat}}\left( {T_g^n} \right) + {\left( {\frac{{\partial {q_{sat}}}}{{\partial T}}} \right)_{T_g^n}} * \left( {T_g^{n + 1} - T_g^n} \right)$$</div>
 
-<div>\[{q_{f,sat}}\left( {T_f^{n + 1}} \right) = {q_{sat}}\left( {T_f^n} \right) + {\left( {\frac{{\partial {q_{sat}}}}{{\partial T}}} \right)_{T_f^n}} * \left( {T_f^{n + 1} - T_f^n} \right)\]</div>
+<div>$${q_{f,sat}}\left( {T_f^{n + 1}} \right) = {q_{sat}}\left( {T_f^n} \right) + {\left( {\frac{{\partial {q_{sat}}}}{{\partial T}}} \right)_{T_f^n}} * \left( {T_f^{n + 1} - T_f^n} \right)$$</div>
 
 where q<sub>sat</sub>(T<sub>g</sub><sup>n</sup>) is the saturation mixing ratio at the previous time step and is formulated as given in Garratt:
 
-<div>\[{q_{sat}}\left( {T_g^n} \right) = \frac{{0.622{e^ * }\left( {T_g^n} \right)}}{{P - {e^ * }\left( {T_g^n} \right)}}\]</div>
+<div>$${q_{sat}}\left( {T_g^n} \right) = \frac{{0.622{e^ * }\left( {T_g^n} \right)}}{{P - {e^ * }\left( {T_g^n} \right)}}$$</div>
 
 Here the saturation vapor pressure e\* (Pa) is evaluated at the ground temperature from the previous time step (T<sub>g</sub><sup>n</sup>) as:
 
-<div>\[{e^*} = 611.2\exp \left[ {17.67\left( {\frac{{T_g^n - 273.15}}{{T_g^n - 29.65}}} \right)} \right]\]</div>
+<div>$${e^*} = 611.2\exp \left[ {17.67\left( {\frac{{T_g^n - 273.15}}{{T_g^n - 29.65}}} \right)} \right]$$</div>
 
 The derivative of saturation mixing ratio at the previous time step is given by:
 
-<div>\[\frac{{d{q^ * }}}{{dT_g^n}} = \left[ {\frac{{0.622 * P}}{{{{\left( {P - 0.378 * {e^ * }} \right)}^2}}}} \right]\left( {\frac{{d{e^ * }}}{{dT_g^n}}} \right)\]</div>
+<div>$$\frac{{d{q^ * }}}{{dT_g^n}} = \left[ {\frac{{0.622 * P}}{{{{\left( {P - 0.378 * {e^ * }} \right)}^2}}}} \right]\left( {\frac{{d{e^ * }}}{{dT_g^n}}} \right)$$</div>
 
 Here, the derivative of the saturation vapor pressure can be calculated from the Clausius-Clapeyron equation:
 
-<div>\[\frac{{d{e^ * }}}{{dT_g^n}} = \frac{{{l_g} * {e^ * }\left( {T_g^n} \right)}}{{\left( {{R_v} * {{\left( {T_g^n} \right)}^2}} \right)}}\]</div>
+<div>$$\frac{{d{e^ * }}}{{dT_g^n}} = \frac{{{l_g} * {e^ * }\left( {T_g^n} \right)}}{{\left( {{R_v} * {{\left( {T_g^n} \right)}^2}} \right)}}$$</div>
 
 Where R<sub>v</sub> is the gas constant for water vapor and l<sub>g</sub> is the latent heat of vaporization at the soil surface temperature.
 
@@ -485,9 +485,9 @@ The corresponding saturation mixing ratio relations for the leaf surfaces can be
 
 After linearization the final equations are of the form:
 
-<div>\[C_1^f + C_2^f{T_g} + C_3^f{T_f} = 0\]</div>
+<div>$$C_1^f + C_2^f{T_g} + C_3^f{T_f} = 0$$</div>
 
-<div>\[C_1^g + C_2^g{T_g} + C_3^g{T_f} = 0\]</div>
+<div>$$C_1^g + C_2^g{T_g} + C_3^g{T_f} = 0$$</div>
 
 The coefficients in these equations result from the direct combination of the equations from the above development. The interested reader is directed to the papers by Frankenstein and Koenig for the complete and somewhat complicated expressions.
 

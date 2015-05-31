@@ -295,9 +295,6 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< Real64 > MaterialProps( 40 ); // Temporary array to transfer material properties
 		static bool ErrorsFound( false ); // If errors detected in input
 		//  INTEGER :: CondFDMat                ! Number of variable property CondFD materials in input
-		int ConstructNumber; // Cconstruction with CondHBsimple to be overridden with CondHBdetailed
-
-		int NumConstructionAlpha;
 		int Loop;
 		int NumAlphas;
 		int NumNumbers;
@@ -1085,18 +1082,14 @@ namespace HeatBalFiniteDiffManager {
 		// Aliases
 		auto & surfaceFD( SurfaceFD( Surf ) );
 		auto const & T( surfaceFD.T );
-		auto & TOld( surfaceFD.TOld );
 		auto & TT( surfaceFD.TT );
 		auto const & Rhov( surfaceFD.Rhov );
-		auto & RhovOld( surfaceFD.RhovOld );
 		auto & RhoT( surfaceFD.RhoT );
 		auto const & TD( surfaceFD.TD );
 		auto & TDT( surfaceFD.TDT );
 		auto & TDTLast( surfaceFD.TDTLast );
-		auto & TDOld( surfaceFD.TDOld );
 		auto & TDreport( surfaceFD.TDreport );
 		auto & RH( surfaceFD.RH );
-		auto & RHreport( surfaceFD.RHreport );
 		auto & EnthOld( surfaceFD.EnthOld );
 		auto & EnthNew( surfaceFD.EnthNew );
 		auto & EnthLast( surfaceFD.EnthLast );
@@ -1401,11 +1394,11 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		Array1< Real64 > const & T, // Old node Temperature in MFD finite difference solution
+		Array1< Real64 > const & EP_UNUSED( T ), // Old node Temperature in MFD finite difference solution
 		Array1< Real64 > & TT, // New node Temperature in MFD finite difference solution.
-		Array1< Real64 > const & Rhov, // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
+		Array1< Real64 > const & EP_UNUSED( Rhov ), // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
 		Array1< Real64 > & RhoT, // MFD vapor density for the new time step.
-		Array1< Real64 > & RH, // Nodal relative humidity
+		Array1< Real64 > & EP_UNUSED( RH ), // Nodal relative humidity
 		Array1< Real64 > const & TD, // The old dry Temperature at each node for the CondFD algorithm..
 		Array1< Real64 > & TDT, // The current or new Temperature at each node location for the CondFD solution..
 		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
@@ -1681,11 +1674,11 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		Array1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & EP_UNUSED( T ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( TT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & EP_UNUSED( Rhov ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RhoT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RH ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Array1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Array1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
@@ -1800,16 +1793,16 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		Array1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > & RH, // RELATIVE HUMIDITY.
+		Array1< Real64 > const & EP_UNUSED( T ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( TT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & EP_UNUSED( Rhov ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RhoT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RH ), // RELATIVE HUMIDITY.
 		Array1< Real64 > const & TD, // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
 		Array1< Real64 > & TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-		Array1< Real64 > const & EnthOld, // Old Nodal enthalpy
+		Array1< Real64 > const & EP_UNUSED( EnthOld ), // Old Nodal enthalpy
 		Array1< Real64 > & EnthNew, // New Nodal enthalpy
-		int const GSiter // Iteration number of Gauss Seidell iteration
+		int const EP_UNUSED( GSiter ) // Iteration number of Gauss Seidell iteration
 	)
 	{
 
@@ -2082,11 +2075,11 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		Array1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
-		Array1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
-		Array1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		Array1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & EP_UNUSED( T ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
+		Array1< Real64 > & EP_UNUSED( TT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
+		Array1< Real64 > const & EP_UNUSED( Rhov ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RhoT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RH ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Array1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Array1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Array1< Real64 > & EnthOld, // Old Nodal enthalpy

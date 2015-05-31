@@ -1656,7 +1656,6 @@ namespace WaterManager {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::DoingSizing;

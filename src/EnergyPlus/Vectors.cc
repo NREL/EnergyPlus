@@ -263,13 +263,13 @@ namespace Vectors {
 	void
 	DetermineAzimuthAndTilt(
 		Array1S< Vector > Surf, // Surface Definition
-		int const NSides, // Number of sides to surface
+		int const EP_UNUSED( NSides ), // Number of sides to surface
 		Real64 & Azimuth, // Outward Normal Azimuth Angle
 		Real64 & Tilt, // Tilt angle of surface
 		Vector & lcsx,
 		Vector & lcsy,
 		Vector & lcsz,
-		Real64 const surfaceArea,
+		Real64 const EP_UNUSED( surfaceArea ),
 		Vector const & NewellSurfaceNormalVector
 	)
 	{

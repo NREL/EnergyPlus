@@ -374,7 +374,6 @@ namespace HVACInterfaceManager {
 		using DataLoopNode::Node;
 		using namespace DataConvergParams;
 		using DataPlant::PlantLoop;
-		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;
 		using FluidProperties::GetSpecificHeatGlycol;
 
@@ -391,14 +390,12 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 DeltaEnergy;
 		Real64 OldTankOutletTemp;
 		Real64 OldOtherLoopSideInletMdot;
 		Real64 TankOutletTemp;
 		Real64 Cp;
 		Real64 MixedOutletTemp;
 		int ThisLoopSideInletNode;
-		int ZoneInSysIndex;
 
 		// FLOW:
 
@@ -994,7 +991,6 @@ namespace HVACInterfaceManager {
 		using DataPlant::DemandSide;
 		using DataPlant::TotNumLoops;
 		using DataPlant::DeltaTempTol;
-		using DataPlant::PlantReport;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataLoopNode::Node;
 		using PlantUtilities::SetActuatedBranchFlowRate;
@@ -1007,14 +1003,6 @@ namespace HVACInterfaceManager {
 		int const DemandLedSecondaryInletUpdate( 102 );
 		int const SupplyLedPrimaryInletUpdate( 103 );
 		int const SupplyLedSecondaryInletUpdate( 104 );
-		int const BothLedPrimaryInletUpdate( 105 );
-		int const BothLedSecondaryInletUpdate( 106 );
-
-		int const NeedsMoreFlow( 201 );
-		int const NeedsLessFlow( 202 );
-		int const NeedsSameFlow( 203 );
-
-		Real64 const MdotPerturbFactor( 0.02 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

@@ -1718,7 +1718,6 @@ namespace ZoneEquipmentManager {
 		// Using/Aliasing
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
-		using DataGlobals::TimeStepZone;
 		using DataGlobals::NumOfTimeStepInHour;
 		using DataGlobals::BeginDay;
 		using DataGlobals::DuringDay;
@@ -1726,11 +1725,9 @@ namespace ZoneEquipmentManager {
 		using DataGlobals::EndZoneSizingCalc;
 		using DataGlobals::MinutesPerTimeStep;
 		using DataGlobals::OutputFileZoneSizing;
-		using DataGlobals::OutputFileDebug;
 		using DataGlobals::emsCallFromZoneSizing;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::isPulseZoneSizing;
-		using DataGlobals::OutputFileZonePulse;
 		using DataHVACGlobals::FracTimeStepZone;
 		using DataHVACGlobals::SmallMassFlow;
 		using DataHVACGlobals::SmallTempDiff;
@@ -2596,7 +2593,6 @@ namespace ZoneEquipmentManager {
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
 		using WaterThermalTanks::SimHeatPumpWaterHeater;
 		using DataAirSystems::PrimaryAirSystem;
-		using DataAirLoop::AirLoopControlInfo;
 		using ElectricBaseboardRadiator::SimElecBaseboard;
 		using HVACVariableRefrigerantFlow::SimulateVRF;
 		using RefrigeratedCase::SimAirChillerSet;
@@ -2605,7 +2601,6 @@ namespace ZoneEquipmentManager {
 		using DataGlobals::isPulseZoneSizing;
 		using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
 		using HVACUnitarySystem::SimUnitarySystem;
-		using DataHeatBalance::Mixing;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using SwimmingPool::SimSwimmingPool;
 
@@ -3332,7 +3327,6 @@ namespace ZoneEquipmentManager {
 
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::MassConservation;
-		using DataHeatBalance::Mixing;
 		using DataHeatBalance::Infiltration;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using DataHeatBalance::AddInfiltrationFlow;
@@ -3621,7 +3615,6 @@ namespace ZoneEquipmentManager {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::RefrigCaseCredit;
 		using DataHeatBalance::Zone;
 		using DataHeatBalFanSys::SysDepZoneLoads;
@@ -3948,9 +3941,6 @@ namespace ZoneEquipmentManager {
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyTdbFnHW;
 		using DataRoomAirModel::ZTJET;
-		using DataRoomAirModel::AirModel;
-		using DataRoomAirModel::RoomAirModel_UCSDDV;
-		using DataRoomAirModel::RoomAirModel_UCSDCV;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlSimple;
@@ -3969,9 +3959,6 @@ namespace ZoneEquipmentManager {
 		using DataContaminantBalance::MixingMassFlowGC;
 
 		using DataHeatBalance::Ventilation;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::WarmupFlag;
-		using DataGlobals::EndHourFlag;
 		using DataGlobals::SecInHour;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::HourOfDay;

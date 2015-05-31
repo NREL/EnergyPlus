@@ -98,7 +98,14 @@ namespace DataTimings {
 	// Functions
 
 	void
-	epStartTime( std::string const & ctimingElementstring )
+	epStartTime(
+#ifdef EP_NO_Timings
+		std::string const & EP_UNUSED( ctimingElementstring )
+#endif
+#ifdef EP_Timings
+		std::string const & ctimingElementstring
+#endif
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -136,8 +143,6 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop; // testing if already in structure
-		int found; // indicator for element
 
 		// Object Data
 		Array1D< timings > tempTiming; // used for reallocate.
@@ -146,6 +151,8 @@ namespace DataTimings {
 		return;
 #endif
 #ifdef EP_Timings
+		int loop; // testing if already in structure
+		int found; // indicator for element
 		if ( NumTimingElements == 0 ) {
 			MaxTimingElements = 250;
 			Timing.allocate( MaxTimingElements );
@@ -179,9 +186,16 @@ namespace DataTimings {
 
 	void
 	epStopTime(
+#ifdef EP_NO_Timings
+		std::string const & EP_UNUSED( ctimingElementstring ),
+		Optional_bool_const EP_UNUSED( printit ), // true if it should be printed here.
+		Optional_string_const EP_UNUSED( wprint ) // only needed (and assumed, if printit is true)
+#endif
+#ifdef EP_Timings
 		std::string const & ctimingElementstring,
 		Optional_bool_const printit, // true if it should be printed here.
 		Optional_string_const wprint // only needed (and assumed, if printit is true)
+#endif
 	)
 	{
 
@@ -221,14 +235,14 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop; // testing if already in structure
-		int found; // indicator for element
-		Real64 stoptime;
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop; // testing if already in structure
+		int found; // indicator for element
+		Real64 stoptime;
 		found = 0;
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {
 			if ( Timing( loop ).Element != ctimingElementstring ) continue;
@@ -280,7 +294,14 @@ namespace DataTimings {
 	}
 
 	void
-	epSummaryTimes( Real64 & TimeUsed_CPUTime )
+	epSummaryTimes( 
+#ifdef EP_NO_Timings
+		Real64 & EP_UNUSED( TimeUsed_CPUTime )
+#endif
+#ifdef EP_Timings
+		Real64 & TimeUsed_CPUTime
+#endif
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -315,13 +336,13 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop;
-		int EchoInputFile;
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop;
+		int EchoInputFile;
 		EchoInputFile = FindUnitNumber( outputAuditFile );
 		gio::write( EchoInputFile, fmtA ) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 

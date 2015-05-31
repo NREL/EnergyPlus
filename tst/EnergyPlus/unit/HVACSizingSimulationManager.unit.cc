@@ -118,10 +118,6 @@ TEST_F( HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 // calls code related to coincident plant sizing with HVAC sizing simulation
 // this test runs 3 system timesteps for each zone timestep
 
-	int temp;
-
-
-
 	Environment.deallocate();
 			// setup weather manager state needed
 	NumOfEnvrn = 4;
@@ -335,8 +331,6 @@ TEST_F( HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 // to coincident plant sizing with HVAC sizing simulation
 // this test runs 3 system timesteps for each zone timestep
 
-	int temp;
-
 	HVACSizingSimulationManager testSizeSimManagerObj;
 
 	testSizeSimManagerObj.DetermineSizingAnalysesNeeded ();
@@ -467,7 +461,6 @@ TEST_F( HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 // to coincident plant sizing with HVAC sizing simulation
 // this test runs 1 system timestep for each zone timestep
 
-	int temp;
 	GlobalCoolSizingFactor = 1.0;
 	PlantSizData( NumPltSizInput ).SizingFactorOption = GlobalCoolingSizingFactorMode;
 
@@ -554,7 +547,6 @@ TEST_F( HVACSizingSimulationManagerTest, VarySysTimesteps )
 // to coincident plant sizing with HVAC sizing simulation
 // this test run varies the system timestep some to test irregular
 
-	int temp;
 	PlantSizData( NumPltSizInput ).NumTimeStepsInAvg = 2;
 	GlobalHeatSizingFactor = 1.0;
 	PlantSizData( NumPltSizInput ).SizingFactorOption = GlobalHeatingSizingFactorMode;

@@ -258,7 +258,6 @@ namespace InternalHeatGains {
 		int Item;
 		int ZLItem;
 		int Item1;
-		int MaxZoneNameLengthInZoneList;
 
 		// Formats
 		static gio::Fmt Format_720( "(' Zone Internal Gains, ',A,',',A,',',A,',')" );
@@ -3224,8 +3223,6 @@ namespace InternalHeatGains {
 		using OutputReportTabular::radiantPulseTimestep;
 		using OutputReportTabular::radiantPulseReceived;
 		using DataGlobals::CompLoadReportIsReq;
-		using DataGlobalConstants::endUseHeating;
-		using DataGlobalConstants::endUseCooling;
 		using OutputReportTabular::AllocateLoadComponentArrays;
 		using DataSizing::CurOverallSimDay;
 
@@ -3697,7 +3694,6 @@ namespace InternalHeatGains {
 		Real64 AirVolFlowFrac;		// Air volume flow fraction
 		Real64 AirVolFlowFracDesignT; // Air volume flow fraction at design entering air temperature
 		Real64 AirVolFlowRate;		// Air volume flow rate at current density [m3/s]
-		Real64 AirDensity;			// Air density at inlet [kg/m3]
 		Real64 AirMassFlowRate;		// Air mass flow rate [kg/s]
 		Real64 CPUPower;			// CPU power input [W]
 		Real64 FanPower;			// Fan power input [W]
@@ -4002,7 +3998,6 @@ namespace InternalHeatGains {
 		// OutputDataStructure.doc (EnergyPlus documentation)
 
 		// Using/Aliasing
-		using DataGlobals::SecInHour;
 		using OutputReportTabular::WriteTabularFiles;
 
 		// Locals

@@ -1066,7 +1066,7 @@ namespace General {
 	std::string
 	TrimSigDigits(
 		int const IntegerValue,
-		Optional_int_const SigDigits // ignored
+		Optional_int_const EP_UNUSED( SigDigits ) // ignored
 	)
 	{
 
@@ -1255,7 +1255,7 @@ namespace General {
 	std::string
 	RoundSigDigits(
 		int const IntegerValue,
-		Optional_int_const SigDigits // ignored
+		Optional_int_const EP_UNUSED( SigDigits ) // ignored
 	)
 	{
 
@@ -2499,7 +2499,6 @@ namespace General {
 
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
-		using DataGlobals::ZoneTSReporting;
 		using DataGlobals::HVACTSReporting;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::CurrentTime;
@@ -3404,7 +3403,6 @@ namespace General {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		errFlag = false;
-		bool DuplicateNameError = false;
 		std::string::size_type const ItemNameLength = len( ItemName );
 		std::string::size_type const ItemLength = len( ZoneName ) + ItemNameLength;
 		ResultName = ZoneName + ' ' + ItemName;

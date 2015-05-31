@@ -142,6 +142,16 @@ TEST( Array5Test, ConstructIndexes )
 	EXPECT_FALSE( A.initializer_active() );
 }
 
+TEST( Array5Test, RangeBasedFor )
+{
+	Array5D_int A( 2, 2, 2, 2, 2 );
+	int v( 0 );
+	for ( auto & e : A ) {
+		e = ++v;
+		EXPECT_EQ( v, e );
+	}
+}
+
 TEST( Array5Test, Subscript )
 {
 	Array5D_int A( 2, 2, 2, 2, 2, {
@@ -255,8 +265,8 @@ TEST( Array5Test, Predicates )
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
 	EXPECT_TRUE( A1.contiguous() );
-	EXPECT_TRUE( A1.data_size_bounded() );
-	EXPECT_FALSE( A1.data_size_unbounded() );
+	EXPECT_TRUE( A1.capacity_bounded() );
+	EXPECT_FALSE( A1.capacity_unbounded() );
 	EXPECT_TRUE( A1.empty() );
 	EXPECT_TRUE( A1.size_bounded() );
 	EXPECT_FALSE( A1.size_unbounded() );
@@ -271,11 +281,11 @@ TEST( Array5Test, Predicates )
 	EXPECT_TRUE( A2.active() );
 	EXPECT_TRUE( A2.allocated() );
 	EXPECT_TRUE( A2.contiguous() );
-	EXPECT_TRUE( A2.data_size_bounded() );
-	EXPECT_FALSE( A2.data_size_unbounded() );
+	EXPECT_TRUE( A2.capacity_bounded() );
+	EXPECT_FALSE( A2.capacity_unbounded() );
 	EXPECT_FALSE( A2.empty() );
-	EXPECT_TRUE( A2.data_size_bounded() );
-	EXPECT_FALSE( A2.data_size_unbounded() );
+	EXPECT_TRUE( A2.capacity_bounded() );
+	EXPECT_FALSE( A2.capacity_unbounded() );
 	EXPECT_TRUE( A2.owner() );
 	EXPECT_FALSE( A2.proxy() );
 
@@ -283,11 +293,11 @@ TEST( Array5Test, Predicates )
 	EXPECT_TRUE( A3.active() );
 	EXPECT_TRUE( A3.allocated() );
 	EXPECT_TRUE( A3.contiguous() );
-	EXPECT_TRUE( A3.data_size_bounded() );
-	EXPECT_FALSE( A3.data_size_unbounded() );
+	EXPECT_TRUE( A3.capacity_bounded() );
+	EXPECT_FALSE( A3.capacity_unbounded() );
 	EXPECT_FALSE( A3.empty() );
-	EXPECT_TRUE( A3.data_size_bounded() );
-	EXPECT_FALSE( A3.data_size_unbounded() );
+	EXPECT_TRUE( A3.capacity_bounded() );
+	EXPECT_FALSE( A3.capacity_unbounded() );
 	EXPECT_TRUE( A3.owner() );
 	EXPECT_FALSE( A3.proxy() );
 	EXPECT_FALSE( A3.is_default() );
@@ -332,11 +342,11 @@ TEST( Array5Test, Predicates )
 	EXPECT_TRUE( A4.active() );
 	EXPECT_TRUE( A4.allocated() );
 	EXPECT_TRUE( A4.contiguous() );
-	EXPECT_TRUE( A4.data_size_bounded() );
-	EXPECT_FALSE( A4.data_size_unbounded() );
+	EXPECT_TRUE( A4.capacity_bounded() );
+	EXPECT_FALSE( A4.capacity_unbounded() );
 	EXPECT_FALSE( A4.empty() );
-	EXPECT_TRUE( A4.data_size_bounded() );
-	EXPECT_FALSE( A4.data_size_unbounded() );
+	EXPECT_TRUE( A4.capacity_bounded() );
+	EXPECT_FALSE( A4.capacity_unbounded() );
 	EXPECT_TRUE( A4.owner() );
 	EXPECT_FALSE( A4.proxy() );
 	EXPECT_FALSE( A4.is_default() );
