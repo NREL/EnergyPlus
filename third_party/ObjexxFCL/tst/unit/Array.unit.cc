@@ -51,6 +51,15 @@ TEST( ArrayTest, Construction2DIndexRangeInitializerList )
 			EXPECT_EQ( k, r( i, j ) );
 		}
 	}
+	int v( 0 );
+	for ( auto const e : r ) {
+		EXPECT_EQ( ++v, e );
+	}
+	v = 10;
+	for ( auto & e : r ) {
+		e = ++v;
+		EXPECT_EQ( v, e );
+	}
 }
 
 TEST( ArrayTest, Construction2DDifferentValueType )

@@ -78,9 +78,9 @@ namespace OutsideEnergySources {
 
 	void
 	SimOutsideEnergy(
-		std::string const & EnergyType,
+		std::string const & EP_UNUSED( EnergyType ),
 		std::string const & EquipName,
-		int const EquipFlowCtrl, // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int & CompIndex,
 		bool const RunFlag,
 		bool const InitLoopEquip,
@@ -88,7 +88,7 @@ namespace OutsideEnergySources {
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -411,8 +411,6 @@ namespace OutsideEnergySources {
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataPlant::PlantFirstSizesOkayToFinalize;
-		using DataPlant::PlantFirstSizeCompleted;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -519,7 +517,6 @@ namespace OutsideEnergySources {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNum( 0 );	// Plant sizing index for hot water loop
 		bool ErrorsFound( false );	// If errors detected in input
-		bool IsAutoSize( false );	// Indicator to autosize for reporting
 		Real64 NomCapDes( 0.0 );	// Autosized nominal capacity for reporting
 		Real64 NomCapUser( 0.0 );	// Hardsized nominal capacity for reporting
 		Real64 rho( 0.0 );	// Density (kg/m3)

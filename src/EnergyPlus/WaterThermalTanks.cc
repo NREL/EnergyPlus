@@ -217,7 +217,7 @@ namespace WaterThermalTanks {
 		int const CompType,
 		std::string const & CompName,
 		int & CompIndex,
-		bool const RunFlag, // unused1208
+		bool const EP_UNUSED( RunFlag ), // unused1208
 		bool const InitLoopEquip,
 		Real64 & MyLoad,
 		Real64 & MaxCap,
@@ -247,7 +247,6 @@ namespace WaterThermalTanks {
 		// Standard EnergyPlus methodology. Subroutine is called from PlantLoopEquipments
 
 		// Using/Aliasing
-		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::KickOffSimulation;
 		using InputProcessor::FindItem;
 		using DataSizing::DataNonZoneNonAirloopValue;
@@ -508,8 +507,6 @@ namespace WaterThermalTanks {
 		// called from NonZoneEquipmentManager.
 
 		// Using/Aliasing
-		using DataHVACGlobals::NumPlantLoops;
-		using DataLoopNode::Node;
 		using namespace DataPlant;
 
 		// Locals
@@ -772,7 +769,6 @@ namespace WaterThermalTanks {
 		using DataGlobals::NumOfZones;
 		using DataGlobals::AutoCalculate;
 		using DataGlobals::ScheduleAlwaysOn;
-		using DataGlobals::OutputFileDebug;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
@@ -792,9 +788,7 @@ namespace WaterThermalTanks {
 		using DataLoopNode::NodeType_Water;
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::NodeConnectionType_Outlet;
-		using DataLoopNode::NodeConnectionType_ZoneExhaust;
 		using DataLoopNode::NodeConnectionType_ReliefAir;
-		using DataLoopNode::NodeConnectionType_OutsideAir;
 		using DataLoopNode::NodeConnectionType_OutsideAirReference;
 		using DataLoopNode::ObjectIsParent;
 		using DataLoopNode::ObjectIsNotParent;
@@ -832,8 +826,6 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::DrawThru;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
-		using DataSizing::PlantSizData;
-		using DataSizing::NumPltSizInput;
 		using RefrigeratedCase::CheckRefrigerationInput;
 		using GlobalNames::VerifyUniqueCoilName;
 
@@ -4545,8 +4537,8 @@ namespace WaterThermalTanks {
 	InitWaterThermalTank(
 		int const WaterThermalTankNum,
 		bool const FirstHVACIteration,
-		Optional_int_const LoopNum,
-		Optional_int_const LoopSideNum
+		Optional_int_const EP_UNUSED( LoopNum ),
+		Optional_int_const EP_UNUSED( LoopSideNum )
 	)
 	{
 
@@ -4584,7 +4576,6 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::HPWHInletDBTemp;
 		using DataHVACGlobals::HPWHInletWBTemp;
 		using DataHVACGlobals::HPWHCrankcaseDBTemp;
-		using DataHVACGlobals::NumPlantLoops;
 		using DataSizing::AutoSize;
 		using DataSizing::CurZoneEqNum;
 		using DataSizing::ZoneEqSizing;
@@ -4649,7 +4640,6 @@ namespace WaterThermalTanks {
 		bool errFlag;
 		Real64 rho; // local fluid density
 		static int DummyWaterIndex( 1 );
-		static int found( 0 );
 		static Real64 TankChangeRateScale( 0.0 ); // local temporary for nominal tank change rate
 		static Real64 MaxSideVolFlow( 0.0 ); // local temporary for largest connection design flow
 
@@ -7284,7 +7274,6 @@ namespace WaterThermalTanks {
 		// References to objects used in this function
 		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
 		HeatPumpWaterHeaterData & HeatPump = HPWaterHeater( Tank.HeatPumpNum );
-		DXCoils::DXCoilData & Coil = DXCoils::DXCoil( HeatPump.DXCoilNum );
 
 		// FLOW:
 		// initialize local variables
@@ -7956,7 +7945,7 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::CycFanCycCoil;
 
 		int WaterThermalTankNum; // index of water heater
-		Real64 NewTankTemp; // resulting tank temperature [C]
+		Real64 NewTankTemp( 0 ); // resulting tank temperature [C]
 		int SpeedNum;
 		int HPNum;
 		Real64 MdotWater(0);
@@ -8029,8 +8018,7 @@ namespace WaterThermalTanks {
 
 		// USE STATEMENTS:
 		// Using/Aliasing
-		using DataHVACGlobals::NumPlantLoops;
-
+		
 		// Return value
 		Real64 PLRResidualMixedTank;
 
@@ -8093,8 +8081,7 @@ namespace WaterThermalTanks {
 
 		// USE STATEMENTS:
 		// Using/Aliasing
-		using DataHVACGlobals::NumPlantLoops;
-
+		
 		// Return value
 		Real64 PLRResidualStratifiedTank;
 
@@ -8141,7 +8128,7 @@ namespace WaterThermalTanks {
 		bool const FirstHVACIteration,
 		int const WaterThermalTankSide,
 		int const PlantLoopSide,
-		bool const PlumbedInSeries, // !unused1208
+		bool const EP_UNUSED( PlumbedInSeries ), // !unused1208
 		int const BranchControlType,
 		Real64 const OutletTemp,
 		Real64 const DeadBandTemp,
@@ -8488,7 +8475,6 @@ namespace WaterThermalTanks {
 		// na
 
 		// Using/Aliasing
-		using DataHVACGlobals::NumPlantLoops;
 		using DataSizing::AutoSize;
 
 		// Locals
@@ -8598,7 +8584,6 @@ namespace WaterThermalTanks {
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		using DataHVACGlobals::NumPlantLoops;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -8788,13 +8773,9 @@ namespace WaterThermalTanks {
 		using DataPlant::PlantLoop;
 		using DataGlobals::Pi;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		using DataHVACGlobals::NumPlantLoops;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using namespace OutputReportPredefined;
-		using SolarCollectors::Collector;
-		using SolarCollectors::NumOfCollectors;
-		using DataSurfaces::Surface;
 		using DataPlant::PlantFinalSizesOkayToReport;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
@@ -9165,8 +9146,6 @@ namespace WaterThermalTanks {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeTankForSupplySide" );
-		Real64 const GalTocubicMeters( 0.0037854 );
-		Real64 const kBtuPerHrToWatts( 293.1 );
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
@@ -9309,7 +9288,6 @@ namespace WaterThermalTanks {
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		using DataHVACGlobals::NumPlantLoops;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -9344,7 +9322,6 @@ namespace WaterThermalTanks {
 
 		static int DummyWaterIndex( 1 );
 		Real64 rho;
-		Real64 Cp;
 		Real64 tmpUseDesignVolFlowRate; // local use side design flow rate
 		Real64 tmpSourceDesignVolFlowRate; // local use side design flow rate
 
@@ -10011,7 +9988,6 @@ namespace WaterThermalTanks {
 		Real64 RatedDXCoilTotalCapacity; // used during HPWH rating procedure
 		bool FirstTimeFlag; // used during HPWH rating procedure
 		std::string equipName;
-		static bool MyOneTimeSetupFlag( true ); // one time setup flag
 		Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); //place holder to calling vs HPWH function
 		bool bIsVSCoil(false); // variable-speed HPWH identifier
 		Real64 RhoWater; //water density
@@ -10384,7 +10360,6 @@ namespace WaterThermalTanks {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		static int StratNodeToUse( 0 );
 		HeatPumpWaterHeaterData const & HPWH = HPWaterHeater( Tank.HeatPumpNum );
 
 		Real64 ControlSensor1Temp = Tank.Node( HPWH.ControlSensor1Node ).Temp;

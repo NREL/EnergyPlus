@@ -5942,7 +5942,7 @@ Secondary coils reject to or remove heat from a secondary zone. Secondary coil r
 
 Figure: Schematic of DX System in cooling operating mode
 
-The heat rejected or extracted by the secondary DX coil is estimated from the delivered capacity and electric power input of the primary DX coils. And the rejected or extracted heat is treated as internal gain of the secondary zone. Currently secondary DX coil are allowed in single speed, two speed and multi speed DX coil objects: _Coil:Cooling:DX:SingleSpeed_, _Coil:Heating:DX:SingleSpeed_, _Coil:Cooling:DX:TwoSpeed_, _Coil:Cooling:DX:MultiSpeed_, and _Coil:Heating:DX:MultiSpeed_.
+Applications of this technology include: inter-zone heat pump in NTED (Dixon, 2010), and PTAC or PTHP serving Offices attached to a Warehouse, where the office partially or fully enclosed by the warehouse and the condenser is placed inside the Warehouse. The heat rejected or extracted by the secondary DX coil is estimated from the delivered capacity and electric power input of the primary DX coils. And the rejected or extracted heat is treated as internal gain of the secondary zone. Currently secondary DX coil are allowed in single speed, two speed and multi speed DX coil objects: _Coil:Cooling:DX:SingleSpeed_, _Coil:Heating:DX:SingleSpeed_, _Coil:Cooling:DX:TwoSpeed_, _Coil:Cooling:DX:MultiSpeed_, and _Coil:Heating:DX:MultiSpeed_.
 
 #### Model Description:
 The secondary coil performance calculation is invoked using inputs in the DX coil objects.  The input required for cooling and heating operation of the primary DX coils are different. In the DX cooling coils the only required input is the zone name where the secondary coil is installed. In heating DX coils six inputs are required for single speed coils and a minimum of 11 input fields are required for multispeed DX heating coils.  And five more inputs are required for every additional compressor speed. The extensible five input fields are used for splitting the total heat extraction rate into sensible and latent components. These five input fields are: rated sensible heat ratio, secondary air flow rates, scaling factor for auto-sizing secondary air flow rates, sensible heat ratio modifier curves as a function of temperature and sensible heat ratio modifier curves as a function of secondary air flow fraction. The secondary coil model assumes that liquid water from defrosting operation is drained to the outdoor and has no impact on the zone air heat balance. 
@@ -6034,6 +6034,7 @@ where
 *\(\omega_\text{InletNode}\) is the secondary coil inlet node air humidity ratio, (kgH2O/kgDryair)
 *\(\omega_\text{OutletNode}\) is the secondary coil outlet node air humidity ratio, (kgH2O/kgDryair)
 
+Reference: Dixon, Erin Elizabeth, "Energy Model Development and Heating Energy Investigation of the Nested Thermal Envelope Design (NTED (tm))" (2010). Theses and dissertations. Paper 974.
 
 ### Packaged Thermal Storage Cooling Coil
 

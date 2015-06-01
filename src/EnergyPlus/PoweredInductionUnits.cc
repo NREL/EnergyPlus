@@ -844,7 +844,6 @@ namespace PoweredInductionUnits {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // do loop index for plant sizing
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		Real64 CoilInTemp;
 		Real64 CoilOutTemp;
@@ -1282,7 +1281,6 @@ namespace PoweredInductionUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 25 ); // maximum number of iterations for controlling output
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -1316,8 +1314,6 @@ namespace PoweredInductionUnits {
 		Real64 MixTempNeeded; // mixer outlet temperature needed to meet cooling load
 		Real64 MinSteamFlow;
 		Real64 MaxSteamFlow;
-		Real64 rho; // local plant fluid density
-		Real64 Cp; // local plant specific Heat
 		Real64 mdot; // local plant fluid flow rate kg/s
 
 		// FLOW
@@ -1529,7 +1525,6 @@ namespace PoweredInductionUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 25 ); // maximum number of iterations for controlling output
 
 		// INTERFACE BLOCK SPECIFICATIONS
 

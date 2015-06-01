@@ -1756,12 +1756,12 @@ An example follows.
        0.05,                                       !- Cover Spacing {m}
        1.526,                                     !- Refractive Index of Outer Cover {dimensionless}
        0.0125,           !- Extinction Coefficient Times Thickness of Outer Cover {dimensionless}
-       0.88,                                       !- Emmissivity of Outer Cover
+       0.88,                                       !- Emissivity of Outer Cover
        1.126,                                     !- Refractive Index of Inner Cover {dimensionless}
        0.0126,           !- Extinction Coefficient Times Thickness of Inner Cover {dimensionless}
-       0.88,                                       !- Emmissivity of Inner Cover {dimensionless}
+       0.88,                                       !- Emissivity of Inner Cover {dimensionless}
        0.96,                                       !- Absorptance of Absorber Plate {dimensionless}
-       0.60;                                       !- Emmissivity of Absorber Plate {dimensionless}
+       0.60;                                       !- Emissivity of Absorber Plate {dimensionless}
 ```
 
 
@@ -2410,7 +2410,7 @@ The part of mass flow rate of natural ventilation air exchange between the plenu
 
 #### Solar Collector Buoyancy Natural Ventilation Mass Flow Rate [kg/s]
 
-The part of mass flow rate of natural ventilation air exchange between the plenum and ambient when the collector is inactive due to bouyancy-driven forces.
+The part of mass flow rate of natural ventilation air exchange between the plenum and ambient when the collector is inactive due to buoyancy-driven forces.
 
 #### Solar Collector Incident Solar Radiation [W/m2]
 
@@ -7975,48 +7975,48 @@ Following is an example input for this compound object:
 ```idf
 CoilSystem:Cooling:DX:HeatExchangerAssisted,
        HeatExchangerAssistedCoolingCoil,               ! Name of the heat exchanger assisted cooling coil
-       HeatExchanger:AirToAir:SensibleAndLatent,             ! Heat exchanger type
-       Air to Air Heat Exchanger 1,                         ! Heat exchanger name
-       Coil:Cooling:DX:SingleSpeed,       ! Cooling coil type
-       DX Cooling Coil 1;                                             ! Cooling coil name
+       HeatExchanger:AirToAir:SensibleAndLatent,       ! Heat exchanger type
+       Air to Air Heat Exchanger 1,                    ! Heat exchanger name
+       Coil:Cooling:DX:SingleSpeed,                    ! Cooling coil type
+       DX Cooling Coil 1;                              ! Cooling coil name
 
 
    HeatExchanger:AirToAir:SensibleAndLatent,
-       Air to Air Heat Exchanger 1,             !- Heat exchanger name
-       FanAndCoilAvailSched,                           !- Availability schedule name
-       1.3,                                                             !- Nominal supply air flow rate {m3/s}
-       .2,                                                               !- Sensible effectiveness at 100% airflow heating condition
-       .0,                                                               !- Latent effectiveness at 100% airflow heating condition
-       .23,                                                             !- Sensible effectiveness at 75% airflow heating condition
-       .0,                                                               !- Latent effectiveness at 75% airflow heating condition
-       .2,                                                               !- Sensible effectiveness at 100% airflow cooling condition
-       .0,                                                               !- Latent effectiveness at 100% airflow cooling condition
-       .23,                                                             !- Sensible effectiveness at 75% airflow cooling condition
-       .0,                                                               !- Latent effectiveness at 75% airflow cooling condition
-       HeatExchangerSupplyAirInletNode,     !- Supply air inlet node name
-       DX Cooling Coil Air Inlet Node,       !- Supply air outlet node name
+       Air to Air Heat Exchanger 1,        !- Heat exchanger name
+       FanAndCoilAvailSched,               !- Availability schedule name
+       1.3,                                !- Nominal supply air flow rate {m3/s}
+       .2,                                 !- Sensible effectiveness at 100% airflow heating condition
+       .0,                                 !- Latent effectiveness at 100% airflow heating condition
+       .23,                                !- Sensible effectiveness at 75% airflow heating condition
+       .0,                                 !- Latent effectiveness at 75% airflow heating condition
+       .2,                                 !- Sensible effectiveness at 100% airflow cooling condition
+       .0,                                 !- Latent effectiveness at 100% airflow cooling condition
+       .23,                                !- Sensible effectiveness at 75% airflow cooling condition
+       .0,                                 !- Latent effectiveness at 75% airflow cooling condition
+       HeatExchangerSupplyAirInletNode,    !- Supply air inlet node name
+       DX Cooling Coil Air Inlet Node,     !- Supply air outlet node name
        HeatExchangerExhaustAirInletNode,   !- Exhaust air inlet node name
-       HeatExchangerExhaustAirOutletNode, !- Exhaust air outlet node name
-       50.0,                                                           !- Nominal electric power {W}
-       No,                                                               !- Supply air outlet temperature control
-       Rotary,                                                       !- Heat exchanger type
-       None;                                                           !- Frost control type
+       HeatExchangerExhaustAirOutletNode,  !- Exhaust air outlet node name
+       50.0,                               !- Nominal electric power {W}
+       No,                                 !- Supply air outlet temperature control
+       Rotary,                             !- Heat exchanger type
+       None;                               !- Frost control type
 
 
    Coil:Cooling:DX:SingleSpeed,
-       DX Cooling Coil 1,                               !- Coil Name
-       FanAndCoilAvailSched,                         !- Availability Schedule
-       25000,                                                       !- Gross Rated Total Cooling Capacity {W}
-       0.75,                                                         !- Gross Rated Sensible Heat Ratio
-       3.0,                                                           !- Gross Rated Cooling COP
-       1.3,                                                           !- Rated Air Flow Rate {m3/s}
+       DX Cooling Coil 1,                  !- Coil Name
+       FanAndCoilAvailSched,               !- Availability Schedule
+       25000,                              !- Gross Rated Total Cooling Capacity {W}
+       0.75,                               !- Gross Rated Sensible Heat Ratio
+       3.0,                                !- Gross Rated Cooling COP
+       1.3,                                !- Rated Air Flow Rate {m3/s}
        DX Cooling Coil Air Inlet Node,     !- Coil Air Inlet Node
-       HeatExchangerExhaustAirInletNode, !- Coil Air Outlet Node
-       ACCoolCapFT,                   !- Total Cooling Capacity Modifier Curve (function of temperature)
+       HeatExchangerExhaustAirInletNode,   !- Coil Air Outlet Node
+       ACCoolCapFT,                  !- Total Cooling Capacity Modifier Curve (function of temperature)
        ACCoolCapFFF,                 !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-       ACEIRFT,                           !- Energy Input Ratio Modifier Curve (function of temperature)
-       ACEIRFFF,                         !- Energy Input Ratio Modifier Curve (function of flow fraction)
-       ACPLFFPLR;                       !- Part Load Fraction Correlation (function of part load ratio)
+       ACEIRFT,                      !- Energy Input Ratio Modifier Curve (function of temperature)
+       ACEIRFFF,                     !- Energy Input Ratio Modifier Curve (function of flow fraction)
+       ACPLFFPLR;                    !- Part Load Fraction Correlation (function of part load ratio)
 ```
 
 
@@ -10835,19 +10835,19 @@ These are the power and energy outputs for the TES tank   s heat exchange with t
 
 ### Secondary Coils of DX System and Heat Pump
 
-Secondary Coils reject to or remove heat from a secondary zone as part of a DX system or an air-to-air heat pump. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed inside a zone either heat is dumped to or extracted from a secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coils but they are add-on features on existing DX coil objects. A secondary DX coil is modelled by specifying additional inputs in one of the following DX coil objects: Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, and Coil:Heating:DX:MultiSpeed. These additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary (active) coil is serving another controlled zone as shown in [Figure](#SecondaryCoilsFigure1).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. Heat is rejected or extracted depending on the primary DX coil operating modes.  For instance, heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only whereas the energy extracted from a secondary zone may contain sensible and latent components.
+Secondary Coils reject to or remove heat from a secondary zone as part of a DX system or an air-to-air heat pump. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed inside a zone either heat is dumped to or extracted from a secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coils but they are add-on features on existing DX coil objects. A secondary DX coil is modeled by specifying additional inputs in one of the following DX coil objects: Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, and Coil:Heating:DX:MultiSpeed. These additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary (active) coil is serving another controlled zone as shown in [Figure](#SecondaryCoilsFigure1).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. Heat is rejected or extracted depending on the primary DX coil operating modes.  For instance, heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only whereas the energy extracted from a secondary zone may contain sensible and latent components.
 
 ![](InputOutputReference/media/image903.png)
 
 Figure: Schematic of DX System and heat pump in cooling operating mode <a name="SecondaryCoilsFigure1"></a>
 
-Heat rejected or extracted by the secondary DX coil installed in a secondary zone is estimated from the DX coil models and it is considered as internal gains of the secondary zone. The capacity and electric power input of the DX system and heat pumps are determined from the operating modes of the primary cooling or heating DX coils. Calculation of a secondary coil tracks the operating modes of the primary DX coil serving the primary conditioned zone(s). Currently allowed DX coil models are single speed, two speed and multi speed DX Systems and Heat Pumps.  To model secondary DX coils the condenser type should be AirCooled.  There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. And the fuel type in multispeed DX coils should Electricity.
+Applications of this technology include: inter-zone heat pump in NTED (Dixon, 2010), and PTAC or PTHP serving Offices attached to a Warehouse, where the office partially or fully enclosed by the warehouse and the condenser is inside the Warehouse. Heat rejected or extracted by the secondary DX coil installed in a secondary zone is estimated from the DX coil models and it is considered as internal gains of the secondary zone. The capacity and electric power input of the DX system and heat pumps are determined from the operating modes of the primary cooling or heating DX coils. Calculation of a secondary coil tracks the operating modes of the primary DX coil serving the primary conditioned zone(s). Currently allowed DX coil models are single speed, two speed and multi speed DX Systems and Heat Pumps.  To model secondary DX coils the condenser type should be AirCooled.  There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. And the fuel type in multispeed DX coils should Electricity.
 
-**Cooling Operating Mode**: the primary DX cooling coil of a DX system serving a primary zone is active and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects.  This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in [Figure](#SecondaryCoilsFigure2). Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked.  New input field required as add-on to the DX cooling coil objects is a zone name for the secondary coil (condenser) placement. 
+**Cooling Operating Mode**: the primary DX cooling coil of a DX system serving a primary zone is active and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects.  This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in [Figure](#SecondaryCoilsFigure2). Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked. The only input field required to invoke the secondary DX coil in cooling operating model is to add a zone name in the input field  _Zone Name for Condenser Placement_ in the DX cooling coil object. 
 
 #### Field: Zone Name for Condenser Placement
 
-This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into a zone.  The heat rejected is modeled as sensible internal gain of a secondary zone. 
+This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into this zone.  The heat rejected is modeled as sensible internal gain of a secondary zone. 
 
 ![](InputOutputReference/media/image904.png)
 
@@ -11036,7 +11036,7 @@ Coil:Cooling:DX:MultiSpeed,
     NORTH ZONE;              !- Zone Name for Condenser Placement
 ```
 
-**Heating Operating Mode**: When a heat pump operates in heating mode then energy is extracted from the secondary zone.  Total energy extracted from a secondary zone may contain sensible and latent components.  The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction.  If the coil operation is dry, then the SHR is set to 1.0.  In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside.  Thus, defrosting energy is not included in the zone energy balance. New input fields required in the single speed DX heating coils include:
+**Heating Operating Mode**: When a heat pump operates in heating mode then energy is extracted from the secondary zone.  Total energy extracted from a secondary zone may contain sensible and latent components.  The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction.  If the coil operation is dry, then the SHR is set to 1.0.  In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside.  Thus, defrosting energy is not included in the zone energy balance. The six optioal input fields required in the DX heating coils are the following. The last five input fields are extensible depending on the speed of the heating DX coil:
 
 #### Field: Zone Name for Evaporator Placement
 
@@ -11188,6 +11188,21 @@ Coil:Heating:DX:MultiSpeed,
     DXSecondaryCoilSHRFFF;   !- Speed 4 Sensible Heat Ratio Function of Flow Fraction Curve Name
 ```
 
+### Secondary DX Coil Output
+
+* HVAC, Average, Secondary Coil Heat Rejection Rate [W] 
+
+* HVAC, Average, Secondary Coil Total Heat Removal Rate [W]
+
+* HVAC, Average, Secondary Coil Sensible Heat Removal Rate [W]
+
+* HVAC, Average, Secondary Coil Latent Heat Removal Rate [W]
+
+* HVAC, Average, Secondary Coil Sensible Heat Ratio []
+
+* HVAC, Average, Secondary Coil Compressor Part Load Ratio []
+
+
 #### Secondary Coil Heat Rejection Rate [W]
 
 This is the sensible heat rejected to a zone by a secondary DX coil (condenser) in Watts. This is sum of the total cooling rate of a DX cooling coil and cooling electric power of the primary DX coil.  This heat is applied as an internal gain to the secondary zone where the condenser is installed.
@@ -11200,7 +11215,7 @@ This is the total energy removed from a a zone by a secondary DX coil (evaporato
 
 This is the sensible heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is determined by multiplying the total heat removed with sensible heat ratio of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that sensible heat is removed from the zone.
 
-#### Secondary Coil Total Heat  Removal Rate [W]
+#### Secondary Coil Latent Heat  Removal Rate [W]
 
 This is the latent heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is the difference between the total heat removal rate and the sensible heat remobal rate of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that moisture is removed from the zone.
 
@@ -11210,7 +11225,9 @@ This is the operating sensible heat ratio the secondary DX coil (condenser) when
 
 #### Secondary Coil Compressor Part Load Ratio []
 
-This is the compressor part load ratio when the heat pump is operating in heating mode and the secondary coil is extracting heat from a zone where the later is installed.
+This is the compressor part load ratio when the heat pump is operating in heating mode and the secondary coil is extracting heat from a zone where the coil is installed. The secondary coil DX coil compressor part load ratio can be different from the primary DX coil compressor part load ratio in that the later may include the defrosting load.
+
+Reference: Dixon, Erin Elizabeth, "Energy Model Development and Heating Energy Investigation of the Nested Thermal Envelope Design (NTED (tm))" (2010). Theses and dissertations. Paper 974.
 
 Group     Fans
 ------------
@@ -15038,6 +15055,10 @@ Simulation order for setpoint managers:
 
 - SetpointManager:OutdoorAirPretreat
 
+- SetpointManager:ReturnTemperature:ChilledWater,
+
+- SetpointManager:ReturnTemperature:HotWater
+
 ### SetpointManager:Scheduled
 
 The simplest Setpoint Manager simply uses a schedule to determine one or more setpoints. No node data is used as input. The input consists of the Setpoint Manager name, the control variable, the schedule name, and the name of a node list. The node list contains the name of those nodes at which the setpoint is to be applied. Of course, a node list name can always be simply the name of a single node.
@@ -16480,9 +16501,143 @@ SetpointManager:SingleZone:OneStageHeating,
        Main Heating Coil 2 Air Outlet Node ; !- Setpoint Node or NodeList Name
 ```
 
+### SetpointManager:ReturnTemperature:ChilledWater
 
+This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment.  This setpoint manager is specifically for "chilled water" (although it could be any fluid) applications.  This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what set-point temperature would provide the desired target return temperature.
 
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  However, as described in the EngineeringReference, for most realistic building profiles the control works quite well under normal timestep size.  If your load profile is highly jagged with step changes in demand, a smaller timestep could help achieve tight control.
 
+#### Field: Name
+
+This alpha field is a unique, user-assigned name for an instance of a chilled water return temperature reset setpoint manager.
+
+#### Plant Loop Supply Outlet Node
+
+This alpha field is the name of the plant loop supply side outlet node for the plant being managed by this setpoint manager.  The current temperature of this node is sensed in order to calculate current loop demand.  This node is typically also where the plant loop setpoint is specified, but not necessarily.  This setpoint manager looks up the actual setpoint node from the PlantLoop internal data structures as it is specified on the PlantLoop object.  If the plant loop setpoint is on a different node than the supply outlet node, the loop may not maintain return temperature control as expected.
+
+#### Plant Loop Supply Inlet Node
+
+This alpha field is the name of the plant loop supply side inlet node whose temperature is controlled using this setpoint manager by resetting the supply setpoint temperature.  The current temperature of this node is also sensed in order to calculate current loop demand.
+
+#### Minimum Supply Temperature Setpoint
+
+This numeric field plays multiple roles.  During initialization, such as before the plant data structures are fully established, this is used as the default plant supply setpoint temperature.  During normal calculation, this is used as the minimum chilled water supply temperature to avoid resetting the setpoint too low.  During times of no-load, or odd conditions such as a negative load, the setpoint is reset to this design setpoint.
+
+#### Maximum Supply Temperature Setpoint
+
+This numeric field is the maximum value to which the supply setpoint can be reset.  This ensures that the chilled water temperature does not go too high during reset operations.
+
+#### Return Temperature Setpoint Input Type
+
+This alpha field must be one of three strings: "Constant", "Scheduled", or "ReturnTemperatureSetpoint".  If the choice is "Constant", the constant value in the next field is used as the target return temperature.  If the choice is "Scheduled", the current value of the schedule named in the following field is used as the target return temperature.  If the choice is "ReturnTemperatureSetpoint", the actual setpoint temperature on the "Plant Loop Supply Inlet Node" specified above is retrieved and used as the target return temperature.  This is convenient as a separate setpoint manager could be established to pre-calculate the desired return temperature, and will assign the Setpoint internally.  Then when this return temperature manager executes, the setpoint will be updated and utilized.
+
+#### Return Temperature Setpoint Constant Value
+
+If the "Return Temperature Setpoint Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
+
+#### Return Temperature Setpoint Schedule Name
+
+If the "Return Temperature Setpoint Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
+
+An example idf input for a constant return reset setpoint manager is shown here:
+
+```idf
+  SetpointManager:ReturnTemperature:ChilledWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    7.0,                     !- Minimum Supply Temperature Setpoint
+    10.0,                    !- Maximum Supply Temperature Setpoint
+    Constant,                !- Return Temperature Setpoint Input Type
+    12.0,                    !- Return Temperature Setpoint Constant Value
+    ;                        !- Return Temperature Setpoint Schedule Name
+```
+
+Another example which uses the "ReturnTemperatureSetpoint" is shown here with the accompanying setpoint being used to set the setpoint on the return node:
+
+```
+  SetpointManager:Scheduled,
+    Return Temperature Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    Return Temperature Sch,  !- Schedule Name
+    Supply Inlet Node;       !- Setpoint Node or NodeList Name
+
+  Schedule:Constant,
+    Return Temperature Sch,  !- Name
+    Any Number,              !- Schedule Limits
+    11.75;                   !- Value
+
+  SetpointManager:ReturnTemperature:ChilledWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    7.0,                     !- Minimum Supply Temperature Setpoint
+    10.0,                    !- Maximum Supply Temperature Setpoint
+    ReturnTemperatureSetpoint, !- Return Temperature Setpoint Input Type
+    ,                        !- Return Temperature Setpoint Constant Value
+    ;                        !- Return Temperature Setpoint Schedule Name
+```
+
+### SetpointManager:ReturnTemperature:HotWater
+
+This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment.  This setpoint manager is specifically for "hot water" (although it could be any fluid) applications.  This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what supply set-point temperature would provide the desired target return temperature.
+
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  However, as described in the EngineeringReference, for most realistic building profiles the control works quite well under normal timestep size.  If your load profile is highly jagged with step changes in demand, a smaller timestep could help achieve tight control.
+
+#### Field: Name
+
+This alpha field is a unique, user-assigned name for an instance of a hot water return temperature reset setpoint manager.
+
+#### Plant Loop Supply Outlet Node
+
+This alpha field is the name of the plant loop supply side outlet node for the plant being managed by this setpoint manager.  The current temperature of this node is sensed in order to calculate current loop demand.  This node is typically also where the plant loop setpoint is specified, but not necessarily.  This setpoint manager looks up the actual setpoint node from the PlantLoop internal data structures as it is specified on the PlantLoop object.  If the plant loop setpoint is on a different node than the supply outlet node, the loop may not maintain return temperature control as expected.
+
+#### Plant Loop Supply Inlet Node
+
+This alpha field is the name of the plant loop supply side inlet node whose temperature is controlled using this setpoint manager by resetting the supply setpoint temperature.  The current temperature of this node is also sensed in order to calculate current loop demand.
+
+#### Minimum Supply Temperature Setpoint
+
+This numeric field is the minimum value to which the supply setpoint can be reset.  This ensures that the hot water temperature does not go too low during reset operations.
+
+#### Maximum Supply Temperature Setpoint
+
+This numeric field plays multiple roles.  During initialization, such as before the plant data structures are fully established, this is used as the default plant supply setpoint temperature.  During normal calculation, this is used as the maximum hot water supply temperature to avoid resetting the setpoint too high.  During times of no-load, or odd conditions such as a negative load, the setpoint is reset to this design setpoint.
+
+#### Return Temperature Setpoint Input Type
+
+This alpha field must be one of three strings: "Constant", "Scheduled", or "ReturnTemperatureSetpoint".  If the choice is "Constant", the constant value in the next field is used as the target return temperature.  If the choice is "Scheduled", the current value of the schedule named in the following field is used as the target return temperature.  If the choice is "ReturnTemperatureSetpoint", the actual setpoint temperature on the "Plant Loop Supply Inlet Node" specified above is retrieved and used as the target return temperature.  This is convenient as a separate setpoint manager could be established to pre-calculate the desired return temperature, and will assign the Setpoint internally.  Then when this return temperature manager executes, the setpoint will be updated and utilized.
+
+#### Return Temperature Setpoint Constant Value
+
+If the "Return Temperature Setpoint Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
+
+#### Return Temperature Setpoint Schedule Name
+
+If the "Return Temperature Setpoint Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
+
+An example idf input for a scheduled return reset setpoint manager is shown here:
+
+```idf
+  SetpointManager:ReturnTemperature:HotWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    57.0,                    !- Minimum Supply Temperature Setpoint
+    60.0,                    !- Maximum Supply Temperature Setpoint
+    Scheduled,               !- Return Temperature Setpoint Input Type
+    ,                        !- Return Temperature Setpoint Constant Value
+    ReturnTempSchedule;      !- Return Temperature Setpoint Schedule Name
+
+  Schedule:Compact,
+    ReturnTempSchedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 12:00, 55,        !- Field 3
+    UNTIL: 17:00, 53,        !- Field 3
+    UNTIL: 24:00, 55;        !- Field 3
+```
 
 Group     Controllers
 -------------------
@@ -16511,7 +16666,7 @@ This was setup to be generic but to date has only been used for temperature cont
 
 #### Field: Action
 
-The next input refers to the    action    of the control. This can be best described by an example. In a coil where water mass flow rate is to be controlled, a coil will increase the mass flow rate through the coil when more heating or cooling is requested. In a heating coil, this increases the value of heat transfer from the water to the air stream. As a result, this is considered a    Normal    action controller. In a cooling coil, an increase in water mass flow rate through the coil decreases the value of heat transfer from the water to the air stream (absolute value increases, but since cooling is traditionally described as a negative number, an increase in absolute value results in a decrease in the actual heat transfer value). Thus, the cooling coil controller has    Reverse    action since an increase in flow rate results in a decrease in heat transfer.
+The next input refers to the action of the control. This can be best described by an example. In a coil where water mass flow rate is to be controlled, a coil will increase the mass flow rate through the coil when more heating or cooling is requested. In a heating coil, this increases the value of heat transfer from the water to the air stream. As a result, this is considered a    Normal    action controller. In a cooling coil, an increase in water mass flow rate through the coil decreases the value of heat transfer from the water to the air stream (absolute value increases, but since cooling is traditionally described as a negative number, an increase in absolute value results in a decrease in the actual heat transfer value). Thus, the cooling coil controller has    Reverse    action since an increase in flow rate results in a decrease in heat transfer.
 
 #### Field: Actuator Variable
 
@@ -16668,29 +16823,29 @@ The **ModulateFlow** option can also be used with the HeatExchanger:AirToAir:Fla
 
 Input for this field is the outdoor air temperature high limit ( &deg;C) for economizer operation. If the outdoor air temperature is above this limit, the outdoor airflow rate will be set to the minimum. This field is required if Economizer Control Type    FixedDryBulb    or    FixedDewPointAndDryBulb    has been specified.
 
-No input (blank) in this field means that there is no outdoor air temperature high limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer.
+No input (blank) in this field means that there is no outdoor air temperature high limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Economizer Maximum Limit Enthalpy
 
 Input for this field is the outdoor air enthalpy limit (in J/kg) for economizer operation. If the outdoor air enthalpy is above this value, the outdoor airflow rate will be set to the minimum. This field is required if Economizer Control Type    FixedEnthalpy    has been specified.
 
-No input (blank) in this field means that there is no outdoor air enthalpy limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer.
+No input (blank) in this field means that there is no outdoor air enthalpy limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Economizer Maximum Limit Dewpoint Temperature
 
 Input for this field is the outdoor air dewpoint limit ( &deg;C) for economizer operation. If the outdoor air dewpoint temperature is above this value, the outdoor airflow rate will be set to the minimum. This field is required if the Economizer Control Type       FixedDewPointAndDryBulb    has been specified.
 
-No input (blank) in this field means that there is no outdoor air dewpoint limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer.
+No input (blank) in this field means that there is no outdoor air dewpoint limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Electronic Enthalpy Limit Curve Name
 
-Input for this field is the name of a quadratic or cubic curve which provides the maximum outdoor air humidity ratio (function of outdoor air dry-bulb temperature) for economizer operation. If the outdoor air humidity ratio is greater than the curve   s maximum humidity ratio (evaluated at the outdoor air dry-bulb temperature), the outdoor air flow rate will be set to the minimum. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. No input (blank) in this field means that there is no electronic enthalpy limit control.
+Input for this field is the name of a quadratic or cubic curve which provides the maximum outdoor air humidity ratio (function of outdoor air dry-bulb temperature) for economizer operation. If the outdoor air humidity ratio is greater than the curve   s maximum humidity ratio (evaluated at the outdoor air dry-bulb temperature), the outdoor air flow rate will be set to the minimum. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. No input (blank) in this field means that there is no electronic enthalpy limit control. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Economizer Minimum Limit Dry-Bulb Temperature
 
 Input for this field is the outdoor air temperature low limit ( &deg;C) for economizer operation. If the outdoor air temperature is below this limit, the outdoor airflow rate will be set to the minimum.
 
-No input (blank) in this field means that there is no outdoor air temperature low limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer.
+No input (blank) in this field means that there is no outdoor air temperature low limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Lockout Type
 
@@ -17883,17 +18038,17 @@ An IDF example:
 
 ```idf
    HeatExchanger:AirToAir:FlatPlate,
-       OA Heat Recovery 1,           !- Name
+       OA Heat Recovery 1,         !- Name
        FanAndCoilAvailSched,       !- Availability Schedule Name
-       CounterFlow,                         !- Flow Arrangement Type
-       Yes,                                         !- Economizer Lockout
-       1.0,                                         !- Ratio of Supply to Secondary hA Values
-       0.4333,                                   !- Nominal Supply Air Flow Rate {m3/s}
-       5.0,                                         !- Nominal Supply Air Inlet Temperature {C}
-       15.0,                                       !- Nominal Supply Air Outlet Temperature {C}
-       0.4333,                                   !- Nominal Secondary Air Flow Rate {m3/s}
-       20.0,                                       !- Nominal Secondary Air Inlet Temperature {C}
-       0.0,                                         !- Nominal Electric Power {W}
+       CounterFlow,                !- Flow Arrangement Type
+       Yes,                        !- Economizer Lockout
+       1.0,                        !- Ratio of Supply to Secondary hA Values
+       0.4333,                     !- Nominal Supply Air Flow Rate {m3/s}
+       5.0,                        !- Nominal Supply Air Inlet Temperature {C}
+       15.0,                       !- Nominal Supply Air Outlet Temperature {C}
+       0.4333,                     !- Nominal Secondary Air Flow Rate {m3/s}
+       20.0,                       !- Nominal Secondary Air Inlet Temperature {C}
+       0.0,                        !- Nominal Electric Power {W}
        Desiccant Process Outlet Node,   !- Supply Air Inlet Node Name
        Heat Recovery Outlet Node,   !- Supply Air Outlet Node Name
        Relief Air Outlet Node,   !- Secondary Air Inlet Node Name
@@ -18332,10 +18487,10 @@ Sensible + latent
     <td>-23.3&deg;C (-10&deg;F)</td>
   </tr>
 </table>
+
 Source: Indoor Humidity Assessment Tool, U.S. Environmental Protection Agency,[http://www.epa.gov/iaq/schooldesign/saves.html](http://www.epa.gov/iaq/schooldesign/saves.html)
 
-\*\* To model preheat frost control, specify frost control type as    None    and place a heating coil in the supply inlet air stream controlled to the keep the air temperature above the frost threshold temperature.
-
+\*\* To model preheat frost control, specify frost control type as None and place a heating coil in the supply inlet air stream controlled to the keep the air temperature above the frost threshold temperature.
 
 
 #### Field: Initial Defrost Time Fraction
@@ -18362,25 +18517,25 @@ Following is an example input for this heat exchanger object:
 
 ```idf
    HeatExchanger:AirToAir:SensibleAndLatent,
-       OA Heat Recovery 1,           !- Name
+       OA Heat Recovery 1,         !- Name
        FanAndCoilAvailSched,       !- Availability Schedule Name
-       0.4333,                                   !- Nominal Supply Air Flow Rate {m3/s}
-       .76,                                         !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
-       .68,                                         !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-       .81,                                         !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-       .73,                                         !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
-       .76,                                         !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
-       .68,                                         !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-       .81,                                         !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-       .73,                                         !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
+       0.4333,                     !- Nominal Supply Air Flow Rate {m3/s}
+       .76,                        !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
+       .68,                        !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
+       .81,                        !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
+       .73,                        !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
+       .76,                        !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
+       .68,                        !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
+       .81,                        !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
+       .73,                        !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
        Outside Air Inlet Node Preheated,   !- Supply Air Inlet Node Name
-       Heat Recovery Outlet Node,   !- Supply Air Outlet Node Name
-       Relief Air Outlet Node,   !- Exhaust Air Inlet Node Name
+       Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name
+       Relief Air Outlet Node,     !- Exhaust Air Inlet Node Name
        Heat Recovery Secondary Outlet Node,   !- Exhaust Air Outlet Node Name
-       200.0,                                     !- Nominal Electric Power {W}
-       No,                                           !- Supply Air Outlet Temperature Control
-       Plate,                                     !- Heat Exchanger Type
-       None;                                       !- Frost Control Type
+       200.0,                      !- Nominal Electric Power {W}
+       No,                         !- Supply Air Outlet Temperature Control
+       Plate,                      !- Heat Exchanger Type
+       None;                       !- Frost Control Type
 ```
 
 ### HeatExchanger:AirToAir:SensibleAndLatent Outputs
@@ -19680,7 +19835,7 @@ This field is used to identify the inverter connected to this load center (if an
 
 #### Field: Electrical Storage Object Name
 
-This field is used to identify the electrical storage connected to this load center (if any).   This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverterDCStorage or DirectCurrentWithInverterACStorage.   Enter the name of an ElectricLoadCenter:Storage:Simple object defined elsewhere in the input file.
+This field is used to identify the electrical storage connected to this load center (if any).   This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverterDCStorage or DirectCurrentWithInverterACStorage.   Enter the name of an ElectricLoadCenter:Storage:* object defined elsewhere in the input file.
 
 #### Field: Transformer Object Name
 
@@ -22329,7 +22484,7 @@ This field is used to describe the amount of fuel (kmol) used during the entire 
 
 This field is used to describe the amount of electricity (J) used by ancillary equipment during the entire shut down period.
 
-#### Field: Ancilliary Electricity Constant Term
+#### Field: Ancillary Electricity Constant Term
 
 This field is used to describe the constant term, <span>$an{c_0}$</span>, in a relation that describes the AC electrical power used by ancillary equipment located inside the power module, <span>${P_{el,ancillaries - AC}}$</span>. The model uses this relation,
 
@@ -22337,7 +22492,7 @@ This field is used to describe the constant term, <span>$an{c_0}$</span>, in a r
 
 where <span>${\dot N_{fuel}}$</span>  is the rate of fuel use in the power module (kmol/s).
 
-#### Field: Ancilliary Electricity Linear Term
+#### Field: Ancillary Electricity Linear Term
 
 This field is used to describe the linear term, <span>$an{c_1}$</span>, in the relation shown in the previous field.
 
@@ -22414,8 +22569,8 @@ Generator:FuelCell:PowerModule,
        0.0,                                         !- Shut Down Time {s}
        0.2,                                         !- Shut Down Fuel {kmol}
        ,                                               !- Shut Down Electricity Consumption {J}
-       0.0,                                         !- Ancilliary Electricity Constant Term
-       0.0,                                         !- Ancilliary Electricity Linear Term
+       0.0,                                         !- Ancillary Electricity Constant Term
+       0.0,                                         !- Ancillary Electricity Linear Term
        ConstantRate,                       !- Skin Loss Calculation Mode
        ZN_1_FLR_1_SEC_5,               !- Zone Name
        0.6392,                                   !- Skin Loss Radiative Fraction
@@ -22827,8 +22982,8 @@ An example input data file (IDF) entry for this object is provided below:
    Generator:FuelCell:AuxiliaryHeater,
        FCT SOFC Auxiliary Heater,   !- Name
        0.0,                                         !- Excess Air Ratio
-       0.0,                                         !- Ancilliary Power Constant Term
-       0.0,                                         !- Ancilliary Power Linear Term
+       0.0,                                         !- Ancillary Power Constant Term
+       0.0,                                         !- Ancillary Power Linear Term
        0.5,                                         !- Skin Loss U-Factor Times Area Value
        SurroundingZone,                 !- Skin Loss Destination
        ZN_1_FLR_1_SEC_5,               !- Zone Name to Receive Skin Losses

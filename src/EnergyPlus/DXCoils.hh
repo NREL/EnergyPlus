@@ -1218,7 +1218,7 @@ namespace DXCoils {
 
 		// Member Constructor
 		DXCoilNumericFieldData(
-			Array1_int const & PerfMode // Name of the HeatingCoil numeric field descriptions
+			Array1_int const & EP_UNUSED( PerfMode ) // Name of the HeatingCoil numeric field descriptions
 	) :
 		PerfMode( 0 )
 		{}

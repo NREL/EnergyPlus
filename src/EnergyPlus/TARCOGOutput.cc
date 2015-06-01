@@ -193,7 +193,6 @@ namespace TARCOGOutput {
 
 		int i;
 		int j;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_10001( "('TARCOG v.',A,'compiled ',A)" );
@@ -516,7 +515,7 @@ namespace TARCOGOutput {
 	void
 	WriteModifiedArguments(
 		int const InArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED( DBGD ),
 		Real64 const esky,
 		Real64 const trmout,
 		Real64 const trmin,
@@ -556,7 +555,6 @@ namespace TARCOGOutput {
 		// Locals
 		int i;
 		int j;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_1014( "('Adjusted input arguments:')" );
@@ -638,7 +636,7 @@ namespace TARCOGOutput {
 	void
 	WriteOutputArguments(
 		int & OutArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED( DBGD ),
 		int const nlayer,
 		Real64 const tamb,
 		Array1A< Real64 > const q,
@@ -712,7 +710,6 @@ namespace TARCOGOutput {
 		Array1D_string real_CLOCK( 3 );
 
 		int i;
-		int nperr;
 
 		// Formats
 		static gio::Fmt Format_2000( "('TARCOG calculation results - ',I4,'-',I2.2,'-',I2.2,', ',I2.2,':',I2.2,':',I2.2)" );
@@ -945,7 +942,7 @@ namespace TARCOGOutput {
 	void
 	WriteOutputEN673(
 		int & OutArgumentsFile,
-		std::string const & DBGD,
+		std::string const & EP_UNUSED( DBGD ),
 		int const nlayer,
 		Real64 const ufactor,
 		Real64 const hout,
@@ -955,7 +952,7 @@ namespace TARCOGOutput {
 		Array1A< Real64 > const hg,
 		Array1A< Real64 > const hr,
 		Array1A< Real64 > const hs,
-		int & nperr
+		int & EP_UNUSED( nperr )
 	)
 	{
 
@@ -1141,7 +1138,6 @@ namespace TARCOGOutput {
 		Array1D_int DATE_TIME( 8 );
 		Array1D_string real_CLOCK( 3 );
 
-		int nperr;
 
 		static std::string dynFormat;
 
@@ -1402,7 +1398,6 @@ namespace TARCOGOutput {
 	{
 
 		// Locals
-		int ferr;
 
 		// Formats
 		static gio::Fmt Format_2360( "('TARCOG status: ',I3,' - Normal termination.')" );

@@ -208,14 +208,8 @@ namespace PlantLoopEquip {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CompNum; // Plant side component list equipment number
-		int BrnNum; // Branch counter
 		int EquipNum; // Plant side component list equipment number
 		int EquipTypeNum;
-		int BranchInletNode;
-		int LastNodeOnBranch;
-		int PumpOutletNode;
-		int LoopControl;
 		bool RunFlag; // TRUE if operating this iteration
 		// std::string EquipType; // local equipment type
 		// std::string EquipName; // local equipment name
@@ -225,11 +219,7 @@ namespace PlantLoopEquip {
 		Real64 MinLoad;
 		Real64 OptLoad;
 		Real64 SizingFac; // the component sizing fraction
-		static Real64 BranchFlowRequest( 0.0 );
-		static Real64 InitialBranchFlow( 0.0 );
 		int GeneralEquipType; // Basic Equipment type from EquipType Used to help organize this routine
-		static bool PumpPowerToLoop( false );
-		static bool RunLoopPumps( false );
 		Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
 		Real64 TempEvapOutDesign;
 

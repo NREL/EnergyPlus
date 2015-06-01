@@ -531,11 +531,11 @@ namespace HeatPumpWaterToWaterHEATING {
 
 	void
 	CalcGshpModel(
-		std::string const & GSHPType, // type ofGSHP
+		std::string const & EP_UNUSED( GSHPType ), // type ofGSHP
 		std::string const & GSHPName, // user specified name ofGSHP
 		int const GSHPNum, // GSHP Number
 		Real64 & MyLoad, // Operating Load
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -552,9 +552,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using namespace FluidProperties;
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;

@@ -154,13 +154,11 @@ namespace EnergyPlus {
 		SystemTimestepObject tmpSysStepStamp
 	)
 	{
-		using DataLoopNode::Node;
 		int lastZnStepIndex( 0 );
 		int ztIndex( 0 );
 		int oldNumSubSteps;
 		int newNumSubSteps;
 		Real64 const MinutesPerHour( 60.0 );
-		Real64 StartDiff; //in fractional hours
 		Real64 ZoneStepStartMinutes;
 
 		ztIndex = GetSysStepZtStepIndex(tmpztStepStamp);
@@ -306,7 +304,6 @@ namespace EnergyPlus {
 		using namespace WeatherManager;
 		int VectorLength( 0 );
 		int const HoursPerDay( 24 );
-		int LogSetIndex;
 
 		SizingLog tmpLog( rVariable );
 		tmpLog.NumOfEnvironmentsInLogSet = 0;
@@ -473,8 +470,6 @@ namespace EnergyPlus {
 		using namespace OutputReportPredefined;
 		using WeatherManager::Environment;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		Real64 PeakDemandReturnTemp;
-		Real64 PeakDemandMassFlow;
 		bool setNewSizes;
 		Real64 sizingFac;
 		Real64 normalizedChange;

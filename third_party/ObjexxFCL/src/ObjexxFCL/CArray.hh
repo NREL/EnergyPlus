@@ -26,6 +26,7 @@
 #include <initializer_list>
 #include <iomanip>
 #include <istream>
+#include <iterator>
 #include <ostream>
 #include <type_traits>
 #include <utility>
@@ -53,6 +54,8 @@ public: // Types
 	typedef  T const *  const_pointer;
 	typedef  T *  iterator;
 	typedef  T const *  const_iterator;
+	typedef  std::reverse_iterator< T * >  reverse_iterator;
+	typedef  std::reverse_iterator< T const * >  const_reverse_iterator;
 	typedef  std::size_t  size_type;
 	typedef  std::ptrdiff_t  difference_type;
 
@@ -64,6 +67,8 @@ public: // Types
 	typedef  T const *  ConstPointer;
 	typedef  T *  Iterator;
 	typedef  T const *  ConstIterator;
+	typedef  std::reverse_iterator< T * >  ReverseIterator;
+	typedef  std::reverse_iterator< T const * >  ConstReverseIterator;
 	typedef  std::size_t  Size;
 	typedef  std::ptrdiff_t  Difference;
 
@@ -650,7 +655,7 @@ public: // Subscript
 
 public: // Iterator
 
-	// const_iterator to Beginning of Array
+	// Begin Iterator
 	inline
 	const_iterator
 	begin() const
@@ -658,7 +663,7 @@ public: // Iterator
 		return data_;
 	}
 
-	// iterator to Beginning of Array
+	// Begin Iterator
 	inline
 	iterator
 	begin()
@@ -666,20 +671,52 @@ public: // Iterator
 		return data_;
 	}
 
-	// const_iterator to Element Past End of Array
+	// End Iterator
 	inline
 	const_iterator
 	end() const
 	{
-		return data_ + size_;
+		return ( data_ != nullptr ? data_ + size_ : nullptr );
 	}
 
-	// iterator to Element Past End of Array
+	// End Iterator
 	inline
 	iterator
 	end()
 	{
-		return data_ + size_;
+		return ( data_ != nullptr ? data_ + size_ : nullptr );
+	}
+
+	// Reverse Begin Iterator
+	inline
+	const_reverse_iterator
+	rbegin() const
+	{
+		return const_reverse_iterator( data_ != nullptr ? data_ + size_ : nullptr );
+	}
+
+	// Reverse Begin Iterator
+	inline
+	reverse_iterator
+	rbegin()
+	{
+		return reverse_iterator( data_ != nullptr ? data_ + size_ : nullptr );
+	}
+
+	// Reverse End Iterator
+	inline
+	const_reverse_iterator
+	rend() const
+	{
+		return const_reverse_iterator( data_ );
+	}
+
+	// Reverse End Iterator
+	inline
+	reverse_iterator
+	rend()
+	{
+		return reverse_iterator( data_ );
 	}
 
 public: // Array Accessor

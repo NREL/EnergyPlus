@@ -2369,6 +2369,12 @@ namespace DataPlant {
 		Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
 	);
 
+	bool
+	verifyTwoNodeNumsOnSamePlantLoop(
+		int const nodeIndexA,
+		int const nodeIndexB
+	);
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

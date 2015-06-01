@@ -420,9 +420,9 @@ namespace HeatPumpWaterToWaterSimple {
 	void
 	InitWatertoWaterHP(
 		int const GSHPTypeNum, // Type of GSHP
-		std::string const & GSHPName, // User Specified Name of GSHP
+		std::string const & EP_UNUSED( GSHPName ), // User Specified Name of GSHP
 		int const GSHPNum, // GSHP Number
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		Real64 const MyLoad // Demand Load
 	)
 	{
@@ -449,7 +449,6 @@ namespace HeatPumpWaterToWaterSimple {
 		// Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;

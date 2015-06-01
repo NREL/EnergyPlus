@@ -297,7 +297,6 @@ namespace DualDuct {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		int ZoneNum; // Index to actual zone number
 		static Array1D< Real64 > NumArray( 2, 0.0 );
 		static Array1D_string AlphArray( 7 );
 		static Array1D_string cAlphaFields( 7 ); // Alpha field names
@@ -1934,7 +1933,7 @@ namespace DualDuct {
 	// *****************************************************************************
 
 	void
-	ReportDualDuct( int const DamperNum ) // unused1208
+	ReportDualDuct( int const EP_UNUSED( DamperNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2098,7 +2097,7 @@ namespace DualDuct {
 
 	void
 	GetDualDuctOutdoorAirRecircUse(
-		std::string const & CompTypeName,
+		std::string const & EP_UNUSED( CompTypeName ),
 		std::string const & CompName,
 		bool & RecircIsUsed
 	)

@@ -3579,28 +3579,28 @@ An IDF example:
 
 ```idf
 EARTHTUBE,
-  Zone 2,           !- Zone Name
-  Simple EarthTube, !- Schedule Name
-  3.425198,         !- Design Volume Flow Rate
-  10.0,             !- Minimum Zone Temperature when Cooling
-  30.0,             !- Maximum Zone Temperature when Heating
-  1.0,              !- Delta Temperature
-  NATURAL,          !- EarthTube Type
-  350.0,            !- Fan Pressure Rise
-  0.9,              !- Fan Total Efficiency
-  0.25,             !- Pipe Radius
-  0.2,              !- Pipe Thickness
-  15.0,             !- Pipe Length
-  200.0,            !- Pipe Thermal Conductivity
-  3.5,              !- Pipe Depth Under Ground Surface
-  HeavyAndDamp,     !- Soil Condition
-  15.0,             !- Average Soil Surface Temperature
-  5.6,              !- Amplitude of Soil Surface Temperature
-  0.0,              !- Phase Constant of Soil Surface Temperature
-  0.6060000    ,    !- Constant Term Flow Coef
-  2.0199999E-02,    !- Temp Term Flow Coef
-  5.9800001E-04,    !- Velocity Term Flow Coef
-  0.0000000E+00;    !- Velocity**2 Term Flow Coef
+  Zone 2,           !- Zone Name
+  Simple EarthTube, !- Schedule Name
+  3.425198,         !- Design Volume Flow Rate
+  10.0,             !- Minimum Zone Temperature when Cooling
+  30.0,             !- Maximum Zone Temperature when Heating
+  1.0,              !- Delta Temperature
+  NATURAL,          !- EarthTube Type
+  350.0,            !- Fan Pressure Rise
+  0.9,              !- Fan Total Efficiency
+  0.25,             !- Pipe Radius
+  0.2,              !- Pipe Thickness
+  15.0,             !- Pipe Length
+  200.0,            !- Pipe Thermal Conductivity
+  3.5,              !- Pipe Depth Under Ground Surface
+  HeavyAndDamp,     !- Soil Condition
+  15.0,             !- Average Soil Surface Temperature
+  5.6,              !- Amplitude of Soil Surface Temperature
+  0.0,              !- Phase Constant of Soil Surface Temperature
+  0.6060000    ,    !- Constant Term Flow Coef
+  2.0199999E-02,    !- Temp Term Flow Coef
+  5.9800001E-04,    !- Velocity Term Flow Coef
+  0.0000000E+00;    !- Velocity**2 Term Flow Coef
 ```
 
 
@@ -8852,7 +8852,7 @@ This alpha field contains the identifying name given to the Demand Side Connecto
 
 #### Field: Load Distribution Scheme
 
-This alpha field contains the Load Distribution Scheme Keyword. The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. **Optimal**operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **SequentialLoad**loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **UniformLoad**evenly distributes the loop demand among all available components on the equipment list for a given load range. **SequentialUniformPLR** loads all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the PlantEquipmentList until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. **UniformPLR** will load all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the PlantEquipmentList operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
+This alpha field contains the Load Distribution Scheme Keyword. The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **SequentialLoad** loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **UniformLoad** evenly distributes the loop demand among all available components on the equipment list for a given load range. **SequentialUniformPLR** loads all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the PlantEquipmentList until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. **UniformPLR** will load all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the PlantEquipmentList operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
 
 Note: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
 
@@ -9151,7 +9151,7 @@ This required alpha field contains the identifying name given to the Demand Side
 
 #### Field: Load Distribution Scheme
 
-This alpha field contains the Load Distribution Scheme Keyword. The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. **Optimal**operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **SequentialLoad**loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **UniformLoad**evenly distributes the loop demand among all available components on the equipment list for a given load range. **SequentialUniformPLR** loads all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the PlantEquipmentList until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. **UniformPLR** will load all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the PlantEquipmentList operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
+This alpha field contains the Load Distribution Scheme Keyword. The Load Distribution Scheme selects the algorithm used to sequence equipment operation in order to meet the plant loop demand. Currently, five schemes are functional. **Optimal** operates each piece of equipment at its optimal part load ratio and will operate the last component between its minimum and maximum part load ratio in order to meet the loop demand. **SequentialLoad** loads each piece of equipment sequentially in the order specified in the PlantEquipmentList to its maximum part load ratio and will operate the last required piece of equipment between its minimum and maximum part load ratio in order to meet the loop demand. **UniformLoad** evenly distributes the loop demand among all available components on the equipment list for a given load range. **SequentialUniformPLR** loads all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). Components are loaded sequentially based on the order specified in the PlantEquipmentList until each component is fully loaded, at which point the next subsequent component is added and the load is distributed uniformly based on PLR between the components. **UniformPLR** will load all equipment on the PlantEquipmentList to a uniform part load ratio (PLR). No equipment will be loaded below its minimum PLR. If the total load is less than the sum of all equipment on the PlantEquipmentList operating at their respective minimum PLRs, then the last item in the equipment list is dropped and the load is distributed based on a uniform PLR for the remaining plant equipment.
 
 Note: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
 
@@ -9181,7 +9181,7 @@ An example of this statement used in an IDF is:
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;              !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name
@@ -9211,7 +9211,7 @@ An example of this statement used in an IDF is:
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;              !- Load Distribution Scheme
 ```
 
 

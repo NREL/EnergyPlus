@@ -450,7 +450,6 @@ namespace HVACUnitarySystem {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSatDensityRefrig;
 		using HeatingCoils::SimulateHeatingCoilComponents;
-		auto & GetHeatingCoilCapacity( HeatingCoils::GetCoilCapacity );
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using WaterCoils::SetCoilDesFlow;
@@ -1757,8 +1756,6 @@ namespace HVACUnitarySystem {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeUnitarySystem" );
-		Real64 const MaxRatedVolFlowPerRatedTotCap1( 0.00006041 ); // m3/s per watt = 450 cfm/ton
-		Real64 const MinRatedVolFlowPerRatedTotCap1( 0.00004027 ); // m3/s per watt = 300 cfm/ton
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1771,40 +1768,17 @@ namespace HVACUnitarySystem {
 		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		int MSHPIndex; // Index to design Specification object
 		int BranchNum; // Index to branch on air loop
-		int CompNum; // Index to component on branch
 		Real64 BranchFlow; // branch flow rate [m3/s]
 		Real64 BranchFanFlow; // branch fan flow rate [m3/s]
 		bool ErrFound; // logical error flag
 		std::string FanType; // fan type
 		std::string FanName; // fan name
-		int DXHeatCoilBranch; // branch where DX heating coil is located
-		int DXHeatCoilCompNum; // comp number of DX heating coil on branch
-		int CoolUnitarySystemNum; // index to unitary system with DX cooling coil
-		int CoolCoilIndex; // index to DX cooling coil
-		int CoolCoilType; // type of DX cooling coil
 		std::string CoolCoilName; // name of DX cooling coil
-		Real64 rhoair; // air density [kg/m3]
-		Real64 CpAirStd; // air specific heat [J/kg-k]
-		Real64 MixTemp; // mixed air temp used for sizing [C]
-		Real64 MixHumRat; // mixed air humidity ratio used for sizing [kg/kg]
-		Real64 MixEnth; // mixed air enthalpy used for sizing [J/kg]
-		Real64 MixWetBulb; // mixed air wet bulb temp used for sizing [C]
-		Real64 SupTemp; // supply air temp used for sizing [C]
-		Real64 SupHumRat; // supply air humidity ratio used for sizing [kg/kg]
-		Real64 SupEnth; // supply air enthalpy used for sizing [J/kg]
-		Real64 OutTemp; // outdoor air temp used for sizing [C]
-		Real64 OutAirFrac; // fraction of outdoor air flow
-		Real64 VolFlowRate; // volumetric flow rate [m3/s]
 		Real64 CoolCapAtPeak; // cooling capacity at peak [W]
 		Real64 HeatCapAtPeak; // heating capacity at peak [W]
-		int TimeStepNumAtMax; // time step at peak
-		int DDNum; // design day index at peak
-		Real64 TotCapTempModFac; // capacity modifier used for sizing
-		Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity[m3/s-W)
 		std::string SystemType; // type of air loop equipment
 		Real64 OnOffAirFlowRatio; // used to pass to cooling coil for sizing
 		Real64 PartLoadRatio; // used to pass to cooling coil for sizing
-		int CapFTCurve; // index to DX coil Capacity as a function of Temperature curve
 		bool TempCoolingLoad; // size cooling coils with a cooling load, save actual load
 		bool TempHeatingLoad; // save actual load
 		Real64 SysCoolingFlow; // individually sized cooling flow rate [m3/s]
@@ -2526,7 +2500,6 @@ namespace HVACUnitarySystem {
 		auto & GetWtoAHPSimpleCoilOutletNode( WaterToAirHeatPumpSimple::GetCoilOutletNode );
 		auto & GetWtoAHPSimpleCoilIndex( WaterToAirHeatPumpSimple::GetCoilIndex );
 		using WaterToAirHeatPumpSimple::SetSimpleWSHPData;
-		auto & GetWtoAHPSimpleCoilAirFlow( WaterToAirHeatPumpSimple::GetCoilAirFlowRate );
 		using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
 		using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
 		using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
@@ -2562,7 +2535,6 @@ namespace HVACUnitarySystem {
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilIndex;
 		auto & GetHXAssistedCoilTypeNum( HVACHXAssistedCoolingCoil::GetCoilGroupTypeNum );
 		using HVACHXAssistedCoolingCoil::GetActualDXCoilIndex;
-		auto & GetWaterHXAssistedCoilCapacity( HVACHXAssistedCoolingCoil::GetCoilCapacity );
 		using HVACHXAssistedCoolingCoil::GetHXCoilAirFlowRate;
 		using HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum;
 		using WaterCoils::GetCoilWaterInletNode;
@@ -2577,7 +2549,6 @@ namespace HVACUnitarySystem {
 		using SteamCoils::GetCoilAirOutletNode;
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
-		using SteamCoils::ZoneLoadControl;
 		using SteamCoils::GetSteamCoilAvailScheduleIndex;
 		using Fans::GetFanDesignVolumeFlowRate;
 		using Fans::GetFanInletNode;
@@ -2589,7 +2560,6 @@ namespace HVACUnitarySystem {
 		using EMSManager::ManageEMS;
 		using SetPointManager::NodeHasSPMCtrlVarType;
 		using SetPointManager::iCtrlVarType_Temp;
-		using SetPointManager::iCtrlVarType_HumRat;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5832,7 +5802,6 @@ namespace HVACUnitarySystem {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIter( 100 ); // maximum number of iterations
-		Real64 const MinPLR( 0.0 ); // minimum part load ratio allowed
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8475,7 +8444,6 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.0e-3 ); // Accuracy of solver result
-		Real64 const HumRatAcc( 1.0e-6 ); // Accuracy of solver result
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		//  na
@@ -8905,7 +8873,6 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.0e-3 ); // Accuracy of solver result
-		Real64 const HumRatAcc( 1.0e-6 ); // Accuracy of solver result
 		int const SolveMaxIter( 50 );
 
 		// INTERFACE BLOCK SPECIFICATIONS

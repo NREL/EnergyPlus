@@ -114,7 +114,7 @@ documents = []
 documents.append(SingleDocInfo(srcdir, sitedir, "Acknowledgements", "Acknowledgements", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "AuxiliaryPrograms", "AuxiliaryPrograms", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "EMS_Application_Guide", "EMS_Application_Guide", 30000))
-documents.append(SingleDocInfo(srcdir, sitedir, "EngineeringReference", "EngRef", 18000000, EngRefConcatenate))  # yes...18000000ms = 18000s = 5h ... don't need that much, but just let it go overnight
+documents.append(SingleDocInfo(srcdir, sitedir, "EngineeringReference", "EngRef", 24000000, EngRefConcatenate))  # yes...18000000ms = 18000s = 5h ... don't need that much, but just let it go overnight
 documents.append(SingleDocInfo(srcdir, sitedir, "ExternalInterfaces_Application_Guide", "ExternalInterfaces_Application_Guide", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "GettingStarted", "GettingStarted", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "InputOutputReference", "IORef", 300000, IORefConcatenate)) # 300000ms = 300s = 5m
@@ -164,8 +164,8 @@ for document in documents:
 	args.extend(["--outline", "--outline-depth", "3"]) # Set up the bookmarks in the pdf
 	args.extend(["--javascript-delay", "%i" % document.delay]) # Set the delay for javascript rendering
 	args.extend(["--page-size", "Letter"]) # Set the page size
-	if document.doc_name in ["AuxiliaryPrograms","EngineeringReference", "InputOutputReference", "ModuleDeveloper","OutputDetailsAndExamples"]:
-		args.extend(["--minimum-font-size", "16"]) # Do an override to get the font an appropriate size
+	#if document.doc_name in ["AuxiliaryPrograms","EngineeringReference", "InputOutputReference", "ModuleDeveloper","OutputDetailsAndExamples"]:
+	#	args.extend(["--minimum-font-size", "16"]) # Do an override to get the font an appropriate size
 	args.extend(["--margin-bottom", "20mm", "--margin-top", "20mm"]) # Top and bottom margins, 
 	args.extend(["--margin-left", "20mm", "--margin-right", "20mm"]) # Left and right margins
 	args.extend(["--footer-font-size", "9", "--footer-line", "--footer-left", "EnergyPlus Documentation", "--footer-right", "Page [page] of [toPage]"]) # Set the footer

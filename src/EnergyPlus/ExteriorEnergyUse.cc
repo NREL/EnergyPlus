@@ -546,7 +546,6 @@ namespace ExteriorEnergyUse {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoOutputReporting;
 		using DataGlobals::KindOfSim;
