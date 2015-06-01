@@ -12,6 +12,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -29,8 +30,7 @@ namespace PipeHeatTransfer {
 
 	extern Real64 const InnerDeltaTime; // one minute time step in seconds
 
-	class PipeHTData : public PlantComponent
-	{
+	class PipeHTData : public PlantComponent {
 	public:
 		// Members
 		// Input data
@@ -76,6 +76,8 @@ namespace PipeHeatTransfer {
 		Real64 InsulationResistance; // Insulation thermal resistance [m2.K/W]
 		Real64 CurrentSimTime; // Current simulation time [hr]
 		Real64 PreviousSimTime; // simulation time the report data was last updated
+		Real64 DeltaTime; // system time step in seconds
+		int NumInnerTimeSteps; // number of time steps to perform per hvac time step
 		Array1D< Real64 > TentativeFluidTemp;
 		Array1D< Real64 > FluidTemp; // arrays for fluid and pipe temperatures at each node
 		Array1D< Real64 > PreviousFluidTemp;
@@ -124,6 +126,7 @@ namespace PipeHeatTransfer {
 		int BranchNum; // ..LoopSide%Branch index where this pipe lies
 		int CompNum; // ..Branch%Comp index where this pipe lies
 		bool CheckEquipName;
+		Real64 EnvironmentTemp; // environmental temperature (surrounding pipe)
 		// Report data
 		Real64 FluidInletTemp; // inlet temperature [C]
 		Real64 FluidOutletTemp; // outlet temperature [C]
@@ -134,6 +137,7 @@ namespace PipeHeatTransfer {
 		Real64 PipeOutletTemp; // pipe temperature at Oulet [C]
 		Real64 EnvironmentHeatLossRate; // overall heat transfer rate from pipe to environment [W]
 		Real64 EnvHeatLossEnergy; // energy transferred from pipe to environment [J]
+		Real64 EnvHeatLossRate; // energy rate transferred from pipe to environment [W]
 		Real64 VolumeFlowRate;
 		
 		// Default Constructor
@@ -170,6 +174,8 @@ namespace PipeHeatTransfer {
 			InsulationResistance( 0.0 ),
 			CurrentSimTime( 0.0 ),
 			PreviousSimTime( 0.0 ),
+			DeltaTime( 0.0 ),
+			NumInnerTimeSteps( 0.0 ),
 			NumDepthNodes( 0 ),
 			PipeNodeDepth( 0 ),
 			PipeNodeWidth( 0 ),
@@ -210,6 +216,7 @@ namespace PipeHeatTransfer {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			CheckEquipName( true ),
+			EnvironmentTemp( 0.0 ),
 			// report variables
 			FluidInletTemp( 0.0 ),
 			FluidOutletTemp( 0.0 ),
@@ -220,7 +227,9 @@ namespace PipeHeatTransfer {
 			PipeOutletTemp( 0.0 ),
 			EnvironmentHeatLossRate( 0.0 ),
 			EnvHeatLossEnergy( 0.0 ),
+			EnvHeatLossRate( 0.0 ),
 			VolumeFlowRate( 0.0 )
+			
 		{}
 
 		// required implementations from base class
@@ -234,14 +243,8 @@ namespace PipeHeatTransfer {
 		void
 		pushInnerTimeStepArrays();
 
-		void
-		validatePipeConstruction(
-			std::string const & PipeType, // module object of pipe (error messages)
-			std::string const & ConstructionName, // construction name of pipe (error messages)
-			std::string const & FieldName, // fieldname of pipe (error messages)
-			int const ConstructionNum, // pointer into construction data
-			bool & ErrorsFound // set to true if errors found here
-		);
+		int
+		validatePipeConstruction();
 
 		void
 		initPipesHeatTransfer();
@@ -250,7 +253,7 @@ namespace PipeHeatTransfer {
 		initializeHeatTransferPipes();
 		
 		void
-		calcPipesHeatTransfer();
+		calcPipesHeatTransfer(int LengthIndex = -1);
 
 		void
 		calcBuriedPipeSoil();
@@ -259,17 +262,13 @@ namespace PipeHeatTransfer {
 		updatePipesHeatTransfer();
 
 		void
-		ReportPipesHeatTransfer();
+		reportPipesHeatTransfer();
 
 		void
 		calcZonePipesHeatGain();
 
 		Real64
-		calcPipeHeatTransCoef(
-			Real64 const Temperature, // Temperature of water entering the surface, in C
-			Real64 const MassFlowRate, // Mass flow rate, in kg/s
-			Real64 const Diameter // Pipe diameter, m
-		);
+		calcPipeHeatTransCoef();
 
 		Real64
 		outsidePipeHeatTransCoef(); 
@@ -277,13 +276,13 @@ namespace PipeHeatTransfer {
 		Real64
 		TBND(
 			Real64 const z, // Current Depth
-			Real64 const DayOfSim, // Current Simulation Day
+			Real64 const DayOfSim // Current Simulation Day
 		);
 
 	};
 
 	// Object Data
-	extern Array1D< PipeHTData > PipeHT;
+	extern Array1D< std::shared_ptr< PipeHTData > > PipeHT;
 
 
 	//==============================================================================

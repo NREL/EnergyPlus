@@ -26,7 +26,7 @@ namespace PlantLoopEquip {
 	);
 
 	void
-	simulateSingleComponent( EnergyPlus::DataPlant::CompData & sim_component );
+	simulateSingleComponent( EnergyPlus::DataPlant::CompData & sim_component, bool FirstHVACIteration );
 
 	//     NOTICE
 

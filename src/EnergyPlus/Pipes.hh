@@ -42,6 +42,7 @@ namespace Pipes {
 		int performEveryTimeInit();
 		int performOneTimeInit();
 		int performBeginEnvrnInit();
+		int performFirstHVACInit();
 		int simulate();
 
 	};

@@ -132,8 +132,7 @@ namespace PipeHeatTransfer {
 		// create a new instance of a pipe heat transfer
 		std::shared_ptr<PipeHTData> thisPipe( new PipeHTData() );
 
-		switch ( objectType ) {
-		case ( DataPlant::TypeOf_PipeExterior )
+		if ( objectType == DataPlant::TypeOf_PipeExterior ) {
 			cCurrentModuleObject = "Pipe:Outdoor";
 			int const NumOfPipeHTExt = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem ) {
@@ -214,11 +213,12 @@ namespace PipeHeatTransfer {
 				}
 
 				if ( thisPipe->ConstructionNum != 0 ) {
-					ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), thisPipe->ConstructionNum, Item, ErrorsFound );
+					thisPipe->validatePipeConstruction();
 				}
 
 			} // end of input loop
-		case ( DataPlant::TypeOf_PipeInterior )
+
+		} else if ( objectType == DataPlant::TypeOf_PipeInterior ) {
 			cCurrentModuleObject = "Pipe:Indoor";
 			int const NumOfPipeHTInt = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem ) {
@@ -321,10 +321,12 @@ namespace PipeHeatTransfer {
 				}
 
 				if ( thisPipe->ConstructionNum != 0 ) {
-					ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), thisPipe->ConstructionNum, Item, ErrorsFound );
+					thisPipe->validatePipeConstruction();
 				}
 			}
-		case ( DataPlant::TypeOf_PipeUnderground )
+
+		} else if ( objectType == DataPlant::TypeOf_PipeUnderground ) {
+
 			cCurrentModuleObject = "Pipe:Underground";
 			int const NumOfPipeHTUG = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int PipeItem = 1; PipeItem <= NumOfPipeHTUG; ++PipeItem ) {
@@ -465,11 +467,10 @@ namespace PipeHeatTransfer {
 				}
 
 				if ( thisPipe->ConstructionNum != 0 ) {
-					ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), thisPipe->ConstructionNum, Item, ErrorsFound );
+					thisPipe->validatePipeConstruction();
 				}
 
 				// Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
-				NumSections = NumPipeSections;
 				thisPipe->NumSections = NumPipeSections;
 
 				// For buried pipes, we need to allocate the cartesian finite difference array
@@ -478,20 +479,25 @@ namespace PipeHeatTransfer {
 
 			} // PipeUG input loop
 		}
-		NumSections = NumPipeSections;
 		thisPipe->NumSections = NumPipeSections;
 
 		// We need to allocate the Hanby model arrays for all pipes, including buried
-		thisPipe->TentativeFluidTemp.allocate( {0,NumSections}, 0.0 );
-		thisPipe->TentativePipeTemp.allocate( {0,NumSections}, 0.0 );
-		thisPipe->FluidTemp.allocate( {0,NumSections}, 0.0 );
-		thisPipe->PreviousFluidTemp.allocate( {0,NumSections}, 0.0 );
-		thisPipe->PipeTemp.allocate( {0,NumSections}, 0.0 );
-		thisPipe->PreviousPipeTemp.allocate( {0,NumSections}, 0.0 );
+		thisPipe->TentativeFluidTemp.allocate( {0,thisPipe->NumSections} );
+		thisPipe->TentativePipeTemp.allocate( {0,thisPipe->NumSections} );
+		thisPipe->FluidTemp.allocate( {0,thisPipe->NumSections} );
+		thisPipe->PreviousFluidTemp.allocate( {0,thisPipe->NumSections} );
+		thisPipe->PipeTemp.allocate( {0,thisPipe->NumSections} );
+		thisPipe->PreviousPipeTemp.allocate( {0,thisPipe->NumSections} );
+		thisPipe->TentativeFluidTemp = 0.0;
+		thisPipe->TentativePipeTemp = 0.0;
+		thisPipe->FluidTemp = 0.0;
+		thisPipe->PreviousFluidTemp = 0.0;
+		thisPipe->PipeTemp = 0.0;
+		thisPipe->PreviousPipeTemp = 0.0;
 
 		// work out heat transfer areas (area per section)
-		thisPipe->InsideArea = Pi * thisPipe->PipeID * thisPipe->Length / NumSections;
-		thisPipe->OutsideArea = Pi * ( thisPipe->PipeOD + 2 * thisPipe->InsulationThickness ) * thisPipe->Length / NumSections;
+		thisPipe->InsideArea = Pi * thisPipe->PipeID * thisPipe->Length / thisPipe->NumSections;
+		thisPipe->OutsideArea = Pi * ( thisPipe->PipeOD + 2 * thisPipe->InsulationThickness ) * thisPipe->Length / thisPipe->NumSections;
 
 		// cross sectional area
 		thisPipe->SectionArea = Pi * 0.25 * pow_2( thisPipe->PipeID );
@@ -533,26 +539,23 @@ namespace PipeHeatTransfer {
 	int
 	PipeHTData::performEveryTimeInit() {
 
-		// Assign variable
-		CurSimDay = double( DayOfSim );
+		// for reporting
+		std::string const RoutineName = "PipeHTData::performEveryTimeInit";
 
-		// some useful module variables
-		InletNodeNum = this->InletNodeNum;
-		OutletNodeNum = this->OutletNodeNum;
-		MassFlowRate = Node( InletNodeNum ).MassFlowRate;
-		InletTemp = Node( InletNodeNum ).Temp;
-
-		// time step in seconds
-		DeltaTime = TimeStepSys * SecInHour;
-		NumInnerTimeSteps = int( DeltaTime / InnerDeltaTime );
+		// some useful struct variables
+		this->MassFlowRate = DataLoopNode::Node( this->InletNodeNum ).MassFlowRate;
+		this->FluidInletTemp = DataLoopNode::Node( this->InletNodeNum ).Temp;
+		this->DeltaTime = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+		this->NumInnerTimeSteps = int( this->DeltaTime / InnerDeltaTime );
 
 		//Calculate the current sim time for this pipe (not necessarily structure variable, but it is ok for consistency)
-		this->CurrentSimTime = ( DayOfSim - 1 ) * 24 + HourOfDay - 1 + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed;
+		this->CurrentSimTime = ( DataGlobals::DayOfSim - 1 ) * 24 + DataGlobals::HourOfDay - 1 + ( DataGlobals::TimeStep - 1 ) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+		
+		// initialize the push variable to false, then override if time has moved
+		bool PushArrays = false; //Time hasn't passed, don't accept the tentative values yet!
 		if ( std::abs( this->CurrentSimTime - this->PreviousSimTime ) > 1.0e-6 ) {
 			PushArrays = true;
 			this->PreviousSimTime = this->CurrentSimTime;
-		} else {
-			PushArrays = false; //Time hasn't passed, don't accept the tentative values yet!
 		}
 
 		if ( PushArrays ) {
@@ -561,9 +564,9 @@ namespace PipeHeatTransfer {
 			// Thus we will now shift the arrays from 2>1 and 3>2 so we can then begin
 			// to update 2 and 3 again.
 			if ( this->EnvironmentPtr == GroundEnv ) {
-				for ( LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
-					for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
-						for ( WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
+				for ( int LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
+					for ( int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
+						for ( int WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 							//This will essentially 'accept' the tentative values that were calculated last iteration
 							// as the new officially 'current' values
 							this->T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex ) = this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
@@ -578,12 +581,12 @@ namespace PipeHeatTransfer {
 
 		} else {
 
-			//If we don't have FirstHVAC, the last iteration values were not accepted, and we should
+			//If we don't move forward, the last iteration values were not accepted, and we should
 			// not step through time.  Thus we will revert our T(3,:,:,:) array back to T(2,:,:,:) to
 			// start over with the same values as last time.
-			for ( LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
-				for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
-					for ( WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
+			for ( int LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
+				for ( int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
+					for ( int WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 						//This will essentially erase the past iterations and revert back to the correct values
 						this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = this->T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex );
 					}
@@ -596,12 +599,9 @@ namespace PipeHeatTransfer {
 
 		}
 
-		//This still catches even in winter design day
-		//Even though the loop eventually has no flow rate, it appears it initializes to a value, then converges to OFF
-		//Thus, this is called at the beginning of every time step once.
-
-		this->FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, InletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
-		this->FluidDensity = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, InletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+		auto & thisPlantLoop = DataPlant::PlantLoop( this->LoopNum );
+		this->FluidSpecHeat = FluidProperties::GetSpecificHeatGlycol( thisPlantLoop.FluidName, this->FluidInletTemp, thisPlantLoop.FluidIndex, RoutineName );
+		this->FluidDensity = FluidProperties::GetDensityGlycol( thisPlantLoop.FluidName, this->FluidInletTemp, thisPlantLoop.FluidIndex, RoutineName );
 
 		// At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
 		this->FluidHeatLossRate = 0.0;
@@ -611,13 +611,14 @@ namespace PipeHeatTransfer {
 		this->ZoneHeatGainRate = 0.0;
 		this->FluidHeatLossRate = 0.0;
 		this->EnvHeatLossRate = 0.0;
-		this->OutletTemp = 0.0;
-
+		
 		if ( this->FluidDensity > 0.0 ) {
 			//The density will only be zero the first time through, which will be a warmup day, and not reported
 			this->VolumeFlowRate = this->MassFlowRate / this->FluidDensity;
 		}
 
+		// return value can be used to trigger success/failure
+		return 0;
 	}
 
 	int
@@ -627,8 +628,8 @@ namespace PipeHeatTransfer {
 		int const AvgDaysInMonth( 30 ); // Average days in a month
 		Real64 const LargeNumber( 9999.9 ); // Large number (compared to temperature values)
 
-		errFlag = false;
-		ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
+		bool errFlag = false;
+		DataPlant::ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 
 		//If there are any underground buried pipes, we must bring in data
 		if ( this->EnvironmentPtr == GroundEnv ) {
@@ -637,31 +638,31 @@ namespace PipeHeatTransfer {
 			// then we must get it from the surface ground temperatures
 			if ( this->AvgAnnualManualInput == 0 ) {
 
-				if ( ! PubGroundTempSurfFlag ) {
+				if ( ! DataEnvironment::PubGroundTempSurfFlag ) {
 					ShowFatalError( "No Site:GroundTemperature:Shallow object found.  This is required for a Pipe:Underground object." );
 				}
 
 				//Calculate Average Ground Temperature for all 12 months of the year:
 				this->AvgGroundTemp = 0.0;
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					this->AvgGroundTemp += PubGroundTempSurface( MonthIndex );
+				for ( int MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
+					this->AvgGroundTemp += DataEnvironment::PubGroundTempSurface( MonthIndex );
 				}
 				this->AvgGroundTemp /= MonthsInYear;
 
 				//Calculate Average Amplitude from Average:
 				this->AvgGndTempAmp = 0.0;
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					this->AvgGndTempAmp += std::abs( PubGroundTempSurface( MonthIndex ) - this->AvgGroundTemp );
+				for ( int MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
+					this->AvgGndTempAmp += std::abs( DataEnvironment::PubGroundTempSurface( MonthIndex ) - this->AvgGroundTemp );
 				}
 				this->AvgGndTempAmp /= MonthsInYear;
 
 				//Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
 				this->MonthOfMinSurfTemp = 0;
 				this->MinSurfTemp = LargeNumber; //Set high so that the first months temp will be lower and actually get updated
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					if ( PubGroundTempSurface( MonthIndex ) <= this->MinSurfTemp ) {
+				for ( int MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
+					if ( DataEnvironment::PubGroundTempSurface( MonthIndex ) <= this->MinSurfTemp ) {
 						this->MonthOfMinSurfTemp = MonthIndex;
-						this->MinSurfTemp = PubGroundTempSurface( MonthIndex );
+						this->MinSurfTemp = DataEnvironment::PubGroundTempSurface( MonthIndex );
 					}
 				}
 				this->PhaseShiftDays = this->MonthOfMinSurfTemp * AvgDaysInMonth;
@@ -670,21 +671,25 @@ namespace PipeHeatTransfer {
 		}
 		if ( errFlag ) {
 			ShowFatalError( "InitPipesHeatTransfer: Program terminated due to previous condition(s)." );
+			return 1;
+		} else {
+			return 0;
 		}
 	}
 
 	int
 	PipeHTData::performBeginEnvrnInit() {
-		
+
 		// For underground pipes, we need to re-init the cartesian array each environment
+		Real64 CurSimDay = double( DataGlobals::DayOfSim );
 		if ( this->EnvironmentPtr == GroundEnv ) {
 			for ( int TimeIndex = PreviousTimeIndex; TimeIndex <= TentativeTimeIndex; ++TimeIndex ) {
 				//Loop through all length, depth, and width of pipe to init soil temperature
-				for ( int LengthIndex = 1; LengthIndex <= PipeHT( PipeNum ).NumSections; ++LengthIndex ) {
-					for ( int DepthIndex = 1; DepthIndex <= PipeHT( PipeNum ).NumDepthNodes; ++DepthIndex ) {
-						for ( int WidthIndex = 1; WidthIndex <= PipeHT( PipeNum ).PipeNodeWidth; ++WidthIndex ) {
-							Real64 CurrentDepth = ( DepthIndex - 1 ) * PipeHT( PipeNum ).dSregular;
-							this->T( WidthIndex, DepthIndex, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay, PipeNum );
+				for ( int LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex ) {
+					for ( int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
+						for ( int WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
+							Real64 CurrentDepth = ( DepthIndex - 1 ) * this->dSregular;
+							this->T( WidthIndex, DepthIndex, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay );
 						}
 					}
 				}
@@ -701,11 +706,14 @@ namespace PipeHeatTransfer {
 		this->PreviousPipeTemp = FirstTemperatures;
 		this->PreviousSimTime = 0.0;
 		this->DeltaTime = 0.0;
-		this->OutletTemp = 0.0;
+		this->FluidOutletTemp = 0.0;
 		this->EnvironmentTemp = 0.0;
 		this->EnvHeatLossRate = 0.0;
 		this->FluidHeatLossRate = 0.0;
 		this->ZoneHeatGainRate = 0.0;
+
+		// return value can be used to report success/failure
+		return 0;
 	}
 
 	int
@@ -715,17 +723,18 @@ namespace PipeHeatTransfer {
 		if ( this->EnvironmentPtr == GroundEnv ) {
 
 			// And then update Ground Boundary Conditions
+			Real64 CurSimDay = double( DataGlobals::DayOfSim );
 			for ( int TimeIndex = 1; TimeIndex <= TentativeTimeIndex; ++TimeIndex ) {
 				for ( int LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex ) {
 					for ( int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
 						//Farfield boundary
 						Real64 CurrentDepth = ( DepthIndex - 1 ) * this->dSregular;
-						this->T( 1, DepthIndex, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay, PipeHTNum );
+						this->T( 1, DepthIndex, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay );
 					}
-					for ( WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
+					for ( int WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 						//Bottom side of boundary
 						Real64 CurrentDepth = this->DomainDepth;
-						this->T( WidthIndex, this->NumDepthNodes, LengthIndex, TimeIndex ) = CurTemp = TBND( CurrentDepth, CurSimDay, PipeHTNum );
+						this->T( WidthIndex, this->NumDepthNodes, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay );
 					}
 				}
 			}
@@ -736,32 +745,37 @@ namespace PipeHeatTransfer {
 		if ( SELECT_CASE_var == GroundEnv ) {
 			//EnvironmentTemp = GroundTemp
 		} else if ( SELECT_CASE_var == OutsideAirEnv ) {
-			EnvironmentTemp = OutDryBulbTemp;
+			this->EnvironmentTemp = DataEnvironment::OutDryBulbTemp;
 		} else if ( SELECT_CASE_var == ZoneEnv ) {
-			EnvironmentTemp = MAT( this->EnvrZonePtr );
+			this->EnvironmentTemp = DataHeatBalFanSys::MAT( this->EnvrZonePtr );
 		} else if ( SELECT_CASE_var == ScheduleEnv ) {
-			EnvironmentTemp = GetCurrentScheduleValue( this->EnvrSchedPtr );
+			this->EnvironmentTemp = ScheduleManager::GetCurrentScheduleValue( this->EnvrSchedPtr );
 		} else if ( SELECT_CASE_var == None ) { //default to outside temp
-			EnvironmentTemp = OutDryBulbTemp;
+			this->EnvironmentTemp = DataEnvironment::OutDryBulbTemp;
 		}}
+
+		// return value could be used to report success/failure
+		return 0;
 	}
 
 	int
 	PipeHTData::simulate() {
 		// make the calculations
-		for ( int InnerTimeStepCtr = 1; InnerTimeStepCtr <= NumInnerTimeSteps; ++InnerTimeStepCtr ) {
+		for ( int InnerTimeStepCtr = 1; InnerTimeStepCtr <= this->NumInnerTimeSteps; ++InnerTimeStepCtr ) {
 			{ auto const SELECT_CASE_var( this->EnvironmentPtr );
 			if ( SELECT_CASE_var == GroundEnv ) {
-				CalcBuriedPipeSoil( PipeHTNum );
+				this->calcBuriedPipeSoil();
 			} else {
-				CalcPipesHeatTransfer( PipeHTNum );
+				this->calcPipesHeatTransfer();
 			}}
-			PushInnerTimeStepArrays( PipeHTNum );
+			this->pushInnerTimeStepArrays();
 		}
 		// update vaiables
-		UpdatePipesHeatTransfer();
+		this->updatePipesHeatTransfer();
 		// update report variables
-		ReportPipesHeatTransfer( PipeHTNum );
+		this->reportPipesHeatTransfer();
+		// return value could be used to report success/failure
+		return 0;
 	}
 
 	void
@@ -847,7 +861,7 @@ namespace PipeHeatTransfer {
 	}
 
 	void
-	PipeHTData::calcPipesHeatTransfer() {
+	PipeHTData::calcPipesHeatTransfer(int LengthIndex) {
 
 		//       AUTHOR         Simon Rees
 		//       DATE WRITTEN   July 2007
@@ -865,70 +879,25 @@ namespace PipeHeatTransfer {
 		// The heat loss/gain calculations are run continuously, even when the loop is off.
 		// Fluid temps will drift according to environmental conditions when there is zero flow.
 
-		// REFERENCES:
-
-		// Using/Aliasing
-		using namespace DataEnvironment;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// fluid node heat balance (see engineering doc).
-		static Real64 A1( 0.0 ); // sum of the heat balance terms
-		static Real64 A2( 0.0 ); // mass flow term
-		static Real64 A3( 0.0 ); // inside pipe wall convection term
-		static Real64 A4( 0.0 ); // fluid node heat capacity term
-		// pipe wall node heat balance (see engineering doc).
-		static Real64 B1( 0.0 ); // sum of the heat balance terms
-		static Real64 B2( 0.0 ); // inside pipe wall convection term
-		static Real64 B3( 0.0 ); // outside pipe wall convection term
-		static Real64 B4( 0.0 ); // fluid node heat capacity term
-
-		static Real64 AirConvCoef( 0.0 ); // air-pipe convection coefficient
-		static Real64 FluidConvCoef( 0.0 ); // fluid-pipe convection coefficient
-		static Real64 EnvHeatTransCoef( 0.0 ); // external convection coefficient (outside pipe)
-		static Real64 FluidNodeHeatCapacity( 0.0 ); // local var for MCp for single node of pipe
-
-		static int PipeDepth( 0 );
-		static int PipeWidth( 0 );
-		int curnode;
-		Real64 TempBelow;
-		Real64 TempBeside;
-		Real64 TempAbove;
-		Real64 Numerator;
-		Real64 Denominator;
-		Real64 SurfaceTemp;
-
 		// traps fluid properties problems such as freezing conditions
 		if ( this->FluidSpecHeat <= 0.0 || this->FluidDensity <= 0.0 ) {
 			// leave the state of the pipe as it was
-			OutletTemp = this->TentativeFluidTemp( this->NumSections );
+			this->FluidOutletTemp = this->TentativeFluidTemp( this->NumSections );
 			// set heat transfer rates to zero for consistency
-			EnvHeatLossRate = 0.0;
-			FluidHeatLossRate = 0.0;
+			this->EnvHeatLossRate = 0.0;
+			this->FluidHeatLossRate = 0.0;
 			return;
 		}
 
-		//  AirConvCoef =  OutsidePipeHeatTransCoef(PipeHTNum)
-		// Revised by L. Gu by including insulation conductance 6/19/08
-
+		Real64 FluidConvCoef = this->calcPipeHeatTransCoef();
+		Real64 AirConvCoef;
 		if ( this->EnvironmentPtr != GroundEnv ) {
-			AirConvCoef = 1.0 / ( 1.0 / OutsidePipeHeatTransCoef( PipeHTNum ) + this->InsulationResistance );
+			// Revised by L. Gu by including insulation conductance 6/19/08
+			AirConvCoef = 1.0 / ( 1.0 / this->outsidePipeHeatTransCoef() + this->InsulationResistance );
 		}
 
-		FluidConvCoef = CalcPipeHeatTransCoef( PipeHTNum, InletTemp, MassFlowRate, this->PipeID );
-
 		// heat transfer to air or ground
+		Real64 EnvHeatTransCoef;
 		{ auto const SELECT_CASE_var( this->EnvironmentPtr );
 		if ( SELECT_CASE_var == GroundEnv ) {
 			//Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
@@ -947,75 +916,69 @@ namespace PipeHeatTransfer {
 		}}
 
 		// work out the coefficients
-		FluidNodeHeatCapacity = this->SectionArea * this->Length / this->NumSections * this->FluidSpecHeat * this->FluidDensity; // Mass of Node x Specific heat
+		Real64 FluidNodeHeatCapacity = this->SectionArea * this->Length / this->NumSections * this->FluidSpecHeat * this->FluidDensity; // Mass of Node x Specific heat
 
 		// coef of fluid heat balance
-		A1 = FluidNodeHeatCapacity + MassFlowRate * this->FluidSpecHeat * DeltaTime + FluidConvCoef * this->InsideArea * DeltaTime;
-
-		A2 = MassFlowRate * this->FluidSpecHeat * DeltaTime;
-
-		A3 = FluidConvCoef * this->InsideArea * DeltaTime;
-
-		A4 = FluidNodeHeatCapacity;
+		Real64 A1 = FluidNodeHeatCapacity + this->MassFlowRate * this->FluidSpecHeat * DeltaTime + FluidConvCoef * this->InsideArea * DeltaTime;
+		Real64 A2 = MassFlowRate * this->FluidSpecHeat * DeltaTime;
+		Real64 A3 = FluidConvCoef * this->InsideArea * DeltaTime;
+		Real64 A4 = FluidNodeHeatCapacity;
 
 		// coef of pipe heat balance
-		B1 = this->PipeHeatCapacity + FluidConvCoef * this->InsideArea * DeltaTime + EnvHeatTransCoef * this->OutsideArea * DeltaTime;
+		Real64 B1 = this->PipeHeatCapacity + FluidConvCoef * this->InsideArea * DeltaTime + EnvHeatTransCoef * this->OutsideArea * DeltaTime;
+		Real64 B2 = A3;
+		Real64 B3 = EnvHeatTransCoef * this->OutsideArea * DeltaTime;
+		Real64 B4 = this->PipeHeatCapacity;
 
-		B2 = A3;
-
-		B3 = EnvHeatTransCoef * this->OutsideArea * DeltaTime;
-
-		B4 = this->PipeHeatCapacity;
-
-		this->TentativeFluidTemp( 0 ) = InletTemp;
+		this->TentativeFluidTemp( 0 ) = this->FluidInletTemp;
 
 		this->TentativePipeTemp( 0 ) = this->PipeTemp( 1 ); // for convenience
 
-		if ( present( LengthIndex ) ) { //Just simulate the single section if being called from Pipe:Underground
+		if ( LengthIndex > -1 ) { //Just simulate the single section if being called from Pipe:Underground
 
-			PipeDepth = this->PipeNodeDepth;
-			PipeWidth = this->PipeNodeWidth;
-			TempBelow = this->T( PipeWidth, PipeDepth + 1, LengthIndex, CurrentTimeIndex );
-			TempBeside = this->T( PipeWidth - 1, PipeDepth, LengthIndex, CurrentTimeIndex );
-			TempAbove = this->T( PipeWidth, PipeDepth - 1, LengthIndex, CurrentTimeIndex );
-			EnvironmentTemp = ( TempBelow + TempBeside + TempAbove ) / 3.0;
+			Real64 PipeDepth = this->PipeNodeDepth;
+			Real64 PipeWidth = this->PipeNodeWidth;
+			Real64 TempBelow = this->T( PipeWidth, PipeDepth + 1, LengthIndex, CurrentTimeIndex );
+			Real64 TempBeside = this->T( PipeWidth - 1, PipeDepth, LengthIndex, CurrentTimeIndex );
+			Real64 TempAbove = this->T( PipeWidth, PipeDepth - 1, LengthIndex, CurrentTimeIndex );
+			Real64 EnvironmentTemp = ( TempBelow + TempBeside + TempAbove ) / 3.0;
 
 			this->TentativeFluidTemp( LengthIndex ) = ( A2 * this->TentativeFluidTemp( LengthIndex - 1 ) + A3 / B1 * ( B3 * EnvironmentTemp + B4 * this->PreviousPipeTemp( LengthIndex ) ) + A4 * this->PreviousFluidTemp( LengthIndex ) ) / ( A1 - A3 * B2 / B1 );
 
 			this->TentativePipeTemp( LengthIndex ) = ( B2 * this->TentativeFluidTemp( LengthIndex ) + B3 * EnvironmentTemp + B4 * this->PreviousPipeTemp( LengthIndex ) ) / B1;
 
 			// Get exterior surface temperature from energy balance at the surface
-			Numerator = EnvironmentTemp - this->TentativeFluidTemp( LengthIndex );
-			Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + this->SumTK );
-			SurfaceTemp = EnvironmentTemp - Numerator / Denominator;
+			Real64 Numerator = this->EnvironmentTemp - this->TentativeFluidTemp( LengthIndex );
+			Real64 Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + this->SumTK );
+			Real64 SurfaceTemp = this->EnvironmentTemp - Numerator / Denominator;
 
 			// keep track of environmental heat loss rate - not same as fluid loss at same time
-			EnvHeatLossRate += EnvHeatTransCoef * this->OutsideArea * ( SurfaceTemp - EnvironmentTemp );
+			this->EnvHeatLossRate += EnvHeatTransCoef * this->OutsideArea * ( SurfaceTemp - this->EnvironmentTemp );
 
 		} else { //Simulate all sections at once if not pipe:underground
 
 			// start loop along pipe
 			// b1 must not be zero but this should have been checked on input
-			for ( curnode = 1; curnode <= this->NumSections; ++curnode ) {
+			for ( int curnode = 1; curnode <= this->NumSections; ++curnode ) {
 				this->TentativeFluidTemp( curnode ) = ( A2 * this->TentativeFluidTemp( curnode - 1 ) + A3 / B1 * ( B3 * EnvironmentTemp + B4 * this->PreviousPipeTemp( curnode ) ) + A4 * this->PreviousFluidTemp( curnode ) ) / ( A1 - A3 * B2 / B1 );
 
 				this->TentativePipeTemp( curnode ) = ( B2 * this->TentativeFluidTemp( curnode ) + B3 * EnvironmentTemp + B4 * this->PreviousPipeTemp( curnode ) ) / B1;
 
 				// Get exterior surface temperature from energy balance at the surface
-				Numerator = EnvironmentTemp - this->TentativeFluidTemp( curnode );
-				Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + this->SumTK );
-				SurfaceTemp = EnvironmentTemp - Numerator / Denominator;
+				Real64 Numerator = this->EnvironmentTemp - this->TentativeFluidTemp( curnode );
+				Real64 Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + this->SumTK );
+				Real64 SurfaceTemp = this->EnvironmentTemp - Numerator / Denominator;
 
 				// Keep track of environmental heat loss
-				EnvHeatLossRate += EnvHeatTransCoef * this->OutsideArea * ( SurfaceTemp - EnvironmentTemp );
+				this->EnvHeatLossRate += EnvHeatTransCoef * this->OutsideArea * ( SurfaceTemp - this->EnvironmentTemp );
 
 			}
 
 		}
 
-		FluidHeatLossRate = MassFlowRate * this->FluidSpecHeat * ( this->TentativeFluidTemp( 0 ) - this->TentativeFluidTemp( this->NumSections ) );
+		this->FluidHeatLossRate = MassFlowRate * this->FluidSpecHeat * ( this->TentativeFluidTemp( 0 ) - this->TentativeFluidTemp( this->NumSections ) );
 
-		OutletTemp = this->TentativeFluidTemp( this->NumSections );
+		this->FluidOutletTemp = this->TentativeFluidTemp( this->NumSections );
 
 	}
 
@@ -1175,7 +1138,7 @@ namespace PipeHeatTransfer {
 							if ( DepthIndex == this->PipeNodeDepth ) { //On the node containing the pipe
 
 								//-Call to simulate a single pipe segment (by passing OPTIONAL LengthIndex argument)
-								CalcPipesHeatTransfer( PipeHTNum, LengthIndex );
+								this->calcPipesHeatTransfer( LengthIndex );
 
 								//-Update node for cartesian system
 								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = this->PipeTemp( LengthIndex );
@@ -1236,35 +1199,35 @@ namespace PipeHeatTransfer {
 	void
 	PipeHTData::updatePipesHeatTransfer() {
 		
-		int const OutletNodeNum = this->OutletNodeNum
-		int const InletNodeNum = this->InletNodeNum
+		auto & outletNode = DataLoopNode::Node( this->OutletNodeNum );
+		auto & inletNode = DataLoopNode::Node( this->InletNodeNum );
 		
-		Node( OutletNodeNum ).Temp = this->OutletTemp;
+		outletNode.Temp = this->FluidOutletTemp;
 
 		// pass everything else through
-		Node( OutletNodeNum ).TempMin = Node( InletNodeNum ).TempMin;
-		Node( OutletNodeNum ).TempMax = Node( InletNodeNum ).TempMax;
-		Node( OutletNodeNum ).MassFlowRate = Node( InletNodeNum ).MassFlowRate;
-		Node( OutletNodeNum ).MassFlowRateMin = Node( InletNodeNum ).MassFlowRateMin;
-		Node( OutletNodeNum ).MassFlowRateMax = Node( InletNodeNum ).MassFlowRateMax;
-		Node( OutletNodeNum ).MassFlowRateMinAvail = Node( InletNodeNum ).MassFlowRateMinAvail;
-		Node( OutletNodeNum ).MassFlowRateMaxAvail = Node( InletNodeNum ).MassFlowRateMaxAvail;
-		Node( OutletNodeNum ).Quality = Node( InletNodeNum ).Quality;
+		outletNode.TempMin = inletNode.TempMin;
+		outletNode.TempMax = inletNode.TempMax;
+		outletNode.MassFlowRate = inletNode.MassFlowRate;
+		outletNode.MassFlowRateMin = inletNode.MassFlowRateMin;
+		outletNode.MassFlowRateMax = inletNode.MassFlowRateMax;
+		outletNode.MassFlowRateMinAvail = inletNode.MassFlowRateMinAvail;
+		outletNode.MassFlowRateMaxAvail = inletNode.MassFlowRateMaxAvail;
+		outletNode.Quality = inletNode.Quality;
 		//Only pass pressure if we aren't doing a pressure simulation
-		if ( PlantLoop( this->LoopNum ).PressureSimType > 1 ) {
+		if ( DataPlant::PlantLoop( this->LoopNum ).PressureSimType > 1 ) {
 			//Don't do anything
 		} else {
-			Node( OutletNodeNum ).Press = Node( InletNodeNum ).Press;
+			outletNode.Press = inletNode.Press;
 		}
-		Node( OutletNodeNum ).Enthalpy = Node( InletNodeNum ).Enthalpy;
-		Node( OutletNodeNum ).HumRat = Node( InletNodeNum ).HumRat;
+		outletNode.Enthalpy = inletNode.Enthalpy;
+		outletNode.HumRat = inletNode.HumRat;
 	}
 
 	void
-	PipeHTData::ReportPipesHeatTransfer() {
+	PipeHTData::reportPipesHeatTransfer() {
 		// update flows and temps from module variables
-		this->FluidInletTemp = this->InletTemp;
-		this->FluidOutletTemp = this->OutletTemp;
+		//this->FluidInletTemp = this->InletTemp;
+		//this->FluidOutletTemp = this->OutletTemp;
 		this->MassFlowRate = this->MassFlowRate;
 		this->VolumeFlowRate = this->VolumeFlowRate;
 
@@ -1285,11 +1248,7 @@ namespace PipeHeatTransfer {
 	}
 
 	Real64
-	PipeHTData::calcPipeHeatTransCoef(
-		Real64 const Temperature, // Temperature of water entering the surface, in C
-		Real64 const MassFlowRate, // Mass flow rate, in kg/s
-		Real64 const Diameter // Pipe diameter, m
-	) {
+	PipeHTData::calcPipeHeatTransCoef() {
 		
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Simon Rees
@@ -1332,11 +1291,9 @@ namespace PipeHeatTransfer {
 		static Array1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656 } ); // Conductivity, in W/mK
 		static Array1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
+		Real64 const Temperature = this->FluidInletTemp; // Temperature of water entering the surface, in C
+		Real64 const MassFlowRate = this->MassFlowRate; // Mass flow rate, in kg/s
+		Real64 const Diameter = this->PipeID; // Pipe diameter, m
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int idx;
@@ -1549,7 +1506,7 @@ namespace PipeHeatTransfer {
 	Real64
 	PipeHTData::TBND(
 		Real64 const z, // Current Depth
-		Real64 const DayOfSim, // Current Simulation Day
+		Real64 const DayOfSim // Current Simulation Day
 	) {
 		using DataGlobals::Pi;
 

@@ -674,7 +674,6 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		using PipeHeatTransfer::InitializeHeatTransferPipes;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -1514,14 +1513,6 @@ namespace PlantManager {
 								LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNameOut = TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNameOut;
 								LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNumOut = TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
 
-								if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_Pipe || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeSteam ) {
-									//                Call InitializePipes(TempLoop%Branch(BranchNum)%Comp(CompNum)%TypeOf_Num,  &
-									//                            LoopPipe(HalfLoopNum)%Pipe(PipeNum)%Name,  &
-									//                            TempLoop%Branch(BranchNum)%Comp(CompNum)%CompNum, &
-									//                            0.0d0)
-								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
-									InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
-								}
 							}
 						}
 					}

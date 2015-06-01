@@ -56,33 +56,42 @@ namespace Pipes {
 		bool ErrorsFound = false;
 		std::shared_ptr<LocalPipeData> thisPipe( new LocalPipeData() );
 
-		// search through adiabatic pipes here
-		std::string const cCurrentModuleObject = "Pipe:Adiabatic";
-		int numWaterPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-		for ( int PipeWaterNum = 1; PipeWaterNum <= numWaterPipes; ++PipeWaterNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			if ( objectName == cAlphaArgs( 1 ) ) {
-				found = true;
-				thisPipe->name = objectName;
-				thisPipe->compType = TypeOf_Pipe;
-				thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
-			}
-		}
+		if ( objectType == DataPlant::TypeOf_Pipe ) {
 
-		std::string const cCurrentModuleObject2 = "Pipe:Adiabatic:Steam";
-		int numSteamPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject2 );
-		for ( int PipeSteamNum = 1; PipeSteamNum <= numSteamPipes; ++PipeSteamNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject2, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			if ( objectName == cAlphaArgs( 1 ) ) {
-				found = true;
-				thisPipe->name = objectName;
-				thisPipe->compType = TypeOf_PipeSteam;
-				thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				TestCompSet( cCurrentModuleObject2, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
+			// search through adiabatic pipes here
+			std::string const cCurrentModuleObject = "Pipe:Adiabatic";
+			int numWaterPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			for ( int PipeWaterNum = 1; PipeWaterNum <= numWaterPipes; ++PipeWaterNum ) {
+				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				if ( objectName == cAlphaArgs( 1 ) ) {
+					found = true;
+					thisPipe->name = objectName;
+					thisPipe->compType = TypeOf_Pipe;
+					thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+					thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+					TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
+				}
 			}
+
+		} else if ( objectType == DataPlant::TypeOf_PipeSteam ) {
+
+			std::string const cCurrentModuleObject2 = "Pipe:Adiabatic:Steam";
+			int numSteamPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject2 );
+			for ( int PipeSteamNum = 1; PipeSteamNum <= numSteamPipes; ++PipeSteamNum ) {
+				InputProcessor::GetObjectItem( cCurrentModuleObject2, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				if ( objectName == cAlphaArgs( 1 ) ) {
+					found = true;
+					thisPipe->name = objectName;
+					thisPipe->compType = TypeOf_PipeSteam;
+					thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+					thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+					TestCompSet( cCurrentModuleObject2, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
+				}
+			}
+
+		} else { 
+			//bad pipe type
+
 		}
 
 		if ( found && !ErrorsFound ) {
@@ -96,6 +105,11 @@ namespace Pipes {
 	}
 
 	int LocalPipeData::performEveryTimeInit(){
+		// nothing here
+		return 0;
+	}
+
+	int LocalPipeData::performFirstHVACInit(){
 		// nothing here
 		return 0;
 	}
