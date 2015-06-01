@@ -148,8 +148,6 @@ SQLite::SQLite( std::shared_ptr<std::ostream> errorStream, std::string const & d
 	m_reportDictionaryInsertStmt(nullptr),
 	m_timeIndexInsertStmt(nullptr),
 	m_zoneInfoInsertStmt(nullptr),
-	m_zoneListInsertStmt(nullptr),
-	m_zoneGroupInsertStmt(nullptr),
 	m_zoneInfoZoneListInsertStmt(nullptr),
 	m_nominalLightingInsertStmt(nullptr),
 	m_nominalElectricEquipmentInsertStmt(nullptr),
@@ -162,6 +160,8 @@ SQLite::SQLite( std::shared_ptr<std::ostream> errorStream, std::string const & d
 	m_constructionInsertStmt(nullptr),
 	m_constructionLayerInsertStmt(nullptr),
 	m_materialInsertStmt(nullptr),
+	m_zoneListInsertStmt(nullptr),
+	m_zoneGroupInsertStmt(nullptr),
 	m_infiltrationInsertStmt(nullptr),
 	m_ventilationInsertStmt(nullptr),
 	m_nominalPeopleInsertStmt(nullptr),
@@ -1526,7 +1526,7 @@ void SQLite::createSQLiteReportDataRecord(
 
 void SQLite::createSQLiteTimeIndexRecord(
 	int const reportingInterval,
-	int const recordIndex,
+	int const EP_UNUSED( recordIndex ),
 	int const cumlativeSimulationDays,
 	int const curEnvirNum,
 	Optional_int_const month,
@@ -2511,7 +2511,7 @@ bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt, sqlite3_stmt
 	bool zoneListInsertValid = insertIntoSQLite( insertStmt );
 	if ( !zoneListInsertValid ) return false;
 	bool valid = true;
-	for ( int i = 1; i <= zones.size(); ++i ) {
+	for ( size_t i = 1; i <= zones.size(); ++i ) {
 		sqliteBindForeignKey(subInsertStmt, 1, number);
 		sqliteBindForeignKey(subInsertStmt, 2, zones( i ));
 		int rc = sqliteStepCommand(subInsertStmt);
@@ -2579,17 +2579,17 @@ SQLite::SQLiteData::SQLiteData( std::shared_ptr<std::ostream> const & errorStrea
 
 SQLiteProcedures::SQLiteProcedures( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db )
 	:
-	m_db(db),
 	m_writeOutputToSQLite(true),
+	m_errorStream(errorStream),
 	m_connection(nullptr),
-	m_errorStream(errorStream)
+	m_db(db)
 {}
 
 SQLiteProcedures::SQLiteProcedures( std::shared_ptr<std::ostream> const & errorStream, bool writeOutputToSQLite, std::string const & dbName, std::string const & errorFileName )
 	:
 	m_writeOutputToSQLite(writeOutputToSQLite),
-	m_connection(nullptr),
-	m_errorStream(errorStream)
+	m_errorStream(errorStream),
+	m_connection(nullptr)
 {
 	if ( m_writeOutputToSQLite ) {
 		int rc = -1;

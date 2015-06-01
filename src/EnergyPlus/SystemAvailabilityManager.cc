@@ -2150,8 +2150,8 @@ namespace SystemAvailabilityManager {
 		int const SysAvailNum, // number of the current scheduled system availability manager
 		int const PriAirSysNum, // number of the primary air system affected by this Avail. Manager
 		int & AvailStatus, // System status indicator
-		Optional_int_const ZoneEquipType, // Type of ZoneHVAC equipment component
-		Optional_int_const CompNum // Index of ZoneHVAC equipment component
+		Optional_int_const EP_UNUSED( ZoneEquipType ), // Type of ZoneHVAC equipment component
+		Optional_int_const EP_UNUSED( CompNum ) // Index of ZoneHVAC equipment component
 	)
 	{
 
@@ -2181,7 +2181,6 @@ namespace SystemAvailabilityManager {
 		using DataEnvironment::DSTIndicator;
 		using DataEnvironment::DayOfYear;
 		using DataEnvironment::DayOfWeekTomorrow;
-		using DataEnvironment::DayOfWeek;
 		using DataZoneControls::OccRoomTSetPointHeat;
 		using DataZoneControls::OccRoomTSetPointCool;
 
@@ -2197,12 +2196,10 @@ namespace SystemAvailabilityManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int ScheduleIndex;
-		int DayScheduleIndex;
 		Array2D< Real64 > DayValues;
 		Array2D< Real64 > DayValuesTmr;
 		int JDay;
 		int TmrJDay;
-		int CurDayofWeek;
 		int TmrDayOfWeek;
 		int ZoneNum;
 		Real64 FanStartTime;
@@ -3750,7 +3747,6 @@ namespace SystemAvailabilityManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PriAirSysNum; // Primary Air System index
 		int SysAvailNum;
-		int ZoneNum;
 
 		if ( GetHybridInputFlag ) {
 			GetHybridVentilationInputs();

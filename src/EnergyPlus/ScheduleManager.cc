@@ -149,7 +149,6 @@ namespace ScheduleManager {
 		using DataStringGlobals::CharSpace;
 		using DataStringGlobals::CharSemicolon;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
-		using DataSystemVariables::iASCII_CR;
 		using DataSystemVariables::iUnicode_end;
 		using DataSystemVariables::TempFullFileName;
 		using DataSystemVariables::CheckForActualFileName;

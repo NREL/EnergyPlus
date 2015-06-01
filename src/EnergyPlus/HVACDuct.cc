@@ -75,7 +75,7 @@ namespace HVACDuct {
 	void
 	SimDuct(
 		std::string const & CompName, // name of the duct component
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // TRUE if 1st HVAC simulation of system timestep !unused1208
 		int & CompIndex // index of duct component
 	)
 	{
@@ -289,7 +289,7 @@ namespace HVACDuct {
 	}
 
 	void
-	CalcDuct( int const DuctNum ) // number of the current duct being simulated !unused1208
+	CalcDuct( int const EP_UNUSED( DuctNum ) ) // number of the current duct being simulated !unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -390,7 +390,7 @@ namespace HVACDuct {
 	}
 
 	void
-	ReportDuct( int const DuctNum ) // number of the current duct being simulated !unused1208
+	ReportDuct( int const EP_UNUSED( DuctNum ) ) // number of the current duct being simulated !unused1208
 	{
 
 		// SUBROUTINE INFORMATION:

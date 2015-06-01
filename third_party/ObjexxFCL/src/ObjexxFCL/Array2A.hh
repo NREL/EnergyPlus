@@ -68,11 +68,11 @@ public: // Types
 	using Super::size_of;
 	using Super::size_set;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::I1_;
 	using Super::I2_;
 	using Super::sdata_;
 	using Super::shift_;
+	using Super::size_;
 	using Super::z1_;
 	using Super::z2_;
 
@@ -689,15 +689,15 @@ private: // Functions
 		assert( I2_.bounded() );
 		if ( I1_.bounded() ) {
 			size_set( size_of( z1_, z2_ ) );
-		} else if ( data_size_ == npos ) {
+		} else if ( size_ == npos ) {
 			size_set( npos );
 		} else {
 			if ( z2_ > 0u ) { // Infer size
-				z1_ = data_size_ / z2_;
+				z1_ = size_ / z2_;
 				I1_.u( I1_.l() + static_cast< int >( z1_ ) - 1 );
 				size_set( size_of( z1_, z2_ ) );
 			} else {
-				size_set( data_size_ );
+				size_set( size_ );
 			}
 		}
 		shift_set( ( I1_.l() * z2_ ) + I2_.l() );

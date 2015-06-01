@@ -72,13 +72,13 @@ namespace PlantValves {
 		int const CompTypeNum,
 		std::string const & CompName,
 		int & CompNum,
-		bool const RunFlag, // unused1208
+		bool const EP_UNUSED( RunFlag ), // unused1208
 		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
+		Real64 & EP_UNUSED( MyLoad ), // unused1208
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation
 	)
 	{
 
@@ -98,7 +98,6 @@ namespace PlantValves {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::BeginEnvrnFlag;
 		using InputProcessor::FindItemInList;
 
 		// Locals

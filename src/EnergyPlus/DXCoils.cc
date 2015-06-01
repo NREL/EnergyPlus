@@ -464,7 +464,7 @@ namespace DXCoils {
 	void
 	SimDXCoilMultiMode(
 		std::string const & CompName, // name of the fan coil unit
-		int const CompOp, // compressor operation; 1=on, 0=off !unused1208
+		int const EP_UNUSED( CompOp ), // compressor operation; 1=on, 0=off !unused1208
 		bool const FirstHVACIteration, // true if first hvac iteration
 		Real64 const PartLoadRatio, // part load ratio
 		int const DehumidMode, // dehumidification mode (0=normal, 1=enhanced)
@@ -5160,7 +5160,6 @@ namespace DXCoils {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 rhoair;
-		Real64 CpAir;
 		Real64 MixTemp;
 		Real64 MixHumRat;
 		Real64 MixEnth;
@@ -5181,8 +5180,6 @@ namespace DXCoils {
 		int Mode; // Operating mode for MultiMode DX coil; Always 1 for other coil types
 		int NumOfSpeedCompanion; // Number of speed for a companion cooling coil (Multispeed HO heating coil only
 		std::string equipName;
-		bool OASysFlag; // Logical flag determines if parent object set OA Sys coil property
-		bool AirLoopSysFlag; // Logical flag determines if parent object set air loop coil property
 		Real64 RatedAirVolFlowRateDes; // Design rated air volume flow for reporting
 		Real64 RatedAirVolFlowRateUser; // Hard-sized rated air volume flow for reporting
 		Real64 RatedAirVolFlowRate2Des; // Design rated low speed air volume flow for reporting
@@ -8242,9 +8239,7 @@ Label50: ;
 		Real64 OutletAirTemp; // Supply air temperature (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirHumRat; // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
-		Real64 EvapInletDryBulb; // secondary DX coil (evaporator) entering zone air node dry bulb temperature 
-		Real64 EvapInletWetBulb; // secondary DX coil (evaporator) entering zone air node wet bulb temperature 
-
+		
 		if ( present( OnOffAirFlowRatio ) ) {
 			AirFlowRatio = OnOffAirFlowRatio;
 		} else {
@@ -9170,7 +9165,6 @@ Label50: ;
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using DataEnvironment::StdRhoAir;
 
 		// Return value
 		Real64 CBF( 0.0 ); // the result - the coil bypass factor
@@ -13331,9 +13325,6 @@ Label50: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 30 );
-		Real64 const RelaxationFactor( 0.4 );
-		Real64 const Tolerance( 0.1 );
 		static std::string const RoutineName( "CalcSecondaryDXCoils" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -13344,7 +13335,6 @@ Label50: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CondInletDryBulb; // condenser entering air dry-bulb temperature (C)
-		Real64 EvapAirVolFlow; // evaporator air volumetric flow [m3/s]
 		Real64 EvapAirMassFlow; // Condenser air mass flow rate [kg/s]
 		Real64 EvapInletDryBulb; // evaporator inlet air drybulb [C]
 		Real64 EvapInletHumRat; // evaporator inlet air humidity ratio [kg/kg]
@@ -13354,9 +13344,9 @@ Label50: ;
 		Real64 FullLoadOutAirHumRat; // evaporator outlet humidity ratio at full load
 		Real64 FullLoadOutAirTemp; // evaporator outlet air temperature at full load [C]
 		Real64 hTinwout; // Enthalpy at inlet dry-bulb and outlet humidity ratio [J/kg]
-		Real64 SHR; // sensible heat ratio
+		Real64 SHR( 0 ); // sensible heat ratio
 		Real64 RhoAir; // secondary coil entering air density [kg/m3]
-		Real64 PartLoadRatio; // primary coil part-load ratio [-]
+		Real64 PartLoadRatio( 0 ); // primary coil part-load ratio [-]
 		Real64 SecCoilRatedSHR; // secondary DX coil nominal or rated sensible heat ratio
 		Real64 SecCoilFlowFraction; // secondary coil flow fraction, is 1.0 for single speed machine
 		Real64 TotalHeatRemovalRate; // secondary coil total heat removal rate
@@ -13524,7 +13514,7 @@ Label50: ;
 
 	Real64
 	CalcSecondaryDXCoilsSHR(
-		int const DXCoilNum,
+		int const EP_UNUSED( DXCoilNum ),
 		Real64 const EvapAirMassFlow,
 		Real64 const TotalHeatRemovalRate,
 		Real64 const PartLoadRatio, 
@@ -13585,13 +13575,9 @@ Label50: ;
 		Real64 DryCoilTestEvapInletWetBulb; // evaporator coil inlet dry bulb temperature test for dry coil
 		Real64 FullLoadOutAirEnth; // evaporator outlet full load enthalpy [J/kg]
 		Real64 FullLoadOutAirTemp; // evaporator outlet air temperature at full load [C]
-		Real64 SHRTempFac; // sensible heat ratio modification factor due to temps []
-		Real64 SHRFlowFac; // sensible heat ratio modification factor due to flow []
-		Real64 hTinwout; // Enthalpy at inlet dry-bulb and outlet humidity ratio [J/kg]
 		Real64 hTinwADP; // enthaly of air at secondary coil entering temperature and Humidity ratio at ADP
 		Real64 SHRadp; // Sensible heat ratio
 		Real64 hADP; // enthaly of air at secondary coil at ADP
-		Real64 RhoAir; // secondary DX coil entering air density [kg/m3]
 		Real64 tADP; // dry bulb temperature of air at secondary coil at ADP
 		Real64 wADP; // humidity ratio of air at secondary coil at ADP
 		Real64 HumRatError; // humidity ratio error

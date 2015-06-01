@@ -1313,14 +1313,12 @@ namespace Pumps {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using General::RoundSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataConvergParams::PlantFlowRateToler;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const RotSpeed_Tol( 0.01 );
 		static std::string const RoutineName( "PlantPumps:CalcPumps: " );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1347,7 +1345,6 @@ namespace Pumps {
 		Real64 RotSpeed_Max;
 		Real64 PumpActualRPMValueOne;
 		Real64 PumpActualRPMValueTwo;
-		int NumBranchesOnThisLoopSide;
 
 		InletNode = PumpEquip( PumpNum ).InletNodeNum;
 		OutletNode = PumpEquip( PumpNum ).OutletNodeNum;

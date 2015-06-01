@@ -396,15 +396,12 @@ namespace WindowManager {
 		static Real64 tmpReflectVisBeamBack( 0.0 );
 
 		//Debug
-		int Idb;
 		static Array1D< Real64 > DbgTheta( 11, { 0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 82.5, 89.5 } );
 		static Array1D< Real64 > DbgTSol( 11, 0.0 );
 		static Array1D< Real64 > DbgRbSol( 11, 0.0 );
 		static Array1D< Real64 > DbgTVis( 11, 0.0 );
 		static Array2D< Real64 > DbgFtAbs( 5, 11, 0.0 );
 		static Array2D< Real64 > DbgBkAbs( 5, 11, 0.0 );
-		static Real64 DbgTSolDiff( 0.0 );
-		static Real64 DbgRBSolDiff( 0.0 );
 		static Array1D< Real64 > DbgFTAbsDiff( 5, 0.0 );
 		static Array1D< Real64 > DbgBkAbsDiff( 5, 0.0 );
 
@@ -2091,7 +2088,6 @@ namespace WindowManager {
 		Real64 SurfOutsideEmiss; // temporary for result of outside surface emissivity
 		Real64 Tsout; // temporary for result of outside surface temp in Kelvin
 		//integer :: CurrentThermalAlgorithm
-		int CurrentThermalModelNumber;
 		int temp;
 
 		//CurrentThermalAlgorithm = -1
@@ -4976,8 +4972,6 @@ namespace WindowManager {
 		Real64 rbp2;
 		Real64 betaf; // Intermediate variables
 		Real64 betab;
-		Real64 t0f; // Intermediate variables
-		Real64 t0b;
 		Real64 r0f;
 		Real64 r0b;
 		Real64 abf;
@@ -7107,7 +7101,6 @@ namespace WindowManager {
 		static bool HasWindows( false );
 		static bool HasComplexWindows( false );
 		static bool HasEQLWindows( false ); // equivalent layer window defined
-		static int SurfConstr( 0 );
 		static Real64 TempVar( 0.0 ); // just temporary usage for complex fenestration
 
 		int ThisNum;

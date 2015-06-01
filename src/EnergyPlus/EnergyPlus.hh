@@ -8,6 +8,10 @@
 // C++ Headers
 #include <cstdint> // C++11
 
+// macro to supress unused parameter
+// UNUSED( foo );
+#define EP_UNUSED( expr )
+
 // ObjexxFCL
 namespace ObjexxFCL {
 namespace fmt {

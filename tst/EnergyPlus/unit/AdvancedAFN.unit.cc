@@ -37,10 +37,6 @@ TEST( AdvancedAFNTest, Test1 )
 	int OpenStatus;
 	int OpenProbStatus;
 	int CloseProbStatus;
-	Real64 Tcomfort;
-	Real64 ComfortBand;
-	Real64 Toperative;
-	int DXCoilNum;
 	int CurveNum;
 
 	AirflowNetworkNumOfOccuVentCtrls = 1;

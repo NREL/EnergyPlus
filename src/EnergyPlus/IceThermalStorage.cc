@@ -194,11 +194,9 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys; // [hr]
 		using InputProcessor::FindItemInList;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -1388,10 +1386,6 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataGlobals::WarmupFlag;
-		using DataGlobals::NumOfTimeStepInHour;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
@@ -1404,7 +1398,6 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umax; // Max Urate  [fraction]
 		Real64 Umin; // Min Urate  [fraction]
 		Real64 Uact; // Acting between Umax and Umin [fraction]
 		Real64 ITSCoolingRateMax;
@@ -1428,7 +1421,6 @@ namespace IceThermalStorage {
 			OptCap = 0.0;
 
 			// Initialize processed Usys values
-			Umax = 0.0;
 			Umin = 0.0;
 			Uact = 0.0;
 
@@ -1449,8 +1441,6 @@ namespace IceThermalStorage {
 			// QiceMin is REAL(r64) ITS capacity.
 			CalcQiceDischageMax( QiceMin );
 
-			// Check Umax and Umin to verify the input U value.
-			Umax = 0.0;
 			// At the first call of ITS model, MyLoad is 0. After that proper MyLoad will be provided by E+.
 			// Therefore, Umin is decided between input U and ITS REAL(r64) capacity.
 			Umin = min( max( ( -( 1.0 - EpsLimitForDisCharge ) * QiceMin * TimeInterval / ITSNomCap ), ( -XCurIceFrac + EpsLimitForX ) ), 0.0 );
@@ -1505,19 +1495,11 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umax; // Max Urate  [fraction]
-		Real64 Umin; // Min Urate  [fraction]
-		Real64 Uact; // Acting between Umax and Umin [fraction]
 
 		// FLOW
 		{ auto const SELECT_CASE_var( IceStorageType ); //by ZG
 
 		if ( SELECT_CASE_var == IceStorageType_Simple ) { //by ZG
-
-			// Initialize processed Usys values
-			Umax = 0.0;
-			Umin = 0.0;
-			Uact = 0.0;
 
 			// Provide output results for ITS.
 			ITSMassFlowRate = 0.0; //[kg/s]
@@ -1751,7 +1733,7 @@ namespace IceThermalStorage {
 
 	void
 	CalcQiceChargeMaxByITS(
-		int & IceNum,
+		int & EP_UNUSED( IceNum ),
 		Real64 const ChillerOutletTemp, // [degC]
 		Real64 & QiceMaxByITS // [W]
 	)
@@ -1820,7 +1802,7 @@ namespace IceThermalStorage {
 		int const IceNum, // ice storage number
 		Real64 const MyLoad, // operating load
 		bool const RunFlag, // TRUE when ice storage operating
-		bool const FirstIteration, // TRUE when first iteration of timestep
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep
 		Real64 const MaxCap // Max possible discharge rate (positive value)
 	)
 	{
@@ -1835,9 +1817,6 @@ namespace IceThermalStorage {
 
 		// Using/Aliasing
 		using DataBranchAirLoopPlant::MassFlowTolerance;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
-		using DataGlobals::NumOfTimeStepInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -1849,7 +1828,6 @@ namespace IceThermalStorage {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const TempTol( 0.0001 ); // C - minimum significant mass flow rate
 		static std::string const RoutineName( "CalcIceStorageDischarge" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2189,7 +2167,7 @@ namespace IceThermalStorage {
 	UpdateNode(
 		Real64 const MyLoad,
 		bool const RunFlag,
-		int const Num
+		int const EP_UNUSED( Num )
 	)
 	{
 		// SUBROUTINE INFORMATION:
