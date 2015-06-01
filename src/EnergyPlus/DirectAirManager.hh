@@ -50,6 +50,9 @@ namespace DirectAirManager {
 		Real64 CoolRate;
 		Real64 HeatEnergy;
 		Real64 CoolEnergy;
+		// pointers
+		int ZoneEqNum;
+		int ZoneNum;
 
 		// Default Constructor
 		DirectAirProps() :
@@ -66,7 +69,9 @@ namespace DirectAirManager {
 			HeatRate( 0.0 ),
 			CoolRate( 0.0 ),
 			HeatEnergy( 0.0 ),
-			CoolEnergy( 0.0 )
+			CoolEnergy( 0.0 ),
+			ZoneEqNum( 0 ),
+			ZoneNum( 0 )
 		{}
 
 		// Member Constructor
@@ -87,7 +92,9 @@ namespace DirectAirManager {
 			Real64 const HeatRate,
 			Real64 const CoolRate,
 			Real64 const HeatEnergy,
-			Real64 const CoolEnergy
+			Real64 const CoolEnergy,
+			int const ZoneEqNum,
+			int const ZoneNum
 		) :
 			cObjectName( cObjectName ),
 			EquipID( EquipID ),
@@ -105,7 +112,9 @@ namespace DirectAirManager {
 			HeatRate( HeatRate ),
 			CoolRate( CoolRate ),
 			HeatEnergy( HeatEnergy ),
-			CoolEnergy( CoolEnergy )
+			CoolEnergy( CoolEnergy ),
+			ZoneEqNum( ZoneEqNum ),
+			ZoneNum( ZoneNum )
 		{}
 
 	};
@@ -134,6 +143,7 @@ namespace DirectAirManager {
 	void
 	InitDirectAir(
 		int const DirectAirNum,
+		int const ControlledZoneNum,
 		bool const FirstHVACIteration
 	);
 

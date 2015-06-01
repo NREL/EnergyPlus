@@ -154,7 +154,7 @@ namespace DirectAirManager {
 		}
 
 		// With the correct DirectAirNum to Initialize the system
-		InitDirectAir( DirectAirNum, FirstHVACIteration );
+		InitDirectAir( DirectAirNum, ControlledZoneNum, FirstHVACIteration );
 
 		CalcDirectAir( DirectAirNum, ControlledZoneNum, SensOutputProvided, LatOutputProvided );
 
@@ -312,6 +312,7 @@ namespace DirectAirManager {
 	void
 	InitDirectAir(
 		int const DirectAirNum,
+		int const ControlledZoneNum,
 		bool const FirstHVACIteration
 	)
 	{
@@ -339,6 +340,7 @@ namespace DirectAirManager {
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
+		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -384,6 +386,9 @@ namespace DirectAirManager {
 		if ( ! SysSizingCalc && MySizeFlag( DirectAirNum ) ) {
 
 			SizeDirectAir( DirectAirNum );
+
+			DirectAir( DirectAirNum ).ZoneEqNum = ControlledZoneNum;
+			DirectAir( DirectAirNum ).ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
 
 			MySizeFlag( DirectAirNum ) = false;
 		}

@@ -416,6 +416,8 @@ namespace OutputReportPredefined {
 	int pdstSHGSannual;
 	int pdchSHGSAnHvacHt;
 	int pdchSHGSAnHvacCl;
+	int pdchSHGSAnHvacATUHt;
+	int pdchSHGSAnHvacATUCl;
 	int pdchSHGSAnSurfHt;
 	int pdchSHGSAnSurfCl;
 	int pdchSHGSAnPeoplAdd;
@@ -435,6 +437,8 @@ namespace OutputReportPredefined {
 	int pdchSHGSClTimePeak;
 	int pdchSHGSClHvacHt;
 	int pdchSHGSClHvacCl;
+	int pdchSHGSClHvacATUHt;
+	int pdchSHGSClHvacATUCl;
 	int pdchSHGSClSurfHt;
 	int pdchSHGSClSurfCl;
 	int pdchSHGSClPeoplAdd;
@@ -454,6 +458,8 @@ namespace OutputReportPredefined {
 	int pdchSHGSHtTimePeak;
 	int pdchSHGSHtHvacHt;
 	int pdchSHGSHtHvacCl;
+	int pdchSHGSHtHvacATUHt;
+	int pdchSHGSHtHvacATUCl;
 	int pdchSHGSHtSurfHt;
 	int pdchSHGSHtSurfCl;
 	int pdchSHGSHtPeoplAdd;
@@ -1161,13 +1167,15 @@ namespace OutputReportPredefined {
 		pdchEMotherJmaxvalue = newPreDefColumn( pdstEMotherJvalues, "Maximum Value [W]" );
 		pdchEMotherJmaxvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Maximum" );
 
-		// Sensible Heat Gas Component Report
+		// Sensible Heat Gain Component Report
 		pdrSensibleGain = newPreDefReport( "SensibleHeatGainSummary", "SHGS", "Sensible Heat Gain Summary" );
 
 		pdstSHGSannual = newPreDefSubTable( pdrSensibleGain, "Annual Building Sensible Heat Gain Components" );
 
 		pdchSHGSAnHvacHt = newPreDefColumn( pdstSHGSannual, "HVAC Input Sensible Air Heating [GJ]" );
 		pdchSHGSAnHvacCl = newPreDefColumn( pdstSHGSannual, "HVAC Input Sensible Air Cooling [GJ]" );
+		pdchSHGSAnHvacATUHt = newPreDefColumn( pdstSHGSannual, "HVAC Air Terminal Sensible Air Heating [GJ]" );
+		pdchSHGSAnHvacATUCl = newPreDefColumn( pdstSHGSannual, "HVAC Air Terminal Sensible Air Cooling [GJ]" );
 		pdchSHGSAnSurfHt = newPreDefColumn( pdstSHGSannual, "HVAC Input Heated Surface Heating [GJ]" );
 		pdchSHGSAnSurfCl = newPreDefColumn( pdstSHGSannual, "HVAC Input Cooled Surface Cooling [GJ]" );
 		pdchSHGSAnPeoplAdd = newPreDefColumn( pdstSHGSannual, "People Sensible Heat Addition [GJ]" );
@@ -1188,6 +1196,8 @@ namespace OutputReportPredefined {
 		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak" );
 		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Sensible Air Heating [W]" );
 		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Sensible Air Cooling [W]" );
+		pdchSHGSClHvacATUHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Air Terminal Sensible Air Heating [W]" );
+		pdchSHGSClHvacATUCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Air Terminal Sensible Air Cooling [W]" );
 		pdchSHGSClSurfHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Heated Surface Heating [W]" );
 		pdchSHGSClSurfCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Cooled Surface Cooling [W]" );
 		pdchSHGSClPeoplAdd = newPreDefColumn( pdstSHGSpkCl, "People Sensible Heat Addition [W]" );
@@ -1208,6 +1218,8 @@ namespace OutputReportPredefined {
 		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak" );
 		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Sensible Air Heating [W]" );
 		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Sensible Air Cooling [W]" );
+		pdchSHGSHtHvacATUHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Air Terminal Sensible Air Heating [W]" );
+		pdchSHGSHtHvacATUCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Air Terminal Sensible Air Cooling [W]" );
 		pdchSHGSHtSurfHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Heated Surface Heating [W]" );
 		pdchSHGSHtSurfCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Cooled Surface Cooling [W]" );
 		pdchSHGSHtPeoplAdd = newPreDefColumn( pdstSHGSpkHt, "People Sensible Heat Addition [W]" );

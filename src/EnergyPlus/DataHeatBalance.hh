@@ -4861,6 +4861,8 @@ namespace DataHeatBalance {
 		//annual
 		Real64 SHGSAnHvacHt; // hvac air heating
 		Real64 SHGSAnHvacCl; // hvac air cooling
+		Real64 SHGSAnHvacATUHt; // heating by Air Terminal Unit [J]
+		Real64 SHGSAnHvacATUCl; // coolinging by Air Terminal Unit [J]
 		Real64 SHGSAnSurfHt; // heated surface heating
 		Real64 SHGSAnSurfCl; // cooled surface cooling
 		Real64 SHGSAnPeoplAdd; // people additions
@@ -4880,6 +4882,8 @@ namespace DataHeatBalance {
 		Real64 clPeak; // cooling peak value (hvac air cooling + cooled surface)
 		Real64 SHGSClHvacHt; // hvac air heating
 		Real64 SHGSClHvacCl; // hvac air cooling
+		Real64 SHGSClHvacATUHt; // heating by air terminal unit at cool peak [W]
+		Real64 SHGSClHvacATUCl; // cooling by air terminal unit at cool peak [W]
 		Real64 SHGSClSurfHt; // heated surface heating
 		Real64 SHGSClSurfCl; // cooled surface cooling
 		Real64 SHGSClPeoplAdd; // people additions
@@ -4900,6 +4904,8 @@ namespace DataHeatBalance {
 		Real64 SHGSHtHvacHt; // hvac air heating
 		Real64 SHGSHtHvacCl; // hvac air cooling
 		Real64 SHGSHtSurfHt; // heated surface heating
+		Real64 SHGSHtHvacATUHt; // heating by air terminal unit at heat peak [W]
+		Real64 SHGSHtHvacATUCl; // cooling by air terminal unit at heat peak [W]
 		Real64 SHGSHtSurfCl; // cooled surface cooling
 		Real64 SHGSHtPeoplAdd; // people additions
 		Real64 SHGSHtLiteAdd; // lighing addition
@@ -4930,6 +4936,8 @@ namespace DataHeatBalance {
 			SimpVentVolMin( 9.9e9 ),
 			SHGSAnHvacHt( 0.0 ),
 			SHGSAnHvacCl( 0.0 ),
+			SHGSAnHvacATUHt( 0.0 ),
+			SHGSAnHvacATUCl( 0.0 ),
 			SHGSAnSurfHt( 0.0 ),
 			SHGSAnSurfCl( 0.0 ),
 			SHGSAnPeoplAdd( 0.0 ),
@@ -4948,6 +4956,8 @@ namespace DataHeatBalance {
 			clPeak( 0.0 ),
 			SHGSClHvacHt( 0.0 ),
 			SHGSClHvacCl( 0.0 ),
+			SHGSClHvacATUHt( 0.0 ),
+			SHGSClHvacATUCl( 0.0 ),
 			SHGSClSurfHt( 0.0 ),
 			SHGSClSurfCl( 0.0 ),
 			SHGSClPeoplAdd( 0.0 ),
@@ -4966,6 +4976,8 @@ namespace DataHeatBalance {
 			htPeak( 0.0 ),
 			SHGSHtHvacHt( 0.0 ),
 			SHGSHtHvacCl( 0.0 ),
+			SHGSHtHvacATUHt( 0.0 ),
+			SHGSHtHvacATUCl( 0.0 ),
 			SHGSHtSurfHt( 0.0 ),
 			SHGSHtSurfCl( 0.0 ),
 			SHGSHtPeoplAdd( 0.0 ),
@@ -4998,6 +5010,8 @@ namespace DataHeatBalance {
 			Real64 const SimpVentVolMin, // a large number since finding minimum volume
 			Real64 const SHGSAnHvacHt, // hvac air heating
 			Real64 const SHGSAnHvacCl, // hvac air cooling
+			Real64 const SHGSAnHvacATUHt, // annual ATU heating [J]
+			Real64 const SHGSAnHvacATUCl, // annual ATU cooling [J}
 			Real64 const SHGSAnSurfHt, // heated surface heating
 			Real64 const SHGSAnSurfCl, // cooled surface cooling
 			Real64 const SHGSAnPeoplAdd, // people additions
@@ -5016,6 +5030,8 @@ namespace DataHeatBalance {
 			Real64 const clPeak, // cooling peak value (hvac air cooling + cooled surface)
 			Real64 const SHGSClHvacHt, // hvac air heating
 			Real64 const SHGSClHvacCl, // hvac air cooling
+			Real64 const SHGSClHvacATUHt, // heating by air terminal unit at the cooling peak [W]
+			Real64 const SHGSClHvacATUCl, // cooling by air terminal unit at the cooling peak [W]
 			Real64 const SHGSClSurfHt, // heated surface heating
 			Real64 const SHGSClSurfCl, // cooled surface cooling
 			Real64 const SHGSClPeoplAdd, // people additions
@@ -5034,6 +5050,8 @@ namespace DataHeatBalance {
 			Real64 const htPeak, // heating peak value (hvac air heating + heated surface)
 			Real64 const SHGSHtHvacHt, // hvac air heating
 			Real64 const SHGSHtHvacCl, // hvac air cooling
+			Real64 const SHGSHtHvacATUHt, // heating by air terminal unit at the heat peak [W]
+			Real64 const SHGSHtHvacATUCl, // cooling by air terminal unit at the heat peak [W]
 			Real64 const SHGSHtSurfHt, // heated surface heating
 			Real64 const SHGSHtSurfCl, // cooled surface cooling
 			Real64 const SHGSHtPeoplAdd, // people additions
@@ -5063,6 +5081,8 @@ namespace DataHeatBalance {
 			SimpVentVolMin( SimpVentVolMin ),
 			SHGSAnHvacHt( SHGSAnHvacHt ),
 			SHGSAnHvacCl( SHGSAnHvacCl ),
+			SHGSAnHvacATUHt( SHGSAnHvacATUHt ),
+			SHGSAnHvacATUCl( SHGSAnHvacATUCl ),
 			SHGSAnSurfHt( SHGSAnSurfHt ),
 			SHGSAnSurfCl( SHGSAnSurfCl ),
 			SHGSAnPeoplAdd( SHGSAnPeoplAdd ),
@@ -5081,6 +5101,8 @@ namespace DataHeatBalance {
 			clPeak( clPeak ),
 			SHGSClHvacHt( SHGSClHvacHt ),
 			SHGSClHvacCl( SHGSClHvacCl ),
+			SHGSClHvacATUHt( SHGSClHvacATUHt ),
+			SHGSClHvacATUCl( SHGSClHvacATUCl ),
 			SHGSClSurfHt( SHGSClSurfHt ),
 			SHGSClSurfCl( SHGSClSurfCl ),
 			SHGSClPeoplAdd( SHGSClPeoplAdd ),
@@ -5099,6 +5121,8 @@ namespace DataHeatBalance {
 			htPeak( htPeak ),
 			SHGSHtHvacHt( SHGSHtHvacHt ),
 			SHGSHtHvacCl( SHGSHtHvacCl ),
+			SHGSHtHvacATUHt( SHGSHtHvacATUHt ),
+			SHGSHtHvacATUCl( SHGSHtHvacATUCl ),
 			SHGSHtSurfHt( SHGSHtSurfHt ),
 			SHGSHtSurfCl( SHGSHtSurfCl ),
 			SHGSHtPeoplAdd( SHGSHtPeoplAdd ),

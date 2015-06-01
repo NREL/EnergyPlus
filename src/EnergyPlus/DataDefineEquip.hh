@@ -72,6 +72,12 @@ namespace DataDefineEquip {
 		Real64 LeakLoadMult; // zome load multiplier to adjust for downstream leak
 		bool UpStreamLeak; // if true, there is an upstream leak
 		bool DownStreamLeak; // if true, there is an downstream leak
+		int ZoneNum; // index of the zone object for this terminal unit
+	 	bool AccountForDOAS; // if true user has asked for DOAS
+		Real64 HeatRate; // [W]
+		Real64 CoolRate; // [W]
+		Real64 HeatGain; // [J]
+		Real64 CoolGain; // [J]
 
 		// Default Constructor
 		ZoneAirEquip() :
@@ -95,7 +101,13 @@ namespace DataDefineEquip {
 			ZoneEqNum( 0 ),
 			LeakLoadMult( 0.0 ),
 			UpStreamLeak( false ),
-			DownStreamLeak( false )
+			DownStreamLeak( false ),
+			ZoneNum( 0 ),
+			AccountForDOAS( false ),
+			HeatRate( 0.0 ),
+			CoolRate( 0.0 ),
+			HeatGain( 0.0 ),
+			CoolGain( 0.0 )
 		{}
 
 		// Member Constructor
@@ -121,7 +133,13 @@ namespace DataDefineEquip {
 			int const ZoneEqNum, // index of zone equipment object for this terminal unit
 			Real64 const LeakLoadMult, // zome load multiplier to adjust for downstream leak
 			bool const UpStreamLeak, // if true, there is an upstream leak
-			bool const DownStreamLeak // if true, there is an downstream leak
+			bool const DownStreamLeak, // if true, there is an downstream leak
+			int const ZoneNum, // index of zone object for this terminal unit
+			bool const AccountForDOAS, // if true user has asked for DOAS
+			Real64 const HeatRate, // [W]
+			Real64 const CoolRate, // [W]
+			Real64 const HeatGain, // [J]
+			Real64 const CoolGain  // [J]
 		) :
 			Name( Name ),
 			OutletNodeNum( OutletNodeNum ),
@@ -144,7 +162,13 @@ namespace DataDefineEquip {
 			ZoneEqNum( ZoneEqNum ),
 			LeakLoadMult( LeakLoadMult ),
 			UpStreamLeak( UpStreamLeak ),
-			DownStreamLeak( DownStreamLeak )
+			DownStreamLeak( DownStreamLeak ),
+			ZoneNum( ZoneNum ),
+			AccountForDOAS( AccountForDOAS ),
+			HeatRate( HeatRate ),
+			CoolRate( CoolRate ),
+			HeatGain( HeatGain ),
+			CoolGain( CoolGain )
 		{}
 
 	};
