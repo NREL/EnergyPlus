@@ -139,7 +139,9 @@ namespace PipeHeatTransfer {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( objectName != cAlphaArgs( 1 ) ) {
+				if ( objectName == cAlphaArgs( 1 ) ) {
+					found = true;
+				} else {
 					continue;
 				}
 
@@ -216,6 +218,9 @@ namespace PipeHeatTransfer {
 					thisPipe->validatePipeConstruction();
 				}
 
+				// exit since we found one
+				break;
+
 			} // end of input loop
 
 		} else if ( objectType == DataPlant::TypeOf_PipeInterior ) {
@@ -225,7 +230,9 @@ namespace PipeHeatTransfer {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( objectName != cAlphaArgs( 1 ) ) {
+				if ( objectName == cAlphaArgs( 1 ) ) {
+					found = true;
+				} else {
 					continue;
 				}
 
@@ -323,6 +330,9 @@ namespace PipeHeatTransfer {
 				if ( thisPipe->ConstructionNum != 0 ) {
 					thisPipe->validatePipeConstruction();
 				}
+
+				// exit since we found one
+				break;
 			}
 
 		} else if ( objectType == DataPlant::TypeOf_PipeUnderground ) {
@@ -333,10 +343,12 @@ namespace PipeHeatTransfer {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( objectName != cAlphaArgs( 1 ) ) {
+				if ( objectName == cAlphaArgs( 1 ) ) {
+					found = true;
+				} else {
 					continue;
 				}
-				
+
 				thisPipe->Name = cAlphaArgs( 1 );
 				thisPipe->TypeOf = TypeOf_PipeUnderground;
 
@@ -477,6 +489,9 @@ namespace PipeHeatTransfer {
 				thisPipe->T.allocate( thisPipe->PipeNodeWidth, thisPipe->NumDepthNodes, thisPipe->NumSections, TentativeTimeIndex );
 				thisPipe->T = 0.0;
 
+				// exit since we found one
+				break;
+
 			} // PipeUG input loop
 		}
 		thisPipe->NumSections = NumPipeSections;
@@ -505,11 +520,6 @@ namespace PipeHeatTransfer {
 		// pipe & insulation mass
 		thisPipe->PipeHeatCapacity = thisPipe->PipeCp * thisPipe->PipeDensity * ( Pi * 0.25 * pow_2( thisPipe->PipeOD ) - thisPipe->SectionArea ); // the metal component
 
-		// final error check
-		if ( ErrorsFound ) {
-			ShowFatalError( "GetPipesHeatTransfer: Errors found in input. Preceding conditions cause termination." );
-		}
-
 		// Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
 		SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", thisPipe->FluidHeatLossRate, "Plant", "Average", thisPipe->Name );
 		SetupOutputVariable( "Pipe Fluid Heat Transfer Energy [J]", thisPipe->FluidHeatLossEnergy, "Plant", "Sum", thisPipe->Name );
@@ -525,12 +535,11 @@ namespace PipeHeatTransfer {
 		SetupOutputVariable( "Pipe Inlet Temperature [C]", thisPipe->FluidInletTemp, "Plant", "Average", thisPipe->Name );
 		SetupOutputVariable( "Pipe Outlet Temperature [C]", thisPipe->FluidOutletTemp, "Plant", "Average", thisPipe->Name );
 
-
 		if ( found && !ErrorsFound ) {
 			PipeHT.push_back( thisPipe );
 			return thisPipe;
 		} else {
-			ShowFatalError( "GetPipeHTInput: Errors getting input for pipes" );
+			ShowFatalError( "GetPipesHeatTransfer: Errors found in input. Preceding conditions cause termination." );
 			// add a dummy return here to hush up the compiler
 			return nullptr;
 		}
