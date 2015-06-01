@@ -476,6 +476,18 @@ public: // Modifier
 		return *this;
 	}
 
+	// Grow Upper
+	inline
+	IndexRange &
+	grow( int const n = 1 )
+	{
+		assert( n >= 0 );
+		assert( u_ <= u_max - n );
+		u_ = clean_u( u_ + n );
+		size_ = computed_size();
+		return *this;
+	}
+
 	// Expand to Contain an Index
 	inline
 	IndexRange &
@@ -554,12 +566,7 @@ private: // Methods
 	int
 	clean_u( int const u )
 	{
-		if ( l_ > u ) {
-			l_ = 1; // Changes lower index: Side effect
-			return 0;
-		} else {
-			return u;
-		}
+		return std::max( u, l_ - 1 );
 	}
 
 public: // Data

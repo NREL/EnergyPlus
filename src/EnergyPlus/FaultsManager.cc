@@ -172,7 +172,6 @@ namespace FaultsManager {
 		int jFaultyAirFilter; //Number of fault objects of type 109: fouled air filter
 		int jj;
 		int iFaults;
-		int iTotalFaults;
 		std::string cFault1;
 
 		if ( RunMeOnceFlag ) return;

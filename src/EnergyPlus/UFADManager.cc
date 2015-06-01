@@ -131,7 +131,6 @@ namespace UFADManager {
 		using namespace DataSurfaces;
 		using namespace DataRoomAirModel;
 		using ConvectionCoefficients::CalcDetailedHcInForDVModel;
-		using DataHVACGlobals::SysTimeElapsed;
 		using namespace DataUCSDSharedData;
 
 		// Locals
@@ -630,13 +629,11 @@ namespace UFADManager {
 		// -
 
 		// Using/Aliasing
-		using DataRoomAirModel::AirModel;
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
 		using namespace InputProcessor;
 		using ScheduleManager::GetScheduleIndex;
-		using DataGlobals::BeginEnvrnFlag;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

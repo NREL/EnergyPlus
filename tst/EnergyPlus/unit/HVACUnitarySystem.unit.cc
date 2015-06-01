@@ -186,7 +186,6 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	int iHeatingSizingType( 1 );
 	bool FirstHVACIteration( true );
 	bool SaveOutputFile( false );
-	Real64 PartLoadRatio( 1.0 );
 	int write_stat;
 	Array1D_int SizingTypes( { DataSizing::None, DataSizing::SupplyAirFlowRate, DataSizing::FlowPerFloorArea, DataSizing::FractionOfAutosizedCoolingAirflow, DataSizing::FractionOfAutosizedHeatingAirflow, DataSizing::FlowPerCoolingCapacity, DataSizing::FlowPerHeatingCapacity } );
 

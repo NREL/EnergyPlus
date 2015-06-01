@@ -443,7 +443,6 @@ namespace WeatherManager {
 		static bool FirstCall( true );
 		static bool PrntEnvHeaders( true );
 		int Loop;
-		int Loop1;
 		std::string StDate;
 		std::string EnDate;
 		std::string string;
@@ -460,9 +459,6 @@ namespace WeatherManager {
 		int TWeekDay;
 		Array1D_int MonWeekDay( 12 );
 		Array1D_int ActEndDayOfMonth( 12 );
-		int ThisDay;
-		int JDay;
-		int JDay1;
 		int JDay5Start;
 		int JDay5End;
 		std::string Source;
@@ -2357,10 +2353,6 @@ namespace WeatherManager {
 		static Real64 NextHrDifSolarRad;
 		static Real64 NextHrLiquidPrecip;
 		bool RecordDateMatch;
-		int JDay5Start;
-		int JDay5End;
-		int Loop;
-		int TWeekDay;
 
 		struct HourlyWeatherData
 		{
@@ -3458,15 +3450,8 @@ Label902: ;
 		static bool PrintDDHeader;
 		std::string AlpUseRain;
 		std::string AlpUseSnow;
-		Real64 LastHrBeamSolarRad; // Direct normal solar irradiance
-		Real64 LastHrDifSolarRad; // Sky diffuse horizontal solar irradiance
-		Real64 NextHrBeamSolarRad; // Direct normal solar irradiance
-		Real64 NextHrDifSolarRad; // Sky diffuse horizontal solar irradiance
 		bool ConstantHumidityRatio;
 		Real64 OutHumRat;
-		Real64 WgtHourNow;
-		Real64 WgtPrevHour;
-		Real64 WgtNextHour;
 		std::string StringOut;
 		bool SaveWarmupFlag;
 		Real64 GloHorzRad;
@@ -8002,7 +7987,6 @@ Label9999: ;
 		int CurOne;
 		int NumEPWHolidays;
 		int NumGrndTemps;
-		std::string::size_type endcol;
 		int TropExtremeCount; // because these can show up as "no dry" need to count and separate.
 		int actcount;
 		bool errflag1;

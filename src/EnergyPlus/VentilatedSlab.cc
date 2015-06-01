@@ -293,8 +293,6 @@ namespace VentilatedSlab {
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::Construct;
-		using DataSizing::AutoSize;
-		using DataZoneEquipment::VentilatedSlab_Num;
 		using ScheduleManager::GetScheduleIndex;
 		using namespace DataLoopNode;
 		using namespace DataSurfaceLists;
@@ -304,7 +302,6 @@ namespace VentilatedSlab {
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
-		using DataHVACGlobals::ZoneComp;
 		using DataSizing::ZoneHVACSizing;
 		using DataSizing::NumZoneHVACSizing;
 
@@ -1080,7 +1077,6 @@ namespace VentilatedSlab {
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::BeginEnvrnFlag;
@@ -1429,10 +1425,6 @@ namespace VentilatedSlab {
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		bool ErrorsFound;
-		Real64 CoilInTemp;
-		Real64 CoilOutTemp;
-		Real64 CoilOutHumRat;
-		Real64 CoilInHumRat;
 		Real64 DesCoilLoad;
 		Real64 TempSteamIn;
 		Real64 EnthSteamInDry;
@@ -1464,7 +1456,6 @@ namespace VentilatedSlab {
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value of coil input field
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
@@ -2043,7 +2034,6 @@ namespace VentilatedSlab {
 		using DataHeatBalance::MRT;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZoneAirHumRat;
-		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::ZoneCompTurnFansOn;
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataLoopNode::Node;
@@ -2068,7 +2058,6 @@ namespace VentilatedSlab {
 		// (below this value the temperatures are assumed equal)
 		Real64 const LowOAFracDiff( 0.01 ); // Smallest allowed outside air fraction difference for comparison
 		// (below this value the fractions are assumed equal)
-		Real64 const MinFlowAllowed( 0.001 ); // lowest air flow rate allowed [kg/sec]
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -2866,7 +2855,7 @@ namespace VentilatedSlab {
 	void
 	CalcVentilatedSlabRadComps(
 		int const Item, // System index in ventilated slab array
-		bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // flag for 1st HVAV iteration in the time step !unused1208
 	)
 	{
 
@@ -2921,7 +2910,6 @@ namespace VentilatedSlab {
 		// of a space before the radiant cooling system shuts off the flow.
 		Real64 const ZeroSystemResp( 0.1 ); // Response below which the system response is really zero
 		Real64 const TempCheckLimit( 0.1 ); // Maximum allowed temperature difference between outlet temperature calculations
-		Real64 const VentSlabAirTempToler( 0.001 ); // Maximum allowed temperature difference between the zone and return air
 		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -3612,7 +3600,7 @@ namespace VentilatedSlab {
 	void
 	UpdateVentilatedSlab(
 		int const Item, // Index for the ventilated slab under consideration within the derived types
-		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if 1st HVAC simulation of system timestep !unused1208
 	)
 	{
 

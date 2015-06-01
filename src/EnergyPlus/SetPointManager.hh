@@ -8,6 +8,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -70,6 +71,8 @@ namespace SetPointManager {
 	extern int const iSPMType_IdealCondEntReset;
 	extern int const iSPMType_SZOneStageCooling;
 	extern int const iSPMType_SZOneStageHeating;
+	extern int const iSPMType_ReturnWaterResetChW;
+	extern int const iSPMType_ReturnWaterResetHW;
 
 	extern int const NumValidSPMTypes;
 	extern Array1D_string const cValidSPMTypes;
@@ -107,6 +110,8 @@ namespace SetPointManager {
 	extern int NumIdealCondEntSetPtMgrs; // number of Ideal Condenser Entering Temperature setpoint managers
 	extern int NumSZOneStageCoolingSetPtMgrs; // number of single zone one stage cooling setpoint managers
 	extern int NumSZOneStageHeatingSetPtMgrs; // number of singel zone one stage heating setpoint managers
+	extern int NumReturnWaterResetChWSetPtMgrs; // number of chilled-water return water reset setpoint managers
+	extern int NumReturnWaterResetHWSetPtMgrs; // number of hot-water return water reset setpoint managers
 
 	extern bool ManagerOn;
 	extern bool GetInputFlag; // First time, input is "gotten"
@@ -1840,6 +1845,76 @@ namespace SetPointManager {
 		{}
 
 	};
+	
+	struct DefineReturnWaterChWSetPointManager // derived type for SetpointManager:SupplyResetForReturnTemperature:ChilledWater data
+	{
+		// Members
+		std::string Name;
+		int returnNodeIndex; // node ID for the plant supply-side return node
+		int supplyNodeIndex; // node ID for the plant supply-side supply node
+		Real64 minimumChilledWaterSetpoint; // the minimum reset temperature for the chilled water setpoint
+		Real64 maximumChilledWaterSetpoint; // the maximum reset temperature for the chilled water setpoint
+		int returnTemperatureScheduleIndex; // the index in Schedules array for the scheduled return temperature; zero if not used
+		Real64 returnTemperatureConstantTarget; // the constant value used as the return temperature target; used if schedule index is zero
+		Real64 currentSupplySetPt; // the current supply setpoint temperature
+		int plantLoopIndex; // the index for the plant loop for this manager, zero if not initialized
+		int plantSetpointNodeIndex; // the index for the node where the plant setpoint is set, need to look up after Plant is established
+		bool useReturnTempSetpoint; // only true if the target return temperature should be looked up as the Node(returnNode).TempSetPoint
+
+		// Default Constructor
+		DefineReturnWaterChWSetPointManager() :
+			Name( "" ),
+			returnNodeIndex( 0 ),
+			supplyNodeIndex( 0 ),
+			minimumChilledWaterSetpoint( 0.0 ),
+			maximumChilledWaterSetpoint( 0.0 ),
+			returnTemperatureScheduleIndex( 0 ),
+			returnTemperatureConstantTarget( 0.0 ),
+			currentSupplySetPt( 0.0 ),
+			plantLoopIndex( 0 ),
+			plantSetpointNodeIndex( 0 ),
+			useReturnTempSetpoint( false )
+		{}
+
+		// Calculation method
+		void calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode );
+
+	};
+	
+	struct DefineReturnWaterHWSetPointManager // derived type for SetpointManager:SupplyResetForReturnTemperature:HotWater data
+	{
+		// Members
+		std::string Name;
+		int returnNodeIndex; // node ID for the plant supply-side return node
+		int supplyNodeIndex; // node ID for the plant supply-side supply node
+		Real64 maximumHotWaterSetpoint; // the maximum reset temperature for the hot water setpoint
+		Real64 minimumHotWaterSetpoint; // the minimum reset temperature for the hot water setpoint
+		int returnTemperatureScheduleIndex; // the index in Schedules array for the scheduled return temperature; zero if not used
+		Real64 returnTemperatureConstantTarget; // the constant value used as the return temperature target; used if schedule index is zero
+		Real64 currentSupplySetPt; // the current supply setpoint temperature
+		int plantLoopIndex; // the index for the plant loop for this manager, zero if not initialized
+		int plantSetpointNodeIndex; // the index for the node where the plant setpoint is set, need to look up after Plant is established
+		bool useReturnTempSetpoint; // only true if the target return temperature should be looked up as the Node(returnNode).TempSetPoint
+
+		// Default Constructor
+		DefineReturnWaterHWSetPointManager() :
+			Name( "" ),
+			returnNodeIndex( 0 ),
+			supplyNodeIndex( 0 ),
+			maximumHotWaterSetpoint( 0.0 ),
+			minimumHotWaterSetpoint( 0.0 ),
+			returnTemperatureScheduleIndex( 0 ),
+			returnTemperatureConstantTarget( 0.0 ),
+			currentSupplySetPt( 0.0 ),
+			plantLoopIndex( 0 ),
+			plantSetpointNodeIndex( 0 ),
+			useReturnTempSetpoint( false )
+		{}
+
+		// Calculation method
+		void calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode );
+
+	};
 
 	// Object Data
 	extern Array1D< DataSetPointManager > AllSetPtMgr; // Array for all Setpoint Manager data(warnings)
@@ -1870,7 +1945,8 @@ namespace SetPointManager {
 	extern Array1D< DefineIdealCondEntSetPointManager > IdealCondEntSetPtMgr; // Ideal Condenser Entering Set Pt Mgr
 	extern Array1D< DefineSZOneStageCoolinggSetPointManager > SZOneStageCoolingSetPtMgr; // single zone 1 stage cool
 	extern Array1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
-
+	extern Array1D< DefineReturnWaterChWSetPointManager > ReturnWaterResetChWSetPtMgr; // return water reset
+	extern Array1D< DefineReturnWaterHWSetPointManager > ReturnWaterResetHWSetPtMgr; // hot-water return reset
 	// Functions
 
 	void

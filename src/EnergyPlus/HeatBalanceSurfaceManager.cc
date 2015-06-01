@@ -180,7 +180,6 @@ namespace HeatBalanceSurfaceManager {
 		using HeatBalanceAirManager::ManageAirHeatBalance;
 		using ThermalComfort::ManageThermalComfort;
 		using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular compoonent loads output reports
-		using DataSystemVariables::DeveloperFlag;
 		using HeatBalFiniteDiffManager::SurfaceFD;
 
 		// Locals
@@ -276,8 +275,6 @@ namespace HeatBalanceSurfaceManager {
 		// Using/Aliasing
 		using DataDaylighting::ZoneDaylight;
 		using DataDaylighting::NoDaylighting;
-		using DataDaylighting::DetailedDaylighting;
-		using DataDaylighting::DElightDaylighting;
 		using DataDaylighting::mapResultsToReport;
 		using DataDaylighting::TotIllumMaps;
 		using DataDaylightingDevices::NumOfTDDPipes;
@@ -298,7 +295,6 @@ namespace HeatBalanceSurfaceManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Eps( 1.e-10 ); // Small number
 		static gio::Fmt fmtA( "(A)" );
 		static gio::Fmt fmtLD( "*" );
 
@@ -316,7 +312,6 @@ namespace HeatBalanceSurfaceManager {
 		int SurfNum; // DO loop counter for surfaces
 		int Term; // DO loop counter for conduction equation terms
 		Real64 TSC; // Intermediate calculation variable
-		int ZoneNum; // Counter for zone loop initialization
 
 		// RJH DElight Modification Begin
 		Real64 dPowerReducFac; // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
@@ -666,7 +661,6 @@ namespace HeatBalanceSurfaceManager {
 
 					//Tuned Aliases and linear indexing
 					Real64 const ctf_cross( construct.CTFCross( Term ) );
-					Real64 const ctf_flux( construct.CTFFlux( Term ) );
 					Real64 const TH11( TH[ l11 ] );
 					Real64 const TH12( TH[ l12 ] );
 
@@ -3755,7 +3749,6 @@ namespace HeatBalanceSurfaceManager {
 		int HistTermNum; // DO loop counter for history terms
 		int SideNum; // DO loop counter for surfaces sides (inside, outside)
 		int SurfNum; // Surface number DO loop counter
-		int ZoneNum; // Zone number DO loop counter
 
 		static Array1D< Real64 > QExt1; // Heat flux at the exterior surface during first time step/series
 		static Array1D< Real64 > QInt1; // Heat flux at the interior surface during first time step/series
@@ -4111,7 +4104,6 @@ namespace HeatBalanceSurfaceManager {
 		using OutputReportTabular::feneSolarRadSeq;
 		using DataGlobals::NumOfTimeStepInHour;
 		using DataGlobals::CompLoadReportIsReq;
-		using DataGlobals::isPulseZoneSizing;
 		using DataSizing::CurOverallSimDay;
 
 		// Locals
@@ -4885,7 +4877,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	Real64 EmisOut; // Glass outside surface emissivity
 
 	static Array1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
-	Real64 RhoVaporSat; // Local temporary saturated vapor density for checking
 	Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
 	Real64 TempSurfInSat; // Local temperary surface dew point temperature
 	static bool firstTime( true ); // Used for trapping errors or other problems
@@ -5926,14 +5917,12 @@ CalcExteriorVentedCavity( int const SurfNum ) // index of surface
 	using DataEnvironment::SkyTemp;
 	using DataEnvironment::SunIsUp;
 	using DataEnvironment::OutBaroPress;
-	using DataEnvironment::OutEnthalpy;
 	using DataEnvironment::IsRain;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using DataSurfaces::Surface;
 	using DataSurfaces::ExtVentedCavity;
-	using DataSurfaces::TotExtVentCav;
 	using DataSurfaces::OSCM;
 	//unused0909  USE DataHVACGlobals , ONLY: TimeStepSys
 	using ConvectionCoefficients::InitExteriorConvectionCoeff;

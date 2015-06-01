@@ -791,14 +791,11 @@ namespace DaylightingManager {
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
 		using namespace Vectors;
-		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const tmpDFCalc( 0.05 ); // cut off illuminance (lux) for exterior horizontal in calculating
-		// the daylighting and glare factors
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -885,7 +882,6 @@ namespace DaylightingManager {
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
 		using namespace Vectors;
-		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		using DataEnvironment::SunIsUp;
 
@@ -893,8 +889,6 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const tmpDFCalc( 0.05 ); // cut off illuminance (lux) for exterior horizontal in calculating
-		// the daylighting and glare factors
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1142,7 +1136,6 @@ namespace DaylightingManager {
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
 		using namespace Vectors;
-		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		using DataEnvironment::SunIsUp;
 
@@ -1150,7 +1143,7 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const tmpDFCalc( 0.05 ); // cut off illuminance (lux) for exterior horizontal in calculating
+
 		// the daylighting and glare factors
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -2346,7 +2339,7 @@ namespace DaylightingManager {
 	InitializeCFSStateData(
 		BSDFRefPoints & StateRefPoint,
 		BSDFRefPointsGeomDescr & DaylghtGeomDescr,
-		int const ZoneNum, // Current zone number
+		int const EP_UNUSED( ZoneNum ), // Current zone number
 		int const iWin,
 		Array1A< Real64 > const RefPoint, // reference point
 		int const CurFenState,
@@ -2362,8 +2355,8 @@ namespace DaylightingManager {
 		Real64 const DWY,
 		Array1A< Real64 > const WNorm, // unit vector from window (point towards outside)
 		Real64 const WinElArea,
-		int const CalledFrom,
-		Optional_int_const MapNum
+		int const EP_UNUSED( CalledFrom ),
+		Optional_int_const EP_UNUSED( MapNum )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -8219,7 +8212,7 @@ namespace DaylightingManager {
 		int const IWin, // Window index
 		int const WinEl, // Current window element counter
 		int const IHR, // Hour of day
-		int const ZoneNum, // Zone number
+		int const EP_UNUSED( ZoneNum ), // Zone number
 		int const iRefPoint, // reference point index
 		int const CalledFrom,
 		Optional_int_const MapNum
@@ -8347,7 +8340,7 @@ namespace DaylightingManager {
 	void
 	DayltgDirectSunDiskComplexFenestration(
 		int const iWin, // Window index
-		int const ZoneNum, // Zone number
+		int const EP_UNUSED( ZoneNum ), // Zone number
 		int const iHour, // Hour of day
 		int const LoopWin,
 		int const iRefPoint,

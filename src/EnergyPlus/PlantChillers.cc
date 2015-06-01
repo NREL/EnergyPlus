@@ -173,7 +173,7 @@ namespace PlantChillers {
 	void
 	SimChiller(
 		int const LoopNum, // Flow control mode for the equipment
-		int const LoopSide, // chiller number pointer
+		int const EP_UNUSED( LoopSide ), // chiller number pointer
 		int const ChillerType, // type of chiller
 		std::string const & ChillerName, // user specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
@@ -3003,7 +3003,6 @@ namespace PlantChillers {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
-		bool LoopErrorsFound;
 		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -3305,7 +3304,6 @@ namespace PlantChillers {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
-		bool LoopErrorsFound;
 		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -3571,7 +3569,6 @@ namespace PlantChillers {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
-		bool LoopErrorsFound;
 		Real64 EngineEff; // this should be an input! needed to autosize the engine capacity.
 		std::string equipName;
 		Real64 rho; // local fluid density
@@ -3868,7 +3865,6 @@ namespace PlantChillers {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
-		bool LoopErrorsFound;
 		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -4103,9 +4099,7 @@ namespace PlantChillers {
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::SecInHour;
-		using DataGlobals::OutputFileDebug;
 		using DataGlobals::CurrentTime;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using General::RoundSigDigits;
@@ -4652,7 +4646,6 @@ namespace PlantChillers {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using CurveManager::CurveValue;
@@ -5255,7 +5248,6 @@ namespace PlantChillers {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using General::RoundSigDigits;
@@ -6336,9 +6328,7 @@ namespace PlantChillers {
 		int HeatRecInNode;
 		int HeatRecOutNode;
 		Real64 QTotal;
-		Real64 QCondTmp;
 		Real64 HeatRecMassFlowRate;
-		Real64 FracHeatRec;
 		Real64 TAvgIn;
 		Real64 TAvgOut;
 		Real64 CpHeatRec;

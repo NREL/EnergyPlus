@@ -94,7 +94,7 @@ namespace ElectricBaseboardRadiator {
 	void
 	SimElecBaseboard(
 		std::string const & EquipName,
-		int const ActualZoneNum,
+		int const EP_UNUSED( ActualZoneNum ),
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
 		Real64 & PowerMet,
@@ -217,7 +217,6 @@ namespace ElectricBaseboardRadiator {
 		using namespace DataIPShortCuts;
 		using General::TrimSigDigits;
 		using DataSizing::AutoSize;
-		using DataSizing::FinalZoneSizing;
 		using DataSizing::HeatingDesignCapacity;
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
@@ -246,7 +245,6 @@ namespace ElectricBaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
 		int BaseboardNum;
-		int ElecBBNum;
 		int NumAlphas;
 		int NumNumbers;
 		int SurfNum; // surface number that radiant heat delivered
@@ -719,7 +717,7 @@ namespace ElectricBaseboardRadiator {
 	void
 	CalcElectricBaseboard(
 		int const BaseboardNum,
-		int const ControlledZoneNum
+		int const EP_UNUSED( ControlledZoneNum )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -956,7 +954,6 @@ namespace ElectricBaseboardRadiator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // DO loop counter for surface index
-		int ZoneNum; // DO loop counter for surface index
 
 		// FLOW:
 		ElecBaseboardSysOn = false;
