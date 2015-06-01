@@ -195,7 +195,7 @@ namespace WaterUse {
 
 	void
 	SimulateWaterUseConnection(
-		int const EquipTypeNum,
+		int const EP_UNUSED( EquipTypeNum ),
 		std::string const & CompName,
 		int & CompIndex,
 		bool const InitLoopEquip,
@@ -946,7 +946,6 @@ namespace WaterUse {
 		// METHODOLOGY EMPLOYED:
 
 		// Using/Aliasing
-		using DataGlobals::SysSizingCalc;
 		using DataGlobals::DoingSizing;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataLoopNode::Node;
@@ -1486,7 +1485,6 @@ namespace WaterUse {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::Zone;
 
 		// Locals

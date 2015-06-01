@@ -85,7 +85,7 @@ namespace ICEngineElectricGenerator {
 
 	void
 	SimICEngineGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
@@ -156,7 +156,7 @@ namespace ICEngineElectricGenerator {
 
 	void
 	GetICEGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy
@@ -205,13 +205,13 @@ namespace ICEngineElectricGenerator {
 
 	void
 	SimICEPlantHeatRecovery(
-		std::string const & CompType,
+		std::string const & EP_UNUSED( CompType ),
 		std::string const & CompName,
-		int const CompTypeNum,
+		int const EP_UNUSED( CompTypeNum ),
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & MyLoad,
+		Real64 & EP_UNUSED( MyLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
@@ -536,7 +536,7 @@ namespace ICEngineElectricGenerator {
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
 		Real64 const MyLoad, // Generator demand
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -554,11 +554,9 @@ namespace ICEngineElectricGenerator {
 		// REFERENCES:na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using CurveManager::CurveValue;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using DataPlant::PlantLoop;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -597,13 +595,12 @@ namespace ICEngineElectricGenerator {
 		Real64 ExhaustEnergyRec; // exhaust gas heat recovered (J)
 		Real64 QExhaustTotal; // total engine exhaust heat (W)
 		Real64 ExhaustGasFlow; // exhaust gas mass flow rate (kg/s)
-		Real64 ExhaustStackTemp; // engine stack temp. (C)
+		Real64 ExhaustStackTemp( 0 ); // engine stack temp. (C)
 		Real64 DesignMinExitGasTemp; // design engine stact saturated steam temp. (C)
 		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
 		int HeatRecInNode; // Heat Recovery Fluid Inlet Node Num
 		Real64 HeatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
 		Real64 HeatRecMdot; // Heat Recovery Fluid Mass FlowRate (kg/s)
-		Real64 HeatRecCp; // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 		Real64 HRecRatio; // When Max Temp is reached the amount of recovered heat has to be reduced.
 		// and this assumption uses this ratio to accomplish this task.
 
@@ -615,7 +612,6 @@ namespace ICEngineElectricGenerator {
 		if ( ICEngineGenerator( GeneratorNum ).HeatRecActive ) {
 			HeatRecInNode = ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum;
 			HeatRecInTemp = Node( HeatRecInNode ).Temp;
-			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 			HeatRecMdot = Node( HeatRecInNode ).MassFlowRate;
 
 		} else {
@@ -795,7 +791,6 @@ namespace ICEngineElectricGenerator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HeatRecInNode;
-		int HeatRecOutNode;
 		Real64 MinHeatRecMdot;
 		Real64 HeatRecInTemp;
 		Real64 HeatRecOutTemp;
@@ -803,7 +798,6 @@ namespace ICEngineElectricGenerator {
 
 		//Load inputs to local structure
 		HeatRecInNode = ICEngineGenerator( Num ).HeatRecInletNodeNum;
-		HeatRecOutNode = ICEngineGenerator( Num ).HeatRecOutletNodeNum;
 
 		//Need to set the HeatRecRatio to 1.0 if it is not modified
 		HRecRatio = 1.0;
@@ -858,7 +852,7 @@ namespace ICEngineElectricGenerator {
 	InitICEngineGenerators(
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
-		Real64 const MyLoad, // Generator demand
+		Real64 const EP_UNUSED( MyLoad ), // Generator demand
 		bool const FirstHVACIteration
 	)
 	{
@@ -988,7 +982,7 @@ namespace ICEngineElectricGenerator {
 
 	void
 	UpdateICEngineGeneratorRecords(
-		bool const RunFlag, // TRUE if Generator operating
+		bool const EP_UNUSED( RunFlag ), // TRUE if Generator operating
 		int const Num // Generator number
 	)
 	{
@@ -1015,11 +1009,9 @@ namespace ICEngineElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int HeatRecInletNode;
 		int HeatRecOutletNode;
 
 		if ( ICEngineGenerator( Num ).HeatRecActive ) {
-			HeatRecInletNode = ICEngineGenerator( Num ).HeatRecInletNodeNum;
 			HeatRecOutletNode = ICEngineGenerator( Num ).HeatRecOutletNodeNum;
 			//      Node(HeatRecOutletNode)%MassFlowRate            = ICEngineGenerator(Num)%HeatRecMdotActual
 			Node( HeatRecOutletNode ).Temp = ICEngineGenerator( Num ).HeatRecOutletTemp;

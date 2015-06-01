@@ -109,7 +109,6 @@ namespace PlantLoopSolver {
 		using PlantPressureSystem::SimPressureDropSystem;
 		using DataPlant::DemandSide;
 		using DataPlant::SupplySide;
-		using DataPlant::TotNumLoops;
 		using DataPlant::FlowPumpQuery;
 		using DataPlant::FlowUnlocked;
 		using DataPlant::FlowLocked;
@@ -570,8 +569,6 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const ThisSideFlowIndex( 1 );
-		int const OtherSideFlowIndex( 2 );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 		int LoopCounter;
@@ -1891,7 +1888,6 @@ namespace PlantLoopSolver {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_PumpVariableSpeed;
 		using DataPlant::TypeOf_PumpBankVariableSpeed;
-		using DataBranchAirLoopPlant::ControlType_Unknown;
 		using DataBranchAirLoopPlant::ControlType_Active;
 		using DataBranchAirLoopPlant::ControlType_Passive;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
@@ -2831,7 +2827,6 @@ namespace PlantLoopSolver {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::BeginEnvrnFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;

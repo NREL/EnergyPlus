@@ -250,7 +250,6 @@ namespace HVACHXAssistedCoolingCoil {
 		using InputProcessor::SameString;
 		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
@@ -822,7 +821,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	CheckHXAssistedCoolingCoilSchedule(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
@@ -1800,7 +1799,6 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
-		static int ErrCount( 0 );
 
 		// Obtains and allocates HXAssistedCoolingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { // First time subroutine has been called, get input data

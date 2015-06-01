@@ -229,7 +229,6 @@ namespace InputProcessor {
 		int CountErr;
 		int Num1;
 		int Which;
-		int endcol;
 		int write_stat;
 		int read_stat;
 
@@ -2175,8 +2174,6 @@ namespace InputProcessor {
 		std::string cfld1;
 		std::string cfld2;
 		bool GoodItem;
-		int NAfld;
-		int NNfld;
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		NumAlphas = 0; //Autodesk:Uninit Force default initialization
@@ -3182,7 +3179,6 @@ namespace InputProcessor {
 		if ( StringLen == 0 ) return rProcessNumber;
 		int IoStatus( 0 );
 		if ( PString.find_first_not_of( ValidNumerics ) == std::string::npos ) {
-			Real64 Temp;
 			{ IOFlags flags; gio::read( PString, fmtLD, flags ) >> rProcessNumber; IoStatus = flags.ios(); }
 			ErrorFlag = false;
 		} else {

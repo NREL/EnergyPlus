@@ -229,13 +229,7 @@ namespace EMSManager {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using DataGlobals::WarmupFlag;
-		using DataGlobals::DoingSizing;
-		using DataGlobals::ZoneTSReporting;
-		using DataGlobals::HVACTSReporting;
-		using DataGlobals::KickOffSimulation;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
-		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::emsCallFromSetupSimulation;
 		using DataGlobals::emsCallFromExternalInterface;
 		using DataGlobals::emsCallFromBeginNewEvironment;
@@ -244,11 +238,8 @@ namespace EMSManager {
 		using RuntimeLanguageProcessor::EvaluateStack;
 		using RuntimeLanguageProcessor::BeginEnvrnInitializeRuntimeLanguage;
 		using OutputProcessor::MeterType;
-		using OutputProcessor::NumEnergyMeters;
-		using OutputProcessor::EnergyMeters;
 		using OutputProcessor::RealVariables;
 		using OutputProcessor::RealVariableType;
-		using OutputProcessor::NumOfRVariable;
 		using OutputProcessor::RVar;
 		using OutputProcessor::RVariableTypes;
 
@@ -376,7 +367,6 @@ namespace EMSManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::BeginEnvrnFlag;

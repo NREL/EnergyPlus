@@ -208,7 +208,6 @@ namespace FluidProperties {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const TempToler( 0.1 ); // Some reasonable value for comparisons
 		Real64 const PressToler( 1.0 ); // Some reasonable value for comparisons
 		int const DefaultNumGlyTemps( 33 ); // Temperature dimension of default glycol data
 		int const DefaultNumGlyConcs( 10 ); // Concentration dimension of default glycol data
@@ -247,7 +246,6 @@ namespace FluidProperties {
 		int NumOfConcPts;
 		static bool ErrorsFound( false );
 		int Index;
-		int i;
 		int NumOfGlyConcs;
 		bool GlycolFound;
 		int NumOfOptionalInput;
@@ -3435,8 +3433,6 @@ namespace FluidProperties {
 		Real64 TempInterpRatio; // ratio to interpolate in temperature domain
 		// error counters and dummy string
 		bool ErrorFlag; // error flag for current call
-		static int TempRangeErrCount( 0 ); // cumulative error counter
-		static int TempRangeErrIndex( 0 );
 
 		// FLOW:
 		if ( GetInput ) {
@@ -3550,8 +3546,6 @@ namespace FluidProperties {
 		Real64 PresInterpRatio; // ratio to interpolate in temperature domain
 		// error counters and dummy string
 		bool ErrorFlag; // error flag for current call
-		static int PresRangeErrCount( 0 ); // cumulative error counter
-		static int PresRangeErrIndex( 0 );
 
 		// FLOW:
 		if ( GetInput ) {
@@ -3755,8 +3749,6 @@ namespace FluidProperties {
 		bool ErrorFlag; // error flag for current call
 
 		// error counters and dummy string
-		static int TempRangeErrCount( 0 ); // cumulative error counter
-		static int TempRangeErrIndex( 0 ); // cumulative error counter
 
 		// FLOW:
 		if ( GetInput ) {
@@ -4008,12 +4000,7 @@ namespace FluidProperties {
 		int ErrCount; // error counter for current call
 		int CurTempRangeErrCount; // error counter for current call
 		int CurPresRangeErrCount; // error counter for current call
-		static int TempRangeErrCount( 0 );
-		static int TempRangeErrIndex( 0 );
-		static int PresRangeErrCount( 0 );
-		static int PresRangeErrIndex( 0 );
 		static int SatErrCount( 0 );
-		static int SatErrIndex( 0 );
 
 		// see if data is there
 		if ( GetInput ) {
@@ -4214,7 +4201,6 @@ namespace FluidProperties {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETERS:
-		Real64 const EnthalpyDiff( 0.01 ); // Allows a 1% difference in the enthalpy input and
 		// the enthalpy calculated from the pressure found
 		static std::string const RoutineName( "GetSupHeatPressureRefrig: " );
 		static std::string const RoutineNameNoSpace( "GetSupHeatPressureRefrig:" );
@@ -4254,12 +4240,6 @@ namespace FluidProperties {
 		int HiEnthalpyIndex; // Index value of higher enthalpy from data
 
 		// error counters and dummy string
-		static int TempRangeErrCount( 0 );
-		static int EnthalpyRangeErrCount( 0 );
-		static int SatErrCount( 0 );
-		static int TempRangeErrIndex( 0 );
-		static int EnthalpyRangeErrIndex( 0 );
-		static int SatErrIndex( 0 );
 		int ErrCount; // error counter for current call
 		int CurTempRangeErrCount; // error counter for current call
 		int CurEnthalpyRangeErrCount; // error counter for current call
@@ -4524,12 +4504,7 @@ namespace FluidProperties {
 		int RefrigNum; // index for refrigerant under consideration
 		int TempIndex; // low index value of Temperature from table
 		// error counters and dummy string
-		static int TempRangeErrCount( 0 );
-		static int PresRangeErrCount( 0 );
 		static int SatErrCount( 0 );
-		static int TempRangeErrIndex( 0 );
-		static int PresRangeErrIndex( 0 );
-		static int SatErrIndex( 0 );
 		int ErrCount; // error counter for current call
 		int CurTempRangeErrCount; // error counter for current call
 		int CurPresRangeErrCount; // error counter for current call
@@ -4743,8 +4718,6 @@ namespace FluidProperties {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static int HighTempLimitErr( 0 );
 		static int LowTempLimitErr( 0 );
-		static int HighTempLimitIndex( 0 );
-		static int LowTempLimitIndex( 0 );
 
 		// Get the input if we haven't already
 		if ( GetInput ) {
@@ -4870,9 +4843,7 @@ namespace FluidProperties {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Loop; // DO loop counter
 		static int HighTempLimitErr( 0 );
-		static int HighTempLimitIndex( 0 );
 		static int LowTempLimitErr( 0 );
-		static int LowTempLimitIndex( 0 );
 		int GlycolNum;
 		bool LowErrorThisTime;
 		bool HighErrorThisTime;
@@ -5014,8 +4985,6 @@ namespace FluidProperties {
 		int Loop; // DO loop counter
 		static int HighTempLimitErr( 0 );
 		static int LowTempLimitErr( 0 );
-		static int HighTempLimitIndex( 0 );
-		static int LowTempLimitIndex( 0 );
 		int GlycolNum;
 		bool LowErrorThisTime;
 		bool HighErrorThisTime;
@@ -5156,9 +5125,7 @@ namespace FluidProperties {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Loop; // DO loop counter
 		static int HighTempLimitErr( 0 );
-		static int HighTempLimitIndex( 0 );
 		static int LowTempLimitErr( 0 );
-		static int LowTempLimitIndex( 0 );
 		int GlycolNum;
 		bool LowErrorThisTime;
 		bool HighErrorThisTime;

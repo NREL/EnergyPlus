@@ -234,7 +234,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHfgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
+		Real64 const EP_UNUSED( w ), // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -267,7 +267,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
+		Real64 const EP_UNUSED( w ), // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -1232,7 +1232,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	CPCW(
-		Real64 const Temperature // unused1208
+		Real64 const EP_UNUSED( Temperature ) // unused1208
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1248,7 +1248,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	CPHW(
-		Real64 const Temperature // unused1208
+		Real64 const EP_UNUSED( Temperature ) // unused1208
 	)
 	{
 		// FUNCTION INFORMATION:

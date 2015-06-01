@@ -206,7 +206,7 @@ namespace ReturnAirPathManager {
 	}
 
 	void
-	InitReturnAirPath( int & ReturnAirPathNum ) // unused1208
+	InitReturnAirPath( int & EP_UNUSED( ReturnAirPathNum ) ) // unused1208
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Russ Taylor
@@ -243,7 +243,6 @@ namespace ReturnAirPathManager {
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkFanActivated;
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
-		using DataHVACGlobals::TurnFansOn;
 
 		// Locals
 		int ComponentNum;
@@ -274,7 +273,7 @@ namespace ReturnAirPathManager {
 	}
 
 	void
-	ReportReturnAirPath( int & ReturnAirPathNum ) // unused1208
+	ReportReturnAirPath( int & EP_UNUSED( ReturnAirPathNum ) ) // unused1208
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Russ Taylor

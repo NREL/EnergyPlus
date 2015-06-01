@@ -298,9 +298,9 @@ namespace PlantComponentTemperatureSources {
 	void
 	InitWaterSource(
 		int const SourceNum, // number of the current component being simulated
-		bool const RunFlag, // TRUE when component operating
+		bool const EP_UNUSED( RunFlag ), // TRUE when component operating
 		Real64 const MyLoad,
-		bool const FirstHVACIteration // initialize variables when TRUE
+		bool const EP_UNUSED( FirstHVACIteration ) // initialize variables when TRUE
 	)
 	{
 
@@ -321,10 +321,8 @@ namespace PlantComponentTemperatureSources {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -583,10 +581,6 @@ namespace PlantComponentTemperatureSources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-		int LoopNum;
-		int LoopSideNum;
 		Real64 Cp;
 		Real64 rDummy;
 		int iDummy;

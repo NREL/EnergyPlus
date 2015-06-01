@@ -846,7 +846,7 @@ namespace DataPlant {
 		std::string const & CompType, // component description
 		std::string const & CompName, // user name of component
 		int const NodeNumIn, // component water inlet node
-		int const NodeNumOut, // component water outlet node
+		int const EP_UNUSED( NodeNumOut ), // component water outlet node
 		bool & ErrorsFound, // set to true if there's an error
 		Optional_bool_const SupressErrors // used for WSHP's where condenser loop may not be on a plant loop
 	)
@@ -936,6 +936,35 @@ namespace DataPlant {
 
 		return MyPltSizNum;
 
+	}
+
+	bool
+	verifyTwoNodeNumsOnSamePlantLoop(
+		int const nodeIndexA,
+		int const nodeIndexB
+	)
+	{
+		// this function simply searches across plant loops looking for node numbers
+		// it returns true if the two nodes are found to be on the same loop
+		// it returns false otherwise
+		// because this is a nested loop, there's no reason it should be called except in one-time fashion
+		int matchedIndexA = 0;
+		int matchedIndexB = 0;
+		for ( int loopNum = 1; loopNum <= TotNumLoops; loopNum++ ) {
+			for ( auto & loopSide : PlantLoop( loopNum ).LoopSide ) {
+				for ( auto & branch : loopSide.Branch ) {
+					for ( auto & comp : branch.Comp ) {
+						if ( comp.NodeNumIn == nodeIndexA || comp.NodeNumOut == nodeIndexA ) {
+							matchedIndexA = loopNum;
+						}
+						if ( comp.NodeNumIn == nodeIndexB || comp.NodeNumOut == nodeIndexB ) {
+							matchedIndexB = loopNum;
+						}
+					}
+				}
+			}
+		}
+		return ( matchedIndexA == matchedIndexB ) && ( matchedIndexA != 0 ); // only return true if both are equal and non-zero
 	}
 
 	//     NOTICE

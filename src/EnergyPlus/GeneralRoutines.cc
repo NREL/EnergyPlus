@@ -906,7 +906,6 @@ CalcPassiveExteriorBaffleGap(
 	using namespace DataPrecisionGlobals;
 	using DataEnvironment::SkyTemp;
 	using DataEnvironment::WindSpeedAt;
-	using DataEnvironment::SunIsUp;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::IsRain;
 	// USE DataLoopNode    , ONLY: Node
@@ -931,7 +930,6 @@ CalcPassiveExteriorBaffleGap(
 	Real64 const g( 9.807 ); // gravitational constant (m/s**2)
 	Real64 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
 	Real64 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
-	Real64 const Pr( 0.71 ); // Prandtl number for air
 	Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 	Real64 const KelvinConv( 273.15 ); // Conversion from Celsius to Kelvin
 	static std::string const RoutineName( "CalcPassiveExteriorBaffleGap" );
@@ -1324,7 +1322,6 @@ TestAirPathIntegrity( bool & ErrFound )
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::OutputFileBNDetails;
 	using namespace DataLoopNode;
 	using DataHVACGlobals::NumPrimaryAirSys;
 	using DataAirLoop::AirToZoneNodeInfo;

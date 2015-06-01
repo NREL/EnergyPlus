@@ -110,7 +110,7 @@ namespace Humidifiers {
 	void
 	SimHumidifier(
 		std::string const & CompName, // name of the humidifier unit
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		bool const EP_UNUSED( FirstHVACIteration ), // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex // Pointer to Humidifier Unit
 	)
 	{
@@ -504,7 +504,6 @@ namespace Humidifiers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumHum;
 
 		//static bool MySetPointCheckFlag( true );
 
@@ -601,7 +600,6 @@ namespace Humidifiers {
 		using DataSizing::CurDuctType;
 		using DataSizing::FinalZoneSizing;
 		using DataSizing::FinalSysSizing;
-		using DataSizing::AutoVsHardSizingDeltaTempThreshold;
 		using DataSizing::AutoVsHardSizingThreshold;
 		using DataHVACGlobals::Main;
 		using DataHVACGlobals::Cooling;
@@ -624,7 +622,6 @@ namespace Humidifiers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string ModuleObjectType; // for ease in getting objects
-		int NumHum;
 		int RefrigerantIndex; // refiferant index
 		int WaterIndex; // fluid type index
 		Real64 NominalPower; // Nominal power input to humidifier, W
@@ -1050,9 +1047,9 @@ namespace Humidifiers {
 		Real64 HumRatSatApp; // the approximate humidity ratio where the line drawn between inlet and desired outlet conditions
 		// crosses the saturation line.
 		Real64 WaterDens; // density of liquid water [kg/m3]
-		Real64 ThermEffCurveOutput; // thermal efficiency modifier normalized curve output value [-]
+		Real64 ThermEffCurveOutput( 0 ); // thermal efficiency modifier normalized curve output value [-]
 		Real64 PartLoadRatio; // gas fired humidifier part load ratio [-]
-		Real64 GasUseRateAtRatedEff; // gas use rate at rated thermal efficiency [W]
+		Real64 GasUseRateAtRatedEff( 0 ); // gas use rate at rated thermal efficiency [W]
 		Real64 WaterSpecHeatAvg; // specific heat of water [J/kgK]
 		Real64 SteamSatEnthalpy; // enthalpy of saturated steam at 100C [J/kg]
 		Real64 WaterSatEnthalpy; // enthalpy of saturated water at 100C [J/kg]
@@ -1204,7 +1201,6 @@ namespace Humidifiers {
 				TankSupplyVdot = AvailTankVdot;
 			}
 
-			TankSupplyVdot = TankSupplyVdot;
 			TankSupplyVol = TankSupplyVdot * ( TimeStepSys * SecInHour );
 			StarvedSupplyVdot = StarvedVdot;
 			StarvedSupplyVol = StarvedVdot * ( TimeStepSys * SecInHour );

@@ -361,7 +361,6 @@ namespace EconomicTariff {
 		using DataGlobals::NumOfTimeStepInHour;
 		using OutputReportTabular::AddTOCEntry;
 		using OutputProcessor::EnergyMeters;
-		using OutputProcessor::NumEnergyMeters;
 		using DataGlobalConstants::AssignResourceTypeNum;
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
@@ -2592,7 +2591,6 @@ namespace EconomicTariff {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::OutputFileInits;
 		using OutputReportTabular::IntToStr;
 
 		// Locals
@@ -3001,8 +2999,6 @@ namespace EconomicTariff {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
 		using DataGlobals::TimeStepZoneSec;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -5457,7 +5453,6 @@ namespace EconomicTariff {
 
 		// Using/Aliasing
 		using OutputProcessor::EnergyMeters;
-		using OutputProcessor::NumEnergyMeters;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
