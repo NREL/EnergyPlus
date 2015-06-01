@@ -47320,6 +47320,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \default 13.5
        \note Evaporator inlet air wet-bulb temperature corresponding to rated coil performance
        \note (heating capacity, COP and SHR).
+  N6 , \field Rated Condenser Inlet Water Temperature
        \type real
        \units C
        \minimum> 25
