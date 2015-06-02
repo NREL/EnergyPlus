@@ -154,6 +154,7 @@ namespace ZoneAirLoopEquipmentManager {
 		//  CALL RecordZoneAirLoopEquipment
 
 		//  CALL ReportZoneAirLoopEquipment
+		ReportZoneAirLoopEquipment( AirDistUnitNum );
 
 		SimZone = false;
 
