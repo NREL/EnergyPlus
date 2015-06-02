@@ -19,7 +19,7 @@ namespace Pipes {
 
 	class LocalPipeData : public PlantComponent
 	{
-	public:
+
 		// Members
 		int InletNodeNum; // Node number on the inlet side of the plant
 		int OutletNodeNum; // Node number on the inlet side of the plant
@@ -38,7 +38,10 @@ namespace Pipes {
 			CompIndex( 0 )
 		{}
 
+	public:
 		static std::shared_ptr<PlantComponent> pipeFactory( int objectType, std::string objectName );
+
+	private: // methods implemented from base class
 		int performEveryTimeInit();
 		int performOneTimeInit();
 		int performBeginEnvrnInit();
@@ -47,7 +50,6 @@ namespace Pipes {
 
 	};
 
-	// Object Data
 	extern Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
 
 	//     NOTICE

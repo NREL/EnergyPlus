@@ -64,9 +64,6 @@ namespace PipeHeatTransfer {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataPlant::TypeOf_PipeExterior;
-	using DataPlant::TypeOf_PipeInterior;
-	using DataPlant::TypeOf_PipeUnderground;
 
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
@@ -98,29 +95,10 @@ namespace PipeHeatTransfer {
 		// from the user input file.  This will contain all of the information
 		// needed to define and simulate the surface.
 		
-		using DataGlobals::NumOfZones;
-		using DataGlobals::SecInHour;
-		using DataGlobals::Pi;
-		using DataHeatBalance::Construct;
-		using DataHeatBalance::TotConstructs;
-		using DataHeatBalance::Zone;
-		using DataHeatBalance::Material;
-		using DataHeatBalance::TotMaterials;
-		using DataHeatBalance::IntGainTypeOf_PipeIndoor;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
-		using NodeInputManager::GetOnlySingleNode;
-		using BranchNodeConnections::TestCompSet;
-		using General::RoundSigDigits;
-		using namespace DataLoopNode;
-		using ScheduleManager::GetScheduleIndex;
-		using OutAirNodeManager::CheckOutAirNodeNumber;
 
 		int const NumPipeSections( 20 );
 		int const NumberOfDepthNodes( 8 ); // Number of nodes in the cartesian grid-Should be an even # for now
-		Real64 const SecondsInHour( SecInHour );
 		Real64 const HoursInDay( 24.0 );
 
 		bool found = false;
@@ -146,11 +124,11 @@ namespace PipeHeatTransfer {
 				}
 
 				thisPipe->Name = cAlphaArgs( 1 );
-				thisPipe->TypeOf = TypeOf_PipeExterior;
+				thisPipe->compType = DataPlant::TypeOf_PipeExterior;
 
 				// General user input data
 				thisPipe->Construction = cAlphaArgs( 2 );
-				thisPipe->ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				thisPipe->ConstructionNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), DataHeatBalance::Construct.Name(), DataHeatBalance::TotConstructs );
 
 				if ( thisPipe->ConstructionNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -160,7 +138,7 @@ namespace PipeHeatTransfer {
 
 				//get inlet node data
 				thisPipe->InletNode = cAlphaArgs( 3 );
-				thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				thisPipe->InletNodeNum = NodeInputManager::GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
 				if ( thisPipe->InletNodeNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -169,22 +147,22 @@ namespace PipeHeatTransfer {
 
 				// get outlet node data
 				thisPipe->OutletNode = cAlphaArgs( 4 );
-				thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				thisPipe->OutletNodeNum = NodeInputManager::GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
 				if ( thisPipe->OutletNodeNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 
-				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Pipe Nodes" );
+				BranchNodeConnections::TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Pipe Nodes" );
 
 				// get environmental boundary condition type
 				thisPipe->EnvironmentPtr = OutsideAirEnv;
 
 				thisPipe->EnvrAirNode = cAlphaArgs( 5 );
-				thisPipe->EnvrAirNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				thisPipe->EnvrAirNodeNum = NodeInputManager::GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_OutsideAirReference, 1, DataLoopNode::ObjectIsNotParent );
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					if ( ! CheckOutAirNodeNumber( thisPipe->EnvrAirNodeNum ) ) {
+					if ( ! OutAirNodeManager::CheckOutAirNodeNumber( thisPipe->EnvrAirNodeNum ) ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ShowContinueError( "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node" );
@@ -200,7 +178,7 @@ namespace PipeHeatTransfer {
 				// dimensions
 				thisPipe->PipeID = rNumericArgs( 1 );
 				if ( rNumericArgs( 1 ) <= 0.0 ) { // not really necessary because idd field has "minimum> 0"
-					ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + " of " + RoundSigDigits( rNumericArgs( 1 ), 4 ) );
+					ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + " of " + General::RoundSigDigits( rNumericArgs( 1 ), 4 ) );
 					ShowContinueError( cNumericFieldNames( 1 ) + " must be > 0.0" );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -208,7 +186,7 @@ namespace PipeHeatTransfer {
 
 				thisPipe->Length = rNumericArgs( 2 );
 				if ( rNumericArgs( 2 ) <= 0.0 ) { // not really necessary because idd field has "minimum> 0"
-					ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + " of " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+					ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + " of " + General::RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 					ShowContinueError( cNumericFieldNames( 2 ) + " must be > 0.0" );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -237,11 +215,11 @@ namespace PipeHeatTransfer {
 				}
 
 				thisPipe->Name = cAlphaArgs( 1 );
-				thisPipe->TypeOf = TypeOf_PipeInterior;
+				thisPipe->compType = DataPlant::TypeOf_PipeInterior;
 
 				// General user input data
 				thisPipe->Construction = cAlphaArgs( 2 );
-				thisPipe->ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				thisPipe->ConstructionNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), DataHeatBalance::Construct.Name(), DataHeatBalance::TotConstructs );
 
 				if ( thisPipe->ConstructionNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -251,7 +229,7 @@ namespace PipeHeatTransfer {
 
 				//get inlet node data
 				thisPipe->InletNode = cAlphaArgs( 3 );
-				thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				thisPipe->InletNodeNum = NodeInputManager::GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
 				if ( thisPipe->InletNodeNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -260,37 +238,35 @@ namespace PipeHeatTransfer {
 
 				// get outlet node data
 				thisPipe->OutletNode = cAlphaArgs( 4 );
-				thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				thisPipe->OutletNodeNum = NodeInputManager::GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
 				if ( thisPipe->OutletNodeNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 
-				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Pipe Nodes" );
+				BranchNodeConnections::TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Pipe Nodes" );
 
 				// get environmental boundary condition type
 
 				if ( lAlphaFieldBlanks( 5 ) ) cAlphaArgs( 5 ) = "ZONE";
 
-				{ auto const SELECT_CASE_var( cAlphaArgs( 5 ) );
-
-				if ( SELECT_CASE_var == "ZONE" ) {
+				if ( cAlphaArgs( 5 ) == "ZONE" ) {
 					thisPipe->EnvironmentPtr = ZoneEnv;
 					thisPipe->EnvrZone = cAlphaArgs( 6 );
-					thisPipe->EnvrZonePtr = FindItemInList( cAlphaArgs( 6 ), Zone.Name(), NumOfZones );
+					thisPipe->EnvrZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 6 ), DataHeatBalance::Zone.Name(), DataGlobals::NumOfZones );
 					if ( thisPipe->EnvrZonePtr == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 
-				} else if ( SELECT_CASE_var == "SCHEDULE" ) {
+				} else if ( cAlphaArgs( 5 ) == "SCHEDULE" ) {
 					thisPipe->EnvironmentPtr = ScheduleEnv;
 					thisPipe->EnvrSchedule = cAlphaArgs( 7 );
-					thisPipe->EnvrSchedPtr = GetScheduleIndex( thisPipe->EnvrSchedule );
+					thisPipe->EnvrSchedPtr = ScheduleManager::GetScheduleIndex( thisPipe->EnvrSchedule );
 					thisPipe->EnvrVelSchedule = cAlphaArgs( 8 );
-					thisPipe->EnvrVelSchedPtr = GetScheduleIndex( thisPipe->EnvrVelSchedule );
+					thisPipe->EnvrVelSchedPtr = ScheduleManager::GetScheduleIndex( thisPipe->EnvrVelSchedule );
 					if ( thisPipe->EnvrSchedPtr == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -308,12 +284,12 @@ namespace PipeHeatTransfer {
 					ShowContinueError( "Should be \"ZONE\" or \"SCHEDULE\"" ); //TODO rename point
 					ErrorsFound = true;
 
-				}}
+				}
 
 				// dimensions
 				thisPipe->PipeID = rNumericArgs( 1 );
 				if ( rNumericArgs( 1 ) <= 0.0 ) { // not really necessary because idd field has "minimum> 0"
-					ShowSevereError( "GetPipesHeatTransfer: invalid " + cNumericFieldNames( 1 ) + " of " + RoundSigDigits( rNumericArgs( 1 ), 4 ) );
+					ShowSevereError( "GetPipesHeatTransfer: invalid " + cNumericFieldNames( 1 ) + " of " + General::RoundSigDigits( rNumericArgs( 1 ), 4 ) );
 					ShowContinueError( cNumericFieldNames( 1 ) + " must be > 0.0" );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -321,7 +297,7 @@ namespace PipeHeatTransfer {
 
 				thisPipe->Length = rNumericArgs( 2 );
 				if ( rNumericArgs( 2 ) <= 0.0 ) { // not really necessary because idd field has "minimum> 0"
-					ShowSevereError( "GetPipesHeatTransfer: invalid " + cNumericFieldNames( 2 ) + " of " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+					ShowSevereError( "GetPipesHeatTransfer: invalid " + cNumericFieldNames( 2 ) + " of " + General::RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 					ShowContinueError( cNumericFieldNames( 2 ) + " must be > 0.0" );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -350,11 +326,11 @@ namespace PipeHeatTransfer {
 				}
 
 				thisPipe->Name = cAlphaArgs( 1 );
-				thisPipe->TypeOf = TypeOf_PipeUnderground;
+				thisPipe->compType = DataPlant::TypeOf_PipeUnderground;
 
 				// General user input data
 				thisPipe->Construction = cAlphaArgs( 2 );
-				thisPipe->ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				thisPipe->ConstructionNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), DataHeatBalance::Construct.Name(), DataHeatBalance::TotConstructs );
 
 				if ( thisPipe->ConstructionNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -364,7 +340,7 @@ namespace PipeHeatTransfer {
 
 				//get inlet node data
 				thisPipe->InletNode = cAlphaArgs( 3 );
-				thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+				thisPipe->InletNodeNum = NodeInputManager::GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
 				if ( thisPipe->InletNodeNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -373,22 +349,22 @@ namespace PipeHeatTransfer {
 
 				// get outlet node data
 				thisPipe->OutletNode = cAlphaArgs( 4 );
-				thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+				thisPipe->OutletNodeNum = NodeInputManager::GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
 				if ( thisPipe->OutletNodeNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
 
-				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Pipe Nodes" );
+				BranchNodeConnections::TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Pipe Nodes" );
 
 				thisPipe->EnvironmentPtr = GroundEnv;
 
 				// Solar inclusion flag
 				// A6,  \field Sun Exposure
-				if ( SameString( cAlphaArgs( 5 ), "SUNEXPOSED" ) ) {
+				if ( InputProcessor::SameString( cAlphaArgs( 5 ), "SUNEXPOSED" ) ) {
 					thisPipe->SolarExposed = true;
-				} else if ( SameString( cAlphaArgs( 5 ), "NOSUN" ) ) {
+				} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "NOSUN" ) ) {
 					thisPipe->SolarExposed = false;
 				} else {
 					ShowSevereError( "GetPipesHeatTransfer: invalid key for sun exposure flag for " + cAlphaArgs( 1 ) );
@@ -399,7 +375,7 @@ namespace PipeHeatTransfer {
 				// dimensions
 				thisPipe->PipeID = rNumericArgs( 1 );
 				if ( rNumericArgs( 1 ) <= 0.0 ) { // not really necessary because idd field has "minimum> 0"
-					ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + " of " + RoundSigDigits( rNumericArgs( 1 ), 4 ) );
+					ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + " of " + General::RoundSigDigits( rNumericArgs( 1 ), 4 ) );
 					ShowContinueError( cNumericFieldNames( 1 ) + " must be > 0.0" );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -407,7 +383,7 @@ namespace PipeHeatTransfer {
 
 				thisPipe->Length = rNumericArgs( 2 );
 				if ( rNumericArgs( 2 ) <= 0.0 ) { // not really necessary because idd field has "minimum> 0"
-					ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + " of " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
+					ShowSevereError( "Invalid " + cNumericFieldNames( 2 ) + " of " + General::RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 					ShowContinueError( cNumericFieldNames( 2 ) + " must be > 0.0" );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -416,23 +392,23 @@ namespace PipeHeatTransfer {
 				// Also get the soil material name
 				// A7,  \field Soil Material
 				thisPipe->SoilMaterial = cAlphaArgs( 6 );
-				thisPipe->SoilMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material.Name(), TotMaterials );
+				thisPipe->SoilMaterialNum = InputProcessor::FindItemInList( cAlphaArgs( 6 ), DataHeatBalance::Material.Name(), DataHeatBalance::TotMaterials );
 				if ( thisPipe->SoilMaterialNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + thisPipe->SoilMaterial );
 					ShowContinueError( "Found in " + cCurrentModuleObject + '=' + thisPipe->Name );
 					ErrorsFound = true;
 				} else {
-					thisPipe->SoilDensity = Material( thisPipe->SoilMaterialNum ).Density;
-					thisPipe->SoilDepth = Material( thisPipe->SoilMaterialNum ).Thickness;
-					thisPipe->SoilCp = Material( thisPipe->SoilMaterialNum ).SpecHeat;
-					thisPipe->SoilConductivity = Material( thisPipe->SoilMaterialNum ).Conductivity;
-					thisPipe->SoilThermAbs = Material( thisPipe->SoilMaterialNum ).AbsorpThermal;
-					thisPipe->SoilSolarAbs = Material( thisPipe->SoilMaterialNum ).AbsorpSolar;
-					thisPipe->SoilRoughness = Material( thisPipe->SoilMaterialNum ).Roughness;
+					thisPipe->SoilDensity = DataHeatBalance::Material( thisPipe->SoilMaterialNum ).Density;
+					thisPipe->SoilDepth = DataHeatBalance::Material( thisPipe->SoilMaterialNum ).Thickness;
+					thisPipe->SoilCp = DataHeatBalance::Material( thisPipe->SoilMaterialNum ).SpecHeat;
+					thisPipe->SoilConductivity = DataHeatBalance::Material( thisPipe->SoilMaterialNum ).Conductivity;
+					thisPipe->SoilThermAbs = DataHeatBalance::Material( thisPipe->SoilMaterialNum ).AbsorpThermal;
+					thisPipe->SoilSolarAbs = DataHeatBalance::Material( thisPipe->SoilMaterialNum ).AbsorpSolar;
+					thisPipe->SoilRoughness = DataHeatBalance::Material( thisPipe->SoilMaterialNum ).Roughness;
 					thisPipe->PipeDepth = thisPipe->SoilDepth + thisPipe->PipeID / 2.0;
 					thisPipe->DomainDepth = thisPipe->PipeDepth * 2.0;
 					thisPipe->SoilDiffusivity = thisPipe->SoilConductivity / ( thisPipe->SoilDensity * thisPipe->SoilCp );
-					thisPipe->SoilDiffusivityPerDay = thisPipe->SoilDiffusivity * SecondsInHour * HoursInDay;
+					thisPipe->SoilDiffusivityPerDay = thisPipe->SoilDiffusivity * DataGlobals::SecInHour * HoursInDay;
 
 					// Mesh the cartesian domain
 					thisPipe->NumDepthNodes = NumberOfDepthNodes;
@@ -454,7 +430,7 @@ namespace PipeHeatTransfer {
 					if ( NumNumbers >= 4 ) {
 						thisPipe->AvgGndTempAmp = rNumericArgs( 4 );
 						if ( thisPipe->AvgGndTempAmp < 0.0 ) {
-							ShowSevereError( "Invalid " + cNumericFieldNames( 4 ) + '=' + RoundSigDigits( thisPipe->AvgGndTempAmp, 2 ) );
+							ShowSevereError( "Invalid " + cNumericFieldNames( 4 ) + '=' + General::RoundSigDigits( thisPipe->AvgGndTempAmp, 2 ) );
 							ShowContinueError( "Found in " + cCurrentModuleObject + '=' + thisPipe->Name );
 							ErrorsFound = true;
 						}
@@ -464,7 +440,7 @@ namespace PipeHeatTransfer {
 					if ( NumNumbers >= 5 ) {
 						thisPipe->PhaseShiftDays = rNumericArgs( 5 );
 						if ( thisPipe->PhaseShiftDays < 0 ) {
-							ShowSevereError( "Invalid " + cNumericFieldNames( 5 ) + '=' + RoundSigDigits( thisPipe->PhaseShiftDays ) );
+							ShowSevereError( "Invalid " + cNumericFieldNames( 5 ) + '=' + General::RoundSigDigits( thisPipe->PhaseShiftDays ) );
 							ShowContinueError( "Found in " + cCurrentModuleObject + '=' + thisPipe->Name );
 							ErrorsFound = true;
 						}
@@ -511,14 +487,14 @@ namespace PipeHeatTransfer {
 		thisPipe->PreviousPipeTemp = 0.0;
 
 		// work out heat transfer areas (area per section)
-		thisPipe->InsideArea = Pi * thisPipe->PipeID * thisPipe->Length / thisPipe->NumSections;
-		thisPipe->OutsideArea = Pi * ( thisPipe->PipeOD + 2 * thisPipe->InsulationThickness ) * thisPipe->Length / thisPipe->NumSections;
+		thisPipe->InsideArea = DataGlobals::Pi * thisPipe->PipeID * thisPipe->Length / thisPipe->NumSections;
+		thisPipe->OutsideArea = DataGlobals::Pi * ( thisPipe->PipeOD + 2 * thisPipe->InsulationThickness ) * thisPipe->Length / thisPipe->NumSections;
 
 		// cross sectional area
-		thisPipe->SectionArea = Pi * 0.25 * pow_2( thisPipe->PipeID );
+		thisPipe->SectionArea = DataGlobals::Pi * 0.25 * pow_2( thisPipe->PipeID );
 
 		// pipe & insulation mass
-		thisPipe->PipeHeatCapacity = thisPipe->PipeCp * thisPipe->PipeDensity * ( Pi * 0.25 * pow_2( thisPipe->PipeOD ) - thisPipe->SectionArea ); // the metal component
+		thisPipe->PipeHeatCapacity = thisPipe->PipeCp * thisPipe->PipeDensity * ( DataGlobals::Pi * 0.25 * pow_2( thisPipe->PipeOD ) - thisPipe->SectionArea ); // the metal component
 
 		// Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
 		SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", thisPipe->FluidHeatLossRate, "Plant", "Average", thisPipe->Name );
@@ -527,7 +503,7 @@ namespace PipeHeatTransfer {
 		if ( thisPipe->EnvironmentPtr == ZoneEnv ) {
 			SetupOutputVariable( "Pipe Ambient Heat Transfer Rate [W]", thisPipe->EnvironmentHeatLossRate, "Plant", "Average", thisPipe->Name );
 			SetupOutputVariable( "Pipe Ambient Heat Transfer Energy [J]", thisPipe->EnvHeatLossEnergy, "Plant", "Sum", thisPipe->Name );
-			SetupZoneInternalGain( thisPipe->EnvrZonePtr, "Pipe:Indoor", thisPipe->Name, IntGainTypeOf_PipeIndoor, thisPipe->ZoneHeatGainRate );
+			SetupZoneInternalGain( thisPipe->EnvrZonePtr, "Pipe:Indoor", thisPipe->Name, DataHeatBalance::IntGainTypeOf_PipeIndoor, thisPipe->ZoneHeatGainRate );
 		}
 
 		SetupOutputVariable( "Pipe Mass Flow Rate [kg/s]", thisPipe->MassFlowRate, "Plant", "Average", thisPipe->Name );
@@ -638,7 +614,7 @@ namespace PipeHeatTransfer {
 		Real64 const LargeNumber( 9999.9 ); // Large number (compared to temperature values)
 
 		bool errFlag = false;
-		DataPlant::ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
+		DataPlant::ScanPlantLoopsForObject( this->Name, this->compType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 
 		//If there are any underground buried pipes, we must bring in data
 		if ( this->EnvironmentPtr == GroundEnv ) {
@@ -698,7 +674,7 @@ namespace PipeHeatTransfer {
 					for ( int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
 						for ( int WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 							Real64 CurrentDepth = ( DepthIndex - 1 ) * this->dSregular;
-							this->T( WidthIndex, DepthIndex, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay );
+							this->T( WidthIndex, DepthIndex, LengthIndex, TimeIndex ) = this->farfieldTemperature( CurrentDepth, CurSimDay );
 						}
 					}
 				}
@@ -738,30 +714,29 @@ namespace PipeHeatTransfer {
 					for ( int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
 						//Farfield boundary
 						Real64 CurrentDepth = ( DepthIndex - 1 ) * this->dSregular;
-						this->T( 1, DepthIndex, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay );
+						this->T( 1, DepthIndex, LengthIndex, TimeIndex ) = this->farfieldTemperature( CurrentDepth, CurSimDay );
 					}
 					for ( int WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 						//Bottom side of boundary
 						Real64 CurrentDepth = this->DomainDepth;
-						this->T( WidthIndex, this->NumDepthNodes, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay );
+						this->T( WidthIndex, this->NumDepthNodes, LengthIndex, TimeIndex ) = this->farfieldTemperature( CurrentDepth, CurSimDay );
 					}
 				}
 			}
 		}
 
 		// should next choose environment temperature according to coupled with air or ground
-		{ auto const SELECT_CASE_var( this->EnvironmentPtr );
-		if ( SELECT_CASE_var == GroundEnv ) {
-			//EnvironmentTemp = GroundTemp
-		} else if ( SELECT_CASE_var == OutsideAirEnv ) {
+		if ( this->EnvironmentPtr == GroundEnv ) {
+			//this->EnvironmentTemp = GroundTemp
+		} else if ( this->EnvironmentPtr == OutsideAirEnv ) {
 			this->EnvironmentTemp = DataEnvironment::OutDryBulbTemp;
-		} else if ( SELECT_CASE_var == ZoneEnv ) {
+		} else if ( this->EnvironmentPtr == ZoneEnv ) {
 			this->EnvironmentTemp = DataHeatBalFanSys::MAT( this->EnvrZonePtr );
-		} else if ( SELECT_CASE_var == ScheduleEnv ) {
+		} else if ( this->EnvironmentPtr == ScheduleEnv ) {
 			this->EnvironmentTemp = ScheduleManager::GetCurrentScheduleValue( this->EnvrSchedPtr );
-		} else if ( SELECT_CASE_var == None ) { //default to outside temp
+		} else if ( this->EnvironmentPtr == None ) { //default to outside temp
 			this->EnvironmentTemp = DataEnvironment::OutDryBulbTemp;
-		}}
+		}
 
 		// return value could be used to report success/failure
 		return 0;
@@ -769,14 +744,23 @@ namespace PipeHeatTransfer {
 
 	int
 	PipeHTData::simulate() {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   July 2007
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine uses the Kusuda-Achenbach correlation to return a farfield ground temperature
+
 		// make the calculations
 		for ( int InnerTimeStepCtr = 1; InnerTimeStepCtr <= this->NumInnerTimeSteps; ++InnerTimeStepCtr ) {
-			{ auto const SELECT_CASE_var( this->EnvironmentPtr );
-			if ( SELECT_CASE_var == GroundEnv ) {
+			if ( this->EnvironmentPtr == GroundEnv ) {
 				this->calcBuriedPipeSoil();
 			} else {
 				this->calcPipesHeatTransfer();
-			}}
+			}
 			this->pushInnerTimeStepArrays();
 		}
 		// update vaiables
@@ -907,22 +891,21 @@ namespace PipeHeatTransfer {
 
 		// heat transfer to air or ground
 		Real64 EnvHeatTransCoef;
-		{ auto const SELECT_CASE_var( this->EnvironmentPtr );
-		if ( SELECT_CASE_var == GroundEnv ) {
+		if ( this->EnvironmentPtr == GroundEnv ) {
 			//Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
 			// between pipe wall and next closest node.
 			EnvHeatTransCoef = this->SoilConductivity / ( this->dSregular - ( this->PipeID / 2.0 ) );
-		} else if ( SELECT_CASE_var == OutsideAirEnv ) {
+		} else if ( this->EnvironmentPtr == OutsideAirEnv ) {
 			EnvHeatTransCoef = AirConvCoef;
-		} else if ( SELECT_CASE_var == ZoneEnv ) {
+		} else if ( this->EnvironmentPtr == ZoneEnv ) {
 			EnvHeatTransCoef = AirConvCoef;
-		} else if ( SELECT_CASE_var == ScheduleEnv ) {
+		} else if ( this->EnvironmentPtr == ScheduleEnv ) {
 			EnvHeatTransCoef = AirConvCoef;
-		} else if ( SELECT_CASE_var == None ) {
+		} else if ( this->EnvironmentPtr == None ) {
 			EnvHeatTransCoef = 0.0;
 		} else {
 			EnvHeatTransCoef = 0.0;
-		}}
+		}
 
 		// work out the coefficients
 		Real64 FluidNodeHeatCapacity = this->SectionArea * this->Length / this->NumSections * this->FluidSpecHeat * this->FluidDensity; // Mass of Node x Specific heat
@@ -1008,26 +991,6 @@ namespace PipeHeatTransfer {
 		// is set up, which simulates transient behavior in the soil.
 		// This then interfaces with the Hanby model for near-pipe region
 
-		// REFERENCES: See Module Level Description
-
-		// Using/Aliasing
-		using DataLoopNode::Node;
-		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::SkyTemp;
-		using DataEnvironment::WindSpeed;
-		using DataEnvironment::BeamSolarRad;
-		using DataEnvironment::DifSolarRad;
-		using DataEnvironment::SOLCOS;
-		using DataGlobals::Pi;
-		using DataGlobals::TimeStep;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::KelvinConv;
-		using DataGlobals::rTinyValue;
-		using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const NumSections( 20 );
 		Real64 const ConvCrit( 0.05 );
@@ -1091,8 +1054,8 @@ namespace PipeHeatTransfer {
 
 							//If on soil boundary, load up local variables and perform calculations
 							NodePast = this->T( WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex );
-							PastNodeTempAbs = NodePast + KelvinConv;
-							SkyTempAbs = SkyTemp + KelvinConv;
+							PastNodeTempAbs = NodePast + DataGlobals::KelvinConv;
+							SkyTempAbs = DataEnvironment::SkyTemp + DataGlobals::KelvinConv;
 							TopRoughness = this->SoilRoughness;
 							TopThermAbs = this->SoilThermAbs;
 							TopSolarAbs = this->SoilSolarAbs;
@@ -1102,18 +1065,18 @@ namespace PipeHeatTransfer {
 							Cp = this->SoilCp;
 
 							// ASHRAE simple convection coefficient model for external surfaces.
-							this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff( TopRoughness, WindSpeed );
+							this->OutdoorConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff( TopRoughness, DataEnvironment::WindSpeed );
 							ConvCoef = this->OutdoorConvCoef;
 
 							// thermal radiation coefficient using surf temp from past time step
-							if ( std::abs( PastNodeTempAbs - SkyTempAbs ) > rTinyValue ) {
+							if ( std::abs( PastNodeTempAbs - SkyTempAbs ) > DataGlobals::rTinyValue ) {
 								RadCoef = StefBoltzmann * TopThermAbs * ( pow_4( PastNodeTempAbs ) - pow_4( SkyTempAbs ) ) / ( PastNodeTempAbs - SkyTempAbs );
 							} else {
 								RadCoef = 0.0;
 							}
 
 							// total absorbed solar - no ground solar
-							QSolAbsorbed = TopSolarAbs * ( max( SOLCOS( 3 ), 0.0 ) * BeamSolarRad + DifSolarRad );
+							QSolAbsorbed = TopSolarAbs * ( max( DataEnvironment::SOLCOS( 3 ), 0.0 ) * DataEnvironment::BeamSolarRad + DataEnvironment::DifSolarRad );
 
 							// If sun is not exposed, then turn off both solar and thermal radiation
 							if ( ! this->SolarExposed ) {
@@ -1128,7 +1091,7 @@ namespace PipeHeatTransfer {
 								NodeLeft = this->T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
 
 								//-Update Equation, basically a detailed energy balance at the surface
-								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + 2 * NodeLeft ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
+								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * DataEnvironment::SkyTemp + ConvCoef * DataEnvironment::OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + 2 * NodeLeft ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
 
 							} else { //Soil surface, but not on centerline
 
@@ -1138,7 +1101,7 @@ namespace PipeHeatTransfer {
 								NodeRight = this->T( WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex );
 
 								//-Update Equation
-								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + NodeLeft + NodeRight ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
+								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * DataEnvironment::SkyTemp + ConvCoef * DataEnvironment::OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + NodeLeft + NodeRight ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
 
 							} //Soil-to-air surface node structure
 
@@ -1207,7 +1170,16 @@ namespace PipeHeatTransfer {
 
 	void
 	PipeHTData::updatePipesHeatTransfer() {
-		
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   July 2007
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine updates the outlet node conditions
+
 		auto & outletNode = DataLoopNode::Node( this->OutletNodeNum );
 		auto & inletNode = DataLoopNode::Node( this->InletNodeNum );
 		
@@ -1234,9 +1206,16 @@ namespace PipeHeatTransfer {
 
 	void
 	PipeHTData::reportPipesHeatTransfer() {
-		// update flows and temps from module variables
-		//this->FluidInletTemp = this->InletTemp;
-		//this->FluidOutletTemp = this->OutletTemp;
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   July 2007
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine updates report variables for pipe heat transfer objects
+
 		this->MassFlowRate = this->MassFlowRate;
 		this->VolumeFlowRate = this->VolumeFlowRate;
 
@@ -1279,18 +1258,6 @@ namespace PipeHeatTransfer {
 		// Heat exchanger information also from Incropera and DeWitt.
 		// Code based loosely on code from IBLAST program (research version)
 
-		// Using/Aliasing
-		using DataGlobals::Pi;
-		using DataPlant::PlantLoop;
-		using FluidProperties::GetConductivityGlycol;
-		using FluidProperties::GetViscosityGlycol;
-
-		// Return value
-		Real64 CalcPipeHeatTransCoef;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "PipeHeatTransfer::CalcPipeHeatTransCoef: " );
 		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
@@ -1305,20 +1272,18 @@ namespace PipeHeatTransfer {
 		Real64 const Diameter = this->PipeID; // Pipe diameter, m
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int idx;
 		Real64 InterpFrac;
 		Real64 NuD;
 		Real64 ReD;
 		Real64 Kactual;
 		Real64 MUactual;
 		Real64 PRactual;
-		int LoopNum;
 
 		//retrieve loop index for this component so we can look up fluid properties
-		LoopNum = this->LoopNum;
+		auto thisLoop = DataPlant::PlantLoop( this->LoopNum );
 
 		//since the fluid properties routine doesn't have Prandtl, we'll just use water values
-		idx = 1;
+		int idx = 1;
 		while ( idx <= NumOfPropDivisions ) {
 			if ( Temperature < Temps( idx ) ) {
 				if ( idx == 1 ) {
@@ -1337,11 +1302,11 @@ namespace PipeHeatTransfer {
 		}
 
 		//look up conductivity and viscosity
-		Kactual = GetConductivityGlycol( PlantLoop( LoopNum ).FluidName, this->FluidTemp( 0 ), PlantLoop( LoopNum ).FluidIndex, RoutineName ); //W/m-K
-		MUactual = GetViscosityGlycol( PlantLoop( LoopNum ).FluidName, this->FluidTemp( 0 ), PlantLoop( LoopNum ).FluidIndex, RoutineName ) / 1000.0; //Note fluid properties routine returns mPa-s, we need Pa-s
+		Kactual = FluidProperties::GetConductivityGlycol( thisLoop.FluidName, this->FluidTemp( 0 ), thisLoop.FluidIndex, RoutineName ); //W/m-K
+		MUactual = FluidProperties::GetViscosityGlycol( thisLoop.FluidName, this->FluidTemp( 0 ), thisLoop.FluidIndex, RoutineName ) / 1000.0; //Note fluid properties routine returns mPa-s, we need Pa-s
 
 		// Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter) - as RadiantSysLowTemp
-		ReD = 4.0 * MassFlowRate / ( Pi * MUactual * Diameter );
+		ReD = 4.0 * MassFlowRate / ( DataGlobals::Pi * MUactual * Diameter );
 
 		if ( ReD == 0.0 ) { // No flow
 
@@ -1359,9 +1324,7 @@ namespace PipeHeatTransfer {
 
 		}
 
-		CalcPipeHeatTransCoef = Kactual * NuD / Diameter;
-
-		return CalcPipeHeatTransCoef;
+		return Kactual * NuD / Diameter;
 
 	}
 
@@ -1388,12 +1351,6 @@ namespace PipeHeatTransfer {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataEnvironment::WindSpeed;
 
-		// Return value
-		Real64 OutsidePipeHeatTransCoef;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Pr( 0.7 ); // Prandl number for air (assume constant)
 		Real64 const CondAir( 0.025 ); // thermal conductivity of air (assume constant) [W/m.K]
@@ -1402,7 +1359,7 @@ namespace PipeHeatTransfer {
 		//Nusselt for natural convection for horizontal cylinder
 		//from: Correlations for Convective Heat Transfer
 		//      Dr. Bernhard Spang
-		//      Chemical Engineers’ Resource Page: http://www.cheresources.com/convection.pdf
+		//      Chemical Engineers' Resource Page: http://www.cheresources.com/convection.pdf
 		int const NumOfParamDivisions( 5 ); // intervals in property correlation
 		int const NumOfPropDivisions( 12 ); // intervals in property correlation
 
@@ -1413,12 +1370,6 @@ namespace PipeHeatTransfer {
 
 		static Array1D< Real64 > const Temperature( NumOfPropDivisions, { -73.0, -23.0, -10.0, 0.0, 10.0, 20.0, 27.0, 30.0, 40.0, 50.0, 76.85, 126.85 } ); // temperature [C]
 		static Array1D< Real64 > const DynVisc( NumOfPropDivisions, { 75.52e-7, 11.37e-6, 12.44e-6, 13.3e-6, 14.18e-6, 15.08e-6, 15.75e-6, 16e-6, 16.95e-6, 17.91e-6, 20.92e-6, 26.41e-6 } ); // dynamic viscosity [m^2/s]
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int idx;
@@ -1434,29 +1385,26 @@ namespace PipeHeatTransfer {
 		bool CoefSet;
 
 		//Set environmental variables
-		{ auto const SELECT_CASE_var( this->TypeOf );
+		
+		if ( this->compType == DataPlant::TypeOf_PipeInterior ) {
 
-		if ( SELECT_CASE_var == TypeOf_PipeInterior ) {
-
-			{ auto const SELECT_CASE_var1( this->EnvironmentPtr );
-			if ( SELECT_CASE_var1 == ScheduleEnv ) {
+			if ( this->EnvironmentPtr == ScheduleEnv ) {
 				AirTemp = GetCurrentScheduleValue( this->EnvrSchedPtr );
 				AirVel = GetCurrentScheduleValue( this->EnvrVelSchedPtr );
 
-			} else if ( SELECT_CASE_var1 == ZoneEnv ) {
+			} else if ( this->EnvironmentPtr == ZoneEnv ) {
 				AirTemp = MAT( this->EnvrZonePtr );
 				AirVel = RoomAirVel;
-			}}
+			}
 
-		} else if ( SELECT_CASE_var == TypeOf_PipeExterior ) {
+		} else if ( this->compType == DataPlant::TypeOf_PipeExterior ) {
 
-			{ auto const SELECT_CASE_var1( this->EnvironmentPtr );
-			if ( SELECT_CASE_var1 == OutsideAirEnv ) {
+			if ( this->EnvironmentPtr == OutsideAirEnv ) {
 				AirTemp = Node( this->EnvrAirNodeNum ).Temp;
 				AirVel = WindSpeed;
-			}}
+			}
 
-		}}
+		}
 
 		PipeOD = this->InsulationOD;
 
@@ -1506,27 +1454,28 @@ namespace PipeHeatTransfer {
 		NuD = max( NuD, NaturalConvNusselt );
 
 		// h = (k)(Nu)/D
-		OutsidePipeHeatTransCoef = CondAir * NuD / PipeOD;
-
-		return OutsidePipeHeatTransCoef;
+		return CondAir * NuD / PipeOD;
 
 	}
 
 	Real64
-	PipeHTData::TBND(
+	PipeHTData::farfieldTemperature(
 		Real64 const z, // Current Depth
 		Real64 const DayOfSim // Current Simulation Day
 	) {
-		using DataGlobals::Pi;
 
-		// Return value
-		Real64 TBND;
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   July 2007
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
-		//Kusuda and Achenbach
-		TBND = this->AvgGroundTemp - this->AvgGndTempAmp * std::exp( -z * std::sqrt( Pi / ( 365.0 * this->SoilDiffusivityPerDay ) ) ) * std::cos( ( 2.0 * Pi / 365.0 ) * ( DayOfSim - this->PhaseShiftDays - ( z / 2.0 ) * std::sqrt( 365.0 / ( Pi * this->SoilDiffusivityPerDay ) ) ) );
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine uses the Kusuda-Achenbach correlation to return a farfield ground temperature
 
-		return TBND;
-
+		return this->AvgGroundTemp - this->AvgGndTempAmp * 
+				std::exp( -z * std::sqrt( DataGlobals::Pi / ( 365.0 * this->SoilDiffusivityPerDay ) ) ) * 
+				std::cos( ( 2.0 * DataGlobals::Pi / 365.0 ) * ( DayOfSim - this->PhaseShiftDays - ( z / 2.0 ) * std::sqrt( 365.0 / ( DataGlobals::Pi * this->SoilDiffusivityPerDay ) ) ) );
 	}
 
 	//     NOTICE

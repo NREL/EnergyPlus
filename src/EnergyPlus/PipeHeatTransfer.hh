@@ -30,8 +30,9 @@ namespace PipeHeatTransfer {
 
 	extern Real64 const InnerDeltaTime; // one minute time step in seconds
 
-	class PipeHTData : public PlantComponent {
-	public:
+	class PipeHTData : public PlantComponent
+	{
+	
 		// Members
 		// Input data
 		std::string Name; // name of the component
@@ -47,7 +48,6 @@ namespace PipeHeatTransfer {
 		std::string OutletNode; // outlet node name
 		int InletNodeNum; // inlet node number
 		int OutletNodeNum; // outlet node number
-		int TypeOf; // Type of pipe
 		// derived data
 		int ConstructionNum; // construction ref number
 		int EnvironmentPtr;
@@ -114,10 +114,6 @@ namespace PipeHeatTransfer {
 		Real64 SoilDiffusivityPerDay; // soil thermal diffusivity [m2/day]
 		int AvgAnnualManualInput; // flag for method of bringing in annual avg data yes-1 no-0
 		Array4D< Real64 > T; // soil temperature array
-		bool BeginSimInit; // begin sim and begin environment flag
-		bool BeginSimEnvrn; // begin sim and begin environment flag
-		bool FirstHVACupdateFlag;
-		bool BeginEnvrnupdateFlag;
 		bool SolarExposed; // Flag to determine if solar is included at ground surface
 		Real64 SumTK; // Sum of thickness/conductivity over all material layers
 		Real64 ZoneHeatGainRate; // Lagged energy summation for zone heat gain {W}
@@ -125,7 +121,6 @@ namespace PipeHeatTransfer {
 		int LoopSideNum; // PlantLoop%LoopSide index where this pipe lies
 		int BranchNum; // ..LoopSide%Branch index where this pipe lies
 		int CompNum; // ..Branch%Comp index where this pipe lies
-		bool CheckEquipName;
 		Real64 EnvironmentTemp; // environmental temperature (surrounding pipe)
 		// Report data
 		Real64 FluidInletTemp; // inlet temperature [C]
@@ -146,7 +141,6 @@ namespace PipeHeatTransfer {
 			PipeID( 0.0 ),
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
-			TypeOf( 0 ),
 			ConstructionNum( 0 ),
 			EnvironmentPtr( 0 ),
 			EnvrSchedPtr( 0 ),
@@ -204,10 +198,6 @@ namespace PipeHeatTransfer {
 			SoilDiffusivity( 0.0 ),
 			SoilDiffusivityPerDay( 0.0 ),
 			AvgAnnualManualInput( 0 ),
-			BeginSimInit( true ),
-			BeginSimEnvrn( true ),
-			FirstHVACupdateFlag( true ),
-			BeginEnvrnupdateFlag( true ),
 			SolarExposed( true ),
 			SumTK( 0.0 ),
 			ZoneHeatGainRate( 0.0 ),
@@ -215,7 +205,6 @@ namespace PipeHeatTransfer {
 			LoopSideNum( 0 ),
 			BranchNum( 0 ),
 			CompNum( 0 ),
-			CheckEquipName( true ),
 			EnvironmentTemp( 0.0 ),
 			// report variables
 			FluidInletTemp( 0.0 ),
@@ -229,16 +218,35 @@ namespace PipeHeatTransfer {
 			EnvHeatLossEnergy( 0.0 ),
 			EnvHeatLossRate( 0.0 ),
 			VolumeFlowRate( 0.0 )
-			
 		{}
 
-		// required implementations from base class
-		static std::shared_ptr<PlantComponent> pipeHTFactory( int objectType, std::string objectName );
-		int performEveryTimeInit();
-		int performOneTimeInit();
-		int performBeginEnvrnInit();
-		int performFirstHVACInit();
-		int simulate();
+	public:
+		static std::shared_ptr< PlantComponent >
+		pipeHTFactory(
+			int objectType,
+			std::string objectName
+		);
+	
+	private: 
+
+		// methods implemented from base class
+
+		int
+		performEveryTimeInit();
+		
+		int
+		performOneTimeInit();
+		
+		int
+		performBeginEnvrnInit();
+		
+		int
+		performFirstHVACInit();
+		
+		int
+		simulate();
+
+		// additional worker methods 
 
 		void
 		pushInnerTimeStepArrays();
@@ -274,7 +282,7 @@ namespace PipeHeatTransfer {
 		outsidePipeHeatTransCoef(); 
 
 		Real64
-		TBND(
+		farfieldTemperature(
 			Real64 const z, // Current Depth
 			Real64 const DayOfSim // Current Simulation Day
 		);

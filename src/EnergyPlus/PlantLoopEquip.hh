@@ -9,11 +9,6 @@ namespace EnergyPlus {
 
 namespace PlantLoopEquip {
 
-	// Data
-	// SUBROUTINE SPECIFICATION
-
-	// Functions
-
 	void
 	SimPlantEquip(
 		int const LoopNum, // loop counter

@@ -35,13 +35,6 @@ namespace Pipes {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using namespace DataHVACGlobals;
-	using namespace DataLoopNode;
-	using DataPlant::TypeOf_Pipe;
-	using DataPlant::TypeOf_PipeSteam;
-	using namespace DataIPShortCuts;
-	using NodeInputManager::GetOnlySingleNode;
-	using BranchNodeConnections::TestCompSet;
 
 	// Object Data
 	Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
@@ -62,14 +55,14 @@ namespace Pipes {
 			std::string const cCurrentModuleObject = "Pipe:Adiabatic";
 			int numWaterPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int PipeWaterNum = 1; PipeWaterNum <= numWaterPipes; ++PipeWaterNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				if ( objectName == cAlphaArgs( 1 ) ) {
+				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeWaterNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat );
+				if ( objectName == DataIPShortCuts::cAlphaArgs( 1 ) ) {
 					found = true;
 					thisPipe->name = objectName;
-					thisPipe->compType = TypeOf_Pipe;
-					thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-					thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-					TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
+					thisPipe->compType = DataPlant::TypeOf_Pipe;
+					thisPipe->InletNodeNum = NodeInputManager::GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+					thisPipe->OutletNodeNum = NodeInputManager::GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+					BranchNodeConnections::TestCompSet( cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ), DataIPShortCuts::cAlphaArgs( 2 ), DataIPShortCuts::cAlphaArgs( 3 ), "Pipe Nodes" );
 					break;
 				}
 			}
@@ -79,14 +72,14 @@ namespace Pipes {
 			std::string const cCurrentModuleObject2 = "Pipe:Adiabatic:Steam";
 			int numSteamPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject2 );
 			for ( int PipeSteamNum = 1; PipeSteamNum <= numSteamPipes; ++PipeSteamNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject2, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				if ( objectName == cAlphaArgs( 1 ) ) {
+				InputProcessor::GetObjectItem( cCurrentModuleObject2, PipeSteamNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat );
+				if ( objectName == DataIPShortCuts::cAlphaArgs( 1 ) ) {
 					found = true;
 					thisPipe->name = objectName;
-					thisPipe->compType = TypeOf_PipeSteam;
-					thisPipe->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-					thisPipe->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject2, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-					TestCompSet( cCurrentModuleObject2, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
+					thisPipe->compType = DataPlant::TypeOf_PipeSteam;
+					thisPipe->InletNodeNum = NodeInputManager::GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject2, DataIPShortCuts::cAlphaArgs( 1 ), DataLoopNode::NodeType_Steam, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+					thisPipe->OutletNodeNum = NodeInputManager::GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject2, DataIPShortCuts::cAlphaArgs( 1 ), DataLoopNode::NodeType_Steam, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+					BranchNodeConnections::TestCompSet( cCurrentModuleObject2, DataIPShortCuts::cAlphaArgs( 1 ), DataIPShortCuts::cAlphaArgs( 2 ), DataIPShortCuts::cAlphaArgs( 3 ), "Pipe Nodes" );
 					break;
 				}
 			}
