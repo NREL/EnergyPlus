@@ -52435,7 +52435,7 @@ AirConditioner:VariableRefrigerantFlow,
        \key No
        \key Yes
        \default No
-       \note This field is reserved for future use. The only valid choice is No.
+       \note This field enables heat recovery operation within this VRF outdoor unit.
   N11, \field Equivalent Piping Length used for Piping Correction Factor in Cooling Mode
        \type real
        \units m
