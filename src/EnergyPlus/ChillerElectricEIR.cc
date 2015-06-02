@@ -711,7 +711,7 @@ namespace ChillerElectricEIR {
 			SetupOutputVariable( "Chiller Part Load Ratio []", ElectricEIRChillerReport( EIRChillerNum ).ChillerPartLoadRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Cycling Ratio []", ElectricEIRChillerReport( EIRChillerNum ).ChillerCyclingRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Electric Power [W]", ElectricEIRChillerReport( EIRChillerNum ).Power, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", "Chiller", "Plant" );
 
 			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", ElectricEIRChillerReport( EIRChillerNum ).QEvap, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).EvapEnergy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
@@ -749,7 +749,7 @@ namespace ChillerElectricEIR {
 				SetupOutputVariable( "Chiller Condenser Inlet Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).CondInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 				if ( ElectricEIRChiller( EIRChillerNum ).CondenserFanPowerRatio > 0 ) {
 					SetupOutputVariable( "Chiller Condenser Fan Electric Power [W]", ElectricEIRChillerReport( EIRChillerNum ).CondenserFanPowerUse, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-					SetupOutputVariable( "Chiller Condenser Fan Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).CondenserFanEnergyConsumption, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+					SetupOutputVariable( "Chiller Condenser Fan Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).CondenserFanEnergyConsumption, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", "Chiller Condenser Fan", "Plant" );
 				}
 				if ( ElectricEIRChiller( EIRChillerNum ).CondenserType == EvapCooled ) {
 					if ( ElectricEIRChiller( EIRChillerNum ).BasinHeaterPowerFTempDiff > 0.0 ) {

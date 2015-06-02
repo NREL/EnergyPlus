@@ -4208,6 +4208,16 @@ namespace CondenserLoopTowers {
 			return;
 		}
 
+		if ( std::abs( MyLoad ) <= SmallLoad ) {
+		// tower doesn't need to do anything
+			OutletWaterTemp = Node( WaterInletNode ).Temp;
+			CTFanPower = 0.0;
+			AirFlowRateRatio = 0.0;
+			Qactual = 0.0;
+			CalcBasinHeaterPower( SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff, SimpleTower( TowerNum ).BasinHeaterSchedulePtr, SimpleTower( TowerNum ).BasinHeaterSetPointTemp, BasinHeaterPower );
+			return;
+		}
+
 		// first find free convection cooling rate
 		UAdesignPerCell = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
@@ -4217,7 +4227,10 @@ namespace CondenserLoopTowers {
 
 		FreeConvQdot = WaterMassFlowRate * CpWater * ( Node( WaterInletNode ).Temp - OutletWaterTempOFF );
 		CTFanPower = 0.0;
+
 		if ( std::abs( MyLoad ) <= FreeConvQdot ) { // can meet load with free convection and fan off
+
+
 			OutletWaterTemp = OutletWaterTempOFF;
 			AirFlowRateRatio = 0.0;
 			Qactual = FreeConvQdot;

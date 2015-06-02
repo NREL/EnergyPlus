@@ -1841,12 +1841,12 @@ namespace VariableSpeedCoils {
 						SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", VarSpeedCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
 						if ( VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 							SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).BasinHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-							SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+							SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", "VS DX Coil", "System" );
 						}
 					}
 
 					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", "VS DX Coil", "System" );
 				} else {
 					// air source heating coils
 					SetupOutputVariable( "Heating Coil Air Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
@@ -1865,9 +1865,9 @@ namespace VariableSpeedCoils {
 					SetupOutputVariable( "Heating Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
 					SetupOutputVariable( "Heating Coil Defrost Electric Power [W]", VarSpeedCoil( DXCoilNum ).DefrostPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", VarSpeedCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+					SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", VarSpeedCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", "VS DX Coil", "System" );
 					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", "VS DX Coil", "System" );
 
 				}
 			} else {
@@ -3629,8 +3629,13 @@ namespace VariableSpeedCoils {
 		// count the powr separately
 		Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower &
 		//+ VarSpeedCoil(DXCoilNum)%BasinHeaterPower + VarSpeedCoil(DXCoilNum)%EvapCondPumpElecPower
-		QSource *= PartLoadRatio;
 		QWasteHeat *= PartLoadRatio;
+		// use runtime fraction adjusted Work input for QSource
+		QSource = QLoadTotal + Winput - QWasteHeat;
+		if ( QSource < 0 ) {
+			QSource = 0.0;
+			QWasteHeat = QLoadTotal + Winput;
+		}
 
 		//  Add power to global variable so power can be summed by parent object
 		DXElecCoolingPower = Winput;
@@ -4047,13 +4052,10 @@ namespace VariableSpeedCoils {
 
 		}
 
-		QSource = QLoadTotal + QWasteHeat - Winput;
+
 		QSensible = QLoadTotal;
 
-		if ( QSource < 0 ) {
-			QSource = 0.0;
-			QWasteHeat = Winput - QLoadTotal;
-		}
+
 
 		// calculate coil outlet state variables
 		LoadSideOutletEnth = LoadSideInletEnth + QLoadTotal / LoadSideMassFlowRate;
@@ -4080,8 +4082,13 @@ namespace VariableSpeedCoils {
 		QSensible *= PartLoadRatio;
 		// count the powr separately
 		Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower
-		QSource *= PartLoadRatio;
 		QWasteHeat *= PartLoadRatio;
+		// use runtime fraction adjusted Work input for QSource
+		QSource = QLoadTotal + QWasteHeat - Winput;
+		if ( QSource < 0 ) {
+			QSource = 0.0;
+			QWasteHeat = Winput - QLoadTotal;
+		}
 
 		//  Add power to global variable so power can be summed by parent object
 		DXElecHeatingPower = Winput;

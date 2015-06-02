@@ -237,6 +237,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 SUMultiplier; // exponential timer for mode changes
 		Real64 TUCoolingLoad; // total TU cooling load for each VRF system
 		Real64 TUHeatingLoad; // total TU heating load for each VRF system
+		Real64 SimultaneousHeatCoolTime; // total time with simulataneous cooling and heating requests from terminal units
 		bool SwitchedMode; // used to derate capacity/power when system changes operating mode
 		// begin variables used for heat recovery mode
 		Real64 OperatingCOP; // Operating VRF heat pump COP (total TU capacity/total power)
@@ -407,6 +408,7 @@ namespace HVACVariableRefrigerantFlow {
 			SUMultiplier( 0.0 ),
 			TUCoolingLoad( 0.0 ),
 			TUHeatingLoad( 0.0 ),
+			SimultaneousHeatCoolTime( 0.0 ),
 			SwitchedMode( false ),
 			OperatingCOP( 0.0 ),
 			MinOATHeatRecovery( 0.0 ),

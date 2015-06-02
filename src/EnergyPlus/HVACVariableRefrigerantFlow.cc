@@ -593,6 +593,7 @@ namespace HVACVariableRefrigerantFlow {
 		VRF( VRFCond ).TUCoolingLoad = TUCoolingLoad;
 		VRF( VRFCond ).TUHeatingLoad = TUHeatingLoad;
 
+
 		// loop through TU's and calculate average inlet conditions for active coils
 		for ( NumTU = 1; NumTU <= NumTUInList; ++NumTU ) {
 			TUIndex = TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU );
@@ -758,7 +759,10 @@ namespace HVACVariableRefrigerantFlow {
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle && VRF( VRFCond ).DefrostControl == OnDemand ) {
+
+					// logic here doesn't include case with reverse cycle and timed control, test removing on demand check here
+					//if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle && VRF( VRFCond ).DefrostControl == OnDemand ) {
+					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle  ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( VRF( VRFCond ).HeatingCapacity / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( VRF( VRFCond ).DefrostEIRPtr, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 
@@ -775,6 +779,8 @@ namespace HVACVariableRefrigerantFlow {
 								DefrostEIRTempModFac = 0.0;
 							}
 						}
+
+						// this next equation is missing RTF term that shows in Eng Ref
 
 						VRF( VRFCond ).DefrostPower = DefrostEIRTempModFac * ( VRF( VRFCond ).HeatingCapacity / 1.01667 ) * FractionalDefrostTime;
 
@@ -821,6 +827,12 @@ namespace HVACVariableRefrigerantFlow {
 
 		HRHeatRequestFlag = any( TerminalUnitList( TUListNum ).HRHeatRequest );
 		HRCoolRequestFlag = any( TerminalUnitList( TUListNum ).HRCoolRequest );
+
+		if ( HRHeatRequestFlag && HRCoolRequestFlag ) {
+			VRF( VRFCond ).SimultaneousHeatCoolTime = TimeStepSys;
+		} else {
+			VRF( VRFCond ).SimultaneousHeatCoolTime = 0.0;
+		}
 
 		if ( ! DoingSizing && ! WarmupFlag ) {
 			if ( HRHeatRequestFlag && HRCoolRequestFlag ) {
@@ -2108,6 +2120,10 @@ namespace HVACVariableRefrigerantFlow {
 				ShowSevereError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
 				ShowContinueError( "Terminal unit not found on any ZoneTerminalUnitList." );
 				ErrorsFound = true;
+				// can hard crash before last fatal if TUListIndex is zero
+				if ( ErrorsFound ) {
+					ShowFatalError( RoutineName + "Errors found in getting AirConditioner:VariableRefrigerantFlow system input. Preceding condition(s) causes termination." );
+				}
 			}
 
 			for ( NumCond = 1; NumCond <= NumVRFCond; ++NumCond ) {
@@ -2681,7 +2697,7 @@ namespace HVACVariableRefrigerantFlow {
 		for ( VRFNum = 1; VRFNum <= NumVRFTU; ++VRFNum ) {
 			if ( VRFTU( VRFNum ).CoolingCoilPresent ) {
 				SetupOutputVariable( "Zone VRF Air Terminal Cooling Electric Power [W]", VRFTU( VRFNum ).ParasiticCoolElecPower, "System", "Average", VRFTU( VRFNum ).Name );
-				SetupOutputVariable( "Zone VRF Air Terminal Cooling Electric Energy [J]", VRFTU( VRFNum ).ParasiticElecCoolConsumption, "System", "Sum", VRFTU( VRFNum ).Name, _, "Electric", "COOLING", "VRF", "System" );
+				SetupOutputVariable( "Zone VRF Air Terminal Cooling Electric Energy [J]", VRFTU( VRFNum ).ParasiticElecCoolConsumption, "System", "Sum", VRFTU( VRFNum ).Name, _, "Electric", "COOLING", "VRF Indoor Parasitic", "System" );
 				SetupOutputVariable( "Zone VRF Air Terminal Total Cooling Rate [W]", VRFTU( VRFNum ).TotalCoolingRate, "System", "Average", VRFTU( VRFNum ).Name );
 				SetupOutputVariable( "Zone VRF Air Terminal Sensible Cooling Rate [W]", VRFTU( VRFNum ).SensibleCoolingRate, "System", "Average", VRFTU( VRFNum ).Name );
 				SetupOutputVariable( "Zone VRF Air Terminal Latent Cooling Rate [W]", VRFTU( VRFNum ).LatentCoolingRate, "System", "Average", VRFTU( VRFNum ).Name );
@@ -2691,7 +2707,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			if ( VRFTU( VRFNum ).HeatingCoilPresent ) {
 				SetupOutputVariable( "Zone VRF Air Terminal Heating Electric Power [W]", VRFTU( VRFNum ).ParasiticHeatElecPower, "System", "Average", VRFTU( VRFNum ).Name );
-				SetupOutputVariable( "Zone VRF Air Terminal Heating Electric Energy [J]", VRFTU( VRFNum ).ParasiticElecHeatConsumption, "System", "Sum", VRFTU( VRFNum ).Name, _, "Electric", "HEATING", "VRF", "System" );
+				SetupOutputVariable( "Zone VRF Air Terminal Heating Electric Energy [J]", VRFTU( VRFNum ).ParasiticElecHeatConsumption, "System", "Sum", VRFTU( VRFNum ).Name, _, "Electric", "HEATING", "VRF Indoor Parasitic", "System" );
 				SetupOutputVariable( "Zone VRF Air Terminal Total Heating Rate [W]", VRFTU( VRFNum ).TotalHeatingRate, "System", "Average", VRFTU( VRFNum ).Name );
 				SetupOutputVariable( "Zone VRF Air Terminal Sensible Heating Rate [W]", VRFTU( VRFNum ).SensibleHeatingRate, "System", "Average", VRFTU( VRFNum ).Name );
 				SetupOutputVariable( "Zone VRF Air Terminal Latent Heating Rate [W]", VRFTU( VRFNum ).LatentHeatingRate, "System", "Average", VRFTU( VRFNum ).Name );
@@ -2710,14 +2726,14 @@ namespace HVACVariableRefrigerantFlow {
 			SetupOutputVariable( "VRF Heat Pump Total Heating Rate [W]", VRF( NumCond ).TotalHeatingCapacity, "System", "Average", VRF( NumCond ).Name );
 			if ( VRF( NumCond ).FuelType == FuelTypeElectric ) {
 				SetupOutputVariable( "VRF Heat Pump Cooling Electric Power [W]", VRF( NumCond ).ElecCoolingPower, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Cooling Electric Energy [J]", VRF( NumCond ).CoolElecConsumption, "System", "Sum", VRF( NumCond ).Name, _, cValidFuelTypes( VRF( NumCond ).FuelType ), "COOLING", "VRF", "System" );
+				SetupOutputVariable( "VRF Heat Pump Cooling Electric Energy [J]", VRF( NumCond ).CoolElecConsumption, "System", "Sum", VRF( NumCond ).Name, _, cValidFuelTypes( VRF( NumCond ).FuelType ), "COOLING", "VRF OD Unit", "System" );
 			} else {
 				SetupOutputVariable( "VRF Heat Pump Cooling " + cValidFuelTypes( VRF( NumCond ).FuelType ) + " Rate [W]", VRF( NumCond ).ElecCoolingPower, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Cooling " + cValidFuelTypes( VRF( NumCond ).FuelType ) + " Energy [J]", VRF( NumCond ).CoolElecConsumption, "System", "Sum", VRF( NumCond ).Name, _, cValidFuelTypes( VRF( NumCond ).FuelType ), "COOLING", "VRF", "System" );
 			}
 			if ( VRF( NumCond ).FuelType == FuelTypeElectric ) {
 				SetupOutputVariable( "VRF Heat Pump Heating Electric Power [W]", VRF( NumCond ).ElecHeatingPower, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Heating Electric Energy [J]", VRF( NumCond ).HeatElecConsumption, "System", "Sum", VRF( NumCond ).Name, _, cValidFuelTypes( VRF( NumCond ).FuelType ), "HEATING", "VRF", "System" );
+				SetupOutputVariable( "VRF Heat Pump Heating Electric Energy [J]", VRF( NumCond ).HeatElecConsumption, "System", "Sum", VRF( NumCond ).Name, _, cValidFuelTypes( VRF( NumCond ).FuelType ), "HEATING", "VRF OD Unit", "System" );
 			} else {
 				SetupOutputVariable( "VRF Heat Pump Heating " + cValidFuelTypes( VRF( NumCond ).FuelType ) + " Rate [W]", VRF( NumCond ).ElecHeatingPower, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Heating " + cValidFuelTypes( VRF( NumCond ).FuelType ) + " Energy [J]", VRF( NumCond ).HeatElecConsumption, "System", "Sum", VRF( NumCond ).Name, _, cValidFuelTypes( VRF( NumCond ).FuelType ), "HEATING", "VRF", "System" );
@@ -2729,7 +2745,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			if ( VRF( NumCond ).DefrostStrategy == Resistive || ( VRF( NumCond ).DefrostStrategy == ReverseCycle && VRF( NumCond ).FuelType == FuelTypeElectric ) ) {
 				SetupOutputVariable( "VRF Heat Pump Defrost Electric Power [W]", VRF( NumCond ).DefrostPower, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Defrost Electric Energy [J]", VRF( NumCond ).DefrostConsumption, "System", "Sum", VRF( NumCond ).Name, _, "Electric", "HEATING", "VRF", "System" );
+				SetupOutputVariable( "VRF Heat Pump Defrost Electric Energy [J]", VRF( NumCond ).DefrostConsumption, "System", "Sum", VRF( NumCond ).Name, _, "Electric", "HEATING", "VRF Defrost", "System" );
 			} else { // defrost energy appied to fuel type
 				SetupOutputVariable( "VRF Heat Pump Defrost " + cValidFuelTypes( VRF( NumCond ).FuelType ) + " Rate [W]", VRF( NumCond ).DefrostPower, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Defrost " + cValidFuelTypes( VRF( NumCond ).FuelType ) + " Energy [J]", VRF( NumCond ).DefrostConsumption, "System", "Sum", VRF( NumCond ).Name, _, cValidFuelTypes( VRF( NumCond ).FuelType ), "HEATING", "VRF", "System" );
@@ -2745,9 +2761,10 @@ namespace HVACVariableRefrigerantFlow {
 			SetupOutputVariable( "VRF Heat Pump Maximum Capacity Heating Rate [W]", MaxHeatingCapacity( NumCond ), "System", "Average", VRF( NumCond ).Name );
 
 			SetupOutputVariable( "VRF Heat Pump Crankcase Heater Electric Power [W]", VRF( NumCond ).CrankCaseHeaterPower, "System", "Average", VRF( NumCond ).Name );
-			SetupOutputVariable( "VRF Heat Pump Crankcase Heater Electric Energy [J]", VRF( NumCond ).CrankCaseHeaterElecConsumption, "System", "Sum", VRF( NumCond ).Name, _, "Electric", "COOLING", _, "System" );
+			SetupOutputVariable( "VRF Heat Pump Crankcase Heater Electric Energy [J]", VRF( NumCond ).CrankCaseHeaterElecConsumption, "System", "Sum", VRF( NumCond ).Name, _, "Electric", "COOLING", "VRF Crankcase Heater", "System" );
 			SetupOutputVariable( "VRF Heat Pump Terminal Unit Cooling Load Rate [W]", VRF( NumCond ).TUCoolingLoad, "System", "Average", VRF( NumCond ).Name );
 			SetupOutputVariable( "VRF Heat Pump Terminal Unit Heating Load Rate [W]", VRF( NumCond ).TUHeatingLoad, "System", "Average", VRF( NumCond ).Name );
+			SetupOutputVariable("VRF Heat Pump Simultaneous Cooling and Heating Time [hr]", VRF ( NumCond ).SimultaneousHeatCoolTime, "System", "Sum", VRF( NumCond ).Name );
 			if ( VRF( NumCond ).HeatRecoveryUsed ) {
 				SetupOutputVariable( "VRF Heat Pump Heat Recovery Status Change Multiplier []", VRF( NumCond ).SUMultiplier, "System", "Average", VRF( NumCond ).Name );
 			}
