@@ -362,6 +362,9 @@ SET( SRC_2
   PlantPipes/Pipes.hh
   PlantCentralGSHP.cc
   PlantCentralGSHP.hh
+  PlantChillers/ChillerBase.hh
+  PlantChillers/ChillerConstCOP.cc
+  PlantChillers/ChillerConstCOP.hh
   PlantChillers/PlantChillers.cc
   PlantChillers/PlantChillers.hh
   PlantComponent.hh
