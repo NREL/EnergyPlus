@@ -751,6 +751,7 @@ namespace WaterThermalTanks {
 		Real64 HeatingPLR; // HP PLR used for reporting
 		Real64 SetPointTemp; // set point or cut-out temperature [C]
 		Real64 MinAirTempForHPOperation; // HP does not operate below this ambient temperature
+		Real64 MaxAirTempForHPOperation; // HP does not operate above this ambient temperature
 		int InletAirMixerNode; // Inlet air mixer node number of HP water heater
 		int OutletAirSplitterNode; // Outlet air splitter node number of HP water heater
 		Real64 SourceMassFlowRate; // Maximum mass flow rate on the source side (kg/s)
@@ -855,6 +856,7 @@ namespace WaterThermalTanks {
 			HeatingPLR( 0.0 ),
 			SetPointTemp( 0.0 ),
 			MinAirTempForHPOperation( 5.0 ),
+			MaxAirTempForHPOperation( 48.8888888889 ),
 			InletAirMixerNode( 0 ),
 			OutletAirSplitterNode( 0 ),
 			SourceMassFlowRate( 0.0 ),
@@ -966,6 +968,7 @@ namespace WaterThermalTanks {
 			Real64 const HeatingPLR, // HP PLR used for reporting
 			Real64 const SetPointTemp, // set point or cut-out temperature [C]
 			Real64 const MinAirTempForHPOperation, // HP does not operate below this ambient temperature
+			Real64 const MaxAirTempForHPOperation, // HP does not operate above this ambient temperature
 			int const InletAirMixerNode, // Inlet air mixer node number of HP water heater
 			int const OutletAirSplitterNode, // Outlet air splitter node number of HP water heater
 			Real64 const SourceMassFlowRate, // Maximum mass flow rate on the source side (kg/s)
@@ -1074,6 +1077,7 @@ namespace WaterThermalTanks {
 			HeatingPLR( HeatingPLR ),
 			SetPointTemp( SetPointTemp ),
 			MinAirTempForHPOperation( MinAirTempForHPOperation ),
+			MaxAirTempForHPOperation( MaxAirTempForHPOperation ),
 			InletAirMixerNode( InletAirMixerNode ),
 			OutletAirSplitterNode( OutletAirSplitterNode ),
 			SourceMassFlowRate( SourceMassFlowRate ),

@@ -1551,6 +1551,15 @@ namespace WaterThermalTanks {
 						ShowContinueError( "...Minimum inlet air temperature = " + TrimSigDigits( hpwhNumeric[ 4 + nNumericOffset ], 1 ) );
 					}
 
+					// Maximum Inlet Air Temperature for Compressor Operation
+					HPWH.MaxAirTempForHPOperation = hpwhNumeric[ 5 + nNumericOffset ];
+					if ( HPWH.MaxAirTempForHPOperation <= HPWH.MinAirTempForHPOperation ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": maximum inlet air temperature for heat pump compressor operation");
+						ShowContinueError( "must be greater than the minimum inlet air temperature for heat pump compressor operation." );
+						ShowContinueError( "...Minimum inlet air temperature = " + TrimSigDigits( HPWH.MinAirTempForHPOperation, 1 ) );
+						ShowContinueError( "...Maximum inlet air temperature = " + TrimSigDigits( HPWH.MaxAirTempForHPOperation, 1 ) );
+					}
+
 					// Compressor Location
 					{ auto const SELECT_CASE_var( hpwhAlpha[ 18 + nAlphaOffset ] );
 					if ( SELECT_CASE_var == "SCHEDULE" ) {
@@ -1664,18 +1673,18 @@ namespace WaterThermalTanks {
 					}
 
 					// On Cycle Parasitic Electric Load
-					HPWH.OnCycParaLoad = hpwhNumeric[ 5 + nNumericOffset ];
+					HPWH.OnCycParaLoad = hpwhNumeric[ 6 + nNumericOffset ];
 					if ( HPWH.OnCycParaLoad < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"," );
-						ShowContinueError( hpwhNumericFieldNames[ 5 + nNumericOffset ] + " must be >= 0. " + hpwhNumericFieldNames[ 5 + nNumericOffset ] + " = " + TrimSigDigits( hpwhNumeric[ 5 + nNumericOffset ], 2 ) );
+						ShowContinueError( hpwhNumericFieldNames[ 6 + nNumericOffset ] + " must be >= 0. " + hpwhNumericFieldNames[ 6 + nNumericOffset ] + " = " + TrimSigDigits( hpwhNumeric[ 6 + nNumericOffset ], 2 ) );
 						ErrorsFound = true;
 					}
 
 					// Off Cycle Parasitic Electric Load
-					HPWH.OffCycParaLoad = hpwhNumeric[ 6 + nNumericOffset ];
+					HPWH.OffCycParaLoad = hpwhNumeric[ 7 + nNumericOffset ];
 					if ( HPWH.OffCycParaLoad < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"," );
-						ShowContinueError( hpwhNumericFieldNames[ 6 + nNumericOffset ] + " must be >= 0. " + hpwhNumericFieldNames[ 2 + nNumericOffset ] + " = " + TrimSigDigits( hpwhNumeric[ 6 + nNumericOffset ], 2 ) );
+						ShowContinueError( hpwhNumericFieldNames[ 7 + nNumericOffset ] + " must be >= 0. " + hpwhNumericFieldNames[ 2 + nNumericOffset ] + " = " + TrimSigDigits( hpwhNumeric[ 7 + nNumericOffset ], 2 ) );
 						ErrorsFound = true;
 					}
 
@@ -1935,19 +1944,19 @@ namespace WaterThermalTanks {
 					}
 
 					// Control Sensor 1 Location In Stratified Tank
-					if ( ! hpwhNumericBlank[ 7 + nNumericOffset ] ) {
-						HPWH.ControlSensor1Height = hpwhNumeric[ 7 + nNumericOffset ];
+					if ( ! hpwhNumericBlank[ 8 + nNumericOffset ] ) {
+						HPWH.ControlSensor1Height = hpwhNumeric[ 8 + nNumericOffset ];
 					} else {
 						// use heater1 location, which we don't know right now
 						HPWH.ControlSensor1Height = -1.0;
 					}
 
 					// Control Sensor 1 Weight
-					HPWH.ControlSensor1Weight = hpwhNumericBlank[ 8 + nNumericOffset ] ? 1.0 : hpwhNumeric[ 8 + nNumericOffset ];
+					HPWH.ControlSensor1Weight = hpwhNumericBlank[ 9 + nNumericOffset ] ? 1.0 : hpwhNumeric[ 9 + nNumericOffset ];
 
 					// Control Sensor 2 Location In Stratified Tank
-					if ( ! hpwhNumericBlank[ 9 + nNumericOffset ] ) {
-						HPWH.ControlSensor2Height = hpwhNumeric[ 9 + nNumericOffset ];
+					if ( ! hpwhNumericBlank[ 10 + nNumericOffset ] ) {
+						HPWH.ControlSensor2Height = hpwhNumeric[ 10 + nNumericOffset ];
 					} else {
 						HPWH.ControlSensor2Height = -1.0;
 					}
@@ -7317,7 +7326,7 @@ namespace WaterThermalTanks {
 		//   simulate only water heater tank if HP compressor cut-out temperature is lower than the tank's cut-in temperature
 		//    simulate only water heater tank if HP inlet air temperature is below minimum temperature for HP compressor operation
 		//    if the tank maximum temperature limit is less than the HPWH set point temp, disable HPWH
-		if ( AvailSchedule == 0.0 || ( SetPointTemp - DeadBandTempDiff ) <= Tank.SetPointTemp || HPWHInletDBTemp < HeatPump.MinAirTempForHPOperation || SetPointTemp >= Tank.TankTempLimit || ( !HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && Tank.TypeNum == MixedWaterHeater && Tank.SavedMode == HeatMode ) || ( !HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && Tank.TypeNum == StratifiedWaterHeater && ( Tank.SavedHeaterOn1 || Tank.SavedHeaterOn2 ) )) {
+		if ( AvailSchedule == 0.0 || ( SetPointTemp - DeadBandTempDiff ) <= Tank.SetPointTemp || HPWHInletDBTemp < HeatPump.MinAirTempForHPOperation || HPWHInletDBTemp > HeatPump.MaxAirTempForHPOperation || SetPointTemp >= Tank.TankTempLimit || ( !HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && Tank.TypeNum == MixedWaterHeater && Tank.SavedMode == HeatMode ) || ( !HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && Tank.TypeNum == StratifiedWaterHeater && ( Tank.SavedHeaterOn1 || Tank.SavedHeaterOn2 ) )) {
 			//   revert to float mode any time HPWH compressor is OFF
 			HeatPump.Mode = FloatMode;
 			if ( InletAirMixerNode > 0 ) {

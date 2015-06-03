@@ -64897,7 +64897,7 @@ WaterHeater:Sizing,
        \minimum 0.0
 
 WaterHeater:HeatPump:PumpedCondenser,
-       \min-fields 28
+       \min-fields 29
        \memo This object models an air-source heat pump for water heating.
        \memo WaterHeater:HeatPump:PumpedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump:*, Fan:OnOff, WaterHeater:Mixed or WaterHeater:Stratified
@@ -65028,6 +65028,14 @@ WaterHeater:HeatPump:PumpedCondenser,
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
+  N5 , \field Maximum Inlet Air Temperature for Compressor Operation
+       \type real
+       \units C
+       \default 48.88888888889
+       \minimum 26
+       \maximum 94
+       \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
+       \note is above this value.
   A18, \field Compressor Location
        \required-field
        \type choice
@@ -65053,14 +65061,14 @@ WaterHeater:HeatPump:PumpedCondenser,
        \default DrawThrough
        \note BlowThrough means the fan is located before the air coil (upstream).
        \note DrawThrough means the fan is located after the air coil (downstream).
-  N5 , \field On Cycle Parasitic Electric Load
+  N6 , \field On Cycle Parasitic Electric Load
        \type real
        \units W
        \minimum 0.0
        \default 0.0
        \note Parasitic electric power consumed when the heat pump compressor operates.
        \note Does not contribute to water heating but can impact the zone air heat balance.
-  N6 , \field Off Cycle Parasitic Electric Load
+  N7 , \field Off Cycle Parasitic Electric Load
        \type real
        \units W
        \minimum 0.0
@@ -65103,20 +65111,20 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note heat pump is shut down until setpoint is reached.
        \note Simultaneous (default) means that both the tank heating element and
        \note heat pump are used at the same time recover the tank temperature.
-  N7,  \field Control Sensor 1 Height In Stratified Tank
+  N8,  \field Control Sensor 1 Height In Stratified Tank
        \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
        \note If left blank, it will default to the height of Heater1
        \type real
        \units m
        \minimum 0.0
-  N8,  \field Control Sensor 1 Weight
+  N9,  \field Control Sensor 1 Weight
        \note Weight to give Control Sensor 1 temperature
        \note The weight of Control Sensor 2 will be 1 - (wt. of control sensor 1)
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 1.0
-  N9;  \field Control Sensor 2 Height In Stratified Tank
+  N10; \field Control Sensor 2 Height In Stratified Tank
        \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
        \note If left blank, it will default to the height of Heater2
        \type real
@@ -65124,7 +65132,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \minimum 0.0
 
 WaterHeater:HeatPump:WrappedCondenser,
-       \min-fields 27
+       \min-fields 28
        \memo This object models an air-source heat pump for water heating.
        \memo WaterHeater:HeatPump:WrappedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump:Pumped, Fan:OnOff, WaterHeater:Mixed
@@ -65247,6 +65255,14 @@ WaterHeater:HeatPump:WrappedCondenser,
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
+  N6 , \field Maximum Inlet Air Temperature for Compressor Operation
+       \type real
+       \units C
+       \default 48.88888888889
+       \minimum 26
+       \maximum 94
+       \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
+       \note is above this value.
   A16, \field Compressor Location
        \required-field
        \type choice
@@ -65272,14 +65288,14 @@ WaterHeater:HeatPump:WrappedCondenser,
        \default DrawThrough
        \note BlowThrough means the fan is located before the air coil (upstream).
        \note DrawThrough means the fan is located after the air coil (downstream).
-  N6 , \field On Cycle Parasitic Electric Load
+  N7 , \field On Cycle Parasitic Electric Load
        \type real
        \units W
        \minimum 0.0
        \default 0.0
        \note Parasitic electric power consumed when the heat pump compressor operates.
        \note Does not contribute to water heating but can impact the zone air heat balance.
-  N7 , \field Off Cycle Parasitic Electric Load
+  N8 , \field Off Cycle Parasitic Electric Load
        \type real
        \units W
        \minimum 0.0
@@ -65322,19 +65338,19 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note heat pump is shut down until setpoint is reached.
        \note Simultaneous (default) means that both the tank heating element and
        \note heat pump are used at the same time recover the tank temperature.
-  N8,  \field Control Sensor 1 Height In Stratified Tank
+  N9,  \field Control Sensor 1 Height In Stratified Tank
        \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
        \note If left blank, it will default to the height of Heater1
        \type real
        \units m
        \minimum 0.0
-  N9,  \field Control Sensor 1 Weight
+  N10, \field Control Sensor 1 Weight
        \note Weight to give Control Sensor 1 temperature
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 1.0
-  N10; \field Control Sensor 2 Height In Stratified Tank
+  N11; \field Control Sensor 2 Height In Stratified Tank
        \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
        \note If left blank, it will default to the height of Heater2
        \note The weight of this control sensor will be 1 - (wt. of control sensor 1)

@@ -2152,6 +2152,7 @@
     ,                        !- Tank Use Side Outlet Node Name
     HPWHDXCoil,              !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     HPWHFan,                 !- Fan Name
@@ -2397,6 +2398,7 @@
     ,                        !- Tank Use Side Outlet Node Name
     Zone4HPWHDXCoil,         !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Zone4HPWHFan,            !- Fan Name
@@ -2542,6 +2544,7 @@
     Water Heater Use Outlet Node,                        !- Tank Use Side Outlet Node Name
     Zone4bHPWHDXCoil,         !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Zone4bHPWHFan,            !- Fan Name
@@ -2687,6 +2690,7 @@
     ,                        !- Tank Use Side Outlet Node Name
     HPWHOutdoorDXCoil,       !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     HPWHOutdoorFan,          !- Fan Name
@@ -2863,6 +2867,7 @@
     ,                        !- Tank Use Side Outlet Node Name
     HPWHScheduledDXCoil,     !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Schedule,                !- Compressor Location
     ScheduledCompressorTemp, !- Compressor Ambient Temperature Schedule Name
     HPWHScheduledFan,        !- Fan Name
@@ -4009,6 +4014,7 @@
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
     HPWHPlantDXCoil,         !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     HPWHPlantFan,            !- Fan Name
