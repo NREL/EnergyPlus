@@ -11,6 +11,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantLocation.hh>
 #include <PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -46,7 +47,7 @@ namespace Pipes {
 		int performOneTimeInit();
 		int performBeginEnvrnInit();
 		int performFirstHVACInit();
-		int simulate();
+		int simulate( const PlantLocation & calledFromLocation );
 
 	};
 

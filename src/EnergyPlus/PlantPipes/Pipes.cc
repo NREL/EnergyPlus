@@ -5,7 +5,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <Pipes.hh>
+#include <PlantPipes/Pipes.hh>
 #include <BranchNodeConnections.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -18,7 +18,7 @@
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <UtilityRoutines.hh>
-#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -127,7 +127,7 @@ namespace Pipes {
 		return 0;
 	}
 	
-	int LocalPipeData::simulate(){
+	int LocalPipeData::simulate( const PlantLocation & EP_UNUSED(calledFromLocation) ){
 		PlantUtilities::SafeCopyPlantNode( this->InletNodeNum, this->OutletNodeNum, this->LoopNum );
 		return 0;
 	}

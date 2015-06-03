@@ -10,8 +10,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <DataPlant.hh>
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantLocation.hh>
 #include <PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -32,7 +34,7 @@ namespace PipeHeatTransfer {
 
 	class PipeHTData : public PlantComponent
 	{
-	
+
 		// Members
 		// Input data
 		std::string Name; // name of the component
@@ -244,7 +246,7 @@ namespace PipeHeatTransfer {
 		performFirstHVACInit();
 		
 		int
-		simulate();
+		simulate( const PlantLocation & calledFromLocation );
 
 		// additional worker methods 
 

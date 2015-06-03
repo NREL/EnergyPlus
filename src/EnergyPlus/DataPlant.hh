@@ -14,6 +14,7 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <PlantComponent.hh>
+#include <PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -642,7 +643,8 @@ namespace DataPlant {
 		Real64 TempDesCondIn;
 		Real64 TempDesEvapOut;
 		std::shared_ptr< PlantComponent > compPtr;
-
+		PlantLocation thisCompLocation; // stored here at the comp level for convenience later
+		
 		// Default Constructor
 		CompData() :
 			TypeOf_Num( 0 ),
@@ -675,7 +677,8 @@ namespace DataPlant {
 			IndexInLoopSidePumps( 0 ),
 			TempDesCondIn( 0.0 ),
 			TempDesEvapOut( 0.0 ),
-			compPtr( nullptr )
+			compPtr( nullptr ),
+			thisCompLocation( PlantLocation( 0, 0, 0, 0 ) )
 		{}
 
 	};
@@ -845,33 +848,6 @@ namespace DataPlant {
 			LoopSideNum( 0 ),
 			ConnectorTypeOf_Num( 0 ),
 			LoopDemandsOnRemote( false )
-		{}
-
-	};
-
-	struct PlantLocation
-	{
-		// Members
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
-
-		// Default Constructor
-		PlantLocation()
-		{}
-
-		// Member Constructor
-		PlantLocation(
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
 		{}
 
 	};

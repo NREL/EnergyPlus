@@ -25,8 +25,9 @@
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
-#include <PipeHeatTransfer.hh>
-#include <Pipes.hh>
+#include <PlantPipes/PipeHeatTransfer.hh>
+#include <PlantPipes/Pipes.hh>
+#include <PlantLocation.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
@@ -35,7 +36,6 @@
 #include <SetPointManager.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
-#include <Pipes.hh>
 
 namespace EnergyPlus {
 
@@ -810,7 +810,8 @@ namespace PlantManager {
 
 						this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 						this_comp.TypeOf = this_comp_type;
-
+						this_comp.thisCompLocation = PlantLocation( LoopNum, LoopSideNum, BranchNum, CompNum );
+						
 						if ( SameString( this_comp_type, "Pipe:Adiabatic" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Pipe;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;

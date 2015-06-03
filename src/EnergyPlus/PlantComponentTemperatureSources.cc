@@ -20,6 +20,7 @@
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <PlantLocation.hh>
 #include <PlantUtilities.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
@@ -53,7 +54,6 @@ namespace PlantComponentTemperatureSources {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using DataPlant::TypeOf_WaterSource;
-	using DataPlant::PlantLocation;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 

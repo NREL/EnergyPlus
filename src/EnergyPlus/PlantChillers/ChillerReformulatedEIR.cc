@@ -9,7 +9,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <ChillerReformulatedEIR.hh>
+#include <PlantChillers/ChillerReformulatedEIR.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataBranchAirLoopPlant.hh>

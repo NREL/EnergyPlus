@@ -34,7 +34,6 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
-#include <PipeHeatTransfer.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
 #include <ScheduleManager.hh>

@@ -5,12 +5,12 @@
 #include <BaseboardRadiator.hh>
 #include <Boilers.hh>
 #include <BoilerSteam.hh>
-#include <ChillerAbsorption.hh>
-#include <ChillerElectricEIR.hh>
-#include <ChillerExhaustAbsorption.hh>
-#include <ChillerGasAbsorption.hh>
-#include <ChillerIndirectAbsorption.hh>
-#include <ChillerReformulatedEIR.hh>
+#include <PlantChillers/ChillerAbsorption.hh>
+#include <PlantChillers/ChillerElectricEIR.hh>
+#include <PlantChillers/ChillerExhaustAbsorption.hh>
+#include <PlantChillers/ChillerGasAbsorption.hh>
+#include <PlantChillers/ChillerIndirectAbsorption.hh>
+#include <PlantChillers/ChillerReformulatedEIR.hh>
 #include <CondenserLoopTowers.hh>
 #include <CTElectricGenerator.hh>
 #include <DataGlobals.hh>
@@ -32,10 +32,8 @@
 #include <MicroturbineElectricGenerator.hh>
 #include <OutsideEnergySources.hh>
 #include <PhotovoltaicThermalCollectors.hh>
-#include <PipeHeatTransfer.hh>
-#include <Pipes.hh>
 #include <PlantCentralGSHP.hh>
-#include <PlantChillers.hh>
+#include <PlantChillers/PlantChillers.hh>
 #include <PlantComponentTemperatureSources.hh>
 #include <PlantHeatExchangerFluidToFluid.hh>
 #include <PlantLoadProfile.hh>
@@ -1100,7 +1098,7 @@ namespace PlantLoopEquip {
 			sim_component.compPtr->performFirstHVACInit();
 		}
 		sim_component.compPtr->performEveryTimeInit();
-		sim_component.compPtr->simulate();
+		sim_component.compPtr->simulate( sim_component.thisCompLocation );
 	}
 
 	//     NOTICE

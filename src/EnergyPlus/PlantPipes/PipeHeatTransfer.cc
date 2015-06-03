@@ -9,7 +9,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <PipeHeatTransfer.hh>
+#include <PlantPipes/PipeHeatTransfer.hh>
 #include <BranchNodeConnections.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataEnvironment.hh>
@@ -743,7 +743,7 @@ namespace PipeHeatTransfer {
 	}
 
 	int
-	PipeHTData::simulate() {
+	PipeHTData::simulate( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Edwin Lee

@@ -32,18 +32,18 @@ SET( SRC
   BranchNodeConnections.hh
   CTElectricGenerator.cc
   CTElectricGenerator.hh
-  ChillerAbsorption.cc
-  ChillerAbsorption.hh
-  ChillerElectricEIR.cc
-  ChillerElectricEIR.hh
-  ChillerExhaustAbsorption.cc
-  ChillerExhaustAbsorption.hh
-  ChillerGasAbsorption.cc
-  ChillerGasAbsorption.hh
-  ChillerIndirectAbsorption.cc
-  ChillerIndirectAbsorption.hh
-  ChillerReformulatedEIR.cc
-  ChillerReformulatedEIR.hh
+  PlantChillers/ChillerAbsorption.cc
+  PlantChillers/ChillerAbsorption.hh
+  PlantChillers/ChillerElectricEIR.cc
+  PlantChillers/ChillerElectricEIR.hh
+  PlantChillers/ChillerExhaustAbsorption.cc
+  PlantChillers/ChillerExhaustAbsorption.hh
+  PlantChillers/ChillerGasAbsorption.cc
+  PlantChillers/ChillerGasAbsorption.hh
+  PlantChillers/ChillerIndirectAbsorption.cc
+  PlantChillers/ChillerIndirectAbsorption.hh
+  PlantChillers/ChillerReformulatedEIR.cc
+  PlantChillers/ChillerReformulatedEIR.hh
   #CommandLineInterface.cc
   #CommandLineInterface.hh
   CondenserLoopTowers.cc
@@ -356,14 +356,15 @@ SET( SRC_2
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
   Photovoltaics.hh
-  PipeHeatTransfer.cc
-  PipeHeatTransfer.hh
-  Pipes.cc
-  Pipes.hh
+  PlantPipes/PipeHeatTransfer.cc
+  PlantPipes/PipeHeatTransfer.hh
+  PlantPipes/Pipes.cc
+  PlantPipes/Pipes.hh
   PlantCentralGSHP.cc
   PlantCentralGSHP.hh
-  PlantChillers.cc
-  PlantChillers.hh
+  PlantChillers/PlantChillers.cc
+  PlantChillers/PlantChillers.hh
+  PlantComponent.hh
   PlantComponentTemperatureSources.cc
   PlantComponentTemperatureSources.hh
   PlantCondLoopOperation.cc
@@ -372,6 +373,7 @@ SET( SRC_2
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
+  PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
   PlantLoopSolver.cc

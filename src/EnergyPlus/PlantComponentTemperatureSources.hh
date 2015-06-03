@@ -8,13 +8,11 @@
 #include <EnergyPlus.hh>
 #include <DataPlant.hh>
 #include <DataGlobals.hh>
+#include <PlantLocation.hh>
 
 namespace EnergyPlus {
 
 namespace PlantComponentTemperatureSources {
-
-	// Using/Aliasing
-	using DataPlant::PlantLocation;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:

@@ -3,8 +3,10 @@
 
 #include <string>
 #include <memory>
+#include <PlantLocation.hh>
 
-// this is a pure virtual class that should be the base for anything called to simulate by the plant manager
+namespace EnergyPlus {
+
 class PlantComponent
 {
 public:
@@ -16,7 +18,9 @@ public:
 	virtual int performOneTimeInit() = 0;
 	virtual int performBeginEnvrnInit() = 0;
 	virtual int performFirstHVACInit() = 0;
-	virtual int simulate() = 0;
+	virtual int simulate( const PlantLocation & calledFromLocation ) = 0;
 };
+
+}
 
 #endif
