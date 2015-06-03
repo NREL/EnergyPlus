@@ -157,6 +157,7 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
+  ADD_SUBDIRECTORY(tst/jsoncpp/unit)
 endif()
 
 if( BUILD_FORTRAN )
