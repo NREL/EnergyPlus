@@ -289,6 +289,7 @@
     Water Heater Use Outlet Node,  !- Tank Use Side Outlet Node Name
     HPWHPlantDXCoil,         !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     HPWHPlantFan,            !- Fan Name
