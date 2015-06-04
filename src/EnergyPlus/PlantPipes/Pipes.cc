@@ -99,17 +99,17 @@ namespace Pipes {
 		}
 	}
 
-	int LocalPipeData::performEveryTimeInit(){
+	int LocalPipeData::performEveryTimeInit( const PlantLocation & EP_UNUSED(calledFromLocation) ){
 		// nothing here
 		return 0;
 	}
 
-	int LocalPipeData::performFirstHVACInit(){
+	int LocalPipeData::performFirstHVACInit( const PlantLocation & EP_UNUSED(calledFromLocation) ){
 		// nothing here
 		return 0;
 	}
 	
-	int LocalPipeData::performOneTimeInit(){
+	int LocalPipeData::performOneTimeInit( const PlantLocation & EP_UNUSED(calledFromLocation) ){
 		bool FoundOnLoop = 0;
 		bool errFlag = false;
 		DataPlant::ScanPlantLoopsForObject( this->name, this->compType, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, _, _, FoundOnLoop, _, _, errFlag );
@@ -122,12 +122,12 @@ namespace Pipes {
 		return 0;
 	}
 	
-	int LocalPipeData::performBeginEnvrnInit(){
+	int LocalPipeData::performBeginEnvrnInit( const PlantLocation & EP_UNUSED(calledFromLocation) ){
 		PlantUtilities::InitComponentNodes( 0.0, DataPlant::PlantLoop( this->LoopNum ).MaxMassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex );
 		return 0;
 	}
 	
-	int LocalPipeData::simulate( const PlantLocation & EP_UNUSED(calledFromLocation) ){
+	int LocalPipeData::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const & EP_UNUSED(FirstHVACIteration) ){
 		PlantUtilities::SafeCopyPlantNode( this->InletNodeNum, this->OutletNodeNum, this->LoopNum );
 		return 0;
 	}

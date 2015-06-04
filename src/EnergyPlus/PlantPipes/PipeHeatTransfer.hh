@@ -234,19 +234,19 @@ namespace PipeHeatTransfer {
 		// methods implemented from base class
 
 		int
-		performEveryTimeInit();
+		performEveryTimeInit( const PlantLocation & calledFromLocation );
 		
 		int
-		performOneTimeInit();
+		performOneTimeInit( const PlantLocation & calledFromLocation );
 		
 		int
-		performBeginEnvrnInit();
+		performBeginEnvrnInit( const PlantLocation & calledFromLocation );
 		
 		int
-		performFirstHVACInit();
+		performFirstHVACInit( const PlantLocation & calledFromLocation );
 		
 		int
-		simulate( const PlantLocation & calledFromLocation );
+		simulate( const PlantLocation & calledFromLocation, bool const & FirstHVACIteration );
 
 		// additional worker methods 
 

@@ -8,20 +8,21 @@
 namespace EnergyPlus {
 
 // condenser types
-enum ChillerCondenserType { AIRCOOLED, WATERCOOLED, EVAPCOOLED };
+enum ChillerCondenserType { AirCooled, WaterCooled, EvapCooled };
 
 // chiller flow modes
-enum ChillerFlowMode { NOTSET, CONSTANTFLOW, NOTMODULATED, LEAVINGSETPOINTMODULATED };
+enum ChillerFlowMode { NotSet, ConstantFlow, NotModulated, LeavingSetPointModulated };
 
 // base class for all chillers
 class ChillerBase : public PlantComponent
 {
+	public:
 	// Members
 	ChillerCondenserType condenserType; // Type of Condenser - Air or Water Cooled
 	Real64 NomCap; // design nominal capacity of chiller
 	bool NomCapWasAutoSized; // true if NomCap was autosize on input
 	Real64 COP; // COP
-	ChillerFlowMode flowMode; // one of 3 modes for componet flow during operation
+	ChillerFlowMode FlowMode; // one of 3 modes for componet flow during operation
 	bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
 	bool ModulatedFlowErrDone; // true if setpoint warning issued
 	bool HRSPErrDone; // TRUE if set point warning issued for heat recovery loop
@@ -51,14 +52,15 @@ class ChillerBase : public PlantComponent
 	bool CheckEquipName;
 	bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 	int CondMassFlowIndex;
+	Real64 BasinHeaterPower;
 
 	// Default Constructor
 	ChillerBase() :
-		condenserType( AIRCOOLED ),
+		condenserType( AirCooled ),
 		NomCap( 0.0 ),
 		NomCapWasAutoSized( false ),
 		COP( 0.0 ),
-		flowMode( NOTSET ),
+		FlowMode( NotSet ),
 		ModulatedFlowSetToLoop( false ),
 		ModulatedFlowErrDone( false ),
 		HRSPErrDone( false ),
@@ -85,7 +87,8 @@ class ChillerBase : public PlantComponent
 		MsgErrorCount( 0 ),
 		CheckEquipName( true ),
 		PossibleSubcooling( false ),
-		CondMassFlowIndex( 0 )
+		CondMassFlowIndex( 0 ),
+		BasinHeaterPower( 0.0 )
 	{}
 };
 

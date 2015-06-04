@@ -43,11 +43,11 @@ namespace Pipes {
 		static std::shared_ptr<PlantComponent> pipeFactory( int objectType, std::string objectName );
 
 	private: // methods implemented from base class
-		int performEveryTimeInit();
-		int performOneTimeInit();
-		int performBeginEnvrnInit();
-		int performFirstHVACInit();
-		int simulate( const PlantLocation & calledFromLocation );
+		int performEveryTimeInit( const PlantLocation & calledFromLocation );
+		int performOneTimeInit( const PlantLocation & calledFromLocation );
+		int performBeginEnvrnInit( const PlantLocation & calledFromLocation );
+		int performFirstHVACInit( const PlantLocation & calledFromLocation );
+		int simulate( const PlantLocation & calledFromLocation, bool const & FirstHVACIteration );
 
 	};
 

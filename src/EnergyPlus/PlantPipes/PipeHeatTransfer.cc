@@ -522,7 +522,7 @@ namespace PipeHeatTransfer {
 	}
 
 	int
-	PipeHTData::performEveryTimeInit() {
+	PipeHTData::performEveryTimeInit( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
 
 		// for reporting
 		std::string const RoutineName = "PipeHTData::performEveryTimeInit";
@@ -607,7 +607,7 @@ namespace PipeHeatTransfer {
 	}
 
 	int
-	PipeHTData::performOneTimeInit() {
+	PipeHTData::performOneTimeInit( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
 
 		int const MonthsInYear( 12 ); // Number of months in the year
 		int const AvgDaysInMonth( 30 ); // Average days in a month
@@ -663,7 +663,7 @@ namespace PipeHeatTransfer {
 	}
 
 	int
-	PipeHTData::performBeginEnvrnInit() {
+	PipeHTData::performBeginEnvrnInit( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
 
 		// For underground pipes, we need to re-init the cartesian array each environment
 		Real64 CurSimDay = double( DataGlobals::DayOfSim );
@@ -702,7 +702,7 @@ namespace PipeHeatTransfer {
 	}
 
 	int
-	PipeHTData::performFirstHVACInit() {
+	PipeHTData::performFirstHVACInit( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
 	
 		//We need to update boundary conditions here, as well as updating the arrays
 		if ( this->EnvironmentPtr == GroundEnv ) {
@@ -743,7 +743,7 @@ namespace PipeHeatTransfer {
 	}
 
 	int
-	PipeHTData::simulate( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
+	PipeHTData::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const & EP_UNUSED(FirstHVACIteration) ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Edwin Lee

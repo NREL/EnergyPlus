@@ -14,11 +14,11 @@ public:
 	int compType;
 	bool myEnvrnFlag = true;
 	bool oneTimeInit = true;
-	virtual int performEveryTimeInit() = 0;
-	virtual int performOneTimeInit() = 0;
-	virtual int performBeginEnvrnInit() = 0;
-	virtual int performFirstHVACInit() = 0;
-	virtual int simulate( const PlantLocation & calledFromLocation ) = 0;
+	virtual int performEveryTimeInit( const PlantLocation & calledFromLocation ) = 0;
+	virtual int performOneTimeInit( const PlantLocation & calledFromLocation ) = 0;
+	virtual int performBeginEnvrnInit( const PlantLocation & calledFromLocation ) = 0;
+	virtual int performFirstHVACInit( const PlantLocation & calledFromLocation ) = 0;
+	virtual int simulate( const PlantLocation & calledFromLocation, bool const & FirstHVACIteration ) = 0;
 };
 
 }

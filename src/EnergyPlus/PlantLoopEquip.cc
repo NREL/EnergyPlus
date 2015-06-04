@@ -1084,21 +1084,21 @@ namespace PlantLoopEquip {
 	void
 	simulateSingleComponent( DataPlant::CompData & sim_component, bool firstHVACiteration ) {
 		if ( sim_component.compPtr->oneTimeInit ) {
-			sim_component.compPtr->performOneTimeInit();
+			sim_component.compPtr->performOneTimeInit( sim_component.thisCompLocation );
 			sim_component.compPtr->oneTimeInit = false;
 		}
 		if ( DataGlobals::BeginEnvrnFlag && sim_component.compPtr->myEnvrnFlag ) {
-			sim_component.compPtr->performBeginEnvrnInit();
+			sim_component.compPtr->performBeginEnvrnInit( sim_component.thisCompLocation );
 			sim_component.compPtr->myEnvrnFlag = false;
 		}
 		if ( !DataGlobals::BeginEnvrnFlag ) {
 			sim_component.compPtr->myEnvrnFlag = true;
 		}
 		if ( firstHVACiteration ) {
-			sim_component.compPtr->performFirstHVACInit();
+			sim_component.compPtr->performFirstHVACInit( sim_component.thisCompLocation );
 		}
-		sim_component.compPtr->performEveryTimeInit();
-		sim_component.compPtr->simulate( sim_component.thisCompLocation );
+		sim_component.compPtr->performEveryTimeInit( sim_component.thisCompLocation );
+		sim_component.compPtr->simulate( sim_component.thisCompLocation, firstHVACiteration );
 	}
 
 	//     NOTICE

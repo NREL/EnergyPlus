@@ -16,12 +16,24 @@ namespace PlantChillers {
 
 class ChillerConstCOP : public ChillerBase {
 
-	// report variables
-	ChillerBaseReportVars reports;
-	Real64 ActualCOP = 0.0;
-
-	// methods
 	public:
+		class ReportVars : public ChillerBaseReportVars {
+			public:
+			Real64 Qcond;
+			ReportVars() :
+				Qcond( 0.0 )
+			{}
+		};
+
+		// additional variables over the base class
+		ReportVars report;
+		Real64 ActualCOP = 0.0;
+		Real64 curLoad = 0.0;
+		bool runFlag = false;
+
+		// methods
+		ChillerConstCOP();
+		
 		static std::shared_ptr< PlantComponent >
 		constCOPChillerFactory(
 			int objectType,
@@ -29,11 +41,11 @@ class ChillerConstCOP : public ChillerBase {
 		);
 
 	private:
-		int performEveryTimeInit();
-		int performOneTimeInit();
-		int performBeginEnvrnInit();
-		int performFirstHVACInit();
-		int simulate( const PlantLocation & calledFromLocation );
+		int performEveryTimeInit( const PlantLocation & calledFromLocation );
+		int performOneTimeInit( const PlantLocation & calledFromLocation );
+		int performBeginEnvrnInit( const PlantLocation & calledFromLocation );
+		int performFirstHVACInit( const PlantLocation & calledFromLocation );
+		int simulate( const PlantLocation & calledFromLocation, bool const & FirstHVACIteration );
 		int sizeChiller();
 		int calcChiller();
 		int updateChiller();
