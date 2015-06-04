@@ -16,7 +16,7 @@ TEST( JsonCppTests, Simple )
   EXPECT_EQ(root["name"], "EnergyPlus");
   EXPECT_EQ(root["value"], 1);
   EXPECT_TRUE(root["string array"].isArray());
-  EXPECT_EQ(2, root["string array"].size());
+  EXPECT_EQ(2u, root["string array"].size());
   int i = 0;
   for (const Json::Value &value : root["string array"]) {
     ASSERT_TRUE(value.isString());
