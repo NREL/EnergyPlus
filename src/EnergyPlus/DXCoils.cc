@@ -8604,8 +8604,6 @@ Label50: ;
 		Real64 OutletAirTemp; // Supply air temperature (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirHumRat; // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
-		Real64 EvapInletDryBulb; // secondary DX coil (evaporator) entering zone air node dry bulb temperature
-		Real64 EvapInletWetBulb; // secondary DX coil (evaporator) entering zone air node wet bulb temperature
 
 		if ( present( OnOffAirFlowRatio ) ) {
 			AirFlowRatio = OnOffAirFlowRatio;
