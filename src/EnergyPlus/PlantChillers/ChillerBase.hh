@@ -108,8 +108,8 @@ class ChillerBaseReportVars
 		Real64 EvapInletTemp;
 		Real64 CondOutletTemp;
 		Real64 EvapOutletTemp;
-		Real64 Evapmdot;
-		Real64 Condmdot;
+		Real64 EvapMassFlowRate;
+		Real64 CondMassFlowRate;
 		Real64 BasinHeaterPower; // Basin heater power (W)
 		Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
 
@@ -125,8 +125,8 @@ class ChillerBaseReportVars
 			EvapInletTemp( 0.0 ),
 			CondOutletTemp( 0.0 ),
 			EvapOutletTemp( 0.0 ),
-			Evapmdot( 0.0 ),
-			Condmdot( 0.0 ),
+			EvapMassFlowRate( 0.0 ),
+			CondMassFlowRate( 0.0 ),
 			BasinHeaterPower( 0.0 ),
 			BasinHeaterConsumption( 0.0 )
 		{}

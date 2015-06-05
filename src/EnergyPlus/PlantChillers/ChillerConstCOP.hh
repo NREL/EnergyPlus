@@ -30,7 +30,9 @@ class ChillerConstCOP : public ChillerBase {
 		Real64 ActualCOP = 0.0;
 		Real64 curLoad = 0.0;
 		bool runFlag = false;
-
+		Real64 CurrentEndTimeLast = 0.0; // DIFFs possible here because these were static
+		Real64 TimeStepSysLast = 0.0; 
+		
 		// methods
 		ChillerConstCOP();
 		
@@ -47,7 +49,7 @@ class ChillerConstCOP : public ChillerBase {
 		int performFirstHVACInit( const PlantLocation & calledFromLocation );
 		int simulate( const PlantLocation & calledFromLocation, bool const & FirstHVACIteration );
 		int sizeChiller();
-		int calcChiller();
+		int calcChiller( const PlantLocation & calledFromLocation );
 		int updateChiller();
 
 };
