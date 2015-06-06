@@ -1,4 +1,4 @@
-![](EMS_Application_Guide/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -1717,13 +1717,13 @@ The best calling point will depend on the type of actuator being controlled and 
 
 This section starts with a series of three figures and then discusses them and the 14 calling points. Figure 1 shows the overall flow of an EnergyPlus model with some EMS calling points. Figure 2 shows the sequence for a single timestep with the remaining EMS calling points. Figure 3 is similar but shows the calling points for shortened system timesteps. These diagram the flow of procedures during a run from top to bottom.
 
-![EMSCallingPointDiagOverall](EMS_Application_Guide/media/image003.jpg)
+![EMSCallingPointDiagOverall](media/image003.jpg)
 
 Figure 1. Overall Program Flow and EMS Calling Points
 
 
 
-![EMSCallingPointDiagTimestep](EMS_Application_Guide/media/image004.jpg)
+![EMSCallingPointDiagTimestep](media/image004.jpg)
 
 Figure 2. Timestep Sequence with EMS Calling Points
 
@@ -1731,7 +1731,7 @@ Figure 2. Timestep Sequence with EMS Calling Points
 
 
 
-![EMSCallingPointDiagSystemTimestep](EMS_Application_Guide/media/image005.jpg)
+![EMSCallingPointDiagSystemTimestep](media/image005.jpg)
 
 Figure 3. System Timestep Sequence with EMS Calling Points
 
@@ -4072,7 +4072,7 @@ Referring to the cooling capacity equation above, a new equation must be develop
 
 
 
-![](EMS_Application_Guide/media/image011.jpg)
+![](media/image011.jpg)
 
 Figure 4. Results of Performance Curve Override
 

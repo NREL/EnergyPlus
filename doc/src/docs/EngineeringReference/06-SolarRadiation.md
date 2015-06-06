@@ -15,15 +15,15 @@ Opaque building surfaces (walls, for example) are assumed to be diffusely reflec
 
 * **The ground surface**. Beam solar and sky solar reflection from the ground is calculated even if “withReflections” is not used (the default). But in this case the ground plane is considered unobstructed, i.e., the shadowing of the ground by the building itself or by obstructions such as neighboring buildings is ignored. This shadowing is taken into account only if “WithReflections” is used in the Solar Distribution field (in “Building” input object) (Figure 52). In this case the user-input value of ground view factor is not used.
 
-![](EngineeringReference/media/image670.png)
+![](media/image670.png)
 
 Figure 50.   Examples of solar reflection from shadowing surfaces in the Shading series of input objects. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface.
 
-![](EngineeringReference/media/image671.png)
+![](media/image671.png)
 
 Figure 51.   Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse.
 
-![](EngineeringReference/media/image672.png)
+![](media/image672.png)
 
 Figure 52. Shadowing by the building itself affects beam solar reflection from the ground.  Beam-to-diffuse reflection from the ground onto the building occurs only for sunlit areas, A and C, not for shaded area, B. Shadowing by the building also affects sky solar reflection from ground (not shown).
 
@@ -52,7 +52,7 @@ For example, for a vertical 3m by 5m rectangle with vertices (0,0,3), (0,0,0), (
 
 
 
-![](EngineeringReference/media/image676.png)
+![](media/image676.png)
 
 Figure 53. Vertical rectangular exterior heat transfer surface showing location of receiving points for calculating incident solar radiation reflected from obstructions.
 
@@ -78,7 +78,7 @@ In subroutine InitSolReflRecSurf, the following is determined for each ray, *i,*
 
 
 
-![](EngineeringReference/media/image680.png)
+![](media/image680.png)
 
 Figure 54.  Two-dimensional schematic showing rays going outward from a point on a receiving surface. Rays 1-6 hit the ground, rays 7-11 hit an obstruction, and rays 12-15 hit the sky.
 
@@ -119,7 +119,7 @@ If a downgoing ray from a receiving point hits the ground (for example, rays 1-6
 
 
 
-![](EngineeringReference/media/image685.png)
+![](media/image685.png)
 
 Figure 55.  Two-dimensional schematic showing rays going upward from a ground hit point.
 
@@ -201,7 +201,7 @@ QRadSWOutIncBmToDiffReflGnd(RecSurfNum) = BeamSolarRad \* <span>${\rho_{gnd}}$</
 
 Figure 56 shows schematically how specular (beam-to-beam) reflection from an obstruction is calculated. [[7]](#_ftn7)
 
-![](EngineeringReference/media/image703.png)
+![](media/image703.png)
 
 Figure 56.  Two-dimensional schematic showing specular reflection from an obstruction such as the glazed façade of a neighboring building. The receiving point receives specularly reflected beam solar radiation if (1) DB passes through specularly reflecting surface EF, (2) CD does not hit any obstructions (such as RS), and (3) AC does not hit any obstructions (such as PQ).
 

@@ -10,7 +10,7 @@ The input object “SurfaceProperty:ExteriorNaturalVentedCavity” allows modeli
 
 The baffle is assumed to be sufficiently thin and high-conductivity so that it can be modeled using a single temperature (for both sides and along its area).  This temperature <span>${T_{s,baff}}$</span>is determined by formulating a heat balance on a control volume that just encapsulates the baffle surface.  The baffle is assumed to completely cover the underlying surface such that it is opaque to shortwave and longwave radiation.  This assumption means that even though the baffle will have some open area for ventilation, no solar energy passes through these openings. The heat balance is diagrammed in the following figure.
 
-![](EngineeringReference/media/image438.png)
+![](media/image438.png)
 
 Figure 33.  Baffle Surface Heat Balance
 
@@ -88,7 +88,7 @@ where,
 
 The *cavity* is the volume of air located between the baffle and the underlying heat transfer surface.  The cavity air is modeled as well-mixed.  The uniform temperature of the cavity air, <span>${T_{a,cav}}$</span>, is determined by formulating a heat balance on a control volume of air as diagrammed below.
 
-![](EngineeringReference/media/image469.png)
+![](media/image469.png)
 
 Figure 34.  Cavity Air Heat Balance
 
@@ -286,7 +286,7 @@ The detailed energy balance analysis and resulting equations, being rather compl
 
 As with a traditional roof, the energy balance of an green roof is dominated by radiative forcing from the sun. This solar radiation is balanced by sensible (convection) and latent (evaporative) heat flux from soil and plant surfaces combined with conduction of heat into the soil substrate. This energy balance is illustrated in Figure 35. The variables introduced in this figure are defined in the equations that follow.
 
-![Fig1EcoRoof](EngineeringReference/media/image509.png)
+![Fig1EcoRoof](media/image509.png)
 
 Figure 35.  The Energy Balance for a Green Roof.
 

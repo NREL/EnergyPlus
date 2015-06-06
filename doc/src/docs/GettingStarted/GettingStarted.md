@@ -1,5 +1,5 @@
 
-![](GettingStarted/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -98,13 +98,13 @@ Since the original version (2001), EnergyPlus code and structure continued to ev
 
 ***Established Links:*** The modularity of EnergyPlus makes it easier for other developers to quickly add other component simulation modules. This means that it will be significantly easier to establish links to other programming elements. Since initially the EnergyPlus code will contain a significant number of existing modules, there will be many places within the HVAC code where natural links to new programming elements can be established. These are fully documented to assist other developers in a swift integration of their research into EnergyPlus. In addition to these more natural links in the HVAC section of the code, EnergyPlus will also have other more fluid links in areas such as the heat balance that will allow for interaction where the modules might be more complex or less component based. Again, the goal of this feature of EnergyPlus is maximize the number of developers who can quickly integrate their work into EnergyPlus for the minimum investment of resources. The following diagram depicts how other programs have already been linked to EnergyPlus and a big picture view of how future work can impact the program.
 
-![](GettingStarted/media/image001.png)
+![](media/image001.png)
 
 Figure 1. EnergyPlus -- the big picture
 
 ***Integration of Loads, Systems, and Plants:*** One of the strong points of EnergyPlus is the integration of all aspects of the simulation—loads, systems, and plants. Based on a research version of the BLAST program called IBLAST, system and plant output is allowed to directly impact the building thermal response rather than calculating all loads first, then simulating systems and plants. The simulation is coupled allowing the designer to more accurately investigate the effect of undersizing fans and equipment and what impact that might have on the thermal comfort of occupants within the building. The diagram below shows a basic overview of the integration of these important elements of a building energy simulation.
 
-![](GettingStarted/media/image002.jpg)
+![](media/image002.jpg)
 
 Figure 2. EnergyPlus -- Internal elements
 
@@ -248,7 +248,7 @@ EP-Launch is an optional component of the EnergyPlus Windows installation (it is
 
 
 
-![](GettingStarted/media/image004.png)
+![](media/image004.png)
 
 Figure 4. EP-Launch Screen
 
@@ -276,7 +276,7 @@ Multiple single input file and group simulations can be started at the same time
 
 After you have run a simulation and the black DOS window closes, EnergyPlus has completed, and a status message is displayed see Figure 5:
 
-![](GettingStarted/media/image005.jpg)
+![](media/image005.jpg)
 
 Figure 5. EP-Launch Finish Status
 
@@ -284,7 +284,7 @@ This status gives you a quick overview of whether there were warning (**should l
 
 Another way to open files easily is by using the View Results buttons shown in Figure 6. Two different panels of buttons can be used under View Results, one shown by using the “All” tab on the left edge and by using the “Sets” tab on the left edge. The “All” tab shows all the various files by file extension that can be viewed individually.  Files available for view  based on the current input file name are “enabled” (extension names clearly readable). The contents of each file extension is listed below.
 
-![](GettingStarted/media/image006.png)
+![](media/image006.png)
 
 Figure 6. EP-Launch with the Sets tab of View Results
 
@@ -388,13 +388,13 @@ No cutting or pasting is used in this program so the edit menu shows options tha
 
 The View menu (Figure 7) duplicates the options in the "View Results" area of the main screen (see the *Looking at the Results* section above) and allows opening of selected output files. You can also open the folders that contain the active input and weather files. Opening a single file is under a submenu and is very similar to the Quick Open Panel for Single Simulation described above. Selecting “HTML File” from the “View” menu will open any user created files saved in the format: &lt;filename&gt;table.html (see *OutputControl:Table:Style*).
 
-![](GettingStarted/media/image007.png)
+![](media/image007.png)
 
 Figure 7. EP-Launch View Menu
 
 
 
-![](GettingStarted/media/image008.png)
+![](media/image008.png)
 
 Figure 8. EP-Launch Options Screen.
 
@@ -492,7 +492,7 @@ The recently used input, weather and group file pull down lists can hold a maxim
 
 The utilities tab shown in the following figure allows several utility programs that come with EnergyPlus to be used directly. More information on each utility is also available in the AuxiliaryPrograms documentation.
 
-![](GettingStarted/media/image009.png)
+![](media/image009.png)
 
 Figure 9. EP-Launch Utilities Tab.
 
@@ -514,7 +514,7 @@ The EPL-RUN.BAT batch file is used to run EnergyPlus from the EP-Launch program.
 
 Though EnergyPlus has had several releases (including beta releases prior to initial release), there still may be problems when input files meet with EnergyPlus. If you are using EP-Launch when this happens, you will see a window appear as in the figure below (Figure 10). Follow the instructions listed on the screen.
 
-![](GettingStarted/media/image010.jpg)
+![](media/image010.jpg)
 
 Figure 10. EnergyPlus crash within EP-Launch.
 
@@ -677,7 +677,7 @@ Running EnergyPlus, Building Envelope, Internal Loads, Reports
 
 - Lightweight construction
 
-![Exercise1](GettingStarted/media/image011.jpg)
+![Exercise1](media/image011.jpg)
 
 Figure 11. Schematic for Exercise 1
 
@@ -1206,7 +1206,7 @@ A "zone" is a *thermal,* not a *geometric,* concept. A “zone” is an air volu
 
 Although defining building zones is somewhat of an art, a few general rules will keep the new simulation user out of trouble. Consider the following figure, which shows the floor plan of an Adult Education Center.
 
-![](GettingStarted/media/image012.png)
+![](media/image012.png)
 
 Figure 12. Adult Education Center
 
@@ -1216,7 +1216,7 @@ The question is, "How many *thermal* zones should be used to model this building
 
 Complete estimates of the total building load (magnitude only) may be obtained with very simple models. For example the total building load calculated using a one-zone model of the Education Center (Figure 13) will **NOT** be significantly different from the total building load calculated using a more detailed model. The *distribution* of the load within the building cannot be estimated with the simplified building model, but its *magnitude* (such as would be used in sizing the central plant equipment) can be quickly estimated using a very simple model. For simplicity, assume there is no ground heat transfer; if you want to simulate ground heat transfer, you should use the slab and/or basement programs as described in the Auxiliary Programs document.
 
-![](GettingStarted/media/image013.png)
+![](media/image013.png)
 
 Figure 13. Single Zone Model of the Adult Education Center.
 
@@ -1287,7 +1287,7 @@ Table 2. Zoning the Building by System Type.
 
 
 
-![](GettingStarted/media/image014.png)
+![](media/image014.png)
 
 Figure 14. Thermal Zones in the Education Center
 
@@ -1480,7 +1480,7 @@ Before dealing with equivalent surfaces, it is appropriate to take the concept o
 
 The following figure shows the surfaces and subsurfaces required for a one-zone model, i.e., the education center. Since there were two types of partitions in the building, two heat storage surfaces ("internal mass") of different constructions were defined.
 
-![](GettingStarted/media/image015.png)
+![](media/image015.png)
 
 Figure 15. Simplifications Using Equivalent Surfaces
 
@@ -1632,7 +1632,7 @@ Notes:
 
 *Building North Axis:* This syntax simplifies building geometry specification by designating one wall of the building as the building’s north pointing axis. The building model North axis is measured from true (compass) North. Surface facing angles (see surface information below) are then specified relative to the building north axis. The *North Axis* entry in the Input Output Reference (duplicated here) illustrates specification of the building north axis.
 
-![](GettingStarted/media/image016.png)
+![](media/image016.png)
 
 Figure 16. Illustration of Building North Axis
 
@@ -1666,7 +1666,7 @@ For the single zone model, the following figure is a schematic representation of
 
 4.    Specify the roof and floor as rectangles of the correct size.
 
-![OneZoneEducCenter-takeoff](GettingStarted/media/image017.jpg)
+![OneZoneEducCenter-takeoff](media/image017.jpg)
 
 Figure 17. Schematic of One Zone Model with Exterior Wall length and Window Areas.
 
@@ -1958,13 +1958,13 @@ The column headings in the table have the following meanings:
 
 As the following figure shows, the equivalent area floor/roof does not fit in the building perimeter. As an exercise, you might reconfigure both floor and roof to be a polygonal shape and compare results.
 
-![](GettingStarted/media/image018.png)
+![](media/image018.png)
 
 Figure 18. Full Building - Adult Education Center
 
 As an adjunct to the previous schematic layout for the one zone approach, the following figure shows the same building but with IP units:
 
-![](GettingStarted/media/image019.jpg)
+![](media/image019.jpg)
 
 Figure 19, Schematic for One Zone Building - IP Units
 
@@ -1988,7 +1988,7 @@ Unitary System and VAV using HVACTemplate Inputs
 
 
 
-![](GettingStarted/media/image020.png)
+![](media/image020.png)
 
 Figure 20. Schematic for Exercise 2.
 
@@ -2544,7 +2544,7 @@ Full details of the IDF Editor can be found in the Auxiliary Programs document.�
 
 IDF Editor is an optional component of the EnergyPlus installation. For users who want a simple way of creating or editing EnergyPlus input data files (IDF), IDF Editor provides this service.  The IDF Editor does not check inputs for validity, although some numeric fields are highlighted if out of range and some text fields are highlighted if they contain an invalid reference. For instructions and rules that must be followed when creating an IDF file the user should refer to the [*Input/Output Reference*](../../EnergyPlusFromStarTeam/EnergyPlusFromStarTeam/Documentation/sources/InputOutputReference.pdf) document.
 
-![](GettingStarted/media/image021.jpg)
+![](media/image021.jpg)
 
 Figure 21. IDF Editor Screen.
 
@@ -2592,7 +2592,7 @@ The “File”, “Save Options” screen is shown below.
 
 
 
- ![](GettingStarted/media/image022.png)
+ ![](media/image022.png)
 
 Figure 22. IDF Editor Save Options Screen.
 
@@ -2674,7 +2674,7 @@ Results from EnergyPlus (using EP-Launch) appear in several possible formats.  
 
 As an example, here is what the normal “csv” file might look like in Excel™:
 
-![](GettingStarted/media/image023.png)
+![](media/image023.png)
 
 Figure 23. Results in Spreadsheet format
 
@@ -2883,7 +2883,7 @@ Standard Energy Meters
 
 Meters provide one way for EnergyPlus to report energy use in a form that is pallatable to the users. The primary implemented method for output gives very fine detail (down to the variable level) for results from EnergyPlus. However, to get the required energy use, there may be several variables that need to be polled and accumulated. The meter implementation for EnergyPlus accomplishes this reporting.
 
-![EnergyMeters](GettingStarted/media/image024.jpg)
+![EnergyMeters](media/image024.jpg)
 
 Figure 24. Illustration of Energy Metering
 

@@ -29,7 +29,7 @@ The input object AirTerminal:SingleDuct:ConstantVolume:Reheat provides a model f
 
 This object can be configured with a water, steam, electric or gas reheat coil. Operation is basically the same with all coil types. The coil is controlled to raise the zone supply air temperature (i.e., the Unit Air Outlet Node temperature) to match the zone load.  If the coil is undersized, the zone setpoint temperature will not be maintained.
 
-![ConstVolumeReheat](EngineeringReference/media/image2788.png)
+![ConstVolumeReheat](media/image2788.png)
 
 Figure 153. Schematic of AirTerminal:SingleDuct:ConstantVolume:Reheat Unit
 
@@ -39,13 +39,13 @@ The VAV Single Duct Reheat and No Reheat terminal units (objects AirTerminal:Sin
 
 
 
-![Damper\_NoHeat](EngineeringReference/media/image2789.png)
+![Damper\_NoHeat](media/image2789.png)
 
 Figure 154. Schematic of AirTerminal:SingleDuct:VAV:NoReheat Unit
 
 
 
-![Damper](EngineeringReference/media/image2790.png)
+![Damper](media/image2790.png)
 
 Figure 155. Schematic of AirTerminal:SingleDuct:VAV:Reheat Unit
 
@@ -77,13 +77,13 @@ The no reheat version of the single duct VAV heat and cool terminal unit contain
 
 Both units are simulated to provide an air flow rate sufficient to satisfy the thermostat request. The air flow rate is a function of the terminal unit’s inlet air temperature and the load sensed by the thermostat. The output of the models are simply the damper position required to satisfy the zone’s thermal load. Other information regarding terminal unit performance may be viewed using node report variables and heating coil report variables.
 
-![Damper\_NoHeat](EngineeringReference/media/image2791.png)
+![Damper\_NoHeat](media/image2791.png)
 
 Figure 156. Schematic of AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat Unit
 
 
 
-![Damper](EngineeringReference/media/image2792.png)
+![Damper](media/image2792.png)
 
 Figure 157. Schematic of AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat Unit
 
@@ -801,7 +801,7 @@ The emphasis in EnergyPlus was laid on developing a building simulation model fo
 
 The steam boiler is a variable mass flow rate device.  The mass flow rate of steam through the boiler is determined by the heating demand on the loop which in turn is determined by the equipment that is hooked to the demand side of the loop, namely the steam coils and hot water heater.  In short, the steam coil determines the mass flow rate of steam required for heating the zone to its required setpoint, the mixer sums up the total steam demanded by each of the individual coils and reports it to the boiler via the pump.
 
-![SteamBoilerInSteamLoop](EngineeringReference/media/image2932.png)
+![SteamBoilerInSteamLoop](media/image2932.png)
 
 Figure 158.  Schematic of Steam Boiler in the Steam loop
 
@@ -813,7 +813,7 @@ Figure 159 outlines the simple steam boiler model.  Sub cooled water enters the
 
 The advantage of steam heating systems over hot water is the high latent heat carrying capacity of steam, which reduces the mass flow rate of the fluid required.  The amount of superheated and sub cooled heat transfer in Steam heating systems is negligible, latent heat transfer accounts for almost all of the heat exchange into the zones via steam to air heat exchangers.
 
-![SteamBoilerOperation](EngineeringReference/media/image2933.png)
+![SteamBoilerOperation](media/image2933.png)
 
 Figure 159.  Schematic of Steam Boiler Operation
 
@@ -1306,7 +1306,7 @@ The Chiller:Absorption:Indirect object is an enhanced version of the absorption 
 
 The indirect absorption chiller’s condenser and evaporator are similar to that of a standard chiller, which are both water-to-water heat exchangers. The assembly of a generator and absorber provides the compression operation. A schematic of a single-stage absorption chiller is shown in the figure below. Low-pressure vapor from the evaporator is absorbed by the liquid solution in the absorber. A pump receives low-pressure liquid from the absorber, elevates the pressure of the liquid, and delivers the liquid to the generator. In the generator, heat from a high temperature source (hot water or steam) drives off the vapor that has been absorbed by the solution. The liquid solution returns to the absorber through a throttling valve whose purpose is to provide a pressure drop to maintain the pressure difference between the generator and absorber. The heat supplied to the generator can be either hot water or steam, however, connection to an actual plant loop is not required. For more information on indirect absorption chillers, see the Input/Output Reference Document (Object: Chiller:Absorption:Indirect).
 
-![Schematic\_AbsorptionChiller](EngineeringReference/media/image3060.png)
+![Schematic\_AbsorptionChiller](media/image3060.png)
 
 Figure 160. Schematic Diagram of a Single-Stage Absorption Chiller
 
@@ -2048,7 +2048,7 @@ This chiller’s basin heater (for evaporatively-cooled condenser type) operates
 
 The electric chillers (e.g., Chiller:Electric, Chiller:EngineDriven, Chiller:CombustionTurbine, Chiller:Electric:EIR, and Chiller:Electric:ReformulatedEIR) all have the option of connecting a third plant loop for heating hot water at the same time the chiller cools the chilled water.  The engine and combustion turbine chillers models include curves for heat recovery from oil and or jacket coolers.  The other three chillers can model heat recovery where part of its condenser section is connected to a heat recovery loop for what is commonly known as a double bundled chiller, or single condenser with split bundles.  The heat recovery chiller is simulated as a standard vapor compression refrigeration cycle with a double bundled condenser.  A double bundle condenser involves two separate flow paths through a split condenser.  One of these paths is condenser water typically connected to a standard cooling tower; the other path is hot water connected to a heat recovery loop.  After leaving the compressor, the refrigerant is condensed to liquid in a refrigerant to water condenser.  In a split bundle, the chiller’s internal controls will direct a part of the refrigerant to heat recovery condenser bundle and/or to the tower water condenser bundle depending on the chilled water load, the condenser inlet temperatures and internal chiller controls (and possibly a leaving hot water temperature setpoint).  The refrigerant pressure is then dropped through a throttling valve so that fluid can evaporate at a low pressure that provides cooling to the evaporator.
 
-![](EngineeringReference/media/image3175.png)
+![](media/image3175.png)
 
 Figure 161.  Diagram of Chiller:Electric with Heat Recovery
 

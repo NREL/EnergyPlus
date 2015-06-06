@@ -574,7 +574,7 @@ where
 
 
 
-![ClearSkyAngles](EngineeringReference/media/image733.png)
+![ClearSkyAngles](media/image733.png)
 
 Figure 57.  Angles appearing in the expression for the clear-sky luminance distribution.
 
@@ -647,7 +647,7 @@ The net illuminance from the window is obtained by summing the contributions fro
 
 In performing the summation, window elements that lie below the workplane (<span>$\cos \gamma  < 0$</span>) are omitted since light from these elements cannot reach the workplane directly.
 
-![GeomDirComp](EngineeringReference/media/image755.png)
+![GeomDirComp](media/image755.png)
 
 Figure 58.  Geometry for calculation of direct component of daylight illuminance at a reference point. Vectors R<sub>ref</sub>, W<sub>1</sub>, W<sub>2</sub>, W<sub>3</sub> and R<sub>win</sub> are in the building coordinate system.
 
@@ -836,7 +836,7 @@ where
   \end{array}
 $$</div>
 
-![GeomGlare](EngineeringReference/media/image794.png)
+![GeomGlare](media/image794.png)
 
 Figure 59.  Geometry for calculation of displacement ratios used in the glare formula.
 
@@ -1308,7 +1308,7 @@ For a continuously-dimmable control system, it is assumed that *f<sub>P</sub>* i
 
 <div>$${f_P} = \left\{ \begin{array}{l}{f_{P,\min }} & {\rm{for }}{f_L} < {f_{L,\min }}\\\frac{{{f_L} + (1 - {f_L}){f_{P,\min }} - {f_{L,\min }}}}{{1 - {f_{L,\min }}}}\end{array} \right.{\rm{   for }}{f_{L,\min }} \le {f_L} \le 1$$</div>
 
-![](EngineeringReference/media/image823.png)
+![](media/image823.png)
 
 Figure 60.  Control action for a continuous dimming system.
 
@@ -1324,7 +1324,7 @@ For a stepped control system, *f<sub>P</sub>* takes on discrete values depending
 
 If a lighting control probability,* p<sub>L</sub>*, is specified,* f<sub>P</sub>* is set one level higher a fraction of the time equal to *1-p<sub>L</sub>*. Specifically, if* f<sub>P</sub>* &lt;1,* f<sub>P</sub>*à* f<sub>P</sub>*+ 1/*N<sub>L</sub>* if a random number between 0 and 1 exceeds *p<sub>L</sub>*. This can be used to simulate the uncertainty associated with manual switching of lights.
 
-![](EngineeringReference/media/image825.png)
+![](media/image825.png)
 
 Figure 61.  Stepped lighting control with three steps.
 
@@ -1409,7 +1409,7 @@ The DElight daylighting calculation has three main steps:
 
 * *Complex Fenestration System Calculation:*  DElight calculates the contribution to the initial interior illuminance at each reference point, and to the luminance at each gridded nodal patch of interior surfaces, of the light transmitted by complex fenestration systems (CFS).  The analysis of a CFS within DElight is based on the characterization of the system using bi-directional transmittance distribution functions (BTDF), which must be either pre-calculated (e.g., using ray-tracing techniques) or pre-measured, prior to analysis by DElight.  A BTDF is a set of data for a given CFS, which gives the ratios of incident to transmitted light for a range of incoming and outgoing directions.  As illustrated in Figure 62, a BTDF can be thought of as collapsing a CFS to a “black box” that is represented geometrically as a flat two-dimensional light-transmitting surface that will be treated as an aperture surface in the daylit zone description. For each incoming direction across the exterior hemisphere of the CFS, varying portions of that light are transmitted at multiple outgoing directions across the interior hemisphere of the CFS.  The two-dimensional CFS “surface” and directional hemispheres are “abstract” in that they may not literally correspond to actual CFS component geometric details.
 
-![](EngineeringReference/media/image827.png)
+![](media/image827.png)
 
 Figure 62.  Bi-Directional Transmittance Data.
 
@@ -1464,7 +1464,7 @@ For any case, illuminace at a window element can be calculated by using the foll
 
 where <span>$dE{W_{at\_window}}$</span> is the illuminance at a window element, <span>$Lu{m_{el}}({\theta_{el}},{\phi_{el}})$</span> represents the function of horizontal luminance from the exterior element in the direction <span>$({\theta_{el}},{\phi_{el}})$</span>, <span>${\beta_{el}}$</span> represents the angle at which the ray hits the surface of the window and <span>$({\theta_{el}},{\phi_{el}})$</span> represents the exterior element azimuth and altitude relative to the window (see Figure 63).
 
-![](EngineeringReference/media/image834.png)
+![](media/image834.png)
 
 Figure 63: Exterior Luminance Element
 
@@ -1482,7 +1482,7 @@ To calculate the interan average reflected illumiance from the window, a similla
 
 where <span>${F_1}$</span>represents first reflected flux which in the case of non-CFS is calculated by using the split-flux method.  In the case of CFS, first the reflected flux can be calculated more precisely by using light patches area.  Since each CFS is described by a BSDF, it is possible to calculate the light patches for each outgoing direction (see Figure 64).
 
-![](EngineeringReference/media/image842.png)
+![](media/image842.png)
 
 Figure 64: Complex Fenestration System Light Patches
 
@@ -1516,7 +1516,7 @@ In the case of CFS it is of interest to calculate fluxes for each outgoing BSDF 
 
 where <span>${T_{dir - dir,i,o}}$</span> is the direct-direct transmittance for given incoming and outgoing directions (“i” and “o”).
 
-![](EngineeringReference/media/image854.png)
+![](media/image854.png)
 
 Figure 65: Complex Fenestration System Flux Transition - Single Incoming Direction to Single Outgoing Direction
 
@@ -1563,7 +1563,7 @@ There are two types of daylighting device in EnergyPlus:  tubular daylighting d
 
 The input object DaylightingDevice:Tubular provides a special model for fenestration components known as Tubular Daylighting Devices (TDDs), also known as tubular skylights or light pipes.  TDDs are constructed of three components: a dome, a pipe, and a diffuser.
 
-![TubeDevices](EngineeringReference/media/image869.png)
+![TubeDevices](media/image869.png)
 
 Figure 66.  Tubular Daylighting Devices
 
@@ -1581,7 +1581,7 @@ Solar gains and conductive/convective gains are simulated by the zone heat balan
 
 For both daylighting and heat balance simulations, the dome and diffuser are treated as special window surfaces to take advantage of many of the standard daylighting and heat transfer routines.  Together the dome and diffuser become "receiver" and "transmitter", i.e. radiation entering the dome ends up exiting the diffuser.
 
-![](EngineeringReference/media/image870.png)
+![](media/image870.png)
 
 Figure 67.  Dome and Diffuser Surfaces
 
@@ -1591,7 +1591,7 @@ The pipe is simulated by a separate code module.  While several different measu
 
 The transmittance of beam radiation is derived from the integration of the transmittance of many discrete rays.  The transmittance of a discrete ray through a pipe is dependent on the reflectivity of the inside pipe surface, the aspect ratio of the pipe, the incident angle of the ray, and the point of entry into the pipe.
 
-![](EngineeringReference/media/image871.png)
+![](media/image871.png)
 
 Figure 68.  Discrete Ray in a Pipe
 
@@ -1621,7 +1621,7 @@ In the graph below, interpolated values from EnergyPlus are compared to the resu
 
 
 
-![](EngineeringReference/media/image874.png)
+![](media/image874.png)
 
 Figure 69.  Pipe Transmittance Comparison.
 
@@ -1813,7 +1813,7 @@ The input object DaylightingDevice:Shelf provides a special model for light shel
 
 The window is divided into two window surfaces: an upper window and a lower window.  The upper window interacts with the daylighting shelf but the lower window does not, except to receive shading from the outside shelf.
 
-![](EngineeringReference/media/image893.png)
+![](media/image893.png)
 
 Figure 70.  Daylighting Shelf Diagram
 
@@ -1889,7 +1889,7 @@ The view factor to the outside shelf, F<sub>ws</sub>, if not specified by the us
 
 
 
-![](EngineeringReference/media/image899.png)
+![](media/image899.png)
 
 Figure 71.  Window and Outside Shelf as Adjacent Perpendicular Rectangles.
 
@@ -1955,7 +1955,7 @@ The input object DaylightingDevice:LightWell provides a model for attenuation of
 
 The attenuation is characterized by the **well efficiency**, which is the ratio of the amount of light leaving the well to the amount of light entering the well. The well efficiency varies from close to 1.0  to close to zero if there is high attenuation. The well efficiency is used only in the EnergyPlus detailed daylighting calculation, where it multiplies the beam and diffuse light transmitted by the skylight. (The well efficiency is not used in calculating the solar gain through the skylight.)
 
-![](EngineeringReference/media/image907.png)
+![](media/image907.png)
 
 Figure 72. Skylight with light well: (a) perspective view, (b) vertical section.
  If the bottom of the light well is a rectangle of side lengths c and d, as shown in (a), then the perimeter of the bottom of the well = 2(c+d) and the area = cd (see description of field names for the Light Well object).
@@ -1970,7 +1970,7 @@ The model in EnergyPlus was implemented by fitting a curve to the data presented
 
 <div>$${\rm{Well efficiency}} = {e^{ - WCR*(0.16368 - 0.144678*{\rm{Reflectance}})}}$$</div>
 
-![](EngineeringReference/media/image910.png)
+![](media/image910.png)
 
 Figure 73. Graph showing light well efficiency vs. well cavity ratio (WCR) for well-wall visible reflectances of 80% (upper curve), 60% (middle curve) and 40% (lower curve). Based on Fig. 8-21 of the Lighting Handbook: Reference and Application, 8<sup>th</sup> Edition, 1993, Illuminating Engineering Society of North America.
 
@@ -2457,7 +2457,7 @@ The angular properties of windows are important because during energy modeling, 
 
 
 
- ![AngularCorrelationMAP](EngineeringReference/media/image947.png)
+ ![AngularCorrelationMAP](media/image947.png)
 
 Figure 74. Diagram of Transmittance and Reflectance Correlations Used based on U and SHGC.
 
@@ -2469,13 +2469,13 @@ The coefficient values for a, b, c, d, and e are listed in the following tables 
 
 
 
-![Figure72](EngineeringReference/media/image950.png)
+![Figure72](media/image950.png)
 
 Figure 75. Normalized Transmittance Correlations for Angular Performance
 
 
 
-![Fiure73](EngineeringReference/media/image951.png)
+![Fiure73](media/image951.png)
 
 Figure 76. Normalized Reflectanct Correlations for Angular Performance
 
@@ -2505,7 +2505,7 @@ The optical properties of a glazing system consisting of *N* glass layers separa
 
 In Eq. *T<sub>i,j</sub>* = 1 and *R<sub>i,j</sub>* = 0 if* i*&lt;0 or* j*&gt;*N*.
 
-![](EngineeringReference/media/image956.png)
+![](media/image956.png)
 
 Figure 77.  Schematic of transmission, reflection and absorption of solar radiation within a multi-layer glazing system.
 
@@ -2859,7 +2859,7 @@ The value of the switching factor in a particular time step depends on what type
 
 Thermochromic (TC) materials have active, reversible optical properties that vary with temperature. Thermochromic windows are adaptive window systems for incorporation into building envelopes. Thermochromic windows respond by absorbing sunlight and turning the sunlight energy into heat. As the thermochromic film warms it changes its light transmission level from less absorbing to more absorbing. The more sunlight it absorbs the lower the light level going through it. Figure 78 shows the variations of window properties with the temperature of the thermochromic glazing layer. By using the suns own energy the window adapts based solely on the directness and amount of sunlight. Thermochromic materials will normally reduce optical transparency by absorption and/or reflection, and are specular (maintaining vision).
 
-![](EngineeringReference/media/image1015.svg.png)
+![](media/image1015.svg.png)
 
 Figure 78. Variations of Window Properties with the Temperature of the Thermochromic Glazing Layer
 
@@ -2877,7 +2877,7 @@ The active thermochromic material can be embodied within a laminate layer or a s
 
 The tinted film, in combination with a heat reflecting, low-e layer allows the window to reject most of the absorbed radiation thus reducing undesirable heat load in a building. In the absence of direct sunlight the window cools and clears and again allows lower intensity diffuse radiation into a building. TC windows can be designed in several ways (Figure 79), with the most common being a triple pane windows with the TC glass layer in the middle a double pane windows with the TC layer on the inner surface of the outer pane or for sloped glazing a double pane with the laminate layer on the inner pane with a low-e layer toward the interior. The TC glass layer has variable optical properties depending on its temperature, with a lower temperature at which the optical change is initiated, and an upper temperature at which a minimum transmittance is reached. TC windows act as passive solar shading devices without the need for sensors, controls and power supplies but their optical performance is dependent on varying solar and other environmental conditions at the location of the window.
 
-![](EngineeringReference/media/image1016.png) ![](EngineeringReference/media/image1017.png)
+![](media/image1017.png)
 
 Figure 79. Configurations of Thermochromic Windows
 
@@ -2936,7 +2936,7 @@ The direct-to-direct and direct-to-diffuse transmittance of a blind is calculate
 
 The goal of the blind direct transmission calculation is to determine the direct and diffuse radiation leaving the cell through *s<sub>2</sub>* for unit direct radiation entering the cell through *s<sub>1</sub>*.
 
-![](EngineeringReference/media/image1034.png)
+![](media/image1034.png)
 
 Figure 80. (a) Side view of a cell formed by adjacent slats showing how the cell is divided into segments, *s<sub>i</sub>*,  for the calculation of direct solar transmittance; (b) side view of a cell showing case where some of the direct solar passes between adjacent slats without touching either of them. In this figure φ<sub>s</sub> is the profile angle and φ<sub>b</sub> is the slat angle.
 
@@ -3027,11 +3027,11 @@ The view factors, <span>${F_{ij}}$</span>, are obtained as follows. The cell we 
 
 These constraints lead to simple equations for the view factors for* n* = 3 and 4. For *n* = 3, we have the following geometry and view factor expression:
 
-![WindowHB\_1](EngineeringReference/media/image1059.png)
+![WindowHB\_1](media/image1059.png)
 
 For  *n* = 4  we have:
 
-![WindowHB\_2](EngineeringReference/media/image1060.png)
+![WindowHB\_2](media/image1060.png)
 
 Applying these to the slat cell shown in Figure 81 we have the following:
 
@@ -3039,7 +3039,7 @@ Applying these to the slat cell shown in Figure 81 we have the following:
 
 <div>$${F_{13}} = \frac{{h + {s_3} - {d_3}}}{{2h}}{\rm{ ,  etc}}{\rm{.}}$$</div>
 
-![](EngineeringReference/media/image1063.png)
+![](media/image1063.png)
 
 Figure 81. Slat cell showing geometry for calculation of view factors between the segments of the cell.
 
@@ -3112,7 +3112,7 @@ The back-side properties are calculated in a similar way by setting *Q<sub>2</su
 
 The diffuse-to-diffuse calculations are performed separately for solar, visible and IR slat properties to get the corresponding solar, visible and IR blind properties.
 
-![](EngineeringReference/media/image1078.png)
+![](media/image1078.png)
 
 Figure 82. Slat cell showing arrangement of segments and location of source for calculation of diffuse-to-diffuse optical properties.
 
@@ -3140,7 +3140,7 @@ These are obtained by integrating over sky and ground elements, as shown in Figu
 
 <div>$$\alpha_{bl,f}^{sky - dif} = \frac{{\int\limits_0^{\pi /2} {\alpha_{bl,f}^{dir}{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}{{\int\limits_0^{\pi /2} {{I_{sky}}({\phi_s})\cos {\phi_s}d{\phi_s}} }}$$</div>
 
-![](EngineeringReference/media/image1090.png)
+![](media/image1090.png)
 
 Figure 83.  Side view of horizontal slats in a vertical blind showing geometry for calculating blind transmission, reflection and absorption properties for sky and ground diffuse radiation.
 
@@ -3168,7 +3168,7 @@ As an example of how the edge correction factor is applied, the following two eq
 
 <div>$$\begin{array}{l}\tau_{bl,f}^{dif,dif} \to \tau_{bl,f}^{dif,dif}\left( {1 - {f_{edge}}} \right)\\\rho_{bl,f}^{dif} \to \rho_{bl,f}^{dif}\left( {1 - {f_{edge}}} \right) + {f_{edge}}{\rho_f}\end{array}$$</div>
 
-![](EngineeringReference/media/image1100.png)
+![](media/image1100.png)
 
 Figure 84. Side view of slats showing geometry for calculation of slat edge correction factor for incident direct radiation.
 
@@ -3754,7 +3754,7 @@ This reflected beam transmittance component depends upon the diffuse (i.e., beam
 
 The model is based on an orthogonal crossed cylinder geometry in which the screen material’s cylindrical diameter and spacing are known. The model assumes that the screen material diameter and spacing are the same in both directions. Figure 85 shows a rendering of intersecting orthogonal crossed cylinders used as the basis for the EnergyPlus screen model.
 
-![ScreenDiameter\_Spacing](EngineeringReference/media/image1148.png)
+![ScreenDiameter\_Spacing](media/image1148.png)
 
 Figure 85. Screen model rendering of intersecting orthogonal crossed cylinders
 
@@ -3784,7 +3784,7 @@ where
 
 Figure 86 below shows the input requirements for material diameter and spacing and the associated calculation for openness factor, the equivalent to *T<sub>beam</sub>* at direct normal incidence.
 
-![AspectRatio](EngineeringReference/media/image1153.png)
+![AspectRatio](media/image1153.png)
 
 Figure 86. Physical screen material properties
 
@@ -3794,7 +3794,7 @@ Figure 86. Physical screen material properties
 
 The first component of the window screen transmittance model is a geometric representation of the open area of the screen material and is dependent on the angle of incident beam radiation. Figure 87 shows a schematic of a South-facing vertical window screen and the solar angles used in EnergyPlus. The window screen model is based on the relative angles of incidence of the sun’s rays with respect the the window screen outward normal. In the figure, the relative solar azimuth and relative solar altitude are represented as φ’ and α’, respectively.
 
-![WindowScreenSchematic](EngineeringReference/media/image1154.png)
+![WindowScreenSchematic](media/image1154.png)
 
 Figure 87. Schematic of a vertical window screen facing due South
 
@@ -3951,7 +3951,7 @@ The screen absorptance(overall value for the screen assembly, accounting for the
 
 The transmittance of the screen to half-hemispherical diffuse (sky) radiation is calculated by performing a finite-element-summation, approximately equivalent to an integration over the solid angle of the beam transmittance, assuming uniform radiance. This single-number screen diffuse transmittance is then multiplied by the irradiance incident on the screen from a uniform half-hemisphere of sky- or ground-reflected radiation to determine the level of additional flux transmitted by the screen to the window from the diffuse sky or ground. The sun angles shown in the figure below represent the solar altitude angle (θ) and solar azimuth angle (Ф) in polar coordinates. These angles are used to calculate the average diffuse-to-diffuse properties for screens in the following derivations.
 
-![PolarCoordinates](EngineeringReference/media/image1210.png)
+![PolarCoordinates](media/image1210.png)
 
 Figure 88. Sun Angles in Screen Calculations.
 
@@ -3993,7 +3993,7 @@ The combined system properties of the screen/glass combination are calculated us
 
 For the example of beam transmittance, the incident solar beam strikes the screen at the incident angle associated with the current relative azimuth and altitude angle. The incident beam splits into reflected and transmitted components at the screen. The transmitted component is attenuated as it passes through the screen material by the screen’s beam transmittance (<span>$T_{sc}^{dir,dir}$</span>, shown as<span>$T_{sc}^{dir}$</span> in the figure and equations below) at this incident angle. The reflected (scattered) transmittance of incident solar beam is also shown at this point and will be discussed later in this section. As the attenuated solar beam continues on towards the front glass surface, a portion of the screen-transmitted beam splits at the window surface into transmitted and reflected components. The reflected component reflects off the front surface of the glass material (<span>$T_{sc}^{dir,dir}R_{gl,f}^{dir}$</span>) and the transmitted component continues to travel through the glass material and is further attenuated by the glass beam transmittance. Thus the first term of the combined screen/glass solar beam transmittance is shown as <span>$T_{sc}^{dir,dir}T_{gl}^{dir}$</span>. Interreflections are accounted for by following the beam as it continues to reflect off the front surface of the glass material and the back surface of the screen material. Continuing on with the glass-reflected beam (<span>$T_{sc}^{dir,dir}R_{gl,f}^{dir}$</span>) described above, this beam strikes the back surface of the screen material at the same incident angle as the incident solar beam. This reflected beam is also assumed to be a collimated beam (solid lines) which strikes the back surface of the screen material and reflects as hemispherically-diffuse radiation (dotted lines). The reflective property of the screen material used here is the beam reflectance calculated at the incident solar angle (<span>$R_{sc}^{dir,dif}$</span>). A single ray of this diffuse light will be followed through the remaining steps and represents the energy associated with **all** diffuse rays interreflecting between the screen and glass layers. To determine the second term of the combined screen/glass beam transmittance, the diffusely-reflected ray (<span>$T_{sc}^{dir,dir}R_{gl,f}^{dir}R_{sc}^{dir,dif}$</span>) passes through and is attenuated by the glass layer. Since this ray originates from diffuse reflection, the attenuation of this ray is accounted for using the diffuse transmittance property of the glass. Thus, the second term is shown as <span>$T_{sc}^{dir,dir}R_{gl,f}^{dir}R_{sc}^{dir,dif}T_{gl}^{dif}$</span>. Defining the remaining terms continues in a similar fashion using diffuse properties of both the screen and glass material. Notice that the 3<sup>rd</sup> and 4<sup>th</sup> terms shown below are similar to the 2<sup>nd</sup> term, but additional terms are raised to increasing powers.
 
-![TransmittanceEquation](EngineeringReference/media/image1231.png)
+![TransmittanceEquation](media/image1231.png)
 
 Figure 89. Screen/Glass System Transmittance Equation Schematic.
 
@@ -4115,7 +4115,7 @@ We can express the irradiance in terms of the exterior luminance, S, in that dir
 
 <div>$$dE({{\bf{p}}^{{\rm{(I)}}}})dA = {S^{{\rm{(I)}}}}({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}dA$$</div>
 
-![Calc Outl Fig 1](EngineeringReference/media/image1271.png)
+![Calc Outl Fig 1](media/image1271.png)
 
 Figure 90. Irradiance geometry
 
@@ -4131,7 +4131,7 @@ The radiance in equation is emitted from the back side of the element of area sh
 
 This expression, however, contains a number of new quantities, such as <span>$d{\Omega ^{{\rm{(I,2)}}}}$</span>, the element of solid angle for incoming radiation as seen from surface 2.  We can sort this out by referring to Figure 91 and making some changes and clarifications in notation.
 
-![](EngineeringReference/media/image1275.png)
+![](media/image1275.png)
 
 Figure 91. Radiation exchange between two surface elements
 
@@ -4366,7 +4366,7 @@ The normal WINDOW “full” basis has 145 output directions.  Figure 92 shows 
 
 In general, the basis appears to be reasonably matched to the calculation, with neither a loss of angular detail nor great oversampling.
 
-![](EngineeringReference/media/image1326.png)
+![](media/image1326.png)
 
 Figure 92. Transmitted Radiation in Three Directions for a Perimeter Office.  (a) q=0º; (b) q=40º, f=15º; (c) q=70º, f=67.5º.  q and f are the normal spherical angle coordinates in a right-handed coordinate system where y points up and z is normal to the window p
 
@@ -4559,7 +4559,7 @@ The total power leaving the fenestration (in any direction) and arriving at surf
 
 Substituting equations , , , , into equation yields a series of expressions for the total power arriving at surface *k* (by transmission through fenestration f) from each of the sources of exterior radiation.  However, the equations for transmitted radiation describe an infinitesimal region, which means that the radiation in a given direction will always come from one source.  When one integrates the transmitted power over the fenestration surface, one encounters the problem that for this direction different parts of the fenestration area may receive radiation from different sources.  Also, for a given outgoing direction, the projection of a receiving surface back onto the fenestration may produce an image that covers only part of the fenestration area, and this image may not be identical with the part of the area that receives incident radiation from a particular source.  The most important origin of this problem is the existence of inner and outer window reveals, as illustrated in Figure 93.
 
-![](EngineeringReference/media/image1392.png)
+![](media/image1392.png)
 
 Figure 93. Mismatch of irradiated and viewed fenestration areas for different incident and outgoing directions
 
@@ -4605,7 +4605,7 @@ then equations through become
 
 The notation s(*t*) appearing in a subscript in several of the above equations refers to the basis direction for which the sun direction is contained in the basis solid angle element.  This is of course time dependent.  What is meant here is that at any given time the particular basis element containing the sun is to be picked out.  (If no basis element for the fenestration contains the sun at a given time, then the corresponding view factor—and therefore irradiance or absorption factor—is zero.)  It is therefore necessary to tabulate those quantities with an s(*t*) subscript for all basis directions *s* that could possibly contain the sun direction (and for *r(t)*, all basis directions that could possibly contain the reflected sun angle for the surface n).  This is a set considerably smaller than that of all incoming basis directions.  Figure 94 illustrates this point for direct irradiation of fenestrations in three different orientations in a building at a particular latitude, using the W6 full basis, which has 145 incoming directions.  In the worst case (west-facing) one only needs to consider around 50 of these, with much fewer needed in other orientations.  The specific numbers for a given fenestration will depend on the choice of basis, orientation and latitude.  The basis direction values can of course be interpolated where greater directional resolution is warranted.  In equation the specular direction r(*t*) is uniquely determined by the sun direction s(*t*), so the Z factor does not need an additional index for *s*.
 
-![](EngineeringReference/media/image1410.png)
+![](media/image1410.png)
 
 Figure 94. Sun Paths and Incident Basis for Three Window Orientations, 38º N. Latitude.  The nodal positions (blue dots) for a W6 full basis are compared with the summer solstice (red curve) and winter solstice (green curve) solar paths.  Solar paths for other days of the year will lie between these two extremes.  (Note: the basis points are to be interpreted as the direction of a vector pointing from the fenestration to the sun.)  (a) South facing.  (b) West facing.  (c) North facing (the winter path is off the figure (i.e., the window is shaded); allowed paths will be outside the red path.
 
@@ -5083,7 +5083,7 @@ Table 36.  Fortran Variables used in Window Heat Balance Calculations
 
 The window glass face temperatures are determined by solving the heat balance equations on each face every time step. For a window with *N* glass layers there are 2*N* faces and therefore 2*N* equations to solve. Figure 95 shows the variables used for double glazing (*N*=2).
 
-![](EngineeringReference/media/image1470.png)
+![](media/image1470.png)
 
 Figure 95.  Glazing system with two glass layers showing variables used in heat balance equations.
 
@@ -5333,7 +5333,7 @@ where
 
 The different regions are shown in Figure 96:
 
-![](EngineeringReference/media/image1534.png)
+![](media/image1534.png)
 
 Figure 96:  Different types of glass regions.
 
@@ -5676,7 +5676,7 @@ Figure 97 shows a cross section through a window showing frame and divider. The 
 
 
 
-![](EngineeringReference/media/image1557.png)
+![](media/image1557.png)
 
 Figure 97.  Cross section through a window showing frame and divider (exaggerated horizontally).
 
@@ -5832,7 +5832,7 @@ This section describes how beam solar radiation that is reflected from window re
 
 The amount of beam solar reflected from reveal surfaces depends, among other things, on the extent to which reveal surfaces are shadowed by other reveal surfaces. An example of this shadowing is shown in Figure 98. In this case the sun is positioned such that the top reveal surfaces shadow the left and bottom reveal surfaces. And the right reveal surfaces shadow the bottom reveal surfaces. The result is that the left/outside, bottom/outside, left/inside and bottom/inside reveal surfaces each have sunlit areas. Note that the top and right reveal surfaces are facing away from the sun in this example so their sunlit areas are zero.
 
-![](EngineeringReference/media/image1593.png)
+![](media/image1593.png)
 
 Figure 98.  Example of shadowing of reveal surfaces by other reveal surfaces.
 
@@ -5876,11 +5876,11 @@ For simplicity it is assumed that, for the case without a frame, the shadowed an
 
 Figure 99.  Expression for area of shaded regions for different shadow patterns: (a) window without frame, (b) window with frame
 
-![](EngineeringReference/media/image1605.png)
+![](media/image1605.png)
 
-![](EngineeringReference/media/image1606.png)
+![](media/image1606.png)
 
-![](EngineeringReference/media/image1607.png)
+![](media/image1607.png)
 
 Figure 100.  Vertical section through a vertical window with outside and inside reveal showing calculation of the shadows cast by the top reveal onto the inside sill and by the frame onto the inside sill.
 
@@ -6098,7 +6098,7 @@ If a window shading device is deployed the heat balance equations for the glass 
 
 
 
-![](EngineeringReference/media/image1663.png)
+![](media/image1663.png)
 
 Figure 101. Glazing system with two glass layers and an interior shading layer showing variables used in heat balance equations.
 
@@ -6186,7 +6186,7 @@ where
 
 For interior and exterior shading devices a pressure-balance equation is used to determine gap air velocity, gap air mean equivalent temperature and gap outlet air temperature given values of zone air temperature (or outside temperature for exterior shading), shading layer face temperatures and gap geometry. The pressure balance equates the buoyancy pressure acting on the gap air to the pressure losses associated with gap airflow between gap inlet and outlet [ISO15099, 2001]. The variables used in the following analysis of the interior shading case are shown in Figure 102.
 
-![](EngineeringReference/media/image1670.png)
+![](media/image1670.png)
 
 Figure 102.  Vertical section (a) and perspective view (b) of glass layer and interior shading layer showing variables used in the gap airflow analysis. The opening areas *A<sub>bot</sub>*, *A<sub>top</sub>*, *A<sub>l</sub>*, *A<sub>r</sub>* and *A<sub>h</sub>* are shown schematically.
 
@@ -6283,7 +6283,7 @@ A<sub>h</sub> = air permeability of the shading device expressed as the total ar
 
 Figure 103 shows examples of A<sub>bot</sub>, A<sub>top</sub>, A<sub>l</sub> and A<sub>r</sub> for different shading device configurations.  These areas range from zero to a maximum value equal to the associated shade/screen/blind-to-glass cross-sectional area; i.e., A<sub>bot</sub> and A<sub>top</sub> ≤ sW,  A<sub>l</sub> and A<sub>r</sub> ≤ sH.
 
-![](EngineeringReference/media/image1679.png)
+![](media/image1679.png)
 
 Figure 103.  Examples of openings for an interior shading layer covering glass of height H and width W. Not to scale. (a) Horizontal section through shading layer with openings on the left and right sides (top view). (b) Vertical section through shading layer with openings at the top and bottom (side view).
 
@@ -6325,7 +6325,7 @@ The thermal equivalent mean temperature of the gap air is
 
 <div>$${T_{gap}} = \frac{1}{H}\int\limits_0^H {{T_{gap}}(h)dh = {T_{ave}} - \frac{{{H_0}}}{H}} \left( {{T_{gap,out}} - {T_{gap,in}}} \right)$$</div>
 
-![](EngineeringReference/media/image1687.png)
+![](media/image1687.png)
 
 Figure 104.  Variation of gap air temperature with distance from the inlet for upward flow.
 
@@ -6369,7 +6369,7 @@ In EnergyPlus shading devices are allowed between the two glass panes of double 
 
 
 
-![](EngineeringReference/media/image1691.png)
+![](media/image1691.png)
 
 Figure 105. Glazing system with two glass layers and a between-glass shading device showing variables used in the heat balance equations.
 
@@ -6547,7 +6547,7 @@ OutsideAir à InsideAir
 
 OutsideAir à OutsideAir
 
-![](EngineeringReference/media/image1748.png)
+![](media/image1748.png)
 
 Figure 106. Gap airflow configurations for airflow windows. From “Active facades,” Version no. 1, Belgian Building Research Institute, June 2002.
 
@@ -6555,7 +6555,7 @@ A common application of airflow windows is to reduce the zone cooling load by ex
 
 Figure 107 shows the variables used in the heat balance equations for forced airflow in a double-glazed window.
 
-![](EngineeringReference/media/image1749.png)
+![](media/image1749.png)
 
 Figure 107. Glazing system with forced airflow between two glass layers showing variables used in the heat balance equations.
 
@@ -6657,7 +6657,7 @@ and
 
 
 
-![](EngineeringReference/media/image1763.png)
+![](media/image1763.png)
 
 Figure 108. Airflow window with between-glass shading device showing variables used in the heat balance equations.
 
@@ -6875,7 +6875,7 @@ Mathematical model described in detail here is based on the research work by Ber
 
 If coordinate system is set as shown in Figure 109 and Figure 110, it is possible to calculate deflection distribution at each point of pane by using following equation:
 
-![](EngineeringReference/media/image1779.png)
+![](media/image1779.png)
 
 Figure 109. Deflection Coordinate System - 2D
 
@@ -6895,7 +6895,7 @@ n = poison’s ratio (0.22 for glass) [Non-Dimensional]
 
 
 
-![](EngineeringReference/media/image1782.png)
+![](media/image1782.png)
 
 Figure 110. Deflection Coordinate System - 3D
 
@@ -6941,7 +6941,7 @@ Where,
 
 Deflection of each pane can be positive or negative and is done solely to establish reference. Current frame of reference is that positive deflection means that pane is deflecting towards left side, while negative deflection means that pane is deflecting towards right side . Whether the deflection is in the direction of reducing the gap width or increasing it, it will be the result of pressure difference, as described in . When pressure in the glazing unit is higher than surrounding environmental pressure, the deflection will be towards increasing gap width (i.e., ballooning), while the opposite situation will result in decreasing gap width (i.e., vacuuming)
 
-![](EngineeringReference/media/image1787.png)
+![](media/image1787.png)
 
 Figure 111. Deflection Direction Convention
 
@@ -7001,7 +7001,7 @@ Measured value is typically gap width at the point of maximum deflection, which 
 
 <div>$${L_{G\left( i \right)}} = {L_{\left( i \right)}} + \left( {{L_{D\left( i \right),max}} - {L_{D\left( {i + 1} \right),max}}} \right)$$</div>
 
-![](EngineeringReference/media/image1798.png)
+![](media/image1798.png)
 
 Figure 112. Sketch of the non-symetrically Deflected Glazing Panes
 
@@ -7115,7 +7115,7 @@ The section describes the equivalent layer fenestration optical and thermal mode
 
 The equivalent layer windows system is treated as a series of parallel layers separated by gaps as shown in Figure 113. This multi-layer structure has been used in several computer programs and the underlying theory has been documented (ASHRAE 1311-RP).
 
-![](EngineeringReference/media/image1827.svg.png)
+![](media/image1827.svg.png)
 
 Figure 113. Multi-layer fenestration analysis structure (ASHRAE 1311-RP)
 
@@ -7125,11 +7125,11 @@ Equivalent layer fenestration model uses two-step analysis. First, the flux of a
 
 The multilayer optical model is based on an algorithm originally developed by Edwards (1977) and extended by Wright and Kotey (2006). The algorithm models the interaction of incident solar radiation with a glazing system composed of any number of parallel, planar, specular glazing layers. The shading layers scatter portion of the incident solar radiation diffusely, and the model tracks the beam and diffuse components of solar radiation as they interact with a multi-layer system of glazing and shading layers. The conceptual arrangement for tracking beam and diffuse solar flux components is illustrated in Figure 114.
 
-![](EngineeringReference/media/image1828.svg.png)
+![](media/image1828.svg.png)
 
 Analysis yields beam-beam, beam-diffuse and diffuse-diffuse fluxes, providing full detail concerning the quantities of reflected, transmitted and absorbed radiation.
 
-![](EngineeringReference/media/image1829.svg.png)
+![](media/image1829.svg.png)
 
 Figure 114. Solar analysis of the multi-layer glazing/shading system showing beam and diffuse fluxes (ASHRAE 1311-RP)
 
@@ -7175,7 +7175,7 @@ Superscripts
 
 *w*    =          represents an apparent wire property
 
-![](EngineeringReference/media/image1830.svg.png)
+![](media/image1830.svg.png)
 
 Figure 115. Twelve solar properties assigned at each layer (ASHRAE 1311-RP)
 
@@ -7185,7 +7185,7 @@ Each glazing or shading layer, in general, require eleven set of solar propertie
 
 A surface energy balance is applied at each layer and the resulting set of equation is solved for layer temperatures and heat transfer fluxes. A schematic drawing of the multi-layer illustration and variables designation is shown in Figure 116. The net radiation formulation based on the radiosities, Jf,i and Jb,i the radiant flux leaving the front and back surfaces of the i<sup>th</sup> layer, respectively, is the used as a solution technique. The net radiant heat flux across a gap can be expressed as the difference between the radiosities of the bounding surfaces. The net radiation model analysis yields the layer temperatures and corresponding heat transfer coefficients that are used to determine U-factor and SHGC. The thermal analysis is done in “ASHWAT\_Thermal” routine.
 
-![](EngineeringReference/media/image1831.svg.png)
+![](media/image1831.svg.png)
 
 Figure 116. Radiosity model used in thermal analysis of the multi-layer glazing/shading system (ASHRAE 1311-RP)
 
@@ -7241,7 +7241,7 @@ The above set of equations for drapery fabrics apply to the full range of A<sub>
 
 The optical and thermal properties determined using the above same sets of equations are equally valid for pleated drape shades (Kotey, et. al., 2009a). For pleated drape, the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle, and interaction with a fabric pleated rectangular geometry shown in Figure 117. The solar optical properties of the two different pleat planes are evaluated on the basis of the local solar incidence angle. Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, W<sub>H</sub>, but also by incidence angle (ASHRAE 1311-RP).
 
-![](EngineeringReference/media/image1844.svg.png)
+![](media/image1844.svg.png)
 
 Figure 117. Geometry used for Pleated Drape Analysis
 
@@ -7251,11 +7251,11 @@ The solar diffuse-diffuse and long-wave effective properties of the pleated drap
 
 The effective shortwave optical and longwave optical properties of venetian blind layer is estimated using analytical models (Yahoda and Wright 2004, 2005; Kotey et al. 2008). The model requires properties of venetian blind slats and geometry of the slats shown in Figure 1118.
 
-![](EngineeringReference/media/image1845.svg.png)
+![](media/image1845.svg.png)
 
 Figure 1118. Likewise, the effective longwave properties are obtained for the layer knowing longwave properties of the slats.
 
-![](EngineeringReference/media/image1846.svg.png)
+![](media/image1846.svg.png)
 
 Figure 118. Geometry and properties used for venetian blind analysis
 
@@ -7300,7 +7300,7 @@ The diffuse-diffuse transmittance and reflectance are obtained by Rhomberg numer
 
 The empirical correlations formulated to obtain the effective off-normal solar and longwave properties of insect screens were based on measurements (Kotey et al. (2009a). Insect screen geometry is shown in Figure 119. The calculation of effective solar properties requires a set of properties measured at normal incidence: *t*<sub>bb</sub> (q=0), *t*<sub>bd</sub> (q=0) and *r*<sub>bt</sub> (q=0).
 
-![](EngineeringReference/media/image1857.svg.png)
+![](media/image1857.svg.png)
 
 Figure 119. Geometry used for insect screen analysis
 

@@ -183,7 +183,7 @@ where <span>${\dot Q_{sys}}$</span> is the air system heat load with negative v
 
 where *H<sub>return</sub>* is the distance between the air system return and the floor air node assumed to be 0.1 m from the floor and *z* is the vertical distance.
 
-![](EngineeringReference/media/image2341.svg.png)
+![](media/image2341.svg.png)
 
 Figure 132.  Height versus temperature schematic for Mundt model
 
@@ -611,11 +611,11 @@ where *T<sub>r</sub>*, *T<sub>oz</sub>*, and *T<sub>s</sub>* are the return air 
 
 *Comparisons between full-scale UCB data and small-scale UCSD data*
 
-![](EngineeringReference/media/image2469.png)
+![](media/image2469.png)
 
 Figure 133. Data comparisons in the non-dimensional (a) regular G-fplot
 
-![](EngineeringReference/media/image2470.png)
+![](media/image2470.png)
 
 Figure 134. (b) log-log G-fplot.}
 
@@ -623,7 +623,7 @@ The figures (Figure 133. Data comparisons in the non-dimensional (a) regular G-f
 
 We could work out the occupied zone temperature by using the least-square fitting line suggested in figure 1(b). Hence the interface height is needed to determine a entire two-layer stratification. Figure 135 shows the dimensionless interface height<span>$(h/\sqrt {n'A} )$</span>of the UCSD small-scale experiments plotted against *G*. Note that for the experiments with elevated heat source, the interface heights have been modified by<span>$h' = h - \frac{1}{2}{h_s}$</span> where *h<sub>s</sub>* is the vertical position of the elevated heat source. All data then are located along a line in Figure 135. Since the salt-tank experiments are concluded to represent important characteristics of a full-scale UFAD room, this figure provides some guidelines for estimate the interface position in a real UFAD room.
 
-![](EngineeringReference/media/image2474.png)
+![](media/image2474.png)
 
 Figure 135. Non-dimensional interface height of small-scale experiments.
 
@@ -1108,7 +1108,7 @@ The room lengths for which these models are expected to be applied range between
 
 
 
-![](EngineeringReference/media/image2622.png)
+![](media/image2622.png)
 
 Figure 136. Development of an axisymmetric jet from airflow through a window.
 
@@ -1134,13 +1134,13 @@ The model is based on the hypothesis that the flow is composed of:
 
       B – A confined axisymmetric jet flow.
 
-![](EngineeringReference/media/image2623.png)
+![](media/image2623.png)
 
 Figure 137. Top view of a cross ventilated room. The air entrained by the jet is detrained at the outlet, typically creating two recirculation zones.
 
 
 
-![](EngineeringReference/media/image2624.png)
+![](media/image2624.png)
 
 Figure 138. Top view of one half of a cross ventilated room. The flow is approximately composed of a confined jet and two lid driven cavity flows (one on each side).
 
@@ -1198,7 +1198,7 @@ where q’’<sub>RM</sub> is the total internal heat gain for the room, r and *
 
 Table 44 lists the cases used to develop the updated CV model, which predicts the output variables defined in Table 45 (see also Figure 139). Figure 140, Figure 141, and Figure 142 show plots of the data derived from the CFD simulations of these test cases, and the lines giving the best fit to the data. Table 46 summarizes the correlation formulae and constants. Finally, Table 47 provides estimates for the error of the correlation in each test case.
 
-![](EngineeringReference/media/image2634.png)
+![](media/image2634.png)
 
 Figure 139. Jet and recirculation regions in typical vertical cross-section through room (y-z plane). Jet boundary occurs where jet velocity has fallen to 50% of centerline maximum. Remainder of cross-section is treated as recirculation. Volumetric heat sources ar
 
@@ -1626,19 +1626,19 @@ In each case the error is the percentage difference between the given correlatio
 
 
 
-<span>$\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)$</span><span>${U_J}/{U_{in}}$</span>![](EngineeringReference/media/image2652.png)
+<span>$\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)$</span><span>${U_J}/{U_{in}}$</span>![](media/image2652.png)
 
 Figure 140. Jet velocity correlation.
 
 
 
-<span>$\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)$</span><span>${U_R}/{U_{in}}$</span>![](EngineeringReference/media/image2655.png)
+<span>$\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)$</span><span>${U_R}/{U_{in}}$</span>![](media/image2655.png)
 
 Figure 141. Recirculation region velocity correlation.
 
 
 
-<span>$\sqrt {{A_{in}}{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)$</span><span>${Q_R}/{U_{in}}$</span>![](EngineeringReference/media/image2658.png)
+<span>$\sqrt {{A_{in}}{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)$</span><span>${Q_R}/{U_{in}}$</span>![](media/image2658.png)
 
 Figure 142. Recirculation region flow rate.
 
@@ -1646,7 +1646,7 @@ Figure 142. Recirculation region flow rate.
 
 When the incoming wind is not normal to the façade the jet enters the room at an angle, as shown in Figure 143.
 
-![](EngineeringReference/media/image2659.png)
+![](media/image2659.png)
 
 Figure 143. Schematic of jet resulting from wind at angle φ to façade.
 
@@ -1662,11 +1662,11 @@ The first effect increases indoor velocities while the second effect decreases t
 
 CFD simulations for rooms with more than one inflow aperture show that the model can be applied to these configurations with minimal adjustments. As a result of increased dissipation in the central recirculation region, where two distinct recirculation flows collide (Figure 144), the airflow velocities are reduced by 5-10%, as shown in the charts in Figure 145.
 
-![](EngineeringReference/media/image2660.png)
+![](media/image2660.png)
 
 Figure 144. Flow regions for a room with 2 inlets and 2 outlets.
 
-![](EngineeringReference/media/image2661.png)![](EngineeringReference/media/image2662.png)
+![](media/image2662.png)
 
 Figure 145. Jet velocity and recirculation velocity for the two halves of 3 different 2-inlet rooms, A-C, compared with the corresponding 1-inlet rooms.
 
@@ -1680,7 +1680,7 @@ The part of the recirculation flow that exchanges heat with the jet (label R).
 
 The wall boundary layer part of the recirculation flow (label W).
 
-![](EngineeringReference/media/image2663.png)
+![](media/image2663.png)
 
 Figure 146. Top view of the flow structure in case R.
 
@@ -2072,7 +2072,7 @@ where
 
 The Input Output Reference provides the relationship between airflow and pressure for the most of the components (Ref.AirflowNetwork Model). The relationship between airflow and pressure for the AirflowNetwork:Multizone:Component:DetailedOpening, AirflowNetwork:Multizone:Component:SimpleOpening, and AirflowNetwork:Multizone:Component:HorizontalOpening objects are provided in detail in this reference.
 
-![](EngineeringReference/media/image2691.svg.png)
+![](media/image2691.svg.png)
 
 Figure 147. The general problem of gravitational flow through a vertical opening
 
@@ -2130,7 +2130,7 @@ AirflowNetwork:Multizone:Component:DetailedOpening).
 
 The above calculation procedure is used for a normal rectangular window. For a horizontally pivoted rectangular window, the calculation procedure is slightly different. A schematic drawing of a horizontally-pivoted window is shown in Figure 148.
 
-![PivotedWindow](EngineeringReference/media/image2703.png)
+![PivotedWindow](media/image2703.png)
 
 Figure 148.  Schematic drawing of a horizontally-pivoted window
 
@@ -2152,7 +2152,7 @@ It should be pointed out that the discharge coefficient is modulated based on op
 
 The schematic drawing of air flow patterns through a simple vertical opening (AirflowNetwork:Multizone:Component:SimpleOpening) is shown in Figure 149. The equations used below are available from Walton (1989).
 
-![](EngineeringReference/media/image2708.svg.png)
+![](media/image2708.svg.png)
 
 Figure 149. Schematic of large opening and associated three flow patterns
 
@@ -2202,7 +2202,7 @@ The model for horizontal openings consists of forced airflow, buoyancy airflow, 
 
 For simplicity, a two zone building (upper and lower zones) connected by a large horizontal opening is used to describe the model, as shown in Figure 150. Forced and buoyancy airflows are described separately below.
 
-![AirflowNetwork-4](EngineeringReference/media/image2716.png)
+![AirflowNetwork-4](media/image2716.png)
 
 Figure 150. Air movements across a horizontal opening
 
@@ -2354,7 +2354,7 @@ c.                            P<sub>L</sub> &lt; P<s
 
 *Sloping plane*
 
-![](EngineeringReference/media/image2741.png)
+![](media/image2741.png)
 
 Figure 151. A Staircase is attached to the horizontal opening.
 
@@ -2408,7 +2408,7 @@ Table 49.  Legend Description
 
 </table>
 
-![](EngineeringReference/media/image2743.svg.png)
+![](media/image2743.svg.png)
 
 Figure 152. Flow rates at different pressure differences
 

@@ -1146,7 +1146,7 @@ AirLoopHVAC:ReturnPath,
 
 The simple building shown in the figure below consists of a controlled zone and a return plenum zone that is used for the return air. This simple configuration contains a ground floor controlled zone with a window and a return plenum zone which handles the roof load. The return air plenum is a special type of component since there is both a heat balance connection and building description and a system airflow connection that transfers the airflow directly from the controlled zone to the return plenum zone in the system air simulation. The input described in this section is mainly just for the system airflow connections in the HVAC algorithms. In addition the return plenum zone must be fully input as a zone object for the heat balance calculation. The zone description needs to contain the wall descriptions - the interzone ceiling and floor, and for this simple case the roof. All the other attributes of a zone that can be specified in the building description can be used with a return plenum zone if necessary: scheduled loads, windows, etc.
 
-![](InputOutputReference/media/image337.svg)
+![](media/image337.svg)
 
 Figure 130. Illustration of Zone Return Plenum
 
@@ -1221,7 +1221,7 @@ Below is an example of the AirLoopHVAC:ReturnPath for the simple case shown abov
 
 The building shown in the figure below consists of three controlled zones served by an AirLoopHVAC:SupplyPlenum beneath the floor.
 
-![](InputOutputReference/media/image338.png)
+![](media/image338.png)
 
 Figure 131. Illustration of AirLoopHVAC:SupplyPlenum
 
@@ -1978,7 +1978,7 @@ This section provides an overview of how to model solar heating systems.   A sol
 
 If the solar heating system is for domestic hot water (or service water heating) usage only, the field *Use Flow Rate Fraction Schedule Name* of the WaterHeater:Mixed object can be used to avoid additional plant connections. If the system has more complicated hot water requirements or if the system is for space heating, the *Use Side Inlet* and *Use Side Outlet* nodes must be connected to another plant loop to serve zone and non-zone equipment. (See the WaterHeater:Mixed object documentation for more information.)
 
-![](InputOutputReference/media/image339.png)
+![](media/image339.png)
 
 Figure 132. Solar Collector Plant Loop Connection Diagram
 
@@ -1986,7 +1986,7 @@ NOTE:   The EnergyPlus plant simulation requires the pump to be the first compon
 
 In order to realize energy savings with a solar heating system, it is best to use a two-tank system with a storage tank and auxiliary water heater. The storage tank gathers heat directly from the solar collectors and stores it for later use. The storage tank is modeled using a WaterHeater:Mixed object with the *Heater Maximum Capacity* set to zero. The auxiliary water heater is positioned downstream of the storage tank on the supply side of the main plant loop. The auxiliary water heater, or booster water heater, provides additional heat if the storage tank water is not hot enough. The auxiliary water heater can be modeled as an instantaneous/tankless water heater or as a standard tanked water heater with heating source (see WaterHeater:Mixed).
 
-![](InputOutputReference/media/image340.png)
+![](media/image340.png)
 
 Figure 133. Two-Tank Solar Heating System Connection Diagram
 
@@ -1994,7 +1994,7 @@ Another strategy to consider for solar heating systems is to allow the storage t
 
 A complete two-tank solar heating system with tempering valve is shown below.
 
-![](InputOutputReference/media/image341.png)
+![](media/image341.png)
 
 Figure 134. Two-Tank Solar Heating System with Tempering Valve
 
@@ -3366,7 +3366,7 @@ Group     Heating and Cooling Coils
 
 Several different coils may be added to zone equipment and air loops. This includes simple heating (gas, electric, and hot water) and a simple water-cooling coil as well as a more detailed flat fin water-cooling coil model. In general, the heating coil description can be used for a heating coil, a reheat coil, or a preheat coil in the air loop simulation or for zone equipment. Figure 135 is an example of a heating and cooling coil in the air loop simulation in a dual duct system. This does show the basic node structure that will be referenced in the input description. The figure does show water coils since they are the most complex to input in the simulation compared to the Electric and Gas coils which only have air connections.
 
-![Figure103\_ExampleAirLoopHeatingandCoolingCoil](InputOutputReference/media/image349.png)
+![Figure103\_ExampleAirLoopHeatingandCoolingCoil](media/image349.png)
 
 Figure 135. Example Air Loop Heating & Cooling Coil
 
@@ -4564,13 +4564,13 @@ This detailed flat fin coil model is for continuous plate fins. First, found in 
 
 The following figures illustrate the geometry and circuits in a cooling coil.
 
-![Figure104\_GeometryofaCoolingCoilCC](InputOutputReference/media/image353.png)
+![Figure104\_GeometryofaCoolingCoilCC](media/image353.png)
 
 Figure 136. Geometry of a Cooling Coil (CC)
 
 
 
-![Figure105\_NumberofCoolantCircuiteCCNCC](InputOutputReference/media/image354.png)
+![Figure105\_NumberofCoolantCircuiteCCNCC](media/image354.png)
 
 Figure 137. Number of Coolant Circuits (CCNCC)
 
@@ -7694,7 +7694,7 @@ The CoilSystem:Cooling:DX object is a virtual container component that consists 
 
 This component may be used as a cooling coil in constant volume or variable volume systems, as blow through or draw through, with or without humidity controls. Unlike AirLoopHVAC:Unitary system types, this component controls only the DX coil, not the supply fan.   CoilSystem:Cooling:DX is added to a system by placing it in an air loop branch (see Branch object) or in an AirLoopHVAC:OutdoorAirSystem:EquipmentList or in a ZoneHVAC:OutdoorAirUnit:EquipmentList . It requires one or more setpoint manager (see SetpointManager:\*) objects to specify temperature and/or humidity setpoints (unless it is used in a ZoneHVAC:OutdoorAirUnit which has its own temperature setpoints).   This object is the one that is listed in the Branch or equipment list object rather than the coil itself.   A constant volume or variable volume fan is modeled separately from this cooling system. These are the only fan types allowed for this system type (ref. Fan:ConstantVolume and Fan:VariableVolume).   Cycling fan operation is not available with this model. The CoilSystem:Cooling:DX object can also be placed on dedicated outdoor air system (DOAS) airloop branches or in arloop branches where the air flow to capacity ratio range is between 100     300 cfm/ton. 100% DOAS DX cooling coils operate in lower flow to capacity ratio range compared to regular DX cooling coils. The CoilSystem:Cooling:DX is selected to operate in DOAS application or in low flow to capacity ratio range by specifying    YES    to the input field    Use Outdoor Air DX Cooling Coil   . If this optional input field is left blank or specified as    NO   , then the coil is modeled as regular DX cooling coil. If the CoilSystem:Cooling:DX object is in an AirLoopHVAC:OutdoorAirSystem:EquipmentList or in a ZoneHVAC:OutdoorAirUnit:EquipmentList then it is treated as 100% DOAS DX cooling coil only if the choice input field    Use Outdoor Air DX Cooling Coil    is set too    YES   . All the control options of the regular DX cooling coils are available to DOAS DX coils as well. Heating DX coils in DOAS airloop operate at the same flow to capacity ratio limits as the DOAS DX cooling coils.
 
-![DXAirLoop](InputOutputReference/media/image368.svg)
+![DXAirLoop](media/image368.svg)
 
 Figure 138. Schematic of CoilSystem:Cooling:DX Object in an Air Loop for a Blow Through Application
 
@@ -7938,7 +7938,7 @@ In terms of controlling the operation of the heat exchanger, the heat exchanger 
 
 Links to the cooling coil and air-to-air heat exchanger specifications are provided in the input data syntax for this compound object. A description of each input field for this compound object is provided below.
 
-![GenericHXAssisted](InputOutputReference/media/image369.png)
+![GenericHXAssisted](media/image369.png)
 
 Figure 139. Schematic of the CoilSystem:Cooling:DX:HeatExchangerAssisted compound object
 
@@ -8028,7 +8028,7 @@ No variables are reported for this compound object. However, outputs are provide
 
 The heat exchanger-assisted water cooling coil is a    virtual    component consisting of a chilled-water cooling coil and an air-to-air heat exchanger as shown in Figure 140 below. The air-to-air heat exchanger precools the air entering the cooling coil, and reuses this energy to reheat the supply air leaving the cooling coil. This heat exchange process improves the latent removal performance of the cooling coil by allowing it to dedicate more of its cooling capacity toward dehumidification (lower sensible heat ratio).
 
-![GenericHXAssisted](InputOutputReference/media/image370.png)
+![GenericHXAssisted](media/image370.png)
 
 Figure 140. Schematic of the CoilSystem:Cooling:Water:HeatExchangerAssisted compound object
 
@@ -10625,7 +10625,7 @@ These are the power and energy outputs for the TES tank   s heat exchange with t
 
 Secondary Coils reject to or remove heat from a secondary zone as part of a DX system or an air-to-air heat pump. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed inside a zone either heat is dumped to or extracted from a secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coils but they are add-on features on existing DX coil objects. A secondary DX coil is modeled by specifying additional inputs in one of the following DX coil objects: Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, and Coil:Heating:DX:MultiSpeed. These additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary (active) coil is serving another controlled zone as shown in [Figure](#SecondaryCoilsFigure1).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. Heat is rejected or extracted depending on the primary DX coil operating modes.  For instance, heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only whereas the energy extracted from a secondary zone may contain sensible and latent components.
 
-![](InputOutputReference/media/image903.png)
+![](media/image903.png)
 
 Figure: Schematic of DX System and heat pump in cooling operating mode <a name="SecondaryCoilsFigure1"></a>
 
@@ -10637,7 +10637,7 @@ Applications of this technology include: inter-zone heat pump in NTED (Dixon, 20
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into this zone.  The heat rejected is modeled as sensible internal gain of a secondary zone. 
 
-![](InputOutputReference/media/image904.png)
+![](media/image904.png)
 
 Figure: Schematic of DX system and secondary coil in cooling mode <a name="SecondaryCoilsFigure2"></a>
 
@@ -12470,7 +12470,7 @@ The Dehumidifier:Desiccant:System object in EnergyPlus is a compound object that
 
 It is important to note that the optional exhaust air fan is modeled internal to the Dehumidifier:Desiccant:System and a separate fan object should *not* be added to the input data file (idf) for this fan. On the other hand, a separate fan object *is* required in the input data file for the regeneration air fan.
 
-![DesiccantDehumidifier\_DrawThrough](InputOutputReference/media/image409.png)
+![DesiccantDehumidifier\_DrawThrough](media/image409.png)
 
 Figure 141. Schematic of Dehumidifier:Desiccant:System with Draw Through Regeneration Fan Placement
 
@@ -12484,7 +12484,7 @@ NOTE: As with any air loop compound object, the Dehumidifier:Desiccant:System ob
 
 
 
-![DesiccantDehumidifier\_BlowThrough](InputOutputReference/media/image410.png)
+![DesiccantDehumidifier\_BlowThrough](media/image410.png)
 
 Figure 142. Schematic of Dehumidifier:Desiccant:System with Blow Through Regeneration Fan Placement
 
@@ -16894,7 +16894,7 @@ This controller object is used exclusively by the stand alone energy recovery ve
 
 In addition, the outdoor air flow rate may be modified and heat exchange suspended in response to high indoor relative humidities. When the indoor relative humidity exceeds the zone humidistat   s relative humidity set point, high humidity control is activated. When activated, if high humidity control is based on the outdoor air humidity ratio and the outdoor humidity ratio is greater than the indoor humidity ratio, high humidity control is terminated.
 
-![Schematic\_StandAloneERV](InputOutputReference/media/image414.svg)
+![Schematic\_StandAloneERV](media/image414.svg)
 
 Figure 143. Schematic of the ZoneHVAC:EnergyRecoveryVentilator compound object
 
@@ -16988,13 +16988,13 @@ This group of objects describes the properties and configuration for the evapora
 
 The direct stage, shown in the figure below, consists of a rigid media evaporative pad, with water recirculated from a reservoir.   The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media.   The evaporative pad provides the area for the adiabatic saturation of the air.   While the process provides a lower dry-bulb temperature, the moisture content of the leaving air is higher than the entering condition.   The direct stage is used for comfort cooling in a building where adding humidity to the air can be tolerated.
 
-![](InputOutputReference/media/image415.svg)
+![](media/image415.svg)
 
 Figure 144.   Direct Stage Evaporative Cooler
 
 The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic cooling, and follows a constant enthalpy line on the psychrometric chart, it is shown in the figure below as a process from A to B.   Since the deviation of the constant wet-bulb line and the constant enthalpy line is small, it is assumed that the wet-bulb temperature is constant across the direct evaporative stage.
 
-![](InputOutputReference/media/image416.svg)
+![](media/image416.svg)
 
 Figure 145.   Psychrometric Chart -- Constant Enthalpy
 
@@ -17246,13 +17246,13 @@ This is the source (mains) of water consumed by the evaporative cooler that coul
 
 The dry coil indirect evaporative cooler, shown in the figure below, has a rigid media pad, similar to the direct evaporative stage, where the adiabatic cooling takes place. The secondary air leaves the rigid media pad and enters an air to air heat exchanger where it cools the supply air flowing through the heat exchanger tubes. The moist secondary air is then exhausted to the environment. The secondary air stream has its own fan and consists of a rigid media evaporative pad, with water recirculated from a reservoir. The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media. The evaporative pad provides the area for the adiabatic saturation of the air.
 
-![](InputOutputReference/media/image419.svg)
+![](media/image419.svg)
 
 Figure 146. Evaporative Cooler -- Indirect Dry Coil
 
 The process that the secondary air goes through, A to C to D, is shown by the dashed lines in   the following figure. Process A to C is adiabatic cooling in the rigid media pad. Then the air enters the shell side of the heat exchanger and is sensibly heated from C to D by the warm supply air passing through the tube side. The secondary air inlet is modeled as a separate stream of outdoor air and the user has the option of defining the name of an outdoor air node.
 
-![](InputOutputReference/media/image420.svg)
+![](media/image420.svg)
 
 Figure 147. Secondary Air Process -- Indirect Dry Coil Evap Cooler
 
@@ -17394,13 +17394,13 @@ This is the source (mains) of water consumed by the evaporative cooler that coul
 
 The wetted coil evaporative cooler shown in the figure below, has water sprayed directly on the tubes of the heat exchanger where latent cooling takes place. The vaporization of the water on the outside of the heat exchanger tubes allows the simultaneous heat and mass transfer which removes heat from the supply air on the tube side. Then the moist secondary air is exhausted. The secondary air stream has its own fan.
 
-![](InputOutputReference/media/image421.svg)
+![](media/image421.svg)
 
 Figure 148. Evaporative Cooler     Indirect Wet Coil
 
 The process that the secondary air goes through, A to C on the following figure, is a path of simultaneous heat and mass transfer, but it does not follow a line of constant enthalpy as in the direct stage. The process is not adiabatic due to the heat gain from the supply air flowing through the tubes of the heat exchanger.
 
-![](InputOutputReference/media/image422.svg)
+![](media/image422.svg)
 
 Figure 149. Secondary Air Process     Indirect Wet Coil Evap Cooler
 
@@ -17931,7 +17931,7 @@ This output is the electric consumption of the unit in Joules for the timestep b
 
 ### HeatExchanger:AirToAir:SensibleAndLatent
 
-![](InputOutputReference/media/image423.svg)
+![](media/image423.svg)
 
 The sensible and latent air-to-air heat exchanger is an HVAC component typically used for exhaust or relief air heat recovery (Figure 150). Heat exchanger performance can be specified to transfer sensible energy, latent energy or both between the supply and exhaust air streams. The input requires no geometric data. Performance is defined by specifying sensible and/or latent effectiveness at 75% and 100% of the nominal (rated) supply air flow rate at two operating conditions as shown in Table 30.
 
@@ -18444,7 +18444,7 @@ This output is the average fraction of the reporting timestep when frost control
 
 This desiccant heat exchanger object is an HVAC component used to model both temperature (sensible) and moisture (latent) heat exchange between two air streams (Figure 151). The model assumes balanced air flow through the regeneration and process sides of the heat exchanger (i.e., regeneration and process air volume flow rates and face velocities are the same). Heat exchanger performance is specified through a performance data type object (e.g., HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1).
 
-![BalancedFlowDesiccantHeatExchanger\_Schematic](InputOutputReference/media/image424.png)
+![BalancedFlowDesiccantHeatExchanger\_Schematic](media/image424.png)
 
 Figure 151. Schematic of the Balanced Flow Desiccant Heat Exchanger
 
@@ -21786,7 +21786,7 @@ This object is used to model small Fuel Cell (FC) generators. IEA/ECBCS Annex 42
 
 There should be one Generator:FuelCell object for each individual FC generator in the model. Multiple fuel cell generators can be included in a given simulation. Because there are a large number of inputs to the FC model and numerous, somewhat separable subsystems within a fuel cell, the EnergyPlus input objects have been organized into a number of separate input objects. This object simply refers to the names of all the other input objects that provide the input details for individual subsystems within the fuel cell cogeneration device. The following figure diagrams these separate subsystems. (not shown is an optional stack cooler with separate connections to heat recovery water loop and surrounding zone air).
 
-![SOFCSchematic](InputOutputReference/media/image467.png)
+![SOFCSchematic](media/image467.png)
 
 Figure 152. Fuel cell subsystems.
 
@@ -24521,7 +24521,7 @@ The WaterUse:Connections object can be thought of as a subsystem that groups tog
 
 - Internal connections to simulate drainwater heat recovery.
 
-![Water Use Connections IO Diagram](InputOutputReference/media/image579.png)
+![Water Use Connections IO Diagram](media/image579.png)
 
 Figure 153. Diagram of internal connections for WaterUse:Connections
 

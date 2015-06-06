@@ -1,5 +1,5 @@
 
-![](Using_EnergyPlus_for_Compliance/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>

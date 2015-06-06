@@ -98,7 +98,7 @@ $$</div>
     \left[\begin{array}{cc}0 & h \\ -h & 0\end{array}\right] \left[\begin{array}{c}T_o \\ T_i\end{array}\right]
 $$</div>
 
-![](EngineeringReference/media/image168.svg.png)
+![](media/image168.svg.png)
 
 Figure 10.  Two Node State Space Example.
 
@@ -122,19 +122,19 @@ Even though CTF methods require that values of the surface temperatures and flux
 
 The method shown in the Figure 11 maintains two sets of histories out of phase with each other.  The figure shows how this would work for two sets of histories out of phase by one half of a time step.  More sets of temperature and flux histories could be used, allowing the simulation time step to take on values: 1/3, 1/4, 1/5, etc., of the minimum time step allowed for the CTF calculations.  The time step between inputs to the CTF series would be the smallest convenient interval at which the CTF series is stable.  This scenario is illustrated in this figure for two separate sets of temperature and flux histories.  Cycling through each history, in order, allowed calculations of the zone energy balance to be performed with updated surface information at a shorter time step than one CTF history series would otherwise allow.  This method required no interpolation between the series once each set of histories was initialized.  However, if the smallest time step for a stable CTF series was large compared to the zone temperature update time step, significant memory was required to store all the sets of histories.
 
-![](EngineeringReference/media/image169.svg.png)
+![](media/image169.svg.png)
 
 Figure 11. Multiple, staggered time history scheme
 
 Another method is shown in Figure 12. Sequential interpolation of new histories that uses successive interpolations to determine the next set of temperature and flux histories.  The current history is interpolated directly from the previous history set using the required time phase shift between the two.  This method required permanent storage for only one set of temperature and flux histories at a time, but smoothed out temperature and flux data as more interpolations were performed.  As a result, at concurrent simulation times current values of history terms were different form previous "in phase" history terms.  This was unacceptable from, a physical point of view, because it allowed current information to change data from a previous time.
 
-![](EngineeringReference/media/image170.svg.png)
+![](media/image170.svg.png)
 
 Figure 12. Sequential interpolation of new histories
 
 A final method, shown in Figure 13. Master history with interpolation, was something of a hybrid of the previous two methods.  One "master" history set was maintained and updated for all time; this solved the problem of current events propagating information backwards in time.  When surface fluxes needed to be calculated at times out of phase with this master history a new, temporary history was interpolated from the master values.  This method proved to be the best of the three options described because it eliminated propagation of information backwards in time and only required concurrent storage of two sets of temperature and flux histories. This method was subsequently incorporated into the IBLAST program in conjunction with Seem's procedure for calculating the coefficients of the CTF series.
 
-![](EngineeringReference/media/image171.svg.png)
+![](media/image171.svg.png)
 
 Figure 13. Master history with interpolation
 
@@ -152,7 +152,7 @@ In EnergyPlus, there are two possible cases for the existence of “no mass” l
 
 The case where a resistance-only layer is defined anywhere except the inner or outer layer of a construction is handled by treating the “no mass” layer as a single node layer.  This will result in a node at each interface as in the standard material layer cases.  When a “no mass” material is present, the R-Value only layer will not add any thermal capacitance to the nodes at the interfaces at either side of the material.  It will simply add resistance between the two nodes.
 
-![](EngineeringReference/media/image172.png)
+![](media/image172.png)
 
 Figure 14. Illustration of no-mass layer between two mass layers
 
@@ -248,7 +248,7 @@ The fully implicit scheme is also based on an Adams-Moulton solution approach. I
 
 For both schemes, EnergyPlus uses the following four types of nodes, as shown in the figure below (1) interior surface nodes, (2) interior nodes, (3) material interface nodes and (4) external surface nodes. The grid for each material is established by specifying a half node for each edge of a material and equal size nodes for the rest of the material. Equations such as are formed for all nodes in a construction. The formulation of all node types is basically the same.
 
-![Description: C:\Griffith\AnalysisTools\CondFDpaper\Figures\Figures\Figure2.tif](EngineeringReference/media/image176.png)
+![Description: C:\Griffith\AnalysisTools\CondFDpaper\Figures\Figures\Figure2.tif](media/image176.png)
 
 Figure 15. Node depiction for Conduction Finite Difference Model
 
@@ -300,7 +300,7 @@ These additional property information values are put into the input file as expl
 
 A graph showing the effect of a large PCM on the outside surface of a zone is shown below. The phase change temperature was 30°C, and the flat temperature response during the phase change is obvious. This example was run with a zone time step of one minute to show that such small time steps can be done with the finite difference solution technique. It is more efficient to set the zone time step shorter than those used for the CTF solution algorithm. It should be set to 20 time steps per hour or greater, and can range up to 60. The finite difference algorithm actually works better with shorter zone time steps. The computation time has a minimum at a zone time step around two minutes (30 time steps/hr), and increases for shorter or longer zone time steps.
 
-![Description: Phase Change Graph OutsidePCM](EngineeringReference/media/image185.png)
+![Description: Phase Change Graph OutsidePCM](media/image185.png)
 
 Figure 16. Effects of Large PCM on Outside Zone Surface
 
@@ -694,7 +694,7 @@ where
 
 Figure 17 gives the EMPD values to be used for various vapor diffusivities evaluated at different ambient excitations.
 
-![](EngineeringReference/media/image241.svg.png)
+![](media/image241.svg.png)
 
 Figure 17. Limit of Effective Penetration Depth Values for Various Vapor Diffusivities at Different Ambient Excitations.
 
@@ -763,7 +763,7 @@ Kerestecioglu, A., M. V. Swami, P. Brahma, L. Gu, P. Fairey, and S. Chandra, 198
 Outside Surface Heat Balance
 ----------------------------
 
-![](EngineeringReference/media/image242.png)
+![](media/image242.png)
 
 Figure 18. Outside Heat Balance Control Volume Diagram
 
@@ -1818,7 +1818,7 @@ where:
 
 Each of these heat balance components is introduced briefly below.
 
-![](EngineeringReference/media/image301.png)
+![](media/image301.png)
 
 Figure 19.  Inside Heat Balance Control Volume Diagram
 
@@ -2741,7 +2741,7 @@ For Floors:
 
 The correlation for floors is illustrated in the following figure:
 
-![](EngineeringReference/media/image378.png)
+![](media/image378.png)
 
 Figure 1017.  Ceiling Diffuser Correlation for Floors
 
@@ -2751,7 +2751,7 @@ For ceilings:
 
 The correlation for ceilings is illustrated in the following figure:
 
-![](EngineeringReference/media/image380.png)
+![](media/image380.png)
 
 Figure 1018.  Ceiling Diffuser Correlation for Ceilings
 
@@ -2761,7 +2761,7 @@ For Walls:
 
 The correlation for walls is illustrated in the following figure:
 
-![](EngineeringReference/media/image382.png)
+![](media/image382.png)
 
 Figure 1019.  Ceiling Diffuser Correlation for Walls
 
@@ -2857,13 +2857,13 @@ The IR radiation exchange is accomplished by introducing special IR Transparent 
 
 Schematic diagrams of the application of the IRT surfaces are shown in Figure 20 and Figure 21. The first figure shows it applied between two stacked zones that could be part of an atrium. All radiation incident on the IRT in the lower and upper zone is completely absorbed by the surface. It is prevented from participating in the zone air heat balance by fixing the heat transfer coefficients on either side at zero.
 
-![IRTFig1](EngineeringReference/media/image390.png)
+![IRTFig1](media/image390.png)
 
 Figure 20. Schematic View of Stacked Zones
 
 The same arrangement can be used for simulating a underfloor air distribution system (UFAD). The two zones represent the lower occupied (mixed) zone and the upper stratified zone. Since the upper zone is being modeled as a mixed EnergyPlus zone, it is not precisely the stratified zone concept. However, if a user has concern about having the entire upper part of the space at a single average temperature, the space could be modeled with two stacked upper zones. In that case the stratified temperature profile would be established by the relative size of the mixing from the convective plumes. The user would have to supply those estimates from external knowledge of the behavior of UFAD systems and plumes.
 
-![IRTFig2](EngineeringReference/media/image391.png)
+![IRTFig2](media/image391.png)
 
 Figure 21. Schematic Model of a UFAD Zone
 
@@ -2871,7 +2871,7 @@ Figure 21. Schematic Model of a UFAD Zone
 
 The behavior of the IRT surface can be analyzed by considering three parallel black plates infinite in extent, as shown in Figure 22. The outside plates are held at two different temperatures, and the intermediate plate assumes an equilibrium temperature when the net heat flux goes to zero. All plates have black body surface characteristics.
 
-![IRTFig3](EngineeringReference/media/image392.png)
+![IRTFig3](media/image392.png)
 
 Figure 22. Radiation Exchange Model
 
@@ -2913,13 +2913,13 @@ The Infrared Transparent surface should not participate in a convective/conducti
 
 The behavior of multi zones separated with infrared transparent surfaces can be checked with a simple comparison. Begin with a single zone model as shown below. This model has a south-facing window, and four walls exposed to wind and sun, and a roof exposed to wind and sun.
 
-![SingleZoneDrawing](EngineeringReference/media/image396.png)
+![SingleZoneDrawing](media/image396.png)
 
 Figure 23. Single Zone Model
 
 The single zone model will be compared with a stacked three zone model that has zones separated by interzone infrared transparent surfaces. This model is shown below.
 
-![ThreeZone-bldgAreaSE-2](EngineeringReference/media/image397.png)
+![ThreeZone-bldgAreaSE-2](media/image397.png)
 
 Figure 24. Stacked Three Zone Model
 
@@ -2929,7 +2929,7 @@ The sensible heating results are shown below. The results show the sum of the se
 
 
 
-![Comparison of single and three stacked zones](EngineeringReference/media/image398.png)
+![Comparison of single and three stacked zones](media/image398.png)
 
 Figure 25. Comparison of Single and Three Stacked Zones
 
@@ -2946,7 +2946,7 @@ Transparent Insulation is now used in the housing industry as a passive solar fe
 
 A qualitative comparison between the performance of Transparent Insulation and opaque insulation is shown diagrammatically in the figure below. The upper half of the figure represents approximate heat transfer through the wall cross-section for both transparent and opaque insulation cases.  The lower half of this figure shows representative temperature variations through the wall cross-sections for different solar conditions.
 
-![](EngineeringReference/media/image399.png)
+![](media/image399.png)
 
 Figure 26.  Energy Flows of Opaquely and Transparently Insulated Walls (Wood and Jesch 1993).
 
@@ -2966,13 +2966,13 @@ Quasi-Homogeneous Structures
 
 Cross-sections of each of these types is shown in the figure below.  The arrows in these diagrams indicate solar rays and the path these rays trace as they are transmitted through the transparent insulation layer.  The most advantageous set-up (see absorber-parallel below) would send most of the rays downward towards the interior of the building while minimizing the rays that are reflected back to the exterior environment.
 
-![](EngineeringReference/media/image400.png)
+![](media/image400.png)
 
 Figure 27.  Geometrical Categories of Classification for Transparent Insulation Material (Wood and Jesch 1993).
 
 ### TIM- Basic Mathematical Model
 
-![](EngineeringReference/media/image401.png)
+![](media/image401.png)
 
 Figure 28.  Cross Section of TIM and wall, showing energy flow
 
@@ -3425,15 +3425,15 @@ In this case the values of HA, HS and HG must be found by using an estimated val
 
 
 
-![](EngineeringReference/media/image420.png)
+![](media/image420.png)
 
 Figure 29.  Thermal Network for Simple Outside Surface Coefficient
 
-![](EngineeringReference/media/image421.png)
+![](media/image421.png)
 
 Figure 30.  Thermal Network for Detailed Outside Surface Coefficient
 
-![](EngineeringReference/media/image422.png)
+![](media/image422.png)
 
 Figure 31.  Thermal Network for Outside Moveable Insulation
 
@@ -3882,7 +3882,7 @@ Finally,
 
 R<sub>fic</sub> = R<sub>eff</sub> – 0.077
 
-![FCDrawing](EngineeringReference/media/image435.png)
+![FCDrawing](media/image435.png)
 
 Figure 32. Schematic for Slab on Grade - Two Spaces
 
@@ -3916,7 +3916,7 @@ R<sub>soil</sub> is the effective R-value of the soil. Reference values from Tab
 
 Table 17. Effective R-Value of Soil for Below-Grade Walls
 
-![](EngineeringReference/media/image436.png)
+![](media/image436.png)
 
 A fairly good linear regression (R<sup>2</sup> = 0.9967) for the above data is,
 
@@ -4080,7 +4080,7 @@ The ground domain is updated at each zone timestep, or hourly as specified by th
 
 The basement floor and walls are simulated by standard surface heat balance models within EnergyPlus (CTF, finite difference). The horizontal and vertical insulation are simulated by the ground domain finite difference solver. This is shown in the [Figure](#BasementGHTFigure1) below where the dotted red line defines the OtherSideConditionsModel interface separating the two solution domains. This methodology applies to the basement floor and walls.
 
-![](EngineeringReference/media/image8000.png)
+![](media/image8000.png)
 
 Figure: Example surface construction. <a name="BasementGHTFigure1"></a>
 

@@ -219,7 +219,7 @@ Coils <a name="Coils"></a>
 
 The input object Coil:Cooling:Water is simpler than the detailed geometry model.  The simple model provides a good prediction of the air and water outlet conditions without requiring the detailed geometric input required for the detailed model.  A greatly simplified schematic of enthalpy and temperature conditions in a counter flow cooling/dehumidifying coil is shown in the schematic Figure 162.  The input required to model the coil includes only a set of thermodynamic design inputs, which require no specific manufacturer's data.  The coil simulation model is essentially a modification of one presented by Elmahdy and Mitalas (1977), TRNSYS, 1990 and Threlkeld, J.L. 1970.  The model calculates the UA values required for a Dry, Wet and Part Wet & Part Dry Coil and iterates between the Dry and Wet Coil to output the fraction wet.  There are two modes of flow operation for this model: Cross Flow, which is widely applicable in HVAC systems and the second being Counter flow mode. The default value in program is set up for Counter Flow.  In addition the coil has two modes of analysis: Simple Analysis and Detailed Analysis. The Simple analysis mode operates the coil as either wet or dry while the detailed mode simulates the coil as part wet part-dry. While the detailed mode provides more accurate results, it is significantly slower than the simple model. The simple mode gives good results for an annual simulation but will not be adequate for a time step performance analysis.
 
-![](EngineeringReference/media/image3304.svg.png)
+![](media/image3304.svg.png)
 
 Figure 162.  Simplified Schematic of Cooling/Dehumidifying Coil
 
@@ -631,25 +631,25 @@ If equation is satisfied then Coil is Dry and simply output the value for Dry Co
 
 Graphs Showing the Performance of the coil model at optimum operating conditions are shown below. All values of variable used have been normalized.
 
-![](EngineeringReference/media/image3348.png)
+![](media/image3348.png)
 
 Figure 163.  Air Outlet Temperature Vs Air Mass Flow Rate
 
 
 
-![](EngineeringReference/media/image3349.png)
+![](media/image3349.png)
 
 Figure 164.  Sensible Load variations Vs Air mass Flow Rate
 
 
 
-![](EngineeringReference/media/image3350.png)
+![](media/image3350.png)
 
 Figure 165.  Total and Sensible Load variations Vs Air Mass Flow Rate
 
 
 
-![](EngineeringReference/media/image3351.png)
+![](media/image3351.png)
 
 Figure 166.  Surface Area Fraction Wet Vs Air Mass Flow Rate
 
@@ -679,7 +679,7 @@ Elmahdy, A.H., and Mitalas, G.P. 1977. "A Simple Model for Cooling and Dehumidif
 
 The input object Coil:Cooling:Water:DetailedGeometry provides a coil model that predicts changes in air and water flow variables across the coil based on the coil geometry. A greatly simplified schematic of enthalpy and temperature conditions in a counterflow cooling/dehumidifying coil is shown in the following schematic figure. In addition, the variables required to model a cooling/dehumidifying coils and their definitions are extensively listed in “Table 55. Coil Geometry and Flow Variables for Coils”. The input required to model the coil includes a complete geometric description that, in most cases, should be derivable from specific manufacturer's data.  The coil simulation model is essentially the one presented by Elmahdy and Mitalas (1977) and implemented in HVACSIM+ (Clark 1985), a modular program also designed for energy analysis of building systems. The model solves the equations for the dry and wet sections of the coil using log mean temperature and log mean enthalpy differences between the liquid and the air streams.  Elmahdy and Mitalas state that crossflow counterflow coils with at four rows or more are approximated well by this model.  This does not constitute a major limitation since cooling and dehumidifying coils typically have more than four rows.
 
-![](EngineeringReference/media/image3352.svg.png)
+![](media/image3352.svg.png)
 
 Figure 167.  Simplified Schematic of Cooling/Dehumidifying Coil
 
@@ -1376,19 +1376,19 @@ EnergyPlus is able to model latent capacity degradation based on algorithms deve
 
 The following discussion applies to both cycling fan and continuous fan operation when the fan operates for a longer period of time than the compressor and air continues to flow over the moisture laden cooling coil after compressor operation has terminated.
 
-![](EngineeringReference/media/image3484.png)
+![](media/image3484.png)
 
 Figure 168.  Transient Sensible and Latent Capacity of a Cooling Coil Over an Operating Cycle
 
 
 
-![](EngineeringReference/media/image3485.png)
+![](media/image3485.png)
 
 Figure 169. Field Data Showing the Net Impact of Part-Load Operation on Sensible Heat Ratio
 
 
 
-![](EngineeringReference/media/image3486.png)
+![](media/image3486.png)
 
 
 
@@ -4542,7 +4542,7 @@ The desuperheater heating coil can be used in air loop simulations for various a
 
 The desuperheater heating coil can also be used with cooling/heating systems that maintain specific air loop (deck) temperatures. For example, Figure 171 shows a schematic diagram of the desuperheater heating coil used in conjunction with the CoilSystem:Cooling:DX object. The desuperheater heating coil must be placed downstream of the DX cooling coil when reclaiming heat from that cooling coil’s compressor(s). Desuperheating heating coil placement is unrestricted when reclaiming heat from a refrigeration compressor rack or refrigeration condenser. The configuration in Figure 171 shows the heating coil being controlled via a temperature-based strategy. In this example, the DX cooling coil could be used to the maintain its discharge air temperature at 11°C for zone dehumidification. The desuperheater heating coil could then raise the air dry-bulb temperature to 16°C providing a dry supply air stream at a temperature which does not require much additional heating by terminal units to meet the zone temperature setpoint.
 
-![Schematic\_DesuperheaterHeatingCoil](EngineeringReference/media/image4016.png)
+![Schematic\_DesuperheaterHeatingCoil](media/image4016.png)
 
 Figure 171. Desuperheater Heating Coil Used as a Reheat Coil with CoilSystem:Cooling:DX
 
@@ -4714,7 +4714,7 @@ To model a desuperheater water heating coil, the input data file must include th
 
 A schematic diagram showing the desuperheater water heating coil with its water heater and DX system condenser is shown below.
 
-![DesuperheaterSchematic\_DS](EngineeringReference/media/image4049.png)
+![DesuperheaterSchematic\_DS](media/image4049.png)
 
 Figure 172.  Schematic of Desuperheater Water Heating Coil
 
@@ -4864,7 +4864,7 @@ As shown in Figure 173, the air-to-air heat exchanger pre-conditions the air ent
 
 
 
-![GenericHXAssisted](EngineeringReference/media/image4091.png)
+![GenericHXAssisted](media/image4091.png)
 
 Figure 173. Schematic of a Heat Exchanger Assisted Cooling Coil
 
@@ -4876,13 +4876,13 @@ Note that while the HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:D
 
 
 
-![PsychChart\_SensibleHXAssisted](EngineeringReference/media/image4092.png)
+![PsychChart\_SensibleHXAssisted](media/image4092.png)
 
 Figure 174. Psychrometric Process for Heat Exchanger Assisted Cooling Coil (Sensible HX Only)
 
 
 
-![PsychChart\_SensPlusLatHXAssisted](EngineeringReference/media/image4093.png)
+![PsychChart\_SensPlusLatHXAssisted](media/image4093.png)
 
 Figure 175. Psychrometric Process for Heat Exchanger Assisted Cooling Coil (Sensible+Latent HX)
 
@@ -4894,7 +4894,7 @@ For the CoilSystem:Cooling:DX:HeatExchangerAssisted object, heat exchanger opera
 
 The heat exchanger assisted DX cooling coil may be used with furnaces or unitary systems located in an air loop (ref. AirLoopHVAC:Unitary:Furnace:HeatCool or AirLoopHVAC:UnitaryHeatCool). These system objects have three options for dehumidification control (None, Multimode, and CoolReheat). When no dehumidification control is specified in the furnace or unitary system object (None), the heat exchanger is always active when the cooling coil is operating. When multimode or coolreheat dehumidification control is specified, a humidistat is required as shown in Figure 176. For the case of multimode dehumidification control, the heat exchanger is only active when the zone air humidity level is above the humidistat setpoint (i.e., the system’s cooling coil can’t meet the latent cooling load when operating without heat exchanger energy transfer) while the AC system operates to meet the sensible (dry-bulb cooling thermostat) load. For the case of coolreheat dehumidification control, the heat exchanger is always active when the cooling coil operates and this system tries to meet both the sensible (thermostat) and latent (humidistat) loads.
 
-![GenericHXAssisted\_humidistat](EngineeringReference/media/image4094.png)
+![GenericHXAssisted\_humidistat](media/image4094.png)
 
 Figure 176. Schematic of a heat exchanger assisted DX cooling coil with optional humidistat
 
@@ -4902,7 +4902,7 @@ The heat exchanger assisted DX cooling coil may also be used with a DX system lo
 
 When the heat exchanger assisted cooling coil is used with a furnace or unitary system (ref. AirLoopHVAC:Unitary:Furnace:HeatCool or AirLoopHVAC:UnitaryHeatCool) or DX system (ref. CoilSystem:Cooling:DX) located in an air loop (or DX system used in an outside air system), an ecomizier function may be customized as necessary. For economizer control, an outdoor air controller (ref. Controller:OutdoorAir) is used to define the economizer control inputs and determine when economizer mode is active. The heat exchanger (ref. HeatExchanger:\*) object provides an economizer lockout feature which disables heat recovery any time the economizer is active. This feature can be turned on and off using the heat exchanger lockout input. Heat exchanger assisted cooling coils used with the zone equipment described below disregard this economizer control feature.
 
-![GenericHXAssisted\_humidistat\_Plus\_Setpointmanager](EngineeringReference/media/image4095.png)
+![GenericHXAssisted\_humidistat\_Plus\_Setpointmanager](media/image4095.png)
 
 Figure 177. Schematic of Heat Exchanger Assisted DX Coil with Humidistat and Setpoint Manager
 
@@ -4926,13 +4926,13 @@ The input object Coil:WaterHeating:AirToWaterHeatPump provides a model used in a
 
 
 
-![HPWHSchematic\_EAplusOA](EngineeringReference/media/image4096.png)
+![HPWHSchematic\_EAplusOA](media/image4096.png)
 
 Figure 178. Schematic of a Heat Pump Water Heater using Optional Mixer/Splitter Nodes
 
 The heat pump water heater DX coil model described here determines the thermal performance and energy consumption of the DX compression system, which includes a water heating coil (condenser), a coil used to extract heat from air (evaporator), and the compressor. This model also simulates the performance of a condenser water pump that is assumed to cycle on and off with the compressor.
 
-![HeatPumpWaterHeater\_Schematic2](EngineeringReference/media/image4097.png)
+![HeatPumpWaterHeater\_Schematic2](media/image4097.png)
 
 Figure 179. Schematic of the Heat Pump Water Heater DX Coil
 
@@ -5314,7 +5314,7 @@ where
 
 The following figure shows this process on a psychrometric chart. This variable refrigerant flow DX cooling coil model follows the dotted process line from h<sub>in</sub> towards the outlet air enthalpy (the clear circles, ο) based on the modulated refrigerant flow (PLR). The coil surface temperature (ADP, apparatus dew point) is found by drawing a straight line through these points. The process line from h<sub>in</sub> to h<sub>ADP1</sub> represents the full load (PLR=1). This would be what the original DX cooling coil model calculates. At this point the sensible heat ratio is at the design point (assuming h<sub>in</sub> is the rating point and the coil operates at the rated air mass flow rate). As the coil load is reduced, the refrigerant flow rate is restricted and the outlet air condition rides up the dotted line. The outlet air condition and associated h<sub>ADP2</sub> is shown for a PLR of 0.7 (for example purposes only). Here the sensible heat ratio is higher than that found at full load operation. As the load continues to reduce, the refrigerant flow rate continues to throttle back and there comes a point where the coil’s ADP is equal to the inlet air dew point temperature (h<sub>ADP3</sub>). At this point, and for all other PLR’s less than this value, the coil surface becomes dry (at PLR=0.4 in this example) and the coil’s sensible heat ratio = 1. Between this PLR and PLR=0, the coil outlet air condition follows the dotted line back towards H<sub>in</sub>.
 
-<span>$ \cdot $</span> ![](EngineeringReference/media/image4182.png)
+<span>$ \cdot $</span> ![](media/image4182.png)
 
 Figure 180. Process on psychrometric chart
 
@@ -5668,11 +5668,11 @@ TheDOE/ORNL Heat Pump Design Model(HPDM) is a steady-state vapor compression equ
 
 And then, we plotted the resultant A<sub>o</sub> as a function of indoor air flow rate and compressor speed, as below:
 
-![](EngineeringReference/media/image4240.svg.png)
+![](media/image4240.svg.png)
 
 Figure 181. Effective Surface Area (Ao) Changing with Compressor Speed and Indoor SCFM
 
-![](EngineeringReference/media/image4241.svg.png)
+![](media/image4241.svg.png)
 
 Figure 182. Bypass Factor (BF) Changing with Compressor Speed and Indoor SCFM
 
@@ -5938,7 +5938,7 @@ S.A. Klein 2011, User Manual of Engineering Equation Solver V8
 
 Secondary coils reject to or remove heat from a secondary zone. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed indoor either heat is dumped to or extracted from the secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coil objects but they are add-on features on existing DX coil objects. A secondary DX coil is modelled by specifying additional inputs in single speed and multi speed DX coil objects: The additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary coil serves another controlled zone as shown in [Figure](#SchematicDXCoil).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. The operating mode of a secondary DX coil is determined by the primary DX coil serving the conditioned zone. If the primary DX coil is in cooling mode, then the secondary coil is rejecting heat (heating mode) to the secondary zone, or else if the  primary DX coil is in heating mode, then the secondary coil is extracting heat (cooling mode) from the secondary zone. Heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only. Whereas energy extracted from a secondary zone may contain sensible and latent components. The condenser type of the primary DX coils should be AirCooled. There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. Air drawn by the secondary coil fan passes through the secondary coil and dumped back into the secondary zone. The previous time step zone condition is used as an inlet condition to the current time for the secondary DX coil model.
 
-![SchematicDXCoil](EngineeringReference/media/image8002.png)<a name="SchematicDXCoil"></a>
+![SchematicDXCoil](media/image8002.png)<a name="SchematicDXCoil"></a>
 
 Figure: Schematic of DX System in cooling operating mode
 
@@ -5959,7 +5959,7 @@ where
 
 Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in [Figure](#SchematicDXAndSecondary). Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked.  New input field required as add-on to the DX cooling coil objects is "_Zone Name for Secondary Coil (condenser) Placement_".
 
-![SchematicDXAndSecondary](EngineeringReference/media/image8003.png)<a name="SchematicDXCoil"></a>
+![SchematicDXAndSecondary](media/image8003.png)<a name="SchematicDXCoil"></a>
 
 Figure: Schematic of DX system and secondary coil (condenser)
 
@@ -6040,7 +6040,7 @@ Reference: Dixon, Erin Elizabeth, "Energy Model Development and Heating Energy I
 
 The DX cooling coil model for Coil:Cooling:DX:SingleSpeed:ThermalStorage is described in this section. The following diagram shows the main aspects of the model for packaged thermal energy storage cooling coil.  This model allows charging and discharging to shift cooling energy use. The dashed line shows the boundary of the empirical "black box" model.  The main parts are the Condenser, Evaporator, Compressor, and Thermal Energy Storage (TES) tank.  The model interacts with the surroundings via a condenser inlet and outlet nodes, evaporator inlet and outlet nodes, heat transfer between TES tank and surrounding ambient environment, and optional added plant connection to the TES tank.
 
-![](EngineeringReference/media/image4287.png)
+![](media/image4287.png)
 
 Figure 183. Highlights of Packaged Thermal Storage Cooling Coil
 
@@ -6048,7 +6048,7 @@ Depending on the operating mode, different parts are active.  There are six mod
 
 **Off Mode** is when the unit is not running but the TES tank still interacts with ambient and the model needs to track the state of charge in the tank.
 
-![](EngineeringReference/media/image4288.png)
+![](media/image4288.png)
 
 Figure 184. Thermal Storage Cooling Coil Off Mode
 
@@ -6066,7 +6066,7 @@ Governing equations for Off Mode include:
 
 **Cooling Only Mode** is when the unit is running but since it is neither charging nor discharging the TES tank, the model is essentially the same as a normal single speed DX cooling coil.  The latent degradation model is not available.  The model uses SHR curves  from user input.
 
-![](EngineeringReference/media/image4293.png)
+![](media/image4293.png)
 
 Figure 185. Thermal Storage Coil Cooling Only Modee
 
@@ -6128,7 +6128,7 @@ The results of the performance curves are applied as follows to determine SHR:
 
 Cool and Charge Mode is when the unit is both cooling and charging the TES, then all the parts are active. The electric power into the compressor is split into two terms to accommodate devices that actually have dual compressors.
 
-![](EngineeringReference/media/image4309.png)
+![](media/image4309.png)
 
 Figure 186. Thermal Storage Coil Cool and Charge Modes
 
@@ -6204,7 +6204,7 @@ The results of the performance curves are applied as follows to determine SHR:
 
 
 
-![](EngineeringReference/media/image4331.png)
+![](media/image4331.png)
 
 Figure 187. Thermal Storage Coil Cool and Discharge Modes
 
@@ -6294,7 +6294,7 @@ The results of the performance curves are applied as follows to determine SHR:
 
 
 
-![](EngineeringReference/media/image4355.png)
+![](media/image4355.png)
 
 Figure 188. Thermal Storage Coil Charge Only Mode
 
@@ -6334,7 +6334,7 @@ Energy input ratio modifier factor is a function of evaporator inlet wetbulb and
 
 **Discharge Only Mode** is when the unit is only discharging, there is no heat flow at the condenser. The rate of discharge will modulate to meet part loading at the evaporator.
 
-![](EngineeringReference/media/image4366.png)
+![](media/image4366.png)
 
 Figure 189. Thermal Storage Coil Discharge Only Mode
 
@@ -6403,7 +6403,7 @@ The input object Controller:WaterCoil provides a simple controller model for adj
 
 The figure below illustrates the use of a simple controller used with a central chilled water coil (control variable Temperature). The controller reads the desired temperature setpoint from the control node (established by a SetpointManager) and modulates the chilled water flow rate at the actuator node in order to meet the desired supply (coil outlet) air temperature.
 
-![TemperatureControlledWaterCoil](EngineeringReference/media/image4384.png)
+![TemperatureControlledWaterCoil](media/image4384.png)
 
 Figure 190. Controller:WaterCoil used with Central Chilled Water Coil
 
@@ -6411,7 +6411,7 @@ In this case, the controller simply senses the temperature at the control node a
 
 The simple controller may also be used to control both high temperature and high humidity levels by controlling the water flow rate through a chilled water coil. Setting the controller’s control variable to TemperatureAndHumidityRatio enables this feature. In this case, the controller monitors two setpoint values, one for temperature control and the other for high humidity control. Note that two setpoint managers must be used to establish these setpoints as shown in the figure below. The limiting case for either temperature or high humidity control (i.e., the minimum supply air temperature required to meet both setpoints) is used for controlling the water flow rate through the chilled water coil. If high humidity control is the limiting case then colder supply air will be delivered by the cooling coil to achieve proper dehumidification and some form of air reheat may be required to avoid overcooling of the zones being served by this air loop.
 
-![TempHumRatControlledWaterCoil](EngineeringReference/media/image4385.png)
+![TempHumRatControlledWaterCoil](media/image4385.png)
 
 Figure 191. Two Setpoint managers used in Controller:WaterCoil
 
@@ -6537,7 +6537,7 @@ Economizer limits may be used to create single-point or multi-point controllers.
 
 Economizer limits may also be used to create multi-point controllers where two or more limits specify the economizer operating region. The economizer is disabled (OFF) if any single multi-point economizer limit is exceeded.
 
-![EconomizerLimitContrrol](EngineeringReference/media/image4411.png)
+![EconomizerLimitContrrol](media/image4411.png)
 
 Figure 192. Economizer Limit Controls
 
@@ -6691,7 +6691,7 @@ If heat recovery bypass control is selected, the type of control determines how 
 
 The stand alone energy recovery ventilator (ERV) controller is used solely in conjunction with a stand alone energy recovery ventilator (see figure below).
 
-![Schematic\_StandAloneERV](EngineeringReference/media/image4482.png)
+![Schematic\_StandAloneERV](media/image4482.png)
 
 Figure 193. Schematic of the ZoneHVAC:EnergyRecoveryVentilator Compound Object
 

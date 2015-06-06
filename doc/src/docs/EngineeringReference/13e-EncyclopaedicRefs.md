@@ -46,13 +46,13 @@ This equation is typically coupled with Fourier’s law of conduction that relat
 
 <div>$$q''\left( {x,t} \right) =  - k\frac{{\partial T\left( {x,t} \right)}}{{\partial x}}$$</div>
 
-![](EngineeringReference/media/image5973.png)
+![](media/image5973.png)
 
 Figure 266. Single Layered Building Element
 
 While analytical solutions exist for the single homogeneous layer shown in Figure 266, the solution becomes extremely tedious for the multiple layered slab shown in Figure 267.
 
-![](EngineeringReference/media/image5974.png)
+![](media/image5974.png)
 
 Figure 267. Multilayered Building Element
 
@@ -192,7 +192,7 @@ In matrix format:
 
 <div>$$\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\ {{{q''}_o}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ {{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h\\ { - h}&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\ {{T_i}}\end{array}} \right]$$</div>
 
-![](EngineeringReference/media/image6008.svg.png)
+![](media/image6008.svg.png)
 
 Figure 268. Two Node State Space Example
 
@@ -208,7 +208,7 @@ Degiovanni (1988) proposed two methodologies for including sources or sinks in t
 
 The second method that will be analyzed in more detail involves the addition of a source or sink at the interface between two layers.  The derivation of the necessary equations is begun by analyzing the simple two layer element shown in Figure 269.
 
-![](EngineeringReference/media/image6009.png)
+![](media/image6009.png)
 
 <div>$$\left[ {\begin{array}{*{20}{c}}{{T_2}\left( s \right)}\\ {{q_2}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{{A_2}\left( s \right)}&{{B_2}\left( s \right)}\\ {{C_2}\left( s \right)}&{{D_2}\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_3}\left( s \right)}\\ {{q_3}\left( s \right)}\end{array}} \right]$$</div>
 
@@ -286,7 +286,7 @@ The nodal equations for the finite difference network shown in Figure 270 are:
 
 <div>$${q''_o} = h\left( {{T_1} - {T_o}} \right)$$</div>
 
-![](EngineeringReference/media/image6034.svg.png)
+![](media/image6034.svg.png)
 
 Figure 270.  Two Node State Space Example with a Heat Source
 
@@ -374,11 +374,11 @@ Graphical descriptions of the controls for the low temperature radiant system mo
 
 In the constant flow-variable temperature systems, the controls are also considered piecewise linear functions, but in this case the user selects both the control temperatures and the water temperatures via schedules.  This offers greater flexibility for defining how the radiant system operates though it may not model every situation.  Figure 272 shows how the “desired” inlet water temperature is controlled based on user schedules.  The user has the ability to specify the high and low water and control temperature schedules for heating and cooling (separately; a total of eight temperature schedules).  Note that this inlet temperature is a “desired” inlet temperature in that there is no guarantee that the system will provide water to the system at that temperature.  The model includes a local loop that attempts to meet this demand temperature through mixing and recirculation.
 
-![](EngineeringReference/media/image6053.png)
+![](media/image6053.png)
 
 Figure 271.  Variable Flow Low Temperature Radiant System Controls
 
-![](EngineeringReference/media/image6054.png)
+![](media/image6054.png)
 
 Figure 272.  Variable Temperature Low Temperature Radiant System Controls
 
@@ -386,7 +386,7 @@ The constant flow (variable temperature) low temperature radiant system model is
 
 There are four possible conditions (separate for heating and cooling).  First, if the loop has adequate temperature and flow to meet system requests, then the model sets the radiant system inlet temperature and controls to the desired values based on the controls and simulates.  This is the best condition and recirculation and bypass amounts are adjusted accordingly based on radiant system outlet temperatures.  Second, if the loop temperature is adequate but the loop flow rate is less than the radiant system flow rate, we may or may not be able to meet the desired inlet temperature since recirculation might lower the temperature below the desired temperature.  In this second case, the model first simulates the radiant system with the desired conditions and then resimulates it to solve for the actual inlet temperature (see later in this section) if it cannot achieve the desired inlet temperature.  Third, if the loop flow is greater than the radiant flow but the temperature of the loop is not adequate, then there is no amount of mixing that will solve this problem.  All of the radiant flow comes from the loop and the loop temperature (after pump heat addition) becomes the radiant system inlet regardless of the temperature controls.  Finally, if both the temperature and the flow of the loop are inadequate, then the model simply solves for the actual radiant system inlet temperature and does not try to meet the controls (merely tries to get as close as physically possible given the loop conditions).
 
-![](EngineeringReference/media/image6055.png)
+![](media/image6055.png)
 
 Figure 273.  Variable Temperature Low Temperature Radiant System Component Details
 
@@ -400,7 +400,7 @@ In reality, this is not physically correct because each change in the flow rate 
 
 Despite the fact that the simulation algorithm described above may either over- or under-predict system response dependent on how the system has been controlled in previous system time steps, it is reasonable to expect that the effect of these variations will balance out over time even though it might lead to slightly inaccurate results at any particular system time step.  The long-term approach is also in view in the final simulation step at each zone time step.  After the system has simulated through enough system time steps to equal a zone time step, the radiant system will rerun the heat balance using the average heat source/sink over all of the system time steps during the past zone time step.  This maintains the conservation of energy within the heat balance simulation over the zone time steps and defines more appropriate temperature and flux histories at each surface that are critical to the success of a conduction transfer function based solution.  A graphical picture of this somewhat complex multiple step simulation is shown in the figure below.
 
-![](EngineeringReference/media/image6056.png)
+![](media/image6056.png)
 
 Figure 274.  Resolution of Radiant System Response at Varying Time Steps
 
@@ -705,11 +705,11 @@ The user has two options when describing the balance of the system. Energy used 
 
 A detailed refrigeration system object models compressor and condenser performance separately. The detailed refrigeration system also includes the ability to transfer refrigeration load from one system to another using subcoolers, cascade condensers, and secondary loops. An example schematic of the detailed refrigeration system is shown in Figure 277 below. Subcooler \#2 is shown twice on  Figure 277 because it represents a liquid suction heat exchanger. This type of subcooler uses the cool suction gas to subcool the warmer condensed liquid. Subcoolers \#1 and \#3 on Figure 277 represent mechanical subcoolers. These subcoolers are used to subcool the condensate on a lower-temperature system using the cold liquid refrigerant from a higher temperature system. On this example, only subcoolers \#1 and \#2 would be defined as a part of the refrigeration system. However, subcooler \#3 would place a refrigerating load, similar to the load of a refrigerated case, on the system.
 
-![racksystem\_low](EngineeringReference/media/image6091.png)
+![racksystem\_low](media/image6091.png)
 
 Figure 276. Typical Compressor Rack Equipment Schematic
 
-![DetailedSystem](EngineeringReference/media/image6092.png)
+![DetailedSystem](media/image6092.png)
 
 Figure 277. Typical Detailed Refrigeration System Equipment Schematic
 
@@ -739,7 +739,7 @@ The simulation of the evaporative cooled condenser utilizes an effective air dry
 
 If the condenser heat rejection is specified as water cooled, an appropriate plant water loop must be defined by the user (see documentation on *Plant/Condenser Loops* for additional details about plant loops).  This will include defining cooling supply components, such as pumps, water storage tanks, and cooling towers, as well as related branches, nodes, and connectors. The heat rejection from the refrigeration condenser is modeled as a cooling demand, which is satisfied by heat extraction devices (e.g., water tank and cooling tower) on the cooling supply side of a water loop. An example of such an arrangement is shown in Figure 278.
 
-![watertankheatrecoveryschematic](EngineeringReference/media/image6093.png)
+![watertankheatrecoveryschematic](media/image6093.png)
 
 Figure 278. Example Of Condenser Heat Recovery To Water Storage Tank
 
@@ -1370,7 +1370,7 @@ Table 76. Representative Latent Case Credit Curve Coefficients for Case Temperat
 
 For certain refrigerated case types, the sensible case credits provided to the zone can create an uncomfortably cold environment in the surrounding area. For this reason, return air ducts are frequently placed behind these cases to draw this cold air under the case and direct it back to the HVAC system. This reduces localized over-cooling and improves occupant comfort.
 
-![RAFraction](EngineeringReference/media/image6247.png)
+![RAFraction](media/image6247.png)
 
 Figure 279. Return Air Factor Versus Under Case HVAC Return Air Fraction
 
@@ -1782,7 +1782,7 @@ T<sub>evap</sub>            = Evaporating temperature (C)
 
 The rated values for the cooling capacity and power consumption from the manufacturer include a specified amount of subcooling before the thermal expansion valve and a certain amount of superheat in the suction gas. Adjustments must be made to these rated values to reflect the actual subcooling and superheat conditions. Actual subcooling is determined by the condenser’s rated subcooling and by the subcooling provided by optional subcoolers. The actual superheat is determined by the refrigerated case superheat (usually set to ensure that there is no liquid in the suction lines leading to the compressors), set here at 4C, and the effect from any optional subcoolers(ASHRAE 2006b). These various state points are shown in Figure 280.
 
-![CorrectedPHcycledrawing](EngineeringReference/media/image6275.png)
+![CorrectedPHcycledrawing](media/image6275.png)
 
 Figure 280. State Points and Energy Flows for Detailed Refrigeration System
 
@@ -1810,13 +1810,13 @@ Between the two stages of compression, an intercooler is used to cool the discha
 
 Several methods of two-stage compression and intercooling have been used.  For large industrial refrigeration systems, typical of ammonia systems used in refrigerated warehouses, both shell-and-coil intercooling (Figure 281) and flash intercooling (Figure 282) are used.  The two stages of compression in these systems may be performed by separate low- and high-stage compressors or with a compound compressor containing both the low and high stages within the same compressor body.
 
-![](EngineeringReference/media/image6278.png)
+![](media/image6278.png)
 
 Figure 281.  Two-Stage Compression System with a Shell-and-Coil Intercooler.
 
 
 
-![](EngineeringReference/media/image6279.png)
+![](media/image6279.png)
 
 Figure 282.  Two-Stage Compression System with a Flash Intercooler.
 
@@ -1920,7 +1920,7 @@ The Air Volume Ratio is limited by a minimum value, which may be specified by th
 
 Four fan curves are built into the condenser fan model to represent four types of fan control, as shown in Figure 283. (Lawrence Berkeley Laboratory and Resource Dynamics, April 2003)
 
-![](EngineeringReference/media/image6291.svg.png)
+![](media/image6291.svg.png)
 
 Figure 283. Condenser fan power curve options
 
@@ -1982,7 +1982,7 @@ C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub>, and C<sub>4</sub>     =    
 
 Figure 284 shows a comparison between this equation form, which produced an adjusted R<sup>2</sup> of 0.998 and a maximum residual of 0.7C, for one manufacturer of evaporative condensers. Data from two other manufacturers showed similar agreement with this parameterization.
 
-![](EngineeringReference/media/image6301.svg.png)
+![](media/image6301.svg.png)
 
 Figure 284. Comparison of the condensing temperature predicted by four-factor equation to manufacturer's data
 
@@ -2040,7 +2040,7 @@ If the condenser heat rejection is specified as water cooled (input object Refri
 
 A cascade condenser joins two full detailed refrigeration systems; that is, both systems joined by the cascade condenser have loads, compressor(s), and a condenser, as shown in Figure 285.
 
-![Cascade](EngineeringReference/media/image6310.png)
+![Cascade](media/image6310.png)
 
 Figure 285. A cascade condenser is used to reject heat from a low-temperature detailed refrigeration system to a higher-temperature detailed refrigeration system
 
@@ -2138,13 +2138,13 @@ In the secondary loop shown in Figure 286, the secondary evaporator serves to ch
 
 
 
-![brinesecondary](EngineeringReference/media/image6323.png)
+![brinesecondary](media/image6323.png)
 
 Figure 286. Secondary loop with brine or glycol solution circulation
 
 
 
-![liquidoverfeedsecondary](EngineeringReference/media/image6324.png)
+![liquidoverfeedsecondary](media/image6324.png)
 
 Figure 287. Secondary loop with liquid-overfeed refrigerant circulation
 
@@ -2154,7 +2154,7 @@ For a brine system, the secondary loop capacity is matched to the case and walk-
 
 For a secondary loop to accommodate a two-phase secondary coolant, additional hardware is required and the system control mode changes. A separator/receiver is required to separate the wet mixture of liquid and gas returning from the refrigeration load, as shown in Figure 287.  (In the following discussion, we will refer to the secondary fluid in a liquid-overfeed system as CO<sub>2</sub>.) In Figure 288, which focuses in on the secondary loop alone, the gaseous CO<sub>2</sub> moves via thermosiphon effect to the secondary evaporator, where heat is absorbed by the primary system to condense the CO<sub>2</sub>, which then returns via gravity flow to the separator/revceiver.  The liquid CO<sub>2</sub> is pulled from the bottom of the separator/receiver and pumped to the load. The term ‘liquid overfeed ratio’ refers to the ratio of the total pumped mass flow rate (at the point labeled “1” on Figure 288) of CO<sub>2</sub> to the mass rate of CO<sub>2</sub> evaporated at the load (vapor portion of the flow at the point labled “5” on Figure 288). With a variable flow rate(obtained with either a variable-speed pump or multiple constant-speed pumps), the liquid overfeed ratio is maintained at or above the specified value. With a constant flow rate (obtained by specifying a single constant-speed pump), the liquid overfeed ratio will vary to match the capacity of the variable refrigeration load.(Hinde et al 2009) Even though a greater amount of CO<sub>2</sub> is circulated than is evaporated, the pumping power requirements are still much less than those for a single-phase secondary coolant.
 
-![DanfossCO2cycle](EngineeringReference/media/image6325.png)
+![DanfossCO2cycle](media/image6325.png)
 
 Figure 288. Thermodynamic cycle for a liquid overfeed secondary loop
 
@@ -2354,13 +2354,13 @@ EnergyPlus is capable of modeling the transcritical booster refrigeration cycle.
 
 
 
-![](EngineeringReference/media/image6337.png)
+![](media/image6337.png)
 
 Figure 289.  Schematic of the Transcritical CO<sub>2</sub> Booster Refrigeration Cycle.
 
 
 
-![](EngineeringReference/media/image6338.png)
+![](media/image6338.png)
 
 Figure 290.  Pressure-Enthalpy (*p-H*) Diagram for the Transcritical CO<sub>2</sub> Booster Refrigeration Cycle.
 
@@ -2396,7 +2396,7 @@ Only one gas cooler is allowed per transcritical refrigeration system. However, 
 
 When the compressor discharge conditions are such that the CO<sub>2</sub> is in the supercritical region, then the high-side operating pressure is independent of the gas cooler exit temperature (Sawalha 2008).  Thus, for a given gas cooler exit temperature, there is an optimum pressure to achieve the maximum coefficient of performance (COP).  Figure 291 illustrates the variation in COP of a transcritical CO<sub>2</sub> cycle with discharge pressure at different gas cooler exit temperatures.
 
-![](EngineeringReference/media/image6342.png)
+![](media/image6342.png)
 
 Figure 291.  COP of CO<sub>2</sub> Transcritical Cycle vs. Discharge Pressure at Different Gas Cooler Exit Temperatures (Sawalha 2008).
 
@@ -3047,7 +3047,7 @@ NF = Normalized condenser water flow per unit of tower capacity, m3/W
 
 MinDsnWB is compared against the design tower wetbulb. This curve is usually a function of Weighted PLR and NF. So if NF is constant at 5.382E-8 m3/s (3 gpm/ton), the curve can be depicted as follows:
 
-![](EngineeringReference/media/image6482.png)
+![](media/image6482.png)
 
 Figure 292. Minimum Tower Design Wet Bulb Boundary Condition
 
@@ -3073,7 +3073,7 @@ where,
 
 MinActualWb is compared against this time step’s outside air wet bulb. This curve is usually a function of MinDesignWB, WeightedRatio and TwrDesignWB. So if TwrDesignWB is constant at 25.6 °C (78 °F), and NF = 5.382E-8 m3/s (3 gpm/ton), the curve can be depicted as follows:
 
-![](EngineeringReference/media/image6483.png)
+![](media/image6483.png)
 
 Figure 293. Minimum Wet Bulb Boundary Condition
 
@@ -3099,7 +3099,7 @@ where,
 
 A graph of the curve can be depicted as follows:
 
-![](EngineeringReference/media/image6484.png)
+![](media/image6484.png)
 
 Figure 294. Optimum EWT vs PLR & OaWb
 
@@ -3165,19 +3165,19 @@ For a chilled water loop, the user-specified minimum is the default setpoint use
 
 The setpoint will be reset at the beginning of a system time step, and remain that way through that time step.  The setpoint is calculated based on the latest known value of loop demand and loop flow rate.  If the demand and flow rate remain the same for the currently calculated time step, the loop will maintain control well.  However, if either changes, there will be a lag effect while the loop attempts to maintain control.  Consider the following plot, with a short description following:
 
-![](EngineeringReference/media/SetPointManager-ResetForReturnControl1.png)
+![](media/SetPointManager-ResetForReturnControl1.png)
 
 Throughout the day, the heat addition (green line) to the loop increases.  Each time it increases, there is a small period of time where the loop attempts to regain control of the return temperature.  The setpoint is only reset at the beginning of the system time step, so as the plant converges within a single time step, the load will vary and the return temperature may not be exactly on target.
 
 This isn't necessarily a big problem.  However, some users may be especially interested in very tight control of the return temperature.  This can be done very easily by simply reducing the simulation time step.  For example, in the following plot, the time step was reduced from 10 minutes to 1 minute, with some description following the plot:
 
-![](EngineeringReference/media/SetPointManager-ResetForReturnControl2.png)
+![](media/SetPointManager-ResetForReturnControl2.png)
 
 With the smaller time step, the reporting frequency is higher.  But more importantly, with the smaller time step, the setpoint can be corrected much more often.  Because of this, the return temperature regains control much quicker than with the larger time step.  
 
 However, these examples are for a jagged demand profile full of discontinuous step changes in loop demand.  As a final example, this return water temperature control is applied to the large office reference building chilled water loop.  Here is the response:
 
-![](EngineeringReference/media/SetPointManager-ResetForReturnControl3.png)
+![](media/SetPointManager-ResetForReturnControl3.png)
 
 Note the control is working properly, maintaining a return temperature around the target of 12 degrees where possible.  Since the load profile is a typical -smooth- profile, the control is also much smoother.  This should be a good representation of the capabilities of this setpoint manager.
 
@@ -3338,7 +3338,7 @@ Solar Rating and Certification Corporation.  2004.  Directory of SRCC Certifie
 
 Solar collectors with integral storage unit models use SolarCollector:IntegralCollectorStorage object, and the characteristics parameter inputs of this collector are provided by the SolarCollectorPerformance:IntegralCollectorStorage object. This model is based on detailed Energy Balance equations of solar collectors that integrates storage in it. This model has two options to represent the collector bottom outside boundary conditions: AmbientAir, and OtherSideConditionsModel. AmbientAir simply applies outside air temperature using combined convection and radiation conductance, and the OtherSideConditionsModel applies combined radiation and convection models that exiats in a naturally ventilated cavity to represent the collector bottom outside boundary condition. The later boundary condition accounts for the shading of the collector on the underlying surface, hence, the ICS collector can be assumed as an integral part of the building envelope. Schematic diagram of a rectangular ICS solar collector is shown in Figure 295 below:
 
-![](EngineeringReference/media/image6502.png)
+![](media/image6502.png)
 
 Figure 295. Schematic diagram of rectangular Integrated Collector Storage unit
 
@@ -3436,7 +3436,7 @@ Or
 
 The convection and radiation heat transfer coefficients in equation above are calculated based on temperatures at the previous time step and determined as described in the *Heat Transfer Coefficients* section.
 
-![](EngineeringReference/media/image6522.png)
+![](media/image6522.png)
 
 Figure 296. Thermal network diagram for ICS Solar Collector
 
@@ -3444,7 +3444,7 @@ Figure 296. Thermal network diagram for ICS Solar Collector
 
 Ignoring the thermal mass of the collector cover, a steady state heat balance equations are formulated for each cover that allow us to determine cover temperatures.  The cover surface heat balance representation is shown in Figure 297 below.
 
-![](EngineeringReference/media/image6523.png)
+![](media/image6523.png)
 
 Figure 297. Collector Cover Surface Heat Balance
 
@@ -3490,7 +3490,7 @@ Where,
 
 ICS Solar Collectors are commonly mounted on building heat transfer surfaces hence the collectors shade the underlying heat transfer surface and require a unique boundary condition that reflects the air cavity environment created between the bottom of the collector surface and the underlying surface. The other side condition model that allows us to estimate the other side temperature, *T<sub>osc</sub>*, can be determined based on steady state heat balance using the known collector water temperature at the previous time step.
 
-![](EngineeringReference/media/image6527.png)
+![](media/image6527.png)
 
 Figure 298. Illustration for Other Side Condition Model
 
@@ -3902,7 +3902,7 @@ The collector is assumed to be sufficiently thin and high-conductivity so that i
 
 Observe that for the passive case, we do not use the heat exchanger relations to directly model the interaction of ventilating air with the collector.  This is because these relations are considered to not apply when the UTSC is in passive mode.  They were developed for uni-directional flow (rather than the balanced-in-and-out flow expected from natural forces) and for specific ranges of suction face velocity.  Therefore, this heat transfer mechanism is handled using classical surface convection models (as if the collector was not perforated).  (Air exchanges are modeled as ventilation in the plenum air heat balance but do not interact with the hole edges in the collector surface.)
 
-![](EngineeringReference/media/image6620.png)
+![](media/image6620.png)
 
 Figure 299.  Transpired Collector Heat Balance
 
@@ -4014,7 +4014,7 @@ Note that we have formulated the control volumes with slight differences for the
 
 
 
-![](EngineeringReference/media/image6664.png)
+![](media/image6664.png)
 
 Figure 300.  Transpired Collector Plenum Air Heat Balance
 
@@ -4518,7 +4518,7 @@ Else
 
 Optimum start is often also referred to as optimum recovery time. Commercial buildings are often operated intermittently by lowering heating set-point and increasing cooling set-point during unoccupied period. The building should return to set-point just before occupancy period starts. Therefore it is important to start the operation of heating and cooling plant before building is occupied. If the operation is started too early before the occupants return, energy is wasted. If it is started too late the occupants will be uncomfortable. An optimum start time for operation will save energy without compromising comfort.
 
-![](EngineeringReference/media/image6731.png)
+![](media/image6731.png)
 
 Figure 301. Optimal Start Control
 

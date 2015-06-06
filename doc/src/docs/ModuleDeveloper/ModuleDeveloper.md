@@ -1,5 +1,5 @@
 
-![](ModuleDeveloper/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -4142,7 +4142,7 @@ Programmers throughout time have had to deal with speed of code execution and it
 
 However, many people may read the code – as developers, we should try to make it as readable at first glance as possible.  For a true example from the code and a general indication of preferred style, take the case of the zone temperature update equation.  In the [Engineering Reference](file:///E:\Docs4PDFs\EngineeringReference.pdf) document, the form is recognizable and usual:
 
-![](ModuleDeveloper/media/image001.png)And, this equation appears in the code (ZoneTempPredictorCorrector Module), as:
+![](media/image001.png)And, this equation appears in the code (ZoneTempPredictorCorrector Module), as:
 
 ZT(ZoneNum)= (CoefSumhat +   CoefAirrat\*(3.0\*ZTM1(ZoneNum) - (3.0/2.0)\*ZTM2(ZoneNum) &
 
@@ -4740,7 +4740,7 @@ Branches, Connectors, and Nodes
 
 In EnergyPlus, the HVAC system and plant form a network (technically, a graph). The individual pieces of equipment – the fans, coils, chillers, etc. – are connected together by air ducts and fluid pipes. In EnergyPlus nomenclature, the air and fluid circuits are called loops. Specifying how an individual system and plant are connected is done in the EnergyPlus input (IDF) file. The overall structure of the network is defined with Branch and Connector objects. The detail is filled with components and their inlet and outlet nodes. A Branch consists of one or more components arranged sequentially along a pipe or duct. A Connector specifies how three or more branches are connected through a Splitter or Mixer. Nodes connect components along a branch: the outlet node of one component is the inlet node of the next downstream component. The nodes represent conditions at a point on a loop. Each component has one or more inlet and outlet nodes, depending on how many loops it interacts with. A fan, for instance, has one inlet node and one outlet node, since it interacts with a single air loop. A water coil will have 2 inlet and 2 outlet nodes, since it interacts with an air and a fluid loop. Figure 1 shows a diagram of an EnergyPlus HVAC input.
 
-![](ModuleDeveloper/media/image002.png)
+![](media/image002.png)
 
 Figure 1.  HVAC Input Diagram
 
@@ -9817,7 +9817,7 @@ The following general guidelines are to be followed when choosing names for new 
 
 An output variable name should be constructed from up to six separate name elements.  The following diagram shows the elements and the order that they are to be used in the name.  The first three are each somewhat optional and are used as needed to identify the type of engineering model, object, or device being reported on.  The last three are nearly always needed. Units are always needed (as described below.
 
-![OutputNameScheme.png](ModuleDeveloper/media/image003.jpg)
+![OutputNameScheme.png](media/image003.jpg)
 
 Figure 2. Output Variable Classification Elements
 

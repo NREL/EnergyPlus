@@ -40,7 +40,7 @@ Electric load centers can have one of five different configurations. Load center
 
 The most basic configuration is selected with the keyword “Alternating Current” for the Electrical Buss Type, shown in the following diagram.
 
-![ACtopology](EngineeringReference/media/image7480.png)
+![ACtopology](media/image7480.png)
 
 Figure 333. Basic Alternating Current Schematic
 
@@ -50,7 +50,7 @@ A configuration with AC generators with on-site electrical storage is selected w
 
 
 
-![ACwithStorageTopology](EngineeringReference/media/image7481.png)
+![ACwithStorageTopology](media/image7481.png)
 
 Figure 334. AC Generators with On-site Electrical Storage Schematic
 
@@ -60,7 +60,7 @@ The basic configuration for photovoltaic generators is selected using the “Dir
 
 
 
-![DCwithInverterTopology](EngineeringReference/media/image7482.png)
+![DCwithInverterTopology](media/image7482.png)
 
 Figure 335. Direct Current With Inverter Photovoltaic Generators Schematic
 
@@ -70,7 +70,7 @@ If the PV-based load center is equipped with DC electrical storage that is conne
 
 
 
-![DCwithInverterDCStorageTopology](EngineeringReference/media/image7483.png)
+![DCwithInverterDCStorageTopology](media/image7483.png)
 
 Figure 336. PV based Load Center with DC Electrical Storage Schematic
 
@@ -80,7 +80,7 @@ If the PV-based load center is equipped with AC electrical storage that is conne
 
 
 
-![DCWithInverterACStorage](EngineeringReference/media/image7484.png)
+![DCWithInverterACStorage](media/image7484.png)
 
 Figure 337. PV Based Load Center with AC Electrical Storage Schematic
 
@@ -170,7 +170,7 @@ where,
 
 KiBaM views the battery as a voltage source in series with an electric resistance (Figure 338). The internal resistance is assumed to be constant and the open circuit voltage varies with current and state of charge.
 
-![](EngineeringReference/media/image7528.svg.png)
+![](media/image7528.svg.png)
 
 Figure 338. Electrical equivalent model for KiBaM
 
@@ -642,7 +642,7 @@ This is a reasonable approximation for crystalline modules. The “four paramete
 
 The four-parameter equivalent circuit is shown in the following figure:
 
-![](EngineeringReference/media/image7592.svg.png)
+![](media/image7592.svg.png)
 
 Figure 339. Equivalent circuit in the four parameter model
 
@@ -1932,7 +1932,7 @@ The overall power production that includes conversion loss and delivery loss is 
 
 #### Vertical Axis Wind Turbine
 
-![WindTurbine-1](EngineeringReference/media/image7837.png)
+![WindTurbine-1](media/image7837.png)
 
 Figure 340. Flow velocities and force diagram of a single blade airfoil
  (Adapted from Mazharul Islam et al., 2008)

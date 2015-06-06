@@ -1,4 +1,4 @@
-![](EngineeringReference/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -45,7 +45,7 @@ General Modeling Overview
 
 The EnergyPlus program is a collection of many program modules that work together to calculate the energy required for heating and cooling a building using a variety of systems and energy sources. It does this by simulating the building and associated energy systems when they are exposed to different environmental and operating conditions. The core of the simulation is a model of the building that is based on fundamental heat balance principles. Since it is relatively meaningless to state: “based on fundamental heat balance principles”, the model will be described in greater detail in later sections of this document in concert with the FORTRAN code which is used to describe the model. It turns out that the model itself is relatively simple compared with the data organization and control that is needed to simulate the great many combinations of system types, primary energy plant arrangements, schedules, and environments. The next section shows this overall organization in schematic form. Later sections will expand on the details within the blocks of the schematic.
 
-![](EngineeringReference/media/image1.png)
+![](media/image1.png)
 
 Figure 1. EnergyPlus Program Schematic
 
@@ -154,7 +154,7 @@ where Tmax,prev is the maximum zone temperature of previous day, Tmax is the max
 
 Note that a minimum load of 100W is used to establish a fraction for the maximum loads when they are less than the minimum. This is done to avoid a false negative indication for the percentage load difference that may appear when zonal loads are very small. The convergence checks are repeated until passed for all zones. EnergyPlus assumes that the warmup period has been reached steady-periodic when these four parameters are within tolerance. Finally, temperature and load differences between the last two warmup days for individual zone at each time step in the last warmup day are reported so that users can easily track whether or not the warmup period has converged. The input parameters and output related to the warmup period are discussed in the Input-Output Reference.
 
-![](EngineeringReference/media/image6.png)
+![](media/image6.png)
 
 Figure 2. Flows of Warmup Convergence Checks
 

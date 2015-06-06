@@ -1,5 +1,5 @@
 
-![](InterfaceDeveloper/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -22,7 +22,7 @@ Introduction
 
 This document is intended for developers who are creating user interfaces for EnergyPlus.  It provides an overview of the essentials of the input-output structure of EnergyPlus and describes the parts of each in detail.
 
-![](InterfaceDeveloper/media/image001.png)
+![](media/image001.png)
 
 Figure 1. EnergyPlus Input/Output Overview
 
@@ -613,7 +613,7 @@ To assist you in using the [Input Output Reference](file:///E:\Docs4PDFs\InputOu
 
 To determine the latest set of groups and objects, it will be useful for you to open the IDFEditor (an intelligent editor that is installed with EnergyPlus) and write out the current object list.  The following figure shows the screen shot of the IDFEditor and the help menu to select the objectlist.  Select “**create objectlist.txt**” to create the object list – it will be put into the IDFEditor program folder.
 
-![](InterfaceDeveloper/media/image002.jpg)
+![](media/image002.jpg)
 
 Figure 2. Using IDFEditor to find the latest groups and objects for the Energy+.idd
 
@@ -958,7 +958,7 @@ The data is produced when the actual simulation is performed (after the warmup d
 
 This output file can be easily turned into a form that is read into commonly used spreadsheet programs where it can be further analyzed, graphed, etc.
 
-![](InterfaceDeveloper/media/image003.png)
+![](media/image003.png)
 
 Figure 3.  Example Chart from Standard Output File
 

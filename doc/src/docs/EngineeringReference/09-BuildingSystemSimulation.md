@@ -539,7 +539,7 @@ There are two main types of loops within the HVAC simulation in EnergyPlus: an a
 
 Plant loops are further divided into “half-loops” or “semi-loops” for organizational clarity and simulation logistics (see Figure “Connections between the Main HVAC Simulation Loops and Half-Loops”). These sub-loops, or half-loop sides, are matched pairs that consist of half of a main plant loop. Plant loops are broken into supply and demand sides. The plant demand side half-loop contains equipment that places a load on the primary equipment. This might include coils, baseboards, radiant systems, etc. The load is met by primary equipment such as chillers or boilers on the supply side half-loop. Each supply side half-loop must be connected to a demand side half-loop and vice versa. A similar breakdown is present on condenser loops where the demand side includes the water side of chiller’s condensers while the supply side includes condenser equipment such as cooling towers.
 
-![](EngineeringReference/media/image1957.svg.png)
+![](media/image1957.svg.png)
 
 Figure 120. Connections between the Main HVAC Simulation Loops and Half-Loops.
 
@@ -551,7 +551,7 @@ Each half-loop may only have one splitter and one mixer. Thus, equipment may be 
 
 In addition, to avoid the need for overly complex solver routines, there are some restrictions on the placement of pumps within a particular half-loop. There are two general types of pumps, loop pumps and branch pumps. A pump that is the first component on the first branch (between A and B) is termed a “loop pump” while any pump in the parallel section (between Ci and Di) is termed a “branch pump”.   The simplest and most common arrangement is to have one loop pump on the supply side inlet.  In plant demand half-loops pumps can be placed only in the inlet branch. This will allow simulation of primary-secondary systems. For more information on pumps and pump placement rules, see the section on PipingSystem:Underground Simulation Pumps in this document.
 
-![](EngineeringReference/media/image1958.svg.png)
+![](media/image1958.svg.png)
 
 Figure 121. Branch Layout for Individual Plant Half-Loops
 
@@ -625,7 +625,7 @@ In order to achieve these design criteria without resorting to a pressure based 
 
 The flow resolver employs a simple predictor-corrector algorithm to enforce mass continuity across the plant loop splitter as shown in the following figure.
 
-![](EngineeringReference/media/image1959.png)
+![](media/image1959.png)
 
 Figure 122. Plant/Condenser Supply Side Solution Scheme.
 
@@ -670,7 +670,7 @@ Plant loops include a simple loop capacitance model to simulate these effects ba
 
 
 
-![Loop Capacitance.tif](EngineeringReference/media/image1962.png)
+![Loop Capacitance.tif](media/image1962.png)
 
 Figure 123. Loop Capacitance Tank Models
 
@@ -718,7 +718,7 @@ The Branch definition is input in simulation and connection order for all of the
 
 Five load distribution schemes are employed in EnergyPlus. The figure below illustrates the plant load distribution algorithm. The total loop demand is calculated and used in the **ManagePlantLoopOperation** routine to determine which equipment is available based on the supervisory control scheme specified by the user. Once all available components have been identified the loop demand is distributed to the available components based on the user specified load distribution scheme.
 
- ![](EngineeringReference/media/image1974.png)
+ ![](media/image1974.png)
 
 Figure 124. Load Distribution Scheme
 
@@ -835,7 +835,7 @@ Common pipe feature eliminates the need of specifying two different EnergyPlus l
 
 * The pumps can have different schedules and any loop can be shut off when the other loop is still running.
 
-![CommonPipe](EngineeringReference/media/image1975.png)
+![CommonPipe](media/image1975.png)
 
 Figure 125. Common Pipe Layout Schematic
 
@@ -881,7 +881,7 @@ Figure 126 shows a schematic of the Two-Way Common Pipe. There are two common pi
 
 * When the Two Way Common Pipe is controlling conditions at the secondary-side, or demand side, inlet node, then the loop capacitance model usually used for the conditions at the demand inlet is not used as it would interfere with control.
 
-![](EngineeringReference/media/image1976.svg.png)
+![](media/image1976.svg.png)
 
 Figure 126. Schematic of a Two-Way Common Pipe used in Primary-Secondary System.
 
@@ -889,7 +889,7 @@ Figure 126. Schematic of a Two-Way Common Pipe used in Primary-Secondary System.
 
 Heat Recovery is accomplished by specifying another set of supply and demand loops. Each of the heat recovery components, i.e. engine driven and combustion turbine chillers, and internal combustion and combustion turbine generators is designed to use the existing component/loop/solution structure to facilitate the simulation with the existing demand side manager and the supply side manager. Heat recovery normally contains components that produce heat that can be recovered, and the ability to store or use that heat elsewhere in the system. The component that can store the excess heat and allow it to be used elsewhere in the system or for domestic hot water is the Water Heater:Simple and is defined in the Input/Output Reference.
 
-![](EngineeringReference/media/image1977.png).
+![](media/image1977.png).
 
 Figure 127. Example of a Heat Recovery Loop Simulation
 
@@ -947,7 +947,7 @@ Beginning at demand side outlet (linked to supply inlet), and working backwards,
 
 When a parallel system is encountered, a special operation is performed. Since we are not resolving flows with this version of the pressure simulation, the parallel system is set to use the largest value of pressure drop found on the parallel branches. In this manner, the highest pressure drop component essentially governs the set of parallel branches, and the other components must match the pressure drop in order to achieve their desired flow rate. This is performed by placing “imaginary” valves in the splitter. This allows individual branches to report their own pressure information, while the splitter accounts for the required pressure drop to match the governing branch. This is shown graphically in the figure below.
 
-![SplitterValves](EngineeringReference/media/image1978.png)
+![SplitterValves](media/image1978.png)
 
 Figure 128: Explanation of valves inherently built into Splitter object
 
@@ -1056,7 +1056,7 @@ The following figure describes the Temperature Entropy Ts diagram based on which
 
 
 
-![SteamSchematic](EngineeringReference/media/image1986.png)
+![SteamSchematic](media/image1986.png)
 
 Figure 129. Schematic of Temperature – Entropy Diagram for Steam loop
 
@@ -1326,7 +1326,7 @@ A simple schematic describing the coil framework, inlet and outlet conditions to
 
 
 
-![SchematicSteamCoil](EngineeringReference/media/image2032.png)
+![SchematicSteamCoil](media/image2032.png)
 
 Figure 130. Schematic of Steam Coil Connection to the Steam Loop
 
@@ -1386,7 +1386,7 @@ Pump control is an important part of the steam loop.  Existing control structur
 
 A simple schematic describing the flow across the pump is shown in the following figure
 
-![SchmaticCondensatePump](EngineeringReference/media/image2040.png)
+![SchmaticCondensatePump](media/image2040.png)
 
 Figure 131.  Schematic of Condensate Pump in Steam Loop
 

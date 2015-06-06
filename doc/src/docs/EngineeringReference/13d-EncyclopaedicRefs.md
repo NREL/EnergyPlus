@@ -55,7 +55,7 @@ Latent Gain is simply the total gain (metabolic rate) – sensible gain:
 
 <div>$$LatentGain = MetabolicRate - SensibleGain$$</div>
 
-![](EngineeringReference/media/image5820.png)
+![](media/image5820.png)
 
 Figure 259.  Sensible Heat Gain from People Correlation
 
@@ -176,7 +176,7 @@ SHIZone = ∑ [VAir * (TAirIn – TAirSupply)] / ∑ [VAir * (TAirOut - TAirSupp
 
 The input object ZoneBaseboard:OutdoorTemperatureControlled provides a model for an outdoor temperature controlled baseboard heater that adds energy to the zone according a control profile as shown in the following figure.  At TA = T2, the baseboard heat gain is Q2.  For TA &gt; T2, there is no heat gain.  For TA &lt; T1, a maximum amount of energy, Q1, is added to the zone.  There is proportional control between those two temperatures:
 
-![](EngineeringReference/media/image5821.png)
+![](media/image5821.png)
 
 Figure 260.  Control of Outdoor Temperature Controlled Baseboard Heat
 
@@ -546,7 +546,7 @@ In the case of a pipe in a zone, the heat loss or gain is accounted for in the p
 
 Pipe heat transfer in EnergyPlus is simulated by discretizing the pipe length into a number of nodes (20) and is an implementation of the model by Hanby et al. (2002). A control volume drawn around a node in the pipe is shown in Figure 261. Three nodes are defined at each discrete section of the pipe and represent the fluid, pipe wall and external environment. The fluid and pipe have defined thermal capacitance (mass). The insulation around the pipe is currently modeled as steady-state (no thermal mass), and so the effect of this resistance is accounted for within the h<sub>f</sub> term in the following description.  For the fluid, there is one-dimensional flow from each upstream node.
 
-![PipeDelay](EngineeringReference/media/image5831.png)
+![PipeDelay](media/image5831.png)
 
 Figure 261. Control Volume drawn around node *i*
 
@@ -632,7 +632,7 @@ The buried pipe model in EnergyPlus is similar to the other pipe heat transfer o
 
 The buried model develops a grid around the pipe. The grid was based originally on a model by Piechowski (1999), and still carries the model nomenclature. The grid extends from the ground surface down to a calculated distance below the pipe. The domain extends sideways from the symmetric center of the pipe to a calculated distance from the pipe. The grid stretches along the full length of the pipe. At each cross section, transient 2D Cartesian finite difference equations are used, updating each node except the node centered on the pipe. Axial heat transfer is not modeled in the soil. The large view of the outer Cartesian grid system is shown in Figure 262.
 
-![](EngineeringReference/media/image5851.png)
+![](media/image5851.png)
 
 Figure 262. Pipe:Underground Outer Finite Difference Grid
 
@@ -680,11 +680,11 @@ A dual-coordinate system finite volume heat transfer model of pipes buried in a 
 
 A new heat transfer model is implemented to handle a diverse set of buried pipe conditions.  The model uses a dual-coordinate system approach to solve a finite volume domain in a computationally efficient manner.  The main idea behind the dual coordinate system technique is to focus the computational effort to the region where it is most needed: near the pipe(s).  To this end, a coarse grid Cartesian coordinate system is used to solve the slow-moving ground heat transfer.  Then, within one of these cells, a radial coordinate system is configured around the pipe/insulation with a specialized interface cell between the systems.  Figure 263 shows an example of cells surrounding a pipe, including the radial region in the near-pipe cell, while Figure 264 shows a zoomed-in view of the near-pipe cell itself.
 
-![](EngineeringReference/media/image5852.png)
+![](media/image5852.png)
 
 Figure 263. Radial "near-pipe" cell within a Cartesian cell
 
-![](EngineeringReference/media/image5853.png)
+![](media/image5853.png)
 
 Figure 264. Close-up view of example radial cell
 
@@ -879,7 +879,7 @@ Differential pressure based control will maintain the differential pressure with
 
 The allowable mass flow rate range for the Differential pressure control is explained in the figure below:
 
-![](EngineeringReference/media/image5856.png)
+![](media/image5856.png)
 
 Figure 265. Allowable mass flow rate range for the Differential pressure control
 

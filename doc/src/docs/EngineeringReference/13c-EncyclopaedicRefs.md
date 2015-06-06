@@ -121,7 +121,7 @@ where
 
 This equation is identical to the expression for effectiveness of an indirect contact (i.e., fluids separated by a solid wall) counterflow heat exchanger (Incropera and DeWitt 1981). Therefore, the cooling tower can be modeled, in the steady-state regime, by an equivalent counterflow heat exchanger as shown in the following figure.
 
-![](EngineeringReference/media/image4542.png)
+![](media/image4542.png)
 
 Figure 194. Cooling Tower Schematic
 
@@ -1096,7 +1096,7 @@ Where:
 
 <span>${E_i}$</span>= the zone air distribution effectiveness, see following figure for ASHRAE recommended values.
 
-![](EngineeringReference/media/image4716.png)
+![](media/image4716.png)
 
 Figure 195. Zone Air Distribution Effectiveness Typical Values (Source: ASHRAE Standard 62.1-2010)
 
@@ -1178,7 +1178,7 @@ The method used to calculate the outdoor ventilation air flow rate for each syst
 
 
 
-![](EngineeringReference/media/image4731.png)
+![](media/image4731.png)
 
 Figure 196.  Demand Control Ventilation -- Air Flow Paths
 
@@ -1361,13 +1361,13 @@ This section describes the evaporative coolers models for HVAC in EnergyPlus.
 
 The input object EvaporativeCooler:Direct:CelDekPad provides a model of a direct stage evaporative cooler, shown in the figure below, that consists of a rigid media evaporative pad, with water recirculated from a reservoir.  The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media.  The evaporative pad provides the area for the adiabatic saturation of the air.  While the process provides a lower dry-bulb temperature, the moisture content of the leaving air is higher than the entering condition.  The direct stage is used for comfort cooling in a building where adding humidity to the air can be tolerated.
 
-![](EngineeringReference/media/image4789.png)
+![](media/image4789.png)
 
 Figure 197.  Direct Stage Evaporative Cooler
 
 The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic cooling, and follows a constant enthalpy line on the psychrometric chart; it is shown in the figure below as a process from A to B.  Since the deviation of the constant wet-bulb line and the constant enthalpy line is small, it is assumed that the wet-bulb temperature is constant across the direct evaporative stage.
 
-![](EngineeringReference/media/image4790.png)
+![](media/image4790.png)
 
 Figure 198.  Psychrometric Chart -- Constant Enthalpy
 
@@ -1403,7 +1403,7 @@ Thus, adiabatic saturation in evaporative cooling is only an approximation, howe
 
 The saturation efficiency is usually reported as a function of airflow, pad face velocity, and pad thickness.  The Figure below shows a typical graph of manufacturer's data for the saturation efficiency.  A multi-variate least squares curve fit of the data was used to generate saturation efficiency functions for the evaporative models that use the CelDek rigid media pad.
 
-![](EngineeringReference/media/image4793.png)
+![](media/image4793.png)
 
 Figure 199.  Graph of Saturation Efficiency
 
@@ -1417,13 +1417,13 @@ Where Airvel is in meters per second and Depth is in meters.  This curve fit is
 
 The input object EvaporativeCooler:Indirect:CelDekPad provides a model of a dry coil indirect evaporative cooler, shown in the figure below, that has a rigid media pad, similar to the direct evaporative stage, where the adiabatic cooling takes place.  The secondary air leaves the rigid media pad and enters an air-to-air heat exchanger where it cools the supply air flowing through the heat exchanger tubes.  The moist secondary air is then exhausted to the environment.  The secondary air stream has its own fan and includes consists of a rigid media evaporative pad, with water recirculated from a reservoir.  The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media.  The evaporative pad provides the area for the adiabatic saturation of the air.
 
-![](EngineeringReference/media/image4794.png)
+![](media/image4794.png)
 
 Figure 200.  Evaporative Cooler -- Indirect Dry Coil
 
 The process that the secondary air goes through, A to C to D, is shown by the dashed lines in  the following figure.  Process A to C is adiabatic cooling in the rigid media pad.  Then the air enters the shell side of the heat exchanger and is sensibly heated from C to D by the warm supply air passing through the tube side.
 
-![](EngineeringReference/media/image4795.png)
+![](media/image4795.png)
 
 Figure 201.  Secondary Air Process -- Indirect Dry Coil Evap Cooler
 
@@ -1447,13 +1447,13 @@ The input object EvaporativeCooler:Indirect:WetCoil provides a model for a wette
 
 
 
-![](EngineeringReference/media/image4797.png)
+![](media/image4797.png)
 
 Figure 202.  Wet Coil Indirect Evaporative Cooler
 
 The process that the secondary air goes through, A to C on the following figure, is a path of simultaneous heat and mass transfer, but it does not follow a line of constant enthalpy as in the direct stage.  The process is not adiabatic due to the heat gain from the supply air flowing through the tubes of the heat exchanger.
 
-![](EngineeringReference/media/image4798.png)
+![](media/image4798.png)
 
 Figure 203.  Secondary Air Process – Indirect Wet Coil Evaporative Cooler
 
@@ -1501,13 +1501,13 @@ The maximum efficiency of the stage is a combination of the efficiency due to th
 
 A two stage cooler can be modeled by combining either a wet coil or the dry coil indirect evaporative cooler staged with a direct evaporative cooler.  The figure below shows a dry coil indirect evaporative cooler with a direct evaporative cooler.  This configuration is mainly used for total comfort cooling for a building and would not normally be used as a pre-cooler for a refrigeration coil, since the direct stage would increase the latent load on a refrigeration coil.
 
-![](EngineeringReference/media/image4806.png)
+![](media/image4806.png)
 
 Figure 204.  Two Stage Evaporative Cooler
 
 The thermodynamic process for the supply air is shown below, going from A to B to C.  The process from A to B is sensible cooling in the indirect stage.  The process from B to C is simultaneous heat and mass transfer following a constant enthalpy line.  The air leaving the final stage has a lower dry-bulb and wet-bulb temperature, and an increase in moisture from the direct stage.
 
-![](EngineeringReference/media/image4807.png)
+![](media/image4807.png)
 
 Figure 205.  Thermodynamic Process for Supply Air Through Two Stage Evaporative Cooler
 
@@ -1519,7 +1519,7 @@ This section summarizes the model implemented in the component EvaporativeCooler
 
 The indirect research special evaporative cooler (IEC) machine provides improved modeling features needed for data center and other hybrid cooling applications.  The new model includes performance curves for variable effectiveness, fan power, and pump power.  It is intended to be able to model IEC machines that have 1) variable speed secondary fans, 2) variable speed pumps for water recirculation and spraying, and 3) ability to operate in a dry mode.  Such IEC machines can modulate the cooling power during operation by varying either the secondary side fan speed or the intensity of water spray or both.  To simplify the model it is assumed that the device’s internal controls are such that, when it is operating as a “Wet” evaporative cooler, secondary fan and spray pump operation are linked together so that there is a one-to-one mapping between them at any given part load situation.  This allows formulating the fan and pump power performance curves to be based on the same independent variable, secondary air flow fraction.
 
-![figure 166 renamed](EngineeringReference/media/image4808.png)
+![figure 166 renamed](media/image4808.png)
 
 Figure 206. Research Special Indirect Evaporative Cooler
 
@@ -1527,7 +1527,7 @@ Figure 206. Research Special Indirect Evaporative Cooler
 
 Each time the model is called it takes the inputs on the left and produces the outputs on the right as shown in [Figure](#IndEvapCoolerFig2). “sys” is primary air stream and typically sits on an AirLoop HVAC branch. “sec” is secondary purge air stream and is typically outdoor air.  The model will set node flow rates and “out_sec” state variables on the secondary outlet. 
 
-![](EngineeringReference/media/image8005.png)
+![](media/image8005.png)
 
 Figure: Illustration of Inputs-Outputs of Indirect Evaporative Cooler Research Special <a name="IndEvapCoolerFig2"></a>
 
@@ -1755,7 +1755,7 @@ Blowdown is water drained from the sump to counter the build up of solids in the
 
 <div>$${\dot V_{blowdown}} = \frac{{{{\dot V}_{evap}}}}{{\left( {{R_{concentration}} - 1.0} \right)}} - {\dot V_{drift}}$$</div>
 
-![figure 167 renamed](EngineeringReference/media/image4833.png)
+![figure 167 renamed](media/image4833.png)
 
 Figure 207. Research Special Indirect Evaporative Cooler Using Relief Air
 
@@ -2018,7 +2018,7 @@ Fan pressure rise must be sufficient to overcome the air-handling system pressur
 
 The relation between system pressure drop and flow defines what is commonly called a “system curve”. When system characteristics change, such as when the duct static pressure set point is varied, a family of system curves results. The intersections of these curves with fan curves (e.g., power as a function of pressure rise and flow) on a pressure versus flow plot define one or more loci of unique fan operating points. Each of these points has an associated fan efficiency, power, and speed.
 
-![Fancomp1](EngineeringReference/media/image4888.png)
+![Fancomp1](media/image4888.png)
 
 Figure 208. Example Fan Performance Maps - Manufacturer’s Data from Loren Cook Company, plus Derived Static Efficiency (Three-Dimensional and Contours)
  (Dashed Parabolic Curve is “Do Not Select Line”)
@@ -2063,7 +2063,7 @@ where **Δ***P<sub>fan</sub>* is the fan static pressure rise (Pa), *D<sub>fan</
 
 By plotting the normalized fan static efficiency (*static efficiency / maximum static efficiency*) versus the logarithm base 10 of the normalized Euler number (*Eu* */* *Eu* *at maximum static efficiency*), the dimensionless performance of various fan sizes is very similar (as one might expect from the “fan laws”), but so also is the dimensionless performance of different *types* of fans (e.g., single-inlet plenum fans, double-inlet housed centrifugal fans, mixed flow fans, vane axial fans, fans with backward or forward curved blades). An example of this correlation for the “normal operation” (non-stall) and stall regions of eight fans is shown in Figure 209.
 
-![Fancomp2](EngineeringReference/media/image4895.png)
+![Fancomp2](media/image4895.png)
 
 Figure 209. Normalized Efficiency Curves for Eight Fans in Dimensionless Space
  *(BC=backward curved, FC=forward curved; SI=single inlet, DI=double inlet)*
@@ -2086,7 +2086,7 @@ In this case, the coefficient of determination R<sup>2</sup> is 0.994. Also, the
 
 If more accuracy is needed for a specific fan, a similarly shaped curve can be developed for that fan (using extracted data, Equation , and least-squares regression techniques), segmented into normal operation and stall regions with specific coefficients fitted for each region. Figure 210 shows an example, using the data from Figure 208.
 
-![](EngineeringReference/media/image4897.svg.png)
+![](media/image4897.svg.png)
 
 Figure 210. Example Normalized Efficiency Data for One Fan
 
@@ -2144,7 +2144,7 @@ For the fan, dimensionless flow (*φ*) can be defined as (ASHRAE 1993):
 
 where *ω<sub>fan</sub>* is the fan speed (rad/s). This parameter can be calculated for each operating point on the fan manufacturer’s performance map that represents fan speed as a function of flow and fan pressure rise. To simplify the data representation to a single curve (as we have done for fan efficiency), one can plot normalized dimensionless flow (dimensionless flow divided by maximum dimensionless flow, (*φ*(*x<sub>fan</sub>*) */* *φ<sub>max</sub>*) as a function of the log base 10 of the normalized Euler (*Eu*) parameter (*x<sub>fan</sub>*). Figure 211 shows an example plot derived from the manufacturer’s data in Figure 208.
 
-![](EngineeringReference/media/image4901.svg.png)
+![](media/image4901.svg.png)
 
 Figure 211. Example Normalized Dimensionless Flow Data for One Fan
 
@@ -2246,7 +2246,7 @@ To determine *η<sub>belt,max</sub>* if data for a specific belt are not availab
 
 Then, use Equations and , along with a choice of low, medium, or high efficiency coefficients from Table 68, to calculate *η<sub>belt,max</sub>*.
 
-![](EngineeringReference/media/image4907.svg.png)
+![](media/image4907.svg.png)
 
 Figure 212. Belt Maximum Efficiency vs. Fan Shaft Power Input
 
@@ -2300,7 +2300,7 @@ The belt maximum efficiency is therefore:
 
 The normalized *part-load* belt efficiency model is provided to modify the maximum efficiency of the belt. This model is based on part-load data for belts in ACEEE’s handbook on motor systems (Nadel et al. 2002). To determine the normalized belt efficiency at part-load (*η<sub>belt</sub>*(*x<sub>belt</sub>*)/* η<sub>belt,max</sub>*), use the fan shaft (belt output) fractional torque (*x<sub>belt</sub>* = *τ<sub>belt</sub>* / *τ<sub>belt,max;</sub> τ<sub>belt</sub> = τ<sub>fan</sub>*) as the belt fractional load in Equation or (select the equation for the region that contains *x<sub>belt</sub>*) and use coefficients from Table 69 that correspond to that region and the belt type: V-Belt or synchronous (toothed). Figure 213 shows a graphical representation of the curves defined by these equations and coefficients.
 
-![](EngineeringReference/media/image4910.svg.png)
+![](media/image4910.svg.png)
 
 Figure 213. Belt Normalized Efficiency vs. Belt Fractional Load)
 
@@ -2381,7 +2381,7 @@ Table 69. Belt Normalized Efficiency Curve Coefficients
 
 *Motor Efficiency and Input Power Model:* Figure 214 shows three maximum efficiency (*η<sub>motor,max</sub>*) curves for motors (low, medium, and high) as a function of rated motor output power (belt input power). This set of efficiency curves is based on maximum efficiency data in DOE’s MotorMaster+ database (2003) from about 800 tests. It is provided for use in the absence of manufacturer’s data.
 
-![](EngineeringReference/media/image4917.svg.png)
+![](media/image4917.svg.png)
 
 Figure 214. Maximum Motor Efficiency vs. Belt Power Input (Motor Output)
 
@@ -2429,7 +2429,7 @@ Table 70. Motor Maximum Efficiency Curve Coefficients
 
 The normalized *part-load* motor efficiency model is provided to modify the maximum efficiency of the motor. This model is based on part-load data for motors from DOE’s MotorMaster+ database (2003). To determine the normalized motor efficiency at part-load (*η<sub>motor</sub>*(*x<sub>motor</sub>*)/* η<sub>motor,max</sub>*), use the motor fractional power output (*x<sub>motor</sub> =H<sub>belt</sub>* / *H<sub>belt,max</sub>*) as the fraction of motor output power in Equation and use coefficients from Table 71, or for a specific motor, determined from DOE MotorMaster+ data or from manufacturer’s data. Figure 215 shows a graphical representation of eight example curves defined by these equations and coefficients.
 
-![](EngineeringReference/media/image4919.svg.png)
+![](media/image4919.svg.png)
 
 Figure 215. Motor Normalized Efficiency vs. Motor Load Fraction
 
@@ -2526,12 +2526,12 @@ Motor input power (electrical, W) is:
 
 *VFD Efficiency and Input Power Model:* For VFDs, published performance data are limited. Data from DOE (2008) suggest using a functional relation similar to that used for motors to represent VFD efficiency (*η<sub>VFD</sub>*) as a function of the fraction of full-load motor input power (*x<sub>VFD</sub> =H<sub>motor</sub>* / *H<sub>motor,max</sub>*), as shown in Figure 216, or as a function of the fraction of full-load speed (*x<sub>VFD</sub> =ω<sub>motor</sub> / ω<sub>motor,max</sub>*), as shown in Figure 217.
 
-![](EngineeringReference/media/image4923.svg.png)
+![](media/image4923.svg.png)
 
 Figure 216. VFD Efficiency vs. Fraction of Motor Full-Load Input Power
  (*Source: DOE 2008*)
 
-![](EngineeringReference/media/image4924.svg.png)
+![](media/image4924.svg.png)
 
 Figure 217. VFD Efficiency vs. Fraction of Full-Load Motor Speed
  (*Courtesy of Saftronics*)
@@ -2673,7 +2673,7 @@ Air System Compound Component Groups <a name="AirComponentGroups"></a>
 
 The input object AirLoopHVAC:UnitarySystem provide a “virtual” component that collect and control a set of components: fan, heating coil, cooling coil, and/or reheat coil. Reheat coil is modeled for controlling high zone humidity levels. The unit may be configured to have either a blow through or draw through fan. In a blow through configuration, fan is generally the fist component upstream of heating ro cooling coil. In a draw through fan configuration, fan is placed directly after the heating coil and before reheat coil.
 
-![](EngineeringReference/media/image4930.png)
+![](media/image4930.png)
 
 Figure 218. Schematic of the EnergyPlus Unitary System (Blow Through Configuration)
 
@@ -3175,13 +3175,13 @@ Where,
 
 When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the unitary system’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the unitary system cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists, the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
-![HiHumidControl](EngineeringReference/media/image5015.png)
+![HiHumidControl](media/image5015.png)
 
 Figure 219. Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint
 
 If a heating load exists (Figure 229), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the unitary system operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
-![HiHumidControl-1](EngineeringReference/media/image5016.png)
+![HiHumidControl-1](media/image5016.png)
 
 Figure 220. Supplemental heating coil load when predicted zone air temperature is below the heating setpoint
 
@@ -3213,7 +3213,7 @@ The input objects AirLoopHVAC:Unitary:Furnace:HeatOnly and AirLoopHVAC:Unitary:F
 
 Note: the coil order shown here has been revised from previous versions of Energyplus to configure the cooling coil upstream of the heating coil. This configuration provides uniformity with all unitary equipment. However, for unitary HeatCool systems that do not use a reheat coil, the heating coil can also be placed upstream of the cooling coil. This optional coil placement is retained to allow compatibility with previous versions of Energyplus. For input files developed using previous versions of Energyplus, it is recommended that the coil order be revised according to the figure below.
 
-![FurnaceSchematic\_BlowThru](EngineeringReference/media/image5019.png)
+![FurnaceSchematic\_BlowThru](media/image5019.png)
 
 Figure 221. Schematic of the EnergyPlus Furnace (Blow Through Configuration)
 
@@ -3403,17 +3403,17 @@ where:
 
 The model uses the greater of the two part-load ratios, PartLoadRatio or LatentPartLoadRatio, to determine the operating part-load ratio of the furnace’s DX cooling coil. As previously described, iterations are performed to converge on the solution within the convergence tolerance.
 
-![FurnaceSchematic\_BlowThru\_HighRHControl](EngineeringReference/media/image5049.png)
+![FurnaceSchematic\_BlowThru\_HighRHControl](media/image5049.png)
 
 Figure 222. Schematic for Blow Through Furnace with High Humidity Control
 
 If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the furnace’s cooling coil, the reheat coil is used to offset the excess sensible capacity provided by the unit. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (Figure 223), the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, the reheat coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists. If a heating load exists (Figure 224), the reheat coil is used to offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint) and the heating coil is used to meet the entire heating load as described in the HeatOnly configuration section above. Note that when a heating load exists and high humidity control is required, the furnace operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, DX cooling coil, and heating coil, report variables associated with reheat coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric consumption, heating coil runtime fraction, etc.) are managed in the reheat (heating) coil object.
 
-![ZoneLoadSchematic](EngineeringReference/media/image5050.png)
+![ZoneLoadSchematic](media/image5050.png)
 
 Figure 223. Reheat Coil Load when Predicted Zone Temperature is Above Heating Setpoint
 
-![ZoneLoadSchematic2](EngineeringReference/media/image5051.png)
+![ZoneLoadSchematic2](media/image5051.png)
 
 Figure 224. Reheat Coil Load when Predicted Zone Temperature is Below Heating Setpoint
 
@@ -3429,7 +3429,7 @@ The input object AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass provides a mode
 
 
 
-![DrawthruCBVAV](EngineeringReference/media/image5052.png)
+![DrawthruCBVAV](media/image5052.png)
 
 
 
@@ -3437,7 +3437,7 @@ Figure 225. Schematic of a Changeover Bypass VAV Unitary System with Draw Throug
 
 
 
-![BlowthruCBVAV](EngineeringReference/media/image5053.png)
+![BlowthruCBVAV](media/image5053.png)
 
 Figure 226. Schematic of Changeover Bypass VAV Unitary System with Blow Through Fan
 
@@ -3661,7 +3661,7 @@ The changeover-bypass VAV system is modeled as an air loop component and is size
 
 The input object AirLoopHVAC:UnitaryHeatPump:AirToAir provides a model for an air-to-air heat pump that is a “virtual” component that consists of an on/off or constant volume fan component, a DX cooling coil, a DX heating coil, and a gas or electric supplemental heating coil. The specific configuration of the blow through heat pump is shown in the following figure. For a draw through heat pump, the fan is located between the DX heating coil and the supplemental heating coil.
 
-![FurnaceSchematic\_HeatPump](EngineeringReference/media/image5106.png)
+![FurnaceSchematic\_HeatPump](media/image5106.png)
 
 Figure 227. Schematic of a Blow Through Air-to-Air Heat Pump
 
@@ -3863,13 +3863,13 @@ Where,
 
 When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the heatpump’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the heat pump DX cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (see Figure 2),  the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
-![HiHumidControl](EngineeringReference/media/image5145.png)
+![HiHumidControl](media/image5145.png)
 
 Figure 228. Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint
 
 If a heating load exists (Figure 229), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the heat pump operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and DX cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
-![HiHumidControl-1](EngineeringReference/media/image5146.png)
+![HiHumidControl-1](media/image5146.png)
 
 Figure 229. Supplemental heating coil load when predicted zone air temperature is below the heating setpoint
 
@@ -3879,7 +3879,7 @@ Figure 229. Supplemental heating coil load when predicted zone air temperature i
 
 The input object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed provides a model for a multispeed air-to-air heat pump that is a “virtual” component that consists of an on/off or constant volume fan component, a multispeed DX cooling coil, a multispeed DX heating coil, and a gas or electric supplemental heating coil. The main difference between this heat pump object and other EnergyPlus heat pump objects is that this object allows from two to four discrete compressor speeds for heating and cooling operation (instead of a single speed for each mode). The specific configuration of the blow through heat pump is shown in the following figure. For a draw through heat pump, the fan is located between the DX heating coil and the supplemental heating coil.
 
-![FurnaceSchematic\_BlowThru\_Multispeed](EngineeringReference/media/image5147.png)
+![FurnaceSchematic\_BlowThru\_Multispeed](media/image5147.png)
 
 Figure 230. Schematic of a Multispeed Air-to-Air Heat Pump (Blow-through Configuration)
 
@@ -4193,7 +4193,7 @@ The DX cooling package subsystem model provides a “virtual” component that c
 
 This system does not need any plant specification and will provide the electric consumption necessary to operate the compressor and the condenser fan.
 
-![](EngineeringReference/media/image5198.png)
+![](media/image5198.png)
 
 Figure 231.  Schematic of Packaged DX Cooling Subsystem in Air Loop for a Blow-Thru Application
 
@@ -4239,13 +4239,13 @@ The input object Dehumidifier:Desiccant:System provides a model that packages co
 
 The Dehumidifier:Desiccant:System desiccant dehumidifier object in EnergyPlus is a compound object that can be placed anywhere in an air loop. Common locations for this object are in an AirLoopHVAC:OutdoorAirSystem or in the main air loop downstream of a cooling coil (postcooling desiccant dehumidifier). This compound object coordinates the operation of several ‘children’ objects: a desiccant heat exchanger, a regeneration air fan, and an optional regeneration air heater. If this dehumidifier is placed in the main air loop immediately downstream of a direct expansion (DX) cooling coil, then the dehumidifier’s operation can be coordinated with the operation of the companion DX coil and it is also possible to specify that the DX system’s condenser waste heat can be used to help regenerate the desiccant heat exchanger. For the case of condenser waste heat regeneration, an optional exhaust fan can also be modeled by this desiccant dehumidifier compound object to help maintain a setpoint temperature for air entering the regeneration side of the desiccant heat exchanger. Refer to the EnergyPlus Input Output Reference for the specific input syntax for this desiccant dehumidifier object.
 
-![DesiccantDehumidifier\_DrawThrough](EngineeringReference/media/image5199.png)
+![DesiccantDehumidifier\_DrawThrough](media/image5199.png)
 
 Figure 232. Schematic of a Desiccant Dehumidifier with Draw Through Regeneration Fan Placement
 
 
 
-![DesiccantDehumidifier\_BlowThrough](EngineeringReference/media/image5200.png)
+![DesiccantDehumidifier\_BlowThrough](media/image5200.png)
 
 Figure 233. Schematic of a Desiccant Dehumidifier in Blow Through Regeneration Fan Placement
 
@@ -4338,7 +4338,7 @@ Kosar, D. et al. 2006. Dehumidification Enhancement of Direct Expansion Systems 
 
 The input object AirLoopHVAC:UnitaryHeatPump:WaterToAir provides a model for a water-to-Air heat pump that is a “virtual” component that consists of an on/off fan component, a water-to-air heat pump cooling coil, a water-to-air heat pump heating coil, and a gas or electric supplemental heating coil. The specific configuration of the blowthru heat pump is shown in the following figure. For a drawthru heat pump, the fan is located between the water-to-air heat pump heating coil and the supplemental heating coil. The configuration of the water-to-air heat pump in the air loop is similar to an air-to-air heat pump. In addition, a water-to-air heat pump has a water loop connection on its source side. The water loop can be served by a condenser loop (like GHE for Ground source systems), or by a cooling tower/ boiler plant loop (for water loop systems).
 
-![FurnaceSchematic\_WSHP](EngineeringReference/media/image5222.png)
+![FurnaceSchematic\_WSHP](media/image5222.png)
 
 Figure 234.  Source Side and Load Side Configuration of a BlowThru WateroToAir Heat Pump
 
@@ -4406,7 +4406,7 @@ For cooling mode, the reference conditions; reference load side air volumetric f
 
 The generalized least square method is used to generate the coefficients. This method utilizes an optimization method which calculates the coefficients that will give the least amount of differences between the model outputs and the catalog data. A set of coefficients for the cooling mode is generated which includes A1-A5 for total cooling capacity, B1-B6 for sensible cooling capacity, and C1-C5 for power consumption. The same procedure is repeated for the heating mode to generate the coefficients E1-E5 and F1-F5. An information flow chart showing the inputs, reference conditions, performance coefficients and outputs are shown in the figure below:
 
-![](EngineeringReference/media/image5250.png)
+![](media/image5250.png)
 
 Figure 235. Information Flow Chart for Water-to-Air Heat Pump Equation Fit Model (Tang 2005)
 
@@ -4458,13 +4458,13 @@ When the predicted zone air temperature is above the heating setpoint and if the
 
 
 
-![HiHumidControl-2](EngineeringReference/media/image5262.png)
+![HiHumidControl-2](media/image5262.png)
 
 Figure 236. Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint
 
 If a heating load exists (Figure 237), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the heat pump operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and DX cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
-![HiHumidControl-3](EngineeringReference/media/image5263.png)
+![HiHumidControl-3](media/image5263.png)
 
 Figure 237. Supplemental heating coil load when predicted zone air temperature is below the heating setpoint
 
@@ -4555,7 +4555,7 @@ For cooling mode, the reference conditions; reference load side volumetric flow 
 
 The generalized least square method is used to generate the coefficients. This method utilizes an optimization method which calculates for the coefficients that will give the least amount of differences between the model outputs and the catalog data. A set of coefficients for the cooling mode is generated which includes A1-A5 for load side heat transfer. The same procedure is repeated for the heating mode to generate the coefficients B1-B5. An information flow chart showing the inputs, reference conditions, performance coefficients and outputs are shown in the figure below:
 
-![](EngineeringReference/media/image5290.png)
+![](media/image5290.png)
 
 Figure 238.  Information Flow Chart for Water-To-Water Heat Pump Equation Fit (Tang 2005)
 
@@ -4583,7 +4583,7 @@ P = Pressure
 
 v = Specific volume
 
-![](EngineeringReference/media/image5296.png)
+![](media/image5296.png)
 
 Figure 239.  Schematic indicator diagram for a reciprocating Compressor(Jin 2002)
 
@@ -4627,7 +4627,7 @@ n Source side heat transfer coefficient, (UA)<sub>S</sub>
 
 n Load side heat transfer coefficient, (UA)<sub>L</sub>
 
-![](EngineeringReference/media/image5306.png)
+![](media/image5306.png)
 
 Figure 240.  Information Flowchart for Water-To-Water Heat Pump Parameter Estimation Mmodel implementation (Jin 2002)
 
@@ -4659,7 +4659,7 @@ Where
 
 Extrapolation beyond the catalog data grants the parameter estimation model an upper hand in comparison with the equation fit and deterministic models. However, the detailed model is computationally more intensive. Moreover, when the model is implemented within a transient system simulation program, it may come across figures that are random and unplanned by the manufacturer such as low water flow rates or extreme temperatures. This oddity may result in unrealistic set of results.
 
-![Jin's flow chart](EngineeringReference/media/image5314.png)
+![Jin's flow chart](media/image5314.png)
 
 Figure 241.  Flow diagram of EnergyPlus Water to Water HeatPump implementation
 
@@ -4700,13 +4700,13 @@ When the heat pump does operate to reclaim waste heat, the VRF AC system can sim
 
 The figure below shows the VRF AC terminal units with draw through fan placement. Blow through fan placement can also be modeled by connecting the supply air fan inlet node to the outside air mixer’s mixed air node if an outdoor air mixer is used or to the zone terminal unit inlet node if an outdoor air mixer is not used. The variable refrigerant flow heat pump coordinates the operation of these components and is modeled as a type of zone equipment where the *zone terminal units* are specified in a zone equipment list (Ref. ZoneHVAC: EquipmentList and ZoneHVAC:EquipmentConnections). The AirConditioner: VariableRefrigerantFlow object *is not* specified in an air primary loop or a zone equipment list object.
 
-![](EngineeringReference/media/image5315.png)
+![](media/image5315.png)
 
 Figure 242. Variable Refrigerant Flow Heat Pump (draw through fan placement)
 
 
 
-![](EngineeringReference/media/image5316.png)
+![](media/image5316.png)
 
 Figure 243. Variable Refrigerant Flow object connections in Energyplus
 
@@ -4812,11 +4812,11 @@ For the performance data shown below, the boundary curve would be created by ide
 
 Table 73. Performance Data for Variable Refrigerant Flow Air Conditioner Model
 
-![](EngineeringReference/media/image5339.svg.png)
+![](media/image5339.svg.png)
 
 Although the capacity and energy performance curves each have an independent boundary curve input, in this example the same boundary curve may be used for both the capacity and energy input ratio curves. When the “low” and “high” predicted performance data do not line up at the boundary curve points, the boundary curve may have to be modified slightly to allow a smooth transition in performance from the “low” to “high” temperature region. In this case, the boundary curves for capacity and energy may be different.
 
-![](EngineeringReference/media/image5340.png)
+![](media/image5340.png)
 
 Figure 244. Non-Linear Performance of VRF Heat Pump in Cooling Mode
 
@@ -4882,7 +4882,7 @@ where
 
 An example piping correction factor chart is shown in the following figure. The height selected for use in the equation above is selected to minimize the piping correction factor and serves to identify the worst case piping losses.
 
-![PipingFactorCorrectionChart](EngineeringReference/media/image5358.png)
+![PipingFactorCorrectionChart](media/image5358.png)
 
 Figure 245. Typical Piping Factor Correction Chart
 
@@ -4916,7 +4916,7 @@ where
 
 The figure below shows VRF system laboratory data for cooling only mode (solid characters) and heat recovery mode (dotted characters). Using the limited laboratory data, the available cooling capacity fraction used to model heat recovery mode is approximately 0.91 and the cooling energy fraction is approximately 1.14. This is the only data available at this time to estimate the impact of heat recovery mode on performance. In the bi-quadratic equation, only coefficient a should be used until more complete data sets exist. Laboratory testing will eventually provide more data and better estimates of performance in heat recovery mode.
 
-![](EngineeringReference/media/image5366.png)
+![](media/image5366.png)
 
 Figure 246.  Comparison of cooling only and heat recovery mode operation
 
@@ -4928,7 +4928,7 @@ When the VRF system transitions from cooling only operation to heat recovery ope
 
 
 
-![](EngineeringReference/media/image5367.png)
+![](media/image5367.png)
 
 Figure 247.  Laboratory test identifies performance changes during transition period
 
@@ -4970,7 +4970,7 @@ where:
 
 When multiple terminal units are operating, the terminal units near their maximum capacity are more likely to be capacity limited than those terminal units operating well below their available capacity. The assumption here is that terminal units that are not capacity limited can provide more refrigerant to meet the same load. When the model finds that there is no terminal unit capacity limit, this variable will report 1E+20 indicating that no limit exists.  The figure below demonstrates the application of the capacity limit factor for the case where all indoor terminal units are operating at different capacities. A solution is reached when the sum of the indoor terminal unit’s cooling capacities (accounting for piping losses) is equal to the heat pump condenser’s available cooling capacity.
 
-![](EngineeringReference/media/image5376.png)
+![](media/image5376.png)
 
 Figure 248. Example of Cooling Capacity Limit
 
@@ -5366,7 +5366,7 @@ where:
 
 The zone terminal unit list identifies the terminal units that are connected to a single variable refrigerant flow heat pump. The zone terminal unit list is used exclusively in the variable refrigerant flow (VRF) heat pump object (ref: AirConditioner:VariableRefrigerantFlow) and VRF zone terminal units (ref: ZoneHVAC: TerminalUnit:VariableRefrigerantFlow). Up to 20 terminal units may be connected to a single VRF outdoor condensing unit. This list is extensible if additional indoor terminal units are required. The following figure shows the connection scheme between the zone terminal units, the zone terminal unit list, and finally the VRF AC system. The zone terminal units are connected to the zone through zone inlet and outlet zone nodes. Each zone terminal unit is entered in a list which represents all terminal units connected to a single VRF AC system. And finally, the zone terminal unit list name is entered in the corresponding VRF AC object.
 
-![](EngineeringReference/media/image5454.png)
+![](media/image5454.png)
 
 Figure 249. Zone Terminal List connections in EnergyPlus objects
 
@@ -5379,7 +5379,7 @@ Heat Exchangers <a name="HX"></a>
 
 The input object HeatExchanger:AirToAir:SensibleAndLatent provides a model for a generic, sensible and latent air-to-air heat exchanger that is an HVAC air system component that consists of a heat exchanger and primary/secondary airflow bypass dampers. The specific configuration of the component is shown in the following figure.
 
-![](EngineeringReference/media/image5455.png)
+![](media/image5455.png)
 
 
 
@@ -5745,7 +5745,7 @@ This control strategy is typically used in conjunction with economizer operation
 
 As the outdoor air temperature falls further below the setpoint for the supply air outlet temperature (same as the economizer lower temperature limit), the heat exchanger bypass dampers will modulate closed to maintain the desired supply air temperature for a plate heat exchanger. For a rotary heat exchanger the rotary heat exchanger speed will gradually increase to maintain the desired supply air temperature. Modulation of heat exchanger performance will continue until the supply air temperature setpoint can no longer be maintained. This control will attempt to achieve the desired temperature set point whether the heat exchanger is cooling or heating the supply air stream. Care should be used to set the supply outlet air temperature set point to the desired value for proper control.
 
-![](EngineeringReference/media/image5550.png)
+![](media/image5550.png)
 
 Figure 251.  Air to Air Heat Exchanger with Supply Air Temperature Control
 
@@ -5791,7 +5791,7 @@ M. Wetter. 1999. *Simulation Model: Air-To-Air Plate Heat Exchanger*, LBNL-42354
 
 The input object HeatExchanger:Desiccant:BalancedFlow provides a model for a desiccant heat exchanger that is an HVAC component used to model both temperature (sensible) and moisture (latent) heat exchange between two air streams (Figure 252). The model assumes balanced air flow through the regeneration and process sides of the heat exchanger (i.e., regeneration and process air volume flow rates and face velocities are the same). Heat exchanger performance is specified through a performance data type object (e.g., Heat Exchanger:Desiccant:BalancedFlow:Performance Data Type 1). Refer to the EnergyPlus Input Output Reference for the specific input syntax for this desiccant heat exchanger object.
 
-![BalancedFlowDesiccantHeatExchanger\_Schematic](EngineeringReference/media/image5554.png)
+![BalancedFlowDesiccantHeatExchanger\_Schematic](media/image5554.png)
 
 Figure 252. Schematic of the Balanced Flow Desiccant Heat Exchanger
 
@@ -6123,7 +6123,7 @@ Eskilson developed *g*-functions for various borehole configurations. He plotted
 
 Figure 253 shows the *g*-function plotted against the non-dimensional time defined as <span>$\ln (t/{t_s})$</span>, <span>${t_s} = {H^2}/9\alpha $</span> for various configurations of vertical boreholes with *B/H* ratio of .1 along with single borehole. It is seen from this figure that the thermal interaction between boreholes increases with time and with the number of boreholes in field.
 
-![](EngineeringReference/media/image5651.png)
+![](media/image5651.png)
 
 Figure 253.  Short Time Step g Function Curve as an Extension of Long Time Step g Function Curves for Different Configuration of Boreholes (Eskilson 1987, Yavuzturk 1999).
 
@@ -6149,7 +6149,7 @@ For example, let us take the sub hourly loads 1,2 & 3. These loads occurred at 0
 
 Thus for each time step since the time step increments are not uniform we need to store the simulation times at which these time-steps occurred, and calculate corresponding *g*-functions at each time-step.
 
-![](EngineeringReference/media/image5655.png)
+![](media/image5655.png)
 
 Figure 254.  Variable Timestep Ground Loop Heat Exchanger Model Schematic Explaining the *g* Function Estimation.
 
@@ -6159,7 +6159,7 @@ Yavuzturk model calculates the outlet fluid temperature by iteration beginning w
 
 A load aggregation scheme was developed for energy simulation software with variable short time steps down to one minute. A major issue in the development was the calculation of the *g*-functions.  As discussed previously in the variable time step environments, the time step increments are not uniform. As a result, g-functions cannot e pre-calculated. Figure 255 shows a schematic of the variable time step ground loop heat exchanger model. The figure shows the larger monthly block loads, hourly loads and sub hourly loads and along with the time of occurrence of those loads. The figure also shows the time at which the *g*-functions are applied to different load blocks.
 
-![](EngineeringReference/media/image5656.png)
+![](media/image5656.png)
 
 Figure 255.  Schematic of Variable Time Step Model *g* Function Calculation.
 
@@ -6169,7 +6169,7 @@ For example from the schematic (Figure 256), for the sub hourly load 1, which oc
 
 Thus, the algorithm keeps track of the sub hourly loads along with their time of occurrence for a user-defined length of time during which the sub hourly calculations are made. The algorithm also estimates the time weighted hourly load from their corresponding sub hourly loads as each hour passes. The sub-hourly loads are time weighted because of the irregular intervals at which the time-step occurs. This is also illustrated in Figure 256. The sub hourly loads 1,2 &3 occur for varying length of time. The load 3 occurs for a longer duration than 1 and 2 in that order. This implies that the load 3 has to be given more weight than 1 and 2. So the sub hourly loads for a particular hour are multiplied by the length of their respective period of occurrence and averaged over the hour. This is further explained by the schematic in Figure 5.
 
-![](EngineeringReference/media/image5657.png)
+![](media/image5657.png)
 
 Figure 256.  Schematic Showing the Calculation of Hourly Load from the Sub Houly Loads.
 
@@ -6376,7 +6376,7 @@ The third and final simplification takes advantatge of geometric similarity that
 
 For more information, see [Xiong et al. 2015](#SlinkyReferenceXiong).
 
-![](EngineeringReference/media/image8001.png)
+![](media/image8001.png)
 
 Figure: Schematic of first and second improvements to the algorithm for computational efficiency. <a name="SlinkyGHX1"></a>
 
@@ -6388,7 +6388,7 @@ Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015. Development and Validation of a 
 
 The pond model (Object: GroundHeatExchanger:Pond) is a ‘lumped parameter’ model where the pond is represented by a single node with thermal mass. The pond surface temperature is the same as the temperature at this node, i.e. the surface temperature is the same as the bulk temperature. A first order differential equation is solved in the model to calculate the pond temperature at each time step. This type of heat rejecter is modeled as several circuits connected in parallel.
 
-![](EngineeringReference/media/image5676.png)
+![](media/image5676.png)
 
 Figure 257.  Heat Transfer Mechanisms in a Pond (Chiasson 1999)
 
@@ -6434,7 +6434,7 @@ q<sub>fluid                    </sub> = Total heat transfer 
 
 A heat balance is calculated at a single node that represents the pond. Heat transfer takes place by surface convection, long-wave radiation to the sky, absorption of solar energy, ground heat transfer and heat exchange with the fluid. A heat exchanger analogy is used to calculate the heat transfer between the heat transfer fluid and the pond. The differential equation defined by the heat balance is solved using a fourth order Runge-Kutta numerical integration method. The implementation along with the model equations are summarized in the figure below.
 
-![](EngineeringReference/media/image5686.png)
+![](media/image5686.png)
 
 Figure 258.  Pond Model Component Configuration (Chiasson 1999)
 

@@ -1660,7 +1660,7 @@ In ASHRAE Standard 55, the monthly mean outdoor air temperature, used in the ada
 
 The model defines two comfort regions: 80% Acceptability, and 90% Acceptability. If the monthly mean outdoor air temperature is not within the specified domain, the model is not applicable.
 
-![](EngineeringReference/media/image6814.png)
+![](media/image6814.png)
 
 Figure 302. Acceptable operative temperature ranges for naturally conditioned spaces (ASHRAE Standard 55-2010)
 
@@ -1702,13 +1702,13 @@ The EN15251-2007 is similar to ASHRAE 55-2010, but with slightly different curve
 
 This weighted running average is calculated from a full annual weather file that must be specified for the simulation. This is used as an index for occupant adaptation to outdoor conditions, and determines the acceptability of indoor conditions. The model also accounts for people’s clothing adaptation in naturally conditioned spaces by relating the acceptable range of indoor temperatures to the outdoor climate, so it is not necessary to estimate the clothing values for the space. No humidity or air-speed limits are required when this option is used. The model defines three comfort regions: Category I (90%) Acceptability, Category II (80%) Acceptability, and Category III (65%) Acceptability. If T<sub>rm</sub> is not within the specified domain, the model is not applicable.
 
-![](EngineeringReference/media/image6819.png)
+![](media/image6819.png)
 
 Figure 303. Categories for European Standard EN15251-2007
 
 
 
-![](EngineeringReference/media/image6820.png)
+![](media/image6820.png)
 
 Figure 304. Acceptable operative temperature ranges for naturally conditioned spaces (CEN EN15251-2007)
 
@@ -1756,7 +1756,7 @@ or t<sub>a(out,6)</sub> ≥ 26°C <span>${I_{cl}} = 0.46$</span>
 
 Where, *I<sub>cl</sub>* is the clothing insulation value, *t<sub>a(out,\\ 6)</sub>* is the outdoor air temperature measured at 6 o’clock in the morning. The following figure illustrates the proposed clothing insulation model.
 
-![](EngineeringReference/media/image6825.png)
+![](media/image6825.png)
 
 Figure 305. Clothing Schedule Illustration
 
@@ -1764,7 +1764,7 @@ In the figure above, clothing insulation schedule for a fixed model (blue) typic
 
 The following figure illustrates the new clothing insulation model.
 
-![](EngineeringReference/media/image6826.png)
+![](media/image6826.png)
 
 Figure 306. Graphical representation of the proposed clothing insulation model
 
@@ -1907,7 +1907,7 @@ To simulate the Trombe wall, a very narrow zone is coupled to the desired surfac
 
 
 
-![](EngineeringReference/media/image6830.png)
+![](media/image6830.png)
 
 Figure 307. Building with Trombe Wall
 
@@ -1929,13 +1929,13 @@ An input file (PassiveTrombeWall.idf) is provided to demonstrate a sample sealed
 
 The resulting temperature profiles for winter and summer design days are plotted below.
 
-![](EngineeringReference/media/image6831.png)
+![](media/image6831.png)
 
 Figure 308. Passive Trombe Wall Winter
 
 
 
-![](EngineeringReference/media/image6832.png)
+![](media/image6832.png)
 
 Figure 309. Passive Trombe Wall Summer
 
@@ -1963,7 +1963,7 @@ An input file (ActiveTrombeWall.idf) is provided to demonstrate a sample active 
 
 The resulting temperature profile for the winter design day is plotted below.  The plot for the summer design day is not shown because it is identical to Figure 309 above since the fan is not scheduled to operate in the summer.
 
-![](EngineeringReference/media/image6833.png)
+![](media/image6833.png)
 
 Figure 310. Active Trombe Wall Winter
 
@@ -2112,7 +2112,7 @@ An illustration of how the control algorithm cycles on and off is shown below. 
 
 Although the instantaneous tank water temperature may vary considerably within a timestep (due to cycling, etc.), only the average temperature over the timestep is reported.  The model calculates the average by piece-wise integration of the area under the instantaneous temperature curve for each unique set of conditions.  The instantaneous temperature is preserved internally by the program and is propogated from the end of one timestep to the beginning of the next.
 
-![](EngineeringReference/media/image6852.png)
+![](media/image6852.png)
 
 Figure 311. Water Heater Cycle Control Algorithm
 
@@ -2176,15 +2176,15 @@ The input object WaterHeater:HeatPump provides a model for a heat pump water hea
 
 Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled. The DX coil compressor may be located in a zone, outdoors, or the ambient temperature surrounding the compressor may be scheduled. The location of the compressor controls the operation of its crankcase heater. The water heater tank location is specified in the water heater tank object and is independent of the compressor location. In addition, the inlet air configuration may be specified in one of several ways. The heat pump water heater air coil and fan assembly may draw its inlet air from the zone and outdoor air using an optional mixer and splitter assembly as shown in the first figure below. When used, the mixer and splitter air streams are controlled by a single inlet air mixer schedule. When the HPWH draws its inlet air solely from a zone, the mixer/splitter assembly is not required as shown in the second figure below. In this case, the inlet air to the evaporator and fan assembly is made up entirely of zone air and the heat pump outlet air is directed back to the zone. The final figure illustrates a HPWH that draws its inlet air solely from outdoors and exhausts its outlet air outdoors as well. Each of these configurations may also be connected to a plant hot water loop (via the water heater tank use nodes).
 
-![HPWHSchematic\_EAplusOA](EngineeringReference/media/image6855.png)
+![HPWHSchematic\_EAplusOA](media/image6855.png)
 
 Figure 312. Schematic of a heat pump water heater using optional mixer/splitter nodes
 
-![HPWH](EngineeringReference/media/image6856.png)
+![HPWH](media/image6856.png)
 
 Figure 313. Schematic of a Heat Pump Water Heater with Inlet Air from a Zone
 
-![HPWHSchematic\_outdoors](EngineeringReference/media/image6857.png)
+![HPWHSchematic\_outdoors](media/image6857.png)
 
 Figure 314. Schematic of a Heat Pump Water Heater with Inlet Air from Outdoors
 
@@ -2769,7 +2769,7 @@ For the Chicago-O'Hare TMY2 weather file, T<sub>out,avg</sub> = 9.69 C and ΔT<s
 
 
 
-![](EngineeringReference/media/image6936.png)
+![](media/image6936.png)
 
 #### References
 
@@ -2791,7 +2791,7 @@ The WaterUse:Equipment object simulates all different types of water end uses. 
 
 Common water equipment, such as sinks and showers, requires mixing of hot and cold water to provide a desired temperature at the tap.  Water use equipment that is simulated in "unconnected" mode, i.e., without being referenced by a WaterUse:Connections object, presents a relatively simple modeling problem illustrated by the diagram below:
 
-![Water Use Connections ENG Diagram 1](EngineeringReference/media/image6937.png)
+![Water Use Connections ENG Diagram 1](media/image6937.png)
 
 Figure 315. Hot and Cold Water Mixing
 
@@ -2865,7 +2865,7 @@ A second set of variables is tied to the specifics of the water equipment which 
 
 The approach taken here is to utilize the first set of initial condition variables and forego the overly-complex second set.  The initial conditions can be used to calculate a maximum possible change in sensible and latent energy between the entering water conditions and the leaving water conditions at an infinite time later.  Sensible and latent energy are calculated separately and represent the maximum heat gain, respectively, that could be added to the zone air.  The user simply specifies a fraction of the maximum heat gain for sensible and latent that is actually added to the zone air.  The fraction is specified with a schedule to account for different modes of operation.  The split between sensible and latent will vary depending on the type of equipment that is to be modeled.  Typically, both fractions should be small numbers.
 
-![Water Use Connections ENG Diagram 2](EngineeringReference/media/image6962.png)
+![Water Use Connections ENG Diagram 2](media/image6962.png)
 
 Figure 316.  Zone Heat Gain from Water Use Equipment
 
@@ -2981,7 +2981,7 @@ The WaterUse:Connections object overrides the hot and cold water supply temperat
 
 Solving the water subsystem described by the WaterUse:Connections object is appreciably more difficult than solving a single, unconnected piece of water use equipment.  The subsystem is illustrated below.
 
-![Water Use Connections ENG Diagram 3](EngineeringReference/media/image7005.png)
+![Water Use Connections ENG Diagram 3](media/image7005.png)
 
 Figure 317. Water Use Connections Subsystem
 
@@ -3079,7 +3079,7 @@ The heat exchanger can be modeled as "ideal", "counterflow", or "crossflow".  O
 
 The destination of the preheated makeup water can be plumbed in three possible configurations:  "plant", "equipment", "plant and equipment".  In the "plant" configuration, all preheated water flow is returned to the plant loop to match the makeup water for the hot water supply flow.  In the "equipment" configuration, all preheated water flow is directed internally within the WaterUse:Connections object to provide the makeup water for the cold water supply flow for the local water use equipment.  In the "plant and equipment" configuration, the preheated water is split between both of the previous configurations.  This is the only configuration where the flow rate is equal on both sides of the heat exchanger.
 
-![Water Use Connections ENG Diagram 4](EngineeringReference/media/image7054.png)
+![Water Use Connections ENG Diagram 4](media/image7054.png)
 
 Figure 318. Water Use Connections Subsystem with Drainwater Heat Recovery
 
@@ -3975,7 +3975,7 @@ No specific references.
 
 The input object ZoneHVAC:PackagedTerminalAirConditioner provides a model for a packaged terminal air conditioner (PTAC) that is a compound object made up of other components. Each PTAC consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil (gas, electric, hot water, or steam) and a supply air fan. While the figure below shows the PTAC with draw through fan placement, blow through fan placement can also be modeled by positioning the supply air fan between the outdoor air mixer and DX cooling coil. The packaged terminal air conditioner coordinates the operation of these components and is modeled as a type of zone equipment (Ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![PTAC\_Drawthrough](EngineeringReference/media/image7172.png)
+![PTAC\_Drawthrough](media/image7172.png)
 
 Figure 319. Schematic of a Packaged Terminal Air Conditioner with Draw Through Fan Placement
 
@@ -4167,7 +4167,7 @@ where:
 
 The input object ZoneHVAC:PackagedTerminalHeatPump provides a model for a packaged terminal heat pump (PTHP) that is a compound object made up of other components. Each PTHP consists of an outdoor air mixer, direct expansion (DX) cooling coil, DX heating coil, supply air fan, and a supplemental heating coil. While the figure below shows the PTHP with draw through fan placement, blow through fan placement can also be modeled by moving the supply air fan before the DX cooling coil. The packaged terminal heat pump coordinates the operation of these components and is modeled as a type of zone equipment (Ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![PTHP](EngineeringReference/media/image7215.png)
+![PTHP](media/image7215.png)
 
 Figure 320.  Schematic of a Packaged Terminal Heat Pump (Draw Through Fan Placement)
 
@@ -4347,7 +4347,7 @@ where:
 
 The input object ZoneHVAC:WaterToAirHeatPump provides a zone equipment model for a water-to-air heat pump that is a “virtual” component consisting of an on/off fan component, a water-to-air heat pump cooling coil, a water-to-air heat pump heating coil, and a gas or electric supplemental heating coil. The specific configuration of the blowthru heat pump is shown in the following figure. For a drawthru heat pump, the fan is located between the water-to-air heat pump heating coil and the supplemental heating coil. In addition, a water-to-air heat pump has a water loop connection on its source side. The water loop can be served by a condenser loop (like GHE for Ground source systems), or by a cooling tower/ boiler plant loop (for water loop systems).
 
-![Schematic\_ZoneWSHP](EngineeringReference/media/image7258.png)
+![Schematic\_ZoneWSHP](media/image7258.png)
 
 Figure 321.  Source Side and Load Side Configuration of a Zone WaterToAir Heat Pump
 
@@ -4419,7 +4419,7 @@ The generalized least square method is used to generate the coefficients. This m
 
 
 
-![](EngineeringReference/media/image7286.png)
+![](media/image7286.png)
 
 Figure 322. Information Flow Chart for Water-to-Air Heat Pump Equation Fit Model (Tang 2005)
 
@@ -4429,7 +4429,7 @@ Figure 322. Information Flow Chart for Water-to-Air Heat Pump Equation Fit Model
 
 This model, object name ZoneHVAC:Dehumidifier:DX, simulates the thermal performance and electric power consumption of conventional mechanical dehumidifiers. These systems use a direct expansion (DX) cooling coil to cool and dehumidify an airstream. Heat from the DX system’s condenser section is rejected into the cooled/dehumidified airstream, resulting in warm dry air being supplied from the unit. In EnergyPlus, this object is modeled as a type of zone equipment (ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![Dehumidifier\_Schematic](EngineeringReference/media/image7287.png)
+![Dehumidifier\_Schematic](media/image7287.png)
 
 Figure 323. Mechanical Dehumidifier Schematic
 
@@ -4609,7 +4609,7 @@ where
 
 The input object ZoneHVAC:EnergyRecoveryVentilator provides a model for a stand alone energy recovery ventilator (ERV) that is a single-zone HVAC component used for exhaust air heat recovery (see figure below). This compound object consists of three required components: a generic air-to-air heat exchanger (see object HeatExchanger:AirToAir:SensibleAndLatent), a supply air fan, and an exhaust air fan (see object Fan:OnOff). An optional controller (see object  ZoneHVAC:EnergyRecoveryVentilator:Controller) may be used to simulate economizer (free cooling) operation.
 
-![Schematic\_StandAloneERV](EngineeringReference/media/image7321.png)
+![Schematic\_StandAloneERV](media/image7321.png)
 
 Figure 324. Schematic of the Energy Recovery Ventilator:Stand Alone compound object
 
@@ -4849,7 +4849,7 @@ Note: the unit ventilator controls are strictly temperature based and do not fac
 
 Variable refrigerant flow zone terminal units are used exclusively with variable refrigerant flow (VRF) air conditioning systems (ref: AirConditioner:VariableRefrigerantFlow and ZoneTerminalUnitList). The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Outdoor ventilation air is modeled with the use of an outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating. A supply air fan is also required and can be modeled as either draw through as shown in the figure below or as blow through where the fan inlet node would be connected to the outside air mixer mixed air node. If an outside air mixer is not used, the fan inlet node would be connected to the zone exhaust node.
 
-![](EngineeringReference/media/image7369.png)
+![](media/image7369.png)
 
 Figure 325. Zone Terminal Unit Schematic
 
@@ -4967,7 +4967,7 @@ where:
 
 The input object ZoneHVAC:VentilatedSlab provides a model for ventilated slab systems that in general use outdoor air to “precool” slabs with colder nighttime air. This method of precooling the thermal mass of a space can be very effective when nighttime temperatures are low and the mass of the system is high enough to provide a significant amount of cooling potential during the day to counteract internal heat gains within a zone. Nearly all ventilated slabs are simple systems such as that shown in the right side of Figure 326. The fan is shown in a blow through position, but the model will allow either a blow or draw through configuration.
 
-![Slide1](EngineeringReference/media/image7396.png)
+![Slide1](media/image7396.png)
 
 Figure 326. Basic System for the Ventilated Slab Module
 
@@ -4975,15 +4975,15 @@ It should be noted that in Figure 326 the use of “unit ventilator” and “lo
 
 The ventilated slab system has been implemented in a fashion that is similar to the “unit ventilator” system in EnergyPlus. The unit ventilator is a system that allows the user to bring in outdoor air (ventilation) that may or may not be tempered with a heating or cooling coil as shown the left side of Figure 326. The air can be delivered to the slab only (Figure 327), to the slab then to the space(Figure 328), and to several slabs in different areas in series (Figure 329). The model essentially combines the functionality of the low temperature radiant system (using air as a transport medium rather than water) and the unit ventilator. In some cases, the system may not meet all the zone heating and cooling load because it is operated not by setpoint of the zone but control temperature range and coil outlet air temperature set by user input.**Note that no coils are shown in Figure 329 for diagram simplicity but the implementation of the system shown in Figure 329 includes coils as in Figure 327 and Figure 328.
 
-![Slide2](EngineeringReference/media/image7397.png)
+![Slide2](media/image7397.png)
 
 Figure 327. Model with Air Delivered to Slab. (Slab Only Mode)
 
-![Slide3](EngineeringReference/media/image7398.png)
+![Slide3](media/image7398.png)
 
 Figure 328. Zone Supply Model using Ventilated Slab (Slab and Zone mode)
 
-![Slide4](EngineeringReference/media/image7399.png)
+![Slide4](media/image7399.png)
 
 Figure 329. Multiple Slabs model with Several Zones (Series Slabs Mode)
 
@@ -5003,7 +5003,7 @@ The Cool Tower (object ZoneCoolTower:Shower) is available for modeling a cooltow
 
 The shower cooling tower shown in figure below is controlled by a schedule and the specification of maximum water flow rate and volume flow rate as well as minimum indoor temperature. The actual flow rate of water and air can be controlled as users specify the fractions of water loss and flow schedule. The required input fields include effective tower height and exit area to obtain the temperature and flow rate of the air exiting the tower. A schedule and rated power for the water pump are also required to determine the power consumed. The component typically has a stand-alone water system that is not added to the water consumption from mains. However, users are required to specify the water source through an optional field, the name of water supply storage tank, in case any water comes from a water main.
 
-![cooltower config](EngineeringReference/media/image7400.svg.png)
+![cooltower config](media/image7400.svg.png)
 
 Figure 330. Typical Cooltower Configuration
 
@@ -5532,7 +5532,7 @@ The ZoneThermalChimney input object is available for modeling a thermal chimney 
 
 * The discharged amount of interior air induced by the thermal chimney is replaced by the outdoor air infiltration.
 
-![Thermal Chimney](EngineeringReference/media/image7454.png)
+![Thermal Chimney](media/image7454.png)
 
 Figure 331. Basic Composition of Thermal Chimney
 
@@ -5761,7 +5761,7 @@ M. M. Aboulnaga and S. N. Abdrabboh, Improving Night Ventilation into Low-rise B
 
 The zone outdoor air unit (object ZoneHVAC:OutdoorAirUnit) is intended to model systems such as zone make-up air units and dedicated outside air systems.  These components are “zone equipment” meaning that they do not require an air loop but serve a zone directly.  The system is comprised of a supply fan (in either draw through or blow through configuration), an optional exhaust fan, and a variety of components such as heating coils, cooling coils, heat recovery, etc.  The object of the zone outdoor air unit is to bring in additional ventilation air into a zone.  These might be used for high ventilation spaces such as kitchens or laboratories where another system is primarily responsible for space conditioning while the zone outside air unit is primarily responsible for fresh air delivery to the zone.  Most of the information necessary to configure a zone outdoor air unit is contained in the EnergyPlus Input/Output Reference.  A diagram of the zone outdoor air unit is shown below.  As this system is relatively simple and does not contain any unique operating algorithm or equations, the discussion here is limited to the application of the user defined controls and how it relates to the operation of the device.
 
-![](EngineeringReference/media/image7466.png)
+![](media/image7466.png)
 
 Figure 332. Zone Outdoor Air Unit Schematic
 

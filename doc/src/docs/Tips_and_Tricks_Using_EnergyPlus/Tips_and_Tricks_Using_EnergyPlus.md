@@ -1,5 +1,5 @@
 
-![](Tips_and_Tricks_Using_EnergyPlus/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -275,7 +275,7 @@ The WINDOW program is published from LBNL at http://windows.lbl.gov/software. Mo
 
 The preferred method of using WINDOW data in EnergyPlus is to excerpt or “report” a specific Window from the Window library screen (see below):
 
-![](Tips_and_Tricks_Using_EnergyPlus/media/image001.jpg)
+![](media/image001.jpg)
 
 Figure 1. WINDOW screen for exporting IDF Window specifications
 
@@ -323,7 +323,7 @@ If the WINDOW data file entry has two glazing systems, System1 and System2, the 
 
 
 
-![](Tips_and_Tricks_Using_EnergyPlus/media/image002.png)
+![](media/image002.png)
 
 Figure 2. Window Glazing system with dual glazing constructions
 
@@ -654,13 +654,13 @@ Building heat transfer surfaces, such as roofs and walls, only cast shadows in a
 
 
 
-![](Tips_and_Tricks_Using_EnergyPlus/media/image003.png)
+![](media/image003.png)
 
 Figure 3. Building heat transfer surfaces cast shadows in the direction of outward facing normal.
 
 
 
-![](Tips_and_Tricks_Using_EnergyPlus/media/image004.png)
+![](media/image004.png)
 
 Figure 4. Extended roof surface will not shade the walls below.
 
@@ -670,7 +670,7 @@ For the configuration on the left, the overhang should be a shading surface whic
 
 For the configuration on the right, the attic is fully enclosed with building heat transfer surfaces for the roof and soffits. The soffits would be described as floor surfaces in the attic and would face downward. The central portion of the attic floor would be described as an interzone floor surface where the outside boundary condition is the ceiling surface in the zone below.
 
-![](Tips_and_Tricks_Using_EnergyPlus/media/image005.png)
+![](media/image005.png)
 
 Figure 5. Proper surface configurations for roof overhangs for two types of attic construction.
 
@@ -682,7 +682,7 @@ Exterior shading surfaces modeled using "FullInteriorAndExteriorWithReflections"
 
 For example, a building is shaded by surfaces A, B, and C. Shading Surface A intercepts with Shading Surfaces B and C, and are broken into three areas A1, A2, and A3. Surface A should be entered as the shown three shading areas in order to correctly model sky diffuse solar reflection from Shading Surface A.
 
-![Reflections](Tips_and_Tricks_Using_EnergyPlus/media/image006.jpg)
+![Reflections](media/image006.jpg)
 
 Figure 6. Limitations in modeling reflections from surfaces
 
@@ -777,7 +777,7 @@ Zone multipliers are designed as a “multiplier” for floor area, zone loads, 
 
 To illustrate the benefits (and comparison of results), the MultiStory.idf example file was used. The MultiStory file is a 9 zone, 10 story/floored building with heating (ZoneHVAC:Baseboard:Convective:Electric object) and cooling (ZoneHVAC:WindowAirConditioner object). The middle zone of each floor in the original represents 4 zones (multiplier=4) and the middle floor (ZoneGroup) represents 8 floors (ZoneGroup multiplier=8). Clone representations were made for comparisons:
 
-![Multistory](Tips_and_Tricks_Using_EnergyPlus/media/image007.png)
+![Multistory](media/image007.png)
 
 Figure 7. Original Multistory IDF
 
@@ -826,13 +826,13 @@ In the figure above, each “middle” zone represents 4 zones.  The middle “
 
 For comparison purposes, clones of the middle zones were done.
 
-![Multistory-clones1](Tips_and_Tricks_Using_EnergyPlus/media/image008.png)
+![Multistory-clones1](media/image008.png)
 
 Figure 8. Multistory with cloned middle zones.
 
 And, finally, the entire building was created:
 
-![Multistory-clones2](Tips_and_Tricks_Using_EnergyPlus/media/image009.png)
+![Multistory-clones2](media/image009.png)
 
 Figure 9. Multistory building -- fully cloned.
 

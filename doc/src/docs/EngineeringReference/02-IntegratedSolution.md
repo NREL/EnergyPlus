@@ -3,7 +3,7 @@ Integrated Solution Manager
 
 EnergyPlus is an integrated simulation. This means that all three of the major parts, building, system, and plant, must be solved simultaneously. In programs with sequential simulation, such as BLAST or DOE-2, the building zones, air handling systems, and central plant equipment are simulated sequentially with no feedback from one to the other. The sequential solution begins with a zone heat balance that updates the zone conditions and determines the heating/cooling loads at all time steps. This information is fed to the air handling simulation to determine the system response; but that response does not affect zone conditions. Similarly, the system information is passed to the plant simulation without feedback. This simulation technique works well when the system response is a well-defined function of the air temperature of the conditioned space. For a cooling situation, a typical supply and demand situation is shown schematically in the Figure 3. Here, the operating point is at the intersection of the supply and demand curves.
 
-![](EngineeringReference/media/image7.png)
+![](media/image7.png)
 
 Figure 3. Sequential Simulation Supply/Demand Relationship.
 
@@ -11,7 +11,7 @@ However, in most situations the system capacity is dependent on outside conditio
 
 To obtain a simulation that is physically realistic, the elements have to be linked in a simultaneous solution scheme. The entire integrated program can be represented as a series of functional elements connected by fluid loops as shown in Figure “Schematic of Simultaneous Solution Scheme”. In EnergyPlus all the elements are integrated and controlled by the Integrated Solution Manager. The loops are divided into supply and demand sides, and the solution scheme generally relies on successive substitution iteration to reconcile supply and demand using the Gauss-Seidell philosophy of continuous updating.
 
-![](EngineeringReference/media/image8.png)
+![](media/image8.png)
 
 Figure 4. Schematic of Simultaneous Solution Scheme
 
@@ -138,7 +138,7 @@ Prior to implementing the new heat balance method (3rdOrderBackwardDifference) i
 
 This is Equation without the term due to the air system. In addition, Tz is now the *desired* zone temperature as defined by the control system setpoints that must be specified for each zone. An assumption was made that if the air system has sufficient capacity (based on the desired zone air temperature) to meet the zone conditioning requirements (i.e. Qsys=Qload) at the desired zone air temperature then those requirements will be met. On the other hand, if the air system cannot provide enough conditioning to the zone to maintain the desired temperature, then the air system provides its maximum output to the zone and the zone air temperature is allowed to "float."  Equation was used to calculate the air system output required to maintain the desired zone air temperature; the actual zone temperature update was accomplished using Equation . This method was called *predictive system energy balance*. It has many characteristics of a predictor-corrector method since the air system response is first approximated based on a predicted zone temperature and then the actual change in zone temperature is determined from that air system response. The predictive air system energy balance method required that the system controls on air mass flow rate, supply air temperature, etc., be formulated as a function of the zone air temperature. However, this was not a serious drawback. The first example considered was a single zone draw through air system. Typically, such systems have a cooling coil and heating coil in series, and constant air volume flow rate. Single zone draw through systems run at maximum capacity when turned on; so the only way to regulate net air system output and keep the zone air temperature within the desired range is to turn the air system on and off. A simplified schematic of this system type is shown in Figure 5. Simplified Single Zone Draw Through Air System.
 
-![](EngineeringReference/media/image31.svg.png)
+![](media/image31.svg.png)
 
 Figure 5. Simplified Single Zone Draw Through Air System
 
@@ -150,13 +150,13 @@ where h is the fraction of the time step that the air system is turned on and va
 
 A far more complex, though again simplified, air system is the variable air volume (VAV) system, shown in Figure 6. Simplified Variable Volume Air System. In VAV systems, the supply air temperature, as well as the supply air volume, are continuous functions of zone air temperature. As shown in Figure 7. Idealized Variable Volume System Operation., when the zone air temperature is between Tcl and Tcu, cooling is required and the air system varies the supply air flow rate while maintaining a constant supply air temperature. When the zone air temperature is between Thl and Thu, heating is required and air is supplied at a constant minimum flow rate while the supply air temperature is varied.
 
-![](EngineeringReference/media/image33.svg.png)
+![](media/image33.svg.png)
 
 Figure 6. Simplified Variable Volume Air System.
 
 The next figure (Idealized variable volume system operation) shows idealized behavior of a VAV system; in practice, the air flow rate and temperature are not exact linear functions of zone air temperature.
 
-![](EngineeringReference/media/image34.svg.png)
+![](media/image34.svg.png)
 
 Figure 7. Idealized Variable Volume System Operation.
 
@@ -617,7 +617,7 @@ Figure 8 illustrates the zone mass flow components for an air loop system provid
 
 
 
-![](EngineeringReference/media/image134.svg.png)
+![](media/image134.svg.png)
 
 
 
@@ -696,7 +696,7 @@ EnergyPlus models building performance over time spans of days to years using a 
 
 An EnergyPlus simulation covers a certain period of time, such as a day or a year, that is broken down into a series of discrete bins of time that are referred to as *timesteps*. The program marches through time by recalculating model equations at each timestep. The figure below diagrams some of these basic concepts.
 
-![TimeStepDataDefn](EngineeringReference/media/image141.png)
+![TimeStepDataDefn](media/image141.png)
 
 Figure 9. Diagram of TimeStep Formulation
 
