@@ -46,6 +46,7 @@ option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
+option( BUILD_DOCS "Build markdown based documentation" OFF )
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
@@ -319,8 +320,6 @@ endif()
 
 
 
-
-
 if (BUILD_VALIDATION_REPORTS)
   include(ExternalProject)
   ExternalProject_Add(ValidationReports
@@ -332,5 +331,10 @@ if (BUILD_VALIDATION_REPORTS)
       -DENERGYPLUS_VERSION:STRING=${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}
     INSTALL_COMMAND ""
     )
+endif()
+
+
+if (BUILD_DOCS)
+  add_subdirectory(doc/src)
 endif()
 
