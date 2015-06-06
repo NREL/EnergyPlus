@@ -17307,7 +17307,7 @@ Table 12. Winter Clothes (1.0 Clo)
 
 
 
-![](InputOutputReference/media/image084.svg)
+![](InputOutputReference/media/image084.png)
 
 Figure 49. Winter Comfort Range
 
@@ -17339,7 +17339,7 @@ Table 13. Summer Clothes (0.5 Clo)
 </table>
 
 
-![](InputOutputReference/media/image085.svg)
+![](InputOutputReference/media/image085.png)
 
 Figure 50. Summer Comfort Range
 

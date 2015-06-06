@@ -2402,7 +2402,9 @@ Figure 291.  COP of CO<sub>2</sub> Transcritical Cycle vs. Discharge Pressure a
 
 Several researchers have developed correlations to determine the optimum gas cooler pressure in CO<sub>2</sub> refrigeration systems (Chen and Gu 2005; Ge and Tassou 2011; Kauf 1998; Liao and Zhao 2000; Sawalha 2008).  Using a similar curve-fitting procedure, the following optimum gas cooler pressure correlations are used in EnergyPlus:
 
-<div>$${p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} < 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} \ge 27}\end{array}} \right.$$</div>
+<div><!-- $${p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} < 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} \ge 27}\end{array}} \right.$$ --> </div>
+
+<div>$${p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}} {T_{amb}} < 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}} {T_{amb}} \ge 27}\end{array}} \right.$$</div>
 
 where *p<sub>gc</sub>* is the optimum gas cooler pressure (Pa) and *T<sub>amb</sub>* (°C) is the ambient temperature surrounding the gas cooler.  The corresponding gas cooler exit temperature, *T<sub>gco</sub>* (°C), is determined as follows:
 
@@ -2416,7 +2418,9 @@ During transcritical operation, the gas cooler outlet pressure is not allowed to
 
 During subcritical operation, the gas cooler behaves as a condenser and the condensing pressure is allowed to float with the ambient conditions.  The condensing temperature, *T<sub>cond</sub>* (°C), is determined according to the following:
 
-<div>$${T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{cond,min}} - \Delta T < {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} - \Delta T < {T_{amb}} < {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} \le {T_{amb}} < 30.978}\end{array}} \right.$$</div>
+<div> <!--$${T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{cond,min}} - \Delta T < {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} - \Delta T < {T_{amb}} < {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} \le {T_{amb}} < 30.978}\end{array}} \right.$$ --> </div>
+
+<div>$${T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}} {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}} {T_{cond,min}} - \Delta T < {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}} {T_{trans}} - \Delta T < {T_{amb}} < {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}} {T_{trans}} \le {T_{amb}} < 30.978}\end{array}} \right.$$</div>
 
 where *T<sub>amb</sub>* is the ambient temperature (°C), Δ*T* is the temperature difference between the condensing temperature and the ambient temperature (°C), *T<sub>cond</sub>*<sub>,*min*</sub> is the minimum allowable condensing temperature (°C), and *T<sub>trans</sub>* is the ambient air transition temperature between subcritical and transcritical operation (°C).  The condensing pressure, *P<sub>cond</sub>* (Pa), is determined as the saturation pressure corresponding to the condensing temperature.
 
