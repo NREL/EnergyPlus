@@ -52,7 +52,7 @@ Function(AddPDF docName)
 
   add_custom_command(OUTPUT ${output_name}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/media ${CMAKE_BINARY_DIR}/docs/${docName}/media
-    COMMAND ${WKHTMLTOPDF_EXECUTABLE} --disable-smart-shrinking --zoom .75 --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 8 --footer-center [page] --javascript-delay 240000 --outline --outline-depth 3 toc ${${docName}_Inputs} ${output_name}
+    COMMAND ${WKHTMLTOPDF_EXECUTABLE} --disable-smart-shrinking --zoom .75 --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 8 --footer-center [page] --no-stop-slow-scripts --javascript-delay 300000 --outline --outline-depth 3 toc ${${docName}_Inputs} ${output_name} 
     DEPENDS ${${docName}_Inputs}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/docs
     )
