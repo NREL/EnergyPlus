@@ -442,6 +442,7 @@ ADD_SIMULATION_TEST(IDF_FILE VentilatedSlab_SeriesSlabs.idf EPW_FILE USA_IL_Chic
 ADD_SIMULATION_TEST(IDF_FILE VentilationSimpleTest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WaterHeaterDHWPlantLoop.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WaterHeaterHeatPumpStratifiedTank.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE WaterHeaterHeatPumpWrappedCondenser.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WaterHeaterStandAlone.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WaterSideEconomizer_Integrated.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WaterSideEconomizer_NonIntegrated.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
