@@ -297,8 +297,6 @@ namespace PlantChillers {
 	int ChillerConstCOP::performOneTimeInit( const PlantLocation & calledFromLocation )
 	{
 
-		// need to be careful that the one-time init, etc., is at the topology component level!!!!
-		this->performEveryTimeInit( calledFromLocation );
 		auto & thisTopologyComponent = DataPlant::PlantLoop( calledFromLocation.LoopNum ).
 												  LoopSide( calledFromLocation.LoopSideNum ).
 												  Branch( calledFromLocation.BranchNum ).
@@ -316,6 +314,7 @@ namespace PlantChillers {
 			return 1; // so compiler understands we won't get past here
 		}
 
+		
 		// set flow information and assign a setpoint if needed
 		if ( this->FlowMode == ChillerFlowMode::ConstantFlow ) {
 			// reset flow priority
@@ -353,21 +352,6 @@ namespace PlantChillers {
 				DataLoopNode::Node( this->EvapOutletNodeNum ).TempSetPointHi = DataLoopNode::Node( DataPlant::PlantLoop( this->chwLocation.LoopNum ).TempSetPointNodeNum ).TempSetPointHi;
 			}
 		}
-
-		// size the chiller as needed and assign the resulting min/max/opt capacities to the plant topology
-		if ( calledFromLocation.LoopNum == this->chwLocation.LoopNum ) {
-			this->sizeChiller();
-			thisTopologyComponent.MinLoad = 0.0;
-			thisTopologyComponent.MaxLoad = this->NomCap;
-			thisTopologyComponent.OptLoad = this->NomCap;
-		} else {
-			thisTopologyComponent.MinLoad = 0.0;
-			thisTopologyComponent.MaxLoad = 0.0;
-			thisTopologyComponent.OptLoad = 0.0;
-		}
-		thisTopologyComponent.SizFac = this->SizFac;
-		thisTopologyComponent.TempDesCondIn = 0.0;
-		thisTopologyComponent.TempDesEvapOut = 0.0;
 		return 0;
 	}
 
@@ -409,6 +393,31 @@ namespace PlantChillers {
 		return 0;
 	}
 
+	int ChillerConstCOP::performInitLoopEquip( const PlantLocation & calledFromLocation ) {
+		auto & thisTopologyComponent = DataPlant::PlantLoop( calledFromLocation.LoopNum ).
+												  LoopSide( calledFromLocation.LoopSideNum ).
+												  Branch( calledFromLocation.BranchNum ).
+												  Comp( calledFromLocation.CompNum );
+		// do standard initialization
+		this->performEveryTimeInit( calledFromLocation );
+		// size the chiller as needed and assign the resulting min/max/opt capacities to the plant topology
+		if ( calledFromLocation.LoopNum == this->chwLocation.LoopNum ) {
+			this->sizeChiller();
+			thisTopologyComponent.MinLoad = 0.0;
+			thisTopologyComponent.MaxLoad = this->NomCap;
+			thisTopologyComponent.OptLoad = this->NomCap;
+		} else {
+			thisTopologyComponent.MinLoad = 0.0;
+			thisTopologyComponent.MaxLoad = 0.0;
+			thisTopologyComponent.OptLoad = 0.0;
+		}
+		thisTopologyComponent.SizFac = this->SizFac;
+		thisTopologyComponent.TempDesCondIn = 0.0;
+		thisTopologyComponent.TempDesEvapOut = 0.0;
+		return 0;
+	}
+
+
 	int ChillerConstCOP::simulate( const PlantLocation & calledFromLocation, bool const & FirstHVACIteration )
 	{
 		if ( calledFromLocation.LoopNum == this->chwLocation.LoopNum ) {
@@ -448,8 +457,9 @@ namespace PlantChillers {
 		Real64 tmpEvapVolFlowRate = this->EvapVolFlowRate;
 		Real64 tmpCondVolFlowRate = this->CondVolFlowRate;
 		Real64 tmpNomCap = this->NomCap;
-
-		int PltSizCondNum; // Plant Sizing index for condenser loop
+		Real64 NomCapUser = 0.0;
+		
+		int PltSizCondNum = 0; // Plant Sizing index for condenser loop
 		if ( this->condenserType == ChillerCondenserType::WaterCooled ) {
 			PltSizCondNum = DataPlant::PlantLoop( this->condLocation.LoopNum ).PlantSizNum;
 		}
@@ -458,11 +468,10 @@ namespace PlantChillers {
 
 		// size nominal capacity
 		if ( PltSizNum > 0 ) {
-			Real64 tmpNomCap = 0.0;
 			if ( DataSizing::PlantSizData( PltSizNum ).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow ) {
 				Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->chwLocation.LoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( this->chwLocation.LoopNum ).FluidIndex, RoutineName );
 				Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( this->chwLocation.LoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( this->chwLocation.LoopNum ).FluidIndex, RoutineName );
-				Real64 tmpNomCap = Cp * rho * DataSizing::PlantSizData( PltSizNum ).DeltaT * DataSizing::PlantSizData( PltSizNum ).DesVolFlowRate * this->SizFac;
+				tmpNomCap = Cp * rho * DataSizing::PlantSizData( PltSizNum ).DeltaT * DataSizing::PlantSizData( PltSizNum ).DesVolFlowRate * this->SizFac;
 				if ( ! this->NomCapWasAutoSized ) tmpNomCap = this->NomCap;
 			} else {
 				if ( this->NomCapWasAutoSized ) tmpNomCap = 0.0;
@@ -478,7 +487,7 @@ namespace PlantChillers {
 					}
 				} else { // Hard-size with sizing data
 					if ( this->NomCap > 0.0 && tmpNomCap > 0.0 ) {
-						Real64 NomCapUser = this->NomCap;
+						NomCapUser = this->NomCap;
 						if ( DataPlant::PlantFinalSizesOkayToReport ) {
 							ReportSizingManager::ReportSizingOutput( "Chiller:ConstantCOP", this->name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DataGlobals::DisplayExtraWarnings ) {

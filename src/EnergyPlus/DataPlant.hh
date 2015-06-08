@@ -644,7 +644,9 @@ namespace DataPlant {
 		Real64 TempDesEvapOut;
 		std::shared_ptr< PlantComponent > compPtr;
 		PlantLocation thisCompLocation; // stored here at the comp level for convenience later
-		
+		bool myEnvrnFlag;
+		bool oneTimeInit;
+
 		// Default Constructor
 		CompData() :
 			TypeOf_Num( 0 ),
@@ -678,7 +680,9 @@ namespace DataPlant {
 			TempDesCondIn( 0.0 ),
 			TempDesEvapOut( 0.0 ),
 			compPtr( nullptr ),
-			thisCompLocation( PlantLocation( 0, 0, 0, 0 ) )
+			thisCompLocation( PlantLocation( 0, 0, 0, 0 ) ),
+			myEnvrnFlag( true ),
+			oneTimeInit( true )
 		{}
 
 	};

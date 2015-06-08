@@ -27,6 +27,7 @@
 #include <OutputProcessor.hh>
 #include <PlantPipes/PipeHeatTransfer.hh>
 #include <PlantPipes/Pipes.hh>
+#include <PlantChillers/ChillerConstCOP.hh>
 #include <PlantLocation.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
@@ -1008,6 +1009,7 @@ namespace PlantManager {
 							} else if ( LoopSideNum == SupplySide ) {
 								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
+							this_comp.compPtr = PlantChillers::ChillerConstCOP::constCOPChillerFactory( TypeOf_Chiller_ConstCOP, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Boiler:HotWater" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
 							this_comp.GeneralEquipType = GenEquipTypes_Boiler;

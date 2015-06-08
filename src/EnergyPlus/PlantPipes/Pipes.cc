@@ -108,7 +108,12 @@ namespace Pipes {
 		// nothing here
 		return 0;
 	}
-	
+
+	int LocalPipeData::performInitLoopEquip( const PlantLocation & calledFromLocation ) {
+		// nothing here
+		return 0;
+	}
+
 	int LocalPipeData::performOneTimeInit( const PlantLocation & EP_UNUSED(calledFromLocation) ){
 		bool FoundOnLoop = 0;
 		bool errFlag = false;

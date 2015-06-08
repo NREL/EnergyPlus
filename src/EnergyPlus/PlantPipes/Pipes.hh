@@ -47,6 +47,7 @@ namespace Pipes {
 		int performOneTimeInit( const PlantLocation & calledFromLocation );
 		int performBeginEnvrnInit( const PlantLocation & calledFromLocation );
 		int performFirstHVACInit( const PlantLocation & calledFromLocation );
+		int performInitLoopEquip( const PlantLocation & calledFromLocation );
 		int simulate( const PlantLocation & calledFromLocation, bool const & FirstHVACIteration );
 
 	};

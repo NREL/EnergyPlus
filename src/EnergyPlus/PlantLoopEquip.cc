@@ -205,15 +205,15 @@ namespace PlantLoopEquip {
 		//PIPES
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				simulateSingleComponent( sim_component, FirstHVACIteration );
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				simulateSingleComponent( sim_component, FirstHVACIteration );
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				simulateSingleComponent( sim_component, FirstHVACIteration );
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				simulateSingleComponent( sim_component, FirstHVACIteration );
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				simulateSingleComponent( sim_component, FirstHVACIteration );
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
@@ -252,7 +252,7 @@ namespace PlantLoopEquip {
 
 			//CHILLERS
 		} else if ( GeneralEquipType == GenEquipTypes_Chiller ) {
-			if ( ( EquipTypeNum == TypeOf_Chiller_EngineDriven ) || ( EquipTypeNum == TypeOf_Chiller_Electric ) || ( EquipTypeNum == TypeOf_Chiller_ConstCOP ) || ( EquipTypeNum == TypeOf_Chiller_CombTurbine ) ) {
+			if ( ( EquipTypeNum == TypeOf_Chiller_EngineDriven ) || ( EquipTypeNum == TypeOf_Chiller_Electric ) || ( EquipTypeNum == TypeOf_Chiller_CombTurbine ) ) {
 				SimChiller( LoopNum, LoopSideNum, EquipTypeNum, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
@@ -265,6 +265,9 @@ namespace PlantLoopEquip {
 				if ( GetCompSizFac ) {
 					sim_component.SizFac = SizingFac;
 				}
+
+			} else if ( EquipTypeNum == TypeOf_Chiller_ConstCOP ) {
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_Chiller_Absorption ) {
 				SimBLASTAbsorber( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
@@ -356,7 +359,7 @@ namespace PlantLoopEquip {
 				ShowFatalError( "Preceding condition causes termination." );
 			}
 
-			if ( InitLoopEquip && EquipNum == 0 ) {
+			if ( InitLoopEquip && EquipNum == 0 && (EquipTypeNum != TypeOf_Chiller_ConstCOP) ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Chiller=" + sim_component.TypeOf );
 				ShowContinueError( "..Chiller Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
@@ -1082,17 +1085,20 @@ namespace PlantLoopEquip {
 	}
 
 	void
-	simulateSingleComponent( DataPlant::CompData & sim_component, bool firstHVACiteration ) {
-		if ( sim_component.compPtr->oneTimeInit ) {
+	simulateSingleComponent( DataPlant::CompData & sim_component, bool const & firstHVACiteration, bool const & initLoopEquip ) {
+		if ( sim_component.oneTimeInit ) {
 			sim_component.compPtr->performOneTimeInit( sim_component.thisCompLocation );
-			sim_component.compPtr->oneTimeInit = false;
+			sim_component.oneTimeInit = false;
 		}
-		if ( DataGlobals::BeginEnvrnFlag && sim_component.compPtr->myEnvrnFlag ) {
+		if ( DataGlobals::BeginEnvrnFlag && sim_component.myEnvrnFlag ) {
 			sim_component.compPtr->performBeginEnvrnInit( sim_component.thisCompLocation );
-			sim_component.compPtr->myEnvrnFlag = false;
+			sim_component.myEnvrnFlag = false;
 		}
 		if ( !DataGlobals::BeginEnvrnFlag ) {
-			sim_component.compPtr->myEnvrnFlag = true;
+			sim_component.myEnvrnFlag = true;
+		}
+		if ( initLoopEquip ) {
+			sim_component.compPtr->performInitLoopEquip( sim_component.thisCompLocation );
 		}
 		if ( firstHVACiteration ) {
 			sim_component.compPtr->performFirstHVACInit( sim_component.thisCompLocation );
