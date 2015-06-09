@@ -4,6 +4,11 @@
 ! This input file illustrates WATER USE EQUIPMENT objects connected to a WATER HEATER:STRATIFIED object in a simple
 ! plant loop for domestic hot water.
 !
+! Location:                Miami, FL
+!
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7 degC
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2 degC MWB=25.3 degC
+!
 ! Run:      1 short run period.
 ! Building: None.
 ! System:   None.
@@ -29,32 +34,34 @@
     Relative;                !- Coordinate System
 
   Site:Location,
-    CHICAGO_IL_USA_WMO_725300,  !- Name
-    42.00,                   !- Latitude {deg}
-    -87.88,                  !- Longitude {deg}
-    -6.00,                   !- Time Zone {hr}
-    190.00;                  !- Elevation {m}
+    Miami Intl Ap FL USA WMO=722020,  !- Name
+    25.82,                   !- Latitude {deg}
+    -80.30,                  !- Longitude {deg}
+    -5.00,                   !- Time Zone {hr}
+    11.00;                   !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+ ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
+ ! Coldest Month=January
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7 degC
 
   SizingPeriod:DesignDay,
-    CHICAGO Ann Htg 99% Condns DB,  !- Name
+    Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
     1,                       !- Month
     21,                      !- Day of Month
     WinterDesignDay,         !- Day Type
-    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    8.7,                     !- Maximum Dry-Bulb Temperature {C}
     0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    8.7,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063,                   !- Barometric Pressure {Pa}
-    4.9,                     !- Wind Speed {m/s}
-    270,                     !- Wind Direction {deg}
+    101217.,                 !- Barometric Pressure {Pa}
+    3.8,                     !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
     No,                      !- Rain Indicator
     No,                      !- Snow Indicator
     No,                      !- Daylight Saving Time Indicator
@@ -63,28 +70,30 @@
     ,                        !- Diffuse Solar Day Schedule Name
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    0.0;                     !- Sky Clearness
+    0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5°C MWB=23°C
+ ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
+ ! Hottest Month=July
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2 degC MWB=25.3 degC
 
   SizingPeriod:DesignDay,
-    CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name
+    Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
     7,                       !- Month
     21,                      !- Day of Month
     SummerDesignDay,         !- Day Type
-    31.5,                    !- Maximum Dry-Bulb Temperature {C}
-    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    33.2,                    !- Maximum Dry-Bulb Temperature {C}
+    6.7,                     !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    23,                      !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    25.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063,                   !- Barometric Pressure {Pa}
-    5.3,                     !- Wind Speed {m/s}
-    230,                     !- Wind Direction {deg}
+    101217.,                 !- Barometric Pressure {Pa}
+    4.5,                     !- Wind Speed {m/s}
+    140,                     !- Wind Direction {deg}
     No,                      !- Rain Indicator
     No,                      !- Snow Indicator
     No,                      !- Daylight Saving Time Indicator
@@ -93,7 +102,7 @@
     ,                        !- Diffuse Solar Day Schedule Name
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    1.0;                     !- Sky Clearness
+    1.00;                    !- Sky Clearness
 
   RunPeriod,
     April,                   !- Name
@@ -565,7 +574,7 @@
   WaterUse:Equipment,
     Showers,                 !- Name
     Showers,                 !- End-Use Subcategory
-    0.000158,                !- Peak Flow Rate {m3/s}
+    0.000205,                !- Peak Flow Rate {m3/s}
     Showers Flow Schedule,   !- Flow Rate Fraction Schedule Name
     Sinks and Showers Temp Schedule;  !- Target Temperature Schedule Name
 
