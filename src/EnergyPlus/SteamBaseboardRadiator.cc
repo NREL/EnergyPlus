@@ -154,7 +154,6 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 30 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -605,7 +604,6 @@ namespace SteamBaseboardRadiator {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::InitComponentNodes;
@@ -763,7 +761,6 @@ namespace SteamBaseboardRadiator {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-		using DataEnvironment::StdBaroPress;
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatDensityRefrig;
 		using FluidProperties::GetSatSpecificHeatRefrig;
@@ -795,7 +792,6 @@ namespace SteamBaseboardRadiator {
 		Real64 LatentHeatSteam; // latent heat of steam
 		Real64 SteamDensity; // Density of steam
 		Real64 Cp; // local fluid specific heat
-		Real64 tmpSteamVolFlowRateMax; // local temporary design steam flow
 		bool ErrorsFound; // If errors detected in input
 		bool IsAutoSize; // Indicator to autosizing steam flow
 		Real64 SteamVolFlowRateMaxDes; // Design maximum steam volume flow for reporting
@@ -961,7 +957,6 @@ namespace SteamBaseboardRadiator {
 		using FluidProperties::GetSatDensityRefrig;
 		using FluidProperties::GetSatSpecificHeatRefrig;
 		using DataHVACGlobals::SmallLoad;
-		using DataBranchAirLoopPlant::MassFlowTolerance;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1072,7 +1067,6 @@ namespace SteamBaseboardRadiator {
 		// Using/Aliasing
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataEnvironment::StdBaroPress;
 		using PlantUtilities::SafeCopyPlantNode;
 
 		// Locals
@@ -1394,11 +1388,11 @@ namespace SteamBaseboardRadiator {
 	UpdateSteamBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
 		std::string const & BaseboardName, // component name
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int const LoopNum, // Plant loop index for where called from
-		int const LoopSide, // Plant loop side index for where called from
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
+		int const EP_UNUSED( LoopNum ), // Plant loop index for where called from
+		int const EP_UNUSED( LoopSide ), // Plant loop side index for where called from
 		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
 	)
 	{
@@ -1445,8 +1439,6 @@ namespace SteamBaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum;
-		int InletNodeNum;
-		int OutletNodeNum;
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {

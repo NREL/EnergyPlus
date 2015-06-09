@@ -239,7 +239,6 @@ CloseMiscOpenFiles()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	int const MaxUnitNumber( 1000 );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na

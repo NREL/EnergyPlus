@@ -97,7 +97,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-		using DataLoopNode::Node;
 		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;

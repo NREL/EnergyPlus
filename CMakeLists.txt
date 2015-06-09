@@ -6,7 +6,7 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 3 )
-set( CMAKE_VERSION_PATCH 2 )
+set( CMAKE_VERSION_PATCH 3 )
 
 set( PREV_RELEASE_SHA "6d97d07" )
 
@@ -129,6 +129,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/jsoncpp)
 
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
@@ -147,6 +148,7 @@ ADD_SUBDIRECTORY(third_party/DElight)
 IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
+ADD_SUBDIRECTORY(third_party/jsoncpp)
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
@@ -155,6 +157,7 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
+  ADD_SUBDIRECTORY(tst/jsoncpp/unit)
 endif()
 
 if( BUILD_FORTRAN )

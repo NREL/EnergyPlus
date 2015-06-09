@@ -109,9 +109,9 @@ namespace ChillerExhaustAbsorption {
 
 	void
 	SimExhaustAbsorber(
-		std::string const & AbsorberType, // type of Absorber
+		std::string const & EP_UNUSED( AbsorberType ), // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
-		int const EquipFlowCtrl, // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE
 		bool const FirstIteration, // initialize variables when TRUE
@@ -525,7 +525,7 @@ namespace ChillerExhaustAbsorption {
 	void
 	InitExhaustAbsorber(
 		int const ChillNum, // number of the current engine driven chiller being simulated
-		bool const RunFlag // TRUE when chiller operating
+		bool const EP_UNUSED( RunFlag ) // TRUE when chiller operating
 	)
 	{
 
@@ -551,7 +551,6 @@ namespace ChillerExhaustAbsorption {
 		using DataPlant::TypeOf_Chiller_ExhFiredAbsorption;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using PlantUtilities::InitComponentNodes;
@@ -1102,7 +1101,7 @@ namespace ChillerExhaustAbsorption {
 	CalcExhaustAbsorberChillerModel(
 		int & ChillNum, // Absorber number
 		Real64 & MyLoad, // operating load
-		bool const RunFlag // TRUE when Absorber operating
+		bool const EP_UNUSED( RunFlag ) // TRUE when Absorber operating
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1123,9 +1122,6 @@ namespace ChillerExhaustAbsorption {
 		// 2.  CoolTools GasMod work
 
 		// Using/Aliasing
-		using DataGlobals::BeginFullSimFlag;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
-		using DataHVACGlobals::TimeStepSys;
 		using CurveManager::CurveValue;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using DataPlant::DeltaTempTol;
@@ -1145,7 +1141,6 @@ namespace ChillerExhaustAbsorption {
 		// FlowLock = 1  if mass flow rates may not be changed by loop components
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const WaterMassFlowTol( 0.001 ); // kg/s - minimum significan mass flow rate
 		Real64 const AbsLeavingTemp( 176.667 ); // C - Minimum temperature leaving the Chiller absorber (350 F)
 		static std::string const RoutineName( "CalcExhaustAbsorberChillerModel" );
 
@@ -1586,10 +1581,7 @@ namespace ChillerExhaustAbsorption {
 		// 2.  CoolTools GasMod work
 
 		// Using/Aliasing
-		using DataGlobals::BeginFullSimFlag;
 		using DataEnvironment::OutDryBulbTemp;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
-		using DataHVACGlobals::TimeStepSys;
 		using CurveManager::CurveValue;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -1609,7 +1601,6 @@ namespace ChillerExhaustAbsorption {
 		//                 below Setpoint
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const WaterMassFlowTol( 0.001 ); // kg/s - minimum significan mass flow rate
 		Real64 const AbsLeavingTemp( 176.667 ); // C - Minimum temperature leaving the Chiller absorber (350 F)
 		static std::string const RoutineName( "CalcExhaustAbsorberHeaterModel" );
 		//INTEGER    :: ExhTempLTAbsLeavingTempCount      = 0        ! Counter for exhaust temp < absorber leaving air temp warning messages
@@ -1665,8 +1656,6 @@ namespace ChillerExhaustAbsorption {
 		int LoopNum;
 		int LoopSideNum;
 		Real64 Cp_HW; // local fluid specific heat for hot water
-		int GeneratorType;
-		int GenIndex1;
 		Real64 CpAir;
 		Real64 rhoHW; // local fluid density for hot water
 		int lExhaustAirInletNodeNum; // Combustion Air Inlet Node number

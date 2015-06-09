@@ -231,7 +231,6 @@ namespace CrossVentMgr {
 		// -
 
 		// Using/Aliasing
-		using DataRoomAirModel::AirModel;
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
@@ -431,7 +430,6 @@ namespace CrossVentMgr {
 		int Ctd; // counter
 		int Ctd2; // counter
 		int OPtr; // counter
-		static Real64 Win; // Inflow aperture width
 		static Real64 Aroom; // Room area cross section
 		static Real64 Wroom; // Room width
 		Real64 Uin; // Inflow air velocity [m/s]
@@ -787,10 +785,8 @@ namespace CrossVentMgr {
 		using namespace InputProcessor;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataZoneEquipment::ZoneEquipConfig;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
-		using DataHVACGlobals::TimeStepSys;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
 
@@ -798,7 +794,6 @@ namespace CrossVentMgr {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Sigma( 10.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -815,7 +810,6 @@ namespace CrossVentMgr {
 		Real64 ZTAveraged;
 
 		int Ctd;
-		Real64 VolOverAin;
 		Real64 MCpT_Total;
 		Real64 L;
 		Real64 ZoneMult; // total zone multiplier

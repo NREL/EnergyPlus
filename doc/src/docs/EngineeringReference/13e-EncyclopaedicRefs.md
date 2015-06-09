@@ -3043,7 +3043,7 @@ NF = Normalized condenser water flow per unit of tower capacity, m3/W
 
 MinDsnWB is compared against the design tower wetbulb. This curve is usually a function of Weighted PLR and NF. So if NF is constant at 5.382E-8 m3/s (3 gpm/ton), the curve can be depicted as follows:
 
-![闒粀闀粀](EngineeringReference/media/image6482.png)
+![](EngineeringReference/media/image6482.png)
 
 Figure 292. Minimum Tower Design Wet Bulb Boundary Condition
 
@@ -3069,7 +3069,7 @@ where,
 
 MinActualWb is compared against this time step’s outside air wet bulb. This curve is usually a function of MinDesignWB, WeightedRatio and TwrDesignWB. So if TwrDesignWB is constant at 25.6 °C (78 °F), and NF = 5.382E-8 m3/s (3 gpm/ton), the curve can be depicted as follows:
 
-![闒粀闀粀](EngineeringReference/media/image6483.png)
+![](EngineeringReference/media/image6483.png)
 
 Figure 293. Minimum Wet Bulb Boundary Condition
 
@@ -3095,7 +3095,7 @@ where,
 
 A graph of the curve can be depicted as follows:
 
-![闒粀闀粀](EngineeringReference/media/image6484.png)
+![](EngineeringReference/media/image6484.png)
 
 Figure 294. Optimum EWT vs PLR & OaWb
 
@@ -3120,6 +3120,64 @@ The object determines a “near-optimal” condenser water entering set point at
 6)   If Toptset<sub>N</sub> reaches to the minimum boundary value and still dTEC<sub>N</sub> is positive, set the “optimal” setpoint to Toptset<sub>N+1</sub>.
 
 7)   If TEC<sub>N</sub> becomes negative, decrease Toptset<sub>N-1</sub> by 0.2˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC<sub>M</sub>=TEC<sub>M</sub>–TEC<sub>M+1</sub>) until dTEC<sub>M</sub> becomes negative. Then set the “optimal” setpoint to Toptset<sub>M+1</sub>.
+
+### Plant Return Water Control Setpoint Reset
+
+The input objects:
+
+* SetpointManager:ReturnTemperature:ChilledWater, and 
+
+* SetpointManager:ReturnTemperature:HotWater
+
+allow for controlling the temperature of the water (or a different fluid defined for the plant) that is returning back to the plant supply equipment.  In a typical chilled water loop configuration, this is essentially controlling the temperature of the water entering the chiller.  In a typical hot water loop configuration, this is essentially controlling the temperature of the water entering the boiler.
+
+The target return temperature can be specified by:
+
+* providing a constant value to use throughout the simulation, or
+
+* scheduling the value to vary through the simulation (which then allows custom EMS overriding of the scheduled value), or
+
+* using a separate setpoint manager to set the setpoint on the return node itself, which is then retrieved by this reset manager.  
+
+#### Operation
+
+The setpoint manager senses conditions on two named nodes, which should correspond to a central plant's supply side inlet and outlet nodes, the return and supply nodes, respectively.  The temperature and flow rate information is used in a series of calculations in order to determine a setpoint to specify on the supply outlet node which will in turn provide the target desired return temperature on the supply inlet node.  The calculations are summarized for a chilled water loop here:
+
+1. Use the current supply and demand temperatures to calculate an average temperature for property calculation: <span>$C_p = f\left(T_{avg}\right) = f\left(\frac{T_{ret}+T_{sup}}{2}\right)$</span>
+
+2. Calculate the current loop demand using: <span>$\dot{Q} = \dot{m} * C_p * \left(T_{ret} - T_{sup}\right)$</span>
+
+3. Assuming that this load will be the same moving forward, we can calculate what supply temperature we should target in order to meet the desired return temperature.
+
+4. So retrieve the current target return temperature, <span>$T_{ret,target}$</span>, either from a schedule or constant value.
+
+5. Then calculate the supply temperature setpoint using: <span>$T_{sup,sp} = T_{ret,target} - \frac{\dot{Q}}{\dot{m} C_p}$</span>
+
+6. Constrain the value to user-specified limiting min/max values
+
+For a chilled water loop, the user-specified minimum is the default setpoint used in cases of no-load or negative-load.  In a hot-water loop the user-specified maximum is used for these situations.  Also, in a hot-water loop the sign of the demand will be reversed.
+
+#### Key control note
+
+The setpoint will be reset at the beginning of a system time step, and remain that way through that time step.  The setpoint is calculated based on the latest known value of loop demand and loop flow rate.  If the demand and flow rate remain the same for the currently calculated time step, the loop will maintain control well.  However, if either changes, there will be a lag effect while the loop attempts to maintain control.  Consider the following plot, with a short description following:
+
+![](EngineeringReference/media/SetPointManager-ResetForReturnControl1.png)
+
+Throughout the day, the heat addition (green line) to the loop increases.  Each time it increases, there is a small period of time where the loop attempts to regain control of the return temperature.  The setpoint is only reset at the beginning of the system time step, so as the plant converges within a single time step, the load will vary and the return temperature may not be exactly on target.
+
+This isn't necessarily a big problem.  However, some users may be especially interested in very tight control of the return temperature.  This can be done very easily by simply reducing the simulation time step.  For example, in the following plot, the time step was reduced from 10 minutes to 1 minute, with some description following the plot:
+
+![](EngineeringReference/media/SetPointManager-ResetForReturnControl2.png)
+
+With the smaller time step, the reporting frequency is higher.  But more importantly, with the smaller time step, the setpoint can be corrected much more often.  Because of this, the return temperature regains control much quicker than with the larger time step.  
+
+However, these examples are for a jagged demand profile full of discontinuous step changes in loop demand.  As a final example, this return water temperature control is applied to the large office reference building chilled water loop.  Here is the response:
+
+![](EngineeringReference/media/SetPointManager-ResetForReturnControl3.png)
+
+Note the control is working properly, maintaining a return temperature around the target of 12 degrees where possible.  Since the load profile is a typical -smooth- profile, the control is also much smoother.  This should be a good representation of the capabilities of this setpoint manager.
+
+For jagged load profiles, if tight control is highly important, choosing a smaller timestep (~1 minute) is recommended.  For normal building profiles, the typical range of timesteps (~15 minute) should be fully satisfactory.
 
 Solar Collectors <a name="SolarCollectors"></a>
 ----------------

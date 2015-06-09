@@ -249,14 +249,12 @@ namespace UnitHeater {
 		using WaterCoils::GetCoilWaterInletNode;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetSteamCoilIndex;
-		using DataZoneEquipment::UnitHeater_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSizing::AutoSize;
 		using General::TrimSigDigits;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataHVACGlobals::ZoneComp;
 		using DataGlobals::NumOfZones;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -581,7 +579,7 @@ namespace UnitHeater {
 	InitUnitHeater(
 		int const UnitHeatNum, // index for the current unit heater
 		int const ZoneNum, // number of zone being served
-		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if 1st HVAC simulation of system timestep
 	)
 	{
 
@@ -602,7 +600,6 @@ namespace UnitHeater {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
@@ -839,7 +836,6 @@ namespace UnitHeater {
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingAirflowSizing;
 		using DataHVACGlobals::HeatingCapacitySizing;
-		using DataHVACGlobals::HeatingWaterflowSizing;
 		using DataHeatBalance::Zone;
 
 		// Locals

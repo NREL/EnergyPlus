@@ -411,7 +411,6 @@ namespace DaylightingDevices {
 		using InputProcessor::FindItemInList;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
-		using DataDaylighting::ZoneDaylight;
 		using General::RoundSigDigits;
 		using General::SafeDivide;
 
@@ -1382,7 +1381,6 @@ namespace DaylightingDevices {
 		using DataHeatBalance::QRadSWwinAbs;
 		using DataHeatBalance::QRadSWwinAbsTot;
 		using DataHeatBalance::QS;
-		using DataHeatBalance::ZoneIntGain;
 		using DataSurfaces::WinTransSolar;
 
 		// Locals

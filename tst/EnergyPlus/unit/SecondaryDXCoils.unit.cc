@@ -167,7 +167,6 @@ TEST( SecondaryDXHeatingCoilMultiSpeed, Test5 ) {
 
 	// tests secondary DX coil calculation of multi speed heat pump
 	int DXCoilNum;
-	int NumOfSpeed;
 
 	NumDXCoils = 1;
 	DXCoilNum = 1;

@@ -189,7 +189,6 @@ namespace EnergyPlus {
 	{
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
-		using DataEnvironment::EndMonthFlag;
 		using DataEnvironment::CurrentOverallSimDay;
 		using DataEnvironment::TotalOverallSimDays;
 		using General::TrimSigDigits;

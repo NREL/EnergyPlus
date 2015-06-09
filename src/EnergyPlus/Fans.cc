@@ -900,7 +900,7 @@ namespace Fans {
 	void
 	InitFan(
 		int const FanNum,
-		bool const FirstHVACIteration // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // unused1208
 	)
 	{
 
@@ -3066,7 +3066,7 @@ namespace Fans {
 	Real64
 	FanDesDT(
 		int const FanNum, // index of fan in Fan array
-		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+		Real64 const EP_UNUSED( FanVolFlow ) // fan volumetric flow rate [m3/s]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3098,7 +3098,6 @@ namespace Fans {
 		Real64 TotEff; // fan design total efficiency
 		Real64 MotEff; // fan design motor efficiency
 		Real64 MotInAirFrac; // fraction of motor in the air stream
-		Real64 PowerLossToAir; // fan and motor loss to air stream (W)
 		//
 		if ( FanNum == 0 ) {
 			DesignDeltaT = 0.0;
@@ -3148,8 +3147,6 @@ namespace Fans {
 		Real64 DesignHeatGain; // returned heat gain of matched fan [W]
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 RhoAir; // density of air [kg/m3]
-		Real64 CpAir;  // specific heat of air [J/kg-K]
 		Real64 DeltaP; // fan design pressure rise [N/m2]
 		Real64 TotEff; // fan design total efficiency
 		Real64 MotEff; // fan design motor efficiency

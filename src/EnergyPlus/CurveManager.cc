@@ -2604,7 +2604,6 @@ namespace CurveManager {
 		using General::RoundSigDigits;
 		using DataGlobals::DisplayAdvancedReportVariables;
 		using DataGlobals::OutputFileInits;
-		using DataSystemVariables::iASCII_CR;
 		using DataSystemVariables::iUnicode_end;
 		using DataSystemVariables::GoodIOStatValue;
 		using DataSystemVariables::TempFullFileName;

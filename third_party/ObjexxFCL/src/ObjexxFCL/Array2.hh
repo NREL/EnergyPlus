@@ -88,7 +88,6 @@ public: // Types
 	using Super::slice_k;
 	using Super::swapB;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
@@ -911,7 +910,7 @@ public: // Subscript
 	{
 		assert( contains( i1, i2 ) );
 		size_type const offset( ( ( i1 * z2_ ) + i2 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), ( data_size_ != npos ? data_size_ - offset : npos ) );
+		return Tail( static_cast< T const * >( data_ + offset ), ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 	// Tail Starting at array( i1, i2 )
@@ -921,7 +920,7 @@ public: // Subscript
 	{
 		assert( contains( i1, i2 ) );
 		size_type const offset( ( ( i1 * z2_ ) + i2 ) - shift_ );
-		return Tail( data_ + offset, ( data_size_ != npos ? data_size_ - offset : npos ) );
+		return Tail( data_ + offset, ( size_ != npos ? size_ - offset : npos ) );
 	}
 
 public: // Slice Proxy Generators
@@ -1366,10 +1365,9 @@ public: // Modifier
 	Array2 &
 	right_multiply_by( Array2< U > const & a )
 	{
-		size_type const as1( a.z1_ );
 		size_type const as2( a.z2_ );
-		assert( z2_ == as1 );
-		assert( as1 == as2 ); // Square so that this array's dimensions aren't changed
+		assert( z2_ == a.z1_ );
+		assert( a.z1_ == as2 ); // Square so that this array's dimensions aren't changed
 		Array2 & t( *this ); // Shorthand name for this array
 		T * const r( new T[ z2_ ] ); // Temporary row
 		for ( size_type i = 0; i < z1_; ++i ) {
@@ -1395,9 +1393,8 @@ public: // Modifier
 	right_multiply_by_transpose( Array2< U > const & a )
 	{
 		size_type const as1( a.z1_ );
-		size_type const as2( a.z2_ );
-		assert( z2_ == as2 );
-		assert( as1 == as2 ); // Square so that this array's dimensions aren't changed
+		assert( z2_ == a.z2_ );
+		assert( as1 == a.z2_ ); // Square so that this array's dimensions aren't changed
 		Array2 & t( *this ); // Shorthand name for this array
 		T * const r( new T[ z2_ ] ); // Temporary row
 		for ( size_type i = 0; i < z1_; ++i ) {

@@ -31,7 +31,6 @@ TEST( AirflowNetworkSolverTest, HorizontalOpening )
 
 	int i = 1;
 	int j = 1;
-	int CurveNum;
 	int n;
 	int m;
 	int NF;

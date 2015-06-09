@@ -14843,6 +14843,10 @@ Simulation order for setpoint managers:
 
 - SetpointManager:OutdoorAirPretreat
 
+- SetpointManager:ReturnTemperature:ChilledWater,
+
+- SetpointManager:ReturnTemperature:HotWater
+
 ### SetpointManager:Scheduled
 
 The simplest Setpoint Manager simply uses a schedule to determine one or more setpoints. No node data is used as input. The input consists of the Setpoint Manager name, the control variable, the schedule name, and the name of a node list. The node list contains the name of those nodes at which the setpoint is to be applied. Of course, a node list name can always be simply the name of a single node.
@@ -16285,9 +16289,143 @@ SetpointManager:SingleZone:OneStageHeating,
        Main Heating Coil 2 Air Outlet Node ; !- Setpoint Node or NodeList Name
 ```
 
+### SetpointManager:ReturnTemperature:ChilledWater
 
+This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment.  This setpoint manager is specifically for "chilled water" (although it could be any fluid) applications.  This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what set-point temperature would provide the desired target return temperature.
 
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  However, as described in the EngineeringReference, for most realistic building profiles the control works quite well under normal timestep size.  If your load profile is highly jagged with step changes in demand, a smaller timestep could help achieve tight control.
 
+#### Field: Name
+
+This alpha field is a unique, user-assigned name for an instance of a chilled water return temperature reset setpoint manager.
+
+#### Plant Loop Supply Outlet Node
+
+This alpha field is the name of the plant loop supply side outlet node for the plant being managed by this setpoint manager.  The current temperature of this node is sensed in order to calculate current loop demand.  This node is typically also where the plant loop setpoint is specified, but not necessarily.  This setpoint manager looks up the actual setpoint node from the PlantLoop internal data structures as it is specified on the PlantLoop object.  If the plant loop setpoint is on a different node than the supply outlet node, the loop may not maintain return temperature control as expected.
+
+#### Plant Loop Supply Inlet Node
+
+This alpha field is the name of the plant loop supply side inlet node whose temperature is controlled using this setpoint manager by resetting the supply setpoint temperature.  The current temperature of this node is also sensed in order to calculate current loop demand.
+
+#### Minimum Supply Temperature Setpoint
+
+This numeric field plays multiple roles.  During initialization, such as before the plant data structures are fully established, this is used as the default plant supply setpoint temperature.  During normal calculation, this is used as the minimum chilled water supply temperature to avoid resetting the setpoint too low.  During times of no-load, or odd conditions such as a negative load, the setpoint is reset to this design setpoint.
+
+#### Maximum Supply Temperature Setpoint
+
+This numeric field is the maximum value to which the supply setpoint can be reset.  This ensures that the chilled water temperature does not go too high during reset operations.
+
+#### Return Temperature Setpoint Input Type
+
+This alpha field must be one of three strings: "Constant", "Scheduled", or "ReturnTemperatureSetpoint".  If the choice is "Constant", the constant value in the next field is used as the target return temperature.  If the choice is "Scheduled", the current value of the schedule named in the following field is used as the target return temperature.  If the choice is "ReturnTemperatureSetpoint", the actual setpoint temperature on the "Plant Loop Supply Inlet Node" specified above is retrieved and used as the target return temperature.  This is convenient as a separate setpoint manager could be established to pre-calculate the desired return temperature, and will assign the Setpoint internally.  Then when this return temperature manager executes, the setpoint will be updated and utilized.
+
+#### Return Temperature Setpoint Constant Value
+
+If the "Return Temperature Setpoint Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
+
+#### Return Temperature Setpoint Schedule Name
+
+If the "Return Temperature Setpoint Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
+
+An example idf input for a constant return reset setpoint manager is shown here:
+
+```idf
+  SetpointManager:ReturnTemperature:ChilledWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    7.0,                     !- Minimum Supply Temperature Setpoint
+    10.0,                    !- Maximum Supply Temperature Setpoint
+    Constant,                !- Return Temperature Setpoint Input Type
+    12.0,                    !- Return Temperature Setpoint Constant Value
+    ;                        !- Return Temperature Setpoint Schedule Name
+```
+
+Another example which uses the "ReturnTemperatureSetpoint" is shown here with the accompanying setpoint being used to set the setpoint on the return node:
+
+```
+  SetpointManager:Scheduled,
+    Return Temperature Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    Return Temperature Sch,  !- Schedule Name
+    Supply Inlet Node;       !- Setpoint Node or NodeList Name
+
+  Schedule:Constant,
+    Return Temperature Sch,  !- Name
+    Any Number,              !- Schedule Limits
+    11.75;                   !- Value
+
+  SetpointManager:ReturnTemperature:ChilledWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    7.0,                     !- Minimum Supply Temperature Setpoint
+    10.0,                    !- Maximum Supply Temperature Setpoint
+    ReturnTemperatureSetpoint, !- Return Temperature Setpoint Input Type
+    ,                        !- Return Temperature Setpoint Constant Value
+    ;                        !- Return Temperature Setpoint Schedule Name
+```
+
+### SetpointManager:ReturnTemperature:HotWater
+
+This setpoint manager allows for the central plant simulation in EnergyPlus to target a specific return water temperature entering the plant supply equipment.  This setpoint manager is specifically for "hot water" (although it could be any fluid) applications.  This setpoint manager senses the current supply and return temperatures, calculates the current demand on the loop, and assuming this load remains constant for this time step, it predicts what supply set-point temperature would provide the desired target return temperature.
+
+Because this is predictive, and the setpoint is only updated once per system timestep (frequency of the call to ManageSetPoints), the longer the time step, the less accurate the prediction will be.  To make tighter control, the time step can be reduced down even to one minute.  However, as described in the EngineeringReference, for most realistic building profiles the control works quite well under normal timestep size.  If your load profile is highly jagged with step changes in demand, a smaller timestep could help achieve tight control.
+
+#### Field: Name
+
+This alpha field is a unique, user-assigned name for an instance of a hot water return temperature reset setpoint manager.
+
+#### Plant Loop Supply Outlet Node
+
+This alpha field is the name of the plant loop supply side outlet node for the plant being managed by this setpoint manager.  The current temperature of this node is sensed in order to calculate current loop demand.  This node is typically also where the plant loop setpoint is specified, but not necessarily.  This setpoint manager looks up the actual setpoint node from the PlantLoop internal data structures as it is specified on the PlantLoop object.  If the plant loop setpoint is on a different node than the supply outlet node, the loop may not maintain return temperature control as expected.
+
+#### Plant Loop Supply Inlet Node
+
+This alpha field is the name of the plant loop supply side inlet node whose temperature is controlled using this setpoint manager by resetting the supply setpoint temperature.  The current temperature of this node is also sensed in order to calculate current loop demand.
+
+#### Minimum Supply Temperature Setpoint
+
+This numeric field is the minimum value to which the supply setpoint can be reset.  This ensures that the hot water temperature does not go too low during reset operations.
+
+#### Maximum Supply Temperature Setpoint
+
+This numeric field plays multiple roles.  During initialization, such as before the plant data structures are fully established, this is used as the default plant supply setpoint temperature.  During normal calculation, this is used as the maximum hot water supply temperature to avoid resetting the setpoint too high.  During times of no-load, or odd conditions such as a negative load, the setpoint is reset to this design setpoint.
+
+#### Return Temperature Setpoint Input Type
+
+This alpha field must be one of three strings: "Constant", "Scheduled", or "ReturnTemperatureSetpoint".  If the choice is "Constant", the constant value in the next field is used as the target return temperature.  If the choice is "Scheduled", the current value of the schedule named in the following field is used as the target return temperature.  If the choice is "ReturnTemperatureSetpoint", the actual setpoint temperature on the "Plant Loop Supply Inlet Node" specified above is retrieved and used as the target return temperature.  This is convenient as a separate setpoint manager could be established to pre-calculate the desired return temperature, and will assign the Setpoint internally.  Then when this return temperature manager executes, the setpoint will be updated and utilized.
+
+#### Return Temperature Setpoint Constant Value
+
+If the "Return Temperature Setpoint Input Type" field is "constant", the numeric value entered here is used as the target return temperature throughout the simulation.
+
+#### Return Temperature Setpoint Schedule Name
+
+If the "Return Temperature Setpoint Input Type" field is "scheduled", this alpha field defines the name of a user-defined schedule storing values of return target temperature.  The "current" value is looked up throughout the simulation.  This is especially useful as EMS can be employed to do additional sensing and override the schedule value in a given timestep to a new dynamically-calculated return temperature.
+
+An example idf input for a scheduled return reset setpoint manager is shown here:
+
+```idf
+  SetpointManager:ReturnTemperature:HotWater,
+    Main Loop Setpoint Manager, !- Name
+    Supply Outlet Node,      !- Plant Loop Supply Outlet Node
+    Supply Inlet Node,       !- Plant Loop Supply Inlet Node
+    57.0,                    !- Minimum Supply Temperature Setpoint
+    60.0,                    !- Maximum Supply Temperature Setpoint
+    Scheduled,               !- Return Temperature Setpoint Input Type
+    ,                        !- Return Temperature Setpoint Constant Value
+    ReturnTempSchedule;      !- Return Temperature Setpoint Schedule Name
+
+  Schedule:Compact,
+    ReturnTempSchedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 12:00, 55,        !- Field 3
+    UNTIL: 17:00, 53,        !- Field 3
+    UNTIL: 24:00, 55;        !- Field 3
+```
 
 Group     Controllers
 -------------------
@@ -16316,7 +16454,7 @@ This was setup to be generic but to date has only been used for temperature cont
 
 #### Field: Action
 
-The next input refers to the    action    of the control. This can be best described by an example. In a coil where water mass flow rate is to be controlled, a coil will increase the mass flow rate through the coil when more heating or cooling is requested. In a heating coil, this increases the value of heat transfer from the water to the air stream. As a result, this is considered a    Normal    action controller. In a cooling coil, an increase in water mass flow rate through the coil decreases the value of heat transfer from the water to the air stream (absolute value increases, but since cooling is traditionally described as a negative number, an increase in absolute value results in a decrease in the actual heat transfer value). Thus, the cooling coil controller has    Reverse    action since an increase in flow rate results in a decrease in heat transfer.
+The next input refers to the action of the control. This can be best described by an example. In a coil where water mass flow rate is to be controlled, a coil will increase the mass flow rate through the coil when more heating or cooling is requested. In a heating coil, this increases the value of heat transfer from the water to the air stream. As a result, this is considered a    Normal    action controller. In a cooling coil, an increase in water mass flow rate through the coil decreases the value of heat transfer from the water to the air stream (absolute value increases, but since cooling is traditionally described as a negative number, an increase in absolute value results in a decrease in the actual heat transfer value). Thus, the cooling coil controller has    Reverse    action since an increase in flow rate results in a decrease in heat transfer.
 
 #### Field: Actuator Variable
 

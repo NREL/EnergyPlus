@@ -87,11 +87,11 @@ namespace WindTurbine {
 
 	void
 	SimWindTurbine(
-		int const GeneratorType, // Type of Generator
+		int const EP_UNUSED( GeneratorType ), // Type of Generator
 		std::string const & GeneratorName, // User specified name of Generator
 		int & GeneratorIndex, // Generator index
 		bool const RunFlag, // ON or OFF
-		Real64 const WTLoad // Electrical load on WT (not used)
+		Real64 const EP_UNUSED( WTLoad ) // Electrical load on WT (not used)
 	)
 	{
 
@@ -113,7 +113,6 @@ namespace WindTurbine {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using DataGlobalConstants::iGeneratorWindTurbine;
 		using General::TrimSigDigits;
 		// na
 
@@ -165,7 +164,7 @@ namespace WindTurbine {
 
 	void
 	GetWTGeneratorResults(
-		int const GeneratorType, // Type of Generator
+		int const EP_UNUSED( GeneratorType ), // Type of Generator
 		int const GeneratorIndex, // Generator number
 		Real64 & GeneratorPower, // Electrical power
 		Real64 & GeneratorEnergy, // Electrical energy
@@ -608,7 +607,6 @@ namespace WindTurbine {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		int OpenStatus; // Open status of stat file
 		int ReadStatus; // Reading status of stat file
 		int statFile; // Weather Stat File
 		std::string::size_type lnPtr; // scan pointer for Line input
@@ -717,7 +715,7 @@ namespace WindTurbine {
 	void
 	CalcWindTurbine(
 		int const WindTurbineNum, // System is on
-		bool const RunFlag // System is on
+		bool const EP_UNUSED( RunFlag ) // System is on
 	)
 	{
 
@@ -742,7 +740,6 @@ namespace WindTurbine {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using Psychrometrics::PsyWFnTdbTwbPb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::WindSpeed;
 		using DataEnvironment::WindSpeedAt;
 		using DataEnvironment::OutDryBulbTempAt;
@@ -755,9 +752,7 @@ namespace WindTurbine {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MaxTheta( 90.0 ); // Maximum of theta
 		Real64 const MaxDegree( 360.0 ); // Maximum limit of outdoor air wind speed in m/s
-		Real64 const PitchAngle( 0.0 ); // No pitch control, i.e. maximum rotor speed
 		Real64 const SecInMin( 60.0 );
-		Real64 const MaxTSR( 12.0 ); // Maximum of tip speed ratio
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -793,7 +788,6 @@ namespace WindTurbine {
 		Real64 TanForceCoeff; // Tnagential force coefficient
 		Real64 NorForceCoeff; // Normal force coefficient
 		Real64 Period; // Period of sine and cosine functions
-		Real64 Integrand; // Integrand of tangential force
 		Real64 C1; // Empirical power coefficient C1
 		Real64 C2; // Empirical power coefficient C2
 		Real64 C3; // Empirical power coefficient C3

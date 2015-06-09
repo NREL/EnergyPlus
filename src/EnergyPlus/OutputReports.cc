@@ -302,7 +302,6 @@ DXFOut(
 	using DataDaylighting::ZoneDaylight;
 	using DataDaylighting::TotIllumMaps;
 	using DataDaylighting::IllumMapCalc;
-	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using namespace DXFEarClipping;
@@ -832,7 +831,6 @@ DXFOutLines( std::string const & ColorScheme )
 	using namespace DataSurfaces;
 	using namespace DataSurfaceColors;
 	using DataDaylighting::ZoneDaylight;
-	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using General::TrimSigDigits;
@@ -1258,7 +1256,6 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	using namespace DataSurfaces;
 	using namespace DataSurfaceColors;
 	using DataDaylighting::ZoneDaylight;
-	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using General::TrimSigDigits;
@@ -1693,7 +1690,6 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	std::string SolarDiffusing;
 	int fd;
 	std::string AlgoName;
-	bool isWithConvCoefValid;
 
 	// Formats
 	static gio::Fmt Format_700( "('! <Zone/Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
@@ -2169,7 +2165,6 @@ VRMLOut(
 	using DataHeatBalance::Zone;
 	using namespace DataSurfaces;
 	using DataDaylighting::ZoneDaylight;
-	using DataGlobals::DegToRadians;
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using namespace DXFEarClipping;

@@ -178,7 +178,6 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using DataPlant::PlantFirstSizesOkayToFinalize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -775,7 +774,7 @@ namespace FluidCoolers {
 	void
 	InitFluidCooler(
 		int const FluidCoolerNum, // Number of the current fluid cooler being simulated
-		bool const RunFlag // TRUE if fluid cooler is ON
+		bool const EP_UNUSED( RunFlag ) // TRUE if fluid cooler is ON
 	)
 	{
 
@@ -797,13 +796,10 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		//  USE Psychrometrics,  ONLY: PsyTwbFnTdbWPb
-		//  USE FluidProperties, ONLY : GetDensityGlycol
 		using InputProcessor::SameString;
 		using DataPlant::TypeOf_FluidCooler_SingleSpd;
 		using DataPlant::TypeOf_FluidCooler_TwoSpd;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -826,7 +822,6 @@ namespace FluidCoolers {
 		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool OneTimeFlagForEachFluidCooler;
-		bool FatalError;
 		int TypeOf_Num( 0 );
 		int LoopNum;
 		int LoopSideNum;

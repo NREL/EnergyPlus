@@ -259,7 +259,6 @@ namespace WaterToAirHeatPump {
 		int NumCool;
 		int NumHeat;
 		int WatertoAirHPNum;
-		int NumFluids;
 		int NumAlphas;
 		int NumParams;
 		int NumNums;
@@ -634,9 +633,6 @@ namespace WaterToAirHeatPump {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// REAL(r64), PARAMETER        :: CpWater=4210.d0          ! Specific heat of water J/kg_C
-		Real64 const TempTOL( 0.2 ); // air temperature tolerance to trigger resimulation
-		Real64 const EnthTOL( 0.2 ); // air enthalpy tolerance to trigger resimulation
-		Real64 const HumRatTOL( 0.2 ); // air humidity ratio tolerance
 		static std::string const RoutineName( "InitWatertoAirHP" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -655,7 +651,6 @@ namespace WaterToAirHeatPump {
 		static Array1D_bool MyEnvrnFlag;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		Real64 Temptemp;
 		bool errFlag;
 
 		if ( MyOneTimeFlag ) {
@@ -844,7 +839,7 @@ namespace WaterToAirHeatPump {
 		int const CyclingScheme, // fan/compressor cycling scheme indicator
 		bool const FirstHVACIteration, // first iteration flag
 		Real64 const RuntimeFrac,
-		bool const InitFlag, // suppress property errors if true
+		bool const EP_UNUSED( InitFlag ), // suppress property errors if true
 		Real64 const SensDemand,
 		int const CompOp,
 		Real64 const PartLoadRatio
@@ -888,7 +883,6 @@ namespace WaterToAirHeatPump {
 		Real64 const gamma( 1.114 ); // Expansion Coefficient
 		Real64 const RelaxParam( 0.5 ); // Relaxation Parameter
 		Real64 const ERR( 0.01 ); // Error Value
-		Real64 const ERR1( 0.001 ); // Error Value
 		Real64 const PB( 1.013e5 ); // Barometric Pressure (Pa)
 
 		int const STOP1( 100000 ); // Iteration stopper1
@@ -1009,7 +1003,6 @@ namespace WaterToAirHeatPump {
 		Real64 SHReff; // Effective sensible heat ratio at part-load condition
 		Array1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
 		int SolFlag; // Solution flag returned from RegulaFalsi function
-		static bool ErrorsFound( false );
 		static bool firstTime( true );
 		static Real64 LoadSideInletDBTemp_Init; // rated conditions
 		static Real64 LoadSideInletHumRat_Init; // rated conditions
@@ -1514,7 +1507,7 @@ namespace WaterToAirHeatPump {
 		int const CyclingScheme, // fan/compressor cycling scheme indicator
 		bool const FirstHVACIteration, // first iteration flag
 		Real64 const RuntimeFrac,
-		bool const InitFlag, // first iteration flag
+		bool const EP_UNUSED( InitFlag ), // first iteration flag
 		Real64 const SensDemand,
 		int const CompOp,
 		Real64 const PartLoadRatio
@@ -1553,8 +1546,6 @@ namespace WaterToAirHeatPump {
 		Real64 const gamma( 1.114 ); // Expnasion Coefficient
 		Real64 const RelaxParam( 0.5 ); // Relaxation Parameter
 		Real64 const ERR( 0.01 ); // Error Value
-		Real64 const ERR1( 0.01 ); // Error Value
-		Real64 const PB( 1.013e5 ); // Barometric Pressure (Pa)
 		int const STOP1( 10000 ); // Iteration stopper1
 		int const STOP2( 100000 ); // Iteration stopper2
 		int const STOP3( 100000 ); // Iteration stopper3

@@ -617,8 +617,6 @@ namespace HVACManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		bool const IsPlantLoop( true );
-		bool const NotPlantLoop( false );
 		bool const SimWithPlantFlowUnlocked( false );
 		bool const SimWithPlantFlowLocked( true );
 
@@ -635,7 +633,6 @@ namespace HVACManager {
 		static int ErrCount( 0 ); // Number of times that the maximum iterations was exceeded
 		static bool MySetPointInit( true );
 		std::string CharErrOut; // a character string equivalent of ErrCount
-		int que;
 		static int MaxErrCount( 0 );
 		static std::string ErrEnvironmentName;
 		int LoopNum;
@@ -646,7 +643,6 @@ namespace HVACManager {
 		int StackDepth;
 		std::string HistoryStack;
 		std::string HistoryTrace;
-		int ZoneInSysIndex;
 		Real64 SlopeHumRat;
 		Real64 SlopeMdot;
 		Real64 SlopeTemps;
@@ -1471,8 +1467,6 @@ namespace HVACManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxAir( 5 ); // Iteration Max for Air Simulation Iterations
-		int const MaxPlant( 3 ); // Iteration Max for Plant Simulation Iteration
-		int const MaxCond( 3 ); // Iteration Max for Plant Simulation Iteration
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1637,7 +1631,6 @@ namespace HVACManager {
 		// na
 
 		// Using/Aliasing
-		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1697,7 +1690,6 @@ namespace HVACManager {
 		// na
 
 		// Using/Aliasing
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataConvergParams::HVACFlowRateToler;
 
 		// Locals
@@ -2043,7 +2035,6 @@ namespace HVACManager {
 
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
@@ -2623,7 +2614,6 @@ namespace HVACManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
-		int ZoneIndex;
 		int NodeIndex;
 		int NodeNum;
 		Array1D< Real64 > tmpRealARR( ConvergLogStackDepth );
