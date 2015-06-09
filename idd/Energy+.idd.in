@@ -63797,33 +63797,33 @@ GroundHeatExchanger:Slinky,
         \units m3/s
         \minimum> 0
         \default 0.002
-   N4 , \field Soil Thermal Conductivity
+   N2 , \field Soil Thermal Conductivity
         \type real
         \units W/m-K
         \minimum> 0
         \default 1.08        
-   N2 , \field Soil Density
+   N3 , \field Soil Density
         \type real
         \units kg/m3
         \minimum> 0
         \default 962
-   N3,  \field Soil Specific Heat
+   N4,  \field Soil Specific Heat
         \required-field
         \type real
         \units J/kg-K
         \minimum> 0
         \default 2576
-   N7,  \field Pipe Thermal Conductivity
+   N5,  \field Pipe Thermal Conductivity
         \type real
         \units W/m-K
         \minimum> 0
         \default 0.4
-   N5,  \field Pipe Density
+   N6,  \field Pipe Density
         \type real
         \units kg/m3
         \minimum> 0
         \default 641
-   N6,  \field Pipe Specific Heat
+   N7,  \field Pipe Specific Heat
         \type real
         \units J/kg-K
         \minimum> 0
@@ -63852,14 +63852,14 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 1.0       
-   N7 , \field Coil Pitch
+   N11, \field Coil Pitch
         \note This is the center-to-center distance between coils
         \type real
         \units m
         \minimum> 0
         \ip-units ft
         \default 0.20   
-   N7 , \field Trench Depth
+   N12, \field Trench Depth
         \note This is the distance from the ground surface to the
         \note trench bottom
         \type real
@@ -63867,7 +63867,7 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 1.8     
-   N2 , \field Trench Length
+   N13, \field Trench Length
         \note This is the total length of a single trench
         \note This assumes the heat exchanger runs the full length 
         \note of the trench
@@ -63876,13 +63876,13 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 10 
-   N3 , \field Number of Trenches
+   N14, \field Number of Trenches
         \note This is the number of parallel trenches that 
         \note has a heat exchanger, one per trench
         \type integer
         \minimum 1
         \default 1
-   N4 , \field Horizontal Spacing Between Pipes
+   N15, \field Horizontal Spacing Between Pipes
         \note This represents the average horizontal spacing 
         \note between any two
         \note trenches for heat exchangers that have multiple trenches
