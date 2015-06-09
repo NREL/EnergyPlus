@@ -58,9 +58,10 @@ TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 	
 }
 
-TEST( WaterThermalTankData, getDeadBandTemp )
+TEST( WaterThermalTankData, GetDeadBandTemp )
 {
 
+	ShowMessage( "Begin Test: WaterThermalTankData, GetDeadBandTemp" );
 	WaterThermalTanks::WaterThermalTankData thisTank;
 	thisTank.SetPointTemp = 10;
 	thisTank.DeadBandDeltaTemp = 1;
