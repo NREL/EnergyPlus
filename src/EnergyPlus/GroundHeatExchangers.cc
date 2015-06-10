@@ -243,7 +243,7 @@ namespace GroundHeatExchangers {
 			// Initialize HX
 			thisGLHE.initGLHESimVars();
 
-			// Simulat HX
+			// Simulate HX
 			thisGLHE.calcGroundHeatExchanger();
 
 			// Update HX Report Vars

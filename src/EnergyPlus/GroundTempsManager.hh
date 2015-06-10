@@ -10,10 +10,10 @@
 
 namespace EnergyPlus {
 
-namespace GroundTempsManager {
+namespace GroundTemps {
 
-	int objectType_Kusuda( 1 );
-	int objectType_FiniteDiff( 2 );
+	//int objectType_Kusuda( 1 );
+	//int objectType_FiniteDiff( 2 );
 
 	// Base class
 	class BaseGroundTempsModel
@@ -30,8 +30,10 @@ namespace GroundTempsManager {
 
 		// Virtual method for retrieving the ground temp
 		virtual Real64
-		getCurrentGroundTemp( 
-			Real64
+		getGroundTemp( 
+			Real64 const,
+			Real64 const,
+			Real64 const
 		)=0;
 
 	};
@@ -40,12 +42,20 @@ namespace GroundTempsManager {
 	class KusudaGroundTempsModel : public BaseGroundTempsModel
 	{
 		public:
-			// Members
-			int objectType;
+			// Public Members
+			int objectType = 1;
+
+		private:
+			// Private Members
+			Real64 aveGroundTemp;
+			Real64 aveGroundTempAmplitude;
+			Real64 phaseShiftInDays;
 
 		Real64
-		getCurrentGroundTemp(
-			Real64 const depth
+		getGroundTemp(
+			Real64 const depth,
+			Real64 const diffusivityGround,
+			Real64 const optionalSimTime = -1
 		);
 
 		static std::shared_ptr< KusudaGroundTempsModel > KusudaGTMFactory( int objectType, std::string objectName);
@@ -55,6 +65,10 @@ namespace GroundTempsManager {
 	// Derived class for Finite-Difference Model
 	class FiniteDiffGroundTempsModel : public BaseGroundTempsModel {
 		
+		public:
+			// Public Members
+			int objectType = 2;
+
 		struct Cell {
 			Real64 Density;
 			Real64 SpecificHeat;
@@ -99,12 +113,20 @@ namespace GroundTempsManager {
 		};
 
 		Real64
-		getCurrentGroundTemp(
-			Real64 const depth
+		getGroundTemp(
+			Real64 const depth,
+			Real64 const diffusivityGround,
+			Real64 const optionalSimTime
 		);
 
 		static std::shared_ptr< FiniteDiffGroundTempsModel > FiniteDiffGTMFactory( int objectType, std::string objectName);
 	};
+
+	std::shared_ptr< BaseGroundTempsModel >
+	GetGroundTempInstance(
+		int const type,
+		std::string const name
+	);
 
 
 	//******************************************************************************
@@ -132,7 +154,7 @@ namespace GroundTempsManager {
 
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
-}	// GroundTempsManger
+}	// GroundTemps
 
 }	// EnergyPlus
 

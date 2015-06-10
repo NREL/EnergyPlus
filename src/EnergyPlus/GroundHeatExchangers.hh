@@ -1,18 +1,24 @@
 #ifndef GroundHeatExchangers_hh_INCLUDED
 #define GroundHeatExchangers_hh_INCLUDED
 
+// C++ Headers
+#include <vector>
+#include <memory>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <GroundTempsManager.hh>
 
 namespace EnergyPlus {
 
 namespace GroundHeatExchangers {
 
 	// Using/Aliasing
+	using namespace GroundTemps;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -77,6 +83,7 @@ namespace GroundHeatExchangers {
 		Real64 totalTubeLength; // The total length of pipe. NumBoreholes * BoreholeDepth OR Pi * Dcoil * NumCoils
 		Real64 timeSS; // Steady state time
 		Real64 timeSSFactor; // Steady state time factor for calculation
+		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 
 		// Default Constructor
 		GLHEBase() :

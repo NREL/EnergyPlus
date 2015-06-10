@@ -11,10 +11,10 @@
 
 namespace EnergyPlus {
 
-namespace GroundTempsManager {
+namespace GroundTemps {
 
 	// Object Data
-	std::vector< std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
+	std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
 
 	// Kusuda model factory
 	std::shared_ptr< KusudaGroundTempsModel > 
@@ -68,7 +68,7 @@ namespace GroundTempsManager {
 		// New shared pointer for this model object
 		std::shared_ptr< FiniteDiffGroundTempsModel > thisModel( new FiniteDiffGroundTempsModel() );
 
-		// Search through Kusuda models here
+		// Search through finite diff models here
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:FiniteDifference";
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
@@ -92,6 +92,18 @@ namespace GroundTempsManager {
 			ShowFatalError( "GetGroundTempsModelInput: Errors getting input for ground temperature model");
 			return nullptr;
 		}
+	}
+
+	std::shared_ptr< BaseGroundTempsModel >
+	GetGroundTempInstance(
+		int const type,
+		std::string const name
+	)
+	{
+
+		int foundModel;
+
+		return groundTempModels[foundModel];
 	}
 
 	//******************************************************************************
@@ -119,6 +131,6 @@ namespace GroundTempsManager {
 
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
-}	// GroundTempsManger
+}	// GroundTemps
 
 }	// EnergyPlus

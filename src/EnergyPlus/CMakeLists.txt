@@ -240,6 +240,7 @@ SET( SRC
   GroundHeatExchangers.hh
   GroundTempsManager.cc
   GroundTempsManager.hh
+  GroundTempsModelKusudaAchenbach.cc
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
