@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cmath>
 #include <string>
-#include <vector>
 #include <unordered_map>
 
 // ObjexxFCL Headers
@@ -3258,54 +3257,6 @@ namespace SystemReports {
 			SysTotH2OHOT( AirLoopNum ) = SysHCCompH2OHOT( AirLoopNum );
 		}
 
-	}
-
-	bool
-	index_in_sorted_string_vector(
-		std::vector< std::string > const & v,
-		std::string const & s,
-		std::vector< std::string >::size_type & i
-	)
-	{
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Stuart Mentzer
-		//       DATE WRITTEN   June 2014
-		//       MODIFIED
-		//       RE-ENGINEERED
-
-		// PURPOSE OF THIS FUNCTION:
-		// Find a string in a sorted vector of strings
-		// std::lower_bound can do this but is slower
-
-		// METHODOLOGY EMPLOYED:
-		// Binary search
-
-		assert( std::is_sorted( v.begin(), v.end() ) );
-		typedef  std::vector< std::string >::size_type  size_type;
-		size_type const v_size( v.size() );
-		if ( v_size == 0 ) { // Empty
-			i = 1u;
-			return false;
-		} else if ( s < v[ 0 ] ) { // Less than all
-			i = v_size;
-			return false;
-		} else if ( s > v[ v_size - 1 ] ) { // Greater than all
-			i = v_size;
-			return false;
-		} else {
-			size_type beg( 0 ), mid, end( v_size );
-			while ( beg + 1 < end ) {
-				mid = ( ( beg + end ) >> 1 ); // bit shifting is faster than /2
-				( s >= v[ mid ] ? beg : end ) = mid;
-			} // Invariant: v[beg] <= s < v[end] (if end < v.size())
-			if ( s == v[ beg ] ) {
-				i = beg;
-				return true;
-			} else {
-				i = v_size;
-				return false;
-			}
-		}
 	}
 
 	void
