@@ -45,14 +45,14 @@ Function(AddMarkdownInput docName fileName offset)
     )
 EndFunction()
 
-Function(AddPDF docName)
+Function(AddPDF docName timeout)
 
   set(output_name ${CMAKE_BINARY_DIR}/built_pdfs/${docName}.pdf)
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/built_pdfs)
 
   add_custom_command(OUTPUT ${output_name}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/media ${CMAKE_BINARY_DIR}/docs/${docName}/media
-    COMMAND ${WKHTMLTOPDF_EXECUTABLE} --disable-smart-shrinking --zoom .75 --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 8 --footer-center [page] --no-stop-slow-scripts --javascript-delay 300000 --outline --outline-depth 3 toc ${${docName}_Inputs} ${output_name} 
+    COMMAND ${WKHTMLTOPDF_EXECUTABLE} --disable-smart-shrinking --zoom .60 --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 8 --footer-center [page] --no-stop-slow-scripts --javascript-delay ${timeout} --outline --outline-depth 3 toc ${${docName}_Inputs} ${output_name} 
     DEPENDS ${${docName}_Inputs}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName}
     )
@@ -66,13 +66,13 @@ Function(AddPDF docName)
 EndFunction()
 
 AddMarkdownInput(Acknowledgements Acknowledgements.md 0)
-AddPDF(Acknowledgements)
+AddPDF(Acknowledgements 10000)
 
 AddMarkdownInput(AuxiliaryPrograms AuxiliaryPrograms.md 0)
-AddPDF(AuxiliaryPrograms)
+AddPDF(AuxiliaryPrograms 10000)
 
 AddMarkdownInput(EMS_Application_Guide EMS_Application_Guide.md 0)
-AddPDF(EMS_Application_Guide)
+AddPDF(EMS_Application_Guide 10000)
 
 AddMarkdownInput(EngineeringReference 01-Overview.md 0)
 AddMarkdownInput(EngineeringReference 02-IntegratedSolution.md 1)
@@ -98,13 +98,13 @@ AddMarkdownInput(EngineeringReference 14-OnSiteGeneration.md 20)
 AddMarkdownInput(EngineeringReference 15-PerformanceCurves.md 21)
 AddMarkdownInput(EngineeringReference 16-Economics.md 22)
 AddMarkdownInput(EngineeringReference 17-SpecialModulesReporting.md 23)
-AddPDF(EngineeringReference)
+AddPDF(EngineeringReference 600000)
 
 AddMarkdownInput(ExternalInterfaces_Application_Guide ExternalInterfaces_Application_Guide.md 0)
-AddPDF(ExternalInterfaces_Application_Guide)
+AddPDF(ExternalInterfaces_Application_Guide 10000)
 
 AddMarkdownInput(GettingStarted GettingStarted.md 0)
-AddPDF(GettingStarted)
+AddPDF(GettingStarted 10000)
 
 AddMarkdownInput(InputOutputReference 01a-InputOutputReference.md 0)
 AddMarkdownInput(InputOutputReference 01b-InputOutputReference.md 1)
@@ -118,25 +118,25 @@ AddMarkdownInput(InputOutputReference 06-StandardOutputReports.md 8)
 AddMarkdownInput(InputOutputReference 07-WeatherData.md 9)
 AddMarkdownInput(InputOutputReference 08-RunningEnergyPlus.md 10)
 AddMarkdownInput(InputOutputReference 09-Appendix.md 11)
-AddPDF(InputOutputReference)
+AddPDF(InputOutputReference 300000)
 
 AddMarkdownInput(InterfaceDeveloper InterfaceDeveloper.md 0)
-AddPDF(InterfaceDeveloper)
+AddPDF(InterfaceDeveloper 10000)
 
 AddMarkdownInput(ModuleDeveloper ModuleDeveloper.md 0)
-AddPDF(ModuleDeveloper)
+AddPDF(ModuleDeveloper 10000)
 
 AddMarkdownInput(OutputDetailsAndExamples OutputDetailsAndExamples.md 0)
-AddPDF(OutputDetailsAndExamples)
+AddPDF(OutputDetailsAndExamples 10000)
 
 AddMarkdownInput(PlantApplicationGuide PlantApplicationGuide.md 0)
-AddPDF(PlantApplicationGuide)
+AddPDF(PlantApplicationGuide 10000)
 
 AddMarkdownInput(Tips_and_Tricks_Using_EnergyPlus Tips_and_Tricks_Using_EnergyPlus.md 0)
-AddPDF(Tips_and_Tricks_Using_EnergyPlus)
+AddPDF(Tips_and_Tricks_Using_EnergyPlus 10000)
 
 AddMarkdownInput(Using_EnergyPlus_for_Compliance Using_EnergyPlus_for_Compliance.md 0)
-AddPDF(Using_EnergyPlus_for_Compliance)
+AddPDF(Using_EnergyPlus_for_Compliance 10000)
 
 
 
