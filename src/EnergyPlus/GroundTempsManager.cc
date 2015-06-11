@@ -6,12 +6,15 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
+#include <DataIPShortCuts.hh>
 #include <GroundTempsManager.hh>
 #include <InputProcessor.hh>
 
 namespace EnergyPlus {
 
 namespace GroundTemps {
+
+	using InputProcessor::GetObjectDefMaxArgs;
 
 	// Object Data
 	std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
@@ -20,6 +23,8 @@ namespace GroundTemps {
 	std::shared_ptr< KusudaGroundTempsModel > 
 	KusudaGTMFactory( int objectType, std::string objectName ){
 
+		using namespace DataIPShortCuts;
+		
 		bool found = false;
 		int NumNums;
 		int NumAlphas;
@@ -34,13 +39,23 @@ namespace GroundTemps {
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-				Array1D_string cAlphaArgs;
-				Array1D< Real64 > rNumericArgs;
+				int static totalArgs;
+				int static numAlphas;
+				int static numNumbers;
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 				if ( objectName == cAlphaArgs( 1 ) ) {
 					// Read input into object here
+
+					thisModel->objectName = cAlphaArgs( 1 );
+
+					thisModel->aveGroundTemp = rNumericArgs( 1 );
+
+					thisModel->aveGroundTempAmplitude = rNumericArgs( 2 );
+
+					thisModel->phaseShiftInDays = rNumericArgs( 3 );
+
 					found = true;
 					break;
 				}
@@ -89,21 +104,53 @@ namespace GroundTemps {
 			groundTempModels.push_back( thisModel );
 			return thisModel;
 		} else {
-			ShowFatalError( "GetGroundTempsModelInput: Errors getting input for ground temperature model");
+			ShowFatalError( "GetGroundTempsModelInput: Errors getting input for ground temperature model" );
 			return nullptr;
 		}
 	}
 
 	std::shared_ptr< BaseGroundTempsModel >
-	GetGroundTempInstance(
-		int const type,
-		std::string const name
+	GetGroundTempModelAndInit(
+		std::string const objectType_str,
+		std::string const objectName
 	)
 	{
+		int objectType( 0 );
+		int objectType_Kusuda( 1 );
+		int objectType_FiniteDiff( 2 );
 
-		int foundModel;
+		std::string objectType_Kusdua_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:KUSUDAACHENBACH";
+		std::string objectType_FiniteDiff_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:FINITEDIFFERENCE";
 
-		return groundTempModels[foundModel];
+		int numGTMs = groundTempModels.size();
+	
+
+		if ( objectType_str == objectType_Kusdua_str ) {
+			objectType = objectType_Kusuda;
+		} else if ( objectType_str == objectType_FiniteDiff_str ) {
+			objectType = objectType_FiniteDiff;
+		} else {
+			ShowFatalError( "GetGroundTempsModelInput: Undisturbed Ground Temperature Object Type Not Recognized" );
+		}
+
+		// Check if this instance of this model has already been retrieved
+		for ( int i = 1; i <= numGTMs; ++i ) {
+			auto & currentModel( groundTempModels[i] );
+			// Check if the type and name match
+			if ( objectType == currentModel->objectType && objectName == currentModel->objectName) {
+				return groundTempModels[i];
+			}
+		}
+
+		// If not found, create new instance of the model
+		if ( objectType == objectType_Kusuda ) {
+			return KusudaGTMFactory( objectType, objectName );
+		} else if ( objectType == objectType_FiniteDiff ) {
+			return FiniteDiffGTMFactory( objectType, objectName );
+		} else {
+			// Error
+			return nullptr; 
+		}
 	}
 
 	//******************************************************************************

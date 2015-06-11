@@ -12,42 +12,13 @@ namespace EnergyPlus {
 namespace GroundTemps {
 
 	Real64
-	KusudaGroundTempsModel::getGroundTemp(
+	FiniteDiffGroundTempsModel::getGroundTemp(
 		Real64 const z, // Depth
-		Real64 const diffusivityGround, // Groud props
-		Real64 const simTime // Simulation time
+		Real64 const diffusivityGround,
+		Real64 const optionalSimTime // Optional simulation time
 	)
 	{
-		// AUTHOR         Matt Mitchell
-		// DATE WRITTEN   June 2015
-		// MODIFIED       na
-		// RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Returns a ground temperature
-
-		// METHODOLOGY EMPLOYED:
-		// Kusuda and Achenbach correlation is used
-
-		//Kusuda and Achenbach
-		// Using/Aliasing
-		using DataGlobals::SecsInDay;
-		using DataGlobals::Pi;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 term1;
-		Real64 term2;
-		Real64 secsInYear;
-
-		secsInYear = SecsInDay * 365.0;
-
-		term1 = -z * std::sqrt( Pi / ( secsInYear * diffusivityGround ) );
-		term2 = ( 2 * Pi / secsInYear ) * ( ( simTime - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( secsInYear / ( Pi * diffusivityGround ) ) );
-
-		return aveGroundTemp - aveGroundTempAmplitude * std::exp( term1 ) * std::cos( term2 );
+		return 0;
 	}
 
 

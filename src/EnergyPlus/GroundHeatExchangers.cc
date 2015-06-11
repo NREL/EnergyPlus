@@ -17,6 +17,7 @@
 #include <DisplayRoutines.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundTempsManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -76,6 +77,7 @@ namespace GroundHeatExchangers {
 	using DataHVACGlobals::SysTimeElapsed;
 	using namespace DataLoopNode;
 	using General::TrimSigDigits;
+	using namespace GroundTemps;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -1551,7 +1553,7 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).trenchLength = rNumericArgs( 13 );
 				slinkyGLHE( GLHENum ).numTrenches = rNumericArgs( 14 );
 				slinkyGLHE( GLHENum ).trenchSpacing = rNumericArgs( 15 );
-				slinkyGLHE( GLHENum ).maxSimYears = rNumericArgs( 19 );
+				slinkyGLHE( GLHENum ).maxSimYears = rNumericArgs( 16 );
 
 				// Number of coils
 				slinkyGLHE( GLHENum ).numCoils = slinkyGLHE( GLHENum ).trenchLength / slinkyGLHE( GLHENum ).coilPitch;
@@ -1565,7 +1567,7 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).AGG = 192;
 
 				// Farfield model parameters, validated min/max by IP
-				slinkyGLHE( GLHENum ).useGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
+				//slinkyGLHE( GLHENum ).useGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
 
 				// Average coil depth
 				if ( slinkyGLHE( GLHENum ).verticalConfig ) {
@@ -1591,51 +1593,55 @@ namespace GroundHeatExchangers {
 				// Thermal diffusivity of the ground
 				slinkyGLHE( GLHENum ).diffusivityGround = slinkyGLHE( GLHENum ).kGround / slinkyGLHE( GLHENum ).cpRhoGround;
 
-				if ( !slinkyGLHE( GLHENum ).useGroundTempDataForKusuda ) {
-					slinkyGLHE( GLHENum ).averageGroundTemp = rNumericArgs( 16 );
-					slinkyGLHE( GLHENum ).averageGroundTempAmplitude = rNumericArgs( 17 );
-					slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = rNumericArgs( 18 );
-				} else {
-					// If ground temp data was not brought in manually in GETINPUT,
-					// then we must get it from the surface ground temperatures
 
-					if ( !PubGroundTempSurfFlag ) {
-						ShowSevereError( "Input problem for " + cCurrentModuleObject + '=' + slinkyGLHE( GLHENum ).Name );
-						ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-						ShowContinueError( "This is required for the ground domain if farfield parameters are" );
-						ShowContinueError( " not directly entered into the input object." );
-						errorsFound = true;
-					}
 
-					// Calculate Average Ground Temperature for all 12 months of the year:
-					slinkyGLHE( GLHENum ).averageGroundTemp = 0.0;
-					for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-						slinkyGLHE( GLHENum ).averageGroundTemp += PubGroundTempSurface( monthIndex );
-					}
+				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
 
-					slinkyGLHE( GLHENum ).averageGroundTemp /= monthsInYear;
+				//if ( !slinkyGLHE( GLHENum ).useGroundTempDataForKusuda ) {
+				//	slinkyGLHE( GLHENum ).averageGroundTemp = rNumericArgs( 16 );
+				//	slinkyGLHE( GLHENum ).averageGroundTempAmplitude = rNumericArgs( 17 );
+				//	slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = rNumericArgs( 18 );
+				//} else {
+				//	// If ground temp data was not brought in manually in GETINPUT,
+				//	// then we must get it from the surface ground temperatures
 
-					// Calculate Average Amplitude from Average:
-					slinkyGLHE( GLHENum ).averageGroundTempAmplitude = 0.0;
-					for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-						slinkyGLHE( GLHENum ).averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - slinkyGLHE( GLHENum ).averageGroundTemp );
-					}
+				//	if ( !PubGroundTempSurfFlag ) {
+				//		ShowSevereError( "Input problem for " + cCurrentModuleObject + '=' + slinkyGLHE( GLHENum ).Name );
+				//		ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
+				//		ShowContinueError( "This is required for the ground domain if farfield parameters are" );
+				//		ShowContinueError( " not directly entered into the input object." );
+				//		errorsFound = true;
+				//	}
 
-					slinkyGLHE( GLHENum ).averageGroundTempAmplitude /= monthsInYear;
+				//	// Calculate Average Ground Temperature for all 12 months of the year:
+				//	slinkyGLHE( GLHENum ).averageGroundTemp = 0.0;
+				//	for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+				//		slinkyGLHE( GLHENum ).averageGroundTemp += PubGroundTempSurface( monthIndex );
+				//	}
 
-					// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-					slinkyGLHE( GLHENum ).monthOfMinSurfTemp = 0;
-					slinkyGLHE( GLHENum ).minSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-					for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-						if ( PubGroundTempSurface( monthIndex ) <= slinkyGLHE( GLHENum ).minSurfTemp ) {
-							slinkyGLHE( GLHENum ).monthOfMinSurfTemp = monthIndex;
-							slinkyGLHE( GLHENum ).minSurfTemp = PubGroundTempSurface( monthIndex );
-						}
-					}
+				//	slinkyGLHE( GLHENum ).averageGroundTemp /= monthsInYear;
 
-					slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = slinkyGLHE( GLHENum ).monthOfMinSurfTemp * AvgDaysInMonth;
+				//	// Calculate Average Amplitude from Average:
+				//	slinkyGLHE( GLHENum ).averageGroundTempAmplitude = 0.0;
+				//	for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+				//		slinkyGLHE( GLHENum ).averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - slinkyGLHE( GLHENum ).averageGroundTemp );
+				//	}
 
-				}
+				//	slinkyGLHE( GLHENum ).averageGroundTempAmplitude /= monthsInYear;
+
+				//	// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
+				//	slinkyGLHE( GLHENum ).monthOfMinSurfTemp = 0;
+				//	slinkyGLHE( GLHENum ).minSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
+				//	for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+				//		if ( PubGroundTempSurface( monthIndex ) <= slinkyGLHE( GLHENum ).minSurfTemp ) {
+				//			slinkyGLHE( GLHENum ).monthOfMinSurfTemp = monthIndex;
+				//			slinkyGLHE( GLHENum ).minSurfTemp = PubGroundTempSurface( monthIndex );
+				//		}
+				//	}
+
+				//	slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = slinkyGLHE( GLHENum ).monthOfMinSurfTemp * AvgDaysInMonth;
+
+				//}
 
 				if ( ! allocated ) {
 					prevTimeSteps.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
@@ -2163,6 +2169,7 @@ namespace GroundHeatExchangers {
 		using DataPlant::TypeOf_GrndHtExchgSlinky;
 		using DataPlant::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
+		using namespace GroundTemps;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2200,8 +2207,8 @@ namespace GroundHeatExchangers {
 			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
 			lastQnSubHr = 0.0;
-			Node( inletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
-			Node( outletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
+			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, DayOfSim ); //getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
+			Node( outletNodeNum ).Temp = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, DayOfSim ); //getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
 
 			// zero out all history arrays
 
@@ -2215,7 +2222,7 @@ namespace GroundHeatExchangers {
 			prevHour = 1;
 		}
 
-		tempGround = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays);
+		tempGround = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, DayOfSim ); //getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays);
 
 		massFlowRate = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
 
@@ -2228,45 +2235,45 @@ namespace GroundHeatExchangers {
 
 	//******************************************************************************
 
-	Real64
-	GLHEBase::getKAGrndTemp(
-		Real64 const z, // Depth
-		Real64 const EP_UNUSED( dayOfYear ), // Day of year
-		Real64 const aveGroundTemp, // Average annual ground tempeature
-		Real64 const aveGroundTempAmplitude, // Average amplitude of annual ground temperature
-		Real64 const phaseShiftInDays // Phase shift
-	)
-	{
-		// AUTHOR         Matt Mitchell
-		// DATE WRITTEN   February 2015
-		// MODIFIED       na
-		// RE-ENGINEERED  na
+	//Real64
+	//GLHEBase::getKAGrndTemp(
+	//	Real64 const z, // Depth
+	//	Real64 const EP_UNUSED( dayOfYear ), // Day of year
+	//	Real64 const aveGroundTemp, // Average annual ground tempeature
+	//	Real64 const aveGroundTempAmplitude, // Average amplitude of annual ground temperature
+	//	Real64 const phaseShiftInDays // Phase shift
+	//)
+	//{
+	//	// AUTHOR         Matt Mitchell
+	//	// DATE WRITTEN   February 2015
+	//	// MODIFIED       na
+	//	// RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// Returns a ground temperature
+	//	// PURPOSE OF THIS FUNCTION:
+	//	// Returns a ground temperature
 
-		// METHODOLOGY EMPLOYED:
-		// Kusuda and Achenbach correlation is used
+	//	// METHODOLOGY EMPLOYED:
+	//	// Kusuda and Achenbach correlation is used
 
-		//Kusuda and Achenbach
-		// Using/Aliasing
-		using DataGlobals::SecsInDay;
+	//	//Kusuda and Achenbach
+	//	// Using/Aliasing
+	//	using DataGlobals::SecsInDay;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
+	//	// Locals
+	//	// FUNCTION ARGUMENT DEFINITIONS:
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 Term1;
-		Real64 Term2;
-		Real64 SecsInYear;
+	//	// FUNCTION LOCAL VARIABLE DECLARATIONS:
+	//	Real64 Term1;
+	//	Real64 Term2;
+	//	Real64 SecsInYear;
 
-		SecsInYear = SecsInDay * 365.0;
+	//	SecsInYear = SecsInDay * 365.0;
 
-		Term1 = -z * std::sqrt( Pi / ( SecsInYear * diffusivityGround ) );
-		Term2 = ( 2 * Pi / SecsInYear ) * ( ( DayOfSim - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( SecsInYear / ( Pi * diffusivityGround ) ) );
+	//	Term1 = -z * std::sqrt( Pi / ( SecsInYear * diffusivityGround ) );
+	//	Term2 = ( 2 * Pi / SecsInYear ) * ( ( DayOfSim - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( SecsInYear / ( Pi * diffusivityGround ) ) );
 
-		return aveGroundTemp - aveGroundTempAmplitude * std::exp( Term1 ) * std::cos( Term2 );
-	}
+	//	return aveGroundTemp - aveGroundTempAmplitude * std::exp( Term1 ) * std::cos( Term2 );
+	//}
 
 	//******************************************************************************
 

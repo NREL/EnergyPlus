@@ -151,14 +151,14 @@ namespace GroundHeatExchangers {
 		virtual void
 		getAnnualTimeConstant()=0;
 
-		Real64
-		getKAGrndTemp(
-			Real64 const z,
-			Real64 const dayOfYear,
-			Real64 const aveGroundTemp,
-			Real64 const aveGroundTempAmplitude,
-			Real64 const phaseShift
-		);
+		//Real64
+		//getKAGrndTemp(
+		//	Real64 const z,
+		//	Real64 const dayOfYear,
+		//	Real64 const aveGroundTemp,
+		//	Real64 const aveGroundTempAmplitude,
+		//	Real64 const phaseShift
+		//);
 
 	};
 

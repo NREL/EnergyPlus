@@ -12,22 +12,19 @@ namespace EnergyPlus {
 
 namespace GroundTemps {
 
-	//int objectType_Kusuda( 1 );
-	//int objectType_FiniteDiff( 2 );
-
 	// Base class
 	class BaseGroundTempsModel
 	{
 		public:
-			// Members
+			// Public Members
 			int objectType;
 			std::string objectName;
 
-			// Default Constructor
-			BaseGroundTempsModel() :
-				objectType( 0 )
-			{}
-
+			//// Default Constructor
+			//BaseGroundTempsModel() :
+			//	objectType( 0 )
+			//{}
+		
 		// Virtual method for retrieving the ground temp
 		virtual Real64
 		getGroundTemp( 
@@ -45,7 +42,6 @@ namespace GroundTemps {
 			// Public Members
 			int objectType = 1;
 
-		private:
 			// Private Members
 			Real64 aveGroundTemp;
 			Real64 aveGroundTempAmplitude;
@@ -116,15 +112,15 @@ namespace GroundTemps {
 		getGroundTemp(
 			Real64 const depth,
 			Real64 const diffusivityGround,
-			Real64 const optionalSimTime
+			Real64 const optionalSimTime = -1
 		);
 
 		static std::shared_ptr< FiniteDiffGroundTempsModel > FiniteDiffGTMFactory( int objectType, std::string objectName);
 	};
 
 	std::shared_ptr< BaseGroundTempsModel >
-	GetGroundTempInstance(
-		int const type,
+	GetGroundTempModelAndInit(
+		std::string const type,
 		std::string const name
 	);
 

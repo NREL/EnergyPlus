@@ -1732,6 +1732,28 @@ Site:GroundTemperature:Deep,
        \units C
        \type real
        \default 16
+       
+Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+       \memo Undisturbed ground temperature object using the 
+       \memo Kusuda-Achenbach 1965 correlation.
+  A1,  \field Name of ground temperature object
+       \required-field
+  N1,  \field Average Surface Temperature
+       \required-field
+       \type real
+       \units C
+       \note Annual average surface temperature
+  N2,  \field Average Amplitude of Surface Temperature
+       \required-field
+       \type real
+       \units deltaC
+       \note Annual average surface temperature variation from average.
+  N3;  \field Phase Shift of Minimum Surface Temperature
+       \required-field
+       \type real
+       \units days
+       \note The phase shift of minimum surface temperature, or the day
+       \note of the year when the minimum surface temperature occurs.
 
 Site:GroundDomain:Slab,
         \memo Ground-coupled slab model for on-grade and
@@ -63891,39 +63913,9 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 2.0
-   N16, \field Kusuda-Achenbach Average Surface Temperature
-        \note This is the parameter for average annual surface
-        \note temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be 
-        \note approximated from this object
-        \type real
-        \units C
-   N17, \field Kusuda-Achenbach Average Amplitude of Surface 
-        \note Temperature
-        \note This is the parameter for annual average amplitude from
-        \note average surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be approximated
-        \note from this object
-        \type real
-        \units deltaC
-   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface 
-        \note Temperature
-        \note This is the parameter for phase shift from minimum
-        \note surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be approximated
-        \note from this object
-        \type real
-        \units days
-   N19; \field Maximum Length of Simulation
+   A5,  \field Type of Undisturbed Ground Temperature Model
+   A6,  \field Name of Undisturbed Ground Temperature Model 
+   N16; \field Maximum Length of Simulation
         \type real
         \units years
 
