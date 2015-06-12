@@ -15,7 +15,7 @@ namespace GroundTemps {
 	KusudaGroundTempsModel::getGroundTemp(
 		Real64 const z, // Depth
 		Real64 const diffusivityGround, // Groud props
-		Real64 const simTime // Simulation time
+		Real64 const simTimeInSeconds // Simulation time
 	)
 	{
 		// AUTHOR         Matt Mitchell
@@ -45,7 +45,7 @@ namespace GroundTemps {
 		secsInYear = SecsInDay * 365.0;
 
 		term1 = -z * std::sqrt( Pi / ( secsInYear * diffusivityGround ) );
-		term2 = ( 2 * Pi / secsInYear ) * ( ( simTime - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( secsInYear / ( Pi * diffusivityGround ) ) );
+		term2 = ( 2 * Pi / secsInYear ) * ( simTimeInSeconds - phaseShiftInSecs - ( z / 2 ) * std::sqrt( secsInYear / ( Pi * diffusivityGround ) ) );
 
 		return aveGroundTemp - aveGroundTempAmplitude * std::exp( term1 ) * std::cos( term2 );
 	}

@@ -24,6 +24,7 @@ namespace GroundTemps {
 	KusudaGTMFactory( int objectType, std::string objectName ){
 
 		using namespace DataIPShortCuts;
+		using DataGlobals::SecsInDay;
 		
 		bool found = false;
 		int NumNums;
@@ -54,7 +55,7 @@ namespace GroundTemps {
 
 					thisModel->aveGroundTempAmplitude = rNumericArgs( 2 );
 
-					thisModel->phaseShiftInDays = rNumericArgs( 3 );
+					thisModel->phaseShiftInSecs = rNumericArgs( 3 ) * SecsInDay;
 
 					found = true;
 					break;

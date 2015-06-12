@@ -41,17 +41,15 @@ namespace GroundTemps {
 		public:
 			// Public Members
 			int objectType = 1;
-
-			// Private Members
 			Real64 aveGroundTemp;
 			Real64 aveGroundTempAmplitude;
-			Real64 phaseShiftInDays;
+			Real64 phaseShiftInSecs;
 
 		Real64
 		getGroundTemp(
 			Real64 const depth,
 			Real64 const diffusivityGround,
-			Real64 const optionalSimTime = -1
+			Real64 const simTime
 		);
 
 		static std::shared_ptr< KusudaGroundTempsModel > KusudaGTMFactory( int objectType, std::string objectName);
@@ -112,7 +110,7 @@ namespace GroundTemps {
 		getGroundTemp(
 			Real64 const depth,
 			Real64 const diffusivityGround,
-			Real64 const optionalSimTime = -1
+			Real64 const simTime
 		);
 
 		static std::shared_ptr< FiniteDiffGroundTempsModel > FiniteDiffGTMFactory( int objectType, std::string objectName);

@@ -2185,6 +2185,9 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 fluidDensity;
 		bool errFlag;
+		Real64 CurTime;
+
+		CurTime = ( ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed ) * SecInHour;
 
 		// Init more variables
 		if ( myFlag ) {
@@ -2206,8 +2209,8 @@ namespace GroundHeatExchangers {
 			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
 			lastQnSubHr = 0.0;
-			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, DayOfSim ); //getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
-			Node( outletNodeNum ).Temp = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, DayOfSim ); //getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
+			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, CurTime ); 
+			Node( outletNodeNum ).Temp = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, CurTime );
 
 			// zero out all history arrays
 
@@ -2221,7 +2224,7 @@ namespace GroundHeatExchangers {
 			prevHour = 1;
 		}
 
-		tempGround = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, DayOfSim ); //getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays);
+		tempGround = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, CurTime );
 
 		massFlowRate = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
 
