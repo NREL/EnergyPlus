@@ -57161,58 +57161,48 @@ PipingSystem:Underground:Domain,
         \minimum 0
         \maximum 100
         \default 50
-   N15, \field Kusuda-Achenbach Average Surface Temperature
-        \required-field
-        \type real
-        \units C
-   N16, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \required-field
-        \type real
-        \units deltaC
-   N17, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \required-field
-        \type real
-        \units days
-   A5,  \field This Domain Includes Basement Surface Interaction
+   A5,  \field Type of Undisturbed Ground Temperature Model
+   A6,  \field Name of Undisturbed Ground Temperature Model 
+   A7,  \field This Domain Includes Basement Surface Interaction
         \type choice
         \key Yes
         \key No
         \default No
         \note if Yes, then the following basement inputs are used
         \note if No, then the following basement inputs are *ignored*
-   N18, \field Width of Basement Floor in Ground Domain
+   N15, \field Width of Basement Floor in Ground Domain
         \type real
         \units m
         \note Required only if Domain Has Basement Interaction
-   N19, \field Depth of Basement Wall In Ground Domain
+   N16, \field Depth of Basement Wall In Ground Domain
         \type real
         \units m
         \note Required only if Domain Has Basement Interaction
-   A6,  \field Shift Pipe X Coordinates By Basement Width
+   A8,  \field Shift Pipe X Coordinates By Basement Width
         \type choice
         \key Yes
         \key No
         \note Required only if Domain Has Basement Interaction
-   A7,  \field Name of Basement Wall Boundary Condition Model
+   A9,  \field Name of Basement Wall Boundary Condition Model
         \type object-list
         \object-list OSCMNames
         \note Required only if Domain Has Basement Interaction
-   A8,  \field Name of Basement Floor Boundary Condition Model
+   A10,  \field Name of Basement Floor Boundary Condition Model
         \type object-list
         \object-list OSCMNames
         \note Required only if Domain Has Basement Interaction
-   N20, \field Convergence Criterion for the Outer Cartesian Domain Iteration Loop
+   N17, \field Convergence Criterion for the Outer Cartesian Domain Iteration Loop
         \type real
         \units deltaC
         \minimum 0.000001
         \maximum 0.5
         \default 0.001
-   N21, \field Maximum Iterations in the Outer Cartesian Domain Iteration Loop
+   N18, \field Maximum Iterations in the Outer Cartesian Domain Iteration Loop
         \type integer
         \minimum 3
         \maximum 10000
         \default 500
-   N22, \field Evapotranspiration Ground Cover Parameter
+   N19, \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -57223,37 +57213,37 @@ PipingSystem:Underground:Domain,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-   N23, \field Number of Pipe Circuits Entered for this Domain
+   N20, \field Number of Pipe Circuits Entered for this Domain
         \required-field
         \type integer
         \minimum 1
-   A9,  \field Pipe Circuit 1
+   A11,  \field Pipe Circuit 1
         \required-field
         \begin-extensible
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A10, \field Pipe Circuit 2
+   A12, \field Pipe Circuit 2
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A11, \field Pipe Circuit 3
+   A13, \field Pipe Circuit 3
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A12, \field Pipe Circuit 4
+   A14, \field Pipe Circuit 4
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A13, \field Pipe Circuit 5
+   A15, \field Pipe Circuit 5
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A14; \field Pipe Circuit 6
+   A16; \field Pipe Circuit 6
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames

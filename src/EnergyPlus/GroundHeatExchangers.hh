@@ -151,15 +151,6 @@ namespace GroundHeatExchangers {
 		virtual void
 		getAnnualTimeConstant()=0;
 
-		//Real64
-		//getKAGrndTemp(
-		//	Real64 const z,
-		//	Real64 const dayOfYear,
-		//	Real64 const aveGroundTemp,
-		//	Real64 const aveGroundTempAmplitude,
-		//	Real64 const phaseShift
-		//);
-
 	};
 
 	struct GLHEVert:GLHEBase
@@ -218,9 +209,6 @@ namespace GroundHeatExchangers {
 		Real64 trenchSpacing;	// Spacing between parallel trenches [m]
 		int numCoils;			// Number of coils
 		bool useGroundTempDataForKusuda; // Use Ground Temp Data Flag
-		Real64 averageGroundTemp;
-		Real64 averageGroundTempAmplitude;
-		Real64 phaseShiftOfMinGroundTempDays;
 		int monthOfMinSurfTemp;
 		Real64 maxSimYears;
 		Real64 minSurfTemp;
@@ -240,9 +228,6 @@ namespace GroundHeatExchangers {
 			trenchSpacing( 0.0 ),
 			numCoils( 0 ),
 			useGroundTempDataForKusuda( false ),
-			averageGroundTemp( 0.0 ),
-			averageGroundTempAmplitude( 0.0 ),
-			phaseShiftOfMinGroundTempDays( 0.0 ),
 			monthOfMinSurfTemp( 0 ),
 			maxSimYears( 0.0 ),
 			minSurfTemp( 0.0 )

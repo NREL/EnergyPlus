@@ -1593,8 +1593,7 @@ namespace GroundHeatExchangers {
 				// Thermal diffusivity of the ground
 				slinkyGLHE( GLHENum ).diffusivityGround = slinkyGLHE( GLHENum ).kGround / slinkyGLHE( GLHENum ).cpRhoGround;
 
-
-
+				// Initialize ground temperature model and get pointer reference
 				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
 
 				//if ( !slinkyGLHE( GLHENum ).useGroundTempDataForKusuda ) {
@@ -2232,48 +2231,6 @@ namespace GroundHeatExchangers {
 		if ( ! BeginEnvrnFlag ) myEnvrnFlag = true;
 
 	}
-
-	//******************************************************************************
-
-	//Real64
-	//GLHEBase::getKAGrndTemp(
-	//	Real64 const z, // Depth
-	//	Real64 const EP_UNUSED( dayOfYear ), // Day of year
-	//	Real64 const aveGroundTemp, // Average annual ground tempeature
-	//	Real64 const aveGroundTempAmplitude, // Average amplitude of annual ground temperature
-	//	Real64 const phaseShiftInDays // Phase shift
-	//)
-	//{
-	//	// AUTHOR         Matt Mitchell
-	//	// DATE WRITTEN   February 2015
-	//	// MODIFIED       na
-	//	// RE-ENGINEERED  na
-
-	//	// PURPOSE OF THIS FUNCTION:
-	//	// Returns a ground temperature
-
-	//	// METHODOLOGY EMPLOYED:
-	//	// Kusuda and Achenbach correlation is used
-
-	//	//Kusuda and Achenbach
-	//	// Using/Aliasing
-	//	using DataGlobals::SecsInDay;
-
-	//	// Locals
-	//	// FUNCTION ARGUMENT DEFINITIONS:
-
-	//	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-	//	Real64 Term1;
-	//	Real64 Term2;
-	//	Real64 SecsInYear;
-
-	//	SecsInYear = SecsInDay * 365.0;
-
-	//	Term1 = -z * std::sqrt( Pi / ( SecsInYear * diffusivityGround ) );
-	//	Term2 = ( 2 * Pi / SecsInYear ) * ( ( DayOfSim - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( SecsInYear / ( Pi * diffusivityGround ) ) );
-
-	//	return aveGroundTemp - aveGroundTempAmplitude * std::exp( Term1 ) * std::cos( Term2 );
-	//}
 
 	//******************************************************************************
 
