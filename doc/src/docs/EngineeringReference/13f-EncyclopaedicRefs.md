@@ -2181,7 +2181,7 @@ There are two types of heat pump water heater models available:
 
 Each type of `WaterHeater:HeatPump:*` object is compatible with certain `Coil:WaterHeating:AirToWaterHeatPump:*` objects as shown in the following table:
 
-<table>
+<table class="table table-striped">
   <tr>
     <th>`WaterHeater:HeatPump:\*`</th>
     <th>`Coil:WaterHeating:AirToWaterHeatPump:\*`</th>
@@ -2201,7 +2201,7 @@ Each type of `WaterHeater:HeatPump:*` object is compatible with certain `Coil:Wa
 
 Additionally the `WaterHeater:HeatPump:WrappedCondenser` object is only compatible with stratified tanks. Therefore `WaterHeater:HeatPump:\*` has the following tank compatibility matrix:
 
-<table>
+<table class="table table-striped">
   <tr>
     <th rowspan="2">`WaterHeater:HeatPump:*`</th>
     <th colspan="2">`WaterHeater:*`<br></th>
