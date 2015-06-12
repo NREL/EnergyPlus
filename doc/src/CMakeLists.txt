@@ -1,5 +1,13 @@
-find_program(WKHTMLTOPDF_EXECUTABLE wkhtmltopdf)
 
+if(MSVC)
+  find_program(WKHTMLTOPDF_EXECUTABLE 
+    wkhtmltopdf
+    PATHS "C:/Program Files/wkhtmltopdf/bin" "C:/Program Files (x86)/wkhtmltopdf/bin")
+else()
+  find_program(WKHTMLTOPDF_EXECUTABLE 
+    wkhtmltopdf
+    )
+endif()
 
 # wkhtmltopdf
 execute_process(COMMAND ${WKHTMLTOPDF_EXECUTABLE} -V 
@@ -52,7 +60,7 @@ Function(AddPDF docName timeout)
 
   add_custom_command(OUTPUT ${output_name}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/media ${CMAKE_BINARY_DIR}/docs/${docName}/media
-    COMMAND ${WKHTMLTOPDF_EXECUTABLE} --disable-smart-shrinking --zoom .65 --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 3 --footer-center [page] --no-stop-slow-scripts --javascript-delay ${timeout} --outline --outline-depth 3 toc ${${docName}_Inputs} ${output_name} 
+    COMMAND ${WKHTMLTOPDF_EXECUTABLE} -q --disable-smart-shrinking --zoom .65 --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 3 --footer-center [page] --no-stop-slow-scripts --javascript-delay ${timeout} --outline --outline-depth 3 toc ${${docName}_Inputs} ${output_name} 
     DEPENDS ${${docName}_Inputs}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName}
     )
