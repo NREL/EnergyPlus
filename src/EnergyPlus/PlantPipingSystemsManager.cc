@@ -1,6 +1,7 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <memory>
 #include <set>
 #include <utility>
 
@@ -26,6 +27,7 @@
 #include <DataSurfaces.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundTempsManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -705,6 +707,7 @@ namespace PlantPipingSystemsManager {
 		using DataSurfaces::TotOSCM;
 		using General::TrimSigDigits;
 		using DataGlobals::SecsInDay;
+		using namespace GroundTemps;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -827,6 +830,9 @@ namespace PlantPipingSystemsManager {
 
 			// Unit conversion
 			//PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
+
+			// Initialize ground temperature model and get pointer reference
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
 
 			// check if there is a basement
 			if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
@@ -7794,39 +7800,41 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::SecsInDay;
+		//using DataGlobals::SecsInDay;
+		using DataGlobals::DayOfSim;
+		using namespace GroundTemps;
 
 		// Return value
-		Real64 RetVal;
+		//Real64 RetVal;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 z;
-		Real64 Term1;
-		Real64 Term2;
+		//Real64 Term1;
+		//Real64 Term2;
 		Real64 Diffusivity;
-		Real64 SecondsInYear;
-		Real64 KATemp;
-		Real64 KAAmp;
-		Real64 KAPhase;
-		Real64 CurTime;
+		//Real64 SecondsInYear;
+		//Real64 KATemp;
+		//Real64 KAAmp;
+		//Real64 KAPhase;
+		//Real64 CurTime;
 
-		KATemp = PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature;
-		KAAmp = PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude;
-		KAPhase = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp;
-		CurTime = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
+		//KATemp = PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature;
+		//KAAmp = PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude;
+		//KAPhase = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp;
+		//CurTime = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
 
-		SecondsInYear = SecsInDay * 365.0;
+		//SecondsInYear = SecsInDay * 365.0;
 		z = PipingSystemDomains( DomainNum ).Extents.Ymax - cell.Centroid.Y;
 		Diffusivity = BaseThermalPropertySet_Diffusivity( PipingSystemDomains( DomainNum ).GroundProperties );
 
-		Term1 = -z * std::sqrt( Pi / ( SecondsInYear * Diffusivity ) );
-		Term2 = ( 2 * Pi / SecondsInYear ) * ( CurTime - KAPhase - ( z / 2 ) * std::sqrt( SecondsInYear / ( Pi * Diffusivity ) ) );
-		RetVal = KATemp - KAAmp * std::exp( Term1 ) * std::cos( Term2 );
+		//Term1 = -z * std::sqrt( Pi / ( SecondsInYear * Diffusivity ) );
+		//Term2 = ( 2 * Pi / SecondsInYear ) * ( CurTime - KAPhase - ( z / 2 ) * std::sqrt( SecondsInYear / ( Pi * Diffusivity ) ) );
+		//RetVal = KATemp - KAAmp * std::exp( Term1 ) * std::cos( Term2 );
 
-		return RetVal;
+		return PipingSystemDomains( DomainNum).Farfield.groundTempModel->getGroundTemp( z, Diffusivity, DayOfSim );
 
 	}
 

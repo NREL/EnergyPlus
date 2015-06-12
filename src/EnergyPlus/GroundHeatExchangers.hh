@@ -2,7 +2,6 @@
 #define GroundHeatExchangers_hh_INCLUDED
 
 // C++ Headers
-#include <vector>
 #include <memory>
 
 // ObjexxFCL Headers

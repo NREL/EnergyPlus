@@ -1,6 +1,9 @@
 #ifndef DataPlantPipingSystems_hh_INCLUDED
 #define DataPlantPipingSystems_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array3D.hh>
@@ -8,12 +11,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <GroundTempsManager.hh>
 
 namespace EnergyPlus {
 
 namespace DataPlantPipingSystems {
 
 	// Using/Aliasing
+	using namespace GroundTemps;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -731,6 +736,7 @@ namespace DataPlantPipingSystems {
 		Real64 AverageGroundTemperatureAmplitude; // C
 		Real64 PhaseShiftOfMinGroundTempDays; // days
 		Real64 PhaseShiftOfMinGroundTemp; // seconds
+		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 
 		// Default Constructor
 		FarfieldInfo() :
