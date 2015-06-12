@@ -122,94 +122,41 @@ namespace FaultsManager {
 		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule  
 		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
 		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
-		
+
 		// Default Constructor
 		FaultProperties() :
+			Name( "" ),
+			FaultType( "" ),
+			AvaiSchedule( "" ),
+			SeveritySchedule( "" ),
+			ControllerType( "" ),
 			ControllerTypeEnum( 0 ),
+			ControllerName( "" ),
 			ControllerID( 0 ),
 			Offset( 0.0 ),
 			Status( false ),
 			AvaiSchedPtr( 0 ),
 			SeveritySchedPtr( 0 ),
-			FaultyAirFilterPressFracSchePtr( 0 ),
-			FaultyAirFilterFanCurvePtr( 0 ),
 			FaultTypeEnum( 0 ),
+			FouledCoilName( "" ),
 			FouledCoilID( 0 ),
 			FoulingInputMethod( 0 ),
 			UAFouled( 0.0 ),
 			Rfw( 0.0 ),
 			Rfa( 0.0 ),
 			Aout( 0.0 ),
-			Aratio( 0.0 )
-		{}
-
-		// Member Constructor
-		FaultProperties(
-			std::string const & Name,
-			std::string const & FaultType, // Fault type
-			std::string const & AvaiSchedule, // Availability schedule
-			std::string const & SeveritySchedule, // Severity schedule, multipliers to the Offset
-			std::string const & ControllerType, // Controller type
-			int const ControllerTypeEnum,
-			std::string const & ControllerName, // Controller name
-			int const ControllerID, // Point to a controller associated with the fault
-			Real64 const Offset, // offset, + means sensor reading is higher than actual value
-			bool const Status, // for future use
-			int const AvaiSchedPtr,
-			int const SeveritySchedPtr,
-			int const FaultTypeEnum,
-			std::string const & FouledCoilName, // The fouled coil name
-			std::string const & FaultyThermostatName, // The faulty thermostat name
-			std::string const & FaultyHumidistatName, // The faulty humidistat name
-			std::string const & FaultyHumidistatType, // The faulty humidistat type
-			int const FouledCoilID, // Point to a fouling coil
-			int const FoulingInputMethod, // Coil fouling input method
-			Real64 const UAFouled, // Fouling coil UA under rating conditions
-			Real64 const Rfw, // Water side fouling factor
-			Real64 const Rfa, // Air side fouling factor
-			Real64 const Aout, // Coil outside surface area
-			Real64 const Aratio, // Inside to outside surface area ratio
-			std::string  FaultyAirFilterFanName,          // The name of the fan corresponding to the fouled air filter
-			std::string  FaultyAirFilterFanType,          // The type of the fan corresponding to the fouled air filter
-			std::string  FaultyAirFilterFanCurve,         // The name of the fan curve
-			int const    FaultyAirFilterFanCurvePtr,      // The pointer to the curve 
-			std::string  FaultyAirFilterPressFracSche,    // Schedule describing variations of the fan pressure rise
-			int const    FaultyAirFilterPressFracSchePtr, // The pointer to the schedule describing fan pressure rise
-			Real64 const FaultyAirFilterFanPressInc,      // The increase of the fan pressure due to fouled air filter
-			Real64 const FaultyAirFilterFanFlowDec        // The decrease of the fan airflow rate due to fouled air filter
-		) :
-			Name( Name ),
-			FaultType( FaultType ),
-			AvaiSchedule( AvaiSchedule ),
-			SeveritySchedule( SeveritySchedule ),
-			ControllerType( ControllerType ),
-			ControllerTypeEnum( ControllerTypeEnum ),
-			ControllerName( ControllerName ),
-			ControllerID( ControllerID ),
-			Offset( Offset ),
-			Status( Status ),
-			AvaiSchedPtr( AvaiSchedPtr ),
-			SeveritySchedPtr( SeveritySchedPtr ),
-			FaultTypeEnum( FaultTypeEnum ),
-			FouledCoilName( FouledCoilName ),
-			FouledCoilID( FouledCoilID ),
-			FoulingInputMethod( FoulingInputMethod ),
-			UAFouled( UAFouled ),
-			Rfw( Rfw ),
-			Rfa( Rfa ),
-			Aout( Aout ),
-			Aratio( Aratio ),
-			FaultyThermostatName( FaultyThermostatName ),
-			FaultyHumidistatName( FaultyHumidistatName ),
-			FaultyHumidistatType( FaultyHumidistatType ),
-			FaultyAirFilterFanName( FaultyAirFilterFanName ),  
-			FaultyAirFilterFanType( FaultyAirFilterFanType ),         
-			FaultyAirFilterFanCurve( FaultyAirFilterFanCurve ),          
-			FaultyAirFilterFanCurvePtr( FaultyAirFilterFanCurvePtr ),    
-			FaultyAirFilterPressFracSche( FaultyAirFilterPressFracSche ), 
-			FaultyAirFilterPressFracSchePtr( FaultyAirFilterPressFracSchePtr ), 
-			FaultyAirFilterFanPressInc( FaultyAirFilterFanPressInc ),
-			FaultyAirFilterFanFlowDec( FaultyAirFilterFanFlowDec )
+			Aratio( 0.0 ),
+			FaultyThermostatName( "" ),
+			FaultyHumidistatName( "" ),
+			FaultyHumidistatType( "" ),
+			FaultyAirFilterFanName( "" ),
+			FaultyAirFilterFanType( "" ),
+			FaultyAirFilterFanCurve( "" ),
+			FaultyAirFilterFanCurvePtr( 0 ),
+			FaultyAirFilterPressFracSche( "" ),
+			FaultyAirFilterPressFracSchePtr( 0 ),
+			FaultyAirFilterFanPressInc( 0.0 ),
+			FaultyAirFilterFanFlowDec( 0.0 )
 		{}
 
 	};
