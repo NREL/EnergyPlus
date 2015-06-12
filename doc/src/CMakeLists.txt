@@ -98,7 +98,7 @@ AddMarkdownInput(EngineeringReference 14-OnSiteGeneration.md 20)
 AddMarkdownInput(EngineeringReference 15-PerformanceCurves.md 21)
 AddMarkdownInput(EngineeringReference 16-Economics.md 22)
 AddMarkdownInput(EngineeringReference 17-SpecialModulesReporting.md 23)
-AddPDF(EngineeringReference 800000)
+AddPDF(EngineeringReference 1800000)
 
 AddMarkdownInput(ExternalInterfaces_Application_Guide ExternalInterfaces_Application_Guide.md 0)
 AddPDF(ExternalInterfaces_Application_Guide 10000)
