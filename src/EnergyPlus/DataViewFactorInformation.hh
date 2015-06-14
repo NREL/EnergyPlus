@@ -9,7 +9,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 
-#define ALIGNED_SCRIPTF
+#undef ALIGNED_SCRIPTF
 
 namespace EnergyPlus {
 

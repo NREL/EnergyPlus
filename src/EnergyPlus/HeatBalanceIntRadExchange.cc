@@ -354,10 +354,10 @@ namespace HeatBalanceIntRadExchange {
 #ifdef ALIGNED_SCRIPTF					
 					int Npad = ((zvfi.NumOfSurfaces + 1) >> 1) << 1;
 #endif // ALIGNED_SCRIPTF
-					for ( size_type SendZoneSurfNum = 0; SendZoneSurfNum < zvfi.NumOfSurfaces; ++SendZoneSurfNum ) {
+					for ( int SendZoneSurfNum = 0; SendZoneSurfNum < zvfi.NumOfSurfaces; ++SendZoneSurfNum ) {
 						// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
 #ifndef ALIGNED_SCRIPTF
-						int lSendRec = zvfi.ScriptFx(SendZoneSurfNum+1, RecZoneSurfNum+1);
+						int lSendRec = zvfi.ScriptF.index(SendZoneSurfNum+1, RecZoneSurfNum+1);
 						window.IRfromParentZone += zvfi.ScriptF[ lSendRec ] * SurfaceTempK4[ SendZoneSurfNum ] / SurfaceEmiss[ RecZoneSurfNum ];
 #else // ALIGNED_SCRIPTF
 			
@@ -395,9 +395,9 @@ namespace HeatBalanceIntRadExchange {
 				for ( size_type SendZoneSurfNum = 0; SendZoneSurfNum < zvfi.NumOfSurfaces; ++SendZoneSurfNum ) {
 					// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
 #ifndef ALIGNED_SCRIPTF
-					int lSendRec = zvfi.ScriptFx(SendZoneSurfNum+1, RecZoneSurfNum+1);
+					int lSendRec = zvfi.ScriptF.index(SendZoneSurfNum+1, RecZoneSurfNum+1);
 					window.IRfromParentZone += zvfi.ScriptF[ lSendRec ] * SurfaceTempK4[ SendZoneSurfNum ] / SurfaceEmiss[ RecZoneSurfNum ];
-#else // ALIGNED_SCRIPTF
+#else // !ALIGNED_SCRIPTF
 			
 					window.IRfromParentZone += zvfi.ScriptF[ SendZoneSurfNum * (Npad) + RecZoneSurfNum ] * SurfaceTempK4[ SendZoneSurfNum ] / SurfaceEmiss[ RecZoneSurfNum ];
 #endif // !ALIGNED_SCRIPTF						
