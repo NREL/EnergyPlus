@@ -169,6 +169,10 @@ namespace DemandManager {
 		int NumOfLoads; // Number of load objects
 		Array1D_int Load; // Pointers to load objects
 
+		// Additional fields related to DemandManager:Ventilation
+		Real64 FixedRate; // m3 per person
+		Real64 ReductionRatio; // % of reduction
+
 		// Default Constructor
 		DemandManagerData() :
 			Type( 0 ),
@@ -187,7 +191,9 @@ namespace DemandManager {
 			RotatedLoadNum( 0 ),
 			LowerLimit( 0.0 ),
 			UpperLimit( 0.0 ),
-			NumOfLoads( 0 )
+			NumOfLoads( 0 ),
+			FixedRate(0),
+			ReductionRatio(0)
 		{}
 
 		// Member Constructor
@@ -210,7 +216,9 @@ namespace DemandManager {
 			Real64 const LowerLimit, // Lowest demand limit as fraction of design level
 			Real64 const UpperLimit, // Not used for demand limit
 			int const NumOfLoads, // Number of load objects
-			Array1_int const & Load // Pointers to load objects
+			Array1_int const & Load, // Pointers to load objects
+			Real64 const FixedRate, // fixed rate for ventilation strategy
+			Real64 const ReductionRatio // reduction rate for ventilation strategy
 		) :
 			Name( Name ),
 			Type( Type ),
@@ -230,7 +238,9 @@ namespace DemandManager {
 			LowerLimit( LowerLimit ),
 			UpperLimit( UpperLimit ),
 			NumOfLoads( NumOfLoads ),
-			Load( Load )
+			Load( Load ),
+			FixedRate(FixedRate),
+			ReductionRatio(ReductionRatio)
 		{}
 
 	};
