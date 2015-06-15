@@ -11,7 +11,6 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataZoneControls.hh>
-#include <MixedAir.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
@@ -27,7 +26,7 @@ namespace DemandManager {
 	// MODULE INFORMATION:
 	//       AUTHOR         Peter Graham Ellis
 	//       DATE WRITTEN   July 2005
-	//       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
+	//       MODIFIED       na
 	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
@@ -53,7 +52,6 @@ namespace DemandManager {
 	int const ManagerTypeLights( 2 );
 	int const ManagerTypeElecEquip( 3 );
 	int const ManagerTypeThermostats( 4 );
-	int const ManagerTypeVentilation( 5 );
 
 	int const ManagerPrioritySequential( 1 );
 	int const ManagerPriorityOptimal( 2 );
@@ -62,7 +60,6 @@ namespace DemandManager {
 	int const ManagerLimitOff( 1 );
 	int const ManagerLimitFixed( 2 );
 	int const ManagerLimitVariable( 3 );
-	int const ManagerLimitReductionRatio( 4 );
 
 	int const ManagerSelectionAll( 1 );
 	int const ManagerSelectionMany( 2 );
@@ -220,7 +217,7 @@ namespace DemandManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   July 2005
-		//       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -285,7 +282,7 @@ namespace DemandManager {
 								ResimHB = true;
 								ResimHVAC = true;
 
-							} else if ((SELECT_CASE_var1 == ManagerTypeThermostats) || (SELECT_CASE_var1 == ManagerTypeVentilation)) {
+							} else if ( SELECT_CASE_var1 == ManagerTypeThermostats ) {
 								ResimHVAC = true;
 
 							}}
@@ -313,8 +310,7 @@ namespace DemandManager {
 								ResimHB = true;
 								ResimHVAC = true;
 
-							}
-							else if ((SELECT_CASE_var1 == ManagerTypeThermostats) || (SELECT_CASE_var1 == ManagerTypeVentilation)) {
+							} else if ( SELECT_CASE_var1 == ManagerTypeThermostats ) {
 								ResimHVAC = true;
 
 							}}
@@ -336,7 +332,7 @@ namespace DemandManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   July 2005
-		//       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -481,7 +477,7 @@ namespace DemandManager {
 
 						// Validate DEMAND MANAGER Type
 						{ auto const SELECT_CASE_var( AlphArray( MgrNum * 2 + 5 ) );
-						if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") || (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
+						if ( ( SELECT_CASE_var == "DEMANDMANAGER:LIGHTS" ) || ( SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS" ) || ( SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT" ) || ( SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS" ) ) {
 
 							DemandManagerList( ListNum ).Manager( MgrNum ) = FindItemInList( AlphArray( MgrNum * 2 + 6 ), DemandMgr.Name(), NumDemandMgr );
 
@@ -542,7 +538,7 @@ namespace DemandManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   July 2005
-		//       MODIFIED       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -575,7 +571,6 @@ namespace DemandManager {
 		using DataZoneControls::TStatObjects;
 		using DataZoneControls::NumTStatStatements;
 		using General::RoundSigDigits;
-		using MixedAir::GetOAController;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -586,7 +581,6 @@ namespace DemandManager {
 		int NumDemandMgrLights;
 		int NumDemandMgrElecEquip;
 		int NumDemandMgrThermostats;
-		int NumDemandMgrVentilation;
 		int MgrNum;
 		int StartIndex;
 		int EndIndex;
@@ -638,15 +632,8 @@ namespace DemandManager {
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
-		CurrentModuleObject = "DemandManager:Ventilation";
-		NumDemandMgrVentilation = GetNumObjectsFound(CurrentModuleObject);
-		if (NumDemandMgrVentilation > 0) {
-			GetObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
-			MaxAlphas = max(MaxAlphas, NumAlphas);
-			MaxNums = max(MaxNums, NumNums);
-		}
 
-		NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats + NumDemandMgrVentilation;
+		NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats;
 
 		if ( NumDemandMgr > 0 ) {
 			AlphArray.dimension( MaxAlphas, BlankString );
@@ -1092,116 +1079,6 @@ namespace DemandManager {
 
 			} // MgrNum
 
-			// Get input for DemandManager:Ventilation
-			StartIndex = EndIndex + 1;
-			EndIndex += NumDemandMgrVentilation;
-
-			CurrentModuleObject = "DemandManager:Ventilation";
-
-			for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
-
-				GetObjectItem(CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName(AlphArray(1), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name");
-				if (IsNotOK) {
-					ErrorsFound = true;
-					if (IsBlank) AlphArray(1) = "xxxxx";
-				}
-				DemandMgr(MgrNum).Name = AlphArray(1);
-
-				DemandMgr(MgrNum).Type = ManagerTypeVentilation;
-
-				if (!lAlphaFieldBlanks(2)) {
-					DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
-
-					if (DemandMgr(MgrNum).AvailSchedule == 0) {
-						ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
-						ErrorsFound = true;
-					}
-				}
-				else {
-					DemandMgr(MgrNum).AvailSchedule = ScheduleAlwaysOn;
-				}
-
-				// Validate Limiting Control
-				{ auto const SELECT_CASE_var(AlphArray(3));
-				if (SELECT_CASE_var == "OFF") {
-					DemandMgr(MgrNum).LimitControl = ManagerLimitOff;
-
-				}
-				else if (SELECT_CASE_var == "FIXEDRATE") {
-					DemandMgr(MgrNum).LimitControl = ManagerLimitFixed;
-
-				}
-				else if (SELECT_CASE_var == "REDUCTIONRATIO") {
-					DemandMgr(MgrNum).LimitControl = ManagerLimitReductionRatio;
-
-				}
-				else {
-					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-					ShowContinueError("...value must be one of Off, Fixed, or Variable.");
-					ErrorsFound = true;
-				}}
-
-				DemandMgr(MgrNum).LimitDuration = NumArray(1);
-
-				DemandMgr(MgrNum).FixedRate = NumArray(2);
-				DemandMgr(MgrNum).ReductionRatio = NumArray(3);
-
-				DemandMgr(MgrNum).LowerLimit = NumArray(4);
-
-				// Validate Selection Control
-				{ auto const SELECT_CASE_var(AlphArray(4));
-				if (SELECT_CASE_var == "ALL") {
-					DemandMgr(MgrNum).SelectionControl = ManagerSelectionAll;
-
-				}
-				else if (SELECT_CASE_var == "ROTATEONE") {
-					DemandMgr(MgrNum).SelectionControl = ManagerSelectionOne;
-
-				}
-				else if (SELECT_CASE_var == "ROTATEMANY") {
-					DemandMgr(MgrNum).SelectionControl = ManagerSelectionMany;
-
-				}
-				else {
-					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-					ShowContinueError("...value must be one of All, RotateOne, or RotateMany.");
-					ErrorsFound = true;
-				}}
-
-				DemandMgr(MgrNum).RotationDuration = NumArray(5);
-
-				// Count number of string fileds for loading Controller:OutdoorAir names. This number must be increased in case if
-				// new string field is added or decreased if string fields are removed.
-				int AlphaShift = 4;
-
-				// Count actual pointers to air controllers
-				DemandMgr(MgrNum).NumOfLoads = 0;
-				for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-					LoadPtr = GetOAController(AlphArray(LoadNum + AlphaShift));
-					if (LoadPtr > 0) {
-						++DemandMgr(MgrNum).NumOfLoads;
-					}
-					else {
-						ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + AlphaShift) + "=\"" + AlphArray(LoadNum + AlphaShift) + "\" not found.");
-						ErrorsFound = true;
-					}
-				}
-
-				if (DemandMgr(MgrNum).NumOfLoads > 0) {
-					DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
-					for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-						LoadPtr = GetOAController(AlphArray(LoadNum + AlphaShift));
-						if (LoadPtr > 0) {
-							DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
-						}
-					}
-				}
-			} // MgrNum
-
 			AlphArray.deallocate();
 			NumArray.deallocate();
 
@@ -1618,10 +1495,6 @@ namespace DemandManager {
 		using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 		using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 		using DataHeatBalFanSys::ComfortControlType;
-		using MixedAir::OAGetFlowRate;
-		using MixedAir::OAGetMinFlowRate;
-		using MixedAir::OASetDemandManagerVentilationState;
-		using MixedAir::OASetDemandManagerVentilationFlow;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1691,34 +1564,7 @@ namespace DemandManager {
 				}
 			}
 
-		} else if (SELECT_CASE_var == ManagerTypeVentilation) {
-			Real64 MinFlowRate(0), FlowRate(0);
-			//MinFlowRate = OAGetMinFlowRate(LoadPtr);
-			FlowRate = OAGetFlowRate(LoadPtr);
-			if (Action == CheckCanReduce) {
-				CanReduceDemand = true;
-			}
-			else if (Action == SetLimit) {
-				OASetDemandManagerVentilationState(LoadPtr, true);
-				if (DemandMgr(MgrNum).LimitControl == ManagerLimitFixed)
-				{
-					OASetDemandManagerVentilationFlow(LoadPtr, DemandMgr(MgrNum).FixedRate);
-				}
-				else if (DemandMgr(MgrNum).LimitControl == ManagerLimitReductionRatio)
-				{
-					Real64 DemandRate(0);
-					DemandRate = FlowRate * DemandMgr(MgrNum).ReductionRatio;
-					OASetDemandManagerVentilationFlow(LoadPtr, DemandRate);
-				}
-			}
-			else if (Action == ClearLimit)
-			{
-				OASetDemandManagerVentilationState(LoadPtr, false);
-			}
-		}
-
-
-		}
+		}}
 
 	}
 
