@@ -972,6 +972,7 @@ namespace PlantPipingSystemsManager {
 			using DataHeatBalance::TotMaterials;
 			using DataEnvironment::PubGroundTempSurfFlag;
 			using DataEnvironment::PubGroundTempSurface;
+			using namespace GroundTemps;
 
 			// Locals
 			// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1128,7 +1129,7 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// Read in the rest of the inputs into the local type for clarity during transition
-				Domain( ZoneCoupledDomainCtr ).OSCMName = cAlphaArgs( 2 );
+				Domain( ZoneCoupledDomainCtr ).OSCMName = cAlphaArgs( 4 );
 				Domain( ZoneCoupledDomainCtr ).Depth = rNumericArgs( 1 );
 				Domain( ZoneCoupledDomainCtr ).AspectRatio = rNumericArgs( 2 );
 				Domain( ZoneCoupledDomainCtr ).PerimeterOffset = rNumericArgs( 3 );
@@ -1137,18 +1138,21 @@ namespace PlantPipingSystemsManager {
 				Domain( ZoneCoupledDomainCtr ).SoilSpecificHeat = rNumericArgs( 6 );
 				Domain( ZoneCoupledDomainCtr ).MoistureContent = rNumericArgs( 7 );
 				Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent = rNumericArgs( 8 );
-				Domain( ZoneCoupledDomainCtr ).KusudaAvgSurfTemp = rNumericArgs( 9 );
-				Domain( ZoneCoupledDomainCtr ).KusudaAvgAmplitude = rNumericArgs( 10 );
-				Domain( ZoneCoupledDomainCtr ).KusudaPhaseShift = rNumericArgs( 11 );
-				Domain( ZoneCoupledDomainCtr ).EvapotranspirationCoeff = rNumericArgs( 12 );
-				Domain( ZoneCoupledDomainCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 10 ) || lNumericFieldBlanks( 11 ) || lNumericFieldBlanks( 12 );
-				Domain( ZoneCoupledDomainCtr ).HorizInsWidth = rNumericArgs( 13 );
-				Domain( ZoneCoupledDomainCtr ).VertInsDepth = rNumericArgs( 14 );
+				
+				Domain( ZoneCoupledDomainCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+				
+				//Domain( ZoneCoupledDomainCtr ).KusudaAvgSurfTemp = rNumericArgs( 9 );
+				//Domain( ZoneCoupledDomainCtr ).KusudaAvgAmplitude = rNumericArgs( 10 );
+				//Domain( ZoneCoupledDomainCtr ).KusudaPhaseShift = rNumericArgs( 11 );
+				Domain( ZoneCoupledDomainCtr ).EvapotranspirationCoeff = rNumericArgs( 9 );
+				//Domain( ZoneCoupledDomainCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 10 ) || lNumericFieldBlanks( 11 ) || lNumericFieldBlanks( 12 );
+				Domain( ZoneCoupledDomainCtr ).HorizInsWidth = rNumericArgs( 10 );
+				Domain( ZoneCoupledDomainCtr ).VertInsDepth = rNumericArgs( 11 );
 
 				// Set flag for slab in-grade or slab on-grade
-				if ( SameString( cAlphaArgs( 3 ), "INGRADE" ) ) {
+				if ( SameString( cAlphaArgs( 5 ), "INGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = true;
-				} else if ( SameString( cAlphaArgs( 3 ), "ONGRADE" ) ) {
+				} else if ( SameString( cAlphaArgs( 5 ), "ONGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = false;
 				} else {
 					ShowContinueError( "Slab location not determined." );
@@ -1157,10 +1161,10 @@ namespace PlantPipingSystemsManager {
 
 				// Get slab material properties
 				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
-					Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 4 );
-					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material.Name(), TotMaterials );
+					Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 6 );
+					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material.Name(), TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
-						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 						ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
 						ErrorsFound = true;
 					} else {
@@ -1174,9 +1178,9 @@ namespace PlantPipingSystemsManager {
 
 				// set flag for horizontal insulation
 				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
-					if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
+					if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
 						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
-					} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
+					} else if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
 						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
 					} else {
 						ShowContinueError( "Must enter either yes or no for horizontal insulation." );
@@ -1186,10 +1190,10 @@ namespace PlantPipingSystemsManager {
 
 				// Get horizontal insulation material properties
 				if ( PipingSystemDomains( DomainCtr ).HorizInsPresentFlag ) {
-					Domain( ZoneCoupledDomainCtr ).HorizInsMaterial = cAlphaArgs( 6 );
-					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material.Name(), TotMaterials );
+					Domain( ZoneCoupledDomainCtr ).HorizInsMaterial = cAlphaArgs( 8 );
+					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material.Name(), TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum == 0 ) {
-						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
 						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).HorizInsMaterial );
 						ErrorsFound = true;
 					} else {
@@ -1200,9 +1204,9 @@ namespace PlantPipingSystemsManager {
 					}
 
 					// Set flag for horizontal insulation extents
-					if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
+					if ( SameString( cAlphaArgs( 9 ), "PERIMETER" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = false;
-					} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
+					} else if ( SameString( cAlphaArgs( 9 ), "FULL" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = true;
 					} else {
 						ShowContinueError( "Must enter either PERIMETER or FULL for horizontal insulation extents." );
@@ -1214,9 +1218,9 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// set flag for vertical insulation
-				if ( SameString( cAlphaArgs( 8 ), "NO" ) ) {
+				if ( SameString( cAlphaArgs( 10 ), "NO" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = false;
-				} else if ( SameString( cAlphaArgs( 8 ), "YES" ) ) {
+				} else if ( SameString( cAlphaArgs( 10 ), "YES" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = true;
 				} else {
 					ShowContinueError( "Must enter either yes or no for vertical insulation." );
@@ -1225,10 +1229,10 @@ namespace PlantPipingSystemsManager {
 
 				// Get vertical insulation material properties
 				if ( PipingSystemDomains( DomainCtr ).VertInsPresentFlag ) {
-					Domain( ZoneCoupledDomainCtr ).VertInsMaterial = cAlphaArgs( 9 );
-					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 9 ), Material.Name(), TotMaterials );
+					Domain( ZoneCoupledDomainCtr ).VertInsMaterial = cAlphaArgs( 11 );
+					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 11 ), Material.Name(), TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).VertInsMaterialNum == 0 ) {
-						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + "=" + cAlphaArgs( 9 ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + "=" + cAlphaArgs( 11 ) );
 						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).VertInsMaterial );
 						ErrorsFound = true;
 					} else {
@@ -1252,9 +1256,9 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).PerimeterOffset = Domain( ZoneCoupledDomainCtr ).PerimeterOffset;
 
 				// Set simulation interval flag
-				if ( SameString( cAlphaArgs( 10 ), "TIMESTEP" ) ) {
+				if ( SameString( cAlphaArgs( 12 ), "TIMESTEP" ) ) {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
-				} else if ( SameString( cAlphaArgs( 10 ), "HOURLY" ) ) {
+				} else if ( SameString( cAlphaArgs( 12 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
 				} else {
 					ShowContinueError( "Could not determine slab simulation interval. Check input." );
