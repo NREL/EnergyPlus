@@ -1011,6 +1011,7 @@ namespace PlantPipingSystemsManager {
 				Real64 KusudaAvgSurfTemp;
 				Real64 KusudaAvgAmplitude;
 				Real64 KusudaPhaseShift;
+				std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 				Real64 EvapotranspirationCoeff;
 				bool UseGroundTempDataForKusuda;
 				Real64 MinSurfTemp;
@@ -1329,7 +1330,9 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_liq = Domain( ZoneCoupledDomainCtr ).MoistureContent / 100.0;
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent / 100.0;
 
-				// Farfield model parameters
+				// Farfield model
+				PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = Domain( ZoneCoupledDomainCtr ).groundTempModel;
+
 				if ( !Domain( ZoneCoupledDomainCtr ).UseGroundTempDataForKusuda ) {
 					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = Domain( ZoneCoupledDomainCtr ).KusudaAvgSurfTemp;
 					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = Domain( ZoneCoupledDomainCtr ).KusudaAvgAmplitude;
