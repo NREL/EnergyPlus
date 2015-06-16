@@ -232,15 +232,24 @@ namespace FaultsManager {
 					FaultsFouledAirFilters( jFaultyAirFilter ).Name = cAlphaArgs( 1 );
 
 					// Informatin of the fan associated with the fouling air filter
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName = cAlphaArgs( 2 );
-					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType = cAlphaArgs( 3 );	
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType = cAlphaArgs( 2 );
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );	
 
 					// Check whether the specified fan exsits in the fan list
-					if ( FindItemInList( cAlphaArgs( 2 ), Fans::Fan.FanName(), Fans::NumFans ) != 1 ) {
-						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan.FanName(), Fans::NumFans ) != 1 ) {
+						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 						ErrorsFound = true;
-					}				
-
+					}			
+					
+					// Assign fault index to the fan object
+					for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
+						if ( SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) { 
+							Fans::Fan( FanNum ).FaultyFilterFlag = true;
+							Fans::Fan( FanNum ).FaultyFilterIndex = jFaultyAirFilter;
+							break;
+						}
+					}
+					
 					// Fault availability schedule
 					FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedule = cAlphaArgs( 4 );
 					if ( lAlphaFieldBlanks( 4 ) ) {
@@ -542,15 +551,23 @@ namespace FaultsManager {
 		Real64 FanMaxAirFlowRate; // Design Max Specified Volume Flow Rate of Fan [m3/sec]
 		Real64 FanDeltaPress;     // Design Delta Pressure Across the Fan [Pa]
 		Real64 FanDeltaPressCal;  // Calculated Delta Pressure Across the Fan [Pa]
+		bool   FanFound;          // Whether the fan is found or not
 
 		// FLOW
+		
+		FanFound = false;
 		
 		for ( int FanNum = 1; FanNum <= NumFans; ++FanNum ) {
 			if ( SameString( Fan( FanNum ).FanName, FanName ) ) { 
 				FanMaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;
 				FanDeltaPress = Fan( FanNum ).DeltaPress;
+				FanFound = true;
 				break;
 			}
+		}
+		
+		if ( !FanFound ) {
+			return false;
 		}
 		
 		FanDeltaPressCal = CurveValue( FanCurvePtr, FanMaxAirFlowRate );

@@ -1481,32 +1481,23 @@ namespace Fans {
 		RhoAir = Fan( FanNum ).RhoAirStdInit;
 		MassFlow = Fan( FanNum ).InletAirMassFlowRate;
 		
-		//Faulty fan operations_Apr. 2015, zrp
+		//Faulty fan operations_Jun. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) { 
 			
-			//  loop through the FaultsFouledAirFilters objects to find the one for the current fan
-			for ( int iFault = 1; iFault <= FaultsManager::NumFaultyAirFilter; ++iFault ) {
+			int iFault = Fan( FanNum ).FaultyFilterIndex;
+			
+			// Check fault availability schedules
+			if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
+				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
 
-				// find the FaultsFouledAirFilters object for the current fan
-				if ( SameString( Fan( FanNum ).FanName, FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanName ) ) {
-
-					// Check fault availability schedules
-					if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
-						Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
-
-						FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
-							( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
-							FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
-						
-						//Update MassFlow & DeltaPress of the fan
-						MassFlow = min( MassFlow, Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir );
-						DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
-					}
-					
-					// Stop searching the FaultsFouledAirFilters object for the fan
-					break;
-				}
+				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
+					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
+					FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
+				
+				//Update MassFlow & DeltaPress of the fan
+				MassFlow = min( MassFlow, Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir );
+				DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
 			}
 		}
 
@@ -1651,31 +1642,22 @@ namespace Fans {
 		
 		//Faulty fan operations_Apr. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
+		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
 			
-			//  loop through the FaultsFouledAirFilters objects to find the one for the current fan
-			for ( int iFault = 1; iFault <= FaultsManager::NumFaultyAirFilter; ++iFault ) {
+			int iFault = Fan( FanNum ).FaultyFilterIndex;
+			
+			// Check fault availability schedules
+			if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
+				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
 
-				// find the FaultsFouledAirFilters object for the current fan
-				if ( SameString( Fan( FanNum ).FanName, FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanName ) ) {
-
-					// Check fault availability schedules
-					if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
-						Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
-
-						FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
-							( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
-							FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
-						
-						//Update MassFlow & DeltaPress of the fan 
-						MaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate - FanDesignFlowRateDec;
-						MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
-						DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
-					}
-					
-					// Stop searching the FaultsFouledAirFilters object for the fan
-					break;
-				}
+				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
+					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
+					FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
+				
+				//Update MassFlow & DeltaPress of the fan 
+				MaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate - FanDesignFlowRateDec;
+				MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
+				DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
 			}
 		}
 
@@ -1832,30 +1814,21 @@ namespace Fans {
 
 		//Faulty fan operations_Apr. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
+		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
 			
-			//  loop through the FaultsFouledAirFilters objects to find the one for the current fan
-			for ( int iFault = 1; iFault <= FaultsManager::NumFaultyAirFilter; ++iFault ) {
+			int iFault = Fan( FanNum ).FaultyFilterIndex;
+			
+			// Check fault availability schedules
+			if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
+				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
 
-				// find the FaultsFouledAirFilters object for the current fan
-				if ( SameString( Fan( FanNum ).FanName, FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanName ) ) {
-
-					// Check fault availability schedules
-					if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
-						Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
-
-						FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
-							( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
-							FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
-						
-						//Update MassFlow & DeltaPress of the fan
-						MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
-						DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
-					}
-					
-					// Stop searching the FaultsFouledAirFilters object for the fan
-					break;
-				}
+				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
+					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
+					FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
+				
+				//Update MassFlow & DeltaPress of the fan
+				MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
+				DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
 			}
 		}
 		

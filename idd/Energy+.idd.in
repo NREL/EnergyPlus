@@ -76260,18 +76260,18 @@ FaultModel:Fouling:AirFilter,
        \note Enter the name of the fault
        \required-field
        \type alpha
-   A2, \field Fan Name
-       \note Enter the name of a fan object
-       \required-field
-       \type object-list
-       \object-list FansCVandOnOffandVAV 
-   A3, \field Fan Object Type
+   A2, \field Fan Object Type
        \note Choose the type of the fan
        \required-field
        \type choice
        \key Fan:OnOff
        \key Fan:ConstantVolume
        \key Fan:VariableVolume
+   A3, \field Fan Name
+       \note Enter the name of a fan object
+       \required-field
+       \type object-list
+       \object-list FansCVandOnOffandVAV 
    A4, \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames

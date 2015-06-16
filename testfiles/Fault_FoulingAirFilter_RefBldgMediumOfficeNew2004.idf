@@ -7933,8 +7933,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: FaultModel:Fouling:AirFilter ===========
 FaultModel:Fouling:AirFilter,
    DF_VAV_1_Fan, 	     !- Name
-   VAV_1_Fan, 		     !- Fan Name
    Fan:VariableVolume,	 !- Fan Object Type
+   VAV_1_Fan, 		     !- Fan Name
    ALWAYS_ON,  		     !- Availability Schedule Name
    Pressure_Inc_Sch,  	 !- Pressure Fraction Schedule Name
    VAV_1_Fan_Curve; 	 !- Fan Curve Name
