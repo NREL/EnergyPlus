@@ -1549,8 +1549,8 @@ namespace PlantPipingSystemsManager {
 			Domain( BasementCtr ).Depth = rNumericArgs( 1 );
 			Domain( BasementCtr ).AspectRatio = rNumericArgs( 2 );
 			Domain( BasementCtr ).PerimeterOffset = rNumericArgs( 3 );
-			Domain( BasementCtr ).HorizInsWidth = rNumericArgs( 13 );
-			Domain( BasementCtr ).VertInsDepth = rNumericArgs( 15 );
+			Domain( BasementCtr ).HorizInsWidth = rNumericArgs( 10 );
+			Domain( BasementCtr ).VertInsDepth = rNumericArgs( 12 );
 
 			// Soil properties, validated min/max by IP
 			PipingSystemDomains( DomainNum ).GroundProperties.Conductivity = rNumericArgs( 4 );
@@ -1561,73 +1561,74 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Moisture.Theta_liq = rNumericArgs( 7 ) / 100.0;
 			PipingSystemDomains( DomainNum ).Moisture.Theta_sat = rNumericArgs( 8 ) / 100.0;
 
-			// Farfield model parameters, validated min/max by IP
-			Domain( BasementCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 9 ) || lNumericFieldBlanks( 10 ) || lNumericFieldBlanks( 11 );
+			// Farfield ground temperature model
+			//Domain( BasementCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 9 ) || lNumericFieldBlanks( 10 ) || lNumericFieldBlanks( 11 );
+			PipingSystemDomains( BasementCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
-			if ( !Domain( BasementCtr ).UseGroundTempDataForKusuda ) {
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = rNumericArgs( 9 );
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = rNumericArgs( 10 );
-				PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = rNumericArgs( 11 );
-			} else {
-				// If ground temp data was not brought in manually in GETINPUT,
-				// then we must get it from the surface ground temperatures
+			//if ( !Domain( BasementCtr ).UseGroundTempDataForKusuda ) {
+			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = rNumericArgs( 9 );
+			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = rNumericArgs( 10 );
+			//	PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = rNumericArgs( 11 );
+			//} else {
+			//	// If ground temp data was not brought in manually in GETINPUT,
+			//	// then we must get it from the surface ground temperatures
 
-				if ( !PubGroundTempSurfFlag ) {
-					ShowSevereError( "Input problem for " + ObjName_ZoneCoupled_Basement + '=' + Domain( BasementCtr ).ObjName );
-					ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-					ShowContinueError( "This is required for the ground domain if farfield parameters are" );
-					ShowContinueError( " not directly entered into the input object." );
-					ErrorsFound = true;
-				}
+			//	if ( !PubGroundTempSurfFlag ) {
+			//		ShowSevereError( "Input problem for " + ObjName_ZoneCoupled_Basement + '=' + Domain( BasementCtr ).ObjName );
+			//		ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
+			//		ShowContinueError( "This is required for the ground domain if farfield parameters are" );
+			//		ShowContinueError( " not directly entered into the input object." );
+			//		ErrorsFound = true;
+			//	}
 
-				// Calculate Average Ground Temperature for all 12 months of the year:
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = 0.0;
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
-				}
+			//	// Calculate Average Ground Temperature for all 12 months of the year:
+			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = 0.0;
+			//	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
+			//		PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
+			//	}
 
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature /= MonthsInYear;
+			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature /= MonthsInYear;
 
-				// Calculate Average Amplitude from Average:
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature );
-				}
+			//	// Calculate Average Amplitude from Average:
+			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
+			//	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
+			//		PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature );
+			//	}
 
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
+			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
 
-				// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				Domain( BasementCtr ).MonthOfMinSurfTemp = 0;
-				Domain( BasementCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					if ( PubGroundTempSurface( MonthIndex ) <= Domain( BasementCtr ).MinSurfTemp ) {
-						Domain( BasementCtr ).MonthOfMinSurfTemp = MonthIndex;
-						Domain( BasementCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-					}
-				}
+			//	// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
+			//	Domain( BasementCtr ).MonthOfMinSurfTemp = 0;
+			//	Domain( BasementCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
+			//	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
+			//		if ( PubGroundTempSurface( MonthIndex ) <= Domain( BasementCtr ).MinSurfTemp ) {
+			//			Domain( BasementCtr ).MonthOfMinSurfTemp = MonthIndex;
+			//			Domain( BasementCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
+			//		}
+			//	}
 
-				PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( BasementCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
-			}
+			//	PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( BasementCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
+			//}
 
 			// Unit conversion
-			PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
+			//PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
 
 			// check if there are blank inputs related to the basement,
-			if ( lNumericFieldBlanks( 14 ) || lAlphaFieldBlanks( 3 ) || lAlphaFieldBlanks( 8 ) ) {
+			if ( lNumericFieldBlanks( 11 ) || lAlphaFieldBlanks( 5 ) || lAlphaFieldBlanks( 10 ) ) {
 				ShowSevereError( "Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "At least one basement input was left blank." );
 				ErrorsFound = true;
 			}
 
 			// Basement zone depth
-			CurIndex = 14;
+			CurIndex = 11;
 			PipingSystemDomains( DomainNum ).BasementZone.Depth = rNumericArgs( CurIndex );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.Depth <= 0.0 ) {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cNumericFieldNames( CurIndex ), rNumericArgs( CurIndex ), "Basement depth must be a positive nonzero value.", ErrorsFound );
 			}
 
 			// get boundary condition model names and indeces --error check
-			CurIndex = 2;
+			CurIndex = 4;
 			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName = cAlphaArgs( CurIndex );
 			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM.Name(), TotOSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex <= 0 ) {
@@ -1645,7 +1646,7 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 
-			CurIndex = 6;
+			CurIndex = 8;
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM.Name(), TotOSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
@@ -1665,14 +1666,14 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS = 250;
 
 			// additional evapotranspiration parameter, min/max validated by IP
-			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 12 );
+			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 9 );
 
 			// assign the mesh count
 			int meshCount;
-			if ( lNumericFieldBlanks( 16 ) ) {
+			if ( lNumericFieldBlanks( 13 ) ) {
 				meshCount = 4;
 			} else {
-				meshCount = rNumericArgs( 16 );
+				meshCount = rNumericArgs( 13 );
 			}
 
 			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = meshCount;
@@ -1690,9 +1691,9 @@ namespace PlantPipingSystemsManager {
 
 			// set flag for horizontal insulation
 			// Check cAlphaArgs value
-			if ( SameString( cAlphaArgs( 3 ), "NO" ) ) {
+			if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = false;
-			} else if ( SameString( cAlphaArgs( 3 ), "YES" ) ) {
+			} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = true;
 			} else {
 				ShowContinueError( "Must enter either yes or no for horizontal insulation." );
@@ -1701,10 +1702,10 @@ namespace PlantPipingSystemsManager {
 
 			// Get horizontal insulation material properties
 			if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
-				Domain( BasementCtr ).HorizInsMaterial = cAlphaArgs( 4 );
-				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material.Name(), TotMaterials );
+				Domain( BasementCtr ).HorizInsMaterial = cAlphaArgs( 6 );
+				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material.Name(), TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).HorizInsMaterialNum == 0 ) {
-					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 					ShowContinueError( "Found in " + Domain( BasementCtr ).HorizInsMaterial );
 					ErrorsFound = true;
 				} else {
@@ -1715,9 +1716,9 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// Set flag for horizontal insulation extents
-				if ( SameString( cAlphaArgs( 5 ), "PERIMETER" ) ) {
+				if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = false;
-				} else if ( SameString( cAlphaArgs( 5 ), "FULL" ) ) {
+				} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = true;
 				} else {
 					ShowContinueError( "Must enter either PERIMETER or FULL for horizontal insulation extents." );
@@ -1729,9 +1730,9 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// set flag for vertical insulation
-			if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
+			if ( SameString( cAlphaArgs( 9 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = false;
-			} else if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
+			} else if ( SameString( cAlphaArgs( 9 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = true;
 			} else {
 				ShowContinueError( "Must enter either yes or no for vertical insulation." );
@@ -1740,10 +1741,10 @@ namespace PlantPipingSystemsManager {
 
 			// Get vertical insulation material properties
 			if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) {
-				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 8 );
-				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material.Name(), TotMaterials );
+				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 10 );
+				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 10 ), Material.Name(), TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).VertInsMaterialNum == 0 ) {
-					ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
 					ShowContinueError( "Found in " + Domain( BasementCtr ).VertInsMaterial );
 					ErrorsFound = true;
 				} else {
@@ -1758,9 +1759,9 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Set simulation interval flag
-			if ( SameString( cAlphaArgs( 9 ), "TIMESTEP" ) ) {
+			if ( SameString( cAlphaArgs( 11 ), "TIMESTEP" ) ) {
 				PipingSystemDomains( DomainNum ).SimTimestepFlag = true;
-			} else if ( SameString( cAlphaArgs( 9 ), "HOURLY" ) ) {
+			} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
 				PipingSystemDomains( DomainNum ).SimHourlyFlag = true;
 			} else {
 				ShowContinueError( "Could not determine basement simulation interval. Check input." );
