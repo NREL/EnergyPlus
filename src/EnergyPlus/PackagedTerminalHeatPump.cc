@@ -484,7 +484,6 @@ namespace PackagedTerminalHeatPump {
 		auto & GetHXDXCoilInletNode( HVACHXAssistedCoolingCoil::GetCoilInletNode );
 		auto & GetHXDXCoilOutletNode( HVACHXAssistedCoolingCoil::GetCoilOutletNode );
 		auto & GetHeatingCoilIndex( HeatingCoils::GetCoilIndex );
-		using HeatingCoils::HeatingCoil;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		auto & GetHeatingCoilInletNode( HeatingCoils::GetCoilInletNode );
 		auto & GetHeatingCoilOutletNode( HeatingCoils::GetCoilOutletNode );
@@ -511,9 +510,6 @@ namespace PackagedTerminalHeatPump {
 		using BranchNodeConnections::SetUpCompSets;
 		using FluidProperties::GetSatDensityRefrig;
 		auto & GetWtoAHPCoilCapacity( WaterToAirHeatPump::GetCoilCapacity );
-		auto & GetWtoAHPCoilInletNode( WaterToAirHeatPump::GetCoilInletNode );
-		auto & GetWtoAHPCoilOutletNode( WaterToAirHeatPump::GetCoilOutletNode );
-		auto & GetWtoAHPCoilIndex( WaterToAirHeatPump::GetCoilIndex );
 		auto & GetWtoAHPSimpleCoilCapacity( WaterToAirHeatPumpSimple::GetCoilCapacity );
 		auto & GetWtoAHPSimpleCoilInletNode( WaterToAirHeatPumpSimple::GetCoilInletNode );
 		auto & GetWtoAHPSimpleCoilOutletNode( WaterToAirHeatPumpSimple::GetCoilOutletNode );
@@ -2722,12 +2718,10 @@ namespace PackagedTerminalHeatPump {
 		using namespace DataZoneEnergyDemands;
 		using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
-		using DataZoneEquipment::ZoneEquipSimulatedOnce;
 		auto & GetHeatingCoilCapacity( HeatingCoils::GetCoilCapacity );
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
@@ -4253,7 +4247,6 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
 		int const SolveMaxIter( 50 );
 
@@ -4277,13 +4270,10 @@ namespace PackagedTerminalHeatPump {
 		bool errFlag; // subroutine error flag
 		Real64 WSHPRuntimeFrac; // RTF variable for WSHP's
 		Real64 mdot; // local temporary for mass flow rate
-		Real64 PartLoadFraction; // heating or cooling part load fraction
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
 		static Array1D< Real64 > Par( 3 );
 		int SolFlag;
-		Real64 MinFlow; // minimum fluid flow rate, kg/s
-		int ControlCompTypeNum; // temporary component index number
 		static int ATMixOutNode( 0 ); // outlet node of ATM Mixer
 
 		//Tuned Named constants to avoid heap allocation when passed to Optional args
@@ -5570,7 +5560,6 @@ namespace PackagedTerminalHeatPump {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::CurrentTime;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using SteamCoils::SimulateSteamCoilComponents;
@@ -5584,7 +5573,6 @@ namespace PackagedTerminalHeatPump {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
-		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5602,7 +5590,6 @@ namespace PackagedTerminalHeatPump {
 		int SolFla; // Flag of RegulaFalsi solver
 		static Array1D< Real64 > Par( 11 ); // Parameters passed to RegulaFalsi
 		Real64 CpAir; // air specific heat
-		Real64 QCoilActual; // coil load actually delivered returned to calling component
 		int i; // Speed index
 		static int ErrCountCyc( 0 ); // Counter used to minimize the occurrence of output warnings
 		static int ErrCountVar( 0 ); // Counter used to minimize the occurrence of output warnings
@@ -6094,7 +6081,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 const QLatReq, // Zone latent load []
 		Real64 & OnOffAirFlowRatio, // ratio of compressor ON airflow to AVERAGE airflow over timestep
 		Real64 & SupHeaterLoad, // supplemental heater load (W)
-		bool const HXUnitOn // flag to enable heat exchanger
+		bool const EP_UNUSED( HXUnitOn ) // flag to enable heat exchanger
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -6157,7 +6144,6 @@ namespace PackagedTerminalHeatPump {
 		Real64 QCoilReq; // load passed to heating coil (W)
 		Real64 QActual; // actual heating coil output (W)
 		int OpMode; // fan operating mode, CycFanCycCoil or ContFanCycCoil
-		bool errFlag; // subroutine error flag
 		Real64 mdot; // local temporary for mass flow rate
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
@@ -6367,7 +6353,7 @@ namespace PackagedTerminalHeatPump {
 	void
 	SetVSHPAirFlow(
 		int const PTUnitNum, // Unit index
-		int const ZoneNum, // Zone index
+		int const EP_UNUSED( ZoneNum ), // Zone index
 		Real64 const PartLoadRatio, // unit part load ratio
 		Real64 & OnOffAirFlowRatio, // ratio of compressor ON airflow to average airflow over timestep
 		Optional_int_const SpeedNum, // Speed number
@@ -6540,11 +6526,11 @@ namespace PackagedTerminalHeatPump {
 		int const PTUnitNum, // index to furnace
 		int const ZoneNum, // index to zone
 		bool const FirstHVACIteration, // Flag for 1st HVAC iteration
-		int const AirLoopNum, // index to air loop !unused1208
+		int const EP_UNUSED( AirLoopNum ), // index to air loop !unused1208
 		Real64 & OnOffAirFlowRatio, // ratio of coil on to coil off air flow rate
-		int const OpMode, // fan operating mode
-		Real64 const QZnReq, // sensible load to be met (W) !unused1208
-		Real64 const MoistureLoad, // moisture load to be met (W)
+		int const EP_UNUSED( OpMode ), // fan operating mode
+		Real64 const EP_UNUSED( QZnReq ), // sensible load to be met (W) !unused1208
+		Real64 const EP_UNUSED( MoistureLoad ), // moisture load to be met (W)
 		Real64 & PartLoadRatio // coil part-load ratio
 	)
 	{

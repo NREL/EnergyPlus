@@ -70,11 +70,11 @@ namespace PlantLoadProfile {
 
 	void
 	SimulatePlantProfile(
-		std::string const & EquipTypeName, // description of model (not used until different types of profiles)
+		std::string const & EP_UNUSED( EquipTypeName ), // description of model (not used until different types of profiles)
 		std::string const & EquipName, // the user-defined name
-		int const EquipTypeNum, // the plant parameter ID for equipment model
+		int const EP_UNUSED( EquipTypeNum ), // the plant parameter ID for equipment model
 		int & ProfileNum, // the index for specific load profile
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool const InitLoopEquip // flag indicating if called in special initialization mode.
 	)
 	{

@@ -190,7 +190,6 @@ namespace ZoneAirLoopEquipmentManager {
 		using namespace DataLoopNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ZoneEquipList;
 		using DualDuct::GetDualDuctOutdoorAirRecircUse;
 		using SingleDuct::GetATMixerPriNode;
 
@@ -453,7 +452,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	InitZoneAirLoopEquipment(
-		bool const FirstHVACIteration, // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // unused1208
 		int const AirDistUnitNum,
 		int const ZoneNum
 	)
@@ -547,7 +546,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ZoneEquipList;
 		using DataLoopNode::Node;
 		using DataAirLoop::AirLoopFlow;
 		using DualDuct::SimulateDualDuct;

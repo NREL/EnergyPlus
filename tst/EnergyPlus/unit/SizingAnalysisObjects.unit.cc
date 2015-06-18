@@ -186,7 +186,6 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour )
 // fill first step in log with zone step data
 	int KindOfSim( 4 );
 	int Envrn( 3 );
-	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
 	int CurMin( 15 );
@@ -353,7 +352,6 @@ TEST_F( SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest )
 	// fill first step in log with zone step data
 	int KindOfSim( 4 );
 	int Envrn( 4 );
-	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
 	int CurMin( 15 );

@@ -522,7 +522,6 @@ namespace HVACMultiSpeedHeatPump {
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
 		using SteamCoils::GetTypeOfCoil;
-		using SteamCoils::ZoneLoadControl;
 		using FluidProperties::GetSatDensityRefrig;
 		using ZoneTempPredictorCorrector::NumStageCtrZone;
 		using DataZoneControls::StageControlledZone;
@@ -559,7 +558,6 @@ namespace HVACMultiSpeedHeatPump {
 		int SuppHeatCoilInletNode; // Supplemental heating coil inlet node number
 		int SuppHeatCoilOutletNode; // Supplemental heating coil outlet node number
 		bool LocalError; // Local error flag
-		int SpeedInput; // Status of number of speed input
 		Array1D_string Alphas; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
 		Array1D_string cNumericFields; // Numeric field names
@@ -1511,13 +1509,10 @@ namespace HVACMultiSpeedHeatPump {
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataSizing::AutoSize;
-		using DataEnvironment::StdBaroPress;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
-		using DataBranchNodeConnections::NodeConnections;
-		using DataBranchNodeConnections::NumOfNodeConnections;
 		using InputProcessor::SameString;
 		using DataAirLoop::AirLoopControlInfo;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -1551,8 +1546,6 @@ namespace HVACMultiSpeedHeatPump {
 		int InNode; // Inlet node number in MSHP loop
 		int OutNode; // Outlet node number in MSHP loop
 		int ZoneInNode; // Zone inlet node number in the controlled zone for MSHP
-		int HeatRecInNode; // Inlet node number of heat recovery
-		int HeatRecOutNode; // Outlet node number of heat recovery
 		Real64 RhoAir; // Air density at InNode
 		static bool MyOneTimeFlag( true ); // Initialization flag
 		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
@@ -2228,9 +2221,6 @@ namespace HVACMultiSpeedHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static int ControlledZoneNum( 0 ); // Index of Controllerd zone number
-		static int ThisCtrlZoneNum( 0 ); // Controllerd zone number
-		static Real64 ControlZoneVolFlow( 0.0 ); // Controlled zone volumetric flow
 		int NumOfSpeedCooling; // Number of speeds for cooling
 		int NumOfSpeedHeating; // Number of speeds for heating
 		int i; // Index to speed
@@ -2388,7 +2378,6 @@ namespace HVACMultiSpeedHeatPump {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::CurrentTime;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using Psychrometrics::PsyCpAirFnWTdb;
 
@@ -2397,7 +2386,6 @@ namespace HVACMultiSpeedHeatPump {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
-		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2722,6 +2710,7 @@ namespace HVACMultiSpeedHeatPump {
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using DXCoils::SimDXCoilMultiSpeed;
 		using DXCoils::DXCoilPartLoadRatio;
+		using DXCoils::DXCoil;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2747,14 +2736,27 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 SavePartloadRatio;
 		Real64 SaveSpeedRatio;
 		Real64 QCoilActual; // coil load actually delivered returned to calling component
-		Real64 MdotSupp; // suppleental coil hot water or steam flow rate
 		Real64 MinWaterFlow; // minimum water flow rate
 		Real64 ErrorToler; // supplemental heating coil convergence tollerance
 
 		// FLOW
 		OutletNode = MSHeatPump( MSHeatPumpNum ).AirOutletNodeNum;
 		InletNode = MSHeatPump( MSHeatPumpNum ).AirInletNodeNum;
-		OutsideDryBulbTemp = OutDryBulbTemp;
+		if ( MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex > 0 ) {
+			if ( DXCoil( MSHeatPump( MSHeatPumpNum ).DXHeatCoilIndex ).IsSecondaryDXCoilInZone ) {
+				OutsideDryBulbTemp = Node( DXCoil( MSHeatPump( MSHeatPumpNum ).DXHeatCoilIndex ).SecZoneAirNodeNum ).Temp;
+			} else {
+				OutsideDryBulbTemp = OutDryBulbTemp;
+			}
+		} else if ( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex > 0) {
+			if ( DXCoil( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex ).IsSecondaryDXCoilInZone ) {
+				OutsideDryBulbTemp = Node( DXCoil( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex ).SecZoneAirNodeNum ).Temp;
+			} else {
+				OutsideDryBulbTemp = OutDryBulbTemp;
+			}
+		} else {
+			OutsideDryBulbTemp = OutDryBulbTemp;
+		}
 		FanOutletNode = MSHeatPump( MSHeatPumpNum ).FanOutletNode;
 		FanInletNode = MSHeatPump( MSHeatPumpNum ).FanInletNode;
 
@@ -3416,7 +3418,6 @@ namespace HVACMultiSpeedHeatPump {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 QCoilRequired; // heat addition required from an electric, gas, steam, or hot water coil
 		Real64 QCoilActual; // actual heating load met
 		Real64 mdot; // heating coil steam or hot water mass flow rate
 		Real64 MinWaterFlow; // coil minimum hot water mass flow rate, kg/s

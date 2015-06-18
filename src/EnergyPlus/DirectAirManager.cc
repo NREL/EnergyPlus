@@ -333,7 +333,6 @@ namespace DirectAirManager {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkFanActivated;

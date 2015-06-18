@@ -1891,10 +1891,17 @@ namespace HeatRecovery {
 			//   Control the supply air outlet temperature to a setpoint for Heating Mode only
 			//   (ControlFraction = 0 HX fully bypassed, ControlFraction = 1 air passed entirely through HX)
 			//   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
-			if ( ExchCond( ExNum ).ControlToTemperatureSetPoint && ExchCond( ExNum ).SupInTemp < HXTempSetPoint ) {
-				//     IF secondary inlet temperature is above the supply inlet temperature, control to SP
-				if ( ExchCond( ExNum ).SecInTemp > ExchCond( ExNum ).SupInTemp && ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) != 0.0 ) {
-					ControlFraction = max( 0.0, min( 1.0, ( ExchCond( ExNum ).SupInTemp - HXTempSetPoint ) / ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) ) );
+			if ( ExchCond( ExNum ).ControlToTemperatureSetPoint ) {
+				if ( ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) != 0.0 ) {
+					if ( ( ExchCond( ExNum ).SupInTemp < HXTempSetPoint && ExchCond( ExNum ).SupOutTemp > HXTempSetPoint ) || 
+						( ExchCond( ExNum ).SupInTemp > HXTempSetPoint && ExchCond( ExNum ).SupOutTemp < HXTempSetPoint ) ) {
+						ControlFraction = max( 0.0, min( 1.0, std::abs( ( ExchCond( ExNum ).SupInTemp - HXTempSetPoint ) / ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) ) ) );
+					} else if ( ( ExchCond( ExNum ).SupInTemp < ExchCond( ExNum ).SupOutTemp && ExchCond( ExNum ).SupOutTemp < HXTempSetPoint ) ||
+								( ExchCond( ExNum ).SupInTemp > ExchCond( ExNum ).SupOutTemp && ExchCond( ExNum ).SupOutTemp > HXTempSetPoint ) ) {
+						ControlFraction = 1.0;
+					} else {
+						ControlFraction = 0.0;
+					}
 				} else {
 					//     ELSE fully bypass HX to maintain supply outlet temp as high as possible
 					ControlFraction = 0.0;
@@ -1941,7 +1948,7 @@ namespace HeatRecovery {
 						Error = ( TempSupOut - HXTempSetPoint );
 						//         IF supply inlet temp = supply outlet temp, fully bypass HX - ELSE control to SP
 						if ( TempSupIn != TempSupOut ) {
-							ControlFraction = max( 0.0, min( 1.0, ControlFraction * ( TempSupIn - HXTempSetPoint ) / ( TempSupIn - TempSupOut ) ) );
+							ControlFraction = max( 0.0, min( 1.0, std::abs( ControlFraction * ( TempSupIn - HXTempSetPoint ) / ( TempSupIn - TempSupOut ) ) ) );
 						} else if ( std::abs( TempSupOut - HXTempSetPoint ) < ErrorTol ) {
 							//           IF TempSupIn = TempSupOut then TempSecIn = TempSupIn (ControlFraction = ?)
 							//           Do nothing, variables in ELSE below have already been calculated
@@ -2089,7 +2096,6 @@ namespace HeatRecovery {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const ErrorTol( 0.001 ); // error tolerence
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2120,8 +2126,8 @@ namespace HeatRecovery {
 		Real64 Coeff7; // coefficient7 to empirical model (used for both temperature and humidity ratio equations)
 		Real64 Coeff8; // coefficient8 to empirical model (used for both temperature and humidity ratio equations)
 		Real64 BalFaceVelActual; // operating face velocity [m/s]
-		Real64 FullLoadSupOutTemp; // empirical model supply outlet temperature [C]
-		Real64 FullLoadSupOutHumRat; // empirical model supply outlet humidity ratio [kg/kg]
+		Real64 FullLoadSupOutTemp( 0 ); // empirical model supply outlet temperature [C]
+		Real64 FullLoadSupOutHumRat( 0 ); // empirical model supply outlet humidity ratio [kg/kg]
 		Real64 FullLoadDeltaT; // empirical model heat exchanger delta temperature [C]
 		Real64 FullLoadDeltaW; // empirical model heat exchanger delta humidity ratio [kg/kg]
 		Real64 T_RegenInTemp; // empirical model supply (regen) inlet temperature for temperature equation [C]

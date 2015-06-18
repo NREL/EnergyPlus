@@ -308,7 +308,6 @@ namespace HeatBalanceManager {
 
 		// Using/Aliasing
 		using InternalHeatGains::ManageInternalHeatGains;
-		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4178,10 +4177,10 @@ namespace HeatBalanceManager {
 		int & NumAlphas,
 		Array1< Real64 > const & rNumericArgs,
 		int & NumNumbers,
-		Array1_bool const & lNumericFieldBlanks, //Unused
+		Array1_bool const & EP_UNUSED( lNumericFieldBlanks ), //Unused
 		Array1_bool const & lAlphaFieldBlanks,
 		Array1_string const & cAlphaFieldNames,
-		Array1_string const & cNumericFieldNames, //Unused
+		Array1_string const & EP_UNUSED( cNumericFieldNames ), //Unused
 		bool & ErrorsFound // If errors found in input
 	)
 	{
@@ -4386,7 +4385,6 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StormWinNum; // Number of StormWindow object
 		int SurfNum; // Surface number
-		int Num; // Loop counter
 		static bool ChangeSet( true ); // Toggle for checking storm windows
 
 		// FLOW:
@@ -5272,7 +5270,6 @@ namespace HeatBalanceManager {
 		using namespace DataStringGlobals;
 		using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
 		using General::TrimSigDigits;
-		using DataSystemVariables::iASCII_CR;
 		using DataSystemVariables::iUnicode_end;
 		using DataSystemVariables::GoodIOStatValue;
 		using DataSystemVariables::TempFullFileName;
@@ -6425,7 +6422,6 @@ Label1000: ;
 		int ScheduleNum;
 		int i;
 		int NumOfScheduledLayers;
-		int NumOfConstrLayers;
 		bool NumOfLayersMatch;
 		int iZone;
 
@@ -6674,7 +6670,7 @@ Label1000: ;
 	}
 
 	void
-	CreateTCConstructions( bool & ErrorsFound ) // If errors found in input
+	CreateTCConstructions( bool & EP_UNUSED( ErrorsFound ) ) // If errors found in input
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6988,10 +6984,7 @@ Label1000: ;
 		static std::string const RoutineName( "SetupComplexFenestrationMaterialInput: " );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int IOStat; // IO Status when calling get input subroutine
 		Array1D_string MaterialNames( 5 ); // Number of Material Alpha names defined
-		int MaterialNumAlpha; // Number of material alpha names being passed
-		int MaterialNumProp; // Number of material properties being passed
 		Array1D< Real64 > MaterialProps( 27 ); // Temporary array to transfer material properties
 		int Loop;
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -7368,7 +7361,6 @@ Label1000: ;
 		int NBasis; // temporary number of elements in basis
 		int Layer; // loop counter for material layers
 		int AlphaIndex;
-		int ThConstNum; // number of thermal construction
 		int ThermalModelNum; // number of thermal model parameters object
 		int NumOfTotalLayers; // total number of layers in the construction
 		int NumOfOpticalLayers; // number of optical layers in the construction (excluding gasses and gas mixtures)

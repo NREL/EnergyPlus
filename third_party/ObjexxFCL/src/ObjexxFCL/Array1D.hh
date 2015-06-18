@@ -42,22 +42,30 @@ public: // Types
 	typedef  typename Super::IR  IR;
 
 	// STL Style
-	typedef  typename Base::value_type  value_type;
-	typedef  typename Base::reference  reference;
-	typedef  typename Base::const_reference  const_reference;
-	typedef  typename Base::pointer  pointer;
-	typedef  typename Base::const_pointer  const_pointer;
-	typedef  typename Base::size_type  size_type;
-	typedef  typename Base::difference_type  difference_type;
+	typedef  typename Super::value_type  value_type;
+	typedef  typename Super::reference  reference;
+	typedef  typename Super::const_reference  const_reference;
+	typedef  typename Super::pointer  pointer;
+	typedef  typename Super::const_pointer  const_pointer;
+	typedef  typename Super::iterator  iterator;
+	typedef  typename Super::const_iterator  const_iterator;
+	typedef  typename Super::reverse_iterator  reverse_iterator;
+	typedef  typename Super::const_reverse_iterator  const_reverse_iterator;
+	typedef  typename Super::size_type  size_type;
+	typedef  typename Super::difference_type  difference_type;
 
 	// C++ Style
-	typedef  typename Base::Value  Value;
-	typedef  typename Base::Reference  Reference;
-	typedef  typename Base::ConstReference  ConstReference;
-	typedef  typename Base::Pointer  Pointer;
-	typedef  typename Base::ConstPointer  ConstPointer;
-	typedef  typename Base::Size  Size;
-	typedef  typename Base::Difference  Difference;
+	typedef  typename Super::Value  Value;
+	typedef  typename Super::Reference  Reference;
+	typedef  typename Super::ConstReference  ConstReference;
+	typedef  typename Super::Pointer  Pointer;
+	typedef  typename Super::ConstPointer  ConstPointer;
+	typedef  typename Super::Iterator  Iterator;
+	typedef  typename Super::ConstIterator  ConstIterator;
+	typedef  typename Super::ReverseIterator  ReverseIterator;
+	typedef  typename Super::ConstReverseIterator  ConstReverseIterator;
+	typedef  typename Super::Size  Size;
+	typedef  typename Super::Difference  Difference;
 
 	typedef  ArrayInitializer< T, ObjexxFCL::Array1D >  Initializer;
 	typedef  typename Initializer::Function  InitializerFunction;
@@ -77,8 +85,8 @@ public: // Types
 	using Super::size_of;
 	using Super::swap1;
 	using Super::u;
+	using Super::capacity_;
 	using Super::data_;
-	using Super::data_size_;
 	using Super::I_;
 	using Super::sdata_;
 	using Super::shift_;
@@ -1247,7 +1255,7 @@ public: // Subscript
 	a( int const i ) const
 	{
 		assert( contains( i ) );
-		return Tail( static_cast< T const * >( sdata_ + i ), data_size_ - ( i - shift_ ) );
+		return Tail( static_cast< T const * >( sdata_ + i ), size_ - ( i - shift_ ) );
 	}
 
 	// Tail Starting at array( i )
@@ -1256,7 +1264,7 @@ public: // Subscript
 	a( int const i )
 	{
 		assert( contains( i ) );
-		return Tail( sdata_ + i, data_size_ - ( i - shift_ ) );
+		return Tail( sdata_ + i, size_ - ( i - shift_ ) );
 	}
 
 public: // Predicate
@@ -1454,6 +1462,122 @@ public: // Modifier
 			}
 		}
 		return swap( o );
+	}
+
+	// Append Value: Grow by 1
+	inline
+	Array1D &
+	append( T const & t )
+	{
+		if ( capacity_ == size_ ) { // Grow by 1
+			Array1D o( IndexRange( l(), u() + 1 ) );
+			for ( int i = l(), e = u(); i <= e; ++i ) {
+				o( i ) = operator ()( i );
+			}
+			swap( o );
+		} else {
+			I_.u( u() + 1 );
+		}
+		operator ()( u() ) = t;
+		return *this;
+	}
+
+	// Append Value: Grow Capacity
+	inline
+	Array1D &
+	push_back( T const & t )
+	{
+		Base::grow_capacity();
+		I_.grow();
+		setup_real();
+		operator ()( I_.u() ) = t;
+		return *this;
+	}
+
+	// Append Value: Grow Capacity
+	inline
+	Array1D &
+	push_back( T && t )
+	{
+		Base::grow_capacity();
+		I_.grow();
+		setup_real();
+		operator ()( I_.u() ) = std::move( t );
+		return *this;
+	}
+
+	// Construct and Append Value: Grow Capacity
+	template< class... Args >
+	Array1D &
+	emplace_back( Args&&... args )
+	{
+		Base::grow_capacity();
+		operator ()( I_.grow().u() ) = T( std::forward< Args >( args )... );
+		return *this;
+	}
+
+	// Remove Last Value
+	inline
+	Array1D &
+	pop_back()
+	{
+		if ( size_ > 0u ) --size_;
+		return *this;
+	}
+
+	// First Value
+	inline
+	T const &
+	front() const
+	{
+		assert( size_ > 0u );
+		return operator []( 0u );
+	}
+
+	// First Value
+	inline
+	T &
+	front()
+	{
+		assert( size_ > 0u );
+		return operator []( 0u );
+	}
+
+	// Last Value
+	inline
+	T const &
+	back() const
+	{
+		assert( size_ > 0u );
+		return operator []( size_ - 1 );
+	}
+
+	// Last Value
+	inline
+	T &
+	back()
+	{
+		assert( size_ > 0u );
+		return operator []( size_ - 1 );
+	}
+
+	// Reserve Capacity
+	inline
+	Array1D &
+	reserve( size_type const n )
+	{
+		Base::reserve_capacity( n );
+		setup_real();
+		return *this;
+	}
+
+	// Shrink Capacity to Size
+	inline
+	Array1D &
+	shrink_to_fit()
+	{
+		Base::shrink_capacity();
+		return *this;
 	}
 
 	// Set Initializer Value

@@ -270,13 +270,11 @@ namespace UnitVentilator {
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataHVACGlobals::ZoneComp;
 
 		using DataSizing::AutoSize;
 		using DataSizing::ZoneHVACSizing;
 		using DataSizing::NumZoneHVACSizing;
 		using General::TrimSigDigits;
-		using DataZoneEquipment::UnitVentilator_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -895,7 +893,6 @@ namespace UnitVentilator {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
@@ -1224,12 +1221,6 @@ namespace UnitVentilator {
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		bool ErrorsFound;
-		Real64 CoilInTemp;
-		Real64 CoilOutTemp;
-		Real64 CoilOutHumRat;
-		Real64 CoilInHumRat;
-		Real64 CoilInEnthalpy;
-		Real64 CoilOutEnthalpy;
 		Real64 DesCoolingLoad;
 		Real64 DesHeatingLoad;
 		Real64 TempSteamIn;
@@ -1264,7 +1255,6 @@ namespace UnitVentilator {
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value of coil input field
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)

@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Vector3.fwd.hh>
+#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -614,48 +615,6 @@ public: // Properties: Predicates
 		return ( length_squared() == T( 1 ) );
 	}
 
-public: // Properties: Comparison
-
-	// Equal Length?
-	inline
-	bool
-	equal_length( Vector3 const & v )
-	{
-		return ( length_squared() == v.length_squared() );
-	}
-
-	// Longer?
-	inline
-	bool
-	longer( Vector3 const & v )
-	{
-		return ( length_squared() > v.length_squared() );
-	}
-
-	// Longer or Equal Length?
-	inline
-	bool
-	longer_or_equal( Vector3 const & v )
-	{
-		return ( length_squared() >= v.length_squared() );
-	}
-
-	// Shorter?
-	inline
-	bool
-	shorter( Vector3 const & v )
-	{
-		return ( length_squared() < v.length_squared() );
-	}
-
-	// Shorter or Equal Length?
-	inline
-	bool
-	shorter_or_equal( Vector3 const & v )
-	{
-		return ( length_squared() <= v.length_squared() );
-	}
-
 public: // Properties: General
 
 	// Size
@@ -719,7 +678,7 @@ public: // Properties: General
 	T
 	norm_Linf() const
 	{
-		return max3( std::abs( x ), std::abs( y ), std::abs( z ) );
+		return ObjexxFCL::max( std::abs( x ), std::abs( y ), std::abs( z ) );
 	}
 
 	// Distance
@@ -883,6 +842,23 @@ public: // Modifiers
 		return *this;
 	}
 
+	// Normalize to a Length: Uniform Vector3 if Length is Zero
+	inline
+	Vector3 &
+	normalize_uniform( T const & tar_length = T( 1 ) )
+	{
+		T const cur_length( length() );
+		if ( cur_length > T( 0 ) ) {
+			T const dilation( tar_length / cur_length );
+			x *= dilation;
+			y *= dilation;
+			z *= dilation;
+		} else { // Set uniform vector
+			operator =( uniform_vector( tar_length ) );
+		}
+		return *this;
+	}
+
 	// Normalize to a Length: x Vector3 if Length is Zero
 	inline
 	Vector3 &
@@ -937,24 +913,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Normalize to a Length: Uniform Vector3 if Length is Zero
-	inline
-	Vector3 &
-	normalize_uniform( T const & tar_length = T( 1 ) )
-	{
-		T const cur_length( length() );
-		if ( cur_length > T( 0 ) ) {
-			T const dilation( tar_length / cur_length );
-			x *= dilation;
-			y *= dilation;
-			z *= dilation;
-		} else { // Set uniform vector
-			operator =( uniform_vector( tar_length ) );
-		}
-		return *this;
-	}
-
-	// Set Minimum Coordinates wrt a Vector3
+	// Minimum Coordinates with a Vector3
 	inline
 	Vector3 &
 	min( Vector3 const & v )
@@ -965,7 +924,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Set Maximum Coordinates wrt a Vector3
+	// Maximum Coordinates with a Vector3
 	inline
 	Vector3 &
 	max( Vector3 const & v )
@@ -976,85 +935,29 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Sum of Vector3s
+	// Sum In a Vector3
 	inline
 	Vector3 &
-	sum( Vector3 const & a, Vector3 const & b )
+	sum( Vector3 const & v )
 	{
-		x = a.x + b.x;
-		y = a.y + b.y;
-		z = a.z + b.z;
+		x += v.x;
+		y += v.y;
+		z += v.z;
 		return *this;
 	}
 
-	// Difference of Vector3s
+	// Subtract Out a Vector3
 	inline
 	Vector3 &
-	diff( Vector3 const & a, Vector3 const & b )
+	sub( Vector3 const & v )
 	{
-		x = a.x - b.x;
-		y = a.y - b.y;
-		z = a.z - b.z;
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
 		return *this;
 	}
 
-	// Cross Product of Vector3s
-	inline
-	Vector3 &
-	cross( Vector3 const & a, Vector3 const & b )
-	{
-		x = ( a.y * b.z ) - ( a.z * b.y );
-		y = ( a.z * b.x ) - ( a.x * b.z );
-		z = ( a.x * b.y ) - ( a.y * b.x );
-		return *this;
-	}
-
-	// Midpoint of Two Vector3s
-	inline
-	Vector3 &
-	mid( Vector3 const & a, Vector3 const & b )
-	{
-		x = T( 0.5 * ( a.x + b.x ) );
-		y = T( 0.5 * ( a.y + b.y ) );
-		z = T( 0.5 * ( a.z + b.z ) );
-		return *this;
-	}
-
-	// Center of Two Vector3s
-	inline
-	Vector3 &
-	cen( Vector3 const & a, Vector3 const & b )
-	{
-		x = T( 0.5 * ( a.x + b.x ) );
-		y = T( 0.5 * ( a.y + b.y ) );
-		z = T( 0.5 * ( a.z + b.z ) );
-		return *this;
-	}
-
-	// Center of Three Vector3s
-	inline
-	Vector3 &
-	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		static long double const third( 1.0 / 3.0 );
-		x = T( third * ( a.x + b.x + c.x ) );
-		y = T( third * ( a.y + b.y + c.y ) );
-		z = T( third * ( a.z + b.z + c.z ) );
-		return *this;
-	}
-
-	// Center of Four Vector3s
-	inline
-	Vector3 &
-	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
-	{
-		x = T( 0.25 * ( a.x + b.x + c.x + d.x ) );
-		y = T( 0.25 * ( a.y + b.y + c.y + d.y ) );
-		z = T( 0.25 * ( a.z + b.z + c.z + d.z ) );
-		return *this;
-	}
-
-	// Project Normally onto a Vector3
+	// Project Normal to a Vector3
 	inline
 	Vector3 &
 	project_normal( Vector3 const & v )
@@ -1067,7 +970,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Project in Direction of a Vector3
+	// Project onto a Vector3
 	inline
 	Vector3 &
 	project_parallel( Vector3 const & v )
@@ -1131,6 +1034,24 @@ public: // Generators
 		}
 	}
 
+	// Normalized to a Length: Uniform Vector3 if Length is Zero
+	inline
+	Vector3
+	normalized_uniform( T const & tar_length = T( 1 ) ) const
+	{
+		T const cur_length( length() );
+		if ( cur_length > T( 0 ) ) {
+			T const dilation( tar_length / cur_length );
+			return Vector3(
+			 x * dilation,
+			 y * dilation,
+			 z * dilation
+			);
+		} else { // Return uniform vector
+			return uniform_vector( tar_length );
+		}
+	}
+
 	// Normalized to a Length: x Vector3 if Length is Zero
 	inline
 	Vector3
@@ -1182,24 +1103,6 @@ public: // Generators
 			);
 		} else { // Return z vector
 			return Vector3( tar_length, T( 0 ), T( 0 ), tar_length );
-		}
-	}
-
-	// Normalized to a Length: Uniform Vector3 if Length is Zero
-	inline
-	Vector3
-	normalized_uniform( T const & tar_length = T( 1 ) ) const
-	{
-		T const cur_length( length() );
-		if ( cur_length > T( 0 ) ) {
-			T const dilation( tar_length / cur_length );
-			return Vector3(
-			 x * dilation,
-			 y * dilation,
-			 z * dilation
-			);
-		} else { // Return uniform vector
-			return uniform_vector( tar_length );
 		}
 	}
 
@@ -1331,7 +1234,7 @@ public: // Generators
 		return Vector3( t / v.x, t / v.y, t / v.z );
 	}
 
-	// Vector3 with Min Coordinates of Two Vector3s
+	// Minimum of Two Vector3s
 	friend
 	inline
 	Vector3
@@ -1344,7 +1247,33 @@ public: // Generators
 		);
 	}
 
-	// Vector3 with Max Coordinates of Two Vector3s
+	// Minimum of Three Vector3s
+	friend
+	inline
+	Vector3
+	min( Vector3 const & a, Vector3 const & b, Vector3 const & c )
+	{
+		return Vector3(
+		 ObjexxFCL::min( a.x, b.x, c.x ),
+		 ObjexxFCL::min( a.y, b.y, c.y ),
+		 ObjexxFCL::min( a.z, b.z, c.z )
+		);
+	}
+
+	// Minimum of Four Vector3s
+	friend
+	inline
+	Vector3
+	min( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
+	{
+		return Vector3(
+		 ObjexxFCL::min( a.x, b.x, c.x, d.x ),
+		 ObjexxFCL::min( a.y, b.y, c.y, d.y ),
+		 ObjexxFCL::min( a.z, b.z, c.z, d.z )
+		);
+	}
+
+	// Maximum of Two Vector3s
 	friend
 	inline
 	Vector3
@@ -1357,7 +1286,122 @@ public: // Generators
 		);
 	}
 
-	// Projected Normally onto a Vector3
+	// Maximum of Three Vector3s
+	friend
+	inline
+	Vector3
+	max( Vector3 const & a, Vector3 const & b, Vector3 const & c )
+	{
+		return Vector3(
+		 ObjexxFCL::max( a.x, b.x, c.x ),
+		 ObjexxFCL::max( a.y, b.y, c.y ),
+		 ObjexxFCL::max( a.z, b.z, c.z )
+		);
+	}
+
+	// Maximum of Four Vector3s
+	friend
+	inline
+	Vector3
+	max( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
+	{
+		return Vector3(
+		 ObjexxFCL::max( a.x, b.x, c.x, d.x ),
+		 ObjexxFCL::max( a.y, b.y, c.y, d.y ),
+		 ObjexxFCL::max( a.z, b.z, c.z, d.z )
+		);
+	}
+
+	// Sum of Two Vector3s
+	friend
+	inline
+	Vector3
+	sum( Vector3 const & a, Vector3 const & b )
+	{
+		return Vector3( a.x + b.x, a.y + b.y, a.z + b.z );
+	}
+
+	// Sum of Three Vector3s
+	friend
+	inline
+	Vector3
+	sum( Vector3 const & a, Vector3 const & b, Vector3 const & c )
+	{
+		return Vector3( a.x + b.x + c.x, a.y + b.y + c.y, a.z + b.z + c.z );
+	}
+
+	// Sum of Four Vector3s
+	friend
+	inline
+	Vector3
+	sum( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
+	{
+		return Vector3( a.x + b.x + c.x + d.x, a.y + b.y + c.y + d.y, a.z + b.z + c.z + d.z );
+	}
+
+	// Subtract of Two Vector3s
+	friend
+	inline
+	Vector3
+	sub( Vector3 const & a, Vector3 const & b )
+	{
+		return Vector3( a.x - b.x, a.y - b.y, a.z - b.z );
+	}
+
+	// Midpoint of Two Vector3s
+	friend
+	inline
+	Vector3
+	mid( Vector3 const & a, Vector3 const & b )
+	{
+		return Vector3(
+		 T( 0.5 * ( a.x + b.x ) ),
+		 T( 0.5 * ( a.y + b.y ) ),
+		 T( 0.5 * ( a.z + b.z ) )
+		);
+	}
+
+	// Center of Two Vector3s
+	friend
+	inline
+	Vector3
+	cen( Vector3 const & a, Vector3 const & b )
+	{
+		return Vector3(
+		 T( 0.5 * ( a.x + b.x ) ),
+		 T( 0.5 * ( a.y + b.y ) ),
+		 T( 0.5 * ( a.z + b.z ) )
+		);
+	}
+
+	// Center of Three Vector3s
+	friend
+	inline
+	Vector3
+	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c )
+	{
+		static long double const third( 1.0 / 3.0 );
+		return Vector3(
+		 T( third * ( a.x + b.x + c.x ) ),
+		 T( third * ( a.y + b.y + c.y ) ),
+		 T( third * ( a.z + b.z + c.z ) )
+		);
+	}
+
+	// Center of Four Vector3s
+	friend
+	inline
+	Vector3
+	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
+	{
+		return Vector3(
+		 T( 0.25 * ( a.x + b.x + c.x + d.x ) ),
+		 T( 0.25 * ( a.y + b.y + c.y + d.y ) ),
+		 T( 0.25 * ( a.z + b.z + c.z + d.z ) )
+		);
+	}
+
+	// Projected Normal to a Vector3
 	inline
 	Vector3
 	projected_normal( Vector3 const & v ) const
@@ -1367,7 +1411,7 @@ public: // Generators
 		return Vector3( x - ( c * v.x ), y - ( c * v.y ), z - ( c * v.z ) );
 	}
 
-	// Projected in Direction of a Vector3
+	// Projected onto a Vector3
 	inline
 	Vector3
 	projected_parallel( Vector3 const & v ) const
@@ -1611,14 +1655,6 @@ public: // Friends: Comparison
 	}
 
 	// Not Equal Length?
-	inline
-	bool
-	not_equal_length( Vector3 const & v )
-	{
-		return ( length_squared() != v.length_squared() );
-	}
-
-	// Not Equal Length?
 	friend
 	inline
 	bool
@@ -1666,59 +1702,6 @@ public: // Friends
 		 ( a.y * b.z ) - ( a.z * b.y ),
 		 ( a.z * b.x ) - ( a.x * b.z ),
 		 ( a.x * b.y ) - ( a.y * b.x )
-		);
-	}
-
-	// Midpoint of Two Vector3s
-	friend
-	inline
-	Vector3
-	mid( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3(
-		 T( 0.5 * ( a.x + b.x ) ),
-		 T( 0.5 * ( a.y + b.y ) ),
-		 T( 0.5 * ( a.z + b.z ) )
-		);
-	}
-
-	// Center of Two Vector3s
-	friend
-	inline
-	Vector3
-	cen( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3(
-		 T( 0.5 * ( a.x + b.x ) ),
-		 T( 0.5 * ( a.y + b.y ) ),
-		 T( 0.5 * ( a.z + b.z ) )
-		);
-	}
-
-	// Center of Three Vector3s
-	friend
-	inline
-	Vector3
-	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		static long double const third( 1.0 / 3.0 );
-		return Vector3(
-		 T( third * ( a.x + b.x + c.x ) ),
-		 T( third * ( a.y + b.y + c.y ) ),
-		 T( third * ( a.z + b.z + c.z ) )
-		);
-	}
-
-	// Center of Four Vector3s
-	friend
-	inline
-	Vector3
-	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
-	{
-		return Vector3(
-		 T( 0.25 * ( a.x + b.x + c.x + d.x ) ),
-		 T( 0.25 * ( a.y + b.y + c.y + d.y ) ),
-		 T( 0.25 * ( a.z + b.z + c.z + d.z ) )
 		);
 	}
 
@@ -1808,15 +1791,6 @@ private: // Methods
 	{
 		static T const Two_Pi( T( 2 ) * std::acos( -1.0 ) );
 		return ( t >= T( 0 ) ? t : Two_Pi + t );
-	}
-
-	// Max of Three Values
-	inline
-	static
-	T const &
-	max3( T const & a, T const & b, T const & c )
-	{
-		return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 	}
 
 public: // Data

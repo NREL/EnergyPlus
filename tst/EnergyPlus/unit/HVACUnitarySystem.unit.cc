@@ -186,7 +186,6 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	int iHeatingSizingType( 1 );
 	bool FirstHVACIteration( true );
 	bool SaveOutputFile( false );
-	Real64 PartLoadRatio( 1.0 );
 	int write_stat;
 	Array1D_int SizingTypes( { DataSizing::None, DataSizing::SupplyAirFlowRate, DataSizing::FlowPerFloorArea, DataSizing::FractionOfAutosizedCoolingAirflow, DataSizing::FractionOfAutosizedHeatingAirflow, DataSizing::FlowPerCoolingCapacity, DataSizing::FlowPerHeatingCapacity } );
 
@@ -230,7 +229,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 
 	ZoneSizingRunDone = true;
 	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
-	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 16 );
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
 
 	// test cooling only sizing

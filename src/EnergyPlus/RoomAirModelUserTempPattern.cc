@@ -232,7 +232,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::ZTAV;
-		using DataHeatBalance::Zone;
 		using InputProcessor::FindItem;
 
 		// Locals
@@ -283,11 +282,8 @@ namespace RoomAirModelUserTempPattern {
 		// na
 
 		// Using/Aliasing
-		using DataSurfaces::Surface;
-		using DataSurfaces::AdjacentAirTemp;
 		using DataSurfaces::ZoneMeanAirTemp;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataHeatBalance::Zone;
 		using InputProcessor::FindItem;
 		using OutputReportTabular::IntToStr;
 		using General::FindNumberInList;
@@ -949,9 +945,7 @@ namespace RoomAirModelUserTempPattern {
 		using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::TempEffBulkAir;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::RefrigCaseCredit;
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::TempZoneThermostatSetPoint;

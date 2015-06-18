@@ -115,7 +115,7 @@ namespace ChillerIndirectAbsorption {
 
 	void
 	SimIndirectAbsorber(
-		std::string const & AbsorberType, // type of Absorber
+		std::string const & EP_UNUSED( AbsorberType ), // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
@@ -643,7 +643,6 @@ namespace ChillerIndirectAbsorption {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Indirect_Absorption;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using InputProcessor::SameString;
@@ -673,22 +672,10 @@ namespace ChillerIndirectAbsorption {
 		static Array1D_bool MyEnvrnFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
-		int LoopCtr; // Plant loop counter
-		int LoopSideCtr; // Loop side counter
-		int BranchCtr; // Plant branch counter
-		int CompCtr; // Component counter
 		bool errFlag;
 		bool FatalError;
 		Real64 rho; // local fluid density
-		Real64 CpWater; // local specific heat
 		Real64 SteamDensity; // density of generator steam (when connected to a steam loop)
-		Real64 EnthSteamOutDry; // dry enthalpy of steam (quality = 1)
-		Real64 EnthSteamOutWet; // wet enthalpy of steam (quality = 0)
-		Real64 HfgSteam; // latent heat of steam at constant pressure
-		Real64 SteamDeltaT; // amount of sub-cooling of steam condensate
-		int GeneratorInletNode; // generator inlet node number, steam/water side
-		Real64 SteamOutletTemp;
-		static int DummyWaterIndex( 1 );
 		Real64 mdotEvap; // local fluid mass flow rate thru evaporator
 		Real64 mdotCond; // local fluid mass flow rate thru condenser
 		Real64 mdotGen; // local fluid mass flow rate thru generator
@@ -1358,7 +1345,7 @@ namespace ChillerIndirectAbsorption {
 		int const ChillNum, // Absorber number
 		Real64 const MyLoad, // operating load
 		bool const RunFlag, // TRUE when Absorber operating
-		bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep !unused1208
 		int const EquipFlowCtrl // Flow control mode for the equipment
 	)
 	{
@@ -1393,7 +1380,6 @@ namespace ChillerIndirectAbsorption {
 		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using CurveManager::CurveValue;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::OutBaroPress;
 		using PlantUtilities::SetComponentFlowRate;
@@ -1445,7 +1431,6 @@ namespace ChillerIndirectAbsorption {
 		static bool PossibleSubcooling; // flag to determine if supply water temperature is below setpoint
 		Real64 CpFluid; // specific heat of generator fluid
 		Real64 SteamDeltaT; // temperature difference of fluid through generator
-		Real64 SteamDensity; // density of steam
 		Real64 SteamOutletTemp; // generator outlet temperature
 		Real64 CapacityfAbsorberTemp; // performance curve output
 		Real64 CapacityfEvaporatorTemp; // performance curve output

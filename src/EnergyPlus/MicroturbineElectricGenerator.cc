@@ -92,7 +92,7 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	SimMTGenerator(
-		int const GeneratorType, // Type of generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // Type of generator !unused1208
 		std::string const & GeneratorName, // User-specified name of generator
 		int & GeneratorIndex, // Index to microturbine generator
 		bool const RunFlag, // Simulate generator when TRUE
@@ -169,17 +169,17 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	SimMTPlantHeatRecovery(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
-		int const CompTypeNum, // unused1208
+		int const EP_UNUSED( CompTypeNum ), // unused1208
 		int & CompNum,
-		bool const RunFlag, // unused1208
+		bool const EP_UNUSED( RunFlag ), // unused1208
 		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
+		Real64 & EP_UNUSED( MyLoad ), // unused1208
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation !unused1208
 	)
 	{
 
@@ -1122,10 +1122,8 @@ namespace MicroturbineElectricGenerator {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Num; // Loop index over all generators
 		int HeatRecInletNode; // Inlet node number in heat recovery loop
 		int HeatRecOutletNode; // Outlet node number in heat recovery loop
-		static bool InitGeneratorOnce( true ); // Flag for 1 time initialization
 		static Array1D_bool MyEnvrnFlag; // Flag for init once at start of environment
 		static Array1D_bool MyPlantScanFlag;
 		static Array1D_bool MySizeAndNodeInitFlag;
@@ -1244,7 +1242,7 @@ namespace MicroturbineElectricGenerator {
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when generator is being asked to operate
 		Real64 const MyLoad, // Generator demand (W)
-		bool const FirstHVACIteration // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // unused1208
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1262,7 +1260,6 @@ namespace MicroturbineElectricGenerator {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
@@ -1929,7 +1926,7 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	GetMTGeneratorResults(
-		int const GeneratorType, // type of Generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // type of Generator !unused1208
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy
@@ -1978,7 +1975,7 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	GetMTGeneratorExhaustNode(
-		int const CompType,
+		int const EP_UNUSED( CompType ),
 		std::string const & CompName,
 		int & ExhaustOutletNodeNum
 	)

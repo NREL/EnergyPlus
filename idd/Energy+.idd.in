@@ -27903,6 +27903,7 @@ HVACTemplate:System:VAV,
       \default 0.0
   A9, \field Preheat Coil Type
       \type choice
+      \key  HotWater
       \key  Electric
       \key  Gas
       \key  None
@@ -28665,6 +28666,7 @@ HVACTemplate:System:ConstantVolume,
       \default 0.0
  A14, \field Preheat Coil Type
       \type choice
+      \key  HotWater
       \key  Electric
       \key  Gas
       \key  None
@@ -29134,6 +29136,7 @@ HVACTemplate:System:DualDuct,
       \default 0.0
  A17, \field Preheat Coil Type
       \type choice
+      \key  HotWater
       \key  Electric
       \key  Gas
       \key  None
@@ -29827,26 +29830,20 @@ HVACTemplate:Plant:ChilledWaterLoop,
       \note Leave blank for no limit.
       \units C
   A21,\field Chilled Water Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
   A22;\field Condenser Water Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 HVACTemplate:Plant:Chiller,
@@ -30166,15 +30163,12 @@ HVACTemplate:Plant:HotWaterLoop,
       \note Leave blank for no limit.
       \units C
   A13;\field Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 HVACTemplate:Plant:Boiler,
@@ -30375,15 +30369,12 @@ HVACTemplate:Plant:MixedWaterLoop,
       \units deltaC
       \default 5.6
   A13;\field Load Distribution Scheme
-      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
       \key SequentialLoad
       \key UniformLoad
       \key UniformPLR
       \key SequentialUniformPLR
-      \key Sequential
-      \key Uniform
       \default SequentialLoad
 
 \group HVAC Design Objects
@@ -32102,7 +32093,8 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \type alpha
         \note Unique name for this packaged terminal air conditioner object.
    A2,  \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
         \note Schedule values of 0 denote the unit is off.
@@ -32989,7 +32981,8 @@ ZoneHVAC:UnitHeater,
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
    A3 , \field Air Inlet Node Name
@@ -33077,7 +33070,8 @@ ZoneHVAC:EvaporativeCoolerUnit,
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
-        \required-field
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
    A3,  \field Availability Manager List Name
@@ -40654,14 +40648,21 @@ Coil:Cooling:DX:SingleSpeed,
        \note quadratic curve = a + b*ff + c*ff**2
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow
-  A17; \field Report ASHRAE Standard 127 Performance Ratings
+  A17, \field Report ASHRAE Standard 127 Performance Ratings
        \type choice
        \key Yes
        \key No
        \default No
        \note when this input field is specified as Yes then the program calculates the net cooling 
-       \note capacity and total electric power input of DX cooling coils per ANSI/ASHRAE 127.
-   
+       \note capacity and total electric power input of DX cooling coils per ANSI/ASHRAE 127.   
+  A18; \field Zone Name for Condenser Placement
+       \type object-list
+       \object-list ZoneNames 
+       \note This input field is name of a conditioned or unconditioned zone where the secondary 
+       \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
+       \note input field specified only when user desires to reject the condenser heat into a  
+       \note zone. The heat rejected is modelled as internal sensible heat gain of the zone.
+
 Coil:Cooling:DX:TwoSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), two-speed (or variable-speed). Requires two sets of performance
@@ -40916,14 +40917,21 @@ Coil:Cooling:DX:TwoSpeed,
        \note wb = entering wet-bulb temperature seen by the DX cooling coil (C)
        \note db = entering dry-bulb temperature seen by the DX cooling coil (C)
        \note entering temperature can be outside air or pretreated air.
-  A20; \field Low Speed Sensible Heat Ratio Function of Flow Fraction Curve Name
+  A20, \field Low Speed Sensible Heat Ratio Function of Flow Fraction Curve Name
        \type object-list
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
        \note quadratic curve = a + b*ff + c*ff**2
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow
-
+  A21; \field Zone Name for Condenser Placement
+       \type object-list
+       \object-list ZoneNames 
+       \note This input field is name of a conditioned or unconditioned zone where the secondary 
+       \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
+       \note input field specified only when user desires to reject the condenser heat into a  
+       \note zone. The heat rejected is modelled as internal sensible heat gain of the zone.
+   
 Coil:Cooling:DX:MultiSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric or
        \memo engine-driven compressor and condenser fan), multi-speed (or variable-speed).
@@ -41629,12 +41637,19 @@ Coil:Cooling:DX:MultiSpeed,
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N57; \field Speed 4 Rated Evaporative Condenser Pump Power Consumption
+  N57, \field Speed 4 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump at Speed 4
+  A37; \field Zone Name for Condenser Placement
+       \type object-list
+       \object-list ZoneNames 
+       \note This input field is name of a conditioned or unconditioned zone where the secondary 
+       \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
+       \note input field specified only when user desires to reject the condenser heat into a  
+       \note zone. The heat rejected is modelled as internal sensible heat gain of the zone.   
 
 Coil:Cooling:DX:VariableSpeed,
         \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
@@ -43344,11 +43359,68 @@ Coil:Heating:DX:SingleSpeed,
        \maximum 6
        \default 4
        \note Standard Region number for which HSPF and other standard ratings are calculated
-  A13; \field Evaporator Air Inlet Node Name
+  A13, \field Evaporator Air Inlet Node Name
        \type node
        \note Enter the name of an outdoor air node. This node name is also specified in
        \note an OutdoorAir:Node or OutdoorAir:NodeList object.
-
+  A14, \field Zone Name for Evaporator Placement
+       \note This input field is name of a conditioned or unconditioned zone where the secondary
+       \note coil (evaporator) of a heat pump is to be placed.  This is an optional input field 
+       \note specified only when user desires to extract heat from the zone.  The heat extracted 
+       \note is modelled as internal gain of the zone. If the primary DX system is a heat pump, 
+       \note then the zone name should be the same as the zone name specified for placing the 
+       \note secondary cooling DX coil.
+  N13, \field Secondary Coil Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+       \note This input value is the secondary coil (evaporator) air flow rate when the heat pump 
+       \note is working in heating mode or the secondary DX coil (condenser) air flow rate when the 
+       \note heat pump is working in cooling mode.  
+  N14, \field Secondary Coil Fan Flow Scaling Factor
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \default 1.25
+       \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
+       \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
+       \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
+       \note fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set 
+       \note to 1.0.
+  N15, \field Nominal Sensible Heat Ratio of Secondary Coil
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \maximum 1.0
+       \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
+       \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
+       \note This is an optional input field.  If this input field is left blank, then pure sensible 
+       \note internal heat gain is assumed, i.e., sensible heat ratio of 1.0. 
+  A15, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
+       \note curve = a + b*wb + c*wb**2 + d*db + e*db**2 + f*wb*db
+       \note wb = entering wet-bulb temperature seen by the secondary DX coil (C)
+       \note db = entering dry-bulb temperature seen by the primary DX coil (C)
+       \note This input field is name of sensible heat ratio modifier biquadratic curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary zone air node wet-bulb temperature and the heating DX coil entering 
+       \note air dry-bulb temperature.  This is an optional input field.  If this input field is left 
+       \note blank, then the nominal sensible heat ratio specified in the field above will be used.
+  A16; \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note quadratic curve = a + b*ff + c*ff**2
+       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
+       \note ff = secondary air flow fraction of the full load flow
+       \note This input field is name of sensible heat ratio modifier curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary coil air flow fraction. This is an optional input field.  If this input
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.   
+   
 Coil:Heating:DX:MultiSpeed,
        \memo Direct expansion (DX) heating coil (air-to-air heat pump) and compressor unit
        \memo (includes electric or engine-driven compressor and outdoor fan), multi-speed
@@ -43837,14 +43909,221 @@ Coil:Heating:DX:MultiSpeed,
        \minimum> 0.0
        \maximum 1.0
        \note recoverable waste heat at full load and rated conditions
-  A33; \field Speed 4 Waste Heat Function of Temperature Curve Name
+  A33, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-
+  A34, \field Zone Name for Evaporator Placement
+       \note This input field is name of a conditioned or unconditioned zone where the secondary
+       \note coil (evaporator) of a heat pump is to be placed.  This is an optional input field 
+       \note specified only when user desires to extract heat from the zone.  The heat extracted 
+       \note is modeled as internal heat gain of the zone. If the primary DX system is a heat pump, 
+       \note then the zone name should be the same as the zone name specified for placing the 
+       \note secondary cooling DX coil.
+  N30, \field Speed 1 Secondary Coil Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+       \note This input value is the secondary coil (evaporator) air flow rate when the heat pump 
+       \note is working in heating mode or the secondary DX coil (condenser) air flow rate when the 
+       \note heat pump is working in cooling mode.  
+  N31, \field Speed 1 Secondary Coil Fan Flow Scaling Factor
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \default 1.25   
+       \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
+       \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
+       \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
+       \note fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set 
+       \note to 1.0.
+  N32, \field Speed 1 Nominal Sensible Heat Ratio of Secondary Coil
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \maximum 1.0
+       \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
+       \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
+       \note This is an optional input field.  If this input field is left blank, then pure sensible 
+       \note internal heat gain is assumed, i.e., sensible heat ratio of 1.0. 
+  A35, \field Speed 1 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
+       \note curve = a + b*wb + c*wb**2 + d*db + e*db**2 + f*wb*db
+       \note wb = entering wet-bulb temperature seen by the secondary DX coil (C)
+       \note db = entering dry-bulb temperature seen by the primary DX coil (C)
+       \note This input field is name of sensible heat ratio modifier biquadratic curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary zone air node wet-bulb temperature and the heating DX coil entering 
+       \note air dry-bulb temperature.  This is an optional input field.  If this input field is left 
+       \note blank, then the nominal sensible heat ratio specified in the field above will be used.
+  A36, \field Speed 1 Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note quadratic curve = a + b*ff + c*ff**2
+       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
+       \note ff = secondary air flow fraction of the full load flow
+       \note This input field is name of sensible heat ratio modifier curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary coil air flow fraction. This is an optional input field.  If this input
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.
+  N33, \field Speed 2 Secondary Coil Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+       \note This input value is the secondary coil (evaporator) air flow rate when the heat pump 
+       \note is working in heating mode or the secondary DX coil (condenser) air flow rate when the 
+       \note heat pump is working in cooling mode.  
+  N34, \field Speed 2 Secondary Coil Fan Flow Scaling Factor
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \default 1.25   
+       \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
+       \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
+       \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
+       \note fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set 
+       \note to 1.0.
+  N35, \field Speed 2 Nominal Sensible Heat Ratio of Secondary Coil
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \maximum 1.0
+       \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
+       \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
+       \note This is an optional input field.  If this input field is left blank, then pure sensible 
+       \note internal heat gain is assumed, i.e., sensible heat ratio of 1.0. 
+  A37, \field Speed 2 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
+       \note curve = a + b*wb + c*wb**2 + d*db + e*db**2 + f*wb*db
+       \note wb = entering wet-bulb temperature seen by the secondary DX coil (C)
+       \note db = entering dry-bulb temperature seen by the primary DX coil (C)
+       \note This input field is name of sensible heat ratio modifier biquadratic curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary zone air node wet-bulb temperature and the heating DX coil entering 
+       \note air dry-bulb temperature.  This is an optional input field.  If this input field is left 
+       \note blank, then the nominal sensible heat ratio specified in the field above will be used.
+  A38, \field Speed 2 Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note quadratic curve = a + b*ff + c*ff**2
+       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
+       \note ff = secondary air flow fraction of the full load flow
+       \note This input field is name of sensible heat ratio modifier curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary coil air flow fraction. This is an optional input field.  If this input
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.
+  N36, \field Speed 3 Secondary Coil Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+       \note This input value is the secondary coil (evaporator) air flow rate when the heat pump 
+       \note is working in heating mode or the secondary DX coil (condenser) air flow rate when the 
+       \note heat pump is working in cooling mode.  
+  N37, \field Speed 3 Secondary Coil Fan Flow Scaling Factor
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \default 1.25   
+       \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
+       \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
+       \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
+       \note fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set 
+       \note to 1.0.
+  N38, \field Speed 3 Nominal Sensible Heat Ratio of Secondary Coil
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \maximum 1.0
+       \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
+       \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
+       \note This is an optional input field.  If this input field is left blank, then pure sensible 
+       \note internal heat gain is assumed, i.e., sensible heat ratio of 1.0. 
+  A39, \field Speed 3 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
+       \note curve = a + b*wb + c*wb**2 + d*db + e*db**2 + f*wb*db
+       \note wb = entering wet-bulb temperature seen by the secondary DX coil (C)
+       \note db = entering dry-bulb temperature seen by the primary DX coil (C)
+       \note This input field is name of sensible heat ratio modifier biquadratic curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary zone air node wet-bulb temperature and the heating DX coil entering 
+       \note air dry-bulb temperature.  This is an optional input field.  If this input field is left 
+       \note blank, then the nominal sensible heat ratio specified in the field above will be used.
+  A40, \field Speed 3 Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note quadratic curve = a + b*ff + c*ff**2
+       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
+       \note ff = secondary air flow fraction of the full load flow
+       \note This input field is name of sensible heat ratio modifier curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary coil air flow fraction. This is an optional input field.  If this input
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.
+  N39, \field Speed 4 Secondary Coil Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+       \note This input value is the secondary coil (evaporator) air flow rate when the heat pump 
+       \note is working in heating mode or the secondary DX coil (condenser) air flow rate when the 
+       \note heat pump is working in cooling mode.  
+  N40, \field Speed 4 Secondary Coil Fan Flow Scaling Factor
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \default 1.25
+       \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
+       \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
+       \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
+       \note fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set 
+       \note to 1.0.
+  N41, \field Speed 4 Nominal Sensible Heat Ratio of Secondary Coil
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \maximum 1.0
+       \note This input value is the nominal sensible heat ratio used to split the heat extracted by 
+       \note a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  
+       \note This is an optional input field.  If this input field is left blank, then pure sensible 
+       \note internal heat gain is assumed, i.e., sensible heat ratio of 1.0. 
+  A41, \field Speed 4 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
+       \note curve = a + b*wb + c*wb**2 + d*db + e*db**2 + f*wb*db
+       \note wb = entering wet-bulb temperature seen by the secondary DX coil (C)
+       \note db = entering dry-bulb temperature seen by the primary DX coil (C)
+       \note This input field is name of sensible heat ratio modifier biquadratic curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary zone air node wet-bulb temperature and the heating DX coil entering 
+       \note air dry-bulb temperature.  This is an optional input field.  If this input field is left 
+       \note blank, then the nominal sensible heat ratio specified in the field above will be used.
+  A42; \field Speed 4 Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note quadratic curve = a + b*ff + c*ff**2
+       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
+       \note ff = secondary air flow fraction of the full load flow
+       \note This input field is name of sensible heat ratio modifier curve.  The value 
+       \note of this curve modifies the nominal sensible heat ratio for current time step depending 
+       \note on the secondary coil air flow fraction. This is an optional input field.  If this input
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.   
+      
 Coil:Heating:DX:VariableSpeed,
         \memo Direct expansion (DX) heating coil (air-to-air heat pump) and compressor unit
         \memo (includes electric compressor and outdoor fan), variable-speed, with defrost
@@ -63542,33 +63821,33 @@ GroundHeatExchanger:Slinky,
         \units m3/s
         \minimum> 0
         \default 0.002
-   N4 , \field Soil Thermal Conductivity
+   N2 , \field Soil Thermal Conductivity
         \type real
         \units W/m-K
         \minimum> 0
         \default 1.08        
-   N2 , \field Soil Density
+   N3 , \field Soil Density
         \type real
         \units kg/m3
         \minimum> 0
         \default 962
-   N3,  \field Soil Specific Heat
+   N4,  \field Soil Specific Heat
         \required-field
         \type real
         \units J/kg-K
         \minimum> 0
         \default 2576
-   N7,  \field Pipe Thermal Conductivity
+   N5,  \field Pipe Thermal Conductivity
         \type real
         \units W/m-K
         \minimum> 0
         \default 0.4
-   N5,  \field Pipe Density
+   N6,  \field Pipe Density
         \type real
         \units kg/m3
         \minimum> 0
         \default 641
-   N6,  \field Pipe Specific Heat
+   N7,  \field Pipe Specific Heat
         \type real
         \units J/kg-K
         \minimum> 0
@@ -63597,14 +63876,14 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 1.0       
-   N7 , \field Coil Pitch
+   N11, \field Coil Pitch
         \note This is the center-to-center distance between coils
         \type real
         \units m
         \minimum> 0
         \ip-units ft
         \default 0.20   
-   N7 , \field Trench Depth
+   N12, \field Trench Depth
         \note This is the distance from the ground surface to the
         \note trench bottom
         \type real
@@ -63612,7 +63891,7 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 1.8     
-   N2 , \field Trench Length
+   N13, \field Trench Length
         \note This is the total length of a single trench
         \note This assumes the heat exchanger runs the full length 
         \note of the trench
@@ -63621,13 +63900,13 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 10 
-   N3 , \field Number of Trenches
+   N14, \field Number of Trenches
         \note This is the number of parallel trenches that 
         \note has a heat exchanger, one per trench
         \type integer
         \minimum 1
         \default 1
-   N4 , \field Horizontal Spacing Between Pipes
+   N15, \field Horizontal Spacing Between Pipes
         \note This represents the average horizontal spacing 
         \note between any two
         \note trenches for heat exchangers that have multiple trenches
@@ -69562,6 +69841,120 @@ SetpointManager:SingleZone:OneStageHeating,
        \note Node(s) at which the temperature will be set
        \required-field
        \type node
+
+SetpointManager:ReturnTemperature:ChilledWater,
+     \memo This setpoint manager is used to place a temperature setpoint on a plant supply
+     \memo  outlet node based on a target return water setpoint. The setpoint manager attempts
+     \memo  to achieve the desired return water temperature by adjusting the supply temperature 
+     \memo  setpoint based on the plant conditions at each system time step.
+     \min-fields 7
+  A1,  \field Name
+       \required-field
+  A2,  \field Plant Loop Supply Outlet Node
+       \note This is the name of the supply outlet node for the plant being controlled by this 
+       \note setpoint manager.  Typically this is where the setpoint will be actuated for
+       \note supply equipment to control to, but not necessarily.  This setpoint manager will
+       \note mine that information from the internal plant data structures.
+       \type node
+       \required-field
+  A3,  \field Plant Loop Supply Inlet Node
+       \note This is the name of the supply inlet node for the plant being controlled with this 
+       \note setpoint manager. The temperature on this node is controlled by actuating the 
+       \note supply setpoint.
+       \type node
+       \required-field
+  N1,  \field Minimum Supply Temperature Setpoint
+       \note This is the minimum chilled water supply temperature setpoint.  This is also used as the default
+       \note setpoint during no-load or negative-load conditions and during initialization.
+       \type real
+       \units C
+       \default 5
+       \required-field
+  N2,  \field Maximum Supply Temperature Setpoint
+       \note This is the maximum reset temperature for the chilled water supply.
+       \type real
+       \units C
+       \default 10
+       \required-field
+  A4,  \field Return Temperature Setpoint Input Type
+       \note This defines whether the chilled water return temperature target is constant, 
+       \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
+       \type choice
+       \key Constant
+       \key Scheduled
+       \key ReturnTemperatureSetpoint
+       \required-field
+  N3,  \field Return Temperature Setpoint Constant Value
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This constant value is only used if 
+       \note the Design Chilled Water Return Temperature Input Type is Constant
+       \type real
+       \units C
+       \default 13
+  A5;  \field Return Temperature Setpoint Schedule Name
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This is a schedule name to allow the return temperature
+       \note target value to be scheduled.  This field is only used if 
+       \note the Design Chilled Water Return Temperature Input Type is Scheduled
+       \type object-list
+       \object-list ScheduleNames
+
+SetpointManager:ReturnTemperature:HotWater,
+     \memo This setpoint manager is used to place a temperature setpoint on a plant supply
+     \memo  outlet node based on a target return water setpoint. The setpoint manager attempts
+     \memo  to achieve the desired return water temperature by adjusting the supply temperature 
+     \memo  setpoint based on the plant conditions at each system time step.
+     \min-fields 7
+  A1,  \field Name
+       \required-field
+  A2,  \field Plant Loop Supply Outlet Node
+       \note This is the name of the supply outlet node for the plant being controlled by this 
+       \note setpoint manager.  Typically this is where the setpoint will be actuated for
+       \note supply equipment to control to, but not necessarily.  This setpoint manager will
+       \note mine that information from the internal plant data structures.
+       \type node
+       \required-field
+  A3,  \field Plant Loop Supply Inlet Node
+       \note This is the name of the supply inlet node for the plant being controlled with this 
+       \note setpoint manager. The temperature on this node is controlled by actuating the 
+       \note supply setpoint.
+       \type node
+       \required-field
+  N1,  \field Minimum Supply Temperature Setpoint
+       \note This is the minimum reset temperature for the hot water supply.
+       \type real
+       \units C
+       \default 77
+       \required-field
+  N2,  \field Maximum Supply Temperature Setpoint
+       \note This is the maximum hot water supply temperature setpoint.  This is also used as the default
+       \note setpoint during no-load or negative-load conditions and during initialization.
+       \type real
+       \units C
+       \default 82
+       \required-field
+  A4,  \field Return Temperature Setpoint Input Type
+       \note This defines whether the hot water return temperature target is constant, 
+       \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
+       \type choice
+       \key Constant
+       \key Scheduled
+       \key ReturnTemperatureSetpoint
+       \required-field
+  N3,  \field Return Temperature Setpoint Constant Value
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This constant value is only used if 
+       \note the Design Hot Water Return Temperature Input Type is Constant
+       \type real
+       \units C
+       \default 71
+  A5;  \field Return Temperature Setpoint Schedule Name
+       \note This is the desired return temperature target, which is met by adjusting the  
+       \note supply temperature setpoint. This is a schedule name to allow the return temperature
+       \note target value to be scheduled.  This field is only used if 
+       \note the Design Hot Water Return Temperature Input Type is Scheduled
+       \type object-list
+       \object-list ScheduleNames
 
 \group Refrigeration
 

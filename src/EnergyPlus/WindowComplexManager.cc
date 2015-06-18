@@ -171,10 +171,7 @@ namespace WindowComplexManager {
 		static int NumBasis( 0 ); // Number of unique bases (No. in BasisList)
 		static int NBkSurf( 0 ); // Local variable for the number of back surfaces
 		int NumStates; // Local variable for the number of states
-//		static int ThConst( 0 ); // Construct array index of thermal construction of state
 		static int MatrixNo( 0 ); // Index of Basis matrix
-		Real64 Azimuth; // Azimuth of window surface (radians)
-//		Real64 Tilt; // Tilt of window surface (radians)
 		Array1D< Real64 > Thetas; // temp array holding theta values
 		Array1D_int NPhis; // temp array holding number of phis for a given theta
 		Array1D< Real64 > V( 3 ); // vector array
@@ -722,9 +719,9 @@ namespace WindowComplexManager {
 	CFSShadeAndBeamInitialization(
 		int const iSurf, // Window surface number
 		int const iState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
+		BSDFWindowGeomDescr & EP_UNUSED( Window ), // Window Geometry
+		BSDFGeomDescr & EP_UNUSED( Geom ), // State Geometry
+		BSDFStateDescr & EP_UNUSED( State ) // State Description
 	)
 	{
 
@@ -1538,7 +1535,7 @@ namespace WindowComplexManager {
 		int const IConst, // Pointer to construction for this state
 		BSDFWindowGeomDescr & Window, // Window Geometry
 		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
+		BSDFStateDescr & EP_UNUSED( State ) // State Description
 	)
 	{
 
@@ -2363,7 +2360,7 @@ namespace WindowComplexManager {
 	}
 
 	Real64
-	SkyWeight( Vector const & DirVec ) // Direction of the element to be weighted
+	SkyWeight( Vector const & EP_UNUSED( DirVec ) ) // Direction of the element to be weighted
 	{
 
 		// FUNCTION INFORMATION:
@@ -2418,7 +2415,7 @@ namespace WindowComplexManager {
 	}
 
 	Real64
-	SkyGndWeight( Vector const & PosVec ) // x,y,z(=0) of ground intersection pt
+	SkyGndWeight( Vector const & EP_UNUSED( PosVec ) ) // x,y,z(=0) of ground intersection pt
 	{
 
 		// FUNCTION INFORMATION:
@@ -2624,7 +2621,7 @@ namespace WindowComplexManager {
 		Vector const & RayToFind, // Ray vector direction in world CS
 		int const RadType, // Type of radiation: Front_Incident, etc.
 		int const ISurf, // Window Surface number
-		int const IState, // Complex Fenestration state number
+		int const EP_UNUSED( IState ), // Complex Fenestration state number
 		BasisStruct const & Basis, // Complex Fenestration basis root
 		Real64 & Theta, // Theta value for ray
 		Real64 & Phi // Phi value for ray
@@ -3169,7 +3166,6 @@ namespace WindowComplexManager {
 		static Array1D_int iMinDT( 1, 0 );
 		static Array1D_int IDConst( 100, 0 );
 
-		int IConst; // Construction number
 		int TotLay; // Total number of layers in a construction
 		//   (sum of solid layers and gap layers)
 		int Lay; // Layer number

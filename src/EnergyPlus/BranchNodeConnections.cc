@@ -1563,7 +1563,7 @@ namespace BranchNodeConnections {
 	}
 
 	void
-	TestInletOutletNodes( bool & ErrorsFound )
+	TestInletOutletNodes( bool & EP_UNUSED( ErrorsFound ) )
 	{
 
 		// SUBROUTINE INFORMATION:

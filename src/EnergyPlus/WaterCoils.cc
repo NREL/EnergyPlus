@@ -315,8 +315,6 @@ namespace WaterCoils {
 		using namespace DataIPShortCuts;
 		using GlobalNames::VerifyUniqueCoilName;
 		using SetPointManager::NodeHasSPMCtrlVarType;
-		using SetPointManager::iCtrlVarType_Temp;
-		using SetPointManager::iCtrlVarType_HumRat;
 		using namespace FaultsManager;
 
 		// Locals
@@ -785,7 +783,6 @@ namespace WaterCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallNo( 1.e-9 ); // SmallNo number in place of zero
-		Real64 const LargeNo( 1.e20 ); // Large number in place of infinity
 		int const itmax( 10 );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
@@ -1617,8 +1614,6 @@ namespace WaterCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIte( 500 ); // Maximum number of iterations
-		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const InitWaterCoil( "InitWaterCoil" );
 		static std::string const RoutineName( "SizeWaterCoil" );
 
@@ -1690,7 +1685,7 @@ namespace WaterCoils {
 					DataAirFlowUsedForSizing = DesCoilAirFlow;
 					DataFlowUsedForSizing = DesCoilAirFlow;
 					DataDesOutletAirTemp = DesCoilExitTemp;
-					DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.9, StdBaroPress );
+					DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.9, StdBaroPress, RoutineName );
 				}
 
 				SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should always print this!)
@@ -2258,7 +2253,6 @@ namespace WaterCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxCoolCoilErrs( 5 );
 		static Real64 const exp_47( std::exp( -0.41718 ) );
 		static Real64 const exp_35( std::exp( -0.3574 ) );
 		static std::string const RoutineName( "CalcDetailFlatFinCoolingCoil" );
@@ -3481,7 +3475,6 @@ namespace WaterCoils {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const SmallNo( 1.e-9 );
-		Real64 const LargeNo( 1.e9 );
 		int const itmax( 12 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -4763,7 +4756,7 @@ Label10: ;
 
 	void
 	CheckWaterCoilSchedule(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
@@ -5356,7 +5349,6 @@ Label10: ;
 		// Using/Aliasing
 		using SetPointManager::NodeHasSPMCtrlVarType;
 		using SetPointManager::iCtrlVarType_Temp;
-		using SetPointManager::iCtrlVarType_HumRat;
 		using SetPointManager::iCtrlVarType_MaxHumRat;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using EMSManager::iTemperatureSetPoint;
@@ -5495,7 +5487,6 @@ Label10: ;
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		int const itmax( 10 );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 1.0 ); // Accuracy of result
 
@@ -5810,11 +5801,11 @@ Label10: ;
 	UpdateWaterToAirCoilPlantConnection(
 		int const CoilTypeNum,
 		std::string const & CoilName,
-		int const EquipFlowCtrl, // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from
 		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
 	)
 	{

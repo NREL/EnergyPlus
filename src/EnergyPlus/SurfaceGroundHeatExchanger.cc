@@ -446,7 +446,7 @@ namespace loc {
 	void
 	InitSurfaceGroundHeatExchanger(
 		int const SurfaceGHENum, // component number
-		bool const RunFlag // TRUE if equipment is operating
+		bool const EP_UNUSED( RunFlag ) // TRUE if equipment is operating
 	)
 	{
 
@@ -699,9 +699,6 @@ namespace loc {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataGlobals::BeginTimeStepFlag;
-		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using namespace DataEnvironment;
 		using DataPlant::PlantLoop;
 		using General::TrimSigDigits;

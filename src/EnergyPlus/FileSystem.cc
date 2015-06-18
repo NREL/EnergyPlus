@@ -233,7 +233,9 @@ linkFile(std::string const &fileName, std::string const &link)
 #ifdef _WIN32
 	CopyFile(fileName.c_str(), link.c_str(), false);
 #else
-	int status = symlink(fileName.c_str(), link.c_str());
+	int returnValue = symlink(fileName.c_str(), link.c_str()); // ignore the return value
+	// we want to ignore the return value without muting all warnings, so...
+	(void)( returnValue + 1 ); // outsmart the compiler :-/
 #endif
 }
 

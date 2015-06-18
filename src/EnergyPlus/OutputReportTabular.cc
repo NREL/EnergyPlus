@@ -1211,7 +1211,6 @@ namespace OutputReportTabular {
 		int iTable;
 		int firstReport;
 		int repIndex;
-		int indx;
 		int found;
 		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
@@ -3066,7 +3065,6 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iStyle;
 		std::string curDel;
-		int write_stat;
 
 		// get a new file unit number
 		// create a file to hold the results
@@ -3522,7 +3520,6 @@ namespace OutputReportTabular {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::SysTimeElapsed;
 		using DataEnvironment::Month;
 		using DataEnvironment::DayOfMonth;
 		using General::EncodeMonDayHrMin;
@@ -4066,7 +4063,6 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iResource;
 		int jEndUse;
-		int kEndUseSub;
 		Real64 curMeterValue;
 		int curMeterNumber;
 
@@ -4321,7 +4317,6 @@ namespace OutputReportTabular {
 		using OutputReportPredefined::pdrSensibleGain;
 		using OutputReportPredefined::reportName;
 		using DataHVACGlobals::TimeStepSys;
-		using DataHVACGlobals::SysTimeElapsed;
 		using General::EncodeMonDayHrMin;
 		using General::DetermineMinuteForReporting;
 
@@ -4329,7 +4324,6 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const FracToMin( 60.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5539,17 +5533,12 @@ namespace OutputReportTabular {
 		using DataHeatBalance::ZonePreDefRep;
 		using DataHeatBalance::ZnAirRpt;
 		using DataHeatBalance::BuildingPreDefRep;
-		using DataHeatBalance::People;
-		using DataHeatBalance::NumPeopleStatements;
 		using ExteriorEnergyUse::ExteriorLights;
 		using ExteriorEnergyUse::NumExteriorLights;
-		using ExteriorEnergyUse::ScheduleOnly;
-		using ExteriorEnergyUse::AstroClockOverride;
 		using ScheduleManager::ScheduleAverageHoursPerWeek;
 		using ScheduleManager::GetScheduleName;
 		using DataEnvironment::RunPeriodStartDayOfWeek;
 		using DataEnvironment::CurrentYearIsLeapYear;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHVACGlobals::NumPrimaryAirSys;
 		using DataOutputs::iNumberOfRecords;
 		using DataOutputs::iNumberOfDefaultedFields;
@@ -5562,8 +5551,6 @@ namespace OutputReportTabular {
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::WeatherFileLocationTitle;
-		using DataErrorTracking::TotalSevereErrors;
-		using DataErrorTracking::TotalWarningErrors;
 		using General::RoundSigDigits;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
@@ -5586,7 +5573,6 @@ namespace OutputReportTabular {
 		int iLight;
 		int zonePt;
 		int iZone;
-		int jPeople;
 		static Real64 totalVolume( 0.0 );
 		static int numUncondZones( 0 );
 		static int numCondZones( 0 );
@@ -6583,23 +6569,11 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const enduseLine( 1 );
-		int const detailLine( 16 );
-		int const normalizedLine( 23 );
-		int const elecSatisLine( 36 );
-		int const thermSatisLine( 50 );
-		int const waterSatisLine( 59 );
-		int const sourceSiteLine( 69 );
-		int const areaLine( 73 );
-		int const controlLine( 77 );
-		int const notesLine( 83 );
-
 		int const colElectricity( 1 );
 		int const colGas( 2 );
 		int const colAdditionalFuel( 3 );
 		int const colPurchCool( 4 );
 		int const colPurchHeat( 5 );
-		int const colWater( 6 );
 
 		Real64 const SmallValue( 1.e-14 );
 
@@ -6674,7 +6648,6 @@ namespace OutputReportTabular {
 		static Real64 leedSiteFanInt( 0.0 );
 		static Real64 leedSiteSrvWatr( 0.0 );
 		static Real64 leedSiteRecept( 0.0 );
-		static Real64 leedSiteMisc( 0.0 );
 		static Real64 leedSiteTotal( 0.0 );
 		Real64 unconvert;
 
@@ -8009,19 +7982,13 @@ namespace OutputReportTabular {
 		Array1D< Real64 > collapsedTotal( 6 );
 		Array2D< Real64 > collapsedEndUse( 6, NumEndUses );
 		Array3D< Real64 > collapsedEndUseSub( MaxNumSubcategories, NumEndUses, 6 );
-		Real64 totalSourceEnergyUse;
 		int iResource;
 		int jEndUse;
-		int kEndUseSub;
-		int i;
 		Real64 largeConversionFactor;
-		int numRows;
 		Real64 areaConversionFactor;
-		Real64 convBldgGrossFloorArea;
 		Real64 convBldgCondFloorArea;
 		std::string curNameWithSIUnits;
 		std::string curNameAndUnits;
-		int indexUnitConv;
 
 		if ( displaySourceEnergyEndUseSummary ) {
 			// show the headers of the report
@@ -8260,7 +8227,6 @@ namespace OutputReportTabular {
 		int const colAdditionalFuel( 3 );
 		int const colPurchCool( 4 );
 		int const colPurchHeat( 5 );
-		int const colWater( 6 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -9020,10 +8986,8 @@ namespace OutputReportTabular {
 		using DataEnvironment::WeatherFileLocationTitle;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::BuildingAzimuth;
-		using DataHeatBalance::Construct;
 		using DataHeatBalance::TotLights;
 		using DataHeatBalance::Lights;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
 		using DataHeatBalance::ZoneElectric;
@@ -9051,8 +9015,6 @@ namespace OutputReportTabular {
 		using ScheduleManager::GetScheduleName;
 		using ExteriorEnergyUse::ExteriorLights;
 		using ExteriorEnergyUse::NumExteriorLights;
-		using ExteriorEnergyUse::ScheduleOnly;
-		using ExteriorEnergyUse::AstroClockOverride;
 		using General::SafeDivide;
 		using General::RoundSigDigits;
 
@@ -10316,7 +10278,6 @@ namespace OutputReportTabular {
 		//CHARACTER(len=MaxNameLength)                               :: curRecSurf
 		int curRecSurf;
 		std::string listOfSurf;
-		int found;
 		int iShadRel;
 		int jUnique;
 		int iKindRec;
@@ -10842,7 +10803,6 @@ namespace OutputReportTabular {
 		using DataGlobals::isPulseZoneSizing;
 		using DataSizing::CurOverallSimDay;
 		using DataHeatBalance::ZnAirRpt;
-		using DataHeatBalance::RefrigCaseCredit;
 		using DataHVACGlobals::TimeStepSys;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlSimple;
@@ -10926,7 +10886,6 @@ namespace OutputReportTabular {
 		using DataEnvironment::TotRunDesPersDays;
 		using DataGlobals::NumOfTimeStepInHour;
 		using DataSizing::CalcFinalZoneSizing;
-		using DataSizing::NumTimeStepsInAvg;
 		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
@@ -11203,10 +11162,7 @@ namespace OutputReportTabular {
 		static int jTime( 0 );
 		static int k( 0 );
 		static int kSurf( 0 );
-		static int numObj( 0 );
-		static int objCount( 0 );
 		static int ZoneNum( 0 );
-		static int tempUnitConvIndex( 0 );
 		Array1D< Real64 > seqData; // raw data sequence that has not been averaged yet
 		Array1D< Real64 > AvgData; // sequence data after averaging
 		int NumOfTimeStepInDay;
@@ -13019,9 +12975,6 @@ namespace OutputReportTabular {
 
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::StandardZone;
-		using ZonePlenum::ZoneRetPlenCond;
-		using ZonePlenum::ZoneSupPlenCond;
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 
