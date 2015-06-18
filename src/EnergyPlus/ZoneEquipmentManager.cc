@@ -521,6 +521,7 @@ namespace ZoneEquipmentManager {
 		using DataHVACGlobals::SmallTempDiff;
 		using General::RoundSigDigits;
 		using DataEnvironment::StdBaroPress;
+		using DataZoneEquipment::MyOneTimeFlag2;
 
 		// Parameters
 		static std::string const RoutineName( "SizeZoneEquipment" );
@@ -539,7 +540,6 @@ namespace ZoneEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
 		int ControlledZoneNum; // controlled zone index
 		int ActualZoneNum; // index into Zone array (all zones)
 		int SupplyAirNode1; // node number of 1st zone supply air node
@@ -565,9 +565,9 @@ namespace ZoneEquipmentManager {
 		Real64 HR90H; // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 		Real64 HR90L; // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
-		if ( MyOneTimeFlag ) {
+		if ( MyOneTimeFlag2 ) {
 			SetUpZoneSizingArrays();
-			MyOneTimeFlag = false;
+			MyOneTimeFlag2 = false;
 		}
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
