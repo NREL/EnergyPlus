@@ -63722,28 +63722,9 @@ GroundHeatExchanger:HorizontalTrench,
         \minimum 0
         \maximum 100
         \default 50
-   N16, \field Kusuda-Achenbach Average Surface Temperature
-        \note This is the parameter for average annual surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units C
-   N17, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \note This is the parameter for annual average amplitude from average surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units deltaC
-   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \note This is the parameter for phase shift from minimum surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units days
-   N19; \field Evapotranspiration Ground Cover Parameter
+   A4,  \field Type of Undisturbed Ground Temperature Model
+   A5,  \field Name of Undisturbed Ground Temperature Model
+   N16; \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
