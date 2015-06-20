@@ -16,6 +16,7 @@ set( test_src
   FluidCoolers.unit.cc
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
+  GroundTemperatureModels.unit.cc
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
