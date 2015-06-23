@@ -6658,6 +6658,7 @@ namespace OutputReportTabular {
 					collapsedEndUseSub( kEndUseSub, jEndUse, 6 ) /= waterConversionFactor;
 				}
 			}
+			collapsedTotal( 6 ) /= waterConversionFactor;
 
 			// convert to GJ
 			gatherPowerFuelFireGen /= largeConversionFactor;
