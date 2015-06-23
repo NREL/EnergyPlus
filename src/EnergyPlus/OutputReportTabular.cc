@@ -7142,7 +7142,7 @@ namespace OutputReportTabular {
 					curTotal += useVal( iResource, jUse );
 				}
 				if ( abs( curTotal - collapsedTotal( iResource ) ) > ( collapsedTotal( iResource ) * 0.001 )) {
-					ShowWarningError( "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + columnHead( 1 ) );
+					ShowWarningError( "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + columnHead( iResource ) );
 				}
 			}
 
