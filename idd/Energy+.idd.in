@@ -64953,6 +64953,7 @@ ThermalStorage:Ice:Simple,
   A1, \field Name
       \type alpha
       \required-field
+      \reference IceThermalStorageEquipment
   A2, \field Ice Storage Type
       \note IceOnCoilInternal = Ice-on-Coil, internal melt
       \note IceOnCoilExternal = Ice-on-Coil, external melt
@@ -64980,6 +64981,7 @@ ThermalStorage:Ice:Detailed,
        \memo The model uses polynomial equations to describe the system performance.
   A1 , \field Name
        \required-field
+       \reference IceThermalStorageEquipment
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -66622,6 +66624,296 @@ PlantEquipmentOperation:ComponentSetpoint,
        \key Heating
        \key Cooling
        \key Dual
+
+PlantEquipmentOperation:ThermalEnergyStorage,
+       \memo Plant equipment operation scheme for simpler input to control thermal (ice)
+       \memo energy storage systems.  It replaces a host of setpoint managers with simple,
+       \memo single input values.  For more complex controls, use the ComponentSetpoint
+       \memo scheme.
+    \min-fields 7
+   A1, \field Name
+       \required-field
+       \reference ControlSchemeList
+   A2, \field On-Peak Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Charging Availability Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   N1, \field Non-Charging Chilled Water Temperature
+       \memo Single temperature for chiller outlet when not in cooling season
+       \memo or during on-peak cooling (discharge)
+       \required-field
+       \type real
+       \units C
+   N2, \field Charging Chilled Water Temperature
+       \memo Single temperature for chiller outlet when off-peak during cooling
+       \memo season (charging)
+       \required-field
+       \type real
+       \units C
+   A4, \field Component 1 Object Type
+       \required-field
+       \type choice
+       \key ThermalStorage:Ice:Simple
+       \key ThermalStorage:Ice:Detailed
+   A5, \field Component 1 Name
+       \required-field
+       \type object-list
+       \object-list IceThermalStorageEquipment
+   A6, \field Component 1 Demand Calculation Node Name
+       \required-field
+       \type node
+   A7, \field Component 1 Setpoint Node Name
+       \required-field
+       \type node
+   N3, \field Component 1 Flow Rate
+       \required-field
+       \type real
+       \units m3/s
+       \autosizable
+   A8, \field Component 1 Operation Type
+       \required-field
+       \type choice
+       \key Heating
+       \key Cooling
+       \key Dual
+   A9, \field Component 2 Object Type
+       \required-field
+       \type choice
+       \key ThermalStorage:Ice:Simple
+       \key ThermalStorage:Ice:Detailed
+   A10, \field Component 2 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A11, \field Component 2 Demand Calculation Node Name
+        \required-field
+        \type node
+   A12, \field Component 2 Setpoint Node Name
+        \required-field
+        \type node
+   N4,  \field Component 2 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A13, \field Component 2 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A14, \field Component 3 Object Type
+        \required-field
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+   A15, \field Component 3 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A16, \field Component 3 Demand Calculation Node Name
+        \required-field
+        \type node
+   A17, \field Component 3 Setpoint Node Name
+        \required-field
+        \type node
+   N5,  \field Component 3 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A18, \field Component 3 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A19, \field Component 4 Object Type
+        \required-field
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+   A20, \field Component 4 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A21, \field Component 4 Demand Calculation Node Name
+        \required-field
+        \type node
+   A22, \field Component 4 Setpoint Node Name
+        \required-field
+        \type node
+   N6,  \field Component 4 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A23, \field Component 4 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A24, \field Component 5 Object Type
+        \required-field
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+   A25, \field Component 5 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A26, \field Component 5 Demand Calculation Node Name
+        \required-field
+        \type node
+   A27, \field Component 5 Setpoint Node Name
+        \required-field
+        \type node
+   N7,  \field Component 5 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A28, \field Component 5 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A29, \field Component 6 Object Type
+        \required-field
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+   A30, \field Component 6 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A31, \field Component 6 Demand Calculation Node Name
+        \required-field
+        \type node
+   A32, \field Component 6 Setpoint Node Name
+        \required-field
+        \type node
+   N8,  \field Component 6 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A33, \field Component 6 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A34, \field Component 7 Object Type
+        \required-field
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+   A35, \field Component 7 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A36, \field Component 7 Demand Calculation Node Name
+        \required-field
+        \type node
+   A37, \field Component 7 Setpoint Node Name
+        \required-field
+        \type node
+   N9,  \field Component 7 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A38, \field Component 7 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A39, \field Component 8 Object Type
+        \required-field
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+   A40, \field Component 8 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A41, \field Component 8 Demand Calculation Node Name
+        \required-field
+        \type node
+   A42, \field Component 8 Setpoint Node Name
+        \required-field
+        \type node
+   N10, \field Component 8 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A43, \field Component 8 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A44, \field Component 9 Object Type
+        \required-field
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+   A45, \field Component 9 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A46, \field Component 9 Demand Calculation Node Name
+        \required-field
+        \type node
+   A47, \field Component 9 Setpoint Node Name
+        \required-field
+        \type node
+   N11, \field Component 9 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A48, \field Component 9 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A49, \field Component 10 Object Type
+        \required-field
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+   A50, \field Component 10 Name
+        \required-field
+        \type object-list
+        \object-list IceThermalStorageEquipment
+   A51, \field Component 10 Demand Calculation Node Name
+        \required-field
+        \type node
+   A52, \field Component 10 Setpoint Node Name
+        \required-field
+        \type node
+   N12, \field Component 10 Flow Rate
+        \required-field
+        \type real
+        \units m3/s
+        \autosizable
+   A53; \field Component 10 Operation Type
+        \required-field
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
 
 PlantEquipmentOperation:OutdoorDryBulbDifference,
        \memo Plant equipment operation scheme for outdoor dry-bulb temperature difference
