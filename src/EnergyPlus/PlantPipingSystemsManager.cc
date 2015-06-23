@@ -1008,12 +1008,8 @@ namespace PlantPipingSystemsManager {
 				Real64 SoilSpecificHeat;
 				Real64 MoistureContent;
 				Real64 SaturationMoistureContent;
-				Real64 KusudaAvgSurfTemp;
-				Real64 KusudaAvgAmplitude;
-				Real64 KusudaPhaseShift;
 				std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 				Real64 EvapotranspirationCoeff;
-				bool UseGroundTempDataForKusuda;
 				Real64 MinSurfTemp;
 				int MonthOfMinSurfTemp;
 				Real64 HorizInsWidth;
@@ -1034,11 +1030,7 @@ namespace PlantPipingSystemsManager {
 					SoilSpecificHeat( 0.0 ),
 					MoistureContent( 0.0 ),
 					SaturationMoistureContent( 0.0 ),
-					KusudaAvgSurfTemp( 0.0 ),
-					KusudaAvgAmplitude( 0.0 ),
-					KusudaPhaseShift( 0.0 ),
 					EvapotranspirationCoeff( 0.0 ),
-					UseGroundTempDataForKusuda( false ),
 					MinSurfTemp( 0.0 ),
 					MonthOfMinSurfTemp( 0 ),
 					HorizInsWidth( 0.0 ),
@@ -1056,11 +1048,7 @@ namespace PlantPipingSystemsManager {
 					Real64 const SoilSpecificHeat,
 					Real64 const MoistureContent,
 					Real64 const SaturationMoistureContent,
-					Real64 const KusudaAvgSurfTemp,
-					Real64 const KusudaAvgAmplitude,
-					Real64 const KusudaPhaseShift,
 					Real64 const EvapotranspirationCoeff,
-					bool const UseGroundTempDataForKusuda,
 					Real64 const MinSurfTemp,
 					int const MonthOfMinSurfTemp,
 					Real64 const HorizInsWidth,
@@ -1080,11 +1068,7 @@ namespace PlantPipingSystemsManager {
 					SoilSpecificHeat( SoilSpecificHeat ),
 					MoistureContent( MoistureContent ),
 					SaturationMoistureContent( SaturationMoistureContent ),
-					KusudaAvgSurfTemp( KusudaAvgSurfTemp ),
-					KusudaAvgAmplitude( KusudaAvgAmplitude ),
-					KusudaPhaseShift( KusudaPhaseShift ),
 					EvapotranspirationCoeff( EvapotranspirationCoeff ),
-					UseGroundTempDataForKusuda( UseGroundTempDataForKusuda ),
 					MinSurfTemp( MinSurfTemp ),
 					MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
 					HorizInsWidth( HorizInsWidth ),
@@ -1138,15 +1122,9 @@ namespace PlantPipingSystemsManager {
 				Domain( ZoneCoupledDomainCtr ).SoilDensity = rNumericArgs( 5 );
 				Domain( ZoneCoupledDomainCtr ).SoilSpecificHeat = rNumericArgs( 6 );
 				Domain( ZoneCoupledDomainCtr ).MoistureContent = rNumericArgs( 7 );
-				Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent = rNumericArgs( 8 );
-				
+				Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent = rNumericArgs( 8 );		
 				Domain( ZoneCoupledDomainCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
-				
-				//Domain( ZoneCoupledDomainCtr ).KusudaAvgSurfTemp = rNumericArgs( 9 );
-				//Domain( ZoneCoupledDomainCtr ).KusudaAvgAmplitude = rNumericArgs( 10 );
-				//Domain( ZoneCoupledDomainCtr ).KusudaPhaseShift = rNumericArgs( 11 );
 				Domain( ZoneCoupledDomainCtr ).EvapotranspirationCoeff = rNumericArgs( 9 );
-				//Domain( ZoneCoupledDomainCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 10 ) || lNumericFieldBlanks( 11 ) || lNumericFieldBlanks( 12 );
 				Domain( ZoneCoupledDomainCtr ).HorizInsWidth = rNumericArgs( 10 );
 				Domain( ZoneCoupledDomainCtr ).VertInsDepth = rNumericArgs( 11 );
 
@@ -1333,51 +1311,6 @@ namespace PlantPipingSystemsManager {
 				// Farfield model
 				PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = Domain( ZoneCoupledDomainCtr ).groundTempModel;
 
-				if ( !Domain( ZoneCoupledDomainCtr ).UseGroundTempDataForKusuda ) {
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = Domain( ZoneCoupledDomainCtr ).KusudaAvgSurfTemp;
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = Domain( ZoneCoupledDomainCtr ).KusudaAvgAmplitude;
-					PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( ZoneCoupledDomainCtr ).KusudaPhaseShift;
-				} else {
-					// If ground temp data was not brought in manually in GETINPUT,
-					// then we must get it from the surface ground temperatures
-
-					if ( !PubGroundTempSurfFlag ) {
-						ShowSevereError( "Input problem for " + ObjName_ZoneCoupled_Slab + '=' + Domain( ZoneCoupledDomainCtr ).ObjName );
-						ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-						ShowContinueError( "This is required for the ground domain if farfield parameters are" );
-						ShowContinueError( " not directly entered into the input object." );
-						ErrorsFound = true;
-					}
-
-					// Calculate Average Ground Temperature for all 12 months of the year:
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = 0.0;
-					for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-						PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
-					}
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature /= MonthsInYear;
-
-					// Calculate Average Amplitude from Average:
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
-					for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-						PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature );
-					}
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
-
-					// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-					Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp = 0;
-					Domain( ZoneCoupledDomainCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-					for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-						if ( PubGroundTempSurface( MonthIndex ) <= Domain( ZoneCoupledDomainCtr ).MinSurfTemp ) {
-							Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp = MonthIndex;
-							Domain( ZoneCoupledDomainCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-						}
-					}
-					PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
-				}
-
-				// Unit conversion
-				PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
-
 				// Other parameters
 				PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
 				PipingSystemDomains( DomainCtr ).SimControls.MaxIterationsPerTS = 250;
@@ -1471,7 +1404,6 @@ namespace PlantPipingSystemsManager {
 			Real64 VertInsDepth;
 			std::string HorizInsMaterial;
 			std::string VertInsMaterial;
-			bool UseGroundTempDataForKusuda;
 
 			// Default Constructor
 			GroundDomainData() :
@@ -1481,8 +1413,7 @@ namespace PlantPipingSystemsManager {
 				MinSurfTemp( 0.0 ),
 				MonthOfMinSurfTemp( 0 ),
 				HorizInsWidth( 0.0 ),
-				VertInsDepth( 0.0 ),
-				UseGroundTempDataForKusuda( false )
+				VertInsDepth( 0.0 )
 			{}
 
 			// Member Constructor
@@ -1496,8 +1427,7 @@ namespace PlantPipingSystemsManager {
 				Real64 const HorizInsWidth,
 				Real64 const VertInsDepth,
 				std::string const & HorizInsMaterial,
-				std::string const & VertInsMaterial,
-				bool const UseGroundTempDataForKusuda
+				std::string const & VertInsMaterial
 			) :
 				ObjName( ObjName ),
 				Depth( Depth ),
@@ -1508,8 +1438,7 @@ namespace PlantPipingSystemsManager {
 				HorizInsWidth( HorizInsWidth ),
 				VertInsDepth( VertInsDepth ),
 				HorizInsMaterial( HorizInsMaterial ),
-				VertInsMaterial( VertInsMaterial ),
-				UseGroundTempDataForKusuda( UseGroundTempDataForKusuda )
+				VertInsMaterial( VertInsMaterial )
 			{}
 
 		};
@@ -1562,56 +1491,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Moisture.Theta_sat = rNumericArgs( 8 ) / 100.0;
 
 			// Farfield ground temperature model
-			//Domain( BasementCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 9 ) || lNumericFieldBlanks( 10 ) || lNumericFieldBlanks( 11 );
 			PipingSystemDomains( BasementCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
-
-			//if ( !Domain( BasementCtr ).UseGroundTempDataForKusuda ) {
-			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = rNumericArgs( 9 );
-			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = rNumericArgs( 10 );
-			//	PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = rNumericArgs( 11 );
-			//} else {
-			//	// If ground temp data was not brought in manually in GETINPUT,
-			//	// then we must get it from the surface ground temperatures
-
-			//	if ( !PubGroundTempSurfFlag ) {
-			//		ShowSevereError( "Input problem for " + ObjName_ZoneCoupled_Basement + '=' + Domain( BasementCtr ).ObjName );
-			//		ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-			//		ShowContinueError( "This is required for the ground domain if farfield parameters are" );
-			//		ShowContinueError( " not directly entered into the input object." );
-			//		ErrorsFound = true;
-			//	}
-
-			//	// Calculate Average Ground Temperature for all 12 months of the year:
-			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = 0.0;
-			//	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-			//		PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
-			//	}
-
-			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature /= MonthsInYear;
-
-			//	// Calculate Average Amplitude from Average:
-			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
-			//	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-			//		PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature );
-			//	}
-
-			//	PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
-
-			//	// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-			//	Domain( BasementCtr ).MonthOfMinSurfTemp = 0;
-			//	Domain( BasementCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-			//	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-			//		if ( PubGroundTempSurface( MonthIndex ) <= Domain( BasementCtr ).MinSurfTemp ) {
-			//			Domain( BasementCtr ).MonthOfMinSurfTemp = MonthIndex;
-			//			Domain( BasementCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-			//		}
-			//	}
-
-			//	PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( BasementCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
-			//}
-
-			// Unit conversion
-			//PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
 
 			// check if there are blank inputs related to the basement,
 			if ( lNumericFieldBlanks( 11 ) || lAlphaFieldBlanks( 5 ) || lAlphaFieldBlanks( 10 ) ) {
@@ -2116,11 +1996,7 @@ namespace PlantPipingSystemsManager {
 			Real64 InterPipeSpacing;
 			Real64 MoistureContent;
 			Real64 SaturationMoistureContent;
-			Real64 KusudaAvgSurfTemp;
-			Real64 KusudaAvgAmplitude;
-			Real64 KusudaPhaseShift;
 			Real64 EvapotranspirationCoeff;
-			bool UseGroundTempDataForKusuda;
 			Real64 MinSurfTemp;
 			int MonthOfMinSurfTemp;
 			std::shared_ptr< BaseGroundTempsModel > groundTempModel;
@@ -2142,11 +2018,7 @@ namespace PlantPipingSystemsManager {
 				InterPipeSpacing( 0.0 ),
 				MoistureContent( 0.0 ),
 				SaturationMoistureContent( 0.0 ),
-				KusudaAvgSurfTemp( 0.0 ),
-				KusudaAvgAmplitude( 0.0 ),
-				KusudaPhaseShift( 0.0 ),
 				EvapotranspirationCoeff( 0.0 ),
-				UseGroundTempDataForKusuda( false ),
 				MinSurfTemp( 0.0 ),
 				MonthOfMinSurfTemp( 0 )
 			{}
@@ -2171,11 +2043,7 @@ namespace PlantPipingSystemsManager {
 				Real64 const InterPipeSpacing,
 				Real64 const MoistureContent,
 				Real64 const SaturationMoistureContent,
-				Real64 const KusudaAvgSurfTemp,
-				Real64 const KusudaAvgAmplitude,
-				Real64 const KusudaPhaseShift,
 				Real64 const EvapotranspirationCoeff,
-				bool const UseGroundTempDataForKusuda,
 				Real64 const MinSurfTemp,
 				int const MonthOfMinSurfTemp
 			) :
@@ -2197,11 +2065,7 @@ namespace PlantPipingSystemsManager {
 				InterPipeSpacing( InterPipeSpacing ),
 				MoistureContent( MoistureContent ),
 				SaturationMoistureContent( SaturationMoistureContent ),
-				KusudaAvgSurfTemp( KusudaAvgSurfTemp ),
-				KusudaAvgAmplitude( KusudaAvgAmplitude ),
-				KusudaPhaseShift( KusudaPhaseShift ),
 				EvapotranspirationCoeff( EvapotranspirationCoeff ),
-				UseGroundTempDataForKusuda( UseGroundTempDataForKusuda ),
 				MinSurfTemp( MinSurfTemp ),
 				MonthOfMinSurfTemp( MonthOfMinSurfTemp )
 			{}
@@ -2262,11 +2126,7 @@ namespace PlantPipingSystemsManager {
 			HGHX( HorizontalGHXCtr ).MoistureContent = rNumericArgs( 14 );
 			HGHX( HorizontalGHXCtr ).SaturationMoistureContent = rNumericArgs( 15 );
 			HGHX( HorizontalGHXCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
-			//HGHX( HorizontalGHXCtr ).KusudaAvgSurfTemp = rNumericArgs( 16 );
-			//HGHX( HorizontalGHXCtr ).KusudaAvgAmplitude = rNumericArgs( 17 );
-			//HGHX( HorizontalGHXCtr ).KusudaPhaseShift = rNumericArgs( 18 );
 			HGHX( HorizontalGHXCtr ).EvapotranspirationCoeff = rNumericArgs( 16 );
-			//HGHX( HorizontalGHXCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
 
 			//******* We'll first set up the domain ********
 			// the extents will be: Zmax = axial length; Ymax = burial depth*2; Xmax = ( NumPipes+1 )*HorizontalPipeSpacing
@@ -2295,50 +2155,6 @@ namespace PlantPipingSystemsManager {
 
 			// Farfield model parameters
 			PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = HGHX( HorizontalGHXCtr ).groundTempModel;
-			//if ( ! HGHX( HorizontalGHXCtr ).UseGroundTempDataForKusuda ) {
-				//PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = HGHX( HorizontalGHXCtr ).KusudaAvgSurfTemp;
-				//PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = HGHX( HorizontalGHXCtr ).KusudaAvgAmplitude;
-				//PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = HGHX( HorizontalGHXCtr ).KusudaPhaseShift;
-			//} else {
-				//// If ground temp data was not brought in manually in GETINPUT,
-				//// then we must get it from the surface ground temperatures
-
-				//if ( ! PubGroundTempSurfFlag ) {
-					//ShowSevereError( "Input problem for " + ObjName_HorizTrench + '=' + HGHX( HorizontalGHXCtr ).ObjName );
-					//ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-					//ShowContinueError( "This is required for the horizontal ground heat exchanger if farfield parameters are" );
-					//ShowContinueError( " not directly entered into the input object." );
-					//ErrorsFound = true;
-				//}
-
-				//// Calculate Average Ground Temperature for all 12 months of the year:
-				//PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = 0.0;
-				//for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					//PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
-				//}
-				//PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature /= MonthsInYear;
-
-				//// Calculate Average Amplitude from Average:
-				//PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
-				//for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					//PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature );
-				//}
-				//PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
-
-				//// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				//HGHX( HorizontalGHXCtr ).MonthOfMinSurfTemp = 0;
-				//HGHX( HorizontalGHXCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-				//for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					//if ( PubGroundTempSurface( MonthIndex ) <= HGHX( HorizontalGHXCtr ).MinSurfTemp ) {
-						//HGHX( HorizontalGHXCtr ).MonthOfMinSurfTemp = MonthIndex;
-						//HGHX( HorizontalGHXCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-					//}
-				//}
-				//PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = HGHX( HorizontalGHXCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
-			//}
-
-			//// Unit conversion
-			//PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
 
 			// Other parameters
 			PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;

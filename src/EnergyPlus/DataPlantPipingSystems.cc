@@ -46,7 +46,7 @@ namespace DataPlantPipingSystems {
 	int const PartitionType_ZSideWall( -8 );
 	int const PartitionType_FloorInside( -9 );
 	int const PartitionType_UnderFloor( -10 );
-	int const PartitionType_HorizInsXSide( 11 );
+	int const PartitionType_HorizInsXSide( -11 );
 	int const PartitionType_VertInsLowerEdge( -12 );
 	int const PartitionType_HorizInsZSide( -13 );
 

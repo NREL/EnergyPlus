@@ -1566,9 +1566,6 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).SubAGG = 15;
 				slinkyGLHE( GLHENum ).AGG = 192;
 
-				// Farfield model parameters, validated min/max by IP
-				//slinkyGLHE( GLHENum ).useGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
-
 				// Average coil depth
 				if ( slinkyGLHE( GLHENum ).verticalConfig ) {
 					// Vertical configuration
@@ -1595,52 +1592,6 @@ namespace GroundHeatExchangers {
 
 				// Initialize ground temperature model and get pointer reference
 				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
-
-				//if ( !slinkyGLHE( GLHENum ).useGroundTempDataForKusuda ) {
-				//	slinkyGLHE( GLHENum ).averageGroundTemp = rNumericArgs( 16 );
-				//	slinkyGLHE( GLHENum ).averageGroundTempAmplitude = rNumericArgs( 17 );
-				//	slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = rNumericArgs( 18 );
-				//} else {
-				//	// If ground temp data was not brought in manually in GETINPUT,
-				//	// then we must get it from the surface ground temperatures
-
-				//	if ( !PubGroundTempSurfFlag ) {
-				//		ShowSevereError( "Input problem for " + cCurrentModuleObject + '=' + slinkyGLHE( GLHENum ).Name );
-				//		ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-				//		ShowContinueError( "This is required for the ground domain if farfield parameters are" );
-				//		ShowContinueError( " not directly entered into the input object." );
-				//		errorsFound = true;
-				//	}
-
-				//	// Calculate Average Ground Temperature for all 12 months of the year:
-				//	slinkyGLHE( GLHENum ).averageGroundTemp = 0.0;
-				//	for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//		slinkyGLHE( GLHENum ).averageGroundTemp += PubGroundTempSurface( monthIndex );
-				//	}
-
-				//	slinkyGLHE( GLHENum ).averageGroundTemp /= monthsInYear;
-
-				//	// Calculate Average Amplitude from Average:
-				//	slinkyGLHE( GLHENum ).averageGroundTempAmplitude = 0.0;
-				//	for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//		slinkyGLHE( GLHENum ).averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - slinkyGLHE( GLHENum ).averageGroundTemp );
-				//	}
-
-				//	slinkyGLHE( GLHENum ).averageGroundTempAmplitude /= monthsInYear;
-
-				//	// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				//	slinkyGLHE( GLHENum ).monthOfMinSurfTemp = 0;
-				//	slinkyGLHE( GLHENum ).minSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-				//	for ( monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//		if ( PubGroundTempSurface( monthIndex ) <= slinkyGLHE( GLHENum ).minSurfTemp ) {
-				//			slinkyGLHE( GLHENum ).monthOfMinSurfTemp = monthIndex;
-				//			slinkyGLHE( GLHENum ).minSurfTemp = PubGroundTempSurface( monthIndex );
-				//		}
-				//	}
-
-				//	slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = slinkyGLHE( GLHENum ).monthOfMinSurfTemp * AvgDaysInMonth;
-
-				//}
 
 				if ( ! allocated ) {
 					prevTimeSteps.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );

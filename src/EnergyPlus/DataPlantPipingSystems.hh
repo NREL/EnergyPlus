@@ -732,33 +732,7 @@ namespace DataPlantPipingSystems {
 	struct FarfieldInfo
 	{
 		// Members
-		Real64 AverageGroundTemperature; // C
-		Real64 AverageGroundTemperatureAmplitude; // C
-		Real64 PhaseShiftOfMinGroundTempDays; // days
-		Real64 PhaseShiftOfMinGroundTemp; // seconds
 		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
-
-		// Default Constructor
-		FarfieldInfo() :
-			AverageGroundTemperature( 0.0 ),
-			AverageGroundTemperatureAmplitude( 0.0 ),
-			PhaseShiftOfMinGroundTempDays( 0.0 ),
-			PhaseShiftOfMinGroundTemp( 0.0 )
-		{}
-
-		// Member Constructor
-		FarfieldInfo(
-			Real64 const AverageGroundTemperature, // C
-			Real64 const AverageGroundTemperatureAmplitude, // C
-			Real64 const PhaseShiftOfMinGroundTempDays, // days
-			Real64 const PhaseShiftOfMinGroundTemp // seconds
-		) :
-			AverageGroundTemperature( AverageGroundTemperature ),
-			AverageGroundTemperatureAmplitude( AverageGroundTemperatureAmplitude ),
-			PhaseShiftOfMinGroundTempDays( PhaseShiftOfMinGroundTempDays ),
-			PhaseShiftOfMinGroundTemp( PhaseShiftOfMinGroundTemp )
-		{}
-
 	};
 
 	struct BasementZoneInfo

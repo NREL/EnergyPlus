@@ -207,7 +207,6 @@ namespace GroundHeatExchangers {
 		int numTrenches;		// Number of parallel trenches [m]
 		Real64 trenchSpacing;	// Spacing between parallel trenches [m]
 		int numCoils;			// Number of coils
-		bool useGroundTempDataForKusuda; // Use Ground Temp Data Flag
 		int monthOfMinSurfTemp;
 		Real64 maxSimYears;
 		Real64 minSurfTemp;
@@ -226,7 +225,6 @@ namespace GroundHeatExchangers {
 			numTrenches( 0 ),
 			trenchSpacing( 0.0 ),
 			numCoils( 0 ),
-			useGroundTempDataForKusuda( false ),
 			monthOfMinSurfTemp( 0 ),
 			maxSimYears( 0.0 ),
 			minSurfTemp( 0.0 )

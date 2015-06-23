@@ -35,12 +35,14 @@ namespace GroundTemps {
 
 	};
 
+	//******************************************************************************
+
 	// Derived class for Kusuda-Achenbach model
 	class KusudaGroundTempsModel : public BaseGroundTempsModel
 	{
 		public:
 			// Public Members
-			int objectType = 1;
+			int objectType;
 			Real64 aveGroundTemp;
 			Real64 aveGroundTempAmplitude;
 			Real64 phaseShiftInSecs;
@@ -52,16 +54,20 @@ namespace GroundTemps {
 			Real64 const simTime
 		);
 
-		static std::shared_ptr< KusudaGroundTempsModel > KusudaGTMFactory( int objectType, std::string objectName);
+		static std::shared_ptr< KusudaGroundTempsModel > KusudaGTMFactory( int objectType, std::string objectName );
+
+		static std::shared_ptr< KusudaGroundTempsModel > ShallowGTMFactory( int objectType, std::string objectName ); 
 
 	};
+
+	//******************************************************************************
 
 	// Derived class for Finite-Difference Model
 	class FiniteDiffGroundTempsModel : public BaseGroundTempsModel {
 		
 		public:
 			// Public Members
-			int objectType = 2;
+			int objectType;
 
 		struct Cell {
 			Real64 Density;
@@ -116,12 +122,13 @@ namespace GroundTemps {
 		static std::shared_ptr< FiniteDiffGroundTempsModel > FiniteDiffGTMFactory( int objectType, std::string objectName);
 	};
 
+	//******************************************************************************
+
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(
 		std::string const type,
 		std::string const name
 	);
-
 
 	//******************************************************************************
 
