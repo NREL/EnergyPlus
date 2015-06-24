@@ -14,7 +14,7 @@ namespace GroundTemps {
 	Real64
 	KusudaGroundTempsModel::getGroundTemp(
 		Real64 const z, // Depth
-		Real64 const diffusivityGround, // Groud props
+		Real64 const diffusivityGround, // Ground props
 		Real64 const simTimeInSeconds // Simulation time
 	)
 	{

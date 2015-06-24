@@ -19,7 +19,7 @@ TEST(GroundTempsModelKusudaAchenbachTest, getGroundTemp)
 	KusudaGroundTempsModel thisGroundTempsModel;
 	Real64 thisGFunc;
 	Real64 z = 0; // Depth
-	Real64 diffusivityGround = 4.0e-7; // Groud props
+	Real64 diffusivityGround = 4.0e-7; // Ground props
 	Real64 simTimeInSeconds = 0; // Simulation time
 
 	thisGroundTempsModel.aveGroundTemp = 15;

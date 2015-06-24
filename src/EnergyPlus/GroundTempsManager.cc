@@ -20,9 +20,6 @@ namespace GroundTemps {
 	using InputProcessor::GetObjectDefMaxArgs;
 
 	// Object Data
-	int objectType_Kusuda( 1 );
-	int objectType_FiniteDiff( 2 );
-	int objectType_ShallowGroundTemp( 3 );
 	std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
 
 	//******************************************************************************
@@ -48,10 +45,6 @@ namespace GroundTemps {
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-				int static totalArgs;
-				int static numAlphas;
-				int static numNumbers;
-
 				InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 				if ( objectName == cAlphaArgs( 1 ) ) {
@@ -59,7 +52,7 @@ namespace GroundTemps {
 
 					thisModel->objectName = cAlphaArgs( 1 );
 
-					thisModel->objectType = objectType_Kusuda;
+					thisModel->objectType = objectType;
 
 					thisModel->aveGroundTemp = rNumericArgs( 1 );
 
@@ -109,7 +102,7 @@ namespace GroundTemps {
 				if ( objectName == cAlphaArgs( 1 ) ) {
 					// Read input into object here
 
-					thisModel->objectType = objectType_FiniteDiff;
+					thisModel->objectType = objectType;
 
 					found = true;
 					break;
@@ -129,7 +122,7 @@ namespace GroundTemps {
 
 	// Site:GroundTemperature:Shallow model factory
 	std::shared_ptr< KusudaGroundTempsModel > 
-	ShallowGTMFactory( int objectType, std::string objectName ){
+	ShallowGTMFactory( int objectType ){
 
 		using namespace DataIPShortCuts;
 		using DataGlobals::SecsInDay;
@@ -148,52 +141,48 @@ namespace GroundTemps {
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-				int static totalArgs;
-				int static numAlphas;
-				int static numNumbers;
+				int monthsInYear( 12 );
+				int avgDaysInMonth( 30 );
+				int monthOfMinSurfTemp( 0 );
+				Real64 averageGroundTemp( 0 );
+				Real64 averageGroundTempAmplitude( 0 );
+				Real64 phaseShiftOfMinGroundTempDays( 0 );
+				Real64 minSurfTemp( 100 ); // Set high month 1 temp will be lower and actually get updated
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 				thisModel->objectName = "Site:GroundTemperature:Shallow";
 
-				thisModel->objectType = objectType_ShallowGroundTemp;
+				thisModel->objectType = objectType;
 
-				//// Calculate Average Ground Temperature for all 12 months of the year:
-				////	PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = 0.0;
-				////	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-				////		PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
-				////	}
-				////	PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature /= MonthsInYear;
+				// Calculate Average Ground Temperature for all 12 months of the year:
+				for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+					averageGroundTemp += PubGroundTempSurface( monthIndex );
+				}
+				averageGroundTemp /= monthsInYear;
+				
+				thisModel->aveGroundTemp = averageGroundTemp;
 
-				////	 Calculate Average Amplitude from Average:
-				////	PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
-				////	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-				////		PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature );
-				////	}
-				////	PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
+				// Calculate Average Amplitude from Average:;
+				for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+					averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - averageGroundTemp );
+				}
+				averageGroundTempAmplitude /= monthsInYear;
+				
+				thisModel->aveGroundTempAmplitude = averageGroundTempAmplitude;
 
-				////	 Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				////	Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp = 0;
-				////	Domain( ZoneCoupledDomainCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-				////	for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-				////		if ( PubGroundTempSurface( MonthIndex ) <= Domain( ZoneCoupledDomainCtr ).MinSurfTemp ) {
-				////			Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp = MonthIndex;
-				////			Domain( ZoneCoupledDomainCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-				////		}
-				////	}
-				////	PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
-				////}
+				// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
+				for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+					if ( PubGroundTempSurface( monthIndex ) <= minSurfTemp ) {
+						monthOfMinSurfTemp = monthIndex;
+						minSurfTemp = PubGroundTempSurface( monthIndex );
+					}
+				}
+				
+				phaseShiftOfMinGroundTempDays = monthOfMinSurfTemp * avgDaysInMonth;
 
-				//// Unit conversion
-				////PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
-
-
-
-				thisModel->aveGroundTemp = 15;
-
-				thisModel->aveGroundTempAmplitude = 5;
-
-				thisModel->phaseShiftInSecs = 250000;
+				// Unit conversion
+				thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * SecsInDay;
 
 				found = true;
 				break;
@@ -217,7 +206,10 @@ namespace GroundTemps {
 		std::string const objectName
 	)
 	{
-		int objectType( 0 );
+		int objectType ( 0 );
+		int objectType_Kusuda( 1 );
+		int objectType_FiniteDiff( 2 );
+		int objectType_ShallowGroundTemp( 3 );
 
 		std::string objectType_Kusdua_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:KUSUDAACHENBACH";
 		std::string objectType_FiniteDiff_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:FINITEDIFFERENCE";
@@ -257,7 +249,7 @@ namespace GroundTemps {
 		} else if ( objectType == objectType_FiniteDiff ) {
 			return FiniteDiffGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_ShallowGroundTemp ) {
-			return ShallowGTMFactory( objectType, objectName );
+			return ShallowGTMFactory( objectType );
 		} else {
 			// Error
 			return nullptr; 

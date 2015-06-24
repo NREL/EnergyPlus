@@ -706,7 +706,6 @@ namespace PlantPipingSystemsManager {
 		using DataSurfaces::OSCM;
 		using DataSurfaces::TotOSCM;
 		using General::TrimSigDigits;
-		using DataGlobals::SecsInDay;
 		using namespace GroundTemps;
 
 		// Locals
@@ -822,14 +821,6 @@ namespace PlantPipingSystemsManager {
 			// Moisture properties, validated min/max by IP, and converted to a fraction for computation here
 			PipingSystemDomains( DomainNum ).Moisture.Theta_liq = rNumericArgs( 13 ) / 100.0;
 			PipingSystemDomains( DomainNum ).Moisture.Theta_sat = rNumericArgs( 14 ) / 100.0;
-
-			// Farfield model parameters, validated min/max by IP
-			//PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = rNumericArgs( 15 );
-			//PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = rNumericArgs( 16 );
-			//PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = rNumericArgs( 17 );
-
-			// Unit conversion
-			//PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
 
 			// Initialize ground temperature model and get pointer reference
 			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
@@ -967,11 +958,8 @@ namespace PlantPipingSystemsManager {
 			using DataSurfaces::OSCM;
 			using DataSurfaces::TotOSCM;
 			using General::TrimSigDigits;
-			using DataGlobals::SecsInDay;
 			using DataHeatBalance::Material;
 			using DataHeatBalance::TotMaterials;
-			using DataEnvironment::PubGroundTempSurfFlag;
-			using DataEnvironment::PubGroundTempSurface;
 			using namespace GroundTemps;
 
 			// Locals
@@ -979,9 +967,6 @@ namespace PlantPipingSystemsManager {
 
 			// SUBROUTINE PARAMETER DEFINITIONS:
 			static std::string const RoutineName( "ReadZoneCoupledDomainInputs" );
-			int const MonthsInYear( 12 );
-			Real64 const LargeNumber( 10000.0 );
-			Real64 const AvgDaysInMonth( 365.0 / 12.0 );
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			int ZoneCoupledDomainCtr;
@@ -990,7 +975,6 @@ namespace PlantPipingSystemsManager {
 			int NumNumbers; // Number of Numbers for each GetObjectItem call
 			int IOStatus; // Used in GetObjectItem
 			int NumSurfacesWithThisOSCM;
-			int MonthIndex;
 			int SurfCtr;
 			bool IsBlank;
 			bool IsNotOK;
@@ -1362,11 +1346,8 @@ namespace PlantPipingSystemsManager {
 		using DataSurfaces::OSCM;
 		using DataSurfaces::TotOSCM;
 		using General::TrimSigDigits;
-		using DataGlobals::SecsInDay;
 		using DataHeatBalance::Material;
 		using DataHeatBalance::TotMaterials;
-		using DataEnvironment::PubGroundTempSurfFlag;
-		using DataEnvironment::PubGroundTempSurface;
 
 
 		// Locals
@@ -1374,9 +1355,6 @@ namespace PlantPipingSystemsManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadBasementInputs" );
-		int const MonthsInYear( 12 );
-		Real64 const LargeNumber( 10000.0 );
-		Real64 const AvgDaysInMonth( 365.0 / 12.0 );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BasementCtr;
@@ -1386,7 +1364,6 @@ namespace PlantPipingSystemsManager {
 		int IOStatus; // Used in GetObjectItem
 		int CurIndex;
 		int NumSurfacesWithThisOSCM;
-		int MonthIndex;
 		bool IsBlank;
 		bool IsNotOK;
 		Real64 ThisArea;
@@ -1941,12 +1918,9 @@ namespace PlantPipingSystemsManager {
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
-		using DataGlobals::SecsInDay;
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
-		using DataEnvironment::PubGroundTempSurfFlag;
-		using DataEnvironment::PubGroundTempSurface;
 		using namespace GroundTemps;
 
 		// Locals
@@ -1954,9 +1928,6 @@ namespace PlantPipingSystemsManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadHorizontalTrenchInputs" );
-		int const MonthsInYear( 12 );
-		Real64 const LargeNumber( 10000.0 );
-		Real64 const AvgDaysInMonth( 365.0 / 12.0 );
 
 		// DERIVED TYPE DEFINITIONS:
 
@@ -1973,7 +1944,6 @@ namespace PlantPipingSystemsManager {
 		int SegmentCtr;
 		int NumPipeSegments;
 		int ThisCircuitPipeSegmentCounter;
-		int MonthIndex;
 
 		struct HorizontalTrenchData
 		{
