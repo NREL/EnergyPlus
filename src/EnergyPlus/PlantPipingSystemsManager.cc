@@ -822,9 +822,6 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Moisture.Theta_liq = rNumericArgs( 13 ) / 100.0;
 			PipingSystemDomains( DomainNum ).Moisture.Theta_sat = rNumericArgs( 14 ) / 100.0;
 
-			// Initialize ground temperature model and get pointer reference
-			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
-
 			// check if there is a basement
 			if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).HasBasement = true;
@@ -918,6 +915,9 @@ namespace PlantPipingSystemsManager {
 			for ( CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr ) {
 				PipingSystemDomains( DomainNum ).CircuitNames( CircuitCtr ) = cAlphaArgs( CircuitCtr + NumAlphasBeforePipeCircOne );
 			}
+
+			// Initialize ground temperature model and get pointer reference
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
 
 		}
 
@@ -1107,7 +1107,6 @@ namespace PlantPipingSystemsManager {
 				Domain( ZoneCoupledDomainCtr ).SoilSpecificHeat = rNumericArgs( 6 );
 				Domain( ZoneCoupledDomainCtr ).MoistureContent = rNumericArgs( 7 );
 				Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent = rNumericArgs( 8 );		
-				Domain( ZoneCoupledDomainCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 				Domain( ZoneCoupledDomainCtr ).EvapotranspirationCoeff = rNumericArgs( 9 );
 				Domain( ZoneCoupledDomainCtr ).HorizInsWidth = rNumericArgs( 10 );
 				Domain( ZoneCoupledDomainCtr ).VertInsDepth = rNumericArgs( 11 );
@@ -1251,6 +1250,9 @@ namespace PlantPipingSystemsManager {
 						PipingSystemDomains( DomainCtr ).ZoneCoupledSurfaces = GetSurfaceDataForOSCM( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex, NumSurfacesWithThisOSCM );
 					}
 				}
+
+				// Read ground temperature model inputs.
+				Domain( ZoneCoupledDomainCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 				// Total surface area
 				ThisArea = 0.0;
@@ -2095,8 +2097,8 @@ namespace PlantPipingSystemsManager {
 			HGHX( HorizontalGHXCtr ).PipeSpecificHeat = rNumericArgs( 13 );
 			HGHX( HorizontalGHXCtr ).MoistureContent = rNumericArgs( 14 );
 			HGHX( HorizontalGHXCtr ).SaturationMoistureContent = rNumericArgs( 15 );
-			HGHX( HorizontalGHXCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
 			HGHX( HorizontalGHXCtr ).EvapotranspirationCoeff = rNumericArgs( 16 );
+			HGHX( HorizontalGHXCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
 
 			//******* We'll first set up the domain ********
 			// the extents will be: Zmax = axial length; Ymax = burial depth*2; Xmax = ( NumPipes+1 )*HorizontalPipeSpacing

@@ -1590,9 +1590,6 @@ namespace GroundHeatExchangers {
 				// Thermal diffusivity of the ground
 				slinkyGLHE( GLHENum ).diffusivityGround = slinkyGLHE( GLHENum ).kGround / slinkyGLHE( GLHENum ).cpRhoGround;
 
-				// Initialize ground temperature model and get pointer reference
-				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
-
 				if ( ! allocated ) {
 					prevTimeSteps.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
 					prevTimeSteps = 0.0;
@@ -1608,6 +1605,9 @@ namespace GroundHeatExchangers {
 					ShowContinueError( "...Radius will be <=0." );
 					errorsFound = true;
 				}
+
+				// Initialize ground temperature model and get pointer reference
+				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
 
 				//Check for Errors
 				if ( errorsFound ) {
