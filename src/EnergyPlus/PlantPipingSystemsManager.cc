@@ -1467,9 +1467,6 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Moisture.Theta_liq = rNumericArgs( 7 ) / 100.0;
 			PipingSystemDomains( DomainNum ).Moisture.Theta_sat = rNumericArgs( 8 ) / 100.0;
 
-			// Farfield ground temperature model
-			PipingSystemDomains( BasementCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
-
 			// check if there are blank inputs related to the basement,
 			if ( lNumericFieldBlanks( 11 ) || lAlphaFieldBlanks( 5 ) || lAlphaFieldBlanks( 10 ) ) {
 				ShowSevereError( "Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' + cAlphaArgs( 1 ) );
@@ -1624,6 +1621,9 @@ namespace PlantPipingSystemsManager {
 				ShowContinueError( "Could not determine basement simulation interval. Check input." );
 				ShowFatalError( "Preceding error causes program termination." );
 			}
+
+			// Farfield ground temperature model
+			PipingSystemDomains( BasementCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 			// Domain perimeter offset
 			PipingSystemDomains( DomainNum ).PerimeterOffset = Domain( BasementCtr ).PerimeterOffset;
