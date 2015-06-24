@@ -4116,7 +4116,7 @@ None of these applications are necessarily recommended but these and other uses 
 
 - Other than zone thermostat setpoints, the sizing calculations generally know nothing about the system control inputs such as setpoints and availability schedules. The user must coordinate sizing inputs with the actual simulation control inputs.
 
-- The sizing calculations only recognize the presence of central heating and cooling coils, preheat and precool coils and reheat coils. These are assumed to deliver the various supply temperatures specified in the Sizing:System and Sizing:Zone objects. The impact of ther components such as heat recovery, dehumidifiers, fans, and pumps are not accounted for in the sizing calculations.
+- The sizing calculations only recognize the presence of central heating and cooling coils, preheat and precool coils and reheat coils. These are assumed to deliver the various supply temperatures specified in the Sizing:System and Sizing:Zone objects. The impact of other components such as heat recovery, dehumidifiers, and pumps are not accounted for in the sizing calculations. Central supply and return fan temperature rise is taken into account in sizing the central cooling coils.
 
 #### Component Autosizing
 
@@ -7140,6 +7140,8 @@ The Sizing:Zone object is also the place where the user can specify the design o
 
 The user can also place limits on the heating and design cooling air flow rates. See * Heating Design Air Flow Method* and *Cooling Design Air Flow Method* below and the explanations of the various heating and cooling flow input fields.
 
+The user can ask the zone design calculation to take into account the effect of a Dedicated Outdoor Air System on the zone design loads and airflow rates. The design calculation will calculate the heat addition rate to the zone of an idealized SOA system and add or subtract the result from the total zone loads and flow rates. 
+
 #### Field: Zone Name
 
 The name of the Zone corresponding to this Sizing:Zone object. This is the zone for which the design air flow calculation will be made using the input data of this Sizing:Zone Object.
@@ -7232,6 +7234,26 @@ The maximum zone design heating volumetric flow rate expressed as a fraction of 
 
 The name of the DesignSpecification:ZoneAirDistribution object, defining the air distribution effectiveness and secondary recirculation air fraction, that applies to the zone or zone list. This object may be used for the same zone in the Controller:MechanicalVentilation object if no such DesignSpecification:ZoneAirDistribution object is specified.
 
+#### Field: Account for Dedicated Outside Air System
+
+This is a choice field with choices *Yes* or *No*. The default is *No*. Choosing *Yes* means that the zone sizing calculation will use the subsequent inputs to calculate the heat gain or loss (heat gains are positive, heat loss is negative) imposed on the zone by a Dedicated Outdoor Air System (DOAS). This heat gain is then added to the zone design heat gain for the zone and the zone design air flow rate is adjusted to meet the DOAS heat gain plus the zone design heat gain.
+
+#### Field: Dedicated Outside Air System Control Strategy
+
+This is a choice field with a choice of three ideal control strategies for the DOA system. The choices are *NeutralSupplyAir*, *NeutralDehumidifiedSupplyAir*, or *ColdSupplyAir*. The default is *NeutralSupplyAir*.
+
+*NeutralSupplyAir* implies that the ventilation air supplied to the zone will cause little heating or cooling. The air will be heated or cooled to keep it between the low and high temperature setpoints specified in the subsequent two fields. A good choice for these fields might be 21.1 and 23.9 degrees C.
+
+*NeutralDehumidifiedSupplyAir* means that the ventilation air will be cooled and dehumidified and then reheated to a neutral temperature. The ventilation air is cooled to the lower setpoint temperature (if necessary) and reheated to the upper setpoint temperature. A good choice for the setpoints would be 14.4 and 22.2 degrees C.
+
+*ColdSupplyAir* means that the ventilation air will be used to supply cooling to the zone. Cold outside air is heated to the upper setpoint; warm outside air is cooled to the lower setpoint. A good choice for the setpoints would be 12.2 and 14.4 degrees C.
+
+#### Field: Dedicated Outside Air Low Setpoint for Design
+The lower setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
+
+#### Field: Dedicated Outside Air High Setpoint for Design
+The higher setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
+
 An IDF example:
 
 ```idf
@@ -7254,7 +7276,11 @@ Sizing:Zone,
     ,                        !- heating max air flow per zone area {m3/s-m2}
     ,                        !- heating max air flow {m3/s}
     ,                        !- fraction of the cooling design air flow rate
-    DSZADO1;                 !- Design Specification Zone Air Distribution Object Name
+    DSZADO1,                 !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outside Air System
+    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+    12.2,                    !- Dedicated Outside Air Low Setpoint for Design
+    14.4;                    !- Dedicated Outside Air High Setpoint for Design
 
 DesignSpecification:OutdoorAir,
     DSOA1,                   !- Name
