@@ -7600,7 +7600,6 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::DayOfSim;
 		using namespace GroundTemps;
 
 		// Return value

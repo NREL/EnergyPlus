@@ -8293,19 +8293,13 @@ This alpha field is used as an identifying field for the pipe.
 
 This references a Material object that contains the soil properties and thickness.  Note that when defining the soil layer, the thickness should be the thickness of soil between the pipe wall and the ground surface.
 
-#### Field: Average Soil Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#1 of 3 inputs that must be given directly.  This represents the annual average soil temperature above the pipe.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature. This is a required field.
 
-#### Field: Amplitude of Soil Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#2 of 3 inputs that must be given directly.  This represents the annual average soil temperature variation from the average temperature itself.  For example, if this were represented as a sine wave, this would simply be the amplitude of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
-
-#### Field: Phase Constant of Soil Surface Temperature
-
-If a GroundTemperatures:Surface object is not given in the input, this is \#3 of 3 inputs that must be given directly.  This represents the time elapsed from the beginning of the year to the date of minimum surface temperature.  For example, if this were represented as a sine wave, this would simply be the phase shift of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program
-
-In order to avoid having to run the preprocessor program to generate soil temperature, the user may choose to simply input a GroundTemperatures:Surface object.  This object inputs average monthly surface temperatures.  These temperatures are then used within the model to develop average ground surface data.  This ground surface data can then be used as part of the model boundary condition set.  Without a set of surface ground temperatures, the model will require user input of the three last input fields.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature. 
 
 An example of this object in an IDF is:
 
@@ -8320,9 +8314,8 @@ Pipe:Underground,
     0.05,                               !- Pipe Inside Diameter    
     20.0,                               !- pipe Length
     Buried Pipe Soil,                   !- Soil Material
-    13,                                 !- Average Soil Surface Temperature
-    1.5,                                !- Amplitude of Soil Surface Temperature
-    30;                                 !- Phase Constant of Soil Surface Temperature
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                            !- Name of Undisturbed Ground Temperature Object
 
   Construction,
     Insulated Buried Pipe,              !- Name

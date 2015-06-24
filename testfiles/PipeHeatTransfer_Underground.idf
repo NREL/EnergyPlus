@@ -3227,10 +3227,15 @@
     0.05,                    !- Pipe Inside Diameter {m}
     200.0,                   !- Pipe Length {m}
     Buried Pipe Soil,        !- Soil Material Name
-    13,                      !- Average Soil Surface Temperature {C}
-    1.5,                     !- Amplitude of Soil Surface Temperature {C}
-    30;                      !- Phase Constant of Soil Surface Temperature {days}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                 !- Name of Undisturbed Ground Temperature Object
 
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,                 !- Name of object
+    13.0,                    !- Annual average surface temperature
+    1.5,                     !- Annual amplitude of surface temperature
+    30;                     !- Phase shift of minimum surface temperature    
+    
   Branch,
     Condenser Supply Bypass Branch,  !- Name
     0,                       !- Maximum Flow Rate {m3/s}

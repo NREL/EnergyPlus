@@ -1,5 +1,6 @@
 // C++ Headers
 #include <cmath>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -21,6 +22,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundTempsManager.hh>
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -63,6 +65,7 @@ namespace PipeHeatTransfer {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
+	using namespace GroundTemps;
 	using DataPlant::TypeOf_PipeExterior;
 	using DataPlant::TypeOf_PipeInterior;
 	using DataPlant::TypeOf_PipeUnderground;
@@ -644,51 +647,12 @@ namespace PipeHeatTransfer {
 				PipeHT( Item ).dSregular = PipeHT( Item ).DomainDepth / ( PipeHT( Item ).NumDepthNodes - 1 );
 			}
 
-			// Now we need to see if average annual temperature data is brought in here
-			if ( NumNumbers >= 3 ) {
-				PipeHT( Item ).AvgAnnualManualInput = 1;
-
-				//If so, we need to read in the data
-				// N3,  \field Average soil surface temperature
-				PipeHT( Item ).AvgGroundTemp = rNumericArgs( 3 );
-				//IF (PipeHT(Item)%AvgGroundTemp == 0) THEN
-				//  CALL ShowSevereError('GetPipesHeatTransfer: Invalid Average Ground Temp for PIPE:UNDERGROUND=' &
-				//                        //TRIM(PipeHT(Item)%Name))
-				//  CALL ShowContinueError('If any one annual ground temperature item is entered, all 3 items must be entered')
-				//  ErrorsFound=.TRUE.
-				//ENDIF
-
-				// N4,  \field Amplitude of soil surface temperature
-				if ( NumNumbers >= 4 ) {
-					PipeHT( Item ).AvgGndTempAmp = rNumericArgs( 4 );
-					if ( PipeHT( Item ).AvgGndTempAmp < 0.0 ) {
-						ShowSevereError( "Invalid " + cNumericFieldNames( 4 ) + '=' + RoundSigDigits( PipeHT( Item ).AvgGndTempAmp, 2 ) );
-						ShowContinueError( "Found in " + cCurrentModuleObject + '=' + PipeHT( Item ).Name );
-						ErrorsFound = true;
-					}
-				}
-
-				// N5;  \field Phase constant of soil surface temperature
-				if ( NumNumbers >= 5 ) {
-					PipeHT( Item ).PhaseShiftDays = rNumericArgs( 5 );
-					if ( PipeHT( Item ).PhaseShiftDays < 0 ) {
-						ShowSevereError( "Invalid " + cNumericFieldNames( 5 ) + '=' + RoundSigDigits( PipeHT( Item ).PhaseShiftDays ) );
-						ShowContinueError( "Found in " + cCurrentModuleObject + '=' + PipeHT( Item ).Name );
-						ErrorsFound = true;
-					}
-				}
-
-				if ( NumNumbers >= 3 && NumNumbers < 5 ) {
-					ShowSevereError( cCurrentModuleObject + '=' + PipeHT( Item ).Name );
-					ShowContinueError( "If any one annual ground temperature item is entered, all 3 items must be entered" );
-					ErrorsFound = true;
-				}
-
-			}
-
 			if ( PipeHT( Item ).ConstructionNum != 0 ) {
 				ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), PipeHT( Item ).ConstructionNum, Item, ErrorsFound );
 			}
+
+			// Get ground temperature model
+			PipeHT( Item ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 7 ), cAlphaArgs( 8 ) );
 
 			// Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
 			NumSections = NumPipeSections;
@@ -974,45 +938,6 @@ namespace PipeHeatTransfer {
 				//  END IF
 
 				if ( errFlag ) continue;
-
-				//If there are any underground buried pipes, we must bring in data
-				if ( PipeHT( PipeNum ).EnvironmentPtr == GroundEnv ) {
-
-					//If ground temp data was not brought in manually in GETINPUT,
-					// then we must get it from the surface ground temperatures
-					if ( PipeHT( PipeNum ).AvgAnnualManualInput == 0 ) {
-
-						if ( ! PubGroundTempSurfFlag ) {
-							ShowFatalError( "No Site:GroundTemperature:Shallow object found.  This is required for a Pipe:Underground object." );
-						}
-
-						//Calculate Average Ground Temperature for all 12 months of the year:
-						PipeHT( PipeNum ).AvgGroundTemp = 0.0;
-						for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-							PipeHT( PipeNum ).AvgGroundTemp += PubGroundTempSurface( MonthIndex );
-						}
-						PipeHT( PipeNum ).AvgGroundTemp /= MonthsInYear;
-
-						//Calculate Average Amplitude from Average:
-						PipeHT( PipeNum ).AvgGndTempAmp = 0.0;
-						for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-							PipeHT( PipeNum ).AvgGndTempAmp += std::abs( PubGroundTempSurface( MonthIndex ) - PipeHT( PipeNum ).AvgGroundTemp );
-						}
-						PipeHT( PipeNum ).AvgGndTempAmp /= MonthsInYear;
-
-						//Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-						PipeHT( PipeNum ).MonthOfMinSurfTemp = 0;
-						PipeHT( PipeNum ).MinSurfTemp = LargeNumber; //Set high so that the first months temp will be lower and actually get updated
-						for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-							if ( PubGroundTempSurface( MonthIndex ) <= PipeHT( PipeNum ).MinSurfTemp ) {
-								PipeHT( PipeNum ).MonthOfMinSurfTemp = MonthIndex;
-								PipeHT( PipeNum ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-							}
-						}
-						PipeHT( PipeNum ).PhaseShiftDays = PipeHT( PipeNum ).MonthOfMinSurfTemp * AvgDaysInMonth;
-					} //End manual ground data input structure
-
-				}
 
 			}
 			if ( errFlag ) {
@@ -2111,18 +2036,17 @@ namespace PipeHeatTransfer {
 		// Returns a temperature to be used on the boundary of the buried pipe model domain
 
 		// METHODOLOGY EMPLOYED:
-		// Kusuda and Achenbach correlation is used
 
 		// REFERENCES: See Module Level Description
 
 		// Using/Aliasing
-		using DataGlobals::Pi;
+		using DataGlobals::SecsInDay;
 
-		// Return value
+		Real64 soilDiffusivity = PipeHT( PipeHTNum ).SoilDiffusivityPerDay;
+		Real64 curSimTime = DayOfSim * SecsInDay;
 		Real64 TBND;
 
-		//Kusuda and Achenbach
-		TBND = PipeHT( PipeHTNum ).AvgGroundTemp - PipeHT( PipeHTNum ).AvgGndTempAmp * std::exp( -z * std::sqrt( Pi / ( 365.0 * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ) ) * std::cos( ( 2.0 * Pi / 365.0 ) * ( DayOfSim - PipeHT( PipeHTNum ).PhaseShiftDays - ( z / 2.0 ) * std::sqrt( 365.0 / ( Pi * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ) ) );
+		TBND = PipeHT( PipeHTNum ).groundTempModel->getGroundTemp( z, soilDiffusivity, curSimTime );
 
 		return TBND;
 

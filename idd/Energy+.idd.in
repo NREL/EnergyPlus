@@ -57004,23 +57004,8 @@ Pipe:Underground,
    A6,  \field Soil Material Name
         \type alpha
         \required-field
-   N3,  \field Average Soil Surface Temperature
-        \note optional
-        \units C
-        \type real
-        \default 0
-   N4,  \field Amplitude of Soil Surface Temperature
-        \note optional
-        \units deltaC
-        \type real
-        \minimum 0
-        \default 0
-   N5;  \field Phase Constant of Soil Surface Temperature
-        \note optional
-        \units days
-        \type real
-        \minimum 0
-        \default 0
+   A7,  \field Type of Undisturbed Ground Temperature Model
+   A8;  \field Name of Undisturbed Ground Temperature Model 
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
