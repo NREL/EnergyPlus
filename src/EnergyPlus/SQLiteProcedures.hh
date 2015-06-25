@@ -16,6 +16,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <map>
 
 namespace EnergyPlus {
 
@@ -261,6 +262,19 @@ private:
 
 	bool m_writeTabularDataToSQLite;
 	int m_sqlDBTimeIndex;
+
+	int m_hourlyReportIndex = 0;
+	int m_hourlyDataIndex = 0;
+	int m_tabularDataIndex = 0;
+	int m_stringIndex = 1;
+	std::map < std::pair < std::string, int > , int > m_tabularStrings;
+	int m_errorIndex = 0;
+	int m_dataIndex = 0;
+	int m_extendedDataIndex = 0;
+	int m_zoneSizingIndex = 0;
+	int m_systemSizingIndex = 0;
+	int m_componentSizingIndex = 0;
+
 	sqlite3_stmt * m_reportDataInsertStmt;
 	sqlite3_stmt * m_reportExtendedDataInsertStmt;
 	sqlite3_stmt * m_reportDictionaryInsertStmt;

@@ -3001,7 +3001,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
@@ -3010,7 +3010,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintESOTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintESOTimeStamp = false;
 			}
 
@@ -3085,7 +3085,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
@@ -3155,7 +3155,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
@@ -3220,7 +3220,7 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			if ( ! EnergyMeters( Loop ).RptMN && ! EnergyMeters( Loop ).RptAccMN ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
+				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month );
 				PrintTimeStamp = false;
 			}
 
@@ -3290,7 +3290,7 @@ namespace OutputProcessor {
 			EnergyMeters( Loop ).LastSMMaxValDate = EnergyMeters( Loop ).SMMaxValDate;
 			if ( ! EnergyMeters( Loop ).RptSM && ! EnergyMeters( Loop ).RptAccSM ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
+				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp );
 				PrintTimeStamp = false;
 			}
 
@@ -5877,7 +5877,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Month Block
 	if ( EndMonthFlag || EndEnvrnFlag ) {
 		if ( TrackingMonthlyVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
+			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, true, Month );
 		}
 		NumHoursInSim += NumHoursInMonth;
 		EndMonthFlag = false;
@@ -5905,7 +5905,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
+			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, true );
 		}
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
