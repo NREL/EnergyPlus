@@ -10686,7 +10686,9 @@ As installed, the RunEPlus is ready to run the sample files that are included. I
 Running EnergyPlus by Hand
 --------------------------
 
-EnergyPlus is compiled as a 32 bit console application on Windows™ (Windows 98, Windows NT, Windows 2000, Windows ME) operating systems, commonly run on the Intel™ or compatible processing chips (aka WinTel machines). To run the program bring up the command prompt and "cd" to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing "EnergyPlus" (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
+EnergyPlus runs as a console application with optional command line arguments. The arguments may be listed by typing energyplus --help (Windows OS) or man energyplus (Linux OS). For more information about the command line interface, see https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md. The remainder of this section describes running EnergyPlus in legacy mode (i.e. no command-line arguments) on Windows OS.
+ 
+To run the program bring up the command prompt and "cd" to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing "EnergyPlus" (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
 
 ```
  EnergyPlus Starting
