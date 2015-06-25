@@ -8295,11 +8295,11 @@ This references a Material object that contains the soil properties and thicknes
 
 #### Field: Type of Undisturbed Ground Temperature Object
 
-This is the type of undisturbed ground temperature object that is used to determine the ground temperature. This is a required field.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Name of Undisturbed Ground Temperature Object
 
-This is the name of the undisturbed ground temperature object that is used to determine the ground temperature. 
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature. Name is only required for undisturbed ground temperature objects with a "name" field.
 
 An example of this object in an IDF is:
 
@@ -8452,17 +8452,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil
 
-#### Field: Kusuda-Achenbach Average Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achenbach Average Amplitude of Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual average surface temperature variation from average.  This is also used in the Kusuda-Achenbach temperature correlation.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: This Domain Includes Basement Surface Interaction
 
@@ -8612,9 +8608,8 @@ An example of this object in an IDF is offered here for a foundation heat exchan
     2576,                    !- GroundSpecificHeat
     30,                      !- MoistureContent
     50,                      !- MoistureContentAtSaturation
-    15.5,                    !- KusudaGroundTemp
-    12.8,                    !- KusudaGroundTempAmplitude
-    17.3,                    !- KusudaPhaseShift
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps,                 !- Name of Undisturbed Ground Temperature Object
     Yes,                     !- DomainHasBasement
     6,                       !- BasementWidthInDomain
     2.5,                     !- BasementDepthInDomain

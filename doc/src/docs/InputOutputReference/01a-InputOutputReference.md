@@ -2552,6 +2552,8 @@ Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the .5 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions of the building location.
 
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
+
 #### Field: Month Temperature(s) – 12 fields in all
 
 Each numeric field is the monthly surface ground temperature (degrees Celsius) used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
@@ -2569,6 +2571,8 @@ Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the 4 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions or special knowledge of the building location.
 
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
+
 #### Field: Month Temperature(s) – 12 fields in all
 
 Each numeric field is the monthly deep ground temperature (degrees Celsius) used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
@@ -2578,6 +2582,38 @@ An IDF example:
 ```idf
 Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 ```
+
+
+Site:GroundTemperature:Undisturbed:KusduaAchenbach
+
+Site:GroundTemperature:Undisturbed:KusudaAchenbach may be used by all object requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Kusuda T. and P. Achenbach. 1965. The correlation uses three parameters for ground temperature at the surface to define a correlation for undisturbed ground temperatures as a function of depth and time. If one things of the ground temperature for a given depth as a sinusoid, the average ground temperature, amplitude (average difference between maximum ground temperature and minimum ground temperature), and the phase shift (day of minimum surface temperature) are all required to define the correlation.
+
+These parameters can be automatically calculated by using the CalcSoilSurfTemp preprocessor.
+
+Further details about the model can be found in:
+
+Kusuda, T. and P.R. Achenbach. 1965. `Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
+
+#### Field: Average Annual Ground Surface Temperature
+
+This is the average ground surface temperature throughout the entire year, in °C.
+
+#### Field: Average Amplitude of Annual Ground Surface Temperature
+
+This is the average amplitude of the ground surface temperature, in °C.
+
+#### Field: Phase Shift of Minimum Surface Temperature
+
+This is day of the year which has the lowest ground surface temperature.
+
+```idf
+Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,    !- Name
+    15.5,       !- Average Surface Temperature, in °C
+    12.8,       !- Average Amplitude of Surface Temperature, in °C
+    17.3;       !- Phase Shift of Minimum Surface Temperature, in days
+```
+
 
 ### Site:GroundDomain:Slab
 
@@ -2633,17 +2669,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation, in °C
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achebach Average Amplitude of Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean surface temperature variation from average used in determining the farfield boundary conditions.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 
@@ -2697,30 +2729,29 @@ An IDF example of an in-grade slab.
 
 ```idf
 Site:GroundDomain:Slab,
-    IngradeCoupledSlab, !- Name
-    5,                  !- Ground Domain Depth
-    1,                  !- Aspect Ratio
-    5,                  !- Domain Perimeter Offset
-    1.8,                !- Soil Thermal Conductivity
-    3200,               !- Soil Density
-    836,                !- Soil Specific Heat
-    30,   !- Soil Moisture Content Volume Fraction
-    50,   !- Soil Moisture Content Volume Fraction at Saturation
-    15.5, !- Kusuda-Achenbach Average Surface Temperature
-    12.8, !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3, !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+    IngradeCoupledSlab,     !- Name
+    5,                      !- Ground Domain Depth
+    1,                      !- Aspect Ratio
+    5,                      !- Domain Perimeter Offset
+    1.8,                    !- Soil Thermal Conductivity
+    3200,                   !- Soil Density
+    836,                    !- Soil Specific Heat
+    30,                     !- Soil Moisture Content Volume Fraction
+    50,                     !- Soil Moisture Content Volume Fraction at Saturation
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps,                !- Name of Undisturbed Ground Temperature Object
     1,    !- Evapotranspiration Ground Cover Parameter
     GroundCoupledOSCM,      !- Name of Floor Boundary Condition Model
     InGrade,                !- Slab Location (InGrade/OnGrade)
     Slab Material-In-grade, !- Slab Material Name
     Yes,                    !- Horizontal Insulation
-    Slab Insulation,    !- Horizontal Insulation Material Name
-    Perimeter,          !- Full Horizontal or Perimeter Only
-    1,                  !- Perimeter insulation width
-    Yes,                !- Vertical Insulation
-    Slab Insulation,    !- Vertical Insulation Name
-    2,                  !- Vertical perimeter insulation depth from surface
-    Hourly;             !- Simulation timestep</td>
+    Slab Insulation,        !- Horizontal Insulation Material Name
+    Perimeter,              !- Full Horizontal or Perimeter Only
+    1,                      !- Perimeter insulation width
+    Yes,                    !- Vertical Insulation
+    Slab Insulation,        !- Vertical Insulation Name
+    2,                      !- Vertical perimeter insulation depth from surface
+    Hourly;                 !- Simulation timestep</td>
 ```
 
 And IDF example of an on-grade slab
@@ -2734,12 +2765,11 @@ Site:GroundDomain:Slab,
     1.8,                !- Soil Thermal Conductivity {W/m-K}
     3200,               !- Soil Density {kg/m3}
     836,                !- Soil Specific Heat {J/kg-K}
-    30,          !- Soil Moisture Content Volume Fraction
-    50,          !- Soil Moisture Content Volume Fraction at Saturation
-    15.5,        !- Kusuda-Achenbach Average Surface Temperature
-    12.8,   !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3,   !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-    1,           !- Evapotranspiration Ground Cover Parameter
+    30,                 !- Soil Moisture Content Volume Fraction
+    50,                 !- Soil Moisture Content Volume Fraction at Saturation
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps,            !- Name of Undisturbed Ground Temperature Object
+    1,                  !- Evapotranspiration Ground Cover Parameter
     GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
     OnGrade,            !- Slab Location (InGrade/OnGrade)
     ,                   !- Slab Material Name
@@ -2787,9 +2817,8 @@ Site:GroundDomain:Basement,
     836,                     !- Soil Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Volume Fraction {percent}
     50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
-    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps,                 !- Name of Undisturbed Ground Temperature Object
     1,                       !- Evapotranspiration Ground Cover Parameter
     BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
     Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
@@ -2841,17 +2870,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Ground Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average ground surface temperature to be applied to the Kusuda-Achenbach far-field boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this, and the following two parameters for the simulation. In which case, this field and the following two can be left blank.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achebach Average Amplitude of Ground Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous and following parameters. In which case, this field, the previous field, and the following field can be left blank.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-
-The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous two parameters. In which case, this field, the previous two fields can be left blank.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 
@@ -7573,20 +7598,6 @@ Construction, DOUBLE PANE WITH ROLL SHADE,  !- Material layer names follow:
       ROLL SHADE - LIGHT
 ```
 
-
-### Site:GroundTemperature:FCfactorMethod
-
-Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (Construction:CfactorUndergroundWall) and F-factor (Construction:FfactorGroundFloor) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available.
-
-#### Field: Month Temperature(s) – 12 fields in all
-
-Each numeric field is the monthly ground temperature (degrees Celsius) used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
-
-And, the IDF example:
-
-```idf
-Site:GroundTemperature:FCfactorMethod,  9.5,3.5,-0.7,-1.7,-0.6,3.6,9.3,14,18.2,22.7,21.2,16.8;
-```
 
 ### Constructions - Modeling Underground Walls and Ground Floors Defined with C and F Factors for Building Energy Code Compliance
 

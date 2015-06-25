@@ -205,9 +205,11 @@ This is the mass flow rate of the working fluid through the heat exchanger.
 
 This is the average temperature of the working fluid inside the heat exchanger.
 
+
+
 ### GroundHeatExchanger:Slinky
 
-The GroundHeatExchanger:Slinky use the g-functions to calculate the GHX temperature respons, similar to the GroundHeatExchanger:Vertical model, however for this model g-functions are automatically calculated by EnergyPlus without the need of external software or data.
+The GroundHeatExchanger:Slinky use the g-functions to calculate the GHX temperature response, similar to the GroundHeatExchanger:Vertical model, however for this model g-functions are automatically calculated by EnergyPlus without the need of external software or data.
 
 Horizontal slinky-loop ground heat exchangers (GHXs) consist of coiled tubing, with the individual rings spread out along the direction of the trench either horizontally or vertically, as shown in [Figure](#SlinkyIOFig1). A schematic of a slinky GHX can be seen in [Figure](#SlinkyIOFig2). Compared to conventional straight tube horizontal GHXs, slinky loops have a higher tube density; hence, with the same cooling/heating loads, slinky-loop GHXs require less land area and excavation work than straight tube HGHXs. 
 
@@ -242,9 +244,8 @@ GroundHeatExchanger:Slinky,
   40,               !- Trench Length [m]
   15,               !- Number of Parallel Trenches
   2,                !- Trench Spacing [m]
-  15.5,             !- Kusuda-Achenbach Average Surface Temp [C]
-  3.2,              !- Kusuda-Achenbach Average Surface Temp Amplitude [C]
-  8,                !- Kusuda-Achenbach Phase Shift [C]
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps,          !- Name of Undisturbed Ground Temperature Object
   10;               !- Maximum length of simulation [years]
 ```
 
@@ -325,17 +326,13 @@ This numeric field is the number of parallel trenches. Design flow rate will be 
 
 This numeric field is the center-to-center distance in between parallel trenches, in meters.
 
-#### Field: Kusuda-Achenbach Average Annual Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average ground surface temperature to be applied to the Kusuda-Achenbach ground temperature boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achenbach Amplitude of Average Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor
-
-#### Field: Kusuda-Achenbach Phase Shift
-
-The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: Maximum Length of Simulation
 
@@ -380,6 +377,8 @@ This is the mass flow rate of the working fluid through the heat exchanger.
 #### Ground Heat Exchanger Average Fluid Temperature [C]
 
 This is the average temperature of the working fluid inside the heat exchanger.
+
+
 
 ### GroundHeatExchanger:Pond
 
@@ -488,6 +487,8 @@ These outputs are the pond fluid inlet and outlet temperatures and mass flow rat
 #### Pond Heat Exchanger Bulk Temperature [C]
 
 This output is the pond bulk temperature.
+
+
 
 ### GroundHeatExchanger:Surface
 
@@ -626,6 +627,8 @@ This is the total surface energy exchange for the timestep.
 
 This is the surface heat exchanger source temperature.
 
+
+
 ### GroundHeatExchanger:HorizontalTrench
 
 The horizontal trench ground heat exchanger object provides an alternate interface to the detailed PipingSystem:Underground:\* objects.  The same underlying simulation algorithm is utilized, providing a transient numerical simulation of soil with buried pipes and a detailed surface heat balance.  The input syntax is much smaller and useful for simple applications.  For full flexibility, use the PipingSystem:Underground:\* objects to build a detailed simulation domain and piping circuit.  For information regarding the simulation algorithms, see the engineering reference document section covering the buried piping system objects.
@@ -702,17 +705,13 @@ This numeric field represents the volume fraction, in percent, of water content 
 
 This numeric field represents the volume fraction, in percent, of water content in the soil which results in saturation.
 
-***Field: Kusuda-Achenbach Average Surface Temperature [C]***
+#### Field: Type of Undisturbed Ground Temperature Object
 
-This numeric field is the average annual ground surface temperature, used in the Kusuda-Achenbach undisturbed ground temperature (far-field boundary) model.  This field can be inferred (left blank) if a Site:GroundTemperatures:Shallow object is provided in the input file.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-***Field: Kusuda-Achenbach Average Amplitude of Surface Temperature [C]***
+#### Field: Name of Undisturbed Ground Temperature Object
 
-This numeric field is the average annual amplitude of ground surface temperature, used in the Kusuda-Achenbach undisturbed ground temperature (far-field boundary) model.  This field can be inferred (left blank) if a Site:GroundTemperatures:Shallow object is provided in the input file.
-
-***Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature [days]***
-
-This numeric field is the phase shift to minimum ground surface temperature, in days, since the beginning of the year, used in the Kusuda-Achenbach undisturbed ground temperature (far-field boundary) model.  This field can be inferred (left blank) if a Site:GroundTemperatures:Shallow object is provided in the input file.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 ***Field: Evapotranspiration Ground Cover Parameter [-]***
 
@@ -739,10 +738,9 @@ GroundHeatExchanger:HorizontalTrench,
    641,         !- Pipe Density {kg/m3}
    2405,        !- Pipe Specific Heat {J/kg-K}
    30,          !- Soil Moisture Content Volume Fraction {percent}
-   50,       !- Soil Moisture Content Volume Fraction at Saturation {percent}
-   15.5,        !- Kusuda-Achenbach Average Surface Temperature {C}
-   12.8,     !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-   17.3,!- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+   50,          !- Soil Moisture Content Volume Fraction at Saturation {percent}
+   Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+   KATemps,     !- Name of Undisturbed Ground Temperature Object
    0.408;       !- Evapotranspiration Ground Cover Parameter
 ```
 
