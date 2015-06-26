@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <string>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -23,6 +24,7 @@
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GroundTempsManager.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -7120,6 +7122,7 @@ Label9999: ;
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
+		using namespace GroundTemps;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

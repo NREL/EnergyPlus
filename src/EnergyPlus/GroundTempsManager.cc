@@ -120,8 +120,8 @@ namespace GroundTemps {
 
 	//******************************************************************************
 
-	// Site:GroundTemperature:Shallow model factory
-	std::shared_ptr< KusudaGroundTempsModel > 
+	// Site:GroundTemperature:Shallow factory
+	std::shared_ptr< ShallowGroundTempsModel > 
 	ShallowGTMFactory( int objectType ){
 
 		using namespace DataIPShortCuts;
@@ -134,7 +134,7 @@ namespace GroundTemps {
 		bool ErrorsFound = false;
 
 		// New shared pointer for this model object
-		std::shared_ptr< KusudaGroundTempsModel > thisModel( new KusudaGroundTempsModel() );
+		std::shared_ptr< ShallowGroundTempsModel > thisModel( new ShallowGroundTempsModel() );
 
 		// Search through Kusuda models here
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:Shallow";

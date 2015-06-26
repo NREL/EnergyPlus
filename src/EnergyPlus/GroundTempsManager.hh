@@ -126,6 +126,30 @@ namespace GroundTemps {
 	};
 
 	//******************************************************************************
+	
+	// Derived class for Site:GroundTemperature:Shallow
+	class ShallowGroundTempsModel : public BaseGroundTempsModel
+	{
+		public:
+			// Public Members
+			int objectType;
+			Real64 aveGroundTemp;
+			Real64 aveGroundTempAmplitude;
+			Real64 phaseShiftInSecs;
+
+		Real64
+		getGroundTemp(
+			Real64 const depth,
+			Real64 const diffusivityGround,
+			Real64 const simTime
+		);
+
+		static std::shared_ptr< ShallowGroundTempsModel > ShallowGTMFactory( int objectType, std::string objectName ); 
+
+	};
+
+	//******************************************************************************
+
 
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(
