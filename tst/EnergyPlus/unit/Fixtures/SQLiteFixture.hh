@@ -7,6 +7,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -53,10 +54,10 @@ namespace EnergyPlus {
 			ss->str(std::string());
 		}
 
-		std::string newlineDelimitedString( std::vector<std::string> const & strings ) {
+		std::string delimitedString( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL ) {
 			std::unique_ptr<std::ostringstream> compare_text(new std::ostringstream);
 			for( auto const & str : strings ) {
-				* compare_text << str << std::endl;
+				* compare_text << str << delimiter;
 			}
 			return compare_text->str();
 		}
