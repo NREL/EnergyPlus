@@ -127,8 +127,8 @@ TEST_F( SQLiteFixture, reportTSMeters_PrintESOTimeStamp )
 
 	std::vector<std::string> testResult0 {"1", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay\n1,999.9\n2,9999.9\n", mtr_strm->str() );
-	EXPECT_EQ( "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay\n1,999.9\n2,9999.9\n", eso_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), eso_strm->str() );
 
 	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -207,8 +207,8 @@ TEST_F( SQLiteFixture, reportTSMeters )
 
 	std::vector<std::string> testResult0 {"1", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay\n1,999.9\n2,9999.9\n", mtr_strm->str() );
-	EXPECT_EQ( "1,999.9\n2,9999.9\n", eso_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,999.9", "2,9999.9" } ), eso_strm->str() );
 
 	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -280,7 +280,7 @@ TEST_F( SQLiteFixture, reportHRMeters )
 
 	std::vector<std::string> testResult0 {"1", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", ""};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay\n1,999.9\n2,9999.9\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
 
 	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -301,6 +301,7 @@ TEST_F( SQLiteFixture, reportDYMeters )
 	ShowMessage( "Begin Test: OutputProcessor, reportDYMeters" );
 
 	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
+	std::unique_ptr<std::ostringstream> compare_text(new std::ostringstream);
 
 	DataGlobals::mtr_stream = mtr_strm.get();
 
@@ -337,8 +338,8 @@ TEST_F( SQLiteFixture, reportDYMeters )
 	EnergyMeters( 2 ).DYMinVal = 4283136.2516839253;
 	EnergyMeters( 2 ).DYMinValDate = 12210110;
 
-	TimeStepStampReportNbr = 1;
-	TimeStepStampReportChr = "1";
+	DailyStampReportNbr = 1;
+	DailyStampReportChr = "1";
 	DayOfSim = 1;
 	DayOfSimChr = "1";
 	HourOfDay = 1;
@@ -360,7 +361,7 @@ TEST_F( SQLiteFixture, reportDYMeters )
 
 	std::vector<std::string> testResult0 {"1", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( "1,1,12,21, 0,WinterDesignDay\n1,999.9,4283136.25168393, 1,10,4283136.25248438, 1,60\n2,9999.9,4283136.25168393, 1,10,4283136.25248438, 1,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.25168393, 1,10,4283136.25248438, 1,60", "2,9999.9,4283136.25168393, 1,10,4283136.25248438, 1,60" } ), mtr_strm->str() );
 
 	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -421,8 +422,8 @@ TEST_F( SQLiteFixture, reportMNMeters )
 	EnergyMeters( 2 ).MNMinVal = 4283136.2516839253;
 	EnergyMeters( 2 ).MNMinValDate = 12210110;
 
-	TimeStepStampReportNbr = 1;
-	TimeStepStampReportChr = "1";
+	MonthlyStampReportNbr = 1;
+	MonthlyStampReportChr = "1";
 	DayOfSim = 1;
 	DayOfSimChr = "1";
 	HourOfDay = 1;
@@ -444,7 +445,7 @@ TEST_F( SQLiteFixture, reportMNMeters )
 
 	std::vector<std::string> testResult0 {"1", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( "1,1,12\n1,999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60\n2,9999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12", "1,999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60", "2,9999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60" } ), mtr_strm->str() );
 
 	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -505,8 +506,8 @@ TEST_F( SQLiteFixture, reportSMMeters )
 	EnergyMeters( 2 ).SMMinVal = 4283136.2516839253;
 	EnergyMeters( 2 ).SMMinValDate = 12210110;
 
-	TimeStepStampReportNbr = 1;
-	TimeStepStampReportChr = "1";
+	RunPeriodStampReportNbr = 1;
+	RunPeriodStampReportChr = "1";
 	DayOfSim = 1;
 	DayOfSimChr = "1";
 	HourOfDay = 1;
@@ -528,7 +529,7 @@ TEST_F( SQLiteFixture, reportSMMeters )
 
 	std::vector<std::string> testResult0 {"1", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( "1,1\n1,999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60\n2,9999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1", "1,999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60", "2,9999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60" } ), mtr_strm->str() );
 
 	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -584,7 +585,7 @@ TEST_F( SQLiteFixture, writeTimeStampFormatData )
 		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, 
 		StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 
-	EXPECT_EQ( "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay\n", mtr_stream->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ), mtr_stream->str() );
 	mtr_stream->str(std::string());
 
 	// TSMeter
@@ -592,34 +593,34 @@ TEST_F( SQLiteFixture, writeTimeStampFormatData )
 		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, 
 		StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 
-	EXPECT_EQ( "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay\n", mtr_stream->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ), mtr_stream->str() );
 	mtr_stream->str(std::string());
 
 	// HRMeter
 	WriteTimeStampFormatData( mtr_stream.get(), ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
 		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 
-	EXPECT_EQ( "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay\n", mtr_stream->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay" } ), mtr_stream->str() );
 	mtr_stream->str(std::string());
 
 	// DYMeter
 	WriteTimeStampFormatData( mtr_stream.get(), ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, 
 		PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 
-	EXPECT_EQ( "1,1,12,21, 0,WinterDesignDay\n", mtr_stream->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12,21, 0,WinterDesignDay" } ), mtr_stream->str() );
 	mtr_stream->str(std::string());
 
 	// MNMeter
 	WriteTimeStampFormatData( mtr_stream.get(), ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, 
 		PrintTimeStamp, Month );
 
-	EXPECT_EQ( "1,1,12\n", mtr_stream->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1,12" } ), mtr_stream->str() );
 	mtr_stream->str(std::string());
 
 	// SMMeter
 	WriteTimeStampFormatData( mtr_stream.get(), ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp );
 
-	EXPECT_EQ( "1,1\n", mtr_stream->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,1" } ), mtr_stream->str() );
 	mtr_stream->str(std::string());
 
 	sqlite_test = std::move( EnergyPlus::sqlite );
@@ -659,63 +660,63 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 	EnergyPlus::sqlite = std::move( sqlite_test );
 
 	WriteReportMeterData( 1, "1", 999.9, ReportTimeStep, 0.0, 0, 0.0, 0, false );
-	EXPECT_EQ( "1,999.9\n", eso_strm->str() );
-	EXPECT_EQ( "1,999.9\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,999.9" } ), eso_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,999.9" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 	eso_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 999.9, ReportEach, 0.0, 0, 0.0, 0, false );
-	EXPECT_EQ( "1,999.9\n", eso_strm->str() );
-	EXPECT_EQ( "1,999.9\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,999.9" } ), eso_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,999.9" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 	eso_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 999.9, ReportHourly, 0.0, 0, 0.0, 0, false );
-	EXPECT_EQ( "1,999.9\n", eso_strm->str() );
-	EXPECT_EQ( "1,999.9\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,999.9" } ), eso_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,999.9" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 	eso_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60\n", eso_strm->str() );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), eso_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 	eso_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60\n", eso_strm->str() );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), eso_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 	eso_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60\n", eso_strm->str() );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), eso_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 	eso_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( "1,616771620.987027\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( "1,616771620.987027\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( "1,616771620.987027\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 
 	WriteReportMeterData( 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60\n", mtr_strm->str() );
+	EXPECT_EQ( newlineDelimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 
 	sqlite_test = std::move( EnergyPlus::sqlite );

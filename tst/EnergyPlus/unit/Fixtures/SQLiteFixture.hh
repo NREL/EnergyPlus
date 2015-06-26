@@ -53,6 +53,14 @@ namespace EnergyPlus {
 			ss->str(std::string());
 		}
 
+		std::string newlineDelimitedString( std::vector<std::string> const & strings ) {
+			std::unique_ptr<std::ostringstream> compare_text(new std::ostringstream);
+			for( auto const & str : strings ) {
+				* compare_text << str << std::endl;
+			}
+			return compare_text->str();
+		}
+
 		std::string storageType( const int storageTypeIndex ) {
 			return sqlite_test->storageType( storageTypeIndex );
 		}
