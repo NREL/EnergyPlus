@@ -1000,7 +1000,7 @@ TEST_F( SQLiteFixture, writeReportIntegerData )
 
 }
 
-TEST_F ( SQLiteFixture, writeIntegerData )
+TEST_F( SQLiteFixture, writeIntegerData )
 {
 	ShowMessage( "Begin Test: SQLiteFixture, writeIntegerData" );
 
@@ -1077,7 +1077,7 @@ TEST_F ( SQLiteFixture, writeIntegerData )
 	ASSERT_EQ(0ul, reportExtendedData.size());
 }
 
-TEST_F ( SQLiteFixture, getStandardMeterResourceType )
+TEST_F( SQLiteFixture, getStandardMeterResourceType )
 {
 	ShowMessage( "Begin Test: SQLiteFixture, getStandardMeterResourceType" );
 
@@ -1180,7 +1180,7 @@ TEST_F ( SQLiteFixture, getStandardMeterResourceType )
 
 }
 
-TEST ( OutputProcessor, determineIndexGroupKeyFromMeterName )
+TEST( OutputProcessor, determineIndexGroupKeyFromMeterName )
 {
 	ShowMessage( "Begin Test: OutputProcessor, determineIndexGroupKeyFromMeterName" );
 
@@ -1203,7 +1203,7 @@ TEST ( OutputProcessor, determineIndexGroupKeyFromMeterName )
 	}
 }
 
-TEST_F ( SQLiteFixture, validateIndexType )
+TEST_F( SQLiteFixture, validateIndexType )
 {
 	ShowMessage( "Begin Test: SQLiteFixture, validateIndexType" );
 
@@ -1240,7 +1240,7 @@ TEST_F ( SQLiteFixture, validateIndexType )
 
 }
 
-TEST ( OutputProcessor, standardIndexTypeKey )
+TEST( OutputProcessor, standardIndexTypeKey )
 {
 	ShowMessage( "Begin Test: OutputProcessor, standardIndexTypeKey" );
 
@@ -1252,7 +1252,7 @@ TEST ( OutputProcessor, standardIndexTypeKey )
 
 }
 
-TEST_F ( SQLiteFixture, validateVariableType )
+TEST_F( SQLiteFixture, validateVariableType )
 {
 	ShowMessage( "Begin Test: SQLiteFixture, validateVariableType" );
 
@@ -1288,7 +1288,7 @@ TEST_F ( SQLiteFixture, validateVariableType )
 
 }
 
-TEST ( OutputProcessor, standardVariableTypeKey )
+TEST( OutputProcessor, standardVariableTypeKey )
 {
 	ShowMessage( "Begin Test: OutputProcessor, standardVariableTypeKey" );
 
@@ -1300,7 +1300,7 @@ TEST ( OutputProcessor, standardVariableTypeKey )
 
 }
 
-TEST_F (  SQLiteFixture, determineMeterIPUnits ) 
+TEST_F(  SQLiteFixture, determineMeterIPUnits ) 
 {
 	ShowMessage( "Begin Test: SQLiteFixture, determineMeterIPUnits" );
 
@@ -1366,7 +1366,7 @@ TEST_F (  SQLiteFixture, determineMeterIPUnits )
 
 }
 
-TEST ( OutputProcessor, dateToStringWithMonth )
+TEST( OutputProcessor, dateToStringWithMonth )
 {
 	ShowMessage( "Begin Test: OutputProcessor, dateToStringWithMonth" );
 
@@ -1389,8 +1389,6 @@ TEST ( OutputProcessor, dateToStringWithMonth )
 	EXPECT_EQ( "-", DateToStringWithMonth( -12210110 ) );
 	EXPECT_EQ( "-", DateToStringWithMonth( 13082328 ) );
 	EXPECT_EQ( "-", DateToStringWithMonth( 10100 ) );
-
-	// These should fail...
 	EXPECT_EQ( "-", DateToStringWithMonth( 1000101 ) );
 	EXPECT_EQ( "-", DateToStringWithMonth( 990101 ) );
 	EXPECT_EQ( "-", DateToStringWithMonth( 1010001 ) );
@@ -1401,7 +1399,7 @@ TEST ( OutputProcessor, dateToStringWithMonth )
 
 }
 
-TEST_F ( SQLiteFixture, writeMeterDictionaryItem )
+TEST_F( SQLiteFixture, writeMeterDictionaryItem )
 {
 	ShowMessage( "Begin Test: SQLiteFixture, writeMeterDictionaryItem" );
 
@@ -1648,7 +1646,7 @@ TEST_F ( SQLiteFixture, writeMeterDictionaryItem )
 
 }
 
-TEST_F ( SQLiteFixture, writeReportVariableDictionaryItem )
+TEST_F( SQLiteFixture, writeReportVariableDictionaryItem )
 {
 	ShowMessage( "Begin Test: SQLiteFixture, writeReportVariableDictionaryItem" );
 
