@@ -3422,64 +3422,75 @@ namespace OutputProcessor {
 		//   Convert the coded date format into a usable
 		//   string
 
-		// Using/Aliasing
-		using General::DecodeMonDayHrMin;
+		if ( codedDate == 0 ) return "-";
 
-		// Return value
-		std::string StringOut;
-
-		// Locals
-		// ((month*100 + day)*100 + hour)*100 + minute
 		static gio::Fmt DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
 
+		// ((month*100 + day)*100 + hour)*100 + minute
 		int Month; // month in integer format (1-12)
 		int Day; // day in integer format (1-31)
 		int Hour; // hour in integer format (1-24)
 		int Minute; // minute in integer format (0:59)
-		std::string monthName;
 
-		if ( codedDate != 0 ) {
-			monthName = "";
-			DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
-			--Hour;
-			if ( Minute == 60 ) {
-				++Hour;
-				Minute = 0;
-			}
-			if ( Month == 1 ) {
-				monthName = "JAN";
-			} else if ( Month == 2 ) {
-				monthName = "FEB";
-			} else if ( Month == 3 ) {
-				monthName = "MAR";
-			} else if ( Month == 4 ) {
-				monthName = "APR";
-			} else if ( Month == 5 ) {
-				monthName = "MAY";
-			} else if ( Month == 6 ) {
-				monthName = "JUN";
-			} else if ( Month == 7 ) {
-				monthName = "JUL";
-			} else if ( Month == 8 ) {
-				monthName = "AUG";
-			} else if ( Month == 9 ) {
-				monthName = "SEP";
-			} else if ( Month == 10 ) {
-				monthName = "OCT";
-			} else if ( Month == 11 ) {
-				monthName = "NOV";
-			} else if ( Month == 12 ) {
-				monthName = "DEC";
-			} else {
-				monthName = "***";
-			}
-			gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
-			if ( has( StringOut, "*" ) ) {
-				StringOut = "-";
-			}
-		} else { // codeddate = 0
-			StringOut = "-";
+		General::DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
+
+		if ( Month < 1 || Month > 12 ) return "-";
+		if ( Day < 1 || Day > 31 ) return "-";
+		if ( Hour < 1 || Hour > 24 ) return "-";
+		if ( Minute < 0 || Minute > 60 ) return "-";
+
+		--Hour;
+		if ( Minute == 60 ) {
+			++Hour;
+			Minute = 0;
 		}
+
+		std::string monthName;
+		switch ( Month ) {
+			case 1:
+				monthName = "JAN";
+				break;
+			case 2:
+				monthName = "FEB";
+				break;
+			case 3:
+				monthName = "MAR";
+				break;
+			case 4:
+				monthName = "APR";
+				break;
+			case 5:
+				monthName = "MAY";
+				break;
+			case 6:
+				monthName = "JUN";
+				break;
+			case 7:
+				monthName = "JUL";
+				break;
+			case 8:
+				monthName = "AUG";
+				break;
+			case 9:
+				monthName = "SEP";
+				break;
+			case 10:
+				monthName = "OCT";
+				break;
+			case 11:
+				monthName = "NOV";
+				break;
+			case 12:
+				monthName = "DEC";
+				break;
+			default:
+				assert( false );
+				monthName = "Should't get here!!";
+				break;
+		}
+
+		std::string StringOut;
+		gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
 
 		return StringOut;
 	}
