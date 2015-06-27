@@ -133,16 +133,24 @@ TEST_F( SQLiteFixture, reportTSMeters_PrintESOTimeStamp )
 	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
 	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), eso_strm->str() );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(2ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "2", "9999.9"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "2", "9999.9"}
+	});
 
-	ASSERT_EQ(0ul, reportExtendedData.size());
+	std::vector< std::vector<std::string> > reportExtendedData({});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
 
 	EnergyMeters.deallocate();
 }
@@ -213,16 +221,24 @@ TEST_F( SQLiteFixture, reportTSMeters )
 	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
 	EXPECT_EQ( delimitedString( { "1,999.9", "2,9999.9" } ), eso_strm->str() );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(2ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "2", "9999.9"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "2", "9999.9"}
+	});
 
-	ASSERT_EQ(0ul, reportExtendedData.size());
+	std::vector< std::vector<std::string> > reportExtendedData({});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
 
 	EnergyMeters.deallocate();
 }
@@ -285,16 +301,24 @@ TEST_F( SQLiteFixture, reportHRMeters )
 	EXPECT_EQ( testResult0, result[0] );
 	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(2ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "2", "9999.9"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "2", "9999.9"}
+	});
 
-	ASSERT_EQ(0ul, reportExtendedData.size());
+	std::vector< std::vector<std::string> > reportExtendedData({});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
 
 	EnergyMeters.deallocate();
 }
@@ -366,20 +390,32 @@ TEST_F( SQLiteFixture, reportDYMeters )
 	EXPECT_EQ( testResult0, result[0] );
 	EXPECT_EQ( delimitedString( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.25168393, 1,10,4283136.25248438, 1,60", "2,9999.9,4283136.25168393, 1,10,4283136.25248438, 1,60" } ), mtr_strm->str() );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(2ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "2", "9999.9"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "2", "9999.9"}
+	});
 
-	ASSERT_EQ(2ul, reportExtendedData.size());
-	std::vector<std::string> reportExtendedData0 {"1","1","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData1 {"2","2","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"};
-	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
-	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
+	std::vector< std::vector<std::string> > reportExtendedData(
+	{
+		{"1","1","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"},
+		{"2","2","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"}
+	});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
+	for (size_t i = 0; i < reportExtendedDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportExtendedData[i], reportExtendedDataResults[i] );
+	}
 
 	EnergyMeters.deallocate();
 }
@@ -450,20 +486,32 @@ TEST_F( SQLiteFixture, reportMNMeters )
 	EXPECT_EQ( testResult0, result[0] );
 	EXPECT_EQ( delimitedString( { "1,1,12", "1,999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60", "2,9999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60" } ), mtr_strm->str() );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(2ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "2", "9999.9"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "2", "9999.9"}
+	});
 
-	ASSERT_EQ(2ul, reportExtendedData.size());
-	std::vector<std::string> reportExtendedData0 {"1","1","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData1 {"2","2","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"};
-	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
-	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
+	std::vector< std::vector<std::string> > reportExtendedData(
+	{
+		{"1","1","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"},
+		{"2","2","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"}
+	});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
+	for (size_t i = 0; i < reportExtendedDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportExtendedData[i], reportExtendedDataResults[i] );
+	}
 
 	EnergyMeters.deallocate();
 }
@@ -534,20 +582,32 @@ TEST_F( SQLiteFixture, reportSMMeters )
 	EXPECT_EQ( testResult0, result[0] );
 	EXPECT_EQ( delimitedString( { "1,1", "1,999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60", "2,9999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60" } ), mtr_strm->str() );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(2ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "2", "9999.9"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "2", "9999.9"}
+	});
 
-	ASSERT_EQ(2ul, reportExtendedData.size());
-	std::vector<std::string> reportExtendedData0 {"1","1","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData1 {"2","2","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"};
-	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
-	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
+	std::vector< std::vector<std::string> > reportExtendedData(
+	{
+		{"1","1","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"},
+		{"2","2","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"}
+	});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
+	for (size_t i = 0; i < reportExtendedDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportExtendedData[i], reportExtendedDataResults[i] );
+	}
 
 	EnergyMeters.deallocate();
 }
@@ -634,22 +694,23 @@ TEST_F( SQLiteFixture, writeTimeStampFormatData )
 	EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to WriteTimeStampFormatData: 999\n", ss->str());
 	ss->str(std::string());
 
-	auto result = queryResult("SELECT * FROM Time;", "Time");
+	auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
-	ASSERT_EQ(6ul, result.size());
+	std::vector< std::vector<std::string> > timeData(
+	{
+		{"1", "12", "21", "0", "10", "0", "10", "0", "1", "WinterDesignDay", "0", "0"},
+		{"2", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"},
+		{"3", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", "0"},
+		{"4", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", "0"},
+		{"5", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", "0"},
+		{"6", "", "", "", "", "", "1440", "4", "1", "", "0", "0"}
+	});
 
-	std::vector<std::string> testResult0 {"1", "12", "21", "0", "10", "0", "10", "0", "1", "WinterDesignDay", "0", "0"};
-	std::vector<std::string> testResult1 {"2", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
-	std::vector<std::string> testResult2 {"3", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", "0"};
-	std::vector<std::string> testResult3 {"4", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", "0"};
-	std::vector<std::string> testResult4 {"5", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", "0"};
-	std::vector<std::string> testResult5 {"6", "", "", "", "", "", "1440", "4", "1", "", "0", "0"};
-	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( testResult1, result[1] );
-	EXPECT_EQ( testResult2, result[2] );
-	EXPECT_EQ( testResult3, result[3] );
-	EXPECT_EQ( testResult4, result[4] );
-	EXPECT_EQ( testResult5, result[5] );
+	ASSERT_EQ( timeData.size(), timeResults.size() );
+	for (size_t i = 0; i < timeResults.size(); ++i)
+	{
+		EXPECT_EQ( timeData[i], timeResults[i] );
+	}
 
 }
 
@@ -730,55 +791,57 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 
+	WriteReportMeterData( 1, "1", 0, ReportTimeStep, 0.0, 0, 0.0, 0, false );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
 	sqlite_test = std::move( EnergyPlus::sqlite );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(12ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "1", "999.9"};
-	std::vector<std::string> reportData2 {"3", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData3 {"4", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData4 {"5", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData5 {"6", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData6 {"7", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData7 {"8", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData8 {"9", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData9 {"10", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData10 {"11", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData11 {"12", "1", "1", "616771620.987027"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
-	EXPECT_EQ(reportData2, reportData[2]);
-	EXPECT_EQ(reportData3, reportData[3]);
-	EXPECT_EQ(reportData4, reportData[4]);
-	EXPECT_EQ(reportData5, reportData[5]);
-	EXPECT_EQ(reportData6, reportData[6]);
-	EXPECT_EQ(reportData7, reportData[7]);
-	EXPECT_EQ(reportData8, reportData[8]);
-	EXPECT_EQ(reportData9, reportData[9]);
-	EXPECT_EQ(reportData10, reportData[10]);
-	EXPECT_EQ(reportData11, reportData[11]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "1", "999.9"},
+		{"3", "1", "1", "616771620.987027"},
+		{"4", "1", "1", "616771620.987027"},
+		{"5", "1", "1", "616771620.987027"},
+		{"6", "1", "1", "616771620.987027"},
+		{"7", "1", "1", "616771620.987027"},
+		{"8", "1", "1", "616771620.987027"},
+		{"9", "1", "1", "616771620.987027"},
+		{"10", "1", "1", "616771620.987027"},
+		{"11", "1", "1", "616771620.987027"},
+		{"12", "1", "1", "616771620.987027"},
+		{"13", "1", "1", "0.0"}
+	});
 
-	ASSERT_EQ(8ul, reportExtendedData.size());
+	std::vector< std::vector<std::string> > reportExtendedData(
+	{
+		{"1","3","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"},
+		{"2","4","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"},
+		{"3","5","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"},
+		{"4","6","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"},
+		{"5","9","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"},
+		{"6","10","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"},
+		{"7","11","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"},
+		{"8","12","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"}
+	});
 
-	std::vector<std::string> reportExtendedData0 {"1","3","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
-	std::vector<std::string> reportExtendedData1 {"2","4","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
-	std::vector<std::string> reportExtendedData2 {"3","5","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
-	std::vector<std::string> reportExtendedData3 {"4","6","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
-	std::vector<std::string> reportExtendedData4 {"5","9","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
-	std::vector<std::string> reportExtendedData5 {"6","10","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
-	std::vector<std::string> reportExtendedData6 {"7","11","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
-	std::vector<std::string> reportExtendedData7 {"8","12","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
-	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
-	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
-	EXPECT_EQ(reportExtendedData2, reportExtendedData[2]);
-	EXPECT_EQ(reportExtendedData3, reportExtendedData[3]);
-	EXPECT_EQ(reportExtendedData4, reportExtendedData[4]);
-	EXPECT_EQ(reportExtendedData5, reportExtendedData[5]);
-	EXPECT_EQ(reportExtendedData6, reportExtendedData[6]);
-	EXPECT_EQ(reportExtendedData7, reportExtendedData[7]);
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
+	for (size_t i = 0; i < reportExtendedDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportExtendedData[i], reportExtendedDataResults[i] );
+	}
 
 }
 
@@ -843,51 +906,54 @@ TEST_F( SQLiteFixture, writeReportRealData )
 	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), eso_strm->str() );
 	eso_strm->str(std::string());
 
+	WriteReportRealData( 1, "1", 0, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
 	sqlite_test = std::move( EnergyPlus::sqlite );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(12ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "1", "999.9"};
-	std::vector<std::string> reportData2 {"3", "1", "1", "999.9"};
-	std::vector<std::string> reportData3 {"4", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData4 {"5", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData5 {"6", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData6 {"7", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData7 {"8", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData8 {"9", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData9 {"10", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData10 {"11", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData11 {"12", "1", "1", "61677162.0987027"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
-	EXPECT_EQ(reportData2, reportData[2]);
-	EXPECT_EQ(reportData3, reportData[3]);
-	EXPECT_EQ(reportData4, reportData[4]);
-	EXPECT_EQ(reportData5, reportData[5]);
-	EXPECT_EQ(reportData6, reportData[6]);
-	EXPECT_EQ(reportData7, reportData[7]);
-	EXPECT_EQ(reportData8, reportData[8]);
-	EXPECT_EQ(reportData9, reportData[9]);
-	EXPECT_EQ(reportData10, reportData[10]);
-	EXPECT_EQ(reportData11, reportData[11]);
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(6ul, reportExtendedData.size());
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "1", "999.9"},
+		{"3", "1", "1", "999.9"},
+		{"4", "1", "1", "616771620.987027"},
+		{"5", "1", "1", "616771620.987027"},
+		{"6", "1", "1", "616771620.987027"},
+		{"7", "1", "1", "61677162.0987027"},
+		{"8", "1", "1", "61677162.0987027"},
+		{"9", "1", "1", "61677162.0987027"},
+		{"10", "1", "1", "61677162.0987027"},
+		{"11", "1", "1", "61677162.0987027"},
+		{"12", "1", "1", "61677162.0987027"},
+		{"13", "1", "1", "0.0"}
+	});
 
-	std::vector<std::string> reportExtendedData0 {"1","4","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData1 {"2","5","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData2 {"3","6","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData3 {"4","10","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData4 {"5","11","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData5 {"6","12","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
-	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
-	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
-	EXPECT_EQ(reportExtendedData2, reportExtendedData[2]);
-	EXPECT_EQ(reportExtendedData3, reportExtendedData[3]);
-	EXPECT_EQ(reportExtendedData4, reportExtendedData[4]);
-	EXPECT_EQ(reportExtendedData5, reportExtendedData[5]);
+	std::vector< std::vector<std::string> > reportExtendedData(
+	{
+		{"1","4","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"},
+		{"2","5","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"},
+		{"3","6","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"},
+		{"4","10","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"},
+		{"5","11","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"},
+		{"6","12","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"}
+	});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
+	for (size_t i = 0; i < reportExtendedDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportExtendedData[i], reportExtendedDataResults[i] );
+	}
 
 }
 
@@ -952,51 +1018,53 @@ TEST_F( SQLiteFixture, writeReportIntegerData )
 	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ), eso_strm->str() );
 	eso_strm->str(std::string());
 
+	WriteReportIntegerData( 1, "1", 0, 2, 1, ReportTimeStep, 0, 0, 0, 0 );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
 	sqlite_test = std::move( EnergyPlus::sqlite );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(12ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
-	std::vector<std::string> reportData1 {"2", "1", "1", "999.9"};
-	std::vector<std::string> reportData2 {"3", "1", "1", "999.9"};
-	std::vector<std::string> reportData3 {"4", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData4 {"5", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData5 {"6", "1", "1", "616771620.987027"};
-	std::vector<std::string> reportData6 {"7", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData7 {"8", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData8 {"9", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData9 {"10", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData10 {"11", "1", "1", "61677162.0987027"};
-	std::vector<std::string> reportData11 {"12", "1", "1", "61677162.0987027"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
-	EXPECT_EQ(reportData2, reportData[2]);
-	EXPECT_EQ(reportData3, reportData[3]);
-	EXPECT_EQ(reportData4, reportData[4]);
-	EXPECT_EQ(reportData5, reportData[5]);
-	EXPECT_EQ(reportData6, reportData[6]);
-	EXPECT_EQ(reportData7, reportData[7]);
-	EXPECT_EQ(reportData8, reportData[8]);
-	EXPECT_EQ(reportData9, reportData[9]);
-	EXPECT_EQ(reportData10, reportData[10]);
-	EXPECT_EQ(reportData11, reportData[11]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.9"},
+		{"2", "1", "1", "999.9"},
+		{"3", "1", "1", "999.9"},
+		{"4", "1", "1", "616771620.987027"},
+		{"5", "1", "1", "616771620.987027"},
+		{"6", "1", "1", "616771620.987027"},
+		{"7", "1", "1", "61677162.0987027"},
+		{"8", "1", "1", "61677162.0987027"},
+		{"9", "1", "1", "61677162.0987027"},
+		{"10", "1", "1", "61677162.0987027"},
+		{"11", "1", "1", "61677162.0987027"},
+		{"12", "1", "1", "61677162.0987027"},
+		{"13", "1", "1", "0.0"}
+	});
 
-	ASSERT_EQ(6ul, reportExtendedData.size());
+	std::vector< std::vector<std::string> > reportExtendedData(
+	{
+		{"1","4","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"},
+		{"2","5","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"},
+		{"3","6","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"},
+		{"4","10","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"},
+		{"5","11","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"},
+		{"6","12","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"}
+	});
 
-	std::vector<std::string> reportExtendedData0 {"1","4","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData1 {"2","5","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData2 {"3","6","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData3 {"4","10","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData4 {"5","11","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
-	std::vector<std::string> reportExtendedData5 {"6","12","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
-	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
-	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
-	EXPECT_EQ(reportExtendedData2, reportExtendedData[2]);
-	EXPECT_EQ(reportExtendedData3, reportExtendedData[3]);
-	EXPECT_EQ(reportExtendedData4, reportExtendedData[4]);
-	EXPECT_EQ(reportExtendedData5, reportExtendedData[5]);
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
+	for (size_t i = 0; i < reportExtendedDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportExtendedData[i], reportExtendedDataResults[i] );
+	}
 
 }
 
@@ -1051,30 +1119,32 @@ TEST_F( SQLiteFixture, writeIntegerData )
 
 	sqlite_test = std::move( EnergyPlus::sqlite );
 
-	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
-	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	ASSERT_EQ(9ul, reportData.size());
-	std::vector<std::string> reportData0 {"1", "1", "1", "999.0"};
-	std::vector<std::string> reportData1 {"2", "1", "1", "0.0"};
-	std::vector<std::string> reportData2 {"3", "1", "1", "-999.0"};
-	std::vector<std::string> reportData3 {"4", "1", "1", "999.9"};
-	std::vector<std::string> reportData4 {"5", "1", "1", "0.0"};
-	std::vector<std::string> reportData5 {"6", "1", "1", "-999.9"};
-	std::vector<std::string> reportData6 {"7", "1", "1", "999.9"};
-	std::vector<std::string> reportData7 {"8", "1", "1", "0.0"};
-	std::vector<std::string> reportData8 {"9", "1", "1", "-999.9"};
-	EXPECT_EQ(reportData0, reportData[0]);
-	EXPECT_EQ(reportData1, reportData[1]);
-	EXPECT_EQ(reportData2, reportData[2]);
-	EXPECT_EQ(reportData3, reportData[3]);
-	EXPECT_EQ(reportData4, reportData[4]);
-	EXPECT_EQ(reportData5, reportData[5]);
-	EXPECT_EQ(reportData6, reportData[6]);
-	EXPECT_EQ(reportData7, reportData[7]);
-	EXPECT_EQ(reportData8, reportData[8]);
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{"1", "1", "1", "999.0"},
+		{"2", "1", "1", "0.0"},
+		{"3", "1", "1", "-999.0"},
+		{"4", "1", "1", "999.9"},
+		{"5", "1", "1", "0.0"},
+		{"6", "1", "1", "-999.9"},
+		{"7", "1", "1", "999.9"},
+		{"8", "1", "1", "0.0"},
+		{"9", "1", "1", "-999.9"}
+	});
 
-	ASSERT_EQ(0ul, reportExtendedData.size());
+	std::vector< std::vector<std::string> > reportExtendedData({});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
+
 }
 
 TEST_F( SQLiteFixture, getStandardMeterResourceType )
@@ -1573,69 +1643,46 @@ TEST_F( SQLiteFixture, writeMeterDictionaryItem )
 
 	sqlite_test = std::move( EnergyPlus::sqlite );
 
-	auto reportDataDictionary = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
-	ASSERT_EQ(30ul, reportDataDictionary.size());
-	std::vector<std::string> reportDataDictionary0 {"1", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary1 {"2", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary2 {"3", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary3 {"4", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary4 {"5", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary5 {"6", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary6 {"7", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary7 {"8", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary8 {"9", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary9 {"10", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary10 {"11", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary11 {"12", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary12 {"13", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary13 {"14", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary14 {"15", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary15 {"16", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary16 {"17", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary17 {"18", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary18 {"19", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary19 {"20", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary20 {"21", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary21 {"22", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary22 {"23", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary23 {"24", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary24 {"25", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary25 {"26", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary26 {"27", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary27 {"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary28 {"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"};
-	std::vector<std::string> reportDataDictionary29 {"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"};
-	EXPECT_EQ(reportDataDictionary0, reportDataDictionary[0]);
-	EXPECT_EQ(reportDataDictionary1, reportDataDictionary[1]);
-	EXPECT_EQ(reportDataDictionary2, reportDataDictionary[2]);
-	EXPECT_EQ(reportDataDictionary3, reportDataDictionary[3]);
-	EXPECT_EQ(reportDataDictionary4, reportDataDictionary[4]);
-	EXPECT_EQ(reportDataDictionary5, reportDataDictionary[5]);
-	EXPECT_EQ(reportDataDictionary6, reportDataDictionary[6]);
-	EXPECT_EQ(reportDataDictionary7, reportDataDictionary[7]);
-	EXPECT_EQ(reportDataDictionary8, reportDataDictionary[8]);
-	EXPECT_EQ(reportDataDictionary9, reportDataDictionary[9]);
-	EXPECT_EQ(reportDataDictionary10, reportDataDictionary[10]);
-	EXPECT_EQ(reportDataDictionary11, reportDataDictionary[11]);
-	EXPECT_EQ(reportDataDictionary12, reportDataDictionary[12]);
-	EXPECT_EQ(reportDataDictionary13, reportDataDictionary[13]);
-	EXPECT_EQ(reportDataDictionary14, reportDataDictionary[14]);
-	EXPECT_EQ(reportDataDictionary15, reportDataDictionary[15]);
-	EXPECT_EQ(reportDataDictionary16, reportDataDictionary[16]);
-	EXPECT_EQ(reportDataDictionary17, reportDataDictionary[17]);
-	EXPECT_EQ(reportDataDictionary18, reportDataDictionary[18]);
-	EXPECT_EQ(reportDataDictionary19, reportDataDictionary[19]);
-	EXPECT_EQ(reportDataDictionary20, reportDataDictionary[20]);
-	EXPECT_EQ(reportDataDictionary21, reportDataDictionary[21]);
-	EXPECT_EQ(reportDataDictionary22, reportDataDictionary[22]);
-	EXPECT_EQ(reportDataDictionary23, reportDataDictionary[23]);
-	EXPECT_EQ(reportDataDictionary24, reportDataDictionary[24]);
-	EXPECT_EQ(reportDataDictionary25, reportDataDictionary[25]);
-	EXPECT_EQ(reportDataDictionary26, reportDataDictionary[26]);
-	EXPECT_EQ(reportDataDictionary27, reportDataDictionary[27]);
-	EXPECT_EQ(reportDataDictionary28, reportDataDictionary[28]);
-	EXPECT_EQ(reportDataDictionary29, reportDataDictionary[29]);
+	std::vector< std::vector<std::string> > reportDataDictionary(
+	{
+		{"1", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
+		{"2", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
+		{"3", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"},
+		{"4", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
+		{"5", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"},
+		{"6", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
+		{"7", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
+		{"8", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"},
+		{"9", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
+		{"10", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"},
+		{"11", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
+		{"12", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
+		{"13", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"},
+		{"14", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
+		{"15", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"},
+		{"16", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
+		{"17", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
+		{"18", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"},
+		{"19", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
+		{"20", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"},
+		{"21", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
+		{"22", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
+		{"23", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"},
+		{"24", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
+		{"25", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"},
+		{"26", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
+		{"27", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
+		{"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"},
+		{"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
+		{"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"}
+	});
+	ASSERT_EQ( reportDataDictionary.size(), reportDataDictionaryResults.size() );
+	for (size_t i = 0; i < reportDataDictionaryResults.size(); ++i)
+	{
+		EXPECT_EQ( reportDataDictionary[i], reportDataDictionaryResults[i] );
+	}
 
 	// This should be all necessary clean up...
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileMeterDetails, flags ); }
@@ -1822,69 +1869,46 @@ TEST_F( SQLiteFixture, writeReportVariableDictionaryItem )
 
 	sqlite_test = std::move( EnergyPlus::sqlite );
 
-	auto reportDataDictionary = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
-	ASSERT_EQ(30ul, reportDataDictionary.size());
-	std::vector<std::string> reportDataDictionary0 {"1", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary1 {"2", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary2 {"3", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "scheduleName", "variableUnits"};
-	std::vector<std::string> reportDataDictionary3 {"4", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary4 {"5", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary5 {"6", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary6 {"7", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary7 {"8", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "variableUnits"};
-	std::vector<std::string> reportDataDictionary8 {"9", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary9 {"10", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary10 {"11", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary11 {"12", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary12 {"13", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "scheduleName", "variableUnits"};
-	std::vector<std::string> reportDataDictionary13 {"14", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Hourly", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary14 {"15", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Hourly", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary15 {"16", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary16 {"17", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary17 {"18", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "scheduleName", "variableUnits"};
-	std::vector<std::string> reportDataDictionary18 {"19", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Daily", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary19 {"20", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Daily", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary20 {"21", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary21 {"22", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary22 {"23", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "scheduleName", "variableUnits"};
-	std::vector<std::string> reportDataDictionary23 {"24", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Monthly", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary24 {"25", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Monthly", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary25 {"26", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary26 {"27", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary27 {"28", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "scheduleName", "variableUnits"};
-	std::vector<std::string> reportDataDictionary28 {"29", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Run Period", "", "variableUnits"};
-	std::vector<std::string> reportDataDictionary29 {"30", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Run Period", "", "variableUnits"};
-	EXPECT_EQ(reportDataDictionary0, reportDataDictionary[0]);
-	EXPECT_EQ(reportDataDictionary1, reportDataDictionary[1]);
-	EXPECT_EQ(reportDataDictionary2, reportDataDictionary[2]);
-	EXPECT_EQ(reportDataDictionary3, reportDataDictionary[3]);
-	EXPECT_EQ(reportDataDictionary4, reportDataDictionary[4]);
-	EXPECT_EQ(reportDataDictionary5, reportDataDictionary[5]);
-	EXPECT_EQ(reportDataDictionary6, reportDataDictionary[6]);
-	EXPECT_EQ(reportDataDictionary7, reportDataDictionary[7]);
-	EXPECT_EQ(reportDataDictionary8, reportDataDictionary[8]);
-	EXPECT_EQ(reportDataDictionary9, reportDataDictionary[9]);
-	EXPECT_EQ(reportDataDictionary10, reportDataDictionary[10]);
-	EXPECT_EQ(reportDataDictionary11, reportDataDictionary[11]);
-	EXPECT_EQ(reportDataDictionary12, reportDataDictionary[12]);
-	EXPECT_EQ(reportDataDictionary13, reportDataDictionary[13]);
-	EXPECT_EQ(reportDataDictionary14, reportDataDictionary[14]);
-	EXPECT_EQ(reportDataDictionary15, reportDataDictionary[15]);
-	EXPECT_EQ(reportDataDictionary16, reportDataDictionary[16]);
-	EXPECT_EQ(reportDataDictionary17, reportDataDictionary[17]);
-	EXPECT_EQ(reportDataDictionary18, reportDataDictionary[18]);
-	EXPECT_EQ(reportDataDictionary19, reportDataDictionary[19]);
-	EXPECT_EQ(reportDataDictionary20, reportDataDictionary[20]);
-	EXPECT_EQ(reportDataDictionary21, reportDataDictionary[21]);
-	EXPECT_EQ(reportDataDictionary22, reportDataDictionary[22]);
-	EXPECT_EQ(reportDataDictionary23, reportDataDictionary[23]);
-	EXPECT_EQ(reportDataDictionary24, reportDataDictionary[24]);
-	EXPECT_EQ(reportDataDictionary25, reportDataDictionary[25]);
-	EXPECT_EQ(reportDataDictionary26, reportDataDictionary[26]);
-	EXPECT_EQ(reportDataDictionary27, reportDataDictionary[27]);
-	EXPECT_EQ(reportDataDictionary28, reportDataDictionary[28]);
-	EXPECT_EQ(reportDataDictionary29, reportDataDictionary[29]);
+	std::vector< std::vector<std::string> > reportDataDictionary(
+	{
+		{"1", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
+		{"2", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
+		{"3", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "scheduleName", "variableUnits"},
+		{"4", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
+		{"5", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
+		{"6", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
+		{"7", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
+		{"8", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "variableUnits"},
+		{"9", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
+		{"10", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
+		{"11", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
+		{"12", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
+		{"13", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "scheduleName", "variableUnits"},
+		{"14", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
+		{"15", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
+		{"16", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"},
+		{"17", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"},
+		{"18", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "scheduleName", "variableUnits"},
+		{"19", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Daily", "", "variableUnits"},
+		{"20", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Daily", "", "variableUnits"},
+		{"21", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
+		{"22", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
+		{"23", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "scheduleName", "variableUnits"},
+		{"24", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
+		{"25", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
+		{"26", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
+		{"27", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
+		{"28", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "scheduleName", "variableUnits"},
+		{"29", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
+		{"30", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Run Period", "", "variableUnits"}
+	});
+	ASSERT_EQ( reportDataDictionary.size(), reportDataDictionaryResults.size() );
+	for (size_t i = 0; i < reportDataDictionaryResults.size(); ++i)
+	{
+		EXPECT_EQ( reportDataDictionary[i], reportDataDictionaryResults[i] );
+	}
 
 	// This should be all necessary clean up...
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileMeterDetails, flags ); }
@@ -1892,5 +1916,304 @@ TEST_F( SQLiteFixture, writeReportVariableDictionaryItem )
 	IVariableTypes.deallocate();
 	ReportList.deallocate();
 	EndUseCategory.deallocate();
+
+}
+
+TEST_F( SQLiteFixture, writeCumulativeReportMeterData )
+{
+	ShowMessage( "Begin Test: OutputProcessor, writeCumulativeReportMeterData" );
+
+	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
+	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
+
+	DataGlobals::eso_stream = eso_strm.get();
+	DataGlobals::mtr_stream = mtr_strm.get();
+
+	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	WriteCumulativeReportMeterData( 1, "1", 616771620.98702729, true );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteCumulativeReportMeterData( 1, "1", 616771620.98702729, false );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
+	eso_strm->str(std::string());
+	mtr_strm->str(std::string());
+
+	WriteCumulativeReportMeterData( 1, "1", 0, true );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteCumulativeReportMeterData( 1, "1", 0, false );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), mtr_strm->str() );
+	eso_strm->str(std::string());
+	mtr_strm->str(std::string());
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+	ASSERT_EQ(4ul, reportData.size());
+	std::vector<std::string> reportData0 {"1", "1", "1", "616771620.987027"};
+	std::vector<std::string> reportData1 {"2", "1", "1", "616771620.987027"};
+	std::vector<std::string> reportData2 {"3", "1", "1", "0.0"};
+	std::vector<std::string> reportData3 {"4", "1", "1", "0.0"};
+	EXPECT_EQ(reportData0, reportData[0]);
+	EXPECT_EQ(reportData1, reportData[1]);
+	EXPECT_EQ(reportData2, reportData[2]);
+	EXPECT_EQ(reportData3, reportData[3]);
+
+	ASSERT_EQ(0ul, reportExtendedData.size());
+
+}
+
+TEST_F( SQLiteFixture, writeRealData )
+{
+	ShowMessage( "Begin Test: OutputProcessor, writeRealData" );
+
+	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
+
+	DataGlobals::eso_stream = eso_strm.get();
+
+	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	WriteRealData( 1, "1", 0 );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 0.1 );
+	EXPECT_EQ( delimitedString( { "1,0.1" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", -0.1 );
+	EXPECT_EQ( delimitedString( { "1,-0.1" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-2 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-02" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-3 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-03" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-4 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-04" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-5 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-05" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-6 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-06" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-7 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-07" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-8 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-08" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-9 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-09" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-10 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-10" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-11 );
+	// this seems to always be low... not 1.0e-11
+	EXPECT_EQ( delimitedString( { "1,9.999999999999999E-12" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-12 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-12" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-13 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-13" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-14 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-14" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-15 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-15" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-16 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-16" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", -1.0e-16 );
+	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E-16" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e-19 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-19" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 0.5 );
+	EXPECT_EQ( delimitedString( { "1,0.5" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0 );
+	EXPECT_EQ( delimitedString( { "1,1." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 10.0 );
+	EXPECT_EQ( delimitedString( { "1,10." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e2 );
+	EXPECT_EQ( delimitedString( { "1,100." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e3 );
+	EXPECT_EQ( delimitedString( { "1,1000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e4 );
+	EXPECT_EQ( delimitedString( { "1,10000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e5 );
+	EXPECT_EQ( delimitedString( { "1,100000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e6 );
+	EXPECT_EQ( delimitedString( { "1,1000000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e7 );
+	EXPECT_EQ( delimitedString( { "1,10000000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e8 );
+	EXPECT_EQ( delimitedString( { "1,100000000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e9 );
+	EXPECT_EQ( delimitedString( { "1,1000000000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e10 );
+	EXPECT_EQ( delimitedString( { "1,10000000000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e11 );
+	EXPECT_EQ( delimitedString( { "1,100000000000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e12 );
+	EXPECT_EQ( delimitedString( { "1,1000000000000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e13 );
+	EXPECT_EQ( delimitedString( { "1,10000000000000." } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e14 );
+	EXPECT_EQ( delimitedString( { "1,100000000000000" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e15 );
+	EXPECT_EQ( delimitedString( { "1,1000000000000000" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e16 );
+	EXPECT_EQ( delimitedString( { "1,10000000000000000" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e17 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+17" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", -1.0e16 );
+	EXPECT_EQ( delimitedString( { "1,-10000000000000000" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", -1.0e17 );
+	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E+17" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteRealData( 1, "1", 1.0e25 );
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+25" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+	std::vector< std::vector<std::string> > reportData(
+	{
+		{ "1", "1", "1", "0.0" },
+		{ "2", "1", "1", "0.1" },
+		{ "3", "1", "1", "-0.1" },
+		{ "4", "1", "1", "0.01" },
+		{ "5", "1", "1", "0.001" },
+		{ "6", "1", "1", "0.0001" },
+		{ "7", "1", "1", "1.0e-05" },
+		{ "8", "1", "1", "1.0e-06" },
+		{ "9", "1", "1", "1.0e-07" },
+		{ "10", "1", "1", "1.0e-08" },
+		{ "11", "1", "1", "1.0e-09" },
+		{ "12", "1", "1", "1.0e-10" },
+		{ "13", "1", "1", "1.0e-11" },
+		{ "14", "1", "1", "1.0e-12" },
+		{ "15", "1", "1", "1.0e-13" },
+		{ "16", "1", "1", "1.0e-14" },
+		{ "17", "1", "1", "1.0e-15" },
+		{ "18", "1", "1", "1.0e-16" },
+		{ "19", "1", "1", "-1.0e-16" },
+		{ "20", "1", "1", "1.0e-19" },
+		{ "21", "1", "1", "0.5" },
+		{ "22", "1", "1", "1.0" },
+		{ "23", "1", "1", "10.0" },
+		{ "24", "1", "1", "100.0" },
+		{ "25", "1", "1", "1000.0" },
+		{ "26", "1", "1", "10000.0" },
+		{ "27", "1", "1", "100000.0" },
+		{ "28", "1", "1", "1000000.0" },
+		{ "29", "1", "1", "10000000.0" },
+		{ "30", "1", "1", "100000000.0" },
+		{ "31", "1", "1", "1000000000.0" },
+		{ "32", "1", "1", "10000000000.0" },
+		{ "33", "1", "1", "100000000000.0" },
+		{ "34", "1", "1", "1000000000000.0" },
+		{ "35", "1", "1", "10000000000000.0" },
+		{ "36", "1", "1", "100000000000000.0" },
+		{ "37", "1", "1", "1.0e+15" },
+		{ "38", "1", "1", "1.0e+16" },
+		{ "39", "1", "1", "1.0e+17" },
+		{ "40", "1", "1", "-1.0e+16" },
+		{ "41", "1", "1", "-1.0e+17" },
+		{ "42", "1", "1", "1.0e+25" }
+	});
+
+	std::vector< std::vector<std::string> > reportExtendedData({});
+
+	ASSERT_EQ( reportData.size(), reportDataResults.size() );
+	for (size_t i = 0; i < reportDataResults.size(); ++i)
+	{
+		EXPECT_EQ( reportData[i], reportDataResults[i] );
+	}
+
+	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
 
 }
