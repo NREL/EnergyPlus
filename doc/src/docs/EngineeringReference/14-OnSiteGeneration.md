@@ -22,13 +22,13 @@ The TRACK METER scheme tries to have the generators meet all the electrical dema
 
 The TRACK SCHEDULE scheme tries to have the generators meet all of the electrical demand determined by a user-defined schedule.
 
-The FOLLOW THERMAL and FOLLOW THERMAL LIMIT ELECTRICAL schemes run the generators to meet thermal demand. The thermal demand is determined from the plant modeling and depends on the flow requested by other components on the demand side of the plant loop, the loop temperatures, and the loop temperature setpoint. The electric load center distribution manager converts the thermal load to an electrical load using a nominal ratio of the thermal to electrical power production for each generator. For these schemes, the generator needs to be connected to the supply side of a plant loop and serve components that use hot water on the demand side of the plant loop. The thermal load request is obtained from the plant data structure (structure location in code is PlantLoop%LoopSide%Branch%Comp%MyLoad).The distribution manager converts the thermal load, <span>${q_{thermal}}$</span>, to an electrical load using:
+The FOLLOW THERMAL and FOLLOW THERMAL LIMIT ELECTRICAL schemes run the generators to meet thermal demand. The thermal demand is determined from the plant modeling and depends on the flow requested by other components on the demand side of the plant loop, the loop temperatures, and the loop temperature setpoint. The electric load center distribution manager converts the thermal load to an electrical load using a nominal ratio of the thermal to electrical power production for each generator. For these schemes, the generator needs to be connected to the supply side of a plant loop and serve components that use hot water on the demand side of the plant loop. The thermal load request is obtained from the plant data structure (structure location in code is PlantLoop%LoopSide%Branch%Comp%MyLoad).The distribution manager converts the thermal load, <span>\({q_{thermal}}\)</span>, to an electrical load using:
 
 <div>$${q_{Elect}} = \frac{{{q_{thermal}}}}{{ThermElectRatio}}$$</div>
 
 where,
 
-<span>$ThermElectRatio$</span> is a nominal, constant, user-defined value for the ratio of thermal production to electrical production for a cogenerator. This ratio is used for supervisory control and dispatch of the electric power request to the generator; however, the cogenerator model may determine that actual performance varies from this nominal value at different times in the simulation when operating conditions differ from those used for the nominal ratio.
+<span>\(ThermElectRatio\)</span> is a nominal, constant, user-defined value for the ratio of thermal production to electrical production for a cogenerator. This ratio is used for supervisory control and dispatch of the electric power request to the generator; however, the cogenerator model may determine that actual performance varies from this nominal value at different times in the simulation when operating conditions differ from those used for the nominal ratio.
 
 For all operating schemes except BASELOAD, a total electric load reduction target (or thermal load converted to electrical equivalent) is established for the load center based on the specific operating scheme. The load center then requests that its generators operate, one-by-one in the order specified, until the target is met or exceeded. Generators that are not scheduled as ‘available’ for the simulation time step are not called to operate. The requested power demand to be met by each generator is the **smaller of** the nominal ‘rated’ electric power output (as specified in the ElectricLoadCenter:Generators object) or the remaining total electric load reduction target for the load center. After each electric generator is requested to operate, the actual electric power delivered by the generator, which may be greater than or less than the requested amount due to inputs specified in the generator performance model (e.g., Generator:CombustionTurbine, Generator:MicroTurbine, etc.), is used to update the remaining total electric power target for the other generators associated with this load center.
 
@@ -92,29 +92,29 @@ The electric load center generators (object name: ElectricLoadCenter:Generators)
 
 ### Inverters
 
-EnergyPlus includes three models for converting Direct Current (DC) electrical power into Alternating Current (AC) electrical power. The DC power into the inverter, <span>${P_{DC - in}}$</span>, is converted to AC power out, <span>${P_{AC - out}}$</span>, of the inverter using:
+EnergyPlus includes three models for converting Direct Current (DC) electrical power into Alternating Current (AC) electrical power. The DC power into the inverter, <span>\({P_{DC - in}}\)</span>, is converted to AC power out, <span>\({P_{AC - out}}\)</span>, of the inverter using:
 
 <div>$${P_{AC - out}} = {P_{DC - in}} \cdot {\varepsilon_{inverter}}$$</div>
 
-The inverter efficiency is determined using one of the three models. For the“Simple” inveter model, efficiency is constant and input by the user. For the “Look Up Table” model, the efficiency is calculated using linear interpolation. For the “Function of Power” model, the efficiency is calculating using a single-variable curve object. For both the Look Up Table and Function of Power models, the power production is normalized by <span>${P_{DC - in}}$</span>.
+The inverter efficiency is determined using one of the three models. For the“Simple” inveter model, efficiency is constant and input by the user. For the “Look Up Table” model, the efficiency is calculated using linear interpolation. For the “Function of Power” model, the efficiency is calculating using a single-variable curve object. For both the Look Up Table and Function of Power models, the power production is normalized by <span>\({P_{DC - in}}\)</span>.
 
-The thermal losses are calculated from the difference between <span>${P_{DC - in}}$</span> and <span>${P_{AC - out}}$</span>.
+The thermal losses are calculated from the difference between <span>\({P_{DC - in}}\)</span> and <span>\({P_{AC - out}}\)</span>.
 
 ### Electrical Storage
 
 EnergyPlus includes two models for storing electrical energy: a simple model that is not intended to represent any specific type of storage technology and a battery model that represents the kinetic battery model originally developed by Manwell and McGowan.
 
-The simple model might be called “constrained bucket with energy losses.”  The “bucket” holds a quantity of Joules of electrical energy, refered to as the state of charge. There are losses and limits to storing and drawing power but otherwise the bucket just holds electricity. The user sets constraints on the rates of charging,<span>${P_{stor - {\rm{charge - max}}}}$</span>, and drawing, <span>${P_{stor - {\rm{d}}raw{\rm{ - max}}}}$</span>. The user defines efficiencies for charging,<span>${\varepsilon_{{\rm{charge}}}}$</span>, and drawing, <span>${\varepsilon_{draw}}$</span>. The user defines an initial state of charge and a maximum state of charge.
+The simple model might be called “constrained bucket with energy losses.”  The “bucket” holds a quantity of Joules of electrical energy, refered to as the state of charge. There are losses and limits to storing and drawing power but otherwise the bucket just holds electricity. The user sets constraints on the rates of charging,<span>\({P_{stor - {\rm{charge - max}}}}\)</span>, and drawing, <span>\({P_{stor - {\rm{d}}raw{\rm{ - max}}}}\)</span>. The user defines efficiencies for charging,<span>\({\varepsilon_{{\rm{charge}}}}\)</span>, and drawing, <span>\({\varepsilon_{draw}}\)</span>. The user defines an initial state of charge and a maximum state of charge.
 
-The storage control algorithms determine a value for the charging power, <span>${P_{stor - ch\arg e}}$</span>, or the drawing power, <span>${P_{stor - draw}}$</span>. The basic storage control algorithm is to compare the requested generator electricity loads to the current available supply and make up the difference with storage. If extra power is generated, then store it. If there is a shortage, then attempt to draw from storage to meet the remaining electricity request. The load center dispatchs a requested electric load for each generator, runs each generator, and then stores the actual power. This power dispatch can be a function of many different things depending on the operating scheme. The sum of the generator load requests,<span>${P_{load - request}}$</span>, is then compared to the sum of the generator production, <span>${P_{{\rm{gen}} - {\rm{supply}}}}$</span>
+The storage control algorithms determine a value for the charging power, <span>\({P_{stor - ch\arg e}}\)</span>, or the drawing power, <span>\({P_{stor - draw}}\)</span>. The basic storage control algorithm is to compare the requested generator electricity loads to the current available supply and make up the difference with storage. If extra power is generated, then store it. If there is a shortage, then attempt to draw from storage to meet the remaining electricity request. The load center dispatchs a requested electric load for each generator, runs each generator, and then stores the actual power. This power dispatch can be a function of many different things depending on the operating scheme. The sum of the generator load requests,<span>\({P_{load - request}}\)</span>, is then compared to the sum of the generator production, <span>\({P_{{\rm{gen}} - {\rm{supply}}}}\)</span>
 
 <div>$$IF\quad ({P_{load - request}} < {P_{gen - \sup ply}})\quad {P_{stor - ch\arg e}} = {P_{gen - \sup ply}} - {P_{load - request}}$$</div>
 
 <div>$$IF\quad ({P_{load - request}} > {P_{gen - \sup ply}})\quad {P_{stor - draw}} = {P_{load - request}} - {P_{gen - \sup ply}}$$</div>
 
-The limits <span>${P_{stor - {\rm{charge - max}}}}$</span> and <span>${P_{stor - {\rm{d}}raw{\rm{ - max}}}}$</span> are applied.
+The limits <span>\({P_{stor - {\rm{charge - max}}}}\)</span> and <span>\({P_{stor - {\rm{d}}raw{\rm{ - max}}}}\)</span> are applied.
 
-If charging, the new state of charge, <span>$Q_{stor}^{t + \Delta t}$</span>, is determined using:
+If charging, the new state of charge, <span>\(Q_{stor}^{t + \Delta t}\)</span>, is determined using:
 
 <div>$$Q_{stor}^{t + \Delta t} = Q_{stor}^t + {P_{stor - ch\arg e}} \cdot {\varepsilon_{{\rm{charge}}}} \cdot \Delta t$$</div>
 
@@ -122,7 +122,7 @@ If drawing, the new state of charge is:
 
 <div>$$Q_{stor}^{t + \Delta t} = Q_{stor}^t - \frac{{{P_{stor - draw}} \cdot \Delta t}}{{{\varepsilon_{draw}}}}$$</div>
 
-Where <span>$\Delta t$</span> is the length of the system time step in seconds.
+Where <span>\(\Delta t\)</span> is the length of the system time step in seconds.
 
 The storage device has an availability schedule. If it is not available then no power can be drawn or stored.
 
@@ -132,27 +132,27 @@ The gross electric power drawn and stored includes losses in the form of heat. T
 
 The Kinetic Battery Model (KiBaM) (object: ElectricLoadCenter:Storage:Battery) was originally developed by Manwell and McGowan (1993) for use in time series performance models of hybrid energy systems. The model is called kinetic because it is based on a chemical kinetics process to simulate the battery charging and discharging behavior. The model, with different improvements and modifications, has been incorporated into the software Hybrid2 and HOMER as the electrical storage module of hybrid and distributed power systems. In 2005, KiBaM was implemented as a stand-alone application in support of the European Union Benchmarking research project (Bindner et al. 2005).
 
-The Kinetic Battery Model assumes that the battery charge is distributed over two tanks: an available-charge tank and a bound-charge tank. The tank for available charges can supply electrons directly to the load, whereas the tank for chemically bound charges can only supply electrons to the available-charge tank. At any time, the total charge <span>$q$</span> in the battery is the sum of the available charge (<span>${q_1}$</span>) and bound charge (<span>${q_2}$</span>). That is:
+The Kinetic Battery Model assumes that the battery charge is distributed over two tanks: an available-charge tank and a bound-charge tank. The tank for available charges can supply electrons directly to the load, whereas the tank for chemically bound charges can only supply electrons to the available-charge tank. At any time, the total charge <span>\(q\)</span> in the battery is the sum of the available charge (<span>\({q_1}\)</span>) and bound charge (<span>\({q_2}\)</span>). That is:
 
 <div>$$q = {q_1} + {q_2}$$</div>
 
-Based on the governing equations on the change of charge in both tanks (Manwell and McGowan 1993), the battery capacity can be related to a constant charge/discharge current (<span>$I$</span>) as the following equation:
+Based on the governing equations on the change of charge in both tanks (Manwell and McGowan 1993), the battery capacity can be related to a constant charge/discharge current (<span>\(I\)</span>) as the following equation:
 
 <div>$${q_{\max }}(I) = \frac{{{q_{\max }}k \cdot c \cdot t}}{{1 - {e^{ - kt}} + c(kt - 1 + {e^{ - kt}})}}$$</div>
 
 where,
 
-<span>${q_{\max }}(I)$</span>  : Maximum capacity (Ah) at charge or discharge current I
+<span>\({q_{\max }}(I)\)</span>  : Maximum capacity (Ah) at charge or discharge current I
 
-<span>${q_{\max }}$</span>       : Maximum capacity (Ah) at infinitesimal current
+<span>\({q_{\max }}\)</span>       : Maximum capacity (Ah) at infinitesimal current
 
-<span>$t$</span>            : Charge or discharge time (hr), defined by <span>$t = \frac{{{q_{\max }}(I)}}{I}$</span>
+<span>\(t\)</span>            : Charge or discharge time (hr), defined by <span>\(t = \frac{{{q_{\max }}(I)}}{I}\)</span>
 
-<span>$k$</span>           : Constant coefficient (hr<sup>-1</sup>)
+<span>\(k\)</span>           : Constant coefficient (hr<sup>-1</sup>)
 
-<span>$c$</span>           : Parameter indicating the ratio of available charge capacity to total capacity
+<span>\(c\)</span>           : Parameter indicating the ratio of available charge capacity to total capacity
 
-Assuming that a constant current is used in any time step for charging and discharging, the available charge (<span>${q_1}$</span>) and bound charge (<span>${q_2}$</span>) at any time step are given by:
+Assuming that a constant current is used in any time step for charging and discharging, the available charge (<span>\({q_1}\)</span>) and bound charge (<span>\({q_2}\)</span>) at any time step are given by:
 
 <div>$${q_1} = {q_{1,0}}{e^{ - k\Delta t}} + \frac{{({q_0}kc - I)(1 - {e^{ - k\Delta t}})}}{k} - \frac{{Ic(k\Delta t - 1 + {e^{ - k\Delta t}})}}{k}$$</div>
 
@@ -160,13 +160,13 @@ Assuming that a constant current is used in any time step for charging and disch
 
 where,
 
-<span>${q_{1,0}}$</span>  :  Available charge at the beginning of time step (Ah)
+<span>\({q_{1,0}}\)</span>  :  Available charge at the beginning of time step (Ah)
 
-<span>${q_{2,0}}$</span> :  Bound charge at the beginning of time step (Ah)
+<span>\({q_{2,0}}\)</span> :  Bound charge at the beginning of time step (Ah)
 
-<span>${q_0}$</span>   :  Total charge at the beginning of time step (Ah), <span>${q_0} = {q_{1,0}} + {q_{2,0}}$</span>
+<span>\({q_0}\)</span>   :  Total charge at the beginning of time step (Ah), <span>\({q_0} = {q_{1,0}} + {q_{2,0}}\)</span>
 
-<span>$\Delta t$</span>   :  Length of time step (hr)
+<span>\(\Delta t\)</span>   :  Length of time step (hr)
 
 KiBaM views the battery as a voltage source in series with an electric resistance (Figure 338). The internal resistance is assumed to be constant and the open circuit voltage varies with current and state of charge.
 
@@ -174,7 +174,7 @@ KiBaM views the battery as a voltage source in series with an electric resistanc
 
 Figure 338. Electrical equivalent model for KiBaM
 
-The battery’s open circuit voltage is modeled in the same form for charging and discharging, but with different coefficients. The open circuit voltage in charging (<span>${E_c}$</span>) and in discharging (<span>${E_d}$</span>) can be respectively expressed as:
+The battery’s open circuit voltage is modeled in the same form for charging and discharging, but with different coefficients. The open circuit voltage in charging (<span>\({E_c}\)</span>) and in discharging (<span>\({E_d}\)</span>) can be respectively expressed as:
 
 <div>$${E_c} = {E_{0,d}} + {A_c}{X_c} + \frac{{{C_c}{X_c}}}{{{D_c} - {X_c}}}$$</div>
 
@@ -182,15 +182,15 @@ The battery’s open circuit voltage is modeled in the same form for charging an
 
 where,
 
-<span>${E_{0,c}}$</span>               : Open circuit voltage for a fully charged battery
+<span>\({E_{0,c}}\)</span>               : Open circuit voltage for a fully charged battery
 
-<span>${E_{0,d}}$</span>               : Open circuit voltage for a fully discharged battery
+<span>\({E_{0,d}}\)</span>               : Open circuit voltage for a fully discharged battery
 
-<span>${A_c}$</span>, <span>${C_c}$</span>, <span>${D_c}$</span>   : Constant parameters for charging
+<span>\({A_c}\)</span>, <span>\({C_c}\)</span>, <span>\({D_c}\)</span>   : Constant parameters for charging
 
-<span>${A_d}$</span>, <span>${C_d}$</span>, <span>${D_d}$</span>  : Constant parameters for discharging
+<span>\({A_d}\)</span>, <span>\({C_d}\)</span>, <span>\({D_d}\)</span>  : Constant parameters for discharging
 
-<span>${X_c}$</span>, <span>${X_d}$</span>        : Normalized maximum capacity at a given charging or discharging current, calculated as:
+<span>\({X_c}\)</span>, <span>\({X_d}\)</span>        : Normalized maximum capacity at a given charging or discharging current, calculated as:
 
 <div>$$
   X = \left\{
@@ -203,7 +203,7 @@ $$</div>
 
 It needs to be noted that the performance curve (Curve:RectangularHyperbola2) used in the model input covers the 2<sup>nd</sup> and the 3<sup>rd</sup> item of the open circuit voltage equation. Due to the reformatting of performance curve, the voltage function regression coefficients can map to the curve coefficients as follows:
 
-<span>${C_1} =  - C$</span> ;<span>${C_2} =  - D$</span>;<span>${C_3} = A$</span>
+<span>\({C_1} =  - C\)</span> ;<span>\({C_2} =  - D\)</span>;<span>\({C_3} = A\)</span>
 
 With open circuit voltage, the battery terminal voltage (V) can be calculated as:
 
@@ -211,7 +211,7 @@ With open circuit voltage, the battery terminal voltage (V) can be calculated as
 
 where, R is the battery internal resistance in Ohms; the current is positive for discharging and negative for charging.
 
-Given desired power in/out of the battery, the desired charge or discharge current can be calculated from the basic power equation: <span>$P = VI$</span>. In this calculation, iteration is needed to ensure the electric current has converged and the battery operation satisfies all specified technical constraints such as maximum discharge current and charge rate limit.
+Given desired power in/out of the battery, the desired charge or discharge current can be calculated from the basic power equation: <span>\(P = VI\)</span>. In this calculation, iteration is needed to ensure the electric current has converged and the battery operation satisfies all specified technical constraints such as maximum discharge current and charge rate limit.
 
 KiBaM assumes that battery life is a primary function of charge/discharge cycles. One cycle is defined as the process of starting from a certain state of charge (SOC), the battery is discharged to a lower SOC and then recharged back to the starting SOC. It is regarded that the magnitude of cycle plays more important than the average of SOC during the cycle. This means that in terms of the impact on battery life, the cycle from 90% to 70% and then recharge back to 90% of SOC is equivalent to another cycle from 50% to 30% and then recharge back to 50% of SOC.  Battery life in terms of the number of cycles is predicted as a function of the cycle range measured by the fractional depth of discharge. A double exponential equation is used to capture the damage to batteries due to cycling. The equation takes the following form where the coefficients need to be derived from battery test data via curve fitting.
 
@@ -219,9 +219,9 @@ KiBaM assumes that battery life is a primary function of charge/discharge cycles
 
 where,
 
-<span>${C_F}$</span>    :    Cycles to failure
+<span>\({C_F}\)</span>    :    Cycles to failure
 
-<span>${C_1}$</span>-<span>${C_5}$</span>:    Regression coefficients
+<span>\({C_1}\)</span>-<span>\({C_5}\)</span>:    Regression coefficients
 
 R       :    Cycle range in terms of fractional SOC
 
@@ -233,9 +233,9 @@ where,
 
 D    : Fractional battery damage. For example, a value of 0.5 at the end of simulation means that half of the battery life is used up after the length of the simulation period.
 
-<span>${C_{F,i}}$</span>: Number of cycles to failure for the i-th cycle range
+<span>\({C_{F,i}}\)</span>: Number of cycles to failure for the i-th cycle range
 
-<span>${N_i}$</span>  : Total number of cycles over the simulation with the i-th cycle range
+<span>\({N_i}\)</span>  : Total number of cycles over the simulation with the i-th cycle range
 
 It needs to be noted that the temperature effects on battery performance and battery self-discharge are not supported in the current model.
 
@@ -265,13 +265,13 @@ Given the no load loss (NL) and the load loss (LL) at rated load and conditions,
 
 where,
 
-<span>$TL(t)$</span>        Total energy loss at time t (W)
+<span>\(TL(t)\)</span>        Total energy loss at time t (W)
 
-<span>$LL(t)$</span>        Load loss at time t (W)
+<span>\(LL(t)\)</span>        Load loss at time t (W)
 
-<span>$P(t)$</span>          Per unit load at time t
+<span>\(P(t)\)</span>          Per unit load at time t
 
-<span>${f_T}(t)$</span>         Temperature correction factor for the load loss at time t
+<span>\({f_T}(t)\)</span>         Temperature correction factor for the load loss at time t
 
 
 
@@ -281,9 +281,9 @@ The per unit load at time t is calculated as:
 
 where,
 
-<span>$Load(t)$</span>Transformer load at time t (W)
+<span>\(Load(t)\)</span>Transformer load at time t (W)
 
-<span>${S_B}$</span> Transformer nameplate rating (VA)
+<span>\({S_B}\)</span> Transformer nameplate rating (VA)
 
 The temperature correction factor at time t is calculated as (NEMA 2002):
 
@@ -291,13 +291,13 @@ The temperature correction factor at time t is calculated as (NEMA 2002):
 
 where,
 
-<span>${L_{dc}}$</span>            Per unit load loss due to electrical resistance
+<span>\({L_{dc}}\)</span>            Per unit load loss due to electrical resistance
 
-<span>${L_{eddy}}$</span>          Per unit load loss due to eddy currents
+<span>\({L_{eddy}}\)</span>          Per unit load loss due to eddy currents
 
-<span>$R(t)$</span>          Winding electrical resistance at time t
+<span>\(R(t)\)</span>          Winding electrical resistance at time t
 
-<span>${R_{ref}}$</span>           Winding electrical resistance at the full load reference conditions
+<span>\({R_{ref}}\)</span>           Winding electrical resistance at the full load reference conditions
 
 The ratio of winding electrical resistance is calculated as:
 
@@ -305,17 +305,17 @@ The ratio of winding electrical resistance is calculated as:
 
 where,
 
-<span>$F$</span>  Thermal coefficient of resistance for the winding material (=225 for aluminum and 234.5 for copper)
+<span>\(F\)</span>  Thermal coefficient of resistance for the winding material (=225 for aluminum and 234.5 for copper)
 
-<span>${T_{winding,ref}}$</span>Winding temperature rise at the full load reference conditions (°C)
+<span>\({T_{winding,ref}}\)</span>Winding temperature rise at the full load reference conditions (°C)
 
-<span>${T_{winding}}(t)$</span>Winding temperature rise at time t (°C)
+<span>\({T_{winding}}(t)\)</span>Winding temperature rise at time t (°C)
 
-<span>${T_{amb,ref}}$</span>       Ambient temperature at the reference condition (=20 °C)
+<span>\({T_{amb,ref}}\)</span>       Ambient temperature at the reference condition (=20 °C)
 
-<span>${T_{amb}}(t)$</span>      Ambient temperature at time t (°C)
+<span>\({T_{amb}}(t)\)</span>      Ambient temperature at time t (°C)
 
-The Ambient temperature <span>${T_{amb}}(t)$</span>is equal to the zone temperature if a thermal zone is specified in the input; otherwise, it is assumed equal to 20 °C. The winding temperature rise at time t is calculated as (Barnes et al. 1997):
+The Ambient temperature <span>\({T_{amb}}(t)\)</span>is equal to the zone temperature if a thermal zone is specified in the input; otherwise, it is assumed equal to 20 °C. The winding temperature rise at time t is calculated as (Barnes et al. 1997):
 
 <div>$${T_{winding}}(t) = P{(t)^{1.6}}*{T_{winding.ref}}$$</div>
 
@@ -331,13 +331,13 @@ The nameplate efficiency can be expressed as:
 
 where,
 
-<span>${\eta_{np}}$</span>            Nameplate efficiency
+<span>\({\eta_{np}}\)</span>            Nameplate efficiency
 
-<span>${S_B}$</span> Nameplate rating (VA)
+<span>\({S_B}\)</span> Nameplate rating (VA)
 
-<span>${P_{np}}$</span>            Per unit load at which the nameplate efficiency is measured
+<span>\({P_{np}}\)</span>            Per unit load at which the nameplate efficiency is measured
 
-<span>${f_{T,np}}$</span>          Applied temperature correction factor for the nameplate efficiency
+<span>\({f_{T,np}}\)</span>          Applied temperature correction factor for the nameplate efficiency
 
 Maximum efficiency generally occurs when the load loss is equal to the no-load loss. Because the no-load loss does not vary with the load on the transformer, the following relationship can be established:
 
@@ -345,9 +345,9 @@ Maximum efficiency generally occurs when the load loss is equal to the no-load l
 
 where,
 
-<span>${P_{\max ,\eta }}$</span>         Per unit load at which the maximum efficiency is obtained
+<span>\({P_{\max ,\eta }}\)</span>         Per unit load at which the maximum efficiency is obtained
 
-<span>${f_{T,\max  - \eta }}$</span>     Applied temperature correction factor for the maximum efficiency
+<span>\({f_{T,\max  - \eta }}\)</span>     Applied temperature correction factor for the maximum efficiency
 
 Transformers typically have close per unit loads for the nameplate efficiency and the maximum efficiency. Therefore, it is reasonable to assume that the applied temperature correction factors are equal at those two efficiencies. This implies that:
 
@@ -1092,15 +1092,15 @@ For each simulation time step that the generator is being asked to operate (i.e.
 
 where:
 
-<span>${P_{Elec,Full\,Load}}$</span>= Full load electrical power output (W)
+<span>\({P_{Elec,Full\,Load}}\)</span>= Full load electrical power output (W)
 
-<span>${P_{Elec,Ref}}$</span>= Reference Electrical Power Output, user input (W)
+<span>\({P_{Elec,Ref}}\)</span>= Reference Electrical Power Output, user input (W)
 
-<span>$PowerFTempElev$</span>= User-defined Electric Power Modifier Curve (function of temperature and elevation) evaluated at the current combustion air inlet temperature and elevation
+<span>\(PowerFTempElev\)</span>= User-defined Electric Power Modifier Curve (function of temperature and elevation) evaluated at the current combustion air inlet temperature and elevation
 
-<span>${T_{a,i}}$</span>= Combustion air inlet temperature (°C)
+<span>\({T_{a,i}}\)</span>= Combustion air inlet temperature (°C)
 
-<span>$Elev$</span>= Elevation (m). This value obtained from the Location object or the weather file.
+<span>\(Elev\)</span>= Elevation (m). This value obtained from the Location object or the weather file.
 
 The full load electrical power output of the generator is then checked against the minimum and maximum full load electrical power outputs specified by the user:
 
@@ -1108,9 +1108,9 @@ The full load electrical power output of the generator is then checked against t
 
 <div>$${P_{Elec,Full\,Load}} = MAX\left( {{P_{Elec,Full\,Load}},{P_{FL\_Min}}} \right)$$</div>
 
-<span>${P_{FL\_Max}}$</span> = Maximum Full Load Electrical Power Output, user input (W)
+<span>\({P_{FL\_Max}}\)</span> = Maximum Full Load Electrical Power Output, user input (W)
 
-<span>${P_{FL\_Min}}$</span> = Minimum Full Load Electrical Power Output, user input (W)
+<span>\({P_{FL\_Min}}\)</span> = Minimum Full Load Electrical Power Output, user input (W)
 
 The actual (operating) electrical power output from the generator is determined next based on the load requested by the Electric Load Center, the generator’s minimum and maximum part-load ratios, and the ancillary power.
 
@@ -1131,17 +1131,17 @@ The actual (operating) electrical power output from the generator is determined 
 
 where:
 
-<span>${P_{Elec,Operating}}$</span>= Actual (operating) electrical power output (W)
+<span>\({P_{Elec,Operating}}\)</span>= Actual (operating) electrical power output (W)
 
-<span>$Load$</span>  = Electrical power output being requested by the Electric Load Center (W)
+<span>\(Load\)</span>  = Electrical power output being requested by the Electric Load Center (W)
 
-<span>${P_{Ancillary}}$</span> = Ancillary Power, user input (W)
+<span>\({P_{Ancillary}}\)</span> = Ancillary Power, user input (W)
 
-<span>$PLR$</span>= Part-load ratio of the electric generator
+<span>\(PLR\)</span>= Part-load ratio of the electric generator
 
-<span>$PL{R_{\max }}$</span>= Maximum part-load ratio of the electric generator (i.e., the maximum value for the independent variable [PLR] defined in the Curve:Quadratic or Curve:Cubic object for the Electrical Efficiency Modifier Curve [function of part-load ratio])
+<span>\(PL{R_{\max }}\)</span>= Maximum part-load ratio of the electric generator (i.e., the maximum value for the independent variable [PLR] defined in the Curve:Quadratic or Curve:Cubic object for the Electrical Efficiency Modifier Curve [function of part-load ratio])
 
-<span>$PL{R_{\min }}$</span>= Minimum part-load ratio of the electric generator (i.e., the minimum value for the independent variable [PLR] defined in the Curve:Quadratic or Curve:Cubic object for the Electrical Efficiency Modifier Curve [function of part-load ratio])
+<span>\(PL{R_{\min }}\)</span>= Minimum part-load ratio of the electric generator (i.e., the minimum value for the independent variable [PLR] defined in the Curve:Quadratic or Curve:Cubic object for the Electrical Efficiency Modifier Curve [function of part-load ratio])
 
 The generator’s electrical efficiency is then calculated based on the user-specified reference electrical efficiency (lower heating value [LHV] basis) and two electrical efficiency modifier curves.
 
@@ -1153,13 +1153,13 @@ The generator’s electrical efficiency is then calculated based on the user-spe
 
 where:
 
-<span>$ElecEfficiencyFTemp$</span> = User-defined Electrical Efficiency Modifier Curve (function of temperature) evaluated at the current combustion air inlet temperature
+<span>\(ElecEfficiencyFTemp\)</span> = User-defined Electrical Efficiency Modifier Curve (function of temperature) evaluated at the current combustion air inlet temperature
 
-<span>$ElecEfficiencyFPLR$</span> = User-defined Electrical Efficiency Modifier Curve (function of part-load ratio) evaluated at the current operating part-load ratio
+<span>\(ElecEfficiencyFPLR\)</span> = User-defined Electrical Efficiency Modifier Curve (function of part-load ratio) evaluated at the current operating part-load ratio
 
-<span>$ElecEf{f_{Operating}}$</span> = Electrical efficiency at the current operating conditions
+<span>\(ElecEf{f_{Operating}}\)</span> = Electrical efficiency at the current operating conditions
 
-<span>$ElecEf{f_{Ref,LHV}}$</span> = Reference Electrical Efficiency (LHV [lower heating value] Basis),     user input
+<span>\(ElecEf{f_{Ref,LHV}}\)</span> = Reference Electrical Efficiency (LHV [lower heating value] Basis),     user input
 
 The fuel energy consumption rate (LHV Basis) is then calculated as follows:
 
@@ -1167,15 +1167,15 @@ The fuel energy consumption rate (LHV Basis) is then calculated as follows:
 
 where:
 
-<span>${\dot Q_{Fuel,LHV}}$</span> = Fuel energy consumption rate, LHV basis (W)
+<span>\({\dot Q_{Fuel,LHV}}\)</span> = Fuel energy consumption rate, LHV basis (W)
 
-If *ElecEff<sub>Operating</sub>* is equal to zero, then *P<sub>Operating</sub>* and <span>${\dot Q_{Fuel,LHV}}$</span><sub> </sub>are set to zero. The fuel mass flow rate is then calculated.
+If *ElecEff<sub>Operating</sub>* is equal to zero, then *P<sub>Operating</sub>* and <span>\({\dot Q_{Fuel,LHV}}\)</span><sub> </sub>are set to zero. The fuel mass flow rate is then calculated.
 
 <div>$${\dot m_{fuel}} = {\raise0.7ex\hbox{${{{\dot Q}_{Fuel,LHV}}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_{Fuel,LHV}}} {\left( {LHV*1000} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {LHV*1000} \right)}$}}$$</div>
 
 where:
 
-<span>${\dot m_{fuel}}$</span> = Mass flow rate of fuel being consumed by the generator (kg/s), report variable “Generator &lt;FuelType&gt; Mass Flow Rate [kg/s]”
+<span>\({\dot m_{fuel}}\)</span> = Mass flow rate of fuel being consumed by the generator (kg/s), report variable “Generator &lt;FuelType&gt; Mass Flow Rate [kg/s]”
 
 *LHV* = Fuel Lower Heating Value, user input (kJ/kg)
 
@@ -1187,13 +1187,13 @@ The ancillary power is calculated next using the user-specified ancillary power 
 
 where:
 
-<span>$AnciPowFMdotFuel$</span> = User-defined Ancillary Power Modifier Curve (function of fuel input) evaluated at the actual fuel mass flow rate. This multiplier is assumed to be 1.0 if an ancillary power modifier curve name is not specified in the input.
+<span>\(AnciPowFMdotFuel\)</span> = User-defined Ancillary Power Modifier Curve (function of fuel input) evaluated at the actual fuel mass flow rate. This multiplier is assumed to be 1.0 if an ancillary power modifier curve name is not specified in the input.
 
-<span>${P_{Ancillary}}$</span> = Ancillary power, user input (W)
+<span>\({P_{Ancillary}}\)</span> = Ancillary power, user input (W)
 
-<span>${P_{Ancillary,Operating}}$</span> = Ancillary electric power at the current fuel mass flow rate (W), report variable “Generator Ancillary Electric Power [W]”.
+<span>\({P_{Ancillary,Operating}}\)</span> = Ancillary electric power at the current fuel mass flow rate (W), report variable “Generator Ancillary Electric Power [W]”.
 
-If ancillary power is constant for the simulation (e.g., no modifier curve defined), then the calculations continue as described below. However, if an ancillary power modifier curve has been defined, then the calculations described above for *P<sub>ElecOperating</sub>*, *ElecEff<sub>Operating</sub>*, <span>${\dot Q_{Fuel,LHV}}$</span><sub> </sub>and *P<sub>Ancillary,Operating</sub>* are recalculated in sequence until the solution converges.
+If ancillary power is constant for the simulation (e.g., no modifier curve defined), then the calculations continue as described below. However, if an ancillary power modifier curve has been defined, then the calculations described above for *P<sub>ElecOperating</sub>*, *ElecEff<sub>Operating</sub>*, <span>\({\dot Q_{Fuel,LHV}}\)</span><sub> </sub>and *P<sub>Ancillary,Operating</sub>* are recalculated in sequence until the solution converges.
 
 The generator’s “net” electrical power output is calculated as the difference between the generator’s actual power output and the ancillary electric power as follows.
 
@@ -1201,7 +1201,7 @@ The generator’s “net” electrical power output is calculated as the differe
 
 where:
 
-<span>${P_{Elec,Produced}}$</span> = Generator net electric power output, report variable “Generator Produced Electric Power [W]”
+<span>\({P_{Elec,Produced}}\)</span> = Generator net electric power output, report variable “Generator Produced Electric Power [W]”
 
 The fuel energy consumption rate (higher heating value basis) for the generator is then calculated as follows:
 
@@ -1209,9 +1209,9 @@ The fuel energy consumption rate (higher heating value basis) for the generator 
 
 where:
 
-<span>${\dot Q_{Fuel,HHV}}$</span> = fuel energy consumption rate (W), report variables “Generator &lt;FuelType&gt; HHV Basis Rate [W]” and “Generator Fuel HHV Basis Rate [W]”
+<span>\({\dot Q_{Fuel,HHV}}\)</span> = fuel energy consumption rate (W), report variables “Generator &lt;FuelType&gt; HHV Basis Rate [W]” and “Generator Fuel HHV Basis Rate [W]”
 
-<span>$HHV$</span>= Fuel Higher Heating Value, user input (kJ/kg)
+<span>\(HHV\)</span>= Fuel Higher Heating Value, user input (kJ/kg)
 
 Standby electrical power may also be modeled to simulate controls or other parasitics used by the generator. The standby power is calculated only when the generator is not operating (i.e., *Load* from the Electric Load Center is zero). If the generator operates for a given timestep (i.e., *Load* &gt; 0.0), the standby power is set equal to 0.
 
@@ -1219,9 +1219,9 @@ Standby electrical power may also be modeled to simulate controls or other paras
 
 where:
 
-<span>${P_{Standby,user\,input}}$</span> = Standby power, user input (W)
+<span>\({P_{Standby,user\,input}}\)</span> = Standby power, user input (W)
 
-<span>${P_{Standby}}$</span> = Report variable “Generator Standby Electric Power” (W)
+<span>\({P_{Standby}}\)</span> = Report variable “Generator Standby Electric Power” (W)
 
 Report variables for electric energy produced, electric efficiency (LHV basis), fuel consumption (HHV basis), standby electric consumption and ancillary electric consumption are calculated as follows:
 
@@ -1237,15 +1237,15 @@ Report variables for electric energy produced, electric efficiency (LHV basis), 
 
 where:
 
-<span>${E_{Elec,Produced}}$</span> = Report variable “Generator Produced Electric Energy [J]”
+<span>\({E_{Elec,Produced}}\)</span> = Report variable “Generator Produced Electric Energy [J]”
 
-<span>$ElecEf{f_{Operating,LHV}}$</span>= Report variable “Generator LHV Basis Electric Efficiency [-]”
+<span>\(ElecEf{f_{Operating,LHV}}\)</span>= Report variable “Generator LHV Basis Electric Efficiency [-]”
 
-<span>${Q_{Fuel,HHV}}$</span> = Report variables “Generator &lt;FuelType&gt; HHV Basis Energy [J]” and “Generator Fuel HHV Basis Energy [J]”
+<span>\({Q_{Fuel,HHV}}\)</span> = Report variables “Generator &lt;FuelType&gt; HHV Basis Energy [J]” and “Generator Fuel HHV Basis Energy [J]”
 
-<span>${E_{Standby}}$</span> = Report variable “Generator Standby Electric Energy [J]”
+<span>\({E_{Standby}}\)</span> = Report variable “Generator Standby Electric Energy [J]”
 
-<span>${E_{Ancillary}}$</span> =  Report variable “Generator Ancillary Electric Energy [J]”
+<span>\({E_{Ancillary}}\)</span> =  Report variable “Generator Ancillary Electric Energy [J]”
 
 *TimeStepSys*= HVAC system simulation time step (hr)
 
@@ -1255,17 +1255,17 @@ In addition to calculating electric power production and fuel usage, the model i
 
  where:
 
-<span>${\dot m_w}$</span>= Report variable “Generator Heat Recovery Water Mass Flow Rate [kg/s]”
+<span>\({\dot m_w}\)</span>= Report variable “Generator Heat Recovery Water Mass Flow Rate [kg/s]”
 
-<span>${\dot V_{w,Ref}}$</span>= Reference Heat Recovery Water Flow Rate (m<sup>3</sup>/s), user input
+<span>\({\dot V_{w,Ref}}\)</span>= Reference Heat Recovery Water Flow Rate (m<sup>3</sup>/s), user input
 
-<span>${\rho_w}$</span>= Density of water (kg/m<sup>3</sup>) at 5.05°C
+<span>\({\rho_w}\)</span>= Density of water (kg/m<sup>3</sup>) at 5.05°C
 
-<span>$HeatRecFlowFTempPow$</span>= User-defined Heat Recovery Water Flow Rate Modifier Curve (function of temperature and power) evaluated at the current inlet water temperature and net electrical power output. This multiplier is assumed to be 1.0 if a water flow rate modifier curve name is not specified in the input.
+<span>\(HeatRecFlowFTempPow\)</span>= User-defined Heat Recovery Water Flow Rate Modifier Curve (function of temperature and power) evaluated at the current inlet water temperature and net electrical power output. This multiplier is assumed to be 1.0 if a water flow rate modifier curve name is not specified in the input.
 
-<span>${T_{w,i}}$</span>= Heat recovery inlet water temperature (°C), report variable “Generator Heat Recovery Inlet Temperature [C]”
+<span>\({T_{w,i}}\)</span>= Heat recovery inlet water temperature (°C), report variable “Generator Heat Recovery Inlet Temperature [C]”
 
-<span>${P_{net}}$</span>= Net electrical power output from the generator (W)
+<span>\({P_{net}}\)</span>= Net electrical power output from the generator (W)
 
 The methodology for determining thermal power (heat recovery to water) is similar to that used for calculating electric power production. The generator’s steady-state thermal efficiency is calculated based on the user-specified reference thermal efficiency (LHV basis) and a thermal efficiency modifier curve.
 
@@ -1275,11 +1275,11 @@ The methodology for determining thermal power (heat recovery to water) is simila
 
 where:
 
-<span>$ThermalEf{f_{SS}}$</span>= Steady-state thermal efficiency at current conditions
+<span>\(ThermalEf{f_{SS}}\)</span>= Steady-state thermal efficiency at current conditions
 
-<span>$ThermalEf{f_{Ref,LHV}}$</span>= Reference Thermal Efficiency (LHV Basis), user input
+<span>\(ThermalEf{f_{Ref,LHV}}\)</span>= Reference Thermal Efficiency (LHV Basis), user input
 
-<span>$ThermalEffFTempElev$</span>= User-defined Thermal Efficiency Modifier Curve (function of temperature and elevation) evaluated at the current combustion air inlet temperature and elevation. This multiplier is assumed to be 1.0 if a thermal efficiency modifier curve name is not specified in the input.
+<span>\(ThermalEffFTempElev\)</span>= User-defined Thermal Efficiency Modifier Curve (function of temperature and elevation) evaluated at the current combustion air inlet temperature and elevation. This multiplier is assumed to be 1.0 if a thermal efficiency modifier curve name is not specified in the input.
 
 The steady-state thermal power produced (heat recovery rate) is then calculated:
 
@@ -1287,7 +1287,7 @@ The steady-state thermal power produced (heat recovery rate) is then calculated:
 
 The actual (operating) thermal power is then calculated using the steady-state thermal power and three modifier curves:
 
-<span>${P_{Thermal,Operating}} = {P_{Thermal,SS}}\left( {HeatRecRateFPLR} \right)\left( {HeatRecRateFTemp} \right)\left( {HeatRecRateFFlow} \right)$</span><span>$\begin{array}{l}HeatRecRateFPLR = {g_1} + {g_2}\left( {PLR} \right) + {g_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{g_1} + {g_2}\left( {PLR} \right) + {g_3}{\left( {PLR} \right)^2} + {g_4}{\left( {PLR} \right)^3}\end{array}$</span>
+<span>\({P_{Thermal,Operating}} = {P_{Thermal,SS}}\left( {HeatRecRateFPLR} \right)\left( {HeatRecRateFTemp} \right)\left( {HeatRecRateFFlow} \right)\)</span><span>\(\begin{array}{l}HeatRecRateFPLR = {g_1} + {g_2}\left( {PLR} \right) + {g_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{g_1} + {g_2}\left( {PLR} \right) + {g_3}{\left( {PLR} \right)^2} + {g_4}{\left( {PLR} \right)^3}\end{array}\)</span>
 
 <div>$$HeatRecRateFTemp = {h_1} + {h_2}\left( {{T_{w,i}}} \right) + {h_3}{\left( {{T_{w,i}}} \right)^2}$$</div>
 
@@ -1295,13 +1295,13 @@ The actual (operating) thermal power is then calculated using the steady-state t
 
 where:
 
-<span>${P_{Thermal,Operating}}$</span>= Report variable “Generator Produced Thermal Rate [W]”
+<span>\({P_{Thermal,Operating}}\)</span>= Report variable “Generator Produced Thermal Rate [W]”
 
-<span>$HeatRecRateFPLR$</span>= User-defined Heat Recovery Rate Modifier Curve (function of part-load ratio) evaluated at the current operating part-load ratio. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
+<span>\(HeatRecRateFPLR\)</span>= User-defined Heat Recovery Rate Modifier Curve (function of part-load ratio) evaluated at the current operating part-load ratio. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
 
-<span>$HeatRecRateFTemp$</span>= User-defined Heat Recovery Rate Modifier Curve (function of inlet water temperature) evaluated at the current inlet water temperature. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
+<span>\(HeatRecRateFTemp\)</span>= User-defined Heat Recovery Rate Modifier Curve (function of inlet water temperature) evaluated at the current inlet water temperature. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
 
-<span>$HeatRecRateFFlow$</span>= User-defined Heat Recovery Rate Modifier Curve (function of water flow rate) evaluated at the current heat recovery water flow rate. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
+<span>\(HeatRecRateFFlow\)</span>= User-defined Heat Recovery Rate Modifier Curve (function of water flow rate) evaluated at the current heat recovery water flow rate. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
 
 The heat recovery output water temperature is then calculated.
 
@@ -1309,47 +1309,47 @@ The heat recovery output water temperature is then calculated.
 
 where:
 
-<span>${T_{w,o}}$</span>= Heat recovery outlet water temperature (°C), report variable “Generator Heat Recovery Outlet Temperature [C]”
+<span>\({T_{w,o}}\)</span>= Heat recovery outlet water temperature (°C), report variable “Generator Heat Recovery Outlet Temperature [C]”
 
-<span>$C{p_w}$</span>= Heat capacity of water (J/kg-K)
+<span>\(C{p_w}\)</span>= Heat capacity of water (J/kg-K)
 
 If the calculated heat recovery outlet water temperature exceeds to Maximum Heat Recovery Water Temperature (user input), then the outlet water temperature is reset to the maximum temperature (user input) and the thermal power is recalculated.
 
 If combustion air inlet and outlet node names are specified in the input, along with exhaust air flow rate and exhaust air temperature information, then the model calculates the exhaust air conditions for each simulation time step. The exhaust air mass flow rate is first calculated based on the Reference Exhaust Air Mass Flow Rate, two modifier curves and an air density adjustment. Since fans are volumetric flow devices, the ratio of the air density at actual inlet air conditions to air density at reference inlet air conditions is used as an adjustment factor.
 
-<span>${\dot m_{ExhAir}} = {\dot m_{ExhAir,Ref}}\left( {ExhFlowFTemp} \right)\left( {ExhFlowFPLR} \right)\left( {{\raise0.7ex\hbox{${{\rho_{a,i}}}$} \!\mathord{\left/ {\vphantom {{{\rho_{a,i}}} {{\rho_{a,Ref}}}}}\right.}\!\lower0.7ex\hbox{${{\rho_{a,Ref}}}$}}} \right)$</span><span>$\begin{array}{l}ExhFlowFTemp = {j_1} + {j_2}\left( {{T_{a,i}}} \right) + {j_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{j_1} + {j_2}\left( {{T_{a,i}}} \right) + {j_3}{\left( {{T_{a,i}}} \right)^2} + {j_4}{\left( {{T_{a,i}}} \right)^3}\end{array}$</span>
+<span>\({\dot m_{ExhAir}} = {\dot m_{ExhAir,Ref}}\left( {ExhFlowFTemp} \right)\left( {ExhFlowFPLR} \right)\left( {{\raise0.7ex\hbox{${{\rho_{a,i}}}$} \!\mathord{\left/ {\vphantom {{{\rho_{a,i}}} {{\rho_{a,Ref}}}}}\right.}\!\lower0.7ex\hbox{${{\rho_{a,Ref}}}$}}} \right)\)</span><span>\(\begin{array}{l}ExhFlowFTemp = {j_1} + {j_2}\left( {{T_{a,i}}} \right) + {j_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{j_1} + {j_2}\left( {{T_{a,i}}} \right) + {j_3}{\left( {{T_{a,i}}} \right)^2} + {j_4}{\left( {{T_{a,i}}} \right)^3}\end{array}\)</span>
 
 <div>$$\begin{array}{l}ExhFlowFPLR = {k_1} + {k_2}\left( {PLR} \right) + {k_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{k_1} + {k_2}\left( {PLR} \right) + {k_3}{\left( {PLR} \right)^2} + {k_4}{\left( {PLR} \right)^3}\end{array}$$</div>
 
 where:
 
-<span>${\dot m_{ExhAir}}$</span>= Exhaust air mass flow rate (kg/s)
+<span>\({\dot m_{ExhAir}}\)</span>= Exhaust air mass flow rate (kg/s)
 
-<span>${\dot m_{ExhAir,Ref}}$</span>= Reference Exhaust Air Mass Flow Rate (kg/s), user input
+<span>\({\dot m_{ExhAir,Ref}}\)</span>= Reference Exhaust Air Mass Flow Rate (kg/s), user input
 
-<span>$ExhFlowFTemp$</span>= User-defined Exhaust Air Flow Rate Modifier Curve (function of temperature) evaluated at the current combustion air inlet temperature. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
+<span>\(ExhFlowFTemp\)</span>= User-defined Exhaust Air Flow Rate Modifier Curve (function of temperature) evaluated at the current combustion air inlet temperature. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
 
-<span>$ExhFlowFPLR$</span> = User-defined Exhaust Air Flow Rate Rate Modifier Curve (function of part-load ratio) evaluated at the current operating part-load ratio. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
+<span>\(ExhFlowFPLR\)</span> = User-defined Exhaust Air Flow Rate Rate Modifier Curve (function of part-load ratio) evaluated at the current operating part-load ratio. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
 
-<span>${\rho_{a,i}}$</span>= Density of the combustion inlet air (kg/m<sup>3</sup>)
+<span>\({\rho_{a,i}}\)</span>= Density of the combustion inlet air (kg/m<sup>3</sup>)
 
-<span>${\rho_{a,Ref}}$</span>= Density of combustion inlet air at reference conditions (kg/m<sup>3</sup>)
+<span>\({\rho_{a,Ref}}\)</span>= Density of combustion inlet air at reference conditions (kg/m<sup>3</sup>)
 
 In an analogous fashion, the exhaust air temperature is calculated using the Nominal (reference) Exhaust Air Outlet Temperature and two modifier curves.
 
-<span>${T_{a,o}} = {T_{a,o,Nom}}\left( {ExhAirTempFTemp} \right)\left( {ExhAirTempFPLR} \right)$</span><span>$\begin{array}{l}ExhAirTempFTemp = {l_1} + {l_2}\left( {{T_{a,i}}} \right) + {l_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{l_1} + {l_2}\left( {{T_{a,i}}} \right) + {l_3}{\left( {{T_{a,i}}} \right)^2} + {l_4}{\left( {{T_{a,i}}} \right)^3}\end{array}$</span>
+<span>\({T_{a,o}} = {T_{a,o,Nom}}\left( {ExhAirTempFTemp} \right)\left( {ExhAirTempFPLR} \right)\)</span><span>\(\begin{array}{l}ExhAirTempFTemp = {l_1} + {l_2}\left( {{T_{a,i}}} \right) + {l_3}{\left( {{T_{a,i}}} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{l_1} + {l_2}\left( {{T_{a,i}}} \right) + {l_3}{\left( {{T_{a,i}}} \right)^2} + {l_4}{\left( {{T_{a,i}}} \right)^3}\end{array}\)</span>
 
 <div>$$\begin{array}{l}ExhAirTempFPLR = {m_1} + {m_2}\left( {PLR} \right) + {m_3}{\left( {PLR} \right)^2}\,\,\,\,\, - \,or\, - \\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,{m_1} + {m_2}\left( {PLR} \right) + {m_3}{\left( {PLR} \right)^2} + {m_4}{\left( {PLR} \right)^3}\end{array}$$</div>
 
 where:
 
-<span>${T_{a,o}}$</span>= Exhaust air outlet temperature (°C)
+<span>\({T_{a,o}}\)</span>= Exhaust air outlet temperature (°C)
 
-<span>${T_{a,o,Nom}}$</span>= Nominal Exhaust Air Outlet Temperature (°C), user input
+<span>\({T_{a,o,Nom}}\)</span>= Nominal Exhaust Air Outlet Temperature (°C), user input
 
-<span>$ExhAirTempFTemp$</span>= User-defined Exhaust Air Temperature Modifier Curve (function of temperature) evaluated at the current combustion air inlet temperature. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
+<span>\(ExhAirTempFTemp\)</span>= User-defined Exhaust Air Temperature Modifier Curve (function of temperature) evaluated at the current combustion air inlet temperature. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
 
-<span>$ExhAirTempFPLR$</span> = User-defined Exhaust Air Flow Rate Rate Modifier Curve (function of part-load ratio) evaluated at the current operating part-load ratio. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
+<span>\(ExhAirTempFPLR\)</span> = User-defined Exhaust Air Flow Rate Rate Modifier Curve (function of part-load ratio) evaluated at the current operating part-load ratio. This multiplier is assumed to be 1.0 if a modifier curve name is not specified in the input.
 
 The above calculations for exhaust air outlet temperature assume no heat recovery to water is being done.  If thermal power (water heating) is being produced, then the exhaust air outlet temperature is recalculated as follows:
 
@@ -1357,7 +1357,7 @@ The above calculations for exhaust air outlet temperature assume no heat recover
 
 where:
 
-<span>$C{p_{air}}$</span>= Heat capacity of air at the actual combustion air inlet conditions (J/kg-K)
+<span>\(C{p_{air}}\)</span>= Heat capacity of air at the actual combustion air inlet conditions (J/kg-K)
 
 The exhaust air outlet humidity ratio is also calculated.
 
@@ -1365,11 +1365,11 @@ The exhaust air outlet humidity ratio is also calculated.
 
 where:
 
-<span>${w_{a,o}}$</span>= Exhaust air outlet humidity ratio (kg/kg)
+<span>\({w_{a,o}}\)</span>= Exhaust air outlet humidity ratio (kg/kg)
 
-<span>${w_{a,i}}$</span>= Exhaust air inlet humidity ratio (kg/kg)
+<span>\({w_{a,i}}\)</span>= Exhaust air inlet humidity ratio (kg/kg)
 
-<span>${h_{fg,16}}$</span>= Enthalpy of vaporization of moisture at 16°C (J/kg)
+<span>\({h_{fg,16}}\)</span>= Enthalpy of vaporization of moisture at 16°C (J/kg)
 
 The remaining report variables are calculated as follows.
 
@@ -1379,9 +1379,9 @@ The remaining report variables are calculated as follows.
 
 where:
 
-<span>${E_{Thermal,Produced}}$</span>= Report variable “Generator Produced Thermal Energy [J]”
+<span>\({E_{Thermal,Produced}}\)</span>= Report variable “Generator Produced Thermal Energy [J]”
 
-<span>$ThermalEf{f_{Operating,LHV}}$</span>= Report variable “Generator Thermal Efficiency LHV Basis [-]”
+<span>\(ThermalEf{f_{Operating,LHV}}\)</span>= Report variable “Generator Thermal Efficiency LHV Basis [-]”
 
 ### Micro-Cogenerator
 
@@ -1425,47 +1425,47 @@ $$</div>
 
 where,
 
-<span>${\eta_e}$</span> is the steady-state, part load, electrical conversion efficiency of the engine (-)
+<span>\({\eta_e}\)</span> is the steady-state, part load, electrical conversion efficiency of the engine (-)
 
-<span>${\eta_q}$</span> is the steady-state part load, thermal conversion efficiency of the engine (-)
+<span>\({\eta_q}\)</span> is the steady-state part load, thermal conversion efficiency of the engine (-)
 
-<span>${\dot m_{cw}}$</span> is the mass flow rate of plant fluid through the heat recovery section [kg/s]
+<span>\({\dot m_{cw}}\)</span> is the mass flow rate of plant fluid through the heat recovery section [kg/s]
 
-<span>${T_{cw,i}}$</span> is the bulk temperature of the plant fluid entering the heat recovery section (<sup>o</sup>C)
+<span>\({T_{cw,i}}\)</span> is the bulk temperature of the plant fluid entering the heat recovery section (<sup>o</sup>C)
 
-<span>${T_{cw,o}}$</span> is the bulk temperature of the plant fluid leaving the heat recovery section (<sup>o</sup>C)
+<span>\({T_{cw,o}}\)</span> is the bulk temperature of the plant fluid leaving the heat recovery section (<sup>o</sup>C)
 
-<span>${P_{net,ss}}$</span>is the steady-state electrical output of the system (W),
+<span>\({P_{net,ss}}\)</span>is the steady-state electrical output of the system (W),
 
-<span>${q_{gross}}$</span> is the gross heat input into the engine (W),
+<span>\({q_{gross}}\)</span> is the gross heat input into the engine (W),
 
-<span>${q_{gen,ss}}$</span> is the steady-state rate of heat generation within the engine (W)
+<span>\({q_{gen,ss}}\)</span> is the steady-state rate of heat generation within the engine (W)
 
-<span>$LH{V_{fuel}}$</span> is the lower heating value of the fuel used by the system (J/kg or J/kmol),
+<span>\(LH{V_{fuel}}\)</span> is the lower heating value of the fuel used by the system (J/kg or J/kmol),
 
-<span>${\dot N_{fuel}}$</span> is the molar fuel flow rate (kmol/s)
+<span>\({\dot N_{fuel}}\)</span> is the molar fuel flow rate (kmol/s)
 
-<span>${\dot m_{fuel}}$</span> is the mass fuel flow rate (kg/s)
+<span>\({\dot m_{fuel}}\)</span> is the mass fuel flow rate (kg/s)
 
-<span>${\dot m_{air}}$</span> is the mass flow rate of air thru the engine (kg/s)
+<span>\({\dot m_{air}}\)</span> is the mass flow rate of air thru the engine (kg/s)
 
-<span>${[MC]_{eng}}$</span> is the thermal capacitance of the engine control volume (W/K)
+<span>\({[MC]_{eng}}\)</span> is the thermal capacitance of the engine control volume (W/K)
 
-<span>${T_{eng}}$</span> is the temperature of the engine control volume (C)
+<span>\({T_{eng}}\)</span> is the temperature of the engine control volume (C)
 
-<span>$U{A_{HX}}$</span>is the effective thermal conductance between the engine control volume and the cooling water control volume (W/K).
+<span>\(U{A_{HX}}\)</span>is the effective thermal conductance between the engine control volume and the cooling water control volume (W/K).
 
-<span>$U{A_{loss}}$</span> is the effective thermal conductance between the engine control volume and the surrounding environment (W/K)
+<span>\(U{A_{loss}}\)</span> is the effective thermal conductance between the engine control volume and the surrounding environment (W/K)
 
-<span>${T_{room}}$</span> is the air temperature of the surrounding environment (C)
+<span>\({T_{room}}\)</span> is the air temperature of the surrounding environment (C)
 
-<span>${[MC]_{cw}}$</span> is the thermal capacitance of the encapsulated cooling water and heat exchanger shell in immediate thermal contact (J/K)
+<span>\({[MC]_{cw}}\)</span> is the thermal capacitance of the encapsulated cooling water and heat exchanger shell in immediate thermal contact (J/K)
 
-<span>${[\dot m{c_p}]_{cw}}$</span> is the thermal capacity flow rate associated with the cooling water (W/K)
+<span>\({[\dot m{c_p}]_{cw}}\)</span> is the thermal capacity flow rate associated with the cooling water (W/K)
 
-The functional forms for <span>${\eta_e}$</span> and <span>${\eta_q}$</span> are 2<sup>nd</sup> order trivariate polynomials with all of the cross terms.
+The functional forms for <span>\({\eta_e}\)</span> and <span>\({\eta_q}\)</span> are 2<sup>nd</sup> order trivariate polynomials with all of the cross terms.
 
-EnergyPlus solves these for state values for the engine mass temperature, <span>${T_{eng}}$</span>, and the outlet plant node, <span>${T_{cw,o}}$</span>, in the following manner. The last two equations are interrelated but otherwise ordinary differential equations with the general form
+EnergyPlus solves these for state values for the engine mass temperature, <span>\({T_{eng}}\)</span>, and the outlet plant node, <span>\({T_{cw,o}}\)</span>, in the following manner. The last two equations are interrelated but otherwise ordinary differential equations with the general form
 
 <div>$$\frac{{dT}}{{dt}} = a + bT$$</div>
 
@@ -1485,7 +1485,7 @@ The plant node outlet fluid temperature (heat recovered) is solved using
 
 <div>$$b =  - \left( {\frac{{{{[\dot m{c_p}]}_{cw}}}}{{{{[MC]}_{cw}}}} + \frac{{U{A_{HX}}}}{{{{[MC]}_{cw}}}}} \right)$$</div>
 
-The interrelation of these two is handled by sequential substitution using an iteration scheme that alternates between calculations of <span>${T_{eng}}$</span> and <span>${T_{cw,o}}$</span>.  The iteration loop exits once the energy is determined to be balanced using the following criteria:
+The interrelation of these two is handled by sequential substitution using an iteration scheme that alternates between calculations of <span>\({T_{eng}}\)</span> and <span>\({T_{cw,o}}\)</span>.  The iteration loop exits once the energy is determined to be balanced using the following criteria:
 
 Number of iterations &gt; 3\\
 
@@ -1592,7 +1592,7 @@ or
 
 where,
 
-<span>${F_{HX}}$</span> is an adjustment factor,
+<span>\({F_{HX}}\)</span> is an adjustment factor,
 
 <div>$$h_{gas} = h_{gas}^0 \left( \frac{\dot N_{gas}}{\dot N_{gas}^0} \right)^n}$$</div>
 
@@ -1636,11 +1636,11 @@ Gas phase thermochemistry calculations and data are programmed into EnergyPlus t
 
 where,
 
-<span>${\hat h_i}$</span> is the enthalpy (J/kmol)
+<span>\({\hat h_i}\)</span> is the enthalpy (J/kmol)
 
-<span>${\Delta_f}\hat h_i^o$</span> is the molar enthalpy at the standard state (J/kmol)
+<span>\({\Delta_f}\hat h_i^o\)</span> is the molar enthalpy at the standard state (J/kmol)
 
-<span>$T$</span> is the temperature of the gas (K)
+<span>\(T\)</span> is the temperature of the gas (K)
 
 A, B, C, D, E, F, H are the coefficients for the Shomate equation.
 
@@ -1973,7 +1973,7 @@ Average tangential force on a single blade can be defined as:
 
 <div>$${F_{ta}} = \frac{1}{{2\pi }}\int_0^{2\pi } {{F_t}(\theta )d\theta } $$</div>
 
-Substituting the values of *F<sub>t</sub>* and arranging tangential force on azimuth angle, <span>$\theta $</span>, equation above can be written as:
+Substituting the values of *F<sub>t</sub>* and arranging tangential force on azimuth angle, <span>\(\theta \)</span>, equation above can be written as:
 
 <div>$${F_{ta}} = \frac{1}{{4\pi }}{C_t}{\rho_{Local}}{A_c}(\int_0^{2\pi } {{{(\omega R)}^2}}  + \int_0^{2\pi } {V_a^2} )$$</div>
 

@@ -1258,7 +1258,7 @@ The example syntax below shows the basic ventilation flow variables reported on 
 
 #### Ventilation Load Reports
 
-The impact of system outdoor air on a particular zone may be calculated by summing the mass flow weighted <span>${\dot q_{OA}}$</span> over the supply air paths (both cooling and heating) serving the zone as follows:
+The impact of system outdoor air on a particular zone may be calculated by summing the mass flow weighted <span>\({\dot q_{OA}}\)</span> over the supply air paths (both cooling and heating) serving the zone as follows:
 
 <div>\[{\dot q_{OA,Zone\;1}} = \sum\limits_{n = 1}^{AirPathNum} {{{\dot q}_{OA}}\frac{{{{\dot m}_n}}}{{{{\dot m}_{sys}}}}} \]</div>
 
@@ -2208,11 +2208,11 @@ Designates which method is used for AirflowNetwork initialization. The choices f
 
 #### Field: Relative Airflow Convergence Tolerance
 
-The solution is assumed to have converged when <span>${{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}} \right. } {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}$</span>is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|$</span>) to the sum of network airflow magnitudes (<span>$\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} $</span>). The default value is 1.0x10<sup>-4</sup>.
+The solution is assumed to have converged when <span>\({{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}} \right. } {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}\)</span>is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (<span>\(\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|\)</span>) to the sum of network airflow magnitudes (<span>\(\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} \)</span>). The default value is 1.0x10<sup>-4</sup>.
 
 #### Field: Absolute Airflow Convergence Tolerance
 
-The solution is assumed to have converged when the summation of the absolute value of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|$</span>) is less than the value specified for this input field. The default value is 1.0x10<sup>-6</sup>.
+The solution is assumed to have converged when the summation of the absolute value of all network airflows (<span>\(\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|\)</span>) is less than the value specified for this input field. The default value is 1.0x10<sup>-6</sup>.
 
 #### Field: Convergence Acceleration Limit
 
@@ -2481,7 +2481,7 @@ If, in addition, the window is in a thermal zone for which opening modulation ha
 
 If this linkage is associated with an AirflowNetwork:MultiZone:Surface:Crack object, the following crack air flow equation is used.
 
-<sup><span>$Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}$</span></sup>
+<sup><span>\(Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}\)</span></sup>
 
 Where
 
@@ -2491,7 +2491,7 @@ Where
 
 *C<sub>T</sub>* = reference condition temperature correction factor (dimensionless). See AirflowNetwork:MultiZone:Surface:Crack object.
 
-<span>$\Delta P$</span>= pressure difference across crack (Pa)
+<span>\(\Delta P\)</span>= pressure difference across crack (Pa)
 
 *n*   = air flow exponent (dimensionless)
 
@@ -2662,7 +2662,7 @@ AirflowNetwork:MultiZone:ReferenceCrackConditions,
 
 This object specifies the properties of air flow through a crack and the associated measurement conditions. The following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack:
 
-<sup><span>$Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}$</span></sup>
+<sup><span>\(Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}\)</span></sup>
 
 Where
 
@@ -2672,7 +2672,7 @@ Where
 
 *C<sub>T</sub>* = reference condition temperature correction factor (dimensionless)
 
-<span>$\Delta P$</span>= pressure difference across crack (Pa)
+<span>\(\Delta P\)</span>= pressure difference across crack (Pa)
 
 *n*   = air flow exponent (dimensionless)
 
@@ -2696,7 +2696,7 @@ This is a name for this AirflowNetwork:MultiZone:Surface:Crack object. It is ref
 
 #### Field: Air Mass Flow Coefficient at Reference Conditions
 
-The value of the air mass flow coefficient,<span>${C_Q}$</span>, in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero.
+The value of the air mass flow coefficient,<span>\({C_Q}\)</span>, in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero.
 
 #### Field: Air Mass Flow Exponent
 
@@ -2726,15 +2726,15 @@ five fields. The relationship between pressure and airflow may be expressed as:
 
 where
 
-<span>$\dot m$</span>     = Air mass flow rate [kg/s]
+<span>\(\dot m\)</span>     = Air mass flow rate [kg/s]
 
 *ELA*   = Effective leakage area [m<sup>2</sup>]
 
 ρ       = Air density [kg/m<sup>3</sup>]
 
-<span>$\Delta {P_r}$</span>  = Reference pressure difference [Pa]
+<span>\(\Delta {P_r}\)</span>  = Reference pressure difference [Pa]
 
-<span>$\Delta P$</span>   = Pressure difference across this component [Pa]
+<span>\(\Delta P\)</span>   = Pressure difference across this component [Pa]
 
 C<sub>d           </sub> = Discharge coefficient [dimensionless]
 
@@ -2791,7 +2791,7 @@ The name of this AirflowNetwork:MultiZone:Component:DetailedOpening object. It i
 
 #### Field: Air Mass Flow Coefficient When Opening is Closed
 
-Crack flow is assumed when the window or door is closed. The units for this air mass flow coefficient (<span>${C_{Q,\;unit\;length}}$</span>) are different from the units for <span>${C_Q}$</span>(kg/s at 1 Pa pressure difference) defined in an AirflowNetwork:MultiZone:Surface:Crack object. There is no default but the entered value must be greater than zero. The program will automatically generate four cracks around the perimeter of the window or door--one along the bottom, one along the top, and one on each side. The temperature correction factor used in the AirflowNetwork:MultiZone:Surface:Crack object is not used for this component to calculate air mass flow rate.
+Crack flow is assumed when the window or door is closed. The units for this air mass flow coefficient (<span>\({C_{Q,\;unit\;length}}\)</span>) are different from the units for <span>\({C_Q}\)</span>(kg/s at 1 Pa pressure difference) defined in an AirflowNetwork:MultiZone:Surface:Crack object. There is no default but the entered value must be greater than zero. The program will automatically generate four cracks around the perimeter of the window or door--one along the bottom, one along the top, and one on each side. The temperature correction factor used in the AirflowNetwork:MultiZone:Surface:Crack object is not used for this component to calculate air mass flow rate.
 
 #### Field: Air Mass Flow Exponent When Opening Is Closed
 
@@ -2905,7 +2905,7 @@ This is a name for this AirflowNetwork:MultiZone:Component:HorizontalOpening obj
 
 #### Field: Air Mass Flow Coefficient When Opening is Closed
 
-The value of the air mass flow coefficient, <span>${C_{Q,\;unit\;length}}$</span>, in the horizontal opening air flow equation. It has units of kg/s-m at 1Pa. The temperature correction factor is not applied to the mass flow calculation. This is a required input field and the entered value must be greater than zero.
+The value of the air mass flow coefficient, <span>\({C_{Q,\;unit\;length}}\)</span>, in the horizontal opening air flow equation. It has units of kg/s-m at 1Pa. The temperature correction factor is not applied to the mass flow calculation. This is a required input field and the entered value must be greater than zero.
 
 #### Field: Air Mass Flow Exponent When Opening is Closed
 
@@ -2942,7 +2942,7 @@ This is a name for this AirflowNetwork:MultiZone:Component:SimpleOpening object.
 
 #### Field: Air Mass Flow Coefficient When Opening is Closed
 
-The value of the air mass flow coefficient, <span>${C_{Q,\;unit\;length}}$</span>, in the simple opening air flow equation. It has units of kg/s-m at 1Pa. The temperature correction factor is not applied for mass flow calculation.
+The value of the air mass flow coefficient, <span>\({C_{Q,\;unit\;length}}\)</span>, in the simple opening air flow equation. It has units of kg/s-m at 1Pa. The temperature correction factor is not applied for mass flow calculation.
 
 #### Field: Air Mass Flow Exponent When Opening is Closed
 
@@ -2975,7 +2975,7 @@ When the fan is on, the air mass flow rate modeled for the airflow network is ba
 
 When the fan is off, the following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack:
 
-<sup><span>$Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}$</span></sup>
+<sup><span>\(Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}\)</span></sup>
 
 Where
 
@@ -2985,7 +2985,7 @@ Where
 
 *C<sub>T</sub>* = reference condition temperature correction factor (dimensionless)
 
-<span>$\Delta P$</span>= pressure difference across crack (Pa)
+<span>\(\Delta P\)</span>= pressure difference across crack (Pa)
 
 *n*   = air flow exponent (dimensionless)
 
@@ -3009,7 +3009,7 @@ This is the name for this instance of the AirflowNetwork:MultiZone:Component:Zon
 
 #### Field: Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions
 
-The value of the air mass flow coefficient,<span>${C_Q}$</span>, in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when the fan is off.
+The value of the air mass flow coefficient,<span>\({C_Q}\)</span>, in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when the fan is off.
 
 #### Field: Air Mass Flow Exponent When the Zone Exhaust Fan is Off
 
@@ -3201,7 +3201,7 @@ This field is used to calculate the comfort band as a function of predicted perc
 
 where
 
-* <span>$\Theta$</span> is the comfort band (degC)
+* <span>\(\Theta\)</span> is the comfort band (degC)
 * PPD is predicted percentage person of dissatisfied (%)
 
 #### Field: Occupancy Check
@@ -3331,11 +3331,11 @@ This component may be also called a power law component and is used to represent
 
 where
 
-<span>$\dot m$</span> = Air mass flow rate through the component [kg/s]
+<span>\(\dot m\)</span> = Air mass flow rate through the component [kg/s]
 
 C = Air mass flow coefficient (kg/s at 1 Pa pressure difference)
 
-<span>$\Delta P$</span> = Total pressure loss across the element [Pa]
+<span>\(\Delta P\)</span> = Total pressure loss across the element [Pa]
 
 n = Air mass flow exponent
 
@@ -3394,7 +3394,7 @@ where
 
 r = Air density [kg/m<sup>3</sup>]
 
-<span>$\Delta P$</span> = Total pressure loss across the element [Pa]
+<span>\(\Delta P\)</span> = Total pressure loss across the element [Pa]
 
 n = Air mass flow exponent
 
@@ -3408,7 +3408,7 @@ r = Effective leakage ratio [dimensionless]
 
 Q<sub>r</sub> = Maximum airflow rate [m<sup>3</sup>/s]
 
-<span>$\Delta {P_r}$</span> = Reference pressure difference [Pa]
+<span>\(\Delta {P_r}\)</span> = Reference pressure difference [Pa]
 
 n = Air mass flow exponent [dimensionless]
 
@@ -3458,13 +3458,13 @@ This object represents a duct component and requires 9 input fields, one alpha f
 
 where
 
-<span>$\dot m$</span> = Mass flow rate of air through the component [kg/s]
+<span>\(\dot m\)</span> = Mass flow rate of air through the component [kg/s]
 
 r= Air density [kg/m<sup>3</sup>]
 
 A = Cross sectional area [m<sup>2</sup>]
 
-<span>$\Delta P$</span> = Total pressure loss across the component [Pa]
+<span>\(\Delta P\)</span> = Total pressure loss across the component [Pa]
 
 L = Duct length [m]
 
@@ -3482,7 +3482,7 @@ where
 
 e= Surface roughness [m]
 
-Re = Reynolds number = <span>${\raise0.7ex\hbox{${\rho VD}$} \!\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.}\!\lower0.7ex\hbox{$\mu $}}$</span>
+Re = Reynolds number = <span>\({\raise0.7ex\hbox{${\rho VD}$} \!\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.}\!\lower0.7ex\hbox{$\mu $}}\)</span>
 
 #### Field: Name
 
@@ -16450,13 +16450,13 @@ When the condenser type is “EvaporativelyCooled”, this field specifies the e
 
 where:
 
-<span>${T_{effective}}$</span>       = effective dry-bulb temperature of air entering the condenser cooling coil (°C)
+<span>\({T_{effective}}\)</span>       = effective dry-bulb temperature of air entering the condenser cooling coil (°C)
 
-<span>${T_{owb}}$</span>           = outdoor air wet-bulb temperature (°C)
+<span>\({T_{owb}}\)</span>           = outdoor air wet-bulb temperature (°C)
 
-<span>${T_{odb}}$</span>           = outdoor air dry-bulb temperature (°C)
+<span>\({T_{odb}}\)</span>           = outdoor air dry-bulb temperature (°C)
 
-<span>$\varepsilon $</span>               = evaporative condenser effectiveness.
+<span>\(\varepsilon \)</span>               = evaporative condenser effectiveness.
 
 The resulting condenser inlet air temperature is used by the Compressor Rack COP as a Function of Temperature Curve and the Condenser Fan Power as a Function of Temperature Curve. The default value for this field is 0.9, although valid entries can range from 0.0 to 1.0.
 

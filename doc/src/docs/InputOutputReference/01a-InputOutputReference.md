@@ -1012,15 +1012,15 @@ This field determines the solution scheme used by the Conduction Finite Differen
 
 #### Field: Space Discretization Constant
 
-This field controls the how the model determines spatial discretization, or the count of nodes across each material layer in the construction.  The model calculates the nominal distance associated with a node, <span>$\Delta x$</span>, using
+This field controls the how the model determines spatial discretization, or the count of nodes across each material layer in the construction.  The model calculates the nominal distance associated with a node, <span>\(\Delta x\)</span>, using
 
 <div>\[\Delta x = \sqrt {C\alpha \Delta t} \]</div>
 
 Where
 
-<span>$\alpha $</span>is the thermal diffusivity of the material layer, in m<sup>2</sup>/s
+<span>\(\alpha \)</span>is the thermal diffusivity of the material layer, in m<sup>2</sup>/s
 
-<span>$\Delta t$</span>is the length of the timestep in seconds.
+<span>\(\Delta t\)</span>is the length of the timestep in seconds.
 
 *C* is a constant set by this field.
 
@@ -4315,7 +4315,7 @@ a,b,c,d               = Coefficients to define the relationship bet
 
 U                      = Moisture content defined as the mass fraction of water contained in a material [kg/kg]
 
-<span>$\varphi $</span>                    = Surface air relative humidity [0 to 1]
+<span>\(\varphi \)</span>                    = Surface air relative humidity [0 to 1]
 
 #### The next four fields are dimensionless coefficients:
 
@@ -15185,7 +15185,7 @@ This field is used to enter the solar absorbtivity of the baffle. This surface p
 
 #### Field: Height Scale for Buoyancy-Driven Ventilation
 
-This field is used to enter a nominal height scale (m) for prediction of ventilation induced by bouancy. This value (<span>$\Delta {H_{NPL}}$</span>) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
+This field is used to enter a nominal height scale (m) for prediction of ventilation induced by bouancy. This value (<span>\(\Delta {H_{NPL}}\)</span>) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
 
 #### Field: Effective Thickness of Cavity Behind Exterior Baffle
 
@@ -15209,11 +15209,11 @@ This field is used to enter a value for the coefficient used to determine natura
 
 This field is used to enter a value for the coefficient used to determine natural air exchanges from buoyancy. Stack or buoyancy effects will cause exterior air to move in and out of the cavity. Cd is an arbitrary discharge coefficient that depends on the geometry of the opening. Cd should probably be in the range 0.1 to 1.0. Increasing Cd will increase the amount of natural ventilation. The following equations show how Cd is used in the program to predict the volume flow rate due to buoyancy:
 
-<span>${{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} $</span>  (if <span>${T_{a,cav}} > {T_{amb}}$</span>)
+<span>\({{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} \)</span>  (if <span>\({T_{a,cav}} > {T_{amb}}\)</span>)
 
-<span>${{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,cav}}} \right)/{T_{amb}}} $</span>  (if <span>${T_{amb}} > {T_{a,cav}}$</span> and baffle is vertical)
+<span>\({{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,cav}}} \right)/{T_{amb}}} \)</span>  (if <span>\({T_{amb}} > {T_{a,cav}}\)</span> and baffle is vertical)
 
-where <span>$\Delta {H_{NPL}}$</span> is the value input into the field above for the height scale for buoyancy-driven ventilation.
+where <span>\(\Delta {H_{NPL}}\)</span> is the value input into the field above for the height scale for buoyancy-driven ventilation.
 
 #### Field(s): Surface &lt;1 thru x&gt; Name
 

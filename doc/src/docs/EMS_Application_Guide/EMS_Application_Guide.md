@@ -3144,7 +3144,7 @@ One tension often arises with modeling when options being evaluated have an indi
 
 ### EMS Design Discussion
 
-Examining the vendor’s literature for one line of commercial packaged single-zone HVAC air systems shows that the nominal product sizes include 1200 cfm, 1600 cfm, 2000 cfm, 2400 cfm, 3000 cfm, 3400, cfm, and 4000 cfm. The literature also classifies units by tonnage of cooling capacity; however, in EnergyPlus modeling it is simpler to classify by air flow rate rather than by cooling capacity (because the direct expansion models have a tight range for allowable cooling capacity per air flow rate and size themselves off the flow rate). We construct the following simple model to select the next higher air flow rate product that uses the volume flow determined during the usual autosizing calculations, <span>$\dot{V}_{size}$</span>, and threshold values taken from the nominal product sizes (in m<sup>3</sup>/s):
+Examining the vendor’s literature for one line of commercial packaged single-zone HVAC air systems shows that the nominal product sizes include 1200 cfm, 1600 cfm, 2000 cfm, 2400 cfm, 3000 cfm, 3400, cfm, and 4000 cfm. The literature also classifies units by tonnage of cooling capacity; however, in EnergyPlus modeling it is simpler to classify by air flow rate rather than by cooling capacity (because the direct expansion models have a tight range for allowable cooling capacity per air flow rate and size themselves off the flow rate). We construct the following simple model to select the next higher air flow rate product that uses the volume flow determined during the usual autosizing calculations, <span>\(\dot{V}_{size}\)</span>, and threshold values taken from the nominal product sizes (in m<sup>3</sup>/s):
 
 <table class="table table-striped">
   <tr>
@@ -3152,32 +3152,32 @@ Examining the vendor’s literature for one line of commercial packaged single-z
     <th>Selection</th>
   </tr>
   <tr>
-    <td><span>$0 < \dot{V}_{size} \leq 0.566 $</span></td>
-    <td><span>$ \dot{V}= 0.566$</span></td>
+    <td><span>\(0 < \dot{V}_{size} \leq 0.566 \)</span></td>
+    <td><span>\(\dot{V}= 0.566\)</span></td>
   </tr>
   <tr>
-    <td><span>$0.566 < \dot{V}_{size} \leq 0.755 $</span></td>
-    <td><span>$ \dot{V}= 0.755$</span></td>
+    <td><span>\(0.566 < \dot{V}_{size} \leq 0.755 \)</span></td>
+    <td><span>\(\dot{V}= 0.755\)</span></td>
   </tr>
   <tr>
-    <td><span>$0.755 < \dot{V}_{size} \leq 0.944 $</span></td>
-    <td><span>$ \dot{V}= 0.944$</span></td>
+    <td><span>\(0.755 < \dot{V}_{size} \leq 0.944 \)</span></td>
+    <td><span>\(\dot{V}= 0.944\)</span></td>
   </tr>
   <tr>
-    <td><span>$0.944 < \dot{V}_{size} \leq 1.133 $</span></td>
-    <td><span>$ \dot{V}= 1.133$</span></td>
+    <td><span>\(0.944 < \dot{V}_{size} \leq 1.133 \)</span></td>
+    <td><span>\(\dot{V}= 1.133\)</span></td>
   </tr>
   <tr>
-    <td><span>$1.133 < \dot{V}_{size} \leq 1.416 $</span></td>
-    <td><span>$ \dot{V}= 1.416$</span></td>
+    <td><span>\(1.133 < \dot{V}_{size} \leq 1.416 \)</span></td>
+    <td><span>\(\dot{V}= 1.416\)</span></td>
   </tr>
   <tr>
-    <td><span>$1.416 < \dot{V}_{size} \leq 1.604 $</span></td>
-    <td><span>$ \dot{V}= 1.604$</span></td>
+    <td><span>\(1.416 < \dot{V}_{size} \leq 1.604 \)</span></td>
+    <td><span>\(\dot{V}= 1.604\)</span></td>
   </tr>
   <tr>
-    <td><span>$1.604 < \dot{V}_{size} \leq 1.888 $</span></td>
-    <td><span>$ \dot{V}= 1.888$</span></td>
+    <td><span>\(1.604 < \dot{V}_{size} \leq 1.888 \)</span></td>
+    <td><span>\(\dot{V}= 1.888\)</span></td>
   </tr>
 </table>
 

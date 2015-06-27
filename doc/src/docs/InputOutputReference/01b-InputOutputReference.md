@@ -1921,7 +1921,7 @@ ZoneInfiltration:EffectiveLeakageArea model is similar to the other infiltration
 
 <div>\[Infiltration = \left( {{F_{Schedule}}} \right)\frac{{{A_L}}}{{1000}}\sqrt {{C_s}\Delta T + {C_w}{{\left( {WindSpeed} \right)}^2}} \]</div>
 
-where <span>$\Delta T$</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+where <span>\(\Delta T\)</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
 Note that the coefficients for the “EffectiveLeakageArea” model are not interchangeable with the similarly named coefficients in the “FlowCoefficient” model (see ZoneInfiltration:FlowCoefficient object).
 
@@ -1941,11 +1941,11 @@ This field is the name of a schedule (ref: Schedule) that modifies the volume fl
 
 #### Field: Effective Air Leakage Area
 
-This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>${A_L}$</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.
+This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>\({A_L}\)</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.
 
 #### Field: Stack Coefficient
 
-This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the stack coefficient, <span>\({C_s}\)</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -1966,7 +1966,7 @@ This field is the value of the stack coefficient, <span>${C_s}$</span> in the e
 
 #### Field: Wind Coefficient
 
-This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
+This field is the value of the wind coefficient, <span>\({C_w}\)</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
 
 
 
@@ -2061,7 +2061,7 @@ ZoneInfiltration:FlowCoefficient model is similar to the other infiltration obje
 
 <div>\[Infiltration = \left( {{F_{Schedule}}} \right)\sqrt {{{\left( {c\,{C_s}\Delta {T^n}} \right)}^2} + {{\left( {c\,{C_w}{{\left( {s * WindSpeed} \right)}^{2n}}} \right)}^2}} \]</div>
 
-Where <span>$\Delta T$</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+Where <span>\(\Delta T\)</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
 Note that the coefficients for the “Flow Coefficient” model are not interchangeable with the similarly named coefficients in the “Effective Leakage Area” model (see ZoneInfiltration:EffectiveLeakageArea object).
 
@@ -2081,11 +2081,11 @@ This field is the name of a schedule (ref: Schedule) that modifies the volume fl
 
 #### Field: Flow Coefficient
 
-This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>$c$</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
+This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>\(c\)</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
 
 #### Field: Stack Coefficient
 
-This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the stack coefficient, <span>\({C_s}\)</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -2118,7 +2118,7 @@ This field is the value of the pressure exponent, *n* in the equation above.  T
 
 #### Field: Wind Coefficient
 
-This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, <span>\({C_w}\)</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -2160,7 +2160,7 @@ No Flue</td>
 
 #### Field: Shelter Factor
 
-This field is the value of the wind coefficient, <span>$s$</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, <span>\(s\)</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 <table class="table table-striped">
 <tr>
@@ -10682,7 +10682,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load Power at Available Capacity to Full Load Power at Nominal Capacity. The defining equation is:
 
-<span>$FullLoadPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FullLoadPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient1 of the power ratio curve
 
@@ -11674,7 +11674,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power. The defining equation is:
 
-<span>$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient 1 of Power Ratio Curve
 
@@ -12130,7 +12130,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power. The defining equation is:
 
-<span>$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient 1 of Power Ratio Curve
 
@@ -12208,7 +12208,7 @@ This numeric field contains the third coefficient for the Temperature Based Fuel
 
 The Exhaust Flow Curve is a quadratic equation that determines the Ratio of Exhaust Gas Flow Rate to Engine Capacity. The defining equation is:
 
-*<span>$ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15$</span> *
+*<span>\(ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15\)</span> *
 
 where GTCapacity is the Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the current ambient and design ambient temperatures.
 
@@ -12228,7 +12228,7 @@ This numeric field contains the third coefficient for the Exhaust Flow Curve.
 
 The Exhaust Gas Temperature Curve is a polynomial equation that determines the Exhaust Gas Temperature. The equation combines both the Exhaust Gas Temperature Curve Coefficients (Based on the Part Load Ratio) and the (Ambient) Temperature Based Exhaust Gas Temperature Curve Coefficients. The defining equation is:
 
- <span>$RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})$</span>
+ <span>\(RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})\)</span>
 
 where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the Temperature Based Exhaust Gas Temperature Curve Coefficients, RLoad is the Ratio of Load to Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the actual ambient and design ambient temperatures.
 

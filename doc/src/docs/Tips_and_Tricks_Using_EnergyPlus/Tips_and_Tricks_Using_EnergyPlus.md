@@ -1076,15 +1076,15 @@ The Other Side Coefficient (OSC) equation permits setting either the outside sur
 
 where: 
 
-* <span>$T$</span> = Outside Air Temperature when N1 (Combined convective/radiative film Coeff) &gt; 0
+* <span>\(T\)</span> = Outside Air Temperature when N1 (Combined convective/radiative film Coeff) &gt; 0
 
-* <span>$T$</span> = Exterior Surface Temperature when N1 (Combined convective/radiative film Coeff) &lt;= 0
+* <span>\(T\)</span> = Exterior Surface Temperature when N1 (Combined convective/radiative film Coeff) &lt;= 0
 
-* <span>$T_{zone}$</span> =MAT =Temperature of the zone being simulated (°C)
+* <span>\(T_{zone}\)</span> =MAT =Temperature of the zone being simulated (°C)
 
-* <span>$T_{oadb}$</span> = Dry-bulb temperature of the outdoor air (°C)
+* <span>\(T_{oadb}\)</span> = Dry-bulb temperature of the outdoor air (°C)
 
-* <span>$T_{grnd}$</span> = Temperature of the ground (°C) Wspd = Outdoor wind speed (m/sec)
+* <span>\(T_{grnd}\)</span> = Temperature of the ground (°C) Wspd = Outdoor wind speed (m/sec)
 
 The coefficients N<sub>2</sub>, N<sub>3</sub>, N<sub>4</sub>, N<sub>6</sub>, and N<sub>7</sub> scale the contribution of the various terms that follow them.  In the case of N<sub>4</sub>, it is followed by another term N<sub>5</sub>.  This is a constant temperature that can also be overridden by a scheduled value. Note that in some EnergyPlus documentation, the N’s are given as C’s.
 

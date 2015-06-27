@@ -3192,10 +3192,10 @@ This is the Horizontal Infrared Radiation Intensity in Wh/m2. If it is missing, 
 
 where
 
-* <span>$Horizontal_{IR}$</span> is the horizontal IR intensity {W/m<sup>2</sup>}
-* <span>$\epsilon$</span> is the sky emissivity
-* <span>$\sigma$</span> is the Stefan-Boltzmann constant = 5.6697e-8 W/m<sup>2</sup>-K<sup>4</sup>
-* <span>$T_{drybulb}$</span> is the drybulb temperature {K}
+* <span>\(Horizontal_{IR}\)</span> is the horizontal IR intensity {W/m<sup>2</sup>}
+* <span>\(\epsilon\)</span> is the sky emissivity
+* <span>\(\sigma\)</span> is the Stefan-Boltzmann constant = 5.6697e-8 W/m<sup>2</sup>-K<sup>4</sup>
+* <span>\(T_{drybulb}\)</span> is the drybulb temperature {K}
 
 The sky emissivity is given by
 
@@ -3203,14 +3203,14 @@ The sky emissivity is given by
 
 where
 
-* <span>$T_{dewpoint}$</span> is the dewpoint temperature {K}
-* <span>$N$</span> is the opaque sky cover {tenths}
+* <span>\(T_{dewpoint}\)</span> is the dewpoint temperature {K}
+* <span>\(N\)</span> is the opaque sky cover {tenths}
 
-Example: Clear sky (<span>$N=0$</span>), <span>$T_{drybulb} = 273+20=293 K$</span>, <span>$T_{dewpoint} = 273+10=283 K$</span>:
+Example: Clear sky (<span>\(N=0\)</span>), <span>\(T_{drybulb} = 273+20=293 K\)</span>, <span>\(T_{dewpoint} = 273+10=283 K\)</span>:
 
-<span>$\epsilon = 0.787 + 0.764*0.036 = 0.815$</span>
+<span>\(\epsilon = 0.787 + 0.764*0.036 = 0.815\)</span>
 
-<span>$Horizontal_{IR} = 0.815*5.6697e-8*(293^4) = 340.6 W/m^2$</span>
+<span>\(Horizontal_{IR} = 0.815*5.6697e-8*(293^4) = 340.6 W/m^2\)</span>
 
 References (Walton, 1983) (Clark, Allen, 1978) for these calculations are contained in the references section at the end of this list of fields.
 
@@ -3220,11 +3220,11 @@ This is the Global Horizontal Radiation in Wh/m2. (Total amount of direct and di
 
 #### Field: Direct Normal Radiation
 
-This is the Direct Normal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  If the field is missing (<span>$\ge 9999$</span>) or invalid (<span>$<0$</span>), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
+This is the Direct Normal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received directly from the solar disk on a surface perpendicular to the sun's rays, during the number of minutes preceding the time indicated.)  If the field is missing (<span>\(\ge 9999\)</span>) or invalid (<span>\(<0\)</span>), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
 
 #### Field: Diffuse Horizontal Radiation
 
-This is the Diffuse Horizontal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.) If the field is missing (<span>$\ge 9999$</span>) or invalid (<span>$<0$</span>), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
+This is the Diffuse Horizontal Radiation in Wh/m2. (Amount of solar radiation in Wh/m2 received from the sky (excluding the solar disk) on a horizontal surface during the number of minutes preceding the time indicated.) If the field is missing (<span>\(\ge 9999\)</span>) or invalid (<span>\(<0\)</span>), it is set to 0. Counts of such missing values are totaled and presented at the end of the runperiod.
 
 #### Field: Global Horizontal Illuminance
 
@@ -9332,11 +9332,11 @@ Introduction
 
 This auxiliary tool generates HVAC performance curves in EnergyPlus curve object format.  For each set of performance data entered, Capacity and EIR performance curves are generated, and these curves are generated either as a function of temperature(s) or flow fraction.  The Capacity and EIR of Cooling DX Coils as a function of temperatures require only Biquadratic curve whereas Capacity and EIR of Heating DX Coils may use Biquadratic, Cubic and Quadratic curves. The selection of either of these curves is dependent on availability of performance data. The Capacity and EIR as a function of flow fraction allows either Cubic or Quadratic curve type. The curve types allowed are:
 
-Biquadratic: <span>$\text{CurveValue} = a_0 + a_1 X + a_2 X^2 + a_3 Y + a_4 Y^2 + a_5 XY $</span>
+Biquadratic: <span>\(\text{CurveValue} = a_0 + a_1 X + a_2 X^2 + a_3 Y + a_4 Y^2 + a_5 XY \)</span>
 
-Cubic: <span>$\text{CurveValue} = a_0 + a_1 X + a_2 X^2 + a_3 X^3 $</span>
+Cubic: <span>\(\text{CurveValue} = a_0 + a_1 X + a_2 X^2 + a_3 X^3 \)</span>
 
-Quadratic: <span>$\text{CurveValue} = a_0 + a_1 X + a_2 X^2 $</span>
+Quadratic: <span>\(\text{CurveValue} = a_0 + a_1 X + a_2 X^2 \)</span>
 
 These performance curves as a function of temperatures are generated for a given set of input data at a given speed. The curves as a function of flow fraction are generated at the rated temperature conditions.  The rated test condition is the AHRI standard test condition (AHRI 2003;2007; 2008).  The AHRI standard test condition may vary by the equipment type.   For multiple speeds or multiple stage DX Coils, different curve sets can be generated by entering a different set of data for each speed or stage at a time.  The tool automatically populates the labels for each data inputs variable when users select the Coil Type, Independent Variables, Curve Type, and Units. The curve fit tool interface in Figure 1 shows labels selected to generate capacity and EIR biquadratic curves as function of temperatures for DX cooling coil.
 
@@ -9383,7 +9383,7 @@ SI: Temperature in °C, Capacity in kW, Power in kW, and Flow in m<sup>3</sup>/s
 <tr>
 <td>Curve Object Name</td>
 <td>This input is optional.  This string is appended to the default curve object name, or if left blank the default curve object name will be displayed. A curve object is named is created by concatenation as follows:
-<span>$
+<span>\(
 =
 \left\{
  \begin{array}{c}
@@ -9400,7 +9400,7 @@ SI: Temperature in °C, Capacity in kW, Power in kW, and Flow in m<sup>3</sup>/s
   \text{EIRFFF}
  \end{array}
 \right\}
-$</span></td>
+\)</span></td>
 </tr>
 </table>
 

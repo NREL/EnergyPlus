@@ -334,19 +334,19 @@ ThermostatSetpoint:DualSetpoint, VAV Setpoints, Heating Setpoints, Cooling Setpo
 
 This object is used to modify the program   s behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone   s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related set point objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures).
 
-This thermostatic operative temperature, <span>${T_{OP}}$</span>, is defined as:
+This thermostatic operative temperature, <span>\({T_{OP}}\)</span>, is defined as:
 
 <div>\[{T_{OP}} = \gamma {T_{MRT}} + (1 - \gamma ){T_{drybulb}}\]</div>
 
 where,
 
-<span>$\gamma $</span>   is the radiative fraction,
+<span>\(\gamma \)</span>   is the radiative fraction,
 
-<span>${T_{MRT}}$</span>  is the mean radiant temperature for the thermal zone, and
+<span>\({T_{MRT}}\)</span>  is the mean radiant temperature for the thermal zone, and
 
-<span>${T_{drybulb}}$</span>is the mean zone air temperature.
+<span>\({T_{drybulb}}\)</span>is the mean zone air temperature.
 
-The radiative fraction <span>$\gamma $</span>  is selected by the user and can be scheduled to vary during the simulation. A typical value is 0.5. The maximum value needs to be less than 0.9 and the minimum is 0.0. A value of 0.0 is the same as controlling on only zone air temperature. If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply. Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.
+The radiative fraction <span>\(\gamma \)</span>  is selected by the user and can be scheduled to vary during the simulation. A typical value is 0.5. The maximum value needs to be less than 0.9 and the minimum is 0.0. A value of 0.0 is the same as controlling on only zone air temperature. If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply. Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.
 
 Table 28. Radiative Fraction vs Air Velocity (Operative Temperature Control)
 
@@ -358,7 +358,7 @@ Table 28. Radiative Fraction vs Air Velocity (Operative Temperature Control)
 <th>0.6 to 1.0</th>
 </tr>
 <tr>
-<td><span>$\gamma $</span></td>
+<td><span>\(\gamma \)</span></td>
 <td>0.5</td>
 <td>0.4</td>
 <td>0.3</td>
@@ -379,11 +379,11 @@ This field controls whether the input for radiative fraction is a constant value
 
 #### Field: Fixed Radiative Fraction
 
-This is the fraction, <span>$\gamma $</span>, of the operative temperature that is due to the mean radiant temperature in the zone. This field is used by the program if the previous field is set to **Constant**.
+This is the fraction, <span>\(\gamma \)</span>, of the operative temperature that is due to the mean radiant temperature in the zone. This field is used by the program if the previous field is set to **Constant**.
 
 #### Field: Radiative Fraction Schedule Name
 
-This field contains the name of a schedule, defined elsewhere, that determines the value for radiative fraction <span>$\gamma $</span>  during the simulation period. This schedule should have fractional values from 0.0 to 0.9. When the value of this schedule is 0.0, the controlling will be equivalent to control based only on zone air temperature. This field is used by the program if the Input Mode field is set to **Scheduled**.
+This field contains the name of a schedule, defined elsewhere, that determines the value for radiative fraction <span>\(\gamma \)</span>  during the simulation period. This schedule should have fractional values from 0.0 to 0.9. When the value of this schedule is 0.0, the controlling will be equivalent to control based only on zone air temperature. This field is used by the program if the Input Mode field is set to **Scheduled**.
 
 Note that by setting the values in this schedule separately for design days, the user can control how operative temperature control is applied during autosizing. (Operative temperature control tends to increase the equipment capacities calculated during sizing.)
 
@@ -2358,7 +2358,7 @@ In addition to related output that can be obtained for air nodes and surfaces, t
 
 #### Solar Collector Heat Exchanger Effectiveness []
 
-The results from UTSC correlations defined by <span>${\varepsilon_{HX}} = \frac{{{T_{a,HX}} - {T_{amb}}}}{{{T_{s,coll}} - {T_{amb}}}}$</span>.
+The results from UTSC correlations defined by <span>\({\varepsilon_{HX}} = \frac{{{T_{a,HX}} - {T_{amb}}}}{{{T_{s,coll}} - {T_{amb}}}}\)</span>.
 
 #### Solar Collector Leaving Air Temperature [C]
 
@@ -3611,7 +3611,7 @@ This is the ratio of convective heat transfers between air side and water side o
 
 where,
 
-<span>${\eta_f}$</span>  is the fin efficiency, (dimensionless)
+<span>\({\eta_f}\)</span>  is the fin efficiency, (dimensionless)
 
 *h* is the surface convection heat transfer coefficient
 
@@ -7192,7 +7192,7 @@ This numeric field contains the rated volumetric air flow rate on the load side 
 
 And the volumetric air flow rates in the parent objects are calculated as below,
 
-#### <span>$\begin{array}{l}{\rm{LoopVolumetricAirFlowRate}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\\quad \quad \quad {\rm{AirFlowScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitVolAirFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times \\\quad {\kern 1pt} {\kern 1pt} \quad \quad {\rm{CapacityScaleFactor}}\end{array}$</span>
+#### <span>\(\begin{array}{l}{\rm{LoopVolumetricAirFlowRate}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\\quad \quad \quad {\rm{AirFlowScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitVolAirFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times \\\quad {\kern 1pt} {\kern 1pt} \quad \quad {\rm{CapacityScaleFactor}}\end{array}\)</span>
 
 #### Field: Part Load Fraction Correlation Curve Name
 
@@ -10006,7 +10006,7 @@ This field is used to assign the environmental conditions surrounding the TES co
 
 #### Field:   Storage Tank to Ambient U-value Times Area Heat Transfer Coefficient [W/K]
 
-This field is used to characterize the rate at which heat is exchanged between the TES tank and the surrounding ambient conditions, in W/K.   This is an overall    UA    value for the tank where the U-factor and surface area are combined into one coefficient.   Heat loss or gain to the TES tank is modeled using <span>$\dot Q = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)$</span>. This field is required.
+This field is used to characterize the rate at which heat is exchanged between the TES tank and the surrounding ambient conditions, in W/K.   This is an overall    UA    value for the tank where the U-factor and surface area are combined into one coefficient.   Heat loss or gain to the TES tank is modeled using <span>\(\dot Q = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)\)</span>. This field is required.
 
 #### Field:   Fluid Storage Tank Rating Temperature [C]
 
@@ -10376,11 +10376,11 @@ This field is the wetbulb effectiveness for the evaporatively-cooled condenser. 
 
 where
 
-           <span>${T_{cond\;inlet}}$</span>= the temperature of air entering the condenser section, in  &deg;C. This value will be used when evaluating performance curves that depend on the drybulb entering the condenser section.
+           <span>\({T_{cond\;inlet}}\)</span>= the temperature of air entering the condenser section, in  &deg;C. This value will be used when evaluating performance curves that depend on the drybulb entering the condenser section.
 
-           <span>${T_{wb,o}}$</span>= the wetbulb temperature of outdoor air, in  &deg;C
+           <span>\({T_{wb,o}}\)</span>= the wetbulb temperature of outdoor air, in  &deg;C
 
-           <span>${T_{db,o}}$</span>= the drybulb temperature of outdoor air, in  &deg;C.
+           <span>\({T_{db,o}}\)</span>= the drybulb temperature of outdoor air, in  &deg;C.
 
 This field is required if the condenser type is set to EvaporativelyCooled. If the field is left blank then a default of 0.7 is used.
 
@@ -11594,7 +11594,7 @@ The required numeric outlet area of the fan (*A<sub>fan,out</sub>*, m<sup>2</sup
 
 #### Field: Maximum Fan Static Efficiency
 
-The required numeric maximum ratio (<span>$\eta_{fan,max}$</span>) between the power delivered to the air (*H<sub>air</sub>*, W) and the fan shaft input power (*H<sub>fan</sub>*, W). For this parameter, *H<sub>air</sub>* is the volumetric airflow through the fan multiplied by the fan static pressure rise. Maximum fan static efficiency is determined from analyses of manufacturers data using:
+The required numeric maximum ratio (<span>\(\eta_{fan,max}\)</span>) between the power delivered to the air (*H<sub>air</sub>*, W) and the fan shaft input power (*H<sub>fan</sub>*, W). For this parameter, *H<sub>air</sub>* is the volumetric airflow through the fan multiplied by the fan static pressure rise. Maximum fan static efficiency is determined from analyses of manufacturers data using:
 
 <div>\[{\eta_{fan,\max }} = \max \left[ {\frac{{\left( {\Delta {P_{fan}} * {Q_{fan}}} \right)}}{{{H_{fan}}}}} \right]\]</div>
 
@@ -11612,11 +11612,11 @@ where *P<sub>fan</sub>* is fan static pressure rise (Pa; see *Fan Pressure Rise 
 
 #### Field: Maximum Dimensionless Fan Airflow
 
-The required numeric maximum dimensionless airflow (<span>$\psi_{max}$</span>) through the fan, which corresponds to the maximum ratio between the airflow through the fan (*Q<sub>fan</sub>*, m<sup>3</sup>/sec) and the fan shaft rotational speed (<span>$\omega$</span><sub>fan</sub>*, rpm) for the specified fan wheel diameter (*D<sub>fan</sub>*, m). *φ<sub>max</sub>* is determined from manufacturers data using:
+The required numeric maximum dimensionless airflow (<span>\(\psi_{max}\)</span>) through the fan, which corresponds to the maximum ratio between the airflow through the fan (*Q<sub>fan</sub>*, m<sup>3</sup>/sec) and the fan shaft rotational speed (<span>\(\omega\)</span><sub>fan</sub>*, rpm) for the specified fan wheel diameter (*D<sub>fan</sub>*, m). *φ<sub>max</sub>* is determined from manufacturers data using:
 
 <div>\[{\varphi_{\max }} = \frac{{30}}{{\pi D_{fan}^3}}*\max \left( {\frac{{{Q_{fan}}}}{{{\omega_{fan}}}}} \right)\]</div>
 
-<sub>max</sub>* occurs at minimum *Eu*, which corresponds to maximum speed (high flow) with zero pressure rise. The factor (<span>$30/\pi$</span>) converts revolutions per minute (rpm) to rad/s. Must be greater than zero.
+<sub>max</sub>* occurs at minimum *Eu*, which corresponds to maximum speed (high flow) with zero pressure rise. The factor (<span>\(30/\pi\)</span>) converts revolutions per minute (rpm) to rad/s. Must be greater than zero.
 
 #### Field: Motor Fan Pulley Ratio
 
@@ -11626,7 +11626,7 @@ Specified or autosized motor/fan pulley diameter ratio is reported in the .eio f
 
 #### Field: Belt Maximum Torque
 
-The required numeric maximum output torque capacity of the fan drive belt (<span>$\tau_{belt,max}$</span> [N-m]). If specified, must be greater than zero. Can be autosized. Use autosize if no belt (i.e., direct drive).
+The required numeric maximum output torque capacity of the fan drive belt (<span>\(\tau_{belt,max}\)</span> [N-m]). If specified, must be greater than zero. Can be autosized. Use autosize if no belt (i.e., direct drive).
 
 Specified or autosized belt maximum output torque (including effects of scaling by Field: Belt Sizing Factor) is reported in the .eio file as Design Belt Output Torque [N -m]. Also, calculated maximum belt efficiency corresponding to Design Fan Shaft Power, along with belt efficiency at design flow condition (including part-load effects of oversized belt), are reported in the .eio file as, respectively, Maximum Belt Efficiency [-] and Design Belt Efficiency [-].
 
@@ -11684,7 +11684,7 @@ For an ad hoc linear duct static pressure reset scheme, the relation (ref: Curve
 
 <div>\[{P_{sm}} = {P_{sm,\min }} + \left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)*\frac{{\left( {{Q_{fan}} - {Q_{fan,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}} = {C_1} + {C_2}*{Q_{fan}}\]</div>
 
-where <span>${C_1} = {P_{sm,\min }} - {C_2}*{Q_{fan,\min }}$</span>  and <span>${C_2} = \frac{{\left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}}$</span>
+where <span>\({C_1} = {P_{sm,\min }} - {C_2}*{Q_{fan,\min }}\)</span>  and <span>\({C_2} = \frac{{\left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}}\)</span>
 
 
 
@@ -11724,7 +11724,7 @@ The output of this curve is used to calculate the dimensionless airflow *φ* (*x
 
 The alpha name of the quartic polynomial performance curve (ref: Curve:Quartic in Performance Curves) that determines the maximum fan drive belt efficiency in logarithmic space (*-<sub>belt,max,ln</sub>*) as a function of *x<sub>belt,max</sub>*. The curve is:
 
-*<span>${\eta_{belt,\max ,\ln }} = {C_1} + {C_2} \cdot {x_{belt,\max }} + {C_3} \cdot x_{_{belt,\max }}^2 + {C_4} \cdot x_{_{belt,\max }}^3 + {C_5} \cdot x_{_{belt,\max }}^4$</span>*
+*<span>\({\eta_{belt,\max ,\ln }} = {C_1} + {C_2} \cdot {x_{belt,\max }} + {C_3} \cdot x_{_{belt,\max }}^2 + {C_4} \cdot x_{_{belt,\max }}^3 + {C_5} \cdot x_{_{belt,\max }}^4\)</span>*
 
 where *x<sub>belt,max</sub>* *= ln*(*F<sub>belt</sub>\*H<sub>fan,max</sub>*) with *H<sub>fan,max</sub>* expressed in terms of hp.
 
@@ -16998,7 +16998,7 @@ The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic
 
 Figure 145.   Psychrometric Chart -- Constant Enthalpy
 
-If the direct evaporative process were 100% efficient, the leaving dry-bulb temperature would equal the entering wet-bulb temperature.   The efficiency of the direct evaporative process is less than 100% and by defining saturation efficiency (<span>$\varepsilon $</span>se) for the direct stage or evaporative pad, the leaving dry-bulb temperature can be expressed by the following equation.
+If the direct evaporative process were 100% efficient, the leaving dry-bulb temperature would equal the entering wet-bulb temperature.   The efficiency of the direct evaporative process is less than 100% and by defining saturation efficiency (<span>\(\varepsilon \)</span>se) for the direct stage or evaporative pad, the leaving dry-bulb temperature can be expressed by the following equation.
 
 <div>\[{T_{db\,supout}} = {T_{db\,sup\,in}} - {\varepsilon_{se}}\cdot \left( {{T_{db\,sup\,in}} - {T_{wb\,sup\,in}}} \right)\]</div>
 
@@ -18604,17 +18604,17 @@ This model predicts the regeneration air stream outlet temperature and humidity 
 
 where,
 
-<span>$RTO$</span>  = Regeneration outlet air dry-bulb temperature (C)
+<span>\(RTO\)</span>  = Regeneration outlet air dry-bulb temperature (C)
 
-<span>$RWI$</span>  = Regeneration inlet air humidity ratio (kgWater/kgDryAir)
+<span>\(RWI\)</span>  = Regeneration inlet air humidity ratio (kgWater/kgDryAir)
 
-<span>$RTI$</span>    = Regeneration inlet air dry-bulb temperature (C)
+<span>\(RTI\)</span>    = Regeneration inlet air dry-bulb temperature (C)
 
-<span>$PWI$</span>  = Process inlet air humidity ratio (kgWater/kgDryAir)
+<span>\(PWI\)</span>  = Process inlet air humidity ratio (kgWater/kgDryAir)
 
-<span>$PTI$</span>   = Process inlet air dry-bulb temperature (C)
+<span>\(PTI\)</span>   = Process inlet air dry-bulb temperature (C)
 
-<span>$RFV$</span>  = Regeneration (and process) face velocity (m/s)
+<span>\(RFV\)</span>  = Regeneration (and process) face velocity (m/s)
 
 - The humidity ratio of the regeneration outlet air is defined using the same empirical equation form; however, different coefficients are used as follows:
 
@@ -18622,7 +18622,7 @@ where,
 
 where,
 
-<span>$RWO$</span>  = Regeneration outlet air humidity ratio (kgWater/kgDryAir)
+<span>\(RWO\)</span>  = Regeneration outlet air humidity ratio (kgWater/kgDryAir)
 
 - The process outlet air conditions are then calculated based on the regeneration outlet air conditions (temperature or humidity ratio) calculated above, the actual regeneration inlet air conditions entering the heat exchanger, and assuming the same amount of sensible and total energy transfer across both the process and regeneration sides of the heat exchanger. The difference between the actual inlet air conditions and RTI/RWI/PTI/PWI is made here because user-defined limits for RTI/RWI/PTI/PWI may result in a difference between the actual conditions and those used in the equations shown above (see the EnergyPlus Engineering Reference for further discussion).
 
@@ -20224,7 +20224,7 @@ This field indicates the open circuit voltage for a fully discharged battery mod
 
 #### Field: Voltage Change Curve Name for Charging
 
-This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (<span>$\Delta E$</span>) as a function of the battery state of charge in charging. The change of open circuit voltage is relative to a fully discharged battery.
+This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (<span>\(\Delta E\)</span>) as a function of the battery state of charge in charging. The change of open circuit voltage is relative to a fully discharged battery.
 
 The curve has the following form:
 
@@ -20234,7 +20234,7 @@ where X is the battery charge divided by the maximum capacity at a given current
 
 #### Field: Voltage Change Curve Name for Discharging
 
-This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (<span>$\Delta E$</span>) as a function of the battery state of charge in discharging. The change of open circuit voltage is relative to a fully charged battery.
+This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (<span>\(\Delta E\)</span>) as a function of the battery state of charge in discharging. The change of open circuit voltage is relative to a fully charged battery.
 
 The curve has the following form:
 
@@ -21475,19 +21475,19 @@ This is the maximum temperature of cooling water inlet or outlet that can occur 
 
 #### Field: Electrical Efficiency Curve Name
 
-This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>${\eta_e}$</span>, is a function of   the cooling water mass flow rate, <span>${\dot m_{cw}}$</span>, the temperature of the cooling water at the inlet, <span>${T_{cw}}$</span>, the steady-state net electrical power produced, <span>${P_{net,ss}}$</span>.
+This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>\({\eta_e}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
 
-           <span>${\eta_e} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)$</span>
+           <span>\({\eta_e} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
 
-The associated Curve:Triquadratic object should be defined with the independent variables <span>${P_{net,ss}},{\dot m_{cw}},{T_{cw}}$</span>  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Thermal Efficiency Curve Name
 
-This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>${\eta_q}$</span>, is a function of   the cooling water mass flow rate, <span>${\dot m_{cw}}$</span>, the temperature of the cooling water at the inlet, <span>${T_{cw}}$</span>, the steady-state net electrical power produced, <span>${P_{net,ss}}$</span>.
+This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>\({\eta_q}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
 
-           <span>${\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)$</span>
+           <span>\({\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
 
-The associated Curve:Triquadratic object should be defined with the independent variables <span>${P_{net,ss}},{\dot m_{cw}},{T_{cw}}$</span>  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Cooling Water Flow Rate Mode
 
@@ -21497,7 +21497,7 @@ For internal control, the following field is used to define a Biquadratic curve 
 
 #### Field: Cooling Water Flow Rate Curve Name
 
-This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span>${\dot m_{cw}}$</span>.   This field is only used if the prior field is set to    InternalControl.      The mass flow of cooling water is a function of steady-state power, <span>${P_{net,ss}}$</span>, and the inlet temperature of the cooling water, <span>${T_{cw}}$</span>.   The associated Curve:Biquadratic should be defined with the independent variables <span>${P_{net,ss}}$</span>  and <span>${T_{cw}}$</span>  corresponding to *x* and *y*, respectively.
+This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span>\({\dot m_{cw}}\)</span>.   This field is only used if the prior field is set to    InternalControl.      The mass flow of cooling water is a function of steady-state power, <span>\({P_{net,ss}}\)</span>, and the inlet temperature of the cooling water, <span>\({T_{cw}}\)</span>.   The associated Curve:Biquadratic should be defined with the independent variables <span>\({P_{net,ss}}\)</span>  and <span>\({T_{cw}}\)</span>  corresponding to *x* and *y*, respectively.
 
 #### Field: Air Flow Rate Curve Name
 
@@ -21547,7 +21547,7 @@ This field describes the value for the coefficient used to determine the rate of
 
 #### Field: Nominal Engine Operating Temperature
 
-This field describes the nominal engine temperature during normal, steady-state operation, <span>${T_{eng,nom}}$</span>  [ &deg;C].
+This field describes the nominal engine temperature during normal, steady-state operation, <span>\({T_{eng,nom}}\)</span>  [ &deg;C].
 
 #### Field: Warm Up Power Coefficient
 
@@ -22022,15 +22022,15 @@ This variable provides the temperature of the air supplied to the power module a
 
 #### Generator Air Molar Flow Rate [kmol/s]
 
-This variable provides the results for <span>${\dot N_{air}}$</span>, the flow rate of air into the FC.
+This variable provides the results for <span>\({\dot N_{air}}\)</span>, the flow rate of air into the FC.
 
 #### Generator Power Module Entering Air Enthalpy [W]
 
-This variable provides the results for <span>${\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}$</span>, which is the enthalpy flow in the air stream entering the power module relative to 25 &deg;C.
+This variable provides the results for <span>\({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\)</span>, which is the enthalpy flow in the air stream entering the power module relative to 25 &deg;C.
 
 #### Generator Blower Electric Power [W]
 
-This variable provides the results for <span>${P_{blower - el}}$</span>, which is the electrical power used by the air supply blower.
+This variable provides the results for <span>\({P_{blower - el}}\)</span>, which is the electrical power used by the air supply blower.
 
 #### Generator Blower Electric Energy [J]
 
@@ -22038,7 +22038,7 @@ This variable provides the results for the energy used by the air supply blower.
 
 #### Generator Blower Skin Heat Loss Rate [W]
 
-This variable provides the results for <span>${q_{blower - heat - loss}}$</span>, which is the rate of energy    lost    to the surroundings.
+This variable provides the results for <span>\({q_{blower - heat - loss}}\)</span>, which is the rate of energy    lost    to the surroundings.
 
 #### Generator Fuel Inlet Temperature [C]
 
@@ -22050,15 +22050,15 @@ This variable provides the temperature of the fuel supplied to the power module 
 
 #### Generator Fuel Molar Flow Rate [kmol/s]
 
-This variable provides the results for <span>${\dot N_{fuel}}$</span>, which is the flow rate of fuel into the FC.
+This variable provides the results for <span>\({\dot N_{fuel}}\)</span>, which is the flow rate of fuel into the FC.
 
 #### Generator Power Module Entering Fuel Enthalpy [W]
 
-This variable provides the results for <span>${\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}$</span>, which is the enthalpy flow in the fuel stream entering the power module relative to 25 &deg;C.
+This variable provides the results for <span>\({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\)</span>, which is the enthalpy flow in the fuel stream entering the power module relative to 25 &deg;C.
 
 #### Generator Fuel Compressor Electric Power [W]
 
-This variable provides the results for <span>${P_{comp - el}}$</span>, which is the electrical power used by the fuel supply compressor.
+This variable provides the results for <span>\({P_{comp - el}}\)</span>, which is the electrical power used by the fuel supply compressor.
 
 #### Generator Fuel Compressor Electric Energy [J]
 
@@ -22078,11 +22078,11 @@ This variable provides the temperature of the water supplied to the power module
 
 #### Generator Fuel Reformer Water Molar Flow Rate [kmol/s]
 
-This variable provides the results for <span>${\dot N_{water}}$</span>, which the flow rate of reforming water into the FC.
+This variable provides the results for <span>\({\dot N_{water}}\)</span>, which the flow rate of reforming water into the FC.
 
 #### Generator Fuel Reformer Water Pump Electric Power [W]
 
-This variable provides the results for <span>${P_{pump - el}}$</span>, which is the electrical power used by the water pump.
+This variable provides the results for <span>\({P_{pump - el}}\)</span>, which is the electrical power used by the water pump.
 
 #### Generator Fuel Reformer Water Pump Electric Energy [J]
 
@@ -22090,7 +22090,7 @@ This variable provides the results for energy used by the water pump. It is also
 
 #### Generator Power Module Entering Reforming Water Enthalpy [W]
 
-This variable provides the results for <span>${\dot H_{liq - water}}$</span>  which is the enthalpy flow of the water stream entering the power module relative to 25 &deg;C.
+This variable provides the results for <span>\({\dot H_{liq - water}}\)</span>  which is the enthalpy flow of the water stream entering the power module relative to 25 &deg;C.
 
 #### Generator Product Gas Temperature [C]
 
@@ -22098,7 +22098,7 @@ This variable provides the results for the temperature of the product gas stream
 
 #### Generator Product Gas Enthalpy [W]
 
-This variable provides the results for <span>${\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}$</span>, which is the enthalpy flow in the product gas stream leaving the power module relative to 25 &deg;C.
+This variable provides the results for <span>\({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}\)</span>, which is the enthalpy flow in the product gas stream leaving the power module relative to 25 &deg;C.
 
 #### Generator Product Gas Molar Flow Rate [kmol/s]
 
@@ -22130,11 +22130,11 @@ This variable provides the results for the power losses associated with ineffici
 
 #### Generator Produced DC Electric Power [W]
 
-This variable provides the results for <span>${P_{el}}$</span>, which is the net DC electrical power produced by the fuel cell power module.
+This variable provides the results for <span>\({P_{el}}\)</span>, which is the net DC electrical power produced by the fuel cell power module.
 
 #### Generator DC Power Efficiency [ ]
 
-This variable provides the results for <span>${\varepsilon_{el}}$</span>, which is the electrical efficiency of the fuel cell power module.
+This variable provides the results for <span>\({\varepsilon_{el}}\)</span>, which is the electrical efficiency of the fuel cell power module.
 
 #### Generator Electric Storage Charge State [J]
 
@@ -22158,7 +22158,7 @@ This variable provides the energy drawn from the fuel cell   s electrical storag
 
 #### Generator Ancillary AC Electric Power [W]
 
-This variable provides the results for <span>${P_{el,ancillaries - AC}}$</span>, which is the rate at which ancillary devices within the power module use electricity supplied to the fuel cell by an external source.
+This variable provides the results for <span>\({P_{el,ancillaries - AC}}\)</span>, which is the rate at which ancillary devices within the power module use electricity supplied to the fuel cell by an external source.
 
 #### Generator Ancillary AC Electric Energy [J]
 
@@ -22198,7 +22198,7 @@ This field is used to choose between different modes of inputting the electrical
 
 #### Field: Efficiency Curve Name
 
-This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. The curve is a function of the net DC electric power, <span>${P_{el}}$</span>  (W), produced by the power module and describes either the electrical efficiency or the how the efficiency is modified depending on the mode selected in the previous field. This quadratic curve is just one part of the entire parametric relation used to describe electrical efficiency <span>${\varepsilon_{el}}$</span>. For the Annex42 mode the full relation for efficiency is,
+This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. The curve is a function of the net DC electric power, <span>\({P_{el}}\)</span>  (W), produced by the power module and describes either the electrical efficiency or the how the efficiency is modified depending on the mode selected in the previous field. This quadratic curve is just one part of the entire parametric relation used to describe electrical efficiency <span>\({\varepsilon_{el}}\)</span>. For the Annex42 mode the full relation for efficiency is,
 
 <div>\[{\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot {P_{el}} + {\varepsilon_2} \cdot P_{el}^2} \right] \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_{} {dt - {t_{threshold}},0.0))}  \cdot L} \right]\]</div>
 
@@ -22206,35 +22206,35 @@ where the Curve:Quadratic input object named in this field serves to define the 
 
 <div>\[{\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot \frac{{{P_{el}}}}{{{P_{nom}}}} + {\varepsilon_2} \cdot {{\left( {\frac{{{P_{el}}}}{{{P_{nom}}}}} \right)}^2}} \right] \cdot {\varepsilon_{nom}} \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_0 {dt - {t_{threshold}},0.0))}  \cdot L} \right]\]</div>
 
-where <span>${\varepsilon_{nom}}$</span>  is the nominal electrical efficiency at the rating point <span>${P_{nom}}$</span>  which are described in the next two fields. The Normalized mode may be more useful for a simulation study that needs to vary the capacity of the FC.
+where <span>\({\varepsilon_{nom}}\)</span>  is the nominal electrical efficiency at the rating point <span>\({P_{nom}}\)</span>  which are described in the next two fields. The Normalized mode may be more useful for a simulation study that needs to vary the capacity of the FC.
 
 #### Field: Nominal Efficiency
 
-This field is used for the    Normalized    efficiency curve mode and provides the nominal efficiency <span>${\varepsilon_{nom}}$</span>  (dimensionless) at the rating point. This field can be left blank if using the    Annex42    mode.
+This field is used for the    Normalized    efficiency curve mode and provides the nominal efficiency <span>\({\varepsilon_{nom}}\)</span>  (dimensionless) at the rating point. This field can be left blank if using the    Annex42    mode.
 
 #### Field: Nominal Electrical Power
 
-This field is used for the    Normalized    efficiency curve mode and provides the nominal net DC electrical power produced <span>${P_{nom}}$</span>  (W) at the rating point. This field can be left blank if using the    Annex42    mode.
+This field is used for the    Normalized    efficiency curve mode and provides the nominal net DC electrical power produced <span>\({P_{nom}}\)</span>  (W) at the rating point. This field can be left blank if using the    Annex42    mode.
 
 #### Field: Number of Stops at Start of Simulation
 
-This field is used to describe the number of times the FC has been cycled on and off prior to the start of the simulation. FC products might degrade as a result of starting and stopping the fuel cell stack, so the model includes terms to model the degradation effects of cycling FC units on and off. This is the initial value of the <span>${N_{stops}}$</span>*<sub>  </sub>*term in the efficiency relation above.
+This field is used to describe the number of times the FC has been cycled on and off prior to the start of the simulation. FC products might degrade as a result of starting and stopping the fuel cell stack, so the model includes terms to model the degradation effects of cycling FC units on and off. This is the initial value of the <span>\({N_{stops}}\)</span>*<sub>  </sub>*term in the efficiency relation above.
 
 #### Field: Cycling Performance Degradation Coefficient
 
-This field is used to describe the fixed value representing the fractional performance degradation associated with each start and stop cycle. This is the value of <span>$D$</span>  in the efficiency relations above. If there is no degradation from cycling, then D should be 0.0.
+This field is used to describe the fixed value representing the fractional performance degradation associated with each start and stop cycle. This is the value of <span>\(D\)</span>  in the efficiency relations above. If there is no degradation from cycling, then D should be 0.0.
 
 #### Field: Number of Run Hours at Beginning of Simulation
 
-This field is used to describe the amount of time the FC has been operating prior to the start of the simulation. FC products might degrade over time so the model includes terms to model the degradation effects of FC run time. This is the initial value of the integrated run time term <span>$\int\limits_0 {dt} $</span>.
+This field is used to describe the amount of time the FC has been operating prior to the start of the simulation. FC products might degrade over time so the model includes terms to model the degradation effects of FC run time. This is the initial value of the integrated run time term <span>\(\int\limits_0 {dt} \)</span>.
 
 #### Field: Accumulated Run Time Degradation Coefficient
 
-This field is used to describe the fixed value representing the fractional performance degradation associated with the total amount of run time. This is the value of <span>$L$</span>  in the efficiency relations above. If there is no degradation from run time, the L should be 0.0.
+This field is used to describe the fixed value representing the fractional performance degradation associated with the total amount of run time. This is the value of <span>\(L\)</span>  in the efficiency relations above. If there is no degradation from run time, the L should be 0.0.
 
 #### Field: Run Time Degradation Initiation Time Threshold
 
-This field is used to describe the time period for which there is no degradation associated with the amount of run time. This provides the ability to model a system that initially operates without degradation for some period time before it starts to degrade. This is the value of <span>${t_{threshold}}$</span>  in the efficiency relations above.
+This field is used to describe the time period for which there is no degradation associated with the amount of run time. This provides the ability to model a system that initially operates without degradation for some period time before it starts to degrade. This is the value of <span>\({t_{threshold}}\)</span>  in the efficiency relations above.
 
 #### Field: Power Up Transient Limit
 
@@ -22274,15 +22274,15 @@ This field is used to describe the amount of electricity (J) used by ancillary e
 
 #### Field: Ancillary Electricity Constant Term
 
-This field is used to describe the constant term, <span>$an{c_0}$</span>, in a relation that describes the AC electrical power used by ancillary equipment located inside the power module, <span>${P_{el,ancillaries - AC}}$</span>. The model uses this relation,
+This field is used to describe the constant term, <span>\(an{c_0}\)</span>, in a relation that describes the AC electrical power used by ancillary equipment located inside the power module, <span>\({P_{el,ancillaries - AC}}\)</span>. The model uses this relation,
 
 <div>\[{P_{el,ancillaries - AC}} = an{c_0} + an{c_1} \cdot {\dot N_{fuel}}\]</div>
 
-where <span>${\dot N_{fuel}}$</span>  is the rate of fuel use in the power module (kmol/s).
+where <span>\({\dot N_{fuel}}\)</span>  is the rate of fuel use in the power module (kmol/s).
 
 #### Field: Ancillary Electricity Linear Term
 
-This field is used to describe the linear term, <span>$an{c_1}$</span>, in the relation shown in the previous field.
+This field is used to describe the linear term, <span>\(an{c_1}\)</span>, in the relation shown in the previous field.
 
 #### Field: Skin Loss Calculation Mode
 
@@ -22328,11 +22328,11 @@ This field is used to describe the air node where the dilution air is exhausted 
 
 #### Field: Minimum Operating Point
 
-This field is used to describe the minimum operating point for the net DC electric power, <span>${P_{el}}$</span>  (W).
+This field is used to describe the minimum operating point for the net DC electric power, <span>\({P_{el}}\)</span>  (W).
 
 #### Field: Maximum Operating Point
 
-This field is used to describe the maximum operating point for the net DC electric power, <span>${P_{el}}$</span>  (W).
+This field is used to describe the maximum operating point for the net DC electric power, <span>\({P_{el}}\)</span>  (W).
 
 An example input data file (IDF) entry for this object is provided below:
 
@@ -22391,13 +22391,13 @@ This field contains the node name for the water outlet from the stack cooler.
 
 #### Field: Nominal Stack Temperature
 
-This field contains the nominal stack operating temperature for the PEMFC, <span>$T_{stack}^o$</span>. This field and the next five provide values for use in the empirical equation for the rate of heat extracted from the fuel cell power module by the stack cooler using the following relation
+This field contains the nominal stack operating temperature for the PEMFC, <span>\(T_{stack}^o\)</span>. This field and the next five provide values for use in the empirical equation for the rate of heat extracted from the fuel cell power module by the stack cooler using the following relation
 
 <div>\[{q_{s - cool}} = \left[ {{r_0} + {r_1}\left( {{T_{stack}} - T_{stack}^o} \right)} \right] \cdot \left[ {1 + {r_2}{P_{el}} + {r_3}P_{el}^2} \right]\]</div>
 
 #### Field: Actual Stack Temperature]
 
-This field contains the actual stack operating temperature for the PEMFC, <span>${T_{stack}}$</span>.
+This field contains the actual stack operating temperature for the PEMFC, <span>\({T_{stack}}\)</span>.
 
 #### Field: Coefficient r0
 
@@ -22425,27 +22425,27 @@ This is the heat transfer coefficient between the stack and the coolant.
 
 #### Field: Fs-cogen Adjustment Factor
 
-This field provides the value for an adjustment factor, <span>${F_{s - cogen}}$</span>, used in the following relation for the cogeneration heat transfer coefficient, <span>${\left( {UA} \right)_{s - cogen}}$</span>:
+This field provides the value for an adjustment factor, <span>\({F_{s - cogen}}\)</span>, used in the following relation for the cogeneration heat transfer coefficient, <span>\({\left( {UA} \right)_{s - cogen}}\)</span>:
 
 <div>\[{\left( {UA} \right)_{s - cogen}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{s - cogen}}}} + {F_{s - cogen}}} \right]^{ - 1}}\]</div>
 
 #### Field: Stack Cogeneration Exchanger Area
 
-This field provides the value for the cogeneration heat exchanger area, <span>${A_{s - cogen}}$</span>
+This field provides the value for the cogeneration heat exchanger area, <span>\({A_{s - cogen}}\)</span>
 
 #### Field: Stack Cogeneration Exchanger Nominal Flow Rate
 
-This field provides the value for <span>$\dot N_{s - cogen}^0$</span>  in the following relation for the cogeneration heat exchanger convection coefficient, <span>${h_{s - cogen}}$</span>:
+This field provides the value for <span>\(\dot N_{s - cogen}^0\)</span>  in the following relation for the cogeneration heat exchanger convection coefficient, <span>\({h_{s - cogen}}\)</span>:
 
 <div>\[{h_{s - cogen}} = h_{s - cogen}^0 \cdot {\left( {\frac{{{{\dot N}_{s - cogen}}}}{{\dot N_{s - cogen}^0}}} \right)^{{n_s}}}\]</div>
 
 #### Field: Stack Cogeneration Exchanger Nominal Heat Transfer Coefficient
 
-This field provides the value for <span>$h_{s - cogen}^0$</span>  in the relation above for the cogeneration heat exchanger convection coefficient, <span>${h_{s - cogen}}$</span>.
+This field provides the value for <span>\(h_{s - cogen}^0\)</span>  in the relation above for the cogeneration heat exchanger convection coefficient, <span>\({h_{s - cogen}}\)</span>.
 
 #### Field: Stack Cogeneration Exchanger Nominal Heat Transfer Coefficient Exponent
 
-This field provides the value for <span>${n_s}$</span>  is the relation above for the cogeneration heat exchanger convection coefficient, <span>${h_{s - cogen}}$</span>.
+This field provides the value for <span>\({n_s}\)</span>  is the relation above for the cogeneration heat exchanger convection coefficient, <span>\({h_{s - cogen}}\)</span>.
 
 #### Field: Stack Cooler Pump Power
 
@@ -22501,19 +22501,19 @@ This field describes the excess air ratio beyond stoichiometric air supply. This
 
 #### Field: Air Rate Function of Electric Power Curve Name
 
-This field contains the name of a QuadraticCurve input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofElectricPower. The quadratic curve named here describes the first part of the relation below used to calculate the rate of inlet air, <span>${\dot N_{air}}$</span>(kmol/s). It is a quadratic function of the net DC electrical power, <span>${P_{el}}$</span>  (W).
+This field contains the name of a QuadraticCurve input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofElectricPower. The quadratic curve named here describes the first part of the relation below used to calculate the rate of inlet air, <span>\({\dot N_{air}}\)</span>(kmol/s). It is a quadratic function of the net DC electrical power, <span>\({P_{el}}\)</span>  (W).
 
 <div>\[{a_3}\]</div>
 
 #### Field: Air Rate Air Temperature Coefficient
 
-This field is used to describe the air temperature coefficient, <span>${\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]$</span>, used to adjust inlet air flow rate in the relations for inlet air rate.
+This field is used to describe the air temperature coefficient, <span>\({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)</span>, used to adjust inlet air flow rate in the relations for inlet air rate.
 
 #### Field: Air Rate Function of Fuel Rate Curve Name
 
-This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofFuelRate. The quadratic curve named here describes the first part of the relation used to calculate the rate of inlet air, <span>${\dot N_{air}}$</span>(kmol/s). It is a quadratic function of the fuel flow rate, <span>${\dot N_{fuel}}$</span>.
+This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofFuelRate. The quadratic curve named here describes the first part of the relation used to calculate the rate of inlet air, <span>\({\dot N_{air}}\)</span>(kmol/s). It is a quadratic function of the fuel flow rate, <span>\({\dot N_{fuel}}\)</span>.
 
-<span>${\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]$</span><span>${\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]$</span>
+<span>\({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)</span><span>\({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)</span>
 
 #### Field: Air Intake Heat Recovery Mode
 
@@ -22720,13 +22720,13 @@ This field describes the excess air ratio beyond stoichiometric air supply for t
 
 #### Field: Ancillary Power Constant Term
 
-This field describes the constant term, <span>${x_0}$</span>, used to model the auxiliary burner   s ancillary devices such as fans and ignition controls. The electrical power for ancillaries is calculated using,
+This field describes the constant term, <span>\({x_0}\)</span>, used to model the auxiliary burner   s ancillary devices such as fans and ignition controls. The electrical power for ancillaries is calculated using,
 
 <div>\[{P_{el,aux - ancillaries}} = {x_0} + {x_1} \cdot {\dot N_{aux - fuel}}\]</div>
 
 #### Field: Ancillary Power Linear Term
 
-This field describes the linear term, <span>${x_1}$</span>, used to model the auxiliary burner   s ancillary devices.
+This field describes the linear term, <span>\({x_1}\)</span>, used to model the auxiliary burner   s ancillary devices.
 
 #### Field: Skin Loss U-Factor Times Area Value
 
@@ -22734,7 +22734,7 @@ This field describes the    UA    term (W/K) for calculating skin losses in the 
 
 <div>\[{q_{aux - skin - losses}} = {(UA)_{aux}} \cdot ({T_{aux - mix}} - {T_{room}})\]</div>
 
-where, <span>${T_{aux - mix}}$</span>  is temperature of product gases leaving the auxiliary burner and includes the mixing of the product gases from the fuel cell power module. Thus, the input for UA should reflect this choice of reference temperature rather than an exterior surface temperature of the auxiliary burner.
+where, <span>\({T_{aux - mix}}\)</span>  is temperature of product gases leaving the auxiliary burner and includes the mixing of the product gases from the fuel cell power module. Thus, the input for UA should reflect this choice of reference temperature rather than an exterior surface temperature of the auxiliary burner.
 
 #### Field: Skin Loss Destination
 
@@ -22813,89 +22813,89 @@ This field is used to direct how EnergyPlus will calculate heat exchanger perfor
 
 #### Field: Method 1 Heat Exchanger Effectiveness
 
-This field describes constant heat exchanger effectiveness, <span>${\varepsilon_{HX}}$</span>. This field is only used with the    FixedEffectiveness    mode, which corresponds to    method 1    in the Annex 42 specification. For this mode, the heat exchange between the exhaust gases and the heat recovery water are calculated using,
+This field describes constant heat exchanger effectiveness, <span>\({\varepsilon_{HX}}\)</span>. This field is only used with the    FixedEffectiveness    mode, which corresponds to    method 1    in the Annex 42 specification. For this mode, the heat exchange between the exhaust gases and the heat recovery water are calculated using,
 
 <div>\[{q_{HX}} = {\varepsilon_{HX}} \cdot {\left( {\dot N{{\hat c}_p}} \right)_{\min }} \cdot \left( {{T_{aux - mix}} - {T_{water,in}}} \right)\]</div>
 
-where, <span>${\left( {\dot N{{\hat c}_p}} \right)_{\min }}$</span>is the minimum value of <span>${\left( {\dot N{{\hat c}_p}} \right)_{aux - mix}}$</span>and <span>${\left( {\dot N{{\hat c}_p}} \right)_{water}}$</span>.
+where, <span>\({\left( {\dot N{{\hat c}_p}} \right)_{\min }}\)</span>is the minimum value of <span>\({\left( {\dot N{{\hat c}_p}} \right)_{aux - mix}}\)</span>and <span>\({\left( {\dot N{{\hat c}_p}} \right)_{water}}\)</span>.
 
 #### Field: Method 2 Parameter hxs0
 
-This field describes the value of <span>$h{x_{s,0}}$</span>  in the relation below for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   . This method uses the log mean temperature difference (LMTD) approach to calculate the heat exchange:
+This field describes the value of <span>\(h{x_{s,0}}\)</span>  in the relation below for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   . This method uses the log mean temperature difference (LMTD) approach to calculate the heat exchange:
 
 <div>\[{q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}}\]</div>
 
-The user input in this field, and the next four fields, describe coefficients in an empirical relation for <span>${\left( {UA} \right)_{eff}}$</span>:
+The user input in this field, and the next four fields, describe coefficients in an empirical relation for <span>\({\left( {UA} \right)_{eff}}\)</span>:
 
 <div>\[{\left( {UA} \right)_{eff}} = h{x_{s,0}} + h{x_{s,1}} \cdot {\dot N_{water}} + h{x_{s,2}} \cdot \dot N_{water}^2 + h{x_{s,3}} \cdot {\dot N_{aux - mix}} + h{x_{s,4}} \cdot \dot N_{aux - mix}^2\]</div>
 
 #### Field: Method 2 Parameter hxs1
 
-This field describes the value of <span>$h{x_{s,1}}$</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
+This field describes the value of <span>\(h{x_{s,1}}\)</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
 
 #### Field: Method 2 Parameter hxs2
 
-This field describes the value of <span>$h{x_{s,2}}$</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
+This field describes the value of <span>\(h{x_{s,2}}\)</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
 
 #### Field: Method 2 Parameter hxs3
 
-This field describes the value of <span>$h{x_{s,3}}$</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
+This field describes the value of <span>\(h{x_{s,3}}\)</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
 
 #### Field: Method 2 Parameter hxs4
 
-This field describes the value of <span>$h{x_{s,4}}$</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
+This field describes the value of <span>\(h{x_{s,4}}\)</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
 
 #### Field: Method 3 h0Gas Coefficient
 
-This field describes the value of <span>$h_{gas}^0$</span>  in the relation below. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification. For this mode, the heat exchange is calculated using the LMTD method, but the effective UA is determined using:
+This field describes the value of <span>\(h_{gas}^0\)</span>  in the relation below. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification. For this mode, the heat exchange is calculated using the LMTD method, but the effective UA is determined using:
 
 <div>\[{\left( {UA} \right)_{eff}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{gas}}}} + \frac{1}{{{{(hA)}_{water}}}} + {F_{HX}}} \right]^{ - 1}}\]</div>
 
 where,
 
-<span>${F_{HX}}$</span>  is an adjustment factor,
+<span>\({F_{HX}}\)</span>  is an adjustment factor,
 
-<span>${h_{gas}} = h_{gas}^0 \cdot {\left( {\frac{{{{\dot N}_{gas}}}}{{\dot N_{gas}^0}}} \right)^n}$</span>,
+<span>\({h_{gas}} = h_{gas}^0 \cdot {\left( {\frac{{{{\dot N}_{gas}}}}{{\dot N_{gas}^0}}} \right)^n}\)</span>,
 
 <div>\[{h_{water}} = h_{water}^0 \cdot {\left( {\frac{{{{\dot N}_{water}}}}{{\dot N_{water}^0}}} \right)^m}\]</div>
 
 #### Field: Method 3 NdotGasRef Coefficient
 
-This field describes the value of <span>$\dot N_{gas}^0$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(\dot N_{gas}^0\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 n Coefficient
 
-This field describes the value of <span>$n$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(n\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 
 
 #### Field: Method 3 Gas Area
 
-This field describes the value of <span>${A_{gas}}$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\({A_{gas}}\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 h0 Water Coefficient
 
-This field describes the value of <span>$h_{water}^0$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(h_{water}^0\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 N dot Water ref Coefficient
 
-This field describes the value of <span>$\dot N_{water}^0$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(\dot N_{water}^0\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 m Coefficient
 
-This field describes the value of <span>$m$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(m\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 Area Water Coefficient
 
-This field describes the value of <span>${A_{water}}$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\({A_{water}}\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 F Adjustment Factor
 
-This field describes the value of <span>${F_{HX}}$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\({F_{HX}}\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 4 hxl1 Coefficient
 
-This field describes the value of <span>$h{x_{l,1}}$</span>  in the relation below for the rate of condensation of water from the gas stream, <span>${\dot N_{{H_2}O - cond}}$</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification. This method uses a modified version of the LMTD approach to calculate heat exchange:
+This field describes the value of <span>\(h{x_{l,1}}\)</span>  in the relation below for the rate of condensation of water from the gas stream, <span>\({\dot N_{{H_2}O - cond}}\)</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification. This method uses a modified version of the LMTD approach to calculate heat exchange:
 
 <div>\[{q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}} + {\dot N_{{H_2}O - cond}} \cdot {\hat h_{fg}}\]</div>
 
@@ -22905,13 +22905,13 @@ where,
 
 #### Field: Method 4 hxl2 Coefficient
 
-This field describes the value of <span>$h{x_{l,2}}$</span>  in the relation above for the rate of condensation of water from the gas stream, <span>${\dot N_{{H_2}O - cond}}$</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification.
+This field describes the value of <span>\(h{x_{l,2}}\)</span>  in the relation above for the rate of condensation of water from the gas stream, <span>\({\dot N_{{H_2}O - cond}}\)</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification.
 
 
 
 #### Field: Method 4 Condensation Threshold
 
-This field describes the value of <span>${T_{cond - threshold}}$</span>  in the relation above for the rate of condensation of water from the gas stream, <span>${\dot N_{{H_2}O - cond}}$</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification.
+This field describes the value of <span>\({T_{cond - threshold}}\)</span>  in the relation above for the rate of condensation of water from the gas stream, <span>\({\dot N_{{H_2}O - cond}}\)</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification.
 
 
 
@@ -22963,7 +22963,7 @@ This field is used to direct how EnergyPlus will model electrical storage. The o
 
 #### Field: Nominal Charging Energetic Efficiency
 
-This field describes the value of <span>${\varepsilon_{charge}}$</span>  in the relation for the State of Charge, <span>$Q_{battery}^{t + \Delta t}$</span>:
+This field describes the value of <span>\({\varepsilon_{charge}}\)</span>  in the relation for the State of Charge, <span>\(Q_{battery}^{t + \Delta t}\)</span>:
 
 <div>\[Q_{battery}^{t + \Delta t} = Q_{battery}^t + {P_{battery - charge}} \cdot {\varepsilon_{charge}} \cdot \Delta t\]</div>
 
@@ -22971,7 +22971,7 @@ This is the energetic efficiency of charging the storage device. A value of 1.0 
 
 #### Field: Nominal Discharging Energetic Efficiency
 
-This field describes the value of <span>${\varepsilon_{discharge}}$</span>  in the relation for the State of Charge, <span>$Q_{battery}^{t + \Delta t}$</span>:
+This field describes the value of <span>\({\varepsilon_{discharge}}\)</span>  in the relation for the State of Charge, <span>\(Q_{battery}^{t + \Delta t}\)</span>:
 
 <div>\[Q_{battery}^{t + \Delta t} = Q_{battery}^t + \frac{{{P_{battery - discharge}} \cdot \Delta t}}{{{\varepsilon_{discharge}}}}\]</div>
 
@@ -24044,15 +24044,15 @@ with
 
 where
 
-<span>$C_p$</span> = power coefficient
+<span>\(C_p\)</span> = power coefficient
 
-<span>$C_{1-6}$</span> = empirical power coefficient parameters
+<span>\(C_{1-6}\)</span> = empirical power coefficient parameters
 
-<span>$\lambda$</span> = tip speed ratio (often known as TSR)
+<span>\(\lambda\)</span> = tip speed ratio (often known as TSR)
 
-<span>$\lambda_i$</span> = tip speed ratio at ith time step
+<span>\(\lambda_i\)</span> = tip speed ratio at ith time step
 
-<span>$\theta$</span> = azimuth angle of the pitch, 0 [degree]
+<span>\(\theta\)</span> = azimuth angle of the pitch, 0 [degree]
 
 
 
@@ -26335,22 +26335,22 @@ This curve is a function of two independent variables. Input consists of the cur
 A user assigned unique name for an instance of a quadratic-linear curve. When a curve is used, it is referenced by this name.
 
 #### Field: Coefficient1 Constant
-The constant coefficient (<span>$C_1$</span>) in the equation.
+The constant coefficient (<span>\(C_1\)</span>) in the equation.
 
 #### Field: Coefficient2 x
-The coefficient <span>$C_2</span> in the equation.
+The coefficient <span>\(C_2</span> in the equation.
 
 #### Field: Coefficient3 x**2
-The coefficient <span>$C_3</span> in the equation.
+The coefficient <span>\(C_3</span> in the equation.
 
 #### Field: Coefficient4 x**3
-The coefficient <span>$C_4</span> in the equation.
+The coefficient <span>\(C_4</span> in the equation.
 
 #### Field: Coefficient5 y
-The coefficient <span>$C_5</span> in the equation.
+The coefficient <span>\(C_5</span> in the equation.
 
 #### Field: Coefficient6 x*y
-The coefficient <span>$C_6</span> in the equation.
+The coefficient <span>\(C_6</span> in the equation.
 
 #### Field: Minimum Value of x
 The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
@@ -26926,7 +26926,7 @@ Input for the fan total pressure rise curve consists of the curve name, the four
 
 <div>\[\Delta {P_{fan,tot}} = {C_1}*Q_{fan}^2 + {C_2}*Q_{fan}^{} + {C_3}*Q_{fan}^{}*\sqrt {{P_{sm}} - {P_o}}  + {C_4}*\left( {{P_{sm}} - {P_o}} \right)\]</div>
 
-where <span>$\Delta P_{fan,tot}$</span> is the fan total pressure rise (Pa) as a function of volumetric flow through the fan (<span>$Q_{fan}, m^3/s$</span>), duct static pressure set point (<span>$P_{sm}$</span>, Pa), and static pressure surrounding the ducts (<span>$P_o$</span>, Pa). <span>$P_o$</span> is assumed to be zero.
+where <span>\(\Delta P_{fan,tot}\)</span> is the fan total pressure rise (Pa) as a function of volumetric flow through the fan (<span>\(Q_{fan}, m^3/s\)</span>), duct static pressure set point (<span>\(P_{sm}\)</span>, Pa), and static pressure surrounding the ducts (<span>\(P_o\)</span>, Pa). <span>\(P_o\)</span> is assumed to be zero.
 
 The first term of the curve looks like the common system curve in which the fan pressure rise is proportional to the square of the fan flow, but here it also depends implicitly on supply and return pressure losses, and in part on the fraction of the fan flow that is outdoor air (essentially "leaks" into and out of the return side of the system). Very often it is the only term considered, but that would only be correct with fixed-position dampers, no distribution system leakage, no linear resistance components, and no duct static pressure control.
 
