@@ -663,6 +663,8 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 	DataGlobals::eso_stream = eso_strm.get();
 	DataGlobals::mtr_stream = mtr_strm.get();
 
+	DataGlobals::MinutesPerTimeStep = 10;
+
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
@@ -680,9 +682,9 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 	mtr_strm->str(std::string());
 	eso_strm->str(std::string());
 
-	WriteReportMeterData( 1, "1", 999.9, ReportHourly, 0.0, 0, 0.0, 0, false );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), mtr_strm->str() );
+	WriteReportMeterData( 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
 	mtr_strm->str(std::string());
 	eso_strm->str(std::string());
 
@@ -736,7 +738,7 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 	ASSERT_EQ(12ul, reportData.size());
 	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
 	std::vector<std::string> reportData1 {"2", "1", "1", "999.9"};
-	std::vector<std::string> reportData2 {"3", "1", "1", "999.9"};
+	std::vector<std::string> reportData2 {"3", "1", "1", "616771620.987027"};
 	std::vector<std::string> reportData3 {"4", "1", "1", "616771620.987027"};
 	std::vector<std::string> reportData4 {"5", "1", "1", "616771620.987027"};
 	std::vector<std::string> reportData5 {"6", "1", "1", "616771620.987027"};
@@ -759,15 +761,16 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 	EXPECT_EQ(reportData10, reportData[10]);
 	EXPECT_EQ(reportData11, reportData[11]);
 
-	ASSERT_EQ(7ul, reportExtendedData.size());
+	ASSERT_EQ(8ul, reportExtendedData.size());
 
-	std::vector<std::string> reportExtendedData0 {"1","4","4283136.25872118","12","21","24","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData1 {"2","5","4283136.25872118","12","21","24","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData2 {"3","6","4283136.25872118","12","21","24","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData3 {"4","9","4283136.25872118","12","21","24","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData4 {"5","10","4283136.25872118","12","21","24","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData5 {"6","11","4283136.25872118","12","21","24","1","0","4283136.25168393","12","21","0","11","10"};
-	std::vector<std::string> reportExtendedData6 {"7","12","4283136.25872118","12","21","24","1","0","4283136.25168393","12","21","0","11","10"};
+	std::vector<std::string> reportExtendedData0 {"1","3","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
+	std::vector<std::string> reportExtendedData1 {"2","4","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
+	std::vector<std::string> reportExtendedData2 {"3","5","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
+	std::vector<std::string> reportExtendedData3 {"4","6","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
+	std::vector<std::string> reportExtendedData4 {"5","9","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
+	std::vector<std::string> reportExtendedData5 {"6","10","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
+	std::vector<std::string> reportExtendedData6 {"7","11","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
+	std::vector<std::string> reportExtendedData7 {"8","12","4283136.25872118","12","21","24","-9","0","4283136.25168393","12","21","0","1","10"};
 	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
 	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
 	EXPECT_EQ(reportExtendedData2, reportExtendedData[2]);
@@ -775,7 +778,303 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 	EXPECT_EQ(reportExtendedData4, reportExtendedData[4]);
 	EXPECT_EQ(reportExtendedData5, reportExtendedData[5]);
 	EXPECT_EQ(reportExtendedData6, reportExtendedData[6]);
+	EXPECT_EQ(reportExtendedData7, reportExtendedData[7]);
 
+}
+
+TEST_F( SQLiteFixture, writeReportRealData )
+{
+	ShowMessage( "Begin Test: OutputProcessor, writeReportRealData" );
+
+	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
+
+	DataGlobals::eso_stream = eso_strm.get();
+
+	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	WriteReportRealData( 1, "1", 999.9, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 );
+	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 999.9, 2, 1, ReportEach, 0.0, 0, 0.0, 0 );
+	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 999.9, 2, 1, ReportHourly, 0.0, 0, 0.0, 0 );
+	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+	ASSERT_EQ(12ul, reportData.size());
+	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
+	std::vector<std::string> reportData1 {"2", "1", "1", "999.9"};
+	std::vector<std::string> reportData2 {"3", "1", "1", "999.9"};
+	std::vector<std::string> reportData3 {"4", "1", "1", "616771620.987027"};
+	std::vector<std::string> reportData4 {"5", "1", "1", "616771620.987027"};
+	std::vector<std::string> reportData5 {"6", "1", "1", "616771620.987027"};
+	std::vector<std::string> reportData6 {"7", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData7 {"8", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData8 {"9", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData9 {"10", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData10 {"11", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData11 {"12", "1", "1", "61677162.0987027"};
+	EXPECT_EQ(reportData0, reportData[0]);
+	EXPECT_EQ(reportData1, reportData[1]);
+	EXPECT_EQ(reportData2, reportData[2]);
+	EXPECT_EQ(reportData3, reportData[3]);
+	EXPECT_EQ(reportData4, reportData[4]);
+	EXPECT_EQ(reportData5, reportData[5]);
+	EXPECT_EQ(reportData6, reportData[6]);
+	EXPECT_EQ(reportData7, reportData[7]);
+	EXPECT_EQ(reportData8, reportData[8]);
+	EXPECT_EQ(reportData9, reportData[9]);
+	EXPECT_EQ(reportData10, reportData[10]);
+	EXPECT_EQ(reportData11, reportData[11]);
+
+	ASSERT_EQ(6ul, reportExtendedData.size());
+
+	std::vector<std::string> reportExtendedData0 {"1","4","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData1 {"2","5","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData2 {"3","6","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData3 {"4","10","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData4 {"5","11","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData5 {"6","12","4283136.25872118","12","21","24","","0","4283136.25168393","12","21","0","","10"};
+	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
+	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
+	EXPECT_EQ(reportExtendedData2, reportExtendedData[2]);
+	EXPECT_EQ(reportExtendedData3, reportExtendedData[3]);
+	EXPECT_EQ(reportExtendedData4, reportExtendedData[4]);
+	EXPECT_EQ(reportExtendedData5, reportExtendedData[5]);
+
+}
+
+TEST_F( SQLiteFixture, writeReportIntegerData )
+{
+	ShowMessage( "Begin Test: OutputProcessor, writeReportIntegerData" );
+
+	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
+
+	DataGlobals::eso_stream = eso_strm.get();
+
+	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportTimeStep, 0, 0, 0, 0 );
+	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportEach, 0, 0, 0, 0 );
+	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportHourly, 0, 0, 0, 0 );
+	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136, 1,10,4283196,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136,21, 1,10,4283196,21,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportEach, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportHourly, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136, 1,10,4283196,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136,21, 1,10,4283196,21,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136, 12210110, 4283196, 12212460 );
+	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+	ASSERT_EQ(12ul, reportData.size());
+	std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
+	std::vector<std::string> reportData1 {"2", "1", "1", "999.9"};
+	std::vector<std::string> reportData2 {"3", "1", "1", "999.9"};
+	std::vector<std::string> reportData3 {"4", "1", "1", "616771620.987027"};
+	std::vector<std::string> reportData4 {"5", "1", "1", "616771620.987027"};
+	std::vector<std::string> reportData5 {"6", "1", "1", "616771620.987027"};
+	std::vector<std::string> reportData6 {"7", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData7 {"8", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData8 {"9", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData9 {"10", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData10 {"11", "1", "1", "61677162.0987027"};
+	std::vector<std::string> reportData11 {"12", "1", "1", "61677162.0987027"};
+	EXPECT_EQ(reportData0, reportData[0]);
+	EXPECT_EQ(reportData1, reportData[1]);
+	EXPECT_EQ(reportData2, reportData[2]);
+	EXPECT_EQ(reportData3, reportData[3]);
+	EXPECT_EQ(reportData4, reportData[4]);
+	EXPECT_EQ(reportData5, reportData[5]);
+	EXPECT_EQ(reportData6, reportData[6]);
+	EXPECT_EQ(reportData7, reportData[7]);
+	EXPECT_EQ(reportData8, reportData[8]);
+	EXPECT_EQ(reportData9, reportData[9]);
+	EXPECT_EQ(reportData10, reportData[10]);
+	EXPECT_EQ(reportData11, reportData[11]);
+
+	ASSERT_EQ(6ul, reportExtendedData.size());
+
+	std::vector<std::string> reportExtendedData0 {"1","4","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData1 {"2","5","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData2 {"3","6","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData3 {"4","10","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData4 {"5","11","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
+	std::vector<std::string> reportExtendedData5 {"6","12","4283196.0","12","21","24","","0","4283136.0","12","21","0","","10"};
+	EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
+	EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
+	EXPECT_EQ(reportExtendedData2, reportExtendedData[2]);
+	EXPECT_EQ(reportExtendedData3, reportExtendedData[3]);
+	EXPECT_EQ(reportExtendedData4, reportExtendedData[4]);
+	EXPECT_EQ(reportExtendedData5, reportExtendedData[5]);
+
+}
+
+TEST_F ( SQLiteFixture, writeIntegerData )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, writeIntegerData" );
+
+	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
+
+	DataGlobals::eso_stream = eso_strm.get();
+
+	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	WriteIntegerData( 1, "1", 999 );
+	EXPECT_EQ( delimitedString( { "1,999" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteIntegerData( 1, "1", 0 );
+	EXPECT_EQ( delimitedString( { "1,0" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteIntegerData( 1, "1", -999 );
+	EXPECT_EQ( delimitedString( { "1,-999" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteIntegerData( 1, "1", _, 999.9 );
+	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteIntegerData( 1, "1", _, 0.0 );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteIntegerData( 1, "1", _, -999.9 );
+	EXPECT_EQ( delimitedString( { "1,-999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteIntegerData( 1, "1", 999, 999.9 );
+	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteIntegerData( 1, "1", 0, 0.0 );
+	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteIntegerData( 1, "1", -999, -999.9 );
+	EXPECT_EQ( delimitedString( { "1,-999.9" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+	ASSERT_EQ(9ul, reportData.size());
+	std::vector<std::string> reportData0 {"1", "1", "1", "999.0"};
+	std::vector<std::string> reportData1 {"2", "1", "1", "0.0"};
+	std::vector<std::string> reportData2 {"3", "1", "1", "-999.0"};
+	std::vector<std::string> reportData3 {"4", "1", "1", "999.9"};
+	std::vector<std::string> reportData4 {"5", "1", "1", "0.0"};
+	std::vector<std::string> reportData5 {"6", "1", "1", "-999.9"};
+	std::vector<std::string> reportData6 {"7", "1", "1", "999.9"};
+	std::vector<std::string> reportData7 {"8", "1", "1", "0.0"};
+	std::vector<std::string> reportData8 {"9", "1", "1", "-999.9"};
+	EXPECT_EQ(reportData0, reportData[0]);
+	EXPECT_EQ(reportData1, reportData[1]);
+	EXPECT_EQ(reportData2, reportData[2]);
+	EXPECT_EQ(reportData3, reportData[3]);
+	EXPECT_EQ(reportData4, reportData[4]);
+	EXPECT_EQ(reportData5, reportData[5]);
+	EXPECT_EQ(reportData6, reportData[6]);
+	EXPECT_EQ(reportData7, reportData[7]);
+	EXPECT_EQ(reportData8, reportData[8]);
+
+	ASSERT_EQ(0ul, reportExtendedData.size());
 }
 
 TEST_F ( SQLiteFixture, getStandardMeterResourceType )
@@ -879,6 +1178,29 @@ TEST_F ( SQLiteFixture, getStandardMeterResourceType )
 	std::vector<std::string> errorData0 {"1", "1", "1", "GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered=BAD INPUT", "1"};
 	EXPECT_EQ(errorData0, errorData[0]);
 
+}
+
+TEST_F ( SQLiteFixture, determineIndexGroupKeyFromMeterName )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, determineIndexGroupKeyFromMeterName" );
+
+	std::map< std::string, int > const resource_map = {
+		{ "Electricity:Facility", 100 },
+		{ "Gas:Facility", 101 },
+		{ "DistricHeating:Facility", 102 },
+		{ "DistricCooling:Facility", 103 },
+		{ "ElectricityNet:Facility", 104 },
+		{ "Electricity:Building", 201 },
+		{ "Gas:Building", 202 },
+		{ "Electricity:HVAC", 301 },
+		{ "InteriorLights:Electricity", 401 },
+		{ "InteriorLights:Electricity:Zone", 501 },
+		{ "BAD INPUT", -11 }
+	};
+
+	for( auto const & indexGroup : resource_map ) {
+		EXPECT_EQ( indexGroup.second, DetermineIndexGroupKeyFromMeterName( indexGroup.first ) ) << "where meterName is " << indexGroup.first;
+	}
 }
 
 TEST_F ( SQLiteFixture, writeMeterDictionaryItem )
@@ -1088,6 +1410,255 @@ TEST_F ( SQLiteFixture, writeMeterDictionaryItem )
 	std::vector<std::string> reportDataDictionary27 {"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"};
 	std::vector<std::string> reportDataDictionary28 {"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"};
 	std::vector<std::string> reportDataDictionary29 {"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"};
+	EXPECT_EQ(reportDataDictionary0, reportDataDictionary[0]);
+	EXPECT_EQ(reportDataDictionary1, reportDataDictionary[1]);
+	EXPECT_EQ(reportDataDictionary2, reportDataDictionary[2]);
+	EXPECT_EQ(reportDataDictionary3, reportDataDictionary[3]);
+	EXPECT_EQ(reportDataDictionary4, reportDataDictionary[4]);
+	EXPECT_EQ(reportDataDictionary5, reportDataDictionary[5]);
+	EXPECT_EQ(reportDataDictionary6, reportDataDictionary[6]);
+	EXPECT_EQ(reportDataDictionary7, reportDataDictionary[7]);
+	EXPECT_EQ(reportDataDictionary8, reportDataDictionary[8]);
+	EXPECT_EQ(reportDataDictionary9, reportDataDictionary[9]);
+	EXPECT_EQ(reportDataDictionary10, reportDataDictionary[10]);
+	EXPECT_EQ(reportDataDictionary11, reportDataDictionary[11]);
+	EXPECT_EQ(reportDataDictionary12, reportDataDictionary[12]);
+	EXPECT_EQ(reportDataDictionary13, reportDataDictionary[13]);
+	EXPECT_EQ(reportDataDictionary14, reportDataDictionary[14]);
+	EXPECT_EQ(reportDataDictionary15, reportDataDictionary[15]);
+	EXPECT_EQ(reportDataDictionary16, reportDataDictionary[16]);
+	EXPECT_EQ(reportDataDictionary17, reportDataDictionary[17]);
+	EXPECT_EQ(reportDataDictionary18, reportDataDictionary[18]);
+	EXPECT_EQ(reportDataDictionary19, reportDataDictionary[19]);
+	EXPECT_EQ(reportDataDictionary20, reportDataDictionary[20]);
+	EXPECT_EQ(reportDataDictionary21, reportDataDictionary[21]);
+	EXPECT_EQ(reportDataDictionary22, reportDataDictionary[22]);
+	EXPECT_EQ(reportDataDictionary23, reportDataDictionary[23]);
+	EXPECT_EQ(reportDataDictionary24, reportDataDictionary[24]);
+	EXPECT_EQ(reportDataDictionary25, reportDataDictionary[25]);
+	EXPECT_EQ(reportDataDictionary26, reportDataDictionary[26]);
+	EXPECT_EQ(reportDataDictionary27, reportDataDictionary[27]);
+	EXPECT_EQ(reportDataDictionary28, reportDataDictionary[28]);
+	EXPECT_EQ(reportDataDictionary29, reportDataDictionary[29]);
+
+	// This should be all necessary clean up...
+	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileMeterDetails, flags ); }
+	RVariableTypes.deallocate();
+	IVariableTypes.deallocate();
+	ReportList.deallocate();
+	EndUseCategory.deallocate();
+
+}
+
+TEST_F ( SQLiteFixture, writeReportVariableDictionaryItem )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, writeReportVariableDictionaryItem" );
+
+	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
+
+	DataGlobals::eso_stream = eso_strm.get();
+
+	InitializeOutput();
+
+	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	WriteReportVariableDictionaryItem( ReportTimeStep, 1, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_EQ( delimitedString( { "1,1,keyedValue,variableName [variableUnits] !TimeStep" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportTimeStep, 2, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_EQ( delimitedString( { "2,1,keyedValue,variableName [variableUnits] !TimeStep" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportTimeStep, 1, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	EXPECT_EQ( delimitedString( { "3,1,keyedValue,variableName [variableUnits] !TimeStep,scheduleName" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportTimeStep, 1, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, "variableUnits" );
+	EXPECT_EQ( delimitedString( { "4,1,keyedValue,variableName [variableUnits] !TimeStep" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportTimeStep, 1, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, "variableUnits" );
+	EXPECT_EQ( delimitedString( { "5,1,keyedValue,variableName [variableUnits] !TimeStep" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportEach, 1, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_EQ( delimitedString( { "6,1,keyedValue,variableName [variableUnits] !Each Call" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportEach, 2, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_EQ( delimitedString( { "7,1,keyedValue,variableName [variableUnits] !Each Call" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportEach, 1, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	EXPECT_EQ( delimitedString( { "8,1,keyedValue,variableName [variableUnits] !Each Call,scheduleName" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportEach, 1, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, "variableUnits" );
+	EXPECT_EQ( delimitedString( { "9,1,keyedValue,variableName [variableUnits] !Each Call" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportEach, 1, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, "variableUnits" );
+	EXPECT_EQ( delimitedString( { "10,1,keyedValue,variableName [variableUnits] !Each Call" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportHourly, 1, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_TRUE( TrackingHourlyVariables );
+	TrackingHourlyVariables = false;
+	EXPECT_EQ( delimitedString( { "11,1,keyedValue,variableName [variableUnits] !Hourly" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportHourly, 2, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_TRUE( TrackingHourlyVariables );
+	TrackingHourlyVariables = false;
+	EXPECT_EQ( delimitedString( { "12,1,keyedValue,variableName [variableUnits] !Hourly" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportHourly, 1, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	EXPECT_TRUE( TrackingHourlyVariables );
+	TrackingHourlyVariables = false;
+	EXPECT_EQ( delimitedString( { "13,1,keyedValue,variableName [variableUnits] !Hourly,scheduleName" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportHourly, 1, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, "variableUnits" );
+	EXPECT_TRUE( TrackingHourlyVariables );
+	TrackingHourlyVariables = false;
+	EXPECT_EQ( delimitedString( { "14,1,keyedValue,variableName [variableUnits] !Hourly" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportHourly, 1, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, "variableUnits" );
+	EXPECT_TRUE( TrackingHourlyVariables );
+	TrackingHourlyVariables = false;
+	EXPECT_EQ( delimitedString( { "15,1,keyedValue,variableName [variableUnits] !Hourly" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportDaily, 1, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_TRUE( TrackingDailyVariables );
+	TrackingDailyVariables = false;
+	EXPECT_EQ( delimitedString( { "16,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportDaily, 2, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_TRUE( TrackingDailyVariables );
+	TrackingDailyVariables = false;
+	EXPECT_EQ( delimitedString( { "17,7,keyedValue,variableName [variableUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportDaily, 1, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	EXPECT_TRUE( TrackingDailyVariables );
+	TrackingDailyVariables = false;
+	EXPECT_EQ( delimitedString( { "18,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportDaily, 1, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, "variableUnits" );
+	EXPECT_TRUE( TrackingDailyVariables );
+	TrackingDailyVariables = false;
+	EXPECT_EQ( delimitedString( { "19,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportDaily, 1, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, "variableUnits" );
+	EXPECT_TRUE( TrackingDailyVariables );
+	TrackingDailyVariables = false;
+	EXPECT_EQ( delimitedString( { "20,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportMonthly, 1, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_TRUE( TrackingMonthlyVariables );
+	TrackingMonthlyVariables = false;
+	EXPECT_EQ( delimitedString( { "21,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportMonthly, 2, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_TRUE( TrackingMonthlyVariables );
+	TrackingMonthlyVariables = false;
+	EXPECT_EQ( delimitedString( { "22,9,keyedValue,variableName [variableUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportMonthly, 1, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	EXPECT_TRUE( TrackingMonthlyVariables );
+	TrackingMonthlyVariables = false;
+	EXPECT_EQ( delimitedString( { "23,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportMonthly, 1, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, "variableUnits" );
+	EXPECT_TRUE( TrackingMonthlyVariables );
+	TrackingMonthlyVariables = false;
+	EXPECT_EQ( delimitedString( { "24,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportMonthly, 1, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, "variableUnits" );
+	EXPECT_TRUE( TrackingMonthlyVariables );
+	TrackingMonthlyVariables = false;
+	EXPECT_EQ( delimitedString( { "25,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportSim, 1, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_TRUE( TrackingRunPeriodVariables );
+	TrackingRunPeriodVariables = false;
+	EXPECT_EQ( delimitedString( { "26,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportSim, 2, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, "variableUnits" );
+	EXPECT_TRUE( TrackingRunPeriodVariables );
+	TrackingRunPeriodVariables = false;
+	EXPECT_EQ( delimitedString( { "27,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportSim, 1, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	EXPECT_TRUE( TrackingRunPeriodVariables );
+	TrackingRunPeriodVariables = false;
+	EXPECT_EQ( delimitedString( { "28,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportSim, 1, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, "variableUnits" );
+	EXPECT_TRUE( TrackingRunPeriodVariables );
+	TrackingRunPeriodVariables = false;
+	EXPECT_EQ( delimitedString( { "29,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	WriteReportVariableDictionaryItem( ReportSim, 1, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, "variableUnits" );
+	EXPECT_TRUE( TrackingRunPeriodVariables );
+	TrackingRunPeriodVariables = false;
+	EXPECT_EQ( delimitedString( { "30,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
+	eso_strm->str(std::string());
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto reportDataDictionary = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+	ASSERT_EQ(30ul, reportDataDictionary.size());
+	std::vector<std::string> reportDataDictionary0 {"1", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary1 {"2", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary2 {"3", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "scheduleName", "variableUnits"};
+	std::vector<std::string> reportDataDictionary3 {"4", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary4 {"5", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary5 {"6", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary6 {"7", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary7 {"8", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "variableUnits"};
+	std::vector<std::string> reportDataDictionary8 {"9", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary9 {"10", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary10 {"11", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary11 {"12", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary12 {"13", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "scheduleName", "variableUnits"};
+	std::vector<std::string> reportDataDictionary13 {"14", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Hourly", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary14 {"15", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Hourly", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary15 {"16", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary16 {"17", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary17 {"18", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "scheduleName", "variableUnits"};
+	std::vector<std::string> reportDataDictionary18 {"19", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Daily", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary19 {"20", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Daily", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary20 {"21", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary21 {"22", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary22 {"23", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "scheduleName", "variableUnits"};
+	std::vector<std::string> reportDataDictionary23 {"24", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Monthly", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary24 {"25", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Monthly", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary25 {"26", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary26 {"27", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary27 {"28", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "scheduleName", "variableUnits"};
+	std::vector<std::string> reportDataDictionary28 {"29", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Run Period", "", "variableUnits"};
+	std::vector<std::string> reportDataDictionary29 {"30", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Run Period", "", "variableUnits"};
 	EXPECT_EQ(reportDataDictionary0, reportDataDictionary[0]);
 	EXPECT_EQ(reportDataDictionary1, reportDataDictionary[1]);
 	EXPECT_EQ(reportDataDictionary2, reportDataDictionary[2]);
