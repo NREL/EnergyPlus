@@ -1151,8 +1151,6 @@ TEST_F ( SQLiteFixture, getStandardMeterResourceType )
 		{ "OTHERFUEL2", "OtherFuel2" }
 	};
 
-	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-
 	std::string out_resource_type;
 	bool error_found = false;
 
@@ -1161,6 +1159,8 @@ TEST_F ( SQLiteFixture, getStandardMeterResourceType )
 		EXPECT_EQ( meterType.second, out_resource_type );
 		EXPECT_FALSE( error_found );
 	}
+
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 	auto const meterType = "BAD INPUT";
 	out_resource_type = "BAD INPUT";
@@ -1180,9 +1180,9 @@ TEST_F ( SQLiteFixture, getStandardMeterResourceType )
 
 }
 
-TEST_F ( SQLiteFixture, determineIndexGroupKeyFromMeterName )
+TEST ( OutputProcessor, determineIndexGroupKeyFromMeterName )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, determineIndexGroupKeyFromMeterName" );
+	ShowMessage( "Begin Test: OutputProcessor, determineIndexGroupKeyFromMeterName" );
 
 	std::map< std::string, int > const resource_map = {
 		{ "Electricity:Facility", 100 },
@@ -1201,6 +1201,204 @@ TEST_F ( SQLiteFixture, determineIndexGroupKeyFromMeterName )
 	for( auto const & indexGroup : resource_map ) {
 		EXPECT_EQ( indexGroup.second, DetermineIndexGroupKeyFromMeterName( indexGroup.first ) ) << "where meterName is " << indexGroup.first;
 	}
+}
+
+TEST_F ( SQLiteFixture, validateIndexType )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, validateIndexType" );
+
+	std::map< std::string, int > const resource_map = {
+		{ "ZONE", 1 },
+		{ "HEATBALANCE", 1 },
+		{ "HEAT BALANCE", 1 },
+		{ "HVAC", 2 },
+		{ "SYSTEM", 2 },
+		{ "PLANT", 2 }
+	};
+
+	auto const calledFrom = "UnitTest";
+
+	for( auto const & indexGroup : resource_map ) {
+		EXPECT_EQ( indexGroup.second, ValidateIndexType( indexGroup.first, calledFrom ) ) << "where indexTypeKey is " << indexGroup.first;
+	}
+
+	// Can't test a bad input because it fatal errors and kills the whole unit test framework.
+
+	// auto const indexTypeKey = "BAD INPUT";
+
+	// EnergyPlus::sqlite = std::move( sqlite_test );
+	// auto index = ValidateIndexType( indexTypeKey, calledFrom );
+	// sqlite_test = std::move( EnergyPlus::sqlite );
+
+	// EXPECT_EQ( 0, index );
+
+	// auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
+
+	// ASSERT_EQ(1ul, errorData.size());
+	// std::vector<std::string> errorData0 {"1", "1", "1", "OutputProcessor/ValidateIndexType: Invalid Index Key passed to ValidateIndexType=BAD INPUT", "1"};
+	// EXPECT_EQ(errorData0, errorData[0]);
+
+}
+
+TEST ( OutputProcessor, standardIndexTypeKey )
+{
+	ShowMessage( "Begin Test: OutputProcessor, standardIndexTypeKey" );
+
+	EXPECT_EQ( "Zone", StandardIndexTypeKey( 1 ) );
+	EXPECT_EQ( "HVAC", StandardIndexTypeKey( 2 ) );
+	EXPECT_EQ( "UNKW", StandardIndexTypeKey( 0 ) );
+	EXPECT_EQ( "UNKW", StandardIndexTypeKey( -1 ) );
+	EXPECT_EQ( "UNKW", StandardIndexTypeKey( 3 ) );
+
+}
+
+TEST_F ( SQLiteFixture, validateVariableType )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, validateVariableType" );
+
+	std::map< std::string, int > const resource_map = {
+		{ "STATE", 1 },
+		{ "AVERAGE", 1 },
+		{ "AVERAGED", 1 },
+		{ "NON STATE", 2 },
+		{ "NONSTATE", 2 },
+		{ "SUM", 2 },
+		{ "SUMMED", 2 }
+	};
+
+	for( auto const & variableType : resource_map ) {
+		EXPECT_EQ( variableType.second, ValidateVariableType( variableType.first ) ) << "where variableTypeKey is " << variableType.first;
+	}
+
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+
+	auto const variableTypeKey = "BAD INPUT";
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+	auto index = ValidateVariableType( variableTypeKey );
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	EXPECT_EQ( 0, index );
+
+	auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
+
+	ASSERT_EQ(1ul, errorData.size());
+	std::vector<std::string> errorData0 {"1", "1", "1", "Invalid variable type requested=BAD INPUT", "1"};
+	EXPECT_EQ(errorData0, errorData[0]);
+
+}
+
+TEST ( OutputProcessor, standardVariableTypeKey )
+{
+	ShowMessage( "Begin Test: OutputProcessor, standardVariableTypeKey" );
+
+	EXPECT_EQ( "Average", StandardVariableTypeKey( 1 ) );
+	EXPECT_EQ( "Sum", StandardVariableTypeKey( 2 ) );
+	EXPECT_EQ( "Unknown", StandardVariableTypeKey( 0 ) );
+	EXPECT_EQ( "Unknown", StandardVariableTypeKey( -1 ) );
+	EXPECT_EQ( "Unknown", StandardVariableTypeKey( 3 ) );
+
+}
+
+TEST_F (  SQLiteFixture, determineMeterIPUnits ) 
+{
+	ShowMessage( "Begin Test: SQLiteFixture, determineMeterIPUnits" );
+
+	// int & CodeForIPUnits, // Output Code for IP Units
+	// std::string const & ResourceType, // Resource Type
+	// std::string const & MtrUnits, // Meter units
+	// bool & ErrorsFound // true if errors found during subroutine
+
+	int ipUnits = -999999;
+	bool errorFound = false;
+
+	DetermineMeterIPUnits( ipUnits, "ELEC", "J", errorFound );
+	EXPECT_EQ( RT_IPUnits_Electricity, ipUnits );
+	EXPECT_FALSE( errorFound );
+
+	DetermineMeterIPUnits( ipUnits, "GAS", "J", errorFound );
+	EXPECT_EQ( RT_IPUnits_Gas, ipUnits );
+	EXPECT_FALSE( errorFound );
+
+	DetermineMeterIPUnits( ipUnits, "COOL", "J", errorFound );
+	EXPECT_EQ( RT_IPUnits_Cooling, ipUnits );
+	EXPECT_FALSE( errorFound );
+
+	DetermineMeterIPUnits( ipUnits, "WATER", "m3", errorFound );
+	EXPECT_EQ( RT_IPUnits_Water, ipUnits );
+	EXPECT_FALSE( errorFound );
+
+	DetermineMeterIPUnits( ipUnits, "OTHER", "m3", errorFound );
+	EXPECT_EQ( RT_IPUnits_OtherM3, ipUnits );
+	EXPECT_FALSE( errorFound );
+
+	DetermineMeterIPUnits( ipUnits, "OTHER", "kg", errorFound );
+	EXPECT_EQ( RT_IPUnits_OtherKG, ipUnits );
+	EXPECT_FALSE( errorFound );
+
+	DetermineMeterIPUnits( ipUnits, "OTHER", "L", errorFound );
+	EXPECT_EQ( RT_IPUnits_OtherL, ipUnits );
+	EXPECT_FALSE( errorFound );
+
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	ipUnits = -999999;
+	DetermineMeterIPUnits( ipUnits, "UNKONWN", "badUnits", errorFound );
+	EXPECT_EQ( RT_IPUnits_OtherJ, ipUnits );
+	EXPECT_TRUE( errorFound );
+
+	ipUnits = -999999;
+	DetermineMeterIPUnits( ipUnits, "ELEC", "kWh", errorFound );
+	EXPECT_EQ( RT_IPUnits_Electricity, ipUnits );
+	EXPECT_TRUE( errorFound );
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
+
+	ASSERT_EQ(2ul, errorData.size());
+	std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[badUnits].", "1"};
+	std::vector<std::string> errorData1 {"2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[kWh].", "1"};
+	EXPECT_EQ(errorData0, errorData[0]);
+	EXPECT_EQ(errorData1, errorData[1]);
+
+}
+
+TEST ( OutputProcessor, dateToStringWithMonth )
+{
+	ShowMessage( "Begin Test: OutputProcessor, dateToStringWithMonth" );
+
+	EXPECT_EQ( "01-JAN-00:01", DateToStringWithMonth( 1010101 ) );
+	EXPECT_EQ( "01-JAN-00:00", DateToStringWithMonth( 1010100 ) );
+	EXPECT_EQ( "01-FEB-01:00", DateToStringWithMonth( 2010160 ) );
+	EXPECT_EQ( "20-MAR-01:59", DateToStringWithMonth( 3200259 ) );
+	EXPECT_EQ( "13-APR-23:59", DateToStringWithMonth( 4132459 ) );
+	EXPECT_EQ( "15-MAY-20:30", DateToStringWithMonth( 5152130 ) );
+	EXPECT_EQ( "19-JUN-12:10", DateToStringWithMonth( 6191310 ) );
+	EXPECT_EQ( "25-JUL-19:40", DateToStringWithMonth( 7252040 ) );
+	EXPECT_EQ( "05-AUG-06:22", DateToStringWithMonth( 8050722 ) );
+	EXPECT_EQ( "03-SEP-09:50", DateToStringWithMonth( 9031050 ) );
+	EXPECT_EQ( "27-OCT-03:31", DateToStringWithMonth( 10270431 ) );
+	EXPECT_EQ( "08-NOV-22:28", DateToStringWithMonth( 11082328 ) );
+	EXPECT_EQ( "21-DEC-00:10", DateToStringWithMonth( 12210110 ) );
+
+	EXPECT_EQ( "-", DateToStringWithMonth( 0 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( -9999 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( -12210110 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( 13082328 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( 10100 ) );
+
+	// These should fail...
+	EXPECT_EQ( "-", DateToStringWithMonth( 1000101 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( 990101 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( 1010001 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( 1009901 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( 1010099 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( 1320100 ) );
+	EXPECT_EQ( "-", DateToStringWithMonth( 1012500 ) );
+
 }
 
 TEST_F ( SQLiteFixture, writeMeterDictionaryItem )
