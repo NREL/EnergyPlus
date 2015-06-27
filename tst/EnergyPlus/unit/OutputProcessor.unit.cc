@@ -8,6 +8,9 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <ObjexxFCL/gio.hh>
+
+#include <map>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::OutputProcessor;
@@ -623,7 +626,13 @@ TEST_F( SQLiteFixture, writeTimeStampFormatData )
 	EXPECT_EQ( delimitedString( { "1,1" } ), mtr_stream->str() );
 	mtr_stream->str(std::string());
 
+	// Bad input
+	WriteTimeStampFormatData( mtr_stream.get(), 999, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp );
+
 	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to WriteTimeStampFormatData: 999\n", ss->str());
+	ss->str(std::string());
 
 	auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -766,5 +775,355 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 	EXPECT_EQ(reportExtendedData4, reportExtendedData[4]);
 	EXPECT_EQ(reportExtendedData5, reportExtendedData[5]);
 	EXPECT_EQ(reportExtendedData6, reportExtendedData[6]);
+
+}
+
+TEST_F ( SQLiteFixture, getStandardMeterResourceType )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, getStandardMeterResourceType" );
+
+	std::map< std::string, std::string > const resource_map = {
+		{ "ELECTRICITY", "Electricity" },
+		{ "ELECTRIC", "Electricity" },
+		{ "ELEC", "Electricity" },
+		{ "GAS", "Gas" },
+		{ "NATURALGAS", "Gas" },
+		{ "NATURAL GAS", "Gas" },
+		{ "GASOLINE", "Gasoline" },
+		{ "DIESEL", "Diesel" },
+		{ "COAL", "Coal" },
+		{ "FUEL OIL #1", "FuelOil#1" },
+		{ "FUELOIL#1", "FuelOil#1" },
+		{ "FUEL OIL", "FuelOil#1" },
+		{ "DISTILLATE OIL", "FuelOil#1" },
+		{ "FUEL OIL #2", "FuelOil#2" },
+		{ "FUELOIL#2", "FuelOil#2" },
+		{ "RESIDUAL OIL", "FuelOil#2" },
+		{ "PROPANE", "Propane" },
+		{ "LPG", "Propane" },
+		{ "PROPANEGAS", "Propane" },
+		{ "PROPANE GAS", "Propane" },
+		{ "WATER", "Water" },
+		{ "H2O", "Water" },
+		{ "ONSITEWATER", "OnSiteWater" },
+		{ "WATERPRODUCED", "OnSiteWater" },
+		{ "ONSITE WATER", "OnSiteWater" },
+		{ "MAINSWATER", "MainsWater" },
+		{ "WATERSUPPLY", "MainsWater" },
+		{ "RAINWATER", "RainWater" },
+		{ "PRECIPITATION", "RainWater" },
+		{ "WELLWATER", "WellWater" },
+		{ "GROUNDWATER", "WellWater" },
+		{ "CONDENSATE", "Condensate" },
+		{ "ENERGYTRANSFER", "EnergyTransfer" },
+		{ "ENERGYXFER", "EnergyTransfer" },
+		{ "XFER", "EnergyTransfer" },
+		{ "STEAM", "Steam" },
+		{ "DISTRICTCOOLING", "DistrictCooling" },
+		{ "DISTRICTHEATING", "DistrictHeating" },
+		{ "ELECTRICITYPRODUCED", "ElectricityProduced" },
+		{ "ELECTRICITYPURCHASED", "ElectricityPurchased" },
+		{ "ELECTRICITYSURPLUSSOLD", "ElectricitySurplusSold" },
+		{ "ELECTRICITYNET", "ElectricityNet" },
+		{ "SOLARWATER", "SolarWater" },
+		{ "SOLARAIR", "SolarAir" },
+		{ "SO2", "SO2" },
+		{ "NOX", "NOx" },
+		{ "N2O", "N2O" },
+		{ "PM", "PM" },
+		{ "PM2.5", "PM2.5" },
+		{ "PM10", "PM10" },
+		{ "CO", "CO" },
+		{ "CO2", "CO2" },
+		{ "CH4", "CH4" },
+		{ "NH3", "NH3" },
+		{ "NMVOC", "NMVOC" },
+		{ "HG", "Hg" },
+		{ "PB", "Pb" },
+		{ "NUCLEAR HIGH", "Nuclear High" },
+		{ "NUCLEAR LOW", "Nuclear Low" },
+		{ "WATERENVIRONMENTALFACTORS", "WaterEnvironmentalFactors" },
+		{ "CARBON EQUIVALENT", "Carbon Equivalent" },
+		{ "SOURCE", "Source" },
+		{ "PLANTLOOPHEATINGDEMAND", "PlantLoopHeatingDemand" },
+		{ "PLANTLOOPCOOLINGDEMAND", "PlantLoopCoolingDemand" },
+		{ "GENERIC", "Generic" },
+		{ "OTHERFUEL1", "OtherFuel1" },
+		{ "OTHERFUEL2", "OtherFuel2" }
+	};
+
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+
+	std::string out_resource_type;
+	bool error_found = false;
+
+	for( auto const & meterType : resource_map ) {
+		GetStandardMeterResourceType( out_resource_type, meterType.first, error_found );
+		EXPECT_EQ( meterType.second, out_resource_type );
+		EXPECT_FALSE( error_found );
+	}
+
+	auto const meterType = "BAD INPUT";
+	out_resource_type = "BAD INPUT";
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+	GetStandardMeterResourceType( out_resource_type, meterType, error_found );
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	EXPECT_EQ( meterType, out_resource_type );
+	EXPECT_TRUE( error_found );
+
+	auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
+
+	ASSERT_EQ(1ul, errorData.size());
+	std::vector<std::string> errorData0 {"1", "1", "1", "GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered=BAD INPUT", "1"};
+	EXPECT_EQ(errorData0, errorData[0]);
+
+}
+
+TEST_F ( SQLiteFixture, writeMeterDictionaryItem )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, writeMeterDictionaryItem" );
+
+	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
+	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
+
+	DataGlobals::eso_stream = eso_strm.get();
+	DataGlobals::mtr_stream = mtr_strm.get();
+
+	InitializeOutput();
+
+	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	WriteMeterDictionaryItem( ReportTimeStep, 1, 1, -999, "indexGroup", "1", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "1,1,meterName [meterUnits] !TimeStep" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "1,1,meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportTimeStep, 2, 2, -999, "indexGroup", "2", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "2,1,meterName [meterUnits] !TimeStep" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "2,1,meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportTimeStep, 1, 3, -999, "indexGroup", "3", "meterName", "meterUnits", true, false );
+	EXPECT_EQ( delimitedString( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportTimeStep, 1, 4, -999, "indexGroup", "4", "meterName", "meterUnits", false, true );
+	EXPECT_EQ( delimitedString( { "4,1,meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportTimeStep, 1, 5, -999, "indexGroup", "5", "meterName", "meterUnits", true, true );
+	EXPECT_EQ( delimitedString( { "5,1,Cumulative meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportEach, 1, 6, -999, "indexGroup", "6", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "6,1,meterName [meterUnits] !Each Call" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "6,1,meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportEach, 2, 7, -999, "indexGroup", "7", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "7,1,meterName [meterUnits] !Each Call" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "7,1,meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportEach, 1, 8, -999, "indexGroup", "8", "meterName", "meterUnits", true, false );
+	EXPECT_EQ( delimitedString( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportEach, 1, 9, -999, "indexGroup", "9", "meterName", "meterUnits", false, true );
+	EXPECT_EQ( delimitedString( { "9,1,meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportEach, 1, 10, -999, "indexGroup", "10", "meterName", "meterUnits", true, true );
+	EXPECT_EQ( delimitedString( { "10,1,Cumulative meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportHourly, 1, 11, -999, "indexGroup", "11", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "11,1,meterName [meterUnits] !Hourly" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "11,1,meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportHourly, 2, 12, -999, "indexGroup", "12", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "12,1,meterName [meterUnits] !Hourly" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "12,1,meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportHourly, 1, 13, -999, "indexGroup", "13", "meterName", "meterUnits", true, false );
+	EXPECT_EQ( delimitedString( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportHourly, 1, 14, -999, "indexGroup", "14", "meterName", "meterUnits", false, true );
+	EXPECT_EQ( delimitedString( { "14,1,meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportHourly, 1, 15, -999, "indexGroup", "15", "meterName", "meterUnits", true, true );
+	EXPECT_EQ( delimitedString( { "15,1,Cumulative meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportDaily, 1, 16, -999, "indexGroup", "16", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportDaily, 2, 17, -999, "indexGroup", "17", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportDaily, 1, 18, -999, "indexGroup", "18", "meterName", "meterUnits", true, false );
+	EXPECT_EQ( delimitedString( { "18,1,Cumulative meterName [meterUnits] !Daily " } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "18,1,Cumulative meterName [meterUnits] !Daily " } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportDaily, 1, 19, -999, "indexGroup", "19", "meterName", "meterUnits", false, true );
+	EXPECT_EQ( delimitedString( { "19,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportDaily, 1, 20, -999, "indexGroup", "20", "meterName", "meterUnits", true, true );
+	EXPECT_EQ( delimitedString( { "20,1,Cumulative meterName [meterUnits] !Daily " } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportMonthly, 1, 21, -999, "indexGroup", "21", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportMonthly, 2, 22, -999, "indexGroup", "22", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportMonthly, 1, 23, -999, "indexGroup", "23", "meterName", "meterUnits", true, false );
+	EXPECT_EQ( delimitedString( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportMonthly, 1, 24, -999, "indexGroup", "24", "meterName", "meterUnits", false, true );
+	EXPECT_EQ( delimitedString( { "24,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportMonthly, 1, 25, -999, "indexGroup", "25", "meterName", "meterUnits", true, true );
+	EXPECT_EQ( delimitedString( { "25,1,Cumulative meterName [meterUnits] !Monthly " } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportSim, 1, 26, -999, "indexGroup", "26", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportSim, 2, 27, -999, "indexGroup", "27", "meterName", "meterUnits", false, false );
+	EXPECT_EQ( delimitedString( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportSim, 1, 28, -999, "indexGroup", "28", "meterName", "meterUnits", true, false );
+	EXPECT_EQ( delimitedString( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ), eso_strm->str() );
+	EXPECT_EQ( delimitedString( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+	eso_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportSim, 1, 29, -999, "indexGroup", "29", "meterName", "meterUnits", false, true );
+	EXPECT_EQ( delimitedString( { "29,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	WriteMeterDictionaryItem( ReportSim, 1, 30, -999, "indexGroup", "30", "meterName", "meterUnits", true, true );
+	EXPECT_EQ( delimitedString( { "30,1,Cumulative meterName [meterUnits] !RunPeriod " } ), mtr_strm->str() );
+	mtr_strm->str(std::string());
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto reportDataDictionary = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+	ASSERT_EQ(30ul, reportDataDictionary.size());
+	std::vector<std::string> reportDataDictionary0 {"1", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary1 {"2", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary2 {"3", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary3 {"4", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary4 {"5", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary5 {"6", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary6 {"7", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary7 {"8", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary8 {"9", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary9 {"10", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary10 {"11", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary11 {"12", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary12 {"13", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary13 {"14", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary14 {"15", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary15 {"16", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary16 {"17", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary17 {"18", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary18 {"19", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary19 {"20", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary20 {"21", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary21 {"22", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary22 {"23", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary23 {"24", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary24 {"25", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary25 {"26", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary26 {"27", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary27 {"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary28 {"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"};
+	std::vector<std::string> reportDataDictionary29 {"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"};
+	EXPECT_EQ(reportDataDictionary0, reportDataDictionary[0]);
+	EXPECT_EQ(reportDataDictionary1, reportDataDictionary[1]);
+	EXPECT_EQ(reportDataDictionary2, reportDataDictionary[2]);
+	EXPECT_EQ(reportDataDictionary3, reportDataDictionary[3]);
+	EXPECT_EQ(reportDataDictionary4, reportDataDictionary[4]);
+	EXPECT_EQ(reportDataDictionary5, reportDataDictionary[5]);
+	EXPECT_EQ(reportDataDictionary6, reportDataDictionary[6]);
+	EXPECT_EQ(reportDataDictionary7, reportDataDictionary[7]);
+	EXPECT_EQ(reportDataDictionary8, reportDataDictionary[8]);
+	EXPECT_EQ(reportDataDictionary9, reportDataDictionary[9]);
+	EXPECT_EQ(reportDataDictionary10, reportDataDictionary[10]);
+	EXPECT_EQ(reportDataDictionary11, reportDataDictionary[11]);
+	EXPECT_EQ(reportDataDictionary12, reportDataDictionary[12]);
+	EXPECT_EQ(reportDataDictionary13, reportDataDictionary[13]);
+	EXPECT_EQ(reportDataDictionary14, reportDataDictionary[14]);
+	EXPECT_EQ(reportDataDictionary15, reportDataDictionary[15]);
+	EXPECT_EQ(reportDataDictionary16, reportDataDictionary[16]);
+	EXPECT_EQ(reportDataDictionary17, reportDataDictionary[17]);
+	EXPECT_EQ(reportDataDictionary18, reportDataDictionary[18]);
+	EXPECT_EQ(reportDataDictionary19, reportDataDictionary[19]);
+	EXPECT_EQ(reportDataDictionary20, reportDataDictionary[20]);
+	EXPECT_EQ(reportDataDictionary21, reportDataDictionary[21]);
+	EXPECT_EQ(reportDataDictionary22, reportDataDictionary[22]);
+	EXPECT_EQ(reportDataDictionary23, reportDataDictionary[23]);
+	EXPECT_EQ(reportDataDictionary24, reportDataDictionary[24]);
+	EXPECT_EQ(reportDataDictionary25, reportDataDictionary[25]);
+	EXPECT_EQ(reportDataDictionary26, reportDataDictionary[26]);
+	EXPECT_EQ(reportDataDictionary27, reportDataDictionary[27]);
+	EXPECT_EQ(reportDataDictionary28, reportDataDictionary[28]);
+	EXPECT_EQ(reportDataDictionary29, reportDataDictionary[29]);
+
+	// This should be all necessary clean up...
+	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileMeterDetails, flags ); }
+	RVariableTypes.deallocate();
+	IVariableTypes.deallocate();
+	ReportList.deallocate();
+	EndUseCategory.deallocate();
 
 }
