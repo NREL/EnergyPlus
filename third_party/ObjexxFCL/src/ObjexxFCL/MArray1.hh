@@ -1061,8 +1061,8 @@ public: // MArray Generators
 public: // Comparison: Predicate
 
 	// MArray1 == MArray1
-	inline
 	friend
+	inline
 	bool
 	eq( MArray1 const & a, MArray1 const & b )
 	{
@@ -1076,8 +1076,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 != MArray1
-	inline
 	friend
+	inline
 	bool
 	ne( MArray1 const & a, MArray1 const & b )
 	{
@@ -1085,8 +1085,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 < MArray1
-	inline
 	friend
+	inline
 	bool
 	lt( MArray1 const & a, MArray1 const & b )
 	{
@@ -1100,8 +1100,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 <= MArray1
-	inline
 	friend
+	inline
 	bool
 	le( MArray1 const & a, MArray1 const & b )
 	{
@@ -1115,8 +1115,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 > MArray1
-	inline
 	friend
+	inline
 	bool
 	gt( MArray1 const & a, MArray1 const & b )
 	{
@@ -1124,8 +1124,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 >= MArray1
-	inline
 	friend
+	inline
 	bool
 	ge( MArray1 const & a, MArray1 const & b )
 	{
@@ -1133,8 +1133,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 == Value
-	inline
 	friend
+	inline
 	bool
 	eq( MArray1 const & a, T const & t )
 	{
@@ -1145,8 +1145,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 != Value
-	inline
 	friend
+	inline
 	bool
 	ne( MArray1 const & a, T const & t )
 	{
@@ -1154,8 +1154,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 < Value
-	inline
 	friend
+	inline
 	bool
 	lt( MArray1 const & a, T const & t )
 	{
@@ -1167,8 +1167,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 <= Value
-	inline
 	friend
+	inline
 	bool
 	le( MArray1 const & a, T const & t )
 	{
@@ -1180,8 +1180,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 > Value
-	inline
 	friend
+	inline
 	bool
 	gt( MArray1 const & a, T const & t )
 	{
@@ -1189,8 +1189,8 @@ public: // Comparison: Predicate
 	}
 
 	// MArray1 >= Value
-	inline
 	friend
+	inline
 	bool
 	ge( MArray1 const & a, T const & t )
 	{
@@ -1198,8 +1198,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value == MArray1
-	inline
 	friend
+	inline
 	bool
 	eq( T const & t, MArray1 const & a )
 	{
@@ -1207,8 +1207,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value != MArray1
-	inline
 	friend
+	inline
 	bool
 	ne( T const & t, MArray1 const & a )
 	{
@@ -1216,8 +1216,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value < MArray1
-	inline
 	friend
+	inline
 	bool
 	lt( T const & t, MArray1 const & a )
 	{
@@ -1229,8 +1229,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value <= MArray1
-	inline
 	friend
+	inline
 	bool
 	le( T const & t, MArray1 const & a )
 	{
@@ -1242,8 +1242,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value > MArray1
-	inline
 	friend
+	inline
 	bool
 	gt( T const & t, MArray1 const & a )
 	{
@@ -1251,8 +1251,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value >= MArray1
-	inline
 	friend
+	inline
 	bool
 	ge( T const & t, MArray1 const & a )
 	{
@@ -1262,8 +1262,8 @@ public: // Comparison: Predicate
 public: // Comparison: Predicate: Any
 
 	// Any MArray1 == MArray1
-	inline
 	friend
+	inline
 	bool
 	any_eq( MArray1 const & a, MArray1 const & b )
 	{
@@ -1277,8 +1277,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 != MArray1
-	inline
 	friend
+	inline
 	bool
 	any_ne( MArray1 const & a, MArray1 const & b )
 	{
@@ -1286,8 +1286,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 < MArray1
-	inline
 	friend
+	inline
 	bool
 	any_lt( MArray1 const & a, MArray1 const & b )
 	{
@@ -1301,8 +1301,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 <= MArray1
-	inline
 	friend
+	inline
 	bool
 	any_le( MArray1 const & a, MArray1 const & b )
 	{
@@ -1316,8 +1316,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 > MArray1
-	inline
 	friend
+	inline
 	bool
 	any_gt( MArray1 const & a, MArray1 const & b )
 	{
@@ -1325,8 +1325,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 >= MArray1
-	inline
 	friend
+	inline
 	bool
 	any_ge( MArray1 const & a, MArray1 const & b )
 	{
@@ -1334,8 +1334,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 == Value
-	inline
 	friend
+	inline
 	bool
 	any_eq( MArray1 const & a, T const & t )
 	{
@@ -1347,8 +1347,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 != Value
-	inline
 	friend
+	inline
 	bool
 	any_ne( MArray1 const & a, T const & t )
 	{
@@ -1356,8 +1356,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 < Value
-	inline
 	friend
+	inline
 	bool
 	any_lt( MArray1 const & a, T const & t )
 	{
@@ -1369,8 +1369,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 <= Value
-	inline
 	friend
+	inline
 	bool
 	any_le( MArray1 const & a, T const & t )
 	{
@@ -1382,8 +1382,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 > Value
-	inline
 	friend
+	inline
 	bool
 	any_gt( MArray1 const & a, T const & t )
 	{
@@ -1391,8 +1391,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any MArray1 >= Value
-	inline
 	friend
+	inline
 	bool
 	any_ge( MArray1 const & a, T const & t )
 	{
@@ -1400,8 +1400,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value == MArray1
-	inline
 	friend
+	inline
 	bool
 	any_eq( T const & t, MArray1 const & a )
 	{
@@ -1409,8 +1409,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value != MArray1
-	inline
 	friend
+	inline
 	bool
 	any_ne( T const & t, MArray1 const & a )
 	{
@@ -1418,8 +1418,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value < MArray1
-	inline
 	friend
+	inline
 	bool
 	any_lt( T const & t, MArray1 const & a )
 	{
@@ -1431,8 +1431,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value <= MArray1
-	inline
 	friend
+	inline
 	bool
 	any_le( T const & t, MArray1 const & a )
 	{
@@ -1444,8 +1444,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value > MArray1
-	inline
 	friend
+	inline
 	bool
 	any_gt( T const & t, MArray1 const & a )
 	{
@@ -1453,8 +1453,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value >= MArray1
-	inline
 	friend
+	inline
 	bool
 	any_ge( T const & t, MArray1 const & a )
 	{
@@ -1464,8 +1464,8 @@ public: // Comparison: Predicate: Any
 public: // Comparison: Predicate: All
 
 	// All MArray1 == MArray1
-	inline
 	friend
+	inline
 	bool
 	all_eq( MArray1 const & a, MArray1 const & b )
 	{
@@ -1473,8 +1473,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 != MArray1
-	inline
 	friend
+	inline
 	bool
 	all_ne( MArray1 const & a, MArray1 const & b )
 	{
@@ -1482,8 +1482,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 < MArray1
-	inline
 	friend
+	inline
 	bool
 	all_lt( MArray1 const & a, MArray1 const & b )
 	{
@@ -1491,8 +1491,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 <= MArray1
-	inline
 	friend
+	inline
 	bool
 	all_le( MArray1 const & a, MArray1 const & b )
 	{
@@ -1500,8 +1500,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 > MArray1
-	inline
 	friend
+	inline
 	bool
 	all_gt( MArray1 const & a, MArray1 const & b )
 	{
@@ -1509,8 +1509,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 >= MArray1
-	inline
 	friend
+	inline
 	bool
 	all_ge( MArray1 const & a, MArray1 const & b )
 	{
@@ -1518,8 +1518,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 == Value
-	inline
 	friend
+	inline
 	bool
 	all_eq( MArray1 const & a, T const & t )
 	{
@@ -1527,8 +1527,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 != Value
-	inline
 	friend
+	inline
 	bool
 	all_ne( MArray1 const & a, T const & t )
 	{
@@ -1536,8 +1536,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 < Value
-	inline
 	friend
+	inline
 	bool
 	all_lt( MArray1 const & a, T const & t )
 	{
@@ -1545,8 +1545,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 <= Value
-	inline
 	friend
+	inline
 	bool
 	all_le( MArray1 const & a, T const & t )
 	{
@@ -1554,8 +1554,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 > Value
-	inline
 	friend
+	inline
 	bool
 	all_gt( MArray1 const & a, T const & t )
 	{
@@ -1563,8 +1563,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All MArray1 >= Value
-	inline
 	friend
+	inline
 	bool
 	all_ge( MArray1 const & a, T const & t )
 	{
@@ -1572,8 +1572,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value == MArray1
-	inline
 	friend
+	inline
 	bool
 	all_eq( T const & t, MArray1 const & a )
 	{
@@ -1581,8 +1581,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value != MArray1
-	inline
 	friend
+	inline
 	bool
 	all_ne( T const & t, MArray1 const & a )
 	{
@@ -1590,8 +1590,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value < MArray1
-	inline
 	friend
+	inline
 	bool
 	all_lt( T const & t, MArray1 const & a )
 	{
@@ -1599,8 +1599,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value <= MArray1
-	inline
 	friend
+	inline
 	bool
 	all_le( T const & t, MArray1 const & a )
 	{
@@ -1608,8 +1608,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value > MArray1
-	inline
 	friend
+	inline
 	bool
 	all_gt( T const & t, MArray1 const & a )
 	{
@@ -1617,8 +1617,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value >= MArray1
-	inline
 	friend
+	inline
 	bool
 	all_ge( T const & t, MArray1 const & a )
 	{
@@ -1628,8 +1628,8 @@ public: // Comparison: Predicate: All
 public: // Comparison: Count
 
 	// Count MArray1 == MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_eq( MArray1 const & a, MArray1 const & b )
 	{
@@ -1644,8 +1644,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 != MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_ne( MArray1 const & a, MArray1 const & b )
 	{
@@ -1660,8 +1660,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 < MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_lt( MArray1 const & a, MArray1 const & b )
 	{
@@ -1676,8 +1676,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 <= MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_le( MArray1 const & a, MArray1 const & b )
 	{
@@ -1692,8 +1692,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 > MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_gt( MArray1 const & a, MArray1 const & b )
 	{
@@ -1708,8 +1708,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 >= MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_ge( MArray1 const & a, MArray1 const & b )
 	{
@@ -1724,8 +1724,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 == Value
-	inline
 	friend
+	inline
 	size_type
 	count_eq( MArray1 const & a, T const & t )
 	{
@@ -1738,8 +1738,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value == MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_eq( T const & t, MArray1 const & a )
 	{
@@ -1747,8 +1747,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 != Value
-	inline
 	friend
+	inline
 	size_type
 	count_ne( MArray1 const & a, T const & t )
 	{
@@ -1761,8 +1761,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value != MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_ne( T const & t, MArray1 const & a )
 	{
@@ -1770,8 +1770,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 < Value
-	inline
 	friend
+	inline
 	size_type
 	count_lt( MArray1 const & a, T const & t )
 	{
@@ -1784,8 +1784,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value < MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_lt( T const & t, MArray1 const & a )
 	{
@@ -1793,8 +1793,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 <= Value
-	inline
 	friend
+	inline
 	size_type
 	count_le( MArray1 const & a, T const & t )
 	{
@@ -1807,8 +1807,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value <= MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_le( T const & t, MArray1 const & a )
 	{
@@ -1816,8 +1816,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 > Value
-	inline
 	friend
+	inline
 	size_type
 	count_gt( MArray1 const & a, T const & t )
 	{
@@ -1830,8 +1830,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value > MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_gt( T const & t, MArray1 const & a )
 	{
@@ -1839,8 +1839,8 @@ public: // Comparison: Count
 	}
 
 	// Count MArray1 >= Value
-	inline
 	friend
+	inline
 	size_type
 	count_ge( MArray1 const & a, T const & t )
 	{
@@ -1853,8 +1853,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value >= MArray1
-	inline
 	friend
+	inline
 	size_type
 	count_ge( T const & t, MArray1 const & a )
 	{

@@ -224,8 +224,8 @@ public: // Modifiers
 public: // Comparison
 
 	// Optional == Optional
-	inline
 	friend
+	inline
 	bool
 	operator ==( Optional const & a, Optional const & b )
 	{
@@ -233,8 +233,8 @@ public: // Comparison
 	}
 
 	// Optional != Optional
-	inline
 	friend
+	inline
 	bool
 	operator !=( Optional const & a, Optional const & b )
 	{
@@ -242,8 +242,8 @@ public: // Comparison
 	}
 
 	// Optional == Value
-	inline
 	friend
+	inline
 	bool
 	operator ==( Optional const & a, T const & b )
 	{
@@ -251,8 +251,8 @@ public: // Comparison
 	}
 
 	// Optional != Value
-	inline
 	friend
+	inline
 	bool
 	operator !=( Optional const & a, T const & b )
 	{
@@ -260,8 +260,8 @@ public: // Comparison
 	}
 
 	// Value == Optional
-	inline
 	friend
+	inline
 	bool
 	operator ==( T const & a, Optional const & b )
 	{
@@ -269,8 +269,8 @@ public: // Comparison
 	}
 
 	// Value != Optional
-	inline
 	friend
+	inline
 	bool
 	operator !=( T const & a, Optional const & b )
 	{
@@ -448,8 +448,8 @@ public: // Modifiers
 public: // Comparison
 
 	// Optional == Optional
-	inline
 	friend
+	inline
 	bool
 	operator ==( Optional const & a, Optional const & b )
 	{
@@ -457,8 +457,8 @@ public: // Comparison
 	}
 
 	// Optional != Optional
-	inline
 	friend
+	inline
 	bool
 	operator !=( Optional const & a, Optional const & b )
 	{
@@ -466,8 +466,8 @@ public: // Comparison
 	}
 
 	// Optional == Value
-	inline
 	friend
+	inline
 	bool
 	operator ==( Optional const & a, T const & b )
 	{
@@ -475,8 +475,8 @@ public: // Comparison
 	}
 
 	// Optional != Value
-	inline
 	friend
+	inline
 	bool
 	operator !=( Optional const & a, T const & b )
 	{
@@ -484,8 +484,8 @@ public: // Comparison
 	}
 
 	// Value == Optional
-	inline
 	friend
+	inline
 	bool
 	operator ==( T const & a, Optional const & b )
 	{
@@ -493,8 +493,8 @@ public: // Comparison
 	}
 
 	// Value != Optional
-	inline
 	friend
+	inline
 	bool
 	operator !=( T const & a, Optional const & b )
 	{

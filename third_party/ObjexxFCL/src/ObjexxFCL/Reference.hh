@@ -315,8 +315,8 @@ public: // Modifiers
 public: // Comparison
 
 	// Reference == Reference
-	inline
 	friend
+	inline
 	bool
 	operator ==( Reference const & a, Reference const & b )
 	{
@@ -325,8 +325,8 @@ public: // Comparison
 	}
 
 	// Reference != Reference
-	inline
 	friend
+	inline
 	bool
 	operator !=( Reference const & a, Reference const & b )
 	{
@@ -335,8 +335,8 @@ public: // Comparison
 	}
 
 	// Reference == Value
-	inline
 	friend
+	inline
 	bool
 	operator ==( Reference const & a, T const & b )
 	{
@@ -345,8 +345,8 @@ public: // Comparison
 	}
 
 	// Reference != Value
-	inline
 	friend
+	inline
 	bool
 	operator !=( Reference const & a, T const & b )
 	{
@@ -355,8 +355,8 @@ public: // Comparison
 	}
 
 	// Value == Reference
-	inline
 	friend
+	inline
 	bool
 	operator ==( T const & a, Reference const & b )
 	{
@@ -365,8 +365,8 @@ public: // Comparison
 	}
 
 	// Value != Reference
-	inline
 	friend
+	inline
 	bool
 	operator !=( T const & a, Reference const & b )
 	{
