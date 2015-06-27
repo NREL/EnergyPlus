@@ -4771,13 +4771,13 @@ namespace OutputProcessor {
 		} else if ( has( meterName, "Electricity:HVAC" ) ) {
 			indexGroupKey = 301;
 
-			// InteriorLights:Electricity indices are in the 400s
-		} else if ( has( meterName, "InteriorLights:Electricity" ) ) {
-			indexGroupKey = 401;
-
 			// InteriorLights:Electricity:Zone indices are in the 500s
 		} else if ( has( meterName, "InteriorLights:Electricity:Zone" ) ) {
 			indexGroupKey = 501;
+
+			// InteriorLights:Electricity indices are in the 400s
+		} else if ( has( meterName, "InteriorLights:Electricity" ) ) {
+			indexGroupKey = 401;
 
 			// Unknown items have negative indices
 		} else {
