@@ -153,6 +153,7 @@ TEST_F( SQLiteFixture, reportTSMeters_PrintESOTimeStamp )
 	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
 
 	EnergyMeters.deallocate();
+	NumEnergyMeters = 0;
 }
 
 TEST_F( SQLiteFixture, reportTSMeters )
@@ -241,6 +242,7 @@ TEST_F( SQLiteFixture, reportTSMeters )
 	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
 
 	EnergyMeters.deallocate();
+	NumEnergyMeters = 0;
 }
 
 TEST_F( SQLiteFixture, reportHRMeters )
@@ -321,6 +323,7 @@ TEST_F( SQLiteFixture, reportHRMeters )
 	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
 
 	EnergyMeters.deallocate();
+	NumEnergyMeters = 0;
 }
 
 TEST_F( SQLiteFixture, reportDYMeters )
@@ -418,6 +421,7 @@ TEST_F( SQLiteFixture, reportDYMeters )
 	}
 
 	EnergyMeters.deallocate();
+	NumEnergyMeters = 0;
 }
 
 TEST_F( SQLiteFixture, reportMNMeters )
@@ -514,6 +518,7 @@ TEST_F( SQLiteFixture, reportMNMeters )
 	}
 
 	EnergyMeters.deallocate();
+	NumEnergyMeters = 0;
 }
 
 TEST_F( SQLiteFixture, reportSMMeters )
@@ -610,6 +615,7 @@ TEST_F( SQLiteFixture, reportSMMeters )
 	}
 
 	EnergyMeters.deallocate();
+	NumEnergyMeters = 0;
 }
 
 TEST_F( SQLiteFixture, writeTimeStampFormatData )
@@ -1373,11 +1379,6 @@ TEST( OutputProcessor, standardVariableTypeKey )
 TEST_F(  SQLiteFixture, determineMeterIPUnits ) 
 {
 	ShowMessage( "Begin Test: SQLiteFixture, determineMeterIPUnits" );
-
-	// int & CodeForIPUnits, // Output Code for IP Units
-	// std::string const & ResourceType, // Resource Type
-	// std::string const & MtrUnits, // Meter units
-	// bool & ErrorsFound // true if errors found during subroutine
 
 	int ipUnits = -999999;
 	bool errorFound = false;
@@ -2215,5 +2216,333 @@ TEST_F( SQLiteFixture, writeRealData )
 	}
 
 	ASSERT_EQ( reportExtendedData.size(), reportExtendedDataResults.size() );
+
+}
+
+TEST_F( SQLiteFixture, addMeter )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, addMeter" );
+
+	auto const name( "testMeter" );
+	auto const units( "J" );
+	auto const resourceType( "ELEC" );
+	auto const endUse( "testEndUse" );
+	auto const endUseSub( "testEndUseSub" );
+	auto const group( "testGroup" );
+
+	EXPECT_EQ( 0, NumEnergyMeters );
+	EXPECT_EQ( 0ul, EnergyMeters.size() );
+
+	AddMeter( name, units, resourceType, endUse, endUseSub, group );
+
+	ASSERT_EQ( 1, NumEnergyMeters );
+	ASSERT_EQ( 1ul, EnergyMeters.size() );
+
+	EXPECT_EQ( name, EnergyMeters( 1 ).Name );
+	EXPECT_EQ( resourceType, EnergyMeters( 1 ).ResourceType );
+	EXPECT_EQ( endUse, EnergyMeters( 1 ).EndUse );
+	EXPECT_EQ( endUseSub, EnergyMeters( 1 ).EndUseSub );
+	EXPECT_EQ( group, EnergyMeters( 1 ).Group );
+	EXPECT_EQ( units, EnergyMeters( 1 ).Units );
+	EXPECT_EQ( 1, EnergyMeters( 1 ).TSRptNum );
+	EXPECT_EQ( 2, EnergyMeters( 1 ).HRRptNum );
+	EXPECT_EQ( 3, EnergyMeters( 1 ).DYRptNum );
+	EXPECT_EQ( 4, EnergyMeters( 1 ).MNRptNum );
+	EXPECT_EQ( 5, EnergyMeters( 1 ).SMRptNum );
+	EXPECT_EQ( 6, EnergyMeters( 1 ).TSAccRptNum );
+	EXPECT_EQ( 7, EnergyMeters( 1 ).HRAccRptNum );
+	EXPECT_EQ( 8, EnergyMeters( 1 ).DYAccRptNum );
+	EXPECT_EQ( 9, EnergyMeters( 1 ).MNAccRptNum );
+	EXPECT_EQ( 10, EnergyMeters( 1 ).SMAccRptNum );
+
+	auto const name2( "testMeter2" );
+	auto const units2( "kWh" );
+	auto const resourceType2( "OTHER" );
+	auto const endUse2( "testEndUse2" );
+	auto const endUseSub2( "testEndUseSub2" );
+	auto const group2( "testGroup2" );
+
+	EXPECT_EQ( 1, NumEnergyMeters );
+	EXPECT_EQ( 1ul, EnergyMeters.size() );
+
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+	AddMeter( name2, units2, resourceType2, endUse2, endUseSub2, group2 );
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
+
+	ASSERT_EQ(1ul, errorData.size());
+	std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[kWh].  ..on Meter=\"testMeter2\".  ..requests for IP units from this meter will be ignored.", "1"};
+	EXPECT_EQ(errorData0, errorData[0]);
+
+	ASSERT_EQ( 2, NumEnergyMeters );
+	ASSERT_EQ( 2ul, EnergyMeters.size() );
+
+	EnergyMeters.deallocate();
+	NumEnergyMeters = 0;
+}
+
+TEST_F( SQLiteFixture, validateNStandardizeMeterTitles )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, validateNStandardizeMeterTitles" );
+
+	std::vector< std::vector< std::string > > input_map = {
+		{ "J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "SYSTEM" },
+		{ "J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "PLANT" },
+		{ "J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "BUILDING", "zoneName" },
+		{ "J", "ELEC", "INTERIORLIGHTS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "EXTERIOR LIGHTS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "EXTERIORLIGHTS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HTG", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATPRODUCED", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COOLING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "CLG", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "DOMESTICHOTWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "DHW", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "DOMESTIC HOT WATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COGEN", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COGENERATION", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "INTERIOREQUIPMENT", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "INTERIOR EQUIPMENT", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "EXTERIOREQUIPMENT", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "EXTERIOR EQUIPMENT", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "EXT EQ", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "EXTERIOREQ", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "EXTERIOR:WATEREQUIPMENT", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PURCHASEDHOTWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "DISTRICTHOTWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PURCHASED HEATING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PURCHASEDCOLDWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "DISTRICTCHILLEDWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PURCHASEDCHILLEDWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PURCHASED COLD WATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PURCHASED COOLING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "FANS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "FAN", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATINGCOILS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATINGCOIL", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATING COILS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATING COIL", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COOLINGCOILS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COOLINGCOIL", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COOLING COILS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COOLING COIL", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PUMPS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PUMP", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "FREECOOLING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "FREE COOLING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "LOOPTOLOOP", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "CHILLERS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "CHILLER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "BOILERS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "BOILER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "BASEBOARD", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "BASEBOARDS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATREJECTION", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEAT REJECTION", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HUMIDIFIER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HUMIDIFIERS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATRECOVERY", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEAT RECOVERY", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PHOTOVOLTAICS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PV", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PHOTOVOLTAIC", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "WINDTURBINES", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "WT", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "WINDTURBINE", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEAT RECOVERY FOR COOLING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATRECOVERYFORCOOLING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATRECOVERYCOOLING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEAT RECOVERY FOR HEATING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATRECOVERYFORHEATING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "HEATRECOVERYHEATING", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "ELECTRICEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PURCHASEDELECTRICEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "SOLDELECTRICEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "NATURALGASEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "FUELOIL#1EMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "FUELOIL#2EMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COALEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "GASOLINEEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PROPANEEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "DIESELEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "OTHERFUEL1EMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "OTHERFUEL2EMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "CARBONEQUIVALENTEMISSIONS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "REFRIGERATION", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COLDSTORAGECHARGE", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "COLDSTORAGEDISCHARGE", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "WATERSYSTEMS", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "WATERSYSTEM", "endUseSub", "HVAC" },
+		// { "J", "ELEC", "Water System", "endUseSub", "HVAC" },  // This one fails because Water System isn't a proper choice (needs to be upper cased in code...)
+		{ "J", "ELEC", "RAINWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "CONDENSATE", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "WELLWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "MAINSWATER", "endUseSub", "HVAC" },
+		{ "J", "ELEC", "PURCHASEDWATER", "endUseSub", "HVAC" }
+	};
+
+	std::vector< std::string > const result_map = {
+		"Electricity:Facility",
+		"Electricity:HVAC",
+		"InteriorLights:Electricity",
+		"endUseSub:InteriorLights:Electricity",
+		"Electricity:Plant",
+		"Electricity:Building",
+		"Electricity:Zone:zoneName",
+		"InteriorLights:Electricity:Zone:zoneName",
+		"ExteriorLights:Electricity",
+		"endUseSub:ExteriorLights:Electricity",
+		"Heating:Electricity",
+		"endUseSub:Heating:Electricity",
+		"HeatProduced:Electricity",
+		"endUseSub:HeatProduced:Electricity",
+		"Cooling:Electricity",
+		"endUseSub:Cooling:Electricity",
+		"WaterSystems:Electricity",
+		"endUseSub:WaterSystems:Electricity",
+		"Cogeneration:Electricity",
+		"endUseSub:Cogeneration:Electricity",
+		"InteriorEquipment:Electricity",
+		"endUseSub:InteriorEquipment:Electricity",
+		"ExteriorEquipment:Electricity",
+		"endUseSub:ExteriorEquipment:Electricity",
+		"DistrictHotWater:Electricity",
+		"endUseSub:DistrictHotWater:Electricity",
+		"DistrictChilledWater:Electricity",
+		"endUseSub:DistrictChilledWater:Electricity",
+		"Fans:Electricity",
+		"endUseSub:Fans:Electricity",
+		"HeatingCoils:Electricity",
+		"endUseSub:HeatingCoils:Electricity",
+		"CoolingCoils:Electricity",
+		"endUseSub:CoolingCoils:Electricity",
+		"Pumps:Electricity",
+		"endUseSub:Pumps:Electricity",
+		"Freecooling:Electricity",
+		"endUseSub:Freecooling:Electricity",
+		"LoopToLoop:Electricity",
+		"endUseSub:LoopToLoop:Electricity",
+		"Chillers:Electricity",
+		"endUseSub:Chillers:Electricity",
+		"Boilers:Electricity",
+		"endUseSub:Boilers:Electricity",
+		"Baseboard:Electricity",
+		"endUseSub:Baseboard:Electricity",
+		"HeatRejection:Electricity",
+		"endUseSub:HeatRejection:Electricity",
+		"Humidifier:Electricity",
+		"endUseSub:Humidifier:Electricity",
+		"HeatRecovery:Electricity",
+		"endUseSub:HeatRecovery:Electricity",
+		"Photovoltaic:Electricity",
+		"endUseSub:Photovoltaic:Electricity",
+		"WindTurbine:Electricity",
+		"endUseSub:WindTurbine:Electricity",
+		"HeatRecoveryForCooling:Electricity",
+		"endUseSub:HeatRecoveryForCooling:Electricity",
+		"HeatRecoveryForHeating:Electricity",
+		"endUseSub:HeatRecoveryForHeating:Electricity",
+		"ElectricEmissions:Electricity",
+		"endUseSub:ElectricEmissions:Electricity",
+		"PurchasedElectricEmissions:Electricity",
+		"endUseSub:PurchasedElectricEmissions:Electricity",
+		"SoldElectricEmissions:Electricity",
+		"endUseSub:SoldElectricEmissions:Electricity",
+		"NaturalGasEmissions:Electricity",
+		"endUseSub:NaturalGasEmissions:Electricity",
+		"FuelOil#1Emissions:Electricity",
+		"endUseSub:FuelOil#1Emissions:Electricity",
+		"FuelOil#2Emissions:Electricity",
+		"endUseSub:FuelOil#2Emissions:Electricity",
+		"CoalEmissions:Electricity",
+		"endUseSub:CoalEmissions:Electricity",
+		"GasolineEmissions:Electricity",
+		"endUseSub:GasolineEmissions:Electricity",
+		"PropaneEmissions:Electricity",
+		"endUseSub:PropaneEmissions:Electricity",
+		"DieselEmissions:Electricity",
+		"endUseSub:DieselEmissions:Electricity",
+		"OtherFuel1Emissions:Electricity",
+		"endUseSub:OtherFuel1Emissions:Electricity",
+		"OtherFuel2Emissions:Electricity",
+		"endUseSub:OtherFuel2Emissions:Electricity",
+		"CarbonEquivalentEmissions:Electricity",
+		"endUseSub:CarbonEquivalentEmissions:Electricity",
+		"Refrigeration:Electricity",
+		"endUseSub:Refrigeration:Electricity",
+		"ColdStorageCharge:Electricity",
+		"endUseSub:ColdStorageCharge:Electricity",
+		"ColdStorageDischarge:Electricity",
+		"endUseSub:ColdStorageDischarge:Electricity",
+		"Rainwater:Electricity",
+		"endUseSub:Rainwater:Electricity",
+		"Condensate:Electricity",
+		"endUseSub:Condensate:Electricity",
+		"Wellwater:Electricity",
+		"endUseSub:Wellwater:Electricity",
+		"MainsWater:Electricity",
+		"endUseSub:MainsWater:Electricity"
+	};
+
+	bool errorFound = false;
+	for ( auto & meter : input_map ) {
+		errorFound = false;
+		if ( meter.size() == 5 ) {
+			ValidateNStandardizeMeterTitles( meter[ 0 ], meter[ 1 ], meter[ 2 ], meter[ 3 ], meter[ 4 ], errorFound );
+		} else if ( meter.size() == 6 ) {
+			ValidateNStandardizeMeterTitles( meter[ 0 ], meter[ 1 ], meter[ 2 ], meter[ 3 ], meter[ 4 ], errorFound, meter[ 5 ] );
+		}
+		EXPECT_FALSE( errorFound );
+	}
+
+	ASSERT_EQ( 100, NumEnergyMeters );
+	ASSERT_EQ( 100ul, EnergyMeters.size() );
+
+	for (int i = 0; i < NumEnergyMeters; ++i)
+	{
+		EXPECT_EQ( result_map[ i ], EnergyMeters( i + 1 ).Name );
+	}
+
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	std::string units = "J";
+	std::string resourceType = "ELEC";
+	std::string endUse = "INTERIOR LIGHTS";
+	std::string endUseSub = "endUseSub";
+	std::string group = "BAD INPUT";
+	errorFound = false;
+
+	ValidateNStandardizeMeterTitles( units, resourceType, endUse, endUseSub, group, errorFound );
+	EXPECT_TRUE( errorFound );
+
+	units = "J";
+	resourceType = "ELEC";
+	endUse = "BAD INPUT";
+	endUseSub = "endUseSub";
+	group = "HVAC";
+	errorFound = false;
+
+	ValidateNStandardizeMeterTitles( units, resourceType, endUse, endUseSub, group, errorFound );
+	EXPECT_TRUE( errorFound );
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
+
+	ASSERT_EQ(2ul, errorData.size());
+	std::vector<std::string> errorData0 {"1", "1", "1", "Illegal Group (for Meters) Entered=BAD INPUT", "1"};
+	std::vector<std::string> errorData1 {"2", "1", "1", "Illegal EndUse (for Meters) Entered=BAD INPUT", "1"};
+	EXPECT_EQ(errorData0, errorData[0]);
+	EXPECT_EQ(errorData1, errorData[1]);
+
+	EnergyMeters.deallocate();
+	NumEnergyMeters = 0;
 
 }
