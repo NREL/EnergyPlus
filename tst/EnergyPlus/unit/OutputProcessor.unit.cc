@@ -2000,72 +2000,140 @@ TEST_F( SQLiteFixture, writeRealData )
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-2 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-002" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-02" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-3 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-003" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-03" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-4 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-004" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-04" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-5 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-005" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-05" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-6 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-006" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-06" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-7 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-007" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-07" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-8 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-008" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-08" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-9 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-009" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-09" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-10 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-010" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-10" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-11 );
 	// this seems to always be low... not 1.0e-11
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,9.999999999999999E-012" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,9.999999999999999E-12" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-12 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-012" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-12" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-13 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-013" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-13" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-14 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-014" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-14" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-15 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-015" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-15" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-16 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-016" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-16" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", -1.0e-16 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E-016" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E-16" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e-19 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-019" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-19" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 0.5 );
@@ -2141,7 +2209,11 @@ TEST_F( SQLiteFixture, writeRealData )
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e17 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+017" } ), eso_strm->str() );
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+17" } ), eso_strm->str() );
+#endif
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", -1.0e16 );
@@ -2149,11 +2221,19 @@ TEST_F( SQLiteFixture, writeRealData )
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", -1.0e17 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E+017" } ), eso_strm->str() );
+#else
 	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E+17" } ), eso_strm->str() );
+#endif	
 	eso_strm->str(std::string());
 
 	WriteRealData( 1, "1", 1.0e25 );
+#ifdef _WIN32
+	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+025" } ), eso_strm->str() );
+#else
 	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+25" } ), eso_strm->str() );
+#endif	
 	eso_strm->str(std::string());
 
 	sqlite_test = std::move( EnergyPlus::sqlite );
