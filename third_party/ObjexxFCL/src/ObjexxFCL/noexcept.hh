@@ -13,7 +13,7 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
+#if defined(_MSC_VER) && _MSC_VER < 1900 && !defined(__INTEL_COMPILER)
 #define NOEXCEPT throw()
 #else
 #define NOEXCEPT noexcept
