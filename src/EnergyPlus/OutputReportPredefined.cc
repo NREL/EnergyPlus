@@ -956,7 +956,7 @@ namespace OutputReportPredefined {
 
 		pdrSizing = newPreDefReport( "HVACSizingSummary", "Size", "HVAC Sizing Summary" );
 
-		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Cooling" );
+		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Sensible Cooling" );
 
 		pdchZnClCalcDesLd = newPreDefColumn( pdstZoneClSize, "Calculated Design Load [W]" );
 		pdchZnClUserDesLd = newPreDefColumn( pdstZoneClSize, "User Design Load [W]" );
@@ -970,8 +970,9 @@ namespace OutputReportPredefined {
 		pdchZnClPkIndHum = newPreDefColumn( pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnClPkOATemp = newPreDefColumn( pdstZoneClSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnClPkOAHum = newPreDefColumn( pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
+		addFootNoteSubTable( pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 
-		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Heating" );
+		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Sensible Heating" );
 
 		pdchZnHtCalcDesLd = newPreDefColumn( pdstZoneHtSize, "Calculated Design Load [W]" );
 		pdchZnHtUserDesLd = newPreDefColumn( pdstZoneHtSize, "User Design Load [W]" );
@@ -985,6 +986,7 @@ namespace OutputReportPredefined {
 		pdchZnHtPkIndHum = newPreDefColumn( pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnHtPkOATemp = newPreDefColumn( pdstZoneHtSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnHtPkOAHum = newPreDefColumn( pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
+		addFootNoteSubTable( pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 
 		pdstSystemSize = newPreDefSubTable( pdrSizing, "System Design Air Flow Rates" );
 
