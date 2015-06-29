@@ -380,11 +380,9 @@ namespace HeatBalanceIntRadExchange {
 
 			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfaces; ++ZoneSurfNum ) {
 				int SurfNum = zvfi.SurfacePtr[ ZoneSurfNum ];
-				if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) {
+				NetLWRadToSurf( SurfNum ) += NetLWRadToSurf_Temp[ ZoneSurfNum ];
+				if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) 
 					SurfaceWindow( SurfNum ).IRfromParentZone += IRfromParentZone_Temp[ ZoneSurfNum ] / SurfaceEmiss [ ZoneSurfNum ];
-				} else {
-					NetLWRadToSurf( SurfNum ) += NetLWRadToSurf_Temp[ ZoneSurfNum ];
-				}
 			} // for ZoneSurfNum
 		} // for ZoneNum
 
