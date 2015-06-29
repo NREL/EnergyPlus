@@ -131,19 +131,19 @@ In this case, the fan operation state changes from point A (intersection of the 
 
 Figure 345. Effect of dirty air filter on variable speed fan operation – flow rate maintained 
 
-The required airflow rate m can be maintained while the fan pressure rise $\Delta P$  is increased to $\Delta P_{df}$. This leads to higher fan power ($\dot{Q}_{tot,df}$) and higher power entering the air ($\dot{Q}_{toair,df}$), and thus changes the specific enthalpies of the fan outlet air stream ($h_{out,df}$).
+The required airflow rate m can be maintained while the fan pressure rise <span>$\Delta P$</span>  is increased to <span>$\Delta P_{df}$</span>. This leads to higher fan power <span>$\dot Q_{tot,df}$</span> and higher power entering the air <span>$\dot Q_{toair,df}$</span>, and thus changes the specific enthalpies of the fan outlet air stream (<span>$h_{out,df}$</span>).
 
-$$ f_{flow,df} = m / m_{design,df} $$
+<div>$$ f_{flow,df} = m / m_{design,df} $$</div>
 
-$$ f_{pl,df} = c_{1} + c_{2}*f_{flow,df} + c_{3}*f_{flow,df}^2 + c_{4}*f_{flow,df}^3 + c_{5}*f_{flow,df}^4 $$
+<div>$$ f_{pl,df} = c_{1} + c_{2}*f_{flow,df} + c_{3}*f_{flow,df}^2 + c_{4}*f_{flow,df}^3 + c_{5}*f_{flow,df}^4 $$</div>
 
-$$ \dot{Q}_{tot,df} = f_{pl,df} \times m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$
+<div>$$ \dot{Q}_{tot,df} = f_{pl,df} \times m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$</div>
 
-$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$
+<div>$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$</div>
 
-$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$
+<div>$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$</div>
 
-$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m $$
+<div>$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m $$</div>
 
 Where,
 
@@ -179,19 +179,19 @@ In this case, the fan operation state changes from point A (intersection of the 
 
 Figure 346. Effect of dirty air filter on variable speed fan operation – flow rate reduced 
 
-The airflow rate m is reduced to $m_{df}$ while the fan design pressure rise $\Delta P$ is increased to $\Delta P_{df}$. Similarly to case (a), the fan power ($\dot{Q}_{tot}$), the power entering the air ($\dot{Q}_{toair}$), and the specific enthalpies of the fan outlet air stream ($h_{out}$) are all affected. Different from case (a), however, the fan power ($\dot{Q}_{tot}$) may either increase or decrease, depending on the degree of the airflow rate decrease and pressure rise increase. Also note that $f_{flow,df}$ is always 1 in this case, since the fan runs at its maximum speed.
+The airflow rate m is reduced to $m_{df}$ while the fan design pressure rise $\Delta P$ is increased to $\Delta P_{df}$. Similarly to case (a), the fan power (<span>$\dot Q_{tot}$</span>), the power entering the air (<span>$\dot Q_{toair}$</span>), and the specific enthalpies of the fan outlet air stream (<span>$h_{out}$</span>) are all affected. Different from case (a), however, the fan power (<span>$\dot Q_{tot}$</span>) may either increase or decrease, depending on the degree of the airflow rate decrease and pressure rise increase. Also note that <span>$f\_{flow,df}$</span> is always 1 in this case, since the fan runs at its maximum speed.
 
-$$ f_{flow,df} = 1 $$
+<div>$$ f_{flow,df} = 1 $$</div>
 
-$$ f_{pl,df} = c_{1} + c_{2}*f_{flow,df} + c_{3}*f_{flow,df}^2 + c_{4}*f_{flow,df}^3 + c_{5}*f_{flow,df}^4 $$
+<div>$$ f_{pl,df} = c_{1} + c_{2}*f_{flow,df} + c_{3}*f_{flow,df}^2 + c_{4}*f_{flow,df}^3 + c_{5}*f_{flow,df}^4 $$</div>
 
-$$ \dot{Q}_{tot,df} = f_{pl,df} \times m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$
+<div>$$ \dot{Q}_{tot,df} = f_{pl,df} \times m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$</div>
 
-$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$
+<div>$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$</div>
 
-$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$
+<div>$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$</div>
 
-$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m_{design,df} $$
+<div>$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m_{design,df} $$</div>
 
 Where,
 
@@ -227,15 +227,15 @@ In this case, the fan operation state changes from point A (intersection of the 
 
 Figure 347. Effect of dirty air filter on constant speed fan operation
 
-Similarly to case (b), the airflow rate m is reduced to $m_{df}$ while the fan pressure rise $\Delta P$ is increased to $\Delta P_{df}$. This results in the variations of the fan power ($\dot{Q}_{tot}$), the power entering the air ($\dot{Q}_{toair}$), and the specific enthalpies of the fan outlet air stream ($h_{out}$).
+Similarly to case (b), the airflow rate m is reduced to <span>$m_{df}$</span> while the fan pressure rise $\Delta P$ is increased to <span>$\Delta P_{df}$</span>. This results in the variations of the fan power (<span>$\dot Q_{tot}$</span>), the power entering the air (<span>$\dot Q_{toair}$</span>), and the specific enthalpies of the fan outlet air stream (<span>$h_{out}$</span>).
 
-$$ \dot{Q}_{tot,df} = m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$
+<div>$$ \dot{Q}_{tot,df} = m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} ) $$</div>
 
-$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$
+<div>$$ \dot{Q}_{shaft,df} = e_{motor} \times \dot{Q}_{tot, df} $$</div>
 
-$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$
+<div>$$ \dot{Q}_{toair,df} = \dot{Q}_{shaft,df} +( \dot{Q}_{tot,df} - \dot{Q}_{shaft,df}) \times f_{motortoair} $$</div>
 
-$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m_{design,df} $$
+<div>$$ h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m_{design,df} $$</div>
 
 Where,
 
