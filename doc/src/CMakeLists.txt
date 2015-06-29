@@ -1,5 +1,13 @@
-find_program(WKHTMLTOPDF_EXECUTABLE wkhtmltopdf)
 
+if(MSVC)
+  find_program(WKHTMLTOPDF_EXECUTABLE 
+    wkhtmltopdf
+    PATHS "C:/Program Files/wkhtmltopdf/bin" "C:/Program Files (x86)/wkhtmltopdf/bin")
+else()
+  find_program(WKHTMLTOPDF_EXECUTABLE 
+    wkhtmltopdf
+    )
+endif()
 
 # wkhtmltopdf
 execute_process(COMMAND ${WKHTMLTOPDF_EXECUTABLE} -V 
