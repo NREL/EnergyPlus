@@ -688,6 +688,9 @@ namespace WaterThermalTanks {
 			MaxCycleErrorIndex( 0 )
 		{}
 
+		Real64
+		getDeadBandTemp();
+
 	};
 
 	struct HeatPumpWaterHeaterData
