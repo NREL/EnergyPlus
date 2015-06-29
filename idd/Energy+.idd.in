@@ -76019,7 +76019,10 @@ WaterUse:RainCollector,
 !
 FaultModel:TemperatureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air temperature sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
+       \required-field
        \type alpha
    A2, \field Availability Schedule Name
        \type object-list
@@ -76044,7 +76047,9 @@ FaultModel:TemperatureSensorOffset:OutdoorAir,
 
 FaultModel:HumiditySensorOffset:OutdoorAir,
    \memo This object describes outdoor air humidity sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76070,7 +76075,9 @@ FaultModel:HumiditySensorOffset:OutdoorAir,
 
 FaultModel:EnthalpySensorOffset:OutdoorAir,
    \memo This object describes outdoor air enthalpy sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76096,7 +76103,9 @@ FaultModel:EnthalpySensorOffset:OutdoorAir,
 
 FaultModel:PressureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air pressure sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76122,7 +76131,9 @@ FaultModel:PressureSensorOffset:OutdoorAir,
 
 FaultModel:TemperatureSensorOffset:ReturnAir,
    \memo This object describes return air temperature sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76148,7 +76159,9 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
 	   
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76174,7 +76187,9 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
 
 FaultModel:ThermostatOffset,
    \memo This object describes fault of thermostat offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
        \reference ThermostatOffsetFaults
@@ -76199,7 +76214,9 @@ FaultModel:ThermostatOffset,
 
 FaultModel:HumidistatOffset, 
    \memo This object describes fault of humidistat offset
+   \min-fields 4
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Humidistat Name
@@ -76235,6 +76252,42 @@ FaultModel:HumidistatOffset,
        \note Required field for Type ThermostatOffsetDependent
        \type object-list
        \object-list ThermostatOffsetFaults   
+	   
+FaultModel:Fouling:AirFilter,
+   \memo This object describes fault of dirty air filters
+   \min-fields 4
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Fan Object Type
+       \note Choose the type of the fan
+       \required-field
+       \type choice
+       \key Fan:OnOff
+       \key Fan:ConstantVolume
+       \key Fan:VariableVolume
+   A3, \field Fan Name
+       \note Enter the name of a fan object
+       \required-field
+       \type object-list
+       \object-list FansCVandOnOffandVAV 
+   A4, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Pressure Fraction Schedule Name 
+       \note Enter the name of a schedule 
+       \note describing the variations of the fan pressure rise 
+       \note in terms of multipliers to the fan design pressure rise
+       \type object-list
+       \object-list ScheduleNames   
+   A6; \field Fan Curve Name
+       \note The curve describes the relationship between 
+       \note the fan pressure rise and air flow rate
+       \required-field
+       \type object-list 
+       \object-list CubicCurves
+       \object-list UniVariateTables
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
