@@ -22,11 +22,13 @@ namespace GroundTemps {
 			// Public Members
 			int objectType;
 			std::string objectName;
+			bool errorsFound;
 
-			//// Default Constructor
-			//BaseGroundTempsModel() :
-			//	objectType( 0 )
-			//{}
+			// Default Constructor
+		BaseGroundTempsModel() :
+			objectType( 0 ),
+			errorsFound( false )
+			{}
 		
 		// Virtual method for retrieving the ground temp
 		virtual Real64
@@ -45,7 +47,6 @@ namespace GroundTemps {
 	{
 		public:
 			// Public Members
-			int objectType;
 			Real64 aveGroundTemp;
 			Real64 aveGroundTempAmplitude;
 			Real64 phaseShiftInSecs;
@@ -70,7 +71,6 @@ namespace GroundTemps {
 		
 		public:
 			// Public Members
-			int objectType;
 
 		struct Cell {
 			Real64 Density;
@@ -128,14 +128,23 @@ namespace GroundTemps {
 	//******************************************************************************
 	
 	// Derived class for Site:GroundTemperature:Shallow
-	class ShallowGroundTempsModel : public BaseGroundTempsModel
+	class ShallowGroundTemps : public BaseGroundTempsModel
 	{
 		public:
 			// Public Members
-			int objectType;
 			Real64 aveGroundTemp;
 			Real64 aveGroundTempAmplitude;
 			Real64 phaseShiftInSecs;
+			Array1D< Real64 > surfaceGroundTemps;
+
+		// Default Constructor
+		ShallowGroundTemps():
+			aveGroundTemp( 15 ),
+			aveGroundTempAmplitude( 12 ),
+			phaseShiftInSecs( 0 ),
+			surfaceGroundTemps( 12, 13.0 )
+
+			{}
 
 		Real64
 		getGroundTemp(
@@ -144,12 +153,11 @@ namespace GroundTemps {
 			Real64 const simTime
 		);
 
-		static std::shared_ptr< ShallowGroundTempsModel > ShallowGTMFactory( int objectType, std::string objectName ); 
+		static std::shared_ptr< ShallowGroundTemps > ShallowGTMFactory( int objectType, std::string objectName ); 
 
 	};
 
 	//******************************************************************************
-
 
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(

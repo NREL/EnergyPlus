@@ -64,6 +64,7 @@ namespace WeatherManager {
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataEnvironment;
+	using namespace GroundTemps;
 	using namespace DataReportingFlags;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
@@ -282,6 +283,8 @@ namespace WeatherManager {
 	Array1D< WeatherProperties > WPSkyTemperature;
 	Array1D< SpecialDayData > SpecialDays;
 	Array1D< DataPeriodData > DataPeriods;
+
+	std::shared_ptr< BaseGroundTempsModel > siteShallowGroundTempsPtr;
 
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
@@ -1997,6 +2000,7 @@ namespace WeatherManager {
 		using General::JulianDay;
 		using ScheduleManager::UpdateScheduleValues;
 		using InputProcessor::SameString;
+		using namespace GroundTemps;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2046,7 +2050,7 @@ namespace WeatherManager {
 		GroundTemp = GroundTemps( Month );
 		GroundTempKelvin = GroundTemp + KelvinConv;
 		GroundTempFC = GroundTempsFC( Month );
-		GroundTemp_Surface = SurfaceGroundTemps( Month );
+		GroundTemp_Surface = siteShallowGroundTempsPtr->getGroundTemp(1, 1, Month);
 		GroundTemp_Deep = DeepGroundTemps( Month );
 		GndReflectance = GroundReflectances( Month );
 		GndReflectanceForDayltg = GndReflectance;
@@ -7217,36 +7221,10 @@ Label9999: ;
 			for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << GroundTempsFC( I ); gio::write( OutputFileInits );
 		}
 
-		PubGroundTempSurfFlag = false;
-		cCurrentModuleObject = "Site:GroundTemperature:Shallow";
-		I = GetNumObjectsFound( cCurrentModuleObject );
-		if ( I == 1 ) {
-			//Get the object names for each construction from the input processor
-			GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
+		// Initialize Site:GroundTemperature:Shallow object
+		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "");
 
-			if ( GndNumProp < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				ErrorsFound = true;
-			}
-
-			//Assign the ground temps to the variable
-			for ( I = 1; I <= 12; ++I ) {
-				SurfaceGroundTemps( I ) = GndProps( I );
-			}
-
-			GroundTemp_SurfaceObjInput = true;
-
-		} else if ( I > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			ErrorsFound = true;
-		} else {
-			SurfaceGroundTemps = 13.0;
-		}
-
-		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Shallow>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Shallow";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << SurfaceGroundTemps( I ); gio::write( OutputFileInits );
+		ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
 
 		cCurrentModuleObject = "Site:GroundTemperature:Deep";
 		I = GetNumObjectsFound( cCurrentModuleObject );
@@ -7277,16 +7255,6 @@ Label9999: ;
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Deep>, Months From Jan to Dec {C}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Deep";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << DeepGroundTemps( I ); gio::write( OutputFileInits );
-
-		//Assigning the ground temperature array to a public array for use in other subroutines
-		//Main use is for PlantPipeHeatTransfer, where the buried pipe model needs to average
-		// a full year's worth of data at the beginning of the simulation
-		if ( GroundTemp_SurfaceObjInput ) {
-			PubGroundTempSurfFlag = true;
-			for ( I = 1; I <= 12; ++I ) {
-				PubGroundTempSurface( I ) = SurfaceGroundTemps( I );
-			}
-		}
 
 	}
 

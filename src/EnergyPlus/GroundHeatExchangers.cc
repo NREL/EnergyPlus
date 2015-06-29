@@ -1303,8 +1303,6 @@ namespace GroundHeatExchangers {
 		using General::RoundSigDigits;
 		using DataEnvironment::MaxNumberSimYears;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-		using DataEnvironment::PubGroundTempSurfFlag;
-		using DataEnvironment::PubGroundTempSurface;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

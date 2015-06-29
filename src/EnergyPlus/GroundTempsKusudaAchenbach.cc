@@ -1,6 +1,5 @@
 // C++ Headers
 #include<memory>
-#include<vector>
 
 // ObjexxFCL Headers
 

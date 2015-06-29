@@ -53,8 +53,6 @@ namespace DataEnvironment {
 	extern Real64 GroundTempFC; // Current ground temperature defined for F or C factor method {C}
 	extern Real64 GroundTemp_Surface; // Current surface ground temperature {C}
 	extern Real64 GroundTemp_Deep; // Current deep ground temperature
-	extern Array1D< Real64 > PubGroundTempSurface; // All 12 Surf Gnd Temps (assigned in Weather Mgr, used in PlantPipeHeatTransfer)
-	extern bool PubGroundTempSurfFlag; // Flag for if Surf Ground Temps Exist in idf  (assigned, used same as PubGroundTempSurface)
 	extern int HolidayIndex; // Indicates whether current day is a holiday and if so what type
 	// HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
 	extern int HolidayIndexTomorrow; // Tomorrow's Holiday Index

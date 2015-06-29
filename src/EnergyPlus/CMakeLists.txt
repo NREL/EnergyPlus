@@ -240,8 +240,9 @@ SET( SRC
   GroundHeatExchangers.hh
   GroundTempsManager.cc
   GroundTempsManager.hh
-  GroundTempsModelFiniteDiff.cc
-  GroundTempsModelKusudaAchenbach.cc
+  GroundTempsFiniteDiff.cc
+  GroundTempsKusudaAchenbach.cc
+  GroundTempsSite.cc
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc

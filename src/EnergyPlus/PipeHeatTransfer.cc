@@ -859,8 +859,6 @@ namespace PipeHeatTransfer {
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::PubGroundTempSurface;
-		using DataEnvironment::PubGroundTempSurfFlag;
 		using DataLoopNode::Node;
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::TotMaterials;
