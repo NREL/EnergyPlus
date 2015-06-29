@@ -40,7 +40,7 @@ Function(AddMarkdownInput docName fileName offset)
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName})
 
   add_custom_command(OUTPUT ${output_name}
-    COMMAND ${PANDOC_EXECUTABLE} ${input_name} -o ${output_name} -f markdown_github -s -t html -N -H ${CMAKE_CURRENT_SOURCE_DIR}/docs/header.html --number-offset=${offset} --email-obfuscation=none --mathjax
+    COMMAND ${PANDOC_EXECUTABLE} ${input_name} -o ${output_name} -f markdown_github -s -t html -N -H ${CMAKE_CURRENT_SOURCE_DIR}/docs/header.html --number-offset=${offset} --email-obfuscation=none
     DEPENDS ${input_name} ${CMAKE_CURRENT_SOURCE_DIR}/docs/header.html
     )
 EndFunction()
@@ -59,8 +59,8 @@ Function(AddPDF docName timeout smart_shrink )
 
   add_custom_command(OUTPUT ${output_name}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/media ${CMAKE_BINARY_DIR}/docs/${docName}/media
-    COMMAND ${WKHTMLTOPDF_EXECUTABLE} ${shrinking_options} --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 3 --footer-center [page] --no-stop-slow-scripts --javascript-delay ${timeout} --disable-external-links --outline --outline-depth 3 toc ${${docName}_Inputs} ${output_name} 
-    DEPENDS ${${docName}_Inputs}
+    COMMAND ${WKHTMLTOPDF_EXECUTABLE} --outline --outline-depth 3  ${shrinking_options} --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 3 --footer-center [page] --no-stop-slow-scripts --javascript-delay ${timeout}  toc --xsl-style-sheet ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl  ${${docName}_Inputs} ${output_name} 
+    DEPENDS ${${docName}_Inputs} ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName}
     )
 
@@ -105,7 +105,7 @@ AddMarkdownInput(EngineeringReference 14-OnSiteGeneration.md 20)
 AddMarkdownInput(EngineeringReference 15-PerformanceCurves.md 21)
 AddMarkdownInput(EngineeringReference 16-Economics.md 22)
 AddMarkdownInput(EngineeringReference 17-SpecialModulesReporting.md 23)
-AddPDF(EngineeringReference 1800000 false .68)
+AddPDF(EngineeringReference 1800000 false .61)
 
 AddMarkdownInput(ExternalInterfaces_Application_Guide ExternalInterfaces_Application_Guide.md 0)
 AddPDF(ExternalInterfaces_Application_Guide 10000 true)
@@ -125,7 +125,7 @@ AddMarkdownInput(InputOutputReference 06-StandardOutputReports.md 8)
 AddMarkdownInput(InputOutputReference 07-WeatherData.md 9)
 AddMarkdownInput(InputOutputReference 08-RunningEnergyPlus.md 10)
 AddMarkdownInput(InputOutputReference 09-Appendix.md 11)
-AddPDF(InputOutputReference 300000 false .68)
+AddPDF(InputOutputReference 300000 false .66)
 
 AddMarkdownInput(InterfaceDeveloper InterfaceDeveloper.md 0)
 AddPDF(InterfaceDeveloper 10000 true)
