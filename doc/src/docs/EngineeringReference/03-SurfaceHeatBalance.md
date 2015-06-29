@@ -1673,9 +1673,9 @@ Blocken et al. (2009) developed a set of correlations for windward facing outdoo
 <div>$$
   \begin{array}{lcl}
     h_f = 4.6V^{0.89}_{10m} & : & \theta \leq 11.25 \\
-    h_f = 5.0V^{0.80}_{10m} & : & 11.25 < \theta \leq 33.75 \\
-    h_f = 4.6V^{0.84}_{10m} & : & 33.75 < \theta \leq 56.25 \\
-    h_f = 4.5V^{0.81}_{10m} & : & 56.25 < \theta \leq 100.0
+    h_f = 5.0V^{0.80}_{10m} & : & 11.25 &lt; \theta \leq 33.75 \\
+    h_f = 4.6V^{0.84}_{10m} & : & 33.75 &lt; \theta \leq 56.25 \\
+    h_f = 4.5V^{0.81}_{10m} & : & 56.25 &lt; \theta \leq 100.0
   \end{array}
 $$</div>
 
@@ -1714,10 +1714,10 @@ Emmel et al. (2007) developed a set of correlations for outdoor surfaces using n
 <div>$$
   \begin{array}{lcl}
     h_f = 5.15V^{0.81}_{10m} & : & \theta \leq 22.5 \\
-    h_f = 3.34V^{0.84}_{10m} & : & 22.5 < \theta \leq 67.5 \\
-    h_f = 4.78V^{0.71}_{10m} & : & 67.5 < \theta \leq 112.5 \\
-    h_f = 4.05V^{0.77}_{10m} & : & 112.5 < \theta \leq 157.5 \\
-    h_f = 3.54V^{0.76}_{10m} & : & 157.5 < \theta \leq 180.0
+    h_f = 3.34V^{0.84}_{10m} & : & 22.5 &lt; \theta \leq 67.5 \\
+    h_f = 4.78V^{0.71}_{10m} & : & 67.5 &lt; \theta \leq 112.5 \\
+    h_f = 4.05V^{0.77}_{10m} & : & 112.5 &lt; \theta \leq 157.5 \\
+    h_f = 3.54V^{0.76}_{10m} & : & 157.5 &lt; \theta \leq 180.0
   \end{array}
 $$</div>
 
@@ -1726,8 +1726,8 @@ Where *V<sub>10m</sub>* is the air velocity at the location of the weather stati
 <div>$$
   \begin{array}{lcl}
     h_f = 5.11V^{0.78}_{10m} & : & \theta \leq 22.5 \\
-    h_f = 4.60V^{0.79}_{10m} & : & 22.5 < \theta \leq 67.5 \\
-    h_f = 3.67V^{0.85}_{10m} & : & 67.5 < \theta \leq 90
+    h_f = 4.60V^{0.79}_{10m} & : & 22.5 &lt; \theta \leq 67.5 \\
+    h_f = 3.67V^{0.85}_{10m} & : & 67.5 &lt; \theta \leq 90
   \end{array}
 $$</div>
 
@@ -2613,7 +2613,7 @@ where,
 
 There are four cases for the Nusselt correlation that vary by the tilt angle in degrees, <span>\(\gamma \)</span>, and are based on heating conditions.  For cooling conditions (where <span>\({T_{surf,i}} > {T_{air}}\)</span>) the tilt angle is complemented so that <span>\(\gamma  = 180 - \gamma \)</span>
 
-Case A. <span>\({0^\circ } \le \gamma  < 15^\circ \)</span>
+Case A. <span>\({0^\circ } \le \gamma  &lt; 15^\circ \)</span>
 
 <div>$$Nu = 0.13Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}$$</div>
 
@@ -2625,11 +2625,11 @@ Case B. <span>\(15^\circ  \le \gamma  \le 90^\circ \)</span>
 
 <div>$$Nu = 0.13\left( {Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}} - Ra_{CV}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}} \right) + 0.56{\left( {R{a_{CV}}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;R{a_H} > R{a_{CV}}$$</div>
 
-Case C. <span>\(90^\circ  < \gamma  \le 179^\circ \)</span>
+Case C. <span>\(90^\circ  &lt; \gamma  \le 179^\circ \)</span>
 
-<div>$$Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;{10^5} \le R{a_H}\sin \gamma  < {10^{11}}$$</div>
+<div>$$Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;{10^5} \le R{a_H}\sin \gamma  &lt; {10^{11}}$$</div>
 
-Case D. <span>\(179^\circ  < \gamma  \le 180^\circ \)</span>
+Case D. <span>\(179^\circ  &lt; \gamma  \le 180^\circ \)</span>
 
 <div>$$Nu = 0.58Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}};\;R{a_H} \le {10^{11}}$$</div>
 

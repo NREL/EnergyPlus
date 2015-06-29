@@ -386,7 +386,7 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that displacement ventilation was taking place: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If <span>\({T_{mx}} < {T_{oc}}\)</span> or <span>\(MC{P_{tot}} \le 0\)</span> or <span>\({H_{fr}} \cdot {H_{ceil}} < {H_{fl,top}} + \Delta {z_{occ,\min }}\)</span> then the following mixed calculation will replace the displacement ventilation calculation.
+If <span>\({T_{mx}} &lt; {T_{oc}}\)</span> or <span>\(MC{P_{tot}} \le 0\)</span> or <span>\({H_{fr}} \cdot {H_{ceil}} &lt; {H_{fl,top}} + \Delta {z_{occ,\min }}\)</span> then the following mixed calculation will replace the displacement ventilation calculation.
 
 **Note:**  <span>\(\Delta {z_{occ,\min }}\)</span> is the minimum thickness of occupied subzone. It is set to 0.2 meters. <span>\({H_{fl,top}}\)</span>is the height of the top of the floor subzone. It is defined to be 0.2 meters; that is, the floor subzone is always 0.2 meters thick and <span>\({T_{fl}}\)</span> is the temperature at 0.1 meter above the floor surface.
 
@@ -442,15 +442,15 @@ If *H<sub>comf</sub>* &lt; *H<sub>flavg</sub>*
 
 <div>$${T_{comf}} = {T_{fl}}$$</div>
 
-Else if <span>\({H_{comf}} \ge {H_{flavg}}\)</span> and <span>\({H_{comf}} < {H_{ocavg}}\)</span>
+Else if <span>\({H_{comf}} \ge {H_{flavg}}\)</span> and <span>\({H_{comf}} &lt; {H_{ocavg}}\)</span>
 
 <div>$${T_{comf}} = ({T_{fl}}({H_{ocavg}} - {H_{comf}}) + {T_{mx}}({H_{comf}} - {H_{flavg}})/({H_{ocavg}} - {H_{flavg}})$$</div>
 
-Else if <span>\({H_{comf}} \ge {H_{ocavg}}\)</span> and <span>\({H_{comf}} < {H_{mxavg}}\)</span>
+Else if <span>\({H_{comf}} \ge {H_{ocavg}}\)</span> and <span>\({H_{comf}} &lt; {H_{mxavg}}\)</span>
 
 <div>$${T_{comf}} = ({T_{oc}}({H_{mxavg}} - {H_{comf}}) + {T_{mx}}({H_{comf}} - {H_{ocavg}})/({H_{mxavg}} - {H_{ocavg}})$$</div>
 
-Else if <span>\({H_{comf}} \ge {H_{mxavg}}\)</span> and <span>\({H_{comf}} < {H_{ceil}}\)</span>
+Else if <span>\({H_{comf}} \ge {H_{mxavg}}\)</span> and <span>\({H_{comf}} &lt; {H_{ceil}}\)</span>
 
 <div>$${T_{comf}} = {T_{mx}}$$</div>
 
@@ -466,15 +466,15 @@ If *H<sub>stat</sub>* &lt; *H<sub>flavg</sub>*
 
 <div>$${T_{stat}} = {T_{fl}}$$</div>
 
-Else if <span>\({H_{stat}} \ge {H_{flavg}}\)</span> and <span>\({H_{stat}} < {H_{ocavg}}\)</span>
+Else if <span>\({H_{stat}} \ge {H_{flavg}}\)</span> and <span>\({H_{stat}} &lt; {H_{ocavg}}\)</span>
 
 <div>$${T_{stat}} = ({T_{fl}}({H_{ocavg}} - {H_{stat}}) + {T_{mx}}({H_{stat}} - {H_{flavg}})/({H_{ocavg}} - {H_{flavg}})$$</div>
 
-Else if <span>\({H_{stat}} \ge {H_{ocavg}}\)</span> and <span>\({H_{stat}} < {H_{mxavg}}\)</span>
+Else if <span>\({H_{stat}} \ge {H_{ocavg}}\)</span> and <span>\({H_{stat}} &lt; {H_{mxavg}}\)</span>
 
 <div>$${T_{stat}} = ({T_{oc}}({H_{mxavg}} - {H_{stat}}) + {T_{mx}}({H_{stat}} - {H_{ocavg}})/({H_{mxavg}} - {H_{ocavg}})$$</div>
 
-Else if <span>\({H_{stat}} \ge {H_{mxavg}}\)</span> and <span>\({H_{stat}} < {H_{ceil}}\)</span>
+Else if <span>\({H_{stat}} \ge {H_{mxavg}}\)</span> and <span>\({H_{stat}} &lt; {H_{ceil}}\)</span>
 
 <div>$${T_{stat}} = {T_{mx}}$$</div>
 
@@ -505,7 +505,7 @@ else <span>\(Grad{T_{\max ,2}} =  - 9.999\)</span>
 
 For reporting purposes, if the zone is deemed to be mixed, the displacement ventilation report variables are set to flag values.
 
-If <span>\({T_{mx}} < {T_{oc}}\)</span> or <span>\(MC{P_{tot}} \le 0\)</span> or <span>\({H_{fr}} \cdot {H_{ceil}} < {H_{fl,top}} + \Delta {z_{occ,\min }}\)</span> or <span>\({T_{mx}} - {T_{oc}} < \Delta {T_{Crit{\mathop{\rm Re}\nolimits} p}}\)</span>
+If <span>\({T_{mx}} &lt; {T_{oc}}\)</span> or <span>\(MC{P_{tot}} \le 0\)</span> or <span>\({H_{fr}} \cdot {H_{ceil}} &lt; {H_{fl,top}} + \Delta {z_{occ,\min }}\)</span> or <span>\({T_{mx}} - {T_{oc}} &lt; \Delta {T_{Crit{\mathop{\rm Re}\nolimits} p}}\)</span>
 
 <div>$$Grad{T_{avg}} =  - 9.999$$</div>
 
@@ -750,7 +750,7 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that the UFAD nonuniform zone model was appropriate: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If <span>\({T_{mx}} < {T_{oc}}\)</span> or <span>\(MC{P_{tot}} \le 0\)</span> or <span>\({H_{fr}} \cdot {H_{ceil}} < \Delta {z_{occ,\min }}\)</span> then the following mixed calculation will replace the UFAD interior zone calculation.
+If <span>\({T_{mx}} &lt; {T_{oc}}\)</span> or <span>\(MC{P_{tot}} \le 0\)</span> or <span>\({H_{fr}} \cdot {H_{ceil}} &lt; \Delta {z_{occ,\min }}\)</span> then the following mixed calculation will replace the UFAD interior zone calculation.
 
 **Note:**  <span>\(\Delta {z_{occ,min}}\)</span> is the minimum thickness of occupied subzone. It is set to 0.2 meters.
 
@@ -792,35 +792,35 @@ If mixing:
 
 If UFAD:
 
-If  <span>\({H_{comf}} < {H_{ocavg}}\)</span>
+If  <span>\({H_{comf}} &lt; {H_{ocavg}}\)</span>
 
 <div>$${T_{comf}} = {T_{occ}}$$</div>
 
-Else if <span>\({H_{comf}} \ge {H_{ocavg}}\)</span> and <span>\({H_{comf}} < {H_{mxavg}}\)</span>
+Else if <span>\({H_{comf}} \ge {H_{ocavg}}\)</span> and <span>\({H_{comf}} &lt; {H_{mxavg}}\)</span>
 
 <div>$${T_{comf}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{comf}}} \right) + {T_{mx}}\left( {{H_{comf}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)$$</div>
 
-Else if <span>\({H_{comf}} \ge {H_{mxavg}}\)</span> and <span>\({H_{comf}} < {H_{ceil}}\)</span>
+Else if <span>\({H_{comf}} \ge {H_{mxavg}}\)</span> and <span>\({H_{comf}} &lt; {H_{ceil}}\)</span>
 
-<div>$${T_{comf}} < {T_{mx}}$$</div>
+<div>$${T_{comf}} &lt; {T_{mx}}$$</div>
 
 Using the user defined thermostat height we calculate the temperature at the thermostat.
 
 If mixing:
 
-<div>$${T_{stat}} < {T_{avg}}$$</div>
+<div>$${T_{stat}} &lt; {T_{avg}}$$</div>
 
 If UFAD:
 
-If<span>\({H_{stat}} < {H_{ocavg}}\)</span>
+If<span>\({H_{stat}} &lt; {H_{ocavg}}\)</span>
 
 <div>$${T_{stat}} = {T_{occ}}$$</div>
 
-Else if <span>\({H_{stat}} \ge {H_{ocavg}}\)</span> and <span>\({H_{stat}} < {H_{mxavg}}\)</span>
+Else if <span>\({H_{stat}} \ge {H_{ocavg}}\)</span> and <span>\({H_{stat}} &lt; {H_{mxavg}}\)</span>
 
 <div>$${T_{stat}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{stat}}} \right) + {T_{mx}}\left( {{H_{stat}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)$$</div>
 
-Else if <span>\({H_{stat}} \ge {H_{mxavg}}\)</span> and <span>\({H_{stat}} < {H_{ceil}}\)</span>
+Else if <span>\({H_{stat}} \ge {H_{mxavg}}\)</span> and <span>\({H_{stat}} &lt; {H_{ceil}}\)</span>
 
 <div>$${T_{stat}} = {T_{mx}}$$</div>
 
@@ -980,7 +980,7 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that the UFAD zone model was applicable: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If <span>\({T_{mx}} < {T_{oc}}\)</span> or <span>\(MC{P_{tot}} \le 0\)</span> or <span>\({H_{fr}} \cdot {H_{ceil}} < \Delta {z_{occ,\min }}\)</span> then the following mixed calculation will replace the UFAD exterior zone calculation.
+If <span>\({T_{mx}} &lt; {T_{oc}}\)</span> or <span>\(MC{P_{tot}} \le 0\)</span> or <span>\({H_{fr}} \cdot {H_{ceil}} &lt; \Delta {z_{occ,\min }}\)</span> then the following mixed calculation will replace the UFAD exterior zone calculation.
 
 **Note:**  <span>\({\Delta_{occ,min}}\)</span> is the minimum thickness of occupied subzone. It is set to 0.2 meters.
 
@@ -1022,17 +1022,17 @@ If mixing:
 
 If UFAD:
 
-If  <span>\({H_{comf}} < {H_{ocavg}}\)</span>
+If  <span>\({H_{comf}} &lt; {H_{ocavg}}\)</span>
 
 <div>$${T_{comf}} = {T_{occ}}$$</div>
 
-Else if <span>\({H_{comf}} \ge {H_{ocavg}}\)</span> and <span>\({H_{comf}} < {H_{mxavg}}\)</span>
+Else if <span>\({H_{comf}} \ge {H_{ocavg}}\)</span> and <span>\({H_{comf}} &lt; {H_{mxavg}}\)</span>
 
 <div>$${T_{comf}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{comf}}} \right) + {T_{mx}}\left( {{H_{comf}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)$$</div>
 
-Else if <span>\({H_{comf}} \ge {H_{mxavg}}\)</span> and <span>\({H_{comf}} < {H_{ceil}}\)</span>
+Else if <span>\({H_{comf}} \ge {H_{mxavg}}\)</span> and <span>\({H_{comf}} &lt; {H_{ceil}}\)</span>
 
-<div>$${T_{comf}} < {T_{mx}}$$</div>
+<div>$${T_{comf}} &lt; {T_{mx}}$$</div>
 
 Using the user defined thermostat height we calculate the temperature at the thermostat.
 
@@ -1042,15 +1042,15 @@ If mixing:
 
 If UFAD:
 
-If<span>\({H_{stat}} < {H_{ocavg}}\)</span>
+If<span>\({H_{stat}} &lt; {H_{ocavg}}\)</span>
 
 <div>$${T_{stat}} = {T_{occ}}$$</div>
 
-Else if <span>\({H_{stat}} \ge {H_{ocavg}}\)</span> and <span>\({H_{stat}} < {H_{mcavg}}\)</span>
+Else if <span>\({H_{stat}} \ge {H_{ocavg}}\)</span> and <span>\({H_{stat}} &lt; {H_{mcavg}}\)</span>
 
 <div>$${T_{stat}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{stat}}} \right) + {T_{mx}}\left( {{H_{stat}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)$$</div>
 
-Else if <span>\({H_{stat}} \ge {H_{mxavg}}\)</span> and <span>\({H_{stat}} < {H_{ceil}}\)</span>
+Else if <span>\({H_{stat}} \ge {H_{mxavg}}\)</span> and <span>\({H_{stat}} &lt; {H_{ceil}}\)</span>
 
 <div>$${T_{stat}} = {T_{mx}}$$</div>
 
@@ -2312,7 +2312,7 @@ D    = Opening depth [m]
 
 As mentioned above, when the air pressure difference between two zones is zero there is the maximum bi-directional flow due to the buoyancy force. When the pressure difference increases from 0 and is less than |ΔP<sub>Flood</sub>|, there is some bi-directional flow across the opening, but less than the maximum flow. If the pressure difference keeps increasing and exceeds |ΔP<sub>Flood</sub>|, there is no bi-directional flow.  Cooper’s model assumes the buoyancy flow varies linearly with pressure difference.
 
-<div>$${\mathop m\limits^ \bullet_{buo}} = \left\{ \begin{array}{l}{\mathop m\limits^ \bullet_{buo,\max }}*\left( {1 - \frac{{\left| {\Delta P} \right|}}{{\left| {\Delta {P_{Flood}}} \right|}}} \right)\;\,\,If\;\Delta \rho  > 0\;and\;\frac{{\left| {\Delta P} \right|}}{{\left| {\Delta {P_{Flood}}} \right|}} < 1\\0\;\,\,\,Otherwise\end{array} \right\}$$</div>
+<div>$${\mathop m\limits^ \bullet_{buo}} = \left\{ \begin{array}{l}{\mathop m\limits^ \bullet_{buo,\max }}*\left( {1 - \frac{{\left| {\Delta P} \right|}}{{\left| {\Delta {P_{Flood}}} \right|}}} \right)\;\,\,If\;\Delta \rho  > 0\;and\;\frac{{\left| {\Delta P} \right|}}{{\left| {\Delta {P_{Flood}}} \right|}} &lt; 1\\0\;\,\,\,Otherwise\end{array} \right\}$$</div>
 
 The total air flow across the opening is based on superposition of the forced and buoyancy flows, and may be expressed for three different pressure difference scenarios as follows:
 
@@ -2793,7 +2793,7 @@ Step 4: Thermal comfort temperature calculation
 The thermal comfort check requires the thermal comfort temperature and the comfort band. The comfort temperature of Tcomf is calculated as a function of the outdoor dry-bulb temperature Tout. The comfort temperature calculation may be based on two curves and a boundary temperature point. 
 
 <div>$$
-  T_{comf} = \left\{ \begin{array}{ll} \rm{Low Temp Curve,} & \min T_{out} < x \leq \rm{Boundary Point} \\ \rm{High Temp Curve,} & \rm{Boundary Point} \leq x < \max T_{out}  \end{array}\right.
+  T_{comf} = \left\{ \begin{array}{ll} \rm{Low Temp Curve,} & \min T_{out} &lt; x \leq \rm{Boundary Point} \\ \rm{High Temp Curve,} & \rm{Boundary Point} \leq x &lt; \max T_{out}  \end{array}\right.
 $$</div>
 
 Step 5: Thermal band calculation 
@@ -2824,7 +2824,7 @@ Step 7: Lower boundary check of thermal comfort
 
 The lower boundary check will follow the upper boundary check to check the window closing status, using the following logic.
 
-<div>$$T_g < \left(T_{comf} - \theta\right)$$</div>
+<div>$$T_g &lt; \left(T_{comf} - \theta\right)$$</div>
 
 If the above logic check is true, the closing probability check will be performed. The detailed description is given in the closing probability section. 
 
@@ -2832,7 +2832,7 @@ If the above logic check is false, no action is needed.
 
 If the closing probability check is true and lower boundary check is satisfied, a window will be closed, regardless of open/closed status at the previous time step. If the closing probability check is false and lower boundary check is satisfied, a window will remain at the status from the previous time step.
 
-<div>$$T_g < \left(T_{comf} - \theta\right) \&\& \rm{ClosingProbability}$$</div>
+<div>$$T_g &lt; \left(T_{comf} - \theta\right) \&\& \rm{ClosingProbability}$$</div>
 
 The output variables from the model are open status, opening probability status, and closing probability status. The detailed description of opening status is given in the Airflow Network Outputs section in the Input Output Reference.
 
@@ -2864,11 +2864,11 @@ There are 5 temperature control types. The following types are available:
 
 * Single heating setpoint: If Tzon > setpoint, go to next step. Otherwise, return false.
 
-* Single cooling setpoint: If Tzon < setpoint, go to next step. Otherwise, return false.
+* Single cooling setpoint: If Tzon &lt; setpoint, go to next step. Otherwise, return false.
 
 * Single heating and cooling setpoint: no action by returning false
 
-* Dual heating and setpoints: If heating setpoint < Tzon < Cooling setpoint, go to next step. Otherwise, return false.
+* Dual heating and setpoints: If heating setpoint &lt; Tzon &lt; Cooling setpoint, go to next step. Otherwise, return false.
 
 Step 4: Select bypass or opening probability check 
 

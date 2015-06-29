@@ -250,7 +250,7 @@ The following is a basic description of the structure of the IDD (it’s actuall
 !
 !  \maximum         Maximum that includes the following value
 !
-!  \maximum<        Maximum that must be < than the following value
+!  \maximum<        Maximum that must be &lt; than the following value
 !
 !  \default         Default for the field (if N/A then omit entire line)
 !

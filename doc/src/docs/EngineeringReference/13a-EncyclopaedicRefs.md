@@ -235,7 +235,7 @@ If the unit is on, check whether active heating or cooling by the hydronic coils
 
 If <span>\({\dot Q_{z,req}} > {\dot Q_{pri}}\)</span> we need active heating. Set the cold water flow rate to the minimum. Check that the terminal unit can meet the load by setting the hot water flow rate to the maximum and calling *CalcFourPipeIndUnit*. If the output is less than the zone demand we are done – all the outputs have been calculated. Otherwise call *SolveRegulaFalsi* to obtain the hot water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
 
-If <span>\({\dot Q_{z,req}} < {\dot Q_{pri}}\)</span>we need active cooling. We set the hot water flow rate to the minimum. We check whether the terminal unit can supply the needed output by setting the cold water flow rate to the maximum and calling *CalcFourPipeIndUnit.* If this maximum cooling output is not able to meet the zone cooling demand we are done. Otherwise call *SolveRegulaFalsi* to obtain the cold water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
+If <span>\({\dot Q_{z,req}} &lt; {\dot Q_{pri}}\)</span>we need active cooling. We set the hot water flow rate to the minimum. We check whether the terminal unit can supply the needed output by setting the cold water flow rate to the maximum and calling *CalcFourPipeIndUnit.* If this maximum cooling output is not able to meet the zone cooling demand we are done. Otherwise call *SolveRegulaFalsi* to obtain the cold water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
 
 Note that the terminal unit output is never explicitly passed to another routine. Instead the output is saved as the outlet conditions on the terminal unit outlet air node. The node data is accessed when the terminal unit output is needed elsewhere in the program (in *SimZoneAirLoopEquipment* for instance).
 
@@ -428,9 +428,9 @@ To establish the boundaries of region a) we call *CalcVAVVS* twice: once with th
 and 
 <span>\({\dot Q_{cool,min,fanon}}\)</span>
 . Remembering that EnergyPlus convention is that cooling loads are negative, then if 
-<span>\({\dot Q_{tot}} < {\dot Q_{cool,max,fanon}}\)</span>
+<span>\({\dot Q_{tot}} &lt; {\dot Q_{cool,max,fanon}}\)</span>
 the terminal unit can not meet the demand. Set the air mass flow rate to the cooling maximum and call *CalcVAVV* again. This concludes the simulation. If  
-<span>\({\dot Q_{cool,max,fanon}} < {\dot Q_{tot}} < {\dot Q_{cool,min,fanon}}\)</span>
+<span>\({\dot Q_{cool,max,fanon}} &lt; {\dot Q_{tot}} &lt; {\dot Q_{cool,min,fanon}}\)</span>
 the cooling demand is in the active cooling region. We hold the heating at the minimum, allow the supply air flow to vary between the cooling maximum and the minimum with the fan on, and call *SolveRegulaFalsi* to obtain the supply air flow rate that will produce the unit sensible cooling output that matches the demand. This concludes the simulation.
 
 To establish the boundaries of region b) call *CalcVAVVS* twice: once with the supply air flow rate set to the heating maximum, once with the supply air flow rate set to the minimum. In both calls, if the heating coil is a hot water coil, the hot water flow rate is at the maximum. For electric and gas coils, the heating power is set to the maximum at maximum supply air flow and to zero at the minimum supply air flow. In both calls the fan is set to be on. Call the 2 heating outputs returned from the two calls to *CalcVAVVS* 
@@ -438,9 +438,9 @@ To establish the boundaries of region b) call *CalcVAVVS* twice: once with the s
 and 
 <span>\({\dot Q_{heat,min,fanon}}\)</span>
 . If 
-<span>\({\dot Q_{heat,max,fanon}} < {\dot Q_{tot}}\)</span>
+<span>\({\dot Q_{heat,max,fanon}} &lt; {\dot Q_{tot}}\)</span>
 the terminal unit can not meet the load. Set the air flow rate to the heating maximum and the hot water flow rate or heating coil power to the maximum and call *CalcVAVVS* again. This concludes the simulation for this case. If 
-<span>\({\dot Q_{heat,min,fanon}} < {\dot Q_{tot}} < {\dot Q_{heat,max,fanon}}\)</span>
+<span>\({\dot Q_{heat,min,fanon}} &lt; {\dot Q_{tot}} &lt; {\dot Q_{heat,max,fanon}}\)</span>
 the heating demand is in the active heating, fan on region. For a hot water coil we call *SolveRegulaFalsi* with the supply air flow rate as the input that is varied and the hot water flow rate set to the maximum. For electric and gas coils the coil power and the supply air flow rate are both varied together from their minimum to maximum in a call to *SolveRegulaFalsi*.  The call to *SolveRegulaFalsi* concludes the simulation for this case.
 
 This region only applies to terminal units with a hot water coil. To establish the boundaries of region c) the fan is set to off, the supply air flow rate is set to minimum flow and *CalcVAVVS* is called twice: once with the hot water flow at maximum and once with the hot water flow at minimum. Call the two heating outputs 
@@ -861,7 +861,7 @@ Calculating the boiler delta temperature difference between the inlet and outlet
 
 In case the temperature difference calculated with the previous equation equation  is zero then the boiler just needs to supply latent heat to steam, else the boiler performs its normal load calculations by providing both sensible and latent heat to the inlet stream.
 
-<div>$$If\,\,(\Delta {T_{in\_out}}\,\, < \,\,\,\,0\,\,\,)\,\,\,THEN$$</div>
+<div>$$If\,\,(\Delta {T_{in\_out}}\,\, &lt; \,\,\,\,0\,\,\,)\,\,\,THEN$$</div>
 
 <div>$${Q_B}\,\, = \,\,\,{\dot m_b}\,\,\, \times \,\,{h_{fg}}$$</div>
 

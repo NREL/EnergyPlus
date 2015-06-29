@@ -2261,7 +2261,7 @@ n<sub>i</sub>/N = fractional bin hours for the cooling season; the ratio of the 
 
 *Case 2*:  The unit cycles between successive the minimum (low) and maximum (high) compressor speed capacity to meet the building cooling load at outdoor air temperature *T<sub>j</sub>*.  That is, the cooling building load is between the units successive minimum (low) and maximum (high) compressor speed capacities:
 
-<div>$$\dot Q_c^{k = 1}({T_j}) < BL({T_j}) < \dot Q_c^{k = 2}({T_j})$$</div>
+<div>$$\dot Q_c^{k = 1}({T_j}) &lt; BL({T_j}) &lt; \dot Q_c^{k = 2}({T_j})$$</div>
 
 <span>\(\frac{{{q_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot Q_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot Q_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}\)</span><span>\(\frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot E_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}\)</span>
 
@@ -3476,8 +3476,8 @@ Low temperature cut-out factor <span>\(\delta ({T_j})\)</span>is determined as f
 <div>$$
   \delta ({T_j}) = \left\{ 
     \begin{array}{l}
-      {\rm{0, if }}{T_j} \le {T_{off}}{\rm{ or }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} < 1 \\
-      {\rm{1/2, if }}{T_{off}} < {T_j} \le {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1 \\
+      {\rm{0, if }}{T_j} \le {T_{off}}{\rm{ or }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} &lt; 1 \\
+      {\rm{1/2, if }}{T_{off}} &lt; {T_j} \le {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1 \\
       {\rm{1, if }}{T_j} > {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1
     \end{array}
   \right.
@@ -3491,9 +3491,9 @@ where,
 
 Calculate <span>\(\mathop {{Q_h}}\limits^ \cdot  ({T_j})\)</span>and <span>\(\mathop {{E_h}}\limits^ \cdot  ({T_j})\)</span> using,
 
-<div>$$\mathop {{Q_h}}\limits^ \cdot  ({T_j}) = \left\{ \begin{array}{l}\mathop {{Q_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{Q_h}}\limits^ \cdot  (8.33) - \mathop {{Q_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{16.67}}{\rm{, if }}{T_j} \ge 7.22^\circ {\rm{C or }}{T_j} \le  - 8.33^\circ {\rm{C}}\\\mathop {{Q_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{Q_h}}\limits^ \cdot  (1.67) - \mathop {{Q_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{10}}{\rm{, if }} - 8.33^\circ {\rm{C}} < {T_j} < 7.22^\circ {\rm{C}}\end{array} \right.$$</div>
+<div>$$\mathop {{Q_h}}\limits^ \cdot  ({T_j}) = \left\{ \begin{array}{l}\mathop {{Q_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{Q_h}}\limits^ \cdot  (8.33) - \mathop {{Q_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{16.67}}{\rm{, if }}{T_j} \ge 7.22^\circ {\rm{C or }}{T_j} \le  - 8.33^\circ {\rm{C}}\\\mathop {{Q_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{Q_h}}\limits^ \cdot  (1.67) - \mathop {{Q_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{10}}{\rm{, if }} - 8.33^\circ {\rm{C}} &lt; {T_j} &lt; 7.22^\circ {\rm{C}}\end{array} \right.$$</div>
 
-<div>$$\mathop {{E_h}}\limits^ \cdot  ({T_j}) = \left\{ \begin{array}{l}\mathop {{E_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{E_h}}\limits^ \cdot  (8.33) - \mathop {{E_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{16.67}}{\rm{, if }}{T_j} \ge 7.22^\circ {\rm{C or }}{T_j} \le  - 8.33^\circ {\rm{C}}\\\mathop {{E_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{E_h}}\limits^ \cdot  (1.67) - \mathop {{E_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{10}}{\rm{, if }} - 8.33^\circ {\rm{C}} < {T_j} < 7.22^\circ {\rm{C}}\end{array} \right.$$</div>
+<div>$$\mathop {{E_h}}\limits^ \cdot  ({T_j}) = \left\{ \begin{array}{l}\mathop {{E_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{E_h}}\limits^ \cdot  (8.33) - \mathop {{E_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{16.67}}{\rm{, if }}{T_j} \ge 7.22^\circ {\rm{C or }}{T_j} \le  - 8.33^\circ {\rm{C}}\\\mathop {{E_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{E_h}}\limits^ \cdot  (1.67) - \mathop {{E_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{10}}{\rm{, if }} - 8.33^\circ {\rm{C}} &lt; {T_j} &lt; 7.22^\circ {\rm{C}}\end{array} \right.$$</div>
 
 <span>\(\mathop {{Q_h}}\limits^ \cdot  ( - 8.33),\mathop {{Q_h}}\limits^ \cdot  (1.67),\mathop {{Q_h}}\limits^ \cdot  (8.33),\mathop {{E_h}}\limits^ \cdot  ( - 8.33),\mathop {{E_h}}\limits^ \cdot  (1.67)\)</span> and <span>\(\mathop {{E_h}}\limits^ \cdot  (8.33)\)</span> are the **(net)** values calculated using performance curves entered by the user and supply fan power per rated air flow rate.
 
@@ -4107,8 +4107,8 @@ The heating capacity delivered and electric power input of the heat pump when op
   {\rm{\dot Q}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ 
     \begin{array}{l}
       {\rm{\dot Q}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}} \\
-      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} < 4.44{\rm{^\circ C}} \\
-      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} <  - 8.33{\rm{^\circ C}}\,
+      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} &lt; 4.44{\rm{^\circ C}} \\
+      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} &lt;  - 8.33{\rm{^\circ C}}\,
     \end{array}
   \right\}
 $$</div>
@@ -4117,8 +4117,8 @@ $$</div>
   {\rm{\dot E}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{
     \begin{array}{l}
       {\rm{\dot E}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}} \\
-      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} < 4.44{\rm{^\circ C}} \\
-      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} <  - 8.33{\rm{^\circ C}}\,
+      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} &lt; 4.44{\rm{^\circ C}} \\
+      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} &lt;  - 8.33{\rm{^\circ C}}\,
     \end{array}
   \right\}
 $$</div>
@@ -4141,9 +4141,9 @@ An alternative to conducting or evaluating the performance at H2<sub>1</sub> tes
 
 The heating capacity delivered and electric power input of the heat pump when operating at maximum (high) compressor speed and outdoor air temperature of *T<sub>j</sub>* is given by:
 
-<div>$$\dot Q_h^{k = 2}({T_j}) = \left\{ \begin{array}{l}\dot Q_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot Q_h^{k = 2}(8.33) - \dot Q_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{8.33 + 8.33}},\quad IF\,{T_j} \ge 7.2^\circ C\,or\,{T_j} \le  - 8.33^\circ C\\\dot Q_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot Q_h^{k = 2}(1.67) - \dot Q_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{1.67 + 8.33}},\quad IF\, - 8.33^\circ C < {T_j} < 7.2^\circ C\end{array} \right.$$</div>
+<div>$$\dot Q_h^{k = 2}({T_j}) = \left\{ \begin{array}{l}\dot Q_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot Q_h^{k = 2}(8.33) - \dot Q_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{8.33 + 8.33}},\quad IF\,{T_j} \ge 7.2^\circ C\,or\,{T_j} \le  - 8.33^\circ C\\\dot Q_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot Q_h^{k = 2}(1.67) - \dot Q_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{1.67 + 8.33}},\quad IF\, - 8.33^\circ C &lt; {T_j} &lt; 7.2^\circ C\end{array} \right.$$</div>
 
-<div>$$\dot E_h^{k = 2}({T_j}) = \left\{ \begin{array}{l}\dot E_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot E_h^{k = 2}(8.33) - \dot E_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{8.33 + 8.33}},\quad IF\,{T_j} \ge 7.2^\circ C\,or\,{T_j} \le  - 8.33^\circ C\\\dot E_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot E_h^{k = 2}(1.67) - \dot E_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{1.67 + 8.33}},\quad IF\, - 8.33^\circ C < {T_j} < 7.2^\circ C\end{array} \right.$$</div>
+<div>$$\dot E_h^{k = 2}({T_j}) = \left\{ \begin{array}{l}\dot E_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot E_h^{k = 2}(8.33) - \dot E_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{8.33 + 8.33}},\quad IF\,{T_j} \ge 7.2^\circ C\,or\,{T_j} \le  - 8.33^\circ C\\\dot E_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot E_h^{k = 2}(1.67) - \dot E_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{1.67 + 8.33}},\quad IF\, - 8.33^\circ C &lt; {T_j} &lt; 7.2^\circ C\end{array} \right.$$</div>
 
 Where,
 
@@ -4165,7 +4165,7 @@ The electric energy used by the heat pumps differs depending up on whether the h
 
 <div>$${{\rm{X}}^{k = 1}}\left( {{{\rm{T}}_{\rm{j}}}} \right){\rm{ = MIN}}\left\{ \begin{array}{l}BL\left( {{{\rm{T}}_{\rm{j}}}} \right){\rm{/\dot Q}}_h^{k = 1}\left( {{{\rm{T}}_{\rm{j}}}} \right)\\1.0\end{array} \right\}$$</div>
 
-<div>$${\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\1/2,\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}$$</div>
+<div>$${\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\1/2,\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} &lt; {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}$$</div>
 
 <div>$$PL{F_{\rm{j}}}{\rm{ = 1 - }}C_D^h \cdot \left[ {{\rm{1 - }}{{\rm{X}}^{k = 1}}{\rm{(}}{T_j}{\rm{)}}} \right]$$</div>
 
@@ -4173,13 +4173,13 @@ The electric energy used by the heat pumps differs depending up on whether the h
 
 *Case 2*:  The unit cycles between the low (minimum) and high (maximum) compressor capacity to meet the building heating load at outdoor air temperature *T<sub>j</sub>*.  That is, the heating building load is between the unit low and high compressor capacities:
 
-<div>$$\dot Q_h^{k = 1}({T_j}) < BL({T_j}) < \dot Q_h^{k = 2}({T_j})$$</div>
+<div>$$\dot Q_h^{k = 1}({T_j}) &lt; BL({T_j}) &lt; \dot Q_h^{k = 2}({T_j})$$</div>
 
 <div>$$\frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_h^{k = 1}({T_j}) + {X^{k = 2}}({T_j}) \cdot \dot E_h^{k = 2}({T_j})} \right] \cdot {\delta ^\prime}({T_j}) \cdot \frac{{{n_j}}}{N}$$</div>
 
 <div>$$\frac{{RH\left( {{{\rm{T}}_{\rm{j}}}} \right)}}{{\rm{N}}}{\rm{ = BL}}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot \left[ {{\rm{1 - }}{{\rm{\delta }}^\prime}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right] \cdot \frac{{{n_j}}}{N}$$</div>
 
-<div>$${\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\ 1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}$$</div>
+<div>$${\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} &lt; {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\ 1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}$$</div>
 
 <div>$${X^{k = 1}}({T_j}) = \frac{{\dot Q_h^{k = 2}({T_j}) - BL({T_j})}}{{\dot Q_h^{k = 2}({T_j}) - \dot Q_h^{k = 1}({T_j})}}$$</div>
 
@@ -4195,7 +4195,7 @@ For units when operating continuously at maximum compressor speed (k=2) speed at
 
 <div>$$\frac{{RH\left( {{T_j}} \right)}}{N}{\rm{ = }}\left\{ {BL\left( {{{\rm{T}}_{\rm{j}}}} \right) - \left[ {{\rm{\dot Q}}_h^{k = 2}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot {{\rm{\delta }}^``}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right]} \right\} \cdot \frac{{{n_j}}}{N}$$</div>
 
-<div>$${\delta ^``}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,{\rm{or}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}\, < \,1\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\end{array} \right\}$$</div>
+<div>$${\delta ^``}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,{\rm{or}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}\, &lt; \,1\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} &lt; {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\end{array} \right\}$$</div>
 
 X(T<sub>j</sub>)            =          the heating mode load factor for temperature bin j, (-)
 
@@ -6567,13 +6567,13 @@ If <span>\(\left| {{T_{_r}} - {T_{in}}} \right| > \Delta {T_{small}}\)</span>the
 
 Otherwise:
 
-if <span>\({T_r} < {T_{mix,set}}\)</span>and <span>\({T_r} \ge {T_i}\)</span> , <span>\({S_{oa,init}}\)</span>is set to -1;
+if <span>\({T_r} &lt; {T_{mix,set}}\)</span>and <span>\({T_r} \ge {T_i}\)</span> , <span>\({S_{oa,init}}\)</span>is set to -1;
 
-if <span>\({T_r} < {T_{mix,set}}\)</span> and <span>\({T_r} < {T_i}\)</span>, <span>\({S_{oa,init}}\)</span>  is set to 1;
+if <span>\({T_r} &lt; {T_{mix,set}}\)</span> and <span>\({T_r} &lt; {T_i}\)</span>, <span>\({S_{oa,init}}\)</span>  is set to 1;
 
 if <span>\({T_r} \ge {T_{mix,set}}\)</span>and <span>\({T_r} \ge {T_i}\)</span>, <span>\({S_{oa,init}}\)</span> is set to 1;
 
-if <span>\({T_r} \ge {T_{mix,set}}\)</span> and <span>\({T_r} < {T_i}\)</span>, <span>\({S_{oa,init}}\)</span> is set to -1.
+if <span>\({T_r} \ge {T_{mix,set}}\)</span> and <span>\({T_r} &lt; {T_i}\)</span>, <span>\({S_{oa,init}}\)</span> is set to -1.
 
 Finally, <span>\({S_{oa,init}}\)</span>is constrained to be: <span>\({f_{oa,\min }} \le {S_{oa,init}} \le 1\)</span>. Basically, if the outside air can not accomplish cooling, <span>\({S_{oa,init}}\)</span> is set to <span>\({f_{oa,\min }}\)</span>. If it can do cooling, <span>\({S_{oa,init}}\)</span> is greater than the minimum outside air flow fraction but not greater than1. Here
 
@@ -6589,7 +6589,7 @@ Finally, <span>\({S_{oa,init}}\)</span>is constrained to be: <span>\({f_{oa,\min
 
 ·        If *EconomizerChoice* = *No Economizer*, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>.
 
-·        If <span>\({\dot V_{oa,\max }} < {\dot V_{small}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>; <span>\({\dot V_{small}}\)</span>is.001 m<sup>3</sup>/s.
+·        If <span>\({\dot V_{oa,\max }} &lt; {\dot V_{small}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>; <span>\({\dot V_{small}}\)</span>is.001 m<sup>3</sup>/s.
 
 ·        If the economizer is locked out, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>.
 
@@ -6621,7 +6621,7 @@ o   If an electronic enthalpy curve was input and <span>\({w_{OA}} > {w_{Curv
 
 ·        Another Economizer choice called DifferentialDryBulbAndEnthalpy checks the outside air temperature against return temperature and outside air enthalpy against return air enthalpy and also checks the setpoints.
 
-·        If a low temperature limit was input and <span>\({T_{oa}} < {T_{low}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>.
+·        If a low temperature limit was input and <span>\({T_{oa}} &lt; {T_{low}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>.
 
 Note: the above nine cases set the *EconomizerOperationFlag* to *false*       (economizer not operating), otherwise the economizer is active.
 

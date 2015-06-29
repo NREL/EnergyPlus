@@ -2014,7 +2014,7 @@ Output:PreprocessorMessage="EPMacro" has the following Severe conditions:
    **   ~~~   ** at approximately input line number=200: column=11
    **   ~~~   ** cannot find/read include file
    **   ~~~   ** symbol=HVAC3ZoneMat-Const.imf
-   **   ~~~   ** refer to &lt;file&gt;.epmdet for details.
+   **   ~~~   ** refer to <file>.epmdet for details.
 ```
 
 Some preprocessor utility programs will give more details than others.  Here, you see at input file line number 200, about column 11, that the program cannot find (or read) the include file and that there will be more details after the end of EnergyPlus processing in the file with epmdet for extension.
@@ -2294,7 +2294,7 @@ Recurring Errors
 The recurring error category is employed during the actual simulation periods. Usually, a heading message will appear:
 
 ```
-   ** Warning ** Coil:Cooling:DX:SingleSpeed "DXCOOLINGCOIL_SOUTHZONE_2NDFLOOR" - Full load outlet air dry-bulb temperature &lt; 2C. This indicates the possibility of coil frost/freeze. Outlet temperature = -4.60 C.
+   ** Warning ** Coil:Cooling:DX:SingleSpeed "DXCOOLINGCOIL_SOUTHZONE_2NDFLOOR" - Full load outlet air dry-bulb temperature < 2C. This indicates the possibility of coil frost/freeze. Outlet temperature = -4.60 C.
    **   ~~~   **  ...Occurrence info = Washington Dc Dulles IntL Ar VA USA TMY3 WMO#=724030, 01/02 06:01 - 06:02
    **   ~~~   ** ... Possible reasons for low outlet air dry-bulb temperatures are: This DX coil
    **   ~~~   **    1) may have a low inlet air dry-bulb temperature. Inlet air temperature = 9.778 C.

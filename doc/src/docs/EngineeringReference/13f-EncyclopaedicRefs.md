@@ -4761,11 +4761,11 @@ There are three choices for control methods.
 
 The following algorithm is used to determine if the unit will operate.
 
-If <span>\(\left[ {{T_{zone}} < \left( {{T_{set}} - 0.5*\Delta {T_{throttle}}} \right)} \right]\)</span> is true, then do not operate cooler unit.
+If <span>\(\left[ {{T_{zone}} &lt; \left( {{T_{set}} - 0.5*\Delta {T_{throttle}}} \right)} \right]\)</span> is true, then do not operate cooler unit.
 
 If <span>\(\left[ {{T_{zone}} > \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)} \right]\)</span> is true, then operate the cooler unit (at full speed).
 
-If zone air temperature is within the throttling range, <span>\(\left[ {\left( {{T_{set}} - 0.5*\Delta {T_{throttle}}} \right) < {T_{zone}} < \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)} \right]\)</span>, then continue to operate the cooler if it was running during the previous timestep and do not operate the cooler if it was not running during the previous timestep.
+If zone air temperature is within the throttling range, <span>\(\left[ {\left( {{T_{set}} - 0.5*\Delta {T_{throttle}}} \right) &lt; {T_{zone}} &lt; \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)} \right]\)</span>, then continue to operate the cooler if it was running during the previous timestep and do not operate the cooler if it was not running during the previous timestep.
 
 Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed.
 
@@ -4783,7 +4783,7 @@ If <span>\(\left[ {{{\dot Q}_{CoolLoad}} \le {{\dot Q}_{thresh}}} \right]\)</spa
 
 If <span>\(\left[ {{{\dot Q}_{CoolLoad}} > {{\dot Q}_{thresh}}} \right]\)</span> is true, then operate the cooler unit.
 
-When the unit operates, the model first operates the unit at the highest fan speed, a fan speed ratio of 1.0, and determines the sensible cooling provided by the unit to the zone, <span>\({\dot Q_{FullOutput}}\)</span>.  If <span>\({\dot Q_{FullOutput}} \le {\dot Q_{CoolLoad}}\)</span>then the unit operates at full fan speed because the cooler cannot meet the entire zone cooling load.  If <span>\({\dot Q_{FullOutput}} > {\dot Q_{CoolLoad}}\)</span> then the model solves for a fan speed ratio between 0.0 and 1.0 that satisifies <span>\(ABS\left( {\dot Q{}_{Output} - {{\dot Q}_{CoolLoad}}} \right) < 0.01\)</span> using the non-linear numerical method called regula falsi.
+When the unit operates, the model first operates the unit at the highest fan speed, a fan speed ratio of 1.0, and determines the sensible cooling provided by the unit to the zone, <span>\({\dot Q_{FullOutput}}\)</span>.  If <span>\({\dot Q_{FullOutput}} \le {\dot Q_{CoolLoad}}\)</span>then the unit operates at full fan speed because the cooler cannot meet the entire zone cooling load.  If <span>\({\dot Q_{FullOutput}} > {\dot Q_{CoolLoad}}\)</span> then the model solves for a fan speed ratio between 0.0 and 1.0 that satisifies <span>\(ABS\left( {\dot Q{}_{Output} - {{\dot Q}_{CoolLoad}}} \right) &lt; 0.01\)</span> using the non-linear numerical method called regula falsi.
 
 ### Unit Heater
 
@@ -5783,7 +5783,7 @@ It should be noted that to avoid excessive iteration that the zone mean air temp
 
 ***Temperature Control***.  If the user selects temperature control, the intent is to limit the outlet temperature of the unit for either heating or cooling or both or perhaps to provide unconditioned air to the space.  The algorithm used to determine the outlet temperature of the unit is as follows.  When the outdoor air temperature is at or below the low air temperature control schedule value, the outlet temperature is set to the low air temperature control schedule value and any heating equipment included in the unit description and available will attempt to provide enough heating to produce an outlet temperature equal to the low temperature schedule value.  When the outdoor air temperature is at or above the high air temperature control schedule value, the outlet temperature of the unit is set to the high air temperature control schedule value and any cooling equipment included in the unit description and available will attempt to provide enough cooling to produce an outlet air temperature equal to the high temperature schedule value.  When the outdoor air temperature is between the high and low temperature values, the unit will not provide any conditioning of outdoor air and will simply deliver it to the zone.  Mathematically, this can be summarized as:
 
-<div>$${T_{out}} = \left\{ {\begin{array}{*{20}{c}}{{T_{high}}\;if\;{T_{oa}} \ge {T_{high}}}\\ {{T_{oa}}\;if\;{T_{low}} < {T_{oa}} < {T_{high}}}\\ {{T_{low}}\;if\;{T_{oa}} \le {T_{low}}}\end{array}} \right.$$</div>
+<div>$${T_{out}} = \left\{ {\begin{array}{*{20}{c}}{{T_{high}}\;if\;{T_{oa}} \ge {T_{high}}}\\ {{T_{oa}}\;if\;{T_{low}} &lt; {T_{oa}} &lt; {T_{high}}}\\ {{T_{low}}\;if\;{T_{oa}} \le {T_{low}}}\end{array}} \right.$$</div>
 
 where:
 

@@ -3619,7 +3619,7 @@ where:
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
-<div>$$\begin{array}{l}If\;({{\dot Q}_{total}} < 0.0)\;Then\\\quad {{\dot Q}_{total,cooling}} = ABS({{\dot Q}_{total}})\\\quad {{\dot Q}_{total,heating}} = 0.0\\Else\\\quad {{\dot Q}_{total,cooling}} = 0.0\\\quad {{\dot Q}_{total,heating}} = {{\dot Q}_{total}}\\Endif\end{array}$$</div>
+<div>$$\begin{array}{l}If\;({{\dot Q}_{total}} &lt; 0.0)\;Then\\\quad {{\dot Q}_{total,cooling}} = ABS({{\dot Q}_{total}})\\\quad {{\dot Q}_{total,heating}} = 0.0\\Else\\\quad {{\dot Q}_{total,cooling}} = 0.0\\\quad {{\dot Q}_{total,heating}} = {{\dot Q}_{total}}\\Endif\end{array}$$</div>
 
 where:
 
@@ -5859,11 +5859,11 @@ To simplify the accounting of heat exchanger performance, the sensible, latent, 
 
 <div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}} > 0} \right){\mathop Q\limits^ \bullet_{SensibleHeating}} = {\mathop Q\limits^ \bullet_{Sensible}}$$</div>
 
-<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Latent}} <  = 0} \right){\mathop Q\limits^ \bullet_{LatentCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Latent}}} \right)$$</div>
+<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Latent}} &lt;  = 0} \right){\mathop Q\limits^ \bullet_{LatentCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Latent}}} \right)$$</div>
 
 <div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Latent}} > 0} \right){\mathop Q\limits^ \bullet_{LatentHeating}} = {\mathop Q\limits^ \bullet_{Latent}}$$</div>
 
-<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Total}} <  = 0} \right){\mathop Q\limits^ \bullet_{TotalCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Total}}} \right)$$</div>
+<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Total}} &lt;  = 0} \right){\mathop Q\limits^ \bullet_{TotalCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Total}}} \right)$$</div>
 
 <div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Total}} > 0} \right){\mathop Q\limits^ \bullet_{TotalHeating}} = {\mathop Q\limits^ \bullet_{Total}}$$</div>
 
@@ -6019,7 +6019,7 @@ The regeneration outlet air conditions described above represent the full load o
 
 
 
-<span>\(\begin{array}{l}IF\,\,\left( {{w_{diff}} > 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,humidified,\,process\,air\,dehumidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{max, set\,point}}} \right)}}{{{w_{diff}}}}\\ELSE\,IF\,\left( {{w_{diff}} < 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,dehumidified,\,process\,air\,humidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{min, set\,point}}} \right)}}{{{w_{diff}}}}\\END\,IF\\HXPartLoadRatio = MAX\left( {0.0,HXPartLoadRatio} \right)\\HXPartLoadRatio = MIN\,\left( {1.0,HXPartLoadRatio} \right)\end{array}\)</span>
+<span>\(\begin{array}{l}IF\,\,\left( {{w_{diff}} > 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,humidified,\,process\,air\,dehumidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{max, set\,point}}} \right)}}{{{w_{diff}}}}\\ELSE\,IF\,\left( {{w_{diff}} &lt; 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,dehumidified,\,process\,air\,humidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{min, set\,point}}} \right)}}{{{w_{diff}}}}\\END\,IF\\HXPartLoadRatio = MAX\left( {0.0,HXPartLoadRatio} \right)\\HXPartLoadRatio = MIN\,\left( {1.0,HXPartLoadRatio} \right)\end{array}\)</span>
 
 If this heat exchanger is not being called by a parent object and no humidity setpoints are placed on the process air outlet node, then the model assumes that the heat exchanger operates for the entire simulation time step when it is available to operate (based on its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams.
 

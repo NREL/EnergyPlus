@@ -108,7 +108,7 @@ The simple model might be called “constrained bucket with energy losses.”  
 
 The storage control algorithms determine a value for the charging power, <span>\({P_{stor - ch\arg e}}\)</span>, or the drawing power, <span>\({P_{stor - draw}}\)</span>. The basic storage control algorithm is to compare the requested generator electricity loads to the current available supply and make up the difference with storage. If extra power is generated, then store it. If there is a shortage, then attempt to draw from storage to meet the remaining electricity request. The load center dispatchs a requested electric load for each generator, runs each generator, and then stores the actual power. This power dispatch can be a function of many different things depending on the operating scheme. The sum of the generator load requests,<span>\({P_{load - request}}\)</span>, is then compared to the sum of the generator production, <span>\({P_{{\rm{gen}} - {\rm{supply}}}}\)</span>
 
-<div>$$IF\quad ({P_{load - request}} < {P_{gen - \sup ply}})\quad {P_{stor - ch\arg e}} = {P_{gen - \sup ply}} - {P_{load - request}}$$</div>
+<div>$$IF\quad ({P_{load - request}} &lt; {P_{gen - \sup ply}})\quad {P_{stor - ch\arg e}} = {P_{gen - \sup ply}} - {P_{load - request}}$$</div>
 
 <div>$$IF\quad ({P_{load - request}} > {P_{gen - \sup ply}})\quad {P_{stor - draw}} = {P_{load - request}} - {P_{gen - \sup ply}}$$</div>
 
@@ -1215,7 +1215,7 @@ where:
 
 Standby electrical power may also be modeled to simulate controls or other parasitics used by the generator. The standby power is calculated only when the generator is not operating (i.e., *Load* from the Electric Load Center is zero). If the generator operates for a given timestep (i.e., *Load* &gt; 0.0), the standby power is set equal to 0.
 
-<div>$$\begin{array}{l}IF\,\,\left( {Load\, <  = 0.0} \right)\,\,THEN\\\,\,\,\,\,{P_{Standby}} = {P_{Standby,user\,input}}\\ELSE\\\,\,\,\,\,{P_{Standby}} = 0.0\\END\,IF\end{array}$$</div>
+<div>$$\begin{array}{l}IF\,\,\left( {Load\, &lt;  = 0.0} \right)\,\,THEN\\\,\,\,\,\,{P_{Standby}} = {P_{Standby,user\,input}}\\ELSE\\\,\,\,\,\,{P_{Standby}} = 0.0\\END\,IF\end{array}$$</div>
 
 where:
 

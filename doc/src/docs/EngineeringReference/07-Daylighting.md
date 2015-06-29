@@ -645,7 +645,7 @@ The net illuminance from the window is obtained by summing the contributions fro
 
 <div>$${E_h} = \sum\limits_{\scriptstyle window\atop\scriptstyle elements} {{L_w}d\Omega \cos \gamma } $$</div>
 
-In performing the summation, window elements that lie below the workplane (<span>\(\cos \gamma  < 0\)</span>) are omitted since light from these elements cannot reach the workplane directly.
+In performing the summation, window elements that lie below the workplane (<span>\(\cos \gamma  &lt; 0\)</span>) are omitted since light from these elements cannot reach the workplane directly.
 
 ![GeomDirComp](media/image755.png)
 
@@ -1306,7 +1306,7 @@ The fractional electric lighting input power, *f<sub>P</sub>*, corresponding to 
 
 For a continuously-dimmable control system, it is assumed that *f<sub>P</sub>* is constant and equal to *f<sub>P,min</sub>*for *f<sub>L</sub>&lt;f<sub>L,min</sub>* and that f<sub>P</sub> increases linearly from *f<sub>P,min</sub>* to 1.0 as *f<sub>L</sub>* increases from *f<sub>L,min</sub>* to 1.0 (Figure 60). This gives
 
-<div>$${f_P} = \left\{ \begin{array}{l}{f_{P,\min }} & {\rm{for }}{f_L} < {f_{L,\min }}\\\frac{{{f_L} + (1 - {f_L}){f_{P,\min }} - {f_{L,\min }}}}{{1 - {f_{L,\min }}}}\end{array} \right.{\rm{   for }}{f_{L,\min }} \le {f_L} \le 1$$</div>
+<div>$${f_P} = \left\{ \begin{array}{l}{f_{P,\min }} & {\rm{for }}{f_L} &lt; {f_{L,\min }}\\\frac{{{f_L} + (1 - {f_L}){f_{P,\min }} - {f_{L,\min }}}}{{1 - {f_{L,\min }}}}\end{array} \right.{\rm{   for }}{f_{L,\min }} \le {f_L} \le 1$$</div>
 
 ![](media/image823.png)
 
@@ -1320,7 +1320,7 @@ A “continuous/off” dimming system has the same behavior as a continuous dimm
 
 For a stepped control system, *f<sub>P</sub>* takes on discrete values depending on the range of *f<sub>L</sub>*and the number of steps, *N<sub>L</sub>*<sub> </sub> (Figure 61). This gives
 
-<div>$${f_P} = \left\{ \begin{array}{l}0, & {\rm{if }}{f_L} = 0\\\frac{{{\mathop{\rm int}} ({N_L}{f_L}) + 1}}{{{N_L}}}, & {\rm{for }}0 < {f_L} < 1\\1, & {\rm{if }}{f_L} = 1\end{array} \right.$$</div>
+<div>$${f_P} = \left\{ \begin{array}{l}0, & {\rm{if }}{f_L} = 0\\\frac{{{\mathop{\rm int}} ({N_L}{f_L}) + 1}}{{{N_L}}}, & {\rm{for }}0 &lt; {f_L} &lt; 1\\1, & {\rm{if }}{f_L} = 1\end{array} \right.$$</div>
 
 If a lighting control probability,* p<sub>L</sub>*, is specified,* f<sub>P</sub>* is set one level higher a fraction of the time equal to *1-p<sub>L</sub>*. Specifically, if* f<sub>P</sub>* &lt;1,* f<sub>P</sub>*à* f<sub>P</sub>*+ 1/*N<sub>L</sub>* if a random number between 0 and 1 exceeds *p<sub>L</sub>*. This can be used to simulate the uncertainty associated with manual switching of lights.
 
@@ -2381,7 +2381,7 @@ Where,
 
 The values for <span>\({R_{i,w}}\)</span> and <span>\({R_{o,w}}\)</span> depend on U and are calculated using the following correlations.
 
-<div>$${R_{i,w}} = \frac{1}{{(0.359073\;Ln(U) + 6.949915)}};\quad for\quad U < 5.85$$</div>
+<div>$${R_{i,w}} = \frac{1}{{(0.359073\;Ln(U) + 6.949915)}};\quad for\quad U &lt; 5.85$$</div>
 
 <div>$${R_{i,w}} = \frac{1}{{(1.788041\;U - 2.886625)}};\quad for\quad U \ge 5.85$$</div>
 
@@ -2411,13 +2411,13 @@ The effective thermal conductivity, <span>\({\lambda_{eff}}\)</span>, of the equ
 
 The layer’s solar transmittance at normal incidence, <span>\({T_{sol}}\)</span>, is calculated using correlations that are a function of SHGC and U-Factor.
 
-<div>$${T_{sol}} = 0.939998\;SHG{C^2} + 0.20332\;SHGC;\quad U > 4.5;\;SHGC < 0.7206$$</div>
+<div>$${T_{sol}} = 0.939998\;SHG{C^2} + 0.20332\;SHGC;\quad U > 4.5;\;SHGC &lt; 0.7206$$</div>
 
 <div>$${T_{sol}} = 1.30415SHGC - 0.30515\;;\quad U > 4.5;\;SHGC \ge 0.7206$$</div>
 
-<div>$${T_{sol}} = 0.41040\;SHGC;\quad U < 3.4;\;SHGC \le 0.15$$</div>
+<div>$${T_{sol}} = 0.41040\;SHGC;\quad U &lt; 3.4;\;SHGC \le 0.15$$</div>
 
-<div>$${T_{sol}} = 0.085775\;SHG{C^2} + 0.963954\;SHGC - 0.084958\;;\;\;U < 3.4;\;SHGC > 0.15$$</div>
+<div>$${T_{sol}} = 0.085775\;SHG{C^2} + 0.963954\;SHGC - 0.084958\;;\;\;U &lt; 3.4;\;SHGC > 0.15$$</div>
 
 And for U-values between 3.4 and 4.5, the value for <span>\({T_{sol}}\)</span> is interpolated using results of the equations for both ranges.
 
@@ -2425,9 +2425,9 @@ And for U-values between 3.4 and 4.5, the value for <span>\({T_{sol}}\)</span> 
 
 The layer’s solar reflectance is calculated by first determining the inward flowing fraction which requires values for the resistance of the inside and outside film coefficients under summer conditions, <span>\({R_{i,s}}\)</span> and <span>\({R_{o,s}}\)</span>respectively.  The correlations are
 
-<span>\({R_{i,s}} = \frac{1}{{\left( {29.436546\;{{\left( {SHGC - {T_{Sol}}} \right)}^3} - 21.943415{{\left( {SHGC - {T_{Sol}}} \right)}^2} + 9.945872\left( {SHGC - {T_{Sol}}} \right) + 7.426151} \right)}};\,U > 4.5\)</span><span>\({R_{i,s}} = \frac{1}{{\left( {199.8208128\;{{\left( {SHGC - {T_{Sol}}} \right)}^3} - 90.639733{{\left( {SHGC - {T_{Sol}}} \right)}^2} + 19.737055\left( {SHGC - {T_{Sol}}} \right) + 6.766575} \right)}};\,U < 3.4\)</span><span>\({R_{o,s}} = \frac{1}{{\left( {2.225824(SHGC - {T_{Sol}}) + 20.57708} \right)}};\;U > 4.5\)</span>
+<span>\({R_{i,s}} = \frac{1}{{\left( {29.436546\;{{\left( {SHGC - {T_{Sol}}} \right)}^3} - 21.943415{{\left( {SHGC - {T_{Sol}}} \right)}^2} + 9.945872\left( {SHGC - {T_{Sol}}} \right) + 7.426151} \right)}};\,U > 4.5\)</span><span>\({R_{i,s}} = \frac{1}{{\left( {199.8208128\;{{\left( {SHGC - {T_{Sol}}} \right)}^3} - 90.639733{{\left( {SHGC - {T_{Sol}}} \right)}^2} + 19.737055\left( {SHGC - {T_{Sol}}} \right) + 6.766575} \right)}};\,U &lt; 3.4\)</span><span>\({R_{o,s}} = \frac{1}{{\left( {2.225824(SHGC - {T_{Sol}}) + 20.57708} \right)}};\;U > 4.5\)</span>
 
-<div>$${R_{o,s}} = \frac{1}{{\left( {5.763355(SHGC - {T_{Sol}}) + 20.541528} \right)}};\;U < 3.4$$</div>
+<div>$${R_{o,s}} = \frac{1}{{\left( {5.763355(SHGC - {T_{Sol}}) + 20.541528} \right)}};\;U &lt; 3.4$$</div>
 
 And for U-values between 3.4 and 4.5, the values are interpolated using results from both sets of equations.
 
@@ -5161,7 +5161,7 @@ where,
 
 There are four cases for the Nusselt correlation that vary by the tilt angle in degrees, <span>\(\gamma \)</span>, and are based on heating conditions.  For cooling conditions (where <span>\({T_{surf,i}} > {T_{air}}\)</span>) the tilt angle is complemented so that <span>\(\gamma  = 180 - \gamma \)</span>
 
-Case A. <span>\({0^\circ } \le \gamma  < 15^\circ \)</span>
+Case A. <span>\({0^\circ } \le \gamma  &lt; 15^\circ \)</span>
 
 <div>$$Nu = 0.13Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}$$</div>
 
@@ -5173,11 +5173,11 @@ Case B. <span>\(15^\circ  \le \gamma  \le 90^\circ \)</span>
 
 <div>$$Nu = 0.13\left( {Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}} - Ra_{CV}^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 3}}\right.}\!\lower0.7ex\hbox{$3$}}}} \right) + 0.56{\left( {R{a_{CV}}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;R{a_H} > R{a_{CV}}$$</div>
 
-Case C. <span>\(90^\circ  < \gamma  \le 179^\circ \)</span>
+Case C. <span>\(90^\circ  &lt; \gamma  \le 179^\circ \)</span>
 
-<div>$$Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;{10^5} \le R{a_H}\sin \gamma  < {10^{11}}$$</div>
+<div>$$Nu = 0.56{\left( {R{a_H}\sin \gamma } \right)^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 4}}\right.}\!\lower0.7ex\hbox{$4$}}}};\;{10^5} \le R{a_H}\sin \gamma  &lt; {10^{11}}$$</div>
 
-Case D. <span>\(179^\circ  < \gamma  \le 180^\circ \)</span>
+Case D. <span>\(179^\circ  &lt; \gamma  \le 180^\circ \)</span>
 
 <div>$$Nu = 0.58Ra_H^{{\raise0.7ex\hbox{$1$} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{$5$}}};\;R{a_H} \le {10^{11}}$$</div>
 
@@ -5219,7 +5219,7 @@ The equations are solved as follows:
 
 Repeat steps 4 to 9 until the difference, <span>\(\Delta {\theta_i}\)</span>, between values of the <span>\({\theta_i}\)</span> in successive iterations is less than some tolerance value. Currently, the test is
 
-<div>$$\frac{1}{{2N}}\sum\limits_{i = 1}^{2N} {|\Delta {\theta_i}|{\rm{ }} < 0.02K} $$</div>
+<div>$$\frac{1}{{2N}}\sum\limits_{i = 1}^{2N} {|\Delta {\theta_i}|{\rm{ }} &lt; 0.02K} $$</div>
 
 If this test does not pass after 100 iterations, the tolerance is increased to 0.2K. If the test still fails the program stops and an error message is issued.
 
@@ -5934,7 +5934,7 @@ L2 = average distance to frame of illuminated area of inside reveal (used to cal
      END IF
    ELSE  ! d2prime > d2
      A2sh = d2*L
-     IF(d2prime < d1+d2) THEN
+     IF(d2prime &lt; d1+d2) THEN
        IF(d12*TanAlpha <= L) THEN
          A1sh = L*(d2prime-d2) + 0.5*TanAlpha*d12**2
        ELSE  ! d12*TanAlpha > L
@@ -5969,7 +5969,7 @@ L2 = average distance to frame of illuminated area of inside reveal (used to cal
         A2sh = (d2prime+d2prime2)*L + &
           0.5*TanAlpha*((d1+d2-d2prime)**2-d1+p2+d2prime2)**2)
         L2   = d2prime2 + 0.5*(d2-(d2prime+d2prime2+P2))
-      ELSE  ! d2-(d2prime+d2prime2+P2) < 0.
+      ELSE  ! d2-(d2prime+d2prime2+P2) &lt; 0.
         ! Inside reveal is fully shadowed by frame and/or
          !opposing reveal
         A2sh = f2*L
@@ -5982,7 +5982,7 @@ L2 = average distance to frame of illuminated area of inside reveal (used to cal
         IF((d1+P2+d2prime2)*TanAlpha >= L) THEN
           A2sh = f2*L
           L2   = f2
-        ELSE  ! (d1+P2+d2prime2)*TanAlpha < L
+        ELSE  ! (d1+P2+d2prime2)*TanAlpha &lt; L
           A2sh = f2*L - 0.5*(L-(d1+P2)*TanAlpha)**2/TanAlpha &
              + d2prime2*(L-(d1+P2+d2prime2/2)*TanAlpha)
           L2 = d2prime2 + (L/TanAlpha - (d1+P2+d2prime2))/3
@@ -6007,7 +6007,7 @@ L2 = average distance to frame of illuminated area of inside reveal (used to cal
     IF(d2prime >= d1+d2) THEN
       A1sh = 0.0
       L1   = f1
-    ELSE  ! d2prime < d1+d2
+    ELSE  ! d2prime &lt; d1+d2
       IF(d2prime <= d2+P1) THEN
         IF(f1*TanAlpha <= L) THEN
           A1sh = 0.5*TanAlpha*f1**2
@@ -7265,7 +7265,7 @@ The model assumes that venetian blind slats reflect and transmit solar radiation
 
 The off-normal properties of roller-blind are determined from solar properties of roller blind fabric measured at normal incidence (q=0) using correlations (Kotey, et. al., 2009b). The off-normal properties for roller blind shades are calculated using the set equations given below:
 
-<div>$${{\rm{\tau }}_{bb}}\left( {\rm{\theta }} \right) = \left\{ \begin{array}{l}{{\rm{\tau }}_{bb}}{\rm{(\theta }} = {\rm{0)}} \cdot {\rm{co}}{{\rm{s}}^{\rm{b}}}{\kern 1pt} \left( {\frac{{\rm{\theta }}}{{{{\rm{\theta }}_{{\rm{cutoff}}}}}} \cdot \frac{\pi }{2}} \right)\quad \theta  < {\theta_{CutOff}}\\0\quad \quad \quad \theta  \ge {\theta_{CutOff}}\end{array} \right.$$</div>
+<div>$${{\rm{\tau }}_{bb}}\left( {\rm{\theta }} \right) = \left\{ \begin{array}{l}{{\rm{\tau }}_{bb}}{\rm{(\theta }} = {\rm{0)}} \cdot {\rm{co}}{{\rm{s}}^{\rm{b}}}{\kern 1pt} \left( {\frac{{\rm{\theta }}}{{{{\rm{\theta }}_{{\rm{cutoff}}}}}} \cdot \frac{\pi }{2}} \right)\quad \theta  &lt; {\theta_{CutOff}}\\0\quad \quad \quad \theta  \ge {\theta_{CutOff}}\end{array} \right.$$</div>
 
 <div>$${\rm{b}} = {\rm{0}}{\rm{.6}} \cdot {\rm{co}}{{\rm{s}}^{{\rm{0}}{\rm{.3}}}}\left( {{{\rm{A}}_{\rm{o}}} \cdot \frac{{\rm{\pi }}}{{\rm{2}}}} \right)$$</div>
 
@@ -7277,7 +7277,7 @@ The off-normal properties of roller-blind are determined from solar properties o
   b = \left\{ 
     \begin{array}{lc}
       0.133 \cdot \left( \rm{\tau}^{str} + 0.003 \right)^{-0.467} &\text{if} \left( 0 \le \rm{\tau}^{str} \le 0.33 \right) \\
-      0.33 \cdot \left( 1 - \rm{\tau}^{str} \right)               &\text{if} \left( 0.33 < \rm{\tau}^{str} \le 1 \right)
+      0.33 \cdot \left( 1 - \rm{\tau}^{str} \right)               &\text{if} \left( 0.33 &lt; \rm{\tau}^{str} \le 1 \right)
     \end{array}
   \right.
 $$</div>
@@ -7314,7 +7314,7 @@ The incidence angle beyond which direct beam transmission is cut off, *q*<sub>Cu
 
 The off-normal properties are calculated as follows.
 
-<div>$${\tau_{bb}}\left( {\rm{\theta }} \right) = \left\{ \begin{array}{l}{\tau_{bb}}{\rm{(\theta }} = {\rm{0)}} \cdot {\rm{co}}{{\rm{s}}^{\rm{b}}}\left( {\frac{{\rm{\theta }}}{{{{\rm{\theta }}_{{\rm{cutoff}}}}}} \cdot \frac{\pi }{{\rm{2}}}} \right)\quad {\rm{\theta }} < {{\rm{\theta }}_{{\rm{cutoff}}}}\\0\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \;\,{\rm{\theta }} \ge {{\rm{\theta }}_{{\rm{cutoff}}}}\end{array} \right.$$</div>
+<div>$${\tau_{bb}}\left( {\rm{\theta }} \right) = \left\{ \begin{array}{l}{\tau_{bb}}{\rm{(\theta }} = {\rm{0)}} \cdot {\rm{co}}{{\rm{s}}^{\rm{b}}}\left( {\frac{{\rm{\theta }}}{{{{\rm{\theta }}_{{\rm{cutoff}}}}}} \cdot \frac{\pi }{{\rm{2}}}} \right)\quad {\rm{\theta }} &lt; {{\rm{\theta }}_{{\rm{cutoff}}}}\\0\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \;\,{\rm{\theta }} \ge {{\rm{\theta }}_{{\rm{cutoff}}}}\end{array} \right.$$</div>
 
 <div>$${\rm{b}} =  - {\rm{0}}{\rm{.45}}\;{\rm{ln}}\;\left( {{\rm{MAX}}\left( {{{\rm{\tau }}_{{\rm{bb}}}}\left( {{\rm{\theta }} = {\rm{0}}} \right){\rm{,}}\;{\rm{0}}{\rm{.01}}} \right)} \right)\; + \;{\rm{0}}{\rm{.1}}$$</div>
 

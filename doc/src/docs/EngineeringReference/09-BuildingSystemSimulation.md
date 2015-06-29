@@ -1246,7 +1246,7 @@ Calculate the heating load on the coil using setpoint and inlet air temperatures
 
 The logic loop for temperature-controlled coil begins here.  In case the heating load on the coil is negative, which might occur if the setpoint is below the air inlet temperature, the coil operation needs to be shut off.
 
-<div>$$IF\,\,({Q_{al}}\,\,\, < \,\,\,\,0.0)\,\,\,\,THEN$$</div>
+<div>$$IF\,\,({Q_{al}}\,\,\, &lt; \,\,\,\,0.0)\,\,\,\,THEN$$</div>
 
 Assigning the inlet to outlet and mass flows to zero shuts off the coil operation.
 

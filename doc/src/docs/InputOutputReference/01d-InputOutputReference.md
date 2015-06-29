@@ -12851,7 +12851,7 @@ Example IDF input objects follow.
 ```idf
 EnergyManagementSystem:Program,
    RH_OpeningController ,         ! Name
-   IF ZoneRH < 25,
+   IF ZoneRH &lt; 25,
        SET MyOpenFactor = 0.0 ,
    ELSEIF ZoneRH > 60,
        SET MyOpenFactor = 1.0 ,
@@ -12907,7 +12907,7 @@ EnergyManagementSystem:Subroutine,
 
 EnergyManagementSystem:Subroutine,
    manage_solar_collector,                             !- Name
-   IF Tout_F < 32,                                             !- EnergyPlus Runtime Language
+   IF Tout_F &lt; 32,                                             !- EnergyPlus Runtime Language
        SET pump_pwr = On,
        EXIT,
    ENDIF,

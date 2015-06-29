@@ -1946,7 +1946,7 @@ For an ideal variable speed fan, the power is proportional to the cube of the ai
 
 For a two-speed fan, the fan power is varied as for a constant speed fan with dampers for Air Volume Ratios greater than or equal to 0.6. For lower Air Volume Ratios,  which correspond to a half-speed fan setting, the power is reduced to the variable fan power value at that point and then varied as for damper control below Air Volume Ratios of 0.6.
 
-<div>$$\begin{array}{*{20}{c}}{{P_{CondFan}} = ({\rm{Air Volume Ratio}})\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right){P_{CondFan,design}}{\rm{      for Air Volume Ratio}} \ge 0.6}\\ {{P_{CondFan}} = \left( {\frac{{{\rm{Air Volume Ratio }} + {\rm{ 0}}{\rm{.4}}}}{{{{\rm{2}}^{{\rm{2}}{\rm{.5}}}}}}} \right)\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right)\left( {{P_{CondFan,design}}} \right){\rm{    for Air Volume Ratio }} < {\rm{ 0}}{\rm{.6}}}\end{array}$$</div>
+<div>$$\begin{array}{*{20}{c}}{{P_{CondFan}} = ({\rm{Air Volume Ratio}})\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right){P_{CondFan,design}}{\rm{      for Air Volume Ratio}} \ge 0.6}\\ {{P_{CondFan}} = \left( {\frac{{{\rm{Air Volume Ratio }} + {\rm{ 0}}{\rm{.4}}}}{{{{\rm{2}}^{{\rm{2}}{\rm{.5}}}}}}} \right)\left( {{e^{(1 - {\rm{Air Volume Ratio}})}}} \right)\left( {{P_{CondFan,design}}} \right){\rm{    for Air Volume Ratio }} &lt; {\rm{ 0}}{\rm{.6}}}\end{array}$$</div>
 
 For a water cooled condenser, there is no fan load at the condenser (i.e., the  water/refrigerant heat exchanger). Any fan load would be related to and accounted for at the heat rejection object (e.g., cooling tower)
 
@@ -2402,9 +2402,9 @@ Figure 291.  COP of CO<sub>2</sub> Transcritical Cycle vs. Discharge Pressure a
 
 Several researchers have developed correlations to determine the optimum gas cooler pressure in CO<sub>2</sub> refrigeration systems (Chen and Gu 2005; Ge and Tassou 2011; Kauf 1998; Liao and Zhao 2000; Sawalha 2008).  Using a similar curve-fitting procedure, the following optimum gas cooler pressure correlations are used in EnergyPlus:
 
-<div><!-- $${p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} < 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} \ge 27}\end{array}} \right.$$ --> </div>
+<div><!-- $${p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} &lt; 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}}![](1101-1200/html/1101-1200_files/image145.png) {T_{amb}} \ge 27}\end{array}} \right.$$ --> </div>
 
-<div>$${p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}} {T_{amb}} < 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}} {T_{amb}} \ge 27}\end{array}} \right.$$</div>
+<div>$${p_{gc}} = \left\{ {\begin{array}{*{20}{c}}{7.5 \times {{10}^6},{\rm{}} {T_{amb}} &lt; 27}\\ {2.3083 \times {{10}^5}{T_{amb}} + 1.190 \times {{10}^6},{\rm{}} {T_{amb}} \ge 27}\end{array}} \right.$$</div>
 
 where *p<sub>gc</sub>* is the optimum gas cooler pressure (Pa) and *T<sub>amb</sub>* (°C) is the ambient temperature surrounding the gas cooler.  The corresponding gas cooler exit temperature, *T<sub>gco</sub>* (°C), is determined as follows:
 
@@ -2418,9 +2418,9 @@ During transcritical operation, the gas cooler outlet pressure is not allowed to
 
 During subcritical operation, the gas cooler behaves as a condenser and the condensing pressure is allowed to float with the ambient conditions.  The condensing temperature, *T<sub>cond</sub>* (°C), is determined according to the following:
 
-<div> <!--$${T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{cond,min}} - \Delta T < {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} - \Delta T < {T_{amb}} < {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} \le {T_{amb}} < 30.978}\end{array}} \right.$$ --> </div>
+<div> <!--$${T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{cond,min}} - \Delta T &lt; {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} - \Delta T &lt; {T_{amb}} &lt; {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}}![](1101-1200/html/1101-1200_files/image147.png) {T_{trans}} \le {T_{amb}} &lt; 30.978}\end{array}} \right.$$ --> </div>
 
-<div>$${T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}} {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}} {T_{cond,min}} - \Delta T < {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}} {T_{trans}} - \Delta T < {T_{amb}} < {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}} {T_{trans}} \le {T_{amb}} < 30.978}\end{array}} \right.$$</div>
+<div>$${T_{cond}} = \left\{ {\begin{array}{*{20}{c}}{{T_{cond,min}},{\rm{}} {T_{amb}} \le {T_{cond,min}} - \Delta T}\\ {{T_{amb}} + \Delta T,{\rm{}} {T_{cond,min}} - \Delta T &lt; {T_{amb}} \le {T_{trans}} - \Delta T}\\ {{T_{trans}},{\rm{}} {T_{trans}} - \Delta T &lt; {T_{amb}} &lt; {T_{trans}}}\\ {{T_{sat,{\rm{}}P = 7.2{\rm{}}MPa}},{\rm{}} {T_{trans}} \le {T_{amb}} &lt; 30.978}\end{array}} \right.$$</div>
 
 where *T<sub>amb</sub>* is the ambient temperature (°C), Δ*T* is the temperature difference between the condensing temperature and the ambient temperature (°C), *T<sub>cond</sub>*<sub>,*min*</sub> is the minimum allowable condensing temperature (°C), and *T<sub>trans</sub>* is the ambient air transition temperature between subcritical and transcritical operation (°C).  The condensing pressure, *P<sub>cond</sub>* (Pa), is determined as the saturation pressure corresponding to the condensing temperature.
 
@@ -2583,7 +2583,7 @@ otherwise
 
 <span>\({T_{set,atOAhigh}} = {T_{1,set,atOAhigh}}\)</span>.
 
-If <span>\({T_{out,low}} < {T_{out,high}}\)</span>and <span>\({T_{set,atOAlow}} > {T_{set,atOAhigh}}\)</span> then
+If <span>\({T_{out,low}} &lt; {T_{out,high}}\)</span>and <span>\({T_{set,atOAlow}} > {T_{set,atOAhigh}}\)</span> then
 
       If <span>\({T_{out}} \le {T_{out,low}}\)</span> then
 
@@ -2735,7 +2735,7 @@ The input object SetpointManager:Warmest provides a setpoint manager that attemp
 
 <div>$${T_{set,z}} = {T_z} + {\dot Q_z}/({C_{p,air}}\cdot {\dot m_{z,max}})$$</div>
 
-Note that for cooling <span>\({\dot Q_z} < 0.\)</span>The lowest <span>\({T_{set,z}}\)</span>is chosen as <span>\({T_{set}}\)</span>. <span>\({T_{set}}\)</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone cooling loads is very small, the setpoint temperature is set to the maximum. <span>\({T_{set}}\)</span>will be applied to the node or nodes specified in the SetpointManager:Warmest object input.
+Note that for cooling <span>\({\dot Q_z} &lt; 0.\)</span>The lowest <span>\({T_{set,z}}\)</span>is chosen as <span>\({T_{set}}\)</span>. <span>\({T_{set}}\)</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone cooling loads is very small, the setpoint temperature is set to the maximum. <span>\({T_{set}}\)</span>will be applied to the node or nodes specified in the SetpointManager:Warmest object input.
 
 ### Coldest Zone Supply Air Reset
 
@@ -2777,7 +2777,7 @@ The algorithm loops over all the zones that the system can cool and calculates a
 
 where <span>\({\dot m_{z,\min }}\)</span>is the minimum air flow rate to the zone produced by reducing the capacity of the supply fan or by reducing the opening of the damper in the terminal box, if present, and  <span>\({\dot m_{z,\max }}\)</span> is the design air flow rate to the zone.
 
-Note that for cooling <span>\({\dot Q_z} < 0.\)</span> The lowest <span>\({T_{set,z}}\)</span>is chosen as <span>\({T_{set}}\)</span>. <span>\({T_{set}}\)</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the unconstrained value of <span>\({T_{set}}\)</span>is less than the minimum setpoint temperature and there are no VAV terminal boxes, the fan capacity is increased so as to meet the zone cooling loads with the constrained value of <span>\({T_{set}}\)</span>:
+Note that for cooling <span>\({\dot Q_z} &lt; 0.\)</span> The lowest <span>\({T_{set,z}}\)</span>is chosen as <span>\({T_{set}}\)</span>. <span>\({T_{set}}\)</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the unconstrained value of <span>\({T_{set}}\)</span>is less than the minimum setpoint temperature and there are no VAV terminal boxes, the fan capacity is increased so as to meet the zone cooling loads with the constrained value of <span>\({T_{set}}\)</span>:
 
 
 
@@ -2835,7 +2835,7 @@ END IF
 
 <div>$${\bar T_z} = {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}$$</div>
 
-Note that for cooling <span>\({\dot Q_{Zj}} < 0.\)</span> The average supply air setpoint temperature <span>\({\bar T_{SP}}\)</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible cooling loads is extremely small (i.e., no cooling load), the setpoint temperature is set to the maximum. <span>\({\bar T_{SP}}\)</span>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Cooling:Average object.
+Note that for cooling <span>\({\dot Q_{Zj}} &lt; 0.\)</span> The average supply air setpoint temperature <span>\({\bar T_{SP}}\)</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible cooling loads is extremely small (i.e., no cooling load), the setpoint temperature is set to the maximum. <span>\({\bar T_{SP}}\)</span>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Cooling:Average object.
 
 ### Multizone Minimum Humidity Average
 
@@ -3532,11 +3532,11 @@ The cavity air temperature is determined from the cavity air energy balance.  T
 
 The equations used to determine for the various heat transfer coefficients in the absorber and water heat balance equations are given below. The absorbed solar energy is transferred to the water by convection.  Assuming natural convection dominated heat transfer for a hot surface facing down and a clod surface facing down the following correlation for Nusselt number by Fujii and Imura (1972).  The Nusselt number for hot surface facing down ward is given by:
 
-<div>$$Nu = 0.56{\left( {Gr \cdot \Pr  \cdot cos{\kern 1pt} \theta } \right)^{1/5}}\quad {10^5} < Gr \cdot Pr < {10^{11}}$$</div>
+<div>$$Nu = 0.56{\left( {Gr \cdot \Pr  \cdot cos{\kern 1pt} \theta } \right)^{1/5}}\quad {10^5} &lt; Gr \cdot Pr &lt; {10^{11}}$$</div>
 
 The Nusselt number for hot surface upward and cold surface facing down is given by:
 
-<div>$$Nu = 0.13{\left( {Gr \cdot \Pr } \right)^{1/3}}\quad Gr \cdot Pr < 5.0 \times {10^8}$$</div>
+<div>$$Nu = 0.13{\left( {Gr \cdot \Pr } \right)^{1/3}}\quad Gr \cdot Pr &lt; 5.0 \times {10^8}$$</div>
 
 <div>$$Nu = 0.16{\left( {Gr \cdot \Pr } \right)^{1/3}}\quad Gr \cdot Pr > 5.0 \times {10^8}$$</div>
 

@@ -161,7 +161,7 @@ The following is a basic description of the structure of the IDD (it’s actuall
 !
 !  \maximum         Maximum that includes the following value
 !
-!  \maximum&lt;        Maximum that must be &lt; than the following value
+!  \maximum<        Maximum that must be < than the following value
 !
 !  \default         Default for the field (if N/A then omit entire line)
 !
@@ -265,11 +265,11 @@ The following is a basic description of the structure of the IDD (it’s actuall
 !                   appropriate message to the error file.
 !                   usage:  \obsolete New=&gt;[New object name]
 !
-!  \extensible:&lt;\#&gt;  This object is dynamically extensible -- meaning, if you
+!  \extensible:<\#&gt;  This object is dynamically extensible -- meaning, if you
 !           change the IDD appropriately (if the object has a simple list
 !           structure -- just add items to the list arguments (i.e. BRANCH
 !           LIST). These will be automatically redimensioned and used during
-!           the simulation. &lt;\#&gt; should be entered by the developer to signify
+!           the simulation. <\#&gt; should be entered by the developer to signify
 !           how many of the last fields are needed to be extended (and EnergyPlus
 !           will attempt to auto-extend the object).  The first field of the first
 !           instance of the extensible field set is marked with \begin-extensible.
@@ -505,7 +505,7 @@ Site:Location,
   N4 ; \field Elevation
        \units m
        \minimum -300.0
-       \maximum&lt; 8900.0
+       \maximum< 8900.0
        \default 0.0
        \type real
 ```
@@ -2875,7 +2875,7 @@ Alpha field indicates whether the horizontal underfloor insulation extends to co
 
 #### Field: Perimeter Insulation Width
 
-Numeric field indicating the width of the perimeter insulation measured from the basement floor edge. Valid range from > 0 to < half of smallest basement floor width.
+Numeric field indicating the width of the perimeter insulation measured from the basement floor edge. Valid range from > 0 to &lt; half of smallest basement floor width.
 
 #### Field: Basement Depth
 
@@ -2895,7 +2895,7 @@ Name of material object representing the vertical slab insulation. Optional argu
 
 #### Field: Vertical Insulation Depth
 
-Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from > 0 to < Basement Depth.
+Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from > 0 to &lt; Basement Depth.
 
 #### Field: Simulation Timestep
 
@@ -19356,7 +19356,7 @@ This output is the average generic contaminant generation rate from each Surface
 
 The ZoneContaminantSourceAndSink:Generic contaminant:CutoffModel object specifies the generic contaminant generation rate based on the cutoff concentration model. The basic equation used to calculate generic contaminant source for the pressure driven constant model is given below:
 
-<div>\[{S_f}(t) = \left\{ \begin{array}{l}{G_f}(t)*{F_G}*\left( {1 - \frac{{{C_f}(t)}}{{{C_{cutoff}}}}} \right)\;\;\;\;\;{C_f} < {C_{cutoff}}\\0\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;{C_f} \ge {C_{cutoff}}\end{array} \right\}\]</div>
+<div>\[{S_f}(t) = \left\{ \begin{array}{l}{G_f}(t)*{F_G}*\left( {1 - \frac{{{C_f}(t)}}{{{C_{cutoff}}}}} \right)\;\;\;\;\;{C_f} &lt; {C_{cutoff}}\\0\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;{C_f} \ge {C_{cutoff}}\end{array} \right\}\]</div>
 
 where
 
