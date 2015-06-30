@@ -9,6 +9,8 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 
+#undef ALIGNED_SCRIPTF
+
 namespace EnergyPlus {
 
 namespace DataViewFactorInformation {
@@ -31,7 +33,11 @@ namespace DataViewFactorInformation {
 		std::string Name; // Zone name
 		int NumOfSurfaces; // Number of surfaces in the zone
 		Array2D< Real64 > F; // View Factors
+#ifdef ALIGNED_SCRIPTF
+		Real64 *ScriptF;
+#else // !ALIGNED_SRIPTF
 		Array2D< Real64 > ScriptF; // Hottel's Script F //Tuned Transposed
+#endif // ALIGNED_SCRIPTF
 		Array1D< Real64 > Area; // Surface area
 		Array1D< Real64 > Emissivity; // Surface emissivity
 		Array1D< Real64 > Azimuth; // Azimuth angle of the surface (in degrees)
@@ -49,7 +55,11 @@ namespace DataViewFactorInformation {
 			std::string const & Name, // Zone name
 			int const NumOfSurfaces, // Number of surfaces in the zone
 			Array2< Real64 > const & F, // View Factors
+#ifdef ALIGNED_SCRIPTF
+			Real64 *ScriptF,
+#else // !ALIGNED_SCRIPTF
 			Array2< Real64 > const & ScriptF, // Hottel's Script F //Tuned Transposed
+#endif // ALIGNED_SCRIPTF
 			Array1< Real64 > const & Area, // Surface area
 			Array1< Real64 > const & Emissivity, // Surface emissivity
 			Array1< Real64 > const & Azimuth, // Azimuth angle of the surface (in degrees)
@@ -78,4 +88,5 @@ namespace DataViewFactorInformation {
 
 } // EnergyPlus
 
-#endif
+#endif // DataViewFactorInformation_hh_INCLUDED
+
