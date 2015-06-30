@@ -8,6 +8,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <ObjexxFCL/gio.hh>
 
 #include <map>
@@ -1298,21 +1299,7 @@ TEST_F( SQLiteFixture, validateIndexType )
 		EXPECT_EQ( indexGroup.second, ValidateIndexType( indexGroup.first, calledFrom ) ) << "where indexTypeKey is " << indexGroup.first;
 	}
 
-	// Can't test a bad input because it fatal errors and kills the whole unit test framework.
-
-	// auto const indexTypeKey = "BAD INPUT";
-
-	// EnergyPlus::sqlite = std::move( sqlite_test );
-	// auto index = ValidateIndexType( indexTypeKey, calledFrom );
-	// sqlite_test = std::move( EnergyPlus::sqlite );
-
-	// EXPECT_EQ( 0, index );
-
-	// auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
-
-	// ASSERT_EQ(1ul, errorData.size());
-	// std::vector<std::string> errorData0 {"1", "1", "1", "OutputProcessor/ValidateIndexType: Invalid Index Key passed to ValidateIndexType=BAD INPUT", "1"};
-	// EXPECT_EQ(errorData0, errorData[0]);
+	EXPECT_DEATH( ValidateIndexType( "BAD INPUT", calledFrom ), "" );
 
 }
 
@@ -2625,4 +2612,255 @@ TEST_F( SQLiteFixture, validateNStandardizeMeterTitles )
 	EnergyMeters.deallocate();
 	NumEnergyMeters = 0;
 
+}
+
+TEST_F( SQLiteFixture, setupTimePointers )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, setupTimePointers" );
+
+	TimeValue.allocate( 2 );
+
+	auto timeStep = 1.0;
+
+	SetupTimePointers( "Zone", timeStep );
+
+	EXPECT_DOUBLE_EQ( timeStep, TimeValue( 1 ).TimeStep );
+	EXPECT_DOUBLE_EQ( 0.0, TimeValue( 1 ).CurMinute );
+
+	timeStep = 2.0;
+
+	SetupTimePointers( "HVAC", timeStep );
+
+	EXPECT_DOUBLE_EQ( timeStep, TimeValue( 2 ).TimeStep );
+	EXPECT_DOUBLE_EQ( 0.0, TimeValue( 2 ).CurMinute );
+
+	TimeValue.deallocate();
+}
+
+TEST( OutputProcessor, getVariableUnitsString )
+{
+	ShowMessage( "Begin Test: OutputProcessor, getVariableUnitsString" );
+
+	// This can be an ofstream as well or any other ostream
+	std::stringstream buffer;
+
+	// Save cout's buffer here
+	std::streambuf *sbuf = std::cout.rdbuf();
+
+	// Redirect cout to our stringstream buffer or any other ostream
+	std::cout.rdbuf(buffer.rdbuf());
+
+	// // Use cout as usual
+	// std::cout << "Hello World";
+
+	EXPECT_EQ( "C", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C]" ) );
+	EXPECT_EQ( "%", GetVariableUnitsString( "Site Outdoor Air Relative Humidity [%]" ) );
+	EXPECT_EQ( "kgWater/kgDryAir", GetVariableUnitsString( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]" ) );
+	EXPECT_EQ( "", GetVariableUnitsString( "Site Daylighting Model Sky Clearness []" ) );
+	EXPECT_EQ( "", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature" ) );
+	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ), "" );
+	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ), "" );
+	EXPECT_EQ( "0123456789012345", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ) );
+	// EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ), "" );
+	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ), "" );
+
+	// When done redirect cout to its old self
+	std::cout.rdbuf(sbuf);
+}
+
+// TEST( OutputProcessor, getReportVariableInput )
+// {
+// 	ShowMessage( "Begin Test: OutputProcessor, getReportVariableInput" );
+
+// 	GetReportVariableInput();
+// }
+
+// TEST_F( SQLiteFixture, setupOutputVariable )
+// {
+// 	ShowMessage( "Begin Test: SQLiteFixture, setupOutputVariable" );
+
+// 	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", OutDryBulbTemp, "Zone", "Average", "Environment" );
+
+// 	// This should be all necessary clean up...
+// 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileMeterDetails, flags ); }
+// 	RVariableTypes.deallocate();
+// 	IVariableTypes.deallocate();
+// 	ReportList.deallocate();
+// 	EndUseCategory.deallocate();
+// }
+
+TEST_F( SQLiteFixture, updateDataandReport )
+{
+	ShowMessage( "Begin Test: SQLiteFixture, updateDataandReport" );
+
+	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
+	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
+
+	DataGlobals::eso_stream = eso_strm.get();
+	DataGlobals::mtr_stream = mtr_strm.get();
+
+	NumEnergyMeters = 10;
+	EnergyMeters.allocate( NumEnergyMeters );
+	EnergyMeters( 1 ).CurTSValue = 999.9;
+	EnergyMeters( 1 ).TSValue = 999.9;
+	EnergyMeters( 1 ).RptTS = true;
+	EnergyMeters( 1 ).RptAccTS = false;
+	EnergyMeters( 1 ).RptTSFO = false;
+	EnergyMeters( 1 ).RptAccTSFO = false;
+	EnergyMeters( 1 ).TSRptNum = 1;
+	EnergyMeters( 1 ).TSRptNumChr = "1";
+	EnergyMeters( 1 ).TSAccRptNum = 1;
+	EnergyMeters( 1 ).SMValue = 999.9;
+
+	EnergyMeters( 2 ).CurTSValue = 9999.9;
+	EnergyMeters( 2 ).TSValue = 9999.9;
+	EnergyMeters( 2 ).RptTS = true;
+	EnergyMeters( 2 ).RptAccTS = false;
+	EnergyMeters( 2 ).RptTSFO = false;
+	EnergyMeters( 2 ).RptAccTSFO = false;
+	EnergyMeters( 2 ).TSRptNum = 2;
+	EnergyMeters( 2 ).TSRptNumChr = "2";
+	EnergyMeters( 2 ).TSAccRptNum = 2;
+	EnergyMeters( 2 ).SMValue = 9999.9;
+
+	// TimeStepStampReportNbr = 1;
+	// TimeStepStampReportChr = "1";
+
+	EnergyMeters( 3 ).RptHR = true;
+	EnergyMeters( 3 ).RptHRFO = true;
+	EnergyMeters( 3 ).RptAccHR = false;
+	EnergyMeters( 3 ).RptAccHRFO = false;
+	EnergyMeters( 3 ).HRRptNum = 1;
+	EnergyMeters( 3 ).HRRptNumChr = "1";
+	EnergyMeters( 3 ).HRValue = 999.9;
+	EnergyMeters( 3 ).HRAccRptNum = 1;
+	EnergyMeters( 3 ).SMValue = 999.9;
+
+	EnergyMeters( 4 ).RptHR = true;
+	EnergyMeters( 4 ).RptHRFO = true;
+	EnergyMeters( 4 ).RptAccHR = false;
+	EnergyMeters( 4 ).RptAccHRFO = false;
+	EnergyMeters( 4 ).HRRptNum = 2;
+	EnergyMeters( 4 ).HRRptNumChr = "2";
+	EnergyMeters( 4 ).HRValue = 9999.9;
+	EnergyMeters( 4 ).HRAccRptNum = 2;
+	EnergyMeters( 4 ).SMValue = 9999.9;
+
+	TimeStepStampReportNbr = 1;
+	TimeStepStampReportChr = "1";
+
+	EnergyMeters( 5 ).RptDY = true;
+	EnergyMeters( 5 ).RptDYFO = true;
+	EnergyMeters( 5 ).RptAccDY = false;
+	EnergyMeters( 5 ).RptAccDYFO = false;
+	EnergyMeters( 5 ).DYRptNum = 1;
+	EnergyMeters( 5 ).DYRptNumChr = "1";
+	EnergyMeters( 5 ).DYValue = 999.9;
+	EnergyMeters( 5 ).DYAccRptNum = 1;
+	EnergyMeters( 5 ).SMValue = 999.9;
+	EnergyMeters( 5 ).DYMaxVal = 4283136.2524843821;
+	EnergyMeters( 5 ).DYMaxValDate = 12210160;
+	EnergyMeters( 5 ).DYMinVal = 4283136.2516839253;
+	EnergyMeters( 5 ).DYMinValDate = 12210110;
+
+	EnergyMeters( 6 ).RptDY = true;
+	EnergyMeters( 6 ).RptDYFO = true;
+	EnergyMeters( 6 ).RptAccDY = false;
+	EnergyMeters( 6 ).RptAccDYFO = false;
+	EnergyMeters( 6 ).DYRptNum = 2;
+	EnergyMeters( 6 ).DYRptNumChr = "2";
+	EnergyMeters( 6 ).DYValue = 9999.9;
+	EnergyMeters( 6 ).DYAccRptNum = 2;
+	EnergyMeters( 6 ).SMValue = 9999.9;
+	EnergyMeters( 6 ).DYMaxVal = 4283136.2524843821;
+	EnergyMeters( 6 ).DYMaxValDate = 12210160;
+	EnergyMeters( 6 ).DYMinVal = 4283136.2516839253;
+	EnergyMeters( 6 ).DYMinValDate = 12210110;
+
+	DailyStampReportNbr = 1;
+	DailyStampReportChr = "1";
+
+	EnergyMeters( 7 ).RptMN = true;
+	EnergyMeters( 7 ).RptMNFO = true;
+	EnergyMeters( 7 ).RptAccMN = false;
+	EnergyMeters( 7 ).RptAccMNFO = false;
+	EnergyMeters( 7 ).MNRptNum = 1;
+	EnergyMeters( 7 ).MNRptNumChr = "1";
+	EnergyMeters( 7 ).MNValue = 999.9;
+	EnergyMeters( 7 ).MNAccRptNum = 1;
+	EnergyMeters( 7 ).SMValue = 999.9;
+	EnergyMeters( 7 ).MNMaxVal = 4283136.2524843821;
+	EnergyMeters( 7 ).MNMaxValDate = 12210160;
+	EnergyMeters( 7 ).MNMinVal = 4283136.2516839253;
+	EnergyMeters( 7 ).MNMinValDate = 12210110;
+
+	EnergyMeters( 8 ).RptMN = true;
+	EnergyMeters( 8 ).RptMNFO = true;
+	EnergyMeters( 8 ).RptAccMN = false;
+	EnergyMeters( 8 ).RptAccMNFO = false;
+	EnergyMeters( 8 ).MNRptNum = 2;
+	EnergyMeters( 8 ).MNRptNumChr = "2";
+	EnergyMeters( 8 ).MNValue = 9999.9;
+	EnergyMeters( 8 ).MNAccRptNum = 2;
+	EnergyMeters( 8 ).SMValue = 9999.9;
+	EnergyMeters( 8 ).MNMaxVal = 4283136.2524843821;
+	EnergyMeters( 8 ).MNMaxValDate = 12210160;
+	EnergyMeters( 8 ).MNMinVal = 4283136.2516839253;
+	EnergyMeters( 8 ).MNMinValDate = 12210110;
+
+	MonthlyStampReportNbr = 1;
+	MonthlyStampReportChr = "1";
+
+	EnergyMeters( 9 ).RptSM = true;
+	EnergyMeters( 9 ).RptSMFO = true;
+	EnergyMeters( 9 ).RptAccSM = false;
+	EnergyMeters( 9 ).RptAccSMFO = false;
+	EnergyMeters( 9 ).SMRptNum = 1;
+	EnergyMeters( 9 ).SMRptNumChr = "1";
+	EnergyMeters( 9 ).SMValue = 999.9;
+	EnergyMeters( 9 ).SMAccRptNum = 1;
+	EnergyMeters( 9 ).SMValue = 999.9;
+	EnergyMeters( 9 ).SMMaxVal = 4283136.2524843821;
+	EnergyMeters( 9 ).SMMaxValDate = 12210160;
+	EnergyMeters( 9 ).SMMinVal = 4283136.2516839253;
+	EnergyMeters( 9 ).SMMinValDate = 12210110;
+
+	EnergyMeters( 10 ).RptSM = true;
+	EnergyMeters( 10 ).RptSMFO = true;
+	EnergyMeters( 10 ).RptAccSM = false;
+	EnergyMeters( 10 ).RptAccSMFO = false;
+	EnergyMeters( 10 ).SMRptNum = 2;
+	EnergyMeters( 10 ).SMRptNumChr = "2";
+	EnergyMeters( 10 ).SMValue = 9999.9;
+	EnergyMeters( 10 ).SMAccRptNum = 2;
+	EnergyMeters( 10 ).SMValue = 9999.9;
+	EnergyMeters( 10 ).SMMaxVal = 4283136.2524843821;
+	EnergyMeters( 10 ).SMMaxValDate = 12210160;
+	EnergyMeters( 10 ).SMMinVal = 4283136.2516839253;
+	EnergyMeters( 10 ).SMMinValDate = 12210110;
+
+	RunPeriodStampReportNbr = 1;
+	RunPeriodStampReportChr = "1";
+
+	DayOfSim = 1;
+	DayOfSimChr = "1";
+	HourOfDay = 1;
+	DataEnvironment::Month = 12;
+	DataEnvironment::DayOfMonth = 21;
+	DataEnvironment::DSTIndicator = 0;
+	DataEnvironment::DayOfWeek = 2;
+	DataEnvironment::HolidayIndex = 3;
+	// int EndMinute = 10;
+	// int StartMinute = 0;
+	// bool PrintESOTimeStamp = true;
+
+	// SetupTimePointers( "Zone", TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
+	// SetupTimePointers( "HVAC", TimeStepSys );
+
+	// UpdateDataandReport( 1 );
+
+	// UpdateDataandReport( 2 );
+
+	NumEnergyMeters = 0;
+	EnergyMeters.deallocate();
 }
