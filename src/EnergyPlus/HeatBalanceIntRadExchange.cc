@@ -328,10 +328,10 @@ namespace HeatBalanceIntRadExchange {
 				vecSurfaceTempK4[ ZoneSurfNum ] = pow_4( vecSurfaceTempK4 [ ZoneSurfNum ] + KelvinConv );
 			} // for ZoneSurfNum
 
-			Real64 * __restrict vecNetLWRadToSurf_Temp( &NetLWRadToSurf_Temp[ 0 ] );
-			__ep_assume_aligned(Real64 *, vecNetLWRadToSurf_Temp, 16);
-			Real64 * __restrict vecIRfromParentZone_Temp( &IRfromParentZone_Temp[ 0 ] );
-			__ep_assume_aligned(Real64 *, vecIRfromParentZone_Temp, 16);
+			//Real64 * __restrict vecNetLWRadToSurf_Temp( &NetLWRadToSurf_Temp[ 0 ] );
+			//__ep_assume_aligned(Real64 *, vecNetLWRadToSurf_Temp, 16);
+			//Real64 * __restrict vecIRfromParentZone_Temp( &IRfromParentZone_Temp[ 0 ] );
+			//__ep_assume_aligned(Real64 *, vecIRfromParentZone_Temp, 16);
 			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfaces; ++ZoneSurfNum ) {
 				NetLWRadToSurf_Temp[ ZoneSurfNum ] = 0.0;
 				IRfromParentZone_Temp[ ZoneSurfNum ] = 0.0;
