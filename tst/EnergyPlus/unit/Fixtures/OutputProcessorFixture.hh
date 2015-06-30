@@ -36,13 +36,30 @@ namespace EnergyPlus {
 			SQLiteFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 
-		void compareESOStream( std::string const & correctString, bool resetStream = true ) {
-			EXPECT_EQ( correctString, this->eso_stream->str() );
+		// Must use ASSERT_NO_FATAL_FAILURE or EXPECT_NO_FATAL_FAILURE in calling test if using assert_eq = true, otherwise
+		// ASSERT_EQ will not cause fatal failure in calling test.
+		// Usage: 	ASSERT_NO_FATAL_FAILURE(Foo());
+		// 			int i;
+		// 			EXPECT_NO_FATAL_FAILURE({
+		//   			i = Bar();
+		// 			});
+		// Or we can check if current test has fatal failure
+		// Usage:	if ( HasFatalFailure() ) return;
+		void compareESOStream( std::string const & correctString, bool resetStream = true, bool assert_eq = false ) {
+			if ( assert_eq ) {
+				ASSERT_EQ( correctString, this->eso_stream->str() );
+			} else {
+				EXPECT_EQ( correctString, this->eso_stream->str() );
+			}
 			if ( resetStream ) this->eso_stream->str(std::string());
 		}
 
-		void compareMTRStream( std::string const & correctString, bool resetStream = true ) {
-			EXPECT_EQ( correctString, this->mtr_stream->str() );
+		void compareMTRStream( std::string const & correctString, bool resetStream = true, bool assert_eq = false ) {
+			if ( assert_eq ) {
+				ASSERT_EQ( correctString, this->mtr_stream->str() );
+			} else {
+				EXPECT_EQ( correctString, this->mtr_stream->str() );
+			}
 			if ( resetStream ) this->mtr_stream->str(std::string());
 		}
 

@@ -70,6 +70,33 @@ namespace EnergyPlus {
 			return compare_text->str();
 		}
 
+		// Must use ASSERT_NO_FATAL_FAILURE or EXPECT_NO_FATAL_FAILURE in calling test if using assert_eq = true, otherwise
+		// ASSERT_EQ will not cause fatal failure in calling test.
+		// Usage: 	ASSERT_NO_FATAL_FAILURE(Foo());
+		// 			int i;
+		// 			EXPECT_NO_FATAL_FAILURE({
+		//   			i = Bar();
+		// 			});
+		// Or we can check if current test has fatal failure
+		// Usage:	if ( HasFatalFailure() ) return;
+		void compareCOUTStream( std::string const & correctString, bool resetStream = true, bool assert_eq = false ) {
+			if ( assert_eq ) {
+				ASSERT_EQ( correctString, this->m_cout_buffer->str() );
+			} else {
+				EXPECT_EQ( correctString, this->m_cout_buffer->str() );
+			}
+			if ( resetStream ) this->m_cout_buffer->str(std::string());
+		}
+
+		void compareCERRStream( std::string const & correctString, bool resetStream = true, bool assert_eq = false ) {
+			if ( assert_eq ) {
+				ASSERT_EQ( correctString, this->m_cerr_buffer->str() );
+			} else {
+				EXPECT_EQ( correctString, this->m_cerr_buffer->str() );
+			}
+			if ( resetStream ) this->m_cerr_buffer->str(std::string());
+		}
+
 	private:
 		std::unique_ptr<std::ostringstream> m_cout_buffer;
 		std::unique_ptr<std::ostringstream> m_cerr_buffer;
