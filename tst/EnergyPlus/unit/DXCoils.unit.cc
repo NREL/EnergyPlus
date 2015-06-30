@@ -4,46 +4,15 @@
 // Google test headers
 #include <gtest/gtest.h>
 
-// C++ Headers
-#include <cassert>
-#include <cmath>
-#include <string>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <DXCoils.hh>
-#include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataBranchNodeConnections.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
-#include <DataWater.hh>
-#include <EMSManager.hh>
-#include <Fans.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <StandardRatings.hh>
-#include <UtilityRoutines.hh>
-#include <WaterManager.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -55,7 +24,23 @@ using namespace CurveManager;
 using namespace OutputReportPredefined;
 using namespace EnergyPlus::Psychrometrics;
 
-TEST( DXCoilsTest, Test1 )
+class DXCoilFixture : public EnergyPlusFixture
+{
+protected:
+	virtual void SetUp() {
+		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+		Psychrometrics::InitializePsychRoutines();
+	}
+
+	virtual void TearDown() {
+		Psychrometrics::cached_Twb.deallocate();
+		Psychrometrics::cached_Psat.deallocate();
+		
+		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+	}
+};
+
+TEST_F( DXCoilFixture, Test1 )
 {
 
 	ShowMessage( "Begin Test: DXCoilsTest, Test1" );
@@ -68,7 +53,6 @@ TEST( DXCoilsTest, Test1 )
 	int DXCoilNum;
 	int CurveNum;
 
-	InitializePsychRoutines();
 	NumDXCoils = 2;
 	DXCoilNum = 2;
 	DXCoil.allocate( NumDXCoils );
@@ -181,15 +165,17 @@ TEST( DXCoilsTest, Test1 )
 	SizeDXCoil( 2 );
 	EXPECT_DOUBLE_EQ( 5000.0, DXCoil( 2 ).DefrostCapacity );
 
+	compareCERRStream( delimitedString( { 
+		"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number", 
+		" DX Heating Coil Standard Rating Information, , DX Heating coil, 6414.3, 6414.3, 6.58, 4" } ) );
+
 	// Clean up
 	DXCoil.deallocate();
 	DXCoilNumericFields.deallocate();
 	PerfCurve.deallocate();
-	cached_Twb.deallocate();
-	cached_Psat.deallocate();
 
 }
-TEST( DXCoilsTest, Test2 )
+TEST_F( DXCoilFixture, Test2 )
 {
 
 	using CurveManager::Quadratic;
@@ -198,7 +184,6 @@ TEST( DXCoilsTest, Test2 )
 	int DXCoilNum;
 	int CurveNum;
 
-	InitializePsychRoutines();
 	DisplayExtraWarnings = true;
 	SysSizingRunDone = true;
 	FinalSysSizing.allocate( 1 );
@@ -283,6 +268,12 @@ TEST( DXCoilsTest, Test2 )
 	SizeDXCoil( 2 );
 	EXPECT_DOUBLE_EQ( 0.0, DXCoil( 2 ).RatedTotCap( 1 ) );
 
+	compareCERRStream( delimitedString( { 
+		"! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value", 
+		" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size  [W], 0.00000", 
+		" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified  [W], 5000.00000", 
+		" DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, 0.0, 0.0, 3.51, 4"} ) );
+
 	// Clean up
 	DXCoil.deallocate();
 	DXCoilNumericFields.deallocate();
@@ -291,8 +282,6 @@ TEST( DXCoilsTest, Test2 )
 	FinalSysSizing.deallocate();
 	PrimaryAirSystem.deallocate();
 	AirLoopControlInfo.deallocate();
-	cached_Twb.deallocate();
-	cached_Psat.deallocate();
 
 }
 
