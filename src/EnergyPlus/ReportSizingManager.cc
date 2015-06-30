@@ -1532,7 +1532,7 @@ namespace ReportSizingManager {
 								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
 							}
 							CoilOutTemp = min( CoilInTemp, CoilOutTemp );
-							CoilOutTemp = min( CoilInHumRat, CoilOutHumRat );
+							CoilOutHumRat = min( CoilInHumRat, CoilOutHumRat );
 							CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat );
 							CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine );
 							CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
