@@ -4,11 +4,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/SQLiteFixture.hh"
+#include "Fixtures/OutputProcessorFixture.hh"
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <DisplayRoutines.hh>
 #include <ObjexxFCL/gio.hh>
 
 #include <map>
@@ -18,9 +19,11 @@ using namespace EnergyPlus::OutputProcessor;
 using namespace ObjexxFCL;
 using namespace DataGlobals;
 
-TEST( OutputProcessor, TestGetMeteredVariables )
+namespace EnergyPlus {
+
+TEST_F( OutputProcessorFixture, TestGetMeteredVariables )
 {
-	ShowMessage( "Begin Test: OutputProcessor, TestGetMeteredVariables" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, TestGetMeteredVariables" );
 
 	int const NumVariables = 2;
 	Array1D_int VarIndexes( NumVariables ); // Variable Numbers
@@ -68,15 +71,9 @@ TEST( OutputProcessor, TestGetMeteredVariables )
 	EnergyMeters.deallocate();
 }
 
-TEST_F( SQLiteFixture, reportTSMeters_PrintESOTimeStamp )
+TEST_F( OutputProcessorFixture, reportTSMeters_PrintESOTimeStamp )
 {
-	ShowMessage( "Begin Test: OutputProcessor, reportTSMeters_PrintESOTimeStamp" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, reportTSMeters_PrintESOTimeStamp" );
 
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -119,11 +116,7 @@ TEST_F( SQLiteFixture, reportTSMeters_PrintESOTimeStamp )
 	int StartMinute = 0;
 	bool PrintESOTimeStamp = true;
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-
-	ReportTSMeters( StartMinute, EndMinute, PrintESOTimeStamp );
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind(ReportTSMeters, StartMinute, EndMinute, PrintESOTimeStamp ) );
 
 	auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -131,8 +124,8 @@ TEST_F( SQLiteFixture, reportTSMeters_PrintESOTimeStamp )
 
 	std::vector<std::string> testResult0 {"1", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), eso_strm->str() );
+	compareMTRStream( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) );
+	compareESOStream( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -157,15 +150,9 @@ TEST_F( SQLiteFixture, reportTSMeters_PrintESOTimeStamp )
 	NumEnergyMeters = 0;
 }
 
-TEST_F( SQLiteFixture, reportTSMeters )
+TEST_F( OutputProcessorFixture, reportTSMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessor, reportTSMeters" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, reportTSMeters" );
 
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -208,11 +195,7 @@ TEST_F( SQLiteFixture, reportTSMeters )
 	int StartMinute = 0;
 	bool PrintESOTimeStamp = false;
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-
-	ReportTSMeters( StartMinute, EndMinute, PrintESOTimeStamp );
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind(ReportTSMeters, StartMinute, EndMinute, PrintESOTimeStamp ) );
 
 	auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -220,8 +203,8 @@ TEST_F( SQLiteFixture, reportTSMeters )
 
 	std::vector<std::string> testResult0 {"1", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,999.9", "2,9999.9" } ), eso_strm->str() );
+	compareMTRStream( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) );
+	compareESOStream( delimitedString( { "1,999.9", "2,9999.9" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -246,13 +229,9 @@ TEST_F( SQLiteFixture, reportTSMeters )
 	NumEnergyMeters = 0;
 }
 
-TEST_F( SQLiteFixture, reportHRMeters )
+TEST_F( OutputProcessorFixture, reportHRMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessor, reportHRMeters" );
-
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, reportHRMeters" );
 
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -290,11 +269,7 @@ TEST_F( SQLiteFixture, reportHRMeters )
 	DataEnvironment::DayOfWeek = 2;
 	DataEnvironment::HolidayIndex = 3;
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-
-	ReportHRMeters();
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind(ReportHRMeters ) );
 
 	auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -302,7 +277,7 @@ TEST_F( SQLiteFixture, reportHRMeters )
 
 	std::vector<std::string> testResult0 {"1", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", ""};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay", "1,999.9", "2,9999.9" } ), mtr_strm->str() );
+	compareMTRStream( delimitedString( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -327,14 +302,9 @@ TEST_F( SQLiteFixture, reportHRMeters )
 	NumEnergyMeters = 0;
 }
 
-TEST_F( SQLiteFixture, reportDYMeters )
+TEST_F( OutputProcessorFixture, reportDYMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessor, reportDYMeters" );
-
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-	std::unique_ptr<std::ostringstream> compare_text(new std::ostringstream);
-
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, reportDYMeters" );
 
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -380,11 +350,7 @@ TEST_F( SQLiteFixture, reportDYMeters )
 	DataEnvironment::DayOfWeek = 2;
 	DataEnvironment::HolidayIndex = 3;
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-
-	ReportDYMeters();
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind(ReportDYMeters ) );
 
 	auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -392,7 +358,7 @@ TEST_F( SQLiteFixture, reportDYMeters )
 
 	std::vector<std::string> testResult0 {"1", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.25168393, 1,10,4283136.25248438, 1,60", "2,9999.9,4283136.25168393, 1,10,4283136.25248438, 1,60" } ), mtr_strm->str() );
+	compareMTRStream( delimitedString( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.25168393, 1,10,4283136.25248438, 1,60", "2,9999.9,4283136.25168393, 1,10,4283136.25248438, 1,60" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -425,13 +391,9 @@ TEST_F( SQLiteFixture, reportDYMeters )
 	NumEnergyMeters = 0;
 }
 
-TEST_F( SQLiteFixture, reportMNMeters )
+TEST_F( OutputProcessorFixture, reportMNMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessor, reportMNMeters" );
-
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, reportMNMeters" );
 
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -477,11 +439,7 @@ TEST_F( SQLiteFixture, reportMNMeters )
 	DataEnvironment::DayOfWeek = 2;
 	DataEnvironment::HolidayIndex = 3;
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-
-	ReportMNMeters();
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind(ReportMNMeters ) );
 
 	auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -489,7 +447,7 @@ TEST_F( SQLiteFixture, reportMNMeters )
 
 	std::vector<std::string> testResult0 {"1", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( delimitedString( { "1,1,12", "1,999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60", "2,9999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60" } ), mtr_strm->str() );
+	compareMTRStream( delimitedString( { "1,1,12", "1,999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60", "2,9999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -522,13 +480,9 @@ TEST_F( SQLiteFixture, reportMNMeters )
 	NumEnergyMeters = 0;
 }
 
-TEST_F( SQLiteFixture, reportSMMeters )
+TEST_F( OutputProcessorFixture, reportSMMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessor, reportSMMeters" );
-
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, reportSMMeters" );
 
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -574,11 +528,7 @@ TEST_F( SQLiteFixture, reportSMMeters )
 	DataEnvironment::DayOfWeek = 2;
 	DataEnvironment::HolidayIndex = 3;
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-
-	ReportSMMeters();
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind( ReportSMMeters ) );
 
 	auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -586,7 +536,7 @@ TEST_F( SQLiteFixture, reportSMMeters )
 
 	std::vector<std::string> testResult0 {"1", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
 	EXPECT_EQ( testResult0, result[0] );
-	EXPECT_EQ( delimitedString( { "1,1", "1,999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60", "2,9999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60" } ), mtr_strm->str() );
+	compareMTRStream( delimitedString( { "1,1", "1,999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60", "2,9999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -619,11 +569,9 @@ TEST_F( SQLiteFixture, reportSMMeters )
 	NumEnergyMeters = 0;
 }
 
-TEST_F( SQLiteFixture, writeTimeStampFormatData )
+TEST_F( OutputProcessorFixture, writeTimeStampFormatData )
 {
-	ShowMessage( "Begin Test: OutputProcessor, writeTimeStampFormatData" );
-
-	std::unique_ptr<std::ostringstream> mtr_stream(new std::ostringstream);
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeTimeStampFormatData" );
 
 	int TimeStepStampReportNbr = 1;
 	std::string TimeStepStampReportChr = "1";
@@ -648,55 +596,36 @@ TEST_F( SQLiteFixture, writeTimeStampFormatData )
 	int DSTIndicator = 0;
 	int CurDayType = 10;
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	// TSMeter
+	functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportTimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
+		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) ) );
+	compareMTRStream( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) );
 
 	// TSMeter
-	WriteTimeStampFormatData( mtr_stream.get(), ReportTimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
-		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, 
-		StartMinute, DSTIndicator, DayTypes( CurDayType ) );
-
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ), mtr_stream->str() );
-	mtr_stream->str(std::string());
-
-	// TSMeter
-	WriteTimeStampFormatData( mtr_stream.get(), ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
-		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, 
-		StartMinute, DSTIndicator, DayTypes( CurDayType ) );
-
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ), mtr_stream->str() );
-	mtr_stream->str(std::string());
+	functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
+		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) ) );
+	compareMTRStream( delimitedString( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) );
 
 	// HRMeter
-	WriteTimeStampFormatData( mtr_stream.get(), ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
-		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
-
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay" } ), mtr_stream->str() );
-	mtr_stream->str(std::string());
+	functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
+		DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) ) );
+	compareMTRStream( delimitedString( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay" } ) );
 
 	// DYMeter
-	WriteTimeStampFormatData( mtr_stream.get(), ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, 
-		PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
-
-	EXPECT_EQ( delimitedString( { "1,1,12,21, 0,WinterDesignDay" } ), mtr_stream->str() );
-	mtr_stream->str(std::string());
+	functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, 
+		PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) ) );
+	compareMTRStream( delimitedString( { "1,1,12,21, 0,WinterDesignDay" } ) );
 
 	// MNMeter
-	WriteTimeStampFormatData( mtr_stream.get(), ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, 
-		PrintTimeStamp, Month );
-
-	EXPECT_EQ( delimitedString( { "1,1,12" } ), mtr_stream->str() );
-	mtr_stream->str(std::string());
+	functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, _, _, _, _, _, _ ) );
+	compareMTRStream( delimitedString( { "1,1,12" } ) );
 
 	// SMMeter
-	WriteTimeStampFormatData( mtr_stream.get(), ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp );
-
-	EXPECT_EQ( delimitedString( { "1,1" } ), mtr_stream->str() );
-	mtr_stream->str(std::string());
+	functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ ) );
+	compareMTRStream( delimitedString( { "1,1" } ) );
 
 	// Bad input
-	WriteTimeStampFormatData( mtr_stream.get(), 999, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp );
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, 999, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ ) );
 
 	EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to WriteTimeStampFormatData: 999\n", ss->str());
 	ss->str(std::string());
@@ -721,90 +650,60 @@ TEST_F( SQLiteFixture, writeTimeStampFormatData )
 
 }
 
-TEST_F( SQLiteFixture, writeReportMeterData )
+TEST_F( OutputProcessorFixture, writeReportMeterData )
 {
-	ShowMessage( "Begin Test: OutputProcessor, writeReportMeterData" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeReportMeterData" );
 
 	DataGlobals::MinutesPerTimeStep = 10;
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 999.9, ReportTimeStep, 0.0, 0, 0.0, 0, false ) );
+	compareMTRStream( delimitedString( { "1,999.9" } ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteReportMeterData( 1, "1", 999.9, ReportTimeStep, 0.0, 0, 0.0, 0, false );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 999.9, ReportEach, 0.0, 0, 0.0, 0, false ) );
+	compareMTRStream( delimitedString( { "1,999.9" } ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteReportMeterData( 1, "1", 999.9, ReportEach, 0.0, 0, 0.0, 0, false );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027" } ) );
+	compareESOStream( delimitedString( { "1,616771620.987027" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) );
 
-	WriteReportMeterData( 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-
-	WriteReportMeterData( 1, "1", 0, ReportTimeStep, 0.0, 0, 0.0, 0, false );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 0, ReportTimeStep, 0.0, 0, 0.0, 0, false ) );
+	compareMTRStream( delimitedString( { "1,0.0" } ) );
+	compareESOStream( delimitedString( { "1,0.0" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -852,73 +751,51 @@ TEST_F( SQLiteFixture, writeReportMeterData )
 
 }
 
-TEST_F( SQLiteFixture, writeReportRealData )
+TEST_F( OutputProcessorFixture, writeReportRealData )
 {
-	ShowMessage( "Begin Test: OutputProcessor, writeReportRealData" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeReportRealData" );
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteReportRealData( 1, "1", 999.9, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, 2, 1, ReportEach, 0.0, 0, 0.0, 0 ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteReportRealData( 1, "1", 999.9, 2, 1, ReportEach, 0.0, 0, 0.0, 0 );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, 2, 1, ReportHourly, 0.0, 0, 0.0, 0 ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteReportRealData( 1, "1", 999.9, 2, 1, ReportHourly, 0.0, 0, 0.0, 0 );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) );
 
-	WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
-
-	WriteReportRealData( 1, "1", 0, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
-	eso_strm->str(std::string());
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
-
+	functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 0, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 ) );
+	compareESOStream( delimitedString( { "1,0.0" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -964,72 +841,51 @@ TEST_F( SQLiteFixture, writeReportRealData )
 
 }
 
-TEST_F( SQLiteFixture, writeReportIntegerData )
+TEST_F( OutputProcessorFixture, writeReportIntegerData )
 {
-	ShowMessage( "Begin Test: OutputProcessor, writeReportIntegerData" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeReportIntegerData" );
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, 2, 1, ReportTimeStep, 0, 0, 0, 0 ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportTimeStep, 0, 0, 0, 0 );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, 2, 1, ReportEach, 0, 0, 0, 0 ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportEach, 0, 0, 0, 0 );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, 2, 1, ReportHourly, 0, 0, 0, 0 ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportHourly, 0, 0, 0, 0 );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136, 12210110, 4283196, 12212460 ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136, 1,10,4283196,24,60" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136, 1,10,4283196,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136, 12210110, 4283196, 12212460 ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136,21, 1,10,4283196,21,24,60" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136,21, 1,10,4283196,21,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136, 12210110, 4283196, 12212460 ) );
+	compareESOStream( delimitedString( { "1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 0, 0, 0, 0 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 1, 10, ReportEach, 0, 0, 0, 0 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportEach, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 1, 10, ReportHourly, 0, 0, 0, 0 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportHourly, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136, 12210110, 4283196, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027,4283136, 1,10,4283196,24,60" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136, 1,10,4283196,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136, 12210110, 4283196, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027,4283136,21, 1,10,4283196,21,24,60" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136,21, 1,10,4283196,21,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136, 12210110, 4283196, 12212460 ) );
+	compareESOStream( delimitedString( { "1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ) );
 
-	WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136, 12210110, 4283196, 12212460 );
-	EXPECT_EQ( delimitedString( { "1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ), eso_strm->str() );
-	eso_strm->str(std::string());
-
-	WriteReportIntegerData( 1, "1", 0, 2, 1, ReportTimeStep, 0, 0, 0, 0 );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
-	eso_strm->str(std::string());
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 0, 2, 1, ReportTimeStep, 0, 0, 0, 0 ) );
+	compareESOStream( delimitedString( { "1,0.0" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -1075,56 +931,39 @@ TEST_F( SQLiteFixture, writeReportIntegerData )
 
 }
 
-TEST_F( SQLiteFixture, writeIntegerData )
+TEST_F( OutputProcessorFixture, writeIntegerData )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, writeIntegerData" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeIntegerData" );
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", 999, _ ) );
+	compareESOStream( delimitedString( { "1,999" } ) );
 
-	WriteIntegerData( 1, "1", 999 );
-	EXPECT_EQ( delimitedString( { "1,999" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", 0, _ ) );
+	compareESOStream( delimitedString( { "1,0" } ) );
 
-	WriteIntegerData( 1, "1", 0 );
-	EXPECT_EQ( delimitedString( { "1,0" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", -999, _ ) );
+	compareESOStream( delimitedString( { "1,-999" } ) );
 
-	WriteIntegerData( 1, "1", -999 );
-	EXPECT_EQ( delimitedString( { "1,-999" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", _, 999.9 ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteIntegerData( 1, "1", _, 999.9 );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", _, 0.0) );
+	compareESOStream( delimitedString( { "1,0.0" } ) );
 
-	WriteIntegerData( 1, "1", _, 0.0 );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", _, -999.9 ) );
+	compareESOStream( delimitedString( { "1,-999.9" } ) );
 
-	WriteIntegerData( 1, "1", _, -999.9 );
-	EXPECT_EQ( delimitedString( { "1,-999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", 999, 999.9 ) );
+	compareESOStream( delimitedString( { "1,999.9" } ) );
 
-	WriteIntegerData( 1, "1", 999, 999.9 );
-	EXPECT_EQ( delimitedString( { "1,999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", 0, 0.0) );
+	compareESOStream( delimitedString( { "1,0.0" } ) );
 
-	WriteIntegerData( 1, "1", 0, 0.0 );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
-	eso_strm->str(std::string());
-
-	WriteIntegerData( 1, "1", -999, -999.9 );
-	EXPECT_EQ( delimitedString( { "1,-999.9" } ), eso_strm->str() );
-	eso_strm->str(std::string());
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", -999, -999.9 ) );
+	compareESOStream( delimitedString( { "1,-999.9" } ) );
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -1154,9 +993,9 @@ TEST_F( SQLiteFixture, writeIntegerData )
 
 }
 
-TEST_F( SQLiteFixture, getStandardMeterResourceType )
+TEST_F( OutputProcessorFixture, getStandardMeterResourceType )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, getStandardMeterResourceType" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, getStandardMeterResourceType" );
 
 	std::map< std::string, std::string > const resource_map = {
 		{ "ELECTRICITY", "Electricity" },
@@ -1257,9 +1096,9 @@ TEST_F( SQLiteFixture, getStandardMeterResourceType )
 
 }
 
-TEST( OutputProcessor, determineIndexGroupKeyFromMeterName )
+TEST_F( OutputProcessorFixture, determineIndexGroupKeyFromMeterName )
 {
-	ShowMessage( "Begin Test: OutputProcessor, determineIndexGroupKeyFromMeterName" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, determineIndexGroupKeyFromMeterName" );
 
 	std::map< std::string, int > const resource_map = {
 		{ "Electricity:Facility", 100 },
@@ -1280,9 +1119,9 @@ TEST( OutputProcessor, determineIndexGroupKeyFromMeterName )
 	}
 }
 
-TEST_F( SQLiteFixture, validateIndexType )
+TEST_F( OutputProcessorFixture, validateIndexType )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, validateIndexType" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, validateIndexType" );
 
 	std::map< std::string, int > const resource_map = {
 		{ "ZONE", 1 },
@@ -1303,9 +1142,9 @@ TEST_F( SQLiteFixture, validateIndexType )
 
 }
 
-TEST( OutputProcessor, standardIndexTypeKey )
+TEST_F( OutputProcessorFixture, standardIndexTypeKey )
 {
-	ShowMessage( "Begin Test: OutputProcessor, standardIndexTypeKey" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, standardIndexTypeKey" );
 
 	EXPECT_EQ( "Zone", StandardIndexTypeKey( 1 ) );
 	EXPECT_EQ( "HVAC", StandardIndexTypeKey( 2 ) );
@@ -1315,9 +1154,9 @@ TEST( OutputProcessor, standardIndexTypeKey )
 
 }
 
-TEST_F( SQLiteFixture, validateVariableType )
+TEST_F( OutputProcessorFixture, validateVariableType )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, validateVariableType" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, validateVariableType" );
 
 	std::map< std::string, int > const resource_map = {
 		{ "STATE", 1 },
@@ -1335,11 +1174,10 @@ TEST_F( SQLiteFixture, validateVariableType )
 
 	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
-	auto const variableTypeKey = "BAD INPUT";
+	std::string const variableTypeKey = "BAD INPUT";
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-	auto index = ValidateVariableType( variableTypeKey );
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	auto index = functionUsingSQLite( std::bind( ValidateVariableType, variableTypeKey ) );
+	// auto index = functionUsingSQLite<int>( std::bind( ValidateVariableType, variableTypeKey ) );
 
 	EXPECT_EQ( 0, index );
 
@@ -1351,9 +1189,9 @@ TEST_F( SQLiteFixture, validateVariableType )
 
 }
 
-TEST( OutputProcessor, standardVariableTypeKey )
+TEST_F( OutputProcessorFixture, standardVariableTypeKey )
 {
-	ShowMessage( "Begin Test: OutputProcessor, standardVariableTypeKey" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, standardVariableTypeKey" );
 
 	EXPECT_EQ( "Average", StandardVariableTypeKey( 1 ) );
 	EXPECT_EQ( "Sum", StandardVariableTypeKey( 2 ) );
@@ -1363,9 +1201,9 @@ TEST( OutputProcessor, standardVariableTypeKey )
 
 }
 
-TEST_F(  SQLiteFixture, determineMeterIPUnits ) 
+TEST_F(  OutputProcessorFixture, determineMeterIPUnits ) 
 {
-	ShowMessage( "Begin Test: SQLiteFixture, determineMeterIPUnits" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, determineMeterIPUnits" );
 
 	int ipUnits = -999999;
 	bool errorFound = false;
@@ -1424,9 +1262,9 @@ TEST_F(  SQLiteFixture, determineMeterIPUnits )
 
 }
 
-TEST( OutputProcessor, dateToStringWithMonth )
+TEST_F( OutputProcessorFixture, dateToStringWithMonth )
 {
-	ShowMessage( "Begin Test: OutputProcessor, dateToStringWithMonth" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, dateToStringWithMonth" );
 
 	EXPECT_EQ( "01-JAN-00:01", DateToStringWithMonth( 1010101 ) );
 	EXPECT_EQ( "01-JAN-00:00", DateToStringWithMonth( 1010100 ) );
@@ -1457,179 +1295,121 @@ TEST( OutputProcessor, dateToStringWithMonth )
 
 }
 
-TEST_F( SQLiteFixture, writeMeterDictionaryItem )
+TEST_F( OutputProcessorFixture, writeMeterDictionaryItem )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, writeMeterDictionaryItem" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeMeterDictionaryItem" );
 
 	InitializeOutput();
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 1, -999, "indexGroup", "1", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "1,1,meterName [meterUnits] !TimeStep" } ) );
+	compareESOStream( delimitedString( { "1,1,meterName [meterUnits] !TimeStep" } ) );
 
-	WriteMeterDictionaryItem( ReportTimeStep, 1, 1, -999, "indexGroup", "1", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "1,1,meterName [meterUnits] !TimeStep" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,1,meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 2, 2, -999, "indexGroup", "2", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "2,1,meterName [meterUnits] !TimeStep" } ) );
+	compareESOStream( delimitedString( { "2,1,meterName [meterUnits] !TimeStep" } ) );
 
-	WriteMeterDictionaryItem( ReportTimeStep, 2, 2, -999, "indexGroup", "2", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "2,1,meterName [meterUnits] !TimeStep" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "2,1,meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 3, -999, "indexGroup", "3", "meterName", "meterUnits", true, false ) );
+	compareMTRStream( delimitedString( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ) );
+	compareESOStream( delimitedString( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ) );
 
-	WriteMeterDictionaryItem( ReportTimeStep, 1, 3, -999, "indexGroup", "3", "meterName", "meterUnits", true, false );
-	EXPECT_EQ( delimitedString( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 4, -999, "indexGroup", "4", "meterName", "meterUnits", false, true ) );
+	compareMTRStream( delimitedString( { "4,1,meterName [meterUnits] !TimeStep" } ) );
 
-	WriteMeterDictionaryItem( ReportTimeStep, 1, 4, -999, "indexGroup", "4", "meterName", "meterUnits", false, true );
-	EXPECT_EQ( delimitedString( { "4,1,meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 5, -999, "indexGroup", "5", "meterName", "meterUnits", true, true ) );
+	compareMTRStream( delimitedString( { "5,1,Cumulative meterName [meterUnits] !TimeStep" } ) );
 
-	WriteMeterDictionaryItem( ReportTimeStep, 1, 5, -999, "indexGroup", "5", "meterName", "meterUnits", true, true );
-	EXPECT_EQ( delimitedString( { "5,1,Cumulative meterName [meterUnits] !TimeStep" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 6, -999, "indexGroup", "6", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "6,1,meterName [meterUnits] !Each Call" } ) );
+	compareESOStream( delimitedString( { "6,1,meterName [meterUnits] !Each Call" } ) );
 
-	WriteMeterDictionaryItem( ReportEach, 1, 6, -999, "indexGroup", "6", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "6,1,meterName [meterUnits] !Each Call" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "6,1,meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 2, 7, -999, "indexGroup", "7", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "7,1,meterName [meterUnits] !Each Call" } ) );
+	compareESOStream( delimitedString( { "7,1,meterName [meterUnits] !Each Call" } ) );
 
-	WriteMeterDictionaryItem( ReportEach, 2, 7, -999, "indexGroup", "7", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "7,1,meterName [meterUnits] !Each Call" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "7,1,meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 8, -999, "indexGroup", "8", "meterName", "meterUnits", true, false ) );
+	compareMTRStream( delimitedString( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ) );
+	compareESOStream( delimitedString( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ) );
 
-	WriteMeterDictionaryItem( ReportEach, 1, 8, -999, "indexGroup", "8", "meterName", "meterUnits", true, false );
-	EXPECT_EQ( delimitedString( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 9, -999, "indexGroup", "9", "meterName", "meterUnits", false, true ) );
+	compareMTRStream( delimitedString( { "9,1,meterName [meterUnits] !Each Call" } ) );
 
-	WriteMeterDictionaryItem( ReportEach, 1, 9, -999, "indexGroup", "9", "meterName", "meterUnits", false, true );
-	EXPECT_EQ( delimitedString( { "9,1,meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 10, -999, "indexGroup", "10", "meterName", "meterUnits", true, true ) );
+	compareMTRStream( delimitedString( { "10,1,Cumulative meterName [meterUnits] !Each Call" } ) );
 
-	WriteMeterDictionaryItem( ReportEach, 1, 10, -999, "indexGroup", "10", "meterName", "meterUnits", true, true );
-	EXPECT_EQ( delimitedString( { "10,1,Cumulative meterName [meterUnits] !Each Call" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 11, -999, "indexGroup", "11", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "11,1,meterName [meterUnits] !Hourly" } ) );
+	compareESOStream( delimitedString( { "11,1,meterName [meterUnits] !Hourly" } ) );
 
-	WriteMeterDictionaryItem( ReportHourly, 1, 11, -999, "indexGroup", "11", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "11,1,meterName [meterUnits] !Hourly" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "11,1,meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 2, 12, -999, "indexGroup", "12", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "12,1,meterName [meterUnits] !Hourly" } ) );
+	compareESOStream( delimitedString( { "12,1,meterName [meterUnits] !Hourly" } ) );
 
-	WriteMeterDictionaryItem( ReportHourly, 2, 12, -999, "indexGroup", "12", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "12,1,meterName [meterUnits] !Hourly" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "12,1,meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 13, -999, "indexGroup", "13", "meterName", "meterUnits", true, false ) );
+	compareMTRStream( delimitedString( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ) );
+	compareESOStream( delimitedString( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ) );
 
-	WriteMeterDictionaryItem( ReportHourly, 1, 13, -999, "indexGroup", "13", "meterName", "meterUnits", true, false );
-	EXPECT_EQ( delimitedString( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 14, -999, "indexGroup", "14", "meterName", "meterUnits", false, true ) );
+	compareMTRStream( delimitedString( { "14,1,meterName [meterUnits] !Hourly" } ) );
 
-	WriteMeterDictionaryItem( ReportHourly, 1, 14, -999, "indexGroup", "14", "meterName", "meterUnits", false, true );
-	EXPECT_EQ( delimitedString( { "14,1,meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 15, -999, "indexGroup", "15", "meterName", "meterUnits", true, true ) );
+	compareMTRStream( delimitedString( { "15,1,Cumulative meterName [meterUnits] !Hourly" } ) );
 
-	WriteMeterDictionaryItem( ReportHourly, 1, 15, -999, "indexGroup", "15", "meterName", "meterUnits", true, true );
-	EXPECT_EQ( delimitedString( { "15,1,Cumulative meterName [meterUnits] !Hourly" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 16, -999, "indexGroup", "16", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
+	compareESOStream( delimitedString( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportDaily, 1, 16, -999, "indexGroup", "16", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 2, 17, -999, "indexGroup", "17", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
+	compareESOStream( delimitedString( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportDaily, 2, 17, -999, "indexGroup", "17", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 18, -999, "indexGroup", "18", "meterName", "meterUnits", true, false ) );
+	compareMTRStream( delimitedString( { "18,1,Cumulative meterName [meterUnits] !Daily " } ) );
+	compareESOStream( delimitedString( { "18,1,Cumulative meterName [meterUnits] !Daily " } ) );
 
-	WriteMeterDictionaryItem( ReportDaily, 1, 18, -999, "indexGroup", "18", "meterName", "meterUnits", true, false );
-	EXPECT_EQ( delimitedString( { "18,1,Cumulative meterName [meterUnits] !Daily " } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "18,1,Cumulative meterName [meterUnits] !Daily " } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 19, -999, "indexGroup", "19", "meterName", "meterUnits", false, true ) );
+	compareMTRStream( delimitedString( { "19,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportDaily, 1, 19, -999, "indexGroup", "19", "meterName", "meterUnits", false, true );
-	EXPECT_EQ( delimitedString( { "19,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 20, -999, "indexGroup", "20", "meterName", "meterUnits", true, true ) );
+	compareMTRStream( delimitedString( { "20,1,Cumulative meterName [meterUnits] !Daily " } ) );
 
-	WriteMeterDictionaryItem( ReportDaily, 1, 20, -999, "indexGroup", "20", "meterName", "meterUnits", true, true );
-	EXPECT_EQ( delimitedString( { "20,1,Cumulative meterName [meterUnits] !Daily " } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 21, -999, "indexGroup", "21", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
+	compareESOStream( delimitedString( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportMonthly, 1, 21, -999, "indexGroup", "21", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 2, 22, -999, "indexGroup", "22", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
+	compareESOStream( delimitedString( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportMonthly, 2, 22, -999, "indexGroup", "22", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 23, -999, "indexGroup", "23", "meterName", "meterUnits", true, false ) );
+	compareMTRStream( delimitedString( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ) );
+	compareESOStream( delimitedString( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ) );
 
-	WriteMeterDictionaryItem( ReportMonthly, 1, 23, -999, "indexGroup", "23", "meterName", "meterUnits", true, false );
-	EXPECT_EQ( delimitedString( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 24, -999, "indexGroup", "24", "meterName", "meterUnits", false, true ) );
+	compareMTRStream( delimitedString( { "24,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportMonthly, 1, 24, -999, "indexGroup", "24", "meterName", "meterUnits", false, true );
-	EXPECT_EQ( delimitedString( { "24,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 25, -999, "indexGroup", "25", "meterName", "meterUnits", true, true ) );
+	compareMTRStream( delimitedString( { "25,1,Cumulative meterName [meterUnits] !Monthly " } ) );
 
-	WriteMeterDictionaryItem( ReportMonthly, 1, 25, -999, "indexGroup", "25", "meterName", "meterUnits", true, true );
-	EXPECT_EQ( delimitedString( { "25,1,Cumulative meterName [meterUnits] !Monthly " } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 26, -999, "indexGroup", "26", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
+	compareESOStream( delimitedString( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportSim, 1, 26, -999, "indexGroup", "26", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 2, 27, -999, "indexGroup", "27", "meterName", "meterUnits", false, false ) );
+	compareMTRStream( delimitedString( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
+	compareESOStream( delimitedString( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportSim, 2, 27, -999, "indexGroup", "27", "meterName", "meterUnits", false, false );
-	EXPECT_EQ( delimitedString( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 28, -999, "indexGroup", "28", "meterName", "meterUnits", true, false ) );
+	compareMTRStream( delimitedString( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ) );
+	compareESOStream( delimitedString( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ) );
 
-	WriteMeterDictionaryItem( ReportSim, 1, 28, -999, "indexGroup", "28", "meterName", "meterUnits", true, false );
-	EXPECT_EQ( delimitedString( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 29, -999, "indexGroup", "29", "meterName", "meterUnits", false, true ) );
+	compareMTRStream( delimitedString( { "29,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
 
-	WriteMeterDictionaryItem( ReportSim, 1, 29, -999, "indexGroup", "29", "meterName", "meterUnits", false, true );
-	EXPECT_EQ( delimitedString( { "29,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-
-	WriteMeterDictionaryItem( ReportSim, 1, 30, -999, "indexGroup", "30", "meterName", "meterUnits", true, true );
-	EXPECT_EQ( delimitedString( { "30,1,Cumulative meterName [meterUnits] !RunPeriod " } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 30, -999, "indexGroup", "30", "meterName", "meterUnits", true, true ) );
+	compareMTRStream( delimitedString( { "30,1,Cumulative meterName [meterUnits] !RunPeriod " } ) );
 
 	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -1681,181 +1461,143 @@ TEST_F( SQLiteFixture, writeMeterDictionaryItem )
 
 }
 
-TEST_F( SQLiteFixture, writeReportVariableDictionaryItem )
+TEST_F( OutputProcessorFixture, writeReportVariableDictionaryItem )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, writeReportVariableDictionaryItem" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeReportVariableDictionaryItem" );
 
 	InitializeOutput();
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+	compareESOStream( delimitedString( { "1,1,keyedValue,variableName [variableUnits] !TimeStep" } ) );
 
-	WriteReportVariableDictionaryItem( ReportTimeStep, 1, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, "variableUnits" );
-	EXPECT_EQ( delimitedString( { "1,1,keyedValue,variableName [variableUnits] !TimeStep" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 2, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+	compareESOStream( delimitedString( { "2,1,keyedValue,variableName [variableUnits] !TimeStep" } ) );
 
-	WriteReportVariableDictionaryItem( ReportTimeStep, 2, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, "variableUnits" );
-	EXPECT_EQ( delimitedString( { "2,1,keyedValue,variableName [variableUnits] !TimeStep" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
+	compareESOStream( delimitedString( { "3,1,keyedValue,variableName [variableUnits] !TimeStep,scheduleName" } ) );
 
-	WriteReportVariableDictionaryItem( ReportTimeStep, 1, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
-	EXPECT_EQ( delimitedString( { "3,1,keyedValue,variableName [variableUnits] !TimeStep,scheduleName" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, "variableUnits", _ ) );
+	compareESOStream( delimitedString( { "4,1,keyedValue,variableName [variableUnits] !TimeStep" } ) );
 
-	WriteReportVariableDictionaryItem( ReportTimeStep, 1, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, "variableUnits" );
-	EXPECT_EQ( delimitedString( { "4,1,keyedValue,variableName [variableUnits] !TimeStep" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, "variableUnits", _ ) );
+	compareESOStream( delimitedString( { "5,1,keyedValue,variableName [variableUnits] !TimeStep" } ) );
 
-	WriteReportVariableDictionaryItem( ReportTimeStep, 1, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, "variableUnits" );
-	EXPECT_EQ( delimitedString( { "5,1,keyedValue,variableName [variableUnits] !TimeStep" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+	compareESOStream( delimitedString( { "6,1,keyedValue,variableName [variableUnits] !Each Call" } ) );
 
-	WriteReportVariableDictionaryItem( ReportEach, 1, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, "variableUnits" );
-	EXPECT_EQ( delimitedString( { "6,1,keyedValue,variableName [variableUnits] !Each Call" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 2, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+	compareESOStream( delimitedString( { "7,1,keyedValue,variableName [variableUnits] !Each Call" } ) );
 
-	WriteReportVariableDictionaryItem( ReportEach, 2, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, "variableUnits" );
-	EXPECT_EQ( delimitedString( { "7,1,keyedValue,variableName [variableUnits] !Each Call" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
+	compareESOStream( delimitedString( { "8,1,keyedValue,variableName [variableUnits] !Each Call,scheduleName" } ) );
 
-	WriteReportVariableDictionaryItem( ReportEach, 1, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
-	EXPECT_EQ( delimitedString( { "8,1,keyedValue,variableName [variableUnits] !Each Call,scheduleName" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, "variableUnits", _ ) );
+	compareESOStream( delimitedString( { "9,1,keyedValue,variableName [variableUnits] !Each Call" } ) );
 
-	WriteReportVariableDictionaryItem( ReportEach, 1, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, "variableUnits" );
-	EXPECT_EQ( delimitedString( { "9,1,keyedValue,variableName [variableUnits] !Each Call" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, "variableUnits", _ ) );
+	compareESOStream( delimitedString( { "10,1,keyedValue,variableName [variableUnits] !Each Call" } ) );
 
-	WriteReportVariableDictionaryItem( ReportEach, 1, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, "variableUnits" );
-	EXPECT_EQ( delimitedString( { "10,1,keyedValue,variableName [variableUnits] !Each Call" } ), eso_strm->str() );
-	eso_strm->str(std::string());
-
-	WriteReportVariableDictionaryItem( ReportHourly, 1, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingHourlyVariables );
 	TrackingHourlyVariables = false;
-	EXPECT_EQ( delimitedString( { "11,1,keyedValue,variableName [variableUnits] !Hourly" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "11,1,keyedValue,variableName [variableUnits] !Hourly" } ) );
 
-	WriteReportVariableDictionaryItem( ReportHourly, 2, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 2, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingHourlyVariables );
 	TrackingHourlyVariables = false;
-	EXPECT_EQ( delimitedString( { "12,1,keyedValue,variableName [variableUnits] !Hourly" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "12,1,keyedValue,variableName [variableUnits] !Hourly" } ) );
 
-	WriteReportVariableDictionaryItem( ReportHourly, 1, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
 	EXPECT_TRUE( TrackingHourlyVariables );
 	TrackingHourlyVariables = false;
-	EXPECT_EQ( delimitedString( { "13,1,keyedValue,variableName [variableUnits] !Hourly,scheduleName" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "13,1,keyedValue,variableName [variableUnits] !Hourly,scheduleName" } ) );
 
-	WriteReportVariableDictionaryItem( ReportHourly, 1, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingHourlyVariables );
 	TrackingHourlyVariables = false;
-	EXPECT_EQ( delimitedString( { "14,1,keyedValue,variableName [variableUnits] !Hourly" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "14,1,keyedValue,variableName [variableUnits] !Hourly" } ) );
 
-	WriteReportVariableDictionaryItem( ReportHourly, 1, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingHourlyVariables );
 	TrackingHourlyVariables = false;
-	EXPECT_EQ( delimitedString( { "15,1,keyedValue,variableName [variableUnits] !Hourly" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "15,1,keyedValue,variableName [variableUnits] !Hourly" } ) );
 
-	WriteReportVariableDictionaryItem( ReportDaily, 1, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingDailyVariables );
 	TrackingDailyVariables = false;
-	EXPECT_EQ( delimitedString( { "16,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "16,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportDaily, 2, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 2, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingDailyVariables );
 	TrackingDailyVariables = false;
-	EXPECT_EQ( delimitedString( { "17,7,keyedValue,variableName [variableUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "17,7,keyedValue,variableName [variableUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportDaily, 1, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
 	EXPECT_TRUE( TrackingDailyVariables );
 	TrackingDailyVariables = false;
-	EXPECT_EQ( delimitedString( { "18,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "18,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName" } ) );
 
-	WriteReportVariableDictionaryItem( ReportDaily, 1, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingDailyVariables );
 	TrackingDailyVariables = false;
-	EXPECT_EQ( delimitedString( { "19,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "19,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportDaily, 1, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingDailyVariables );
 	TrackingDailyVariables = false;
-	EXPECT_EQ( delimitedString( { "20,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "20,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportMonthly, 1, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingMonthlyVariables );
 	TrackingMonthlyVariables = false;
-	EXPECT_EQ( delimitedString( { "21,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "21,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportMonthly, 2, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 2, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingMonthlyVariables );
 	TrackingMonthlyVariables = false;
-	EXPECT_EQ( delimitedString( { "22,9,keyedValue,variableName [variableUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "22,9,keyedValue,variableName [variableUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportMonthly, 1, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
 	EXPECT_TRUE( TrackingMonthlyVariables );
 	TrackingMonthlyVariables = false;
-	EXPECT_EQ( delimitedString( { "23,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "23,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName" } ) );
 
-	WriteReportVariableDictionaryItem( ReportMonthly, 1, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingMonthlyVariables );
 	TrackingMonthlyVariables = false;
-	EXPECT_EQ( delimitedString( { "24,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "24,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportMonthly, 1, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingMonthlyVariables );
 	TrackingMonthlyVariables = false;
-	EXPECT_EQ( delimitedString( { "25,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "25,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportSim, 1, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingRunPeriodVariables );
 	TrackingRunPeriodVariables = false;
-	EXPECT_EQ( delimitedString( { "26,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "26,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportSim, 2, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 2, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingRunPeriodVariables );
 	TrackingRunPeriodVariables = false;
-	EXPECT_EQ( delimitedString( { "27,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "27,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportSim, 1, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
 	EXPECT_TRUE( TrackingRunPeriodVariables );
 	TrackingRunPeriodVariables = false;
-	EXPECT_EQ( delimitedString( { "28,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "28,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName" } ) );
 
-	WriteReportVariableDictionaryItem( ReportSim, 1, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingRunPeriodVariables );
 	TrackingRunPeriodVariables = false;
-	EXPECT_EQ( delimitedString( { "29,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "29,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
 
-	WriteReportVariableDictionaryItem( ReportSim, 1, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, "variableUnits" );
+	functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, "variableUnits", _ ) );
 	EXPECT_TRUE( TrackingRunPeriodVariables );
 	TrackingRunPeriodVariables = false;
-	EXPECT_EQ( delimitedString( { "30,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ), eso_strm->str() );
-	eso_strm->str(std::string());
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	compareESOStream( delimitedString( { "30,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) );
 
 	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -1907,42 +1649,26 @@ TEST_F( SQLiteFixture, writeReportVariableDictionaryItem )
 
 }
 
-TEST_F( SQLiteFixture, writeCumulativeReportMeterData )
+TEST_F( OutputProcessorFixture, writeCumulativeReportMeterData )
 {
-	ShowMessage( "Begin Test: OutputProcessor, writeCumulativeReportMeterData" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
-	DataGlobals::mtr_stream = mtr_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeCumulativeReportMeterData" );
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, true ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027" } ) );
 
-	WriteCumulativeReportMeterData( 1, "1", 616771620.98702729, true );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, false ) );
+	compareMTRStream( delimitedString( { "1,616771620.987027" } ) );
+	compareESOStream( delimitedString( { "1,616771620.987027" } ) );
 
-	WriteCumulativeReportMeterData( 1, "1", 616771620.98702729, false );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,616771620.987027" } ), mtr_strm->str() );
-	eso_strm->str(std::string());
-	mtr_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 0, true ) );
+	compareMTRStream( delimitedString( { "1,0.0" } ) );
 
-	WriteCumulativeReportMeterData( 1, "1", 0, true );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), mtr_strm->str() );
-	mtr_strm->str(std::string());
-
-	WriteCumulativeReportMeterData( 1, "1", 0, false );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), mtr_strm->str() );
-	eso_strm->str(std::string());
-	mtr_strm->str(std::string());
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 0, false ) );
+	compareMTRStream( delimitedString( { "1,0.0" } ) );
+	compareESOStream( delimitedString( { "1,0.0" } ) );
 
 	auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -1961,269 +1687,219 @@ TEST_F( SQLiteFixture, writeCumulativeReportMeterData )
 
 }
 
-TEST_F( SQLiteFixture, writeRealData )
+TEST_F( OutputProcessorFixture, writeRealData )
 {
-	ShowMessage( "Begin Test: OutputProcessor, writeRealData" );
-
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-
-	DataGlobals::eso_stream = eso_strm.get();
+	ShowMessage( "Begin Test: OutputProcessorFixture, writeRealData" );
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 0 ) );
+	compareESOStream( delimitedString( { "1,0.0" } ) );
 
-	WriteRealData( 1, "1", 0 );
-	EXPECT_EQ( delimitedString( { "1,0.0" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 0.1 ) );
+	compareESOStream( delimitedString( { "1,0.1" } ) );
 
-	WriteRealData( 1, "1", 0.1 );
-	EXPECT_EQ( delimitedString( { "1,0.1" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", -0.1 ) );
+	compareESOStream( delimitedString( { "1,-0.1" } ) );
 
-	WriteRealData( 1, "1", -0.1 );
-	EXPECT_EQ( delimitedString( { "1,-0.1" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
-	eso_strm->str(std::string());
-
-	WriteRealData( 1, "1", 1.0e-2 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-2 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-002" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-002" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-02" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-02" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-3 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-3 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-003" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-003" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-03" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-03" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-4 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-4 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-004" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-004" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-04" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-04" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-5 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-5 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-005" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-005" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-05" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-05" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-6 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-6 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-006" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-006" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-06" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-06" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-7 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-7 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-007" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-007" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-07" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-07" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-8 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-8 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-008" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-008" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-08" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-08" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-9 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-9 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-009" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-009" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-09" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-09" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-10 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-10 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-010" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-010" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-10" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-10" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-11 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-11 ) );
 	// this seems to always be low... not 1.0e-11
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,9.999999999999999E-012" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,9.999999999999999E-012" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,9.999999999999999E-12" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,9.999999999999999E-12" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-12 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-12 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-012" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-012" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-12" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-12" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-13 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-13 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-013" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-013" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-13" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-13" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-14 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-14 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-014" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-014" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-14" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-14" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-15 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-15 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-015" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-015" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-15" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-15" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-16 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-16 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-016" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-016" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-16" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-16" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", -1.0e-16 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", -1.0e-16 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E-016" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,-1.000000000000000E-016" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E-16" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,-1.000000000000000E-16" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 1.0e-19 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-19 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-019" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-019" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E-19" } ), eso_strm->str() ) << "This might fail due to floating point, revisit if happens regularly.";
+	compareESOStream( delimitedString( { "1,1.000000000000000E-19" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", 0.5 );
-	EXPECT_EQ( delimitedString( { "1,0.5" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 0.5 ) );
+	compareESOStream( delimitedString( { "1,0.5" } ) );
 
-	WriteRealData( 1, "1", 1.0 );
-	EXPECT_EQ( delimitedString( { "1,1." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0 ) );
+	compareESOStream( delimitedString( { "1,1." } ) );
 
-	WriteRealData( 1, "1", 10.0 );
-	EXPECT_EQ( delimitedString( { "1,10." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 10.0 ) );
+	compareESOStream( delimitedString( { "1,10." } ) );
 
-	WriteRealData( 1, "1", 1.0e2 );
-	EXPECT_EQ( delimitedString( { "1,100." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e2 ) );
+	compareESOStream( delimitedString( { "1,100." } ) );
 
-	WriteRealData( 1, "1", 1.0e3 );
-	EXPECT_EQ( delimitedString( { "1,1000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e3 ) );
+	compareESOStream( delimitedString( { "1,1000." } ) );
 
-	WriteRealData( 1, "1", 1.0e4 );
-	EXPECT_EQ( delimitedString( { "1,10000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e4 ) );
+	compareESOStream( delimitedString( { "1,10000." } ) );
 
-	WriteRealData( 1, "1", 1.0e5 );
-	EXPECT_EQ( delimitedString( { "1,100000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e5 ) );
+	compareESOStream( delimitedString( { "1,100000." } ) );
 
-	WriteRealData( 1, "1", 1.0e6 );
-	EXPECT_EQ( delimitedString( { "1,1000000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e6 ) );
+	compareESOStream( delimitedString( { "1,1000000." } ) );
 
-	WriteRealData( 1, "1", 1.0e7 );
-	EXPECT_EQ( delimitedString( { "1,10000000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e7 ) );
+	compareESOStream( delimitedString( { "1,10000000." } ) );
 
-	WriteRealData( 1, "1", 1.0e8 );
-	EXPECT_EQ( delimitedString( { "1,100000000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e8 ) );
+	compareESOStream( delimitedString( { "1,100000000." } ) );
 
-	WriteRealData( 1, "1", 1.0e9 );
-	EXPECT_EQ( delimitedString( { "1,1000000000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e9 ) );
+	compareESOStream( delimitedString( { "1,1000000000." } ) );
 
-	WriteRealData( 1, "1", 1.0e10 );
-	EXPECT_EQ( delimitedString( { "1,10000000000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e10 ) );
+	compareESOStream( delimitedString( { "1,10000000000." } ) );
 
-	WriteRealData( 1, "1", 1.0e11 );
-	EXPECT_EQ( delimitedString( { "1,100000000000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e11 ) );
+	compareESOStream( delimitedString( { "1,100000000000." } ) );
 
-	WriteRealData( 1, "1", 1.0e12 );
-	EXPECT_EQ( delimitedString( { "1,1000000000000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e12 ) );
+	compareESOStream( delimitedString( { "1,1000000000000." } ) );
 
-	WriteRealData( 1, "1", 1.0e13 );
-	EXPECT_EQ( delimitedString( { "1,10000000000000." } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e13 ) );
+	compareESOStream( delimitedString( { "1,10000000000000." } ) );
 
-	WriteRealData( 1, "1", 1.0e14 );
-	EXPECT_EQ( delimitedString( { "1,100000000000000" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e14 ) );
+	compareESOStream( delimitedString( { "1,100000000000000" } ) );
 
-	WriteRealData( 1, "1", 1.0e15 );
-	EXPECT_EQ( delimitedString( { "1,1000000000000000" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e15 ) );
+	compareESOStream( delimitedString( { "1,1000000000000000" } ) );
 
-	WriteRealData( 1, "1", 1.0e16 );
-	EXPECT_EQ( delimitedString( { "1,10000000000000000" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e16 ) );
+	compareESOStream( delimitedString( { "1,10000000000000000" } ) );
 
-	WriteRealData( 1, "1", 1.0e17 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e17 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+017" } ), eso_strm->str() );
+	compareESOStream( delimitedString( { "1,1.000000000000000E+017" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+17" } ), eso_strm->str() );
+	compareESOStream( delimitedString( { "1,1.000000000000000E+17" } ) );
 #endif
-	eso_strm->str(std::string());
 
-	WriteRealData( 1, "1", -1.0e16 );
-	EXPECT_EQ( delimitedString( { "1,-10000000000000000" } ), eso_strm->str() );
-	eso_strm->str(std::string());
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", -1.0e16 ) );
+	compareESOStream( delimitedString( { "1,-10000000000000000" } ) );
 
-	WriteRealData( 1, "1", -1.0e17 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", -1.0e17 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E+017" } ), eso_strm->str() );
+	compareESOStream( delimitedString( { "1,-1.000000000000000E+017" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,-1.000000000000000E+17" } ), eso_strm->str() );
-#endif	
-	eso_strm->str(std::string());
+	compareESOStream( delimitedString( { "1,-1.000000000000000E+17" } ) );
+#endif
 
-	WriteRealData( 1, "1", 1.0e25 );
+	functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e25 ) );
 #ifdef _WIN32
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+025" } ), eso_strm->str() );
+	compareESOStream( delimitedString( { "1,1.000000000000000E+025" } ) );
 #else
-	EXPECT_EQ( delimitedString( { "1,1.000000000000000E+25" } ), eso_strm->str() );
-#endif	
-	eso_strm->str(std::string());
-
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	compareESOStream( delimitedString( { "1,1.000000000000000E+25" } ) );
+#endif
 
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -2286,9 +1962,9 @@ TEST_F( SQLiteFixture, writeRealData )
 
 }
 
-TEST_F( SQLiteFixture, addMeter )
+TEST_F( OutputProcessorFixture, addMeter )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, addMeter" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, addMeter" );
 
 	auto const name( "testMeter" );
 	auto const units( "J" );
@@ -2334,9 +2010,7 @@ TEST_F( SQLiteFixture, addMeter )
 
 	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-	AddMeter( name2, units2, resourceType2, endUse2, endUseSub2, group2 );
-	sqlite_test = std::move( EnergyPlus::sqlite );
+	functionUsingSQLite( std::bind(AddMeter, name2, units2, resourceType2, endUse2, endUseSub2, group2 ) );
 
 	auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
@@ -2351,9 +2025,9 @@ TEST_F( SQLiteFixture, addMeter )
 	NumEnergyMeters = 0;
 }
 
-TEST_F( SQLiteFixture, validateNStandardizeMeterTitles )
+TEST_F( OutputProcessorFixture, validateNStandardizeMeterTitles )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, validateNStandardizeMeterTitles" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, validateNStandardizeMeterTitles" );
 
 	std::vector< std::vector< std::string > > input_map = {
 		{ "J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "HVAC" },
@@ -2614,9 +2288,9 @@ TEST_F( SQLiteFixture, validateNStandardizeMeterTitles )
 
 }
 
-TEST_F( SQLiteFixture, setupTimePointers )
+TEST_F( OutputProcessorFixture, setupTimePointers )
 {
-	ShowMessage( "Begin Test: SQLiteFixture, setupTimePointers" );
+	ShowMessage( "Begin Test: OutputProcessorFixture, setupTimePointers" );
 
 	TimeValue.allocate( 2 );
 
@@ -2637,47 +2311,33 @@ TEST_F( SQLiteFixture, setupTimePointers )
 	TimeValue.deallocate();
 }
 
-TEST( OutputProcessor, getVariableUnitsString )
+TEST_F( OutputProcessorFixture, getVariableUnitsString )
 {
-	ShowMessage( "Begin Test: OutputProcessor, getVariableUnitsString" );
-
-	// This can be an ofstream as well or any other ostream
-	std::stringstream buffer;
-
-	// Save cout's buffer here
-	std::streambuf *sbuf = std::cout.rdbuf();
-
-	// Redirect cout to our stringstream buffer or any other ostream
-	std::cout.rdbuf(buffer.rdbuf());
-
-	// // Use cout as usual
-	// std::cout << "Hello World";
+	ShowMessage( "Begin Test: OutputProcessorFixture, getVariableUnitsString" );
 
 	EXPECT_EQ( "C", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C]" ) );
 	EXPECT_EQ( "%", GetVariableUnitsString( "Site Outdoor Air Relative Humidity [%]" ) );
 	EXPECT_EQ( "kgWater/kgDryAir", GetVariableUnitsString( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]" ) );
 	EXPECT_EQ( "", GetVariableUnitsString( "Site Daylighting Model Sky Clearness []" ) );
 	EXPECT_EQ( "", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature" ) );
+
 	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ), "" );
 	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ), "" );
 	EXPECT_EQ( "0123456789012345", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ) );
-	// EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ), "" );
 	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ), "" );
 
-	// When done redirect cout to its old self
-	std::cout.rdbuf(sbuf);
 }
 
-// TEST( OutputProcessor, getReportVariableInput )
+// TEST_F( OutputProcessorFixture, getReportVariableInput )
 // {
-// 	ShowMessage( "Begin Test: OutputProcessor, getReportVariableInput" );
+// 	ShowMessage( "Begin Test: OutputProcessorFixture, getReportVariableInput" );
 
 // 	GetReportVariableInput();
 // }
 
-// TEST_F( SQLiteFixture, setupOutputVariable )
+// TEST_F( OutputProcessorFixture, setupOutputVariable )
 // {
-// 	ShowMessage( "Begin Test: SQLiteFixture, setupOutputVariable" );
+// 	ShowMessage( "Begin Test: OutputProcessorFixture, setupOutputVariable" );
 
 // 	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", OutDryBulbTemp, "Zone", "Average", "Environment" );
 
@@ -2689,178 +2349,174 @@ TEST( OutputProcessor, getVariableUnitsString )
 // 	EndUseCategory.deallocate();
 // }
 
-TEST_F( SQLiteFixture, updateDataandReport )
-{
-	ShowMessage( "Begin Test: SQLiteFixture, updateDataandReport" );
+// TEST_F( OutputProcessorFixture, updateDataandReport )
+// {
+// 	ShowMessage( "Begin Test: OutputProcessorFixture, updateDataandReport" );
 
-	std::unique_ptr<std::ostringstream> eso_strm(new std::ostringstream);
-	std::unique_ptr<std::ostringstream> mtr_strm(new std::ostringstream);
+// 	NumEnergyMeters = 10;
+// 	EnergyMeters.allocate( NumEnergyMeters );
+// 	EnergyMeters( 1 ).CurTSValue = 999.9;
+// 	EnergyMeters( 1 ).TSValue = 999.9;
+// 	EnergyMeters( 1 ).RptTS = true;
+// 	EnergyMeters( 1 ).RptAccTS = false;
+// 	EnergyMeters( 1 ).RptTSFO = false;
+// 	EnergyMeters( 1 ).RptAccTSFO = false;
+// 	EnergyMeters( 1 ).TSRptNum = 1;
+// 	EnergyMeters( 1 ).TSRptNumChr = "1";
+// 	EnergyMeters( 1 ).TSAccRptNum = 1;
+// 	EnergyMeters( 1 ).SMValue = 999.9;
 
-	DataGlobals::eso_stream = eso_strm.get();
-	DataGlobals::mtr_stream = mtr_strm.get();
+// 	EnergyMeters( 2 ).CurTSValue = 9999.9;
+// 	EnergyMeters( 2 ).TSValue = 9999.9;
+// 	EnergyMeters( 2 ).RptTS = true;
+// 	EnergyMeters( 2 ).RptAccTS = false;
+// 	EnergyMeters( 2 ).RptTSFO = false;
+// 	EnergyMeters( 2 ).RptAccTSFO = false;
+// 	EnergyMeters( 2 ).TSRptNum = 2;
+// 	EnergyMeters( 2 ).TSRptNumChr = "2";
+// 	EnergyMeters( 2 ).TSAccRptNum = 2;
+// 	EnergyMeters( 2 ).SMValue = 9999.9;
 
-	NumEnergyMeters = 10;
-	EnergyMeters.allocate( NumEnergyMeters );
-	EnergyMeters( 1 ).CurTSValue = 999.9;
-	EnergyMeters( 1 ).TSValue = 999.9;
-	EnergyMeters( 1 ).RptTS = true;
-	EnergyMeters( 1 ).RptAccTS = false;
-	EnergyMeters( 1 ).RptTSFO = false;
-	EnergyMeters( 1 ).RptAccTSFO = false;
-	EnergyMeters( 1 ).TSRptNum = 1;
-	EnergyMeters( 1 ).TSRptNumChr = "1";
-	EnergyMeters( 1 ).TSAccRptNum = 1;
-	EnergyMeters( 1 ).SMValue = 999.9;
+// 	// TimeStepStampReportNbr = 1;
+// 	// TimeStepStampReportChr = "1";
 
-	EnergyMeters( 2 ).CurTSValue = 9999.9;
-	EnergyMeters( 2 ).TSValue = 9999.9;
-	EnergyMeters( 2 ).RptTS = true;
-	EnergyMeters( 2 ).RptAccTS = false;
-	EnergyMeters( 2 ).RptTSFO = false;
-	EnergyMeters( 2 ).RptAccTSFO = false;
-	EnergyMeters( 2 ).TSRptNum = 2;
-	EnergyMeters( 2 ).TSRptNumChr = "2";
-	EnergyMeters( 2 ).TSAccRptNum = 2;
-	EnergyMeters( 2 ).SMValue = 9999.9;
+// 	EnergyMeters( 3 ).RptHR = true;
+// 	EnergyMeters( 3 ).RptHRFO = true;
+// 	EnergyMeters( 3 ).RptAccHR = false;
+// 	EnergyMeters( 3 ).RptAccHRFO = false;
+// 	EnergyMeters( 3 ).HRRptNum = 1;
+// 	EnergyMeters( 3 ).HRRptNumChr = "1";
+// 	EnergyMeters( 3 ).HRValue = 999.9;
+// 	EnergyMeters( 3 ).HRAccRptNum = 1;
+// 	EnergyMeters( 3 ).SMValue = 999.9;
 
-	// TimeStepStampReportNbr = 1;
-	// TimeStepStampReportChr = "1";
+// 	EnergyMeters( 4 ).RptHR = true;
+// 	EnergyMeters( 4 ).RptHRFO = true;
+// 	EnergyMeters( 4 ).RptAccHR = false;
+// 	EnergyMeters( 4 ).RptAccHRFO = false;
+// 	EnergyMeters( 4 ).HRRptNum = 2;
+// 	EnergyMeters( 4 ).HRRptNumChr = "2";
+// 	EnergyMeters( 4 ).HRValue = 9999.9;
+// 	EnergyMeters( 4 ).HRAccRptNum = 2;
+// 	EnergyMeters( 4 ).SMValue = 9999.9;
 
-	EnergyMeters( 3 ).RptHR = true;
-	EnergyMeters( 3 ).RptHRFO = true;
-	EnergyMeters( 3 ).RptAccHR = false;
-	EnergyMeters( 3 ).RptAccHRFO = false;
-	EnergyMeters( 3 ).HRRptNum = 1;
-	EnergyMeters( 3 ).HRRptNumChr = "1";
-	EnergyMeters( 3 ).HRValue = 999.9;
-	EnergyMeters( 3 ).HRAccRptNum = 1;
-	EnergyMeters( 3 ).SMValue = 999.9;
+// 	TimeStepStampReportNbr = 1;
+// 	TimeStepStampReportChr = "1";
 
-	EnergyMeters( 4 ).RptHR = true;
-	EnergyMeters( 4 ).RptHRFO = true;
-	EnergyMeters( 4 ).RptAccHR = false;
-	EnergyMeters( 4 ).RptAccHRFO = false;
-	EnergyMeters( 4 ).HRRptNum = 2;
-	EnergyMeters( 4 ).HRRptNumChr = "2";
-	EnergyMeters( 4 ).HRValue = 9999.9;
-	EnergyMeters( 4 ).HRAccRptNum = 2;
-	EnergyMeters( 4 ).SMValue = 9999.9;
+// 	EnergyMeters( 5 ).RptDY = true;
+// 	EnergyMeters( 5 ).RptDYFO = true;
+// 	EnergyMeters( 5 ).RptAccDY = false;
+// 	EnergyMeters( 5 ).RptAccDYFO = false;
+// 	EnergyMeters( 5 ).DYRptNum = 1;
+// 	EnergyMeters( 5 ).DYRptNumChr = "1";
+// 	EnergyMeters( 5 ).DYValue = 999.9;
+// 	EnergyMeters( 5 ).DYAccRptNum = 1;
+// 	EnergyMeters( 5 ).SMValue = 999.9;
+// 	EnergyMeters( 5 ).DYMaxVal = 4283136.2524843821;
+// 	EnergyMeters( 5 ).DYMaxValDate = 12210160;
+// 	EnergyMeters( 5 ).DYMinVal = 4283136.2516839253;
+// 	EnergyMeters( 5 ).DYMinValDate = 12210110;
 
-	TimeStepStampReportNbr = 1;
-	TimeStepStampReportChr = "1";
+// 	EnergyMeters( 6 ).RptDY = true;
+// 	EnergyMeters( 6 ).RptDYFO = true;
+// 	EnergyMeters( 6 ).RptAccDY = false;
+// 	EnergyMeters( 6 ).RptAccDYFO = false;
+// 	EnergyMeters( 6 ).DYRptNum = 2;
+// 	EnergyMeters( 6 ).DYRptNumChr = "2";
+// 	EnergyMeters( 6 ).DYValue = 9999.9;
+// 	EnergyMeters( 6 ).DYAccRptNum = 2;
+// 	EnergyMeters( 6 ).SMValue = 9999.9;
+// 	EnergyMeters( 6 ).DYMaxVal = 4283136.2524843821;
+// 	EnergyMeters( 6 ).DYMaxValDate = 12210160;
+// 	EnergyMeters( 6 ).DYMinVal = 4283136.2516839253;
+// 	EnergyMeters( 6 ).DYMinValDate = 12210110;
 
-	EnergyMeters( 5 ).RptDY = true;
-	EnergyMeters( 5 ).RptDYFO = true;
-	EnergyMeters( 5 ).RptAccDY = false;
-	EnergyMeters( 5 ).RptAccDYFO = false;
-	EnergyMeters( 5 ).DYRptNum = 1;
-	EnergyMeters( 5 ).DYRptNumChr = "1";
-	EnergyMeters( 5 ).DYValue = 999.9;
-	EnergyMeters( 5 ).DYAccRptNum = 1;
-	EnergyMeters( 5 ).SMValue = 999.9;
-	EnergyMeters( 5 ).DYMaxVal = 4283136.2524843821;
-	EnergyMeters( 5 ).DYMaxValDate = 12210160;
-	EnergyMeters( 5 ).DYMinVal = 4283136.2516839253;
-	EnergyMeters( 5 ).DYMinValDate = 12210110;
+// 	DailyStampReportNbr = 1;
+// 	DailyStampReportChr = "1";
 
-	EnergyMeters( 6 ).RptDY = true;
-	EnergyMeters( 6 ).RptDYFO = true;
-	EnergyMeters( 6 ).RptAccDY = false;
-	EnergyMeters( 6 ).RptAccDYFO = false;
-	EnergyMeters( 6 ).DYRptNum = 2;
-	EnergyMeters( 6 ).DYRptNumChr = "2";
-	EnergyMeters( 6 ).DYValue = 9999.9;
-	EnergyMeters( 6 ).DYAccRptNum = 2;
-	EnergyMeters( 6 ).SMValue = 9999.9;
-	EnergyMeters( 6 ).DYMaxVal = 4283136.2524843821;
-	EnergyMeters( 6 ).DYMaxValDate = 12210160;
-	EnergyMeters( 6 ).DYMinVal = 4283136.2516839253;
-	EnergyMeters( 6 ).DYMinValDate = 12210110;
+// 	EnergyMeters( 7 ).RptMN = true;
+// 	EnergyMeters( 7 ).RptMNFO = true;
+// 	EnergyMeters( 7 ).RptAccMN = false;
+// 	EnergyMeters( 7 ).RptAccMNFO = false;
+// 	EnergyMeters( 7 ).MNRptNum = 1;
+// 	EnergyMeters( 7 ).MNRptNumChr = "1";
+// 	EnergyMeters( 7 ).MNValue = 999.9;
+// 	EnergyMeters( 7 ).MNAccRptNum = 1;
+// 	EnergyMeters( 7 ).SMValue = 999.9;
+// 	EnergyMeters( 7 ).MNMaxVal = 4283136.2524843821;
+// 	EnergyMeters( 7 ).MNMaxValDate = 12210160;
+// 	EnergyMeters( 7 ).MNMinVal = 4283136.2516839253;
+// 	EnergyMeters( 7 ).MNMinValDate = 12210110;
 
-	DailyStampReportNbr = 1;
-	DailyStampReportChr = "1";
+// 	EnergyMeters( 8 ).RptMN = true;
+// 	EnergyMeters( 8 ).RptMNFO = true;
+// 	EnergyMeters( 8 ).RptAccMN = false;
+// 	EnergyMeters( 8 ).RptAccMNFO = false;
+// 	EnergyMeters( 8 ).MNRptNum = 2;
+// 	EnergyMeters( 8 ).MNRptNumChr = "2";
+// 	EnergyMeters( 8 ).MNValue = 9999.9;
+// 	EnergyMeters( 8 ).MNAccRptNum = 2;
+// 	EnergyMeters( 8 ).SMValue = 9999.9;
+// 	EnergyMeters( 8 ).MNMaxVal = 4283136.2524843821;
+// 	EnergyMeters( 8 ).MNMaxValDate = 12210160;
+// 	EnergyMeters( 8 ).MNMinVal = 4283136.2516839253;
+// 	EnergyMeters( 8 ).MNMinValDate = 12210110;
 
-	EnergyMeters( 7 ).RptMN = true;
-	EnergyMeters( 7 ).RptMNFO = true;
-	EnergyMeters( 7 ).RptAccMN = false;
-	EnergyMeters( 7 ).RptAccMNFO = false;
-	EnergyMeters( 7 ).MNRptNum = 1;
-	EnergyMeters( 7 ).MNRptNumChr = "1";
-	EnergyMeters( 7 ).MNValue = 999.9;
-	EnergyMeters( 7 ).MNAccRptNum = 1;
-	EnergyMeters( 7 ).SMValue = 999.9;
-	EnergyMeters( 7 ).MNMaxVal = 4283136.2524843821;
-	EnergyMeters( 7 ).MNMaxValDate = 12210160;
-	EnergyMeters( 7 ).MNMinVal = 4283136.2516839253;
-	EnergyMeters( 7 ).MNMinValDate = 12210110;
+// 	MonthlyStampReportNbr = 1;
+// 	MonthlyStampReportChr = "1";
 
-	EnergyMeters( 8 ).RptMN = true;
-	EnergyMeters( 8 ).RptMNFO = true;
-	EnergyMeters( 8 ).RptAccMN = false;
-	EnergyMeters( 8 ).RptAccMNFO = false;
-	EnergyMeters( 8 ).MNRptNum = 2;
-	EnergyMeters( 8 ).MNRptNumChr = "2";
-	EnergyMeters( 8 ).MNValue = 9999.9;
-	EnergyMeters( 8 ).MNAccRptNum = 2;
-	EnergyMeters( 8 ).SMValue = 9999.9;
-	EnergyMeters( 8 ).MNMaxVal = 4283136.2524843821;
-	EnergyMeters( 8 ).MNMaxValDate = 12210160;
-	EnergyMeters( 8 ).MNMinVal = 4283136.2516839253;
-	EnergyMeters( 8 ).MNMinValDate = 12210110;
+// 	EnergyMeters( 9 ).RptSM = true;
+// 	EnergyMeters( 9 ).RptSMFO = true;
+// 	EnergyMeters( 9 ).RptAccSM = false;
+// 	EnergyMeters( 9 ).RptAccSMFO = false;
+// 	EnergyMeters( 9 ).SMRptNum = 1;
+// 	EnergyMeters( 9 ).SMRptNumChr = "1";
+// 	EnergyMeters( 9 ).SMValue = 999.9;
+// 	EnergyMeters( 9 ).SMAccRptNum = 1;
+// 	EnergyMeters( 9 ).SMValue = 999.9;
+// 	EnergyMeters( 9 ).SMMaxVal = 4283136.2524843821;
+// 	EnergyMeters( 9 ).SMMaxValDate = 12210160;
+// 	EnergyMeters( 9 ).SMMinVal = 4283136.2516839253;
+// 	EnergyMeters( 9 ).SMMinValDate = 12210110;
 
-	MonthlyStampReportNbr = 1;
-	MonthlyStampReportChr = "1";
+// 	EnergyMeters( 10 ).RptSM = true;
+// 	EnergyMeters( 10 ).RptSMFO = true;
+// 	EnergyMeters( 10 ).RptAccSM = false;
+// 	EnergyMeters( 10 ).RptAccSMFO = false;
+// 	EnergyMeters( 10 ).SMRptNum = 2;
+// 	EnergyMeters( 10 ).SMRptNumChr = "2";
+// 	EnergyMeters( 10 ).SMValue = 9999.9;
+// 	EnergyMeters( 10 ).SMAccRptNum = 2;
+// 	EnergyMeters( 10 ).SMValue = 9999.9;
+// 	EnergyMeters( 10 ).SMMaxVal = 4283136.2524843821;
+// 	EnergyMeters( 10 ).SMMaxValDate = 12210160;
+// 	EnergyMeters( 10 ).SMMinVal = 4283136.2516839253;
+// 	EnergyMeters( 10 ).SMMinValDate = 12210110;
 
-	EnergyMeters( 9 ).RptSM = true;
-	EnergyMeters( 9 ).RptSMFO = true;
-	EnergyMeters( 9 ).RptAccSM = false;
-	EnergyMeters( 9 ).RptAccSMFO = false;
-	EnergyMeters( 9 ).SMRptNum = 1;
-	EnergyMeters( 9 ).SMRptNumChr = "1";
-	EnergyMeters( 9 ).SMValue = 999.9;
-	EnergyMeters( 9 ).SMAccRptNum = 1;
-	EnergyMeters( 9 ).SMValue = 999.9;
-	EnergyMeters( 9 ).SMMaxVal = 4283136.2524843821;
-	EnergyMeters( 9 ).SMMaxValDate = 12210160;
-	EnergyMeters( 9 ).SMMinVal = 4283136.2516839253;
-	EnergyMeters( 9 ).SMMinValDate = 12210110;
+// 	RunPeriodStampReportNbr = 1;
+// 	RunPeriodStampReportChr = "1";
 
-	EnergyMeters( 10 ).RptSM = true;
-	EnergyMeters( 10 ).RptSMFO = true;
-	EnergyMeters( 10 ).RptAccSM = false;
-	EnergyMeters( 10 ).RptAccSMFO = false;
-	EnergyMeters( 10 ).SMRptNum = 2;
-	EnergyMeters( 10 ).SMRptNumChr = "2";
-	EnergyMeters( 10 ).SMValue = 9999.9;
-	EnergyMeters( 10 ).SMAccRptNum = 2;
-	EnergyMeters( 10 ).SMValue = 9999.9;
-	EnergyMeters( 10 ).SMMaxVal = 4283136.2524843821;
-	EnergyMeters( 10 ).SMMaxValDate = 12210160;
-	EnergyMeters( 10 ).SMMinVal = 4283136.2516839253;
-	EnergyMeters( 10 ).SMMinValDate = 12210110;
+// 	DayOfSim = 1;
+// 	DayOfSimChr = "1";
+// 	HourOfDay = 1;
+// 	DataEnvironment::Month = 12;
+// 	DataEnvironment::DayOfMonth = 21;
+// 	DataEnvironment::DSTIndicator = 0;
+// 	DataEnvironment::DayOfWeek = 2;
+// 	DataEnvironment::HolidayIndex = 3;
+// 	// int EndMinute = 10;
+// 	// int StartMinute = 0;
+// 	// bool PrintESOTimeStamp = true;
 
-	RunPeriodStampReportNbr = 1;
-	RunPeriodStampReportChr = "1";
+// 	// SetupTimePointers( "Zone", TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
+// 	// SetupTimePointers( "HVAC", TimeStepSys );
 
-	DayOfSim = 1;
-	DayOfSimChr = "1";
-	HourOfDay = 1;
-	DataEnvironment::Month = 12;
-	DataEnvironment::DayOfMonth = 21;
-	DataEnvironment::DSTIndicator = 0;
-	DataEnvironment::DayOfWeek = 2;
-	DataEnvironment::HolidayIndex = 3;
-	// int EndMinute = 10;
-	// int StartMinute = 0;
-	// bool PrintESOTimeStamp = true;
+// 	// UpdateDataandReport( 1 );
 
-	// SetupTimePointers( "Zone", TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
-	// SetupTimePointers( "HVAC", TimeStepSys );
+// 	// UpdateDataandReport( 2 );
 
-	// UpdateDataandReport( 1 );
+// 	NumEnergyMeters = 0;
+// 	EnergyMeters.deallocate();
+// }
 
-	// UpdateDataandReport( 2 );
-
-	NumEnergyMeters = 0;
-	EnergyMeters.deallocate();
 }

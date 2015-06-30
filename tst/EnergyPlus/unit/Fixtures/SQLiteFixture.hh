@@ -5,16 +5,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "EnergyPlusFixture.hh"
 #include <EnergyPlus/SQLiteProcedures.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
-	class SQLiteFixture : public testing::Test
+	class SQLiteFixture : public EnergyPlusFixture
 	{
 
 	protected:
@@ -26,6 +24,7 @@ namespace EnergyPlus {
 		std::shared_ptr<std::ostringstream> ss;
 
 		virtual void SetUp() {
+			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
 			ss = std::make_shared<std::ostringstream>();
 			ASSERT_NO_THROW(sqlite_test = std::unique_ptr<SQLite>(new SQLite( ss, ":memory:", "std::ostringstream", true, true )));
 			ASSERT_TRUE(sqlite_test->writeOutputToSQLite());
@@ -39,6 +38,7 @@ namespace EnergyPlus {
 			// don't know if this is needed...
 			sqlite_test.reset();
 			sqlite_test = nullptr;
+			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 
 		void resetDatabase() {
@@ -54,13 +54,29 @@ namespace EnergyPlus {
 			ss->str(std::string());
 		}
 
-		std::string delimitedString( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL ) {
-			std::unique_ptr<std::ostringstream> compare_text(new std::ostringstream);
-			for( auto const & str : strings ) {
-				* compare_text << str << delimiter;
-			}
-			return compare_text->str();
+		// Need to move unit test unique_ptr to EnergyPlus sqlite unique_ptr and back again so usage of the sqlite bindings in
+		// EnergyPlus code can be queried against in unit tests.
+		// These do not change non-const rvalue references...
+		void functionUsingSQLite( std::function<void()> func ) {
+			EnergyPlus::sqlite = std::move( sqlite_test );
+			func();
+			sqlite_test = std::move( EnergyPlus::sqlite );
 		}
+
+		int functionUsingSQLite( std::function<int()> func ) {
+			EnergyPlus::sqlite = std::move( sqlite_test );
+			int value = func();
+			sqlite_test = std::move( EnergyPlus::sqlite );
+			return value;
+		}
+
+		// template <typename T>
+		// T functionUsingSQLite( std::function<T()> func ) {
+		// 	EnergyPlus::sqlite = std::move( sqlite_test );
+		// 	T value = func();
+		// 	sqlite_test = std::move( EnergyPlus::sqlite );
+		// 	return value;
+		// }
 
 		std::string storageType( const int storageTypeIndex ) {
 			return sqlite_test->storageType( storageTypeIndex );
