@@ -286,6 +286,7 @@ namespace WeatherManager {
 
 	std::shared_ptr< BaseGroundTempsModel > siteShallowGroundTempsPtr;
 	std::shared_ptr< BaseGroundTempsModel > siteBuildingSurfaceGroundTempsPtr;
+	std::shared_ptr< BaseGroundTempsModel > siteFCFactorMethodGroundTempsPtr;
 
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
@@ -2050,7 +2051,7 @@ namespace WeatherManager {
 
 		GroundTemp = siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GroundTempKelvin = GroundTemp + KelvinConv;
-		GroundTempFC = GroundTempsFC( Month );
+		GroundTempFC = siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GroundTemp_Surface = siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GroundTemp_Deep = DeepGroundTemps( Month );
 		GndReflectance = GroundReflectances( Month );
@@ -7157,43 +7158,14 @@ Label9999: ;
 		// FLOW:
 		// Initialize Site:GroundTemperature:BuildingSurface object
 		siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "", 0.0);
+		ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;
 
-		ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;		
-
-		//Added for ground temperatures for F and C factor defined surfaces
-		cCurrentModuleObject = "Site:GroundTemperature:FCfactorMethod";
-		I = GetNumObjectsFound( cCurrentModuleObject );
-		if ( I == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
-
-			if ( GndNumProp < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				ErrorsFound = true;
-			}
-
-			FCGroundTemps = true;
-			// overwrite values read from weather file for the 0.5m set ground temperatures
-			for ( I = 1; I <= 12; ++I ) {
-				GroundTempsFC( I ) = GndProps( I );
-			}
-
-		} else if ( I > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			ErrorsFound = true;
-
-		} else if ( wthFCGroundTemps ) {
-			FCGroundTemps = true;
-		}
-
-		if ( FCGroundTemps ) { // Write Ground Temp Information to the initialization output file
-			gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:FCfactorMethod>, Months From Jan to Dec {C}";
-			gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:FCfactorMethod";
-			for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << GroundTempsFC( I ); gio::write( OutputFileInits );
-		}
+		// Initialize Site:GroundTemperature:FCFactorMethod object
+		siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "", 0.0);
+		ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;	
 
 		// Initialize Site:GroundTemperature:Shallow object
 		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "", 0.0);
-
 		ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
 
 		cCurrentModuleObject = "Site:GroundTemperature:Deep";

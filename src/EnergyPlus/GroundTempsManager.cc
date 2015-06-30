@@ -11,6 +11,7 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTempsManager.hh>
 #include <InputProcessor.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -34,8 +35,9 @@ namespace GroundTemps {
 	Real64 groundThermalDiffusivity
 	)
 	{
-		using namespace DataIPShortCuts;
+		
 		using DataGlobals::SecsInDay;
+		using namespace DataIPShortCuts;
 		
 		bool found = false;
 		int NumNums;
@@ -179,9 +181,9 @@ namespace GroundTemps {
 	ShallowGTMFactory( int objectType ){
 
 		using DataEnvironment::GroundTemp_SurfaceObjInput;
-		using namespace DataIPShortCuts;
-		using DataGlobals::SecsInDay;
 		using DataGlobals::OutputFileInits;
+		using DataGlobals::SecsInDay;
+		using namespace DataIPShortCuts;
 		using namespace ObjexxFCL::gio;
 		
 		bool found = false;
@@ -238,14 +240,14 @@ namespace GroundTemps {
 
 	//******************************************************************************
 
-	// Site:GroundTemperature:Shallow factory
+	// Site:GroundTemperature:BuildingSurface factory
 	std::shared_ptr< BuildingSurfaceGroundTemps > 
 	BuildingSurfaceGTMFactory( int objectType ){
 
 		using DataEnvironment::GroundTempObjInput;
-		using namespace DataIPShortCuts;
+		using DataGlobals::OutputFileInits;		
 		using DataGlobals::SecsInDay;
-		using DataGlobals::OutputFileInits;
+		using namespace DataIPShortCuts;
 		using namespace ObjexxFCL::gio;
 		
 		bool found = false;
@@ -303,6 +305,75 @@ namespace GroundTemps {
 			return thisModel;
 		} else {
 			ShowContinueError( "Site:GroundTemperature:BuildingSurface--Errors getting input for ground temperature model");
+			return nullptr;
+		}
+	}
+
+	//******************************************************************************
+
+	// Site:GroundTemperature:FCFactorMethod factory
+	std::shared_ptr< FCFactorGroundTemps > 
+	FCFactorGTMFactory( int objectType ){
+
+		using DataEnvironment::FCGroundTemps;
+		using DataGlobals::OutputFileInits;
+		using DataGlobals::SecsInDay;
+		using WeatherManager::wthFCGroundTemps;
+		using namespace DataIPShortCuts;
+		using namespace ObjexxFCL::gio;
+
+		
+		
+		bool found = false;
+		bool genErrorMessage = false;
+		int NumNums;
+		int NumAlphas;
+		int IOStat;
+
+		// New shared pointer for this model object
+		std::shared_ptr< FCFactorGroundTemps > thisModel( new FCFactorGroundTemps() );
+
+		// Search through Kusuda models here
+		std::string const cCurrentModuleObject = "Site:GroundTemperature:FCFactorMethod";
+		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( numCurrObjects == 1 ) {
+
+			//Get the object names for each construction from the input processor
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+
+			if ( NumNums < 12 ) {
+				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
+				thisModel->errorsFound = true;
+			}
+
+			// overwrite values read from weather file for the 0.5m set ground temperatures
+			for ( int i = 1; i <= 12; ++i ) {
+				thisModel->fcFactorGroundTemps( i ) = rNumericArgs( i );
+			}
+
+			FCGroundTemps = true;
+
+		} else if ( numCurrObjects > 1 ) {
+			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
+			thisModel->errorsFound = true;
+
+		} else if ( wthFCGroundTemps ) {
+			FCGroundTemps = true;
+		}
+
+		// Write Final Ground Temp Information to the initialization output file
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:FCfactorMethod>, Months From Jan to Dec {C}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:FCfactorMethod";
+		for ( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->fcFactorGroundTemps( i ); gio::write( OutputFileInits );
+
+		found = true;
+
+		if ( found && !thisModel->errorsFound ) {
+			groundTempModels.push_back( thisModel );
+			return thisModel;
+		} else {
+			ShowContinueError( "Site:GroundTemperature:FCFactorMethod--Errors getting input for ground temperature model");
 			return nullptr;
 		}
 	}
@@ -372,7 +443,7 @@ namespace GroundTemps {
 		} else if ( objectType == objectType_SiteDeepGroundTemp ) {
 			return 0;
 		} else if ( objectType == objectType_SiteFCFactorMethodGroundTemp ) {
-			return 0;
+			return FCFactorGTMFactory( objectType );
 		} else {
 			// Error
 			return nullptr; 

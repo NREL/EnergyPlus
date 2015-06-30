@@ -165,7 +165,6 @@ namespace GroundTemps {
 			int timeOfSimInMonths;
 			Array1D< Real64 > surfaceGroundTemps;
 
-
 		// Default Constructor
 		ShallowGroundTemps():
 			//aveGroundTemp( 15 ),
@@ -204,7 +203,6 @@ namespace GroundTemps {
 			int timeOfSimInMonths;
 			Array1D< Real64 > buildingSurfaceGroundTemps;
 
-
 		// Default Constructor
 		BuildingSurfaceGroundTemps():
 			timeOfSimInMonths( 0 ),
@@ -228,6 +226,41 @@ namespace GroundTemps {
 		);
 
 		static std::shared_ptr< BuildingSurfaceGroundTemps > BuildingSurfaceGTMFactory( int objectType ); 
+
+	};
+
+	//******************************************************************************
+
+	// Derived class for Site:GroundTemperature:FCFactorMethod
+	class FCFactorGroundTemps : public BaseGroundTempsModel
+	{
+		public:
+			int timeOfSimInMonths;
+			Array1D< Real64 > fcFactorGroundTemps;
+
+		// Default Constructor
+		FCFactorGroundTemps():
+			timeOfSimInMonths( 0 ),
+			fcFactorGroundTemps( 12, 13.0 )
+
+			{}
+
+		Real64
+		getGroundTemp();
+
+		Real64
+		getGroundTempAtTimeInSeconds(
+			Real64 const depth,
+			Real64 const timeInSecondsOfSim
+		);
+
+		Real64
+		getGroundTempAtTimeInMonths(
+			Real64 const depth,
+			int const monthOfSim
+		);
+
+		static std::shared_ptr< FCFactorGroundTemps > FCFactorGTMFactory( int objectType ); 
 
 	};
 
