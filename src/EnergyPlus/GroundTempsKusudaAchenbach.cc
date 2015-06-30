@@ -5,17 +5,14 @@
 
 // EnergyPlus Headers
 #include <GroundTempsManager.hh>
+#include <InputProcessor.hh>
 
 namespace EnergyPlus {
 
 namespace GroundTemps {
 
 	Real64
-	KusudaGroundTempsModel::getGroundTemp(
-		Real64 const z, // Depth
-		Real64 const diffusivityGround, // Ground props
-		Real64 const simTimeInSeconds // Simulation time
-	)
+	KusudaGroundTempsModel::getGroundTemp()
 	{
 		// AUTHOR         Matt Mitchell
 		// DATE WRITTEN   June 2015
@@ -43,10 +40,46 @@ namespace GroundTemps {
 
 		secsInYear = SecsInDay * 365.0;
 
-		term1 = -z * std::sqrt( Pi / ( secsInYear * diffusivityGround ) );
-		term2 = ( 2 * Pi / secsInYear ) * ( simTimeInSeconds - phaseShiftInSecs - ( z / 2 ) * std::sqrt( secsInYear / ( Pi * diffusivityGround ) ) );
+		term1 = -depth * std::sqrt( Pi / ( secsInYear * groundThermalDiffisivity ) );
+		term2 = ( 2 * Pi / secsInYear ) * ( simTimeInSeconds - phaseShiftInSecs - ( depth / 2 ) * std::sqrt( secsInYear / ( Pi * groundThermalDiffisivity ) ) );
 
 		return aveGroundTemp - aveGroundTempAmplitude * std::exp( term1 ) * std::cos( term2 );
+	}
+
+	Real64
+	KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(
+		Real64 const depthOfTemp,
+		Real64 const seconds
+	)
+	{	
+		// Set depth of temperature
+		depth = depthOfTemp;
+
+		// Set sim time in seconds
+		simTimeInSeconds = seconds;
+
+		// Get and return ground temperature
+		return getGroundTemp();
+	}
+
+	Real64
+	KusudaGroundTempsModel::getGroundTempAtTimeInMonths(
+		Real64 const depth,
+		int const month
+	)
+	{
+
+		Real64 const aveSecondsInMonth = ( 365 / 12 ) * ( 3600 * 24 );
+
+		// Convert months to seconds. Puts 'seconds' time in middle of specified month
+		if ( month >= 1 && month <= 12 ) {
+			simTimeInSeconds = aveSecondsInMonth * ( ( month - 1 ) + 0.5 );
+		} else {
+			ShowFatalError("KusudaGroundTempsModel: Invalid month passed to ground temperature model");
+		}
+		
+		// Get and return ground temperature
+		return getGroundTemp();
 	}
 
 

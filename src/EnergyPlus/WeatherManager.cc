@@ -2050,7 +2050,7 @@ namespace WeatherManager {
 		GroundTemp = GroundTemps( Month );
 		GroundTempKelvin = GroundTemp + KelvinConv;
 		GroundTempFC = GroundTempsFC( Month );
-		GroundTemp_Surface = siteShallowGroundTempsPtr->getGroundTemp(1, 1, Month);
+		GroundTemp_Surface = siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GroundTemp_Deep = DeepGroundTemps( Month );
 		GndReflectance = GroundReflectances( Month );
 		GndReflectanceForDayltg = GndReflectance;
@@ -7222,7 +7222,7 @@ Label9999: ;
 		}
 
 		// Initialize Site:GroundTemperature:Shallow object
-		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "");
+		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "", 0.0);
 
 		ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
 

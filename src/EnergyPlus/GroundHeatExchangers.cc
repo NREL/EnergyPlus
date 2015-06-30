@@ -1605,7 +1605,7 @@ namespace GroundHeatExchangers {
 				}
 
 				// Initialize ground temperature model and get pointer reference
-				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
+				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ), slinkyGLHE( GLHENum ).diffusivityGround );
 
 				//Check for Errors
 				if ( errorsFound ) {
@@ -2158,8 +2158,8 @@ namespace GroundHeatExchangers {
 			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
 			lastQnSubHr = 0.0;
-			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, CurTime ); 
-			Node( outletNodeNum ).Temp = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, CurTime );
+			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime ); 
+			Node( outletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
 
 			// zero out all history arrays
 
@@ -2173,7 +2173,7 @@ namespace GroundHeatExchangers {
 			prevHour = 1;
 		}
 
-		tempGround = this->groundTempModel->getGroundTemp( coilDepth, diffusivityGround, CurTime );
+		tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
 
 		massFlowRate = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
 

@@ -652,7 +652,7 @@ namespace PipeHeatTransfer {
 			}
 
 			// Get ground temperature model
-			PipeHT( Item ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 7 ), cAlphaArgs( 8 ) );
+			PipeHT( Item ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 7 ), cAlphaArgs( 8 ), PipeHT( Item ).SoilDiffusivity );
 
 			// Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
 			NumSections = NumPipeSections;
@@ -2044,7 +2044,7 @@ namespace PipeHeatTransfer {
 		Real64 curSimTime = DayOfSim * SecsInDay;
 		Real64 TBND;
 
-		TBND = PipeHT( PipeHTNum ).groundTempModel->getGroundTemp( z, soilDiffusivity, curSimTime );
+		TBND = PipeHT( PipeHTNum ).groundTempModel->getGroundTempAtTimeInSeconds( z, curSimTime );
 
 		return TBND;
 

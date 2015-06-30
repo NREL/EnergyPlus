@@ -28,8 +28,12 @@ namespace GroundTemps {
 
 	// Kusuda model factory
 	std::shared_ptr< KusudaGroundTempsModel > 
-	KusudaGTMFactory( int objectType, std::string objectName ){
-
+	KusudaGTMFactory( 
+	int objectType, 
+	std::string objectName,
+	Real64 groundThermalDiffusivity
+	)
+	{
 		using namespace DataIPShortCuts;
 		using DataGlobals::SecsInDay;
 		
@@ -61,6 +65,8 @@ namespace GroundTemps {
 					thisModel->aveGroundTempAmplitude = rNumericArgs( 2 );
 
 					thisModel->phaseShiftInSecs = rNumericArgs( 3 ) * SecsInDay;
+
+					thisModel->groundThermalDiffisivity = groundThermalDiffusivity;
 
 					found = true;
 					break;
@@ -231,7 +237,8 @@ namespace GroundTemps {
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(
 		std::string const objectType_str,
-		std::string const objectName
+		std::string const objectName,
+		Real64 const groundThermalDiffusivity
 	)
 	{
 		int objectType( 0 );
@@ -280,7 +287,7 @@ namespace GroundTemps {
 
 		// If not found, create new instance of the model
 		if ( objectType == objectType_KusudaGroundTemp ) {
-			return KusudaGTMFactory( objectType, objectName );
+			return KusudaGTMFactory( objectType, objectName, groundThermalDiffusivity );
 		} else if ( objectType == objectType_FiniteDiffGroundTemp ) {
 			return FiniteDiffGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_SiteBuildingSurfaceGroundTemp ) {

@@ -917,7 +917,8 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Initialize ground temperature model and get pointer reference
-			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
+			Real64 groundDiffisivity = PipingSystemDomains( DomainNum ).GroundProperties.Conductivity / ( PipingSystemDomains( DomainNum ).GroundProperties.Density * PipingSystemDomains( DomainNum ).GroundProperties.SpecificHeat);
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ), groundDiffisivity );
 
 		}
 
@@ -1252,7 +1253,8 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// Read ground temperature model inputs.
-				Domain( ZoneCoupledDomainCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+				Real64 soilDiffusivity = Domain( ZoneCoupledDomainCtr ).SoilConductivity / ( Domain( ZoneCoupledDomainCtr ).SoilDensity * Domain( ZoneCoupledDomainCtr ).SoilSpecificHeat );
+				Domain( ZoneCoupledDomainCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ), soilDiffusivity );
 
 				// Total surface area
 				ThisArea = 0.0;
@@ -1625,7 +1627,8 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Farfield ground temperature model
-			PipingSystemDomains( BasementCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+			Real64 groundDiffusivity = PipingSystemDomains( DomainNum ).GroundProperties.Conductivity / ( PipingSystemDomains( DomainNum ).GroundProperties.Density * PipingSystemDomains( DomainNum ).GroundProperties.SpecificHeat );
+			PipingSystemDomains( BasementCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ), groundDiffusivity );
 
 			// Domain perimeter offset
 			PipingSystemDomains( DomainNum ).PerimeterOffset = Domain( BasementCtr ).PerimeterOffset;
@@ -2098,7 +2101,9 @@ namespace PlantPipingSystemsManager {
 			HGHX( HorizontalGHXCtr ).MoistureContent = rNumericArgs( 14 );
 			HGHX( HorizontalGHXCtr ).SaturationMoistureContent = rNumericArgs( 15 );
 			HGHX( HorizontalGHXCtr ).EvapotranspirationCoeff = rNumericArgs( 16 );
-			HGHX( HorizontalGHXCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
+
+			Real64 groundDiffusivity = HGHX( HorizontalGHXCtr ).SoilConductivity / ( HGHX( HorizontalGHXCtr ).SoilDensity * HGHX( HorizontalGHXCtr ).SoilSpecificHeat );
+			HGHX( HorizontalGHXCtr ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ), groundDiffusivity );
 
 			//******* We'll first set up the domain ********
 			// the extents will be: Zmax = axial length; Ymax = burial depth*2; Xmax = ( NumPipes+1 )*HorizontalPipeSpacing
@@ -7618,7 +7623,7 @@ namespace PlantPipingSystemsManager {
 		z = PipingSystemDomains( DomainNum ).Extents.Ymax - cell.Centroid.Y;
 		Diffusivity = BaseThermalPropertySet_Diffusivity( PipingSystemDomains( DomainNum ).GroundProperties );
 
-		RetVal = PipingSystemDomains( DomainNum).Farfield.groundTempModel->getGroundTemp( z, Diffusivity, CurTime );
+		RetVal = PipingSystemDomains( DomainNum).Farfield.groundTempModel->getGroundTempAtTimeInSeconds( z, CurTime );
 
 		return RetVal;
 

@@ -32,10 +32,18 @@ namespace GroundTemps {
 		
 		// Virtual method for retrieving the ground temp
 		virtual Real64
-		getGroundTemp( 
-			Real64 const,
+		getGroundTemp()=0;
+
+		virtual Real64
+		getGroundTempAtTimeInSeconds(
 			Real64 const,
 			Real64 const
+		)=0;
+
+		virtual Real64
+		getGroundTempAtTimeInMonths(
+			Real64 const,
+			int const
 		)=0;
 
 	};
@@ -47,15 +55,26 @@ namespace GroundTemps {
 	{
 		public:
 			// Public Members
+			Real64 depth;
+			Real64 groundThermalDiffisivity;
+			Real64 simTimeInSeconds;
 			Real64 aveGroundTemp;
 			Real64 aveGroundTempAmplitude;
 			Real64 phaseShiftInSecs;
 
 		Real64
-		getGroundTemp(
+		getGroundTemp();
+
+		Real64
+		getGroundTempAtTimeInSeconds(
 			Real64 const depth,
-			Real64 const diffusivityGround,
-			Real64 const simTime
+			Real64 const timeInSecondsOfSim
+		);
+
+		Real64
+		getGroundTempAtTimeInMonths(
+			Real64 const depth,
+			int const monthOfSim
 		);
 
 		static std::shared_ptr< KusudaGroundTempsModel > KusudaGTMFactory( int objectType, std::string objectName );
@@ -116,10 +135,18 @@ namespace GroundTemps {
 		};
 
 		Real64
-		getGroundTemp(
+		getGroundTemp();
+
+		Real64
+		getGroundTempAtTimeInSeconds(
 			Real64 const depth,
-			Real64 const diffusivityGround,
-			Real64 const simTime
+			Real64 const timeInSecondsOfSim
+		);
+
+		Real64
+		getGroundTempAtTimeInMonths(
+			Real64 const depth,
+			int const monthOfSim
 		);
 
 		static std::shared_ptr< FiniteDiffGroundTempsModel > FiniteDiffGTMFactory( int objectType, std::string objectName);
@@ -132,25 +159,36 @@ namespace GroundTemps {
 	{
 		public:
 			// Public Members
-			Real64 aveGroundTemp;
-			Real64 aveGroundTempAmplitude;
-			Real64 phaseShiftInSecs;
+			//Real64 aveGroundTemp;
+			//Real64 aveGroundTempAmplitude;
+			//Real64 phaseShiftInSecs;
+			int timeOfSimInMonths;
 			Array1D< Real64 > surfaceGroundTemps;
+
 
 		// Default Constructor
 		ShallowGroundTemps():
-			aveGroundTemp( 15 ),
-			aveGroundTempAmplitude( 12 ),
-			phaseShiftInSecs( 0 ),
+			//aveGroundTemp( 15 ),
+			//aveGroundTempAmplitude( 12 ),
+			//phaseShiftInSecs( 0 ),
+			timeOfSimInMonths( 0 ),
 			surfaceGroundTemps( 12, 13.0 )
 
 			{}
 
 		Real64
-		getGroundTemp(
+		getGroundTemp();
+
+		Real64
+		getGroundTempAtTimeInSeconds(
 			Real64 const depth,
-			Real64 const diffusivityGround,
-			Real64 const simTime
+			Real64 const timeInSecondsOfSim
+		);
+
+		Real64
+		getGroundTempAtTimeInMonths(
+			Real64 const depth,
+			int const monthOfSim
 		);
 
 		static std::shared_ptr< ShallowGroundTemps > ShallowGTMFactory( int objectType, std::string objectName ); 
@@ -162,7 +200,8 @@ namespace GroundTemps {
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(
 		std::string const type,
-		std::string const name
+		std::string const name,
+		Real64 const groundThermalDiffusivity
 	);
 
 	//******************************************************************************

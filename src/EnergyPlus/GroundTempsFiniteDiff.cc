@@ -11,10 +11,24 @@ namespace EnergyPlus {
 namespace GroundTemps {
 
 	Real64
-	FiniteDiffGroundTempsModel::getGroundTemp(
-		Real64 const z, // Depth
-		Real64 const diffusivityGround,
-		Real64 const optionalSimTime // Optional simulation time
+	FiniteDiffGroundTempsModel::getGroundTemp()
+	{
+		return 0;
+	}
+
+	Real64
+	FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(
+		Real64 const depth,
+		Real64 const simTimeInSeconds
+	)
+	{
+		return 0;
+	}
+
+	Real64
+	FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(
+		Real64 const depth,
+		int const simTimeInMonths
 	)
 	{
 		return 0;

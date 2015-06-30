@@ -1,9 +1,11 @@
 // C++ Headers
-#include<memory>
+#include <memory>
 
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
+#include <DataEnvironment.hh>
+#include <InputProcessor.hh>
 #include <GroundTempsManager.hh>
 
 namespace EnergyPlus {
@@ -11,21 +13,50 @@ namespace EnergyPlus {
 namespace GroundTemps {
 
 	Real64
-	ShallowGroundTemps::getGroundTemp(
-		Real64 const z, // Depth
-		Real64 const diffusivityGround,
-		Real64 const month // Optional simulation time
+	ShallowGroundTemps::getGroundTemp()
+	{
+		return surfaceGroundTemps( timeOfSimInMonths );
+	}
+
+	Real64
+	ShallowGroundTemps::getGroundTempAtTimeInSeconds(
+		Real64 const depth,
+		Real64 const seconds
 	)
 	{
 
-		//if ( !PubGroundTempSurfFlag ) {
-		//	ShowSevereError( "Input problem for " + objectType_str );
-		//	ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-		//}
+		Real64 secPerMonth = 365 * 3600 * 24 / 12;
+		int month;
 
-		return surfaceGroundTemps( month );
+		// Convert secs to months
+		if ( seconds > 0.0 && seconds <= ( secPerMonth * 12 ) ) {
+			month = ceil( seconds / ( secPerMonth * 12 ) );
+		} else if ( seconds > ( secPerMonth * 12 ) ) {
+			month = ceil( seconds / (secPerMonth * 12.0 ) );
+			month = remainder( month, 12 );
+		} else {
+			ShowFatalError("Site:GroundTemperature:Shallow: Invalid time passed to ground temperature model");
+		}
+
+		timeOfSimInMonths = month;
+
+			// Get and return ground temp
+			return getGroundTemp();
+		}
+
+	Real64
+	ShallowGroundTemps::getGroundTempAtTimeInMonths(
+		Real64 const depth,
+		int const month
+	)
+	{
+		// Set month
+		timeOfSimInMonths = month;
+
+		// Get and return ground temp
+		return getGroundTemp();
+
 	}
-
 
 	//******************************************************************************
 
