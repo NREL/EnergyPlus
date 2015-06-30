@@ -16,6 +16,8 @@ namespace GroundTemps {
 		return 0;
 	}
 
+	//******************************************************************************
+
 	Real64
 	FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(
 		Real64 const depth,
@@ -25,6 +27,8 @@ namespace GroundTemps {
 		return 0;
 	}
 
+	//******************************************************************************
+
 	Real64
 	FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(
 		Real64 const depth,
@@ -33,7 +37,6 @@ namespace GroundTemps {
 	{
 		return 0;
 	}
-
 
 	//******************************************************************************
 

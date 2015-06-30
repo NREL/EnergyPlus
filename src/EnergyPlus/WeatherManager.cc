@@ -285,6 +285,7 @@ namespace WeatherManager {
 	Array1D< DataPeriodData > DataPeriods;
 
 	std::shared_ptr< BaseGroundTempsModel > siteShallowGroundTempsPtr;
+	std::shared_ptr< BaseGroundTempsModel > siteBuildingSurfaceGroundTempsPtr;
 
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
@@ -2047,7 +2048,7 @@ namespace WeatherManager {
 		CurrentTime = ( HourOfDay - 1 ) + TimeStep * ( TimeStepFraction );
 		SimTimeSteps = ( DayOfSim - 1 ) * 24 * NumOfTimeStepInHour + ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
 
-		GroundTemp = GroundTemps( Month );
+		GroundTemp = siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GroundTempKelvin = GroundTemp + KelvinConv;
 		GroundTempFC = GroundTempsFC( Month );
 		GroundTemp_Surface = siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
@@ -7154,41 +7155,10 @@ Label9999: ;
 		static gio::Fmt Format_720( "(' ',A,12(', ',F6.2))" );
 
 		// FLOW:
-		cCurrentModuleObject = "Site:GroundTemperature:BuildingSurface";
-		I = GetNumObjectsFound( cCurrentModuleObject );
-		if ( I == 1 ) {
-			//Get the object names for each construction from the input processor
-			GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
+		// Initialize Site:GroundTemperature:BuildingSurface object
+		siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "", 0.0);
 
-			if ( GndNumProp < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				ErrorsFound = true;
-			}
-
-			//Assign the ground temps to the variable
-			for ( I = 1; I <= 12; ++I ) {
-				GroundTemps( I ) = GndProps( I );
-				if ( GroundTemps( I ) < 15.0 || GroundTemps( I ) > 25.0 ) GenErrorMessage = true;
-			}
-
-			GroundTempObjInput = true;
-
-		} else if ( I > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			ErrorsFound = true;
-		} else {
-			GroundTemps = 18.0;
-		}
-
-		if ( GenErrorMessage ) {
-			ShowWarningError( cCurrentModuleObject + ": Some values fall outside the range of 15-25C." );
-			ShowContinueError( "These values may be inappropriate.  Please consult the Input Output Reference for more details." );
-		}
-
-		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:BuildingSurface>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:BuildingSurface";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << GroundTemps( I ); gio::write( OutputFileInits );
+		ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;		
 
 		//Added for ground temperatures for F and C factor defined surfaces
 		cCurrentModuleObject = "Site:GroundTemperature:FCfactorMethod";

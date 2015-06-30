@@ -68,6 +68,52 @@ namespace GroundTemps {
 
 					thisModel->groundThermalDiffisivity = groundThermalDiffusivity;
 
+					// Putting this here for now. Need to implement functionality allowing parameters to be generated from Site:GroundTemperature:Shallow if KA object not present
+
+					//int monthsInYear( 12 );
+					//int avgDaysInMonth( 30 );
+					//int monthOfMinSurfTemp( 0 );
+					//Real64 averageGroundTemp( 0 );
+					//Real64 averageGroundTempAmplitude( 0 );
+					//Real64 phaseShiftOfMinGroundTempDays( 0 );
+					//Real64 minSurfTemp( 100 ); // Set high month 1 temp will be lower and actually get updated
+
+					//InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+
+					//thisModel->objectName = "Site:GroundTemperature:Shallow";
+
+					//thisModel->objectType = objectType;
+
+					//// Calculate Average Ground Temperature for all 12 months of the year:
+					//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+					//	averageGroundTemp += PubGroundTempSurface( monthIndex );
+					//}
+					//averageGroundTemp /= monthsInYear;
+					//
+					//thisModel->aveGroundTemp = averageGroundTemp;
+
+					//// Calculate Average Amplitude from Average:;
+					//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+					//	averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - averageGroundTemp );
+					//}
+					//averageGroundTempAmplitude /= monthsInYear;
+					//
+					//thisModel->aveGroundTempAmplitude = averageGroundTempAmplitude;
+
+					//// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
+					//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+					//	if ( PubGroundTempSurface( monthIndex ) <= minSurfTemp ) {
+					//		monthOfMinSurfTemp = monthIndex;
+					//		minSurfTemp = PubGroundTempSurface( monthIndex );
+					//	}
+					//}
+					//
+					//phaseShiftOfMinGroundTempDays = monthOfMinSurfTemp * avgDaysInMonth;
+
+					//// Unit conversion
+					//thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * SecsInDay;
+
+
 					found = true;
 					break;
 				}
@@ -149,85 +195,114 @@ namespace GroundTemps {
 		// Search through Kusuda models here
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:Shallow";
 		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-			if ( numCurrObjects == 1 ) {
 
-				//PubGroundTempSurfFlag = false;
+		if ( numCurrObjects == 1 ) {
 
-				//Get the object names for each construction from the input processor
-				InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			//Get the object names for each construction from the input processor
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
-				if ( NumNums < 12 ) {
-					ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-					thisModel->errorsFound = true;
-				}
+			if ( NumNums < 12 ) {
+				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
+				thisModel->errorsFound = true;
+			}
 
-				//Assign the ground temps to the variable
-				for ( int i = 1; i <= 12; ++i ) {
-					thisModel->surfaceGroundTemps( i ) = rNumericArgs( i );
-				}
+			//Assign the ground temps to the variable
+			for ( int i = 1; i <= 12; ++i ) {
+				thisModel->surfaceGroundTemps( i ) = rNumericArgs( i );
+			}
 
-				GroundTemp_SurfaceObjInput = true;
+			GroundTemp_SurfaceObjInput = true;
 
-				} else if ( numCurrObjects > 1 ) {
-					ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-					thisModel->errorsFound = true;
-				}
+		} else if ( numCurrObjects > 1 ) {
+			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
+			thisModel->errorsFound = true;
+		} else {
+			thisModel->surfaceGroundTemps = 13.0;
+		}
 
-				// Write Final Ground Temp Information to the initialization output file
-				gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Shallow>, Months From Jan to Dec {C}";
-				gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Shallow";
-				for ( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->surfaceGroundTemps( i ); gio::write( OutputFileInits );
+		// Write Final Ground Temp Information to the initialization output file
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Shallow>, Months From Jan to Dec {C}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Shallow";
+		for ( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->surfaceGroundTemps( i ); gio::write( OutputFileInits );
 
-				//int monthsInYear( 12 );
-				//int avgDaysInMonth( 30 );
-				//int monthOfMinSurfTemp( 0 );
-				//Real64 averageGroundTemp( 0 );
-				//Real64 averageGroundTempAmplitude( 0 );
-				//Real64 phaseShiftOfMinGroundTempDays( 0 );
-				//Real64 minSurfTemp( 100 ); // Set high month 1 temp will be lower and actually get updated
-
-				//InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-
-				//thisModel->objectName = "Site:GroundTemperature:Shallow";
-
-				//thisModel->objectType = objectType;
-
-				//// Calculate Average Ground Temperature for all 12 months of the year:
-				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//	averageGroundTemp += PubGroundTempSurface( monthIndex );
-				//}
-				//averageGroundTemp /= monthsInYear;
-				//
-				//thisModel->aveGroundTemp = averageGroundTemp;
-
-				//// Calculate Average Amplitude from Average:;
-				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//	averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - averageGroundTemp );
-				//}
-				//averageGroundTempAmplitude /= monthsInYear;
-				//
-				//thisModel->aveGroundTempAmplitude = averageGroundTempAmplitude;
-
-				//// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//	if ( PubGroundTempSurface( monthIndex ) <= minSurfTemp ) {
-				//		monthOfMinSurfTemp = monthIndex;
-				//		minSurfTemp = PubGroundTempSurface( monthIndex );
-				//	}
-				//}
-				//
-				//phaseShiftOfMinGroundTempDays = monthOfMinSurfTemp * avgDaysInMonth;
-
-				//// Unit conversion
-				//thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * SecsInDay;
-
-				found = true;
+		found = true;
 
 		if ( found && !thisModel->errorsFound ) {
 			groundTempModels.push_back( thisModel );
 			return thisModel;
 		} else {
 			ShowContinueError( "Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");
+			return nullptr;
+		}
+	}
+
+	//******************************************************************************
+
+	// Site:GroundTemperature:Shallow factory
+	std::shared_ptr< BuildingSurfaceGroundTemps > 
+	BuildingSurfaceGTMFactory( int objectType ){
+
+		using DataEnvironment::GroundTempObjInput;
+		using namespace DataIPShortCuts;
+		using DataGlobals::SecsInDay;
+		using DataGlobals::OutputFileInits;
+		using namespace ObjexxFCL::gio;
+		
+		bool found = false;
+		bool genErrorMessage = false;
+		int NumNums;
+		int NumAlphas;
+		int IOStat;
+
+		// New shared pointer for this model object
+		std::shared_ptr< BuildingSurfaceGroundTemps > thisModel( new BuildingSurfaceGroundTemps() );
+
+		// Search through Kusuda models here
+		std::string const cCurrentModuleObject = "Site:GroundTemperature:BuildingSurface";
+		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( numCurrObjects == 1 ) {
+
+			//Get the object names for each construction from the input processor
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+
+			if ( NumNums < 12 ) {
+				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
+				thisModel->errorsFound = true;
+			}
+
+			//Assign the ground temps to the variable
+			for ( int i = 1; i <= 12; ++i ) {
+				thisModel->buildingSurfaceGroundTemps( i ) = rNumericArgs( i );
+				if ( thisModel->buildingSurfaceGroundTemps( i ) < 15.0 || thisModel->buildingSurfaceGroundTemps( i ) > 25.0 ) genErrorMessage = true;
+			}
+
+			GroundTempObjInput = true;
+
+			if ( genErrorMessage ) {
+			ShowWarningError( cCurrentModuleObject + ": Some values fall outside the range of 15-25C." );
+			ShowContinueError( "These values may be inappropriate.  Please consult the Input Output Reference for more details." );
+			}
+
+		} else if ( numCurrObjects > 1 ) {
+			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
+			thisModel->errorsFound = true;
+		} else {
+			thisModel->buildingSurfaceGroundTemps = 18.0;
+		}
+
+		// Write Final Ground Temp Information to the initialization output file
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:BuildingSurface>, Months From Jan to Dec {C}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:BuildingSurface";
+		for ( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->buildingSurfaceGroundTemps( i ); gio::write( OutputFileInits );
+
+		found = true;
+
+		if ( found && !thisModel->errorsFound ) {
+			groundTempModels.push_back( thisModel );
+			return thisModel;
+		} else {
+			ShowContinueError( "Site:GroundTemperature:BuildingSurface--Errors getting input for ground temperature model");
 			return nullptr;
 		}
 	}
@@ -291,7 +366,7 @@ namespace GroundTemps {
 		} else if ( objectType == objectType_FiniteDiffGroundTemp ) {
 			return FiniteDiffGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_SiteBuildingSurfaceGroundTemp ) {
-			return 0;
+			return BuildingSurfaceGTMFactory( objectType );
 		} else if ( objectType == objectType_SiteShallowGroundTemp ) {
 			return ShallowGTMFactory( objectType );
 		} else if ( objectType == objectType_SiteDeepGroundTemp ) {

@@ -18,6 +18,8 @@ namespace GroundTemps {
 		return surfaceGroundTemps( timeOfSimInMonths );
 	}
 
+	//******************************************************************************
+
 	Real64
 	ShallowGroundTemps::getGroundTempAtTimeInSeconds(
 		Real64 const depth,
@@ -35,7 +37,7 @@ namespace GroundTemps {
 			month = ceil( seconds / (secPerMonth * 12.0 ) );
 			month = remainder( month, 12 );
 		} else {
-			ShowFatalError("Site:GroundTemperature:Shallow: Invalid time passed to ground temperature model");
+			ShowFatalError("Site:GroundTemperature:Shallow--Invalid time passed to ground temperature model");
 		}
 
 		timeOfSimInMonths = month;
@@ -44,8 +46,62 @@ namespace GroundTemps {
 			return getGroundTemp();
 		}
 
+	//******************************************************************************
+
 	Real64
 	ShallowGroundTemps::getGroundTempAtTimeInMonths(
+		Real64 const depth,
+		int const month
+	)
+	{
+		// Set month
+		timeOfSimInMonths = month;
+
+		// Get and return ground temp
+		return getGroundTemp();
+
+	}
+
+	//******************************************************************************
+
+	Real64
+	BuildingSurfaceGroundTemps::getGroundTemp()
+	{
+		return buildingSurfaceGroundTemps( timeOfSimInMonths );
+	}
+
+	//******************************************************************************
+
+	Real64
+	BuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(
+		Real64 const depth,
+		Real64 const seconds
+	)
+	{
+
+		Real64 secPerMonth = 365 * 3600 * 24 / 12;
+		int month;
+
+		// Convert secs to months
+		if ( seconds > 0.0 && seconds <= ( secPerMonth * 12 ) ) {
+			month = ceil( seconds / ( secPerMonth * 12 ) );
+		} else if ( seconds > ( secPerMonth * 12 ) ) {
+			month = ceil( seconds / (secPerMonth * 12.0 ) );
+			month = remainder( month, 12 );
+		} else {
+			ShowFatalError("Site:GroundTemperature:BuildingSurface--Invalid time passed to ground temperature model");
+		}
+
+		timeOfSimInMonths = month;
+
+			// Get and return ground temp
+			return getGroundTemp();
+		}
+
+	//******************************************************************************
+
+	Real64
+	BuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(
 		Real64 const depth,
 		int const month
 	)

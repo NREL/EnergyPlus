@@ -46,6 +46,8 @@ namespace GroundTemps {
 		return aveGroundTemp - aveGroundTempAmplitude * std::exp( term1 ) * std::cos( term2 );
 	}
 
+	//******************************************************************************
+
 	Real64
 	KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(
 		Real64 const depthOfTemp,
@@ -61,6 +63,8 @@ namespace GroundTemps {
 		// Get and return ground temperature
 		return getGroundTemp();
 	}
+
+	//******************************************************************************
 
 	Real64
 	KusudaGroundTempsModel::getGroundTempAtTimeInMonths(

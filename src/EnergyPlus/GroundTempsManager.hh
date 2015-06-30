@@ -191,7 +191,43 @@ namespace GroundTemps {
 			int const monthOfSim
 		);
 
-		static std::shared_ptr< ShallowGroundTemps > ShallowGTMFactory( int objectType, std::string objectName ); 
+		static std::shared_ptr< ShallowGroundTemps > ShallowGTMFactory( int objectType ); 
+
+	};
+
+	//******************************************************************************
+
+	// Derived class for Site:GroundTemperature:BuildingSurface
+	class BuildingSurfaceGroundTemps : public BaseGroundTempsModel
+	{
+		public:
+			int timeOfSimInMonths;
+			Array1D< Real64 > buildingSurfaceGroundTemps;
+
+
+		// Default Constructor
+		BuildingSurfaceGroundTemps():
+			timeOfSimInMonths( 0 ),
+			buildingSurfaceGroundTemps( 12, 13.0 )
+
+			{}
+
+		Real64
+		getGroundTemp();
+
+		Real64
+		getGroundTempAtTimeInSeconds(
+			Real64 const depth,
+			Real64 const timeInSecondsOfSim
+		);
+
+		Real64
+		getGroundTempAtTimeInMonths(
+			Real64 const depth,
+			int const monthOfSim
+		);
+
+		static std::shared_ptr< BuildingSurfaceGroundTemps > BuildingSurfaceGTMFactory( int objectType ); 
 
 	};
 
