@@ -896,13 +896,13 @@ void SQLite::initializeZoneSizingTable()
 		"CREATE TABLE ZoneSizes ( "
 		"ZoneSizesIndex INTEGER PRIMARY KEY, ZoneName TEXT, LoadType TEXT, "
 		"CalcDesLoad REAL, UserDesLoad REAL, CalcDesFlow REAL, UserDesFlow REAL, DesDayName TEXT, PeakHrMin TEXT, "
-		"PeakTemp REAL, PeakHumRat REAL, CalcOutsideAirFlow REAL"
+		"PeakTemp REAL, PeakHumRat REAL, CalcOutsideAirFlow REAL, DOASHeatAddRate REAL"
 		");";
 
 	sqliteExecuteCommand(zoneSizesTableSQL);
 
 	const std::string zoneSizingInsertSQL =
-		"INSERT INTO ZoneSizes VALUES(?,?,?,?,?,?,?,?,?,?,?,?);";
+		"INSERT INTO ZoneSizes VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_zoneSizingInsertStmt,zoneSizingInsertSQL);
 }
