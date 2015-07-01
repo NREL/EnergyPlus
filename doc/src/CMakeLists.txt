@@ -40,7 +40,8 @@ if (PANDOC_VER VERSION_LESS "1.13.2")
   message(FATAL_ERROR "pandoc version 1.13.2 or greater required")
 endif()
 
-Function(AddMarkdownInput docName fileName offset)
+
+Function(AddSplitMarkdownInput docName fileName offset)
   set(input_name ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/${fileName})
   set(output_name ${CMAKE_BINARY_DIR}/docs/${docName}/${fileName}.html)
   set(${docName}_Inputs ${${docName}_Inputs} ${output_name} PARENT_SCOPE)
@@ -53,21 +54,15 @@ Function(AddMarkdownInput docName fileName offset)
     )
 EndFunction()
 
-Function(AddPDF docName timeout smart_shrink )
-
+Function(AddSplitPDF docName zoom )
   set(output_name ${CMAKE_BINARY_DIR}/built_pdfs/${docName}.pdf)
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/built_pdfs)
 
-  if (${smart_shrink})
-    set(shrinking_options --enable-smart-shrinking)
-  else()
-    set(shrinking_options --disable-smart-shrinking --zoom ${ARGV3})
-  endif()
-
+  set(shrinking_options --disable-smart-shrinking --zoom ${zoom})
 
   add_custom_command(OUTPUT ${output_name}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/media ${CMAKE_BINARY_DIR}/docs/${docName}/media
-    COMMAND ${WKHTMLTOPDF_EXECUTABLE} --outline --outline-depth 3  ${shrinking_options} --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 3 --footer-center [page] --no-stop-slow-scripts --javascript-delay ${timeout}  toc --xsl-style-sheet ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl  ${${docName}_Inputs} ${output_name} 
+    COMMAND ${WKHTMLTOPDF_EXECUTABLE}  --window-status "MATHJAXDONE" --outline --outline-depth 3  ${shrinking_options} --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 3 --footer-center [page] --no-stop-slow-scripts   toc --xsl-style-sheet ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl  ${${docName}_Inputs} ${output_name} 
     DEPENDS ${${docName}_Inputs} ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName}
     )
@@ -80,78 +75,108 @@ Function(AddPDF docName timeout smart_shrink )
 
 EndFunction()
 
-AddMarkdownInput(Acknowledgements Acknowledgements.md 0)
-AddPDF(Acknowledgements 10000 true)
 
-AddMarkdownInput(AuxiliaryPrograms AuxiliaryPrograms.md 0)
-AddPDF(AuxiliaryPrograms 10000 true)
+Function(AddMarkdownInput docName)
+  set(output_name ${CMAKE_BINARY_DIR}/docs/${docName}/${docName}.html)
 
-AddMarkdownInput(EMS_Application_Guide EMS_Application_Guide.md 0)
-AddPDF(EMS_Application_Guide 10000 true)
+  set(input_names "")
 
-AddMarkdownInput(EngineeringReference 01-Overview.md 0)
-AddMarkdownInput(EngineeringReference 02-IntegratedSolution.md 1)
-AddMarkdownInput(EngineeringReference 03-SurfaceHeatBalance.md 2)
-AddMarkdownInput(EngineeringReference 04-AdvancedSurface.md 3)
-AddMarkdownInput(EngineeringReference 05-Climate.md 4)
-AddMarkdownInput(EngineeringReference 06-SolarRadiation.md 5)
-AddMarkdownInput(EngineeringReference 07-Daylighting.md 6)
-AddMarkdownInput(EngineeringReference 08-AirHeatBalance.md 7)
-AddMarkdownInput(EngineeringReference 09-BuildingSystemSimulation.md 8)
-AddMarkdownInput(EngineeringReference 10-Sizing.md 9)
-AddMarkdownInput(EngineeringReference OperationalFaults.md 10)
-AddMarkdownInput(EngineeringReference 11-DemandLimiting.md 11)
-AddMarkdownInput(EngineeringReference 12-AlternativeModeling.md 12)
-AddMarkdownInput(EngineeringReference 13-EncyclopaedicRefs.md 13)
-AddMarkdownInput(EngineeringReference 13a-EncyclopaedicRefs.md 14)
-AddMarkdownInput(EngineeringReference 13b-EncyclopaedicRefs.md 15)
-AddMarkdownInput(EngineeringReference 13c-EncyclopaedicRefs.md 16)
-AddMarkdownInput(EngineeringReference 13d-EncyclopaedicRefs.md 17)
-AddMarkdownInput(EngineeringReference 13e-EncyclopaedicRefs.md 18)
-AddMarkdownInput(EngineeringReference 13f-EncyclopaedicRefs.md 19)
-AddMarkdownInput(EngineeringReference 14-OnSiteGeneration.md 20)
-AddMarkdownInput(EngineeringReference 15-PerformanceCurves.md 21)
-AddMarkdownInput(EngineeringReference 16-Economics.md 22)
-AddMarkdownInput(EngineeringReference 17-SpecialModulesReporting.md 23)
-AddPDF(EngineeringReference 1800000 false .61)
+  foreach(input_name ${ARGN})
+    list(APPEND input_names ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/${input_name})
+  endforeach()
 
-AddMarkdownInput(ExternalInterfaces_Application_Guide ExternalInterfaces_Application_Guide.md 0)
-AddPDF(ExternalInterfaces_Application_Guide 10000 true)
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName})
 
-AddMarkdownInput(GettingStarted GettingStarted.md 0)
-AddPDF(GettingStarted 10000 true)
+  add_custom_command(OUTPUT ${output_name}
+    COMMAND ${PANDOC_EXECUTABLE} ${input_names} -o ${output_name} -f markdown_github -s -t html -N -H ${CMAKE_CURRENT_SOURCE_DIR}/docs/header.html  --email-obfuscation=none
+    DEPENDS ${input_names} ${CMAKE_CURRENT_SOURCE_DIR}/docs/header.html
+    )
+EndFunction()
 
-AddMarkdownInput(InputOutputReference 01a-InputOutputReference.md 0)
-AddMarkdownInput(InputOutputReference 01b-InputOutputReference.md 1)
-AddMarkdownInput(InputOutputReference 01c-InputOutputReference.md 2)
-AddMarkdownInput(InputOutputReference 01d-InputOutputReference.md 3)
-AddMarkdownInput(InputOutputReference 02-HVACTemplates.md 4)
-AddMarkdownInput(InputOutputReference 03-Economics.md 5)
-AddMarkdownInput(InputOutputReference 04-Parametrics.md 6)
-AddMarkdownInput(InputOutputReference 05-InputForOutput.md 7)
-AddMarkdownInput(InputOutputReference 06-StandardOutputReports.md 8)
-AddMarkdownInput(InputOutputReference 07-WeatherData.md 9)
-AddMarkdownInput(InputOutputReference 08-RunningEnergyPlus.md 10)
-AddMarkdownInput(InputOutputReference 09-Appendix.md 11)
-AddPDF(InputOutputReference 300000 false .66)
 
-AddMarkdownInput(InterfaceDeveloper InterfaceDeveloper.md 0)
-AddPDF(InterfaceDeveloper 10000 true)
+Function(AddPDF docName)
 
-AddMarkdownInput(ModuleDeveloper ModuleDeveloper.md 0)
-AddPDF(ModuleDeveloper 10000 true)
+  set(output_name ${CMAKE_BINARY_DIR}/built_pdfs/${docName}.pdf)
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/built_pdfs)
 
-AddMarkdownInput(OutputDetailsAndExamples OutputDetailsAndExamples.md 0)
-AddPDF(OutputDetailsAndExamples 10000 true)
+  add_custom_command(OUTPUT ${output_name}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/media ${CMAKE_BINARY_DIR}/docs/${docName}/media
+    COMMAND ${WKHTMLTOPDF_EXECUTABLE} --window-status "MATHJAXDONE" --outline --outline-depth 3  --enable-smart-shrinking --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 3 --footer-center [page] --no-stop-slow-scripts  toc --xsl-style-sheet ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl  ${CMAKE_BINARY_DIR}/docs/${docName}/${docName}.html ${output_name} 
+    DEPENDS ${CMAKE_BINARY_DIR}/docs/${docName}/${docName}.html ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName}
+    )
 
-AddMarkdownInput(PlantApplicationGuide PlantApplicationGuide.md 0)
-AddPDF(PlantApplicationGuide 10000 true)
+  add_custom_target(${docName}_pdf ALL
+    DEPENDS ${output_name}
+    )
 
-AddMarkdownInput(Tips_and_Tricks_Using_EnergyPlus Tips_and_Tricks_Using_EnergyPlus.md 0)
-AddPDF(Tips_and_Tricks_Using_EnergyPlus 10000 true)
+  INSTALL(FILES "${output_name}" DESTINATION "./Documentation")
 
-AddMarkdownInput(Using_EnergyPlus_for_Compliance Using_EnergyPlus_for_Compliance.md 0)
-AddPDF(Using_EnergyPlus_for_Compliance 10000 true)
+EndFunction()
+
+AddMarkdownInput(Acknowledgements Acknowledgements.md)
+AddPDF(Acknowledgements)
+
+AddMarkdownInput(AuxiliaryPrograms AuxiliaryPrograms.md)
+AddPDF(AuxiliaryPrograms)
+
+AddMarkdownInput(EMS_Application_Guide EMS_Application_Guide.md)
+AddPDF(EMS_Application_Guide)
+
+
+AddSplitMarkdownInput(EngineeringReference 01-Overview.md 0)
+AddSplitMarkdownInput(EngineeringReference 02-IntegratedSolution.md 1)
+AddSplitMarkdownInput(EngineeringReference 03-SurfaceHeatBalance.md 2)
+AddSplitMarkdownInput(EngineeringReference 04-AdvancedSurface.md 3)
+AddSplitMarkdownInput(EngineeringReference 05-Climate.md 4)
+AddSplitMarkdownInput(EngineeringReference 06-SolarRadiation.md 5)
+AddSplitMarkdownInput(EngineeringReference 07-Daylighting.md 6)
+AddSplitMarkdownInput(EngineeringReference 08-AirHeatBalance.md 7)
+AddSplitMarkdownInput(EngineeringReference 09-BuildingSystemSimulation.md 8)
+AddSplitMarkdownInput(EngineeringReference 10-Sizing.md 9)
+AddSplitMarkdownInput(EngineeringReference OperationalFaults.md 10)
+AddSplitMarkdownInput(EngineeringReference 11-DemandLimiting.md 11)
+AddSplitMarkdownInput(EngineeringReference 12-AlternativeModeling.md 12)
+AddSplitMarkdownInput(EngineeringReference 13-EncyclopaedicRefs.md 13)
+AddSplitMarkdownInput(EngineeringReference 13a-EncyclopaedicRefs.md 14)
+AddSplitMarkdownInput(EngineeringReference 13b-EncyclopaedicRefs.md 15)
+AddSplitMarkdownInput(EngineeringReference 13c-EncyclopaedicRefs.md 16)
+AddSplitMarkdownInput(EngineeringReference 13d-EncyclopaedicRefs.md 17)
+AddSplitMarkdownInput(EngineeringReference 13e-EncyclopaedicRefs.md 18)
+AddSplitMarkdownInput(EngineeringReference 13f-EncyclopaedicRefs.md 19)
+AddSplitMarkdownInput(EngineeringReference 14-OnSiteGeneration.md 20)
+AddSplitMarkdownInput(EngineeringReference 15-PerformanceCurves.md 21)
+AddSplitMarkdownInput(EngineeringReference 16-Economics.md 22)
+AddSplitMarkdownInput(EngineeringReference 17-SpecialModulesReporting.md 23)
+AddSplitPDF(EngineeringReference .61)
+
+
+AddMarkdownInput(ExternalInterfaces_Application_Guide ExternalInterfaces_Application_Guide.md)
+AddPDF(ExternalInterfaces_Application_Guide)
+
+AddMarkdownInput(GettingStarted GettingStarted.md )
+AddPDF(GettingStarted )
+
+AddMarkdownInput(InputOutputReference 01a-InputOutputReference.md 01b-InputOutputReference.md 01c-InputOutputReference.md 01d-InputOutputReference.md 02-HVACTemplates.md 03-Economics.md 04-Parametrics.md 05-InputForOutput.md 06-StandardOutputReports.md 07-WeatherData.md 08-RunningEnergyPlus.md 09-Appendix.md)
+AddPDF(InputOutputReference)
+
+AddMarkdownInput(InterfaceDeveloper InterfaceDeveloper.md)
+AddPDF(InterfaceDeveloper)
+
+AddMarkdownInput(ModuleDeveloper ModuleDeveloper.md)
+AddPDF(ModuleDeveloper)
+
+AddMarkdownInput(OutputDetailsAndExamples OutputDetailsAndExamples.md)
+AddPDF(OutputDetailsAndExamples)
+
+AddMarkdownInput(PlantApplicationGuide PlantApplicationGuide.md)
+AddPDF(PlantApplicationGuide)
+
+AddMarkdownInput(Tips_and_Tricks_Using_EnergyPlus Tips_and_Tricks_Using_EnergyPlus.md)
+AddPDF(Tips_and_Tricks_Using_EnergyPlus)
+
+AddMarkdownInput(Using_EnergyPlus_for_Compliance Using_EnergyPlus_for_Compliance.md)
+AddPDF(Using_EnergyPlus_for_Compliance)
 
 
 
