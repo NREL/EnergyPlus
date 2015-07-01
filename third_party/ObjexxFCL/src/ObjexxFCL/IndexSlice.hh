@@ -586,8 +586,8 @@ public: // Modifier
 public: // Friend
 
 	// Swap
-	inline
 	friend
+	inline
 	void
 	swap( IndexSlice & a, IndexSlice & b )
 	{
@@ -597,8 +597,8 @@ public: // Friend
 public: // Comparison
 
 	// IndexSlice == IndexSlice
-	inline
 	friend
+	inline
 	bool
 	operator ==( IndexSlice const & I, IndexSlice const & J )
 	{
@@ -606,8 +606,8 @@ public: // Comparison
 	}
 
 	// IndexSlice != IndexSlice
-	inline
 	friend
+	inline
 	bool
 	operator !=( IndexSlice const & I, IndexSlice const & J )
 	{
