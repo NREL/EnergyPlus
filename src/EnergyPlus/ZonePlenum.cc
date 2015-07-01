@@ -726,10 +726,10 @@ namespace ZonePlenum {
 			ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail( NodeNum ) = Node( InducedNode ).MassFlowRateMaxAvail;
 			ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail( NodeNum ) = Node( InducedNode ).MassFlowRateMinAvail;
 
-			ZoneRetPlenCond( ZonePlenumNum ).InducedTemp = Node( ZoneNodeNum ).Temp;
-			ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat = Node( ZoneNodeNum ).HumRat;
-			ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy = Node( ZoneNodeNum ).Enthalpy;
-			ZoneRetPlenCond( ZonePlenumNum ).InducedPressure = Node( ZoneNodeNum ).Press;
+			ZoneRetPlenCond( ZonePlenumNum ).InducedTemp( NodeNum ) = Node( ZoneNodeNum ).Temp;
+			ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat( NodeNum ) = Node( ZoneNodeNum ).HumRat;
+			ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy( NodeNum ) = Node( ZoneNodeNum ).Enthalpy;
+			ZoneRetPlenCond( ZonePlenumNum ).InducedPressure( NodeNum ) = Node( ZoneNodeNum ).Press;
 		}
 
 		// Add stuff to calculate conduction inputs to the zone plenum
