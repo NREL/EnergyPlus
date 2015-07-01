@@ -8,6 +8,7 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <DataContaminantBalance.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -15,6 +16,7 @@ using namespace DataGlobals;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::Psychrometrics;
+using DataContaminantBalance::Contaminant;
 
 
 TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
@@ -23,23 +25,8 @@ TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
 
 	InitializePsychRoutines();
 	BeginEnvrnFlag = false;
-
-	//TimeStepSys = 15.0 / 60.0; // System timestep in hours
-
-	//ZoneEquipConfig.allocate( 1 );
-	//ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
-	//ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	//std::vector< int > controlledZoneEquipConfigNums;
-	//controlledZoneEquipConfigNums.push_back( 1 );
-
-	//ZoneEquipConfig( 1 ).NumInletNodes = 2;
-	//ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
-	//ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;
-	//ZoneEquipConfig( 1 ).InletNode( 2 ) = 2;
-	//ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
-	//ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
-	//ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	//ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	Contaminant.CO2Simulation = true;
+	Contaminant.GenericContamSimulation = true;
 
 	NumZoneReturnPlenums = 1;
 	ZoneRetPlenCond.allocate( NumZoneReturnPlenums );
@@ -54,6 +41,8 @@ TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
 	ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 	ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 	ZoneRetPlenCond( ZonePlenumNum ).InducedPressure.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
+	ZoneRetPlenCond( ZonePlenumNum ).InducedCO2.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
+	ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate = 0.0;
 	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail = 0.0;
 	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail = 0.0;
@@ -61,6 +50,8 @@ TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
 	ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat = 0.0;
 	ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy = 0.0;
 	ZoneRetPlenCond( ZonePlenumNum ).InducedPressure = 0.0;
+	ZoneRetPlenCond( ZonePlenumNum ).InducedCO2 = 0.0;
+	ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam = 0.0;
 
 	Node.allocate( 3 ); // One node per plenum plus total of NumInducedNodes for all plenums)
 	int ZoneNodeNum = 1;
@@ -69,50 +60,40 @@ TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
 	Node( ZoneNodeNum ).HumRat= 0.0003;
 	Node( ZoneNodeNum ).Enthalpy = 40000.0;
 	Node( ZoneNodeNum ).Press = 99000.0;
+	Node( ZoneNodeNum ).CO2 = 50000.0;
+	Node( ZoneNodeNum ).GenContam = 100.0;
 
 	int InducedNodeIndex = 1;
-	int InducedNode = 2;
-	ZoneRetPlenCond( ZonePlenumNum ).InducedNode( InducedNodeIndex ) = InducedNode;
-	Node( InducedNode ).MassFlowRate = 0.20;
-	Node( InducedNode ).MassFlowRateMaxAvail = 0.25;
-	Node( InducedNode ).MassFlowRateMinAvail = 0.10;
+	int InducedNodeNum = 2;
+	ZoneRetPlenCond( ZonePlenumNum ).InducedNode( InducedNodeIndex ) = InducedNodeNum;
+	Node( InducedNodeNum ).MassFlowRate = 0.20;
+	Node( InducedNodeNum ).MassFlowRateMaxAvail = 0.25;
+	Node( InducedNodeNum ).MassFlowRateMinAvail = 0.10;
 
 	InducedNodeIndex = 2;
-	InducedNode = 3;
-	ZoneRetPlenCond( ZonePlenumNum ).InducedNode( InducedNodeIndex ) = InducedNode;
-	Node( InducedNode ).MassFlowRate = 0.40;
-	Node( InducedNode ).MassFlowRateMaxAvail = 0.50;
-	Node( InducedNode ).MassFlowRateMinAvail = 0.22;
+	InducedNodeNum = 3;
+	ZoneRetPlenCond( ZonePlenumNum ).InducedNode( InducedNodeIndex ) = InducedNodeNum;
+	Node( InducedNodeNum ).MassFlowRate = 0.40;
+	Node( InducedNodeNum ).MassFlowRateMaxAvail = 0.50;
+	Node( InducedNodeNum ).MassFlowRateMinAvail = 0.22;
 
 	InitAirZoneReturnPlenum( ZonePlenumNum );
 	
-	// Check first induced air node
-	InducedNodeIndex = 1;
-	InducedNode = ZoneRetPlenCond( ZonePlenumNum ).InducedNode( InducedNodeIndex );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate( InducedNodeIndex ), Node( InducedNode ).MassFlowRate );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail( InducedNodeIndex ) , Node( InducedNode ).MassFlowRateMaxAvail );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail( InducedNodeIndex ) , Node( InducedNode ).MassFlowRateMinAvail );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedTemp( InducedNodeIndex ), Node( ZoneNodeNum ).Temp );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat( InducedNodeIndex ) , Node( ZoneNodeNum ).HumRat );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy( InducedNodeIndex ) , Node( ZoneNodeNum ).Enthalpy );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedPressure( InducedNodeIndex ) , Node( ZoneNodeNum ).Press );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneTemp , Node( ZoneNodeNum ).Temp );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneHumRat , Node( ZoneNodeNum ).HumRat );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneEnthalpy , Node( ZoneNodeNum ).Enthalpy );
-
-	// Check second induced air node
-	InducedNodeIndex = 2;
-	InducedNode = ZoneRetPlenCond( ZonePlenumNum ).InducedNode( InducedNodeIndex );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate( InducedNodeIndex ), Node( InducedNode ).MassFlowRate );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail( InducedNodeIndex ), Node( InducedNode ).MassFlowRateMaxAvail );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail( InducedNodeIndex ), Node( InducedNode ).MassFlowRateMinAvail );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedTemp( InducedNodeIndex ), Node( ZoneNodeNum ).Temp );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat( InducedNodeIndex ), Node( ZoneNodeNum ).HumRat );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy( InducedNodeIndex ), Node( ZoneNodeNum ).Enthalpy );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedPressure( InducedNodeIndex ), Node( ZoneNodeNum ).Press );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneTemp, Node( ZoneNodeNum ).Temp );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneHumRat, Node( ZoneNodeNum ).HumRat );
-	EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneEnthalpy, Node( ZoneNodeNum ).Enthalpy );
+	for ( InducedNodeIndex = 1; InducedNodeIndex <= ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes; ++InducedNodeIndex ) {
+		InducedNodeNum = ZoneRetPlenCond( ZonePlenumNum ).InducedNode( InducedNodeIndex );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate( InducedNodeIndex ), Node( InducedNodeNum ).MassFlowRate );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail( InducedNodeIndex ) , Node( InducedNodeNum ).MassFlowRateMaxAvail );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail( InducedNodeIndex ) , Node( InducedNodeNum ).MassFlowRateMinAvail );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedTemp( InducedNodeIndex ), Node( ZoneNodeNum ).Temp );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat( InducedNodeIndex ) , Node( ZoneNodeNum ).HumRat );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy( InducedNodeIndex ) , Node( ZoneNodeNum ).Enthalpy );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedPressure( InducedNodeIndex ) , Node( ZoneNodeNum ).Press );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedCO2( InducedNodeIndex ), Node( ZoneNodeNum ).CO2 );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam( InducedNodeIndex ), Node( ZoneNodeNum ).GenContam );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneTemp, Node( ZoneNodeNum ).Temp );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneHumRat , Node( ZoneNodeNum ).HumRat );
+		EXPECT_EQ( ZoneRetPlenCond( ZonePlenumNum ).ZoneEnthalpy , Node( ZoneNodeNum ).Enthalpy );
+	}
 
 	// Deallocate everything
 	ZoneRetPlenCond( ZonePlenumNum ).InducedNode.deallocate( );
@@ -123,6 +104,8 @@ TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
 	ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat.deallocate( );
 	ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy.deallocate( );
 	ZoneRetPlenCond( ZonePlenumNum ).InducedPressure.deallocate( );
+	ZoneRetPlenCond( ZonePlenumNum ).InducedCO2.deallocate( );
+	ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam.deallocate( );
 	ZoneRetPlenCond.deallocate( );
 	Node.deallocate();
 

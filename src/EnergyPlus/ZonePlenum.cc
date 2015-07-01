@@ -381,6 +381,8 @@ namespace ZonePlenum {
 				ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 				ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 				ZoneRetPlenCond( ZonePlenumNum ).InducedPressure.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
+				ZoneRetPlenCond( ZonePlenumNum ).InducedCO2.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
+				ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInducedNodes );
 				ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate = 0.0;
 				ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail = 0.0;
 				ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail = 0.0;
@@ -388,6 +390,8 @@ namespace ZonePlenum {
 				ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat = 0.0;
 				ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy = 0.0;
 				ZoneRetPlenCond( ZonePlenumNum ).InducedPressure = 0.0;
+				ZoneRetPlenCond( ZonePlenumNum ).InducedCO2 = 0.0;
+				ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam = 0.0;
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) = NodeNums( NodeNum );
 					UniqueNodeError = false;
@@ -600,6 +604,7 @@ namespace ZonePlenum {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataDefineEquip::AirDistUnit;
 		using DataDefineEquip::NumAirDistUnits;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -730,6 +735,12 @@ namespace ZonePlenum {
 			ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat( NodeNum ) = Node( ZoneNodeNum ).HumRat;
 			ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy( NodeNum ) = Node( ZoneNodeNum ).Enthalpy;
 			ZoneRetPlenCond( ZonePlenumNum ).InducedPressure( NodeNum ) = Node( ZoneNodeNum ).Press;
+			if ( Contaminant.CO2Simulation ) {
+				ZoneRetPlenCond( ZonePlenumNum ).InducedCO2( NodeNum ) = Node( ZoneNodeNum ).CO2;
+			}
+			if ( Contaminant.GenericContamSimulation ) {
+				ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam( NodeNum ) = Node( ZoneNodeNum ).GenContam;
+			}
 		}
 
 		// Add stuff to calculate conduction inputs to the zone plenum
@@ -1127,6 +1138,12 @@ namespace ZonePlenum {
 			Node( InducedNode ).HumRat = ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat( IndNum );
 			Node( InducedNode ).Enthalpy = ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy( IndNum );
 			Node( InducedNode ).Press = ZoneRetPlenCond( ZonePlenumNum ).InducedPressure( IndNum );
+			if ( Contaminant.CO2Simulation ) {
+				Node( InducedNode ).CO2 = ZoneRetPlenCond( ZonePlenumNum ).InducedCO2( IndNum );
+			}
+			if ( Contaminant.GenericContamSimulation ) {
+				Node( InducedNode ).GenContam = ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam( IndNum );
+			}
 			Node( InducedNode ).Quality = Node( InletNode ).Quality;
 		}
 
