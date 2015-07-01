@@ -564,7 +564,7 @@ namespace FluidCoolers {
 
 	bool
 	TestFluidCoolerTwoSpeedInputForDesign(
-		std::string const cCurrentModuleObject,
+		std::string const & cCurrentModuleObject,
 		Array1D<std::string> const &  AlphArray,
 		Array1D<std::string> const & cNumericFieldNames,
 		Array1D<std::string> const & cAlphaFieldNames,

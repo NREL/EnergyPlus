@@ -5954,9 +5954,9 @@ Label20: ;
 					Phi = double( IPhi - 1 ) * 10.0;
 					CosPhi = std::cos( Phi * DegToRadians );
 					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
-					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
-					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef( {1,6} ) );
-					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef( {1,6} ) );
+					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef );
+					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef );
+					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
 						solabsFit( IGlass, IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
