@@ -168,6 +168,58 @@ namespace GroundTemps {
 
 	//******************************************************************************
 
+	Real64
+	DeepGroundTemps::getGroundTemp()
+	{
+		return deepGroundTemps( timeOfSimInMonths );
+	}
+
+	//******************************************************************************
+
+	Real64
+	DeepGroundTemps::getGroundTempAtTimeInSeconds(
+		Real64 const depth,
+		Real64 const seconds
+	)
+	{
+
+		Real64 secPerMonth = 365 * 3600 * 24 / 12;
+		int month;
+
+		// Convert secs to months
+		if ( seconds > 0.0 && seconds <= ( secPerMonth * 12 ) ) {
+			month = ceil( seconds / ( secPerMonth * 12 ) );
+		} else if ( seconds > ( secPerMonth * 12 ) ) {
+			month = ceil( seconds / (secPerMonth * 12.0 ) );
+			month = remainder( month, 12 );
+		} else {
+			ShowFatalError("Site:GroundTemperature:Deep--Invalid time passed to ground temperature model");
+		}
+
+		timeOfSimInMonths = month;
+
+			// Get and return ground temp
+			return getGroundTemp();
+		}
+
+	//******************************************************************************
+
+	Real64
+	DeepGroundTemps::getGroundTempAtTimeInMonths(
+		Real64 const depth,
+		int const month
+	)
+	{
+		// Set month
+		timeOfSimInMonths = month;
+
+		// Get and return ground temp
+		return getGroundTemp();
+
+	}
+
+	//******************************************************************************
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
