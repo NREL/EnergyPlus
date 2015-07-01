@@ -26,7 +26,7 @@ protected:
 	}
 
 	virtual void TearDown() {
-		if ( NumObjectDefs > 0 ) {
+		if ( NumObjectDefs > 0 && ObjectDef.size() > 0 ) {
 			ObjectDef( NumObjectDefs ).AlphaOrNumeric.deallocate();
 			ObjectDef( NumObjectDefs ).NumRangeChks.deallocate();
 			ObjectDef( NumObjectDefs ).AlphFieldChks.deallocate();
@@ -56,9 +56,14 @@ protected:
 		if( !idd.empty() ) {
 			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
 		} else {
-			idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( "Energy+.idd", std::ios_base::in | std::ios_base::binary ) );
-			if ( ! idd_stream->good() ) {
-				idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( "../Energy+.idd", std::ios_base::in | std::ios_base::binary ) );
+			static std::vector< std::string > const possible_idd_locations( { "Energy+.idd", "Products/Energy+.idd", "../Energy+.idd" } );
+			for( auto const & idd_locations : possible_idd_locations ) {
+				idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_locations, std::ios_base::in | std::ios_base::binary ) );
+				if ( idd_stream->good() ) {
+					break;
+				} else {
+					continue;
+				}
 			}
 		}
 
@@ -108,15 +113,73 @@ TEST_F( InputProcessorFixture, findItemInSortedList )
 
 	InputProcessor::NumObjectDefs = ListOfObjects.size();
 
-	EXPECT_EQ( 1, FindItemInSortedList( "OUTPUT:METER", ListOfObjects, NumObjectDefs ) );
-	EXPECT_EQ( 2, FindItemInSortedList( "OUTPUT:METER:CUMULATIVE", ListOfObjects, NumObjectDefs ) );
-	EXPECT_EQ( 3, FindItemInSortedList( "OUTPUT:METER:CUMULATIVE:METERFILEONLY", ListOfObjects, NumObjectDefs ) );
-	EXPECT_EQ( 4, FindItemInSortedList( "OUTPUT:METER:METERFILEONLY", ListOfObjects, NumObjectDefs ) );
-	EXPECT_EQ( 5, FindItemInSortedList( "OUTPUT:SQLITE", ListOfObjects, NumObjectDefs ) );
-	EXPECT_EQ( 6, FindItemInSortedList( "OUTPUT:VARIABLE", ListOfObjects, NumObjectDefs ) );
+	iListOfObjects.allocate( NumObjectDefs );
+	SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );
 
-	InputProcessor::NumObjectDefs = 0;
-	InputProcessor::ListOfObjects.deallocate();
+	auto index1 = FindItemInSortedList( "OUTPUT:METER", ListOfObjects, NumObjectDefs );
+	auto index2 = FindItemInSortedList( "OUTPUT:METER:CUMULATIVE", ListOfObjects, NumObjectDefs );
+	auto index3 = FindItemInSortedList( "OUTPUT:METER:CUMULATIVE:METERFILEONLY", ListOfObjects, NumObjectDefs );
+	auto index4 = FindItemInSortedList( "OUTPUT:METER:METERFILEONLY", ListOfObjects, NumObjectDefs );
+	auto index5 = FindItemInSortedList( "OUTPUT:SQLITE", ListOfObjects, NumObjectDefs );
+	auto index6 = FindItemInSortedList( "OUTPUT:VARIABLE", ListOfObjects, NumObjectDefs );
+
+
+	EXPECT_EQ( 1, index1 );
+	EXPECT_EQ( 2, index2 );
+	EXPECT_EQ( 3, index3 );
+	EXPECT_EQ( 4, index4 );
+	EXPECT_EQ( 5, index5 );
+	EXPECT_EQ( 6, index6 );
+
+	EXPECT_EQ( 1, iListOfObjects( index1 ) );
+	EXPECT_EQ( 2, iListOfObjects( index2 ) );
+	EXPECT_EQ( 3, iListOfObjects( index3 ) );
+	EXPECT_EQ( 4, iListOfObjects( index4 ) );
+	EXPECT_EQ( 5, iListOfObjects( index5 ) );
+	EXPECT_EQ( 6, iListOfObjects( index6 ) );
+
+}
+
+TEST_F( InputProcessorFixture, findItemInSortedList_unsorted )
+{
+	ShowMessage( "Begin Test: InputProcessorFixture, findItemInSortedList" );
+
+	InputProcessor::ListOfObjects = Array1D_string ({
+		"OUTPUT:VARIABLE",
+		"OUTPUT:METER",
+		"OUTPUT:METER:METERFILEONLY",
+		"OUTPUT:METER:CUMULATIVE",
+		"OUTPUT:METER:CUMULATIVE:METERFILEONLY",
+		"OUTPUT:SQLITE"
+	});
+
+	InputProcessor::NumObjectDefs = ListOfObjects.size();
+
+	iListOfObjects.allocate( NumObjectDefs );
+	SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );
+
+	auto index1 = FindItemInSortedList( "OUTPUT:METER", ListOfObjects, NumObjectDefs );
+	auto index2 = FindItemInSortedList( "OUTPUT:METER:CUMULATIVE", ListOfObjects, NumObjectDefs );
+	auto index3 = FindItemInSortedList( "OUTPUT:METER:CUMULATIVE:METERFILEONLY", ListOfObjects, NumObjectDefs );
+	auto index4 = FindItemInSortedList( "OUTPUT:METER:METERFILEONLY", ListOfObjects, NumObjectDefs );
+	auto index5 = FindItemInSortedList( "OUTPUT:SQLITE", ListOfObjects, NumObjectDefs );
+	auto index6 = FindItemInSortedList( "OUTPUT:VARIABLE", ListOfObjects, NumObjectDefs );
+
+
+	EXPECT_EQ( 1, index1 );
+	EXPECT_EQ( 2, index2 );
+	EXPECT_EQ( 3, index3 );
+	EXPECT_EQ( 4, index4 );
+	EXPECT_EQ( 5, index5 );
+	EXPECT_EQ( 6, index6 );
+
+	EXPECT_EQ( 2, iListOfObjects( index1 ) );
+	EXPECT_EQ( 4, iListOfObjects( index2 ) );
+	EXPECT_EQ( 5, iListOfObjects( index3 ) );
+	EXPECT_EQ( 3, iListOfObjects( index4 ) );
+	EXPECT_EQ( 6, iListOfObjects( index5 ) );
+	EXPECT_EQ( 1, iListOfObjects( index6 ) );
+
 }
 
 TEST_F( InputProcessorFixture, findItemInList )
@@ -141,8 +204,6 @@ TEST_F( InputProcessorFixture, findItemInList )
 	EXPECT_EQ( 6, FindItemInList( "OUTPUT:SQLITE", ListOfObjects, NumObjectDefs ) );
 	EXPECT_EQ( 1, FindItemInList( "OUTPUT:VARIABLE", ListOfObjects, NumObjectDefs ) );
 
-	InputProcessor::NumObjectDefs = 0;
-	InputProcessor::ListOfObjects.deallocate();
 }
 
 TEST_F( InputProcessorFixture, processDataDicFile_FullIDD )

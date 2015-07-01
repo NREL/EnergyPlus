@@ -5,7 +5,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+
+#include <memory>
+
+using namespace EnergyPlus;
+using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
@@ -85,7 +91,7 @@ namespace EnergyPlus {
 			} else {
 				EXPECT_EQ( correctString, this->m_cout_buffer->str() );
 			}
-			if ( resetStream ) this->m_cout_buffer->str(std::string());
+			if ( resetStream ) this->m_cout_buffer->str( std::string() );
 		}
 
 		void compareCERRStream( std::string const & correctString, bool resetStream = true, bool assert_eq = false ) {
@@ -94,7 +100,15 @@ namespace EnergyPlus {
 			} else {
 				EXPECT_EQ( correctString, this->m_cerr_buffer->str() );
 			}
-			if ( resetStream ) this->m_cerr_buffer->str(std::string());
+			if ( resetStream ) this->m_cerr_buffer->str( std::string() );
+		}
+
+		bool hasCoutOutput(){
+			return this->m_cout_buffer->str().size() > 0;
+		}
+
+		bool hasCerrOutput(){
+			return this->m_cerr_buffer->str().size() > 0;
 		}
 
 	private:
