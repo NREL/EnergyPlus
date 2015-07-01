@@ -287,6 +287,7 @@ namespace WeatherManager {
 	std::shared_ptr< BaseGroundTempsModel > siteShallowGroundTempsPtr;
 	std::shared_ptr< BaseGroundTempsModel > siteBuildingSurfaceGroundTempsPtr;
 	std::shared_ptr< BaseGroundTempsModel > siteFCFactorMethodGroundTempsPtr;
+	std::shared_ptr< BaseGroundTempsModel > siteDeepGroundTempsPtr;
 
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
@@ -2053,7 +2054,7 @@ namespace WeatherManager {
 		GroundTempKelvin = GroundTemp + KelvinConv;
 		GroundTempFC = siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GroundTemp_Surface = siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
-		GroundTemp_Deep = DeepGroundTemps( Month );
+		GroundTemp_Deep = siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GndReflectance = GroundReflectances( Month );
 		GndReflectanceForDayltg = GndReflectance;
 
@@ -7144,14 +7145,6 @@ Label9999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int GndNumAlpha; // Number of construction alpha names being passed
-		int GndNumProp; // dummy variable for properties being passed
-		int IOStat; // IO Status when calling get input subroutine
-		int I; // Loop counter variable
-		Array1D_string GndAlphas( 1 ); // Construction Alpha names defined
-		Array1D< Real64 > GndProps( 12 ); // Temporary array to transfer ground temperatures
-		static bool GenErrorMessage( false );
-
 		// Formats
 		static gio::Fmt Format_720( "(' ',A,12(', ',F6.2))" );
 
@@ -7167,36 +7160,10 @@ Label9999: ;
 		// Initialize Site:GroundTemperature:Shallow object
 		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "", 0.0);
 		ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
-
-		cCurrentModuleObject = "Site:GroundTemperature:Deep";
-		I = GetNumObjectsFound( cCurrentModuleObject );
-		if ( I == 1 ) {
-			//Get the object names for each construction from the input processor
-			GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
-
-			if ( GndNumProp < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				ErrorsFound = true;
-			}
-
-			//Assign the ground temps to the variable
-			for ( I = 1; I <= 12; ++I ) {
-				DeepGroundTemps( I ) = GndProps( I );
-			}
-
-			GroundTemp_DeepObjInput = true;
-
-		} else if ( I > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			ErrorsFound = true;
-		} else {
-			DeepGroundTemps = 16.0;
-		}
-
-		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Deep>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Deep";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << DeepGroundTemps( I ); gio::write( OutputFileInits );
+		
+		// Initialize Site:GroundTemperature:Deep object
+		siteDeepGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:DEEP", "", 0.0);
+		ErrorsFound = siteDeepGroundTempsPtr->errorsFound;
 
 	}
 

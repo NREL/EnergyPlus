@@ -190,7 +190,7 @@ namespace GroundTemps {
 			int const monthOfSim
 		);
 
-		static std::shared_ptr< ShallowGroundTemps > ShallowGTMFactory( int objectType ); 
+		static std::shared_ptr< ShallowGroundTemps > ShallowGTMFactory(); 
 
 	};
 
@@ -225,7 +225,7 @@ namespace GroundTemps {
 			int const monthOfSim
 		);
 
-		static std::shared_ptr< BuildingSurfaceGroundTemps > BuildingSurfaceGTMFactory( int objectType ); 
+		static std::shared_ptr< BuildingSurfaceGroundTemps > BuildingSurfaceGTMFactory(); 
 
 	};
 
@@ -260,9 +260,44 @@ namespace GroundTemps {
 			int const monthOfSim
 		);
 
-		static std::shared_ptr< FCFactorGroundTemps > FCFactorGTMFactory( int objectType ); 
+		static std::shared_ptr< FCFactorGroundTemps > FCFactorGTMFactory(); 
 
 	};
+	
+	//******************************************************************************
+
+	// Derived class for Site:GroundTemperature:Deep
+	class DeepGroundTemps : public BaseGroundTempsModel
+	{
+		public:
+			int timeOfSimInMonths;
+			Array1D< Real64 > deepGroundTemps;
+
+		// Default Constructor
+		DeepGroundTemps():
+			timeOfSimInMonths( 0 ),
+			deepGroundTemps( 12, 13.0 )
+
+			{}
+
+		Real64
+		getGroundTemp();
+
+		Real64
+		getGroundTempAtTimeInSeconds(
+			Real64 const depth,
+			Real64 const timeInSecondsOfSim
+		);
+
+		Real64
+		getGroundTempAtTimeInMonths(
+			Real64 const depth,
+			int const monthOfSim
+		);
+
+		static std::shared_ptr< DeepGroundTemps > DeepGTMFactory(); 
+
+	};	
 
 	//******************************************************************************
 

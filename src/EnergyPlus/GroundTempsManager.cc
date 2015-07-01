@@ -48,7 +48,6 @@ namespace GroundTemps {
 		// New shared pointer for this model object
 		std::shared_ptr< KusudaGroundTempsModel > thisModel( new KusudaGroundTempsModel() );
 
-		// Search through Kusuda models here
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:KusudaAchenbach";
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
@@ -178,7 +177,7 @@ namespace GroundTemps {
 
 	// Site:GroundTemperature:Shallow factory
 	std::shared_ptr< ShallowGroundTemps > 
-	ShallowGTMFactory( int objectType ){
+	ShallowGTMFactory(){
 
 		using DataEnvironment::GroundTemp_SurfaceObjInput;
 		using DataGlobals::OutputFileInits;
@@ -194,7 +193,6 @@ namespace GroundTemps {
 		// New shared pointer for this model object
 		std::shared_ptr< ShallowGroundTemps > thisModel( new ShallowGroundTemps() );
 
-		// Search through Kusuda models here
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:Shallow";
 		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
@@ -242,7 +240,7 @@ namespace GroundTemps {
 
 	// Site:GroundTemperature:BuildingSurface factory
 	std::shared_ptr< BuildingSurfaceGroundTemps > 
-	BuildingSurfaceGTMFactory( int objectType ){
+	BuildingSurfaceGTMFactory(){
 
 		using DataEnvironment::GroundTempObjInput;
 		using DataGlobals::OutputFileInits;		
@@ -259,7 +257,6 @@ namespace GroundTemps {
 		// New shared pointer for this model object
 		std::shared_ptr< BuildingSurfaceGroundTemps > thisModel( new BuildingSurfaceGroundTemps() );
 
-		// Search through Kusuda models here
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:BuildingSurface";
 		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
@@ -313,7 +310,7 @@ namespace GroundTemps {
 
 	// Site:GroundTemperature:FCFactorMethod factory
 	std::shared_ptr< FCFactorGroundTemps > 
-	FCFactorGTMFactory( int objectType ){
+	FCFactorGTMFactory(){
 
 		using DataEnvironment::FCGroundTemps;
 		using DataGlobals::OutputFileInits;
@@ -322,10 +319,7 @@ namespace GroundTemps {
 		using namespace DataIPShortCuts;
 		using namespace ObjexxFCL::gio;
 
-		
-		
 		bool found = false;
-		bool genErrorMessage = false;
 		int NumNums;
 		int NumAlphas;
 		int IOStat;
@@ -333,7 +327,6 @@ namespace GroundTemps {
 		// New shared pointer for this model object
 		std::shared_ptr< FCFactorGroundTemps > thisModel( new FCFactorGroundTemps() );
 
-		// Search through Kusuda models here
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:FCFactorMethod";
 		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
@@ -377,6 +370,70 @@ namespace GroundTemps {
 			return nullptr;
 		}
 	}
+	
+	//******************************************************************************
+
+	// Site:GroundTemperature:Deep factory
+	std::shared_ptr< DeepGroundTemps > 
+	DeepGTMFactory(){
+
+		using DataEnvironment::GroundTemp_DeepObjInput;
+		using DataGlobals::OutputFileInits;
+		using DataGlobals::SecsInDay;
+		using namespace DataIPShortCuts;
+		using namespace ObjexxFCL::gio;
+
+		bool found = false;
+		int NumNums;
+		int NumAlphas;
+		int IOStat;
+
+		// New shared pointer for this model object
+		std::shared_ptr< DeepGroundTemps > thisModel( new DeepGroundTemps() );
+
+		std::string const cCurrentModuleObject = "Site:GroundTemperature:Deep";
+		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( numCurrObjects == 1 ) {
+
+			//Get the object names for each construction from the input processor
+			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+
+			if ( NumNums < 12 ) {
+				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
+				thisModel->errorsFound = true;
+			}
+
+			// overwrite values read from weather file for the 0.5m set ground temperatures
+			for ( int i = 1; i <= 12; ++i ) {
+				thisModel->deepGroundTemps( i ) = rNumericArgs( i );
+			}
+
+			GroundTemp_DeepObjInput = true;
+
+		} else if ( numCurrObjects > 1 ) {
+			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
+			thisModel->errorsFound = true;
+
+		} else {
+			thisModel->deepGroundTemps = 16.0;
+		}
+
+		// Write Final Ground Temp Information to the initialization output file
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Deep>, Months From Jan to Dec {C}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Deep";
+		for ( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->deepGroundTemps( i ); gio::write( OutputFileInits );
+
+		found = true;
+
+		if ( found && !thisModel->errorsFound ) {
+			groundTempModels.push_back( thisModel );
+			return thisModel;
+		} else {
+			ShowContinueError( "Site:GroundTemperature:Deep--Errors getting input for ground temperature model");
+			return nullptr;
+		}
+	}	
 
 	//******************************************************************************
 
@@ -437,13 +494,13 @@ namespace GroundTemps {
 		} else if ( objectType == objectType_FiniteDiffGroundTemp ) {
 			return FiniteDiffGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_SiteBuildingSurfaceGroundTemp ) {
-			return BuildingSurfaceGTMFactory( objectType );
+			return BuildingSurfaceGTMFactory();
 		} else if ( objectType == objectType_SiteShallowGroundTemp ) {
-			return ShallowGTMFactory( objectType );
+			return ShallowGTMFactory();
 		} else if ( objectType == objectType_SiteDeepGroundTemp ) {
-			return 0;
+			return DeepGTMFactory();
 		} else if ( objectType == objectType_SiteFCFactorMethodGroundTemp ) {
-			return FCFactorGTMFactory( objectType );
+			return FCFactorGTMFactory();
 		} else {
 			// Error
 			return nullptr; 
