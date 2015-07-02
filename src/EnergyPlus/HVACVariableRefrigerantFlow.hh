@@ -1343,8 +1343,29 @@ namespace HVACVariableRefrigerantFlow {
 		Array1S< Real64 > const CapArray, // Array of coil capacities in either cooling or heating mode [W]
 		Real64 & MaxLimit // Maximum terminal unit capacity for coils in same operating mode [W]
 	);
-
 	// End of Utility subroutines for the Module
+	// *****************************************************************************
+
+	
+	// Begin of Methods for New VRF Model: Fluid Temperature Control
+	//******************************************************************************
+	void
+	CalcVRF_FluidTCtrl(
+		int const VRFTUNum, // Unit index in VRF terminal unit array
+		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+		Real64 const PartLoadRatio, // compressor part load fraction
+		Real64 & LoadMet, // load met by unit (W)
+		Real64 & OnOffAirFlowRatio, // ratio of ON air flow to average air flow
+		Optional< Real64 > LatOutputProvided = _ // delivered latent capacity (W)
+	);
+
+	void
+	CalcVRFCondenser_FluidTCtrl(
+		int const VRFCond, // index to VRF condenser
+		bool const FirstHVACIteration // flag for first time through HVAC system simulation
+	);
+
+	// End of Methods for New VRF Model: Fluid Temperature Control
 	// *****************************************************************************
 
 	//     NOTICE

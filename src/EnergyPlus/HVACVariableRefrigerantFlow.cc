@@ -6090,6 +6090,849 @@ namespace HVACVariableRefrigerantFlow {
 
 	}
 
+	void
+	CalcVRFCondenser_FluidTCtrl(
+		int const VRFCond, // index to VRF condenser
+		bool const EP_UNUSED( FirstHVACIteration ) // flag for first time through HVAC system simulation
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         R. Raustad, FSEC
+		//       DATE WRITTEN   September 2010
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Model the interactions of VRF terminal units with a single variable-speed condenser.
+		// The terminal units are simulated first, and then the condenser is simulated.
+		// If terminal units require more capacity than can be delivered by condenser, a limit is set.
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using General::TrimSigDigits;
+		using Psychrometrics::RhoH2O;
+		using DataEnvironment::EnvironmentName;
+		using DataEnvironment::CurMnDy;
+		using DataEnvironment::OutDryBulbTemp;
+		using DataEnvironment::OutHumRat;
+		using DataEnvironment::OutBaroPress;
+		using DataEnvironment::OutWetBulbTemp;
+		using DXCoils::DXCoilCoolInletAirWBTemp;
+		using DXCoils::DXCoilHeatInletAirDBTemp;
+		using DXCoils::DXCoilHeatInletAirWBTemp;
+		using PlantUtilities::SetComponentFlowRate;
+		using FluidProperties::GetSpecificHeatGlycol;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "VRFCondenser" );
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int TUListNum; // index to TU List
+		int NumTUInList; // number of terminal units is list
+		int NumTU; // loop counter
+		int TUIndex; // Index to terminal unit
+		int CoolCoilIndex; // index to cooling coil in terminal unit
+		int HeatCoilIndex; // index to heating coil in terminal unit
+		int NumTUInCoolingMode; // number of terminal units actually cooling
+		int NumTUInHeatingMode; // number of terminal units actually heating
+
+		Real64 TUCoolingLoad; // DX cooling coil load to be met by condenser (W)
+		Real64 TUHeatingLoad; // DX heating coil load to be met by condenser (W)
+		Real64 TUParasiticPower; // total terminal unit parasitic power (W)
+		Real64 TUFanPower; // total terminal unit fan power (W)
+		Real64 TotCoolCapTempModFac; // cooling CAPFT curve output
+		Real64 TotHeatCapTempModFac; // heating CAPFT curve output
+		Real64 TotCoolEIRTempModFac; // cooling EIRFT curve output
+		Real64 TotHeatEIRTempModFac; // heating EIRFT curve output
+		Real64 InletAirWetBulbC; // coil inlet air wet-bulb temperature (C)
+		Real64 InletAirDryBulbC; // coil inlet air dry-bulb temperature (C)
+		Real64 CondInletTemp( 0.0 ); // condenser inlet air temperature (C)
+		Real64 CondInletHumRat; // condenser inlet air humidity ratio (kg/kg)
+		Real64 OutdoorDryBulb; // outdoor dry-bulb temperature (C)
+		Real64 OutdoorHumRat; // outdoor humidity ratio (kg/kg)
+		Real64 OutdoorPressure; // outdoor pressure (Pa)
+		Real64 OutdoorWetBulb; // outdoor wet-bulb temperature (C)
+		Real64 SumCoolInletWB; // sum of active TU's DX cooling coil inlet air wet-bulb temperature
+		Real64 SumHeatInletDB; // sum of active TU's DX heating coil inlet air dry-bulb temperature
+		Real64 SumHeatInletWB; // sum of active TU's DX heating coil inlet air wet-bulb temperature
+		Real64 CoolOABoundary; // output of cooling boundary curve (outdoor temperature, C)
+		Real64 HeatOABoundary; // output of heating boundary curve (outdoor temperature, C)
+		Real64 TotalTUCoolingCapacity; // sum of TU's cooling capacity (W)
+		Real64 TotalTUHeatingCapacity; // sum of TU's heating capacity (W)
+		Real64 TotalCondCoolingCapacity; // total available condenser cooling capacity (W)
+		Real64 TotalCondHeatingCapacity; // total available condenser heating capacity (W)
+		Real64 CoolingPLR; // condenser cooling PLR
+		Real64 HeatingPLR; // condenser heating PLR
+		Real64 CyclingRatio; // cycling ratio of condenser's compressors
+		Real64 EIRFPLRModFac; // EIRFPLR curve output
+		int Stage; // used for crankcase heater power calculation
+		Real64 UpperStageCompressorRatio; // used for crankcase heater power calculation
+		Real64 RhoAir; // Density of air [kg/m3]
+		Real64 RhoWater; // Density of water [kg/m3]
+		Real64 CpCond; // Specific Heat of water [J/kg-k]
+		Real64 CondAirMassFlow; // Condenser air mass flow rate [kg/s]
+		Real64 CondWaterMassFlow; // Condenser water mass flow rate [kg/s]
+		Real64 PartLoadFraction; // Part load fraction from PLFFPLR curve
+		Real64 VRFRTF; // VRF runtime fraction when cycling below MINPLR
+		Real64 OutdoorCoilT; // Outdoor coil temperature (C)
+		Real64 OutdoorCoildw; // Outdoor coil delta w assuming coil temp of OutdoorCoilT (kg/kg)
+		Real64 FractionalDefrostTime; // Fraction of time step system is in defrost
+		Real64 HeatingCapacityMultiplier; // Multiplier for heating capacity when system is in defrost
+		Real64 InputPowerMultiplier; // Multiplier for power when system is in defrost
+		Real64 LoadDueToDefrost; // Additional load due to defrost
+		Real64 DefrostEIRTempModFac; // EIR modifier for defrost (function of entering drybulb, outside wetbulb)
+		int HRCAPFT; // index to heat recovery CAPFTCool curve
+		Real64 HRCAPFTConst; // stead-state capacity fraction
+		Real64 HRInitialCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
+		Real64 HRCapTC; // Time constant used to recover from intial degratation in cooling heat recovery
+		int HREIRFT; // Index to cool EIR as a function of temperature curve for heat recovery
+		Real64 HREIRFTConst; // stead-state EIR fraction
+		Real64 HRInitialEIRFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
+		Real64 HREIRTC; // Time constant used to recover from intial degratation in cooling heat recovery
+		static Real64 CurrentEndTime; // end time of current time step
+		static Real64 CurrentEndTimeLast; // end time of last time step
+		static Real64 TimeStepSysLast; // system time step on last time step
+		Real64 SUMultiplier; // multiplier for simulating mode changes
+		Real64 CondPower; // condenser power [W]
+		Real64 CondCapacity; // condenser heat rejection [W]
+		Real64 CondOutletTemp; // Outlet temperature from VRF condenser [C]
+		Real64 QCondTmp; // temporary variable for condenser heat rejection [W]
+		Real64 TotPower; // total condenser power use [W]
+		bool HRHeatRequestFlag; // flag indicating VRF TU could operate in heating mode
+		bool HRCoolRequestFlag; // flag indicating VRF TU could operate in cooling mode
+		// FLOW
+
+		// variable initializations
+		TUListNum = VRF( VRFCond ).ZoneTUListPtr;
+		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
+		TUCoolingLoad = 0.0;
+		TUHeatingLoad = 0.0;
+		TUParasiticPower = 0.0;
+		TUFanPower = 0.0;
+		CoolingPLR = 0.0;
+		HeatingPLR = 0.0;
+		CyclingRatio = 1.0;
+		SumCoolInletWB = 0.0;
+		SumHeatInletDB = 0.0;
+		SumHeatInletWB = 0.0;
+		TotalCondCoolingCapacity = 0.0;
+		TotalCondHeatingCapacity = 0.0;
+		TotalTUCoolingCapacity = 0.0;
+		TotalTUHeatingCapacity = 0.0;
+		NumTUInCoolingMode = 0;
+		NumTUInHeatingMode = 0;
+		VRF( VRFCond ).ElecCoolingPower = 0.0;
+		VRF( VRFCond ).ElecHeatingPower = 0.0;
+		VRF( VRFCond ).CrankCaseHeaterPower = 0.0;
+		VRF( VRFCond ).EvapCondPumpElecPower = 0.0;
+		VRF( VRFCond ).EvapWaterConsumpRate = 0.0;
+		VRF( VRFCond ).DefrostPower = 0.0;
+		VRF( VRFCond ).OperatingCoolingCOP = 0.0;
+		VRF( VRFCond ).OperatingHeatingCOP = 0.0;
+		VRF( VRFCond ).OperatingCOP = 0.0;
+		VRF( VRFCond ).BasinHeaterPower = 0.0;
+
+		// sum loads on TU coils
+		for ( NumTU = 1; NumTU <= NumTUInList; ++NumTU ) {
+			TUCoolingLoad += TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU );
+			TUHeatingLoad += TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU );
+			TUParasiticPower += VRFTU( TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU ) ).ParasiticCoolElecPower + VRFTU( TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU ) ).ParasiticHeatElecPower;
+			TUFanPower += VRFTU( TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU ) ).FanPower;
+		}
+		VRF( VRFCond ).TUCoolingLoad = TUCoolingLoad;
+		VRF( VRFCond ).TUHeatingLoad = TUHeatingLoad;
+
+		// loop through TU's and calculate average inlet conditions for active coils
+		for ( NumTU = 1; NumTU <= NumTUInList; ++NumTU ) {
+			TUIndex = TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU );
+			CoolCoilIndex = VRFTU( TUIndex ).CoolCoilIndex;
+			HeatCoilIndex = VRFTU( TUIndex ).HeatCoilIndex;
+
+			if ( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) > 0.0 ) {
+				SumCoolInletWB += DXCoilCoolInletAirWBTemp( CoolCoilIndex ) * TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) / TUCoolingLoad;
+				++NumTUInCoolingMode;
+			}
+			if ( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) > 0.0 ) {
+				SumHeatInletDB += DXCoilHeatInletAirDBTemp( HeatCoilIndex ) * TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) / TUHeatingLoad;
+				SumHeatInletWB += DXCoilHeatInletAirWBTemp( HeatCoilIndex ) * TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) / TUHeatingLoad;
+				++NumTUInHeatingMode;
+			}
+		}
+
+		// set condenser entering air conditions
+		if ( VRF( VRFCond ).CondenserNodeNum != 0 ) {
+			OutdoorDryBulb = Node( VRF( VRFCond ).CondenserNodeNum ).Temp;
+			if ( VRF( VRFCond ).CondenserType != WaterCooled ) {
+				OutdoorHumRat = Node( VRF( VRFCond ).CondenserNodeNum ).HumRat;
+				OutdoorPressure = Node( VRF( VRFCond ).CondenserNodeNum ).Press;
+				OutdoorWetBulb = Node( VRF( VRFCond ).CondenserNodeNum ).OutAirWetBulb;
+			} else {
+				OutdoorHumRat = OutHumRat;
+				OutdoorPressure = OutBaroPress;
+				OutdoorWetBulb = OutWetBulbTemp;
+			}
+		} else {
+			OutdoorDryBulb = OutDryBulbTemp;
+			OutdoorHumRat = OutHumRat;
+			OutdoorPressure = OutBaroPress;
+			OutdoorWetBulb = OutWetBulbTemp;
+		}
+
+		if ( VRF( VRFCond ).CondenserType == AirCooled ) {
+			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
+		} else if ( VRF( VRFCond ).CondenserType == EvapCooled ) {
+			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
+			CondAirMassFlow = RhoAir * VRF( VRFCond ).EvapCondAirVolFlowRate;
+			// (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
+			CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - VRF( VRFCond ).EvapCondEffectiveness );
+			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure );
+		} else if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
+			CondInletTemp = OutdoorDryBulb; // node inlet temp from above
+			CondWaterMassFlow = VRF( VRFCond ).WaterCondenserDesignMassFlow;
+		} else {
+			assert( false );
+		}
+		VRF( VRFCond ).CondenserInletTemp = CondInletTemp;
+
+		// calculate capacities and energy use
+		if ( CoolingLoad( VRFCond ) && TerminalUnitList( TUListNum ).CoolingCoilPresent( NumTUInList ) ) {
+			InletAirWetBulbC = SumCoolInletWB;
+			TotCoolCapTempModFac = CurveValue( VRF( VRFCond ).CoolCapFT, InletAirWetBulbC, CondInletTemp );
+			TotCoolEIRTempModFac = CurveValue( VRF( VRFCond ).CoolEIRFT, InletAirWetBulbC, CondInletTemp );
+
+			// recalculate cooling Cap and EIR curve output if using boundary curve along with dual Cap and EIR curves.
+			if ( VRF( VRFCond ).CoolBoundaryCurvePtr > 0 ) {
+				CoolOABoundary = CurveValue( VRF( VRFCond ).CoolBoundaryCurvePtr, InletAirWetBulbC );
+				if ( OutdoorDryBulb > CoolOABoundary ) {
+					if ( VRF( VRFCond ).CoolCapFTHi > 0 ) TotCoolCapTempModFac = CurveValue( VRF( VRFCond ).CoolCapFTHi, InletAirWetBulbC, CondInletTemp );
+					if ( VRF( VRFCond ).CoolEIRFTHi > 0 ) TotCoolEIRTempModFac = CurveValue( VRF( VRFCond ).CoolEIRFTHi, InletAirWetBulbC, CondInletTemp );
+				}
+			}
+
+			TotalCondCoolingCapacity = VRF( VRFCond ).CoolingCapacity * CoolCombinationRatio( VRFCond ) * TotCoolCapTempModFac;
+			TotalTUCoolingCapacity = TotalCondCoolingCapacity * VRF( VRFCond ).PipingCorrectionCooling;
+
+			if ( TotalCondCoolingCapacity > 0.0 ) {
+				CoolingPLR = ( TUCoolingLoad / VRF( VRFCond ).PipingCorrectionCooling ) / TotalCondCoolingCapacity;
+			} else {
+				CoolingPLR = 0.0;
+			}
+
+			//   Warn user if curve output goes negative
+			if ( TotCoolEIRTempModFac < 0.0 ) {
+				if ( ! WarmupFlag && NumTUInCoolingMode > 0 ) {
+					if ( VRF( VRFCond ).EIRFTempCoolErrorIndex == 0 ) {
+						ShowSevereMessage( cVRFTypes( VRF_HeatPump ) + " \"" + VRF( VRFCond ).Name + "\":" );
+						ShowContinueError( " Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative (" + TrimSigDigits( TotCoolEIRTempModFac, 3 ) + ")." );
+						ShowContinueError( " Negative value occurs using an outdoor air temperature of " + TrimSigDigits( CondInletTemp, 1 ) + " C and an average indoor air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + " C." );
+						ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
+					}
+					ShowRecurringWarningErrorAtEnd( ccSimPlantEquipTypes( TypeOf_HeatPumpVRF ) + " \"" + VRF( VRFCond ).Name + "\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...", VRF( VRFCond ).EIRFTempCoolErrorIndex, TotCoolEIRTempModFac, TotCoolEIRTempModFac );
+					TotCoolEIRTempModFac = 0.0;
+				}
+			}
+
+		} else if ( HeatingLoad( VRFCond ) && TerminalUnitList( TUListNum ).HeatingCoilPresent( NumTUInList ) ) {
+			InletAirDryBulbC = SumHeatInletDB;
+			InletAirWetBulbC = SumHeatInletWB;
+			{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
+			if ( SELECT_CASE_var == DryBulbIndicator ) {
+				TotHeatCapTempModFac = CurveValue( VRF( VRFCond ).HeatCapFT, InletAirDryBulbC, CondInletTemp );
+				TotHeatEIRTempModFac = CurveValue( VRF( VRFCond ).HeatEIRFT, InletAirDryBulbC, CondInletTemp );
+			} else if ( SELECT_CASE_var == WetBulbIndicator ) {
+				TotHeatCapTempModFac = CurveValue( VRF( VRFCond ).HeatCapFT, InletAirDryBulbC, OutdoorWetBulb );
+				TotHeatEIRTempModFac = CurveValue( VRF( VRFCond ).HeatEIRFT, InletAirDryBulbC, OutdoorWetBulb );
+			} else {
+				TotHeatCapTempModFac = 1.0;
+				TotHeatEIRTempModFac = 1.0;
+			}}
+			// recalculate heating Cap and EIR curve output if using boundary curve along with dual Cap and EIR curves.
+			if ( VRF( VRFCond ).HeatBoundaryCurvePtr > 0 ) {
+				HeatOABoundary = CurveValue( VRF( VRFCond ).HeatBoundaryCurvePtr, InletAirDryBulbC );
+				{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
+				if ( SELECT_CASE_var == DryBulbIndicator ) {
+					if ( OutdoorDryBulb > HeatOABoundary ) {
+						if ( VRF( VRFCond ).HeatCapFTHi > 0 ) TotHeatCapTempModFac = CurveValue( VRF( VRFCond ).HeatCapFTHi, InletAirDryBulbC, CondInletTemp );
+					}
+				} else if ( SELECT_CASE_var == WetBulbIndicator ) {
+					if ( OutdoorWetBulb > HeatOABoundary ) {
+						if ( VRF( VRFCond ).HeatCapFTHi > 0 ) TotHeatCapTempModFac = CurveValue( VRF( VRFCond ).HeatCapFTHi, InletAirDryBulbC, OutdoorWetBulb );
+					}
+				} else {
+					TotHeatCapTempModFac = 1.0;
+				}}
+			}
+			if ( VRF( VRFCond ).EIRHeatBoundaryCurvePtr > 0 ) {
+				HeatOABoundary = CurveValue( VRF( VRFCond ).EIRHeatBoundaryCurvePtr, InletAirDryBulbC );
+				{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
+				if ( SELECT_CASE_var == DryBulbIndicator ) {
+					if ( OutdoorDryBulb > HeatOABoundary ) {
+						if ( VRF( VRFCond ).HeatEIRFTHi > 0 ) TotHeatEIRTempModFac = CurveValue( VRF( VRFCond ).HeatEIRFTHi, InletAirDryBulbC, CondInletTemp );
+					}
+				} else if ( SELECT_CASE_var == WetBulbIndicator ) {
+					if ( OutdoorWetBulb > HeatOABoundary ) {
+						if ( VRF( VRFCond ).HeatEIRFTHi > 0 ) TotHeatEIRTempModFac = CurveValue( VRF( VRFCond ).HeatEIRFTHi, InletAirDryBulbC, OutdoorWetBulb );
+					}
+				} else {
+					TotHeatEIRTempModFac = 1.0;
+				}}
+			}
+
+			// Initializing defrost adjustment factors
+			LoadDueToDefrost = 0.0;
+			HeatingCapacityMultiplier = 1.0;
+			FractionalDefrostTime = 0.0;
+			InputPowerMultiplier = 1.0;
+
+			// Check outdoor temperature to determine of defrost is active
+			if ( OutdoorDryBulb <= VRF( VRFCond ).MaxOATDefrost ) {
+
+				// Calculating adjustment factors for defrost
+				// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
+				OutdoorCoilT = 0.82 * OutdoorDryBulb - 8.589;
+				OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure ) ) );
+
+				// Calculate defrost adjustment factors depending on defrost control type
+				if ( VRF( VRFCond ).DefrostControl == Timed ) {
+					FractionalDefrostTime = VRF( VRFCond ).DefrostFraction;
+					if ( FractionalDefrostTime > 0.0 ) {
+						HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
+						InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
+					}
+				} else { //else defrost control is on-demand
+					FractionalDefrostTime = 1.0 / ( 1.0 + 0.01446 / OutdoorCoildw );
+					HeatingCapacityMultiplier = 0.875 * ( 1.0 - FractionalDefrostTime );
+					InputPowerMultiplier = 0.954 * ( 1.0 - FractionalDefrostTime );
+				}
+
+				if ( FractionalDefrostTime > 0.0 ) {
+					// Calculate defrost adjustment factors depending on defrost control strategy
+					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle && VRF( VRFCond ).DefrostControl == OnDemand ) {
+						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( VRF( VRFCond ).HeatingCapacity / 1.01667 );
+						DefrostEIRTempModFac = CurveValue( VRF( VRFCond ).DefrostEIRPtr, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
+
+						//         Warn user if curve output goes negative
+						if ( DefrostEIRTempModFac < 0.0 ) {
+							if ( ! WarmupFlag ) {
+								if ( VRF( VRFCond ).DefrostHeatErrorIndex == 0 ) {
+									ShowSevereMessage( cVRFTypes( VRF_HeatPump ) + " \"" + VRF( VRFCond ).Name + "\":" );
+									ShowContinueError( " Defrost Energy Input Ratio Modifier curve (function of temperature) output is negative (" + TrimSigDigits( DefrostEIRTempModFac, 3 ) + ")." );
+									ShowContinueError( " Negative value occurs using an outdoor air dry-bulb temperature of " + TrimSigDigits( OutdoorDryBulb, 1 ) + " C and an average indoor air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + " C." );
+									ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
+								}
+								ShowRecurringWarningErrorAtEnd( ccSimPlantEquipTypes( TypeOf_HeatPumpVRF ) + " \"" + VRF( VRFCond ).Name + "\": Defrost Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...", VRF( VRFCond ).DefrostHeatErrorIndex, DefrostEIRTempModFac, DefrostEIRTempModFac );
+								DefrostEIRTempModFac = 0.0;
+							}
+						}
+
+						VRF( VRFCond ).DefrostPower = DefrostEIRTempModFac * ( VRF( VRFCond ).HeatingCapacity / 1.01667 ) * FractionalDefrostTime;
+
+					} else { // Defrost strategy is resistive
+						VRF( VRFCond ).DefrostPower = VRF( VRFCond ).DefrostCapacity * FractionalDefrostTime;
+					}
+				} else { // Defrost is not active because FractionalDefrostTime = 0.0
+					VRF( VRFCond ).DefrostPower = 0.0;
+				}
+			}
+
+			TotalCondHeatingCapacity = VRF( VRFCond ).HeatingCapacity * HeatCombinationRatio( VRFCond ) * TotHeatCapTempModFac * HeatingCapacityMultiplier;
+			TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
+			if ( TotalCondHeatingCapacity > 0.0 ) {
+				HeatingPLR = ( TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating ) / TotalCondHeatingCapacity;
+				HeatingPLR += LoadDueToDefrost / TotalCondHeatingCapacity;
+			} else {
+				HeatingPLR = 0.0;
+			}
+
+			//   Warn user if curve output goes negative
+			if ( TotHeatEIRTempModFac < 0.0 ) {
+				if ( ! WarmupFlag && NumTUInHeatingMode > 0 ) {
+					if ( VRF( VRFCond ).EIRFTempHeatErrorIndex == 0 ) {
+						ShowSevereMessage( cVRFTypes( VRF_HeatPump ) + " \"" + VRF( VRFCond ).Name + "\":" );
+						ShowContinueError( " Heating Energy Input Ratio Modifier curve (function of temperature) output is negative (" + TrimSigDigits( TotHeatEIRTempModFac, 3 ) + ")." );
+						{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
+						if ( SELECT_CASE_var == DryBulbIndicator ) {
+							ShowContinueError( " Negative value occurs using an outdoor air dry-bulb temperature of " + TrimSigDigits( CondInletTemp, 1 ) + " C and an average indoor air dry-bulb temperature of " + TrimSigDigits( InletAirDryBulbC, 1 ) + " C." );
+						} else if ( SELECT_CASE_var == WetBulbIndicator ) {
+							ShowContinueError( " Negative value occurs using an outdoor air wet-bulb temperature of " + TrimSigDigits( OutdoorWetBulb, 1 ) + " C and an average indoor air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + " C." );
+						} else {
+						}}
+						ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
+					}
+					ShowRecurringWarningErrorAtEnd( ccSimPlantEquipTypes( TypeOf_HeatPumpVRF ) + " \"" + VRF( VRFCond ).Name + "\": Heating Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...", VRF( VRFCond ).EIRFTempHeatErrorIndex, TotHeatEIRTempModFac, TotHeatEIRTempModFac );
+					TotHeatEIRTempModFac = 0.0;
+				}
+			}
+
+		}
+
+		VRF( VRFCond ).VRFCondPLR = max( CoolingPLR, HeatingPLR );
+
+		HRHeatRequestFlag = any( TerminalUnitList( TUListNum ).HRHeatRequest );
+		HRCoolRequestFlag = any( TerminalUnitList( TUListNum ).HRCoolRequest );
+
+		if ( ! DoingSizing && ! WarmupFlag ) {
+			if ( HRHeatRequestFlag && HRCoolRequestFlag ) {
+				// determine operating mode change
+				if ( ! VRF( VRFCond ).HRCoolingActive && ! VRF( VRFCond ).HRHeatingActive ) {
+					VRF( VRFCond ).ModeChange = true;
+				}
+				if ( CoolingLoad( VRFCond ) ) {
+					if ( VRF( VRFCond ).HRHeatingActive && ! VRF( VRFCond ).HRCoolingActive ) {
+						VRF( VRFCond ).HRModeChange = true;
+					}
+					VRF( VRFCond ).HRCoolingActive = true;
+					VRF( VRFCond ).HRHeatingActive = false;
+					HRCAPFT = VRF( VRFCond ).HRCAPFTCool; // Index to cool capacity as a function of temperature\PLR curve for heat recovery
+					if ( HRCAPFT > 0 ) {
+						//         VRF(VRFCond)%HRCAPFTCoolConst = 0.9d0 ! initialized to 0.9
+						if ( VRF( VRFCond ).HRCAPFTCoolType == BiQuadratic ) { // Curve type for HRCAPFTCool
+							VRF( VRFCond ).HRCAPFTCoolConst = CurveValue( HRCAPFT, InletAirWetBulbC, CondInletTemp );
+						} else {
+							VRF( VRFCond ).HRCAPFTCoolConst = CurveValue( HRCAPFT, VRF( VRFCond ).VRFCondPLR );
+						}
+					}
+					HRCAPFTConst = VRF( VRFCond ).HRCAPFTCoolConst;
+					HRInitialCapFrac = VRF( VRFCond ).HRInitialCoolCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
+					HRCapTC = VRF( VRFCond ).HRCoolCapTC; // Time constant used to recover from intial degratation in cooling heat recovery
+
+					HREIRFT = VRF( VRFCond ).HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
+					if ( HREIRFT > 0 ) {
+						//         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
+						if ( VRF( VRFCond ).HREIRFTCoolType == BiQuadratic ) { // Curve type for HRCAPFTCool
+							VRF( VRFCond ).HREIRFTCoolConst = CurveValue( HREIRFT, InletAirWetBulbC, CondInletTemp );
+						} else {
+							VRF( VRFCond ).HREIRFTCoolConst = CurveValue( HREIRFT, VRF( VRFCond ).VRFCondPLR );
+						}
+					}
+					HREIRFTConst = VRF( VRFCond ).HREIRFTCoolConst;
+					HRInitialEIRFrac = VRF( VRFCond ).HRInitialCoolEIRFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
+					HREIRTC = VRF( VRFCond ).HRCoolEIRTC; // Time constant used to recover from intial degratation in cooling heat recovery
+				} else if ( HeatingLoad( VRFCond ) ) {
+					if ( ! VRF( VRFCond ).HRHeatingActive && VRF( VRFCond ).HRCoolingActive ) {
+						VRF( VRFCond ).HRModeChange = true;
+					}
+					VRF( VRFCond ).HRCoolingActive = false;
+					VRF( VRFCond ).HRHeatingActive = true;
+					HRCAPFT = VRF( VRFCond ).HRCAPFTHeat; // Index to heat capacity as a function of temperature\PLR curve for heat recovery
+					if ( HRCAPFT > 0 ) {
+						//         VRF(VRFCond)%HRCAPFTHeatConst = 1.1d0 ! initialized to 1.1
+						if ( VRF( VRFCond ).HRCAPFTHeatType == BiQuadratic ) { // Curve type for HRCAPFTCool
+							{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
+							if ( SELECT_CASE_var == DryBulbIndicator ) {
+								VRF( VRFCond ).HRCAPFTHeatConst = CurveValue( HRCAPFT, InletAirDryBulbC, CondInletTemp );
+							} else if ( SELECT_CASE_var == WetBulbIndicator ) {
+								VRF( VRFCond ).HRCAPFTHeatConst = CurveValue( HRCAPFT, InletAirDryBulbC, OutdoorWetBulb );
+							} else {
+								VRF( VRFCond ).HRCAPFTHeatConst = 1.0;
+							}}
+						} else {
+							VRF( VRFCond ).HRCAPFTHeatConst = CurveValue( HRCAPFT, VRF( VRFCond ).VRFCondPLR );
+						}
+					}
+					HRCAPFTConst = VRF( VRFCond ).HRCAPFTHeatConst;
+					HRInitialCapFrac = VRF( VRFCond ).HRInitialHeatCapFrac; // Fractional heating degradation at the start of heat recovery from cooling mode
+					HRCapTC = VRF( VRFCond ).HRHeatCapTC; // Time constant used to recover from intial degratation in heating heat recovery
+
+					HREIRFT = VRF( VRFCond ).HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
+					if ( HREIRFT > 0 ) {
+						//         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
+						if ( VRF( VRFCond ).HREIRFTHeatType == BiQuadratic ) { // Curve type for HRCAPFTHeat
+							{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
+							if ( SELECT_CASE_var == DryBulbIndicator ) {
+								VRF( VRFCond ).HREIRFTHeatConst = CurveValue( HREIRFT, InletAirDryBulbC, CondInletTemp );
+							} else if ( SELECT_CASE_var == WetBulbIndicator ) {
+								VRF( VRFCond ).HREIRFTHeatConst = CurveValue( HREIRFT, InletAirDryBulbC, OutdoorWetBulb );
+							} else {
+								VRF( VRFCond ).HREIRFTHeatConst = 1.0;
+							}}
+						} else {
+							VRF( VRFCond ).HREIRFTHeatConst = CurveValue( HREIRFT, VRF( VRFCond ).VRFCondPLR );
+						}
+					}
+					HREIRFTConst = VRF( VRFCond ).HRCAPFTHeatConst;
+					HRInitialEIRFrac = VRF( VRFCond ).HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
+					HREIRTC = VRF( VRFCond ).HRHeatEIRTC; // Time constant used to recover from intial degratation in heating heat recovery
+				} else {
+					//   zone thermostats satisfied, condenser is off. Set values anyway
+					HRCAPFTConst = 1.0;
+					HRInitialCapFrac = 1.0;
+					HRCapTC = 1.0;
+					HREIRFTConst = 1.0;
+					HRInitialEIRFrac = 1.0;
+					HREIRTC = 1.0;
+					if ( VRF( VRFCond ).HRHeatingActive || VRF( VRFCond ).HRCoolingActive ) {
+						VRF( VRFCond ).HRModeChange = true;
+					}
+					VRF( VRFCond ).HRCoolingActive = false;
+					VRF( VRFCond ).HRHeatingActive = false;
+				}
+
+			} else { // IF(HRHeatRequestFlag .AND. HRCoolRequestFlag)THEN -- Heat recovery turned off
+				HRCAPFTConst = 1.0;
+				HRInitialCapFrac = 1.0;
+				HRCapTC = 0.0;
+				HREIRFTConst = 1.0;
+				HRInitialEIRFrac = 1.0;
+				HREIRTC = 0.0;
+				VRF( VRFCond ).HRModeChange = false;
+				VRF( VRFCond ).HRCoolingActive = false;
+				VRF( VRFCond ).HRHeatingActive = false;
+			}
+
+			// calculate end time of current time step to determine if max capacity reset is required
+			CurrentEndTime = double( ( DayOfSim - 1 ) * 24 ) + CurrentTime - TimeStepZone + SysTimeElapsed;
+
+			if ( VRF( VRFCond ).ModeChange || VRF( VRFCond ).HRModeChange ) {
+				if ( VRF( VRFCond ).HRCoolingActive && VRF( VRFCond ).HRTimer == 0.0 ) {
+					VRF( VRFCond ).HRTimer = CurrentEndTimeLast;
+				} else if ( VRF( VRFCond ).HRHeatingActive && VRF( VRFCond ).HRTimer == 0.0 ) {
+					VRF( VRFCond ).HRTimer = CurrentEndTimeLast;
+				} else if ( ! VRF( VRFCond ).HRCoolingActive && ! VRF( VRFCond ).HRHeatingActive ) {
+					VRF( VRFCond ).HRTimer = 0.0;
+				}
+			}
+
+			VRF( VRFCond ).HRTime = max( 0.0, CurrentEndTime - VRF( VRFCond ).HRTimer );
+			if ( VRF( VRFCond ).HRTime < ( HRCapTC * 5.0 ) ) {
+				if ( HRCapTC > 0.0 ) {
+					SUMultiplier = min( 1.0, 1.0 - std::exp( -VRF( VRFCond ).HRTime / HRCapTC ) );
+				} else {
+					SUMultiplier = 1.0;
+				}
+			} else {
+				SUMultiplier = 1.0;
+				VRF( VRFCond ).ModeChange = false;
+				VRF( VRFCond ).HRModeChange = false;
+			}
+			VRF( VRFCond ).SUMultiplier = SUMultiplier;
+
+			TimeStepSysLast = TimeStepSys;
+			CurrentEndTimeLast = CurrentEndTime;
+
+			if ( VRF( VRFCond ).HeatRecoveryUsed && VRF( VRFCond ).HRCoolingActive ) {
+				TotalCondCoolingCapacity *= HRCAPFTConst;
+				TotalCondCoolingCapacity = HRInitialCapFrac * TotalCondCoolingCapacity + ( 1.0 - HRInitialCapFrac ) * TotalCondCoolingCapacity * SUMultiplier;
+				TotalTUCoolingCapacity = TotalCondCoolingCapacity * VRF( VRFCond ).PipingCorrectionCooling;
+				if ( TotalCondCoolingCapacity > 0.0 ) {
+					CoolingPLR = min( 1.0, ( TUCoolingLoad / VRF( VRFCond ).PipingCorrectionCooling ) / TotalCondCoolingCapacity );
+				} else {
+					CoolingPLR = 0.0;
+				}
+			} else if ( VRF( VRFCond ).HeatRecoveryUsed && VRF( VRFCond ).HRHeatingActive ) {
+				TotalCondHeatingCapacity *= HRCAPFTConst;
+				TotalCondHeatingCapacity = HRInitialCapFrac * TotalCondHeatingCapacity + ( 1.0 - HRInitialCapFrac ) * TotalCondHeatingCapacity * SUMultiplier;
+				TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
+				if ( TotalCondHeatingCapacity > 0.0 ) {
+					HeatingPLR = min( 1.0, ( TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating ) / TotalCondHeatingCapacity );
+				} else {
+					HeatingPLR = 0.0;
+				}
+			}
+			VRF( VRFCond ).VRFCondPLR = max( CoolingPLR, HeatingPLR );
+		}
+
+		VRF( VRFCond ).TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR;
+		VRF( VRFCond ).TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR;
+
+		if ( VRF( VRFCond ).MinPLR > 0.0 ) {
+			CyclingRatio = min( 1.0, VRF( VRFCond ).VRFCondPLR / VRF( VRFCond ).MinPLR );
+			if ( VRF( VRFCond ).VRFCondPLR < VRF( VRFCond ).MinPLR && VRF( VRFCond ).VRFCondPLR > 0.0 ) {
+				VRF( VRFCond ).VRFCondPLR = VRF( VRFCond ).MinPLR;
+			}
+		}
+		VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
+
+		VRF( VRFCond ).OperatingMode = 0; // report variable for heating or cooling mode
+		EIRFPLRModFac = 1.0;
+		VRFRTF = 0.0;
+		// cooling and heating is optional (only one may exist), if so then performance curve for missing coil are not required
+		if ( CoolingLoad( VRFCond ) && CoolingPLR > 0.0 ) {
+			VRF( VRFCond ).OperatingMode = 1;
+			if ( CoolingPLR > 1.0 ) {
+				if ( VRF( VRFCond ).CoolEIRFPLR2 > 0 ) EIRFPLRModFac = CurveValue( VRF( VRFCond ).CoolEIRFPLR2, max( VRF( VRFCond ).MinPLR, CoolingPLR ) );
+			} else {
+				if ( VRF( VRFCond ).CoolEIRFPLR1 > 0 ) EIRFPLRModFac = CurveValue( VRF( VRFCond ).CoolEIRFPLR1, max( VRF( VRFCond ).MinPLR, CoolingPLR ) );
+			}
+			// find part load fraction to calculate RTF
+			if ( VRF( VRFCond ).CoolPLFFPLR > 0 ) {
+				PartLoadFraction = max( 0.7, CurveValue( VRF( VRFCond ).CoolPLFFPLR, CyclingRatio ) );
+			} else {
+				PartLoadFraction = 1.0;
+			}
+			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
+
+			VRF( VRFCond ).ElecCoolingPower = ( VRF( VRFCond ).RatedCoolingPower * TotCoolCapTempModFac ) * TotCoolEIRTempModFac * EIRFPLRModFac * VRFRTF;
+		}
+		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
+			VRF( VRFCond ).OperatingMode = 2;
+			if ( HeatingPLR > 1.0 ) {
+				if ( VRF( VRFCond ).HeatEIRFPLR2 > 0 ) EIRFPLRModFac = CurveValue( VRF( VRFCond ).HeatEIRFPLR2, max( VRF( VRFCond ).MinPLR, HeatingPLR ) );
+			} else {
+				if ( VRF( VRFCond ).HeatEIRFPLR1 > 0 ) EIRFPLRModFac = CurveValue( VRF( VRFCond ).HeatEIRFPLR1, max( VRF( VRFCond ).MinPLR, HeatingPLR ) );
+			}
+			// find part load fraction to calculate RTF
+			if ( VRF( VRFCond ).HeatPLFFPLR > 0 ) {
+				PartLoadFraction = max( 0.7, CurveValue( VRF( VRFCond ).HeatPLFFPLR, CyclingRatio ) );
+			} else {
+				PartLoadFraction = 1.0;
+			}
+			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
+
+			VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).RatedHeatingPower * TotHeatCapTempModFac ) * TotHeatEIRTempModFac * EIRFPLRModFac * VRFRTF * InputPowerMultiplier;
+		}
+		VRF( VRFCond ).VRFCondRTF = VRFRTF;
+
+		// calculate crankcase heater power
+		if ( VRF( VRFCond ).MaxOATCCHeater > OutdoorDryBulb ) {
+			// calculate crankcase heater power
+			VRF( VRFCond ).CrankCaseHeaterPower = VRF( VRFCond ).CCHeaterPower * ( 1.0 - VRFRTF );
+			if ( VRF( VRFCond ).NumCompressors > 1 ) {
+				UpperStageCompressorRatio = ( 1.0 - VRF( VRFCond ).CompressorSizeRatio ) / ( VRF( VRFCond ).NumCompressors - 1 );
+				for ( Stage = 1; Stage <= VRF( VRFCond ).NumCompressors - 2; ++Stage ) {
+					if ( VRF( VRFCond ).VRFCondPLR < ( VRF( VRFCond ).CompressorSizeRatio + Stage * UpperStageCompressorRatio ) ) {
+						VRF( VRFCond ).CrankCaseHeaterPower += VRF( VRFCond ).CCHeaterPower;
+					}
+				}
+			}
+		} else {
+			VRF( VRFCond ).CrankCaseHeaterPower = 0.0;
+		}
+
+		CondCapacity = max( VRF( VRFCond ).TotalCoolingCapacity, VRF( VRFCond ).TotalHeatingCapacity ) * VRFRTF;
+		CondPower = max( VRF( VRFCond ).ElecCoolingPower, VRF( VRFCond ).ElecHeatingPower );
+		if ( VRF( VRFCond ).ElecCoolingPower > 0.0 ) {
+			VRF( VRFCond ).QCondenser = CondCapacity + CondPower - VRF( VRFCond ).TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating;
+		} else if ( VRF( VRFCond ).ElecHeatingPower > 0.0 ) {
+			VRF( VRFCond ).QCondenser = -CondCapacity + CondPower + VRF( VRFCond ).TUCoolingLoad / VRF( VRFCond ).PipingCorrectionCooling;
+		} else {
+			VRF( VRFCond ).QCondenser = 0.0;
+		}
+
+		if ( VRF( VRFCond ).CondenserType == EvapCooled ) {
+			// Calculate basin heater power
+			CalcBasinHeaterPower( VRF( VRFCond ).BasinHeaterPowerFTempDiff, VRF( VRFCond ).BasinHeaterSchedulePtr, VRF( VRFCond ).BasinHeaterSetPointTemp, VRF( VRFCond ).BasinHeaterPower );
+			VRF( VRFCond ).BasinHeaterPower *= ( 1.0 - VRFRTF );
+
+			// calcualte evaporative condenser pump power and water consumption
+			if ( CoolingLoad( VRFCond ) && CoolingPLR > 0.0 ) {
+				//******************
+				// WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
+				// H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
+				//                    /RhoWater [kg H2O/m3 H2O]
+				//******************
+				RhoWater = RhoH2O( OutdoorDryBulb );
+				VRF( VRFCond ).EvapWaterConsumpRate = ( CondInletHumRat - OutdoorHumRat ) * CondAirMassFlow / RhoWater * VRF( VRFCond ).VRFCondPLR;
+				VRF( VRFCond ).EvapCondPumpElecPower = VRF( VRFCond ).EvapCondPumpPower * VRFRTF;
+			}
+		} else if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
+
+			if ( CondCapacity > 0.0 ) {
+				CondenserWaterMassFlowRate = CondWaterMassFlow;
+			} else {
+				CondenserWaterMassFlowRate = 0.0;
+			}
+			SetComponentFlowRate( CondenserWaterMassFlowRate, VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).CondenserOutletNodeNum, VRF( VRFCond ).SourceLoopNum, VRF( VRFCond ).SourceLoopSideNum, VRF( VRFCond ).SourceBranchNum, VRF( VRFCond ).SourceCompNum );
+
+			VRF( VRFCond ).CondenserInletTemp = Node( VRF( VRFCond ).CondenserNodeNum ).Temp;
+			VRF( VRFCond ).WaterCondenserMassFlow = Node( VRF( VRFCond ).CondenserNodeNum ).MassFlowRate;
+
+			CpCond = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, VRF( VRFCond ).CondenserInletTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
+			if ( CondWaterMassFlow > 0.0 ) {
+				CondOutletTemp = VRF( VRFCond ).QCondenser / ( CondWaterMassFlow * CpCond ) + CondInletTemp;
+			} else {
+				CondOutletTemp = CondInletTemp;
+			}
+			QCondTmp = CondWaterMassFlow * CpCond * ( CondOutletTemp - CondInletTemp );
+			VRF( VRFCond ).CondenserSideOutletTemp = CondOutletTemp;
+
+		}
+
+		// calculate operating COP
+		if ( CoolingLoad( VRFCond ) && CoolingPLR > 0.0 ) {
+			if ( VRF( VRFCond ).ElecCoolingPower != 0.0 ) {
+				// this calc should use delivered capacity, not condenser capacity, use VRF(VRFCond)%TUCoolingLoad
+				VRF( VRFCond ).OperatingCoolingCOP = ( VRF( VRFCond ).TotalCoolingCapacity ) / ( VRF( VRFCond ).ElecCoolingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower );
+			} else {
+				VRF( VRFCond ).OperatingCoolingCOP = 0.0;
+			}
+		}
+		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
+			if ( VRF( VRFCond ).ElecHeatingPower != 0.0 ) {
+				// this calc should use deleivered capacity, not condenser capacity, use VRF(VRFCond)%TUHeatingLoad
+				VRF( VRFCond ).OperatingHeatingCOP = ( VRF( VRFCond ).TotalHeatingCapacity ) / ( VRF( VRFCond ).ElecHeatingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower );
+			} else {
+				VRF( VRFCond ).OperatingHeatingCOP = 0.0;
+			}
+		}
+
+		TotPower = TUParasiticPower + TUFanPower + VRF( VRFCond ).ElecHeatingPower + VRF( VRFCond ).ElecCoolingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower;
+		if ( TotPower > 0.0 ) VRF( VRFCond ).OperatingCOP = ( VRF( VRFCond ).TUCoolingLoad + VRF( VRFCond ).TUHeatingLoad ) / TotPower;
+
+		// limit the TU capacity when the condenser is maxed out on capacity
+		// I think this next line will make the max cap report variable match the coil objects, will probably change the answer though
+		//  IF(CoolingLoad(VRFCond) .AND. NumTUInCoolingMode .GT. 0 .AND. MaxCoolingCapacity(VRFCond) == MaxCap)THEN
+		if ( CoolingLoad( VRFCond ) && NumTUInCoolingMode > 0 ) {
+
+			//   IF TU capacity is greater than condenser capacity find maximum allowed TU capacity (i.e., conserve energy)
+			if ( TUCoolingLoad > TotalTUCoolingCapacity ) {
+				LimitTUCapacity( VRFCond, NumTUInList, TotalTUCoolingCapacity, TerminalUnitList( TUListNum ).TotalCoolLoad, MaxCoolingCapacity( VRFCond ), TotalTUHeatingCapacity, TerminalUnitList( TUListNum ).TotalHeatLoad, MaxHeatingCapacity( VRFCond ) );
+			}
+		} else if ( HeatingLoad( VRFCond ) && NumTUInHeatingMode > 0 ) {
+			//   IF TU capacity is greater than condenser capacity
+			if ( TUHeatingLoad > TotalTUHeatingCapacity ) {
+				LimitTUCapacity( VRFCond, NumTUInList, TotalTUHeatingCapacity, TerminalUnitList( TUListNum ).TotalHeatLoad, MaxHeatingCapacity( VRFCond ), TotalTUCoolingCapacity, TerminalUnitList( TUListNum ).TotalCoolLoad, MaxCoolingCapacity( VRFCond ) );
+			}
+		} else {
+		}
+
+	}
+	
+	void
+	CalcVRF_FluidTCtrl(
+		int const VRFTUNum, // Unit index in VRF terminal unit array
+		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+		Real64 const PartLoadRatio, // compressor part load fraction
+		Real64 & LoadMet, // load met by unit (W)
+		Real64 & OnOffAirFlowRatio, // ratio of ON air flow to average air flow
+		Optional< Real64 > LatOutputProvided // delivered latent capacity (W)
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   July 2005
+		//       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Simulate the components making up the VRF terminal unit.
+
+		// METHODOLOGY EMPLOYED:
+		// Simulates the unit components sequentially in the air flow direction.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using Fans::SimulateFanComponents;
+		using DXCoils::SimDXCoil;
+		using MixedAir::SimOAMixer;
+		using HeatingCoils::SimulateHeatingCoilComponents;
+		using SteamCoils::SimulateSteamCoilComponents;
+		using WaterCoils::SimulateWaterCoilComponents;
+		using InputProcessor::SameString;
+		using DataEnvironment::OutDryBulbTemp;
+		using DataSizing::AutoSize;
+		//  USE WaterToAirHeatPumpSimple,  ONLY: SimWatertoAirHPSimple
+		using DataAirLoop::LoopDXCoilRTF;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int VRFTUOutletNodeNum; // TU air outlet node
+		int VRFTUInletNodeNum; // TU air inlet node
+		Real64 AirMassFlow; // total supply air mass flow [m3/s]
+		Real64 MinHumRat; // minimum humidity ratio for sensible capacity calculation (kg/kg)
+		int OpMode; // fan operating mode, CycFanCycCoil or ContFanCycCoil
+		int VRFCond; // index to VRF condenser
+		Real64 SpecHumOut; // specific humidity ratio at outlet node
+		Real64 SpecHumIn; // specific humidity ratio at inlet node
+		int TUListIndex; // index to TU list for this VRF system
+		int IndexToTUInTUList; // index to TU in specific list for the VRF system
+
+		// FLOW
+
+		VRFCond = VRFTU( VRFTUNum ).VRFSysNum;
+		TUListIndex = VRF( VRFCond ).ZoneTUListPtr;
+		IndexToTUInTUList = VRFTU( VRFTUNum ).IndexToTUInTUList;
+		VRFTUOutletNodeNum = VRFTU( VRFTUNum ).VRFTUOutletNodeNum;
+		VRFTUInletNodeNum = VRFTU( VRFTUNum ).VRFTUInletNodeNum;
+		OpMode = VRFTU( VRFTUNum ).OpMode;
+
+		// Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
+		SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
+
+		AirMassFlow = Node( VRFTUInletNodeNum ).MassFlowRate;
+		if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
+
+		// if blow through, simulate fan then coils
+		if ( VRFTU( VRFTUNum ).FanPlace == BlowThru ) {
+			SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+		}
+
+		if ( VRFTU( VRFTUNum ).CoolingCoilPresent ) {
+			// above condition for heat pump mode, below condition for heat recovery mode
+			if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && CoolingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
+				SimDXCoil( "", On, FirstHVACIteration, VRFTU( VRFTUNum ).CoolCoilIndex, OpMode, PartLoadRatio, OnOffAirFlowRatio, _, MaxCoolingCapacity( VRFCond ), VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFCondCyclingRatio );
+			} else { // cooling coil is off
+				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio );
+			}
+			LoopDXCoolCoilRTF = LoopDXCoilRTF;
+		} else {
+			LoopDXCoolCoilRTF = 0.0;
+		}
+
+		if ( VRFTU( VRFTUNum ).HeatingCoilPresent ) {
+			// above condition for heat pump mode, below condition for heat recovery mode
+			if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && HeatingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) {
+				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).HeatCoilIndex, OpMode, PartLoadRatio, OnOffAirFlowRatio, _, MaxHeatingCapacity( VRFCond ) );
+			} else {
+				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio );
+			}
+			LoopDXHeatCoilRTF = LoopDXCoilRTF;
+		} else {
+			LoopDXHeatCoilRTF = 0.0;
+		}
+
+		// if draw through, simulate coils then fan
+		if ( VRFTU( VRFTUNum ).FanPlace == DrawThru ) {
+			SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+		}
+
+		// track fan power per terminal unit for calculating COP
+		VRFTU( VRFTUNum ).FanPower = FanElecPower;
+
+		// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
+		MinHumRat = min( Node( VRFTUInletNodeNum ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
+		LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( VRFTUInletNodeNum ).Temp, MinHumRat ) );
+
+		if ( present( LatOutputProvided ) ) {
+			//   CR9155 Remove specific humidity calculations
+			SpecHumOut = Node( VRFTUOutletNodeNum ).HumRat;
+			SpecHumIn = Node( VRFTUInletNodeNum ).HumRat;
+			LatOutputProvided = AirMassFlow * ( SpecHumOut - SpecHumIn ); // Latent rate, kg/s (dehumid = negative)
+		}
+
+	}
+
+	
+
 	// End of Utility subroutines for the Module
 	// *****************************************************************************
 
