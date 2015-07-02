@@ -1152,31 +1152,12 @@ namespace ZonePlenum {
 		Node( ZoneNode ).Quality = Node( InletNode ).Quality;
 
 		if ( Contaminant.CO2Simulation ) {
-			if ( ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate > 0.0 ) {
-				// CO2 balance to get outlet air CO2
-				Node( OutletNode ).CO2 = 0.0;
-				for ( InletNodeNum = 1; InletNodeNum <= ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes; ++InletNodeNum ) {
-					Node( OutletNode ).CO2 += Node( ZoneRetPlenCond( ZonePlenumNum ).InletNode( InletNodeNum ) ).CO2 * ZoneRetPlenCond( ZonePlenumNum ).InletMassFlowRate( InletNodeNum ) / ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate;
-				}
-				Node( ZoneNode ).CO2 = Node( OutletNode ).CO2;
-			} else {
-				Node( OutletNode ).CO2 = Node( InletNode ).CO2;
-				Node( ZoneNode ).CO2 = Node( InletNode ).CO2;
-			}
+			Node( OutletNode ).CO2 = Node( ZoneNode ).CO2;
 		}
 
+		// Set the outlet node contaminant properties if needed. The zone contaminant conditions are calculated in ZoneContaminantPredictorCorrector
 		if ( Contaminant.GenericContamSimulation ) {
-			if ( ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate > 0.0 ) {
-				// Contaminant balance to get outlet air generic contaminant
-				Node( OutletNode ).GenContam = 0.0;
-				for ( InletNodeNum = 1; InletNodeNum <= ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes; ++InletNodeNum ) {
-					Node( OutletNode ).GenContam += Node( ZoneRetPlenCond( ZonePlenumNum ).InletNode( InletNodeNum ) ).GenContam * ZoneRetPlenCond( ZonePlenumNum ).InletMassFlowRate( InletNodeNum ) / ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate;
-				}
-				Node( ZoneNode ).GenContam = Node( OutletNode ).GenContam;
-			} else {
-				Node( OutletNode ).GenContam = Node( InletNode ).GenContam;
-				Node( ZoneNode ).GenContam = Node( InletNode ).GenContam;
-			}
+			Node( OutletNode ).GenContam = Node( ZoneNode ).GenContam;
 		}
 
 	}
