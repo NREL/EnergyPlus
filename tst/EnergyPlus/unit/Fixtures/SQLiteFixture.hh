@@ -8,8 +8,6 @@
 #include "EnergyPlusFixture.hh"
 #include <EnergyPlus/SQLiteProcedures.hh>
 
-using namespace EnergyPlus;
-
 namespace EnergyPlus {
 
 	class SQLiteFixture : public EnergyPlusFixture
@@ -54,7 +52,7 @@ namespace EnergyPlus {
 			ss->str(std::string());
 		}
 
-		// Need to move unit test unique_ptr to EnergyPlus sqlite unique_ptr and back again so usage of the sqlite bindings in
+		// Need to move unit test sqlite_test unique_ptr to EnergyPlus sqlite unique_ptr and back again so usage of the sqlite bindings in
 		// EnergyPlus code can be queried against in unit tests.
 		// These do not change non-const rvalue references...
 		void functionUsingSQLite( std::function<void()> func ) {

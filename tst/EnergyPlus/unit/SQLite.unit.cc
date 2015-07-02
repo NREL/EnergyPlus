@@ -5,11 +5,6 @@
 
 // EnergyPlus Headers
 #include "Fixtures/SQLiteFixture.hh"
-#include <EnergyPlus/SQLiteProcedures.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-
-using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 

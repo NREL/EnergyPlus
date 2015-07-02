@@ -5,165 +5,26 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/InputProcessor.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/SortAndStringUtilities.hh>
-#include <EnergyPlus/FileSystem.hh>
 
-#include <fstream>
-#include <typeinfo>
-
-using namespace EnergyPlus;
-using namespace EnergyPlus::InputProcessor;
-using namespace ObjexxFCL;
+using namespace InputProcessor;
 
 namespace EnergyPlus {
 
-class InputProcessorFixture : public EnergyPlusFixture
-{
-protected:
-	virtual void SetUp() {
-		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
-	}
-
-	virtual void TearDown() {
-		if ( NumObjectDefs > 0 && ObjectDef.size() > 0 ) {
-			ObjectDef( NumObjectDefs ).AlphaOrNumeric.deallocate();
-			ObjectDef( NumObjectDefs ).NumRangeChks.deallocate();
-			ObjectDef( NumObjectDefs ).AlphFieldChks.deallocate();
-			ObjectDef( NumObjectDefs ).AlphFieldDefs.deallocate();
-			ObjectDef( NumObjectDefs ).ReqField.deallocate();
-			ObjectDef( NumObjectDefs ).AlphRetainCase.deallocate();
-		}
-		ObjectDef.deallocate();
-		SectionDef.deallocate();
-		SectionsOnFile.deallocate();
-		ObjectStartRecord.deallocate();
-		ObjectGotCount.deallocate();
-		ObsoleteObjectsRepNames.deallocate();
-		ListOfSections.deallocate();
-		ListOfObjects.deallocate();
-		iListOfObjects.deallocate();
-		IDFRecordsGotten.deallocate();
-		IDFRecords.deallocate();
-		RepObjects.deallocate();
-		LineItem.Numbers.deallocate();
-		LineItem.NumBlank.deallocate();
-		LineItem.Alphas.deallocate();
-		LineItem.AlphBlank.deallocate();
-
-		NumObjectDefs = 0;
-		NumSectionDefs = 0;
-		MaxObjectDefs = 0;
-		MaxSectionDefs = 0;
-		NumLines = 0;
-		MaxIDFRecords = 0;
-		NumIDFRecords = 0;
-		MaxIDFSections = 0;
-		NumIDFSections = 0;
-		EchoInputFile = 0;
-		InputLineLength = 0;
-		MaxAlphaArgsFound = 0;
-		MaxNumericArgsFound = 0;
-		NumAlphaArgsFound = 0;
-		NumNumericArgsFound = 0;
-		MaxAlphaIDFArgsFound = 0;
-		MaxNumericIDFArgsFound = 0;
-		MaxAlphaIDFDefArgsFound = 0;
-		MaxNumericIDFDefArgsFound = 0;
-		NumOutOfRangeErrorsFound = 0;
-		NumBlankReqFieldFound = 0;
-		NumMiscErrorsFound = 0;
-		MinimumNumberOfFields = 0;
-		NumObsoleteObjects = 0;
-		TotalAuditErrors = 0;
-		NumSecretObjects = 0;
-		ProcessingIDD = false;
-		echo_stream = nullptr;
-
-		InputLine = std::string();
-		CurrentFieldName = std::string();
-		ReplacementName = std::string();
-
-		OverallErrorFlag = false;
-		EchoInputLine = true;
-		ReportRangeCheckErrors = true;
-		FieldSet = false;
-		RequiredField = false;
-		RetainCaseFlag = false;
-		ObsoleteObject = false;
-		RequiredObject = false;
-		UniqueObject = false;
-		ExtensibleObject = false;
-		ExtensibleNumFields = 0;
-
-		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
-	}
-
-	template < typename T >
-	bool compareVectors( T const & correct, T const & to_check ) {
-		auto const correct_size = correct.size();
-		if ( correct_size != to_check.size() ) return false;
-		if ( correct_size > 0 ) {
-			if ( typeid( correct[ 0 ] ) != typeid( to_check[ 0 ] ) ) return false;
-		}
-		bool is_correct = true;
-		for ( size_t i = 0; i < correct_size; ++i )
-		{
-			is_correct = ( correct[ i ] == to_check[ i ] );
-			EXPECT_EQ( correct[ i ], to_check[ i ] ) << "Array index: " << i;
-		}
-		return is_correct;
-	}
-
-	bool processIDD( std::string const & idd, bool & errors_found ) {
-		std::unique_ptr< std::istream > idd_stream;
-		if( !idd.empty() ) {
-			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
-		} else {
-			auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
-			auto const idd_location = exeDirectory + "Energy+.idd";
-
-			EXPECT_TRUE( FileSystem::fileExists( idd_location ) ) << 
-				"Energy+.idd does not exist at search location." << std::endl << "IDD search location: \"" << idd_location << "\""; 
-
-			idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_location, std::ios_base::in | std::ios_base::binary ) );
+	class InputProcessorFixture : public EnergyPlusFixture
+	{
+	protected:
+		virtual void SetUp() {
+			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
 		}
 
-		if ( ! idd_stream->good() ) {
-			errors_found = true;
-			return errors_found;
+		virtual void TearDown() {
+			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 
-		ProcessingIDD = true;
-		DataSystemVariables::SortedIDD = true;
-		ProcessDataDicFile( *idd_stream, errors_found );
-		ProcessingIDD = false;
-
-		if( !errors_found ) {
-			ListOfObjects.allocate( NumObjectDefs );
-			ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
-			if ( DataSystemVariables::SortedIDD ) {
-				iListOfObjects.allocate( NumObjectDefs );
-				SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );
-			}
+		bool processIDD( std::string const & idd, bool & errors_found ) {
+			return EnergyPlusFixture::processIDD( idd, errors_found );
 		}
-
-		ObjectStartRecord.dimension( NumObjectDefs, 0 );
-		ObjectGotCount.dimension( NumObjectDefs, 0 );
-
-		return errors_found;
-	}
-
-	void processIDF( std::string const & idf ) {
-		auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream );
-		*idf_stream << idf << std::endl;
-
-		ProcessingIDD = false;
-		NumLines = 0;
-		ProcessInputDataFile( *idf_stream );
-	}
-};
+	};
 
 TEST_F( InputProcessorFixture, findItemInSortedList )
 {
@@ -273,7 +134,7 @@ TEST_F( InputProcessorFixture, findItemInList )
 
 }
 
-TEST_F( InputProcessorFixture, processIDD_FullIDD )
+TEST_F( InputProcessorFixture, processIDD_Full_IDD )
 {
 	std::string const idd_objects;
 
@@ -302,12 +163,12 @@ TEST_F( InputProcessorFixture, processIDD_FullIDD )
 	EXPECT_EQ( 0, ObjectDef( index ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( index ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( index ).ObsPtr );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { true } , ObjectDef( index ).AlphaOrNumeric ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( index ).ReqField ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( index ).AlphRetainCase ) );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "Option Type" }, ObjectDef( index ).AlphFieldChks ) );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "" }, ObjectDef( index ).AlphFieldDefs ) );
-	// EXPECT_TRUE( compareVectors< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( index ).NumRangeChks ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( index ).ReqField.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( index ).AlphRetainCase.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "Option Type" }, ObjectDef( index ).AlphFieldChks.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "" }, ObjectDef( index ).AlphFieldDefs.begin() ) );
+	// EXPECT_TRUE( compareContainers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( index ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( index ).NumFound );
 
 }
@@ -343,12 +204,12 @@ TEST_F( InputProcessorFixture, processIDD )
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { true } , ObjectDef( 1 ).AlphaOrNumeric ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( 1 ).ReqField ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( 1 ).AlphRetainCase ) );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "Option Type" }, ObjectDef( 1 ).AlphFieldChks ) );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "" }, ObjectDef( 1 ).AlphFieldDefs ) );
-	// EXPECT_TRUE( compareVectors< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { true } , ObjectDef( 1 ).AlphaOrNumeric.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( 1 ).ReqField.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( 1 ).AlphRetainCase.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "Option Type" }, ObjectDef( 1 ).AlphFieldChks.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldDefs.begin() ) );
+	// EXPECT_TRUE( compareContainers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
 
 }
@@ -401,12 +262,12 @@ TEST_F( InputProcessorFixture, addObjectDefandParse )
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { true } , ObjectDef( 1 ).AlphaOrNumeric ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( 1 ).ReqField ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( 1 ).AlphRetainCase ) );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "" }, ObjectDef( 1 ).AlphFieldChks ) );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "" }, ObjectDef( 1 ).AlphFieldDefs ) );
-	// EXPECT_TRUE( compareVectors< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { true } , ObjectDef( 1 ).AlphaOrNumeric.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( 1 ).ReqField.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( 1 ).AlphRetainCase.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldChks.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldDefs.begin() ) );
+	// EXPECT_TRUE( compareContainers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
 
 }
@@ -491,10 +352,10 @@ TEST_F( InputProcessorFixture, validateObjectandParse )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "8.3" }, IDFRecords( index ).Alphas ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
-	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 	std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -509,21 +370,15 @@ TEST_F( InputProcessorFixture, validateObjectandParse )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
-	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 }
 
-TEST_F( InputProcessorFixture, processIDF_FullIDD )
+TEST_F( InputProcessorFixture, processIDF_Full_IDD )
 {
-	std::string const idd_objects;
-
-	bool errors_found = false;
-
-	ASSERT_FALSE( processIDD( idd_objects, errors_found ) );
-
 	std::string const idf_objects = delimitedString({
 		"Version,",
 		"8.3;",
@@ -531,7 +386,7 @@ TEST_F( InputProcessorFixture, processIDF_FullIDD )
 		"SimpleAndTabular;"
 	});
 
-	processIDF( idf_objects );
+	ASSERT_FALSE( processIDF( idf_objects ) );
 
 	EXPECT_FALSE( OverallErrorFlag );
 
@@ -551,10 +406,10 @@ TEST_F( InputProcessorFixture, processIDF_FullIDD )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "8.3" }, IDFRecords( index ).Alphas ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
-	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 	std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -569,10 +424,10 @@ TEST_F( InputProcessorFixture, processIDF_FullIDD )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
-	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 }
 
@@ -595,10 +450,6 @@ TEST_F( InputProcessorFixture, processIDF )
 		"       \\key SimpleAndTabular"
 	});
 
-	bool errors_found = false;
-
-	ASSERT_FALSE( processIDD( idd_objects, errors_found ) ) << "Error processing IDD.";
-
 	std::string const idf_objects = delimitedString({
 		"Version,",
 		"8.3;",
@@ -606,7 +457,7 @@ TEST_F( InputProcessorFixture, processIDF )
 		"SimpleAndTabular;"
 	});
 
-	processIDF( idf_objects );
+	ASSERT_FALSE( processIDF( idf_objects, idd_objects ) );
 
 	EXPECT_FALSE( OverallErrorFlag );
 
@@ -626,10 +477,10 @@ TEST_F( InputProcessorFixture, processIDF )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "8.3" }, IDFRecords( index ).Alphas ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
-	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 	std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -644,81 +495,80 @@ TEST_F( InputProcessorFixture, processIDF )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareVectors< Array1D_string >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
-	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 }
 
-// TEST_F( InputProcessorFixture, getNumObjectsFound )
-// {
-// 	ShowMessage( "Begin Test: InputProcessorFixture, getNumObjectsFound" );
+TEST_F( InputProcessorFixture, getNumObjectsFound )
+{
+	ShowMessage( "Begin Test: InputProcessorFixture, getNumObjectsFound" );
 
-// 	InputProcessor::ListOfObjects = Array1D_string ({
-// 		"OUTPUT:METER",
-// 		"OUTPUT:METER:CUMULATIVE",
-// 		"OUTPUT:METER:CUMULATIVE:METERFILEONLY",
-// 		"OUTPUT:METER:METERFILEONLY",
-// 		"OUTPUT:SQLITE",
-// 		"OUTPUT:VARIABLE"
-// 	});
-// 	InputProcessor::NumObjectDefs = ListOfObjects.size();
+	std::string const idd_objects = delimitedString({
+		"Version,",
+		"      \\memo Specifies the EnergyPlus version of the IDF file.",
+		"      \\unique-object",
+		"      \\format singleLine",
+		"  A1 ; \\field Version Identifier",
+		"      \\required-field",
+		"      \\default 8.3",
+		"Output:SQLite,",
+		"       \\memo Output from EnergyPlus can be written to an SQLite format file.",
+		"       \\unique-object",
+		"  A1 ; \\field Option Type",
+		"       \\type choice",
+		"       \\key Simple",
+		"       \\key SimpleAndTabular",
+		"Output:Meter:MeterFileOnly,",
+		"       \\memo Each Output:Meter:MeterFileOnly command picks meters to be put only onto meter file (.mtr).",
+		"       \\memo Not all meters are reported in every simulation. A list of meters that can be reported",
+		"       \\memo a list of meters that can be reported are available after a run on",
+		"       \\memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.",
+		"       \\format singleLine",
+		"  A1,  \\field Name",
+		"       \\required-field",
+		"       \\type external-list",
+		"       \\external-list autoRDDmeter",
+		"       \\note Form is EnergyUseType:..., e.g. Electricity:* for all Electricity meters",
+		"       \\note or EndUse:..., e.g. GeneralLights:* for all General Lights",
+		"       \\note Output:Meter:MeterFileOnly puts results on the eplusout.mtr file only",
+		"  A2 ; \\field Reporting Frequency",
+		"       \\type choice",
+		"       \\key Timestep",
+		"       \\note Timestep refers to the zone Timestep/Number of Timesteps in hour value",
+		"       \\note RunPeriod, Environment, and Annual are the same",
+		"       \\key Hourly",
+		"       \\key Daily",
+		"       \\key Monthly",
+		"       \\key RunPeriod",
+		"       \\key Environment",
+		"       \\key Annual",
+		"       \\default Hourly",
+		"       \\note RunPeriod, Environment, and Annual are synonymous"
+	});
 
-// 	InputProcessor::ObjectDef = Array1D< ObjectsDefinition > ({
-// 		ObjectsDefinition( "Unused", 4, 4, 0, 2, false, false, false, false, 0, 0, 0, 0, Array1_bool({}), Array1_bool({}), Array1_bool({}), Array1_string({}), Array1_string({}), Array1< RangeCheckDef >({}), 2 )
-// 	});
+	std::string const idf_objects = delimitedString({
+		"Version,8.3;",
+		"Output:SQLite,SimpleAndTabular;",
+		"Output:Meter:MeterFileOnly,Electricity:Facility,timestep;",
+		"Output:Meter:MeterFileOnly,Electricity:Facility,hourly;",
+		"Output:Meter:MeterFileOnly,Electricity:Facility,daily;",
+		"Output:Meter:MeterFileOnly,Electricity:Facility,monthly;",
+		"Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;",
+	});
 
-// // 	int const NumParams, // Number of parameters to be processed for each object
-// // 	int const NumAlpha, // Number of Alpha elements in the object
-// // 	int const NumNumeric, // Number of Numeric elements in the object
-// // 	int const MinNumFields, // Minimum number of fields to be passed to the Get routines
-// // 	bool const NameAlpha1, // True if the first alpha appears to "name" the object for error messages
-// // 	bool const UniqueObject, // True if this object has been designated \unique-object
-// // 	bool const RequiredObject, // True if this object has been designated \required-object
-// // 	bool const ExtensibleObject, // True if this object has been designated \extensible
-// // 	int const ExtensibleNum, // how many fields to extend
-// // 	int const LastExtendAlpha, // Count for extended alpha fields
-// // 	int const LastExtendNum, // Count for extended numeric fields
-// // 	int const ObsPtr, // If > 0, object is obsolete and this is the
-// // 	Array1_bool const & AlphaOrNumeric, // Positionally, whether the argument
-// // 	Array1_bool const & ReqField, // True for required fields
-// // 	Array1_bool const & AlphRetainCase, // true if retaincase is set for this field (alpha fields only)
-// // 	Array1_string const & AlphFieldChks, // Field names for alphas
-// // 	Array1_string const & AlphFieldDefs, // Defaults for alphas
-// // 	Array1< RangeCheckDef > const & NumRangeChks, // Used to range check and default numeric fields
-// // 	int const NumFound // Number of this object found in IDF
+	ASSERT_FALSE( processIDF( idf_objects, idd_objects ) );
 
-// // 	NumParams	int	4	4
-// // NumAlpha	int	4	4
-// // NumNumeric	int	0	0
-// // MinNumFields	int	2	2
-// // NameAlpha1	bool	false	false
-// // UniqueObject	bool	false	false
-// // RequiredObject	bool	false	false
-// // ExtensibleObject	bool	false	false
-// // ExtensibleNum	int	0	0
-// // LastExtendAlpha	int	0	0
-// // LastExtendNum	int	0	0
-// // ObsPtr	int	0	0
-// // AlphaOrNumeric	ObjexxFCL::Array1D_bool		
-// // ReqField	ObjexxFCL::Array1D_bool		
-// // AlphRetainCase	ObjexxFCL::Array1D_bool		
-// // AlphFieldChks	ObjexxFCL::Array1D_string		
-// // AlphFieldDefs	ObjexxFCL::Array1D_string		
-// // NumRangeChks	ObjexxFCL::Array1D<EnergyPlus::InputProcessor::RangeCheckDef>		
-// // NumFound	int	2	2
+	EXPECT_EQ( 1, GetNumObjectsFound( "VERSION" ) );
+	EXPECT_EQ( 1, GetNumObjectsFound( "OUTPUT:SQLITE" ) );
+	EXPECT_EQ( 5, GetNumObjectsFound( "OUTPUT:METER:METERFILEONLY" ) );
+	EXPECT_EQ( 0, GetNumObjectsFound( "OUTPUT:VARIABLE" ) );
 
-// 	EXPECT_EQ( 1ul, ObjectDef.size() );
+	EXPECT_FALSE( hasCoutOutput() );
+	EXPECT_FALSE( hasCerrOutput() );
 
-// 	// ListOfObjects.allocate( NumObjectDefs );
-// 	// ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
-
-// 	// GetNumObjectsFound( "" );
-
-// 	InputProcessor::NumObjectDefs = 0;
-// 	InputProcessor::ListOfObjects.deallocate();
-// 	InputProcessor::ObjectDef.deallocate();
-// }
+}
 
 }
