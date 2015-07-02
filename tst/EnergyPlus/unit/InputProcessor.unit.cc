@@ -11,11 +11,11 @@
 #include <EnergyPlus/FileSystem.hh>
 
 #include <fstream>
+#include <typeinfo>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::InputProcessor;
 using namespace ObjexxFCL;
-// using namespace DataGlobals;
 
 namespace EnergyPlus {
 
@@ -36,22 +36,84 @@ protected:
 			ObjectDef( NumObjectDefs ).AlphRetainCase.deallocate();
 		}
 		ObjectDef.deallocate();
-		NumObjectDefs = 0;
+		SectionDef.deallocate();
+		SectionsOnFile.deallocate();
+		ObjectStartRecord.deallocate();
+		ObjectGotCount.deallocate();
 		ObsoleteObjectsRepNames.deallocate();
-
+		ListOfSections.deallocate();
 		ListOfObjects.deallocate();
 		iListOfObjects.deallocate();
-
-		SectionsOnFile.deallocate();
+		IDFRecordsGotten.deallocate();
 		IDFRecords.deallocate();
-		// LineItem.Numbers.deallocate( MaxNumericArgsFound );
-		// LineItem.NumBlank.deallocate( MaxNumericArgsFound );
-		// LineItem.Alphas.deallocate( MaxAlphaArgsFound );
-		// LineItem.AlphBlank.deallocate( MaxAlphaArgsFound );
-		MaxNumericArgsFound = 0;
+		RepObjects.deallocate();
+		LineItem.Numbers.deallocate();
+		LineItem.NumBlank.deallocate();
+		LineItem.Alphas.deallocate();
+		LineItem.AlphBlank.deallocate();
+
+		NumObjectDefs = 0;
+		NumSectionDefs = 0;
+		MaxObjectDefs = 0;
+		MaxSectionDefs = 0;
+		NumLines = 0;
+		MaxIDFRecords = 0;
+		NumIDFRecords = 0;
+		MaxIDFSections = 0;
+		NumIDFSections = 0;
+		EchoInputFile = 0;
+		InputLineLength = 0;
 		MaxAlphaArgsFound = 0;
+		MaxNumericArgsFound = 0;
+		NumAlphaArgsFound = 0;
+		NumNumericArgsFound = 0;
+		MaxAlphaIDFArgsFound = 0;
+		MaxNumericIDFArgsFound = 0;
+		MaxAlphaIDFDefArgsFound = 0;
+		MaxNumericIDFDefArgsFound = 0;
+		NumOutOfRangeErrorsFound = 0;
+		NumBlankReqFieldFound = 0;
+		NumMiscErrorsFound = 0;
+		MinimumNumberOfFields = 0;
+		NumObsoleteObjects = 0;
+		TotalAuditErrors = 0;
+		NumSecretObjects = 0;
+		ProcessingIDD = false;
+		echo_stream = nullptr;
+
+		InputLine = std::string();
+		CurrentFieldName = std::string();
+		ReplacementName = std::string();
+
+		OverallErrorFlag = false;
+		EchoInputLine = true;
+		ReportRangeCheckErrors = true;
+		FieldSet = false;
+		RequiredField = false;
+		RetainCaseFlag = false;
+		ObsoleteObject = false;
+		RequiredObject = false;
+		UniqueObject = false;
+		ExtensibleObject = false;
+		ExtensibleNumFields = 0;
 
 		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+	}
+
+	template < typename T >
+	bool compareVectors( T const & correct, T const & to_check ) {
+		auto const correct_size = correct.size();
+		if ( correct_size != to_check.size() ) return false;
+		if ( correct_size > 0 ) {
+			if ( typeid( correct[ 0 ] ) != typeid( to_check[ 0 ] ) ) return false;
+		}
+		bool is_correct = true;
+		for ( size_t i = 0; i < correct_size; ++i )
+		{
+			is_correct = ( correct[ i ] == to_check[ i ] );
+			EXPECT_EQ( correct[ i ], to_check[ i ] ) << "Array index: " << i;
+		}
+		return is_correct;
 	}
 
 	bool processIDD( std::string const & idd, bool & errors_found ) {
@@ -62,17 +124,10 @@ protected:
 			auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
 			auto const idd_location = exeDirectory + "Energy+.idd";
 
-			idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_location, std::ios_base::in | std::ios_base::binary ) );
+			EXPECT_TRUE( FileSystem::fileExists( idd_location ) ) << 
+				"Energy+.idd does not exist at search location." << std::endl << "IDD search location: \"" << idd_location << "\""; 
 
-			// static std::vector< std::string > const possible_idd_locations( { "Energy+.idd", "Products/Energy+.idd", "../Energy+.idd" } );
-			// for( auto const & idd_location : possible_idd_locations ) {
-			// 	idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_location, std::ios_base::in | std::ios_base::binary ) );
-			// 	if ( idd_stream->good() ) {
-			// 		break;
-			// 	} else {
-			// 		continue;
-			// 	}
-			// }
+			idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_location, std::ios_base::in | std::ios_base::binary ) );
 		}
 
 		if ( ! idd_stream->good() ) {
@@ -94,6 +149,9 @@ protected:
 			}
 		}
 
+		ObjectStartRecord.dimension( NumObjectDefs, 0 );
+		ObjectGotCount.dimension( NumObjectDefs, 0 );
+
 		return errors_found;
 	}
 
@@ -102,6 +160,7 @@ protected:
 		*idf_stream << idf << std::endl;
 
 		ProcessingIDD = false;
+		NumLines = 0;
 		ProcessInputDataFile( *idf_stream );
 	}
 };
@@ -214,7 +273,7 @@ TEST_F( InputProcessorFixture, findItemInList )
 
 }
 
-TEST_F( InputProcessorFixture, processDataDicFile_FullIDD )
+TEST_F( InputProcessorFixture, processIDD_FullIDD )
 {
 	std::string const idd_objects;
 
@@ -243,17 +302,17 @@ TEST_F( InputProcessorFixture, processDataDicFile_FullIDD )
 	EXPECT_EQ( 0, ObjectDef( index ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( index ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( index ).ObsPtr );
-	// EXPECT_EQ( 1, ObjectDef( index ).AlphaOrNumeric );
-	// EXPECT_EQ( 1, ObjectDef( index ).ReqField );
-	// EXPECT_EQ( 1, ObjectDef( index ).AlphRetainCase );
-	// EXPECT_EQ( 1, ObjectDef( index ).AlphFieldChks );
-	// EXPECT_EQ( 1, ObjectDef( index ).AlphFieldDefs );
-	// EXPECT_EQ( 1, ObjectDef( index ).NumRangeChks );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { true } , ObjectDef( index ).AlphaOrNumeric ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( index ).ReqField ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( index ).AlphRetainCase ) );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "Option Type" }, ObjectDef( index ).AlphFieldChks ) );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "" }, ObjectDef( index ).AlphFieldDefs ) );
+	// EXPECT_TRUE( compareVectors< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( index ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( index ).NumFound );
 
 }
 
-TEST_F( InputProcessorFixture, processDataDicFile )
+TEST_F( InputProcessorFixture, processIDD )
 {
 	std::string const idd_objects = delimitedString({
 		"Output:SQLite,",
@@ -284,12 +343,12 @@ TEST_F( InputProcessorFixture, processDataDicFile )
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-	// EXPECT_EQ( 1, ObjectDef( 1 ).AlphaOrNumeric );
-	// EXPECT_EQ( 1, ObjectDef( 1 ).ReqField );
-	// EXPECT_EQ( 1, ObjectDef( 1 ).AlphRetainCase );
-	// EXPECT_EQ( 1, ObjectDef( 1 ).AlphFieldChks );
-	// EXPECT_EQ( 1, ObjectDef( 1 ).AlphFieldDefs );
-	// EXPECT_EQ( 1, ObjectDef( 1 ).NumRangeChks );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { true } , ObjectDef( 1 ).AlphaOrNumeric ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( 1 ).ReqField ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( 1 ).AlphRetainCase ) );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "Option Type" }, ObjectDef( 1 ).AlphFieldChks ) );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "" }, ObjectDef( 1 ).AlphFieldDefs ) );
+	// EXPECT_TRUE( compareVectors< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
 
 }
@@ -298,7 +357,6 @@ TEST_F( InputProcessorFixture, addObjectDefandParse )
 {
 	ShowMessage( "Begin Test: InputProcessorFixture, addObjectDefandParse" );
 
-	ProcessingIDD = true;
 	std::string const idd_objects = 
 		"Output:SQLite,\n"
 		"       \\memo Output from EnergyPlus can be written to an SQLite format file.\n"
@@ -310,18 +368,25 @@ TEST_F( InputProcessorFixture, addObjectDefandParse )
 
 	auto idd_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idd_objects ) );
 
-	std::string const proposed_object = "Output:SQLite";
+	MaxSectionDefs = SectionDefAllocInc;
+	MaxObjectDefs = ObjectDefAllocInc;
 
-	auto current_pos = idd_objects.find_first_of( ',' );
+	SectionDef.allocate( MaxSectionDefs );
+	ObjectDef.allocate( MaxObjectDefs );
 
-	EXPECT_EQ( 13ul, current_pos );
+	NumObjectDefs = 0;
+	NumSectionDefs = 0;
 
-	bool end_of_file = false;
-	bool errors_found = false;
+	ProcessingIDD = true;
 
-	ObjectDef.allocate( 100 );
+	bool errors_found( false );
+	bool end_of_file( false );
+	bool blank_line( false );
+	std::string::size_type current_pos;
 
-	AddObjectDefandParse( *idd_stream, proposed_object, current_pos, end_of_file, errors_found );
+	ReadInputLine( *idd_stream, current_pos, blank_line, end_of_file );
+	current_pos = scan( InputLine, ",;" );
+	AddObjectDefandParse( *idd_stream, InputLine.substr( 0, current_pos ), current_pos, end_of_file, errors_found );
 
 	EXPECT_EQ( "OUTPUT:SQLITE", ObjectDef( 1 ).Name );
 	EXPECT_EQ( 1, ObjectDef( 1 ).NumParams );
@@ -336,15 +401,254 @@ TEST_F( InputProcessorFixture, addObjectDefandParse )
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-	// EXPECT_EQ( Array1D_bool( { false } ) , ObjectDef( 1 ).AlphaOrNumeric );
-	// EXPECT_EQ( Array1D_bool( { false } ) , ObjectDef( 1 ).ReqField );
-	// EXPECT_EQ( Array1D_bool( { false } ) , ObjectDef( 1 ).AlphRetainCase );
-	// EXPECT_EQ( Array1D_string( { "" } ), ObjectDef( 1 ).AlphFieldChks );
-	// EXPECT_EQ( Array1D_string( { "" } ), ObjectDef( 1 ).AlphFieldDefs );
-	// EXPECT_EQ( Array1< RangeCheckDef >( RangeCheckDef() ), ObjectDef( 1 ).NumRangeChks );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { true } , ObjectDef( 1 ).AlphaOrNumeric ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( 1 ).ReqField ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false } , ObjectDef( 1 ).AlphRetainCase ) );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "" }, ObjectDef( 1 ).AlphFieldChks ) );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "" }, ObjectDef( 1 ).AlphFieldDefs ) );
+	// EXPECT_TRUE( compareVectors< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
 
-	ProcessingIDD = false;
+}
+
+TEST_F( InputProcessorFixture, validateObjectandParse )
+{
+	ShowMessage( "Begin Test: InputProcessorFixture, validateObjectandParse" );
+
+	std::string const idf_objects = delimitedString({
+		"Version,",
+		"8.3;",
+		"Output:SQLite,",
+		"SimpleAndTabular;"
+	});
+
+	NumIDFRecords = 2;
+	IDFRecords.allocate( 2 );
+
+	auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
+
+	std::string const idd_objects = delimitedString({
+		"Version,",
+		"      \\memo Specifies the EnergyPlus version of the IDF file.",
+		"      \\unique-object",
+		"      \\format singleLine",
+		"  A1 ; \\field Version Identifier",
+		"      \\required-field",
+		"      \\default 8.3",
+		"Output:SQLite,",
+		"       \\memo Output from EnergyPlus can be written to an SQLite format file.",
+		"       \\unique-object",
+		"  A1 ; \\field Option Type",
+		"       \\type choice",
+		"       \\key Simple",
+		"       \\key SimpleAndTabular"
+	});
+
+	bool errors_found = false;
+
+	ASSERT_FALSE( processIDD( idd_objects, errors_found ) ) << "Error processing IDD.";
+
+	NumLines = 0;
+
+	MaxIDFRecords = ObjectsIDFAllocInc;
+	NumIDFRecords = 0;
+	MaxIDFSections = SectionsIDFAllocInc;
+	NumIDFSections = 0;
+
+	SectionsOnFile.allocate( MaxIDFSections );
+	IDFRecords.allocate( MaxIDFRecords );
+	LineItem.Numbers.allocate( MaxNumericArgsFound );
+	LineItem.NumBlank.allocate( MaxNumericArgsFound );
+	LineItem.Alphas.allocate( MaxAlphaArgsFound );
+	LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
+
+	bool end_of_file( false );
+	bool blank_line( false );
+	std::string::size_type current_pos;
+
+	while ( ! end_of_file ) {
+		ReadInputLine( *idf_stream, current_pos, blank_line, end_of_file );
+		if ( blank_line || end_of_file ) continue;
+		current_pos = scan( InputLine, ",;" );
+		ValidateObjectandParse( *idf_stream, InputLine.substr( 0, current_pos ), current_pos, end_of_file );
+	}
+
+	EXPECT_FALSE( OverallErrorFlag );
+
+	EXPECT_FALSE( hasCoutOutput() );
+	EXPECT_FALSE( hasCerrOutput() );
+
+	std::string const version_name( "VERSION" );
+
+	auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+	if ( index != 0 ) index = iListOfObjects( index );
+
+	index = ObjectStartRecord( index );
+
+	EXPECT_EQ( 1, index );
+
+	EXPECT_EQ( version_name, IDFRecords( index ).Name );
+	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "8.3" }, IDFRecords( index ).Alphas ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
+	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+
+	std::string const sqlite_name( "OUTPUT:SQLITE" );
+
+	index = FindItemInSortedList( sqlite_name, ListOfObjects, NumObjectDefs );
+	if ( index != 0 ) index = iListOfObjects( index );
+
+	index = ObjectStartRecord( index );
+
+	EXPECT_EQ( 2, index );
+
+	EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
+	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
+	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+
+}
+
+TEST_F( InputProcessorFixture, processIDF_FullIDD )
+{
+	std::string const idd_objects;
+
+	bool errors_found = false;
+
+	ASSERT_FALSE( processIDD( idd_objects, errors_found ) );
+
+	std::string const idf_objects = delimitedString({
+		"Version,",
+		"8.3;",
+		"Output:SQLite,",
+		"SimpleAndTabular;"
+	});
+
+	processIDF( idf_objects );
+
+	EXPECT_FALSE( OverallErrorFlag );
+
+	EXPECT_FALSE( hasCoutOutput() );
+	EXPECT_FALSE( hasCerrOutput() );
+
+	std::string const version_name( "VERSION" );
+
+	auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+	if ( index != 0 ) index = iListOfObjects( index );
+
+	index = ObjectStartRecord( index );
+
+	EXPECT_EQ( 1, index );
+
+	EXPECT_EQ( version_name, IDFRecords( index ).Name );
+	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "8.3" }, IDFRecords( index ).Alphas ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
+	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+
+	std::string const sqlite_name( "OUTPUT:SQLITE" );
+
+	index = FindItemInSortedList( sqlite_name, ListOfObjects, NumObjectDefs );
+	if ( index != 0 ) index = iListOfObjects( index );
+
+	index = ObjectStartRecord( index );
+
+	EXPECT_EQ( 2, index );
+
+	EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
+	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
+	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+
+}
+
+TEST_F( InputProcessorFixture, processIDF )
+{
+	std::string const idd_objects = delimitedString({
+		"Version,",
+		"      \\memo Specifies the EnergyPlus version of the IDF file.",
+		"      \\unique-object",
+		"      \\format singleLine",
+		"  A1 ; \\field Version Identifier",
+		"      \\required-field",
+		"      \\default 8.3",
+		"Output:SQLite,",
+		"       \\memo Output from EnergyPlus can be written to an SQLite format file.",
+		"       \\unique-object",
+		"  A1 ; \\field Option Type",
+		"       \\type choice",
+		"       \\key Simple",
+		"       \\key SimpleAndTabular"
+	});
+
+	bool errors_found = false;
+
+	ASSERT_FALSE( processIDD( idd_objects, errors_found ) ) << "Error processing IDD.";
+
+	std::string const idf_objects = delimitedString({
+		"Version,",
+		"8.3;",
+		"Output:SQLite,",
+		"SimpleAndTabular;"
+	});
+
+	processIDF( idf_objects );
+
+	EXPECT_FALSE( OverallErrorFlag );
+
+	EXPECT_FALSE( hasCoutOutput() );
+	EXPECT_FALSE( hasCerrOutput() );
+
+	std::string const version_name( "VERSION" );
+
+	auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+	if ( index != 0 ) index = iListOfObjects( index );
+
+	index = ObjectStartRecord( index );
+
+	EXPECT_EQ( 1, index );
+
+	EXPECT_EQ( version_name, IDFRecords( index ).Name );
+	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "8.3" }, IDFRecords( index ).Alphas ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
+	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+
+	std::string const sqlite_name( "OUTPUT:SQLITE" );
+
+	index = FindItemInSortedList( sqlite_name, ListOfObjects, NumObjectDefs );
+	if ( index != 0 ) index = iListOfObjects( index );
+
+	index = ObjectStartRecord( index );
+
+	EXPECT_EQ( 2, index );
+
+	EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
+	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+	EXPECT_TRUE( compareVectors< Array1D_string >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( { false }, IDFRecords( index ).AlphBlank ) );
+	EXPECT_TRUE( compareVectors< Array1D< Real64 > >( {}, IDFRecords( index ).Numbers ) );
+	EXPECT_TRUE( compareVectors< Array1D_bool >( {}, IDFRecords( index ).NumBlank ) );
+
 }
 
 // TEST_F( InputProcessorFixture, getNumObjectsFound )

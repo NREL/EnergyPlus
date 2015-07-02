@@ -65,6 +65,7 @@ TEST_F( OutputProcessorFixture, TestGetMeteredVariables )
 	EXPECT_EQ( 1 , NumFound );
 
 	// Clean up
+	NumOfRVariable = 0;
 	RVariableTypes.deallocate();
 	RVar.deallocate();
 	VarMeterArrays.deallocate();
@@ -1176,7 +1177,11 @@ TEST_F( OutputProcessorFixture, validateVariableType )
 
 	std::string const variableTypeKey = "BAD INPUT";
 
-	auto index = functionUsingSQLite( std::bind( ValidateVariableType, variableTypeKey ) );
+	EnergyPlus::sqlite = std::move( sqlite_test );
+	auto index = ValidateVariableType( variableTypeKey );
+	sqlite_test = std::move( EnergyPlus::sqlite );
+	// See note in SQLiteFixture.hh, can maybe move to this in the future.
+	// auto index = functionUsingSQLite( std::bind( ValidateVariableType, variableTypeKey ) );
 	// auto index = functionUsingSQLite<int>( std::bind( ValidateVariableType, variableTypeKey ) );
 
 	EXPECT_EQ( 0, index );
@@ -1998,18 +2003,17 @@ TEST_F( OutputProcessorFixture, addMeter )
 	EXPECT_EQ( 9, EnergyMeters( 1 ).MNAccRptNum );
 	EXPECT_EQ( 10, EnergyMeters( 1 ).SMAccRptNum );
 
+	EXPECT_EQ( 1, NumEnergyMeters );
+	EXPECT_EQ( 1ul, EnergyMeters.size() );
+
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+
 	auto const name2( "testMeter2" );
 	auto const units2( "kWh" );
 	auto const resourceType2( "OTHER" );
 	auto const endUse2( "testEndUse2" );
 	auto const endUseSub2( "testEndUseSub2" );
 	auto const group2( "testGroup2" );
-
-	EXPECT_EQ( 1, NumEnergyMeters );
-	EXPECT_EQ( 1ul, EnergyMeters.size() );
-
-	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-
 	functionUsingSQLite( std::bind(AddMeter, name2, units2, resourceType2, endUse2, endUseSub2, group2 ) );
 
 	auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
@@ -2335,6 +2339,13 @@ TEST_F( OutputProcessorFixture, getVariableUnitsString )
 // 	GetReportVariableInput();
 // }
 
+// TEST_F( OutputProcessorFixture, checkReportVariable )
+// {
+// 	ShowMessage( "Begin Test: OutputProcessorFixture, checkReportVariable" );
+
+// 	CheckReportVariable();
+// }
+
 // TEST_F( OutputProcessorFixture, setupOutputVariable )
 // {
 // 	ShowMessage( "Begin Test: OutputProcessorFixture, setupOutputVariable" );
@@ -2496,17 +2507,24 @@ TEST_F( OutputProcessorFixture, getVariableUnitsString )
 // 	RunPeriodStampReportNbr = 1;
 // 	RunPeriodStampReportChr = "1";
 
-// 	DayOfSim = 1;
-// 	DayOfSimChr = "1";
-// 	HourOfDay = 1;
+// 	DayOfSim = 365;
+// 	DayOfSimChr = "365";
 // 	DataEnvironment::Month = 12;
-// 	DataEnvironment::DayOfMonth = 21;
+// 	DataEnvironment::DayOfMonth = 31;
 // 	DataEnvironment::DSTIndicator = 0;
-// 	DataEnvironment::DayOfWeek = 2;
-// 	DataEnvironment::HolidayIndex = 3;
+// 	DataEnvironment::DayOfWeek = 3;
+// 	DataEnvironment::HolidayIndex = 0;
+// 	DataGlobals::HourOfDay = 24;
 // 	// int EndMinute = 10;
 // 	// int StartMinute = 0;
 // 	// bool PrintESOTimeStamp = true;
+
+// 	TimeValue.allocate( 2 );
+
+// 	auto timeStep = 1.0 / 6;
+
+// 	SetupTimePointers( "Zone", timeStep );
+// 	SetupTimePointers( "HVAC", timeStep );
 
 // 	// SetupTimePointers( "Zone", TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 // 	// SetupTimePointers( "HVAC", TimeStepSys );
@@ -2517,6 +2535,7 @@ TEST_F( OutputProcessorFixture, getVariableUnitsString )
 
 // 	NumEnergyMeters = 0;
 // 	EnergyMeters.deallocate();
+// 	TimeValue.deallocate();
 // }
 
 }

@@ -63,13 +63,17 @@ namespace EnergyPlus {
 			sqlite_test = std::move( EnergyPlus::sqlite );
 		}
 
-		int functionUsingSQLite( std::function<int()> func ) {
-			EnergyPlus::sqlite = std::move( sqlite_test );
-			int value = func();
-			sqlite_test = std::move( EnergyPlus::sqlite );
-			return value;
-		}
+		// This is causing C2668 'EnergyPlus::SQLiteFixture::functionUsingSQLite' : ambiguous call to overloaded function on Windows CI
+		// Maybe Visual Studio 2015 will fix this and catch up to clang/gcc..
+		// int functionUsingSQLite( std::function<int()> func ) {
+		// 	EnergyPlus::sqlite = std::move( sqlite_test );
+		// 	int value = func();
+		// 	sqlite_test = std::move( EnergyPlus::sqlite );
+		// 	return value;
+		// }
 
+		// This is causing C2668 'EnergyPlus::SQLiteFixture::functionUsingSQLite' : ambiguous call to overloaded function on Windows CI
+		// Maybe Visual Studio 2015 will fix this and catch up to clang/gcc..
 		// template <typename T>
 		// T functionUsingSQLite( std::function<T()> func ) {
 		// 	EnergyPlus::sqlite = std::move( sqlite_test );
