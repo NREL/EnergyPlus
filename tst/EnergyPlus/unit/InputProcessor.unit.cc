@@ -8,6 +8,7 @@
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 #include <fstream>
 
@@ -41,12 +42,14 @@ protected:
 		ListOfObjects.deallocate();
 		iListOfObjects.deallocate();
 
-		// SectionsOnFile.deallocate();
-		// IDFRecords.deallocate();
+		SectionsOnFile.deallocate();
+		IDFRecords.deallocate();
 		// LineItem.Numbers.deallocate( MaxNumericArgsFound );
 		// LineItem.NumBlank.deallocate( MaxNumericArgsFound );
 		// LineItem.Alphas.deallocate( MaxAlphaArgsFound );
 		// LineItem.AlphBlank.deallocate( MaxAlphaArgsFound );
+		MaxNumericArgsFound = 0;
+		MaxAlphaArgsFound = 0;
 
 		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 	}
@@ -56,15 +59,20 @@ protected:
 		if( !idd.empty() ) {
 			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
 		} else {
-			static std::vector< std::string > const possible_idd_locations( { "Energy+.idd", "Products/Energy+.idd", "../Energy+.idd" } );
-			for( auto const & idd_locations : possible_idd_locations ) {
-				idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_locations, std::ios_base::in | std::ios_base::binary ) );
-				if ( idd_stream->good() ) {
-					break;
-				} else {
-					continue;
-				}
-			}
+			auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
+			auto const idd_location = exeDirectory + "Energy+.idd";
+
+			idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_location, std::ios_base::in | std::ios_base::binary ) );
+
+			// static std::vector< std::string > const possible_idd_locations( { "Energy+.idd", "Products/Energy+.idd", "../Energy+.idd" } );
+			// for( auto const & idd_location : possible_idd_locations ) {
+			// 	idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_location, std::ios_base::in | std::ios_base::binary ) );
+			// 	if ( idd_stream->good() ) {
+			// 		break;
+			// 	} else {
+			// 		continue;
+			// 	}
+			// }
 		}
 
 		if ( ! idd_stream->good() ) {
@@ -300,9 +308,7 @@ TEST_F( InputProcessorFixture, addObjectDefandParse )
 		"       \\key Simple\n"
 		"       \\key SimpleAndTabular\n";
 
-	auto idd_stream = std::unique_ptr<std::stringstream>( new std::stringstream );
-
-	*idd_stream << idd_objects;
+	auto idd_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idd_objects ) );
 
 	std::string const proposed_object = "Output:SQLite";
 
