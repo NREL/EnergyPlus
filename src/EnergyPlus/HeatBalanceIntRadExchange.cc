@@ -27,6 +27,17 @@
 
 namespace EnergyPlus {
 
+	// Amir Roth 2017-07-01: __ep_assume_aligned is a portable
+	// compiler hint that tells the compiler that address A of
+	// type T is aligned to an N byte boundary.  Alignment hints
+	// are used by some compilers to generate optimized vector
+	// memory load/store code.
+
+	// TODO: move to a header file somewhere
+	// TODO: add MSVC support once MSVC "catches up"
+	// TODO: simplify macro by combining with __restrict?
+	// TODO: encapsulate in aligned/padded ArrayXD templates?
+
 #if defined(__GNUC__) && !defined(__clang__)
 #define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
 #elif defined(__INTEL_COMPILER) 
@@ -167,6 +178,10 @@ namespace HeatBalanceIntRadExchange {
 		static Array1D< Real64 > SurfaceTempK4;
 		static Array1D< Real64 > SurfaceEmiss;
 
+		// Amir Roth 2015-07-01: variables added as part of
+		// vectorization strategy - could be eliminated if
+		// Surface array is resorted so that window and
+		// non-window surfaces are contiguous within a zone
 		static Array1D< Real64 > IRfromParentZone_Temp;
 		static Array1D< Real64 > NetLWRadToSurf_Temp;
 
@@ -319,15 +334,22 @@ namespace HeatBalanceIntRadExchange {
 				}
 			} // for ZoneSurfNum
 
-			// Split off so that this will vectorize.
-			Real64 * __restrict vecSurfaceTempK4( &SurfaceTempK4[0] );
-			// We know this is aligned, we allocated it here.
-			__ep_assume_aligned(Real64 *, vecSurfaceTempK4, 16);
+			// Amir Roth 2015-07-01: Split off SurfaceTemp = pow4(SurfaceTemp) calculation so that it will vectorize.
 
+			// __restrict is a hint that tells the compiler that the array vecSurfaceTempK4 does not overlap in memory with 
+			// any other array, this helps the compiler decide that the code is vectorizable.
+			Real64 * __restrict vecSurfaceTempK4( &SurfaceTempK4[ 0 ] );
+			// __ep_assume_aligned tells the compiler that vecSurfaceTempK4 is aligned in memory allowing it to generate
+			// optimized vector load/store code. 
+			__ep_assume_aligned(Real64 *, vecSurfaceTempK4, 16);
+			// Both __restrict and __assume_aligned hints require raw pointers, hence need to use raw pointers here.  These 
+			// pointers do not manage or "own" memory, they simply point at memory in a way that allows the compiler to optimize
+			// better
 			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfaces; ++ZoneSurfNum ) {
 				vecSurfaceTempK4[ ZoneSurfNum ] = pow_4( vecSurfaceTempK4 [ ZoneSurfNum ] + KelvinConv );
 			} // for ZoneSurfNum
 
+			// See comments above for explanation of __restrict and __ep_assume_aligned
 			Real64 * __restrict vecNetLWRadToSurf_Temp( &NetLWRadToSurf_Temp[ 0 ] );
 			__ep_assume_aligned(Real64 *, vecNetLWRadToSurf_Temp, 16);
 			Real64 * __restrict vecIRfromParentZone_Temp( &IRfromParentZone_Temp[ 0 ] );
@@ -338,12 +360,14 @@ namespace HeatBalanceIntRadExchange {
 			} // ZoneSurfNum
 
 			// These are the money loops
-
-			int lSR = 0;
+			
+			// Amir Roth 2015-07-01: vectorize the inner loop for performance.  Made SendZoneSurfNum the outer loop to enable 
+			// vectorization.
 			for ( int SendZoneSurfNum = 0; SendZoneSurfNum < zvfi.NumOfSurfaces; ++SendZoneSurfNum ) {
 
 				int RecZoneSurfNum = 0;
 
+				// See comments above for explanation of __restrict and __ep_assume_aligned vectorization hints
 				Real64 * __restrict vecNetLWRadToSurf_Temp( &NetLWRadToSurf_Temp[ RecZoneSurfNum ] );
 				__ep_assume_aligned(Real64 *, vecNetLWRadToSurf_Temp, 16);
 				Real64 * __restrict vecIRfromParentZone_Temp( &IRfromParentZone_Temp[ RecZoneSurfNum ] );
@@ -351,6 +375,7 @@ namespace HeatBalanceIntRadExchange {
 				Real64 * __restrict vecSurfaceTempK4( &SurfaceTempK4[ RecZoneSurfNum ] );
 				__ep_assume_aligned(Real64 *, vecSurfaceTempK4, 16);
 
+				// ScriptF is a "hand-rolled" padded 2D array.  Npad is the size of a padded row.
 				int Npad = (( zvfi.NumOfSurfaces + 1 ) >> 1 ) << 1;
 				Real64 * __restrict vecZvfiScriptF( &zvfi.ScriptF[ (SendZoneSurfNum * Npad) + RecZoneSurfNum ] );
 				__ep_assume_aligned(Real64 *, vecZvfiScriptF, 16);
@@ -358,12 +383,13 @@ namespace HeatBalanceIntRadExchange {
 			
 				// Calculate net long-wave radiation for opaque surfaces and incident
 				// long-wave radiation for windows.
-				for ( int RecZoneSurfNum = 0; RecZoneSurfNum < zvfi.NumOfSurfaces; ++RecZoneSurfNum, ++lSR ) {
+
+				// Amir Roth 2015-07-01: vectorized inner loop.
+				for ( ; RecZoneSurfNum < zvfi.NumOfSurfaces; ++RecZoneSurfNum ) {
 					// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
 
 					vecIRfromParentZone_Temp[ RecZoneSurfNum ] += vecZvfiScriptF[ RecZoneSurfNum ] * vecSurfaceTempK4[ SendZoneSurfNum ];
-					vecNetLWRadToSurf_Temp[ RecZoneSurfNum ] += vecZvfiScriptF[ RecZoneSurfNum ] * ( vecSurfaceTempK4[ SendZoneSurfNum ] - vecSurfaceTempK4[ RecZoneSurfNum ] ); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
-					
+					vecNetLWRadToSurf_Temp[ RecZoneSurfNum ] += vecZvfiScriptF[ RecZoneSurfNum ] * ( vecSurfaceTempK4[ SendZoneSurfNum ] - vecSurfaceTempK4[ RecZoneSurfNum ] ); 					
 					// Per BG -- this should never happened.  (CR6346,CR6550 caused this to be put in.  Now removed. LKL 1/2013)
 					//          IF (SurfaceWindow(RecSurfNum)%IRfromParentZone < 0.0) THEN
 					//            CALL ShowRecurringWarningErrorAtEnd('CalcInteriorRadExchange: Window_IRFromParentZone negative, Window="'// &
@@ -378,6 +404,9 @@ namespace HeatBalanceIntRadExchange {
 				} // for SendZoneSurfNum
 			} // for RecZoneSurfNum
 
+
+			// Amir Roth 2015-07-01: because loops with conditionals will not vectorize and because "money" Send->Recv inner loop had a 
+			// conditional, pulled that conditional out and implemented it here.
 			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfaces; ++ZoneSurfNum ) {
 				int SurfNum = zvfi.SurfacePtr[ ZoneSurfNum ];
 				NetLWRadToSurf( SurfNum ) += NetLWRadToSurf_Temp[ ZoneSurfNum ];
@@ -1219,7 +1248,7 @@ namespace HeatBalanceIntRadExchange {
 		Array1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
 		Array2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
 		Array1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		Real64 *ScriptF
+		Real64 *ScriptF // Hottel's ScriptF, Amir Roth 2015-07-01: this is a hand-rolled "padded" 2D array.  Should be replaced by an Array2DPadded object.
 	)
 	{
 
@@ -1310,7 +1339,8 @@ namespace HeatBalanceIntRadExchange {
 		}
 		Excite.clear(); // Release memory ASAP
 
-		// Form Script F matrix 
+		// Form ScriptF matrix 
+		// Amir Roth 2015-07-01: Npad is the size of a "padded" row
 		unsigned int Npad = ((N+1) >> 1) << 1;
 
 		for ( int i = 1; i <= N; ++i ) { 
