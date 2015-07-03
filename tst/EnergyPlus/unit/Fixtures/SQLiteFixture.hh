@@ -15,7 +15,6 @@ namespace EnergyPlus {
 
 	protected:
 		static void SetUpTestCase() { }
-
 		static void TearDownTestCase() { }
 
 		std::unique_ptr<SQLite> sqlite_test;
@@ -161,6 +160,8 @@ namespace EnergyPlus {
 			return queryVector;
 		}
 	};
+
+	typedef SQLiteFixture SQLiteDeathTestFixture;
 
 }
 

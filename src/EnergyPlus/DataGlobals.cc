@@ -1,13 +1,11 @@
 // C++ Headers
 #include <ostream>
-#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -36,7 +34,6 @@ namespace DataGlobals {
 	// na
 
 	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
 
 	// Data
 	// -only module should be available to other modules and routines.

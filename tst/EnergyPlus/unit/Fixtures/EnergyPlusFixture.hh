@@ -6,6 +6,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -53,11 +54,29 @@ namespace EnergyPlus {
 	protected:
 		friend class InputProcessorFixture;
 
-		static void SetUpTestCase() { }
+		static void SetUpTestCase() {
+			static auto errors_found = false;
+			static auto const idd = "";
+			processIDD( idd, errors_found );
+			if ( errors_found ) {
+				clearInputProcessorState();
+				return;
+			}
+			m_idd_cache = std::unique_ptr<InputProcessorCache>( new InputProcessorCache );
+			clearInputProcessorState();
+		}
 
 		static void TearDownTestCase() { }
 
 		virtual void SetUp() {
+			show_message();
+
+			this->eso_stream = std::unique_ptr<std::ostringstream>( new std::ostringstream );
+			this->mtr_stream = std::unique_ptr<std::ostringstream>( new std::ostringstream );
+
+			DataGlobals::eso_stream = this->eso_stream.get();
+			DataGlobals::mtr_stream = this->mtr_stream.get();
+
 			m_cout_buffer = std::unique_ptr<std::ostringstream>( new std::ostringstream );
 			m_redirect_cout = std::unique_ptr<RedirectCout>( new RedirectCout( m_cout_buffer ) );
 
@@ -66,6 +85,11 @@ namespace EnergyPlus {
 		}
 
 		virtual void TearDown() {
+			this->eso_stream.reset();
+			this->eso_stream = nullptr;
+			this->mtr_stream.reset();
+			this->mtr_stream = nullptr;
+
 			m_redirect_cout.reset();
 			m_redirect_cout = nullptr;
 			m_redirect_cerr.reset();
@@ -77,6 +101,17 @@ namespace EnergyPlus {
 			m_cerr_buffer = nullptr;
 
 			clearInputProcessorState();
+			clearDataGlobalsState();
+		}
+
+		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
+		// Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
+		// unit test names change.
+		void show_message() {
+			// Gets information about the currently running test.
+			// Do NOT delete the returned object - it's managed by the UnitTest class.
+			const ::testing::TestInfo* const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+			ShowMessage( "Begin Test: " + std::string( test_info->test_case_name() ) + ", " + std::string( test_info->name() ) );
 		}
 
 		// This will compare either a STL container or ObjexxFCL container
@@ -100,6 +135,18 @@ namespace EnergyPlus {
 			return compare_text->str();
 		}
 
+		bool compareESOStream( std::string const & correctString, bool resetStream = true ) {
+			bool are_equal = ( correctString == this->eso_stream->str() );
+			if ( resetStream ) this->eso_stream->str( std::string() );
+			return are_equal;
+		}
+
+		bool compareMTRStream( std::string const & correctString, bool resetStream = true ) {
+			bool are_equal = ( correctString == this->mtr_stream->str() );
+			if ( resetStream ) this->mtr_stream->str( std::string() );
+			return are_equal;
+		}
+
 		bool compareCOUTStream( std::string const & correctString, bool resetStream = true ) {
 			bool are_equal = ( correctString == this->m_cout_buffer->str() );
 			if ( resetStream ) this->m_cout_buffer->str( std::string() );
@@ -120,11 +167,17 @@ namespace EnergyPlus {
 			return this->m_cerr_buffer->str().size() > 0;
 		}
 
-		bool processIDF( std::string const & idf, std::string const & idd = "" ) {
+		bool processIDF( std::string const & idf, bool use_idd_cache = true ) {
 			using namespace InputProcessor;
 
 			auto errors_found = false;
-			processIDD( idd, errors_found );
+
+			if ( use_idd_cache && m_idd_cache ) {
+				m_idd_cache->fillInputProcessorGlobals();
+			} else {
+				auto const idd = "";
+				processIDD( idd, errors_found );
+			}
 
 			if ( errors_found ) return errors_found;
 
@@ -133,7 +186,7 @@ namespace EnergyPlus {
 			ProcessInputDataFile( *idf_stream );
 
 			ListOfSections.allocate( NumSectionDefs );
-			ListOfSections = SectionDef( {1,NumSectionDefs} ).Name();
+			ListOfSections = SectionDef( { 1, NumSectionDefs } ).Name();
 
 			DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
 			DataIPShortCuts::cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
@@ -148,12 +201,17 @@ namespace EnergyPlus {
 		}
 
 	private:
+		struct InputProcessorCache;
+
+		std::unique_ptr<std::ostringstream> eso_stream;
+		std::unique_ptr<std::ostringstream> mtr_stream;
 		std::unique_ptr<std::ostringstream> m_cout_buffer;
 		std::unique_ptr<std::ostringstream> m_cerr_buffer;
 		std::unique_ptr<RedirectCout> m_redirect_cout;
 		std::unique_ptr<RedirectCerr> m_redirect_cerr;
+		static std::unique_ptr<InputProcessorCache> m_idd_cache;
 
-		bool processIDD( std::string const & idd, bool & errors_found ) {
+		static bool processIDD( std::string const & idd, bool & errors_found ) {
 			using namespace InputProcessor;
 
 			std::unique_ptr< std::istream > idd_stream;
@@ -194,7 +252,91 @@ namespace EnergyPlus {
 			return errors_found;
 		}
 
-		void clearInputProcessorState() {
+		static void clearDataGlobalsState() {
+			using namespace DataGlobals;
+
+			runReadVars = false;
+			DDOnlySimulation = false;
+			AnnualSimulation = false;
+			BeginDayFlag = false;
+			BeginEnvrnFlag = false;
+			BeginHourFlag = false;
+			BeginSimFlag = false;
+			BeginFullSimFlag = false;
+			BeginTimeStepFlag = false;
+			DayOfSim = 0;
+			DayOfSimChr = "0";
+			EndEnvrnFlag = false;
+			EndDesignDayEnvrnsFlag = false;
+			EndDayFlag = false;
+			EndHourFlag = false;
+			PreviousHour = 0;
+			HourOfDay = 0;
+			WeightPreviousHour = 0.0;
+			WeightNow = 0.0;
+			NumOfDayInEnvrn = 0;
+			NumOfTimeStepInHour = 0;
+			NumOfZones = 0;
+			TimeStep = 0;
+			TimeStepZone = 0.0;
+			WarmupFlag = false;
+			OutputFileStandard = 0;
+			StdOutputRecordCount = 0;
+			OutputFileInits = 0;
+			OutputFileDebug = 0;
+			OutputFileZoneSizing = 0;
+			OutputFileSysSizing = 0;
+			OutputFileMeters = 0;
+			StdMeterRecordCount = 0;
+			OutputFileBNDetails = 0;
+			ZoneSizingCalc = false;
+			SysSizingCalc = false;
+			DoZoneSizing = false;
+			DoSystemSizing = false;
+			DoPlantSizing = false;
+			DoDesDaySim = false;
+			DoWeathSim = false;
+			DoHVACSizingSimulation = false;
+			HVACSizingSimMaxIterations = 0;
+			WeathSimReq = false;
+			KindOfSim = 0;
+			DoOutputReporting = false;
+			DoingSizing = false;
+			DoingHVACSizingSimulations = false;
+			DoingInputProcessing = false;
+			DisplayAllWarnings = false;
+			DisplayExtraWarnings = false;
+			DisplayUnusedObjects = false;
+			DisplayUnusedSchedules = false;
+			DisplayAdvancedReportVariables = false;
+			DisplayZoneAirHeatBalanceOffBalance = false;
+			DisplayInputInAudit = false;
+			CreateMinimalSurfaceVariables = false;
+			CurrentTime = 0.0;
+			SimTimeSteps = 0;
+			MinutesPerTimeStep = 0;
+			TimeStepZoneSec = 0.0;
+			MetersHaveBeenInitialized = false;
+			KickOffSimulation = false;
+			KickOffSizing = false;
+			RedoSizesHVACSimulation = false;
+			FinalSizingHVACSizingSimIteration = false;
+			AnyEnergyManagementSystemInModel = false;
+			AnyPlantInModel = false;
+			CacheIPErrorFile = 0;
+			AnyIdealCondEntSetPointInModel = false;
+			RunOptCondEntTemp = false;
+			CompLoadReportIsReq = false;
+			isPulseZoneSizing = false;
+			OutputFileZonePulse = 0;
+			doLoadComponentPulseNow = false;
+			ShowDecayCurvesInEIO = false;
+			AnySlabsInModel = false;
+			AnyBasementsInModel = false;
+			Progress = 0;
+		}
+
+		static void clearInputProcessorState() {
 			using namespace InputProcessor;
 
 			ObjectDef.deallocate();
@@ -267,7 +409,208 @@ namespace EnergyPlus {
 			ExtensibleNumFields = 0;
 		}
 
+		struct InputProcessorCache {
+			InputProcessorCache()
+			{
+				using namespace InputProcessor;
+
+				m_ObjectDef = ObjectDef;
+				m_SectionDef = SectionDef;
+				m_SectionsOnFile = SectionsOnFile;
+				m_ObjectStartRecord = ObjectStartRecord;
+				m_ObjectGotCount = ObjectGotCount;
+				m_ObsoleteObjectsRepNames = ObsoleteObjectsRepNames;
+				m_ListOfSections = ListOfSections;
+				m_ListOfObjects = ListOfObjects;
+				m_iListOfObjects = iListOfObjects;
+				m_IDFRecordsGotten = IDFRecordsGotten;
+				m_IDFRecords = IDFRecords;
+				m_RepObjects = RepObjects;
+				m_LineItem = LineItem;
+				m_cAlphaFieldNames = DataIPShortCuts::cAlphaFieldNames;
+				m_cAlphaArgs = DataIPShortCuts::cAlphaArgs;
+				m_lAlphaFieldBlanks = DataIPShortCuts::lAlphaFieldBlanks;
+				m_cNumericFieldNames = DataIPShortCuts::cNumericFieldNames;
+				m_rNumericArgs = DataIPShortCuts::rNumericArgs;
+				m_lNumericFieldBlanks = DataIPShortCuts::lNumericFieldBlanks;
+				m_NumObjectDefs = NumObjectDefs;
+				m_NumSectionDefs = NumSectionDefs;
+				m_MaxObjectDefs = MaxObjectDefs;
+				m_MaxSectionDefs = MaxSectionDefs;
+				m_NumLines = NumLines;
+				m_MaxIDFRecords = MaxIDFRecords;
+				m_NumIDFRecords = NumIDFRecords;
+				m_MaxIDFSections = MaxIDFSections;
+				m_NumIDFSections = NumIDFSections;
+				m_EchoInputFile = EchoInputFile;
+				m_InputLineLength = InputLineLength;
+				m_MaxAlphaArgsFound = MaxAlphaArgsFound;
+				m_MaxNumericArgsFound = MaxNumericArgsFound;
+				m_NumAlphaArgsFound = NumAlphaArgsFound;
+				m_NumNumericArgsFound = NumNumericArgsFound;
+				m_MaxAlphaIDFArgsFound = MaxAlphaIDFArgsFound;
+				m_MaxNumericIDFArgsFound = MaxNumericIDFArgsFound;
+				m_MaxAlphaIDFDefArgsFound = MaxAlphaIDFDefArgsFound;
+				m_MaxNumericIDFDefArgsFound = MaxNumericIDFDefArgsFound;
+				m_NumOutOfRangeErrorsFound = NumOutOfRangeErrorsFound;
+				m_NumBlankReqFieldFound = NumBlankReqFieldFound;
+				m_NumMiscErrorsFound = NumMiscErrorsFound;
+				m_MinimumNumberOfFields = MinimumNumberOfFields;
+				m_NumObsoleteObjects = NumObsoleteObjects;
+				m_TotalAuditErrors = TotalAuditErrors;
+				m_NumSecretObjects = NumSecretObjects;
+				m_ProcessingIDD = ProcessingIDD;
+				m_echo_stream = echo_stream;
+				m_InputLine = InputLine;
+				m_CurrentFieldName = CurrentFieldName;
+				m_ReplacementName = ReplacementName;
+				m_OverallErrorFlag = OverallErrorFlag;
+				m_EchoInputLine = EchoInputLine;
+				m_ReportRangeCheckErrors = ReportRangeCheckErrors;
+				m_FieldSet = FieldSet;
+				m_RequiredField = RequiredField;
+				m_RetainCaseFlag = RetainCaseFlag;
+				m_ObsoleteObject = ObsoleteObject;
+				m_RequiredObject = RequiredObject;
+				m_UniqueObject = UniqueObject;
+				m_ExtensibleObject = ExtensibleObject;
+				m_ExtensibleNumFields = ExtensibleNumFields;
+			}
+
+			void fillInputProcessorGlobals()
+			{
+				using namespace InputProcessor;
+
+				ObjectDef = m_ObjectDef;
+				SectionDef = m_SectionDef;
+				SectionsOnFile = m_SectionsOnFile;
+				ObjectStartRecord = m_ObjectStartRecord;
+				ObjectGotCount = m_ObjectGotCount;
+				ObsoleteObjectsRepNames = m_ObsoleteObjectsRepNames;
+				ListOfSections = m_ListOfSections;
+				ListOfObjects = m_ListOfObjects;
+				iListOfObjects = m_iListOfObjects;
+				IDFRecordsGotten = m_IDFRecordsGotten;
+				IDFRecords = m_IDFRecords;
+				RepObjects = m_RepObjects;
+				LineItem = m_LineItem;
+				DataIPShortCuts::cAlphaFieldNames = m_cAlphaFieldNames;
+				DataIPShortCuts::cAlphaArgs = m_cAlphaArgs;
+				DataIPShortCuts::lAlphaFieldBlanks = m_lAlphaFieldBlanks;
+				DataIPShortCuts::cNumericFieldNames = m_cNumericFieldNames;
+				DataIPShortCuts::rNumericArgs = m_rNumericArgs;
+				DataIPShortCuts::lNumericFieldBlanks = m_lNumericFieldBlanks;
+				NumObjectDefs = m_NumObjectDefs;
+				NumSectionDefs = m_NumSectionDefs;
+				MaxObjectDefs = m_MaxObjectDefs;
+				MaxSectionDefs = m_MaxSectionDefs;
+				NumLines = m_NumLines;
+				MaxIDFRecords = m_MaxIDFRecords;
+				NumIDFRecords = m_NumIDFRecords;
+				MaxIDFSections = m_MaxIDFSections;
+				NumIDFSections = m_NumIDFSections;
+				EchoInputFile = m_EchoInputFile;
+				InputLineLength = m_InputLineLength;
+				MaxAlphaArgsFound = m_MaxAlphaArgsFound;
+				MaxNumericArgsFound = m_MaxNumericArgsFound;
+				NumAlphaArgsFound = m_NumAlphaArgsFound;
+				NumNumericArgsFound = m_NumNumericArgsFound;
+				MaxAlphaIDFArgsFound = m_MaxAlphaIDFArgsFound;
+				MaxNumericIDFArgsFound = m_MaxNumericIDFArgsFound;
+				MaxAlphaIDFDefArgsFound = m_MaxAlphaIDFDefArgsFound;
+				MaxNumericIDFDefArgsFound = m_MaxNumericIDFDefArgsFound;
+				NumOutOfRangeErrorsFound = m_NumOutOfRangeErrorsFound;
+				NumBlankReqFieldFound = m_NumBlankReqFieldFound;
+				NumMiscErrorsFound = m_NumMiscErrorsFound;
+				MinimumNumberOfFields = m_MinimumNumberOfFields;
+				NumObsoleteObjects = m_NumObsoleteObjects;
+				TotalAuditErrors = m_TotalAuditErrors;
+				NumSecretObjects = m_NumSecretObjects;
+				ProcessingIDD = m_ProcessingIDD;
+				echo_stream = m_echo_stream;
+				InputLine = m_InputLine;
+				CurrentFieldName = m_CurrentFieldName;
+				ReplacementName = m_ReplacementName;
+				OverallErrorFlag = m_OverallErrorFlag;
+				EchoInputLine = m_EchoInputLine;
+				ReportRangeCheckErrors = m_ReportRangeCheckErrors;
+				FieldSet = m_FieldSet;
+				RequiredField = m_RequiredField;
+				RetainCaseFlag = m_RetainCaseFlag;
+				ObsoleteObject = m_ObsoleteObject;
+				RequiredObject = m_RequiredObject;
+				UniqueObject = m_UniqueObject;
+				ExtensibleObject = m_ExtensibleObject;
+				ExtensibleNumFields = m_ExtensibleNumFields;
+			}
+
+		private:
+			int m_NumObjectDefs = 0;
+			int m_NumSectionDefs = 0;
+			int m_MaxObjectDefs = 0;
+			int m_MaxSectionDefs = 0;
+			int m_NumLines = 0;
+			int m_MaxIDFRecords = 0;
+			int m_NumIDFRecords = 0;
+			int m_MaxIDFSections = 0;
+			int m_NumIDFSections = 0;
+			int m_EchoInputFile = 0;
+			int m_InputLineLength = 0;
+			int m_MaxAlphaArgsFound = 0;
+			int m_MaxNumericArgsFound = 0;
+			int m_NumAlphaArgsFound = 0;
+			int m_NumNumericArgsFound = 0;
+			int m_MaxAlphaIDFArgsFound = 0;
+			int m_MaxNumericIDFArgsFound = 0;
+			int m_MaxAlphaIDFDefArgsFound = 0;
+			int m_MaxNumericIDFDefArgsFound = 0;
+			int m_NumOutOfRangeErrorsFound = 0;
+			int m_NumBlankReqFieldFound = 0;
+			int m_NumMiscErrorsFound = 0;
+			int m_MinimumNumberOfFields = 0;
+			int m_NumObsoleteObjects = 0;
+			int m_TotalAuditErrors = 0;
+			int m_NumSecretObjects = 0;
+			bool m_ProcessingIDD = false;
+			std::ostream * m_echo_stream = nullptr;
+			std::string m_InputLine;
+			Array1D_string m_ListOfSections;
+			Array1D_string m_ListOfObjects;
+			Array1D_int m_iListOfObjects;
+			Array1D_int m_ObjectGotCount;
+			Array1D_int m_ObjectStartRecord;
+			std::string m_CurrentFieldName;
+			Array1D_string m_ObsoleteObjectsRepNames;
+			std::string m_ReplacementName;
+			bool m_OverallErrorFlag = false;
+			bool m_EchoInputLine = true;
+			bool m_ReportRangeCheckErrors = true;
+			bool m_FieldSet = false;
+			bool m_RequiredField = false;
+			bool m_RetainCaseFlag = false;
+			bool m_ObsoleteObject = false;
+			bool m_RequiredObject = false;
+			bool m_UniqueObject = false;
+			bool m_ExtensibleObject = false;
+			int m_ExtensibleNumFields = 0;
+			Array1D_bool m_IDFRecordsGotten;
+			Array1D< InputProcessor::ObjectsDefinition > m_ObjectDef;
+			Array1D< InputProcessor::SectionsDefinition > m_SectionDef;
+			Array1D< InputProcessor::FileSectionsDefinition > m_SectionsOnFile;
+			InputProcessor::LineDefinition m_LineItem;
+			Array1D< InputProcessor::LineDefinition > m_IDFRecords;
+			Array1D< InputProcessor::SecretObjects > m_RepObjects;
+			Array1D_string m_cAlphaFieldNames;
+			Array1D_string m_cNumericFieldNames;
+			Array1D_bool m_lNumericFieldBlanks;
+			Array1D_bool m_lAlphaFieldBlanks;
+			Array1D_string m_cAlphaArgs;
+			Array1D< Real64 > m_rNumericArgs;
+		};
+
 	};
+
+	typedef EnergyPlusFixture EnergyPlusDeathTestFixture;
 
 }
 

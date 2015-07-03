@@ -18,26 +18,19 @@ namespace EnergyPlus {
 	{
 
 	protected:
-		static void SetUpTestCase() { }
-
+		static void SetUpTestCase() {
+			// Needed to initialize IDD cache
+			EnergyPlusFixture::SetUpTestCase();
+		}
 		static void TearDownTestCase() { }
-
+		
 		virtual void SetUp() {
 			SQLiteFixture::SetUp();  // Sets up the base fixture first.
-			this->eso_stream = std::unique_ptr<std::ostringstream>( new std::ostringstream );
-			this->mtr_stream = std::unique_ptr<std::ostringstream>( new std::ostringstream );
-			DataGlobals::eso_stream = this->eso_stream.get();
-			DataGlobals::mtr_stream = this->mtr_stream.get();
 
 			FreqNotice = Array2D_string( {1,2}, {-1,4} );
 		}
 
 		virtual void TearDown() {
-			this->eso_stream.reset();
-			this->eso_stream = nullptr;
-			this->mtr_stream.reset();
-			this->mtr_stream = nullptr;
-
 			InstMeterCacheSize = 1000;
 			InstMeterCacheSizeInc = 1000;
 			InstMeterCache.deallocate();
@@ -104,23 +97,9 @@ namespace EnergyPlus {
 			SQLiteFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 
-		bool compareESOStream( std::string const & correctString, bool resetStream = true ) {
-			bool are_equal = ( correctString == this->eso_stream->str() );
-			if ( resetStream ) this->eso_stream->str( std::string() );
-			return are_equal;
-		}
-
-		bool compareMTRStream( std::string const & correctString, bool resetStream = true ) {
-			bool are_equal = ( correctString == this->mtr_stream->str() );
-			if ( resetStream ) this->mtr_stream->str( std::string() );
-			return are_equal;
-		}
-
-	private:
-		std::unique_ptr<std::ostringstream> eso_stream;
-		std::unique_ptr<std::ostringstream> mtr_stream;
-
 	};
+
+	typedef OutputProcessorFixture OutputProcessorDeathTestFixture;
 
 }
 

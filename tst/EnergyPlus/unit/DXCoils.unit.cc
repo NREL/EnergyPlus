@@ -5,14 +5,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/HVACFixture.hh"
 #include <DXCoils.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataSizing.hh>
 #include <OutputReportPredefined.hh>
-#include <Psychrometrics.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -22,29 +21,9 @@ using namespace DataHVACGlobals;
 using namespace DataSizing;
 using namespace CurveManager;
 using namespace OutputReportPredefined;
-using namespace EnergyPlus::Psychrometrics;
 
-class DXCoilFixture : public EnergyPlusFixture
+TEST_F( HVACFixture, DXCoils_Test1 )
 {
-protected:
-	virtual void SetUp() {
-		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
-		Psychrometrics::InitializePsychRoutines();
-	}
-
-	virtual void TearDown() {
-		Psychrometrics::cached_Twb.deallocate();
-		Psychrometrics::cached_Psat.deallocate();
-		
-		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
-	}
-};
-
-TEST_F( DXCoilFixture, Test1 )
-{
-
-	ShowMessage( "Begin Test: DXCoilsTest, Test1" );
-
 	using CurveManager::Quadratic;
 	using CurveManager::BiQuadratic;
 	using CurveManager::NumCurves;
@@ -178,16 +157,15 @@ TEST_F( DXCoilFixture, Test1 )
 	PerfCurve.deallocate();
 
 }
-TEST_F( DXCoilFixture, Test2 )
+TEST_F( HVACFixture, DXCoils_Test2 )
 {
-
 	using CurveManager::Quadratic;
 	using CurveManager::BiQuadratic;
 	using CurveManager::NumCurves;
 	int DXCoilNum;
 	int CurveNum;
 
-	DisplayExtraWarnings = true;
+	DataGlobals::DisplayExtraWarnings = true;
 	SysSizingRunDone = true;
 	FinalSysSizing.allocate( 1 );
 	PrimaryAirSystem.allocate( 1 );

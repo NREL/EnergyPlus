@@ -13,6 +13,12 @@ namespace EnergyPlus {
 	class InputProcessorFixture : public EnergyPlusFixture
 	{
 	protected:
+		static void SetUpTestCase() {
+			// Needed to initialize IDD cache
+			EnergyPlusFixture::SetUpTestCase();
+		}
+		static void TearDownTestCase() { }
+
 		virtual void SetUp() {
 			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
 		}
@@ -26,10 +32,15 @@ namespace EnergyPlus {
 		}
 	};
 
+	typedef InputProcessorFixture InputProcessorDeathTestFixture;
+}
+
+// These must be here otherwise the linker will complain. This is so the shared resource m_idd_cache can be used by unit tests.
+struct InputProcessorCache;
+std::unique_ptr<EnergyPlus::EnergyPlusFixture::InputProcessorCache> EnergyPlusFixture::m_idd_cache = nullptr;
+
 TEST_F( InputProcessorFixture, findItemInSortedList )
 {
-	ShowMessage( "Begin Test: InputProcessorFixture, findItemInSortedList" );
-
 	InputProcessor::ListOfObjects = Array1D_string ({
 		"OUTPUT:METER",
 		"OUTPUT:METER:CUMULATIVE",
@@ -70,8 +81,6 @@ TEST_F( InputProcessorFixture, findItemInSortedList )
 
 TEST_F( InputProcessorFixture, findItemInSortedList_unsorted )
 {
-	ShowMessage( "Begin Test: InputProcessorFixture, findItemInSortedList" );
-
 	InputProcessor::ListOfObjects = Array1D_string ({
 		"OUTPUT:VARIABLE",
 		"OUTPUT:METER",
@@ -112,8 +121,6 @@ TEST_F( InputProcessorFixture, findItemInSortedList_unsorted )
 
 TEST_F( InputProcessorFixture, findItemInList )
 {
-	ShowMessage( "Begin Test: InputProcessorFixture, findItemInList" );
-
 	InputProcessor::ListOfObjects = Array1D_string ({
 		"OUTPUT:VARIABLE",
 		"OUTPUT:METER",
@@ -216,8 +223,6 @@ TEST_F( InputProcessorFixture, processIDD )
 
 TEST_F( InputProcessorFixture, addObjectDefandParse )
 {
-	ShowMessage( "Begin Test: InputProcessorFixture, addObjectDefandParse" );
-
 	std::string const idd_objects = 
 		"Output:SQLite,\n"
 		"       \\memo Output from EnergyPlus can be written to an SQLite format file.\n"
@@ -274,8 +279,6 @@ TEST_F( InputProcessorFixture, addObjectDefandParse )
 
 TEST_F( InputProcessorFixture, validateObjectandParse )
 {
-	ShowMessage( "Begin Test: InputProcessorFixture, validateObjectandParse" );
-
 	std::string const idf_objects = delimitedString({
 		"Version,",
 		"8.3;",
@@ -377,7 +380,61 @@ TEST_F( InputProcessorFixture, validateObjectandParse )
 
 }
 
-TEST_F( InputProcessorFixture, processIDF_Full_IDD )
+TEST_F( InputProcessorFixture, processIDF )
+{
+	std::string const idf_objects = delimitedString({
+		"Version,",
+		"8.3;",
+		"Output:SQLite,",
+		"SimpleAndTabular;"
+	});
+
+	ASSERT_FALSE( processIDF( idf_objects, false ) );
+
+	EXPECT_FALSE( OverallErrorFlag );
+
+	EXPECT_FALSE( hasCoutOutput() );
+	EXPECT_FALSE( hasCerrOutput() );
+
+	std::string const version_name( "VERSION" );
+
+	auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+	if ( index != 0 ) index = iListOfObjects( index );
+
+	index = ObjectStartRecord( index );
+
+	EXPECT_EQ( 1, index );
+
+	EXPECT_EQ( version_name, IDFRecords( index ).Name );
+	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
+
+	std::string const sqlite_name( "OUTPUT:SQLITE" );
+
+	index = FindItemInSortedList( sqlite_name, ListOfObjects, NumObjectDefs );
+	if ( index != 0 ) index = iListOfObjects( index );
+
+	index = ObjectStartRecord( index );
+
+	EXPECT_EQ( 2, index );
+
+	EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
+	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
+	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
+
+}
+
+TEST_F( InputProcessorFixture, processIDF_Cached )
 {
 	std::string const idf_objects = delimitedString({
 		"Version,",
@@ -431,124 +488,8 @@ TEST_F( InputProcessorFixture, processIDF_Full_IDD )
 
 }
 
-TEST_F( InputProcessorFixture, processIDF )
-{
-	std::string const idd_objects = delimitedString({
-		"Version,",
-		"      \\memo Specifies the EnergyPlus version of the IDF file.",
-		"      \\unique-object",
-		"      \\format singleLine",
-		"  A1 ; \\field Version Identifier",
-		"      \\required-field",
-		"      \\default 8.3",
-		"Output:SQLite,",
-		"       \\memo Output from EnergyPlus can be written to an SQLite format file.",
-		"       \\unique-object",
-		"  A1 ; \\field Option Type",
-		"       \\type choice",
-		"       \\key Simple",
-		"       \\key SimpleAndTabular"
-	});
-
-	std::string const idf_objects = delimitedString({
-		"Version,",
-		"8.3;",
-		"Output:SQLite,",
-		"SimpleAndTabular;"
-	});
-
-	ASSERT_FALSE( processIDF( idf_objects, idd_objects ) );
-
-	EXPECT_FALSE( OverallErrorFlag );
-
-	EXPECT_FALSE( hasCoutOutput() );
-	EXPECT_FALSE( hasCerrOutput() );
-
-	std::string const version_name( "VERSION" );
-
-	auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
-	if ( index != 0 ) index = iListOfObjects( index );
-
-	index = ObjectStartRecord( index );
-
-	EXPECT_EQ( 1, index );
-
-	EXPECT_EQ( version_name, IDFRecords( index ).Name );
-	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
-	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
-
-	std::string const sqlite_name( "OUTPUT:SQLITE" );
-
-	index = FindItemInSortedList( sqlite_name, ListOfObjects, NumObjectDefs );
-	if ( index != 0 ) index = iListOfObjects( index );
-
-	index = ObjectStartRecord( index );
-
-	EXPECT_EQ( 2, index );
-
-	EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
-	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
-	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-	EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
-
-}
-
 TEST_F( InputProcessorFixture, getNumObjectsFound )
 {
-	ShowMessage( "Begin Test: InputProcessorFixture, getNumObjectsFound" );
-
-	std::string const idd_objects = delimitedString({
-		"Version,",
-		"      \\memo Specifies the EnergyPlus version of the IDF file.",
-		"      \\unique-object",
-		"      \\format singleLine",
-		"  A1 ; \\field Version Identifier",
-		"      \\required-field",
-		"      \\default 8.3",
-		"Output:SQLite,",
-		"       \\memo Output from EnergyPlus can be written to an SQLite format file.",
-		"       \\unique-object",
-		"  A1 ; \\field Option Type",
-		"       \\type choice",
-		"       \\key Simple",
-		"       \\key SimpleAndTabular",
-		"Output:Meter:MeterFileOnly,",
-		"       \\memo Each Output:Meter:MeterFileOnly command picks meters to be put only onto meter file (.mtr).",
-		"       \\memo Not all meters are reported in every simulation. A list of meters that can be reported",
-		"       \\memo a list of meters that can be reported are available after a run on",
-		"       \\memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.",
-		"       \\format singleLine",
-		"  A1,  \\field Name",
-		"       \\required-field",
-		"       \\type external-list",
-		"       \\external-list autoRDDmeter",
-		"       \\note Form is EnergyUseType:..., e.g. Electricity:* for all Electricity meters",
-		"       \\note or EndUse:..., e.g. GeneralLights:* for all General Lights",
-		"       \\note Output:Meter:MeterFileOnly puts results on the eplusout.mtr file only",
-		"  A2 ; \\field Reporting Frequency",
-		"       \\type choice",
-		"       \\key Timestep",
-		"       \\note Timestep refers to the zone Timestep/Number of Timesteps in hour value",
-		"       \\note RunPeriod, Environment, and Annual are the same",
-		"       \\key Hourly",
-		"       \\key Daily",
-		"       \\key Monthly",
-		"       \\key RunPeriod",
-		"       \\key Environment",
-		"       \\key Annual",
-		"       \\default Hourly",
-		"       \\note RunPeriod, Environment, and Annual are synonymous"
-	});
-
 	std::string const idf_objects = delimitedString({
 		"Version,8.3;",
 		"Output:SQLite,SimpleAndTabular;",
@@ -559,7 +500,7 @@ TEST_F( InputProcessorFixture, getNumObjectsFound )
 		"Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;",
 	});
 
-	ASSERT_FALSE( processIDF( idf_objects, idd_objects ) );
+	ASSERT_FALSE( processIDF( idf_objects ) );
 
 	EXPECT_EQ( 1, GetNumObjectsFound( "VERSION" ) );
 	EXPECT_EQ( 1, GetNumObjectsFound( "OUTPUT:SQLITE" ) );
@@ -568,7 +509,5 @@ TEST_F( InputProcessorFixture, getNumObjectsFound )
 
 	EXPECT_FALSE( hasCoutOutput() );
 	EXPECT_FALSE( hasCerrOutput() );
-
-}
 
 }

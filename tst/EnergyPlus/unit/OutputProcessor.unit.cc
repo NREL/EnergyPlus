@@ -16,8 +16,6 @@ namespace EnergyPlus {
 
 TEST_F( OutputProcessorFixture, TestGetMeteredVariables )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, TestGetMeteredVariables" );
-
 	int const NumVariables = 2;
 	Array1D_int VarIndexes( NumVariables ); // Variable Numbers
 	Array1D_int VarTypes( NumVariables ); // Variable Types (1=integer, 2=real, 3=meter)
@@ -61,8 +59,6 @@ TEST_F( OutputProcessorFixture, TestGetMeteredVariables )
 
 TEST_F( OutputProcessorFixture, reportTSMeters_PrintESOTimeStamp )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, reportTSMeters_PrintESOTimeStamp" );
-
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -133,8 +129,6 @@ TEST_F( OutputProcessorFixture, reportTSMeters_PrintESOTimeStamp )
 
 TEST_F( OutputProcessorFixture, reportTSMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, reportTSMeters" );
-
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -205,8 +199,6 @@ TEST_F( OutputProcessorFixture, reportTSMeters )
 
 TEST_F( OutputProcessorFixture, reportHRMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, reportHRMeters" );
-
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -271,8 +263,6 @@ TEST_F( OutputProcessorFixture, reportHRMeters )
 
 TEST_F( OutputProcessorFixture, reportDYMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, reportDYMeters" );
-
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -349,8 +339,6 @@ TEST_F( OutputProcessorFixture, reportDYMeters )
 
 TEST_F( OutputProcessorFixture, reportMNMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, reportMNMeters" );
-
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -427,8 +415,6 @@ TEST_F( OutputProcessorFixture, reportMNMeters )
 
 TEST_F( OutputProcessorFixture, reportSMMeters )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, reportSMMeters" );
-
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 	sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
@@ -505,8 +491,6 @@ TEST_F( OutputProcessorFixture, reportSMMeters )
 
 TEST_F( OutputProcessorFixture, writeTimeStampFormatData )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeTimeStampFormatData" );
-
 	int TimeStepStampReportNbr = 1;
 	std::string TimeStepStampReportChr = "1";
 
@@ -582,8 +566,6 @@ TEST_F( OutputProcessorFixture, writeTimeStampFormatData )
 
 TEST_F( OutputProcessorFixture, writeReportMeterData )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeReportMeterData" );
-
 	DataGlobals::MinutesPerTimeStep = 10;
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
@@ -674,8 +656,6 @@ TEST_F( OutputProcessorFixture, writeReportMeterData )
 
 TEST_F( OutputProcessorFixture, writeReportRealData )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeReportRealData" );
-
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
@@ -755,8 +735,6 @@ TEST_F( OutputProcessorFixture, writeReportRealData )
 
 TEST_F( OutputProcessorFixture, writeReportIntegerData )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeReportIntegerData" );
-
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
@@ -836,8 +814,6 @@ TEST_F( OutputProcessorFixture, writeReportIntegerData )
 
 TEST_F( OutputProcessorFixture, writeIntegerData )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeIntegerData" );
-
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
@@ -893,8 +869,6 @@ TEST_F( OutputProcessorFixture, writeIntegerData )
 
 TEST_F( OutputProcessorFixture, getStandardMeterResourceType )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, getStandardMeterResourceType" );
-
 	std::map< std::string, std::string > const resource_map = {
 		{ "ELECTRICITY", "Electricity" },
 		{ "ELECTRIC", "Electricity" },
@@ -996,8 +970,6 @@ TEST_F( OutputProcessorFixture, getStandardMeterResourceType )
 
 TEST_F( OutputProcessorFixture, determineIndexGroupKeyFromMeterName )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, determineIndexGroupKeyFromMeterName" );
-
 	std::map< std::string, int > const resource_map = {
 		{ "Electricity:Facility", 100 },
 		{ "Gas:Facility", 101 },
@@ -1019,8 +991,6 @@ TEST_F( OutputProcessorFixture, determineIndexGroupKeyFromMeterName )
 
 TEST_F( OutputProcessorFixture, validateIndexType )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, validateIndexType" );
-
 	std::map< std::string, int > const resource_map = {
 		{ "ZONE", 1 },
 		{ "HEATBALANCE", 1 },
@@ -1036,14 +1006,17 @@ TEST_F( OutputProcessorFixture, validateIndexType )
 		EXPECT_EQ( indexGroup.second, ValidateIndexType( indexGroup.first, calledFrom ) ) << "where indexTypeKey is " << indexGroup.first;
 	}
 
+}
+
+TEST_F( OutputProcessorDeathTestFixture, validateIndexType )
+{
+	auto const calledFrom = "UnitTest";
 	EXPECT_DEATH( ValidateIndexType( "BAD INPUT", calledFrom ), "" );
 
 }
 
 TEST_F( OutputProcessorFixture, standardIndexTypeKey )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, standardIndexTypeKey" );
-
 	EXPECT_EQ( "Zone", StandardIndexTypeKey( 1 ) );
 	EXPECT_EQ( "HVAC", StandardIndexTypeKey( 2 ) );
 	EXPECT_EQ( "UNKW", StandardIndexTypeKey( 0 ) );
@@ -1054,8 +1027,6 @@ TEST_F( OutputProcessorFixture, standardIndexTypeKey )
 
 TEST_F( OutputProcessorFixture, validateVariableType )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, validateVariableType" );
-
 	std::map< std::string, int > const resource_map = {
 		{ "STATE", 1 },
 		{ "AVERAGE", 1 },
@@ -1093,8 +1064,6 @@ TEST_F( OutputProcessorFixture, validateVariableType )
 
 TEST_F( OutputProcessorFixture, standardVariableTypeKey )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, standardVariableTypeKey" );
-
 	EXPECT_EQ( "Average", StandardVariableTypeKey( 1 ) );
 	EXPECT_EQ( "Sum", StandardVariableTypeKey( 2 ) );
 	EXPECT_EQ( "Unknown", StandardVariableTypeKey( 0 ) );
@@ -1105,8 +1074,6 @@ TEST_F( OutputProcessorFixture, standardVariableTypeKey )
 
 TEST_F(  OutputProcessorFixture, determineMeterIPUnits ) 
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, determineMeterIPUnits" );
-
 	int ipUnits = -999999;
 	bool errorFound = false;
 
@@ -1166,8 +1133,6 @@ TEST_F(  OutputProcessorFixture, determineMeterIPUnits )
 
 TEST_F( OutputProcessorFixture, dateToStringWithMonth )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, dateToStringWithMonth" );
-
 	EXPECT_EQ( "01-JAN-00:01", DateToStringWithMonth( 1010101 ) );
 	EXPECT_EQ( "01-JAN-00:00", DateToStringWithMonth( 1010100 ) );
 	EXPECT_EQ( "01-FEB-01:00", DateToStringWithMonth( 2010160 ) );
@@ -1199,8 +1164,6 @@ TEST_F( OutputProcessorFixture, dateToStringWithMonth )
 
 TEST_F( OutputProcessorFixture, writeMeterDictionaryItem )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeMeterDictionaryItem" );
-
 	InitializeOutput();
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
@@ -1354,8 +1317,6 @@ TEST_F( OutputProcessorFixture, writeMeterDictionaryItem )
 
 TEST_F( OutputProcessorFixture, writeReportVariableDictionaryItem )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeReportVariableDictionaryItem" );
-
 	InitializeOutput();
 
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
@@ -1531,8 +1492,6 @@ TEST_F( OutputProcessorFixture, writeReportVariableDictionaryItem )
 
 TEST_F( OutputProcessorFixture, writeCumulativeReportMeterData )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeCumulativeReportMeterData" );
-
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
@@ -1569,8 +1528,6 @@ TEST_F( OutputProcessorFixture, writeCumulativeReportMeterData )
 
 TEST_F( OutputProcessorFixture, writeRealData )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, writeRealData" );
-
 	sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 	sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
@@ -1839,8 +1796,6 @@ TEST_F( OutputProcessorFixture, writeRealData )
 
 TEST_F( OutputProcessorFixture, addMeter )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, addMeter" );
-
 	auto const name( "testMeter" );
 	auto const units( "J" );
 	auto const resourceType( "ELEC" );
@@ -1899,8 +1854,6 @@ TEST_F( OutputProcessorFixture, addMeter )
 
 TEST_F( OutputProcessorFixture, validateNStandardizeMeterTitles )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, validateNStandardizeMeterTitles" );
-
 	std::vector< std::vector< std::string > > input_map = {
 		{ "J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "HVAC" },
 		{ "J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "SYSTEM" },
@@ -2159,8 +2112,6 @@ TEST_F( OutputProcessorFixture, validateNStandardizeMeterTitles )
 
 TEST_F( OutputProcessorFixture, setupTimePointers )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, setupTimePointers" );
-
 	TimeValue.allocate( 2 );
 
 	auto timeStep = 1.0;
@@ -2181,59 +2132,25 @@ TEST_F( OutputProcessorFixture, setupTimePointers )
 
 TEST_F( OutputProcessorFixture, getVariableUnitsString )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, getVariableUnitsString" );
-
 	EXPECT_EQ( "C", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C]" ) );
 	EXPECT_EQ( "%", GetVariableUnitsString( "Site Outdoor Air Relative Humidity [%]" ) );
 	EXPECT_EQ( "kgWater/kgDryAir", GetVariableUnitsString( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]" ) );
 	EXPECT_EQ( "", GetVariableUnitsString( "Site Daylighting Model Sky Clearness []" ) );
 	EXPECT_EQ( "", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature" ) );
+	EXPECT_EQ( "0123456789012345", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ) );
 
+}
+
+TEST_F( OutputProcessorDeathTestFixture, getVariableUnitsString )
+{
 	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ), "" );
 	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ), "" );
-	EXPECT_EQ( "0123456789012345", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ) );
 	EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ), "" );
 
 }
 
 TEST_F( OutputProcessorFixture, getReportVariableInput )
 {
-	ShowMessage( "Begin Test: OutputProcessorFixture, getReportVariableInput" );
-
-	std::string const idd_objects = delimitedString({
-		"Output:Variable,",
-		"       \\memo each Output:Variable command picks variables to be put onto the standard output file (.eso)",
-		"       \\memo some variables may not be reported for every simulation.",
-		"       \\memo a list of variables that can be reported are available after a run on",
-		"       \\memo the report dictionary file (.rdd) if the Output:VariableDictionary has been requested.",
-		"       \\format singleLine",
-		"  A1 , \\field Key Value",
-		"       \\default *",
-		"       \\note use '*' (without quotes) to apply this variable to all keys",
-		"  A2 , \\field Variable Name",
-		"       \\required-field",
-		"       \\type external-list",
-		"       \\external-list autoRDDvariable",
-		"  A3 , \\field Reporting Frequency",
-		"       \\type choice",
-		"       \\key Detailed",
-		"       \\note Detailed lists every instance (i.e. HVAC variable timesteps)",
-		"       \\key Timestep",
-		"       \\note Timestep refers to the zone Timestep/Number of Timesteps in hour value",
-		"       \\note RunPeriod, Environment, and Annual are the same",
-		"       \\key Hourly",
-		"       \\key Daily",
-		"       \\key Monthly",
-		"       \\key RunPeriod",
-		"       \\key Environment",
-		"       \\key Annual",
-		"       \\default Hourly",
-		"       \\note RunPeriod, Environment, and Annual are synonymous",
-		"  A4 ; \\field Schedule Name",
-		"       \\type object-list",
-		"       \\object-list ScheduleNames",
-	});
-
 	std::string const idf_objects = delimitedString({
 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
@@ -2242,7 +2159,7 @@ TEST_F( OutputProcessorFixture, getReportVariableInput )
 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 	});
 
-	ASSERT_FALSE( processIDF( idf_objects, idd_objects ) );
+	ASSERT_FALSE( processIDF( idf_objects ) );
 
 	GetReportVariableInput();
 
@@ -2289,15 +2206,11 @@ TEST_F( OutputProcessorFixture, getReportVariableInput )
 
 // TEST_F( OutputProcessorFixture, checkReportVariable )
 // {
-// 	ShowMessage( "Begin Test: OutputProcessorFixture, checkReportVariable" );
-
 // 	CheckReportVariable();
 // }
 
 // TEST_F( OutputProcessorFixture, setupOutputVariable )
 // {
-// 	ShowMessage( "Begin Test: OutputProcessorFixture, setupOutputVariable" );
-
 // 	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", OutDryBulbTemp, "Zone", "Average", "Environment" );
 
 // 	// This should be all necessary clean up...
@@ -2310,8 +2223,6 @@ TEST_F( OutputProcessorFixture, getReportVariableInput )
 
 // TEST_F( OutputProcessorFixture, updateDataandReport )
 // {
-// 	ShowMessage( "Begin Test: OutputProcessorFixture, updateDataandReport" );
-
 // 	NumEnergyMeters = 10;
 // 	EnergyMeters.allocate( NumEnergyMeters );
 // 	EnergyMeters( 1 ).CurTSValue = 999.9;
