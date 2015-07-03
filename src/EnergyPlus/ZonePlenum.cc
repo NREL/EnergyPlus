@@ -1110,7 +1110,6 @@ namespace ZonePlenum {
 		int OutletNode;
 		int InletNode;
 		int ZoneNode;
-		int InletNodeNum;
 		int InducedNode; // the node number of an induced air outlet node
 		int IndNum; // the induced air outlet index in ZoneRetPlenCond
 
