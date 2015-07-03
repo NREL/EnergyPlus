@@ -2712,7 +2712,9 @@ namespace VentilatedSlab {
 		SpecHumIn = Node( FanOutletNode ).HumRat;
 		LatentOutput = AirMassFlow * ( SpecHumOut - SpecHumIn ); // Latent rate (kg/s), dehumid = negative
 
-		QTotUnitOut = AirMassFlow * ( Node( FanOutletNode ).Enthalpy - Node( OutletNode ).Enthalpy );
+		QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( FanOutletNode ).Enthalpy );
+		// Limit sensible <= total when cooling (which is negative, so use max)
+		QUnitOut = max( QUnitOut, QTotUnitOut );
 
 		// Report variables...
 		VentSlab( Item ).HeatCoilPower = max( 0.0, QUnitOut );
