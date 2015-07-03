@@ -78,7 +78,9 @@ namespace HVACVariableRefrigerantFlow {
 	//MODULE VARIABLE DECLARATIONS:
 	extern bool GetVRFInputFlag; // Flag set to make sure you get input once
 	extern Array1D_bool CheckEquipName; // Flag set to check equipment connections once
-	extern int NumVRFCond; // total number of VRF condensers
+	extern int NumVRFCond; // total number of VRF condensers (All VRF Algorithm Types)
+	extern int NumVRFCond_SysCurve; // total number of VRF condensers with VRF Algorithm Type 1 
+	extern int NumVRFCond_FluidTCtrl; // total number of VRF condensers with VRF Algorithm Type 2 
 	extern int NumVRFTU; // total number of VRF terminal units
 	extern int NumVRFTULists; // The number of VRF TU lists
 	extern Real64 CompOnMassFlow; // Supply air mass flow rate w/ compressor ON
@@ -127,6 +129,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Members
 		std::string Name; // Name of the VRF Terminal Unit
 		int VRFSystemTypeNum; // integer equivalent of system type
+		int VRFAlgorithmTypeNum; // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
 		int VRFPlantTypeOfNum; // integer equivalent of index to DataPlant type
 		int SourceLoopNum; // plant data for water-coole only
 		int SourceLoopSideNum; // plant data for water-coole only
@@ -297,6 +300,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Default Constructor
 		VRFCondenserEquipment() :
 			VRFSystemTypeNum( 0 ),
+			VRFAlgorithmTypeNum( 0 ),
 			VRFPlantTypeOfNum( 0 ),
 			SourceLoopNum( 0 ),
 			SourceLoopSideNum( 0 ),
@@ -461,6 +465,7 @@ namespace HVACVariableRefrigerantFlow {
 		VRFCondenserEquipment(
 			std::string const & Name, // Name of the VRF Terminal Unit
 			int const VRFSystemTypeNum, // integer equivalent of system type
+			int const VRFAlgorithmTypeNum, // Algorithm type:1_system curve based model; 2_physics based model (FluidTCtrl)
 			int const VRFPlantTypeOfNum, // integer equivalent of index to DataPlant type
 			int const SourceLoopNum, // plant data for water-coole only
 			int const SourceLoopSideNum, // plant data for water-coole only
@@ -624,6 +629,7 @@ namespace HVACVariableRefrigerantFlow {
 		) :
 			Name( Name ),
 			VRFSystemTypeNum( VRFSystemTypeNum ),
+			VRFAlgorithmTypeNum( VRFAlgorithmTypeNum ),
 			VRFPlantTypeOfNum( VRFPlantTypeOfNum ),
 			SourceLoopNum( SourceLoopNum ),
 			SourceLoopSideNum( SourceLoopSideNum ),
