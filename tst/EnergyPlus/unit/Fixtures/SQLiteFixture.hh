@@ -32,16 +32,10 @@ namespace EnergyPlus {
 		}
 
 		virtual void TearDown() {
-			// don't know if this is needed...
-			sqlite_test.reset();
-			sqlite_test = nullptr;
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 
 		void resetDatabase() {
-			sqlite_test.reset();
-			sqlite_test = nullptr;
-
 			ss = std::make_shared<std::ostringstream>();
 			ASSERT_NO_THROW(sqlite_test = std::unique_ptr<SQLite>(new SQLite( ss, ":memory:", "std::ostringstream", true, true )));
 			ASSERT_TRUE(sqlite_test->writeOutputToSQLite());

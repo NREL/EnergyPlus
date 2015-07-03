@@ -57,13 +57,13 @@ namespace EnergyPlus {
 		static void SetUpTestCase() {
 			static auto errors_found = false;
 			static auto const idd = "";
-			processIDD( idd, errors_found );
+			process_idd( idd, errors_found );
 			if ( errors_found ) {
-				clearInputProcessorState();
+				clear_InputProcessor_state();
 				return;
 			}
-			m_idd_cache = std::unique_ptr<InputProcessorCache>( new InputProcessorCache );
-			clearInputProcessorState();
+			m_idd_cache = std::unique_ptr< InputProcessorCache >( new InputProcessorCache );
+			clear_InputProcessor_state();
 		}
 
 		static void TearDownTestCase() { }
@@ -71,37 +71,24 @@ namespace EnergyPlus {
 		virtual void SetUp() {
 			show_message();
 
-			this->eso_stream = std::unique_ptr<std::ostringstream>( new std::ostringstream );
-			this->mtr_stream = std::unique_ptr<std::ostringstream>( new std::ostringstream );
+			this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+			this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+			this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 			DataGlobals::eso_stream = this->eso_stream.get();
 			DataGlobals::mtr_stream = this->mtr_stream.get();
+			InputProcessor::echo_stream = this->echo_stream.get();
 
-			m_cout_buffer = std::unique_ptr<std::ostringstream>( new std::ostringstream );
-			m_redirect_cout = std::unique_ptr<RedirectCout>( new RedirectCout( m_cout_buffer ) );
+			m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+			m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
 
-			m_cerr_buffer = std::unique_ptr<std::ostringstream>( new std::ostringstream );
-			m_redirect_cerr = std::unique_ptr<RedirectCerr>( new RedirectCerr( m_cerr_buffer ) );
+			m_cerr_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+			m_redirect_cerr = std::unique_ptr< RedirectCerr >( new RedirectCerr( m_cerr_buffer ) );
 		}
 
 		virtual void TearDown() {
-			this->eso_stream.reset();
-			this->eso_stream = nullptr;
-			this->mtr_stream.reset();
-			this->mtr_stream = nullptr;
-
-			m_redirect_cout.reset();
-			m_redirect_cout = nullptr;
-			m_redirect_cerr.reset();
-			m_redirect_cerr = nullptr;
-
-			m_cout_buffer.reset();
-			m_cout_buffer = nullptr;
-			m_cerr_buffer.reset();
-			m_cerr_buffer = nullptr;
-
-			clearInputProcessorState();
-			clearDataGlobalsState();
+			clear_InputProcessor_state();
+			clear_DataGlobals_state();
 		}
 
 		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
@@ -120,14 +107,14 @@ namespace EnergyPlus {
 		// I had to only do one template typename due to wrapping this in Google Test macros causes the macro to fail. It thinks
 		// there are more macro arguments than expected. This is a way around that restriction.
 		// Example Usage: 
-		// 		EXPECT_TRUE( compareContainers< std::vector< bool > >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
-		// 		EXPECT_TRUE( compareContainers< Array1D_bool >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
+		// 		EXPECT_TRUE( compare_containers< std::vector< bool > >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
+		// 		EXPECT_TRUE( compare_containers< Array1D_bool >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
 		template < typename T, class ForwardIterator >
-		bool compareContainers( T const & correctVector, ForwardIterator test_vector_forward_iter ) {
+		bool compare_containers( T const & correctVector, ForwardIterator test_vector_forward_iter ) {
 			return std::equal( correctVector.begin(), correctVector.end(), test_vector_forward_iter );
 		}
 
-		std::string delimitedString( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL ) {
+		std::string delimited_string( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL ) {
 			std::unique_ptr<std::ostringstream> compare_text(new std::ostringstream);
 			for( auto const & str : strings ) {
 				* compare_text << str << delimiter;
@@ -135,48 +122,54 @@ namespace EnergyPlus {
 			return compare_text->str();
 		}
 
-		bool compareESOStream( std::string const & correctString, bool resetStream = true ) {
+		bool compare_eso_stream( std::string const & correctString, bool resetStream = true ) {
 			bool are_equal = ( correctString == this->eso_stream->str() );
 			if ( resetStream ) this->eso_stream->str( std::string() );
 			return are_equal;
 		}
 
-		bool compareMTRStream( std::string const & correctString, bool resetStream = true ) {
+		bool compare_mtr_stream( std::string const & correctString, bool resetStream = true ) {
 			bool are_equal = ( correctString == this->mtr_stream->str() );
 			if ( resetStream ) this->mtr_stream->str( std::string() );
 			return are_equal;
 		}
 
-		bool compareCOUTStream( std::string const & correctString, bool resetStream = true ) {
+		bool compare_echo_stream( std::string const & correctString, bool resetStream = true ) {
+			bool are_equal = ( correctString == this->echo_stream->str() );
+			if ( resetStream ) this->echo_stream->str( std::string() );
+			return are_equal;
+		}
+
+		bool compare_cout_stream( std::string const & correctString, bool resetStream = true ) {
 			bool are_equal = ( correctString == this->m_cout_buffer->str() );
 			if ( resetStream ) this->m_cout_buffer->str( std::string() );
 			return are_equal;
 		}
 
-		bool compareCERRStream( std::string const & correctString, bool resetStream = true ) {
+		bool compare_cerr_stream( std::string const & correctString, bool resetStream = true ) {
 			bool are_equal = ( correctString == this->m_cerr_buffer->str() );
 			if ( resetStream ) this->m_cerr_buffer->str( std::string() );
 			return are_equal;
 		}
 
-		bool hasCoutOutput(){
+		bool has_cout_output(){
 			return this->m_cout_buffer->str().size() > 0;
 		}
 
-		bool hasCerrOutput(){
+		bool has_cerr_output(){
 			return this->m_cerr_buffer->str().size() > 0;
 		}
 
-		bool processIDF( std::string const & idf, bool use_idd_cache = true ) {
+		bool process_idf( std::string const & idf, bool use_idd_cache = true ) {
 			using namespace InputProcessor;
 
 			auto errors_found = false;
 
 			if ( use_idd_cache && m_idd_cache ) {
-				m_idd_cache->fillInputProcessorGlobals();
+				m_idd_cache->fill_InputProcessor_global_data();
 			} else {
 				auto const idd = "";
-				processIDD( idd, errors_found );
+				process_idd( idd, errors_found );
 			}
 
 			if ( errors_found ) return errors_found;
@@ -203,26 +196,32 @@ namespace EnergyPlus {
 	private:
 		struct InputProcessorCache;
 
-		std::unique_ptr<std::ostringstream> eso_stream;
-		std::unique_ptr<std::ostringstream> mtr_stream;
-		std::unique_ptr<std::ostringstream> m_cout_buffer;
-		std::unique_ptr<std::ostringstream> m_cerr_buffer;
-		std::unique_ptr<RedirectCout> m_redirect_cout;
-		std::unique_ptr<RedirectCerr> m_redirect_cerr;
-		static std::unique_ptr<InputProcessorCache> m_idd_cache;
+		std::unique_ptr< std::ostringstream > eso_stream;
+		std::unique_ptr< std::ostringstream > mtr_stream;
+		std::unique_ptr< std::ostringstream > echo_stream;
+		std::unique_ptr< std::ostringstream > m_cout_buffer;
+		std::unique_ptr< std::ostringstream > m_cerr_buffer;
+		std::unique_ptr< RedirectCout > m_redirect_cout;
+		std::unique_ptr< RedirectCerr > m_redirect_cerr;
+		static std::unique_ptr< InputProcessorCache > m_idd_cache;
 
-		static bool processIDD( std::string const & idd, bool & errors_found ) {
+		static bool process_idd( std::string const & idd, bool & errors_found ) {
 			using namespace InputProcessor;
 
 			std::unique_ptr< std::istream > idd_stream;
 			if( !idd.empty() ) {
 				idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
 			} else {
-				auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
-				auto const idd_location = exeDirectory + "Energy+.idd";
+				static auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
+				static auto const idd_location = exeDirectory + "Energy+.idd";
+				static auto const file_exists = FileSystem::fileExists( idd_location );
 
-				EXPECT_TRUE( FileSystem::fileExists( idd_location ) ) << 
-					"Energy+.idd does not exist at search location." << std::endl << "IDD search location: \"" << idd_location << "\""; 
+				if ( ! file_exists ) {
+					EXPECT_TRUE( file_exists ) << 
+						"Energy+.idd does not exist at search location." << std::endl << "IDD search location: \"" << idd_location << "\"";
+					errors_found = true;
+					return errors_found;
+				}
 
 				idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_location, std::ios_base::in | std::ios_base::binary ) );
 			}
@@ -252,7 +251,7 @@ namespace EnergyPlus {
 			return errors_found;
 		}
 
-		static void clearDataGlobalsState() {
+		static void clear_DataGlobals_state() {
 			using namespace DataGlobals;
 
 			runReadVars = false;
@@ -336,7 +335,7 @@ namespace EnergyPlus {
 			Progress = 0;
 		}
 
-		static void clearInputProcessorState() {
+		static void clear_InputProcessor_state() {
 			using namespace InputProcessor;
 
 			ObjectDef.deallocate();
@@ -390,7 +389,6 @@ namespace EnergyPlus {
 			TotalAuditErrors = 0;
 			NumSecretObjects = 0;
 			ProcessingIDD = false;
-			echo_stream = nullptr;
 
 			InputLine = std::string();
 			CurrentFieldName = std::string();
@@ -460,7 +458,6 @@ namespace EnergyPlus {
 				m_TotalAuditErrors = TotalAuditErrors;
 				m_NumSecretObjects = NumSecretObjects;
 				m_ProcessingIDD = ProcessingIDD;
-				m_echo_stream = echo_stream;
 				m_InputLine = InputLine;
 				m_CurrentFieldName = CurrentFieldName;
 				m_ReplacementName = ReplacementName;
@@ -477,7 +474,7 @@ namespace EnergyPlus {
 				m_ExtensibleNumFields = ExtensibleNumFields;
 			}
 
-			void fillInputProcessorGlobals()
+			void fill_InputProcessor_global_data()
 			{
 				using namespace InputProcessor;
 
@@ -527,7 +524,6 @@ namespace EnergyPlus {
 				TotalAuditErrors = m_TotalAuditErrors;
 				NumSecretObjects = m_NumSecretObjects;
 				ProcessingIDD = m_ProcessingIDD;
-				echo_stream = m_echo_stream;
 				InputLine = m_InputLine;
 				CurrentFieldName = m_CurrentFieldName;
 				ReplacementName = m_ReplacementName;
@@ -572,7 +568,6 @@ namespace EnergyPlus {
 			int m_TotalAuditErrors = 0;
 			int m_NumSecretObjects = 0;
 			bool m_ProcessingIDD = false;
-			std::ostream * m_echo_stream = nullptr;
 			std::string m_InputLine;
 			Array1D_string m_ListOfSections;
 			Array1D_string m_ListOfObjects;

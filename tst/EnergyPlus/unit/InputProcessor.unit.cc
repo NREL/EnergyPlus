@@ -27,8 +27,8 @@ namespace EnergyPlus {
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 
-		bool processIDD( std::string const & idd, bool & errors_found ) {
-			return EnergyPlusFixture::processIDD( idd, errors_found );
+		bool process_idd( std::string const & idd, bool & errors_found ) {
+			return EnergyPlusFixture::process_idd( idd, errors_found );
 		}
 	};
 
@@ -147,7 +147,7 @@ TEST_F( InputProcessorFixture, processIDD_Full_IDD )
 
 	bool errors_found = false;
 
-	ASSERT_FALSE( processIDD( idd_objects, errors_found ) );
+	ASSERT_FALSE( process_idd( idd_objects, errors_found ) );
 
 	EXPECT_EQ( 745, NumObjectDefs );
 	ASSERT_EQ( static_cast<unsigned long>( NumObjectDefs ), ListOfObjects.size() );
@@ -170,19 +170,19 @@ TEST_F( InputProcessorFixture, processIDD_Full_IDD )
 	EXPECT_EQ( 0, ObjectDef( index ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( index ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( index ).ObsPtr );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( index ).ReqField.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( index ).AlphRetainCase.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "Option Type" }, ObjectDef( index ).AlphFieldChks.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "" }, ObjectDef( index ).AlphFieldDefs.begin() ) );
-	// EXPECT_TRUE( compareContainers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( index ).NumRangeChks ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( index ).ReqField.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( index ).AlphRetainCase.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Option Type" }, ObjectDef( index ).AlphFieldChks.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "" }, ObjectDef( index ).AlphFieldDefs.begin() ) );
+	// EXPECT_TRUE( compare_containers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( index ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( index ).NumFound );
 
 }
 
 TEST_F( InputProcessorFixture, processIDD )
 {
-	std::string const idd_objects = delimitedString({
+	std::string const idd_objects = delimited_string({
 		"Output:SQLite,",
 		"       \\memo Output from EnergyPlus can be written to an SQLite format file.",
 		"       \\unique-object",
@@ -194,7 +194,7 @@ TEST_F( InputProcessorFixture, processIDD )
 
 	bool errors_found = false;
 
-	ASSERT_FALSE( processIDD( idd_objects, errors_found ) );
+	ASSERT_FALSE( process_idd( idd_objects, errors_found ) );
 
 	EXPECT_EQ( 1, NumObjectDefs );
 
@@ -211,12 +211,12 @@ TEST_F( InputProcessorFixture, processIDD )
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { true } , ObjectDef( 1 ).AlphaOrNumeric.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( 1 ).ReqField.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( 1 ).AlphRetainCase.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "Option Type" }, ObjectDef( 1 ).AlphFieldChks.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldDefs.begin() ) );
-	// EXPECT_TRUE( compareContainers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { true } , ObjectDef( 1 ).AlphaOrNumeric.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( 1 ).ReqField.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( 1 ).AlphRetainCase.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Option Type" }, ObjectDef( 1 ).AlphFieldChks.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldDefs.begin() ) );
+	// EXPECT_TRUE( compare_containers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
 
 }
@@ -267,19 +267,19 @@ TEST_F( InputProcessorFixture, addObjectDefandParse )
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
 	EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
 	EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { true } , ObjectDef( 1 ).AlphaOrNumeric.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( 1 ).ReqField.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false } , ObjectDef( 1 ).AlphRetainCase.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldChks.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldDefs.begin() ) );
-	// EXPECT_TRUE( compareContainers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { true } , ObjectDef( 1 ).AlphaOrNumeric.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( 1 ).ReqField.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( 1 ).AlphRetainCase.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldChks.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldDefs.begin() ) );
+	// EXPECT_TRUE( compare_containers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
 	EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
 
 }
 
 TEST_F( InputProcessorFixture, validateObjectandParse )
 {
-	std::string const idf_objects = delimitedString({
+	std::string const idf_objects = delimited_string({
 		"Version,",
 		"8.3;",
 		"Output:SQLite,",
@@ -291,7 +291,7 @@ TEST_F( InputProcessorFixture, validateObjectandParse )
 
 	auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
 
-	std::string const idd_objects = delimitedString({
+	std::string const idd_objects = delimited_string({
 		"Version,",
 		"      \\memo Specifies the EnergyPlus version of the IDF file.",
 		"      \\unique-object",
@@ -310,7 +310,7 @@ TEST_F( InputProcessorFixture, validateObjectandParse )
 
 	bool errors_found = false;
 
-	ASSERT_FALSE( processIDD( idd_objects, errors_found ) ) << "Error processing IDD.";
+	ASSERT_FALSE( process_idd( idd_objects, errors_found ) ) << "Error processing IDD.";
 
 	NumLines = 0;
 
@@ -339,8 +339,8 @@ TEST_F( InputProcessorFixture, validateObjectandParse )
 
 	EXPECT_FALSE( OverallErrorFlag );
 
-	EXPECT_FALSE( hasCoutOutput() );
-	EXPECT_FALSE( hasCerrOutput() );
+	EXPECT_FALSE( has_cout_output() );
+	EXPECT_FALSE( has_cerr_output() );
 
 	std::string const version_name( "VERSION" );
 
@@ -355,10 +355,10 @@ TEST_F( InputProcessorFixture, validateObjectandParse )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 	std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -373,28 +373,28 @@ TEST_F( InputProcessorFixture, validateObjectandParse )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 }
 
 TEST_F( InputProcessorFixture, processIDF )
 {
-	std::string const idf_objects = delimitedString({
+	std::string const idf_objects = delimited_string({
 		"Version,",
 		"8.3;",
 		"Output:SQLite,",
 		"SimpleAndTabular;"
 	});
 
-	ASSERT_FALSE( processIDF( idf_objects, false ) );
+	ASSERT_FALSE( process_idf( idf_objects, false ) );
 
 	EXPECT_FALSE( OverallErrorFlag );
 
-	EXPECT_FALSE( hasCoutOutput() );
-	EXPECT_FALSE( hasCerrOutput() );
+	EXPECT_FALSE( has_cout_output() );
+	EXPECT_FALSE( has_cerr_output() );
 
 	std::string const version_name( "VERSION" );
 
@@ -409,10 +409,10 @@ TEST_F( InputProcessorFixture, processIDF )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 	std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -427,28 +427,28 @@ TEST_F( InputProcessorFixture, processIDF )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 }
 
 TEST_F( InputProcessorFixture, processIDF_Cached )
 {
-	std::string const idf_objects = delimitedString({
+	std::string const idf_objects = delimited_string({
 		"Version,",
 		"8.3;",
 		"Output:SQLite,",
 		"SimpleAndTabular;"
 	});
 
-	ASSERT_FALSE( processIDF( idf_objects ) );
+	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	EXPECT_FALSE( OverallErrorFlag );
 
-	EXPECT_FALSE( hasCoutOutput() );
-	EXPECT_FALSE( hasCerrOutput() );
+	EXPECT_FALSE( has_cout_output() );
+	EXPECT_FALSE( has_cerr_output() );
 
 	std::string const version_name( "VERSION" );
 
@@ -463,10 +463,10 @@ TEST_F( InputProcessorFixture, processIDF_Cached )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 	std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -481,16 +481,16 @@ TEST_F( InputProcessorFixture, processIDF_Cached )
 	EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 	EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 	EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-	EXPECT_TRUE( compareContainers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
-	EXPECT_TRUE( compareContainers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers.begin() ) );
+	EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank.begin() ) );
 
 }
 
 TEST_F( InputProcessorFixture, getNumObjectsFound )
 {
-	std::string const idf_objects = delimitedString({
+	std::string const idf_objects = delimited_string({
 		"Version,8.3;",
 		"Output:SQLite,SimpleAndTabular;",
 		"Output:Meter:MeterFileOnly,Electricity:Facility,timestep;",
@@ -500,14 +500,14 @@ TEST_F( InputProcessorFixture, getNumObjectsFound )
 		"Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;",
 	});
 
-	ASSERT_FALSE( processIDF( idf_objects ) );
+	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	EXPECT_EQ( 1, GetNumObjectsFound( "VERSION" ) );
 	EXPECT_EQ( 1, GetNumObjectsFound( "OUTPUT:SQLITE" ) );
 	EXPECT_EQ( 5, GetNumObjectsFound( "OUTPUT:METER:METERFILEONLY" ) );
 	EXPECT_EQ( 0, GetNumObjectsFound( "OUTPUT:VARIABLE" ) );
 
-	EXPECT_FALSE( hasCoutOutput() );
-	EXPECT_FALSE( hasCerrOutput() );
+	EXPECT_FALSE( has_cout_output() );
+	EXPECT_FALSE( has_cerr_output() );
 
 }
