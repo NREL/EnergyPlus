@@ -2196,12 +2196,96 @@ TEST_F( OutputProcessorFixture, getVariableUnitsString )
 
 }
 
-// TEST_F( OutputProcessorFixture, getReportVariableInput )
-// {
-// 	ShowMessage( "Begin Test: OutputProcessorFixture, getReportVariableInput" );
+TEST_F( OutputProcessorFixture, getReportVariableInput )
+{
+	ShowMessage( "Begin Test: OutputProcessorFixture, getReportVariableInput" );
 
-// 	GetReportVariableInput();
-// }
+	std::string const idd_objects = delimitedString({
+		"Output:Variable,",
+		"       \\memo each Output:Variable command picks variables to be put onto the standard output file (.eso)",
+		"       \\memo some variables may not be reported for every simulation.",
+		"       \\memo a list of variables that can be reported are available after a run on",
+		"       \\memo the report dictionary file (.rdd) if the Output:VariableDictionary has been requested.",
+		"       \\format singleLine",
+		"  A1 , \\field Key Value",
+		"       \\default *",
+		"       \\note use '*' (without quotes) to apply this variable to all keys",
+		"  A2 , \\field Variable Name",
+		"       \\required-field",
+		"       \\type external-list",
+		"       \\external-list autoRDDvariable",
+		"  A3 , \\field Reporting Frequency",
+		"       \\type choice",
+		"       \\key Detailed",
+		"       \\note Detailed lists every instance (i.e. HVAC variable timesteps)",
+		"       \\key Timestep",
+		"       \\note Timestep refers to the zone Timestep/Number of Timesteps in hour value",
+		"       \\note RunPeriod, Environment, and Annual are the same",
+		"       \\key Hourly",
+		"       \\key Daily",
+		"       \\key Monthly",
+		"       \\key RunPeriod",
+		"       \\key Environment",
+		"       \\key Annual",
+		"       \\default Hourly",
+		"       \\note RunPeriod, Environment, and Annual are synonymous",
+		"  A4 ; \\field Schedule Name",
+		"       \\type object-list",
+		"       \\object-list ScheduleNames",
+	});
+
+	std::string const idf_objects = delimitedString({
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+	});
+
+	ASSERT_FALSE( processIDF( idf_objects, idd_objects ) );
+
+	GetReportVariableInput();
+
+	NumOfReqVariables = InputProcessor::GetNumObjectsFound( "Output:Variable" );
+
+	EXPECT_EQ( 5, NumOfReqVariables );
+
+	EXPECT_EQ( "", ReqRepVars( 1 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 1 ).VarName );
+	EXPECT_EQ( ReportTimeStep, ReqRepVars( 1 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 1 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 1 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 1 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 2 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 2 ).VarName );
+	EXPECT_EQ( ReportHourly, ReqRepVars( 2 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 2 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 2 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 2 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 3 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 3 ).VarName );
+	EXPECT_EQ( ReportDaily, ReqRepVars( 3 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 3 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 3 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 3 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 4 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 4 ).VarName );
+	EXPECT_EQ( ReportMonthly, ReqRepVars( 4 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 4 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 4 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 4 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 5 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 5 ).VarName );
+	EXPECT_EQ( ReportSim, ReqRepVars( 5 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 5 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 5 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 5 ).Used );
+
+}
 
 // TEST_F( OutputProcessorFixture, checkReportVariable )
 // {

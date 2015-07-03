@@ -11,6 +11,7 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 
 #include <fstream>
 #include <memory>
@@ -130,6 +131,19 @@ namespace EnergyPlus {
 			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf ) );
 			NumLines = 0;
 			ProcessInputDataFile( *idf_stream );
+
+			ListOfSections.allocate( NumSectionDefs );
+			ListOfSections = SectionDef( {1,NumSectionDefs} ).Name();
+
+			DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
+			DataIPShortCuts::cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
+			DataIPShortCuts::lAlphaFieldBlanks.dimension( MaxAlphaIDFDefArgsFound, false );
+			DataIPShortCuts::cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
+			DataIPShortCuts::rNumericArgs.dimension( MaxNumericIDFDefArgsFound, 0.0 );
+			DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumericIDFDefArgsFound, false );
+
+			IDFRecordsGotten.dimension( NumIDFRecords, false );
+
 			return errors_found;
 		}
 
@@ -199,6 +213,13 @@ namespace EnergyPlus {
 			LineItem.NumBlank.deallocate();
 			LineItem.Alphas.deallocate();
 			LineItem.AlphBlank.deallocate();
+
+			DataIPShortCuts::cAlphaFieldNames.deallocate();
+			DataIPShortCuts::cAlphaArgs.deallocate();
+			DataIPShortCuts::lAlphaFieldBlanks.deallocate();
+			DataIPShortCuts::cNumericFieldNames.deallocate();
+			DataIPShortCuts::rNumericArgs.deallocate();
+			DataIPShortCuts::lNumericFieldBlanks.deallocate();
 
 			NumObjectDefs = 0;
 			NumSectionDefs = 0;
