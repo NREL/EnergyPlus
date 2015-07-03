@@ -61191,7 +61191,7 @@ ChillerHeaterPerformance:Electric:EIR,
 CoolingTower:SingleSpeed,
        \min-fields 16
        \memo This tower model is based on Merkel's theory, which is also the basis
-       \memo for the tower model in ASHRAE's HVAC1 Toolkit. The closed-circuit cooling tower
+       \memo for the tower model in ASHRAE's HVAC1 Toolkit. The open wet cooling tower
        \memo is modeled as a counter flow heat exchanger with a single-speed fan drawing air
        \memo through the tower (induced-draft configuration).
        \memo Added fluid bypass as an additional capacity control. 8/2008.
@@ -61403,7 +61403,7 @@ CoolingTower:SingleSpeed,
 CoolingTower:TwoSpeed,
        \min-fields 24
        \memo This tower model is based on Merkel's theory, which is also the basis
-       \memo for the tower model in ASHRAE's HVAC1 Toolkit. The closed-circuit cooling tower
+       \memo for the tower model in ASHRAE's HVAC1 Toolkit. The open wet cooling tower
        \memo is modeled as a counter flow heat exchanger with a two-speed fan drawing air
        \memo through the tower (induced-draft configuration).
        \memo For a multi-cell tower, the capacity and air/water flow rate inputs are for the entire tower.
@@ -61677,7 +61677,7 @@ CoolingTower:TwoSpeed,
 CoolingTower:VariableSpeed:Merkel,
        \min-fields 24
        \memo This tower model is based on Merkel's theory, which is also the basis
-       \memo for the tower model in ASHRAE's HVAC1 Toolkit. The closed-circuit cooling tower
+       \memo for the tower model in ASHRAE's HVAC1 Toolkit. The open wet cooling tower
        \memo is modeled as a counter flow heat exchanger with a variable-speed fan drawing air
        \memo through the tower (induced-draft configuration).
        \memo For a multi-cell tower, the capacity and air/water flow rate inputs are for the entire tower.
@@ -61953,7 +61953,7 @@ CoolingTower:VariableSpeed:Merkel,
 
 CoolingTower:VariableSpeed,
        \min-fields 15
-       \memo This tower model is based on purely empirical algorithms derived from manufacturer's
+       \memo This open wet tower model is based on purely empirical algorithms derived from manufacturer's
        \memo performance data or field measurements. The user can select from two existing
        \memo algorithms (CoolTools or YorkCalc), or they can enter their own correlation for
        \memo approach temperature by using a variable speed tower model coefficient object.
