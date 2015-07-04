@@ -138,6 +138,8 @@ namespace OutputProcessor {
 
 	extern int MaxNumSubcategories;
 
+	extern int ReportNumberCounter; // The report number is used in output reports as a key.
+
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
 	//PUBLIC  SetReportNow

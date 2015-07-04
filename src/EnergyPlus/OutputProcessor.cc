@@ -202,6 +202,8 @@ namespace OutputProcessor {
 
 	int MaxNumSubcategories( 1 );
 
+	int ReportNumberCounter( 0 ); // The report number is used in output reports as a key.
+
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
 	//PUBLIC  SetReportNow
@@ -5962,7 +5964,7 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// USE STATEMENTS:
-	// na
+	using namespace OutputProcessor;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5977,7 +5979,6 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-	static int ReportNumberCounter( 0 );
 
 	++ReportNumberCounter;
 	ReportNumber = ReportNumberCounter;

@@ -82,6 +82,7 @@ namespace EnergyPlus {
 			ErrorsLogged = false;
 			ProduceVariableDictionary = false;
 			MaxNumSubcategories = 1;
+			ReportNumberCounter = 0;
 			TimeValue.deallocate();
 			RVariableTypes.deallocate();
 			IVariableTypes.deallocate();

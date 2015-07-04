@@ -2421,10 +2421,7 @@ TEST_F( OutputProcessorFixture, setupOutputVariable )
 
 	std::vector< std::vector<std::string> > reportDataDictionary(
 	{
-		// The 1021 is an assigned report number. This may or may not change in the future depending on other code changes... possibly IDD changes?
-		// Could maybe change AssignReportNumber so ReportNumberCounter is not a static variable within the function but rather part of the namespace
-		// Then this could be reset every test run.
-		{ "1021", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C" }
+		{ "1", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C" }
 	});
 	EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
 
