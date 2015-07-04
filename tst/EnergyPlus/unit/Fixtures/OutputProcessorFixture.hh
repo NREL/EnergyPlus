@@ -27,6 +27,9 @@ namespace EnergyPlus {
 		virtual void SetUp() {
 			SQLiteFixture::SetUp();  // Sets up the base fixture first.
 
+			// might want to call InitializeOutput()...
+			ReportList.allocate( 500 );
+
 			FreqNotice = Array2D_string( {1,2}, {-1,4} );
 		}
 

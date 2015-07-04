@@ -2204,22 +2204,303 @@ TEST_F( OutputProcessorFixture, getReportVariableInput )
 
 }
 
-// TEST_F( OutputProcessorFixture, checkReportVariable )
-// {
-// 	CheckReportVariable();
-// }
+TEST_F( OutputProcessorFixture, buildKeyVarList )
+{
+	std::string const idf_objects = delimited_string({
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+	});
 
-// TEST_F( OutputProcessorFixture, setupOutputVariable )
-// {
-// 	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", OutDryBulbTemp, "Zone", "Average", "Environment" );
+	ASSERT_FALSE( process_idf( idf_objects ) );
 
-// 	// This should be all necessary clean up...
-// 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileMeterDetails, flags ); }
-// 	RVariableTypes.deallocate();
-// 	IVariableTypes.deallocate();
-// 	ReportList.deallocate();
-// 	EndUseCategory.deallocate();
-// }
+	GetReportVariableInput();
+
+	auto const keyed_value = "ENVIRONMENT";
+	auto const var_name = "SITE OUTDOOR AIR DRYBULB TEMPERATURE";
+
+	BuildKeyVarList( keyed_value, var_name, 1, 6 );
+
+	EXPECT_EQ( 0, NumExtraVars );
+	EXPECT_EQ( 6, NumOfReqVariables );
+
+	EXPECT_EQ( "", ReqRepVars( 1 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 1 ).VarName );
+	EXPECT_EQ( ReportTimeStep, ReqRepVars( 1 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 1 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 1 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 1 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 2 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 2 ).VarName );
+	EXPECT_EQ( ReportHourly, ReqRepVars( 2 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 2 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 2 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 2 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 3 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 3 ).VarName );
+	EXPECT_EQ( ReportDaily, ReqRepVars( 3 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 3 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 3 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 3 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 4 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 4 ).VarName );
+	EXPECT_EQ( ReportMonthly, ReqRepVars( 4 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 4 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 4 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 4 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 5 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 5 ).VarName );
+	EXPECT_EQ( ReportSim, ReqRepVars( 5 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 5 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 5 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 5 ).Used );
+}
+
+TEST_F( OutputProcessorFixture, addBlankKeys )
+{
+	std::string const idf_objects = delimited_string({
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	GetReportVariableInput();
+
+	auto const var_name = "Site Outdoor Air Drybulb Temperature";
+
+	AddBlankKeys( var_name, 1, 5 );
+
+	EXPECT_EQ( 5, NumExtraVars );
+	EXPECT_EQ( 1, ReportList( 1 ) );
+	EXPECT_EQ( 2, ReportList( 2 ) );
+	EXPECT_EQ( 3, ReportList( 3 ) );
+	EXPECT_EQ( 4, ReportList( 4 ) );
+	EXPECT_EQ( 5, ReportList( 5 ) );
+	EXPECT_EQ( 5, NumOfReqVariables );
+
+	EXPECT_EQ( "", ReqRepVars( 1 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 1 ).VarName );
+	EXPECT_EQ( ReportTimeStep, ReqRepVars( 1 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 1 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 1 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 1 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 2 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 2 ).VarName );
+	EXPECT_EQ( ReportHourly, ReqRepVars( 2 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 2 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 2 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 2 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 3 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 3 ).VarName );
+	EXPECT_EQ( ReportDaily, ReqRepVars( 3 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 3 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 3 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 3 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 4 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 4 ).VarName );
+	EXPECT_EQ( ReportMonthly, ReqRepVars( 4 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 4 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 4 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 4 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 5 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 5 ).VarName );
+	EXPECT_EQ( ReportSim, ReqRepVars( 5 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 5 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 5 ).SchedName );
+	EXPECT_EQ( false, ReqRepVars( 5 ).Used );
+
+}
+
+TEST_F( OutputProcessorFixture, determineFrequency )
+{
+	auto const valid_options = std::map< std::string, int >({ 
+		{ "Detailed", -1 },
+		{ "Timestep", 0 },
+		{ "Hourly", 1 },
+		{ "Daily", 2 },
+		{ "Monthly", 3 },
+		{ "RunPeriod", 4 },
+		{ "Environment", 4 },
+		{ "Annual", 4 },
+		{ "Bad Input", 1 }
+	});
+
+	int report_freq = -2;
+
+	for ( auto const option : valid_options ) {
+		DetermineFrequency( option.first, report_freq );
+		EXPECT_EQ( option.second, report_freq );
+	}
+
+}
+
+TEST_F( OutputProcessorFixture, addToOutputVariableList )
+{
+	std::string const idf_objects = delimited_string({
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Wetbulb Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Humidity Ratio,hourly;",
+		"Output:Variable,*,Site Outdoor Air Relative Humidity,hourly;",
+		"Output:Variable,*,Zone Mean Air Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	AddToOutputVariableList( "Site Outdoor Air Drybulb Temperature", 1, 1, 2, "C" );
+	AddToOutputVariableList( "Site Outdoor Air Wetbulb Temperature", 1, 1, 2, "C" );
+	AddToOutputVariableList( "Site Outdoor Air Humidity Ratio", 1, 1, 2, "kgWater/kgDryAir" );
+	AddToOutputVariableList( "Site Outdoor Air Relative Humidity", 1, 1, 2, "%" );
+
+	EXPECT_EQ( 1, DDVariableTypes( 1 ).IndexType );
+	EXPECT_EQ( 1, DDVariableTypes( 1 ).StoreType );
+	EXPECT_EQ( 2, DDVariableTypes( 1 ).VariableType );
+	EXPECT_EQ( 0, DDVariableTypes( 1 ).Next );
+	EXPECT_FALSE( DDVariableTypes( 1 ).ReportedOnDDFile );
+	EXPECT_EQ( "Site Outdoor Air Drybulb Temperature", DDVariableTypes( 1 ).VarNameOnly );
+	EXPECT_EQ( "C", DDVariableTypes( 1 ).UnitsString );
+
+	EXPECT_EQ( 1, DDVariableTypes( 2 ).IndexType );
+	EXPECT_EQ( 1, DDVariableTypes( 2 ).StoreType );
+	EXPECT_EQ( 2, DDVariableTypes( 2 ).VariableType );
+	EXPECT_EQ( 0, DDVariableTypes( 2 ).Next );
+	EXPECT_FALSE( DDVariableTypes( 2 ).ReportedOnDDFile );
+	EXPECT_EQ( "Site Outdoor Air Wetbulb Temperature", DDVariableTypes( 2 ).VarNameOnly );
+	EXPECT_EQ( "C", DDVariableTypes( 2 ).UnitsString );
+
+	EXPECT_EQ( 1, DDVariableTypes( 3 ).IndexType );
+	EXPECT_EQ( 1, DDVariableTypes( 3 ).StoreType );
+	EXPECT_EQ( 2, DDVariableTypes( 3 ).VariableType );
+	EXPECT_EQ( 0, DDVariableTypes( 3 ).Next );
+	EXPECT_FALSE( DDVariableTypes( 3 ).ReportedOnDDFile );
+	EXPECT_EQ( "Site Outdoor Air Humidity Ratio", DDVariableTypes( 3 ).VarNameOnly );
+	EXPECT_EQ( "kgWater/kgDryAir", DDVariableTypes( 3 ).UnitsString );
+
+	EXPECT_EQ( 1, DDVariableTypes( 4 ).IndexType );
+	EXPECT_EQ( 1, DDVariableTypes( 4 ).StoreType );
+	EXPECT_EQ( 2, DDVariableTypes( 4 ).VariableType );
+	EXPECT_EQ( 0, DDVariableTypes( 4 ).Next );
+	EXPECT_FALSE( DDVariableTypes( 4 ).ReportedOnDDFile );
+	EXPECT_EQ( "Site Outdoor Air Relative Humidity", DDVariableTypes( 4 ).VarNameOnly );
+	EXPECT_EQ( "%", DDVariableTypes( 4 ).UnitsString );
+
+}
+
+TEST_F( OutputProcessorFixture, setupOutputVariable )
+{
+	std::string const idf_objects = delimited_string({
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+	GetReportVariableInput();
+	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+	std::vector< std::vector<std::string> > reportDataDictionary(
+	{
+		// The 1021 is an assigned report number. This may or may not change in the future depending on other code changes... possibly IDD changes?
+		// Could maybe change AssignReportNumber so ReportNumberCounter is not a static variable within the function but rather part of the namespace
+		// Then this could be reset every test run.
+		{ "1021", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C" }
+	});
+	EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+
+	EXPECT_EQ( 1, NumExtraVars );
+
+	EXPECT_EQ( "", ReqRepVars( 1 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 1 ).VarName );
+	EXPECT_EQ( ReportSim, ReqRepVars( 1 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 1 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 1 ).SchedName );
+	EXPECT_EQ( true, ReqRepVars( 1 ).Used );
+
+	EXPECT_EQ( 1, DDVariableTypes( 1 ).IndexType );
+	EXPECT_EQ( 1, DDVariableTypes( 1 ).StoreType );
+	EXPECT_EQ( 2, DDVariableTypes( 1 ).VariableType );
+	EXPECT_EQ( 0, DDVariableTypes( 1 ).Next );
+	EXPECT_FALSE( DDVariableTypes( 1 ).ReportedOnDDFile );
+	EXPECT_EQ( "Site Outdoor Air Drybulb Temperature", DDVariableTypes( 1 ).VarNameOnly );
+
+}
+
+TEST_F( OutputProcessorFixture, checkReportVariable )
+{
+	std::string const idf_objects = delimited_string({
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	auto const keyed_value = "Environment";
+	auto const var_name = "Site Outdoor Air Drybulb Temperature";
+
+	GetReportVariableInput();
+	CheckReportVariable( keyed_value, var_name );
+
+	EXPECT_EQ( 5, NumOfReqVariables );
+
+	EXPECT_EQ( "", ReqRepVars( 1 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 1 ).VarName );
+	EXPECT_EQ( ReportTimeStep, ReqRepVars( 1 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 1 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 1 ).SchedName );
+	EXPECT_EQ( true, ReqRepVars( 1 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 2 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 2 ).VarName );
+	EXPECT_EQ( ReportHourly, ReqRepVars( 2 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 2 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 2 ).SchedName );
+	EXPECT_EQ( true, ReqRepVars( 2 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 3 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 3 ).VarName );
+	EXPECT_EQ( ReportDaily, ReqRepVars( 3 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 3 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 3 ).SchedName );
+	EXPECT_EQ( true, ReqRepVars( 3 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 4 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 4 ).VarName );
+	EXPECT_EQ( ReportMonthly, ReqRepVars( 4 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 4 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 4 ).SchedName );
+	EXPECT_EQ( true, ReqRepVars( 4 ).Used );
+
+	EXPECT_EQ( "", ReqRepVars( 5 ).Key );
+	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 5 ).VarName );
+	EXPECT_EQ( ReportSim, ReqRepVars( 5 ).ReportFreq );
+	EXPECT_EQ( 0, ReqRepVars( 5 ).SchedPtr );
+	EXPECT_EQ( "", ReqRepVars( 5 ).SchedName );
+	EXPECT_EQ( true, ReqRepVars( 5 ).Used );
+}
 
 // TEST_F( OutputProcessorFixture, updateDataandReport )
 // {

@@ -7,6 +7,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -89,6 +90,7 @@ namespace EnergyPlus {
 		virtual void TearDown() {
 			clear_InputProcessor_state();
 			clear_DataGlobals_state();
+			clear_DataOutputs_state();
 		}
 
 		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
@@ -109,9 +111,18 @@ namespace EnergyPlus {
 		// Example Usage: 
 		// 		EXPECT_TRUE( compare_containers< std::vector< bool > >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
 		// 		EXPECT_TRUE( compare_containers< Array1D_bool >( { true } , ObjectDef( index ).AlphaOrNumeric.begin() ) );
-		template < typename T, class ForwardIterator >
-		bool compare_containers( T const & correctVector, ForwardIterator test_vector_forward_iter ) {
-			return std::equal( correctVector.begin(), correctVector.end(), test_vector_forward_iter );
+		template < typename T, class T2 >
+		bool compare_containers( T const & correct_container, T2 test_container ) {
+			bool is_valid = ( correct_container.size() == test_container.size() );
+			EXPECT_TRUE( is_valid ) << "Containers are not equal size. Correct: " << correct_container.size() << " Test: " << test_container.size();
+			auto it = correct_container.begin();
+			auto it2 = test_container.begin();
+			for ( ; it != correct_container.end(); ++it, ++it2 ) {
+				// This may fail due to floating point issues...
+				is_valid = ( *it == *it2 );
+				EXPECT_TRUE( is_valid ) << "Correct element: \"" << *it << "\"" << std::endl << "Test element: \"" << *it2 << "\"";
+			}
+			return is_valid;
 		}
 
 		std::string delimited_string( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL ) {
@@ -123,31 +134,41 @@ namespace EnergyPlus {
 		}
 
 		bool compare_eso_stream( std::string const & correctString, bool resetStream = true ) {
-			bool are_equal = ( correctString == this->eso_stream->str() );
+			auto const stream_str = this->eso_stream->str();
+			EXPECT_EQ( correctString, stream_str );
+			bool are_equal = ( correctString == stream_str );
 			if ( resetStream ) this->eso_stream->str( std::string() );
 			return are_equal;
 		}
 
 		bool compare_mtr_stream( std::string const & correctString, bool resetStream = true ) {
-			bool are_equal = ( correctString == this->mtr_stream->str() );
+			auto const stream_str = this->mtr_stream->str();
+			EXPECT_EQ( correctString, stream_str );
+			bool are_equal = ( correctString == stream_str );
 			if ( resetStream ) this->mtr_stream->str( std::string() );
 			return are_equal;
 		}
 
 		bool compare_echo_stream( std::string const & correctString, bool resetStream = true ) {
-			bool are_equal = ( correctString == this->echo_stream->str() );
+			auto const stream_str = this->echo_stream->str();
+			EXPECT_EQ( correctString, stream_str );
+			bool are_equal = ( correctString == stream_str );
 			if ( resetStream ) this->echo_stream->str( std::string() );
 			return are_equal;
 		}
 
 		bool compare_cout_stream( std::string const & correctString, bool resetStream = true ) {
-			bool are_equal = ( correctString == this->m_cout_buffer->str() );
+			auto const stream_str = this->m_cout_buffer->str();
+			EXPECT_EQ( correctString, stream_str );
+			bool are_equal = ( correctString == stream_str );
 			if ( resetStream ) this->m_cout_buffer->str( std::string() );
 			return are_equal;
 		}
 
 		bool compare_cerr_stream( std::string const & correctString, bool resetStream = true ) {
-			bool are_equal = ( correctString == this->m_cerr_buffer->str() );
+			auto const stream_str = this->m_cerr_buffer->str();
+			EXPECT_EQ( correctString, stream_str );
+			bool are_equal = ( correctString == stream_str );
 			if ( resetStream ) this->m_cerr_buffer->str( std::string() );
 			return are_equal;
 		}
@@ -189,6 +210,8 @@ namespace EnergyPlus {
 			DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumericIDFDefArgsFound, false );
 
 			IDFRecordsGotten.dimension( NumIDFRecords, false );
+
+			PreScanReportingVariables();
 
 			return errors_found;
 		}
@@ -249,6 +272,21 @@ namespace EnergyPlus {
 			ObjectGotCount.dimension( NumObjectDefs, 0 );
 
 			return errors_found;
+		}
+
+		static void clear_DataOutputs_state() {
+			using namespace DataOutputs;
+
+			MaxConsideredOutputVariables = 0;
+			NumConsideredOutputVariables = 0;
+			iNumberOfRecords = int();
+			iNumberOfDefaultedFields = int();
+			iTotalFieldsWithDefaults = int();
+			iNumberOfAutoSizedFields = int();
+			iTotalAutoSizableFields = int();
+			iNumberOfAutoCalcedFields = int();
+			iTotalAutoCalculatableFields = int();
+			OutputVariablesForSimulation.deallocate();
 		}
 
 		static void clear_DataGlobals_state() {
