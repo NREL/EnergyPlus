@@ -18,6 +18,10 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 
+#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -30,6 +34,9 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataHVACGlobals;
 
+using namespace EnergyPlus::InputProcessor;
+using namespace EnergyPlus::DataIPShortCuts;
+using namespace EnergyPlus::DataGlobals;
 
 TEST( GasFiredHumidifierTest, Sizing ) {
 	ShowMessage( "Begin Test: GasFiredHumidifierTest, Sizing" );
@@ -180,4 +187,118 @@ TEST( GasFiredHumidifierTest, EnergyUse ) {
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+}
+TEST( Humidifiers, GetGasHumidifierInput ) {
+	ShowMessage( "Begin Test: Humidifiers, GetGasHumidifierInput" );
+
+	// Test get input for gas fired humidifier object
+	//Humidifier:Steam:Gas,
+	//  Main Gas Humidifier,     !- Name
+	//  ALWAYS_ON,               !- Availability Schedule Name
+	//  autosize,                !- Rated Capacity {m3/s}
+	//  autosize,                !- Rated Gas Use Rate {W}
+	//  0.80,                    !- Thermal Efficiency {-} 
+	//  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name
+	//  0,                       !- Rated Fan Power {W}
+	//  0,                       !- Auxiliary Electric Power {W}
+	//  Mixed Air Node 1,        !- Air Inlet Node Name
+	//  Main Humidifier Outlet Node,  !- Air Outlet Node Name
+	//  ;                        !- Water Storage Tank Name
+
+	bool ErrorsFound( false ); // If errors detected in input
+	int NumGasSteamHums( 1 ); // Zone number
+	int NumAlphas( 7 );
+	int NumNumbers( 5 );
+
+
+	NumAlphas = 7;
+	NumNumbers = 5;
+
+	// GetNumObjectsFound function requires the IDF object for Construction
+	NumObjectDefs = 2;
+	ListOfObjects.allocate( NumObjectDefs );
+	ListOfObjects( 1 ) = "HUMIDIFIER:STEAM:GAS";
+	iListOfObjects.allocate( NumObjectDefs );
+	iListOfObjects( 1 ) = 1;
+	ObjectStartRecord.allocate( NumObjectDefs );
+	ObjectStartRecord( 1 ) = 1;
+	ObjectGotCount.allocate( NumObjectDefs );
+	IDFRecordsGotten.allocate( NumObjectDefs );
+	IDFRecordsGotten( NumObjectDefs ) = false;
+	ObjectDef.allocate( NumObjectDefs );
+	ObjectDef( 1 ).NumFound = 1;
+	ObjectDef( 1 ).NumParams = 7;
+	ObjectDef( 1 ).NumAlpha = 7;
+	ObjectDef( 1 ).NumNumeric = 5;
+	ObjectDef( 1 ).AlphFieldChks.allocate( NumAlphas );
+	ObjectDef( 1 ).AlphFieldChks = " ";
+	ObjectDef( 1 ).NumRangeChks.allocate( NumNumbers );
+
+	NumIDFRecords = 1;
+	IDFRecords.allocate( NumIDFRecords );
+	IDFRecords( 1 ).Name = ListOfObjects( 1 );
+	IDFRecords( 1 ).NumNumbers = NumNumbers;
+	IDFRecords( 1 ).NumAlphas = NumAlphas;
+	IDFRecords( 1 ).ObjectDefPtr = ObjectDef( 1 ).NumFound;
+	IDFRecords( 1 ).Alphas.allocate( NumAlphas );
+	IDFRecords( 1 ).Alphas( 1 ) = "Main Gas Humidifier";
+	IDFRecords( 1 ).Alphas( 2 ) = "";
+	IDFRecords( 1 ).Alphas( 3 ) = "ThermalEfficiencyFPLR";
+	IDFRecords( 1 ).Alphas( 4 ) = "Mixed Air Node 1";
+	IDFRecords( 1 ).Alphas( 5 ) = "Main Humidifier Outlet Node";
+	IDFRecords( 1 ).Alphas( 6 ) = "";
+	IDFRecords( 1 ).Alphas( 7 ) = "";
+	IDFRecords( 1 ).AlphBlank.allocate( NumAlphas );
+	IDFRecords( 1 ).AlphBlank( 1 ) = false;
+	IDFRecords( 1 ).AlphBlank( 2 ) = true;
+	IDFRecords( 1 ).AlphBlank( 3 ) = false;
+	IDFRecords( 1 ).AlphBlank( 4 ) = false;
+	IDFRecords( 1 ).AlphBlank( 5 ) = false;
+	IDFRecords( 1 ).AlphBlank( 6 ) = true;
+	IDFRecords( 1 ).AlphBlank( 7 ) = true;
+	IDFRecords( 1 ).Numbers.allocate( NumNumbers );
+	IDFRecords( 1 ).Numbers( 1 ) = 0.00045;
+	IDFRecords( 1 ).Numbers( 2 ) = 10000.0;
+	IDFRecords( 1 ).Numbers( 3 ) = 0.80;
+	IDFRecords( 1 ).Numbers( 4 ) = 0.0;
+	IDFRecords( 1 ).Numbers( 5 ) = 0.0;
+	IDFRecords( 1 ).NumBlank.allocate( NumNumbers );
+	IDFRecords( 1 ).NumBlank = false;
+
+	MaxAlphaArgsFound = NumAlphas;
+	MaxNumericArgsFound = NumNumbers;
+
+	// GetOnlySingleNode requires that the IDD object definition for NodeList is present, so populate it here
+	ListOfObjects( 2 ) = "NodeList";
+	iListOfObjects( 2 ) = 2;
+	ObjectDef( 2 ).NumParams = 2;
+	ObjectDef( 2 ).NumAlpha = 2;
+	ObjectDef( 2 ).NumNumeric = 0;
+
+	// call to get valid window material types
+	ErrorsFound = false;
+	GetHumidifierInput(); // 
+	EXPECT_EQ( 1, Humidifier( 1 ).EfficiencyCurvePtr );
+
+	// deallocate variables
+	Humidifier.deallocate();
+	iListOfObjects.deallocate();
+	ObjectStartRecord.deallocate();
+	ObjectGotCount.deallocate();
+	IDFRecordsGotten.deallocate();
+	ObjectDef( 2 ).AlphFieldChks.deallocate();
+	ObjectDef( 2 ).NumRangeChks.deallocate();
+	ObjectDef.deallocate();
+	IDFRecords( 1 ).Alphas.deallocate();
+	IDFRecords( 1 ).AlphBlank.deallocate();
+	IDFRecords( 1 ).Numbers.deallocate();
+	IDFRecords( 1 ).NumBlank.deallocate();
+	IDFRecords.deallocate();
+
+	//lNumericBlanks.deallocate();
+	//lAlphaBlanks.deallocate();
+	//cAlphaFields.deallocate();
+	//cNumericFields.deallocate();
+	//Alphas.deallocate();
+	//Numbers.deallocate();
 }
