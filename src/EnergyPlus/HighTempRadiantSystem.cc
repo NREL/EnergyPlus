@@ -576,6 +576,7 @@ namespace HighTempRadiantSystem {
 		} // ...end of DO loop through all of the high temperature radiant heaters
 
 		// Set up the output variables for high temperature radiant heaters
+		// cCurrentModuleObject = "ZoneHVAC:HighTemperatureRadiant"
 		for ( Item = 1; Item <= NumOfHighTempRadSys; ++Item ) {
 			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", HighTempRadSys( Item ).HeatPower, "System", "Average", HighTempRadSys( Item ).Name );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", HighTempRadSys( Item ).HeatEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );

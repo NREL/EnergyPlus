@@ -482,6 +482,7 @@ namespace WaterCoils {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
 
 			//Setup the Simple Heating Coil reporting variables
+			//CurrentModuleObject = "Coil:Heating:Water"
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy [J]", WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Heating Rate [W]", WaterCoil( CoilNum ).TotWaterHeatingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
@@ -584,6 +585,7 @@ namespace WaterCoils {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
 
 			// Setup Report variables for the Detailed Flat Fin Cooling Coils
+			// CurrentModuleObject = "Coil:Cooling:Water:DetailedGeometry"
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", WaterCoil( CoilNum ).SenWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name );
@@ -696,6 +698,7 @@ namespace WaterCoils {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 5 ), AlphArray( 6 ), "Air Nodes" );
 
 			// Setup Report variables for the Design input Cooling Coils
+			// CurrentModuleObject = "Coil:Cooling:Water"
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", WaterCoil( CoilNum ).SenWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name );

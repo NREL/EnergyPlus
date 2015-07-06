@@ -1578,6 +1578,7 @@ namespace PackagedThermalStorageCoil {
 		for ( item = 1; item <= NumTESCoils; ++item ) {
 			SetupOutputVariable( "Cooling Coil Operating Mode Index []", TESCoil( item ).CurControlMode, "System", "Average", TESCoil( item ).Name );
 
+			// cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage"
 			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", TESCoil( item ).EvapTotCoolingRate, "System", "Average", TESCoil( item ).Name );
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", TESCoil( item ).EvapTotCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", TESCoil( item ).EvapSensCoolingRate, "System", "Average", TESCoil( item ).Name );
