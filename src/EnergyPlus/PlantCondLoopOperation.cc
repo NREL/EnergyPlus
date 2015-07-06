@@ -1338,6 +1338,7 @@ namespace PlantCondLoopOperation {
 		int CompNumA;
 		int CompNumN;
 		int CompOpType; // 1=cooling, 2=dual(or other)
+		Real64 SlopToler( 1.0 );
 
 		SchemeNameFound = true;
 
@@ -1399,7 +1400,7 @@ namespace PlantCondLoopOperation {
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeNum = GetOnlySingleNode( cAlphaArgs( CompNumA ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointFlowRate = rNumericArgs( CompNumN );
 
-						if ( rNumericArgs( CompNum ) == AutoSize ) {
+						if ( ( rNumericArgs( CompNum ) < ( AutoSize + SlopToler ) ) && ( rNumericArgs( CompNum ) > ( AutoSize - SlopToler ) ) ) {
 							for ( Num = 1; Num <= SaveNumPlantComps; ++Num ) {
 								CompInNode = CompDesWaterFlow( Num ).SupNode;
 								CompFlowRate = CompDesWaterFlow( Num ).DesVolFlowRate;
