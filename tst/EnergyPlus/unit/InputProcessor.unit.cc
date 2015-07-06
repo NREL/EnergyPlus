@@ -1039,3 +1039,27 @@ TEST_F( InputProcessorFixture, preScanReportingVariables )
 	EXPECT_EQ( 0, DataOutputs::OutputVariablesForSimulation( 1 ).Next );
 
 }
+
+TEST_F( InputProcessorFixture, initSecretObjects )
+{
+	InitSecretObjects();
+
+	EXPECT_EQ( 5, NumSecretObjects );
+
+	EXPECT_EQ( "SKY RADIANCE DISTRIBUTION", RepObjects( 1 ).OldName );
+	EXPECT_TRUE( RepObjects( 1 ).Deleted );
+
+	EXPECT_EQ( "SURFACE:SHADING:DETACHED", RepObjects( 2 ).OldName );
+	EXPECT_EQ( "Shading:Site:Detailed", RepObjects( 2 ).NewName );
+
+	EXPECT_EQ( "AIRFLOW MODEL", RepObjects( 3 ).OldName );
+	EXPECT_TRUE( RepObjects( 3 ).Deleted );
+
+	EXPECT_EQ( "AIRFLOWNETWORK:MULTIZONE:SITEWINDCONDITIONS", RepObjects( 4 ).OldName );
+	EXPECT_TRUE( RepObjects( 4 ).Deleted );
+
+	EXPECT_EQ( "OUTPUT:REPORTS", RepObjects( 5 ).OldName );
+	EXPECT_EQ( "various - depends on fields", RepObjects( 5 ).NewName );
+	EXPECT_TRUE( RepObjects( 5 ).Deleted );
+	EXPECT_TRUE( RepObjects( 5 ).TransitionDefer );
+}
