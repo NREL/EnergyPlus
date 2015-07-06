@@ -2173,35 +2173,35 @@ TEST_F( OutputProcessorFixture, getReportVariableInput )
 	EXPECT_EQ( ReportTimeStep, ReqRepVars( 1 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 1 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 1 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 1 ).Used );
+	EXPECT_FALSE( ReqRepVars( 1 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 2 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 2 ).VarName );
 	EXPECT_EQ( ReportHourly, ReqRepVars( 2 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 2 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 2 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 2 ).Used );
+	EXPECT_FALSE( ReqRepVars( 2 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 3 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 3 ).VarName );
 	EXPECT_EQ( ReportDaily, ReqRepVars( 3 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 3 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 3 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 3 ).Used );
+	EXPECT_FALSE( ReqRepVars( 3 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 4 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 4 ).VarName );
 	EXPECT_EQ( ReportMonthly, ReqRepVars( 4 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 4 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 4 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 4 ).Used );
+	EXPECT_FALSE( ReqRepVars( 4 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 5 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 5 ).VarName );
 	EXPECT_EQ( ReportSim, ReqRepVars( 5 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 5 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 5 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 5 ).Used );
+	EXPECT_FALSE( ReqRepVars( 5 ).Used );
 
 }
 
@@ -2233,35 +2233,35 @@ TEST_F( OutputProcessorFixture, buildKeyVarList )
 	EXPECT_EQ( ReportTimeStep, ReqRepVars( 1 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 1 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 1 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 1 ).Used );
+	EXPECT_FALSE( ReqRepVars( 1 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 2 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 2 ).VarName );
 	EXPECT_EQ( ReportHourly, ReqRepVars( 2 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 2 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 2 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 2 ).Used );
+	EXPECT_FALSE( ReqRepVars( 2 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 3 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 3 ).VarName );
 	EXPECT_EQ( ReportDaily, ReqRepVars( 3 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 3 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 3 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 3 ).Used );
+	EXPECT_FALSE( ReqRepVars( 3 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 4 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 4 ).VarName );
 	EXPECT_EQ( ReportMonthly, ReqRepVars( 4 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 4 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 4 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 4 ).Used );
+	EXPECT_FALSE( ReqRepVars( 4 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 5 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 5 ).VarName );
 	EXPECT_EQ( ReportSim, ReqRepVars( 5 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 5 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 5 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 5 ).Used );
+	EXPECT_FALSE( ReqRepVars( 5 ).Used );
 }
 
 TEST_F( OutputProcessorFixture, addBlankKeys )
@@ -2295,35 +2295,35 @@ TEST_F( OutputProcessorFixture, addBlankKeys )
 	EXPECT_EQ( ReportTimeStep, ReqRepVars( 1 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 1 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 1 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 1 ).Used );
+	EXPECT_FALSE( ReqRepVars( 1 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 2 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 2 ).VarName );
 	EXPECT_EQ( ReportHourly, ReqRepVars( 2 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 2 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 2 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 2 ).Used );
+	EXPECT_FALSE( ReqRepVars( 2 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 3 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 3 ).VarName );
 	EXPECT_EQ( ReportDaily, ReqRepVars( 3 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 3 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 3 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 3 ).Used );
+	EXPECT_FALSE( ReqRepVars( 3 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 4 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 4 ).VarName );
 	EXPECT_EQ( ReportMonthly, ReqRepVars( 4 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 4 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 4 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 4 ).Used );
+	EXPECT_FALSE( ReqRepVars( 4 ).Used );
 
 	EXPECT_EQ( "", ReqRepVars( 5 ).Key );
 	EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", ReqRepVars( 5 ).VarName );
 	EXPECT_EQ( ReportSim, ReqRepVars( 5 ).ReportFreq );
 	EXPECT_EQ( 0, ReqRepVars( 5 ).SchedPtr );
 	EXPECT_EQ( "", ReqRepVars( 5 ).SchedName );
-	EXPECT_EQ( false, ReqRepVars( 5 ).Used );
+	EXPECT_FALSE( ReqRepVars( 5 ).Used );
 
 }
 
@@ -2726,6 +2726,7 @@ TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting )
 	DataEnvironment::HolidayIndex = 0;
 	DataGlobals::HourOfDay = 24;
 	DataGlobals::NumOfDayInEnvrn = 365;
+	DataGlobals::MinutesPerTimeStep = 10;
 
 	if ( TimeStep == NumOfTimeStepInHour ) {
 		EndHourFlag = true;
@@ -2754,13 +2755,13 @@ TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting )
 	EnergyPlus::sqlite = std::move( sqlite_test );
 	GetReportVariableInput();
 	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
-	Real64 light_consumption = 0;
+	Real64 light_consumption = 999;
 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
-	Real64 zone_infil_total_loss = 0;
+	Real64 zone_infil_total_loss = 999;
 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
@@ -2775,8 +2776,7 @@ TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting )
 
 	auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
-	std::vector< std::vector<std::string> > timeData(
-	{
+	std::vector< std::vector<std::string> > timeData({
 		{"1", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
 		{"2", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
 		{"3", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
@@ -2788,8 +2788,7 @@ TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting )
 
 	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
-	std::vector< std::vector<std::string> > reportDataDictionary(
-	{
+	std::vector< std::vector<std::string> > reportDataDictionary({
 		{ "1", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Zone Timestep", "", "C" },
 		{ "2", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C" },
 		{ "3", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Daily", "", "C" },
@@ -2807,177 +2806,423 @@ TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting )
 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-	std::vector< std::vector<std::string> > reportData(
-	{
-		{ "1", "1", "1", "" }, 
-		{ "2", "1", "7", "0.0" }, 
-		{ "3", "2", "2", "" }, 
-		{ "4", "2", "8", "0.0" }, 
-		{ "5", "3", "3", "" }, 
-		{ "6", "3", "9", "0.0" }, 
-		{ "7", "4", "4", "" }, 
-		{ "8", "4", "10", "0.0" }, 
-		{ "9", "5", "5", "" },
-		{ "10", "5", "11", "0.0" },
+	std::vector< std::vector<std::string> > reportData({
+		{ "1", "1", "1", "0.0" }, 
+		{ "2", "1", "7", "4995.0" }, 
+		{ "3", "2", "2", "0.0" }, 
+		{ "4", "2", "8", "4995.0" }, 
+		{ "5", "3", "3", "0.0" }, 
+		{ "6", "3", "9", "4995.0" }, 
+		{ "7", "4", "4", "0.0" }, 
+		{ "8", "4", "10", "4995.0" }, 
+		{ "9", "5", "5", "0.0" },
+		{ "10", "5", "11", "4995.0" },
 	});
 
-	std::vector< std::vector<std::string> > reportExtendedData(
-	{
+	std::vector< std::vector<std::string> > reportExtendedData({
 		{ "1", "5", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" }, 
-		{ "2", "6", "0.0", "12", "31", "24", "1", "0", "0.0", "12", "31", "24", "1", "0" }, 
+		{ "2", "6", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" }, 
 		{ "3", "7", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" }, 
-		{ "4", "8", "0.0", "12", "31", "24", "1", "0", "0.0", "12", "31", "24", "1", "0" }, 
+		{ "4", "8", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" }, 
 		{ "5", "9", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" }, 
-		{ "6", "10", "0.0", "12", "31", "24", "1", "0", "0.0", "12", "31", "24", "1", "0" }
+		{ "6", "10", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" }
 	});
 
 	EXPECT_EQ( reportData, reportDataResults );
 	EXPECT_EQ( reportExtendedData, reportExtendedDataResults );
 
-	compare_eso_stream( "1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep\n2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly\n3,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]\n4,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]\n5,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]\n7,1,Electricity:Facility [J] !TimeStep\n8,1,Electricity:Facility [J] !Hourly\n9,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]\n10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]\n11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]\n,365,12,31, 0,24,50.00,60.00,Tuesday\n1,NAN\n7,0.0\n,365,12,31, 0,24, 0.00,60.00,Tuesday\n2,NAN\n8,0.0\n,365,12,31, 0,Tuesday\n3,nan-2147483648,0.0,24,60,0.0,24,60\n9,0.0,0.0,24,60,0.0,24,60\n,365,12\n4,nan-2147483648,0.0,31,24,60,0.0,31,24,60\n10,0.0,0.0,31,24,60,0.0,31,24,60\n,365\n5,nan-2147483648,0.0,12,31,24,60,0.0,12,31,24,60\n11,0.0,0.0,12,31,24,60,0.0,12,31,24,60\n" );
-	compare_mtr_stream( "7,1,Electricity:Facility [J] !TimeStep\n8,1,Electricity:Facility [J] !Hourly\n9,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]\n10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]\n11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]\n,365,12,31, 0,24,50.00,60.00,Tuesday\n7,0.0\n,365,12,31, 0,24, 0.00,60.00,Tuesday\n8,0.0\n,365,12,31, 0,Tuesday\n9,0.0,0.0,24,60,0.0,24,60\n,365,12\n10,0.0,0.0,31,24,60,0.0,31,24,60\n,365\n11,0.0,0.0,12,31,24,60,0.0,12,31,24,60\n" );
+	compare_eso_stream( delimited_string( {
+		"1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep",
+		"2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly",
+		"3,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"4,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"5,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+		"7,1,Electricity:Facility [J] !TimeStep",
+		"8,1,Electricity:Facility [J] !Hourly",
+		"9,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+		",365,12,31, 0,24,50.00,60.00,Tuesday",
+		"1,0.0",
+		"7,4995.",
+		",365,12,31, 0,24, 0.00,60.00,Tuesday",
+		"2,0.0",
+		"8,4995.",
+		",365,12,31, 0,Tuesday",
+		"3,0.0,0.0,24,60,0.0,24,60",
+		"9,4995.,4995.,24,60,4995.,24,60",
+		",365,12",
+		"4,0.0,0.0,31,24,60,0.0,31,24,60",
+		"10,4995.,4995.,31,24,60,4995.,31,24,60",
+		",365",
+		"5,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
+		"11,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+	} ) );
+
+	compare_mtr_stream( delimited_string( {
+		"7,1,Electricity:Facility [J] !TimeStep",
+		"8,1,Electricity:Facility [J] !Hourly",
+		"9,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+		",365,12,31, 0,24,50.00,60.00,Tuesday",
+		"7,4995.",
+		",365,12,31, 0,24, 0.00,60.00,Tuesday",
+		"8,4995.",
+		",365,12,31, 0,Tuesday",
+		"9,4995.,4995.,24,60,4995.,24,60",
+		",365,12",
+		"10,4995.,4995.,31,24,60,4995.,31,24,60",
+		",365",
+		"11,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+	} ) );
 }
 
-// TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting_with_detailed )
-// {
-// 	std::string const idf_objects = delimited_string({
-// 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,detailed;",
-// 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
-// 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
-// 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
-// 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
-// 		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
-// 		"Output:Meter,Electricity:Facility,detailed;",
-// 		"Output:Meter,Electricity:Facility,timestep;",
-// 		"Output:Meter,Electricity:Facility,hourly;",
-// 		"Output:Meter,Electricity:Facility,daily;",
-// 		"Output:Meter,Electricity:Facility,monthly;",
-// 		"Output:Meter,Electricity:Facility,runperiod;",
-// 	});
+TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting_with_detailed )
+{
+	std::string const idf_objects = delimited_string({
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,detailed;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+		"Output:Variable,*,Boiler Gas Rate,detailed;",
+		"Output:Variable,*,Boiler Heating Rate,detailed;",
+		"Output:Meter,Electricity:Facility,detailed;",
+		"Output:Meter,Electricity:Facility,timestep;",
+		"Output:Meter,Electricity:Facility,hourly;",
+		"Output:Meter,Electricity:Facility,daily;",
+		"Output:Meter,Electricity:Facility,monthly;",
+		"Output:Meter,Electricity:Facility,runperiod;",
+	});
 
-// 	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_FALSE( process_idf( idf_objects ) );
 
-// 	DataGlobals::DayOfSim = 365;
-// 	DataGlobals::DayOfSimChr = "365";
-// 	DataEnvironment::Month = 12;
-// 	DataEnvironment::DayOfMonth = 31;
-// 	DataEnvironment::DSTIndicator = 0;
-// 	DataEnvironment::DayOfWeek = 3;
-// 	DataEnvironment::HolidayIndex = 0;
-// 	DataGlobals::HourOfDay = 24;
-// 	DataGlobals::NumOfDayInEnvrn = 365;
+	DataGlobals::DayOfSim = 365;
+	DataGlobals::DayOfSimChr = "365";
+	DataEnvironment::Month = 12;
+	DataEnvironment::DayOfMonth = 31;
+	DataEnvironment::DSTIndicator = 0;
+	DataEnvironment::DayOfWeek = 3;
+	DataEnvironment::HolidayIndex = 0;
+	DataGlobals::HourOfDay = 24;
+	DataGlobals::NumOfDayInEnvrn = 365;
+	DataGlobals::MinutesPerTimeStep = 10;
 
-// 	if ( TimeStep == NumOfTimeStepInHour ) {
-// 		EndHourFlag = true;
-// 		if ( HourOfDay == 24 ) {
-// 			EndDayFlag = true;
-// 			if ( ( ! WarmupFlag ) && ( DayOfSim == NumOfDayInEnvrn ) ) {
-// 				EndEnvrnFlag = true;
-// 			}
-// 		}
-// 	}
+	if ( TimeStep == NumOfTimeStepInHour ) {
+		EndHourFlag = true;
+		if ( HourOfDay == 24 ) {
+			EndDayFlag = true;
+			if ( ( ! WarmupFlag ) && ( DayOfSim == NumOfDayInEnvrn ) ) {
+				EndEnvrnFlag = true;
+			}
+		}
+	}
 
-// 	if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth( DataEnvironment::Month ) ) {
-// 		DataEnvironment::EndMonthFlag = true;
-// 	}
+	if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth( DataEnvironment::Month ) ) {
+		DataEnvironment::EndMonthFlag = true;
+	}
 
-// 	TimeValue.allocate( 2 );
+	TimeValue.allocate( 2 );
 
-// 	auto timeStep = 1.0 / 6;
+	auto timeStep = 1.0 / 6;
 
-// 	SetupTimePointers( "Zone", timeStep );
-// 	SetupTimePointers( "HVAC", timeStep );
+	SetupTimePointers( "Zone", timeStep );
+	SetupTimePointers( "HVAC", timeStep );
 
-// 	TimeValue( 1 ).CurMinute = 50;
-// 	TimeValue( 2 ).CurMinute = 50;
+	TimeValue( 1 ).CurMinute = 50;
+	TimeValue( 2 ).CurMinute = 50;
 
-// 	EnergyPlus::sqlite = std::move( sqlite_test );
-// 	GetReportVariableInput();
-// 	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
-// 	Real64 light_consumption = 0;
-// 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-// 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-// 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-// 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-// 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
-// 	Real64 zone_infil_total_loss = 0;
-// 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-// 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-// 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-// 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-// 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+	EnergyPlus::sqlite = std::move( sqlite_test );
+	GetReportVariableInput();
+	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+	Real64 light_consumption = 999;
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+	Real64 zone_infil_total_loss = 999;
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+	Real64 fuel_used = 999;
+	Real64 boiler_load = 999;
+	SetupOutputVariable( "Boiler Heating Rate [W]", boiler_load, "System", "Average", "Boiler1" );
+	SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
 
-// 	UpdateMeterReporting();
+	UpdateMeterReporting();
 
-// 	UpdateDataandReport( DataGlobals::ZoneTSReporting );
+	UpdateDataandReport( DataGlobals::ZoneTSReporting );
 
-// 	sqlite_test = std::move( EnergyPlus::sqlite );
+	sqlite_test = std::move( EnergyPlus::sqlite );
 
-// 	auto timeResults = queryResult("SELECT * FROM Time;", "Time");
+	auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
-// 	std::vector< std::vector<std::string> > timeData(
-// 	{
-// 		{"1", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
-// 		{"2", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
-// 		{"3", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
-// 		{"4", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
-// 		{"5", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
-// 	});
+	std::vector< std::vector<std::string> > timeData({
+		{"1", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
+		{"2", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
+		{"3", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
+		{"4", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
+		{"5", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
+	});
 
-// 	EXPECT_EQ( timeData, timeResults );
+	EXPECT_EQ( timeData, timeResults );
 
-// 	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
-// 	std::vector< std::vector<std::string> > reportDataDictionary(
-// 	{
-// 		{ "1", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "HVAC System Timestep", "", "C" },
-// 		{ "2", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Zone Timestep", "", "C" },
-// 		{ "3", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C" },
-// 		{ "4", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Daily", "", "C" },
-// 		{ "5", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Monthly", "", "C" },
-// 		{ "6", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C" },
-// 		{ "8", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "HVAC System Timestep", "", "J" },
-// 		{ "9", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Hourly", "", "J" },
-// 		{ "10", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Daily", "", "J" },
-// 		{ "11", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Monthly", "", "J" },
-// 		{ "12", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" }
-// 	});
+	std::vector< std::vector<std::string> > reportDataDictionary({
+		{ "1", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "HVAC System Timestep", "", "C" },
+		{ "2", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Zone Timestep", "", "C" },
+		{ "3", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C" },
+		{ "4", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Daily", "", "C" },
+		{ "5", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Monthly", "", "C" },
+		{ "6", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C" },
+		{ "8", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "HVAC System Timestep", "", "J" },
+		{ "9", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Hourly", "", "J" },
+		{ "10", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Daily", "", "J" },
+		{ "11", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Monthly", "", "J" },
+		{ "12", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
+		{ "152", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W" },
+		{ "153", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W" },
+	});
 
-// 	EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+	EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
 
-// 	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
-// 	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
-// 	std::vector< std::vector<std::string> > reportData(
-// 	{
-// 		{ "1", "1", "1", "0.0" },
-// 		{ "2", "1", "2", "" },
-// 		{ "3", "1", "8", "0.0" },
-// 		{ "4", "2", "3", "" },
-// 		{ "5", "2", "9", "0.0" },
-// 		{ "6", "3", "4", "" },
-// 		{ "7", "3", "10", "0.0" },
-// 		{ "8", "4", "5", "" },
-// 		{ "9", "4", "11", "0.0" },
-// 		{ "10", "5", "6", "" },
-// 		{ "11", "5", "12", "0.0" },
-// 	});
+	std::vector< std::vector<std::string> > reportData({
+		{ "1", "1", "1", "0.0" },
+		{ "2", "1", "2", "0.0" },
+		{ "3", "1", "8", "4995.0" },
+		{ "4", "2", "3", "0.0" },
+		{ "5", "2", "9", "4995.0" },
+		{ "6", "3", "4", "0.0" },
+		{ "7", "3", "10", "4995.0" },
+		{ "8", "4", "5", "0.0" },
+		{ "9", "4", "11", "4995.0" },
+		{ "10", "5", "6", "0.0" },
+		{ "11", "5", "12", "4995.0" },
+	});
 
-// 	std::vector< std::vector<std::string> > reportExtendedData(
-// 	{
-// 		{ "1", "6", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
-// 		{ "2", "7", "0.0", "12", "31", "24", "1", "0", "0.0", "12", "31", "24", "1", "0" },
-// 		{ "3", "8", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
-// 		{ "4", "9", "0.0", "12", "31", "24", "1", "0", "0.0", "12", "31", "24", "1", "0" },
-// 		{ "5", "10", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
-// 		{ "6", "11", "0.0", "12", "31", "24", "1", "0", "0.0", "12", "31", "24", "1", "0" },
-// 	});
+	std::vector< std::vector<std::string> > reportExtendedData({
+		{ "1", "6", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
+		{ "2", "7", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" },
+		{ "3", "8", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
+		{ "4", "9", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" },
+		{ "5", "10", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
+		{ "6", "11", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" },
+	});
 
-// 	EXPECT_EQ( reportData, reportDataResults );
-// 	EXPECT_EQ( reportExtendedData, reportExtendedDataResults );
+	EXPECT_EQ( reportData, reportDataResults );
+	EXPECT_EQ( reportExtendedData, reportExtendedDataResults );
 
-// 	compare_eso_stream( "1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Each Call\n2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep\n3,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly\n4,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]\n5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]\n6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]\n8,1,Electricity:Facility [J] !Each Call\n9,1,Electricity:Facility [J] !Hourly\n10,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]\n11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]\n12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]\n1,0.0\n2,NAN\n8,0.0\n,365,12,31, 0,24, 0.00,60.00,Tuesday\n3,NAN\n9,0.0\n,365,12,31, 0,Tuesday\n4,nan-2147483648,0.0,24,60,0.0,24,60\n10,0.0,0.0,24,60,0.0,24,60\n,365,12\n5,nan-2147483648,0.0,31,24,60,0.0,31,24,60\n11,0.0,0.0,31,24,60,0.0,31,24,60\n,365\n6,nan-2147483648,0.0,12,31,24,60,0.0,12,31,24,60\n12,0.0,0.0,12,31,24,60,0.0,12,31,24,60\n" );
-// 	compare_mtr_stream( "8,1,Electricity:Facility [J] !Each Call\n9,1,Electricity:Facility [J] !Hourly\n10,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]\n11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]\n12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]\n,365,12,31, 0,24,50.00,60.00,Tuesday\n8,0.0\n,365,12,31, 0,24, 0.00,60.00,Tuesday\n9,0.0\n,365,12,31, 0,Tuesday\n10,0.0,0.0,24,60,0.0,24,60\n,365,12\n11,0.0,0.0,31,24,60,0.0,31,24,60\n,365\n12,0.0,0.0,12,31,24,60,0.0,12,31,24,60\n" );
-// }
+	compare_eso_stream( delimited_string( {
+		"1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Each Call",
+		"2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep",
+		"3,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly",
+		"4,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+		"152,1,Boiler1,Boiler Heating Rate [W] !Each Call",
+		"153,1,Boiler1,Boiler Gas Rate [W] !Each Call",
+		"8,1,Electricity:Facility [J] !Each Call",
+		"9,1,Electricity:Facility [J] !Hourly",
+		"10,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+		",365,12,31, 0,24,50.00,60.00,Tuesday",
+		"1,0.0",
+		"2,0.0",
+		"8,4995.",
+		",365,12,31, 0,24, 0.00,60.00,Tuesday",
+		"3,0.0",
+		"9,4995.",
+		",365,12,31, 0,Tuesday",
+		"4,0.0,0.0,24,60,0.0,24,60",
+		"10,4995.,4995.,24,60,4995.,24,60",
+		",365,12",
+		"5,0.0,0.0,31,24,60,0.0,31,24,60",
+		"11,4995.,4995.,31,24,60,4995.,31,24,60",
+		",365",
+		"6,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
+		"12,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+	} ) );
+
+	compare_mtr_stream( delimited_string( {
+		"8,1,Electricity:Facility [J] !Each Call",
+		"9,1,Electricity:Facility [J] !Hourly",
+		"10,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+		",365,12,31, 0,24,50.00,60.00,Tuesday",
+		"8,4995.",
+		",365,12,31, 0,24, 0.00,60.00,Tuesday",
+		"9,4995.",
+		",365,12,31, 0,Tuesday",
+		"10,4995.,4995.,24,60,4995.,24,60",
+		",365,12",
+		"11,4995.,4995.,31,24,60,4995.,31,24,60",
+		",365",
+		"12,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+	} ) );
+
+}
+
+TEST_F( OutputProcessorFixture, updateDataandReport_HVACTSReporting )
+{
+	std::string const idf_objects = delimited_string({
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,detailed;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
+		"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+		"Output:Variable,*,Boiler Gas Rate,detailed;",
+		"Output:Variable,*,Boiler Heating Rate,detailed;",
+		"Output:Meter,Electricity:Facility,detailed;",
+		"Output:Meter,Electricity:Facility,timestep;",
+		"Output:Meter,Electricity:Facility,hourly;",
+		"Output:Meter,Electricity:Facility,daily;",
+		"Output:Meter,Electricity:Facility,monthly;",
+		"Output:Meter,Electricity:Facility,runperiod;",
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::DayOfSim = 365;
+	DataGlobals::DayOfSimChr = "365";
+	DataEnvironment::Month = 12;
+	DataEnvironment::DayOfMonth = 31;
+	DataEnvironment::DSTIndicator = 0;
+	DataEnvironment::DayOfWeek = 3;
+	DataEnvironment::HolidayIndex = 0;
+	DataGlobals::HourOfDay = 24;
+	DataGlobals::NumOfDayInEnvrn = 365;
+	DataGlobals::MinutesPerTimeStep = 10;
+
+	if ( TimeStep == NumOfTimeStepInHour ) {
+		EndHourFlag = true;
+		if ( HourOfDay == 24 ) {
+			EndDayFlag = true;
+			if ( ( ! WarmupFlag ) && ( DayOfSim == NumOfDayInEnvrn ) ) {
+				EndEnvrnFlag = true;
+			}
+		}
+	}
+
+	if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth( DataEnvironment::Month ) ) {
+		DataEnvironment::EndMonthFlag = true;
+	}
+
+	TimeValue.allocate( 2 );
+
+	auto timeStep = 1.0 / 6;
+
+	SetupTimePointers( "Zone", timeStep );
+	SetupTimePointers( "HVAC", timeStep );
+
+	TimeValue( 1 ).CurMinute = 50;
+	TimeValue( 2 ).CurMinute = 50;
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+	GetReportVariableInput();
+	SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+	Real64 light_consumption = 999;
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+	Real64 zone_infil_total_loss = 999;
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+	Real64 fuel_used = 999;
+	Real64 boiler_load = 999;
+	SetupOutputVariable( "Boiler Heating Rate [W]", boiler_load, "System", "Average", "Boiler1" );
+	SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
+
+	UpdateMeterReporting();
+
+	UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto timeResults = queryResult("SELECT * FROM Time;", "Time");
+
+	std::vector< std::vector<std::string> > timeData({
+		{ "1", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0" },
+	});
+
+	EXPECT_EQ( timeData, timeResults );
+
+	auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+	std::vector< std::vector<std::string> > reportDataDictionary({
+		{ "1", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "HVAC System Timestep", "", "C" },
+		{ "2", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Zone Timestep", "", "C" },
+		{ "3", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C" },
+		{ "4", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Daily", "", "C" },
+		{ "5", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Monthly", "", "C" },
+		{ "6", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C" },
+		{ "8", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "HVAC System Timestep", "", "J" },
+		{ "9", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Hourly", "", "J" },
+		{ "10", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Daily", "", "J" },
+		{ "11", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Monthly", "", "J" },
+		{ "12", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
+		{ "152", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W" },
+		{ "153", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W" },
+	});
+
+	EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
+
+	auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+	auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+	std::vector< std::vector<std::string> > reportData({
+		{ "1", "1", "152", "999.0" },
+		{ "2", "1", "153", "999.0" },
+	});
+
+	std::vector< std::vector<std::string> > reportExtendedData({});
+
+	EXPECT_EQ( reportData, reportDataResults );
+	EXPECT_EQ( reportExtendedData, reportExtendedDataResults );
+
+	compare_eso_stream( delimited_string( {
+		"1,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Each Call",
+		"2,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep",
+		"3,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly",
+		"4,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+		"152,1,Boiler1,Boiler Heating Rate [W] !Each Call",
+		"153,1,Boiler1,Boiler Gas Rate [W] !Each Call",
+		"8,1,Electricity:Facility [J] !Each Call",
+		"9,1,Electricity:Facility [J] !Hourly",
+		"10,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+		",365,12,31, 0,24,50.00,60.00,Tuesday",
+		"152,999.",
+		"153,999.",
+	} ) );
+
+	compare_mtr_stream( delimited_string( {
+		"8,1,Electricity:Facility [J] !Each Call",
+		"9,1,Electricity:Facility [J] !Hourly",
+		"10,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
+		"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+		"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+	} ) );
+
+}
 
 }

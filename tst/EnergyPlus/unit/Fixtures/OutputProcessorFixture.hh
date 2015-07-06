@@ -83,6 +83,10 @@ namespace EnergyPlus {
 			ProduceVariableDictionary = false;
 			MaxNumSubcategories = 1;
 			ReportNumberCounter = 0;
+			LHourP = -1;
+			LStartMin = -1.0;
+			LEndMin = -1.0;
+			EndTimeStepFlag = false;
 			TimeValue.deallocate();
 			RVariableTypes.deallocate();
 			IVariableTypes.deallocate();

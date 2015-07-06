@@ -138,7 +138,13 @@ namespace OutputProcessor {
 
 	extern int MaxNumSubcategories;
 
+	// These were static variables within different functions. They were pulled out into the namespace 
+	// to facilitate easier unit testing of those functions.
 	extern int ReportNumberCounter; // The report number is used in output reports as a key.
+	extern int LHourP; // Helps set hours for timestamp output
+	extern Real64 LStartMin; // Helps set minutes for timestamp output
+	extern Real64 LEndMin; // Helps set minutes for timestamp output
+	extern bool EndTimeStepFlag; // True when it's the end of the Zone Time Step
 
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar

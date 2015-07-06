@@ -202,7 +202,13 @@ namespace OutputProcessor {
 
 	int MaxNumSubcategories( 1 );
 
+	// These were static variables within different functions. They were pulled out into the namespace 
+	// to facilitate easier unit testing of those functions.
 	int ReportNumberCounter( 0 ); // The report number is used in output reports as a key.
+	int LHourP( -1 ); // Helps set hours for timestamp output
+	Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
+	Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	bool EndTimeStepFlag( false ); // True when it's the end of the Zone Time Step
 
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
@@ -5527,10 +5533,6 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	Real64 MinuteNow; // What minute it is now
 	bool ReportNow; // True if this variable should be reported now
 	int CurDayType; // What kind of day it is (weekday (sunday, etc) or holiday)
-	static int LHourP( -1 ); // Helps set hours for timestamp output
-	static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
-	static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
-	static bool EndTimeStepFlag( false ); // True when it's the end of the Zone Time Step
 	Real64 rxTime; // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
 
 	IndexType = IndexTypeKey;
