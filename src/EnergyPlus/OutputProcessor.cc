@@ -2948,7 +2948,8 @@ namespace OutputProcessor {
 	ReportTSMeters(
 		Real64 const StartMinute, // Start Minute for TimeStep
 		Real64 const EndMinute, // End Minute for TimeStep
-		bool & PrintESOTimeStamp // True if the ESO Time Stamp also needs to be printed
+		bool & PrintESOTimeStamp, // True if the ESO Time Stamp also needs to be printed
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
 	)
 	{
 
@@ -3003,8 +3004,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( PrintESOTimeStamp && ! EnergyMeters( Loop ).RptTSFO && ! EnergyMeters( Loop ).RptAccTSFO ) {
@@ -3012,7 +3014,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintESOTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintESOTimeStamp = false;
 			}
 
@@ -3034,7 +3036,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportHRMeters()
+	ReportHRMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3087,8 +3091,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptHR ) {
@@ -3108,7 +3113,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportDYMeters()
+	ReportDYMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3157,8 +3164,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptDY ) {
@@ -3178,7 +3186,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportMNMeters()
+	ReportMNMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3222,8 +3232,9 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			if ( ! EnergyMeters( Loop ).RptMN && ! EnergyMeters( Loop ).RptAccMN ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month );
+				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptMN ) {
@@ -3243,7 +3254,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportSMMeters()
+	ReportSMMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3292,8 +3305,9 @@ namespace OutputProcessor {
 			EnergyMeters( Loop ).LastSMMaxValDate = EnergyMeters( Loop ).SMMaxValDate;
 			if ( ! EnergyMeters( Loop ).RptSM && ! EnergyMeters( Loop ).RptAccSM ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp );
+				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptSM ) {
@@ -3484,10 +3498,6 @@ namespace OutputProcessor {
 				break;
 			case 12:
 				monthName = "DEC";
-				break;
-			default:
-				assert( false );
-				monthName = "Should't get here!!";
 				break;
 		}
 
@@ -5512,7 +5522,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	Real64 CurVal; // Current value for real variables
 	Real64 ICurVal; // Current value for integer variables
 	int MDHM; // Month,Day,Hour,Minute
-	bool TimePrint; // True if the time needs to be printed
+	bool TimePrint( true ); // True if the time needs to be printed
 	Real64 StartMinute; // StartMinute for UpdateData call
 	Real64 MinuteNow; // What minute it is now
 	bool ReportNow; // True if this variable should be reported now
@@ -5778,7 +5788,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 		UpdateMeters( MDHM );
 
-		ReportTSMeters( StartMinute, TimeValue( 1 ).CurMinute, TimePrint );
+		ReportTSMeters( StartMinute, TimeValue( 1 ).CurMinute, TimePrint, TimePrint );
 
 	} // TimeStep Block
 
@@ -5790,6 +5800,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				CurDayType = 7 + HolidayIndex;
 			}
 			WriteTimeStampFormatData( eso_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			TimePrint = false;
 		}
 
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
@@ -5848,7 +5859,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // IndexType (Zone or HVAC)
 
-		ReportHRMeters();
+		ReportHRMeters( TimePrint );
 
 	} // Hour Block
 
@@ -5862,6 +5873,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				CurDayType = 7 + HolidayIndex;
 			}
 			WriteTimeStampFormatData( eso_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			TimePrint = false;
 		}
 		NumHoursInMonth += 24;
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) {
@@ -5880,7 +5892,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // Index type (Zone or HVAC)
 
-		ReportDYMeters();
+		ReportDYMeters( TimePrint );
 
 	} // Day Block
 
@@ -5891,6 +5903,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	if ( EndMonthFlag || EndEnvrnFlag ) {
 		if ( TrackingMonthlyVariables ) {
 			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, true, Month );
+			TimePrint = false;
 		}
 		NumHoursInSim += NumHoursInMonth;
 		EndMonthFlag = false;
@@ -5910,7 +5923,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // IndexType (Zone, HVAC)
 
-		ReportMNMeters();
+		ReportMNMeters( TimePrint );
 
 		NumHoursInMonth = 0;
 	} // Month Block
@@ -5919,6 +5932,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
 			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, true );
+			TimePrint = false;
 		}
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
@@ -5936,7 +5950,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // Index Type (Zone, HVAC)
 
-		ReportSMMeters();
+		ReportSMMeters( TimePrint );
 
 		NumHoursInSim = 0;
 	}

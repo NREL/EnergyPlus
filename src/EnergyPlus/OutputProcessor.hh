@@ -1095,20 +1095,29 @@ namespace OutputProcessor {
 	ReportTSMeters(
 		Real64 const StartMinute, // Start Minute for TimeStep
 		Real64 const EndMinute, // End Minute for TimeStep
-		bool & PrintESOTimeStamp // True if the ESO Time Stamp also needs to be printed
+		bool & PrintESOTimeStamp, // True if the ESO Time Stamp also needs to be printed
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
 	);
 
 	void
-	ReportHRMeters();
+	ReportHRMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
 
 	void
-	ReportDYMeters();
+	ReportDYMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
 
 	void
-	ReportMNMeters();
+	ReportMNMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
 
 	void
-	ReportSMMeters();
+	ReportSMMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
 
 	void
 	ReportForTabularReports();
