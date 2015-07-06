@@ -356,9 +356,9 @@ namespace HeatBalanceIntRadExchange {
 			Real64 * __restrict vecIRfromParentZone_Temp( &IRfromParentZone_Temp[ 0 ] );
 			__ep_assume_aligned(Real64 *, vecIRfromParentZone_Temp, 16);
 
-			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfaces; ++ZoneSurfNum ) {
-				NetLWRadToSurf_Temp[ ZoneSurfNum ] = 0.0;
-				IRfromParentZone_Temp[ ZoneSurfNum ] = 0.0;
+			for (int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfaces; ++ZoneSurfNum) {
+				vecNetLWRadToSurf_Temp[ZoneSurfNum] = 0.0;
+				vecIRfromParentZone_Temp[ZoneSurfNum] = 0.0;
 			} // ZoneSurfNum
 
 			// These are the money loops
@@ -522,8 +522,9 @@ namespace HeatBalanceIntRadExchange {
 
 			int Npad = (( NumOfZoneSurfaces + 1 ) >> 1 ) << 1;
 			ZoneInfo( ZoneNum ).ScriptF = new Real64[ NumOfZoneSurfaces * Npad ];
-			for (int i = 0; i < NumOfZoneSurfaces * Npad; ++i)
-				ZoneInfo( ZoneNum ).ScriptF[i] = 0.0;
+			for (int i = 0; i < NumOfZoneSurfaces * Npad; ++i) {
+				ZoneInfo(ZoneNum).ScriptF[i] = 0.0;
+			}
 
 			ZoneInfo( ZoneNum ).Area.dimension( NumOfZoneSurfaces, 0.0 );
 			ZoneInfo( ZoneNum ).Emissivity.dimension( NumOfZoneSurfaces, 0.0 );
