@@ -2077,6 +2077,8 @@ namespace VentilatedSlab {
 		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/sec]
 		int OutletNode; // air outlet node
 		int OutsideAirNode; // outside air node
+		int MixoutNode; // oa mixer outlet node
+		int ReturnAirNode; // return air node
 		Real64 QTotUnitOut; // total unit output [watts]
 		Real64 QUnitOut; // heating or sens. cooling provided by fan coil unit [watts]
 		Real64 LatentOutput; // Latent (moisture) add/removal rate, negative is dehumidification [kg/s]
@@ -2175,12 +2177,15 @@ namespace VentilatedSlab {
 		LatentOutput = 0.0;
 		MaxWaterFlow = 0.0;
 		MinWaterFlow = 0.0;
+		AirMassFlow = 0.0;
 		InletNode = VentSlab( Item ).ReturnAirNode;
 		OutletNode = VentSlab( Item ).RadInNode;
 		FanOutletNode = VentSlab( Item ).FanOutletNode;
 		ZoneAirInNode = VentSlab( Item ).ZoneAirInNode;
 		OutsideAirNode = VentSlab( Item ).OutsideAirNode;
 		AirRelNode = VentSlab( Item ).AirReliefNode;
+		MixoutNode = VentSlab( Item ).OAMixerOutNode;
+		ReturnAirNode = VentSlab( Item ).ReturnAirNode;
 		ZoneRadNum = VentSlab( Item ).ZonePtr;
 		RadSurfNum = VentSlab( Item ).NumOfSurfaces;
 		Tinlet = Node( InletNode ).Temp;
@@ -2229,7 +2234,16 @@ namespace VentilatedSlab {
 			Node( AirRelNode ).MassFlowRate = 0.0;
 			Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
 			Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
-			AirMassFlow = Node( FanOutletNode ).MassFlowRate;
+			Node( ReturnAirNode ).MassFlowRate = 0.0;
+			Node( ReturnAirNode ).MassFlowRateMaxAvail = 0.0;
+			Node( ReturnAirNode ).MassFlowRateMinAvail = 0.0;
+			Node( MixoutNode ).MassFlowRate = 0.0;
+			Node( MixoutNode ).MassFlowRateMaxAvail = 0.0;
+			Node( MixoutNode ).MassFlowRateMinAvail = 0.0;
+			Node( FanOutletNode ).MassFlowRate = 0.0;
+			Node( FanOutletNode ).MassFlowRateMaxAvail = 0.0;
+			Node( FanOutletNode ).MassFlowRateMinAvail = 0.0;
+			AirMassFlow = 0.0;
 			HCoilOn = false;
 
 			// Node condition
@@ -2702,12 +2716,12 @@ namespace VentilatedSlab {
 
 			CalcVentilatedSlabRadComps( Item, FirstHVACIteration );
 
-			AirMassFlow = Node( OutletNode ).MassFlowRate;
-			QUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( FanOutletNode ).HumRat ) - PsyHFnTdbW( Node( FanOutletNode ).Temp, Node( FanOutletNode ).HumRat ) );
+// redundant			QUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( FanOutletNode ).HumRat ) - PsyHFnTdbW( Node( FanOutletNode ).Temp, Node( FanOutletNode ).HumRat ) );
 
 		} // ...end of system ON/OFF IF-THEN block
 
 		// CR9155 Remove specific humidity calculations
+		AirMassFlow = Node( OutletNode ).MassFlowRate;
 		SpecHumOut = Node( OutletNode ).HumRat;
 		SpecHumIn = Node( FanOutletNode ).HumRat;
 		LatentOutput = AirMassFlow * ( SpecHumOut - SpecHumIn ); // Latent rate (kg/s), dehumid = negative
@@ -2716,6 +2730,16 @@ namespace VentilatedSlab {
 		// Limit sensible <= total when cooling (which is negative, so use max)
 		QUnitOut = max( QUnitOut, QTotUnitOut );
 
+		// Resimulate fans if AirMassFlow is zero and FanElecPower is > 0, indicating that load or condensation controls shut off the ventilated slab in CalcVentilatedSlabRadComps
+		if(( AirMassFlow <= 0.0 ) && ( FanElecPower > 0.0) ) {
+			Node( MixoutNode ).MassFlowRate = 0.0;
+			Node( MixoutNode ).MassFlowRateMaxAvail = 0.0;
+			Node( MixoutNode ).MassFlowRateMinAvail = 0.0;
+			Node( FanOutletNode ).MassFlowRate = 0.0;
+			Node( FanOutletNode ).MassFlowRateMaxAvail = 0.0;
+			Node( FanOutletNode ).MassFlowRateMinAvail = 0.0;
+			SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+		}
 		// Report variables...
 		VentSlab( Item ).HeatCoilPower = max( 0.0, QUnitOut );
 		VentSlab( Item ).SensCoolCoilPower = std::abs( min( 0.0, QUnitOut ) );
