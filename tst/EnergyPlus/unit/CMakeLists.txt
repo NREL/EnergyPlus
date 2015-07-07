@@ -41,6 +41,7 @@ set( test_src
   SQLite.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  VentilatedSlab.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
