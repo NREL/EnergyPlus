@@ -1442,8 +1442,8 @@ public: // MArray Generators
 public: // Comparison: Predicate
 
 	// Array2 == Array2
-	inline
 	friend
+	inline
 	bool
 	eq( Array2 const & a, Array2 const & b )
 	{
@@ -1453,8 +1453,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array2 != Array2
-	inline
 	friend
+	inline
 	bool
 	ne( Array2 const & a, Array2 const & b )
 	{
@@ -1462,8 +1462,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array2 < Array2
-	inline
 	friend
+	inline
 	bool
 	lt( Array2 const & a, Array2 const & b )
 	{
@@ -1473,8 +1473,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array2 <= Array2
-	inline
 	friend
+	inline
 	bool
 	le( Array2 const & a, Array2 const & b )
 	{
@@ -1484,8 +1484,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array2 > Array2
-	inline
 	friend
+	inline
 	bool
 	gt( Array2 const & a, Array2 const & b )
 	{
@@ -1493,8 +1493,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array2 >= Array2
-	inline
 	friend
+	inline
 	bool
 	ge( Array2 const & a, Array2 const & b )
 	{
@@ -1504,8 +1504,8 @@ public: // Comparison: Predicate
 public: // Comparison: Predicate: Any
 
 	// Array2 == Array2
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array2 const & a, Array2 const & b )
 	{
@@ -1515,8 +1515,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Array2 != Array2
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array2 const & a, Array2 const & b )
 	{
@@ -1524,8 +1524,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Array2 < Array2
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array2 const & a, Array2 const & b )
 	{
@@ -1535,8 +1535,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Array2 <= Array2
-	inline
 	friend
+	inline
 	bool
 	any_le( Array2 const & a, Array2 const & b )
 	{
@@ -1546,8 +1546,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Array2 > Array2
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array2 const & a, Array2 const & b )
 	{
@@ -1555,8 +1555,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Array2 >= Array2
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array2 const & a, Array2 const & b )
 	{
@@ -1566,8 +1566,8 @@ public: // Comparison: Predicate: Any
 public: // Comparison: Predicate: All
 
 	// Array2 == Array2
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array2 const & a, Array2 const & b )
 	{
@@ -1575,8 +1575,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// Array2 != Array2
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array2 const & a, Array2 const & b )
 	{
@@ -1584,8 +1584,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// Array2 < Array2
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array2 const & a, Array2 const & b )
 	{
@@ -1593,8 +1593,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// Array2 <= Array2
-	inline
 	friend
+	inline
 	bool
 	all_le( Array2 const & a, Array2 const & b )
 	{
@@ -1602,8 +1602,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// Array2 > Array2
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array2 const & a, Array2 const & b )
 	{
@@ -1611,8 +1611,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// Array2 >= Array2
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array2 const & a, Array2 const & b )
 	{
@@ -1622,8 +1622,8 @@ public: // Comparison: Predicate: All
 public: // Comparison: Count
 
 	// Array2 == Array2
-	inline
 	friend
+	inline
 	bool
 	count_eq( Array2 const & a, Array2 const & b )
 	{
@@ -1633,8 +1633,8 @@ public: // Comparison: Count
 	}
 
 	// Array2 != Array2
-	inline
 	friend
+	inline
 	bool
 	count_ne( Array2 const & a, Array2 const & b )
 	{
@@ -1644,8 +1644,8 @@ public: // Comparison: Count
 	}
 
 	// Array2 < Array2
-	inline
 	friend
+	inline
 	bool
 	count_lt( Array2 const & a, Array2 const & b )
 	{
@@ -1655,8 +1655,8 @@ public: // Comparison: Count
 	}
 
 	// Array2 <= Array2
-	inline
 	friend
+	inline
 	bool
 	count_le( Array2 const & a, Array2 const & b )
 	{
@@ -1666,8 +1666,8 @@ public: // Comparison: Count
 	}
 
 	// Array2 > Array2
-	inline
 	friend
+	inline
 	bool
 	count_gt( Array2 const & a, Array2 const & b )
 	{
@@ -1677,8 +1677,8 @@ public: // Comparison: Count
 	}
 
 	// Array2 >= Array2
-	inline
 	friend
+	inline
 	bool
 	count_ge( Array2 const & a, Array2 const & b )
 	{
@@ -1690,8 +1690,8 @@ public: // Comparison: Count
 public: // Comparison: Predicate: Slice
 
 	// Array2 == Array2S
-	inline
 	friend
+	inline
 	bool
 	eq( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1708,8 +1708,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2 != Array2S
-	inline
 	friend
+	inline
 	bool
 	ne( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1717,8 +1717,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2 < Array2S
-	inline
 	friend
+	inline
 	bool
 	lt( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1735,8 +1735,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2 <= Array2S
-	inline
 	friend
+	inline
 	bool
 	le( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1753,8 +1753,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2 > Array2S
-	inline
 	friend
+	inline
 	bool
 	gt( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1771,8 +1771,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2 >= Array2S
-	inline
 	friend
+	inline
 	bool
 	ge( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1789,8 +1789,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2S == Array2
-	inline
 	friend
+	inline
 	bool
 	eq( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1798,8 +1798,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2S != Array2
-	inline
 	friend
+	inline
 	bool
 	ne( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1807,8 +1807,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2S < Array2
-	inline
 	friend
+	inline
 	bool
 	lt( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1816,8 +1816,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2S <= Array2
-	inline
 	friend
+	inline
 	bool
 	le( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1825,8 +1825,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2S > Array2
-	inline
 	friend
+	inline
 	bool
 	gt( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1834,8 +1834,8 @@ public: // Comparison: Predicate: Slice
 	}
 
 	// Array2S >= Array2
-	inline
 	friend
+	inline
 	bool
 	ge( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1845,8 +1845,8 @@ public: // Comparison: Predicate: Slice
 public: // Comparison: Predicate: Any: Slice
 
 	// Any Array2 == Array2S
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1863,8 +1863,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2 != Array2S
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1872,8 +1872,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2 < Array2S
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1890,8 +1890,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2 <= Array2S
-	inline
 	friend
+	inline
 	bool
 	any_le( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1908,8 +1908,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2 > Array2S
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1926,8 +1926,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2 >= Array2S
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array2 const & a, Array2S< T > const & b )
 	{
@@ -1944,8 +1944,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2S == Array2
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1953,8 +1953,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2S != Array2
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1962,8 +1962,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2S < Array2
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1971,8 +1971,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2S <= Array2
-	inline
 	friend
+	inline
 	bool
 	any_le( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1980,8 +1980,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2S > Array2
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array2S< T > const & a, Array2 const & b )
 	{
@@ -1989,8 +1989,8 @@ public: // Comparison: Predicate: Any: Slice
 	}
 
 	// Any Array2S >= Array2
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2000,8 +2000,8 @@ public: // Comparison: Predicate: Any: Slice
 public: // Comparison: Predicate: All: Slice
 
 	// All Array2 == Array2S
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2009,8 +2009,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2 != Array2S
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2018,8 +2018,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2 < Array2S
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2027,8 +2027,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2 <= Array2S
-	inline
 	friend
+	inline
 	bool
 	all_le( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2036,8 +2036,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2 > Array2S
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2045,8 +2045,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2 >= Array2S
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2054,8 +2054,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2S == Array2
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2063,8 +2063,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2S != Array2
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2072,8 +2072,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2S < Array2
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2081,8 +2081,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2S <= Array2
-	inline
 	friend
+	inline
 	bool
 	all_le( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2090,8 +2090,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2S > Array2
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2099,8 +2099,8 @@ public: // Comparison: Predicate: All: Slice
 	}
 
 	// All Array2S >= Array2
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2110,8 +2110,8 @@ public: // Comparison: Predicate: All: Slice
 public: // Comparison: Count: Slice
 
 	// Count Array2 == Array2S
-	inline
 	friend
+	inline
 	size_type
 	count_eq( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2128,8 +2128,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2 != Array2S
-	inline
 	friend
+	inline
 	size_type
 	count_ne( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2146,8 +2146,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2 < Array2S
-	inline
 	friend
+	inline
 	size_type
 	count_lt( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2164,8 +2164,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2 <= Array2S
-	inline
 	friend
+	inline
 	size_type
 	count_le( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2182,8 +2182,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2 > Array2S
-	inline
 	friend
+	inline
 	size_type
 	count_gt( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2200,8 +2200,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2 >= Array2S
-	inline
 	friend
+	inline
 	size_type
 	count_ge( Array2 const & a, Array2S< T > const & b )
 	{
@@ -2218,8 +2218,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2S == Array2
-	inline
 	friend
+	inline
 	size_type
 	count_eq( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2227,8 +2227,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2S != Array2
-	inline
 	friend
+	inline
 	size_type
 	count_ne( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2236,8 +2236,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2S < Array2
-	inline
 	friend
+	inline
 	size_type
 	count_lt( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2245,8 +2245,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2S <= Array2
-	inline
 	friend
+	inline
 	size_type
 	count_le( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2254,8 +2254,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2S > Array2
-	inline
 	friend
+	inline
 	size_type
 	count_gt( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2263,8 +2263,8 @@ public: // Comparison: Count: Slice
 	}
 
 	// Count Array2S >= Array2
-	inline
 	friend
+	inline
 	size_type
 	count_ge( Array2S< T > const & a, Array2 const & b )
 	{
@@ -2275,8 +2275,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array2 == MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	eq( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2294,8 +2294,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array2 != MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	ne( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2304,8 +2304,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array2 < MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	lt( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2323,8 +2323,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array2 <= MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	le( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2342,8 +2342,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array2 > MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	gt( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2361,8 +2361,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array2 >= MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	ge( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2380,8 +2380,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray2 == Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	eq( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2390,8 +2390,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray2 != Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	ne( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2400,8 +2400,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray2 < Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	lt( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2410,8 +2410,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray2 <= Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	le( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2420,8 +2420,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray2 > Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	gt( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2430,8 +2430,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray2 >= Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	ge( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2442,8 +2442,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array2 == MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2461,8 +2461,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array2 != MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2471,8 +2471,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array2 < MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2491,8 +2491,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array2 <= MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_le( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2510,8 +2510,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array2 > MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2530,8 +2530,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array2 >= MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2549,8 +2549,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray2 == Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_eq( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2559,8 +2559,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray2 != Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_ne( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2569,8 +2569,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray2 < Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_lt( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2579,8 +2579,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray2 <= Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_le( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2589,8 +2589,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray2 > Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_gt( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2599,8 +2599,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray2 >= Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_ge( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2611,8 +2611,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array2 == MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2621,8 +2621,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array2 != MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2631,8 +2631,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array2 < MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2641,8 +2641,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array2 <= MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_le( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2651,8 +2651,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array2 > MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2661,8 +2661,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array2 >= MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2671,8 +2671,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray2 == Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_eq( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2681,8 +2681,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray2 != Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_ne( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2691,8 +2691,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray2 < Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_lt( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2701,8 +2701,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray2 <= Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_le( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2711,8 +2711,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray2 > Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_gt( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2721,8 +2721,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray2 >= Array2
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_ge( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2733,8 +2733,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array2 == MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_eq( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2752,8 +2752,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array2 != MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_ne( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2771,8 +2771,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array2 < MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_lt( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2790,8 +2790,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array2 <= MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_le( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2809,8 +2809,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array2 > MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_gt( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2828,8 +2828,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array2 >= MArray2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_ge( Array2 const & a, MArray2< A, T > const & b )
 	{
@@ -2847,8 +2847,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray2 == Array2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_eq( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2857,8 +2857,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray2 != Array2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_ne( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2867,8 +2867,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray2 < Array2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_lt( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2877,8 +2877,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray2 <= Array2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_le( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2887,8 +2887,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray2 > Array2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_gt( MArray2< A, T > const & a, Array2 const & b )
 	{
@@ -2897,8 +2897,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray2 >= Array2
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_ge( MArray2< A, T > const & a, Array2 const & b )
 	{

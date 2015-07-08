@@ -1,4 +1,6 @@
-! RefBldgMediumOfficeNew2004_Chicago.idf
+! Fault_ThermostatOffset_RefBldgMediumOfficeNew2004_Chicago.idf
+!
+! Highlights:  Illustrates modeling of thermostat offset fault  
 !
 ! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
 !
