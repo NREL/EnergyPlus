@@ -154,6 +154,11 @@ namespace DataEnvironment {
 
 	// Functions
 
+	// Clears the global data in DataEnvironment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	Real64
 	OutDryBulbTempAt( Real64 const Z ); // Height above ground (m)
 

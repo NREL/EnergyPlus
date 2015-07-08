@@ -27,7 +27,7 @@ namespace EnergyPlus {
 		}
 
 		void use_cached_idd() {
-			EnergyPlusFixture::m_idd_cache->fill_InputProcessor_global_data();
+			EnergyPlusFixture::m_idd_cache->use_cache();
 		}
 
 		bool process_idd( std::string const & idd, bool & errors_found ) {

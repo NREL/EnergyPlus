@@ -204,6 +204,8 @@ namespace OutputProcessor {
 
 	// These were static variables within different functions. They were pulled out into the namespace 
 	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of OutputProcessor should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	int ReportNumberCounter( 0 ); // The report number is used in output reports as a key.
 	int LHourP( -1 ); // Helps set hours for timestamp output
 	Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
@@ -251,6 +253,78 @@ namespace OutputProcessor {
 	//  UpdateMeterReporting
 
 	// Functions
+
+	// Clears the global data in OutputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		InstMeterCacheSize = 1000;
+		InstMeterCacheSizeInc = 1000;
+		InstMeterCache.deallocate();
+		InstMeterCacheLastUsed = 0;
+		CurrentReportNumber = 0;
+		NumVariablesForOutput = 0;
+		MaxVariablesForOutput = 0;
+		NumOfRVariable_Setup = 0;
+		NumTotalRVariable = 0;
+		NumOfRVariable_Sum = 0;
+		NumOfRVariable_Meter = 0;
+		NumOfRVariable = 0;
+		MaxRVariable = 0;
+		NumOfIVariable_Setup = 0;
+		NumTotalIVariable = 0;
+		NumOfIVariable_Sum = 0;
+		NumOfIVariable = 0;
+		MaxIVariable = 0;
+		OutputInitialized = false;
+		ProduceReportVDD = ReportVDD_No;
+		OutputFileMeterDetails = 0;
+		NumHoursInDay = 24;
+		NumHoursInMonth = 0;
+		NumHoursInSim = 0;
+		ReportList.deallocate();
+		NumReportList = 0;
+		NumExtraVars = 0;
+		FreqNotice.deallocate();
+		NumOfReqVariables = 0;
+		NumVarMeterArrays = 0;
+		NumEnergyMeters = 0;
+		MeterValue.deallocate();
+		TimeStepStampReportNbr = 0;
+		TimeStepStampReportChr = "";
+		TrackingHourlyVariables = false;
+		DailyStampReportNbr = 0;
+		DailyStampReportChr = "";
+		TrackingDailyVariables = false;
+		MonthlyStampReportNbr = 0;
+		MonthlyStampReportChr = "";
+		TrackingMonthlyVariables = false;
+		RunPeriodStampReportNbr = 0;
+		RunPeriodStampReportChr = "";
+		TrackingRunPeriodVariables = false;
+		TimeStepZoneSec = 0;
+		ErrorsLogged = false;
+		ProduceVariableDictionary = false;
+		MaxNumSubcategories = 1;
+		ReportNumberCounter = 0;
+		LHourP = -1;
+		LStartMin = -1.0;
+		LEndMin = -1.0;
+		EndTimeStepFlag = false;
+		TimeValue.deallocate();
+		RVariableTypes.deallocate();
+		IVariableTypes.deallocate();
+		DDVariableTypes.deallocate();
+		RVariable.deallocate();
+		IVariable.deallocate();
+		RVar.deallocate();
+		IVar.deallocate();
+		ReqRepVars.deallocate();
+		VarMeterArrays.deallocate();
+		EnergyMeters.deallocate();
+		EndUseCategory.deallocate();
+	}
 
 	void
 	InitializeOutput()
@@ -5533,6 +5607,11 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	Real64 MinuteNow; // What minute it is now
 	bool ReportNow; // True if this variable should be reported now
 	int CurDayType; // What kind of day it is (weekday (sunday, etc) or holiday)
+	// pulled out into namespace
+	// static int LHourP( -1 ); // Helps set hours for timestamp output
+	// static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
+	// static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	// static bool EndTimeStepFlag( false ); // True when it's the end of the Zone Time Step
 	Real64 rxTime; // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
 
 	IndexType = IndexTypeKey;
@@ -5995,6 +6074,8 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
+	// pulled into namespace
+	// static int ReportNumberCounter( 0 );
 
 	++ReportNumberCounter;
 	ReportNumber = ReportNumberCounter;
