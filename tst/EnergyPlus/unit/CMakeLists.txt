@@ -10,6 +10,7 @@ set( test_src
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DXCoils.unit.cc
+  EnergyPlusFixture.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   Fans.unit.cc

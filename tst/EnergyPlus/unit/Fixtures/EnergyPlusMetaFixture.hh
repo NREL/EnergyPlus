@@ -1,5 +1,5 @@
-#ifndef InputProcessorFixture_hh_INCLUDED
-#define InputProcessorFixture_hh_INCLUDED
+#ifndef EnergyPlusMetaFixture_hh_INCLUDED
+#define EnergyPlusMetaFixture_hh_INCLUDED
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -9,7 +9,7 @@
 
 namespace EnergyPlus {
 
-	class InputProcessorFixture : public EnergyPlusFixture
+	class EnergyPlusMetaFixture : public EnergyPlusFixture
 	{
 	protected:
 		static void SetUpTestCase() {
@@ -29,9 +29,13 @@ namespace EnergyPlus {
 		void use_cached_idd() {
 			EnergyPlusFixture::m_idd_cache->fill_InputProcessor_global_data();
 		}
+
+		bool process_idd( std::string const & idd, bool & errors_found ) {
+			return EnergyPlusFixture::process_idd( idd, errors_found );
+		}
 	};
 
-	typedef InputProcessorFixture InputProcessorDeathTestFixture;
+	typedef EnergyPlusMetaFixture EnergyPlusMetaDeathTestFixture;
 }
 
 #endif
