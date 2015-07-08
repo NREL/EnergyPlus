@@ -17,11 +17,12 @@
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
-
 #include <EnergyPlus/InputProcessor.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -33,10 +34,11 @@ using namespace EnergyPlus::ReportSizingManager;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataHVACGlobals;
-
 using namespace EnergyPlus::InputProcessor;
-using namespace EnergyPlus::DataIPShortCuts;
 using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::CurveManager;
+using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::NodeInputManager;
 
 TEST( GasFiredHumidifierTest, Sizing ) {
 	ShowMessage( "Begin Test: GasFiredHumidifierTest, Sizing" );
@@ -188,8 +190,8 @@ TEST( GasFiredHumidifierTest, EnergyUse ) {
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 }
-TEST( Humidifiers, GetGasHumidifierInput ) {
-	ShowMessage( "Begin Test: Humidifiers, GetGasHumidifierInput" );
+TEST( GasFiredHumidifierTest, GetHumidifierInput ) {
+	ShowMessage( "Begin Test: GasFiredHumidifierTest, GetHumidifierInput" );
 
 	// Test get input for gas fired humidifier object
 	//Humidifier:Steam:Gas,
@@ -205,11 +207,10 @@ TEST( Humidifiers, GetGasHumidifierInput ) {
 	//  Main Humidifier Outlet Node,  !- Air Outlet Node Name
 	//  ;                        !- Water Storage Tank Name
 
-	bool ErrorsFound( false ); // If errors detected in input
 	int NumGasSteamHums( 1 ); // Zone number
-	int NumAlphas( 7 );
-	int NumNumbers( 5 );
-
+	int NumAlphas;
+	int NumNumbers;
+	int CurveNum;
 
 	NumAlphas = 7;
 	NumNumbers = 5;
@@ -220,6 +221,7 @@ TEST( Humidifiers, GetGasHumidifierInput ) {
 	ListOfObjects( 1 ) = "HUMIDIFIER:STEAM:GAS";
 	iListOfObjects.allocate( NumObjectDefs );
 	iListOfObjects( 1 ) = 1;
+
 	ObjectStartRecord.allocate( NumObjectDefs );
 	ObjectStartRecord( 1 ) = 1;
 	ObjectGotCount.allocate( NumObjectDefs );
@@ -227,15 +229,15 @@ TEST( Humidifiers, GetGasHumidifierInput ) {
 	IDFRecordsGotten( NumObjectDefs ) = false;
 	ObjectDef.allocate( NumObjectDefs );
 	ObjectDef( 1 ).NumFound = 1;
-	ObjectDef( 1 ).NumParams = 7;
-	ObjectDef( 1 ).NumAlpha = 7;
-	ObjectDef( 1 ).NumNumeric = 5;
+	ObjectDef( 1 ).NumParams = NumAlphas + NumNumbers;
+	ObjectDef( 1 ).NumAlpha = NumAlphas;
+	ObjectDef( 1 ).NumNumeric = NumNumbers;
 	ObjectDef( 1 ).AlphFieldChks.allocate( NumAlphas );
 	ObjectDef( 1 ).AlphFieldChks = " ";
 	ObjectDef( 1 ).NumRangeChks.allocate( NumNumbers );
 
 	NumIDFRecords = 1;
-	IDFRecords.allocate( NumIDFRecords );
+	IDFRecords.allocate( 1 );
 	IDFRecords( 1 ).Name = ListOfObjects( 1 );
 	IDFRecords( 1 ).NumNumbers = NumNumbers;
 	IDFRecords( 1 ).NumAlphas = NumAlphas;
@@ -265,23 +267,62 @@ TEST( Humidifiers, GetGasHumidifierInput ) {
 	IDFRecords( 1 ).NumBlank.allocate( NumNumbers );
 	IDFRecords( 1 ).NumBlank = false;
 
-	MaxAlphaArgsFound = NumAlphas;
-	MaxNumericArgsFound = NumNumbers;
+	// the following array size allocation is done only once every simulation in
+	// GetObjectItem function in InputProcessor module.
+	// AlphaArgs.allocate( MaxAlphaArgsFound );
+	// NumberArgs.allocate( MaxNumericArgsFound );
+	// thus maximum array size is already fixed by unit tests (HeatBalanceManager.unit.cc)
+	// that use these variables and called prior to this unit test. This initialization is 
+	// used only if want to run this unit test individually, or some changes the calling 
+	// sequence of the unit test.
+	MaxAlphaArgsFound = 20;
+	MaxNumericArgsFound = 20;
 
-	// GetOnlySingleNode requires that the IDD object definition for NodeList is present, so populate it here
+	// GetOnlySingleNode requires that the IDD object definition
 	ListOfObjects( 2 ) = "NodeList";
 	iListOfObjects( 2 ) = 2;
 	ObjectDef( 2 ).NumParams = 2;
 	ObjectDef( 2 ).NumAlpha = 2;
 	ObjectDef( 2 ).NumNumeric = 0;
 
+	CurveNum = 1;
+	CurveManager::NumCurves = 1; 
+	CurveManager::GetCurvesInputFlag = false;
+	NodeInputManager::GetNodeInputFlag = false;
+	PerfCurve.allocate( CurveNum );
+	PerfCurve( CurveNum ).Name = "ThermalEfficiencyFPLR";
+	PerfCurve( CurveNum ).CurveType = CurveManager::Quadratic;
+	PerfCurve( CurveNum ).ObjectType = CurveType_Quadratic;
+	PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
+	PerfCurve( CurveNum ).Coeff1 = 0.9375;
+	PerfCurve( CurveNum ).Coeff2 = 0.0625;
+	PerfCurve( CurveNum ).Coeff3 = -7.0E-15;
+	PerfCurve( CurveNum ).Coeff4 = 0.0;
+	PerfCurve( CurveNum ).Coeff5 = 0.0;
+	PerfCurve( CurveNum ).Coeff6 = 0.0;
+	PerfCurve( CurveNum ).Var1Min = 0.0;
+	PerfCurve( CurveNum ).Var1Max = 1.2;
+	PerfCurve( CurveNum ).Var2Min = 0.7;
+	PerfCurve( CurveNum ).Var2Max = 1.0;
+
 	// call to get valid window material types
-	ErrorsFound = false;
 	GetHumidifierInput(); // 
 	EXPECT_EQ( 1, Humidifier( 1 ).EfficiencyCurvePtr );
 
+	// clear varaibles
+	NumIDFRecords = 0;
+	NumObjectDefs = 0;
+	NumGasSteamHums = 0;
+	NumCurves = 0;
+	MaxAlphaArgsFound = 0;
+	MaxNumericArgsFound = 0;
+	CurveManager::GetCurvesInputFlag = true;
+	NodeInputManager::GetNodeInputFlag = true;
+	NodeInputManager::NumOfUniqueNodeNames = 0;
+
 	// deallocate variables
 	Humidifier.deallocate();
+	ListOfObjects.deallocate();
 	iListOfObjects.deallocate();
 	ObjectStartRecord.deallocate();
 	ObjectGotCount.deallocate();
@@ -294,11 +335,80 @@ TEST( Humidifiers, GetGasHumidifierInput ) {
 	IDFRecords( 1 ).Numbers.deallocate();
 	IDFRecords( 1 ).NumBlank.deallocate();
 	IDFRecords.deallocate();
+	PerfCurve.deallocate();
 
-	//lNumericBlanks.deallocate();
-	//lAlphaBlanks.deallocate();
-	//cAlphaFields.deallocate();
-	//cNumericFields.deallocate();
-	//Alphas.deallocate();
-	//Numbers.deallocate();
+}
+TEST( GasFiredHumidifierTest, ThermalEfficiency ) {
+	ShowMessage( "Begin Test: GasFiredHumidifierTest, ThermalEfficiency" );
+
+	// tests thermal efficiency modifier curve use
+
+	HumidifierData thisHum;
+	int CurveNum;
+
+	TimeStepSys = 0.25;
+	SysSizingRunDone = true;
+	CurSysNum = 1;
+
+	NumElecSteamHums = 0;
+	NumGasSteamHums = 1;
+	NumHumidifiers = 1;
+	Humidifier.allocate( NumGasSteamHums );
+	thisHum.HumType_Code = 2;
+	thisHum.NomCapVol = 4.00E-5;
+	thisHum.NomCap = 4.00E-2;
+	thisHum.NomPower = 103720.0;
+	thisHum.ThermalEffRated = 0.80;
+	thisHum.FanPower = 0.0;
+	thisHum.StandbyPower = 0.0;
+	thisHum.SchedPtr = ScheduleAlwaysOn;
+	thisHum.SchedPtr = ScheduleAlwaysOn;
+
+	FinalSysSizing.allocate( CurSysNum );
+	FinalSysSizing( CurSysNum ).MixTempAtCoolPeak = 20.0;
+	FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak = 0.00089;
+	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.60894;
+	FinalSysSizing( CurSysNum ).HeatMixHumRat = 0.05;
+	FinalSysSizing( CurSysNum ).CoolSupHumRat = 0.07;
+	FinalSysSizing( CurSysNum ).HeatSupHumRat = 0.10;
+
+	// calculate gas use rate and energy at full load
+	thisHum.AirInMassFlowRate = 1.8919;
+	thisHum.AirInTemp = 20.0;
+	thisHum.AirInEnthalpy = 25000.0;
+	thisHum.InletWaterTempOption = 1;
+	thisHum.CurMakeupWaterTemp = 20.0;
+	OutBaroPress = 101325.0;
+
+	InitializePsychRoutines();
+
+	CurveNum = 1;
+	thisHum.EfficiencyCurvePtr = 1;
+	thisHum.EfficiencyCurveType = 2;
+	CurveManager::NumCurves = 1;
+	CurveManager::GetCurvesInputFlag = false;
+	PerfCurve.allocate( CurveNum );
+	PerfCurve( CurveNum ).Name = "ThermalEfficiencyFPLR";
+	PerfCurve( CurveNum ).CurveType = CurveManager::Quadratic;
+	PerfCurve( CurveNum ).ObjectType = CurveType_Quadratic;
+	PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
+	PerfCurve( CurveNum ).Coeff1 = 0.9375;
+	PerfCurve( CurveNum ).Coeff2 = 0.0625;
+	PerfCurve( CurveNum ).Coeff3 =-7.0E-15;
+	PerfCurve( CurveNum ).Coeff4 = 0.0;
+	PerfCurve( CurveNum ).Coeff5 = 0.0;
+	PerfCurve( CurveNum ).Coeff6 = 0.0;
+	PerfCurve( CurveNum ).Var1Min = 0.0;
+	PerfCurve( CurveNum ).Var1Max = 1.2;
+	PerfCurve( CurveNum ).Var2Min = 0.7;
+	PerfCurve( CurveNum ).Var2Max = 1.0;
+
+	thisHum.CalcGasSteamHumidifier( 0.030 );
+	EXPECT_NEAR( 0.7875, thisHum.ThermalEff, 0.001 );
+
+	// clean up
+	CurveManager::GetCurvesInputFlag = true;
+	FinalSysSizing.deallocate();
+	Humidifier.deallocate();
+	PerfCurve.deallocate();
 }

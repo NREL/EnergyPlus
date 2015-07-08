@@ -62,7 +62,6 @@ TEST( ProcessOAControllerTest, Test1 )
 	ObjectDef( 1 ).NumAlpha = 4;
 	ObjectDef( 1 ).NumNumeric = 0;
 
-
 	// Set up Controller input objects
 	lNumericFieldBlanks.allocate ( NumNumbers );
 	lAlphaFieldBlanks.allocate( NumAlphas );
@@ -140,6 +139,9 @@ TEST( ProcessOAControllerTest, Test1 )
 	EXPECT_FALSE( ErrorsFound );
 	EXPECT_EQ( 4, OAController( 2 ).OANode );
 	EXPECT_FALSE( CheckOutAirNodeNumber( OAController( 2 ).OANode ) );
+
+	// clean variables
+	NumObjectDefs = 0;
 
 	// Clean up
 	OAController.deallocate();
