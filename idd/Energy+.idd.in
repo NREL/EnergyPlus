@@ -786,6 +786,7 @@ ConvergenceLimits,
 
 ProgramControl,
        \memo used to support various efforts in time reduction for simulation including threading
+       \memo This object is currently disabled.
   N1 ; \field Number of Threads Allowed
        \type integer
        \minimum 0
