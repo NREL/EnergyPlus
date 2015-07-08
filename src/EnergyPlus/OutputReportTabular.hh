@@ -863,6 +863,12 @@ namespace OutputReportTabular {
 	void
 	WriteBEPSTable();
 
+	std::string
+	ResourceWarningMessage(std::string resource);
+
+	Real64
+	WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
+
 	void
 	WriteSourceEnergyEndUseSummary();
 
