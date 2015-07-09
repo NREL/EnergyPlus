@@ -25,6 +25,7 @@ namespace EnergyPlus {
 	class EnergyPlusFixture : public testing::Test
 	{
 	private:
+		// friend classes for unit testing and forward declarations
 		friend class IdfParserFixture;
 		struct RedirectCout;
 		struct RedirectCerr;
@@ -115,7 +116,7 @@ namespace EnergyPlus {
 			auto actual = actual_container.begin();
 			for ( ; expected != expected_container.end(); ++expected, ++actual ) {
 				// This may fail due to floating point issues for float and double...
-				EXPECT_EQ( *expected, *actual );
+				EXPECT_EQ( *expected, *actual ) << "Incorrect index: " << ( expected - expected_container.begin() );
 				is_valid = ( *expected == *actual );
 			}
 			return is_valid;
@@ -206,51 +207,17 @@ namespace EnergyPlus {
 			return this->m_cerr_buffer->str().size() > 0;
 		}
 
-		int check_for_object( std::string const & object_name, std::string const & idf_snippet ) {
-			auto idf_size = idf_snippet.size();
-			auto object_size = object_name.size();
-			if ( object_name.empty() ) return 0;
-			size_t index = 0;
-			int object_count = 0;
-
-			while ( index < idf_size )
-			{
-				if ( toupper( idf_snippet[ index ] ) == toupper( object_name[ 0 ] ) && ( index + object_size < idf_size ) ) {
-					bool is_valid = true;
-					for ( size_t i = 0; i < object_size; i++ ) {
-						if ( toupper( idf_snippet[ i + index ] ) != toupper( object_name[ i ] ) ) {
-							index += i;
-							is_valid = false;
-							break;
-						}
-					}
-					if ( is_valid ) {
-						index += object_size;
-						for ( ; index < idf_size; index++ ) {
-							if ( idf_snippet[ index ] == ' ' ) {
-								continue;
-							} else if ( idf_snippet[ index ] == ',' ) {
-								object_count++;
-								break;
-							} else {
-								break;
-							}
-						}
-					}
-				}
-				++index;
-			}
-
-			return object_count;
-		}
-
+		// This function processes an idf snippet and defaults to using the idd cache for the fixture.
+		// The cache should be used for nearly all calls to this function.
+		// This more or less replicates InputProcessor::ProcessInput() but in a more usable fashion for unit testing
 		bool process_idf( std::string const & idf_snippet, bool use_idd_cache = true ) {
 			using namespace InputProcessor;
 
-			std::string idf = idf_snippet;
-
+			// Parse idf snippet to look for Building and GlobalGeometryRules. If not present then this adds a default implementation
+			// otherwise it will use the objects in the snippet. This is done because there is a check for required objects.
+			// Right now, IdfParser::decode returns a very naive data structure for objects but it works for this purpose.
 			IdfParser parser;
-			bool success = true;
+			bool success = false;
 			auto const parsed_idf = parser.decode( idf_snippet, success );
 			EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
 			bool found_building = false;
@@ -268,6 +235,7 @@ namespace EnergyPlus {
 					}
 				}
 			}
+			std::string idf = idf_snippet;
 			if ( ! found_building ) {
 				idf += "Building, Bldg, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;" + DataStringGlobals::NL;
 			}
@@ -404,6 +372,9 @@ namespace EnergyPlus {
 			return errors_found;
 		}
 
+		// This is a helper function to easily compare an expected IDF data structure with the actual IDFRecords data structure
+		// Usage (assuming "Version,8.3;" was parsed as an idf snippet):
+		// 		EXPECT_FALSE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
 		bool compare_idf( 
 			std::string const & name, 
 			int const num_alphas, 
@@ -449,6 +420,10 @@ namespace EnergyPlus {
 		std::unique_ptr< RedirectCerr > m_redirect_cerr;
 		static std::unique_ptr< InputProcessorCache > m_idd_cache;
 
+		// Private function to process the Energy+.idd
+		// This will always grab the Energy+.idd that is part of the Products folder
+		// This function should be called by process_idf() so unit tests can take advantage of caching
+		// If IDD specific unit testing is required using this specific function, EnergyPlusMetaFixture can call this function.
 		static bool process_idd( std::string const & idd, bool & errors_found ) {
 			using namespace InputProcessor;
 
@@ -513,14 +488,14 @@ namespace EnergyPlus {
 				if ( idf.empty() ) return std::vector< std::vector< std::string > >();
 
 				size_t index = 0;
-				return parse_array( idf, index, success );
+				return parse_idf( idf, index, success );
 			}
 
 		private:
 			friend class IdfParserFixture;
 			enum Token : size_t { NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5 };
 
-			std::vector< std::vector< std::string > > parse_array( std::string const & idf, size_t & index, bool & success )
+			std::vector< std::vector< std::string > > parse_idf( std::string const & idf, size_t & index, bool & success )
 			{
 				std::vector< std::vector< std::string > > obj;
 				Token token;
@@ -580,10 +555,8 @@ namespace EnergyPlus {
 				switch ( look_ahead( idf, index ) ) {
 					case Token::STRING:
 						return parse_string( idf, index, success );
-					case Token::NONE:
-						break;
-					// done to silence compiler warning
-					default:
+					case Token::NONE: case Token::END: case Token::EXCLAMATION: 
+					case Token::COMMA: case Token::SEMICOLON:
 						break;
 				}
 
@@ -739,6 +712,9 @@ namespace EnergyPlus {
 				std::unique_ptr<std::streambuf> m_old_buffer;
 		};
 
+		// struct to implement the caching of InputProcessor namespace variables
+		// This reads all the variables in the InputProcessor namespace in the constructor and stores them in member variables.
+		// Then when use_cache() is called, it copies the member variables into the InputProcessor namespace variables.
 		struct InputProcessorCache {
 			InputProcessorCache()
 			{

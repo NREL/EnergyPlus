@@ -55,9 +55,9 @@ namespace EnergyPlus {
 			return parser.next_token( idf, index );
 		}
 
-		std::vector< std::vector< std::string > > parse_array( std::string const & idf, size_t & index, bool & success ) {
+		std::vector< std::vector< std::string > > parse_idf( std::string const & idf, size_t & index, bool & success ) {
 			IdfParser parser;
-			return parser.parse_array( idf, index, success );
+			return parser.parse_idf( idf, index, success );
 		}
 
 		std::vector< std::string > parse_object( std::string const & idf, size_t & index, bool & success ) {
