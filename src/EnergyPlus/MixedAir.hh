@@ -290,8 +290,8 @@ namespace MixedAir {
 			EMSOverrideOARate( false ),
 			EMSOARateValue( 0.0 ),
 			HeatRecoveryBypassControlType( BypassWhenWithinEconomizerLimits ),
-			ManageDemand(false),
-			DemandLimitFlowRate(0.0)
+			ManageDemand( false ),
+			DemandLimitFlowRate( 0.0 )
 		{}
 
 		// Member Constructor
@@ -421,8 +421,8 @@ namespace MixedAir {
 			EMSOverrideOARate( EMSOverrideOARate ),
 			EMSOARateValue( EMSOARateValue ),
 			HeatRecoveryBypassControlType( HeatRecoveryBypassControlType ),
-			ManageDemand(ManageDemand),
-			DemandLimitFlowRate(DemandLimitFlowRate)
+			ManageDemand( ManageDemand ),
+			DemandLimitFlowRate( DemandLimitFlowRate )
 		{}
 
 	};

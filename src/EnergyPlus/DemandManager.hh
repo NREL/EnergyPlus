@@ -193,8 +193,8 @@ namespace DemandManager {
 			LowerLimit( 0.0 ),
 			UpperLimit( 0.0 ),
 			NumOfLoads( 0 ),
-			FixedRate(0),
-			ReductionRatio(0)
+			FixedRate( 0.0 ),
+			ReductionRatio( 0.0 )
 		{}
 
 		// Member Constructor
@@ -240,8 +240,8 @@ namespace DemandManager {
 			UpperLimit( UpperLimit ),
 			NumOfLoads( NumOfLoads ),
 			Load( Load ),
-			FixedRate(FixedRate),
-			ReductionRatio(ReductionRatio)
+			FixedRate( FixedRate ),
+			ReductionRatio( ReductionRatio )
 		{}
 
 	};

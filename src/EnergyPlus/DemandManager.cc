@@ -285,7 +285,7 @@ namespace DemandManager {
 								ResimHB = true;
 								ResimHVAC = true;
 
-							} else if ((SELECT_CASE_var1 == ManagerTypeThermostats) || (SELECT_CASE_var1 == ManagerTypeVentilation)) {
+							} else if ( ( SELECT_CASE_var1 == ManagerTypeThermostats ) || ( SELECT_CASE_var1 == ManagerTypeVentilation ) ) {
 								ResimHVAC = true;
 
 							}}
@@ -314,7 +314,7 @@ namespace DemandManager {
 								ResimHVAC = true;
 
 							}
-							else if ((SELECT_CASE_var1 == ManagerTypeThermostats) || (SELECT_CASE_var1 == ManagerTypeVentilation)) {
+							else if ( ( SELECT_CASE_var1 == ManagerTypeThermostats ) || ( SELECT_CASE_var1 == ManagerTypeVentilation ) ) {
 								ResimHVAC = true;
 
 							}}
@@ -639,11 +639,11 @@ namespace DemandManager {
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:Ventilation";
-		NumDemandMgrVentilation = GetNumObjectsFound(CurrentModuleObject);
-		if (NumDemandMgrVentilation > 0) {
-			GetObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
-			MaxAlphas = max(MaxAlphas, NumAlphas);
-			MaxNums = max(MaxNums, NumNums);
+		NumDemandMgrVentilation = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumDemandMgrVentilation > 0 ) {
+			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			MaxAlphas = max( MaxAlphas, NumAlphas );
+			MaxNums = max( MaxNums, NumNums );
 		}
 
 		NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats + NumDemandMgrVentilation;
@@ -703,7 +703,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
 				DemandMgr( MgrNum ).LowerLimit = NumArray( 2 );
 
@@ -724,7 +727,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
+				if ( NumArray( 4 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
 
 				DemandMgr( MgrNum ).NumOfLoads = NumAlphas - 4;
 
@@ -743,6 +749,12 @@ namespace DemandManager {
 
 						}
 					} // LoadNum
+				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
 				}
 
 			} // MgrNum
@@ -796,7 +808,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
 				DemandMgr( MgrNum ).LowerLimit = NumArray( 2 );
 
@@ -817,7 +832,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
+				if ( NumArray( 4 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
 
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
@@ -856,6 +874,12 @@ namespace DemandManager {
 							}
 						}
 					} // LoadNum
+				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
 				}
 
 			} // MgrNum
@@ -909,7 +933,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
 				DemandMgr( MgrNum ).LowerLimit = NumArray( 2 );
 
@@ -930,7 +957,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
+				if ( NumArray( 4 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
 
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
@@ -969,6 +999,12 @@ namespace DemandManager {
 							}
 						}
 					} // LoadNum
+				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
 				}
 
 			} // MgrNum
@@ -1022,7 +1058,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
 				DemandMgr( MgrNum ).LowerLimit = NumArray( 2 );
 				DemandMgr( MgrNum ).UpperLimit = NumArray( 3 );
@@ -1051,7 +1090,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).RotationDuration = NumArray( 5 );
+				if ( NumArray( 5 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 5 );
 
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
@@ -1089,6 +1131,12 @@ namespace DemandManager {
 						}
 					} // LoadNum
 				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
+				}
 
 			} // MgrNum
 
@@ -1098,107 +1146,121 @@ namespace DemandManager {
 
 			CurrentModuleObject = "DemandManager:Ventilation";
 
-			for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
+			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				GetObjectItem(CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+				GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName(AlphArray(1), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name");
-				if (IsNotOK) {
+				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
 					ErrorsFound = true;
-					if (IsBlank) AlphArray(1) = "xxxxx";
+					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 				}
-				DemandMgr(MgrNum).Name = AlphArray(1);
+				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
-				DemandMgr(MgrNum).Type = ManagerTypeVentilation;
+				DemandMgr( MgrNum ).Type = ManagerTypeVentilation;
 
-				if (!lAlphaFieldBlanks(2)) {
-					DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
+				if ( !lAlphaFieldBlanks( 2 ) ) {
+					DemandMgr( MgrNum ).AvailSchedule = GetScheduleIndex( AlphArray( 2 ) );
 
-					if (DemandMgr(MgrNum).AvailSchedule == 0) {
-						ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
+					if ( DemandMgr( MgrNum ).AvailSchedule == 0 ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				}
 				else {
-					DemandMgr(MgrNum).AvailSchedule = ScheduleAlwaysOn;
+					DemandMgr( MgrNum ).AvailSchedule = ScheduleAlwaysOn;
 				}
 
 				// Validate Limiting Control
-				{ auto const SELECT_CASE_var(AlphArray(3));
-				if (SELECT_CASE_var == "OFF") {
-					DemandMgr(MgrNum).LimitControl = ManagerLimitOff;
+				{ auto const SELECT_CASE_var( AlphArray( 3 ) );
+				if ( SELECT_CASE_var == "OFF" ) {
+					DemandMgr( MgrNum ).LimitControl = ManagerLimitOff;
 
 				}
-				else if (SELECT_CASE_var == "FIXEDRATE") {
-					DemandMgr(MgrNum).LimitControl = ManagerLimitFixed;
+				else if ( SELECT_CASE_var == "FIXEDRATE" ) {
+					DemandMgr( MgrNum ).LimitControl = ManagerLimitFixed;
 
 				}
-				else if (SELECT_CASE_var == "REDUCTIONRATIO") {
-					DemandMgr(MgrNum).LimitControl = ManagerLimitReductionRatio;
+				else if ( SELECT_CASE_var == "REDUCTIONRATIO" ) {
+					DemandMgr( MgrNum ).LimitControl = ManagerLimitReductionRatio;
 
 				}
 				else {
-					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-					ShowContinueError("...value must be one of Off, Fixed, or Variable.");
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
+					ShowContinueError( "...value must be one of Off, FixedRate, or ReductionRatio." );
 					ErrorsFound = true;
 				}}
 
-				DemandMgr(MgrNum).LimitDuration = NumArray(1);
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
-				DemandMgr(MgrNum).FixedRate = NumArray(2);
-				DemandMgr(MgrNum).ReductionRatio = NumArray(3);
+				if ( DemandMgr( MgrNum ).LimitControl == ManagerLimitFixed )
+					DemandMgr( MgrNum ).FixedRate = NumArray( 2 );
+				if ( DemandMgr( MgrNum ).LimitControl == ManagerLimitReductionRatio )
+					DemandMgr( MgrNum ).ReductionRatio = NumArray( 3 );
 
-				DemandMgr(MgrNum).LowerLimit = NumArray(4);
+				DemandMgr( MgrNum ).LowerLimit = NumArray( 4 );
 
 				// Validate Selection Control
-				{ auto const SELECT_CASE_var(AlphArray(4));
-				if (SELECT_CASE_var == "ALL") {
-					DemandMgr(MgrNum).SelectionControl = ManagerSelectionAll;
+				{ auto const SELECT_CASE_var( AlphArray( 4 ) );
+				if ( SELECT_CASE_var == "ALL" ) {
+					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionAll;
 
 				}
-				else if (SELECT_CASE_var == "ROTATEONE") {
-					DemandMgr(MgrNum).SelectionControl = ManagerSelectionOne;
+				else if ( SELECT_CASE_var == "ROTATEONE" ) {
+					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionOne;
 
 				}
-				else if (SELECT_CASE_var == "ROTATEMANY") {
-					DemandMgr(MgrNum).SelectionControl = ManagerSelectionMany;
+				else if ( SELECT_CASE_var == "ROTATEMANY" ) {
+					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionMany;
 
 				}
 				else {
-					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-					ShowContinueError("...value must be one of All, RotateOne, or RotateMany.");
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 4 ) + "=\"" + AlphArray( 4 ) + "\"." );
+					ShowContinueError( "...value must be one of All, RotateOne, or RotateMany." );
 					ErrorsFound = true;
 				}}
 
-				DemandMgr(MgrNum).RotationDuration = NumArray(5);
+				if ( NumArray( 5 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 5 );
 
-				// Count number of string fileds for loading Controller:OutdoorAir names. This number must be increased in case if
+				// Count number of string fields for loading Controller:OutdoorAir names. This number must be increased in case if
 				// new string field is added or decreased if string fields are removed.
 				int AlphaShift = 4;
 
 				// Count actual pointers to air controllers
 				DemandMgr(MgrNum).NumOfLoads = 0;
-				for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-					LoadPtr = GetOAController(AlphArray(LoadNum + AlphaShift));
-					if (LoadPtr > 0) {
-						++DemandMgr(MgrNum).NumOfLoads;
+				for ( LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum ) {
+					LoadPtr = GetOAController( AlphArray( LoadNum + AlphaShift ) );
+					if ( LoadPtr > 0 ) {
+						++DemandMgr( MgrNum ).NumOfLoads;
 					}
 					else {
-						ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + AlphaShift) + "=\"" + AlphArray(LoadNum + AlphaShift) + "\" not found.");
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( LoadNum + AlphaShift ) + "=\"" + AlphArray( LoadNum + AlphaShift ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				}
 
-				if (DemandMgr(MgrNum).NumOfLoads > 0) {
-					DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
-					for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-						LoadPtr = GetOAController(AlphArray(LoadNum + AlphaShift));
-						if (LoadPtr > 0) {
-							DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
+				if ( DemandMgr( MgrNum ).NumOfLoads > 0 ) {
+					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
+					for ( LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum ) {
+						LoadPtr = GetOAController( AlphArray( LoadNum + AlphaShift ) );
+						if ( LoadPtr > 0 ) {
+							DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
 						}
 					}
+				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
 				}
 			} // MgrNum
 
@@ -1691,29 +1753,29 @@ namespace DemandManager {
 				}
 			}
 
-		} else if (SELECT_CASE_var == ManagerTypeVentilation) {
-			Real64 MinFlowRate(0), FlowRate(0);
-			//MinFlowRate = OAGetMinFlowRate(LoadPtr);
-			FlowRate = OAGetFlowRate(LoadPtr);
-			if (Action == CheckCanReduce) {
+		} else if ( SELECT_CASE_var == ManagerTypeVentilation ) {
+			Real64 MinFlowRate( 0 ), FlowRate( 0 );
+			//MinFlowRate = OAGetMinFlowRate( LoadPtr );
+			FlowRate = OAGetFlowRate( LoadPtr );
+			if ( Action == CheckCanReduce ) {
 				CanReduceDemand = true;
 			}
-			else if (Action == SetLimit) {
-				OASetDemandManagerVentilationState(LoadPtr, true);
-				if (DemandMgr(MgrNum).LimitControl == ManagerLimitFixed)
+			else if ( Action == SetLimit ) {
+				OASetDemandManagerVentilationState( LoadPtr, true );
+				if ( DemandMgr(MgrNum).LimitControl == ManagerLimitFixed )
 				{
-					OASetDemandManagerVentilationFlow(LoadPtr, DemandMgr(MgrNum).FixedRate);
+					OASetDemandManagerVentilationFlow( LoadPtr, DemandMgr( MgrNum ).FixedRate );
 				}
-				else if (DemandMgr(MgrNum).LimitControl == ManagerLimitReductionRatio)
+				else if ( DemandMgr( MgrNum ).LimitControl == ManagerLimitReductionRatio )
 				{
-					Real64 DemandRate(0);
-					DemandRate = FlowRate * DemandMgr(MgrNum).ReductionRatio;
-					OASetDemandManagerVentilationFlow(LoadPtr, DemandRate);
+					Real64 DemandRate( 0 );
+					DemandRate = FlowRate * DemandMgr( MgrNum ).ReductionRatio;
+					OASetDemandManagerVentilationFlow( LoadPtr, DemandRate );
 				}
 			}
-			else if (Action == ClearLimit)
+			else if ( Action == ClearLimit )
 			{
-				OASetDemandManagerVentilationState(LoadPtr, false);
+				OASetDemandManagerVentilationState( LoadPtr, false );
 			}
 		}
 
