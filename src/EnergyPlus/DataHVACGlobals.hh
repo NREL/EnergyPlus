@@ -125,7 +125,8 @@ namespace DataHVACGlobals {
 	extern int const CoilDX_CoolingTwoSpeed;
 	extern int const CoilDX_CoolingHXAssisted;
 	extern int const CoilDX_CoolingTwoStageWHumControl;
-	extern int const CoilDX_HeatPumpWaterHeater;
+	extern int const CoilDX_HeatPumpWaterHeaterPumped;
+	extern int const CoilDX_HeatPumpWaterHeaterWrapped;
 	extern int const CoilDX_MultiSpeedCooling;
 	extern int const CoilDX_MultiSpeedHeating;
 
