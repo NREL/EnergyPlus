@@ -275,8 +275,8 @@ TEST( GasFiredHumidifierTest, GetHumidifierInput ) {
 	// that use these variables and called prior to this unit test. This initialization is 
 	// used only if want to run this unit test individually, or some changes the calling 
 	// sequence of the unit test.
-	MaxAlphaArgsFound = 20;
-	MaxNumericArgsFound = 20;
+	MaxAlphaArgsFound = 100;
+	MaxNumericArgsFound = 100;
 
 	// GetOnlySingleNode requires that the IDD object definition
 	ListOfObjects( 2 ) = "NodeList";

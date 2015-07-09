@@ -191,8 +191,8 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData )
 	// for this test only, then other unit test withe larger array size requirement
 	// will fail since this variables are sized only once every simulation or unit 
 	// tests run
-	MaxAlphaArgsFound = 20;
-	MaxNumericArgsFound = 20;
+	MaxAlphaArgsFound = 100;
+	MaxNumericArgsFound = 100;
 
 	// Set up construction input objects
 	lNumericFieldBlanks.allocate( NumNumbers );
