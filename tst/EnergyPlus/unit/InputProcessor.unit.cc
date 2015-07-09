@@ -13,6 +13,59 @@ namespace EnergyPlus {
 
 	namespace InputProcessor {
 
+		TEST_F( InputProcessorFixture, getObjectItem )
+		{
+			std::string const idf_objects = delimited_string({
+				"Version,8.3;",
+				"Humidifier:Steam:Gas,",
+				"  Main Gas Humidifier,     !- Name",
+				"  ,                        !- Availability Schedule Name",
+				"  autosize,                !- Rated Capacity {m3/s}",
+				"  autosize,                !- Rated Gas Use Rate {W}",
+				"  0.80,                    !- Thermal Efficiency {-} ",
+				"  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
+				"  0,                       !- Rated Fan Power {W}",
+				"  0,                       !- Auxiliary Electric Power {W}",
+				"  Mixed Air Node 1,        !- Air Inlet Node Name",
+				"  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
+				"  ;                        !- Water Storage Tank Name",
+			});
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
+
+			int NumGasSteamHums = GetNumObjectsFound( CurrentModuleObject );
+			ASSERT_EQ( 1, NumGasSteamHums );
+
+			int TotalArgs = 0;
+			int NumAlphas = 0;
+			int NumNumbers = 0;
+
+			GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+			int IOStatus = 0;
+			Array1D_string Alphas( NumAlphas );
+			Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+			Array1D_bool lNumericBlanks( NumAlphas, true );
+			Array1D_bool lAlphaBlanks( NumAlphas, true );
+			Array1D_string cAlphaFields( NumAlphas );
+			Array1D_string cNumericFields( NumNumbers );
+
+			GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" }, Alphas ) );
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" }, cAlphaFields ) );
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" }, cNumericFields ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false, false, false, true, true }, lNumericBlanks ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, true, false, false, false, true, true }, lAlphaBlanks ) );
+			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( { -99999, -99999, 0.80, 0.0, 0.0 }, Numbers ) );
+			EXPECT_EQ( 6, NumAlphas );
+			EXPECT_EQ( 5, NumNumbers );
+			EXPECT_EQ( 1, IOStatus );
+
+		}
+
 		TEST_F( InputProcessorFixture, findItemInSortedList )
 		{
 			InputProcessor::ListOfObjects = Array1D_string ({
@@ -171,6 +224,46 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F( InputProcessorFixture, addSectionDef )
+		{
+			std::string const idd_objects = delimited_string({
+				"Lead Input;",
+				"Simulation Data;",
+			});
+
+			auto idd_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idd_objects ) );
+
+			MaxSectionDefs = SectionDefAllocInc;
+			SectionDef.allocate( MaxSectionDefs );
+			NumSectionDefs = 0;
+
+			ProcessingIDD = true;
+
+			bool errors_found( false );
+			bool end_of_file( false );
+			bool blank_line( false );
+			std::string::size_type current_pos;
+
+			while ( ! end_of_file ) {
+				ReadInputLine( *idd_stream, current_pos, blank_line, end_of_file );
+				if ( blank_line || end_of_file ) continue;
+				current_pos = scan( InputLine, ",;" );
+				if ( InputLine[ current_pos ] == ';' ) {
+					AddSectionDef( InputLine.substr( 0, current_pos ), errors_found );
+					EXPECT_FALSE( errors_found );
+				}
+			}
+
+			ASSERT_EQ( 2, NumSectionDefs );
+
+			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
+			EXPECT_EQ( 0, SectionDef( 1 ).NumFound );
+
+			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
+			EXPECT_EQ( 0, SectionDef( 2 ).NumFound );
+
+		}
+
 		TEST_F( InputProcessorFixture, validateObjectandParse )
 		{
 			std::string const idf_objects = delimited_string({
@@ -253,6 +346,236 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
 			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
 
+		}
+
+		TEST_F( InputProcessorFixture, validateSection )
+		{
+			std::string const idf_objects = delimited_string({
+				"Simulation Data;",
+				"report variable dictionary;",
+				"Lead Input;",
+				"End Lead Input;",
+				"SimulationControl;", // object used like section
+				"Building;", // object used like section
+			});
+
+			NumIDFRecords = 2;
+			IDFRecords.allocate( 2 );
+
+			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
+
+			use_cached_idd();
+
+			NumLines = 0;
+
+			MaxIDFRecords = ObjectsIDFAllocInc;
+			NumIDFRecords = 0;
+			MaxIDFSections = SectionsIDFAllocInc;
+			NumIDFSections = 0;
+
+			SectionsOnFile.allocate( MaxIDFSections );
+			IDFRecords.allocate( MaxIDFRecords );
+			LineItem.Numbers.allocate( MaxNumericArgsFound );
+			LineItem.NumBlank.allocate( MaxNumericArgsFound );
+			LineItem.Alphas.allocate( MaxAlphaArgsFound );
+			LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
+
+			bool errors_found( false );
+			bool end_of_file( false );
+			bool blank_line( false );
+			std::string::size_type current_pos;
+
+			while ( ! end_of_file ) {
+				ReadInputLine( *idf_stream, current_pos, blank_line, end_of_file );
+				if ( blank_line || end_of_file ) continue;
+				current_pos = scan( InputLine, ",;" );
+				if ( InputLine[ current_pos ] == ';' ) {
+					ValidateSection( InputLine.substr( 0, current_pos ), errors_found );
+					EXPECT_FALSE( errors_found );
+				}
+			}
+
+			std::string const version_name( "SIMULATIONCONTROL" );
+
+			auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+			if ( index != 0 ) index = iListOfObjects( index );
+
+			index = ObjectStartRecord( index );
+
+			ASSERT_EQ( 1, index );
+
+			EXPECT_EQ( version_name, IDFRecords( index ).Name );
+			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
+			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "NO", "NO", "NO", "YES", "YES" }, IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false, false, false }, IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+
+			EXPECT_EQ( 1, ObjectDef( 2 ).NumFound );
+
+			std::string const building_name( "BUILDING" );
+
+			index = FindItemInSortedList( building_name, ListOfObjects, NumObjectDefs );
+			if ( index != 0 ) index = iListOfObjects( index );
+
+			index = ObjectStartRecord( index );
+
+			ASSERT_EQ( 2, index );
+
+			EXPECT_EQ( building_name, IDFRecords( index ).Name );
+			EXPECT_EQ( 3, IDFRecords( index ).NumAlphas );
+			EXPECT_EQ( 5, IDFRecords( index ).NumNumbers );
+			EXPECT_EQ( 3, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "NONE", "SUBURBS", "FULLEXTERIOR" }, IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false }, IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( { 0.0, 0.04, 0.4, 25, 6 }, IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( { true, true, true, true, true }, IDFRecords( index ).NumBlank ) );
+
+			EXPECT_EQ( 1, ObjectDef( 3 ).NumFound );
+
+			ASSERT_EQ( 5, NumSectionDefs );
+
+			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
+			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
+
+			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 3 ).Name );
+			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
+
+			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
+			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
+
+			EXPECT_EQ( "SIMULATIONCONTROL", SectionDef( 4 ).Name );
+			EXPECT_EQ( 1, SectionDef( 4 ).NumFound );
+
+			EXPECT_EQ( "BUILDING", SectionDef( 5 ).Name );
+			EXPECT_EQ( 1, SectionDef( 5 ).NumFound );
+
+			ASSERT_EQ( 5, NumIDFSections );
+
+			EXPECT_EQ( "SIMULATION DATA", SectionsOnFile( 1 ).Name );
+			EXPECT_EQ( 0, SectionsOnFile( 1 ).FirstRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 1 ).LastRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 1 ).FirstLineNo );
+
+			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionsOnFile( 2 ).Name );
+			EXPECT_EQ( 0, SectionsOnFile( 2 ).FirstRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 2 ).LastRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 2 ).FirstLineNo );
+
+			EXPECT_EQ( "LEAD INPUT", SectionsOnFile( 3 ).Name );
+			EXPECT_EQ( 0, SectionsOnFile( 3 ).FirstRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 3 ).LastRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 3 ).FirstLineNo );
+
+			EXPECT_EQ( "SIMULATIONCONTROL", SectionsOnFile( 4 ).Name );
+			EXPECT_EQ( 1, SectionsOnFile( 4 ).FirstRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 4 ).LastRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 4 ).FirstLineNo );
+
+			EXPECT_EQ( "BUILDING", SectionsOnFile( 5 ).Name );
+			EXPECT_EQ( 2, SectionsOnFile( 5 ).FirstRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 5 ).LastRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 5 ).FirstLineNo );
+
+		}
+
+		TEST_F( InputProcessorFixture, processSection )
+		{
+			std::string const idf_objects = delimited_string({
+				"Simulation Data;",
+				"report variable dictionary;",
+				" Lead Input;",
+				"  SimulationControl,",
+				"    No,                      !- Do Zone Sizing Calculation",
+				"    No,                      !- Do System Sizing Calculation",
+				"    No,                      !- Do Plant Sizing Calculation",
+				"    Yes,                     !- Run Simulation for Sizing Periods",
+				"    No;                      !- Run Simulation for Weather File Run Periods",
+				" End Lead Input;",
+			});
+
+			NumIDFRecords = 1;
+			IDFRecords.allocate( 1 );
+
+			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
+
+			use_cached_idd();
+
+			NumLines = 0;
+
+			MaxIDFRecords = ObjectsIDFAllocInc;
+			NumIDFRecords = 0;
+			MaxIDFSections = SectionsIDFAllocInc;
+			NumIDFSections = 0;
+
+			SectionsOnFile.allocate( MaxIDFSections );
+			IDFRecords.allocate( MaxIDFRecords );
+			LineItem.Numbers.allocate( MaxNumericArgsFound );
+			LineItem.NumBlank.allocate( MaxNumericArgsFound );
+			LineItem.Alphas.allocate( MaxAlphaArgsFound );
+			LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
+
+			bool errors_found( false );
+			bool end_of_file( false );
+			bool blank_line( false );
+			std::string::size_type current_pos;
+
+			while ( ! end_of_file ) {
+				ReadInputLine( *idf_stream, current_pos, blank_line, end_of_file );
+				if ( blank_line || end_of_file ) continue;
+				current_pos = scan( InputLine, ",;" );
+				if ( InputLine[ current_pos ] == ';' ) {
+					ValidateSection( InputLine.substr( 0, current_pos ), errors_found );
+					EXPECT_FALSE( errors_found );
+				} else {
+					ValidateObjectandParse( *idf_stream, InputLine.substr( 0, current_pos ), current_pos, end_of_file );
+				}
+			}
+
+			std::string const version_name( "SIMULATIONCONTROL" );
+
+			auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+			if ( index != 0 ) index = iListOfObjects( index );
+
+			index = ObjectStartRecord( index );
+
+			ASSERT_EQ( 1, index );
+
+			EXPECT_EQ( version_name, IDFRecords( index ).Name );
+			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
+			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "NO", "NO", "NO", "YES", "NO" }, IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false, false, false }, IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+
+			ASSERT_EQ( 3, NumSectionDefs );
+
+			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
+			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
+
+			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 3 ).Name );
+			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
+
+			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
+			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
+
+			ASSERT_EQ( 3, NumIDFSections );
+
+			EXPECT_EQ( "SIMULATION DATA", SectionsOnFile( 1 ).Name );
+			EXPECT_EQ( 0, SectionsOnFile( 1 ).FirstRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 1 ).FirstLineNo );
+
+			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionsOnFile( 2 ).Name );
+			EXPECT_EQ( 0, SectionsOnFile( 2 ).FirstRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 2 ).FirstLineNo );
+
+			EXPECT_EQ( "LEAD INPUT", SectionsOnFile( 3 ).Name );
+			EXPECT_EQ( 0, SectionsOnFile( 3 ).FirstRecord );
+			EXPECT_EQ( 0, SectionsOnFile( 3 ).FirstLineNo );
 		}
 
 		TEST_F( InputProcessorFixture, getNumObjectsFound )

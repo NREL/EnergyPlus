@@ -378,18 +378,22 @@ namespace EnergyPlus {
 				// check if IDF version matches IDD version
 				// this really shouldn't be an issue but i'm keeping it just in case a unit test is written against a specific IDF version
 				// This fixture will always use the most up to date version of the IDD regardless.
+				bool found_version = false;
 				for ( auto const idf_record : IDFRecords ) {
 					if ( "VERSION" == idf_record.Name ) {
+						bool bad_version = false;
 						auto const version_length( len( DataStringGlobals::MatchVersion ) );
 						if ( ( version_length > 0 ) && ( DataStringGlobals::MatchVersion[ version_length - 1 ] == '0' ) ) {
-							EXPECT_EQ( DataStringGlobals::MatchVersion.substr( 0, version_length - 2 ), idf_record.Alphas( 1 ).substr( 0, version_length - 2 ) ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
+							bad_version = ( DataStringGlobals::MatchVersion.substr( 0, version_length - 2 ) == idf_record.Alphas( 1 ).substr( 0, version_length - 2 ) );
 						} else {
-							EXPECT_EQ( DataStringGlobals::MatchVersion, idf_record.Alphas( 1 ) ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
+							bad_version = ( DataStringGlobals::MatchVersion == idf_record.Alphas( 1 ) );
 						}
+						found_version = true;
+						EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
 						break;
 					}
 				}
-
+				EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
 				errors_found = true;
 			}
 
@@ -693,10 +697,8 @@ namespace EnergyPlus {
 						return Token::COMMA;
 					case ';':
 						return Token::SEMICOLON;
-					case '\n': case '\r':
-						break;
 					default:
-						static std::string const search_chars( "-:.#/\\[]{}_@$%^&*()|+=<>?'\"" );
+						static std::string const search_chars( "-:.#/\\[]{}_@$%^&*()|+=<>?'\"~" );
 						if ( isalnum( c ) || ( std::string::npos != search_chars.find_first_of( c ) ) ) {
 							return Token::STRING;
 						}

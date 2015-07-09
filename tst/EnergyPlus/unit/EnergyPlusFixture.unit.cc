@@ -476,7 +476,7 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( IdfParserFixture, look_ahead ) {
-		std::string const test_input( "B , ! t ; \n" );
+		std::string const test_input( "B , ! t ; `" );
 		size_t index = 0;
 		size_t token = look_ahead( test_input, index );
 		EXPECT_EQ( 0ul, index );
@@ -500,18 +500,18 @@ namespace EnergyPlus {
 		index = 9;
 		token = look_ahead( test_input, index );
 		EXPECT_EQ( 9ul, index );
-		EXPECT_EQ( 1ul, token );
-		index = test_input.size() + 1;
-		token = look_ahead( test_input, index );
-		EXPECT_EQ( test_input.size() + 1, index );
 		EXPECT_EQ( 0ul, token );
+		index = test_input.size();
+		token = look_ahead( test_input, index );
+		EXPECT_EQ( test_input.size(), index );
+		EXPECT_EQ( 1ul, token );
 
 	}
 
 	TEST_F( IdfParserFixture, next_token ) {
 		size_t index = 0;
 
-		std::string const test_input( "B , ! t ; \n" );
+		std::string const test_input( "B , ! t ; `" );
 		size_t token = next_token( test_input, index );
 		EXPECT_EQ( 1ul, index );
 		EXPECT_EQ( 5ul, token );
@@ -528,12 +528,12 @@ namespace EnergyPlus {
 		EXPECT_EQ( 9ul, index );
 		EXPECT_EQ( 4ul, token );
 		token = next_token( test_input, index );
-		EXPECT_EQ( test_input.size(), index );
-		EXPECT_EQ( 1ul, token );
-		index = test_input.size() + 1;
-		token = next_token( test_input, index );
-		EXPECT_EQ( test_input.size() + 1, index );
+		EXPECT_EQ( 10ul, index );
 		EXPECT_EQ( 0ul, token );
+		index = test_input.size();
+		token = next_token( test_input, index );
+		EXPECT_EQ( test_input.size() , index );
+		EXPECT_EQ( 1ul, token );
 
 	}
 
