@@ -376,7 +376,7 @@ namespace Humidifiers {
 			Humidifier( HumNum ).AirOutNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 4 ), Alphas( 5 ), "Air Nodes" );
 
-			Humidifier( HumNum ).EfficiencyCurvePtr = GetCurveIndex( cAlphaArgs( 3 ) );
+			Humidifier( HumNum ).EfficiencyCurvePtr = GetCurveIndex( Alphas( 3 ) );
 			if ( Humidifier( HumNum ).EfficiencyCurvePtr > 0 ) {
 					{ auto const SELECT_CASE_var( GetCurveType( Humidifier( HumNum ).EfficiencyCurvePtr ) );
 					if ( SELECT_CASE_var == "LINEAR" ) {
@@ -391,7 +391,7 @@ namespace Humidifiers {
 						ShowContinueError( "...Curve type for " + cAlphaFields( 3 ) + " = " + GetCurveType( Humidifier( HumNum ).EfficiencyCurvePtr ) );
 						ErrorsFound = true;
 					}}
-			} else if ( !lAlphaFieldBlanks( 3 ) ) {
+			} else if ( !lAlphaBlanks( 3 ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"," );
 				ShowContinueError( "Invalid " + cAlphaFields( 3 ) + '=' + Alphas( 3 ) );
 				ShowSevereError( "..." + cAlphaFields( 3 ) + " not found." );
