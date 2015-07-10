@@ -10407,9 +10407,12 @@ Label50: ;
 		Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
 		Real64 TotCapHS; // total capacity at high speed [W]
 		Real64 TotCapLS; // total capacity at low speed [W]
+		Real64 TotCapHSAdj; // total adjusted capacity at high speed [W]
+		Real64 TotCapLSAdj; // total adjusted capacity at low speed [W]
 		Real64 EIRHS; // EIR at off rated conditions (high speed)
 		Real64 EIRLS; // EIR at off rated conditions (low speed)
 		Real64 TotCap; // total capacity at current speed [W]
+		Real64 TotCapAdj; // total adjusted capacity at current speed [W]
 		Real64 EIR; // EIR at current speed
 		Real64 PLF; // Part load factor, accounts for thermal lag at compressor startup, used in
 		// power calculation
@@ -10667,11 +10670,11 @@ Label50: ;
 					}
 				}
 
-				TotCapLS *= HeatingCapacityMultiplier;
-				TotCapHS *= HeatingCapacityMultiplier;
+				TotCapLSAdj = TotCapLS * HeatingCapacityMultiplier;
+				TotCapHSAdj = TotCapHS * HeatingCapacityMultiplier;
 
 				// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
-				PLRHeating = min( 1.0, ( SpeedRatio + LoadDueToDefrostHS / TotCapHS ) );
+				PLRHeating = min( 1.0, ( SpeedRatio + LoadDueToDefrostHS / TotCapHSAdj ) );
 				PLF = CurveValue( DXCoil( DXCoilNum ).MSPLFFPLR( SpeedNumHS ), PLRHeating ); // Calculate part-load factor
 
 				if ( PLF < 0.7 ) {
@@ -10700,10 +10703,10 @@ Label50: ;
 				}
 
 				// Get full load output and power
-				LSFullLoadOutAirEnth = InletAirEnthalpy + TotCapLS / MSHPMassFlowRateLow;
-				HSFullLoadOutAirEnth = InletAirEnthalpy + TotCapHS / MSHPMassFlowRateHigh;
-				LSElecHeatingPower = TotCapLS / HeatingCapacityMultiplier * EIRLS * InputPowerMultiplier;
-				HSElecHeatingPower = TotCapHS / HeatingCapacityMultiplier * EIRHS * InputPowerMultiplier;
+				LSFullLoadOutAirEnth = InletAirEnthalpy + TotCapLSAdj / MSHPMassFlowRateLow;
+				HSFullLoadOutAirEnth = InletAirEnthalpy + TotCapHSAdj / MSHPMassFlowRateHigh;
+				LSElecHeatingPower = TotCapLS * EIRLS * InputPowerMultiplier;
+				HSElecHeatingPower = TotCapHS * EIRHS * InputPowerMultiplier;
 				OutletAirHumRat = InletAirHumRat;
 
 				// if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
@@ -10829,10 +10832,10 @@ Label50: ;
 				}
 
 				// Modify total heating capacity based on defrost heating capacity multiplier
-				TotCap *= HeatingCapacityMultiplier;
+				TotCapAdj = TotCap * HeatingCapacityMultiplier;
 
 				// Calculate full load outlet conditions
-				FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
+				FullLoadOutAirEnth = InletAirEnthalpy + TotCapAdj / AirMassFlow;
 				FullLoadOutAirHumRat = InletAirHumRat;
 				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 				FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad );
@@ -10861,7 +10864,7 @@ Label50: ;
 				EIRFlowModFac = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( 1 ), AirMassFlowRatioLS );
 				EIR = 1.0 / DXCoil( DXCoilNum ).MSRatedCOP( 1 ) * EIRTempModFac * EIRFlowModFac;
 				// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
-				PLRHeating = min( 1.0, ( CycRatio + LoadDueToDefrost / TotCap ) );
+				PLRHeating = min( 1.0, ( CycRatio + LoadDueToDefrost / TotCapAdj ) );
 				PLF = CurveValue( DXCoil( DXCoilNum ).MSPLFFPLR( 1 ), PLRHeating ); // Calculate part-load factor
 				if ( FanOpMode == CycFanCycCoil && CycRatio == 1.0 && PLF != 1.0 ) {
 					if ( DXCoil( DXCoilNum ).PLFErrIndex == 0 ) {
