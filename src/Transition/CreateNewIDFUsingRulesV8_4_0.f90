@@ -125,6 +125,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   REAL :: IndirectNewFieldThirteen
   CHARACTER(len=10) :: IndirectNewFieldString
 
+  INTEGER :: HeightFieldNum
+  INTEGER :: TankSearchNum
+  INTEGER :: HeaterNum
+  CHARACTER(len=MaxNameLength) :: ThisObjectType
+  CHARACTER(len=MaxNameLength) :: ThisObjectName
+  CHARACTER(len=MaxNameLength) :: LookingForTankName
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -344,7 +351,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
-                IF ((InArgs(1)(1:3)) == '8.3' .and. ArgFile) THEN
+                IF ((InArgs(1)(1:3)) == sVersionNum .and. ArgFile) THEN
                   CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
                   CLOSE(diflfn,STATUS='DELETE')
                   LatestVersion=.true.
@@ -355,7 +362,73 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
 
     !!!    Changes for this version
-              !CASE('SOMETHING')
+              CASE('COIL:WATERHEATING:AIRTOWATERHEATPUMP')
+                ! object rename only
+                ObjectName = "Coil:WaterHeating:AirToWaterHeatPump:Pumped"
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                                
+              CASE('WATERHEATER:STRATIFIED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:63)  = InArgs(1:63)
+                OutArgs(64:65) = '' ! add two new blank fields
+                OutArgs(66:67) = InArgs(64:65)
+                CurArgs = CurArgs + 2
+                nodiff=.true.
+             
+              CASE('WATERHEATER:HEATPUMP')
+                ObjectName = "WaterHeater:HeatPump:PumpedCondenser"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:16)  = InArgs(1:16) ! no change
+                ! DELETE InArgs(17)
+                OutArgs(17:19) = InArgs(18:20) ! move these up by 1 to accommodate removed field F17
+                ! DELETE InArgs(21)
+                OutArgs(20:21) = InArgs(22:23) ! move these up by 2 to accommodate removed field F21 and F17
+                OutArgs(22) = '' ! Add new blank field F22
+                OutArgs(23:24) = InArgs(24:25) ! move these up by 1 to accommodate removed F17,F21 and added F22
+                ! DELETE InArgs(26) 
+                OutArgs(25:32) = InArgs(27:34) ! move these up by 2 to accommodate removed F17,F21,F26 and added F22
+                ! DELETE InArgs(35)
+                OutArgs(33) = '' ! Insert new blank field
+                
+                ! For OutArgs(34) "Control Sensor 1 Height In Stratified Tank", we need to mine it from the stratified tank child object
+                ! We will start by initializing it to a blank string in case we couldn't find it
+                OutArgs(34) = '' ! Get appropriate height from waterheater:stratified object or leave blank in
+                IF ( SameString(InArgs(17), "WaterHeater:Stratified" ) ) THEN ! Make sure we are dealing with a stratified tank child object
+                  HeaterNum = 0
+                  IF ( MakeUPPERCase(InArgs(35)) == "HEATER1" ) THEN
+                    HeaterNum = 1
+                  ELSE IF ( MakeUPPERCASE(InArgs(35)) == "HEATER2" ) THEN
+                    HeaterNum = 2
+                  END IF
+                  LookingForTankName = InArgs(18)
+                  IF ( HeaterNum > 0 ) THEN
+                    ! Then the child tank name is InArgs(18)
+                    DO TankSearchNum = 1, NumIDFRecords
+                      ThisObjectType = IDFRecords(TankSearchNum)%Name
+                      IF ( UBOUND(IDFRecords(TankSearchNum)%Alphas, 1) > 0 ) THEN
+                        ThisObjectName = IDFRecords(TankSearchNum)%Alphas(1)
+                      ELSE
+                        ThisObjectName = "<nothing>"
+                      END IF
+                      IF (MakeUPPERCase(ThisObjectType) /= 'WATERHEATER:STRATIFIED') CYCLE
+                      IF (MakeUPPERCase(ThisObjectName) == MakeUPPERCase(LookingForTankName)) THEN
+                        ! We have our match for the stratified tank child
+                        WRITE(diflfn,fmta) '! Found a stratified tank child component; name ='//IDFRecords(TankSearchNum)%Alphas(1)
+                        ! Now simply get the tank height
+                        IF ( HeaterNum == 1 ) THEN
+                          HeightFieldNum = 7
+                        ELSE IF ( HeaterNum == 2 ) THEN
+                          HeightFieldNum = 10
+                        END IF
+                        OutArgs(34) = IDFRecords(TankSearchNum)%Numbers(HeightFieldNum)
+                      END IF
+                    END DO
+                  END IF
+                END IF
+                OutArgs(35:36) = '' ! Finish 
+                nodiff = .true.
+                CurArgs = CurArgs + 1 ! the net gain is +1 field
                 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
