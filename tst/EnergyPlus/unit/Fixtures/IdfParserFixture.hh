@@ -5,22 +5,30 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "EnergyPlusFixture.hh"
+#include <EnergyPlus/DataStringGlobals.hh>
+
+#include "../TestHelpers/IdfParser.hh"
 
 namespace EnergyPlus {
 
-	class IdfParserFixture : public EnergyPlusFixture
+	class IdfParserFixture : public testing::Test
 	{
 	protected:
 		static void SetUpTestCase() { }
 		static void TearDownTestCase() { }
 
-		virtual void SetUp() {
-			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
-		}
+		virtual void SetUp() { }
 
-		virtual void TearDown() {
-			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+		virtual void TearDown() { }
+
+		// This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any 
+		// delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
+		std::string delimited_string( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL ) {
+			std::unique_ptr<std::ostringstream> compare_text(new std::ostringstream);
+			for( auto const & str : strings ) {
+				* compare_text << str << delimiter;
+			}
+			return compare_text->str();
 		}
 
 		void eat_whitespace( std::string const & idf, size_t & index ) {
@@ -43,13 +51,13 @@ namespace EnergyPlus {
 			return parser.parse_value( idf, index, success );
 		}
 
-		size_t look_ahead( std::string const & idf, size_t index)
+		IdfParser::Token look_ahead( std::string const & idf, size_t index)
 		{
 			IdfParser parser;
 			return parser.look_ahead( idf, index );
 		}
 
-		size_t next_token( std::string const & idf, size_t & index)
+		IdfParser::Token next_token( std::string const & idf, size_t & index)
 		{
 			IdfParser parser;
 			return parser.next_token( idf, index );
@@ -63,16 +71,6 @@ namespace EnergyPlus {
 		std::vector< std::string > parse_object( std::string const & idf, size_t & index, bool & success ) {
 			IdfParser parser;
 			return parser.parse_object( idf, index, success );
-		}
-
-		std::vector< std::vector< std::string > > decode( std::string const & idf ) {
-			IdfParser parser;
-			return parser.decode( idf );
-		}
-
-		std::vector< std::vector< std::string > > decode( std::string const & idf, bool & success ) {
-			IdfParser parser;
-			return parser.decode( idf, success );
 		}
 		
 	};

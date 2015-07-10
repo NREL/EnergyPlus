@@ -18,10 +18,7 @@ namespace EnergyPlus {
 		{
 
 		protected:
-			static void SetUpTestCase() {
-				// Needed to initialize IDD cache
-				EnergyPlusFixture::SetUpTestCase();
-			}
+			static void SetUpTestCase() { }
 			static void TearDownTestCase() { }
 			
 			virtual void SetUp() {

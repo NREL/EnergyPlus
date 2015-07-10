@@ -102,33 +102,17 @@ namespace InputProcessor {
 
 	// MODULE VARIABLE DECLARATIONS:
 
-	// These were static variables within different functions. They were pulled out into the namespace 
-	// to facilitate easier unit testing of those functions.
-	// These are purposefully not in the header file as an extern variable. No one outside of InputProcessor should
-	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-	Array1D_string AlphaArgs;
-	Array1D< Real64 > NumberArgs;
-	Array1D_bool AlphaArgsBlank;
-	Array1D_bool NumberArgsBlank;
-	bool ErrorsInIDD( false ); // to check for any errors flagged during data dictionary processing
-	Array1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha,
-	Array1D_bool RequiredFields; // Array of argument required fields
-	Array1D_bool AlphRetainCase; // Array of argument for retain case
-	Array1D_string AlphFieldChecks; // Array with alpha field names
-	Array1D_string AlphFieldDefaults; // Array with alpha field defaults
-	int MaxANArgs( 7700 ); // Current count of Max args to object  (9/2010)
-	int PrevSizeNumNumeric( -1 );
-	int PrevCount( -1 );
-	int PrevSizeNumAlpha( -1 );
-	Array1D< RangeCheckDef > NumRangeChecks; // Structure for Range Check, Defaults of numeric fields
-	Array1D< RangeCheckDef > TempChecks; // Structure (ref: NumRangeChecks) for re-allocation procedure
-	bool errFlag( false );
-	int const dimLineBuf( 10 );
-	Array1D_string LineBuf( dimLineBuf );
-	int StartLine = int();
-	int NumConxLines = int();
-	int CurLines = int();
-	int CurQPtr = int();
+	namespace {
+		// These were static variables within different functions. They were hoisted into the namespace 
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of InputProcessor should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		Array1D_string AlphaArgs;
+		Array1D< Real64 > NumberArgs;
+		Array1D_bool AlphaArgsBlank;
+		Array1D_bool NumberArgsBlank;
+	}
 
 	//Integer Variables for the Module
 	int NumObjectDefs( 0 ); // Count of number of object definitions found in the IDD
@@ -281,25 +265,6 @@ namespace InputProcessor {
 		NumberArgs.deallocate();
 		AlphaArgsBlank.deallocate();
 		NumberArgsBlank.deallocate();
-
-		AlphaOrNumeric.deallocate();
-		RequiredFields.deallocate();
-		AlphRetainCase.deallocate();
-		AlphFieldChecks.deallocate();
-		AlphFieldDefaults.deallocate();
-		ErrorsInIDD = false;
-		MaxANArgs = 7700;
-		PrevSizeNumNumeric = -1;
-		PrevCount = -1;
-		PrevSizeNumAlpha = -1;
-		NumRangeChecks.deallocate();
-		TempChecks.deallocate();
-		errFlag = false;
-		LineBuf = Array1D_string( dimLineBuf );
-		StartLine = int();
-		NumConxLines = int();
-		CurLines = int();
-		CurQPtr = int();
 	}
 
 	void
@@ -350,8 +315,7 @@ namespace InputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool FileExists; // Check variable for .idd/.idf files
-		// pulled into namespace
-		// static bool ErrorsInIDD( false ); // to check for any errors flagged during data dictionary processing
+		static bool ErrorsInIDD( false ); // to check for any errors flagged during data dictionary processing
 		int Loop;
 		int CountErr;
 		int Num1;
@@ -762,13 +726,11 @@ namespace InputProcessor {
 		bool errFlag; // Local Error condition flag, when true, object not added to Global list
 		char TargetChar; // Single character scanned to test for current field type (A or N)
 		bool BlankLine; // True when this line is "blank" (may have comment characters as first character on line)
-		// pulled into namespace
-		// static Array1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha,
-		// False is numeric, saved in ObjectDef when done
-		// static Array1D_bool RequiredFields; // Array of argument required fields
-		// static Array1D_bool AlphRetainCase; // Array of argument for retain case
-		// static Array1D_string AlphFieldChecks; // Array with alpha field names
-		// static Array1D_string AlphFieldDefaults; // Array with alpha field defaults
+		static Array1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha, False is numeric, saved in ObjectDef when done
+		static Array1D_bool RequiredFields; // Array of argument required fields
+		static Array1D_bool AlphRetainCase; // Array of argument for retain case
+		static Array1D_string AlphFieldChecks; // Array with alpha field names
+		static Array1D_string AlphFieldDefaults; // Array with alpha field defaults
 		bool MinMax; // Set to true when MinMax field has been found by ReadInputLine
 		bool Default; // Set to true when Default field has been found by ReadInputLine
 		bool AutoSize; // Set to true when Autosizable field has been found by ReadInputLine
@@ -778,18 +740,15 @@ namespace InputProcessor {
 		int WhichMinMax; // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		Real64 Value; // Value returned by ReadInputLine (either min, max, default, autosize or autocalculate)
 		bool MinMaxError; // Used to see if min, max, defaults have been set appropriately (True if error)
-		// pulled into namespace
-		// static int MaxANArgs( 7700 ); // Current count of Max args to object  (9/2010)
+		static int MaxANArgs( 7700 ); // Current count of Max args to object  (9/2010)
 		bool ErrorsFoundFlag;
-		// pulled into namespace
-		// static int PrevSizeNumNumeric( -1 );
-		// static int PrevCount( -1 );
-		// static int PrevSizeNumAlpha( -1 );
+		static int PrevSizeNumNumeric( -1 );
+		static int PrevCount( -1 );
+		static int PrevSizeNumAlpha( -1 );
 
 		// Object Data
-		// pulled into namespace
-		// static Array1D< RangeCheckDef > NumRangeChecks; // Structure for Range Check, Defaults of numeric fields
-		// static Array1D< RangeCheckDef > TempChecks; // Structure (ref: NumRangeChecks) for re-allocation procedure
+		static Array1D< RangeCheckDef > NumRangeChecks; // Structure for Range Check, Defaults of numeric fields
+		static Array1D< RangeCheckDef > TempChecks; // Structure (ref: NumRangeChecks) for re-allocation procedure
 
 		if ( ! allocated( AlphaOrNumeric ) ) {
 			AlphaOrNumeric.allocate( {0,MaxANArgs} );
@@ -1439,8 +1398,7 @@ namespace InputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// pulled into namespace due to static Array1D_string LineBuf( dimLineBuf );
-		// int const dimLineBuf( 10 );
+		int const dimLineBuf( 10 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1459,8 +1417,7 @@ namespace InputProcessor {
 		std::string::size_type Pos;
 		bool EndofObject;
 		bool BlankLine;
-		// pulled into namespace
-		// static bool errFlag( false );
+		static bool errFlag( false );
 		std::string::size_type LenLeft;
 		int Count;
 		std::string FieldString;
@@ -1468,12 +1425,11 @@ namespace InputProcessor {
 		std::string Message;
 		std::string cStartLine;
 		std::string cStartName;
-		// pulled into namespace
-		// static Array1D_string LineBuf( dimLineBuf );
-		// static int StartLine;
-		// static int NumConxLines;
-		// static int CurLines;
-		// static int CurQPtr;
+		static Array1D_string LineBuf( dimLineBuf );
+		static int StartLine;
+		static int NumConxLines;
+		static int CurLines;
+		static int CurQPtr;
 
 		std::string String;
 		bool IDidntMeanIt;
@@ -2297,11 +2253,12 @@ namespace InputProcessor {
 		int LoopIndex;
 		std::string ObjectWord;
 		std::string UCObject;
-		// pulled into namespace
+		//////////// hoisted into namespace ////////////
 		// static Array1D_string AlphaArgs;
 		// static Array1D< Real64 > NumberArgs;
 		// static Array1D_bool AlphaArgsBlank;
 		// static Array1D_bool NumberArgsBlank;
+		////////////////////////////////////////////////
 		int MaxAlphas;
 		int MaxNumbers;
 		int Found;

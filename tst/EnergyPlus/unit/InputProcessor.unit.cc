@@ -4,16 +4,63 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/InputProcessorFixture.hh"
+#include <EnergyPlus/SortAndStringUtilities.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 #include <tuple>
 #include <map>
 
 namespace EnergyPlus {
 
+	typedef EnergyPlusFixture InputProcessorFixture;
+	typedef EnergyPlusFixture InputProcessorDeathTestFixture;
+
 	namespace InputProcessor {
 
-		TEST_F( InputProcessorFixture, getObjectItem )
+		TEST_F( InputProcessorFixture, getObjectItem1 )
+		{
+			std::string const idf_objects = delimited_string({
+				"Version,8.3;",
+				"Output:SQLite,SimpleAndTabular;",
+			});
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			std::string const CurrentModuleObject = "Output:SQLite";
+
+			int NumSQLite = GetNumObjectsFound( CurrentModuleObject );
+			ASSERT_EQ( 1, NumSQLite );
+
+			int TotalArgs = 0;
+			int NumAlphas = 0;
+			int NumNumbers = 0;
+
+			GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+			int IOStatus = 0;
+			Array1D_string Alphas( NumAlphas );
+			Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+			Array1D_bool lNumericBlanks( NumAlphas, true );
+			Array1D_bool lAlphaBlanks( NumAlphas, true );
+			Array1D_string cAlphaFields( NumAlphas );
+			Array1D_string cNumericFields( NumNumbers );
+
+			GetObjectItem( CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, Alphas ) );
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Option Type" }, cAlphaFields ) );
+			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { }, cNumericFields ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( { true }, lNumericBlanks ) );
+			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, lAlphaBlanks ) );
+			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( { }, Numbers ) );
+			EXPECT_EQ( 1, NumAlphas );
+			EXPECT_EQ( 0, NumNumbers );
+			EXPECT_EQ( 1, IOStatus );
+
+		}
+
+		TEST_F( InputProcessorFixture, getObjectItem2 )
 		{
 			std::string const idf_objects = delimited_string({
 				"Version,8.3;",
@@ -278,7 +325,7 @@ namespace EnergyPlus {
 
 			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
 
-			use_cached_idd();
+			EnergyPlusFixture::use_cached_idd();
 
 			NumLines = 0;
 
@@ -364,7 +411,7 @@ namespace EnergyPlus {
 
 			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
 
-			use_cached_idd();
+			EnergyPlusFixture::use_cached_idd();
 
 			NumLines = 0;
 
@@ -501,7 +548,7 @@ namespace EnergyPlus {
 
 			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
 
-			use_cached_idd();
+			EnergyPlusFixture::use_cached_idd();
 
 			NumLines = 0;
 
