@@ -365,6 +365,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('COIL:WATERHEATING:AIRTOWATERHEATPUMP')
                 ! object rename only
                 ObjectName = "Coil:WaterHeating:AirToWaterHeatPump:Pumped"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 nodiff=.true.
                                 
