@@ -380,17 +380,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('WATERHEATER:HEATPUMP')
                 ObjectName = "WaterHeater:HeatPump:PumpedCondenser"
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:16)  = InArgs(1:16) ! no change
-                ! DELETE InArgs(17)
-                OutArgs(17:19) = InArgs(18:20) ! move these up by 1 to accommodate removed field F17
+                OutArgs(1:20)  = InArgs(1:20) ! no change
                 ! DELETE InArgs(21)
-                OutArgs(20:21) = InArgs(22:23) ! move these up by 2 to accommodate removed field F21 and F17
-                OutArgs(22) = '' ! Add new blank field F22
-                OutArgs(23:24) = InArgs(24:25) ! move these up by 1 to accommodate removed F17,F21 and added F22
+                OutArgs(21:22) = InArgs(22:23) ! move these up by 1 to accommodate removed field F21
+                OutArgs(23) = '' ! Add new blank field F23
+                OutArgs(24:25) = InArgs(24:25) ! these don't move because of removed F21 and added F23
                 ! DELETE InArgs(26) 
-                OutArgs(25:32) = InArgs(27:34) ! move these up by 2 to accommodate removed F17,F21,F26 and added F22
+                OutArgs(26:33) = InArgs(27:34) ! move these up by 1 to accommodate removed F21,F26 and added F23
                 ! DELETE InArgs(35)
-                OutArgs(33) = '' ! Insert new blank field
+                OutArgs(34) = '' ! Insert new blank field
                 
                 ! For OutArgs(34) "Control Sensor 1 Height In Stratified Tank", we need to mine it from the stratified tank child object
                 ! We will start by initializing it to a blank string in case we couldn't find it
