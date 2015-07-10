@@ -1754,8 +1754,7 @@ namespace DemandManager {
 			}
 
 		} else if ( SELECT_CASE_var == ManagerTypeVentilation ) {
-			Real64 MinFlowRate( 0 ), FlowRate( 0 );
-			//MinFlowRate = OAGetMinFlowRate( LoadPtr );
+			Real64 FlowRate( 0 );
 			FlowRate = OAGetFlowRate( LoadPtr );
 			if ( Action == CheckCanReduce ) {
 				CanReduceDemand = true;

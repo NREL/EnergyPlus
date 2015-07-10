@@ -253,7 +253,7 @@ namespace MixedAir {
 		}
 
 		return FlowRate;
-	};
+	}
 
 	Real64 OAGetMinFlowRate( int OAPtr )
 	{
@@ -278,7 +278,7 @@ namespace MixedAir {
 		}
 
 		return MinFlowRate;
-	};
+	}
 
 	void OASetDemandManagerVentilationState( int OAPtr, bool aState )
 	{
@@ -299,7 +299,7 @@ namespace MixedAir {
 		{
 			OAController( OAPtr ).ManageDemand = aState;
 		}
-	};
+	}
 
 	void OASetDemandManagerVentilationFlow( int OAPtr, Real64 aFlow )
 	{
@@ -321,7 +321,7 @@ namespace MixedAir {
 			OAController( OAPtr ).DemandLimitFlowRate = aFlow * StdRhoAir;
 		}
 
-	};
+	}
 
 	int GetOAController( std::string const & OAName )
 	{
@@ -349,7 +349,7 @@ namespace MixedAir {
 		}
 
 		return CurrentOAController;
-	};
+	}
 
 	void
 	ManageOutsideAirSystem(
