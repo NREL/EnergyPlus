@@ -10702,8 +10702,8 @@ Label50: ;
 				// Get full load output and power
 				LSFullLoadOutAirEnth = InletAirEnthalpy + TotCapLS / MSHPMassFlowRateLow;
 				HSFullLoadOutAirEnth = InletAirEnthalpy + TotCapHS / MSHPMassFlowRateHigh;
-				LSElecHeatingPower = TotCapLS * EIRLS * InputPowerMultiplier;
-				HSElecHeatingPower = TotCapHS * EIRHS * InputPowerMultiplier;
+				LSElecHeatingPower = TotCapLS / HeatingCapacityMultiplier * EIRLS * InputPowerMultiplier;
+				HSElecHeatingPower = TotCapHS / HeatingCapacityMultiplier * EIRHS * InputPowerMultiplier;
 				OutletAirHumRat = InletAirHumRat;
 
 				// if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
@@ -10899,7 +10899,7 @@ Label50: ;
 				}
 				// if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
 				if ( FanOpMode == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF;
-				DXCoil( DXCoilNum ).ElecHeatingPower = TotCap * EIR * DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction * InputPowerMultiplier;
+				DXCoil( DXCoilNum ).ElecHeatingPower = TotCap / HeatingCapacityMultiplier * EIR * DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction * InputPowerMultiplier;
 
 				// Calculate crankcase heater power using the runtime fraction for this DX heating coil only if there is no companion DX coil.
 				// Else use the largest runtime fraction of this DX heating coil and the companion DX cooling coil.
@@ -13639,7 +13639,7 @@ Label50: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
