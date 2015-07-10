@@ -4,10 +4,20 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
 // EnergyPlus Headers
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 #include "../TestHelpers/IOHelper.hh"
 
@@ -29,10 +39,31 @@ namespace EnergyPlus {
 
 		// This is run every unit test and makes sure to clear all state in global variables this fixture touches.
 		virtual void TearDown() {
-			InputProcessor::clear_state();
+			CurveManager::clear_state();
 			DataEnvironment::clear_state();
 			DataGlobals::clear_state();
+			DataHeatBalance::clear_state();
+			DataIPShortCuts::clear_state();
 			DataOutputs::clear_state();
+			DataSurfaces::clear_state();
+			InputProcessor::clear_state();
+			OutputProcessor::clear_state();
+			ScheduleManager::clear_state();
+
+			{ 
+				IOFlags flags; 
+				flags.DISPOSE( "DELETE" );
+				gio::close( OutputProcessor::OutputFileMeterDetails, flags );
+				gio::close( DataGlobals::OutputFileStandard, flags ); 
+				gio::close( DataGlobals::OutputFileInits, flags );
+				gio::close( DataGlobals::OutputFileDebug, flags );
+				gio::close( DataGlobals::OutputFileZoneSizing, flags );
+				gio::close( DataGlobals::OutputFileSysSizing, flags );
+				gio::close( DataGlobals::OutputFileMeters, flags );
+				gio::close( DataGlobals::OutputFileBNDetails, flags );
+				gio::close( DataGlobals::OutputFileZonePulse, flags );
+
+			}
 		}
 
 		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.

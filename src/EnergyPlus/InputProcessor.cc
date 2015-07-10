@@ -205,17 +205,7 @@ namespace InputProcessor {
 		IDFRecordsGotten.deallocate();
 		IDFRecords.deallocate();
 		RepObjects.deallocate();
-		LineItem.Numbers.deallocate();
-		LineItem.NumBlank.deallocate();
-		LineItem.Alphas.deallocate();
-		LineItem.AlphBlank.deallocate();
-
-		DataIPShortCuts::cAlphaFieldNames.deallocate();
-		DataIPShortCuts::cAlphaArgs.deallocate();
-		DataIPShortCuts::lAlphaFieldBlanks.deallocate();
-		DataIPShortCuts::cNumericFieldNames.deallocate();
-		DataIPShortCuts::rNumericArgs.deallocate();
-		DataIPShortCuts::lNumericFieldBlanks.deallocate();
+		LineItem = LineDefinition();
 
 		NumObjectDefs = 0;
 		NumSectionDefs = 0;

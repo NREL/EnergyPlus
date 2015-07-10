@@ -183,6 +183,11 @@ namespace DataBranchNodeConnections {
 	extern Array1D< NodeConnectionDef > NodeConnections;
 	extern Array1D< EqNodeConnectionDef > AirTerminalNodeConnections;
 
+	// Clears the global data in DataBranchNodeConnections.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 } // DataBranchNodeConnections
 
 } // EnergyPlus

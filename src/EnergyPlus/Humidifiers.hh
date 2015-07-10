@@ -182,6 +182,12 @@ namespace Humidifiers {
 	extern Array1D< HumidifierData > Humidifier;
 
 	// Functions
+
+	// Clears the global data in Humidifiers.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	SimHumidifier(
 		std::string const & CompName, // name of the humidifier unit

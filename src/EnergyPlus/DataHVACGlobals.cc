@@ -323,6 +323,75 @@ namespace DataHVACGlobals {
 	OptStartDataType OptStartData; // For optimum start
 	Array1D< ComponentSetPtData > CompSetPtEquip;
 
+	// Clears the global data in DataHVACGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		DXCT = 1;
+		FirstTimeStepSysFlag = false;
+		SysUpdateTimeInc = 0.0;
+		TimeStepSys = 0.0;
+		SysTimeElapsed = 0.0;
+		FracTimeStepZone = 0.0;
+		ShortenTimeStepSys = false;
+		NumOfSysTimeSteps = 1;
+		NumOfSysTimeStepsLastZoneTimeStep = 1;
+		LimitNumSysSteps = 0;
+		UseZoneTimeStepHistory = true;
+		NumPlantLoops = 0;
+		NumCondLoops = 0;
+		NumElecCircuits = 0;
+		NumGasMeters = 0;
+		NumPrimaryAirSys = 0;
+		FanElecPower = 0.0;
+		OnOffFanPartLoadFraction = 1.0;
+		DXCoilTotalCapacity = 0.0;
+		DXElecCoolingPower = 0.0;
+		DXElecHeatingPower = 0.0;
+		ElecHeatingCoilPower = 0.0;
+		AirToAirHXElecPower = 0.0;
+		UnbalExhMassFlow = 0.0;
+		BalancedExhMassFlow = 0.0;
+		PlenumInducedMassFlow = 0.0;
+		TurnFansOn = false;
+		TurnFansOff = false;
+		ZoneCompTurnFansOn = false;
+		ZoneCompTurnFansOff = false;
+		SetPointErrorFlag = false;
+		DoSetPointTest = false;
+		NightVentOn = false;
+		NumTempContComps = 0;
+		HPWHInletDBTemp = 0.0;
+		HPWHInletWBTemp = 0.0;
+		HPWHCrankcaseDBTemp = 0.0;
+		AirLoopInit = false;
+		AirLoopsSimOnce = false;
+		NumHybridVentSysAvailMgrs = 0;
+		HybridVentSysAvailAirLoopNum.deallocate();
+		HybridVentSysAvailVentCtrl.deallocate();
+		HybridVentSysAvailActualZoneNum.deallocate();
+		HybridVentSysAvailANCtrlStatus.deallocate();
+		HybridVentSysAvailMaster.deallocate();
+		HybridVentSysAvailWindModifier.deallocate();
+		MSHPMassFlowRateLow = 0.0;
+		MSHPMassFlowRateHigh = 0.0;
+		MSHPWasteHeat = 0.0;
+		PreviousTimeStep = 0.0;
+		ShortenTimeStepSysRoomAir = false;
+		deviationFromSetPtThresholdHtg = -0.2;
+		deviationFromSetPtThresholdClg = 0.2;
+		SimAirLoopsFlag = true;
+		SimElecCircuitsFlag = true;
+		SimPlantLoopsFlag = true;
+		SimZoneEquipmentFlag = true;
+		SimNonZoneEquipmentFlag = true;
+		ZoneMassBalanceHVACReSim = true;
+		ZoneComp.deallocate();
+		OptStartData = OptStartDataType();
+		CompSetPtEquip.deallocate();
+	}
+
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
