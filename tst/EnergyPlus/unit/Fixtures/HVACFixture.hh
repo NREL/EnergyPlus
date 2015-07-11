@@ -6,11 +6,15 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
@@ -31,11 +35,15 @@ namespace EnergyPlus {
 			Psychrometrics::cached_Twb.deallocate();
 			Psychrometrics::cached_Psat.deallocate();
 
+			DataAirLoop::clear_state();
 			DataBranchNodeConnections::clear_state();
 			DataHVACGlobals::clear_state();
+			DataLoopNode::clear_state();
 			DataSizing::clear_state();
 			Humidifiers::clear_state();
+			MixedAir::clear_state();
 			NodeInputManager::clear_state();
+			OutAirNodeManager::clear_state();
 			
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
