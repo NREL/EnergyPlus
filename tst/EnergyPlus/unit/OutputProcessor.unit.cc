@@ -4,7 +4,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/OutputProcessorFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -12,6 +13,9 @@
 #include <map>
 
 namespace EnergyPlus {
+
+	typedef SQLiteFixture OutputProcessorFixture;
+	typedef SQLiteFixture OutputProcessorDeathTestFixture;
 
 	namespace OutputProcessor {
 
@@ -2276,6 +2280,8 @@ namespace EnergyPlus {
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
 
+			InitializeOutput();
+
 			GetReportVariableInput();
 
 			auto const var_name = "Site Outdoor Air Drybulb Temperature";
@@ -2458,6 +2464,8 @@ namespace EnergyPlus {
 
 			auto const keyed_value = "Environment";
 			auto const var_name = "Site Outdoor Air Drybulb Temperature";
+
+			InitializeOutput();
 
 			GetReportVariableInput();
 			CheckReportVariable( keyed_value, var_name );

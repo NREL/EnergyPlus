@@ -241,22 +241,22 @@ namespace EnergyPlus {
 		}
 
 		if ( TotalAuditErrors > 0 ) {
-			EXPECT_GT( TotalAuditErrors, 0 ) << "Note -- Some missing fields have been filled with defaults.";
+			EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
 			errors_found = true;
 		}
 
 		if ( NumOutOfRangeErrorsFound > 0 ) {
-			EXPECT_GT( NumOutOfRangeErrorsFound, 0 ) << "Out of \"range\" values found in input";
+			EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
 			errors_found = true;
 		}
 
 		if ( NumBlankReqFieldFound > 0 ) {
-			EXPECT_GT( NumBlankReqFieldFound, 0 ) << "Blank \"required\" fields found in input";
+			EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
 			errors_found = true;
 		}
 
 		if ( NumMiscErrorsFound > 0 ) {
-			EXPECT_GT( NumMiscErrorsFound, 0 ) << "Other miscellaneous errors found in input";
+			EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
 			errors_found = true;
 		}
 
