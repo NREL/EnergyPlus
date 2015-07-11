@@ -9,6 +9,8 @@
 
 #include "../TestHelpers/IdfParser.hh"
 
+#include <ostream>
+
 namespace EnergyPlus {
 
 	class IdfParserFixture : public testing::Test
@@ -24,11 +26,11 @@ namespace EnergyPlus {
 		// This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any 
 		// delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
 		std::string delimited_string( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL ) {
-			std::unique_ptr<std::ostringstream> compare_text(new std::ostringstream);
+			std::ostringstream compare_text;
 			for( auto const & str : strings ) {
-				* compare_text << str << delimiter;
+				compare_text << str << delimiter;
 			}
-			return compare_text->str();
+			return compare_text.str();
 		}
 
 		void eat_whitespace( std::string const & idf, size_t & index ) {

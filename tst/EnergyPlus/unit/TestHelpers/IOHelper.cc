@@ -13,7 +13,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 
 #include <fstream>
-#include <memory>
 #include <algorithm>
 
 struct InputProcessorCache;
@@ -36,13 +35,14 @@ namespace EnergyPlus {
 
 		m_cerr_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cerr = std::unique_ptr< RedirectCerr >( new RedirectCerr( m_cerr_buffer ) );
-	};
+	}
+
 	IOHelper::~IOHelper()
 	{
 		DataGlobals::eso_stream = nullptr;
 		DataGlobals::mtr_stream = nullptr;
 		InputProcessor::echo_stream = nullptr;
-	};
+	}
 
 	void IOHelper::setup_cache()
 	{

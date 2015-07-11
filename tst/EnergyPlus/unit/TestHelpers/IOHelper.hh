@@ -6,6 +6,9 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/InputProcessor.hh>
 
+#include <memory>
+#include <ostream>
+
 namespace EnergyPlus {
 
 	// This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and

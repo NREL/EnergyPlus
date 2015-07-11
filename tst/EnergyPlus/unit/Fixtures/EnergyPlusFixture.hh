@@ -22,6 +22,8 @@
 
 #include "../TestHelpers/IOHelper.hh"
 
+#include <memory>
+
 namespace EnergyPlus {
 
 	class EnergyPlusFixture : public testing::Test
