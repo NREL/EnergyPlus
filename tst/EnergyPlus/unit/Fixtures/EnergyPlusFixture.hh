@@ -15,6 +15,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -46,6 +47,7 @@ namespace EnergyPlus {
 			DataIPShortCuts::clear_state();
 			DataOutputs::clear_state();
 			DataSurfaces::clear_state();
+			HeatBalanceManager::clear_state();
 			InputProcessor::clear_state();
 			OutputProcessor::clear_state();
 			ScheduleManager::clear_state();

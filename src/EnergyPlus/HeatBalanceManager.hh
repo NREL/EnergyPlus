@@ -109,6 +109,11 @@ namespace HeatBalanceManager {
 
 	// Functions
 
+	// Clears the global data in HeatBalanceManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	ManageHeatBalance();
 
