@@ -63,13 +63,18 @@ namespace EnergyPlus {
 			"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
 			"    FullInteriorAndExterior, !- Solar Distribution",
 			"    25,                      !- Maximum Number of Warmup Days",
-			"    6;  ",
+			"    6;",
 		} ) );
 
 		auto const output = parse_idf( test_object, index, success );
 
 		EXPECT_EQ( std::vector< std::vector< std::string > >({ { "Version", "8.3" }, { "Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6" } }), output );
-		EXPECT_EQ( 434ul, index );
+	#ifdef _WIN32
+		// Windows has \r\n for line ending so it needs to be 2 back
+		EXPECT_EQ( test_object.size() - 2, index );
+	#else
+		EXPECT_EQ( test_object.size() - 1, index );
+	#endif
 		EXPECT_TRUE( success );
 	}
 
@@ -90,7 +95,12 @@ namespace EnergyPlus {
 
 		auto const output_vector = parse_object( test_object, index, success );
 		EXPECT_EQ( std::vector< std::string >({ "Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6" }), output_vector );
+	#ifdef _WIN32
+		// Windows has \r\n for line ending so it needs to be 2 back
+		EXPECT_EQ( test_object.size() - 2, index );
+	#else
 		EXPECT_EQ( test_object.size() - 1, index );
+	#endif
 		EXPECT_TRUE( success );
 	}
 
