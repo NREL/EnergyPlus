@@ -4269,8 +4269,9 @@ namespace MixedAir {
 			OAController( OAControllerNum ).OAMassFlow = min( OAController( OAControllerNum ).OAMassFlow, OAController( OAControllerNum ).MaxOAMassFlowRate );
 		}
 
-		// Update demand managers here and before EMS override because we want EMS to have higher priority than demand manager
-		if (!WarmupFlag && !DoingSizing && (OAController(OAControllerNum).ManageDemand) && (OAController(OAControllerNum).OAMassFlow > OAController(OAControllerNum).DemandLimitFlowRate))
+		// Update OAMassFlow if there is Demand Manager on ventilation
+		// Implement demand managers before EMS override because we want EMS to have higher priority than demand manager
+		if ( !WarmupFlag && !DoingSizing && ( OAController( OAControllerNum ).ManageDemand ) && ( OAController( OAControllerNum ).OAMassFlow > OAController( OAControllerNum ).DemandLimitFlowRate ) )
 			OAController( OAControllerNum ).OAMassFlow = OAController( OAControllerNum ).DemandLimitFlowRate;
 
 		if ( OAController( OAControllerNum ).EMSOverrideOARate ) {
@@ -4695,6 +4696,8 @@ namespace MixedAir {
 
 		// Using/Aliasing
 		using namespace DataLoopNode;
+		using DataGlobals::WarmupFlag;
+		using DataGlobals::DoingSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -4720,7 +4723,7 @@ namespace MixedAir {
 
 		if ( OAController( OAControllerNum ).ControllerType_Num == ControllerOutsideAir ) {
 			// The outside air controller sets the outside air flow rate and the relief air flow rate
-			if ( OAController( OAControllerNum ).ManageDemand )
+			if ( !WarmupFlag && !DoingSizing && ( OAController( OAControllerNum ).ManageDemand ) && ( OAController( OAControllerNum ).OAMassFlow > OAController( OAControllerNum ).DemandLimitFlowRate ) )
 			{
 				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).DemandLimitFlowRate;
 				Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).DemandLimitFlowRate;
@@ -4738,7 +4741,7 @@ namespace MixedAir {
 			// Currently, the Stand Alone ERV only has constant air flows (supply and exhaust), and these are
 			// already set in HVACStandAloneERV.cc (subroutine init). Therefore, these flow assignments below are
 			// currently redundant but may be useful in the future as mass flow rates can vary based on the controller signal.
-			if ( OAController( OAControllerNum ).ManageDemand )
+			if ( !WarmupFlag && !DoingSizing && ( OAController( OAControllerNum ).ManageDemand ) && ( OAController( OAControllerNum ).OAMassFlow > OAController( OAControllerNum ).DemandLimitFlowRate ) )
 			{
 				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).DemandLimitFlowRate;
 				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).DemandLimitFlowRate;
