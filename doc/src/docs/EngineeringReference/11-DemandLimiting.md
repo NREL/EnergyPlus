@@ -10,11 +10,13 @@ Demand limiting controls shut off or reduce the power to non-essential loads in 
 
 * reset the thermostatic setpoints on HVAC systems
 
+* reduce ventilation load thus electricity demand
+
 * reduce the load of a set of similar components by rotating one or more components "off" for a short time interval
 
 * turn on generators to meet some or all of the building's demand.
 
-The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies.  The DemandManagerAssignmentList object is a high level control that makes demand limiting decisions based on a list of possible demand limiting strategies.  Each demand limiting strategy is described in a separate DemandManager object.  Each DemandManager object controls a group of similar load objects of the same type, such as DemandManager:Lights, DemandManager:ElectricEquipment, or DemandManager:Thermostats objects.
+The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies.  The DemandManagerAssignmentList object is a high level control that makes demand limiting decisions based on a list of possible demand limiting strategies.  Each demand limiting strategy is described in a separate DemandManager object.  Each DemandManager object controls a group of similar load objects of the same type, such as DemandManager:Lights, DemandManager:ElectricEquipment, DemandManager:Thermostats, or DemandManager:Ventilation objects.
 
 ### Algorithm
 
@@ -61,6 +63,12 @@ Table 42. Demand Manager Types and Resimulation.
 </tr>
 <tr>
 <td>DemandManager:Thermostats</td>
+<td> </td>
+<td> </td>
+<td>ü</td>
+</tr>
+<tr>
+<td>DemandManager:Ventilation</td>
 <td> </td>
 <td> </td>
 <td>ü</td>
