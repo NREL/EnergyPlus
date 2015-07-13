@@ -14361,6 +14361,8 @@ This section describes the radiative/convective zone equipment units.  The foll
 
 - ZoneHVAC:Baseboard:Convective:Water
 
+- ZoneHVAC:CoolingPanel:RadiantConvective:Water
+
 - ZoneHVAC:HighTemperatureRadiant
 
 - ZoneHVAC:LowTemperatureRadiant:ConstantFlow
@@ -14855,6 +14857,183 @@ This field reports the amount of radiant energy transferred from the baseboard t
 
 This field reports the amount of convective energy transferred from the baseboard directly to the zone air in Joules.
 
+### ZoneHVAC:CoolingPanel:RadiantConvective:Water
+
+The radiant/convective cooling panel is a component of zone equipment.  Chilled water is supplied by the plant and circulated through the panel.  Through radiation and convective heat transfer, the panel absorbs energy contained within the zone to provide cooling.  Control of the panel is achieved using the methodology used for low temperature radiant systems—a piecewise linear control profile that varies the flow rate to the panel based on a control parameter defined by the user.  This is different than being controlled to meet any remaining load like the air-based systems.  However, due to the radiant nature of these devices, it is not possible to control precisely on a zone air-based load since this will result in overcooling at the next time step.  Despite this, in addition to the piecewise linear controls that have been used with low temperature radiant systems in the past, two new controls will be added for this simple model: one that varies convective output of the system to meet the remaining zone load and one that varies the total convective output of the system to meet the remaining zone load.  In these two zone load control types, the user must enter the typical zone thermostat object to replace the setpoint and throttling range input in this object.  In this component, control is accomplished by throttling the chilled water flow to the device.  Capacity rating information is required as input and is used to calculate a UA value of the unit. The unit is connected to a chilled water loop (demand side) with an inlet and outlet node. The input data dictionary definition of the unit is as follows.
+
+#### Field: Name
+
+A unique user assigned name for an instance of radiant cooling panel. Any reference to this unit by another object will use this name.
+
+#### Field: Available Schedule Name
+
+The name of the schedule (ref: Schedule) that denotes whether the radiant cooling panel can run during a given hour. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the hour. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the hour.
+
+#### Field: Inlet Node Name
+
+The name of the water inlet node for the radiant cooling panel.
+
+#### Field: Outlet Node Name
+
+The name of the water outlet node for the radiant cooling panel.
+
+#### Field: Rated Inlet Water Temperature
+
+This field is the inlet temperature to the panel under conditions used to rate the capacity of the panel.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  The default value is 5°C (44°F).
+
+#### Field: Rated Space Temperature
+
+This field is the combined space temperature (air and surface) that the panel is exposed to during the rating process to obtain a rated capacity.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  The default value is 24°C (75.2°F).
+
+#### Field: Rated Water Mass Flow Rate
+
+This field is the rated standard water flow rate in kg/s that was used to obtain the rated capacity under rated conditions.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  The default value is 0.063kg/s (1 gpm).  If it is blank or zero, the default value is assumed.
+
+#### Field: Rated Capacity
+
+This field is the rated radiant cooling panel capacity in Watts at a rated water mass flow rate (see previous field).  Most manufacturers will publish a capacity in their literature.  This field can be autosized by EnergyPlus. If it is blank or zero, autosizing is assumed.
+
+#### Field: Maximum Chilled Water Flow Rate
+
+The maximum chilled water volumetric flow rate in m3/sec.  This field can also be autosized.
+
+#### Field: Control Type
+
+This field specifies two different types of control categories: temperature or zone load.  For one of the temperature based controls, this field along with the throttling range and setpoint schedules determines how the user wishes to control the radiant cooling panel.  The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature.  The current field controls the choice of temperature.  For controls that are based more on zone load, the user can make one of two choices based on whether the zone load is met by only the convective output of the unit or the total output of the unit.  These zone load controls will not perform as precisely as air-based systems.  The convective zone load control will come close to meeting the current setpoint temperature (defined by the typical zone thermostat input by the user) since the convective output of the unit will be set to match the remaining zone load.  However, in the long run, this will likely overcool the space since radiant energy is being absorbed by surfaces and this will impact the zone conditions at later time steps.  The total zone load control will likely undercool the space in the short term since the total output (radiant and convective) of the unit will be set to meet the remaining zone load.  However, this will not fully impact the zone air temperature immediately since some of the energy is being absorbed from surfaces rather than the zone air.  The user must select from the following options:
+* MeanAirTemperature
+* MeanRadiantTemperature* OperativeTemperature* OutdoorDryBulbTemperature* OutdoorWetBulbTemperature* ZoneConvectiveLoad* ZoneTotalLoadOperative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, MeanAirTemperature control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
+
+#### Field: Cooling Control Throttling Range
+
+This field specifies the range of temperature in degrees Celsuis over which the radiant cooling panel throttles from zero flow rate up to the maximum defined by the maximum chilled water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature to define the response of the system to various zone conditions. The cooling control temperature schedule specifies the “setpoint” temperature where the flow rate to the system is at half of the maximum flow rate. For example, if the cooling control temperature setpoint is currently 25 C and the cooling throttling range is 2 C, the water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or below 24 C and the maximum flow rate when the controlling temperature is at or above 26 C. This represents a throttling range of 2 C around the setpoint of 25 C. In between 24 C and 26 C, the flow rate to the radiant system is varied linearly.  Note that this field is ignored when the control type is either ZoneLoadConvective or ZoneLoadTotal.  For the two zone load controls, the user must use a typical zone thermostat and the system output will be dependent on the remaining zone load.
+
+#### Field: Cooling Control Temperature Schedule Name
+
+This field specifies the cooling setpoint or control temperature for the radiant cooling panel in degrees Celsius. Used in conjunction with the previous field (cooling control throttling range), it will define whether or not the system is running and the current flow rate. Water flow rate to the system is varied linearly around the setpoint temperature based on the throttling range and the maximum cooling flow rate parameters (see above). It should be noted that this control schedule will allow different setpoint temperatures throughout the year for cooling. The control of the radiant cooling panel is based solely on the cooling control throttling range listed above, the cooling control temperature schedule, and the control temperature type listed above. The radiant cooling panel will not use any zone thermostat that might be used by other systems serving the zone in which this radiant cooling panel resides.  Note that this field is ignored when the control type is either ZoneLoadConvective or ZoneLoadTotal.  For the two zone load controls, the user must use a typical zone thermostat and the system output will be dependent on the remaining zone load.
+
+#### Field: Condensation Control Type
+
+Since radiant cooling panels provide a cold surface in what could be a humid zone, there is the possibility that condensation will occur on the surface of the panel. This is due to the fact that the surface temperature may drop below the dew-point temperature of the space. When this occurs, condensation on the surface will occur. Since there is no direct calculation of the surface temperature of the radiant cooling panel, the condensation check will be made at the inlet water temperature to the panel. Since the user can utilize the next parameter to adjust the differential between the dewpoint temperature and the inlet water temperature, this will allow some flexibility in controlling when the panel will shutdown to avoid condensation. In EnergyPlus, users have several options for handling potential condensation including: Off, SimpleOff, and VariableOff. When the user chooses the Off option, EnergyPlus will not do anything other than produce a warning message when condensation is predicted to occur. The program will simply continue on; no moisture will be removed from the zone air and there will be no adjustment of the surface temperature as a result of the condensation. When the user chooses the SimpleOff option, the program will predict cases where condensation will occur and shut-off the radiant system to avoid this situation. With this option, the users also have the opportunity to adjust when the system will shut down. This is specified with the next parameter (field: condensation differential parameter). When the user chooses the VariableOff option, the program will attempt to reduce the inlet temperature to the panel by locally recirculating some of the water leaving the panel and mixing it with water from the overall demand side flow.  This also means that some of the demand side water will bypass the panel. In reality, this would require a pump to achieve such mixing and recirculation, but due to the simple nature of this model, no pump definition will be required. Like the SimpleOff option, the VariableOff option uses the condensation dewpoint offset parameter to adjust when the system will try to adjust for the possibility of condensation. This parameter is optional and EnergyPlus will use the SimpleOff strategy when this parameter is not specified.
+
+#### Field: Condensation Control Dewpoint Offset
+
+This optional parameter is only valid with the SimpleOff and VariableOff condensation handling algorithm (see previous input parameter). It establishes the difference between the calculated dew-point temperature of the space and the allowed inlet water temperature to the radiant cooling panel before the system shuts down in degrees Celsius. This parameter can be any positive, negative, or zero value. When this parameter is zero, the radiant system will shut down or recirculate water (depending on whether SimpleOff or VariableOff is used) when the inlet temperature drops to the dew-point temperature or below. When this parameter is positive, the radiant system will shut down or recirculate water when the inlet water temperature is the number of degrees Celsius above the dew-point temperature. This allows some extra safety to avoid condensation. When this parameter is negative, the radiant system will shut down or recirculate water when the inlet water temperature is the number of degrees Celsius below the dew-point temperature. This strategy allows the user to simulate a situation where small amounts of condensation are tolerable or the resistance of the panel from the water loop to the panel surface is being taken into account as condensation would likely happen at the panel surface.
+
+#### Field: Fraction Radiant
+
+This field gives the user an opportunity to characterize the zone temperature as a function of the zone mean radiant temperature and the mean air temperature.  The performance of the unit is proportional to the difference between the water inlet temperature and the zone temperature where the zone temperature is found using a weighted average of zone mean radiant temperature and mean air temperature.  The weighting factor is this parameter and it is multiplied by the zone mean radiant temperature.  The remainder of the zone temperature calculation is made up of the zone mean air temperature.  This parameter can be difficult to quantify as the fraction radiant can vary with zone conditions.  However, by definition, a radiant system like this radiant cooling panel must exchange at least 50% of its energy to the zone via radiation.  One study has shown that a fraction radiant between 0.6 and 0.7 is a reasonable estimation.  For more information, see the EnergyPlus Engineering Reference in section Radiant System Models, subsection Simple Radiant Cooling Panel.
+
+#### Field: Fraction of Radiant Energy Incident on People
+
+This field allows the user to direct some of the radiant energy to be absorbed from people rather than surfaces within the space.  This would have a direct impact on thermal comfort and would depend on the location of the people with respect to the radiant cooling panel.  All energy absorbed by the panel would have a cooling effect on people and is subtracted from the total radiant energy absorbed by the panel defined by the previous term.
+
+#### Field: Surface 1 Name
+
+The radiant energy absorbed by the radiant cooling panel can be specified to be received from particular surfaces within the space.  The next series of pairs of inputs (surface name and fraction of radiant energy) specify where this radiant energy is coming from.  In essense, the fraction radiant terms for each surface are similar to a view factor.  These pairs can be repeated for up to 100 surfaces giving the user plenty of flexibility to have the radiant cooling panel interact with many potential surfaces.  This first parameter in the pair is the name of the surface defined by user input elsewhere in the input file.  Note that the surface must reside in the same zone as all of the other surfaces in the following list (that is, all surfaces listed must be in the same zone).
+
+#### Field: Fraction of Radiant Energy to Surface 1
+
+In combination with the previous field, this defines what fraction of the radiant energy being absorbed by the radiant cooling panel comes from the surface named by the previous field.  These pairs of surface names and fractions of radiant energy from the surface can be repeated up to 100 times in the input for a particular radiant cooling panel.  Note that the sum of all of the radiant energy fractions plus the radiant fraction from people must add up to unity just like in the radiant-convective baseboard models.  Note that there is a small possibility that a particular surface listed in these pairs is actually lower than the temperature of the panel.  This probably will not happen unless there is another cooling surface within the zone.  In reality, absorbing net radiant energy from a colder surface would violate the Second Law of Thermodynamics.  However, in keeping with the simple nature of this model, EnergyPlus will monitor the inlet water temperature to the panel and produce a warning message if this temperature is lower than any of the surface temperature of the surfaces with which this system is interacting.
+
+An example input for the radiant cooling panel is shown below.
+
+```idf
+ZoneHVAC:CoolingPanel:RadiantConvective:Water,
+Radiant Cooling Panel 1,   !- Name
+RCP Schedule 1,            !- Availability schedule
+RCP Water Inlet Node,      !- Inlet node name
+RCP Water Outlet Node,     !- Outlet node name
+5.0,                       !- Rated Water Inlet Temperature {C}
+24.0,                      !- Rated Space Temperature {C}
+0.063,                     !- Rated Water Mass Flow Rate {kg/s}
+5000.0,                    !- Rated capacity
+0.1,                       !- Maximum water flow rate {m3/s}
+MeanAirTemperature,        !- Temperature Control Type
+1.0,                       !- Cooling Control Throttling Range
+RCP Temp Schedule,         !- Cooling Control Temperature Schedule Name
+SimpleOff,                 !- Condensation Control Type
+1.0,                       !- Condensation Control Dewpoint Offset
+0.65,                      !- Fraction Radiant
+0.2,                       !- Fraction of Radiant Energy Incident on People
+Zone 1 Floor,              !- Surface 1 Name
+0.5,                       !- Fraction of Radiant Energy to Surface 1
+Zone 1 West Wall,          !- Surface 2 Name
+0.25,                      !- Fraction of Radiant Energy to Surface 2
+Zone 1 South Wall,         !- Surface 3 Name
+0.25;                      !- Fraction of Radiant Energy to Surface 3
+```
+
+### ZoneHVAC:CoolingPanel:RadiantConvective:Water Outputs
+
+* HVAC, Average, Radiant Cooling Panel Total System Cooling Rate[W]
+
+* HVAC, Average, Radiant Cooling Panel Total Cooling Rate[W]
+
+* HVAC, Average, Radiant Cooling Panel Convective Cooling Rate[W]
+
+* HVAC, Average, Radiant Cooling Panel Radiant Cooling Rate[W]
+
+* HVAC, Sum, Radiant Cooling Panel Total System Cooling Energy[J]
+
+* HVAC, Sum, Radiant Cooling Panel Total Cooling Energy[J]
+
+* HVAC, Sum, Radiant Cooling Panel Convective Cooling Energy[J]
+
+* HVAC, Sum, Radiant Cooling Panel Radiant Cooling Energy[J]
+
+* HVAC, Meter, RadiantCoolingPanel:EnergyTransfer [J]
+
+* HVAC, Average, Radiant Cooling Panel Water Mass Flow Rate [kg/s]
+
+* HVAC, Average, Radiant Cooling Panel Water Inlet Temperature [C]
+
+#### Radiant Cooling Panel Total System Cooling Rate [W]
+
+This field is the total rate of cooling achieved by the radiant cooling panel on the zone in Watts. This is the impact of the cooling panel on the space and is the actual impact the system has on the zone.  It includes the convective heat transfer rate as well as the decreased convection from zone surfaces as a result of the operation of the unit and the radiant absorbed by people.
+
+#### Radiant Cooling Panel Total Cooling Rate [W]
+
+This variable is the total rate of cooling achieved by the radiant cooling panel on the zone in Watts. This value includes the sum of both the convective and the radiant energy absorbed by the panel.
+
+#### Radiant Cooling Panel Convective Cooling Rate [W]
+
+This field reports the rate at which convective heat is removed by the radiant cooling panel from the zone in Watts.
+
+#### Radiant Cooling Panel Radiant Cooling Rate [W]
+
+This field reports the rate at which radiant heat is removed from people and the surfaces of the zone being served by the radiant cooling panel in Watts.
+
+#### Radiant Cooling Panel Total System Cooling Rate [J]
+
+This field is the total cooling achieved by the radiant cooling panel on the zone in Joules over the timestep being reported. This is the impact of the cooling panel on the space and is the actual impact the system has on the zone.  It includes the convective heat transfer rate as well as the decreased convection from zone surfaces as a result of the operation of the unit and the radiant absorbed by people.
+
+#### Radiant Cooling Panel Total Cooling Energy [J]
+
+This field reports the total heat removal from the zone by the radiant cooling panel in Joules over the timestep being reported.
+
+#### Radiant Cooling Panel Convective Cooling Energy [J]
+
+This field reports the convective heat removal from the zone by the radiant cooling panel in Joules over the timestep being reported.
+
+#### Radiant Cooling Panel Radiant Cooling Energy [J]
+
+This field reports the amount of radiant heat removal from people and the surfaces of the zone being served by the radiant cooling panel in Joules over the timestep being reported.
+
+#### RadiantCoolingPanel:EnergyTransfer [J]
+
+This meter report variable is the sum of the total heat removal being accomplished by all radiant cooling panels in the HVAC systems in the simulation.
+
+#### Radiant Cooling Panel Water Mass Flow Rate [kg/s]
+
+This field reports the water mass flow rate at the inlet node of the radiant cooling panel.  The water mass flow rate at the inlet and outlet node of the radiant cooling panel is the same value.
+
+#### Radiant Cooling Panel Water Inlet Temperature [C]
+
+This field reports the water temperature at the inlet node of the radiant cooling panel.
+
+#### Radiant Cooling Panel Water Outlet Temperature [C]
+
+This field reports the water temperature at the outlet node of the radiant cooling panel.
 ### ZoneHVAC:Baseboard:Convective:Water
 
 The hot water baseboard heater is a component of zone equipment. The component is controlled to meet any remaining zone load not met by other equipment in the zone that have higher heating priority. The control is accomplished by throttling the hot water flow. Input resembles that for the simple heating coil: there is an availability schedule, an overall UA, and a maximum hot water mass flow rate. The unit is connected to a hot water loop (demand side) with an inlet and outlet node. Finally, there is the convergence tolerance, which is the tolerance on how closely the baseboard outlet will meet the zone load. Of course, this tolerance is relative to the zone load.

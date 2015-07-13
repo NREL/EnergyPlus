@@ -197,7 +197,7 @@ namespace CoolingPanelSimple {
 			Real64 const FracRadiant,
 			Real64 const FracConvect,
 			Real64 const FracDistribPerson,
-			Array1D< Real64 > const & FracDistribToSurf,
+			Array1< Real64 > const & FracDistribToSurf,
 			Real64 const TotPower,
 			Real64 const Power,
 			Real64 const ConvPower,
