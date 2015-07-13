@@ -42,6 +42,41 @@ endif()
 
 
 
+Function(AddSplitMarkdownInput docName fileName offset)
+  set(input_name ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/${fileName})
+  set(output_name ${CMAKE_BINARY_DIR}/docs/${docName}/${fileName}.html)
+  set(${docName}_Inputs ${${docName}_Inputs} ${output_name} PARENT_SCOPE)
+
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName})
+
+  add_custom_command(OUTPUT ${output_name}
+    COMMAND ${PANDOC_EXECUTABLE} ${input_name} -o ${output_name} -f markdown_github -s -t html -N -H ${CMAKE_CURRENT_SOURCE_DIR}/docs/header.html --number-offset=${offset} --email-obfuscation=none
+    DEPENDS ${input_name} ${CMAKE_CURRENT_SOURCE_DIR}/docs/header.html
+    )
+EndFunction()
+
+Function(AddSplitPDF docName zoom )
+  set(output_name ${CMAKE_BINARY_DIR}/built_pdfs/${docName}.pdf)
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/built_pdfs)
+
+  set(shrinking_options --disable-smart-shrinking --zoom ${zoom})
+
+  add_custom_command(OUTPUT ${output_name}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs/${docName}/media ${CMAKE_BINARY_DIR}/docs/${docName}/media
+    COMMAND ${WKHTMLTOPDF_EXECUTABLE}  --window-status "MATHJAXDONE" --outline --outline-depth 3  ${shrinking_options} --page-size Letter --load-error-handling abort --load-media-error-handling abort --minimum-font-size 3 --footer-center [page] --no-stop-slow-scripts   toc --xsl-style-sheet ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl  ${${docName}_Inputs} ${output_name} 
+    DEPENDS ${${docName}_Inputs} ${CMAKE_CURRENT_SOURCE_DIR}/docs/toc.xsl
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/docs/${docName}
+    )
+
+  add_custom_target(${docName}_pdf ALL
+    DEPENDS ${output_name}
+    )
+
+  INSTALL(FILES "${output_name}" DESTINATION "./Documentation")
+EndFunction()
+
+
+
 Function(AddMarkdownInput docName tag offset)
   set(output_name ${CMAKE_BINARY_DIR}/docs/${docName}/${docName}${tag}.html)
 
@@ -90,22 +125,49 @@ AddMarkdownInput(EMS_Application_Guide "" 0 EMS_Application_Guide.md)
 AddPDF(EMS_Application_Guide "")
 
 
-# Note: put part2 first because it takes the longest to build, so we don't want things waiting on it
-AddMarkdownInput(EngineeringReference "-part2" 6 07-Daylighting.md 08-AirHeatBalance.md 09-BuildingSystemSimulation.md 10-Sizing.md OperationalFaults.md 11-DemandLimiting.md 12-AlternativeModeling.md)
-AddPDF(EngineeringReference "-part2")
+if (BUILD_MONOLITHIC_ENGINEERINGREFERENCE)
+  AddSplitMarkdownInput(EngineeringReference 01-Overview.md 0)
+  AddSplitMarkdownInput(EngineeringReference 02-IntegratedSolution.md 1)
+  AddSplitMarkdownInput(EngineeringReference 03-SurfaceHeatBalance.md 2)
+  AddSplitMarkdownInput(EngineeringReference 04-AdvancedSurface.md 3)
+  AddSplitMarkdownInput(EngineeringReference 05-Climate.md 4)
+  AddSplitMarkdownInput(EngineeringReference 06-SolarRadiation.md 5)
+  AddSplitMarkdownInput(EngineeringReference 07-Daylighting.md 6)
+  AddSplitMarkdownInput(EngineeringReference 08-AirHeatBalance.md 7)
+  AddSplitMarkdownInput(EngineeringReference 09-BuildingSystemSimulation.md 8)
+  AddSplitMarkdownInput(EngineeringReference 10-Sizing.md 9)
+  AddSplitMarkdownInput(EngineeringReference OperationalFaults.md 10)
+  AddSplitMarkdownInput(EngineeringReference 11-DemandLimiting.md 11)
+  AddSplitMarkdownInput(EngineeringReference 12-AlternativeModeling.md 12)
+  AddSplitMarkdownInput(EngineeringReference 13-EncyclopaedicRefs.md 13)
+  AddSplitMarkdownInput(EngineeringReference 13a-EncyclopaedicRefs.md 14)
+  AddSplitMarkdownInput(EngineeringReference 13b-EncyclopaedicRefs.md 15)
+  AddSplitMarkdownInput(EngineeringReference 13c-EncyclopaedicRefs.md 16)
+  AddSplitMarkdownInput(EngineeringReference 13d-EncyclopaedicRefs.md 17)
+  AddSplitMarkdownInput(EngineeringReference 13e-EncyclopaedicRefs.md 18)
+  AddSplitMarkdownInput(EngineeringReference 13f-EncyclopaedicRefs.md 19)
+  AddSplitMarkdownInput(EngineeringReference 14-OnSiteGeneration.md 20)
+  AddSplitMarkdownInput(EngineeringReference 15-PerformanceCurves.md 21)
+  AddSplitMarkdownInput(EngineeringReference 16-Economics.md 22)
+  AddSplitMarkdownInput(EngineeringReference 17-SpecialModulesReporting.md 23)
+  AddSplitPDF(EngineeringReference .61)
+else()
+  # Note: put part2 first because it takes the longest to build, so we don't want things waiting on it
+  AddMarkdownInput(EngineeringReference "-part2" 6 07-Daylighting.md 08-AirHeatBalance.md 09-BuildingSystemSimulation.md 10-Sizing.md OperationalFaults.md 11-DemandLimiting.md 12-AlternativeModeling.md)
+  AddPDF(EngineeringReference "-part2")
 
-AddMarkdownInput(EngineeringReference "-part1" 0 01-Overview.md 02-IntegratedSolution.md 03-SurfaceHeatBalance.md 04-AdvancedSurface.md 05-Climate.md 06-SolarRadiation.md )
-AddPDF(EngineeringReference "-part1")
+  AddMarkdownInput(EngineeringReference "-part1" 0 01-Overview.md 02-IntegratedSolution.md 03-SurfaceHeatBalance.md 04-AdvancedSurface.md 05-Climate.md 06-SolarRadiation.md )
+  AddPDF(EngineeringReference "-part1")
 
-AddMarkdownInput(EngineeringReference "-part3" 13 13a-EncyclopaedicRefs.md 13b-EncyclopaedicRefs.md)
-AddPDF(EngineeringReference "-part3")
+  AddMarkdownInput(EngineeringReference "-part3" 13 13a-EncyclopaedicRefs.md 13b-EncyclopaedicRefs.md)
+  AddPDF(EngineeringReference "-part3")
 
-AddMarkdownInput(EngineeringReference "-part4" 16 13c-EncyclopaedicRefs.md 13d-EncyclopaedicRefs.md)
-AddPDF(EngineeringReference "-part4")
+  AddMarkdownInput(EngineeringReference "-part4" 16 13c-EncyclopaedicRefs.md 13d-EncyclopaedicRefs.md)
+  AddPDF(EngineeringReference "-part4")
 
-AddMarkdownInput(EngineeringReference "-part5" 17 13e-EncyclopaedicRefs.md 13f-EncyclopaedicRefs.md 14-OnSiteGeneration.md 15-PerformanceCurves.md 16-Economics.md 17-SpecialModulesReporting.md)
-AddPDF(EngineeringReference "-part5")
-
+  AddMarkdownInput(EngineeringReference "-part5" 17 13e-EncyclopaedicRefs.md 13f-EncyclopaedicRefs.md 14-OnSiteGeneration.md 15-PerformanceCurves.md 16-Economics.md 17-SpecialModulesReporting.md)
+  AddPDF(EngineeringReference "-part5")
+endif()
 
 AddMarkdownInput(ExternalInterfaces_Application_Guide "" 0 ExternalInterfaces_Application_Guide.md)
 AddPDF(ExternalInterfaces_Application_Guide "")

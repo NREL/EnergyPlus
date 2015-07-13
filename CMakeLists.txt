@@ -47,6 +47,11 @@ option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
 option( BUILD_DOCS "Build markdown based documentation" OFF )
+
+if (BUILD_DOCS)
+  option( BUILD_MONOLITHIC_ENGINEERINGREFERENCE  "Build all-in-one EngineeringReference (has caveats)" ON )
+endif()
+
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
