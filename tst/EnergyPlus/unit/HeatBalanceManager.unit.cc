@@ -154,9 +154,9 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData )
 	IDFRecordsGotten( NumObjectDefs ) = false;
 	ObjectDef.allocate( NumObjectDefs );
 	ObjectDef( 1 ).NumFound = 1;
-	ObjectDef( 1 ).NumParams = 4;
-	ObjectDef( 1 ).NumAlpha = 4;
-	ObjectDef( 1 ).NumNumeric = 0;
+	ObjectDef( 1 ).NumParams = NumAlphas + NumNumbers;
+	ObjectDef( 1 ).NumAlpha = NumAlphas;
+	ObjectDef( 1 ).NumNumeric = NumNumbers;
 	ObjectDef( 1 ).AlphFieldChks.allocate( NumAlphas );
 	ObjectDef( 1 ).AlphFieldChks = " ";
 	ObjectDef( 1 ).NumRangeChks.allocate( NumNumbers );
@@ -182,8 +182,17 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData )
 	IDFRecords( 1 ).NumBlank.allocate( NumNumbers );
 	IDFRecords( 1 ).NumBlank = false;
 
-	MaxAlphaArgsFound = NumAlphas;
-	MaxNumericArgsFound = NumNumbers;
+	// the following array size allocation is done only once every simulation in
+	// GetObjectItem function in InputProcessor module.
+	// AlphaArgs.allocate( MaxAlphaArgsFound );
+	// NumberArgs.allocate( MaxNumericArgsFound );
+	// thus maximum array size was increased to avoid array size issue for other 
+	// unit tests that run after this unit test. If these arrays were sized
+	// for this test only, then other unit test withe larger array size requirement
+	// will fail since this variables are sized only once every simulation or unit 
+	// tests run
+	MaxAlphaArgsFound = 100;
+	MaxNumericArgsFound = 100;
 
 	// Set up construction input objects
 	lNumericFieldBlanks.allocate( NumNumbers );
@@ -220,9 +229,14 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData )
 	GetConstructData( ErrorsFound ); // returns ErrorsFound as true since layer 2 is invalid
 	EXPECT_TRUE( ErrorsFound );
 
+	// clean variables
+	MaxAlphaArgsFound = 0;
+	MaxNumericArgsFound = 0;
+
 	// dealocate variables
 	Construct.deallocate();
 	Material.deallocate();
+	ListOfObjects.deallocate();
 	iListOfObjects.deallocate();
 	ObjectStartRecord.deallocate();
 	ObjectGotCount.deallocate();
