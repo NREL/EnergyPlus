@@ -50,6 +50,10 @@ option( BUILD_DOCS "Build markdown based documentation" OFF )
 
 if (BUILD_DOCS)
   option( BUILD_MONOLITHIC_ENGINEERINGREFERENCE  "Build all-in-one EngineeringReference (has caveats)" ON )
+
+  if (BUILD_PACKAGE)
+    option( PACKAGE_BUILT_DOCS "Add built docs to package" OFF )
+  endif()
 endif()
 
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.

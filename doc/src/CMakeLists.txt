@@ -111,7 +111,9 @@ Function(AddPDF docName tag)
     DEPENDS ${output_name}
     )
 
-  INSTALL(FILES "${output_name}" DESTINATION "./Documentation")
+  if (PACKAGE_BUILT_DOCS)
+    INSTALL(FILES "${output_name}" DESTINATION "./Documentation")
+  endif()
 
 EndFunction()
 
