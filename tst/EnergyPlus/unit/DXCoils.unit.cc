@@ -436,6 +436,7 @@ TEST( DXCoilsTest, TestMultiSpeedDefrostCOP )
 	pCurve->Var2Max = 100;
 	
 	Coil.MSEIRFTemp( 1 ) = nEIRfT1;
+	Coil.MSEIRTempModFacCurveType( 1 ) = pCurve->CurveType;
 
 	int const nEIRfFF1 = 4;
 	pCurve = &PerfCurve( nEIRfFF1 );
@@ -450,7 +451,6 @@ TEST( DXCoilsTest, TestMultiSpeedDefrostCOP )
 	pCurve->CurveMax = 2;
 	
 	Coil.MSEIRFFlow( 1 ) = nEIRfFF1;
-	Coil.MSEIRTempModFacCurveType( 1 ) = pCurve->CurveType;
 	
 	int const nPLFfPLR1 = 5;
 	pCurve = &PerfCurve( nPLFfPLR1 );
@@ -532,7 +532,7 @@ TEST( DXCoilsTest, TestMultiSpeedDefrostCOP )
 	pCurve->Var2Max = 100;
 	
 	Coil.MSEIRFTemp( 2 ) = nEIRfT2;
-	Coil.MSEIRTempModFacCurveType = pCurve->CurveType;
+	Coil.MSEIRTempModFacCurveType( 2 ) = pCurve->CurveType;
 
 	int const nEIRfFF2 = 10;
 	pCurve = &PerfCurve( nEIRfFF2 );
@@ -586,25 +586,39 @@ TEST( DXCoilsTest, TestMultiSpeedDefrostCOP )
 	// Test high speed
 	Real64 SpeedRatio = 1.0;
 	Real64 CycRatio = 1.0;
+	int SpeedNum = 2;
 	int const FanOpMode = ContFanCycCoil;
 	
-	for ( int SpeedNum = 2; SpeedNum >= 1; --SpeedNum ) {
-		
-		// Defroster on
-		OutDryBulbTemp = -5.0; // cold
-		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
-		Real64 COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF2, 1));
-		Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
-		EXPECT_LT( COPwDefrost, COPwoDefrost );
-		
-		// Defroster off
-		OutDryBulbTemp = 5.0; // not cold enough for defroster
-		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
-		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF2, 1));
-		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
-		EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
+	// Defroster on
+	OutDryBulbTemp = -5.0; // cold
+	CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+	Real64 COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF2, 1));
+	Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
+	EXPECT_LT( COPwDefrost, COPwoDefrost );
+	
+	// Defroster off
+	OutDryBulbTemp = 5.0; // not cold enough for defroster
+	CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+	COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF2, 1));
+	COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
+	EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
+	
+	// Test low speed
+	SpeedNum = 1;
 
-	}
+	// Defroster on
+	OutDryBulbTemp = -5.0; // cold
+	CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+	COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF1, 1));
+	COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
+	EXPECT_LT( COPwDefrost, COPwoDefrost );
+	
+	// Defroster off
+	OutDryBulbTemp = 5.0; // not cold enough for defroster
+	CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+	COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF1, 1));
+	COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
+	EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
 	
 	// Clean up
 	DXCoil.deallocate();
