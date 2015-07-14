@@ -10904,7 +10904,7 @@ Label50: ;
 				}
 				// if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
 				if ( FanOpMode == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF;
-				DXCoil( DXCoilNum ).ElecHeatingPower = TotCap / HeatingCapacityMultiplier * EIR * DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction * InputPowerMultiplier;
+				DXCoil( DXCoilNum ).ElecHeatingPower = TotCap * EIR * DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction * InputPowerMultiplier;
 
 				// Calculate crankcase heater power using the runtime fraction for this DX heating coil only if there is no companion DX coil.
 				// Else use the largest runtime fraction of this DX heating coil and the companion DX cooling coil.
