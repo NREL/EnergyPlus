@@ -200,7 +200,7 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
 ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
 
@@ -3228,31 +3228,17 @@
     ,                         !- Rotation Duration {minutes}
     OA Controller 1;          !- Controller:OutdoorAir Name
 
-  !Output:Variable,*,Site Outdoor Air Drybulb Temperature,TIMESTEP;
-  !Output:Variable,*,Zone Mean Air Temperature,TIMESTEP;
-  !Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,TIMESTEP;
-  !Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,TIMESTEP;
   Output:Variable,*,Lights Electric Power,TIMESTEP;
   Output:Variable,*,Electric Equipment Electric Power,TIMESTEP;
   Output:Variable,*,Chiller Electric Power,TIMESTEP;
   Output:Variable,*,Demand Manager Meter Demand Power,TIMESTEP;
-  !Output:Variable,*,Demand Manager Average Demand Power,TIMESTEP;
-  !Output:Variable,*,Demand Manager Peak Demand Power,TIMESTEP;
-  Output:Variable,*,Demand Manager Scheduled Limit Power,TIMESTEP;
-  !Output:Variable,*,Demand Manager Over Limit Power,TIMESTEP;
-  !Output:Variable,*,Demand Manager Over Limit Time,TIMESTEP;
-  !Output:Variable,*,Demand Manager Exterior Energy Iteration Count,TIMESTEP;
-  !Output:Variable,*,Demand Manager Heat Balance Iteration Count,TIMESTEP;
-  !Output:Variable,*,Demand Manager HVAC Iteration Count,TIMESTEP;  
+  Output:Variable,*,Demand Manager Scheduled Limit Power,TIMESTEP; 
   Output:Variable,*,Fan Electric Power,TIMESTEP;
   Output:Variable,*,Exterior Lights Electric Power,TIMESTEP;
   Output:Variable,*,Boiler Ancillary Electric Power,TIMESTEP;
   Output:Variable,*,Pump Electric Power,TIMESTEP;
   Output:Variable,*,Air System Outdoor Air Mass Flow Rate,TIMESTEP;
   
-  !Output:Meter,Electricity:HVAC,TIMESTEP;
-  !Output:Meter,InteriorLights:Electricity,TIMESTEP;
-  !Output:Meter,Electricity:Facility,TIMESTEP;
   Output:VariableDictionary,Regular;
   Output:Surfaces:Drawing,dxf;
   Output:Constructions,Constructions;
@@ -3297,4 +3283,3 @@
     4.23,                    !- Block 2 Cost per Unit Value or Variable Name
     remaining,               !- Block Size 3 Value or Variable Name
     3.60;                    !- Block 3 Cost per Unit Value or Variable Name
-

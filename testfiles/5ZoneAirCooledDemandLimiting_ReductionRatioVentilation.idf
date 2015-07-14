@@ -200,7 +200,7 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
 ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
 
@@ -3139,50 +3139,6 @@
     UNTIL: 20:00,10000,      !- Field 5
     UNTIL: 24:00,9999999;    !- Field 7
 
-  !DemandManager:ExteriorLights,
-  !  Ext Lights Manager,      !- Name
-  !  ,                        !- Availability Schedule Name
-  !  FIXED,                   !- Limit Control
-  !  60,                      !- Minimum Limit Duration {minutes}
-  !  0.0,                     !- Maximum Limit Fraction
-  !  ,                        !- Limit Step Change
-  !  ALL,                     !- Selection Control
-  !  ,                        !- Rotation Duration {minutes}
-  !  Exterior Lights;         !- Exterior Lights 1 Name
-  !
-  !DemandManager:ElectricEquipment,
-  !  Eq Mgr Stage 1,          !- Name
-  !  ,                        !- Availability Schedule Name
-  !  FIXED,                   !- Limit Control
-  !  60,                      !- Minimum Limit Duration {minutes}
-  !  0.0,                     !- Maximum Limit Fraction
-  !  ,                        !- Limit Step Change
-  !  ALL,                     !- Selection Control
-  !  ,                        !- Rotation Duration {minutes}
-  !  Space1-1 AllZones with Electric Equipment;  !- Electric Equipment 1 Name
-  !
-  !DemandManager:ElectricEquipment,
-  !  Eq Mgr Stage 2,          !- Name
-  !  ,                        !- Availability Schedule Name
-  !  FIXED,                   !- Limit Control
-  !  60,                      !- Minimum Limit Duration {minutes}
-  !  0.0,                     !- Maximum Limit Fraction
-  !  ,                        !- Limit Step Change
-  !  ALL,                     !- Selection Control
-  !  ,                        !- Rotation Duration {minutes}
-  !  Space3-1 AllZones with Electric Equipment;  !- Electric Equipment 1 Name
-  !
-  !DemandManager:ElectricEquipment,
-  !  Eq Mgr Stage 3,          !- Name
-  !  ,                        !- Availability Schedule Name
-  !  FIXED,                   !- Limit Control
-  !  60,                      !- Minimum Limit Duration {minutes}
-  !  0.0,                     !- Maximum Limit Fraction
-  !  ,                        !- Limit Step Change
-  !  ALL,                     !- Selection Control
-  !  ,                        !- Rotation Duration {minutes}
-  !  Space5-1 AllZones with Electric Equipment;  !- Electric Equipment 1 Name
-
   DemandManager:Lights,
     Lights Manager,          !- Name
     ,                        !- Availability Schedule Name
@@ -3193,18 +3149,6 @@
     ALL,                     !- Selection Control
     ,                        !- Rotation Duration {minutes}
     AllZones with Lights;    !- Lights 1 Name
-
-  !DemandManager:Thermostats,
-  !  Thermostats Manager,     !- Name
-  !  ,                        !- Availability Schedule Name
-  !  FIXED,                   !- Reset Control
-  !  60,                      !- Minimum Reset Duration {minutes}
-  !  19,                      !- Maximum Heating Setpoint Reset {C}
-  !  26,                      !- Maximum Cooling Setpoint Reset {C}
-  !  ,                        !- Reset Step Change
-  !  ALL,                     !- Selection Control
-  !  ,                        !- Rotation Duration {minutes}
-  !  AllControlledZones Thermostat;  !- Thermostat 1 Name
     
   DemandManager:Ventilation,
     Ventilation Manager,      !- Name
@@ -3218,31 +3162,17 @@
     ,                         !- Rotation Duration {minutes}
     OA Controller 1;          !- Controller:OutdoorAir Name
 
-  !Output:Variable,*,Site Outdoor Air Drybulb Temperature,TIMESTEP;
-  !Output:Variable,*,Zone Mean Air Temperature,TIMESTEP;
-  !Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,TIMESTEP;
-  !Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,TIMESTEP;
   Output:Variable,*,Lights Electric Power,TIMESTEP;
   Output:Variable,*,Electric Equipment Electric Power,TIMESTEP;
   Output:Variable,*,Chiller Electric Power,TIMESTEP;
   Output:Variable,*,Demand Manager Meter Demand Power,TIMESTEP;
-  !Output:Variable,*,Demand Manager Average Demand Power,TIMESTEP;
-  !Output:Variable,*,Demand Manager Peak Demand Power,TIMESTEP;
-  Output:Variable,*,Demand Manager Scheduled Limit Power,TIMESTEP;
-  !Output:Variable,*,Demand Manager Over Limit Power,TIMESTEP;
-  !Output:Variable,*,Demand Manager Over Limit Time,TIMESTEP;
-  !Output:Variable,*,Demand Manager Exterior Energy Iteration Count,TIMESTEP;
-  !Output:Variable,*,Demand Manager Heat Balance Iteration Count,TIMESTEP;
-  !Output:Variable,*,Demand Manager HVAC Iteration Count,TIMESTEP;  
+  Output:Variable,*,Demand Manager Scheduled Limit Power,TIMESTEP; 
   Output:Variable,*,Fan Electric Power,TIMESTEP;
   Output:Variable,*,Exterior Lights Electric Power,TIMESTEP;
   Output:Variable,*,Boiler Ancillary Electric Power,TIMESTEP;
   Output:Variable,*,Pump Electric Power,TIMESTEP;
   Output:Variable,*,Air System Outdoor Air Mass Flow Rate,TIMESTEP;
   
-  !Output:Meter,Electricity:HVAC,TIMESTEP;
-  !Output:Meter,InteriorLights:Electricity,TIMESTEP;
-  !Output:Meter,Electricity:Facility,TIMESTEP;
   Output:VariableDictionary,Regular;
   Output:Surfaces:Drawing,dxf;
   Output:Constructions,Constructions;
@@ -3287,4 +3217,3 @@
     4.23,                    !- Block 2 Cost per Unit Value or Variable Name
     remaining,               !- Block Size 3 Value or Variable Name
     3.60;                    !- Block 3 Cost per Unit Value or Variable Name
-

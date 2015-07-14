@@ -18927,7 +18927,7 @@ Demand limiting controls shut off or reduce the power to non-essential loads in 
 
 - turn on generators to meet some or all of the building's demand.
 
-The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only Exterior:Lights, Lights, ElectricEquipment, and ZoneControl:Thermostat objects can be demand limited. Additional components will be demand limited in future releases.
+The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only Exterior:Lights, Lights, ElectricEquipment, ZoneControl:Thermostat, and Controller:OutdoorAir objects can be demand limited. Additional components will be demand limited in future releases.
 
 ### DemandManagerAssignmentList
 
