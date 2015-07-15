@@ -19,7 +19,7 @@
 
 Introduction
 ============
-5
+
 This document is intended for developers who are creating user interfaces for EnergyPlus.  It provides an overview of the essentials of the input-output structure of EnergyPlus and describes the parts of each in detail.
 
 ![](InterfaceDeveloper/media/image001.png)
