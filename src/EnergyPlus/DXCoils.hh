@@ -1646,13 +1646,13 @@ namespace DXCoils {
 	Real64 
 	FanSpdResidual( 
 		Real64 FanSpdRto, // indoor unit fan speed ratio  
-		Real64 Par        // parameters
+		Array1< Real64 > const & Par        // parameters
 	);
 	
 	Real64 
 	FanSpdResidualHeat( 
 		Real64 FanSpdRto, // indoor unit fan speed ratio  
-		Real64 Par        // parameters
+		Array1< Real64 > const & Par        // parameters
 	);
 	// End of Methods for New VRF Model: Fluid Temperature Control
 	// *****************************************************************************
