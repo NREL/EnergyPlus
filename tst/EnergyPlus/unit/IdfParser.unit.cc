@@ -22,8 +22,7 @@ namespace EnergyPlus {
 			"    6;  ",
 		} ) );
 
-		IdfParser idfParser;
-		auto const output = idfParser.decode( test_object );
+		auto const output = IdfParser::decode( test_object );
 
 		EXPECT_EQ( std::vector< std::vector< std::string > >({ { "Version", "8.3" }, { "Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6" } }), output );
 	}
@@ -43,8 +42,7 @@ namespace EnergyPlus {
 			"    6;  ",
 		} ) );
 
-		IdfParser idfParser;
-		auto const output = idfParser.decode( test_object, success );
+		auto const output = IdfParser::decode( test_object, success );
 
 		EXPECT_EQ( std::vector< std::vector< std::string > >({ { "Version", "8.3" }, { "Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000", "FullInteriorAndExterior", "25", "6" } }), output );
 		EXPECT_TRUE( success );

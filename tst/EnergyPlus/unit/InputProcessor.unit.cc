@@ -89,12 +89,12 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, ObjectDef( index ).LastExtendAlpha );
 			EXPECT_EQ( 0, ObjectDef( index ).LastExtendNum );
 			EXPECT_EQ( 0, ObjectDef( index ).ObsPtr );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { true } , ObjectDef( index ).AlphaOrNumeric ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( index ).ReqField ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( index ).AlphRetainCase ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Option Type" }, ObjectDef( index ).AlphFieldChks ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "" }, ObjectDef( index ).AlphFieldDefs ) );
-			// EXPECT_TRUE( compare_containers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( index ).NumRangeChks ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), ObjectDef( index ).AlphaOrNumeric ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( index ).ReqField ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( index ).AlphRetainCase ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Option Type" } ), ObjectDef( index ).AlphFieldChks ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "" } ), ObjectDef( index ).AlphFieldDefs ) );
+			// EXPECT_TRUE( compare_containers( Array1D< RangeCheckDef >( { RangeCheckDef() } ), ObjectDef( index ).NumRangeChks ) );
 			EXPECT_EQ( 0, ObjectDef( index ).NumFound );
 
 		}
@@ -131,12 +131,12 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
 			EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
 			EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { true } , ObjectDef( 1 ).AlphaOrNumeric ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( 1 ).ReqField ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( 1 ).AlphRetainCase ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Option Type" }, ObjectDef( 1 ).AlphFieldChks ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldDefs ) );
-			// EXPECT_TRUE( compare_containers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), ObjectDef( 1 ).AlphaOrNumeric ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( 1 ).ReqField ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( 1 ).AlphRetainCase ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Option Type" } ), ObjectDef( 1 ).AlphFieldChks ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "" } ), ObjectDef( 1 ).AlphFieldDefs ) );
+			// EXPECT_TRUE( compare_containers( Array1D< RangeCheckDef >( { RangeCheckDef() } ), ObjectDef( 1 ).NumRangeChks ) );
 			EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
 
 		}
@@ -171,10 +171,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.3" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
 			std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -189,10 +189,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
 		}
 
@@ -239,10 +239,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.3" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
 			std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -257,10 +257,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
 			std::string const building_surface_detailed_name( "BUILDINGSURFACE:DETAILED" );
 
@@ -275,10 +275,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 8, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 14, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 98, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false, false, false, true, false, false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( { 0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 }, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false, false, false, false, false, false, false, false, false, false, false, false }, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, false, false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 } ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, false, false, false, false } ), IDFRecords( index ).NumBlank ) );
 
 		}
 
@@ -312,12 +312,12 @@ namespace EnergyPlus {
 
 			GetObjectItem( CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Option Type" }, cAlphaFields ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { }, cNumericFields ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { true }, lNumericBlanks ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, lAlphaBlanks ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( { }, Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Option Type" } ), cAlphaFields ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { } ), cNumericFields ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), lNumericBlanks ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), lAlphaBlanks ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers ) );
 			EXPECT_EQ( 1, NumAlphas );
 			EXPECT_EQ( 0, NumNumbers );
 			EXPECT_EQ( 1, IOStatus );
@@ -365,12 +365,12 @@ namespace EnergyPlus {
 
 			GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" }, Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" }, cAlphaFields ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" }, cNumericFields ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false, false, false, true, true }, lNumericBlanks ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, true, false, false, false, true, true }, lAlphaBlanks ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( { -99999, -99999, 0.80, 0.0, 0.0 }, Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" } ), Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
 			EXPECT_EQ( 6, NumAlphas );
 			EXPECT_EQ( 5, NumNumbers );
 			EXPECT_EQ( 1, IOStatus );
@@ -525,12 +525,12 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
 			EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
 			EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { true } , ObjectDef( 1 ).AlphaOrNumeric ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( 1 ).ReqField ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false } , ObjectDef( 1 ).AlphRetainCase ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldChks ) );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "" }, ObjectDef( 1 ).AlphFieldDefs ) );
-			// EXPECT_TRUE( compare_containers< Array1D< RangeCheckDef > >( { RangeCheckDef() }, ObjectDef( 1 ).NumRangeChks ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), ObjectDef( 1 ).AlphaOrNumeric ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( 1 ).ReqField ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( 1 ).AlphRetainCase ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "" } ), ObjectDef( 1 ).AlphFieldChks ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "" } ), ObjectDef( 1 ).AlphFieldDefs ) );
+			// EXPECT_TRUE( compare_containers( Array1D< RangeCheckDef >( { RangeCheckDef() } ), ObjectDef( 1 ).NumRangeChks ) );
 			EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
 
 		}
@@ -634,10 +634,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "8.3" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.3" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
 			std::string const sqlite_name( "OUTPUT:SQLITE" );
 
@@ -652,10 +652,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "SIMPLEANDTABULAR" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
 		}
 
@@ -719,10 +719,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "NO", "NO", "NO", "YES", "YES" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false, false, false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
 			EXPECT_EQ( 1, ObjectDef( 2 ).NumFound );
 
@@ -739,10 +739,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 3, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 5, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 3, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "NONE", "SUBURBS", "FULLEXTERIOR" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( { 0.0, 0.04, 0.4, 25, 6 }, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { true, true, true, true, true }, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NONE", "SUBURBS", "FULLEXTERIOR" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.0, 0.04, 0.4, 25, 6 } ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { true, true, true, true, true } ), IDFRecords( index ).NumBlank ) );
 
 			EXPECT_EQ( 1, ObjectDef( 3 ).NumFound );
 
@@ -858,10 +858,10 @@ namespace EnergyPlus {
 			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers< std::vector< std::string > >( { "NO", "NO", "NO", "YES", "NO" }, IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( { false, false, false, false, false }, IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers< std::vector< Real64 > >( {}, IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers< std::vector< bool > >( {}, IDFRecords( index ).NumBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "NO" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
 			ASSERT_EQ( 3, NumSectionDefs );
 

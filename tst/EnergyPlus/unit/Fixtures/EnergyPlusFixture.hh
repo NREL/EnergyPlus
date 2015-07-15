@@ -157,9 +157,6 @@ namespace EnergyPlus {
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return true if containers are equal and false if they are not.
 		// Example Usage: 
-		// 		EXPECT_TRUE( compare_containers( { true }, ObjectDef( index ).AlphaOrNumeric ) );
-		// 		EXPECT_TRUE( compare_containers( { true }, ObjectDef( index ).AlphaOrNumeric ) );
-		// 	or
 		// 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		// 		EXPECT_TRUE( compare_containers( Array1D_bool( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		template < class T, class T2 >

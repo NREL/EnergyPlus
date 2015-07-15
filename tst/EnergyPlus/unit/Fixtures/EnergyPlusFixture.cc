@@ -400,10 +400,10 @@ namespace EnergyPlus {
 		EXPECT_EQ( num_alphas, IDFRecords( index ).NumAlphas );
 		EXPECT_EQ( num_numbers, IDFRecords( index ).NumNumbers );
 		EXPECT_EQ( object_def_ptr, IDFRecords( index ).ObjectDefPtr );
-		EXPECT_TRUE( compare_containers< std::vector< std::string > >( alphas, IDFRecords( index ).Alphas ) );
-		EXPECT_TRUE( compare_containers< std::vector< bool > >( alphas_blank, IDFRecords( index ).AlphBlank ) );
-		EXPECT_TRUE( compare_containers< std::vector< Real64 > >( numbers, IDFRecords( index ).Numbers ) );
-		EXPECT_TRUE( compare_containers< std::vector< bool > >( numbers_blank, IDFRecords( index ).NumBlank ) );
+		EXPECT_TRUE( compare_containers( alphas, IDFRecords( index ).Alphas ) );
+		EXPECT_TRUE( compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) );
+		EXPECT_TRUE( compare_containers( numbers, IDFRecords( index ).Numbers ) );
+		EXPECT_TRUE( compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) );
 
 		return ! ::testing::Test::HasFailure();
 	}
