@@ -425,7 +425,8 @@ namespace SwimmingPool {
 				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 6 ), Alphas( 7 ), "Hot Water Nodes" );
 			}
 			Pool( Item ).WaterVolFlowMax = Numbers( 6 );
-
+			Real64 WaterVolumeFlowMaximum;
+			WaterVolumeFlowMaximum = Numbers(6);
 			Pool( Item ).MiscPowerFactor = Numbers( 7 );
 			if ( Pool( Item ).MiscPowerFactor < MinPowerFactor ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " has a miscellaneous power factor less than zero." );
@@ -484,8 +485,8 @@ namespace SwimmingPool {
 
 		// Set up the output variables for swimming pools
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
-			SetupOutputVariable( "Indoor Pool Makeup Water Rate [m3/s]", Pool( Item ).MakeUpWaterMassFlowRate, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterMass, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
+			SetupOutputVariable( "Indoor Pool Makeup Water Mass Flow Rate [kg/s]", Pool(Item).MakeUpWaterMassFlowRate, "System", "Average", Pool(Item).Name);
+			SetupOutputVariable( "Indoor Pool Makeup Water Mass [kg/s]", Pool( Item ).MakeUpWaterMass, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
 			SetupOutputVariable( "Indoor Pool Makeup Water Temperature [C]", Pool( Item ).CurMakeupWaterTemp, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Water Temperature [C]", Pool( Item ).PoolWaterTemp, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Inlet Water Temperature [C]", Pool( Item ).WaterInletTemp, "System", "Average", Pool( Item ).Name );
@@ -630,7 +631,7 @@ namespace SwimmingPool {
 			Density =GetDensityGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
 			Pool( PoolNum ).WaterMass = Surface( Pool( PoolNum ).SurfacePtr ).Area * Pool( PoolNum ).AvgDepth * Density;
 			Pool( PoolNum ).WaterMassFlowRateMax = Pool( PoolNum ).WaterVolFlowMax * Density;
-
+			Real64 WaterMassFlowRateMaximum = Pool(PoolNum).WaterMassFlowRateMax;
 			if ( ! MyPlantScanFlagPool( PoolNum ) ) {
 				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
 					InitComponentNodes( 0.0, Pool( PoolNum ).WaterVolFlowMax, Pool( PoolNum ).WaterInletNode, Pool( PoolNum ).WaterOutletNode, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum );
