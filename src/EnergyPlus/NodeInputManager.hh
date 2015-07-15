@@ -77,6 +77,11 @@ namespace NodeInputManager {
 
 	// Functions
 
+	// Clears the global data in NodeInputManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	GetNodeNums(
 		std::string const & Name, // Name for which to obtain information

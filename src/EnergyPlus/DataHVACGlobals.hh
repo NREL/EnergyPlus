@@ -461,6 +461,11 @@ namespace DataHVACGlobals {
 	extern OptStartDataType OptStartData; // For optimum start
 	extern Array1D< ComponentSetPtData > CompSetPtEquip;
 
+	// Clears the global data in DataHVACGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 } // DataHVACGlobals
 
 } // EnergyPlus

@@ -185,6 +185,37 @@ namespace HeatBalanceManager {
 
 	// Functions
 
+	// Clears the global data in HeatBalanceManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		MaxCoolLoadPrevDay.deallocate();
+		MaxCoolLoadZone.deallocate();
+		MaxHeatLoadPrevDay.deallocate();
+		MaxHeatLoadZone.deallocate();
+		MaxTempPrevDay.deallocate();
+		MaxTempZone.deallocate();
+		MinTempPrevDay.deallocate();
+		MinTempZone.deallocate();
+		WarmupTempDiff.deallocate();
+		WarmupLoadDiff.deallocate();
+		TempZoneSecPrevDay.deallocate();
+		LoadZoneSecPrevDay.deallocate();
+		TempZonePrevDay.deallocate();
+		LoadZonePrevDay.deallocate();
+		TempZone.deallocate();
+		LoadZone.deallocate();
+		TempZoneRpt.deallocate();
+		TempZoneRptStdDev.deallocate();
+		LoadZoneRpt.deallocate();
+		LoadZoneRptStdDev.deallocate();
+		MaxLoadZoneRpt.deallocate();
+		CountWarmupDayPoints = int();
+		CurrentModuleObject = std::string();
+		WarmupConvergenceValues.deallocate();
+	}
+
 	void
 	ManageHeatBalance()
 	{
