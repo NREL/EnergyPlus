@@ -2532,6 +2532,11 @@ namespace DataSurfaces {
 
 	// Functions
 
+	// Clears the global data in DataSurfaces.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	std::string
 	cSurfaceClass( int const ClassNo );
 

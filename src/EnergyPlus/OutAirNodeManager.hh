@@ -26,6 +26,11 @@ namespace OutAirNodeManager {
 
 	// Functions
 
+	// Clears the global data in OutAirNodeManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	SetOutAirNodes();
 

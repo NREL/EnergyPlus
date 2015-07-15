@@ -68,6 +68,11 @@ namespace DataOutputs {
 
 	// Functions
 
+	// Clears the global data in DataOutputs.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	bool
 	FindItemInVariableList(
 		std::string const & KeyedValue,
