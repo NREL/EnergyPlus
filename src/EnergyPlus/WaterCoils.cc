@@ -917,10 +917,10 @@ namespace WaterCoils {
 
 			MySizeFlag( CoilNum ) = false;
 		}
-		rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( CoilNum ) ) {
+			rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 			//Initialize all report variables to a known state at beginning of simulation
 			WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy = 0.0;
 			WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy = 0.0;

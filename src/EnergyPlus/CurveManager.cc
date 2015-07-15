@@ -169,6 +169,21 @@ namespace CurveManager {
 
 	// Functions
 
+	// Clears the global data in CurveManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumCurves = 0;
+		GetCurvesInputFlag = true;
+		PerfCurve.deallocate();
+		PerfCurveTableData.deallocate();
+		TableData.deallocate();
+		TempTableData.deallocate();
+		Temp2TableData.deallocate();
+		TableLookup.deallocate();
+	}
+
 	void
 	ResetPerformanceCurveOutput()
 	{

@@ -53,6 +53,19 @@ namespace DataIPShortCuts {
 	Array1D< Real64 > rNumericArgs;
 	std::string cCurrentModuleObject;
 
+	// Clears the global data in DataIPShortCuts.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		cAlphaFieldNames.deallocate();
+		cAlphaArgs.deallocate();
+		lAlphaFieldBlanks.deallocate();
+		cNumericFieldNames.deallocate();
+		rNumericArgs.deallocate();
+		lNumericFieldBlanks.deallocate();
+	}
+
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence

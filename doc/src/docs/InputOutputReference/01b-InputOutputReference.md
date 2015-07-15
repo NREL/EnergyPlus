@@ -298,7 +298,7 @@ The X, Y, and Z coordinates, in the same coordinate system, of the second daylig
 
 
 
-![](InputOutputReference/media/image095.svg)
+![](media/image095.svg)
 
 Figure 53. Example showing location of daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters.
 
@@ -436,7 +436,7 @@ Table 19. Recommended Values -- Discomfort Glare Index
 
 For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
 
-![](InputOutputReference/media/image096.svg)
+![](media/image096.svg)
 
 Figure 54. Illustration of continuous dimming relationship
 
@@ -450,7 +450,7 @@ For Lighting Control Type = 1 (continuous), the lowest lighting output the light
 
 The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be &gt;0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
 
-![](InputOutputReference/media/image097.svg)
+![](media/image097.svg)
 
 Figure 55. Stepped lighting control with Number of Steps = 3.
 
@@ -506,13 +506,13 @@ To correctly calculate both direct and inter-reflected daylight illuminance you 
 
 Interior walls IW-1, IW-2 and IW-3 should be treated as adiabatic, i.e., they should have Outside Boundary Condition = Surface and Outside Boundary Condition Object = IW-1, IW-2, or IW-3, respectively (ref: BuildingSurface:Detailed). Similarly, if the ceiling and floor of Room-1 are interior surfaces, they should be treated as adiabatic.
 
-![](InputOutputReference/media/image098.svg)
+![](media/image098.svg)
 
 Figure 56. For daylighting purposes the thermal zone enclosed by the dashed boundary line should be modeled as a typical zone (Room-1) with a zone multiplier of 4.
 
 Sometimes a representative room cannot be found. Figure 57 shows a section of a building with four rooms having different daylighting characteristics because of different floor area, orientation and/or window size. In this case lumping the rooms into a single thermal zone would give nonsensical daylighting illuminance values because of the presence of the interior walls, which EnergyPlus ignores when calculating illuminance reaching a reference point directly from a window (i.e., without reflection). The solution in this case is to describe each room as a separate thermal zone with its own daylighting reference points, and input the interior walls because these will participate in the calculation of inter-reflected illuminance.
 
-![](InputOutputReference/media/image099.svg)
+![](media/image099.svg)
 
 Figure 57. Rooms A, B, C and D have different daylighting characteristics. If lumped into a single thermal zone the daylighting calculation will be less accurate because the blockage of direct light by the interior walls between these rooms is modeled with some simplifications (see Interior Obstructions below). To get a good daylighting calculation each room should be input as a separate thermal zone.
 
@@ -520,7 +520,7 @@ Figure 57. Rooms A, B, C and D have different daylighting characteristics. If lu
 
 The detailed daylighting calculation allows a thermal zone to be divided into two independently-controlled lighting zones. (See the fields: Fraction of Zone Controlled by First Reference Point, Fraction of Zone Controlled by Second Reference Point, Illuminance SetPoint at First Reference Point, and Illuminance SetPoint at Second Reference Point.) An example is shown in Figure 58, where a relatively deep thermal zone has two lighting zones of equal area.
 
-![](InputOutputReference/media/image100.svg)
+![](media/image100.svg)
 
 Figure 58. Two independently-controlled lighting zones, each with 50% of the area of the thermal zone.
 
@@ -556,7 +556,7 @@ An example of an interior obstruction that is a wall in an L-shaped room is show
 
 
 
-![](InputOutputReference/media/image101.svg)
+![](media/image101.svg)
 
 Figure 59. Wall A (or Wall B) is an interior obstruction that prevents light from directly reaching the daylighting reference point from the window.
 
@@ -576,7 +576,7 @@ PurchAirWithDoubleFacadeDaylighting.idf is an input example of daylighting throu
 
 
 
-![](InputOutputReference/media/image102.svg)
+![](media/image102.svg)
 
 Figure 60. Vertical section through a double-façade building showing daylighting through interior windows. The dashed lines show that (1) reference point RP1 receives direct light from exterior window EW1 via interior window IW1; (2) RP2 receives direct light from EW1 and EW2 via IW2; and (3) RP3 receives direct light from EW2 via IW3.
 
@@ -584,7 +584,7 @@ Figure 60. Vertical section through a double-façade building showing daylightin
 
 Figure 61 shows schematically the general configuration of daylighting through interior windows that can be calculated with EnergyPlus. Here, daylit zone ZD has one or more interior windows that are adjacent to other zones, each of which has one or more exterior windows. ZD itself may or may not have exterior windows. If it does, than the daylight illuminance from its exterior and interior windows will be additive. The zones adjacent to ZD may or may not be daylit and may or may not have other interior windows that are not adjacent to ZD. (The program does not consider the illuminance in ZD from electric lighting in adjacent zones.)
 
-![](InputOutputReference/media/image103.svg)
+![](media/image103.svg)
 
 Figure 61. General configuration of daylighting through interior windows that can be calculated with EnergyPlus. IW = interior window, EW = exterior window.
 
@@ -594,7 +594,7 @@ Figure 62 shows schematically a configuration of daylighting through interior wi
 
 
 
-![](InputOutputReference/media/image104.svg)
+![](media/image104.svg)
 
 Figure 62. Configuration in which daylighting of zone Z through its interior window  cannot be calculated with EnergyPlus. IW = interior window, EW = exterior window.
 
@@ -670,7 +670,7 @@ Lighting Control Type = 3 (continuous/off) is the same as Lighting Control Type 
 
 For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
 
-![](InputOutputReference/media/image105.svg)
+![](media/image105.svg)
 
 Figure 63. Illustration of continuous dimming relationship
 
@@ -684,7 +684,7 @@ For Lighting Control Type = 1 (continuous), the lowest lighting output the light
 
 The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be &gt;0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
 
-![](InputOutputReference/media/image106.svg)
+![](media/image106.svg)
 
 Figure 64. Stepped lighting control with Number of Steps = 3.
 
@@ -733,7 +733,7 @@ These three fields are the X, Y and Z values of the Reference point in the coord
 
 
 
-![](InputOutputReference/media/image107.svg)
+![](media/image107.svg)
 
 Figure 65. Example showing location of two daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters.
 
@@ -1035,7 +1035,7 @@ Tubular daylighting devices (TDDs), also known as tubular skylights or light pip
 
 TDDs consist of three components: a dome, a pipe, and a diffuser.
 
-![DaylightingTubular](InputOutputReference/media/image108.png)
+![DaylightingTubular](media/image108.png)
 
 Figure 66. Tubular daylighting device diagram.
 
@@ -1065,7 +1065,7 @@ Since commercial TDDs are assumed to be cylindrical in shape, it is recommended 
 
 Note that the TubularDaylightDome surface is allowed to have a different position and tilt from the roof base surface. If the actual TDD projects some height above the roof surface, the TubularDaylightDome coordinates should be located accordingly.
 
-![](InputOutputReference/media/image109.png)
+![](media/image109.png)
 
 Figure 67. Tubular daylighting device DXF output.
 
@@ -1254,7 +1254,7 @@ Daylighting shelves, or simply light shelves, are another device for bringing mo
 
 
 
-![DaylightingShelf](InputOutputReference/media/image110.png)
+![DaylightingShelf](media/image110.png)
 
 Figure 68. Daylighting shelf diagram.
 
@@ -1264,7 +1264,7 @@ The inside shelf redistributes light that would have entered the zone anyway. In
 
 The outside shelf changes the amount of light entering the zone. If the shelf surface is more reflective than the ground, it can increase the amount of light incident on the upper part of the window. However, the shading effect of the outside shelf on the lower part of the window must also be considered as it can easily negate any gain achieved in the upper part of the window. All light reflected from the outside shelf that enters the upper window is assumed to strike the ceiling.
 
-![](InputOutputReference/media/image111.png)
+![](media/image111.png)
 
 Figure 69. Daylighting shelf DXF output.
 
@@ -1422,7 +1422,7 @@ This object is used to model the impacts on daylighting of a “light well” th
 
 The input object describes the light well using basic characteristics of the geometry along with the visible reflectance of the well’s side walls.  The following figure diagrams how the geometry is characterized.
 
-![](InputOutputReference/media/image112.svg)
+![](media/image112.svg)
 
 Figure 70. Skylight with light well: (a) perspective view, (b) vertical section.
  If the bottom of the light well is a rectangle of side lengths c and d, as shown in (a), then the perimeter of the bottom of the well = 2(c+d) and the area = cd (see description of field names for the Light Well object).
@@ -1921,7 +1921,7 @@ ZoneInfiltration:EffectiveLeakageArea model is similar to the other infiltration
 
 <div>\[Infiltration = \left( {{F_{Schedule}}} \right)\frac{{{A_L}}}{{1000}}\sqrt {{C_s}\Delta T + {C_w}{{\left( {WindSpeed} \right)}^2}} \]</div>
 
-where <span>$\Delta T$</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+where <span>\(\Delta T\)</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
 Note that the coefficients for the “EffectiveLeakageArea” model are not interchangeable with the similarly named coefficients in the “FlowCoefficient” model (see ZoneInfiltration:FlowCoefficient object).
 
@@ -1941,11 +1941,11 @@ This field is the name of a schedule (ref: Schedule) that modifies the volume fl
 
 #### Field: Effective Air Leakage Area
 
-This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>${A_L}$</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.
+This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>\({A_L}\)</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.
 
 #### Field: Stack Coefficient
 
-This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the stack coefficient, <span>\({C_s}\)</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -1966,7 +1966,7 @@ This field is the value of the stack coefficient, <span>${C_s}$</span> in the e
 
 #### Field: Wind Coefficient
 
-This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
+This field is the value of the wind coefficient, <span>\({C_w}\)</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
 
 
 
@@ -2061,7 +2061,7 @@ ZoneInfiltration:FlowCoefficient model is similar to the other infiltration obje
 
 <div>\[Infiltration = \left( {{F_{Schedule}}} \right)\sqrt {{{\left( {c\,{C_s}\Delta {T^n}} \right)}^2} + {{\left( {c\,{C_w}{{\left( {s * WindSpeed} \right)}^{2n}}} \right)}^2}} \]</div>
 
-Where <span>$\Delta T$</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+Where <span>\(\Delta T\)</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
 Note that the coefficients for the “Flow Coefficient” model are not interchangeable with the similarly named coefficients in the “Effective Leakage Area” model (see ZoneInfiltration:EffectiveLeakageArea object).
 
@@ -2081,11 +2081,11 @@ This field is the name of a schedule (ref: Schedule) that modifies the volume fl
 
 #### Field: Flow Coefficient
 
-This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>$c$</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
+This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>\(c\)</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
 
 #### Field: Stack Coefficient
 
-This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the stack coefficient, <span>\({C_s}\)</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -2118,7 +2118,7 @@ This field is the value of the pressure exponent, *n* in the equation above.  T
 
 #### Field: Wind Coefficient
 
-This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, <span>\({C_w}\)</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -2160,7 +2160,7 @@ No Flue</td>
 
 #### Field: Shelter Factor
 
-This field is the value of the wind coefficient, <span>$s$</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, <span>\(s\)</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 <table class="table table-striped">
 <tr>
@@ -7039,7 +7039,7 @@ The positive numeric input for this field is the zone air distribution effective
 
 The positive numeric input for this field is the zone air distribution effectiveness when the zone is in heating mode. Default value of this field is 1.0. ASHRAE Standard 62.1-2010 provides typical values as follows:
 
-![](InputOutputReference/media/image133.svg)
+![](media/image133.svg)
 
 Figure 71. Zone Air Distribution Effectiveness (Source: ASHRAE Standard 62.1-2010)
 
@@ -7560,7 +7560,7 @@ Components are linked together to form various loops within the simulation. Thus
 
 Loop nodes are a key defining feature in EnergyPlus. As a result, it is recommended that one of the first steps taken in defining an HVAC system in EnergyPlus be the definition of a node diagram or map. This is helpful for visualization of the entire system. Such a map could be created electronically within an interface or could be kept in the background out of the sight of the user.
 
-![](InputOutputReference/media/image134.svg)
+![](media/image134.svg)
 
 Figure 72. Example Node Diagram
 
@@ -8774,7 +8774,7 @@ Group – Plant-Condenser Loops
 
 The main elements of the PlantLoop syntax are described in further detail below. A map of how the input for this portion of the HVAC input fits together is provided in the following diagram.
 
-![PlantLoopSyntax (Medium)](InputOutputReference/media/image135.png)
+![PlantLoopSyntax (media/image135.png)
 
 Figure 73. Plant Loop Input Syntax Map
 
@@ -9071,7 +9071,7 @@ This output is available for every component on every branch in a plant (or cond
 
 The condenser loop input is very similar to that for the plant loop. As of version 7, the two loops are modeled the same way and inside the program all condenser loops are just plant loops. (In future versions of the program, this CondenserLoop object might be deprecated and these loops will be described using the PlantLoop object.)  The main differences are the applicable components and operation schemes. This is depicted in the following diagram.
 
-![CondenserLoopSyntax (Medium)](InputOutputReference/media/image136.png)
+![CondenserLoopSyntax (media/image136.png)
 
 Figure 74. Condenser Loop Input Syntax Map
 
@@ -10682,7 +10682,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load Power at Available Capacity to Full Load Power at Nominal Capacity. The defining equation is:
 
-<span>$FullLoadPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FullLoadPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient1 of the power ratio curve
 
@@ -11674,7 +11674,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power. The defining equation is:
 
-<span>$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient 1 of Power Ratio Curve
 
@@ -12130,7 +12130,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power. The defining equation is:
 
-<span>$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient 1 of Power Ratio Curve
 
@@ -12208,7 +12208,7 @@ This numeric field contains the third coefficient for the Temperature Based Fuel
 
 The Exhaust Flow Curve is a quadratic equation that determines the Ratio of Exhaust Gas Flow Rate to Engine Capacity. The defining equation is:
 
-*<span>$ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15$</span> *
+*<span>\(ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15\)</span> *
 
 where GTCapacity is the Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the current ambient and design ambient temperatures.
 
@@ -12228,7 +12228,7 @@ This numeric field contains the third coefficient for the Exhaust Flow Curve.
 
 The Exhaust Gas Temperature Curve is a polynomial equation that determines the Exhaust Gas Temperature. The equation combines both the Exhaust Gas Temperature Curve Coefficients (Based on the Part Load Ratio) and the (Ambient) Temperature Based Exhaust Gas Temperature Curve Coefficients. The defining equation is:
 
- <span>$RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})$</span>
+ <span>\(RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})\)</span>
 
 where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the Temperature Based Exhaust Gas Temperature Curve Coefficients, RLoad is the Ratio of Load to Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the actual ambient and design ambient temperatures.
 
@@ -13773,7 +13773,7 @@ Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simul
 
 The Supply side of the heat pump is usually connected to a Ground Heat Exchanger. The figure below shows the layout and piping diagram of the water-to-water heat pump.
 
-![](InputOutputReference/media/image184.svg)
+![](media/image184.svg)
 
 Figure 75. Schematic of EnergyPlus Ground Loop Heat Exchanger
 
@@ -14675,19 +14675,19 @@ The order of the multiple chiller-heaters’ operation is assumed to be sequenti
 
 
 
-![](InputOutputReference/media/image185.png)
+![](media/image185.png)
 
 Figure 76. Diagram of a central heat pump system with three chiller-heaters in cooling-only mode (Condensers reject heat to the ground source loop)
 
 
 
-![](InputOutputReference/media/image186.png)
+![](media/image186.png)
 
 Figure 77. Diagram of a central heat pump system with three chiller-heaters in heat recovery mode         (No heat is exchanged with the ground source loop)
 
 
 
-![](InputOutputReference/media/image187.png)
+![](media/image187.png)
 
 Figure 78. Diagram of a central heat pump system with one chiller-heater in heat recovery mode and two chiller-heaters in cooling-only mode
 
@@ -14695,7 +14695,7 @@ In the above example, the cooling load needs 3 chiller-heaters and the heating l
 
 
 
-![](InputOutputReference/media/image188.png)
+![](media/image188.png)
 
 Figure 79. Diagram of a central heat pump system with two chiller-heaters in heat recovery mode and one chiller-heater in heating-only mode
 
@@ -16064,7 +16064,7 @@ When coupled to the plant loop, the water heater has an inlet node and outlet no
 
 However, for a water heater that is indirectly heated (e.g. with a separate boiler), the source side can be used to provide remotely heated water to the tank.  The source side is configured to operate as a component on the demand side of a plant loop.  The design flow rate through the source side can be set by the user or autosized.  If autosized, then a Plant Sizing object is needed elsewhere in the input file for the Plant Loop serving the source side.  The water heater input includes an additional design parameter that describes how rapidly the tank can recover.
 
-![WHFig](InputOutputReference/media/image191.png)
+![WHFig](media/image191.png)
 
 Figure 80. Water Heater Configuration
 
@@ -17171,7 +17171,7 @@ This field is used to scale the height of a stratified tank to preserve relative
 
 The heat pump water heater (HPWH) is a compound object consisting of a water heater tank (e.g., WaterHeater:Mixed or WaterHeater:Stratified), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled, with one common configuration shown below.
 
-![HPHotWaterHeater](InputOutputReference/media/image192.png)
+![HPHotWaterHeater](media/image192.png)
 
 Figure 81. Schematic diagram for a heat pump water heater located in a zone
 
@@ -19434,7 +19434,7 @@ The evaporative fluid cooler seeks to maintain the temperature of the water exit
 
 Evaporative fluid coolers consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the fluid coolers. For this purpose, the last seven input fields can either be provided in the input or if nothing is specified then the default values for these fields will be used. These fields provide the methods of controlling details of the water consumption calculations. The user can specify connections to the rest of the building’s water system by providing the name of a water storage tanks (i.e. WaterUse:Storage objects). The schematic of the system is shown below:
 
-![EvaporativeFluidCooler](InputOutputReference/media/image201.svg)
+![EvaporativeFluidCooler](media/image201.svg)
 
 Figure 82. Schematic diagram for evaporative fluid cooler
 

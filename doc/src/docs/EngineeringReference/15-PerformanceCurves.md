@@ -95,11 +95,11 @@ Tc,i (or Tdb,i)= dry-bulb temperature of the air entering an air-cooled condense
 
 Given the data set shown in the table below, each of the independent variables would be calculated according to the fundamental equation above (i.e., the T, T<sup>2</sup>, and cross-product terms would be multiplied out). The data would be converted to degrees celcius and the cooling capacity would be converted to Watts. The data would also be normalized using the ARI rating point shown as highlighted in the table.
 
-![DataTable](EngineeringReference/media/image7865.png)
+![DataTable](media/image7865.png)
 
 The fundamental equation would be used to determine the number of independent variables and also the form of the equation. Given the example described here, the spreadsheet would be set up to look like the equation as shown in the following table. A regression analysis could then be performed on the data set. The first five columns are the independent variables and the last column is the dependent variable. A spreadsheet tool is selected to perform the regression analysis, and the coefficients are calculated and displayed in the spreadsheet.
 
-![RegressionAnalysis](EngineeringReference/media/image7866.png)
+![RegressionAnalysis](media/image7866.png)
 
 
 
@@ -107,7 +107,7 @@ The regression analysis and summary statistical output is shown below. The equat
 
 
 
-![RegressionSummaryOutput](EngineeringReference/media/image7867.png)
+![RegressionSummaryOutput](media/image7867.png)
 
 
 
@@ -272,7 +272,7 @@ Curve:Cubic,
 !...END GENERATING NEW CURVE OBJECT
 ```
 
-![FanPowerRatioExample](EngineeringReference/media/image7870.png)
+![FanPowerRatioExample](media/image7870.png)
 
 ### Tables based on two independent variables
 
@@ -282,7 +282,7 @@ The equation order or degree is user selected as biquadratic or quadraticlinear.
 
 Given a generic manufacturers air conditioner data for an AC system having a rated total cooling capacity of 7735.1 W, the change in capacity is shown in the table to be a function of both cooling coil entering air wet-bulb temperature and condenser entering air dry-bulb temperature. The tabular data is entered as the actual cooling capacity and will be normalized by the program according to the rated capacity of 7735.1 W. The cooling coil EIR curve could be developed in a similar fashion, except that EIR (Power / TotCap) must first be calculated from the tabular data below BEFORE entering this data into a table object. In this example, only data highlighted in yellow will be used.
 
-![NormalizedCapacity](EngineeringReference/media/image7871.png)
+![NormalizedCapacity](media/image7871.png)
 
 The tabular data can be entered directly into a table object. As an example, for an air-cooled DX cooling coil object in Energyplus, the capacity as a function of temperature has the following fundamental equation (Ref. Single-Speed Electric DX Air Cooling Coil):
 
@@ -366,7 +366,7 @@ FromTable_CCOOLCAPFT,  !- Name
 END CREATING NEW CURVE OBJECT
 ```
 
-![NormalizedCapacity](EngineeringReference/media/image7873.png)
+![NormalizedCapacity](media/image7873.png)
 
 ### Lookup Tables
 

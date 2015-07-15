@@ -95,6 +95,8 @@ namespace Fans {
 		Real64 FanEff; // Fan total system efficiency (fan*belt*motor*VFD)
 		bool EMSFanEffOverrideOn; // if true, then EMS is calling to override
 		Real64 EMSFanEffValue; // EMS value for total efficiency of the Fan, fraction on 0..1
+		bool FaultyFilterFlag; // Indicate whether there is a fouling air filter corresponding to the fan
+		int FaultyFilterIndex;  // Index of the fouling air filter corresponding to the fan
 		Real64 MotEff; // Fan motor efficiency
 		Real64 MotInAirFrac; // Fraction of motor heat entering air stream
 		Array1D< Real64 > FanCoeff; // Fan Part Load Coefficients to match fan type
@@ -198,6 +200,8 @@ namespace Fans {
 			FanEff( 0.0 ),
 			EMSFanEffOverrideOn( false ),
 			EMSFanEffValue( 0.0 ),
+		    FaultyFilterFlag( false ),
+		    FaultyFilterIndex( 0 ),
 			MotEff( 0.0 ),
 			MotInAirFrac( 0.0 ),
 			FanCoeff( 5, 0.0 ),
@@ -299,6 +303,8 @@ namespace Fans {
 			Real64 const FanEff, // Fan total system efficiency (fan*belt*motor*VFD)
 			bool const EMSFanEffOverrideOn, // if true, then EMS is calling to override
 			Real64 const EMSFanEffValue, // EMS value for total efficiency of the Fan, fraction on 0..1
+		    bool FaultyFilterFlag, // Indicate whether there is a fouling air filter corresponding to the fan
+		    int FaultyFilterIndex,  // Index of the fouling air filter corresponding to the fan
 			Real64 const MotEff, // Fan motor efficiency
 			Real64 const MotInAirFrac, // Fraction of motor heat entering air stream
 			Array1< Real64 > const & FanCoeff, // Fan Part Load Coefficients to match fan type
@@ -399,6 +405,8 @@ namespace Fans {
 			FanEff( FanEff ),
 			EMSFanEffOverrideOn( EMSFanEffOverrideOn ),
 			EMSFanEffValue( EMSFanEffValue ),
+		    FaultyFilterFlag( FaultyFilterFlag ),
+		    FaultyFilterIndex( FaultyFilterIndex ),
 			MotEff( MotEff ),
 			MotInAirFrac( MotInAirFrac ),
 			FanCoeff( 5, FanCoeff ),
@@ -696,6 +704,15 @@ namespace Fans {
 	FanDesDT(
 		int const FanNum, // index of fan in Fan array
 		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+	);
+
+	Real64 
+	CalFaultyFanAirFlowReduction(
+		std::string const FanName,            // Name of the Fan 
+		Real64 const FanDesignAirFlowRate,    // Fan Design Volume Flow Rate [m3/s]
+		Real64 const FanDesignDeltaPress,     // Fan Design Delta Pressure [Pa]
+		Real64 const FanFaultyDeltaPressInc,  // Increase of Fan Delta Pressure in the Faulty Case [Pa]
+		int const FanCurvePtr                 // Fan Curve Pointer
 	);
 
 	Real64
