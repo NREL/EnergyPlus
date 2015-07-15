@@ -355,6 +355,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
 
     !!!    Changes for this version
+    
               ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
               CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
                 nodiff=.false.
