@@ -109,7 +109,7 @@ A single Parametric:Logic object is allowed per file. It has a freeform syntax i
 ```idf
 Parametric:Logic,
   Main,                            !- name
-  IF $insDepth < 0.1,              !- parametric logic line 1
+  IF $insDepth &lt; 0.1,              !- parametric logic line 1
      DISABLE “MaterialWallBoard”,  !- parametric logic line 2
      DISABLE “MaterialExtFinish”,  !- parametric logic line 3
   ENDIF;                           !- parametric logic line 4

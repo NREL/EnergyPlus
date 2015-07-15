@@ -153,7 +153,7 @@ In many of today’s utility rates, the charges for energy or demand are broken 
 
 The categories are combined in following hierarchy:
 
-![EnergyCharge](InputOutputReference/media/image615.png)
+![EnergyCharge](media/image615.png)
 
 Figure 162. Hierarchy for Economics Charges
 
@@ -1982,7 +1982,7 @@ ComponentCost:Reference,
 
 Cost estimate results are only output to tabular reports; they are not available in the standard output file (.eso). The results are included in the Construction Cost Estimate Summary table by request using the object Output:Table:SummaryReports object with the Component Cost Economics Summary option selected. The figure below shows an example of summary output using html style for tabular reporting. A second table is produced that provides the line item details with one line for every line item object. Per-area cost modeling and cost normalization are based on total conditioned floor area which is also provided in the tabular report.
 
-![FigureOutput](InputOutputReference/media/image616.png)
+![FigureOutput](media/image616.png)
 
 Figure 163. Economics Cost Modeling
 

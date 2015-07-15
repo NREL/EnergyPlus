@@ -671,6 +671,11 @@ namespace MixedAir {
 
 	// Functions
 
+	// Clears the global data in MixedAir.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	ManageOutsideAirSystem(
 		std::string const & OASysName,

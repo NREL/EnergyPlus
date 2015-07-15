@@ -545,6 +545,11 @@ namespace CurveManager {
 
 	// Functions
 
+	// Clears the global data in CurveManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	ResetPerformanceCurveOutput();
 

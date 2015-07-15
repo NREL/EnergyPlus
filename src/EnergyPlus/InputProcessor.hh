@@ -412,6 +412,11 @@ namespace InputProcessor {
 
 	// Functions
 
+	// Clears the global data in InputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	ProcessInput();
 
