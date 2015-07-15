@@ -22,6 +22,7 @@ set( test_src
   Humidifiers.unit.cc
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
+  HeatBalanceIntRadExchange.unit.cc
   ICSCollector.unit.cc
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
