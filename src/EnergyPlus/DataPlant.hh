@@ -239,7 +239,6 @@ namespace DataPlant {
 	extern int const TypeOf_Baseboard_Rad_Conv_Water;
 	extern int const TypeOf_CoolingPanel_Simple;
 	extern int const TypeOf_LowTempRadiant_VarFlow;
-	extern int const TypeOf_LowTempRadiant_VarFlow;
 	extern int const TypeOf_LowTempRadiant_ConstFlow;
 	extern int const TypeOf_CooledBeamAirTerminal;
 	extern int const TypeOf_CoilWAHPHeatingEquationFit;

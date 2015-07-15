@@ -2249,7 +2249,33 @@
     SB45,                    !- Surface 3 Name
     0.1;                     !- Fraction of Radiant Energy to Surface 3
 
-!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER ===========  ZoneHVAC:CoolingPanel:RadiantConvective:Water,    SPACE2 Cooling Panel,   !- Name    CoolingCoilAvailSched,     !- Availability schedule    SPACE2 Cooling Panel Water Inlet Node,      !- Inlet node name    SPACE2 Cooling Panel Water Outlet Node,     !- Outlet node name    5.0,                       !- Rated Water Inlet Temperature {C}    24.0,                      !- Rated Space Temperature {C}    0.63,                      !- Rated Water Mass Flow Rate {kg/s}    600.0,                     !- Rated capacity    0.001,                     !- Maximum water flow rate {m3/s}    ZoneTotalLoad,             !- Temperature Control Type    1.0,                       !- Cooling Control Throttling Range    Clg-SetP-Sch,              !- Cooling Control Temperature Schedule Name    Off,                       !- Condensation Control Type    0.5,                       !- Condensation Control Dewpoint Offset    0.65,                      !- Fraction Radiant    0.10,                      !- Fraction of Radiant Energy Incident on People    F2-1,                      !- Surface 1 Name    0.45,                      !- Fraction of Radiant Energy to Surface 1    RIGHT-1,                   !- Surface 2 Name    0.25,                      !- Fraction of Radiant Energy to Surface 2    SB21,                      !- Surface 3 Name    0.2;                       !- Fraction of Radiant Energy to Surface 3!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT ===========
+!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER ===========
+
+  ZoneHVAC:CoolingPanel:RadiantConvective:Water,
+    SPACE2 Cooling Panel,   !- Name
+    CoolingCoilAvailSched,     !- Availability schedule
+    SPACE2 Cooling Panel Water Inlet Node,      !- Inlet node name
+    SPACE2 Cooling Panel Water Outlet Node,     !- Outlet node name
+    5.0,                       !- Rated Water Inlet Temperature {C}
+    24.0,                      !- Rated Space Temperature {C}
+    0.63,                      !- Rated Water Mass Flow Rate {kg/s}
+    600.0,                     !- Rated capacity
+    0.001,                     !- Maximum water flow rate {m3/s}
+    ZoneTotalLoad,             !- Temperature Control Type
+    1.0,                       !- Cooling Control Throttling Range
+    Clg-SetP-Sch,              !- Cooling Control Temperature Schedule Name
+    Off,                       !- Condensation Control Type
+    0.5,                       !- Condensation Control Dewpoint Offset
+    0.65,                      !- Fraction Radiant
+    0.10,                      !- Fraction of Radiant Energy Incident on People
+    F2-1,                      !- Surface 1 Name
+    0.45,                      !- Fraction of Radiant Energy to Surface 1
+    RIGHT-1,                   !- Surface 2 Name
+    0.25,                      !- Fraction of Radiant Energy to Surface 2
+    SB21,                      !- Surface 3 Name
+    0.2;                       !- Fraction of Radiant Energy to Surface 3
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT ===========
 
   AirTerminal:SingleDuct:VAV:NoReheat,
     SPACE2-1 VAV System,     !- Name
@@ -2372,7 +2398,21 @@
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
-  ZoneHVAC:EquipmentList,    SPACE2-1 Eq,             !- Name    ZoneHVAC:CoolingPanel:RadiantConvective:Water,  !- Zone Equipment 1 Object Type    SPACE2 Cooling Panel,    !- Zone Equipment 1 Name    1,                       !- Zone Equipment 1 Cooling Sequence    1,                       !- Zone Equipment 1 Heating or No-Load Sequence    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type    SPACE2-1 ATU,            !- Zone Equipment 1 Name    2,                       !- Zone Equipment 1 Cooling Sequence    2,                       !- Zone Equipment 1 Heating or No-Load Sequence    ZoneHVAC:Baseboard:RadiantConvective:Water,  !- Zone Equipment 2 Object Type    SPACE2-1 Baseboard,      !- Zone Equipment 2 Name    3,                       !- Zone Equipment 2 Cooling Sequence    3;                       !- Zone Equipment 2 Heating or No-Load Sequence
+  ZoneHVAC:EquipmentList,
+    SPACE2-1 Eq,             !- Name
+    ZoneHVAC:CoolingPanel:RadiantConvective:Water,  !- Zone Equipment 1 Object Type
+    SPACE2 Cooling Panel,    !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE2-1 ATU,            !- Zone Equipment 1 Name
+    2,                       !- Zone Equipment 1 Cooling Sequence
+    2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ZoneHVAC:Baseboard:RadiantConvective:Water,  !- Zone Equipment 2 Object Type
+    SPACE2-1 Baseboard,      !- Zone Equipment 2 Name
+    3,                       !- Zone Equipment 2 Cooling Sequence
+    3;                       !- Zone Equipment 2 Heating or No-Load Sequence
+
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
@@ -2865,7 +2905,16 @@
     Main Cooling Coil 1 Water Outlet Node,  !- Component 1 Outlet Node Name
     Active;                  !- Component 1 Branch Control Type
 
-  Branch,    Cooling Panel Branch,    !- Name    0,                       !- Maximum Flow Rate {m3/s}    ,                        !- Pressure Drop Curve Name    ZoneHVAC:CoolingPanel:RadiantConvective:Water,      !- Component 1 Object Type    SPACE2 Cooling Panel,     !- Component 1 Name    SPACE2 Cooling Panel Water Inlet Node,  !- Component 1 Inlet Node Name    SPACE2 Cooling Panel Water Outlet Node,  !- Component 1 Outlet Node Name    Active;                  !- Component 1 Branch Control Type
+  Branch,
+    Cooling Panel Branch,    !- Name
+    0,                       !- Maximum Flow Rate {m3/s}
+    ,                        !- Pressure Drop Curve Name
+    ZoneHVAC:CoolingPanel:RadiantConvective:Water,      !- Component 1 Object Type
+    SPACE2 Cooling Panel,     !- Component 1 Name
+    SPACE2 Cooling Panel Water Inlet Node,  !- Component 1 Inlet Node Name
+    SPACE2 Cooling Panel Water Outlet Node,  !- Component 1 Outlet Node Name
+    Active;                  !- Component 1 Branch Control Typ
+
   Branch,
     Cooling Demand Bypass Branch,  !- Name
     0,                       !- Maximum Flow Rate {m3/s}
@@ -3089,14 +3138,14 @@
     CW Demand Splitter,      !- Name
     Cooling Demand Inlet,    !- Inlet Branch Name
     Cooling Coil Branch,     !- Outlet Branch 1 Name
-    Cooling Demand Bypass Branch;  !- Outlet Branch 2 Name
+    Cooling Panel Branch,    !- Outlet Branch 2 Name
+    Cooling Demand Bypass Branch;  !- Outlet Branch 3 Name
 
   Connector:Splitter,
     Condenser Demand Splitter,  !- Name
     Condenser Demand Inlet Branch,  !- Inlet Branch Name
     Central Chiller Condenser Branch,  !- Outlet Branch 1 Name
-    Cooling Panel Branch,    !- Outlet Branch 2 Name
-    Condenser Demand Bypass Branch;  !- Outlet Branch 3 Name
+    Condenser Demand Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Splitter,
     Condenser Supply Splitter,  !- Name
@@ -3129,7 +3178,13 @@
     Central Chiller Branch,  !- Inlet Branch 1 Name
     Cooling Supply Bypass Branch;  !- Inlet Branch 2 Name
 
-  Connector:Mixer,    CW Demand Mixer,         !- Name    Cooling Demand Outlet,   !- Outlet Branch Name    Cooling Coil Branch,     !- Inlet Branch 1 Name    Cooling Panel Branch,    !- Inlet Branch 2 Name    Cooling Demand Bypass Branch;  !- Inlet Branch 3 Name
+  Connector:Mixer,
+    CW Demand Mixer,         !- Name
+    Cooling Demand Outlet,   !- Outlet Branch Name
+    Cooling Coil Branch,     !- Inlet Branch 1 Name
+    Cooling Panel Branch,    !- Inlet Branch 2 Name
+    Cooling Demand Bypass Branch;  !- Inlet Branch 3 Name
+
   Connector:Mixer,
     Condenser Demand Mixer,  !- Name
     Condenser Demand Outlet Branch,  !- Outlet Branch Name
@@ -3678,7 +3733,42 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
-  Output:Variable,SB21,Surface Inside Face Temperature,hourly;  Output:Variable,SB23,Surface Inside Face Temperature,hourly;  Output:Variable,SB25,Surface Inside Face Temperature,hourly;  Output:Variable,RIGHT-1,Surface Inside Face Temperature,hourly;  Output:Variable,F2-1,Surface Inside Face Temperature,hourly;  Output:Variable,C2-1,Surface Inside Face Temperature,hourly;  Output:Variable,*,Heating Coil Heating Rate,hourly;  Output:Variable,*,Cooling Panel Total System Cooling Rate,hourly;  Output:Variable,*,Cooling Panel Total Cooling Rate,hourly;  Output:Variable,*,Cooling Panel Convective Cooling Rate,hourly;  Output:Variable,*,Cooling Panel Radiant Cooling Rate,hourly;  Output:Variable,*,Cooling Panel Total System Cooling Energy,hourly;  Output:Variable,*,Cooling Panel Total Cooling Energy,hourly;  Output:Variable,*,Cooling Panel Convective Cooling Energy,hourly;  Output:Variable,*,Cooling Panel Radiant Cooling Energy,hourly;  Output:Variable,*,Cooling Panel Water Mass Flow Rate,hourly;  Output:Variable,*,Cooling Panel Water Inlet Temperature,hourly;  Output:Variable,*,Cooling Panel Water Outlet Temperature,hourly;
+  Output:Variable,SB21,Surface Inside Face Temperature,hourly;
+
+  Output:Variable,SB23,Surface Inside Face Temperature,hourly;
+
+  Output:Variable,SB25,Surface Inside Face Temperature,hourly;
+
+  Output:Variable,RIGHT-1,Surface Inside Face Temperature,hourly;
+
+  Output:Variable,F2-1,Surface Inside Face Temperature,hourly;
+
+  Output:Variable,C2-1,Surface Inside Face Temperature,hourly;
+
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
+
+  Output:Variable,*,Cooling Panel Total System Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Panel Total Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Panel Convective Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Panel Radiant Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Panel Total System Cooling Energy,hourly;
+
+  Output:Variable,*,Cooling Panel Total Cooling Energy,hourly;
+
+  Output:Variable,*,Cooling Panel Convective Cooling Energy,hourly;
+
+  Output:Variable,*,Cooling Panel Radiant Cooling Energy,hourly;
+
+  Output:Variable,*,Cooling Panel Water Mass Flow Rate,hourly;
+
+  Output:Variable,*,Cooling Panel Water Inlet Temperature,hourly;
+
+  Output:Variable,*,Cooling Panel Water Outlet Temperature,hourly;
+
   Output:Variable,SPACE1-1 In Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE1-1 In Node,System Node Temperature,hourly;

@@ -118,11 +118,11 @@ namespace CoolingPanelSimple {
 			ControlCompTypeNum( 0 ),
 			CompErrIndex( 0 ),
 			ControlType( 0 ),
-			ColdThrottlRange( 0.0 ),
 			ColdSetptSchedPtr( 0 ),
 			CondCtrlType( 0 ),
 		    CondDewPtDeltaT( 0.0 ),
 			CondErrIndex( 0 ),
+			ColdThrottlRange( 0.0 ),
 			RatedWaterTemp( 0.0 ),
 			RatedCapacity( 0.0 ),
 			UA( 0.0 ),
@@ -173,7 +173,7 @@ namespace CoolingPanelSimple {
 			int const ControlCompTypeNum,
 			int const CompErrIndex,
 			int const ControlType,
-			std::string const ColdSetptSched,
+			std::string const & ColdSetptSched,
 			int const ColdSetptSchedPtr,
 			Real64 const ColdThrottlRange,
 			int const CondCtrlType,
@@ -227,12 +227,12 @@ namespace CoolingPanelSimple {
 			ControlCompTypeNum( ControlCompTypeNum ),
 			CompErrIndex( CompErrIndex ),
 			ControlType( ControlType ),
-			ColdThrottlRange( ColdThrottlRange ),
 			ColdSetptSched( ColdSetptSched ),
 			ColdSetptSchedPtr( ColdSetptSchedPtr ),
 			CondCtrlType( CondCtrlType ),
 			CondDewPtDeltaT( CondDewPtDeltaT ),
 			CondErrIndex( CondErrIndex ),
+			ColdThrottlRange( ColdThrottlRange ),
 			RatedWaterTemp( RatedWaterTemp ),
 			RatedCapacity( RatedCapacity ),
 			UA( UA ),
@@ -315,17 +315,6 @@ namespace CoolingPanelSimple {
 
 	Real64
 	SumHATsurf( int const ZoneNum ); // Zone number
-
-	void
-	UpdateCoolingPanelPlantConnection(
-		std::string const & CoolingPanelName, // component name
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int const LoopNum, // Plant loop index for where called from
-		int const LoopSide, // Plant loop side index for where called from
-		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
-		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
-	);
 
 	//*****************************************************************************************
 	//     NOTICE
