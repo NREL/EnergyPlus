@@ -155,6 +155,9 @@ namespace DataHVACGlobals {
 	extern int const Coil_CoolingAirToAirVariableSpeed;
 	extern int const Coil_HeatingAirToAirVariableSpeed;
 	extern int const CoilDX_HeatPumpWaterHeaterVariableSpeed;
+	
+	extern int const CoilVRF_Cooling_FluidTCtrl;
+	extern int const CoilVRF_Heating_FluidTCtrl;
 
 	// Water to air HP coil types
 	extern int const WatertoAir_Simple;

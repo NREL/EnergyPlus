@@ -296,6 +296,56 @@ namespace HVACVariableRefrigerantFlow {
 		bool EMSOverrideHPOperatingMode;
 		Real64 EMSValueForHPOperatingMode;
 		int HPOperatingModeErrorIndex;
+		
+		//The following are for the Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+		std::string RefrigerantName;        // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
+		Real64 CondensingTemp;           	// @@Comments should be updated XP_VRV system outdoor unit condensing temperature [C]
+		Real64 EvaporatingTemp;          	// XP_VRV system outdoor unit condensing temperature [C]
+		Real64 MinEvaporatingTemp;       	// XP_VRV system min evaporating temperature among all indoor units [C]
+		Real64 MaxCondensingTemp;        	// XP_VRV system max condensing temperature among all indoor units [C]
+		Real64 SucPressDrop;             	// XP_VRV system min evaporating temperature among all indoor units [C]
+		Real64 DisPressDrop;             	// XP_VRV system min evaporating temperature among all indoor units [C]
+		Real64 MaxCondFlow;              	// XP_Max condenser air flow rate  [m3/s]
+		Real64 MaxCondFlowTemp;          	// XP_outdoor air temp for rated condenser flow  [C]
+		Real64 MinCondFlow;              	// XP_Min condenser air flow rate  [m3/s]
+		Real64 MinCondFlowTemp;          	// XP_outdoor air temp for min condenser flow  [C]
+		Real64 BFC;           	       		// XP_Bypass factor in cooling mode
+		Real64 BFH;           	       		// XP_Bypass factor in heating mode
+		Real64 SH;                       	// XP_Superheating
+		Real64 SC;                       	// XP_Subcooling
+		Real64 C1Te;	                   	// XP_Coefficient 1 to calculate Te,req
+		Real64 C2Te;                     	// XP_Coefficient 2 to calculate Te,req
+		Real64 C3Te;                     	// XP_Coefficient 3 to calculate Te,req
+		Real64 C1Tc;	                   	// XP_Coefficient 1 to calculate Tc,req
+		Real64 C2Tc;                     	// XP_Coefficient 2 to calculate Tc,req
+		Real64 C3Tc;                     	// XP_Coefficient 3 to calculate Tc,req
+		int    Algorithm;                	// XP_1-High sensible, 2-Te/Tc constant
+		Real64 EvapTempFixed;            	// XP_Fixed indoor evaporating temperature
+		Real64 CondTempFixed;            	// XP_Fixed inddor condensing temperature
+		Real64 RatedCondFanPower;        	// XP
+		Real64 CondFanPower;             	// XP
+		Real64 CompActSpeed;             	// XP
+		Real64 NcompCooling;             	// XP-compressor electric power [W]
+		Real64 NcompHeating;             	// XP-compressor electric power [W]
+		Array1D< Real64 > CompressorSpeed;  // XP_compressor speed [rps]
+		Array1D_int OUCoolingCAPFT;         // XP_index to outdoor unit cooling capacity funtion of temperature at different compressor speed
+		Array1D_int OUCoolingPWRFT;         // XP_index to outdoor unit cooling power funtion of temperature at different compressor speed
+		Real64 CoeffCdeltaTout;	            // XP_coefficents in equation 14  
+		Real64 CoeffCdeltaToutHeat;	        // XP_coefficents in equation 14 for heating
+		Real64 CompMaxDeltaP;         	    // XP_maximum compressor delta P
+		Real64 RefPipDia;         	        // XP_diameter of refrigerant pipe that links the outdoor unit to the indoor units
+		Real64 RefPipLen;         	        // XP_length of refrigerant pipe that links the outdoor unit to the indoor units
+		Real64 RefPipHei;         	        // XP_height of refrigerant pipe that links the outdoor unit to the indoor units
+		Real64 RefPipInsThi;   	            // XP_thickness of refrigerant pipe insulation
+		Real64 RefPipInsCon;   	            // XP_thermal conductivity of refrigerant pipe insulation
+		Real64 RefPipInsH;   	            // XP_heat transfer coefficient of air to insulation
+		Real64 Path;  	                    // Yoshi: For debug
+		Real64 NumIteNcomp;  	            // Yoshi: For debug (similar to CompActSpeed)
+		Real64 NumIteTe;  	                // Yoshi: For debug
+		Real64 NumIteHIUIn;  	            // Yoshi: For debug
+		Real64 Modifi_factor; 	            // Yoshi: For debug
+		Real64 Modifi_SH; 	                // Yoshi: For debug
+		Real64 Modifi_Pe; 	                // Yoshi: For debug
 
 		// Default Constructor
 		VRFCondenserEquipment() :
@@ -458,7 +508,51 @@ namespace HVACVariableRefrigerantFlow {
 			BasinHeaterSchedulePtr( 0 ),
 			EMSOverrideHPOperatingMode( false ),
 			EMSValueForHPOperatingMode( 0.0 ),
-			HPOperatingModeErrorIndex( 0 )
+			HPOperatingModeErrorIndex( 0 ),
+			CondensingTemp( 25.0 ),
+			EvaporatingTemp( 6.0 ),
+			MinEvaporatingTemp( 6.0 ), 
+			MaxCondensingTemp( 25.0 ),
+			SucPressDrop( 0.0 ),
+			DisPressDrop( 0.0 ),
+			MaxCondFlow( 0.0 ),
+			MaxCondFlowTemp( 30.0 ),
+			MinCondFlow( 0.0 ),
+			MinCondFlowTemp( 10.0 ),
+			BFC( 0.0 ),   			             
+			BFH( 0.0 ),           	       			             
+			SH( 0.0 ),                       			         
+			SC( 0.0 ),                       			         
+			C1Te( 0.0 ),	                   			         
+			C2Te( 0.0 ),                     			         
+			C3Te( 0.0 ),                     			         
+			C1Tc( 0.0 ),	                   			         
+			C2Tc( 0.0 ),                     			         
+			C3Tc( 0.0 ),                     			         
+			Algorithm( 1 ),            
+			EvapTempFixed( 0.0 ),            			         
+			CondTempFixed( 0.0 ),            			         
+			RatedCondFanPower( 0.0 ),   
+			CondFanPower( 0.0 ),  
+			CompActSpeed( 0.0 ),   
+			NcompCooling( 0.0 ),   
+			NcompHeating( 0.0 ),   		 	 
+			CoeffCdeltaTout( 0.0 ),	                 		 
+			CoeffCdeltaToutHeat( 0.0 ),	             		 
+			CompMaxDeltaP( 0.0 ),         	                     
+			RefPipDia( 0.0 ),         	                         
+			RefPipLen( 0.0 ),         	                         
+			RefPipHei( 0.0 ),       	                         
+			RefPipInsThi( 0.0 ),
+			RefPipInsCon( 0.0 ),
+			RefPipInsH( 0.0 ),
+			Path( 0.0 ),
+			NumIteNcomp( 0.0 ),
+			NumIteTe( 0.0 ),	     
+			NumIteHIUIn( 0.0 ),
+			Modifi_factor( 0.0 ),
+			Modifi_SH( 0.0 ), 	                			     
+			Modifi_Pe( 0.0 )
 		{}
 
 		// Member Constructor
@@ -625,7 +719,55 @@ namespace HVACVariableRefrigerantFlow {
 			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
 			bool const EMSOverrideHPOperatingMode,
 			Real64 const EMSValueForHPOperatingMode,
-			int const HPOperatingModeErrorIndex
+			int const HPOperatingModeErrorIndex,
+			std::string const RefrigerantName, 
+			Real64 const CondensingTemp,           	
+			Real64 const EvaporatingTemp,          	
+			Real64 const MinEvaporatingTemp,       	
+			Real64 const MaxCondensingTemp,        	
+			Real64 const SucPressDrop,             	
+			Real64 const DisPressDrop,             	
+			Real64 const MaxCondFlow,              	
+			Real64 const MaxCondFlowTemp,          	
+			Real64 const MinCondFlow,              	
+			Real64 const MinCondFlowTemp,          	
+			Real64 const BFC,           	       		
+			Real64 const BFH,           	       		
+			Real64 const SH,                       	
+			Real64 const SC,                       	
+			Real64 const C1Te,	                   
+			Real64 const C2Te,                     	
+			Real64 const C3Te,                     	
+			Real64 const C1Tc,	                   
+			Real64 const C2Tc,                     	
+			Real64 const C3Tc,                     	
+			int    const Algorithm,                	
+			Real64 const EvapTempFixed,            	
+			Real64 const CondTempFixed,            	
+			Real64 const RatedCondFanPower,        	
+			Real64 const CondFanPower,             	
+			Real64 const CompActSpeed,             	
+			Real64 const NcompCooling,             	
+			Real64 const NcompHeating,             	
+			Array1D< Real64 > & CompressorSpeed, 
+			Array1D_int & OUCoolingCAPFT,        
+			Array1D_int & OUCoolingPWRFT,        
+			Real64 const CoeffCdeltaTout,	           
+			Real64 const CoeffCdeltaToutHeat,	       
+			Real64 const CompMaxDeltaP,         	   
+			Real64 const RefPipDia,         	       
+			Real64 const RefPipLen,         	       
+			Real64 const RefPipHei,         	       
+			Real64 const RefPipInsThi,   	           
+			Real64 const RefPipInsCon,   	           
+			Real64 const RefPipInsH,   	           
+			Real64 const Path,  	                   
+			Real64 const NumIteNcomp,  	           
+			Real64 const NumIteTe,  	               
+			Real64 const NumIteHIUIn,  	           
+			Real64 const Modifi_factor, 	           
+			Real64 const Modifi_SH, 	               
+			Real64 const Modifi_Pe
 		) :
 			Name( Name ),
 			VRFSystemTypeNum( VRFSystemTypeNum ),
@@ -789,7 +931,55 @@ namespace HVACVariableRefrigerantFlow {
 			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
 			EMSOverrideHPOperatingMode( EMSOverrideHPOperatingMode ),
 			EMSValueForHPOperatingMode( EMSValueForHPOperatingMode ),
-			HPOperatingModeErrorIndex( HPOperatingModeErrorIndex )
+			HPOperatingModeErrorIndex( HPOperatingModeErrorIndex ),
+			RefrigerantName( RefrigerantName ),
+			CondensingTemp( CondensingTemp ),           	
+			EvaporatingTemp( EvaporatingTemp ),          	
+			MinEvaporatingTemp( MinEvaporatingTemp ),       	
+			MaxCondensingTemp( MaxCondensingTemp ),        	
+			SucPressDrop( SucPressDrop ),             	
+			DisPressDrop( DisPressDrop ),             	
+			MaxCondFlow( MaxCondFlow ),              	
+			MaxCondFlowTemp( MaxCondFlowTemp ),          	
+			MinCondFlow( MinCondFlow ),              	
+			MinCondFlowTemp( MinCondFlowTemp ),          	
+			BFC( BFC ),           	       		
+			BFH( BFH ),           	       		
+			SH( SH ),                       	
+			SC( SC ),                       	
+			C1Te( C1Te ),	                   
+			C2Te( C2Te ),                     	
+			C3Te( C3Te ),                     	
+			C1Tc( C1Tc ),	                   
+			C2Tc( C2Tc ),                     	
+			C3Tc( C3Tc ),                     	
+			Algorithm( Algorithm ),                	
+			EvapTempFixed( EvapTempFixed ),            	
+			CondTempFixed( CondTempFixed ),            	
+			RatedCondFanPower( RatedCondFanPower ),        	
+			CondFanPower( CondFanPower ),             	
+			CompActSpeed( CompActSpeed ),             	
+			NcompCooling( NcompCooling ),             	
+			NcompHeating( NcompHeating ),             	
+			CompressorSpeed( CompressorSpeed ), 
+			OUCoolingCAPFT( OUCoolingCAPFT ),        
+			OUCoolingPWRFT( OUCoolingPWRFT ),        
+			CoeffCdeltaTout( CoeffCdeltaTout ),	           
+			CoeffCdeltaToutHeat( CoeffCdeltaToutHeat ),	       
+			CompMaxDeltaP( CompMaxDeltaP ),         	   
+			RefPipDia( RefPipDia ),         	       
+			RefPipLen( RefPipLen ),         	       
+			RefPipHei( RefPipHei ),         	       
+			RefPipInsThi( RefPipInsThi ),   	           
+			RefPipInsCon( RefPipInsCon ),   	           
+			RefPipInsH( RefPipInsH ),   	           
+			Path( Path ),  	                   
+			NumIteNcomp( NumIteNcomp ),  	           
+			NumIteTe( NumIteTe ),  	               
+			NumIteHIUIn( NumIteHIUIn ),  	           
+			Modifi_factor( Modifi_factor ), 	           
+			Modifi_SH( Modifi_SH ), 	               
+			Modifi_Pe( Modifi_Pe )
 		{}
 
 	};
@@ -813,6 +1003,9 @@ namespace HVACVariableRefrigerantFlow {
 		Array1D_bool HeatingCoilAvailable; // cooling coil availability scheduled on
 		Array1D_int CoolingCoilAvailSchPtr; // cooilng coil availability schedule index
 		Array1D_int HeatingCoilAvailSchPtr; // heating coil availability schedule index
+		Array1D< Real64 > TU_SH;        // Yoshi_SH for each TU
+		Array1D< Real64 > TU_SC;        // Yoshi_SC for each TU
+		Array1D< Real64 > TU_IADT;      // Yoshi_Inlet Air Drybulb Temperature for each TU 	 
 
 		// Default Constructor
 		TerminalUnitListData() :
@@ -836,7 +1029,10 @@ namespace HVACVariableRefrigerantFlow {
 			Array1_bool const & CoolingCoilAvailable, // cooling coil availability scheduled on
 			Array1_bool const & HeatingCoilAvailable, // cooling coil availability scheduled on
 			Array1_int const & CoolingCoilAvailSchPtr, // cooilng coil availability schedule index
-			Array1_int const & HeatingCoilAvailSchPtr // heating coil availability schedule index
+			Array1_int const & HeatingCoilAvailSchPtr, // heating coil availability schedule index
+			Array1D< Real64 > const & TU_SH,        // Yoshi_SH for each TU
+			Array1D< Real64 > const & TU_SC,        // Yoshi_SC for each TU
+			Array1D< Real64 > const & TU_IADT       // Yoshi_Inlet Air Drybulb Temperature for each TU 	 
 		) :
 			Name( Name ),
 			NumTUInList( NumTUInList ),
@@ -853,7 +1049,10 @@ namespace HVACVariableRefrigerantFlow {
 			CoolingCoilAvailable( CoolingCoilAvailable ),
 			HeatingCoilAvailable( HeatingCoilAvailable ),
 			CoolingCoilAvailSchPtr( CoolingCoilAvailSchPtr ),
-			HeatingCoilAvailSchPtr( HeatingCoilAvailSchPtr )
+			HeatingCoilAvailSchPtr( HeatingCoilAvailSchPtr ),
+			TU_SH( TU_SH ),
+			TU_SC( TU_SC ),
+			TU_IADT( TU_IADT )
 		{}
 
 	};

@@ -1593,6 +1593,74 @@ namespace DXCoils {
 		int const SecCoilSHRFF
 		);
 
+	// Begin of Methods for New VRF Model: Fluid Temperature Control
+	//******************************************************************************
+	void
+	CalcVRFCoolingCoil_FluidTCtrl(
+		int const DXCoilNum, // the number of the DX coil to be simulated
+		int const CompOp, // compressor operation; 1=on, 0=off
+		bool const FirstHVACIteration, // true if this is the first iteration of HVAC
+		Real64 const PartLoadRatio, // sensible cooling load / full load sensible cooling capacity
+		int const FanOpMode, // Allows parent object to control fan operation
+		Real64 const CompCycRatio, // cycling ratio of VRF condenser
+		Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
+		Optional< Real64 const > OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
+		Optional< Real64 const > MaxCoolCap // maximum capacity of DX coil
+	);
+	
+	void
+	CalcVRFHeatingCoil_FluidTCtrl(
+		int const DXCoilNum, // the number of the DX coil to be simulated
+		int const CompOp, // compressor operation; 1=on, 0=off
+		bool const FirstHVACIteration, // true if this is the first iteration of HVAC
+		Real64 const PartLoadRatio, // sensible cooling load / full load sensible cooling capacity
+		int const FanOpMode, // Allows parent object to control fan operation
+		Real64 const CompCycRatio, // cycling ratio of VRF condenser
+		Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
+		Optional< Real64 const > OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
+		Optional< Real64 const > MaxCoolCap // maximum capacity of DX coil
+	);
+	
+	void
+	CalcVRFEvapCondTemp(
+		int CoolCoilNum, // the number of the VRF Cooling DX coil to be simulated
+		int HeatCoilNum, // the number of the VRF Heating DX coil to be simulated
+		int ZoneIndex,   // index to zone where the VRF Terminal Unit resides
+		Real64 EvapTemp, // evaporating temperature
+		Real64 CondTemp  // condensing temperature 
+	);
+	
+	void
+	CalcVRFAirFlow (
+		int ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
+		int Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
+		Real64 Temp,    // evaporating or condensing temperature
+		int CoolCoil,   // index to VRFTU cooling coil 
+		int HeatCoil,   // index to VRFTU heating coil
+		Real64 FanSpdRatio, // fan speed ratio
+		Real64 Wout,    // outlet air humidity ratio
+		Real64 Toutlet, // outlet air temperature
+		Real64 Houtlet, // outlet air enthalpy
+		Real64 HcoilIn, // inlet air enthalpy
+		Real64 TcIn,    // coil inlet temperature
+		Real64 SHact,   // actual SH
+		Real64 SCact    // actual SC
+	);
+	
+	Real64 
+	FanSpdResidual( 
+		Real64 FanSpdRto, // indoor unit fan speed ratio  
+		Real64 Par        // parameters
+	);
+	
+	Real64 
+	FanSpdResidualHeat( 
+		Real64 FanSpdRto, // indoor unit fan speed ratio  
+		Real64 Par        // parameters
+	);
+	// End of Methods for New VRF Model: Fluid Temperature Control
+	// *****************************************************************************
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
