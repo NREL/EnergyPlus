@@ -1,9 +1,5 @@
 
-<<<<<<< HEAD
 ![](media/ep.gif)
-=======
-![](OutputDetailsAndExamples/media/ep.gif)
->>>>>>> Branch_develop
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -205,11 +201,7 @@ Table 1. EnergyPlus Basic Output  Files
  <td>VRML output from (Output:Reports, Surfaces, VRML)</td>
  <td>&lt;filename&gt;.wrl</td>
 </tr>
-<<<<<<< HEAD
 </table>
-=======
-</table>
->>>>>>> Branch_develop
 
 
 
@@ -544,21 +536,13 @@ You can ask it to triangulate surfaces with &gt;4 sides:
 
 In addition to the building shape (including detached shading elements), the DXF view includes a “true north” arrow (at ground level) and the name from the BUILDING object.
 
-<<<<<<< HEAD
 ![SCCPAPER](media/image001.jpg)
-=======
-![SCCPAPER](OutputDetailsAndExamples/media/image001.jpg)
->>>>>>> Branch_develop
 
 Figure 1. Quick View Plus version of DXF file
 
 Even in the Quick View version, you can see that the different building elements have different colors. These are the “original” colors used in EnergyPlus. The current default color scheme is shown in the following figure of the solid model.
 
-<<<<<<< HEAD
 ![DXFSolid](media/image002.jpg)
-=======
-![DXFSolid](OutputDetailsAndExamples/media/image002.jpg)
->>>>>>> Branch_develop
 
 Figure 2. Voloview 3D Solid view
 
@@ -635,10 +619,7 @@ EOF
 999
 DXF created from EnergyPlus
 999
-<<<<<<< HEAD
 ```
-=======
->>>>>>> Branch_develop
 Program Version,EnergyPlus, &lt;version&gt;
 
 eplusout.edd
@@ -2641,11 +2622,7 @@ For each side of the surface, the vertices are shown in three separate fields (c
 
 It is reasonably easy to import this data into a spreadsheet and then calculate glazing area percentage based on wall facing direction:
 
-<<<<<<< HEAD
 ![](media/image012.png)
-=======
-![](OutputDetailsAndExamples/media/image012.png)
->>>>>>> Branch_develop
 
 Figure 3. Surface Details with Window/Wall % calculated
 
@@ -2766,11 +2743,7 @@ The report describes the actions for the following equation:
 
 The coefficients listed above are used in the following equation:
 
-<<<<<<< HEAD
 <div>\[ T = C_2 T_{zone} + C_3 T_{oadb} + C_4 C_5 + C_6 T_{grnd} + C_7 W_{spd} T_{oadb}\]</div>
-=======
-<div>\[ T = C_2 T_{zone} + C_3 T_{oadb} + C_4 C_5 + C_6 T_{grnd} + C_7 W_{spd} T_{oadb}
->>>>>>> Branch_develop
 
 where:
 
@@ -5392,11 +5365,7 @@ The data is produced when the actual simulation is performed (after the warmup d
 
 This output file can be easily turned into a form that is read into commonly used spreadsheet programs where it can be further analyzed, graphed, etc.
 
-<<<<<<< HEAD
 ![](media/image014.png)
-=======
-![](OutputDetailsAndExamples/media/image014.png)
->>>>>>> Branch_develop
 
 Figure 4. Example Chart from Standard Output File
 
@@ -8699,11 +8668,7 @@ The values in this line only apply to the Mass Flow Rates. The noncoincident pea
 
 Or as depicted graphically:
 
-<<<<<<< HEAD
 ![](media/image017.png)
-=======
-![](OutputDetailsAndExamples/media/image017.png)
->>>>>>> Branch_develop
 
 Figure 5. System Size depiction from eplusout.ssz
 
@@ -8798,11 +8763,7 @@ For the mass flow rates, this indicates the peak volume flow calculation (m3/s) 
 
 Or as depicted in a chart:
 
-<<<<<<< HEAD
 ![](media/image018.jpg)
-=======
-![](OutputDetailsAndExamples/media/image018.jpg)
->>>>>>> Branch_develop
 
 Figure 6. Zone Sizing from epluszsz.csv
 
@@ -8838,11 +8799,7 @@ Output:IlluminanceMap,
 
 generates the following output in csv format when viewed with Microsoft Excel.  **Note that if the point is outside the zone a “\*” will be shown.**
 
-<<<<<<< HEAD
 ![](media/image019.png)
-=======
-![](OutputDetailsAndExamples/media/image019.png)
->>>>>>> Branch_develop
 
 Figure 7. Spreadsheet view of Daylight Map output
 
@@ -8850,21 +8807,13 @@ Each cell reports the illuminance (in lux) at the location specified by the (X;Y
 
 The illuminance values are organized to allow the user to rapidly plot a visualization of the data using Microsoft Excel’s standard “3-D Column” graph. A 3-D graph is shown below for the data in a single day similar to the earlier example.
 
-<<<<<<< HEAD
 ![](media/image020.png)
-=======
-![](OutputDetailsAndExamples/media/image020.png)
->>>>>>> Branch_develop
 
 Figure 8. 3D Graph of Illuminance Map
 
 The following figure illustrates a similar map for the tubular daylighting device example file that is included with the installation.
 
-<<<<<<< HEAD
 ![](media/image021.png)
-=======
-![](OutputDetailsAndExamples/media/image021.png)
->>>>>>> Branch_develop
 
 Figure 9. A 3D illuminance map for the tubular daylighting device file
 
@@ -8992,11 +8941,7 @@ eplusscreen.csv
 
 Results of the window screen transmittance map. This file can be used to create a 3-D Column chart for graphically viewing the direct beam and reflected beam transmittance at various relative azimuth and relative altitude angles. The “relative” angles in this file are the incident solar angles with respect to the outward surface normal. The figures below are example 3-D charts generated using the data provided in this output file.
 
-<<<<<<< HEAD
 ![TransmittancePlotExample](media/image022.jpg)
-=======
-![TransmittancePlotExample](OutputDetailsAndExamples/media/image022.jpg)
->>>>>>> Branch_develop
 
 
 
@@ -17842,19 +17787,11 @@ An example of a diagram generated by HVAC Diagram is shown
 
 
 
-<<<<<<< HEAD
 ![](media/image023.jpg)
 
 A close up of one part of this diagram is shown below
 
 ![](media/image024.jpg)
-=======
-![](OutputDetailsAndExamples/media/image023.jpg)
-
-A close up of one part of this diagram is shown below
-
-![](OutputDetailsAndExamples/media/image024.jpg)
->>>>>>> Branch_develop
 
 The SVG file format is an XML based format so it is text based. The diagram shown above is shown below in text (reduced).
 
@@ -18013,11 +17950,7 @@ In addition, like the DXF output, you can ask it to triangulate (algorithm withi
 
 Most viewers will illustrate a solid model by default:
 
-<<<<<<< HEAD
 ![5zone](media/image025.jpg)
-=======
-![5zone](OutputDetailsAndExamples/media/image025.jpg)
->>>>>>> Branch_develop
 
 Figure 10. VRML output - solid model
 
@@ -18025,11 +17958,7 @@ With some/many viewers, you can also see a wireframe model; some will even fill 
 
 A wireframe model of the same building as above is:
 
-<<<<<<< HEAD
 ![5zonewire](media/image026.jpg)
-=======
-![5zonewire](OutputDetailsAndExamples/media/image026.jpg)
->>>>>>> Branch_develop
 
 Figure 11. VRML output - wireframe model
 
@@ -18147,7 +18076,6 @@ Following convention, each example file should have at the top a set of comments
 
 For example, the file titled “5ZoneAirCooled.idf” has:
 
-<<<<<<< HEAD
 ```idf
 ! 5ZoneAirCooled.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
@@ -18249,109 +18177,6 @@ For example, the file titled “5ZoneAirCooled.idf” has:
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 ```
-=======
-```idf
-! 5ZoneAirCooled.idf
-! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
-!
-! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
-!                          outside air stream controlled to preheat and precool setpoints.
-!
-! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
-!                          Run Control executes the run periods using the weather file
-!
-! Location:                Chicago, IL
-!
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
-!
-! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
-!
-! Run Control:             Zone and System sizing with weather file run control (no design days run)
-!
-! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
-!           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
-!           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
-!           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
-!           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
-!           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap. The window to wall ratio is approxomately 0.29.
-!           The south wall and door have overhangs.
-!
-!           The building is oriented 30 degrees east of north.
-!
-
-
-! Floor Area:        463.6 m2 (5000 ft2)
-! Number of Stories: 1
-!
-! Zone Description Details:
-!
-!      (0,15.2,0)                      (30.5,15.2,0)
-!           _____   ________                ____
-!         |\     ***        ****************   /|
-!         | \                                 / |
-!         |  \                 (26.8,11.6,0) /  |
-!         *   \_____________________________/   *
-!         *    |(3.7,11.6,0)               |    *
-!         *    |                           |    *
-!         *    |                           |    *
-!         *    |               (26.8,3.7,0)|    *
-!         *    |___________________________|    *
-!         *   / (3.7,3.7,0)                 \   *
-!         |  /                               \  |
-!         | /                                 \ |
-!         |/___******************___***________\|
-!          |       Overhang        |   |
-!          |_______________________|   |   window/door = *
-!                                  |___|
-!
-!      (0,0,0)                            (30.5,0,0)
-!
-! Internal gains description:     lighting is 1.5 watts/ft2, office equip is 1.0 watts/ft2. There is 1 occupant
-!                                 per 100 ft2 of floor area. The infiltration is 0.25 air changes per hour.
-!
-! Interzone Surfaces:             6 interzone surfaces (see diagram)
-! Internal Mass:                  None
-! People:                         50
-! Lights:                         7500 W
-! Windows:                        4 ea.: 1) Double pane clear, 3mm glass, 13mm air gap
-!                                        2) Double pane clear, 3mm glass, 13mm argon gap
-!                                        3) Double pane clear, 6mm glass, 6mm air gap
-!                                        4) Double pane lowE,  6mm lowE glass outside, 6mm air gap, 6mm clear glass
-!
-! Doors:                          2 ea.:    Single pane grey,  3mm glass
-!
-! Detached Shading:               None
-! Daylight:                       None
-! Natural Ventilation:            None
-! Compact Schedules:              Yes
-!
-! HVAC:                           Standard VAV system with outside air, hot water reheat coils,
-!                                 central chilled water cooling coil. Central Plant is single hot water
-!                                 boiler, electric compression chiller with air cooled condenser.
-!                                 All equipment is autosized. HW and ChW coils are used in the outside air
-!                                 stream to precondition the outside air.
-!
-! Zonal Equipment:                AirTerminal:SingleDuct:VAV:Reheat
-! Central Air Handling Equipment: Yes
-! System Equipment Autosize:      Yes
-! Purchased Cooling:              None
-! Purchased Heating:              None
-! Coils:                          Coil:Cooling:Water, Coil:Heating:Water
-! Pumps:                          Pump:VariableSpeed
-! Boilers:                        Boiler:HotWater
-! Chillers:                       Chiller:Electric
-!
-! Results:
-! Standard Reports:               None
-! Timestep or Hourly Variables:   Hourly
-! Time bins Report:               None
-! HTML Report:                    None
-! Environmental Emissions:        None
-! Utility Tariffs:                None
-```
->>>>>>> Branch_develop
 
 
 In addition to the idf files, usually an .rvi and perhaps a .mvi of the same file set is included. As discussed previously, the .rvi is used with the ReadVarsESO post-processing program and the .eso file to create a .csv file which can be read easily into Excel™. Like the .rvi, the .mvi file can be used with the .mtr file to create a similar version for “metered” outputs.
@@ -18368,7 +18193,6 @@ Simple List Data Sets
 
 This dataset includes performance curves for air cooled electric EIR chiller (object type: Chiller:Electric:EIR). Knowing the type of chiller that you want to simulate, you can find it and the associated performance curves in the dataset file. A brief synopsis of AirCooledChiller.idf is shown below:
 
-<<<<<<< HEAD
 ```idf
 ! AirCooledChillers.idf
 !
@@ -18391,30 +18215,6 @@ This dataset includes performance curves for air cooled electric EIR chiller (ob
 ! ElectricEIRChiller McQuay AGZ017BS 54.5kW/2.67COP      Scroll     54.5 (15.5)     2.67
 
 ```
-=======
-```idf
-! AirCooledChillers.idf
-!
-! This dataset includes performance curves for object type Chiller:Electric:EIR
-!
-! Summary Table for Electric EIR Chiller reference data sets.
-! Chillers are listed in order of reference capacity. Reference capacity and COP do not necessarily
-! indicate rated capacity and COP at standard rating conditions (e.g. ARI Standard 550/590).
-!
-! Performance curves developed from information collected from manufacturer's catalog data
-! The nomenclature used for the chiller is as follows:
-! ElectricEIRChiller - Manufacturer's Name - Model - Reference Capacity in kW - Reference COP
-!
-!                                                      Compressor   Reference    Reference
-! Chiller Name                                            Type       Capacity      COP
-!                                                                    kW (tons)
-! ElectricEIRChiller McQuay AGZ010BS 34.5kW/2.67COP      Scroll     34.5 (9.8)      2.67
-! ElectricEIRChiller McQuay AGZ013BS 47.1kW/2.67COP      Scroll     47.1 (13.4)     2.67
-! ElectricEIRChiller York YCAL0019EE 54.2kW/2.9COP       Scroll     54.2 (15.4)     2.9
-! ElectricEIRChiller McQuay AGZ017BS 54.5kW/2.67COP      Scroll     54.5 (15.5)     2.67
-
-```
->>>>>>> Branch_develop
 
 
 
@@ -18438,7 +18238,6 @@ This dataset includes object types for specific (by manufacturer and type) Chill
 
 Knowing the type of chiller that you want to simulate, you can find it and the associated performance curves in the dataset file. By example, here is part of the comments in the Chiller.idf file:
 
-<<<<<<< HEAD
 ```idf
 ! Summary Table for Electric EIR Chiller reference data sets (Ref. CoolTools project).
 ! Chillers are listed in order of compressor type and reference capacity (model calibration
@@ -18456,25 +18255,6 @@ Knowing the type of chiller that you want to simulate, you can find it and the a
 ! ElectricEIRChiller McQuay PEH 703kW/7.03COP/Vanes    Centrifugal   703 (200)   7.03   Inlet Vanes
 ! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
 ```
-=======
-```idf
-! Summary Table for Electric EIR Chiller reference data sets (Ref. CoolTools project).
-! Chillers are listed in order of compressor type and reference capacity (model calibration
-! point). Reference capacity and COP do not necessarily indicate rated capacity and COP at
-! standard rating conditions (e.g. ARI Standard 550/590).
-!
-! Performance curves developed from information collected over a 10-year period from 1991 to 2001.
-!
-!                                                      Compressor   Reference  Reference Unloading
-! Chiller Name                                            Type       Capacity    COP     Mechanism
-!                                                                    kW (tons)
-!-------------------------------------------------------------------------------------------------
-! ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes    Centrifugal   471 (134)   5.89   Inlet Vanes
-! ElectricEIRChiller York YT 563kW/10.61COP/Vanes      Centrifugal   563 (160)   10.61  Inlet Vanes
-! ElectricEIRChiller McQuay PEH 703kW/7.03COP/Vanes    Centrifugal   703 (200)   7.03   Inlet Vanes
-! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
-```
->>>>>>> Branch_develop
 
 
 ### CompositeWallConstructions.idf
@@ -18483,7 +18263,6 @@ The Reference Data Set CompositeWallConstructions.idf contains constructions and
 
 An example entry in this data set--for an insulated 2”x4” steel-stud wall--looks like:
 
-<<<<<<< HEAD
 ```idf
 CONSTRUCTION,Composite 2x4 Steel Stud R11,
 ! ASHRAE 1145-RP Wall Assembly 10
@@ -18524,48 +18303,6 @@ MATERIAL,Composite 2x4 Steel Stud R11 \#3,
   0.7,     !- Absorptance:Solar
   0.7;     !- Absorptance:Visible
 ```
-=======
-```idf
-CONSTRUCTION,Composite 2x4 Steel Stud R11,
-! ASHRAE 1145-RP Wall Assembly 10
-! 2"x4" steel studs at 24" on center with between-stud R11 fibreglass insulation.
-! Studs are 3.5", 16 gauge, 15 flange.
-! Layers are 1/2" wood siding, 1/2" plywood, 2x4 steel studs and R11 insulation, 1/2" gypsum board.
-! Area-average R-Value = 8.796 ft2-F-h/Btu (1.548 m2-K/W).
-! Total wall thickness = 5.00in (0.127m)
-! Material layer names follow:
-  Composite 2x4 Steel Stud R11 \#3,
-  Composite 2x4 Steel Stud R11 \#2,
-  Composite 2x4 Steel Stud R11 \#1;
-MATERIAL,Composite 2x4 Steel Stud R11 \#1,
-  Smooth,  !- Roughness
-  0.013,   !- Thickness (m)
-  0.720,   !- Conductivity (W/m-K)
-  640.0,   !- Density (kg/m3)
-  1048,    !- Specific Heat (J/kg-K)
-  0.9,     !- Absorptance:Thermal
-  0.7,     !- Absorptance:Solar
-  0.7;     !- Absorptance:Visible
-MATERIAL,Composite 2x4 Steel Stud R11 \#2,
-  Smooth,  !- Roughness
-  0.089,   !- Thickness (m)
-  0.060,   !- Conductivity (W/m-K)
-  118.223, !- Density (kg/m3)
-  1048,    !- Specific Heat (J/kg-K)
-  0.9,     !- Absorptance:Thermal
-  0.7,     !- Absorptance:Solar
-  0.7;     !- Absorptance:Visible
-MATERIAL,Composite 2x4 Steel Stud R11 \#3,
-  Smooth,  !- Roughness
-  0.025,   !- Thickness (m)
-  0.452,   !- Conductivity (W/m-K)
-  413.782, !- Density (kg/m3)
-  1048,    !- Specific Heat (J/kg-K)
-  0.9,     !- Absorptance:Thermal
-  0.7,     !- Absorptance:Solar
-  0.7;     !- Absorptance:Visible
-```
->>>>>>> Branch_develop
 
 
 The materials here are **not** real materials but are “equivalent” materials obtained from finite-difference modeling. The thickness, conductivity, density and specific heat values of the material layers for the different constructions have been taken from the ASHRAE report “Modeling Two- and Three-Dimensional Heat Transfer through Composite Wall and Roof Assemblies in Hourly Energy Simulation Programs (1145-TRP),” by Enermodal Engineering Limited, Oak Ridge National Laboratory, and the Polish Academy of Sciences, January 2001. EnergyPlus will calculate conduction transfer functions using these materials. The heat transfer based on these conduction transfer functions will then be very close to what would be calculated with a two- or three-dimensional heat transfer calculation.
@@ -18576,7 +18313,6 @@ If your wall’s exterior or interior roughness or thermal, solar or visible abs
 
 Following is a summary of the constructions in the composite wall data set:
 
-<<<<<<< HEAD
 ```idf
 CONSTRUCTION,Composite 2x4 Wood Stud R11,
 ! ASHRAE 1145-RP Wall Assembly 1
@@ -18664,95 +18400,6 @@ CONSTRUCTION,Composite 2-Core Filled Concrete Block Insulated,
 ! The remaining core area is filled with poured concrete.
 ! Area-average R-Value = 2.291 ft2-F-h/Btu (0.403 m2-K/W).
 ```
-=======
-```idf
-CONSTRUCTION,Composite 2x4 Wood Stud R11,
-! ASHRAE 1145-RP Wall Assembly 1
-! 2"x4" wood studs at 24" on center with between-stud R11 fibreglass insulation.
-! Layers are 1/2" wood siding, 1/2" plywood, 2x4 wood studs and R11 insulation, 1/2" gypsum board.
-! Area-average R-Value = 11.391 ft2-F-h/Btu (2.005 m2-K/W).
-
-CONSTRUCTION,Composite 2x6 Wood Stud R19,
-! ASHRAE 1145-RP Wall Assembly 2
-! 2"x6" wood studs at 24" on center with between-stud R19 fibreglass insulation.
-! Layers are 1/2" wood siding, 1/2" plywood, 2x6 wood studs and R19 insulation, 1/2" gypsum board.
-! Area-average R-Value = 17.487 ft2-F-h/Btu (3.078 m2-K/W).
-
-CONSTRUCTION,Composite Insulated Concrete Form Wall With Steel Ties,
-! ASHRAE 1145-RP Wall Assembly 7
-! Wall system is made of two rigid insulation sides held together with wire mesh.
-! The two sides come together to create the formwork for the concrete.
-! Layers are 3/4" concrete stucco, outer polystyrene shell, concrete core, inner polystyrene shell.
-! Area-average R-Value = 11.230 ft2-F-h/Btu (1.977 m2-K/W).
-
-CONSTRUCTION,Composite Concrete/Foam/Concrete With Steel Connectors,
-! ASHRAE 1145-RP Wall Assembly 8
-! Wall system is made of two 3" concrete slabs separated by 2" rigid insulation.
-! The slab connectors are steel ties with a 0.15"x0.15" cross section.
-! Layers are 3" concrete, 2" polystyrene, 3" concrete.
-! Area-average R-Value = 7.659 ft2-F-h/Btu (1.348 m2-K/W).
-
-CONSTRUCTION,Composite Concrete/Foam/Concrete With Plastic Connectors,
-! ASHRAE 1145-RP Wall Assembly 9
-! Wall system is made of two 3" concrete slabs separated by 2" rigid insulation.
-! The slab connectors are plasic ties with a 0.25"x0.25" cross section.
-! Layers are 3" concrete, 2" polystyrene, 3" concrete.
-! Area-average R-Value = 10.582 ft2-F-h/Btu (1.862 m2-K/W).
-
-CONSTRUCTION,Composite 2x4 Steel Stud R11,
-! ASHRAE 1145-RP Wall Assembly 10
-! 2"x4" steel studs at 24" on center with between-stud R11 fibreglass insulation.
-! Studs are 3.5", 16 gauge, 15 flange.
-! Layers are 1/2" wood siding, 1/2" plywood, 2x4 steel studs and R11 insulation, 1/2" gypsum board.
-! Area-average R-Value = 8.796 ft2-F-h/Btu (1.548 m2-K/W).
-
-CONSTRUCTION,Composite Brick Foam 2x4 Steel Stud R11,
-! ASHRAE 1145-RP Wall Assembly 15
-! Brick veneer, polystyrene, 2"x4" steel studs at 24" on center with
-!  between-stud R11 fibreglass insulation.
-! Studs are 3.5", 16 gauge, 15 flange.
-! Layers are 3.25" brick,1" polystyrene insulation, 1/2" plywood, 2x4 steel studs and R11 insulation,
-!  1/2" gypsum board.
-! Area-average R-Value = 12.792 ft2-F-h/Btu (2.251 m2-K/W).
-
-CONSTRUCTION,Composite 2x6 Steel Stud R19,
-! ASHRAE 1145-RP Wall Assembly 16
-! 2"x6" steel studs at 24" on center with between-stud R19 fibreglass insulation.
-! Studs are 5.5", 16 gauge, 15 flange.
-! Layers are 1/2" wood siding, 1/2" plywood, 2x6 steel studs and R19 insulation, 1/2" gypsum board.
-! Area-average R-Value = 12.792 ft2-F-h/Btu (1.991 m2-K/W).
-
-CONSTRUCTION,Composite Foam 2x6 Steel Stud R19,
-! ASHRAE 1145-RP Wall Assembly 17
-! Polystyrene, 2"x6" steel studs at 24" on center with between-stud R19 fibreglass insulation.
-! Studs are 5.5", 16 gauge, 15 flange.
-! Layers are 3/4" concrete stucco,1" polystyrene insulation, 1/2" plywood, 2x6 steel studs and R19 insulation,
-!  1/2" gypsum board.
-! Area-average R-Value = 15.157 ft2-F-h/Btu (2.668 m2-K/W).
-
-CONSTRUCTION,Composite Brick Foam 2x6 Steel Stud R19,
-! ASHRAE 1145-RP Wall Assembly 18
-! Brick veneer, polystyrene, 2"x6" steel studs at 24" on center with
-!  between-stud R19 fibreglass insulation.
-! Studs are 5.5", 16 gauge, 15 flange.
-! Layers are 3.25" brick,1" polystyrene insulation, 1/2" plywood, 2x6 steel studs and R19 insulation,
-!  1/2" gypsum board.
-! Area-average R-Value = 15.465 ft2-F-h/Btu (2.722 m2-K/W).
-
-CONSTRUCTION,Composite 2-Core Filled Concrete Block Uninsulated,
-! ASHRAE 1145-RP Wall Assembly 19
-! Wall system is made of 12" 2-core concrete blocks without insulation.
-! The core area is filled with rebar and poured concrete.
-! Area-average R-Value = 1.326 ft2-F-h/Btu (0.239 m2-K/W).
-
-CONSTRUCTION,Composite 2-Core Filled Concrete Block Insulated,
-! ASHRAE 1145-RP Wall Assembly 20
-! Wall system is made of 12" 2-core concrete blocks with 1.875"-thick
-!  foam inserts in the block cores.
-! The remaining core area is filled with poured concrete.
-! Area-average R-Value = 2.291 ft2-F-h/Btu (0.403 m2-K/W).
-```
->>>>>>> Branch_develop
 
 
 ### DXCoolingCoil.idf
@@ -18761,7 +18408,6 @@ This dataset includes performance curves for the object types Coil:Cooling:DX:Si
 
 Here is a synopsis of the DXCoolingCoil.idf:
 
-<<<<<<< HEAD
 ```idf
 ! DXCoolingCoil.idf
 !
@@ -18876,122 +18522,6 @@ Here is a synopsis of the DXCoolingCoil.idf:
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
 ```
-=======
-```idf
-! DXCoolingCoil.idf
-!
-! This dataset includes performance curves for the object types Coil:Cooling:DX:SingleSpeed and
-! Coil:Cooling:DX:TwoStageWithHumidityControlMode
-!
-! Reference capacity at standard rating conditions (ARI 95F OAT, 67F EWBT and air flow rate
-! around 400 cfm/Ton).
-!
-! In the objects Coil:Cooling:DX:SingleSpeed and Coil:Cooling:DX:TwoStageWithHumidityControlMode
-! below, input fields 'Availability Schedule Name', 'Air Inlet Node Name' and 'Air Outlet Node
-! Name' need to be defined by the user.
-!
-!------------------------------------------------------------------------------------------------!                             Compressor  Nominal    Reference      Reference   Refrig  Expansion
-!                                                                                         Valve
-! Name                           Type     Capacity   Capacity          COP       Type      Type
-!                                         (tons)     kW (tons)
-!------------------------------------------------------------------------------------------------! Carrier Centurion 50PG06      Scroll      5        18.28(5.2)        4.15     R-410A    TXV
-! Carrier Centurion 50PG12      Scroll      10       36.79(10.47)      4.05     R-410A    TXV
-! Carrier Centurion 50PG24      Scroll      20       73.81(21)         3.95     R-410A    TXV
-
-  Coil:Cooling:DX:SingleSpeed,
-    Carrier Centurion 50PG06,     !- Name
-    CoolingCoilAvailSched,        !- Availability Schedule Name
-    18276.96,                     !- Rated Total Cooling Capacity {W}
-    0.74,                         !- Rated Sensible Heat Ratio
-    4.15,                         !- Rated COP
-    0.944,                        !- Rated Air Flow Rate {m3/s}
-    ,                             !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,           !- Air Inlet Node Name
-    DXCoilAirOutletNode,          !- Air Outlet Node Name
-    CarrierCenturion50PG06CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    CarrierCenturion50PG06CapFFF, !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    CarrierCenturion50PG06EIRFT,       !- Energy Input Ratio Function of Temperature Curve Name
-    CarrierCenturion50PG06EIRFFF,      !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Carrier Centurion 50PG06 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
-
-! Curve set (5 Curves):
-
-! Cooling Capacity Function of Temperature Curve
-! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
-
-  Curve:Biquadratic,
-    CarrierCenturion50PG06CapFT,  !- Name
-    0.9953455,               !- Coefficient1 Constant
-    -0.0118418,              !- Coefficient2 x
-    0.0012277,               !- Coefficient3 x**2
-    0.0030246,               !- Coefficient4 y
-    -0.0000702,              !- Coefficient5 y**2
-    -0.0003685,              !- Coefficient6 x*y
-    12.22,                   !- Minimum Value of x
-    26.67,                   !- Maximum Value of x
-    15.56,                   !- Minimum Value of y
-    51.67,                   !- Maximum Value of y
-    ,                        !- Minimum Curve Output
-    ,                        !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless;           !- Output Unit Type
-
-! EIR Function of Temperature Curve
-! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
-
-  Curve:Biquadratic,
-    CarrierCenturion50PG06EIRFT,  !- Name
-    0.3802131,               !- Coefficient1 Constant
-    0.0199468,               !- Coefficient2 x
-    -0.0006682,              !- Coefficient3 x**2
-    0.0058933,               !- Coefficient4 y
-    0.0004646,               !- Coefficient5 y**2
-    -0.0004072,              !- Coefficient6 x*y
-    12.22,                   !- Minimum Value of x
-    26.67,                   !- Maximum Value of x
-    15.56,                   !- Minimum Value of y
-    51.67,                   !- Maximum Value of y
-    ,                        !- Minimum Curve Output
-    ,                        !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless;           !- Output Unit Type
-
-! Cooling Capacity Function of Flow Fraction Curve
-! x = Flow Fraction
-
-  Curve:Quadratic,
-    CarrierCenturion50PG06CapFFF,  !- Name
-    0.7705358,               !- Coefficient1 Constant
-    0.2848007,               !- Coefficient2 x
-    -0.0580891,              !- Coefficient3 x**2
-    0.75,                    !- Minimum Value of x
-    1.25;                    !- Maximum Value of x
-
-! EIR Function of Flow Fraction Curve
-! x = Flow Fraction
-
-  Curve:Quadratic,
-    CarrierCenturion50PG06EIRFFF,   !- Name
-    1.3439758,               !- Coefficient1 Constant
-    -0.5111244,              !- Coefficient2 x
-    0.1732549,               !- Coefficient3 x**2
-    0.75,                    !- Minimum Value of x
-    1.25;                    !- Maximum Value of x
-
-! Part Load Fraction Function of Part Load Ratio Curve
-! x = Part Load Ratio
-
-  Curve:Quadratic,
-    CarrierCenturion50PG06PLFFPLR,   !- Name
-    0.85,                    !- Coefficient1 Constant
-    0.15,                    !- Coefficient2 x
-    0.0,                     !- Coefficient3 x**2
-    0.0,                     !- Minimum Value of x
-    1.0;                     !- Maximum Value of x
-```
->>>>>>> Branch_develop
 
 
 ### ElectricGenerators.idf
@@ -19016,11 +18546,7 @@ Torcellini, Paul; Long, Nicholas; Judkoff, Ron; "Consumptive Water Use for U.S. 
 
 These curves approximate the electronic (variable) enthalpy curves used to simulate humidity biased economizer control. This control scheme adjusts the upper outdoor air humidity ratio based on outdoor air dry-bulb temperature as shown in the figure below. California Title 24 ACM 2005 lists the optional economizer control strategies. One of these control strategies is referred to as variable enthalpy control curve A. This control strategy is also cited in ASHRAE Standard 90.1-2004, using the term “electronic enthalpy”. Electronic enthalpy curves A-D are included in this dataset.
 
-<<<<<<< HEAD
 ![Schematic\_ElectronicEnthalpyEconomizerControl](media/image027.jpg)
-=======
-![Schematic\_ElectronicEnthalpyEconomizerControl](OutputDetailsAndExamples/media/image027.jpg)
->>>>>>> Branch_develop
 
 Figure 12. Psychrometric Chart Illustration of the Electronic (Variable) Enthalpy Economizer Limit Example Curve Objects
 
@@ -19242,15 +18768,9 @@ This file contains sample input for the ground loop heat exchanger model. The re
 
 The sample data has been calculated for a number of configurations:
 
-<<<<<<< HEAD
 * 1 x 2 boreholes
 * 4 x 4 boreholes
 * 8 x 8 boreholes
-=======
-* 1 x 2 boreholes
-* 4 x 4 boreholes
-* 8 x 8 boreholes
->>>>>>> Branch_develop
 
 Data is given for both 'standard' grout (k=0.744 W/m.K) and 'thermally enhanced' grout (k= 1.471 W/m.K). The flow rate per borehole is .1514 kg/s. The pipe given is 0.75in. Dia. SDR11 HDPE. The fluid is water. The borehole/length ratio is 0.06  (76.2m/4.572m [300ft/15ft])
 
@@ -19276,7 +18796,6 @@ This file contains schedules (for an entire year) of precipitation for use with 
 
 All the refrigerated cases included in this database are listed in the following list. Comments before each refrigeration:case object include the manufacturer's model number and assumptions about the fan, lights, defrost etc. The user must ensure that the case names used in the idf file are UNIQUE and must supply the correct zone name.  The user must also supply any required correction curves or schedules. The defrost and drip-down schedule names included here indicate the frequency and duration required. The user must ensure that schedules are provided that meet these needs and that are diversified so that all the cases don't start their defrost cycles at the same time. Please see the example cases for supermarkets to see how these case objects are included with the rest of a supermarket refrigeration system.
 
-<<<<<<< HEAD
 * Multi-Deck Dairy/Deli Merchandiser with Synergy-E
 
 * Multi-Deck Rear Dairy/Deli Merchandiser with Synergy-E
@@ -19992,723 +19511,6 @@ All the refrigerated cases included in this database are listed in the following
 * FW Wide Island Display with Solid Walls for Ice Cream
 
 * FW Wide Island Display with Solid Walls for Medium Temperature;
-=======
-* Multi-Deck Dairy/Deli Merchandiser with Synergy-E
-
-* Multi-Deck Rear Dairy/Deli Merchandiser with Synergy-E
-
-* Multi-Deck Deli back
-
-* Single Deck Club Case Merchandiser
-
-* Single Deck Club Case Merchandiser
-
-* Single Deck Club Merchandiser
-
-* Single Deck Club Case Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Multi-Deck Dairy/Deli Merchandiser with Synergy-E
-
-* Multi Deck Frozen Food Merchandiser
-
-* Multi Deck Frozen Food Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* International Style Service Deli/Meat/Seafood Merchandiser
-
-* International Style Flat Glass Service Deli/Meat/Seafood Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Multi-Deck Deli/Meat End Cap Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Multi-Deck Dairy/Deli/Produce/Meat Merchandiser with Synergy-E
-
-* Multi-Deck Dairy/Deli/Produce/Meat Merchandiser with Synergy-E
-
-* Multi-Deck Produce/Dairy/Deli/Meat Merchandiser
-
-* Multi-Deck Deli/Meat End Cap Merchandiser
-
-* Multi-Deck Bulk Produce End Cap Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Produce Merchandiser
-
-* Wide Island Multi-Deck Produce Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Multi-Deck Dairy/Deli/Produce Merchandiser
-
-* Multi-Deck Dairy/Deli/Produce Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Wide Island Multi-Deck Deli/Meat Merchandiser
-
-* Multi-Deck Dairy/Deli/Produce Merchandiser
-
-* Multi-Deck Dairy/Deli/Produce Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Multi-Deck Merchandiser with Synergy-E
-
-* Multi-Deck Merchandiser with Synergy-E
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* High Multi-Deck Merchandiser with Synergy-E
-
-* High Multi-Deck Merchandiser with Synergy-E
-
-* High Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* High Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* High Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Multi-Deck Read Load Merchandiser with Synergy-E
-
-* Multi-Deck Rear Load Dairy Merchandiser
-
-* Multi-Deck Rear Load Dairy Merchandiser
-
-* High Multi-Deck Rear Load Dairy Merchandiser
-
-* High Multi-Deck Rear Load Dairy Merchandiser
-
-* Multi Deck Merchandiser with Synergy-E
-
-* Multi-Deck Deli/Meat Merchandiser
-
-* High Multi-Deck  Merchandiser with Synergy-E
-
-* Multi-Deck Rear Load Deli/Meat Merchandiser
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Multi-Deck Frozen Food Merchandiser
-
-* Multi-Deck Frozen Food Merchandiser
-
-* Multi-Deck Dairy/Deli/Produce Merchandiser with Synergy E
-
-* Multi-Deck Dairy/Deli/Produce Merchandiser with Synergy E
-
-* Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Full Service Bakery Merchandiser
-
-* Full Service Flat Glass Bakery Merchandiser
-
-* Self Service Bakery/Deli Merchandiser
-
-* Self Service Bakery/Deli Merchandiser
-
-* Self Service Bakery/Deli Merchandiser
-
-* Self Service Deli/Cheese Merchandiser
-
-* Self Service Deli/Cheese Merchandiser
-
-* Single Deck Deli/Meat End Cap Merchandiser
-
-* Single Deck Buck Produce End Cap Merchandiser
-
-* American Style Vertical Glass Service Deli/Meat/Seafood Gravity Coil Merchandiser
-
-* Multi-Deck Deli/Meat Merchandiser
-
-* Multi-Deck Deli/Meat Merchandiser
-
-* Multi-Deck Merchandiser with Synergy-E
-
-* Multi-Deck Merchandiser with Synergy-E
-
-* High Multi-Deck Deli/Meat Merchandiser
-
-* High Multi-Deck Deli/Meat Merchandiser
-
-* Multi-Deck Produce Merchandiser
-
-* Multi-Deck Produce Merchandiser
-
-* High Multi-Deck Merchandiser with Synergy-E
-
-* High Multi-Deck Merchandiser with Synergy-E
-
-* High Multi-Deck Merchandiser with Synergy-E
-
-* High Multi-Deck Merchandiser with Synergy-E
-
-* Wide Island Deli/Meat Merchandiser
-
-* Wide Island Deli/Meat Merchandiser
-
-* Wide Island Deli/Meat Merchandiser
-
-* Wide Island Deli/Meat Merchandiser
-
-* Wide Island Deli/Meat Merchandiser
-
-* Wide Island Deli/Meat Merchandiser
-
-* Wide Island Bulk Produce Merchandiser
-
-* Wide Island Bulk Produce Merchandiser
-
-* Wide Island Bulk Produce Merchandiser
-
-* Island Frozen Food Merchandiser
-
-* Island Frozen Food Merchandiser
-
-* Flat Glass Service Deli Merchandiser
-
-* Flat Glass Service Deli Gravity Coil Merchandiser
-
-* Single-Deck Deli/Meat/Seafood Merchandiser with Synergy -E
-
-* Single-Deck Deli/Meat/Seafood Merchandiser
-
-* Single-Deck Deli/Meat/Seafood Merchandiser
-
-* Single Deck Frozen Meat Merchandiser
-
-* Single Deck Frozen Food/Ice Cream Merchandiser
-
-* Single Deck Frozen Food/Ice Cream Merchandiser
-
-* Narrow Mulit Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Narrow Multi Deck Deli Meat End Cap Merchandiser
-
-* Narrow Multi Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Narrow Multi-Deck Deli/Meat End Cap Merchandiser
-
-* Narrow Multi Deck Bulk Produce End Cap Merchandiser
-
-* Narrow Island Multi Deck Deli/Meat Merchandiser
-
-* Narrow Island Multi Deck Deli/Meat Merchandiser
-
-* Narrow Multi Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Multi-Deck Self Service Hot Foods Merchandiser
-
-* Narrow Multi Deck Produce/Dairy/Deli Merchandiser
-
-* Narrow Multi Deck Produce/Dairy/Deli Merchandiser
-
-* Narrow Multi Deck Produce/Dairy/Deli Merchandiser
-
-* High Narrow Multi-Deck Merchandiser with Synergy-E
-
-* High Narrow Multi-Deck Merchandiser with Synergy-E
-
-* High Narrow Multi-Deck Produce/Dairy Merchandiser
-
-* High Narrow Multi-Deck Produce/Dairy Merchandiser
-
-* Narrow Multi-Deck Deli End Cap Merchandiser
-
-* Narrow Multi-Deck Produce Merchandiser
-
-* Narrow Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Narrow Single Deck Frozen Meat End Cap Merchandiser
-
-* Narrow Multi-Deck Deli/Meat Merchandiser
-
-* Narrow Multi-Deck Deli/Meat Merchandiser
-
-* High Narrow Multi-Deck Deli/Meat Merchandiser
-
-* High Narrow Multi-Deck Deli/Meat Merchandiser
-
-* Narrow Multi-Deck Produce Merchandiser
-
-* Narrow Multi-Deck Produce Merchandiser
-
-* High Narrow Multi-Deck Produce Merchandiser
-
-* High Narrow Multi-Deck Produce Merchandiser
-
-* Narrow Island Deli/Meat Merchandiser double Wraparound end
-
-* Narrow Island Deli/Meat Merchandiser double Wraparound end
-
-* Narrow Island Bulk Produce Merchandiser
-
-* Narrow Island Bulk Produce Merchandiser
-
-* Narrow Island Bulk Produce Merchandiser
-
-* Narrow Island Frozen Food/Ice Cream Merchandiser
-
-* Narrow Island Frozen Food/Ice Cream Merchandiser
-
-* Narrow Island Frozen Food/Ice Cream Merchandiser
-
-* Narrow Island Frozen Food Merchandiser
-
-* Narrow Single Deck Frozen Meat Merchandiser
-
-* Multi Deck Dairy Merchandiser
-
-* Narrow Multi Deck Deli Merchandiser
-
-* Multi Deck Utility Merchandiser
-
-* Narrow Single Deck Produce Merchandiser
-
-* Narrow Glass Door Reach In Beverage Merchandiser
-
-* Narrow Glass Door Reach In Beverage Merchandiser
-
-* High Narrow Glass Door Reach-in Beverage Merchandiser
-
-* High Narrow Glass Door Reach-in Beverage Merchandiser
-
-* Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
-
-* Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
-
-* High Narrow Glass Door Reach-in Back-to-Back Frozen Food/Ice Cream: Frozen food
-
-* High Narrow Glass Door Reach-in Back-to-Back Frozen Food/Ice Cream: Ice cream
-
-* Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
-
-* Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Ice Cream
-
-* High Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser
-
-* High Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser
-
-* High Narrow Glass Door Reach in Back to back Frozen Food/Ice Cream Merchandiser
-
-* Narrow Multi-Deck Produce/Dairy/Deli/Meat Merchandiser
-
-* Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser
-
-* Narrow Multi-Deck Dome Deli Merchandiser
-
-* Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
-
-* Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
-
-* Narrow Single-Deck Frozen Food/Ice Cream Merchandiser
-
-* Single Deck Produce Merchandiser
-
-* Single Deck Produce Merchandiser
-
-* Single Deck Produce Merchandiser
-
-* Single Deck Produce Merchandiser
-
-* Glass Door Reach-in Beverage Merchandiser
-
-* Glass Door Reach-in Beverage Merchandiser
-
-* High Glass Door Reach-in Beverage Merchandiser
-
-* High Glass Door Reach-in Beverage Merchandiser
-
-* Glass Door Reach-in Rear Load Beverage Merchandiser
-
-* Roll in Rear Load Merchandiser with Synergy-E
-
-* Roll in Rear Load Dairy Merchandiser
-
-* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
-
-* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
-
-* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
-
-* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
-
-* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
-
-* Glass Door Reach-in Back too Back Frozen Food/Ice Cream Merchandiser
-
-* High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
-
-* High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
-
-* American Style Curved Glass Service Deli Merchandiser
-
-* American Style Curved Glass Service Deli/Meat/Seafood Gravity Merchandiser
-
-* American Style Curved Glass Service Deli/Meat/Seafood Gravity Merchandiser
-
-* American Style Glass Service Deli Merchandiser
-
-* American Style Glass Service Deli Merchandiser
-
-* American Style Flat Glass Service Deli/Meat/Seafood Gravity Coil Merchandiser
-
-* International Style Service Deli/Seafood Merchandiser
-
-* International Style Flat Glass Service Deli/Meat/Seafood Merchandiser
-
-* International Style Single Deck Deli Seafood Merchandiser
-
-* American Style Vertical Glass Service Deli Merchandiser
-
-* American Style Flat Glass Service Frozen Food Merchandiser
-
-* Multi-Deck Produce/Dairy/Meat/Seafood Merchandiser
-
-* Wide Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Wide Multi-Deck Produce/Dairy/Deli Merchandiser
-
-* Wide Island End Cap Frozen Food/Ice Cream Merchandiser
-
-* Wide Island End Cap Frozen Food/Ice Cream Merchandiser
-
-* Wide Island End Cap Frozen Food/Ice Cream Merchandiser
-
-* Wide High Multi-Deck Produce Merchandiser
-
-* Wide High Multi-Deck Produce Merchandiser
-
-* Wide Island Frozen Food/Ice Cream Merchandiser
-
-* Wide Island Frozen Food/Ice Cream Merchandiser
-
-* Wide Island Frozen Food/Ice Cream Merchandiser
-
-* Wide Single Deck Produce Merchandiser
-
-* Wide Single Deck Produce Merchandiser
-
-* Wide Single Deck Produce Merchandiser
-
-* Wide Single Deck Produce Merchandiser
-
-* Wide International Style Service Deli/Seafood Merchandiser
-
-* Wide International Style Single Deck Deli/Seafood Merchandiser
-
-* Single Deck Frozen Food Merchandiser
-
-* Single Deck Frozen Food Merchandiser
-
-* Wide Single Deck Frozen Food Merchandiser
-
-* Full Service Flat Glass Deli Merchandiser
-
-* Multi-Deck Curved Glass Dome Deli/Meat/Seafood Merchandiser
-
-* Multi-Deck Curved Glass Dome Deli/Meat/Seafood Merchandiser
-
-* Glass Door Reach-in Beverage Merchandiser
-
-* Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
-
-* Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
-
-* High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
-
-* High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
-
-* Single Deck Wood Clad Merchandiser for Medium Temp Application
-
-* Single Deck Wood Clad Merchandiser for Medium Temp Application
-
-* 55'' Tall Convertible With Extended Canopy. Medium Temperature Merchandiser
-
-* C2LGE MultiDeck 3 display levels
-
-* Convertible Island End. Low Profile Multi-Deck
-
-* Unitized Convertible Island. Low Profile Multi-Deck
-
-* Convertible Island. Low Profile Multi-Deck
-
-* Unitized Convertible Island. Low Profile Multi-Deck
-
-* Unitized Convertible Island. Low Profile Multi-Deck
-
-* Unitized Convertible Island. Low Profile Multi-Deck
-
-* Unitized Convertible Island. Low Profile Multi-Deck
-
-* Convertible Island. Low Profile Multi-Deck
-
-* Self-Serve Three-Level Display With Extended Canopy
-
-* Self-Serve Four-Level Display With Extended Canopy
-
-* Self-Serve Four-Level Display With Extended Canopy
-
-* ED1 Impact Service Merchandiser with curved hinged glass 1 display level
-
-* ED1 Impact Service Merchandiser with curved hinged glass 1 display level
-
-* EDS1 Impact self service glass 1 display level
-
-* E1 Self Service Single Deck Display for Deli Cheese and Salads
-
-* E1S Self Service Single Deck Display for Deli Cheese and Salads
-
-* E2 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
-
-* E2 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
-
-* E2S Self-Serve Three Level Display For Deli Cheese Pizza
-
-* E2S Self-Serve Three Level Display For Deli Cheese Pizza
-
-* E2S Self-Serve Three Level Display For Deli Cheese Pizza
-
-* E2S Self-Serve Three Level Display For Deli Cheese Pizza
-
-* E3 Self-Serve Multi-Deck Display For Deli Cheese Pizza Floral Fresh Juice
-
-* Self Serve Multi-Deck Display Merchandiser
-
-* Self Serve Multi-Deck Display Merchandiser
-
-* ES1 Single-Deck Curved Glass Service Case with 1 display level
-
-* ES1S Single-Deck Straight glass Service Case with one display level
-
-* ESBD Curved glass case for deli with blower coil and one display level with optional shelves
-
-* ESBDHV High Volume Curved Glass Blower Coil Service Case for Deli with 3 display levels
-
-* ESBDS Straight glass service case for deli with blower coil and one display level with optional 2 shelves
-
-* ESGM Curved Glass Gravity Coil Service Case for Meat and Seafood
-
-* ESGMS Straight Glass Gravity Coil Service Case for Meat and Seafood
-
-* ESGMVS Vertical hinged glass service case for Deli with Gravity Coil\_single display level
-
-* ESGS Curved Glass Gravity Coil Service Case for Meat and Seafood
-
-* ESGSS Straight Glass Gravity Coil Service Case for Meat and Seafood
-
-* ESBDVS Straight hinged glass service case for Deli with Blower Coil\_1 display level with optional shelves
-
-* B1X BulkSinlge Decked Extended Depth Glass Front
-
-* B3XC Bulk Multi-Deck Convertible Merchandiser
-
-* B3XC Bulk Multi-Deck Convertible Merchandiser
-
-* B4-XE Four-Deck High Volume Bulk Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2X Low-Profile Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C2XX Extra-Height C2XX Multi-Deck Convertible Merchandiser
-
-* C3X Multi-Deck Convertible Merchandiser with four display levels
-
-* C3X Multi-Deck Convertible Merchandiser with four display levels
-
-* C4X Multi-Deck Convertible Merchandiser
-
-* C4X Multi-Deck Convertible Merchandiser
-
-* C4X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C5X Multi-Deck Convertible Merchandiser
-
-* C6X High Capacity Multi-Deck Convertible Merchandiser
-
-* C6X High Capacity Multi-Deck Convertible Merchandiser
-
-* C6X High Capacity Multi-Deck Convertible Merchandiser
-
-* C6X High Capacity Multi-Deck Convertible Merchandiser
-
-* C6X High Capacity Multi-Deck Convertible Merchandiser
-
-* C6X High Capacity Multi-Deck Convertible Merchandiser
-
-* C6X High Capacity Multi-Deck Convertible Merchandiser
-
-* C6X High Capacity Multi-Deck Convertible Merchandiser
-
-* C6XLRE High Capacity Multi-Deck Convertible Merchandiser with Rear Load-In for Dairy and Deli
-
-* D5X-ULEP Ultra Low Front Multi-Deck Dairy/Deli Merchandiser
-
-* D5X-E Multi-Deck Dairy/Deli Merchandiser
-
-* D5X-EP Multi-Deck Dairy/Deli Merchandiser
-
-* D5X-EP Multi-Deck Dairy/Deli Merchandiser
-
-* D5X-HE Multi-Deck Dairy/Deli Merchandiser
-
-* D5X Multi-Deck Dairy/Deli Merchandiser
-
-* D5X-LE Multi-Deck Dairy/Deli Merchandiser
-
-* D5X-LEP Multi-Deck Dairy/Deli Merchandiser
-
-* D5X-LEP Multi-Deck Dairy/Deli Merchandiser
-
-* D5XLRE Multi-Deck Dairy/Deli Merchandiser With Rear Sliding Doors and low front
-
-* D5XRRI Rear Roll-IN Dairy Merchandiser
-
-* D5XRRIS Rear Roll-IN Dairy Merchandiser
-
-* D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
-
-* D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
-
-* D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
-
-* D6NX Narrow Footprint Extra Tall Multi-Deck Dairy/Deli Merchandiser
-
-* D6X-ULEP Ultra Low Front Dairy Merchandiser
-
-* F Single Deck Wall Model Merchandiser  with solid front for Frozen Food
-
-* F Single Deck Wall Model Merchandiser  with solid front for Ice Cream
-
-* F Single Deck Wall Model Merchandiser  with solid front for Medium Temp Products
-
-* FI Intermediate Island Merchandiser with solid walls for Frozen Food
-
-* F2XLG Low Temperature Multi-Deck Merchandiser for Frozen Seafood and Meat
-
-* F6 Low Temperature Multi-Deck Open Merchandiser
-
-* F6L Low Temperature Multi-Deck Open Merchandiser
-
-* FG Single Deck Wall Model Merchandiser with glass front for Frozen Food
-
-* FG Single Deck Wall Model Merchandiser r with glass front for Ice Cream
-
-* FG Single Deck Wall Model Merchandiser r with glass front for Medium Temp Products
-
-* FIG Intermediate Island Merchandiser with glass walls for Frozen Food
-
-* FL5NX Excel Multi-Deck Narrow Footprint Floral Merchandiser
-
-* FN Narrow Island display with solid walls for Frozen Food
-
-* FN Narrow Island display with solid walls for Ice Cream
-
-* FN Narrow Island display with solid walls for medium temperature
-
-* FNG Narrow Glass Sided Island Merchandiser for Frozen
-
-* FNG Narrow Glass Sided Island Merchandiser for Ice Cream
-
-* FNG Narrow Glass Sided Island Merchandiser for Medium Temperature
-
-* FW Wide Island Display with Solid Walls for Frozen Food
-
-* FW Wide Island Display with Solid Walls for Ice Cream
-
-* FW Wide Island Display with Solid Walls for Medium Temperature;
->>>>>>> Branch_develop
 
 
 ### RefrigerationCompressorCurves.idf
@@ -20719,7 +19521,6 @@ This dataset includes object types for specific (by manufacturer and type) Refri
 
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
-<<<<<<< HEAD
 ```idf
 Curve:Bicubic,
     06CC016_R-22_Low_qcurv,  !- Name
@@ -20767,55 +19568,6 @@ Refrigeration:Compressor,
     4.4,                     !- Rated Liquid Temperature {C}
     ;                        !- Compressor Rated Subcooling {C}
 ```
-=======
-```idf
-Curve:Bicubic,
-    06CC016_R-22_Low_qcurv,  !- Name
-    2.350e+004,              !- Coefficient1 Constant
-    816.7,                   !- Coefficient2 x
-    10.70,                   !- Coefficient3 x**2
-    -28.24,                  !- Coefficient4 y
-    0.1131,                  !- Coefficient5 y**2
-    -0.4553,                 !- Coefficient6 x*y
-    0.05604,                 !- Coefficient7 x**3
-    -0.004120,               !- Coefficient8 y**3
-    -0.006728,               !- Coefficient9 x**2*y
-    0.006782,                !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Carlyle_R-22_Low_06CC016,   !nominal kW = 3.1
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
-    06CC016_R-22_Low_pwrcurv,!- Name
-    4018.,                   !- Coefficient1 Constant
-    95.00,                   !- Coefficient2 x
-    1.507,                   !- Coefficient3 x**2
-    5.705,                   !- Coefficient4 y
-    1.247,                   !- Coefficient5 y**2
-    -1.381,                  !- Coefficient6 x*y
-    0.01277,                 !- Coefficient7 x**3
-    -0.007518,               !- Coefficient8 y**3
-    -0.02424,                !- Coefficient9 x**2*y
-    0.02917,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0, !nominal kW = 3.1
-Refrigeration:Compressor,
-    Carlyle_R-22_Low_06CC016,!- Name
-    06CC016_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
-    06CC016_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Compressor Rated Suction Temperature {C}
-    4.4,                     !- Rated Liquid Temperature {C}
-    ;                        !- Compressor Rated Subcooling {C}
-```
->>>>>>> Branch_develop
 
 
 ### RooftopPackagedHeatPump.idf
