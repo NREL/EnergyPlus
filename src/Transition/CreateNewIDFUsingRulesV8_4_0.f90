@@ -344,7 +344,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
-                IF ((InArgs(1)(1:3)) == '8.3' .and. ArgFile) THEN
+                IF ((InArgs(1)(1:3)) == sVersionNum .and. ArgFile) THEN
                   CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
                   CLOSE(diflfn,STATUS='DELETE')
                   LatestVersion=.true.
@@ -355,7 +355,58 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
 
     !!!    Changes for this version
-              !CASE('SOMETHING')
+              ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
+              CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 32, the chw loop load distribution type and make a decision:
+                if (SameString(InArgs(32), "SEQUENTIAL")) then
+                  OutArgs(32)="SequentialLoad"
+                elseif (SameString(InArgs(32), "UNIFORM")) then
+                  OutArgs(32)="UniformLoad"
+                else
+                  OutArgs(32)=InArgs(32) ! Redundant, but clear
+                endif
+                ! then check the value of 33, the cond loop load distribution type and make a decision:
+                if (SameString(InArgs(33), "SEQUENTIAL")) then
+                  OutArgs(33)="SequentialLoad"
+                elseif (SameString(InArgs(33), "UNIFORM")) then
+                  OutArgs(33)="UniformLoad"
+                else
+                  OutArgs(33)=InArgs(33) ! Redundant, but clear
+                endif
+
+              ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
+              CASE('HVACTEMPLATE:PLANT:HOTWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 21, the load distribution type and make a decision:
+                if (SameString(InArgs(21), "SEQUENTIAL")) then
+                  OutArgs(21)="SequentialLoad"
+                elseif (SameString(InArgs(21), "UNIFORM")) then
+                  OutArgs(21)="UniformLoad"
+                else
+                  OutArgs(21)=InArgs(21) ! Redundant, but clear
+                endif
+
+              ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
+              CASE('HVACTEMPLATE:PLANT:MIXEDWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 17, the load distribution type and make a decision:
+                if (SameString(InArgs(17), "SEQUENTIAL")) then
+                  OutArgs(17)="SequentialLoad"
+                elseif (SameString(InArgs(17), "UNIFORM")) then
+                  OutArgs(17)="UniformLoad"
+                else
+                  OutArgs(17)=InArgs(17) ! Redundant, but clear
+                endif
                 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
