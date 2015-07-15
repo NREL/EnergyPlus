@@ -1610,15 +1610,11 @@ namespace DXCoils {
 	
 	void
 	CalcVRFHeatingCoil_FluidTCtrl(
-		int const DXCoilNum, // the number of the DX coil to be simulated
-		int const CompOp, // compressor operation; 1=on, 0=off
-		bool const FirstHVACIteration, // true if this is the first iteration of HVAC
+		int const DXCoilNum, // the number of the DX heating coil to be simulated
 		Real64 const PartLoadRatio, // sensible cooling load / full load sensible cooling capacity
-		int const FanOpMode, // Allows parent object to control fan operation
-		Real64 const CompCycRatio, // cycling ratio of VRF condenser
-		Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
+		int const FanOpMode, // Allows parent object to control fan mode
 		Optional< Real64 const > OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
-		Optional< Real64 const > MaxCoolCap // maximum capacity of DX coil
+		Optional< Real64 const > MaxHeatCap // maximum allowed heating capacity
 	);
 	
 	void
