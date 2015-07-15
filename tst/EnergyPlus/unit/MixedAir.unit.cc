@@ -12,10 +12,7 @@ using namespace EnergyPlus::MixedAir;
 
 namespace EnergyPlus {
 
-	typedef HVACFixture MixedAirFixture;
-	typedef HVACFixture MixedAirDeathTestFixture;
-
-	TEST_F( MixedAirFixture, ProcessOAControllerTest )
+	TEST_F( HVACFixture, MixedAir_ProcessOAControllerTest )
 	{
 		std::string const idf_objects = delimited_string({
 			"Version,8.3;",

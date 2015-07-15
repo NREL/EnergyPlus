@@ -8,7 +8,7 @@
 
 namespace EnergyPlus {
 
-	TEST_F( SQLiteFixture, sqliteWriteMessage ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_sqliteWriteMessage ) {
 		sqlite_test->sqliteWriteMessage( "" );
 		EXPECT_EQ("SQLite3 message, \n", ss->str());
 		ss->str(std::string());
@@ -17,7 +17,7 @@ namespace EnergyPlus {
 		ss->str(std::string());
 	}
 
-	TEST_F( SQLiteFixture, initializeIndexes ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_initializeIndexes ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->initializeIndexes();
 		sqlite_test->sqliteCommit();
@@ -29,7 +29,7 @@ namespace EnergyPlus {
 		EXPECT_FALSE(indexExists("tdI"));
 	}
 
-	TEST_F( SQLiteFixture, simulationRecords ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_simulationRecords ) {
 		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise updateSQLiteSimulationRecord will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
@@ -59,7 +59,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult3, result[0]);
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteEnvironmentPeriodRecord ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord ) {
 		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
@@ -91,7 +91,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(4ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, errorRecords ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_errorRecords ) {
 		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
@@ -137,7 +137,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(3ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteReportDictionaryRecord )
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord )
 	{
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -186,7 +186,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(9ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteTimeIndexRecord ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 0, 1 );
@@ -245,7 +245,7 @@ namespace EnergyPlus {
 		sqlite_test->sqliteCommit();
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteReportDataRecord ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -289,7 +289,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(2ul, reportExtendedData.size());
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteZoneSizingRecord ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteZoneSizingRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteZoneSizingRecord( "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033 );
 		auto result = queryResult("SELECT * FROM ZoneSizes;", "ZoneSizes");
@@ -300,7 +300,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult0, result[0]);
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteSystemSizingRecord ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Calculated Cooling Design Air Flow Rate [m3/s]", 6.37 );
 		sqlite_test->addSQLiteSystemSizingRecord( "VAV_2", "User Cooling Design Air Flow Rate", 5.1 );
@@ -314,7 +314,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult1, result[1]);
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteComponentSizingRecord ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteComponentSizingRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteComponentSizingRecord( "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate [m3/s]", 3.23 );
 		sqlite_test->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
@@ -328,7 +328,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult1, result[1]);
 	}
 
-	TEST_F( SQLiteFixture, privateMethods ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_privateMethods ) {
 		// test storageType
 		EXPECT_EQ( "Avg", storageType( 1 ) );
 		EXPECT_EQ( "Sum", storageType( 2 ) );
@@ -368,7 +368,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( 65, minutes );
 	}
 
-	TEST_F( SQLiteFixture, DaylightMaping ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_DaylightMaping ) {
 		auto const & zone = std::unique_ptr<DataHeatBalance::ZoneData>( new DataHeatBalance::ZoneData() );
 		zone->Name = "DAYLIT ZONE";
 		zone->CeilingHeight = 3;
@@ -429,7 +429,7 @@ namespace EnergyPlus {
 		ASSERT_EQ(4ul, daylightMapHourlyData.size());
 	}
 
-	TEST_F( SQLiteFixture, createZoneExtendedOutput ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput ) {
 		auto const & zoneData0 = std::unique_ptr<DataHeatBalance::ZoneData>( new DataHeatBalance::ZoneData() );
 		zoneData0->Name = "test zone 1";
 		zoneData0->CeilingHeight = 1;
@@ -871,7 +871,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(roomAirModel1, roomAirModels[1]);
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteTabularDataRecords ) {
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteTabularDataRecords ) {
 		Array1D_string const rowLabels( { "Heating", "Cooling" } );
 		Array1D_string const columnLabels( { "Electricity [GJ]", "Natural Gas [GJ]" } );
 		Array2D_string const body( 2, 2, { "216.38", "869.08", "1822.42", "0.00" } );

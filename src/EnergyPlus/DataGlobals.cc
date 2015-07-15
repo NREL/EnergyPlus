@@ -278,6 +278,8 @@ namespace DataGlobals {
 		AnySlabsInModel = false;
 		AnyBasementsInModel = false;
 		Progress = 0;
+		eso_stream = nullptr;
+		mtr_stream = nullptr;
 	}
 
 	//     NOTICE

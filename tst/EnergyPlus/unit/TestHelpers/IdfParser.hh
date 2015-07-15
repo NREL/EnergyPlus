@@ -14,30 +14,30 @@ namespace EnergyPlus {
 	class IdfParser
 	{
 	public:
-		std::vector< std::vector< std::string > > decode( std::string const & idf );
+		static std::vector< std::vector< std::string > > decode( std::string const & idf );
 
-		std::vector< std::vector< std::string > > decode( std::string const & idf, bool & success );
+		static std::vector< std::vector< std::string > > decode( std::string const & idf, bool & success );
 		
 		enum class Token : size_t { NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5 };
 
 	private:
 		friend class IdfParserFixture;
 		
-		std::vector< std::vector< std::string > > parse_idf( std::string const & idf, size_t & index, bool & success );
+		static std::vector< std::vector< std::string > > parse_idf( std::string const & idf, size_t & index, bool & success );
 
-		std::vector< std::string > parse_object( std::string const & idf, size_t & index, bool & success );
+		static std::vector< std::string > parse_object( std::string const & idf, size_t & index, bool & success );
 
-		std::string parse_value( std::string const & idf, size_t & index, bool & success);
+		static std::string parse_value( std::string const & idf, size_t & index, bool & success);
 
-		std::string parse_string( std::string const & idf, size_t & index, bool & success);
+		static std::string parse_string( std::string const & idf, size_t & index, bool & success);
 
-		void eat_whitespace( std::string const & idf, size_t & index);
+		static void eat_whitespace( std::string const & idf, size_t & index);
 
-		void eat_comment( std::string const & idf, size_t & index);
+		static void eat_comment( std::string const & idf, size_t & index);
 
-		Token look_ahead( std::string const & idf, size_t index);
+		static Token look_ahead( std::string const & idf, size_t index);
 
-		Token next_token( std::string const & idf, size_t & index);
+		static Token next_token( std::string const & idf, size_t & index);
 	};
 
 }

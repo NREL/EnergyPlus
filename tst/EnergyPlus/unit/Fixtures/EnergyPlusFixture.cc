@@ -1,27 +1,40 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
 // EnergyPlus Headers
-#include "IOHelper.hh"
-#include "IdfParser.hh"
+#include "EnergyPlusFixture.hh"
+#include "../TestHelpers/IdfParser.hh"
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
+
 
 #include <fstream>
 #include <algorithm>
 
 struct InputProcessorCache;
-std::unique_ptr<EnergyPlus::InputProcessorCache> EnergyPlus::IOHelper::m_idd_cache = nullptr;
+std::unique_ptr<EnergyPlus::InputProcessorCache> EnergyPlus::EnergyPlusFixture::m_idd_cache = nullptr;
 
 namespace EnergyPlus {
 
-	IOHelper::IOHelper()
-	{
+	void EnergyPlusFixture::SetUp() {
+		show_message();
+
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -37,14 +50,36 @@ namespace EnergyPlus {
 		m_redirect_cerr = std::unique_ptr< RedirectCerr >( new RedirectCerr( m_cerr_buffer ) );
 	}
 
-	IOHelper::~IOHelper()
-	{
-		DataGlobals::eso_stream = nullptr;
-		DataGlobals::mtr_stream = nullptr;
-		InputProcessor::echo_stream = nullptr;
+	void EnergyPlusFixture::TearDown() {
+		CurveManager::clear_state();
+		DataEnvironment::clear_state();
+		DataGlobals::clear_state();
+		DataHeatBalance::clear_state();
+		DataIPShortCuts::clear_state();
+		DataOutputs::clear_state();
+		DataSurfaces::clear_state();
+		HeatBalanceManager::clear_state();
+		InputProcessor::clear_state();
+		OutputProcessor::clear_state();
+		ScheduleManager::clear_state();
+
+		{ 
+			IOFlags flags; 
+			flags.DISPOSE( "DELETE" );
+			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
+			gio::close( DataGlobals::OutputFileStandard, flags ); 
+			gio::close( DataGlobals::OutputFileInits, flags );
+			gio::close( DataGlobals::OutputFileDebug, flags );
+			gio::close( DataGlobals::OutputFileZoneSizing, flags );
+			gio::close( DataGlobals::OutputFileSysSizing, flags );
+			gio::close( DataGlobals::OutputFileMeters, flags );
+			gio::close( DataGlobals::OutputFileBNDetails, flags );
+			gio::close( DataGlobals::OutputFileZonePulse, flags );
+
+		}
 	}
 
-	void IOHelper::setup_cache()
+	void EnergyPlusFixture::setup_cache()
 	{
 		if ( ! m_idd_cache ) {
 			static auto errors_found = false;
@@ -60,7 +95,7 @@ namespace EnergyPlus {
 		}
 	}
 
-	void IOHelper::use_cache()
+	void EnergyPlusFixture::use_cached_idd()
 	{
 		setup_cache();
 		if ( m_idd_cache ) {
@@ -69,20 +104,20 @@ namespace EnergyPlus {
 	}
 
 	template < typename T, class T2 >
-	bool IOHelper::compare_containers( T const & expected_container, T2 const & actual_container ) {
+	bool EnergyPlusFixture::compare_containers( T const & expected_container, T2 const & actual_container ) {
 		bool is_valid = ( expected_container.size() == actual_container.size() );
 		EXPECT_EQ( expected_container.size(), actual_container.size() ) << "Containers are not equal size.";
 		auto expected = expected_container.begin();
 		auto actual = actual_container.begin();
 		for ( ; expected != expected_container.end(); ++expected, ++actual ) {
 			// This may fail due to floating point issues for float and double...
-			EXPECT_EQ( *expected, *actual ) << "Incorrect index: " << ( expected - expected_container.begin() );
+			EXPECT_EQ( *expected, *actual ) << "Incorrect 0-based index: " << ( expected - expected_container.begin() );
 			is_valid = ( *expected == *actual );
 		}
 		return is_valid;
 	}
 
-	std::string IOHelper::delimited_string( std::vector<std::string> const & strings, std::string const & delimiter ) {
+	std::string EnergyPlusFixture::delimited_string( std::vector<std::string> const & strings, std::string const & delimiter ) {
 		std::ostringstream compare_text;
 		for( auto const & str : strings ) {
 			compare_text << str << delimiter;
@@ -90,7 +125,7 @@ namespace EnergyPlus {
 		return compare_text.str();
 	}
 
-	bool IOHelper::compare_eso_stream( std::string const & expected_string, bool reset_stream ) {
+	bool EnergyPlusFixture::compare_eso_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->eso_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -98,7 +133,7 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool IOHelper::compare_mtr_stream( std::string const & expected_string, bool reset_stream ) {
+	bool EnergyPlusFixture::compare_mtr_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->mtr_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -106,7 +141,7 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool IOHelper::compare_echo_stream( std::string const & expected_string, bool reset_stream ) {
+	bool EnergyPlusFixture::compare_echo_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->echo_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -114,7 +149,7 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool IOHelper::compare_cout_stream( std::string const & expected_string, bool reset_stream ) {
+	bool EnergyPlusFixture::compare_cout_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->m_cout_buffer->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -122,7 +157,7 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool IOHelper::compare_cerr_stream( std::string const & expected_string, bool reset_stream ) {
+	bool EnergyPlusFixture::compare_cerr_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->m_cerr_buffer->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -130,7 +165,7 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool IOHelper::process_idf( std::string const & idf_snippet, bool use_idd_cache ) {
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_idd_cache ) {
 		using namespace InputProcessor;
 
 		// Parse idf snippet to look for Building and GlobalGeometryRules. If not present then this adds a default implementation
@@ -166,7 +201,7 @@ namespace EnergyPlus {
 		auto errors_found = false;
 
 		if ( use_idd_cache ) {
-			use_cache();
+			use_cached_idd();
 		} else {
 			auto const idd = "";
 			process_idd( idd, errors_found );
@@ -292,7 +327,7 @@ namespace EnergyPlus {
 		return errors_found;
 	}
 
-	bool IOHelper::process_idd( std::string const & idd, bool & errors_found ) {
+	bool EnergyPlusFixture::process_idd( std::string const & idd, bool & errors_found ) {
 		using namespace InputProcessor;
 
 		std::unique_ptr< std::istream > idd_stream;
@@ -330,15 +365,15 @@ namespace EnergyPlus {
 				iListOfObjects.allocate( NumObjectDefs );
 				SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );
 			}
-		}
 
-		ObjectStartRecord.dimension( NumObjectDefs, 0 );
-		ObjectGotCount.dimension( NumObjectDefs, 0 );
+			ObjectStartRecord.dimension( NumObjectDefs, 0 );
+			ObjectGotCount.dimension( NumObjectDefs, 0 );
+		}
 
 		return errors_found;
 	}
 
-	bool IOHelper::compare_idf( 
+	bool EnergyPlusFixture::compare_idf( 
 		std::string const & name, 
 		int const num_alphas, 
 		int const num_numbers, 
@@ -370,7 +405,7 @@ namespace EnergyPlus {
 		EXPECT_TRUE( compare_containers< std::vector< Real64 > >( numbers, IDFRecords( index ).Numbers ) );
 		EXPECT_TRUE( compare_containers< std::vector< bool > >( numbers_blank, IDFRecords( index ).NumBlank ) );
 
-		return OverallErrorFlag && ::testing::Test::HasFailure();
+		return ! ::testing::Test::HasFailure();
 	}
 
 	InputProcessorCache::InputProcessorCache()

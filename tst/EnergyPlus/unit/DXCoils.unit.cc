@@ -24,10 +24,7 @@ using namespace OutputReportPredefined;
 
 namespace EnergyPlus {
 
-	typedef HVACFixture DXCoilsFixture;
-	typedef HVACFixture DXCoilsDeathTestFixture;
-
-	TEST_F( DXCoilsFixture, Test1 )
+	TEST_F( HVACFixture, DXCoils_Test1 )
 	{
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
@@ -162,7 +159,7 @@ namespace EnergyPlus {
 		PerfCurve.deallocate();
 
 	}
-	TEST_F( DXCoilsFixture, Test2 )
+	TEST_F( HVACFixture, DXCoils_Test2 )
 	{
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;

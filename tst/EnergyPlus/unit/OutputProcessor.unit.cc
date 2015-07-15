@@ -14,12 +14,9 @@
 
 namespace EnergyPlus {
 
-	typedef SQLiteFixture OutputProcessorFixture;
-	typedef SQLiteFixture OutputProcessorDeathTestFixture;
-
 	namespace OutputProcessor {
 
-		TEST_F( OutputProcessorFixture, TestGetMeteredVariables )
+		TEST_F( SQLiteFixture, OutputProcessor_TestGetMeteredVariables )
 		{
 			int const NumVariables = 2;
 			Array1D_int VarIndexes( NumVariables ); // Variable Numbers
@@ -62,7 +59,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, reportTSMeters_PrintESOTimeStamp )
+		TEST_F( SQLiteFixture, OutputProcessor_reportTSMeters_PrintESOTimeStamp )
 		{
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -132,7 +129,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, reportTSMeters )
+		TEST_F( SQLiteFixture, OutputProcessor_reportTSMeters )
 		{
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -202,7 +199,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, reportHRMeters )
+		TEST_F( SQLiteFixture, OutputProcessor_reportHRMeters )
 		{
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -266,7 +263,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, reportDYMeters )
+		TEST_F( SQLiteFixture, OutputProcessor_reportDYMeters )
 		{
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -342,7 +339,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, reportMNMeters )
+		TEST_F( SQLiteFixture, OutputProcessor_reportMNMeters )
 		{
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -418,7 +415,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, reportSMMeters )
+		TEST_F( SQLiteFixture, OutputProcessor_reportSMMeters )
 		{
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -494,7 +491,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeTimeStampFormatData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeTimeStampFormatData )
 		{
 			int TimeStepStampReportNbr = 1;
 			std::string TimeStepStampReportChr = "1";
@@ -569,7 +566,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeReportMeterData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeReportMeterData )
 		{
 			DataGlobals::MinutesPerTimeStep = 10;
 
@@ -659,7 +656,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeReportRealData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeReportRealData )
 		{
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -738,7 +735,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeReportIntegerData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeReportIntegerData )
 		{
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -817,7 +814,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeIntegerData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeIntegerData )
 		{
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -872,7 +869,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, getStandardMeterResourceType )
+		TEST_F( SQLiteFixture, OutputProcessor_getStandardMeterResourceType )
 		{
 			std::map< std::string, std::string > const resource_map = {
 				{ "ELECTRICITY", "Electricity" },
@@ -973,7 +970,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, determineIndexGroupKeyFromMeterName )
+		TEST_F( SQLiteFixture, OutputProcessor_determineIndexGroupKeyFromMeterName )
 		{
 			std::map< std::string, int > const resource_map = {
 				{ "Electricity:Facility", 100 },
@@ -994,7 +991,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		TEST_F( OutputProcessorFixture, validateIndexType )
+		TEST_F( SQLiteFixture, OutputProcessor_validateIndexType )
 		{
 			std::map< std::string, int > const resource_map = {
 				{ "ZONE", 1 },
@@ -1013,14 +1010,14 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorDeathTestFixture, validateIndexType )
+		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_validateIndexType )
 		{
 			auto const calledFrom = "UnitTest";
 			EXPECT_DEATH( ValidateIndexType( "BAD INPUT", calledFrom ), "" );
 
 		}
 
-		TEST_F( OutputProcessorFixture, standardIndexTypeKey )
+		TEST_F( SQLiteFixture, OutputProcessor_standardIndexTypeKey )
 		{
 			EXPECT_EQ( "Zone", StandardIndexTypeKey( 1 ) );
 			EXPECT_EQ( "HVAC", StandardIndexTypeKey( 2 ) );
@@ -1030,7 +1027,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, validateVariableType )
+		TEST_F( SQLiteFixture, OutputProcessor_validateVariableType )
 		{
 			std::map< std::string, int > const resource_map = {
 				{ "STATE", 1 },
@@ -1067,7 +1064,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, standardVariableTypeKey )
+		TEST_F( SQLiteFixture, OutputProcessor_standardVariableTypeKey )
 		{
 			EXPECT_EQ( "Average", StandardVariableTypeKey( 1 ) );
 			EXPECT_EQ( "Sum", StandardVariableTypeKey( 2 ) );
@@ -1077,7 +1074,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F(  OutputProcessorFixture, determineMeterIPUnits ) 
+		TEST_F(  SQLiteFixture, OutputProcessor_determineMeterIPUnits ) 
 		{
 			int ipUnits = -999999;
 			bool errorFound = false;
@@ -1136,7 +1133,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, dateToStringWithMonth )
+		TEST_F( SQLiteFixture, OutputProcessor_dateToStringWithMonth )
 		{
 			EXPECT_EQ( "01-JAN-00:01", DateToStringWithMonth( 1010101 ) );
 			EXPECT_EQ( "01-JAN-00:00", DateToStringWithMonth( 1010100 ) );
@@ -1167,7 +1164,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeMeterDictionaryItem )
+		TEST_F( SQLiteFixture, OutputProcessor_writeMeterDictionaryItem )
 		{
 			InitializeOutput();
 
@@ -1320,7 +1317,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeReportVariableDictionaryItem )
+		TEST_F( SQLiteFixture, OutputProcessor_writeReportVariableDictionaryItem )
 		{
 			InitializeOutput();
 
@@ -1495,7 +1492,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeCumulativeReportMeterData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeCumulativeReportMeterData )
 		{
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -1531,7 +1528,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, writeRealData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeRealData )
 		{
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -1799,7 +1796,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, addMeter )
+		TEST_F( SQLiteFixture, OutputProcessor_addMeter )
 		{
 			auto const name( "testMeter" );
 			auto const units( "J" );
@@ -1857,7 +1854,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, validateNStandardizeMeterTitles )
+		TEST_F( SQLiteFixture, OutputProcessor_validateNStandardizeMeterTitles )
 		{
 			std::vector< std::vector< std::string > > input_map = {
 				{ "J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "HVAC" },
@@ -2115,7 +2112,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, setupTimePointers )
+		TEST_F( SQLiteFixture, OutputProcessor_setupTimePointers )
 		{
 			TimeValue.allocate( 2 );
 
@@ -2135,7 +2132,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, getVariableUnitsString )
+		TEST_F( SQLiteFixture, OutputProcessor_getVariableUnitsString )
 		{
 			EXPECT_EQ( "C", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C]" ) );
 			EXPECT_EQ( "%", GetVariableUnitsString( "Site Outdoor Air Relative Humidity [%]" ) );
@@ -2146,7 +2143,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorDeathTestFixture, getVariableUnitsString )
+		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_getVariableUnitsString )
 		{
 			EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ), "" );
 			EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ), "" );
@@ -2154,7 +2151,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, getReportVariableInput )
+		TEST_F( SQLiteFixture, OutputProcessor_getReportVariableInput )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
@@ -2209,7 +2206,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, buildKeyVarList )
+		TEST_F( SQLiteFixture, OutputProcessor_buildKeyVarList )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
@@ -2268,7 +2265,7 @@ namespace EnergyPlus {
 			EXPECT_FALSE( ReqRepVars( 5 ).Used );
 		}
 
-		TEST_F( OutputProcessorFixture, addBlankKeys )
+		TEST_F( SQLiteFixture, OutputProcessor_addBlankKeys )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
@@ -2333,7 +2330,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, determineFrequency )
+		TEST_F( SQLiteFixture, OutputProcessor_determineFrequency )
 		{
 			auto const valid_options = std::map< std::string, int >({ 
 				{ "Detailed", -1 },
@@ -2356,7 +2353,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, addToOutputVariableList )
+		TEST_F( SQLiteFixture, OutputProcessor_addToOutputVariableList )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
@@ -2411,7 +2408,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, setupOutputVariable )
+		TEST_F( SQLiteFixture, OutputProcessor_setupOutputVariable )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
@@ -2450,7 +2447,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, checkReportVariable )
+		TEST_F( SQLiteFixture, OutputProcessor_checkReportVariable )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
@@ -2508,7 +2505,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( true, ReqRepVars( 5 ).Used );
 		}
 
-		TEST_F( OutputProcessorFixture, getCustomMeterInput )
+		TEST_F( SQLiteFixture, OutputProcessor_getCustomMeterInput )
 		{
 			std::string const idf_objects = delimited_string({
 				"  Output:Meter:MeterFileOnly,MyGeneralLights,monthly;",
@@ -2597,7 +2594,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		TEST_F( OutputProcessorFixture, attachMeters )
+		TEST_F( SQLiteFixture, OutputProcessor_attachMeters )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Meter,Electricity:Facility,timestep;",
@@ -2647,68 +2644,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		// TEST_F( OutputProcessorFixture, setInitialMeterReportingAndOutputNames )
-		// {
-		// 	std::string const idf_objects = delimited_string({
-		// 		"Output:Meter,Electricity:Facility,timestep;",
-		// 		"Output:Meter,Electricity:Facility,hourly;",
-		// 		"Output:Meter,Electricity:Facility,daily;",
-		// 		"Output:Meter,Electricity:Facility,monthly;",
-		// 		"Output:Meter,Electricity:Facility,runperiod;",
-		// 	});
-
-		// 	ASSERT_FALSE( process_idf( idf_objects ) );
-
-		// 	Real64 light_consumption = 0;
-		// 	SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-		// 	Real64 zone_infil_total_loss = 0;
-		// 	SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-
-		// 	ASSERT_EQ( 6, NumEnergyMeters );
-
-		// 	auto const meters_result = std::map< int, std::tuple < int, std::string, std::string, std::string, std::string, std::string, std::string > >({
-		// 		{ 1, std::make_tuple( 0, "Electricity:Facility", "Electricity", "", "", "", "J" ) },
-		// 		{ 2, std::make_tuple( 0, "Electricity:Building", "Electricity", "", "", "Building", "J" ) },
-		// 		{ 3, std::make_tuple( 0, "Electricity:Zone:SPACE1-1", "Electricity", "", "", "Zone", "J" ) },
-		// 		{ 4, std::make_tuple( 0, "InteriorLights:Electricity", "Electricity", "InteriorLights", "", "", "J" ) },
-		// 		{ 5, std::make_tuple( 0, "InteriorLights:Electricity:Zone:SPACE1-1", "Electricity", "InteriorLights", "", "Zone", "J" ) },
-		// 		{ 6, std::make_tuple( 0, "GeneralLights:InteriorLights:Electricity", "Electricity", "InteriorLights", "GeneralLights", "", "J" ) },
-		// 	});
-
-		// 	for ( auto const result : meters_result ) {
-		// 		EXPECT_EQ( std::get<0>( result.second ), EnergyMeters( result.first ).TypeOfMeter );
-		// 		EXPECT_EQ( std::get<1>( result.second ), EnergyMeters( result.first ).Name );
-		// 		EXPECT_EQ( std::get<2>( result.second ), EnergyMeters( result.first ).ResourceType );
-		// 		EXPECT_EQ( std::get<3>( result.second ), EnergyMeters( result.first ).EndUse );
-		// 		EXPECT_EQ( std::get<4>( result.second ), EnergyMeters( result.first ).EndUseSub );
-		// 		EXPECT_EQ( std::get<5>( result.second ), EnergyMeters( result.first ).Group );
-		// 		EXPECT_EQ( std::get<6>( result.second ), EnergyMeters( result.first ).Units );
-		// 	}
-
-		// 	SetInitialMeterReportingAndOutputNames();
-		// }
-
-		TEST_F( OutputProcessorFixture, updateMeterReporting )
-		{
-			// std::string const idf_objects = delimited_string({
-			// 	"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
-			// 	"Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;",
-			// 	"Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
-			// 	"Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
-			// 	"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
-			// 	"Output:Meter,Electricity:Facility,timestep;",
-			// 	"Output:Meter,Electricity:Facility,hourly;",
-			// 	"Output:Meter,Electricity:Facility,daily;",
-			// 	"Output:Meter,Electricity:Facility,monthly;",
-			// 	"Output:Meter,Electricity:Facility,runperiod;",
-			// });
-
-			// ASSERT_FALSE( process_idf( idf_objects ) );
-
-			// UpdateMeterReporting();
-		}
-
-		TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting )
+		TEST_F( SQLiteFixture, OutputProcessor_updateDataandReport_ZoneTSReporting )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
@@ -2886,7 +2822,7 @@ namespace EnergyPlus {
 			} ) );
 		}
 
-		TEST_F( OutputProcessorFixture, updateDataandReport_ZoneTSReporting_with_detailed )
+		TEST_F( SQLiteFixture, OutputProcessor_updateDataandReport_ZoneTSReporting_with_detailed )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,detailed;",
@@ -3081,7 +3017,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( OutputProcessorFixture, updateDataandReport_HVACTSReporting )
+		TEST_F( SQLiteFixture, OutputProcessor_updateDataandReport_HVACTSReporting )
 		{
 			std::string const idf_objects = delimited_string({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,detailed;",

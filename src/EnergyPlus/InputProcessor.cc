@@ -255,6 +255,8 @@ namespace InputProcessor {
 		NumberArgs.deallocate();
 		AlphaArgsBlank.deallocate();
 		NumberArgsBlank.deallocate();
+
+		echo_stream = nullptr;
 	}
 
 	void

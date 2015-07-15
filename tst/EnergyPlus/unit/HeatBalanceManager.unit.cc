@@ -4,7 +4,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <HeatBalanceManager.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -15,10 +18,7 @@ using namespace EnergyPlus::DataGlobals;
 
 namespace EnergyPlus {
 
-	typedef EnergyPlusFixture HeatBalanceManagerFixture;
-	typedef EnergyPlusFixture HeatBalanceManagerDeathTestFixture;
-
-	TEST_F( HeatBalanceManagerFixture, ProcessZoneData )
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_ProcessZoneData )
 	{
 	// Test input processing of Zone object
 	//	Zone,
@@ -95,7 +95,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HeatBalanceManagerFixture, GetWindowConstructData )
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData )
 	{
 		// Test get input for window construction object
 		// Construction,

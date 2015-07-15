@@ -155,8 +155,6 @@ namespace EnergyPlus {
 		}
 	};
 
-	typedef SQLiteFixture SQLiteDeathTestFixture;
-
 }
 
 #endif

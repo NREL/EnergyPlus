@@ -49,8 +49,6 @@ namespace EnergyPlus {
 		}
 	};
 
-	typedef HVACFixture HVACDeathTestFixture;
-
 }
 
 #endif
