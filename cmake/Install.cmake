@@ -399,25 +399,25 @@ set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 
 
 
+if (NOT PACKAGE_BUILT_DOCS)
+  # remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/AuxiliaryPrograms.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/EMS_Application_Guide.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/EngineeringReference.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/ExternalInterfaces_Application_Guide.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/GettingStarted.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/InputOutputReference.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/InterfaceDeveloper.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/ModuleDeveloper.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/OutputDetailsAndExamples.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/PlantApplicationGuide.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Tips_and_Tricks_Using_EnergyPlus.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Using_EnergyPlus_for_Compliance.pdf" "./Documentation")
 
-# remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/AuxiliaryPrograms.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/EMS_Application_Guide.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/EngineeringReference.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/ExternalInterfaces_Application_Guide.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/GettingStarted.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/InputOutputReference.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/InterfaceDeveloper.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/ModuleDeveloper.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/OutputDetailsAndExamples.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/PlantApplicationGuide.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Tips_and_Tricks_Using_EnergyPlus.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Using_EnergyPlus_for_Compliance.pdf" "./Documentation")
-
-# Should this be included or no? There is no .md source for generating
-#install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/ProgrammingStandard.pdf" "./Documentation")
-
+  # Should this be included or no? There is no .md source for generating
+  #install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/ProgrammingStandard.pdf" "./Documentation")
+endif()
 
 
 
