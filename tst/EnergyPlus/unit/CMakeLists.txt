@@ -2,6 +2,10 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
 set( test_src
+  TestHelpers/IdfParser.cc
+  TestHelpers/IdfParser.hh
+  Fixtures/EnergyPlusFixture.cc
+  Fixtures/EnergyPlusFixture.hh
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
@@ -13,6 +17,7 @@ set( test_src
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   Fans.unit.cc
+  FaultFoulingAirFilters.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
@@ -22,6 +27,8 @@ set( test_src
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
+  IdfParser.unit.cc
+  InputProcessor.unit.cc
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
   HVACUnitarySystem.unit.cc

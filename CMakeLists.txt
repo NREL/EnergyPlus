@@ -6,7 +6,7 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 3 )
-set( CMAKE_VERSION_PATCH 3 )
+set( CMAKE_VERSION_PATCH 4 )
 
 set( PREV_RELEASE_SHA "6d97d07" )
 
@@ -46,6 +46,16 @@ option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
+option( BUILD_DOCS "Build markdown based documentation" OFF )
+
+if (BUILD_DOCS)
+  option( BUILD_MONOLITHIC_ENGINEERINGREFERENCE  "Build all-in-one EngineeringReference (has caveats)" ON )
+
+  if (BUILD_PACKAGE)
+    option( PACKAGE_BUILT_DOCS "Add built docs to package" OFF )
+  endif()
+endif()
+
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
@@ -322,8 +332,6 @@ endif()
 
 
 
-
-
 if (BUILD_VALIDATION_REPORTS)
   include(ExternalProject)
   ExternalProject_Add(ValidationReports
@@ -335,5 +343,10 @@ if (BUILD_VALIDATION_REPORTS)
       -DENERGYPLUS_VERSION:STRING=${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}
     INSTALL_COMMAND ""
     )
+endif()
+
+
+if (BUILD_DOCS)
+  add_subdirectory(doc/src)
 endif()
 

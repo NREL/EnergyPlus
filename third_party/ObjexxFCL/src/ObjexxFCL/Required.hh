@@ -210,8 +210,8 @@ public: // Properties
 public: // Comparison
 
 	// Required == Required
-	inline
 	friend
+	inline
 	bool
 	operator ==( Required const & a, Required const & b )
 	{
@@ -219,8 +219,8 @@ public: // Comparison
 	}
 
 	// Required != Required
-	inline
 	friend
+	inline
 	bool
 	operator !=( Required const & a, Required const & b )
 	{
@@ -228,8 +228,8 @@ public: // Comparison
 	}
 
 	// Required == Value
-	inline
 	friend
+	inline
 	bool
 	operator ==( Required const & a, T const & b )
 	{
@@ -237,8 +237,8 @@ public: // Comparison
 	}
 
 	// Required != Value
-	inline
 	friend
+	inline
 	bool
 	operator !=( Required const & a, T const & b )
 	{
@@ -246,8 +246,8 @@ public: // Comparison
 	}
 
 	// Value == Required
-	inline
 	friend
+	inline
 	bool
 	operator ==( T const & a, Required const & b )
 	{
@@ -255,8 +255,8 @@ public: // Comparison
 	}
 
 	// Value != Required
-	inline
 	friend
+	inline
 	bool
 	operator !=( T const & a, Required const & b )
 	{
@@ -424,8 +424,8 @@ public: // Properties
 public: // Comparison
 
 	// Required == Required
-	inline
 	friend
+	inline
 	bool
 	operator ==( Required const & a, Required const & b )
 	{
@@ -433,8 +433,8 @@ public: // Comparison
 	}
 
 	// Required != Required
-	inline
 	friend
+	inline
 	bool
 	operator !=( Required const & a, Required const & b )
 	{
@@ -442,8 +442,8 @@ public: // Comparison
 	}
 
 	// Required == Value
-	inline
 	friend
+	inline
 	bool
 	operator ==( Required const & a, T const & b )
 	{
@@ -451,8 +451,8 @@ public: // Comparison
 	}
 
 	// Required != Value
-	inline
 	friend
+	inline
 	bool
 	operator !=( Required const & a, T const & b )
 	{
@@ -460,8 +460,8 @@ public: // Comparison
 	}
 
 	// Value == Required
-	inline
 	friend
+	inline
 	bool
 	operator ==( T const & a, Required const & b )
 	{
@@ -469,8 +469,8 @@ public: // Comparison
 	}
 
 	// Value != Required
-	inline
 	friend
+	inline
 	bool
 	operator !=( T const & a, Required const & b )
 	{
