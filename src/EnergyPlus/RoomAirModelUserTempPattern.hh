@@ -65,6 +65,15 @@ namespace RoomAirModelUserTempPattern {
 		int const ZoneNum
 	);
 
+	Real64
+	OutdoorDryBulbGrad(
+		Real64 DryBulbTemp,
+		Real64 UpperBound, 
+		Real64 HiGradient,
+		Real64 LowerBound, 
+		Real64 LowGradient 
+	);
+
 	void
 	FigureConstGradPattern(
 		int const PattrnID,
