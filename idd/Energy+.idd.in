@@ -64462,6 +64462,7 @@ WaterHeater:Stratified,
        \required-field
        \type alpha
        \reference WaterHeaterNames
+       \reference WaterHeaterStratifiedNames
   A2 , \field End-Use Subcategory
        \type alpha
        \retaincase
@@ -64898,7 +64899,10 @@ WaterHeater:Sizing,
 
 WaterHeater:HeatPump:PumpedCondenser,
        \min-fields 29
-       \memo This object models an air-source heat pump for water heating.
+       \memo This object models an air-source heat pump for water heating where the water is pumped out of the tank,
+       \memo through a heating coil and returned to the tank. 
+       \memo For wrapped condenser HPWHs, see WaterHeater:HeatPump:WrappedCondenser.
+       \memo see 
        \memo WaterHeater:HeatPump:PumpedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump:*, Fan:OnOff, WaterHeater:Mixed or WaterHeater:Stratified
   A1 , \field Name
@@ -65019,7 +65023,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoilsPumped
-	   \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:* object.
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
@@ -65133,7 +65137,9 @@ WaterHeater:HeatPump:PumpedCondenser,
 
 WaterHeater:HeatPump:WrappedCondenser,
        \min-fields 28
-       \memo This object models an air-source heat pump for water heating.
+       \memo This object models an air-source heat pump for water heating where the heating coil is wrapped around
+       \memo the tank, which is typical of residential HPWHs. 
+       \memo For pumped condenser HPWHs, see WaterHeater:HeatPump:PumpedCondenser.
        \memo WaterHeater:HeatPump:WrappedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump:Pumped, Fan:OnOff, WaterHeater:Mixed
   A1 , \field Name
@@ -65230,7 +65236,7 @@ WaterHeater:HeatPump:WrappedCondenser,
   A12, \field Tank Name
        \required-field
        \type object-list
-       \object-list WaterHeaterNames
+       \object-list WaterHeaterStratifiedNames
        \note Needs to match the name used in the corresponding Water Heater object. 
        \note Must be a WaterHeater:Stratified tank.
   A13, \field Tank Use Side Inlet Node Name
