@@ -619,6 +619,7 @@ EOF
 999
 DXF created from EnergyPlus
 999
+```
 Program Version,EnergyPlus, &lt;version&gt;
 
 eplusout.edd
@@ -2742,7 +2743,7 @@ The report describes the actions for the following equation:
 
 The coefficients listed above are used in the following equation:
 
-<div>\[ T = C_2 T_{zone} + C_3 T_{oadb} + C_4 C_5 + C_6 T_{grnd} + C_7 W_{spd} T_{oadb}
+<div>\[ T = C_2 T_{zone} + C_3 T_{oadb} + C_4 C_5 + C_6 T_{grnd} + C_7 W_{spd} T_{oadb}\]</div>
 
 where:
 

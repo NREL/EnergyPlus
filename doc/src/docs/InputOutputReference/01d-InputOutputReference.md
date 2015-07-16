@@ -225,35 +225,35 @@ This is the current zone thermostat stage number when the ZoneControl:Thermostat
 
 #### Zone Heating Setpoint Not Met Time [hr]
 
-Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint. See the OutputControl:ReportingTolrances object to change the reporting range from 0.2 degrees C.
+Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint. See the OutputControl:ReportingTolerances object to change the reporting range from 0.2 degrees C.
 
 #### Zone Heating Setpoint Not Met While Occupied Time [hr]
 
-Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint and when people are present in the zone. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolrances object.
+Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint and when people are present in the zone. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolerances object.
 
 #### Zone Cooling Setpoint Not Met Time [hr]
 
-Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint. See the OutputControl:ReportingTolrances object to change the reporting range from 0.2 degrees C.
+Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint. See the OutputControl:ReportingTolerances object to change the reporting range from 0.2 degrees C.
 
 #### Zone Cooling Setpoint Not Met While Occupied Time [hr]
 
-Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint and when people are present in the zone. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolrances object.
+Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint and when people are present in the zone. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolerances object.
 
 #### Facility Heating Setpoint Not Met Time [hr]
 
-Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint in any one or more zones. See the OutputControl:ReportingTolrances object to change the reporting range from 0.2 degrees C.
+Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint in any one or more zones. See the OutputControl:ReportingTolerances object to change the reporting range from 0.2 degrees C.
 
 #### Facility Heating Setpoint Not Met While Occupied Time [hr]
 
-Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint and when people are present in any one or more zones. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolrances object.
+Hours when the zone temperature is lower than 0.2 (default) degrees C below the heating setpoint and when people are present in any one or more zones. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolerances object.
 
 #### Facility Cooling Setpoint Not Met Time [hr]
 
-Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint in any one or more zones. See the OutputControl:ReportingTolrances object to change the reporting range from 0.2 degrees C.
+Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint in any one or more zones. See the OutputControl:ReportingTolerances object to change the reporting range from 0.2 degrees C.
 
 #### Facility Cooling Setpoint Not Met While Occupied Time [hr]
 
-Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint and when people are present in any one or more zones. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolrances object.
+Hours when the zone temperature is greater than 0.2 (default) degrees C above the cooling setpoint and when people are present in any one or more zones. To change the reporting range from 0.2 degrees C, see the OutputControl:ReportingTolerances object.
 
 #### Zone Oscillating Temperatures Time[hr]
 
