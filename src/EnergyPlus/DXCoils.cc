@@ -167,6 +167,13 @@ namespace DXCoils {
 	Array1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
 	Array1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
 	Array1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
+	
+	// Followings for VRF FluidTCtrl Only
+	Array1D< Real64 >  DXCoilSH; // Yoshi_DX superheating degrees [C]
+	Array1D< Real64 >  DXCoilSC; // Yoshi_DX subcooling degrees [C]
+	Array1D< Real64 >  DXCoil_InletAirDBT; // Yoshi_InletAirDBT [C]
+	int MinIDUFanSpeed( 0 ); //XP_minimum indoor unit fan speed ratio
+	
 	int CurDXCoilNum( 0 );
 
 	int NumDXCoils( 0 ); // Total number of DX coils
@@ -1017,6 +1024,12 @@ namespace DXCoils {
 		DXCoilCoolInletAirWBTemp.allocate( NumDXCoils );
 		DXCoilHeatInletAirDBTemp.allocate( NumDXCoils );
 		DXCoilHeatInletAirWBTemp.allocate( NumDXCoils );
+		
+		// Followings for VRF FluidTCtrl Only
+		DXCoilSH.allocate( NumDXCoils );
+		DXCoilSC.allocate( NumDXCoils );
+		DXCoil_InletAirDBT.allocate( NumDXCoils );
+		
 		// initialize the module level arrays
 		DXCoilOutletTemp = 0.0;
 		DXCoilOutletHumRat = 0.0;
@@ -14904,11 +14917,11 @@ Label50: ;
 
     void
     CalcVRFEvapCondTemp(
-    	int CoolCoilNum, // the number of the VRF Cooling DX coil to be simulated
-    	int HeatCoilNum, // the number of the VRF Heating DX coil to be simulated
-    	int ZoneIndex,   // index to zone where the VRF Terminal Unit resides
-    	Real64 EvapTemp, // evaporating temperature
-    	Real64 CondTemp  // condensing temperature 
+    	int const CoolCoilNum, // the number of the VRF Cooling DX coil to be simulated
+    	int const HeatCoilNum, // the number of the VRF Heating DX coil to be simulated
+    	int const ZoneIndex,   // index to zone where the VRF Terminal Unit resides
+    	Real64 & EvapTemp, // evaporating temperature
+    	Real64 & CondTemp  // condensing temperature 
     ) {
 	        // SUBROUTINE INFORMATION:
         //       AUTHOR         Xiufeng Pang
@@ -14989,7 +15002,7 @@ Label50: ;
         Hin         = DXCoil( CoolCoilNum ).InletAirEnthalpy;
         Win         = DXCoil( CoolCoilNum ).InletAirHumRat;
         Garate      = DXCoil( CoolCoilNum ).RatedAirMassFlowRate( 1 ); 
-        Qfan        = DXCoil( CoolCoilNum ).QFan;
+        Qfan        = DXCoil( CoolCoilNum ).Qfan;
         C1Tevap     = DXCoil( CoolCoilNum ).C1Te;
         C2Tevap     = DXCoil( CoolCoilNum ).C2Te;
         C3Tevap     = DXCoil( CoolCoilNum ).C3Te;
@@ -15010,11 +15023,11 @@ Label50: ;
             Th2min = 6.0 + DeltaT; // XP_6.0 is the nominal Te 
             hADP = PsyHFnTdbRhPb( Th2min, RHsat, Pb, "CalcVRFEvapCondTemp" );
             wADP = PsyWFnTdbH( Th2min, hADP,"CalcVRFEvapCondTemp" );
-            hTinwADP = PsyHFnTdbW( TairInlet, wADP, "CalcVRFEvapCondTemp" );
+            hTinwADP = PsyHFnTdbW( TairInlet, wADP );
             SHRini = min ( ( hTinwADP-hADP )/( Hin-hADP ), 1.0 );
             SENrated = CAPRated * SHRini;
 	    	
-            if ( QZnReqSenCoolingLoad .ge. SENrated ) 
+            if ( QZnReqSenCoolingLoad >= SENrated ) 
                 EvapTemp = 6.0;
             else {
                 TcoilIn = TairInlet + Qfan/Garate/1005;
@@ -15027,7 +15040,7 @@ Label50: ;
         if ( QZnReqSenHeatingLoad <= 0 ) {
             CondTemp = DXCoil( HeatCoilNum ).InletAirTemp;
         } else {
-            if ( QZnReqSenHeatingLoad .ge. RatedTotCap ) {
+            if ( QZnReqSenHeatingLoad >= RatedTotCap ) {
                  CondTemp = 46.0;
             } else {
                  TcoilIn = TairInlet + Qfan/Garate/1005;
@@ -15043,19 +15056,19 @@ Label50: ;
 	
     void
     CalcVRFAirFlow (
-        int ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
-        int Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
-        Real64 Temp,    // evaporating or condensing temperature
-        int CoolCoil,   // index to VRFTU cooling coil 
-        int HeatCoil,   // index to VRFTU heating coil
-        Real64 FanSpdRatio, // fan speed ratio
-        Real64 Wout,    // outlet air humidity ratio
-        Real64 Toutlet, // outlet air temperature
-        Real64 Houtlet, // outlet air enthalpy
-        Real64 HcoilIn, // inlet air enthalpy
-        Real64 TcIn,    // coil inlet temperature
-        Real64 SHact,   // actual SH
-        Real64 SCact    // actual SC
+        int const ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
+        int const Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
+        Real64 const Temp,    // evaporating or condensing temperature
+        int const CoolCoil,   // index to VRFTU cooling coil 
+        int const HeatCoil,   // index to VRFTU heating coil
+        Optional< Real64 >  & FanSpdRatio, // fan speed ratio
+        Optional< Real64 >  & Wout,    // outlet air humidity ratio
+        Optional< Real64 >  & Toutlet, // outlet air temperature
+        Optional< Real64 >  & Houtlet, // outlet air enthalpy
+        Optional< Real64 >  & HcoilIn, // inlet air enthalpy
+        Optional< Real64 >  & TcIn,    // coil inlet temperature
+        Optional< Real64 >  & SHact,   // actual SH
+        Optional< Real64 >  & SCact    // actual SC
     )
 	{
         // SUBROUTINE INFORMATION:
@@ -15148,7 +15161,7 @@ Label50: ;
         if( Mode < 0.5 && QZnReqSenCoolingLoad > 0.0 ) {
         
             BF = DXCoil( CoolCoil).BF;
-            Qfan = DXCoil( CoolCoil).QFan;
+            Qfan = DXCoil( CoolCoil).Qfan;
             Garate = DXCoil( CoolCoil).RatedAirMassFlowRate( 1);
             TairInlet = DXCoil( CoolCoil).InletAirTemp;
             Win = DXCoil( CoolCoil).InletAirHumRat ;
@@ -15187,8 +15200,8 @@ Label50: ;
                         Wout = Win;
                     }
                     
-                    Houtlet = PsyHFnTdbW( Toutlet, Wout, "CalcVRFAirFlow");
-                    HcoilIn = PsyHFnTdbW( TcIn, Win, "CalcVRFAirFlow");
+                    Houtlet = PsyHFnTdbW( Toutlet, Wout );
+                    HcoilIn = PsyHFnTdbW( TcIn, Win );
                     SHact = SH;
                     SCact = 999.0;
                     
@@ -15223,8 +15236,8 @@ Label50: ;
                             Wout = Win;
                         }
                         
-                        Houtlet = PsyHFnTdbW( Toutlet, Wout, "CalcVRFAirFlow");
-                        HcoilIn = PsyHFnTdbW( TcoilIn, Win, "CalcVRFAirFlow"); 
+                        Houtlet = PsyHFnTdbW( Toutlet, Wout );
+                        HcoilIn = PsyHFnTdbW( TcoilIn, Win ); 
                         SCact = 999.0; 
                     }
                 }
@@ -15233,7 +15246,7 @@ Label50: ;
         } else if( Mode > 0.5 && Mode < 1.5 && QZnReqSenHeatingLoad > 0.0 ) {
         
             BF = DXCoil( HeatCoil).BF;
-            Qfan = DXCoil( HeatCoil).QFan;
+            Qfan = DXCoil( HeatCoil).Qfan;
             Garate = DXCoil( HeatCoil).RatedAirMassFlowRate( 1);
             TairInlet = DXCoil( HeatCoil).InletAirTemp;
             Win = DXCoil( HeatCoil).InletAirHumRat;
@@ -15263,8 +15276,8 @@ Label50: ;
                     TcIn = TairInlet + Qfan* pow_2( FanSpdRatio)/Garate/1005.0;
                     Toutlet = TcIn +( Th21 - TcIn)*(1-BF );
                     Wout = Win;
-                    Houtlet = PsyHFnTdbW( Toutlet, Wout, "CalcVRFAirFlow" );
-                    HcoilIn = PsyHFnTdbW( TcIn, Win, "CalcVRFAirFlow" );
+                    Houtlet = PsyHFnTdbW( Toutlet, Wout );
+                    HcoilIn = PsyHFnTdbW( TcIn, Win );
                     SHact = 999.0;
                     SCact = SC;
                 } 
@@ -15291,8 +15304,8 @@ Label50: ;
         			}
         			
         			Wout = Win; 
-        			Houtlet = PsyHFnTdbW( Toutlet, Wout, "CalcVRFAirFlow" );
-        			HcoilIn = PsyHFnTdbW( TcoilIn, Win, "CalcVRFAirFlow" );
+        			Houtlet = PsyHFnTdbW( Toutlet, Wout );
+        			HcoilIn = PsyHFnTdbW( TcoilIn, Win );
         			SHact = 999.0;
         		}
         	}
@@ -15321,7 +15334,7 @@ Label50: ;
 	
 	Real64 
 	FanSpdResidual( 
-		Real64 FanSpdRto, // indoor unit fan speed ratio  
+		Real64 const FanSpdRto, // indoor unit fan speed ratio  
 	    Array1< Real64 > const & Par        // parameters
 	)
 	{
@@ -15372,7 +15385,7 @@ Label50: ;
 	
 	Real64 
 	FanSpdResidualHeat( 
-		Real64 FanSpdRto, // indoor unit fan speed ratio  
+		Real64 const FanSpdRto, // indoor unit fan speed ratio  
 		Array1< Real64 > const & Par        // parameters
 	)
 	{

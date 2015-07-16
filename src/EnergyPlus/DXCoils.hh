@@ -87,6 +87,12 @@ namespace DXCoils {
 	extern Array1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
+	// Followings for VRF FluidTCtrl Only
+	extern Array1D< Real64 >  DXCoilSH; // Yoshi_DX superheating degrees [C]
+	extern Array1D< Real64 >  DXCoilSC; // Yoshi_DX subcooling degrees [C]
+	extern Array1D< Real64 >  DXCoil_InletAirDBT; // Yoshi_InletAirDBT [C]
+	extern int MinIDUFanSpeed; //XP_minimum indoor unit fan speed ratio
+	
 	extern int CurDXCoilNum;
 
 	extern int NumDXCoils; // Total number of DX coils
@@ -440,6 +446,22 @@ namespace DXCoils {
 		int MSSpeedNumHS; // current high speed number of multspeed HP
 		Real64 MSSpeedRatio; // current speed ratio of multspeed HP
 		Real64 MSCycRatio; // current cycling ratio of multspeed HP
+		
+		//The following members are for VRF Coils (FluidTCtrl Model)
+		Real64 EvaporatingTemp; // XP_indoor unit evaporating temperature [C]
+		Real64 CondensingTemp; // XP_indoor unit condensing temperature [C]
+		Real64 C1Te; // XP_Indoor Unit Coefficient 1 to calculate Te,req
+		Real64 C2Te; // XP_Indoor Unit Coefficient 2 to calculate Te,req
+		Real64 C3Te; // XP_Indoor Unit Coefficient 3 to calculate Te,req
+		Real64 C1Tc; // XP_Indoor Unit Coefficient 1 to calculate Tc,req
+		Real64 C2Tc; // XP_Indoor Unit Coefficient 2 to calculate Tc,req 
+		Real64 C3Tc; // XP_Indoor Unit Coefficient 3 to calculate Tc,req
+		Real64 Qfan; // XP_Indoor Unit fan motor released heat at nominal condition
+		Real64 BF  ; // XP_Bypass factor
+		Real64 SH  ; // XP_Superheating
+		Real64 SC  ; // XP_Subcooling 
+		Real64 ActualSH; // XP_Superheating
+		Real64 ActualSC; // XP_Subcooling 
 
 		// Default Constructor
 		DXCoilData() :
@@ -660,9 +682,21 @@ namespace DXCoils {
 			MSSpeedNumLS( 1 ),
 			MSSpeedNumHS( 2 ),
 			MSSpeedRatio( 0.0 ),
-			MSCycRatio( 0.0 )
-
-
+			MSCycRatio( 0.0 ),
+			EvaporatingTemp( 4.0 ),  
+			CondensingTemp( 40.0 ), 
+			C1Te( 0.0 ),	                
+			C2Te( 0.0 ),                 
+			C3Te( 0.0 ),                 
+			C1Tc( 0.0 ),	                
+			C2Tc( 0.0 ),                 
+			C3Tc( 0.0 ),                 
+			Qfan( 0.0 ),                 
+			BF( 0.0 ),                   
+			SH( 0.0 ),                   
+			SC( 0.0 ),                   
+			ActualSH( 0.0 ),             
+			ActualSC( 0.0 ) 
 		{}
 
 		// Member Constructor
@@ -923,7 +957,21 @@ namespace DXCoils {
 			int const MSSpeedNumLS, // current low speed number of multspeed HP
 			int const MSSpeedNumHS, // current high speed number of multspeed HP
 			Real64 const MSSpeedRatio, // current speed ratio of multspeed HP
-			Real64 const MSCycRatio // current cycling ratio of multspeed HP
+			Real64 const MSCycRatio, // current cycling ratio of multspeed HP
+			Real64 const EvaporatingTemp, // XP_indoor unit evaporating temperature [C]
+			Real64 const CondensingTemp, // XP_indoor unit condensing temperature [C]
+			Real64 const C1Te, // XP_Indoor Unit Coefficient 1 to calculate Te,req
+			Real64 const C2Te, // XP_Indoor Unit Coefficient 2 to calculate Te,req
+			Real64 const C3Te, // XP_Indoor Unit Coefficient 3 to calculate Te,req
+			Real64 const C1Tc, // XP_Indoor Unit Coefficient 1 to calculate Tc,req
+			Real64 const C2Tc, // XP_Indoor Unit Coefficient 2 to calculate Tc,req 
+			Real64 const C3Tc, // XP_Indoor Unit Coefficient 3 to calculate Tc,req
+			Real64 const Qfan, // XP_Indoor Unit fan motor released heat at nominal condition
+			Real64 const BF  , // XP_Bypass factor
+			Real64 const SH  , // XP_Superheating
+			Real64 const SC  , // XP_Subcooling 
+			Real64 const ActualSH, // XP_Superheating
+			Real64 const ActualSC // XP_Subcooling 
 		) :
 			Name( Name ),
 			DXCoilType( DXCoilType ),
@@ -1181,8 +1229,21 @@ namespace DXCoils {
 			MSSpeedNumLS( MSSpeedNumLS ),
 			MSSpeedNumHS( MSSpeedNumHS ),
 			MSSpeedRatio( MSSpeedRatio ),
-			MSCycRatio( MSCycRatio )
-
+			MSCycRatio( MSCycRatio ),
+			EvaporatingTemp( EvaporatingTemp ),
+			CondensingTemp( CondensingTemp ),
+			C1Te( C1Te ),
+			C2Te( C2Te ),
+			C3Te( C3Te ),
+			C1Tc( C1Tc ),
+			C2Tc( C2Tc ),
+			C3Tc( C3Tc ),
+			Qfan( Qfan ),
+			BF( BF ),             
+			SH( SH ),
+			SC( SC ),
+			ActualSH( ActualSH ),
+			ActualSC( ActualSC )
 		{}
 
 	};
@@ -1619,33 +1680,33 @@ namespace DXCoils {
 	
 	void
 	CalcVRFEvapCondTemp(
-		int CoolCoilNum, // the number of the VRF Cooling DX coil to be simulated
-		int HeatCoilNum, // the number of the VRF Heating DX coil to be simulated
-		int ZoneIndex,   // index to zone where the VRF Terminal Unit resides
-		Real64 EvapTemp, // evaporating temperature
-		Real64 CondTemp  // condensing temperature 
+		int const CoolCoilNum, // the number of the VRF Cooling DX coil to be simulated
+    	int const HeatCoilNum, // the number of the VRF Heating DX coil to be simulated
+    	int const ZoneIndex,   // index to zone where the VRF Terminal Unit resides
+    	Real64 & EvapTemp, // evaporating temperature
+    	Real64 & CondTemp  // condensing temperature 
 	);
 	
 	void
 	CalcVRFAirFlow (
-		int ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
-		int Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
-		Real64 Temp,    // evaporating or condensing temperature
-		int CoolCoil,   // index to VRFTU cooling coil 
-		int HeatCoil,   // index to VRFTU heating coil
-		Real64 FanSpdRatio, // fan speed ratio
-		Real64 Wout,    // outlet air humidity ratio
-		Real64 Toutlet, // outlet air temperature
-		Real64 Houtlet, // outlet air enthalpy
-		Real64 HcoilIn, // inlet air enthalpy
-		Real64 TcIn,    // coil inlet temperature
-		Real64 SHact,   // actual SH
-		Real64 SCact    // actual SC
+		int const ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
+        int const Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
+        Real64 const Temp,    // evaporating or condensing temperature
+        int const CoolCoil,   // index to VRFTU cooling coil 
+        int const HeatCoil,   // index to VRFTU heating coil
+        Optional< Real64 >  & FanSpdRatio, // fan speed ratio
+        Optional< Real64 >  & Wout,    // outlet air humidity ratio
+        Optional< Real64 >  & Toutlet, // outlet air temperature
+        Optional< Real64 >  & Houtlet, // outlet air enthalpy
+        Optional< Real64 >  & HcoilIn, // inlet air enthalpy
+        Optional< Real64 >  & TcIn,    // coil inlet temperature
+        Optional< Real64 >  & SHact,   // actual SH
+        Optional< Real64 >  & SCact    // actual SC
 	);
 	
 	Real64 
 	FanSpdResidual( 
-		Real64 FanSpdRto, // indoor unit fan speed ratio  
+		Real64 const FanSpdRto, // indoor unit fan speed ratio  
 		Array1< Real64 > const & Par        // parameters
 	);
 	
