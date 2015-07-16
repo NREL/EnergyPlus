@@ -2172,51 +2172,51 @@ Under certain input parameters, the rating method will not succeed and a warning
 
 #### Overview
 
-The input objects `WaterHeater:HeatPump:\*` provide models for a heat pump water heater (HPWH) that is a compound object consisting of a water heater tank (e.g., `WaterHeater:Mixed` or `WaterHeater:Stratified`), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+The input objects `WaterHeater:HeatPump:*` provide models for a heat pump water heater (HPWH) that is a compound object consisting of a water heater tank (e.g., `WaterHeater:Mixed` or `WaterHeater:Stratified`), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
 
 There are two types of heat pump water heater models available:
 
-    1. `WaterHeater:HeatPump:PumpedCondenser`: This model is used to represent a heat pump water heater where water is removed from the tank, pumped through a condenser, and returned to the tank at a higher temperature. 
-    2. `WaterHeater:HeatPump:WrappedCondenser`: This model is used for heat pump water heaters that are more typical in the residential building context where the heating coil is wrapped around or submerged in the tank.
+1. `WaterHeater:HeatPump:PumpedCondenser`: This model is used to represent a heat pump water heater where water is removed from the tank, pumped through a condenser, and returned to the tank at a higher temperature. 
+2. `WaterHeater:HeatPump:WrappedCondenser`: This model is used for heat pump water heaters that are more typical in the residential building context where the heating coil is wrapped around or submerged in the tank.
 
 Each type of `WaterHeater:HeatPump:*` object is compatible with certain `Coil:WaterHeating:AirToWaterHeatPump:*` objects as shown in the following table:
 
 <table class="table table-striped">
   <tr>
-    <th>`WaterHeater:HeatPump:\*`</th>
-    <th>`Coil:WaterHeating:AirToWaterHeatPump:\*`</th>
+    <th>WaterHeater:HeatPump:*</th>
+    <th>Coil:WaterHeating:AirToWaterHeatPump:*</th>
   </tr>
   <tr>
-    <td rowspan="2">`PumpedCondenser`</td>
-    <td>`Pumped`</td>
+    <td rowspan="2">PumpedCondenser</td>
+    <td>Pumped</td>
   </tr>
   <tr>
-    <td>`VariableSpeed`</td>
+    <td>VariableSpeed</td>
   </tr>
   <tr>
-    <td>`WrappedCondenser`</td>
-    <td>`Wrapped`</td>
+    <td>WrappedCondenser</td>
+    <td>Wrapped</td>
   </tr>
 </table>
 
-Additionally the `WaterHeater:HeatPump:WrappedCondenser` object is only compatible with stratified tanks. Therefore `WaterHeater:HeatPump:\*` has the following tank compatibility matrix:
+Additionally the `WaterHeater:HeatPump:WrappedCondenser` object is only compatible with stratified tanks. Therefore `WaterHeater:HeatPump:*` has the following tank compatibility matrix:
 
 <table class="table table-striped">
   <tr>
-    <th rowspan="2">`WaterHeater:HeatPump:*`</th>
-    <th colspan="2">`WaterHeater:*`<br></th>
+    <th rowspan="2">WaterHeater:HeatPump:*</th>
+    <th colspan="2">WaterHeater:*<br></th>
   </tr>
   <tr>
-    <th>`Mixed`</th>
-    <th>`Stratified`</th>
+    <th>Mixed</th>
+    <th>Stratified</th>
   </tr>
   <tr>
-    <td>`Pumped`</td>
+    <td>Pumped</td>
     <td>X</td>
     <td>X</td>
   </tr>
   <tr>
-    <td>`Wrapped`</td>
+    <td>Wrapped</td>
     <td></td>
     <td>X</td>
   </tr>

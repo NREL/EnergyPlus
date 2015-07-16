@@ -17227,7 +17227,7 @@ This numeric field contains the heat pump’s condenser water flow rate in cubic
 
 #### Field: Evaporator Air Flow Rate
 
-This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
+This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump:Pumped). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump:Pumped), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
 
 #### Field: Inlet Air Configuration
 
@@ -17263,7 +17263,7 @@ This alpha field contains the name of the zone from which the heat pump evaporat
 
 #### Field: Tank Name
 
-This alpha field contains the name of the specific water heater tank (WaterHeater:Mixed object) used by this heat pump water heater. This must be a tank of type `WaterHeater:Mixed` or `WaterHeater:Stratified`.
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type `WaterHeater:Mixed` or `WaterHeater:Stratified`.
 
 #### Field: Tank Use Side Inlet Node Name
 
@@ -17283,7 +17283,7 @@ This numeric field contains the minimum inlet air dry-bulb temperature entering 
 
 #### Field: Compressor Location
 
-This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
+This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump:Pumped object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
 
 #### Field: Compressor Ambient Temperature Schedule Name
 
@@ -17499,7 +17499,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
 
 #### Water Heater Compressor Part Load Ratio
 
-This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part- load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
+This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part-load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
 
 #### Water Heater On Cycle Ancillary Electric Power [W]
 
@@ -17561,7 +17561,7 @@ This numeric field contains the distance from the bottom of the tank to the top 
 
 #### Field: Evaporator Air Flow Rate
 
-This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
+This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump:Wrapped). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump:Wrapped), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
 
 #### Field: Inlet Air Configuration
 
@@ -17597,7 +17597,7 @@ This alpha field contains the name of the zone from which the heat pump evaporat
 
 #### Field: Tank Name
 
-This alpha field contains the name of the specific water heater tank (WaterHeater:Mixed object) used by this heat pump water heater. This must be a tank of type `WaterHeater:Stratified`.
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type `WaterHeater:Stratified`.
 
 #### Field: Tank Use Side Inlet Node Name
 
@@ -17617,7 +17617,7 @@ This numeric field contains the minimum inlet air dry-bulb temperature entering 
 
 #### Field: Compressor Location
 
-This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
+This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump:Wrapped object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
 
 #### Field: Compressor Ambient Temperature Schedule Name
 
@@ -17834,7 +17834,7 @@ Fan:OnOff,
 
 #### Water Heater Compressor Part Load Ratio
 
-This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part- load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
+This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part-load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
 
 #### Water Heater On Cycle Ancillary Electric Power [W]
 

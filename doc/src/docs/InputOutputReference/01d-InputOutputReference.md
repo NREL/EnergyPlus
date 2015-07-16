@@ -8182,7 +8182,7 @@ This numeric field defines the condenser inlet water temperature, in degrees Cel
 
 #### Field: Rated Evaporator Air Flow Rate
 
-This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated   (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
+This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
 
 #### Field: Rated Condenser Water Flow Rate
 
@@ -8230,7 +8230,7 @@ This numeric field defines the compressor's crankcase heater capacity in Watts. 
 
 #### Field: Maximum Ambient Temperature for Crankcase Heater Operation
 
-This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off   The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
+This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off. The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
 
 #### Field: Evaporator Air Temperature Type for Curve Objects
 
@@ -8262,7 +8262,7 @@ This alpha field specifies the name of a **quadratic** or **cubic** performance 
 
 #### Field: Part Load Fraction Correlation Curve Name
 
-This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the    effective    EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
 
 The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 &lt;= PLR &lt; 1), the following rules apply:
 
@@ -8370,11 +8370,11 @@ This output field is the average runtime fraction of the DX coil compressor for 
 
 #### Cooling Coil Crankcase Heater Electric Power[W]
 
-This output field is the average electricity consumption rate of the DX coil compressor   s crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
+This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
 #### Cooling Coil Crankcase Heater Electric Energy [J]
 
-This output field is the total electricity consumption of the DX coil compressor   s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
 #### Cooling Coil Total Water Heating Rate [W]
 
@@ -8438,7 +8438,7 @@ This numeric field defines the condenser inlet water temperature, in degrees Cel
 
 #### Field: Rated Evaporator Air Flow Rate
 
-This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated   (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
+This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
 
 #### Field: Evaporator Fan Power Included in Rated COP
 
@@ -8458,7 +8458,7 @@ This numeric field defines the compressor's crankcase heater capacity in Watts. 
 
 #### Field: Maximum Ambient Temperature for Crankcase Heater Operation
 
-This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off   The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
+This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off. The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
 
 #### Field: Evaporator Air Temperature Type for Curve Objects
 
@@ -8482,7 +8482,7 @@ This alpha field specifies the name of a **quadratic** or **cubic** performance 
 
 #### Field: Part Load Fraction Correlation Curve Name
 
-This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the    effective    EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
 
 The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 &lt;= PLR &lt; 1), the following rules apply:
 
@@ -8498,7 +8498,7 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
            PLF = 1.0 + 0.0(PLR)
 
-Following is an example input for the `Coil:WaterHeating:AirToWaterHeatPump:Pumped` object:
+Following is an example input for the `Coil:WaterHeating:AirToWaterHeatPump:Wrapped` object:
 
 ```idf
 Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
@@ -8581,11 +8581,11 @@ This output field is the average runtime fraction of the DX coil compressor for 
 
 #### Cooling Coil Crankcase Heater Electric Power[W]
 
-This output field is the average electricity consumption rate of the DX coil compressor   s crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
+This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
 #### Cooling Coil Crankcase Heater Electric Energy [J]
 
-This output field is the total electricity consumption of the DX coil compressor   s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
 #### Cooling Coil Total Water Heating Rate [W]
 

@@ -47119,7 +47119,7 @@ Coil:WaterHeating:AirToWaterHeatPump:Pumped,
 Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
        \memo Heat pump water heater (HPWH) heating coil, air-to-water direct-expansion (DX)
        \memo system which includes a water heating coil, evaporator air coil, evaporator
-       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPump:PumpedCondenser system.
+       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPump:WrappedCondenser system.
        \min-fields 14
   A1 , \field Name
        \required-field
@@ -47204,7 +47204,7 @@ Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
        \note The compressor crankcase heater only operates when the dry-bulb temperature of air
        \note surrounding the compressor is below the Maximum Ambient Temperature for Crankcase
        \note Heater Operation and the DX coil is off.  The ambient temperature surrounding the
-       \note compressor is set by the WaterHeater:HeatPump:PumpedCondenser parent object (field Compressor Location).
+       \note compressor is set by the WaterHeater:HeatPump:WrappedCondenser parent object (field Compressor Location).
   N9,  \field Maximum Ambient Temperature for Crankcase Heater Operation
        \type real
        \minimum 0
@@ -47213,7 +47213,7 @@ Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
        \note The compressor crankcase heater only operates when the dry-bulb temperature of air
        \note surrounding the compressor is below the Maximum Outdoor Temperature for Crankcase
        \note Heater Operation and the unit is off. The ambient temperature surrounding the
-       \note compressor is set by the WaterHeater:HeatPump:PumpedCondenser parent object (field Compressor Location).
+       \note compressor is set by the WaterHeater:HeatPump:WrappedCondenser parent object (field Compressor Location).
   A5,  \field Evaporator Air Temperature Type for Curve Objects
        \type choice
        \key DryBulbTemperature
@@ -64457,7 +64457,7 @@ WaterHeater:Mixed,
 WaterHeater:Stratified,
        \memo Water heater with stratified, multi-node water tank. May be used to model a tankless
        \memo water heater (small tank volume), a hot water storage tank (zero heater capacity), or
-       \memo a heat pump water heater (see WaterHeater:HeatPump:*.)
+       \memo a heat pump water heater (see WaterHeater:HeatPump:\*.)
   A1 , \field Name
        \required-field
        \type alpha
@@ -65101,7 +65101,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note A schedule value of 0 denotes inlet air is drawn only from the zone.
        \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
        \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
-       \note proportional to the schedule value.
+       \note proportional to the schedule value (i.e. 0.4 = 40% outdoor air, 60% zone air).
   A26, \field Tank Element Control Logic
        \type choice
        \key MutuallyExlcusive
@@ -65112,7 +65112,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note Simultaneous (default) means that both the tank heating element and
        \note heat pump are used at the same time recover the tank temperature.
   N8,  \field Control Sensor 1 Height In Stratified Tank
-       \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
+       \note Used to indicate height of control sensor for Tank Object Type = WaterHeater:Stratified
        \note If left blank, it will default to the height of Heater1
        \type real
        \units m
@@ -65125,7 +65125,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \maximum 1.0
        \default 1.0
   N10; \field Control Sensor 2 Height In Stratified Tank
-       \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
+       \note Used to indicate height of control sensor for Tank Object Type = WaterHeater:Stratified
        \note If left blank, it will default to the height of Heater2
        \type real
        \units m
