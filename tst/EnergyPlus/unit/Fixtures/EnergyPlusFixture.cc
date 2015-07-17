@@ -386,6 +386,8 @@ namespace EnergyPlus {
 	{
 		using namespace InputProcessor;
 
+		bool has_error = OverallErrorFlag;
+
 		EXPECT_FALSE( OverallErrorFlag );
 
 		auto index = FindItemInSortedList( name, ListOfObjects, NumObjectDefs );
@@ -397,15 +399,19 @@ namespace EnergyPlus {
 		index = ObjectStartRecord( index );
 
 		EXPECT_EQ( name, IDFRecords( index ).Name );
+		if ( name != IDFRecords( index ).Name ) has_error = true;
 		EXPECT_EQ( num_alphas, IDFRecords( index ).NumAlphas );
+		if ( num_alphas != IDFRecords( index ).NumAlphas ) has_error = true;
 		EXPECT_EQ( num_numbers, IDFRecords( index ).NumNumbers );
-		EXPECT_EQ( object_def_ptr, IDFRecords( index ).ObjectDefPtr );
-		EXPECT_TRUE( compare_containers( alphas, IDFRecords( index ).Alphas ) );
-		EXPECT_TRUE( compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) );
-		EXPECT_TRUE( compare_containers( numbers, IDFRecords( index ).Numbers ) );
-		EXPECT_TRUE( compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) );
+		if ( num_numbers != IDFRecords( index ).NumNumbers ) has_error = true;
+		EXPECT_EQ( object_def_ptr, IDFRecords( index ).ObjectDefPtr ) << "If not equal, could be due to added or removed IDD object.";
+		if ( object_def_ptr != IDFRecords( index ).ObjectDefPtr ) has_error = true;
+		if ( ! compare_containers( alphas, IDFRecords( index ).Alphas ) ) has_error = true;
+		if ( ! compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) ) has_error = true;
+		if ( ! compare_containers( numbers, IDFRecords( index ).Numbers ) ) has_error = true;
+		if ( ! compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) ) has_error = true;
 
-		return ! ::testing::Test::HasFailure();
+		return ! has_error;
 	}
 
 	InputProcessorCache::InputProcessorCache()
