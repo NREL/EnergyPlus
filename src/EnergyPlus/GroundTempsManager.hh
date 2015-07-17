@@ -89,50 +89,70 @@ namespace GroundTemps {
 	class FiniteDiffGroundTempsModel : public BaseGroundTempsModel {
 		
 		public:
-			// Public Members
+			std::string surfaceCover;
+			Real64 baseConductivity;
+			Real64 baseDensity;
+			Real64 baseSpecificHeat;
+			Real64 baseMoistureContent;
+			Real64 baseMoistureContentAtSaturation;
+			int totalNumCells;
 
-		struct Cell {
-			Real64 Density;
-			Real64 SpecificHeat;
-			Real64 Conductivity;
-			Real64 Thickness;
-			Real64 Depth;
-			Real64 Temp;
+		struct cell {
 
-			void EvaluateCellTemp();
-
-			void UpdateCellProps();
-
-			void CalcCellResistance();
-		};
-
-		struct Canopy {
-			int CanopyType;
-			Real64 VegitationDensity;
-
-			void CalcCanopyHT();
-		};
-
-		struct WeatherData {
-			struct SingleWeatherDataPoint {
-				Real64 DryBulbTemp;
-				Real64 WetBulbTemp;
-				Real64 WindSpeed;
+			struct properties
+			{
+				Real64 conductivity;
+				Real64 density;
+				Real64 specificHeat;
+				Real64 diffusivity;
 			};
 
-			Array1D< Real64 > SingleWeatherDataPoint;
-
-			void GetWeatherData();
+			properties props;
+		
+			int index;
+			Real64 thickness;
+			Real64 minZValue;
+			Real64 maxZValue;
+			Real64 temperature;
+			Real64 temperature_prevIteration;
+			Real64 temperature_prevTimeStep;
 	
 		};
 
-		struct GroundSurface {
-			Real64 Qnet;
-			Real64 SurfaceArea;
-			bool SnowCover;
+		Array1D< cell > cellArray;
 
-			void EvaluateGroundSurfHT();
-		};
+		void
+		initModel();
+
+		void
+		developMesh();
+
+		void
+		performSimulation();
+
+		void
+		updateSurfaceCellTemperature();
+
+		void
+		updateGeneralDomainCellTemperature();
+
+		void
+		updateBottomCellTemperature();
+
+		void
+		initDomainTemperatures();
+
+		bool
+		checkFinalTemperatureConvergence();
+
+		bool
+		checkIterationTemperatureConvergence();
+
+		void
+		updateIterationTemperatures();
+
+		void
+		updateTimeStepTemperatures();
 
 		Real64
 		getGroundTemp();
@@ -312,7 +332,7 @@ namespace GroundTemps {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

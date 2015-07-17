@@ -26,7 +26,14 @@ TEST(GroundTempsModelKusudaAchenbachTest, getGroundTemp)
 	thisGroundTempsModel.aveGroundTempAmplitude = 5;
 	thisGroundTempsModel.phaseShiftInSecs = 0;
 	
-	thisGFunc = thisGroundTempsModel.getGroundTemp( z, diffusivityGround, simTimeInSeconds );
-	EXPECT_DOUBLE_EQ( 10.0, thisGFunc );
+	//thisGFunc = thisGroundTempsModel.getGroundTemp( z, diffusivityGround, simTimeInSeconds );
+	//EXPECT_DOUBLE_EQ( 10.0, thisGFunc );
 
+}
+
+TEST( GroundTempsModelFiniteDiff, developMesh )
+{
+	FiniteDiffGroundTempsModel thisGTM;
+
+	thisGTM.developMesh();
 }

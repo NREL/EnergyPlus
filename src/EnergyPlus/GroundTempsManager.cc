@@ -135,6 +135,8 @@ namespace GroundTemps {
 	std::shared_ptr< FiniteDiffGroundTempsModel > 
 	FiniteDiffGTMFactory( int objectType, std::string objectName ){
 
+		using namespace DataIPShortCuts;
+
 		bool found = false;
 		int NumNums;
 		int NumAlphas;
@@ -149,15 +151,26 @@ namespace GroundTemps {
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 			for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-				Array1D_string cAlphaArgs;
-				Array1D< Real64 > rNumericArgs;
-
 				InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 				if ( objectName == cAlphaArgs( 1 ) ) {
 					// Read input into object here
 
 					thisModel->objectType = objectType;
+
+					thisModel->objectName = cAlphaArgs( 1 );
+
+					thisModel->surfaceCover = cAlphaArgs( 2 );
+
+					thisModel->baseConductivity = rNumericArgs( 1 );
+
+					thisModel->baseDensity = rNumericArgs( 2 );
+
+					thisModel->baseSpecificHeat = rNumericArgs( 3 );
+
+					thisModel->baseMoistureContent = rNumericArgs( 4 );
+
+					thisModel->baseMoistureContentAtSaturation = rNumericArgs( 5 );
 
 					found = true;
 					break;
@@ -166,11 +179,17 @@ namespace GroundTemps {
 
 		if ( found && !ErrorsFound ) {
 			groundTempModels.push_back( thisModel );
+
+			// Initialize the model
+			thisModel->initModel();
+
+			// Return the pointer
 			return thisModel;
 		} else {
 			ShowFatalError( "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model" );
 			return nullptr;
 		}
+
 	}
 
 	//******************************************************************************
@@ -511,7 +530,7 @@ namespace GroundTemps {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
