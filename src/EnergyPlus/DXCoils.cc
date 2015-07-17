@@ -13917,41 +13917,22 @@ Label50: ;
 		Optional< Real64 const > MaxCoolCap // maximum capacity of DX coil
 	)
 	{
-
+	//@@  EvapTemp, ZoneIndex
+		Real64 EvapTemp = 4.0;
+		int ZoneIndex = 1;
+	
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Richard Raustad
-		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
+		//       AUTHOR         Xiufeng Pang, LBNL
+		//       DATE WRITTEN   Jan 2013
+		//       MODIFIED       Jul 2015, RP Zhang, LBNL 
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the air-side performance of a direct-expansion, air-cooled
-		// VRF terminal unit cooling coil.
-		// A new subroutine was created in case this DX coil model is significantly
-		// different from the existing CalcDoe2DXCoil subroutine. The VRF heating coil
-		// uses the existing DX heating coil subroutine (CalcDXHeatingCoil).
+		// VRF terminal unit cooling coil, for the new VRF model.
 
 		// METHODOLOGY EMPLOYED:
-		// This routine simulates the performance of a variable refrigerant flow cooling coil.
-		// The routine requires the user to enter the total cooling capacity and sensible heat ratio.
-		// Since different manufacturer's rate their equipment at different air flow rates,
-		// the supply air flow rate corresponding to the rated capacities must also be
-		// entered (should be between 300 cfm/ton and 450 cfm/ton). The rated information entered by
-		// the user should NOT include the thermal or electrical impacts of the supply air fan, as
-		// this is addressed by another module.
-
-		// With the rated performance data entered by the user, the model employs some of the
-		// DOE-2.1E curve fits to adjust the capacity and efficiency of the unit as a function
-		// of entering air temperatures and supply air flow rate (actual vs rated flow). The model
-		// does NOT employ the exact same methodology to calculate performance as DOE-2.
-		// This VRF cooling coil model adjusts the rated total cooling capacity by the CAPFT
-		// and CAP funciton of flow curve/model currently used by the existing DX coil model.
-		// The part-load ratio is then applied to the total operating capacity to find the capacity
-		// required to meet the load. This VRF model then uses the ADP/bypass method to find the
-		// SHR and resulting outlet conditions given that total capacity (or delta H).
-
-		// The model checks for coil dryout conditions, and adjusts the calculated performance
-		// appropriately.
+		// This subroutine is derived from CalcVRFCoolingCoil, and implements the new VRF model for FluidTCtrl.
 
 		// REFERENCES:
 		// na
@@ -13966,6 +13947,7 @@ Label50: ;
 		using General::RoundSigDigits;
 		using General::CreateSysTimeIntervalString;
 		using DataWater::WaterStorage;
+		using namespace DataZoneEnergyDemands;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -14041,6 +14023,23 @@ Label50: ;
 		Real64 OutletAirHumRat; // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
 		Real64 ADiff; // Used for exponential
+		
+		// Followings for VRF FluidTCtrl Only @@ Refine
+		Real64 SHRRated;                // Rated Sensible Heat Ratio (sensible/total) of the cooling coil
+		Real64 QZnReqSenCoolingLoad;    // XP
+		Real64 PartCoolRatio;           // XP
+		Real64 QfanRated;               // XP
+		Real64 Qfan;                    // XP
+		Real64 FanSpdRatio;             // XP
+		Real64 Wout;                    // XP
+		Real64 TcoilIn;                 // XP
+		Real64 HcoilIn;                 // XP
+		Real64 Tout;                    // XP
+		Real64 MinSpd = 0.65;           // XP
+		Real64 ActualSH;                // XP
+		Real64 ActualSC;                // XP
+		int OperatingMode;              // XP
+		bool FanCycFlag;                // XP
 
 		// If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
 		if ( present( PerfMode ) ) {
@@ -14073,6 +14072,10 @@ Label50: ;
 		DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction = 0.0;
 		DXCoil( DXCoilNum ).PartLoadRatio = 0.0;
 		DXCoil( DXCoilNum ).BasinHeaterPower = 0.0;
+		
+		//@@
+		DXCoil(DXCoilNum).EvaporatingTemp = EvapTemp;  // XP
+		PartCoolRatio = 0.0;
 
 		if ( DXCoil( DXCoilNum ).CondenserInletNodeNum( Mode ) != 0 ) {
 			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( Mode ) ).Temp;
@@ -14174,14 +14177,15 @@ Label50: ;
 		DXCoil( DXCoilNum ).PrintLowAmbMessage = false;
 		DXCoil( DXCoilNum ).PrintLowOutTempMessage = false;
 
-		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( PartLoadRatio > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
-			if ( FanOpMode == CycFanCycCoil ) {
-				AirMassFlow /= PartLoadRatio;
-			} else if ( FanOpMode == ContFanCycCoil ) {
-				AirMassFlow *= AirFlowRatio;
-			} else {
-				AirMassFlow = DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
-			}
+		// @@ ! XP_new multi-speed fan control algorithm needs to be programmed here
+		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
+			// if ( FanOpMode == CycFanCycCoil ) {
+			// 	AirMassFlow /= PartLoadRatio;
+			// } else if ( FanOpMode == ContFanCycCoil ) {
+			// 	AirMassFlow *= AirFlowRatio;
+			// } else {
+			// 	AirMassFlow = DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
+			// }
 
 			// Check for valid air volume flow per rated total cooling capacity (200 - 500 cfm/ton)
 
@@ -14260,81 +14264,84 @@ Label50: ;
 			InletAirHumRatTemp = InletAirHumRat;
 			// No need to differentiate between curve types, single-independent curve will just use first variable
 			// (as long as the first independent variable is the same for both curve types)
-Label50: ;
-			TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), InletAirWetBulbC, CondInletTemp );
+			
+//Label50: ; @@
+			// TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( Mode ), InletAirWetBulbC, CondInletTemp );
+            // 
+			// //  Warn user if curve output goes negative
+			// if ( TotCapTempModFac < 0.0 ) {
+			// 	if ( DXCoil( DXCoilNum ).CCapFTempErrorIndex == 0 ) {
+			// 		ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+			// 		ShowContinueError( " Total Cooling Capacity Modifier curve (function of temperature) output is negative (" + TrimSigDigits( TotCapTempModFac, 3 ) + ")." );
+			// 		ShowContinueError( " Negative value occurs using a condenser inlet temperature of " + TrimSigDigits( CondInletTemp, 1 ) + " and an inlet air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + "." );
+			// 		if ( Mode > 1 ) {
+			// 			ShowContinueError( " Negative output results from stage " + TrimSigDigits( Mode ) + " compressor operation." );
+			// 		}
+			// 		ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
+			// 	}
+			// 	ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Total Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...", DXCoil( DXCoilNum ).CCapFTempErrorIndex, TotCapTempModFac, TotCapTempModFac );
+			// 	TotCapTempModFac = 0.0;
+			// }
+            // 
+			// //  Get total capacity modifying factor (function of mass flow) for off-rated conditions
+			// AirMassFlowRatio = AirMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
+			// TotCapFlowModFac = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( Mode ), AirMassFlowRatio );
 
-			//  Warn user if curve output goes negative
-			if ( TotCapTempModFac < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).CCapFTempErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
-					ShowContinueError( " Total Cooling Capacity Modifier curve (function of temperature) output is negative (" + TrimSigDigits( TotCapTempModFac, 3 ) + ")." );
-					ShowContinueError( " Negative value occurs using a condenser inlet temperature of " + TrimSigDigits( CondInletTemp, 1 ) + " and an inlet air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + "." );
-					if ( Mode > 1 ) {
-						ShowContinueError( " Negative output results from stage " + TrimSigDigits( Mode ) + " compressor operation." );
-					}
-					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
-				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Total Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...", DXCoil( DXCoilNum ).CCapFTempErrorIndex, TotCapTempModFac, TotCapTempModFac );
-				TotCapTempModFac = 0.0;
-			}
-
-			//  Get total capacity modifying factor (function of mass flow) for off-rated conditions
-			AirMassFlowRatio = AirMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
-			TotCapFlowModFac = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( Mode ), AirMassFlowRatio );
-
-			//  Warn user if curve output goes negative
-			if ( TotCapFlowModFac < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).CCapFFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
-					ShowContinueError( " Total Cooling Capacity Modifier curve (function of flow fraction) output is negative (" + TrimSigDigits( TotCapFlowModFac, 3 ) + ")." );
-					ShowContinueError( " Negative value occurs using an air flow fraction of " + TrimSigDigits( AirMassFlowRatio, 3 ) + "." );
-					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
-					if ( Mode > 1 ) {
-						ShowContinueError( " Negative output results from stage " + TrimSigDigits( Mode ) + " compressor operation." );
-					}
-				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Total Cooling Capacity Modifier curve (function of flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).CCapFFlowErrorIndex, TotCapFlowModFac, TotCapFlowModFac );
-				TotCapFlowModFac = 0.0;
-			}
-
-			if ( present( MaxCoolCap ) ) {
-				TotCap = min( MaxCoolCap, DXCoil( DXCoilNum ).RatedTotCap( Mode ) * TotCapFlowModFac * TotCapTempModFac );
-			} else {
-				TotCap = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * TotCapFlowModFac * TotCapTempModFac;
-			}
-
-			TotCap *= PartLoadRatio;
-
-			// Calculate apparatus dew point conditions using TotCap and CBF
-			hDelta = TotCap / AirMassFlow;
-			// there is an issue here with using CBF to calculate the ADP enthalpy.
-			// at low loads the bypass factor increases significantly.
-			hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBF );
-			tADP = PsyTsatFnHPb( hADP, OutdoorPressure, RoutineName );
-			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-			//  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-			wADP = min( InletAirHumRat, PsyWFnTdbH( tADP, hADP, RoutineName ) );
-			hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
-			if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
-				SHR = min( ( hTinwADP - hADP ) / ( InletAirEnthalpy - hADP ), 1.0 );
-			} else {
-				SHR = 1.0;
-			}
-			// Check for dry evaporator conditions (win < wadp)
-			if ( wADP > InletAirHumRatTemp || ( Counter >= 1 && Counter < MaxIter ) ) {
-				if ( InletAirHumRatTemp == 0.0 ) InletAirHumRatTemp = 0.00001;
-				werror = ( InletAirHumRatTemp - wADP ) / InletAirHumRatTemp;
-				// Increase InletAirHumRatTemp at constant InletAirTemp to find coil dry-out point. Then use the
-				// capacity at the dry-out point to determine exiting conditions from coil. This is required
-				// since the TotCapTempModFac doesn't work properly with dry-coil conditions.
-				InletAirHumRatTemp = RF * wADP + ( 1.0 - RF ) * InletAirHumRatTemp;
-				InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRatTemp, OutdoorPressure );
-				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-				//     InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRatTemp,InletAirPressure)
-				++Counter;
-				if ( std::abs( werror ) > Tolerance ) goto Label50; // Recalculate with modified inlet conditions
-
-			}
+			// Warn user if curve output goes negative
+			// TotCapModFac = 1.0; // XP_not used in new algorithm
+			
+			// if ( TotCapFlowModFac < 0.0 ) {
+			// 	if ( DXCoil( DXCoilNum ).CCapFFlowErrorIndex == 0 ) {
+			// 		ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+			// 		ShowContinueError( " Total Cooling Capacity Modifier curve (function of flow fraction) output is negative (" + TrimSigDigits( TotCapFlowModFac, 3 ) + ")." );
+			// 		ShowContinueError( " Negative value occurs using an air flow fraction of " + TrimSigDigits( AirMassFlowRatio, 3 ) + "." );
+			// 		ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
+			// 		if ( Mode > 1 ) {
+			// 			ShowContinueError( " Negative output results from stage " + TrimSigDigits( Mode ) + " compressor operation." );
+			// 		}
+			// 	}
+			// 	ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Total Cooling Capacity Modifier curve (function of flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).CCapFFlowErrorIndex, TotCapFlowModFac, TotCapFlowModFac );
+			// 	TotCapFlowModFac = 0.0;
+			// }
+            // 
+			// if ( present( MaxCoolCap ) ) {
+			// 	TotCap = min( MaxCoolCap, DXCoil( DXCoilNum ).RatedTotCap( Mode ) * TotCapFlowModFac * TotCapTempModFac );
+			// } else {
+			// 	TotCap = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * TotCapFlowModFac * TotCapTempModFac;
+			// }
+            // 
+			// TotCap *= PartLoadRatio;
+            // 
+			// // Calculate apparatus dew point conditions using TotCap and CBF
+			// hDelta = TotCap / AirMassFlow;
+			// // there is an issue here with using CBF to calculate the ADP enthalpy.
+			// // at low loads the bypass factor increases significantly.
+			// hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBF );
+			// tADP = PsyTsatFnHPb( hADP, OutdoorPressure, RoutineName );
+			// //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
+			// //  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
+			// wADP = min( InletAirHumRat, PsyWFnTdbH( tADP, hADP, RoutineName ) );
+			// hTinwADP = PsyHFnTdbW( InletAirDryBulbTemp, wADP );
+			// if ( ( InletAirEnthalpy - hADP ) > 1.e-10 ) {
+			// 	SHR = min( ( hTinwADP - hADP ) / ( InletAirEnthalpy - hADP ), 1.0 );
+			// } else {
+			// 	SHR = 1.0;
+			// }
+			// // Check for dry evaporator conditions (win < wadp)
+			// if ( wADP > InletAirHumRatTemp || ( Counter >= 1 && Counter < MaxIter ) ) {
+			// 	if ( InletAirHumRatTemp == 0.0 ) InletAirHumRatTemp = 0.00001;
+			// 	werror = ( InletAirHumRatTemp - wADP ) / InletAirHumRatTemp;
+			// 	// Increase InletAirHumRatTemp at constant InletAirTemp to find coil dry-out point. Then use the
+			// 	// capacity at the dry-out point to determine exiting conditions from coil. This is required
+			// 	// since the TotCapTempModFac doesn't work properly with dry-coil conditions.
+			// 	InletAirHumRatTemp = RF * wADP + ( 1.0 - RF ) * InletAirHumRatTemp;
+			// 	InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRatTemp, OutdoorPressure );
+			// 	//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
+			// 	//     InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRatTemp,InletAirPressure)
+			// 	++Counter;
+			// 	if ( std::abs( werror ) > Tolerance ) goto Label50; // Recalculate with modified inlet conditions
+            // 
+			// }
 
 			if ( DXCoil( DXCoilNum ).PLFFPLR( Mode ) > 0 && CompCycRatio < 1.0 ) {
 				PLF = CurveValue( DXCoil( DXCoilNum ).PLFFPLR( Mode ), CompCycRatio ); // Calculate part-load factor
@@ -14342,15 +14349,16 @@ Label50: ;
 				PLF = 1.0;
 			}
 
-			if ( PLF < 0.7 ) {
-				if ( DXCoil( DXCoilNum ).ErrIndex2 == 0 ) {
-					ShowWarningMessage( "The PLF curve value for the DX cooling coil " + DXCoil( DXCoilNum ).Name + " =" + RoundSigDigits( PLF, 3 ) + " for part-load ratio =" + RoundSigDigits( PartLoadRatio, 3 ) );
-					ShowContinueErrorTimeStamp( "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing." );
-					ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed]." );
-				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).Name + ", DX cooling coil PLF curve < 0.7 warning continues...", DXCoil( DXCoilNum ).ErrIndex2, PLF, PLF );
-				PLF = 0.7;
-			}
+			// @@
+			// if ( PLF < 0.7 ) {
+			// 	if ( DXCoil( DXCoilNum ).ErrIndex2 == 0 ) {
+			// 		ShowWarningMessage( "The PLF curve value for the DX cooling coil " + DXCoil( DXCoilNum ).Name + " =" + RoundSigDigits( PLF, 3 ) + " for part-load ratio =" + RoundSigDigits( PartLoadRatio, 3 ) );
+			// 		ShowContinueErrorTimeStamp( "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing." );
+			// 		ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed]." );
+			// 	}
+			// 	ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).Name + ", DX cooling coil PLF curve < 0.7 warning continues...", DXCoil( DXCoilNum ).ErrIndex2, PLF, PLF );
+			// 	PLF = 0.7;
+			// }
 
 			DXCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
 			DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction = CompCycRatio / PLF;
@@ -14371,7 +14379,10 @@ Label50: ;
 			if ( FanOpMode == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF;
 
 			//  Calculate full load output conditions
-			if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+			// if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+			SHR = 1.0;
+			TotCap = 0.0;
+			hDelta = 0.0;
 			FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 			hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 			if ( SHR < 1.0 ) {
@@ -14407,62 +14418,86 @@ Label50: ;
 
 			//  If constant fan with cycling compressor, call function to determine "effective SHR"
 			//  which includes the part-load degradation on latent capacity
-			if ( FanOpMode == ContFanCycCoil && CompCycRatio < 1.0 ) {
-				QLatRated = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * ( 1.0 - DXCoil( DXCoilNum ).RatedSHR( Mode ) );
-				QLatActual = TotCap * ( 1.0 - SHR );
-				SHRUnadjusted = SHR;
-				SHR = CalcEffectiveSHR( DXCoilNum, SHR, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, QLatRated, QLatActual, InletAirDryBulbTemp, InletAirWetBulbC, Mode );
-
-				//  Calculate full load output conditions
-				if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
-				FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
-				hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
-				if ( SHR < 1.0 ) {
-					FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
-				} else {
-					FullLoadOutAirHumRat = InletAirHumRat;
-				}
-				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
-
-			}
+			//@@
+			//  if ( FanOpMode == ContFanCycCoil && CompCycRatio < 1.0 ) {
+			//  	QLatRated = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * ( 1.0 - DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+			//  	QLatActual = TotCap * ( 1.0 - SHR );
+			//  	SHRUnadjusted = SHR;
+			//  	SHR = CalcEffectiveSHR( DXCoilNum, SHR, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, QLatRated, QLatActual, InletAirDryBulbTemp, InletAirWetBulbC, Mode );
+            //  
+			//  	//  Calculate full load output conditions
+			//  	if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+			//  	FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
+			//  	hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
+			//  	if ( SHR < 1.0 ) {
+			//  		FullLoadOutAirHumRat = PsyWFnTdbH( InletAirDryBulbTemp, hTinwout );
+			//  	} else {
+			//  		FullLoadOutAirHumRat = InletAirHumRat;
+			//  	}
+			//  	FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
+            //  
+			//  }
 
 			//  Calculate actual outlet conditions for the input part load ratio
 			//  Actual outlet conditions are "average" for time step when compressor cycles
 
-			if ( FanOpMode == ContFanCycCoil && CompCycRatio < 1.0 ) {
-				// Continuous fan, cycling compressor
-				OutletAirEnthalpy = ( ( PartLoadRatio * AirFlowRatio ) * FullLoadOutAirEnth + ( 1.0 - ( PartLoadRatio * AirFlowRatio ) ) * InletAirEnthalpy );
-				OutletAirHumRat = ( ( PartLoadRatio * AirFlowRatio ) * FullLoadOutAirHumRat + ( 1.0 - ( PartLoadRatio * AirFlowRatio ) ) * InletAirHumRat );
-				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
-			} else {
-				// Default to cycling fan, cycling compressor
-				OutletAirEnthalpy = FullLoadOutAirEnth;
-				OutletAirHumRat = FullLoadOutAirHumRat;
-				OutletAirTemp = FullLoadOutAirTemp;
-			}
-
-			// Check for saturation error and modify temperature at constant enthalpy
-			if ( OutletAirTemp < PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, RoutineName ) ) {
-				OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure );
-				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-				//   IF(OutletAirTemp .LT. PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)) THEN
-				//    OutletAirTemp = PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)
-				OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy );
-			}
+			// if ( FanOpMode == ContFanCycCoil && CompCycRatio < 1.0 ) {
+			// 	// Continuous fan, cycling compressor
+			// 	OutletAirEnthalpy = ( ( PartLoadRatio * AirFlowRatio ) * FullLoadOutAirEnth + ( 1.0 - ( PartLoadRatio * AirFlowRatio ) ) * InletAirEnthalpy );
+			// 	OutletAirHumRat = ( ( PartLoadRatio * AirFlowRatio ) * FullLoadOutAirHumRat + ( 1.0 - ( PartLoadRatio * AirFlowRatio ) ) * InletAirHumRat );
+			// 	OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+			// } else {
+			// 	// Default to cycling fan, cycling compressor
+			// 	OutletAirEnthalpy = FullLoadOutAirEnth;
+			// 	OutletAirHumRat = FullLoadOutAirHumRat;
+			// 	OutletAirTemp = FullLoadOutAirTemp;
+			// }
+            // 
+			// // Check for saturation error and modify temperature at constant enthalpy
+			// if ( OutletAirTemp < PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure, RoutineName ) ) {
+			// 	OutletAirTemp = PsyTsatFnHPb( OutletAirEnthalpy, OutdoorPressure );
+			// 	//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
+			// 	//   IF(OutletAirTemp .LT. PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)) THEN
+			// 	//    OutletAirTemp = PsyTsatFnHPb(OutletAirEnthalpy,InletAirPressure)
+			// 	OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy );
+			// }
 
 			// Reset AirMassFlow to inlet node air mass flow for final total, sensible and latent calculations
 			// since AirMassFlow might have been modified above (in this subroutine):
 			//     IF (FanOpMode .EQ. CycFanCycCoil) AirMassFlow = AirMassFlow / PartLoadRatio
+			
 			// For multimode coil, this should be full flow including bypassed fraction
-			AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
-			DXCoil( DXCoilNum ).TotalCoolingEnergyRate = AirMassFlow * ( InletAirEnthalpy - OutletAirEnthalpy );
-
+			// AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
+			// DXCoil( DXCoilNum ).TotalCoolingEnergyRate = AirMassFlow * ( InletAirEnthalpy - OutletAirEnthalpy );
+			
+			// XP_minimum fan speed is 70%, need to calculate the cycling ratio when room sensible load is less than the capacity provided by the IDU.
+			QZnReqSenCoolingLoad = -1.0 * ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP;
+			
+			if( QZnReqSenCoolingLoad > 0.0) {
+			// There is cooling load			
+				OperatingMode = 0;				
+				// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
+				CalcVRFIUAirFlow( ZoneIndex, OperatingMode, DXCoil( DXCoilNum ).EvaporatingTemp,DXCoilNum, DXCoilNum, FanSpdRatio, OutletAirHumRat, 
+								OutletAirTemp, OutletAirEnthalpy, HcoilIn, TcoilIn, ActualSH, ActualSC );				
+			} else {
+			// There is no cooling load
+				OutletAirTemp = DXCoil(DXCoilNum).InletAirTemp;
+				OutletAirHumRat = DXCoil(DXCoilNum).InletAirHumRat;
+				OutletAirEnthalpy = DXCoil(DXCoilNum).InletAirEnthalpy;
+				HcoilIn = DXCoil(DXCoilNum).InletAirEnthalpy;
+				TcoilIn = DXCoil(DXCoilNum).InletAirTemp;
+				ActualSH = 998.0;
+				ActualSC = 998.0;
+			}
+			
+			DXCoil( DXCoilNum ).TotalCoolingEnergyRate = AirMassFlow * ( HcoilIn - OutletAirEnthalpy );
+			
 			//! Set DataHeatGlobal heat reclaim variable for use by heat reclaim coil (part load ratio is accounted for)
 			//! Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
 			//  HeatReclaimDXCoil(DXCoilNum)%AvailCapacity = DXCoil(DXCoilNum)%TotalCoolingEnergyRate + DXCoil(DXCoilNum)%ElecCoolingPower
 
 			MinAirHumRat = min( InletAirHumRat, OutletAirHumRat );
-			DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * ( PsyHFnTdbW( InletAirDryBulbTemp, MinAirHumRat ) - PsyHFnTdbW( OutletAirTemp, MinAirHumRat ) );
+			DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * 1005.0 * ( TcoilIn - OutletAirTemp );
 			//  Don't let sensible capacity be greater than total capacity
 			if ( DXCoil( DXCoilNum ).SensCoolingEnergyRate > DXCoil( DXCoilNum ).TotalCoolingEnergyRate ) {
 				DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
@@ -14471,10 +14506,13 @@ Label50: ;
 			DXCoil( DXCoilNum ).OutletAirTemp = OutletAirTemp;
 			DXCoil( DXCoilNum ).OutletAirHumRat = OutletAirHumRat;
 			DXCoil( DXCoilNum ).OutletAirEnthalpy = OutletAirEnthalpy;
+			// Followings for VRF FluidTCtrl Only
+			DXCoil( DXCoilNum ).ActualSH = ActualSH;
+			DXCoil( DXCoilNum ).ActualSC = ActualSC;
 
 		} else {
-
-			// DX coil is off; just pass through conditions
+		// DX coil is off; just pass through conditions
+			
 			DXCoil( DXCoilNum ).OutletAirEnthalpy = DXCoil( DXCoilNum ).InletAirEnthalpy;
 			DXCoil( DXCoilNum ).OutletAirHumRat = DXCoil( DXCoilNum ).InletAirHumRat;
 			DXCoil( DXCoilNum ).OutletAirTemp = DXCoil( DXCoilNum ).InletAirTemp;
@@ -14485,6 +14523,9 @@ Label50: ;
 			DXCoil( DXCoilNum ).LatCoolingEnergyRate = 0.0;
 			DXCoil( DXCoilNum ).EvapCondPumpElecPower = 0.0;
 			DXCoil( DXCoilNum ).EvapWaterConsumpRate = 0.0;
+			// Followings for VRF FluidTCtrl Only
+			DXCoil( DXCoilNum ).ActualSH = 999.0;
+			DXCoil( DXCoilNum ).ActualSC = 999.0;
 
 			// Reset globals when DX coil is OFF for use in heat recovery module
 			DXCoilFullLoadOutAirTemp( DXCoilNum ) = 0.0;
@@ -14506,6 +14547,7 @@ Label50: ;
 		DXCoilCoolInletAirWBTemp( DXCoilNum ) = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
 
 	}
+	
 	
 	void
 	CalcVRFHeatingCoil_FluidTCtrl(
@@ -14766,21 +14808,18 @@ Label50: ;
 			
 			if ( QZnHeating > 0.0 ) {
 			// There is heating load
-			
 				OperatingMode = 1;
-				
-				// calculate (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
+				// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
 				CalcVRFIUAirFlow( ZoneIndex, OperatingMode, DXCoil( DXCoilNum ).CondensingTemp, DXCoilNum, DXCoilNum, FanSpdRatio, OutletAirHumRat, 
 								OutletAirTemp, OutletAirEnthalpy, HcoilIn, TcoilIn, ActualSH, ActualSC );
-				
 			} else { 
 			// There is no heating load
 				OutletAirHumRat = DXCoil( DXCoilNum ).InletAirHumRat;
 				OutletAirTemp = DXCoil( DXCoilNum ).InletAirTemp;
 				OutletAirEnthalpy = DXCoil( DXCoilNum ).InletAirEnthalpy;
 				HcoilIn = DXCoil( DXCoilNum ).InletAirEnthalpy;
-				ActualSH = 999.0;
-				ActualSC = 999.0;
+				ActualSH = 998.0;
+				ActualSC = 998.0;
 			}
 			
 			DXCoil( DXCoilNum ).OutletAirTemp = OutletAirTemp;
