@@ -4588,61 +4588,69 @@ namespace DXCoils {
 			DXCoil( DXCoilNum ).RatedSHR( 1 ) = Numbers( 2 );
 			DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = Numbers( 3 );
 
-			DXCoil( DXCoilNum ).CCapFTemp( 1 ) = GetCurveIndex( Alphas( 3 ) );
-			// Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
-			{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
+			// @@
+			DXCoil( DXCoilNum ).C1Te = Numbers( 4 );
+			DXCoil( DXCoilNum ).C2Te = Numbers( 5 );
+			DXCoil( DXCoilNum ).C3Te = Numbers( 6 );
+			DXCoil( DXCoilNum ).Qfan = Numbers( 7 );
+			DXCoil( DXCoilNum ).BF   = Numbers( 8 );
+			DXCoil( DXCoilNum ).SH   = Numbers( 9 );
+			
+			// DXCoil( DXCoilNum ).CCapFTemp( 1 ) = GetCurveIndex( Alphas( 3 ) );
+			// // Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
+			// { auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
+            // 
+			// if ( SELECT_CASE_var == "LINEAR" ) {
+			// 	DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Linear;
+            // 
+			// } else if ( SELECT_CASE_var == "QUADRATIC" ) {
+			// 	DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
+            // 
+			// } else if ( SELECT_CASE_var == "CUBIC" ) {
+			// 	DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
+            // 
+			// } else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 	DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
+            // 
+			// } else {
+			// 	ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+			// 	ShowContinueError( "...illegal " + cAlphaFields( 3 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
+			// 	ShowContinueError( "... Curve type must be Linear, Quadratic, Cubic, or BiQuadratic." );
+			// 	ErrorsFound = true;
+			// }}
+            // 
+			// DXCoil( DXCoilNum ).CCapFFlow( 1 ) = GetCurveIndex( Alphas( 4 ) ); // convert curve name to number
+			// if ( DXCoil( DXCoilNum ).CCapFFlow( 1 ) == 0 ) {
+			// 	if ( lAlphaBlanks( 4 ) ) {
+			// 		ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
+			// 		ShowContinueError( "...required " + cAlphaFields( 4 ) + " is blank." );
+			// 	} else {
+			// 		ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+			// 		ShowContinueError( "...not found " + cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\"." );
+			// 	}
+			// 	ErrorsFound = true;
+			// } else {
+			// 	// Verify Curve Object, only legal type is Linear, Quadratic or Cubic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
+            // 
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+            // 
+			// 	} else {
+			// 		ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+			// 		ShowContinueError( "...illegal " + cAlphaFields( 4 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
+			// 		ShowContinueError( "... Curve type must be Linear, Quadratic or Cubic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
 
-			if ( SELECT_CASE_var == "LINEAR" ) {
-				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Linear;
+			DXCoil( DXCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
+			DXCoil( DXCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			} else if ( SELECT_CASE_var == "CUBIC" ) {
-				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
+			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
-			} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-
-			} else {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-				ShowContinueError( "...illegal " + cAlphaFields( 3 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
-				ShowContinueError( "... Curve type must be Linear, Quadratic, Cubic, or BiQuadratic." );
-				ErrorsFound = true;
-			}}
-
-			DXCoil( DXCoilNum ).CCapFFlow( 1 ) = GetCurveIndex( Alphas( 4 ) ); // convert curve name to number
-			if ( DXCoil( DXCoilNum ).CCapFFlow( 1 ) == 0 ) {
-				if ( lAlphaBlanks( 4 ) ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-					ShowContinueError( "...required " + cAlphaFields( 4 ) + " is blank." );
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "...not found " + cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\"." );
-				}
-				ErrorsFound = true;
-			} else {
-				// Verify Curve Object, only legal type is Linear, Quadratic or Cubic
-				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
-
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "...illegal " + cAlphaFields( 4 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
-					ShowContinueError( "... Curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			DXCoil( DXCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-
-			DXCoil( DXCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-
-			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 5 ), Alphas( 6 ), "Air Nodes" );
-
-			DXCoil( DXCoilNum ).CondensateCollectName = Alphas( 7 );
-			if ( lAlphaBlanks( 7 ) ) {
+			DXCoil( DXCoilNum ).CondensateCollectName = Alphas( 5 );
+			if ( lAlphaBlanks( 5 ) ) {
 				DXCoil( DXCoilNum ).CondensateCollectMode = CondensateDiscarded;
 			} else {
 				DXCoil( DXCoilNum ).CondensateCollectMode = CondensateToTank;
@@ -4695,6 +4703,14 @@ namespace DXCoils {
 			}
 			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
 			DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = Numbers( 2 );
+
+			// @@
+			DXCoil( DXCoilNum ).C1Tc = Numbers( 3 );
+			DXCoil( DXCoilNum ).C2Tc = Numbers( 4 );
+			DXCoil( DXCoilNum ).C3Tc = Numbers( 5 );
+			DXCoil( DXCoilNum ).Qfan = Numbers( 6 );
+			DXCoil( DXCoilNum ).BF   = Numbers( 7 );
+			DXCoil( DXCoilNum ).SC   = Numbers( 8 );
 
 			DXCoil( DXCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
@@ -4958,14 +4974,7 @@ namespace DXCoils {
 				SetupOutputVariable("Secondary Coil Sensible Heat Ratio []", DXCoil(DXCoilNum).SecCoilSHR, "System", "Average", DXCoil(DXCoilNum).Name);
 			}
 		}
-
-		//@@ Add for_FluidTCtrl
-		// Set Up Output Variable for VRF cooling coils (VRF FluidTCtrl Model)
-		// ...
-		// Set Up Output Variable for VRF heating coils (VRF FluidTCtrl Model)
-		// ...
 		
-		// Set Up Output Variable for VRF cooling coils
 		for ( DXCoilNum = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils; ++DXCoilNum ) {
 			// Setup Report Variables for Cooling Equipment:
 			// CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow
@@ -4982,13 +4991,44 @@ namespace DXCoils {
 			}
 		}
 
-		// Set Up Output Variable for VRF heating coils
 		for ( DXCoilNum = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils; ++DXCoilNum ) {
 			// Setup Report Variables for Heating Equipment:
 			// CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow
 			SetupOutputVariable( "Heating Coil Total Heating Rate [W]", DXCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Total Heating Energy [J]", DXCoil( DXCoilNum ).TotalHeatingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Runtime Fraction []", DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
+		}
+		
+		for ( DXCoilNum = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils + NumVRFCoolingFluidTCtrlCoils; ++DXCoilNum ) {
+			// @@ Setup Report Variables for Cooling Equipment:
+			// CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
+			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", DXCoil( DXCoilNum ).TotalCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", DXCoil( DXCoilNum ).TotalCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", DXCoil( DXCoilNum ).SensCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", DXCoil( DXCoilNum ).SensCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", DXCoil( DXCoilNum ).LatCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", DXCoil( DXCoilNum ).LatCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Runtime Fraction []", DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
+			// Followings for VRF FluidTCtrl Only
+			SetupOutputVariable( "Cooling Coil VRF Evaporating Temperature [C]", DXCoil( DXCoilNum ).EvaporatingTemp, "System", "Average", DXCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil VRF Super Heating Degrees [C]", DXCoil( DXCoilNum ).ActualSH, "System", "Average", DXCoil( DXCoilNum ).Name );
+			
+			if ( DXCoil( DXCoilNum ).CondensateCollectMode == CondensateToTank ) {
+				SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate [m3/s]", DXCoil( DXCoilNum ).CondensateVdot, "System", "Average", DXCoil( DXCoilNum ).Name );
+				SetupOutputVariable( "Cooling Coil Condensate Volume [m3]", DXCoil( DXCoilNum ).CondensateVol, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
+			}
+		}
+
+		for ( DXCoilNum = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils + NumVRFCoolingFluidTCtrlCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils + NumVRFCoolingFluidTCtrlCoils + NumVRFHeatingFluidTCtrlCoils; ++DXCoilNum ) {
+			// @@ Setup Report Variables for Heating Equipment:
+			// CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
+			SetupOutputVariable( "Heating Coil Total Heating Rate [W]", DXCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Total Heating Energy [J]", DXCoil( DXCoilNum ).TotalHeatingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Runtime Fraction []", DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
+			// Followings for VRF FluidTCtrl Only
+			SetupOutputVariable( "Heating Coil VRF Condensing Temperature [C]", DXCoil( DXCoilNum ).CondensingTemp, "System", "Average", DXCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Heating Coil VRF Subcooling Degrees [C]", DXCoil( DXCoilNum ).ActualSC, "System", "Average", DXCoil( DXCoilNum ).Name );
+			
 		}
 		
 		if ( AnyEnergyManagementSystemInModel ) {
@@ -14545,6 +14585,10 @@ Label50: ;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp;
 		DXCoilTotalCooling( DXCoilNum ) = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
 		DXCoilCoolInletAirWBTemp( DXCoilNum ) = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
+		
+		DXCoilSH( DXCoilNum ) = DXCoil( DXCoilNum ).ActualSH;
+		DXCoilSC( DXCoilNum ) = DXCoil( DXCoilNum ).ActualSC;
+		DXCoil_InletAirDBT( DXCoilNum ) = DXCoil( DXCoilNum ).InletAirTemp;
 
 	}
 	
@@ -14866,7 +14910,7 @@ Label50: ;
 		DXCoilSH( DXCoilNum ) = DXCoil( DXCoilNum ).ActualSH;
 		DXCoilSC( DXCoilNum ) = DXCoil( DXCoilNum ).ActualSC;
 		DXCoil_InletAirDBT( DXCoilNum ) = DXCoil( DXCoilNum ).InletAirTemp;
-
+		
 		// calc secondary coil if specified 
 		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
 			CalcSecondaryDXCoils( DXCoilNum );
