@@ -2147,14 +2147,17 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE5-1,                !- Inlet Air Zone Name
+    WaterHeater:Stratified,       !- Tank Object Type
     HPWHTank,                !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHDXCoil,              !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
     HPWHFan,                 !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2218,20 +2221,8 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
+  10;                                 !- Number of Nodes
+
   Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHDXCoil,              !- Name
     4000.0,                  !- Rated Heating Capacity {W}
@@ -2393,14 +2384,17 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE4-1,                !- Inlet Air Zone Name
+    WaterHeater:Stratified,       !- Tank Object Type
     Zone4HPWHTank,           !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     Zone4HPWHDXCoil,         !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
     Zone4HPWHFan,            !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2464,20 +2458,8 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
+  10;                                 !- Number of Nodes
+
   Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     Zone4HPWHDXCoil,         !- Name
     4000.0,                  !- Rated Heating Capacity {W}
@@ -2539,14 +2521,17 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE4-1,                !- Inlet Air Zone Name
+    WaterHeater:Stratified,       !- Tank Object Type
     Zone4bHPWHTank,           !- Tank Name
     Water Heater Use Inlet Node,                        !- Tank Use Side Inlet Node Name
     Water Heater Use Outlet Node,                        !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     Zone4bHPWHDXCoil,         !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
     Zone4bHPWHFan,            !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2610,20 +2595,8 @@
   autosize,                           !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
+  10;                                 !- Number of Nodes
+
   Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     Zone4bHPWHDXCoil,         !- Name
     4000,                  !- Rated Heating Capacity {W}
@@ -2685,14 +2658,17 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
+    WaterHeater:Stratified,       !- Tank Object Type
     HPWHOutdoorTank,         !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHOutdoorDXCoil,       !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
     HPWHOutdoorFan,          !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -2756,20 +2732,8 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
+  10;                                 !- Number of Nodes
+
   OutdoorAir:Node,
     HPWHOutdoorTank OA Node; !- Name
 
@@ -2862,14 +2826,17 @@
     ScheduledAmbientTemp,    !- Inlet Air Temperature Schedule Name
     ScheduledAmbientRH,      !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
+    WaterHeater:Stratified,       !- Tank Object Type
     HPWHScheduledTank,       !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHScheduledDXCoil,     !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Schedule,                !- Compressor Location
     ScheduledCompressorTemp, !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
     HPWHScheduledFan,        !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -2933,20 +2900,8 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
+  10;                                 !- Number of Nodes
+
   Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHScheduledDXCoil,     !- Name
     4000.0,                  !- Rated Heating Capacity {W}
@@ -3043,21 +2998,9 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
-  Site:WaterMainsTemperature,
+  10;                                 !- Number of Nodes
+
+ Site:WaterMainsTemperature,
     CORRELATION,             !- Calculation Method
     ,                        !- Temperature Schedule Name
     9.69,                    !- Annual Average Outdoor Air Temperature {C}
@@ -4009,14 +3952,17 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
+    WaterHeater:Stratified,       !- Tank Object Type
     HPWHPlantTank,           !- Tank Name
     HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHPlantDXCoil,         !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
     HPWHPlantFan,            !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -4080,20 +4026,8 @@
   autosize,                                 !- Use Side Design Flow Rate
   ,                                         !- Source Side Design Flow Rate
   ,                                         !- Indirect Water Heating Recovery Time
-  10,                                       !- Number of Nodes
-  ,                                         !- Additional Destratification Conductivity
-  ,                                         !- Node 1 Additional Loss Coefficient
-  ,                                         !- Node 2 Additional Loss Coefficient
-  ,                                         !- Node 3 Additional Loss Coefficient
-  ,                                         !- Node 4 Additional Loss Coefficient
-  ,                                         !- Node 5 Additional Loss Coefficient
-  ,                                         !- Node 6 Additional Loss Coefficient
-  ,                                         !- Node 7 Additional Loss Coefficient
-  ,                                         !- Node 8 Additional Loss Coefficient
-  ,                                         !- Node 9 Additional Loss Coefficient
-  ,                                         !- Node 10 Additional Loss Coefficient
-  ,                                         !- Source Side Flow Control Mode
-  ;                                         !- Indirect Alternate Setpoint Temperature Schedule Name
+  10;                                       !- Number of Nodes
+
   OutdoorAir:Node,
     HPWHPlantTank OA Node;   !- Name
 

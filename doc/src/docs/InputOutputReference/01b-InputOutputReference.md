@@ -16078,9 +16078,10 @@ There are currently two water heater objects in EnergyPlus:
 
 - WaterHeater:Stratified
 
-There is also a compound object that uses the WaterHeater:Mixed as part of its strategy:
+There are also compound objects that uses the WaterHeater:Mixed and/or WaterHeater:Stratified as part of their strategy:
 
-- WaterHeater:HeatPump:\*
+- WaterHeater:HeatPump:PumpedCondenser (WaterHeater:Mixed or WaterHeater:Stratified)
+- WaterHeater:HeatPump:WrappedCondenser (WaterHeater:Stratified only)
 
 The WaterHeater:Mixed object simulates a well-mixed, single-node water tank. The WaterHeater:Stratified object simulates a stratified, multi-node water tank. Both water heater objects can be appropriate for simulating many types of water heaters and storage tanks, including gas and electric residential water heaters, and a variety of large commercial water heaters. Both objects share similar features, such as stand-alone operation, on- and off-cycle parasitic loads, and thermal losses to the zone. However, each object has its advantages which may make one water heater object more appropriate than the other depending on the application.
 
@@ -17261,6 +17262,10 @@ This alpha field contains the name of a schedule used to define the humidity of 
 
 This alpha field contains the name of the zone from which the heat pump evaporator and fan section draws some or all of its inlet air. This field is only used when the Inlet Air Configuration defined above is specified as ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’.
 
+#### Field: Tank Object Type
+
+This alpha (choice) field contains the type of water heater tank used by this heat pump water heater. Currently, the only valid choices are WaterHeater:Mixed or WaterHeater:Stratified.
+
 #### Field: Tank Name
 
 This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type `WaterHeater:Mixed` or `WaterHeater:Stratified`.
@@ -17272,6 +17277,10 @@ This alpha field contains the name of the use side inlet node of the water heate
 #### Field: Tank Use Side Outlet Node Name
 
 This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. `WaterHeater:Mixed`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:PumpedCondenser` object (see branch object example below).
+
+#### Field: DX Coil Object Type
+
+This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped.
 
 #### Field: DX Coil Name
 
@@ -17288,6 +17297,10 @@ This alpha (choice) field contains the location of the heat pump compressor and 
 #### Field: Compressor Ambient Temperature Schedule Name
 
 This alpha field contains the name of a schedule that defines the ambient air temperature surrounding the heat pump compressor, which is used to control the compressor’s crankcase heater operation. This field is only used when the compressor location field defined above is specified as ‘Schedule’, otherwise it should be left blank.
+
+#### Field: Fan Object Type
+
+This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choice is Fan: OnOff.
 
 #### Field: Fan Name
 
@@ -17360,13 +17373,16 @@ WaterHeater:HeatPump:PumpedCondenser,
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
+    WaterHeater:Mixed,       !- Tank Object Type
     HPWHPlantTank,           !- Tank Name
     HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHPlantDXCoil,         !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
     HPWHPlantFan,            !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -17595,6 +17611,10 @@ This alpha field contains the name of a schedule used to define the humidity of 
 
 This alpha field contains the name of the zone from which the heat pump evaporator and fan section draws some or all of its inlet air. This field is only used when the Inlet Air Configuration defined above is specified as ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’.
 
+#### Field: Tank Object Type
+
+This alpha (choice) field contains the type of water heater tank used by this heat pump water heater. Currently, the only valid choice is WaterHeater:Stratified.
+
 #### Field: Tank Name
 
 This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type `WaterHeater:Stratified`.
@@ -17606,6 +17626,10 @@ This alpha field contains the name of the use side inlet node of the water heate
 #### Field: Tank Use Side Outlet Node Name
 
 This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. `WaterHeater:Stratified`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:WrappedCondenser` object (see branch object example below).
+
+#### Field: DX Coil Object Type
+
+This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump:Wrapped.
 
 #### Field: DX Coil Name
 
@@ -17622,6 +17646,10 @@ This alpha (choice) field contains the location of the heat pump compressor and 
 #### Field: Compressor Ambient Temperature Schedule Name
 
 This alpha field contains the name of a schedule that defines the ambient air temperature surrounding the heat pump compressor, which is used to control the compressor’s crankcase heater operation. This field is only used when the compressor location field defined above is specified as ‘Schedule’, otherwise it should be left blank.
+
+#### Field: Fan Object Type
+
+This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choice is Fan: OnOff.
 
 #### Field: Fan Name
 
@@ -17693,13 +17721,16 @@ WaterHeater:HeatPump:WrappedCondenser,
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
+    WaterHeater:Stratified,  !- Tank Object Type
     HPWHPlantTank,           !- Tank Name
     HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Wrapped,  !- DX Coil Object Type
     HPWHPlantDXCoil,         !- DX Coil Name
     7.2,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
     HPWHPlantFan,            !- Fan Name
     DrawThrough,             !- Fan Placement
     0,                       !- On Cycle Parasitic Electric Load {W}

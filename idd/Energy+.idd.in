@@ -64457,7 +64457,7 @@ WaterHeater:Mixed,
 WaterHeater:Stratified,
        \memo Water heater with stratified, multi-node water tank. May be used to model a tankless
        \memo water heater (small tank volume), a hot water storage tank (zero heater capacity), or
-       \memo a heat pump water heater (see WaterHeater:HeatPump:\*.)
+       \memo a heat pump water heater (see WaterHeater:HeatPump:*.)
   A1 , \field Name
        \required-field
        \type alpha
@@ -64898,7 +64898,7 @@ WaterHeater:Sizing,
        \minimum 0.0
 
 WaterHeater:HeatPump:PumpedCondenser,
-       \min-fields 29
+       \min-fields 32
        \memo This object models an air-source heat pump for water heating where the water is pumped out of the tank,
        \memo through a heating coil and returned to the tank. 
        \memo For wrapped condenser HPWHs, see WaterHeater:HeatPump:WrappedCondenser.
@@ -65004,22 +65004,37 @@ WaterHeater:HeatPump:PumpedCondenser,
        \object-list ZoneNames
        \note Used only if Inlet Air Configuration is ZoneAirOnly or ZoneAndOutdoorAir.
        \note Otherwise, leave field blank.
-  A14, \field Tank Name
+  A14, \field Tank Object Type
+       \required-field
+       \type choice
+       \key WaterHeater:Mixed
+       \key WaterHeater:Stratified
+       \default WaterHeater:Mixed
+       \note Specify the type of water heater tank used by this heat pump water heater.
+  A15, \field Tank Name
        \required-field
        \type object-list
        \object-list WaterHeaterNames
        \note Needs to match the name used in the corresponding Water Heater object.
-  A15, \field Tank Use Side Inlet Node Name
+  A16, \field Tank Use Side Inlet Node Name
        \type node
        \note Used only when the heat pump water heater is connected to a plant loop,
        \note otherwise leave blank. Needs to match the name used in the corresponding
        \note Water Heater object when connected to a plant loop.
-  A16, \field Tank Use Side Outlet Node Name
+  A17, \field Tank Use Side Outlet Node Name
        \type node
        \note Used only when the heat pump water heater is connected to a plant loop,
        \note otherwise leave blank. Needs to match the name used in the corresponding
        \note Water Heater object when connected to a plant loop.
-  A17, \field DX Coil Name
+  A18, \field DX Coil Object Type
+       \required-field
+       \type choice
+       \key Coil:WaterHeating:AirToWaterHeatPump:Pumped
+	   \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
+       \default Coil:WaterHeating:AirToWaterHeatPump:Pumped
+       \note Specify the type of DX coil used by this heat pump water heater. The only
+       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
+  A19, \field DX Coil Name
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoilsPumped
@@ -65040,7 +65055,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \maximum 94
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is above this value.
-  A18, \field Compressor Location
+  A20, \field Compressor Location
        \required-field
        \type choice
        \key Schedule
@@ -65049,16 +65064,23 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note If Zone is selected, Inlet Air Configuration must be ZoneAirOnly or
        \note ZoneAndOutdoorAir. If Schedule is selected, then you must provide a
        \note Compressor Ambient Temperature Schedule Name below.
-  A19, \field Compressor Ambient Temperature Schedule Name
+  A21, \field Compressor Ambient Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Used only if Compressor Location is Schedule, otherwise leave field blank.
-  A20, \field Fan Name
+  A22, \field Fan Object Type
+       \required-field
+       \type choice
+       \key Fan:OnOff
+       \default Fan:OnOff
+       \note Specify the type of fan used by this heat pump water heater. The only
+       \note valid choice is Fan:OnOff.
+  A23, \field Fan Name
        \required-field
        \type object-list
        \object-list FansOnOff
        \note Needs to match the name used in the corresponding Fan:OnOff object.
-  A21, \field Fan Placement
+  A24, \field Fan Placement
        \type choice
        \key BlowThrough
        \key DrawThrough
@@ -65080,7 +65102,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note Parasitic electric power consumed when the heat pump compressor is off.
        \note Does not contribute to water heating but can impact the zone air heat balance.
        \note Off-cycle parasitic power is 0 when the availability schedule is 0.
-  A22, \field Parasitic Heat Rejection Location
+  A25, \field Parasitic Heat Rejection Location
        \type choice
        \key Zone
        \key Outdoors
@@ -65088,15 +65110,15 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note This field determines if the parasitic electric load impacts the zone air
        \note heat balance. If Zone is selected, Inlet Air Configuration must be
        \note ZoneAirOnly or ZoneAndOutdoorAir.
-  A23, \field Inlet Air Mixer Node Name
+  A26, \field Inlet Air Mixer Node Name
        \type node
        \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
        \note leave field blank.
-  A24, \field Outlet Air Splitter Node Name
+  A27, \field Outlet Air Splitter Node Name
        \type node
        \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
        \note leave field blank.
-  A25, \field Inlet Air Mixer Schedule Name
+  A28, \field Inlet Air Mixer Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
@@ -65106,7 +65128,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
        \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
        \note proportional to the schedule value (i.e. 0.4 = 40% outdoor air, 60% zone air).
-  A26, \field Tank Element Control Logic
+  A29, \field Tank Element Control Logic
        \type choice
        \key MutuallyExlcusive
        \key Simultaneous
@@ -65136,7 +65158,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \minimum 0.0
 
 WaterHeater:HeatPump:WrappedCondenser,
-       \min-fields 28
+       \min-fields 31
        \memo This object models an air-source heat pump for water heating where the heating coil is wrapped around
        \memo the tank, which is typical of residential HPWHs. 
        \memo For pumped condenser HPWHs, see WaterHeater:HeatPump:PumpedCondenser.
@@ -65233,23 +65255,36 @@ WaterHeater:HeatPump:WrappedCondenser,
        \object-list ZoneNames
        \note Used only if Inlet Air Configuration is ZoneAirOnly or ZoneAndOutdoorAir.
        \note Otherwise, leave field blank.
-  A12, \field Tank Name
+  A12, \field Tank Object Type
+       \required-field
+       \type choice
+       \key WaterHeater:Stratified
+       \default WaterHeater:Stratified
+       \note Specify the type of water heater tank used by this heat pump water heater.
+  A13, \field Tank Name
        \required-field
        \type object-list
        \object-list WaterHeaterStratifiedNames
        \note Needs to match the name used in the corresponding Water Heater object. 
        \note Must be a WaterHeater:Stratified tank.
-  A13, \field Tank Use Side Inlet Node Name
+  A14, \field Tank Use Side Inlet Node Name
        \type node
        \note Used only when the heat pump water heater is connected to a plant loop,
        \note otherwise leave blank. Needs to match the name used in the corresponding
        \note Water Heater object when connected to a plant loop.
-  A14, \field Tank Use Side Outlet Node Name
+  A15, \field Tank Use Side Outlet Node Name
        \type node
        \note Used only when the heat pump water heater is connected to a plant loop,
        \note otherwise leave blank. Needs to match the name used in the corresponding
        \note Water Heater object when connected to a plant loop.
-  A15, \field DX Coil Name
+  A16, \field DX Coil Object Type
+       \required-field
+       \type choice
+       \key Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+       \default Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+       \note Specify the type of DX coil used by this heat pump water heater. The only
+       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+  A17, \field DX Coil Name
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoilsWrapped
@@ -65269,7 +65304,7 @@ WaterHeater:HeatPump:WrappedCondenser,
        \maximum 94
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is above this value.
-  A16, \field Compressor Location
+  A18, \field Compressor Location
        \required-field
        \type choice
        \key Schedule
@@ -65278,16 +65313,23 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note If Zone is selected, Inlet Air Configuration must be ZoneAirOnly or
        \note ZoneAndOutdoorAir. If Schedule is selected, then you must provide a
        \note Compressor Ambient Temperature Schedule Name below.
-  A17, \field Compressor Ambient Temperature Schedule Name
+  A19, \field Compressor Ambient Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Used only if Compressor Location is Schedule, otherwise leave field blank.
-  A18, \field Fan Name
+  A20, \field Fan Object Type
+       \required-field
+       \type choice
+       \key Fan:OnOff
+       \default Fan:OnOff
+       \note Specify the type of fan used by this heat pump water heater. The only
+       \note valid choice is Fan:OnOff.
+  A21, \field Fan Name
        \required-field
        \type object-list
        \object-list FansOnOff
        \note Needs to match the name used in the corresponding Fan:OnOff object.
-  A19, \field Fan Placement
+  A22, \field Fan Placement
        \type choice
        \key BlowThrough
        \key DrawThrough
@@ -65309,7 +65351,7 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note Parasitic electric power consumed when the heat pump compressor is off.
        \note Does not contribute to water heating but can impact the zone air heat balance.
        \note Off-cycle parasitic power is 0 when the availability schedule is 0.
-  A20, \field Parasitic Heat Rejection Location
+  A23, \field Parasitic Heat Rejection Location
        \type choice
        \key Zone
        \key Outdoors
@@ -65317,15 +65359,15 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note This field determines if the parasitic electric load impacts the zone air
        \note heat balance. If Zone is selected, Inlet Air Configuration must be
        \note ZoneAirOnly or ZoneAndOutdoorAir.
-  A21, \field Inlet Air Mixer Node Name
+  A24, \field Inlet Air Mixer Node Name
        \type node
        \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
        \note leave field blank.
-  A22, \field Outlet Air Splitter Node Name
+  A25, \field Outlet Air Splitter Node Name
        \type node
        \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
        \note leave field blank.
-  A23, \field Inlet Air Mixer Schedule Name
+  A26, \field Inlet Air Mixer Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
@@ -65335,7 +65377,7 @@ WaterHeater:HeatPump:WrappedCondenser,
        \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
        \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
        \note proportional to the schedule value.
-  A24, \field Tank Element Control Logic
+  A27, \field Tank Element Control Logic
        \type choice
        \key MutuallyExlcusive
        \key Simultaneous

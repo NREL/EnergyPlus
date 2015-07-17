@@ -292,14 +292,17 @@
     ,                             !- Inlet Air Temperature Schedule Name
     ,                             !- Inlet Air Humidity Schedule Name
     ,                             !- Inlet Air Zone Name
+    WaterHeater:Stratified,       !- Tank Type
     Water Heater Tank,            !- Tank Name
     Water Heater Use Inlet Node,  !- Tank Use Side Inlet Node Name
     Water Heater Use Outlet Node, !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Wrapped, !- DX Coil Type
     HPWHPlantDXCoil,              !- DX Coil Name
     7.2,                          !- Minimum Inlet Air Temperature for Compressor Operation {C}
     48.89,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                     !- Compressor Location
     ,                             !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,                    !- Fan Type
     HPWHPlantFan,                 !- Fan Name
     DrawThrough,                  !- Fan Placement
     0,                            !- On Cycle Parasitic Electric Load {W}
