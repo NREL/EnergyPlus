@@ -1671,6 +1671,7 @@ namespace DXCoils {
 	
 	void
 	CalcVRFHeatingCoil_FluidTCtrl(
+		int const CompOp, // compressor operation; 1=on, 0=off
 		int const DXCoilNum, // the number of the DX heating coil to be simulated
 		Real64 const PartLoadRatio, // sensible cooling load / full load sensible cooling capacity
 		int const FanOpMode, // Allows parent object to control fan mode
@@ -1679,7 +1680,7 @@ namespace DXCoils {
 	);
 	
 	void
-	CalcVRFEvapCondTemp(
+	CalcVRFIUEvapCondTemp(
 		int const CoolCoilNum, // the number of the VRF Cooling DX coil to be simulated
     	int const HeatCoilNum, // the number of the VRF Heating DX coil to be simulated
     	int const ZoneIndex,   // index to zone where the VRF Terminal Unit resides
@@ -1688,24 +1689,24 @@ namespace DXCoils {
 	);
 	
 	void
-	CalcVRFAirFlow (
+	CalcVRFIUAirFlow (
 		int const ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
         int const Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
         Real64 const Temp,    // evaporating or condensing temperature
         int const CoolCoil,   // index to VRFTU cooling coil 
         int const HeatCoil,   // index to VRFTU heating coil
-        Optional< Real64 >  & FanSpdRatio, // fan speed ratio
-        Optional< Real64 >  & Wout,    // outlet air humidity ratio
-        Optional< Real64 >  & Toutlet, // outlet air temperature
-        Optional< Real64 >  & Houtlet, // outlet air enthalpy
-        Optional< Real64 >  & HcoilIn, // inlet air enthalpy
-        Optional< Real64 >  & TcIn,    // coil inlet temperature
-        Optional< Real64 >  & SHact,   // actual SH
-        Optional< Real64 >  & SCact    // actual SC
+        Real64 & FanSpdRatio, // fan speed ratio
+        Real64 & Wout,    // outlet air humidity ratio
+        Real64 & Toutlet, // outlet air temperature
+        Real64 & Houtlet, // outlet air enthalpy
+        Real64 & HcoilIn, // inlet air enthalpy
+        Real64 & TcoilIn, // coil inlet temperature
+        Real64 & SHact,   // actual SH
+        Real64 & SCact    // actual SC
 	);
 	
 	Real64 
-	FanSpdResidual( 
+	FanSpdResidualCool( 
 		Real64 const FanSpdRto, // indoor unit fan speed ratio  
 		Array1< Real64 > const & Par        // parameters
 	);
